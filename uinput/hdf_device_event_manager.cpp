@@ -46,16 +46,17 @@ void HdfDeviceEventManager::ConnectHDFInit()
         return;
     }
 
-    std::unique_ptr<HdfDeviceEventDispatch> hdf = std::make_unique<HdfDeviceEventDispatch>();
-    if (hdf == nullptr) {
-        HiLog::Error(LABEL, "%s{public}s hdf is nullptr", __func__);
-        return;
-    }
     thread_ = std::thread(&InjectThread::InjectFunc, injectThread_);
     ret = inputInterface_->iInputManager->OpenInputDevice(TOUCH_DEV_ID);
     if ((ret == INPUT_SUCCESS) && (inputInterface_->iInputReporter != nullptr)) {
         inputInterface_->iInputManager->GetInputDevice(TOUCH_DEV_ID, &iDevInfo_);
-        callback_.EventPkgCallback = hdf->GetEventCallbackDispatch;
+        std::unique_ptr<HdfDeviceEventDispatch> hdf = std::make_unique<HdfDeviceEventDispatch>(\
+            iDevInfo_->attrSet.axisInfo[ABS_MT_POSITION_X].max, iDevInfo_->attrSet.axisInfo[ABS_MT_POSITION_Y].max);
+        if (hdf == nullptr) {
+            HiLog::Error(LABEL, "%s{public}s hdf is nullptr", __func__);
+            return;
+        }
+        callback_.ReportEventPkgCallback = hdf->GetEventCallbackDispatch;
         ret = inputInterface_->iInputReporter->RegisterReportCallback(TOUCH_DEV_ID, &callback_);
     }
 }
