@@ -14,6 +14,7 @@
         "//third_party/mtdev:libmtdev",
         "//third_party/libevdev:libevdev",
         "//third_party/libinput:libinput-third",
+        "//third_party/libinput:libinput-debug",
         "//foundation/multimodalinput/input:uinput_inject",
         "//foundation/multimodalinput/input:mmi_uinject",
         "//third_party/XKeyboardConfig:conf_xkb_geometry_sgi_vndr_indy",
