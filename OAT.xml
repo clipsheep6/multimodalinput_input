@@ -19,10 +19,10 @@
 
 <configuration>
     <oatconfig>
-        <licensefile></licensefile>
+        <licensefile>LICENSE</licensefile>
         <filefilterlist>
             <filefilter name="defaultFilter" desc="Files not to check">
-                <filteritem type="filename" name="*.gif" desc="GIF file for README"/>
+                <filteritem type="filename" name="figures/icon-note.gif" desc="GIF file for README"/>
             </filefilter>
         </filefilterlist>
     </oatconfig>
