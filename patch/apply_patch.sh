@@ -34,6 +34,7 @@ path_file_dir=$3
 
 echo "curdir: $curdir"
 echo "source_dir: $source_dir"
+
 echo "out_dir: $out_dir"
 echo "path_file_dir: $path_file_dir"
 
