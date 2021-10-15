@@ -10,21 +10,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import("//build/test.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
 import("//build/config/features.gni")
 import("//build/ohos.gni")
+import("//build/test.gni")
+import("//drivers/adapter/uhdf2/uhdf.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
-group("manipulation_event_fuzz_test")
-{
-    testonly = true
-    deps = [
-        "get_force:manipulation_event_get_force_fuzz_test",
-        "get_pointer_id:manipulation_event_get_pointer_id_fuzz_test",
-        "get_pointer_position:manipulation_event_get_pointer_position_fuzz_test",
-        "get_pointer_screen_position:manipulation_event_get_pointer_screen_position_fuzz_test",
-        "get_radius:manipulation_event_get_radius_fuzz_test",
-        "set_screen_offset:manipulation_event_set_screen_offset_fuzz_test",
-    ]
+group("manipulation_event_fuzz_test") {
+  testonly = true
+  deps = [
+    "get_force:manipulation_event_get_force_fuzz_test",
+    "get_pointer_id:manipulation_event_get_pointer_id_fuzz_test",
+    "get_pointer_position:manipulation_event_get_pointer_position_fuzz_test",
+    "get_pointer_screen_position:manipulation_event_get_pointer_screen_position_fuzz_test",
+    "get_radius:manipulation_event_get_radius_fuzz_test",
+    "set_screen_offset:manipulation_event_set_screen_offset_fuzz_test",
+  ]
 }

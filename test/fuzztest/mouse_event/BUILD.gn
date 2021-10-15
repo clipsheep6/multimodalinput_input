@@ -10,19 +10,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import("//build/test.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
 import("//build/config/features.gni")
 import("//build/ohos.gni")
+import("//build/test.gni")
+import("//drivers/adapter/uhdf2/uhdf.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
-group("mouse_event_fuzz_test")
-{
-    testonly = true
-    deps = [
-        "get_axis_value:mouse_event_get_axis_value_fuzz_test",
-        "get_cursor_delta:mouse_event_get_cursor_delta_fuzz_test",
-        "get_scrolling_delta:mouse_event_get_scrolling_delta_fuzz_test",
-        "set_cursor_offset:mouse_event_set_cursor_offset_fuzz_test",
-    ]
+group("mouse_event_fuzz_test") {
+  testonly = true
+  deps = [
+    "get_axis_value:mouse_event_get_axis_value_fuzz_test",
+    "get_cursor_delta:mouse_event_get_cursor_delta_fuzz_test",
+    "get_scrolling_delta:mouse_event_get_scrolling_delta_fuzz_test",
+    "set_cursor_offset:mouse_event_set_cursor_offset_fuzz_test",
+  ]
 }

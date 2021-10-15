@@ -8,9 +8,9 @@ config("virtual_device_config") {
 
   include_dirs = [
     "./include",
-    "//utils/native/base/include"
+    "//utils/native/base/include",
   ]
-  
+
   cflags = [
     "-DOHOS_BUILD",
     "-Wno-unused-parameter",
@@ -26,109 +26,85 @@ config("virtual_device_config") {
   ]
 
   if (is_mmi_have_debug) {
-    cflags += [
-      "-DOHOS_BUILD_MMI_DEBUG",
-    ]
+    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
   }
-  
-    if (is_mmi_have_libinput) {
-        cflags += [
-            "-DOHOS_BUILD_LIBINPUT",
-        ]
-    }
 
-    if (is_mmi_have_hdf) {
-        cflags += [
-            "-DOHOS_BUILD_HDF",
-        ]
-    }
+  if (is_mmi_have_libinput) {
+    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+  }
 
-    if (is_mmi_have_ai) {
-        cflags += [
-            "-DOHOS_BUILD_AI",
-        ]
-    }
+  if (is_mmi_have_hdf) {
+    cflags += [ "-DOHOS_BUILD_HDF" ]
+  }
+
+  if (is_mmi_have_ai) {
+    cflags += [ "-DOHOS_BUILD_AI" ]
+  }
 }
 
 config("virtual_device_public_config") {
-    include_dirs = [
-      "include",
-      "//utils/native/base/include"
-    ]
+  include_dirs = [
+    "include",
+    "//utils/native/base/include",
+  ]
 }
 
 ohos_shared_library("libmmi-virtual-device") {
   sources = [
-    "src/virtual_trackpad_mouse.cpp",
-    "src/virtual_gamepad.cpp",
-    "src/virtual_keyboard_consumer_ctrl.cpp",
-    "src/virtual_knob_consumer_ctrl.cpp",
-    "src/virtual_knob_sys_ctrl.cpp",
-    "src/virtual_keyboard_ext.cpp",
-    "src/virtual_remote_control.cpp",
-    "src/virtual_knob.cpp",
-    "src/virtual_joystick.cpp",
-    "src/virtual_knob_mouse.cpp",
-    "src/virtual_keyboard_sys_ctrl.cpp",
-    "src/virtual_trackpad.cpp",
-    "src/virtual_mouse.cpp",
-    "src/virtual_trackball.cpp",
-    "src/virtual_keyboard.cpp",
-    "src/virtual_trackpad_sys_ctrl.cpp",
     "src/virtual_device.cpp",
     "src/virtual_finger.cpp",
+    "src/virtual_gamepad.cpp",
+    "src/virtual_joystick.cpp",
+    "src/virtual_keyboard.cpp",
+    "src/virtual_keyboard_consumer_ctrl.cpp",
+    "src/virtual_keyboard_ext.cpp",
+    "src/virtual_keyboard_sys_ctrl.cpp",
+    "src/virtual_knob.cpp",
+    "src/virtual_knob_consumer_ctrl.cpp",
+    "src/virtual_knob_mouse.cpp",
+    "src/virtual_knob_sys_ctrl.cpp",
+    "src/virtual_mouse.cpp",
+    "src/virtual_remote_control.cpp",
     "src/virtual_stylus.cpp",
     "src/virtual_touchpad.cpp",
     "src/virtual_touchscreen.cpp",
+    "src/virtual_trackball.cpp",
+    "src/virtual_trackpad.cpp",
+    "src/virtual_trackpad_mouse.cpp",
+    "src/virtual_trackpad_sys_ctrl.cpp",
   ]
-  
-  configs = [
-    ":virtual_device_config",
-  ]
-  
-  public_configs = [
-    ":virtual_device_public_config",
-  ]
-  
-  cflags = [
-      "-DOHOS_BUILD",
-    ]
+
+  configs = [ ":virtual_device_config" ]
+
+  public_configs = [ ":virtual_device_public_config" ]
+
+  cflags = [ "-DOHOS_BUILD" ]
 
   if (is_mmi_have_debug) {
-    cflags += [
-      "-DOHOS_BUILD_MMI_DEBUG",
-    ]
+    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
   }
 
   if (is_mmi_have_libinput) {
-    cflags += [
-      "-DOHOS_BUILD_LIBINPUT",
-    ]
+    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
   }
-  
+
   if (is_mmi_have_hdf) {
-    cflags += [
-      "-DOHOS_BUILD_HDF",
-    ]
+    cflags += [ "-DOHOS_BUILD_HDF" ]
   }
-  
+
   if (is_mmi_have_ai) {
-    cflags += [
-      "-DOHOS_BUILD_AI",
-    ]
+    cflags += [ "-DOHOS_BUILD_AI" ]
   }
-  
-  deps = [
-    "//utils/native/base:utils",
-  ]
-  
+
+  deps = [ "//utils/native/base:utils" ]
+
   install_enable = true
   part_name = "multimodalinput_base"
 }
 
 module_output_path = "multimodalinput/unit_out"
 ohos_unittest("ut-virtual-device-out") {
-module_out_path = module_output_path
+  module_out_path = module_output_path
   include_dirs = [
     "${mmi_path}/tools/virtual_device_manager/include",
     "//utils/native/base/include",
@@ -142,14 +118,10 @@ module_out_path = module_output_path
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
-    include_dirs += [
-      "$root_out_dir/diff_libinput_mmi/src",
-    ]
+    include_dirs += [ "$root_out_dir/diff_libinput_mmi/src" ]
   }
 
-  sources = [
-    "./test/virtual_device_test.cpp",
-  ]
+  sources = [ "./test/virtual_device_test.cpp" ]
 
   cflags = [
     "-DOHOS_BUILD",
@@ -157,52 +129,37 @@ module_out_path = module_output_path
   ]
 
   if (is_mmi_have_debug) {
-    cflags += [
-      "-DOHOS_BUILD_MMI_DEBUG",
-    ]
+    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
   }
 
   if (is_mmi_have_libinput) {
-    cflags += [
-      "-DOHOS_BUILD_LIBINPUT",
-    ]
+    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
   }
 
   if (is_mmi_have_hdf) {
-    cflags += [
-      "-DOHOS_BUILD_HDF",
-    ]
+    cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
   if (is_mmi_have_ai) {
-    cflags += [
-      "-DOHOS_BUILD_AI",
-    ]
+    cflags += [ "-DOHOS_BUILD_AI" ]
   }
 
   deps = [
+    "${mmi_path}/frameworks/util:libmmi-util",
+    "${mmi_path}/tools/virtual_device_manager:libmmi-virtual-device",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
-    "${mmi_path}/tools/virtual_device_manager:libmmi-virtual-device",
-    "${mmi_path}/frameworks/util:libmmi-util",
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
-    deps += [
-      "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
-    ]
+    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
-  external_deps = [
-      "hiviewdfx_hilog_native:libhilog"
-  ]
+  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 }
 
-group("ut-virtual-device")
-{
+group("ut-virtual-device") {
   testonly = true
   deps = []
-  deps += [
-    ":ut-virtual-device-out"
-  ]
+  deps += [ ":ut-virtual-device-out" ]
 }

@@ -27,19 +27,15 @@ config("mmi_connect_manager_config") {
 ohos_source_set("mmi_connect_manager_service") {
   sources = [
     "${mmi_connect_manager_path}/src/multimodal_input_connect_def_parcel.cpp",
-    "${mmi_connect_manager_path}/src/multimodal_input_connect_stub.cpp",
     "${mmi_connect_manager_path}/src/multimodal_input_connect_service.cpp",
+    "${mmi_connect_manager_path}/src/multimodal_input_connect_stub.cpp",
   ]
-  
-  public_configs = [
-    ":mmi_connect_manager_config",
-  ]
-  
+
+  public_configs = [ ":mmi_connect_manager_config" ]
+
   configs = [ ":mmi_connect_manager_config" ]
-  
-  cflags = [
-    "-DOHOS_BUILD",
-  ]
+
+  cflags = [ "-DOHOS_BUILD" ]
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
@@ -51,21 +47,17 @@ ohos_source_set("mmi_connect_manager_service") {
 
 ohos_source_set("mmi_connect_manager_proxy") {
   sources = [
-    "${mmi_connect_manager_path}/src/multimodal_input_connect_def_parcel.cpp",
     "${mmi_connect_manager_path}/src/multimodal_input_connect_death_recipient.cpp",
-    "${mmi_connect_manager_path}/src/multimodal_input_connect_proxy.cpp",
+    "${mmi_connect_manager_path}/src/multimodal_input_connect_def_parcel.cpp",
     "${mmi_connect_manager_path}/src/multimodal_input_connect_manager.cpp",
+    "${mmi_connect_manager_path}/src/multimodal_input_connect_proxy.cpp",
   ]
-  
-  public_configs = [
-    ":mmi_connect_manager_config",
-  ]
-  
+
+  public_configs = [ ":mmi_connect_manager_config" ]
+
   configs = [ ":mmi_connect_manager_config" ]
-  
-  cflags = [
-    "-DOHOS_BUILD",
-  ]
+
+  cflags = [ "-DOHOS_BUILD" ]
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
@@ -74,4 +66,3 @@ ohos_source_set("mmi_connect_manager_proxy") {
     "samgr_L2:samgr_proxy",
   ]
 }
-

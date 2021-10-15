@@ -34,9 +34,7 @@ action("apply_patch") {
 config("libmtdev_config") {
   visibility = [ ":*" ]
 
-  include_dirs = [
-    "$gen_dst_dir/src",
-  ]
+  include_dirs = [ "$gen_dst_dir/src" ]
 
   cflags = [
     "-Wno-unused-parameter",
@@ -45,12 +43,9 @@ config("libmtdev_config") {
 }
 
 config("libmtdev_public_config") {
-  include_dirs = [
-    "$gen_dst_dir/include",
-  ]
+  include_dirs = [ "$gen_dst_dir/include" ]
 
-  cflags = [
-  ]
+  cflags = []
 }
 
 ohos_source_set("patch_gen_mtdev-third") {
@@ -61,41 +56,26 @@ ohos_source_set("patch_gen_mtdev-third") {
     "$gen_dst_dir/src/match.c",
     "$gen_dst_dir/src/match_four.c",
   ]
-  
-  configs = [
-    ":libmtdev_config",
-  ]
 
-  public_configs = [
-    ":libmtdev_public_config",
-  ]
-  
-  deps = [
-    ":apply_patch"
-  ]
-  
-  public_deps = [
-  ]
+  configs = [ ":libmtdev_config" ]
+
+  public_configs = [ ":libmtdev_public_config" ]
+
+  deps = [ ":apply_patch" ]
+
+  public_deps = []
 }
 
 ohos_shared_library("libmtdev-hdf") {
-  sources = [
-  ]
+  sources = []
 
-  configs = [
-    ":libmtdev_config",
-  ]
+  configs = [ ":libmtdev_config" ]
 
-  public_configs = [
-    ":libmtdev_public_config",
-  ]
+  public_configs = [ ":libmtdev_public_config" ]
 
-  deps = [
-  ]
+  deps = []
 
-  public_deps = [
-    ":patch_gen_mtdev-third",
-  ]
+  public_deps = [ ":patch_gen_mtdev-third" ]
 
   part_name = "multimodalinput_base"
 }

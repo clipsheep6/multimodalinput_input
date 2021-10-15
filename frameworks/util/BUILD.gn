@@ -1,73 +1,61 @@
-import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
-import("//build/test.gni")
 import("//build/ohos.gni")
+import("//build/test.gni")
+import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
 module_output_path = "multimodalinput/unit_out"
 config("libmmi_util_public_config") {
-    include_dirs = [
-      "./common/include",
-      "./network/include",
-      "./socket/include",
-      "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
-      "//drivers/peripheral/input/interfaces/include",
-      "//utils/native/base/include",
-    ]
-    
-    cflags = [
-      "-DOHOS_BUILD",
-    ]
+  include_dirs = [
+    "./common/include",
+    "./network/include",
+    "./socket/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
+    "//drivers/peripheral/input/interfaces/include",
+    "//utils/native/base/include",
+  ]
+
+  cflags = [ "-DOHOS_BUILD" ]
 
   if (is_mmi_have_debug) {
-    cflags += [
-      "-DOHOS_BUILD_MMI_DEBUG",
-    ]
+    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
   }
 
   if (is_mmi_have_libinput) {
-    cflags += [
-    "-DOHOS_BUILD_LIBINPUT",
-    ]
+    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
   }
 
   if (is_mmi_have_hdf) {
-    cflags += [
-    "-DOHOS_BUILD_HDF",
-    ]
+    cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
   if (is_mmi_have_ai) {
-    cflags += [
-    "-DOHOS_BUILD_AI",
-    ]
+    cflags += [ "-DOHOS_BUILD_AI" ]
   }
 }
 
 ohos_shared_library("libmmi-util") {
   sources = [
+    "./common/include/klog.c",
     "./common/src/libmmi_util.cpp",
     "./common/src/log.cpp",
-    "./common/include/klog.c",
     "./common/src/safe_keeper.cpp",
     "./common/src/util.cpp",
     "./common/src/uuid.cpp",
-    "./network/src/stream_buffer.cpp",
     "./network/src/net_packet.cpp",
+    "./network/src/stream_buffer.cpp",
     "./socket/src/uds_client.cpp",
     "./socket/src/uds_session.cpp",
     "./socket/src/uds_socket.cpp",
   ]
 
   if (is_mmi_have_debug) {
-    sources += [
-      "./common/src/uds_command_queue.cpp",
-    ]
+    sources += [ "./common/src/uds_command_queue.cpp" ]
   }
 
   public_configs = [
     "//foundation/multimodalinput/input:multimodalinput_mmi_public_config",
     ":libmmi_util_public_config",
   ]
-  
+
   public_deps = [
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//third_party/bounds_checking_function:libsec_static",
@@ -99,9 +87,7 @@ ohos_unittest("ut-mmi-util-out") {
   ]
 
   if (is_mmi_have_libinput) {
-    include_dirs += [
-      "$root_out_dir/diff_libinput_mmi/src",
-    ]
+    include_dirs += [ "$root_out_dir/diff_libinput_mmi/src" ]
   }
 
   cflags = [
@@ -110,27 +96,19 @@ ohos_unittest("ut-mmi-util-out") {
   ]
 
   if (is_mmi_have_debug) {
-    cflags += [
-      "-DOHOS_BUILD_MMI_DEBUG",
-    ]
+    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
   }
 
   if (is_mmi_have_libinput) {
-    cflags += [
-      "-DOHOS_BUILD_LIBINPUT",
-    ]
+    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
   }
 
   if (is_mmi_have_hdf) {
-    cflags += [
-      "-DOHOS_BUILD_HDF",
-    ]
+    cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
   if (is_mmi_have_ai) {
-    cflags += [
-      "-DOHOS_BUILD_AI",
-    ]
+    cflags += [ "-DOHOS_BUILD_AI" ]
   }
 
   sources = [
@@ -145,21 +123,16 @@ ohos_unittest("ut-mmi-util-out") {
   ]
 
   deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/frameworks/util:libmmi-util",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
-    "${mmi_path}/frameworks/util:libmmi-util",
-    "${mmi_path}/frameworks/proxy:libmmi-client",
   ]
-  external_deps = [
-      "hiviewdfx_hilog_native:libhilog"
-  ]
+  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 }
 
-group("ut-mmi-util")
-{
+group("ut-mmi-util") {
   testonly = true
   deps = []
-  deps += [
-    ":ut-mmi-util-out"
-  ]
+  deps += [ ":ut-mmi-util-out" ]
 }

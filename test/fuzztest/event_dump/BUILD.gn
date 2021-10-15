@@ -10,17 +10,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import("//build/test.gni")
-import("//drivers/adapter/uhdf2/uhdf.gni")
 import("//build/config/features.gni")
 import("//build/ohos.gni")
+import("//build/test.gni")
+import("//drivers/adapter/uhdf2/uhdf.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
-group("event_dump_fuzz_test")
-{
-    testonly = true
-    deps = [
-        "dump:event_dump_dump_fuzz_test",
-
-    ]
+group("event_dump_fuzz_test") {
+  testonly = true
+  deps = [ "dump:event_dump_dump_fuzz_test" ]
 }

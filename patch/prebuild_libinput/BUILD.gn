@@ -193,8 +193,7 @@ ohos_prebuilt_etc("conf_patch_libinput_quirks_50-system-toshiba.quirks") {
   part_name = "multimodalinput_base"
 }
 
-group("prebuild_libinput")
-{
+group("prebuild_libinput") {
   deps = [
     ":conf_patch_libinput_quirks_10-generic-keyboard.quirks",
     ":conf_patch_libinput_quirks_10-generic-lid.quirks",

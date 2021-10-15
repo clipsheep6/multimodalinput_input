@@ -373,13 +373,15 @@ ohos_prebuilt_etc("conf_patch_eudev_rules.d_61-gdm.rules") {
   part_name = "multimodalinput_base"
 }
 
-ohos_prebuilt_etc("conf_patch_eudev_rules.d_61-gnome-settings-daemon-rfkill.rules") {
+ohos_prebuilt_etc(
+    "conf_patch_eudev_rules.d_61-gnome-settings-daemon-rfkill.rules") {
   source = "rules.d/61-gnome-settings-daemon-rfkill.rules"
   relative_install_dir = "udev/rules.d"
   part_name = "multimodalinput_base"
 }
 
-ohos_prebuilt_etc("conf_patch_eudev_rules.d_61-persistent-storage-android.rules") {
+ohos_prebuilt_etc(
+    "conf_patch_eudev_rules.d_61-persistent-storage-android.rules") {
   source = "rules.d/61-persistent-storage-android.rules"
   relative_install_dir = "udev/rules.d"
   part_name = "multimodalinput_base"
@@ -559,7 +561,8 @@ ohos_prebuilt_etc("conf_patch_eudev_rules.d_77-mm-haier-port-types.rules") {
   part_name = "multimodalinput_base"
 }
 
-ohos_prebuilt_etc("conf_patch_eudev_rules.d_77-mm-huawei-net-port-types.rules") {
+ohos_prebuilt_etc(
+    "conf_patch_eudev_rules.d_77-mm-huawei-net-port-types.rules") {
   source = "rules.d/77-mm-huawei-net-port-types.rules"
   relative_install_dir = "udev/rules.d"
   part_name = "multimodalinput_base"
@@ -583,7 +586,8 @@ ohos_prebuilt_etc("conf_patch_eudev_rules.d_77-mm-nokia-port-types.rules") {
   part_name = "multimodalinput_base"
 }
 
-ohos_prebuilt_etc("conf_patch_eudev_rules.d_77-mm-pcmcia-device-blacklist.rules") {
+ohos_prebuilt_etc(
+    "conf_patch_eudev_rules.d_77-mm-pcmcia-device-blacklist.rules") {
   source = "rules.d/77-mm-pcmcia-device-blacklist.rules"
   relative_install_dir = "udev/rules.d"
   part_name = "multimodalinput_base"
@@ -637,7 +641,8 @@ ohos_prebuilt_etc("conf_patch_eudev_rules.d_77-mm-usb-device-blacklist.rules") {
   part_name = "multimodalinput_base"
 }
 
-ohos_prebuilt_etc("conf_patch_eudev_rules.d_77-mm-usb-serial-adapters-greylist.rules") {
+ohos_prebuilt_etc(
+    "conf_patch_eudev_rules.d_77-mm-usb-serial-adapters-greylist.rules") {
   source = "rules.d/77-mm-usb-serial-adapters-greylist.rules"
   relative_install_dir = "udev/rules.d"
   part_name = "multimodalinput_base"
@@ -865,15 +870,14 @@ ohos_prebuilt_etc("conf_patch_eudev_rules.d_99-virtual_touchpad.rules") {
   part_name = "multimodalinput_base"
 }
 
-group("prebuild_eudev")
-{
+group("prebuild_eudev") {
   deps = [
     ":conf_patch_eudev__udev.conf",
+    ":conf_patch_eudev_hwdb.d_20-OUI.hwdb",
     ":conf_patch_eudev_hwdb.d_20-acpi-vendor.hwdb",
     ":conf_patch_eudev_hwdb.d_20-bluetooth-vendor-product.hwdb",
     ":conf_patch_eudev_hwdb.d_20-libgphoto2-6.hwdb",
     ":conf_patch_eudev_hwdb.d_20-net-ifname.hwdb",
-    ":conf_patch_eudev_hwdb.d_20-OUI.hwdb",
     ":conf_patch_eudev_hwdb.d_20-pci-classes.hwdb",
     ":conf_patch_eudev_hwdb.d_20-pci-vendor-model.hwdb",
     ":conf_patch_eudev_hwdb.d_20-sane.hwdb",

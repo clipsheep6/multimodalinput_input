@@ -15,60 +15,50 @@ config("libinputeventclient_config") {
     "//foundation/multimodalinput/input/common/include",
     "//foundation/multimodalinput/input/tools/event_inject/include",
   ]
-  
+
   cflags = [
     "-DOHOS_BUILD",
     "-DOHOS_AUTO_TEST_FRAME",
   ]
   if (is_mmi_have_libinput) {
-        cflags += [
-            "-DOHOS_BUILD_LIBINPUT",
-        ]
-    }
+    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+  }
 
-    if (is_mmi_have_hdf) {
-        cflags += [
-            "-DOHOS_BUILD_HDF",
-        ]
-    }
+  if (is_mmi_have_hdf) {
+    cflags += [ "-DOHOS_BUILD_HDF" ]
+  }
 
-    if (is_mmi_have_ai) {
-        cflags += [
-            "-DOHOS_BUILD_AI",
-        ]
-    }
+  if (is_mmi_have_ai) {
+    cflags += [ "-DOHOS_BUILD_AI" ]
+  }
 }
 
 ohos_shared_library("libinputeventclient") {
   sources = [
-    "src/multi_input_common.cpp",
-    "src/js_register_util.cpp",
     "src/js_register_event.cpp",
     "src/js_register_handle.cpp",
     "src/js_register_module.cpp",
+    "src/js_register_util.cpp",
+    "src/multi_input_common.cpp",
   ]
 
-  configs = [
-    ":libinputeventclient_config",
-  ]
+  configs = [ ":libinputeventclient_config" ]
 
   deps = [
+    "//drivers/peripheral/input/hal:hdi_input",
+    "//foundation/ace/napi:ace_napi",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
-    "//foundation/ace/napi:ace_napi",
     "//foundation/multimodalinput/input/tools/event_inject:event-injection",
-    "//utils/native/base:utils",
-    "//drivers/peripheral/input/hal:hdi_input",
+    "//third_party/libxkbcommon:libxkbcommon",
     "//third_party/wayland-ivi-extension:ivi-controller",
     "//third_party/wayland-ivi-extension:libscreen-info-module",
-    "//third_party/libxkbcommon:libxkbcommon",
+    "//utils/native/base:utils",
   ]
-  
+
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
-    deps += [
-      "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
-    ]
+    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
 
   relative_install_dir = "module/multimodalinput"

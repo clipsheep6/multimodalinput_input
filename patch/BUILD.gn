@@ -14,34 +14,34 @@
 import("//build/ohos.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
-group("patch_packages"){
+group("patch_packages") {
   deps = [
-    "prebuild_x_keyboard_config:prebuild_x_keyboard_config",
-    "prebuild_eudev:prebuild_eudev",
     "diff_libinput_mmi:libinput-third-mmi",
+    "prebuild_eudev:prebuild_eudev",
+    "prebuild_x_keyboard_config:prebuild_x_keyboard_config",
   ]
-  
+
   if (is_mmi_have_hdf) {
     deps += [
-        "diff_mtdev_hdf:libmtdev-hdf",
-        "diff_libevdev_hdf:libevdev-hdf",
+      "diff_libevdev_hdf:libevdev-hdf",
+      "diff_mtdev_hdf:libmtdev-hdf",
     ]
   }
 
   if (is_mmi_have_libinput) {
-    deps += [            
-        "//third_party/eudev:libudev",
-        "//third_party/eudev:udevd",
-        "//third_party/eudev:udevd.rc",
-        "//third_party/eudev:udev_conf",
-        "diff_libinput_mmi:libinput-debug-mmi",
-        "diff_libinput_mmi:libinput-list-mmi",
-        "diff_libinput_mmi:libinput-tablet-mmi",
-        "diff_libinput_mmi:libinput-record-mmi",
-        "diff_libinput_mmi:libinput-analyze-mmi",
-        "diff_libinput_mmi:libinput-measure-mmi",
-        "diff_libinput_mmi:libinput-quirks-mmi",
-        "prebuild_libinput:prebuild_libinput",
+    deps += [
+      "diff_libinput_mmi:libinput-analyze-mmi",
+      "diff_libinput_mmi:libinput-debug-mmi",
+      "diff_libinput_mmi:libinput-list-mmi",
+      "diff_libinput_mmi:libinput-measure-mmi",
+      "diff_libinput_mmi:libinput-quirks-mmi",
+      "diff_libinput_mmi:libinput-record-mmi",
+      "diff_libinput_mmi:libinput-tablet-mmi",
+      "prebuild_libinput:prebuild_libinput",
+      "//third_party/eudev:libudev",
+      "//third_party/eudev:udev_conf",
+      "//third_party/eudev:udevd",
+      "//third_party/eudev:udevd.rc",
     ]
   }
 }

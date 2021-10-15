@@ -10,60 +10,42 @@ ohos_moduletest("sdk-test-out") {
     "//foundation/multimodalinput/input/service/event_dump/include",
   ]
 
-  sources = [
-    "dfx_sdk_test.cpp"
-  ]
+  sources = [ "dfx_sdk_test.cpp" ]
 
-  cflags = [
-    "-DOHOS_BUILD",
-  ]
+  cflags = [ "-DOHOS_BUILD" ]
 
   if (is_mmi_have_debug) {
-    cflags += [
-      "-DOHOS_BUILD_MMI_DEBUG",
-    ]
+    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
   }
 
   if (is_mmi_have_libinput) {
-    cflags += [
-      "-DOHOS_BUILD_LIBINPUT",
-    ]
+    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
   }
 
   if (is_mmi_have_hdf) {
-    cflags += [
-      "-DOHOS_BUILD_HDF",
-    ]
+    cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
   if (is_mmi_have_ai) {
-    cflags += [
-      "-DOHOS_BUILD_AI",
-    ]
+    cflags += [ "-DOHOS_BUILD_AI" ]
   }
 
   deps = [
-    "${mmi_path}/frameworks/util:libmmi-util",
     "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/frameworks/util:libmmi-util",
     "${mmi_path}/service:libmmi-server",
     "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main"
+    "//third_party/googletest:gtest_main",
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
-      deps += [
-          "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
-      ]
+    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
 
-  external_deps = [
-      "hiviewdfx_hilog_native:libhilog"
-  ]
+  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 }
 
 group("sdk-test") {
   testonly = true
-  deps = [
-    ":sdk-test-out"
-  ]
+  deps = [ ":sdk-test-out" ]
 }

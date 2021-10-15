@@ -45,55 +45,37 @@ config("libevdev_config") {
 }
 
 config("libevdev_public_config") {
-  include_dirs = [
-    "$gen_dst_dir/export_include",
-  ]
+  include_dirs = [ "$gen_dst_dir/export_include" ]
 
-  cflags = [
-  ]
+  cflags = []
 }
 
 ohos_source_set("patch_gen_libevdev") {
   sources = [
+    "$gen_dst_dir/libevdev/libevdev-names.c",
     "$gen_dst_dir/libevdev/libevdev-uinput.c",
     "$gen_dst_dir/libevdev/libevdev.c",
-    "$gen_dst_dir/libevdev/libevdev-names.c",
-  ]
-  
-  configs = [
-    ":libevdev_config",
   ]
 
-  public_configs = [
-    ":libevdev_public_config",
-  ]
-  
-  deps = [
-    ":apply_patch"
-  ]
-  
-  public_deps = [
-  ]
+  configs = [ ":libevdev_config" ]
+
+  public_configs = [ ":libevdev_public_config" ]
+
+  deps = [ ":apply_patch" ]
+
+  public_deps = []
 }
 
 ohos_shared_library("libevdev-hdf") {
-  sources = [
-  ]
+  sources = []
 
-  configs = [
-    ":libevdev_config",
-  ]
+  configs = [ ":libevdev_config" ]
 
-  public_configs = [
-    ":libevdev_public_config",
-  ]
+  public_configs = [ ":libevdev_public_config" ]
 
-  deps = [
-    ":patch_gen_libevdev",
-  ]
+  deps = [ ":patch_gen_libevdev" ]
 
-  public_deps = [
-  ]
+  public_deps = []
 
   part_name = "multimodalinput_base"
 }
