@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
 ## Install mmi_uinput.rc to /system/etc/init/mmi_uinput.rc {{{
 ohos_prebuilt_etc("mmi_uinput.rc") {
@@ -105,9 +106,42 @@ ohos_shared_library("mmi_uinject") {
   subsystem_name = "multimodalinput"
 }
 
-group("test_packages") {
+config("multimodalinput_mmi_public_config"){
+  include_dirs = [
+    "./common/include/",
+  ]
+}
+
+group("multimodalinput_mmi_packages"){
+  deps = [
+    "./frameworks/util:libmmi-util",
+    "./frameworks/proxy:libmmi-client",
+    "./frameworks/napi:libinputeventclient",
+    "./service:libmmi-server",
+    "./tools/event_inject:event-injection",
+    "./tools/virtual_device_manager:libmmi-virtual-device",
+    "./examples/hosmmi:hosmmi-client",
+    "./examples/hosmmi:hosmmi-server",
+    "./examples/hosmmi:hosmmi-event-injection",
+    "./examples/hosmmi:hosmmi-virtual-device-manager",
+  ]
+
+  if (is_mmi_have_libinput) {
+    deps += [
+      "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-debug-mmi",
+      "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-list-mmi",
+      "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-tablet-mmi",
+    ]
+  }
+}
+
+group("unittests") {
   testonly = true
   deps = [
-    "interfaces/native/innerkits/event/test:unittest",
+    "./frameworks/proxy:ut-mmi-proxy",
+    "./frameworks/util:ut-mmi-util",
+    "./service:ut-mmi-service",
+    "./tools/event_inject:ut-event-injection",
+    "./tools/virtual_device_manager:ut-virtual-device",
   ]
 }
