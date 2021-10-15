@@ -37,11 +37,13 @@ OHOS::MMI::HdfEventManager *OHOS::MMI::HdfEventManager::m_globleThis;
 int OHOS::MMI::HdfEventManager::EvdevSimIoctl(int hdindex, int pcmd, void *iobuff)
 {
     uhdf *hdiuhdf = nullptr;
-    int size = (pcmd >> IOCTL_CMD_SHIFT) & IOCTL_CMD_MASK;
+    const int size = (pcmd >> IOCTL_CMD_SHIFT) & IOCTL_CMD_MASK;
+    const int iobuffSize = size;
     int cmd = pcmd & 0xff;
 
     MMI_LOGD("----evdev_simioctl %{public}p,index =%{public}d,cmd = %{public}02x: size =%{public}d "
-        "pcmd = %{public}04x ---", iobuff, hdindex, cmd, size, pcmd);
+             "pcmd = %{public}04x ---",
+             iobuff, hdindex, cmd, size, pcmd);
     DrvType drvtype = index2DrvType[hdindex - MAX_INPUT_DEVICE_COUNT];
     MMI_LOGD("----evdev_simioctl drvtype =%{public}d", drvtype);
     if (drvtype >= INVALD) {
@@ -53,56 +55,60 @@ int OHOS::MMI::HdfEventManager::EvdevSimIoctl(int hdindex, int pcmd, void *iobuf
             break;
         }
     }
+    int ret = 0;
     switch (cmd) {
         case IO_BITS: // bits
-            memcpy(iobuff, &arrayBits[drvtype], size);
+            ret = memcpy_s(iobuff, iobuffSize, &arrayBits[drvtype], size);
             break;
         case IO_KEYBITS: // key_bits
-            memcpy(iobuff, &arrayKeyBits[drvtype], size);
+            ret = memcpy_s(iobuff, iobuffSize, &arrayKeyBits[drvtype], size);
             break;
         case IO_RELBITS: // rel_bits
-            memcpy(iobuff, &arrayRelBits[drvtype], size);
+            ret = memcpy_s(iobuff, iobuffSize, &arrayRelBits[drvtype], size);
             break;
         case IO_ABSBITS: // abs_bits
-            memcpy(iobuff, &arrayAbsBits[drvtype], size);
+            ret = memcpy_s(iobuff, iobuffSize, &arrayAbsBits[drvtype], size);
             break;
         case IO_MSCBITS: // msc_bits
-            memcpy(iobuff, &arrayMscBits[drvtype], size);
+            ret = memcpy_s(iobuff, iobuffSize, &arrayMscBits[drvtype], size);
             break;
         case IO_SWBITS: // sw_bits
-            memcpy(iobuff, &arraySwBits[drvtype], size);
+            ret = memcpy_s(iobuff, iobuffSize, &arraySwBits[drvtype], size);
             break;
         case IO_LEDBITS: // led_bits
-            memcpy(iobuff, &arrayLedBits[drvtype], size);
+            ret = memcpy_s(iobuff, iobuffSize, &arrayLedBits[drvtype], size);
             break;
         case IO_SNDBITS: // snd_bits
-            memcpy(iobuff, &arraySndBits[drvtype], size);
+            ret = memcpy_s(iobuff, iobuffSize, &arraySndBits[drvtype], size);
             break;
         case IO_PROPBITS: // poops
-            memcpy(iobuff, &arrayPropsBits[drvtype], size);
+            ret = memcpy_s(iobuff, iobuffSize, &arrayPropsBits[drvtype], size);
             break;
         case IO_KEYVALUES: // key_values
-            memcpy(iobuff, &arrayKeyValues[drvtype], size);
+            ret = memcpy_s(iobuff, iobuffSize, &arrayKeyValues[drvtype], size);
             break;
         case IO_LEDVALUES: // led_values
-            memcpy(iobuff, &arrayLedValues[drvtype], size);
+            ret = memcpy_s(iobuff, iobuffSize, &arrayLedValues[drvtype], size);
             break;
         case IO_SWVALUES: // sw_values
-            memcpy(iobuff, &arraySwValues[drvtype], size);
+            ret = memcpy_s(iobuff, iobuffSize, &arraySwValues[drvtype], size);
             break;
         case IO_MTVABS: // mtv abs
             break;
         case IO_IDS:  // ids
-            memcpy(iobuff, &arrayIds[drvtype], size);
+            ret = memcpy_s(iobuff, iobuffSize, &arrayIds[drvtype], size);
             break;
         case IO_FFBITS: // ff bits
-            memcpy(iobuff, &arrayFfBits[drvtype], size);
+            ret = memcpy_s(iobuff, iobuffSize, &arrayFfBits[drvtype], size);
             break;
         default:
             if (cmd >= IO_ABSBEGIN && cmd < IO_ABEND) {
-                memcpy(iobuff, &arrayAxisInfo[drvtype][cmd - IO_ABSBEGIN], size);
+                ret = memcpy_s(iobuff, iobuffSize, &arrayAxisInfo[drvtype][cmd - IO_ABSBEGIN], size);
             }
             break;
+    }
+    if (ret != EOK) {
+        MMI_LOGE("call memcpy_s fail, cmd = %d, ret = %d", cmd, ret);
     }
     return 0;
 }
@@ -110,6 +116,7 @@ int OHOS::MMI::HdfEventManager::EvdevIoctl(int hdiindex, int pcmd, void *iobuff)
 {
     uhdf *hdiuhdf = nullptr;
     int size = (pcmd >> IOCTL_CMD_SHIFT) & IOCTL_CMD_MASK;
+    const int iobuffSize = size;
     int cmd = pcmd & 0xff;
     DeviceInfo *deviceinfo = nullptr;
     MMI_LOGD("----evdev_ioctl %{public}p,index =%{public}d,cmd = %{public}02x: size =%{public}d  "
@@ -125,56 +132,60 @@ int OHOS::MMI::HdfEventManager::EvdevIoctl(int hdiindex, int pcmd, void *iobuff)
     if (deviceinfo == nullptr) {
         return 0;
     }
+    int ret = 0;
     switch (cmd) {
         case IO_BITS: // bits
-            memcpy(iobuff, deviceinfo->abilitySet.eventType, size);
+            ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.eventType, size);
             break;
         case IO_KEYBITS: // key_bits
-            memcpy(iobuff, deviceinfo->abilitySet.keyCode, size);
+            ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.keyCode, size);
             break;
         case IO_RELBITS: // rel_bits
-            memcpy(iobuff, deviceinfo->abilitySet.relCode, size);
+            ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.relCode, size);
             break;
         case IO_ABSBITS: // abs_bits
-            memcpy(iobuff, deviceinfo->abilitySet.absCode, size);
+            ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.absCode, size);
             break;
         case IO_MSCBITS: // msc_bits
-            memcpy(iobuff, deviceinfo->abilitySet.miscCode, size);
+            ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.miscCode, size);
             break;
         case IO_SWBITS: // sw_bits
-            memcpy(iobuff, deviceinfo->abilitySet.switchCode, size);
+            ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.switchCode, size);
             break;
         case IO_LEDBITS: // led_bits
-            memcpy(iobuff, deviceinfo->abilitySet.ledCode, size);
+            ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.ledCode, size);
             break;
         case IO_SNDBITS: // snd_bits
-            memcpy(iobuff, deviceinfo->abilitySet.forceCode, size);
+            ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.forceCode, size);
             break;
         case IO_PROPBITS: // poops
-            memcpy(iobuff, deviceinfo->abilitySet.devProp, size);
+            ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.devProp, size);
             break;
         case IO_KEYVALUES: // key_values
-            memcpy(iobuff, deviceinfo->abilitySet.keyType, size);
+            ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.keyType, size);
             break;
         case IO_LEDVALUES: // led_values
-            memcpy(iobuff, deviceinfo->abilitySet.ledType, size);
+            ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.ledType, size);
             break;
         case IO_SWVALUES: // sw_values
-            memcpy(iobuff, deviceinfo->abilitySet.switchType, size);
+            ret = memcpy_s(iobuff, iobuffSize, deviceinfo->abilitySet.switchType, size);
             break;
         case IO_MTVABS: // mtv abs
             break;
         case IO_IDS:  // ids
-            memcpy(iobuff, &deviceinfo->attrSet.id, size);
+            ret = memcpy_s(iobuff, iobuffSize, &deviceinfo->attrSet.id, size);
             break;
         case IO_FFBITS: // ff bits
-            memcpy(iobuff, &deviceinfo->abilitySet.forceCode, size);
+            ret = memcpy_s(iobuff, iobuffSize, &deviceinfo->abilitySet.forceCode, size);
             break;
         default:
             if (cmd >= IO_ABSBEGIN && cmd < IO_ABEND) {
-                memcpy(iobuff, &deviceinfo->attrSet.axisInfo[cmd - IO_ABSBEGIN], size);
+                ret = memcpy_s(iobuff, iobuffSize, &deviceinfo->attrSet.axisInfo[cmd - IO_ABSBEGIN], size);
             }
             break;
+    }
+    if (ret != EOK) {
+        MMI_LOGE("call memcpy_s fail, cmd = %d, ret = %d", cmd, ret);
     }
     return 0;
 }
@@ -217,7 +228,6 @@ int OHOS::MMI::HdfEventManager::HdfdevtypeMapLibinputType(uint32_t devIndex, uin
 #ifdef  OHOS_BUILD_HDF
 int OHOS::MMI::HdfEventManager::GetDeviceCount()
 {
-    int jectcount = 0;
     int devcount = 0;
     int ret = memset_s(mountDevIndex_, sizeof(DevDesc) * TOTAL_INPUT_DEVICE_COUNT, 0, sizeof(DevDesc) * TOTAL_INPUT_DEVICE_COUNT);
     if (ret != EOK) {
@@ -227,30 +237,31 @@ int OHOS::MMI::HdfEventManager::GetDeviceCount()
         int32_t ret = inputInterface_->iInputManager->ScanInputDevice(mountDevIndex_, MAX_INPUT_DEVICE_COUNT);
         if (ret) {
             MMI_LOGE("---- %{public}s:%{public}d Error:ScanInputDevice failed. ----\n", __func__, __LINE__);
-        } else {
-            for (int i = 0; i < MAX_INPUT_DEVICE_COUNT; i++) {
-                if (mountDevIndex_[i].devIndex != 0) {
-                    devcount = devcount + 1;
-                }
-            }
+			return 0;
         }
-    }
 
+		for (int i = 0; i < MAX_INPUT_DEVICE_COUNT; i++) {
+			if (mountDevIndex_[i].devIndex != 0) {
+				devcount = devcount + 1;
+			}
+		}
+    }
+    int jectcount = 0;
     if (injectInterface_ != nullptr || injectInterface_->iInputManager != nullptr) {
         int32_t ret = injectInterface_->iInputManager->ScanInputDevice(&mountDevIndex_[devcount],
                                                                        MAX_INPUT_DEVICE_COUNT);
         if (ret) {
             MMI_LOGE("---- %{public}s:%{public}d Error:injectInterface_ ScanInputDevice failed. ----\n",
                 __func__, __LINE__);
-        } else {
-            for (int i = 0; i < MAX_INPUT_DEVICE_COUNT; i++) {
-                if (mountDevIndex_[devcount + i].devIndex != 0) {
-                    jectcount = jectcount + 1;
-                }
-            }
+			return devcount;
         }
-    }
 
+		for (int i = 0; i < MAX_INPUT_DEVICE_COUNT; i++) {
+			if (mountDevIndex_[devcount + i].devIndex != 0) {
+				jectcount = jectcount + 1;
+			}
+		}
+    }
     return devcount + jectcount;
 }
 void OHOS::MMI::HdfEventManager::SetupCallback()

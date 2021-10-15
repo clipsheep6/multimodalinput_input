@@ -13,15 +13,24 @@
  * limitations under the License.
  */
 #include <gtest/gtest.h>
-#include "injection_event_dispatch.h"
+#include "proto.h"
+#include "injection_tools_help_func.h"
+#include "msg_head.h"
 
 namespace {
 using namespace testing::ext;
+using namespace OHOS::MMI;
 using namespace std;
-
-class InjectionExceptionEventTest : public testing::Test {
+class InjectionToolsHelpFuncTest : public testing::Test {
 public:
-    static void SetUpTestCase(void) {}
-    static void TearDownTestCase(void) {}
+    static void SetUpTestCase(void) {};
+    static void TearDownTestCase(void) {};
 };
-} // namespace
+
+HWTEST_F(InjectionToolsHelpFuncTest, Test_InjectionToolsHelpFuncTest, TestSize.Level1)
+{
+    InjectionToolsHelpFunc injectionToolsHelpFunc;
+    auto ret = injectionToolsHelpFunc.GetHelpText();
+    EXPECT_EQ(ret.empty(), false);
+}
+}

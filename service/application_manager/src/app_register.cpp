@@ -141,7 +141,7 @@ void OHOS::MMI::AppRegister::Dump(int32_t fd)
     std::lock_guard<std::mutex> lock(mu_);
     mprintf(fd, "AppInfos: count=%d", mapSurface.size());
     for (auto& it : mapSurface) {
-        mprintf(fd, "\tabilityId=%d windowId=%d fd=%d bundlerName=%s appName=%s", it.second.abilityId, 
+        mprintf(fd, "\tabilityId=%d windowId=%d fd=%d bundlerName=%s appName=%s", it.second.abilityId,
                 it.second.windowId, it.second.fd, it.second.bundlerName.c_str(), it.second.appName.c_str());
     }
 }
@@ -201,16 +201,17 @@ bool AppRegister::CheckConnectionIsDead(ssize_t currentTime, ssize_t timeOut,
         MMI_LOGE(" IsMultimodeInputReady: The connection is dead! errCode:%{public}d \n", CONN_BREAK);
         auto appInfo = FindAppInfoBySocketFd(findFd);
         for (auto iter = waitQueue_.begin(); iter != waitQueue_.end(); iter++) {
-            if (findFd == iter->fd) {
-                if (currentTime >= (iter->currentTime + timeOut)) {
-                    waitQueue_.erase(iter);
-                    WinMgr->EraseSurfaceInfo(appInfo.windowId);
-                    UnregisterBySocketFd(findFd);
-                    OnAnrLocked(findFd);
-                    return false;
-                }
+            if (findFd != iter->fd) {
+                continue;
+            }
+            if (currentTime >= (iter->currentTime + timeOut)) {
+                waitQueue_.erase(iter);
+                WinMgr->EraseSurfaceInfo(appInfo.windowId);
+                UnregisterBySocketFd(findFd);
+                OnAnrLocked(findFd);
                 return false;
             }
+            return false;
         }
         WinMgr->EraseSurfaceInfo(appInfo.windowId);
         UnregisterBySocketFd(findFd);
@@ -227,16 +228,17 @@ bool AppRegister::CheckBufferIsFull(ssize_t currentTime, ssize_t timeOut,
         MMI_LOGE(" IsMultimodeInputReady: The buffer is full! errCode:%{public}d \n", SOCKET_BUF_FULL);
         auto appInfo = FindAppInfoBySocketFd(findFd);
         for (auto iter = waitQueue_.begin(); iter != waitQueue_.end(); iter++) {
-            if (findFd == iter->fd) {
-                if (currentTime >= (iter->currentTime + timeOut)) {
-                    waitQueue_.erase(iter);
-                    WinMgr->EraseSurfaceInfo(appInfo.windowId);
-                    UnregisterBySocketFd(findFd);
-                    OnAnrLocked(findFd);
-                    return false;
-                }
+            if (findFd != iter->fd) {
+                continue;
+            }
+            if (currentTime >= (iter->currentTime + timeOut)) {
+                waitQueue_.erase(iter);
+                WinMgr->EraseSurfaceInfo(appInfo.windowId);
+                UnregisterBySocketFd(findFd);
+                OnAnrLocked(findFd);
                 return false;
             }
+            return false;
         }
         WinMgr->EraseSurfaceInfo(appInfo.windowId);
         UnregisterBySocketFd(findFd);

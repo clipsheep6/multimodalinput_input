@@ -12,3 +12,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <gtest/gtest.h>
+#include "proto.h"
+#define private public
+#include "get_device_node.h"
+#undef private
+#include "msg_head.h"
+
+namespace {
+using namespace testing::ext;
+using namespace OHOS::MMI;
+using namespace std;
+class GetDeviceNodeTest : public testing::Test {
+public:
+    static void SetUpTestCase(void) {}
+    static void TearDownTestCase(void) {}
+};
+
+HWTEST_F(GetDeviceNodeTest, Test_GetDeviceNodeTest, TestSize.Level1)
+{
+    GetDeviceNode getDeviceNode;
+    const string cmd = "";
+    StringList cmdResult;
+    auto ret = getDeviceNode.ExecuteCmd(cmd, cmdResult);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+HWTEST_F(GetDeviceNodeTest, Test_GetDeviceNodeTestCmdError, TestSize.Level1)
+{
+    GetDeviceNode getDeviceNode;
+    const string cmd = "temp";
+    StringList cmdResult;
+    auto ret = getDeviceNode.ExecuteCmd(cmd, cmdResult);
+    EXPECT_EQ(ret, RET_ERR);
+}
+}

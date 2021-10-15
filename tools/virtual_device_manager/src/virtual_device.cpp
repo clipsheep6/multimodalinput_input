@@ -222,7 +222,7 @@ bool OHOS::MMI::VirtualDevice::SetUp()
         return false;
     }
 
-    if (0 != strncpy_s(dev_.name, sizeof(dev_.name), deviceName_.c_str(), deviceName_.size())) {
+    if (strncpy_s(dev_.name, sizeof(dev_.name), deviceName_.c_str(), deviceName_.size()) != 0) {
         return false;
     };
     dev_.id.bustype = busTtype_;
@@ -392,7 +392,7 @@ bool OHOS::MMI::VirtualDevice::CreateHandle(const String deviceArgv)
         virtualTouchpad.SetUp();
         static OHOS::MMI::VirtualFinger virtualFinger;
         virtualFinger.SetUp();
-    } else if(deviceArgv == "touchscreen") {
+    } else if (deviceArgv == "touchscreen") {
         static OHOS::MMI::VirtualTouchScreen virtualTouchScreen;
         virtualTouchScreen.SetUp();
     } else if (deviceArgv == "all") {

@@ -15,7 +15,7 @@
 #include "injection_event_dispatch.h"
 #include "util.h"
 #include "proto.h"
-#include "message_send_recv_stat.h"
+#include "message_send_recv_stat_mgr.h"
 
 using namespace std;
 using namespace OHOS::MMI;

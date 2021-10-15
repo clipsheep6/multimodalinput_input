@@ -79,7 +79,7 @@ private:
     void AnalysisTouchPadEvent(const UDSClient& client, NetPacket& pkt) const;
     void GetStandardStylusActionType(int32_t curRventType, int32_t &stylusAction, int32_t &touchAction) const;
     int32_t GetNonStandardStylusActionType(int32_t tableToolState) const;
-    void GetMouseActionType(int32_t eventType, int32_t proximityState, int32_t &mouseAction, 
+    void GetMouseActionType(int32_t eventType, int32_t proximityState, int32_t &mouseAction,
                             int32_t &touchAction) const;
     void PrintEventTabletToolInfo(EventTabletTool tableTool, uint64_t serverStartTime,
                                   int32_t abilityId, int32_t windowId, int32_t fd) const;

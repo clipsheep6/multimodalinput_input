@@ -60,6 +60,5 @@ ConnectDefRespParcel *ConnectDefRespParcel::Unmarshalling(Parcel &in)
     RELEASE_IF_FALSE(in.ReadInt32(response->data.allocedSocketId), response);
     return response;
 }
-
 } // namespace MMI
 } // namespace OHOS

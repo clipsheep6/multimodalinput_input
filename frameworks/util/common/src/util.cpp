@@ -72,7 +72,7 @@ std::string GetEnv(const std::string &name)
 {
     CHKR(!name.empty(), PARAM_INPUT_INVALID, "");
     auto val = getenv(name.c_str());
-    if (nullptr == val) {
+    if (val == nullptr) {
         return "";
     }
     return val;
@@ -319,7 +319,10 @@ const char* GetProgramName()
         KMSG_LOGE("copySize is 0.");
         return "";
     }
-    memcpy_s(programName, programNameSize, tempName.c_str(), copySize);
+    int ret = memcpy_s(programName, programNameSize, tempName.c_str(), copySize);
+    if (RET_OK != ret) {
+        return "";
+    }
 
     KMSG_LOGI("GetProgramName success. programName = %s", programName);
 
@@ -389,8 +392,7 @@ const std::string& GetThreadName()
     if (ret == 0) {
         thisThreadName[MAX_THREAD_NAME_SIZE] = '\0';
         threadName = thisThreadName;
-    }
-    else {
+    } else {
         const int errnoSaved = errno;
         printf("in GetThreadName, call prctl get name fail, errno: %d, error msg: %s.\n",
                errnoSaved, strerror(errnoSaved));
@@ -398,6 +400,5 @@ const std::string& GetThreadName()
 
     return threadName;
 }
-
 }
 }

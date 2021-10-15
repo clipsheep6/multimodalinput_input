@@ -18,8 +18,7 @@
 #include "singleton.h"
 
 namespace OHOS::MMI {
-class MessageSendRecvStatMgr : public OHOS::Singleton<OHOS::MMI::MessageSendRecvStatMgr>
-{
+class MessageSendRecvStatMgr : public OHOS::Singleton<OHOS::MMI::MessageSendRecvStatMgr> {
 public:
     MessageSendRecvStatMgr() = default;
     ~MessageSendRecvStatMgr() = default;

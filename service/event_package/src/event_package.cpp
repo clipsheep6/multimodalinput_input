@@ -533,7 +533,7 @@ int32_t EventPackage::PackageTouchEvent(libinput_event& event,
             WinMgr->TransfromToSurfaceCoordinate(touch.point.x, touch.point.y, *touchSurfaceInfo, true);
             break;
         }
-        case LIBINPUT_EVENT_TOUCH_UP:{
+        case LIBINPUT_EVENT_TOUCH_UP: {
             touch.point.x = 0;
             touch.point.y = 0;
             break;

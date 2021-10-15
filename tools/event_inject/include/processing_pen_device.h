@@ -20,7 +20,7 @@
 
 namespace OHOS {
 namespace MMI {
-class ProcessingPenDevice :public DeviceBase {
+class ProcessingPenDevice : public DeviceBase {
     struct PenEvent {
         std::string eventType;
         int32_t xPos;

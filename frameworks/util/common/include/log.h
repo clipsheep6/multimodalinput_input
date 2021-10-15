@@ -170,14 +170,14 @@ protected:
 
     // ---日志信息
 struct LogData : public RefBase {
-    time_t curTime;       // 时间
-    uint32_t precise;     // 毫秒
-    std::string threadId_;// 线程ID
-    std::string threadName_;// 线程名
-    std::string curFile;  // 所在文件名
-    int32_t curLine;      // 所在文件中行数
-    int32_t level;        // 级别
-    std::string data;     // 内容
+    time_t curTime;           // 时间
+    uint32_t precise;         // 毫秒
+    std::string threadId_;    // 线程ID
+    std::string threadName_;  // 线程名
+    std::string curFile;      // 所在文件名
+    int32_t curLine;          // 所在文件中行数
+    int32_t level;            // 级别
+    std::string data;         // 内容
 
     LogData();
 };

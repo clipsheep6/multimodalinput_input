@@ -147,6 +147,5 @@ void EventDump::InsertFormat(std::string str, ...)
     va_end(args);
     InsertDumpInfo(buf);
 }
-
 }
 }

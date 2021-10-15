@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 #include <codecvt>
 #include "mmi_token.h"
-#include "libmmi_client.h"
+#include "mmi_client.h"
 #include "error_multimodal.h"
 #include "multimodal_event_handler.h"
 #include "key_event_handler.h"

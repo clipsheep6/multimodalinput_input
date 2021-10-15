@@ -24,7 +24,7 @@ namespace OHOS::AAFwk {
 class Want {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, OHOS::MMI::MMI_LOG_DOMAIN, "Want" };
 public:
-    static constexpr char const* FLAG_HOME_INTENT_FROM_SYSTEM = "AddEntityTest";
+    static constexpr char const *FLAG_HOME_INTENT_FROM_SYSTEM = "AddEntityTest";
 
     Want() = default;
     ~Want() = default;

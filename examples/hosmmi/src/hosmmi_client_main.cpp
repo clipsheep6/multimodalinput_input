@@ -16,7 +16,7 @@
 #include <locale>
 #include <csignal>
 #include "mmi_token.h"
-#include "libmmi_client.h"
+#include "mmi_client.h"
 #include "key_event_handler.h"
 #include "multimodal_event_handler.h"
 #include "common_event_handler.h"

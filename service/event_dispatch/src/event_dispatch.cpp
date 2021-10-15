@@ -529,22 +529,14 @@ int32_t OHOS::MMI::EventDispatch::DispatchPointerEvent(UDSServer &udsServer, lib
             if (size == windowCount_) {
 #ifdef DEBUG_CODE_TEST
                 MMI_LOGT("\nMMIWMS:windowId = [%{public}s]\n", strIds.c_str());
-                if (desWindowId == -1) {
-                    MMI_LOGT("\nWMS:windowId = ''\n");
-                } else {
-                    MMI_LOGT("\nWMS:windowId = %{public}d\n", desWindowId);
-                }
+                MMI_LOGT("\nWMS:windowId = %{public}d\n", desWindowId);
                 MMI_LOGT("\nCALL_AMS:windowId = %{public}d\n", desWindowId);
                 MMI_LOGT("\nMMIAPPM:fd =%{public}d,abilityID = %{public}d\n", appInfo.fd, appInfo.abilityId);
 #endif
             } else {
 #ifdef DEBUG_CODE_TEST
                 MMI_LOGT("\nMMIWMS:windowId=[%{public}s]\n", strIds.c_str());
-                if (desWindowId == -1) {
-                    MMI_LOGT("\nWMS:windowId = ''\n");
-                } else {
-                    MMI_LOGT("\nWMS:windowId = %{public}d\n", desWindowId);
-                }
+                MMI_LOGT("\nWMS:windowId = %{public}d\n", desWindowId);
                 MMI_LOGT("\nCALL_AMS:windowId = ''\n");
                 MMI_LOGT("\nMMIAPPM:fd =%{public}d,abilityID = %{public}d\n", appInfo.fd, appInfo.abilityId);
 #endif

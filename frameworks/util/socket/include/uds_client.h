@@ -47,7 +47,10 @@ public:
     }
 
 protected:
-    virtual bool IsFirstConnectFailExit() { return false; }
+    virtual bool IsFirstConnectFailExit()
+    { 
+        return false; 
+    }
     virtual void OnConnected() {}
     virtual void OnDisconnected() {}
     virtual void OnThreadLoop() {}

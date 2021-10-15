@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 #include <gtest/gtest.h>
-#include "libmmi_client.h"
+#include "mmi_client.h"
 
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
 
-class LibmmiClientTest : public testing::Test {
+class MMIClientTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
@@ -40,23 +40,23 @@ public:
 MMIClient mmiClient;
 ConnectCallback connectFun;
 
-HWTEST_F(LibmmiClientTest, RegisterConnectedFunction, TestSize.Level1)
+HWTEST_F(MMIClientTest, RegisterConnectedFunction, TestSize.Level1)
 {
     mmiClient.RegisterConnectedFunction(connectFun);
 }
 
-HWTEST_F(LibmmiClientTest, RegisterDisconnectedFunction, TestSize.Level1)
+HWTEST_F(MMIClientTest, RegisterDisconnectedFunction, TestSize.Level1)
 {
     mmiClient.RegisterDisconnectedFunction(connectFun);
 }
 
-HWTEST_F(LibmmiClientTest, VirtualKeyIn, TestSize.Level1)
+HWTEST_F(MMIClientTest, VirtualKeyIn, TestSize.Level1)
 {
     RawInputEvent virtualKeyEvent = {};
     mmiClient.VirtualKeyIn(virtualKeyEvent);
 }
 
-HWTEST_F(LibmmiClientTest, ReplyMessageToServer_001, TestSize.Level1)
+HWTEST_F(MMIClientTest, ReplyMessageToServer_001, TestSize.Level1)
 {
     ssize_t time = 1;
     uint64_t serverStartTime = 1;
@@ -66,7 +66,7 @@ HWTEST_F(LibmmiClientTest, ReplyMessageToServer_001, TestSize.Level1)
     mmiClient.ReplyMessageToServer(4, time, serverStartTime, clientEndTime, fd);
 }
 
-HWTEST_F(LibmmiClientTest, ReplyMessageToServer_002, TestSize.Level1)
+HWTEST_F(MMIClientTest, ReplyMessageToServer_002, TestSize.Level1)
 {
     ssize_t time = 0;
     uint64_t serverStartTime = 0;
@@ -76,29 +76,29 @@ HWTEST_F(LibmmiClientTest, ReplyMessageToServer_002, TestSize.Level1)
     mmiClient.ReplyMessageToServer(3, time, serverStartTime, clientEndTime, fd);
 }
 
-HWTEST_F(LibmmiClientTest, SdkGetMultimodeInputInfo, TestSize.Level1)
+HWTEST_F(MMIClientTest, SdkGetMultimodeInputInfo, TestSize.Level1)
 {
     mmiClient.SdkGetMultimodeInputInfo();
 }
 
 MMIClientUnitTest mmiClientTest;
-HWTEST_F(LibmmiClientTest, Re_RegisterConnectedFunction, TestSize.Level1)
+HWTEST_F(MMIClientTest, Re_RegisterConnectedFunction, TestSize.Level1)
 {
     mmiClientTest.RegisterConnectedFunction(connectFun);
 }
 
-HWTEST_F(LibmmiClientTest, Re_RegisterDisconnectedFunction, TestSize.Level1)
+HWTEST_F(MMIClientTest, Re_RegisterDisconnectedFunction, TestSize.Level1)
 {
     mmiClientTest.RegisterDisconnectedFunction(connectFun);
 }
 
-HWTEST_F(LibmmiClientTest, Re_VirtualKeyIn, TestSize.Level1)
+HWTEST_F(MMIClientTest, Re_VirtualKeyIn, TestSize.Level1)
 {
     RawInputEvent virtualKeyEvent = {};
     mmiClientTest.VirtualKeyIn(virtualKeyEvent);
 }
 
-HWTEST_F(LibmmiClientTest, Re_ReplyMessageToServer_001, TestSize.Level1)
+HWTEST_F(MMIClientTest, Re_ReplyMessageToServer_001, TestSize.Level1)
 {
     ssize_t timeId = 1;
     uint64_t serverStartTime = 1;
@@ -108,7 +108,7 @@ HWTEST_F(LibmmiClientTest, Re_ReplyMessageToServer_001, TestSize.Level1)
     mmiClientTest.ReplyMessageToServer(1, timeId, serverStartTime, clientEndTime, fd);
 }
 
-HWTEST_F(LibmmiClientTest, Re_ReplyMessageToServer_002, TestSize.Level1)
+HWTEST_F(MMIClientTest, Re_ReplyMessageToServer_002, TestSize.Level1)
 {
     ssize_t timeId = 0;
     uint64_t serverStartTime = 0;
@@ -118,28 +118,28 @@ HWTEST_F(LibmmiClientTest, Re_ReplyMessageToServer_002, TestSize.Level1)
     mmiClientTest.ReplyMessageToServer(2, timeId, serverStartTime, clientEndTime, fileId);
 }
 
-HWTEST_F(LibmmiClientTest, Re_SdkGetMultimodeInputInfo, TestSize.Level1)
+HWTEST_F(MMIClientTest, Re_SdkGetMultimodeInputInfo, TestSize.Level1)
 {
     mmiClientTest.SdkGetMultimodeInputInfo();
 }
 
-HWTEST_F(LibmmiClientTest, Re_OnConnected, TestSize.Level1)
+HWTEST_F(MMIClientTest, Re_OnConnected, TestSize.Level1)
 {
     mmiClientTest.OnConnectedUnitTest();
 }
-HWTEST_F(LibmmiClientTest, Re_OnConnected_002, TestSize.Level1)
+HWTEST_F(MMIClientTest, Re_OnConnected_002, TestSize.Level1)
 {
     ConnectCallback funTmp;
     mmiClientTest.RegisterConnectedFunction(funTmp);
     mmiClientTest.OnConnectedUnitTest();
 }
 
-HWTEST_F(LibmmiClientTest, Re_OnDisconnected, TestSize.Level1)
+HWTEST_F(MMIClientTest, Re_OnDisconnected, TestSize.Level1)
 {
     mmiClientTest.OnDisconnectedUnitTest();
 }
 
-HWTEST_F(LibmmiClientTest, Re_OnDisconnected_002, TestSize.Level1)
+HWTEST_F(MMIClientTest, Re_OnDisconnected_002, TestSize.Level1)
 {
     ConnectCallback funTmp;
     mmiClientTest.RegisterDisconnectedFunction(funTmp);

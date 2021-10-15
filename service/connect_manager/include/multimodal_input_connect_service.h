@@ -20,7 +20,7 @@
 #include "iremote_object.h"
 #include "system_ability.h"
 #include "nocopyable.h"
-#include "multimodal_input_connect_stub.h"
+#include "i_multimodal_input_connect_stub.h"
 #include "i_uds_server.h"
 
 namespace OHOS {

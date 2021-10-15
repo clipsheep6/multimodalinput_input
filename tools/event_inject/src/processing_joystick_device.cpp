@@ -98,7 +98,7 @@ int32_t ProcessingJoystickDevice::AnalysisJoystickEvent(const Json& inputData,
 }
 
 void ProcessingJoystickDevice::TransformPadEventToInputEvent(const std::vector<JoystickEvent>& JoystickEventArray,
-                                                        InputEventArray& inputEventArray)
+                                                             InputEventArray& inputEventArray)
 {
     for (JoystickEvent joystickEvent : JoystickEventArray) {
         if (joystickEvent.eventType == "KEY_EVENT_PRESS") {

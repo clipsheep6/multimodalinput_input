@@ -20,13 +20,13 @@ namespace {
 using namespace testing::ext;
 using namespace OHOS;
 
-class KeyBoardEventsApiTest : public testing::Test {
+class KeyboardEventApiTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
 };
 
-HWTEST_F(KeyBoardEventsApiTest, Api_Test_IsHandledByIme_InitTrue, TestSize.Level1)
+HWTEST_F(KeyboardEventApiTest, Api_Test_IsHandledByIme_InitTrue, TestSize.Level1)
 {
     KeyBoardEvent keyBoardEventTest;
     int32_t windowId = 0;
@@ -54,7 +54,7 @@ HWTEST_F(KeyBoardEventsApiTest, Api_Test_IsHandledByIme_InitTrue, TestSize.Level
     EXPECT_TRUE(rethandledByIme == true);
 }
 
-HWTEST_F(KeyBoardEventsApiTest, Api_Test_IsHandledByIme_InitFalse, TestSize.Level1)
+HWTEST_F(KeyboardEventApiTest, Api_Test_IsHandledByIme_InitFalse, TestSize.Level1)
 {
     KeyBoardEvent keyBoardEventTest;
     int32_t windowId = 0;
@@ -82,7 +82,7 @@ HWTEST_F(KeyBoardEventsApiTest, Api_Test_IsHandledByIme_InitFalse, TestSize.Leve
     EXPECT_TRUE(rethandledByIme == false);
 }
 
-HWTEST_F(KeyBoardEventsApiTest, Api_Test_EnableIme_IsHandledByIme, TestSize.Level1)
+HWTEST_F(KeyboardEventApiTest, Api_Test_EnableIme_IsHandledByIme, TestSize.Level1)
 {
     KeyBoardEvent keyBoardEventTest;
     keyBoardEventTest.EnableIme();
@@ -90,7 +90,7 @@ HWTEST_F(KeyBoardEventsApiTest, Api_Test_EnableIme_IsHandledByIme, TestSize.Leve
     EXPECT_TRUE(handledByIme == true);
 }
 
-HWTEST_F(KeyBoardEventsApiTest, Api_Test_DisableIme_IsHandledByIme, TestSize.Level1)
+HWTEST_F(KeyboardEventApiTest, Api_Test_DisableIme_IsHandledByIme, TestSize.Level1)
 {
     KeyBoardEvent keyBoardEventTest;
     keyBoardEventTest.DisableIme();
@@ -98,7 +98,7 @@ HWTEST_F(KeyBoardEventsApiTest, Api_Test_DisableIme_IsHandledByIme, TestSize.Lev
     EXPECT_TRUE(handledByIme == false);
 }
 
-HWTEST_F(KeyBoardEventsApiTest, Api_Test_IsNoncharacterKeyPressed_One_Normal, TestSize.Level1)
+HWTEST_F(KeyboardEventApiTest, Api_Test_IsNoncharacterKeyPressed_One_Normal, TestSize.Level1)
 {
     KeyBoardEvent keyBoardEventTest;
     int32_t keycodeOne = 0;
@@ -106,7 +106,7 @@ HWTEST_F(KeyBoardEventsApiTest, Api_Test_IsNoncharacterKeyPressed_One_Normal, Te
     EXPECT_TRUE(noncharacterKeyPressed == false);
 }
 
-HWTEST_F(KeyBoardEventsApiTest, Api_Test_IsNoncharacterKeyPressed_One_Abnormal, TestSize.Level1)
+HWTEST_F(KeyboardEventApiTest, Api_Test_IsNoncharacterKeyPressed_One_Abnormal, TestSize.Level1)
 {
     KeyBoardEvent keyBoardEventTest;
     int32_t keycodeOne = 0xFFFFFFF;
@@ -114,7 +114,7 @@ HWTEST_F(KeyBoardEventsApiTest, Api_Test_IsNoncharacterKeyPressed_One_Abnormal, 
     EXPECT_TRUE(noncharacterKeyPressed == false);
 }
 
-HWTEST_F(KeyBoardEventsApiTest, Api_Test_IsNoncharacterKeyPressed_One_Min, TestSize.Level1)
+HWTEST_F(KeyboardEventApiTest, Api_Test_IsNoncharacterKeyPressed_One_Min, TestSize.Level1)
 {
     KeyBoardEvent keyBoardEventTest;
     int32_t keycodeOne = static_cast<int32_t>(0xFFFFFFFF);
@@ -122,7 +122,7 @@ HWTEST_F(KeyBoardEventsApiTest, Api_Test_IsNoncharacterKeyPressed_One_Min, TestS
     EXPECT_TRUE(noncharacterKeyPressed == false);
 }
 
-HWTEST_F(KeyBoardEventsApiTest, Api_Test_IsNoncharacterKeyPressed_One_Max, TestSize.Level1)
+HWTEST_F(KeyboardEventApiTest, Api_Test_IsNoncharacterKeyPressed_One_Max, TestSize.Level1)
 {
     KeyBoardEvent keyBoardEventTest;
     int32_t keycodeOne = 0x7FFFFFFF;
@@ -130,7 +130,7 @@ HWTEST_F(KeyBoardEventsApiTest, Api_Test_IsNoncharacterKeyPressed_One_Max, TestS
     EXPECT_TRUE(noncharacterKeyPressed == false);
 }
 
-HWTEST_F(KeyBoardEventsApiTest, Api_Test_IsNoncharacterKeyPressed_Two_Normal, TestSize.Level1)
+HWTEST_F(KeyboardEventApiTest, Api_Test_IsNoncharacterKeyPressed_Two_Normal, TestSize.Level1)
 {
     KeyBoardEvent keyBoardEventTest;
     int32_t keycodeOne = 0;
@@ -139,7 +139,7 @@ HWTEST_F(KeyBoardEventsApiTest, Api_Test_IsNoncharacterKeyPressed_Two_Normal, Te
     EXPECT_TRUE(noncharacterKeyPressed == false);
 }
 
-HWTEST_F(KeyBoardEventsApiTest, Api_Test_IsNoncharacterKeyPressed_Two_Abnormal, TestSize.Level1)
+HWTEST_F(KeyboardEventApiTest, Api_Test_IsNoncharacterKeyPressed_Two_Abnormal, TestSize.Level1)
 {
     KeyBoardEvent keyBoardEventTest;
     int32_t keycodeOne = 0xFFFFFFFF;
@@ -148,7 +148,7 @@ HWTEST_F(KeyBoardEventsApiTest, Api_Test_IsNoncharacterKeyPressed_Two_Abnormal, 
     EXPECT_TRUE(noncharacterKeyPressed == false);
 }
 
-HWTEST_F(KeyBoardEventsApiTest, Api_Test_IsNoncharacterKeyPressed_Two_Min, TestSize.Level1)
+HWTEST_F(KeyboardEventApiTest, Api_Test_IsNoncharacterKeyPressed_Two_Min, TestSize.Level1)
 {
     KeyBoardEvent keyBoardEventTest;
     int32_t keycodeOne = static_cast<int32_t>(0xFFFFFFFF);
@@ -157,7 +157,7 @@ HWTEST_F(KeyBoardEventsApiTest, Api_Test_IsNoncharacterKeyPressed_Two_Min, TestS
     EXPECT_TRUE(noncharacterKeyPressed == false);
 }
 
-HWTEST_F(KeyBoardEventsApiTest, Api_Test_IsNoncharacterKeyPressed_Two_Max, TestSize.Level1)
+HWTEST_F(KeyboardEventApiTest, Api_Test_IsNoncharacterKeyPressed_Two_Max, TestSize.Level1)
 {
     KeyBoardEvent keyBoardEventTest;
     int32_t keycodeOne = 0x7FFFFFFF;
@@ -166,7 +166,7 @@ HWTEST_F(KeyBoardEventsApiTest, Api_Test_IsNoncharacterKeyPressed_Two_Max, TestS
     EXPECT_TRUE(noncharacterKeyPressed == false);
 }
 
-HWTEST_F(KeyBoardEventsApiTest, Api_Test_IsNoncharacterKeyPressed_Three_Normal, TestSize.Level1)
+HWTEST_F(KeyboardEventApiTest, Api_Test_IsNoncharacterKeyPressed_Three_Normal, TestSize.Level1)
 {
     KeyBoardEvent keyBoardEventTest;
     int32_t keycodeOne = 0;
@@ -176,7 +176,7 @@ HWTEST_F(KeyBoardEventsApiTest, Api_Test_IsNoncharacterKeyPressed_Three_Normal, 
     EXPECT_TRUE(noncharacterKeyPressed == false);
 }
 
-HWTEST_F(KeyBoardEventsApiTest, Api_Test_IsNoncharacterKeyPressed_Three_Abnormal, TestSize.Level1)
+HWTEST_F(KeyboardEventApiTest, Api_Test_IsNoncharacterKeyPressed_Three_Abnormal, TestSize.Level1)
 {
     KeyBoardEvent keyBoardEventTest;
     int32_t keycodeOne = 0xFFFFFFFF;
@@ -186,7 +186,7 @@ HWTEST_F(KeyBoardEventsApiTest, Api_Test_IsNoncharacterKeyPressed_Three_Abnormal
     EXPECT_TRUE(noncharacterKeyPressed == false);
 }
 
-HWTEST_F(KeyBoardEventsApiTest, Api_Test_IsNoncharacterKeyPressed_Three_Min, TestSize.Level1)
+HWTEST_F(KeyboardEventApiTest, Api_Test_IsNoncharacterKeyPressed_Three_Min, TestSize.Level1)
 {
     KeyBoardEvent keyBoardEventTest;
     int32_t keycodeOne = static_cast<int32_t>(0xFFFFFFFF);
@@ -196,7 +196,7 @@ HWTEST_F(KeyBoardEventsApiTest, Api_Test_IsNoncharacterKeyPressed_Three_Min, Tes
     EXPECT_TRUE(noncharacterKeyPressed == false);
 }
 
-HWTEST_F(KeyBoardEventsApiTest, Api_Test_IsNoncharacterKeyPressed_Three_Max, TestSize.Level1)
+HWTEST_F(KeyboardEventApiTest, Api_Test_IsNoncharacterKeyPressed_Three_Max, TestSize.Level1)
 {
     KeyBoardEvent keyBoardEventTest;
     int32_t keycodeOne = 0x7FFFFFFF;
@@ -206,7 +206,7 @@ HWTEST_F(KeyBoardEventsApiTest, Api_Test_IsNoncharacterKeyPressed_Three_Max, Tes
     EXPECT_TRUE(noncharacterKeyPressed == false);
 }
 
-HWTEST_F(KeyBoardEventsApiTest, Api_Test_GetUnicode_Normal, TestSize.Level1)
+HWTEST_F(KeyboardEventApiTest, Api_Test_GetUnicode_Normal, TestSize.Level1)
 {
     KeyBoardEvent keyBoardEventTest;
     int32_t windowId = 0;
@@ -234,7 +234,7 @@ HWTEST_F(KeyBoardEventsApiTest, Api_Test_GetUnicode_Normal, TestSize.Level1)
     EXPECT_EQ(retUnicode, uniCode);
 }
 
-HWTEST_F(KeyBoardEventsApiTest, Api_Test_GetUnicode_Abnormal, TestSize.Level1)
+HWTEST_F(KeyboardEventApiTest, Api_Test_GetUnicode_Abnormal, TestSize.Level1)
 {
     KeyBoardEvent keyBoardEventTest;
     int32_t windowId = 0;
@@ -262,7 +262,7 @@ HWTEST_F(KeyBoardEventsApiTest, Api_Test_GetUnicode_Abnormal, TestSize.Level1)
     EXPECT_EQ(retUnicode, uniCode);
 }
 
-HWTEST_F(KeyBoardEventsApiTest, Api_Test_GetUnicode_Min, TestSize.Level1)
+HWTEST_F(KeyboardEventApiTest, Api_Test_GetUnicode_Min, TestSize.Level1)
 {
     KeyBoardEvent keyBoardEventTest;
     int32_t windowId = 0;
@@ -290,7 +290,7 @@ HWTEST_F(KeyBoardEventsApiTest, Api_Test_GetUnicode_Min, TestSize.Level1)
     EXPECT_EQ(retUnicode, uniCode);
 }
 
-HWTEST_F(KeyBoardEventsApiTest, Api_Test_GetUnicode_Max, TestSize.Level1)
+HWTEST_F(KeyboardEventApiTest, Api_Test_GetUnicode_Max, TestSize.Level1)
 {
     KeyBoardEvent keyBoardEventTest;
     int32_t windowId = 0;

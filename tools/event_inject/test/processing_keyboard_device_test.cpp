@@ -30,38 +30,49 @@ public:
 
 HWTEST_F(ProcessingKeyboardDeviceTest, Test_TransformKeyBoardJsonDataToInputData, TestSize.Level1)
 {
-    const string path = "temp/Test_TransformKeyBoardJsonDataToInputData.json";
 #ifdef OHOS_BUILD
-    string cmd = "hosmmi-virtual-device-manager start keyboard & ";
+    const string path = "/data/json/Test_TransformKeyBoardJsonDataToInputData.json";
+    string startDeviceCmd = "hosmmi-virtual-device-manager start keyboard & ";
+    string closeDeviceCmd = "hosmmi-virtual-device-manager close all";
 #else
-    string cmd = "./hosmmi-virtual-deviced.out start keyboard &";
+    const string path = "temp/Test_TransformKeyBoardJsonDataToInputData.json";
+    string startDeviceCmd = "./hosmmi-virtual-deviced.out start keyboard &";
+    string closeDeviceCmd = "./hosmmi-virtual-deviced.out close all";
 #endif
-    system(cmd.c_str());
+    system(startDeviceCmd.c_str());
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     std::ifstream reader(path);
     Json inputEventArrays;
     reader >> inputEventArrays;
     reader.close();
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    system(closeDeviceCmd.c_str());
     EXPECT_EQ(ret, RET_OK);
 }
 
 HWTEST_F(ProcessingKeyboardDeviceTest, Test_TransformKeyBoardJsonDataToInputDataEventsIsEmpty, TestSize.Level1)
 {
-    const string path = "temp/Test_TransformKeyBoardJsonDataToInputDataEventsIsEmpty.json";
 #ifdef OHOS_BUILD
-    string cmd = "hosmmi-virtual-device-manager start keyboard & ";
+    const string path = "/data/json/Test_TransformKeyBoardJsonDataToInputDataEventsIsEmpty.json";
+    string startDeviceCmd = "hosmmi-virtual-device-manager start keyboard & ";
+    string closeDeviceCmd = "hosmmi-virtual-device-manager close all";
 #else
-    string cmd = "./hosmmi-virtual-deviced.out start keyboard &";
+    const string path = "temp/Test_TransformKeyBoardJsonDataToInputDataEventsIsEmpty.json";
+    string startDeviceCmd = "./hosmmi-virtual-deviced.out start keyboard &";
+    string closeDeviceCmd = "./hosmmi-virtual-deviced.out close all";
 #endif
-    system(cmd.c_str());
+    system(startDeviceCmd.c_str());
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     std::ifstream reader(path);
     Json inputEventArrays;
     reader >> inputEventArrays;
     reader.close();
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    system(startDeviceCmd.c_str());
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     EXPECT_EQ(ret, RET_ERR);
 }
-
 }

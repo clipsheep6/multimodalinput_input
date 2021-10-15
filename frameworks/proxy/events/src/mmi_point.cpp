@@ -16,7 +16,7 @@
 #include <iostream>
 
 namespace OHOS {
-MmiPoint::MmiPoint() 
+MmiPoint::MmiPoint()
 {
     pz_ = 0.f;
 }

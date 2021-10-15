@@ -17,7 +17,7 @@
 #include "proto.h"
 #include "injection_event_dispatch.h"
 #include "multimodal_input_connect_manager.h"
-#include "message_send_recv_stat.h"
+#include "message_send_recv_stat_mgr.h"
 
 using namespace std;
 using namespace OHOS::MMI;
@@ -129,8 +129,7 @@ int32_t OHOS::MMI::TestAuxToolClient::Socket()
     if (fd_ == IMultimodalInputConnect::INVALID_SOCKET_FD) {
         MMI_LOGE("UDSSocket::Socket, call MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair"
                  " return invalid fd.");
-    }
-    else {
+    } else {
         MMI_LOGT("UDSSocket::Socket, call MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair"
                  " return fd = %{public}d.", fd_);
     }

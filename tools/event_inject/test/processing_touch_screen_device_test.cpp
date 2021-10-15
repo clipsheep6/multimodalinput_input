@@ -30,55 +30,73 @@ public:
 
 HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputData, TestSize.Level1)
 {
-    const string path = "temp/Test_TransformTouchScreenJsonDataToInputData.json";
 #ifdef OHOS_BUILD
-    string cmd = "hosmmi-virtual-device-manager start touchscreen & ";
+    const string path = "/data/json/Test_TransformTouchScreenJsonDataToInputData.json";
+    string startDeviceCmd = "hosmmi-virtual-device-manager start touchscreen & ";
+    string closeDeviceCmd = "hosmmi-virtual-device-manager close all";
 #else
-    string cmd = "./hosmmi-virtual-deviced.out start touchscreen &";
+    const string path = "temp/Test_TransformTouchScreenJsonDataToInputData.json";
+    string startDeviceCmd = "./hosmmi-virtual-deviced.out start touchscreen &";
+    string closeDeviceCmd = "./hosmmi-virtual-deviced.out close all";
 #endif
-    system(cmd.c_str());
+    system(startDeviceCmd.c_str());
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     std::ifstream reader(path);
     Json inputEventArrays;
     reader >> inputEventArrays;
     reader.close();
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    system(closeDeviceCmd.c_str());
     EXPECT_EQ(ret, RET_OK);
 }
 
 HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataEventsIsEmpty, TestSize.Level1)
 {
-    const string path = "temp/Test_TransformJsonDataToInputDataEventsIsEmpty.json";
 #ifdef OHOS_BUILD
-    string cmd = "hosmmi-virtual-device-manager start touchscreen & ";
+    const string path = "/data/json/Test_TransformJsonDataToInputDataEventsIsEmpty.json";
+    string startDeviceCmd = "hosmmi-virtual-device-manager start touchscreen & ";
+    string closeDeviceCmd = "hosmmi-virtual-device-manager close all";
 #else
-    string cmd = "./hosmmi-virtual-deviced.out start touchscreen &";
+    const string path = "temp/Test_TransformJsonDataToInputDataEventsIsEmpty.json";
+    string startDeviceCmd = "./hosmmi-virtual-deviced.out start touchscreen &";
+    string closeDeviceCmd = "./hosmmi-virtual-deviced.out close all";
 #endif
-    system(cmd.c_str());
+    system(startDeviceCmd.c_str());
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     std::ifstream reader(path);
     Json inputEventArrays;
     reader >> inputEventArrays;
     reader.close();
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    system(closeDeviceCmd.c_str());
     EXPECT_EQ(ret, RET_ERR);
 }
 
 HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataSingleEventsIsEmpty, TestSize.Level1)
 {
-    const string path = "temp/Test_TransformJsonDataToInputDataSingleEventsIsEmpty.json";
 #ifdef OHOS_BUILD
-    string cmd = "hosmmi-virtual-device-manager start touchscreen & ";
+    const string path = "/data/json/Test_TransformJsonDataToInputDataSingleEventsIsEmpty.json";
+    string startDeviceCmd = "hosmmi-virtual-device-manager start touchscreen & ";
+    string closeDeviceCmd = "hosmmi-virtual-device-manager close all";
 #else
-    string cmd = "./hosmmi-virtual-deviced.out start touchscreen &";
+    const string path = "temp/Test_TransformJsonDataToInputDataSingleEventsIsEmpty.json";
+    string startDeviceCmd = "./hosmmi-virtual-deviced.out start touchscreen &";
+    string closeDeviceCmd = "./hosmmi-virtual-deviced.out close all";
 #endif
-    system(cmd.c_str());
+    system(startDeviceCmd.c_str());
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     std::ifstream reader(path);
     Json inputEventArrays;
     reader >> inputEventArrays;
     reader.close();
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    system(closeDeviceCmd.c_str());
     EXPECT_EQ(ret, RET_ERR);
 }
 }

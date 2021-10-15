@@ -90,7 +90,7 @@ int32_t ProcessingGamePadDevice::AnalysisGamePadEvent(const Json& inputData, std
 }
 
 void ProcessingGamePadDevice::TransformPadEventToInputEvent(const std::vector<GamePadEvent>& padEventArray,
-                                                        InputEventArray& inputEventArray)
+                                                            InputEventArray& inputEventArray)
 {
     for (GamePadEvent padEvent : padEventArray) {
         if (padEvent.eventType == "KEY_EVENT_PRESS") {

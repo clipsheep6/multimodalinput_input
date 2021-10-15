@@ -85,7 +85,7 @@ void mmi_console_log(bool withoutFileInfo, char* fileName, int lineNo, int level
 
 #define MMI_LOG_MANAGER_OUT(fmt, ...) do { \
     printf(fmt, ##__VA_ARGS__);\
-} while(0)
+} while (0)
 
 #define LOGLOG(fmt, ...) do { \
     mmi_console_log(false, (char *)__FILE__, __LINE__, OHOS::MMI::LL_INFO, OHOS::MMI::GetThreadName(),\
@@ -326,35 +326,15 @@ void LogManager::WriteFile(LogDataPtr pLog)
     }
 
     if (runing_) {
-        f_.Write(longTime, strlen(longTime));
-        f_.Write(" ", LOG_CHAR_LEN);
-        // 进程
-        f_.Write("[", LOG_CHAR_LEN);
-        f_.Write(proId_.c_str(), proId_.length());
-        f_.Write("]", LOG_CHAR_LEN);
-        f_.Write(" ", LOG_CHAR_LEN);
-        // 线程
-        f_.Write("[", LOG_CHAR_LEN);
-        f_.Write(pLog->threadId_.c_str(), pLog->threadId_.length());
-        f_.Write("]", LOG_CHAR_LEN);
-        f_.Write(" ", LOG_CHAR_LEN);
-        // 线程名
-        f_.Write("[", LOG_CHAR_LEN);
-        f_.Write(pLog->threadName_.c_str(), pLog->threadName_.length());
-        f_.Write("]", LOG_CHAR_LEN);
-        f_.Write(" ", LOG_CHAR_LEN);
-        // 级别
-        f_.Write("[", LOG_CHAR_LEN);
-        f_.Write(LOG_LEVELSTR[pLog->level].c_str(), LOG_LEVELSTR[pLog->level].size());
-        f_.Write("]", LOG_CHAR_LEN);
-        f_.Write(" ", LOG_CHAR_LEN);
-        // 内容
-        f_.Write(pLog->data.c_str(), pLog->data.length());
-        f_.Write(" ", LOG_CHAR_LEN);
-        // 文件
-        f_.Write("(", LOG_CHAR_LEN);
-        f_.Write(pLog->curFile.c_str(), pLog->curFile.length());
-        f_.Write(")", LOG_CHAR_LEN);
+        const size_t bufSize = 200;
+        char buf[bufSize] = {};
+        int ret = sprintf_s(buf, bufSize, "%s [%s] [%s] [%s] [%s] %s (%s)",
+                            longTime, proId_.c_str(), pLog->threadId_.c_str(), pLog->threadName_.c_str(),
+                            LOG_LEVELSTR[pLog->level].c_str(), pLog->data.c_str(), pLog->curFile.c_str());
+        if (ret == -1) {
+            LOGLOG("call sprintf_s fail.");
+        }
+        f_.Write(buf, strlen(buf));
         // 行数
         if (logFileline_) {
             char longNum[LOG_MAX_NUM_LEN] = { 0 };
@@ -619,7 +599,7 @@ bool LogManager::Init(const std::string& configPath)
     // 设置日志路径，如果目录不存在，创建目录
     if (filePath_.empty()) {
         filePath_ = DEF_MMI_DATA_ROOT "log/";
-    }    
+    }
     SetLogPath(filePath_.c_str());
     char cmdStr[LOG_MAX_CMD_LEN] = {0};
     if (access(filePath_.c_str(), 0) != 0) {
@@ -799,12 +779,10 @@ void LogManager::OnThread(std::promise<bool>& threadPromiseHadRunning, std::prom
     while (true) {
         count = 0;
         while ((pLog = PopLog()) != nullptr) {
-            if (!f_.IsOpen()) {
-                if (!OpenFileHandle()) {
-                    LOGLOG("LogManager::run file is not Open and open %s failed", fileName_.c_str());
-                    PushLog(pLog);
-                    break;
-                }
+            if (!f_.IsOpen() && !OpenFileHandle()) {
+                LOGLOG("LogManager::run file is not Open and open %s failed", fileName_.c_str());
+                PushLog(pLog);
+                break;
             }
             if (f_.IsOpen()) {
                 WriteFile(pLog);

@@ -16,7 +16,7 @@
 #include "time_cost_chk.h"
 #include "libmmi_util.h"
 #include "proto.h"
-#include "message_send_recv_stat.h"
+#include "message_send_recv_stat_mgr.h"
 
 using namespace OHOS::MMI;
 

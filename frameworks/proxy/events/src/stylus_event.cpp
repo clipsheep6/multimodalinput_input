@@ -59,7 +59,7 @@ int32_t StylusEvent::stylusButtonMapping(int32_t stylusButton) const
     const int32_t SECOND_BUTTON = 0x14c;  // stylus second button
     int32_t actionButton = stylusButton;
 
-    switch(stylusButton) {
+    switch (stylusButton) {
         case FIRST_BUTTON: {
             actionButton = BUTTON_STYLUS;
             break;

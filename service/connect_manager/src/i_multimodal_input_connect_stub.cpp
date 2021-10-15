@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "multimodal_input_connect_stub.h"
+#include "i_multimodal_input_connect_stub.h"
 #include <sys/types.h>
 #include <sys/socket.h>
 #include "ipc_skeleton.h"

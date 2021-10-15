@@ -18,7 +18,6 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <algorithm>
 #include "utils/log.h"
 #include "libmmi_util.h"
 namespace OHOS {

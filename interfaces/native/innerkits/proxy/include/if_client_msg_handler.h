@@ -21,8 +21,7 @@ namespace OHOS {
 namespace MMI {
 class UDSClient;
 class NetPacket;
-class IfClientMsgHandler
-{
+class IfClientMsgHandler {
 public:
     virtual bool Init() = 0;
     virtual void OnMsgHandler(const UDSClient& client, NetPacket& pkt) = 0;

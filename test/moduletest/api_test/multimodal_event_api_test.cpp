@@ -21,13 +21,13 @@ namespace {
 using namespace testing::ext;
 using namespace OHOS;
 
-class MultimodalEventsApiTest : public testing::Test {
+class MultimodalEventApiTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
 };
 
-HWTEST_F(MultimodalEventsApiTest, Api_Test_IsSameEvent_Normal, TestSize.Level1)
+HWTEST_F(MultimodalEventApiTest, Api_Test_IsSameEvent_Normal, TestSize.Level1)
 {
     MultimodalEvent multimodalEventTest;
     int32_t windowId = 0;
@@ -46,7 +46,7 @@ HWTEST_F(MultimodalEventsApiTest, Api_Test_IsSameEvent_Normal, TestSize.Level1)
     EXPECT_TRUE(isTrue == true);
 }
 
-HWTEST_F(MultimodalEventsApiTest, Api_Test_IsSameEvent_Abnormal, TestSize.Level1)
+HWTEST_F(MultimodalEventApiTest, Api_Test_IsSameEvent_Abnormal, TestSize.Level1)
 {
     MultimodalEvent multimodalEventTest;
     int32_t windowId = 0;
@@ -65,7 +65,7 @@ HWTEST_F(MultimodalEventsApiTest, Api_Test_IsSameEvent_Abnormal, TestSize.Level1
     EXPECT_TRUE(isTrue == false);
 }
 
-HWTEST_F(MultimodalEventsApiTest, Api_Test_IsHighLevelInput_Normal, TestSize.Level1)
+HWTEST_F(MultimodalEventApiTest, Api_Test_IsHighLevelInput_Normal, TestSize.Level1)
 {
     MultimodalEvent multimodalEventTest;
     int32_t windowId = 0;
@@ -83,7 +83,7 @@ HWTEST_F(MultimodalEventsApiTest, Api_Test_IsHighLevelInput_Normal, TestSize.Lev
     EXPECT_EQ(retHighLevelInput, isHighLevelEvent);
 }
 
-HWTEST_F(MultimodalEventsApiTest, Api_Test_IsHighLevelInput_Abnormal, TestSize.Level1)
+HWTEST_F(MultimodalEventApiTest, Api_Test_IsHighLevelInput_Abnormal, TestSize.Level1)
 {
     MultimodalEvent multimodalEventTest;
     int32_t windowId = 0;
@@ -101,7 +101,7 @@ HWTEST_F(MultimodalEventsApiTest, Api_Test_IsHighLevelInput_Abnormal, TestSize.L
     EXPECT_EQ(retHighLevelInput, isHighLevelEvent);
 }
 
-HWTEST_F(MultimodalEventsApiTest, Api_Test_GetHighLevelEvent_Normal, TestSize.Level1)
+HWTEST_F(MultimodalEventApiTest, Api_Test_GetHighLevelEvent_Normal, TestSize.Level1)
 {
     MultimodalEvent multimodalEventTest;
     int32_t windowId = 0;
@@ -119,7 +119,7 @@ HWTEST_F(MultimodalEventsApiTest, Api_Test_GetHighLevelEvent_Normal, TestSize.Le
     EXPECT_EQ(retHighLevelEvent, highLevelEvent);
 }
 
-HWTEST_F(MultimodalEventsApiTest, Api_Test_GetHighLevelEvent_Abnormal, TestSize.Level1)
+HWTEST_F(MultimodalEventApiTest, Api_Test_GetHighLevelEvent_Abnormal, TestSize.Level1)
 {
     MultimodalEvent multimodalEventTest;
     int32_t windowId = 0;
@@ -137,7 +137,7 @@ HWTEST_F(MultimodalEventsApiTest, Api_Test_GetHighLevelEvent_Abnormal, TestSize.
     EXPECT_EQ(retHighLevelEvent, highLevelEvent);
 }
 
-HWTEST_F(MultimodalEventsApiTest, Api_Test_GetHighLevelEvent_Min, TestSize.Level1)
+HWTEST_F(MultimodalEventApiTest, Api_Test_GetHighLevelEvent_Min, TestSize.Level1)
 {
     MultimodalEvent multimodalEventTest;
     int32_t windowId = 0;
@@ -155,7 +155,7 @@ HWTEST_F(MultimodalEventsApiTest, Api_Test_GetHighLevelEvent_Min, TestSize.Level
     EXPECT_EQ(retHighLevelEvent, highLevelEvent);
 }
 
-HWTEST_F(MultimodalEventsApiTest, Api_Test_GetHighLevelEvent_Max, TestSize.Level1)
+HWTEST_F(MultimodalEventApiTest, Api_Test_GetHighLevelEvent_Max, TestSize.Level1)
 {
     MultimodalEvent multimodalEventTest;
     int32_t windowId = 0;
@@ -173,7 +173,7 @@ HWTEST_F(MultimodalEventsApiTest, Api_Test_GetHighLevelEvent_Max, TestSize.Level
     EXPECT_EQ(retHighLevelEvent, highLevelEvent);
 }
 
-HWTEST_F(MultimodalEventsApiTest, Api_Test_GetSourceDevice_Normal, TestSize.Level1)
+HWTEST_F(MultimodalEventApiTest, Api_Test_GetSourceDevice_Normal, TestSize.Level1)
 {
     MultimodalEvent multimodalEventTest;
     int32_t windowId = 0;
@@ -191,7 +191,7 @@ HWTEST_F(MultimodalEventsApiTest, Api_Test_GetSourceDevice_Normal, TestSize.Leve
     EXPECT_EQ(retSourceDevice, KEYBOARD);
 }
 
-HWTEST_F(MultimodalEventsApiTest, Api_Test_GetSourceDevice_Abnormal, TestSize.Level1)
+HWTEST_F(MultimodalEventApiTest, Api_Test_GetSourceDevice_Abnormal, TestSize.Level1)
 {
     MultimodalEvent multimodalEventTest;
     int32_t windowId = 0;
@@ -209,7 +209,7 @@ HWTEST_F(MultimodalEventsApiTest, Api_Test_GetSourceDevice_Abnormal, TestSize.Le
     EXPECT_EQ(retSourceDevice, UNSUPPORTED_DEVICE);
 }
 
-HWTEST_F(MultimodalEventsApiTest, Api_Test_GetSourceDevice_Min, TestSize.Level1)
+HWTEST_F(MultimodalEventApiTest, Api_Test_GetSourceDevice_Min, TestSize.Level1)
 {
     MultimodalEvent multimodalEventTest;
     int32_t windowId = 0;
@@ -227,7 +227,7 @@ HWTEST_F(MultimodalEventsApiTest, Api_Test_GetSourceDevice_Min, TestSize.Level1)
     EXPECT_EQ(retSourceDevice, UNSUPPORTED_DEVICE);
 }
 
-HWTEST_F(MultimodalEventsApiTest, Api_Test_GetSourceDevice_Max, TestSize.Level1)
+HWTEST_F(MultimodalEventApiTest, Api_Test_GetSourceDevice_Max, TestSize.Level1)
 {
     MultimodalEvent multimodalEventTest;
     int32_t windowId = 0;
@@ -245,7 +245,7 @@ HWTEST_F(MultimodalEventsApiTest, Api_Test_GetSourceDevice_Max, TestSize.Level1)
     EXPECT_EQ(retSourceDevice, UNSUPPORTED_DEVICE);
 }
 
-HWTEST_F(MultimodalEventsApiTest, Api_Test_GetDeviceId_Normal, TestSize.Level1)
+HWTEST_F(MultimodalEventApiTest, Api_Test_GetDeviceId_Normal, TestSize.Level1)
 {
     MultimodalEvent multimodalEventTest;
     int32_t windowId = 0;
@@ -263,7 +263,7 @@ HWTEST_F(MultimodalEventsApiTest, Api_Test_GetDeviceId_Normal, TestSize.Level1)
     EXPECT_EQ(retDeviceId, deviceId);
 }
 
-HWTEST_F(MultimodalEventsApiTest, Api_Test_GetDeviceId_Abnormal, TestSize.Level1)
+HWTEST_F(MultimodalEventApiTest, Api_Test_GetDeviceId_Abnormal, TestSize.Level1)
 {
     MultimodalEvent multimodalEventTest;
     int32_t windowId = 0;
@@ -281,7 +281,7 @@ HWTEST_F(MultimodalEventsApiTest, Api_Test_GetDeviceId_Abnormal, TestSize.Level1
     EXPECT_EQ(retDeviceId, deviceId);
 }
 
-HWTEST_F(MultimodalEventsApiTest, Api_Test_GetDeviceId_NULL, TestSize.Level1)
+HWTEST_F(MultimodalEventApiTest, Api_Test_GetDeviceId_NULL, TestSize.Level1)
 {
     MultimodalEvent multimodalEventTest;
     int32_t windowId = 0;
@@ -299,7 +299,7 @@ HWTEST_F(MultimodalEventsApiTest, Api_Test_GetDeviceId_NULL, TestSize.Level1)
     EXPECT_EQ(retDeviceId, deviceId);
 }
 
-HWTEST_F(MultimodalEventsApiTest, Api_Test_GetDeviceId_ERROR, TestSize.Level1)
+HWTEST_F(MultimodalEventApiTest, Api_Test_GetDeviceId_ERROR, TestSize.Level1)
 {
     MultimodalEvent multimodalEventTest;
     int32_t windowId = 0;
@@ -317,7 +317,7 @@ HWTEST_F(MultimodalEventsApiTest, Api_Test_GetDeviceId_ERROR, TestSize.Level1)
     EXPECT_EQ(retDeviceId, deviceId);
 }
 
-HWTEST_F(MultimodalEventsApiTest, Api_Test_GetInputDeviceId_Normal, TestSize.Level1)
+HWTEST_F(MultimodalEventApiTest, Api_Test_GetInputDeviceId_Normal, TestSize.Level1)
 {
     MultimodalEvent multimodalEventTest;
     int32_t windowId = 0;
@@ -335,7 +335,7 @@ HWTEST_F(MultimodalEventsApiTest, Api_Test_GetInputDeviceId_Normal, TestSize.Lev
     EXPECT_EQ(retDeviceId, inputDeviceId);
 }
 
-HWTEST_F(MultimodalEventsApiTest, Api_Test_GetInputDeviceId_Abnormal, TestSize.Level1)
+HWTEST_F(MultimodalEventApiTest, Api_Test_GetInputDeviceId_Abnormal, TestSize.Level1)
 {
     MultimodalEvent multimodalEventTest;
     int32_t windowId = 0;
@@ -353,7 +353,7 @@ HWTEST_F(MultimodalEventsApiTest, Api_Test_GetInputDeviceId_Abnormal, TestSize.L
     EXPECT_EQ(retDeviceId, inputDeviceId);
 }
 
-HWTEST_F(MultimodalEventsApiTest, Api_Test_GetInputDeviceId_Min, TestSize.Level1)
+HWTEST_F(MultimodalEventApiTest, Api_Test_GetInputDeviceId_Min, TestSize.Level1)
 {
     MultimodalEvent multimodalEventTest;
     int32_t windowId = 0;
@@ -371,7 +371,7 @@ HWTEST_F(MultimodalEventsApiTest, Api_Test_GetInputDeviceId_Min, TestSize.Level1
     EXPECT_EQ(retDeviceId, inputDeviceId);
 }
 
-HWTEST_F(MultimodalEventsApiTest, Api_Test_GetInputDeviceId_Max, TestSize.Level1)
+HWTEST_F(MultimodalEventApiTest, Api_Test_GetInputDeviceId_Max, TestSize.Level1)
 {
     MultimodalEvent multimodalEventTest;
     int32_t windowId = 0;
@@ -389,7 +389,7 @@ HWTEST_F(MultimodalEventsApiTest, Api_Test_GetInputDeviceId_Max, TestSize.Level1
     EXPECT_EQ(retDeviceId, inputDeviceId);
 }
 
-HWTEST_F(MultimodalEventsApiTest, Api_Test_GetOccurredTime_Normal, TestSize.Level1)
+HWTEST_F(MultimodalEventApiTest, Api_Test_GetOccurredTime_Normal, TestSize.Level1)
 {
     MultimodalEvent multimodalEventTest;
     int32_t windowId = 0;
@@ -407,7 +407,7 @@ HWTEST_F(MultimodalEventsApiTest, Api_Test_GetOccurredTime_Normal, TestSize.Leve
     EXPECT_EQ(retOccurredTime, occurredTime);
 }
 
-HWTEST_F(MultimodalEventsApiTest, Api_Test_GetOccurredTime_Abnormal, TestSize.Level1)
+HWTEST_F(MultimodalEventApiTest, Api_Test_GetOccurredTime_Abnormal, TestSize.Level1)
 {
     MultimodalEvent multimodalEventTest;
     int32_t windowId = 0;
@@ -425,7 +425,7 @@ HWTEST_F(MultimodalEventsApiTest, Api_Test_GetOccurredTime_Abnormal, TestSize.Le
     EXPECT_EQ(retOccurredTime, occurredTime);
 }
 
-HWTEST_F(MultimodalEventsApiTest, Api_Test_GetOccurredTime_Min, TestSize.Level1)
+HWTEST_F(MultimodalEventApiTest, Api_Test_GetOccurredTime_Min, TestSize.Level1)
 {
     MultimodalEvent multimodalEventTest;
     int32_t windowId = 0;
@@ -443,7 +443,7 @@ HWTEST_F(MultimodalEventsApiTest, Api_Test_GetOccurredTime_Min, TestSize.Level1)
     EXPECT_EQ(retOccurredTime, occurredTime);
 }
 
-HWTEST_F(MultimodalEventsApiTest, Api_Test_GetWindowID_Normal, TestSize.Level1)
+HWTEST_F(MultimodalEventApiTest, Api_Test_GetWindowID_Normal, TestSize.Level1)
 {
     MultimodalEvent multimodalEventTest;
     int32_t windowId = 105;
@@ -461,7 +461,7 @@ HWTEST_F(MultimodalEventsApiTest, Api_Test_GetWindowID_Normal, TestSize.Level1)
     EXPECT_EQ(retWindowID, windowId);
 }
 
-HWTEST_F(MultimodalEventsApiTest, Api_Test_GetWindowID_Abnormal, TestSize.Level1)
+HWTEST_F(MultimodalEventApiTest, Api_Test_GetWindowID_Abnormal, TestSize.Level1)
 {
     MultimodalEvent multimodalEventTest;
     int32_t windowId = 0xFFFFFFFF;
@@ -479,7 +479,7 @@ HWTEST_F(MultimodalEventsApiTest, Api_Test_GetWindowID_Abnormal, TestSize.Level1
     EXPECT_EQ(retWindowID, windowId);
 }
 
-HWTEST_F(MultimodalEventsApiTest, Api_Test_GetUuid_Normal, TestSize.Level1)
+HWTEST_F(MultimodalEventApiTest, Api_Test_GetUuid_Normal, TestSize.Level1)
 {
     MultimodalEvent multimodalEventTest;
     int32_t windowId = 0;
@@ -497,7 +497,7 @@ HWTEST_F(MultimodalEventsApiTest, Api_Test_GetUuid_Normal, TestSize.Level1)
     EXPECT_EQ(retUuid, uuid);
 }
 
-HWTEST_F(MultimodalEventsApiTest, Api_Test_GetUuid_Abnormal, TestSize.Level1)
+HWTEST_F(MultimodalEventApiTest, Api_Test_GetUuid_Abnormal, TestSize.Level1)
 {
     MultimodalEvent multimodalEventTest;
     int32_t windowId = 0;

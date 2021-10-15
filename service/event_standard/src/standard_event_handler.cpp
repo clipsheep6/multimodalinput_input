@@ -87,7 +87,7 @@ void OHOS::MMI::StandardEventHandler::PointerPressedStandard(libinput_event& eve
 }
 
 void OHOS::MMI::StandardEventHandler::PointerReleasedStandardEvent(struct libinput_event_pointer& szPoint,
-                                                                      StandardTouchStruct& data)
+                                                                   StandardTouchStruct& data)
 {
     data.msgType = LIBINPUT_EVENT_TOUCH_UP;
     data.reRventType = LIBINPUT_EVENT_POINTER_BUTTON;
@@ -101,7 +101,7 @@ void OHOS::MMI::StandardEventHandler::PointerReleasedStandardEvent(struct libinp
 }
 
 void OHOS::MMI::StandardEventHandler::PointerPressedStandardEvent(struct libinput_event_pointer& szPoint,
-                                                                     StandardTouchStruct& data)
+                                                                  StandardTouchStruct& data)
 {
     data.msgType = LIBINPUT_EVENT_TOUCH_DOWN;
     data.reRventType = LIBINPUT_EVENT_POINTER_BUTTON;

@@ -307,9 +307,9 @@ namespace OHOS {
                 HILOG_ERROR("InjectCmd: call napi_create_int32 fail.");
                 return result;
             }
+
             HILOG_INFO("SetInjectFile:End"); 
             return result;
-            
         }
         
         EXTERN_C_START

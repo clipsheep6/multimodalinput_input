@@ -35,8 +35,7 @@ void OHOS::MMI::MMIClient::TestSocketPairClose()
     fd_ = MultimodalInputConnectManager::GetInstance()->GetClientSocketFdOfAllocedSocketPair();
     if (fd_ == IMultimodalInputConnect::INVALID_SOCKET_FD) {
         MMI_LOGE("UDSSocket::Socket, call MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair return invalid fd.");
-    }
-    else {
+    } else {
         MMI_LOGT("UDSSocket::Socket, call MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair return fd = %{public}d.", fd_);
     }
 
@@ -44,8 +43,7 @@ void OHOS::MMI::MMIClient::TestSocketPairClose()
         MMI_LOGI("%s, call write, fd = %d, enter\n", title, fd_);
         bool bToSendMessage = true;
         int i = 0;
-        while (bToSendMessage)
-        {
+        while (bToSendMessage) {
             scanf("%d", &bToSendMessage);
             if (bToSendMessage) {
                 MMI_LOGI(">>> call write, fd = %d, begin\n", fd_);
@@ -352,8 +350,7 @@ StandEventPtr CreateEvent()
     return StandEventPtr(new T());
 }
 
-class HosMmiClient
-{
+class HosMmiClient {
 private:
     sptr<IRemoteObject> remoteObject_;
     int32_t windowId_;
@@ -420,8 +417,7 @@ public:
     void UnregisterStandardizedEventHandle()
     {
         MMI_LOGI("HosMmiClient::UnregisterStandardizedEventHandle enter.");
-        for (auto it = handerMap_.begin(); it != handerMap_.end();)
-        {
+        for (auto it = handerMap_.begin(); it != handerMap_.end();) {
             MMI_LOGT("UnregisterStandardizedEventHandle %{public}s", it->first.c_str());
             LOGLOG("UnregisterStandardizedEventHandle %s", it->first.c_str());
             MMIEventHdl->UnregisterStandardizedEventHandle(remoteObject_, windowId_, it->second);
@@ -472,8 +468,7 @@ int main(int argc, char* argv[])
 
     // RunClient();
     
-    for (int i = 0; i < 10; i++)
-    {
+    for (int i = 0; i < 10; i++) {
         TestSocketPair();
         if (funcIsContinue("Will break?")) {
             break;

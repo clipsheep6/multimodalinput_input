@@ -18,7 +18,7 @@
 #include "proto.h"
 #include "struct_multimodal.h"
 #include "event_factory.h"
-#include "libmmi_client.h"
+#include "mmi_client.h"
 
 namespace {
 using namespace testing::ext;

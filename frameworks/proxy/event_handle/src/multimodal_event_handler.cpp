@@ -14,7 +14,7 @@
  */
 
 #include "multimodal_event_handler.h"
-#include "libmmi_client.h"
+#include "mmi_client.h"
 #include "proto.h"
 #include "immi_token.h"
 

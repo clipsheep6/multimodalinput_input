@@ -20,7 +20,6 @@
 
 namespace OHOS {
 namespace MMI {
-
 class IMultimodalInputConnect : public IRemoteBroker {
 public:
     [[maybe_unused]] static constexpr int INVALID_SOCKET_FD = -1;

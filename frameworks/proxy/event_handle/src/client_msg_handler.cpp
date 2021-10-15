@@ -21,7 +21,7 @@
 #include "stylus_event.h"
 #include "multimodal_event_handler.h"
 #include "event_factory.h"
-#include "libmmi_client.h"
+#include "mmi_client.h"
 #include "auto_test_multimodal.h"
 
 namespace OHOS::MMI {
@@ -544,7 +544,7 @@ int32_t OHOS::MMI::ClientMsgHandler::PackedData(MultimodalEvent& multEvent, cons
                      data.occurredTime, data.eventType, data.deviceId, fd, abilityId, windowId);
         }
         uint64_t clientEndTime = GetSysClockTime();
-        ((MMIClient *)&client)->ReplyMessageToServer(pkt.GetMsgId(), data.occurredTime, serverStartTime, 
+        ((MMIClient *)&client)->ReplyMessageToServer(pkt.GetMsgId(), data.occurredTime, serverStartTime,
             clientEndTime, fd);
         multEvent.Initialize(windowId, 0, data.uuid, data.eventType, data.occurredTime, "", data.deviceId, 0,
             data.deviceType);

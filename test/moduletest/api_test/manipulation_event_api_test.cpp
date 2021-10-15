@@ -20,13 +20,13 @@ namespace {
 using namespace testing::ext;
 using namespace OHOS;
 
-class ManipulationEventsApiTest : public testing::Test {
+class ManipulationEventApiTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
 };
 
-HWTEST_F(ManipulationEventsApiTest, Api_Test_GetStartTime_Normal, TestSize.Level1)
+HWTEST_F(ManipulationEventApiTest, Api_Test_GetStartTime_Normal, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
@@ -48,7 +48,7 @@ HWTEST_F(ManipulationEventsApiTest, Api_Test_GetStartTime_Normal, TestSize.Level
     EXPECT_EQ(retStartTime, startTime);
 }
 
-HWTEST_F(ManipulationEventsApiTest, Api_Test_GetStartTime_Abnormal, TestSize.Level1)
+HWTEST_F(ManipulationEventApiTest, Api_Test_GetStartTime_Abnormal, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
@@ -70,7 +70,7 @@ HWTEST_F(ManipulationEventsApiTest, Api_Test_GetStartTime_Abnormal, TestSize.Lev
     EXPECT_EQ(retStartTime, startTime);
 }
 
-HWTEST_F(ManipulationEventsApiTest, Api_Test_GetStartTime_Min, TestSize.Level1)
+HWTEST_F(ManipulationEventApiTest, Api_Test_GetStartTime_Min, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
@@ -92,7 +92,7 @@ HWTEST_F(ManipulationEventsApiTest, Api_Test_GetStartTime_Min, TestSize.Level1)
     EXPECT_EQ(retStartTime, startTime);
 }
 
-HWTEST_F(ManipulationEventsApiTest, Api_Test_GetStartTime_Max, TestSize.Level1)
+HWTEST_F(ManipulationEventApiTest, Api_Test_GetStartTime_Max, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
@@ -114,7 +114,7 @@ HWTEST_F(ManipulationEventsApiTest, Api_Test_GetStartTime_Max, TestSize.Level1)
     EXPECT_EQ(retStartTime, startTime);
 }
 
-HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPhase_Normal, TestSize.Level1)
+HWTEST_F(ManipulationEventApiTest, Api_Test_GetPhase_Normal, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
@@ -136,7 +136,7 @@ HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPhase_Normal, TestSize.Level1)
     EXPECT_EQ(retPhase, operationState);
 }
 
-HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPhase_Abnormal, TestSize.Level1)
+HWTEST_F(ManipulationEventApiTest, Api_Test_GetPhase_Abnormal, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
@@ -158,7 +158,7 @@ HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPhase_Abnormal, TestSize.Level1)
     EXPECT_EQ(retPhase, operationState);
 }
 
-HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPhase_Min, TestSize.Level1)
+HWTEST_F(ManipulationEventApiTest, Api_Test_GetPhase_Min, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
@@ -180,7 +180,7 @@ HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPhase_Min, TestSize.Level1)
     EXPECT_EQ(retPhase, operationState);
 }
 
-HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPhase_Max, TestSize.Level1)
+HWTEST_F(ManipulationEventApiTest, Api_Test_GetPhase_Max, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
@@ -202,7 +202,7 @@ HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPhase_Max, TestSize.Level1)
     EXPECT_EQ(retPhase, operationState);
 }
 
-HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPointerPosition_Normal, TestSize.Level1)
+HWTEST_F(ManipulationEventApiTest, Api_Test_GetPointerPosition_Normal, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
@@ -230,7 +230,7 @@ HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPointerPosition_Normal, TestSize
     EXPECT_FLOAT_EQ(retX, x);
 }
 
-HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPointerPosition_Fail, TestSize.Level1)
+HWTEST_F(ManipulationEventApiTest, Api_Test_GetPointerPosition_Fail, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
@@ -258,7 +258,7 @@ HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPointerPosition_Fail, TestSize.L
     EXPECT_FLOAT_EQ(retX, 0.0f);
 }
 
-HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPointerPosition_Abnormal, TestSize.Level1)
+HWTEST_F(ManipulationEventApiTest, Api_Test_GetPointerPosition_Abnormal, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
@@ -286,7 +286,7 @@ HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPointerPosition_Abnormal, TestSi
     EXPECT_FLOAT_EQ(retX, 0.0f);
 }
 
-HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPointerPosition_Abnormal_Parameter, TestSize.Level1)
+HWTEST_F(ManipulationEventApiTest, Api_Test_GetPointerPosition_Abnormal_Parameter, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
@@ -314,7 +314,7 @@ HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPointerPosition_Abnormal_Paramet
     EXPECT_FLOAT_EQ(retX, 0.0f);
 }
 
-HWTEST_F(ManipulationEventsApiTest, Api_Test_SetScreenOffset_GetFingersInfos_Normal, TestSize.Level1)
+HWTEST_F(ManipulationEventApiTest, Api_Test_SetScreenOffset_GetFingersInfos_Normal, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
@@ -341,7 +341,7 @@ HWTEST_F(ManipulationEventsApiTest, Api_Test_SetScreenOffset_GetFingersInfos_Nor
     EXPECT_FLOAT_EQ(retY, offsetY);
 }
 
-HWTEST_F(ManipulationEventsApiTest, Api_Test_SetScreenOffset_GetFingersInfos_Abnormal, TestSize.Level1)
+HWTEST_F(ManipulationEventApiTest, Api_Test_SetScreenOffset_GetFingersInfos_Abnormal, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
@@ -368,7 +368,7 @@ HWTEST_F(ManipulationEventsApiTest, Api_Test_SetScreenOffset_GetFingersInfos_Abn
     EXPECT_FLOAT_EQ(retY, offsetY);
 }
 
-HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPointerCount_Normal, TestSize.Level1)
+HWTEST_F(ManipulationEventApiTest, Api_Test_GetPointerCount_Normal, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
@@ -391,7 +391,7 @@ HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPointerCount_Normal, TestSize.Le
     EXPECT_EQ(retPointerCount, pointerCount);
 }
 
-HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPointerCount_Abnormal, TestSize.Level1)
+HWTEST_F(ManipulationEventApiTest, Api_Test_GetPointerCount_Abnormal, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
@@ -414,7 +414,7 @@ HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPointerCount_Abnormal, TestSize.
     EXPECT_EQ(retPointerCount, 0);
 }
 
-HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPointerCount_Min, TestSize.Level1)
+HWTEST_F(ManipulationEventApiTest, Api_Test_GetPointerCount_Min, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
@@ -437,7 +437,7 @@ HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPointerCount_Min, TestSize.Level
     EXPECT_EQ(retPointerCount, 0);
 }
 
-HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPointerCount_Max, TestSize.Level1)
+HWTEST_F(ManipulationEventApiTest, Api_Test_GetPointerCount_Max, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
@@ -460,7 +460,7 @@ HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPointerCount_Max, TestSize.Level
     EXPECT_EQ(retPointerCount, 0);
 }
 
-HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPointerScreenPosition_Normal, TestSize.Level1)
+HWTEST_F(ManipulationEventApiTest, Api_Test_GetPointerScreenPosition_Normal, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
@@ -488,7 +488,7 @@ HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPointerScreenPosition_Normal, Te
     EXPECT_FLOAT_EQ(retY, y);
 }
 
-HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPointerScreenPosition_Abnormal, TestSize.Level1)
+HWTEST_F(ManipulationEventApiTest, Api_Test_GetPointerScreenPosition_Abnormal, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
@@ -516,7 +516,7 @@ HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPointerScreenPosition_Abnormal, 
     EXPECT_FLOAT_EQ(retY, 0.0f);
 }
 
-HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPointerScreenPosition_Abnormal_Parameter, TestSize.Level1)
+HWTEST_F(ManipulationEventApiTest, Api_Test_GetPointerScreenPosition_Abnormal_Parameter, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
@@ -544,7 +544,7 @@ HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPointerScreenPosition_Abnormal_P
     EXPECT_FLOAT_EQ(retY, 0.0f);
 }
 
-HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPointerId_Normal, TestSize.Level1)
+HWTEST_F(ManipulationEventApiTest, Api_Test_GetPointerId_Normal, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
@@ -568,7 +568,7 @@ HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPointerId_Normal, TestSize.Level
     EXPECT_EQ(retPointerId, fingersInfos[2].mPointerId);
 }
 
-HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPointerId_Anomalous, TestSize.Level1)
+HWTEST_F(ManipulationEventApiTest, Api_Test_GetPointerId_Anomalous, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
@@ -592,7 +592,7 @@ HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPointerId_Anomalous, TestSize.Le
     EXPECT_EQ(retPointerId, -1);
 }
 
-HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPointerId_Min, TestSize.Level1)
+HWTEST_F(ManipulationEventApiTest, Api_Test_GetPointerId_Min, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
@@ -616,7 +616,7 @@ HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPointerId_Min, TestSize.Level1)
     EXPECT_EQ(retPointerId, -1);
 }
 
-HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPointerId_Max, TestSize.Level1)
+HWTEST_F(ManipulationEventApiTest, Api_Test_GetPointerId_Max, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
@@ -640,7 +640,7 @@ HWTEST_F(ManipulationEventsApiTest, Api_Test_GetPointerId_Max, TestSize.Level1)
     EXPECT_EQ(retPointerId, -1);
 }
 
-HWTEST_F(ManipulationEventsApiTest, Api_Test_GetForce_Normal, TestSize.Level1)
+HWTEST_F(ManipulationEventApiTest, Api_Test_GetForce_Normal, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
@@ -664,7 +664,7 @@ HWTEST_F(ManipulationEventsApiTest, Api_Test_GetForce_Normal, TestSize.Level1)
     EXPECT_FLOAT_EQ(retForce, fingersInfos[2].mTouchPressure);
 }
 
-HWTEST_F(ManipulationEventsApiTest, Api_Test_GetForce_Anomalous, TestSize.Level1)
+HWTEST_F(ManipulationEventApiTest, Api_Test_GetForce_Anomalous, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
@@ -688,7 +688,7 @@ HWTEST_F(ManipulationEventsApiTest, Api_Test_GetForce_Anomalous, TestSize.Level1
     EXPECT_FLOAT_EQ(retForce, 0.0f);
 }
 
-HWTEST_F(ManipulationEventsApiTest, Api_Test_GetForce_Min, TestSize.Level1)
+HWTEST_F(ManipulationEventApiTest, Api_Test_GetForce_Min, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
@@ -712,7 +712,7 @@ HWTEST_F(ManipulationEventsApiTest, Api_Test_GetForce_Min, TestSize.Level1)
     EXPECT_FLOAT_EQ(retForce, 0.0f);
 }
 
-HWTEST_F(ManipulationEventsApiTest, Api_Test_GetForce_Max, TestSize.Level1)
+HWTEST_F(ManipulationEventApiTest, Api_Test_GetForce_Max, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
@@ -736,7 +736,7 @@ HWTEST_F(ManipulationEventsApiTest, Api_Test_GetForce_Max, TestSize.Level1)
     EXPECT_FLOAT_EQ(retForce, 0.0f);
 }
 
-HWTEST_F(ManipulationEventsApiTest, Api_Test_GetRadius_Normal, TestSize.Level1)
+HWTEST_F(ManipulationEventApiTest, Api_Test_GetRadius_Normal, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
@@ -760,7 +760,7 @@ HWTEST_F(ManipulationEventsApiTest, Api_Test_GetRadius_Normal, TestSize.Level1)
     EXPECT_FLOAT_EQ(retRadius, fingersInfos[2].mTouchArea);
 }
 
-HWTEST_F(ManipulationEventsApiTest, Api_Test_GetRadius_Anomalous, TestSize.Level1)
+HWTEST_F(ManipulationEventApiTest, Api_Test_GetRadius_Anomalous, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
@@ -784,7 +784,7 @@ HWTEST_F(ManipulationEventsApiTest, Api_Test_GetRadius_Anomalous, TestSize.Level
     EXPECT_FLOAT_EQ(retRadius, 0.0f);
 }
 
-HWTEST_F(ManipulationEventsApiTest, Api_Test_GetRadius_Min, TestSize.Level1)
+HWTEST_F(ManipulationEventApiTest, Api_Test_GetRadius_Min, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;
@@ -808,7 +808,7 @@ HWTEST_F(ManipulationEventsApiTest, Api_Test_GetRadius_Min, TestSize.Level1)
     EXPECT_FLOAT_EQ(retRadius, 0.0f);
 }
 
-HWTEST_F(ManipulationEventsApiTest, Api_Test_GetRadius_Max, TestSize.Level1)
+HWTEST_F(ManipulationEventApiTest, Api_Test_GetRadius_Max, TestSize.Level1)
 {
     ManipulationEvent manipulationEventTest;
     int32_t windowId = 0;

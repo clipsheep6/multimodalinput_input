@@ -78,7 +78,7 @@ ohos_shared_library("event-injection") {
    sources = [
     "./src/injection_event_dispatch.cpp",
     "./src/send_message.cpp",
-    "./src/message_send_recv_stat.cpp",
+    "./src/message_send_recv_stat_mgr.cpp",
     "./src/test_aux_tool_client.cpp",
     "./src/test_aux_tool_msg_handler.cpp",
     "./src/injection_tools_help_func.cpp",
@@ -174,14 +174,20 @@ ohos_unittest("ut-event-injection-out") {
 
   sources = [
     "./test/aux_tool_msg_handler_test.cpp",
-    "./test/injection_dump_event_test.cpp",
     "./test/injection_event_dispatch_test.cpp",
-    "./test/injection_exception_event_test.cpp",
-    "./test/injection_hdi_event_test.cpp",
-    "./test/injection_list_event_test.cpp",
-    #"./test/injection_touch_event_test.cpp",
     "./test/libmmi_aisensor_client_test.cpp",
-    #"./test/parse_file_send_message_test.cpp",
+    "./test/device_base_test.cpp",
+    "./test/get_device_node_test.cpp",
+    "./test/get_device_object_test.cpp",
+    "./test/processing_finger_device_test.cpp",
+    "./test/processing_game_pad_device_test.cpp",
+    "./test/processing_joystick_device_test.cpp",
+    "./test/processing_keyboard_device_test.cpp",
+    "./test/processing_mouse_device_test.cpp",
+    "./test/processing_pad_device_test.cpp",
+    "./test/processing_touch_screen_device_test.cpp",
+    "./test/processing_pen_device_test.cpp",
+    "./test/injection_tools_help_func_test.cpp",
   ]
 
   cflags = [

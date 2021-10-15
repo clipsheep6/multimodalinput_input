@@ -57,7 +57,7 @@ ohos_shared_library("libmmi-client") {
     "./events/src/speech_event.cpp",
     "./events/src/stylus_event.cpp",
     "./events/src/touch_event.cpp",
-    "./module_loader/src/libmmi_client.cpp",
+    "./module_loader/src/mmi_client.cpp",
   ]
 
   cflags = [
@@ -151,7 +151,7 @@ ohos_unittest("ut-mmi-proxy-out") {
   }
 
   sources = [
-    "./module_loader/test/libmmi_client_test.cpp",
+    "./module_loader/test/mmi_client_test.cpp",
     "./events/test/device_event_test.cpp",
     "./events/test/key_event_test.cpp",
     "./events/test/keyboard_event_test.cpp",

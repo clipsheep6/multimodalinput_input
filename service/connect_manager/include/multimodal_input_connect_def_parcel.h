@@ -28,7 +28,7 @@ struct ConnectDefReqParcel final : public Parcelable {
 
     bool Marshalling(Parcel& out) const override;
 
-    static ConnectDefReqParcel * Unmarshalling(Parcel& in);
+    static ConnectDefReqParcel *Unmarshalling(Parcel& in);
 
     ConnectDefReq data;
 };

@@ -118,8 +118,7 @@ int32_t OHOS::MMI::UDSSocket::EpollCreat(int32_t size)
     epollFd_ = epoll_create(size);
     if (epollFd_ < 0) {
         MMI_LOGE("UDSSocket::EpollCreat epoll_create retrun %{public}d", epollFd_);
-    }
-    else {
+    } else {
         MMI_LOGI("UDSSocket::EpollCreat epoll_create, epollFd_ = %{public}d", epollFd_);
     }
     return epollFd_;

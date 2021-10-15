@@ -30,19 +30,25 @@ public:
 
 HWTEST_F(ProcessingMouseDeviceTest, Test_TransformJsonDataToInputData, TestSize.Level1)
 {
-    const string path = "temp/Test_TransformMouseJsonDataToInputData.json";
 #ifdef OHOS_BUILD
-    string cmd = "hosmmi-virtual-device-manager start mouse & ";
+    const string path = "/data/json/Test_TransformMouseJsonDataToInputData.json";
+    string startDeviceCmd = "hosmmi-virtual-device-manager start mouse & ";
+    string closeDeviceCmd = "hosmmi-virtual-device-manager close all";
 #else
-    string cmd = "./hosmmi-virtual-deviced.out start mouse &";
+    const string path = "temp/Test_TransformMouseJsonDataToInputData.json";
+    string startDeviceCmd = "./hosmmi-virtual-deviced.out start mouse &";
+    string closeDeviceCmd = "./hosmmi-virtual-deviced.out close all";
 #endif
-    system(cmd.c_str());
+    system(startDeviceCmd.c_str());
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     std::ifstream reader(path);
     Json inputEventArrays;
     reader >> inputEventArrays;
     reader.close();
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    system(closeDeviceCmd.c_str());
     EXPECT_EQ(ret, RET_OK);
 }
 }

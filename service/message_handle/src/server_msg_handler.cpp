@@ -64,7 +64,7 @@ bool OHOS::MMI::ServerMsgHandler::Init(UDSServer& udsServer)
         {ID_MSG_SENIOR_INPUT_FUNC, MsgCallbackBind2(&ServerMsgHandler::OnSeniorInputFuncProc, this)},
 #endif // OHOS_BUILD_AI
 #ifdef OHOS_BUILD_HDF
-                    {ID_MSG_HDI_INJECT, MsgCallbackBind2(&ServerMsgHandler::OnHdiInject, this)},
+        {ID_MSG_HDI_INJECT, MsgCallbackBind2(&ServerMsgHandler::OnHdiInject, this)},
 #endif // OHOS_BUILD_HDF
 #ifdef OHOS_AUTO_TEST_FRAME
         {ID_MSG_AUTOTEST_FRAME, MsgCallbackBind2(&ServerMsgHandler::AutoTestFrameRegister, this)},

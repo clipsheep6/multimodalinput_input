@@ -14,7 +14,9 @@
  */
 #include <gtest/gtest.h>
 #include "proto.h"
+#define private public
 #include "manage_inject_device.h"
+#undef private
 #include "msg_head.h"
 
 namespace {
@@ -38,25 +40,66 @@ HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataCheckFileIsEmpty, TestSiz
 
 HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataCheckFileNotEmpty, TestSize.Level1)
 {
+#ifdef OHOS_BUILD
+    const string path = "/data/json/Test_TransformJsonDataCheckFileNotEmpty.json";
+    string startDeviceCmd = "hosmmi-virtual-device-manager start all & ";
+    string closeDeviceCmd = "hosmmi-virtual-device-manager close all";
+#else
     const string path = "temp/Test_TransformJsonDataCheckFileNotEmpty.json";
+    string startDeviceCmd = "./hosmmi-virtual-deviced.out start all &";
+    string closeDeviceCmd = "./hosmmi-virtual-deviced.out close all";
+#endif
+    system(startDeviceCmd.c_str());
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     std::ifstream reader(path);
     Json inputEventArrays;
     reader >> inputEventArrays;
     reader.close();
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    system(closeDeviceCmd.c_str());
     EXPECT_EQ(ret, RET_OK);
 }
 
 HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataGetDeviceNodeError, TestSize.Level1)
 {
+#ifdef OHOS_BUILD
+    const string path = "/data/json/Test_TransformJsonDataGetDeviceNodeError.json";
+    string startDeviceCmd = "hosmmi-virtual-device-manager start all & ";
+    string closeDeviceCmd = "hosmmi-virtual-device-manager close all";
+#else
     const string path = "temp/Test_TransformJsonDataGetDeviceNodeError.json";
+    string startDeviceCmd = "./hosmmi-virtual-deviced.out start all &";
+    string closeDeviceCmd = "./hosmmi-virtual-deviced.out close all";
+#endif
+    system(startDeviceCmd.c_str());
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     std::ifstream reader(path);
     Json inputEventArrays;
     reader >> inputEventArrays;
     reader.close();
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    system(closeDeviceCmd.c_str());
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+HWTEST_F(ManageInjectDeviceTest, Test_SendEventToHdi, TestSize.Level1)
+{
+    ManageInjectDevice manageInjectDevice;
+    InputEventArray inputEventArray = {};
+    auto ret = manageInjectDevice.SendEventToHdi(inputEventArray);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+HWTEST_F(ManageInjectDeviceTest, Test_SendEventToDeviveNodeError, TestSize.Level1)
+{
+    ManageInjectDevice manageInjectDevice;
+    InputEventArray inputEventArray = {};
+    inputEventArray.target = "";
+    auto ret = manageInjectDevice.SendEventToDeviveNode(inputEventArray);
     EXPECT_EQ(ret, RET_ERR);
 }
 }

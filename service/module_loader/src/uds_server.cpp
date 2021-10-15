@@ -132,7 +132,7 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, 
 
     MMI_LOGE("alloc socketpair, serverFd = %{public}d, clientFd = %{public}d(%{public}d).",
              serverFd, toReturnClientFd, sockFds[1]);
-    auto closeSocketFdWhenError = [&serverFd, &toReturnClientFd]{
+    auto closeSocketFdWhenError = [&serverFd, &toReturnClientFd] {
         close(serverFd);
         close(toReturnClientFd);
         serverFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
@@ -150,7 +150,7 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, 
 
     if (!ClearDeadSessionInMap(serverFd, toReturnClientFd)) {
         cleanTaskWhenError();
-        MMI_LOGE("IsSocketFdNotUsed error!");        
+        MMI_LOGE("IsSocketFdNotUsed error!");
         return RET_ERR;
     }
 

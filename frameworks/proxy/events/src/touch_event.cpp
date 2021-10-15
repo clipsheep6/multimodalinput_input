@@ -54,9 +54,9 @@ void TouchEvent::Initialize(TouchEvent& touchEvent)
     mIsStandard_ = touchEvent.GetIsStandard();
 }
 
-void TouchEvent::Initialize(int32_t windowId, MultimodalEventPtr deviceEvent, int32_t deviceEventType, int32_t action, int32_t index, 
-                            float forcePrecision, float maxForce, float tapCount, int32_t startTime, 
-                            int32_t operationState, int32_t pointerCount, fingerInfos fingersInfos[], 
+void TouchEvent::Initialize(int32_t windowId, MultimodalEventPtr deviceEvent, int32_t deviceEventType, int32_t action, int32_t index,
+                            float forcePrecision, float maxForce, float tapCount, int32_t startTime,
+                            int32_t operationState, int32_t pointerCount, fingerInfos fingersInfos[],
                             bool isStandard)
 {
     CHK(deviceEvent, NULL_POINTER);

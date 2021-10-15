@@ -15,7 +15,7 @@
 
 #include <gtest/gtest.h>
 #include "multimodal_event_handler.h"
-#include "libmmi_client.h"
+#include "mmi_client.h"
 #include "proto.h"
 
 namespace {
@@ -23,13 +23,13 @@ using namespace testing::ext;
 using namespace OHOS::MMI;
 using namespace OHOS;
 
-class MultimodalEventsHandlerTest : public testing::Test {
+class MultimodalEventHandlerTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
 };
 
-HWTEST_F(MultimodalEventsHandlerTest, TEST_GetAbilityInfoVec, TestSize.Level1)
+HWTEST_F(MultimodalEventHandlerTest, TEST_GetAbilityInfoVec, TestSize.Level1)
 {
     MultimodalEventHandler multimodalEventHandler;
     multimodalEventHandler.GetAbilityInfoVec();

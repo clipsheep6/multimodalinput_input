@@ -90,7 +90,7 @@ void ProcessingPenDevice::SetPenSlidePadEvent(const PenEvent& penEvent, InputEve
         SetMscSerial(inputEventArray, 0);
         SetSynReport(inputEventArray, 0);
         return;
-    } 
+    }
     SetEvAbsX(inputEventArray, 0, penEvent.xPos);
     SetEvAbsY(inputEventArray, 0, penEvent.yPos);
     if (penEvent.pressure > 0) {
