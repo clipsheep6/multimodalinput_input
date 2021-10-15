@@ -524,7 +524,7 @@ void LogManager::ParseLogLimitSize(const std::string& str)
     limit = (limit > maxLimitSize) ? maxLimitSize : limit;
     limitSize_ = limit * ONE_MILLION;
     if (LOG_MAX_FILE_SIZE != size && size != limitSize_) {
-        LOGLOG("The log LimitSize will be modified. The old is %u and the new is %u",
+        LOGLOG("The log LimitSize will be modified. The old is %zu and the new is %zu",
                size, limitSize_);
     }
 }
@@ -646,18 +646,18 @@ bool LogManager::Start(void)
 bool LogManager::Stop()
 {
     if (runing_) {
-        LOGLOG("LogManager::stop, log thread stoping, log queue size: %d.", logs_.size());
+        LOGLOG("LogManager::stop, log thread stoping, log queue size: %lu.", logs_.size());
 		toExit_ = true;
 		//runing_ = false;
         // while (!logs_.empty()) {
             // logs_.pop();
         // }        
         Wait();
-        LOGLOG("LogManager::stop, wait log thread stoping end, log queue size: %d.", logs_.size());
+        LOGLOG("LogManager::stop, wait log thread stoping end, log queue size: %lu.", logs_.size());
         return true;
     }
 
-    LOGLOG("LogManager::stop, log had stoped., log queue size: %d.", logs_.size());
+    LOGLOG("LogManager::stop, log had stoped., log queue size: %lu.", logs_.size());
     return false;
 }
 

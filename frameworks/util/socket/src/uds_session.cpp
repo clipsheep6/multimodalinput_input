@@ -42,7 +42,7 @@ bool OHOS::MMI::UDSSession::SendMsg(const char *buf, size_t size) const
     auto ret = write(fd_, static_cast<void *>(const_cast<char *>(buf)), size);
     if (ret < 0) {
         const int errNoSaved = errno;
-        MMI_LOGE("UDSSession::SendMsg write return %{public}d, fd_: %{public}d, errNoSaved: %{public}d, %{public}s.",
+        MMI_LOGE("UDSSession::SendMsg write return %{public}u, fd_: %{public}d, errNoSaved: %{public}d, %{public}s.",
             ret, fd_, errNoSaved, strerror(errNoSaved));
         return false;
     }

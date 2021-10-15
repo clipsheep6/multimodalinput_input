@@ -234,8 +234,8 @@ void PrintEventJoyStickAxisInfo(const EventJoyStickAxis& r, const int32_t fd,
     const int32_t abilityId, const int32_t focusId, const uint64_t preHandlerTime)
 {
     MMI_LOGT("4.event dispatcher of server: EventJoyStickAxis:deviceId: %{public}u; devicePhys: %{public}s;"
-             "fd: %{public}d; abilityId: %{public}d; windowId: %{public}d; preHandlerTime: %{public}llu; "
-             "time: %{public}llu; deviceType: %{public}u; eventType: %{public}d; deviceName: %{public}s\n",
+             "fd: %{public}d; abilityId: %{public}d; windowId: %{public}d; preHandlerTime: %{public}u; "
+             "time: %{public}u; deviceType: %{public}u; eventType: %{public}d; deviceName: %{public}s\n",
              r.deviceId, r.devicePhys, fd, abilityId, focusId, preHandlerTime, r.time, r.deviceType,
              r.eventType, r.deviceName);
 

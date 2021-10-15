@@ -42,7 +42,7 @@ bool OHOS::MMI::SafeKeeper::RegisterEvent(uint64_t tid, const std::string& remar
     LOCKGUARD(mtx_);
     const SafeEvent event = {tid, GetMillisTime(), remark};
     dList_.push_back(event);
-    MMI_LOGI("SafeKeeper register tid:[%{public}llu] remark:[%{public}s]", tid, remark.c_str());
+    MMI_LOGI("SafeKeeper register tid:[%{public}lu] remark:[%{public}s]", tid, remark.c_str());
     return true;
 }
 
@@ -59,7 +59,7 @@ void OHOS::MMI::SafeKeeper::ReportHealthStatus(uint64_t tid)
     LOCKGUARD(mtx_);
     auto ptr = GetEvent(tid);
     if (!ptr) {
-        MMI_LOGE("SafeKeeper report ptr = nullptr tid:[%{public}llu] errCode:%{public}d", tid, NULL_POINTER);
+        MMI_LOGE("SafeKeeper report ptr = nullptr tid:[%{public}lu] errCode:%{public}d", tid, NULL_POINTER);
         return;
     }
     ptr->lastTime = GetMillisTime();
