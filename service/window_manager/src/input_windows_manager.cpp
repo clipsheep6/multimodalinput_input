@@ -71,7 +71,7 @@ void OHOS::MMI::InputWindowsManager::UpdateSeatsInfo()
 {
     LOCKGUARD(mu_);
     if (seatsInfo_ != nullptr) {
-        FreeSeatsInfo(const_cast<const SeatInfo**>(seatsInfo_));
+        FreeSeatsInfo(seatsInfo_);
     }
     seatsInfo_ = GetSeatsInfo();
     if (seatsInfo_ == nullptr) {
@@ -90,7 +90,7 @@ void OHOS::MMI::InputWindowsManager::UpdateScreensInfo()
     LOCKGUARD(mu_);
     // free the last screen info
     if (screensInfo_ != nullptr) {
-        FreeScreensInfo(const_cast<const ScreenInfo**>(screensInfo_));
+        FreeScreensInfo(screensInfo_);
     }
     screensInfo_ = GetScreensInfo();
     if (screensInfo_ == nullptr) {
@@ -242,11 +242,11 @@ void OHOS::MMI::InputWindowsManager::Clear()
 {
     LOCKGUARD(mu_);
     if (seatsInfo_) {
-        FreeSeatsInfo(const_cast<const SeatInfo**>(seatsInfo_));
+        FreeSeatsInfo(seatsInfo_);
         seatsInfo_ = nullptr;
     }
     if (screensInfo_) {
-        FreeScreensInfo(const_cast<const ScreenInfo**>(screensInfo_));
+        FreeScreensInfo(screensInfo_);
         screensInfo_ = nullptr;
     }
     focusInfoID_ = 0;
