@@ -169,7 +169,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnKey(const UDSClient& client, NetPacket& p
     uint64_t serverStartTime = 0;
     EventKeyboard key = {};
     pkt >> key >> abilityId >> windowId >> fd >> serverStartTime;
-    MMI_LOGT("\nevent dispatcher of client:\neventKeyboard:time=%{public}llu;key=%{public}u;deviceId=%{public}u;"
+    MMI_LOGT("\nevent dispatcher of client:\neventKeyboard:time=%{public}zu;key=%{public}u;deviceId=%{public}u;"
              "deviceType=%{public}u;seat_key_count=%{public}u;state=%{public}d;abilityId=%{public}d;"
              "windowId=%{public}d;fd=%{public}d\n*************************************************************\n",
              key.time, key.key, key.deviceId, key.deviceType, key.seat_key_count, key.state, abilityId, windowId, fd);
@@ -532,12 +532,12 @@ int32_t OHOS::MMI::ClientMsgHandler::PackedData(MultimodalEvent& multEvent, cons
     } else {
         pkt >> data >> fd >> windowId >> abilityId >> serverStartTime;
         if (windowId == -1) {
-            MMI_LOGT("\nevent dispatcher of client:\n occurredTime=%{public}llu;\nsourceType=%{public}d;\n"
+            MMI_LOGT("\nevent dispatcher of client:\n occurredTime=%{public}zu;\nsourceType=%{public}d;\n"
                      "deviceId=%{public}d;\nfd=%{public}d;\nabilityId=%{public}d;\n"
                      "\n************************************************************************\n",
                      data.occurredTime, data.eventType, data.deviceId, fd, abilityId);
         } else {
-            MMI_LOGT("\nevent dispatcher of client:\n occurredTime=%{public}llu;\nsourceType=%{public}d;\n"
+            MMI_LOGT("\nevent dispatcher of client:\n occurredTime=%{public}zu;\nsourceType=%{public}d;\n"
                      "deviceId=%{public}d;\nfd=%{public}d;\nabilityId=%{public}d;\nwindowId=%{public}d;\n"
                      "\n**************************************************************\n",
                      data.occurredTime, data.eventType, data.deviceId, fd, abilityId, windowId);
@@ -612,7 +612,7 @@ void OHOS::MMI::ClientMsgHandler::AnalysisPointEvent(const UDSClient& client, Ne
     MultimodalEventPtr mousePtr = EventFactory::CreateEvent(EVENT_MOUSE);
     CHK(mousePtr, NULL_POINTER);
     pkt >> ret >> pointData >> abilityId >> windowId >> fd >> serverStartTime;
-    MMI_LOGT("\nevent dispatcher of client: mouse_data \neventPointer:time=%{public}llu; eventType=%{public}d;"
+    MMI_LOGT("\nevent dispatcher of client: mouse_data \neventPointer:time=%{public}zu; eventType=%{public}d;"
              "buttonCode=%{public}u;deviceId=%{public}u;deviceType=%{public}u;seat_button_count=%{public}u;"
              "axes=%{public}u;buttonState=%{public}d;source=%{public}d;delta.x=%{public}lf;delta.y=%{public}lf;"
              "delta_raw.x=%{public}lf;delta_raw.y=%{public}lf;absolute.x=%{public}lf;absolute.y=%{public}lf;"
@@ -694,7 +694,7 @@ void OHOS::MMI::ClientMsgHandler::AnalysisTouchEvent(const UDSClient& client, Ne
         fingersInfos[i].mMp.Setxy(touchData.point.x, touchData.point.y);
     }
 
-    MMI_LOGT("\nevent dispatcher of client:\neventTouch:time=%{public}llu;deviceId=%{public}u;"
+    MMI_LOGT("\nevent dispatcher of client:\neventTouch:time=%{public}zu;deviceId=%{public}u;"
              "deviceType=%{public}u;eventType=%{public}d;slot=%{public}d;seat_slot=%{public}d;"
              "fd=%{public}d,abilityId=%{public}d,windowId=%{public}d"
              "\n************************************************************************\n",
@@ -788,11 +788,11 @@ void OHOS::MMI::ClientMsgHandler::AnalysisTouchPadEvent(const UDSClient& client,
     MultimodalEventPtr mousePtr = EventFactory::CreateEvent(EVENT_MOUSE);
     CHK(mousePtr, NULL_POINTER);
     pkt >> tabletPad >> abilityId >> windowId >> fd >> serverStartTime;
-    MMI_LOGT("\nevent dispatcher of client: event tablet Pad :time=%{public}llu;deviceType=%{public}u;"
+    MMI_LOGT("\nevent dispatcher of client: event tablet Pad :time=%{public}zu;deviceType=%{public}u;"
              "deviceId=%{public}d;deviceName=%{public}s;eventType=%{public}d;\n"
              "ring.number=%{public}d;ring.position=%{public}lf;ring.source=%{public}d;\n"
              "strip.number=%{public}d;strip.position=%{public}lf;strip.source=%{public}d;\n"
-             "fd=%{public}d;abilityId=%{public}d;windowId=%{public}d;preHandlerTime=%{public}llu;\n*"
+             "fd=%{public}d;abilityId=%{public}d;windowId=%{public}d;preHandlerTime=%{public}zu;\n*"
              "***********************************************************************\n",
              tabletPad.time, tabletPad.deviceType, tabletPad.deviceId, tabletPad.deviceName, tabletPad.eventType,
              tabletPad.ring.number, tabletPad.ring.position, tabletPad.ring.source, tabletPad.strip.number,
@@ -828,7 +828,7 @@ void OHOS::MMI::ClientMsgHandler::AnalysisTouchPadEvent(const UDSClient& client,
 void OHOS::MMI::ClientMsgHandler::PrintEventTabletToolInfo(EventTabletTool tableTool, uint64_t serverStartTime,
                                                            int32_t abilityId, int32_t windowId, int32_t fd) const
 {
-    MMI_LOGT("\nevent dispatcher of client: event tablet Tool :time=%{public}llu; deviceType=%{public}u; "
+    MMI_LOGT("\nevent dispatcher of client: event tablet Tool :time=%{public}zu; deviceType=%{public}u; "
              "deviceId=%{public}d; deviceName=%{public}s; eventType=%{public}d; type=%{public}u;"
              "tool_id=%{public}u; serial=%{public}u; button=%{public}d; "
              "state=%{public}d; point.x=%{public}lf; point.y=%{public}lf; tilt.x=%{public}lf;"
@@ -836,7 +836,7 @@ void OHOS::MMI::ClientMsgHandler::PrintEventTabletToolInfo(EventTabletTool table
              "rotation=%{public}lf; slider=%{public}lf; wheel=%{public}lf; wheel_discrete=%{public}d;"
              "size.major=%{public}lf; size.minor=%{public}lf; "
              "proximity_state=%{public}d; tip_state=%{public}d; state=%{public}d; seat_button_count=%{public}d;"
-             "fd=%{public}d; abilityId=%{public}d; windowId=%{public}d; preHandlerTime=%{public}llu;\n"
+             "fd=%{public}d; abilityId=%{public}d; windowId=%{public}d; preHandlerTime=%{public}zu;\n"
              "***********************************************************************\n",
              tableTool.time, tableTool.deviceType, tableTool.deviceId, tableTool.deviceName,
              tableTool.eventType, tableTool.tool.type, tableTool.tool.tool_id, tableTool.tool.serial,
@@ -994,11 +994,11 @@ void OHOS::MMI::ClientMsgHandler::AnalysisGestureEvent(const UDSClient& client, 
     fingerInfos fingersInfos[FINGER_NUM] = {};
     CHK(mousePtr, NULL_POINTER);
     pkt >> gesture >> abilityId >> windowId >> fd >> serverStartTime;
-    MMI_LOGT("\nevent dispatcher of client: event Gesture :time=%{public}llu;deviceId=%{public}u;"
+    MMI_LOGT("\nevent dispatcher of client: event Gesture :time=%{public}zu;deviceId=%{public}u;"
              "deviceType=%{public}u;deviceName=%{public}s;devNode=%{public}s;eventType=%{public}d;"
              "fingerCount=%{public}d;cancelled=%{public}d;delta.x=%{public}lf;delta.y=%{public}lf;"
              "deltaUnaccel.x=%{public}lf;deltaUnaccel.y=%{public}lf;fd=%{public}d;abilityId=%{public}d;"
-             "windowId=%{public}d;preHandlerTime=%{public}llu;\n***************************************************\n",
+             "windowId=%{public}d;preHandlerTime=%{public}zu;\n***************************************************\n",
              gesture.time, gesture.deviceId, gesture.deviceType, gesture.deviceName, gesture.devicePhys,
              gesture.eventType, gesture.fingerCount, gesture.cancelled, gesture.delta.x, gesture.delta.y,
              gesture.deltaUnaccel.x, gesture.deltaUnaccel.y, fd, abilityId, windowId, serverStartTime);
