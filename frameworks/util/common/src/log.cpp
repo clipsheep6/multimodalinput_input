@@ -525,7 +525,7 @@ void LogManager::ParseLogLimitSize(const std::string& str)
     limit = (limit > maxLimitSize) ? maxLimitSize : limit;
     limitSize_ = limit * ONE_MILLION;
     if (LOG_MAX_FILE_SIZE != size && size != limitSize_) {
-        LOGLOG("The log LimitSize will be modified. The old is %" PRId64 " and the new is %" PRId64 "",
+        LOGLOG("The log LimitSize will be modified. The old is %zu and the new is %zu",
                size, limitSize_);
     }
 }
@@ -647,18 +647,18 @@ bool LogManager::Start(void)
 bool LogManager::Stop()
 {
     if (runing_) {
-        LOGLOG("LogManager::stop, log thread stoping, log queue size: %" PRId64 ".", logs_.size());
+        LOGLOG("LogManager::stop, log thread stoping, log queue size: %" PRId64 ".", static_cast<uint64_t>(logs_.size()));
 		toExit_ = true;
 		//runing_ = false;
         // while (!logs_.empty()) {
             // logs_.pop();
         // }        
         Wait();
-        LOGLOG("LogManager::stop, wait log thread stoping end, log queue size: %" PRId64 ".", logs_.size());
+        LOGLOG("LogManager::stop, wait log thread stoping end, log queue size: %" PRId64 ".", static_cast<uint64_t>(logs_.size()));
         return true;
     }
 
-    LOGLOG("LogManager::stop, log had stoped., log queue size: %" PRId64 ".", logs_.size());
+    LOGLOG("LogManager::stop, log had stoped., log queue size: %" PRId64 ".", static_cast<uint64_t>(logs_.size()));
     return false;
 }
 

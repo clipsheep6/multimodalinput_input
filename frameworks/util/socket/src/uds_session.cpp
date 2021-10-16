@@ -40,7 +40,7 @@ bool OHOS::MMI::UDSSession::SendMsg(const char *buf, size_t size) const
     CHKF(buf, OHOS::NULL_POINTER);
     CHKF(size > 0 && size <= MAX_PACKET_BUF_SIZE, PARAM_INPUT_INVALID);
     CHKF(fd_ >= 0, PARAM_INPUT_INVALID);
-    auto ret = write(fd_, static_cast<void *>(const_cast<char *>(buf)), size);
+    uint64_t ret = write(fd_, static_cast<void *>(const_cast<char *>(buf)), size);
     if (ret < 0) {
         const int errNoSaved = errno;
         MMI_LOGE("UDSSession::SendMsg write return %{public}" PRId64 ", fd_: %{public}d, errNoSaved: %{public}d, %{public}s.",

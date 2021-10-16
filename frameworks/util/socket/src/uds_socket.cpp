@@ -49,7 +49,7 @@ size_t OHOS::MMI::UDSSocket::Read(char *buf, size_t size)
     CHKR(buf, NULL_POINTER, -1);
     CHKR(size > 0, PARAM_INPUT_INVALID, -1);
     CHKR(fd_ >= 0, PARAM_INPUT_INVALID, -1);
-    auto ret = read(fd_, static_cast<void *>(buf), size);
+    uint64_t ret = read(fd_, static_cast<void *>(buf), size);
     if (ret < 0) {
         MMI_LOGE("UDSSocket::Read read return %{public}" PRId64 "", ret);
     }
@@ -61,7 +61,7 @@ size_t OHOS::MMI::UDSSocket::Write(const char *buf, size_t size)
     CHKR(buf, NULL_POINTER, -1);
     CHKR(size > 0, PARAM_INPUT_INVALID, -1);
     CHKR(fd_ >= 0, PARAM_INPUT_INVALID, -1);
-    auto ret = write(fd_, buf, size);
+    uint64_t ret = write(fd_, buf, size);
     if (ret < 0) {
         MMI_LOGE("UDSSocket::Write write return %{public}" PRId64 "", ret);
     }
@@ -72,7 +72,7 @@ size_t OHOS::MMI::UDSSocket::Send(const char *buf, size_t size, int32_t flags)
 {
     CHKR(buf, NULL_POINTER, -1);
     CHKR(size > 0, PARAM_INPUT_INVALID, -1);
-    auto ret = send(fd_, buf, size, flags);
+    uint64_t ret = send(fd_, buf, size, flags);
     if (ret < 0) {
         MMI_LOGE("UDSSocket::Send send return %{public}" PRId64 "", ret);
     }
@@ -83,7 +83,7 @@ size_t OHOS::MMI::UDSSocket::Recv(char *buf, size_t size, int32_t flags)
 {
     CHKR(buf, NULL_POINTER, -1);
     CHKR(size > 0, PARAM_INPUT_INVALID, -1);
-    auto ret = recv(fd_, static_cast<void *>(buf), size, flags);
+    uint64_t ret = recv(fd_, static_cast<void *>(buf), size, flags);
     if (ret < 0) {
         MMI_LOGE("UDSSocket::Recv recv return %{public}" PRId64 "", ret);
     }
@@ -95,7 +95,7 @@ size_t OHOS::MMI::UDSSocket::Recvfrom(char *buf, size_t size, uint32_t flags, so
     CHKR(buf, NULL_POINTER, -1);
     CHKR(size > 0, PARAM_INPUT_INVALID, -1);
     CHKR(fd_ >= 0, PARAM_INPUT_INVALID, -1);
-    auto ret = recvfrom(fd_, static_cast<void *>(buf), size, flags, addr, reinterpret_cast<socklen_t *>(addrlen));
+    uint64_t ret = recvfrom(fd_, static_cast<void *>(buf), size, flags, addr, reinterpret_cast<socklen_t *>(addrlen));
     if (ret < 0) {
         MMI_LOGE("UDSSocket::Recvfrom recvfrom return %{public}" PRId64 "", ret);
     }
@@ -107,7 +107,7 @@ size_t OHOS::MMI::UDSSocket::Sendto(const char *buf, size_t size, uint32_t flags
     CHKR(buf, NULL_POINTER, -1);
     CHKR(size > 0, PARAM_INPUT_INVALID, -1);
     CHKR(fd_ >= 0, PARAM_INPUT_INVALID, -1);
-    auto ret = sendto(fd_, static_cast<const void *>(buf), size, flags, addr, static_cast<socklen_t>(addrlen));
+    uint64_t ret = sendto(fd_, static_cast<const void *>(buf), size, flags, addr, static_cast<socklen_t>(addrlen));
     if (ret < 0) {
         MMI_LOGE("UDSSocket::Sendto sendto return %{public}" PRId64 "", ret);
     }
