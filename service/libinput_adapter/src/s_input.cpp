@@ -16,6 +16,7 @@
 #include <sys/epoll.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <inttypes.h>
 #include "libmmi_util.h"
 #include "safe_keeper.h"
 #include "util.h"
@@ -120,9 +121,9 @@ void OHOS::MMI::SInput::EventDispatch()
 void OHOS::MMI::SInput::OnThread()
 {
     OHOS::MMI::SetThreadName(std::string("s_input"));
-    auto tid = GetThisThreadIdOfLL();
+    uint64_t tid = GetThisThreadIdOfLL();
     CHK(tid > 0, PARAM_INPUT_INVALID);
-    MMI_LOGI("CInput::OnThread begin... fd:%{public}d tid:%{public}llu", lfd_, tid);
+    MMI_LOGI("CInput::OnThread begin... fd:%{public}d tid:%{public}" PRId64 "", lfd_, tid);
     SafeKpr->RegisterEvent(tid, "CInput::_OnThread");
 
     int32_t count = 0;

@@ -14,6 +14,7 @@
  */
 #include "js_register_util.h"
 #include "js_register_module.h"
+#include <inttypes.h>
 
 namespace OHOS {
     namespace MMI {
@@ -99,12 +100,12 @@ namespace OHOS {
 
         void SetNamedProperty(const napi_env& env, napi_value object, const std::string& name, uint64_t value)
         {
-            HILOG_DEBUG("SetNamedProperty: %{public}s=%{public}llu", name.c_str(), value);
+            HILOG_DEBUG("SetNamedProperty: %{public}s=%{public}" PRId64 "", name.c_str(), value);
             napi_status status;
             napi_value napiValue;
             status = napi_create_int64(env, value, &napiValue);
             if (status != napi_ok) {
-                HILOG_ERROR("SetNamedProperty: %{public}s=%{public}llu failed.", name.c_str(), value);
+                HILOG_ERROR("SetNamedProperty: %{public}s=%{public}" PRId64 " failed.", name.c_str(), value);
                 return;
             }
             NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), napiValue));
@@ -206,7 +207,7 @@ namespace OHOS {
                 return value;
             }
             napi_get_value_int64(env, napiValue, &value);
-            HILOG_DEBUG("GetNamedPropertyInt64: %{public}s=%{public}llu", name.c_str(), value);
+            HILOG_DEBUG("GetNamedPropertyInt64: %{public}s=%{public}" PRId64 "", name.c_str(), value);
             return value;
         }
 

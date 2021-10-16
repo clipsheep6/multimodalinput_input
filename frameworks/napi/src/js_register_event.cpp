@@ -15,6 +15,7 @@
 #include "js_register_event.h"
 #include "js_register_util.h"
 #include "stylus_event.h"
+#include <inttypes.h>
 
 namespace OHOS {
     namespace MMI {
@@ -106,7 +107,7 @@ namespace OHOS {
                 return JS_CALLBACK_EVENT_FAILED;
             }
             HILOG_DEBUG("AddEventCallback: event=%{public}s", event.name.c_str());
-            HILOG_DEBUG("AddEventCallback: jsEvent size=%{public}d", jsEvent.size());
+            HILOG_DEBUG("AddEventCallback: jsEvent size=%{public}d", static_cast<int32_t>(jsEvent.size()));
 
             auto it = iter->second.begin();
             while (it != iter->second.end()) {
@@ -123,7 +124,7 @@ namespace OHOS {
             napi_ref callbackRef = nullptr;
             napi_create_reference(env, event.handle, 1, &callbackRef);
             iter->second.push_back(callbackRef);
-            HILOG_DEBUG("AddEventCallback: callback size=%{public}d", iter->second.size());
+            HILOG_DEBUG("AddEventCallback: callback size=%{public}d", static_cast<int32_t>(iter->second.size()));
             HILOG_DEBUG("AddEventCallback: success");
             return JS_CALLBACK_EVENT_SUCCESS;
         }
@@ -147,12 +148,12 @@ namespace OHOS {
                 if (isEquals) {
                     napi_delete_reference(env, *it);
                     iter->second.erase(it);
-                    HILOG_DEBUG("DelCallback: success. callback exists. size=%{public}d", iter->second.size());
+                    HILOG_DEBUG("DelCallback: success. callback exists. size=%{public}d", static_cast<int32_t>(iter->second.size()));
                     return JS_CALLBACK_EVENT_SUCCESS;
                 }
                 it++;
             }
-            HILOG_DEBUG("DelEventCallback: callback size=%{public}d", iter->second.size());
+            HILOG_DEBUG("DelEventCallback: callback size=%{public}d", static_cast<int32_t>(iter->second.size()));
             HILOG_DEBUG("DelEventCallback: success.");
             return JS_CALLBACK_EVENT_NOT_EXIST;
         }
@@ -338,7 +339,7 @@ namespace OHOS {
                                  const MultimodalEvent& event)
         {
             HILOG_DEBUG("SendMultimodalEvent: event=%{public}s ", eventTable[type].c_str());
-            HILOG_DEBUG("SendMultimodalEvent: CallbackMap size=%{public}d", jsEvent.size());
+            HILOG_DEBUG("SendMultimodalEvent: CallbackMap size=%{public}d", static_cast<int32_t>(jsEvent.size()));
             size_t argc = 1;
             napi_value argv;
             napi_value result;

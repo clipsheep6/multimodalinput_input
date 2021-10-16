@@ -17,6 +17,7 @@
 #include "js_register_util.h"
 #include "js_register_event.h"
 #include "js_register_handle.h"
+#include <inttypes.h>
 
 namespace OHOS {
     namespace MMI {
@@ -199,7 +200,7 @@ namespace OHOS {
                 return result;
             }
 
-            napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+            napi_get_cb_info(env, info, static_cast<size_t *>(&argc), argv, nullptr, nullptr);
             NAPI_ASSERT(env, argc == 1, "InjectEvent: paramater num error");
 
             napi_value keyHandle = nullptr;
@@ -235,7 +236,7 @@ namespace OHOS {
                 HILOG_ERROR("UnitTest: call napi_create_int32 fail.");
                 return result;
             }
-            napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+            napi_get_cb_info(env, info, static_cast<size_t *>(&argc), argv, nullptr, nullptr);
             NAPI_ASSERT(env, argc == ARGC_UT_NUM, "UnitTest: paramater num error");
 
             napi_valuetype eventWinIdType;
@@ -282,7 +283,7 @@ namespace OHOS {
                 HILOG_ERROR("InjectCmd: call napi_create_int32 fail.");
                 return result;
             }
-            napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+            napi_get_cb_info(env, info, static_cast<size_t *>(&argc), argv, nullptr, nullptr);
 
             napi_valuetype eventWinIdType;
             napi_typeof(env, argv[ARGV_FIRST], &eventWinIdType);

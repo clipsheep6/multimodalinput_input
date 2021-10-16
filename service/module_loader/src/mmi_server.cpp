@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "mmi_server.h"
+#include <inttypes.h>
 #include "util.h"
 #include "log.h"
 #include "event_dump.h"
@@ -97,8 +98,8 @@ OHOS::MMI::MMIServer::~MMIServer()
 int32_t OHOS::MMI::MMIServer::Start()
 {
     CheckDefine();
-    auto tid = GetThisThreadIdOfLL();
-    MMI_LOGD("Main Thread tid:%{public}llu", tid);
+    uint64_t tid = GetThisThreadIdOfLL();
+    MMI_LOGD("Main Thread tid:%{public}" PRId64 "", tid);
 
     int32_t ret = RET_OK;
     ret = SaConnectServiceRegister();
@@ -135,9 +136,9 @@ int32_t OHOS::MMI::MMIServer::Start()
 	CHKR((ret == RET_OK), ret, ret);
 
 #ifdef DEBUG_CODE_TEST
-    auto curTime = OHOS::MMI::GetMillisTime();
-    auto consumeTime = curTime - GetMmiServerStartTime();
-    MMI_LOGW("The server started successfully, the time consumed was %{public}lld Ms curTime:%{public}lld", consumeTime, curTime);
+    uint64_t curTime = OHOS::MMI::GetMillisTime();
+    uint64_t consumeTime = curTime - GetMmiServerStartTime();
+    MMI_LOGW("The server started successfully, the time consumed was %{public}" PRId64 " Ms curTime:%{public}" PRId64 "", consumeTime, curTime);
 #endif
     return RET_OK;
 }

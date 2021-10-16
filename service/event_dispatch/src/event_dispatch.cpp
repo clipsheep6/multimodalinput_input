@@ -14,6 +14,7 @@
  */
 
 #include "event_dispatch.h"
+#include <inttypes.h>
 #include "util.h"
 #include "mmi_server.h"
 #include "system_event_handler.h"
@@ -138,7 +139,7 @@ int32_t OHOS::MMI::EventDispatch::RegisteredEventDispatch(const ID_MSG& idMsg, O
     for (auto fd : fds) {
         auto appInfo = AppRegs->FindBySocketFd(fd);
         MMI_LOGT("\nevent dispatcher of server:\n RegisteredEvent:deviceId=%{public}u;devicePhys=%{public}s;"
-                 "deviceType=%{public}u;eventType=%{public}u;occurredTime=%{public}llu;uuid=%{public}s;"
+                 "deviceType=%{public}u;eventType=%{public}u;occurredTime=%{public}" PRId64 ";uuid=%{public}s;"
                  "conbinecode=%{public}d;fd=%{public}d;windowId=%{public}d;abilityId=%{public}d;\n*****************\n",
                  registeredEvent.deviceId, registeredEvent.devicePhys, registeredEvent.deviceType,
                  registeredEvent.eventType, registeredEvent.occurredTime, registeredEvent.uuid,
@@ -267,11 +268,11 @@ int32_t OHOS::MMI::EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, l
     }
 
 #endif  // OHOS_AUTO_TEST_FRAME
-    MMI_LOGT("\n4.event dispatcher of server:\nEventTabletPad:time=%{public}llu;deviceType=%{public}u;"
+    MMI_LOGT("\n4.event dispatcher of server:\nEventTabletPad:time=%{public}" PRId64 ";deviceType=%{public}u;"
              "deviceId=%{public}u;deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;\n"
              "ring.number=%{public}d;ring.position=%{public}lf;ring.source=%{public}d;\n"
              "strip.number=%{public}d;strip.position=%{public}lf;strip.source=%{public}d;\n"
-             "fd=%{public}d;abilityId=%{public}d;windowId=%{public}d;preHandlerTime=%{public}llu;\n*"
+             "fd=%{public}d;abilityId=%{public}d;windowId=%{public}d;preHandlerTime=%{public}" PRId64 ";\n*"
              "***********************************************************************\n",
              tabletPad.time, tabletPad.deviceType, tabletPad.deviceId, tabletPad.deviceName,
              tabletPad.devicePhys, tabletPad.eventType, tabletPad.ring.number, tabletPad.ring.position,
@@ -431,14 +432,14 @@ int32_t OHOS::MMI::EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, 
         std::string strIds = WinMgr->GetSurfaceIdListString();
         PrintWMSInfo(strIds, appInfo.fd, appInfo.abilityId, focusId);
 #endif
-        MMI_LOGT("\n4.event dispatcher of server:TabletTool:time=%{public}llu; deviceId=%{public}u; "
+        MMI_LOGT("\n4.event dispatcher of server:TabletTool:time=%{public}" PRId64 "; deviceId=%{public}u; "
                  "deviceType=%{public}u; deviceName=%{public}s; devicePhys=%{public}s; eventType=%{public}d; "
                  "type=%{public}u; tool_id=%{public}u; serial=%{public}u; button=%{public}d; state=%{public}d; "
                  "point.x=%{public}lf; point.y=%{public}lf; tilt.x=%{public}lf; tilt.y=%{public}lf; "
                  "distance=%{public}lf; pressure=%{public}lf; rotation=%{public}lf; slider=%{public}lf; "
                  "wheel=%{public}lf; wheel_discrete=%{public}d; size.major=%{public}lf; size.minor=%{public}lf; "
                  "proximity_state=%{public}d; tip_state=%{public}d; state=%{public}d; seat_button_count=%{public}d; "
-                 "preHandlerTime=%{public}llu; fd=%{public}d;windowId=%{public}d; "
+                 "preHandlerTime=%{public}" PRId64 "; fd=%{public}d;windowId=%{public}d; "
                  "abilityId=%{public}d;\n**************************************************\n",
                  tableTool.time, tableTool.deviceId, tableTool.deviceType, tableTool.deviceName,
                  tableTool.devicePhys, tableTool.eventType, tableTool.tool.type, tableTool.tool.tool_id,
@@ -569,13 +570,13 @@ int32_t OHOS::MMI::EventDispatch::DispatchPointerEvent(UDSServer &udsServer, lib
             MMI_LOGE("Send event to auto-test failed! errCode:%{public}d", KEY_EVENT_DISP_FAIL);
         }
 #endif  // OHOS_AUTO_TEST_FRAME
-        MMI_LOGT("\n4.event dispatcher of server:\neventPointer:time=%{public}llu;deviceType=%{public}u;"
+        MMI_LOGT("\n4.event dispatcher of server:\neventPointer:time=%{public}" PRId64 ";deviceType=%{public}u;"
                  "deviceId=%{public}u;deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
                  "buttonCode=%{public}u;seat_button_count=%{public}u;axes=%{public}u;buttonState=%{public}d;"
                  "source=%{public}d;delta.x=%{public}lf;delta.y=%{public}lf;delta_raw.x=%{public}lf;"
                  "delta_raw.y=%{public}lf;absolute.x=%{public}lf;absolute.y=%{public}lf;discrete.x=%{public}lf;"
                  "discrete.y=%{public}lf;fd=%{public}d;abilityId=%{public}d;windowId=%{public}d;"
-                 "preHandlerTime=%{public}llu;\n**************************************************************\n",
+                 "preHandlerTime=%{public}" PRId64 ";\n**************************************************************\n",
                  point.time, point.deviceType, point.deviceId, point.deviceName,
                  point.devicePhys, point.eventType, point.button, point.seat_button_count, point.axes,
                  point.state, point.source, point.delta.x, point.delta.y, point.delta_raw.x,
@@ -642,11 +643,11 @@ int32_t OHOS::MMI::EventDispatch::DispatchGestureEvent(UDSServer& udsServer, lib
     }
 
 #endif  // OHOS_AUTO_TEST_FRAME
-    MMI_LOGT("\n4.event dispatcher of server:\nEventGesture:time=%{public}llu;deviceType=%{public}u;"
+    MMI_LOGT("\n4.event dispatcher of server:\nEventGesture:time=%{public}" PRId64 ";deviceType=%{public}u;"
              "deviceId=%{public}u;deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
              "fingerCount=%{public}d;cancelled=%{public}d;delta.x=%{public}lf;delta.y=%{public}lf;"
              "deltaUnaccel.x=%{public}lf;deltaUnaccel.y=%{public}lf;fd=%{public}d;abilityId=%{public}d;"
-             "windowId=%{public}d;preHandlerTime=%{public}llu;\n***************************************************\n",
+             "windowId=%{public}d;preHandlerTime=%{public}" PRId64 ";\n***************************************************\n",
              gesture.time, gesture.deviceType, gesture.deviceId, gesture.deviceName, gesture.devicePhys,
              gesture.eventType, gesture.fingerCount, gesture.cancelled, gesture.delta.x, gesture.delta.y,
              gesture.deltaUnaccel.x, gesture.deltaUnaccel.y, appInfo.fd, appInfo.abilityId, focusId, preHandlerTime);
@@ -747,11 +748,11 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
                 CHKR(EOK == memcpy_s(&touchTemp, sizeof(touchTemp), &touch, sizeof(touch)),
                      MEMCPY_SEC_FUN_FAIL, RET_ERR);
                 MMIRegEvent->GetTouchInfoByTouchId(touchTemp, touchId);
-                MMI_LOGT("\n4.event dispatcher of server:\neventTouch:time=%{public}llu;deviceType=%{public}u;"
+                MMI_LOGT("\n4.event dispatcher of server:\neventTouch:time=%{public}" PRId64 ";deviceType=%{public}u;"
                          "deviceId=%{public}u;deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
                          "slot=%{public}d;seat_slot=%{public}d;pressure=%{public}lf;point.x=%{public}lf;"
                          "point.y=%{public}lf;fd=%{public}d;abilityId=%{public}d,windowId=%{public}d;"
-                         "preHandlerTime=%{public}llu;\n*********************************************************\n",
+                         "preHandlerTime=%{public}" PRId64 ";\n*********************************************************\n",
                          touchTemp.time, touchTemp.deviceType, touchTemp.deviceId, touchTemp.deviceName,
                          touchTemp.devicePhys, touchTemp.eventType, touchTemp.slot, touchTemp.seat_slot,
                          touchTemp.pressure, touchTemp.point.x, touchTemp.point.y, appInfo.fd,
@@ -774,11 +775,11 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
         }
         if (touch.eventType == LIBINPUT_EVENT_TOUCH_UP) {
             newPacket << touch;
-            MMI_LOGT("\n4.event dispatcher of server:\neventTouch:time=%{public}llu;deviceType=%{public}u;"
+            MMI_LOGT("\n4.event dispatcher of server:\neventTouch:time=%{public}" PRId64 ";deviceType=%{public}u;"
                      "deviceId=%{public}u;deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
                      "slot=%{public}d;seat_slot=%{public}d;pressure=%{public}lf;point.x=%{public}lf;"
                      "point.y=%{public}lf;fd=%{public}d;abilityId=%{public}d;windowId=%{public}d;"
-                     "preHandlerTime=%{public}llu;\n****************************************************************\n",
+                     "preHandlerTime=%{public}" PRId64 ";\n****************************************************************\n",
                      touch.time, touch.deviceType, touch.deviceId, touch.deviceName,
                      touch.devicePhys, touch.eventType, touch.slot, touch.seat_slot, touch.pressure,
                      touch.point.x, touch.point.y, appInfo.fd, appInfo.abilityId, touchFocusId, preHandlerTime);
@@ -887,11 +888,11 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinpu
     PrintWMSInfo(str, appInfo.fd, appInfo.abilityId, focusId);
 #endif
 
-    MMI_LOGT("\n4.event dispatcher of server:\neventKeyboard:time=%{public}llu;deviceType=%{public}u;"
+    MMI_LOGT("\n4.event dispatcher of server:\neventKeyboard:time=%{public}" PRId64 ";deviceType=%{public}u;"
              "deviceId=%{public}u;deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
              "mUnicode=%{public}d;key=%{public}u;key_detail=%{public}s;seat_key_count=%{public}u;"
              "state=%{public}d;fd=%{public}d;abilityId=%{public}d;windowId=%{public}d;"
-             "preHandlerTime=%{public}llu;\n***********************************************************************\n",
+             "preHandlerTime=%{public}" PRId64 ";\n***********************************************************************\n",
              key.time, key.deviceType, key.deviceId, key.deviceName, key.devicePhys, key.eventType,
              key.mUnicode, key.key, trs.keyEvent.c_str(), key.seat_key_count, key.state, appInfo.fd,
              appInfo.abilityId, focusId, preHandlerTime);

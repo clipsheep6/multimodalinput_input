@@ -14,6 +14,7 @@
  */
 
 #include <sys/ioctl.h>
+#include <inttypes.h>
 #include "util.h"
 #include "safe_keeper.h"
 #include "mmi_server.h"
@@ -58,7 +59,7 @@ namespace {
 void OnThreadTermination(uint32_t outTime, uint64_t tid, const std::string& remark)
 {
     using namespace OHOS::MMI;
-    MMI_LOGE("OnThreadTermination tid:%{public}llu %{public}s %{public}d/%{public}d",
+    MMI_LOGE("OnThreadTermination tid:%{public}" PRId64 " %{public}s %{public}d/%{public}d",
         tid, remark.c_str(), outTime, MAX_THREAD_DEATH_TIME);
     MMIEventDump->InsertFormat("OnThreadTermination tid=%llu, remark=%s %d/%d",
         tid, remark.c_str(), outTime, MAX_THREAD_DEATH_TIME);
@@ -129,9 +130,9 @@ void StartMmiServer()
 
 #ifdef DEBUG_CODE_TEST
     using namespace OHOS::MMI;
-    auto tid = OHOS::MMI::GetThisThreadIdOfLL();
+    uint64_t tid = OHOS::MMI::GetThisThreadIdOfLL();
     g_llStartTime = OHOS::MMI::GetMillisTime();
-    MMI_LOGI("The server starts to start tid:%llu. The current timestamp is %lld Ms\n", tid, g_llStartTime);
+    MMI_LOGI("The server starts to start tid:%" PRId64 ". The current timestamp is %" PRId64 " Ms\n", tid, g_llStartTime);
 #endif
     g_isRun = true;
     static std::thread t(&OnThread);

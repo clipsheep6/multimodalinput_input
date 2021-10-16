@@ -15,6 +15,7 @@
 #include "uds_server.h"
 #include <sys/socket.h>
 #include <list>
+#include <inttypes.h>
 #include "safe_keeper.h"
 #include "util.h"
 #include "util_ex.h"
@@ -344,9 +345,9 @@ void OHOS::MMI::UDSServer::DelSession(int32_t fd)
 void OHOS::MMI::UDSServer::OnThread()
 {
     OHOS::MMI::SetThreadName(std::string("uds_server"));
-    auto tid = GetThisThreadIdOfLL();
+    uint64_t tid = GetThisThreadIdOfLL();
     CHK(tid > 0, VAL_NOT_EXP);
-    MMI_LOGI("begin... tid:%{public}llu", tid);
+    MMI_LOGI("begin... tid:%{public}" PRId64 "", tid);
     SafeKpr->RegisterEvent(tid, "UDSServer::_OnThread");
 
     CLMAP<int32_t, StreamBufData> bufMap;
