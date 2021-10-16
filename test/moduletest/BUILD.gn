@@ -1,0 +1,17 @@
+import("//build/ohos.gni")
+import("//build/test.gni")
+import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+config("module_test_config") {
+  include_dirs = []
+
+  configs = []
+}
+
+group("moduletest") {
+  testonly = true
+  deps = [
+    "api_test:api-test",
+    "dump_test:dump-test",
+    "sdk_test:sdk-test",
+  ]
+}
