@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "server_msg_handler.h"
+#include <inttypes.h>
 #include "time_cost_chk.h"
 #include "mmi_server.h"
 #include "event_dump.h"
@@ -367,7 +368,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
         return FOCUS_ID_OBTAIN_FAIL;
     }
 #ifdef DEBUG_CODE_TEST
-    MMI_LOGT("\n4.event dispatcher of server:\neventKeyboard:time=%{public}llu;sourceType=%{public}d;key=%{public}u;"
+    MMI_LOGT("\n4.event dispatcher of server:\neventKeyboard:time=%{public}" PRId64 ";sourceType=%{public}d;key=%{public}u;"
              "seat_key_count=%{public}u;state=%{public}d;fd=%{public}d;abilityId=%{public}d;"
              "windowId=%{public}s(%{public}d).\n*******************************************************\n",
              key.time, LIBINPUT_EVENT_KEYBOARD_KEY, key.key, key.seat_key_count, key.state, appInfo.fd,

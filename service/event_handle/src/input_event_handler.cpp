@@ -20,7 +20,7 @@
 #include <unistd.h>
 #include <functional>
 #include <cstdio>
-
+#include <inttypes.h>
 #include "util.h"
 #include "mmi_server.h"
 #include "outer_interface.h"
@@ -168,7 +168,7 @@ void OHOS::MMI::InputEventHandler::OnEvent(void *event)
     libinput_event *lpEvent = static_cast<libinput_event *>(event);
     CHK(lpEvent, NULL_POINTER);
     if (initSysClock_ != 0 && lastSysClock_ == 0) {
-        MMI_LOGE("Event not handled... id:%{public}llu eventType:%{public}d initSysClock:%{public}llu",
+        MMI_LOGE("Event not handled... id:%{public}" PRId64 " eventType:%{public}d initSysClock:%{public}" PRId64 "",
                  idSeed_, eventType_, initSysClock_);
     }
 
@@ -181,13 +181,13 @@ void OHOS::MMI::InputEventHandler::OnEvent(void *event)
     if (idSeed_ >= maxUInt64) {
         idSeed_ = 1;
     }
-    MMI_LOGT("Event reporting... id:%{public}llu tid:%{public}llu eventType:%{public}d initSysClock:%{public}llu",
+    MMI_LOGT("Event reporting... id:%{public}" PRId64 " tid:%{public}" PRId64 " eventType:%{public}d initSysClock:%{public}" PRId64 "",
              idSeed_, tid, eventType_, initSysClock_);
 
     OnEventHandler(*lpEvent);
     lastSysClock_ = GetSysClockTime();
     uint64_t lostTime = lastSysClock_ - initSysClock_;
-    MMI_LOGT("Event handling completed... id:%{public}llu lastSynClock:%{public}llu lostTime:%{public}llu",
+    MMI_LOGT("Event handling completed... id:%{public}" PRId64 " lastSynClock:%{public}" PRId64 " lostTime:%{public}" PRId64 "",
              idSeed_, lastSysClock_, lostTime);
 }
 
@@ -224,8 +224,8 @@ void OHOS::MMI::InputEventHandler::OnCheckEventReport()
     if (lostTime < MAX_DID_TIME) {
         return;
     }
-    MMI_LOGE("Event not responding... id:%{public}llu eventType:%{public}d initSysClock:%{public}llu "
-             "lostTime:%{public}llu", idSeed_, eventType_, initSysClock_, lostTime);
+    MMI_LOGE("Event not responding... id:%{public}" PRId64 " eventType:%{public}d initSysClock:%{public}" PRId64 " "
+             "lostTime:%{public}" PRId64 "", idSeed_, eventType_, initSysClock_, lostTime);
 }
 
 void OHOS::MMI::InputEventHandler::RegistnotifyDeviceChange(NotifyDeviceChange cb)

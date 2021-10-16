@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "standard_event_handler.h"
+#include <inttypes.h>
 
 namespace OHOS::MMI {
     namespace {
@@ -122,7 +123,7 @@ void OHOS::MMI::StandardEventHandler::PointerAbsoluteStandardEvent(libinput_even
     data.time = libinput_event_pointer_get_time_usec(szPoint);
     data.x = libinput_event_pointer_get_absolute_x(szPoint);
     data.y = libinput_event_pointer_get_absolute_y(szPoint);
-    MMI_LOGT("\nEvent:time=%{public}llu;x=%{public}f;y=%{public}f;\n***********************************************\n",
+    MMI_LOGT("\nEvent:time=%{public}" PRId64 ";x=%{public}f;y=%{public}f;\n***********************************************\n",
              data.time, data.x, data.y);
     if (leftButtonState_ == LIBINPUT_BUTTON_STATE_PRESSED && leftButton_ == BTN_LEFT) {
         data.msgType = LIBINPUT_EVENT_TOUCH_MOTION;
@@ -151,7 +152,7 @@ void OHOS::MMI::StandardEventHandler::PointerMotionStandardEvent(libinput_event&
     double rawY = data.y;
     data.x = libinput_event_pointer_get_dx(szPoint);
     data.y = libinput_event_pointer_get_dy(szPoint);
-    MMI_LOGT("\nEvent:time=%{public}llu;x=%{public}f;y=%{public}f;\n********************************************\n",
+    MMI_LOGT("\nEvent:time=%{public}" PRId64 ";x=%{public}f;y=%{public}f;\n********************************************\n",
              data.time, data.x, data.y);
     if (leftButtonState_ == LIBINPUT_BUTTON_STATE_PRESSED && leftButton_ == BTN_LEFT) {
         data.msgType = LIBINPUT_EVENT_TOUCH_MOTION;
