@@ -14,6 +14,7 @@
  */
 #include "util.h"
 #include <sstream>
+#include <inttypes.h>
 #include <chrono>
 #include <thread>
 #include <unistd.h>

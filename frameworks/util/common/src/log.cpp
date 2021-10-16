@@ -15,6 +15,7 @@
 #include "log.h"
 #include <cstdio>
 #include <cstdlib>
+#include <inttypes.h>
 #include <cstdarg>
 #include <ctime>
 #include <string>

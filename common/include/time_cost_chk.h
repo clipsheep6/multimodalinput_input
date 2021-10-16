@@ -16,6 +16,8 @@
 #ifndef OHOS_TIME_COST_CHK_H
 #define OHOS_TIME_COST_CHK_H
 
+#include <inttypes.h>
+
 #define MAX_INPUT_EVENT_TIME (1000)
 #define MAX_OVER_TIME (300)
 

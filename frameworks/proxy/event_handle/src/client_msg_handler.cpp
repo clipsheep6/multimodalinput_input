@@ -14,6 +14,7 @@
  */
 #include "client_msg_handler.h"
 #include <iostream>
+#include <inttypes.h>
 #include "time_cost_chk.h"
 #include "util.h"
 #include "proto.h"

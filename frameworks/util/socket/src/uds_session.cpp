@@ -18,6 +18,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sstream>
+#include <inttypes.h>
 
 namespace OHOS::MMI {
     namespace {

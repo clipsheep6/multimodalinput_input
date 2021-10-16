@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "safe_keeper.h"
+#include <inttypes.h>
 #include "log.h"
 #include "util.h"
 

@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "uds_socket.h"
+#include <inttypes.h>
 #include "log.h"
 
 namespace OHOS::MMI {

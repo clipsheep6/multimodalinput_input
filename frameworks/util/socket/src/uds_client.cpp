@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "uds_client.h"
+#include <inttypes.h>
 #include "util.h"
 
 namespace OHOS::MMI {
