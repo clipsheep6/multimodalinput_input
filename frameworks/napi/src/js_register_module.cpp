@@ -191,7 +191,7 @@ namespace OHOS {
         static napi_value InjectEvent(napi_env env, napi_callback_info info)
         {
             HILOG_DEBUG("InjectEvent: enter");
-            uint32_t argc;
+            size_t argc;
             napi_value argv[1] = { 0 };
             napi_valuetype tmpType = napi_undefined;
             napi_value result;
@@ -200,7 +200,7 @@ namespace OHOS {
                 return result;
             }
 
-            napi_get_cb_info(env, info, static_cast<size_t *>(&argc), argv, nullptr, nullptr);
+            napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
             NAPI_ASSERT(env, argc == 1, "InjectEvent: paramater num error");
 
             napi_value keyHandle = nullptr;
@@ -229,14 +229,14 @@ namespace OHOS {
         static napi_value UnitTest(napi_env env, napi_callback_info info)
         {
             HILOG_DEBUG("UnitTest: enter");
-            uint32_t argc;
+            size_t argc;
             napi_value argv[ARGC_UT_NUM] = { 0 };
             napi_value result;
             if (napi_create_int32(env, ERROR_CODE, &result) != napi_ok) {
                 HILOG_ERROR("UnitTest: call napi_create_int32 fail.");
                 return result;
             }
-            napi_get_cb_info(env, info, static_cast<size_t *>(&argc), argv, nullptr, nullptr);
+            napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
             NAPI_ASSERT(env, argc == ARGC_UT_NUM, "UnitTest: paramater num error");
 
             napi_valuetype eventWinIdType;
@@ -276,14 +276,14 @@ namespace OHOS {
         static napi_value SetInjectFile(napi_env env, napi_callback_info info)
         {
             HILOG_DEBUG("SetInjectFile: enter");
-            uint32_t argc;
+            size_t argc;
             napi_value argv[ARGC_UT_NUM] = { 0 };
             napi_value result;
             if (napi_create_int32(env, ERROR_CODE, &result) != napi_ok) {
                 HILOG_ERROR("InjectCmd: call napi_create_int32 fail.");
                 return result;
             }
-            napi_get_cb_info(env, info, static_cast<size_t *>(&argc), argv, nullptr, nullptr);
+            napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
 
             napi_valuetype eventWinIdType;
             napi_typeof(env, argv[ARGV_FIRST], &eventWinIdType);
