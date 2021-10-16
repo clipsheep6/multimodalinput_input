@@ -36,6 +36,6 @@ void OHOS::MMI::MessageSendRecvStatMgr::Decrease()
 
 bool OHOS::MMI::MessageSendRecvStatMgr::IsNoWaitMessage()
 {
-	MMI_LOGF("(%d, %d) = %d", sendMessageCount_, recvMessageCount_, (sendMessageCount_ == recvMessageCount_));
+	MMI_LOGF("(%zu, %zu) = %d", sendMessageCount_, recvMessageCount_, (sendMessageCount_ == recvMessageCount_));
 	return (sendMessageCount_ == recvMessageCount_);
 }
