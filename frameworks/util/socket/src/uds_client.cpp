@@ -55,7 +55,7 @@ bool OHOS::MMI::UDSClient::SendMsg(const char *buf, size_t size) const
     CHKF(fd_ >= 0, PARAM_INPUT_INVALID);
     auto ret = write(fd_, static_cast<const void *>(buf), size);
     if (ret < 0) {
-        MMI_LOGE("SendMsg write errCode:%{public}d return %{public}d", MSG_SEND_FAIL, ret);
+        MMI_LOGE("SendMsg write errCode:%{public}d return %{public}" PRId64 "", MSG_SEND_FAIL, ret);
         return false;
     }
     return true;

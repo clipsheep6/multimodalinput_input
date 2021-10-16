@@ -38,11 +38,11 @@ public:
         auto ullCost = GetElapsed_micro(); // microsecond
         if ((ullCost > uiTime_) && strReason_.size() > 0 && strOutput_.size() > 0) {
             if (0 != llParam1_ || 0 != llParam2_) {
-                MMI_LOGW("Time cost overtime (%{public}llu(us)>%{public}u(us)) when Reason:%{public}s chk:%{public}s "
-                         "param1:%{public}llu param2:%{public}llu",
+                MMI_LOGW("Time cost overtime (%{public}" PRId64 "(us)>%{public}u(us)) when Reason:%{public}s chk:%{public}s "
+                         "param1:%{public}" PRId64 " param2:%{public}" PRId64 "",
                          ullCost, uiTime_, strReason_.c_str(), strOutput_.c_str(), llParam1_, llParam2_);
             } else {
-                MMI_LOGW("TimeCostChk Overtime(%{public}llu(us)>%{public}u(us)) when Reason:%{public}s chk:%{public}s",
+                MMI_LOGW("TimeCostChk Overtime(%{public}" PRId64 "(us)>%{public}u(us)) when Reason:%{public}s chk:%{public}s",
                          ullCost, uiTime_, strReason_.c_str(), strOutput_.c_str());
             }
         }
