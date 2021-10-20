@@ -54,5 +54,4 @@ const std::string DOUBLE_COLON = "::";
     OHOS::HiviewDFX::HiLog::Fatal(MMI_COMMON_LABEL, "%{public}s: " fmt, __FUNCTION__, ##__VA_ARGS__)
 #endif
 }  // namespace OHOS
-
 #endif  // OHOS_MMI_LOG_H
