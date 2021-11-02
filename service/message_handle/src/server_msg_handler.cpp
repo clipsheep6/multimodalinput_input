@@ -192,29 +192,32 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRegisterAppInfo(SessionPtr sess, NetPacke
     std::string appName;
     int32_t fd = sess->GetFd();
     pkt >> abilityId >> windowId >> bundlerName >> appName;
-    struct AppInfo appInfo = { abilityId, windowId, fd, bundlerName, appName };
-
-    AppRegs->RegisterAppInfoforServer(appInfo);
+    struct AppInfo appInfo = {abilityId, windowId, fd, bundlerName, appName};
+    if (windowId <= 0) {
+        MMI_LOGW("OnRegisterAppInfo Subscription event window ID cannot be 0 ... abilityId:%{public}d "
+                 "winId:%{public}d", abilityId, windowId);
+    } else {
+        AppRegs->RegisterAppInfoforServer(appInfo);
 #if !defined(OHOS_BUILD) || !defined(OHOS_WESTEN_MODEL)
-    WinMgr->SetFocusSurfaceId(windowId);
+        WinMgr->SetFocusSurfaceId(windowId);
 #endif
+    }
     MMI_LOGD("OnRegisterAppInfo abilityId:%{public}d winId:%{public}d fd:%{public}d bundlerName:%{public}s "
              "appName:%{public}s", abilityId, windowId, fd, bundlerName.c_str(), appName.c_str());
 
 #ifdef OHOS_AUTO_TEST_FRAME
-    if (!AppRegs->AutoTestGetAutoTestFd()) {
-        return RET_OK;
-    }
-    std::vector<AutoTestClientListPkt> clientListPkt;
-    AppRegs->AutoTestGetAllAppInfo(clientListPkt);
-    uint32_t sizeOfList = static_cast<uint32_t>(clientListPkt.size());
-    NetPacket pktAutoTest(MmiMessageId::ST_MESSAGE_CLISTPKT);
-    pktAutoTest << sizeOfList;
-    for (auto it = clientListPkt.begin(); it != clientListPkt.end(); it++) {
-        pktAutoTest << *it;
-    }
-    if (!udsServer_->SendMsg(AppRegs->AutoTestGetAutoTestFd(), pktAutoTest)) {
-        MMI_LOGE("Send ClientList massage failed to auto-test frame !\n");
+    if (AppRegs->AutoTestGetAutoTestFd()) {
+        std::vector<AutoTestClientListPkt> clientListPkt;
+        AppRegs->AutoTestGetAllAppInfo(clientListPkt);
+        uint32_t sizeOfList = static_cast<uint32_t>(clientListPkt.size());
+        NetPacket pktAutoTest(MmiMessageId::ST_MESSAGE_CLISTPKT);
+        pktAutoTest << sizeOfList;
+        for (auto it = clientListPkt.begin(); it != clientListPkt.end(); it++) {
+            pktAutoTest << *it;
+        }
+        if (!udsServer_->SendMsg(AppRegs->AutoTestGetAutoTestFd(), pktAutoTest)) {
+            MMI_LOGE("Send ClientList massage failed to auto-test frame !\n");
+        }
     }
 #endif  // OHOS_AUTO_TEST_FRAME
     return RET_OK;
@@ -246,14 +249,14 @@ int32_t OHOS::MMI::ServerMsgHandler::OnUnregisterMsgHandler(SessionPtr sess, Net
     MmiMessageId messageId = MmiMessageId::INVALID;
     int32_t fd = sess->GetFd();
     pkt >> messageId;
-    RegEventHM->UnregisterEventHandleManager(messageId, fd);
+    RegEventHM->UnregisterEvent(messageId, fd);
     return RET_OK;
 }
 
 int32_t OHOS::MMI::ServerMsgHandler::OnWindow(SessionPtr sess, NetPacket& pkt)
 {
     CHKR(udsServer_, NULL_POINTER, RET_ERR);
-    TestSurfaceInfo surfaces = {};
+    MMISurfaceInfo surfaces = {};
     TestSurfaceData mysurfaceInfo = {};
     pkt >> mysurfaceInfo;
     surfaces.opacity = mysurfaceInfo.opacity;
@@ -396,7 +399,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
 #endif // DEBUG_CODE_TEST
     if (AppRegs->IsMultimodeInputReady(key.time, MmiMessageId::ON_KEY, appInfo.fd, testConnectState, testBufferState)) {
         NetPacket pkt2(MmiMessageId::ON_KEY);
-        pkt2 << key << appInfo.abilityId << focusId << appInfo.fd;
+        pkt2 << key << appInfo.abilityId << focusId << appInfo.fd << key.time;
         if (!udsServer_->SendMsg(appInfo.fd, pkt2)) {
             MMI_LOGE("Sending structure of EventKeyboard failed!\n");
             return MSG_SEND_FAIL;

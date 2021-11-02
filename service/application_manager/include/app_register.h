@@ -53,16 +53,13 @@ public:
 
     void RegisterAppInfoforServer(const AppInfo& appInfo);
 
-    void UnregisterAppInfoforServer(int32_t abilityId);
-
-    void UnregisterAppInfoforServer(const AppInfo& appInfo);
-
     void UnregisterAppInfoBySocketFd(int32_t fd);
 
     void UnregisterConnectState(int32_t fd);
 
     void PrintfMap();
     void Dump(int32_t fd);
+    void SurfacesDestroyed(const IdsList &desList);
 
     int32_t QueryMapSurfaceNum();
 
@@ -98,10 +95,13 @@ private:
     bool CheckWaitQueueBlock(ssize_t currentTime, ssize_t timeOut, const int32_t findFd);
     const AppInfo& FindAppInfoBySocketFd(int32_t fd);
     void UnregisterBySocketFd(int32_t fd);
+    std::map<int32_t, AppInfo>::iterator EraseAppInfo(const std::map<int32_t, AppInfo>::iterator &it);
+    std::map<int32_t, AppInfo>::iterator UnregisterAppInfo(int32_t winId);
 
 private:
     int16_t teseArgv_ = 0;
-    std::map<int32_t, AppInfo> mapSurface = {}; // key=windowId:value=AppInfo
+    IdsList fds_;
+    std::map<int32_t, AppInfo> mapSurface_ = {}; // key=windowId:value=AppInfo
     std::vector<WaitQueueEvent> waitQueue_ = {};
     std::map<int32_t, ConnectStateByFd> mapConnectState_ = {};
 #ifdef OHOS_AUTO_TEST_FRAME
