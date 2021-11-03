@@ -92,7 +92,7 @@ void SetLibInputEventListener(const LibInputEventListener listener);
 }
 #endif
 
-struct TestSurfaceInfo : public SurfaceInfo {
+struct MMISurfaceInfo : public SurfaceInfo {
     int32_t screenId;
 };
 
@@ -109,10 +109,10 @@ public:
 
     const ScreenInfo* GetScreenInfo(int32_t screenId);
     const LayerInfo* GetLayerInfo(int32_t layerId);
-    const TestSurfaceInfo* GetSurfaceInfo(int32_t sufaceId);
-    bool CheckFocusSurface(double x, double y, const TestSurfaceInfo& info) const;
-    const TestSurfaceInfo* GetTouchSurfaceInfo(double x, double y);
-    void TransfromToSurfaceCoordinate(double& x, double& y, const TestSurfaceInfo& info, bool debug = false);
+    const MMISurfaceInfo* GetSurfaceInfo(int32_t sufaceId);
+    bool CheckFocusSurface(double x, double y, const MMISurfaceInfo& info) const;
+    const MMISurfaceInfo* GetTouchSurfaceInfo(double x, double y);
+    void TransfromToSurfaceCoordinate(double& x, double& y, const MMISurfaceInfo& info, bool debug = false);
 
     bool GetTouchSurfaceId(const double x, const double y, std::vector<int32_t>& ids);
 
@@ -120,9 +120,9 @@ public:
 
     const CLMAP<int32_t, LayerInfo>& GetLayerInfo() const;
 
-    const CLMAP<int32_t, TestSurfaceInfo>& GetSurfaceInfo() const;
+    const CLMAP<int32_t, MMISurfaceInfo>& GetSurfaceInfo() const;
 
-    void InsertSurfaceInfo(const TestSurfaceInfo& tmpSurfaceInfo);
+    void InsertSurfaceInfo(const MMISurfaceInfo& tmpSurfaceInfo);
 
     bool EraseSurfaceInfo(int32_t surfaceID);
 
@@ -151,9 +151,10 @@ private:
     struct ScreenInfo **screensInfo_ = nullptr;
     int32_t focusInfoID_ = 0;
     int32_t touchFocusId_ = 0;
+    IdsList surfacesList_; // surfaces ids list
     std::vector<struct ScreenInfo> screenInfoVec_ = {};
     CLMAP<int32_t, struct LayerInfo> layers_ = {};
-    CLMAP<int32_t, struct TestSurfaceInfo> mysurfaces_ = {};
+    CLMAP<int32_t, struct MMISurfaceInfo> surfaces_ = {};
     UDSServer* udsServer_ = nullptr;
 };
 }

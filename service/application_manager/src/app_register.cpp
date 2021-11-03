@@ -39,7 +39,7 @@ bool AppRegister::Init(UDSServer& udsServer)
 #ifdef OHOS_AUTO_TEST_FRAME
     autoTestFrameFd_ = 0;
 #endif  // OHOS_AUTO_TEST_FRAME
-    mapSurface.clear();
+    mapSurface_.clear();
     waitQueue_.clear();
     mapConnectState_.clear();
     if (mu_.try_lock()) {
@@ -52,8 +52,8 @@ bool AppRegister::Init(UDSServer& udsServer)
 const AppInfo& AppRegister::FindByWinId(int32_t windowId)
 {
     std::lock_guard<std::mutex> lock(mu_);
-    auto it = mapSurface.find(windowId);
-    if (it != mapSurface.end()) {
+    auto it = mapSurface_.find(windowId);
+    if (it != mapSurface_.end()) {
         return it->second;
     }
     return AppRegister::AppInfoError_;
@@ -68,7 +68,7 @@ const AppInfo& AppRegister::FindBySocketFd(int32_t fd)
 
 const AppInfo& AppRegister::FindAppInfoBySocketFd(int32_t fd)
 {
-    for (auto iter = mapSurface.begin(); iter != mapSurface.end(); iter++) {
+    for (auto iter = mapSurface_.begin(); iter != mapSurface_.end(); iter++) {
         if (iter->second.fd == fd) {
             return iter->second;
         }
@@ -79,33 +79,8 @@ const AppInfo& AppRegister::FindAppInfoBySocketFd(int32_t fd)
 void AppRegister::RegisterAppInfoforServer(const AppInfo& appInfo)
 {
     std::lock_guard<std::mutex> lock(mu_);
-    mapSurface.insert(std::pair<int32_t, AppInfo>(appInfo.windowId, appInfo));
-}
-
-void AppRegister::UnregisterAppInfoforServer(int32_t abilityId)
-{
-    std::lock_guard<std::mutex> lock(mu_);
-    auto it = mapSurface.begin();
-    while (it != mapSurface.end()) {
-        if (it->second.abilityId == abilityId) {
-            it = mapSurface.erase(it);
-        } else {
-            it++;
-        }
-    }
-}
-
-void AppRegister::UnregisterAppInfoforServer(const AppInfo& appInfo)
-{
-    std::lock_guard<std::mutex> lock(mu_);
-    auto it = mapSurface.begin();
-    while (it != mapSurface.end()) {
-        if (it->second.abilityId == appInfo.abilityId) {
-            it = mapSurface.erase(it);
-        } else {
-            it++;
-        }
-    }
+    mapSurface_.insert(std::pair<int32_t, AppInfo>(appInfo.windowId, appInfo));
+    AddId(fds_, appInfo.fd);
 }
 
 void AppRegister::UnregisterAppInfoBySocketFd(int32_t fd)
@@ -117,20 +92,37 @@ void AppRegister::UnregisterAppInfoBySocketFd(int32_t fd)
 
 void AppRegister::UnregisterBySocketFd(int32_t fd)
 {
-    auto it = mapSurface.begin();
-    while (it != mapSurface.end()) {
+    auto it = mapSurface_.begin();
+    while (it != mapSurface_.end()) {
         if (it->second.fd == fd) {
-            it = mapSurface.erase(it);
+            it = mapSurface_.erase(it);
         } else {
             it++;
         }
     }
 }
 
+std::map<int32_t, AppInfo>::iterator AppRegister::EraseAppInfo(const std::map<int32_t, AppInfo>::iterator &it)
+{
+    return mapSurface_.erase(it);
+}
+
+std::map<int32_t, AppInfo>::iterator AppRegister::UnregisterAppInfo(int32_t winId)
+{
+    if (winId <= 0) {
+        return mapSurface_.end();
+    }
+    auto itr = mapSurface_.find(winId);
+    if (itr == mapSurface_.end()) {
+        return mapSurface_.end();
+    }
+    return EraseAppInfo(itr);
+}
+
 void AppRegister::PrintfMap()
 {
     std::lock_guard<std::mutex> lock(mu_);
-    for (auto i : mapSurface) {
+    for (auto i : mapSurface_) {
         std::cout << "mapSurface " << i.second.abilityId << ", " << i.second.windowId <<
             ", " << i.second.fd << std::endl;
     }
@@ -139,17 +131,25 @@ void AppRegister::PrintfMap()
 void OHOS::MMI::AppRegister::Dump(int32_t fd)
 {
     std::lock_guard<std::mutex> lock(mu_);
-    mprintf(fd, "AppInfos: count=%d", mapSurface.size());
-    for (auto& it : mapSurface) {
+    mprintf(fd, "AppInfos: count=%d", mapSurface_.size());
+    for (auto& it : mapSurface_) {
         mprintf(fd, "\tabilityId=%d windowId=%d fd=%d bundlerName=%s appName=%s", it.second.abilityId,
                 it.second.windowId, it.second.fd, it.second.bundlerName.c_str(), it.second.appName.c_str());
+    }
+}
+
+void AppRegister::SurfacesDestroyed(const IdsList &desList)
+{
+    std::lock_guard<std::mutex> lock(mu_);
+    for (auto it : desList) {
+        UnregisterAppInfo(it);
     }
 }
 
 int32_t AppRegister::QueryMapSurfaceNum()
 {
     std::lock_guard<std::mutex> lock(mu_);
-    return static_cast<int32_t>(mapSurface.size());
+    return static_cast<int32_t>(mapSurface_.size());
 }
 
 bool AppRegister::IsMultimodeInputReady(ssize_t currentTime, MmiMessageId idMsg, const int32_t findFd,
@@ -293,6 +293,7 @@ void AppRegister::RegisterConnectState(int32_t fd)
 void AppRegister::UnregisterConnectState(int32_t fd)
 {
     CHK(fd >= 0, PARAM_INPUT_INVALID);
+    std::lock_guard<std::mutex> lock(mu_);
     // Unregister all by fd
     UnregisterBySocketFd(fd);
     RegEventHM->UnregisterEventHandleBySocketFd(fd);
@@ -333,7 +334,7 @@ int32_t AppRegister::AutoTestGetAutoTestFd()
 void AppRegister::AutoTestGetAllAppInfo(std::vector<AutoTestClientListPkt>& clientListPkt)
 {
     AutoTestClientListPkt tempInfo;
-    for (auto i : mapSurface) {
+    for (auto i : mapSurface_) {
         tempInfo = {i.second.fd, i.second.windowId, i.second.abilityId};
         clientListPkt.push_back(tempInfo);
     }
