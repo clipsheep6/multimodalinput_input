@@ -1,0 +1,12 @@
+[
+    { 
+     "deviceName": "pen", 
+     "events":[
+                {"eventType": "PEN_KEY", "keyValue": 331, "keyStatus":1},
+                {"eventType": "PEN_TOUCH", "xPos":12809, "yPos":16233, "tiltX":10,"tiltY":5, "pressure":4200,  "distance":45},
+                {"eventType": "PEN_TOUCH", "xPos":12734, "yPos":16224, "tiltX":10,"tiltY":5, "pressure":4200,  "distance":30},
+                {"eventType": "PEN_TOUCH", "xPos":12702, "yPos":16220, "tiltX":10,"tiltY":5, "pressure":4200,  "distance":35},
+                {"eventType": "PEN_TOUCH", "xPos":12668, "yPos":16210, "tiltX":10,"tiltY":5, "pressure":4200,  "distance":30},
+                ]
+    }
+]

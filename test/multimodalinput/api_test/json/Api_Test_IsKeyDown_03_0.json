@@ -1,0 +1,7 @@
+ [
+    { 
+     "deviceName": "gamePad",
+     "events":[
+                {"eventType": "KEY_EVENT_PRESS", "keyValue": 316}]
+    }
+]

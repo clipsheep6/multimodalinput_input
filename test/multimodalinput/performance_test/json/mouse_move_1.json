@@ -1,0 +1,8 @@
+ [
+    {
+     "deviceName": "mouse", 
+     "events":[
+                {"eventType": "MOUSE_EVENT_MOVE", "xPos": -35, "yPos": 40}
+            ]
+    }
+]

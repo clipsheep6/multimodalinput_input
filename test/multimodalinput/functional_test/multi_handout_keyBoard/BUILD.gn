@@ -1,0 +1,292 @@
+import("//build/ohos.gni")
+import("//build/test.gni")
+import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+module_output_path = "multimodalinput/systemtest_out"
+
+ohos_systemtest("multi_handout_keyboard_reg_reg_C") {
+  module_out_path = module_output_path
+
+  sources = [
+    "multi_handout_keyboard_reg_reg_C.cpp",
+  ]
+
+  cflags = [
+  ]
+
+  if (is_mmi_have_libinput) {
+    cflags += [
+      "-DOHOS_BUILD_LIBINPUT",
+    ]
+  }
+
+  if (is_mmi_have_hdf) {
+    cflags += [
+      "-DOHOS_BUILD_HDF",
+    ]
+  }
+
+  if (is_mmi_have_ai) {
+    cflags += [
+      "-DOHOS_BUILD_AI",
+    ]
+  }
+
+  deps = [
+    "//test/xts/acts/multimodalinput/lib/mmi_st_client:mmi_st_client",
+    "//third_party/googletest:gtest",
+    "//third_party/googletest:gtest_main",
+  ]
+  
+  external_deps = [
+      "hiviewdfx_hilog_native:libhilog"
+  ]
+}
+
+ohos_systemtest("multi_handout_keyboard_click_unReg_R") {
+  module_out_path = module_output_path
+
+  sources = [
+    "multi_handout_keyboard_click_unReg_R.cpp",
+  ]
+
+  cflags = [
+  ]
+
+  if (is_mmi_have_libinput) {
+    cflags += [
+      "-DOHOS_BUILD_LIBINPUT",
+    ]
+  }
+
+  if (is_mmi_have_hdf) {
+    cflags += [
+      "-DOHOS_BUILD_HDF",
+    ]
+  }
+
+  if (is_mmi_have_ai) {
+    cflags += [
+      "-DOHOS_BUILD_AI",
+    ]
+  }
+
+  deps = [
+    "//test/xts/acts/multimodalinput/lib/mmi_st_client:mmi_st_client",
+    "//third_party/googletest:gtest",
+    "//third_party/googletest:gtest_main",
+  ]
+  
+  external_deps = [
+      "hiviewdfx_hilog_native:libhilog"
+  ]
+}
+
+ohos_systemtest("multi_handout_keyboard_longclick_unReg_R") {
+  module_out_path = module_output_path
+
+  sources = [
+    "multi_handout_keyboard_longclick_unReg_R.cpp",
+  ]
+
+  cflags = [
+  ]
+
+  if (is_mmi_have_libinput) {
+    cflags += [
+      "-DOHOS_BUILD_LIBINPUT",
+    ]
+  }
+
+  if (is_mmi_have_hdf) {
+    cflags += [
+      "-DOHOS_BUILD_HDF",
+    ]
+  }
+
+  if (is_mmi_have_ai) {
+    cflags += [
+      "-DOHOS_BUILD_AI",
+    ]
+  }
+
+  deps = [
+    "//test/xts/acts/multimodalinput/lib/mmi_st_client:mmi_st_client",
+    "//third_party/googletest:gtest",
+    "//third_party/googletest:gtest_main",
+  ]
+  
+  external_deps = [
+      "hiviewdfx_hilog_native:libhilog"
+  ]
+}
+
+ohos_systemtest("multi_handout_keyboard_doubleclick_unReg_R") {
+  module_out_path = module_output_path
+
+  sources = [
+    "multi_handout_keyboard_doubleclick_unReg_R.cpp",
+  ]
+
+  cflags = [
+  ]
+
+  if (is_mmi_have_libinput) {
+    cflags += [
+      "-DOHOS_BUILD_LIBINPUT",
+    ]
+  }
+
+  if (is_mmi_have_hdf) {
+    cflags += [
+      "-DOHOS_BUILD_HDF",
+    ]
+  }
+
+  if (is_mmi_have_ai) {
+    cflags += [
+      "-DOHOS_BUILD_AI",
+    ]
+  }
+
+  deps = [
+    "//test/xts/acts/multimodalinput/lib/mmi_st_client:mmi_st_client",
+    "//third_party/googletest:gtest",
+    "//third_party/googletest:gtest_main",
+  ]
+  
+  external_deps = [
+      "hiviewdfx_hilog_native:libhilog"
+  ]
+}
+
+ohos_systemtest("multi_handout_keyboard_multiclick_unReg_R") {
+  module_out_path = module_output_path
+
+  sources = [
+    "multi_handout_keyboard_multiclick_unReg_R.cpp",
+  ]
+
+  cflags = [
+  ]
+
+  if (is_mmi_have_libinput) {
+    cflags += [
+      "-DOHOS_BUILD_LIBINPUT",
+    ]
+  }
+
+  if (is_mmi_have_hdf) {
+    cflags += [
+      "-DOHOS_BUILD_HDF",
+    ]
+  }
+
+  if (is_mmi_have_ai) {
+    cflags += [
+      "-DOHOS_BUILD_AI",
+    ]
+  }
+
+  deps = [
+    "//test/xts/acts/multimodalinput/lib/mmi_st_client:mmi_st_client",
+    "//third_party/googletest:gtest",
+    "//third_party/googletest:gtest_main",
+  ]
+  
+  external_deps = [
+      "hiviewdfx_hilog_native:libhilog"
+  ]
+}
+
+ohos_systemtest("multi_handout_keyboard_reg_reg_A") {
+  module_out_path = module_output_path
+
+  sources = [
+    "multi_handout_keyboard_reg_reg_A.cpp",
+  ]
+
+  cflags = [
+  ]
+
+  if (is_mmi_have_libinput) {
+    cflags += [
+      "-DOHOS_BUILD_LIBINPUT",
+    ]
+  }
+
+  if (is_mmi_have_hdf) {
+    cflags += [
+      "-DOHOS_BUILD_HDF",
+    ]
+  }
+
+  if (is_mmi_have_ai) {
+    cflags += [
+      "-DOHOS_BUILD_AI",
+    ]
+  }
+
+  deps = [
+    "//test/xts/acts/multimodalinput/lib/mmi_st_client:mmi_st_client",
+    "//third_party/googletest:gtest",
+    "//third_party/googletest:gtest_main",
+  ]
+  
+  external_deps = [
+      "hiviewdfx_hilog_native:libhilog"
+  ]
+}
+
+ohos_systemtest("multi_handout_keyboard_unu_unReg_R") {
+  module_out_path = module_output_path
+
+  sources = [
+    "multi_handout_keyboard_unu_unReg_R.cpp",
+  ]
+
+  cflags = [
+  ]
+
+  if (is_mmi_have_libinput) {
+    cflags += [
+      "-DOHOS_BUILD_LIBINPUT",
+    ]
+  }
+
+  if (is_mmi_have_hdf) {
+    cflags += [
+      "-DOHOS_BUILD_HDF",
+    ]
+  }
+
+  if (is_mmi_have_ai) {
+    cflags += [
+      "-DOHOS_BUILD_AI",
+    ]
+  }
+
+  deps = [
+    "//test/xts/acts/multimodalinput/lib/mmi_st_client:mmi_st_client",
+    "//third_party/googletest:gtest",
+    "//third_party/googletest:gtest_main",
+  ]
+  
+  external_deps = [
+      "hiviewdfx_hilog_native:libhilog"
+  ]
+}
+
+
+group("keyboard")
+{
+    testonly = true
+    deps = [
+    ":multi_handout_keyboard_reg_reg_C",
+    ":multi_handout_keyboard_longclick_unReg_R",
+    ":multi_handout_keyboard_click_unReg_R",
+    ":multi_handout_keyboard_unu_unReg_R",
+    #":multi_handout_keyboard_reg_reg_A",
+    ":multi_handout_keyboard_multiclick_unReg_R",
+    ":multi_handout_keyboard_doubleclick_unReg_R"
+    ]
+}

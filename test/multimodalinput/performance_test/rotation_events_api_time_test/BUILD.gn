@@ -1,0 +1,57 @@
+import("//build/ohos.gni")
+import("//build/test.gni")
+import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+module_output_path = "multimodalinput/moduletest_out"
+
+ohos_moduletest("rotation_event_api_time_test") {
+  module_out_path = module_output_path
+  include_dirs = [ "../include" ]
+
+  sources = [
+    "../common/MultiInputCommon.cpp",
+    "../common/api_time.cpp",
+    "../common/log.cpp",
+    "rotation_event_api_time_test.cpp",
+  ]
+
+  cflags = [ "-DOHOS_BUILD" ]
+
+  if (is_mmi_have_debug) {
+    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+  }
+
+  if (is_mmi_have_libinput) {
+    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+  }
+
+  if (is_mmi_have_hdf) {
+    cflags += [ "-DOHOS_BUILD_HDF" ]
+  }
+
+  if (is_mmi_have_ai) {
+    cflags += [ "-DOHOS_BUILD_AI" ]
+  }
+
+  deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/frameworks/util:libmmi-util",
+    "${mmi_path}/service:libmmi-server",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  if (is_mmi_have_libinput) {
+    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
+  }
+
+  if (is_mmi_have_hdf) {
+    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_hdf:libinput-third-hdf" ]
+  }
+
+  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+}
+
+group("rotation_event_api_time_test_info") {
+  testonly = true
+  deps = [ ":rotation_event_api_time_test" ]
+}

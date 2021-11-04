@@ -1,0 +1,30 @@
+import("//build/ohos.gni")
+import("//build/test.gni")
+import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+config("system_test_config") {
+  include_dirs = []
+
+  configs = []
+}
+
+group("performance") {
+  testonly = true
+  if (is_mmi_have_hdf) {
+    deps = [
+      "common_event_handler_api_time_test:common_event_handler_api_time_test_info",
+      "key_event_api_time_test:key_event_api_time_test_info",
+      "keyboard_event_api_time_test:keyboard_event_api_time_test_info",
+      "manipulation_event_api_time_test:manipulation_event_api_time_test_info",
+      "media_event_handler_api_time_test:media_event_handler_api_time_test_info",
+      "mouse_event_api_time_test:mouse_event_api_time_test_info",
+      "multimodal_event_api_time_test:multimodal_event_api_time_test_info",
+      "multimodal_event_handler_api_time_test:multimodal_event_handler_api_time_test_info",
+      "rotation_event_api_time_test:rotation_event_api_time_test_info",
+      "speech_event_api_time_test:speech_event_api_time_test_info",
+      "stylus_event_api_time_test:stylus_event_api_time_test_info",
+      "system_event_handler_api_time_test:system_event_handler_api_time_test_info",
+      "telephone_event_handler_api_time_test:telephone_event_handler_api_time_test_info",
+      "touch_event_api_time_test:touch_event_api_time_test_info",
+    ]
+  }
+}

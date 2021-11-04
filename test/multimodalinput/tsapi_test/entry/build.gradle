@@ -1,0 +1,46 @@
+apply plugin: 'com.huawei.ohos.hap'
+apply plugin: 'com.huawei.ohos.decctest'
+ohos {
+    signingConfigs {
+        release {
+            storeFile file('E:\\HarmonyOS\\js_demos\\signFile\\mmi.p12')
+            storePassword '0000001A1C279A7806512CE711F381629EB07AA7831437542D02825B31719F14503DBC932848D05F62E2'
+            keyAlias = 'jsdemoV2_debug'
+            keyPassword '0000001A62C9BB030DF474E53FEA090F53B9ED4A4555EF87246CD2FA29C29576A7B50FE7B737323A9B40'
+            signAlg = 'SHA256withECDSA'
+            profile file('E:\\HarmonyOS\\js_demos\\signFile\\SgnedReleasedProfileTemplate.p7b')
+            certpath file('E:\\HarmonyOS\\js_demos\\signFile\\mmi.cer')
+        }
+        debug {
+            storeFile file('E:\\HarmonyOS\\js_demos\\signFile\\mmi.p12')
+            storePassword '0000001A655DECC34BFA23515DCEDBBB8A7C9F33A511FA773849F8368EDFC3292347D5D5066F6908B8BF'
+            keyAlias = 'jsdemoV2_debug'
+            keyPassword '0000001A83D2C0036CE68851B01B3D8C943FA38F957277CE4087A677159935C6665BDE02B47625C7858F'
+            signAlg = 'SHA256withECDSA'
+            profile file('E:\\HarmonyOS\\js_demos\\signFile\\SgnedReleasedProfileTemplate.p7b')
+            certpath file('E:\\HarmonyOS\\js_demos\\signFile\\mmi.cer')
+        }
+    }
+    compileSdkVersion 5
+    defaultConfig {
+        compatibleSdkVersion 4
+    }
+    buildTypes {
+        release {
+            proguardOpt {
+                proguardEnabled false
+                rulesFiles 'proguard-rules.pro'
+            }
+        }
+    }
+
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar', '*.har'])
+    testImplementation 'junit:junit:4.13'
+    ohosTestImplementation 'com.huawei.ohos.testkit:runner:1.0.0.100'
+}
+decc {
+    supportType = ['html', 'xml']
+}

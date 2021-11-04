@@ -1,0 +1,131 @@
+import("//build/ohos.gni")
+import("//build/test.gni")
+import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+module_output_path = "multimodalinput/systemtest_out"
+
+ohos_systemtest("multi_handOut_trackPad_reg_C") {
+  module_out_path = module_output_path
+
+  sources = [
+    "multi_handOut_trackPad_reg_C.cpp",
+  ]
+
+  cflags = [
+  ]
+
+  if (is_mmi_have_libinput) {
+    cflags += [
+      "-DOHOS_BUILD_LIBINPUT",
+    ]
+  }
+
+  if (is_mmi_have_hdf) {
+    cflags += [
+      "-DOHOS_BUILD_HDF",
+    ]
+  }
+
+  if (is_mmi_have_ai) {
+    cflags += [
+      "-DOHOS_BUILD_AI",
+    ]
+  }
+
+  deps = [
+    "//test/xts/acts/multimodalinput/lib/mmi_st_client:mmi_st_client",
+    "//third_party/googletest:gtest",
+    "//third_party/googletest:gtest_main",
+  ]
+  
+  external_deps = [
+      "hiviewdfx_hilog_native:libhilog"
+  ]
+}
+
+ohos_systemtest("multi_handout_trackpad_unReg_H") {
+  module_out_path = module_output_path
+
+  sources = [
+    "multi_handout_trackpad_unReg_H.cpp",
+  ]
+
+  cflags = [
+  ]
+
+  if (is_mmi_have_libinput) {
+    cflags += [
+      "-DOHOS_BUILD_LIBINPUT",
+    ]
+  }
+
+  if (is_mmi_have_hdf) {
+    cflags += [
+      "-DOHOS_BUILD_HDF",
+    ]
+  }
+
+  if (is_mmi_have_ai) {
+    cflags += [
+      "-DOHOS_BUILD_AI",
+    ]
+  }
+
+  deps = [
+    "//test/xts/acts/multimodalinput/lib/mmi_st_client:mmi_st_client",
+    "//third_party/googletest:gtest",
+    "//third_party/googletest:gtest_main",
+  ]
+  
+  external_deps = [
+      "hiviewdfx_hilog_native:libhilog"
+  ]
+}
+
+ohos_systemtest("multi_handout_trackpad_unReg_R") {
+  module_out_path = module_output_path
+
+  sources = [
+    "multi_handout_trackpad_unReg_R.cpp",
+  ]
+
+  cflags = [
+  ]
+
+  if (is_mmi_have_libinput) {
+    cflags += [
+      "-DOHOS_BUILD_LIBINPUT",
+    ]
+  }
+
+  if (is_mmi_have_hdf) {
+    cflags += [
+      "-DOHOS_BUILD_HDF",
+    ]
+  }
+
+  if (is_mmi_have_ai) {
+    cflags += [
+      "-DOHOS_BUILD_AI",
+    ]
+  }
+
+  deps = [
+    "//test/xts/acts/multimodalinput/lib/mmi_st_client:mmi_st_client",
+    "//third_party/googletest:gtest",
+    "//third_party/googletest:gtest_main",
+  ]
+  
+  external_deps = [
+      "hiviewdfx_hilog_native:libhilog"
+  ]
+}
+
+group("trackpad")
+{
+    testonly = true
+    deps = [
+    ":multi_handOut_trackPad_reg_C",
+    ":multi_handout_trackpad_unReg_H",
+    ":multi_handout_trackpad_unReg_R",
+    ]
+}

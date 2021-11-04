@@ -1,0 +1,10 @@
+ [
+    {
+     "deviceName": "keyboard model1",
+     "events":[
+                {"eventType": "KEY_EVENT_RELEASE", "keyValue": 97},
+                {"eventType": "KEY_EVENT_RELEASE", "keyValue": 100},
+                {"eventType": "KEY_EVENT_RELEASE", "keyValue": 30}
+            ]
+    }
+]

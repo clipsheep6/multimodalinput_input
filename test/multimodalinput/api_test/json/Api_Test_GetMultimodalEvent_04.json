@@ -1,0 +1,13 @@
+ [
+    {
+     "deviceName": "mouse",
+     "events":[
+                {"eventType": "MOUSE_EVENT_MOVE", "xPos": 10, "yPos": 20},
+                {"eventType": "MOUSE_EVENT_MOVE", "xPos": 9, "yPos": 21},
+                {"eventType": "MOUSE_EVENT_MOVE", "xPos": 8, "yPos": 22},
+                {"eventType": "MOUSE_EVENT_MOVE", "xPos": 7, "yPos": 23},
+                {"eventType": "MOUSE_EVENT_MOVE", "xPos": 6, "yPos": 24},
+                
+            ]
+    }
+]

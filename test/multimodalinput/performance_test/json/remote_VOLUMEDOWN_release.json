@@ -1,0 +1,22 @@
+ [   
+    {
+     "deviceName": "remoteControl",  
+     "events":[
+                {"eventType": "KEY_EVENT_RELEASE", "keyValue": 114},
+            ]
+    }
+] [   
+    {
+     "deviceName": "remoteControl",  
+     "events":[
+                {"eventType": "KEY_EVENT_RELEASE", "keyValue": 114},
+            ]
+    }
+] [   
+    {
+     "deviceName": "remoteControl",  
+     "events":[
+                {"eventType": "KEY_EVENT_RELEASE", "keyValue": 114},
+            ]
+    }
+]

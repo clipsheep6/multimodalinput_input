@@ -1,0 +1,8 @@
+ [
+    {
+     "deviceName": "mouse", "sendType": "libinput",
+     "events":[
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 274}
+            ]
+    }
+]

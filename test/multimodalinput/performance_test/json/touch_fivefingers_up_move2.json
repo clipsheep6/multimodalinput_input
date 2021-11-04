@@ -1,0 +1,10 @@
+[{
+"deviceName":"touch","sendType":"libinput","devIndex":0,
+"singleEvent":[
+{"eventType":"move","trackingId":0,"xPos":200,"yPos":310,"reportType":"mtReport"},
+{"eventType":"move","trackingId":1,"xPos":300,"yPos":310,"reportType":"mtReport"},
+{"eventType":"move","trackingId":2,"xPos":400,"yPos":310,"reportType":"mtReport"},
+{"eventType":"move","trackingId":3,"xPos":500,"yPos":310,"reportType":"mtReport"},
+{"eventType":"move","trackingId":4,"xPos":600,"yPos":310,"reportType":"synReport"}
+]
+}]

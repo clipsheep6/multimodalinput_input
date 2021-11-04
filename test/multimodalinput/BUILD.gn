@@ -1,0 +1,21 @@
+import("//build/ohos.gni")
+import("//build/test.gni")
+import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+config("system_test_config") {
+  include_dirs = []
+  configs = []
+}
+
+group("multimodalinput") {
+  testonly = true
+  deps = [
+    "functional_test:functional_test_info",
+    "fuzztest:fuzz_test",
+    "lib/mmi_st_client:mmi_st_client",
+    "lib/hosmmi_st_analyzer:hosmmi_st_analyzer",
+    #"lib/mmi_st_demo:mmi_st_demo",
+    "api_test:api-test",
+    #"performance_test:performance_test",
+    #"tsapi_test:hjs_tsapi_test",
+  ]
+}

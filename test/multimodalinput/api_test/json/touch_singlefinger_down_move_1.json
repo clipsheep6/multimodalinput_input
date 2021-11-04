@@ -1,0 +1,6 @@
+[{
+"deviceName":"touch","devIndex":0,
+"singleEvent":[
+{"eventType":"move","trackingId":1,"xPos":125,"yPos":237,"reportType":"synReport"}
+]
+}]

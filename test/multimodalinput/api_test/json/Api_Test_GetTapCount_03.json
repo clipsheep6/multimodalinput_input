@@ -1,0 +1,9 @@
+[
+    {
+    "deviceName": "touch", "devIndex":0,
+     "events":[
+                [[200, 200]],
+                [[200, 250]]
+            ]
+    }
+]

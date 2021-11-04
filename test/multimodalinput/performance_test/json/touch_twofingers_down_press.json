@@ -1,0 +1,7 @@
+[{
+"deviceName":"touch","sendType":"libinput","devIndex":0,
+"singleEvent":[
+{"eventType":"press","trackingId":0,"xPos":100,"yPos":100,"reportType":"mtReport"},
+{"eventType":"press","trackingId":1,"xPos":300,"yPos":100,"reportType":"synReport"}
+]
+}]

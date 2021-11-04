@@ -1,0 +1,8 @@
+ [
+    {
+     "deviceName": "gamePad", 
+     "events":[
+                {"eventType": "ROCKER_2", "direction":"down", "event":[1405,2989,5365,7266,7899,6316,3623,1405]}
+            ]
+    }
+]
