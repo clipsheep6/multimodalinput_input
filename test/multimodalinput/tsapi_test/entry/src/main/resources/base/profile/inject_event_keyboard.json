@@ -1,0 +1,13 @@
+ [
+    {
+     "deviceName": "keyboard", "sendType": "libinput",
+     "events":[
+                {"eventType": "KEY_EVENT_PRESS", "keyValue": 30},
+                {"eventType": "KEY_EVENT_RELESE", "keyValue": 30},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 32},
+                {"eventType": "KEY_EVENT_PRESS", "keyValue": 33, "blockTime":1000},
+                {"eventType": "KEY_EVENT_RELESE", "keyValue": 33, "blockTime":1000},
+                {"eventType": "KEY_EVENT_LONG_PRESS", "keyValue": 31, "blockTime":1000}
+            ]
+    }
+]

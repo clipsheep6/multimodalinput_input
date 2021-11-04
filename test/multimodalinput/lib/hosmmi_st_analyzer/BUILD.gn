@@ -1,0 +1,16 @@
+import("//build/ohos.gni")
+import("//build/test.gni")
+import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+module_output_path = "multimodalinput/systemtest_out"
+
+ohos_systemtest("hosmmi_st_analyzer") {
+  module_out_path = module_output_path
+  sources = [ "hosmmi_st_analyzer.cpp" ]
+
+  deps = [
+    "//test/xts/acts/multimodalinput/lib/mmi_st_client:mmi_st_client",
+  ]
+
+  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+}
+

@@ -1,0 +1,75 @@
+# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build/config/features.gni")
+import("//build/ohos.gni")
+import("//build/test.gni")
+import("//drivers/adapter/uhdf2/uhdf.gni")
+import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+
+module_output_path = "multimodalinput/unit_out"
+
+##############################fuzztest##########################################
+ohos_fuzztest("system_event_handler_on_close_page_fuzz_test") {
+  module_out_path = module_output_path
+
+  include_dirs = [
+    "//foundation/multimodalinput/input/frameworks/util/network/include",
+    "//foundation/multimodalinput/input/frameworks/util/socket/include",
+    "//foundation/multimodalinput/input/frameworks/util/common/include",
+    "//foundation/multimodalinput/input/frameworks/proxy/module_loader/include",
+    "//foundation/multimodalinput/input/frameworks/proxy/event_handle/include",
+    "//foundation/multimodalinput/input/test/mmi_auto_test_loader/include",
+    "//foundation/multimodalinput/input/test/systemtest/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/napi/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
+    "//foundation/multimodalinput/input/common/include",
+    "//foundation/multimodalinput/input/service/event_standard/include",
+    "//foundation/multimodalinput/input/service/hdf_adapter/include",
+    "//foundation/multimodalinput/input/service/window_manager/include",
+    "//foundation/multimodalinput/input/service/message_handle/include",
+    "//foundation/multimodalinput/input/service/event_dispatch/include",
+    "//foundation/multimodalinput/input/service/module_loader/include",
+    "//foundation/multimodalinput/input/service/libinput_adapter/include",
+    "//foundation/multimodalinput/input/service/senior_input_func_proc/include",
+    "//foundation/multimodalinput/input/service/ai_sensor_adapter/include",
+    "//foundation/multimodalinput/input/service/include",
+    "//foundation/multimodalinput/input/service/event_dump/include",
+    "//foundation/multimodalinput/input/service/application_manager/include",
+    "//foundation/multimodalinput/input/service/event_handle/include",
+    "//foundation/multimodalinput/input/service/device_scalability/include",
+    "//foundation/multimodalinput/input/service/hdi_inject/include",
+    "//foundation/multimodalinput/input/service/event_package/include",
+    "//foundation/multimodalinput/input/uinput",
+    "//foundation/multimodalinput/input/tools/event_inject/include",
+    "//foundation/multimodalinput/input/tools/virtual_device_manager/include",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//utils/native/base/include",
+    "//third_party/libinput/src",
+    "//third_party/eudev/src/libudev",
+  ]
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
+    "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
+    "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
+  ]
+  ldflags = []
+  sources = [ "onclosepage_fuzz.cpp" ]
+}

@@ -1,0 +1,8 @@
+ [
+    { 
+     "deviceName": "pen", 
+     "events":[
+                {"eventType": "PEN_KEY", "keyValue": 331, "keyStatus":0}
+            ]
+    }
+]

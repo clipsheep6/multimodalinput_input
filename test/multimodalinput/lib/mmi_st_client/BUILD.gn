@@ -1,0 +1,63 @@
+import("//build/ohos.gni")
+import("//build/test.gni")
+import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+
+# module_output_path = "multimodalinput/systemtest_out"
+
+config("libmmi_st_client_public_config") {
+  visibility = [ ":*" ]
+
+  include_dirs = [
+    "//foundation/multimodalinput/input/common/include",
+    "//foundation/multimodalinput/input/frameworks/util/common/include",
+    "//foundation/multimodalinput/input/frameworks/util/network/include",
+    "//foundation/multimodalinput/input/frameworks/util/socket/include",
+    "//test/xts/acts/multimodalinput/lib/mmi_st_client/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//utils/native/base/include",
+    "//third_party/googletest/googletest/include/gtest",
+  ]
+
+  cflags = [ "-DOHOS_BUILD" ]
+
+  if (is_mmi_have_debug) {
+    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+  }
+
+  if (is_mmi_have_libinput) {
+    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+  }
+
+  if (is_mmi_have_hdf) {
+    cflags += [ "-DOHOS_BUILD_HDF" ]
+  }
+
+  if (is_mmi_have_ai) {
+    cflags += [ "-DOHOS_BUILD_AI" ]
+  }
+}
+
+source_set("mmi_st_client") {
+  testonly = true
+
+  # output_dir = module_output_path
+  sources = [
+    "src/libmmi_st_client.cpp",
+    "src/st_client_helper.cpp",
+    "src/st_data_process.cpp",
+    "src/st_helper.cpp",
+    "src/st_msg_handler.cpp",
+  ]
+
+  public_configs = [ ":libmmi_st_client_public_config" ]
+
+  deps = [
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
+    "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
+    "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_proxy",
+    "//third_party/googletest:gtest",
+  ]
+}

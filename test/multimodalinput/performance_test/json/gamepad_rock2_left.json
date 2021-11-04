@@ -1,0 +1,8 @@
+ [
+    {
+     "deviceName": "gamePad", 
+     "events":[
+                {"eventType": "ROCKER_2", "direction":"left", "event":[1796,3280,4949,7731,9029,7545,2167]}
+            ]
+    }
+]

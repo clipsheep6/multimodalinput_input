@@ -1,0 +1,8 @@
+ [
+    {
+     "deviceName": "knob model3"," ":"knob model3 click",
+     "events":[
+                {"eventType": "KEY_EVENT_RELEASE", "keyValue": 276}
+            ]
+    }
+    ]

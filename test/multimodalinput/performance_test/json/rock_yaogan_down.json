@@ -1,0 +1,8 @@
+ [
+    {
+     "deviceName": "joystick", 
+     "events":[
+                {"eventType": "ROCKER_1", "direction":"down", "event":[1285, 3696, 6248, 8234, 9935, 11070, 11354, 8943, 6390, 3412]}
+            ]
+    }
+]

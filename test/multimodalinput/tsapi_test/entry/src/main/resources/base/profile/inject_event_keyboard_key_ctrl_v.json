@@ -1,0 +1,11 @@
+[
+    {
+     "deviceName": "keyboard model1", "sendType": "libinput",
+     "events":[
+                {"eventType": "KEY_EVENT_PRESS", "keyValue": 97},
+                {"eventType": "KEY_EVENT_PRESS", "keyValue": 47},
+                {"eventType": "KEY_EVENT_RELESE", "keyValue": 47},
+                {"eventType": "KEY_EVENT_RELESE", "keyValue": 97}
+            ]
+    }
+]

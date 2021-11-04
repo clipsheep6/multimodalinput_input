@@ -1,0 +1,9 @@
+ [
+    {
+     "deviceName": "trackball",
+     "events":[
+                {"eventType": "MOUSE_EVENT_MOVE", "xPos": 10, "yPos": -20},
+                {"eventType": "MOUSE_EVENT_MOVE", "xPos": -10, "yPos": 20},
+            ]
+    }
+]

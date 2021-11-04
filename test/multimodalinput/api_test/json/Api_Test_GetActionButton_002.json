@@ -1,0 +1,8 @@
+[
+    {
+     "deviceName": "keyboard model2", 
+     "events":[
+                 {"eventType": "KEY_EVENT_CLICK", "keyValue": 139}
+            ]
+    }
+]

@@ -1,0 +1,37 @@
+ [
+    {
+     "deviceName": "knob model1", "sendType": "libinput",
+     "events":[
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 113},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 115},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 114},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 163},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 165}
+            ]
+    },
+    {
+     "deviceName": "knob model2", "sendType": "libinput",
+     "events":[
+                {"eventType": "KEY_EVENT_PRESS", "keyValue": 29},
+                {"eventType": "KEY_EVENT_PRESS", "keyValue": 56},
+                {"eventType": "KEY_EVENT_PRESS", "keyValue": 49},
+                {"eventType": "KEY_EVENT_RELESE", "keyValue": 29},
+                {"eventType": "KEY_EVENT_RELESE", "keyValue": 56},
+                {"eventType": "KEY_EVENT_RELESE", "keyValue": 49},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 115},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 114},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 106},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 105}
+            ]
+    },
+    {
+     "deviceName": "knob model3", "sendType": "libinput",
+     "events":[
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 274},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 275},
+                {"eventType": "KEY_EVENT_CLICK", "keyValue": 276},
+                {"eventType": "MOUSE_EVENT_HWHEEL", "direction": "right", "distance": 20},
+                {"eventType": "MOUSE_EVENT_HWHEEL", "direction": "left", "distance": 10}   
+            ]
+    }
+    ]

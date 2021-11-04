@@ -1,0 +1,8 @@
+[
+    {
+     "deviceName": "mouse", "sendType": "libinput",
+     "events":[
+                {"eventType": "MOUSE_EVENT_WHEEL", "direction": "down", "distance": 20}
+            ]
+    }
+]
