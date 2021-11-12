@@ -27,7 +27,7 @@ namespace OHOS {
         {
             HILOG_INFO("InjectionIni: start");
             if (iniFilePath.empty()) {
-                return;
+                   return;
             }
 
             const std::string eventsFile = iniFilePath + fileName;
