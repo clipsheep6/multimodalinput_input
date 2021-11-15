@@ -528,8 +528,8 @@ int32_t OHOS::MMI::ClientMsgHandler::PackedData(MultimodalEvent& multEvent, cons
         uint64_t clientEndTime = GetSysClockTime();
         ((MMIClient *)&client)->ReplyMessageToServer(pkt.GetMsgId(), data.occurredTime, serverStartTime,
             clientEndTime, fd);
-        multEvent.Initialize(windowId, 0, data.uuid, data.eventType, data.occurredTime, "", data.deviceId, 0,
-            data.deviceType);
+        multEvent.Initialize(windowId, 0, data.uuid, data.deviceType, data.occurredTime, "", data.deviceId, 0,
+            data.eventType);
     }
 
 #ifdef OHOS_AUTO_TEST_FRAME
