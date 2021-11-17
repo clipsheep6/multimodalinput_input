@@ -120,8 +120,9 @@ namespace OHOS {
         MEMSET_SEC_FUN_FAIL,                        // memset安全函数错误
         DEVICEID_PARAM_PKG_FAIL,                    // 设备号参数封装失败
         MALLOC_FAIL,                                // malloc失败
-        SEC_MEMSET_FAIL,
         SEC_STRCPY_FAIL,                            // 安全函数strcpy错误
+        START_TIMER_MANAGER_FAIL,                   // 启动定时器失败
+        ADD_TIMER_FAIL,                             // 增加定时器失败
     };
     // Error code for util
     constexpr ErrCode UTIL_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_UTIL);

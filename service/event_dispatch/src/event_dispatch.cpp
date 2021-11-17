@@ -19,12 +19,19 @@
 #include "mmi_server.h"
 #include "system_event_handler.h"
 #include "outer_interface.h"
+#include "mtimer_manager.h"
 
 namespace OHOS::MMI {
     namespace {
         static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatch" };
     }
 }
+struct MMBLongPressData {
+    int32_t idMsg;
+    OHOS::MMI::UDSServer *serv;
+    EventPointer event;
+    uint64_t preHandlerTime;
+};
 
 #ifdef OHOS_AUTO_TEST_FRAME
 static float AutoTestStandardValue[JOYSTICK_AXIS_END] = {};
@@ -797,7 +804,23 @@ int32_t OHOS::MMI::EventDispatch::DispatchCommonPointEvent(UDSServer& udsServer,
     int32_t ret = RET_OK;
     MmiMessageId idMsg = MmiMessageId::INVALID;
     if (type == LIBINPUT_EVENT_POINTER_BUTTON) {
-        MMIRegEvent->OnEventPointButton(point.button, point.time, point.state, idMsg);
+        if (point.button == BTN_MIDDLE) {
+            if (point.state == BUTTON_STATE_PRESSED) {
+                if (!TimerMgr->IsExist(point.button)) {
+                    auto uData = static_cast<MMBLongPressData *>(malloc(sizeof(MMBLongPressData)));
+                    CHKR(uData, OHOS::NULL_POINTER, RET_ERR);
+                    uData->idMsg = static_cast<int32_t>(MmiMessageId::ON_GOTO_DESKTOP);
+                    uData->serv = &udsServer;
+                    uData->preHandlerTime = preHandlerTime;
+                    CHKR(EOK == memcpy_s(&uData->event, sizeof(EventPointer), &point, sizeof(EventPointer)),
+                         MEMCPY_SEC_FUN_FAIL, RET_ERR);
+                    CK(TimerMgr->AddTimer(uData->idMsg, MMB_LONG_PRESS_CKTIME,
+                       std::bind(&EventDispatch::OnMMBLongPress, this, std::placeholders::_1), uData), ADD_TIMER_FAIL);
+                }
+            } else if (point.state == BUTTON_STATE_RELEASED) {
+                TimerMgr->DelTimer(static_cast<int32_t>(MmiMessageId::ON_GOTO_DESKTOP));
+            }
+        }
     }
     if (type == LIBINPUT_EVENT_POINTER_AXIS) {
         MMIRegEvent->OnEventPointAxis(point, idMsg);
@@ -1064,3 +1087,23 @@ void OHOS::MMI::EventDispatch::AutoTestSetStandardValue(EventJoyStickAxis& event
     }
 }
 #endif  // OHOS_AUTO_TEST_FRAME
+
+void OHOS::MMI::EventDispatch::OnMMBLongPress(void *data)
+{
+    CHK(data, NULL_POINTER);
+    auto uData = reinterpret_cast<MMBLongPressData *>(data);
+    CHK(uData, NULL_POINTER);
+    RegisteredEvent registeredEvent = {};
+    auto packageResult = eventPackage_.PackageRegisteredEvent<EventPointer>(registeredEvent, uData->event);
+    if (packageResult != RET_OK) {
+        MMI_LOGE("Registered event package failed... ret:%{public}d errCode:%{public}d",
+                 packageResult, REG_EVENT_PKG_FAIL);
+    }
+    SysEveHdl->OnSystemEventHandler(static_cast<MmiMessageId>(uData->idMsg));
+    auto ret = RegisteredEventDispatch(static_cast<MmiMessageId>(uData->idMsg), *uData->serv, registeredEvent,
+                                       INPUT_DEVICE_CAP_POINTER, uData->preHandlerTime);
+    if (ret != RET_OK) {
+        MMI_LOGE("key comb dispatch failed return:%{public}d errCode:%{public}d",
+                 ret, REG_EVENT_DISP_FAIL);
+    }
+}

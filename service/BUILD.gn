@@ -30,6 +30,7 @@ config("libmmi_server_public_config") {
     "message_handle/include",
     "module_loader/include",
     "window_manager/include",
+    "timer/include",
     "${mmi_service_path}/connect_manager/include",
     "//third_party/libxkbcommon",
     "//third_party/weston/libweston",
@@ -99,6 +100,8 @@ ohos_shared_library("libmmi-server") {
     "window_manager/src/input_windows_manager.cpp",
     "window_manager/src/outer_interface.cpp",
     "window_manager/src/window_switch.cpp",
+    "timer/src/mtimer.cpp",
+    "timer/src/mtimer_manager.cpp",
   ]
 
   if (is_mmi_have_hdf) {
