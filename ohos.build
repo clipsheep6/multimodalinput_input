@@ -8,6 +8,7 @@
         "//foundation/multimodalinput/input/patch:patch_packages",
         "//third_party/eudev:libudev",
         "//third_party/eudev:udevd",
+        "//third_party/eudev:udevadm",
         "//third_party/eudev:udevd.rc",
         "//third_party/eudev:udev_conf",
         "//third_party/eudev:udev_touchscreen_rule",
