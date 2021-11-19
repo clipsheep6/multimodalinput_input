@@ -295,7 +295,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, l
         }
         for (auto fd : fds) {
             NetPacket newPkt1(MmiMessageId::ON_TOUCH);
-            newPkt1 << inputType << tabletPad << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
+            newPkt1 << inputType << tabletPad << appInfo.abilityId << 0 << appInfo.fd << preHandlerTime;
             udsServer.SendMsg(fd, newPkt1);
         }
     }
@@ -359,7 +359,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchJoyStickEvent(UDSServer &udsServer, li
         }
         for (auto fd : fds) {
             NetPacket newPacket1(MmiMessageId::ON_TOUCH);
-            newPacket1 << inputType << eventJoyStickAxis << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
+            newPacket1 << inputType << eventJoyStickAxis << appInfo.abilityId << 0 << appInfo.fd << preHandlerTime;
             udsServer.SendMsg(fd, newPacket1);
         }
     }
@@ -452,7 +452,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, 
         for (auto fd : fds) {
             NetPacket newPacket1(MmiMessageId::ON_TOUCH);
             newPacket1 << inputType << inputEvent.curRventType << tableTool << appInfo.abilityId
-            << focusId << appInfo.fd << preHandlerTime;
+            << 0 << appInfo.fd << preHandlerTime;
             if (inputEvent.curRventType > 0) {
                 newPacket1 << inputEvent;
             }
@@ -587,7 +587,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchPointerEvent(UDSServer &udsServer, lib
         for (auto fd : fds) {
             NetPacket newPacket1(MmiMessageId::ON_TOUCH);
              newPacket1 << inputType << inputEvent.curRventType << point << appInfo.abilityId
-            << desWindowId << appInfo.fd << preHandlerTime;
+            << 0 << appInfo.fd << preHandlerTime;
             if (inputEvent.curRventType > 0) {
                 newPacket1 << inputEvent;
             }
@@ -677,7 +677,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchGestureEvent(UDSServer& udsServer, lib
         }
         for (auto fd : fds) {
             NetPacket newPacket1(MmiMessageId::ON_TOUCH);
-            newPacket1 << inputType << gesture << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
+            newPacket1 << inputType << gesture << appInfo.abilityId << 0 << appInfo.fd << preHandlerTime;
             udsServer.SendMsg(fd, newPacket1);
         }
     }
@@ -741,7 +741,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
         OnEventTouchGetPointEventType(touch, pointEventType, fingerCount);
         int32_t eventType = pointEventType;
         newPacket << eventType << appInfo.abilityId << touchFocusId << appInfo.fd << preHandlerTime;
-        newPacket1 << eventType << appInfo.abilityId << touchFocusId << appInfo.fd << preHandlerTime;
+        newPacket1 << eventType << appInfo.abilityId << 0 << appInfo.fd << preHandlerTime;
 #ifdef OHOS_AUTO_TEST_FRAME    // Send event to auto-test frame
         AutoTestCoordinate coordinate = { static_cast<double>(0), static_cast<double>(0), static_cast<double>(0),
             static_cast<double>(0) };
