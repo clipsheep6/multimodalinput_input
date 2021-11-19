@@ -896,6 +896,14 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinpu
             MMI_LOGE("Sending structure of EventKeyboard failed! errCode:%{public}d\n", MSG_SEND_FAIL);
             return MSG_SEND_FAIL;
         }
+        std::vector<int32_t> fds;
+        RegEventHM->FindSocketFdsByEventHandle(MmiMessageId::ON_COPY, fds);
+        if (fds.empty()) {
+            return RET_OK;
+        }
+        for (auto fd : fds) {
+            udsServer.SendMsg(fd, newPkt);
+        }
     }
     return ret;
 }
