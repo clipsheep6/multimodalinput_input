@@ -288,6 +288,16 @@ int32_t OHOS::MMI::EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, l
             MMI_LOGE("Sending structure of EventTabletPad failed! errCode:%{public}d\n", MSG_SEND_FAIL);
             return MSG_SEND_FAIL;
         }
+        std::vector<int32_t> fds;
+        RegEventHM->FindSocketFdsByEventHandle(MmiMessageId::ON_COPY, fds);
+        if (fds.empty()) {
+            return RET_OK;
+        }
+        for (auto fd : fds) {
+            NetPacket newPkt1(MmiMessageId::ON_TOUCH);
+            newPkt1 << inputType << tabletPad << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
+            udsServer.SendMsg(fd, newPkt1);
+        }
     }
     return RET_OK;
 }
@@ -341,6 +351,16 @@ int32_t OHOS::MMI::EventDispatch::DispatchJoyStickEvent(UDSServer &udsServer, li
         if (!udsServer.SendMsg(appInfo.fd, newPacket)) {
             MMI_LOGE("Sending structure of EventJoyStickAxis failed! errCode:%{public}d\n", MSG_SEND_FAIL);
             return MSG_SEND_FAIL;
+        }
+        std::vector<int32_t> fds;
+        RegEventHM->FindSocketFdsByEventHandle(MmiMessageId::ON_COPY, fds);
+        if (fds.empty()) {
+            return RET_OK;
+        }
+        for (auto fd : fds) {
+            NetPacket newPacket1(MmiMessageId::ON_TOUCH);
+            newPacket1 << inputType << eventJoyStickAxis << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
+            udsServer.SendMsg(fd, newPacket1);
         }
     }
     return RET_OK;
@@ -422,6 +442,21 @@ int32_t OHOS::MMI::EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, 
         if (!udsServer.SendMsg(appInfo.fd, newPacket)) {
             MMI_LOGE("Sending structure of EventTabletTool failed! errCode:%{public}d\n", MSG_SEND_FAIL);
             return MSG_SEND_FAIL;
+        }
+
+        std::vector<int32_t> fds;
+        RegEventHM->FindSocketFdsByEventHandle(MmiMessageId::ON_COPY, fds);
+        if (fds.empty()) {
+            return RET_OK;
+        }
+        for (auto fd : fds) {
+            NetPacket newPacket1(MmiMessageId::ON_TOUCH);
+            newPacket1 << inputType << inputEvent.curRventType << tableTool << appInfo.abilityId
+            << focusId << appInfo.fd << preHandlerTime;
+            if (inputEvent.curRventType > 0) {
+                newPacket1 << inputEvent;
+            }
+            udsServer.SendMsg(fd, newPacket1);
         }
     }
     return RET_OK;
@@ -544,6 +579,21 @@ int32_t OHOS::MMI::EventDispatch::DispatchPointerEvent(UDSServer &udsServer, lib
             MMI_LOGE("Sending structure of EventPointer failed! errCode:%{public}d\n", MSG_SEND_FAIL);
             return MSG_SEND_FAIL;
         }
+        std::vector<int32_t> fds;
+        RegEventHM->FindSocketFdsByEventHandle(MmiMessageId::ON_COPY, fds);
+        if (fds.empty()) {
+            return RET_OK;
+        }
+        for (auto fd : fds) {
+            NetPacket newPacket1(MmiMessageId::ON_TOUCH);
+             newPacket1 << inputType << inputEvent.curRventType << point << appInfo.abilityId
+            << desWindowId << appInfo.fd << preHandlerTime;
+            if (inputEvent.curRventType > 0) {
+                newPacket1 << inputEvent;
+            }
+            udsServer.SendMsg(fd, newPacket1);
+        }
+        
     }
     return RET_OK;
 }
@@ -620,6 +670,16 @@ int32_t OHOS::MMI::EventDispatch::DispatchGestureEvent(UDSServer& udsServer, lib
             MMI_LOGE("Sending structure of EventGesture failed! errCode:%{public}d\n", MSG_SEND_FAIL);
             return MSG_SEND_FAIL;
         }
+        std::vector<int32_t> fds;
+        RegEventHM->FindSocketFdsByEventHandle(MmiMessageId::ON_COPY, fds);
+        if (fds.empty()) {
+            return RET_OK;
+        }
+        for (auto fd : fds) {
+            NetPacket newPacket1(MmiMessageId::ON_TOUCH);
+            newPacket1 << inputType << gesture << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
+            udsServer.SendMsg(fd, newPacket1);
+        }
     }
     return RET_OK;
 }
@@ -669,16 +729,19 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
 
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_TOUCH, appInfo.fd, touch.time, preHandlerTime)) {
         NetPacket newPacket(MmiMessageId::ON_TOUCH);
+        NetPacket newPacket1(MmiMessageId::ON_TOUCH);
         int32_t fingerCount = MMIRegEvent->GetTouchInfoSizeByDeviceId(touch.deviceId);
         if (touch.eventType == LIBINPUT_EVENT_TOUCH_UP) {
             fingerCount++;
         }
         int32_t inputType = INPUT_DEVICE_CAP_TOUCH;
         newPacket << inputType << fingerCount;
+        newPacket1 << inputType << fingerCount;
         POINT_EVENT_TYPE pointEventType = EVENT_TYPE_INVALID;
         OnEventTouchGetPointEventType(touch, pointEventType, fingerCount);
         int32_t eventType = pointEventType;
         newPacket << eventType << appInfo.abilityId << touchFocusId << appInfo.fd << preHandlerTime;
+        newPacket1 << eventType << appInfo.abilityId << touchFocusId << appInfo.fd << preHandlerTime;
 #ifdef OHOS_AUTO_TEST_FRAME    // Send event to auto-test frame
         AutoTestCoordinate coordinate = { static_cast<double>(0), static_cast<double>(0), static_cast<double>(0),
             static_cast<double>(0) };
@@ -740,6 +803,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
                          touchTemp.pressure, touchTemp.point.x, touchTemp.point.y, appInfo.fd,
                          appInfo.abilityId, touchFocusId, preHandlerTime);
                 newPacket << touchTemp;
+                newPacket1 << touchTemp;
 
 #ifdef OHOS_AUTO_TEST_FRAME    // Send event to auto-test frame
                 const AutoTestDispatcherPkt autoTestDispatcherPkt = {
@@ -756,6 +820,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
         }
         if (touch.eventType == LIBINPUT_EVENT_TOUCH_UP) {
             newPacket << touch;
+            newPacket1 << touch;
             MMI_LOGT("\n4.event dispatcher of server:\neventTouch:time=%{public}" PRId64 ";deviceType=%{public}u;"
                      "deviceId=%{public}u;deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
                      "slot=%{public}d;seat_slot=%{public}d;pressure=%{public}lf;point.x=%{public}lf;"
@@ -780,6 +845,14 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
         if (!udsServer.SendMsg(appInfo.fd, newPacket)) {
             MMI_LOGE("Sending structure of EventTouch failed! errCode:%{public}d\n", MSG_SEND_FAIL);
             return MSG_SEND_FAIL;
+        }
+        std::vector<int32_t> fds;
+        RegEventHM->FindSocketFdsByEventHandle(MmiMessageId::ON_COPY, fds);
+        if (fds.empty()) {
+            return RET_OK;
+        }
+        for (auto fd : fds) {
+            udsServer.SendMsg(fd, newPacket1);
         }
     }
     return ret;
