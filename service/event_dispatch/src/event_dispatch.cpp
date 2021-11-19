@@ -902,7 +902,9 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinpu
             return RET_OK;
         }
         for (auto fd : fds) {
-            udsServer.SendMsg(fd, newPkt);
+            NetPacket newPkt1(MmiMessageId::ON_KEY);
+            newPkt1 << key << appInfo.abilityId << 0 << preHandlerTime;
+            udsServer.SendMsg(fd, newPkt1);
         }
     }
     return ret;
