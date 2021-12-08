@@ -121,6 +121,7 @@ void OHOS::MMI::InputWindowsManager::InsertSurfaceInfo(const MMISurfaceInfo& tmp
 {
     std::lock_guard<std::mutex> lock(mu_);
     surfaces_.insert(std::pair<int32_t, MMISurfaceInfo>(tmpSurfaceInfo.surfaceId, tmpSurfaceInfo));
+    surfaceVec_.push_back(tmpSurfaceInfo);
     MMI_LOGW("OnWindow InsertSurfaceInfo ChangeFocusSurfaceId old:%{public}d new:%{public}d", focusInfoID_,
              tmpSurfaceInfo.surfaceId);
     focusInfoID_ = tmpSurfaceInfo.surfaceId;
@@ -242,6 +243,7 @@ void OHOS::MMI::InputWindowsManager::Clear()
     screenInfoVec_.clear();
     layers_.clear();
     surfaces_.clear();
+    surfaceVec_.clear();
     surfacesList_.clear();
 }
 
@@ -294,6 +296,7 @@ void OHOS::MMI::InputWindowsManager::SaveScreenInfoToMap(const ScreenInfo** scre
     screenInfoVec_.clear();
     layers_.clear();
     surfaces_.clear();
+    surfaceVec_.clear();
 
     // save windows info
     IdsList surfaceList;
@@ -314,6 +317,7 @@ void OHOS::MMI::InputWindowsManager::SaveScreenInfoToMap(const ScreenInfo** scre
                     MEMCPY_SEC_FUN_FAIL);
                 mySurfaceTmp.screenId = screenInfo[i]->screenId;
                 surfaces_.insert(std::pair<int32_t, MMISurfaceInfo>(mySurfaceTmp.surfaceId, mySurfaceTmp));
+                surfaceVec_.push_back(mySurfaceTmp);
                 AddId(surfaceList, mySurfaceTmp.surfaceId);
             }
         }
@@ -416,12 +420,12 @@ const MMISurfaceInfo* OHOS::MMI::InputWindowsManager::GetTouchSurfaceInfo(double
     std::lock_guard<std::mutex> lock(mu_);
     int32_t newLayerId = -1;
     const MMISurfaceInfo* surfacePtr = nullptr;
-    for (auto& it : surfaces_) {
+    for (auto& surface : surfaceVec_) {
         // find window by coordinate
-        if (CheckFocusSurface(x, y, it.second) && it.second.onLayerId >= newLayerId) {
-            newLayerId = it.second.onLayerId;
-            if (it.second.visibility == 1 && AppRegs->FindByWinId(it.second.surfaceId).fd > 0) {
-                surfacePtr = &it.second;
+        if (CheckFocusSurface(x, y, surface) && surface.onLayerId >= newLayerId) {
+            newLayerId = surface.onLayerId;
+            if (surface.visibility == 1 && AppRegs->FindByWinId(surface.surfaceId).fd > 0) {
+                surfacePtr = &surface;
             }
         }
     }
