@@ -535,7 +535,9 @@ int32_t OHOS::MMI::InputEventHandler::OnEventTouchSecond(libinput_event& event)
 int32_t OHOS::MMI::InputEventHandler::OnEventTouch(libinput_event& event)
 {
     SInput::Loginfo_packaging_tool(event);
+#ifndef OHOS_WESTEN_MODEL
     OnEventTouchSecond(event);
+#endif
     uint64_t preHandlerTime = GetSysClockTime();
     struct EventTouch touch = {};
     CHKR(udsServer_, NULL_POINTER, RET_ERR);
@@ -548,11 +550,12 @@ int32_t OHOS::MMI::InputEventHandler::OnEventTouch(libinput_event& event)
                  packageResult, TOUCH_EVENT_PKG_FAIL);
         return TOUCH_EVENT_PKG_FAIL;
     }
-
+#ifndef OHOS_WESTEN_MODEL
     if (ServerKeyFilter->OnTouchEvent(*udsServer_, event, touch, preHandlerTime, winSwitch_)) {
         return RET_OK;
     }
-
+#endif
+#ifdef OHOS_WESTEN_MODEL
 #ifdef OHOS_AUTO_TEST_FRAME
     // Send event to auto-test frame
     const AutoTestLibinputPkt autoTestLibinputPkt = {
@@ -573,6 +576,7 @@ int32_t OHOS::MMI::InputEventHandler::OnEventTouch(libinput_event& event)
         MMI_LOGE("Touch event dispatch failed... ret:%{public}d errCode:%{public}d", ret, TOUCH_EVENT_DISP_FAIL);
         return TOUCH_EVENT_DISP_FAIL;
     }
+#endif
     return RET_OK;
 }
 

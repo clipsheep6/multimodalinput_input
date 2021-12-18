@@ -534,10 +534,12 @@ int32_t EventPackage::PackageTouchEvent(libinput_event& event,
         case LIBINPUT_EVENT_TOUCH_DOWN: {
             touch.point.x = libinput_event_touch_get_x(data);
             touch.point.y = libinput_event_touch_get_y(data);
+#ifdef OHOS_WESTEN_MODEL
             auto touchSurfaceInfo = WinMgr->GetTouchSurfaceInfo(touch.point.x, touch.point.y);
             CHKR(touchSurfaceInfo, NULL_POINTER, RET_ERR);
             WinMgr->SetTouchFocusSurfaceId(touchSurfaceInfo->surfaceId);
             WinMgr->TransfromToSurfaceCoordinate(touch.point.x, touch.point.y, *touchSurfaceInfo, true);
+#endif
             break;
         }
         case LIBINPUT_EVENT_TOUCH_UP: {
@@ -548,10 +550,12 @@ int32_t EventPackage::PackageTouchEvent(libinput_event& event,
         case LIBINPUT_EVENT_TOUCH_MOTION: {
             touch.point.x = libinput_event_touch_get_x(data);
             touch.point.y = libinput_event_touch_get_y(data);
+#ifdef OHOS_WESTEN_MODEL
             auto touchSurfaceId = WinMgr->GetTouchFocusSurfaceId();
             auto touchSurfaceInfo = WinMgr->GetSurfaceInfo(touchSurfaceId);
             CHKR(touchSurfaceInfo, NULL_POINTER, RET_ERR);
             WinMgr->TransfromToSurfaceCoordinate(touch.point.x, touch.point.y, *touchSurfaceInfo);
+#endif
             break;
         }
         default: {
@@ -745,7 +749,7 @@ int32_t EventPackage::KeyboardToKeyEvent(EventKeyboard& key,
     return RET_OK;
 }
 
-const uint16_t pointerID = 1; // 鼠标只有一个PoingerItem，所以ID只为1
+const uint16_t pointerID = 1; // mouse has only an PoingeItem, so id is 1
 
 std::shared_ptr<OHOS::MMI::PointerEvent> EventPackage::GestureToPointerEvent(EventGesture& gesture,
                                                                              UDSServer& udsServer)
