@@ -13,10 +13,10 @@
      limitations under the License.
 -->
 <info>
-    <process>multimodalinputservice</process>
+    <process>multimodalinput</process>
     <systemability>
-        <name>3101</name> <!-- Declare MultimodalInputService SytemAbilityID-->
-        <libpath>libmultimodalinput_service.z.so</libpath>
+        <name>3101</name> <!-- Declare MMIService SytemAbilityID-->
+        <libpath>libmmi-server.z.so</libpath>
         <run-on-create>true</run-on-create>
         <distributed>false</distributed>
         <dump-level>1</dump-level>
