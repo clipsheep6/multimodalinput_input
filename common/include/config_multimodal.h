@@ -48,6 +48,7 @@
 #define MAX_STREAM_BUF_SIZE (1024*10)       // Maximum buffer size of socket stream
 #define MAX_PACKET_BUF_SIZE 1024            // Maximum buffer size of network packets
 #define DEFINE_EPOLL_TIMEOUT 1000           // Default epoll write timeout
+#define MMB_LONG_PRESS_CKTIME (500*1000)    // Middle mouse button long press detection time(microsecond)
 
 #define CLIENT_RECONNECT_COOLING_TIME 800   // Client reconnection cooldown
 #define SERVER_RESTART_COOLING_TIME 2000    // Server failure restart cooldown

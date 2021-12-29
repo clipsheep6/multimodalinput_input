@@ -65,6 +65,7 @@ protected:
         int32_t SendManagePktToAutoTest(UDSServer& udsServer, const OHOS::MMI::AppInfo& appInfo,
             const int32_t focusId, const std::vector<int32_t>& fds, AutoTestCoordinate coordinate) const;
 #endif  // OHOS_AUTO_TEST_FRAME
+    void OnMMBLongPress(void *data);
 
 protected:
     int32_t touchDownFocusSurfaceId_ = 0;

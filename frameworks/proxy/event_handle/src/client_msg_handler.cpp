@@ -527,7 +527,7 @@ int32_t OHOS::MMI::ClientMsgHandler::PackedData(MultimodalEvent& multEvent, cons
                      data.occurredTime, data.eventType, data.deviceId, fd, abilityId, windowId);
         }
         multEvent.Initialize(windowId, 0, data.uuid, data.eventType, data.occurredTime, "", data.deviceId, 0,
-            data.deviceType);
+            static_cast<uint16_t>(data.eventType));
     }
 
 #ifdef OHOS_AUTO_TEST_FRAME

@@ -128,7 +128,7 @@ protected:
     static const int32_t KEY_SCREENRECORD = 0x282; /* remote SCREENRECORD key */
     static const int32_t KEY_RECENT = 0x283; /* remote switch windows key */
     static const int32_t KEY_NOTIFICATION = 0x284; /* remote NOTIFICATION key */
-    static const uint64_t INTERVALTIME = 1000000;
+    static const uint64_t INTERVALTIME = 600000;
     static const uint64_t PRESSTIME = 6000000;  // 6s
     static const int32_t MAXFINGER = 5;
     static const int32_t MOVEDISTANCE = 100;

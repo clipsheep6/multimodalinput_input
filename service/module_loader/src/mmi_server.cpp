@@ -18,6 +18,7 @@
 #include "log.h"
 #include "event_dump.h"
 #include "multimodal_input_connect_service.h"
+#include "mtimer_manager.h"
 
 namespace OHOS::MMI {
     namespace {
@@ -119,6 +120,7 @@ int32_t OHOS::MMI::MMIServer::Start()
     CHKR((ret == RET_OK), ret, ret);
     SetRecvFun(std::bind(&ServerMsgHandler::OnMsgHandler, &sMsgHandler_, std::placeholders::_1, std::placeholders::_2));
 
+    CHKR(TimerMgr->Init(), START_TIMER_MANAGER_FAIL, START_TIMER_MANAGER_FAIL);
     CHKR(StartServer(), LIBMMI_SVR_START_FAIL, LIBMMI_SVR_START_FAIL);
 
     ret = SaConnectServiceStart();
@@ -198,6 +200,7 @@ void OHOS::MMI::MMIServer::StopAll()
     Stop();
     RegEventHM->Clear();
     InputHandler->Clear();
+    TimerMgr->Stop();
 #ifndef OHOS_WESTEN_MODEL
     input_.Stop();
 #endif

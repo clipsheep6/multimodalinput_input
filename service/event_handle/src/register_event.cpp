@@ -211,31 +211,29 @@ int32_t RegisterEvent::OnEventPointButton(const int32_t buttonCode, const uint64
     CHKF(buttonCode >= 0, PARAM_INPUT_INVALID);
     CHKF(timeNow > 0, PARAM_INPUT_INVALID);
     CHKF(stateValue == 0 || stateValue == BIT1, PARAM_INPUT_INVALID);
-    if (buttonCode == BTN_MIDDLE && stateValue == BUTTON_STATE_PRESSED) {
-        if (timeCount_ == 0) {
-            timeCount_ = timeNow;
-        } else {
-            if (timeNow - timeCount_ <= INTERVALTIME) {
-                msgId = MmiMessageId::ON_RECENT;
+    if (buttonCode == BTN_MIDDLE) {
+        const auto difTime = timeNow - timeCount_;
+        if (stateValue == BUTTON_STATE_PRESSED) {
+            if (timeCount_ == 0) {
                 timeCount_ = timeNow;
             } else {
-                timeCount_ = timeNow;
+                if (difTime <= INTERVALTIME) {
+                    msgId = MmiMessageId::ON_RECENT;
+                    timeCount_ = 0;
+                } else {
+                    timeCount_ = timeNow;
+                }
+            }
+        } else if (stateValue == BUTTON_STATE_RELEASED) {
+            if (timeCount_ > 0) {
+                if (difTime < (INTERVALTIME / BIT2)) {
+                    msgId = MmiMessageId::ON_BACK;
+                } else {
+                    timeCount_ = 0;
+                }
             }
         }
-    }
-    if (buttonCode == BTN_MIDDLE && stateValue == BUTTON_STATE_RELEASED) {
-        if (timeCount_ == 0) {
-            return RET_OK;
-        } else {
-            if (timeNow - timeCount_ >= (INTERVALTIME / BIT2)) {
-                msgId = MmiMessageId::ON_GOTO_DESKTOP;
-                timeCount_ = 0;
-            } else {
-                msgId = MmiMessageId::ON_BACK;
-            }
-        }
-    }
-    if (buttonCode == BTN_RIGHT && stateValue == BUTTON_STATE_PRESSED) {
+    } else if (buttonCode == BTN_RIGHT && stateValue == BUTTON_STATE_PRESSED) {
         msgId = MmiMessageId::ON_SHOW_MENU;
     }
     return RET_OK;
