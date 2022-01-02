@@ -581,7 +581,6 @@ int32_t MultimodalStandardizedEventManager::InjectionVirtual(bool isPressed, int
     virtualevent.isPressed = isPressed;
     virtualevent.keyCode = keyCode;
     virtualevent.keyDownDuration = keyDownDuration;
-    virtualevent.maxKeyCode = maxKeyCode;
     OHOS::MMI::NetPacket ckv(MmiMessageId::ON_VIRTUAL_KEY);
     ckv << virtualevent;
     return SendMsg(ckv);
