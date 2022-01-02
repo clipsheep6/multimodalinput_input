@@ -89,13 +89,11 @@ bool OHOS::MMI::UDSServer::SendMsg(int32_t fd, NetPacket& pkt)
     std::lock_guard<std::mutex> lock(mux_);
     CHKF(fd >= 0, PARAM_INPUT_INVALID);
     auto ses = GetSession(fd);
-    MMI_LOGE("SendMsg 004 ");
     if (!ses) {
         MMI_LOGE("SendMsg fd:%{public}d not found, The message was discarded! errCode:%{public}d",
                  fd, SESSION_NOT_FOUND);
         return false;
     }
-    MMI_LOGE("SendMsg 005 ");
     return ses->SendMsg(pkt);
 }
 
@@ -210,6 +208,7 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, 
     sess->SetClientFd(toReturnClientFd);
 #endif // OHOS__BUILD_MMI_DEBUG
 
+    OnConnected(sess);
     if (!AddSession(sess)) {
         cleanTaskWhenError();
         MMI_LOGE("AddSession fail.");
@@ -391,6 +390,10 @@ bool OHOS::MMI::UDSServer::AddSession(SessionPtr ses)
     CHKF(fd >= 0, VAL_NOT_EXP);
     sessionsMap_[fd] = ses;
     DumpSession("AddSession");
+    if (sessionsMap_.size() > MAX_SESSON_ALARM) {
+        MMI_LOGW("Too many clients... Warning Value:%{public}d Current Value:%{public}zd",
+                 MAX_SESSON_ALARM, sessionsMap_.size());
+    }
     MMI_LOGI("AddSession end...");
     return true;
 }

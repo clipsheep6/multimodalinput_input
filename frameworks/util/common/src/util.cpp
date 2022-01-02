@@ -237,10 +237,10 @@ static void PrintEventJoyStickAxisInfo(const std::string &axisName, const EventJ
 void PrintEventJoyStickAxisInfo(const EventJoyStickAxis& r, const int32_t fd,
     const int32_t abilityId, const int32_t focusId, const uint64_t preHandlerTime)
 {
-    MMI_LOGT("4.event dispatcher of server: EventJoyStickAxis:devicePhys: %{public}s;"
-             "fd: %{public}d; preHandlerTime: %{public}" PRId64 "; "
+    MMI_LOGT("4.event dispatcher of server: EventJoyStickAxis:deviceId: %{public}u; devicePhys: %{public}s;"
+             "fd: %{public}d; abilityId: %{public}d; windowId: %{public}d; preHandlerTime: %{public}" PRId64 "; "
              "time: %{public}" PRId64 "; deviceType: %{public}u; eventType: %{public}d; deviceName: %{public}s\n",
-             r.devicePhys, fd, preHandlerTime, r.time, r.deviceType,
+             r.deviceId, r.devicePhys, fd, abilityId, focusId, preHandlerTime, r.time, r.deviceType,
              r.eventType, r.deviceName);
 
     PrintEventJoyStickAxisInfo(std::string("abs_throttle"), r.abs_throttle);
@@ -403,5 +403,36 @@ const std::string& GetThreadName()
 
     return g_threadName;
 }
+
+void AddId(IdsList &list, int32_t id)
+{
+    if (id <= 0) {
+        return;
+    }
+    auto it = std::find(list.begin(), list.end(), id);
+    if (it != list.end()) {
+        return;
+    }
+    list.push_back(id);
+}
+
+size_t CalculateDifference(const IdsList &list1, IdsList &list2, IdsList &difList)
+{
+    if (list1.empty()) {
+        difList = list2;
+        return difList.size();
+    }
+    if (list2.empty()) {
+        difList = list1;
+        return difList.size();
+    }
+    IdsList l1 = list1;
+    std::sort(l1.begin(), l1.end());
+    IdsList l2 = list2;
+    std::sort(l2.begin(), l2.end());
+    std::set_difference(l1.begin(), l1.end(), l2.begin(), l2.end(), std::back_inserter(difList));
+    return difList.size();
+}
+
 }
 }

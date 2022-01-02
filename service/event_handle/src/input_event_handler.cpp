@@ -171,7 +171,7 @@ void OHOS::MMI::InputEventHandler::OnEvent(void *event)
 {
     CHK(event, NULL_POINTER);
     std::lock_guard<std::mutex> lock(mu_);
-    auto *lpMmiEvent = static_cast<multimodal_libinput_event  *>(event);
+    auto *lpMmiEvent = static_cast<multimodal_libinput_event *>(event);
     CHK(lpMmiEvent, NULL_POINTER);
     auto *lpEvent = lpMmiEvent->event;
     CHK(lpEvent, NULL_POINTER);
@@ -199,7 +199,7 @@ void OHOS::MMI::InputEventHandler::OnEvent(void *event)
              idSeed_, lastSysClock_, lostTime);
 }
 
-int32_t OHOS::MMI::InputEventHandler::OnEventHandler(multimodal_libinput_event& ev)
+int32_t OHOS::MMI::InputEventHandler::OnEventHandler(multimodal_libinput_event &ev)
 {
     CHKR(ev.event, NULL_POINTER, NULL_POINTER);
     auto type = libinput_event_get_type(ev.event);
@@ -263,9 +263,9 @@ int32_t OHOS::MMI::InputEventHandler::OnEventDeviceAdded(multimodal_libinput_eve
                  packageResult, DEV_ADD_EVENT_PKG_FAIL);
         return DEV_ADD_EVENT_PKG_FAIL;
     }
-    MMI_LOGT("\n4.event dispatcher of server:DeviceManage:devicePhys=%{public}s;"
+    MMI_LOGT("\n4.event dispatcher of server:DeviceManage:deviceId=%{public}u;devicePhys=%{public}s;"
              "deviceName=%{public}s;deviceType=%{public}u;\n**************************************\n",
-             deviceManage.devicePhys, deviceManage.deviceName, deviceManage.deviceType);
+             deviceManage.deviceId, deviceManage.devicePhys, deviceManage.deviceName, deviceManage.deviceType);
 
     int32_t focusId = WinMgr->GetFocusSurfaceId();
     if (focusId < 0) {
@@ -299,9 +299,9 @@ int32_t OHOS::MMI::InputEventHandler::OnEventDeviceRemoved(multimodal_libinput_e
                  packageResult, DEV_REMOVE_EVENT_PKG_FAIL);
         return DEV_REMOVE_EVENT_PKG_FAIL;
     }
-    MMI_LOGT("\n4.event dispatcher of server:DeviceManage:devicePhys=%{public}s;"
+    MMI_LOGT("\n4.event dispatcher of server:DeviceManage:deviceId=%{public}u;devicePhys=%{public}s;"
              "deviceName=%{public}s;deviceType=%{public}u;\n**************************************\n",
-             deviceManage.devicePhys, deviceManage.deviceName, deviceManage.deviceType);
+             deviceManage.deviceId, deviceManage.devicePhys, deviceManage.deviceName, deviceManage.deviceType);
 
     int32_t focusId = WinMgr->GetFocusSurfaceId();
     if (focusId < 0) {
@@ -542,7 +542,7 @@ int32_t OHOS::MMI::InputEventHandler::OnEventTouchSecond(libinput_event &ev)
 int32_t OHOS::MMI::InputEventHandler::OnEventTouch(multimodal_libinput_event &ev)
 {
     CHKR(ev.event, NULL_POINTER, NULL_POINTER);
-    SInput::Loginfo_packaging_tool(event);
+    SInput::Loginfo_packaging_tool(*ev.event);
 #ifndef OHOS_WESTEN_MODEL
     OnEventTouchSecond(*ev.event);
 #endif
@@ -559,7 +559,7 @@ int32_t OHOS::MMI::InputEventHandler::OnEventTouch(multimodal_libinput_event &ev
         return TOUCH_EVENT_PKG_FAIL;
     }
 #ifndef OHOS_WESTEN_MODEL
-    if (ServerKeyFilter->OnTouchEvent(*udsServer_, event, touch, preHandlerTime, winSwitch_)) {
+    if (ServerKeyFilter->OnTouchEvent(*udsServer_, *ev.event, touch, preHandlerTime, winSwitch_)) {
         return RET_OK;
     }
 #endif
@@ -804,7 +804,7 @@ int32_t OHOS::MMI::InputEventHandler::OnEventTabletPadKey(multimodal_libinput_ev
     return RET_OK;
 }
 
-int32_t OHOS::MMI::InputEventHandler::OnEventJoyStickKey(libinput_event& event, const uint64_t time)
+int32_t OHOS::MMI::InputEventHandler::OnEventJoyStickKey(multimodal_libinput_event &ev, const uint64_t time)
 {
     CHKR(ev.event, NULL_POINTER, NULL_POINTER);
     CHKR(udsServer_, NULL_POINTER, RET_ERR);
@@ -855,7 +855,7 @@ int32_t OHOS::MMI::InputEventHandler::OnEventJoyStickKey(libinput_event& event, 
     return RET_OK;
 }
 
-int32_t OHOS::MMI::InputEventHandler::OnEventJoyStickAxis(libinput_event& event, const uint64_t time)
+int32_t OHOS::MMI::InputEventHandler::OnEventJoyStickAxis(multimodal_libinput_event &ev, const uint64_t time)
 {
     CHKR(ev.event, NULL_POINTER, NULL_POINTER);
     CHKR(udsServer_, NULL_POINTER, RET_ERR);

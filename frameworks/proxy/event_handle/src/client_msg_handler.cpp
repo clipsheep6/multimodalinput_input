@@ -116,11 +116,15 @@ void OHOS::MMI::ClientMsgHandler::OnMsgHandler(const OHOS::MMI::UDSClient& clien
         MMI_LOGE("CClientMsgHandler::OnMsgHandler Unknown msg id[%{public}d].", id);
         return;
     }
+    
+    uint64_t clientTime = GetSysClockTime();
     auto ret = (*fun)(client, pkt);
     if (ret < 0) {
         MMI_LOGE("CClientMsgHandler::OnMsgHandler Msg handling failed. id[%{public}d] ret[%{public}d]", id, ret);
         return;
     }
+    uint64_t endTime = GetSysClockTime();
+    ((MMIClient *)&client)->ReplyMessageToServer(pkt.GetMsgId(), clientTime, endTime);
 }
 
 int32_t OHOS::MMI::ClientMsgHandler::OnKeyMonitor(const UDSClient& client, NetPacket& pkt)
@@ -217,13 +221,10 @@ int32_t OHOS::MMI::ClientMsgHandler::OnKey(const UDSClient& client, NetPacket& p
     uint64_t serverStartTime = 0;
     EventKeyboard key = {};
     pkt >> key >> abilityId >> windowId >> fd >> serverStartTime;
-    MMI_LOGT("\nevent dispatcher of client:\neventKeyboard:time=%{public}" PRId64 ";key=%{public}u;"
-             "deviceType=%{public}u;seat_key_count=%{public}u;state=%{public}d;"
-             "fd=%{public}d\n*************************************************************\n",
-             key.time, key.key, key.deviceType, key.seat_key_count, key.state, fd);
-
-    uint64_t clientEndTime = GetSysClockTime();
-    ((MMIClient *)&client)->ReplyMessageToServer(pkt.GetMsgId(), key.time, serverStartTime, clientEndTime, fd);
+    MMI_LOGT("\nevent dispatcher of client:\neventKeyboard:time=%{public}" PRId64 ";key=%{public}u;deviceId=%{public}u;"
+             "deviceType=%{public}u;seat_key_count=%{public}u;state=%{public}d;abilityId=%{public}d;"
+             "windowId=%{public}d;fd=%{public}d\n*************************************************************\n",
+             key.time, key.key, key.deviceId, key.deviceType, key.seat_key_count, key.state, abilityId, windowId, fd);
 
 #ifdef OHOS_AUTO_TEST_FRAME
     // Be used by auto-test frame!
@@ -568,13 +569,14 @@ int32_t OHOS::MMI::ClientMsgHandler::PackedData(MultimodalEvent& multEvent, cons
     if (type == INPUT_DEVICE_CAP_AISENSOR || type == INPUT_DEVICE_CAP_KNUCKLE) {
         pkt >> idMsg >> deviceId >> fd >> windowId >> abilityId >> serverStartTime >> uuid >> occurredTime;
         MMI_LOGT("\nevent dispatcher of client: manager_aisensor\n"
-                 "Msg=%{public}d,fd=%{public}d,"
-                 "occurredTime=%{public}d;\n\n"
+                 "idMsg=%{public}d,deviceId=%{public}d,fd=%{public}d,windowId = %{public}d,abilityId = %{public}d,"
+                 "uuid=%{public}s,occurredTime=%{public}d;\n\n"
                  "************************************************************************\n",
-                 idMsg, fd, occurredTime);
+                 idMsg, deviceId, fd, windowId, abilityId, uuid.c_str(), occurredTime);
         if (type == INPUT_DEVICE_CAP_KNUCKLE) {
             type = HOS_KNUCKLE;
-        } else if (type == INPUT_DEVICE_CAP_AISENSOR) {
+        }
+        else if (type == INPUT_DEVICE_CAP_AISENSOR) {
             type = HOS_AI_SPEECH;
         }
         multEvent.Initialize(windowId, 0, uuid, type, occurredTime, "", deviceId, 0, 0);
@@ -582,18 +584,15 @@ int32_t OHOS::MMI::ClientMsgHandler::PackedData(MultimodalEvent& multEvent, cons
         pkt >> data >> fd >> windowId >> abilityId >> serverStartTime;
         if (windowId == -1) {
             MMI_LOGT("\nevent dispatcher of client:\n occurredTime=%{public}" PRId64 ";\nsourceType=%{public}d;\n"
-                     "\nfd=%{public}d;\n"
+                     "deviceId=%{public}d;\nfd=%{public}d;\nabilityId=%{public}d;\n"
                      "\n************************************************************************\n",
-                     data.occurredTime, data.eventType, fd);
+                     data.occurredTime, data.eventType, data.deviceId, fd, abilityId);
         } else {
             MMI_LOGT("\nevent dispatcher of client:\n occurredTime=%{public}" PRId64 ";\nsourceType=%{public}d;\n"
-                     "\nfd=%{public}d;"
+                     "deviceId=%{public}d;\nfd=%{public}d;\nabilityId=%{public}d;\nwindowId=%{public}d;\n"
                      "\n**************************************************************\n",
-                     data.occurredTime, data.eventType, fd);
+                     data.occurredTime, data.eventType, data.deviceId, fd, abilityId, windowId);
         }
-        uint64_t clientEndTime = GetSysClockTime();
-        ((MMIClient *)&client)->ReplyMessageToServer(pkt.GetMsgId(), data.occurredTime, serverStartTime,
-            clientEndTime, fd);
         multEvent.Initialize(windowId, 0, data.uuid, data.eventType, data.occurredTime, "", data.deviceId, 0,
             data.deviceType);
     }
@@ -824,15 +823,14 @@ void OHOS::MMI::ClientMsgHandler::AnalysisPointEvent(const UDSClient& client, Ne
     CHK(mousePtr, NULL_POINTER);
     pkt >> ret >> pointData >> abilityId >> windowId >> fd >> serverStartTime;
     MMI_LOGT("\nevent dispatcher of client: mouse_data \neventPointer:time=%{public}" PRId64 "; eventType=%{public}d;"
-             "buttonCode=%{public}u;deviceType=%{public}u;seat_button_count=%{public}u;"
+             "buttonCode=%{public}u;deviceId=%{public}u;deviceType=%{public}u;seat_button_count=%{public}u;"
              "axes=%{public}u;buttonState=%{public}d;source=%{public}d;delta.x=%{public}lf;delta.y=%{public}lf;"
              "delta_raw.x=%{public}lf;delta_raw.y=%{public}lf;absolute.x=%{public}lf;absolute.y=%{public}lf;"
-             "discYe.x=%{public}lf;discrete.y=%{public}lf;fd=%{public}d;\n",
-             pointData.time, pointData.eventType, pointData.button, pointData.deviceType,
+             "discYe.x=%{public}lf;discrete.y=%{public}lf;fd=%{public}d;abilityId=%{public}d;windowId=%{public}d.\n",
+             pointData.time, pointData.eventType, pointData.button, pointData.deviceId, pointData.deviceType,
              pointData.seat_button_count, pointData.axes, pointData.state, pointData.source, pointData.delta.x,
              pointData.delta.y, pointData.delta_raw.x, pointData.delta_raw.y, pointData.absolute.x,
-             pointData.absolute.y, pointData.discrete.x, pointData.discrete.y, fd);
-    ((MMIClient*)&client)->ReplyMessageToServer(pkt.GetMsgId(), pointData.time, serverStartTime, GetSysClockTime(), fd);
+             pointData.absolute.y, pointData.discrete.x, pointData.discrete.y, fd, abilityId, windowId);
 
 #ifdef OHOS_AUTO_TEST_FRAME
     // Be used by auto-test frame!
@@ -887,7 +885,6 @@ void OHOS::MMI::ClientMsgHandler::AnalysisTouchEvent(const UDSClient& client, Ne
     int32_t eventAction = 0;
     int32_t seatSlot = 0;
     uint64_t serverStartTime = 0;
-    uint64_t clientEndTime = 0;
     EventTouch touchData = {};
     MmiPoint mmiPoint;
     pkt >> fingerCount >> eventAction >> abilityId >> windowId >> fd >> serverStartTime >> seatSlot;
@@ -904,23 +901,19 @@ void OHOS::MMI::ClientMsgHandler::AnalysisTouchEvent(const UDSClient& client, Ne
         fingersInfos[i].mTouchArea = static_cast<float>(touchData.area);
         fingersInfos[i].mTouchPressure = static_cast<float>(touchData.pressure);
         fingersInfos[i].mMp.Setxy(touchData.point.x, touchData.point.y);
-    }
-
-    MMI_LOGT("\nevent dispatcher of client:\neventTouch:time=%{public}" PRId64 ";"
+        MMI_LOGT("\nevent dispatcher of client:\neventTouch:time=%{public}" PRId64 ";deviceId=%{public}u;"
              "deviceType=%{public}u;eventType=%{public}d;slot=%{public}d;seat_slot=%{public}d;"
-             "fd=%{public}d"
+             "fd=%{public}d,abilityId=%{public}d,windowId=%{public}d"
              "\n************************************************************************\n",
-        touchData.time, touchData.deviceType, touchData.eventType, touchData.slot,
-        touchData.seat_slot, fd);
+        touchData.time, touchData.deviceId, touchData.deviceType, touchData.eventType, touchData.slot,
+        touchData.seat_slot, fd, abilityId, windowId);
+    }
 
     TouchEvent touchEvent;
     int32_t deviceEventType = TOUCH_EVENT;
     touchEvent.Initialize(windowId, eventAction, seatSlot, 0, 0, 0, 0, 0, fingerCount, fingersInfos, 0,
         touchData.uuid, touchData.eventType, static_cast<int32_t>(touchData.time), "",
         static_cast<int32_t>(touchData.deviceId), 0, false, touchData.deviceType, deviceEventType);
-
-    clientEndTime = GetSysClockTime();
-    ((MMIClient*)&client)->ReplyMessageToServer(pkt.GetMsgId(), touchData.time, serverStartTime, clientEndTime, fd);
 
 #ifdef OHOS_AUTO_TEST_FRAME
     // Be used by auto-test frame!
@@ -943,18 +936,14 @@ void OHOS::MMI::ClientMsgHandler::AnalysisJoystickEvent(const UDSClient& client,
     int32_t deviceEventType = 0;
     std::string nullUUid = "";
     uint64_t serverStartTime = 0;
-    uint64_t clientEndTime = 0;
     MmiPoint mmiPoint;
     MultimodalEventPtr mousePtr = EventFactory::CreateEvent(EventType::EVENT_MOUSE);
     CHK(mousePtr, NULL_POINTER);
     pkt >> eventJoyStickData >> abilityId >> windowId >> fd >> serverStartTime;
     MMI_LOGT("\nevent dispatcher of client: "
-        "event JoyStick: fd: %{public}d\n", fd);
+             "event JoyStick: fd: %{public}d, abilityId: %{public}d ,windowId: %{public}d\n",
+             fd, abilityId, windowId);
     PrintEventJoyStickAxisInfo(eventJoyStickData, fd, abilityId, windowId, serverStartTime);
-    // multimodal ANR
-    clientEndTime = GetSysClockTime();
-    ((MMIClient*)&client)->ReplyMessageToServer(pkt.GetMsgId(), eventJoyStickData.time, serverStartTime,
-        clientEndTime, fd);
 
 #ifdef OHOS_AUTO_TEST_FRAME
     // Be used by auto-test frame!
@@ -985,7 +974,6 @@ void OHOS::MMI::ClientMsgHandler::AnalysisTouchPadEvent(const UDSClient& client,
     int32_t windowId = 0;
     int32_t fd = 0;
     uint64_t serverStartTime = 0;
-    uint64_t clientEndTime = 0;
     int32_t touchAction = 0;
     int32_t deviceEventType = 0;
     MmiPoint mmiPoint;
@@ -995,18 +983,14 @@ void OHOS::MMI::ClientMsgHandler::AnalysisTouchPadEvent(const UDSClient& client,
     CHK(mousePtr, NULL_POINTER);
     pkt >> tabletPad >> abilityId >> windowId >> fd >> serverStartTime;
     MMI_LOGT("\nevent dispatcher of client: event tablet Pad :time=%{public}" PRId64 ";deviceType=%{public}u;"
-             "deviceName=%{public}s;eventType=%{public}d;\n"
+             "deviceId=%{public}d;deviceName=%{public}s;eventType=%{public}d;\n"
              "ring.number=%{public}d;ring.position=%{public}lf;ring.source=%{public}d;\n"
              "strip.number=%{public}d;strip.position=%{public}lf;strip.source=%{public}d;\n"
-             "fd=%{public}d;preHandlerTime=%{public}" PRId64 ";\n*"
+             "fd=%{public}d;abilityId=%{public}d;windowId=%{public}d;preHandlerTime=%{public}" PRId64 ";\n*"
              "***********************************************************************\n",
-             tabletPad.time, tabletPad.deviceType, tabletPad.deviceName, tabletPad.eventType,
+             tabletPad.time, tabletPad.deviceType, tabletPad.deviceId, tabletPad.deviceName, tabletPad.eventType,
              tabletPad.ring.number, tabletPad.ring.position, tabletPad.ring.source, tabletPad.strip.number,
-             tabletPad.strip.position, tabletPad.strip.source, fd, serverStartTime);
-
-    // multimodal ANR
-    clientEndTime = GetSysClockTime();
-    ((MMIClient*)&client)->ReplyMessageToServer(pkt.GetMsgId(), tabletPad.time, serverStartTime, clientEndTime, fd);
+             tabletPad.strip.position, tabletPad.strip.source, fd, abilityId, windowId, serverStartTime);
 
 #ifdef OHOS_AUTO_TEST_FRAME
     // Be used by auto-test frame!
@@ -1035,23 +1019,23 @@ void OHOS::MMI::ClientMsgHandler::PrintEventTabletToolInfo(EventTabletTool table
                                                            int32_t abilityId, int32_t windowId, int32_t fd) const
 {
     MMI_LOGT("\nevent dispatcher of client: event tablet Tool :time=%{public}" PRId64 "; deviceType=%{public}u; "
-             "deviceName=%{public}s; eventType=%{public}d; type=%{public}u;"
-             "serial=%{public}u; button=%{public}d; "
+             "deviceId=%{public}d; deviceName=%{public}s; eventType=%{public}d; type=%{public}u;"
+             "tool_id=%{public}u; serial=%{public}u; button=%{public}d; "
              "state=%{public}d; point.x=%{public}lf; point.y=%{public}lf; tilt.x=%{public}lf;"
              "tilt.y=%{public}lf; distance=%{public}lf; pressure=%{public}lf; "
              "rotation=%{public}lf; slider=%{public}lf; wheel=%{public}lf; wheel_discrete=%{public}d;"
              "size.major=%{public}lf; size.minor=%{public}lf; "
              "proximity_state=%{public}d; tip_state=%{public}d; state=%{public}d; seat_button_count=%{public}d;"
-             "fd=%{public}d; preHandlerTime=%{public}" PRId64 ";\n"
+             "fd=%{public}d; abilityId=%{public}d; windowId=%{public}d; preHandlerTime=%{public}" PRId64 ";\n"
              "***********************************************************************\n",
-             tableTool.time, tableTool.deviceType, tableTool.deviceName,
-             tableTool.eventType, tableTool.tool.type, tableTool.tool.serial,
+             tableTool.time, tableTool.deviceType, tableTool.deviceId, tableTool.deviceName,
+             tableTool.eventType, tableTool.tool.type, tableTool.tool.tool_id, tableTool.tool.serial,
              tableTool.button, tableTool.state, tableTool.axes.point.x, tableTool.axes.point.y,
              tableTool.axes.tilt.x, tableTool.axes.tilt.y, tableTool.axes.distance, tableTool.axes.pressure,
              tableTool.axes.rotation, tableTool.axes.slider, tableTool.axes.wheel,
              tableTool.axes.wheel_discrete, tableTool.axes.size.major, tableTool.axes.size.minor,
              tableTool.proximity_state, tableTool.tip_state, tableTool.state, tableTool.seat_button_count,
-             fd, serverStartTime);
+             fd, abilityId, windowId, serverStartTime);
 }
 
 void OHOS::MMI::ClientMsgHandler::GetStandardStylusActionType(int32_t curRventType, int32_t &stylusAction,
@@ -1172,10 +1156,6 @@ void OHOS::MMI::ClientMsgHandler::AnalysisTabletToolEvent(const UDSClient& clien
     pkt >> curRventType >> tableTool >> abilityId >> windowId >> fd >> serverStartTime;
     PrintEventTabletToolInfo(tableTool, serverStartTime, abilityId, windowId, fd);
 
-    // multimodal ANR
-    uint64_t clientEndTime = GetSysClockTime();
-    ((MMIClient*)&client)->ReplyMessageToServer(pkt.GetMsgId(), tableTool.time, serverStartTime, clientEndTime, fd);
-
 #ifdef OHOS_AUTO_TEST_FRAME
     // Be used by auto-test frame!
     const AutoTestClientPkt autoTestClientTabletToolPkt = {
@@ -1200,18 +1180,14 @@ void OHOS::MMI::ClientMsgHandler::AnalysisGestureEvent(const UDSClient& client, 
     fingerInfos fingersInfos[FINGER_NUM] = {};
     CHK(mousePtr, NULL_POINTER);
     pkt >> gesture >> abilityId >> windowId >> fd >> serverStartTime;
-    MMI_LOGT("\nevent dispatcher of client: event Gesture :time=%{public}" PRId64 ";"
+    MMI_LOGT("\nevent dispatcher of client: event Gesture :time=%{public}" PRId64 ";deviceId=%{public}u;"
              "deviceType=%{public}u;deviceName=%{public}s;devNode=%{public}s;eventType=%{public}d;"
              "fingerCount=%{public}d;cancelled=%{public}d;delta.x=%{public}lf;delta.y=%{public}lf;"
-             "deltaUnaccel.x=%{public}lf;deltaUnaccel.y=%{public}lf;fd=%{public}d;"
-             "preHandlerTime=%{public}" PRId64 ";\n***************************************************\n",
-             gesture.time, gesture.deviceType, gesture.deviceName, gesture.devicePhys,
+             "deltaUnaccel.x=%{public}lf;deltaUnaccel.y=%{public}lf;fd=%{public}d;abilityId=%{public}d;"
+             "windowId=%{public}d;preHandlerTime=%{public}" PRId64 ";\n***************************************************\n",
+             gesture.time, gesture.deviceId, gesture.deviceType, gesture.deviceName, gesture.devicePhys,
              gesture.eventType, gesture.fingerCount, gesture.cancelled, gesture.delta.x, gesture.delta.y,
-             gesture.deltaUnaccel.x, gesture.deltaUnaccel.y, fd, serverStartTime);
-
-    // multimodal ANR
-    uint64_t clientEndTime = GetSysClockTime();
-    ((MMIClient*)&client)->ReplyMessageToServer(pkt.GetMsgId(), gesture.time, serverStartTime, clientEndTime, fd);
+             gesture.deltaUnaccel.x, gesture.deltaUnaccel.y, fd, abilityId, windowId, serverStartTime);
 
 #ifdef OHOS_AUTO_TEST_FRAME
     // Be used by auto-test frame!

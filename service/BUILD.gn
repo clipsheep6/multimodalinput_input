@@ -38,7 +38,7 @@ config("libmmi_server_public_config") {
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "mouse_event_handler/include",
-    "//third_party/libxkbcommon/",
+    "//third_party/libxkbcommon",
     "//third_party/FreeBSD/sys/dev/evdev",
     "//third_party/json/include",
     "//third_party/json/include/nlohmann",
@@ -92,7 +92,10 @@ config("libmmi_server_public_config") {
   }
 
   if (is_mmi_have_weston) {
-    include_dirs += [ "//foundation/graphic/standard/frameworks/wmserver/src" ]
+    include_dirs += [
+        "//third_party/weston/libweston",
+    	"//foundation/graphic/standard/frameworks/wmserver/src",
+    ]
     cflags += [ "-DOHOS_WESTEN_MODEL" ]
   }
 }

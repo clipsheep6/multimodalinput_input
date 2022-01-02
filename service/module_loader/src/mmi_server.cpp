@@ -129,7 +129,7 @@ int32_t OHOS::MMI::MMIServer::Start()
     uint64_t curTime = OHOS::MMI::GetMillisTime();
     uint64_t consumeTime = curTime - GetMmiServerStartTime();
     MMI_LOGW("The server started successfully, the time consumed was %{public}" PRId64
-            " Ms curTime:%{public}" PRId64 "", consumeTime, curTime);
+             " Ms curTime:%{public}" PRId64 "", consumeTime, curTime);
 #endif
     return RET_OK;
 }
@@ -156,14 +156,14 @@ int32_t OHOS::MMI::MMIServer::InitLibinput()
 
 #ifdef OHOS_BUILD_HDF
     MMI_LOGD("HDF Init");
-    SetLibInputEventListener([](struct multimodal_libinput_event* event) {
+    SetLibInputEventListener([](struct multimodal_libinput_event *event) {
         InputHandler->OnEvent(event);
     });
     hdfEventManager.SetupCallback();
 #else
     #ifdef OHOS_WESTEN_MODEL
         MMI_LOGD("InitLibinput WestonInit...");
-        SetLibInputEventListener([](struct multimodal_libinput_event* event) {
+        SetLibInputEventListener([](struct multimodal_libinput_event *event) {
             InputHandler->OnEvent(event);
         });
     #else
@@ -266,7 +266,8 @@ void OHOS::MMI::MMIServer::OnDisconnected(SessionPtr s)
     int32_t fd = s->GetFd();
 
     auto appInfo = AppRegs->FindBySocketFd(fd);
-    WinMgr->EraseSurfaceInfo(appInfo.windowId);
+    RegEventHM->UnregisterEventHandleBySocketFd(fd);
+    AppRegs->UnregisterAppInfoBySocketFd(fd);
     AppRegs->UnregisterConnectState(fd);
 #ifdef  OHOS_BUILD_AI
     seniorInput_.DeviceDisconnect(fd);
