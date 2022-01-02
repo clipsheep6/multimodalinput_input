@@ -160,9 +160,6 @@ int32_t OHOS::MMI::ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPack
              key->GetActionStartTime(), key->GetEventType(),
              key->GetFlag(), key->GetKeyAction(), fd, serverStartTime);
 
-    uint64_t clientEndTime = GetSysClockTime();
-    ((MMIClient *)&client)->ReplyMessageToServer(pkt.GetMsgId(), key->GetActionTime(), serverStartTime, clientEndTime, fd);
-
 #ifdef OHOS_AUTO_TEST_FRAME
     // Be used by auto-test frame!
     const AutoTestClientPkt autoTestClientKeyPkt = {

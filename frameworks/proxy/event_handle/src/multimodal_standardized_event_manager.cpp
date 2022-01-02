@@ -601,7 +601,6 @@ int32_t MultimodalStandardizedEventManager::InjectEvent(const OHOS::KeyEvent& ke
     virtualevent.isPressed = keyEvent.IsKeyDown();
     virtualevent.keyCode = keyEvent.GetKeyCode();
     virtualevent.keyDownDuration = keyEvent.GetKeyDownDuration();
-	virtualevent.maxKeyCode = keyEvent.GetMaxKeyCode();
     virtualevent.isIntercepted = keyEvent.IsIntercepted();
     OHOS::MMI::NetPacket ckv(MmiMessageId::INJECT_KEY_EVENT);
     ckv << virtualevent;
