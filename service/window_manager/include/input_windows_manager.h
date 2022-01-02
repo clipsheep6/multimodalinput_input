@@ -88,7 +88,7 @@ void SetSeatListener(const SeatInfoChangeListener listener);
 void SetScreenListener(const ScreenInfoChangeListener listener);
 
 struct libinput_event;
-typedef void (*LibInputEventListener)(struct libinput_event* event);
+typedef void (*LibInputEventListener)(struct multimodal_libinput_event* event);
 namespace OHOS {
 namespace MMI {
 void SetLibInputEventListener(const LibInputEventListener listener);
