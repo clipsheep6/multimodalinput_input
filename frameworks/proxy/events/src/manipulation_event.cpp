@@ -12,9 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "manipulation_event.h"
-#include "error_multimodal.h"
 #include "define_multimodal.h"
+#include "error_multimodal.h"
 #include "securec.h"
 
 namespace OHOS {
@@ -72,13 +73,18 @@ MmiPoint ManipulationEvent::GetPointerPosition(int32_t index) const
     if (index < 0 || index >= FINGER_NUM) {
         return MmiPoint(0, 0, 0);
     }
-    return mfingersInfos_[index].mMp;
+    for (int i = 0; i < mPointerCount_; i++) {
+        if (mfingersInfos_[i].mPointerId == index) {
+            return mfingersInfos_[i].mMp;
+        }
+    }
+    return MmiPoint(0, 0, 0);
 }
 
 void ManipulationEvent::SetScreenOffset(float offsetX, float offsetY)
 {
     int32_t pointerCount = GetPointerCount();
-    
+
     for (int32_t i = 0; i < pointerCount; i++) {
         mfingersInfos_[i].mMp.Setxy(offsetX, offsetY);
     }
