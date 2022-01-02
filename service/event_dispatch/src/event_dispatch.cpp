@@ -910,11 +910,6 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
     // EventKeyboard prevKey = {};
     // MMIRegEvent->OnEventKeyGetSign(key, idMsg, prevKey);
 
-#ifdef DEBUG_CODE_TEST
-    if (AppRegs->ChkTestArg(MULTIMODE_INPUT_ANR_NOWINDOW)) {
-        WinMgr->SetFocusSurfaceId(RET_ERR);
-    }
-#endif // DEBUG_CODE_TEST
     auto fd = WinMgr->UpdateTarget(key);
     CHKR(fd > 0, FD_OBTAIN_FAIL, RET_ERR);
 #ifdef DEBUG_CODE_TEST

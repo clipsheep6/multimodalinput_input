@@ -247,10 +247,10 @@ OHOS::MMI::UDSServer* OHOS::MMI::InputEventHandler::GetUDSServer()
     return udsServer_;
 }
 
-int32_t OHOS::MMI::InputEventHandler::OnEventDeviceAdded(multimodal_libinput_event &event)
+int32_t OHOS::MMI::InputEventHandler::OnEventDeviceAdded(multimodal_libinput_event &ev)
 {
     CHKR(ev.event, NULL_POINTER, NULL_POINTER);
-    auto device = libinput_event_get_device(&event);
+    auto device = libinput_event_get_device(*ev.event);
     INPUTDEVMGR->OnInputDeviceAdded(device);
 
     uint64_t preHandlerTime = GetSysClockTime();
@@ -284,10 +284,10 @@ int32_t OHOS::MMI::InputEventHandler::OnEventDeviceAdded(multimodal_libinput_eve
     return RET_OK;
 }
 
-int32_t OHOS::MMI::InputEventHandler::OnEventDeviceRemoved(multimodal_libinput_event &event)
+int32_t OHOS::MMI::InputEventHandler::OnEventDeviceRemoved(multimodal_libinput_event &ev)
 {
     CHKR(ev.event, NULL_POINTER, NULL_POINTER);
-    auto device = libinput_event_get_device(&event);
+    auto device = libinput_event_get_device(*ev.event);
     INPUTDEVMGR->OnInputDeviceRemoved(device);
 
     uint64_t preHandlerTime = GetSysClockTime();
