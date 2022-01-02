@@ -93,8 +93,8 @@ config("libmmi_server_public_config") {
 
   if (is_mmi_have_weston) {
     include_dirs += [
-        "//third_party/weston/libweston",
-    	"//foundation/graphic/standard/frameworks/wmserver/src",
+      "//third_party/weston/libweston",
+      "//foundation/graphic/standard/frameworks/wmserver/src",
     ]
     cflags += [ "-DOHOS_WESTEN_MODEL" ]
   }
