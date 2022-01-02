@@ -250,7 +250,7 @@ OHOS::MMI::UDSServer* OHOS::MMI::InputEventHandler::GetUDSServer()
 int32_t OHOS::MMI::InputEventHandler::OnEventDeviceAdded(multimodal_libinput_event &ev)
 {
     CHKR(ev.event, NULL_POINTER, NULL_POINTER);
-    auto device = libinput_event_get_device(*ev.event);
+    auto device = libinput_event_get_device(ev.event);
     INPUTDEVMGR->OnInputDeviceAdded(device);
 
     uint64_t preHandlerTime = GetSysClockTime();
@@ -287,7 +287,7 @@ int32_t OHOS::MMI::InputEventHandler::OnEventDeviceAdded(multimodal_libinput_eve
 int32_t OHOS::MMI::InputEventHandler::OnEventDeviceRemoved(multimodal_libinput_event &ev)
 {
     CHKR(ev.event, NULL_POINTER, NULL_POINTER);
-    auto device = libinput_event_get_device(*ev.event);
+    auto device = libinput_event_get_device(ev.event);
     INPUTDEVMGR->OnInputDeviceRemoved(device);
 
     uint64_t preHandlerTime = GetSysClockTime();
@@ -325,7 +325,7 @@ int32_t OHOS::MMI::InputEventHandler::OnKeyboardEvent(libinput_event &ev)
     uint64_t preHandlerTime = GetSysClockTime();
     EventKeyboard key = {};
     CHKR(udsServer_, NULL_POINTER, RET_ERR);
-    auto packageResult = eventPackage_.PackageKeyEvent(event, key, *udsServer_);
+    auto packageResult = eventPackage_.PackageKeyEvent(*ev.event, key, *udsServer_);
     if (packageResult == MULTIDEVICE_SAME_EVENT_FAIL) { // The multi_device_same_event should be discarded
         return RET_OK;
     }
@@ -374,7 +374,7 @@ int32_t OHOS::MMI::InputEventHandler::OnKeyboardEvent(libinput_event &ev)
         MMI_LOGD("key event start launch an ability, keyCode : %{puiblic}d", key.key);
         return RET_OK;
     }
-    auto device = libinput_event_get_device(&event);
+    auto device = libinput_event_get_device(ev.event);
     CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
     auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent, preHandlerTime);
@@ -517,7 +517,7 @@ int32_t OHOS::MMI::InputEventHandler::OnEventPointer(multimodal_libinput_event &
     return RET_OK;
 }
 
-int32_t OHOS::MMI::InputEventHandler::OnEventTouchSecond(libinput_event &ev)
+int32_t OHOS::MMI::InputEventHandler::OnEventTouchSecond(libinput_event &event)
 {
     MMI_LOGD("call  OnEventTouchSecond begin"); 
     auto point = touchTransformPointManger->onLibinputTouchEvent(event);
@@ -588,7 +588,7 @@ int32_t OHOS::MMI::InputEventHandler::OnEventTouch(multimodal_libinput_event &ev
     return RET_OK;
 }
 
-int32_t OHOS::MMI::InputEventHandler::OnGestureEvent(libinput_event &ev)
+int32_t OHOS::MMI::InputEventHandler::OnGestureEvent(libinput_event &event)
 {
     MMI_LOGT("InputEventHandler::OnGestureEvent\n");
     uint64_t preHandlerTime = GetSysClockTime();

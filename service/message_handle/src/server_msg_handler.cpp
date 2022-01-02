@@ -323,7 +323,7 @@ int32_t OHOS::MMI::ServerMsgHandler::CheckReplyMessageFormClient(SessionPtr sess
     int32_t fd = sess->GetFd();
     auto waitData = AppRegs->GetWaitQueueEvent(fd, idMsg);
     if (waitData.inputTime <= 0) {
-        return RET_OK; //Î´Ê¹ÓÃµÄANRÏûÏ¢²»´¦Àí
+        return RET_OK; //Î´Ê¹ï¿½Ãµï¿½ANRï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     }
     AppRegs->DeleteEventFromWaitQueue(fd, idMsg);
 
@@ -497,8 +497,8 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectPointerEvent(SessionPtr sess, NetPa
     int32_t bufferState {  };
     InputHandlerManagerGlobal::GetInstance().HandleEvent(pointerEvent);
 
-    if (AppRegs->IsMultimodeInputReady(pointerEvent->GetActionTime(),
-        MmiMessageId::ON_POINTER_EVENT, appInfo.fd, connectState, bufferState)) {
+    if (AppRegs->IsMultimodeInputReady(
+        MmiMessageId::ON_POINTER_EVENT, appInfo.fd, pointerEvent->GetActionTime())) {
         NetPacket rPkt(MmiMessageId::ON_POINTER_EVENT);
         CHKR((RET_OK == OHOS::MMI::InputEventDataTransformation::SerializePointerEvent(pointerEvent, rPkt)),
             STREAM_BUF_WRITE_FAIL, RET_ERR);
