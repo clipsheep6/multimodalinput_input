@@ -22,6 +22,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include "input_device_manager.h"
+#include "libinput-private.h"
 #include "mmi_server.h"
 #include "mouse_event_handler.h"
 #include "outer_interface.h"
@@ -320,12 +321,12 @@ int32_t OHOS::MMI::InputEventHandler::OnEventDeviceRemoved(multimodal_libinput_e
     return RET_OK;
 }
 
-int32_t OHOS::MMI::InputEventHandler::OnKeyboardEvent(libinput_event &ev)
+int32_t OHOS::MMI::InputEventHandler::OnKeyboardEvent(libinput_event &event)
 {
     uint64_t preHandlerTime = GetSysClockTime();
     EventKeyboard key = {};
     CHKR(udsServer_, NULL_POINTER, RET_ERR);
-    auto packageResult = eventPackage_.PackageKeyEvent(*ev.event, key, *udsServer_);
+    auto packageResult = eventPackage_.PackageKeyEvent(event, key, *udsServer_);
     if (packageResult == MULTIDEVICE_SAME_EVENT_FAIL) { // The multi_device_same_event should be discarded
         return RET_OK;
     }
@@ -374,7 +375,7 @@ int32_t OHOS::MMI::InputEventHandler::OnKeyboardEvent(libinput_event &ev)
         MMI_LOGD("key event start launch an ability, keyCode : %{puiblic}d", key.key);
         return RET_OK;
     }
-    auto device = libinput_event_get_device(ev.event);
+    auto device = libinput_event_get_device(&event);
     CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
     auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent, preHandlerTime);
