@@ -22,7 +22,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include "input_device_manager.h"
-#include "libinput-private.h"
 #include "mmi_server.h"
 #include "mouse_event_handler.h"
 #include "outer_interface.h"
