@@ -109,8 +109,12 @@ ohos_prebuilt_etc("multimodalinput_config_ability.json") {
 
 ohos_shared_library("libmmi-server") {
   sources = [
+    "ability_launch/src/ability_launch_manager.cpp",
     "application_manager/src/app_register.cpp",
     "device_manager/src/device_register.cpp",
+    "device_manager/src/input_device.cpp",
+    "device_manager/src/input_device_manager.cpp",
+    "device_manager/src/message_post.cpp",
     "device_scalability/src/expansibility_operation.cpp",
     "event_dispatch/src/event_dispatch.cpp",
     "event_dump/src/event_dump.cpp",
@@ -120,26 +124,22 @@ ohos_shared_library("libmmi-server") {
     "event_handle/src/register_eventhandle_manager.cpp",
     "event_handle/src/system_event_handler.cpp",
     "event_package/src/event_package.cpp",
+    "event_package/src/mouse_state_gesture.cpp",
     "event_standard/src/standard_event_handler.cpp",
+    "input_monitor/src/input_event_monitor_manager.cpp",
+    "input_monitor/src/input_handler_manager_global.cpp",
     "libinput_adapter/src/s_input.cpp",
     "message_handle/src/server_msg_handler.cpp",
     "module_loader/src/libmmi_main.cpp",
     "module_loader/src/uds_server.cpp",
-    "window_manager/src/input_windows_manager.cpp",
-    "window_manager/src/outer_interface.cpp",
-    "window_manager/src/window_switch.cpp",
-    "window_manager/src/input_windows_manager_stub.cpp",
-    "event_package/src/mouse_state_gesture.cpp",
-    "input_monitor/src/input_event_monitor_manager.cpp",
-    "input_monitor/src/input_handler_manager_global.cpp",
+    "mouse_event_handler/src/mouse_event_handler.cpp",
+    "server_input_filter_manager/src/server_input_filter_manager.cpp",
     "touch_transform_point/src/touch_transform_point_manager.cpp",
     "touch_transform_point/src/touch_transform_point_processor.cpp",
-    "server_input_filter_manager/src/server_input_filter_manager.cpp",
-    "mouse_event_handler/src/mouse_event_handler.cpp",
-    "device_manager/src/input_device_manager.cpp",
-    "device_manager/src/input_device.cpp",
-    "device_manager/src/message_post.cpp",
-    "ability_launch/src/ability_launch_manager.cpp",
+    "window_manager/src/input_windows_manager.cpp",
+    "window_manager/src/input_windows_manager_stub.cpp",
+    "window_manager/src/outer_interface.cpp",
+    "window_manager/src/window_switch.cpp",
   ]
 
   if (is_mmi_have_hdf) {
@@ -160,9 +160,7 @@ ohos_shared_library("libmmi-server") {
   if (is_mmi_have_weston) {
     sources += [ "module_loader/src/mmi_server.cpp" ]
   } else {
-    sources += [
-      "module_loader/src/mmi_service.cpp",
-    ]
+    sources += [ "module_loader/src/mmi_service.cpp" ]
   }
 
   public_configs = [ ":libmmi_server_public_config" ]
@@ -172,15 +170,15 @@ ohos_shared_library("libmmi-server") {
     ":mmi_log.conf",
     ":multimodalinput_config_ability.json",
     "//drivers/peripheral/input/hal:hdi_input",
-    "//foundation/aafwk/standard/interfaces/innerkits/ability_manager:ability_manager",
-    "//foundation/aafwk/standard/interfaces/innerkits/want:want",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
+    "//foundation/aafwk/standard/interfaces/innerkits/ability_manager:ability_manager",
     "//foundation/aafwk/standard/interfaces/innerkits/base:base",
+    "//foundation/aafwk/standard/interfaces/innerkits/want:want",
     "//foundation/aafwk/standard/services/abilitymgr:abilityms",
-    "//foundation/appexecfwk/standard/kits:appkit_native",
     "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base:appexecfwk_base",
     "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_core:appexecfwk_core",
     "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler:libeventhandler",
+    "//foundation/appexecfwk/standard/kits:appkit_native",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_service",
@@ -285,6 +283,7 @@ ohos_unittest("ut-mmi-service-out") {
     "device_scalability/test/expansibility_operation_test.cpp",
     "event_dispatch/test/event_dispatch_test.cpp",
     "event_handle/test/register_event_test.cpp",
+
     #"event_handle/test/system_event_handler_test.cpp",
     "event_standard/test/standard_event_handler_test.cpp",
     "hdi_inject/test/hdi_inject_test.cpp",
