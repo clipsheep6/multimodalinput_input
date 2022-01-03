@@ -529,10 +529,9 @@ int32_t EventPackage::PackageTouchEvent(multimodal_libinput_event &ev,
     touch.slot = libinput_event_touch_get_slot(data);
     touch.seat_slot = libinput_event_touch_get_seat_slot(data);
     touch.pressure = libinput_event_get_touch_pressure(ev.event);
-
     switch (type) {
         case LIBINPUT_EVENT_TOUCH_DOWN: {
-#ifdef OHOS_WESTON_MODEL
+#ifdef OHOS_WESTEN_MODEL
             auto uData = static_cast<multimodal_input_pointer_data *>(ev.userdata);
             CHKR(uData, NULL_POINTER, RET_ERR);
             auto touchSurfaceInfo = WinMgr->GetTouchSurfaceInfo(uData->x, uData->y);
@@ -549,10 +548,10 @@ int32_t EventPackage::PackageTouchEvent(multimodal_libinput_event &ev,
             break;
         }
         case LIBINPUT_EVENT_TOUCH_UP: {
-            MMIRegEvent->GetTouchInfoByTouchId(touch, MAKEPAIR(touch.deviceId, touch.seat_slot));
-            touch.time = libinput_event_touch_get_time_usec(data);
-            touch.eventType = LIBINPUT_EVENT_TOUCH_UP;
-            break;
+           MMIRegEvent->GetTouchInfoByTouchId(touch, MAKEPAIR(touch.deviceId, touch.seat_slot));
+           touch.time = libinput_event_touch_get_time_usec(data);
+           touch.eventType = LIBINPUT_EVENT_TOUCH_UP;
+           break;
         }
         case LIBINPUT_EVENT_TOUCH_MOTION: {
 #ifdef OHOS_WESTEN_MODEL

@@ -121,7 +121,7 @@ int32_t MultimodalInputConnectService::HandleAllocSocketFd(MessageParcel& data, 
         MMI_LOGE("permission denied");
         return RET_ERR;
     }
-
+    MMI_LOGT("SetUdsServer this %{public}p, IUdsServer %{public}p", this, udsServer_);
     if (udsServer_ == nullptr) {
         MMI_LOGE("udsServer_ is nullptr.");
         return RET_ERR;
@@ -151,6 +151,7 @@ int32_t MultimodalInputConnectService::HandleAllocSocketFd(MessageParcel& data, 
 void MultimodalInputConnectService::SetUdsServer(IUdsServer *server)
 {
     MMI_LOGT("enter");
+    MMI_LOGT("SetUdsServer this %{public}p, IUdsServer %{public}p", this, server);
     udsServer_ = server;
 }
 
