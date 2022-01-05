@@ -28,9 +28,9 @@ InputDeviceEvent& InputDeviceEvent::GetInstance()
     return instance;
 }
 
-InputDeviceEvent::InputDeviceEvent(){}
+InputDeviceEvent::InputDeviceEvent() {}
 
-InputDeviceEvent::~InputDeviceEvent(){}
+InputDeviceEvent::~InputDeviceEvent() {}
 
 void InputDeviceEvent::GetInputDeviceIdsAsync(std::function<void(std::vector<int32_t>)> callback)
 {
