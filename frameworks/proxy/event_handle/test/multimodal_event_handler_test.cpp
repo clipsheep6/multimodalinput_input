@@ -349,11 +349,11 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_AddKeyBoardFilter_00
 HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_AddKeyBoardFilter_002, TestSize.Level1)
 {
     std::string name = "KeyBoardFilter";
-    inputFilterManager.FilterKeyEvent(name, LOW_AUTHORITY, [](KeyBoardEvent event){
+    inputFilterManager.FilterKeyEvent(name, LOW_AUTHORITY, [](KeyBoardEvent event) {
         EXPECT_TRUE(event.GetKeyCode() == HOS_KEY_BACK);
         MMI_LOGD("filter 1 receive keycode : %{public}d", event.GetKeyCode());
     });
-    inputFilterManager.FilterKeyEvent(name, LOW_AUTHORITY, [](KeyBoardEvent event){
+    inputFilterManager.FilterKeyEvent(name, LOW_AUTHORITY, [](KeyBoardEvent event) {
         EXPECT_TRUE(false);
         MMI_LOGD("filter 2 receive keycode : %{public}d", event.GetKeyCode());
     });
