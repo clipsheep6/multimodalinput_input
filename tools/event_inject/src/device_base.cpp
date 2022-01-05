@@ -192,8 +192,8 @@ void DeviceBase::SetEvAbsY(InputEventArray& inputEventArray, int32_t blockTime, 
     inputEventArray.events.push_back(injectEvent);
 }
 
-void DeviceBase::SetMtTouchFingerType(InputEventArray& inputEventArray, int32_t blockTime,
-    int32_t value, int32_t status)
+void DeviceBase::SetMtTouchFingerType(InputEventArray& inputEventArray, 
+    int32_t blockTime, int32_t value, int32_t status)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;
