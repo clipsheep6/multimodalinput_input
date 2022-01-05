@@ -15,14 +15,23 @@
 #ifndef OHOS_MMI_INTERFACE_H
 #define OHOS_MMI_INTERFACE_H
 
+#include "singleton.h"
+#ifdef OHOS_WESTEN_MODEL
+#ifdef LOG_TAG
+#undef LOG_TAG
+#endif
+#include "libweston.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
     void Dump(int fd);
     int GetMultimodeInputinformation(void);
-
+#ifdef OHOS_WESTEN_MODEL
     void StartMmiServer(void);
-    int wet_module_init(struct weston_compositor* ec, int* argc, char* argv[]);
+#endif
+int wet_module_init(struct weston_compositor* ec, int* argc, char* argv[]);
 #ifdef __cplusplus
 }
 #endif

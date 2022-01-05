@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "mmi_server.h"
 #include "mmi_interface.h"
 
@@ -28,7 +29,10 @@ int32_t main(int32_t argc, const char *argv[])
     VerifyLogManagerRun();
 #endif
 
+#ifdef OHOS_WESTEN_MODEL
     StartMmiServer();
+#endif
+
 #ifdef DEBUG_CODE_TEST
     SetMmiServerWorking();
     while (IsMmiServerWorking()) {
