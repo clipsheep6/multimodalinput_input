@@ -61,6 +61,7 @@ const static struct {
 } NAME_MAP[] = {
     {"Test_OnEvent", "keyboard", "inject_event_keyboard.json"},
     {"Test_OnEventKeyboard", "keyboard", "inject_event_keyboard.json"},
+    {"Test_OnKeyboardEvent", "keyboard", "inject_event_keyboard.json"},
     {"Test_OnEventPointer_LeftButton", "mouse", "inject_event_mouse_left_button.json"},
     {"Test_OnEventPointer_Motion", "mouse", "inject_event_mouse_motion.json"},
     {"Test_OnEventPointer_Axis", "mouse", "inject_event_mouse_axis.json"},
@@ -162,6 +163,16 @@ HWTEST_F(InputEventHandlerTest, Test_OnEventKeyboard, TestSize.Level1)
     EXPECT_TRUE(event_);
     mmi_event = {event_, nullptr};
     EXPECT_EQ(eventHandler_.OnEventKeyboard(mmi_event), OHOS::KEY_EVENT_DISP_FAIL);
+}
+
+HWTEST_F(InputEventHandlerTest, Test_OnKeyboardEvent, TestSize.Level1)
+{
+    event_ = libinput_get_event(input_);
+    EXPECT_TRUE(event_);
+    EXPECT_EQ(eventHandler_.OnKeyboardEvent(*event_), OHOS::KEY_EVENT_DISP_FAIL);
+    event_ = libinput_get_event(input_);
+    EXPECT_TRUE(event_);
+    EXPECT_EQ(eventHandler_.OnKeyboardEvent(*event_), OHOS::KEY_EVENT_DISP_FAIL);
 }
 
 HWTEST_F(InputEventHandlerTest, Test_OnEventPointer_LeftButton, TestSize.Level1)
