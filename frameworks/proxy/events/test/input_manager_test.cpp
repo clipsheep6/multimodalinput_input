@@ -1758,7 +1758,7 @@ HWTEST_F(InputManagerTest, InterceptorManagerTest_OnAddInterceptor_004, TestSize
     std::vector<int32_t> ids(N_TEST_CASES);
 
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
-        ids[i] = GetInstance()->AddInterceptor(PointerEvent::SOURCE_TYPE_TOUCHPAD,
+        ids[i] = InputManager::GetInstance()->AddInterceptor(PointerEvent::SOURCE_TYPE_TOUCHPAD,
                                                 InterceptorManagerCallBack);
         EXPECT_TRUE(ids[i] >= 1);
         std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_FOR_A_SEC));
@@ -1830,7 +1830,7 @@ HWTEST_F(InputManagerTest, InterceptorManagerTest_OnAddInterceptor_005, TestSize
         EXPECT_TRUE(tLogs.back() == sLogs.back());
 }
 
-static void InputManagerTest::TouchPadMonitorCallBack(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
+void InputManagerTest::TouchPadMonitorCallBack(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
 {
     int32_t pointerId = pointerEvent->GetPointerId();
     OHOS::MMI::PointerEvent::PointerItem pointerItem;
