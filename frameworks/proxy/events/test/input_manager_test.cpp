@@ -1592,7 +1592,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_009, TestSize.Leve
     std::this_thread::sleep_for(std::chrono::milliseconds(3000));
 }
 
-void InputManagerTest::InterceptorManagerCallBack(std::shared_ptr<PointerEvent> interceptor)
+void InputManagerTest::InterceptorManagerCallBack(std::shared_ptr<PointerEvent> pointerEvent)
 {
     int32_t pointerId = pointerEvent->GetPointerId();
     OHOS::MMI::PointerEvent::PointerItem pointerItem;
