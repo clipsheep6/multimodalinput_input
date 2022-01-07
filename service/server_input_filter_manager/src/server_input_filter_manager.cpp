@@ -357,7 +357,7 @@ int32_t ServerInputFilterManager::RemoveTouchEventFilter(SessionPtr sess)
     auto iter = touchEventFilterMap_.find(sess);
     if (iter != touchEventFilterMap_.end()) {
         touchEventFilterMap_.erase(sess);
-        MMI_LOGE("this sess delete filter success");
+        MMI_LOGE("this sess delete filter success!");
     }
     return RET_OK;
 }
