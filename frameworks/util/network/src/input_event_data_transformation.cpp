@@ -137,8 +137,19 @@ int32_t InputEventDataTransformation::SerializePointerEvent(std::shared_ptr<Poin
     CHKR(pck.Write(pointerE->GetPointerId()), STREAM_BUF_WRITE_FAIL, RET_ERR);
     CHKR(pck.Write(pointerE->GetSourceType()), STREAM_BUF_WRITE_FAIL, RET_ERR);
     CHKR(pck.Write(pointerE->GetButtonId()), STREAM_BUF_WRITE_FAIL, RET_ERR);
-    CHKR(pck.Write(pointerE->GetAxis()), STREAM_BUF_WRITE_FAIL, RET_ERR);
-    CHKR(pck.Write(pointerE->GetAxisValue()), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    CHKR(pck.Write(pointerE->GetAxes()), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    if (pointerE->HasAxis(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)) {
+        CHKR(pck.Write(pointerE->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)),
+            STREAM_BUF_WRITE_FAIL, RET_ERR);
+    }
+    if (pointerE->HasAxis(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL)) {
+        CHKR(pck.Write(pointerE->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL)),
+            STREAM_BUF_WRITE_FAIL, RET_ERR);
+    }
+    if (pointerE->HasAxis(PointerEvent::AXIS_TYPE_PINCH)) {
+        CHKR(pck.Write(pointerE->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH)),
+            STREAM_BUF_WRITE_FAIL, RET_ERR);
+    }
 
     std::set<int32_t> pressedBtns { pointerE->GetPressedButtons() };
     CHKR(pck.Write(pressedBtns.size()), STREAM_BUF_WRITE_FAIL, RET_ERR);
@@ -185,10 +196,19 @@ int32_t InputEventDataTransformation::DeserializePointerEvent(bool skipId,
     CHKR(pck.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
     pointerE->SetButtonId(tField);
     CHKR(pck.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
-    pointerE->SetAxis(tField);
     double axisValue {  };
-    CHKR(pck.Read(axisValue), STREAM_BUF_READ_FAIL, RET_ERR);
-    pointerE->SetAxisValue(axisValue);
+    if (PointerEvent::HasAxis(tField, PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)) {
+        CHKR(pck.Read(axisValue), STREAM_BUF_READ_FAIL, RET_ERR);
+        pointerE->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, axisValue);
+    }
+    if (PointerEvent::HasAxis(tField, PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL)) {
+        CHKR(pck.Read(axisValue), STREAM_BUF_READ_FAIL, RET_ERR);
+        pointerE->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, axisValue);
+    }
+    if (PointerEvent::HasAxis(tField, PointerEvent::AXIS_TYPE_PINCH)) {
+        CHKR(pck.Read(axisValue), STREAM_BUF_READ_FAIL, RET_ERR);
+        pointerE->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, axisValue);
+    }
 
     std::set<int32_t>::size_type nPressed {  };
     CHKR(pck.Read(nPressed), STREAM_BUF_READ_FAIL, RET_ERR);

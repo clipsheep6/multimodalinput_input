@@ -47,16 +47,22 @@ public:
     int32_t AddMonitor(std::function<bool(std::shared_ptr<KeyEvent>)> monitor);
     void RemoveMonitor(int32_t monitorId);
 
+    int32_t AddMonitor2(std::shared_ptr<IInputEventConsumer> consumer);
+    void RemoveMonitor2(int32_t monitorId);
+    void MarkConsumed(int32_t monitorId, int32_t eventId);
+
+    int32_t AddInputEventTouchpadMontior(std::function<void(std::shared_ptr<PointerEvent>)> monitor);
+    int32_t AddInputEventTouchpadMontior(std::function<bool(std::shared_ptr<PointerEvent>)> monitor);
+    void RemoveInputEventTouchpadMontior(int32_t monitorId);
+
     int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptorId);
+    int32_t AddInterceptor(int32_t sourceType, std::function<void(std::shared_ptr<PointerEvent>)> interceptor);
     void RemoveInterceptor(int32_t interceptorId);
 
     void SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent);
     void SimulateInputEvent(std::list<std::shared_ptr<KeyEvent>> keyEvents);
     void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void SimulateInputEvent(std::list<std::shared_ptr<PointerEvent>> pointerEvents);
-    void GetInputDeviceIdsAsync(std::function<void(std::vector<int32_t>)> callback);
-    void GetInputDeviceAsync(int32_t deviceId,
-                             std::function<void(std::shared_ptr<InputDeviceEvent::InputDeviceInfo>)> callback);
 
 private:
     InputManager() = default;
