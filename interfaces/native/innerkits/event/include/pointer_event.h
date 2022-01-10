@@ -191,6 +191,9 @@ public:
     void SetAxisValue(AxisType axis, double axisValue);
     bool HasAxis(AxisType axis) const;
     int32_t GetAxes() const;
+	
+	void SetPressedKeys(const std::vector<int32_t> pressedKeys);
+    std::vector<int32_t> GetPressedKeys() const;
 
 public:
     static bool HasAxis(int32_t axes, AxisType axis);
@@ -207,6 +210,7 @@ private:
     int32_t buttonId_ { -1 };
     int32_t axes_ { 0 };
     std::array<double, AXIS_TYPE_MAX>   axisValues_ { };
+	std::vector<int32_t> pressedKeys_;
 };
 
 inline bool PointerEvent::HasAxis(AxisType axis) const

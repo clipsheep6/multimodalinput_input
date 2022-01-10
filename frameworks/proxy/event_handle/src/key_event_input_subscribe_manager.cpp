@@ -61,7 +61,7 @@ bool KeyEventInputSubscribeManager::CheckRepeatSubscribeKeyEevent(std::shared_pt
             }
             ++subPreKeyCount;
         }
-        if (preKeyCount == subPreKeyCount) {
+        if (preKeyCount == subPreKeyCount && subscribeKeyOption->IsFinalKeyDown() == keyOption->IsFinalKeyDown()) {
             return true;
         }
     }

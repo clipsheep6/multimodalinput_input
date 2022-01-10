@@ -79,18 +79,22 @@ void OHOS::MMI::MouseEventHandler::SetMouseButon(PointerEvent::PointerItem& poin
     } else if (libinput_event_pointer_get_button(&pointEventData) == MIDDLE_BUTTON) {
         this->SetButtonId(PointerEvent::MOUSE_BUTTON_MIDDLE);
         g_btnId = this->GetButtonId();
+    } else {
+        MMI_LOGW("PointerAction : %{public}d, unProces Button code : %{public}u",
+        this->GetPointerAction(), libinput_event_pointer_get_button(&pointEventData));
     }
-	
-	if (libinput_event_pointer_get_button_state(&pointEventData) == LIBINPUT_BUTTON_STATE_RELEASED) {
+    if (libinput_event_pointer_get_button_state(&pointEventData) == LIBINPUT_BUTTON_STATE_RELEASED) {
         this->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
         isPressed = false;
         g_isPressed = isPressed;
+        g_btnId = BUTTON_NONE;
     } else if (libinput_event_pointer_get_button_state(&pointEventData) == LIBINPUT_BUTTON_STATE_PRESSED) {
         this->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
         this->SetButtonPressed(libinput_event_pointer_get_button(&pointEventData));
         isPressed = true;
         g_isPressed = isPressed;
     }
+
     pointerItem.SetPressed(isPressed);
     pointerItem.SetGlobalX(info.globleX);
     pointerItem.SetGlobalY(info.globleY);

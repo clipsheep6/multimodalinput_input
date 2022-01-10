@@ -177,6 +177,11 @@ int32_t InputEventDataTransformation::SerializePointerEvent(std::shared_ptr<Poin
         CHKR(pck.Write(item.GetDeviceId()), STREAM_BUF_WRITE_FAIL, RET_ERR);
     }
 
+    std::vector<int32_t> pressedKeys = pointerE->GetPressedKeys();
+    CHKR(pck.Write(pressedKeys.size()), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    for (int32_t keyCode : pressedKeys) {
+        CHKR(pck.Write(keyCode), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    }
     return RET_OK;
 }
 
@@ -226,6 +231,14 @@ int32_t InputEventDataTransformation::DeserializePointerEvent(bool skipId,
         pointerE->AddPointerItem(item);
     }
 
+    std::vector<int32_t> pressedKeys;
+    std::vector<int32_t>::size_type pressedKeySize = 0;
+    CHKR(pck.Read(pressedKeySize), STREAM_BUF_READ_FAIL, RET_ERR);
+    while (pressedKeySize-- > 0) {
+        CHKR(pck.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
+        pressedKeys.push_back(tField);
+    }
+    pointerE->SetPressedKeys(pressedKeys);
     return RET_OK;
 }
 

@@ -943,7 +943,20 @@ int32_t OHOS::MMI::InputEventHandler::OnMouseEventHandler(libinput_event& event,
     if (mouseEvent == nullptr) {
         return RET_ERR;
     }
-
+    if (keyEvent == nullptr) {
+        keyEvent = OHOS::MMI::KeyEvent::Create();
+    }
+    if (keyEvent != nullptr) {
+        std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
+        if (pressedKeys.empty()) {
+            MMI_LOGI("Pressed keys is empty");
+        } else {
+            for (int32_t keyCode : pressedKeys) {
+                MMI_LOGI("Pressed keyCode=%{public}d", keyCode);
+            }
+        }
+        mouseEvent->SetPressedKeys(pressedKeys);
+    }
     mouseEvent->SetMouseData(event, deviceId);
 
     // MouseEvent Normalization Results

@@ -199,7 +199,14 @@ int32_t OHOS::MMI::ClientMsgHandler::OnPointerEvent(const UDSClient& client, Net
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
              static_cast<int32_t>(pointerIds.size()));
-
+    std::vector<int32_t> pressedKeys = pointerEvent->GetPressedKeys();
+    if (pressedKeys.empty()) {
+        MMI_LOGI("Pressed keys is empty");
+    } else {
+        for (int32_t keyCode : pressedKeys) {
+            MMI_LOGI("Pressed keyCode=%{public}d", keyCode);
+        }
+    }
     for (int32_t pointerId : pointerIds) {
         OHOS::MMI::PointerEvent::PointerItem item;
         CHKR(pointerEvent->GetPointerItem(pointerId, item), PARAM_INPUT_FAIL, RET_ERR);

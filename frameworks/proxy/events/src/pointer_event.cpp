@@ -262,5 +262,15 @@ bool PointerEvent::HasAxis(int32_t axes, AxisType axis)
     }
     return ret;
 }
+
+void PointerEvent::SetPressedKeys(const std::vector<int32_t> pressedKeys)
+{
+    pressedKeys_ = pressedKeys;
+}
+
+std::vector<int32_t> PointerEvent::GetPressedKeys() const
+{
+    return pressedKeys_;
+}
 }
 } // namespace OHOS::MMI

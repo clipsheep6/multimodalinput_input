@@ -478,6 +478,14 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectPointerEvent(SessionPtr sess, NetPa
     auto pointerEvent = OHOS::MMI::PointerEvent::Create();
     CHKR((RET_OK == InputEventDataTransformation::DeserializePointerEvent(false, pointerEvent, pkt)),
         STREAM_BUF_READ_FAIL, RET_ERR);
+    std::vector<int32_t> pressedKeys = pointerEvent->GetPressedKeys();
+    if (pressedKeys.empty()) {
+        MMI_LOGI("Pressed keys is empty");
+    } else {
+        for (int32_t keyCode : pressedKeys) {
+            MMI_LOGI("Pressed keyCode=%{public}d", keyCode);
+        }
+    }
     CHKR((RET_OK == eventDispatch_.handlePointerEvent(pointerEvent)), POINT_EVENT_DISP_FAIL, RET_ERR);
     return RET_OK;
 }

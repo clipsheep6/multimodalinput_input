@@ -27,7 +27,7 @@ std::string GetNamedPropertyString(const napi_env &env, const napi_value &object
 int32_t GetNamedPropertyInt32(const napi_env &env, const napi_value &object, const std::string &name);
 std::vector<int32_t> GetCppArrayInt(napi_value value, napi_env env);
 int32_t AddEventCallback(const napi_env &env, OHOS::MMI::CallbackMaps &callbackMaps,
-    OHOS::MMI::KeyEventMonitorInfo *event);
+    OHOS::MMI::KeyEventMonitorInfo *event, int32_t &preSubscribeId);
 int32_t DelEventCallback(const napi_env &env, OHOS::MMI::CallbackMaps &callbackMaps,
     OHOS::MMI::KeyEventMonitorInfo *event, int32_t &subscribeId);
 void EmitAsyncCallbackWork(OHOS::MMI::KeyEventMonitorInfo *event);

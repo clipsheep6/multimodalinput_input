@@ -15,7 +15,6 @@
 
 #include <algorithm>
 #include <inttypes.h>
-
 #include "input_manager.h"
 #include "js_register_util.h"
 #include "js_register_module.h"
@@ -31,8 +30,6 @@ namespace OHOS {
         const uint32_t PRE_KEYS_SIZE = 4;
         // static std::map<std::string, KeyEventMonitorInfo*> g_CallbackInfos;
         static std::map<std::string, std::vector<KeyEventMonitorInfo*>> g_CallbackInfos;
-        static std::vector<int32_t> g_subscribleIds;
-        // typedef std::map<std::string, std::list<napi_ref>> CallbackMap;
         CallbackMaps callbackMaps = {};
 
         static napi_value GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo* event,
@@ -77,11 +74,14 @@ namespace OHOS {
                 return nullptr;
             }
             std::vector<int32_t> preKeys = GetCppArrayInt(receiceValue, env);
+            HILOG_DEBUG("preKeys size:%{public}d", (int32_t)preKeys.size());
+            std::vector<int32_t> sortPrekeys = preKeys;
+            sort(sortPrekeys.begin(), sortPrekeys.end());
             keyOption->SetPreKeys(preKeys);
 
             std::string subKeyNames = "";
-            for (int32_t i = 0; i < preKeys.size(); i++){
-                subKeyNames += std::to_string(preKeys[i]);
+            for (int32_t i = 0; i < sortPrekeys.size(); i++){
+                subKeyNames += std::to_string(sortPrekeys[i]);
                 subKeyNames += ",";
                 HILOG_DEBUG("GetSubscribeEventInfo preKeys = %{public}d", preKeys[i]);
             }
@@ -174,15 +174,18 @@ namespace OHOS {
         bool CheckPara(std::shared_ptr<KeyOption> keyOption)
         {
             std::vector<int32_t> preKeys = keyOption->GetPreKeys();
-            if (preKeys.size() != PRE_KEYS_SIZE) {
+            if (preKeys.size() > PRE_KEYS_SIZE) {
+                HILOG_ERROR("preKeys size is bigger than 4, can not process");
                 return false;
             } 
             std::vector<int32_t> checkRepeat;
             for (int32_t i = 0; i < preKeys.size(); i++) {
                 if (preKeys[i] < 0) {
-                    continue;
+                    HILOG_ERROR("preKey:%{public}d is less 0, can not process", preKeys[i]);
+                    return false;
                 }
                 if (std::find(checkRepeat.begin(), checkRepeat.end(), preKeys[i]) != checkRepeat.end()){
+                    HILOG_ERROR("preKey is repeat, can not process");
                     return false;
                 }
                 checkRepeat.push_back(preKeys[i]);
@@ -213,35 +216,31 @@ namespace OHOS {
             }
 
             event->keyOption = keyOption;
-            if (AddEventCallback(env, callbackMaps, event) < 0 ) {
+            int32_t preSubscribeId = -1;
+            if (AddEventCallback(env, callbackMaps, event, preSubscribeId) < 0 ) {
                 delete event;
                 event = nullptr;
                 HILOG_ERROR("SubscribeKeyEventMonitor: AddEventCallback failed");
                 return nullptr;
             }
 
-            // 测试用例1
+            if (preSubscribeId <= 0) {
+                HILOG_DEBUG("SubscribeKeyEventMonitor eventType = %{public}s", event->eventType.c_str());
+                HILOG_DEBUG("SubscribeKeyEventMonitor eventName = %{public}s", event->name.c_str());
+                int32_t subscribeId = -1;
+                subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, SubKeyEventCallback);
+                if (subscribeId < 0) {
+                    HILOG_DEBUG("SubscribeSystemKeyEventMonitor subscribeId invalid = %{public}d", subscribeId);
+                    event->status = -1;
+                    EmitAsyncCallbackWork(event);
+                    return nullptr;
+                }
+                HILOG_DEBUG("SubscribeSystemKeyEventMonitor subscribeId = %{public}d", subscribeId);
+                event->subscribeId = subscribeId;
+            } else {
+                event->subscribeId = preSubscribeId;
+            }
             int32_t response = MMI_STANDARD_EVENT_SUCCESS;
-            HILOG_DEBUG("SubscribeKeyEventMonitor eventType = %{public}s", event->eventType.c_str());
-            HILOG_DEBUG("SubscribeKeyEventMonitor eventName = %{public}s", event->name.c_str());
-            int32_t subscribeId = -1;
-            subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, SubKeyEventCallback);
-            if (subscribeId < 0) {
-                HILOG_DEBUG("SubscribeSystemKeyEventMonitor subscribeId invalid = %{public}d", subscribeId);
-                event->status = -1;
-                EmitAsyncCallbackWork(event);
-                return nullptr;
-            }
-            HILOG_DEBUG("SubscribeSystemKeyEventMonitor subscribeId = %{public}d", subscribeId);
-            auto iter = std::find(g_subscribleIds.begin(), g_subscribleIds.end(), subscribeId);
-            if (iter != g_subscribleIds.end()) {
-                g_subscribleIds.push_back(subscribeId);
-                HILOG_DEBUG("g_subscribleIds has add subscribeId = %{public}d", subscribeId);
-            }
-            for(auto iter : g_subscribleIds) {
-                HILOG_DEBUG("SubscribeSystemKeyEventMonitor in for add subscribeId = %{public}d", iter);
-            }
-            event->subscribeId = subscribeId;
             if (napi_create_int32(env, response, &result) != napi_ok) {
                 HILOG_ERROR("UnsubscribeKeyEventMonitor napi_create_int32 fail");
                 return nullptr;

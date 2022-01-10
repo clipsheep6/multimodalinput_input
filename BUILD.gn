@@ -125,6 +125,7 @@ group("multimodalinput_mmi_packages") {
     "frameworks/napi/input_consumer:libinputconsumer",
     "frameworks/napi/input_device:libinputdevice",
     "frameworks/napi/input_event_client:libinputeventclient",
+    "frameworks/napi/input_monitor:libinputmonitor",
     "frameworks/proxy:libmmi-client",
     "frameworks/util:libmmi-util",
     "service:libmmi-server",

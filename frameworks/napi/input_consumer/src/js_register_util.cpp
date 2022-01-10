@@ -125,7 +125,7 @@ std::vector<int32_t> GetCppArrayInt(napi_value value, napi_env env)
 }
 
 int32_t AddEventCallback(const napi_env &env, OHOS::MMI::CallbackMaps &callbackMaps,
-    OHOS::MMI::KeyEventMonitorInfo *event)
+    OHOS::MMI::KeyEventMonitorInfo *event, int32_t &preSubscribeId)
 {
     HILOG_DEBUG("%{public}s begin", __func__);
     if (callbackMaps.find(event->eventType) == callbackMaps.end()) {
@@ -147,8 +147,11 @@ int32_t AddEventCallback(const napi_env &env, OHOS::MMI::CallbackMaps &callbackM
         }
         it++;
     }
+    if (iter->second.size() > 0) {
+        preSubscribeId = iter->second.front()->subscribeId;
+    }
     iter->second.push_back(event);
-    HILOG_DEBUG("%{public}s begin", __func__);
+    HILOG_DEBUG("%{public}s end", __func__);
     return JS_CALLBACK_EVENT_SUCCESS;
 }
 
@@ -174,9 +177,10 @@ int32_t DelEventCallback(const napi_env &env, OHOS::MMI::CallbackMaps &callbackM
         if (isEquals) {
             napi_delete_reference(env, (*it)->callback[0]);
             KeyEventMonitorInfo *monitorInfo = *it;
-            subscribeId = monitorInfo->subscribeId;
             iter->second.erase(it);
-
+            if (iter->second.size() <= 0) {
+                subscribeId = monitorInfo->subscribeId;
+            }
             delete monitorInfo;
             monitorInfo = nullptr;
             HILOG_DEBUG("DelCallback: success. callback exists. size=%{public}d",
@@ -232,11 +236,22 @@ void EmitAsyncCallbackWork(OHOS::MMI::KeyEventMonitorInfo *reportEvent)
                     HILOG_ERROR("%{public}s call napi_create_object fail", __func__);
                     return;
                 }
-                MMI::SetNamedProperty(env, result[1], "keyCode", event->keyEvent->GetKeyCode());
-                MMI::SetNamedProperty(env, result[1], "keyAction", event->keyEvent->GetKeyCode());
-                MMI::SetNamedProperty(env, result[1], "action", event->keyEvent->GetAction());
-                MMI::SetNamedProperty(env, result[1], "deviceId", event->keyEvent->GetDeviceId());
-                MMI::SetNamedProperty(env, result[1], "actionStartTime", event->keyEvent->GetActionStartTime());
+
+                napi_value arr;
+                napi_value value;
+                napi_create_array(env, &arr);
+                std::vector<int32_t> preKeys = event->keyOption->GetPreKeys();
+                for (size_t i = 0; i < preKeys.size(); i++) {
+                    napi_create_int32(env, preKeys[i], &value);
+                    napi_set_element(env, arr, i, value);
+                }
+
+                std::string preKeysStr = "preKeys";
+                NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, result[1], preKeysStr.c_str(), arr));
+                MMI::SetNamedProperty(env, result[1], "finalKey", event->keyOption->GetFinalKey());
+                MMI::SetNamedProperty(env, result[1], "isFinalKeyDown", event->keyOption->IsFinalKeyDown());
+                MMI::SetNamedProperty(env, result[1], "finalKeyDownDuration",
+                    event->keyOption->GetFinalKeyDownDuration());
                 if (napi_get_undefined(env, &result[0]) != napi_ok) {
                     HILOG_ERROR("%{public}s call napi_get_undefined fail", __func__);
                     return;

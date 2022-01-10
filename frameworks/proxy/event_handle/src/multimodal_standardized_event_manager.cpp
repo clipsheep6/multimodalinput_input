@@ -679,6 +679,14 @@ int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<P
                  item.GetWidth(), item.GetHeight(), item.GetPressure());
     }
 
+    std::vector<int32_t> pressedKeys = pointerEvent->GetPressedKeys();
+    if (pressedKeys.empty()) {
+        MMI_LOGI("Pressed keys is empty");
+    } else {
+        for (int32_t keyCode : pressedKeys) {
+            MMI_LOGI("Pressed keyCode=%{public}d", keyCode);
+        }
+    }
     OHOS::MMI::NetPacket netPkt(MmiMessageId::INJECT_POINTER_EVENT);
     CHKR((RET_OK == InputEventDataTransformation::SerializePointerEvent(pointerEvent, netPkt)),
         STREAM_BUF_WRITE_FAIL, RET_ERR);
