@@ -712,7 +712,6 @@ int32_t OHOS::MMI::EventDispatch::DispatchGestureEvent(UDSServer& udsServer, lib
 int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event& event,
     EventTouch& touch, const uint64_t preHandlerTime, WindowSwitch& windowSwitch)
 {
-
     auto device = libinput_event_get_device(&event);
     CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
