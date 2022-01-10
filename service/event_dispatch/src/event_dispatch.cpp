@@ -15,6 +15,7 @@
 
 #include "event_dispatch.h"
 #include <inttypes.h>
+#include "bytrace.h"
 #include "input_event_data_transformation.h"
 #include "input_event_monitor_manager.h"
 #include "input_handler_manager_global.h"
@@ -617,6 +618,12 @@ int32_t OHOS::MMI::EventDispatch::DispatchPointerEvent(UDSServer &udsServer, lib
                  point.state, point.source, point.delta.x, point.delta.y, point.delta_raw.x,
                  point.delta_raw.y, point.absolute.x, point.absolute.y, point.discrete.x,
                  point.discrete.y, appInfo.fd, appInfo.abilityId, desWindowId, preHandlerTime);
+        int32_t EVENT_POINTER = 17;
+        char pointerUuid[MAX_UUIDSIZE] = {0};
+        memcpy_s(pointerUuid, sizeof(pointerUuid), point.uuid, strlen(point.uuid) + 1);
+        MMI_LOGT("\n OnEventPointer service DispatchPointerEvent pointerUuid = %{public}s\n", pointerUuid);
+        std::string pointerEvent = pointerUuid;
+        FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, EVENT_POINTER);
         if (!udsServer.SendMsg(appInfo.fd, newPacket)) {
             MMI_LOGE("Sending structure of EventPointer failed! errCode:%{public}d\n", MSG_SEND_FAIL);
             return MSG_SEND_FAIL;
@@ -801,6 +808,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
 #endif  // OHOS_AUTO_TEST_FRAME
         std::vector<PAIR<uint32_t, int32_t>> touchIds;
         MMIRegEvent->GetTouchIds(touchIds, touch.deviceId);
+        int32_t EVENT_TOUCH = 9;
         if (!touchIds.empty()) {
             for (PAIR<uint32_t, int32_t> touchId : touchIds) {
                 struct EventTouch touchTemp = {};
@@ -816,6 +824,11 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
                          touchTemp.devicePhys, touchTemp.eventType, touchTemp.slot, touchTemp.seat_slot,
                          touchTemp.pressure, touchTemp.point.x, touchTemp.point.y, appInfo.fd,
                          appInfo.abilityId, touchFocusId, preHandlerTime);
+                char touchUuid[MAX_UUIDSIZE] = {0};
+                memcpy_s(touchUuid, sizeof(touchUuid), touch.uuid, strlen(touch.uuid) + 1);
+                MMI_LOGT("\n 4.event dispatcher of server: touchUuid = %{public}s\n", touchUuid);
+                std::string touchEvent = touchUuid;
+                FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, EVENT_TOUCH);
                 newPacket << touchTemp;
 
 #ifdef OHOS_AUTO_TEST_FRAME    // Send event to auto-test frame
@@ -841,6 +854,11 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
                      touch.time, touch.deviceType, touch.deviceId, touch.deviceName,
                      touch.devicePhys, touch.eventType, touch.slot, touch.seat_slot, touch.pressure,
                      touch.point.x, touch.point.y, appInfo.fd, appInfo.abilityId, touchFocusId, preHandlerTime);
+            char touchUuid[MAX_UUIDSIZE] = {0};
+            memcpy_s(touchUuid, sizeof(touchUuid), touch.uuid, strlen(touch.uuid) + 1);
+            MMI_LOGT("\n 4.event dispatcher of server: touchUuid = %{public}s\n", touchUuid);
+            std::string touchEvent = touchUuid;
+            FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, EVENT_TOUCH);
 
 #ifdef OHOS_AUTO_TEST_FRAME    // Send event to auto-test frame
             const AutoTestDispatcherPkt autoTestDispatcherPkt = {
@@ -999,6 +1017,12 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinpu
              key.time, key.deviceType, key.deviceId, key.deviceName, key.devicePhys, key.eventType,
              key.mUnicode, key.key, trs.keyEvent.c_str(), key.seat_key_count, key.state, appInfo.fd,
              appInfo.abilityId, focusId, preHandlerTime);
+    int32_t EVENT_KEY = 1;
+    char keyUuid[MAX_UUIDSIZE] = {0};
+    memcpy_s(keyUuid, sizeof(keyUuid), key.uuid, strlen(key.uuid) + 1);
+    MMI_LOGT("\n OnEventKeyboard service DispatchKeyEvent keyUuid = %{public}s\n", keyUuid);
+    std::string keyEvent = keyUuid;
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, EVENT_KEY);
 #ifdef OHOS_AUTO_TEST_FRAME    // Send event to auto-test frame
     AutoTestCoordinate coordinate = { static_cast<double>(0), static_cast<double>(0), static_cast<double>(0),
         static_cast<double>(0) };

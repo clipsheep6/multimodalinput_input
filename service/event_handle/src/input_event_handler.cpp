@@ -21,6 +21,7 @@
 #include <inttypes.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include "bytrace.h"
 #include "input_device_manager.h"
 #include "mmi_server.h"
 #include "mouse_event_handler.h"
@@ -392,6 +393,7 @@ int32_t OHOS::MMI::InputEventHandler::OnEventKeyboard(multimodal_libinput_event 
     CHKR(ev.event, NULL_POINTER, NULL_POINTER);
     uint64_t preHandlerTime = GetSysClockTime();
     EventKeyboard key = {};
+    int32_t EVENT_KEY = 1;
     CHKR(udsServer_, NULL_POINTER, RET_ERR);
     auto packageResult = eventPackage_.PackageKeyEvent(*ev.event, key, *udsServer_);
     if (packageResult == MULTIDEVICE_SAME_EVENT_FAIL) { // The multi_device_same_event should be discarded
@@ -401,7 +403,11 @@ int32_t OHOS::MMI::InputEventHandler::OnEventKeyboard(multimodal_libinput_event 
         MMI_LOGE("Key event package failed... ret:%{public}d errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
         return KEY_EVENT_PKG_FAIL;
     }
-
+    char keyUuid[MAX_UUIDSIZE] = {0};
+    memcpy_s(keyUuid, sizeof(keyUuid), key.uuid, strlen(key.uuid) + 1);
+    MMI_LOGT("\n OnEventKeyboard service reported keyUuid = %{public}s\n", keyUuid);
+    std::string keyEvent = keyUuid;
+    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, EVENT_KEY);
     if (ServerKeyFilter->OnKeyEvent(key)) {
         MMI_LOGD("key event filter find a  key event from Original event  keyCode : %{puiblic}d", key.key);
         return RET_OK;
@@ -447,6 +453,7 @@ int32_t OHOS::MMI::InputEventHandler::OnEventKeyboard(multimodal_libinput_event 
 
 int32_t OHOS::MMI::InputEventHandler::OnEventPointer(multimodal_libinput_event &ev)
 {
+    int32_t EVENT_POINTER = 17;
     CHKR(ev.event, NULL_POINTER, NULL_POINTER);
     uint64_t preHandlerTime = GetSysClockTime();
     auto device = libinput_event_get_device(ev.event);
@@ -471,7 +478,11 @@ int32_t OHOS::MMI::InputEventHandler::OnEventPointer(multimodal_libinput_event &
                  packageResult, POINT_EVENT_PKG_FAIL);
         return POINT_EVENT_PKG_FAIL;
     }
-
+    char pointerUuid[MAX_UUIDSIZE] = {0};
+    memcpy_s(pointerUuid, sizeof(pointerUuid), point.uuid, strlen(point.uuid) + 1);
+    MMI_LOGT("\n OnEventPointer service reported pointerUuid = %{public}s\n", pointerUuid);
+    std::string pointerEvent = pointerUuid;
+    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, EVENT_POINTER);
     if (ServerKeyFilter->OnPointerEvent(point)) {
         MMI_LOGD("pointer event interceptor find a pointer event pointer button: %{puiblic}d", point.button);
         return RET_OK;
@@ -541,6 +552,7 @@ int32_t OHOS::MMI::InputEventHandler::OnEventTouchSecond(libinput_event &event)
 
 int32_t OHOS::MMI::InputEventHandler::OnEventTouch(multimodal_libinput_event &ev)
 {
+    int EVENT_TOUCH = 9;
     CHKR(ev.event, NULL_POINTER, NULL_POINTER);
     SInput::Loginfo_packaging_tool(*ev.event);
 #ifndef OHOS_WESTEN_MODEL
@@ -558,6 +570,11 @@ int32_t OHOS::MMI::InputEventHandler::OnEventTouch(multimodal_libinput_event &ev
                  packageResult, TOUCH_EVENT_PKG_FAIL);
         return TOUCH_EVENT_PKG_FAIL;
     }
+    char touchUuid[MAX_UUIDSIZE] = {0};
+    memcpy_s(touchUuid, sizeof(touchUuid), touch.uuid, strlen(touch.uuid) + 1);
+    MMI_LOGT("\n  OnEventTouch service reported touchUuid = %{public}s\n", touchUuid);
+    std::string touchEvent = touchUuid;
+    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, EVENT_TOUCH);
 #ifndef OHOS_WESTEN_MODEL
     if (ServerKeyFilter->OnTouchEvent(*udsServer_, *ev.event, touch, preHandlerTime, winSwitch_)) {
         return RET_OK;
