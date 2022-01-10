@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "bytrace.h"
 #include "input_filter_manager.h"
 #include "log.h"
 #include "mmi_client.h"
@@ -124,6 +125,11 @@ std::function<void(KeyBoardEvent)> InputFilterManager::KeyEventFilter::GetHandle
 int32_t InputFilterManager::OnKeyEvent(KeyBoardEvent event, int32_t id)
 {
     MMI_LOGD("client on key event call function handler ");
+    std::string keyUuid  = event.GetUuid();
+    const std::string keyEvent = keyUuid;
+    char *tmpPointer = (char*)keyEvent.c_str();
+    MMI_LOGT(" OnKey keyUuid = %{public}s\n", tmpPointer);
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, 1);
     for (auto item : keyEventFilterList_) {
         if (id == item.GetId()) {
             item.GetHandler()(event);
@@ -261,6 +267,11 @@ std::function<void(TouchEvent)> InputFilterManager::TouchEventFilter::GetHandler
 int32_t InputFilterManager::OnTouchEvent(TouchEvent event, int32_t id)
 {
     MMI_LOGE("client on touch event call function handler, id=%{public}d", id);
+    std::string touchUuid  = event.GetUuid();
+    const std::string touchEvent = touchUuid;
+    char *tmpTouch = (char*)touchEvent.c_str();
+    MMI_LOGT(" OnTouchEvent touchUuid = %{public}s\n", tmpTouch);
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, 3);
     for (auto iter : touchEventFilterList_) {
         if (id == iter.GetId()) {
             iter.GetHandler()(event);
@@ -373,6 +384,11 @@ std::function<void(MouseEvent)> InputFilterManager::PointerEventInterceptor::Get
 int32_t InputFilterManager::OnPointerEvent(MouseEvent event, int32_t id_)
 {
     MMI_LOGD("client on point event call function handler ");
+    std::string pointerUuid  = event.GetUuid();
+    const std::string pointerEvent = pointerUuid;
+    char *tmpPointer = (char*)pointerEvent.c_str();
+    MMI_LOGT(" OnPointerEvent pointerUuid = %{public}s\n", tmpPointer);
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, 2);
     for (auto item : PointerEventInterceptorList_)
     {
         if (id_ == item.GetId()) {
