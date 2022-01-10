@@ -114,12 +114,13 @@ int32_t MultimodalStandardizedEventManager::UnregisterStandardizedEventHandle(co
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnKey(const OHOS::KeyEvent& event)
 {
+    int32_t EVENT_KEY = 1;
     MMI_LOGT("\nMultimodalStandardizedEventManagerkey::OnKey\n");
     std::string keyUuid  = event.GetUuid();
     const std::string keyEvent = keyUuid;
     char *tmpPointer = (char*)keyEvent.c_str();
     MMI_LOGT("OnKey keyUuid = %{public}s\n", tmpPointer);
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, 1);
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, EVENT_KEY);
 #ifdef DEBUG_CODE_TEST
     if (event.GetDeviceUdevTags() == HOS_VIRTUAL_KEYBOARD) {
         MMI_LOGT("Inject keyCode = %{public}d,action = %{public}d,revPid = %{public}d",
@@ -138,12 +139,13 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnKey(const OHOS::KeyEven
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnTouch(const TouchEvent& event)
 {
+    int32_t EVENT_TOUCH = 9;
     MMI_LOGT("\nMultimodalStandardizedEventManagertouch::OnTouch\n");
     std::string touchUuid  = event.GetUuid();
     const std::string touchEvent = touchUuid;
     char *tmpTouch = (char*)touchEvent.c_str();
     MMI_LOGT("OnTouch touchUuid = %{public}s\n", tmpTouch);
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, 3);
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, EVENT_TOUCH);
     auto range = mapEvents_.equal_range(MmiMessageId::TOUCH_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.windowId == event.GetWindowID() && i->second.eventCallBack->OnTouch(event) == false) {

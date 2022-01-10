@@ -80,12 +80,13 @@ void ServerInputFilterManager::KeyEventFilter::SetAuthority(Authority authority)
 
 bool ServerInputFilterManager::OnKeyEvent(EventKeyboard key)
 {
+    int32_t EVENT_KEY = 1;
     MMI_LOGD("key event filter on key event begin");
     char keyUuid[MAX_UUIDSIZE] = {0};
     memcpy_s(keyUuid, sizeof(keyUuid), key.uuid, strlen(key.uuid) + 1);
     MMI_LOGT("\n OnKeyEvent service trace keyUuid = %{public}s\n", keyUuid);
     std::string keyEvent = keyUuid;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, 1);
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, EVENT_KEY);
     if (keyEventFilterMap_.size() == 0) {
         MMI_LOGD("keyEventFilterMap_ size is zero");
         return false;
@@ -230,12 +231,13 @@ void ServerInputFilterManager::OnEventTouchGetPointEventType(const EventTouch& t
 bool ServerInputFilterManager::OnTouchEvent(UDSServer& udsServer, libinput_event& event,
     EventTouch& touch, const uint64_t preHandlerTime, WindowSwitch& windowSwitch)
 {
+    int32_t EVENT_TOUCH = 9;
     MMI_LOGD("ServerInputFilterManager::OnTouchEvent");
     char touchUuid[MAX_UUIDSIZE] = {0};
     memcpy_s(touchUuid, sizeof(touchUuid), touch.uuid, strlen(touch.uuid) + 1);
     MMI_LOGT("\n OnTouchEvent service pointerUuid = %{public}s\n", touchUuid);
     std::string touchEvent = touchUuid;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, 3);
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, EVENT_TOUCH);
     if (touchEventFilterMap_.size() == 0) {
         MMI_LOGD("touchEventFilterMap_ size is zero");
         return false;
@@ -375,12 +377,13 @@ int32_t ServerInputFilterManager::RemoveTouchEventFilter(SessionPtr sess)
 
 bool ServerInputFilterManager::OnPointerEvent(EventPointer event_pointer)
 {
+    int32_t EVENT_POINTER = 17;
     MMI_LOGD("pointer event filter on pointer event begin");
     char pointerUuid[MAX_UUIDSIZE] = {0};
     memcpy_s(pointerUuid, sizeof(pointerUuid), event_pointer.uuid, strlen(event_pointer.uuid) + 1);
     MMI_LOGT("\n OnPointerEvent service pointerUuid = %{public}s\n", pointerUuid);
     std::string pointerEvent = pointerUuid;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, 2);
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, EVENT_POINTER);
     if (pointerEventFilterMap_.size() == 0) {
         MMI_LOGD("pointerEventFilterMap_ size is zero");
         return false;

@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "bytrace.h"
 #include "client_msg_handler.h"
 #include <iostream>
@@ -217,6 +218,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnKey(const UDSClient& client, NetPacket& p
     int32_t windowId = 0;
     int32_t fd = 0;
     uint64_t serverStartTime = 0;
+    int32_t EVENT_KEY = 1;
     EventKeyboard key = {};
     pkt >> key >> abilityId >> windowId >> fd >> serverStartTime;
     MMI_LOGT("\nevent dispatcher of client:\neventKeyboard:time=%{public}" PRId64 ";key=%{public}u;deviceId=%{public}u;"
@@ -227,7 +229,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnKey(const UDSClient& client, NetPacket& p
     memcpy_s(keyUuid, sizeof(keyUuid), key.uuid, strlen(key.uuid) + 1);
     MMI_LOGT("\n nevent dispatcher of client: keyUuid = %{public}s\n", keyUuid);
     std::string keyEvent = keyUuid;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, 1);
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, EVENT_KEY);
 #ifdef OHOS_AUTO_TEST_FRAME
     // Be used by auto-test frame!
     const AutoTestClientPkt autoTestClientKeyPkt = {
@@ -688,6 +690,7 @@ int32_t OHOS::MMI::ClientMsgHandler::KeyEventFilter(const UDSClient& client, Net
     EventKeyboard key = {};
     int32_t windowId = 0;
     int32_t id = 0;
+    int EVENT_KEY = 1;
     pkt >> key >>id;
     MMI_LOGT("\nkey event filter : event dispatcher of client:\neventKeyboard:time=%{public}" PRId64
         ";key=%{public}u;deviceId=%{private}u;"
@@ -697,7 +700,7 @@ int32_t OHOS::MMI::ClientMsgHandler::KeyEventFilter(const UDSClient& client, Net
     memcpy_s(keyUuid, sizeof(keyUuid), key.uuid, strlen(key.uuid) + 1);
     MMI_LOGT("\nkey event filter : keyUuid = %{public}s\n", keyUuid);
     std::string keyEvent = keyUuid;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, 1);
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, EVENT_KEY);
     KeyBoardEvent event;
     int32_t deviceEventType = KEY_EVENT;
     event.Initialize(windowId, 0, 0, 0, 0, 0, key.state, key.key, 0, 0, key.uuid, key.eventType,
@@ -715,6 +718,7 @@ int32_t OHOS::MMI::ClientMsgHandler::TouchEventFilter(const UDSClient& client, N
     int32_t fingerCount = 0;
     int32_t eventAction = 0;
     uint64_t serverStartTime = 0;
+    int32_t EVENT_TOUCH = 9;
     EventTouch touchData = {};
     MmiPoint mmiPoint;
     pkt >> fingerCount >> eventAction >> abilityId >> windowId >> fd >> serverStartTime;
@@ -743,7 +747,7 @@ int32_t OHOS::MMI::ClientMsgHandler::TouchEventFilter(const UDSClient& client, N
     memcpy_s(touchUuid, sizeof(touchUuid), touchData.uuid, strlen(touchData.uuid) + 1);
     MMI_LOGT("\n touch event filter: touchUuid = %{public}s\n", touchUuid);
     std::string touchEventString = touchUuid;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEventString, 3);
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEventString, EVENT_TOUCH);
 
     TouchEvent event;
     int32_t deviceEventType = TOUCH_EVENT;
@@ -766,6 +770,7 @@ int32_t OHOS::MMI::ClientMsgHandler::PointerEventInterceptor(const UDSClient& cl
     EventJoyStickAxis eventJoyStickAxis = {};
     int32_t windowId = 0;
     int32_t id = 0;
+    int32_t EVENT_POINTER = 17;
     pkt >> pointData >> id;
     int32_t action = pointData.state;
     MmiPoint mmiPoint;
@@ -783,7 +788,7 @@ int32_t OHOS::MMI::ClientMsgHandler::PointerEventInterceptor(const UDSClient& cl
     memcpy_s(pointerUuid, sizeof(pointerUuid), pointData.uuid, strlen(pointData.uuid) + 1);
     MMI_LOGT("\n pointer event filter: pointDataUuid = %{public}s\n", pointerUuid);
     std::string pointerEventString = pointerUuid;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventString, 2);
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventString, EVENT_POINTER);
     MouseEvent mouse_event;
     mouse_event.Initialize(windowId, action, pointData.button, pointData.state, mmiPoint,
         static_cast<float>(pointData.discrete.x), static_cast<float>(pointData.discrete.y),
@@ -831,6 +836,7 @@ void OHOS::MMI::ClientMsgHandler::AnalysisPointEvent(const UDSClient& client, Ne
     int32_t fd = 0;
     int32_t deviceEventType = 0;
     uint64_t serverStartTime = 0;
+    int32_t EVENT_POINTER = 17;
     int32_t ret = RET_ERR;
     EventPointer pointData = {};
     StandardTouchStruct standardTouch = {};
@@ -851,7 +857,7 @@ void OHOS::MMI::ClientMsgHandler::AnalysisPointEvent(const UDSClient& client, Ne
     memcpy_s(pointerUuid, sizeof(pointerUuid), pointData.uuid, strlen(pointData.uuid) + 1);
     MMI_LOGT("\n nevent dispatcher of client: pointerUuid = %{public}s\n", pointerUuid);
     std::string pointerEvent = pointerUuid;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, 2);
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, EVENT_POINTER);
 
 #ifdef OHOS_AUTO_TEST_FRAME
     // Be used by auto-test frame!
@@ -906,6 +912,7 @@ void OHOS::MMI::ClientMsgHandler::AnalysisTouchEvent(const UDSClient& client, Ne
     int32_t eventAction = 0;
     int32_t seatSlot = 0;
     uint64_t serverStartTime = 0;
+    int32_t EVENT_TOUCH = 9;
     EventTouch touchData = {};
     MmiPoint mmiPoint;
     pkt >> fingerCount >> eventAction >> abilityId >> windowId >> fd >> serverStartTime >> seatSlot;
@@ -933,7 +940,7 @@ void OHOS::MMI::ClientMsgHandler::AnalysisTouchEvent(const UDSClient& client, Ne
     memcpy_s(touchUuid, sizeof(touchUuid), touchData.uuid, strlen(touchData.uuid) + 1);
     MMI_LOGT("\n nevent dispatcher of client: touchUuid = %{public}s\n", touchUuid);
     std::string touchEventString = touchUuid;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEventString, 3);
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEventString, EVENT_TOUCH);
 
     TouchEvent touchEvent;
     int32_t deviceEventType = TOUCH_EVENT;
