@@ -186,7 +186,7 @@ void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::s
 void InputHandlerManagerGlobal::MonitorCollection::Monitor(std::shared_ptr<PointerEvent> pointerEvent)
 {
     std::lock_guard<std::mutex> guard(lockMonitors_);
-    MMI_LOGD("There are currently %{public}d monitors.", monitors_.size());
+    MMI_LOGD("There are currently %{public}d monitors.", static_cast<int32_t>(monitors_.size()));
     for (const SessionMonitor& mon : monitors_) {
         mon.SendToClient(pointerEvent);
     }

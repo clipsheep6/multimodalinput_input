@@ -166,7 +166,7 @@ bool KeyEventInputSubscribeFilter::MatchPreKeysIsPressed(int32_t keyAction,
         }
         ++preKeyCount;
     }
-    MMI_LOGD("preKeyCount=%{public}d,pressedKeySize=%{public}d", preKeyCount, pressedKeys.size());
+    MMI_LOGD("preKeyCount=%{public}d,pressedKeySize=%{public}d", preKeyCount, static_cast<int32_t>(pressedKeys.size()));
     if (keyAction == OHOS::MMI::KeyEvent::KEY_ACTION_DOWN && preKeyCount == (pressedKeys.size() - 1)) {
         return true;
     } else if (keyAction == OHOS::MMI::KeyEvent::KEY_ACTION_UP && preKeyCount == pressedKeys.size()) {
