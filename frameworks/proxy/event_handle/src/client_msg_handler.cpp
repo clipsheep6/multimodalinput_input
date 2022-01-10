@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
-#include "bytrace.h"
 #include "client_msg_handler.h"
 #include <iostream>
 #include <inttypes.h>
 #include "mmi_func_callback.h"
 #include "auto_test_multimodal.h"
+#include "bytrace.h"
 #include "event_factory.h"
 #include "input_device_event.h"
 #include "input_event_data_transformation.h"

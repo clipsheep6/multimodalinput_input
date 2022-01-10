@@ -14,8 +14,8 @@
  */
 
 #include "event_dispatch.h"
-#include "bytrace.h"
 #include <inttypes.h>
+#include "bytrace.h"
 #include "input_event_data_transformation.h"
 #include "input_event_monitor_manager.h"
 #include "input_handler_manager_global.h"

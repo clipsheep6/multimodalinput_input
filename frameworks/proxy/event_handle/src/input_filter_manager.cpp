@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include "bytrace.h"
 #include "input_filter_manager.h"
+#include "bytrace.h"
 #include "log.h"
 #include "mmi_client.h"
 
