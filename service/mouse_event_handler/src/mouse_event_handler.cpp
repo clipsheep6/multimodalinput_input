@@ -17,9 +17,7 @@
 #include <thread>
 #include "input_windows_manager.h"
 #include "libmmi_util.h"
-#include "mouse_event.h"
 #include "util.h"
-
 
 static double g_coordinateX = 0;
 static double g_coordinateY = 0;
@@ -42,25 +40,17 @@ OHOS::MMI::MouseEventHandler::~MouseEventHandler()
 
 void OHOS::MMI::MouseEventHandler::CalcMovedCoordinate(struct libinput_event_pointer& pointEventData)
 {
-    if (libinput_event_pointer_get_dx(&pointEventData) != 0) {
-        g_coordinateX += libinput_event_pointer_get_dx(&pointEventData);
-    }
-    if (libinput_event_pointer_get_dy(&pointEventData) != 0) {
-        g_coordinateY += libinput_event_pointer_get_dy(&pointEventData);
-    }
+    g_coordinateX += libinput_event_pointer_get_dx(&pointEventData);
+    g_coordinateY += libinput_event_pointer_get_dy(&pointEventData);
 
     WinMgr->AdjustCoordinate(g_coordinateX, g_coordinateY);
     MMI_LOGI("g_coordinateX is : %{public}lf, g_coordinateY is : %{public}lf", g_coordinateX, g_coordinateY);
 }
 
-void OHOS::MMI::MouseEventHandler::SetMouseMotion(MouseInfo info, PointerEvent::PointerItem& pointerItem)
+void OHOS::MMI::MouseEventHandler::SetMouseMotion(PointerEvent::PointerItem& pointerItem)
 {
     this->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     this->SetButtonId(g_btnId);
-    pointerItem.SetGlobalX(info.globleX);
-    pointerItem.SetGlobalY(info.globleY);
-    pointerItem.SetLocalX(info.localX);
-    pointerItem.SetLocalY(info.localY);
     pointerItem.SetPressed(g_isPressed);
 }
 
@@ -68,15 +58,14 @@ void OHOS::MMI::MouseEventHandler::SetMouseButon(PointerEvent::PointerItem& poin
                                                  struct libinput_event_pointer& pointEventData)
 {
     bool isPressed = false;
-    MouseInfo info = WinMgr->GetMouseInfo();
 
-    if (libinput_event_pointer_get_button(&pointEventData) == LEFT_BUTTON) {
+    if (libinput_event_pointer_get_button(&pointEventData) == BTN_LEFT) {
         this->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
         g_btnId = this->GetButtonId();
-    } else if (libinput_event_pointer_get_button(&pointEventData) == RIGHT_BUTTON) {
+    } else if (libinput_event_pointer_get_button(&pointEventData) == BTN_RIGHT) {
         this->SetButtonId(PointerEvent::MOUSE_BUTTON_RIGHT);
         g_btnId = this->GetButtonId();
-    } else if (libinput_event_pointer_get_button(&pointEventData) == MIDDLE_BUTTON) {
+    } else if (libinput_event_pointer_get_button(&pointEventData) == BTN_MIDDLE) {
         this->SetButtonId(PointerEvent::MOUSE_BUTTON_MIDDLE);
         g_btnId = this->GetButtonId();
     } else {
@@ -96,10 +85,6 @@ void OHOS::MMI::MouseEventHandler::SetMouseButon(PointerEvent::PointerItem& poin
     }
 
     pointerItem.SetPressed(isPressed);
-    pointerItem.SetGlobalX(info.globleX);
-    pointerItem.SetGlobalY(info.globleY);
-    pointerItem.SetLocalX(info.localX);
-    pointerItem.SetLocalY(info.localY);
 }
 
 void OHOS::MMI::MouseEventHandler::SetMouseAxis(struct libinput_event_pointer& pointEventData)
@@ -124,11 +109,11 @@ void OHOS::MMI::MouseEventHandler::SetMouseData(libinput_event& event, int32_t d
     OHOS::MMI::PointerEvent::PointerItem pointerItem;
     struct libinput_event_pointer *pointEventData = nullptr;
     pointEventData = libinput_event_get_pointer_event(&event);
-    uint64_t time = libinput_event_pointer_get_time_usec(pointEventData);
     int32_t type = libinput_event_get_type(&event);
+    static MouseInfo info = { static_cast<double>(0), static_cast<double>(0), static_cast<double>(0), static_cast<double>(0) };
 
     this->SetActionTime(static_cast<int32_t>(GetSysClockTime()));
-    this->SetActionStartTime(static_cast<int32_t>(time));
+    this->SetActionStartTime(static_cast<int32_t>(libinput_event_pointer_get_time_usec(pointEventData)));
     this->SetDeviceId(deviceId);
     this->SetPointerId(0);
     this->SetTargetDisplayId(0);
@@ -145,10 +130,9 @@ void OHOS::MMI::MouseEventHandler::SetMouseData(libinput_event& event, int32_t d
     if ((type == LIBINPUT_EVENT_POINTER_MOTION) || (type == LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE)) {
         CalcMovedCoordinate(*pointEventData);
         WinMgr->SetMouseInfo(g_coordinateX, g_coordinateY);
-        MMI_LOGI("Change Coordinate : g_coordinateX = %{public}lf, g_coordinateY = %{public}lf",
-                 g_coordinateX, g_coordinateY);
-        MouseInfo info = WinMgr->GetMouseInfo();
-        this->SetMouseMotion(info, pointerItem);
+        MMI_LOGI("Change Coordinate : g_coordinateX = %{public}lf, g_coordinateY = %{public}lf", g_coordinateX, g_coordinateY);
+        info = WinMgr->GetMouseInfo();
+        this->SetMouseMotion(pointerItem);
     } else if (type == LIBINPUT_EVENT_POINTER_BUTTON) {
         this->SetMouseButon(pointerItem, *pointEventData);
     } else if (type == LIBINPUT_EVENT_POINTER_AXIS) {
@@ -156,11 +140,15 @@ void OHOS::MMI::MouseEventHandler::SetMouseData(libinput_event& event, int32_t d
     }
 
     pointerItem.SetPointerId(0);
-    pointerItem.SetDownTime(static_cast<int32_t>(time));
+    pointerItem.SetDownTime(static_cast<int32_t>(libinput_event_pointer_get_time_usec(pointEventData)));
     pointerItem.SetWidth(0);
     pointerItem.SetHeight(0);
     pointerItem.SetPressure(0);
     pointerItem.SetDeviceId(deviceId);
+    pointerItem.SetGlobalX(info.globleX);
+    pointerItem.SetGlobalY(info.globleY);
+    pointerItem.SetLocalX(info.localX);
+    pointerItem.SetLocalY(info.localY);
     this->AddPointerItem(pointerItem);
 }
 
