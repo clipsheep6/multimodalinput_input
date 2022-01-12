@@ -110,7 +110,8 @@ void OHOS::MMI::MouseEventHandler::SetMouseData(libinput_event& event, int32_t d
     struct libinput_event_pointer *pointEventData = nullptr;
     pointEventData = libinput_event_get_pointer_event(&event);
     int32_t type = libinput_event_get_type(&event);
-    static MouseInfo info = { static_cast<double>(0), static_cast<double>(0), static_cast<double>(0), static_cast<double>(0) };
+    static MouseInfo info = { static_cast<double>(0), static_cast<double>(0),
+                              static_cast<double>(0), static_cast<double>(0) };
 
     this->SetActionTime(static_cast<int32_t>(GetSysClockTime()));
     this->SetActionStartTime(static_cast<int32_t>(libinput_event_pointer_get_time_usec(pointEventData)));
@@ -130,7 +131,8 @@ void OHOS::MMI::MouseEventHandler::SetMouseData(libinput_event& event, int32_t d
     if ((type == LIBINPUT_EVENT_POINTER_MOTION) || (type == LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE)) {
         CalcMovedCoordinate(*pointEventData);
         WinMgr->SetMouseInfo(g_coordinateX, g_coordinateY);
-        MMI_LOGI("Change Coordinate : g_coordinateX = %{public}lf, g_coordinateY = %{public}lf", g_coordinateX, g_coordinateY);
+        MMI_LOGI("Change Coordinate : g_coordinateX = %{public}lf, g_coordinateY = %{public}lf",
+                 g_coordinateX, g_coordinateY);
         info = WinMgr->GetMouseInfo();
         this->SetMouseMotion(pointerItem);
     } else if (type == LIBINPUT_EVENT_POINTER_BUTTON) {
