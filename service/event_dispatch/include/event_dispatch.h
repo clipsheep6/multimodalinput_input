@@ -53,6 +53,9 @@ public:
     bool HandleTouchScreenEvent(std::shared_ptr<PointerEvent> point);
     bool HandleMouseEvent(std::shared_ptr<PointerEvent> point);
     bool HandleTouchPadEvent(std::shared_ptr<PointerEvent> point);
+    void DispatchKeyEventTrace(const EventKeyboard& key);
+    void DispatchTouchEventTrace(const EventTouch& touch);
+    void DispatchPointerEventTrace(const EventPointer& point);
 #ifdef OHOS_AUTO_TEST_FRAME
     int32_t SendLibPktToAutoTest(UDSServer& udsServer, const AutoTestLibinputPkt& autoTestLibinputPkt);
     int32_t SendMappingPktToAutoTest(UDSServer& udsServer, int32_t sourceType);

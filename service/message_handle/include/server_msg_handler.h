@@ -70,6 +70,7 @@ protected:
     int32_t OnUnSubscribeKeyEvent(SessionPtr sess, NetPacket& pkt);
     int32_t OnAddTouchpadEventFilter(SessionPtr sess, NetPacket& pkt);
     int32_t OnRemoveTouchpadEventFilter(SessionPtr sess, NetPacket& pkt);
+    void OnInjectKeyEventTrace(const struct EventKeyboard& key);
 #ifdef OHOS_AUTO_TEST_FRAME
     int32_t AutoTestFrameRegister(SessionPtr sess, NetPacket& pkt);
     int32_t AutoTestReceiveClientPkt(SessionPtr sess, NetPacket& pkt);

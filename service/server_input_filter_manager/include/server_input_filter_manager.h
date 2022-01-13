@@ -46,6 +46,7 @@ public:
     int32_t AddKeyEventFilter(SessionPtr sess, std::string name, int32_t id, Authority authority);
     int32_t RemoveKeyEventFilter(SessionPtr sess, int32_t id);
     void DeleteFilterFromSess(SessionPtr sess);
+    void OnKeyEventTrace(const EventKeyboard& key);
 
 public:
     class TouchEventFilter {
@@ -64,6 +65,7 @@ public:
         std::string name_;
         Authority authority_;
     };
+    void OnTouchEventTrace(const EventTouch& touch);
     bool OnTouchEvent(UDSServer& udsServer, libinput_event& event, EventTouch& touch,
         const uint64_t preHandlerTime, WindowSwitch& windowSwitch);
     int32_t AddTouchEventFilter(SessionPtr sess, std::string name, int32_t id, Authority authority);
@@ -92,6 +94,7 @@ public:
         std::string name, Authority authority);
     int32_t UnregisterEventInterceptorforServer(const SessionPtr& sess, int32_t id);
     void DeleteInterceptorFormSess(const SessionPtr& sess);
+    void OnPointerEventTrace(const EventPointer& event_pointer);
 
 protected:
     void OnEventTouchGetPointEventType(const EventTouch& touch, POINT_EVENT_TYPE& pointEventType,
