@@ -33,9 +33,7 @@ config("libinputeventclient_config") {
     "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
   ]
 
-  cflags = [
-    "-DOHOS_BUILD",
-  ]
+  cflags = [ "-DOHOS_BUILD" ]
   if (is_mmi_have_libinput) {
     cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
   }
