@@ -262,9 +262,6 @@ bool ServerInputFilterManager::OnTouchEvent(UDSServer& udsServer, libinput_event
     }
     MMI_LOGD("DispatchTouchEvent focusId:%{public}d fd:%{public}d", touchFocusId, appInfo.fd);
 
-    int32_t testConnectState = 0;
-    int32_t testBufferState = 0;
-
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_TOUCH, appInfo.fd, touch.time)) {
         NetPacket newPacket(MmiMessageId::TOUCH_EVENT_INTERCEPTOR);
         int32_t fingerCount = MMIRegEvent->GetTouchInfoSizeByDeviceId(touch.deviceId);
