@@ -33,7 +33,7 @@ public:
 protected:
     explicit MouseEventHandler(int32_t eventType);
 
-    void SetMouseMotion(MouseInfo info, PointerEvent::PointerItem &pointerItem);
+    void SetMouseMotion(PointerEvent::PointerItem &pointerItem);
     void SetMouseButon(PointerEvent::PointerItem &pointerItem, struct libinput_event_pointer& pointEventData);
     void SetMouseAxis(struct libinput_event_pointer& pointEventData);
     void CalcMovedCoordinate(struct libinput_event_pointer &pointEventData);
