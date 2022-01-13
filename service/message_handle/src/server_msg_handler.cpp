@@ -17,6 +17,7 @@
 #include <inttypes.h>
 #include "mmi_func_callback.h"
 #include "ai_func_proc.h"
+#include "bytrace.h"
 #include "event_dump.h"
 #include "event_package.h"
 #include "input_device_manager.h"
@@ -387,6 +388,19 @@ int32_t OHOS::MMI::ServerMsgHandler::GetMultimodeInputInfo(SessionPtr sess, NetP
     return RET_OK;
 }
 
+void OHOS::MMI::ServerMsgHandler::OnInjectKeyEventTrace(const struct EventKeyboard& key)
+{
+    int32_t EVENT_KEY = 1;
+    char keyUuid[MAX_UUIDSIZE] = {0};
+    if (EOK != memcpy_s(keyUuid, sizeof(keyUuid), key.uuid, sizeof(key.uuid))) {
+        MMI_LOGT("%{public}s copy data failed", __func__);
+        return;
+    }
+    MMI_LOGT("\n OnEventKeyboard service DispatchKeyEvent keyUuid = %{public}s\n", keyUuid);
+    std::string keyEvent = keyUuid;
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, EVENT_KEY);
+}
+
 int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket& pkt)
 {
     CHKR(sess, NULL_POINTER, RET_ERR);
@@ -413,6 +427,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
         event.isPressed, event.isIntercepted);
     struct EventKeyboard key = {};
     auto packageResult = EventPackage::PackageVirtualKeyEvent(event, key, *udsServer_);
+    OnInjectKeyEventTrace(key);
     if (packageResult == RET_ERR) {
         return RET_ERR;
     }

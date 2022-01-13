@@ -53,6 +53,9 @@ protected:
     int32_t OnKeyboardEvent(libinput_event& event);
     int32_t OnMouseEventHandler(libinput_event& event, const int32_t deviceId);
     bool SendMsg(const int32_t fd, NetPacket& pkt) const;
+    void OnEventKeyboardTrace(const EventKeyboard& key);
+    void OnEventPointerTrace(const EventPointer& point);
+    void OnEventTouchTrace(const struct EventTouch& touch);
 #ifndef OHOS_AUTO_TEST_FRAME
     bool OnSystemEvent(const KeyEventValueTransformations& temp, const enum KEY_STATE state) const;
 #else

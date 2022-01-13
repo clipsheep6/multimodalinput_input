@@ -14,6 +14,7 @@
  */
 
 #include "multimodal_standardized_event_manager.h"
+#include "bytrace.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "immi_token.h"
@@ -110,6 +111,15 @@ int32_t MultimodalStandardizedEventManager::UnregisterStandardizedEventHandle(co
     return OHOS::MMI_STANDARD_EVENT_SUCCESS;
 }
 
+void OHOS::MMI::MultimodalStandardizedEventManager::OnkeyTrace(const OHOS::KeyEvent& event)
+{
+    int32_t EVENT_KEY = 1;
+    const std::string keyEvent = event.GetUuid();
+    char *tmpPointer = (char*)keyEvent.c_str();
+    MMI_LOGT("OnKey keyUuid = %{public}s\n", tmpPointer);
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, EVENT_KEY);
+}
+
 int32_t MultimodalStandardizedEventManager::SubscribeKeyEvent(
     const KeyEventInputSubscribeManager::SubscribeKeyEventInfo &subscribeInfo)
 {
@@ -141,6 +151,7 @@ int32_t MultimodalStandardizedEventManager::UnSubscribeKeyEvent(int32_t subscrib
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnKey(const OHOS::KeyEvent& event)
 {
     MMI_LOGT("\nMultimodalStandardizedEventManagerkey::OnKey\n");
+    OnkeyTrace(event);
 #ifdef DEBUG_CODE_TEST
     if (event.GetDeviceUdevTags() == HOS_VIRTUAL_KEYBOARD) {
         MMI_LOGT("Inject keyCode = %{public}d,action = %{public}d,revPid = %{public}d",
@@ -157,9 +168,19 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnKey(const OHOS::KeyEven
     return RET_OK;
 }
 
+void OHOS::MMI::MultimodalStandardizedEventManager::OnTouchTrace(const TouchEvent& event)
+{
+    int32_t EVENT_TOUCH = 9; 
+    const std::string touchEvent = event.GetUuid();
+    char *tmpTouch = (char*)touchEvent.c_str();
+    MMI_LOGT("OnTouch touchUuid = %{public}s\n", tmpTouch);
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, EVENT_TOUCH);
+}
+
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnTouch(const TouchEvent& event)
 {
     MMI_LOGT("\nMultimodalStandardizedEventManagertouch::OnTouch\n");
+    OnTouchTrace(event);
     auto range = mapEvents_.equal_range(MmiMessageId::TOUCH_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.windowId == event.GetWindowID() && i->second.eventCallBack->OnTouch(event) == false) {
