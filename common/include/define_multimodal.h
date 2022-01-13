@@ -74,64 +74,98 @@
 #endif
 
 #ifdef DEBUG_CODE_TEST
-#define CK(msg, ec) \
-    if (!(msg)) { \
-        MMI_LOGE("%{public}s(%{public}d): CK(%{public}s) errCode:%{public}d", __FILE__, __LINE__, #msg, ec); \
-    }
+#define CK(condition, errCode) \
+    do { \
+        if (!(condition)) { \
+            MMI_LOGE("%{public}s, (%{public}d), CK(%{public}s), errCode:%{public}d", __FILE__, __LINE__, #condition, errCode); \
+        } \
+    } while (0)
 
-#define CHK(msg, ec) \
-    if (!(msg)) { \
-        MMI_LOGE("%{public}s(%{public}d): CHK(%{public}s) errCode:%{public}d", __FILE__, __LINE__, #msg, ec); \
-        return; \
-    }
+#define CHK(condition, errCode) \
+    do { \
+        if (!(condition)) { \
+            MMI_LOGE("%{public}s, (%{public}d), CHK(%{public}s), errCode:%{public}d", __FILE__, __LINE__, #condition, errCode); \
+            return; \
+        } \
+    } while (0)
 
-#define CHKF(msg, ec) \
-    if (!(msg)) { \
-        MMI_LOGE("%{public}s(%{public}d): CHKF(%{public}s) errCode:%{public}d", __FILE__, __LINE__, #msg, ec); \
-        return 0; \
-    }
+#define CHKF(condition, errCode) \
+    do { \
+        if (!(condition)) { \
+            MMI_LOGE("%{public}s, (%{public}d), CHKF(%{public}s), errCode:%{public}d", __FILE__, __LINE__, #condition, errCode); \
+            return 0; \
+        } \
+    } while (0)
 
-#define CHKC(msg, ec) \
-    if (!(msg)) { \
-        MMI_LOGE("%{public}s(%{public}d): CHKC(%{public}s) errCode:%{public}d", __FILE__, __LINE__, #msg, ec); \
-        continue; \
-    }
+#define CHKC(condition, errCode) \
+    do { \
+        if (!(condition)) { \
+            MMI_LOGE("%{public}s, (%{public}d), CHKC(%{public}s), errCode:%{public}d", __FILE__, __LINE__, #condition, errCode); \
+            continue; \
+        } \
+    } while (0)
 
-#define CHKR(msg, ec, r) \
-    if (!(msg)) { \
-        MMI_LOGE("%{public}s(%{public}d): CHKR(%{public}s) errCode:%{public}d", __FILE__, __LINE__, #msg, ec); \
-        return r; \
-    }
+#define CHKR(condition, errCode, ret) \ 
+    do { \
+        if (!(condition)) { \
+            MMI_LOGE("%{public}s, (%{public}d), CHKR(%{public}s), errCode:%{public}d", __FILE__, __LINE__, #condition, errCode); \
+            return ret; \
+        } \
+    } while (0)
 #else
-#define CK(msg, ec) \
-    if (!(msg)) { \
-        MMI_LOGE("CK(%{public}s) errCode:%{public}d", #msg, ec); \
-    }
+#define CK(condition, errCode) \
+    do { \
+        if (!(condition)) { \
+            MMI_LOGE("CK(%{public}s), errCode:%{public}d", #condition, errCode); \
+        } \
+    } while (0)
 
-#define CHK(msg, ec) \
-    if (!(msg)) { \
-        MMI_LOGE("CHK(%{public}s) errCode:%{public}d", #msg, ec); \
-        return; \
-    }
+#define CHK(condition, errCode) \
+    do { \
+        if (!(condition)) { \
+            MMI_LOGE("CHK(%{public}s), errCode:%{public}d", #condition, errCode); \
+            return; \
+        } \
+    } while (0)
 
-#define CHKF(msg, ec) \
-    if (!(msg)) { \
-        MMI_LOGE("CHKF(%{public}s) errCode:%{public}d", #msg, ec); \
-        return 0; \
-    }
+#define CHKF(condition, errCode) \
+    do { \
+         if (!(condition)) { \
+            MMI_LOGE("CHKF(%{public}s), errCode:%{public}d", #condition, errCode); \
+            return 0; \
+        } \
+    } while (0)
 
-#define CHKC(msg, ec) \
-    if (!(msg)) { \
-        MMI_LOGE("CHKC(%{public}s) errCode:%{public}d", #msg, ec); \
-        continue; \
-    }
+#define CHKC(condition, errCode) \
+    do { \
+        if (!(condition)) { \
+            MMI_LOGE("CHKC(%{public}s), errCode:%{public}d", #condition, errCode); \
+            continue; \
+        } \
+    } while (0)
 
-#define CHKR(msg, ec, r) \
-    if (!(msg)) { \
-        MMI_LOGE("CHKR(%{public}s) errCode:%{public}d", #msg, ec); \
-        return r; \
-    }
+#define CHKR(condition, errCode, ret) \
+    do { \
+        if (!(condition)) { \
+            MMI_LOGE("CHKR(%{public}s), errCode:%{public}d", #condition, errCode); \
+            return ret; \
+        } \
+    } while (0)
+
+#define CHECK_POINTER(condition, errCode, ret) \
+    do { \
+        if ((condition) == nullptr) { \
+            MMI_LOGE("CHECK_POINTER(%{public}s), errCode:%{public}d", #condition, errCode); \
+            return ret; \
+        } \
+    } while (0)
+
+#define CHECK_BOOL(condition, errCode, ret) \
+    do { \
+        if (!(condition)) { \
+            MMI_LOGE("CHECK_BOOL(%{public}s), errCode:%{public}d", #condition, errCode); \
+            return ret; \
+        } \
+    } while (0)
 #endif
-
-
 #endif
