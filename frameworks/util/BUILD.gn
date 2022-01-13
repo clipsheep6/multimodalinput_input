@@ -109,7 +109,6 @@ ohos_unittest("ut-mmi-util-out") {
 
   cflags = [
     "-DOHOS_BUILD",
-    "-DOHOS_AUTO_TEST_FRAME",
   ]
 
   if (is_mmi_have_debug) {
@@ -176,7 +175,6 @@ ohos_unittest("RunShellUtilTest") {
 
   cflags = [
     "-DOHOS_BUILD",
-    "-DOHOS_AUTO_TEST_FRAME",
   ]
 
   if (is_mmi_have_debug) {
