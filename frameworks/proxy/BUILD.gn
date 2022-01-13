@@ -43,10 +43,6 @@ ohos_shared_library("libmmi-common") {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
   }
 
-  if (is_mmi_have_st_test) {
-    cflags += [ "-DOHOS_AUTO_TEST_FRAME" ]
-  }
-
   configs = [ ":libmmi_client_config" ]
 
   public_configs = [ ":libmmi_client_config" ]
@@ -101,10 +97,6 @@ ohos_shared_library("libmmi-client") {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
   }
 
-  if (is_mmi_have_st_test) {
-    cflags += [ "-DOHOS_AUTO_TEST_FRAME" ]
-  }
-
   if (is_mmi_have_weston) {
     cflags += [ "-DOHOS_WESTEN_MODEL" ]
   }
@@ -154,7 +146,6 @@ ohos_unittest("ut-mmi-proxy-out") {
 
   cflags = [
     "-DOHOS_BUILD",
-    "-DOHOS_AUTO_TEST_FRAME",
   ]
 
   if (is_mmi_have_debug) {
@@ -244,7 +235,6 @@ ohos_unittest("MultimodalinputEventHandlerTest") {
 
   cflags = [
     "-DOHOS_BUILD",
-    "-DOHOS_AUTO_TEST_FRAME",
   ]
 
   if (is_mmi_have_debug) {
@@ -303,7 +293,6 @@ ohos_unittest("InputManagerTest") {
 
   cflags = [
     "-DOHOS_BUILD",
-    "-DOHOS_AUTO_TEST_FRAME",
   ]
 
   if (is_mmi_have_debug) {
@@ -362,7 +351,6 @@ ohos_unittest("PointerEventTest") {
 
   cflags = [
     "-DOHOS_BUILD",
-    "-DOHOS_AUTO_TEST_FRAME",
   ]
 
   if (is_mmi_have_debug) {

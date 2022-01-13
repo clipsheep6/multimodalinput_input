@@ -137,7 +137,6 @@ ohos_unittest("ut-virtual-device-out") {
 
   cflags = [
     "-DOHOS_BUILD",
-    "-DOHOS_AUTO_TEST_FRAME",
   ]
 
   if (is_mmi_have_debug) {
