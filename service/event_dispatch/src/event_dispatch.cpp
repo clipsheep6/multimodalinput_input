@@ -951,7 +951,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinpu
     const KeyEventValueTransformations& trs, EventKeyboard& key, const uint64_t preHandlerTime)
 {
     auto device = libinput_event_get_device(&event);
-    CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHECK_POINTER(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
     int32_t ret = RET_OK;
     ret = KeyBoardRegisteredEventHandler(key, udsServer, event, INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);

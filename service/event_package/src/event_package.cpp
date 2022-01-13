@@ -697,7 +697,7 @@ int32_t EventPackage::PackageDeviceManageEvent(libinput_event& event, DeviceMana
 int32_t EventPackage::PackageKeyEvent(libinput_event& event, EventKeyboard& key, UDSServer& udsServer)
 {
     auto data = libinput_event_get_keyboard_event(&event);
-    CHKR(data, NULL_POINTER, RET_ERR);
+    CHECK_POINTER(data, NULL_POINTER, RET_ERR);
     key.key = libinput_event_keyboard_get_key(data);
     auto ret = PackageEventDeviceInfo<EventKeyboard>(event, key, udsServer);
     if (ret != RET_OK) {

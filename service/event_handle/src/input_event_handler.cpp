@@ -324,7 +324,7 @@ int32_t OHOS::MMI::InputEventHandler::OnKeyboardEvent(libinput_event &event)
 {
     uint64_t preHandlerTime = GetSysClockTime();
     EventKeyboard key = {};
-    CHKR(udsServer_, NULL_POINTER, RET_ERR);
+    CHECK_POINTER(udsServer_, NULL_POINTER, RET_ERR);
     auto packageResult = eventPackage_.PackageKeyEvent(event, key, *udsServer_);
     if (packageResult == MULTIDEVICE_SAME_EVENT_FAIL) { // The multi_device_same_event should be discarded
         return RET_OK;
@@ -389,10 +389,10 @@ int32_t OHOS::MMI::InputEventHandler::OnKeyboardEvent(libinput_event &event)
 
 int32_t OHOS::MMI::InputEventHandler::OnEventKeyboard(multimodal_libinput_event &ev)
 {
-    CHKR(ev.event, NULL_POINTER, NULL_POINTER);
+    CHECK_POINTER(ev.event, NULL_POINTER, NULL_POINTER);
     uint64_t preHandlerTime = GetSysClockTime();
     EventKeyboard key = {};
-    CHKR(udsServer_, NULL_POINTER, RET_ERR);
+    CHECK_POINTER(udsServer_, NULL_POINTER, RET_ERR);
     auto packageResult = eventPackage_.PackageKeyEvent(*ev.event, key, *udsServer_);
     if (packageResult == MULTIDEVICE_SAME_EVENT_FAIL) { // The multi_device_same_event should be discarded
         return RET_OK;
