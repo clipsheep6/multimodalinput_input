@@ -105,10 +105,26 @@
         } \
     } while (0)
 
-#define CHKR(condition, errCode, ret) \ 
+#define CHKR(condition, errCode, ret) \
     do { \
         if (!(condition)) { \
             MMI_LOGE("%{public}s, (%{public}d), CHKR(%{public}s), errCode:%{public}d", __FILE__, __LINE__, #condition, errCode); \
+            return ret; \
+        } \
+    } while (0)
+
+#define CHECK_POINTER(condition, errCode, ret) \
+    do { \
+        if ((condition) == nullptr) { \
+            MMI_LOGE("%{public}s, (%{public}d), CHECK_POINTER(%{public}s), errCode:%{public}d", __FILE__, __LINE__, #condition, errCode); \
+            return ret; \
+        } \
+    } while (0)
+
+#define CHECK_BOOL(condition, errCode, ret) \
+    do { \
+        if (!(condition)) { \
+            MMI_LOGE("%{public}s, (%{public}d), CHECK_BOOL(%{public}s), errCode:%{public}d", __FILE__, __LINE__, #condition, errCode); \
             return ret; \
         } \
     } while (0)
