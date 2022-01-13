@@ -207,6 +207,7 @@ private:
     std::vector<struct ScreenInfo> screenInfoVec_ = {};
     CLMAP<int32_t, struct LayerInfo> layers_ = {};
     CLMAP<int32_t, struct MMISurfaceInfo> surfaces_ = {};
+    std::vector<struct MMISurfaceInfo> surfaceVec_;
     UDSServer* udsServer_ = nullptr;
 
     /* *********************************新框架接口添加*************************** */
