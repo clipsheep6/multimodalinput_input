@@ -94,7 +94,7 @@ public:
         std::string name, Authority authority);
     int32_t UnregisterEventInterceptorforServer(const SessionPtr& sess, int32_t id);
     void DeleteInterceptorFormSess(const SessionPtr& sess);
-	void OnPointerEventTrace(const EventPointer& event_pointer);
+    void OnPointerEventTrace(const EventPointer& event_pointer);
 
 protected:
     void OnEventTouchGetPointEventType(const EventTouch& touch, POINT_EVENT_TYPE& pointEventType,

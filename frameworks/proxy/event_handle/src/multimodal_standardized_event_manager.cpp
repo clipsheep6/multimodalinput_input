@@ -170,7 +170,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnKey(const OHOS::KeyEven
 
 void OHOS::MMI::MultimodalStandardizedEventManager::OnTouchTrace(const TouchEvent& event)
 {
-    int32_t EVENT_TOUCH = 9; 
+    int32_t EVENT_TOUCH = 9;
     const std::string touchEvent = event.GetUuid();
     char *tmpTouch = (char*)touchEvent.c_str();
     MMI_LOGT("OnTouch touchUuid = %{public}s\n", tmpTouch);

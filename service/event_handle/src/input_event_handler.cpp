@@ -434,7 +434,7 @@ int32_t OHOS::MMI::InputEventHandler::OnEventKeyboard(multimodal_libinput_event 
         MMI_LOGE("Key event package failed... ret:%{public}d errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
         return KEY_EVENT_PKG_FAIL;
     }
-	OnEventKeyboardTrace(key);
+    OnEventKeyboardTrace(key);
 #ifndef OHOS_WESTEN_MODEL
     if (ServerKeyFilter->OnKeyEvent(key)) {
         MMI_LOGD("key event filter find a  key event from Original event  keyCode : %{puiblic}d", key.key);
@@ -520,7 +520,14 @@ int32_t OHOS::MMI::InputEventHandler::OnEventPointer(multimodal_libinput_event &
                  packageResult, POINT_EVENT_PKG_FAIL);
         return POINT_EVENT_PKG_FAIL;
     }
-	OnEventPointerTrace(point);
+    OnEventPointerTrace(point);
+    OnEventPointerTrace(point);
+    OnEventPointerTrace(point);
+    OnEventPointerTrace(point);
+    OnEventPointerTrace(point);
+    OnEventPointerTrace(point);
+    OnEventPointerTrace(point);
+    OnEventPointerTrace(point);
 #ifndef OHOS_WESTEN_MODEL
     if (ServerKeyFilter->OnPointerEvent(point)) {
         MMI_LOGD("pointer event interceptor find a pointer event pointer button: %{puiblic}d", point.button);
