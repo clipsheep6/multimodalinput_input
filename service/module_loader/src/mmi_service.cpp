@@ -347,7 +347,6 @@ void MMIService::OnThread()
 
     int32_t count = 0;
     constexpr int32_t timeOut = 50;
-
     epoll_event ev[MAX_EVENT_SIZE] = {};
     CLMAP<int32_t, StreamBufData> bufMap;
     while (state_ == ServiceRunningState::STATE_RUNNING) {
