@@ -254,7 +254,7 @@ void MMIService::OnDump()
 
 void MMIService::OnConnected(SessionPtr s)
 {
-    CHK(s, NULL_POINTER);
+    CHK(s, ERROR_NULL_POINTER);
     int32_t fd = s->GetFd();
     MMI_LOGI("MMIService::_OnConnected fd:%{public}d", fd);
     AppRegs->RegisterConnectState(fd);
@@ -262,7 +262,7 @@ void MMIService::OnConnected(SessionPtr s)
 
 void MMIService::OnDisconnected(SessionPtr s)
 {
-    CHK(s, NULL_POINTER);
+    CHK(s, ERROR_NULL_POINTER);
     MMI_LOGW("MMIService::OnDisconnected enter, session desc:%{public}s", s->GetDescript().c_str());
     int32_t fd = s->GetFd();
 
@@ -334,7 +334,7 @@ int32_t MMIService::SetInputEventFilter(sptr<IEventFilter> filter)
 {
     if (inputEventHdr_ == nullptr) {
         MMI_LOGE("inputEventHdr_ is nullptr");
-        return NULL_POINTER;
+        return ERROR_NULL_POINTER;
     }
 
     return inputEventHdr_->SetInputEventFilter(filter);
@@ -366,7 +366,7 @@ void MMIService::OnThread()
         count = EpollWait(ev[0], MAX_EVENT_SIZE, timeOut, mmiFd_);
         for (int i = 0; i < count; i++) {
             auto mmiEd = reinterpret_cast<mmi_epoll_event*>(ev[i].data.ptr);
-            CHKC(mmiEd, NULL_POINTER);
+            CHKC(mmiEd, ERROR_NULL_POINTER);
             if (mmiEd->event_type == EPOLL_EVENT_INPUT) {
                 input_.EventDispatch(ev[i]);
             } else { // EPOLL_EVENT_SOCKET

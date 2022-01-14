@@ -77,7 +77,7 @@ void ServerInputFilterManager::KeyEventFilter::SetAuthority(Authority authority)
     this->authority_ = authority;
 }
 
-bool ServerInputFilterManager::OnKeyEvent(EventKeyboard key)
+bool ServerInputFilterManager::OnKeyEvent(const EventKeyboard &key)
 {
     MMI_LOGD("key event filter on key event begin");
     if (keyEventFilterMap_.size() == 0) {
@@ -249,7 +249,7 @@ bool ServerInputFilterManager::OnTouchEvent(UDSServer& udsServer, libinput_event
     }
 
     auto device = libinput_event_get_device(&event);
-    CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
     MmiMessageId idMsg = MmiMessageId::INVALID;
     MMIRegEvent->OnEventTouchGetSign(touch, idMsg);

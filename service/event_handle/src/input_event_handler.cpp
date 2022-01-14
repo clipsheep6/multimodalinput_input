@@ -186,12 +186,12 @@ bool OHOS::MMI::InputEventHandler::Init(UDSServer& udsServer)
 
 void OHOS::MMI::InputEventHandler::OnEvent(void *event)
 {
-    CHK(event, NULL_POINTER);
+    CHK(event, ERROR_NULL_POINTER);
     std::lock_guard<std::mutex> lock(mu_);
     auto *lpMmiEvent = static_cast<multimodal_libinput_event *>(event);
-    CHK(lpMmiEvent, NULL_POINTER);
+    CHK(lpMmiEvent, ERROR_NULL_POINTER);
     auto *lpEvent = lpMmiEvent->event;
-    CHK(lpEvent, NULL_POINTER);
+    CHK(lpEvent, ERROR_NULL_POINTER);
     if (initSysClock_ != 0 && lastSysClock_ == 0) {
         MMI_LOGE("Event not handled... id:%{public}" PRId64 " eventType:%{public}d initSysClock:%{public}" PRId64 "",
                  idSeed_, eventType_, initSysClock_);
@@ -218,7 +218,7 @@ void OHOS::MMI::InputEventHandler::OnEvent(void *event)
 
 int32_t OHOS::MMI::InputEventHandler::OnEventHandler(multimodal_libinput_event &ev)
 {
-    CHKR(ev.event, NULL_POINTER, NULL_POINTER);
+    CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     auto type = libinput_event_get_type(ev.event);
     OHOS::MMI::TimeCostChk chk("InputEventHandler::OnEventHandler", "overtime 1000(us)", MAX_INPUT_EVENT_TIME, type);
     auto fun = GetFun(static_cast<MmiMessageId>(type));
@@ -271,14 +271,14 @@ int32_t OHOS::MMI::InputEventHandler::SetInputEventFilter(sptr<IEventFilter> fil
 
 int32_t OHOS::MMI::InputEventHandler::OnEventDeviceAdded(multimodal_libinput_event &ev)
 {
-    CHKR(ev.event, NULL_POINTER, NULL_POINTER);
+    CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(ev.event);
     INPUTDEVMGR->OnInputDeviceAdded(device);
 
     uint64_t preHandlerTime = GetSysClockTime();
     DeviceManage deviceManage = {};
 
-    CHKR(udsServer_, NULL_POINTER, RET_ERR);
+    CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     auto packageResult = eventPackage_.PackageDeviceManageEvent(*ev.event, deviceManage, *udsServer_);
     if (packageResult != RET_OK) {
         MMI_LOGE("Deviceadded event package failed... ret:%{public}d errCode:%{public}d",
@@ -308,12 +308,12 @@ int32_t OHOS::MMI::InputEventHandler::OnEventDeviceAdded(multimodal_libinput_eve
 
 int32_t OHOS::MMI::InputEventHandler::OnEventDeviceRemoved(multimodal_libinput_event &ev)
 {
-    CHKR(ev.event, NULL_POINTER, NULL_POINTER);
+    CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(ev.event);
     INPUTDEVMGR->OnInputDeviceRemoved(device);
 
     uint64_t preHandlerTime = GetSysClockTime();
-    CHKR(udsServer_, NULL_POINTER, RET_ERR);
+    CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     DeviceManage deviceManage = {};
     auto packageResult = eventPackage_.PackageDeviceManageEvent(*ev.event, deviceManage, *udsServer_);
     if (packageResult != RET_OK) {
@@ -348,9 +348,9 @@ int32_t OHOS::MMI::InputEventHandler::OnEventKey(libinput_event& event)
     if (keyEvent == nullptr) {
         keyEvent = OHOS::MMI::KeyEvent::Create();
     }
-    CHKR(udsServer_, NULL_POINTER, RET_ERR);
+    CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     auto packageResult = eventPackage_.PackageKeyEvent(event, keyEvent, *udsServer_);
-    if (packageResult == MULTIDEVICE_SAME_EVENT_FAIL) { // The multi_device_same_event should be discarded
+    if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
         return RET_OK;
     }
     if (packageResult != RET_OK) {
@@ -390,7 +390,7 @@ int32_t OHOS::MMI::InputEventHandler::OnEventKey(libinput_event& event)
     }
 #endif  // OHOS_AUTO_TEST_FRAME
     auto device = libinput_event_get_device(&event);
-    CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
     auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent, preHandlerTime);
     if (eventDispatchResult != RET_OK) {
@@ -410,9 +410,9 @@ int32_t OHOS::MMI::InputEventHandler::OnKeyEventDispatch(multimodal_libinput_eve
     if (keyEvent == nullptr) {
         keyEvent = OHOS::MMI::KeyEvent::Create();
     }
-    CHKR(udsServer_, NULL_POINTER, RET_ERR);
+    CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     auto packageResult = eventPackage_.PackageKeyEvent(*ev.event, keyEvent, *udsServer_);
-    if (packageResult == MULTIDEVICE_SAME_EVENT_FAIL) { // The multi_device_same_event should be discarded
+    if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
         return RET_OK;
     }
     if (packageResult != RET_OK) {
@@ -460,7 +460,7 @@ int32_t OHOS::MMI::InputEventHandler::OnKeyEventDispatch(multimodal_libinput_eve
     }
 #endif  // OHOS_AUTO_TEST_FRAME
     auto device = libinput_event_get_device(ev.event);
-    CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
     auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent, preHandlerTime);
     if (eventDispatchResult != RET_OK) {
@@ -476,13 +476,13 @@ int32_t OHOS::MMI::InputEventHandler::OnKeyboardEvent(libinput_event& event)
 {
     uint64_t preHandlerTime = GetSysClockTime();
     EventKeyboard key = {};
-    CHKR(udsServer_, NULL_POINTER, RET_ERR);
+    CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     auto packageResult = eventPackage_.PackageKeyEvent(event, key, *udsServer_);
-    if (packageResult == MULTIDEVICE_SAME_EVENT_FAIL) { // The multi_device_same_event should be discarded
+    if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
         return RET_OK;
     }
     if (packageResult != RET_OK) {
-        MMI_LOGE("Key event package failed... ret:%{public}d errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
+        MMI_LOGE("Key event package failed. ret:%{public}d, errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
         return KEY_EVENT_PKG_FAIL;
     }
 #ifdef OHOS_AUTO_TEST_FRAME // Send event to auto-test frame
@@ -523,11 +523,11 @@ int32_t OHOS::MMI::InputEventHandler::OnKeyboardEvent(libinput_event& event)
         return RET_ERR;
     }
     auto device = libinput_event_get_device(&event);
-    CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
     auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent, preHandlerTime);
     if (eventDispatchResult != RET_OK) {
-        MMI_LOGE("Key event dispatch failed... ret:%{public}d errCode:%{public}d",
+        MMI_LOGE("Key event dispatch failed. ret:%{public}d, errCode:%{public}d",
                  eventDispatchResult, KEY_EVENT_DISP_FAIL);
         return KEY_EVENT_DISP_FAIL;
     }
@@ -537,26 +537,27 @@ int32_t OHOS::MMI::InputEventHandler::OnKeyboardEvent(libinput_event& event)
 
 int32_t OHOS::MMI::InputEventHandler::OnEventKeyboard(multimodal_libinput_event &ev)
 {
-    CHKR(ev.event, NULL_POINTER, NULL_POINTER);
+    CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
 #ifdef OHOS_WESTEN_MODEL
     uint64_t preHandlerTime = GetSysClockTime();
 #endif
     EventKeyboard key = {};
-    CHKR(udsServer_, NULL_POINTER, RET_ERR);
+    CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     auto packageResult = eventPackage_.PackageKeyEvent(*ev.event, key, *udsServer_);
-    if (packageResult == MULTIDEVICE_SAME_EVENT_FAIL) { // The multi_device_same_event should be discarded
+    if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
+        MMI_LOGD("The same event occurs on multiple devices. ret:%{public}d", packageResult);
         return RET_OK;
     }
     if (packageResult != RET_OK) {
-        MMI_LOGE("Key event package failed... ret:%{public}d errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
+        MMI_LOGE("Key event package failed. ret:%{public}d, errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
         return KEY_EVENT_PKG_FAIL;
     }
 #ifndef OHOS_WESTEN_MODEL
     if (ServerKeyFilter->OnKeyEvent(key)) {
-        MMI_LOGD("key event filter find a  key event from Original event  keyCode : %{puiblic}d", key.key);
+        MMI_LOGD("Key event filter find a key event from Original event, keyCode:%{puiblic}d", key.key);
         return RET_OK;
     }
-    (void)OnKeyboardEvent(*ev.event);
+    return OnKeyboardEvent(*ev.event);
 #else
 #ifdef OHOS_AUTO_TEST_FRAME // Send event to auto-test frame
     const AutoTestLibinputPkt autoTestLibinputPkt = {"eventKeyboard", key.key, key.state, 0, 0, 0, 0};
@@ -589,22 +590,22 @@ int32_t OHOS::MMI::InputEventHandler::OnEventKeyboard(multimodal_libinput_event 
 #endif  // OHOS_AUTO_TEST_FRAME
     auto eventDispatchResult = eventDispatch_.DispatchKeyEvent(*udsServer_, *ev.event, hosKey, key, preHandlerTime);
     if (eventDispatchResult != RET_OK) {
-        MMI_LOGE("Key event dispatch failed... ret:%{public}d errCode:%{public}d",
+        MMI_LOGE("Key event dispatch failed. ret:%{public}d, errCode:%{public}d",
                  eventDispatchResult, KEY_EVENT_DISP_FAIL);
         return KEY_EVENT_DISP_FAIL;
     }
-#endif
     return RET_OK;
+#endif
 }
 
 int32_t OHOS::MMI::InputEventHandler::OnEventPointer(multimodal_libinput_event &ev)
 {
-    CHKR(ev.event, NULL_POINTER, NULL_POINTER);
+    CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     uint64_t preHandlerTime = GetSysClockTime();
     auto device = libinput_event_get_device(ev.event);
     auto type = libinput_event_get_type(ev.event);
-    CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
-    CHKR(udsServer_, NULL_POINTER, RET_ERR);
+    CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     int32_t devicType = static_cast<int32_t>(libinput_device_get_tags(device));
     if (devicType & EVDEV_UDEV_TAG_JOYSTICK) {
         if (type == LIBINPUT_EVENT_POINTER_BUTTON) {
@@ -615,7 +616,7 @@ int32_t OHOS::MMI::InputEventHandler::OnEventPointer(multimodal_libinput_event &
     }
     EventPointer point = {};
     auto packageResult = eventPackage_.PackagePointerEvent(ev, point, winSwitch_, *udsServer_);
-    if (packageResult == MULTIDEVICE_SAME_EVENT_FAIL) { // The multi_device_same_event should be discarded
+    if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
         return RET_OK;
     }
     if (packageResult != RET_OK) {
@@ -659,7 +660,7 @@ int32_t OHOS::MMI::InputEventHandler::OnEventPointer(multimodal_libinput_event &
 #endif
 #ifndef OHOS_WESTEN_MODEL
     /* New */
-    (void)OnMouseEventHandler(*ev.event, point.deviceId);
+    return OnMouseEventHandler(*ev.event, point.deviceId);
 #else
     auto retEvent = eventDispatch_.DispatchPointerEvent(*udsServer_, *ev.event, point, preHandlerTime, winSwitch_);
     if (retEvent != RET_OK) {
@@ -667,8 +668,8 @@ int32_t OHOS::MMI::InputEventHandler::OnEventPointer(multimodal_libinput_event &
             retEvent, POINT_EVENT_DISP_FAIL);
         return POINT_EVENT_DISP_FAIL;
     }
-#endif
     return RET_OK;
+#endif
 }
 
 int32_t OHOS::MMI::InputEventHandler::OnEventTouchSecond(libinput_event& event)
@@ -717,14 +718,14 @@ int32_t OHOS::MMI::InputEventHandler::OnEventTouchPadSecond(libinput_event& even
 }
 int32_t OHOS::MMI::InputEventHandler::OnEventTouch(multimodal_libinput_event &ev)
 {
-    CHKR(ev.event, NULL_POINTER, NULL_POINTER);
+    CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     SInput::Loginfo_packaging_tool(*ev.event);
 #ifndef OHOS_WESTEN_MODEL
     OnEventTouchSecond(*ev.event);
 #endif
     uint64_t preHandlerTime = GetSysClockTime();
     struct EventTouch touch = {};
-    CHKR(udsServer_, NULL_POINTER, RET_ERR);
+    CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     auto packageResult = eventPackage_.PackageTouchEvent(ev, touch, winSwitch_, *udsServer_);
     if (packageResult == UNKNOWN_EVENT_PKG_FAIL) {
         return RET_OK;
@@ -778,7 +779,7 @@ int32_t OHOS::MMI::InputEventHandler::OnGestureEvent(libinput_event& event)
     MMI_LOGT("InputEventHandler::OnGestureEvent\n");
     uint64_t preHandlerTime = GetSysClockTime();
     EventGesture gesture = {};
-    CHKR(udsServer_, NULL_POINTER, RET_ERR);
+    CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     auto packageResult = eventPackage_.PackageGestureEvent(event, gesture, *udsServer_);
     if (packageResult != RET_OK) {
         MMI_LOGE("Gesture swipe event package failed... ret:%{public}d errCode:%{public}d",
@@ -812,11 +813,11 @@ int32_t OHOS::MMI::InputEventHandler::OnGestureEvent(libinput_event& event)
 
 int32_t OHOS::MMI::InputEventHandler::OnEventGesture(multimodal_libinput_event &ev)
 {
-    CHKR(ev.event, NULL_POINTER, NULL_POINTER);
+    CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     OnGestureEvent(*ev.event);
     uint64_t preHandlerTime = GetSysClockTime();
     EventGesture gesture = {};
-    CHKR(udsServer_, NULL_POINTER, RET_ERR);
+    CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     auto packageResult = eventPackage_.PackageGestureEvent(*ev.event, gesture, *udsServer_);
     if (packageResult != RET_OK) {
         MMI_LOGE("Gesture swipe event package failed... ret:%{public}d errCode:%{public}d",
@@ -845,12 +846,12 @@ int32_t OHOS::MMI::InputEventHandler::OnEventGesture(multimodal_libinput_event &
 
 int32_t OHOS::MMI::InputEventHandler::OnEventTabletTool(multimodal_libinput_event &ev)
 {
-    CHKR(ev.event, NULL_POINTER, NULL_POINTER);
+    CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     uint64_t preHandlerTime = GetSysClockTime();
     EventTabletTool tableTool = {};
-    CHKR(udsServer_, NULL_POINTER, RET_ERR);
+    CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     auto packageResult = eventPackage_.PackageTabletToolEvent(*ev.event, tableTool, *udsServer_);
-    if (packageResult == MULTIDEVICE_SAME_EVENT_FAIL) { // The multi_device_same_event should be discarded
+    if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
         return RET_OK;
     }
     if (packageResult != RET_OK) {
@@ -884,9 +885,9 @@ int32_t OHOS::MMI::InputEventHandler::OnEventTabletTool(multimodal_libinput_even
 
 int32_t OHOS::MMI::InputEventHandler::OnEventTabletPad(multimodal_libinput_event &ev)
 {
-    CHKR(ev.event, NULL_POINTER, NULL_POINTER);
+    CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     uint64_t preHandlerTime = GetSysClockTime();
-    CHKR(udsServer_, NULL_POINTER, RET_ERR);
+    CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     EventTabletPad tabletPad = {};
     auto packageResult = eventPackage_.PackageTabletPadEvent(*ev.event, tabletPad, *udsServer_);
     if (packageResult != RET_OK) {
@@ -919,7 +920,7 @@ int32_t OHOS::MMI::InputEventHandler::OnEventTabletPad(multimodal_libinput_event
 
 int32_t OHOS::MMI::InputEventHandler::OnEventSwitchToggle(multimodal_libinput_event &ev)
 {
-    CHKR(ev.event, NULL_POINTER, NULL_POINTER);
+    CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     auto type = libinput_event_get_type(ev.event);
     MMI_LOGT("\nfunction is _OnEventSwitchToggle,sourceType is LIBINPUT_EVENT_SWITCH_TOGGLE %{public}d", type);
 
@@ -942,12 +943,12 @@ int32_t OHOS::MMI::InputEventHandler::OnEventSwitchToggle(multimodal_libinput_ev
 
 int32_t OHOS::MMI::InputEventHandler::OnEventTabletPadKey(multimodal_libinput_event &ev)
 {
-    CHKR(ev.event, NULL_POINTER, NULL_POINTER);
+    CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     uint64_t preHandlerTime = GetSysClockTime();
-    CHKR(udsServer_, NULL_POINTER, RET_ERR);
+    CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     EventKeyboard key = {};
     auto packageResult = eventPackage_.PackageTabletPadKeyEvent(*ev.event, key, *udsServer_);
-    if (packageResult == MULTIDEVICE_SAME_EVENT_FAIL) { // The multi_device_same_event should be discarded
+    if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
         return RET_OK;
     }
     if (packageResult != RET_OK) {
@@ -994,8 +995,8 @@ int32_t OHOS::MMI::InputEventHandler::OnEventTabletPadKey(multimodal_libinput_ev
 
 int32_t OHOS::MMI::InputEventHandler::OnEventJoyStickKey(multimodal_libinput_event &ev, const uint64_t time)
 {
-    CHKR(ev.event, NULL_POINTER, NULL_POINTER);
-    CHKR(udsServer_, NULL_POINTER, RET_ERR);
+    CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
+    CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     EventKeyboard key = {};
     auto packageResult = eventPackage_.PackageJoyStickKeyEvent(*ev.event, key, *udsServer_);
     if (packageResult != RET_OK) {
@@ -1045,8 +1046,8 @@ int32_t OHOS::MMI::InputEventHandler::OnEventJoyStickKey(multimodal_libinput_eve
 
 int32_t OHOS::MMI::InputEventHandler::OnEventJoyStickAxis(multimodal_libinput_event &ev, const uint64_t time)
 {
-    CHKR(ev.event, NULL_POINTER, NULL_POINTER);
-    CHKR(udsServer_, NULL_POINTER, RET_ERR);
+    CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
+    CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     EventJoyStickAxis eventJoyStickAxis = {};
     auto packageResult = eventPackage_.PackageJoyStickAxisEvent(*ev.event, eventJoyStickAxis, *udsServer_);
     if (packageResult != RET_OK) {
@@ -1123,7 +1124,7 @@ int32_t OHOS::MMI::InputEventHandler::OnMouseEventTimerHanler(std::shared_ptr<OH
 
 bool OHOS::MMI::InputEventHandler::SendMsg(const int32_t fd, NetPacket& pkt) const
 {
-    CHKF(udsServer_, OHOS::NULL_POINTER);
+    CHKF(udsServer_, OHOS::ERROR_NULL_POINTER);
     return udsServer_->SendMsg(fd, pkt);
 }
 
