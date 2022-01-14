@@ -24,6 +24,7 @@
 #include "if_mmi_client.h"
 #include "net_packet.h"
 #include "if_client_msg_handler.h"
+#include "event_filter_service.h"
 
 namespace OHOS {
 namespace MMI {
@@ -45,12 +46,26 @@ public:
     int32_t AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor);
     void RemoveMonitor(int32_t monitorId);
 
+    int32_t AddInputEventTouchpadMontior(std::function<void(std::shared_ptr<PointerEvent>)> monitor);
+    void RemoveInputEventTouchpadMontior(int32_t monitorId);
+
+    int32_t AddMonitor2(std::shared_ptr<IInputEventConsumer> consumer);
+    void RemoveMonitor2(int32_t monitorId);
+    void MarkConsumed(int32_t monitorId, int32_t eventId);
+
+    int32_t AddInterceptor(int32_t sourceType, std::function<void(std::shared_ptr<PointerEvent>)> interceptor);
+    int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor);
+    void RemoveInterceptor(int32_t interceptorId);
+
+    void SimulateInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent);
+
 private:
     int32_t PackPhysicalDisplay(NetPacket &ckt);
     int32_t PackLogicalDisplay(NetPacket &ckt);
     void PrintDisplayDebugInfo();
 
 private:
+    sptr<EventFilterService> eventFilterService_ {nullptr};
     std::shared_ptr<OHOS::MMI::IInputEventConsumer> consumer;
     std::vector<PhysicalDisplayInfo> physicalDisplays_;
     std::vector<LogicalDisplayInfo> logicalDisplays_;

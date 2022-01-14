@@ -19,6 +19,7 @@
 #include "log.h"
 #include "multimodal_input_connect_service.h"
 #include "util.h"
+#include "timer_manager.h"
 
 namespace OHOS::MMI {
     namespace {
@@ -129,7 +130,7 @@ int32_t OHOS::MMI::MMIServer::Start()
     uint64_t curTime = OHOS::MMI::GetMillisTime();
     uint64_t consumeTime = curTime - GetMmiServerStartTime();
     MMI_LOGW("The server started successfully, the time consumed was %{public}" PRId64
-             " Ms curTime:%{public}" PRId64 "", consumeTime, curTime);
+            " Ms curTime:%{public}" PRId64 "", consumeTime, curTime);
 #endif
     return RET_OK;
 }
@@ -186,6 +187,7 @@ int32_t OHOS::MMI::MMIServer::InitLibinput()
 void OHOS::MMI::MMIServer::OnTimer()
 {
     InputHandler->OnCheckEventReport();
+    TimerMgr->ProcessTimers();
 }
 
 void OHOS::MMI::MMIServer::StopAll()

@@ -136,6 +136,104 @@ void PointerEvent::PointerItem::SetDeviceId(int32_t deviceId)
     deviceId_ = deviceId;
 }
 
+bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
+{
+    if (!out.WriteInt32(pointerId_)) {
+        return false;
+    }
+
+    if (!out.WriteInt32(donwTime_)) {
+        return false;
+    }
+
+    if (!out.WriteBool(pressed_)) {
+        return false;
+    }
+
+    if (!out.WriteInt32(globalX_)) {
+        return false;
+    }
+
+    if (!out.WriteInt32(globalY_)) {
+        return false;
+    }
+
+    if (!out.WriteInt32(localX_)) {
+        return false;
+    }
+
+    if (!out.WriteInt32(localY_)) {
+        return false;
+    }
+
+    if (!out.WriteInt32(width_)) {
+        return false;
+    }
+
+    if (!out.WriteInt32(height_)) {
+        return false;
+    }
+
+    if (!out.WriteInt32(pressure_)) {
+        return false;
+    }
+
+    if (!out.WriteInt32(deviceId_)) {
+        return false;
+    }
+    
+    return true;
+}
+
+bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
+{
+    if (!in.ReadInt32(pointerId_)) {
+        return false;
+    }
+
+    if (!in.ReadInt32(donwTime_)) {
+        return false;
+    }
+
+    if (!in.ReadBool(pressed_)) {
+        return false;
+    }
+
+    if (!in.ReadInt32(globalX_)) {
+        return false;
+    }
+
+    if (!in.ReadInt32(globalY_)) {
+        return false;
+    }
+
+    if (!in.ReadInt32(localX_)) {
+        return false;
+    }
+
+    if (!in.ReadInt32(localY_)) {
+        return false;
+    }
+
+    if (!in.ReadInt32(width_)) {
+        return false;
+    }
+
+    if (!in.ReadInt32(height_)) {
+        return false;
+    }
+
+    if (!in.ReadInt32(pressure_)) {
+        return false;
+    }
+
+    if (!in.ReadInt32(deviceId_)) {
+        return false;
+    }
+    
+    return true;
+}
+
 PointerEvent::PointerEvent(int32_t eventType) : InputEvent(eventType) {}
 
 PointerEvent::~PointerEvent() {}
@@ -237,24 +335,194 @@ void PointerEvent::SetButtonId(int32_t buttonId)
     buttonId_ = buttonId;
 }
 
-int32_t PointerEvent::GetAxis()
+double PointerEvent::GetAxisValue(AxisType axis) const
 {
-    return axis_;
+    double axisValue {  };
+    if ((axis >= AXIS_TYPE_UNKNOWN) && (axis < AXIS_TYPE_MAX)) {
+        axisValue = axisValues_[axis];
+    }
+    return axisValue;
 }
 
-void PointerEvent::SetAxis(int32_t axis)
+void PointerEvent::SetAxisValue(AxisType axis, double axisValue)
 {
-    axis_ = axis;
+    if ((axis >= AXIS_TYPE_UNKNOWN) && (axis < AXIS_TYPE_MAX)) {
+        axisValues_[axis] = axisValue;
+        axes_ |= (1 << axis);
+    }
 }
 
-double PointerEvent::GetAxisValue()
+bool PointerEvent::HasAxis(int32_t axes, AxisType axis)
 {
-    return axisValue_;
+    bool ret { false };
+    if ((axis >= AXIS_TYPE_UNKNOWN) && (axis < AXIS_TYPE_MAX)) {
+        ret = static_cast<bool>(axes & (1 << axis));
+    }
+    return ret;
 }
 
-void PointerEvent::SetAxisValue(double axisValue)
+void PointerEvent::SetPressedKeys(const std::vector<int32_t> pressedKeys)
 {
-    axisValue_ = axisValue;
+    pressedKeys_ = pressedKeys;
+}
+
+std::vector<int32_t> PointerEvent::GetPressedKeys() const
+{
+    return pressedKeys_;
+}
+
+bool PointerEvent::WriteToParcel(Parcel &out) const
+{
+    if (!InputEvent::WriteToParcel(out)) {
+        return false;
+    }
+
+    if (!out.WriteInt32(pointerId_)) {
+        return false;
+    }
+
+    // vector
+    if (pointers_.size() > INT_MAX) {
+        return false;
+    }
+
+    if (!out.WriteInt32(static_cast<int32_t>(pointers_.size()))) {
+        return false;
+    }
+
+    for (const auto &v : pointers_) {
+        if (!v.WriteToParcel(out)) {
+            return false;
+        }
+    }
+
+    // set
+    if (pressedButtons_.size() > INT_MAX) {
+        return false;
+    }
+
+    if (!out.WriteInt32(static_cast<int32_t>(pressedButtons_.size()))) {
+        return false;
+    }
+
+    for (const auto &v : pressedButtons_) {
+        if (!out.WriteInt32(v)) {
+            return false;
+        }
+    }
+
+    if (!out.WriteInt32(sourceType_)) {
+        return false;
+    }
+
+    if (!out.WriteInt32(pointerAction_)) {
+        return false;
+    }
+
+    if (!out.WriteInt32(buttonId_)) {
+        return false;
+    }
+
+    if (!out.WriteInt32(axes_)) {
+        return false;
+    }
+
+    // axisValues_
+    const size_t axisValuesSize = axisValues_.size();
+    if (axisValuesSize > INT_MAX) {
+        return false;
+    }
+
+    if (axisValuesSize > AXIS_TYPE_MAX) {
+        return false;
+    }
+
+    if (!out.WriteInt32(static_cast<int32_t>(axisValuesSize))) {
+        return false;
+    }
+
+    for (const auto &v : axisValues_) {
+        if (!out.WriteDouble(v)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool PointerEvent::ReadFromParcel(Parcel &in)
+{
+    if (!InputEvent::ReadFromParcel(in)) {
+        return false;
+    }
+
+    if (!in.ReadInt32(pointerId_)) {
+        return false;
+    }
+    
+    // vector
+    const int32_t pointersSize = in.ReadInt32();
+    if (pointersSize < 0) {
+        return false;
+    }
+    
+    for (int32_t i = 0; i < pointersSize; ++i) {
+        PointerItem val = {};
+        if (!val.ReadFromParcel(in)) {
+            return false;
+        }
+        pointers_.push_back(val);
+    }
+
+    // set
+    const int32_t pressedButtonsSize = in.ReadInt32();
+    if (pressedButtonsSize < 0) {
+        return false;
+    }
+    
+    for (int32_t i = 0; i < pressedButtonsSize; ++i) {
+        int32_t val = 0;
+        if (!in.ReadInt32(val)) {
+            return false;
+        }
+        pressedButtons_.insert(val);
+    }
+
+    if (!in.ReadInt32(sourceType_)) {
+        return false;
+    }
+
+    if (!in.ReadInt32(pointerAction_)) {
+        return false;
+    }
+
+    if (!in.ReadInt32(buttonId_)) {
+        return false;
+    }
+
+    if (!in.ReadInt32(axes_)) {
+        return false;
+    }
+
+    // axisValue_ array
+    const int32_t axisValueSize = in.ReadInt32();
+    if (axisValueSize < 0) {
+        return false;
+    }
+
+    if (axisValueSize > AXIS_TYPE_MAX) {
+        return false;
+    }
+    
+    for (int32_t i = 0; i < axisValueSize; ++i) {
+        double val = {};
+        if (!in.ReadDouble(val)) {
+            return false;
+        }
+        axisValues_[i] = val;
+    }
+
+    return true;
 }
 }
 } // namespace OHOS::MMI

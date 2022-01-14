@@ -23,10 +23,14 @@ namespace {
 TouchTransformPointProcessor::TouchTransformPointProcessor()
 {
     this->pointerEvent_ = PointerEvent::Create();
-    pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
 }
 
 TouchTransformPointProcessor::~TouchTransformPointProcessor() {}
+
+void TouchTransformPointProcessor::setPointEventSource(int32_t sourceType)
+{
+    pointerEvent_->SetSourceType(sourceType);
+}
 
 void TouchTransformPointProcessor::onEventTouchDown(libinput_event& event)
 {
@@ -113,6 +117,11 @@ std::shared_ptr<PointerEvent> TouchTransformPointProcessor::onLibinputTouchEvent
 {
     MMI_LOGD("call  onLibinputTouchEvent begin");
     auto type = libinput_event_get_type(&event);
+    if (pointerEvent_ == nullptr) {
+        MMI_LOGE("pointerEvent_ is nullptr");
+        return nullptr;
+    }
+    pointerEvent_->UpdateId();
     switch (type) {
         case LIBINPUT_EVENT_TOUCH_DOWN: {
             onEventTouchDown(event);

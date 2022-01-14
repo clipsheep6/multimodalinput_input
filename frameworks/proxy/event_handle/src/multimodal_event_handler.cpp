@@ -117,6 +117,14 @@ int32_t MultimodalEventHandler::InjectEvent(const OHOS::MMI::KeyEvent& keyEvent)
     return EventManager.InjectEvent(keyEvent);
 }
 
+int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr)
+{
+    if (!InitClient()) {
+      return MMI_SERVICE_INVALID;
+    }
+    return EventManager.InjectEvent(keyEventPtr);
+}
+
 int32_t MultimodalEventHandler::GetMultimodeInputInfo()
 {
     if (!InitClient()) {
@@ -250,6 +258,33 @@ int32_t MultimodalEventHandler::RemoveEventInterceptor(int32_t id)
     return RET_OK;
 }
 
+int32_t MultimodalEventHandler::AddInterceptor(int32_t sourceType, int32_t id)
+{
+    if (!InitClient()) {
+        return MMI_SERVICE_INVALID;
+    }
+
+    OHOS::MMI::NetPacket ck(MmiMessageId::ADD_EVENT_INTERCEPTOR);
+    ck << sourceType << id;
+    mClient_->SendMessage(ck);
+    MMI_LOGD("client add a touchpad event interceptor");
+    return RET_OK;
+}
+
+
+int32_t MultimodalEventHandler::RemoveInterceptor(int32_t id)
+{
+    if (!InitClient()) {
+        return MMI_SERVICE_INVALID;
+    }
+
+    OHOS::MMI::NetPacket ckt(MmiMessageId::REMOVE_EVENT_INTERCEPTOR);
+    ckt << id;
+    mClient_->SendMessage(ckt);
+    MMI_LOGD("client remove a touchpad event interceptor");
+    return RET_OK;
+}
+
 int32_t MultimodalEventHandler::AddInputEventMontior(int32_t keyEventType)
 {
     if (!InitClient()) {
@@ -269,6 +304,32 @@ void MultimodalEventHandler::RemoveInputEventMontior(int32_t keyEventType)
     NetPacket ck(MmiMessageId::REMOVE_INPUT_EVENT_MONITOR);
     ck << OHOS::MMI::InputEvent::EVENT_TYPE_KEY;
     mClient_->SendMessage(ck);
+}
+
+void MultimodalEventHandler::RemoveInputEventTouchpadMontior(int32_t pointerEventType)
+{
+    MMI_LOGD("MultimodalEventHandler::RemoveInputEventTouchpadMontior");
+    if (!InitClient()) {
+        return;
+    }
+    NetPacket ck(MmiMessageId::REMOVE_INPUT_EVENT_TOUCHPAD_MONITOR);
+    ck << OHOS::MMI::InputEvent::EVENT_TYPE_POINTER;
+    mClient_->SendMessage(ck);
+}
+
+int32_t MultimodalEventHandler::AddInputEventTouchpadMontior(int32_t pointerEventType)
+{
+    MMI_LOGE("MultimodalEventHandler::AddInputEventTouchpadMontior");
+    if (!InitClient()) {
+        return MMI_SERVICE_INVALID;
+    }
+    NetPacket ck(MmiMessageId::ADD_INPUT_EVENT_TOUCHPAD_MONITOR);
+    ck << OHOS::MMI::InputEvent::EVENT_TYPE_POINTER;
+    MMI_LOGE("send msg before");
+    bool isSuc = mClient_->SendMessage(ck);
+    if (isSuc)
+        MMI_LOGD("sendAdd msg Success");
+    return RET_OK;
 }
 }
 }

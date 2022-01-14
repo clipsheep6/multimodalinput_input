@@ -21,15 +21,7 @@ namespace MMI {
 int32_t InputEventDataTransformation::KeyEventToNetPacket(
     const std::shared_ptr<OHOS::MMI::KeyEvent> key, NetPacket &pck)
 {
-    CHKR(pck.Write(key->GetId()), STREAM_BUF_WRITE_FAIL, RET_ERR);
-    CHKR(pck.Write(key->GetActionTime()), STREAM_BUF_WRITE_FAIL, RET_ERR);
-    CHKR(pck.Write(key->GetAction()), STREAM_BUF_WRITE_FAIL, RET_ERR);
-    CHKR(pck.Write(key->GetActionStartTime()), STREAM_BUF_WRITE_FAIL, RET_ERR);
-    CHKR(pck.Write(key->GetDeviceId()), STREAM_BUF_WRITE_FAIL, RET_ERR);
-    CHKR(pck.Write(key->GetTargetDisplayId()), STREAM_BUF_WRITE_FAIL, RET_ERR);
-    CHKR(pck.Write(key->GetAgentWindowId()), STREAM_BUF_WRITE_FAIL, RET_ERR);
-    CHKR(pck.Write(key->GetTargetWindowId()), STREAM_BUF_WRITE_FAIL, RET_ERR);
-    CHKR(pck.Write(key->GetFlag()), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    CHKR((RET_OK == SerializeInputEvent(key, pck)), STREAM_BUF_WRITE_FAIL, RET_ERR);
     CHKR(pck.Write(key->GetKeyCode()), STREAM_BUF_WRITE_FAIL, RET_ERR);
     CHKR(pck.Write(key->GetKeyAction()), STREAM_BUF_WRITE_FAIL, RET_ERR);
     auto keys = key->GetKeyItems();
@@ -43,30 +35,13 @@ int32_t InputEventDataTransformation::KeyEventToNetPacket(
     }
     return RET_OK;
 }
-int32_t InputEventDataTransformation::NetPacketToKeyEvent(
+int32_t InputEventDataTransformation::NetPacketToKeyEvent(bool skipId, 
     std::shared_ptr<OHOS::MMI::KeyEvent> key, NetPacket &pck)
 {
     int32_t data = 0;
     int32_t size = 0;
     bool isPressed = false;
-    CHKR(pck.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);
-    key->SetId(data);
-    CHKR(pck.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);
-    key->SetActionTime(data);
-    CHKR(pck.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);
-    key->SetAction(data);
-    CHKR(pck.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);
-    key->SetActionStartTime(data);
-    CHKR(pck.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);
-    key->SetDeviceId(data);
-    CHKR(pck.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);
-    key->SetTargetDisplayId(data);
-    CHKR(pck.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);
-    key->SetAgentWindowId(data);
-    CHKR(pck.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);
-    key->SetTargetWindowId(data);
-    CHKR(pck.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);
-    key->AddFlag(data);
+    CHKR((RET_OK == DeserializeInputEvent(skipId, key, pck)), STREAM_BUF_READ_FAIL, RET_ERR);
     CHKR(pck.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);
     key->SetKeyCode(data);
     CHKR(pck.Read(data), STREAM_BUF_READ_FAIL, RET_ERR);
@@ -137,8 +112,19 @@ int32_t InputEventDataTransformation::SerializePointerEvent(std::shared_ptr<Poin
     CHKR(pck.Write(pointerE->GetPointerId()), STREAM_BUF_WRITE_FAIL, RET_ERR);
     CHKR(pck.Write(pointerE->GetSourceType()), STREAM_BUF_WRITE_FAIL, RET_ERR);
     CHKR(pck.Write(pointerE->GetButtonId()), STREAM_BUF_WRITE_FAIL, RET_ERR);
-    CHKR(pck.Write(pointerE->GetAxis()), STREAM_BUF_WRITE_FAIL, RET_ERR);
-    CHKR(pck.Write(pointerE->GetAxisValue()), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    CHKR(pck.Write(pointerE->GetAxes()), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    if (pointerE->HasAxis(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)) {
+        CHKR(pck.Write(pointerE->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)),
+            STREAM_BUF_WRITE_FAIL, RET_ERR);
+    }
+    if (pointerE->HasAxis(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL)) {
+        CHKR(pck.Write(pointerE->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL)),
+            STREAM_BUF_WRITE_FAIL, RET_ERR);
+    }
+    if (pointerE->HasAxis(PointerEvent::AXIS_TYPE_PINCH)) {
+        CHKR(pck.Write(pointerE->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH)),
+            STREAM_BUF_WRITE_FAIL, RET_ERR);
+    }
 
     std::set<int32_t> pressedBtns { pointerE->GetPressedButtons() };
     CHKR(pck.Write(pressedBtns.size()), STREAM_BUF_WRITE_FAIL, RET_ERR);
@@ -166,6 +152,11 @@ int32_t InputEventDataTransformation::SerializePointerEvent(std::shared_ptr<Poin
         CHKR(pck.Write(item.GetDeviceId()), STREAM_BUF_WRITE_FAIL, RET_ERR);
     }
 
+    std::vector<int32_t> pressedKeys = pointerE->GetPressedKeys();
+    CHKR(pck.Write(pressedKeys.size()), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    for (int32_t keyCode : pressedKeys) {
+        CHKR(pck.Write(keyCode), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    }
     return RET_OK;
 }
 
@@ -185,10 +176,19 @@ int32_t InputEventDataTransformation::DeserializePointerEvent(bool skipId,
     CHKR(pck.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
     pointerE->SetButtonId(tField);
     CHKR(pck.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
-    pointerE->SetAxis(tField);
     double axisValue {  };
-    CHKR(pck.Read(axisValue), STREAM_BUF_READ_FAIL, RET_ERR);
-    pointerE->SetAxisValue(axisValue);
+    if (PointerEvent::HasAxis(tField, PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)) {
+        CHKR(pck.Read(axisValue), STREAM_BUF_READ_FAIL, RET_ERR);
+        pointerE->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, axisValue);
+    }
+    if (PointerEvent::HasAxis(tField, PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL)) {
+        CHKR(pck.Read(axisValue), STREAM_BUF_READ_FAIL, RET_ERR);
+        pointerE->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, axisValue);
+    }
+    if (PointerEvent::HasAxis(tField, PointerEvent::AXIS_TYPE_PINCH)) {
+        CHKR(pck.Read(axisValue), STREAM_BUF_READ_FAIL, RET_ERR);
+        pointerE->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, axisValue);
+    }
 
     std::set<int32_t>::size_type nPressed {  };
     CHKR(pck.Read(nPressed), STREAM_BUF_READ_FAIL, RET_ERR);
@@ -206,6 +206,14 @@ int32_t InputEventDataTransformation::DeserializePointerEvent(bool skipId,
         pointerE->AddPointerItem(item);
     }
 
+    std::vector<int32_t> pressedKeys;
+    std::vector<int32_t>::size_type pressedKeySize = 0;
+    CHKR(pck.Read(pressedKeySize), STREAM_BUF_READ_FAIL, RET_ERR);
+    while (pressedKeySize-- > 0) {
+        CHKR(pck.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
+        pressedKeys.push_back(tField);
+    }
+    pointerE->SetPressedKeys(pressedKeys);
     return RET_OK;
 }
 

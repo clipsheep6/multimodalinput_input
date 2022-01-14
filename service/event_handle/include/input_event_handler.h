@@ -14,10 +14,14 @@
  */
 #ifndef OHOS_INPUT_EVENT_HANDLER_H
 #define OHOS_INPUT_EVENT_HANDLER_H
+#include "key_event_input_subscribe_filter.h"
 #include "msg_handler.h"
 #include "event_dispatch.h"
 #include "event_package.h"
 #include "c_singleton.h"
+#include "i_event_filter.h"
+#include "mouse_event_handler.h"
+#include <memory>
 
 namespace OHOS {
 namespace MMI {
@@ -31,7 +35,9 @@ public:
     void OnEvent(void *event);
     void OnCheckEventReport();
     void RegistnotifyDeviceChange(NotifyDeviceChange cb);
+    int32_t OnMouseEventTimerHanler(std::shared_ptr<OHOS::MMI::PointerEvent> mouse_event);
     UDSServer *GetUDSServer();
+    int32_t SetInputEventFilter(sptr<IEventFilter> filter);
 protected:
     int32_t OnEventDeviceAdded(multimodal_libinput_event& event);
     int32_t OnEventDeviceRemoved(multimodal_libinput_event& event);
@@ -39,7 +45,9 @@ protected:
     int32_t OnEventPointer(multimodal_libinput_event& event);
     int32_t OnEventTouch(multimodal_libinput_event& event);
     int32_t OnEventTouchSecond(libinput_event& event);
+    int32_t OnEventTouchPadSecond(libinput_event& event);
     int32_t OnEventGesture(multimodal_libinput_event& event);
+    int32_t OnEventTouchpad(multimodal_libinput_event& event);
     int32_t OnGestureEvent(libinput_event& event);
     int32_t OnEventTabletTool(multimodal_libinput_event& event);
     int32_t OnEventTabletPad(multimodal_libinput_event& event);
@@ -48,6 +56,9 @@ protected:
     int32_t OnEventTabletPadKey(multimodal_libinput_event& event);
     int32_t OnEventJoyStickAxis(multimodal_libinput_event& event, const uint64_t time);
     int32_t OnKeyboardEvent(libinput_event& event);
+    int32_t OnEventKey(libinput_event& event);
+    int32_t OnKeyEventDispatch(multimodal_libinput_event& event);
+    
     int32_t OnMouseEventHandler(libinput_event& event, const int32_t deviceId);
     bool SendMsg(const int32_t fd, NetPacket& pkt) const;
 #ifndef OHOS_AUTO_TEST_FRAME

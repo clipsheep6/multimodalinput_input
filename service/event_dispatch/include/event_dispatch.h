@@ -22,12 +22,14 @@
 #include "app_register.h"
 #include "event_package.h"
 #include "pointer_event.h"
+#include "i_event_filter.h"
+
 namespace OHOS::MMI {
-class EventDispatch {
+class EventDispatch : public std::enable_shared_from_this<EventDispatch> {
 public:
     EventDispatch();
     virtual ~EventDispatch();
-
+    virtual int32_t SetInputEventFilter(sptr<IEventFilter> filter);
     int32_t DispatchGestureNewEvent(UDSServer& udsServer, libinput_event& event,
         std::shared_ptr<PointerEvent> pointer, const uint64_t preHandlerTime);
     int32_t DispatchGestureEvent(UDSServer& udsServer, libinput_event& event, EventGesture& gesture,
@@ -50,9 +52,9 @@ public:
         EventTabletTool& tableTool, const uint64_t preHandlerTime, WindowSwitch& windowSwitch);
     int32_t DispatchTouchTransformPointEvent(UDSServer& udsServer, std::shared_ptr<PointerEvent> point);
     int32_t handlePointerEvent(std::shared_ptr<PointerEvent> point);
-    int32_t HandleTouchScreenEvent(std::shared_ptr<PointerEvent> point);
-    int32_t HandleMouseEvent(std::shared_ptr<PointerEvent> point);
-    int32_t HandleTouchPadEvent(std::shared_ptr<PointerEvent> point);
+    bool HandleTouchScreenEvent(std::shared_ptr<PointerEvent> point);
+    bool HandleMouseEvent(std::shared_ptr<PointerEvent> point);
+    bool HandleTouchPadEvent(std::shared_ptr<PointerEvent> point);
 #ifdef OHOS_AUTO_TEST_FRAME
     int32_t SendLibPktToAutoTest(UDSServer& udsServer, const AutoTestLibinputPkt& autoTestLibinputPkt);
     int32_t SendMappingPktToAutoTest(UDSServer& udsServer, int32_t sourceType);
@@ -62,6 +64,7 @@ public:
 #endif  // OHOS_AUTO_TEST_FRAME
 
 protected:
+    bool HandlePointerEventFilter(std::shared_ptr<PointerEvent> point);
     void OnEventTouchGetPointEventType(const EventTouch& touch, POINT_EVENT_TYPE& pointEventType,
         const int32_t fingerCount);
     int32_t GestureRegisteredEventDispatch(const MmiMessageId& idMsg, OHOS::MMI::UDSServer& udsServer,
@@ -80,6 +83,9 @@ protected:
     int32_t touchDownFocusSurfaceId_ = 0;
     EventPackage eventPackage_;
     StandardEventHandler standardEvent_;
+    std::mutex lockInputEventFilter_;
+    sptr<IEventFilter> filter_ {nullptr};
+    sptr<IRemoteObject::DeathRecipient> eventFilterRecipient_ {nullptr};
 #ifdef DEBUG_CODE_TEST
 private:
     const size_t windowCount_ = 2;
