@@ -824,11 +824,11 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinpu
 
     MMI_LOGT("\n4.event dispatcher of server:\neventKeyboard:time=%{public}" PRId64 ";deviceType=%{public}u;"
              "deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
-             "mUnicode=%{public}d;key=%{public}u;key_detail=%{public}s;seat_key_count=%{public}u;"
+             "unicode=%{public}d;key=%{public}u;key_detail=%{public}s;seat_key_count=%{public}u;"
              "state=%{public}d;fd=%{public}d;"
              "preHandlerTime=%{public}" PRId64 ";\n***********************************************************************\n",
              key.time, key.deviceType, key.deviceName, key.devicePhys, key.eventType,
-             key.mUnicode, key.key, trs.keyEvent.c_str(), key.seat_key_count, key.state, appInfo.fd,
+             key.unicode, key.key, trs.keyEvent.c_str(), key.seat_key_count, key.state, appInfo.fd,
              preHandlerTime);
 
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_KEY, appInfo.fd, key.time, preHandlerTime)) {
