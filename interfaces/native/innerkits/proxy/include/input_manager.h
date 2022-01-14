@@ -31,7 +31,8 @@ class InputManager {
 public:
     static InputManager *GetInstance();
     virtual ~InputManager() = default;
-
+    
+    //test1
     void UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
         const std::vector<LogicalDisplayInfo> &logicalDisplays);                         // 建议本地调用，可IPC
     void SetInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent> filter)>); // 只能本地
