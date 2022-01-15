@@ -40,6 +40,9 @@ void ChkConfig(int32_t fd)
 #ifdef OHOS_WESTEN_MODEL
     mprintf(fd, "\tOHOS_WESTEN_MODEL");
 #endif
+#ifdef OHOS_AUTO_TEST_FRAME
+    mprintf(fd, "\tOHOS_AUTO_TEST_FRAME");
+#endif
 #ifdef OHOS_BUILD_LIBINPUT
     mprintf(fd, "\tOHOS_BUILD_LIBINPUT");
 #endif
