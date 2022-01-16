@@ -173,5 +173,15 @@ bool InputDeviceManager::IsPointerDevice(struct libinput_device* device)
     return udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK | 
     EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD);
 }
+
+int32_t InputDeviceManager::FindInputDeviceId(libinput_device* inputDevice)
+{
+    for (const auto& it : inputDeviceMap_) {
+        if (static_cast<struct libinput_device *>(it.second) == inputDevice) {
+            return it.first;
+        }
+    }
+    return -1;
+}
 }
 }
