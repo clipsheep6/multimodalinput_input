@@ -28,6 +28,7 @@
 
 
 namespace OHOS::MMI {
+constexpr int32_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
     namespace {
         static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatch" };
     }
@@ -402,6 +403,19 @@ int32_t OHOS::MMI::EventDispatch::handlePointerEvent(std::shared_ptr<PointerEven
         MMI_LOGE("the fd less than 0");
         return RET_ERR;
     }
+
+    auto session = udsServer->GetSession(fd);
+    auto eventId = point->GetId();
+    auto currentTime = GetSysClockTime();
+    session->RecordEvent(eventId, currentTime);
+    auto firstTime = session->GetFirstEventTime();
+    if (currentTime < (firstTime + INPUT_UI_TIMEOUT_TIME)) {
+        MMI_LOGD("The pointer reports normally");
+    }
+    if (currentTime >= (firstTime + INPUT_UI_TIMEOUT_TIME)) {
+        MMI_LOGD("The pointer does not report normally, triggering ANR");
+    }
+
     if (!udsServer->SendMsg(fd, newPacket)) {
         MMI_LOGE("Sending structure of EventTouch failed! errCode:%{public}d\n", MSG_SEND_FAIL);
         return RET_ERR;
@@ -754,6 +768,18 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
              key->GetActionStartTime(),
              key->GetEventType(),
              key->GetFlag(), key->GetKeyAction(), fd, preHandlerTime);
+
+    auto session = udsServer.GetSession(fd);
+    auto eventId = key->GetId();
+    auto currentTime = GetSysClockTime();
+    session->RecordEvent(eventId, currentTime);
+    auto firstTime = session->GetFirstEventTime();
+    if (currentTime < (firstTime + INPUT_UI_TIMEOUT_TIME)) {
+        MMI_LOGD("The key event reports normally");
+    }
+    if (currentTime >= (firstTime + INPUT_UI_TIMEOUT_TIME)) {
+        MMI_LOGD("The key event does not report normally, triggering ANR");
+    }
 
     IEMServiceManager.ReportKeyEvent(key);
     NetPacket newPkt(MmiMessageId::ON_KEYEVENT);
