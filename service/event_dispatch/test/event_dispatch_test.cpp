@@ -22,8 +22,7 @@
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
-namespace
-{
+namespace {
    constexpr int32_t SLEEP = 6000;
    constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatchTest" };
