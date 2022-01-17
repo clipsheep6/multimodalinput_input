@@ -50,8 +50,7 @@ OHOS::MMI::ClientMsgHandler::~ClientMsgHandler()
 
 bool OHOS::MMI::ClientMsgHandler::Init()
 {
-    // LCOV_EXCL_START
-    MsgCallback funs[] = {
+    mapFuns_ = {
         {MmiMessageId::ON_KEY, MsgCallbackBind2(&ClientMsgHandler::OnKey, this)},
         {MmiMessageId::ON_KEYEVENT, MsgCallbackBind2(&ClientMsgHandler::OnKeyEvent, this)},
         {MmiMessageId::ON_SUBSCRIBE_KEY, std::bind(&ClientMsgHandler::OnSubscribeKeyEventCallback,
@@ -106,10 +105,6 @@ bool OHOS::MMI::ClientMsgHandler::Init()
         {MmiMessageId::TOUCHPAD_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::TouchpadEventInterceptor, this)},
         {MmiMessageId::KEYBOARD_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::KeyEventInterceptor, this)}, 
     };
-    // LCOV_EXCL_STOP
-    for (auto& it : funs) {
-        CHKC(RegistrationEvent(it), EVENT_REG_FAIL);
-    }
     return true;
 }
 

@@ -36,7 +36,7 @@ OHOS::MMI::RegisterEventHandleManager::~RegisterEventHandleManager()
 int32_t OHOS::MMI::RegisterEventHandleManager::RegisterEvent(MmiMessageId messageId, int32_t fd)
 {
     std::lock_guard<std::mutex> lock(mu_);
-    CHKR(messageId >= MmiMessageId::INVALID, PARAM_INPUT_INVALID, UNKNOWN_EVENT);
+    CHKR(messageId >= MmiMessageId::INVALID_MSG_ID, PARAM_INPUT_INVALID, UNKNOWN_EVENT);
     switch (messageId) {
         case MmiMessageId::COMMON_EVENT_BEGIN:
             RegisterEventHandleByIdMsage(MmiMessageId::COMMON_EVENT_BEGIN, MmiMessageId::COMMON_EVENT_END, fd);
@@ -67,7 +67,7 @@ int32_t OHOS::MMI::RegisterEventHandleManager::RegisterEvent(MmiMessageId messag
 int32_t OHOS::MMI::RegisterEventHandleManager::UnregisterEventHandleManager(MmiMessageId messageId, int32_t fd)
 {
     std::lock_guard<std::mutex> lock(mu_);
-    CHKR(messageId >= MmiMessageId::INVALID, PARAM_INPUT_INVALID, UNKNOWN_EVENT);
+    CHKR(messageId >= MmiMessageId::INVALID_MSG_ID, PARAM_INPUT_INVALID, UNKNOWN_EVENT);
     switch (messageId) {
         case MmiMessageId::COMMON_EVENT_BEGIN:
             UnregisterEventHandleByIdMsage(MmiMessageId::COMMON_EVENT_BEGIN, MmiMessageId::COMMON_EVENT_END, fd);
@@ -113,7 +113,7 @@ int32_t OHOS::MMI::RegisterEventHandleManager::FindSocketFdsByEventHandle(const 
                                                                           std::vector<int32_t>& fds)
 {
     std::lock_guard<std::mutex> lock(mu_);
-    CHKR(messageId >= MmiMessageId::INVALID, PARAM_INPUT_INVALID, UNKNOWN_EVENT);
+    CHKR(messageId >= MmiMessageId::INVALID_MSG_ID, PARAM_INPUT_INVALID, UNKNOWN_EVENT);
     auto it = mapRegisterManager_.find(messageId);
     if (it != mapRegisterManager_.end()) {
         for (size_t k = 0; k < mapRegisterManager_.count(messageId); k++, it++) {

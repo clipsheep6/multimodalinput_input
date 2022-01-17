@@ -103,7 +103,7 @@ HWTEST_F(UDSSessionTest, SendMsg_type1_005, TestSize.Level1)
 HWTEST_F(UDSSessionTest, SendMsg_type2_001, TestSize.Level1)
 {
     int32_t fd = -1;
-    NetPacket newPacket(MmiMessageId::INVALID);
+    NetPacket newPacket(MmiMessageId::INVALID_MSG_ID);
 
     UDSSession sesObj(PROGRAM_NAME, moduleType_, fd, UID_ROOT, pid_);
     bool retResult = sesObj.SendMsg(newPacket);

@@ -128,7 +128,7 @@ int32_t OHOS::MMI::EventDispatch::GestureRegisteredEventDispatch(const MmiMessag
 int32_t OHOS::MMI::EventDispatch::RegisteredEventDispatch(const MmiMessageId& idMsg, OHOS::MMI::UDSServer& udsServer,
     RegisteredEvent& registeredEvent, int32_t inputDeviceType, uint64_t preHandlerTime)
 {
-    CHKR(idMsg > MmiMessageId::INVALID, PARAM_INPUT_INVALID, PARAM_INPUT_INVALID);
+    CHKR(idMsg > MmiMessageId::INVALID_MSG_ID, PARAM_INPUT_INVALID, PARAM_INPUT_INVALID);
     std::vector<int32_t> fds;
     RegEventHM->FindSocketFdsByEventHandle(idMsg, fds);
     if (fds.empty()) {
@@ -548,9 +548,9 @@ int32_t OHOS::MMI::EventDispatch::DispatchGestureEvent(UDSServer& udsServer, lib
     auto device = libinput_event_get_device(event);
     CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
-    MmiMessageId idMsg = MmiMessageId::INVALID;
+    MmiMessageId idMsg = MmiMessageId::INVALID_MSG_ID;
     MMIRegEvent->OnEventGestureGetSign(gesture, idMsg);
-    if (idMsg != MmiMessageId::INVALID) {
+    if (idMsg != MmiMessageId::INVALID_MSG_ID) {
         RegisteredEvent registeredEvent = {};
         auto packageResult = eventPackage_.PackageRegisteredEvent<EventGesture>(registeredEvent, gesture);
         if (packageResult != RET_OK) {
@@ -607,9 +607,9 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
     std::string str = WinMgr->GetSurfaceIdListString();
 #endif
     int32_t ret = RET_OK;
-    MmiMessageId idMsg = MmiMessageId::INVALID;
+    MmiMessageId idMsg = MmiMessageId::INVALID_MSG_ID;
     MMIRegEvent->OnEventTouchGetSign(touch, idMsg);
-    if (idMsg != MmiMessageId::INVALID) {
+    if (idMsg != MmiMessageId::INVALID_MSG_ID) {
         RegisteredEvent registeredEvent = {};
         auto packageResult = eventPackage_.PackageRegisteredEvent<EventTouch>(registeredEvent, touch);
         if (packageResult != RET_OK) {
@@ -703,14 +703,14 @@ int32_t OHOS::MMI::EventDispatch::DispatchCommonPointEvent(UDSServer& udsServer,
     std::string str = WinMgr->GetSurfaceIdListString();
 #endif
     int32_t ret = RET_OK;
-    MmiMessageId idMsg = MmiMessageId::INVALID;
+    MmiMessageId idMsg = MmiMessageId::INVALID_MSG_ID;
     if (type == LIBINPUT_EVENT_POINTER_BUTTON) {
         MMIRegEvent->OnEventPointButton(point.button, point.time, point.state, idMsg);
     }
     if (type == LIBINPUT_EVENT_POINTER_AXIS) {
         MMIRegEvent->OnEventPointAxis(point, idMsg);
     }
-    if (idMsg != MmiMessageId::INVALID) {
+    if (idMsg != MmiMessageId::INVALID_MSG_ID) {
         RegisteredEvent registeredEvent = {};
         auto packageResult = eventPackage_.PackageRegisteredEvent<EventPointer>(registeredEvent, point);
         if (packageResult != RET_OK) {
@@ -780,10 +780,10 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinpu
         MMI_LOGE("Special Registered Event dispatch failed return:%{public}d errCode:%{public}d", ret,
             SPCL_REG_EVENT_DISP_FAIL);
     }
-    MmiMessageId idMsg = MmiMessageId::INVALID;
+    MmiMessageId idMsg = MmiMessageId::INVALID_MSG_ID;
     EventKeyboard prevKey = {};
     MMIRegEvent->OnEventKeyGetSign(key, idMsg, prevKey);
-    if (MmiMessageId::INVALID != idMsg) {
+    if (MmiMessageId::INVALID_MSG_ID != idMsg) {
         RegisteredEvent registeredEvent = {};
         auto packageResult = eventPackage_.PackageRegisteredEvent<EventKeyboard>(registeredEvent, prevKey);
         if (packageResult != RET_OK) {

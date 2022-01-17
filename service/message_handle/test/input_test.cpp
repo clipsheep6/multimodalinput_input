@@ -58,7 +58,7 @@ HWTEST_F(InputTest, OnMsgHandler, TestSize.Level1)
 HWTEST_F(InputTest, OnMsgHandler_01, TestSize.Level1)
 {
     SessionPtr sess;
-    NetPacket netPacket(MmiMessageId::INVALID);
+    NetPacket netPacket(MmiMessageId::INVALID_MSG_ID);
     ServerMsgHandler serverMsgHandler;
     serverMsgHandler.OnMsgHandler(sess, netPacket);
 }
