@@ -166,7 +166,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPack
              key->GetActionStartTime(), key->GetEventType(),
              key->GetFlag(), key->GetKeyAction(), fd, serverStartTime);
 
-    key->SetProcessedCallback([&client, &key](){
+    key->SetProcessedCallback([&client, &key]() {
         NetPacket ckt(MmiMessageId::NEW_CHECK_REPLY_MESSAGE);
         auto id = key->GetId();
         ckt << id;
@@ -222,7 +222,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnPointerEvent(const UDSClient& client, Net
         MMI_LOGD("Operation canceled.");
     }
 
-    pointerEvent->SetProcessedCallback([&client, &pointerEvent](){
+    pointerEvent->SetProcessedCallback([&client, &pointerEvent]() {
         NetPacket ckt(MmiMessageId::NEW_CHECK_REPLY_MESSAGE);
         auto id = pointerEvent->GetId();
         ckt << id;
