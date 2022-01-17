@@ -15,6 +15,7 @@
 
 #include "mmi_service.h"
 #include <cinttypes>
+#include <signal.h>
 #include "app_register.h"
 #include "device_register.h"
 #include "event_dump.h"
@@ -23,6 +24,7 @@
 #include "multimodal_input_connect_def_parcel.h"
 #include "register_eventhandle_manager.h"
 #include "safe_keeper.h"
+#include "timer_manager.h"
 #include "util.h"
 
 namespace OHOS {
@@ -68,9 +70,6 @@ static void CheckDefine()
 #endif
 #ifdef OHOS_WESTEN_MODEL
     CheckDefineOutput("%-40s", "\tOHOS_WESTEN_MODEL");
-#endif
-#ifdef OHOS_AUTO_TEST_FRAME
-    CheckDefineOutput("%-40s", "\tOHOS_AUTO_TEST_FRAME");
 #endif
 #ifdef OHOS_BUILD_LIBINPUT
     CheckDefineOutput("%-40s", "\tOHOS_BUILD_LIBINPUT");
@@ -181,6 +180,7 @@ bool MMIService::InitExpSoLibrary()
 
 int32_t MMIService::Init()
 {
+    signal(SIGPIPE, SIG_IGN);
     CheckDefine();
     CHKR(InitExpSoLibrary(), EXP_SO_LIBY_INIT_FAIL, EXP_SO_LIBY_INIT_FAIL);
 
@@ -329,12 +329,23 @@ int32_t MMIService::HandleAllocSocketFd(MessageParcel& data, MessageParcel& repl
     return RET_OK;
 }
 
+int32_t MMIService::SetInputEventFilter(sptr<IEventFilter> filter)
+{
+    if (inputEventHdr_ == nullptr) {
+        MMI_LOGE("inputEventHdr_ is nullptr");
+        return NULL_POINTER;
+    }
+
+    return inputEventHdr_->SetInputEventFilter(filter);
+}
+
 void MMIService::OnTimer()
 {
     if (inputEventHdr_ != nullptr) {
         inputEventHdr_->OnCheckEventReport();
     }
-   
+
+    TimerMgr->ProcessTimers();
 }
 
 void MMIService::OnThread()
@@ -346,11 +357,12 @@ void MMIService::OnThread()
     SafeKpr->RegisterEvent(tid, "mmi_service");
 
     int32_t count = 0;
+    constexpr int32_t timeOut = 50;
     epoll_event ev[MAX_EVENT_SIZE] = {};
     CLMAP<int32_t, StreamBufData> bufMap;
     while (state_ == ServiceRunningState::STATE_RUNNING) {
         bufMap.clear();
-        count = EpollWait(ev[0], MAX_EVENT_SIZE, 1, mmiFd_);
+        count = EpollWait(ev[0], MAX_EVENT_SIZE, timeOut, mmiFd_);
         for (int i = 0; i < count; i++) {
             auto mmiEd = reinterpret_cast<mmi_epoll_event*>(ev[i].data.ptr);
             CHKC(mmiEd, NULL_POINTER);

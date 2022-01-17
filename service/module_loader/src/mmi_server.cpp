@@ -19,6 +19,7 @@
 #include "log.h"
 #include "multimodal_input_connect_service.h"
 #include "util.h"
+#include "timer_manager.h"
 
 namespace OHOS::MMI {
     namespace {
@@ -55,9 +56,6 @@ static void CheckDefine()
 #endif
 #ifdef OHOS_WESTEN_MODEL
     CheckDefineOutput("%-40s", "\tOHOS_WESTEN_MODEL");
-#endif
-#ifdef OHOS_AUTO_TEST_FRAME
-    CheckDefineOutput("%-40s", "\tOHOS_AUTO_TEST_FRAME");
 #endif
 #ifdef OHOS_BUILD_LIBINPUT
     CheckDefineOutput("%-40s", "\tOHOS_BUILD_LIBINPUT");
@@ -186,6 +184,7 @@ int32_t OHOS::MMI::MMIServer::InitLibinput()
 void OHOS::MMI::MMIServer::OnTimer()
 {
     InputHandler->OnCheckEventReport();
+    TimerMgr->ProcessTimers();
 }
 
 void OHOS::MMI::MMIServer::StopAll()

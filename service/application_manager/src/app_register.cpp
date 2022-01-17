@@ -21,10 +21,11 @@ namespace MMI {
     namespace {
         static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AppRegister" };
     }
+#if 0
 const int32_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
 const int32_t INPUT_NUI_TIMEOUT_TIME = 10 * 1000000;
 const int32_t WAIT_QUEUE_EVENTS_MAX = 128;
-
+#endif
 AppRegister::AppRegister()
 {
 }
@@ -35,9 +36,6 @@ AppRegister::~AppRegister()
 
 bool AppRegister::Init(UDSServer& udsServer)
 {
-#ifdef OHOS_AUTO_TEST_FRAME
-    autoTestFrameFd_ = 0;
-#endif  // OHOS_AUTO_TEST_FRAME
     mapSurface_.clear();
     waitQueue_.clear();
     mapConnectState_.clear();
@@ -264,38 +262,10 @@ void AppRegister::UnregisterConnectState(int32_t fd)
     CHK(fd >= 0, PARAM_INPUT_INVALID);
     std::lock_guard<std::mutex> lock(mu_);
 
-#ifdef OHOS_AUTO_TEST_FRAME
-    if (autoTestFrameFd_ == fd) {
-        AutoTestSetAutoTestFd(0);
-    }
-#endif  // OHOS_AUTO_TEST_FRAME
-
     auto iter = mapConnectState_.find(fd);
     if (iter != mapConnectState_.end()) {
         mapConnectState_.erase(iter);
     }
 }
-
-// Auto-test frame code
-#ifdef OHOS_AUTO_TEST_FRAME
-void AppRegister::AutoTestSetAutoTestFd(int32_t fd)
-{
-    autoTestFrameFd_ = fd;
-}
-
-int32_t AppRegister::AutoTestGetAutoTestFd()
-{
-    return autoTestFrameFd_;
-}
-
-void AppRegister::AutoTestGetAllAppInfo(std::vector<AutoTestClientListPkt>& clientListPkt)
-{
-    AutoTestClientListPkt tempInfo;
-    for (auto i : mapSurface_) {
-        tempInfo = {i.second.fd, i.second.windowId, i.second.abilityId};
-        clientListPkt.push_back(tempInfo);
-    }
-}
-#endif  // OHOS_AUTO_TEST_FRAME
 }
 }

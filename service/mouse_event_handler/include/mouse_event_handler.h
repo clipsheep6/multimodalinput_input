@@ -19,21 +19,24 @@
 #include "libinput.h"
 #include "pointer_event.h"
 #include "input_windows_manager.h"
+#include "input_event_handler.h"
+#include <memory>
 
 namespace OHOS {
 namespace MMI {
 class MouseEventHandler : public PointerEvent {
 public:
     virtual ~MouseEventHandler();
-    void SetMouseData(libinput_event& event, int32_t deviceId);
+    void SetMouseData(libinput_event *event, int32_t deviceId);
     static std::shared_ptr<MouseEventHandler> Create()
     {
         return std::shared_ptr<MouseEventHandler>(new MouseEventHandler(InputEvent::EVENT_TYPE_POINTER));
     }
+    static int32_t SetMouseEndData(std::shared_ptr<PointerEvent> pointerEvent, int32_t deviceId);
 protected:
     explicit MouseEventHandler(int32_t eventType);
 
-    void SetMouseMotion(MouseInfo info, PointerEvent::PointerItem &pointerItem);
+    void SetMouseMotion(PointerEvent::PointerItem& pointerItem);
     void SetMouseButon(PointerEvent::PointerItem &pointerItem, struct libinput_event_pointer& pointEventData);
     void SetMouseAxis(struct libinput_event_pointer& pointEventData);
     void CalcMovedCoordinate(struct libinput_event_pointer &pointEventData);

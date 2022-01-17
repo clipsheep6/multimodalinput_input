@@ -49,6 +49,7 @@ protected:
     int32_t CheckReplyMessageFormClient(SessionPtr sess, NetPacket& pkt);
     int32_t GetMultimodeInputInfo(SessionPtr sess, NetPacket& pkt);
     int32_t OnInjectKeyEvent(SessionPtr sess, NetPacket& pkt);
+    int32_t OnNewInjectKeyEvent(SessionPtr sess, NetPacket& pkt);
     int32_t OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt);
     int32_t OnAddKeyEventFilter(SessionPtr sess, NetPacket& pkt);
     int32_t OnRemoveKeyEventFilter(SessionPtr sess, NetPacket& pkt);
@@ -70,10 +71,6 @@ protected:
     int32_t OnUnSubscribeKeyEvent(SessionPtr sess, NetPacket& pkt);
     int32_t OnAddTouchpadEventFilter(SessionPtr sess, NetPacket& pkt);
     int32_t OnRemoveTouchpadEventFilter(SessionPtr sess, NetPacket& pkt);
-#ifdef OHOS_AUTO_TEST_FRAME
-    int32_t AutoTestFrameRegister(SessionPtr sess, NetPacket& pkt);
-    int32_t AutoTestReceiveClientPkt(SessionPtr sess, NetPacket& pkt);
-#endif  // OHOS_AUTO_TEST_FRAME
 
 private:
     UDSServer *udsServer_ = nullptr; // External references, do not delete
