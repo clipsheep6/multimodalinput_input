@@ -32,12 +32,12 @@ HWTEST_F(UtilExTest, EnumAdd_001, TestSize.Level1)
 {
     MmiMessageId messageId1 = MmiMessageId::INVALID_MSG_ID;
     auto messageId2 = EnumAdd(messageId1, 1);
-    EXPECT_EQ(messageId2, MmiMessageId::LIBINPUT_EVENT_DEVICE_ADDED);
+    EXPECT_EQ(messageId2, LIBINPUT_EVENT_DEVICE_ADDED);
 }
 
 HWTEST_F(UtilExTest, EnumAdd_002, TestSize.Level1)
 {
-    MmiMessageId messageId1 = MmiMessageId::LIBINPUT_EVENT_DEVICE_ADDED;
+    MmiMessageId messageId1 = LIBINPUT_EVENT_DEVICE_ADDED;
     auto messageId2 = EnumAdd(messageId1, -1);
     EXPECT_EQ(messageId2, MmiMessageId::INVALID_MSG_ID);
 }
