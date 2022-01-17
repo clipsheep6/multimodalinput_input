@@ -51,7 +51,7 @@ public:
     }
 
 protected:
-    MmiMessageId idMsg_ = MmiMessageId::INVALID;
+    MmiMessageId idMsg_ = MmiMessageId::INVALID_MSG_ID;
 };
 }
 }

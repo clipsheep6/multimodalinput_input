@@ -31,13 +31,13 @@ public:
 
 protected:
     struct MsgCallback {
-        MmiMessageId id;
+        int32_t id;
         T fun;
     };
 
 protected:
     virtual ~MsgHandler() {};
-    T *GetFun(MmiMessageId id)
+    T *GetFun(int32_t id)
     {
         auto it = mapFuns_.find(id);
         if (it == mapFuns_.end())
@@ -54,7 +54,7 @@ protected:
     }
 
 protected:
-    std::map<MmiMessageId, T> mapFuns_;
+    std::map<int32_t, T> mapFuns_;
 };
 }
 }

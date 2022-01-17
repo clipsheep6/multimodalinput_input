@@ -330,14 +330,14 @@ HWTEST_F(StandardizedEventHandlerTest, OnTouch, TestSize.Level1)
 
 HWTEST_F(StandardizedEventHandlerTest, SetType, TestSize.Level1)
 {
-    MmiMessageId typeNum = MmiMessageId::INVALID;
+    MmiMessageId typeNum = MmiMessageId::INVALID_MSG_ID;
     StandardizedEventHandler standardHandler;
     standardHandler.SetType(typeNum);
 }
 
 HWTEST_F(StandardizedEventHandlerTest, GetType_001, TestSize.Level1)
 {
-    MmiMessageId typeNum = MmiMessageId::INVALID;
+    MmiMessageId typeNum = MmiMessageId::INVALID_MSG_ID;
     StandardizedEventHandler standardHandler;
     MmiMessageId retResult = standardHandler.GetType();
     EXPECT_EQ(retResult, typeNum);

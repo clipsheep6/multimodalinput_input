@@ -86,7 +86,7 @@ public:
         type_ = type;
     }
 protected:
-    MmiMessageId type_ = MmiMessageId::INVALID;
+    MmiMessageId type_ = MmiMessageId::INVALID_MSG_ID;
 };
 
 template<class T>
