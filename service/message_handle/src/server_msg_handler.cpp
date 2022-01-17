@@ -338,7 +338,6 @@ int32_t OHOS::MMI::ServerMsgHandler::CheckReplyMessageFormClient(SessionPtr sess
 
 int32_t OHOS::MMI::ServerMsgHandler::NewCheckReplyMessageFormClient(SessionPtr sess, NetPacket& pkt)
 {
-    CHKR(sess, NULL_POINTER, RET_ERR);
     MMI_LOGT("begin");
     int32_t id = 0;
     pkt >> id;
