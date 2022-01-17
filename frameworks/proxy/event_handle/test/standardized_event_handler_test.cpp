@@ -346,7 +346,7 @@ HWTEST_F(StandardizedEventHandlerTest, GetType_001, TestSize.Level1)
 
 HWTEST_F(StandardizedEventHandlerTest, GetType_002, TestSize.Level1)
 {
-    MmiMessageId typeNum = LIBINPUT_EVENT_DEVICE_ADDED;
+    MmiMessageId typeNum = 1; // LIBINPUT_EVENT_DEVICE_ADDED
     StandardizedEventHandler standardHandler;
     standardHandler.SetType(typeNum);
     MmiMessageId retResult = standardHandler.GetType();

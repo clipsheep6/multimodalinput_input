@@ -145,13 +145,7 @@ ohos_unittest("ut-mmi-proxy-out") {
   ]
 
   if (is_mmi_have_libinput) {
-    include_dirs += [
-      "$root_out_dir/diff_libinput_mmi/src",
-      "//third_party/eudev/export_include/",
-      "$root_out_dir/diff_libevdev_hdf/export_include",
-      "$root_out_dir/diff_libinput_mmi/include/linux",
-      "//third_party/FreeBSD/sys/dev/evdev",
-    ]
+    include_dirs += [ "$root_out_dir/diff_libinput_mmi/src" ]
   }
 
   cflags = [ "-DOHOS_BUILD" ]
@@ -209,7 +203,6 @@ ohos_unittest("ut-mmi-proxy-out") {
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/frameworks/util:libmmi-util",
-    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
