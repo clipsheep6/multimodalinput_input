@@ -331,34 +331,34 @@ HWTEST_F(StandardizedEventHandlerTest, OnTouch, TestSize.Level1)
 
 HWTEST_F(StandardizedEventHandlerTest, SetType, TestSize.Level1)
 {
-    int32_t typeNum = MmiMessageId::INVALID_MSG_ID;
+    MmiMessageId typeNum = MmiMessageId::INVALID_MSG_ID;
     StandardizedEventHandler standardHandler;
     standardHandler.SetType(typeNum);
 }
 
 HWTEST_F(StandardizedEventHandlerTest, GetType_001, TestSize.Level1)
 {
-    int32_t typeNum = MmiMessageId::INVALID_MSG_ID;
+    MmiMessageId typeNum = MmiMessageId::INVALID_MSG_ID;
     StandardizedEventHandler standardHandler;
-    int32_t retResult = standardHandler.GetType();
+    MmiMessageId retResult = standardHandler.GetType();
     EXPECT_EQ(retResult, typeNum);
 }
 
 HWTEST_F(StandardizedEventHandlerTest, GetType_002, TestSize.Level1)
 {
-    int32_t typeNum = LIBINPUT_EVENT_DEVICE_ADDED;
+    MmiMessageId typeNum = LIBINPUT_EVENT_DEVICE_ADDED;
     StandardizedEventHandler standardHandler;
     standardHandler.SetType(typeNum);
-    int32_t retResult = standardHandler.GetType();
+    MmiMessageId retResult = standardHandler.GetType();
     EXPECT_EQ(retResult, typeNum);
 }
 
 HWTEST_F(StandardizedEventHandlerTest, GetType_003, TestSize.Level1)
 {
-    int32_t typeNum = 4;
+    MmiMessageId typeNum = static_cast<MmiMessageId>(4);
     StandardizedEventHandler standardHandler;
-    standardHandler.SetType(4);
-    int32_t retResult = standardHandler.GetType();
+    standardHandler.SetType(static_cast<MmiMessageId>(4));
+    MmiMessageId retResult = standardHandler.GetType();
     EXPECT_EQ(retResult, typeNum);
 }
 } // namespace
