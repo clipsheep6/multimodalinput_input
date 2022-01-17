@@ -15,7 +15,7 @@
 
 #include "standardized_event_handler.h"
 #include <gtest/gtest.h>
-#include <libinupt.h>
+#include "libinput.h"
 
 namespace {
 using namespace testing::ext;

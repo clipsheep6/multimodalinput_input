@@ -15,7 +15,7 @@
 
 #include "util_ex.h"
 #include <gtest/gtest.h>
-#include <libinput.h>
+#include "libinput.h"
 #include "proto.h"
 
 namespace {
