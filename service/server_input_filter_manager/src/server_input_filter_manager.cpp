@@ -252,7 +252,7 @@ bool ServerInputFilterManager::OnTouchEvent(UDSServer& udsServer, libinput_event
     auto device = libinput_event_get_device(event);
     CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
-    MmiMessageId idMsg = MmiMessageId::INVALID;
+    MmiMessageId idMsg = MmiMessageId::INVALID_MSG_ID;
     MMIRegEvent->OnEventTouchGetSign(touch, idMsg);
 
     int32_t touchFocusId = WinMgr->GetTouchFocusSurfaceId();
