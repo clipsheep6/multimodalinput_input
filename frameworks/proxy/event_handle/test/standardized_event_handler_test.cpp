@@ -15,6 +15,7 @@
 
 #include "standardized_event_handler.h"
 #include <gtest/gtest.h>
+#include <libinupt.h>
 
 namespace {
 using namespace testing::ext;
@@ -330,34 +331,34 @@ HWTEST_F(StandardizedEventHandlerTest, OnTouch, TestSize.Level1)
 
 HWTEST_F(StandardizedEventHandlerTest, SetType, TestSize.Level1)
 {
-    MmiMessageId typeNum = MmiMessageId::INVALID_MSG_ID;
+    int32_t typeNum = MmiMessageId::INVALID_MSG_ID;
     StandardizedEventHandler standardHandler;
     standardHandler.SetType(typeNum);
 }
 
 HWTEST_F(StandardizedEventHandlerTest, GetType_001, TestSize.Level1)
 {
-    MmiMessageId typeNum = MmiMessageId::INVALID_MSG_ID;
+    int32_t typeNum = MmiMessageId::INVALID_MSG_ID;
     StandardizedEventHandler standardHandler;
-    MmiMessageId retResult = standardHandler.GetType();
+    int32_t retResult = standardHandler.GetType();
     EXPECT_EQ(retResult, typeNum);
 }
 
 HWTEST_F(StandardizedEventHandlerTest, GetType_002, TestSize.Level1)
 {
-    MmiMessageId typeNum = LIBINPUT_EVENT_DEVICE_ADDED;
+    int32_t typeNum = LIBINPUT_EVENT_DEVICE_ADDED;
     StandardizedEventHandler standardHandler;
     standardHandler.SetType(typeNum);
-    MmiMessageId retResult = standardHandler.GetType();
+    int32_t retResult = standardHandler.GetType();
     EXPECT_EQ(retResult, typeNum);
 }
 
 HWTEST_F(StandardizedEventHandlerTest, GetType_003, TestSize.Level1)
 {
-    MmiMessageId typeNum = static_cast<MmiMessageId>(4);
+    int32_t typeNum = 4;
     StandardizedEventHandler standardHandler;
-    standardHandler.SetType(static_cast<MmiMessageId>(4));
-    MmiMessageId retResult = standardHandler.GetType();
+    standardHandler.SetType(4);
+    int32_t retResult = standardHandler.GetType();
     EXPECT_EQ(retResult, typeNum);
 }
 } // namespace
