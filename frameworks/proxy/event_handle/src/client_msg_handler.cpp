@@ -700,7 +700,7 @@ int32_t OHOS::MMI::ClientMsgHandler::KeyEventFilter(const UDSClient& client, Net
     int32_t id = 0;
     pkt >> key >>id;
     MMI_LOGT("\nkey event filter : event dispatcher of client:\neventKeyboard:time=%{public}" PRId64
-        ";key=%{public}u;deviceId=%{private}u;"
+        ";key=%{public}u;device=%{private}u;"
         "deviceType=%{public}u;seat_key_count=%{public}u;state=%{public}d;\n",
         key.time, key.key, key.deviceId, key.deviceType, key.seat_key_count, key.state);
 
