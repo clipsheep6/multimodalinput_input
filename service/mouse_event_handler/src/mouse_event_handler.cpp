@@ -138,7 +138,6 @@ void MouseEventHandler::SetMouseData(libinput_event& event, int32_t deviceId)
     pointEventData = libinput_event_get_pointer_event(&event);
     uint64_t time = libinput_event_pointer_get_time_usec(pointEventData);
     int32_t type = libinput_event_get_type(&event);
-
     if ((type == LIBINPUT_EVENT_POINTER_MOTION) || (type == LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE)) {
         CalcMovedCoordinate(*pointEventData);
         WinMgr->SetMouseInfo(g_coordinateX, g_coordinateY);
