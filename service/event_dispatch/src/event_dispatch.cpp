@@ -28,6 +28,7 @@
 
 
 namespace OHOS::MMI {
+const int32_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
     namespace {
         static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatch" };
     }
@@ -768,7 +769,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
              key->GetEventType(),
              key->GetFlag(), key->GetKeyAction(), fd, preHandlerTime);
 
-    auto session = udsServer->GetSession(fd);
+    auto session = udsServer.GetSession(fd);
     auto eventId = key->GetId();
     auto currentTime = GetSysClockTime();
     session->RecordEvent(eventId, currentTime);
