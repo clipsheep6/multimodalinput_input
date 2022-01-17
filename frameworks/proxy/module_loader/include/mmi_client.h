@@ -35,6 +35,9 @@ public:
     void VirtualKeyIn(struct RawInputEvent virtualKeyEvent);
     void ReplyMessageToServer(MmiMessageId idMsg, uint64_t clientTime, uint64_t endTime) const;
 
+#ifdef OHOS_AUTO_TEST_FRAME
+    void AutoTestReplyClientPktToServer(const AutoTestClientPkt& autoTestClientPkt);
+#endif  // OHOS_AUTO_TEST_FRAME
     void SdkGetMultimodeInputInfo();
     MMIClientPtr GetPtr()
     {

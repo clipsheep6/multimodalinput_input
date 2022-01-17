@@ -68,6 +68,12 @@ public:
 
     void RegisterConnectState(int32_t fd);
 
+#ifdef OHOS_AUTO_TEST_FRAME
+    void AutoTestSetAutoTestFd(int32_t fd);
+    int32_t AutoTestGetAutoTestFd();
+    void AutoTestGetAllAppInfo(std::vector<AutoTestClientListPkt>& clientListPkt);
+#endif  // OHOS_AUTO_TEST_FRAME
+
 private:
     bool OnAnrLocked(int32_t fd) const;
     bool CheckFindFdError(const int32_t findFd);
@@ -84,6 +90,9 @@ private:
     std::map<int32_t, AppInfo> mapSurface_ = {}; // key=windowId:value=AppInfo
     std::vector<WaitQueueEvent> waitQueue_ = {};
     std::map<int32_t, int8_t> mapConnectState_ = {};
+#ifdef OHOS_AUTO_TEST_FRAME
+    int32_t autoTestFrameFd_ = 0;
+#endif  // OHOS_AUTO_TEST_FRAME
 
     std::mutex mu_;
     UDSServer *udsServer_ = nullptr;
