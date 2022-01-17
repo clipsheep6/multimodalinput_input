@@ -145,7 +145,11 @@ ohos_unittest("ut-mmi-proxy-out") {
   ]
 
   if (is_mmi_have_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/src" ]
+    include_dirs += [
+      "//third_party/eudev/export_include/",
+      "$root_out_dir/diff_libinput_mmi/src",
+      "$root_out_dir/diff_libinput_mmi/include/linux",
+    ]
   }
 
   cflags = [ "-DOHOS_BUILD" ]
