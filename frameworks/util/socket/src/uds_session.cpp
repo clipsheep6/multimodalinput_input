@@ -103,7 +103,7 @@ void OHOS::MMI::UDSSession::ClearEventList(int32_t id)
     int32_t count = 0;
     for (const auto &it : events_) {
         count++;
-        if (it.id_ == id) {
+        if (it.id == id) {
             events_.erase(events_.begin(), events_.begin() + count);
             MMI_LOGI("Delete events.");
         }
