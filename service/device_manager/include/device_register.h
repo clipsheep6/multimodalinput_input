@@ -41,7 +41,6 @@ inline DeviceRegister & GetDeviceRegister()
 {
     return DeviceRegister::GetInstance();
 }
-
 }
 }
 #endif
