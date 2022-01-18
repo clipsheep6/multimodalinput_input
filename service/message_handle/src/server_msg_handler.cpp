@@ -667,6 +667,37 @@ int32_t OHOS::MMI::ServerMsgHandler::OnMarkConsumed(SessionPtr sess, NetPacket& 
     return RET_OK;
 }
 
+int32_t OHOS::MMI::ServerMsgHandler::OnSubscribeKeyEvent(SessionPtr sess, NetPacket &pkt)
+{
+    int32_t subscribeId = -1;
+    uint32_t preKeySize = 0;
+    std::vector<int32_t> preKeys;
+    int32_t tmpKey = -1;
+    int32_t finalKey = -1;
+    bool isFinalKeyDown = true;
+    int32_t finalKeyDownDuration = 0;
+    pkt >> subscribeId >> finalKey >> isFinalKeyDown >> finalKeyDownDuration >> preKeySize;
+    for (auto i = 0U; i < preKeySize; ++i) {
+        pkt >> tmpKey;
+        preKeys.push_back(tmpKey);
+    }
+    std::shared_ptr<OHOS::MMI::KeyOption> keyOption = std::make_shared<OHOS::MMI::KeyOption>();
+    keyOption->SetPreKeys(preKeys);
+    keyOption->SetFinalKey(finalKey);
+    keyOption->SetFinalKeyDown(isFinalKeyDown);
+    keyOption->SetFinalKeyDownDuration(finalKeyDownDuration);
+    int32_t ret = KeyEventInputSubscribeFlt.SubscribeKeyEvent(sess, subscribeId, keyOption);
+    return ret;
+}
+
+int32_t OHOS::MMI::ServerMsgHandler::OnUnSubscribeKeyEvent(SessionPtr sess, NetPacket &pkt)
+{
+    int32_t subscribeId = -1;
+    pkt >> subscribeId;
+    int32_t ret = KeyEventInputSubscribeFlt.UnSubscribeKeyEvent(sess, subscribeId);
+    return ret;
+}
+
 int32_t OHOS::MMI::ServerMsgHandler::OnInputDeviceIds(SessionPtr sess, NetPacket& pkt)
 {
     MMI_LOGI("begin");
