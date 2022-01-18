@@ -103,7 +103,7 @@ int32_t OHOS::MMI::MMIServer::Start()
     CHKR(AppRegs->Init(*this), APP_REG_INIT_FAIL, APP_REG_INIT_FAIL);
 
     MMI_LOGD("DeviceRegister Init");
-    CHKR(DevRegister->Init(), DEV_REG_INIT_FAIL, DEV_REG_INIT_FAIL);
+    CHKR(GetDeviceRegister().Init(), DEV_REG_INIT_FAIL, DEV_REG_INIT_FAIL);
 
     MMI_LOGD("MsgHandler Init");
     CHKR(sMsgHandler_.Init(*this), SVR_MSG_HANDLER_INIT_FAIL, SVR_MSG_HANDLER_INIT_FAIL);

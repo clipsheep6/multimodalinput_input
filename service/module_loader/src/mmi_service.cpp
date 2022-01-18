@@ -207,7 +207,7 @@ int32_t MMIService::Init()
     CHKR(AppRegs->Init(*this), APP_REG_INIT_FAIL, APP_REG_INIT_FAIL);
 
     MMI_LOGD("DeviceRegister Init");
-    CHKR(DevRegister->Init(), DEV_REG_INIT_FAIL, DEV_REG_INIT_FAIL);
+    CHKR(GetDeviceRegister().Init(), DEV_REG_INIT_FAIL, DEV_REG_INIT_FAIL);
 
     mmiFd_ = EpollCreat(MAX_EVENT_SIZE);
     CHKR(mmiFd_ >= 0, EPOLL_CREATE_FAIL, EPOLL_CREATE_FAIL);
