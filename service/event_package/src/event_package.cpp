@@ -111,14 +111,14 @@ int32_t EventPackage::PackageEventDeviceInfo(libinput_event *event, UDSServer& u
 #endif
     std::string devicePhys(eventData.devicePhys);
     if (type == LIBINPUT_EVENT_DEVICE_REMOVED) {
-        DevRegister->DeleteDeviceInfo(devicePhys);
+        DeviceRegister::GetInstance().DeleteDeviceInfo(devicePhys);
         return RET_OK;
     }
-    uint32_t deviceId = DevRegister->FindDeviceIdByDevicePhys(devicePhys);
+    uint32_t deviceId = DeviceRegister::GetInstance().FindDeviceIdByDevicePhys(devicePhys);
     if (deviceId) {
         eventData.deviceId = deviceId;
     } else {
-        deviceId = DevRegister->AddDeviceInfo(devicePhys);
+        deviceId = DeviceRegister::GetInstance().AddDeviceInfo(devicePhys);
         CHKR(deviceId, ADD_DEVICE_INFO_CALL_FAIL, RET_ERR);
         eventData.deviceId = deviceId;
     }
