@@ -77,10 +77,6 @@ config("libmmi_server_public_config") {
 
   cflags = [ "-DOHOS_BUILD" ]
 
-  if (is_mmi_have_st_test) {
-    cflags += [ "-DOHOS_AUTO_TEST_FRAME" ]
-  }
-
   if (is_mmi_have_debug) {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
   }
@@ -157,8 +153,7 @@ ohos_shared_library("libmmi-server") {
     "window_manager/src/input_windows_manager.cpp",
     "window_manager/src/input_windows_manager_stub.cpp",
     "window_manager/src/outer_interface.cpp",
-
-    #"window_manager/src/pointer_drawing_manager.cpp",
+    "window_manager/src/pointer_drawing_manager.cpp",
     "window_manager/src/window_switch.cpp",
   ]
 
@@ -209,7 +204,6 @@ ohos_shared_library("libmmi-server") {
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_service",
     "//foundation/multimodalinput/input/service/event_filter_binder:mmi_event_filter_proxy",
     "//foundation/windowmanager/wm:libwm",
-    "//foundation/windowmanager/wm:libwmutil",
     "//third_party/libxkbcommon:libxkbcommon",
     "//third_party/wayland_standard:libwayland_server",
     "//third_party/weston:libweston",
@@ -310,10 +304,7 @@ ohos_unittest("PointerDrawTest") {
   }
   sources = [ "window_manager/test/pointer_drawing_manager_test.cpp" ]
 
-  cflags = [
-    "-DOHOS_BUILD",
-    "-DOHOS_AUTO_TEST_FRAME",
-  ]
+  cflags = [ "-DOHOS_BUILD" ]
 
   if (is_mmi_have_debug) {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
@@ -347,7 +338,6 @@ ohos_unittest("PointerDrawTest") {
     "//foundation/multimedia/image_standard/interfaces/innerkits:image",
     "//foundation/multimedia/image_standard/interfaces/innerkits:image_native",
     "//foundation/windowmanager/wm:libwm",
-    "//foundation/windowmanager/wm:libwmutil",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
     "//third_party/libxkbcommon:libxkbcommon",
@@ -438,10 +428,7 @@ ohos_unittest("ut-mmi-service-out") {
   if (is_mmi_have_weston) {
     sources += [ "event_handle/test/input_event_handler_test.cpp" ]
   }
-  cflags = [
-    "-DOHOS_BUILD",
-    "-DOHOS_AUTO_TEST_FRAME",
-  ]
+  cflags = [ "-DOHOS_BUILD" ]
 
   if (is_mmi_have_debug) {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
@@ -491,5 +478,6 @@ group("ut-mmi-service") {
   testonly = true
   deps = []
   deps += [ ":ut-mmi-service-out" ]
-  deps += [ ":PointerDrawTest" ]
+
+  #deps += [ ":PointerDrawTest" ]
 }

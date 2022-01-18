@@ -27,18 +27,18 @@ void InputDeviceManager::Init(weston_compositor* wc)
     if (initFlag_) {
         return;
     }
-    //constexpr int32_t size = 32;
-    //void* devices[size] = {0};
-    // weston_get_device_info(wc, size, devices);
-    // for (int32_t i = 0; i < size; i++) {
-    //     struct libinput_device* item = static_cast<struct libinput_device*>(devices[i]);
-    //     if (item == NULL) {
-    //         continue;
-    //     }
-    //     inputDeviceMap_.insert(std::pair<int32_t, libinput_device*>(nextId_,
-    //         static_cast<struct libinput_device*>(devices[i])));
-    //     nextId_++;
-    // }
+    constexpr int32_t size = 32;
+    void* devices[size] = {0};
+    weston_get_device_info(wc, size, devices);
+    for (int32_t i = 0; i < size; i++) {
+        struct libinput_device* item = static_cast<struct libinput_device*>(devices[i]);
+        if (item == NULL) {
+            continue;
+        }
+        inputDeviceMap_.insert(std::pair<int32_t, libinput_device*>(nextId_,
+            static_cast<struct libinput_device*>(devices[i])));
+        nextId_++;
+    }
     initFlag_ = true;
 }
 
@@ -143,7 +143,7 @@ void InputDeviceManager::OnInputDeviceAdded(libinput_device* inputDevice)
     nextId_++;
 
     if (IsPointerDevice(static_cast<struct libinput_device *>(inputDevice))) {
-        //DrawWgr->TellDeviceInfo(true);
+        DrawWgr->TellDeviceInfo(true);
     }
 }
 
@@ -159,7 +159,7 @@ void InputDeviceManager::OnInputDeviceRemoved(libinput_device* inputDevice)
         if (it->second == inputDevice) {
             inputDeviceMap_.erase(it);
             if (IsPointerDevice(inputDevice)) {
-                //DrawWgr->TellDeviceInfo(false);
+                DrawWgr->TellDeviceInfo(false);
             }
             break;
         }
@@ -172,6 +172,23 @@ bool InputDeviceManager::IsPointerDevice(struct libinput_device* device)
     MMI_LOGD("udev tag is%{public}d", static_cast<int32_t>(udevTags));
     return udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK | 
     EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD);
+}
+
+int32_t InputDeviceManager::FindInputDeviceId(libinput_device* inputDevice)
+{
+    MMI_LOGI("begin");
+    if (inputDevice == nullptr) {
+        MMI_LOGI("Libinput_device is nullptr");
+        return -1;
+    }
+    for (const auto& it : inputDeviceMap_) {
+        if (static_cast<struct libinput_device *>(it.second) == inputDevice) {
+            MMI_LOGI("Find input device id success");
+            return it.first;
+        }
+    }
+    MMI_LOGI("Find input device id failed");
+    return -1;
 }
 }
 }

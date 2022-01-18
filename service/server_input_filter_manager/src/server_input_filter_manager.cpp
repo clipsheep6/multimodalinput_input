@@ -79,9 +79,9 @@ void ServerInputFilterManager::KeyEventFilter::SetAuthority(Authority authority)
 
 bool ServerInputFilterManager::OnKeyEvent(EventKeyboard key)
 {
-    MMI_LOGD("key event filter on key event begin");
+    MMI_LOGD("Key event filter on key event begin");
     if (keyEventFilterMap_.size() == 0) {
-        MMI_LOGD("keyEventFilterMap_ size is zero");
+        MMI_LOGD("The keyEventFilterMap_ size is zero");
         return false;
     }
     SessionPtr temp;
@@ -95,20 +95,20 @@ bool ServerInputFilterManager::OnKeyEvent(EventKeyboard key)
         }
     }
     if (temp == nullptr) {
-        MMI_LOGD("session  is nullptr");
+        MMI_LOGD("Session is nullptr");
         return false;
     }
     if (id == 0) {
-        MMI_LOGD("send msg  id is 0");
+        MMI_LOGD("Send msg id is 0");
         return false;
     }
     NetPacket newPkt(MmiMessageId::KEY_EVENT_INTERCEPTOR);
     newPkt << key << id;
     if (!temp->SendMsg(newPkt)) {
-        MMI_LOGE("Sending structure of EventKeyboard failed! \n");
+        MMI_LOGE("Sending structure of EventKeyboard failed!");
         return false;
     }
-    MMI_LOGD("key event filter on key event end");
+    MMI_LOGD("Key event filter on key event end");
     return true;
 }
 
@@ -221,9 +221,10 @@ void ServerInputFilterManager::OnEventTouchGetPointEventType(const EventTouch& t
     }
 }
 
-bool ServerInputFilterManager::OnTouchEvent(UDSServer& udsServer, libinput_event& event,
+bool ServerInputFilterManager::OnTouchEvent(UDSServer& udsServer, libinput_event *event,
     EventTouch& touch, const uint64_t preHandlerTime, WindowSwitch& windowSwitch)
 {
+    CHKF(event, PARAM_INPUT_INVALID);
     MMI_LOGD("ServerInputFilterManager::OnTouchEvent");
     if (touchEventFilterMap_.size() == 0) {
         MMI_LOGD("touchEventFilterMap_ size is zero");
@@ -248,8 +249,8 @@ bool ServerInputFilterManager::OnTouchEvent(UDSServer& udsServer, libinput_event
         return false;
     }
 
-    auto device = libinput_event_get_device(&event);
-    CHKR(device, NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    auto device = libinput_event_get_device(event);
+    CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
     MmiMessageId idMsg = MmiMessageId::INVALID;
     MMIRegEvent->OnEventTouchGetSign(touch, idMsg);

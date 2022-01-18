@@ -15,6 +15,7 @@
 
 #include "mmi_service.h"
 #include <cinttypes>
+#include <signal.h>
 #include "app_register.h"
 #include "device_register.h"
 #include "event_dump.h"
@@ -69,9 +70,6 @@ static void CheckDefine()
 #endif
 #ifdef OHOS_WESTEN_MODEL
     CheckDefineOutput("%-40s", "\tOHOS_WESTEN_MODEL");
-#endif
-#ifdef OHOS_AUTO_TEST_FRAME
-    CheckDefineOutput("%-40s", "\tOHOS_AUTO_TEST_FRAME");
 #endif
 #ifdef OHOS_BUILD_LIBINPUT
     CheckDefineOutput("%-40s", "\tOHOS_BUILD_LIBINPUT");
@@ -182,6 +180,7 @@ bool MMIService::InitExpSoLibrary()
 
 int32_t MMIService::Init()
 {
+    signal(SIGPIPE, SIG_IGN);
     CheckDefine();
     CHKR(InitExpSoLibrary(), EXP_SO_LIBY_INIT_FAIL, EXP_SO_LIBY_INIT_FAIL);
 
@@ -254,7 +253,7 @@ void MMIService::OnDump()
 
 void MMIService::OnConnected(SessionPtr s)
 {
-    CHK(s, NULL_POINTER);
+    CHK(s, ERROR_NULL_POINTER);
     int32_t fd = s->GetFd();
     MMI_LOGI("MMIService::_OnConnected fd:%{public}d", fd);
     AppRegs->RegisterConnectState(fd);
@@ -262,7 +261,7 @@ void MMIService::OnConnected(SessionPtr s)
 
 void MMIService::OnDisconnected(SessionPtr s)
 {
-    CHK(s, NULL_POINTER);
+    CHK(s, ERROR_NULL_POINTER);
     MMI_LOGW("MMIService::OnDisconnected enter, session desc:%{public}s", s->GetDescript().c_str());
     int32_t fd = s->GetFd();
 
@@ -330,14 +329,14 @@ int32_t MMIService::HandleAllocSocketFd(MessageParcel& data, MessageParcel& repl
     return RET_OK;
 }
 
-int32_t MMIService::SetInputEventFilter(sptr<IEventFilter> filter)
+int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter)
 {
     if (inputEventHdr_ == nullptr) {
         MMI_LOGE("inputEventHdr_ is nullptr");
-        return NULL_POINTER;
+        return ERROR_NULL_POINTER;
     }
 
-    return inputEventHdr_->SetInputEventFilter(filter);
+    return inputEventHdr_->AddInputEventFilter(filter);
 }
 
 void MMIService::OnTimer()
@@ -366,7 +365,7 @@ void MMIService::OnThread()
         count = EpollWait(ev[0], MAX_EVENT_SIZE, timeOut, mmiFd_);
         for (int i = 0; i < count; i++) {
             auto mmiEd = reinterpret_cast<mmi_epoll_event*>(ev[i].data.ptr);
-            CHKC(mmiEd, NULL_POINTER);
+            CHKC(mmiEd, ERROR_NULL_POINTER);
             if (mmiEd->event_type == EPOLL_EVENT_INPUT) {
                 input_.EventDispatch(ev[i]);
             } else { // EPOLL_EVENT_SOCKET

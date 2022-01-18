@@ -288,9 +288,9 @@ void OHOS::MMI::InputWindowsManager::Dump(int32_t fd)
 void OHOS::MMI::InputWindowsManager::SaveScreenInfoToMap(const ScreenInfo** screenInfo)
 {
     // check param
-    CHK(udsServer_, NULL_POINTER);
-    CHK(screenInfo, NULL_POINTER);
-    CHK(*screenInfo, NULL_POINTER);
+    CHK(udsServer_, ERROR_NULL_POINTER);
+    CHK(screenInfo, ERROR_NULL_POINTER);
+    CHK(*screenInfo, ERROR_NULL_POINTER);
 
     // clear windows info
     screenInfoVec_.clear();
@@ -352,7 +352,7 @@ bool OHOS::MMI::InputWindowsManager::GetTouchSurfaceId(const double x, const dou
         int32_t newSurfaceId = -1;
         for (auto it : surfaces_) {
             auto res = static_cast<MMISurfaceInfo*>(&it.second);
-            CHKF(res, NULL_POINTER);
+            CHKF(res, ERROR_NULL_POINTER);
             // find window by coordinate
             if (FindSurfaceByCoordinate(x, y, *res)) {
                 if (res->onLayerId > newLayerId) {
@@ -540,7 +540,7 @@ void OHOS::MMI::InputWindowsManager::UpdateDisplayInfo(const std::vector<Physica
         }
     }
     if (logicalDisplays.size() > 0) {
-        //DrawWgr->TellDisplayInfo(logicalDisplays[0].id, logicalDisplays[0].width, logicalDisplays_[0].height);
+        DrawWgr->TellDisplayInfo(logicalDisplays[0].id, logicalDisplays[0].width, logicalDisplays_[0].height);
     }
     PrintDisplayDebugInfo();
     MMI_LOGD("InputWindowsManager::UpdateDisplayInfo leave");
@@ -754,7 +754,7 @@ bool OHOS::MMI::InputWindowsManager::CheckDisplayIdIfExist(int32_t& displayId)
         MMI_LOGE("logicalDisplays_is empty address is %{public}p", &logicalDisplays_);
         return false;
     }
-    if (displayId <= 0) {
+    if (displayId < 0) {
         displayId = logicalDisplays_[0].id;
         return true;
     }
@@ -851,7 +851,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
     int32_t globalX = pointerItem.GetGlobalX();
     int32_t globalY = pointerItem.GetGlobalY();
     FixCursorPosition(globalX, globalY, IMAGE_SIZE, IMAGE_SIZE);
-    //DrawWgr->DrawPointer(displayId, globalX, globalY);
+    DrawWgr->DrawPointer(displayId, globalX, globalY);
     WindowInfo *focusWindos = nullptr;
     for (auto it : logicalDisplayInfo.windowsInfo_) {
         if (isTouchWindow(globalX, globalY, it)) {

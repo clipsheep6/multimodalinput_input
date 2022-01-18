@@ -140,17 +140,17 @@ int32_t MultimodalStandardizedEventManager::UnSubscribeKeyEvent(int32_t subscrib
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnKey(const OHOS::KeyEvent& event)
 {
-    MMI_LOGT("\nMultimodalStandardizedEventManagerkey::OnKey\n");
+    MMI_LOGT("MultimodalStandardizedEventManagerkey::OnKey");
 #ifdef DEBUG_CODE_TEST
     if (event.GetDeviceUdevTags() == HOS_VIRTUAL_KEYBOARD) {
-        MMI_LOGT("Inject keyCode = %{public}d,action = %{public}d,revPid = %{public}d",
+        MMI_LOGT("Inject, keyCode=%{public}d, action=%{public}d, revPid=%{public}d",
             event.GetKeyCode(), event.IsKeyDown(), GetPid());
     }
 #endif
     auto range = mapEvents_.equal_range(MmiMessageId::KEY_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.windowId == event.GetWindowID() && i->second.eventCallBack->OnKey(event) == false) {
-            MMI_LOGW("\n OnKey Event consumption failed...errCode:%{public}d\n", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnKey Event consumption failed. errCode:%{public}d", EVENT_CONSUM_FAIL);
             break;
         }
     }
@@ -672,7 +672,7 @@ int32_t MultimodalStandardizedEventManager::InjectEvent(const std::shared_ptr<OH
 int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("Inject pointer event ...");
-    CHKR(pointerEvent, NULL_POINTER, RET_ERR);
+    CHKR(pointerEvent, ERROR_NULL_POINTER, RET_ERR);
     std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
     MMI_LOGD("\npointer event dispatcher of client:\neventType=%{public}d,actionTime=%{public}d,"
              "action=%{public}d,actionStartTime=%{public}d,"
@@ -731,7 +731,7 @@ int32_t MultimodalStandardizedEventManager::GetDevice(int32_t taskId, int32_t de
 
 bool MultimodalStandardizedEventManager::SendMsg(NetPacket& pkt) const
 {
-    CHKF(client_, NULL_POINTER);
+    CHKF(client_, ERROR_NULL_POINTER);
     return client_->SendMessage(pkt);
 }
 

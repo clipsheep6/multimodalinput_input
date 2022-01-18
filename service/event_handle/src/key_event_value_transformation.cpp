@@ -443,14 +443,16 @@ const std::multimap<int16_t, KeyEventValueTransformations> MAP_KEY_EVENT_VALUE_T
 KeyEventValueTransformations KeyValueTransformationByInput(int16_t keyValueOfInput)
 {
     auto it = MAP_KEY_EVENT_VALUE_TRANSFORMATION.find(keyValueOfInput);
-    if (it != MAP_KEY_EVENT_VALUE_TRANSFORMATION.end()) {
-        return it->second;
-    } else {
-        KeyEventValueTransformations unknownEvent = {
-            "KEY_UNKNOWN", keyValueOfInput, keyValueOfInput, HOS_KEY_UNKNOWN, 0
+    if (it == MAP_KEY_EVENT_VALUE_TRANSFORMATION.end()) {
+        const int16_t UNKNOWN_KEY_BASE = 10000;
+        KeyEventValueTransformations unknownKey = {
+            "UNKNOWN_KEY", keyValueOfInput, UNKNOWN_KEY_BASE + keyValueOfInput, HOS_UNKNOWN_KEY_BASE, 0
         };
-        return unknownEvent;
+        MMI_LOGE("KeyValueTransformationByInput Failed, unknown linux-code:%{public}d, "
+                 "UNKNOWN_KEY_BASE:%{public}d", keyValueOfInput, UNKNOWN_KEY_BASE);
+        return unknownKey;
     }
+    return it->second;
 }
 
 // class XkbKeyboardHandlerKey begin
