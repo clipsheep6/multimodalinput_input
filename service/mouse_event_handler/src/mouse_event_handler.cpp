@@ -63,8 +63,8 @@ void OHOS::MMI::MouseEventHandler::SetMouseMotion(PointerEvent::PointerItem& poi
     pointerItem.SetPressed(g_isPressed);
 }
 
-void OHOS::MMI::MouseEventHandler::SetMouseButon(PointerEvent::PointerItem& pointerItem,
-                                                 struct libinput_event_pointer& pointEventData)
+void OHOS::MMI::MouseEventHandler::SetMouseButon(const libinput_event_pointer& pointEventData,
+                                                 PointerEvent::PointerItem &pointerItem)
 {
     bool isPressed = false;
 
@@ -79,7 +79,7 @@ void OHOS::MMI::MouseEventHandler::SetMouseButon(PointerEvent::PointerItem& poin
         g_btnId = this->GetButtonId();
     } else {
         MMI_LOGW("PointerAction : %{public}d, unProces Button code : %{public}u",
-        this->GetPointerAction(), libinput_event_pointer_get_button(&pointEventData));
+            this->GetPointerAction(), libinput_event_pointer_get_button(&pointEventData));
     }
     if (libinput_event_pointer_get_button_state(&pointEventData) == LIBINPUT_BUTTON_STATE_RELEASED) {
         this->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
@@ -98,7 +98,7 @@ void OHOS::MMI::MouseEventHandler::SetMouseButon(PointerEvent::PointerItem& poin
 
 void OHOS::MMI::MouseEventHandler::SetMouseAxis(struct libinput_event_pointer& pointEventData)
 {
-    const int32_t MouseTimeOut = 100;
+    const int32_t mouseTimeout = 100;
     double axisValue = 0;
     if (TimerMgr == nullptr) {
         MMI_LOGI("the TimeManager is nullptr");
@@ -112,7 +112,7 @@ void OHOS::MMI::MouseEventHandler::SetMouseAxis(struct libinput_event_pointer& p
         this->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
         MMI_LOGI("pointer axis event begin");
     }
-    g_timerId = TimerMgr->AddTimer(MouseTimeOut, 1, []() {
+    g_timerId = TimerMgr->AddTimer(mouseTimeout, 1, []() {
         g_timerId = -1;
         MMI_LOGI("pointer axis event end TimerCallback run");
         auto pointerEvent = OHOS::MMI::PointerEvent::Create();
