@@ -86,10 +86,10 @@ void MouseEventHandler::SetMouseAxis(struct libinput_event_pointer& pointEventDa
         const int32_t mouseTimeout = 100;
         timerId_ = TimerMgr->AddTimer(mouseTimeout, 1, []() {
             const int32_t defaultTimerId = -1;
-            MouseEvent->SetTimerId(defaultTimerId);
+            MouseEvent.SetTimerId(defaultTimerId);
             MMI_LOGI("pointer axis event end TimerCallback run");
-            MouseEvent->SetMouseAction(PointerEvent::POINTER_ACTION_AXIS_END);
-            auto pointerEvent = MouseEvent->GetPointerEventPtr();
+            MouseEvent.SetMouseAction(PointerEvent::POINTER_ACTION_AXIS_END);
+            auto pointerEvent = MouseEvent.GetPointerEventPtr();
             if (pointerEvent == nullptr) {
                 MMI_LOGE("the pointerEvent is nullptr");
                 return;
