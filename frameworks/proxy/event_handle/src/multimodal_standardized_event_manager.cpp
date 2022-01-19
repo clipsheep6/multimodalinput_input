@@ -14,6 +14,7 @@
  */
 
 #include "multimodal_standardized_event_manager.h"
+#include "bytrace.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "immi_token.h"
@@ -118,6 +119,11 @@ int32_t MultimodalStandardizedEventManager::SubscribeKeyEvent(
     uint32_t preKeySize = keyOption->GetPreKeySize();
     pkt << subscribeInfo.GetSubscribeId() << keyOption->GetFinalKey() << keyOption->IsFinalKeyDown()
     << keyOption->GetFinalKeyDownDuration() << preKeySize;
+    int32_t keySubscibeId = subscribeInfo.GetSubscribeId();
+    const std::string keySubscribeIdstring = std::to_string(keySubscibeId);
+    MMI_LOGT("\n SubscribeKeyEvent client trace subscribeKeyId = %{public}s\n", keySubscribeIdstring.c_str());
+    int32_t EVENT_KEY = 1;
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keySubscribeIdstring, EVENT_KEY);
     std::vector<int32_t> preKeys = keyOption->GetPreKeys();
     for (auto preKeyIter = preKeys.begin(); preKeyIter != preKeys.end(); ++preKeyIter) {
         pkt << *preKeyIter;
@@ -140,26 +146,36 @@ int32_t MultimodalStandardizedEventManager::UnSubscribeKeyEvent(int32_t subscrib
 
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnKey(const OHOS::KeyEvent& event)
 {
-    MMI_LOGT("\nMultimodalStandardizedEventManagerkey::OnKey\n");
+    MMI_LOGT("MultimodalStandardizedEventManagerkey::OnKey");
 #ifdef DEBUG_CODE_TEST
     if (event.GetDeviceUdevTags() == HOS_VIRTUAL_KEYBOARD) {
-        MMI_LOGT("Inject keyCode = %{public}d,action = %{public}d,revPid = %{public}d",
+        MMI_LOGT("Inject, keyCode=%{public}d, action=%{public}d, revPid=%{public}d",
             event.GetKeyCode(), event.IsKeyDown(), GetPid());
     }
 #endif
     auto range = mapEvents_.equal_range(MmiMessageId::KEY_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.windowId == event.GetWindowID() && i->second.eventCallBack->OnKey(event) == false) {
-            MMI_LOGW("\n OnKey Event consumption failed...errCode:%{public}d\n", EVENT_CONSUM_FAIL);
+            MMI_LOGW("OnKey Event consumption failed. errCode:%{public}d", EVENT_CONSUM_FAIL);
             break;
         }
     }
     return RET_OK;
 }
 
+void OHOS::MMI::MultimodalStandardizedEventManager::OnTouchTrace(const TouchEvent& event)
+{
+    int32_t EVENT_TOUCH = 9;
+    const std::string touchEvent = event.GetUuid();
+    char *tmpTouch = (char*)touchEvent.c_str();
+    MMI_LOGT("OnTouch touchUuid = %{public}s\n", tmpTouch);
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, EVENT_TOUCH);
+}
+
 int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnTouch(const TouchEvent& event)
 {
     MMI_LOGT("\nMultimodalStandardizedEventManagertouch::OnTouch\n");
+    OnTouchTrace(event);
     auto range = mapEvents_.equal_range(MmiMessageId::TOUCH_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.windowId == event.GetWindowID() && i->second.eventCallBack->OnTouch(event) == false) {

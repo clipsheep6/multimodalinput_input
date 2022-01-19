@@ -12,34 +12,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_C_SINGLETON_H
-#define OHOS_C_SINGLETON_H
-#include <utility>
+
+#ifndef OHOS_EVENT_FILTER_WRAP_H
+#define OHOS_EVENT_FILTER_WRAP_H
+
+#include <mutex>
+#include "i_event_filter.h"
+#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
-template<typename T>
-class CSingleton {
+class EventFilterWrap : public Singleton<EventFilterWrap> {
 public:
-    template<typename ...Args>
-    static T *GetInstance(Args &&... args)
-    {
-        if (mInstance_ == nullptr) {
-            static T obj(std::forward<Args>(args)...);
-            mInstance_ = &obj;
-        }
-        return mInstance_;
-    }
-protected:
-    CSingleton() {};
-    ~CSingleton() {};
-    CSingleton(const CSingleton&);
-    CSingleton& operator = (const CSingleton&);
+    EventFilterWrap();
+    ~EventFilterWrap();
+    int32_t AddInputEventFilter(sptr<IEventFilter> filter);
+    bool HandlePointerEventFilter(std::shared_ptr<PointerEvent> point);
 private:
-    static T *mInstance_;
+    std::mutex lockInputEventFilter_;
+    sptr<IEventFilter> filter_ {nullptr};
 };
-
-template<class T> T *CSingleton<T>::mInstance_ = nullptr;
-}
-}
-#endif
+} // namespace MMI
+} // namespace OHOS
+#endif // OHOS_EVENT_FILTER_WRAP_H

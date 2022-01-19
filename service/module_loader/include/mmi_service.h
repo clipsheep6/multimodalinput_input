@@ -48,7 +48,7 @@ public:
     virtual void OnStop() override;
     virtual void OnDump() override;
     virtual int32_t AllocSocketFd(const std::string &programName, const int moduleType, int &socketFd) override;
-    virtual int32_t SetInputEventFilter(sptr<IEventFilter> filter) override;
+    virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
 
 protected:
     virtual void OnConnected(SessionPtr s) override;
@@ -74,7 +74,7 @@ private:
     SInput input_;
     UDSServer udsServer_;
     ServerMsgHandler sMsgHandler_;
-    InputEventHandler* inputEventHdr_ {nullptr};
+    std::shared_ptr<InputEventHandler> inputEventHdr_ {nullptr};
     ExpansibilityOperation expOper_;
 #ifdef  OHOS_BUILD_AI
     SeniorInputFuncProcBase seniorInput_;

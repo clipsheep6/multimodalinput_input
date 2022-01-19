@@ -58,6 +58,10 @@ public:
     }
 
     void UpdateDescript();
+    void RecordEvent(int32_t id, uint64_t time);
+    void ClearEventList(int32_t id);
+    uint64_t GetFirstEventTime();
+    void ClearEventsVct();
 
 #ifdef OHOS_BUILD_MMI_DEBUG
     void SetClientFd(const int clientFd)
@@ -68,6 +72,11 @@ public:
 #endif
 
 protected:
+    struct EventTime {
+        int32_t id;
+        uint64_t eventTime;
+    };
+    std::vector<EventTime> events_;
     std::string descript_;
     bool bHasClosed_ = false;
     const std::string programName_;
