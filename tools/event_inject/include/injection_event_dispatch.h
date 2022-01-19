@@ -61,8 +61,8 @@ public:
     int32_t OnKnuckleAll();
     int32_t OnKnuckleEach();
     int32_t OnHelp();
-    int32_t OnAisensorOne(MmiMessageId code, uint32_t value);
-    int32_t OnKnuckleOne(MmiMessageId code, uint32_t value);
+    int32_t OnAisensorOne(int32_t code, uint32_t value);
+    int32_t OnKnuckleOne(int32_t code, uint32_t value);
     int32_t ExecuteFunction(std::string funId);
     int32_t GetDevTypeByIndex(int32_t devIndex);
     int32_t GetDevIndexByType(int32_t devType);

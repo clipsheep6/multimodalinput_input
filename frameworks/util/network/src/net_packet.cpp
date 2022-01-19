@@ -16,7 +16,7 @@
 #include "net_packet.h"
 #include "log.h"
 
-OHOS::MMI::NetPacket::NetPacket(MmiMessageId idMsg) : idMsg_(idMsg)
+OHOS::MMI::NetPacket::NetPacket(int32_t idMsg) : idMsg_(idMsg)
 {
 }
 

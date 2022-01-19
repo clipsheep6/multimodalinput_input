@@ -88,7 +88,7 @@ OHOS::MMI::SystemEventHandler::~SystemEventHandler()
 {
 }
 
-int32_t OHOS::MMI::SystemEventHandler::OnSystemEventHandler(MmiMessageId idMsg)
+int32_t OHOS::MMI::SystemEventHandler::OnSystemEventHandler(int32_t idMsg)
 {
     if (idMsg == MmiMessageId::INVALID_MSG_ID) {
         return PARAM_INPUT_INVALID;

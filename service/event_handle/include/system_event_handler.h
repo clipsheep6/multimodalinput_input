@@ -27,7 +27,7 @@ public:
     SystemEventHandler();
     virtual ~SystemEventHandler();
 
-    int32_t OnSystemEventHandler(MmiMessageId idMsg);
+    int32_t OnSystemEventHandler(int32_t idMsg);
 
 protected:
     void OnGotoDesktop();

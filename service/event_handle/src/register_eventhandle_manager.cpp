@@ -33,7 +33,7 @@ OHOS::MMI::RegisterEventHandleManager::~RegisterEventHandleManager()
 {
 }
 
-int32_t OHOS::MMI::RegisterEventHandleManager::RegisterEvent(MmiMessageId messageId, int32_t fd)
+int32_t OHOS::MMI::RegisterEventHandleManager::RegisterEvent(int32_t messageId, int32_t fd)
 {
     std::lock_guard<std::mutex> lock(mu_);
     CHKR(messageId >= MmiMessageId::INVALID_MSG_ID, PARAM_INPUT_INVALID, UNKNOWN_EVENT);
@@ -64,7 +64,7 @@ int32_t OHOS::MMI::RegisterEventHandleManager::RegisterEvent(MmiMessageId messag
     return RET_OK;
 }
 
-int32_t OHOS::MMI::RegisterEventHandleManager::UnregisterEventHandleManager(MmiMessageId messageId, int32_t fd)
+int32_t OHOS::MMI::RegisterEventHandleManager::UnregisterEventHandleManager(int32_t messageId, int32_t fd)
 {
     std::lock_guard<std::mutex> lock(mu_);
     CHKR(messageId >= MmiMessageId::INVALID_MSG_ID, PARAM_INPUT_INVALID, UNKNOWN_EVENT);
@@ -109,7 +109,7 @@ void OHOS::MMI::RegisterEventHandleManager::UnregisterEventHandleBySocketFd(int3
     }
 }
 
-int32_t OHOS::MMI::RegisterEventHandleManager::FindSocketFdsByEventHandle(const MmiMessageId messageId,
+int32_t OHOS::MMI::RegisterEventHandleManager::FindSocketFdsByEventHandle(const int32_t messageId,
                                                                           std::vector<int32_t>& fds)
 {
     std::lock_guard<std::mutex> lock(mu_);
@@ -163,23 +163,22 @@ void OHOS::MMI::RegisterEventHandleManager::Clear()
     mapRegisterManager_.clear();
 }
 
-void OHOS::MMI::RegisterEventHandleManager::RegisterEventHandleByIdMsage(const MmiMessageId idMsgBegin,
-                                                                         const MmiMessageId idMsgEnd,
+void OHOS::MMI::RegisterEventHandleManager::RegisterEventHandleByIdMsage(const int32_t idMsgBegin,
+                                                                         const int32_t idMsgEnd,
                                                                          const int32_t fd)
 {
     const int32_t messageIdBeginTemp = static_cast<int32_t>(idMsgBegin);
     const int32_t messageIdEndTemp = static_cast<int32_t>(idMsgEnd);
     for (auto it = messageIdBeginTemp + 1; it < messageIdEndTemp; it++) {
-        auto tempId = static_cast<MmiMessageId>(it);
-        mapRegisterManager_.insert(std::pair<MmiMessageId, int32_t>(tempId, fd));
+        mapRegisterManager_.insert(std::pair<int32_t, int32_t>(it, fd));
     }
 }
 
-void OHOS::MMI::RegisterEventHandleManager::UnregisterEventHandleByIdMsage(const MmiMessageId idMsgBegin,
-                                                                           const MmiMessageId idMsgEnd,
+void OHOS::MMI::RegisterEventHandleManager::UnregisterEventHandleByIdMsage(const int32_t idMsgBegin,
+                                                                           const int32_t idMsgEnd,
                                                                            const int32_t fd)
 {
-    MmiMessageId idMsg = static_cast<MmiMessageId>(static_cast<int32_t>(idMsgBegin) + 1);
+    int32_t idMsg = idMsgBegin + 1;
     auto it = mapRegisterManager_.find(idMsg);
     while (it != mapRegisterManager_.end()) {
         if ((it->first < idMsgEnd) && (it->second == fd)) {

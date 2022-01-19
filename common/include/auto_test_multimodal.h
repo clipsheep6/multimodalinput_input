@@ -83,7 +83,7 @@ struct AutoTestDispatcherPkt {
     int32_t keyState;                        // 状态 按下1 抬起0
     double rawX;                             // 相对x坐标偏移量
     double rawY;                             // 相对y坐标偏移量
-    MmiMessageId mixedKey;                        // 组合键值(注册函数的键值)
+    int32_t mixedKey;                        // 组合键值(注册函数的键值)
     int32_t socketFd;                        // 通道号
     int32_t windowId;                        // 窗口Id
     int32_t abilityId;                       // 应用Id

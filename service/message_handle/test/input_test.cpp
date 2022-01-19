@@ -50,7 +50,7 @@ HWTEST_F(InputTest, Init_001, TestSize.Level1)
 HWTEST_F(InputTest, OnMsgHandler, TestSize.Level1)
 {
     SessionPtr sess;
-    NetPacket netPacket(static_cast<MmiMessageId>(10));
+    NetPacket netPacket(10);
     ServerMsgHandler serverMsgHandler;
     serverMsgHandler.OnMsgHandler(sess, netPacket);
 }
@@ -66,7 +66,7 @@ HWTEST_F(InputTest, OnMsgHandler_01, TestSize.Level1)
 HWTEST_F(InputTest, OnMsgHandler_02, TestSize.Level1)
 {
     SessionPtr sess;
-    NetPacket netPacket(static_cast<MmiMessageId>(-10));
+    NetPacket netPacket(-10);
     ServerMsgHandler serverMsgHandler;
     serverMsgHandler.OnMsgHandler(sess, netPacket);
 }

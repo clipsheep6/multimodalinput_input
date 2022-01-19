@@ -92,7 +92,7 @@ bool SeniorInputFuncProcBase::DeviceInit(int32_t sessionId, sptr<SeniorInputFunc
 
 int32_t SeniorInputFuncProcBase::DeviceEventProcess(const RawInputEvent& event)
 {
-    const MmiMessageId msgId = static_cast<MmiMessageId>(event.ev_code);
+    const int32_t msgId = static_cast<int32_t>(event.ev_code);
     const uint32_t occurredTime = static_cast<uint32_t>(event.stamp);
     const std::string uuid = GetUUid();
 

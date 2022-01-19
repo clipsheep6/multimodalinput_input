@@ -751,7 +751,7 @@ bool MultimodalStandardizedEventManager::SendMsg(NetPacket& pkt) const
     return client_->SendMessage(pkt);
 }
 
-bool MultimodalStandardizedEventManager::MakeRegisterHandle(MmiMessageId typeId, int32_t windowId,
+bool MultimodalStandardizedEventManager::MakeRegisterHandle(int32_t typeId, int32_t windowId,
                                                             std::string& rhandle)
 {
     rhandle = std::to_string(windowId) + ",";

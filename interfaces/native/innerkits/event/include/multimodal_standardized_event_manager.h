@@ -29,7 +29,7 @@ struct StandEventCallBack {
     int32_t windowId;
     StandEventPtr eventCallBack;
 };
-typedef std::multimap<MmiMessageId, StandEventCallBack> StandEventMMaps;
+typedef std::multimap<int32_t, StandEventCallBack> StandEventMMaps;
 class MultimodalStandardizedEventManager {
 public:
     MultimodalStandardizedEventManager();
@@ -101,7 +101,7 @@ public:
     int32_t OnDeviceRemove(const DeviceEvent& event);
 
 protected:
-    bool MakeRegisterHandle(MmiMessageId typeId, int32_t windowId, std::string& rhandle);
+    bool MakeRegisterHandle(int32_t typeId, int32_t windowId, std::string& rhandle);
     bool SendMsg(NetPacket& pkt) const;
 
 protected:

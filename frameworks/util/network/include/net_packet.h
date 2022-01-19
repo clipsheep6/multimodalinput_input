@@ -20,7 +20,7 @@
 
 #pragma pack(1)
 using PACKHEAD = struct PackHead {
-    MmiMessageId idMsg;
+    int32_t idMsg;
     int32_t size[1];
 };
 #pragma pack()
@@ -30,7 +30,7 @@ namespace MMI {
 class NetPacket : public StreamBuffer {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "NetPacket" };
 public:
-    explicit NetPacket(MmiMessageId idMsg);
+    explicit NetPacket(int32_t idMsg);
     NetPacket(const NetPacket& pack);
     NetPacket& operator = (const NetPacket& pack);
     virtual ~NetPacket();
@@ -45,13 +45,13 @@ public:
     {
         return Data();
     }
-    MmiMessageId GetMsgId() const
+    int32_t GetMsgId() const
     {
         return idMsg_;
     }
 
 protected:
-    MmiMessageId idMsg_ = MmiMessageId::INVALID_MSG_ID;
+    int32_t idMsg_ = MmiMessageId::INVALID_MSG_ID;
 };
 }
 }

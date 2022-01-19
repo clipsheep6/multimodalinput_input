@@ -40,14 +40,14 @@ int32_t OHOS::MMI::KnuckleFuncProc::DeviceEventDispatchProcess(const RawInputEve
 
 int32_t OHOS::MMI::KnuckleFuncProc::CheckEventCode(const RawInputEvent& event)
 {
-    static const std::set<MmiMessageId> g_knuckleAllowProcCodes = {
+    static const std::set<int32_t> g_knuckleAllowProcCodes = {
         MmiMessageId::ON_SCREEN_SHOT,
         MmiMessageId::ON_SCREEN_SPLIT,
         MmiMessageId::ON_START_SCREEN_RECORD,
         MmiMessageId::ON_STOP_SCREEN_RECORD,
     };
 
-    auto findNum = static_cast<MmiMessageId>(event.ev_code);
+    auto findNum = static_cast<int32_t>(event.ev_code);
     if (g_knuckleAllowProcCodes.find(findNum) != g_knuckleAllowProcCodes.end()) {
         return RET_OK;
     } else {

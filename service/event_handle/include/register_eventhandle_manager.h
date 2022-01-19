@@ -28,25 +28,25 @@ public:
     RegisterEventHandleManager();
     ~RegisterEventHandleManager();
 
-    int32_t RegisterEvent(MmiMessageId messageId, int32_t fd);
+    int32_t RegisterEvent(int32_t messageId, int32_t fd);
 
-    int32_t UnregisterEventHandleManager(MmiMessageId messageId, int32_t fd);
+    int32_t UnregisterEventHandleManager(int32_t messageId, int32_t fd);
 
     void UnregisterEventHandleBySocketFd(int32_t fd);
 
-    int32_t FindSocketFdsByEventHandle(const MmiMessageId messageId, std::vector<int32_t>& fds);
+    int32_t FindSocketFdsByEventHandle(const int32_t messageId, std::vector<int32_t>& fds);
 
     void PrintfMap();
     void Dump(int32_t fd);
     void Clear();
 
 private:
-    void RegisterEventHandleByIdMsage(const MmiMessageId idMsgBegin, const MmiMessageId idMsgEnd, const int32_t fd);
-    void UnregisterEventHandleByIdMsage(const MmiMessageId idMsgBegin, const MmiMessageId idMsgEnd, const int32_t fd);
+    void RegisterEventHandleByIdMsage(const int32_t idMsgBegin, const int32_t idMsgEnd, const int32_t fd);
+    void UnregisterEventHandleByIdMsage(const int32_t idMsgBegin, const int32_t idMsgEnd, const int32_t fd);
 
 private:
     std::mutex mu_;
-    std::multimap<MmiMessageId, int32_t> mapRegisterManager_ = {}; // key=enum MmiMessageId : value=fd
+    std::multimap<int32_t, int32_t> mapRegisterManager_ = {}; // key=enum MmiMessageId : value=fd
 };
 }
 }

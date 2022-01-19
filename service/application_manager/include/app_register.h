@@ -61,7 +61,7 @@ public:
 
     int32_t QueryMapSurfaceNum();
 
-    bool IsMultimodeInputReady(MmiMessageId idMsg, const int32_t findFd, uint64_t inputTime, uint64_t westonTime = 0);
+    bool IsMultimodeInputReady(int32_t idMsg, const int32_t findFd, uint64_t inputTime, uint64_t westonTime = 0);
 
     WaitQueueEvent GetWaitQueueEvent(int32_t fd, int32_t idMsg);
     void DeleteEventFromWaitQueue(int32_t fd, int32_t idMsg);

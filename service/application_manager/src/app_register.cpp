@@ -149,7 +149,7 @@ int32_t AppRegister::QueryMapSurfaceNum()
     return static_cast<int32_t>(mapSurface_.size());
 }
 
-bool AppRegister::IsMultimodeInputReady(MmiMessageId idMsg, const int32_t findFd, uint64_t inputTime,
+bool AppRegister::IsMultimodeInputReady(int32_t idMsg, const int32_t findFd, uint64_t inputTime,
                                         uint64_t westonTime)
 {
 #if 0 // temp comment for test

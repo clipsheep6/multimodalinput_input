@@ -79,7 +79,7 @@ void TestAuxToolClient::OnConnected()
 
 uint32_t OHOS::MMI::TestAuxToolClient::GetAiSensorAllowProcCodes(uint32_t item) const
 {
-    static const vector<MmiMessageId> aiSensorAllowProcCodes {
+    static const vector<int32_t> aiSensorAllowProcCodes {
     MmiMessageId::ON_SHOW_MENU,
     MmiMessageId::ON_SEND,
     MmiMessageId::ON_COPY,

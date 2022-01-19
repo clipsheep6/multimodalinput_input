@@ -63,9 +63,9 @@ protected:
     bool HandlePointerEventFilter(std::shared_ptr<PointerEvent> point);
     void OnEventTouchGetPointEventType(const EventTouch& touch, POINT_EVENT_TYPE& pointEventType,
         const int32_t fingerCount);
-    int32_t GestureRegisteredEventDispatch(const MmiMessageId& idMsg, OHOS::MMI::UDSServer& udsServer,
+    int32_t GestureRegisteredEventDispatch(const int32_t &idMsg, OHOS::MMI::UDSServer& udsServer,
         RegisteredEvent& registeredEvent, uint64_t preHandlerTime);
-    int32_t DispatchRegEvent(const MmiMessageId& idMsg, UDSServer& udsServer,
+    int32_t DispatchRegEvent(const int32_t &idMsg, UDSServer& udsServer,
         RegisteredEvent& eventData, int32_t inputDeviceType, uint64_t preHandlerTime);
     int32_t KeyBoardRegEveHandler(EventKeyboard& key, UDSServer& udsServer,
         libinput_event *event, int32_t inputDeviceType, uint64_t preHandlerTime);

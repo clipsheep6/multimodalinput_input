@@ -235,7 +235,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRegisterAppInfo(SessionPtr sess, NetPacke
 int32_t OHOS::MMI::ServerMsgHandler::OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt)
 {
     CHKR(sess, ERROR_NULL_POINTER, RET_ERR);
-    MmiMessageId eventType = MmiMessageId::INVALID_MSG_ID;
+    int32_t eventType = MmiMessageId::INVALID_MSG_ID;
     int32_t abilityId = 0;
     int32_t winId = 0;
     std::string bundlerName;
@@ -255,7 +255,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRegisterMsgHandler(SessionPtr sess, NetPa
 int32_t OHOS::MMI::ServerMsgHandler::OnUnregisterMsgHandler(SessionPtr sess, NetPacket& pkt)
 {
     CHKR(sess, ERROR_NULL_POINTER, RET_ERR);
-    MmiMessageId messageId = MmiMessageId::INVALID_MSG_ID;
+    int32_t messageId = MmiMessageId::INVALID_MSG_ID;
     int32_t fd = sess->GetFd();
     pkt >> messageId;
     RegEventHM->UnregisterEventHandleManager(messageId, fd);

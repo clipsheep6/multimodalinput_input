@@ -219,7 +219,7 @@ int32_t OHOS::MMI::InputEventHandler::OnEventHandler(multimodal_libinput_event &
     CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     auto type = libinput_event_get_type(ev.event);
     OHOS::MMI::TimeCostChk chk("InputEventHandler::OnEventHandler", "overtime 1000(us)", MAX_INPUT_EVENT_TIME, type);
-    auto fun = GetFun(static_cast<MmiMessageId>(type));
+    auto fun = GetFun(type);
     if (!fun) {
         MMI_LOGE("Unknown event type[%{public}d].errCode:%{public}d", type, UNKNOWN_EVENT);
         return UNKNOWN_EVENT;
