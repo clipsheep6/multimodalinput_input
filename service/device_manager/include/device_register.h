@@ -15,14 +15,15 @@
 
 #ifndef OHOS_DEVICE_REGISTER_H
 #define OHOS_DEVICE_REGISTER_H
+
 #include <set>
+#include "singleton.h"
 #include "uds_server.h"
 #include "util.h"
-#include "c_singleton.h"
 
 namespace OHOS {
 namespace MMI {
-class DeviceRegister : public CSingleton<DeviceRegister> {
+class DeviceRegister : public Singleton<DeviceRegister> {
 public:
     DeviceRegister();
     virtual ~DeviceRegister();
@@ -35,7 +36,11 @@ private:
     std::map<std::string, uint32_t> mapDeviceInfo_ = {};
     std::mutex mu_;
 };
-};
+
+inline DeviceRegister & GetDeviceRegister()
+{
+    return DeviceRegister::GetInstance();
 }
-#define DevRegister OHOS::MMI::DeviceRegister::GetInstance()
+}
+}
 #endif
