@@ -16,7 +16,7 @@
 #include "standardized_event_handler.h"
 #include "log.h"
 
-OHOS::MMI::StandardizedEventHandler::StandardizedEventHandler() : type_(MmiMessageId::INVALID) {}
+OHOS::MMI::StandardizedEventHandler::StandardizedEventHandler() : type_(MmiMessageId::INVALID_MSG_ID) {}
 
 OHOS::MMI::StandardizedEventHandler::~StandardizedEventHandler() {}
 

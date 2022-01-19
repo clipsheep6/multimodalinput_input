@@ -37,7 +37,7 @@ HWTEST_F(AuxToolMsgHandlerTest, Init_001, TestSize.Level1)
 
 HWTEST_F(AuxToolMsgHandlerTest, OnMsgHandler_001, TestSize.Level1)
 {
-    MmiMessageId idMsg = MmiMessageId::INVALID;
+    MmiMessageId idMsg = MmiMessageId::INVALID_MSG_ID;
     UDSClient client;
     NetPacket newPacket(idMsg);
 
@@ -66,7 +66,7 @@ HWTEST_F(AuxToolMsgHandlerTest, OnMsgHandler_003, TestSize.Level1)
 
 HWTEST_F(AuxToolMsgHandlerTest, OnAiServerReply_001, TestSize.Level1)
 {
-    MmiMessageId idMsg = MmiMessageId::INVALID;
+    MmiMessageId idMsg = MmiMessageId::INVALID_MSG_ID;
     UDSClient client;
     NetPacket newPacket(idMsg);
 
@@ -76,7 +76,7 @@ HWTEST_F(AuxToolMsgHandlerTest, OnAiServerReply_001, TestSize.Level1)
 }
 HWTEST_F(AuxToolMsgHandlerTest, OnAiServerReply_002, TestSize.Level1)
 {
-    MmiMessageId idMsg = MmiMessageId::INVALID;
+    MmiMessageId idMsg = MmiMessageId::INVALID_MSG_ID;
     int32_t replyCode = RET_ERR;
 
     UDSClient client;

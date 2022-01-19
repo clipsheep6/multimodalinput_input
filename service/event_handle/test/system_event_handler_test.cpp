@@ -30,7 +30,7 @@ public:
 
 HWTEST_F(SystemEventHandlerTest, Test_AbnormalInvalidMsgId, TestSize.Level1)
 {
-    auto rt = SysEveHdl->OnSystemEventHandler(MmiMessageId::INVALID);
+    auto rt = SysEveHdl->OnSystemEventHandler(MmiMessageId::INVALID_MSG_ID);
     EXPECT_EQ(rt, PARAM_INPUT_INVALID);
 }
 HWTEST_F(SystemEventHandlerTest, Test_AbnormalUnknownMsgId, TestSize.Level1)

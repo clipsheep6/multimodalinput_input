@@ -26,13 +26,13 @@ public:
 
 HWTEST_F(NetPacketTest, construct_001, TestSize.Level1)
 {
-    MmiMessageId idMsg = MmiMessageId::INVALID;
+    MmiMessageId idMsg = MmiMessageId::INVALID_MSG_ID;
     NetPacket pack(idMsg);
 }
 
 HWTEST_F(NetPacketTest, construct_002, TestSize.Level1)
 {
-    MmiMessageId idMsg = MmiMessageId::INVALID;
+    MmiMessageId idMsg = MmiMessageId::INVALID_MSG_ID;
     NetPacket pack(idMsg);
     NetPacket packTmp(pack);
 }
@@ -46,7 +46,7 @@ HWTEST_F(NetPacketTest, construct_003, TestSize.Level1)
 
 HWTEST_F(NetPacketTest, GetSize_001, TestSize.Level1)
 {
-    MmiMessageId idMsg = MmiMessageId::INVALID;
+    MmiMessageId idMsg = MmiMessageId::INVALID_MSG_ID;
     NetPacket pack(idMsg);
     size_t retResult = pack.GetSize();
     EXPECT_TRUE(retResult == 0);
@@ -68,7 +68,7 @@ HWTEST_F(NetPacketTest, GetSize_003, TestSize.Level1)
 
 HWTEST_F(NetPacketTest, GetData_001, TestSize.Level1)
 {
-    MmiMessageId idMsg = MmiMessageId::INVALID;
+    MmiMessageId idMsg = MmiMessageId::INVALID_MSG_ID;
     NetPacket pack(idMsg);
     const char *retResult = pack.GetData();
     EXPECT_TRUE(retResult != nullptr);

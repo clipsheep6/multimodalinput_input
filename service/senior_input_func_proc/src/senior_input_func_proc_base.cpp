@@ -96,7 +96,7 @@ int32_t SeniorInputFuncProcBase::DeviceEventProcess(const RawInputEvent& event)
     const uint32_t occurredTime = static_cast<uint32_t>(event.stamp);
     const std::string uuid = GetUUid();
 
-    if (msgId == MmiMessageId::INVALID) {
+    if (msgId == MmiMessageId::INVALID_MSG_ID) {
         MMI_LOGE("msgId is invalid.");
         return RET_ERR;
     }
