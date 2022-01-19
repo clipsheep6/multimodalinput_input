@@ -134,6 +134,8 @@ void MouseEventHandler::ProcessMouseData(libinput_event *event, int32_t deviceId
     }
 
     auto mouseInfo = WinMgr->GetMouseInfo();
+    MMI_LOGD("mouseInfo.globleX=%{public}d mouseInfo.globleY=%{public}d mouseInfo.localX=%{public}d mouseInfo.localY=%{public}d", 
+                        mouseInfo.globleX, mouseInfo.globleY, mouseInfo.localX, mouseInfo.localY);
     MouseState->SetMouseCoords(mouseInfo.globleX, mouseInfo.globleY);
     pointerItem.SetGlobalX(mouseInfo.globleX);
     pointerItem.SetGlobalY(mouseInfo.globleY);
