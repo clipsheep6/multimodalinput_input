@@ -25,7 +25,7 @@ namespace {
 int32_t ProcessingTouchScreenDevice::TransformJsonDataToInputData(const Json& touchScreenEventArrays,
                                                                   InputEventArray& inputEventArray)
 {
-    MMI_LOGI("Enter TransformJsonDataForTouchScreen function.");
+    MMI_LOG_I("Enter TransformJsonDataForTouchScreen function.");
     if (touchScreenEventArrays.empty()) {
         return RET_ERR;
     }
@@ -34,7 +34,7 @@ int32_t ProcessingTouchScreenDevice::TransformJsonDataToInputData(const Json& to
     }
     Json inputData = touchScreenEventArrays.at("events");
     if (inputData.empty()) {
-        MMI_LOGE("manage touchScreen array faild, inputData is empty.");
+        MMI_LOG_E("manage touchScreen array faild, inputData is empty.");
         return RET_ERR;
     }
     TouchScreenInputEvents touchScreenInputEvents = {};
@@ -48,20 +48,20 @@ int32_t ProcessingTouchScreenDevice::TransformJsonDataToInputData(const Json& to
     TouchScreenInputEvent releaseEvents = touchScreenInputEvents.eventArray[releaseEventIndex];
     AnalysisTouchScreenReleaseData(inputEventArray, releaseEvents);
 
-    MMI_LOGI("Leave TransformJsonDataForTouchScreen function.");
+    MMI_LOG_I("Leave TransformJsonDataForTouchScreen function.");
     return RET_OK;
 }
 
 int32_t ProcessingTouchScreenDevice::TransformJsonDataForSingleTouchScreen(const Json& touchScreenEventArrays,
     InputEventArray& inputEventArray)
 {
-    MMI_LOGI("Enter TransformJsonDataForSingleTouchScreen function.");
+    MMI_LOG_I("Enter TransformJsonDataForSingleTouchScreen function.");
     if (touchScreenEventArrays.empty()) {
         return RET_ERR;
     }
     Json inputData = touchScreenEventArrays.at("singleEvent");
     if (inputData.empty()) {
-        MMI_LOGE("manage touchScreen array faild, inputData is empty.");
+        MMI_LOG_E("manage touchScreen array faild, inputData is empty.");
         return RET_ERR;
     }
 
@@ -70,7 +70,7 @@ int32_t ProcessingTouchScreenDevice::TransformJsonDataForSingleTouchScreen(const
     for (TouchSingleEventData touchSingleEventData : touchSingleEventDatas) {
         AnalysisTouchScreenToInputData(inputEventArray, touchSingleEventData);
     }
-    MMI_LOGI("Leave TransformJsonDataForSingleTouchScreen function.");
+    MMI_LOG_I("Leave TransformJsonDataForSingleTouchScreen function.");
     return RET_OK;
 }
 

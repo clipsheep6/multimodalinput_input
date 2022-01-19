@@ -65,7 +65,7 @@ namespace {
 void OnThreadTermination(int32_t outTime, uint64_t tid, const std::string& remark)
 {
     using namespace OHOS::MMI;
-    MMI_LOGE("OnThreadTermination tid:%{public}" PRId64 " %{public}s %{public}d/%{public}d",
+    MMI_LOG_E("OnThreadTermination tid:%{public}" PRId64 " %{public}s %{public}d/%{public}d",
         tid, remark.c_str(), outTime, MAX_THREAD_DEATH_TIME);
     MMIEventDump->InsertFormat("OnThreadTermination tid=%llu, remark=%s %d/%d",
         tid, remark.c_str(), outTime, MAX_THREAD_DEATH_TIME);
@@ -87,7 +87,7 @@ void OnThread()
             std::placeholders::_3));
         auto ret = mmiServer.Start();
         if (RET_OK != ret) {
-            MMI_LOGW("MMIServer failed to start, it will restart in %{public}d milliseconds. ret:%{public}d",
+            MMI_LOG_W("MMIServer failed to start, it will restart in %{public}d milliseconds. ret:%{public}d",
                 SERVER_RESTART_COOLING_TIME, ret);
             mmiServer.StopAll();
             std::this_thread::sleep_for(std::chrono::milliseconds(SERVER_RESTART_COOLING_TIME));
@@ -95,7 +95,7 @@ void OnThread()
         }
         while (g_isRun) {
             if (g_bThreadTerm) {
-                MMI_LOGW("The program is abnormal(%{public}d), and the server will restart in %{public}d milliseconds",
+                MMI_LOG_W("The program is abnormal(%{public}d), and the server will restart in %{public}d milliseconds",
                     g_bThreadTerm, SERVER_RESTART_COOLING_TIME);
                 mmiServer.StopAll();
                 std::this_thread::sleep_for(std::chrono::milliseconds(SERVER_RESTART_COOLING_TIME));
@@ -117,7 +117,7 @@ void OnThread()
 #ifdef DEBUG_CODE_TEST
     g_isAllRun = false;
 #endif
-    MMI_LOGI("libmmi_main OnThread end...\n");
+    MMI_LOG_I("libmmi_main OnThread end...\n");
 }
 }
 #endif
@@ -146,7 +146,7 @@ void StartMmiServer(void)
     using namespace OHOS::MMI;
     uint64_t tid = OHOS::MMI::GetThisThreadIdOfLL();
     g_llStartTime = OHOS::MMI::GetMillisTime();
-    MMI_LOGI("The server starts to start tid:%" PRId64 ". The current timestamp is %" PRId64
+    MMI_LOG_I("The server starts to start tid:%" PRId64 ". The current timestamp is %" PRId64
             " Ms\n", tid, g_llStartTime);
 #endif
     g_isRun = true;

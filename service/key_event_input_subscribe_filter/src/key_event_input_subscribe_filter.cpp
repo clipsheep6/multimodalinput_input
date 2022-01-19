@@ -31,27 +31,27 @@ static const uint8_t MAX_PRE_KEY_COUNT = 4;
 int32_t KeyEventInputSubscribeFilter::SubscribeKeyEvent(
         SessionPtr sess, int32_t subscribeId, std::shared_ptr<OHOS::MMI::KeyOption> keyOption)
 {
-    MMI_LOGD("Enter");
+    MMI_LOG_D("Enter");
     if (!sess) {
-        MMI_LOGE("Leave, null sess.");
+        MMI_LOG_E("Leave, null sess.");
         return RET_ERR;
     }
 
     if (!keyOption) {
-        MMI_LOGD("Leave, the [KeyOption] is nullptr.");
+        MMI_LOG_D("Leave, the [KeyOption] is nullptr.");
         return RET_ERR;
     }
 
     if (keyOption->GetPreKeySize() > MAX_PRE_KEY_COUNT) {
-        MMI_LOGD("Leave, pre key size more than %{public}d", MAX_PRE_KEY_COUNT);
+        MMI_LOG_D("Leave, pre key size more than %{public}d", MAX_PRE_KEY_COUNT);
         return RET_ERR;
     }
 
     for (auto keyCode : keyOption->GetPreKeys()) {
-        MMI_LOGD("KeyOption->prekey=%{public}s", KeyEvent::KeyCodeToString(keyCode));
+        MMI_LOG_D("KeyOption->prekey=%{public}s", KeyEvent::KeyCodeToString(keyCode));
     }
 
-    MMI_LOGD("SubscribeId=%{public}d,KeyOption->finalKey=%{public}d,"
+    MMI_LOG_D("SubscribeId=%{public}d,KeyOption->finalKey=%{public}d,"
             "KeyOption->isFinalKeyDown=%{public}d,KeyOption->finalKeyDownDuriation=%{public}d",
             subscribeId, keyOption->GetFinalKey(), ((keyOption->IsFinalKeyDown() == true) ? 1 : 0),
             keyOption->GetFinalKeyDownDuration());
@@ -61,41 +61,41 @@ int32_t KeyEventInputSubscribeFilter::SubscribeKeyEvent(
 
     InitSessionDeleteCallback();
 
-    MMI_LOGD("Leave");
+    MMI_LOG_D("Leave");
     return RET_OK;
 }
 
 int32_t KeyEventInputSubscribeFilter::UnSubscribeKeyEvent(SessionPtr sess, int32_t subscribeId)
 {
-    MMI_LOGD("Enter subscribeId:%{public}d", subscribeId);
+    MMI_LOG_D("Enter subscribeId:%{public}d", subscribeId);
     for (auto it = subscribers_.begin(); it != subscribers_.end(); ++it) {
         if ((*it)->id_ == subscribeId && (*it)->sess_ == sess) {
             ClearTimer(*it);
             subscribers_.erase(it);
-            MMI_LOGD("Leave");
+            MMI_LOG_D("Leave");
             return RET_OK;
         }
     }
 
-    MMI_LOGE("Leave");
+    MMI_LOG_E("Leave");
     return RET_ERR;
 }
 
 bool KeyEventInputSubscribeFilter::FilterSubscribeKeyEvent(UDSServer& udsServer,
         std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 {
-    MMI_LOGD("Enter");
+    MMI_LOG_D("Enter");
 
     if (!keyEvent) {
-        MMI_LOGE("Leave, no subscriber");
+        MMI_LOG_E("Leave, no subscriber");
         return false;
     }
 
     bool handled = false;
     int32_t keyAction = keyEvent->GetKeyAction();
-    MMI_LOGD("KeyCode:%{public}d, KeyAction:%{public}s", keyEvent->GetKeyCode(), KeyEvent::ActionToString(keyAction));
+    MMI_LOG_D("KeyCode:%{public}d, KeyAction:%{public}s", keyEvent->GetKeyCode(), KeyEvent::ActionToString(keyAction));
     for (auto& keyCode : keyEvent->GetPressedKeys()) {
-        MMI_LOGD("Pressed KeyCode:%{public}d", keyCode);
+        MMI_LOG_D("Pressed KeyCode:%{public}d", keyCode);
     }
     if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
         handled = HandleKeyDown(keyEvent);
@@ -111,7 +111,7 @@ bool KeyEventInputSubscribeFilter::FilterSubscribeKeyEvent(UDSServer& udsServer,
 
 void KeyEventInputSubscribeFilter::OnSessionLost(SessionPtr sess)
 {
-    MMI_LOGD("Enter");
+    MMI_LOG_D("Enter");
     for (auto it = subscribers_.begin(); it != subscribers_.end(); ) {
         if ((*it)->sess_ == sess) {
             ClearTimer(*it);
@@ -121,7 +121,7 @@ void KeyEventInputSubscribeFilter::OnSessionLost(SessionPtr sess)
         ++it;
     }
 
-    MMI_LOGD("Leave");
+    MMI_LOG_D("Leave");
 }
 
 bool KeyEventInputSubscribeFilter::IsPreKeysMatch(const std::vector<int32_t>& preKeys,
@@ -144,11 +144,11 @@ bool KeyEventInputSubscribeFilter::IsPreKeysMatch(const std::vector<int32_t>& pr
 void KeyEventInputSubscribeFilter::NotifySubscriber(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent,
         const std::shared_ptr<Subscriber>& subscriber)
 {
-    MMI_LOGD("Enter");
+    MMI_LOG_D("Enter");
 
     auto udsServerPtr = InputHandler->GetUDSServer();
     if (!udsServerPtr) {
-        MMI_LOGE("Leave, null udsServerPtr");
+        MMI_LOG_E("Leave, null udsServerPtr");
         return;
     }
 
@@ -158,45 +158,45 @@ void KeyEventInputSubscribeFilter::NotifySubscriber(std::shared_ptr<OHOS::MMI::K
     int32_t fd = subscriber->sess_->GetFd();
     pkt << fd << subscriber->id_;
     if (!udsServer.SendMsg(fd, pkt)) {
-        MMI_LOGE("Leave, server disaptch subscriber failed");
+        MMI_LOG_E("Leave, server disaptch subscriber failed");
         return;
     }
 
-    MMI_LOGD("Leave");
+    MMI_LOG_D("Leave");
 }
 
 bool KeyEventInputSubscribeFilter::AddTimer(const std::shared_ptr<Subscriber>& subscriber,
         const std::shared_ptr<KeyEvent>& keyEvent)
 {
-    MMI_LOGD("Enter");
+    MMI_LOG_D("Enter");
 
     if (!subscriber) {
-        MMI_LOGE("Leave, null subscriber");
+        MMI_LOG_E("Leave, null subscriber");
         return false;
     }
 
     if(subscriber->timerId_ >= 0) {
-        MMI_LOGD("Leave, Timer Already Added");
+        MMI_LOG_D("Leave, Timer Already Added");
         return true;
     }
 
     auto& keyOption = subscriber->keyOption_;
     if (keyOption->GetFinalKeyDownDuration() <= 0) {
-        MMI_LOGE("Leave, Duration <= 0");
+        MMI_LOG_E("Leave, Duration <= 0");
         return true;
     }
 
     if (!CloneKeyEvent(keyEvent)) {
-        MMI_LOGE("Leave, CloneKeyEvent Failed");
+        MMI_LOG_E("Leave, CloneKeyEvent Failed");
         return false;
     }
 
     std::weak_ptr<Subscriber> weakSubscriber = subscriber;
     subscriber->timerId_ = TimerMgr->AddTimer(keyOption->GetFinalKeyDownDuration(), 1, [this, weakSubscriber] () {
-        MMI_LOGD("TimerCallback");
+        MMI_LOG_D("TimerCallback");
         auto subscriber = weakSubscriber.lock();
         if (!subscriber) {
-            MMI_LOGE("Leave, TimerCallback, null subscriber");
+            MMI_LOG_E("Leave, TimerCallback, null subscriber");
             return;
         }
 
@@ -204,24 +204,24 @@ bool KeyEventInputSubscribeFilter::AddTimer(const std::shared_ptr<Subscriber>& s
     });
 
     if (subscriber->timerId_ < 0) {
-        MMI_LOGE("Leave, AddTimer Failed");
+        MMI_LOG_E("Leave, AddTimer Failed");
         return false;
     }
     subscriber->keyEvent_ = keyEvent_;
-    MMI_LOGD("Leave, AddTimer Success, duration:%{public}d, timerId:%{public}d", keyOption->GetFinalKeyDownDuration(), subscriber->timerId_);
+    MMI_LOG_D("Leave, AddTimer Success, duration:%{public}d, timerId:%{public}d", keyOption->GetFinalKeyDownDuration(), subscriber->timerId_);
     return true;
 }
 
 void KeyEventInputSubscribeFilter::ClearTimer(const std::shared_ptr<Subscriber>& subscriber)
 {
-    MMI_LOGD("Enter");
+    MMI_LOG_D("Enter");
     if (!subscriber) {
-        MMI_LOGE("Leave, null subscriber");
+        MMI_LOG_E("Leave, null subscriber");
         return;
     }
 
     if(subscriber->timerId_ < 0) {
-        MMI_LOGE("Leave, subscribeId:%{public}d, null timerId < 0", subscriber->id_);
+        MMI_LOG_E("Leave, subscribeId:%{public}d, null timerId < 0", subscriber->id_);
         return;
     }
 
@@ -229,38 +229,38 @@ void KeyEventInputSubscribeFilter::ClearTimer(const std::shared_ptr<Subscriber>&
     subscriber->keyEvent_.reset();
     subscriber->timerId_ = -1;
     TimerMgr->RemoveTimer(timerId);
-    MMI_LOGD("Leave, subscribeId:%{public}d, subscribeId:%{public}d", subscriber->id_, timerId);
+    MMI_LOG_D("Leave, subscribeId:%{public}d, subscribeId:%{public}d", subscriber->id_, timerId);
 }
 
 void KeyEventInputSubscribeFilter::OnTimer(const std::shared_ptr<Subscriber> subscriber) {
-    MMI_LOGD("Enter");
+    MMI_LOG_D("Enter");
     if (!subscriber) {
-        MMI_LOGE("Leave, null subscriber");
+        MMI_LOG_E("Leave, null subscriber");
         return;
     }
 
     subscriber->timerId_ = -1;
     if (!subscriber->keyEvent_) {
-        MMI_LOGE("Leave, null keyEvent, subscribeId:%{public}d", subscriber->id_);
+        MMI_LOG_E("Leave, null keyEvent, subscribeId:%{public}d", subscriber->id_);
         return;
     }
 
     NotifySubscriber(subscriber->keyEvent_, subscriber);
     subscriber->keyEvent_.reset();
-    MMI_LOGD("Leave, null keyEvent, subscribeId:%{public}d", subscriber->id_);
+    MMI_LOG_D("Leave, null keyEvent, subscribeId:%{public}d", subscriber->id_);
 }
 
 bool KeyEventInputSubscribeFilter::InitSessionDeleteCallback()
 {
-    MMI_LOGD("Enter");
+    MMI_LOG_D("Enter");
     if (sessionDeletedCallbackInitialized_)  {
-        MMI_LOGD("Leave");
+        MMI_LOG_D("Leave");
         return true;
     }
 
     auto udsServerPtr = InputHandler->GetUDSServer();
     if (!udsServerPtr) {
-        MMI_LOGE("Leave, null udsServer");
+        MMI_LOG_E("Leave, null udsServer");
         return false;
     }
 
@@ -269,96 +269,96 @@ bool KeyEventInputSubscribeFilter::InitSessionDeleteCallback()
     udsServerPtr->AddSessionDeletedCallback(callback);
 
     sessionDeletedCallbackInitialized_ = true;
-    MMI_LOGD("Leave");
+    MMI_LOG_D("Leave");
     return true;
 }
 
 bool KeyEventInputSubscribeFilter::HandleKeyDown(const std::shared_ptr<KeyEvent>& keyEvent)
 {
-    MMI_LOGD("Enter");
+    MMI_LOG_D("Enter");
     bool handled = false;
     auto keyCode = keyEvent->GetKeyCode();
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
     RemoveKeyCode(pressedKeys, keyCode);
     for (auto& subscriber : subscribers_) {
         auto& keyOption = subscriber->keyOption_;
-        MMI_LOGD("SubscribeId=%{public}d, KeyOption->finalKey=%{public}d, "
+        MMI_LOG_D("SubscribeId=%{public}d, KeyOption->finalKey=%{public}d, "
                 "KeyOption->isFinalKeyDown=%{public}d, KeyOption->finalKeyDownDuriation=%{public}d",
                 subscriber->id_, keyOption->GetFinalKey(), ((keyOption->IsFinalKeyDown() == true) ? 1 : 0),
                 keyOption->GetFinalKeyDownDuration());
         for (auto keyCode : keyOption->GetPreKeys()) {
-            MMI_LOGD("KeyOption->prekey=%{public}d", keyCode);
+            MMI_LOG_D("KeyOption->prekey=%{public}d", keyCode);
         }
 
         if (!keyOption->IsFinalKeyDown()) {
-            MMI_LOGD("Skip, !keyOption->IsFinalKeyDown()");
+            MMI_LOG_D("Skip, !keyOption->IsFinalKeyDown()");
             continue;
         }
 
         if (keyCode != keyOption->GetFinalKey()) {
             ClearTimer(subscriber);
-            MMI_LOGD("Skip, keyCode != keyOption->GetFinalKey()");
+            MMI_LOG_D("Skip, keyCode != keyOption->GetFinalKey()");
             continue;
         }
 
         if (!IsPreKeysMatch(keyOption->GetPreKeys(), pressedKeys)) {
             ClearTimer(subscriber);
-            MMI_LOGD("Skip, PreKeysMatch Failed");
+            MMI_LOG_D("Skip, PreKeysMatch Failed");
             continue;
         }
 
         if (keyOption->GetFinalKeyDownDuration() <= 0) {
-            MMI_LOGD("Hit, keyOption->GetFinalKeyDownDuration() <= 0");
+            MMI_LOG_D("Hit, keyOption->GetFinalKeyDownDuration() <= 0");
             NotifySubscriber(keyEvent, subscriber);
             handled = true;
             continue;
         }
 
         if (!AddTimer(subscriber, keyEvent)) {
-            MMI_LOGE("Leave, AddTimer Failed");
+            MMI_LOG_E("Leave, AddTimer Failed");
         }
     }
 
-    MMI_LOGD("Leave %{public}s", handled ? "true" : "false");
+    MMI_LOG_D("Leave %{public}s", handled ? "true" : "false");
     return handled;
 }
 
 bool KeyEventInputSubscribeFilter::HandleKeyUp(const std::shared_ptr<KeyEvent>& keyEvent)
 {
-    MMI_LOGD("Enter");
+    MMI_LOG_D("Enter");
     bool handled = false;
     auto keyCode = keyEvent->GetKeyCode();
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
     RemoveKeyCode(pressedKeys, keyCode);
     for (auto& subscriber : subscribers_) {
         auto& keyOption = subscriber->keyOption_;
-        MMI_LOGD("SubscribeId=%{public}d, KeyOption->finalKey=%{public}d, "
+        MMI_LOG_D("SubscribeId=%{public}d, KeyOption->finalKey=%{public}d, "
                 "KeyOption->isFinalKeyDown=%{public}d, KeyOption->finalKeyDownDuriation=%{public}d",
                 subscriber->id_, keyOption->GetFinalKey(), ((keyOption->IsFinalKeyDown() == true) ? 1 : 0),
                 keyOption->GetFinalKeyDownDuration());
         for (auto keyCode : keyOption->GetPreKeys()) {
-            MMI_LOGD("KeyOption->prekey=%{public}d", keyCode);
+            MMI_LOG_D("KeyOption->prekey=%{public}d", keyCode);
         }
 
         if (keyOption->IsFinalKeyDown()) {
             ClearTimer(subscriber);
-            MMI_LOGD("Skip, keyOption->IsFinalKeyDown()");
+            MMI_LOG_D("Skip, keyOption->IsFinalKeyDown()");
             continue;
         }
 
         if (keyCode != keyOption->GetFinalKey()) {
-            MMI_LOGD("Skip, keyCode != keyOption->GetFinalKey()");
+            MMI_LOG_D("Skip, keyCode != keyOption->GetFinalKey()");
             continue;
         }
 
         if (!IsPreKeysMatch(keyOption->GetPreKeys(), pressedKeys)) {
-            MMI_LOGD("Skip, PreKeysMatch Failed");
+            MMI_LOG_D("Skip, PreKeysMatch Failed");
             continue;
         }
 
         auto duration = keyOption->GetFinalKeyDownDuration();
         if (duration <= 0) {
-            MMI_LOGD("Hit, duration <= 0");
+            MMI_LOG_D("Hit, duration <= 0");
             NotifySubscriber(keyEvent, subscriber);
             handled = true;
             continue;
@@ -366,33 +366,33 @@ bool KeyEventInputSubscribeFilter::HandleKeyUp(const std::shared_ptr<KeyEvent>& 
 
         const KeyEvent::KeyItem* keyItem = keyEvent->GetKeyItem();
         if (keyItem == nullptr) {
-            MMI_LOGE("Skip, null keyItem");
+            MMI_LOG_E("Skip, null keyItem");
             continue;
         }
 
         auto upTime = keyEvent->GetActionTime();
         auto downTime = keyItem->GetDownTime();
         if (upTime - downTime >= duration) {
-            MMI_LOGE("Skip, upTime - downTime >= duration");
+            MMI_LOG_E("Skip, upTime - downTime >= duration");
             continue;
         }
 
-        MMI_LOGD("Hit, upTime - downTime < duration");
+        MMI_LOG_D("Hit, upTime - downTime < duration");
         NotifySubscriber(keyEvent, subscriber);
         handled = true;
     }
 
-    MMI_LOGD("Leave %{public}s", handled ? "true" : "false");
+    MMI_LOG_D("Leave %{public}s", handled ? "true" : "false");
     return handled;
 }
 
 bool KeyEventInputSubscribeFilter::HandleKeyCanel(const std::shared_ptr<KeyEvent>& keyEvent)
 {
-    MMI_LOGD("Enter");
+    MMI_LOG_D("Enter");
     for (auto& subscriber : subscribers_) {
         ClearTimer(subscriber);
     }
-    MMI_LOGD("Leave");
+    MMI_LOG_D("Leave");
     return false;
 }
 
@@ -407,7 +407,7 @@ bool KeyEventInputSubscribeFilter::CloneKeyEvent(std::shared_ptr<KeyEvent> keyEv
     }
 
     if (!keyEvent_) {
-        MMI_LOGE("Leave, Clone keyEvent Failed");
+        MMI_LOG_E("Leave, Clone keyEvent Failed");
         return false;
     }
 

@@ -28,11 +28,11 @@ using namespace OHOS::MMI;
 int32_t OHOS::MMI::AIFuncProc::DeviceEventDispatchProcess(const RawInputEvent &event)
 {
     if (CheckEventCode(event) == RET_ERR) {
-        MMI_LOGE("aisensor event.code error. event.code: %{public}d", event.ev_code);
+        MMI_LOG_E("aisensor event.code error. event.code: %{public}d", event.ev_code);
         return RET_ERR;
     }
     if (DeviceEventProcess(event) == RET_ERR) {
-        MMI_LOGE("aisensor device event process fail");
+        MMI_LOG_E("aisensor device event process fail");
         return RET_ERR;
     }
     return RET_OK;

@@ -25,13 +25,13 @@ namespace {
 int32_t ProcessingFingerDevice::TransformJsonDataToInputData(const Json& fingerEventArrays,
     InputEventArray& inputEventArray)
 {
-    MMI_LOGI("Enter TransformJsonDataForTouchFinger function.");
+    MMI_LOG_I("Enter TransformJsonDataForTouchFinger function.");
     if (fingerEventArrays.empty()) {
         return RET_ERR;
     }
     Json inputData = fingerEventArrays.at("events");
     if (inputData.empty()) {
-        MMI_LOGE("manage finger array faild, inputData is empty.");
+        MMI_LOG_E("manage finger array faild, inputData is empty.");
         return RET_ERR;
     }
     TouchPadInputEvents touchPadInputEvents = {};
@@ -44,7 +44,7 @@ int32_t ProcessingFingerDevice::TransformJsonDataToInputData(const Json& fingerE
     uint64_t releaseEventIndex = touchPadInputEvents.eventNumber - 1;
     TouchPadInputEvent releaseEvents = touchPadInputEvents.eventArray[releaseEventIndex];
     AnalysisTouchPadFingerReleaseData(inputEventArray, releaseEvents);
-    MMI_LOGI("Leave TransformJsonDataForTouchFinger function.");
+    MMI_LOG_I("Leave TransformJsonDataForTouchFinger function.");
     return RET_OK;
 }
 

@@ -97,13 +97,13 @@ int32_t SeniorInputFuncProcBase::DeviceEventProcess(const RawInputEvent& event)
     const std::string uuid = GetUUid();
 
     if (msgId == MmiMessageId::INVALID) {
-        MMI_LOGE("msgId is invalid.");
+        MMI_LOG_E("msgId is invalid.");
         return RET_ERR;
     }
 
     std::vector<int32_t> fds;
     if (RegEventHM->FindSocketFdsByEventHandle(msgId, fds) != RET_OK) {
-        MMI_LOGE("can not find handle by fd: %{public}d.", msgId);
+        MMI_LOG_E("can not find handle by fd: %{public}d.", msgId);
         return RET_ERR;
     }
 
@@ -121,14 +121,14 @@ int32_t SeniorInputFuncProcBase::DeviceEventProcess(const RawInputEvent& event)
         newPacket << deviceType << msgId << deviceId << fd << appInfo.windowId << appInfo.abilityId <<
             serverStartTime << uuid << occurredTime;
         if (!udsServerPtr_->SendMsg(fd, newPacket)) {
-            MMI_LOGE("Sending structure of event failed! fd:%{public}d\n", fd);
+            MMI_LOG_E("Sending structure of event failed! fd:%{public}d\n", fd);
             return RET_ERR;
         }
-        MMI_LOGI("senior input func process server: fd = %{public}d,windowId = %{public}d,abilityId = %{public}d,"
+        MMI_LOG_I("senior input func process server: fd = %{public}d,windowId = %{public}d,abilityId = %{public}d,"
                  "conbinecode = %{public}d",
                  fd, appInfo.windowId, appInfo.abilityId, event.ev_code);
     }
-    MMI_LOGI("successed send to client event[%{public}d] to Application management", event.ev_code);
+    MMI_LOG_I("successed send to client event[%{public}d] to Application management", event.ev_code);
     return RET_OK;
 }
 

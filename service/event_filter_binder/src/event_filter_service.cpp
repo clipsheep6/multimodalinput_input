@@ -28,12 +28,12 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN,
 
 EventFilterService::EventFilterService()
 {
-    MMI_LOGT("enter");    
+    MMI_LOG_T("enter");    
 }
 
 EventFilterService::~EventFilterService()
 {
-    MMI_LOGT("enter");    
+    MMI_LOG_T("enter");    
 }
 
 void EventFilterService::SetPointerEventPtr(std::function<bool(std::shared_ptr<PointerEvent>)> pointerFilter)
@@ -44,7 +44,7 @@ void EventFilterService::SetPointerEventPtr(std::function<bool(std::shared_ptr<P
 bool EventFilterService::HandlePointerEvent(const std::shared_ptr<PointerEvent> event)
 {
     if (pointerFilter_ == nullptr) {
-        MMI_LOGE("pointerFilter_ is nullptr");
+        MMI_LOG_E("pointerFilter_ is nullptr");
         return false;
     }
     return pointerFilter_(event);

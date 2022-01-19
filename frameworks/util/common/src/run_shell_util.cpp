@@ -31,13 +31,13 @@ RunShellUtil::~RunShellUtil() {}
 
 int32_t RunShellUtil::RunShellCommand(const std::string &command, std::vector<std::string> &vLog)
 {
-    MMI_LOGD("enter");
+    MMI_LOG_D("enter");
     vLog.clear();
     std::string retLog = "";
     const std::string command_ = HILOG_GREP + "'" + command + "'";
 
     if ((fp = popen(command_.c_str(), "r")) == nullptr) {
-        MMI_LOGE("open fail");
+        MMI_LOG_E("open fail");
         pclose(fp);
         fp = nullptr;
         return RET_ERR;
@@ -46,7 +46,7 @@ int32_t RunShellUtil::RunShellCommand(const std::string &command, std::vector<st
     while (logMaxSize > i) {
         char buf[MAXSIZE] = {0};
         if (fgets(buf, sizeof(buf), fp) == nullptr) {
-            MMI_LOGE("read fp end");
+            MMI_LOG_E("read fp end");
             retLog.append(std::string(buf));
             pclose(fp);
             fp = nullptr;
@@ -56,7 +56,7 @@ int32_t RunShellUtil::RunShellCommand(const std::string &command, std::vector<st
         i++;
     }
     if (retLog.length() == 0) {
-        MMI_LOGD("retLog is empty");
+        MMI_LOG_D("retLog is empty");
         return RET_OK;
     }
     StringToVectorByRegex(retLog, vLog, REGEX_LOG);

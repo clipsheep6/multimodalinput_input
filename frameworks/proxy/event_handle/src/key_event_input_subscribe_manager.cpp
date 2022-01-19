@@ -33,7 +33,7 @@ bool KeyEventInputSubscribeManager::CheckRepeatSubscribeKeyEevent(std::shared_pt
         if (subscribePreKeys.size() != preKeys.size()) {
             continue;
         }
-        MMI_LOGD("subscribeKeyOption final key:%{public}d, keyOption final key:%{public}d",
+        MMI_LOG_D("subscribeKeyOption final key:%{public}d, keyOption final key:%{public}d",
             subscribeKeyOption->GetFinalKey(), keyOption->GetFinalKey());
         if (subscribeKeyOption->GetFinalKey() != keyOption->GetFinalKey()) {
             continue;
@@ -71,24 +71,24 @@ bool KeyEventInputSubscribeManager::CheckRepeatSubscribeKeyEevent(std::shared_pt
 int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<OHOS::MMI::KeyOption> keyOption,
     std::function<void(std::shared_ptr<OHOS::MMI::KeyEvent>)> callback)
 {
-    MMI_LOGD("client subscribe key event");
+    MMI_LOG_D("client subscribe key event");
     if (callback == nullptr) {
-        MMI_LOGD("the [Callback] is nullptr");
+        MMI_LOG_D("the [Callback] is nullptr");
         return -1;
     }
     if (keyOption == nullptr) {
-        MMI_LOGD("the [KeyOption] is nullptr.");
+        MMI_LOG_D("the [KeyOption] is nullptr.");
         return -1;
     }
     if (CheckRepeatSubscribeKeyEevent(keyOption)) {
-        MMI_LOGD("repeat subscribe key event");
+        MMI_LOG_D("repeat subscribe key event");
         return -1;
     }
     for (auto preKey : keyOption->GetPreKeys()) {
-        MMI_LOGD("KeyOption->prekey=%{public}d", preKey);
+        MMI_LOG_D("KeyOption->prekey=%{public}d", preKey);
     }
     SubscribeKeyEventInfo subscribeInfo(keyOption, callback);
-    MMI_LOGD("SubscribeId=%{public}d,KeyOption->finalKey=%{public}d,"
+    MMI_LOG_D("SubscribeId=%{public}d,KeyOption->finalKey=%{public}d,"
         "KeyOption->isFinalKeyDown=%{public}d,KeyOption->finalKeyDownDuriation=%{public}d",
         subscribeInfo.GetSubscribeId(), keyOption->GetFinalKey(), ((keyOption->IsFinalKeyDown() == true) ? 1 : 0),
         keyOption->GetFinalKeyDownDuration());
@@ -101,14 +101,14 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<OHOS::M
 
 int32_t KeyEventInputSubscribeManager::UnSubscribeKeyEvent(int32_t subscribeId)
 {
-    MMI_LOGD("client unsubscribe key event");
+    MMI_LOG_D("client unsubscribe key event");
     if (subscribeId < 0) {
-        MMI_LOGD("the subscribe id is less than 0.");
+        MMI_LOG_D("the subscribe id is less than 0.");
         return RET_ERR;
     }
     int32_t size = subscribeKeyEventInfoList_.size();
     if (size == 0) {
-        MMI_LOGD("the [SubscribeKeyEventInfoList] is empty");
+        MMI_LOG_D("the [SubscribeKeyEventInfoList] is empty");
         return RET_ERR;
     }
     auto it = subscribeKeyEventInfoList_.begin();
@@ -121,28 +121,28 @@ int32_t KeyEventInputSubscribeManager::UnSubscribeKeyEvent(int32_t subscribeId)
         }
     }
     if (it == subscribeKeyEventInfoList_.end()) {
-        MMI_LOGD("cannot find subscribe key event info by subscribe id.");
+        MMI_LOG_D("cannot find subscribe key event info by subscribe id.");
     }
     return RET_ERR;
 }
 
 int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_ptr<KeyEvent> event, int32_t subscribeId)
 {
-    MMI_LOGD("client on subscribe key event callback");
+    MMI_LOG_D("client on subscribe key event callback");
     if (subscribeId < 0) {
-        MMI_LOGD("the subscribe id is less than 0.");
+        MMI_LOG_D("the subscribe id is less than 0.");
         return RET_ERR;
     }
     auto subscribeInfoListIter = subscribeKeyEventInfoList_.begin();
     for (; subscribeInfoListIter != subscribeKeyEventInfoList_.end(); ++subscribeInfoListIter) {
         if (subscribeId == subscribeInfoListIter->GetSubscribeId()) {
             subscribeInfoListIter->GetCallback()(event);
-            MMI_LOGD("client executes subscribe callback function success");
+            MMI_LOG_D("client executes subscribe callback function success");
             return RET_OK;
         }
     }
     if (subscribeInfoListIter == subscribeKeyEventInfoList_.end()) {
-        MMI_LOGD("client cannot find subscribe key event callback");
+        MMI_LOG_D("client cannot find subscribe key event callback");
     }
     return RET_ERR;
 }

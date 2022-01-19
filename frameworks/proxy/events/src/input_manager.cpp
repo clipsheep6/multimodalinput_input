@@ -69,7 +69,7 @@ void InputManager::UnsubscribeKeyEvent(int32_t subscriberId)
 int32_t InputManager::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor)
 {
     if (monitor == nullptr) {
-        MMI_LOGE("InputManager::%{public}s param should not be null!", __func__);
+        MMI_LOG_E("InputManager::%{public}s param should not be null!", __func__);
         return OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER;
     }
     InputManagerImpl::GetInstance()->AddMonitor(monitor);
@@ -79,7 +79,7 @@ int32_t InputManager::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> 
 int32_t InputManager::AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor)
 {
     if (monitor == nullptr) {
-        MMI_LOGE("InputManager::%{public}s param should not be null!", __func__);
+        MMI_LOG_E("InputManager::%{public}s param should not be null!", __func__);
         return InputEventMonitorManager::INVALID_MONITOR_ID;
     }
     return InputManagerImpl::GetInstance()->AddMontior(monitor);
@@ -108,7 +108,7 @@ int32_t InputManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interc
 int32_t InputManager::AddInterceptor(int32_t sourceType, std::function<void(std::shared_ptr<PointerEvent>)> interceptor)
 {
     if (interceptor == nullptr) {
-        MMI_LOGE("InputManager::%{public}s param should not be null!", __func__);
+        MMI_LOG_E("InputManager::%{public}s param should not be null!", __func__);
         return InterceptorManager::INVALID_INTERCEPTOR_ID;
     }
     return InputManagerImpl::GetInstance()->AddInterceptor(sourceType, interceptor);
@@ -132,7 +132,7 @@ void InputManager::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (MultimodalEventHandler::GetInstance().InjectPointerEvent(pointerEvent) != RET_OK)
-        MMI_LOGE("Failed to inject pointer event!");
+        MMI_LOG_E("Failed to inject pointer event!");
 }
 }
 }

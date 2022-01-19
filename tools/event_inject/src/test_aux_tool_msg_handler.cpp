@@ -45,13 +45,13 @@ void TestAuxToolMsgHandler::OnMsgHandler(const UDSClient &client, NetPacket &pkt
     OHOS::MMI::TimeCostChk chk("TestAuxToolMsgHandler::OnMsgHandler", "overtime 200(us)", CHECK_TIME, id);
     auto fun = GetFun(id);
     if (!fun) {
-        MMI_LOGE("TestAuxToolMsgHandler::OnMsgHandler Unknown msg id[%{public}d]. errCode:%{public}d",
+        MMI_LOG_E("TestAuxToolMsgHandler::OnMsgHandler Unknown msg id[%{public}d]. errCode:%{public}d",
                  id, UNKNOWN_MSG_ID);
         return;
     }
     auto ret = (*fun)(client, pkt);
     if (ret < 0) {
-        MMI_LOGE("TestAuxToolMsgHandler::OnMsgHandler Msg handling failed. id[%{public}d] errCode:%{public}d",
+        MMI_LOG_E("TestAuxToolMsgHandler::OnMsgHandler Msg handling failed. id[%{public}d] errCode:%{public}d",
                  id, ret);
     }
 }
@@ -62,10 +62,10 @@ int32_t TestAuxToolMsgHandler::OnAiServerReply([[maybe_unused]] const UDSClient 
     pkt >> replyCode;
     MessageSendRecvStatMgr::GetInstance().Decrease();
     if (replyCode == RET_ERR) {
-        MMI_LOGE("AIserver manage ai inject faild");
+        MMI_LOG_E("AIserver manage ai inject faild");
         return RET_ERR;
     }
-    MMI_LOGI("AIserver manage ai inject successed");
+    MMI_LOG_I("AIserver manage ai inject successed");
     return RET_OK;
 }
 
@@ -75,9 +75,9 @@ int32_t OHOS::MMI::TestAuxToolMsgHandler::OnHdiServerReply([[maybe_unused]] cons
     pkt >> replyCode;
     MessageSendRecvStatMgr::GetInstance().Decrease();
     if (replyCode == RET_ERR) {
-        MMI_LOGE("hdi inject faild.");
+        MMI_LOG_E("hdi inject faild.");
         return RET_ERR;
     }
-    MMI_LOGI("hdi inject successed.");
+    MMI_LOG_I("hdi inject successed.");
     return RET_OK;
 }

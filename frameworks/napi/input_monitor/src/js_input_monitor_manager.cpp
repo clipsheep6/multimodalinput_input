@@ -41,7 +41,7 @@ JsInputMonitorManager& JsInputMonitorManager::GetInstance()
 
 void JsInputMonitorManager::AddMonitor(napi_env jsEnv, napi_value receiver)
 {
-    MMI_LOGD("enter");
+    MMI_LOG_D("enter");
     for (auto& monitor : monitors_) {
         if (monitor->IsMatch(jsEnv, receiver) != RET_ERR) {
             return;
@@ -50,17 +50,17 @@ void JsInputMonitorManager::AddMonitor(napi_env jsEnv, napi_value receiver)
     std::unique_ptr<JsInputMonitor> monitor = std::make_unique<JsInputMonitor>(jsEnv, receiver);
     monitor->Start();
     monitors_.push_back(std::move(monitor));
-    MMI_LOGD("leave");
+    MMI_LOG_D("leave");
 }
 
 void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv, napi_value receiver)
 {
-    MMI_LOGD("enter");
+    MMI_LOG_D("enter");
     for (auto it = monitors_.begin(); it != monitors_.end(); ++it) {
         if ((*it)->IsMatch(jsEnv, receiver) == RET_OK) {
             (*it)->Stop();
             monitors_.erase(it);
-            MMI_LOGD("leave");
+            MMI_LOG_D("leave");
             return;
         }
     }
@@ -68,12 +68,12 @@ void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv, napi_value receiver)
 
 void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv)
 {
-    MMI_LOGD("enter");
+    MMI_LOG_D("enter");
     for (auto it = monitors_.begin(); it != monitors_.end();) {
         if ((*it)->IsMatch(jsEnv) == RET_OK) {
             (*it)->Stop();
             monitors_.erase(it++);
-            MMI_LOGD("leave");
+            MMI_LOG_D("leave");
             return;
         }
         ++it;

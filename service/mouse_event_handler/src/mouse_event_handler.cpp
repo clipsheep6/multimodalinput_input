@@ -47,7 +47,7 @@ void MouseEventHandler::CalcMovedCoordinate(struct libinput_event_pointer& point
     g_coordinateY += libinput_event_pointer_get_dy(&pointEventData);
 
     WinMgr->AdjustCoordinate(g_coordinateX, g_coordinateY);
-    MMI_LOGI("g_coordinateX is : %{public}lf, g_coordinateY is : %{public}lf", g_coordinateX, g_coordinateY);
+    MMI_LOG_I("g_coordinateX is : %{public}lf, g_coordinateY is : %{public}lf", g_coordinateX, g_coordinateY);
 }
 
 void OHOS::MMI::MouseEventHandler::SetMouseMotion(PointerEvent::PointerItem& pointerItem)
@@ -72,7 +72,7 @@ void MouseEventHandler::SetMouseButon(PointerEvent::PointerItem& pointerItem,
         this->SetButtonId(PointerEvent::MOUSE_BUTTON_MIDDLE);
         g_btnId = this->GetButtonId();
     } else {
-        MMI_LOGW("PointerAction : %{public}d, unProces Button code : %{public}u",
+        MMI_LOG_W("PointerAction : %{public}d, unProces Button code : %{public}u",
         this->GetPointerAction(), libinput_event_pointer_get_button(&pointEventData));
     }
     if (libinput_event_pointer_get_button_state(&pointEventData) == LIBINPUT_BUTTON_STATE_RELEASED) {
@@ -95,28 +95,28 @@ void MouseEventHandler::SetMouseAxis(struct libinput_event_pointer& pointEventDa
     const int32_t MouseTimeOut = 100;
     double axisValue = 0;
     if (TimerMgr == nullptr) {
-        MMI_LOGI("the TimeManager is nullptr");
+        MMI_LOG_I("the TimeManager is nullptr");
         return;
     }
     if (TimerMgr->IsExist(g_timerId)) {
         this->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
         TimerMgr->RemoveTimer(g_timerId);
-        MMI_LOGI("pointer axis event update");
+        MMI_LOG_I("pointer axis event update");
     } else {
         this->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
-        MMI_LOGI("pointer axis event begin");
+        MMI_LOG_I("pointer axis event begin");
     }
     g_timerId = TimerMgr->AddTimer(MouseTimeOut, 1, []() {
         g_timerId = -1;
-        MMI_LOGI("pointer axis event end TimerCallback run");
+        MMI_LOG_I("pointer axis event end TimerCallback run");
         auto pointerEvent = OHOS::MMI::PointerEvent::Create();
         if (pointerEvent == nullptr) {
-            MMI_LOGI("the pointerEvent is nullptr");
+            MMI_LOG_I("the pointerEvent is nullptr");
             return;
         }
         if (SetMouseEndData(pointerEvent, g_deviceid) == RET_OK) {
             InputHandler->OnMouseEventTimerHanler(pointerEvent);
-            MMI_LOGI("pointer axis event end");
+            MMI_LOG_I("pointer axis event end");
         }
     });
     if (libinput_event_pointer_has_axis(&pointEventData, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL)) {
@@ -142,7 +142,7 @@ void MouseEventHandler::SetMouseData(libinput_event *event, int32_t deviceId)
     if ((type == LIBINPUT_EVENT_POINTER_MOTION) || (type == LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE)) {
         CalcMovedCoordinate(*pointEventData);
         WinMgr->SetMouseInfo(g_coordinateX, g_coordinateY);
-        MMI_LOGI("Change Coordinate : g_coordinateX = %{public}lf, g_coordinateY = %{public}lf",
+        MMI_LOG_I("Change Coordinate : g_coordinateX = %{public}lf, g_coordinateY = %{public}lf",
                  g_coordinateX, g_coordinateY);
         this->SetMouseMotion(pointerItem);
     } else if (type == LIBINPUT_EVENT_POINTER_BUTTON) {

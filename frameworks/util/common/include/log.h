@@ -284,71 +284,71 @@ private:
 bool VerifyLogManagerRun();
 OHOS::MMI::LogManager& GetLogManager();
 
-#define MMI_LOGT(fmt, ...) do { \
+#define MMI_LOG_T(fmt, ...) do { \
     OHOS::MMI::LogManager::GetInstance().PushFormat(OHOS::MMI::LL_TRACE, __FILE__, __LINE__, \
                                                     MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
     OHOS::HiviewDFX::HiLog::Debug(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 
-#define MMI_LOGD(fmt, ...) do { \
+#define MMI_LOG_D(fmt, ...) do { \
     OHOS::MMI::LogManager::GetInstance().PushFormat(OHOS::MMI::LL_DEBUG, __FILE__, __LINE__, MMI_FUNC_FMT fmt, \
                                                     MMI_FUNC_INFO, ##__VA_ARGS__); \
     OHOS::HiviewDFX::HiLog::Debug(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 
-#define MMI_LOGI(fmt, ...) do { \
+#define MMI_LOG_I(fmt, ...) do { \
     OHOS::MMI::LogManager::GetInstance().PushFormat(OHOS::MMI::LL_INFO, __FILE__, __LINE__, MMI_FUNC_FMT fmt, \
                                                     MMI_FUNC_INFO, ##__VA_ARGS__); \
     OHOS::HiviewDFX::HiLog::Info(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 
-#define MMI_LOGW(fmt, ...) do { \
+#define MMI_LOG_W(fmt, ...) do { \
     OHOS::MMI::LogManager::GetInstance().PushFormat(OHOS::MMI::LL_WARN, __FILE__, __LINE__, MMI_FUNC_FMT fmt, \
                                                     MMI_FUNC_INFO, ##__VA_ARGS__); \
     OHOS::HiviewDFX::HiLog::Warn(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 
-#define MMI_LOGE(fmt, ...) do { \
+#define MMI_LOG_E(fmt, ...) do { \
     OHOS::MMI::LogManager::GetInstance().PushFormat(OHOS::MMI::LL_ERROR, __FILE__, __LINE__, MMI_FUNC_FMT fmt, \
                                                     MMI_FUNC_INFO, ##__VA_ARGS__); \
     OHOS::HiviewDFX::HiLog::Error(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 
-#define MMI_LOGA(fmt, ...) do { \
+#define MMI_LOG_A(fmt, ...) do { \
     OHOS::MMI::LogManager::GetInstance().PushFormat(OHOS::MMI::LL_ALARM, __FILE__, __LINE__, MMI_FUNC_FMT fmt, \
                                                     MMI_FUNC_INFO, ##__VA_ARGS__); \
     OHOS::HiviewDFX::HiLog::Error(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 
-#define MMI_LOGF(fmt, ...) do { \
+#define MMI_LOG_F(fmt, ...) do { \
     OHOS::MMI::LogManager::GetInstance().PushFormat(OHOS::MMI::LL_FATAL, __FILE__, __LINE__, MMI_FUNC_FMT fmt, \
                                                     MMI_FUNC_INFO, ##__VA_ARGS__); \
     OHOS::HiviewDFX::HiLog::Fatal(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 
-#define PRINT_STACK() MMI_LOGT("stack info:\n%s", GetStackInfo().c_str())
+#define PRINT_STACK() MMI_LOG_T("stack info:\n%s", GetStackInfo().c_str())
 
 #else
 
-#define MMI_LOGT(fmt, ...) do { \
+#define MMI_LOG_T(fmt, ...) do { \
     OHOS::HiviewDFX::HiLog::Debug(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
-#define MMI_LOGD(fmt, ...) do { \
+#define MMI_LOG_D(fmt, ...) do { \
     OHOS::HiviewDFX::HiLog::Debug(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
-#define MMI_LOGI(fmt, ...) do { \
+#define MMI_LOG_I(fmt, ...) do { \
     OHOS::HiviewDFX::HiLog::Info(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
-#define MMI_LOGW(fmt, ...) do { \
+#define MMI_LOG_W(fmt, ...) do { \
     OHOS::HiviewDFX::HiLog::Warn(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
-#define MMI_LOGE(fmt, ...) do { \
+#define MMI_LOG_E(fmt, ...) do { \
     OHOS::HiviewDFX::HiLog::Error(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
-#define MMI_LOGA(fmt, ...) do { \
+#define MMI_LOG_A(fmt, ...) do { \
     OHOS::HiviewDFX::HiLog::Error(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
-#define MMI_LOGF(fmt, ...) do { \
+#define MMI_LOG_F(fmt, ...) do { \
     OHOS::HiviewDFX::HiLog::Fatal(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 
@@ -356,37 +356,37 @@ OHOS::MMI::LogManager& GetLogManager();
 
 #define MMI_LOGTK(fmt, ...) do { \
     KMSG_LOGT(fmt, ##__VA_ARGS__); \
-    MMI_LOGT(fmt, ##__VA_ARGS__); \
+    MMI_LOG_T(fmt, ##__VA_ARGS__); \
 } while (0)
 
 #define MMI_LOGDK(fmt, ...) do { \
     KMSG_LOGD(fmt, ##__VA_ARGS__); \
-    MMI_LOGD(fmt, ##__VA_ARGS__); \
+    MMI_LOG_D(fmt, ##__VA_ARGS__); \
 } while (0)
 
 #define MMI_LOGIK(fmt, ...) do { \
     KMSG_LOGI(fmt, ##__VA_ARGS__); \
-    MMI_LOGI(fmt, ##__VA_ARGS__); \
+    MMI_LOG_I(fmt, ##__VA_ARGS__); \
 } while (0)
 
 #define MMI_LOGWK(fmt, ...) do { \
     KMSG_LOGW(fmt, ##__VA_ARGS__); \
-    MMI_LOGW(fmt, ##__VA_ARGS__); \
+    MMI_LOG_W(fmt, ##__VA_ARGS__); \
 } while (0)
 
 #define MMI_LOGEK(fmt, ...) do { \
     KMSG_LOGE(fmt, ##__VA_ARGS__); \
-    MMI_LOGE(fmt, ##__VA_ARGS__); \
+    MMI_LOG_E(fmt, ##__VA_ARGS__); \
 } while (0)
 
 #define MMI_LOGAK(fmt, ...) do { \
     KMSG_LOGA(fmt, ##__VA_ARGS__); \
-    MMI_LOGA(fmt, ##__VA_ARGS__); \
+    MMI_LOG_A(fmt, ##__VA_ARGS__); \
 } while (0)
 
 #define MMI_LOGFK(fmt, ...) do { \
     KMSG_LOGF(fmt, ##__VA_ARGS__); \
-    MMI_LOGF(fmt, ##__VA_ARGS__); \
+    MMI_LOG_F(fmt, ##__VA_ARGS__); \
 } while (0)
 
 #endif // OHOS_LOG_H

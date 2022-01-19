@@ -44,7 +44,7 @@ bool OHOS::MMI::SafeKeeper::RegisterEvent(uint64_t tid, const std::string& remar
     std::lock_guard<std::mutex> lock(mtx_);
     const SafeEvent event = {tid, GetCurMillisTime(), remark};
     dList_.push_back(event);
-    MMI_LOGI("SafeKeeper register tid:[%{public}" PRId64 "] remark:[%{public}s]", tid, remark.c_str());
+    MMI_LOG_I("SafeKeeper register tid:[%{public}" PRId64 "] remark:[%{public}s]", tid, remark.c_str());
     return true;
 }
 
@@ -61,7 +61,7 @@ void OHOS::MMI::SafeKeeper::ReportHealthStatus(uint64_t tid)
     std::lock_guard<std::mutex> lock(mtx_);
     auto ptr = GetEvent(tid);
     if (!ptr) {
-        MMI_LOGE("SafeKeeper report ptr = nullptr tid:[%{public}" PRId64 "] errCode:%{public}d",
+        MMI_LOG_E("SafeKeeper report ptr = nullptr tid:[%{public}" PRId64 "] errCode:%{public}d",
                  tid, ERROR_NULL_POINTER);
         return;
     }

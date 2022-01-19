@@ -33,13 +33,13 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
     std::shared_ptr<IInputEventConsumer> consumer)
 {
     if (inputHandlers_.size() >= MAX_N_INPUT_HANDLERS) {
-        MMI_LOGE("The number of handlers exceeds the maximum.");
+        MMI_LOG_E("The number of handlers exceeds the maximum.");
         return INVALID_HANDLER_ID;
     }
     int32_t handlerId { TakeNextId() };
-    MMI_LOGD("Register new handler(%{public}d).", handlerId);
+    MMI_LOG_D("Register new handler(%{public}d).", handlerId);
     if (RET_OK == AddLocal(handlerId, handlerType, consumer)) {
-        MMI_LOGD("New handler successfully registered, report to server ...");
+        MMI_LOG_D("New handler successfully registered, report to server ...");
         AddToServer(handlerId, handlerType);
     } else {
         handlerId = INVALID_HANDLER_ID;
@@ -49,19 +49,19 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
 
 void InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType handlerType)
 {
-    MMI_LOGD("Unregister handler(%{public}d) with type(%{public}d).", handlerId, handlerType);
+    MMI_LOG_D("Unregister handler(%{public}d) with type(%{public}d).", handlerId, handlerType);
     if (RET_OK == RemoveLocal(handlerId, handlerType)) {
-        MMI_LOGD("Handler(%{public}d) unregistered, report to server ...", handlerId);
+        MMI_LOG_D("Handler(%{public}d) unregistered, report to server ...", handlerId);
         RemoveFromServer(handlerId, handlerType);
     }
 }
 
 void InputHandlerManager::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
-    MMI_LOGD("Mark consumed state: monitorId=%{public}d, eventId=%{public}d.", monitorId, eventId);
+    MMI_LOG_D("Mark consumed state: monitorId=%{public}d, eventId=%{public}d.", monitorId, eventId);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     if (!client) {
-        MMI_LOGE("Get MMIClint false...");
+        MMI_LOG_E("Get MMIClint false...");
         return;
     }
     NetPacket pkt(MmiMessageId::MARK_CONSUMED);
@@ -80,7 +80,7 @@ int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handle
     };
     auto ret = inputHandlers_.emplace(handler.handlerId_, handler);
     if (!ret.second) {
-        MMI_LOGE("Duplicate handler ID.");
+        MMI_LOG_E("Duplicate handler ID.");
         return RET_ERR;
     }
     return RET_OK;
@@ -90,7 +90,7 @@ void InputHandlerManager::AddToServer(int32_t handlerId, InputHandlerType handle
 {
     MMIClientPtr client { MMIEventHdl.GetMMIClient() };
     if (!client) {
-        MMI_LOGE("AddToServer Get MMIClint false...");
+        MMI_LOG_E("AddToServer Get MMIClint false...");
         return;
     }
     NetPacket pkt(MmiMessageId::ADD_INPUT_HANDLER);
@@ -103,11 +103,11 @@ int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType han
     std::lock_guard<std::mutex> guard(lockHandlers_);
     auto tItr = inputHandlers_.find(handlerId);
     if (inputHandlers_.end() == tItr) {
-        MMI_LOGW("No handler with specified ID.");
+        MMI_LOG_W("No handler with specified ID.");
         return RET_ERR;
     }
     if (tItr->second.handlerType_ != handlerType) {
-        MMI_LOGW("Unmatched handler type.");
+        MMI_LOG_W("Unmatched handler type.");
         return RET_ERR;
     }
     inputHandlers_.erase(tItr);
@@ -116,10 +116,10 @@ int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType han
 
 void InputHandlerManager::RemoveFromServer(int32_t handlerId, InputHandlerType handlerType)
 {
-    MMI_LOGD("Remove handler(%{public}d) from server.", handlerId);
+    MMI_LOG_D("Remove handler(%{public}d) from server.", handlerId);
     MMIClientPtr client { MMIEventHdl.GetMMIClient() };
     if (!client) {
-        MMI_LOGE("RemoveFromServer Get MMIClint false...");
+        MMI_LOG_E("RemoveFromServer Get MMIClint false...");
         return;
     }
     NetPacket pkt(MmiMessageId::REMOVE_INPUT_HANDLER);
@@ -152,7 +152,7 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEve
 
 void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("OnInputEvent handlerId : %{public}d", handlerId);
+    MMI_LOG_D("OnInputEvent handlerId : %{public}d", handlerId);
     std::lock_guard<std::mutex> guard(lockHandlers_);
     auto tItr = inputHandlers_.find(handlerId);
     if (tItr != inputHandlers_.end()) {

@@ -46,7 +46,7 @@ namespace OHOS::MMI {
         if (fd < 0) {
             ret = printf("%s\n", buf);
         } else if (fd == 0) {
-            MMI_LOGF("%{public}s", buf);
+            MMI_LOG_F("%{public}s", buf);
         } else {
             ret = dprintf(fd, "%s\n", buf);
         }
@@ -98,7 +98,7 @@ namespace OHOS::MMI {
         size_t i = 0;
         auto funCheckRetAndLog = [ret](const char* fileName, const int lineNo) -> void {
             if (ret == -1) {
-                MMI_LOGE("SEC_RET_EQ: ret:%{public}d, %s:%d", ret, fileName, lineNo);
+                MMI_LOG_E("SEC_RET_EQ: ret:%{public}d, %s:%d", ret, fileName, lineNo);
             }
         };
 

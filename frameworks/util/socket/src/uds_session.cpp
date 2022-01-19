@@ -50,7 +50,7 @@ bool OHOS::MMI::UDSSession::SendMsg(const char *buf, size_t size) const
     uint64_t ret = write(fd_, static_cast<void *>(const_cast<char *>(buf)), size);
     if (ret < 0) {
         const int errNoSaved = errno;
-        MMI_LOGE("UDSSession::SendMsg write return %{public}" PRId64
+        MMI_LOG_E("UDSSession::SendMsg write return %{public}" PRId64
                 ", fd_: %{public}d, errNoSaved: %{public}d, %{public}s.",
                 ret, fd_, errNoSaved, strerror(errNoSaved));
         return false;
@@ -60,7 +60,7 @@ bool OHOS::MMI::UDSSession::SendMsg(const char *buf, size_t size) const
 
 void OHOS::MMI::UDSSession::Close()
 {
-    MMI_LOGT("enter fd_ = %{public}d, bHasClosed_ = %d.", fd_, bHasClosed_);
+    MMI_LOG_T("enter fd_ = %{public}d, bHasClosed_ = %d.", fd_, bHasClosed_);
     if (!bHasClosed_ && fd_ != -1) {
         close(fd_);
         bHasClosed_ = true;
@@ -91,34 +91,34 @@ bool OHOS::MMI::UDSSession::SendMsg(NetPacket& pkt) const
 
 void OHOS::MMI::UDSSession::RecordEvent(int32_t id, uint64_t time)
 {
-    MMI_LOGI("begin");
+    MMI_LOG_I("begin");
     EventTime eventTime = {id, time};
     events_.push_back(eventTime);
-    MMI_LOGI("end");
+    MMI_LOG_I("end");
 }
 
 void OHOS::MMI::UDSSession::ClearEventList(int32_t id)
 {
-    MMI_LOGI("begin");
+    MMI_LOG_I("begin");
     int32_t count = 0;
     for (const auto &it : events_) {
         count++;
         if (it.id == id) {
             events_.erase(events_.begin(), events_.begin() + count);
-            MMI_LOGI("Delete events.");
+            MMI_LOG_I("Delete events.");
         }
     }
-    MMI_LOGI("end");
+    MMI_LOG_I("end");
 }
 
 uint64_t OHOS::MMI::UDSSession::GetFirstEventTime()
 {
-    MMI_LOGI("begin");
+    MMI_LOG_I("begin");
     if (events_.empty()) {
-        MMI_LOGT("events_ is empty");
+        MMI_LOG_T("events_ is empty");
         return 0;
     }
-    MMI_LOGI("end");
+    MMI_LOG_I("end");
     return events_[0].eventTime;
 }
 

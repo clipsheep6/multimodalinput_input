@@ -25,13 +25,13 @@ namespace {
 int32_t ProcessingMouseDevice::TransformJsonDataToInputData(const Json& fingerEventArrays,
                                                             InputEventArray& inputEventArray)
 {
-    MMI_LOGI("Enter TransformJsonDataForMouse function.");
+    MMI_LOG_I("Enter TransformJsonDataForMouse function.");
     if (fingerEventArrays.empty()) {
         return RET_ERR;
     }
     Json inputData = fingerEventArrays.at("events");
     if (inputData.empty()) {
-        MMI_LOGE("manage KeyBoard array faild, inputData is empty.");
+        MMI_LOG_E("manage KeyBoard array faild, inputData is empty.");
         return RET_ERR;
     }
     vector<MouseEvent> mouseEventArray;
@@ -39,7 +39,7 @@ int32_t ProcessingMouseDevice::TransformJsonDataToInputData(const Json& fingerEv
         return RET_ERR;
     }
     TransformMouseEventToInputEvent(mouseEventArray, inputEventArray);
-    MMI_LOGI("Leave TransformJsonDataForMouse function.");
+    MMI_LOG_I("Leave TransformJsonDataForMouse function.");
 
     return RET_OK;
 }

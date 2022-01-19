@@ -45,7 +45,7 @@ void CheckDefineOutput(const char* fmt, Ts... args)
     }
 
     KMSG_LOGI("%s", buf);
-    MMI_LOGI("%s", buf);
+    MMI_LOG_I("%s", buf);
 }
 
 static void CheckDefine()
@@ -80,14 +80,14 @@ OHOS::MMI::MMIServer::MMIServer()
 
 OHOS::MMI::MMIServer::~MMIServer()
 {
-    MMI_LOGT("enter");
+    MMI_LOG_T("enter");
 }
 
 int32_t OHOS::MMI::MMIServer::Start()
 {
     CheckDefine();
     uint64_t tid = GetThisThreadIdOfLL();
-    MMI_LOGD("Main Thread tid:%{public}" PRId64 "", tid);
+    MMI_LOG_D("Main Thread tid:%{public}" PRId64 "", tid);
 
     int32_t ret = RET_OK;
     ret = SaConnectServiceRegister();
@@ -96,19 +96,19 @@ int32_t OHOS::MMI::MMIServer::Start()
     ret = InitExpSoLibrary();
     CHKR((ret == RET_OK), ret, ret);
 
-    MMI_LOGD("Screen_Manager Init");
+    MMI_LOG_D("Screen_Manager Init");
     CHKR(WinMgr->Init(*this), WINDOWS_MSG_INIT_FAIL, WINDOWS_MSG_INIT_FAIL);
 
-    MMI_LOGD("AppRegister Init");
+    MMI_LOG_D("AppRegister Init");
     CHKR(AppRegs->Init(*this), APP_REG_INIT_FAIL, APP_REG_INIT_FAIL);
 
-    MMI_LOGD("DeviceRegister Init");
+    MMI_LOG_D("DeviceRegister Init");
     CHKR(DevRegister->Init(), DEV_REG_INIT_FAIL, DEV_REG_INIT_FAIL);
 
-    MMI_LOGD("MsgHandler Init");
+    MMI_LOG_D("MsgHandler Init");
     CHKR(sMsgHandler_.Init(*this), SVR_MSG_HANDLER_INIT_FAIL, SVR_MSG_HANDLER_INIT_FAIL);
 #ifdef  OHOS_BUILD_AI
-    MMI_LOGD("SeniorInput Init");
+    MMI_LOG_D("SeniorInput Init");
     CHKR(seniorInput_.Init(*this), SENIOR_INPUT_DEV_INIT_FAIL, SENIOR_INPUT_DEV_INIT_FAIL);
     sMsgHandler_.SetSeniorInputHandle(seniorInput_);
 #endif // OHOS_BUILD_AI
@@ -126,7 +126,7 @@ int32_t OHOS::MMI::MMIServer::Start()
 #ifdef DEBUG_CODE_TEST
     uint64_t curTime = OHOS::MMI::GetMillisTime();
     uint64_t consumeTime = curTime - GetMmiServerStartTime();
-    MMI_LOGW("The server started successfully, the time consumed was %{public}" PRId64
+    MMI_LOG_W("The server started successfully, the time consumed was %{public}" PRId64
             " Ms curTime:%{public}" PRId64 "", consumeTime, curTime);
 #endif
     return RET_OK;
@@ -134,7 +134,7 @@ int32_t OHOS::MMI::MMIServer::Start()
 
 int32_t OHOS::MMI::MMIServer::InitExpSoLibrary()
 {
-    MMI_LOGD("Load Expansibility Operation");
+    MMI_LOG_D("Load Expansibility Operation");
     auto expConf = GetEnv("EXP_CONF");
     if (expConf.empty()) {
         expConf = DEF_EXP_CONFIG;
@@ -149,18 +149,18 @@ int32_t OHOS::MMI::MMIServer::InitExpSoLibrary()
 
 int32_t OHOS::MMI::MMIServer::InitLibinput()
 {
-    MMI_LOGD("Libinput event handle init");
+    MMI_LOG_D("Libinput event handle init");
     CHKR(InputHandler->Init(*this), INPUT_EVENT_HANDLER_INIT_FAIL, INPUT_EVENT_HANDLER_INIT_FAIL);
 
 #ifdef OHOS_BUILD_HDF
-    MMI_LOGD("HDF Init");
+    MMI_LOG_D("HDF Init");
     SetLibInputEventListener([](struct multimodal_libinput_event *event) {
         InputHandler->OnEvent(event);
     });
     hdfEventManager.SetupCallback();
 #else
     #ifdef OHOS_WESTEN_MODEL
-        MMI_LOGD("InitLibinput WestonInit...");
+        MMI_LOG_D("InitLibinput WestonInit...");
         SetLibInputEventListener([](struct multimodal_libinput_event *event) {
             InputHandler->OnEvent(event);
         });
@@ -169,13 +169,13 @@ int32_t OHOS::MMI::MMIServer::InitLibinput()
         if (seatId.empty()) {
             seatId = DEF_SEAT_ID;
         }
-        MMI_LOGD("MMIServer: seat:%{public}s", seatId.c_str());
+        MMI_LOG_D("MMIServer: seat:%{public}s", seatId.c_str());
         if (!input_.Init(std::bind(&InputEventHandler::OnEvent, InputHandler, std::placeholders::_1),
             seatId)) {
-            MMI_LOGE("libinput Init Failed");
+            MMI_LOG_E("libinput Init Failed");
             return LIBINPUT_INIT_FAIL;
         }
-        MMI_LOGD("libinput start");
+        MMI_LOG_D("libinput start");
     #endif
 #endif
     return RET_OK;
@@ -189,10 +189,10 @@ void OHOS::MMI::MMIServer::OnTimer()
 
 void OHOS::MMI::MMIServer::StopAll()
 {
-    MMI_LOGD("enter");
+    MMI_LOG_D("enter");
     int32_t ret = SaConnectServiceStop();
     if (ret != RET_OK) {
-        MMI_LOGE("call SaConnectServiceStop fail, ret = %{public}d.", ret);
+        MMI_LOG_E("call SaConnectServiceStop fail, ret = %{public}d.", ret);
     }
     UdsStop();
     RegEventHM->Clear();
@@ -200,24 +200,24 @@ void OHOS::MMI::MMIServer::StopAll()
 #ifndef OHOS_WESTEN_MODEL
     input_.Stop();
 #endif
-    MMI_LOGD("leave");
+    MMI_LOG_D("leave");
 }
 
 int32_t OHOS::MMI::MMIServer::SaConnectServiceRegister()
 {
-    MMI_LOGT("enter.");
+    MMI_LOG_T("enter.");
 
     int32_t ret;
 
     ret = MultimodalInputConnectServiceSetUdsServer(this);
     if (ret != RET_OK) {
-        MMI_LOGE("MultimodalInputConnectServiceSetUdsServer fail, ret = %{public}d.", ret);
+        MMI_LOG_E("MultimodalInputConnectServiceSetUdsServer fail, ret = %{public}d.", ret);
         return RET_ERR;
     }
 
     ret = EpollCreat(MAX_EVENT_SIZE);
     if (ret == -1) {
-        MMI_LOGE("call EpollCreat fail");
+        MMI_LOG_E("call EpollCreat fail");
         return RET_ERR;
     }
 
@@ -226,11 +226,11 @@ int32_t OHOS::MMI::MMIServer::SaConnectServiceRegister()
 
 int32_t OHOS::MMI::MMIServer::SaConnectServiceStart()
 {
-    MMI_LOGT("enter.");
+    MMI_LOG_T("enter.");
 
     int32_t ret = MultimodalInputConnectServiceStart();
     if (ret != RET_OK) {
-        MMI_LOGE("call MultimodalInputConnectServiceStart fail, ret = %{public}d.", ret);
+        MMI_LOG_E("call MultimodalInputConnectServiceStart fail, ret = %{public}d.", ret);
         return RET_ERR;
     }
 
@@ -239,11 +239,11 @@ int32_t OHOS::MMI::MMIServer::SaConnectServiceStart()
 
 int32_t OHOS::MMI::MMIServer::SaConnectServiceStop()
 {
-    MMI_LOGT("enter.");
+    MMI_LOG_T("enter.");
 
     int32_t ret = MultimodalInputConnectServiceStop();
     if (ret != RET_OK) {
-        MMI_LOGE("call MultimodalInputConnectServiceStop fail, ret = %{public}d.", ret);
+        MMI_LOG_E("call MultimodalInputConnectServiceStop fail, ret = %{public}d.", ret);
         return RET_ERR;
     }
 
@@ -254,14 +254,14 @@ void OHOS::MMI::MMIServer::OnConnected(SessionPtr s)
 {
     CHK(s, ERROR_NULL_POINTER);
     int32_t fd = s->GetFd();
-    MMI_LOGI("MMIServer::_OnConnected fd:%{public}d", fd);
+    MMI_LOG_I("MMIServer::_OnConnected fd:%{public}d", fd);
     AppRegs->RegisterConnectState(fd);
 }
 
 void OHOS::MMI::MMIServer::OnDisconnected(SessionPtr s)
 {
     CHK(s, ERROR_NULL_POINTER);
-    MMI_LOGW("MMIServer::OnDisconnected enter, session desc:%{public}s", s->GetDescript().c_str());
+    MMI_LOG_W("MMIServer::OnDisconnected enter, session desc:%{public}s", s->GetDescript().c_str());
     int32_t fd = s->GetFd();
 
     auto appInfo = AppRegs->FindBySocketFd(fd);

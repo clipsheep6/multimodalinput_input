@@ -31,7 +31,7 @@ int32_t main(int32_t argc, const char* argv[])
     do {
         OHOS::MMI::SetThreadName("main");
         if (argc < OHOS::MMI::ARGV_VALID) {
-            MMI_LOGI("Invaild Input Para, Plase Check the validity of the para! errCode:%d\n", OHOS::PARAM_INPUT_FAIL);
+            MMI_LOG_I("Invaild Input Para, Plase Check the validity of the para! errCode:%d\n", OHOS::PARAM_INPUT_FAIL);
             break;
         }
         std::vector<std::string> argvs;
@@ -41,12 +41,12 @@ int32_t main(int32_t argc, const char* argv[])
         OHOS::MMI::InjectionEventDispatch injection;
         injection.Init();
         if (!(injection.VirifyArgvs(argc, argvs))) {
-            MMI_LOGI("Invaild Input Para, Plase Check the validity of the para! errCode:%d\n", OHOS::PARAM_INPUT_FAIL);
+            MMI_LOG_I("Invaild Input Para, Plase Check the validity of the para! errCode:%d\n", OHOS::PARAM_INPUT_FAIL);
             break;
         }
         injection.Run();
         if (OHOS::MMI::TestAuxToolClient::GetInstance().ThreadIsEnd()) {
-            MMI_LOGI("TestAuxToolClient thread is end.");
+            MMI_LOG_I("TestAuxToolClient thread is end.");
         }
     } while (0);
 
@@ -54,7 +54,7 @@ int32_t main(int32_t argc, const char* argv[])
     OHOS::MMI::LogManager::GetInstance().Stop();
 
     if (OHOS::MMI::LogManager::GetInstance().ThreadIsEnd()) {
-        MMI_LOGI("LogManager thread is end.");
+        MMI_LOG_I("LogManager thread is end.");
     }
 #endif
 
