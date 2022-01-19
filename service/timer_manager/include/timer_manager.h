@@ -23,6 +23,7 @@
 #include "log.h"
 #include "singleton.h"
 #include "util.h"
+#include "mouse_event_handler.h"
 
 namespace OHOS {
 namespace MMI {

@@ -13,28 +13,21 @@
  * limitations under the License.
  */
 
-#include <thread>
-#include "input_windows_manager.h"
-#include "libmmi_util.h"
-#include "mouse_event.h"
 #include "mouse_event_handler.h"
-#include "timer_manager.h"
+#include "libmmi_util.h"
 #include "util.h"
-
-static double g_coordinateX = 0;
-static double g_coordinateY = 0;
-static int32_t g_btnId = -1;
-static bool g_isPressed = false;
-static int32_t g_timerId = -1;
-static int32_t g_deviceid = 0;
+#include "input_windows_manager.h"
+#include "timer_manager.h"
+#include "mouse_state_gesture.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MouseEventHandler"};
 }
-MouseEventHandler::MouseEventHandler(int32_t eventType) : PointerEvent(eventType)
+MouseEventHandler::MouseEventHandler()
 {
+    pointerEvent_ = PointerEvent::Create();
 }
 
 MouseEventHandler::~MouseEventHandler()
@@ -43,165 +36,143 @@ MouseEventHandler::~MouseEventHandler()
 
 void MouseEventHandler::CalcMovedCoordinate(struct libinput_event_pointer& pointEventData)
 {
-    g_coordinateX += libinput_event_pointer_get_dx(&pointEventData);
-    g_coordinateY += libinput_event_pointer_get_dy(&pointEventData);
+    coordinateX_ += libinput_event_pointer_get_dx(&pointEventData);
+    coordinateY_ += libinput_event_pointer_get_dy(&pointEventData);
 
-    WinMgr->AdjustCoordinate(g_coordinateX, g_coordinateY);
-    MMI_LOGI("g_coordinateX is : %{public}lf, g_coordinateY is : %{public}lf", g_coordinateX, g_coordinateY);
+    WinMgr->AdjustCoordinate(coordinateX_, coordinateY_);
+    MMI_LOGI("coordinateX_ is : %{public}lf, coordinateY_ is : %{public}lf", coordinateX_, coordinateY_);
 }
 
 void OHOS::MMI::MouseEventHandler::SetMouseMotion(PointerEvent::PointerItem& pointerItem)
 {
-    this->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    this->SetButtonId(g_btnId);
-    pointerItem.SetPressed(g_isPressed);
+    pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
 }
 
 void MouseEventHandler::SetMouseButon(PointerEvent::PointerItem& pointerItem,
                                       struct libinput_event_pointer& pointEventData)
 {
-    bool isPressed = false;
-
-    if (libinput_event_pointer_get_button(&pointEventData) == LEFT_BUTTON) {
-        this->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
-        g_btnId = this->GetButtonId();
-    } else if (libinput_event_pointer_get_button(&pointEventData) == RIGHT_BUTTON) {
-        this->SetButtonId(PointerEvent::MOUSE_BUTTON_RIGHT);
-        g_btnId = this->GetButtonId();
-    } else if (libinput_event_pointer_get_button(&pointEventData) == MIDDLE_BUTTON) {
-        this->SetButtonId(PointerEvent::MOUSE_BUTTON_MIDDLE);
-        g_btnId = this->GetButtonId();
+    auto button = libinput_event_pointer_get_button(&pointEventData);
+    if (button == BTN_LEFT) {
+        pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
+    } else if (button == BTN_RIGHT) {
+        pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_RIGHT);
+    } else if (button == BTN_MIDDLE) {
+        pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_MIDDLE);
     } else {
         MMI_LOGW("PointerAction : %{public}d, unProces Button code : %{public}u",
-        this->GetPointerAction(), libinput_event_pointer_get_button(&pointEventData));
+                 pointerEvent_->GetPointerAction(), button);
     }
-    if (libinput_event_pointer_get_button_state(&pointEventData) == LIBINPUT_BUTTON_STATE_RELEASED) {
-        this->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+    bool isPressed = false;
+    auto state = libinput_event_pointer_get_button_state(&pointEventData);
+    if (state == LIBINPUT_BUTTON_STATE_RELEASED) {
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
         isPressed = false;
-        g_isPressed = isPressed;
-        g_btnId = BUTTON_NONE;
-    } else if (libinput_event_pointer_get_button_state(&pointEventData) == LIBINPUT_BUTTON_STATE_PRESSED) {
-        this->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
-        this->SetButtonPressed(libinput_event_pointer_get_button(&pointEventData));
+    } else if (state == LIBINPUT_BUTTON_STATE_PRESSED) {
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+        pointerEvent_->SetButtonPressed(state);
         isPressed = true;
-        g_isPressed = isPressed;
     }
-
+    MouseState->CountState(button, state);
     pointerItem.SetPressed(isPressed);
 }
 
 void MouseEventHandler::SetMouseAxis(struct libinput_event_pointer& pointEventData)
 {
-    const int32_t MouseTimeOut = 100;
-    double axisValue = 0;
-    if (TimerMgr == nullptr) {
-        MMI_LOGI("the TimeManager is nullptr");
-        return;
-    }
-    if (TimerMgr->IsExist(g_timerId)) {
-        this->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
-        TimerMgr->RemoveTimer(g_timerId);
+    if (TimerMgr->IsExist(timerId_)) {
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
+        TimerMgr->ResetTimer(timerId_);
         MMI_LOGI("pointer axis event update");
     } else {
-        this->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
-        MMI_LOGI("pointer axis event begin");
-    }
-    g_timerId = TimerMgr->AddTimer(MouseTimeOut, 1, []() {
-        g_timerId = -1;
-        MMI_LOGI("pointer axis event end TimerCallback run");
-        auto pointerEvent = OHOS::MMI::PointerEvent::Create();
-        if (pointerEvent == nullptr) {
-            MMI_LOGI("the pointerEvent is nullptr");
-            return;
-        }
-        if (SetMouseEndData(pointerEvent, g_deviceid) == RET_OK) {
+        const int32_t mouseTimeout = 100;
+        timerId_ = TimerMgr->AddTimer(mouseTimeout, 1, []() {
+            const int32_t defaultTimerId = -1;
+            MouseEvent->SetTimerId(defaultTimerId);
+            MMI_LOGI("pointer axis event end TimerCallback run");
+            MouseEvent->SetMouseAction(PointerEvent::POINTER_ACTION_AXIS_END);
+            auto pointerEvent = MouseEvent->GetPointerEventPtr();
+            if (pointerEvent == nullptr) {
+                MMI_LOGE("the pointerEvent is nullptr");
+                return;
+            }
             InputHandler->OnMouseEventTimerHanler(pointerEvent);
             MMI_LOGI("pointer axis event end");
-        }
-    });
+        });
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+        MMI_LOGI("pointer axis event begin");
+    }
+
+    double axisValue = 0;
     if (libinput_event_pointer_has_axis(&pointEventData, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL)) {
         axisValue = libinput_event_pointer_get_axis_value(&pointEventData,
                                                           LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL);
-        this->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, axisValue);
+        pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, axisValue);
     }
     if (libinput_event_pointer_has_axis(&pointEventData, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL)) {
         axisValue = libinput_event_pointer_get_axis_value(&pointEventData,
                                                           LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL);
-        this->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, axisValue);
+        pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, axisValue);
     }
 }
 
-void MouseEventHandler::SetMouseData(libinput_event *event, int32_t deviceId)
+void MouseEventHandler::ProcessMouseData(libinput_event *event, int32_t deviceId)
 {
     CHK(event, PARAM_INPUT_INVALID);
-    PointerEvent::PointerItem pointerItem;
-    struct libinput_event_pointer *pointEventData = nullptr;
-    pointEventData = libinput_event_get_pointer_event(event);
-    uint64_t time = libinput_event_pointer_get_time_usec(pointEventData);
+    auto pointEventData = libinput_event_get_pointer_event(event);
+    CHKP(pointEventData, ERROR_NULL_POINTER);
     int32_t type = libinput_event_get_type(event);
+    PointerEvent::PointerItem pointerItem;
     if ((type == LIBINPUT_EVENT_POINTER_MOTION) || (type == LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE)) {
         CalcMovedCoordinate(*pointEventData);
-        WinMgr->SetMouseInfo(g_coordinateX, g_coordinateY);
-        MMI_LOGI("Change Coordinate : g_coordinateX = %{public}lf, g_coordinateY = %{public}lf",
-                 g_coordinateX, g_coordinateY);
-        this->SetMouseMotion(pointerItem);
+        WinMgr->SetMouseInfo(coordinateX_, coordinateY_);
+        MMI_LOGI("Change Coordinate : coordinateX_ = %{public}lf, coordinateY_ = %{public}lf",
+                 coordinateX_, coordinateY_);
+        SetMouseMotion(pointerItem);
     } else if (type == LIBINPUT_EVENT_POINTER_BUTTON) {
-        this->SetMouseButon(pointerItem, *pointEventData);
+        SetMouseButon(pointerItem, *pointEventData);
     } else if (type == LIBINPUT_EVENT_POINTER_AXIS) {
-        this->SetMouseAxis(*pointEventData);
+        SetMouseAxis(*pointEventData);
     }
 
     auto mouseInfo = WinMgr->GetMouseInfo();
+    MMI_LOGD("mouseInfo.globleX=%{public}d mouseInfo.globleY=%{public}d mouseInfo.localX=%{public}d mouseInfo.localY=%{public}d", 
+                        mouseInfo.globleX, mouseInfo.globleY, mouseInfo.localX, mouseInfo.localY);
+    MouseState->SetMouseCoords(mouseInfo.globleX, mouseInfo.globleY);
     pointerItem.SetGlobalX(mouseInfo.globleX);
     pointerItem.SetGlobalY(mouseInfo.globleY);
     pointerItem.SetLocalX(mouseInfo.localX);
     pointerItem.SetLocalY(mouseInfo.localY);
     pointerItem.SetPointerId(0);
+
+    uint64_t time = libinput_event_pointer_get_time_usec(pointEventData);
     pointerItem.SetDownTime(static_cast<int32_t>(time));
     pointerItem.SetWidth(0);
     pointerItem.SetHeight(0);
     pointerItem.SetPressure(0);
     pointerItem.SetDeviceId(deviceId);
 
-    this->AddPointerItem(pointerItem);
-    this->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    this->SetActionTime(static_cast<int32_t>(GetSysClockTime()));
-    this->SetActionStartTime(static_cast<int32_t>(time));
-    this->SetDeviceId(deviceId);
-    this->SetPointerId(0);
-    this->SetTargetDisplayId(-1);
-    this->SetTargetWindowId(-1);
-    this->SetAgentWindowId(-1);
+    pointerEvent_->AddPointerItem(pointerItem);
+    pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent_->SetActionTime(static_cast<int32_t>(GetSysClockTime()));
+    pointerEvent_->SetActionStartTime(static_cast<int32_t>(time));
+    pointerEvent_->SetDeviceId(deviceId);
+    pointerEvent_->SetPointerId(0);
+    pointerEvent_->SetTargetDisplayId(-1);
+    pointerEvent_->SetTargetWindowId(-1);
+    pointerEvent_->SetAgentWindowId(-1);
 }
 
-int32_t MouseEventHandler::SetMouseEndData(std::shared_ptr<PointerEvent> pointerEvent, int32_t deviceId)
+void MouseEventHandler::SetMouseAction(const int32_t action)
 {
-    if (pointerEvent == nullptr) {
-        return RET_ERR;
-    }
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
-    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, 0);
-    pointerEvent->SetDeviceId(deviceId);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->SetTargetDisplayId(0);
-    pointerEvent->SetTargetWindowId(0);
-    pointerEvent->SetAgentWindowId(0);
-    MouseInfo info = WinMgr->GetMouseInfo();
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    item.SetDownTime(0);
-    item.SetPressed(false);
-    item.SetGlobalX(info.globleX);
-    item.SetGlobalY(info.globleY);
-    item.SetLocalX(info.localX);
-    item.SetLocalY(info.localY);
-    item.SetWidth(0);
-    item.SetHeight(0);
-    item.SetPressure(0);
-    item.SetDeviceId(deviceId);
-    pointerEvent->AddPointerItem(item);
-    return RET_OK;
+    pointerEvent_->SetPointerAction(action);
+}
+
+std::shared_ptr<PointerEvent> MouseEventHandler::GetPointerEventPtr()
+{
+    return pointerEvent_;
+}
+void MouseEventHandler::SetTimerId(const int32_t id)
+{
+    timerId_ = id;
 }
 } // namespace MMI
 } // namespace OHOS
