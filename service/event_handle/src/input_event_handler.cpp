@@ -53,17 +53,17 @@ OHOS::MMI::InputEventHandler::~InputEventHandler()
 bool OHOS::MMI::InputEventHandler::Init(UDSServer& udsServer)
 {
     udsServer_ = &udsServer;
-    MsgCallback funs[] = {
+    mapFuns_ = {
         {
-            MmiMessageId::LIBINPUT_EVENT_DEVICE_ADDED,
+            LIBINPUT_EVENT_DEVICE_ADDED,
             std::bind(&InputEventHandler::OnEventDeviceAdded, this, std::placeholders::_1)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_DEVICE_REMOVED,
+            LIBINPUT_EVENT_DEVICE_REMOVED,
             std::bind(&InputEventHandler::OnEventDeviceRemoved, this, std::placeholders::_1)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_KEYBOARD_KEY,
+            LIBINPUT_EVENT_KEYBOARD_KEY,
             std::bind(&InputEventHandler::OnEventKeyboard, this, std::placeholders::_1)
         },
         {
@@ -71,117 +71,114 @@ bool OHOS::MMI::InputEventHandler::Init(UDSServer& udsServer)
             std::bind(&InputEventHandler::OnKeyEventDispatch, this, std::placeholders::_1)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_POINTER_MOTION,
+            LIBINPUT_EVENT_POINTER_MOTION,
             std::bind(&InputEventHandler::OnEventPointer, this, std::placeholders::_1)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE,
+            LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE,
             std::bind(&InputEventHandler::OnEventPointer, this, std::placeholders::_1)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_POINTER_BUTTON,
+            LIBINPUT_EVENT_POINTER_BUTTON,
             std::bind(&InputEventHandler::OnEventPointer, this, std::placeholders::_1)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_POINTER_AXIS,
+            LIBINPUT_EVENT_POINTER_AXIS,
             std::bind(&InputEventHandler::OnEventPointer, this, std::placeholders::_1)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_TOUCH_DOWN,
+            LIBINPUT_EVENT_TOUCH_DOWN,
             std::bind(&InputEventHandler::OnEventTouch, this, std::placeholders::_1)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_TOUCH_UP,
+            LIBINPUT_EVENT_TOUCH_UP,
             std::bind(&InputEventHandler::OnEventTouch, this, std::placeholders::_1)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_TOUCH_MOTION,
+            LIBINPUT_EVENT_TOUCH_MOTION,
             std::bind(&InputEventHandler::OnEventTouch, this, std::placeholders::_1)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_TOUCH_CANCEL,
+            LIBINPUT_EVENT_TOUCH_CANCEL,
             std::bind(&InputEventHandler::OnEventTouch, this, std::placeholders::_1)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_TOUCH_FRAME,
+            LIBINPUT_EVENT_TOUCH_FRAME,
             std::bind(&InputEventHandler::OnEventTouch, this, std::placeholders::_1)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_TOUCHPAD_DOWN,
+            LIBINPUT_EVENT_TOUCHPAD_DOWN,
             std::bind(&InputEventHandler::OnEventTouchpad, this, std::placeholders::_1)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_TOUCHPAD_UP,
+            LIBINPUT_EVENT_TOUCHPAD_UP,
             std::bind(&InputEventHandler::OnEventTouchpad, this, std::placeholders::_1)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_TOUCHPAD_MOTION,
+            LIBINPUT_EVENT_TOUCHPAD_MOTION,
             std::bind(&InputEventHandler::OnEventTouchpad, this, std::placeholders::_1)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_TABLET_TOOL_AXIS,
+            LIBINPUT_EVENT_TABLET_TOOL_AXIS,
             std::bind(&InputEventHandler::OnEventTabletTool, this, std::placeholders::_1)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY,
+            LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY,
             std::bind(&InputEventHandler::OnEventTabletTool, this, std::placeholders::_1)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_TABLET_TOOL_TIP,
+            LIBINPUT_EVENT_TABLET_TOOL_TIP,
             std::bind(&InputEventHandler::OnEventTabletTool, this, std::placeholders::_1)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_TABLET_TOOL_BUTTON,
+            LIBINPUT_EVENT_TABLET_TOOL_BUTTON,
             std::bind(&InputEventHandler::OnEventTabletTool, this, std::placeholders::_1)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_TABLET_PAD_BUTTON,
+            LIBINPUT_EVENT_TABLET_PAD_BUTTON,
             std::bind(&InputEventHandler::OnEventTabletPadKey, this, std::placeholders::_1)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_TABLET_PAD_RING,
+            LIBINPUT_EVENT_TABLET_PAD_RING,
             std::bind(&InputEventHandler::OnEventTabletPad, this, std::placeholders::_1)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_TABLET_PAD_STRIP,
+            LIBINPUT_EVENT_TABLET_PAD_STRIP,
             std::bind(&InputEventHandler::OnEventTabletPad, this, std::placeholders::_1)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_TABLET_PAD_KEY,
+            LIBINPUT_EVENT_TABLET_PAD_KEY,
             std::bind(&InputEventHandler::OnEventTabletPadKey, this, std::placeholders::_1)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_GESTURE_SWIPE_BEGIN,
+            LIBINPUT_EVENT_GESTURE_SWIPE_BEGIN,
             std::bind(&InputEventHandler::OnEventGesture, this, std::placeholders::_1)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_GESTURE_SWIPE_UPDATE,
+            LIBINPUT_EVENT_GESTURE_SWIPE_UPDATE,
             std::bind(&InputEventHandler::OnEventGesture, this, std::placeholders::_1)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_GESTURE_SWIPE_END,
+            LIBINPUT_EVENT_GESTURE_SWIPE_END,
             std::bind(&InputEventHandler::OnEventGesture, this, std::placeholders::_1)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_GESTURE_PINCH_BEGIN,
+            LIBINPUT_EVENT_GESTURE_PINCH_BEGIN,
             std::bind(&InputEventHandler::OnEventGesture, this, std::placeholders::_1)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_GESTURE_PINCH_UPDATE,
+            LIBINPUT_EVENT_GESTURE_PINCH_UPDATE,
             std::bind(&InputEventHandler::OnEventGesture, this, std::placeholders::_1)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_GESTURE_PINCH_END,
+            LIBINPUT_EVENT_GESTURE_PINCH_END,
             std::bind(&InputEventHandler::OnEventGesture, this, std::placeholders::_1)
         },
         {
-            MmiMessageId::LIBINPUT_EVENT_SWITCH_TOGGLE,
+            LIBINPUT_EVENT_SWITCH_TOGGLE,
             std::bind(&InputEventHandler::OnEventSwitchToggle, this, std::placeholders::_1)
         },
     };
-    for (auto& it : funs) {
-        CHKC(RegistrationEvent(it), EVENT_REG_FAIL);
-    }
     return true;
 }
 
@@ -222,7 +219,7 @@ int32_t OHOS::MMI::InputEventHandler::OnEventHandler(multimodal_libinput_event &
     CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     auto type = libinput_event_get_type(ev.event);
     OHOS::MMI::TimeCostChk chk("InputEventHandler::OnEventHandler", "overtime 1000(us)", MAX_INPUT_EVENT_TIME, type);
-    auto fun = GetFun(static_cast<MmiMessageId>(type));
+    auto fun = GetFun(type);
     if (!fun) {
         MMI_LOGE("Unknown event type[%{public}d].errCode:%{public}d", type, UNKNOWN_EVENT);
         return UNKNOWN_EVENT;

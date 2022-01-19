@@ -77,16 +77,16 @@ public:
     virtual bool OnDeviceAdd(const DeviceEvent& event);
     virtual bool OnDeviceRemove(const DeviceEvent& event);
 
-    MmiMessageId GetType() const
+    int32_t GetType() const
     {
         return type_;
     }
-    void SetType(MmiMessageId type)
+    void SetType(int32_t type)
     {
         type_ = type;
     }
 protected:
-    MmiMessageId type_ = MmiMessageId::INVALID;
+    int32_t type_ = MmiMessageId::INVALID_MSG_ID;
 };
 
 template<class T>

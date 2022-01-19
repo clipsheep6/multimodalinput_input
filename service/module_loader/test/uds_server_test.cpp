@@ -68,7 +68,7 @@ HWTEST_F(UDSServerTest, Init_002, TestSize.Level1)
 HWTEST_F(UDSServerTest, SendMsg_001, TestSize.Level1)
 {
     int fd = 1000;
-    MmiMessageId msgId = MmiMessageId::INVALID;
+    int32_t msgId = MmiMessageId::INVALID_MSG_ID;
     NetPacket newPacket(msgId);
 
     UDSServer serObj;
@@ -79,7 +79,7 @@ HWTEST_F(UDSServerTest, SendMsg_001, TestSize.Level1)
 HWTEST_F(UDSServerTest, SendMsg_002, TestSize.Level1)
 {
     int fd = -1001;
-    MmiMessageId msgId = MmiMessageId::INVALID;
+    int32_t msgId = MmiMessageId::INVALID_MSG_ID;
     NetPacket newPacket(msgId);
 
     UDSServer serObj;
@@ -90,7 +90,7 @@ HWTEST_F(UDSServerTest, SendMsg_002, TestSize.Level1)
 HWTEST_F(UDSServerTest, SendMsg_003, TestSize.Level1)
 {
     int fd = 3333;
-    MmiMessageId msgId = MmiMessageId::BEGIN;
+    int32_t msgId = MmiMessageId::BEGIN;
     NetPacket newPacket(msgId);
 
     UDSServer serObj;
@@ -100,7 +100,7 @@ HWTEST_F(UDSServerTest, SendMsg_003, TestSize.Level1)
 
 HWTEST_F(UDSServerTest, Broadcast_001, TestSize.Level1)
 {
-    MmiMessageId msgId = MmiMessageId::INVALID;
+    int32_t msgId = MmiMessageId::INVALID_MSG_ID;
     NetPacket newPacket(msgId);
 
     UDSServer serObj;
@@ -109,7 +109,7 @@ HWTEST_F(UDSServerTest, Broadcast_001, TestSize.Level1)
 
 HWTEST_F(UDSServerTest, Broadcast_002, TestSize.Level1)
 {
-    MmiMessageId msgId = MmiMessageId::BEGIN;
+    int32_t msgId = MmiMessageId::BEGIN;
     NetPacket newPacket(msgId);
 
     UDSServer serObj;
@@ -118,7 +118,7 @@ HWTEST_F(UDSServerTest, Broadcast_002, TestSize.Level1)
 
 HWTEST_F(UDSServerTest, Broadcast_003, TestSize.Level1)
 {
-    MmiMessageId msgId = MmiMessageId::REGISTER_APP_INFO;
+    int32_t msgId = MmiMessageId::REGISTER_APP_INFO;
     NetPacket newPacket(msgId);
 
     UDSServer serObj;
@@ -127,7 +127,7 @@ HWTEST_F(UDSServerTest, Broadcast_003, TestSize.Level1)
 
 HWTEST_F(UDSServerTest, Broadcast_004, TestSize.Level1)
 {
-    MmiMessageId msgId = MmiMessageId::REGISTER_MSG_HANDLER;
+    int32_t msgId = MmiMessageId::REGISTER_MSG_HANDLER;
     NetPacket newPacket(msgId);
 
     UDSServer serObj;
@@ -136,7 +136,7 @@ HWTEST_F(UDSServerTest, Broadcast_004, TestSize.Level1)
 
 HWTEST_F(UDSServerTest, Multicast, TestSize.Level1)
 {
-    MmiMessageId msgId = MmiMessageId::INVALID;
+    int32_t msgId = MmiMessageId::INVALID_MSG_ID;
     NetPacket newPacket(msgId);
     std::vector<int> fds;
     fds.push_back(1);

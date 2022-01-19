@@ -56,7 +56,7 @@ bool OHOS::MMI::ServerMsgHandler::Init(UDSServer& udsServer)
 #ifdef OHOS_BUILD_HDF
     CHKF(hdiInject->Init(udsServer), SENIOR_INPUT_DEV_INIT_FAIL);
 #endif
-    MsgCallback funs[] = {
+    mapFuns_ = {
         {MmiMessageId::REGISTER_APP_INFO, MsgCallbackBind2(&ServerMsgHandler::OnRegisterAppInfo, this)},
         {MmiMessageId::REGISTER_MSG_HANDLER, MsgCallbackBind2(&ServerMsgHandler::OnRegisterMsgHandler, this)},
         {MmiMessageId::UNREGISTER_MSG_HANDLER, MsgCallbackBind2(&ServerMsgHandler::OnUnregisterMsgHandler, this)},
@@ -103,9 +103,6 @@ bool OHOS::MMI::ServerMsgHandler::Init(UDSServer& udsServer)
         {MmiMessageId::HDI_INJECT, MsgCallbackBind2(&ServerMsgHandler::OnHdiInject, this)},
 #endif // OHOS_BUILD_HDF
     };
-    for (auto& it : funs) {
-        CHKC(RegistrationEvent(it), EVENT_REG_FAIL);
-    }
     return true;
 }
 
@@ -238,7 +235,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRegisterAppInfo(SessionPtr sess, NetPacke
 int32_t OHOS::MMI::ServerMsgHandler::OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt)
 {
     CHKR(sess, ERROR_NULL_POINTER, RET_ERR);
-    MmiMessageId eventType = MmiMessageId::INVALID;
+    int32_t eventType = MmiMessageId::INVALID_MSG_ID;
     int32_t abilityId = 0;
     int32_t winId = 0;
     std::string bundlerName;
@@ -258,7 +255,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRegisterMsgHandler(SessionPtr sess, NetPa
 int32_t OHOS::MMI::ServerMsgHandler::OnUnregisterMsgHandler(SessionPtr sess, NetPacket& pkt)
 {
     CHKR(sess, ERROR_NULL_POINTER, RET_ERR);
-    MmiMessageId messageId = MmiMessageId::INVALID;
+    int32_t messageId = MmiMessageId::INVALID_MSG_ID;
     int32_t fd = sess->GetFd();
     pkt >> messageId;
     RegEventHM->UnregisterEventHandleManager(messageId, fd);
@@ -369,8 +366,8 @@ int32_t OHOS::MMI::ServerMsgHandler::GetMultimodeInputInfo(SessionPtr sess, NetP
     int32_t fd = sess->GetFd();
     pkt >> tagPackHead;
 
-    if (tagPackHead.idMsg != MmiMessageId::INVALID) {
-        TagPackHead tagPackHeadAck = { MmiMessageId::INVALID, {fd}};
+    if (tagPackHead.idMsg != MmiMessageId::INVALID_MSG_ID) {
+        TagPackHead tagPackHeadAck = { MmiMessageId::INVALID_MSG_ID, {fd}};
         NetPacket pktAck(MmiMessageId::GET_MMI_INFO_ACK);
         pktAck << tagPackHeadAck;
         if (!udsServer_->SendMsg(fd, pktAck)) {

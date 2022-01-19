@@ -41,7 +41,7 @@ bool TestAuxToolMsgHandler::Init()
 
 void TestAuxToolMsgHandler::OnMsgHandler(const UDSClient &client, NetPacket &pkt)
 {
-    const MmiMessageId id = pkt.GetMsgId();
+    const int32_t id = pkt.GetMsgId();
     OHOS::MMI::TimeCostChk chk("TestAuxToolMsgHandler::OnMsgHandler", "overtime 200(us)", CHECK_TIME, id);
     auto fun = GetFun(id);
     if (!fun) {

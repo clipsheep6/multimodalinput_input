@@ -75,7 +75,7 @@ void OHOS::MMI::MMIClient::VirtualKeyIn(RawInputEvent virtualKeyEvent)
     SendMsg(ckt);
 }
 
-void OHOS::MMI::MMIClient::ReplyMessageToServer(MmiMessageId idMsg, uint64_t clientTime, uint64_t endTime) const
+void OHOS::MMI::MMIClient::ReplyMessageToServer(int32_t idMsg, uint64_t clientTime, uint64_t endTime) const
 {
     NetPacket ckt(MmiMessageId::CHECK_REPLY_MESSAGE);
     ckt << idMsg << clientTime << endTime;

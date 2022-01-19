@@ -224,7 +224,7 @@ int32_t InjectionEventDispatch::OnAisensor()
     return exRet;
 }
 
-int32_t InjectionEventDispatch::OnAisensorOne(MmiMessageId code, uint32_t value)
+int32_t InjectionEventDispatch::OnAisensorOne(int32_t code, uint32_t value)
 {
     MMI_LOGT("enter, code = %u, value = %u", code, value);
     timeval time;
@@ -245,7 +245,7 @@ int32_t InjectionEventDispatch::OnAisensorOne(MmiMessageId code, uint32_t value)
     }
 }
 
-int32_t InjectionEventDispatch::OnKnuckleOne(MmiMessageId code, uint32_t value)
+int32_t InjectionEventDispatch::OnKnuckleOne(int32_t code, uint32_t value)
 {
     timeval time;
     RawInputEvent rawEvent = {};
@@ -576,7 +576,7 @@ int32_t InjectionEventDispatch::GetDevIndexByType(int32_t devType)
 void OHOS::MMI::InjectionEventDispatch::ProcessAiSensorInfoByCycleNum(uint16_t cycleNum)
 {
     MMI_LOGT("enter");
-    static const vector<MmiMessageId> aiSensorAllowProcCodes {
+    static const vector<int32_t> aiSensorAllowProcCodes {
         MmiMessageId::ON_SHOW_MENU,
         MmiMessageId::ON_SEND,
         MmiMessageId::ON_COPY,
@@ -629,7 +629,7 @@ void OHOS::MMI::InjectionEventDispatch::ProcessAiSensorInfoByCycleNum(uint16_t c
 
 void OHOS::MMI::InjectionEventDispatch::ProcessKnuckleInfoByCycleNum(uint16_t cycleNum)
 {
-    static const vector<MmiMessageId> aiSensorAllowProcCodes = {
+    static const vector<int32_t> aiSensorAllowProcCodes = {
         MmiMessageId::ON_SCREEN_SHOT,
         MmiMessageId::ON_SCREEN_SPLIT,
         MmiMessageId::ON_START_SCREEN_RECORD,

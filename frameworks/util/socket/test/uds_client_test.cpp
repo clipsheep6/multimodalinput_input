@@ -174,7 +174,7 @@ HWTEST_F(UDSClientTest, SendMsg_006, TestSize.Level1)
 
 HWTEST_F(UDSClientTest, SendMsg_type2_001, TestSize.Level1)
 {
-    OHOS::MMI::NetPacket newPacket(MmiMessageId::INVALID);
+    OHOS::MMI::NetPacket newPacket(MmiMessageId::INVALID_MSG_ID);
 
     UDSClient udsClient;
     auto retResult = udsClient.SendMsg(newPacket);
@@ -183,7 +183,7 @@ HWTEST_F(UDSClientTest, SendMsg_type2_001, TestSize.Level1)
 
 HWTEST_F(UDSClientTest, SendMsg_type2_002, TestSize.Level1)
 {
-    OHOS::MMI::NetPacket newPacket(static_cast<MmiMessageId>(222));
+    OHOS::MMI::NetPacket newPacket(222);
 
     UDSClient udsClient;
     auto retResult = udsClient.SendMsg(newPacket);

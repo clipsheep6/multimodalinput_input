@@ -62,7 +62,7 @@ HWTEST_F(MMIClientTest, ReplyMessageToServer_001, TestSize.Level1)
     uint64_t serverStartTime = 1;
     uint64_t clientEndTime = 1;
 
-    mmiClient.ReplyMessageToServer(static_cast<MmiMessageId>(4), serverStartTime, clientEndTime);
+    mmiClient.ReplyMessageToServer(4, serverStartTime, clientEndTime);
 }
 
 HWTEST_F(MMIClientTest, ReplyMessageToServer_002, TestSize.Level1)
@@ -70,7 +70,7 @@ HWTEST_F(MMIClientTest, ReplyMessageToServer_002, TestSize.Level1)
     uint64_t serverStartTime = 0;
     uint64_t clientEndTime = 0;
 
-    mmiClient.ReplyMessageToServer(static_cast<MmiMessageId>(3), serverStartTime, clientEndTime);
+    mmiClient.ReplyMessageToServer(3, serverStartTime, clientEndTime);
 }
 
 HWTEST_F(MMIClientTest, SdkGetMultimodeInputInfo, TestSize.Level1)
@@ -100,7 +100,7 @@ HWTEST_F(MMIClientTest, Re_ReplyMessageToServer_001, TestSize.Level1)
     uint64_t serverStartTime = 1;
     uint64_t clientEndTime = 1;
 
-    mmiClientTest.ReplyMessageToServer(static_cast<MmiMessageId>(1), serverStartTime, clientEndTime);
+    mmiClientTest.ReplyMessageToServer(1, serverStartTime, clientEndTime);
 }
 
 HWTEST_F(MMIClientTest, Re_ReplyMessageToServer_002, TestSize.Level1)
@@ -108,7 +108,7 @@ HWTEST_F(MMIClientTest, Re_ReplyMessageToServer_002, TestSize.Level1)
     uint64_t serverStartTime = 0;
     uint64_t clientEndTime = 0;
 
-    mmiClientTest.ReplyMessageToServer(static_cast<MmiMessageId>(2), serverStartTime, clientEndTime);
+    mmiClientTest.ReplyMessageToServer(2, serverStartTime, clientEndTime);
 }
 
 HWTEST_F(MMIClientTest, Re_SdkGetMultimodeInputInfo, TestSize.Level1)

@@ -59,10 +59,10 @@ public:
     * Returns:   void
     * Qualifier: 判断键盘事件是否为功能键（ctrl,alt,shift,logo）
     */
-    void OnEventKeyGetSign(EventKeyboard& key, MmiMessageId& msg, EventKeyboard& prevKey);
+    void OnEventKeyGetSign(EventKeyboard& key, int32_t &msg, EventKeyboard& prevKey);
     int32_t OnEventPointButton(const int32_t buttonCode, const uint64_t timeNow,
-        const BUTTON_STATE stateValue, MmiMessageId& msgId);
-    int32_t OnEventPointAxis(const EventPointer& point, MmiMessageId& msgId);
+        const BUTTON_STATE stateValue, int32_t &msgId);
+    int32_t OnEventPointAxis(const EventPointer& point, int32_t &msgId);
     /*
     * Method:    OnEventTouchGetSign
     * FullName:  RegisterEvent::OnEventTouchGetSign
@@ -70,22 +70,22 @@ public:
     * Returns:   bool
     * Qualifier: 判断触屏事件的高级事件
     */
-    void OnEventTouchGetSign(const EventTouch& touch, MmiMessageId& msgId);
-    void OnEventGestureGetSign(const EventGesture& gesture, MmiMessageId& msgId);
+    void OnEventTouchGetSign(const EventTouch& touch, int32_t &msgId);
+    void OnEventGestureGetSign(const EventGesture& gesture, int32_t &msgId);
     int32_t GetTouchInfoByTouchId(EventTouch& touch, const PAIR<uint32_t, int32_t> key);
     void GetTouchIds(std::vector<std::pair<uint32_t, int32_t>>& touchIds, const uint32_t deviceId);
     int32_t GetTouchInfoSizeByDeviceId(const uint32_t deviceId);
 protected:
-    int32_t OnEventGestureEndGetSign(const EventGesture& gesture, MmiMessageId& msgId);
-    int32_t OnEventGestureUpdateGetSign(const EventGesture& gesture, MmiMessageId& msgId);
+    int32_t OnEventGestureEndGetSign(const EventGesture& gesture, int32_t &msgId);
+    int32_t OnEventGestureUpdateGetSign(const EventGesture& gesture, int32_t &msgId);
     int32_t OnEventGestureBeginGetSign(const EventGesture& gesture);
-    int32_t OnEventOneFingerHandlerGetSign(MmiMessageId& msgId, TouchInfo& touchUpInfo);
-    int32_t OnEventThreeFingerHandlerGetSign(MmiMessageId& msgId, TouchInfo& touchUpInfo);
+    int32_t OnEventOneFingerHandlerGetSign(int32_t &msgId, TouchInfo& touchUpInfo);
+    int32_t OnEventThreeFingerHandlerGetSign(int32_t &msgId, TouchInfo& touchUpInfo);
     int32_t OnEventTouchDownGetSign(const EventTouch& touch);
-    int32_t OnEventTouchMotionGetSign(const EventTouch& touch, MmiMessageId& msgId);
-    int32_t OnEventTouchUpGetSign(const EventTouch& touch, MmiMessageId& msgId);
-    bool OnGetRepeatKetState(const uint32_t keyCode, MmiMessageId& msgId);
-    int32_t OnEventKeyJudge(EventKeyboard& key, MmiMessageId& msgId, EventKeyboard& prevKey);
+    int32_t OnEventTouchMotionGetSign(const EventTouch& touch, int32_t &msgId);
+    int32_t OnEventTouchUpGetSign(const EventTouch& touch, int32_t &msgId);
+    bool OnGetRepeatKetState(const uint32_t keyCode, int32_t &msgId);
+    int32_t OnEventKeyJudge(EventKeyboard& key, int32_t &msgId, EventKeyboard& prevKey);
     /*
     * Method:    GetBitNum
     * FullName:  RegisterEvent::GetBitNum

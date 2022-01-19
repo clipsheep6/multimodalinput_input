@@ -40,7 +40,7 @@ int32_t OHOS::MMI::AIFuncProc::DeviceEventDispatchProcess(const RawInputEvent &e
 
 int32_t OHOS::MMI::AIFuncProc::CheckEventCode(const RawInputEvent& event)
 {
-    static const std::set<MmiMessageId> g_aiSensorAllowProcCodes = {
+    static const std::set<int32_t> g_aiSensorAllowProcCodes = {
         MmiMessageId::ON_SHOW_MENU,
         MmiMessageId::ON_SEND,
         MmiMessageId::ON_COPY,
@@ -76,7 +76,7 @@ int32_t OHOS::MMI::AIFuncProc::CheckEventCode(const RawInputEvent& event)
         MmiMessageId::ON_TELEPHONE_CONTROL
     };
 
-    auto findNum = static_cast<MmiMessageId>(event.ev_code);
+    auto findNum = static_cast<int32_t>(event.ev_code);
     if (g_aiSensorAllowProcCodes.find(findNum) != g_aiSensorAllowProcCodes.end()) {
         return RET_OK;
     } else {

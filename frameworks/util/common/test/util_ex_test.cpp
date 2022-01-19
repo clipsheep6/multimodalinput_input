@@ -15,6 +15,7 @@
 
 #include "util_ex.h"
 #include <gtest/gtest.h>
+#include "libinput.h"
 #include "proto.h"
 
 namespace {
@@ -30,15 +31,8 @@ public:
 
 HWTEST_F(UtilExTest, EnumAdd_001, TestSize.Level1)
 {
-    MmiMessageId messageId1 = MmiMessageId::INVALID;
+    int32_t messageId1 = MmiMessageId::INVALID_MSG_ID;
     auto messageId2 = EnumAdd(messageId1, 1);
-    EXPECT_EQ(messageId2, MmiMessageId::LIBINPUT_EVENT_DEVICE_ADDED);
-}
-
-HWTEST_F(UtilExTest, EnumAdd_002, TestSize.Level1)
-{
-    MmiMessageId messageId1 = MmiMessageId::LIBINPUT_EVENT_DEVICE_ADDED;
-    auto messageId2 = EnumAdd(messageId1, -1);
-    EXPECT_EQ(messageId2, MmiMessageId::INVALID);
+    EXPECT_EQ(messageId2, LIBINPUT_EVENT_DEVICE_ADDED);
 }
 }

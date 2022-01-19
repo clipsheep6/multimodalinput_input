@@ -40,7 +40,7 @@ protected:
 
 class MultimodalEventFirstUnitTest : public MultimodalStandardizedEventManager {
 public:
-    bool MakeRegisterHandleUnitTest(MmiMessageId typeId, int32_t windowId, std::string& rhandle)
+    bool MakeRegisterHandleUnitTest(int32_t typeId, int32_t windowId, std::string& rhandle)
     {
         return MakeRegisterHandle(typeId, windowId, rhandle);
     }
@@ -49,7 +49,7 @@ public:
         return SendMsg(pkt);
     }
 
-    bool InsertMapEvent(MmiMessageId typeId, StandEventPtr standardizedEventHandle)
+    bool InsertMapEvent(int32_t typeId, StandEventPtr standardizedEventHandle)
     {
         const int32_t windowId = 11;
         struct StandEventCallBack standEventInfo = {};
@@ -72,7 +72,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnSearch_002, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = MmiMessageId::SYSTEM_EVENT_BEGIN;
+    int32_t typeNum = MmiMessageId::SYSTEM_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -89,7 +89,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnSearch_003, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = EnumAdd(MmiMessageId::SYSTEM_EVENT_BEGIN, 1);
+    int32_t typeNum = EnumAdd(MmiMessageId::SYSTEM_EVENT_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -106,7 +106,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnSearch_004, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
+    int32_t typeNum = -1001;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -123,7 +123,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnSearch_005, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = MmiMessageId::SYSTEM_EVENT_BEGIN;
+    int32_t typeNum = MmiMessageId::SYSTEM_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -140,7 +140,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnSearch_006, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = EnumAdd(MmiMessageId::SYSTEM_EVENT_BEGIN, 1);
+    int32_t typeNum = EnumAdd(MmiMessageId::SYSTEM_EVENT_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -157,7 +157,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnSearch_007, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
+    int32_t typeNum = -1001;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -173,7 +173,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnSearch_008, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    auto typeNum = static_cast<MmiMessageId>('A');
+    auto typeNum = static_cast<int32_t>('A');
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -198,7 +198,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnClosePage_002, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = MmiMessageId::SYSTEM_EVENT_BEGIN;
+    int32_t typeNum = MmiMessageId::SYSTEM_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -215,7 +215,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnClosePage_003, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = EnumAdd(MmiMessageId::SYSTEM_EVENT_BEGIN, 1);
+    int32_t typeNum = EnumAdd(MmiMessageId::SYSTEM_EVENT_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -232,7 +232,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnClosePage_004, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
+    int32_t typeNum = -1001;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -249,7 +249,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnClosePage_005, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = MmiMessageId::SYSTEM_EVENT_BEGIN;
+    int32_t typeNum = MmiMessageId::SYSTEM_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -266,7 +266,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnClosePage_006, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = EnumAdd(MmiMessageId::SYSTEM_EVENT_BEGIN, 1);
+    int32_t typeNum = EnumAdd(MmiMessageId::SYSTEM_EVENT_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -283,7 +283,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnClosePage_007, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
+    int32_t typeNum = -1001;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -299,7 +299,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnClosePage_008, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    auto typeNum = static_cast<MmiMessageId>('A');
+    auto typeNum = static_cast<int32_t>('A');
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -323,7 +323,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnLaunchVoiceAssistant_002, TestSize.Leve
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = MmiMessageId::SYSTEM_EVENT_BEGIN;
+    int32_t typeNum = MmiMessageId::SYSTEM_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -340,7 +340,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnLaunchVoiceAssistant_003, TestSize.Leve
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = EnumAdd(MmiMessageId::SYSTEM_EVENT_BEGIN, 1);
+    int32_t typeNum = EnumAdd(MmiMessageId::SYSTEM_EVENT_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -356,7 +356,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnLaunchVoiceAssistant_004, TestSize.Leve
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
+    int32_t typeNum = -1001;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -373,7 +373,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnLaunchVoiceAssistant_005, TestSize.Leve
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = MmiMessageId::SYSTEM_EVENT_BEGIN;
+    int32_t typeNum = MmiMessageId::SYSTEM_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -390,7 +390,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnLaunchVoiceAssistant_006, TestSize.Leve
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = EnumAdd(MmiMessageId::SYSTEM_EVENT_BEGIN, 1);
+    int32_t typeNum = EnumAdd(MmiMessageId::SYSTEM_EVENT_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -407,7 +407,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnLaunchVoiceAssistant_007, TestSize.Leve
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
+    int32_t typeNum = -1001;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -424,7 +424,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnLaunchVoiceAssistant_008, TestSize.Leve
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    auto typeNum = static_cast<MmiMessageId>('B');
+    auto typeNum = static_cast<int32_t>('B');
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -448,7 +448,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnMute_002, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = MmiMessageId::SYSTEM_EVENT_BEGIN;
+    int32_t typeNum = MmiMessageId::SYSTEM_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -464,7 +464,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnMute_003, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = EnumAdd(MmiMessageId::SYSTEM_EVENT_BEGIN, 1);
+    int32_t typeNum = EnumAdd(MmiMessageId::SYSTEM_EVENT_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -481,7 +481,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnMute_004, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
+    int32_t typeNum = -1001;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -498,7 +498,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnMute_005, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = MmiMessageId::SYSTEM_EVENT_BEGIN;
+    int32_t typeNum = MmiMessageId::SYSTEM_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -515,7 +515,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnMute_006, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = EnumAdd(MmiMessageId::SYSTEM_EVENT_BEGIN, 1);
+    int32_t typeNum = EnumAdd(MmiMessageId::SYSTEM_EVENT_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -532,7 +532,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnMute_007, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
+    int32_t typeNum = -1001;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -548,7 +548,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnMute_008, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    auto typeNum = static_cast<MmiMessageId>('B');
+    auto typeNum = static_cast<int32_t>('B');
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -573,7 +573,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnAnswer_002, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = MmiMessageId::TELEPHONE_EVENT_BEGIN;
+    int32_t typeNum = MmiMessageId::TELEPHONE_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -590,7 +590,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnAnswer_003, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = EnumAdd(MmiMessageId::TELEPHONE_EVENT_BEGIN, 1);
+    int32_t typeNum = EnumAdd(MmiMessageId::TELEPHONE_EVENT_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -607,7 +607,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnAnswer_004, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
+    int32_t typeNum = -1001;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -624,7 +624,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnAnswer_005, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = MmiMessageId::TELEPHONE_EVENT_BEGIN;
+    int32_t typeNum = MmiMessageId::TELEPHONE_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -641,7 +641,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnAnswer_006, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = EnumAdd(MmiMessageId::TELEPHONE_EVENT_BEGIN, 1);
+    int32_t typeNum = EnumAdd(MmiMessageId::TELEPHONE_EVENT_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -658,7 +658,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnAnswer_007, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
+    int32_t typeNum = -1001;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -674,7 +674,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnAnswer_008, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    auto typeNum = static_cast<MmiMessageId>('C');
+    auto typeNum = static_cast<int32_t>('C');
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -699,7 +699,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnRefuse_002, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = MmiMessageId::TELEPHONE_EVENT_BEGIN;
+    int32_t typeNum = MmiMessageId::TELEPHONE_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -716,7 +716,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnRefuse_003, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = EnumAdd(MmiMessageId::TELEPHONE_EVENT_BEGIN, 1);
+    int32_t typeNum = EnumAdd(MmiMessageId::TELEPHONE_EVENT_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -733,7 +733,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnRefuse_004, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
+    int32_t typeNum = -1001;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -750,7 +750,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnRefuse_005, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = MmiMessageId::TELEPHONE_EVENT_BEGIN;
+    int32_t typeNum = MmiMessageId::TELEPHONE_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -767,7 +767,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnRefuse_006, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = EnumAdd(MmiMessageId::TELEPHONE_EVENT_BEGIN, 1);
+    int32_t typeNum = EnumAdd(MmiMessageId::TELEPHONE_EVENT_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -784,7 +784,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnRefuse_007, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
+    int32_t typeNum = -1001;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -800,7 +800,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnRefuse_008, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    auto typeNum = static_cast<MmiMessageId>('D');
+    auto typeNum = static_cast<int32_t>('D');
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -824,7 +824,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnHangup_002, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = MmiMessageId::TELEPHONE_EVENT_BEGIN;
+    int32_t typeNum = MmiMessageId::TELEPHONE_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -840,7 +840,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnHangup_003, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = EnumAdd(MmiMessageId::TELEPHONE_EVENT_BEGIN, 1);
+    int32_t typeNum = EnumAdd(MmiMessageId::TELEPHONE_EVENT_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -857,7 +857,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnHangup_004, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
+    int32_t typeNum = -1001;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -874,7 +874,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnHangup_005, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = MmiMessageId::TELEPHONE_EVENT_BEGIN;
+    int32_t typeNum = MmiMessageId::TELEPHONE_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -891,7 +891,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnHangup_006, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = MmiMessageId::TELEPHONE_EVENT_BEGIN;
+    int32_t typeNum = MmiMessageId::TELEPHONE_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -907,7 +907,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnHangup_007, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
+    int32_t typeNum = -1001;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -923,7 +923,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnHangup_008, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    auto typeNum = static_cast<MmiMessageId>('D');
+    auto typeNum = static_cast<int32_t>('D');
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -947,7 +947,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnTelephoneControl_002, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = MmiMessageId::TELEPHONE_EVENT_BEGIN;
+    int32_t typeNum = MmiMessageId::TELEPHONE_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -964,7 +964,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnTelephoneControl_003, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = EnumAdd(MmiMessageId::TELEPHONE_EVENT_BEGIN, 1);
+    int32_t typeNum = EnumAdd(MmiMessageId::TELEPHONE_EVENT_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -981,7 +981,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnTelephoneControl_004, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
+    int32_t typeNum = -1001;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -998,7 +998,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnTelephoneControl_005, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = MmiMessageId::TELEPHONE_EVENT_BEGIN;
+    int32_t typeNum = MmiMessageId::TELEPHONE_EVENT_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -1015,7 +1015,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnTelephoneControl_006, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = EnumAdd(MmiMessageId::TELEPHONE_EVENT_BEGIN, 1);
+    int32_t typeNum = EnumAdd(MmiMessageId::TELEPHONE_EVENT_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -1032,7 +1032,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnTelephoneControl_007, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
+    int32_t typeNum = -1001;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -1048,7 +1048,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnTelephoneControl_008, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    auto typeNum = static_cast<MmiMessageId>('E');
+    auto typeNum = static_cast<int32_t>('E');
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -1072,7 +1072,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnDeviceAdd_002, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = MmiMessageId::DEVICE_BEGIN;
+    int32_t typeNum = MmiMessageId::DEVICE_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -1089,7 +1089,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnDeviceAdd_003, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = EnumAdd(MmiMessageId::DEVICE_BEGIN, 1);
+    int32_t typeNum = EnumAdd(MmiMessageId::DEVICE_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -1106,7 +1106,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnDeviceAdd_004, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
+    int32_t typeNum = -1001;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -1123,7 +1123,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnDeviceAdd_005, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = MmiMessageId::DEVICE_BEGIN;
+    int32_t typeNum = MmiMessageId::DEVICE_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -1140,7 +1140,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnDeviceAdd_006, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = EnumAdd(MmiMessageId::DEVICE_BEGIN, 1);
+    int32_t typeNum = EnumAdd(MmiMessageId::DEVICE_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -1157,7 +1157,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnDeviceAdd_007, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
+    int32_t typeNum = -1001;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -1173,7 +1173,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnDeviceAdd_008, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    auto typeNum = static_cast<MmiMessageId>('F');
+    auto typeNum = static_cast<int32_t>('F');
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -1197,7 +1197,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnDeviceRemove_002, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = MmiMessageId::DEVICE_BEGIN;
+    int32_t typeNum = MmiMessageId::DEVICE_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -1214,7 +1214,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnDeviceRemove_003, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = EnumAdd(MmiMessageId::DEVICE_BEGIN, 1);
+    int32_t typeNum = EnumAdd(MmiMessageId::DEVICE_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -1231,7 +1231,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnDeviceRemove_004, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
+    int32_t typeNum = -1001;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -1248,7 +1248,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnDeviceRemove_005, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = MmiMessageId::DEVICE_BEGIN;
+    int32_t typeNum = MmiMessageId::DEVICE_BEGIN;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -1265,7 +1265,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnDeviceRemove_006, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = EnumAdd(MmiMessageId::DEVICE_BEGIN, 1);
+    int32_t typeNum = EnumAdd(MmiMessageId::DEVICE_BEGIN, 1);
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -1282,7 +1282,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnDeviceRemove_007, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    MmiMessageId typeNum = static_cast<MmiMessageId>(-1001);
+    int32_t typeNum = -1001;
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -1299,7 +1299,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, OnDeviceRemove_008, TestSize.Level1)
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    auto typeNum = static_cast<MmiMessageId>('G');
+    auto typeNum = static_cast<int32_t>('G');
     auto tmpObj = StandardizedEventHandler::Create<StandardizedEventHandler>();
     tmpObj->SetType(typeNum);
     MMIEventHdl.RegisterStandardizedEventHandle(iRemote, g_surFaceId, tmpObj);
@@ -1341,7 +1341,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, InjectEvent, TestSize.Level1)
 HWTEST_F(MultimodalSemanagerThirdTest, SendMsg, TestSize.Level1)
 {
     MultimodalEventFirstUnitTest multimodalTest;
-    NetPacket netPkt(MmiMessageId::INVALID);
+    NetPacket netPkt(MmiMessageId::INVALID_MSG_ID);
 
     int32_t retResult = multimodalTest.SendMsgUnitTest(netPkt);
     EXPECT_TRUE(retResult == RET_OK);
@@ -1350,7 +1350,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, SendMsg, TestSize.Level1)
 HWTEST_F(MultimodalSemanagerThirdTest, MakeRegisterHandle_001, TestSize.Level1)
 {
     MultimodalEventFirstUnitTest multimodalTest;
-    MmiMessageId typeId = MmiMessageId::COMMON_EVENT_BEGIN;
+    int32_t typeId = MmiMessageId::COMMON_EVENT_BEGIN;
     int32_t windowId = 1;
     std::string rhandle = "111";
     bool retResult = multimodalTest.MakeRegisterHandleUnitTest(typeId, windowId, rhandle);
@@ -1360,7 +1360,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, MakeRegisterHandle_001, TestSize.Level1)
 HWTEST_F(MultimodalSemanagerThirdTest, MakeRegisterHandle_002, TestSize.Level1)
 {
     MultimodalEventFirstUnitTest multimodalTest;
-    MmiMessageId typeId = MmiMessageId::KEY_EVENT_BEGIN;
+    int32_t typeId = MmiMessageId::KEY_EVENT_BEGIN;
     int32_t windowId = 2;
     std::string rhandle = "222";
     bool retResult = multimodalTest.MakeRegisterHandleUnitTest(typeId, windowId, rhandle);
@@ -1370,7 +1370,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, MakeRegisterHandle_002, TestSize.Level1)
 HWTEST_F(MultimodalSemanagerThirdTest, MakeRegisterHandle_003, TestSize.Level1)
 {
     MultimodalEventFirstUnitTest multimodalTest;
-    MmiMessageId typeId = MmiMessageId::MEDIA_EVENT_BEGIN;
+    int32_t typeId = MmiMessageId::MEDIA_EVENT_BEGIN;
     int32_t windowId = 3;
     std::string rhandle = "333";
     bool retResult = multimodalTest.MakeRegisterHandleUnitTest(typeId, windowId, rhandle);
@@ -1380,7 +1380,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, MakeRegisterHandle_003, TestSize.Level1)
 HWTEST_F(MultimodalSemanagerThirdTest, MakeRegisterHandle_004, TestSize.Level1)
 {
     MultimodalEventFirstUnitTest multimodalTest;
-    MmiMessageId typeId = MmiMessageId::SYSTEM_EVENT_BEGIN;
+    int32_t typeId = MmiMessageId::SYSTEM_EVENT_BEGIN;
     int32_t windowId = 4;
     std::string rhandle = "444";
     bool retResult = multimodalTest.MakeRegisterHandleUnitTest(typeId, windowId, rhandle);
@@ -1390,7 +1390,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, MakeRegisterHandle_004, TestSize.Level1)
 HWTEST_F(MultimodalSemanagerThirdTest, MakeRegisterHandle_005, TestSize.Level1)
 {
     MultimodalEventFirstUnitTest multimodalTest;
-    MmiMessageId typeId = MmiMessageId::TELEPHONE_EVENT_BEGIN;
+    int32_t typeId = MmiMessageId::TELEPHONE_EVENT_BEGIN;
     int32_t windowId = 5;
     std::string rhandle = "555";
     bool retResult = multimodalTest.MakeRegisterHandleUnitTest(typeId, windowId, rhandle);
@@ -1400,7 +1400,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, MakeRegisterHandle_005, TestSize.Level1)
 HWTEST_F(MultimodalSemanagerThirdTest, MakeRegisterHandle_006, TestSize.Level1)
 {
     MultimodalEventFirstUnitTest multimodalTest;
-    MmiMessageId typeId = MmiMessageId::TOUCH_EVENT_BEGIN;
+    int32_t typeId = MmiMessageId::TOUCH_EVENT_BEGIN;
     int32_t windowId = 6;
     std::string rhandle = "666";
     bool retResult = multimodalTest.MakeRegisterHandleUnitTest(typeId, windowId, rhandle);
@@ -1410,7 +1410,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, MakeRegisterHandle_006, TestSize.Level1)
 HWTEST_F(MultimodalSemanagerThirdTest, MakeRegisterHandle_007, TestSize.Level1)
 {
     MultimodalEventFirstUnitTest multimodalTest;
-    MmiMessageId typeId = MmiMessageId::DEVICE_BEGIN;
+    int32_t typeId = MmiMessageId::DEVICE_BEGIN;
     int32_t windowId = 7;
     std::string rhandle = "777";
     bool retResult = multimodalTest.MakeRegisterHandleUnitTest(typeId, windowId, rhandle);
@@ -1420,7 +1420,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, MakeRegisterHandle_007, TestSize.Level1)
 HWTEST_F(MultimodalSemanagerThirdTest, MakeRegisterHandle_Default, TestSize.Level1)
 {
     MultimodalEventFirstUnitTest multimodalTest;
-    MmiMessageId typeId = MmiMessageId::BEGIN;
+    int32_t typeId = MmiMessageId::BEGIN;
     int32_t windowId = 8;
     std::string rhandle = "default";
     bool retResult = multimodalTest.MakeRegisterHandleUnitTest(typeId, windowId, rhandle);

@@ -106,7 +106,7 @@ enum TABLET_PAD_STRIP_AXIS_SOURCE {
 
 #pragma pack(1)
 struct TagPackHead {
-    MmiMessageId idMsg;
+    int32_t idMsg;
     int32_t sizeEvent[1];
 };
 #pragma pack()

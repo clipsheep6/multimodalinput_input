@@ -43,7 +43,7 @@ HWTEST_F(DfxSdkTest, Test_Client_SDK, TestSize.Level1)
     Start();
     DfxTest sdkTest;
     UDSClient client;
-    NetPacket newPacket(static_cast<MmiMessageId>(1));
+    NetPacket newPacket(1);
     sdkTest.Init();
     auto ret = clientSdkTest.GetMultimodeInputInfoClientTest(client, newPacket);
     std::this_thread::sleep_for(std::chrono::seconds(1));
