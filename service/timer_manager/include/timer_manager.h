@@ -19,15 +19,15 @@
 #include <functional>
 #include <list>
 #include <memory>
-#include "c_singleton.h"
 #include "define_multimodal.h"
 #include "log.h"
+#include "singleton.h"
 #include "util.h"
 #include "mouse_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
-class TimerManager : public CSingleton<TimerManager> {  
+class TimerManager : public DelayedSingleton<TimerManager> {
 public:
     int32_t AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback);
     int32_t RemoveTimer(int32_t timerId);
