@@ -45,7 +45,7 @@ int32_t MultimodalStandardizedEventManager::RegisterStandardizedEventHandle(cons
 {
     CHKR((token && standardizedEventHandle), PARAM_INPUT_INVALID, MMI_STANDARD_EVENT_INVALID_PARAMETER);
     auto messageId = standardizedEventHandle->GetType();
-    CHKR(messageId > MmiMessageId::INVALID, VAL_NOT_EXP, MMI_STANDARD_EVENT_INVALID_PARAMETER);
+    CHKR(messageId > MmiMessageId::INVALID_MSG_ID, VAL_NOT_EXP, MMI_STANDARD_EVENT_INVALID_PARAMETER);
     auto range = mapEvents_.equal_range(messageId);
     for (auto it = range.first; it != range.second; ++it) {
         if (it->second.eventCallBack == standardizedEventHandle) {
@@ -81,7 +81,7 @@ int32_t MultimodalStandardizedEventManager::UnregisterStandardizedEventHandle(co
 {
     CHKR((token && standardizedEventHandle), PARAM_INPUT_INVALID, MMI_STANDARD_EVENT_INVALID_PARAMETER);
     auto typeId = standardizedEventHandle->GetType();
-    CHKR(typeId > MmiMessageId::INVALID, VAL_NOT_EXP, MMI_STANDARD_EVENT_INVALID_PARAMETER);
+    CHKR(typeId > MmiMessageId::INVALID_MSG_ID, VAL_NOT_EXP, MMI_STANDARD_EVENT_INVALID_PARAMETER);
     auto range = mapEvents_.equal_range(typeId);
 
     std::string registerhandle;

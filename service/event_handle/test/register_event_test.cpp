@@ -55,7 +55,7 @@ public:
 HWTEST_F(RegisterEventTest, OnEventPointAxis_001, TestSize.Level1)
 {
     RegisterEvent registerEvent;
-    MmiMessageId msg = MmiMessageId::INVALID;
+    MmiMessageId msg = MmiMessageId::INVALID_MSG_ID;
     EventPointer point = {};
     point.axes = POINTER_AXIS_SCROLL_VERTICAL;
     point.source = POINTER_AXIS_SOURCE_WHEEL;
@@ -67,7 +67,7 @@ HWTEST_F(RegisterEventTest, OnEventPointAxis_001, TestSize.Level1)
 HWTEST_F(RegisterEventTest, OnEventPointAxis_002, TestSize.Level1)
 {
     RegisterEvent registerEvent;
-    MmiMessageId msg = MmiMessageId::INVALID;
+    MmiMessageId msg = MmiMessageId::INVALID_MSG_ID;
     EventPointer point = {};
     point.axes = POINTER_AXIS_SCROLL_VERTICAL;
     point.source = POINTER_AXIS_SOURCE_WHEEL;
@@ -79,7 +79,7 @@ HWTEST_F(RegisterEventTest, OnEventPointAxis_002, TestSize.Level1)
 HWTEST_F(RegisterEventTest, OnEventKeyGetSign_001, TestSize.Level1)
 {
     RegisterEvent registerEvent;
-    MmiMessageId msg = MmiMessageId::INVALID;
+    MmiMessageId msg = MmiMessageId::INVALID_MSG_ID;
     EventKeyboard key = {};
     EventKeyboard prevKey = {};
     key.key = 1;
@@ -89,7 +89,7 @@ HWTEST_F(RegisterEventTest, OnEventKeyGetSign_001, TestSize.Level1)
 
 HWTEST_F(RegisterEventTest, OnGetRepeatKetState_001, TestSize.Level1)
 {
-    MmiMessageId msg = MmiMessageId::INVALID;
+    MmiMessageId msg = MmiMessageId::INVALID_MSG_ID;
     RegisterEventUnitTest registerEventUnit;
 
     registerEventUnit.OnGetRepeatKetStateUnitTest(1, msg);
@@ -97,7 +97,7 @@ HWTEST_F(RegisterEventTest, OnGetRepeatKetState_001, TestSize.Level1)
 
 HWTEST_F(RegisterEventTest, OnEventKeyJudge_001, TestSize.Level1)
 {
-    MmiMessageId msg = MmiMessageId::INVALID;
+    MmiMessageId msg = MmiMessageId::INVALID_MSG_ID;
     RegisterEventUnitTest registerEventUnit;
 
     registerEventUnit.OnEventKeyJudgeUnitTest(1, msg);
@@ -113,7 +113,7 @@ HWTEST_F(RegisterEventTest, BitSetOne_001, TestSize.Level1)
 HWTEST_F(RegisterEventTest, OnEventPointButton_001, TestSize.Level1)
 {
     RegisterEvent registerEvent;
-    MmiMessageId msg = MmiMessageId::INVALID;
+    MmiMessageId msg = MmiMessageId::INVALID_MSG_ID;
     RegisterEventUnitTest registerEventUnit;
 
     registerEventUnit.SetTimeCount(0);
@@ -123,7 +123,7 @@ HWTEST_F(RegisterEventTest, OnEventPointButton_001, TestSize.Level1)
 HWTEST_F(RegisterEventTest, OnEventPointButton_002, TestSize.Level1)
 {
     RegisterEvent registerEvent;
-    MmiMessageId msg = MmiMessageId::INVALID;
+    MmiMessageId msg = MmiMessageId::INVALID_MSG_ID;
     RegisterEventUnitTest registerEventUnit;
 
     registerEventUnit.SetTimeCount(10);
@@ -133,7 +133,7 @@ HWTEST_F(RegisterEventTest, OnEventPointButton_002, TestSize.Level1)
 HWTEST_F(RegisterEventTest, OnEventPointButton_003, TestSize.Level1)
 {
     RegisterEvent registerEvent;
-    MmiMessageId msg = MmiMessageId::INVALID;
+    MmiMessageId msg = MmiMessageId::INVALID_MSG_ID;
     RegisterEventUnitTest registerEventUnit;
 
     registerEventUnit.SetTimeCount(10);
