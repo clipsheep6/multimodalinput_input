@@ -45,7 +45,10 @@ void InputManager::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &phy
     InputManagerImpl::GetInstance()->UpdateDisplayInfo(physicalDisplays, logicalDisplays);
 }
 
-void InputManager::SetInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent> filter)>) {}
+int32_t InputManager::AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter)
+{
+    return InputManagerImpl::GetInstance()->AddInputEventFilter(filter);
+}
 
 void InputManager::SetWindowInputEventConsumer(std::shared_ptr<OHOS::MMI::IInputEventConsumer> inputEventConsumer)
 {
@@ -72,46 +75,24 @@ int32_t InputManager::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> 
     InputManagerImpl::GetInstance()->AddMonitor(monitor);
     return MMI_STANDARD_EVENT_SUCCESS;
 }
-int32_t InputManager::AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor)
-{
-    return 0;
-}
-int32_t InputManager::AddMonitor(std::function<bool(std::shared_ptr<KeyEvent>)> monitor)
-{
-    return 0;
-}
-void InputManager::RemoveMonitor(int32_t monitorId)
-{
-    InputManagerImpl::GetInstance()->RemoveMonitor(monitorId);
-}
 
-int32_t InputManager::AddInputEventTouchpadMontior(std::function<void(std::shared_ptr<PointerEvent>)> monitor)
+int32_t InputManager::AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor)
 {
     if (monitor == nullptr) {
         MMI_LOGE("InputManager::%{public}s param should not be null!", __func__);
         return InputEventMonitorManager::INVALID_MONITOR_ID;
     }
-    return InputManagerImpl::GetInstance()->AddInputEventTouchpadMontior(monitor);
+    return InputManagerImpl::GetInstance()->AddMontior(monitor);
 }
 
-int32_t InputManager::AddInputEventTouchpadMontior(std::function<bool(std::shared_ptr<PointerEvent>)> monitor)
+int32_t InputManager::AddMonitor(std::shared_ptr<IInputEventConsumer> monitor)
 {
-    return 0;
+    return InputManagerImpl::GetInstance()->AddMonitor(monitor);
 }
 
-void InputManager::RemoveInputEventTouchpadMontior(int32_t monitorId)
+void InputManager::RemoveMonitor(int32_t monitorId)
 {
-    InputManagerImpl::GetInstance()->RemoveInputEventTouchpadMontior(monitorId);
-}
-
-int32_t InputManager::AddMonitor2(std::shared_ptr<IInputEventConsumer> consumer)
-{
-    return InputManagerImpl::GetInstance()->AddMonitor2(consumer);
-}
-
-void InputManager::RemoveMonitor2(int32_t monitorId)
-{
-    InputManagerImpl::GetInstance()->RemoveMonitor2(monitorId);
+    InputManagerImpl::GetInstance()->RemoveMonitor(monitorId);
 }
 
 void InputManager::MarkConsumed(int32_t monitorId, int32_t eventId)
@@ -119,7 +100,7 @@ void InputManager::MarkConsumed(int32_t monitorId, int32_t eventId)
     InputManagerImpl::GetInstance()->MarkConsumed(monitorId, eventId);
 }
 
-int32_t InputManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptorId)
+int32_t InputManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
 {
     return 0;
 }
@@ -147,12 +128,11 @@ void InputManager::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     InputManagerImpl::GetInstance()->SimulateInputEvent(keyEvent);
 }
-void InputManager::SimulateInputEvent(std::list<std::shared_ptr<KeyEvent>> keyEvents) {}
+
 void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (MultimodalEventHandler::GetInstance().InjectPointerEvent(pointerEvent) != RET_OK)
         MMI_LOGE("Failed to inject pointer event!");
 }
-void InputManager::SimulateInputEvent(std::list<std::shared_ptr<PointerEvent>> pointerEvents) {}
 }
 }

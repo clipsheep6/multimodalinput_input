@@ -13,28 +13,25 @@
  * limitations under the License.
  */
 
-#ifndef TOUCHPAD_TRANSFORM_POINT_PROCESSOR_H
-#define TOUCHPAD_TRANSFORM_POINT_PROCESSOR_H
+#ifndef OHOS_EVENT_FILTER_WRAP_H
+#define OHOS_EVENT_FILTER_WRAP_H
 
-#include <memory>
-#include "pointer_event.h"
-#include "input_windows_manager.h"
+#include <mutex>
+#include "i_event_filter.h"
+#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
-class TouchPadTransformPointProcessor {
+class EventFilterWrap : public Singleton<EventFilterWrap> {
 public:
-    TouchPadTransformPointProcessor();
-    ~TouchPadTransformPointProcessor();
-    std::shared_ptr<PointerEvent> onLibinputTouchPadEvent(libinput_event *event);
-    void setPointEventSource(int32_t sourceType);
+    EventFilterWrap();
+    ~EventFilterWrap();
+    int32_t AddInputEventFilter(sptr<IEventFilter> filter);
+    bool HandlePointerEventFilter(std::shared_ptr<PointerEvent> point);
 private:
-    void onEventTouchPadDown(libinput_event *event);
-    void onEventTouchPadMotion(libinput_event *event);
-    void onEventTouchPadUp(libinput_event *event);
-    std::shared_ptr<PointerEvent> pointerEvent_;
+    std::mutex lockInputEventFilter_;
+    sptr<IEventFilter> filter_ {nullptr};
 };
-}
-}
-
-#endif
+} // namespace MMI
+} // namespace OHOS
+#endif // OHOS_EVENT_FILTER_WRAP_H

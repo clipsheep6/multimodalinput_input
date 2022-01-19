@@ -29,7 +29,7 @@ class EventDispatch : public std::enable_shared_from_this<EventDispatch> {
 public:
     EventDispatch();
     virtual ~EventDispatch();
-    virtual int32_t SetInputEventFilter(sptr<IEventFilter> filter);
+    virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter);
     int32_t DispatchGestureNewEvent(UDSServer& udsServer, libinput_event *event,
         std::shared_ptr<PointerEvent> pointer, const uint64_t preHandlerTime);
     int32_t DispatchGestureEvent(UDSServer& udsServer, libinput_event *event, EventGesture& gesture,
@@ -39,7 +39,7 @@ public:
     int32_t DispatchKeyEventByPid(UDSServer& udsServer, std::shared_ptr<OHOS::MMI::KeyEvent> key,
         const uint64_t preHandlerTime);
     int32_t DispatchTouchEvent(UDSServer& udsServer, libinput_event *event,
-        EventTouch& touch, const uint64_t preHandlerTime, WindowSwitch& windowSwitch);
+        EventTouch& touch, const uint64_t preHandlerTime);
     int32_t DispatchTabletPadEvent(UDSServer& udsServer, libinput_event *event,
         EventTabletPad& tabletPad, const uint64_t preHandlerTime);
     int32_t DispatchJoyStickEvent(UDSServer& udsServer, libinput_event *event,
@@ -47,14 +47,17 @@ public:
     int32_t DispatchCommonPointEvent(UDSServer& udsServer, libinput_event *event,
         EventPointer& point, const uint64_t preHandlerTime);
     int32_t DispatchPointerEvent(UDSServer& udsServer, libinput_event *event,
-        EventPointer& point, const uint64_t preHandlerTime, WindowSwitch& windowSwitch);
+        EventPointer& point, const uint64_t preHandlerTime);
     int32_t DispatchTabletToolEvent(UDSServer& udsServer, libinput_event *event,
-        EventTabletTool& tableTool, const uint64_t preHandlerTime, WindowSwitch& windowSwitch);
+        EventTabletTool& tableTool, const uint64_t preHandlerTime);
     int32_t DispatchTouchTransformPointEvent(UDSServer& udsServer, std::shared_ptr<PointerEvent> point);
     int32_t handlePointerEvent(std::shared_ptr<PointerEvent> point);
     bool HandleTouchScreenEvent(std::shared_ptr<PointerEvent> point);
     bool HandleMouseEvent(std::shared_ptr<PointerEvent> point);
     bool HandleTouchPadEvent(std::shared_ptr<PointerEvent> point);
+    void DispatchKeyEventTrace(const EventKeyboard& key);
+    void DispatchTouchEventTrace(const EventTouch& touch);
+    void DispatchPointerEventTrace(const EventPointer& point);
 
 protected:
     bool HandlePointerEventFilter(std::shared_ptr<PointerEvent> point);
@@ -62,18 +65,15 @@ protected:
         const int32_t fingerCount);
     int32_t GestureRegisteredEventDispatch(const MmiMessageId& idMsg, OHOS::MMI::UDSServer& udsServer,
         RegisteredEvent& registeredEvent, uint64_t preHandlerTime);
-    int32_t RegisteredEventDispatch(const MmiMessageId& idMsg, UDSServer& udsServer,
+    int32_t DispatchRegEvent(const MmiMessageId& idMsg, UDSServer& udsServer,
         RegisteredEvent& eventData, int32_t inputDeviceType, uint64_t preHandlerTime);
-    int32_t KeyBoardRegisteredEventHandler(EventKeyboard& key, UDSServer& udsServer,
+    int32_t KeyBoardRegEveHandler(EventKeyboard& key, UDSServer& udsServer,
         libinput_event *event, int32_t inputDeviceType, uint64_t preHandlerTime);
 
 protected:
     int32_t touchDownFocusSurfaceId_ = 0;
     EventPackage eventPackage_;
     StandardEventHandler standardEvent_;
-    std::mutex lockInputEventFilter_;
-    sptr<IEventFilter> filter_ {nullptr};
-    sptr<IRemoteObject::DeathRecipient> eventFilterRecipient_ {nullptr};
 #ifdef DEBUG_CODE_TEST
 private:
     const size_t windowCount_ = 2;

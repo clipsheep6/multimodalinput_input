@@ -14,6 +14,7 @@
  */
 
 #include "key_event_input_subscribe_filter.h"
+#include "bytrace.h"
 #include "define_multimodal.h"
 #include "input_event_data_transformation.h"
 #include "net_packet.h"
@@ -90,6 +91,11 @@ bool KeyEventInputSubscribeFilter::FilterSubscribeKeyEvent(UDSServer& udsServer,
         MMI_LOGE("Leave, no subscriber");
         return false;
     }
+    int32_t getKeyCode = keyEvent->GetKeyCode();
+    std::string keyCodestring = std::to_string(getKeyCode);
+    MMI_LOGT(" FilterSubscribeKeyEvent service trace keyId = %{public}s\n", keyCodestring.c_str());
+    int32_t EVENT_KEY = 1;
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, EVENT_KEY);
 
     bool handled = false;
     int32_t keyAction = keyEvent->GetKeyAction();
@@ -282,8 +288,8 @@ bool KeyEventInputSubscribeFilter::HandleKeyDown(const std::shared_ptr<KeyEvent>
     RemoveKeyCode(pressedKeys, keyCode);
     for (auto& subscriber : subscribers_) {
         auto& keyOption = subscriber->keyOption_;
-        MMI_LOGD("SubscribeId=%{public}d,KeyOption->finalKey=%{public}d,"
-                "KeyOption->isFinalKeyDown=%{public}d,KeyOption->finalKeyDownDuriation=%{public}d",
+        MMI_LOGD("SubscribeId=%{public}d, KeyOption->finalKey=%{public}d, "
+                "KeyOption->isFinalKeyDown=%{public}d, KeyOption->finalKeyDownDuriation=%{public}d",
                 subscriber->id_, keyOption->GetFinalKey(), ((keyOption->IsFinalKeyDown() == true) ? 1 : 0),
                 keyOption->GetFinalKeyDownDuration());
         for (auto keyCode : keyOption->GetPreKeys()) {
@@ -332,8 +338,8 @@ bool KeyEventInputSubscribeFilter::HandleKeyUp(const std::shared_ptr<KeyEvent>& 
     RemoveKeyCode(pressedKeys, keyCode);
     for (auto& subscriber : subscribers_) {
         auto& keyOption = subscriber->keyOption_;
-        MMI_LOGD("SubscribeId=%{public}d,KeyOption->finalKey=%{public}d,"
-                "KeyOption->isFinalKeyDown=%{public}d,KeyOption->finalKeyDownDuriation=%{public}d",
+        MMI_LOGD("SubscribeId=%{public}d, KeyOption->finalKey=%{public}d, "
+                "KeyOption->isFinalKeyDown=%{public}d, KeyOption->finalKeyDownDuriation=%{public}d",
                 subscriber->id_, keyOption->GetFinalKey(), ((keyOption->IsFinalKeyDown() == true) ? 1 : 0),
                 keyOption->GetFinalKeyDownDuration());
         for (auto keyCode : keyOption->GetPreKeys()) {

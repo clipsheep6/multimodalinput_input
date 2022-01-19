@@ -37,7 +37,7 @@ public:
     void RegistnotifyDeviceChange(NotifyDeviceChange cb);
     int32_t OnMouseEventTimerHanler(std::shared_ptr<OHOS::MMI::PointerEvent> mouse_event);
     UDSServer *GetUDSServer();
-    int32_t SetInputEventFilter(sptr<IEventFilter> filter);
+    int32_t AddInputEventFilter(sptr<IEventFilter> filter);
 protected:
     int32_t OnEventDeviceAdded(multimodal_libinput_event& event);
     int32_t OnEventDeviceRemoved(multimodal_libinput_event& event);
@@ -61,13 +61,17 @@ protected:
     
     int32_t OnMouseEventHandler(libinput_event *event, const int32_t deviceId);
     bool SendMsg(const int32_t fd, NetPacket& pkt) const;
+    void OnEventKeyboardTrace(const EventKeyboard& key);
+    void OnEventPointerTrace(const EventPointer& point);
+    void OnEventTouchTrace(const struct EventTouch& touch);
+#ifdef OHOS_WESTEN_MODEL
     bool OnSystemEvent(const KeyEventValueTransformations& temp, const enum KEY_STATE state) const;
+#endif
 
 private:
     int32_t OnEventHandler(multimodal_libinput_event& ev);
     std::mutex mu_;
     UDSServer *udsServer_ = nullptr;
-    WindowSwitch winSwitch_;
     EventDispatch eventDispatch_;
     EventPackage eventPackage_;
     KeyEventValueTransformation xkbKeyboardHandlerKey_;
