@@ -556,10 +556,6 @@ int32_t OHOS::MMI::InputEventHandler::OnEventPointer(multimodal_libinput_event &
         MMI_LOGD("pointer event interceptor find a pointer event pointer button: %{puiblic}d", point.button);
         return RET_OK;
     }
-    if (type == LIBINPUT_EVENT_POINTER_BUTTON) {
-        MouseState->CountState(point.button, point.state);
-    }
-    MouseState->SetMouseCoords(point.delta.x, point.delta.y);
 #else
     MMI_LOGT("\n2.mapping event:\nEvent:eventType=%{public}d;", point.eventType);
     /*

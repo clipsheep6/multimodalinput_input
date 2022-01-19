@@ -60,7 +60,7 @@ void MouseEventHandler::SetMouseButon(PointerEvent::PointerItem& pointerItem,
         pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_MIDDLE);
     } else {
         MMI_LOGW("PointerAction : %{public}d, unProces Button code : %{public}u",
-        pointerEvent_->GetPointerAction(), button);
+                 pointerEvent_->GetPointerAction(), button);
     }
     bool isPressed = false;
     auto state = libinput_event_pointer_get_button_state(&pointEventData);
@@ -100,7 +100,6 @@ void MouseEventHandler::SetMouseAxis(struct libinput_event_pointer& pointEventDa
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
         MMI_LOGI("pointer axis event begin");
     }
-    
 
     double axisValue = 0;
     if (libinput_event_pointer_has_axis(&pointEventData, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL)) {
@@ -135,7 +134,7 @@ void MouseEventHandler::ProcessMouseData(libinput_event *event, int32_t deviceId
     }
 
     auto mouseInfo = WinMgr->GetMouseInfo();
-    MouseState->SetMouseCoords(mouseInfo.globleX,mouseInfo.globleY);
+    MouseState->SetMouseCoords(mouseInfo.globleX, mouseInfo.globleY);
     pointerItem.SetGlobalX(mouseInfo.globleX);
     pointerItem.SetGlobalY(mouseInfo.globleY);
     pointerItem.SetLocalX(mouseInfo.localX);

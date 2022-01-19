@@ -24,7 +24,7 @@
 
 namespace OHOS {
 namespace MMI {
-class MouseEventHandler : public CSingleton<MouseEventHandler>{
+class MouseEventHandler : public CSingleton<MouseEventHandler> {
 public:
     MouseEventHandler();
     virtual ~MouseEventHandler();

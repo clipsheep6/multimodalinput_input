@@ -16,12 +16,12 @@
 #ifndef TIMER_MANAGER_H
 #define TIMER_MANAGER_H
 
-#include "c_singleton.h"
-#include "define_multimodal.h"
 #include <functional>
-#include "log.h"
 #include <list>
 #include <memory>
+#include "c_singleton.h"
+#include "define_multimodal.h"
+#include "log.h"
 #include "util.h"
 #include "mouse_event_handler.h"
 
