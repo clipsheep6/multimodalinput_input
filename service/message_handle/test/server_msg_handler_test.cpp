@@ -96,7 +96,7 @@ HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_01, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
     SessionPtr sess = nullptr;
-    NetPacket newPacket(MmiMessageId::INVALID);
+    NetPacket newPacket(MmiMessageId::INVALID_MSG_ID);
     serverMsgHandlerTest.OnVirtualKeyEventTest(sess, newPacket);
 }
 
@@ -136,7 +136,7 @@ HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_06, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
     SessionPtr sess;
-    NetPacket newPacket(MmiMessageId::INVALID);
+    NetPacket newPacket(MmiMessageId::INVALID_MSG_ID);
     serverMsgHandlerTest.OnVirtualKeyEventTest(sess, newPacket);
 }
 
@@ -176,7 +176,7 @@ HWTEST_F(ServerMsgHandlerTest, OnRegisterAppInfoTest_01, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
     SessionPtr sess = nullptr;
-    NetPacket newPacket(MmiMessageId::INVALID);
+    NetPacket newPacket(MmiMessageId::INVALID_MSG_ID);
     serverMsgHandlerTest.OnRegisterAppInfoTest(sess, newPacket);
 }
 
@@ -216,7 +216,7 @@ HWTEST_F(ServerMsgHandlerTest, OnRegisterAppInfoTest_06, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
     SessionPtr sess;
-    NetPacket newPacket(MmiMessageId::INVALID);
+    NetPacket newPacket(MmiMessageId::INVALID_MSG_ID);
     serverMsgHandlerTest.OnRegisterAppInfoTest(sess, newPacket);
 }
 
@@ -256,7 +256,7 @@ HWTEST_F(ServerMsgHandlerTest, OnRegisterMsgHandlerTest_01, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
     SessionPtr sess = nullptr;
-    NetPacket newPacket(MmiMessageId::INVALID);
+    NetPacket newPacket(MmiMessageId::INVALID_MSG_ID);
     serverMsgHandlerTest.OnRegisterMsgHandlerTest(sess, newPacket);
 }
 
@@ -296,7 +296,7 @@ HWTEST_F(ServerMsgHandlerTest, OnRegisterMsgHandlerTest_06, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
     SessionPtr sess;
-    NetPacket newPacket(MmiMessageId::INVALID);
+    NetPacket newPacket(MmiMessageId::INVALID_MSG_ID);
     serverMsgHandlerTest.OnRegisterMsgHandlerTest(sess, newPacket);
 }
 
@@ -336,7 +336,7 @@ HWTEST_F(ServerMsgHandlerTest, OnUnregisterMsgHandlerTest_01, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
     SessionPtr sess = nullptr;
-    NetPacket newPacket(MmiMessageId::INVALID);
+    NetPacket newPacket(MmiMessageId::INVALID_MSG_ID);
     serverMsgHandlerTest.OnUnregisterMsgHandlerTest(sess, newPacket);
 }
 
@@ -376,7 +376,7 @@ HWTEST_F(ServerMsgHandlerTest, OnUnregisterMsgHandlerTest_06, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
     SessionPtr sess;
-    NetPacket newPacket(MmiMessageId::INVALID);
+    NetPacket newPacket(MmiMessageId::INVALID_MSG_ID);
     serverMsgHandlerTest.OnUnregisterMsgHandlerTest(sess, newPacket);
 }
 
@@ -416,7 +416,7 @@ HWTEST_F(ServerMsgHandlerTest, OnAiSensorInfoTest_01, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
     SessionPtr sess = nullptr;
-    NetPacket newPacket(MmiMessageId::INVALID);
+    NetPacket newPacket(MmiMessageId::INVALID_MSG_ID);
     serverMsgHandlerTest.OnAiSensorInfoTest(sess, newPacket);
 }
 
@@ -456,7 +456,7 @@ HWTEST_F(ServerMsgHandlerTest, OnAiSensorInfoTest_06, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
     SessionPtr sess;
-    NetPacket newPacket(MmiMessageId::INVALID);
+    NetPacket newPacket(MmiMessageId::INVALID_MSG_ID);
     serverMsgHandlerTest.OnAiSensorInfoTest(sess, newPacket);
 }
 
@@ -496,7 +496,7 @@ HWTEST_F(ServerMsgHandlerTest, OnListInjectTest_01, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
     SessionPtr sess = nullptr;
-    NetPacket newPacket(MmiMessageId::INVALID);
+    NetPacket newPacket(MmiMessageId::INVALID_MSG_ID);
     serverMsgHandlerTest.OnListInjectTest(sess, newPacket);
 }
 
@@ -536,7 +536,7 @@ HWTEST_F(ServerMsgHandlerTest, OnListInjectTest_06, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
     SessionPtr sess;
-    NetPacket newPacket(MmiMessageId::INVALID);
+    NetPacket newPacket(MmiMessageId::INVALID_MSG_ID);
     serverMsgHandlerTest.OnListInjectTest(sess, newPacket);
 }
 
@@ -577,7 +577,7 @@ HWTEST_F(ServerMsgHandlerTest, OnWindowsTest_01, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
     SessionPtr sess = nullptr;
-    NetPacket newPacket(MmiMessageId::INVALID);
+    NetPacket newPacket(MmiMessageId::INVALID_MSG_ID);
     serverMsgHandlerTest.OnWindowsTest(sess, newPacket);
 }
 
@@ -617,7 +617,7 @@ HWTEST_F(ServerMsgHandlerTest, OnWindowsTest_06, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
     SessionPtr sess;
-    NetPacket newPacket(MmiMessageId::INVALID);
+    NetPacket newPacket(MmiMessageId::INVALID_MSG_ID);
     serverMsgHandlerTest.OnWindowsTest(sess, newPacket);
 }
 
@@ -657,7 +657,7 @@ HWTEST_F(ServerMsgHandlerTest, OnDumpTest_01, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
     SessionPtr sess = nullptr;
-    NetPacket newPacket(MmiMessageId::INVALID);
+    NetPacket newPacket(MmiMessageId::INVALID_MSG_ID);
     serverMsgHandlerTest.OnDumpTest(sess, newPacket);
 }
 
@@ -697,7 +697,7 @@ HWTEST_F(ServerMsgHandlerTest, OnDumpTest_06, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
     SessionPtr sess;
-    NetPacket newPacket(MmiMessageId::INVALID);
+    NetPacket newPacket(MmiMessageId::INVALID_MSG_ID);
     serverMsgHandlerTest.OnDumpTest(sess, newPacket);
 }
 
@@ -737,7 +737,7 @@ HWTEST_F(ServerMsgHandlerTest, CheckReplyMessageFormClientTest_01, TestSize.Leve
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
     SessionPtr sess = nullptr;
-    NetPacket newPacket(MmiMessageId::INVALID);
+    NetPacket newPacket(MmiMessageId::INVALID_MSG_ID);
     serverMsgHandlerTest.CheckReplyMessageFormClientTest(sess, newPacket);
 }
 
@@ -777,7 +777,7 @@ HWTEST_F(ServerMsgHandlerTest, CheckReplyMessageFormClientTest_06, TestSize.Leve
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
     SessionPtr sess;
-    NetPacket newPacket(MmiMessageId::INVALID);
+    NetPacket newPacket(MmiMessageId::INVALID_MSG_ID);
     serverMsgHandlerTest.CheckReplyMessageFormClientTest(sess, newPacket);
 }
 
@@ -817,7 +817,7 @@ HWTEST_F(ServerMsgHandlerTest, GetMultimodeInputInfoTest_01, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
     SessionPtr sess = nullptr;
-    NetPacket newPacket(MmiMessageId::INVALID);
+    NetPacket newPacket(MmiMessageId::INVALID_MSG_ID);
     serverMsgHandlerTest.GetMultimodeInputInfoTest(sess, newPacket);
 }
 
@@ -857,7 +857,7 @@ HWTEST_F(ServerMsgHandlerTest, GetMultimodeInputInfoTest_06, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;
     SessionPtr sess;
-    NetPacket newPacket(MmiMessageId::INVALID);
+    NetPacket newPacket(MmiMessageId::INVALID_MSG_ID);
     serverMsgHandlerTest.GetMultimodeInputInfoTest(sess, newPacket);
 }
 

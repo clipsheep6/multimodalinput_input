@@ -1341,7 +1341,7 @@ HWTEST_F(MultimodalSemanagerThirdTest, InjectEvent, TestSize.Level1)
 HWTEST_F(MultimodalSemanagerThirdTest, SendMsg, TestSize.Level1)
 {
     MultimodalEventFirstUnitTest multimodalTest;
-    NetPacket netPkt(MmiMessageId::INVALID);
+    NetPacket netPkt(MmiMessageId::INVALID_MSG_ID);
 
     int32_t retResult = multimodalTest.SendMsgUnitTest(netPkt);
     EXPECT_TRUE(retResult == RET_OK);

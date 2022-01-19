@@ -68,7 +68,7 @@ HWTEST_F(UDSServerTest, Init_002, TestSize.Level1)
 HWTEST_F(UDSServerTest, SendMsg_001, TestSize.Level1)
 {
     int fd = 1000;
-    MmiMessageId msgId = MmiMessageId::INVALID;
+    MmiMessageId msgId = MmiMessageId::INVALID_MSG_ID;
     NetPacket newPacket(msgId);
 
     UDSServer serObj;
@@ -79,7 +79,7 @@ HWTEST_F(UDSServerTest, SendMsg_001, TestSize.Level1)
 HWTEST_F(UDSServerTest, SendMsg_002, TestSize.Level1)
 {
     int fd = -1001;
-    MmiMessageId msgId = MmiMessageId::INVALID;
+    MmiMessageId msgId = MmiMessageId::INVALID_MSG_ID;
     NetPacket newPacket(msgId);
 
     UDSServer serObj;
@@ -100,7 +100,7 @@ HWTEST_F(UDSServerTest, SendMsg_003, TestSize.Level1)
 
 HWTEST_F(UDSServerTest, Broadcast_001, TestSize.Level1)
 {
-    MmiMessageId msgId = MmiMessageId::INVALID;
+    MmiMessageId msgId = MmiMessageId::INVALID_MSG_ID;
     NetPacket newPacket(msgId);
 
     UDSServer serObj;
@@ -136,7 +136,7 @@ HWTEST_F(UDSServerTest, Broadcast_004, TestSize.Level1)
 
 HWTEST_F(UDSServerTest, Multicast, TestSize.Level1)
 {
-    MmiMessageId msgId = MmiMessageId::INVALID;
+    MmiMessageId msgId = MmiMessageId::INVALID_MSG_ID;
     NetPacket newPacket(msgId);
     std::vector<int> fds;
     fds.push_back(1);
