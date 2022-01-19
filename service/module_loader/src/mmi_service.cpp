@@ -129,7 +129,6 @@ bool MMIService::ChkAuthFd(int32_t fd) const
     return true;
 }
 
-
 bool MMIService::InitLibinputService()
 {
 #ifdef OHOS_BUILD_HDF
