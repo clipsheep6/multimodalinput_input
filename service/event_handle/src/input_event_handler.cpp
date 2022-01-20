@@ -182,6 +182,7 @@ bool OHOS::MMI::InputEventHandler::Init(UDSServer& udsServer)
     for (auto& it : funs) {
         CHKC(RegistrationEvent(it), EVENT_REG_FAIL);
     }
+    
     return true;
 }
 
@@ -304,6 +305,15 @@ int32_t OHOS::MMI::InputEventHandler::OnEventDeviceAdded(multimodal_libinput_eve
         MMI_LOGE("Sending structure of DeviceManage failed! errCode:%{public}d\n", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
+
+    // 设置鼠标事件与按键
+    if (keyEvent == nullptr) {
+        keyEvent = OHOS::MMI::KeyEvent::Create();
+    }
+    if (keyEvent != nulltr) {
+        MouseEvent->SetAssociateKeyEvent(keyEvent);
+    }
+
     return RET_OK;
 }
 
@@ -340,6 +350,10 @@ int32_t OHOS::MMI::InputEventHandler::OnEventDeviceRemoved(multimodal_libinput_e
         MMI_LOGE("Sending structure of DeviceManage failed! errCode:%{public}d\n", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
+
+    // 设置鼠标事件与按键
+    MouseEvent->SetAssociateKeyEvent(nullptr);
+
     return RET_OK;
 }
 
@@ -908,45 +922,26 @@ int32_t OHOS::MMI::InputEventHandler::OnMouseEventHandler(libinput_event *event,
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     MMI_LOGD("Libinput Events reported");
-    MouseEvent->ProcessMouseData(event, deviceId);
+    // 更新 全局 鼠标事件 数据
+    MouseEvent->Normalize(event, deviceId); 
+
+    // 处理 按键 + 鼠标
+    if (keyEvent == nullptr) {
+        keyEvent = OHOS::MMI::KeyEvent::Create();
+    }
+    if (keyEvent != nullptr) {
+        MouseEvent->HandleKey(keyEvent);
+    }
+
+    // 派发
     auto pointerEvent = MouseEvent->GetPointerEventPtr();
     if (pointerEvent == nullptr) {
         MMI_LOGE("MouseEvent is NULL");
         return RET_ERR;
     }
-
-    if (keyEvent == nullptr) {
-        keyEvent = OHOS::MMI::KeyEvent::Create();
-    }
-    if (keyEvent != nullptr) {
-        std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
-        if (pressedKeys.empty()) {
-            MMI_LOGI("Pressed keys is empty");
-        } else {
-            for (int32_t keyCode : pressedKeys) {
-                MMI_LOGI("Pressed keyCode=%{public}d", keyCode);
-            }
-        }
-        pointerEvent->SetPressedKeys(pressedKeys);
-    }
-
-    // MouseEvent Normalization Results
-    MMI_LOGI("MouseEvent Normalization Results : PointerAction = %{public}d, PointerId = %{public}d,"
-        "SourceType = %{public}d, ButtonId = %{public}d,"
-        "VerticalAxisValue = %{public}lf, HorizontalAxisValue = %{public}lf",
-        pointerEvent->GetPointerAction(), pointerEvent->GetPointerId(), pointerEvent->GetSourceType(),
-        pointerEvent->GetButtonId(), pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
-        pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
-    PointerEvent::PointerItem item;
-    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item);
-    MMI_LOGI("MouseEvent Item Normalization Results : DownTime = %{public}d, IsPressed = %{public}d,"
-        "GlobalX = %{public}d, GlobalY = %{public}d, LocalX = %{public}d, LocalY = %{public}d, Width = %{public}d,"
-        "Height = %{public}d, Pressure = %{public}d, DeviceId = %{public}d",
-        item.GetDownTime(), static_cast<int32_t>(item.IsPressed()), item.GetGlobalX(), item.GetGlobalY(),
-        item.GetLocalX(), item.GetLocalY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
-        item.GetDeviceId());
-
     eventDispatch_.handlePointerEvent(pointerEvent);
+
+    // 返回值 代表是 鼠标事件有没有处理过， 不关心成功与失败
     return RET_OK;
 }
 

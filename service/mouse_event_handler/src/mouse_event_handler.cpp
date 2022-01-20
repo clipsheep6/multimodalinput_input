@@ -36,11 +36,11 @@ MouseEventHandler::~MouseEventHandler()
 
 void MouseEventHandler::CalcMovedCoordinate(struct libinput_event_pointer& pointEventData)
 {
-    coordinateX_ += libinput_event_pointer_get_dx(&pointEventData);
-    coordinateY_ += libinput_event_pointer_get_dy(&pointEventData);
+    absolutionX_ += libinput_event_pointer_get_dx(&pointEventData);
+    absolutionY_ += libinput_event_pointer_get_dy(&pointEventData);
 
-    WinMgr->AdjustCoordinate(coordinateX_, coordinateY_);
-    MMI_LOGI("coordinateX_ is : %{public}lf, coordinateY_ is : %{public}lf", coordinateX_, coordinateY_);
+    WinMgr->AdjustCoordinate(absolutionX_, absolutionY_);
+    MMI_LOGI("absolutionX_ is : %{public}lf, absolutionY_ is : %{public}lf", absolutionX_, absolutionY_);
 }
 
 void MouseEventHandler::SetMouseMotion(PointerEvent::PointerItem& pointerItem)
@@ -48,9 +48,10 @@ void MouseEventHandler::SetMouseMotion(PointerEvent::PointerItem& pointerItem)
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
 }
 
-void MouseEventHandler::SetMouseButon(PointerEvent::PointerItem& pointerItem,
-                                      struct libinput_event_pointer& pointEventData)
+void MouseEventHandler::DoHandleMouseButon(PointerEvent::PointerItem& pointerItem, struct libinput_event_pointer& pointEventData)
 {
+    MMI_LOGT("enter, current action: %{public}d", pointerEvent_->GetPointerAction());
+
     auto button = libinput_event_pointer_get_button(&pointEventData);
     if (button == BTN_LEFT) {
         pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
@@ -59,23 +60,26 @@ void MouseEventHandler::SetMouseButon(PointerEvent::PointerItem& pointerItem,
     } else if (button == BTN_MIDDLE) {
         pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_MIDDLE);
     } else {
-        MMI_LOGW("PointerAction : %{public}d, unProces Button code : %{public}u",
-                 pointerEvent_->GetPointerAction(), button);
+        MMI_LOGW("unknown btn, btn: %{public}u", button);
     }
+
     auto state = libinput_event_pointer_get_button_state(&pointEventData);
     if (state == LIBINPUT_BUTTON_STATE_RELEASED) {
-        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
-        pointerItem.SetPressed(false);
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);        
         pointerEvent_->SetButtonId(PointerEvent::BUTTON_NONE);
+        pointerItem.SetPressed(false);
     } else if (state == LIBINPUT_BUTTON_STATE_PRESSED) {
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
         pointerEvent_->SetButtonPressed(state);
         pointerItem.SetPressed(true);
+    } else {
+        MMI_LOGW("unknown state, state: %{public}u", state);
     }
+
     MouseState->CountState(button, state);
 }
 
-void MouseEventHandler::SetMouseAxis(struct libinput_event_pointer& pointEventData)
+void MouseEventHandler::DoHandleMouseAxis(struct libinput_event_pointer& pointEventData)
 {
     if (TimerMgr->IsExist(timerId_)) {
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
@@ -113,28 +117,32 @@ void MouseEventHandler::SetMouseAxis(struct libinput_event_pointer& pointEventDa
     }
 }
 
-void MouseEventHandler::ProcessMouseData(libinput_event *event, int32_t deviceId)
+void MouseEventHandler::Normalize(libinput_event *event, int32_t deviceId)
 {
     CHK(event, PARAM_INPUT_INVALID);
     MMI_LOGD("Mouse Process Start");
-    auto pointEventData = libinput_event_get_pointer_event(event);
-    CHKP(pointEventData, ERROR_NULL_POINTER);
-    int32_t type = libinput_event_get_type(event);
+    auto libinputPointerEvent = libinput_event_get_pointer_event(event);
+    CHKP(libinputPointerEvent, ERROR_NULL_POINTER);    
+
     PointerEvent::PointerItem pointerItem;
-    if ((type == LIBINPUT_EVENT_POINTER_MOTION) || (type == LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE)) {
-        CalcMovedCoordinate(*pointEventData);
-        WinMgr->SetMouseInfo(coordinateX_, coordinateY_);
-        MMI_LOGI("Change Coordinate : coordinateX_ = %{public}lf, coordinateY_ = %{public}lf",
-                 coordinateX_, coordinateY_);
-        SetMouseMotion(pointerItem);
-    } else if (type == LIBINPUT_EVENT_POINTER_BUTTON) {
-        SetMouseButon(pointerItem, *pointEventData);
-    } else if (type == LIBINPUT_EVENT_POINTER_AXIS) {
-        SetMouseAxis(*pointEventData);
+    const int32_t type = libinput_event_get_type(event);
+    if ((type == LIBINPUT_EVENT_POINTER_MOTION) || (type == LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE)) { // mouse move
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+
+        absolutionX_ += libinput_event_pointer_get_dx(libinputPointerEvent);
+        absolutionY_ += libinput_event_pointer_get_dy(libinputPointerEvent);
+
+        WinMgr->UpdateAndAdjustMouseLoction(absolutionX_, absolutionY_);
+
+        MMI_LOGD("Change Coordinate : x:%{public}lf, y:%{public}lf",  absolutionX_, absolutionY_);        
+    } else if (type == LIBINPUT_EVENT_POINTER_BUTTON) { // mouse button
+        DoHandleMouseButon(pointerItem, *libinputPointerEvent);
+    } else if (type == LIBINPUT_EVENT_POINTER_AXIS) { // mouse axis
+        DoHandleMouseAxis(*libinputPointerEvent);
     }
 
     auto mouseInfo = WinMgr->GetMouseInfo();
-    MMI_LOGD("mouseInfo.globleX=%{public}d mouseInfo.globleY=%{public}d mouseInfo.localX=%{public}d mouseInfo.localY=%{public}d", 
+    MMI_LOGD("mouseInfo: globleX=%{public}d globleY=%{public}d localX=%{public}d localY=%{public}d", 
                         mouseInfo.globleX, mouseInfo.globleY, mouseInfo.localX, mouseInfo.localY);
     MouseState->SetMouseCoords(mouseInfo.globleX, mouseInfo.globleY);
     pointerItem.SetGlobalX(mouseInfo.globleX);
@@ -143,7 +151,7 @@ void MouseEventHandler::ProcessMouseData(libinput_event *event, int32_t deviceId
     pointerItem.SetLocalY(mouseInfo.localY);
     pointerItem.SetPointerId(0);
 
-    uint64_t time = libinput_event_pointer_get_time_usec(pointEventData);
+    uint64_t time = libinput_event_pointer_get_time_usec(libinputPointerEvent);
     pointerItem.SetDownTime(static_cast<int32_t>(time));
     pointerItem.SetWidth(0);
     pointerItem.SetHeight(0);
@@ -159,6 +167,40 @@ void MouseEventHandler::ProcessMouseData(libinput_event *event, int32_t deviceId
     pointerEvent_->SetTargetDisplayId(-1);
     pointerEvent_->SetTargetWindowId(-1);
     pointerEvent_->SetAgentWindowId(-1);
+
+    // 调试 信息输出
+
+    // MouseEvent Normalization Results
+    MMI_LOGI("MouseEvent Normalization Results : PointerAction = %{public}d, PointerId = %{public}d,"
+        "SourceType = %{public}d, ButtonId = %{public}d,"
+        "VerticalAxisValue = %{public}lf, HorizontalAxisValue = %{public}lf",
+        pointerEvent->GetPointerAction(), pointerEvent->GetPointerId(), pointerEvent->GetSourceType(),
+        pointerEvent->GetButtonId(), pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
+        pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
+    PointerEvent::PointerItem item;
+    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item);
+    MMI_LOGI("MouseEvent Item Normalization Results : DownTime = %{public}d, IsPressed = %{public}d,"
+        "GlobalX = %{public}d, GlobalY = %{public}d, LocalX = %{public}d, LocalY = %{public}d, Width = %{public}d,"
+        "Height = %{public}d, Pressure = %{public}d, DeviceId = %{public}d",
+        item.GetDownTime(), static_cast<int32_t>(item.IsPressed()), item.GetGlobalX(), item.GetGlobalY(),
+        item.GetLocalX(), item.GetLocalY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
+        item.GetDeviceId());
+}
+
+
+HanleKey()
+{
+    
+        
+        std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
+        if (pressedKeys.empty()) {
+            MMI_LOGI("Pressed keys is empty");
+        } else {
+            for (int32_t keyCode : pressedKeys) {
+                MMI_LOGI("Pressed keyCode=%{public}d", keyCode);
+            }
+        }
+        pointerEvent->SetPressedKeys(pressedKeys);
 }
 
 void MouseEventHandler::SetMouseAction(const int32_t action)

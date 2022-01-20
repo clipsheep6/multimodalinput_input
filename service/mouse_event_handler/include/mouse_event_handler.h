@@ -28,20 +28,20 @@ class MouseEventHandler : public DelayedSingleton<MouseEventHandler> {
 public:
     MouseEventHandler();
     virtual ~MouseEventHandler();
-    void ProcessMouseData(libinput_event *event, int32_t deviceId);
+    void Normalize(libinput_event *event, int32_t deviceId);
     void SetMouseAction(const int32_t action);
     void SetTimerId(const int32_t id);
     std::shared_ptr<PointerEvent> GetPointerEventPtr();
 private:
     void SetMouseMotion(PointerEvent::PointerItem& pointerItem);
-    void SetMouseButon(PointerEvent::PointerItem &pointerItem, struct libinput_event_pointer& pointEventData);
-    void SetMouseAxis(struct libinput_event_pointer& pointEventData);
+    void DoHandleMouseButon(PointerEvent::PointerItem &pointerItem, struct libinput_event_pointer& pointEventData);
+    void DoHandleMouseAxis(struct libinput_event_pointer& pointEventData);
     void CalcMovedCoordinate(struct libinput_event_pointer &pointEventData);
 private:
     std::shared_ptr<PointerEvent> pointerEvent_;
     int32_t timerId_ = -1;
-    double coordinateX_ = 0;
-    double coordinateY_ = 0;
+    double absolutionX_ = 0;
+    double absolutionY_ = 0;
 };
 #define MouseEvent OHOS::MMI::MouseEventHandler::GetInstance()
 }
