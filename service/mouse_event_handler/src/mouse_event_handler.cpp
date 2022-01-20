@@ -146,7 +146,7 @@ void MouseEventHandler::SetMouseData(libinput_event *event, int32_t deviceId)
                  g_coordinateX, g_coordinateY);
         this->SetMouseMotion(pointerItem);
     } else if (type == LIBINPUT_EVENT_POINTER_BUTTON) {
-        this->SetMouseButon(pointerItem, *pointEventData);
+        this->SetMouseButon(*pointEventData, pointerItem);
     } else if (type == LIBINPUT_EVENT_POINTER_AXIS) {
         this->SetMouseAxis(*pointEventData);
     }
