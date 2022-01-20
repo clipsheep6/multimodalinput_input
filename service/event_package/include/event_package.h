@@ -51,7 +51,7 @@ namespace OHOS::MMI {
         /* static std::shared_ptr<OHOS::MMI::PointerEvent> GestureToPointerEvent(EventGesture& gesture,
            UDSServer& udsServer); */
         static std::shared_ptr<OHOS::MMI::PointerEvent> LibinputEventToPointerEvent(libinput_event *event,
-            UDSServer& udsServer)
+            UDSServer& udsServer);
     private:
         uint32_t SEAT_BUTTON_OR_KEY_COUNT_ONE = 1;
         uint32_t SEAT_BUTTON_OR_KEY_COUNT_ZERO = 0;
