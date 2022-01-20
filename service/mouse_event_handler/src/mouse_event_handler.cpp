@@ -43,7 +43,7 @@ void MouseEventHandler::CalcMovedCoordinate(struct libinput_event_pointer& point
     MMI_LOGI("coordinateX_ is : %{public}lf, coordinateY_ is : %{public}lf", coordinateX_, coordinateY_);
 }
 
-void OHOS::MMI::MouseEventHandler::SetMouseMotion(PointerEvent::PointerItem& pointerItem)
+void MouseEventHandler::SetMouseMotion(PointerEvent::PointerItem& pointerItem)
 {
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
 }
@@ -62,18 +62,17 @@ void MouseEventHandler::SetMouseButon(PointerEvent::PointerItem& pointerItem,
         MMI_LOGW("PointerAction : %{public}d, unProces Button code : %{public}u",
                  pointerEvent_->GetPointerAction(), button);
     }
-    bool isPressed = false;
     auto state = libinput_event_pointer_get_button_state(&pointEventData);
     if (state == LIBINPUT_BUTTON_STATE_RELEASED) {
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
-        isPressed = false;
+        pointerItem.SetPressed(false);
+        pointerEvent_->SetButtonId(PointerEvent::BUTTON_NONE);
     } else if (state == LIBINPUT_BUTTON_STATE_PRESSED) {
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
         pointerEvent_->SetButtonPressed(state);
-        isPressed = true;
+        pointerItem.SetPressed(true);
     }
     MouseState->CountState(button, state);
-    pointerItem.SetPressed(isPressed);
 }
 
 void MouseEventHandler::SetMouseAxis(struct libinput_event_pointer& pointEventData)
@@ -86,10 +85,10 @@ void MouseEventHandler::SetMouseAxis(struct libinput_event_pointer& pointEventDa
         const int32_t mouseTimeout = 100;
         timerId_ = TimerMgr->AddTimer(mouseTimeout, 1, []() {
             const int32_t defaultTimerId = -1;
-            MouseEvent.SetTimerId(defaultTimerId);
+            MouseEvent->SetTimerId(defaultTimerId);
             MMI_LOGI("pointer axis event end TimerCallback run");
-            MouseEvent.SetMouseAction(PointerEvent::POINTER_ACTION_AXIS_END);
-            auto pointerEvent = MouseEvent.GetPointerEventPtr();
+            MouseEvent->SetMouseAction(PointerEvent::POINTER_ACTION_AXIS_END);
+            auto pointerEvent = MouseEvent->GetPointerEventPtr();
             if (pointerEvent == nullptr) {
                 MMI_LOGE("the pointerEvent is nullptr");
                 return;
@@ -117,6 +116,7 @@ void MouseEventHandler::SetMouseAxis(struct libinput_event_pointer& pointEventDa
 void MouseEventHandler::ProcessMouseData(libinput_event *event, int32_t deviceId)
 {
     CHK(event, PARAM_INPUT_INVALID);
+    MMI_LOGD("Mouse Process Start");
     auto pointEventData = libinput_event_get_pointer_event(event);
     CHKP(pointEventData, ERROR_NULL_POINTER);
     int32_t type = libinput_event_get_type(event);

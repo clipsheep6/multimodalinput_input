@@ -24,7 +24,7 @@
 
 namespace OHOS {
 namespace MMI {
-class MouseEventHandler : public Singleton<MouseEventHandler> {
+class MouseEventHandler : public DelayedSingleton<MouseEventHandler> {
 public:
     MouseEventHandler();
     virtual ~MouseEventHandler();

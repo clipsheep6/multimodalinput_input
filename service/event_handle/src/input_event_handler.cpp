@@ -907,8 +907,9 @@ int32_t OHOS::MMI::InputEventHandler::OnEventJoyStickAxis(multimodal_libinput_ev
 int32_t OHOS::MMI::InputEventHandler::OnMouseEventHandler(libinput_event *event, const int32_t deviceId)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
-    MouseEvent.ProcessMouseData(event, deviceId);
-    auto pointerEvent = MouseEvent.GetPointerEventPtr();
+    MMI_LOGD("Libinput Events reported");
+    MouseEvent->ProcessMouseData(event, deviceId);
+    auto pointerEvent = MouseEvent->GetPointerEventPtr();
     if (pointerEvent == nullptr) {
         MMI_LOGE("MouseEvent is NULL");
         return RET_ERR;
