@@ -16,12 +16,12 @@
 #define OHOS_INPUT_WINDOWS_MANAGER_H
 
 #include <vector>
-#include "c_singleton.h"
+#include "singleton.h"
 #include "uds_server.h"
 #include "display_info.h"
 #include "input_event.h"
-#include "window_switch.h"
 #include "pointer_event.h"
+#include "libinput.h"
 
 #ifdef OHOS_WESTEN_MODEL
 extern "C" {
@@ -116,7 +116,7 @@ struct MouseInfo {
     int32_t localY;
 };
 
-class InputWindowsManager : public CSingleton<InputWindowsManager> {
+class InputWindowsManager : public DelayedSingleton<InputWindowsManager> {
 public:
     InputWindowsManager();
     virtual ~InputWindowsManager();
