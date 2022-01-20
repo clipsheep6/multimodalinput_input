@@ -1873,8 +1873,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_011, TestSize.Leve
     MMIEventHdl.InjectEvent(injectUpEvent2);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    InputManager::GetInstance()->UnsubscribeKeyEvent(response));
-    InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId2));
+    InputManager::GetInstance()->UnsubscribeKeyEvent(response);
+    InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId2);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
