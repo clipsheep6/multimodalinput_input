@@ -753,7 +753,9 @@ int32_t OHOS::MMI::InputEventHandler::OnGestureEvent(libinput_event *event)
 int32_t OHOS::MMI::InputEventHandler::OnEventGesture(multimodal_libinput_event &ev)
 {
     CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
+#ifndef OHOS_WESTEN_MODEL
     OnGestureEvent(ev.event);
+#else
     uint64_t preHandlerTime = GetSysClockTime();
     EventGesture gesture = {};
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
@@ -770,6 +772,7 @@ int32_t OHOS::MMI::InputEventHandler::OnEventGesture(multimodal_libinput_event &
             eventDispatchResult, GESTURE_EVENT_DISP_FAIL);
         return GESTURE_EVENT_DISP_FAIL;
     }
+#endif
     return RET_OK;
 }
 
