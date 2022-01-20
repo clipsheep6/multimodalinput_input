@@ -838,9 +838,8 @@ std::shared_ptr<OHOS::MMI::PointerEvent> EventPackage::LibinputEventToPointerEve
     double gestureScale = 0;
     int32_t pointerEventType = 0;
     auto pointerEvent = OHOS::MMI::PointerEvent::Create();
-    auto type = libinput_event_get_type(event);
     auto data = libinput_event_get_gesture_event(event);
-    CHKR(data, ERROR_NULL_POINTER, RET_ERR);
+    auto type = libinput_event_get_type(event);
     OHOS::MMI::PointerEvent::PointerItem pointer;
     pointer.SetGlobalX(MouseState->GetMouseCoordsX());
     pointer.SetGlobalY(MouseState->GetMouseCoordsY());
