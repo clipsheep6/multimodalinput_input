@@ -803,7 +803,7 @@ int32_t EventPackage::KeyboardToKeyEvent(EventKeyboard& key,
 
 const uint16_t pointerID = 1; // mouse has only one PoingeItem, so id is 1
 
-std::shared_ptr<OHOS::MMI::PointerEvent> EventPackage::GestureToPointerEvent(EventGesture& gesture,
+/* std::shared_ptr<OHOS::MMI::PointerEvent> EventPackage::GestureToPointerEvent(EventGesture& gesture,
                                                                              UDSServer& udsServer)
 {
     auto pointerEvent = OHOS::MMI::PointerEvent::Create();
@@ -828,6 +828,57 @@ std::shared_ptr<OHOS::MMI::PointerEvent> EventPackage::GestureToPointerEvent(Eve
     pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, gesture.scale);
     pointerEvent->SetPointerAction(gesture.pointerEventType);
 
+    return pointerEvent;
+} */
+
+std::shared_ptr<OHOS::MMI::PointerEvent> EventPackage::LibinputEventToPointerEvent(libinput_event *event,
+                                                                             UDSServer& udsServer)
+{
+    int32_t defaultDeviceId = 0;
+    double gestureScale = 0;
+    int32_t pointerEventType = 0;
+    auto pointerEvent = OHOS::MMI::PointerEvent::Create();
+    auto type = libinput_event_get_type(event);
+    OHOS::MMI::PointerEvent::PointerItem pointer;
+    pointer.SetGlobalX(MouseState->GetMouseCoordsX());
+    pointer.SetGlobalY(MouseState->GetMouseCoordsY());
+    pointer.SetPointerId(pointerID);
+    pointer.SetPressed(MouseState->IsLiftBtnPressed());
+    pointerEvent->AddPointerItem(pointer);
+    std::vector<uint32_t> pressedButtons;
+    MouseState->GetPressedButtons(pressedButtons);
+    
+    if (!pressedButtons.empty()) {
+        for (auto it = pressedButtons.begin(); it != pressedButtons.end(); it++) {
+            pointerEvent->SetButtonPressed(*it);
+        }
+    }
+    
+    switch (type) {
+        case LIBINPUT_EVENT_GESTURE_PINCH_BEGIN: {
+            pointerEventType = OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_BEGIN;
+            break;
+        }
+        case LIBINPUT_EVENT_GESTURE_PINCH_UPDATE: {
+            pointerEventType = OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_UPDATE;
+            gestureScale = libinput_event_gesture_get_scale(data);
+            break;
+        }
+        case LIBINPUT_EVENT_GESTURE_PINCH_END: {
+            pointerEventType = OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_END;
+            gestureScale = libinput_event_gesture_get_scale(data);
+            break;
+        }
+        default: {
+            break;
+        }
+    }
+    
+    pointerEvent->SetTargetDisplayId(0);
+    pointerEvent->SetPointerId(pointerID);
+    pointerEvent->SetDeviceId(defaultDeviceId);
+    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, gestureScale);
+    pointerEvent->SetPointerAction(pointerEventType);
     return pointerEvent;
 }
 }
