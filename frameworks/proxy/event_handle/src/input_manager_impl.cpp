@@ -39,9 +39,9 @@ constexpr int32_t ADD_MASK_BASE = 10;
 void InputManagerImpl::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
     const std::vector<LogicalDisplayInfo> &logicalDisplays)
 {
-    MMI_LOGD("InputManagerImpl::UpdateDisplayInfo enter!");
+    MMI_LOG_D("InputManagerImpl::UpdateDisplayInfo enter!");
     if (physicalDisplays.size() == 0 || logicalDisplays.size() == 0) {
-        MMI_LOGE("display info check failed! physicalDisplays size is %{public}d, logicalDisplays size is %{public}d",
+        MMI_LOG_E("display info check failed! physicalDisplays size is %{public}d, logicalDisplays size is %{public}d",
             static_cast<int32_t>(physicalDisplays.size()), static_cast<int32_t>(logicalDisplays.size()));
         return;
     }
@@ -53,27 +53,27 @@ void InputManagerImpl::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> 
     if (MultimodalEventHandler::GetInstance().GetMMIClient()) {
         OHOS::MMI::NetPacket ckt(MmiMessageId::DISPLAY_INFO);
         if (PackDisplayData(ckt) == RET_ERR) {
-            MMI_LOGE("pack display info failed");
+            MMI_LOG_E("pack display info failed");
             return;
         }
         MultimodalEventHandler::GetInstance().GetMMIClient()->SendMessage(ckt);
     } else {
-        MMI_LOGE("GetMMIClient is failed");
+        MMI_LOG_E("GetMMIClient is failed");
     }
 
-    MMI_LOGD("InputManagerImpl::UpdateDisplayInfo leave!");
+    MMI_LOG_D("InputManagerImpl::UpdateDisplayInfo leave!");
 }
 
 int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter)
 {
-    MMI_LOGT("enter");
+    MMI_LOG_T("enter");
     if (eventFilterService_ == nullptr) {
         eventFilterService_ = new EventFilterService();
-        MMI_LOGD("new EventFilterService");
+        MMI_LOG_D("new EventFilterService");
     }
 
     if (eventFilterService_ == nullptr) {
-        MMI_LOGE("eventFilterService_ is nullptr");
+        MMI_LOG_E("eventFilterService_ is nullptr");
         return RET_ERR;
     }
 
@@ -84,61 +84,65 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
         int32_t ret = MultimodalInputConnectManager::GetInstance()->AddInputEventFilter(eventFilterService_);
         if (ret == RET_OK) {
             hasSendToMmiServer = true;
-            MMI_LOGI("AddInputEventFilter has send to server success");
+            MMI_LOG_I("AddInputEventFilter has send to server success");
             return RET_OK;
         } else {
-            MMI_LOGE("AddInputEventFilter has send to server fail, ret = %{public}d", ret);
+            MMI_LOG_E("AddInputEventFilter has send to server fail, ret = %{public}d", ret);
             return RET_ERR;
         }        
     }
 
-    MMI_LOGT("leave, success with hasSendToMmiServer is already true");
+    MMI_LOG_T("leave, success with hasSendToMmiServer is already true");
     return RET_OK;
 }
 
 void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<OHOS::MMI::IInputEventConsumer> inputEventConsumer)
 {
-    MMI_LOGD("enter");
+    MMI_LOG_D("enter");
     MMIEventHdl.GetMultimodeInputInfo();
     CHK(inputEventConsumer, ERROR_NULL_POINTER);
     consumer = inputEventConsumer;
-    MMI_LOGD("leave");
+    MMI_LOG_D("leave");
 }
 
 void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 {
+<<<<<<< HEAD
+    MMI_LOG_D("enter");
+=======
     MMI_LOGD("enter");
     int32_t getKeyCode = keyEvent->GetKeyCode();
     std::string keyCodestring = std::to_string(getKeyCode);
     MMI_LOGT("\n OnKeyEvent client trace getKeyCode = %{public}s\n", keyCodestring.c_str());
     int32_t EVENT_KEY = 1;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, EVENT_KEY);
+>>>>>>> 411e1a6ad5bc24bff01ed75b7b8ce1291e27b7a2
     if (consumer != nullptr) {
         CHK(keyEvent != nullptr, ERROR_NULL_POINTER);
         consumer->OnInputEvent(keyEvent);
-        MMI_LOGD("leave");
+        MMI_LOG_D("leave");
         return;
     }
-    MMI_LOGD("consumer is null");
+    MMI_LOG_D("consumer is null");
 }
 
 void InputManagerImpl::OnPointerEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
 {
-    MMI_LOGD("Pointer event received, processing ...");
+    MMI_LOG_D("Pointer event received, processing ...");
     if (consumer != nullptr) {
         CHK(pointerEvent != nullptr, ERROR_NULL_POINTER);
-        MMI_LOGD("Passed on to consumer ...");
+        MMI_LOG_D("Passed on to consumer ...");
         consumer->OnInputEvent(pointerEvent);
         return;
     }
 
-    MMI_LOGD("No comsumer respond, let it go.");
+    MMI_LOG_D("No comsumer respond, let it go.");
 }
 
 int32_t InputManagerImpl::PackDisplayData(OHOS::MMI::NetPacket &ckt)
 {
     if (PackPhysicalDisplay(ckt) == RET_ERR) {
-        MMI_LOGE("pack physical display failed");
+        MMI_LOG_E("pack physical display failed");
         return RET_ERR;
     }
     return PackLogicalDisplay(ckt);
@@ -191,9 +195,9 @@ int32_t InputManagerImpl::PackLogicalDisplay(NetPacket &ckt)
 
 void InputManagerImpl::PrintDisplayDebugInfo()
 {
-    MMI_LOGD("physicalDisplays,num:%{public}d", static_cast<int32_t>(physicalDisplays_.size()));
+    MMI_LOG_D("physicalDisplays,num:%{public}d", static_cast<int32_t>(physicalDisplays_.size()));
     for (int32_t i = 0; i < static_cast<int32_t>(physicalDisplays_.size()); i++) {
-        MMI_LOGD("physicalDisplays,id:%{public}d, leftDisplayId:%{public}d, upDisplayId:%{public}d, "
+        MMI_LOG_D("physicalDisplays,id:%{public}d, leftDisplayId:%{public}d, upDisplayId:%{public}d, "
             "topLeftX:%{public}d, topLeftY:%{public}d, width:%{public}d,height:%{public}d,name:%{public}s,"
             "seatId:%{public}s, seatName:%{public}s, logicWidth:%{public}d, logicHeight:%{public}d, "
             "direction:%{public}d",
@@ -204,9 +208,9 @@ void InputManagerImpl::PrintDisplayDebugInfo()
             physicalDisplays_[i].direction);
     }
 
-    MMI_LOGD("logicalDisplays,num:%{public}d", static_cast<int32_t>(logicalDisplays_.size()));
+    MMI_LOG_D("logicalDisplays,num:%{public}d", static_cast<int32_t>(logicalDisplays_.size()));
     for (int32_t i = 0; i < static_cast<int32_t>(logicalDisplays_.size()); i++) {
-        MMI_LOGD("logicalDisplays, id:%{public}d,topLeftX:%{public}d, topLeftY:%{public}d, "
+        MMI_LOG_D("logicalDisplays, id:%{public}d,topLeftX:%{public}d, topLeftY:%{public}d, "
             "width:%{public}d,height:%{public}d,name:%{public}s,"
             "seatId:%{public}s, seatName:%{public}s,focusWindowId:%{public}d,window num:%{public}d",
             logicalDisplays_[i].id, logicalDisplays_[i].topLeftX, logicalDisplays_[i].topLeftY,
@@ -215,7 +219,7 @@ void InputManagerImpl::PrintDisplayDebugInfo()
             logicalDisplays_[i].focusWindowId, static_cast<int32_t>(logicalDisplays_[i].windowsInfo_.size()));
 
         for (int32_t j = 0; j < static_cast<int32_t>(logicalDisplays_[i].windowsInfo_.size()); j++) {
-            MMI_LOGD("windowid:%{public}d, pid:%{public}d,uid:%{public}d,topLeftX:%{public}d,"
+            MMI_LOG_D("windowid:%{public}d, pid:%{public}d,uid:%{public}d,topLeftX:%{public}d,"
                 "topLeftY:%{public}d,width:%{public}d,height:%{public}d,displayId:%{public}d,agentWindowId:%{public}d,",
                 logicalDisplays_[i].windowsInfo_[j].id, logicalDisplays_[i].windowsInfo_[j].pid,
                 logicalDisplays_[i].windowsInfo_[j].uid, logicalDisplays_[i].windowsInfo_[j].topLeftX,
@@ -229,7 +233,7 @@ void InputManagerImpl::PrintDisplayDebugInfo()
 int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor)
 {
     if (monitor == nullptr) {
-        MMI_LOGE("InputManagerImpl::%{public}s param should not be null!", __func__);
+        MMI_LOG_E("InputManagerImpl::%{public}s param should not be null!", __func__);
         return OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER;
     }
     int32_t monitorId = IEMManager.AddInputEventMontior(monitor);
@@ -240,7 +244,7 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent
 int32_t InputManagerImpl::AddMontior(std::function<void(std::shared_ptr<PointerEvent>)> monitor)
 {
     if (monitor == nullptr) {
-        MMI_LOGE("InputManagerImpl::%{public}s param should not be null!", __func__);
+        MMI_LOG_E("InputManagerImpl::%{public}s param should not be null!", __func__);
         return InputEventMonitorManager::INVALID_MONITOR_ID;
     }
     int32_t monitorId = IEMManager.AddInputEventTouchpadMontior(monitor);
@@ -271,7 +275,7 @@ void InputManagerImpl::RemoveMonitor(int32_t monitorId)
             IEMManager.RemoveInputEventTouchpadMontior(monitorId);
             break;
         default:
-        MMI_LOGE("Can't find the mask,mask%{public}d", mask);
+        MMI_LOG_E("Can't find the mask,mask%{public}d", mask);
             break;
     }    
 }
@@ -285,7 +289,7 @@ int32_t InputManagerImpl::AddInterceptor(int32_t sourceType,
                                          std::function<void(std::shared_ptr<PointerEvent>)> interceptor)
 {
     if (interceptor == nullptr) {
-        MMI_LOGE("AddInterceptor::%{public}s param should not be null!", __func__);
+        MMI_LOG_E("AddInterceptor::%{public}s param should not be null!", __func__);
         return InterceptorManager::INVALID_INTERCEPTOR_ID;
     }
     return INTERCEPTORMANAGER.AddInterceptor(sourceType, interceptor);
@@ -294,7 +298,7 @@ int32_t InputManagerImpl::AddInterceptor(int32_t sourceType,
 int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
 {
     if (interceptor == nullptr) {
-        MMI_LOGE("AddInterceptor::%{public}s param should not be null!", __func__);
+        MMI_LOG_E("AddInterceptor::%{public}s param should not be null!", __func__);
         return OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER;
     }
     return INTERCEPTORMANAGER.AddInterceptor(interceptor);
@@ -308,7 +312,7 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
 void InputManagerImpl::SimulateInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 {
     if (MMIEventHdl.InjectEvent(keyEvent) != RET_OK) {
-        MMI_LOGE("Failed to inject keyEvent!");
+        MMI_LOG_E("Failed to inject keyEvent!");
     }
 }
 }

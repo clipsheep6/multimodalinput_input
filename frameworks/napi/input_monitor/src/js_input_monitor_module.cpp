@@ -32,7 +32,7 @@ namespace {
 }
 static napi_value JsOn(napi_env env, napi_callback_info info)
 {
-    MMI_LOGD("enter");
+    MMI_LOG_D("enter");
     size_t requireArgc = 2;
     size_t argc;
     napi_value argv[requireArgc];
@@ -40,22 +40,22 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
 
     status = napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
     if (status != napi_ok) {
-        MMI_LOGE("MMI Throw Error:JsOn get cb info failed");
+        MMI_LOG_E("MMI Throw Error:JsOn get cb info failed");
         return nullptr;
     }
     if (argc < requireArgc) {
-        MMI_LOGE("MMI Throw Error:JsOn argc is not requireArgc");
+        MMI_LOG_E("MMI Throw Error:JsOn argc is not requireArgc");
         return nullptr;
     }
 
     napi_valuetype valueType = napi_undefined;
     status = napi_typeof(env, argv[0], &valueType);
     if (status != napi_ok) {
-        MMI_LOGE("MMI Throw Error:JsOn typeof failed");
+        MMI_LOG_E("MMI Throw Error:JsOn typeof failed");
         return nullptr;
     }
     if (valueType != napi_string) {
-        MMI_LOGE("MMI Throw Error:JsOn valueType is not napi_string");
+        MMI_LOG_E("MMI Throw Error:JsOn valueType is not napi_string");
         return nullptr;
     }
 
@@ -63,31 +63,31 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
     size_t len = 0;
     status = napi_get_value_string_utf8(env, argv[0], typeName, MAX_STRING_LEN - 1, &len);
     if (status != napi_ok) {
-        MMI_LOGE("MMI Throw Error:JsOn napi_get_value_string_utf8 failed");
+        MMI_LOG_E("MMI Throw Error:JsOn napi_get_value_string_utf8 failed");
         return nullptr;
     }
     if (std::strcmp(typeName, "touch") != 0) {
-        MMI_LOGD("not touch");
+        MMI_LOG_D("not touch");
         return nullptr;
     }
 
     status = napi_typeof(env, argv[1], &valueType);
     if (status != napi_ok) {
-        MMI_LOGE("MMI Throw Error:JsOn typeof failed");
+        MMI_LOG_E("MMI Throw Error:JsOn typeof failed");
         return nullptr;
     }
     if (valueType != napi_function) {
-        MMI_LOGE("MMI Throw Error:JsOn is not napi_function");
+        MMI_LOG_E("MMI Throw Error:JsOn is not napi_function");
         return nullptr;
     }
     JSIMM.AddMonitor(env, argv[1]);
-    MMI_LOGD("leave");
+    MMI_LOG_D("leave");
     return nullptr;
 }
 
 static napi_value JsOff(napi_env env, napi_callback_info info)
 {
-    MMI_LOGD("enter");
+    MMI_LOG_D("enter");
     size_t requireArgc = 2;
     size_t argc;
     napi_value argv[requireArgc];
@@ -95,22 +95,22 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
 
     status = napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
     if (status != napi_ok) {
-        MMI_LOGE("MMI Throw Error:JsOff get cb info failed");
+        MMI_LOG_E("MMI Throw Error:JsOff get cb info failed");
         return nullptr;
     }
     if (argc < requireArgc) {
-        MMI_LOGE("MMI Throw Error:JsOff argc is not requireArgc");
+        MMI_LOG_E("MMI Throw Error:JsOff argc is not requireArgc");
         return nullptr;
     }
 
     napi_valuetype valueType = napi_undefined;
     status = napi_typeof(env, argv[0], &valueType);
     if (status != napi_ok) {
-        MMI_LOGE("MMI Throw Error:GetDeviceIds typeof failed");
+        MMI_LOG_E("MMI Throw Error:GetDeviceIds typeof failed");
         return nullptr;
     }
     if (valueType != napi_string) {
-        MMI_LOGE("MMI Throw Error:valueType is not napi_string");
+        MMI_LOG_E("MMI Throw Error:valueType is not napi_string");
         return nullptr;
     }
 
@@ -118,40 +118,40 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     size_t len = 0;
     status = napi_get_value_string_utf8(env, argv[0], typeName, MAX_STRING_LEN - 1, &len);
     if (status != napi_ok) {
-        MMI_LOGE("MMI Throw Error:JsOff napi_get_value_string_utf8 failed");
+        MMI_LOG_E("MMI Throw Error:JsOff napi_get_value_string_utf8 failed");
         return nullptr;
     }
     if (std::strcmp(typeName, "touch") != 0) {
-        MMI_LOGE("type error");
+        MMI_LOG_E("type error");
         return nullptr;
     }
     status = napi_typeof(env, argv[1], &valueType);
     if (status != napi_ok) {
-        MMI_LOGE("MMI Throw Error:JsOff typeof failed");
+        MMI_LOG_E("MMI Throw Error:JsOff typeof failed");
         return nullptr;
     }
     if (valueType != napi_function) {
-        MMI_LOGD("remove all monitor begin");
+        MMI_LOG_D("remove all monitor begin");
         JSIMM.RemoveMonitor(env);
-        MMI_LOGD("remove all monitor");
+        MMI_LOG_D("remove all monitor");
         return nullptr;
     }
 
     JSIMM.RemoveMonitor(env, argv[1]);
-    MMI_LOGD("leave");
+    MMI_LOG_D("leave");
     return nullptr;
 }
 
 EXTERN_C_START
 static napi_value MmiInputMonitorInit(napi_env env, napi_value exports)
 {
-    MMI_LOGD("MmiInputMonitorInit: enter");
+    MMI_LOG_D("MmiInputMonitorInit: enter");
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("on", JsOn),
         DECLARE_NAPI_FUNCTION("off", JsOff),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
-    MMI_LOGD("MmiInputMonitorInit: success");
+    MMI_LOG_D("MmiInputMonitorInit: success");
     return exports;
 }
 EXTERN_C_END

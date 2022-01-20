@@ -47,85 +47,85 @@ public:
 
     virtual bool OnShowMenu(const MultimodalEvent& multiModalEvent)
     {
-        MMI_LOGI("\nCommonEventHandle::OnShowMenu\n");
+        MMI_LOG_I("\nCommonEventHandle::OnShowMenu\n");
         return true;
     }
 
     virtual bool OnSend(const MultimodalEvent& multiModalEvent)
     {
-        MMI_LOGI("\nCommonEventHandle::OnSend\n");
+        MMI_LOG_I("\nCommonEventHandle::OnSend\n");
         return true;
     }
 
     virtual bool OnCopy(const MultimodalEvent& multiModalEvent)
     {
-        MMI_LOGI("\nCommonEventHandle::OnCopy\n");
+        MMI_LOG_I("\nCommonEventHandle::OnCopy\n");
         return true;
     }
 
     virtual bool OnPaste(const MultimodalEvent& multiModalEvent)
     {
-        MMI_LOGI("\nCommonEventHandle::OnPaste\n");
+        MMI_LOG_I("\nCommonEventHandle::OnPaste\n");
         return true;
     }
 
     virtual bool OnCut(const MultimodalEvent& multiModalEvent)
     {
-        MMI_LOGI("\nCommonEventHandle::OnCut\n");
+        MMI_LOG_I("\nCommonEventHandle::OnCut\n");
         return true;
     }
 
     virtual bool OnUndo(const MultimodalEvent& multiModalEvent)
     {
-        MMI_LOGI("\nCommonEventHandle::OnUndo\n");
+        MMI_LOG_I("\nCommonEventHandle::OnUndo\n");
         return true;
     }
 
     virtual bool OnRefresh(const MultimodalEvent& multiModalEvent)
     {
-        MMI_LOGI("\nCommonEventHandle::OnRefresh\n");
+        MMI_LOG_I("\nCommonEventHandle::OnRefresh\n");
         return true;
     }
 
     virtual bool OnStartDrag(const MultimodalEvent& multiModalEvent)
     {
-        MMI_LOGI("\nCommonEventHandle::OnStartDrag\n");
+        MMI_LOG_I("\nCommonEventHandle::OnStartDrag\n");
         return true;
     }
 
     virtual bool OnCancel(const MultimodalEvent& multiModalEvent)
     {
-        MMI_LOGI("\nCommonEventHandle::OnCancel\n");
+        MMI_LOG_I("\nCommonEventHandle::OnCancel\n");
         return true;
     }
 
     virtual bool OnEnter(const MultimodalEvent& multiModalEvent)
     {
-        MMI_LOGI("\nCommonEventHandle::OnEnter\n");
+        MMI_LOG_I("\nCommonEventHandle::OnEnter\n");
         return true;
     }
 
     virtual bool OnPrevious(const MultimodalEvent& multiModalEvent)
     {
-        MMI_LOGI("\nCommonEventHandle::OnPrevious\n");
+        MMI_LOG_I("\nCommonEventHandle::OnPrevious\n");
         return true;
     }
 
     virtual bool OnNext(const MultimodalEvent& multiModalEvent)
     {
-        MMI_LOGI("\nCommonEventHandle::OnNext\n");
+        MMI_LOG_I("\nCommonEventHandle::OnNext\n");
         return true;
     }
 
     virtual bool OnBack(const MultimodalEvent& multiModalEvent)
     {
-        MMI_LOGI("\nCommonEventHandle::OnBack\n");
+        MMI_LOG_I("\nCommonEventHandle::OnBack\n");
         return true;
     }
 
     virtual bool OnPrint(const MultimodalEvent& multiModalEvent)
     {
-        MMI_LOGI("\nCommonEventHandle::OnPrint\n");
+        MMI_LOG_I("\nCommonEventHandle::OnPrint\n");
         return true;
     }
 };

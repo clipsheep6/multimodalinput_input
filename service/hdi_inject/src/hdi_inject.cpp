@@ -37,7 +37,7 @@ bool HdiInject::Init(UDSServer &sess)
 
 int32_t HdiInject::ManageHdfInject(const SessionPtr sess, NetPacket &pkt)
 {
-    MMI_LOGI("into function ManageHdfInject.");
+    MMI_LOG_I("into function ManageHdfInject.");
     int32_t sendType = 0;
     uint32_t devIndex = 0;
     uint32_t devSatatus = 0;
@@ -50,7 +50,7 @@ int32_t HdiInject::ManageHdfInject(const SessionPtr sess, NetPacket &pkt)
             break;
         case SET_EVENT_INJECT:
             pkt >> devIndex >> speechEvent;
-            MMI_LOGI("hdi server recv massage: devIndex = %{public}d.", devIndex);
+            MMI_LOG_I("hdi server recv massage: devIndex = %{public}d.", devIndex);
             OnSetEventInject(speechEvent, devIndex);
             break;
         case SHOW_DEVICE_INFO:
@@ -58,11 +58,11 @@ int32_t HdiInject::ManageHdfInject(const SessionPtr sess, NetPacket &pkt)
             break;
         case SET_HOT_PLUGS:
             pkt >> devIndex >> devSatatus;
-            MMI_LOGI("recv inject tool hot data, devIndex = %{public}d, status = %{public}d.", devIndex, devSatatus);
+            MMI_LOG_I("recv inject tool hot data, devIndex = %{public}d, status = %{public}d.", devIndex, devSatatus);
             OnSetHotPlugs(devIndex, devSatatus);
             break;
         default:
-            MMI_LOGE("The message type:%{public}d cannot be processed.", sendType);
+            MMI_LOG_E("The message type:%{public}d cannot be processed.", sendType);
             return RET_ERR;
     }
     return RET_OK;
@@ -70,7 +70,7 @@ int32_t HdiInject::ManageHdfInject(const SessionPtr sess, NetPacket &pkt)
 
 int32_t HdiInject::OnSetEventInject(const RawInputEvent& allEvent, int32_t devIndex)
 {
-    MMI_LOGI("Enter funtion OnSetEventInject");
+    MMI_LOG_I("Enter funtion OnSetEventInject");
     EventPackage* pack[EVENT_PACKAGE_ARROW_SIZE];
     pack[0] = (EventPackage*)malloc(sizeof(EventPackage));
     pack[0]->type = (int32_t)allEvent.ev_type;
@@ -79,7 +79,7 @@ int32_t HdiInject::OnSetEventInject(const RawInputEvent& allEvent, int32_t devIn
     pack[0]->timestamp = GetSysClockTime();
     hdiInject->eventcallback_.EventPkgCallback((const EventPackage**)pack, 1, devIndex);
     free(pack[0]);
-    MMI_LOGI("Leave funtion OnSetEventInject");
+    MMI_LOG_I("Leave funtion OnSetEventInject");
 
     return RET_OK;
 }
@@ -87,10 +87,10 @@ int32_t HdiInject::OnSetEventInject(const RawInputEvent& allEvent, int32_t devIn
 void HdiInject::OnSetHotPlugs(uint32_t devIndex, uint32_t devSatatus)
 {
     if (!(ReportHotPlugEvent(devIndex, devSatatus))) {
-        MMI_LOGE("OnSetHotPlugs ReportHotPlugEvent faild. ");
+        MMI_LOG_E("OnSetHotPlugs ReportHotPlugEvent faild. ");
         return;
     }
-    MMI_LOGI("OnSetHotPlugs ReportHotPlugEvent success. ");
+    MMI_LOG_I("OnSetHotPlugs ReportHotPlugEvent success. ");
 }
 
 void HdiInject::InitDeviceInfo()
@@ -138,7 +138,7 @@ void HdiInject::OnInitHdiServerStatus()
 void HdiInject::ShowAllDeviceInfo()
 {
     for (auto item : deviceArray_) {
-        MMI_LOGI("deviceName = %{public}s, devIndex = %{public}d, status = %{public}d, devType = %{public}d\n",
+        MMI_LOG_I("deviceName = %{public}s, devIndex = %{public}d, status = %{public}d, devType = %{public}d\n",
             item.chipName, item.devIndex, item.status, item.devType);
     }
 }
@@ -190,7 +190,7 @@ bool HdiInject::ReportHotPlugEvent()
 bool HdiInject::ReportHotPlugEvent(uint32_t devIndex, uint32_t status)
 {
     if (!(SetDeviceHotStatus(devIndex, status))) {
-        MMI_LOGE("SetDeviceHotStatus error devIndex = %{public}d, status = %{public}d.", devIndex, status);
+        MMI_LOG_E("SetDeviceHotStatus error devIndex = %{public}d, status = %{public}d.", devIndex, status);
         return false;
     }
     int32_t devType = GetDevTypeByIndex(devIndex);

@@ -26,17 +26,17 @@ namespace {
 void OHOS::MMI::MessageSendRecvStatMgr::Increase()
 {
     ++sendMessageCount_;
-    MMI_LOGF("sendMessageCount_ = %zu", sendMessageCount_);
+    MMI_LOG_F("sendMessageCount_ = %zu", sendMessageCount_);
 }
 
 void OHOS::MMI::MessageSendRecvStatMgr::Decrease()
 {
     ++recvMessageCount_;
-    MMI_LOGF("recvMessageCount_ = %zu", recvMessageCount_);
+    MMI_LOG_F("recvMessageCount_ = %zu", recvMessageCount_);
 }
 
 bool OHOS::MMI::MessageSendRecvStatMgr::IsNoWaitMessage()
 {
-    MMI_LOGF("(%zu, %zu) = %d", sendMessageCount_, recvMessageCount_, (sendMessageCount_ == recvMessageCount_));
+    MMI_LOG_F("(%zu, %zu) = %d", sendMessageCount_, recvMessageCount_, (sendMessageCount_ == recvMessageCount_));
     return (sendMessageCount_ == recvMessageCount_);
 }

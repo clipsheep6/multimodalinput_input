@@ -29,18 +29,18 @@ int32_t InputFilterManager::FilterKeyEvent(std::string name, Authority authority
     std::function<void(KeyBoardEvent)> handler)
 {
     if (handler == nullptr) {
-        MMI_LOGD("the input name or handle is nullptr");
+        MMI_LOG_D("the input name or handle is nullptr");
         return RET_ERR;
     }
-    MMI_LOGD("******************* the authority is %{public}d", authority);
+    MMI_LOG_D("******************* the authority is %{public}d", authority);
     if (authority < NO_AUTHORITY || authority > HIGH_AUTHORITY) {
-        MMI_LOGD("the input authority is incorrect");
+        MMI_LOG_D("the input authority is incorrect");
         return RET_ERR;
     }
     KeyEventFilter keyEventFilter(name, authority, handler);
     keyEventFilterList_.push_back(keyEventFilter);
     if (authority > HighestAuthority_) {
-        MMI_LOGD("add filter is  the highest Authority");
+        MMI_LOG_D("add filter is  the highest Authority");
         HighestId_ = keyEventFilter.GetId();
         HighestAuthority_ = authority;
         MMIEventHdl.AddKeyEventFIlter(keyEventFilter.GetId(), name, authority);
@@ -52,7 +52,7 @@ int32_t InputFilterManager::UnFilterKeyEvent(int32_t id)
 {
     auto len = keyEventFilterList_.size();
     if (len == 0) {
-        MMI_LOGD("  keyEventFilterList_ size is zero ");
+        MMI_LOG_D("  keyEventFilterList_ size is zero ");
         return RET_ERR;
     }
     for (auto it = keyEventFilterList_.begin(); it != keyEventFilterList_.end(); it++) {
@@ -64,16 +64,16 @@ int32_t InputFilterManager::UnFilterKeyEvent(int32_t id)
                 HighestId_ = 0;
                 break;
             }
-            MMI_LOGD("remove filter isn't  the highest Authority");
+            MMI_LOG_D("remove filter isn't  the highest Authority");
             return RET_OK;
         }
     }
     if (len == keyEventFilterList_.size()) {
-        MMI_LOGD("can't find this id");
+        MMI_LOG_D("can't find this id");
         return RET_ERR;
     }
     if (keyEventFilterList_.size() == 0) {
-        MMI_LOGD("remove filter is the last filter");
+        MMI_LOG_D("remove filter is the last filter");
         return RET_OK;
     }
     auto item = keyEventFilterList_.begin();
@@ -85,7 +85,7 @@ int32_t InputFilterManager::UnFilterKeyEvent(int32_t id)
         }
     }
     if (HighestId_ != 0) {
-        MMI_LOGD("after remove the highest filter, add a next highest filter ");
+        MMI_LOG_D("after remove the highest filter, add a next highest filter ");
         MMIEventHdl.AddKeyEventFIlter(item->GetId(), item->GetName(), item->GetAuthority());
     }
     return RET_OK;
@@ -133,12 +133,16 @@ void InputFilterManager::OnkeyEventTrace(const KeyBoardEvent& event)
 
 int32_t InputFilterManager::OnKeyEvent(KeyBoardEvent event, int32_t id)
 {
+<<<<<<< HEAD
+    MMI_LOG_D("client on key event call function handler ");
+=======
     MMI_LOGD("client on key event call function handler ");
     OnkeyEventTrace(event);
+>>>>>>> 411e1a6ad5bc24bff01ed75b7b8ce1291e27b7a2
     for (auto item : keyEventFilterList_) {
         if (id == item.GetId()) {
             item.GetHandler()(event);
-            MMI_LOGD("client on key event call function handler success");
+            MMI_LOG_D("client on key event call function handler success");
             break;
         }
     }
@@ -177,12 +181,12 @@ int32_t InputFilterManager::FilterTouchEvent(std::string name, Authority authori
     std::function<void(TouchEvent)> handler)
 {
     if (handler == nullptr) {
-        MMI_LOGE("the input name or handle is nullptr");
+        MMI_LOG_E("the input name or handle is nullptr");
         return RET_ERR;
     }
 
     if (authority < NO_AUTHORITY || authority > HIGH_AUTHORITY) {
-        MMI_LOGE("the input authority is incorrect");
+        MMI_LOG_E("the input authority is incorrect");
         return RET_ERR;
     }
 
@@ -191,7 +195,7 @@ int32_t InputFilterManager::FilterTouchEvent(std::string name, Authority authori
 
     int32_t highAuthorityFilterId = GetHighAuthorityFilterId();
     if (highAuthorityFilterId != 0 && highAuthorityFilterId == touchEventFilter.GetId()) {
-        MMI_LOGE("add filter is  the highest Authority");
+        MMI_LOG_E("add filter is  the highest Authority");
         MMIEventHdl.AddTouchEventFilter(touchEventFilter.GetId(), name, authority);
     }
 
@@ -202,21 +206,21 @@ int32_t InputFilterManager::UnFilterTouchEvent(int32_t id)
 {
     auto len = touchEventFilterList_.size();
     if (len == 0) {
-        MMI_LOGE(" touchEventFilterList_ size is zero ");
+        MMI_LOG_E(" touchEventFilterList_ size is zero ");
         return RET_ERR;
     }
 
     int32_t highAuthorityFilterId = GetHighAuthorityFilterId();
     for (auto it = touchEventFilterList_.begin(); it != touchEventFilterList_.end(); it++) {
         if (it->GetId() == id) {
-            MMI_LOGD("remove client filter success");
+            MMI_LOG_D("remove client filter success");
             touchEventFilterList_.erase(it);
             break;
         }
     }
 
     if (len == touchEventFilterList_.size()) {
-        MMI_LOGE("can't find this id");
+        MMI_LOG_E("can't find this id");
         return RET_ERR;
     }
 
@@ -227,12 +231,12 @@ int32_t InputFilterManager::UnFilterTouchEvent(int32_t id)
         if (highAuthorityFilterId != 0) {
             TouchEventFilter newFilter = GetTouchEventFilter(highAuthorityFilterId);
             if (newFilter.GetId() != 0) {
-                MMI_LOGD("after remove the highest filter, add a next highest filter");
+                MMI_LOG_D("after remove the highest filter, add a next highest filter");
                 MMIEventHdl.AddTouchEventFilter(newFilter.GetId(), newFilter.GetName(), newFilter.GetAuthority());
             }
         }
     } else {
-        MMI_LOGD("remove filter isn't  the highest Authority");
+        MMI_LOG_D("remove filter isn't  the highest Authority");
     }
 
     return RET_OK;
@@ -280,12 +284,16 @@ void InputFilterManager::OnTouchEventTrace(const TouchEvent& event)
 
 int32_t InputFilterManager::OnTouchEvent(TouchEvent event, int32_t id)
 {
+<<<<<<< HEAD
+    MMI_LOG_E("client on touch event call function handler, id=%{public}d", id);
+=======
     MMI_LOGE("client on touch event call function handler, id=%{public}d", id);
     OnTouchEventTrace(event);
+>>>>>>> 411e1a6ad5bc24bff01ed75b7b8ce1291e27b7a2
     for (auto iter : touchEventFilterList_) {
         if (id == iter.GetId()) {
             iter.GetHandler()(event);
-            MMI_LOGE("client on touch event call function handler success");
+            MMI_LOG_E("client on touch event call function handler success");
             break;
         }
     }
@@ -296,18 +304,18 @@ int32_t InputFilterManager::RegisterPointerEventInterceptor(std::string name_, A
                                                             std::function<void(MouseEvent)> handler_)
 {
     if (handler_ == nullptr) {
-        MMI_LOGD("the input name or handle is nullptr");
+        MMI_LOG_D("the input name or handle is nullptr");
         return RET_ERR;
     }
-    MMI_LOGD("******************* the authority is %{public}d", authority_);
+    MMI_LOG_D("******************* the authority is %{public}d", authority_);
     if (authority_ < NO_AUTHORITY || authority_ > HIGH_AUTHORITY) {
-        MMI_LOGD("the input authority is incorrect");
+        MMI_LOG_D("the input authority is incorrect");
         return RET_ERR;
     }
     PointerEventInterceptor pointer_interceptor(name_, authority_, handler_);
     PointerEventInterceptorList_.push_back(pointer_interceptor);
     if (authority_ > pHighestAuthority_) {
-        MMI_LOGD("add filter is the highest Authority");
+        MMI_LOG_D("add filter is the highest Authority");
         pHighestId_ = pointer_interceptor.GetId();
         pHighestAuthority_ = authority_;
         MMIEventHdl.AddEventInterceptor(pointer_interceptor.GetId(), pointer_interceptor.GetName(),
@@ -320,7 +328,7 @@ int32_t InputFilterManager::UnRegisterPointerEventInterceptor(int32_t id_)
 {
     auto len = PointerEventInterceptorList_.size();
     if (len == 0) {
-        MMI_LOGD("The number of [pointer event interceptors] is 0");
+        MMI_LOG_D("The number of [pointer event interceptors] is 0");
         return RET_OK;
     }
     for (auto it = PointerEventInterceptorList_.begin(); it != PointerEventInterceptorList_.end(); it++) {
@@ -332,16 +340,16 @@ int32_t InputFilterManager::UnRegisterPointerEventInterceptor(int32_t id_)
                 pHighestId_ = 0;
                 break;
             }
-            MMI_LOGD("remove pointer event interceptor isn't  the highest Authority");
+            MMI_LOG_D("remove pointer event interceptor isn't  the highest Authority");
             return RET_OK;
         }
     }
     if (len == PointerEventInterceptorList_.size()) {
-        MMI_LOGD("can't find this id");
+        MMI_LOG_D("can't find this id");
         return RET_ERR;
     }
     if (PointerEventInterceptorList_.size() == 0) {
-        MMI_LOGD("remove pointer event interceptor is the last interceptor");
+        MMI_LOG_D("remove pointer event interceptor is the last interceptor");
         return RET_OK;
     }
     auto item = PointerEventInterceptorList_.begin();
@@ -353,7 +361,7 @@ int32_t InputFilterManager::UnRegisterPointerEventInterceptor(int32_t id_)
         }
     }
     if (pHighestId_ != 0) {
-        MMI_LOGD("refound highest priority pointer event interceptor");
+        MMI_LOG_D("refound highest priority pointer event interceptor");
         MMIEventHdl.AddEventInterceptor(item->GetId(), item->GetName(), item->GetAuthority());
     }
     return RET_OK;
@@ -402,13 +410,17 @@ void InputFilterManager::OnPointerEventTrace(const MouseEvent& event)
 
 int32_t InputFilterManager::OnPointerEvent(MouseEvent event, int32_t id_)
 {
+<<<<<<< HEAD
+    MMI_LOG_D("client on point event call function handler ");
+=======
     MMI_LOGD("client on point event call function handler ");
     OnPointerEventTrace(event);
+>>>>>>> 411e1a6ad5bc24bff01ed75b7b8ce1291e27b7a2
     for (auto item : PointerEventInterceptorList_)
     {
         if (id_ == item.GetId()) {
             item.GetHandler()(event);
-            MMI_LOGD("client on point event call function handler success");
+            MMI_LOG_D("client on point event call function handler success");
             break;
         }
     }

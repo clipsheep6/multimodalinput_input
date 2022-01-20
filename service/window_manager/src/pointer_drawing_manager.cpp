@@ -42,24 +42,24 @@ std::unique_ptr<OHOS::Media::PixelMap> OHOS::MMI::MouseDrawingManager::DecodeIma
     SourceOptions opts;
     opts.formatHint = "image/png";
     std::unique_ptr<ImageSource> imageSource = ImageSource::CreateImageSource(imagePath, opts, errorCode);
-    MMI_LOGE("CreateImageSource errorCode is %{public}u.", errorCode);
+    MMI_LOG_E("CreateImageSource errorCode is %{public}u.", errorCode);
 
     std::set<std::string> formats;
     uint32_t ret = imageSource->GetSupportedFormats(formats);
-    MMI_LOGE("get the image decode %{public}u", ret);
+    MMI_LOG_E("get the image decode %{public}u", ret);
 
     DecodeOptions decodeOpts;
     std::unique_ptr<PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, errorCode);
     if (pixelMap == nullptr) {
-        MMI_LOGE("pixelMap is nullptr: %{public}u .", errorCode);
+        MMI_LOG_E("pixelMap is nullptr: %{public}u .", errorCode);
     }
     return pixelMap;
 }
 
 void OHOS::MMI::MouseDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY)
 {
-    MMI_LOGD("enter");
-    MMI_LOGD("displayId:%{public}d, globalX:%{public}d, globalY:%{public}d", displayId, globalX, globalY);
+    MMI_LOG_D("enter");
+    MMI_LOG_D("displayId:%{public}d, globalX:%{public}d, globalY:%{public}d", displayId, globalX, globalY);
     if (drawWindow_ == nullptr) {
         std::string windowName = "pointer window";
         sptr<OHOS::Rosen::WindowOption> option = new OHOS::Rosen::WindowOption();
@@ -78,14 +78,14 @@ void OHOS::MMI::MouseDrawingManager::DrawPointer(int32_t displayId, int32_t glob
 
         std::shared_ptr<OHOS::Rosen::RSSurfaceNode> surfaceNode = drawWindow_->GetSurfaceNode();
         if (surfaceNode == nullptr) {
-            MMI_LOGE("draw pointer is faild, get surface node is nullptr");
+            MMI_LOG_E("draw pointer is faild, get surface node is nullptr");
             drawWindow_->Destroy();
             drawWindow_ = nullptr; 
             return;
         }
         sptr<OHOS::Surface> surface = surfaceNode->GetSurface();
         if (surface == nullptr) {
-            MMI_LOGE("draw pointer is faild, get surface node is nullptr");
+            MMI_LOG_E("draw pointer is faild, get surface node is nullptr");
             drawWindow_->Destroy();
             drawWindow_ = nullptr; 
             return;
@@ -102,26 +102,26 @@ void OHOS::MMI::MouseDrawingManager::DrawPointer(int32_t displayId, int32_t glob
         };
 
         OHOS::SurfaceError ret = surface->RequestBuffer(buffer, releaseFence, config);
-        MMI_LOGD("request buffer ret is: %{public}s", SurfaceErrorStr(ret).c_str());
+        MMI_LOG_D("request buffer ret is: %{public}s", SurfaceErrorStr(ret).c_str());
 
         if (buffer == nullptr) {
-            MMI_LOGE("request buffer failed: buffer is nullptr");
+            MMI_LOG_E("request buffer failed: buffer is nullptr");
             drawWindow_->Destroy();
             drawWindow_ = nullptr; 
             return;
         }
         if (buffer->GetVirAddr() == nullptr) {
-            MMI_LOGE("get virAddr failed: virAddr is nullptr");
+            MMI_LOG_E("get virAddr failed: virAddr is nullptr");
             drawWindow_->Destroy();
             drawWindow_ = nullptr; 
             return;
         }
 
         auto addr = static_cast<uint8_t *>(buffer->GetVirAddr());
-        MMI_LOGD("buffer width:%{public}d, height:%{public}d", buffer->GetWidth(), buffer->GetHeight());
+        MMI_LOG_D("buffer width:%{public}d, height:%{public}d", buffer->GetWidth(), buffer->GetHeight());
 
         DoDraw(addr, buffer->GetWidth(), buffer->GetHeight());
-        MMI_LOGD("DoDraw end");
+        MMI_LOG_D("DoDraw end");
         OHOS::BufferFlushConfig flushConfig = {
             .damage = {
                 .w = buffer->GetWidth(),
@@ -129,17 +129,17 @@ void OHOS::MMI::MouseDrawingManager::DrawPointer(int32_t displayId, int32_t glob
         },
         };
         ret = surface->FlushBuffer(buffer, -1, flushConfig);
-        MMI_LOGD("draw pointer FlushBuffer ret is: %{public}s", SurfaceErrorStr(ret).c_str());
+        MMI_LOG_D("draw pointer FlushBuffer ret is: %{public}s", SurfaceErrorStr(ret).c_str());
     } else {
         drawWindow_->MoveTo(globalX, globalY);
     }
     drawWindow_->Show();
-    MMI_LOGD("leave");
+    MMI_LOG_D("leave");
 }
 
 void OHOS::MMI::MouseDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t height)
 {
-    MMI_LOGD("enter");
+    MMI_LOG_D("enter");
     OHOS::Rosen::Drawing::Bitmap bitmap;
     OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
         OHOS::Rosen::Drawing::ALPHATYPE_OPAQUYE };
@@ -155,36 +155,36 @@ void OHOS::MMI::MouseDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint3
     int32_t addrSize = width * height * stride;
     auto ret = memcpy_s(addr, addrSize, bitmap.GetPixels(), addrSize);
     if (ret != EOK) {
-        MMI_LOGE("memcpy_s failed");
+        MMI_LOG_E("memcpy_s failed");
     }
-    MMI_LOGD("leave");
+    MMI_LOG_D("leave");
 }
 
 void OHOS::MMI::MouseDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas)
 {
     OHOS::MMI::MouseDrawingManager mdm;
 
-    MMI_LOGD("enter");
+    MMI_LOG_D("enter");
     std::unique_ptr<OHOS::Media::PixelMap> pixelmap = mdm.DecodeImageToPixelMap(IMAGE_POINTER_JPEG_PATH);
     if (pixelmap == nullptr) {
-        MMI_LOGE("pixelmap is nullptr");
+        MMI_LOG_E("pixelmap is nullptr");
         return;
     }
-    MMI_LOGD("pixelmap is not nullptr");
+    MMI_LOG_D("pixelmap is not nullptr");
 
     OHOS::Rosen::Drawing::Pen pen;
     pen.SetAntiAlias(true);
     pen.SetColor(OHOS::Rosen::Drawing::Color::COLOR_BLUE);
     pen.SetWidth(10);
     canvas.AttachPen(pen);
-    MMI_LOGD("DrawBitmap");
+    MMI_LOG_D("DrawBitmap");
     canvas.DrawBitmap(*pixelmap, 0, 0);
-    MMI_LOGD("leave");
+    MMI_LOG_D("leave");
 }
 
 void OHOS::MMI::MouseDrawingManager::TellDisplayInfo(int32_t displayId, int32_t width, int32_t height) 
 {
-    MMI_LOGD("enter");
+    MMI_LOG_D("enter");
     hasDisplay_ = true;
     displayId_ = displayId;
     displayWidth_ = width;
@@ -194,7 +194,7 @@ void OHOS::MMI::MouseDrawingManager::TellDisplayInfo(int32_t displayId, int32_t 
 
 void OHOS::MMI::MouseDrawingManager::TellDeviceInfo(bool hasPointerDevice) 
 {
-    MMI_LOGD("enter");
+    MMI_LOG_D("enter");
     hasPointerDevice_ = hasPointerDevice;
     Init();
 }
@@ -202,13 +202,13 @@ void OHOS::MMI::MouseDrawingManager::TellDeviceInfo(bool hasPointerDevice)
 void OHOS::MMI::MouseDrawingManager::Init() 
 {
     if (hasDisplay_ && hasPointerDevice_ && drawWindow_ == nullptr) {
-        MMI_LOGD("init draw pointer");
+        MMI_LOG_D("init draw pointer");
         DrawPointer(displayId_, displayWidth_/2, displayHeight_/2);
         return;
     }
 
     if (!hasPointerDevice_ && drawWindow_ != nullptr) {
-        MMI_LOGD("destroy draw pointer");
+        MMI_LOG_D("destroy draw pointer");
         drawWindow_->Destroy();
         drawWindow_ = nullptr; 
     }

@@ -234,7 +234,7 @@ int32_t EventPackage::PackageTabletToolEvent(libinput_event *event, EventTabletT
     CHKR(tool, ERROR_NULL_POINTER, RET_ERR);
     auto rDevRet = PackageEventDeviceInfo<EventTabletTool>(event, tableTool);
     if (rDevRet != RET_OK) {
-        MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", rDevRet, DEV_PARAM_PKG_FAIL);
+        MMI_LOG_E("Device param package failed... ret:%{public}d errCode:%{public}d", rDevRet, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
     tableTool.time = libinput_event_tablet_tool_get_time(data);
@@ -289,7 +289,7 @@ int32_t EventPackage::PackageTabletPadEvent(libinput_event *event, EventTabletPa
     tabletPad.time = libinput_event_tablet_pad_get_time_usec(data);
     auto ret = PackageEventDeviceInfo<EventTabletPad>(event, tabletPad);
     if (ret != RET_OK) {
-        MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
+        MMI_LOG_E("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
     PackageTabletPadOtherParams(event, tabletPad);
@@ -305,7 +305,7 @@ int32_t EventPackage::PackageTabletPadKeyEvent(libinput_event *event, EventKeybo
     key.time = libinput_event_tablet_pad_get_time_usec(data);
     auto ret = PackageEventDeviceInfo<EventKeyboard>(event, key);
     if (ret != RET_OK) {
-        MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
+        MMI_LOG_E("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
     switch (type) {
@@ -352,7 +352,7 @@ int32_t EventPackage::PackageJoyStickKeyEvent(libinput_event *event, EventKeyboa
     key.key = libinput_event_joystick_button_get_key(data);
     auto ret = PackageEventDeviceInfo<EventKeyboard>(event, key);
     if (ret != RET_OK) {
-        MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
+        MMI_LOG_E("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
     key.seat_key_count = libinput_event_joystick_button_get_seat_key_count(data);
@@ -469,7 +469,7 @@ int32_t EventPackage::PackageJoyStickAxisEvent(libinput_event *event,
     CHKR(joyEvent, ERROR_NULL_POINTER, RET_ERR);
     auto ret = PackageEventDeviceInfo<EventJoyStickAxis>(event, eventJoyStickAxis);
     if (ret != RET_OK) {
-        MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
+        MMI_LOG_E("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
     eventJoyStickAxis.time = libinput_event_get_joystick_axis_time(joyEvent);
@@ -510,7 +510,7 @@ int32_t EventPackage::PackageTouchEvent(multimodal_libinput_event &ev,
     }
     auto ret = PackageEventDeviceInfo<EventTouch>(ev.event, touch);
     if (ret != RET_OK) {
-        MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
+        MMI_LOG_E("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
     auto data = libinput_event_get_touch_event(ev.event);
@@ -561,7 +561,7 @@ int32_t EventPackage::PackagePointerEvent(multimodal_libinput_event &ev,
     CHKR(ev.event, PARAM_INPUT_INVALID, RET_ERR);
     auto rDevRet = PackageEventDeviceInfo<EventPointer>(ev.event, point);
     if (rDevRet != RET_OK) {
-        MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", rDevRet, DEV_PARAM_PKG_FAIL);
+        MMI_LOG_E("Device param package failed... ret:%{public}d errCode:%{public}d", rDevRet, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
     int32_t ret = RET_OK;
@@ -585,7 +585,7 @@ int32_t EventPackage::PackagePointerEvent(multimodal_libinput_event &ev,
         }
         default: {
             ret = RET_ERR;
-            MMI_LOGE("Unknown event_type of pointer class has been reported!\n");
+            MMI_LOG_E("Unknown event_type of pointer class has been reported!\n");
             break;
         }
     }
@@ -600,7 +600,7 @@ int32_t OHOS::MMI::EventPackage::PackageGestureEvent(libinput_event *event, Even
     auto type = libinput_event_get_type(event);
     auto ret = PackageEventDeviceInfo<EventGesture>(event, gesture);
     if (ret != RET_OK) {
-        MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
+        MMI_LOG_E("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
     gesture.time = libinput_event_gesture_get_time_usec(data);
@@ -649,7 +649,7 @@ int32_t EventPackage::PackageDeviceManageEvent(libinput_event *event, DeviceMana
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto ret = PackageEventDeviceInfo<DeviceManage>(event, deviceManage);
     if (ret != RET_OK) {
-        MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
+        MMI_LOG_E("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
     return RET_OK;
@@ -663,7 +663,7 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event, EventKeyboard& key,
     key.key = libinput_event_keyboard_get_key(data);
     auto ret = PackageEventDeviceInfo<EventKeyboard>(event, key);
     if (ret != RET_OK) {
-        MMI_LOGE("Device param package failed. ret:%{public}d, errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
+        MMI_LOG_E("Device param package failed. ret:%{public}d, errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
     if (libinput_event_keyboard_get_key_state(data) == 0) {
@@ -675,11 +675,11 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event, EventKeyboard& key,
     key.time = libinput_event_keyboard_get_time_usec(data);
     // Ignore key events that are not seat wide state changes.
     if (key.state == KEY_STATE_PRESSED && key.seat_key_count != SEAT_BUTTON_OR_KEY_COUNT_ONE) {
-        MMI_LOGD("The same button is pressed on multiple devices, state:%{puiblic}d", key.state);
+        MMI_LOG_D("The same button is pressed on multiple devices, state:%{puiblic}d", key.state);
         return MULTIDEVICE_SAME_EVENT_MARK;
     }
     if (key.state == KEY_STATE_RELEASED && key.seat_key_count != SEAT_BUTTON_OR_KEY_COUNT_ZERO) {
-        MMI_LOGD("Release the same button on multiple devices, state:%{puiblic}d", key.state);
+        MMI_LOG_D("Release the same button on multiple devices, state:%{puiblic}d", key.state);
         return MULTIDEVICE_SAME_EVENT_MARK;
     }
     return RET_OK;
@@ -689,13 +689,13 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event,
     std::shared_ptr<OHOS::MMI::KeyEvent> kevnPtr, UDSServer& udsServer)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
-    MMI_LOGD("PackageKeyEvent begin");
+    MMI_LOG_D("PackageKeyEvent begin");
     CHKR(kevnPtr, ERROR_NULL_POINTER, RET_ERR);
     kevnPtr->UpdateId();
     EventKeyboard key = {};
     auto ret = PackageEventDeviceInfo<EventKeyboard>(event, key);
     if (ret != RET_OK) {
-        MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
+        MMI_LOG_E("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
     auto data = libinput_event_get_keyboard_event(event);
@@ -733,7 +733,7 @@ int32_t EventPackage::PackageKeyEvent(libinput_event *event,
     if (keyAction == OHOS::MMI::KeyEvent::KEY_ACTION_UP) {
         kevnPtr->RemoveReleasedKeyItems(item);
     }
-    MMI_LOGD("PackageKeyEvent end");
+    MMI_LOG_D("PackageKeyEvent end");
     return RET_OK;
 }
 

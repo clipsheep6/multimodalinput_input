@@ -26,7 +26,7 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::onLibinputTouchEvent(l
     std::shared_ptr<TouchTransformPointProcessor> processor;
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
-        MMI_LOGD("this touch event is canceled"); 
+        MMI_LOG_D("this touch event is canceled"); 
         return nullptr;
     }
     auto it = processors_.find(ID);

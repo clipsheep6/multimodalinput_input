@@ -34,7 +34,7 @@ InputDeviceEvent::~InputDeviceEvent(){}
 
 void InputDeviceEvent::GetInputDeviceIdsAsync(std::function<void(std::vector<int32_t>)> callback)
 {
-    MMI_LOGE("GetInputDeviceIdsAsync enter");
+    MMI_LOG_E("GetInputDeviceIdsAsync enter");
     std::lock_guard<std::mutex> guard(lk_);
     inputDevciceIdsRequests_.insert(std::pair<int32_t,
         std::function<void(std::vector<int32_t>)>>(this->nextTaskIds_, callback));

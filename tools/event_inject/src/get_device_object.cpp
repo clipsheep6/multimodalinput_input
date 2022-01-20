@@ -50,7 +50,7 @@ DeviceBase* GetDeviceObject::CreateDeviceObject(const std::string deviceName)
                || (deviceName == "trackpad model1") || (deviceName == "trackpad model2")) {
         deviceBasePtr = new ProcessingMouseDevice();
     } else {
-        MMI_LOGI("Not create device object from deviceName:%s", deviceName.c_str());
+        MMI_LOG_I("Not create device object from deviceName:%s", deviceName.c_str());
     }
 
     return deviceBasePtr;

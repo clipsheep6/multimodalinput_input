@@ -38,7 +38,7 @@ void OHOS::MMI::TouchPadTransformPointProcessor::setPointEventSource(int32_t sou
 void OHOS::MMI::TouchPadTransformPointProcessor::onEventTouchPadDown(libinput_event *event)
 {
     CHK(event, PARAM_INPUT_INVALID);
-    MMI_LOGD("this touch pad event is down begin");
+    MMI_LOG_D("this touch pad event is down begin");
     auto data = libinput_event_get_touchpad_event(event);
     auto time = libinput_event_touchpad_get_time(data);
     auto seat_slot = libinput_event_touchpad_get_seat_slot(data);
@@ -62,13 +62,13 @@ void OHOS::MMI::TouchPadTransformPointProcessor::onEventTouchPadDown(libinput_ev
     pointerEvent_->SetDeviceId(id);
     pointerEvent_->AddPointerItem(pointer);
     pointerEvent_->SetPointerId(seat_slot);
-    MMI_LOGD("this touch pad event is down end");
+    MMI_LOG_D("this touch pad event is down end");
 }
 
 void OHOS::MMI::TouchPadTransformPointProcessor::onEventTouchPadMotion(libinput_event *event)
 {
     CHK(event, PARAM_INPUT_INVALID);
-    MMI_LOGD("this touch pad event is motion begin");
+    MMI_LOG_D("this touch pad event is motion begin");
     auto data = libinput_event_get_touchpad_event(event);
     auto time = libinput_event_touchpad_get_time(data);
     auto seat_slot = libinput_event_touchpad_get_seat_slot(data);
@@ -84,13 +84,13 @@ void OHOS::MMI::TouchPadTransformPointProcessor::onEventTouchPadMotion(libinput_
     pointerEvent_->RemovePointerItem(seat_slot);
     pointerEvent_->AddPointerItem(pointer);
     pointerEvent_->SetPointerId(seat_slot);
-    MMI_LOGD("this touch pad event is motion end");
+    MMI_LOG_D("this touch pad event is motion end");
 }
 
 void OHOS::MMI::TouchPadTransformPointProcessor::onEventTouchPadUp(libinput_event *event)
 {
     CHK(event, PARAM_INPUT_INVALID);
-    MMI_LOGD("this touch pad event is up begin");
+    MMI_LOG_D("this touch pad event is up begin");
     auto data = libinput_event_get_touchpad_event(event);
     auto time = libinput_event_touchpad_get_time(data);
     auto seat_slot = libinput_event_touchpad_get_seat_slot(data);
@@ -108,14 +108,14 @@ void OHOS::MMI::TouchPadTransformPointProcessor::onEventTouchPadUp(libinput_even
     pointer.SetGlobalY((int32_t)logicalY);
     pointerEvent_->AddPointerItem(pointer);
     pointerEvent_->SetPointerId(seat_slot);
-    MMI_LOGD("this touch pad event is up end");
+    MMI_LOG_D("this touch pad event is up end");
 }
 
 std::shared_ptr<OHOS::MMI::PointerEvent> OHOS::MMI::TouchPadTransformPointProcessor::onLibinputTouchPadEvent(
     libinput_event *event)
 {
     CHKR(event, PARAM_INPUT_INVALID, nullptr);
-    MMI_LOGD("call  onLibinputTouchPadEvent begin");
+    MMI_LOG_D("call  onLibinputTouchPadEvent begin");
     auto type = libinput_event_get_type(event);
     switch (type) {
         case LIBINPUT_EVENT_TOUCHPAD_DOWN: {
@@ -134,6 +134,6 @@ std::shared_ptr<OHOS::MMI::PointerEvent> OHOS::MMI::TouchPadTransformPointProces
             return nullptr;
         }
     }
-    MMI_LOGD("call  onLibinputTouchPadEvent end");
+    MMI_LOG_D("call  onLibinputTouchPadEvent end");
     return this->pointerEvent_;
 }

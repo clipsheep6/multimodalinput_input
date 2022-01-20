@@ -94,7 +94,7 @@ uint64_t GetSysClockTime()
     struct timespec ts = { 0, 0 };
 
     if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
-        MMI_LOGT("clock_gettime failed: %{public}s\n", strerror(errno));
+        MMI_LOG_T("clock_gettime failed: %{public}s\n", strerror(errno));
         return 0;
     }
 
@@ -227,7 +227,7 @@ std::string Strftime(const std::string &format, time_t curTime)
 
 static void PrintEventJoyStickAxisInfo(const std::string &axisName, const EventJoyStickAxisAbsInfo &r)
 {
-    MMI_LOGT("%{public}s: {code: %{public}d; value: %{public}d; min: %{public}d; max: %{public}d, "
+    MMI_LOG_T("%{public}s: {code: %{public}d; value: %{public}d; min: %{public}d; max: %{public}d, "
              "fuzz: %{public}d, flat: %{public}d, resolution: %{public}d,"
              "standardValue: %{public}lf, isChanged: %{public}d}, \n",
              axisName.c_str(), r.code, r.value, r.minimum, r.maximum, r.fuzz, r.flat, r.resolution,
@@ -237,7 +237,7 @@ static void PrintEventJoyStickAxisInfo(const std::string &axisName, const EventJ
 void PrintEventJoyStickAxisInfo(const EventJoyStickAxis& r, const int32_t fd,
     const int32_t abilityId, const int32_t focusId, const uint64_t preHandlerTime)
 {
-    MMI_LOGT("4.event dispatcher of server: EventJoyStickAxis:devicePhys: %{public}s;"
+    MMI_LOG_T("4.event dispatcher of server: EventJoyStickAxis:devicePhys: %{public}s;"
              "fd: %{public}d; preHandlerTime: %{public}" PRId64 "; "
              "time: %{public}" PRId64 "; deviceType: %{public}u; eventType: %{public}d; deviceName: %{public}s\n",
              r.devicePhys, fd, preHandlerTime, r.time, r.deviceType,
@@ -256,14 +256,14 @@ void PrintEventJoyStickAxisInfo(const EventJoyStickAxis& r, const int32_t fd,
 
 void PrintWMSInfo(const std::string& str, const int32_t fd, const int32_t abilityId, const int32_t focusId)
 {
-    MMI_LOGT("\nMMIWMS:windowId=[%{public}s]\n", str.c_str());
+    MMI_LOG_T("\nMMIWMS:windowId=[%{public}s]\n", str.c_str());
     if (focusId == -1) {
-        MMI_LOGT("\nWMS:windowId = ''\n");
+        MMI_LOG_T("\nWMS:windowId = ''\n");
     } else {
-        MMI_LOGT("\nWMS:windowId = %{public}d\n", focusId);
+        MMI_LOG_T("\nWMS:windowId = %{public}d\n", focusId);
     }
-    MMI_LOGT("\nCALL_AMS:windowId = ''\n");
-    MMI_LOGT("\nMMIAPPM:fd =%{public}d,abilityID = %{public}d\n", fd, abilityId);
+    MMI_LOG_T("\nCALL_AMS:windowId = ''\n");
+    MMI_LOG_T("\nMMIAPPM:fd =%{public}d,abilityID = %{public}d\n", fd, abilityId);
 }
 
 int GetPid()

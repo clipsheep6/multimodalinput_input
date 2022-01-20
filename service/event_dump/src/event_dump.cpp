@@ -116,7 +116,7 @@ void EventDump::TestDump()
         SPRINTF_S_SEC_FUN_FAIL);
     char path[PATH_MAX] = {};
     if (realpath(szPath, path) == nullptr) {
-        MMI_LOGE("path is error, szPath = %{public}s", szPath);
+        MMI_LOG_E("path is error, szPath = %{public}s", szPath);
         return;
     }
     auto fd = open(path, O_WRONLY | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
@@ -144,7 +144,7 @@ void EventDump::InsertFormat(std::string str, ...)
     va_start(args, str);
     char buf[MAX_STREAM_BUF_SIZE] = {};
     if (vsnprintf_s(buf, MAX_STREAM_BUF_SIZE, MAX_STREAM_BUF_SIZE - 1, str.c_str(), args) == -1) {
-        MMI_LOGE("InsertDumpInfo vsnprintf_s error");
+        MMI_LOG_E("InsertDumpInfo vsnprintf_s error");
         va_end(args);
         return;
     }

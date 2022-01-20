@@ -34,7 +34,7 @@ static void HiLogFunc(struct libinput* input, enum libinput_log_priority priorit
 {
     char buffer[256];
     (void)vsnprintf_s(buffer, sizeof(buffer), sizeof(buffer) - 1, fmt, args);
-    MMI_LOGE("PrintLog_Info:%{public}s", buffer);
+    MMI_LOG_E("PrintLog_Info:%{public}s", buffer);
     va_end(args);
 }
 
@@ -62,17 +62,17 @@ const static libinput_interface LIBINPUT_INTERFACE = {
         CHKR(path, OHOS::ERROR_NULL_POINTER, -errno);
         char realPath[PATH_MAX] = {};
         if (realpath(path, realPath) == nullptr) {
-            MMI_LOGE("path is error, path = %{public}s", path);
+            MMI_LOG_E("path is error, path = %{public}s", path);
             return RET_ERR;
         }
         int32_t fd = open(realPath, flags);
-        MMI_LOGD("libinput .open_restricted path:%{public}s fd:%{public}d", path, fd);
+        MMI_LOG_D("libinput .open_restricted path:%{public}s fd:%{public}d", path, fd);
         return fd < 0 ? -errno : fd;
     },
     .close_restricted = [](int32_t fd, void *user_data)
     {
         using namespace OHOS::MMI;
-        MMI_LOGI("libinput .close_restricted fd:%{public}d\n", fd);
+        MMI_LOG_I("libinput .close_restricted fd:%{public}d\n", fd);
         close(fd);
     },
 };
@@ -118,14 +118,14 @@ void OHOS::MMI::SInput::EventDispatch(epoll_event& ev)
     CHK(ev.data.ptr, ERROR_NULL_POINTER);
     auto fd = *static_cast<int*>(ev.data.ptr);
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_LOGF("SInput::OnEventDispatch epoll unrecoverable error, "
+        MMI_LOG_F("SInput::OnEventDispatch epoll unrecoverable error, "
             "The service must be restarted. fd:%{public}d", fd);
         free(ev.data.ptr);
         ev.data.ptr = nullptr;
         return;
     }
     if (libinput_dispatch(input_) != 0) {
-        MMI_LOGE("libinput: Failed to dispatch libinput");
+        MMI_LOG_E("libinput: Failed to dispatch libinput");
         return;
     }
     OnEventHandler();
@@ -161,7 +161,7 @@ void OHOS::MMI::SInput::WriteBrightness(const char *brightness)
 {
     int fd = open("/sys/class/leds/lcd_backlight0/brightness", O_WRONLY);
     int ret = write(fd, brightness, strlen(brightness));
-    MMI_LOGI("power key write brightness %{public}s, %{public}d", brightness, ret);
+    MMI_LOG_I("power key write brightness %{public}s, %{public}d", brightness, ret);
     close(fd);
 }
 
@@ -181,7 +181,7 @@ bool OHOS::MMI::SInput::HandlePowerKey(struct libinput_event *event)
     if ((keyCode != keyPowerCodeValue) || keyAction != LIBINPUT_KEY_STATE_RELEASED) {
         return false;
     }
-    MMI_LOGI("power key handle key %{public}u, %{public}u", keyCode, keyAction);
+    MMI_LOG_I("power key handle key %{public}u, %{public}u", keyCode, keyAction);
 
     const char *brightness = "2000";
     if (screenState_ == -1) {

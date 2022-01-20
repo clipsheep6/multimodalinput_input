@@ -30,7 +30,7 @@ public:
     ~Want() = default;
     Want& AddEntity(const std::string& entity)
     {
-        MMI_LOGW("Want::AddEntity(%{public}s)", entity.c_str());
+        MMI_LOG_W("Want::AddEntity(%{public}s)", entity.c_str());
         return *this;
     }
 };
@@ -50,7 +50,7 @@ public:
     }
     void StartAbility(const AAFwk::Want& want, int requestCode = 0) const
     {
-        MMI_LOGW("AbilityManager::StartAbility");
+        MMI_LOG_W("AbilityManager::StartAbility");
     }
 };
 }
@@ -103,7 +103,7 @@ int32_t OHOS::MMI::SystemEventHandler::OnSystemEventHandler(MmiMessageId idMsg)
 
 void OHOS::MMI::SystemEventHandler::OnGotoDesktop()
 {
-    MMI_LOGI("SystemEventHandler::OnGotoDesktop");
+    MMI_LOG_I("SystemEventHandler::OnGotoDesktop");
     Want want;
     want.AddEntity(Want::FLAG_HOME_INTENT_FROM_SYSTEM);
     AbilityManager::GetInstance().StartAbility(want, 0);
@@ -111,60 +111,60 @@ void OHOS::MMI::SystemEventHandler::OnGotoDesktop()
 
 void OHOS::MMI::SystemEventHandler::OnScreenShot()
 {
-    MMI_LOGI("SystemEventHandler::OnScreenShot");
+    MMI_LOG_I("SystemEventHandler::OnScreenShot");
 }
 
 void OHOS::MMI::SystemEventHandler::OnScreenSplit()
 {
-    MMI_LOGI("SystemEventHandler::OnScreenSplit");
+    MMI_LOG_I("SystemEventHandler::OnScreenSplit");
 }
 
 void OHOS::MMI::SystemEventHandler::OnStopScreenRecord()
 {
-    MMI_LOGI("SystemEventHandler::OnStopScreenRecord");
+    MMI_LOG_I("SystemEventHandler::OnStopScreenRecord");
 }
 
 void OHOS::MMI::SystemEventHandler::OnStartScreenRecord()
 {
-    MMI_LOGI("SystemEventHandler::OnStartScreenRecord");
+    MMI_LOG_I("SystemEventHandler::OnStartScreenRecord");
 }
 
 void OHOS::MMI::SystemEventHandler::OnShowNotification()
 {
-    MMI_LOGI("SystemEventHandler::OnShowNotification");
+    MMI_LOG_I("SystemEventHandler::OnShowNotification");
 }
 
 void OHOS::MMI::SystemEventHandler::OnRecent()
 {
-    MMI_LOGI("SystemEventHandler::OnRecent");
+    MMI_LOG_I("SystemEventHandler::OnRecent");
 }
 
 void OHOS::MMI::SystemEventHandler::OnLockScreen()
 {
-    MMI_LOGI("SystemEventHandler::OnLockScreen");
+    MMI_LOG_I("SystemEventHandler::OnLockScreen");
 }
 
 void OHOS::MMI::SystemEventHandler::OnSearch()
 {
-    MMI_LOGI("SystemEventHandler::OnSearch");
+    MMI_LOG_I("SystemEventHandler::OnSearch");
 }
 
 void OHOS::MMI::SystemEventHandler::OnClosePage()
 {
-    MMI_LOGI("SystemEventHandler::OnClosePage");
+    MMI_LOG_I("SystemEventHandler::OnClosePage");
 }
 
 void OHOS::MMI::SystemEventHandler::OnLaunchVoiceAssistant()
 {
-    MMI_LOGI("SystemEventHandler::OnLaunchVoiceAssistant");
+    MMI_LOG_I("SystemEventHandler::OnLaunchVoiceAssistant");
 }
 
 void OHOS::MMI::SystemEventHandler::OnMute()
 {
-    MMI_LOGI("SystemEventHandler::OnMute");
+    MMI_LOG_I("SystemEventHandler::OnMute");
 }
 
 void OHOS::MMI::SystemEventHandler::OnBack()
 {
-    MMI_LOGI("SystemEventHandler::OnBack");
+    MMI_LOG_I("SystemEventHandler::OnBack");
 }

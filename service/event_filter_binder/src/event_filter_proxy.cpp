@@ -28,52 +28,52 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN,
 // 获取其他设备注册的SA的Proxy
 EventFilterProxy::EventFilterProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IEventFilter>(impl)
 {
-    MMI_LOGI("EventFilterProxy()");
+    MMI_LOG_I("EventFilterProxy()");
 }
 
 EventFilterProxy::~EventFilterProxy()
 {
-    MMI_LOGI("~EventFilterProxy()");
+    MMI_LOG_I("~EventFilterProxy()");
 }
 
 bool EventFilterProxy::HandlePointerEvent(const std::shared_ptr<PointerEvent> event)
 {
-    MMI_LOGT("enter");
+    MMI_LOG_T("enter");
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
 
     if (event == nullptr) {
-        MMI_LOGE("event is nullptr");
+        MMI_LOG_E("event is nullptr");
         return false;
     }
 
     if (!data.WriteInterfaceToken(EventFilterProxy::GetDescriptor())) {
-        MMI_LOGE("Failed to write descriptor");
+        MMI_LOG_E("Failed to write descriptor");
         return false;
     }
 
     if (!event->WriteToParcel(data)) {
-        MMI_LOGE("Failed to write event to req");
+        MMI_LOG_E("Failed to write event to req");
         return false;
     }
 
     const uint32_t code = static_cast<uint32_t>(OPERATOR_TYPE::HANDLE_POINTER_EVENT);
     int requestResult = Remote()->SendRequest(code, data, reply, option);
     if (requestResult != NO_ERROR) {
-        MMI_LOGE("send request fail, result: %{public}d", requestResult);
+        MMI_LOG_E("send request fail, result: %{public}d", requestResult);
         return false;
     }
 
-    MMI_LOGT("have recieve message from server");
+    MMI_LOG_T("have recieve message from server");
 
     bool result = false;
     if (!reply.ReadBool(result)) {
-        MMI_LOGE("reply ReadBool fail");
+        MMI_LOG_E("reply ReadBool fail");
         return false;
     }
 
-    MMI_LOGT("leave");
+    MMI_LOG_T("leave");
     return result;
 }
 } // namespace MMI

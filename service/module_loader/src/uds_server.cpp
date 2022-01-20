@@ -37,9 +37,9 @@ OHOS::MMI::UDSServer::UDSServer()
 
 OHOS::MMI::UDSServer::~UDSServer()
 {
-    MMI_LOGD("enter");
+    MMI_LOG_D("enter");
     UdsStop();
-    MMI_LOGD("leave");
+    MMI_LOG_D("leave");
 }
 
 void OHOS::MMI::UDSServer::UdsStop()
@@ -86,7 +86,7 @@ bool OHOS::MMI::UDSServer::SendMsg(int32_t fd, NetPacket& pkt)
     CHKF(fd >= 0, PARAM_INPUT_INVALID);
     auto ses = GetSession(fd);
     if (!ses) {
-        MMI_LOGE("SendMsg fd:%{public}d not found, The message was discarded! errCode:%{public}d",
+        MMI_LOG_E("SendMsg fd:%{public}d not found, The message was discarded! errCode:%{public}d",
                  fd, SESSION_NOT_FOUND);
         return false;
     }
@@ -112,13 +112,13 @@ bool  OHOS::MMI::UDSServer::ClearDeadSessionInMap(const int serverFd, const int 
 {
     auto it = sessionsMap_.find(serverFd);
     if (it != sessionsMap_.end()) {
-        MMI_LOGE("The session(fd1: %{public}d) on the server side will be closed because it had in map.", serverFd);
+        MMI_LOG_E("The session(fd1: %{public}d) on the server side will be closed because it had in map.", serverFd);
         DelSession(serverFd);
     }
 
     it = sessionsMap_.find(clientFd);
     if (it != sessionsMap_.end()) {
-        MMI_LOGE("The session(fd2:%{public}d) on the server side will be closed because it had in map.", clientFd);
+        MMI_LOG_E("The session(fd2:%{public}d) on the server side will be closed because it had in map.", clientFd);
         DelSession(clientFd);
     }
 
@@ -129,13 +129,13 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, 
                                                 int& toReturnClientFd, const int32_t uid, const int32_t pid)
 {
     std::lock_guard<std::mutex> lock(mux_);
-    MMI_LOGT("enter.");
+    MMI_LOG_T("enter.");
     const int NUMBER_TWO = 2;
     int sockFds[NUMBER_TWO] = {};
 
     if (socketpair(AF_UNIX, SOCK_STREAM, 0, sockFds) != 0) {
         const int savedErrNo = errno;
-        MMI_LOGE("call socketpair fail, errno: %{public}d, msg: %{public}s!", savedErrNo, strerror(savedErrNo));
+        MMI_LOG_E("call socketpair fail, errno: %{public}d, msg: %{public}s!", savedErrNo, strerror(savedErrNo));
         return RET_ERR;
     }
 
@@ -143,7 +143,7 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, 
     toReturnClientFd = sockFds[1]; // fcntl(sockFds[1], F_DUPFD_CLOEXEC, 0);
     if (toReturnClientFd < 0) {
         const int savedErrNo = errno;
-        MMI_LOGE("call fcntl fail, errno: %{public}d, msg: %{public}s!", savedErrNo, strerror(savedErrNo));
+        MMI_LOG_E("call fcntl fail, errno: %{public}d, msg: %{public}s!", savedErrNo, strerror(savedErrNo));
         return RET_ERR;
     }
 
@@ -154,7 +154,7 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, 
     setsockopt(sockFds[1], SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));
     setsockopt(sockFds[1], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
 
-    MMI_LOGD("alloc socketpair, serverFd = %{public}d, clientFd = %{public}d(%{public}d).",
+    MMI_LOG_D("alloc socketpair, serverFd = %{public}d, clientFd = %{public}d(%{public}d).",
              serverFd, toReturnClientFd, sockFds[1]);
     auto closeSocketFdWhenError = [&serverFd, &toReturnClientFd] {
         close(serverFd);
@@ -174,7 +174,7 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, 
 
     if (!ClearDeadSessionInMap(serverFd, toReturnClientFd)) {
         cleanTaskWhenError();
-        MMI_LOGE("IsSocketFdNotUsed error!");
+        MMI_LOG_E("IsSocketFdNotUsed error!");
         return RET_ERR;
     }
 
@@ -189,14 +189,14 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, 
 #endif
     if (ret != RET_OK) {
         cleanTaskWhenError();
-        MMI_LOGE("epoll_ctl EPOLL_CTL_ADD return %{public}d errCode:%{public}d", ret, EPOLL_MODIFY_FAIL);
+        MMI_LOG_E("epoll_ctl EPOLL_CTL_ADD return %{public}d errCode:%{public}d", ret, EPOLL_MODIFY_FAIL);
         return ret;
     }
 
     SessionPtr sess = std::make_shared<UDSSession>(programName, moduleType, serverFd, uid, pid);
     if (sess == nullptr) {
         cleanTaskWhenError();
-        MMI_LOGE("insufficient memory.");
+        MMI_LOG_E("insufficient memory.");
         return RET_ERR;
     }
 
@@ -206,7 +206,7 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, 
 
     if (!AddSession(sess)) {
         cleanTaskWhenError();
-        MMI_LOGE("AddSession fail.");
+        MMI_LOG_E("AddSession fail.");
         return RET_ERR;
     }
     OnConnected(sess);
@@ -233,17 +233,17 @@ void OHOS::MMI::UDSServer::Dump(int32_t fd)
 
 void OHOS::MMI::UDSServer::OnConnected(SessionPtr s)
 {
-    MMI_LOGI("UDSServer::OnConnected session desc:%{public}s", s->GetDescript().c_str());
+    MMI_LOG_I("UDSServer::OnConnected session desc:%{public}s", s->GetDescript().c_str());
 }
 
 void OHOS::MMI::UDSServer::OnDisconnected(SessionPtr s)
 {
-    MMI_LOGI("UDSServer::OnDisconnected session desc:%{public}s", s->GetDescript().c_str());
+    MMI_LOG_I("UDSServer::OnDisconnected session desc:%{public}s", s->GetDescript().c_str());
 }
 
 int32_t OHOS::MMI::UDSServer::EpollCtlAdd(EpollEventType type, int32_t fd)
 {
-    MMI_LOGE("UDSServer::EpollCtlAdd This information should not exist. Subclasses should implement this function.");
+    MMI_LOG_E("UDSServer::EpollCtlAdd This information should not exist. Subclasses should implement this function.");
     return RET_ERR;
 }
 
@@ -296,7 +296,7 @@ void OHOS::MMI::UDSServer::OnEvent(const epoll_event& ev, CLMAP<int32_t, StreamB
     CHK(maxCount > 0, VAL_NOT_EXP);
     auto fd = ev.data.fd;
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_LOGI("UDSServer::OnEvent fd:%{public}d, ev.events = 0x%{public}x", fd, ev.events);
+        MMI_LOG_I("UDSServer::OnEvent fd:%{public}d, ev.events = 0x%{public}x", fd, ev.events);
         auto secPtr = GetSession(fd);
         if (secPtr) {
             OnDisconnected(secPtr);
@@ -336,7 +336,7 @@ void OHOS::MMI::UDSServer::OnEpollEvent(epoll_event& ev, CLMAP<int32_t, StreamBu
     auto fd = *static_cast<int32_t*>(ev.data.ptr);
     CHK(fd >= 0, INVALID_PARAM);
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_LOGI("UDSServer::OnEpollEvent EPOLLERR or EPOLLHUP fd:%{public}d, ev.events = 0x%{public}x", fd, ev.events);
+        MMI_LOG_I("UDSServer::OnEpollEvent EPOLLERR or EPOLLHUP fd:%{public}d, ev.events = 0x%{public}x", fd, ev.events);
         auto secPtr = GetSession(fd);
         if (secPtr) {
             OnDisconnected(secPtr);
@@ -369,17 +369,17 @@ void OHOS::MMI::UDSServer::OnEpollEvent(epoll_event& ev, CLMAP<int32_t, StreamBu
 
 void OHOS::MMI::UDSServer::DumpSession(const std::string &title)
 {
-    MMI_LOGI("in %s: %s\n", __func__, title.c_str());
+    MMI_LOG_I("in %s: %s\n", __func__, title.c_str());
     int i = 0;
     for (auto& r : sessionsMap_) {
-        MMI_LOGI("%d, %s\n", i, r.second->GetDescript().c_str());
+        MMI_LOG_I("%d, %s\n", i, r.second->GetDescript().c_str());
         i++;
     }
 }
 
 bool OHOS::MMI::UDSServer::AddSession(SessionPtr ses)
 {
-    MMI_LOGI("AddSession begin  pid is %{public}d, fd is %{public}d...", ses->GetPid(), ses->GetFd());
+    MMI_LOG_I("AddSession begin  pid is %{public}d, fd is %{public}d...", ses->GetPid(), ses->GetFd());
     CHKF(ses, OHOS::ERROR_NULL_POINTER);
     auto fd = ses->GetFd();
     CHKF(fd >= 0, VAL_NOT_EXP);
@@ -389,16 +389,16 @@ bool OHOS::MMI::UDSServer::AddSession(SessionPtr ses)
     sessionsMap_[fd] = ses;
     DumpSession("AddSession");
     if (sessionsMap_.size() > MAX_SESSON_ALARM) {
-        MMI_LOGW("Too many clients... Warning Value:%{public}d Current Value:%{public}zd",
+        MMI_LOG_W("Too many clients... Warning Value:%{public}d Current Value:%{public}zd",
                  MAX_SESSON_ALARM, sessionsMap_.size());
     }
-    MMI_LOGI("AddSession end...");
+    MMI_LOG_I("AddSession end...");
     return true;
 }
 
 void OHOS::MMI::UDSServer::DelSession(int32_t fd)
 {
-    MMI_LOGI("DelSession begin  fd is %{public}d...", fd);
+    MMI_LOG_I("DelSession begin  fd is %{public}d...", fd);
     CHK(fd >= 0, PARAM_INPUT_INVALID);
     auto pid = GetPidByFd(fd);
     if (pid > 0) {
@@ -410,7 +410,7 @@ void OHOS::MMI::UDSServer::DelSession(int32_t fd)
         sessionsMap_.erase(it);
     }
     DumpSession("DelSession");
-    MMI_LOGI("DelSession end...");
+    MMI_LOG_I("DelSession end...");
 }
 
 void OHOS::MMI::UDSServer::OnThread()
@@ -418,7 +418,7 @@ void OHOS::MMI::UDSServer::OnThread()
     OHOS::MMI::SetThreadName(std::string("uds_server"));
     uint64_t tid = GetThisThreadIdOfLL();
     CHK(tid > 0, VAL_NOT_EXP);
-    MMI_LOGI("begin... tid:%{public}" PRId64 "", tid);
+    MMI_LOG_I("begin... tid:%{public}" PRId64 "", tid);
     SafeKpr->RegisterEvent(tid, "UDSServer::_OnThread");
 
     CLMAP<int32_t, StreamBufData> bufMap;
@@ -442,7 +442,7 @@ void OHOS::MMI::UDSServer::OnThread()
 #endif // OHOS_BUILD_MMI_DEBUG
         SafeKpr->ReportHealthStatus(tid);
     }
-    MMI_LOGI("end");
+    MMI_LOG_I("end");
 }
 
 #ifdef OHOS_BUILD_MMI_DEBUG
@@ -467,17 +467,17 @@ void OHOS::MMI::UDSServer::HandleCommandQueue()
 
 void OHOS::MMI::UDSServer::AddSessionDeletedCallback(std::function<void(SessionPtr)> callback)
 {
-    MMI_LOGD("Enter");
+    MMI_LOG_D("Enter");
     callbacks_.push_back(callback);
-    MMI_LOGD("Leave");
+    MMI_LOG_D("Leave");
 }
 
 void OHOS::MMI::UDSServer::NotifySessionDeleted(SessionPtr ses)
 {
-    MMI_LOGD("Enter");
+    MMI_LOG_D("Enter");
     for (auto& callback : callbacks_) {
         callback(ses);
     }
-    MMI_LOGD("Leave");
+    MMI_LOG_D("Leave");
 }
 

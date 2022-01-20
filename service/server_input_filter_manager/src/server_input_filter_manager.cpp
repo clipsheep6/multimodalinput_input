@@ -36,15 +36,15 @@ ServerInputFilterManager::PointerEventFilter::PointerEventFilter(int32_t id, std
 void ServerInputFilterManager::DeleteFilterFromSess(SessionPtr sess)
 {
     if (sess == nullptr) {
-        MMI_LOGD("this sess is nullptr");
+        MMI_LOG_D("this sess is nullptr");
         return;
     }
     auto it = keyEventFilterMap_.find(sess);
     if (it == keyEventFilterMap_.end()) {
-        MMI_LOGD("this sess have not any filter");
+        MMI_LOG_D("this sess have not any filter");
     } else {
         keyEventFilterMap_.erase(it);
-        MMI_LOGD("this sess delete filter success");
+        MMI_LOG_D("this sess delete filter success");
     }
 }
 
@@ -93,10 +93,14 @@ void ServerInputFilterManager::OnKeyEventTrace(const EventKeyboard& key)
 
 bool ServerInputFilterManager::OnKeyEvent(EventKeyboard key)
 {
+<<<<<<< HEAD
+    MMI_LOG_D("Key event filter on key event begin");
+=======
     MMI_LOGD("Key event filter on key event begin");
     OnKeyEventTrace(key);
+>>>>>>> 411e1a6ad5bc24bff01ed75b7b8ce1291e27b7a2
     if (keyEventFilterMap_.size() == 0) {
-        MMI_LOGD("The keyEventFilterMap_ size is zero");
+        MMI_LOG_D("The keyEventFilterMap_ size is zero");
         return false;
     }
     SessionPtr temp;
@@ -110,20 +114,20 @@ bool ServerInputFilterManager::OnKeyEvent(EventKeyboard key)
         }
     }
     if (temp == nullptr) {
-        MMI_LOGD("Session is nullptr");
+        MMI_LOG_D("Session is nullptr");
         return false;
     }
     if (id == 0) {
-        MMI_LOGD("Send msg id is 0");
+        MMI_LOG_D("Send msg id is 0");
         return false;
     }
     NetPacket newPkt(MmiMessageId::KEY_EVENT_INTERCEPTOR);
     newPkt << key << id;
     if (!temp->SendMsg(newPkt)) {
-        MMI_LOGE("Sending structure of EventKeyboard failed!");
+        MMI_LOG_E("Sending structure of EventKeyboard failed!");
         return false;
     }
-    MMI_LOGD("Key event filter on key event end");
+    MMI_LOG_D("Key event filter on key event end");
     return true;
 }
 
@@ -131,12 +135,12 @@ int32_t ServerInputFilterManager::AddKeyEventFilter(SessionPtr sess, std::string
 {
     auto  it = keyEventFilterMap_.find(sess);
     if (it == keyEventFilterMap_.end()) {
-        MMI_LOGD("can't find sess");
+        MMI_LOG_D("can't find sess");
         KeyEventFilter keyEventFilter(id, name, authority);
         keyEventFilterMap_.insert(std::pair<SessionPtr, KeyEventFilter>(sess, keyEventFilter));
-        MMI_LOGD("add a key Event filter success");
+        MMI_LOG_D("add a key Event filter success");
     } else if (it->second.GetAuthority() < authority) {
-        MMI_LOGD("add a key Event filter success");
+        MMI_LOG_D("add a key Event filter success");
         it->second.SetAuthority(authority);
         it->second.SetId(id);
         it->second.SetName(name);
@@ -147,10 +151,10 @@ int32_t ServerInputFilterManager::AddKeyEventFilter(SessionPtr sess, std::string
 int32_t ServerInputFilterManager::RemoveKeyEventFilter(SessionPtr sess, int32_t id)
 {
     auto it = keyEventFilterMap_.find(sess);
-    MMI_LOGD("remove  the  id : %{public}d", it->second.GetId());
+    MMI_LOG_D("remove  the  id : %{public}d", it->second.GetId());
     if (it != keyEventFilterMap_.end() && it->second.GetId() == id) {
         keyEventFilterMap_.erase(it);
-        MMI_LOGD("remove a key Event filter success");
+        MMI_LOG_D("remove a key Event filter success");
     }
     return RET_OK;
 }
@@ -253,10 +257,14 @@ bool ServerInputFilterManager::OnTouchEvent(UDSServer& udsServer, libinput_event
     EventTouch& touch, const uint64_t preHandlerTime)
 {
     CHKF(event, PARAM_INPUT_INVALID);
+<<<<<<< HEAD
+    MMI_LOG_D("ServerInputFilterManager::OnTouchEvent");
+=======
     MMI_LOGD("ServerInputFilterManager::OnTouchEvent");
     OnTouchEventTrace(touch);
+>>>>>>> 411e1a6ad5bc24bff01ed75b7b8ce1291e27b7a2
     if (touchEventFilterMap_.size() == 0) {
-        MMI_LOGD("touchEventFilterMap_ size is zero");
+        MMI_LOG_D("touchEventFilterMap_ size is zero");
         return false;
     }
     SessionPtr temp;
@@ -270,11 +278,11 @@ bool ServerInputFilterManager::OnTouchEvent(UDSServer& udsServer, libinput_event
         }
     }
     if (temp == nullptr) {
-        MMI_LOGD("session  is nullptr");
+        MMI_LOG_D("session  is nullptr");
         return false;
     }
     if (id == 0) {
-        MMI_LOGD("send msg  id is 0");
+        MMI_LOG_D("send msg  id is 0");
         return false;
     }
 
@@ -287,10 +295,10 @@ bool ServerInputFilterManager::OnTouchEvent(UDSServer& udsServer, libinput_event
     int32_t touchFocusId = WinMgr->GetTouchFocusSurfaceId();
     auto appInfo = AppRegs->FindByWinId(touchFocusId); // obtain application information
     if (appInfo.fd == RET_ERR) {
-        MMI_LOGT("Failed to find fd:%{public}d... errCode:%{public}d", touchFocusId, FOCUS_ID_OBTAIN_FAIL);
+        MMI_LOG_T("Failed to find fd:%{public}d... errCode:%{public}d", touchFocusId, FOCUS_ID_OBTAIN_FAIL);
         return false;
     }
-    MMI_LOGD("DispatchTouchEvent focusId:%{public}d fd:%{public}d", touchFocusId, appInfo.fd);
+    MMI_LOG_D("DispatchTouchEvent focusId:%{public}d fd:%{public}d", touchFocusId, appInfo.fd);
 
     int32_t testConnectState = 0;
     int32_t testBufferState = 0;
@@ -315,7 +323,7 @@ bool ServerInputFilterManager::OnTouchEvent(UDSServer& udsServer, libinput_event
                 CHKR(EOK == memcpy_s(&touchTemp, sizeof(touchTemp), &touch, sizeof(touch)),
                      MEMCPY_SEC_FUN_FAIL, RET_ERR);
                 MMIRegEvent->GetTouchInfoByTouchId(touchTemp, touchId);
-                MMI_LOGT("\n4.event filter of server 1:\neventTouch:time=%{public}" PRId64 ";deviceType=%{public}u;"
+                MMI_LOG_T("\n4.event filter of server 1:\neventTouch:time=%{public}" PRId64 ";deviceType=%{public}u;"
                          "deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
                          "slot=%{public}d;seat_slot=%{public}d;pressure=%{public}lf;point.x=%{public}lf;"
                          "point.y=%{public}lf;fd=%{public}d;"
@@ -329,7 +337,7 @@ bool ServerInputFilterManager::OnTouchEvent(UDSServer& udsServer, libinput_event
         }
         if (touch.eventType == LIBINPUT_EVENT_TOUCH_UP) {
             newPacket << touch;
-            MMI_LOGT("\n4.event filter of server 2:\neventTouch:time=%{public}" PRId64 ";deviceType=%{public}u;"
+            MMI_LOG_T("\n4.event filter of server 2:\neventTouch:time=%{public}" PRId64 ";deviceType=%{public}u;"
                      "deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
                      "slot=%{public}d;seat_slot=%{public}d;pressure=%{public}lf;point.x=%{public}lf;"
                      "point.y=%{public}lf;fd=%{public}d;"
@@ -340,7 +348,7 @@ bool ServerInputFilterManager::OnTouchEvent(UDSServer& udsServer, libinput_event
         }
         newPacket << id;
         if (!temp->SendMsg(newPacket)) {
-            MMI_LOGE("Sending Interceptor EventTouch failed!: session.fd = %{public}d \n", temp->GetFd());
+            MMI_LOG_E("Sending Interceptor EventTouch failed!: session.fd = %{public}d \n", temp->GetFd());
             return false;
         }
     }
@@ -350,7 +358,7 @@ bool ServerInputFilterManager::OnTouchEvent(UDSServer& udsServer, libinput_event
 int32_t ServerInputFilterManager::AddTouchEventFilter(SessionPtr sess, std::string name, int32_t id,
     Authority authority)
 {
-    MMI_LOGE("ServerInputFilterManager::AddTouchEventFilter");
+    MMI_LOG_E("ServerInputFilterManager::AddTouchEventFilter");
     auto iter = touchEventFilterMap_.find(sess);
     if (iter != touchEventFilterMap_.end()) {
         if (iter->second.GetAuthority() < authority) {
@@ -358,22 +366,22 @@ int32_t ServerInputFilterManager::AddTouchEventFilter(SessionPtr sess, std::stri
             iter->second.SetId(id);
             iter->second.SetName(name);
         }
-        MMI_LOGT("replace a touch filter success");
+        MMI_LOG_T("replace a touch filter success");
         return RET_OK;
     }
     TouchEventFilter touchEventFilter(id, name, authority);
     touchEventFilterMap_.insert(std::pair<SessionPtr, TouchEventFilter>(sess, touchEventFilter));
-    MMI_LOGE("add a touch filter success");
+    MMI_LOG_E("add a touch filter success");
     return RET_OK;
 }
 
 int32_t ServerInputFilterManager::RemoveTouchEventFilter(SessionPtr sess, int32_t id)
 {
-    MMI_LOGE("ServerInputFilterManager::RemoveTouchEventFilter");
+    MMI_LOG_E("ServerInputFilterManager::RemoveTouchEventFilter");
     auto iter = touchEventFilterMap_.find(sess);
     if (iter != touchEventFilterMap_.end() && iter->second.GetId() == id) {
         touchEventFilterMap_.erase(sess);
-        MMI_LOGE("Remove a touch filter success");
+        MMI_LOG_E("Remove a touch filter success");
     }
     return RET_OK;
 }
@@ -381,13 +389,13 @@ int32_t ServerInputFilterManager::RemoveTouchEventFilter(SessionPtr sess, int32_
 int32_t ServerInputFilterManager::RemoveTouchEventFilter(SessionPtr sess)
 {
     if (sess == nullptr) {
-        MMI_LOGE("this sess is nullptr");
+        MMI_LOG_E("this sess is nullptr");
         return RET_ERR;
     }
     auto iter = touchEventFilterMap_.find(sess);
     if (iter != touchEventFilterMap_.end()) {
         touchEventFilterMap_.erase(sess);
-        MMI_LOGE("this sess delete filter success");
+        MMI_LOG_E("this sess delete filter success");
     }
     return RET_OK;
 }
@@ -407,10 +415,14 @@ void ServerInputFilterManager::OnPointerEventTrace(const EventPointer& event_poi
 
 bool ServerInputFilterManager::OnPointerEvent(EventPointer event_pointer)
 {
+<<<<<<< HEAD
+    MMI_LOG_D("pointer event filter on pointer event begin");
+=======
     MMI_LOGD("pointer event filter on pointer event begin");
     OnPointerEventTrace(event_pointer);
+>>>>>>> 411e1a6ad5bc24bff01ed75b7b8ce1291e27b7a2
     if (pointerEventFilterMap_.size() == 0) {
-        MMI_LOGD("pointerEventFilterMap_ size is zero");
+        MMI_LOG_D("pointerEventFilterMap_ size is zero");
         return false;
     }
     SessionPtr ptr;
@@ -424,20 +436,20 @@ bool ServerInputFilterManager::OnPointerEvent(EventPointer event_pointer)
         }
     }
     if (ptr == nullptr) {
-        MMI_LOGD("session is nullptr");
+        MMI_LOG_D("session is nullptr");
         return false;
     }
     if (id == 0) {
-        MMI_LOGD("send msg  id is 0");
+        MMI_LOG_D("send msg  id is 0");
         return false;
     }
     NetPacket newPkt(MmiMessageId::POINTER_EVENT_INTERCEPTOR);
     newPkt << event_pointer << id;
     if (!ptr->SendMsg(newPkt)) {
-        MMI_LOGE("Sending structure of pointer failed! \n");
+        MMI_LOG_E("Sending structure of pointer failed! \n");
         return false;
     }
-    MMI_LOGD("pointer event interceptor on pointer event end");
+    MMI_LOG_D("pointer event interceptor on pointer event end");
     return true;
 }
 
@@ -446,12 +458,12 @@ int32_t ServerInputFilterManager::RegisterEventInterceptorforServer(const Sessio
 {
     auto it = pointerEventFilterMap_.find(sess);
     if (it == pointerEventFilterMap_.end()) {
-        MMI_LOGD("can't find sess");
+        MMI_LOG_D("can't find sess");
         PointerEventFilter pointerEventFilter(id, name, authority);
         pointerEventFilterMap_.insert(std::pair<SessionPtr, PointerEventFilter>(sess, pointerEventFilter));
-        MMI_LOGD("add pointer event interceptor success");
+        MMI_LOG_D("add pointer event interceptor success");
     } else if (it->second.GetAuthority() < authority) {
-        MMI_LOGD("add pointer event interceptor success");
+        MMI_LOG_D("add pointer event interceptor success");
         it->second.SetAuthority(authority);
         it->second.SetId(id);
         it->second.SetName(name);
@@ -462,10 +474,10 @@ int32_t ServerInputFilterManager::RegisterEventInterceptorforServer(const Sessio
 int32_t ServerInputFilterManager::UnregisterEventInterceptorforServer(const SessionPtr& sess, int32_t id)
 {
     auto it = pointerEventFilterMap_.find(sess);
-    MMI_LOGD("remove  the  id : %{public}d", it->second.GetId());
+    MMI_LOG_D("remove  the  id : %{public}d", it->second.GetId());
     if (it != pointerEventFilterMap_.end() && it->second.GetId() == id) {
         pointerEventFilterMap_.erase(it);
-        MMI_LOGD("remove pointer Event interceptor success");
+        MMI_LOG_D("remove pointer Event interceptor success");
     }
     return RET_OK;
 }
@@ -473,15 +485,15 @@ int32_t ServerInputFilterManager::UnregisterEventInterceptorforServer(const Sess
 void ServerInputFilterManager::DeleteInterceptorFormSess(const SessionPtr& sess)
 {
     if (sess == nullptr) {
-        MMI_LOGD("This SessionPtr is nullptr");
+        MMI_LOG_D("This SessionPtr is nullptr");
         return;
     }
     auto it = pointerEventFilterMap_.find(sess);
     if (it == pointerEventFilterMap_.end()) {
-        MMI_LOGD("This sess have not any interceptor");
+        MMI_LOG_D("This sess have not any interceptor");
     } else {
         pointerEventFilterMap_.erase(it);
-        MMI_LOGD("This interceptor deleted suceess");
+        MMI_LOG_D("This interceptor deleted suceess");
     }
 }
 

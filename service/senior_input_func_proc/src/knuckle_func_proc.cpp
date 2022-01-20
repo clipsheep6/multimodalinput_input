@@ -28,11 +28,11 @@ using namespace OHOS::MMI;
 int32_t OHOS::MMI::KnuckleFuncProc::DeviceEventDispatchProcess(const RawInputEvent &event)
 {
     if (CheckEventCode(event) == RET_ERR) {
-        MMI_LOGE("knuckle event.code error. event.code: %{public}d", event.ev_code);
+        MMI_LOG_E("knuckle event.code error. event.code: %{public}d", event.ev_code);
         return RET_ERR;
     }
     if (DeviceEventProcess(event) == RET_ERR) {
-        MMI_LOGE("knuckle device event process fail");
+        MMI_LOG_E("knuckle device event process fail");
         return RET_ERR;
     }
     return RET_OK;

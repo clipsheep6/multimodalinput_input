@@ -61,7 +61,7 @@ void InputDeviceManager::FindDeviceByIdAsync(int32_t deviceId,
 
 std::vector<int32_t> InputDeviceManager::GetDeviceIdListSync(weston_compositor* wc)
 {
-    MMI_LOGI("GetDeviceIdList enter");
+    MMI_LOG_I("GetDeviceIdList enter");
     Init(wc);
     std::vector<int32_t> deviceIdList;
     for (auto it : inputDeviceMap_) {
@@ -72,7 +72,7 @@ std::vector<int32_t> InputDeviceManager::GetDeviceIdListSync(weston_compositor* 
 
 std::shared_ptr<InputDevice> InputDeviceManager::FindDeviceByIdSync(weston_compositor* wc, int32_t deviceId)
 {
-    MMI_LOGI("FindDeviceByIdSync enter");
+    MMI_LOG_I("FindDeviceByIdSync enter");
     Init(wc);
     auto item = inputDeviceMap_.find(deviceId);
     if (item == inputDeviceMap_.end()) {
@@ -93,16 +93,16 @@ std::shared_ptr<InputDevice> InputDeviceManager::FindDeviceByIdSync(weston_compo
 
 std::shared_ptr<InputDevice> InputDeviceManager::GetDevice(int32_t id)
 {
-    MMI_LOGI("FindDeviceById enter");
+    MMI_LOG_I("FindDeviceById enter");
     auto item = inputDeviceMap_.find(id);
     if (item == inputDeviceMap_.end()) {
-        MMI_LOGE("find device by id failed");
+        MMI_LOG_E("find device by id failed");
         return nullptr;
     }
 
     std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
     if (inputDevice == nullptr) {
-        MMI_LOGE("create InputDevice ptr failed");
+        MMI_LOG_E("create InputDevice ptr failed");
         return nullptr;
     }
     inputDevice->SetId(item->first);
@@ -117,7 +117,7 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetDevice(int32_t id)
 
 std::vector<int32_t> InputDeviceManager::GetDeviceIds()
 {
-    MMI_LOGI("GetDeviceIdList enter");
+    MMI_LOG_I("GetDeviceIdList enter");
     std::vector<int32_t> deviceIdList;
     for (const auto &it : inputDeviceMap_) {
         deviceIdList.push_back(it.first);
@@ -127,7 +127,7 @@ std::vector<int32_t> InputDeviceManager::GetDeviceIds()
 
 void InputDeviceManager::OnInputDeviceAdded(libinput_device* inputDevice)
 {
-    MMI_LOGI("OnInputDeviceAdded enter");
+    MMI_LOG_I("OnInputDeviceAdded enter");
 #ifdef OHOS_WESTEN_MODEL
     if (initFlag_) {
         return;
@@ -149,7 +149,7 @@ void InputDeviceManager::OnInputDeviceAdded(libinput_device* inputDevice)
 
 void InputDeviceManager::OnInputDeviceRemoved(libinput_device* inputDevice)
 {
-    MMI_LOGI("OnInputDeviceRemoved enter");
+    MMI_LOG_I("OnInputDeviceRemoved enter");
 #ifdef OHOS_WESTEN_MODEL
     if (initFlag_) {
         return;
@@ -169,25 +169,25 @@ void InputDeviceManager::OnInputDeviceRemoved(libinput_device* inputDevice)
 bool InputDeviceManager::IsPointerDevice(struct libinput_device* device)
 {
     enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
-    MMI_LOGD("udev tag is%{public}d", static_cast<int32_t>(udevTags));
+    MMI_LOG_D("udev tag is%{public}d", static_cast<int32_t>(udevTags));
     return udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK | 
     EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD);
 }
 
 int32_t InputDeviceManager::FindInputDeviceId(libinput_device* inputDevice)
 {
-    MMI_LOGI("begin");
+    MMI_LOG_I("begin");
     if (inputDevice == nullptr) {
-        MMI_LOGI("Libinput_device is nullptr");
+        MMI_LOG_I("Libinput_device is nullptr");
         return -1;
     }
     for (const auto& it : inputDeviceMap_) {
         if (static_cast<struct libinput_device *>(it.second) == inputDevice) {
-            MMI_LOGI("Find input device id success");
+            MMI_LOG_I("Find input device id success");
             return it.first;
         }
     }
-    MMI_LOGI("Find input device id failed");
+    MMI_LOG_I("Find input device id failed");
     return -1;
 }
 }

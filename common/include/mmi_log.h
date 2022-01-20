@@ -26,31 +26,31 @@ namespace {
 static constexpr HiviewDFX::HiLogLabel MMI_COMMON_LABEL = { LOG_CORE, COMMON, "MMI" };
 const std::string DOUBLE_COLON = "::";
 #if defined(DEBUG)
-#define MMI_LOGD(fmt, ...) \
+#define MMI_LOG_D(fmt, ...) \
     OHOS::HiviewDFX::HiLog::Debug(MMI_COMMON_LABEL, "File:%{public}s, Line:%{public}d, Function:%{public}s" fmt, \
                                                            __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__)
-#define MMI_LOGI(fmt, ...) \
+#define MMI_LOG_I(fmt, ...) \
     OHOS::HiviewDFX::HiLog::Info(MMI_COMMON_LABEL, "File:%{public}s, Line:%{public}d, Function:%{public}s" fmt, \
                                                           __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__)
-#define MMI_LOGW(fmt, ...) \
+#define MMI_LOG_W(fmt, ...) \
     OHOS::HiviewDFX::HiLog::Warn(MMI_COMMON_LABEL, "File:%{public}s, Line:%{public}d, Function:%{public}s" fmt, \
                                                           __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__)
-#define MMI_LOGE(fmt, ...) \
+#define MMI_LOG_E(fmt, ...) \
     OHOS::HiviewDFX::HiLog::Error(MMI_COMMON_LABEL, "File:%{public}s, Line:%{public}d, Function:%{public}s" fmt, \
                                                            __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__)
-#define MMI_LOGF(fmt, ...) \
+#define MMI_LOG_F(fmt, ...) \
     OHOS::HiviewDFX::HiLog::Fatal(MMI_COMMON_LABEL, "File:%{public}s, Line:%{public}d, Function:%{public}s" fmt, \
                                                            __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__)
 #else
-#define MMI_LOGD(fmt, ...) \
+#define MMI_LOG_D(fmt, ...) \
     OHOS::HiviewDFX::HiLog::Debug(MMI_COMMON_LABEL, "%{public}s: " fmt, __FUNCTION__, ##__VA_ARGS__)
-#define MMI_LOGI(fmt, ...) \
+#define MMI_LOG_I(fmt, ...) \
     OHOS::HiviewDFX::HiLog::Info(MMI_COMMON_LABEL, "%{public}s: " fmt, __FUNCTION__, ##__VA_ARGS__)
-#define MMI_LOGW(fmt, ...) \
+#define MMI_LOG_W(fmt, ...) \
     OHOS::HiviewDFX::HiLog::Warn(MMI_COMMON_LABEL, "%{public}s: " fmt, __FUNCTION__, ##__VA_ARGS__)
-#define MMI_LOGE(fmt, ...) \
+#define MMI_LOG_E(fmt, ...) \
     OHOS::HiviewDFX::HiLog::Error(MMI_COMMON_LABEL, "%{public}s: " fmt, __FUNCTION__, ##__VA_ARGS__)
-#define MMI_LOGF(fmt, ...) \
+#define MMI_LOG_F(fmt, ...) \
     OHOS::HiviewDFX::HiLog::Fatal(MMI_COMMON_LABEL, "%{public}s: " fmt, __FUNCTION__, ##__VA_ARGS__)
 #endif
 }  // namespace OHOS

@@ -59,7 +59,7 @@ void CheckDefineOutput(const char* fmt, Ts... args)
     }
 
     KMSG_LOGI("%s", buf);
-    MMI_LOGI("%{public}s", buf);
+    MMI_LOG_I("%{public}s", buf);
 }
 
 static void CheckDefine()
@@ -105,7 +105,7 @@ int32_t MMIService::EpollCtlAdd(EpollEventType type, int32_t fd)
     CHKR(ed, MALLOC_FAIL, RET_ERR);
     ed->fd = fd;
     ed->event_type = type;
-    MMI_LOGD("MMIService::EpollCtlAdd userdata:[fd:%{public}d, type:%{public}d]", ed->fd, ed->event_type);
+    MMI_LOG_D("MMIService::EpollCtlAdd userdata:[fd:%{public}d, type:%{public}d]", ed->fd, ed->event_type);
 
     epoll_event ev = {};
     ev.events = EPOLLIN;
@@ -132,7 +132,7 @@ bool MMIService::ChkAuthFd(int32_t fd) const
 bool MMIService::InitLibinputService()
 {
 #ifdef OHOS_BUILD_HDF
-    MMI_LOGD("HDF Init");
+    MMI_LOG_D("HDF Init");
     hdfEventManager.SetupCallback();
 #endif
     CHKF(input_.Init(std::bind(&InputEventHandler::OnEvent, inputEventHdr_, std::placeholders::_1),
@@ -140,11 +140,11 @@ bool MMIService::InitLibinputService()
     auto inputFd = input_.GetInputFd();
     auto ret = EpollCtlAdd(EPOLL_EVENT_INPUT, inputFd);
     if (ret <  0) {
-        MMI_LOGE("InitLibinputService EpollCtlAdd error ret = %{public}d", ret);
+        MMI_LOG_E("InitLibinputService EpollCtlAdd error ret = %{public}d", ret);
         EpollClose();
         return false;
     }
-    MMI_LOGD("MMIService::InitLibinputService EpollCtlAdd, epollfd:%{public}d fd:%{public}d", mmiFd_, inputFd);
+    MMI_LOG_D("MMIService::InitLibinputService EpollCtlAdd, epollfd:%{public}d fd:%{public}d", mmiFd_, inputFd);
     return true;
 }
 
@@ -155,17 +155,17 @@ bool MMIService::InitSAService()
     CHKF(EpollCreat(MAX_EVENT_SIZE) >= 0, SASERVICE_INIT_FAIL);
     auto ret = EpollCtlAdd(EPOLL_EVENT_SOCKET, epollFd_);
     if (ret <  0) {
-        MMI_LOGE("InitSAService EpollCtlAdd error ret = %{public}d", ret);
+        MMI_LOG_E("InitSAService EpollCtlAdd error ret = %{public}d", ret);
         EpollClose();
         return false;
     }
-    MMI_LOGD("MMIService::InitLibinputService EpollCtlAdd, epollfd:%{public}d fd:%{public}d", mmiFd_, epollFd_);
+    MMI_LOG_D("MMIService::InitLibinputService EpollCtlAdd, epollfd:%{public}d fd:%{public}d", mmiFd_, epollFd_);
     return true;
 }
 
 bool MMIService::InitExpSoLibrary()
 {
-    MMI_LOGD("Load Expansibility Operation");
+    MMI_LOG_D("Load Expansibility Operation");
     auto expConf = GetEnv("EXP_CONF");
     if (expConf.empty()) {
         expConf = DEF_EXP_CONFIG;
@@ -185,28 +185,28 @@ int32_t MMIService::Init()
     CHKR(InitExpSoLibrary(), EXP_SO_LIBY_INIT_FAIL, EXP_SO_LIBY_INIT_FAIL);
 
 #ifdef  OHOS_BUILD_AI
-    MMI_LOGD("SeniorInput Init");
+    MMI_LOG_D("SeniorInput Init");
     CHKR(seniorInput_.Init(*this), SENIOR_INPUT_DEV_INIT_FAIL, SENIOR_INPUT_DEV_INIT_FAIL);
     sMsgHandler_.SetSeniorInputHandle(seniorInput_);
 #endif // OHOS_BUILD_AI
 
-    MMI_LOGD("InputEventHandler Init");
+    MMI_LOG_D("InputEventHandler Init");
     inputEventHdr_ = OHOS::MMI::InputEventHandler::GetInstance();
     CHKR(inputEventHdr_->Init(*this), INPUT_EVENT_HANDLER_INIT_FAIL, INPUT_EVENT_HANDLER_INIT_FAIL);
 
-    MMI_LOGD("ServerMsgHandler Init");
+    MMI_LOG_D("ServerMsgHandler Init");
     CHKR(sMsgHandler_.Init(*this), SVR_MSG_HANDLER_INIT_FAIL, SVR_MSG_HANDLER_INIT_FAIL);
 
-    MMI_LOGD("EventDump Init");
+    MMI_LOG_D("EventDump Init");
     MMIEventDump->Init(*this);
 
-    MMI_LOGD("WindowsManager Init");
+    MMI_LOG_D("WindowsManager Init");
     CHKR(WinMgr->Init(*this), WINDOWS_MSG_INIT_FAIL, WINDOWS_MSG_INIT_FAIL);
 
-    MMI_LOGD("AppRegister Init");
+    MMI_LOG_D("AppRegister Init");
     CHKR(AppRegs->Init(*this), APP_REG_INIT_FAIL, APP_REG_INIT_FAIL);
 
-    MMI_LOGD("DeviceRegister Init");
+    MMI_LOG_D("DeviceRegister Init");
     CHKR(DevRegister->Init(), DEV_REG_INIT_FAIL, DEV_REG_INIT_FAIL);
 
     mmiFd_ = EpollCreat(MAX_EVENT_SIZE);
@@ -220,12 +220,12 @@ int32_t MMIService::Init()
 void MMIService::OnStart()
 {
     auto tid = GetThisThreadIdOfLL();
-    MMI_LOGD("SA_OnStart Thread tid:%{public}" PRId64 "", tid);
+    MMI_LOG_D("SA_OnStart Thread tid:%{public}" PRId64 "", tid);
 
     int32_t ret = 0;
     CHK((RET_OK == (ret = Init())), ret);
     state_ = ServiceRunningState::STATE_RUNNING;
-    MMI_LOGD("MMIService Started successfully...");
+    MMI_LOG_D("MMIService Started successfully...");
     t_ = std::thread(std::bind(&MMIService::OnThread, this));
     t_.detach();
 }
@@ -233,7 +233,7 @@ void MMIService::OnStart()
 void MMIService::OnStop()
 {
     auto tid = GetThisThreadIdOfLL();
-    MMI_LOGD("SA_OnStop Thread tid:%{public}" PRId64 "", tid);
+    MMI_LOG_D("SA_OnStop Thread tid:%{public}" PRId64 "", tid);
 
     UdsStop();
     RegEventHM->Clear();
@@ -247,7 +247,7 @@ void MMIService::OnStop()
 void MMIService::OnDump()
 {
     auto tid = GetThisThreadIdOfLL();
-    MMI_LOGD("SA_OnDump Thread tid:%{public}" PRId64 "", tid);
+    MMI_LOG_D("SA_OnDump Thread tid:%{public}" PRId64 "", tid);
     MMIEventDump->Dump();
 }
 
@@ -255,14 +255,14 @@ void MMIService::OnConnected(SessionPtr s)
 {
     CHK(s, ERROR_NULL_POINTER);
     int32_t fd = s->GetFd();
-    MMI_LOGI("MMIService::_OnConnected fd:%{public}d", fd);
+    MMI_LOG_I("MMIService::_OnConnected fd:%{public}d", fd);
     AppRegs->RegisterConnectState(fd);
 }
 
 void MMIService::OnDisconnected(SessionPtr s)
 {
     CHK(s, ERROR_NULL_POINTER);
-    MMI_LOGW("MMIService::OnDisconnected enter, session desc:%{public}s", s->GetDescript().c_str());
+    MMI_LOG_W("MMIService::OnDisconnected enter, session desc:%{public}s", s->GetDescript().c_str());
     int32_t fd = s->GetFd();
 
     auto appInfo = AppRegs->FindBySocketFd(fd);
@@ -274,7 +274,7 @@ void MMIService::OnDisconnected(SessionPtr s)
 
 int32_t MMIService::AllocSocketFd(const std::string &programName, const int moduleType, int &toReturnClientFd)
 {
-    MMI_LOGI("MMIService::AllocSocketFd enter, programName: %{public}s, moduleType: %{public}d",
+    MMI_LOG_I("MMIService::AllocSocketFd enter, programName: %{public}s, moduleType: %{public}d",
              programName.c_str(), moduleType);
 
     toReturnClientFd = INVALID_SOCKET_FD;
@@ -283,7 +283,7 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int modu
     int32_t pid = GetCallingPid();
     const int32_t ret = AddSocketPairInfo(programName, moduleType, serverFd, toReturnClientFd, uid, pid);
     if (ret != RET_OK) {
-        MMI_LOGE("call AddSocketPairInfo return %{public}d.", ret);
+        MMI_LOG_E("call AddSocketPairInfo return %{public}d.", ret);
         return RET_ERR;
     }
 
@@ -298,33 +298,33 @@ int32_t MMIService::HandleAllocSocketFd(MessageParcel& data, MessageParcel& repl
     int32_t ret = RET_OK;
     sptr<ConnectDefReqParcel> req = data.ReadParcelable<ConnectDefReqParcel>();
     if (req == nullptr) {
-        MMI_LOGE("read data error.");
+        MMI_LOG_E("read data error.");
         return RET_ERR;
     }
 
     MMI_LOGIK("clientName = %{public}s, moduleId = %{public}d", req->data.clientName.c_str(), req->data.moduleId);
     if (!IsAuthorizedCalling()) {
-        MMI_LOGE("permission denied");
+        MMI_LOG_E("permission denied");
         return RET_ERR;
     }
 
     int clientFd = INVALID_SOCKET_FD;
     ret = AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd);
     if (ret != RET_OK) {
-        MMI_LOGE("call AddSocketPairInfo return %{public}d.", ret);
+        MMI_LOG_E("call AddSocketPairInfo return %{public}d.", ret);
         reply.WriteInt32(RET_ERR);
         return RET_ERR;
     }
 
-    MMI_LOGI("call AllocSocketFd success.");
+    MMI_LOG_I("call AllocSocketFd success.");
 
     reply.WriteInt32(RET_OK);
     reply.WriteFileDescriptor(clientFd);
 
-    MMI_LOGI("send clientFd to client, clientFd = %d", clientFd);
+    MMI_LOG_I("send clientFd to client, clientFd = %d", clientFd);
     close(clientFd);
     clientFd = -1;
-    MMI_LOGI(" clientFd = %d, has closed in server", clientFd);
+    MMI_LOG_I(" clientFd = %d, has closed in server", clientFd);
 
     return RET_OK;
 }
@@ -332,7 +332,7 @@ int32_t MMIService::HandleAllocSocketFd(MessageParcel& data, MessageParcel& repl
 int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter)
 {
     if (inputEventHdr_ == nullptr) {
-        MMI_LOGE("inputEventHdr_ is nullptr");
+        MMI_LOG_E("inputEventHdr_ is nullptr");
         return ERROR_NULL_POINTER;
     }
 
@@ -353,7 +353,7 @@ void MMIService::OnThread()
     OHOS::MMI::SetThreadName(std::string("mmi_service"));
     uint64_t tid = GetThisThreadIdOfLL();
     CHK(tid > 0, VAL_NOT_EXP);
-    MMI_LOGI("Main worker thread start... tid:%{public}" PRId64 "", tid);
+    MMI_LOG_I("Main worker thread start... tid:%{public}" PRId64 "", tid);
     SafeKpr->RegisterEvent(tid, "mmi_service");
 
     int32_t count = 0;
@@ -381,7 +381,7 @@ void MMIService::OnThread()
         SafeKpr->ReportHealthStatus(tid);
         OnTimer();
     }
-    MMI_LOGI("Main worker thread stop... tid:%{public}" PRId64 "", tid);
+    MMI_LOG_I("Main worker thread stop... tid:%{public}" PRId64 "", tid);
 }
 
 }

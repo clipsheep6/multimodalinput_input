@@ -54,7 +54,7 @@ int32_t OHOS::MMI::ExpansibilityOperation::GetNewDeviceFd(const std::string& fil
     filePath.append(libPath_).append(fileName);
     void *libmHandle = dlopen(filePath.c_str(), RTLD_LAZY);
     if (libmHandle == nullptr) {
-        MMI_LOGE("Open Error:%{public}s.", dlerror());
+        MMI_LOG_E("Open Error:%{public}s.", dlerror());
         return -1;
     }
 
@@ -63,7 +63,7 @@ int32_t OHOS::MMI::ExpansibilityOperation::GetNewDeviceFd(const std::string& fil
     initDeviceInfo = reinterpret_cast<int32_t(*)()>(dlsym(libmHandle, "initDeviceInfo"));
     char *errorInfo = dlerror();
     if (errorInfo != nullptr) {
-        MMI_LOGE("Dlsym Error:%{public}s.", errorInfo);
+        MMI_LOG_E("Dlsym Error:%{public}s.", errorInfo);
         dlclose(libmHandle);
         return -1;
     }
@@ -71,7 +71,7 @@ int32_t OHOS::MMI::ExpansibilityOperation::GetNewDeviceFd(const std::string& fil
     // get event fd
     int32_t deviceEventFd = (*initDeviceInfo)();
     if (deviceEventFd > 0) {
-        MMI_LOGE("get new device failed. errCode:%{public}d", ILLEGAL_DEV_ID);
+        MMI_LOG_E("get new device failed. errCode:%{public}d", ILLEGAL_DEV_ID);
         dlclose(libmHandle);
         return -1;
     }
@@ -88,7 +88,7 @@ void OHOS::MMI::ExpansibilityOperation::LoadExteralLibrary(const std::string& cf
     libPath_ = libPath;
     std::ifstream labels(cfg.c_str());
     if (!labels.is_open()) {
-        MMI_LOGE("Can't open the label file![%{public}s] errCode:%{public}d", cfg.c_str(), FILE_OPEN_FAIL);
+        MMI_LOG_E("Can't open the label file![%{public}s] errCode:%{public}d", cfg.c_str(), FILE_OPEN_FAIL);
         return;
     }
 
@@ -103,7 +103,7 @@ void OHOS::MMI::ExpansibilityOperation::LoadExteralLibrary(const std::string& cf
         int32_t deviceEventFd = GetNewDeviceFd(fileName);
         // regist new fd
         if (!RegistDeviceEventFd(deviceEventFd)) {
-            MMI_LOGE("regist new device failed. file name:%{public}s errCode:%{public}d",
+            MMI_LOG_E("regist new device failed. file name:%{public}s errCode:%{public}d",
                      fileName.c_str(), DEV_REG_FAIL);
             return;
         }
@@ -113,7 +113,7 @@ void OHOS::MMI::ExpansibilityOperation::LoadExteralLibrary(const std::string& cf
 
 bool OHOS::MMI::ExpansibilityOperation::RegistDeviceEventFd(int32_t deviceEventFd)
 {
-    MMI_LOGD("The New Device fd:[%{public}d]", deviceEventFd);
+    MMI_LOG_D("The New Device fd:[%{public}d]", deviceEventFd);
     return true;
 }
 
