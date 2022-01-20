@@ -16,14 +16,21 @@
 #include "input_event.h"
 #include <cassert>
 #include <chrono>
+#include "hilog/log.h"
 
+using namespace OHOS::HiviewDFX;
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr HiLogLabel LABEL = { LOG_CORE, 0xD002800, "InputEvent" };
+}
+
 static int32_t g_nextEventId = 1;
 const int32_t InputEvent::EVENT_TYPE_KEY;
 const int32_t InputEvent::EVENT_TYPE_POINTER;
 InputEvent::InputEvent(int32_t eventType) : eventType_(eventType), id_(g_nextEventId++)
 {
+    HiLog::Debug(LABEL, "crash 3");
     Init();
 }
 
@@ -31,6 +38,7 @@ InputEvent::~InputEvent() {}
 
 void InputEvent::Init()
 {
+    HiLog::Debug(LABEL, "crash 4");
     int32_t conversionStep = 1000000;
     struct timespec ts = { 0, 0 };
     if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
@@ -46,10 +54,12 @@ void InputEvent::Init()
     this->targetWindowId_ = DEFALUTID;
     this->agentWindowId_ = DEFALUTID;
     this->flag_ = 0;
+    HiLog::Debug(LABEL, "crash 5");
 }
 
 std::shared_ptr<InputEvent> InputEvent::Create()
 {
+    HiLog::Debug(LABEL, "crash 6");
     return std::shared_ptr<InputEvent>(new InputEvent(InputEvent::EVENT_TYPE_BASE));
 }
 

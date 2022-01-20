@@ -163,31 +163,40 @@ int32_t InputEventDataTransformation::SerializePointerEvent(std::shared_ptr<Poin
 int32_t InputEventDataTransformation::DeserializePointerEvent(bool skipId,
     std::shared_ptr<PointerEvent> pointerE, NetPacket &pck)
 {
+    MMI_LOGE("crash 9");
     CHKR((RET_OK == DeserializeInputEvent(skipId, pointerE, pck)),
         STREAM_BUF_READ_FAIL, RET_ERR);
-
+    MMI_LOGE("crash 10");
     int32_t tField {  };
     CHKR(pck.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
+    MMI_LOGE("crash 11");
     pointerE->SetPointerAction(tField);
     CHKR(pck.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
+    MMI_LOGE("crash 12");
     pointerE->SetPointerId(tField);
     CHKR(pck.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
+    MMI_LOGE("crash 13");
     pointerE->SetSourceType(tField);
     CHKR(pck.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
+    MMI_LOGE("crash 14");
     pointerE->SetButtonId(tField);
     CHKR(pck.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
+    MMI_LOGE("crash 15");
     double axisValue {  };
     if (PointerEvent::HasAxis(tField, PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)) {
         CHKR(pck.Read(axisValue), STREAM_BUF_READ_FAIL, RET_ERR);
         pointerE->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, axisValue);
+        MMI_LOGE("crash 16");
     }
     if (PointerEvent::HasAxis(tField, PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL)) {
         CHKR(pck.Read(axisValue), STREAM_BUF_READ_FAIL, RET_ERR);
         pointerE->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, axisValue);
+        MMI_LOGE("crash 17");
     }
     if (PointerEvent::HasAxis(tField, PointerEvent::AXIS_TYPE_PINCH)) {
         CHKR(pck.Read(axisValue), STREAM_BUF_READ_FAIL, RET_ERR);
         pointerE->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, axisValue);
+        MMI_LOGE("crash 18");
     }
 
     std::set<int32_t>::size_type nPressed {  };
@@ -195,15 +204,17 @@ int32_t InputEventDataTransformation::DeserializePointerEvent(bool skipId,
     while (nPressed-- > 0) {
         CHKR(pck.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
         pointerE->SetButtonPressed(tField);
+        MMI_LOGE("crash 19");
     }
 
     std::vector<int32_t>::size_type pointerCnt {  };
     CHKR(pck.Read(pointerCnt), STREAM_BUF_READ_FAIL, RET_ERR);
-
+    MMI_LOGE("crash 20");
     while (pointerCnt-- > 0) {
         PointerEvent::PointerItem item;
         CHKR((RET_OK == DeserializePointerItem(item, pck)), STREAM_BUF_READ_FAIL, RET_ERR);
         pointerE->AddPointerItem(item);
+        MMI_LOGE("crash 21");
     }
 
     std::vector<int32_t> pressedKeys;
@@ -212,8 +223,10 @@ int32_t InputEventDataTransformation::DeserializePointerEvent(bool skipId,
     while (pressedKeySize-- > 0) {
         CHKR(pck.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
         pressedKeys.push_back(tField);
+        MMI_LOGE("crash 22");
     }
     pointerE->SetPressedKeys(pressedKeys);
+    MMI_LOGE("crash 23");
     return RET_OK;
 }
 
