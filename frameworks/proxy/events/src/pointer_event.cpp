@@ -239,12 +239,15 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
     return true;
 }
 
-PointerEvent::PointerEvent(int32_t eventType) : InputEvent(eventType) {}
+PointerEvent::PointerEvent(int32_t eventType) : InputEvent(eventType) {
+    HiLog::Debug(LABEL, "crash 7");
+}
 
 PointerEvent::~PointerEvent() {}
 
 std::shared_ptr<PointerEvent> PointerEvent::Create()
 {
+    HiLog::Debug(LABEL, "crash 2");
     return std::shared_ptr<PointerEvent>(new PointerEvent(InputEvent::EVENT_TYPE_POINTER));
 }
 

@@ -185,7 +185,9 @@ int32_t OHOS::MMI::ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPack
 
 int32_t OHOS::MMI::ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt)
 {
+    MMI_LOGE("crash 1");
     auto pointerEvent { OHOS::MMI::PointerEvent::Create() };
+    MMI_LOGE("crash 8");
     if (InputEventDataTransformation::DeserializePointerEvent(false, pointerEvent, pkt) != ERR_OK) {
         MMI_LOGE("Failed to deserialize pointer event.");
         return RET_ERR;
