@@ -832,7 +832,7 @@ const uint16_t pointerID = 1; // mouse has only one PoingeItem, so id is 1
 } */
 
 std::shared_ptr<OHOS::MMI::PointerEvent> EventPackage::LibinputEventToPointerEvent(libinput_event *event,
-                                                                             UDSServer& udsServer)
+                                                                                   UDSServer& udsServer)
 {
     int32_t defaultDeviceId = 0;
     double gestureScale = 0;
