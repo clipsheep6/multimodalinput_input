@@ -23,7 +23,8 @@
 
 namespace OHOS {
 namespace MMI {
-class MouseEventHandler : public DelayedSingleton<MouseEventHandler> {
+class MouseEventHandler : public DelayedSingleton<MouseEventHandler>,
+    public std::enable_shared_from_this<MouseEventHandler> {
 public:
     MouseEventHandler();
     ~MouseEventHandler() = default;

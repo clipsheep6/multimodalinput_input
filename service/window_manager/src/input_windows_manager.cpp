@@ -1030,6 +1030,7 @@ void OHOS::MMI::InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, doub
         MMI_LOGE("logicalDisplayInfo is empty");
         return;
     }
+
     for (uint32_t i = 0; i < logicalDisplayInfo.size(); i++) {
         if (logicalDisplayInfo[i].id >= 0) {
             if (integerX < logicalDisplayInfo[i].topLeftX) {
@@ -1095,6 +1096,7 @@ void OHOS::MMI::InputWindowsManager::SetLocalInfo(int32_t x, int32_t y)
         MMI_LOGE("windowInfo is empty");
         return;
     }
+
     for (auto it = windowInfo.begin(); it != windowInfo.end(); it++) {
         if (it->second.agentWindowId >= 0) {
             if (x < it->second.topLeftX) {
@@ -1129,7 +1131,6 @@ void OHOS::MMI::InputWindowsManager::SetLocalInfo(int32_t x, int32_t y)
             }
         }
     }
-
 }
 
 MouseLocation OHOS::MMI::InputWindowsManager::GetMouseInfo()

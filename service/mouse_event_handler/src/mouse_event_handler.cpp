@@ -93,13 +93,18 @@ void MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
         TimerMgr->ResetTimer(timerId_);
         MMI_LOGD("pointer axis update");
     } else {
-        const int32_t timeout = 100; // 100 ms
-        timerId_ = TimerMgr->AddTimer(timeout, 1, [this]() {
-            MMI_LOGD("enter, timer: %{public}d", timerId_);
+        constexpr int32_t timeout = 100; // 100 ms
+        std::weak_ptr<MouseEventHandler> weakPtr = shared_from_this();
+        timerId_ = TimerMgr->AddTimer(timeout, 1, [weakPtr]() {
+            MMI_LOGT("enter");
+            auto sharedPtr = weakPtr.lock();
+            if (sharedPtr) {
+                return;
+            }
+            MMI_LOGD("timer: %{public}d", sharedPtr->timerId_);
+            sharedPtr->timerId_ = -1;
 
-            timerId_ = -1;
-
-            auto pointerEvent = GetPointerEvent();
+            auto pointerEvent = sharedPtr->GetPointerEvent();
             if (pointerEvent == nullptr) {
                 MMI_LOGE("the pointerEvent is nullptr");
                 return;
