@@ -306,14 +306,6 @@ int32_t OHOS::MMI::InputEventHandler::OnEventDeviceAdded(multimodal_libinput_eve
         return MSG_SEND_FAIL;
     }
 
-    // 设置鼠标事件与按键
-    if (keyEvent == nullptr) {
-        keyEvent = OHOS::MMI::KeyEvent::Create();
-    }
-    if (keyEvent != nulltr) {
-        MouseEventHdr->SetAssociateKeyEvent(keyEvent);
-    }
-
     return RET_OK;
 }
 
@@ -350,9 +342,6 @@ int32_t OHOS::MMI::InputEventHandler::OnEventDeviceRemoved(multimodal_libinput_e
         MMI_LOGE("Sending structure of DeviceManage failed! errCode:%{public}d\n", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
-
-    // 设置鼠标事件与按键
-    MouseEventHdr->SetAssociateKeyEvent(nullptr);
 
     return RET_OK;
 }
@@ -922,6 +911,7 @@ int32_t OHOS::MMI::InputEventHandler::OnMouseEventHandler(libinput_event *event,
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     MMI_LOGD("Libinput Events reported");
+
     // 更新 全局 鼠标事件 数据
     MouseEventHdr->Normalize(event, deviceId);
 

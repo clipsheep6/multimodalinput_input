@@ -38,24 +38,24 @@ std::shared_ptr<PointerEvent> MouseEventHandler::GetPointerEvent()
     return pointerEvent_;
 }
 
-void MouseEventHandler::HandleMotionInner(struct libinput_event_pointer& pointEventData)
+void MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
 {
     MMI_LOGT("enter");
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
 
-    absolutionX_ += libinput_event_pointer_get_dx(libinputPointerEvent);
-    absolutionY_ += libinput_event_pointer_get_dy(libinputPointerEvent);
+    absolutionX_ += libinput_event_pointer_get_dx(data);
+    absolutionY_ += libinput_event_pointer_get_dy(data);
 
     WinMgr->UpdateAndAdjustMouseLoction(absolutionX_, absolutionY_);
 
     MMI_LOGD("Change Coordinate : x:%{public}lf, y:%{public}lf",  absolutionX_, absolutionY_);
 }
 
-void MouseEventHandler::HandleButonInner(struct libinput_event_pointer& pointEventData, PointerEvent::PointerItem& pointerItem)
+void MouseEventHandler::HandleButonInner(libinput_event_pointer* data, PointerEvent::PointerItem& pointerItem)
 {
     MMI_LOGT("enter, current action: %{public}d", pointerEvent_->GetPointerAction());
 
-    auto button = libinput_event_pointer_get_button(&pointEventData);
+    auto button = libinput_event_pointer_get_button(data);
     if (button == BTN_LEFT) {
         pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
     } else if (button == BTN_RIGHT) {
@@ -66,7 +66,7 @@ void MouseEventHandler::HandleButonInner(struct libinput_event_pointer& pointEve
         MMI_LOGW("unknown btn, btn: %{public}u", button);
     }
 
-    auto state = libinput_event_pointer_get_button_state(&pointEventData);
+    auto state = libinput_event_pointer_get_button_state(data);
     if (state == LIBINPUT_BUTTON_STATE_RELEASED) {
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);        
         pointerEvent_->SetButtonId(PointerEvent::BUTTON_NONE);
@@ -82,7 +82,7 @@ void MouseEventHandler::HandleButonInner(struct libinput_event_pointer& pointEve
     MouseState->CountState(button, state);
 }
 
-void MouseEventHandler::HandleAxisInner(struct libinput_event_pointer& data)
+void MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
 {
     MMI_LOGT("enter");
 
@@ -112,17 +112,17 @@ void MouseEventHandler::HandleAxisInner(struct libinput_event_pointer& data)
         MMI_LOGD("pointer axis begin");
     }
 
-    if (libinput_event_pointer_has_axis(&data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL)) {
-        auto axisValue = libinput_event_pointer_get_axis_value(&data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL);
+    if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL)) {
+        auto axisValue = libinput_event_pointer_get_axis_value(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL);
         pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, axisValue);
     }
-    if (libinput_event_pointer_has_axis(&data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL)) {
-        auto axisValue = libinput_event_pointer_get_axis_value(&data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL);
+    if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL)) {
+        auto axisValue = libinput_event_pointer_get_axis_value(data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL);
         pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, axisValue);
     }
 }
 
-void MouseEventHandler::HandlePostInner(struct libinput_event_pointer& pointEventData, PointerEvent::PointerItem& pointerItem)
+void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, PointerEvent::PointerItem& pointerItem)
 {
     MMI_LOGT("enter");
 
@@ -136,7 +136,7 @@ void MouseEventHandler::HandlePostInner(struct libinput_event_pointer& pointEven
     pointerItem.SetLocalY(mouseInfo.localY);
     pointerItem.SetPointerId(0);
 
-    uint64_t time = libinput_event_pointer_get_time_usec(libinputPointerEvent);
+    uint64_t time = libinput_event_pointer_get_time_usec(data);
     pointerItem.SetDownTime(static_cast<int32_t>(time));
     pointerItem.SetWidth(0);
     pointerItem.SetHeight(0);
@@ -159,23 +159,23 @@ void MouseEventHandler::Normalize(libinput_event *event, int32_t deviceId)
     CHK(event, PARAM_INPUT_INVALID);
 
     MMI_LOGD("Mouse Process Start");
-    auto libinputPointerEvent = libinput_event_get_pointer_event(event);
-    CHKP(libinputPointerEvent, ERROR_NULL_POINTER);    
+    auto data = libinput_event_get_pointer_event(event);
+    CHKP(data, ERROR_NULL_POINTER);    
 
     PointerEvent::PointerItem pointerItem;
     const int32_t type = libinput_event_get_type(event);
     switch (type) {
         case LIBINPUT_EVENT_POINTER_MOTION:
         case LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE: {
-            HandleMotionInner(*libinputPointerEvent);
+            HandleMotionInner(data);
             break;
         }
         case LIBINPUT_EVENT_POINTER_BUTTON: {
-            HandleButonInner(*libinputPointerEvent, pointerItem);
+            HandleButonInner(data, pointerItem);
             break;
         }
         case LIBINPUT_EVENT_POINTER_AXIS: {
-            HandleAxisInner(*libinputPointerEvent);
+            HandleAxisInner(data);
             break;
         }
         default: {
@@ -184,7 +184,7 @@ void MouseEventHandler::Normalize(libinput_event *event, int32_t deviceId)
         }
     }
 
-    HandlePostInner(*libinputPointerEvent, pointerItem); 
+    HandlePostInner(data, pointerItem); 
 
     // 调试 信息输出
     DumpInner();
@@ -194,12 +194,12 @@ void MouseEventHandler::DumpInner()
 {
     MMI_LOGI("PointerAction：%{public}d, PointerId：%{public}d, SourceType：%{public}d,"
         "ButtonId：%{public}d, VerticalAxisValue：%{public}lf, HorizontalAxisValue：%{public}lf",
-        pointerEvent->GetPointerAction(), pointerEvent->GetPointerId(), pointerEvent->GetSourceType(),
-        pointerEvent->GetButtonId(), pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
-        pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
+        pointerEvent_->GetPointerAction(), pointerEvent_->GetPointerId(), pointerEvent_->GetSourceType(),
+        pointerEvent_->GetButtonId(), pointerEvent_->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
+        pointerEvent_->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
 
     PointerEvent::PointerItem item;
-    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item);
+    pointerEvent->GetPointerItem(pointerEvent_->GetPointerId(), item);
     MMI_LOGI("item: DownTime：%{public}d, IsPressed：%{public}d,"
         "GlobalX：%{public}d, GlobalY：%{public}d, LocalX：%{public}d, LocalY：%{public}d, Width：%{public}d,"
         "Height：%{public}d, Pressure：%{public}d, DeviceId：%{public}d",

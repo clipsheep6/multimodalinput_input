@@ -20,7 +20,6 @@
 #include "libinput.h"
 #include "pointer_event.h"
 #include "singleton.h"
-#include "input_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
@@ -32,17 +31,18 @@ protected:
     MouseEventHandler();
     ~MouseEventHandler() = default;
 private:
-    void HandleMotionInner(struct libinput_event_pointer& pointEventData);
-    void HandleButonInner(PointerEvent::PointerItem &pointerItem, struct libinput_event_pointer& pointEventData);
-    void HandleAxisInner(struct libinput_event_pointer& pointEventData);
-    void HandlePostInner(struct libinput_event_pointer& pointEventData, PointerEvent::PointerItem& pointerItem);
+    void HandleMotionInner(libinput_event_pointer* data);
+    void HandleButonInner(libinput_event_pointer* data, PointerEvent::PointerItem& pointerItem);
+    void HandleAxisInner(libinput_event_pointer* data);
+    void HandlePostInner(libinput_event_pointer* data, PointerEvent::PointerItem& pointerItem);
+    void DumpInner();
 private:
     std::shared_ptr<PointerEvent> pointerEvent_;
     int32_t timerId_ = -1;
     double absolutionX_ = 0;
     double absolutionY_ = 0;
 };
-#define MouseEvent OHOS::MMI::MouseEventHandler::GetInstance()
+#define MouseEventHdr OHOS::MMI::MouseEventHandler::GetInstance()
 }
 } // namespace OHOS::MMI
 #endif // OHOS_MULTIMDOALINPUT_POINTER_EVENT_H
