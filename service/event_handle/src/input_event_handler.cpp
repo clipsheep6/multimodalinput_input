@@ -944,7 +944,7 @@ int32_t OHOS::MMI::InputEventHandler::OnMouseEventHandler(libinput_event *event,
     return RET_OK;
 }
 
-int32_t OHOS::MMI::InputEventHandler::OnMouseEventTimerHanler(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
+int32_t OHOS::MMI::InputEventHandler::OnMouseEventEndTimerHanler(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
 {
     if (pointerEvent == nullptr) {
         MMI_LOGE("pointerEvent is nullptr");

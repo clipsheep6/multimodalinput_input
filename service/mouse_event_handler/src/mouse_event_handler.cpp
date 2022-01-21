@@ -104,7 +104,7 @@ void MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
             }
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
 
-            InputHandler->OnMouseEventTimerHanler(pointerEvent);
+            InputHandler->OnMouseEventEndTimerHanler(pointerEvent);
             MMI_LOGD("leave, pointer axis end");
         });
 
