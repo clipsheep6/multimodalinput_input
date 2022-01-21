@@ -603,7 +603,7 @@ int32_t OHOS::MMI::InputEventHandler::OnEventPointer(multimodal_libinput_event &
 #endif
 #ifndef OHOS_WESTEN_MODEL
     /* New */
-    (void)OnMouseEventHandler(ev.event, point.deviceId);
+    (void)OnMouseEventHandler(ev.event);
 #else
     auto retEvent = eventDispatch_.DispatchPointerEvent(*udsServer_, ev.event, point, preHandlerTime);
     if (retEvent != RET_OK) {
@@ -907,13 +907,13 @@ int32_t OHOS::MMI::InputEventHandler::OnEventJoyStickAxis(multimodal_libinput_ev
     return RET_OK;
 }
 
-int32_t OHOS::MMI::InputEventHandler::OnMouseEventHandler(libinput_event *event, const int32_t deviceId)
+int32_t OHOS::MMI::InputEventHandler::OnMouseEventHandler(libinput_event *event)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     MMI_LOGD("Libinput Events reported");
 
     // 更新 全局 鼠标事件 数据
-    MouseEventHdr->Normalize(event, deviceId);
+    MouseEventHdr->Normalize(event);
 
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
     if (pointerEvent == nullptr) {

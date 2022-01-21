@@ -60,7 +60,7 @@ protected:
     int32_t OnEventKey(libinput_event *event);
     int32_t OnKeyEventDispatch(multimodal_libinput_event& event);
     
-    int32_t OnMouseEventHandler(libinput_event *event, const int32_t deviceId);
+    int32_t OnMouseEventHandler(libinput_event *event);
     bool SendMsg(const int32_t fd, NetPacket& pkt) const;
     void OnEventKeyboardTrace(const EventKeyboard& key);
     void OnEventPointerTrace(const EventPointer& point);
