@@ -48,8 +48,10 @@ namespace OHOS::MMI {
         static int32_t PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& key, UDSServer& udsServer);
         static int32_t KeyboardToKeyEvent(EventKeyboard& key, std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr,
             UDSServer& udsServer);
-        static std::shared_ptr<OHOS::MMI::PointerEvent> GestureToPointerEvent(EventGesture& gesture,
-           UDSServer& udsServer);
+        /* static std::shared_ptr<OHOS::MMI::PointerEvent> GestureToPointerEvent(EventGesture& gesture,
+           UDSServer& udsServer); */
+        static std::shared_ptr<OHOS::MMI::PointerEvent> LibinputEventToPointerEvent(libinput_event *event,
+            UDSServer& udsServer);
     private:
         void PackageTabletPadOtherParams(libinput_event *event, EventTabletPad& tabletPad);
         int32_t PackageTabletToolOtherParams(libinput_event *event, EventTabletTool& tableTool);
