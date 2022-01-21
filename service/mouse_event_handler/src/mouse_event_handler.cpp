@@ -70,7 +70,7 @@ void MouseEventHandler::HandleButonInner(libinput_event_pointer* data, PointerEv
 
     auto state = libinput_event_pointer_get_button_state(data);
     if (state == LIBINPUT_BUTTON_STATE_RELEASED) {
-        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);        
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
         pointerEvent_->SetButtonId(PointerEvent::BUTTON_NONE);
         pointerItem.SetPressed(false);
     } else if (state == LIBINPUT_BUTTON_STATE_PRESSED) {
@@ -129,8 +129,8 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, PointerEve
     MMI_LOGT("enter");
 
     auto mouseInfo = WinMgr->GetMouseInfo();
-    MMI_LOGD("mouseInfo: globleX=%{public}d globleY=%{public}d localX=%{public}d localY=%{public}d", 
-                        mouseInfo.globleX, mouseInfo.globleY, mouseInfo.localX, mouseInfo.localY);
+    MMI_LOGD("mouseInfo: globleX=%{public}d globleY=%{public}d localX=%{public}d localY=%{public}d",
+        mouseInfo.globleX, mouseInfo.globleY, mouseInfo.localX, mouseInfo.localY);
     MouseState->SetMouseCoords(mouseInfo.globleX, mouseInfo.globleY);
     pointerItem.SetGlobalX(mouseInfo.globleX);
     pointerItem.SetGlobalY(mouseInfo.globleY);
@@ -163,7 +163,7 @@ void MouseEventHandler::Normalize(libinput_event *event)
 
     MMI_LOGD("Mouse Process Start");
     auto data = libinput_event_get_pointer_event(event);
-    CHKP(data, ERROR_NULL_POINTER);    
+    CHKP(data, ERROR_NULL_POINTER);
 
     PointerEvent::PointerItem pointerItem;
     const int32_t type = libinput_event_get_type(event);
@@ -187,9 +187,9 @@ void MouseEventHandler::Normalize(libinput_event *event)
         }
     }
 
-    HandlePostInner(data, pointerItem); 
+    HandlePostInner(data, pointerItem);
 
-    // 调试 信息输出
+    // 璋冭瘯 淇℃伅杈撳嚭
     DumpInner();
 }
 
