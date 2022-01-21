@@ -28,27 +28,30 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, 
 MouseEventHandler::MouseEventHandler()
 {
     pointerEvent_ = PointerEvent::Create();
+    if (pointerEvent_ == nullptr) {
+        MMI_LOGF("pointerEvent_ create fail");
+    }
 }
 
-MouseEventHandler::~MouseEventHandler()
+std::shared_ptr<PointerEvent> MouseEventHandler::GetPointerEvent()
 {
+    return pointerEvent_;
 }
 
-void MouseEventHandler::CalcMovedCoordinate(struct libinput_event_pointer& pointEventData)
+void MouseEventHandler::HandleMotionInner(struct libinput_event_pointer& pointEventData)
 {
-    absolutionX_ += libinput_event_pointer_get_dx(&pointEventData);
-    absolutionY_ += libinput_event_pointer_get_dy(&pointEventData);
-
-    WinMgr->AdjustCoordinate(absolutionX_, absolutionY_);
-    MMI_LOGI("absolutionX_ is : %{public}lf, absolutionY_ is : %{public}lf", absolutionX_, absolutionY_);
-}
-
-void MouseEventHandler::SetMouseMotion(PointerEvent::PointerItem& pointerItem)
-{
+    MMI_LOGT("enter");
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+
+    absolutionX_ += libinput_event_pointer_get_dx(libinputPointerEvent);
+    absolutionY_ += libinput_event_pointer_get_dy(libinputPointerEvent);
+
+    WinMgr->UpdateAndAdjustMouseLoction(absolutionX_, absolutionY_);
+
+    MMI_LOGD("Change Coordinate : x:%{public}lf, y:%{public}lf",  absolutionX_, absolutionY_);
 }
 
-void MouseEventHandler::DoHandleMouseButon(PointerEvent::PointerItem& pointerItem, struct libinput_event_pointer& pointEventData)
+void MouseEventHandler::HandleButonInner(struct libinput_event_pointer& pointEventData, PointerEvent::PointerItem& pointerItem)
 {
     MMI_LOGT("enter, current action: %{public}d", pointerEvent_->GetPointerAction());
 
@@ -79,67 +82,49 @@ void MouseEventHandler::DoHandleMouseButon(PointerEvent::PointerItem& pointerIte
     MouseState->CountState(button, state);
 }
 
-void MouseEventHandler::DoHandleMouseAxis(struct libinput_event_pointer& pointEventData)
+void MouseEventHandler::HandleAxisInner(struct libinput_event_pointer& data)
 {
+    MMI_LOGT("enter");
+
     if (TimerMgr->IsExist(timerId_)) {
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
         TimerMgr->ResetTimer(timerId_);
-        MMI_LOGI("pointer axis event update");
+        MMI_LOGD("pointer axis update");
     } else {
-        const int32_t mouseTimeout = 100;
-        timerId_ = TimerMgr->AddTimer(mouseTimeout, 1, []() {
-            const int32_t defaultTimerId = -1;
-            MouseEvent->SetTimerId(defaultTimerId);
-            MMI_LOGI("pointer axis event end TimerCallback run");
-            MouseEvent->SetMouseAction(PointerEvent::POINTER_ACTION_AXIS_END);
-            auto pointerEvent = MouseEvent->GetPointerEventPtr();
+        const int32_t timeout = 100; // 100 ms
+        timerId_ = TimerMgr->AddTimer(timeout, 1, [this]() {
+            MMI_LOGD("enter, timer: %{public}d", timerId_);
+
+            timerId_ = -1;
+
+            auto pointerEvent = GetPointerEvent();
             if (pointerEvent == nullptr) {
                 MMI_LOGE("the pointerEvent is nullptr");
                 return;
             }
+            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
+
             InputHandler->OnMouseEventTimerHanler(pointerEvent);
-            MMI_LOGI("pointer axis event end");
+            MMI_LOGD("leave, pointer axis end");
         });
+
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
-        MMI_LOGI("pointer axis event begin");
+        MMI_LOGD("pointer axis begin");
     }
 
-    double axisValue = 0;
-    if (libinput_event_pointer_has_axis(&pointEventData, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL)) {
-        axisValue = libinput_event_pointer_get_axis_value(&pointEventData,
-                                                          LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL);
+    if (libinput_event_pointer_has_axis(&data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL)) {
+        auto axisValue = libinput_event_pointer_get_axis_value(&data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL);
         pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, axisValue);
     }
-    if (libinput_event_pointer_has_axis(&pointEventData, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL)) {
-        axisValue = libinput_event_pointer_get_axis_value(&pointEventData,
-                                                          LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL);
+    if (libinput_event_pointer_has_axis(&data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL)) {
+        auto axisValue = libinput_event_pointer_get_axis_value(&data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL);
         pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, axisValue);
     }
 }
 
-void MouseEventHandler::Normalize(libinput_event *event, int32_t deviceId)
+void MouseEventHandler::HandlePostInner(struct libinput_event_pointer& pointEventData, PointerEvent::PointerItem& pointerItem)
 {
-    CHK(event, PARAM_INPUT_INVALID);
-    MMI_LOGD("Mouse Process Start");
-    auto libinputPointerEvent = libinput_event_get_pointer_event(event);
-    CHKP(libinputPointerEvent, ERROR_NULL_POINTER);    
-
-    PointerEvent::PointerItem pointerItem;
-    const int32_t type = libinput_event_get_type(event);
-    if ((type == LIBINPUT_EVENT_POINTER_MOTION) || (type == LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE)) { // mouse move
-        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-
-        absolutionX_ += libinput_event_pointer_get_dx(libinputPointerEvent);
-        absolutionY_ += libinput_event_pointer_get_dy(libinputPointerEvent);
-
-        WinMgr->UpdateAndAdjustMouseLoction(absolutionX_, absolutionY_);
-
-        MMI_LOGD("Change Coordinate : x:%{public}lf, y:%{public}lf",  absolutionX_, absolutionY_);        
-    } else if (type == LIBINPUT_EVENT_POINTER_BUTTON) { // mouse button
-        DoHandleMouseButon(pointerItem, *libinputPointerEvent);
-    } else if (type == LIBINPUT_EVENT_POINTER_AXIS) { // mouse axis
-        DoHandleMouseAxis(*libinputPointerEvent);
-    }
+    MMI_LOGT("enter");
 
     auto mouseInfo = WinMgr->GetMouseInfo();
     MMI_LOGD("mouseInfo: globleX=%{public}d globleY=%{public}d localX=%{public}d localY=%{public}d", 
@@ -167,54 +152,60 @@ void MouseEventHandler::Normalize(libinput_event *event, int32_t deviceId)
     pointerEvent_->SetTargetDisplayId(-1);
     pointerEvent_->SetTargetWindowId(-1);
     pointerEvent_->SetAgentWindowId(-1);
+}
+
+void MouseEventHandler::Normalize(libinput_event *event, int32_t deviceId)
+{
+    CHK(event, PARAM_INPUT_INVALID);
+
+    MMI_LOGD("Mouse Process Start");
+    auto libinputPointerEvent = libinput_event_get_pointer_event(event);
+    CHKP(libinputPointerEvent, ERROR_NULL_POINTER);    
+
+    PointerEvent::PointerItem pointerItem;
+    const int32_t type = libinput_event_get_type(event);
+    switch (type) {
+        case LIBINPUT_EVENT_POINTER_MOTION:
+        case LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE: {
+            HandleMotionInner(*libinputPointerEvent);
+            break;
+        }
+        case LIBINPUT_EVENT_POINTER_BUTTON: {
+            HandleButonInner(*libinputPointerEvent, pointerItem);
+            break;
+        }
+        case LIBINPUT_EVENT_POINTER_AXIS: {
+            HandleAxisInner(*libinputPointerEvent);
+            break;
+        }
+        default: {
+            MMI_LOGW("unknow type: %{public}d", type);
+            break;
+        }
+    }
+
+    HandlePostInner(*libinputPointerEvent, pointerItem); 
 
     // 调试 信息输出
+    DumpInner();
+}
 
-    // MouseEvent Normalization Results
-    MMI_LOGI("MouseEvent Normalization Results : PointerAction = %{public}d, PointerId = %{public}d,"
-        "SourceType = %{public}d, ButtonId = %{public}d,"
-        "VerticalAxisValue = %{public}lf, HorizontalAxisValue = %{public}lf",
+void MouseEventHandler::DumpInner()
+{
+    MMI_LOGI("PointerAction：%{public}d, PointerId：%{public}d, SourceType：%{public}d,"
+        "ButtonId：%{public}d, VerticalAxisValue：%{public}lf, HorizontalAxisValue：%{public}lf",
         pointerEvent->GetPointerAction(), pointerEvent->GetPointerId(), pointerEvent->GetSourceType(),
         pointerEvent->GetButtonId(), pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
         pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
+
     PointerEvent::PointerItem item;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item);
-    MMI_LOGI("MouseEvent Item Normalization Results : DownTime = %{public}d, IsPressed = %{public}d,"
-        "GlobalX = %{public}d, GlobalY = %{public}d, LocalX = %{public}d, LocalY = %{public}d, Width = %{public}d,"
-        "Height = %{public}d, Pressure = %{public}d, DeviceId = %{public}d",
+    MMI_LOGI("item: DownTime：%{public}d, IsPressed：%{public}d,"
+        "GlobalX：%{public}d, GlobalY：%{public}d, LocalX：%{public}d, LocalY：%{public}d, Width：%{public}d,"
+        "Height：%{public}d, Pressure：%{public}d, DeviceId：%{public}d",
         item.GetDownTime(), static_cast<int32_t>(item.IsPressed()), item.GetGlobalX(), item.GetGlobalY(),
         item.GetLocalX(), item.GetLocalY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
         item.GetDeviceId());
-}
-
-
-HanleKey()
-{
-    
-        
-        std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
-        if (pressedKeys.empty()) {
-            MMI_LOGI("Pressed keys is empty");
-        } else {
-            for (int32_t keyCode : pressedKeys) {
-                MMI_LOGI("Pressed keyCode=%{public}d", keyCode);
-            }
-        }
-        pointerEvent->SetPressedKeys(pressedKeys);
-}
-
-void MouseEventHandler::SetMouseAction(const int32_t action)
-{
-    pointerEvent_->SetPointerAction(action);
-}
-
-std::shared_ptr<PointerEvent> MouseEventHandler::GetPointerEventPtr()
-{
-    return pointerEvent_;
-}
-void MouseEventHandler::SetTimerId(const int32_t id)
-{
-    timerId_ = id;
 }
 } // namespace MMI
 } // namespace OHOS

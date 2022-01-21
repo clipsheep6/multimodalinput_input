@@ -26,17 +26,16 @@ namespace OHOS {
 namespace MMI {
 class MouseEventHandler : public DelayedSingleton<MouseEventHandler> {
 public:
-    MouseEventHandler();
-    virtual ~MouseEventHandler();
+    std::shared_ptr<PointerEvent> GetPointerEvent();
     void Normalize(libinput_event *event, int32_t deviceId);
-    void SetMouseAction(const int32_t action);
-    void SetTimerId(const int32_t id);
-    std::shared_ptr<PointerEvent> GetPointerEventPtr();
+protected:
+    MouseEventHandler();
+    ~MouseEventHandler() = default;
 private:
-    void SetMouseMotion(PointerEvent::PointerItem& pointerItem);
-    void DoHandleMouseButon(PointerEvent::PointerItem &pointerItem, struct libinput_event_pointer& pointEventData);
-    void DoHandleMouseAxis(struct libinput_event_pointer& pointEventData);
-    void CalcMovedCoordinate(struct libinput_event_pointer &pointEventData);
+    void HandleMotionInner(struct libinput_event_pointer& pointEventData);
+    void HandleButonInner(PointerEvent::PointerItem &pointerItem, struct libinput_event_pointer& pointEventData);
+    void HandleAxisInner(struct libinput_event_pointer& pointEventData);
+    void HandlePostInner(struct libinput_event_pointer& pointEventData, PointerEvent::PointerItem& pointerItem);
 private:
     std::shared_ptr<PointerEvent> pointerEvent_;
     int32_t timerId_ = -1;

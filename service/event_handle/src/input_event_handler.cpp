@@ -311,7 +311,7 @@ int32_t OHOS::MMI::InputEventHandler::OnEventDeviceAdded(multimodal_libinput_eve
         keyEvent = OHOS::MMI::KeyEvent::Create();
     }
     if (keyEvent != nulltr) {
-        MouseEvent->SetAssociateKeyEvent(keyEvent);
+        MouseEventHdr->SetAssociateKeyEvent(keyEvent);
     }
 
     return RET_OK;
@@ -352,7 +352,7 @@ int32_t OHOS::MMI::InputEventHandler::OnEventDeviceRemoved(multimodal_libinput_e
     }
 
     // 设置鼠标事件与按键
-    MouseEvent->SetAssociateKeyEvent(nullptr);
+    MouseEventHdr->SetAssociateKeyEvent(nullptr);
 
     return RET_OK;
 }
@@ -923,22 +923,31 @@ int32_t OHOS::MMI::InputEventHandler::OnMouseEventHandler(libinput_event *event,
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     MMI_LOGD("Libinput Events reported");
     // 更新 全局 鼠标事件 数据
-    MouseEvent->Normalize(event, deviceId); 
+    MouseEventHdr->Normalize(event, deviceId);
+
+    auto pointerEvent = MouseEventHdr->GetPointerEvent();
+    if (pointerEvent == nullptr) {
+        MMI_LOGE("MouseEvent is NULL");
+        return RET_ERR;
+    }
 
     // 处理 按键 + 鼠标
     if (keyEvent == nullptr) {
         keyEvent = OHOS::MMI::KeyEvent::Create();
     }
     if (keyEvent != nullptr) {
-        MouseEvent->HandleKey(keyEvent);
+        std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
+        if (pressedKeys.empty()) {
+            MMI_LOGI("Pressed keys is empty");
+        } else {
+            for (int32_t keyCode : pressedKeys) {
+                MMI_LOGI("Pressed keyCode=%{public}d", keyCode);
+            }
+        }
+        pointerEvent->SetPressedKeys(pressedKeys);
     }
 
     // 派发
-    auto pointerEvent = MouseEvent->GetPointerEventPtr();
-    if (pointerEvent == nullptr) {
-        MMI_LOGE("MouseEvent is NULL");
-        return RET_ERR;
-    }
     eventDispatch_.handlePointerEvent(pointerEvent);
 
     // 返回值 代表是 鼠标事件有没有处理过， 不关心成功与失败
