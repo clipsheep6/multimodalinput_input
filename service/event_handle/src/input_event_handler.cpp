@@ -275,7 +275,7 @@ int32_t OHOS::MMI::InputEventHandler::OnEventDeviceAdded(multimodal_libinput_eve
 {
     CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(ev.event);
-    INPUTDEVMGR->OnInputDeviceAdded(device);
+    inputDeviceManager->OnInputDeviceAdded(device);
 
     uint64_t preHandlerTime = GetSysClockTime();
     DeviceManage deviceManage = {};
@@ -313,7 +313,7 @@ int32_t OHOS::MMI::InputEventHandler::OnEventDeviceRemoved(multimodal_libinput_e
 {
     CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(ev.event);
-    INPUTDEVMGR->OnInputDeviceRemoved(device);
+    inputDeviceManager->OnInputDeviceRemoved(device);
 
     uint64_t preHandlerTime = GetSysClockTime();
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
@@ -499,6 +499,7 @@ void OHOS::MMI::InputEventHandler::OnEventKeyboardTrace(const EventKeyboard& key
     }
     MMI_LOGT(" OnEventKeyboard service reported keyUuid = %{public}s\n", keyUuid);
     std::string keyEvent = keyUuid;
+    keyEvent = "OnEventKeyboard service reported keyUuid: " + keyEvent;
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, EVENT_KEY);
 }
 
@@ -553,8 +554,9 @@ void OHOS::MMI::InputEventHandler::OnEventPointerTrace(const EventPointer& point
         MMI_LOGT("%{public}s copy data failed", __func__);
         return;
     }
-    MMI_LOGT("\n OnEventPointer service reported pointerUuid = %{public}s\n", pointerUuid);
+    MMI_LOGT(" OnEventPointer service reported pointerUuid = %{public}s\n", pointerUuid);
     std::string pointerEvent = pointerUuid;
+    pointerEvent = "OnEventPointer service reported pointerUuid: " + pointerEvent;
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, EVENT_POINTER);
 }
 
@@ -673,6 +675,7 @@ void OHOS::MMI::InputEventHandler::OnEventTouchTrace(const struct EventTouch& to
     }
     MMI_LOGT(" OnEventTouch service reported touchUuid = %{public}s\n", touchUuid);
     std::string touchEvent = touchUuid;
+    touchEvent = "OnEventTouch service reported touchUuid: " + touchEvent;
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, EVENT_TOUCH);
 }
 
