@@ -36,7 +36,11 @@
     #define DEF_MMI_DATA_ROOT "/data/mmi/"
     #define DEF_LOG_CONFIG "/system/etc/mmi_log.conf"
     #define DEF_EXP_CONFIG "/system/etc/mmi_device_config.ini"
+#ifdef __aarch64__
+    #define DEF_EXP_SOPATH "/system/lib64/"
+#else
     #define DEF_EXP_SOPATH "/system/lib/"
+#endif
     #define DEF_XKB_CONFIG "/system/etc/xkb"
     #define DEF_SCREEN_MAX_WIDTH 480
     #define DEF_SCREEN_MAX_HEIGHT 960
