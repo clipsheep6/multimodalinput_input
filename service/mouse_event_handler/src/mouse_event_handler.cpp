@@ -17,7 +17,7 @@
 #include "libmmi_util.h"
 #include "util.h"
 #include "input_windows_manager.h"
-#include "input_event_handler.h"
+// #include "input_event_handler.h"
 #include "timer_manager.h"
 #include "mouse_state_gesture.h"
 
@@ -105,7 +105,7 @@ void MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
             }
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
 
-            InputHandler->OnMouseEventEndTimerHanler(pointerEvent);
+            InputHandler->OnMouseEventEndTimerHandler(pointerEvent);
             MMI_LOGD("leave, pointer axis end");
         });
 

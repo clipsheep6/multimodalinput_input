@@ -26,7 +26,7 @@ namespace MMI {
 class MouseEventHandler : public DelayedSingleton<MouseEventHandler> {
 public:
     std::shared_ptr<PointerEvent> GetPointerEvent();
-    void Normalize(libinput_event *event, int32_t deviceId);
+    void Normalize(libinput_event *event);
 protected:
     MouseEventHandler();
     ~MouseEventHandler() = default;
