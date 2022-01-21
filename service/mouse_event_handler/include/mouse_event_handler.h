@@ -42,7 +42,8 @@ private:
     double absolutionX_ = 0;
     double absolutionY_ = 0;
 };
+} // namespace MMI
+} // namespace OHOS
 #define MouseEventHdr OHOS::MMI::MouseEventHandler::GetInstance()
-}
-} // namespace OHOS::MMI
+
 #endif // OHOS_MULTIMDOALINPUT_POINTER_EVENT_H
