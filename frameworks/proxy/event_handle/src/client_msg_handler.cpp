@@ -43,10 +43,12 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, 
 
 OHOS::MMI::ClientMsgHandler::ClientMsgHandler()
 {
+    eventProcessedCallback_ = std::bind(&ClientMsgHandler::OnEventProcessed, std::placeholders::_1);
 }
 
 OHOS::MMI::ClientMsgHandler::~ClientMsgHandler()
 {
+    eventProcessedCallback_ = std::function<void(int32_t)>();
 }
 
 bool OHOS::MMI::ClientMsgHandler::Init()
@@ -172,12 +174,13 @@ int32_t OHOS::MMI::ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPack
     int32_t EVENT_KEY = 1;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, EVENT_KEY);
     
-    key->SetProcessedCallback([&client, &key]() {
-        NetPacket ckt(MmiMessageId::NEW_CHECK_REPLY_MESSAGE);
-        auto id = key->GetId();
-        ckt << id;
-        client.SendMsg(ckt);
-    });
+    key->SetProcessedCallback(eventProcessedCallback_);
+    // key->SetProcessedCallback([&client, &key]() {
+    //     NetPacket ckt(MmiMessageId::NEW_CHECK_REPLY_MESSAGE);
+    //     auto id = key->GetId();
+    //     ckt << id;
+    //     client.SendMsg(ckt);
+    // });
 
     InputManagerImpl::GetInstance()->OnKeyEvent(key);
     return RET_OK;
@@ -228,12 +231,13 @@ int32_t OHOS::MMI::ClientMsgHandler::OnPointerEvent(const UDSClient& client, Net
         MMI_LOGD("Operation canceled.");
     }
 
-    pointerEvent->SetProcessedCallback([&client, &pointerEvent]() {
-        NetPacket ckt(MmiMessageId::NEW_CHECK_REPLY_MESSAGE);
-        auto id = pointerEvent->GetId();
-        ckt << id;
-        client.SendMsg(ckt);
-    });
+    // pointerEvent->SetProcessedCallback([&client, &pointerEvent]() {
+    //     NetPacket ckt(MmiMessageId::NEW_CHECK_REPLY_MESSAGE);
+    //     auto id = pointerEvent->GetId();
+    //     ckt << id;
+    //     client.SendMsg(ckt);
+    // });
+    pointerEvent->SetProcessedCallback(eventProcessedCallback_);
 
     InputManagerImpl::GetInstance()->OnPointerEvent(pointerEvent);
     return RET_OK;

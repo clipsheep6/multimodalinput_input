@@ -163,7 +163,7 @@ void InputEvent::ClearFlag()
     flag_ = 0X00000000;
 }
 
-void InputEvent::SetProcessedCallback(std::function<void()> callback)
+void InputEvent::SetProcessedCallback(std::function<void(int32_t)> callback)
 {
     processedCallback_ = callback;
 }
@@ -173,13 +173,9 @@ void InputEvent::MarkProcessed()
     if (!processedCallback_) {
         return;
     }
-
-    if (!processedCallback_) {
-        return;
-    }
     auto func = processedCallback_;
-    processedCallback_ = std::function<void()>();
-    func();
+    processedCallback_ = std::function<void(int32_t)>();
+    func(id_);
 }
 
 bool InputEvent::WriteToParcel(Parcel &out) const
