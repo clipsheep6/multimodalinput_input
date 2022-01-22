@@ -606,7 +606,7 @@ int32_t InputEventHandler::OnEventPointer(multimodal_libinput_event &ev)
 #endif
 #ifndef OHOS_WESTEN_MODEL
     /* New */
-    return OnMouseEventHandler(ev.event, point.deviceId);
+    return OnMouseEventHandler(ev.event);
 #else
     auto retEvent = eventDispatch_.DispatchPointerEvent(*udsServer_, ev.event, point, preHandlerTime);
     if (retEvent != RET_OK) {

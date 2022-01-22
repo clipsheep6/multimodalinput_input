@@ -1081,7 +1081,7 @@ void OHOS::MMI::InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, doub
     }
 
     MMI_LOGI("Mouse Data is : globleX = %{public}d, globleY = %{public}d, localX = %{public}d, localY = %{public}d",
-        mouseInfo_.globleX, mouseInfo_.globleY, mouseInfo_.localX, mouseInfo_.localY);
+        mouseLoction_.globleX, mouseLoction_.globleY, mouseLoction_.localX, mouseLoction_.localY);
 }
 
 void OHOS::MMI::InputWindowsManager::SetLocalInfo(int32_t x, int32_t y)

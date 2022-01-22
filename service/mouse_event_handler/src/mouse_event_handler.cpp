@@ -128,7 +128,8 @@ void MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
     }
 }
 
-void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t deviceId, PointerEvent::PointerItem& pointerItem)
+void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t deviceId,
+                                        PointerEvent::PointerItem& pointerItem)
 {
     MMI_LOGT("enter");
 
