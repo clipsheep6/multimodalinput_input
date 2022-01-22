@@ -53,7 +53,7 @@ void MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
     MMI_LOGD("Change Coordinate : x:%{public}lf, y:%{public}lf",  absolutionX_, absolutionY_);
 }
 
-void MouseEventHandler::HandleButonInner(libinput_event_pointer* data, PointerEvent::PointerItem& pointerItem)
+void MouseEventHandler::HandleButonInner(libinput_event_pointer* data, PointerEvent::PointerItem pointerItem)
 {
     MMI_LOGT("enter, current action: %{public}d", pointerEvent_->GetPointerAction());
 
@@ -129,7 +129,7 @@ void MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
     }
 }
 
-void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, PointerEvent::PointerItem& pointerItem)
+void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, PointerEvent::PointerItem pointerItem)
 {
     MMI_LOGT("enter");
 
@@ -208,10 +208,10 @@ void MouseEventHandler::DumpInner()
 
     PointerEvent::PointerItem item;
     pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item);
-    MMI_LOGI("item: DownTime: %{public}d, IsPressed: %{public}d,"
+    MMI_LOGI("item: DownTime: %{public}d, IsPressed: %{public}s,"
         "GlobalX: %{public}d, GlobalY: %{public}d, LocalX: %{public}d, LocalY: %{public}d, Width: %{public}d,"
         "Height: %{public}d, Pressure: %{public}d, DeviceId: %{public}d",
-        item.GetDownTime(), static_cast<int32_t>(item.IsPressed()), item.GetGlobalX(), item.GetGlobalY(),
+        item.GetDownTime(), (item.IsPressed() ? "true" : "false"), item.GetGlobalX(), item.GetGlobalY(),
         item.GetLocalX(), item.GetLocalY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
         item.GetDeviceId());
 }
