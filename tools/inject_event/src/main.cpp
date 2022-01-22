@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,38 +13,10 @@
  * limitations under the License.
  */
 
-#include "input_device.h"
+#include "input_manager_command.h"
 
-namespace OHOS {
-namespace MMI {
-void InputDevice::SetId(int32_t deviceId)
+int main(int argc, char** argv)
 {
-    this->id = deviceId;
-}
-
-int32_t InputDevice::GetId()
-{
-    return this->id;
-}
-
-void InputDevice::SetName(std::string name)
-{
-    this->name = name;
-}
-
-std::string InputDevice::GetName()
-{
-    return this->name;
-}
-
-void InputDevice::SetType(int32_t deviceType)
-{
-    this->deviceType = deviceType;
-}
-
-int32_t InputDevice::GetType()
-{
-    return this->deviceType;
-}
-}
+    OHOS::InputManagerCommand command;
+    return command.ParseCommand(argc, argv);
 }

@@ -576,6 +576,53 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_005, TestSize.Level1)
     EXPECT_TRUE(!tLogs.empty());
 }
 
+HWTEST_F(InputManagerTest, InputManager_ANR_TEST_001, TestSize.Level1)
+{
+    std::this_thread::sleep_for(std::chrono::milliseconds(20000));
+    auto pointerEvent = PointerEvent::Create();
+
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetGlobalX(823);
+    item.SetGlobalY(723);
+    item.SetPressure(5);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetSourceType(-1);
+    pointerEvent->SetPointerId(0);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    MMI_LOGD("InputManager_ANR_TEST_001 wait 2s");
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+
+    item.SetPointerId(1);
+    item.SetGlobalX(823);
+    item.SetGlobalY(723);
+    item.SetPressure(5);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetSourceType(-1);
+    pointerEvent->SetPointerId(1);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    MMI_LOGD("InputManager_ANR_TEST_001 wait 5s");
+    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+
+    item.SetPointerId(2);
+    item.SetGlobalX(823);
+    item.SetGlobalY(723);
+    item.SetPressure(5);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetSourceType(-1);
+    pointerEvent->SetPointerId(2);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
+
 void InputManagerTest::TestSimulateInputEvent_2(std::shared_ptr<PointerEvent> pointerEvent)
 {
     PointerEvent::PointerItem item;
@@ -1738,6 +1785,97 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_010, TestSize.Leve
     InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId1);
     InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId2);
     std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+}
+
+/**
+ * @tc.name:InputManagerTest_SubscribeKeyEvent_011
+ * @tc.desc:Verify subscribe F1 key event.
+ * @tc.type: FUNC
+ * @tc.require: SR000GGQL4  AR000GJNGN
+ * @tc.author: wanghao
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_011, TestSize.Level1)
+{
+    if (!MultimodalEventHandler::GetInstance().GetMMIClient()) {
+        MMI_LOGD("get mmi client failed");
+        return;
+    }
+    
+    int32_t response = -1;
+    std::vector<int32_t> preKeys;
+    std::shared_ptr<OHOS::MMI::KeyOption> keyOption = std::make_shared<OHOS::MMI::KeyOption>();
+    keyOption->SetPreKeys(preKeys);
+    keyOption->SetFinalKey(OHOS::MMI::KeyEvent::KEYCODE_F1);
+    keyOption->SetFinalKeyDown(true);
+    keyOption->SetFinalKeyDownDuration(0);
+    response = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
+        [=](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
+    {
+        MMI_LOGD("KeyEventId=%{public}d,KeyCode=%{public}d,ActionTime=%{public}d,"
+                 "ActionStartTime=%{public}d,Action=%{public}d,KeyAction=%{public}d,"
+                 "EventType=%{public}d,Flag=%{public}d",
+                 keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
+                 keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
+                 keyEvent->GetEventType(), keyEvent->GetFlag());
+        MMI_LOGD("subscribe key event KEYCODE_F1 down trigger callback");
+    });
+    EXPECT_TRUE(response > 0);
+
+    std::shared_ptr<OHOS::MMI::KeyOption> keyOption2 = std::make_shared<OHOS::MMI::KeyOption>();
+    int32_t subscribeId2 = -1;
+    keyOption2->SetPreKeys(preKeys);
+    keyOption2->SetFinalKey(OHOS::MMI::KeyEvent::KEYCODE_F1);
+    keyOption2->SetFinalKeyDown(false);
+    keyOption2->SetFinalKeyDownDuration(0);
+    subscribeId2 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption2,
+        [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent) {
+        MMI_LOGD("KeyEventId=%{public}d,KeyCode=%{public}d,ActionTime=%{public}d,"
+                 "ActionStartTime=%{public}d,Action=%{public}d,KeyAction=%{public}d,"
+                 "EventType=%{public}d,Flag=%{public}d",
+                 keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
+                 keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
+                 keyEvent->GetEventType(), keyEvent->GetFlag());
+        MMI_LOGD("subscribe key event KEYCODE_F1 up trigger callback");
+    });
+    EXPECT_TRUE(subscribeId2 > 0);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    
+    // pressed key
+    uint64_t downTime = static_cast<uint64_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
+    OHOS::KeyEvent injectDownEvent1;
+    injectDownEvent1.Initialize(0, ACTION_DOWN, OHOS::MMI::KeyEvent::KEYCODE_F1,
+                               downTime, 0, "", 0, 0, "", 0, false, 0, ISINTERCEPTED_TRUE);
+    MMIEventHdl.InjectEvent(injectDownEvent1);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+
+    // release pressed key
+    downTime = static_cast<uint64_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
+    OHOS::KeyEvent injectUpEven1;
+    injectUpEven1.Initialize(0, ACTION_UP, OHOS::MMI::KeyEvent::KEYCODE_F1,
+                               downTime, 0, "", 0, 0, "", 0, false, 0, ISINTERCEPTED_TRUE);
+    MMIEventHdl.InjectEvent(injectUpEven1);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    
+    // pressed key
+    downTime = static_cast<uint64_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
+    OHOS::KeyEvent injectDownEvent2;
+    injectDownEvent2.Initialize(0, ACTION_DOWN, OHOS::MMI::KeyEvent::KEYCODE_F1,
+                               downTime, 0, "", 0, 0, "", 0, false, 0, ISINTERCEPTED_TRUE);
+    MMIEventHdl.InjectEvent(injectDownEvent2);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+
+    // release pressed key
+    downTime = static_cast<uint64_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
+    OHOS::KeyEvent injectUpEvent2;
+    injectUpEvent2.Initialize(0, ACTION_UP, OHOS::MMI::KeyEvent::KEYCODE_F1,
+                               downTime, 0, "", 0, 0, "", 0, false, 0, ISINTERCEPTED_TRUE);
+    MMIEventHdl.InjectEvent(injectUpEvent2);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+
+    InputManager::GetInstance()->UnsubscribeKeyEvent(response);
+    InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId2);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
 void InputManagerTest::InterceptorManagerCallBack(std::shared_ptr<PointerEvent> pointerEvent)
