@@ -53,7 +53,7 @@ void MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
     MMI_LOGD("Change Coordinate : x:%{public}lf, y:%{public}lf",  absolutionX_, absolutionY_);
 }
 
-void MouseEventHandler::HandleButonInner(libinput_event_pointer* data, PointerEvent::PointerItem pointerItem)
+void MouseEventHandler::HandleButonInner(libinput_event_pointer* data, PointerEvent::PointerItem& pointerItem)
 {
     MMI_LOGT("enter, current action: %{public}d", pointerEvent_->GetPointerAction());
 
@@ -129,7 +129,7 @@ void MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
     }
 }
 
-void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, PointerEvent::PointerItem pointerItem)
+void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, PointerEvent::PointerItem& pointerItem)
 {
     MMI_LOGT("enter");
 
@@ -151,7 +151,7 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, PointerEve
     pointerItem.SetPressure(0);
     pointerItem.SetDeviceId(deviceId);
 
-    pointerEvent_->AddPointerItem(pointerItem);
+    pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent_->SetActionTime(static_cast<int32_t>(GetSysClockTime()));
     pointerEvent_->SetActionStartTime(static_cast<int32_t>(time));
@@ -205,6 +205,18 @@ void MouseEventHandler::DumpInner()
         pointerEvent_->GetPointerAction(), pointerEvent_->GetPointerId(), pointerEvent_->GetSourceType(),
         pointerEvent_->GetButtonId(), pointerEvent_->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
         pointerEvent_->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
+
+    auto ids = pointerEvent_->GetPointersIdList();
+    for (auto id : ids) {
+        PointerEvent::PointerItem temp;
+        pointerEvent_->GetPointerItem(id, temp);
+        MMI_LOGI("temp: id: %{public}d, DownTime: %{public}d, IsPressed: %{public}s,"
+        "GlobalX: %{public}d, GlobalY: %{public}d, LocalX: %{public}d, LocalY: %{public}d, Width: %{public}d,"
+        "Height: %{public}d, Pressure: %{public}d, DeviceId: %{public}d",
+        id, temp.GetDownTime(), (temp.IsPressed() ? "true" : "false"), temp.GetGlobalX(), temp.GetGlobalY(),
+        temp.GetLocalX(), temp.GetLocalY(), temp.GetWidth(), temp.GetHeight(), temp.GetPressure(),
+        temp.GetDeviceId());
+    }
 
     PointerEvent::PointerItem item;
     pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item);

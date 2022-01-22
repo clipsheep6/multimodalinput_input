@@ -33,9 +33,9 @@ public:
     void Normalize(libinput_event *event);
 private:
     void HandleMotionInner(libinput_event_pointer* data);
-    void HandleButonInner(libinput_event_pointer* data, PointerEvent::PointerItem pointerItem);
+    void HandleButonInner(libinput_event_pointer* data, PointerEvent::PointerItem& pointerItem);
     void HandleAxisInner(libinput_event_pointer* data);
-    void HandlePostInner(libinput_event_pointer* data, PointerEvent::PointerItem pointerItem);
+    void HandlePostInner(libinput_event_pointer* data, PointerEvent::PointerItem& pointerItem);
     void DumpInner();
 private:
     std::shared_ptr<PointerEvent> pointerEvent_;
