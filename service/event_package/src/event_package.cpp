@@ -632,7 +632,7 @@ int32_t EventPackage::PackagePointerEvent(libinput_event *event,
         }
         default: {
             ret = RET_ERR;
-            MMI_LOGE("Unknown event_type of pointer class has been reported!\n");
+            MMI_LOGE("Unknown event_type of pointer class has been reported");
             break;
         }
     }
