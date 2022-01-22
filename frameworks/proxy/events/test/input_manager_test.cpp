@@ -46,9 +46,6 @@ constexpr int32_t TIME_WAIT_FOR_OP = 500;
 constexpr int32_t TIME_WAIT_FOR_LOG = 50;
 constexpr int32_t N_TRIES_FOR_LOG = 20;
 constexpr bool ISINTERCEPTED_TRUE = true;
-constexpr int32_t INDEX_FIRST = 1;
-constexpr int32_t INDEX_SECOND = 2;
-constexpr int32_t INDEX_THIRD = 3;
 constexpr int32_t INDEX_INVALID = -1;
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerTest" };
 }
@@ -1028,14 +1025,8 @@ void InputManagerTest::KeyMonitorCallBack(std::shared_ptr<OHOS::MMI::KeyEvent> k
 
 HWTEST_F(InputManagerTest, InputManagerTest_AddMonitor_001, TestSize.Level1)
 {
-    RunShellUtil runCommand;
-    std::string command = "consumer is null";
-    std::vector<std::string> log;
-    ASSERT_TRUE(runCommand.RunShellCommand(command, log) == RET_OK);
-
-    int32_t response = MMI_STANDARD_EVENT_SUCCESS;
-    response = InputManager::GetInstance()->AddMonitor(KeyMonitorCallBack);
-    EXPECT_EQ(MMI_STANDARD_EVENT_SUCCESS, response);
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(KeyMonitorCallBack);
+    EXPECT_TRUE(monitorId != InputHandlerManager::MIN_HANDLER_ID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     OHOS::KeyEvent injectUpEvent;
@@ -1052,37 +1043,31 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMonitor_001, TestSize.Level1)
 
 HWTEST_F(InputManagerTest, InputManagerTest_AddMonitor_002, TestSize.Level1)
 {
-    RunShellUtil runCommand;
-    std::string command = "consumer is null";
-    std::vector<std::string> log;
-    ASSERT_TRUE(runCommand.RunShellCommand(command, log) == RET_OK);
-
-    int32_t response = MMI_STANDARD_EVENT_SUCCESS;
-    response = InputManager::GetInstance()->AddMonitor(KeyMonitorCallBack);
-    EXPECT_EQ(MMI_STANDARD_EVENT_SUCCESS, response);
+    int32_t monitorId1 = InputManager::GetInstance()->AddMonitor(KeyMonitorCallBack);
+    EXPECT_TRUE(monitorId1 != InputHandlerManager::MIN_HANDLER_ID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    response = InputManager::GetInstance()->AddMonitor(KeyMonitorCallBack);
-    EXPECT_EQ(MMI_STANDARD_EVENT_SUCCESS, response);
+    int32_t monitorId2 = InputManager::GetInstance()->AddMonitor(KeyMonitorCallBack);
+    EXPECT_TRUE(monitorId2 != InputHandlerManager::MIN_HANDLER_ID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    response = InputManager::GetInstance()->AddMonitor(KeyMonitorCallBack);
-    EXPECT_EQ(MMI_STANDARD_EVENT_SUCCESS, response);
+    int32_t monitorId3 = InputManager::GetInstance()->AddMonitor(KeyMonitorCallBack);
+    EXPECT_TRUE(monitorId3 != InputHandlerManager::MIN_HANDLER_ID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     OHOS::KeyEvent injectUpEvent;
     uint64_t downTime = static_cast<uint64_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
     injectUpEvent.Initialize(0, ACTION_UP, HOS_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
         ISINTERCEPTED_TRUE);
-    response = MMIEventHdl.InjectEvent(injectUpEvent);
+    int32_t response = MMIEventHdl.InjectEvent(injectUpEvent);
     EXPECT_TRUE(response);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    InputManager::GetInstance()->RemoveMonitor(INDEX_FIRST);
+    InputManager::GetInstance()->RemoveMonitor(monitorId1);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    InputManager::GetInstance()->RemoveMonitor(INDEX_SECOND);
+    InputManager::GetInstance()->RemoveMonitor(monitorId2);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    InputManager::GetInstance()->RemoveMonitor(INDEX_THIRD);
+    InputManager::GetInstance()->RemoveMonitor(monitorId3);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->RemoveMonitor(INDEX_INVALID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));

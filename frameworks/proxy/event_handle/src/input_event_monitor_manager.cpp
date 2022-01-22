@@ -17,14 +17,14 @@
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 
-namespace OHOS::MMI {
-    namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventMonitorManager" };
-    }
+namespace OHOS {
+namespace MMI {
+namespace {
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventMonitorManager" };
+}
 
 InputEventMonitorManager::InputEventMonitorManager()
 {
-    MMI_LOGT("enter");
 }
 
 InputEventMonitorManager::~InputEventMonitorManager()
@@ -34,11 +34,8 @@ InputEventMonitorManager::~InputEventMonitorManager()
 int32_t InputEventMonitorManager::AddInputEventMontior(
     std::function<void (std::shared_ptr<OHOS::MMI::KeyEvent>)> keyEventMonitor)
 {
-    if (keyEventMonitor == nullptr) {
-        MMI_LOGE("param should not be null");
-        return OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER;
-    }
-    static int32_t monitorId = 0;
+    CHKPR(keyEventMonitor, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
+    static int32_t monitorId = INVALID_MONITOR_ID;
     MonitorItem monitorItem;
     monitorItem.keyEventMonitor = keyEventMonitor;
     monitorItem.id_ = ++monitorId;
@@ -50,8 +47,8 @@ int32_t InputEventMonitorManager::AddInputEventMontior(
 
 void InputEventMonitorManager::RemoveInputEventMontior(int32_t monitorId)
 {
-	if (monitorId <=0 ) {
-		MMI_LOGE("monitorId invalid");
+	if (monitorId < 0 ) {
+		MMI_LOGE("MonitorId invalid");
 	    return;
 	}
     MonitorItem monitorItem;
@@ -59,12 +56,12 @@ void InputEventMonitorManager::RemoveInputEventMontior(int32_t monitorId)
     std::list<MonitorItem>::iterator iter;
     iter = std::find(monitors_.begin(), monitors_.end(), monitorItem);
     if (iter == monitors_.end()) {
-        MMI_LOGE("monitorItem does not exist");
-    } else {
-        iter = monitors_.erase(iter);
-        MMIEventHdl.RemoveInputEventMontior(OHOS::MMI::InputEvent::EVENT_TYPE_KEY);
-        MMI_LOGD("monitorItem id: %{public}d removed", monitorId);
+        MMI_LOGW("MonitorItem does not exist");
+        return;
     }
+    iter = monitors_.erase(iter);
+    MMIEventHdl.RemoveInputEventMontior(OHOS::MMI::InputEvent::EVENT_TYPE_KEY);
+    MMI_LOGD("MonitorId: %{public}d removed", monitorId);
 }
 
 int32_t InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
@@ -136,5 +133,6 @@ int32_t InputEventMonitorManager::OnTouchpadMonitorInputEvent(std::shared_ptr<OH
              pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
              pointerEvent->GetPointerId(), pointer.GetGlobalX(), pointer.GetGlobalY(), pointer.IsPressed());
     return OHOS::MMI_STANDARD_EVENT_SUCCESS;
+}
 }
 }
