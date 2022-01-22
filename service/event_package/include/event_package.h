@@ -48,11 +48,9 @@ namespace OHOS::MMI {
         static int32_t PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& key, UDSServer& udsServer);
         static int32_t KeyboardToKeyEvent(EventKeyboard& key, std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr,
             UDSServer& udsServer);
-        static std::shared_ptr<OHOS::MMI::PointerEvent> GestureToPointerEvent(EventGesture& gesture,
-           UDSServer& udsServer);
+        static std::shared_ptr<OHOS::MMI::PointerEvent> LibinputEventToPointerEvent(libinput_event *event,
+            UDSServer& udsServer);
     private:
-        uint32_t SEAT_BUTTON_OR_KEY_COUNT_ONE = 1;
-        uint32_t SEAT_BUTTON_OR_KEY_COUNT_ZERO = 0;
         void PackageTabletPadOtherParams(libinput_event *event, EventTabletPad& tabletPad);
         int32_t PackageTabletToolOtherParams(libinput_event *event, EventTabletTool& tableTool);
         void PackageTabletToolTypeParam(libinput_event *event, EventTabletTool& tableTool);
@@ -60,6 +58,7 @@ namespace OHOS::MMI {
         int32_t PackagePointerEventByMotionAbs(libinput_event *event, EventPointer& point);
         int32_t PackagePointerEventByButton(libinput_event *event, EventPointer& point);
         int32_t PackagePointerEventByAxis(libinput_event *event, EventPointer& point);
+        void PackageTouchEventByType(int32_t type, struct libinput_event_touch *data, EventTouch& touch);
     };
     template<class T>
     int32_t EventPackage::PackageRegisteredEvent(T& data, RegisteredEvent& event)

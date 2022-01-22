@@ -180,7 +180,7 @@ int32_t OHOS::MMI::EventDispatch::KeyBoardRegEveHandler(EventKeyboard& key, UDSS
             MMI_LOGW("Dispatching ON_ENTER event has failed, ret:%{public}d, errCode:%{public}d", ret2,
                 SPCL_REG_EVENT_DISP_FAIL);
         }
-    } else if (key.key == KEY_ESC && key.state == KEY_STATE_PRESSED) {
+    } else if ((key.key == KEY_ESC) && (key.state == KEY_STATE_PRESSED)) {
         ret1 = DispatchRegEvent(MmiMessageId::ON_CANCEL, udsServer, eve, INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
         if (ret1 != RET_OK) {
             MMI_LOGW("Dispatching ON_CANCEL event has failed, ret:%{public}d, errCode:%{public}d", ret1,
@@ -191,7 +191,7 @@ int32_t OHOS::MMI::EventDispatch::KeyBoardRegEveHandler(EventKeyboard& key, UDSS
             MMI_LOGW("Dispatching ON_BACK event has failed, ret:%{public}d, errCode:%{public}d", ret2,
                 SPCL_REG_EVENT_DISP_FAIL);
         }
-    } else if (key.key == KEY_BACK && key.state == KEY_STATE_PRESSED) {
+    } else if ((key.key == KEY_BACK) && (key.state == KEY_STATE_PRESSED)) {
         ret1 = DispatchRegEvent(MmiMessageId::ON_CLOSE_PAGE, udsServer,
                                 eve, INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
         if (ret1 != RET_OK) {
@@ -204,7 +204,7 @@ int32_t OHOS::MMI::EventDispatch::KeyBoardRegEveHandler(EventKeyboard& key, UDSS
                 SPCL_REG_EVENT_DISP_FAIL);
         }
     }
-    if (ret1 == RET_OK && ret2 == RET_OK) {
+    if ((ret1 == RET_OK) && (ret2 == RET_OK)) {
         return RET_OK;
     } else {
         MMI_LOGE("dispatching special registered event has failed!\n");
@@ -358,12 +358,11 @@ bool OHOS::MMI::EventDispatch::HandlePointerEventFilter(std::shared_ptr<PointerE
 int32_t OHOS::MMI::EventDispatch::handlePointerEvent(std::shared_ptr<PointerEvent> point) 
 {
     MMI_LOGE("handlePointerEvent begin .....");
-
-    auto source = point->GetSourceType();
     auto fd = WinMgr->UpdateTargetPointer(point);
     if (HandlePointerEventFilter(point)) {
         return RET_OK;
     }
+    auto source = point->GetSourceType();
     switch (source) {
         case PointerEvent::SOURCE_TYPE_MOUSE: {
             if (HandleMouseEvent(point)) {
@@ -477,6 +476,7 @@ void OHOS::MMI::EventDispatch::DispatchPointerEventTrace(const EventPointer& poi
     }
     MMI_LOGT(" OnEventPointer service DispatchPointerEvent pointerUuid = %{public}s\n", pointerUuid);
     std::string pointerEvent = pointerUuid;
+    pointerEvent = "DispatchPointerEvent service pointerUuid: " + pointerEvent;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, EVENT_POINTER);
 }
 
@@ -542,13 +542,13 @@ int32_t OHOS::MMI::EventDispatch::DispatchPointerEvent(UDSServer &udsServer, lib
 
         MMI_LOGT("\n4.event dispatcher of server:\neventPointer:time=%{public}" PRId64 ";deviceType=%{public}u;"
                     "deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
-                    "buttonCode=%{public}u;seat_button_count=%{public}u;axes=%{public}u;buttonState=%{public}d;"
+                    "buttonCode=%{public}u;seat_button_count=%{public}u;axis=%{public}u;buttonState=%{public}d;"
                     "source=%{public}d;delta.x=%{public}lf;delta.y=%{public}lf;delta_raw.x=%{public}lf;"
                     "delta_raw.y=%{public}lf;absolute.x=%{public}lf;absolute.y=%{public}lf;discrete.x=%{public}lf;"
                     "discrete.y=%{public}lf;fd=%{public}d;"
                     "preHandlerTime=%{public}" PRId64 ";\n",
                     point.time, point.deviceType, point.deviceName,
-                    point.devicePhys, point.eventType, point.button, point.seat_button_count, point.axes,
+                    point.devicePhys, point.eventType, point.button, point.seat_button_count, point.axis,
                     point.state, point.source, point.delta.x, point.delta.y, point.delta_raw.x,
                     point.delta_raw.y, point.absolute.x, point.absolute.y, point.discrete.x,
                     point.discrete.y, appInfo.fd, preHandlerTime);
@@ -586,6 +586,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchGestureEvent(UDSServer& udsServer, lib
 
     auto focusId = WinMgr->GetFocusSurfaceId();
     if (focusId < 0) {
+        MMI_LOGE("Focus Id is invalid! errCode:%{public}d", FOCUS_ID_OBTAIN_FAIL);
         return RET_OK;
     }
     auto appInfo = AppRegs->FindByWinId(focusId); // obtain application information
@@ -594,11 +595,11 @@ int32_t OHOS::MMI::EventDispatch::DispatchGestureEvent(UDSServer& udsServer, lib
         return FOCUS_ID_OBTAIN_FAIL;
     }
 
-    MMI_LOGT("\n4.event dispatcher of server:\nEventGesture:time=%{public}" PRId64 ";deviceType=%{public}u;"
+    MMI_LOGT("4.event dispatcher of server:EventGesture:time=%{public}" PRId64 ";deviceType=%{public}u;"
              "deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
              "fingerCount=%{public}d;cancelled=%{public}d;delta.x=%{public}lf;delta.y=%{public}lf;"
              "deltaUnaccel.x=%{public}lf;deltaUnaccel.y=%{public}lf;fd=%{public}d;"
-             "preHandlerTime=%{public}" PRId64 ";\n",
+             "preHandlerTime=%{public}" PRId64 ";",
              gesture.time, gesture.deviceType, gesture.deviceName, gesture.devicePhys,
              gesture.eventType, gesture.fingerCount, gesture.cancelled, gesture.delta.x, gesture.delta.y,
              gesture.deltaUnaccel.x, gesture.deltaUnaccel.y, appInfo.fd, preHandlerTime);
@@ -609,7 +610,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchGestureEvent(UDSServer& udsServer, lib
         int32_t inputType = INPUT_DEVICE_CAP_GESTURE;
         newPacket << inputType << gesture << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
         if (!udsServer.SendMsg(appInfo.fd, newPacket)) {
-            MMI_LOGE("Sending structure of EventGesture failed! errCode:%{public}d\n", MSG_SEND_FAIL);
+            MMI_LOGE("Sending structure of EventGesture failed! errCode:%{public}d", MSG_SEND_FAIL);
             return MSG_SEND_FAIL;
         }
     }
@@ -626,6 +627,7 @@ void OHOS::MMI::EventDispatch::DispatchTouchEventTrace(const EventTouch& touch)
     }
     MMI_LOGT(" 4.event dispatcher of server: touchUuid = %{public}s\n", touchUuid);
     std::string touchEvent = touchUuid;
+    touchEvent = "4.event dispatcher of server touchUuid: " + touchEvent;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, EVENT_TOUCH);
 }
 
@@ -692,7 +694,7 @@ int32_t OHOS::MMI::EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libin
                 struct EventTouch touchTemp = {};
                 CHKR(EOK == memcpy_s(&touchTemp, sizeof(touchTemp), &touch, sizeof(touch)),
                      MEMCPY_SEC_FUN_FAIL, RET_ERR);
-                MMIRegEvent->GetTouchInfoByTouchId(touchTemp, touchId);
+                MMIRegEvent->GetTouchInfoByTouchId(touchId, touchTemp);
                 MMI_LOGT("\n4.event dispatcher of server:\neventTouch:time=%{public}" PRId64 ";deviceType=%{public}u;"
                          "deviceName=%{public}s;devicePhys=%{public}s;eventType=%{public}d;"
                          "slot=%{public}d;seat_slot=%{public}d;pressure=%{public}lf;point.x=%{public}lf;"
@@ -829,6 +831,7 @@ void OHOS::MMI::EventDispatch::DispatchKeyEventTrace(const EventKeyboard& key)
     }
     MMI_LOGT(" OnEventKeyboard service DispatchKeyEvent keyUuid = %{public}s\n", keyUuid);
     std::string keyEvent = keyUuid;
+    keyEvent = "4.event dispatcher of server keyUuid: " + keyEvent;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, EVENT_KEY);
 }
 
