@@ -293,7 +293,7 @@ int32_t MultimodalEventHandler::AddInputEventMontior(int32_t keyEventType)
         return MMI_SERVICE_INVALID;
     }
     NetPacket ck(MmiMessageId::ADD_INPUT_EVENT_MONITOR);
-    ck << OHOS::MMI::InputEvent::EVENT_TYPE_KEY;
+    ck << keyEventType;
     mClient_->SendMessage(ck);
     return RET_OK;
 }
@@ -304,7 +304,7 @@ void MultimodalEventHandler::RemoveInputEventMontior(int32_t keyEventType)
         return;
     }
     NetPacket ck(MmiMessageId::REMOVE_INPUT_EVENT_MONITOR);
-    ck << OHOS::MMI::InputEvent::EVENT_TYPE_KEY;
+    ck << keyEventType;
     mClient_->SendMessage(ck);
 }
 
