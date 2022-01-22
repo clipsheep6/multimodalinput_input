@@ -42,6 +42,7 @@ constexpr int32_t DEFAULT_DEVICE_ID = 1;
 constexpr int32_t DEFAULT_POINTER_ID = 0;
 constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
 constexpr int32_t SEC_TO_NANOSEC = 1000000000;
+constexpr int32_t TIME_WAIT_FOR_MONITOR_TEST = 5000;
 constexpr int32_t TIME_WAIT_FOR_OP = 500;
 constexpr int32_t TIME_WAIT_FOR_LOG = 50;
 constexpr int32_t N_TRIES_FOR_LOG = 20;
@@ -1027,7 +1028,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMonitor_001, TestSize.Level1)
 {
     int32_t monitorId = InputManager::GetInstance()->AddMonitor(KeyMonitorCallBack);
     EXPECT_TRUE(monitorId != InputEventMonitorManager::INVALID_MONITOR_ID);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_MONITOR_TEST));
 
     OHOS::KeyEvent injectUpEvent;
     uint64_t downTime = static_cast<uint64_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
@@ -1035,25 +1036,25 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMonitor_001, TestSize.Level1)
         ISINTERCEPTED_TRUE);
     int32_t response = MMIEventHdl.InjectEvent(injectUpEvent);
     EXPECT_TRUE(response);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_MONITOR_TEST));
 
     InputManager::GetInstance()->RemoveMonitor(monitorId);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_MONITOR_TEST));
 }
 
 HWTEST_F(InputManagerTest, InputManagerTest_AddMonitor_002, TestSize.Level1)
 {
     int32_t monitorId1 = InputManager::GetInstance()->AddMonitor(KeyMonitorCallBack);
     EXPECT_TRUE(monitorId1 != InputEventMonitorManager::INVALID_MONITOR_ID);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_MONITOR_TEST));
 
     int32_t monitorId2 = InputManager::GetInstance()->AddMonitor(KeyMonitorCallBack);
     EXPECT_TRUE(monitorId2 != InputEventMonitorManager::INVALID_MONITOR_ID);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_MONITOR_TEST));
 
     int32_t monitorId3 = InputManager::GetInstance()->AddMonitor(KeyMonitorCallBack);
     EXPECT_TRUE(monitorId3 != InputEventMonitorManager::INVALID_MONITOR_ID);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_MONITOR_TEST));
 
     OHOS::KeyEvent injectUpEvent;
     uint64_t downTime = static_cast<uint64_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
@@ -1061,16 +1062,16 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMonitor_002, TestSize.Level1)
         ISINTERCEPTED_TRUE);
     int32_t response = MMIEventHdl.InjectEvent(injectUpEvent);
     EXPECT_TRUE(response);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_MONITOR_TEST));
 
     InputManager::GetInstance()->RemoveMonitor(monitorId1);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_MONITOR_TEST));
     InputManager::GetInstance()->RemoveMonitor(monitorId2);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_MONITOR_TEST));
     InputManager::GetInstance()->RemoveMonitor(monitorId3);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_MONITOR_TEST));
     InputManager::GetInstance()->RemoveMonitor(INDEX_INVALID);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_MONITOR_TEST));
 }
 
 HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_001, TestSize.Level1)

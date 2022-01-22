@@ -56,7 +56,7 @@ void InputEventMonitorManager::RemoveInputEventMontior(int32_t monitorId)
     std::list<MonitorItem>::iterator iter;
     iter = std::find(monitors_.begin(), monitors_.end(), monitorItem);
     if (iter == monitors_.end()) {
-        MMI_LOGW("MonitorItem does not exist");
+        MMI_LOGW("MonitorId: %{public}d does not exist", monitorItem.id_);
         return;
     }
     iter = monitors_.erase(iter);
