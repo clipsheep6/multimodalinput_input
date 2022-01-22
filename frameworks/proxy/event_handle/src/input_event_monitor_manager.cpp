@@ -47,7 +47,7 @@ int32_t InputEventMonitorManager::AddInputEventMontior(
 
 void InputEventMonitorManager::RemoveInputEventMontior(int32_t monitorId)
 {
-    if (monitorId < 0 ) {
+    if (monitorId < 0) {
         MMI_LOGE("MonitorId invalid");
 	    return;
     }
@@ -61,7 +61,7 @@ void InputEventMonitorManager::RemoveInputEventMontior(int32_t monitorId)
     }
     iter = monitors_.erase(iter);
     MMIEventHdl.RemoveInputEventMontior(OHOS::MMI::InputEvent::EVENT_TYPE_KEY);
-    MMI_LOGD("MonitorId: %{public}d removed", monitorId);
+    MMI_LOGT("MonitorId: %{public}d removed", monitorId);
 }
 
 int32_t InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
