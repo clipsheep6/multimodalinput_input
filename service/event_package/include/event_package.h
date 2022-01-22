@@ -39,8 +39,8 @@ namespace OHOS::MMI {
         int32_t PackageKeyEvent(libinput_event *event, std::shared_ptr<OHOS::MMI::KeyEvent> kevnPtr,
             UDSServer& udsServer);
         int32_t PackageGestureEvent(libinput_event *event, EventGesture& gesture, UDSServer& udsServer);
-        int32_t PackagePointerEvent(multimodal_libinput_event &ev, EventPointer& point, UDSServer& udsServer);
-        int32_t PackageTouchEvent(multimodal_libinput_event &ev, EventTouch& touch, UDSServer& udsServer);
+        int32_t PackagePointerEvent(libinput_event *event, EventPointer& point, UDSServer& udsServer);
+        int32_t PackageTouchEvent(libinput_event *event, EventTouch& touch, UDSServer& udsServer);
         int32_t PackageJoyStickAxisEvent(libinput_event *event, EventJoyStickAxis& eventJoyStickAxis,
             UDSServer& udsServer);
         int32_t PackageJoyStickKeyEvent(libinput_event *event, EventKeyboard& key, UDSServer& udsServer);
@@ -48,8 +48,8 @@ namespace OHOS::MMI {
         static int32_t PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& key, UDSServer& udsServer);
         static int32_t KeyboardToKeyEvent(EventKeyboard& key, std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr,
             UDSServer& udsServer);
-        static std::shared_ptr<OHOS::MMI::PointerEvent> GestureToPointerEvent(EventGesture& gesture,
-           UDSServer& udsServer);
+        static std::shared_ptr<OHOS::MMI::PointerEvent> LibinputEventToPointerEvent(libinput_event *event,
+            UDSServer& udsServer);
     private:
         void PackageTabletPadOtherParams(libinput_event *event, EventTabletPad& tabletPad);
         int32_t PackageTabletToolOtherParams(libinput_event *event, EventTabletTool& tableTool);
@@ -58,6 +58,7 @@ namespace OHOS::MMI {
         int32_t PackagePointerEventByMotionAbs(libinput_event *event, EventPointer& point);
         int32_t PackagePointerEventByButton(libinput_event *event, EventPointer& point);
         int32_t PackagePointerEventByAxis(libinput_event *event, EventPointer& point);
+        void PackageTouchEventByType(int32_t type, struct libinput_event_touch *data, EventTouch& touch);
     };
     template<class T>
     int32_t EventPackage::PackageRegisteredEvent(T& data, RegisteredEvent& event)
