@@ -360,12 +360,14 @@ int32_t OHOS::MMI::EventDispatch::handlePointerEvent(std::shared_ptr<PointerEven
     MMI_LOGE("handlePointerEvent begin .....");
     auto fd = WinMgr->UpdateTargetPointer(point);
     if (HandlePointerEventFilter(point)) {
+        MMI_LOGD("PointerEvent consumed,will not send to client.");
         return RET_OK;
     }
     auto source = point->GetSourceType();
     switch (source) {
         case PointerEvent::SOURCE_TYPE_MOUSE: {
             if (HandleMouseEvent(point)) {
+                MMI_LOGD("PointerEvent consumed,will not send to client.");
                 return RET_OK;
             }
             break;
