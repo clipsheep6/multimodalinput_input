@@ -17,12 +17,12 @@
 
 #include "pointer_event.h"
 #include "struct_multimodal.h"
-#include "c_singleton.h"
+#include "singleton.h"
 #include <map>
 #include <mutex>
 
 namespace OHOS::MMI {
-    class MouseDeviceState : public CSingleton<MouseDeviceState> {
+    class MouseDeviceState : public DelayedSingleton<MouseDeviceState> {
     public:
         enum LIBINPUT_BUTTON_CODE {
             LIBINPUT_LEFT_BUTTON_CODE = 272,
@@ -49,7 +49,7 @@ namespace OHOS::MMI {
 
     private:
         int16_t LibinputChangeToPointer(int16_t keyValue);
-        void ChangeMouseState(uint32_t &stateValue, uint32_t btnState);
+        void ChangeMouseState(uint32_t btnState, uint32_t &stateValue);
         void CheckMouseState(uint32_t &stateValue);
 
     private:

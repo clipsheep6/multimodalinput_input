@@ -14,6 +14,7 @@
  */
 
 #include "input_filter_manager.h"
+#include "bytrace.h"
 #include "log.h"
 #include "mmi_client.h"
 
@@ -121,9 +122,19 @@ std::function<void(KeyBoardEvent)> InputFilterManager::KeyEventFilter::GetHandle
     return this->handler_;
 }
 
+void InputFilterManager::OnkeyEventTrace(const KeyBoardEvent& event)
+{
+    int32_t EVENT_KEY = 1;
+    std::string keyEvent = "InputFilter OnKey keyUuid: " + event.GetUuid();
+    char *tmpKey = (char*)keyEvent.c_str();
+    MMI_LOGT(" OnKey keyUuid = %{public}s\n", tmpKey);
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, EVENT_KEY);
+}
+
 int32_t InputFilterManager::OnKeyEvent(KeyBoardEvent event, int32_t id)
 {
     MMI_LOGD("client on key event call function handler ");
+    OnkeyEventTrace(event);
     for (auto item : keyEventFilterList_) {
         if (id == item.GetId()) {
             item.GetHandler()(event);
@@ -258,9 +269,19 @@ std::function<void(TouchEvent)> InputFilterManager::TouchEventFilter::GetHandler
     return this->handler_;
 }
 
+void InputFilterManager::OnTouchEventTrace(const TouchEvent& event)
+{
+    int32_t EVENT_TOUCH = 9;
+    std::string touchEvent = "InputFilter OnTouch touchUuid: " + event.GetUuid();
+    char *tmpTouch = (char*)touchEvent.c_str();
+    MMI_LOGT(" OnTouchEvent touchUuid = %{public}s\n", tmpTouch);
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, EVENT_TOUCH);
+}
+
 int32_t InputFilterManager::OnTouchEvent(TouchEvent event, int32_t id)
 {
     MMI_LOGE("client on touch event call function handler, id=%{public}d", id);
+    OnTouchEventTrace(event);
     for (auto iter : touchEventFilterList_) {
         if (id == iter.GetId()) {
             iter.GetHandler()(event);
@@ -370,9 +391,19 @@ std::function<void(MouseEvent)> InputFilterManager::PointerEventInterceptor::Get
     return this->handler_;
 }
 
+void InputFilterManager::OnPointerEventTrace(const MouseEvent& event)
+{
+    int32_t EVENT_POINTER = 17;
+    std::string pointerEvent = "InputFilter OnPointer pointerUuid: " + event.GetUuid();
+    char *tmpPointer = (char*)pointerEvent.c_str();
+    MMI_LOGT(" OnPointerEvent pointerUuid = %{public}s\n", tmpPointer);
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, EVENT_POINTER);
+}
+
 int32_t InputFilterManager::OnPointerEvent(MouseEvent event, int32_t id_)
 {
     MMI_LOGD("client on point event call function handler ");
+    OnPointerEventTrace(event);
     for (auto item : PointerEventInterceptorList_)
     {
         if (id_ == item.GetId()) {
