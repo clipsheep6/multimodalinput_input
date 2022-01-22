@@ -1026,7 +1026,7 @@ void InputManagerTest::KeyMonitorCallBack(std::shared_ptr<OHOS::MMI::KeyEvent> k
 HWTEST_F(InputManagerTest, InputManagerTest_AddMonitor_001, TestSize.Level1)
 {
     int32_t monitorId = InputManager::GetInstance()->AddMonitor(KeyMonitorCallBack);
-    EXPECT_TRUE(monitorId != InputHandlerManager::MIN_HANDLER_ID);
+    EXPECT_TRUE(monitorId != InputEventMonitorManager::INVALID_MONITOR_ID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     OHOS::KeyEvent injectUpEvent;
@@ -1044,15 +1044,15 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMonitor_001, TestSize.Level1)
 HWTEST_F(InputManagerTest, InputManagerTest_AddMonitor_002, TestSize.Level1)
 {
     int32_t monitorId1 = InputManager::GetInstance()->AddMonitor(KeyMonitorCallBack);
-    EXPECT_TRUE(monitorId1 != InputHandlerManager::MIN_HANDLER_ID);
+    EXPECT_TRUE(monitorId1 != InputEventMonitorManager::INVALID_MONITOR_ID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int32_t monitorId2 = InputManager::GetInstance()->AddMonitor(KeyMonitorCallBack);
-    EXPECT_TRUE(monitorId2 != InputHandlerManager::MIN_HANDLER_ID);
+    EXPECT_TRUE(monitorId2 != InputEventMonitorManager::INVALID_MONITOR_ID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int32_t monitorId3 = InputManager::GetInstance()->AddMonitor(KeyMonitorCallBack);
-    EXPECT_TRUE(monitorId3 != InputHandlerManager::MIN_HANDLER_ID);
+    EXPECT_TRUE(monitorId3 != InputEventMonitorManager::INVALID_MONITOR_ID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     OHOS::KeyEvent injectUpEvent;
