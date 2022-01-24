@@ -352,7 +352,7 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     auto packageResult = eventPackage_.PackageKeyEvent(event, keyEvent, *udsServer_);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
-        MMI_LOGD("The same event reported by multi_device should be discarded!\n");
+        MMI_LOGD("The same event reported by multi_device should be discarded");
         return RET_OK;
     }
     if (packageResult != RET_OK) {
@@ -395,7 +395,7 @@ int32_t InputEventHandler::OnKeyEventDispatch(multimodal_libinput_event& ev)
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     auto packageResult = eventPackage_.PackageKeyEvent(ev.event, keyEvent, *udsServer_);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
-        MMI_LOGD("The same event reported by multi_device should be discarded!\n");
+        MMI_LOGD("The same event reported by multi_device should be discarded");
         return RET_OK;
     }
     if (packageResult != RET_OK) {
@@ -575,7 +575,7 @@ int32_t InputEventHandler::OnEventPointer(multimodal_libinput_event &ev)
     EventPointer point = {};
     auto packageResult = eventPackage_.PackagePointerEvent(ev.event, point, *udsServer_);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
-        MMI_LOGD("The same event reported by multi_device should be discarded!\n");
+        MMI_LOGD("The same event reported by multi_device should be discarded");
         return RET_OK;
     }
     if (packageResult != RET_OK) {
@@ -781,7 +781,7 @@ int32_t InputEventHandler::OnEventTabletTool(multimodal_libinput_event &ev)
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     auto packageResult = eventPackage_.PackageTabletToolEvent(ev.event, tableTool, *udsServer_);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
-        MMI_LOGD("The same event reported by multi_device should be discarded!\n");
+        MMI_LOGD("The same event reported by multi_device should be discarded");
         return RET_OK;
     }
     if (packageResult != RET_OK) {
@@ -837,7 +837,7 @@ int32_t InputEventHandler::OnEventTabletPadKey(multimodal_libinput_event &ev)
     EventKeyboard key = {};
     auto packageResult = eventPackage_.PackageTabletPadKeyEvent(ev.event, key, *udsServer_);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
-        MMI_LOGD("The same event reported by multi_device should be discarded!\n");
+        MMI_LOGD("The same event reported by multi_device should be discarded");
         return RET_OK;
     }
     if (packageResult != RET_OK) {
