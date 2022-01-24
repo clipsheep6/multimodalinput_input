@@ -275,7 +275,7 @@ int32_t InputEventHandler::OnEventDeviceAdded(multimodal_libinput_event &ev)
     auto device = libinput_event_get_device(ev.event);
     inputDeviceManager->OnInputDeviceAdded(device);
 
-    uint64_t preHandlerTime = GetSysClockTime();
+    uint64_t sysStartProcessTime = GetSysClockTime();
     DeviceManage deviceManage = {};
 
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
@@ -298,7 +298,7 @@ int32_t InputEventHandler::OnEventDeviceAdded(multimodal_libinput_event &ev)
         return RET_OK; // DeviceAdded event will be discarded if appInfo.fd == RET_ERR
     }
     NetPacket newPacket(MmiMessageId::ON_DEVICE_ADDED);
-    newPacket << deviceManage << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
+    newPacket << deviceManage << appInfo.abilityId << focusId << appInfo.fd << sysStartProcessTime;
     if (!SendMsg(appInfo.fd, newPacket)) {
         MMI_LOGE("Sending structure of DeviceManage failed! errCode:%{public}d\n", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
@@ -312,7 +312,7 @@ int32_t InputEventHandler::OnEventDeviceRemoved(multimodal_libinput_event &ev)
     auto device = libinput_event_get_device(ev.event);
     inputDeviceManager->OnInputDeviceRemoved(device);
 
-    uint64_t preHandlerTime = GetSysClockTime();
+    uint64_t sysStartProcessTime = GetSysClockTime();
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     DeviceManage deviceManage = {};
     auto packageResult = eventPackage_.PackageDeviceManageEvent(ev.event, deviceManage, *udsServer_);
@@ -334,7 +334,7 @@ int32_t InputEventHandler::OnEventDeviceRemoved(multimodal_libinput_event &ev)
         return RET_OK; // DeviceRemoved event will be discarded if appInfo.fd == RET_ERR
     }
     NetPacket newPacket(MmiMessageId::ON_DEVICE_REMOVED);
-    newPacket << deviceManage << appInfo.abilityId << focusId << appInfo.fd << preHandlerTime;
+    newPacket << deviceManage << appInfo.abilityId << focusId << appInfo.fd << sysStartProcessTime;
     if (!SendMsg(appInfo.fd, newPacket)) {
         MMI_LOGE("Sending structure of DeviceManage failed! errCode:%{public}d\n", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
@@ -345,7 +345,7 @@ int32_t InputEventHandler::OnEventDeviceRemoved(multimodal_libinput_event &ev)
 int32_t InputEventHandler::OnEventKey(libinput_event *event)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
-    uint64_t preHandlerTime = GetSysClockTime();
+    uint64_t sysStartProcessTime = GetSysClockTime();
     if (keyEvent == nullptr) {
         keyEvent = KeyEvent::Create();
     }
@@ -362,7 +362,7 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
 
     int32_t kac = keyEvent->GetKeyAction();
     KEY_STATE kacState = (kac == KeyEvent::KEY_ACTION_DOWN) ? KEY_STATE_PRESSED : KEY_STATE_RELEASED;
-    
+
 #ifdef OHOS_WESTEN_MODEL
     int16_t lowKeyCode = static_cast<int16_t>(keyEvent->GetKeyCode());
     auto oKey = KeyValueTransformationByInput(lowKeyCode);
@@ -374,7 +374,7 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
     auto device = libinput_event_get_device(event);
     CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
-    auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent, preHandlerTime);
+    auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent, sysStartProcessTime);
     if (eventDispatchResult != RET_OK) {
         MMI_LOGE("KeyEvent dispatch failed... ret:%{public}d errCode:%{public}d",
                  eventDispatchResult, KEY_EVENT_DISP_FAIL);
@@ -387,7 +387,7 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
 int32_t InputEventHandler::OnKeyEventDispatch(multimodal_libinput_event& ev)
 {
 #ifdef OHOS_WESTEN_MODEL
-    uint64_t preHandlerTime = GetSysClockTime();
+    uint64_t sysStartProcessTime = GetSysClockTime();
 #endif
     if (keyEvent == nullptr) {
         keyEvent = KeyEvent::Create();
@@ -422,9 +422,9 @@ int32_t InputEventHandler::OnKeyEventDispatch(multimodal_libinput_event& ev)
     auto device = libinput_event_get_device(ev.event);
     CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
-    auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent, preHandlerTime);
+    auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent, sysStartProcessTime);
     if (eventDispatchResult != RET_OK) {
-        MMI_LOGE("KeyEvent dispatch failed... ret:%{public}d errCode:%{public}d", 
+        MMI_LOGE("KeyEvent dispatch failed... ret:%{public}d errCode:%{public}d",
             eventDispatchResult, KEY_EVENT_DISP_FAIL);
         return KEY_EVENT_DISP_FAIL;
     }
@@ -435,7 +435,7 @@ int32_t InputEventHandler::OnKeyEventDispatch(multimodal_libinput_event& ev)
 int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
-    uint64_t preHandlerTime = GetSysClockTime();
+    uint64_t sysStartProcessTime = GetSysClockTime();
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     EventKeyboard keyBoard = {};
     auto packageResult = eventPackage_.PackageKeyEvent(event, keyBoard, *udsServer_);
@@ -475,7 +475,7 @@ int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
     auto device = libinput_event_get_device(event);
     CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
-    auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent, preHandlerTime);
+    auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent, sysStartProcessTime);
     if (eventDispatchResult != RET_OK) {
         MMI_LOGE("Key event dispatch failed. ret:%{public}d, errCode:%{public}d",
                  eventDispatchResult, KEY_EVENT_DISP_FAIL);
@@ -503,7 +503,7 @@ int32_t InputEventHandler::OnEventKeyboard(multimodal_libinput_event &ev)
 {
     CHKPR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
 #ifdef OHOS_WESTEN_MODEL
-    uint64_t preHandlerTime = GetSysClockTime();
+    uint64_t sysStartProcessTime = GetSysClockTime();
 #endif
 
     CHKPR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
@@ -532,7 +532,7 @@ int32_t InputEventHandler::OnEventKeyboard(multimodal_libinput_event &ev)
     }
 
     auto eventDispatchResult = eventDispatch_.DispatchKeyEvent(*udsServer_, ev.event, oKey, keyBoard,
-                                                               preHandlerTime);
+                                                               sysStartProcessTime);
     if (eventDispatchResult != RET_OK) {
         MMI_LOGE("Key event dispatch failed. ret:%{public}d, errCode:%{public}d",
                  eventDispatchResult, KEY_EVENT_DISP_FAIL);
@@ -558,24 +558,26 @@ void InputEventHandler::OnEventPointerTrace(const EventPointer& point)
 
 int32_t InputEventHandler::OnEventPointer(multimodal_libinput_event &ev)
 {
-    CHKPR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
-    uint64_t preHandlerTime = GetSysClockTime();
-    auto device = libinput_event_get_device(ev.event);
-    auto type = libinput_event_get_type(ev.event);
-    CHKPR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
     CHKPR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
+    uint64_t sysStartProcessTime = GetSysClockTime();
+    auto device = libinput_event_get_device(ev.event);
+    CHKPR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
+    auto type = libinput_event_get_type(ev.event);
     int32_t devicType = static_cast<int32_t>(libinput_device_get_tags(device));
     if (devicType & EVDEV_UDEV_TAG_JOYSTICK) {
         if (type == LIBINPUT_EVENT_POINTER_BUTTON) {
-            return OnEventJoyStickKey(ev, preHandlerTime);
+            MMI_LOGI("JoyStickKey Process");
+            return OnEventJoyStickKey(ev, sysStartProcessTime);
         } else if (type == LIBINPUT_EVENT_POINTER_AXIS) {
-            return OnEventJoyStickAxis(ev, preHandlerTime);
+            MMI_LOGI("JoyStickAxis Process");
+            return OnEventJoyStickAxis(ev, sysStartProcessTime);
         }
     }
     EventPointer point = {};
     auto packageResult = eventPackage_.PackagePointerEvent(ev.event, point, *udsServer_);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
-        MMI_LOGD("The same event reported by multi_device should be discarded!\n");
+        MMI_LOGW("The same event reported by multi_device should be discarded!");
         return RET_OK;
     }
     if (packageResult != RET_OK) {
@@ -596,7 +598,7 @@ int32_t InputEventHandler::OnEventPointer(multimodal_libinput_event &ev)
 #else
     MMI_LOGT("\n2.mapping event:\nEvent:eventType=%{public}d;", point.eventType);
     /*
-    auto retEvent = eventDispatch_.DispatchCommonPointEvent(*udsServer_, *ev.event, point, preHandlerTime);
+    auto retEvent = eventDispatch_.DispatchCommonPointEvent(*udsServer_, *ev.event, point, sysStartProcessTime);
     if (retEvent != RET_OK) {
         MMI_LOGE("common_point event dispatch failed... ret:%{public}d errCode:%{public}d",
             retEvent, POINT_REG_EVENT_DISP_FAIL);
@@ -608,7 +610,7 @@ int32_t InputEventHandler::OnEventPointer(multimodal_libinput_event &ev)
     /* New */
     return OnMouseEventHandler(ev.event, point.deviceId);
 #else
-    auto retEvent = eventDispatch_.DispatchPointerEvent(*udsServer_, ev.event, point, preHandlerTime);
+    auto retEvent = eventDispatch_.DispatchPointerEvent(*udsServer_, ev.event, point, sysStartProcessTime);
     if (retEvent != RET_OK) {
         MMI_LOGE("Pointer event dispatch failed... ret:%{public}d errCode:%{public}d",
             retEvent, POINT_EVENT_DISP_FAIL);
@@ -621,7 +623,7 @@ int32_t InputEventHandler::OnEventPointer(multimodal_libinput_event &ev)
 int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
-    MMI_LOGD("call  OnEventTouchSecond begin"); 
+    MMI_LOGD("call  OnEventTouchSecond begin");
     auto point = touchTransformPointManger->onLibinputTouchEvent(event);
     if (point == nullptr) {
         return RET_OK;
@@ -630,14 +632,14 @@ int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_UP) {
         point->RemovePointerItem(point->GetPointerId());
-        MMI_LOGD("this touch event is up  remove this finger"); 
+        MMI_LOGD("this touch event is up  remove this finger");
         if (point->GetPointersIdList().empty()) {
             MMI_LOGD("this touch event is final finger up  remove this finger");
             point->Init();
         }
         return RET_OK;
     }
-    MMI_LOGD("call  OnEventTouchSecond end"); 
+    MMI_LOGD("call  OnEventTouchSecond end");
     return RET_OK;
 }
 
@@ -646,7 +648,7 @@ int32_t InputEventHandler::OnEventTouchPadSecond(libinput_event *event)
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     MMI_LOGD("call  OnEventTouchPadSecond begin");
 
-    auto point = touchTransformPointManger->onLibinputTouchPadEvent(event);    
+    auto point = touchTransformPointManger->onLibinputTouchPadEvent(event);
     if (point == nullptr) {
         return RET_OK;
     }
@@ -686,7 +688,7 @@ int32_t InputEventHandler::OnEventTouch(multimodal_libinput_event &ev)
 #ifndef OHOS_WESTEN_MODEL
     OnEventTouchSecond(ev.event);
 #endif
-    uint64_t preHandlerTime = GetSysClockTime();
+    uint64_t sysStartProcessTime = GetSysClockTime();
     EventTouch touch = {};
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     auto packageResult = eventPackage_.PackageTouchEvent(ev.event, touch, *udsServer_);
@@ -700,13 +702,13 @@ int32_t InputEventHandler::OnEventTouch(multimodal_libinput_event &ev)
     }
     OnEventTouchTrace(touch);
 #ifndef OHOS_WESTEN_MODEL
-    if (ServerKeyFilter->OnTouchEvent(*udsServer_, ev.event, touch, preHandlerTime)) {
+    if (ServerKeyFilter->OnTouchEvent(*udsServer_, ev.event, touch, sysStartProcessTime)) {
         return RET_OK;
     }
 #endif
 #ifdef OHOS_WESTEN_MODEL
 
-    auto ret = eventDispatch_.DispatchTouchEvent(*udsServer_, ev.event, touch, preHandlerTime);
+    auto ret = eventDispatch_.DispatchTouchEvent(*udsServer_, ev.event, touch, sysStartProcessTime);
     if (ret != RET_OK) {
         MMI_LOGE("Touch event dispatch failed... ret:%{public}d errCode:%{public}d", ret, TOUCH_EVENT_DISP_FAIL);
         return TOUCH_EVENT_DISP_FAIL;
@@ -728,17 +730,17 @@ int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
     MMI_LOGT("InputEventHandler::OnGestureEvent\n");
-    uint64_t preHandlerTime = GetSysClockTime();
+    uint64_t sysStartProcessTime = GetSysClockTime();
     EventGesture gesture = {};
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
-    
+
     auto pointerEvent = EventPackage::LibinputEventToPointerEvent(event, *udsServer_);
     if (RET_OK == eventDispatch_.handlePointerEvent(pointerEvent)) {
         MMI_LOGD("interceptor of OnGestureEvent end .....");
         return RET_OK;
     }
     auto eventDispatchResult = eventDispatch_.DispatchGestureNewEvent(*udsServer_, event,
-        pointerEvent, preHandlerTime);
+        pointerEvent, sysStartProcessTime);
     if (eventDispatchResult != RET_OK) {
         MMI_LOGE("Gesture New event dispatch failed... ret:%{public}d errCode:%{public}d",
             eventDispatchResult, GESTURE_EVENT_DISP_FAIL);
@@ -753,7 +755,7 @@ int32_t InputEventHandler::OnEventGesture(multimodal_libinput_event &ev)
 #ifndef OHOS_WESTEN_MODEL
     OnGestureEvent(ev.event);
 #else
-    uint64_t preHandlerTime = GetSysClockTime();
+    uint64_t sysStartProcessTime = GetSysClockTime();
     EventGesture gesture = {};
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     auto packageResult = eventPackage_.PackageGestureEvent(ev.event, gesture, *udsServer_);
@@ -763,7 +765,8 @@ int32_t InputEventHandler::OnEventGesture(multimodal_libinput_event &ev)
         return GESTURE_EVENT_PKG_FAIL;
     }
 
-    auto eventDispatchResult = eventDispatch_.DispatchGestureEvent(*udsServer_, ev.event, gesture, preHandlerTime);
+    auto eventDispatchResult = eventDispatch_.DispatchGestureEvent(*udsServer_, ev.event, gesture,
+                                                                   sysStartProcessTime);
     if (eventDispatchResult != RET_OK) {
         MMI_LOGE("Gesture event dispatch failed... ret:%{public}d errCode:%{public}d",
             eventDispatchResult, GESTURE_EVENT_DISP_FAIL);
@@ -776,7 +779,7 @@ int32_t InputEventHandler::OnEventGesture(multimodal_libinput_event &ev)
 int32_t InputEventHandler::OnEventTabletTool(multimodal_libinput_event &ev)
 {
     CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
-    uint64_t preHandlerTime = GetSysClockTime();
+    uint64_t sysStartProcessTime = GetSysClockTime();
     EventTabletTool tableTool = {};
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     auto packageResult = eventPackage_.PackageTabletToolEvent(ev.event, tableTool, *udsServer_);
@@ -790,8 +793,8 @@ int32_t InputEventHandler::OnEventTabletTool(multimodal_libinput_event &ev)
         return TABLETTOOL_EVENT_PKG_FAIL;
     }
     MMI_LOGT("\n2.mapping event:\nEvent:eventType=%{public}d;", tableTool.eventType);
-    auto retEvent = eventDispatch_.DispatchTabletToolEvent(*udsServer_, ev.event, tableTool,
-        preHandlerTime);
+    auto retEvent = eventDispatch_.DispatchTabletToolEvent(*udsServer_, ev.event, tableTool, 
+		sysStartProcessTime);
     if (retEvent != RET_OK) {
         MMI_LOGE("Tabletool event dispatch failed... ret:%{public}d errCode:%{public}d",
             retEvent, TABLETTOOL_EVENT_DISP_FAIL);
@@ -803,7 +806,7 @@ int32_t InputEventHandler::OnEventTabletTool(multimodal_libinput_event &ev)
 int32_t InputEventHandler::OnEventTabletPad(multimodal_libinput_event &ev)
 {
     CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
-    uint64_t preHandlerTime = GetSysClockTime();
+    uint64_t sysStartProcessTime = GetSysClockTime();
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     EventTabletPad tabletPad = {};
     auto packageResult = eventPackage_.PackageTabletPadEvent(ev.event, tabletPad, *udsServer_);
@@ -812,7 +815,7 @@ int32_t InputEventHandler::OnEventTabletPad(multimodal_libinput_event &ev)
             packageResult, TABLETPAD_EVENT_PKG_FAIL);
         return TABLETPAD_EVENT_PKG_FAIL;
     }
-    auto ret = eventDispatch_.DispatchTabletPadEvent(*udsServer_, ev.event, tabletPad, preHandlerTime);
+    auto ret = eventDispatch_.DispatchTabletPadEvent(*udsServer_, ev.event, tabletPad, sysStartProcessTime);
     if (ret != RET_OK) {
         MMI_LOGE("Tabletpad event dispatch failed... ret:%{public}d errCode:%{public}d",
                  ret, TABLETPAD_EVENT_DISP_FAIL);
@@ -832,7 +835,7 @@ int32_t InputEventHandler::OnEventSwitchToggle(multimodal_libinput_event &ev)
 int32_t InputEventHandler::OnEventTabletPadKey(multimodal_libinput_event &ev)
 {
     CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
-    uint64_t preHandlerTime = GetSysClockTime();
+    uint64_t sysStartProcessTime = GetSysClockTime();
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     EventKeyboard key = {};
     auto packageResult = eventPackage_.PackageTabletPadKeyEvent(ev.event, key, *udsServer_);
@@ -851,7 +854,7 @@ int32_t InputEventHandler::OnEventTabletPadKey(multimodal_libinput_event &ev)
         return RET_OK;
     }
 #endif
-    auto eventDispatchResult = eventDispatch_.DispatchKeyEvent(*udsServer_, ev.event, oKey, key, preHandlerTime);
+    auto eventDispatchResult = eventDispatch_.DispatchKeyEvent(*udsServer_, ev.event, oKey, key, sysStartProcessTime);
     if (eventDispatchResult != RET_OK) {
         MMI_LOGE("Key event dispatch failed... ret:%{public}d errCode:%{public}d",
                  eventDispatchResult, TABLETPAD_KEY_EVENT_DISP_FAIL);
