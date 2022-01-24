@@ -25,6 +25,7 @@
 #include "util.h"
 #include "log.h"
 
+
 namespace {
     using namespace testing::ext;
     using namespace OHOS::MMI;
