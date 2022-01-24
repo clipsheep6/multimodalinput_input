@@ -279,7 +279,7 @@ int32_t InputEventHandler::OnEventDeviceAdded(multimodal_libinput_event &ev)
     DeviceManage deviceManage = {};
 
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
-    auto packageResult = eventPackage_.PackageDeviceManageEvent(ev.event, deviceManage, *udsServer_);
+    auto packageResult = eventPackage_.PackageDeviceManageEvent(ev.event, deviceManage);
     if (packageResult != RET_OK) {
         MMI_LOGE("Deviceadded event package failed... ret:%{public}d errCode:%{public}d",
                  packageResult, DEV_ADD_EVENT_PKG_FAIL);
@@ -315,7 +315,7 @@ int32_t InputEventHandler::OnEventDeviceRemoved(multimodal_libinput_event &ev)
     uint64_t preHandlerTime = GetSysClockTime();
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     DeviceManage deviceManage = {};
-    auto packageResult = eventPackage_.PackageDeviceManageEvent(ev.event, deviceManage, *udsServer_);
+    auto packageResult = eventPackage_.PackageDeviceManageEvent(ev.event, deviceManage);
     if (packageResult != RET_OK) {
         MMI_LOGE("Deviceremoved event package failed... ret:%{public}d errCode:%{public}d",
                  packageResult, DEV_REMOVE_EVENT_PKG_FAIL);
@@ -350,9 +350,9 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
         keyEvent = KeyEvent::Create();
     }
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
-    auto packageResult = eventPackage_.PackageKeyEvent(event, keyEvent, *udsServer_);
+    auto packageResult = eventPackage_.PackageKeyEvent(event, keyEvent);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
-        MMI_LOGD("The same event reported by multi_device should be discarded!\n");
+        MMI_LOGD("The same event reported by multi_device should be discarded");
         return RET_OK;
     }
     if (packageResult != RET_OK) {
@@ -393,9 +393,9 @@ int32_t InputEventHandler::OnKeyEventDispatch(multimodal_libinput_event& ev)
         keyEvent = KeyEvent::Create();
     }
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
-    auto packageResult = eventPackage_.PackageKeyEvent(ev.event, keyEvent, *udsServer_);
+    auto packageResult = eventPackage_.PackageKeyEvent(ev.event, keyEvent);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
-        MMI_LOGD("The same event reported by multi_device should be discarded!\n");
+        MMI_LOGD("The same event reported by multi_device should be discarded");
         return RET_OK;
     }
     if (packageResult != RET_OK) {
@@ -438,7 +438,7 @@ int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
     uint64_t preHandlerTime = GetSysClockTime();
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     EventKeyboard keyBoard = {};
-    auto packageResult = eventPackage_.PackageKeyEvent(event, keyBoard, *udsServer_);
+    auto packageResult = eventPackage_.PackageKeyEvent(event, keyBoard);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
         MMI_LOGD("The same event occurs on multiple devices, ret:%{puiblic}d", packageResult);
         return RET_OK;
@@ -460,7 +460,7 @@ int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
         keyEvent = KeyEvent::Create();
     }
     keyBoard.key = static_cast<uint32_t>(oKey.keyValueOfHos);
-    if (EventPackage::KeyboardToKeyEvent(keyBoard, keyEvent, *udsServer_) == RET_ERR) {
+    if (EventPackage::KeyboardToKeyEvent(keyBoard, keyEvent) == RET_ERR) {
         MMI_LOGE("On the OnKeyboardEvent translate key event error!");
         return RET_ERR;
     }
@@ -468,7 +468,7 @@ int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
         MMI_LOGD("Key event start launch an ability, keyCode:%{puiblic}d", keyBoard.key);
         return RET_OK;
     }
-    if (KeyEventInputSubscribeFlt.FilterSubscribeKeyEvent(*udsServer_, keyEvent)) {
+    if (KeyEventInputSubscribeFlt.FilterSubscribeKeyEvent(keyEvent)) {
         MMI_LOGD("Subscribe key event filter success. keyCode=%{puiblic}d", keyBoard.key);
         return RET_OK;
     }
@@ -508,7 +508,7 @@ int32_t InputEventHandler::OnEventKeyboard(multimodal_libinput_event &ev)
 
     CHKPR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     EventKeyboard keyBoard = {};
-    auto packageResult = eventPackage_.PackageKeyEvent(ev.event, keyBoard, *udsServer_);
+    auto packageResult = eventPackage_.PackageKeyEvent(ev.event, keyBoard);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
         MMI_LOGD("The same event occurs on multiple devices, ret:%{puiblic}d", packageResult);
         return RET_OK;
@@ -573,9 +573,9 @@ int32_t InputEventHandler::OnEventPointer(multimodal_libinput_event &ev)
         }
     }
     EventPointer point = {};
-    auto packageResult = eventPackage_.PackagePointerEvent(ev.event, point, *udsServer_);
+    auto packageResult = eventPackage_.PackagePointerEvent(ev, point);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
-        MMI_LOGD("The same event reported by multi_device should be discarded!\n");
+        MMI_LOGD("The same event reported by multi_device should be discarded");
         return RET_OK;
     }
     if (packageResult != RET_OK) {
@@ -689,7 +689,7 @@ int32_t InputEventHandler::OnEventTouch(multimodal_libinput_event &ev)
     uint64_t preHandlerTime = GetSysClockTime();
     EventTouch touch = {};
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
-    auto packageResult = eventPackage_.PackageTouchEvent(ev.event, touch, *udsServer_);
+    auto packageResult = eventPackage_.PackageTouchEvent(ev.event, touch);
     if (packageResult == UNKNOWN_EVENT_PKG_FAIL) {
         return RET_OK;
     }
@@ -700,7 +700,7 @@ int32_t InputEventHandler::OnEventTouch(multimodal_libinput_event &ev)
     }
     OnEventTouchTrace(touch);
 #ifndef OHOS_WESTEN_MODEL
-    if (ServerKeyFilter->OnTouchEvent(*udsServer_, ev.event, touch, preHandlerTime)) {
+    if (ServerKeyFilter->OnTouchEvent(ev.event, touch, preHandlerTime)) {
         return RET_OK;
     }
 #endif
@@ -732,9 +732,9 @@ int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
     EventGesture gesture = {};
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     
-    auto pointerEvent = EventPackage::LibinputEventToPointerEvent(event, *udsServer_);
+    auto pointerEvent = EventPackage::LibinputEventToPointerEvent(event);
     if (RET_OK == eventDispatch_.handlePointerEvent(pointerEvent)) {
-        MMI_LOGD("interceptor of OnGestureEvent end .....");
+        MMI_LOGD("interceptor of OnGestureEvent end");
         return RET_OK;
     }
     auto eventDispatchResult = eventDispatch_.DispatchGestureNewEvent(*udsServer_, event,
@@ -756,7 +756,7 @@ int32_t InputEventHandler::OnEventGesture(multimodal_libinput_event &ev)
     uint64_t preHandlerTime = GetSysClockTime();
     EventGesture gesture = {};
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
-    auto packageResult = eventPackage_.PackageGestureEvent(ev.event, gesture, *udsServer_);
+    auto packageResult = eventPackage_.PackageGestureEvent(ev.event, gesture);
     if (packageResult != RET_OK) {
         MMI_LOGE("Gesture swipe event package failed... ret:%{public}d errCode:%{public}d",
             packageResult, GESTURE_EVENT_PKG_FAIL);
@@ -779,9 +779,9 @@ int32_t InputEventHandler::OnEventTabletTool(multimodal_libinput_event &ev)
     uint64_t preHandlerTime = GetSysClockTime();
     EventTabletTool tableTool = {};
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
-    auto packageResult = eventPackage_.PackageTabletToolEvent(ev.event, tableTool, *udsServer_);
+    auto packageResult = eventPackage_.PackageTabletToolEvent(ev.event, tableTool);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
-        MMI_LOGD("The same event reported by multi_device should be discarded!\n");
+        MMI_LOGD("The same event reported by multi_device should be discarded");
         return RET_OK;
     }
     if (packageResult != RET_OK) {
@@ -806,7 +806,7 @@ int32_t InputEventHandler::OnEventTabletPad(multimodal_libinput_event &ev)
     uint64_t preHandlerTime = GetSysClockTime();
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     EventTabletPad tabletPad = {};
-    auto packageResult = eventPackage_.PackageTabletPadEvent(ev.event, tabletPad, *udsServer_);
+    auto packageResult = eventPackage_.PackageTabletPadEvent(ev.event, tabletPad);
     if (packageResult != RET_OK) {
         MMI_LOGE("Tabletpad event package failed... ret:%{public}d errCode:%{public}d",
             packageResult, TABLETPAD_EVENT_PKG_FAIL);
@@ -835,9 +835,9 @@ int32_t InputEventHandler::OnEventTabletPadKey(multimodal_libinput_event &ev)
     uint64_t preHandlerTime = GetSysClockTime();
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     EventKeyboard key = {};
-    auto packageResult = eventPackage_.PackageTabletPadKeyEvent(ev.event, key, *udsServer_);
+    auto packageResult = eventPackage_.PackageTabletPadKeyEvent(ev.event, key);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) { // The multi_device_same_event should be discarded
-        MMI_LOGD("The same event reported by multi_device should be discarded!\n");
+        MMI_LOGD("The same event reported by multi_device should be discarded");
         return RET_OK;
     }
     if (packageResult != RET_OK) {
@@ -865,7 +865,7 @@ int32_t InputEventHandler::OnEventJoyStickKey(multimodal_libinput_event &ev, con
     CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     EventKeyboard key = {};
-    auto packageResult = eventPackage_.PackageJoyStickKeyEvent(ev.event, key, *udsServer_);
+    auto packageResult = eventPackage_.PackageJoyStickKeyEvent(ev.event, key);
     if (packageResult != RET_OK) {
         MMI_LOGE("Joystickkey event package failed... ret:%{public}d errCode:%{public}d",
             packageResult, JOYSTICK_KEY_EVENT_PKG_FAIL);
@@ -894,7 +894,7 @@ int32_t InputEventHandler::OnEventJoyStickAxis(multimodal_libinput_event &ev, co
     CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     EventJoyStickAxis eventJoyStickAxis = {};
-    auto packageResult = eventPackage_.PackageJoyStickAxisEvent(ev.event, eventJoyStickAxis, *udsServer_);
+    auto packageResult = eventPackage_.PackageJoyStickAxisEvent(ev.event, eventJoyStickAxis);
     if (packageResult != RET_OK) {
         MMI_LOGE("Joystickaxis event package failed... ret:%{public}d errCode:%{public}d",
             packageResult, JOYSTICK_AXIS_EVENT_PKG_FAIL);
