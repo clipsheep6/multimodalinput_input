@@ -595,7 +595,7 @@ int32_t InputEventHandler::OnEventPointer(multimodal_libinput_event &ev)
     MouseState->SetMouseCoords(point.delta.x, point.delta.y);
 #else
     MMI_LOGT("\n2.mapping event:\nEvent:eventType=%{public}d;", point.eventType);
-    /*
+    /* test
     auto retEvent = eventDispatch_.DispatchCommonPointEvent(*udsServer_, *ev.event, point, preHandlerTime);
     if (retEvent != RET_OK) {
         MMI_LOGE("common_point event dispatch failed... ret:%{public}d errCode:%{public}d",
