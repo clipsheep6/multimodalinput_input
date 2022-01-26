@@ -24,6 +24,7 @@
 #include "bytrace.h"
 #include "input_device_manager.h"
 #include "interceptor_manager_global.h"
+#include "key_event_subscriber.h"
 #include "mmi_server.h"
 #include "mouse_event_handler.h"
 #include "outer_interface.h"
@@ -468,7 +469,7 @@ int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
         MMI_LOGD("Key event start launch an ability, keyCode:%{puiblic}d", keyBoard.key);
         return RET_OK;
     }
-    if (KeyEventInputSubscribeFlt.FilterSubscribeKeyEvent(keyEvent)) {
+    if (KeyEventSubscriber_.FilterSubscribeKeyEvent(keyEvent)) {
         MMI_LOGD("Subscribe key event filter success. keyCode=%{puiblic}d", keyBoard.key);
         return RET_OK;
     }
