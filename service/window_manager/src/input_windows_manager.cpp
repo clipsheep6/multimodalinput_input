@@ -813,14 +813,15 @@ void OHOS::MMI::InputWindowsManager::FixCursorPosition(int32_t &globalX, int32_t
         return;
     }
 
-    int fcursorW = cursorW / 16;
+    int fcursorW = cursorW / cursorW;
     if ((globalX + fcursorW) > logicalDisplays_[0].width ) {
         globalX = logicalDisplays_[0].width - fcursorW;
     }
-    int fcursorH = cursorH / 16;
+    int fcursorH = cursorH / cursorH;
     if ((globalY + fcursorH) > logicalDisplays_[0].height ) {
         globalY = logicalDisplays_[0].height - fcursorH;
     }
+
 }
 
 int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTargetOld(std::shared_ptr<PointerEvent> pointerEvent)
