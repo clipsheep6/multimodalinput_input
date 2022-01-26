@@ -1015,6 +1015,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_015, TestSize.Level1)
     std::vector<std::string> tLogs { SearchForLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 }
+
 void InputManagerTest::KeyMonitorCallBack(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 {
     MMI_LOGD("KeyMonitorCallBack: keyCode = %{public}d, keyAction = %{public}d , action = %{public}d,"
@@ -1255,11 +1256,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_006, TestSize.Level1)
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_001, TestSize.Level1)
 {
-    RunShellUtil runCommand;
-    std::string command = "consumer is null";
-    std::vector<std::string> log;
-    ASSERT_TRUE(runCommand.RunShellCommand(command, log) == RET_OK);
-
     int32_t response = -1;
     std::vector<int32_t> preKeys;
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption = std::make_shared<OHOS::MMI::KeyOption>();
@@ -1296,7 +1292,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_001, TestSize.Leve
     MMIEventHdl.InjectEvent(injectUpEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    InputManager::GetInstance()->UnsubscribeKeyEvent(1);
+    InputManager::GetInstance()->UnsubscribeKeyEvent(response);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -1309,12 +1305,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_001, TestSize.Leve
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_002, TestSize.Level1)
 {
-    RunShellUtil runCommand;
-    std::string command = "consumer is null";
-    std::vector<std::string> log;
-    ASSERT_TRUE(runCommand.RunShellCommand(command, log) == RET_OK);
-
     int32_t response = -1;
+    int32_t response2 = -1;
     std::vector<int32_t> preKeys;
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption = std::make_shared<OHOS::MMI::KeyOption>();
     keyOption->SetPreKeys(preKeys);
@@ -1334,7 +1326,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_002, TestSize.Leve
     });
     EXPECT_TRUE(response > 0);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    response = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
+    response2 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
         [](std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     {
         MMI_LOGD("KeyEventId=%{public}d,KeyCode=%{public}d,ActionTime=%{public}d,"
@@ -1345,7 +1337,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_002, TestSize.Leve
                  keyEvent->GetEventType(), keyEvent->GetFlag());
         MMI_LOGD("subscribe key event trigger callback");
     });
-    EXPECT_TRUE(response < 0);
+    EXPECT_TRUE(response2 < 0);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     OHOS::KeyEvent injectDownEvent;
@@ -1363,7 +1355,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_002, TestSize.Leve
     MMIEventHdl.InjectEvent(injectUpEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    InputManager::GetInstance()->UnsubscribeKeyEvent(2);
+    InputManager::GetInstance()->UnsubscribeKeyEvent(response);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -1376,11 +1368,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_002, TestSize.Leve
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_003, TestSize.Level1)
 {
-    RunShellUtil runCommand;
-    std::string command = "consumer is null";
-    std::vector<std::string> log;
-    ASSERT_TRUE(runCommand.RunShellCommand(command, log) == RET_OK);
-
     int32_t response = -1;
     std::vector<int32_t> preKeys;
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption = std::make_shared<OHOS::MMI::KeyOption>();
@@ -1417,7 +1404,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_003, TestSize.Leve
     MMIEventHdl.InjectEvent(injectUpEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    InputManager::GetInstance()->UnsubscribeKeyEvent(3);
+    InputManager::GetInstance()->UnsubscribeKeyEvent(response);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -1430,11 +1417,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_003, TestSize.Leve
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_004, TestSize.Level1)
 {
-    RunShellUtil runCommand;
-    std::string command = "consumer is null";
-    std::vector<std::string> log;
-    ASSERT_TRUE(runCommand.RunShellCommand(command, log) == RET_OK);
-
     int32_t response = -1;
     std::vector<int32_t> preKeys;
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption = std::make_shared<OHOS::MMI::KeyOption>();
@@ -1471,7 +1453,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_004, TestSize.Leve
     MMIEventHdl.InjectEvent(injectUpEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    InputManager::GetInstance()->UnsubscribeKeyEvent(4);
+    InputManager::GetInstance()->UnsubscribeKeyEvent(response);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -1484,11 +1466,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_004, TestSize.Leve
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_005, TestSize.Level1)
 {
-    RunShellUtil runCommand;
-    std::string command = "consumer is null";
-    std::vector<std::string> log;
-    ASSERT_TRUE(runCommand.RunShellCommand(command, log) == RET_OK);
-
     int32_t response = -1;
     std::vector<int32_t> preKeys;
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption = std::make_shared<OHOS::MMI::KeyOption>();
@@ -1524,7 +1501,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_005, TestSize.Leve
     MMIEventHdl.InjectEvent(injectUpEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    InputManager::GetInstance()->UnsubscribeKeyEvent(5);
+    InputManager::GetInstance()->UnsubscribeKeyEvent(response);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -1537,11 +1514,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_005, TestSize.Leve
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_006, TestSize.Level1)
 {
-    RunShellUtil runCommand;
-    std::string command = "consumer is null";
-    std::vector<std::string> log;
-    ASSERT_TRUE(runCommand.RunShellCommand(command, log) == RET_OK);
-
     int32_t response = -1;
     std::vector<int32_t> preKeys;
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption = std::make_shared<OHOS::MMI::KeyOption>();
@@ -1592,7 +1564,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_006, TestSize.Leve
     MMIEventHdl.InjectEvent(injectUpEvent2);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    InputManager::GetInstance()->UnsubscribeKeyEvent(6);
+    InputManager::GetInstance()->UnsubscribeKeyEvent(response);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -1605,11 +1577,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_006, TestSize.Leve
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_007, TestSize.Level1)
 {
-    RunShellUtil runCommand;
-    std::string command = "consumer is null";
-    std::vector<std::string> log;
-    ASSERT_TRUE(runCommand.RunShellCommand(command, log) == RET_OK);
-
     int32_t response = -1;
     std::vector<int32_t> preKeys;
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption = std::make_shared<OHOS::MMI::KeyOption>();
@@ -1645,7 +1612,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_007, TestSize.Leve
     MMIEventHdl.InjectEvent(injectUpEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    InputManager::GetInstance()->UnsubscribeKeyEvent(7);
+    InputManager::GetInstance()->UnsubscribeKeyEvent(response);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -1658,11 +1625,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_007, TestSize.Leve
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_008, TestSize.Level1)
 {
-    RunShellUtil runCommand;
-    std::string command = "consumer is null";
-    std::vector<std::string> log;
-    ASSERT_TRUE(runCommand.RunShellCommand(command, log) == RET_OK);
-
     int32_t response = -1;
     std::vector<int32_t> preKeys;
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption = std::make_shared<OHOS::MMI::KeyOption>();
@@ -1684,11 +1646,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_008, TestSize.Leve
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_009, TestSize.Level1)
 {
-    RunShellUtil runCommand;
-    std::string command = "consumer is null";
-    std::vector<std::string> log;
-    ASSERT_TRUE(runCommand.RunShellCommand(command, log) == RET_OK);
-
     int32_t response = -1;
     std::vector<int32_t> preKeys;
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption = std::make_shared<OHOS::MMI::KeyOption>();
@@ -1725,7 +1682,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_009, TestSize.Leve
     MMIEventHdl.InjectEvent(injectUpEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    InputManager::GetInstance()->UnsubscribeKeyEvent(8);
+    InputManager::GetInstance()->UnsubscribeKeyEvent(response);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
