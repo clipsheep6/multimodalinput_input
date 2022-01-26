@@ -217,10 +217,7 @@ void InputManagerImpl::PrintDisplayDebugInfo()
 
 int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor)
 {
-    if (monitor == nullptr) {
-        MMI_LOGE("InputManagerImpl::%{public}s param should not be null!", __func__);
-        return OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER;
-    }
+    CHKPR(monitor, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     int32_t monitorId = IEMManager.AddInputEventMontior(monitor);
     monitorId = monitorId * ADD_MASK_BASE + MASK_KEY;
     return monitorId;
