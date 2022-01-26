@@ -304,6 +304,7 @@ void RegisterEvent::OnEventTouchGetSign(const EventTouch& touch, MmiMessageId& m
             OnEventTouchMotionGetSign(touch, msgId);
             break;
         default:
+            MMI_LOGW("Unknown event type of touch, TouchGetSign:%{public}d", touch.eventType);
             break;
     }
     SysEveHdl->OnSystemEventHandler(msgId);
@@ -514,6 +515,7 @@ int32_t RegisterEvent::GetTouchInfo(const std::pair<uint32_t, int32_t> key, Even
         touch.deviceId = iter->second.deviceId;
         return RET_OK;
     } else {
+        MMI_LOGE("Failed to get touch info");
         return RET_ERR;
     }
 }
