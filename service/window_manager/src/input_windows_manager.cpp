@@ -813,12 +813,20 @@ void OHOS::MMI::InputWindowsManager::FixCursorPosition(int32_t &globalX, int32_t
         return;
     }
 
-    if ((globalX + cursorW) > logicalDisplays_[0].width ) {
-        globalX = logicalDisplays_[0].width - cursorW;
+    // if ((globalX + cursorW) > logicalDisplays_[0].width ) {
+    //     globalX = logicalDisplays_[0].width - cursorW;
+    // }
+
+    // if ((globalY + cursorH) > logicalDisplays_[0].height ) {
+    //     globalY = logicalDisplays_[0].height - cursorH;
+    // }
+
+     if (globalX > logicalDisplays_[0].width ) {
+        globalX = logicalDisplays_[0].width;
     }
 
-    if ((globalY + cursorH) > logicalDisplays_[0].height ) {
-        globalY = logicalDisplays_[0].height - cursorH;
+    if (globalY > logicalDisplays_[0].height ) {
+        globalY = logicalDisplays_[0].height;
     }
 }
 
