@@ -72,13 +72,13 @@ private:
 
     private:
         void CountingTime();
-        std::mutex lock;
-        std::condition_variable condition;
-        std::thread checkThread;
-        bool stopFlag;
+        std::mutex lock_;
+        std::condition_variable condition_;
+        std::thread checkThread_;
+        bool stopFlag_;
         std::function<void(ShortcutKey)> callback_;
-        unsigned long time;
-        ShortcutKey shortcutKey;
+        unsigned long time_;
+        ShortcutKey shortcutKey_;
     };
     void ResolveConfig(std::string configFile);
     bool ConvertJson(ShortcutKey &shortcutKey, json &jsonData);
@@ -90,9 +90,9 @@ private:
     bool CheckKeyPressed(int32_t preKey, std::vector<OHOS::MMI::KeyEvent::KeyItem> &pressedKeys, size_t &count);
     void ResetWaitTriggerKey(ShortcutKey &shortcutKey);
     bool CheckShortcutkeyMatch(ShortcutKey &shortcutKey, std::shared_ptr<OHOS::MMI::KeyEvent> &key);
-    Timer timer;
-    ShortcutKey waitTriggerKey;
-    std::map<std::string, ShortcutKey> shortcutKeysMap;
+    Timer timer_;
+    ShortcutKey waitTriggerKey_;
+    std::map<std::string, ShortcutKey> shortcutKeysMap_;
 };
 }
 }

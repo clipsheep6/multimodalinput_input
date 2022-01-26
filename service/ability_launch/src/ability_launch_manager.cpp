@@ -78,14 +78,14 @@ void OHOS::MMI::AbilityLaunchManager::ResolveConfig(std::string configFile)
         MMI_LOGE("shortkeys array is empty!");
         return;
     }
-    shortcutKeysMap.clear();
+    shortcutKeysMap_.clear();
     for (int32_t i = 0; i < static_cast<int32_t>(abilityArray.size()); i++) {
         ShortcutKey shortcutKey;
         if (ConvertJson(shortcutKey, abilityArray[i])) {
             std::string key = ConvertKey(shortcutKey);
-            auto result = shortcutKeysMap.find(key);
-            if (result == shortcutKeysMap.end()) {
-                shortcutKeysMap.emplace(key, shortcutKey);
+            auto result = shortcutKeysMap_.find(key);
+            if (result == shortcutKeysMap_.end()) {
+                shortcutKeysMap_.emplace(key, shortcutKey);
             }
         }
     }
@@ -161,9 +161,9 @@ bool OHOS::MMI::AbilityLaunchManager::UnwrapAbility(Ability &ability, json &json
 
 void OHOS::MMI::AbilityLaunchManager::PrintShortcutKey()
 {
-    int32_t count = shortcutKeysMap.size();
+    int32_t count = shortcutKeysMap_.size();
     MMI_LOGE("shortcutKeysMap size %{public}d", count);
-    for (auto it = shortcutKeysMap.begin(); it != shortcutKeysMap.end(); ++it) {
+    for (auto it = shortcutKeysMap_.begin(); it != shortcutKeysMap_.end(); ++it) {
         auto &shortcutKey = it->second;
         MMI_LOGE("preKey1 = %{public}d preKey2 = %{public}d preKey3 = %{public}d preKey4 = %{public}d finalKey = %{public}d "
             "keyDownDuration = %{public}d triggerType = %{public}d bundleName = %{public}s  abilityName = %{public}s",
@@ -175,13 +175,13 @@ void OHOS::MMI::AbilityLaunchManager::PrintShortcutKey()
 
 bool OHOS::MMI::AbilityLaunchManager::CheckLaunchAbility(std::shared_ptr<OHOS::MMI::KeyEvent> &key)
 {
-    if (CheckShortcutkeyMatch(waitTriggerKey, key)) {
+    if (CheckShortcutkeyMatch(waitTriggerKey_, key)) {
         MMI_LOGE("The same shortcutkey is waiting timeout");
         return true;
     }
-    timer.Stop();
-    ResetWaitTriggerKey(waitTriggerKey);
-    for (auto iter = shortcutKeysMap.begin(); iter != shortcutKeysMap.end(); ++iter) {
+    timer_.Stop();
+    ResetWaitTriggerKey(waitTriggerKey_);
+    for (auto iter = shortcutKeysMap_.begin(); iter != shortcutKeysMap_.end(); ++iter) {
         ShortcutKey &shortcutKey = iter->second;
         int32_t keyCode = key->GetKeyCode();
         std::string checkkeycode = "CheckLaunchAbility service GetKeyCode: " + std::to_string(keyCode);
@@ -193,8 +193,8 @@ bool OHOS::MMI::AbilityLaunchManager::CheckLaunchAbility(std::shared_ptr<OHOS::M
         }
         if (shortcutKey.triggerType == OHOS::MMI::KeyEvent::KEY_ACTION_DOWN && shortcutKey.keyDownDuration > 0) {
             MMI_LOGE("Key event matched, start Timer, key=%{public}d, keyAction=%{public}d", key->GetKeyCode(), key->GetKeyAction());
-            waitTriggerKey = shortcutKey;
-            timer.Start(shortcutKey.keyDownDuration,
+            waitTriggerKey_ = shortcutKey;
+            timer_.Start(shortcutKey.keyDownDuration,
                 std::bind(&AbilityLaunchManager::LaunchAbility, this, std::placeholders::_1), shortcutKey);
         } else {
             MMI_LOGE("Start launch ability");
@@ -277,57 +277,57 @@ void OHOS::MMI::AbilityLaunchManager::LaunchAbility(ShortcutKey key)
     if (err != ERR_OK) {
         MMI_LOGE("LaunchAbility failed, abilityName:%{public}s, err:%{public}d", key.ability.abilityName.c_str(), err);
     }
-    ResetWaitTriggerKey(waitTriggerKey);
+    ResetWaitTriggerKey(waitTriggerKey_);
     MMI_LOGE("End launch ability, abilityName:%{public}s", key.ability.abilityName.c_str());
 }
 
 OHOS::MMI::AbilityLaunchManager::Timer::Timer()
 {
-    stopFlag = false;
-    time = 0;
-    checkThread = std::thread(&Timer::CountingTime, this);
+    stopFlag_ = false;
+    time_ = 0;
+    checkThread_ = std::thread(&Timer::CountingTime, this);
 }
 
 OHOS::MMI::AbilityLaunchManager::Timer::~Timer()
 {
-    std::lock_guard<std::mutex> lockGuard(lock);
-    stopFlag = true;
-    condition.notify_all();
-    if (checkThread.joinable()) {
-        checkThread.join();
+    std::lock_guard<std::mutex> lockGuard(lock_);
+    stopFlag_ = true;
+    condition_.notify_all();
+    if (checkThread_.joinable()) {
+        checkThread_.join();
     }
 }
 
 void OHOS::MMI::AbilityLaunchManager::Timer::Start(unsigned long millsTime,
     std::function<void(ShortcutKey)> callback, ShortcutKey key)
 {
-    std::lock_guard<std::mutex> lockGuard(lock);
-    time = millsTime;
+    std::lock_guard<std::mutex> lockGuard(lock_);
+    time_ = millsTime;
     callback_ = callback;
-    shortcutKey = key;
-    condition.notify_all();
+    shortcutKey_ = key;
+    condition_.notify_all();
 }
 
 void OHOS::MMI::AbilityLaunchManager::Timer::Stop()
 {
-    std::lock_guard<std::mutex> lockGuard(lock);
-    condition.notify_all();
+    std::lock_guard<std::mutex> lockGuard(lock_);
+    condition_.notify_all();
 }
 
 void OHOS::MMI::AbilityLaunchManager::Timer::CountingTime()
 {
-    std::unique_lock<std::mutex> lk(lock);
-    while (!stopFlag) {
-        if (time == 0) {
-            condition.wait(lk);
+    std::unique_lock<std::mutex> lk(lock_);
+    while (!stopFlag_) {
+        if (time_ == 0) {
+            condition_.wait(lk);
         } else {
-            if (condition.wait_for(lk, std::chrono::milliseconds(time)) == std::cv_status::timeout) {
+            if (condition_.wait_for(lk, std::chrono::milliseconds(time_)) == std::cv_status::timeout) {
                 if (callback_ != nullptr) {
-                    MMI_LOGE("timeout, start launch ability abilityName %{public}s", shortcutKey.ability.abilityName.c_str());
-                    callback_(shortcutKey);
+                    MMI_LOGE("timeout, start launch ability abilityName %{public}s", shortcutKey_.ability.abilityName.c_str());
+                    callback_(shortcutKey_);
                 }
             }
-            time = 0;
+            time_ = 0;
         }
     }
 }
