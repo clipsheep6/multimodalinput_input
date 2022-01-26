@@ -148,7 +148,7 @@ void OHOS::MMI::MouseDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint3
 
     OHOS::Rosen::Drawing::Canvas canvas;
     canvas.Bind(bitmap);
-    canvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
+    canvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_YELLOW); // COLOR_TRANSPARENT
 
     DrawPixelmap(canvas);
 
