@@ -285,9 +285,9 @@ int32_t InputEventHandler::OnEventDeviceAdded(multimodal_libinput_event &ev)
                  packageResult, DEV_ADD_EVENT_PKG_FAIL);
         return DEV_ADD_EVENT_PKG_FAIL;
     }
-    MMI_LOGT("\n4.event dispatcher of server:DeviceManage:devicePhys=%{public}s;"
-             "deviceName=%{public}s;deviceType=%{public}u;\n**************************************\n",
-             deviceManage.devicePhys, deviceManage.deviceName, deviceManage.deviceType);
+    MMI_LOGT("4.event dispatcher of server, DeviceManage:physical=%{public}s, "
+             "deviceName=%{public}s, deviceType=%{public}u",
+             deviceManage.physical, deviceManage.deviceName, deviceManage.deviceType);
 
     int32_t focusId = WinMgr->GetFocusSurfaceId();
     if (focusId < 0) {
@@ -300,7 +300,7 @@ int32_t InputEventHandler::OnEventDeviceAdded(multimodal_libinput_event &ev)
     NetPacket newPacket(MmiMessageId::ON_DEVICE_ADDED);
     newPacket << deviceManage << appInfo.abilityId << focusId << appInfo.fd << sysStartProcessTime;
     if (!SendMsg(appInfo.fd, newPacket)) {
-        MMI_LOGE("Sending structure of DeviceManage failed! errCode:%{public}d\n", MSG_SEND_FAIL);
+        MMI_LOGE("Sending structure of DeviceManage failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
     return RET_OK;
@@ -321,9 +321,9 @@ int32_t InputEventHandler::OnEventDeviceRemoved(multimodal_libinput_event &ev)
                  packageResult, DEV_REMOVE_EVENT_PKG_FAIL);
         return DEV_REMOVE_EVENT_PKG_FAIL;
     }
-    MMI_LOGT("\n4.event dispatcher of server:DeviceManage:devicePhys=%{public}s;"
-             "deviceName=%{public}s;deviceType=%{public}u;\n**************************************\n",
-             deviceManage.devicePhys, deviceManage.deviceName, deviceManage.deviceType);
+    MMI_LOGT("4.event dispatcher of server, DeviceManage:physical=%{public}s, "
+             "deviceName=%{public}s, deviceType=%{public}u",
+             deviceManage.physical, deviceManage.deviceName, deviceManage.deviceType);
 
     int32_t focusId = WinMgr->GetFocusSurfaceId();
     if (focusId < 0) {
@@ -336,7 +336,7 @@ int32_t InputEventHandler::OnEventDeviceRemoved(multimodal_libinput_event &ev)
     NetPacket newPacket(MmiMessageId::ON_DEVICE_REMOVED);
     newPacket << deviceManage << appInfo.abilityId << focusId << appInfo.fd << sysStartProcessTime;
     if (!SendMsg(appInfo.fd, newPacket)) {
-        MMI_LOGE("Sending structure of DeviceManage failed! errCode:%{public}d\n", MSG_SEND_FAIL);
+        MMI_LOGE("Sending structure of DeviceManage failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
     return RET_OK;
@@ -492,7 +492,7 @@ void InputEventHandler::OnEventKeyboardTrace(const EventKeyboard& keyBoard)
         MMI_LOGT("%{public}s copy data failed", __func__);
         return;
     }
-    MMI_LOGT(" OnEventKeyboard service reported keyUuid = %{public}s\n", keyUuid);
+    MMI_LOGT(" OnEventKeyboard service reported keyUuid = %{public}s", keyUuid);
     std::string keyEvent = keyUuid;
     keyEvent = "OnEventKeyboard service reported keyUuid: " + keyEvent;
     int32_t eventKey = 1;
@@ -549,7 +549,7 @@ void InputEventHandler::OnEventPointerTrace(const EventPointer& point)
         MMI_LOGT("%{public}s copy data failed", __func__);
         return;
     }
-    MMI_LOGT(" OnEventPointer service reported pointerUuid = %{public}s\n", pointerUuid);
+    MMI_LOGT(" OnEventPointer service reported pointerUuid = %{public}s", pointerUuid);
     std::string pointerEvent = pointerUuid;
     pointerEvent = "OnEventPointer service reported pointerUuid: " + pointerEvent;
     int32_t eventPointer = 17;
@@ -592,7 +592,7 @@ int32_t InputEventHandler::OnEventPointer(multimodal_libinput_event &ev)
         return RET_OK;
     }
 #else
-    MMI_LOGT("\n2.mapping event:\nEvent:eventType=%{public}d;", point.eventType);
+    MMI_LOGT("2.mapping event:Event:eventType=%{public}d;", point.eventType);
     /*
     auto retEvent = eventDispatch_.DispatchCommonPointEvent(*udsServer_, *ev.event, point, sysStartProcessTime);
     if (retEvent != RET_OK) {
@@ -670,7 +670,7 @@ void InputEventHandler::OnEventTouchTrace(const struct EventTouch& touch)
         MMI_LOGT("%{public}s copy data failed", __func__);
         return;
     }
-    MMI_LOGT(" OnEventTouch service reported touchUuid = %{public}s\n", touchUuid);
+    MMI_LOGT(" OnEventTouch service reported touchUuid = %{public}s", touchUuid);
     std::string touchEvent = touchUuid;
     touchEvent = "OnEventTouch service reported touchUuid: " + touchEvent;
     int32_t eventTouch = 9;
@@ -725,7 +725,7 @@ int32_t InputEventHandler::OnEventTouchpad(multimodal_libinput_event& ev)
 int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
 {
     CHKR(event, PARAM_INPUT_INVALID, RET_ERR);
-    MMI_LOGT("InputEventHandler::OnGestureEvent\n");
+    MMI_LOGT("InputEventHandler::OnGestureEvent");
     uint64_t sysStartProcessTime = GetSysClockTime();
     EventGesture gesture = {};
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
@@ -788,7 +788,7 @@ int32_t InputEventHandler::OnEventTabletTool(multimodal_libinput_event &ev)
             packageResult, TABLETTOOL_EVENT_PKG_FAIL);
         return TABLETTOOL_EVENT_PKG_FAIL;
     }
-    MMI_LOGT("\n2.mapping event:\nEvent:eventType=%{public}d;", tableTool.eventType);
+    MMI_LOGT("2.mapping event:\nEvent:eventType=%{public}d;", tableTool.eventType);
     auto retEvent = eventDispatch_.DispatchTabletToolEvent(*udsServer_, ev.event, tableTool, sysStartProcessTime);
     if (retEvent != RET_OK) {
         MMI_LOGE("Tabletool event dispatch failed... ret:%{public}d errCode:%{public}d",
@@ -823,7 +823,7 @@ int32_t InputEventHandler::OnEventSwitchToggle(multimodal_libinput_event &ev)
 {
     CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     auto type = libinput_event_get_type(ev.event);
-    MMI_LOGT("\nfunction is _OnEventSwitchToggle,sourceType is LIBINPUT_EVENT_SWITCH_TOGGLE %{public}d", type);
+    MMI_LOGT("function is _OnEventSwitchToggle,sourceType is LIBINPUT_EVENT_SWITCH_TOGGLE %{public}d", type);
     return RET_OK;
 }
 
