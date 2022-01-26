@@ -112,6 +112,7 @@ std::shared_ptr<PointerEvent> TouchPadTransformPointProcessor::OnLibinputTouchPa
 {
     CHKPR(event, PARAM_INPUT_INVALID, nullptr);
     MMI_LOGD("call  onLibinputTouchPadEvent begin");
+    pointerEvent_->UpdateId();
     auto type = libinput_event_get_type(event);
     switch (type) {
         case LIBINPUT_EVENT_TOUCHPAD_DOWN: {
