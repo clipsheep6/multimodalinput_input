@@ -426,7 +426,8 @@ int32_t EventPackage::PackagePointerEventByAxis(libinput_event *event, EventPoin
     CHKR(data, ERROR_NULL_POINTER, RET_ERR);
 
     point.time = libinput_event_pointer_get_time_usec(data);
-    switch (libinput_event_pointer_get_axis_source(data)) {
+    auto axisSource = libinput_event_pointer_get_axis_source(data)
+    switch (axisSource) {
         case LIBINPUT_POINTER_AXIS_SOURCE_WHEEL: {
             point.source = POINTER_AXIS_SOURCE_WHEEL;
             break;
