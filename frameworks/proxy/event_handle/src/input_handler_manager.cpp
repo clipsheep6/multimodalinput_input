@@ -37,7 +37,7 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
         return INVALID_HANDLER_ID;
     }
     int32_t handlerId = GetNextId();
-    if (RET_ERR == handlerId){
+    if (RET_ERR == handlerId) {
         MMI_LOGE("Exceeded limit of 32-bit maximum number of integers");
         return INVALID_HANDLER_ID;
     }
@@ -64,7 +64,7 @@ void InputHandlerManager::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
     MMI_LOGD("Mark consumed state:monitorId=%{public}d, eventId=%{public}d", monitorId, eventId);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    if (nullptr == client) {
+    if (client == nullptr) {
         MMI_LOGE("Get MMIClint false");
         return;
     }
@@ -93,7 +93,7 @@ int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handle
 void InputHandlerManager::AddToServer(int32_t handlerId, InputHandlerType handlerType)
 {
     MMIClientPtr client { MMIEventHdl.GetMMIClient() };
-    if (nullptr == client) {
+    if (client == nullptr) {
         MMI_LOGE("AddToServer Get MMIClint false");
         return;
     }
@@ -122,7 +122,7 @@ void InputHandlerManager::RemoveFromServer(int32_t handlerId, InputHandlerType h
 {
     MMI_LOGD("Remove handler:%{public}d from server", handlerId);
     MMIClientPtr client { MMIEventHdl.GetMMIClient() };
-    if (nullptr == client) {
+    if (client == nullptr) {
         MMI_LOGE("RemoveFromServer Get MMIClint false");
         return;
     }
@@ -133,7 +133,7 @@ void InputHandlerManager::RemoveFromServer(int32_t handlerId, InputHandlerType h
 
 int32_t InputHandlerManager::GetNextId()
 {
-    if (nextId_ = std::numeric_limits<int32_t>::max()) {
+    if (nextId_ == std::numeric_limits<int32_t>::max()) {
         MMI_LOGE("Exceeded limit of 32-bit maximum number of integers");
         return RET_ERR;
     }
@@ -145,7 +145,7 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEve
     std::lock_guard<std::mutex> guard(lockHandlers_);
     auto tItr = inputHandlers_.find(handlerId);
     if (tItr != inputHandlers_.end()) {
-        if (nullptr == tItr->second.consumer_) {
+        if (tItr->second.consumer_ == nullptr) {
             tItr->second.consumer_->OnInputEvent(keyEvent);
         }
     }
@@ -157,7 +157,7 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<Pointe
     std::lock_guard<std::mutex> guard(lockHandlers_);
     auto tItr = inputHandlers_.find(handlerId);
     if (tItr != inputHandlers_.end()) {
-        if (nullptr != tItr->second.consumer_) {
+        if (tItr->second.consumer_ != nullptr) {
             tItr->second.consumer_->OnInputEvent(pointerEvent);
         }
     }
