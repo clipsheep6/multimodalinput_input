@@ -673,7 +673,7 @@ void InputEventHandler::OnEventTouchTrace(const struct EventTouch& touch)
 {
     int32_t eventTouch = 9;
     std::string touchEvent = "OnEventTouchAsync";
-    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventTouch);
+    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
     char touchUuid[MAX_UUIDSIZE] = {0};
     if (memcpy_s(touchUuid, sizeof(touchUuid), touch.uuid, sizeof(touch.uuid))) {
         MMI_LOGT("%{public}s copy data failed", __func__);

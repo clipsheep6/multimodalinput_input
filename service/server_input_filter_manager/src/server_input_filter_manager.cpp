@@ -252,7 +252,7 @@ void ServerInputFilterManager::OnTouchEventTrace(const EventTouch& touch)
     MMI_LOGT(" OnTouchEvent service touchUuid = %{public}s", touchUuid);
     std::string touchEvent = touchUuid;
     touchEvent = "service touchUuid = " + touchEvent;
-    std::string filtertouch = pointerUuid;
+    std::string filtertouch = touchUuid;
     filtertouch = "service filter touchUuid = " + filtertouch;
     MiddleTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, filtertouch);
     FinishTrace(BYTRACE_TAG_MULTIMODALINPUT);
