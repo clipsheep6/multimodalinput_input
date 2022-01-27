@@ -87,8 +87,13 @@ void ServerInputFilterManager::OnKeyEventTrace(const EventKeyboard& key)
     }
     MMI_LOGT(" OnKeyEvent service trace keyUuid = %{public}s", keyUuid);
     std::string keyEvent = keyUuid;
-    keyEvent = "OnKeyEvent service keyUuid: " + keyEvent;
+    keyEvent = " service keyUuid = " + keyEvent;
+    std::string filterKey = keyUuid;
+    filterKey = "service filter keyUuid = " + filterKey;
+    MiddleTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, filterKey);
+    FinishTrace(BYTRACE_TAG_MULTIMODALINPUT);
     int32_t eventKey = 1;
+    keyEvent = "OnEventKeyboardAsync";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
 }
 
@@ -248,8 +253,13 @@ void ServerInputFilterManager::OnTouchEventTrace(const EventTouch& touch)
     }
     MMI_LOGT(" OnTouchEvent service touchUuid = %{public}s", touchUuid);
     std::string touchEvent = touchUuid;
-    touchEvent = "OnTouchEvent service touchUuid: " + touchEvent;
+    touchEvent = "service touchUuid = " + touchEvent;
+    std::string filtertouch = touchUuid;
+    filtertouch = "service filter touchUuid = " + filtertouch;
+    MiddleTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, filtertouch);
+    FinishTrace(BYTRACE_TAG_MULTIMODALINPUT);
     int32_t eventTouch = 9;
+    touchEvent = "OnEventTouchAsync";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
 }
 
@@ -403,8 +413,13 @@ void ServerInputFilterManager::OnPointerEventTrace(const EventPointer& event_poi
     }
     MMI_LOGT(" OnPointerEvent service pointerUuid = %{public}s", pointerUuid);
     std::string pointerEvent = pointerUuid;
-    pointerEvent = "OnPointerEvent service pointerUuid: " + pointerEvent;
+    pointerEvent = " service pointerUuid = " + pointerEvent;
+    std::string filterpointer = pointerUuid;
+    filterpointer = "service filter pointerUuid = " + filterpointer;
+    MiddleTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, filterpointer);
+    FinishTrace(BYTRACE_TAG_MULTIMODALINPUT);
     int32_t eventPointer = 17;
+    pointerEvent = "OnEventPointerAsync";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, eventPointer);
 }
 
