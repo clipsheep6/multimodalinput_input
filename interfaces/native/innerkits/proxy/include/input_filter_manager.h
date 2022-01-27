@@ -110,5 +110,5 @@ private:
 };
 }
 }
-#define inputFilterManager OHOS::MMI::InputFilterManager::GetInstance()
+#define InputFilterManager OHOS::MMI::InputFilterManager::GetInstance()
 #endif // INPUT_FILTER_MANAGER_H

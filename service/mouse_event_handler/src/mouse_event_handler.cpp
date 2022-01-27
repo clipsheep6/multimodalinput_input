@@ -191,7 +191,7 @@ void MouseEventHandler::Normalize(libinput_event *event)
         }
     }
 
-    int32_t deviceId = inputDeviceManager->FindInputDeviceId(libinput_event_get_device(event));
+    int32_t deviceId = InputDevMgr->FindInputDeviceId(libinput_event_get_device(event));
     HandlePostInner(data, deviceId, pointerItem);
 
     // 调试 信息输出

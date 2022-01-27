@@ -439,7 +439,7 @@ bool EventDispatch::HandleMouseEvent(std::shared_ptr<PointerEvent> point)
 
 bool EventDispatch::HandleTouchPadEvent(std::shared_ptr<PointerEvent> point)
 {
-    if (INTERCEPTORMANAGERGLOBAL.OnPointerEvent(point)) {
+    if (InterceptorMgrGbl.OnPointerEvent(point)) {
         return true;
     }
     if (InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
