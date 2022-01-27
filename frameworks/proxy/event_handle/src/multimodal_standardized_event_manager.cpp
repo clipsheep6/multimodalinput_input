@@ -166,30 +166,22 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnKey(const OHOS::KeyEven
     return RET_OK;
 }
 
-void OHOS::MMI::MultimodalStandardizedEventManager::OnTouchTrace(const TouchEvent& event, int32_t distinguish)
+void OHOS::MMI::MultimodalStandardizedEventManager::OnTouchTrace(const TouchEvent& event)
 {
     std::string touchEvent = "OnTouch touchUuid: " + event.GetUuid();
     char *tmpTouch = (char*)touchEvent.c_str();
     MMI_LOGT("OnTouch touchUuid = %{public}s", tmpTouch);
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, touchEvent);
     FinishTrace(BYTRACE_TAG_MULTIMODALINPUT);
-    int32_t dispatchPointer = 1;
-    int32_t dispatchTouch = 2;
-    if (distinguish == dispatchPointer) {
-        int32_t eventPointer = 17;
-        touchEvent = "PointerEventDispatchAsync";
-        FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventPointer);
-    } else if (distinguish == dispatchTouch) {
-        int32_t eventTouch = 9;
-        touchEvent = "TouchEventDispatchAsync";
-        FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
-    } else {}
+    int32_t eventTouch = 9;
+    touchEvent = "TouchEventDispatchAsync";
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
 }
 
-int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnTouch(const TouchEvent& event, int32_t distinguish)
+int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnTouch(const TouchEvent& event)
 {
     MMI_LOGT("MultimodalStandardizedEventManagertouch::OnTouch");
-    OnTouchTrace(event, distinguish);
+    OnTouchTrace(event);
     auto range = mapEvents_.equal_range(MmiMessageId::TOUCH_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.windowId == event.GetWindowID() && i->second.eventCallBack->OnTouch(event) == false) {

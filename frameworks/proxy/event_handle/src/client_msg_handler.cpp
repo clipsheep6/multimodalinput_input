@@ -915,8 +915,7 @@ void OHOS::MMI::ClientMsgHandler::AnalysisPointEvent(const UDSClient& client, Ne
         touchEvent.Initialize(windowId, mousePtr, deviceEventType, action, 0, 0, 0, 0,
             0, 0, 1, fingersInfos, false);
     }
-    int32_t pointEvent = 1;
-    ret = EventManager.OnTouch(touchEvent, pointEvent);
+    ret = EventManager.OnTouch(touchEvent);
 }
 
 void OHOS::MMI::ClientMsgHandler::AnalysisTouchEvent(const UDSClient& client, NetPacket& pkt) const
@@ -957,8 +956,7 @@ void OHOS::MMI::ClientMsgHandler::AnalysisTouchEvent(const UDSClient& client, Ne
     touchEvent.Initialize(windowId, eventAction, seatSlot, 0, 0, 0, 0, 0, fingerCount, fingersInfos, 0,
         touchData.uuid, touchData.eventType, static_cast<int32_t>(touchData.time), "",
         static_cast<int32_t>(touchData.deviceId), 0, false, touchData.deviceType, deviceEventType);
-    int32_t touchEventDispatch = 2;
-    EventManager.OnTouch(touchEvent, touchEventDispatch);
+    EventManager.OnTouch(touchEvent);
 }
 
 void OHOS::MMI::ClientMsgHandler::AnalysisJoystickEvent(const UDSClient& client, NetPacket& pkt) const
@@ -989,8 +987,7 @@ void OHOS::MMI::ClientMsgHandler::AnalysisJoystickEvent(const UDSClient& client,
     TouchEvent touchEvent;
     touchEvent.Initialize(windowId, mousePtr, deviceEventType, touchAction, 0, 0, 0, 0, 0, 0, 1,
         nullptr, false);
-    int32_t JoystickEvent = 3;
-    EventManager.OnTouch(touchEvent, JoystickEvent);
+    EventManager.OnTouch(touchEvent);
 }
 
 void OHOS::MMI::ClientMsgHandler::AnalysisTouchPadEvent(const UDSClient& client, NetPacket& pkt) const
@@ -1031,8 +1028,7 @@ void OHOS::MMI::ClientMsgHandler::AnalysisTouchPadEvent(const UDSClient& client,
     deviceEventType = MOUSE_EVENT;
     touchAction = HOVER_POINTER_MOVE;
     touchEvent.Initialize(windowId, mousePtr, deviceEventType, touchAction, 0, 0, 0, 0, 0, 0, 1, nullptr, false);
-    int32_t touchPadEvent = 4;
-    EventManager.OnTouch(touchEvent, touchPadEvent);
+    EventManager.OnTouch(touchEvent);
 }
 
 void OHOS::MMI::ClientMsgHandler::PrintEventTabletToolInfo(EventTabletTool tableTool, uint64_t serverStartTime,
@@ -1161,8 +1157,7 @@ void OHOS::MMI::ClientMsgHandler::AnalysisStandardTabletToolEvent(NetPacket& pkt
         touchEvent.Initialize(windowId, mousePtr, deviceEventType, touchAction,
             tableTool.tool.type, 0, 0, 0, 0, 0, 1, fingersInfos, false);
     }
-    int32_t tabletToolEvent = 5;
-    EventManager.OnTouch(touchEvent, tabletToolEvent);
+    EventManager.OnTouch(touchEvent);
 }
 
 void OHOS::MMI::ClientMsgHandler::AnalysisTabletToolEvent(const UDSClient& client, NetPacket& pkt) const
@@ -1219,8 +1214,7 @@ void OHOS::MMI::ClientMsgHandler::AnalysisGestureEvent(const UDSClient& client, 
     TouchEvent touchEvent;
     touchEvent.Initialize(windowId, mousePtr, MOUSE_EVENT, POINT_MOVE, 0, 0, 0, 0, 0, 0,
                           gesture.fingerCount, fingersInfos, true);
-    int32_t gestureEvent = 6;
-    EventManager.OnTouch(touchEvent, gestureEvent);
+    EventManager.OnTouch(touchEvent);
 }
 
 void OHOS::MMI::ClientMsgHandler::TraceKeyEvent(const EventKeyboard& key) const
@@ -1247,7 +1241,7 @@ void OHOS::MMI::ClientMsgHandler::TracePointerEvent(const EventPointer& pointDat
         std::string pointerEvent = "PointerEventFilterAsync";
         StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, eventPointer);
     }
-    std::string pointerEvent = "PointerEventDispatchAsync";
+    std::string pointerEvent = "TouchEventDispatchAsync";
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, eventPointer);
     char pointerUuid[MAX_UUIDSIZE] = {0};
     if (EOK != memcpy_s(pointerUuid, sizeof(pointerUuid), pointData.uuid, sizeof(pointData.uuid))) {
@@ -1265,18 +1259,18 @@ void OHOS::MMI::ClientMsgHandler::TraceTouchEvent(const EventTouch& touchData, i
     int32_t eventTouch = 9;
     int32_t filterTouch = 1;
     if (distinguishEvent == filterTouch) {
-        std::string TouchEvent = "TouchEventFilterAsync";
-        StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, TouchEvent, eventTouch);
+        std::string touchEvent = "TouchEventFilterAsync";
+        StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
     }
-    std::string TouchEvent = "TouchEventDispatchAsync";
-    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, TouchEvent, eventTouch);
+    std::string touchEvent = "TouchEventDispatchAsync";
+    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
     char touchUuid[MAX_UUIDSIZE] = {0};
     if (EOK != memcpy_s(touchUuid, sizeof(touchUuid), touchData.uuid, sizeof(touchData.uuid))) {
         MMI_LOGT("%{public}s copy data failed", __func__);
         return;
     }
     MMI_LOGT(" nevent of client: touchUuid = %{public}s", touchUuid);
-    TouchEvent = touchUuid;
-    TouchEvent = "client touchUuid = " + TouchEvent;
-    StartTrace(BYTRACE_TAG_MULTIMODALINPUT, TouchEvent, eventTouch);
+    touchEvent = touchUuid;
+    touchEvent = "client touchUuid = " + touchEvent;
+    StartTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
 }
