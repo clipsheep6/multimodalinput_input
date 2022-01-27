@@ -20,7 +20,7 @@
 #include <vector>
 
 namespace OHOS {
-namespace MMI {    
+namespace MMI {
 class InputManagerCommand {
 public:
     int32_t ParseCommand(int argc, char *argv[]);
