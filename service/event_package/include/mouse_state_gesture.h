@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_MOUSE_STATE_GESTURE_H
-#define OHOS_MOUSE_STATE_GESTURE_H
+#ifndef MOUSE_STATE_GESTURE_H
+#define MOUSE_STATE_GESTURE_H
 
 #include "pointer_event.h"
 #include "struct_multimodal.h"
@@ -60,4 +60,4 @@ namespace OHOS::MMI {
 }
 
 #define MouseState OHOS::MMI::MouseDeviceState::GetInstance()
-#endif
+#endif // MOUSE_STATE_GESTURE_H

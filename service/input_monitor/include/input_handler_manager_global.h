@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MULTIMDOALINPUT_INPUT_HANDLER_MANAGER_GLOBAL_H
-#define OHOS_MULTIMDOALINPUT_INPUT_HANDLER_MANAGER_GLOBAL_H
+#ifndef INPUT_HANDLER_MANAGER_GLOBAL_H
+#define INPUT_HANDLER_MANAGER_GLOBAL_H
 #include <mutex>
 #include <set>
 #include "input_handler_type.h"
@@ -77,4 +77,4 @@ private:
 }
 } // namespace OHOS::MMI
 
-#endif // OHOS_MULTIMDOALINPUT_INPUT_HANDLER_MANAGER_GLOBAL_H
+#endif // INPUT_HANDLER_MANAGER_GLOBAL_H
