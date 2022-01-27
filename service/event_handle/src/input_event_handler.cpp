@@ -464,14 +464,6 @@ int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
         MMI_LOGE("On the OnKeyboardEvent translate key event error!");
         return RET_ERR;
     }
-    if (AbilityMgr->CheckLaunchAbility(keyEvent_)) {
-        MMI_LOGD("Key event start launch an ability, keyCode:%{puiblic}d", keyBoard.key);
-        return RET_OK;
-    }
-    if (KeyEventInputSubscribeFlt.FilterSubscribeKeyEvent(keyEvent_)) {
-        MMI_LOGD("Subscribe key event filter success. keyCode=%{puiblic}d", keyBoard.key);
-        return RET_OK;
-    }
     auto device = libinput_event_get_device(event);
     CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
 
@@ -692,7 +684,7 @@ int32_t InputEventHandler::OnEventTouch(const multimodal_libinput_event& ev)
         return RET_OK;
     }
     if (packageResult != RET_OK) {
-        MMI_LOGE("Touch event package failed... ret:%{public}d errCode:%{public}d",
+        MMI_LOGE("Touch event package failed, ret:%{public}d, errCode:%{public}d",
                  packageResult, TOUCH_EVENT_PKG_FAIL);
         return TOUCH_EVENT_PKG_FAIL;
     }
@@ -738,7 +730,7 @@ int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
     auto eventDispatchResult = eventDispatch_.DispatchGestureNewEvent(*udsServer_, event,
                                                                       pointerEvent, sysStartProcessTime);
     if (eventDispatchResult != RET_OK) {
-        MMI_LOGE("Gesture New event dispatch failed... ret:%{public}d errCode:%{public}d",
+        MMI_LOGE("Gesture New event dispatch failed, ret:%{public}d, errCode:%{public}d",
             eventDispatchResult, GESTURE_EVENT_DISP_FAIL);
         return GESTURE_EVENT_DISP_FAIL;
     }
@@ -756,7 +748,7 @@ int32_t InputEventHandler::OnEventGesture(const multimodal_libinput_event& ev)
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
     auto packageResult = eventPackage_.PackageGestureEvent(ev.event, gesture);
     if (packageResult != RET_OK) {
-        MMI_LOGE("Gesture swipe event package failed... ret:%{public}d errCode:%{public}d",
+        MMI_LOGE("Gesture swipe event package failed, ret:%{public}d, errCode:%{public}d",
             packageResult, GESTURE_EVENT_PKG_FAIL);
         return GESTURE_EVENT_PKG_FAIL;
     }
@@ -764,7 +756,7 @@ int32_t InputEventHandler::OnEventGesture(const multimodal_libinput_event& ev)
     auto eventDispatchResult = eventDispatch_.DispatchGestureEvent(*udsServer_, ev.event, gesture,
                                                                    sysStartProcessTime);
     if (eventDispatchResult != RET_OK) {
-        MMI_LOGE("Gesture event dispatch failed... ret:%{public}d errCode:%{public}d",
+        MMI_LOGE("Gesture event dispatch failed, ret:%{public}d, errCode:%{public}d",
             eventDispatchResult, GESTURE_EVENT_DISP_FAIL);
         return GESTURE_EVENT_DISP_FAIL;
     }

@@ -114,6 +114,7 @@ int32_t EventPackage::PackageEventDeviceInfo(libinput_event *event, EventType& d
     std::string physical(data.physical);
     if (type == LIBINPUT_EVENT_DEVICE_REMOVED) {
         DevRegister->DeleteDeviceInfo(physical);
+        MMI_LOGI("The libinput event device is removed, EventType:%{public}d", type);
         return RET_OK;
     }
     uint32_t deviceId;
@@ -425,7 +426,8 @@ int32_t EventPackage::PackagePointerEventByAxis(libinput_event *event, EventPoin
     CHKR(data, ERROR_NULL_POINTER, RET_ERR);
 
     point.time = libinput_event_pointer_get_time_usec(data);
-    switch (libinput_event_pointer_get_axis_source(data)) {
+    auto axisSource = libinput_event_pointer_get_axis_source(data);
+    switch (axisSource) {
         case LIBINPUT_POINTER_AXIS_SOURCE_WHEEL: {
             point.source = POINTER_AXIS_SOURCE_WHEEL;
             break;
@@ -443,6 +445,8 @@ int32_t EventPackage::PackagePointerEventByAxis(libinput_event *event, EventPoin
             break;
         }
         default: {
+            MMI_LOGW("Unknown event source of pointer, PointerAxisSource:%{puiblic}d",
+                     axisSource);
             break;
         }
     }
@@ -536,6 +540,7 @@ void EventPackage::PackageTouchEventByType(int32_t type, struct libinput_event_t
             break;
         }
         default: {
+            MMI_LOGW("Unknown event type of touch, touchType:%{public}d", type);
             break;
         }
     }
@@ -552,7 +557,7 @@ int32_t EventPackage::PackageTouchEvent(libinput_event *event, EventTouch& touch
     }
     auto ret = PackageEventDeviceInfo<EventTouch>(event, touch);
     if (ret != RET_OK) {
-        MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
+        MMI_LOGE("Device param package failed, ret:%{public}d, errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
     auto data = libinput_event_get_touch_event(event);
@@ -630,7 +635,7 @@ int32_t EventPackage::PackagePointerEvent(libinput_event *event, EventPointer& p
         }
         default: {
             ret = RET_ERR;
-            MMI_LOGE("Unknown event_type of pointer class has been reported");
+            MMI_LOGW("Unknown event type of pointer, PointerEventType:%{public}d", type);
             break;
         }
     }
@@ -644,7 +649,7 @@ int32_t EventPackage::PackageGestureEvent(libinput_event *event, EventGesture& g
     CHKR(data, ERROR_NULL_POINTER, RET_ERR);
     auto ret = PackageEventDeviceInfo<EventGesture>(event, gesture);
     if (ret != RET_OK) {
-        MMI_LOGE("Device param package failed... ret:%{public}d errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
+        MMI_LOGE("Device param package failed, ret:%{public}d, errCode:%{public}d", ret, DEV_PARAM_PKG_FAIL);
         return DEV_PARAM_PKG_FAIL;
     }
     gesture.time = libinput_event_gesture_get_time_usec(data);
@@ -670,6 +675,7 @@ int32_t EventPackage::PackageGestureEvent(libinput_event *event, EventGesture& g
         }
         /* Third, it refers to the use of requirements, and the code is reserved */
         case LIBINPUT_EVENT_GESTURE_SWIPE_UPDATE: {
+            MMI_LOGI("Three finger slide event update");
             gesture.delta.x = libinput_event_gesture_get_dx(data);
             gesture.delta.y = libinput_event_gesture_get_dy(data);
             gesture.deltaUnaccel.x = libinput_event_gesture_get_dx_unaccelerated(data);
@@ -681,6 +687,7 @@ int32_t EventPackage::PackageGestureEvent(libinput_event *event, EventGesture& g
         }
         /* Third, it refers to the use of requirements, and the code is reserved */
         case LIBINPUT_EVENT_GESTURE_SWIPE_END: {
+            MMI_LOGI("Three finger slide event end");
             gesture.cancelled = libinput_event_gesture_get_cancelled(data);
             break;
         }
@@ -817,20 +824,29 @@ int32_t EventPackage::KeyboardToKeyEvent(const EventKeyboard& key, std::shared_p
         (KeyEvent::KEY_ACTION_DOWN) : (KeyEvent::KEY_ACTION_UP);
     int32_t deviceId = static_cast<int32_t>(key.deviceId);
     int32_t actionStartTime = static_cast<int32_t>(key.time);
+    auto preAction = keyEventPtr->GetAction();
+    if (preAction == KeyEvent::KEY_ACTION_UP) {
+        auto preUpKeyItem = keyEventPtr->GetKeyItem();
+        if (preUpKeyItem != nullptr) {
+            keyEventPtr->RemoveReleasedKeyItems(*preUpKeyItem);
+        } else {
+            MMI_LOGE("preUpKeyItem is null");
+        }
+    }
 
-    keyEventPtr->SetActionTime(actionTime);
+    keyEventPtr->SetActionTime(actionStartTime);
     keyEventPtr->SetAction(keyAction);
-    keyEventPtr->SetActionStartTime(actionStartTime);
     keyEventPtr->SetDeviceId(deviceId);
 
     keyEventPtr->SetKeyCode(keyCode);
     keyEventPtr->SetKeyAction(keyAction);
 
-    bool isKeyPressed = (key.state == KEY_STATE_PRESSED) ? (true) : (false);
-    if (isKeyPressed) {
-        int32_t keyDownTime = actionStartTime;
-        keyItem.SetDownTime(keyDownTime);
+    if (keyEventPtr->GetPressedKeys().empty()) {
+        keyEventPtr->SetActionStartTime(actionStartTime);
     }
+
+    bool isKeyPressed = (key.state == KEY_STATE_PRESSED) ? (true) : (false);
+    keyItem.SetDownTime(actionStartTime);
     keyItem.SetKeyCode(keyCode);
     keyItem.SetDeviceId(deviceId);
     keyItem.SetPressed(isKeyPressed);
@@ -838,7 +854,14 @@ int32_t EventPackage::KeyboardToKeyEvent(const EventKeyboard& key, std::shared_p
     if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
         keyEventPtr->AddPressedKeyItems(keyItem);
     } else if (keyAction == KeyEvent::KEY_ACTION_UP) {
+        auto pressedKeyItem = keyEventPtr->GetKeyItem(keyCode);
+        if (pressedKeyItem != nullptr) {
+            keyItem.SetDownTime(pressedKeyItem->GetDownTime());
+        } else {
+            MMI_LOGE("find pressed key failed, keyCode: %{public}d", keyCode);
+        }
         keyEventPtr->RemoveReleasedKeyItems(keyItem);
+        keyEventPtr->AddPressedKeyItems(keyItem);
     } else {
         // nothing to do.
     }
@@ -863,13 +886,13 @@ std::shared_ptr<PointerEvent> EventPackage::LibinputEventToPointerEvent(libinput
     pointerEvent->AddPointerItem(pointer);
     std::vector<uint32_t> pressedButtons;
     MouseState->GetPressedButtons(pressedButtons);
-    
+
     if (!pressedButtons.empty()) {
         for (auto it = pressedButtons.begin(); it != pressedButtons.end(); it++) {
             pointerEvent->SetButtonPressed(*it);
         }
     }
-    
+
     switch (type) {
         case LIBINPUT_EVENT_GESTURE_PINCH_BEGIN: {
             pointerEventType = PointerEvent::POINTER_ACTION_AXIS_BEGIN;
@@ -886,6 +909,7 @@ std::shared_ptr<PointerEvent> EventPackage::LibinputEventToPointerEvent(libinput
             break;
         }
         default: {
+            MMI_LOGW("Unknown event type of gesture, gestureType:%{public}d", type);
             break;
         }
     }
