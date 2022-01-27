@@ -37,16 +37,6 @@ private:
     void InitializeMouseDeathStub();
 };
 
-
-struct KeyEventI {
-    int32_t mouseMove[2];
-    int32_t mouseOperate;
-    int32_t keyboardOperate;
-    int32_t keyboardCombination[3];
-    int32_t touchMove[4];
-    int32_t touchOperate[2];
-};
-
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -88,7 +78,6 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
     int32_t c;
     int32_t optionIndex;
     optind = 0;
-    KeyEventI *keyEventI = new KeyEventI {};
     
     /* parse the first word of the command */
     if ((c = getopt_long(argc, argv, "MKT?", headOptions, &optionIndex)) != -1) {
@@ -121,8 +110,6 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
                                 std::cout << "Delay "<<delayTime<<" time next one instruction" << std::endl;
                                 }
                             }
-                            keyEventI->mouseMove[0] = px;
-                            keyEventI->mouseMove[1] = py;
 
                             std::cout << "tools 138" << std::endl;
                             auto pointerEvent = PointerEvent::Create();
@@ -174,7 +161,6 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
                                 std::cout << "Delay "<<delayTime<<" time next one instruction" << std::endl;
                                 }
                             }
-                            keyEventI->mouseOperate = buttonId;
                             break;
                         }
                         case 'u': {
@@ -210,7 +196,6 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
                                 std::cout << "Delay "<<delayTime<<" time next one instruction" << std::endl;
                                 }
                             }
-                            keyEventI->mouseOperate = buttonId;
                             break;
                         }
                         case 's': {
@@ -228,8 +213,6 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
                                 std::cout << "Delay "<<delayTime<<" time next one instruction" << std::endl;
                                 }
                             }
-                            keyEventI->mouseOperate = scrollValue;
-
                             auto pointerEvent = PointerEvent::Create();
                             PointerEvent::PointerItem item;
                             item.SetPointerId(1);
@@ -265,7 +248,6 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
                                 std::cout << "Delay "<<delayTime<<" time one instruction" << std::endl;
                                 }
                             }
-                            keyEventI->mouseOperate = buttonId;
                             break;
                         }
                         default: {
@@ -288,7 +270,6 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
                                 std::cout << "invalid command to down key" << std::endl;
                             }
                             if (optind == isCombinationKey + TWO_MORE_COMMAND) {
-                                keyEventI->keyboardCombination[1] = keyID;
                                 downKey.push_back(keyID);
                                 if (argv[optind] != nullptr) {
                                 if (!StrToInt(argv[optind], delayTime)) {
@@ -310,7 +291,6 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
                                 std::cout << "Delay "<<delayTime<<" time next one instruction" << std::endl;
                                 }
                             }
-                            keyEventI->keyboardCombination[0] = keyID;
                             downKey.push_back(keyID);
                             for (int32_t i = 0; i<downKey.size(); i++) {
                                 if (keyID != downKey[i]) {
@@ -328,7 +308,6 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
                             }
                             std::vector<int32_t>::iterator iter = std::find(downKey.begin(), downKey.end(), keyID);
                             if (iter != downKey.end()) {
-                                keyEventI->keyboardOperate = keyID;
                                 std::cout << "You raised the key " << keyID << std::endl;
                                 
                                 if (argv[optind] != nullptr) {
@@ -433,8 +412,6 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
                             std::cout << "tools 170" << std::endl;
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-                            keyEventI->touchOperate[0] = px1;
-                            keyEventI->touchOperate[1] = py1;
                             optind = optind + ONE_MORE_COMMAND;
                             break;
                         }
@@ -459,9 +436,6 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
                                 std::cout << "Delay "<<delayTime<<" time one instruction" << std::endl;
                                 }
                             }
-                            keyEventI->touchOperate[0] = px1;
-                            keyEventI->touchOperate[1] = py1;
-
                             auto pointerEvent = PointerEvent::Create();
                             std::cout << "tools 166" <<pointerEvent<<std::endl;
                             PointerEvent::PointerItem item;
