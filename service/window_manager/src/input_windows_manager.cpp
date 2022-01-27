@@ -852,6 +852,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
     int32_t globalY = pointerItem.GetGlobalY();
     FixCursorPosition(globalX, globalY, IMAGE_SIZE, IMAGE_SIZE);
     DrawWgr->DrawPointer(displayId, globalX, globalY);
+
     WindowInfo *focusWindow = nullptr;
     for (auto it : logicalDisplayInfo.windowsInfo_) {
         if (IsTouchWindow(globalX, globalY, it)) {
@@ -862,6 +863,15 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
     if (focusWindow == nullptr) {
         MMI_LOGE("Find foucusWindow failed");
         return RET_ERR;
+    }
+    int32_t action = pointerEvent->GetPointerAction();
+    if (action == PointerEvent::POINTER_ACTION_BUTTON_DOWN && firstBtnDownWindow_ == nullptr) {
+        firstBtnDownWindow_ = focusWindow;
+    } else if (!(pointerEvent->GetPressedButtons().empty())) {
+        focusWindow = firstBtnDownWindow_ ;
+    } else if ((pointerEvent->GetPressedButtons().empty()) && (action == PointerEvent::POINTER_ACTION_BUTTON_UP)) {
+        focusWindow = firstBtnDownWindow_ ;
+        firstBtnDownWindow_ = nullptr;
     }
     pointerEvent->SetTargetWindowId(focusWindow->id);
     pointerEvent->SetAgentWindowId(focusWindow->agentWindowId);
