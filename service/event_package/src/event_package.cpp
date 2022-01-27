@@ -821,7 +821,7 @@ int32_t EventPackage::KeyboardToKeyEvent(const EventKeyboard& key, std::shared_p
     if (preAction == KeyEvent::KEY_ACTION_UP) {
         auto preUpKeyItem = keyEventPtr->GetKeyItem();
         if (preUpKeyItem != nullptr) {
-            keyEventPtr->RemoveKeyItem(*preUpKeyItem);
+            keyEventPtr->RemoveReleasedKeyItems(*preUpKeyItem);
         } else {
             MMI_LOGE("preUpKeyItem is null");
         }
