@@ -124,10 +124,14 @@ std::function<void(KeyBoardEvent)> InputFilterManager::KeyEventFilter::GetHandle
 
 void InputFilterManager::OnkeyEventTrace(const KeyBoardEvent& event)
 {
-    std::string keyEvent = "InputFilter OnKey keyUuid: " + event.GetUuid();
+    std::string keyEvent = "client keyUuid = " + event.GetUuid();
     char *tmpKey = (char*)keyEvent.c_str();
     MMI_LOGT(" OnKey keyUuid = %{public}s", tmpKey);
+    std::string filterKey = "client filteKey keyUuid = " + event.GetUuid();
+    MiddleTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, filterKey);
+    FinishTrace(BYTRACE_TAG_MULTIMODALINPUT);
     int32_t eventKey = 1;
+    keyEvent = "KeyEventFilterAsync";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
 }
 
@@ -274,7 +278,11 @@ void InputFilterManager::OnTouchEventTrace(const TouchEvent& event)
     std::string touchEvent = "InputFilter OnTouch touchUuid: " + event.GetUuid();
     char *tmpTouch = (char*)touchEvent.c_str();
     MMI_LOGT(" OnTouchEvent touchUuid = %{public}s", tmpTouch);
+    std::string filterTouch = "client filteTouch TouchUuid = " + event.GetUuid();
+    MiddleTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, filterTouch);
+    FinishTrace(BYTRACE_TAG_MULTIMODALINPUT);
     int32_t eventTouch = 9;
+    touchEvent = "TouchEventFilterAsync";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
 }
 
@@ -393,10 +401,14 @@ std::function<void(MouseEvent)> InputFilterManager::PointerEventInterceptor::Get
 
 void InputFilterManager::OnPointerEventTrace(const MouseEvent& event)
 {
-    std::string pointerEvent = "InputFilter OnPointer pointerUuid: " + event.GetUuid();
+    std::string pointerEvent = "client pointUuid = " + event.GetUuid();
     char *tmpPointer = (char*)pointerEvent.c_str();
     MMI_LOGT(" OnPointerEvent pointerUuid = %{public}s", tmpPointer);
+    std::string filterPointer = "client filtePointer pointerUuid = " + event.GetUuid();
+    MiddleTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, filterPointer);
+    FinishTrace(BYTRACE_TAG_MULTIMODALINPUT);
     int32_t eventPointer = 17;
+    pointerEvent = "PointerEventFilterAsync";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, eventPointer);
 }
 

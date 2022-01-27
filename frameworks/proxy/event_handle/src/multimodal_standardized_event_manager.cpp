@@ -120,9 +120,12 @@ int32_t MultimodalStandardizedEventManager::SubscribeKeyEvent(
     pkt << subscribeInfo.GetSubscribeId() << keyOption->GetFinalKey() << keyOption->IsFinalKeyDown()
     << keyOption->GetFinalKeyDownDuration() << preKeySize;
     int32_t keySubscibeId = subscribeInfo.GetSubscribeId();
-    std::string keySubscribeIdstring = "SubscribeKeyEvent client subscribeKeyId: " + std::to_string(keySubscibeId);
+    std::string keySubscribeIdstring = " client subscribeKeyId = " + std::to_string(keySubscibeId);
     MMI_LOGT(" SubscribeKeyEvent client trace subscribeKeyId = %{public}d", keySubscibeId);
+    BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keySubscribeIdstring);
+    FinishTrace(BYTRACE_TAG_MULTIMODALINPUT);
     int32_t eventKey = 1;
+    keySubscribeIdstring = "SubscribeKeyEventAsync";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keySubscribeIdstring, eventKey);
     std::vector<int32_t> preKeys = keyOption->GetPreKeys();
     for (auto preKeyIter = preKeys.begin(); preKeyIter != preKeys.end(); ++preKeyIter) {
@@ -163,19 +166,30 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnKey(const OHOS::KeyEven
     return RET_OK;
 }
 
-void OHOS::MMI::MultimodalStandardizedEventManager::OnTouchTrace(const TouchEvent& event)
+void OHOS::MMI::MultimodalStandardizedEventManager::OnTouchTrace(const TouchEvent& event, int32_t distinguish)
 {
     std::string touchEvent = "OnTouch touchUuid: " + event.GetUuid();
     char *tmpTouch = (char*)touchEvent.c_str();
     MMI_LOGT("OnTouch touchUuid = %{public}s", tmpTouch);
-    int32_t eventTouch = 9;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
+    BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, touchEvent);
+    FinishTrace(BYTRACE_TAG_MULTIMODALINPUT);
+    int32_t dispatchPointer = 1;
+    int32_t dispatchTouch = 2;
+    if (distinguish == dispatchPointer) {
+        int32_t eventPointer = 17;
+        touchEvent = "PointerEventDispatchAsync";
+        FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
+    } else if (distinguish == dispatchTouch) {
+        int32_t eventTouch = 9;
+        touchEvent = "TouchEventDispatchAsync";
+        FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
+    } else {}
 }
 
-int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnTouch(const TouchEvent& event)
+int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnTouch(const TouchEvent& event, int32_t distinguish)
 {
     MMI_LOGT("MultimodalStandardizedEventManagertouch::OnTouch");
-    OnTouchTrace(event);
+    OnTouchTrace(event, distinguish);
     auto range = mapEvents_.equal_range(MmiMessageId::TOUCH_EVENT_BEGIN);
     for (auto i = range.first; i != range.second; ++i) {
         if (i->second.windowId == event.GetWindowID() && i->second.eventCallBack->OnTouch(event) == false) {

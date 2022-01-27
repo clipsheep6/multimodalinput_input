@@ -56,9 +56,9 @@ public:
 
 public:
     void OnkeyTrace(const OHOS::KeyEvent& event);
-    void OnTouchTrace(const TouchEvent& event);
+    void OnTouchTrace(const TouchEvent& event, int32_t distinguish);
     int32_t OnKey(const OHOS::KeyEvent& event);
-    int32_t OnTouch(const TouchEvent& event);
+    int32_t OnTouch(const TouchEvent& event, int32_t distinguish);
 
     int32_t OnShowMenu(const MultimodalEvent& event);
     int32_t OnSend(const MultimodalEvent& event);
