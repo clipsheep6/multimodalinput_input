@@ -1227,7 +1227,7 @@ void OHOS::MMI::ClientMsgHandler::TraceKeyEvent(const EventKeyboard& key) const
 {
     int32_t eventKey = 1;
     std::string keyEvent = "KeyEventFilterAsync";
-    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent,eventKey);
+    StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
     char keyUuid[MAX_UUIDSIZE] = {0};
     if (EOK != memcpy_s(keyUuid, sizeof(keyUuid), key.uuid, sizeof(key.uuid))) {
         MMI_LOGT("%{public}s copy data failed", __func__);
