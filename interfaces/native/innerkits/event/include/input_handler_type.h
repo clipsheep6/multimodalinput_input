@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MULTIMDOALINPUT_HANDLER_TYPE_H
-#define OHOS_MULTIMDOALINPUT_HANDLER_TYPE_H
+#ifndef INPUT_HANDLER_TYPE_H
+#define INPUT_HANDLER_TYPE_H
 
 #include <map>
 #include <mutex>
@@ -31,4 +31,4 @@ enum InputHandlerType : int32_t {
 };
 }
 } // namespace OHOS::MMI
-#endif // OHOS_MULTIMDOALINPUT_HANDLER_TYPE_H
+#endif // INPUT_HANDLER_TYPE_H

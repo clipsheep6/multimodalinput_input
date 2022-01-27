@@ -52,4 +52,4 @@ private:
 }
 }
 #define JSIMM JsInputMonitorManager::GetInstance()
-#endif
+#endif // JS_INPUT_MONITOR_MANAGER_H
