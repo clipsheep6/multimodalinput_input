@@ -104,8 +104,8 @@ private:
     void AnalysisTabletToolEvent(const UDSClient& client, NetPacket& pkt) const;
     void AnalysisGestureEvent(const UDSClient& client, NetPacket& pkt) const;
     void TraceKeyEvent(const EventKeyboard& key) const;
-    void TracePointerEvent(const EventPointer& pointData) const;
-    void TraceTouchEvent(const EventTouch& touchData) const;
+    void TracePointerEvent(const EventPointer& pointData, int32_t distinguishEvent) const;
+    void TraceTouchEvent(const EventTouch& touchData, int32_t distinguishEvent) const;
 
 private:
     bool isServerReqireStMessage_ = true;

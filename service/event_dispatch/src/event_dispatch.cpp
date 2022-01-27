@@ -478,8 +478,13 @@ void EventDispatch::DispatchPointerEventTrace(const EventPointer& point)
     }
     MMI_LOGT(" OnEventPointer service DispatchPointerEvent pointerUuid = %{public}s", pointerUuid);
     std::string pointerEvent = pointerUuid;
-    pointerEvent = "DispatchPointerEvent service pointerUuid: " + pointerEvent;
+    pointerEvent = " server pointerUuid = " + pointerEvent;
+    std::string dispatchPointer = pointerUuid;
+    dispatchPointer = "service dispatch pointerUuid = " + dispatchPointer;
+    MiddleTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, dispatchPointer);
+    FinishTrace(BYTRACE_TAG_MULTIMODALINPUT);
     int32_t eventPointer = 17;
+    pointerEvent = "OnEventPointerAsync";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, eventPointer);
 }
 
@@ -630,8 +635,13 @@ void EventDispatch::DispatchTouchEventTrace(const EventTouch& touch)
     }
     MMI_LOGT(" 4.event dispatcher of server: touchUuid = %{public}s", touchUuid);
     std::string touchEvent = touchUuid;
-    touchEvent = "4.event dispatcher of server touchUuid: " + touchEvent;
+    touchEvent = " server touchUuid = " + touchEvent;
+    std::string dispatchTouch = touchUuid;
+    dispatchTouch = "service dispatch touchUuid = " + dispatchTouch;
+    MiddleTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, dispatchTouch);
+    FinishTrace(BYTRACE_TAG_MULTIMODALINPUT);
     int32_t eventTouch = 9;
+    touchEvent = "OnEventTouchAsync";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
 }
 
@@ -833,8 +843,13 @@ void EventDispatch::DispatchKeyEventTrace(const EventKeyboard& key)
     }
     MMI_LOGT(" OnEventKeyboard service DispatchKeyEvent keyUuid = %{public}s", keyUuid);
     std::string keyEvent = keyUuid;
-    keyEvent = "4.event dispatcher of server keyUuid: " + keyEvent;
+    keyEvent = " server keyUuid = " + keyEvent;
+    std::string dispatchKey = keyUuid;
+    dispatchKey = "service dispatch keyUuid = " + dispatchKey;
+    MiddleTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, dispatchKey);
+    FinishTrace(BYTRACE_TAG_MULTIMODALINPUT);
     int32_t eventKey = 1;
+    keyEvent = "OnEventKeyboardAsync";
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
 }
 
