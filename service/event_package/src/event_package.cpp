@@ -834,7 +834,7 @@ int32_t EventPackage::KeyboardToKeyEvent(const EventKeyboard& key, std::shared_p
     keyEventPtr->SetKeyCode(keyCode);
     keyEventPtr->SetKeyAction(keyAction);
 
-    if (keyEventPtr->GetPressedKeys().isEmpty()) {
+    if (keyEventPtr->GetPressedKeys().empty()) {
         keyEventPtr->SetActionStartTime(actionStartTime);
     }
 
