@@ -178,7 +178,7 @@ void OHOS::MMI::MultimodalStandardizedEventManager::OnTouchTrace(const TouchEven
     if (distinguish == dispatchPointer) {
         int32_t eventPointer = 17;
         touchEvent = "PointerEventDispatchAsync";
-        FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
+        FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventPointer);
     } else if (distinguish == dispatchTouch) {
         int32_t eventTouch = 9;
         touchEvent = "TouchEventDispatchAsync";
