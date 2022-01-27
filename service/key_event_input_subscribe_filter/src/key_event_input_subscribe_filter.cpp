@@ -56,7 +56,13 @@ int32_t KeyEventInputSubscribeFilter::SubscribeKeyEvent(
             "KeyOption->isFinalKeyDown=%{public}d,KeyOption->finalKeyDownDuriation=%{public}d",
             subscribeId, keyOption->GetFinalKey(), ((keyOption->IsFinalKeyDown() == true) ? 1 : 0),
             keyOption->GetFinalKeyDownDuration());
-
+    std::string keyCodeString = std::to_string(subscribeId);
+    keyCodeString = "SubscribeId = " +  keyCodeString;
+    BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyCodeString);
+    FinishTrace(BYTRACE_TAG_MULTIMODALINPUT);
+    int32_t eventKey = 1;
+    keyCodeString = "OnEventKeyboardAsync";
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodeString, eventKey);
     auto subscriber = std::make_shared<Subscriber>(subscribeId, sess, keyOption);
     subscribers_.push_back(subscriber);
 
@@ -90,12 +96,6 @@ bool KeyEventInputSubscribeFilter::FilterSubscribeKeyEvent(std::shared_ptr<KeyEv
         MMI_LOGE("Leave, no subscriber");
         return false;
     }
-    int32_t getKeyCode = keyEvent->GetKeyCode();
-    std::string keyCodestring = std::to_string(getKeyCode);
-    MMI_LOGT(" FilterSubscribeKeyEvent service trace getKeyCode = %{public}d", getKeyCode);
-    int32_t eventKey = 1;
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, eventKey);
-
     bool handled = false;
     int32_t keyAction = keyEvent->GetKeyAction();
     MMI_LOGD("KeyCode:%{public}d, KeyAction:%{public}s", keyEvent->GetKeyCode(), KeyEvent::ActionToString(keyAction));
