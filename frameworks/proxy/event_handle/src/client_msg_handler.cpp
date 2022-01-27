@@ -1260,7 +1260,7 @@ void OHOS::MMI::ClientMsgHandler::TracePointerEvent(const EventPointer& pointDat
     StartTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, eventPointer);
 }
 
-void OHOS::MMI::ClientMsgHandler::TraceTouchEvent(const EventTouch& touchData， int32_t distinguishEvent) const
+void OHOS::MMI::ClientMsgHandler::TraceTouchEvent(const EventTouch& touchData, int32_t distinguishEvent) const
 {
     int32_t eventTouch = 9;
     int32_t filterTouch = 1;
