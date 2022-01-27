@@ -37,17 +37,8 @@ private:
     void InitializeMouseDeathStub();
 };
 
-
-struct KeyEventI {
-    int32_t mouseMove[2];
-    int32_t mouseOperate;
-    int32_t keyboardOperate;
-    int32_t keyboardCombination[3];
-    int32_t touchMove[4];
-    int32_t touchOperate[2];
-};
-
 namespace OHOS {
+namespace MMI {
 namespace {
 constexpr int32_t SLEEPTIME = 20;
 constexpr int32_t ONE_MORE_COMMAND = 1;
@@ -87,27 +78,27 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
     int32_t c;
     int32_t optionIndex;
     optind = 0;
-    KeyEventI *keyEventI = new KeyEventI {};
     
     /* parse the first word of the command */
     if ((c = getopt_long(argc, argv, "MKT?", headOptions, &optionIndex)) != -1) {
         switch (c) {
             case 'M': {
-                int32_t px, py, buttonId, scrollValue, delayTime;
+                int32_t px;
+                int32_t py;
+                int32_t buttonId;
+                int32_t scrollValue;
+                int32_t delayTime;
                 /* parse commands for virtual mouse */
                 while ((c = getopt_long(argc, argv, "m:d:u:c:s:", mouseSensorOptions, &optionIndex)) != -1) {
                     switch (c) {
                         case 'm': {
                             if (optind >= argc) {
-                                std::cout << "argc is ," << argc << std::endl;
-                                std::cout << "optind is ," << optind << std::endl;
-                                std::cout << "optarg is ," << optarg << std::endl;
-                                std::cout << "too few args" << std::endl;
+                                std::cout << "too few arguments to function" << std::endl;
                                 ShowUsage();
                                 return -1;
                             }
                             if (!StrToInt(optarg, px) || !StrToInt(argv[optind], py)) {
-                                std::cout << "invalid command to move mouse" << std::endl;
+                                std::cout <<"invalid paremeter to move mouse" << std::endl;
                                 return -1;
                             }
                             std::cout << "move to " << px << " " << py << std::endl;
@@ -119,25 +110,19 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
                                 std::cout << "Delay "<<delayTime<<" time next one instruction" << std::endl;
                                 }
                             }
-                            keyEventI->mouseMove[0] = px;
-                            keyEventI->mouseMove[1] = py;
 
                             std::cout << "tools 138" << std::endl;
-                            auto pointerEvent = MMI::PointerEvent::Create();
-                            MMI::PointerEvent::PointerItem item;
+                            auto pointerEvent = PointerEvent::Create();
+                            PointerEvent::PointerItem item;
                             item.SetPointerId(1);
                             item.SetGlobalX(px);
                             item.SetGlobalY(py);
                             pointerEvent->AddPointerItem(item);
                             pointerEvent->SetPointerId(1);
-                            pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_MOVE);
-                            pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_MOUSE);
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+                            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
                             
-                            std::cout << "tools 147" << std::endl;
-                            MMI::InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-
-                            std::cout << "tools 149" << std::endl;
-                           
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             optind = optind + ONE_MORE_COMMAND;
                             break;
                         }
@@ -155,17 +140,17 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
                             //  SOURCE_TYPE_MOUSE; 鼠标源事件
 
                             std::cout << "press down 160 " << buttonId << std::endl;
-                            auto pointerEvent = MMI::PointerEvent::Create();
-                            MMI::PointerEvent::PointerItem item;
+                            auto pointerEvent = PointerEvent::Create();
+                            PointerEvent::PointerItem item;
                             item.SetPointerId(1);
                             item.SetPressed(true);
                             pointerEvent->SetPointerId(1);
                             pointerEvent->AddPointerItem(item);
                             pointerEvent->SetButtonId(buttonId);
                             pointerEvent->SetButtonPressed(buttonId);
-                            pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN);
-                            pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_MOUSE);
-                            MMI::InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+                            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
                             std::cout << "tools 173" << std::endl;
                             if (argv[optind] != nullptr) {
@@ -176,7 +161,6 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
                                 std::cout << "Delay "<<delayTime<<" time next one instruction" << std::endl;
                                 }
                             }
-                            keyEventI->mouseOperate = buttonId;
                             break;
                         }
                         case 'u': {
@@ -192,17 +176,17 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
                             }
                             std::cout << "lift up button " << buttonId << std::endl;
 
-                            auto pointerEvent = MMI::PointerEvent::Create();
-                            MMI::PointerEvent::PointerItem item;
+                            auto pointerEvent = PointerEvent::Create();
+                            PointerEvent::PointerItem item;
                             item.SetPointerId(1);
                             item.SetPressed(false);
                             pointerEvent->SetPointerId(1);
                             pointerEvent->AddPointerItem(item);
                             pointerEvent->SetButtonPressed(buttonId);
                             pointerEvent->SetButtonId(buttonId);
-                            pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_BUTTON_UP);
-                            pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_MOUSE);
-                            MMI::InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+                            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             std::cout << "tools 204" << std::endl;
                             if (argv[optind] != nullptr) {
                                 if (!StrToInt(argv[optind], delayTime)) {
@@ -212,7 +196,6 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
                                 std::cout << "Delay "<<delayTime<<" time next one instruction" << std::endl;
                                 }
                             }
-                            keyEventI->mouseOperate = buttonId;
                             break;
                         }
                         case 's': {
@@ -230,21 +213,19 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
                                 std::cout << "Delay "<<delayTime<<" time next one instruction" << std::endl;
                                 }
                             }
-                            keyEventI->mouseOperate = scrollValue;
-
-                            auto pointerEvent = MMI::PointerEvent::Create();
-                            MMI::PointerEvent::PointerItem item;
+                            auto pointerEvent = PointerEvent::Create();
+                            PointerEvent::PointerItem item;
                             item.SetPointerId(1);
                             item.SetPressed(false);
                             pointerEvent->SetPointerId(1);
                             pointerEvent->AddPointerItem(item);
                             pointerEvent->SetButtonPressed(buttonId);
                             pointerEvent->SetButtonId(buttonId);
-                            pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_AXIS_UPDATE);
-                            pointerEvent->SetAxisValue(MMI::PointerEvent::AxisType::AXIS_TYPE_SCROLL_VERTICAL,
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
+                            pointerEvent->SetAxisValue(PointerEvent::AxisType::AXIS_TYPE_SCROLL_VERTICAL,
                                                        scrollValue);
-                            pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_MOUSE);
-                            MMI::InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             break;
                         }
                         case 'c': {
@@ -267,7 +248,6 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
                                 std::cout << "Delay "<<delayTime<<" time one instruction" << std::endl;
                                 }
                             }
-                            keyEventI->mouseOperate = buttonId;
                             break;
                         }
                         default: {
@@ -290,7 +270,6 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
                                 std::cout << "invalid command to down key" << std::endl;
                             }
                             if (optind == isCombinationKey + TWO_MORE_COMMAND) {
-                                keyEventI->keyboardCombination[1] = keyID;
                                 downKey.push_back(keyID);
                                 if (argv[optind] != nullptr) {
                                 if (!StrToInt(argv[optind], delayTime)) {
@@ -312,7 +291,6 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
                                 std::cout << "Delay "<<delayTime<<" time next one instruction" << std::endl;
                                 }
                             }
-                            keyEventI->keyboardCombination[0] = keyID;
                             downKey.push_back(keyID);
                             for (int32_t i = 0; i<downKey.size(); i++) {
                                 if (keyID != downKey[i]) {
@@ -330,7 +308,6 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
                             }
                             std::vector<int32_t>::iterator iter = std::find(downKey.begin(), downKey.end(), keyID);
                             if (iter != downKey.end()) {
-                                keyEventI->keyboardOperate = keyID;
                                 std::cout << "You raised the key " << keyID << std::endl;
                                 
                                 if (argv[optind] != nullptr) {
@@ -368,7 +345,7 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
                     switch (c) {
                         case 'm': {
                             if (optind + twoNumber>= argc) {
-                                std::cout << " 234 row too few args" << std::endl;
+                                std::cout << "too few arguments to function" << std::endl;
                                 ShowUsage();
                                 return -1;
                             }
@@ -387,25 +364,25 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
                                 }
                             }
                             // SOURCE_TYPE_TOUCHSCREEN;触摸屏
-                            auto pointerEvent = MMI::PointerEvent::Create();
+                            auto pointerEvent = PointerEvent::Create();
                             std::cout << "tools 166" <<pointerEvent<<std::endl;
-                            MMI::PointerEvent::PointerItem item;
+                            PointerEvent::PointerItem item;
                             item.SetPointerId(0);
                             item.SetGlobalX(px1);
                             item.SetGlobalY(py1);
                             pointerEvent->SetPointerId(0);
                             pointerEvent->AddPointerItem(item);
-                            pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_MOVE);
-                            pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+                            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
                             std::cout << "tools 170" << std::endl;
-                            MMI::InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             std::cout << "tools 172" << std::endl;
                             optind =  optind + THREE_MORE_COMMAND;
                             break;
                         }
                         case 'd': {
                             if (optind >= argc) {
-                                std::cout << "255 row too few args" << std::endl;
+                                std::cout << "too few arguments to function" << std::endl;
                                 ShowUsage();
                                 return -1;
                             }
@@ -424,24 +401,23 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
                                 std::cout << "Delay "<<delayTime<<" time  one instruction" << std::endl;
                                 }
                             }
-                            auto pointerEvent = MMI::PointerEvent::Create();
-                            MMI::PointerEvent::PointerItem item;
+                            auto pointerEvent = PointerEvent::Create();
+                            PointerEvent::PointerItem item;
                             item.SetPointerId(0);
                             item.SetGlobalX(px1);
                             item.SetGlobalY(py1);
                             pointerEvent->SetPointerId(0);
                             pointerEvent->AddPointerItem(item);
-                            pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_DOWN);
-                            pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+                            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
                             std::cout << "tools 170" << std::endl;
-                            MMI::InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-                            keyEventI->touchOperate[0] = px1;
-                            keyEventI->touchOperate[1] = py1;
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             optind = optind + ONE_MORE_COMMAND;
                             break;
                         }
                         case 'u': {
                             if (optind >= argc) {
+                                std::cout << "too few arguments to function" << std::endl;
                                 ShowUsage();
                                 return -1;
                             }
@@ -460,21 +436,18 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
                                 std::cout << "Delay "<<delayTime<<" time one instruction" << std::endl;
                                 }
                             }
-                            keyEventI->touchOperate[0] = px1;
-                            keyEventI->touchOperate[1] = py1;
-
-                            auto pointerEvent = MMI::PointerEvent::Create();
+                            auto pointerEvent = PointerEvent::Create();
                             std::cout << "tools 166" <<pointerEvent<<std::endl;
-                            MMI::PointerEvent::PointerItem item;
+                            PointerEvent::PointerItem item;
                             item.SetPointerId(0);
                             item.SetGlobalX(px1);
                             item.SetGlobalY(py1);
                             pointerEvent->SetPointerId(0);
                             pointerEvent->AddPointerItem(item);
-                            pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_UP);
-                            pointerEvent->SetSourceType(MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+                            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
                             std::cout << "tools 170" << std::endl;
-                            MMI::InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             optind =  optind + ONE_MORE_COMMAND;
                             break;
                         }
@@ -500,7 +473,7 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
             }
         }
     } else {
-        std::cout << "too few args" << std::endl;
+        std::cout << "too few arguments to function" << std::endl;
         ShowUsage();
         return -1;
     }
@@ -536,4 +509,5 @@ void InputManagerCommand::ShowUsage()
     std::cout << "                                                                  " << std::endl;
     std::cout << "-?  --help                                                        " << std::endl;
 }
-} // namespace OHOS
+}
+} // namespace OHOS::MMI
