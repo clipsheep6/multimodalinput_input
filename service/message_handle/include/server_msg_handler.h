@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_SERVER_MSG_HANDLER_H
-#define OHOS_SERVER_MSG_HANDLER_H
+#ifndef SERVER_MSG_HANDLER_H
+#define SERVER_MSG_HANDLER_H
 #include "key_event_input_subscribe_filter.h"
 #include "msg_handler.h"
 #include "event_dispatch.h"
@@ -81,4 +81,4 @@ private:
 };
 }
 }
-#endif
+#endif // SERVER_MSG_HANDLER_H

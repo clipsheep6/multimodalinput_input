@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef _KEY_EVENT_INPUT_SUBSCRIBE_FILTER_H_
-#define _KEY_EVENT_INPUT_SUBSCRIBE_FILTER_H_
+#ifndef KEY_EVENT_INPUT_SUBSCRIBE_FILTER_H
+#define KEY_EVENT_INPUT_SUBSCRIBE_FILTER_H
 
 #include <algorithm>
 #include <list>
@@ -81,4 +81,4 @@ private:
 }
 }
 #define KeyEventInputSubscribeFlt OHOS::MMI::KeyEventInputSubscribeFilter::GetInstance()
-#endif  // _KEY_EVENT_INPUT_SUBSCRIBE_FILTER_H_
+#endif  // KEY_EVENT_INPUT_SUBSCRIBE_FILTER_H

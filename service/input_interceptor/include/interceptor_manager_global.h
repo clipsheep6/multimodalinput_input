@@ -49,4 +49,4 @@ private:
 }
 
 #define INTERCEPTORMANAGERGLOBAL OHOS::Singleton<OHOS::MMI::InterceptorManagerGlobal>::GetInstance()
-#endif
+#endif // INTERCEPTOR_MANAGER_GLOBAL_H
