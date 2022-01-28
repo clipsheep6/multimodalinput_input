@@ -137,12 +137,13 @@ void OHOS::MMI::ClientMsgHandler::OnMsgHandler(const OHOS::MMI::UDSClient& clien
 int32_t OHOS::MMI::ClientMsgHandler::OnKeyMonitor(const UDSClient& client, NetPacket& pkt)
 {
     auto key = OHOS::MMI::KeyEvent::Create();
+    CHKPR(key, ERROR_NULL_POINTER, RET_ERR);
     int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(fSkipId, key, pkt);
     if (ret != RET_OK) {
         MMI_LOGE("OnKeyMonitor read netPacket failed");
         return RET_ERR;
     }
-    int32_t pid = 0;
+    int32_t pid;
     pkt >> pid;
     MMI_LOGD("Client receive the msg from server, keyCode: %{public}d, pid: %{public}d", key->GetKeyCode(), pid);
     return InputMonitorMgr.OnMonitorInputEvent(key);
