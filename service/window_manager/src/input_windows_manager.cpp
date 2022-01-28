@@ -748,7 +748,7 @@ void OHOS::MMI::InputWindowsManager::ReviseGlobalCoordinate(int32_t& globalX, in
     }
 }
 
-bool OHOS::MMI::InputWindowsManager::CheckDisplayIdIfExist(int32_t& displayId)
+bool OHOS::MMI::InputWindowsManager::IsCheckDisplayIdIfExist(int32_t& displayId)
 {
     if (logicalDisplays_.empty()) {
         MMI_LOGE("logicalDisplays_is empty");
@@ -824,14 +824,14 @@ void OHOS::MMI::InputWindowsManager::FixCursorPosition(int32_t &globalX, int32_t
 
 int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTargetOld(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    return -1;
+    return RET_ERR;
 }
 
 int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("UpdateMouseTarget begin");
     auto displayId = pointerEvent->GetTargetDisplayId();
-    if (!CheckDisplayIdIfExist(displayId)) {
+    if (!IsCheckDisplayIdIfExist(displayId)) {
         MMI_LOGE("This display:%{public}d is not exist", displayId);
         return RET_ERR;
     }
@@ -874,15 +874,15 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
 
 int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTargetOld(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    return -1;
+    return RET_ERR;
 }
 
 int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     auto displayId = pointerEvent->GetTargetDisplayId();
-    if (!CheckDisplayIdIfExist(displayId)) {
-        MMI_LOGE("This displayId is not exist");
-        return -1;
+    if (!IsCheckDisplayIdIfExist(displayId)) {
+        MMI_LOGE("This display is not exist");
+        return RET_ERR;
     }
     pointerEvent->SetTargetDisplayId(displayId);
 
@@ -890,12 +890,12 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<
     PointerEvent::PointerItem pointerItem;
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
         MMI_LOGE("Can't find pointer item, pointer:%{public}d", pointerId);
-        return -1;
+        return RET_ERR;
     }
     MMI_LOGD("UpdateTouchScreenTarget, display:%{public}d", displayId);
     LogicalDisplayInfo logicalDisplayInfo;
     if (!GetLogicalDisplayById(displayId, logicalDisplayInfo)) {
-        MMI_LOGE("DisplayIdGetLogicalDisplay failed");
+        MMI_LOGE("DisplayGetLogicalDisplay failed");
         return RET_ERR;
     }
     int32_t globalX = pointerItem.GetGlobalX();
@@ -920,7 +920,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<
     }
     if (touchWindow == nullptr) {
         MMI_LOGE("touchWindow is nullptr");
-        return -1;
+        return RET_ERR;
     }
 
     pointerEvent->SetTargetWindowId(touchWindow->id);
@@ -942,13 +942,13 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<
 int32_t OHOS::MMI::InputWindowsManager::UpdateTouchPadTargetOld(std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("touchPad event is dropped");
-    return -1;
+    return RET_ERR;
 }
 
 int32_t OHOS::MMI::InputWindowsManager::UpdateTouchPadTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("touchPad event is dropped");
-    return -1;
+    return RET_ERR;
 }
 
 int32_t OHOS::MMI::InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent)
@@ -972,7 +972,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTargetPointer(std::shared_ptr<Poin
         }
     }
     MMI_LOGE("Source is not of the correct type, source:%{public}d", source);
-    return -1;
+    return RET_ERR;
 }
 
 bool OHOS::MMI::InputWindowsManager::FindWindow(std::shared_ptr<PointerEvent> pointerEvent)
