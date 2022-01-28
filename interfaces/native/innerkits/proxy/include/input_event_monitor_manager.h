@@ -29,7 +29,7 @@ struct MonitorItem {
     int32_t id_;
     bool operator == (struct MonitorItem item) const
     {
-        return this->id_ == item.id_;
+        return id_ == item.id_;
     }
     std::string name;
     std::function<void (std::shared_ptr<OHOS::MMI::KeyEvent>)> keyEventMonitor;
