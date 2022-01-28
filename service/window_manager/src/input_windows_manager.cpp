@@ -732,7 +732,7 @@ bool OHOS::MMI::InputWindowsManager::IsTouchWindow(int32_t x, int32_t y, const W
         (y <= (info.topLeftY + info.height));
 }
 
-void OHOS::MMI::InputWindowsManager::ReviseGlobalCoordinate(int32_t& globalX, int32_t& globalY, int32_t width, int32_t height)
+void OHOS::MMI::InputWindowsManager::AdjustGlobalCoordinate(int32_t& globalX, int32_t& globalY, int32_t width, int32_t height)
 {
     if (globalX <= 0) {
         globalX = 0;
@@ -901,7 +901,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<
     int32_t globalX = pointerItem.GetGlobalX();
     int32_t globalY = pointerItem.GetGlobalY();
     MMI_LOGD("UpdateTouchScreenTarget, globalX:%{public}d, globalY:%{public}d", globalX, globalY);
-    ReviseGlobalCoordinate(globalX, globalY, logicalDisplayInfo.width, logicalDisplayInfo.height);
+    AdjustGlobalCoordinate(globalX, globalY, logicalDisplayInfo.width, logicalDisplayInfo.height);
     auto targetWindowId = pointerEvent->GetTargetWindowId();
     MMI_LOGD("UpdateTouchScreenTarget, targetWindow:%{public}d", targetWindowId);
     WindowInfo *touchWindow = nullptr;

@@ -167,7 +167,7 @@ public:
     bool FindWindow(std::shared_ptr<PointerEvent> pointerEvent);
     MouseLocation GetMouseInfo();
     void UpdateAndAdjustMouseLoction(double& x, double& y);
-    void ReviseGlobalCoordinate(int32_t& globalX, int32_t& globalY, int32_t width, int32_t height);
+    void AdjustGlobalCoordinate(int32_t& globalX, int32_t& globalY, int32_t width, int32_t height);
     bool IsCheckDisplayIdIfExist(int32_t& displayId);
     bool GetLogicalDisplayById(int32_t displayId, LogicalDisplayInfo& logicalDisplayInfo);
     int32_t UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent);
