@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef KEY_EVENT_INPUT_SUBSCRIBE_MANAGER_H_
-#define KEY_EVENT_INPUT_SUBSCRIBE_MANAGER_H_
+#ifndef KEY_EVENT_INPUT_SUBSCRIBE_MANAGER_H
+#define KEY_EVENT_INPUT_SUBSCRIBE_MANAGER_H
 
 #include <functional>
 #include <list>
@@ -79,4 +79,4 @@ private:
 
 #define KeyEventInputSubscribeMgr OHOS::MMI::KeyEventInputSubscribeManager::GetInstance()
 
-#endif  // KEY_EVENT_INPUT_SUBSCRIBE_MANAGER_H_
+#endif  // KEY_EVENT_INPUT_SUBSCRIBE_MANAGER_H

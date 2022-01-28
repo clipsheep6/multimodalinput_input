@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MULTIMDOALINPUT_KEY_OPTION_H
-#define OHOS_MULTIMDOALINPUT_KEY_OPTION_H
+#ifndef KEY_OPTION_H
+#define KEY_OPTION_H
 
 #include <vector>
 
@@ -44,4 +44,4 @@ private:
 }
 } // namespace OHOS:MMI
 
-#endif // OHOS_MULTIMDOALINPUT_KEY_OPTION_H
+#endif // KEY_OPTION_H

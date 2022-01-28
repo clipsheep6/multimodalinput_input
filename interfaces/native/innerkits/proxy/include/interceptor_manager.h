@@ -53,4 +53,4 @@ private:
 }
 
 #define INTERCEPTORMANAGER OHOS::Singleton<OHOS::MMI::InterceptorManager>::GetInstance()
-#endif
+#endif // INTERCEPTOR_MANAGER_H

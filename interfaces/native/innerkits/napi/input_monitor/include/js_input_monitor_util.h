@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_JS_INPUT_MONITOR_UTIL_H
-#define OHOS_JS_INPUT_MONITOR_UTIL_H
+#ifndef JS_INPUT_MONITOR_UTIL_H
+#define JS_INPUT_MONITOR_UTIL_H
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 namespace OHOS {
@@ -36,5 +36,4 @@ namespace OHOS {
     }
 }
 
-#endif
-
+#endif // JS_INPUT_MONITOR_UTIL_H
