@@ -277,7 +277,7 @@ int32_t InputManagerImpl::AddInterceptor(int32_t sourceType,
         MMI_LOGE("AddInterceptor::%{public}s param should not be null!", __func__);
         return InterceptorManager::INVALID_INTERCEPTOR_ID;
     }
-    return INTERCEPTORMANAGER.AddInterceptor(sourceType, interceptor);
+    return InterceptorMgr.AddInterceptor(sourceType, interceptor);
 }
 
 int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
@@ -286,12 +286,12 @@ int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyE
         MMI_LOGE("AddInterceptor::%{public}s param should not be null!", __func__);
         return OHOS::MMI_STANDARD_EVENT_INVALID_PARAMETER;
     }
-    return INTERCEPTORMANAGER.AddInterceptor(interceptor);
+    return InterceptorMgr.AddInterceptor(interceptor);
 }
 
 void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
 {
-    INTERCEPTORMANAGER.RemoveInterceptor(interceptorId);
+    InterceptorMgr.RemoveInterceptor(interceptorId);
 }
 
 void InputManagerImpl::SimulateInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)

@@ -54,7 +54,7 @@ bool OHOS::MMI::ServerMsgHandler::Init(UDSServer& udsServer)
 {
     udsServer_ = &udsServer;
 #ifdef OHOS_BUILD_HDF
-    CHKF(hdiInject->Init(udsServer), SENIOR_INPUT_DEV_INIT_FAIL);
+    CHKF(HdiInjectObj->Init(udsServer), SENIOR_INPUT_DEV_INIT_FAIL);
 #endif
     MsgCallback funs[] = {
         {MmiMessageId::REGISTER_APP_INFO, MsgCallbackBind2(&ServerMsgHandler::OnRegisterAppInfo, this)},
@@ -201,7 +201,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnHdiInject(SessionPtr sess, NetPacket& pkt
     MMI_LOGI("hdfinject server access hditools info.");
     CHKR(sess, ERROR_NULL_POINTER, RET_ERR);
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
-    const int32_t processingCode = hdiInject->ManageHdfInject(sess, pkt);
+    const int32_t processingCode = HdiInjectObj->ManageHdfInject(sess, pkt);
     NetPacket newPacket(MmiMessageId::HDI_INJECT);
     newPacket << processingCode;
     if (!sess->SendMsg(newPacket)) {
@@ -395,7 +395,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnNewInjectKeyEvent(SessionPtr sess, NetPac
     }
     
     if (nPtr->HasFlag(OHOS::MMI::InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
-        if (INTERCEPTORMANAGERGLOBAL.OnKeyEvent(nPtr)) {
+        if (InterceptorMgrGbl.OnKeyEvent(nPtr)) {
             MMI_LOGD("keyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d", 
                 nPtr->GetKeyCode());
             return RET_OK;
@@ -706,7 +706,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInputDeviceIds(SessionPtr sess, NetPacket
     CHKR(pkt.Read(taskId), STREAM_BUF_READ_FAIL, RET_ERR);
 
 #ifdef OHOS_WESTEN_MODEL
-    inputDeviceManager->GetInputDeviceIdsAsync([taskId, sess, this](std::vector<int32_t> ids) {
+    InputDevMgr->GetInputDeviceIdsAsync([taskId, sess, this](std::vector<int32_t> ids) {
         NetPacket pkt2(MmiMessageId::INPUT_DEVICE_IDS);
         int32_t num = ids.size();
         CHKR(pkt2.Write(taskId), STREAM_BUF_WRITE_FAIL, RET_ERR);
@@ -720,7 +720,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInputDeviceIds(SessionPtr sess, NetPacket
         }
     });
 #else
-    std::vector<int32_t> ids = inputDeviceManager->GetInputDeviceIds();
+    std::vector<int32_t> ids = InputDevMgr->GetInputDeviceIds();
     NetPacket pkt2(MmiMessageId::INPUT_DEVICE_IDS);
     int32_t size = ids.size();
     CHKR(pkt2.Write(taskId), STREAM_BUF_WRITE_FAIL, RET_ERR);
@@ -747,7 +747,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& p
     CHKR(pkt.Read(deviceId), STREAM_BUF_READ_FAIL, RET_ERR);
 
 #ifdef OHOS_WESTEN_MODEL
-    inputDeviceManager->FindInputDeviceByIdAsync(deviceId,
+    InputDevMgr->FindInputDeviceByIdAsync(deviceId,
         [taskId, sess, this](std::shared_ptr<InputDevice> inputDevice) {
         NetPacket pkt2(MmiMessageId::INPUT_DEVICE);
         if (inputDevice == nullptr) {
@@ -784,7 +784,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& p
     });
 
 #else
-    std::shared_ptr<InputDevice> inputDevice = inputDeviceManager->GetInputDevice(deviceId);
+    std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetInputDevice(deviceId);
     NetPacket pkt2(MmiMessageId::INPUT_DEVICE);
     if (inputDevice == nullptr) {
         MMI_LOGI("Input device not found.");
@@ -871,7 +871,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnAddTouchpadEventFilter(SessionPtr sess, N
     int32_t sourceType = 0;
     int32_t id = 0;
     pkt >> sourceType >> id;
-    INTERCEPTORMANAGERGLOBAL.OnAddInterceptor(sourceType, id, sess);
+    InterceptorMgrGbl.OnAddInterceptor(sourceType, id, sess);
     return RET_OK;
 }
 
@@ -880,7 +880,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRemoveTouchpadEventFilter(SessionPtr sess
     CHKR(sess, ERROR_NULL_POINTER, RET_ERR);
     int32_t id = 0;
     pkt  >> id;
-    INTERCEPTORMANAGERGLOBAL.OnRemoveInterceptor(id);
+    InterceptorMgrGbl.OnRemoveInterceptor(id);
     return RET_OK;
 }
 // LCOV_EXCL_STOP
