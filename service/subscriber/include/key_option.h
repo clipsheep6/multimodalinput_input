@@ -15,15 +15,12 @@
 #ifndef OHOS_MULTIMDOALINPUT_KEY_OPTION_H
 #define OHOS_MULTIMDOALINPUT_KEY_OPTION_H
 
-#include <vector>
-
 namespace OHOS {
 namespace MMI {
 class KeyOption {
 public:
     std::vector<int32_t> GetPreKeys() const;
     void SetPreKeys(const std::vector<int32_t>& preKeys);
-    uint32_t GetPreKeySize();
     int32_t GetFinalKey() const;
     void SetFinalKey(int32_t finalKey);
 
@@ -34,13 +31,12 @@ public:
     void SetFinalKeyDownDuration(int32_t duration);
 
 private:
-    std::vector<int32_t> preKeys_;
-    int32_t preKeySize_;
-    int32_t finalKey_;
+    std::vector<int32_t> preKeys_ {};
+    int32_t finalKey_ { -1 };
     bool isFinalKeyDown_;
-    int32_t finalKeyDownDuration_;
+    int32_t finalKeyDownDuration_ { 0 };
 };
-}
-} // namespace OHOS:MMI
+} // namespace MMI
+} // namespace OHOS
 
 #endif // OHOS_MULTIMDOALINPUT_KEY_OPTION_H
