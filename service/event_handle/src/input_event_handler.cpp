@@ -581,10 +581,6 @@ int32_t InputEventHandler::OnEventPointer(const multimodal_libinput_event& ev)
         MMI_LOGD("pointer event interceptor find a pointer event pointer button: %{puiblic}d", point.button);
         return RET_OK;
     }
-    if (type == LIBINPUT_EVENT_POINTER_BUTTON) {
-        MouseState->CountState(point.button, point.state);
-    }
-    MouseState->SetMouseCoords(point.delta.x, point.delta.y);
 #else
     MMI_LOGT("2.mapping event:Event:eventType=%{public}d;", point.eventType);
     /*
