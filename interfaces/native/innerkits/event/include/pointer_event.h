@@ -98,7 +98,7 @@ public:
 
         // Get or set the time when the Pointer is pressed
         int32_t GetDownTime() const;
-        void SetDownTime(int32_t donwTime);
+        void SetDownTime(int32_t downTime);
 
         // Get or set whether the Pointer is pressed
         bool IsPressed() const;

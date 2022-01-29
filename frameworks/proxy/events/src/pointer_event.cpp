@@ -147,7 +147,7 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         return false;
     }
 
-    if (!out.WriteInt32(donwTime_)) {
+    if (!out.WriteInt32(downTime_)) {
         return false;
     }
 
@@ -196,7 +196,7 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         return false;
     }
 
-    if (!in.ReadInt32(donwTime_)) {
+    if (!in.ReadInt32(downTime_)) {
         return false;
     }
 
