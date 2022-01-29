@@ -62,7 +62,7 @@ void InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType hand
 
 void InputHandlerManager::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
-    MMI_LOGD("Mark consumed state:monitorId=%{public}d, eventId=%{public}d", monitorId, eventId);
+    MMI_LOGD("Mark consumed state:monitorId:%{public}d,eventId:%{public}d", monitorId, eventId);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     if (client == nullptr) {
         MMI_LOGE("Get MMIClint false");

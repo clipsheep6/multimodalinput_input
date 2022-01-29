@@ -182,13 +182,13 @@ void AbilityLaunchManager::Print()
     for (auto it = shortcutKeys_.begin(); it != shortcutKeys_.end(); ++it) {
         auto &shortcutKey = it->second;
         for (auto prekey: shortcutKey.preKeys) {
-            MMI_LOGD("preKey: %{public}d", prekey);
+            MMI_LOGD("preKey:%{public}d", prekey);
         }
-        MMI_LOGD("finalKey: %{public}d", shortcutKey.finalKey);
-        MMI_LOGD("keyDownDuration: %{public}d", shortcutKey.keyDownDuration);
-        MMI_LOGD("triggerType: %{public}d", shortcutKey.triggerType);
-        MMI_LOGD("bundleName: %{public}s", shortcutKey.ability.bundleName.c_str());
-        MMI_LOGD("abilityName: %{public}s", shortcutKey.ability.abilityName.c_str());
+        MMI_LOGD("finalKey:%{public}d", shortcutKey.finalKey);
+        MMI_LOGD("keyDownDuration:%{public}d", shortcutKey.keyDownDuration);
+        MMI_LOGD("triggerType:%{public}d", shortcutKey.triggerType);
+        MMI_LOGD("bundleName:%{public}s", shortcutKey.ability.bundleName.c_str());
+        MMI_LOGD("abilityName:%{public}s", shortcutKey.ability.abilityName.c_str());
     }
 }
 
@@ -200,7 +200,7 @@ bool AbilityLaunchManager::CheckLaunchAbility(const std::shared_ptr<KeyEvent> &k
         return true;
     }
     if (lastMatchedKey_.timerId >= 0) {
-        MMI_LOGE("remove timer timeid: %{public}d", lastMatchedKey_.timerId);
+        MMI_LOGE("remove timer timeid:%{public}d", lastMatchedKey_.timerId);
         TimerMgr->RemoveTimer(lastMatchedKey_.timerId);
     }
     ResetLastMatchedKey();
@@ -208,7 +208,7 @@ bool AbilityLaunchManager::CheckLaunchAbility(const std::shared_ptr<KeyEvent> &k
         ShortcutKey &shortcutKey = iter->second;
         int32_t keyCode = key->GetKeyCode();
         const std::string checkkeycode = std::to_string(keyCode);
-        MMI_LOGT(" CheckLaunchAbility service trace GetKeyCode: %{public}d\n", key->GetKeyCode());
+        MMI_LOGT("CheckLaunchAbility service trace GetKeyCode:%{public}d", key->GetKeyCode());
         int32_t eventKey = 1;
         FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, checkkeycode, eventKey);
         if (!Match(shortcutKey, key)) {
@@ -216,10 +216,10 @@ bool AbilityLaunchManager::CheckLaunchAbility(const std::shared_ptr<KeyEvent> &k
             continue;
         }
         for (auto prekey: shortcutKey.preKeys) {
-            MMI_LOGD("eventkey matched, preKey: %{public}d", prekey);
+            MMI_LOGD("eventkey matched, preKey:%{public}d", prekey);
         }
-        MMI_LOGD("eventkey matched, finalKey: %{public}d", shortcutKey.finalKey);
-        MMI_LOGD("eventkey matched, bundleName: %{public}s", shortcutKey.ability.bundleName.c_str());
+        MMI_LOGD("eventkey matched, finalKey:%{public}d", shortcutKey.finalKey);
+        MMI_LOGD("eventkey matched, bundleName:%{public}s", shortcutKey.ability.bundleName.c_str());
         if(shortcutKey.triggerType == KeyEvent::KEY_ACTION_DOWN) {
             return HandleKeyDown(shortcutKey);
         } else if (shortcutKey.triggerType == KeyEvent::KEY_ACTION_UP) {
@@ -249,7 +249,7 @@ bool AbilityLaunchManager::Match(const ShortcutKey &shortcutKey, const std::shar
             return false;
         }
     }
-    MMI_LOGD("matched...");
+    MMI_LOGD("matched");
     return true;
 }
 
@@ -266,7 +266,7 @@ bool AbilityLaunchManager::HandleKeyDown(ShortcutKey &shortcutKey){
             MMI_LOGD("Timer add failed");
             return false;
         }
-        MMI_LOGD("add timer success, timeid: %{public}d", shortcutKey.timerId);
+        MMI_LOGD("add timer success, timeid:%{public}d", shortcutKey.timerId);
         lastMatchedKey_ = shortcutKey;
     }
     return true;
@@ -286,9 +286,9 @@ bool AbilityLaunchManager::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
 
         auto upTime = keyEvent->GetActionTime();
         auto downTime = keyItem->GetDownTime();
-        MMI_LOGE("upTime %{public}d", upTime);
-        MMI_LOGE("downTime %{public}d", downTime);
-        MMI_LOGE("keyDownDuration %{public}d", shortcutKey.keyDownDuration);
+        MMI_LOGE("upTime:%{public}d", upTime);
+        MMI_LOGE("downTime:%{public}d", downTime);
+        MMI_LOGE("keyDownDuration:%{public}d", shortcutKey.keyDownDuration);
         if (upTime - downTime >= (shortcutKey.keyDownDuration * 1000)) {
             MMI_LOGE("Skip, upTime - downTime >= duration");
             return false;
@@ -306,7 +306,7 @@ bool AbilityLaunchManager::HandleKeyCancel(ShortcutKey &shortcutKey){
     auto timerId = shortcutKey.timerId;
     shortcutKey.timerId = -1;
     TimerMgr->RemoveTimer(timerId);
-    MMI_LOGD("Leave, timerId: %{public}d", timerId);
+    MMI_LOGD("Leave, timerId:%{public}d", timerId);
     return false;
 }
 
@@ -327,10 +327,10 @@ void AbilityLaunchManager::LaunchAbility(ShortcutKey key)
         wParams.SetParam(key, AAFwk::String::Box(value));
     }
     want.SetParams(wParams);
-    MMI_LOGD("Start launch ability, bundleName: %{public}s", key.ability.bundleName.c_str());
+    MMI_LOGD("Start launch ability, bundleName:%{public}s", key.ability.bundleName.c_str());
     ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
     if (err != ERR_OK) {
-        MMI_LOGE("LaunchAbility failed, bundleName: %{public}s err:%{public}d", key.ability.bundleName.c_str(), err);
+        MMI_LOGE("LaunchAbility failed, bundleName:%{public}s,err:%{public}d", key.ability.bundleName.c_str(), err);
     }
     ResetLastMatchedKey();
     MMI_LOGD("End launch ability, bundleName:%{public}s", key.ability.bundleName.c_str());

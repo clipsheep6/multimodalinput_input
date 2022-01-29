@@ -367,7 +367,7 @@ void RunClient()
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
-    MMI_LOGT("UnRegisterStandardizedEventHandle begin....");
+    MMI_LOGT("UnRegisterStandardizedEventHandle begin");
     client.UnregisterStandardizedEventHandle();
     MMI_LOGT("UnRegisterStandardizedEventHandle end, wait 3000ms exit.");
 }

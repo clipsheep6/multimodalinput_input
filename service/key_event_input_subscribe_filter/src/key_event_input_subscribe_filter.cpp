@@ -49,11 +49,11 @@ int32_t KeyEventInputSubscribeFilter::SubscribeKeyEvent(
     }
 
     for (auto keyCode : keyOption->GetPreKeys()) {
-        MMI_LOGD("KeyOption->prekey=%{public}s", KeyEvent::KeyCodeToString(keyCode));
+        MMI_LOGD("KeyOption->prekey:%{public}s", KeyEvent::KeyCodeToString(keyCode));
     }
 
-    MMI_LOGD("SubscribeId=%{public}d,KeyOption->finalKey=%{public}d,"
-            "KeyOption->isFinalKeyDown=%{public}d,KeyOption->finalKeyDownDuriation=%{public}d",
+    MMI_LOGD("SubscribeId:%{public}d,KeyOption->finalKey:%{public}d,"
+            "KeyOption->isFinalKeyDown:%{public}d,KeyOption->finalKeyDownDuriation:%{public}d",
             subscribeId, keyOption->GetFinalKey(), ((keyOption->IsFinalKeyDown() == true) ? 1 : 0),
             keyOption->GetFinalKeyDownDuration());
 
@@ -92,13 +92,13 @@ bool KeyEventInputSubscribeFilter::FilterSubscribeKeyEvent(std::shared_ptr<KeyEv
     }
     int32_t getKeyCode = keyEvent->GetKeyCode();
     std::string keyCodestring = std::to_string(getKeyCode);
-    MMI_LOGT(" FilterSubscribeKeyEvent service trace getKeyCode = %{public}d", getKeyCode);
+    MMI_LOGT(" FilterSubscribeKeyEvent service trace getKeyCode:%{public}d", getKeyCode);
     int32_t eventKey = 1;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, eventKey);
 
     bool handled = false;
     int32_t keyAction = keyEvent->GetKeyAction();
-    MMI_LOGD("KeyCode:%{public}d, KeyAction:%{public}s", keyEvent->GetKeyCode(), KeyEvent::ActionToString(keyAction));
+    MMI_LOGD("KeyCode:%{public}d,KeyAction:%{public}s", keyEvent->GetKeyCode(), KeyEvent::ActionToString(keyAction));
     for (auto& keyCode : keyEvent->GetPressedKeys()) {
         MMI_LOGD("Pressed KeyCode:%{public}d", keyCode);
     }
@@ -213,7 +213,7 @@ bool KeyEventInputSubscribeFilter::AddTimer(const std::shared_ptr<Subscriber>& s
         return false;
     }
     subscriber->keyEvent_ = keyEvent_;
-    MMI_LOGD("Leave, AddTimer Success, duration:%{public}d, timerId:%{public}d", keyOption->GetFinalKeyDownDuration(), subscriber->timerId_);
+    MMI_LOGD("Leave, AddTimer Success, duration:%{public}d,timerId:%{public}d", keyOption->GetFinalKeyDownDuration(), subscriber->timerId_);
     return true;
 }
 
@@ -234,7 +234,7 @@ void KeyEventInputSubscribeFilter::ClearTimer(const std::shared_ptr<Subscriber>&
     subscriber->keyEvent_.reset();
     subscriber->timerId_ = -1;
     TimerMgr->RemoveTimer(timerId);
-    MMI_LOGD("Leave, subscribeId:%{public}d, subscribeId:%{public}d", subscriber->id_, timerId);
+    MMI_LOGD("Leave, subscribeId:%{public}d,subscribeId:%{public}d", subscriber->id_, timerId);
 }
 
 void KeyEventInputSubscribeFilter::OnTimer(const std::shared_ptr<Subscriber> subscriber) {
@@ -287,11 +287,11 @@ bool KeyEventInputSubscribeFilter::HandleKeyDown(const std::shared_ptr<KeyEvent>
     RemoveKeyCode(pressedKeys, keyCode);
     for (auto& subscriber : subscribers_) {
         auto& keyOption = subscriber->keyOption_;
-        MMI_LOGD("SubscribeId=%{public}d, KeyOption->finalKey=%{public}d, KeyOption->isFinalKeyDown=%{public}d, "
-                 "KeyOption->finalKeyDownDuriation=%{public}d", subscriber->id_, keyOption->GetFinalKey(),
+        MMI_LOGD("SubscribeId:%{public}d,KeyOption->finalKey:%{public}d,KeyOption->isFinalKeyDown:%{public}d,"
+                 "KeyOption->finalKeyDownDuriation:%{public}d", subscriber->id_, keyOption->GetFinalKey(),
                  ((keyOption->IsFinalKeyDown() == true) ? 1 : 0), keyOption->GetFinalKeyDownDuration());
         for (auto keyCode : keyOption->GetPreKeys()) {
-            MMI_LOGD("KeyOption->prekey=%{public}d", keyCode);
+            MMI_LOGD("KeyOption->prekey:%{public}d", keyCode);
         }
 
         if (!keyOption->IsFinalKeyDown()) {
@@ -336,11 +336,11 @@ bool KeyEventInputSubscribeFilter::HandleKeyUp(const std::shared_ptr<KeyEvent>& 
     RemoveKeyCode(pressedKeys, keyCode);
     for (auto& subscriber : subscribers_) {
         auto& keyOption = subscriber->keyOption_;
-        MMI_LOGD("SubscribeId=%{public}d, KeyOption->finalKey=%{public}d, KeyOption->isFinalKeyDown=%{public}d, "
-                 "KeyOption->finalKeyDownDuriation=%{public}d", subscriber->id_, keyOption->GetFinalKey(),
+        MMI_LOGD("SubscribeId:%{public}d,KeyOption->finalKey:%{public}d,KeyOption->isFinalKeyDown:%{public}d,"
+                 "KeyOption->finalKeyDownDuriation:%{public}d", subscriber->id_, keyOption->GetFinalKey(),
                  ((keyOption->IsFinalKeyDown() == true) ? 1 : 0), keyOption->GetFinalKeyDownDuration());
         for (auto keyCode : keyOption->GetPreKeys()) {
-            MMI_LOGD("KeyOption->prekey=%{public}d", keyCode);
+            MMI_LOGD("KeyOption->prekey:%{public}d", keyCode);
         }
 
         if (keyOption->IsFinalKeyDown()) {
