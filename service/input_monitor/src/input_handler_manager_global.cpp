@@ -91,7 +91,7 @@ int32_t InputHandlerManagerGlobal::MonitorCollection::AddMonitor(const SessionMo
                  static_cast<int32_t>(monitors_.size()), INVALID_MONITOR_MON);
         return RET_ERR;
     }
-    auto iter = monitors.find(mon);
+    auto iter = monitors_.find(mon);
     if (iter != monitors_.end()) {
         MMI_LOGW("repeate register, errCode:%{public}d", INVALID_MONITOR_MON);
     }
