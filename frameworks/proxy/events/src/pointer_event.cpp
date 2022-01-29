@@ -43,12 +43,12 @@ void PointerEvent::PointerItem::SetPointerId(int32_t pointerId)
 
 int32_t PointerEvent::PointerItem::GetDownTime() const
 {
-    return donwTime_;
+    return downTime_;
 }
 
 void PointerEvent::PointerItem::SetDownTime(int32_t downTime)
 {
-    donwTime_ = downTime;
+    downTime_ = downTime;
 }
 
 bool PointerEvent::PointerItem::IsPressed() const
