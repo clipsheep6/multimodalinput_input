@@ -20,7 +20,6 @@
 #include <sys/types.h>
 #include <sys/un.h>
 #include <unistd.h>
-
 namespace OHOS::MMI {
 namespace {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSession" };
@@ -43,17 +42,21 @@ UDSSession::~UDSSession()
 
 bool UDSSession::SendMsg(const char *buf, size_t size) const
 {
-    CHKF(buf, OHOS::ERROR_NULL_POINTER);
+    CHKPF(buf, OHOS::ERROR_NULL_POINTER);
     CHKF(size > 0 && size <= MAX_PACKET_BUF_SIZE, PARAM_INPUT_INVALID);
     CHKF(fd_ >= 0, PARAM_INPUT_INVALID);
-    uint64_t ret = write(fd_, static_cast<void *>(const_cast<char *>(buf)), size);
-    if (ret < 0) {
+    write(fd_, static_cast<void *>(const_cast<char *>(buf)), size);
+    ssize_t ssize;
+    do {
+        ssize = ::send(fd_, static_cast<void *>(const_cast<char *>(buf)), size, MSG_DONTWAIT | MSG_NOSIGNAL);
+    } while (ssize == -1 && errno == EINTR);
+    /*if (ret < 0) {
         const int errNoSaved = errno;
         MMI_LOGE("UDSSession::SendMsg write return %{public}" PRId64
                 ", fd_: %{public}d, errNoSaved: %{public}d, %{public}s.",
                 ret, fd_, errNoSaved, strerror(errNoSaved));
         return false;
-    }
+    }*/
     return true;
 }
 
