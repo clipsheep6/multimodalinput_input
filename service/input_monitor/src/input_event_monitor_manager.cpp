@@ -109,8 +109,7 @@ void OHOS::MMI::InputEventMonitorManager::RemoveInputEventTouchpadMontior(int32_
     MonitorItem monitorItemtouchpad;
     monitorItemtouchpad.eventType = eventType;
     monitorItemtouchpad.session = session;
-    std::list<MonitorItem>::iterator iter;
-    iter = std::find(monitorsTouch_.begin(), monitorsTouch_.end(), monitorItemtouchpad);
+    auto iter = std::find(monitorsTouch_.begin(), monitorsTouch_.end(), monitorItemtouchpad);
     if (iter == monitorsTouch_.end()) {
         MMI_LOGE("RemoveInputEventTouchpadMontior::monitorItemtouchpad does not exist");
     } else {
