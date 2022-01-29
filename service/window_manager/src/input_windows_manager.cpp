@@ -505,7 +505,7 @@ int32_t OHOS::MMI::InputWindowsManager::GetPidUpdateTarget(std::shared_ptr<Input
         if (logicalDisplays_[i].id != inputEvent->GetTargetDisplayId()) {
             continue;
         }
-        MMI_LOGD("target display id is %{public}d", inputEvent->GetTargetDisplayId());
+        MMI_LOGD("target display id %{public}d", inputEvent->GetTargetDisplayId());
         inputEvent->SetTargetWindowId(logicalDisplays_[i].focusWindowId);
         auto it = windowInfos_.find(logicalDisplays_[i].focusWindowId);
         if (it == windowInfos_.end()) {
@@ -866,8 +866,8 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
     pointerEvent->SetTargetWindowId(focusWindow->id);
     pointerEvent->SetAgentWindowId(focusWindow->agentWindowId);
     auto fd = udsServer_->GetFdByPid(focusWindow->pid);
-    MMI_LOGD("The pid is:%{public}d, the fd is:%{public}d, the globalX is:%{public}d, the globalY is:%{public}d, "
-             "the localX is:%{public}d, the localY is:%{public}d",
+    MMI_LOGD("The pid :%{public}d, the fd :%{public}d, the globalX :%{public}d, the globalY :%{public}d, "
+             "the localX :%{public}d, the localY :%{public}d",
              focusWindow->pid, fd, globalX, globalY, pointerItem.GetLocalX(), pointerItem.GetLocalY());
     return fd;
 }
@@ -932,9 +932,9 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<
     pointerEvent->RemovePointerItem(pointerId);
     pointerEvent->AddPointerItem(pointerItem);
     auto fd = udsServer_->GetFdByPid(touchWindow->pid);
-    MMI_LOGD("the pid is :%{public}d, the fd is :%{public}d, the globalX01 is : %{public}d, "
-             "the globalY01 is : %{public}d, the localX is : %{public}d, the localY is : %{public}d,"
-             "the TargetWindowId is : %{public}d, the AgentWindowId is : %{public}d",
+    MMI_LOGD("the pid :%{public}d, the fd :%{public}d, the globalX01 : %{public}d, "
+             "the globalY01 : %{public}d, the localX : %{public}d, the localY : %{public}d,"
+             "the TargetWindowId : %{public}d, the AgentWindowId : %{public}d",
             touchWindow->pid, fd, globalX, globalY, localX, localY, pointerEvent->GetTargetWindowId(), pointerEvent->GetAgentWindowId());
     return fd;
 }
@@ -1084,7 +1084,7 @@ void OHOS::MMI::InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, doub
         }
     }
 
-    MMI_LOGI("Mouse Data is : globleX = %{public}d, globleY = %{public}d, localX = %{public}d, localY = %{public}d",
+    MMI_LOGI("Mouse Data : globleX = %{public}d, globleY = %{public}d, localX = %{public}d, localY = %{public}d",
         mouseLoction_.globleX, mouseLoction_.globleY, mouseLoction_.localX, mouseLoction_.localY);
 }
 
