@@ -26,23 +26,22 @@
 #include "util_ex.h"
 
 namespace OHOS::MMI {
-    namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "UDSServer"};
-    }
+namespace {
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "UDSServer"};
 }
 
-OHOS::MMI::UDSServer::UDSServer()
+UDSServer::UDSServer()
 {
 }
 
-OHOS::MMI::UDSServer::~UDSServer()
+UDSServer::~UDSServer()
 {
     MMI_LOGD("enter");
     UdsStop();
     MMI_LOGD("leave");
 }
 
-void OHOS::MMI::UDSServer::UdsStop()
+void UDSServer::UdsStop()
 {
     std::lock_guard<std::mutex> lock(mux_);
     isRun_ = false;
@@ -60,7 +59,7 @@ void OHOS::MMI::UDSServer::UdsStop()
     }
 }
 
-int32_t OHOS::MMI::UDSServer::GetFdByPid(int32_t pid)
+int32_t UDSServer::GetFdByPid(int32_t pid)
 {
     std::lock_guard<std::mutex> lock(mux_);
     auto it = idxPidMap_.find(pid);
@@ -72,7 +71,7 @@ int32_t OHOS::MMI::UDSServer::GetFdByPid(int32_t pid)
     return it->second;
 }
 
-int32_t OHOS::MMI::UDSServer::GetPidByFd(int32_t fd)
+int32_t UDSServer::GetPidByFd(int32_t fd)
 {
     std::lock_guard<std::mutex> lock(mux_);
     auto it = sessionsMap_.find(fd);
@@ -84,7 +83,7 @@ int32_t OHOS::MMI::UDSServer::GetPidByFd(int32_t fd)
     return it->second->GetPid();
 }
 
-bool OHOS::MMI::UDSServer::SendMsg(int32_t fd, NetPacket& pkt)
+bool UDSServer::SendMsg(int32_t fd, NetPacket& pkt)
 {
     std::lock_guard<std::mutex> lock(mux_);
     CHKF(fd >= 0, PARAM_INPUT_INVALID);
@@ -97,7 +96,7 @@ bool OHOS::MMI::UDSServer::SendMsg(int32_t fd, NetPacket& pkt)
     return ses->SendMsg(pkt);
 }
 
-void OHOS::MMI::UDSServer::Broadcast(NetPacket& pkt)
+void UDSServer::Broadcast(NetPacket& pkt)
 {
     std::lock_guard<std::mutex> lock(mux_);
     for (auto it : sessionsMap_) {
@@ -105,14 +104,14 @@ void OHOS::MMI::UDSServer::Broadcast(NetPacket& pkt)
     }
 }
 
-void OHOS::MMI::UDSServer::Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt)
+void UDSServer::Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt)
 {
     for (auto it : fdList) {
         SendMsg(it, pkt);
     }
 }
 
-bool  OHOS::MMI::UDSServer::ClearDeadSessionInMap(const int serverFd, const int clientFd)
+bool  UDSServer::ClearDeadSessionInMap(const int serverFd, const int clientFd)
 {
     auto it = sessionsMap_.find(serverFd);
     if (it != sessionsMap_.end()) {
@@ -130,7 +129,7 @@ bool  OHOS::MMI::UDSServer::ClearDeadSessionInMap(const int serverFd, const int 
     return true;
 }
 
-int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, const int moduleType, int& serverFd,
+int32_t UDSServer::AddSocketPairInfo(const std::string& programName, const int moduleType, int& serverFd,
                                                 int& toReturnClientFd, const int32_t uid, const int32_t pid)
 {
     std::lock_guard<std::mutex> lock(mux_);
@@ -219,7 +218,7 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, 
     return RET_OK;
 }
 
-void OHOS::MMI::UDSServer::Dump(int32_t fd)
+void UDSServer::Dump(int32_t fd)
 {
     std::lock_guard<std::mutex> lock(mux_);
     mprintf(fd, "Sessions: count=%d", sessionsMap_.size());
@@ -237,28 +236,28 @@ void OHOS::MMI::UDSServer::Dump(int32_t fd)
     mprintf(fd, "\t%s", strTmp.c_str());
 }
 
-void OHOS::MMI::UDSServer::OnConnected(SessionPtr s)
+void UDSServer::OnConnected(SessionPtr s)
 {
     MMI_LOGI("UDSServer::OnConnected session desc:%{public}s", s->GetDescript().c_str());
 }
 
-void OHOS::MMI::UDSServer::OnDisconnected(SessionPtr s)
+void UDSServer::OnDisconnected(SessionPtr s)
 {
     MMI_LOGI("UDSServer::OnDisconnected session desc:%{public}s", s->GetDescript().c_str());
 }
 
-int32_t OHOS::MMI::UDSServer::EpollCtlAdd(EpollEventType type, int32_t fd)
+int32_t UDSServer::EpollCtlAdd(EpollEventType type, int32_t fd)
 {
     MMI_LOGE("UDSServer::EpollCtlAdd This information should not exist. Subclasses should implement this function.");
     return RET_ERR;
 }
 
-void OHOS::MMI::UDSServer::SetRecvFun(MsgServerFunCallback fun)
+void UDSServer::SetRecvFun(MsgServerFunCallback fun)
 {
     recvFun_ = fun;
 }
 
-bool OHOS::MMI::UDSServer::StartServer()
+bool UDSServer::StartServer()
 {
     isRun_ = true;
     t_ = std::thread(std::bind(&UDSServer::OnThread, this));
@@ -266,7 +265,7 @@ bool OHOS::MMI::UDSServer::StartServer()
     return true;
 }
 
-void OHOS::MMI::UDSServer::OnRecv(int32_t fd, const char *buf, size_t size)
+void UDSServer::OnRecv(int32_t fd, const char *buf, size_t size)
 {
     CHK(fd >= 0 && buf, PARAM_INPUT_INVALID);
     auto sess = GetSession(fd);
@@ -291,12 +290,12 @@ void OHOS::MMI::UDSServer::OnRecv(int32_t fd, const char *buf, size_t size)
     }
 }
 
-void OHOS::MMI::UDSServer::OnEpollRecv(int32_t fd, const char *buf, size_t size)
+void UDSServer::OnEpollRecv(int32_t fd, const char *buf, size_t size)
 {
     OnRecv(fd, buf, size);
 }
 
-void OHOS::MMI::UDSServer::OnEvent(const epoll_event& ev, std::map<int32_t, StreamBufData>& bufMap)
+void UDSServer::OnEvent(const epoll_event& ev, std::map<int32_t, StreamBufData>& bufMap)
 {
     const int32_t maxCount = static_cast<int32_t>(MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE) + 1;
     CHK(maxCount > 0, VAL_NOT_EXP);
@@ -336,7 +335,7 @@ void OHOS::MMI::UDSServer::OnEvent(const epoll_event& ev, std::map<int32_t, Stre
     }
 }
 
-void OHOS::MMI::UDSServer::OnEpollEvent(epoll_event& ev, std::map<int32_t, StreamBufData>& bufMap)
+void UDSServer::OnEpollEvent(epoll_event& ev, std::map<int32_t, StreamBufData>& bufMap)
 {
     const int32_t maxCount = static_cast<int32_t>(MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE) + 1;
     CHK(maxCount > 0, VAL_NOT_EXP);
@@ -377,7 +376,7 @@ void OHOS::MMI::UDSServer::OnEpollEvent(epoll_event& ev, std::map<int32_t, Strea
     }
 }
 
-void OHOS::MMI::UDSServer::DumpSession(const std::string &title)
+void UDSServer::DumpSession(const std::string &title)
 {
     MMI_LOGI("in %s: %s", __func__, title.c_str());
     int i = 0;
@@ -387,7 +386,7 @@ void OHOS::MMI::UDSServer::DumpSession(const std::string &title)
     }
 }
 
-OHOS::MMI::SessionPtr OHOS::MMI::UDSServer::GetSession(int32_t fd) const
+SessionPtr UDSServer::GetSession(int32_t fd) const
 {
     auto it = sessionsMap_.find(fd);
     if (it == sessionsMap_.end()) {
@@ -399,7 +398,7 @@ OHOS::MMI::SessionPtr OHOS::MMI::UDSServer::GetSession(int32_t fd) const
     return it->second->GetPtr();
 }
 
-bool OHOS::MMI::UDSServer::AddSession(SessionPtr ses)
+bool UDSServer::AddSession(SessionPtr ses)
 {
     CHKF(ses, OHOS::ERROR_NULL_POINTER);
     MMI_LOGD("AddSession pid is %{public}d, fd is %{public}d", ses->GetPid(), ses->GetFd());
@@ -418,7 +417,7 @@ bool OHOS::MMI::UDSServer::AddSession(SessionPtr ses)
     return true;
 }
 
-void OHOS::MMI::UDSServer::DelSession(int32_t fd)
+void UDSServer::DelSession(int32_t fd)
 {
     MMI_LOGD("DelSession begin fd is %{public}d", fd);
     CHK(fd >= 0, PARAM_INPUT_INVALID);
@@ -435,9 +434,9 @@ void OHOS::MMI::UDSServer::DelSession(int32_t fd)
     MMI_LOGI("DelSession end...");
 }
 
-void OHOS::MMI::UDSServer::OnThread()
+void UDSServer::OnThread()
 {
-    OHOS::MMI::SetThreadName(std::string("uds_server"));
+    SetThreadName(std::string("uds_server"));
     uint64_t tid = GetThisThreadIdOfLL();
     CHK(tid > 0, VAL_NOT_EXP);
     MMI_LOGD("begin tid:%{public}" PRId64 "", tid);
@@ -468,7 +467,7 @@ void OHOS::MMI::UDSServer::OnThread()
 }
 
 #ifdef OHOS_BUILD_MMI_DEBUG
-void OHOS::MMI::UDSServer::HandleCommandQueue()
+void UDSServer::HandleCommandQueue()
 {
     UdsCommandQueue &commandQueue = Singleton<UdsCommandQueue>::GetInstance();
     if (commandQueue.GetSize() == 0) {
@@ -487,19 +486,20 @@ void OHOS::MMI::UDSServer::HandleCommandQueue()
 }
 #endif // OHOS_BUILD_MMI_DEBUG
 
-void OHOS::MMI::UDSServer::AddSessionDeletedCallback(std::function<void(SessionPtr)> callback)
+void UDSServer::AddSessionDeletedCallback(std::function<void(SessionPtr)> callback)
 {
     MMI_LOGD("Enter");
     callbacks_.push_back(callback);
     MMI_LOGD("Leave");
 }
 
-void OHOS::MMI::UDSServer::NotifySessionDeleted(SessionPtr ses)
+void UDSServer::NotifySessionDeleted(SessionPtr ses)
 {
     MMI_LOGD("Enter");
     for (auto& callback : callbacks_) {
         callback(ses);
     }
     MMI_LOGD("Leave");
+}
 }
 

@@ -18,20 +18,19 @@
 #include "proto.h"
 
 namespace OHOS::MMI {
-    namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventMonitorManager" };
-    }
+namespace {
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventMonitorManager" };
 }
 
-OHOS::MMI::InputEventMonitorManager::InputEventMonitorManager()
+InputEventMonitorManager::InputEventMonitorManager()
 {
 }
 
-OHOS::MMI::InputEventMonitorManager::~InputEventMonitorManager()
+InputEventMonitorManager::~InputEventMonitorManager()
 {
 }
 
-int32_t OHOS::MMI::InputEventMonitorManager::AddInputEventMontior(int32_t eventType, SessionPtr session)
+int32_t InputEventMonitorManager::AddInputEventMontior(int32_t eventType, SessionPtr session)
 {
     CHKPR(session, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     std::lock_guard<std::mutex> lock(mu_);
@@ -50,7 +49,7 @@ int32_t OHOS::MMI::InputEventMonitorManager::AddInputEventMontior(int32_t eventT
     }
 }
 
-void OHOS::MMI::InputEventMonitorManager::RemoveInputEventMontior(int32_t eventType, SessionPtr session)
+void InputEventMonitorManager::RemoveInputEventMontior(int32_t eventType, SessionPtr session)
 {
     CHKP(session, ERROR_NULL_POINTER);
     std::lock_guard<std::mutex> lock(mu_);
@@ -66,7 +65,7 @@ void OHOS::MMI::InputEventMonitorManager::RemoveInputEventMontior(int32_t eventT
     }
 }
 
-void OHOS::MMI::InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
+void InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKP(keyEvent, ERROR_NULL_POINTER);
     if (monitors_.empty()) {
@@ -83,7 +82,7 @@ void OHOS::MMI::InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<OH
     }
 }
 
-void OHOS::MMI::InputEventMonitorManager::ReportKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
+void InputEventMonitorManager::ReportKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKP(keyEvent, ERROR_NULL_POINTER);
     MMI_LOGD("KeyEvent from libinput:keyCode=%{public}d, keyAction=%{public}d, action=%{public}d, "
@@ -92,7 +91,7 @@ void OHOS::MMI::InputEventMonitorManager::ReportKeyEvent(std::shared_ptr<OHOS::M
     OnMonitorInputEvent(keyEvent);
 }
 
-int32_t OHOS::MMI::InputEventMonitorManager::AddInputEventTouchpadMontior(int32_t eventType, SessionPtr session)
+int32_t InputEventMonitorManager::AddInputEventTouchpadMontior(int32_t eventType, SessionPtr session)
 {
     MMI_LOGD("InputEventMonitorManager::AddInputEventTouchpadMontior");
     std::lock_guard<std::mutex> lock(mu_);
@@ -111,7 +110,7 @@ int32_t OHOS::MMI::InputEventMonitorManager::AddInputEventTouchpadMontior(int32_
     }
 }
 
-void OHOS::MMI::InputEventMonitorManager::RemoveInputEventTouchpadMontior(int32_t eventType, SessionPtr session)
+void InputEventMonitorManager::RemoveInputEventTouchpadMontior(int32_t eventType, SessionPtr session)
 {
     MMI_LOGD("InputEventMonitorManager::RemoveInputEventTouchpadMontior");
     std::lock_guard<std::mutex> lock(mu_);
@@ -129,8 +128,8 @@ void OHOS::MMI::InputEventMonitorManager::RemoveInputEventTouchpadMontior(int32_
     }
 }
 
-void OHOS::MMI::InputEventMonitorManager::OnTouchpadMonitorInputEvent(
-    std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
+void InputEventMonitorManager::OnTouchpadMonitorInputEvent(
+    std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("InputEventMonitorManager::OnTouchpadMonitorInputEvent");
     if (monitorsTouch_.empty()) {
@@ -148,7 +147,7 @@ void OHOS::MMI::InputEventMonitorManager::OnTouchpadMonitorInputEvent(
     }
 }
 
-bool OHOS::MMI::InputEventMonitorManager::ReportTouchpadEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
+bool InputEventMonitorManager::ReportTouchpadEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     PointerEvent::PointerItem pointer;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer);
@@ -160,4 +159,5 @@ bool OHOS::MMI::InputEventMonitorManager::ReportTouchpadEvent(std::shared_ptr<OH
              pointerEvent->GetPointerId(), pointer.GetGlobalX(), pointer.GetGlobalY(), pointer.IsPressed());
     OnTouchpadMonitorInputEvent(pointerEvent);
     return true;
+}
 }

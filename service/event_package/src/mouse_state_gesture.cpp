@@ -15,29 +15,31 @@
 
 #include "mouse_state_gesture.h"
 
-OHOS::MMI::MouseDeviceState::MouseDeviceState()
+namespace OHOS {
+namespace MMI {
+MouseDeviceState::MouseDeviceState()
 {
     mouseCoords_ = {0, 0};
 }
 
-OHOS::MMI::MouseDeviceState::~MouseDeviceState() { }
+MouseDeviceState::~MouseDeviceState() { }
 
-double OHOS::MMI::MouseDeviceState::GetMouseCoordsX()
+double MouseDeviceState::GetMouseCoordsX()
 {
     return mouseCoords_.x;
 }
-double OHOS::MMI::MouseDeviceState::GetMouseCoordsY()
+double MouseDeviceState::GetMouseCoordsY()
 {
     return mouseCoords_.y;
 }
 
-void OHOS::MMI::MouseDeviceState::SetMouseCoords(const double x, const double y)
+void MouseDeviceState::SetMouseCoords(const double x, const double y)
 {
     mouseCoords_.x = x;
     mouseCoords_.y = y;
 }
 
-bool OHOS::MMI::MouseDeviceState::IsLiftBtnPressed()
+bool MouseDeviceState::IsLiftBtnPressed()
 {
     std::lock_guard<std::mutex> lock(mu_);
     auto iter = mapCountState_.find(LIBINPUT_LEFT_BUTTON_CODE);
@@ -49,7 +51,7 @@ bool OHOS::MMI::MouseDeviceState::IsLiftBtnPressed()
     return false;
 }
 
-void OHOS::MMI::MouseDeviceState::GetPressedButtons(std::vector<uint32_t>& pressedButtons)
+void MouseDeviceState::GetPressedButtons(std::vector<uint32_t>& pressedButtons)
 {
     std::lock_guard<std::mutex> lock(mu_);
     if (!mapCountState_.empty()) {
@@ -61,12 +63,12 @@ void OHOS::MMI::MouseDeviceState::GetPressedButtons(std::vector<uint32_t>& press
     }
 }
 
-std::map<int16_t, uint32_t> OHOS::MMI::MouseDeviceState::GetCountState()
+std::map<int16_t, uint32_t> MouseDeviceState::GetCountState()
 {
     return mapCountState_;
 }
 
-void OHOS::MMI::MouseDeviceState::CountState(int16_t btnCode, uint32_t btnState)
+void MouseDeviceState::CountState(int16_t btnCode, uint32_t btnState)
 {
     std::lock_guard<std::mutex> lock(mu_);
     std::map<int16_t, uint32_t>::iterator iter = mapCountState_.find(btnCode);
@@ -76,7 +78,7 @@ void OHOS::MMI::MouseDeviceState::CountState(int16_t btnCode, uint32_t btnState)
         mapCountState_.insert(std::make_pair(btnCode, ((btnState == BUTTON_STATE_PRESSED) ? 1 : 0)));
     }
 }
-int16_t OHOS::MMI::MouseDeviceState::LibinputChangeToPointer(int16_t keyValue)
+int16_t MouseDeviceState::LibinputChangeToPointer(int16_t keyValue)
 {
     auto it = mapLibinputChangeToPointer.find(keyValue);
     if (it != mapLibinputChangeToPointer.end()) {
@@ -86,7 +88,7 @@ int16_t OHOS::MMI::MouseDeviceState::LibinputChangeToPointer(int16_t keyValue)
     }
 }
 
-void OHOS::MMI::MouseDeviceState::ChangeMouseState(uint32_t btnState, uint32_t &stateValue)
+void MouseDeviceState::ChangeMouseState(uint32_t btnState, uint32_t &stateValue)
 {
     if (btnState == BUTTON_STATE_PRESSED) {
         stateValue++;
@@ -96,7 +98,7 @@ void OHOS::MMI::MouseDeviceState::ChangeMouseState(uint32_t btnState, uint32_t &
     CheckMouseState(stateValue);
 }
 
-void OHOS::MMI::MouseDeviceState::CheckMouseState(uint32_t &stateValue)
+void MouseDeviceState::CheckMouseState(uint32_t &stateValue)
 {
     const int mouseBtnMax = 8; // 鼠标按键最多为8个
     if (stateValue > mouseBtnMax) {
@@ -104,4 +106,6 @@ void OHOS::MMI::MouseDeviceState::CheckMouseState(uint32_t &stateValue)
     } else if (stateValue < 0) {
         stateValue = 0;
     }
+}
+}
 }

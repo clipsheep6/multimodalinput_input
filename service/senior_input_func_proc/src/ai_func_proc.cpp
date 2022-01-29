@@ -18,14 +18,12 @@
 #include "proto.h"
 
 namespace OHOS::MMI {
-    namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AIFuncProc" };
-    }
+namespace {
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AIFuncProc" };
 }
 
 using namespace std;
-using namespace OHOS::MMI;
-int32_t OHOS::MMI::AIFuncProc::DeviceEventDispatchProcess(const RawInputEvent &event)
+int32_t AIFuncProc::DeviceEventDispatchProcess(const RawInputEvent &event)
 {
     if (CheckEventCode(event) == RET_ERR) {
         MMI_LOGE("aisensor event.code error. event.code: %{public}d", event.ev_code);
@@ -38,7 +36,7 @@ int32_t OHOS::MMI::AIFuncProc::DeviceEventDispatchProcess(const RawInputEvent &e
     return RET_OK;
 }
 
-int32_t OHOS::MMI::AIFuncProc::CheckEventCode(const RawInputEvent& event)
+int32_t AIFuncProc::CheckEventCode(const RawInputEvent& event)
 {
     static const std::set<MmiMessageId> g_aiSensorAllowProcCodes = {
         MmiMessageId::ON_SHOW_MENU,
@@ -84,7 +82,8 @@ int32_t OHOS::MMI::AIFuncProc::CheckEventCode(const RawInputEvent& event)
     }
 }
 
-int32_t OHOS::MMI::AIFuncProc::GetDevType()
+int32_t AIFuncProc::GetDevType()
 {
     return static_cast<int32_t>(INPUT_DEVICE_CAP_AISENSOR);
+}
 }
