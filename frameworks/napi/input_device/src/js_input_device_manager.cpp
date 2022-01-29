@@ -50,7 +50,7 @@ void JsInputDeviceManager::GetDeviceIdsAsync(napi_value handle)
         return;
     }
     auto &instance = InputDeviceImpl::GetInstance();
-    instance.GetInputDeviceIdsAsync([jsIds](std::vector<int32_t> ids){
+    instance.GetInputDeviceIdsAsync([jsIds](std::vector<int32_t> ids) {
         napi_value arr = nullptr;
         napi_env env = jsIds->GetEnv();
         napi_handle_scope scope = nullptr;
@@ -124,7 +124,7 @@ void JsInputDeviceManager::GetDeviceAsync(int32_t id, napi_value handle)
         return;
     }
     auto &instance = InputDeviceImpl::GetInstance();
-    instance.GetInputDeviceAsync(id, [jsDev](std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device){
+    instance.GetInputDeviceAsync(id, [jsDev](std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device) {
         napi_env env = jsDev->GetEnv();
         napi_handle_scope scope = nullptr;
         napi_status status = napi_open_handle_scope(env, &scope);
