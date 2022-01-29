@@ -40,7 +40,7 @@ void InputHandlerManagerGlobal::RemoveInputHandler(int32_t handlerId, InputHandl
 {
     if (InputHandlerType::MONITOR != handlerType) {
         MMI_LOGE("RemoveInputHandler InputHandlerType Not MONITOR:%{public}d", handlerType);
-        return RET_ERR;
+        return;
     }
     MMI_LOGD("Unregister monitor(%{public}d)", handlerId);
     SessionMonitor mon { handlerId, session };
@@ -87,16 +87,17 @@ int32_t InputHandlerManagerGlobal::MonitorCollection::AddMonitor(const SessionMo
 {
     std::lock_guard<std::mutex> guard(lockMonitors_);
     if (monitors_.size() >= MAX_N_INPUT_MONITORS) {
-        MMI_LOGE("The number of monitors exceeds the maximum:%{public}d, errCode:%{public}d", monitors_.size(), INVALID_MONITOR_MON);
+        MMI_LOGE("The number of monitors exceeds the maximum:%{public}d monitors, errCode:%{public}d",
+                 static_cast<int32_t>(monitors_.size()), INVALID_MONITOR_MON);
         return RET_ERR;
     }
-    auto ret = std::find(monitors_.begin(), monitors_.end(), mon);
-    if (ret != monitors_.end()) {
+    auto iter = std::find(monitors_.begin(), monitors_.end(), mon);
+    if (iter != monitors_.end()) {
         MMI_LOGW("repeate register, errCode:%{public}d", INVALID_MONITOR_MON);
     }
-    ret = monitors_.insert(mon);
+    auto ret = monitors_.insert(mon);
     if (!ret.second) {
-        MMI_LOGW("Duplicate monitors.");
+        MMI_LOGW("Duplicate monitors");
     }
     MMI_LOGD("Service AddMonitor Success");
     return RET_OK;
@@ -167,13 +168,13 @@ bool InputHandlerManagerGlobal::MonitorCollection::HasMonitor(int32_t monitorId,
 void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("Update consumption state");
-    CHKPR(pointerEvent, ERROR_NULL_POINTER, RET_ERR);
+    CHKP(pointerEvent, PARAM_INPUT_INVALID);
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         MMI_LOGE("This is not a touch-screen event");
         return;
     }
     lastPointerEvent_ = pointerEvent;
-    const std::vector<int32_t>::size_t nPtrsIndNewProc = 1;
+    const size_t nPtrsIndNewProc = 1;
 
     if (pointerEvent->GetPointersIdList().size() != nPtrsIndNewProc) {
         MMI_LOGD("First press and last lift intermediate process");
