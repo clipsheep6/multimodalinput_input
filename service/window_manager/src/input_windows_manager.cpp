@@ -813,12 +813,14 @@ void OHOS::MMI::InputWindowsManager::FixCursorPosition(int32_t &globalX, int32_t
         return;
     }
 
-    if ((globalX + cursorW) > logicalDisplays_[0].width ) {
-        globalX = logicalDisplays_[0].width - cursorW;
+    int size = 16;
+    int fcursorW = cursorW / size;
+    if ((globalX + fcursorW) > logicalDisplays_[0].width) {
+        globalX = logicalDisplays_[0].width - fcursorW;
     }
-
-    if ((globalY + cursorH) > logicalDisplays_[0].height ) {
-        globalY = logicalDisplays_[0].height - cursorH;
+    int fcursorH = cursorH / size;
+    if ((globalY + fcursorH) > logicalDisplays_[0].height) {
+        globalY = logicalDisplays_[0].height - fcursorH;
     }
 }
 
@@ -866,9 +868,11 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
     pointerEvent->SetTargetWindowId(focusWindow->id);
     pointerEvent->SetAgentWindowId(focusWindow->agentWindowId);
     auto fd = udsServer_->GetFdByPid(focusWindow->pid);
-    MMI_LOGD("The pid :%{public}d, the fd :%{public}d, the globalX :%{public}d, the globalY :%{public}d, "
-             "the localX :%{public}d, the localY :%{public}d",
-             focusWindow->pid, fd, globalX, globalY, pointerItem.GetLocalX(), pointerItem.GetLocalY());
+    auto size = pointerEvent->GetPressedButtons();
+    MMI_LOGD("pressedButtons size : %{public}d, pid :%{public}d, fd :%{public}d,"
+             "globalX :%{public}d, globalY :%{public}d, localX :%{public}d, localY :%{public}d",
+             static_cast<int32_t>(size.size()), focusWindow->pid, fd,
+             globalX, globalY, pointerItem.GetLocalX(), pointerItem.GetLocalY());
     return fd;
 }
 
