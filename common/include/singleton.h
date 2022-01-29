@@ -21,7 +21,6 @@
 #include <memory>
 
 namespace OHOS {
-
 #define DECLARE_DELAYED_SINGLETON(MyClass)\
 public:\
     ~MyClass();\
@@ -35,7 +34,6 @@ private:\
     ~MyClass();\
     MyClass();
 
-
 #define DECLARE_SINGLETON(MyClass)\
 private:\
     friend Singleton<MyClass>;\
@@ -44,13 +42,11 @@ private:\
     MyClass();\
     ~MyClass();
 
-
 template<typename T>
 class DelayedSingleton : public NoCopyable {
 public:
     static std::shared_ptr<T> GetInstance();
     static void DestroyInstance();
-
 private:
     static std::shared_ptr<T> instance_;
     static std::mutex mutex_;
@@ -86,13 +82,10 @@ void DelayedSingleton<T>::DestroyInstance()
     }
 }
 
-
-
 template<typename T>
 class DelayedRefSingleton : public NoCopyable {
 public:
     static T& GetInstance();
-
 private:
     static T* instance_;
     static std::mutex mutex_;
@@ -117,8 +110,6 @@ T& DelayedRefSingleton<T>::GetInstance()
     return *instance_;
 }
 
-
-
 template<typename T>
 class Singleton : public NoCopyable {
 public:
@@ -126,15 +117,11 @@ public:
     {
         return instance_;
     }
-
 private:
     static T instance_;
 };
 
 template<typename T>
 T Singleton<T>::instance_;
-
-
 }
-
 #endif
