@@ -18,20 +18,19 @@
 #include "souceType.h"
 
 namespace OHOS::MMI {
-    namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InterceptorManagerGlobal" };
-    }
+namespace {
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InterceptorManagerGlobal" };
 }
 
-OHOS::MMI::InterceptorManagerGlobal::InterceptorManagerGlobal()
+InterceptorManagerGlobal::InterceptorManagerGlobal()
 {
 }
 
-OHOS::MMI::InterceptorManagerGlobal::~InterceptorManagerGlobal()
+InterceptorManagerGlobal::~InterceptorManagerGlobal()
 {
 }
 
-void OHOS::MMI::InterceptorManagerGlobal::OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session)
+void InterceptorManagerGlobal::OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session)
 {
     std::lock_guard<std::mutex> lock(mu_);
     InterceptorItem interceptorItem {};
@@ -48,7 +47,7 @@ void OHOS::MMI::InterceptorManagerGlobal::OnAddInterceptor(int32_t sourceType, i
     }
 }
 
-void OHOS::MMI::InterceptorManagerGlobal::OnRemoveInterceptor(int32_t id)
+void InterceptorManagerGlobal::OnRemoveInterceptor(int32_t id)
 {
     std::lock_guard<std::mutex> lock(mu_);
     InterceptorItem interceptorItem {};
@@ -63,7 +62,7 @@ void OHOS::MMI::InterceptorManagerGlobal::OnRemoveInterceptor(int32_t id)
     }
 }
 
-bool OHOS::MMI::InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+bool InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (interceptor_.empty()) {
         MMI_LOGE("InterceptorManagerGlobal::%{public}s no interceptor to send msg", __func__);
@@ -88,7 +87,7 @@ bool OHOS::MMI::InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<Pointer
     return true;
 }
 
-bool OHOS::MMI::InterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+bool InterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_LOGD("OnKeyEvent begin");
     if (interceptor_.empty()) {
@@ -107,4 +106,5 @@ bool OHOS::MMI::InterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> k
     }
     MMI_LOGD("OnKeyEvent end");
     return true;
+}
 }

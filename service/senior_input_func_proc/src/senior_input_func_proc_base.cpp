@@ -18,21 +18,19 @@
 #include "util.h"
 
 namespace OHOS::MMI {
-    namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SeniorInputFuncProcBase" };
-    }
+namespace {
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SeniorInputFuncProcBase" };
 }
 
 using namespace std;
-using namespace OHOS::MMI;
-UDSServer* OHOS::MMI::SeniorInputFuncProcBase::udsServerPtr_ = nullptr;
-std::map<int32_t, OHOS::sptr<SeniorInputFuncProcBase>> OHOS::MMI::SeniorInputFuncProcBase::deviceInfoMap_ = {};
+UDSServer* SeniorInputFuncProcBase::udsServerPtr_ = nullptr;
+std::map<int32_t, OHOS::sptr<SeniorInputFuncProcBase>> SeniorInputFuncProcBase::deviceInfoMap_ = {};
 
-OHOS::MMI::SeniorInputFuncProcBase::SeniorInputFuncProcBase()
+SeniorInputFuncProcBase::SeniorInputFuncProcBase()
 {
 }
 
-OHOS::MMI::SeniorInputFuncProcBase::~SeniorInputFuncProcBase()
+SeniorInputFuncProcBase::~SeniorInputFuncProcBase()
 {
 }
 
@@ -47,7 +45,7 @@ void SeniorInputFuncProcBase::SetSessionFd(int32_t fd)
     sessionFd_ = fd;
 }
 
-int32_t OHOS::MMI::SeniorInputFuncProcBase::GetSessionFd()
+int32_t SeniorInputFuncProcBase::GetSessionFd()
 {
     if (sessionFd_ < 0) {
         return RET_ERR;
@@ -55,7 +53,7 @@ int32_t OHOS::MMI::SeniorInputFuncProcBase::GetSessionFd()
     return sessionFd_;
 }
 
-void OHOS::MMI::SeniorInputFuncProcBase::DeviceDisconnect(const int32_t sessionId)
+void SeniorInputFuncProcBase::DeviceDisconnect(const int32_t sessionId)
 {
     auto it = deviceInfoMap_.find(sessionId);
     if (it != deviceInfoMap_.end()) {
@@ -147,4 +145,5 @@ int32_t SeniorInputFuncProcBase::ReplyMessage(SessionPtr aiSessionPtr, int32_t s
         return RET_ERR;
     }
     return RET_OK;
+}
 }

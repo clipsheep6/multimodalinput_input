@@ -22,7 +22,7 @@
 #else
 namespace OHOS::AAFwk {
 class Want {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, OHOS::MMI::MMI_LOG_DOMAIN, "Want" };
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Want" };
 public:
     static constexpr char const *FLAG_HOME_INTENT_FROM_SYSTEM = "AddEntityTest";
 
@@ -38,7 +38,7 @@ public:
 
 namespace OHOS::AppExecFwk {
 class AbilityManager {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, OHOS::MMI::MMI_LOG_DOMAIN, "AbilityManager" };
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AbilityManager" };
 public:
     AbilityManager() = default;
     virtual ~AbilityManager() = default;
@@ -58,14 +58,13 @@ public:
 #endif
 
 namespace OHOS::MMI {
-    namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SystemEventHandler" };
-    }
+namespace {
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SystemEventHandler" };
 }
 
 using namespace OHOS::AAFwk;
 using namespace OHOS::AppExecFwk;
-OHOS::MMI::SystemEventHandler::SystemEventHandler()
+SystemEventHandler::SystemEventHandler()
 {
     mapFuns_ = {
         {MmiMessageId::ON_SCREEN_SHOT, std::bind(&SystemEventHandler::OnScreenShot, this)},
@@ -84,11 +83,11 @@ OHOS::MMI::SystemEventHandler::SystemEventHandler()
     };
 }
 
-OHOS::MMI::SystemEventHandler::~SystemEventHandler()
+SystemEventHandler::~SystemEventHandler()
 {
 }
 
-int32_t OHOS::MMI::SystemEventHandler::OnSystemEventHandler(MmiMessageId idMsg)
+int32_t SystemEventHandler::OnSystemEventHandler(MmiMessageId idMsg)
 {
     if (idMsg == MmiMessageId::INVALID) {
         return PARAM_INPUT_INVALID;
@@ -102,7 +101,7 @@ int32_t OHOS::MMI::SystemEventHandler::OnSystemEventHandler(MmiMessageId idMsg)
     return RET_OK;
 }
 
-void OHOS::MMI::SystemEventHandler::OnGotoDesktop()
+void SystemEventHandler::OnGotoDesktop()
 {
     MMI_LOGI("SystemEventHandler::OnGotoDesktop");
     Want want;
@@ -110,62 +109,63 @@ void OHOS::MMI::SystemEventHandler::OnGotoDesktop()
     AbilityManager::GetInstance().StartAbility(want, 0);
 }
 
-void OHOS::MMI::SystemEventHandler::OnScreenShot()
+void SystemEventHandler::OnScreenShot()
 {
     MMI_LOGI("SystemEventHandler::OnScreenShot");
 }
 
-void OHOS::MMI::SystemEventHandler::OnScreenSplit()
+void SystemEventHandler::OnScreenSplit()
 {
     MMI_LOGI("SystemEventHandler::OnScreenSplit");
 }
 
-void OHOS::MMI::SystemEventHandler::OnStopScreenRecord()
+void SystemEventHandler::OnStopScreenRecord()
 {
     MMI_LOGI("SystemEventHandler::OnStopScreenRecord");
 }
 
-void OHOS::MMI::SystemEventHandler::OnStartScreenRecord()
+void SystemEventHandler::OnStartScreenRecord()
 {
     MMI_LOGI("SystemEventHandler::OnStartScreenRecord");
 }
 
-void OHOS::MMI::SystemEventHandler::OnShowNotification()
+void SystemEventHandler::OnShowNotification()
 {
     MMI_LOGI("SystemEventHandler::OnShowNotification");
 }
 
-void OHOS::MMI::SystemEventHandler::OnRecent()
+void SystemEventHandler::OnRecent()
 {
     MMI_LOGI("SystemEventHandler::OnRecent");
 }
 
-void OHOS::MMI::SystemEventHandler::OnLockScreen()
+void SystemEventHandler::OnLockScreen()
 {
     MMI_LOGI("SystemEventHandler::OnLockScreen");
 }
 
-void OHOS::MMI::SystemEventHandler::OnSearch()
+void SystemEventHandler::OnSearch()
 {
     MMI_LOGI("SystemEventHandler::OnSearch");
 }
 
-void OHOS::MMI::SystemEventHandler::OnClosePage()
+void SystemEventHandler::OnClosePage()
 {
     MMI_LOGI("SystemEventHandler::OnClosePage");
 }
 
-void OHOS::MMI::SystemEventHandler::OnLaunchVoiceAssistant()
+void SystemEventHandler::OnLaunchVoiceAssistant()
 {
     MMI_LOGI("SystemEventHandler::OnLaunchVoiceAssistant");
 }
 
-void OHOS::MMI::SystemEventHandler::OnMute()
+void SystemEventHandler::OnMute()
 {
     MMI_LOGI("SystemEventHandler::OnMute");
 }
 
-void OHOS::MMI::SystemEventHandler::OnBack()
+void SystemEventHandler::OnBack()
 {
     MMI_LOGI("SystemEventHandler::OnBack");
+}
 }

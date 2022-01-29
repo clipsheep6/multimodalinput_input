@@ -18,14 +18,12 @@
 #include "proto.h"
 
 namespace OHOS::MMI {
-    namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KnuckleFuncProc" };
-    }
+namespace {
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KnuckleFuncProc" };
 }
 
 using namespace std;
-using namespace OHOS::MMI;
-int32_t OHOS::MMI::KnuckleFuncProc::DeviceEventDispatchProcess(const RawInputEvent &event)
+int32_t KnuckleFuncProc::DeviceEventDispatchProcess(const RawInputEvent &event)
 {
     if (CheckEventCode(event) == RET_ERR) {
         MMI_LOGE("knuckle event.code error. event.code: %{public}d", event.ev_code);
@@ -38,7 +36,7 @@ int32_t OHOS::MMI::KnuckleFuncProc::DeviceEventDispatchProcess(const RawInputEve
     return RET_OK;
 }
 
-int32_t OHOS::MMI::KnuckleFuncProc::CheckEventCode(const RawInputEvent& event)
+int32_t KnuckleFuncProc::CheckEventCode(const RawInputEvent& event)
 {
     static const std::set<MmiMessageId> g_knuckleAllowProcCodes = {
         MmiMessageId::ON_SCREEN_SHOT,
@@ -55,7 +53,9 @@ int32_t OHOS::MMI::KnuckleFuncProc::CheckEventCode(const RawInputEvent& event)
     }
 }
 
-int32_t OHOS::MMI::KnuckleFuncProc::GetDevType()
+int32_t KnuckleFuncProc::GetDevType()
 {
     return static_cast<int32_t>(INPUT_DEVICE_CAP_KNUCKLE);
 }
+}
+

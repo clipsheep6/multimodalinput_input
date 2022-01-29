@@ -17,20 +17,19 @@
 #include <inttypes.h>
 
 namespace OHOS::MMI {
-    namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "StandardEventHandler" };
-    }
+namespace {
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "StandardEventHandler" };
 }
 
-OHOS::MMI::StandardEventHandler::StandardEventHandler()
+StandardEventHandler::StandardEventHandler()
 {
 }
 
-OHOS::MMI::StandardEventHandler::~StandardEventHandler()
+StandardEventHandler::~StandardEventHandler()
 {
 }
 
-void OHOS::MMI::StandardEventHandler::StandardTouchEvent(libinput_event *event, StandardTouchStruct& data)
+void StandardEventHandler::StandardTouchEvent(libinput_event *event, StandardTouchStruct& data)
 {
     CHK(event, PARAM_INPUT_INVALID);
     enum libinput_event_type eventType = {};
@@ -68,7 +67,7 @@ void OHOS::MMI::StandardEventHandler::StandardTouchEvent(libinput_event *event, 
     }
 }
 
-void OHOS::MMI::StandardEventHandler::PointerPressedStandard(libinput_event *event, StandardTouchStruct& data)
+void StandardEventHandler::PointerPressedStandard(libinput_event *event, StandardTouchStruct& data)
 {
     CHK(event, PARAM_INPUT_INVALID);
     struct libinput_event_pointer *szPoint = nullptr;
@@ -90,7 +89,7 @@ void OHOS::MMI::StandardEventHandler::PointerPressedStandard(libinput_event *eve
     }
 }
 
-void OHOS::MMI::StandardEventHandler::PointerReleasedStandardEvent(struct libinput_event_pointer& szPoint,
+void StandardEventHandler::PointerReleasedStandardEvent(struct libinput_event_pointer& szPoint,
                                                                    StandardTouchStruct& data)
 {
     data.msgType = LIBINPUT_EVENT_TOUCH_UP;
@@ -104,7 +103,7 @@ void OHOS::MMI::StandardEventHandler::PointerReleasedStandardEvent(struct libinp
              data.reRventType, data.curRventType, data.buttonType, data.buttonState);
 }
 
-void OHOS::MMI::StandardEventHandler::PointerPressedStandardEvent(struct libinput_event_pointer& szPoint,
+void StandardEventHandler::PointerPressedStandardEvent(struct libinput_event_pointer& szPoint,
                                                                   StandardTouchStruct& data)
 {
     data.msgType = LIBINPUT_EVENT_TOUCH_DOWN;
@@ -118,7 +117,7 @@ void OHOS::MMI::StandardEventHandler::PointerPressedStandardEvent(struct libinpu
              data.reRventType, data.curRventType, data.buttonType, data.buttonState);
 }
 
-void OHOS::MMI::StandardEventHandler::PointerAbsoluteStandardEvent(libinput_event *event, StandardTouchStruct& data)
+void StandardEventHandler::PointerAbsoluteStandardEvent(libinput_event *event, StandardTouchStruct& data)
 {
     CHK(event, PARAM_INPUT_INVALID);
     struct libinput_event_pointer *szPoint = nullptr;
@@ -145,7 +144,7 @@ void OHOS::MMI::StandardEventHandler::PointerAbsoluteStandardEvent(libinput_even
     }
 }
 
-void OHOS::MMI::StandardEventHandler::PointerMotionStandardEvent(libinput_event *event, StandardTouchStruct& data)
+void StandardEventHandler::PointerMotionStandardEvent(libinput_event *event, StandardTouchStruct& data)
 {
     CHK(event, PARAM_INPUT_INVALID);
     struct libinput_event_pointer *szPoint = nullptr;
@@ -176,7 +175,7 @@ void OHOS::MMI::StandardEventHandler::PointerMotionStandardEvent(libinput_event 
     }
 }
 
-void OHOS::MMI::StandardEventHandler::TipStandardEvent(libinput_event *event, StandardTouchStruct& data)
+void StandardEventHandler::TipStandardEvent(libinput_event *event, StandardTouchStruct& data)
 {
     CHK(event, PARAM_INPUT_INVALID);
     struct libinput_event_tablet_tool* szPoint = nullptr;
@@ -192,7 +191,7 @@ void OHOS::MMI::StandardEventHandler::TipStandardEvent(libinput_event *event, St
     }
 }
 
-void OHOS::MMI::StandardEventHandler::TipUpStandardEvent(struct libinput_event_tablet_tool& szPoint,
+void StandardEventHandler::TipUpStandardEvent(struct libinput_event_tablet_tool& szPoint,
                                                          StandardTouchStruct& data)
 {
     data.msgType = LIBINPUT_EVENT_TOUCH_UP;
@@ -207,7 +206,7 @@ void OHOS::MMI::StandardEventHandler::TipUpStandardEvent(struct libinput_event_t
              data.reRventType, data.curRventType, data.tipState, data.x, data.y);
 }
 
-void OHOS::MMI::StandardEventHandler::TipDownStandardEvent(struct libinput_event_tablet_tool& szPoint,
+void StandardEventHandler::TipDownStandardEvent(struct libinput_event_tablet_tool& szPoint,
                                                            StandardTouchStruct& data)
 {
     data.time = libinput_event_tablet_tool_get_time_usec(&szPoint);
@@ -222,7 +221,7 @@ void OHOS::MMI::StandardEventHandler::TipDownStandardEvent(struct libinput_event
         data.reRventType, data.curRventType, data.tipState, data.x, data.y);
 }
 
-void OHOS::MMI::StandardEventHandler::TipMotionStandardEvent(libinput_event *event, StandardTouchStruct& data)
+void StandardEventHandler::TipMotionStandardEvent(libinput_event *event, StandardTouchStruct& data)
 {
     CHK(event, PARAM_INPUT_INVALID);
     struct libinput_event_tablet_tool* szPoint = nullptr;
@@ -242,4 +241,5 @@ void OHOS::MMI::StandardEventHandler::TipMotionStandardEvent(libinput_event *eve
     } else {
         data.curRventType = RET_ERR;
     }
+}
 }
