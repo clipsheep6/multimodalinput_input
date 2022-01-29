@@ -20,15 +20,13 @@
 #include <sys/types.h>
 #include <sys/un.h>
 #include <unistd.h>
-
-namespace OHOS {
-namespace MMI {
+namespace OHOS::MMI {
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSession" };
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSession" };
 }
 
 UDSSession::UDSSession(const std::string& programName, const int moduleType, const int32_t fd,
-                       const int32_t uid, const int32_t pid)
+    const int32_t uid, const int32_t pid)
     : programName_(programName),
       moduleType_(moduleType),
       fd_(fd),
@@ -130,5 +128,4 @@ void UDSSession::ClearEventsVct()
 {
     std::vector<EventTime>().swap(events_);
 }
-} // namespace MMI
-} // namespace OHOS
+}
