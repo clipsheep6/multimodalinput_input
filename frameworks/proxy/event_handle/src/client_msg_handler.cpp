@@ -179,7 +179,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPack
 int32_t OHOS::MMI::ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt)
 {
     auto pointerEvent { OHOS::MMI::PointerEvent::Create() };
-    if (InputEventDataTransformation::DeserializePointerEvent(false, pointerEvent, pkt) != ERR_OK) {
+    if (InputEventDataTransformation::Unmarshalling(pointerEvent, pkt) != ERR_OK) {
         MMI_LOGE("Failed to deserialize pointer event.");
         return RET_ERR;
     }
@@ -247,7 +247,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient
 int32_t OHOS::MMI::ClientMsgHandler::OnTouchPadMonitor(const UDSClient& client, NetPacket& pkt)
 {
     auto pointer = OHOS::MMI::PointerEvent::Create();
-    int32_t ret = InputEventDataTransformation::DeserializePointerEvent(false, pointer, pkt);
+    int32_t ret = InputEventDataTransformation::Unmarshalling(pointer, pkt);
     if (ret != RET_OK) {
         MMI_LOGE("OnTouchPadMonitor read netPacket failed");
         return RET_ERR;
@@ -816,7 +816,7 @@ int32_t OHOS::MMI::ClientMsgHandler::ReportPointerEvent(const UDSClient& client,
     MMI_LOGD("Client handlerId : %{public}d handlerType : %{public}d", handlerId, handlerType); 
 
     auto pointerEvent { OHOS::MMI::PointerEvent::Create() };
-    if (InputEventDataTransformation::DeserializePointerEvent(false, pointerEvent, pkt) != ERR_OK) {
+    if (InputEventDataTransformation::Unmarshalling(pointerEvent, pkt) != ERR_OK) {
         MMI_LOGE("Failed to deserialize pointer event...");
         return RET_ERR;
     }
@@ -827,7 +827,7 @@ int32_t OHOS::MMI::ClientMsgHandler::ReportPointerEvent(const UDSClient& client,
 int32_t OHOS::MMI::ClientMsgHandler::TouchpadEventInterceptor(const UDSClient& client, NetPacket& pkt)
 {
     auto pointerEvent = OHOS::MMI::PointerEvent::Create();
-    int32_t ret = InputEventDataTransformation::DeserializePointerEvent(false, pointerEvent, pkt);
+    int32_t ret = InputEventDataTransformation::Unmarshalling(pointerEvent, pkt);
     if (ret != RET_OK) {
         MMI_LOGE("TouchpadEventInterceptor read netPacket failed");
         return RET_ERR;
