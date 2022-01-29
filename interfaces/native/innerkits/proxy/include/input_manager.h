@@ -49,9 +49,9 @@ public:
         
     /**
 	 * @brief Sets a globally unique input event filter.
-	 * @param filter Indicates the input event filter to set. When an input event occurs, this filter is 
-     * called and returns a value indicating whether to continue processing the input event.If the filter 
-     * returns <b>true</b>, the processing of the input event ends. If the filter returns <b>false</b>, 
+	 * @param filter Indicates the input event filter to set. When an input event occurs, this filter is
+     * called and returns a value indicating whether to continue processing the input event.If the filter
+     * returns <b>true</b>, the processing of the input event ends. If the filter returns <b>false</b>,
      * the processing of the input event continues.
      * @return return Returns a value greater than or equal to <b>0</b> if the input event filter is added
 	 * successfully; returns a value less than <b>0</b> otherwise.
@@ -61,7 +61,7 @@ public:
 
     /**
 	 * @brief Sets a consumer for the window input event of the current process.
-	 * @param inputEventConsumer Indicates the consumer to set. The window input event of the current process 
+	 * @param inputEventConsumer Indicates the consumer to set. The window input event of the current process
      * will be called back to the consumer object for processing.
 	 * @since 8
 	 */
