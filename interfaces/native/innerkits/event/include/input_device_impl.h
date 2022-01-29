@@ -16,6 +16,7 @@
 #define OHOS_INPUT_DEVICE_EVENT_H
 #include <functional>
 #include <map>
+#include <mutex>
 
 namespace OHOS {
 namespace MMI {
@@ -44,6 +45,7 @@ private:
     std::map<int32_t, std::function<void(std::vector<int32_t>)>> idsRequests_;
     int32_t inputDeviceTaskId_ {1};
     int32_t idsTaskId_ {1};
+    std::mutex lk_;
 };
 } // namespace MMI
 } // namespace OHOS
