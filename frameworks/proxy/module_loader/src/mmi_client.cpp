@@ -92,7 +92,7 @@ void OHOS::MMI::MMIClient::SdkGetMultimodeInputInfo()
 
 void OHOS::MMI::MMIClient::OnDisconnected()
 {
-    MMI_LOGD("Disconnected from server... fd:%{public}d", GetFd());
+    MMI_LOGD("Disconnected from server. fd:%{public}d", GetFd());
     if (funDisconnected_) {
         funDisconnected_(*this);
     }
@@ -102,7 +102,7 @@ void OHOS::MMI::MMIClient::OnDisconnected()
 
 void OHOS::MMI::MMIClient::OnConnected()
 {
-    MMI_LOGD("Connection to server succeeded... fd:%{public}d", GetFd());
+    MMI_LOGD("Connection to server succeeded. fd:%{public}d", GetFd());
     if (funConnected_) {
         funConnected_(*this);
     }
@@ -123,7 +123,7 @@ int32_t OHOS::MMI::MMIClient::Socket()
                  " return invalid fd.");
     } else {
         MMI_LOGT("UDSSocket::Socket, call MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair"
-                 " return fd = %{public}d.", fd_);
+                 " return fd:%{public}d.", fd_);
     }
 
     return fd_;

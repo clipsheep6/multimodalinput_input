@@ -51,7 +51,7 @@ bool OHOS::MMI::UDSSession::SendMsg(const char *buf, size_t size) const
     if (ret < 0) {
         const int errNoSaved = errno;
         MMI_LOGE("UDSSession::SendMsg write return %{public}" PRId64
-                ", fd_: %{public}d, errNoSaved: %{public}d, %{public}s.",
+                ",fd_:%{public}d,errNoSaved:%{public}d,%{public}s.",
                 ret, fd_, errNoSaved, strerror(errNoSaved));
         return false;
     }
@@ -60,7 +60,7 @@ bool OHOS::MMI::UDSSession::SendMsg(const char *buf, size_t size) const
 
 void OHOS::MMI::UDSSession::Close()
 {
-    MMI_LOGT("enter fd_ = %{public}d, bHasClosed_ = %d.", fd_, bHasClosed_);
+    MMI_LOGT("enter fd_:%{public}d, bHasClosed_:%{public}d.", fd_, bHasClosed_);
     if (!bHasClosed_ && fd_ != -1) {
         close(fd_);
         bHasClosed_ = true;

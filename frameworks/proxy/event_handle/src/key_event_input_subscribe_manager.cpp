@@ -86,16 +86,16 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<OHOS::M
         return -1;
     }
     for (auto preKey : keyOption->GetPreKeys()) {
-        MMI_LOGD("KeyOption->prekey=%{public}d", preKey);
+        MMI_LOGD("KeyOption->prekey:%{public}d", preKey);
     }
     SubscribeKeyEventInfo subscribeInfo(keyOption, callback);
-    MMI_LOGD("SubscribeId=%{public}d,KeyOption->finalKey=%{public}d,"
-        "KeyOption->isFinalKeyDown=%{public}d,KeyOption->finalKeyDownDuriation=%{public}d",
+    MMI_LOGD("SubscribeId:%{public}d,KeyOption->finalKey:%{public}d,"
+        "KeyOption->isFinalKeyDown:%{public}d,KeyOption->finalKeyDownDuriation:%{public}d",
         subscribeInfo.GetSubscribeId(), keyOption->GetFinalKey(), ((keyOption->IsFinalKeyDown() == true) ? 1 : 0),
         keyOption->GetFinalKeyDownDuration());
     int32_t keySubscibeId = subscribeInfo.GetSubscribeId();
     std::string keySubscribeIdstring = "SubscribeKeyEvent client subscribeKeyId: " + std::to_string(keySubscibeId);
-    MMI_LOGT(" SubscribeKeyEvent client trace subscribeKeyId = %{public}d", keySubscibeId);
+    MMI_LOGT(" SubscribeKeyEvent client trace subscribeKeyId:%{public}d", keySubscibeId);
     int32_t eventKey = 1;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keySubscribeIdstring, eventKey);
     if (RET_OK == MMIEventHdl.SubscribeKeyEvent(subscribeInfo)) {

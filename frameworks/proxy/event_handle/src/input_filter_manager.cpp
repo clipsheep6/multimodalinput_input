@@ -32,7 +32,7 @@ int32_t InputFilterManager::FilterKeyEvent(std::string name, Authority authority
         MMI_LOGD("the input name or handle is nullptr");
         return RET_ERR;
     }
-    MMI_LOGD("******************* the authority is %{public}d", authority);
+    MMI_LOGD("authority:%{public}d", authority);
     if (authority < NO_AUTHORITY || authority > HIGH_AUTHORITY) {
         MMI_LOGD("the input authority is incorrect");
         return RET_ERR;
@@ -52,7 +52,7 @@ int32_t InputFilterManager::UnFilterKeyEvent(int32_t id)
 {
     auto len = keyEventFilterList_.size();
     if (len == 0) {
-        MMI_LOGD("  keyEventFilterList_ size is zero ");
+        MMI_LOGD("keyEventFilterList_ size is zero ");
         return RET_ERR;
     }
     for (auto it = keyEventFilterList_.begin(); it != keyEventFilterList_.end(); it++) {
@@ -126,7 +126,7 @@ void InputFilterManager::OnkeyEventTrace(const KeyBoardEvent& event)
 {
     std::string keyEvent = "InputFilter OnKey keyUuid: " + event.GetUuid();
     char *tmpKey = (char*)keyEvent.c_str();
-    MMI_LOGT(" OnKey keyUuid = %{public}s", tmpKey);
+    MMI_LOGT(" OnKey keyUuid:%{public}s", tmpKey);
     int32_t eventKey = 1;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
 }
@@ -273,14 +273,14 @@ void InputFilterManager::OnTouchEventTrace(const TouchEvent& event)
 {
     std::string touchEvent = "InputFilter OnTouch touchUuid: " + event.GetUuid();
     char *tmpTouch = (char*)touchEvent.c_str();
-    MMI_LOGT(" OnTouchEvent touchUuid = %{public}s", tmpTouch);
+    MMI_LOGT(" OnTouchEvent touchUuid:%{public}s", tmpTouch);
     int32_t eventTouch = 9;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, eventTouch);
 }
 
 int32_t InputFilterManager::OnTouchEvent(TouchEvent event, int32_t id)
 {
-    MMI_LOGE("client on touch event call function handler, id=%{public}d", id);
+    MMI_LOGE("client on touch event call function handler, id:%{public}d", id);
     OnTouchEventTrace(event);
     for (auto iter : touchEventFilterList_) {
         if (id == iter.GetId()) {
@@ -299,7 +299,7 @@ int32_t InputFilterManager::RegisterPointerEventInterceptor(std::string name_, A
         MMI_LOGD("the input name or handle is nullptr");
         return RET_ERR;
     }
-    MMI_LOGD("******************* the authority is %{public}d", authority_);
+    MMI_LOGD("authority:%{public}d", authority_);
     if (authority_ < NO_AUTHORITY || authority_ > HIGH_AUTHORITY) {
         MMI_LOGD("the input authority is incorrect");
         return RET_ERR;
@@ -395,7 +395,7 @@ void InputFilterManager::OnPointerEventTrace(const MouseEvent& event)
 {
     std::string pointerEvent = "InputFilter OnPointer pointerUuid: " + event.GetUuid();
     char *tmpPointer = (char*)pointerEvent.c_str();
-    MMI_LOGT(" OnPointerEvent pointerUuid = %{public}s", tmpPointer);
+    MMI_LOGT(" OnPointerEvent pointerUuid:%{public}s", tmpPointer);
     int32_t eventPointer = 17;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent, eventPointer);
 }
