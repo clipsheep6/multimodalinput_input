@@ -906,12 +906,12 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<
     MMI_LOGD("UpdateTouchScreenTarget, targetWindow:%{public}d", targetWindowId);
     WindowInfo *touchWindow = nullptr;
     for (auto it : logicalDisplayInfo.windowsInfo_) {
-        if (targetWindowId <= 0) {
+        if (targetWindowId < 0) {
             if (IsTouchWindow(globalX, globalY, it)) {
                 touchWindow = &it;
                 break;
             }
-        } else {
+        } else if(targetWindowId >= 0) {
             if (targetWindowId == it.id) {
                 touchWindow = &it;
                 break;
