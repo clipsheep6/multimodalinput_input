@@ -19,7 +19,7 @@
 #include "auto_test_multimodal.h"
 #include "bytrace.h"
 #include "event_factory.h"
-#include "input_device_event.h"
+#include "input_device_impl.h"
 #include "input_event_data_transformation.h"
 #include "input_event_monitor_manager.h"
 #include "input_filter_manager.h"
@@ -675,7 +675,7 @@ int32_t ClientMsgHandler::OnInputDeviceIds(const UDSClient& client, NetPacket& p
         CHKR(pkt.Read(deviceId), STREAM_BUF_READ_FAIL, RET_ERR);
         inputDeviceIds.push_back(deviceId);
     }
-    auto& instance = InputDeviceEvent::GetInstance();
+    auto& instance = InputDeviceImpl::GetInstance();
     instance.OnInputDeviceIds(taskId, inputDeviceIds);
     return RET_OK;
 }
@@ -692,7 +692,7 @@ int32_t ClientMsgHandler::OnInputDevice(const UDSClient& client, NetPacket& pkt)
     CHKR(pkt.Read(name), STREAM_BUF_READ_FAIL, RET_ERR);
     CHKR(pkt.Read(deviceType), STREAM_BUF_READ_FAIL, RET_ERR);
 
-    auto& instance = InputDeviceEvent::GetInstance();
+    auto& instance = InputDeviceImpl::GetInstance();
     instance.OnInputDevice(taskId, id, name, deviceType);
     return RET_OK;
 }

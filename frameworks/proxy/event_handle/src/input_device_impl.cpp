@@ -13,26 +13,26 @@
  * limitations under the License.
  */
 
-#include "input_device_event.h"
+#include "input_device_impl.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceEvent"};
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceImpl"};
 }
-InputDeviceEvent& InputDeviceEvent::GetInstance()
+InputDeviceImpl& InputDeviceImpl::GetInstance()
 {
-    static InputDeviceEvent instance;
+    static InputDeviceImpl instance;
     return instance;
 }
 
-InputDeviceEvent::InputDeviceEvent(){}
+InputDeviceImpl::InputDeviceImpl(){}
 
-InputDeviceEvent::~InputDeviceEvent(){}
+InputDeviceImpl::~InputDeviceImpl(){}
 
-void InputDeviceEvent::GetInputDeviceIdsAsync(std::function<void(std::vector<int32_t>)> callback)
+void InputDeviceImpl::GetInputDeviceIdsAsync(std::function<void(std::vector<int32_t>)> callback)
 {
     MMI_LOGI("begin");
     std::lock_guard<std::mutex> guard(lk_);
@@ -43,7 +43,7 @@ void InputDeviceEvent::GetInputDeviceIdsAsync(std::function<void(std::vector<int
     MMI_LOGI("end");
 }
 
-void InputDeviceEvent::GetInputDeviceAsync(int32_t deviceId,
+void InputDeviceImpl::GetInputDeviceAsync(int32_t deviceId,
                                            std::function<void(std::shared_ptr<InputDeviceInfo>)> callback)
 {
     MMI_LOGI("begin");
@@ -55,7 +55,7 @@ void InputDeviceEvent::GetInputDeviceAsync(int32_t deviceId,
     MMI_LOGI("end");
 }
 
-void InputDeviceEvent::OnInputDevice(int32_t taskId, int32_t id, std::string name, int32_t deviceType)
+void InputDeviceImpl::OnInputDevice(int32_t taskId, int32_t id, std::string name, int32_t deviceType)
 {
     MMI_LOGI("begin");
     auto inputDeviceInfo = std::make_shared<InputDeviceInfo>();
@@ -71,7 +71,7 @@ void InputDeviceEvent::OnInputDevice(int32_t taskId, int32_t id, std::string nam
     MMI_LOGI("end");
 }
 
-void InputDeviceEvent::OnInputDeviceIds(int32_t taskId, std::vector<int32_t> ids)
+void InputDeviceImpl::OnInputDeviceIds(int32_t taskId, std::vector<int32_t> ids)
 {
     MMI_LOGI("begin");
     for (auto it = idsRequests_.begin(); it != idsRequests_.end(); it++) {
