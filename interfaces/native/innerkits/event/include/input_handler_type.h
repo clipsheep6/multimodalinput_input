@@ -15,7 +15,6 @@
 
 #ifndef OHOS_MULTIMDOALINPUT_HANDLER_TYPE_H
 #define OHOS_MULTIMDOALINPUT_HANDLER_TYPE_H
-#include <cstddef>
 #include <cstdint>
 #include <limits>
 
