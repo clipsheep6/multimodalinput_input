@@ -34,11 +34,13 @@ public:
     void Initialize(MultimodalProperty &multimodalStruct,
         ManipulationProperty &manipulationProperty, TouchProperty touchProperty);
 
-    void SetMultimodalEvent(std::shared_ptr<MultimodalEvent> multimodalEvent) {
+    void SetMultimodalEvent(std::shared_ptr<MultimodalEvent> multimodalEvent)
+    {
         touchProperty_.multimodalEvent = multimodalEvent;
     }
 
-    const std::shared_ptr<MultimodalEvent> GetMultimodalEvent() {
+    const std::shared_ptr<MultimodalEvent> GetMultimodalEvent()
+    {
         return touchProperty_.multimodalEvent;
     }
 

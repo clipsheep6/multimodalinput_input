@@ -13,9 +13,12 @@
  * limitations under the License.
  */
 
+#ifndef KEY_EVENT_HANDLER_H
+#define KEY_EVENT_HANDLER_H
+
+#include "key_event.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
-#include "napi_utils.h"
-#include "key_event.h"
 #include "inject_manager.h"
-#include <memory>
+
+#endif //KEY_EVENT_HANDLER_H
