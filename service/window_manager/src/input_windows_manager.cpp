@@ -911,7 +911,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<
                 touchWindow = &it;
                 break;
             }
-        } else if(targetWindowId >= 0) {
+        } else if (targetWindowId >= 0) {
             if (targetWindowId == it.id) {
                 touchWindow = &it;
                 break;
