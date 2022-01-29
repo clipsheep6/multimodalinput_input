@@ -31,7 +31,7 @@ int32_t InputHandlerManagerGlobal::AddInputHandler(int32_t handlerId, InputHandl
         MMI_LOGE("AddInputHandler InputHandlerType Not MONITOR:%{public}d", handlerType);
         return RET_ERR;
     }
-    MMI_LOGD("Register monitor(%{public}d)", handlerId);
+    MMI_LOGT("Register monitor(%{public}d)", handlerId);
     SessionMonitor mon { handlerId, session };
     return monitors_.AddMonitor(mon);
 }
@@ -42,7 +42,7 @@ void InputHandlerManagerGlobal::RemoveInputHandler(int32_t handlerId, InputHandl
         MMI_LOGE("RemoveInputHandler InputHandlerType Not MONITOR:%{public}d", handlerType);
         return;
     }
-    MMI_LOGD("Unregister monitor(%{public}d)", handlerId);
+    MMI_LOGT("Unregister monitor(%{public}d)", handlerId);
     SessionMonitor mon { handlerId, session };
     return monitors_.RemoveMonitor(mon);
 }
@@ -60,7 +60,7 @@ bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 
 bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("Handle PointerEvent");
+    MMI_LOGT("Handle PointerEvent");
     return monitors_.HandleEvent(pointerEvent);
 }
 
@@ -76,7 +76,7 @@ void InputHandlerManagerGlobal::SessionMonitor::SendToClient(std::shared_ptr<Key
 void InputHandlerManagerGlobal::SessionMonitor::SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const
 {
     NetPacket pkt(MmiMessageId::REPORT_POINTER_EVENT);
-    MMI_LOGD("Service SendToClient id=%{public}d,InputHandlerType=%{public}d", id_, InputHandlerType::MONITOR);
+    MMI_LOGT("Service SendToClient id=%{public}d,InputHandlerType=%{public}d", id_, InputHandlerType::MONITOR);
     pkt << id_ << InputHandlerType::MONITOR;
     CHK((RET_OK == OHOS::MMI::InputEventDataTransformation::Marshalling(pointerEvent, pkt)),
         STREAM_BUF_WRITE_FAIL);
@@ -109,7 +109,7 @@ void InputHandlerManagerGlobal::MonitorCollection::RemoveMonitor(const SessionMo
     std::set<SessionMonitor>::const_iterator tItr = monitors_.find(mon);
     if (tItr != monitors_.end()) {
         monitors_.erase(tItr);
-        MMI_LOGD("Service RemoveMonitor Success");
+        MMI_LOGT("Service RemoveMonitor Success");
     }
 }
 
@@ -167,7 +167,7 @@ bool InputHandlerManagerGlobal::MonitorCollection::HasMonitor(int32_t monitorId,
 
 void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("Update consumption state");
+    MMI_LOGT("Update consumption state");
     CHKP(pointerEvent, PARAM_INPUT_INVALID);
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         MMI_LOGE("This is not a touch-screen event");
@@ -181,11 +181,11 @@ void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::s
         return;
     }
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
-        MMI_LOGD("Press for the first time");
+        MMI_LOGT("Press for the first time");
         downEvent_ = pointerEvent;
         monitorConsumed_ = false;
     } else if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
-        MMI_LOGD("the last time lift");
+        MMI_LOGT("the last time lift");
         downEvent_.reset();
         lastPointerEvent_.reset();
     }
@@ -194,7 +194,7 @@ void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::s
 void InputHandlerManagerGlobal::MonitorCollection::Monitor(std::shared_ptr<PointerEvent> pointerEvent)
 {
     std::lock_guard<std::mutex> guard(lockMonitors_);
-    MMI_LOGD("There are currently %{public}d monitors", static_cast<int32_t>(monitors_.size()));
+    MMI_LOGT("There are currently %{public}d monitors", static_cast<int32_t>(monitors_.size()));
     for (const SessionMonitor& mon : monitors_) {
         mon.SendToClient(pointerEvent);
     }
