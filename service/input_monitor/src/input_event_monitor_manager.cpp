@@ -72,6 +72,8 @@ void OHOS::MMI::InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<OH
     if (monitors_.empty()) {
         MMI_LOGE("No monitor to send msg");
     }
+    NetPacket newPkt(MmiMessageId::ON_KEYMONITOR);
+    InputEventDataTransformation::KeyEventToNetPacket(keyEvent, newPkt);
     for (auto iter = monitors_.begin(); iter != monitors_.end(); iter++) {
         CHKP(iter->session, ERROR_NULL_POINTER);
         newPkt << iter->session->GetPid();

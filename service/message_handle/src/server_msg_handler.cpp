@@ -862,7 +862,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRemoveInputEventTouchpadMontior(SessionPt
     if (eventType != OHOS::MMI::InputEvent::EVENT_TYPE_POINTER) {
         return RET_ERR;
     }
-    InputMonitorServiceMgr.RemoveInputEventMontior(eventType, sess);
+    InputMonitorServiceMgr.RemoveInputEventMontior(sess, eventType);
     return RET_OK;
 }
 int32_t OHOS::MMI::ServerMsgHandler::OnAddTouchpadEventFilter(SessionPtr sess, NetPacket& pkt)
