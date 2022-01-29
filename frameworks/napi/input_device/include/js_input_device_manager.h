@@ -24,7 +24,7 @@
 
 namespace OHOS {
 namespace MMI {
-class JsInputDeviceManager : std::enable_shared_from_this<JsInputDeviceManager> {
+class JsInputDeviceManager : public std::enable_shared_from_this<JsInputDeviceManager> {
 public:
     JsInputDeviceManager(napi_env env);
     void ResetEnv();
