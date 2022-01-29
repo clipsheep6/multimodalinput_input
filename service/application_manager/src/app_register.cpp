@@ -30,6 +30,7 @@ AppRegister::AppRegister()
 {
 }
 
+
 AppRegister::~AppRegister()
 {
 }
