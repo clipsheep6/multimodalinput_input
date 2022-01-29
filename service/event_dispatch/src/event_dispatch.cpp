@@ -357,7 +357,7 @@ bool EventDispatch::HandlePointerEventFilter(std::shared_ptr<PointerEvent> point
 
 int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point) 
 {
-    MMI_LOGD("HandlePointerEvent begin");
+    MMI_LOGD("Enter");
     CHKPR(point, PARAM_INPUT_INVALID, RET_ERR);
     auto fd = WinMgr->UpdateTargetPointer(point);
     if (HandlePointerEventFilter(point)) {
@@ -394,11 +394,11 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
     InputEventDataTransformation::SerializePointerEvent(point, newPacket);
     auto udsServer = InputHandler->GetUDSServer();
     if (udsServer == nullptr) {
-        MMI_LOGE("udsServer is a nullptr");
+        MMI_LOGE("UdsServer is a nullptr");
         return RET_ERR;
     }
     if (fd <= 0) {
-        MMI_LOGE("the fd less than 0");
+        MMI_LOGE("The fd less than 0");
         return RET_ERR;
     }
 
@@ -423,7 +423,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         MMI_LOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return RET_ERR;
     }
-    MMI_LOGD("HandlePointerEvent end");
+    MMI_LOGD("Leave");
     return RET_OK;
 }
 
@@ -640,8 +640,7 @@ int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *
 {
     CHKPR(event, PARAM_INPUT_INVALID, RET_ERR);
     auto device = libinput_event_get_device(event);
-    CHKR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
-
+    CHKPR(device, ERROR_NULL_POINTER, LIBINPUT_DEV_EMPTY);
 #ifdef DEBUG_CODE_TEST
     std::string str = WinMgr->GetSurfaceIdListString();
 #endif
@@ -664,10 +663,10 @@ int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *
     int32_t touchFocusId = WinMgr->GetTouchFocusSurfaceId();
     auto appInfo = AppRegs->FindByWinId(touchFocusId); // obtain application information
     if (appInfo.fd == RET_ERR) {
-        MMI_LOGE("Failed to find fd:%{public}d. errCode:%{public}d", touchFocusId, FOCUS_ID_OBTAIN_FAIL);
+        MMI_LOGE("Failed to find fd:%{public}d,errCode:%{public}d", touchFocusId, FOCUS_ID_OBTAIN_FAIL);
         return FOCUS_ID_OBTAIN_FAIL;
     }
-    MMI_LOGD("DispatchTouchEvent focusId:%{public}d fd:%{public}d", touchFocusId, appInfo.fd);
+    MMI_LOGD("DispatchTouchEvent focusId:%{public}d,fd:%{public}d", touchFocusId, appInfo.fd);
 #ifdef DEBUG_CODE_TEST
     MMI_LOGT("MMIWMS:windowId:%{public}s", str.c_str());
     if (touchFocusId == -1) {
@@ -696,8 +695,8 @@ int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *
         if (!touchIds.empty()) {
             for (std::pair<uint32_t, int32_t> touchId : touchIds) {
                 EventTouch touchTemp = {};
-                CHKR(EOK == memcpy_s(&touchTemp, sizeof(touchTemp), &touch, sizeof(touch)),
-                     MEMCPY_SEC_FUN_FAIL, RET_ERR);
+                errno_t retErr = memcpy_s(&touchTemp, sizeof(touchTemp), &touch, sizeof(touch));
+                CHKR(EOK == retErr, MEMCPY_SEC_FUN_FAIL, RET_ERR);
                 MMIRegEvent->GetTouchInfo(touchId, touchTemp);
                 MMI_LOGT("4.event dispatcher of server, eventTouch:time:%{public}" PRId64 ",deviceType:%{public}u,"
                          "deviceName:%{public}s,physical:%{public}s,eventType:%{public}d,"
@@ -709,7 +708,6 @@ int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *
                          preHandlerTime);
                 DispatchTouchEventTrace(touchTemp);
                 newPacket << touchTemp;
-
             }
         }
         if (touch.eventType == LIBINPUT_EVENT_TOUCH_UP) {

@@ -84,7 +84,7 @@ static napi_value GetEventInfo(napi_env env, napi_callback_info info, KeyEventMo
     keyOption->SetPreKeys(preKeys);
 
     std::string subKeyNames = "";
-    for (int32_t i = 0; i < sortPrekeys.size(); i++){
+    for (size_t i = 0; i < sortPrekeys.size(); i++){
         subKeyNames += std::to_string(sortPrekeys[i]);
         subKeyNames += ",";
         MMI_LOGD("preKeys:%{public}d", preKeys[i]);
@@ -95,9 +95,9 @@ static napi_value GetEventInfo(napi_env env, napi_callback_info info, KeyEventMo
     subKeyNames += ",";
     keyOption->SetFinalKey(finalKey);
     MMI_LOGD("finalKey:%{public}d", finalKey);
-
     bool isFinalKeyDown = GetNamedPropertyBool(env, argv[ARGV_SECOND], "isFinalKeyDown");
     subKeyNames += std::to_string(isFinalKeyDown);
+    subKeyNames += ",";
     keyOption->SetFinalKeyDown(isFinalKeyDown);
     event->eventType = subKeyNames;
     MMI_LOGD("isFinalKeyDown:%{public}d", (isFinalKeyDown == true?1:0));
@@ -105,6 +105,7 @@ static napi_value GetEventInfo(napi_env env, napi_callback_info info, KeyEventMo
 
     int32_t finalKeyDownDuriation = GetNamedPropertyInt32(env, argv[ARGV_SECOND], "finalKeyDownDuration");
     napi_get_value_int32(env, receiceValue, &finalKeyDownDuriation);
+    subKeyNames += std::to_string(finalKeyDownDuriation);
     keyOption->SetFinalKeyDownDuration(finalKeyDownDuriation);
     MMI_LOGD("finalKeyDownDuriation:%{public}d", finalKeyDownDuriation);
 
@@ -150,7 +151,20 @@ static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
         }
         kevEventSize++;
     }
-    MMI_LOGD("kevEventSize:%{public}d,infoSize:%{public}d", kevEventSize, infoSize);
+    MMI_LOGD("kevEventSize:%{public}d, infoSize:%{public}d", kevEventSize, infoSize);
+    const KeyEvent::KeyItem* keyItem = keyEvent->GetKeyItem();
+    if (keyItem == nullptr) {
+        MMI_LOGE("Skip, null keyItem");
+        return false;
+    }
+
+    auto upTime = keyEvent->GetActionTime();
+    auto downTime = keyItem->GetDownTime();
+    auto curDurtionTime = keyOption->GetFinalKeyDownDuration();
+    if (curDurtionTime > 0 && (upTime - downTime >= (curDurtionTime * 1000))) {
+        MMI_LOGE("Skip, upTime - downTime >= duration");
+        return false;
+    }
     return kevEventSize == infoSize;
 }
 
@@ -183,7 +197,7 @@ bool CheckPara(std::shared_ptr<KeyOption> keyOption)
         return false;
     } 
     std::vector<int32_t> checkRepeat;
-    for (int32_t i = 0; i < preKeys.size(); i++) {
+    for (size_t i = 0; i < preKeys.size(); i++) {
         if (preKeys[i] < 0) {
             MMI_LOGE("preKey:%{public}d is less 0, can not process", preKeys[i]);
             return false;
