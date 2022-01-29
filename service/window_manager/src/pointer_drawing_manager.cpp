@@ -193,7 +193,7 @@ void OHOS::MMI::MouseDrawingManager::TellDisplayInfo(int32_t displayId, int32_t 
     Init();
 }
 
-void OHOS::MMI::MouseDrawingManager::TellDeviceInfo(bool hasPointerDevice) 
+void OHOS::MMI::MouseDrawingManager::Update(bool hasPointerDevice) 
 {
     MMI_LOGD("enter");
     hasPointerDevice_ = hasPointerDevice;
@@ -213,4 +213,9 @@ void OHOS::MMI::MouseDrawingManager::Init()
         drawWindow_->Destroy();
         drawWindow_ = nullptr; 
     }
+}
+
+bool OHOS::MMI::MouseDrawingManager::Init()
+{
+    InputDeviceManager::GetInstance()->Attach(this);
 }
