@@ -74,12 +74,12 @@ void OHOS::MMI::InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<OH
     }
     NetPacket newPkt(MmiMessageId::ON_KEYMONITOR);
     InputEventDataTransformation::KeyEventToNetPacket(keyEvent, newPkt);
-    for (auto iter = monitors_.begin(); iter != monitors_.end(); iter++) {
-        CHKP(iter->session, ERROR_NULL_POINTER);
-        newPkt << iter->session->GetPid();
+    for (const auto &monitor : monitors_) {
+        CHKP(monitor->session, ERROR_NULL_POINTER);
+        newPkt << monitor->session->GetPid();
         MMI_LOGD("Server send the msg to client, keyCode: %{public}d, pid: %{public}d", keyEvent->GetKeyCode(),
-            iter->session->GetPid());
-        iter->session->SendMsg(newPkt);
+            monitor->session->GetPid());
+        monitor->session->SendMsg(newPkt);
     }
 }
 
