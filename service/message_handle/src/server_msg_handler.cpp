@@ -433,8 +433,8 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
         MMI_LOGE("keyCode is invalid");
         return RET_ERR;
     }
-    MMI_LOGT("time:%{public}u,keycode:%{public}u,state:%{public}u,
-        isIntercepted:%{public}d", event.keyDownDuration, event.keyCode,
+    MMI_LOGT("time:%{public}u,keycode:%{public}u,state:%{public}u,"
+        "isIntercepted:%{public}d", event.keyDownDuration, event.keyCode,
         event.isPressed, event.isIntercepted);
     EventKeyboard key = {};
     auto packageResult = EventPackage::PackageVirtualKeyEvent(event, key);
@@ -444,7 +444,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
 
     if (event.isIntercepted) {
         if (ServerKeyFilter->OnKeyEvent(key)) {
-            MMI_LOGD("key event filter find a  key event from Original event  keyCode:%{puiblic}d", key.key);
+            MMI_LOGD("key event filter find a  key event from Original event. keyCode:%{puiblic}d", key.key);
             return RET_OK;
         }
     }
