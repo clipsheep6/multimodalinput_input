@@ -17,17 +17,16 @@
 #include <functional>
 #include <map>
 #include <mutex>
-#include <vector>
 
 namespace OHOS {
 namespace MMI {
-class InputDeviceEvent {
+class InputDeviceImpl {
 public:
-    static InputDeviceEvent& GetInstance();
-    InputDeviceEvent(const InputDeviceEvent &) = delete;
-    InputDeviceEvent &operator=(const InputDeviceEvent &) = delete;
-    InputDeviceEvent(InputDeviceEvent &&) = delete;
-    ~InputDeviceEvent();
+    static InputDeviceImpl& GetInstance();
+    InputDeviceImpl(const InputDeviceImpl &) = delete;
+    InputDeviceImpl &operator=(const InputDeviceImpl &) = delete;
+    InputDeviceImpl(InputDeviceImpl &&) = delete;
+    ~InputDeviceImpl();
 
     struct InputDeviceInfo {
         int32_t id;
@@ -41,7 +40,7 @@ public:
     void OnInputDeviceIds(int32_t taskId, std::vector<int32_t> ids);
 
 private:
-    InputDeviceEvent();
+    InputDeviceImpl();
     std::map<int32_t, std::function<void(std::shared_ptr<InputDeviceInfo>)>> inputDevciceRequests_;
     std::map<int32_t, std::function<void(std::vector<int32_t>)>> idsRequests_;
     int32_t inputDeviceTaskId_ {1};
