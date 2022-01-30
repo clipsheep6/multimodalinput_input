@@ -69,7 +69,7 @@ typedef struct {
     std::shared_ptr<KeyOption> keyOption;
 } KeyEventMonitorInfo;
 
-typedef std::map<std::string, std::list<KeyEventMonitorInfo *>> CallbackMaps;
+typedef std::map<std::string, std::list<KeyEventMonitorInfo *>> Callbacks;
 }
 }
 
