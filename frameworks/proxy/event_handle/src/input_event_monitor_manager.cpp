@@ -46,7 +46,7 @@ int32_t InputEventMonitorManager::AddInputEventMontior(
     static int32_t monitorId = INVALID_MONITOR_ID;
     item.id = ++monitorId;
     monitors_.push_back(item);
-    MMI_LOGD("MonitorId:%{public}", monitorId);
+    MMI_LOGD("MonitorId:%{public}d", monitorId);
     return item.id;
 }
 
@@ -90,7 +90,7 @@ int32_t InputEventMonitorManager::AddInputEventTouchpadMontior(
     monitorItem.TouchPadEventMonitor = TouchPadEventMonitor;
     monitorItem.id = ++monitorId;
     monitors_.push_back(monitorItem);
-    MMI_LOGD("monitorId:%{public}", monitorId);
+    MMI_LOGD("monitorId:%{public}d", monitorId);
     MMIEventHdl.AddInputEventTouchpadMontior(OHOS::MMI::InputEvent::EVENT_TYPE_POINTER);
     MMI_LOGD("leave");
     return monitorItem.id;
@@ -110,7 +110,7 @@ void InputEventMonitorManager::RemoveInputEventTouchpadMontior(int32_t monitorId
     } else {
         iter = monitors_.erase(iter);
         MMIEventHdl.RemoveInputEventTouchpadMontior(OHOS::MMI::InputEvent::EVENT_TYPE_POINTER);
-        MMI_LOGD("monitorItem id:%{public} removed", monitorId);
+        MMI_LOGD("monitorItem id:%{public}d removed", monitorId);
     }
 }
 
