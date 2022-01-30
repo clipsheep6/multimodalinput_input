@@ -118,7 +118,7 @@ void InputHandlerManagerGlobal::MonitorCollection::MarkConsumed(int32_t monitorI
     }
     if (!downEvent_ || !lastPointerEvent_) {
         MMI_LOGW("No event came up ever");
-        return
+        return;
     }
     monitorConsumed_ = true;
     lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
