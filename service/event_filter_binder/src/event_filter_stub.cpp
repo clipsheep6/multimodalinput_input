@@ -30,11 +30,11 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN,
 int32_t EventFilterStub::OnRemoteRequest(
     uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
-    MMI_LOGT("enter, code: %{public}d", code);
+    MMI_LOGT("enter, code:%{public}d", code);
 
     std::u16string descriptor = data.ReadInterfaceToken();
     if (descriptor != IEventFilter::GetDescriptor()) {
-        MMI_LOGE("get unexpect descriptor: %{public}s", Str16ToStr8(descriptor).c_str());
+        MMI_LOGE("get unexpect descriptor:%{public}s", Str16ToStr8(descriptor).c_str());
         return ERR_INVALID_STATE;
     }
 
@@ -42,7 +42,7 @@ int32_t EventFilterStub::OnRemoteRequest(
         case static_cast<uint32_t>(IEventFilter::OPERATOR_TYPE::HANDLE_POINTER_EVENT):
             return StubHandlePointerEvent(data, reply);
         default:
-            MMI_LOGE("unknown code: %{public}u, go switch defaut", code);
+            MMI_LOGE("unknown code:%{public}u, go switch defaut", code);
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
 }

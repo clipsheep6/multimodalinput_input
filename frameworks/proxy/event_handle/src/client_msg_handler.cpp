@@ -119,14 +119,14 @@ void ClientMsgHandler::OnMsgHandler(const UDSClient& client, NetPacket& pkt)
     TimeCostChk chk("ClientMsgHandler::OnMsgHandler", "overtime 300(us)", MAX_OVER_TIME, id);
     auto fun = GetFun(id);
     if (!fun) {
-        MMI_LOGE("CClientMsgHandler::OnMsgHandler Unknown msg id[%{public}d].", id);
+        MMI_LOGE("CClientMsgHandler::OnMsgHandler Unknown msg id:%{public}d", id);
         return;
     }
     
     uint64_t clientTime = GetSysClockTime();
     auto ret = (*fun)(client, pkt);
     if (ret < 0) {
-        MMI_LOGE("CClientMsgHandler::OnMsgHandler Msg handling failed. id[%{public}d] ret[%{public}d]", id, ret);
+        MMI_LOGE("CClientMsgHandler::OnMsgHandler Msg handling failed. id:%{public}d,ret:%{public}d", id, ret);
         return;
     }
     uint64_t endTime = GetSysClockTime();
@@ -143,7 +143,7 @@ int32_t ClientMsgHandler::OnKeyMonitor(const UDSClient& client, NetPacket& pkt)
     }
     int32_t pid = 0;
     pkt >> pid;
-    MMI_LOGD("Client receive the msg from server, keyCode: %{public}d, pid: %{public}d", key->GetKeyCode(), pid);
+    MMI_LOGD("Client receive the msg from server, keyCode:%{public}d,pid:%{public}d", key->GetKeyCode(), pid);
     return InputMonitorMgr.OnMonitorInputEvent(key);
 }
 
@@ -158,17 +158,17 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
         return RET_ERR;
     }
     pkt >> fd >> serverStartTime;
-    MMI_LOGT("4.event dispatcher of clien:KeyEvent:KeyCode = %{public}d,"
-             "ActionTime = %{public}d,Action = %{public}d,ActionStartTime = %{public}d,"
-             "EventType = %{public}d,Flag = %{public}d,"
-             "KeyAction = %{public}d, eventNumber = %{public}d, Fd = %{public}d,"
-             "ServerStartTime = %{public}" PRId64"",
+    MMI_LOGT("4.event dispatcher of clien:KeyEvent:KeyCode:%{public}d,"
+             "ActionTime:%{public}d,Action:%{public}d,ActionStartTime:%{public}d,"
+             "EventType:%{public}d,Flag:%{public}d,"
+             "KeyAction:%{public}d, eventNumber:%{public}d,Fd:%{public}d,"
+             "ServerStartTime:%{public}" PRId64"",
              key->GetKeyCode(), key->GetActionTime(), key->GetAction(),
              key->GetActionStartTime(), key->GetEventType(),
              key->GetFlag(), key->GetKeyAction(), key->GetId(), fd, serverStartTime);
     int32_t getKeyCode = key->GetKeyCode();
     std::string keyCodestring = "event dispatcher of client GetKeyCode: " + std::to_string(getKeyCode);
-    MMI_LOGT(" OnKeyEvent client trace keyCode = %{public}d", getKeyCode);
+    MMI_LOGT("OnKeyEvent client trace keyCode:%{public}d", getKeyCode);
     int32_t eventKey = 1;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, eventKey);
     InputManagerImpl::GetInstance()->OnKeyEvent(key);
@@ -185,11 +185,11 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
 
     std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
     MMI_LOGD("pointer event dispatcher of client:");
-    MMI_LOGD("eventType=%{public}d,actionTime=%{public}d,"
-             "action=%{public}d,actionStartTime=%{public}d,"
-             "flag=%{public}d,pointerAction=%{public}d,sourceType=%{public}d,"
-             "VerticalAxisValue=%{public}.2f,HorizontalAxisValue=%{public}.2f,"
-             "pointerCount=%{public}d, eventNumber = %{public}d",
+    MMI_LOGD("eventType:%{public}d,actionTime:%{public}d,"
+             "action:%{public}d,actionStartTime:%{public}d,"
+             "flag:%{public}d,pointerAction:%{public}d,sourceType:%{public}d,"
+             "VerticalAxisValue:%{public}.2f,HorizontalAxisValue:%{public}.2f,"
+             "pointerCount:%{public}d, eventNumber:%{public}d",
              pointerEvent->GetEventType(), pointerEvent->GetActionTime(),
              pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
              pointerEvent->GetFlag(), pointerEvent->GetPointerAction(),
@@ -202,16 +202,16 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
         MMI_LOGI("Pressed keys is empty");
     } else {
         for (int32_t keyCode : pressedKeys) {
-            MMI_LOGI("Pressed keyCode=%{public}d", keyCode);
+            MMI_LOGI("Pressed keyCode:%{public}d", keyCode);
         }
     }
     for (int32_t pointerId : pointerIds) {
         PointerEvent::PointerItem item;
         CHKR(pointerEvent->GetPointerItem(pointerId, item), PARAM_INPUT_FAIL, RET_ERR);
 
-        MMI_LOGD("downTime=%{public}d,isPressed=%{public}s,"
-                "globalX=%{public}d,globalY=%{public}d,localX=%{public}d,localY=%{public}d,"
-                "width=%{public}d,height=%{public}d,pressure=%{public}d",
+        MMI_LOGD("downTime:%{public}d,isPressed:%{public}s,"
+                "globalX:%{public}d,globalY:%{public}d,localX:%{public}d,localY:%{public}d,"
+                "width:%{public}d,height:%{public}d,pressure:%{public}d",
                  item.GetDownTime(), (item.IsPressed() ? "true" : "false"),
                  item.GetGlobalX(), item.GetGlobalY(), item.GetLocalX(), item.GetLocalY(),
                  item.GetWidth(), item.GetHeight(), item.GetPressure());
@@ -234,9 +234,9 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
     int32_t fd = -1;
     int32_t subscribeId = -1;
     pkt >> fd >> subscribeId;
-    MMI_LOGD("SubscribeId=%{public}d,Fd=%{public}d,KeyEventId=%{public}d,"
-             "KeyCode=%{public}d,ActionTime=%{public}d,ActionStartTime=%{public}d,Action=%{public}d,"
-             "KeyAction=%{public}d,EventType=%{public}d,Flag=%{public}d",
+    MMI_LOGD("SubscribeId:%{public}d,Fd:%{public}d,KeyEventId:%{public}d,"
+             "KeyCode:%{public}d,ActionTime:%{public}d,ActionStartTime:%{public}d,Action:%{public}d,"
+             "KeyAction:%{public}d,EventType:%{public}d,Flag:%{public}d",
         subscribeId, fd, keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
         keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
         keyEvent->GetEventType(), keyEvent->GetFlag());
@@ -253,7 +253,7 @@ int32_t ClientMsgHandler::OnTouchPadMonitor(const UDSClient& client, NetPacket& 
     }
     int32_t pid = 0;
     pkt >> pid;
-    MMI_LOGD("client receive the msg from server: EventType = %{public}d, pid = %{public}d",
+    MMI_LOGD("client receive the msg from server: EventType:%{public}d,pid:%{public}d",
         pointer->GetEventType(), pid);
     return InputMonitorMgr.OnTouchpadMonitorInputEvent(pointer);
 }
@@ -266,8 +266,8 @@ int32_t ClientMsgHandler::OnKey(const UDSClient& client, NetPacket& pkt)
     uint64_t serverStartTime = 0;
     EventKeyboard key = {};
     pkt >> key >> abilityId >> windowId >> fd >> serverStartTime;
-    MMI_LOGT("Event dispatcher of client:eventKeyboard:time=%{public}" PRId64 ", key=%{public}u, "
-             "deviceType=%{public}u, seat_key_count=%{public}u, state=%{public}d, fd=%{public}d",
+    MMI_LOGT("Event dispatcher of client:eventKeyboard:time:%{public}" PRId64 ",key:%{public}u,"
+             "deviceType:%{public}u,seat_key_count:%{public}u,state:%{public}d,fd:%{public}d",
              key.time, key.key, key.deviceType, key.seat_key_count, key.state, fd);
 
     /* 根据收到的key，构造keyBoardEvent对象，
@@ -604,10 +604,7 @@ int32_t ClientMsgHandler::PackedData(MultimodalEvent& multEvent, const UDSClient
     if (type == INPUT_DEVICE_CAP_AISENSOR || type == INPUT_DEVICE_CAP_KNUCKLE) {
         pkt >> idMsg >> deviceId >> fd >> windowId >> abilityId >> serverStartTime >> uuid >> occurredTime;
         MMI_LOGT("event dispatcher of client: manager_aisensor"
-                 "Msg=%{public}d,fd=%{public}d,"
-                 "occurredTime=%{public}d;"
-                 "************************************************************************",
-                 idMsg, fd, occurredTime);
+                 "Msg:%{public}d,fd:%{public}d,occurredTime:%{public}d", idMsg, fd, occurredTime);
         if (type == INPUT_DEVICE_CAP_KNUCKLE) {
             type = DEVICE_TYPE_KNUCKLE;
         } else if (type == INPUT_DEVICE_CAP_AISENSOR) {
@@ -617,15 +614,11 @@ int32_t ClientMsgHandler::PackedData(MultimodalEvent& multEvent, const UDSClient
     } else {
         pkt >> data >> fd >> windowId >> abilityId >> serverStartTime;
         if (windowId == -1) {
-            MMI_LOGT("event dispatcher of client: occurredTime=%{public}" PRId64 ";sourceType=%{public}d;"
-                     "fd=%{public}d;"
-                     "************************************************************************",
-                     data.occurredTime, data.eventType, fd);
+            MMI_LOGT("event dispatcher of client: occurredTime:%{public}" PRId64 ",sourceType:%{public}d,"
+                     "fd:%{public}d", data.occurredTime, data.eventType, fd);
         } else {
-            MMI_LOGT("event dispatcher of client: occurredTime=%{public}" PRId64 ";sourceType=%{public}d;"
-                     "fd=%{public}d;"
-                     "**************************************************************",
-                     data.occurredTime, data.eventType, fd);
+            MMI_LOGT("event dispatcher of client: occurredTime:%{public}" PRId64 ",sourceType:%{public}d,"
+                     "fd:%{public}d", data.occurredTime, data.eventType, fd);
         }
         multEvent.Initialize(windowId, 0, data.uuid, data.eventType, data.occurredTime, "", data.deviceId, 0,
             data.deviceType);
@@ -703,9 +696,9 @@ int32_t ClientMsgHandler::KeyEventFilter(const UDSClient& client, NetPacket& pkt
     int32_t windowId = 0;
     int32_t id = 0;
     pkt >> key >>id;
-    MMI_LOGT("key event filter : event dispatcher of client:eventKeyboard:time=%{public}" PRId64
-        ";key=%{public}u;deviceId=%{private}u;"
-        "deviceType=%{public}u;seat_key_count=%{public}u;state=%{public}d;",
+    MMI_LOGT("key event filter : event dispatcher of client:eventKeyboard:time:%{public}" PRId64
+        ",key:%{public}u,deviceId=%{private}u,"
+        "deviceType:%{public}u,seat_key_count:%{public}u,state:%{public}d;",
         key.time, key.key, key.deviceId, key.deviceType, key.seat_key_count, key.state);
     TraceKeyEvent(key);
     KeyBoardEvent event;
@@ -743,8 +736,8 @@ int32_t ClientMsgHandler::TouchEventFilter(const UDSClient& client, NetPacket& p
         fingersInfos[i].mMp.Setxy(touchData.point.x, touchData.point.y);
     }
 
-    MMI_LOGT("Event filter of client:eventTouch:time=%{public}" PRId64 ", "
-             "deviceType=%{public}u, eventType=%{public}d, slot=%{public}d, seatSlot=%{public}d, fd=%{public}d",
+    MMI_LOGT("Event filter of client:eventTouch:time:%{public}" PRId64 ","
+             "deviceType:%{public}u,eventType:%{public}d,slot:%{public}d,seatSlot:%{public}d,fd:%{public}d",
              touchData.time, touchData.deviceType, touchData.eventType, touchData.slot, touchData.seatSlot, fd);
     TraceTouchEvent(touchData);
 
@@ -773,11 +766,11 @@ int32_t ClientMsgHandler::PointerEventInterceptor(const UDSClient& client, NetPa
     int32_t action = pointData.state;
     MmiPoint mmiPoint;
     mmiPoint.Setxy(pointData.delta.x, pointData.delta.y);
-    MMI_LOGT("WangYuanevent dispatcher of client: mouse_data eventPointer:time=%{public}" PRId64 ";"
-             "eventType=%{public}d;buttonCode=%{public}u;deviceType=%{public}u;"
-             "seat_button_count=%{public}u;axis=%{public}u;buttonState=%{public}d;source=%{public}d;"
-             "delta.x=%{public}lf;delta.y=%{public}lf;delta_raw.x=%{public}lf;delta_raw.y=%{public}lf;"
-             "absolute.x=%{public}lf;absolute.y=%{public}lf;discYe.x=%{public}lf;discrete.y=%{public}lf.",
+    MMI_LOGT("WangYuanevent dispatcher of client: mouse_data eventPointer:time:%{public}" PRId64 ","
+             "eventType:%{public}d,buttonCode:%{public}u,deviceType:%{public}u,"
+             "seat_button_count:%{public}u,axis:%{public}u,buttonState:%{public}d,source:%{public}d,"
+             "delta.x:%{public}lf,delta.y:%{public}lf,delta_raw.x:%{public}lf,delta_raw.y:%{public}lf,"
+             "absolute.x:%{public}lf,absolute.y:%{public}lf,discYe.x:%{public}lf,discrete.y:%{public}lf",
              pointData.time, pointData.eventType, pointData.button, pointData.deviceType,
              pointData.seat_button_count, pointData.axis, pointData.state, pointData.source, pointData.delta.x,
              pointData.delta.y, pointData.delta_raw.x, pointData.delta_raw.y, pointData.absolute.x,
@@ -812,11 +805,11 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
     int32_t handlerId { };
     InputHandlerType handlerType { };
     pkt >> handlerId >> handlerType;
-    MMI_LOGD("Client handlerId : %{public}d handlerType : %{public}d", handlerId, handlerType); 
+    MMI_LOGD("Client handlerId:%{public}d,handlerType:%{public}d", handlerId, handlerType); 
 
     auto pointerEvent { PointerEvent::Create() };
     if (InputEventDataTransformation::DeserializePointerEvent(false, pointerEvent, pkt) != ERR_OK) {
-        MMI_LOGE("Failed to deserialize pointer event...");
+        MMI_LOGE("Failed to deserialize pointer event");
         return RET_ERR;
     }
     InputHandlerManager::GetInstance().OnInputEvent(handlerId, pointerEvent); 
@@ -834,7 +827,7 @@ int32_t ClientMsgHandler::TouchpadEventInterceptor(const UDSClient& client, NetP
     int32_t pid = 0;
     int32_t id = 0;
     pkt >> pid >> id;
-    MMI_LOGD("client receive the msg from server: pointId = %{public}d, pid = %{public}d",
+    MMI_LOGD("client receive the msg from server: pointId:%{public}d,pid:%{public}d",
              pointerEvent->GetPointerId(), pid);
     return INTERCEPTORMANAGER.OnPointerEvent(pointerEvent, id);
 }
@@ -849,7 +842,7 @@ int32_t ClientMsgHandler::KeyEventInterceptor(const UDSClient& client, NetPacket
     }
     int32_t pid = 0;
     pkt >> pid;
-    MMI_LOGD("client receive the msg from server: keyCode = %{public}d, pid = %{public}d",
+    MMI_LOGD("client receive the msg from server: keyCode:%{public}d,pid:%{public}d",
         keyEvent->GetKeyCode(), pid);
     return INTERCEPTORMANAGER.OnKeyEvent(keyEvent);
 }
@@ -868,11 +861,11 @@ void ClientMsgHandler::AnalysisPointEvent(const UDSClient& client, NetPacket& pk
     MultimodalEventPtr mousePtr = EventFactory::CreateEvent(EventType::EVENT_MOUSE);
     CHK(mousePtr, ERROR_NULL_POINTER);
     pkt >> ret >> pointData >> abilityId >> windowId >> fd >> serverStartTime;
-    MMI_LOGT("event dispatcher of client: mouse_data eventPointer:time=%{public}" PRId64 "; eventType=%{public}d;"
-             "buttonCode=%{public}u;deviceType=%{public}u;seat_button_count=%{public}u;"
-             "axis=%{public}u;buttonState=%{public}d;source=%{public}d;delta.x=%{public}lf;delta.y=%{public}lf;"
-             "delta_raw.x=%{public}lf;delta_raw.y=%{public}lf;absolute.x=%{public}lf;absolute.y=%{public}lf;"
-             "discYe.x=%{public}lf;discrete.y=%{public}lf;fd=%{public}d;",
+    MMI_LOGT("event dispatcher of client: mouse_data eventPointer:time:%{public}" PRId64 ", eventType:%{public}d,"
+             "buttonCode:%{public}u,deviceType:%{public}u,seat_button_count:%{public}u,"
+             "axis:%{public}u,buttonState:%{public}d,source:%{public}d,delta.x:%{public}lf,delta.y:%{public}lf,"
+             "delta_raw.x:%{public}lf,delta_raw.y:%{public}lf,absolute.x:%{public}lf,absolute.y:%{public}lf,"
+             "discYe.x:%{public}lf,discrete.y:%{public}lf,fd:%{public}d",
              pointData.time, pointData.eventType, pointData.button, pointData.deviceType,
              pointData.seat_button_count, pointData.axis, pointData.state, pointData.source, pointData.delta.x,
              pointData.delta.y, pointData.delta_raw.x, pointData.delta_raw.y, pointData.absolute.x,
@@ -938,9 +931,9 @@ void ClientMsgHandler::AnalysisTouchEvent(const UDSClient& client, NetPacket& pk
         fingersInfos[i].mTouchArea = static_cast<float>(touchData.area);
         fingersInfos[i].mTouchPressure = static_cast<float>(touchData.pressure);
         fingersInfos[i].mMp.Setxy(touchData.point.x, touchData.point.y);
-        MMI_LOGT("Event dispatcher of client:eventTouch:time=%{public}" PRId64 ", "
-                 "deviceType=%{public}u, eventType=%{public}d, slot=%{public}d, seatSlot=%{public}d, "
-                 "fd=%{public}d, point.x=%{public}lf, point.y=%{public}lf",
+        MMI_LOGT("Event dispatcher of client:eventTouch:time:%{public}" PRId64 ","
+                 "deviceType:%{public}u,eventType:%{public}d,slot:%{public}d,seatSlot:%{public}d, "
+                 "fd:%{public}d,point.x:%{public}lf,point.y:%{public}lf",
                  touchData.time, touchData.deviceType, touchData.eventType, touchData.slot,
                  touchData.seatSlot, fd, touchData.point.x, touchData.point.y);
     }
@@ -969,7 +962,7 @@ void ClientMsgHandler::AnalysisJoystickEvent(const UDSClient& client, NetPacket&
     CHK(mousePtr, ERROR_NULL_POINTER);
     pkt >> eventJoyStickData >> abilityId >> windowId >> fd >> serverStartTime;
     MMI_LOGT("event dispatcher of client: "
-        "event JoyStick: fd: %{public}d", fd);
+        "event JoyStick: fd:%{public}d", fd);
     PrintEventJoyStickAxisInfo(eventJoyStickData, fd, abilityId, windowId, serverStartTime);
 
     int32_t mouseAction = static_cast<int32_t>(MouseActionEnum::HOVER_MOVE);
@@ -1000,12 +993,11 @@ void ClientMsgHandler::AnalysisTouchPadEvent(const UDSClient& client, NetPacket&
     MultimodalEventPtr mousePtr = EventFactory::CreateEvent(EventType::EVENT_MOUSE);
     CHK(mousePtr, ERROR_NULL_POINTER);
     pkt >> tabletPad >> abilityId >> windowId >> fd >> serverStartTime;
-    MMI_LOGT("event dispatcher of client: event tablet Pad :time=%{public}" PRId64 ";deviceType=%{public}u;"
-             "deviceName=%{public}s;eventType=%{public}d;"
-             "ring.number=%{public}d;ring.position=%{public}lf;ring.source=%{public}d;"
-             "strip.number=%{public}d;strip.position=%{public}lf;strip.source=%{public}d;"
-             "fd=%{public}d;preHandlerTime=%{public}" PRId64 ";*"
-             "***********************************************************************",
+    MMI_LOGT("event dispatcher of client: event tablet Pad :time:%{public}" PRId64 ",deviceType:%{public}u,"
+             "deviceName:%{public}s,eventType:%{public}d,"
+             "ring.number:%{public}d,ring.position:%{public}lf,ring.source:%{public}d,"
+             "strip.number:%{public}d,strip.position:%{public}lf,strip.source:%{public}d,"
+             "fd:%{public}d,preHandlerTime:%{public}" PRId64,
              tabletPad.time, tabletPad.deviceType, tabletPad.deviceName, tabletPad.eventType,
              tabletPad.ring.number, tabletPad.ring.position, tabletPad.ring.source, tabletPad.strip.number,
              tabletPad.strip.position, tabletPad.strip.source, fd, serverStartTime);
@@ -1029,16 +1021,15 @@ void ClientMsgHandler::AnalysisTouchPadEvent(const UDSClient& client, NetPacket&
 void ClientMsgHandler::PrintEventTabletToolInfo(EventTabletTool tableTool, uint64_t serverStartTime,
                                                 int32_t abilityId, int32_t windowId, int32_t fd) const
 {
-    MMI_LOGT("event dispatcher of client: event tablet Tool :time=%{public}" PRId64 "; deviceType=%{public}u; "
-             "deviceName=%{public}s; eventType=%{public}d; type=%{public}u;"
-             "serial=%{public}u; button=%{public}d; "
-             "state=%{public}d; point.x=%{public}lf; point.y=%{public}lf; tilt.x=%{public}lf;"
-             "tilt.y=%{public}lf; distance=%{public}lf; pressure=%{public}lf; "
-             "rotation=%{public}lf; slider=%{public}lf; wheel=%{public}lf; wheel_discrete=%{public}d;"
-             "size.major=%{public}lf; size.minor=%{public}lf; "
-             "proximity_state=%{public}d; tip_state=%{public}d; state=%{public}d; seat_button_count=%{public}d;"
-             "fd=%{public}d; preHandlerTime=%{public}" PRId64 ";"
-             "***********************************************************************",
+    MMI_LOGT("event dispatcher of client: event tablet Tool :time:%{public}" PRId64 ",deviceType:%{public}u,"
+             "deviceName:%{public}s,eventType:%{public}d,type:%{public}u,"
+             "serial:%{public}u,button:%{public}d,"
+             "state:%{public}d,point.x:%{public}lf,point.y:%{public}lf,tilt.x:%{public}lf,"
+             "tilt.y:%{public}lf,distance:%{public}lf,pressure:%{public}lf,"
+             "rotation:%{public}lf,slider:%{public}lf,wheel:%{public}lf,wheel_discrete:%{public}d,"
+             "size.major:%{public}lf,size.minor:%{public}lf,"
+             "proximity_state:%{public}d,tip_state:%{public}d,state:%{public}d,seat_button_count:%{public}d,"
+             "fd:%{public}d,preHandlerTime:%{public}" PRId64,
              tableTool.time, tableTool.deviceType, tableTool.deviceName,
              tableTool.eventType, tableTool.tool.type, tableTool.tool.serial,
              tableTool.button, tableTool.state, tableTool.axes.point.x, tableTool.axes.point.y,
@@ -1184,11 +1175,11 @@ void ClientMsgHandler::AnalysisGestureEvent(const UDSClient& client, NetPacket& 
     fingerInfos fingersInfos[FINGER_NUM] = {};
     CHK(mousePtr, ERROR_NULL_POINTER);
     pkt >> gesture >> abilityId >> windowId >> fd >> serverStartTime;
-    MMI_LOGT("event dispatcher of client: event Gesture :time=%{public}" PRId64 ";"
-             "deviceType=%{public}u;deviceName=%{public}s;devNode=%{public}s;eventType=%{public}d;"
-             "fingerCount=%{public}d;cancelled=%{public}d;delta.x=%{public}lf;delta.y=%{public}lf;"
-             "deltaUnaccel.x=%{public}lf;deltaUnaccel.y=%{public}lf;fd=%{public}d;"
-             "preHandlerTime=%{public}" PRId64 ";***************************************************",
+    MMI_LOGT("event dispatcher of client: event Gesture :time:%{public}" PRId64 ","
+             "deviceType:%{public}u,deviceName:%{public}s,devNode:%{public}s,eventType:%{public}d,"
+             "fingerCount:%{public}d,cancelled:%{public}d,delta.x:%{public}lf,delta.y:%{public}lf,"
+             "deltaUnaccel.x:%{public}lf,deltaUnaccel.y:%{public}lf,fd:%{public}d,"
+             "preHandlerTime:%{public}" PRId64,
              gesture.time, gesture.deviceType, gesture.deviceName, gesture.physical,
              gesture.eventType, gesture.fingerCount, gesture.cancelled, gesture.delta.x, gesture.delta.y,
              gesture.deltaUnaccel.x, gesture.deltaUnaccel.y, fd, serverStartTime);
@@ -1220,7 +1211,7 @@ void ClientMsgHandler::TraceKeyEvent(const EventKeyboard& key) const
         MMI_LOGT("%{public}s copy data failed", __func__);
         return;
     }
-    MMI_LOGT(" nevent dispatcher of client: keyUuid = %{public}s", keyUuid);
+    MMI_LOGT(" nevent dispatcher of client, keyUuid:%{public}s", keyUuid);
     std::string keyEvent = keyUuid;
     keyEvent = " nevent dispatcher of client keyUuid: " + keyEvent;
     int32_t eventKey = 1;
@@ -1234,7 +1225,7 @@ void ClientMsgHandler::TracePointerEvent(const EventPointer& pointData) const
         MMI_LOGT("%{public}s copy data failed", __func__);
         return;
     }
-    MMI_LOGT(" nevent dispatcher of client: pointerUuid = %{public}s", pointerUuid);
+    MMI_LOGT(" nevent dispatcher of client, pointerUuid:%{public}s", pointerUuid);
     std::string pointerEvent = pointerUuid;
     pointerEvent = " nevent dispatcher of client pointerUuid: " + pointerEvent;
     int32_t eventPointer = 17;
@@ -1248,7 +1239,7 @@ void ClientMsgHandler::TraceTouchEvent(const EventTouch& touchData) const
         MMI_LOGT("%{public}s copy data failed", __func__);
         return;
     }
-    MMI_LOGT(" nevent dispatcher of client: touchUuid = %{public}s", touchUuid);
+    MMI_LOGT(" nevent dispatcher of client: touchUuid:%{public}s", touchUuid);
     std::string touchEventString = touchUuid;
     touchEventString = " nevent dispatcher of client touchUuid: " + touchEventString;
     int32_t eventTouch = 9;
