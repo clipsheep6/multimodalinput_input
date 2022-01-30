@@ -235,9 +235,9 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
     int32_t fd = -1;
     int32_t subscribeId = -1;
     pkt >> fd >> subscribeId;
-    MMI_LOGD("SubscribeId:%{public}d,Fd:%{public}d,KeyEventId:%{public}d,"
-             "KeyCode:%{public}d,ActionTime:%{public}d,ActionStartTime:%{public}d,Action:%{public}d,"
-             "KeyAction:%{public}d,EventType:%{public}d,Flag:%{public}d",
+    MMI_LOGD("SubscribeId:%{public}d,Fd:%{public}d,KeyEventId:%{public}d,KeyCode:%{public}d,"
+        "ActionTime:%{public}d,ActionStartTime:%{public}d,Action:%{public}d,"
+        "KeyAction:%{public}d,EventType:%{public}d,Flag:%{public}d",
         subscribeId, fd, keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
         keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
         keyEvent->GetEventType(), keyEvent->GetFlag());
