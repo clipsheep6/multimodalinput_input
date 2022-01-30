@@ -53,4 +53,3 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualMouse::GetMscs() const
     };
     return mscs;
 }
-

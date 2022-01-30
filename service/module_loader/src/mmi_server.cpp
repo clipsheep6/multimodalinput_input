@@ -272,4 +272,3 @@ void OHOS::MMI::MMIServer::OnDisconnected(SessionPtr s)
     seniorInput_.DeviceDisconnect(fd);
 #endif // OHOS_BUILD_AI
 }
-

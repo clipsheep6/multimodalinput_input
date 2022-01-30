@@ -87,6 +87,7 @@ protected:
     bool OnGetRepeatKetState(const uint32_t keyCode, MmiMessageId& msgId);
     int32_t SetPrevKeyValue(EventKeyboard& prevKey);
     int32_t OnEventKeyJudge(const EventKeyboard& key, MmiMessageId& msgId, EventKeyboard& prevKey);
+
     /*
     * Method:    GetBitNum
     * FullName:  RegisterEvent::GetBitNum
@@ -95,6 +96,7 @@ protected:
     * Qualifier: 得到对应标志位的数值
     */
     int32_t GetBitNum(const int32_t bitCode) const;
+
     /*
     * Method:    BitSetZero
     * FullName:  RegisterEvent::BitSetZero
@@ -103,6 +105,7 @@ protected:
     * Qualifier: 对应标志位置0
     */
     int32_t BitSetZero(const int32_t signCode, const int32_t bitCode) const;
+
     /*
     * Method:    BitSetOne
     * FullName:  RegisterEvent::BitSetOne

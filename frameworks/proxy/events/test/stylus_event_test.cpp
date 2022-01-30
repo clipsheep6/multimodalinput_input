@@ -27,6 +27,7 @@ public:
 };
 
 StylusEvent stylusEvent;
+
 HWTEST_F(StylusEventTest, GetAction_F, TestSize.Level1)
 {
     int32_t retResult = stylusEvent.GetAction();

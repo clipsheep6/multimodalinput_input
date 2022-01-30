@@ -29,6 +29,7 @@ public:
 };
 
 TouchEvent g_touchEvent;
+
 HWTEST_F(TouchEventTest, Initialize_tmp_F, TestSize.Level1)
 {
     TouchEvent touchEventTmp;

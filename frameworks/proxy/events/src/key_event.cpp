@@ -1352,7 +1352,6 @@ const char* KeyEvent::KeyCodeToString(int32_t keyCode)
             return "KEYCODE_LAUNCHER_MENU";
         default:
             return "KEYCODE_INVALID";
-
     }
 }
 
@@ -1376,14 +1375,17 @@ bool KeyEvent::IsValidKeyItem() const
             HiLog::Error(LABEL, "keyCode is invalid");
             return false;
         }
+
         if (it->GetDownTime() <= 0) {
             HiLog::Error(LABEL, "downtime is invalid");
             return false;
         }
+        
         if (action != KEY_ACTION_UP && it->IsPressed() == false) {
             HiLog::Error(LABEL, "isPressed is invalid");
             return false;
         }
+        
         if (action == KEY_ACTION_UP && it->IsPressed() == false) {
             noPressNum++;
             if (it->GetKeyCode() != keyCode) {

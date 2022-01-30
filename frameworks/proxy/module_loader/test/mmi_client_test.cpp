@@ -79,6 +79,7 @@ HWTEST_F(MMIClientTest, SdkGetMultimodeInputInfo, TestSize.Level1)
 }
 
 MMIClientUnitTest mmiClientTest;
+
 HWTEST_F(MMIClientTest, Re_RegisterConnectedFunction, TestSize.Level1)
 {
     mmiClientTest.RegisterConnectedFunction(connectFun);
@@ -120,6 +121,7 @@ HWTEST_F(MMIClientTest, Re_OnConnected, TestSize.Level1)
 {
     mmiClientTest.OnConnectedUnitTest();
 }
+
 HWTEST_F(MMIClientTest, Re_OnConnected_002, TestSize.Level1)
 {
     ConnectCallback funTmp;

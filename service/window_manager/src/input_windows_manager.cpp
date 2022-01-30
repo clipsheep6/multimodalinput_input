@@ -48,6 +48,7 @@ OHOS::MMI::InputWindowsManager::~InputWindowsManager()
 {
     Clear();
 }
+
 /*
  * FullName:  Init
  * Returns:   bool
@@ -716,6 +717,7 @@ bool OHOS::MMI::InputWindowsManager::TpPointLogicDisplayPoint(libinput_event_tou
 
     return false;
 }
+
 const std::vector<struct LogicalDisplayInfo>& OHOS::MMI::InputWindowsManager::GetLogicalDisplayInfo() const
 {
     return logicalDisplays_;

@@ -627,8 +627,6 @@ export default {
     }
   },
 
-
-
   // touch
   touchReg() {
     let _this = this;
@@ -997,7 +995,6 @@ export default {
       return true;
     }
     _this.registerEvent('deviceAdd', _this.device.deviceAdd);
-
 
     _this.device.deviceRemove = (event) => {
       let usb = {

@@ -176,7 +176,6 @@ void ProcessingJoystickDevice::TransformRocker1Event(const JoystickEvent& joysti
     SetSynReport(inputEventArray);
 }
 
-
 void ProcessingJoystickDevice::TransformDerectionKeyEvent(const JoystickEvent& joystickEvent,
                                                           InputEventArray& inputEventArray)
 {

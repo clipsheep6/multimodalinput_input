@@ -28,6 +28,7 @@ namespace MMI {
 using EventFun = std::function<int32_t(const multimodal_libinput_event& ev)>;
 using NotifyDeviceChange = std::function<void(int32_t, int32_t, char *)>;
 class InputEventHandler : public MsgHandler<EventFun>, public DelayedSingleton<InputEventHandler> {
+
 public:
     InputEventHandler();
     virtual ~InputEventHandler() override;
@@ -38,6 +39,7 @@ public:
     int32_t OnMouseEventEndTimerHandler(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent);
     UDSServer *GetUDSServer();
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
+
 protected:
     int32_t OnEventDeviceAdded(const multimodal_libinput_event& event);
     int32_t OnEventDeviceRemoved(const multimodal_libinput_event& event);

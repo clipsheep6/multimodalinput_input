@@ -14,4 +14,3 @@ SUBSYSTEM=="tty|pnp", SUBSYSTEMS=="pnp", ATTRS{id}=="FUJ*", ENV{ID_MODEL}="Seria
 SUBSYSTEM=="tty|pnp", KERNEL=="ttyS[0-9]*", ATTRS{id}=="WACf*", TAG+="systemd", ENV{SYSTEMD_WANTS}+="wacom-inputattach@%k.service"
 
 LABEL="wacom_end"
-

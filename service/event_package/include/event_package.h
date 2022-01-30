@@ -25,6 +25,7 @@ namespace OHOS::MMI {
     class EventPackage {
         static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventPackage" };
         static constexpr uint32_t TabletPadButtonNumberPrefix = 0x100;
+
     public:
         EventPackage();
         virtual ~EventPackage();
@@ -46,6 +47,7 @@ namespace OHOS::MMI {
         static int32_t PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& key);
         static int32_t KeyboardToKeyEvent(const EventKeyboard& key, std::shared_ptr<KeyEvent> keyEventPtr);
         static std::shared_ptr<OHOS::MMI::PointerEvent> LibinputEventToPointerEvent(libinput_event *event);
+
     private:
         void PackageTabletPadOtherParams(libinput_event *event, EventTabletPad& tabletPad);
         int32_t PackageTabletToolOtherParams(libinput_event *event, EventTabletTool& tableTool);

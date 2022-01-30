@@ -28,6 +28,7 @@ public:
 };
 
 MultimodalEvent multiModalEvent;
+
 HWTEST_F(MultimodalEventTest, Initialize_001, TestSize.Level1)
 {
     int32_t windowId = 1;
@@ -73,7 +74,6 @@ HWTEST_F(MultimodalEventTest, GetUuid_003, TestSize.Level1)
 }
 
 HWTEST_F(MultimodalEventTest, GetUuid_004, TestSize.Level1)
-
 {
     std::string retResult = multiModalEvent.GetUuid();
     ASSERT_STRNE(retResult.c_str(), "three word");
@@ -205,7 +205,6 @@ HWTEST_F(MultimodalEventTest, GetUuid_L_003, TestSize.Level1)
 }
 
 HWTEST_F(MultimodalEventTest, GetUuid_L_004, TestSize.Level1)
-
 {
     std::string retResult = multiModalEvent.GetUuid();
     ASSERT_STRNE(retResult.c_str(), "wo33rd");
@@ -330,6 +329,7 @@ HWTEST_F(MultimodalEventTest, IsSameEvent_TMP_001, TestSize.Level1)
     bool retResult = multiModalEventTmp.IsSameEvent(strUuid);
     EXPECT_TRUE(retResult);
 }
+
 HWTEST_F(MultimodalEventTest, IsSameEvent_TMP_002, TestSize.Level1)
 {
     int32_t windowId = 1;

@@ -429,4 +429,3 @@ SUBSYSTEM=="usb", ATTRS{idVendor}=="298d", ATTRS{idProduct}=="2033", ATTRS{dev}=
 SUBSYSTEM=="usb", ATTRS{idVendor}=="298d", ATTRS{idProduct}=="2033", ENV{LIBFPRINT_DRIVER}="Hardcoded whitelist"
 SUBSYSTEM=="usb", ATTRS{idVendor}=="3538", ATTRS{idProduct}=="0930", ATTRS{dev}=="*", TEST=="power/control", ATTR{power/control}="auto", MODE="0660", GROUP="plugdev"
 SUBSYSTEM=="usb", ATTRS{idVendor}=="3538", ATTRS{idProduct}=="0930", ENV{LIBFPRINT_DRIVER}="Hardcoded whitelist"
-
