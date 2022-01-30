@@ -15,25 +15,25 @@
 
 #include "virtual_touch_screen.h"
 
-const std::vector<uint32_t> &VirtualTouchScreen::GetEventTypes() const
+const std::vector<uint32_t> &VirtualTouchScreen::GetEventTypes() const override
 {
     static const std::vector<uint32_t> evtTypes {EV_ABS, EV_KEY, EV_SYN};
     return evtTypes;
 }
 
-const std::vector<uint32_t> &VirtualTouchScreen::GetKeys() const
+const std::vector<uint32_t> &VirtualTouchScreen::GetKeys() const override
 {
     static const std::vector<uint32_t> keys {BTN_TOUCH};
     return keys;
 }
 
-const std::vector<uint32_t> &VirtualTouchScreen::GetProperties() const
+const std::vector<uint32_t> &VirtualTouchScreen::GetProperties() const override
 {
     static const std::vector<uint32_t> properties {INPUT_PROP_DIRECT};
     return properties;
 }
 
-const std::vector<uint32_t> &VirtualTouchScreen::GetAbs() const
+const std::vector<uint32_t> &VirtualTouchScreen::GetAbs() const override
 {
     static const std::vector<uint32_t> abs {
         ABS_X,
