@@ -96,15 +96,15 @@ void InjectionEventDispatch::HandleInjectCommandItems()
     string id = GetFunId();
     auto fun = GetFun(id);
     if (!fun) {
-        MMI_LOGE("event injection Unknown fuction id[%{public}s]", id.c_str());
+        MMI_LOGE("event injection Unknown fuction id:%{public}s", id.c_str());
         return;
     }
 
     auto ret = (*fun)();
     if (ret == RET_OK) {
-        MMI_LOGI("injecte function success id=[%{public}s]", id.c_str());
+        MMI_LOGI("injecte function success id:%{public}s", id.c_str());
     } else {
-        MMI_LOGE("injecte function faild id=[%{public}s]", id.c_str());
+        MMI_LOGE("injecte function faild id:%{public}s", id.c_str());
     }
 
     return;
@@ -160,7 +160,7 @@ void InjectionEventDispatch::Run()
     string id = GetFunId();
     auto fun = GetFun(id);
     if (!fun) {
-        MMI_LOGE("event injection Unknown fuction id[%{public}s]", id.c_str());
+        MMI_LOGE("event injection Unknown fuction id:%{public}s", id.c_str());
         return;
     }
     bool needStartSocket = GetStartSocketPermission(id);
@@ -174,9 +174,9 @@ void InjectionEventDispatch::Run()
     } else {
         ret = (*fun)();
         if (ret == RET_OK) {
-            MMI_LOGI("injecte function success id=[%{public}s]", id.c_str());
+            MMI_LOGI("injecte function success id:%{public}s", id.c_str());
         } else {
-            MMI_LOGE("injecte function faild id=[%{public}s]", id.c_str());
+            MMI_LOGE("injecte function faild id:%{public}s", id.c_str());
         }
     }
 }
@@ -188,16 +188,16 @@ int32_t InjectionEventDispatch::ExecuteFunction(string funId)
     }
     auto fun = GetFun(funId);
     if (!fun) {
-        MMI_LOGE("event injection Unknown fuction id[%{public}s]", funId.c_str());
+        MMI_LOGE("event injection Unknown fuction id:%{public}s", funId.c_str());
         return false;
     }
     int32_t ret = RET_ERR;
-    MMI_LOGI("Inject tools into function: [%{public}s]", funId.c_str());
+    MMI_LOGI("Inject tools into function:%{public}s", funId.c_str());
     ret = (*fun)();
     if (ret == RET_OK) {
-        MMI_LOGI("injecte function success id=[%{public}s]", funId.c_str());
+        MMI_LOGI("injecte function success id:%{public}s", funId.c_str());
     } else {
-        MMI_LOGE("injecte function faild id=[%{public}s]", funId.c_str());
+        MMI_LOGE("injecte function faild id:%{public}s", funId.c_str());
     }
 
     return ret;
@@ -457,7 +457,7 @@ int32_t InjectionEventDispatch::OnHdiHot()
         MMI_LOGE("hdi hot plug to server error.");
         return RET_OK;
     }
-    MMI_LOGI("On hdi hot SendMsg......");
+    MMI_LOGI("On hdi hot SendMsg.");
     return RET_OK;
 }
 
@@ -496,13 +496,13 @@ int32_t InjectionEventDispatch::GetDeviceStatus(const string &deviceStatusText)
 int32_t InjectionEventDispatch::OnSendEvent()
 {
     if (injectArgvs_.size() != SEND_EVENT_ARGV_COUNTS) {
-        MMI_LOGE("Wrong number of input parameters! errCode:%d", PARAM_INPUT_FAIL);
+        MMI_LOGE("Wrong number of input parameters! errCode:%{public}d", PARAM_INPUT_FAIL);
         return RET_ERR;
     }
 
     string deviceNode = injectArgvs_[SEND_EVENT_DEV_NODE_INDEX];
     if (deviceNode.empty()) {
-        MMI_LOGE("device node:%s is not exit.", deviceNode.c_str());
+        MMI_LOGE("device node:%{public}s is not exit", deviceNode.c_str());
         return RET_ERR;
     }
     timeval tm;
@@ -516,7 +516,7 @@ int32_t InjectionEventDispatch::OnSendEvent()
 
     int32_t fd = open(deviceNode.c_str(), O_RDWR);
     if (fd < 0) {
-        MMI_LOGE("open device node:%s faild.", deviceNode.c_str());
+        MMI_LOGE("open device node:%{public}s faild", deviceNode.c_str());
         return RET_ERR;
     }
     write(fd, &event, sizeof(event));
