@@ -29,33 +29,9 @@ void TouchEvent::Initialize(MultimodalProperty &multiProperty,
     touchProperty_.multimodalEvent = touchProperty.multimodalEvent;
 }
 
-bool TouchEvent::Marshalling(Parcel &parcel) const
+bool TouchEvent::MarshallingSupplement(Parcel &parcel) const
 {
     bool result = parcel.WriteInt32(manipulationProperty_.startTime);
-    if (!result) {
-        return result;
-    }
-    result = parcel.WriteInt32(manipulationProperty_.operationState);
-    if (!result) {
-        return result;
-    }
-    result = parcel.WriteInt32(manipulationProperty_.pointerCount);
-    if (!result) {
-        return result;
-    }
-    result = parcel.WriteInt32(manipulationProperty_.pointerId);
-    if (!result) {
-        return result;
-    }
-    result = parcel.WriteFloat(manipulationProperty_.mp.px_);
-    if (!result) {
-        return result;
-    }
-    result = parcel.WriteFloat(manipulationProperty_.mp.py_);
-    if (!result) {
-        return result;
-    }
-    result = parcel.WriteFloat(manipulationProperty_.mp.pz_);
     if (!result) {
         return result;
     }
@@ -93,6 +69,40 @@ bool TouchEvent::Marshalling(Parcel &parcel) const
             return result;
         }
     }
+    return result;
+}
+
+bool TouchEvent::Marshalling(Parcel &parcel) const
+{
+    bool result = parcel.WriteInt32(manipulationProperty_.startTime);
+    if (!result) {
+        return result;
+    }
+    result = parcel.WriteInt32(manipulationProperty_.operationState);
+    if (!result) {
+        return result;
+    }
+    result = parcel.WriteInt32(manipulationProperty_.pointerCount);
+    if (!result) {
+        return result;
+    }
+    result = parcel.WriteInt32(manipulationProperty_.pointerId);
+    if (!result) {
+        return result;
+    }
+    result = parcel.WriteFloat(manipulationProperty_.mp.px_);
+    if (!result) {
+        return result;
+    }
+    result = parcel.WriteFloat(manipulationProperty_.mp.py_);
+    if (!result) {
+        return result;
+    }
+    result = parcel.WriteFloat(manipulationProperty_.mp.pz_);
+    if (!result) {
+        return result;
+    }
+    result = MarshallingSupplement(parcel);
     return result;
 }
 
