@@ -71,9 +71,9 @@ bool OHOS::MMI::InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<Pointer
     }
     PointerEvent::PointerItem pointer;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer);
-    MMI_LOGT("interceptor-servereventTouchpad:actionTime:%{public},"
-             "sourceType:%{public},pointerAction:%{public},"
-             "pointerId:%{public},point.x:%{public},point.y:%{public},press:%{public}",
+    MMI_LOGT("interceptor-servereventTouchpad:actionTime:%{public}d,"
+             "sourceType:%{public}d,pointerAction:%{public}d,"
+             "pointerId:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
              pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
              pointerEvent->GetPointerId(), pointer.GetGlobalX(), pointer.GetGlobalY(), pointer.IsPressed());
     NetPacket newPkt(MmiMessageId::TOUCHPAD_EVENT_INTERCEPTOR);
