@@ -34,7 +34,7 @@ const bool REGISTER_RESULT =
 int32_t MultimodalInputConnectService::AllocSocketFd(const std::string &programName, const int moduleType,
                                                      int &toReturnClientFd)
 {
-    MMI_LOGI("MultimodalInputConnectService::AllocSocketFd enter, programName: %{public}s, moduleType: %{public}d",
+    MMI_LOGI("MultimodalInputConnectService::AllocSocketFd enter, programName:%{public}s,moduleType:%{public}d",
              programName.c_str(), moduleType);
     if (udsServer_ == nullptr) {
         MMI_LOGE("called, udsServer_ is nullptr.");
@@ -50,7 +50,7 @@ int32_t MultimodalInputConnectService::AllocSocketFd(const std::string &programN
         return RET_ERR;
     }
 
-    MMI_LOGIK("leave, programName: %{public}s, moduleType: %{public}d, alloc success.",
+    MMI_LOGIK("leave, programName:%{public}s,moduleType:%{public}d, alloc success.",
         programName.c_str(), moduleType);
 
     return RET_OK;
@@ -122,7 +122,7 @@ int32_t MultimodalInputConnectService::HandleAllocSocketFd(MessageParcel& data, 
         return RET_ERR;
     }
 
-    MMI_LOGIK("clientName = %{public}s, moduleId = %{public}d", req->data.clientName.c_str(), req->data.moduleId);
+    MMI_LOGIK("clientName:%{public}s,moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
     if (!IsAuthorizedCalling()) {
         MMI_LOGE("permission denied");
         return RET_ERR;
