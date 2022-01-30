@@ -15,6 +15,107 @@
 
 #include "key_event_handler.h"
 
+static napi_value InjectEventAsync(napi_env env, struct AsyncCallbackInfo *asyncCallbackInfo,
+    napi_value args, int32_t ret)
+{
+    napi_create_reference(env, args[1], 1, &asyncCallbackInfo->callback[0]);
+    if (ret != 0) {
+        asyncCallbackInfo->callbackData = GetNapiInt32_t(-1, env);
+        EmitAsyncCallbackWork(env, asyncCallbackInfo);
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+    napi_value isPressed, keyCode, keyDownDuration;
+    napi_get_named_property(env, eventObject, "isPressed", &isPressed);
+    napi_get_named_property(env, eventObject, "keyDownDuration", &keyDownDuration);
+    napi_get_named_property(env, eventObject, "keyCode", &keyCode);
+    if (IsMatchType(isPressed, napi_boolean, env) || IsMatchType(keyCode, napi_number, env)
+        || IsMatchType(keyDownDuration, napi_number, env)) {
+        asyncCallbackInfo->callbackData = GetNapiInt32_t(-1, env);
+        EmitAsyncCallbackWork(env, asyncCallbackInfo);
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+    OHOS::KeyProperty keyProperty = {
+        .isPressed = GetCppBool(isPressed, env),
+        .keyCode = GetCppInt32_t(keyCode, env),
+        .keyDownDuration = GetCppInt32_t(keyDownDuration, env),
+    };
+    OHOS::MultimodalProperty multimodalProperty {
+        .highLevelEvent = 1,
+        .uuid = "11111",
+        .sourceType = 1,
+        .occurredTime = 1,
+        .deviceId = "11111",
+        .inputDeviceId = 1,
+        .isHighLevelEvent = true,
+    };
+    OHOS::sptr<OHOS::KeyEvent> event = new OHOS::KeyEvent();
+    event->Initialize(multimodalProperty, keyProperty);
+    std::shared_ptr<OHOS::InjectManager> injectManager = OHOS::InjectManager::GetInstance();
+    bool isSucceed = injectManager->InjectEvent(event);
+    if (!isSucceed) {
+        asyncCallbackInfo->callbackData = GetNapiInt32_t(-1, env);
+        EmitAsyncCallbackWork(env, asyncCallbackInfo);
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+}
+
+static napi_value InjectEventPromise(napi_env env, struct AsyncCallbackInfo *asyncCallbackInfo, napi_deferred deferred,
+    napi_value promise, int32_t ret)
+{
+    NAPI_CALL(env, napi_create_promise(env, &deferred, &promise));
+    asyncCallbackInfo->deferred = deferred;
+    if (ret != 0) {
+        asyncCallbackInfo->callbackData = GetNapiInt32_t(-1, env);
+        EmitPromiseWork(env, asyncCallbackInfo);
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+    napi_value isPressed, keyCode, keyDownDuration;
+    napi_get_named_property(env, eventObject, "isPressed", &isPressed);
+    napi_get_named_property(env, eventObject, "keyDownDuration", &keyDownDuration);
+    napi_get_named_property(env, eventObject, "keyCode", &keyCode);
+    if (IsMatchType(isPressed, napi_boolean, env) || IsMatchType(keyCode, napi_number, env)
+        || IsMatchType(keyDownDuration, napi_number, env)) {
+        asyncCallbackInfo->callbackData = GetNapiInt32_t(-1, env);
+        EmitPromiseWork(env, asyncCallbackInfo);
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+    OHOS::KeyProperty keyProperty = {
+        .isPressed = GetCppBool(isPressed, env),
+        .keyCode = GetCppInt32_t(keyCode, env),
+        .keyDownDuration = GetCppInt32_t(keyDownDuration, env),
+    };
+    OHOS::MultimodalProperty multimodalProperty {
+        .highLevelEvent = 1,
+        .uuid = "11111",
+        .sourceType = 1,
+        .occurredTime = 1,
+        .deviceId = "11111",
+        .inputDeviceId = 1,
+        .isHighLevelEvent = true,
+    };
+    OHOS::sptr<OHOS::KeyEvent> event = new OHOS::KeyEvent();
+    event->Initialize(multimodalProperty, keyProperty);
+    std::shared_ptr<OHOS::InjectManager> injectManager = OHOS::InjectManager::GetInstance();
+    bool isSucceed = injectManager->InjectEvent(event);
+    if (!isSucceed) {
+        asyncCallbackInfo->callbackData = GetNapiInt32_t(-1, env);
+        EmitPromiseWork(env, asyncCallbackInfo);
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+}
+
 static napi_value InjectEvent(napi_env env, napi_callback_info info)
 {
     size_t argc = 2;
@@ -30,51 +131,7 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
         .deferred = nullptr,
     };
     if (argc >= 1) {
-        napi_create_reference(env, args[1], 1, &asyncCallbackInfo->callback[0]);
-        if (ret != 0) {
-            asyncCallbackInfo->callbackData = GetNapiInt32_t(-1, env);
-            EmitAsyncCallbackWork(env, asyncCallbackInfo);
-            napi_value undefined;
-            napi_get_undefined(env, &undefined);
-            return undefined;
-        }
-        napi_value isPressed, keyCode, keyDownDuration;
-        napi_get_named_property(env, eventObject, "isPressed", &isPressed);
-        napi_get_named_property(env, eventObject, "keyDownDuration", &keyDownDuration);
-        napi_get_named_property(env, eventObject, "keyCode", &keyCode);
-        if (IsMatchType(isPressed, napi_boolean, env) || IsMatchType(keyCode, napi_number, env)
-            || IsMatchType(keyDownDuration, napi_number, env)) {
-            asyncCallbackInfo->callbackData = GetNapiInt32_t(-1, env);
-            EmitAsyncCallbackWork(env, asyncCallbackInfo);
-            napi_value undefined;
-            napi_get_undefined(env, &undefined);
-            return undefined;
-        }
-        OHOS::KeyProperty keyProperty = {
-            .isPressed = GetCppBool(isPressed, env),
-            .keyCode = GetCppInt32_t(keyCode, env),
-            .keyDownDuration = GetCppInt32_t(keyDownDuration, env),
-        };
-        OHOS::MultimodalProperty multimodalProperty {
-            .highLevelEvent = 1,
-            .uuid = "11111",
-            .sourceType = 1,
-            .occurredTime = 1,
-            .deviceId = "11111",
-            .inputDeviceId = 1,
-            .isHighLevelEvent = true,
-        };
-        OHOS::sptr<OHOS::KeyEvent> event = new OHOS::KeyEvent();
-        event->Initialize(multimodalProperty, keyProperty);
-        std::shared_ptr<OHOS::InjectManager> injectManager = OHOS::InjectManager::GetInstance();
-        bool isSucceed = injectManager->InjectEvent(event);
-        if (!isSucceed) {
-            asyncCallbackInfo->callbackData = GetNapiInt32_t(-1, env);
-            EmitAsyncCallbackWork(env, asyncCallbackInfo);
-            napi_value undefined;
-            napi_get_undefined(env, &undefined);
-            return undefined;
-        }
+        InjectEventAsync(env, asyncCallbackInfo, args, ret);
         asyncCallbackInfo->callbackData = GetNapiInt32_t(0, env);
         EmitAsyncCallbackWork(env, asyncCallbackInfo);
         napi_value undefined;
@@ -83,55 +140,15 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     } else {
         napi_deferred deferred;
         napi_value promise;
-        NAPI_CALL(env, napi_create_promise(env, &deferred, &promise));
-        asyncCallbackInfo->deferred = deferred;
-        if (ret != 0) {
-            asyncCallbackInfo->callbackData = GetNapiInt32_t(-1, env);
-            EmitPromiseWork(env, asyncCallbackInfo);
-            napi_value undefined;
-            napi_get_undefined(env, &undefined);
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        if (InjectEventPromise(env, asyncCallbackInfo, deferred, promise, ret) == undefined) {
             return undefined;
-        }
-        napi_value isPressed, keyCode, keyDownDuration;
-        napi_get_named_property(env, eventObject, "isPressed", &isPressed);
-        napi_get_named_property(env, eventObject, "keyDownDuration", &keyDownDuration);
-        napi_get_named_property(env, eventObject, "keyCode", &keyCode);
-        if (IsMatchType(isPressed, napi_boolean, env) || IsMatchType(keyCode, napi_number, env)
-            || IsMatchType(keyDownDuration, napi_number, env)) {
-            asyncCallbackInfo->callbackData = GetNapiInt32_t(-1, env);
+        } else {
+            asyncCallbackInfo->callbackData = GetNapiInt32_t(0, env);
             EmitPromiseWork(env, asyncCallbackInfo);
-            napi_value undefined;
-            napi_get_undefined(env, &undefined);
-            return undefined;
+            return promise;
         }
-        OHOS::KeyProperty keyProperty = {
-            .isPressed = GetCppBool(isPressed, env),
-            .keyCode = GetCppInt32_t(keyCode, env),
-            .keyDownDuration = GetCppInt32_t(keyDownDuration, env),
-        };
-        OHOS::MultimodalProperty multimodalProperty {
-            .highLevelEvent = 1,
-            .uuid = "11111",
-            .sourceType = 1,
-            .occurredTime = 1,
-            .deviceId = "11111",
-            .inputDeviceId = 1,
-            .isHighLevelEvent = true,
-        };
-        OHOS::sptr<OHOS::KeyEvent> event = new OHOS::KeyEvent();
-        event->Initialize(multimodalProperty, keyProperty);
-        std::shared_ptr<OHOS::InjectManager> injectManager = OHOS::InjectManager::GetInstance();
-        bool isSucceed = injectManager->InjectEvent(event);
-        if (!isSucceed) {
-            asyncCallbackInfo->callbackData = GetNapiInt32_t(-1, env);
-            EmitPromiseWork(env, asyncCallbackInfo);
-            napi_value undefined;
-            napi_get_undefined(env, &undefined);
-            return undefined;
-        }
-        asyncCallbackInfo->callbackData = GetNapiInt32_t(0, env);
-        EmitPromiseWork(env, asyncCallbackInfo);
-        return promise;
     }
 }
 

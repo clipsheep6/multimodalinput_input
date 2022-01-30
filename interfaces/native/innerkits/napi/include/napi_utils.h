@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#ifndef NAPI_UTILS_H
+#define NAPI_UTILS_H
+
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 
@@ -24,12 +27,13 @@ struct AsyncCallbackInfo {
     napi_value callbackData;
 };
 
-#define EVENT_INVALID_PARAMETER (-1);
-#define EVENT_OK 0;
-int32_t IsMatchType(napi_value value, napi_valuetype type, napi_env env);
-napi_value GetNapiInt32_t(int32_t number, napi_env env);
-int32_t GetCppInt32_t(napi_value value, napi_env env);
-bool GetCppBool(napi_value value, napi_env env);
-void EmitAsyncCallbackWork(napi_env env, AsyncCallbackInfo *async_callback_info);
-void EmitPromiseWork(napi_env env, AsyncCallbackInfo *asyncCallbackInfo);
+#define EVENT_INVALID_PARAMETER (-1)
+#define EVENT_OK 0
+static int32_t IsMatchType(napi_value value, napi_valuetype type, napi_env env);
+static napi_value GetNapiInt32_t(int32_t number, napi_env env);
+static int32_t GetCppInt32_t(napi_value value, napi_env env);
+static bool GetCppBool(napi_value value, napi_env env);
+static void EmitAsyncCallbackWork(napi_env env, AsyncCallbackInfo *async_callback_info);
+static void EmitPromiseWork(napi_env env, AsyncCallbackInfo *asyncCallbackInfo);
 
+#endif  // NAPI_UTILS_H
