@@ -248,7 +248,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRegisterMsgHandler(SessionPtr sess, NetPa
     pkt >> eventType >> abilityId >> winId >> bundlerName >> appName;
     RegEventHM->RegisterEvent(eventType, fd);
     if (winId > 0) {
-        AppRegs->RegisterAppInfoforServer({abilityId, winId, fd, bundlerName, appName});
+        AppRegs->RegisterAppInfoforServer({ abilityId, winId, fd, bundlerName, appName });
     }
     MMI_LOGD("OnRegisterMsgHandler fd:%{public}d,eventType:%{public}d"
              "bundlerName:%{public}s,appName:%{public}s",
@@ -471,11 +471,11 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
     }
 #endif
 #ifdef DEBUG_CODE_TEST
-    MMI_LOGT("4.event dispatcher of server:eventKeyboard:time:%{puiblic}" PRId64 ",sourceType:%{puiblic}d,key:%{puiblic}u,"
-             "seat_key_count:%{puiblic}u,state:%{puiblic}d,fd:%{puiblic}d,abilityId:%{puiblic}d,"
-             "windowId:%{puiblic}s(%{public}d)",
-             key.time, LIBINPUT_EVENT_KEYBOARD_KEY, key.key, key.seat_key_count, key.state, appInfo.fd,
-             appInfo.abilityId, WinMgr->GetSurfaceIdListString().c_str(), focusId);
+    MMI_LOGT("4.event dispatcher of server:eventKeyboard:time:%{puiblic}" PRId64
+        ",sourceType:%{puiblic}d,key:%{puiblic}u,seat_key_count:%{puiblic}u,state:%{puiblic}d,"
+        "fd:%{puiblic}d,abilityId:%{puiblic}d,windowId:%{puiblic}s(%{public}d)",
+        key.time, LIBINPUT_EVENT_KEYBOARD_KEY, key.key, key.seat_key_count, key.state, appInfo.fd,
+        appInfo.abilityId, WinMgr->GetSurfaceIdListString().c_str(), focusId);
 #endif
 
     if (AppRegs->IsMultimodeInputReady(MmiMessageId::ON_KEY, appInfo.fd, key.time)) {

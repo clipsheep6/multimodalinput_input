@@ -805,8 +805,7 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
     int32_t handlerId { };
     InputHandlerType handlerType { };
     pkt >> handlerId >> handlerType;
-    MMI_LOGD("Client handlerId:%{public}d,handlerType:%{public}d", handlerId, handlerType); 
-
+    MMI_LOGD("Client handlerId:%{public}d,handlerType:%{public}d", handlerId, handlerType);
     auto pointerEvent { PointerEvent::Create() };
     if (InputEventDataTransformation::DeserializePointerEvent(false, pointerEvent, pkt) != ERR_OK) {
         MMI_LOGE("Failed to deserialize pointer event");

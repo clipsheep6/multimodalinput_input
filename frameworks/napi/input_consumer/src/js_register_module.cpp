@@ -119,7 +119,7 @@ static napi_value GetEventInfo(napi_env env, napi_callback_info info, KeyEventMo
     return result;
 }
 
-static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent){
+static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent) {
     MMI_LOGD("enter");
     auto keyOption = monitorInfo->keyOption;
     std::vector<int32_t> infoPreKeys = keyOption->GetPreKeys();
@@ -202,7 +202,7 @@ bool CheckPara(std::shared_ptr<KeyOption> keyOption)
             MMI_LOGE("preKey:%{public}d is less 0, can not process", preKeys[i]);
             return false;
         }
-        if (std::find(checkRepeat.begin(), checkRepeat.end(), preKeys[i]) != checkRepeat.end()){
+        if (std::find(checkRepeat.begin(), checkRepeat.end(), preKeys[i]) != checkRepeat.end()) {
             MMI_LOGE("preKey is repeat, can not process");
             return false;
         }
