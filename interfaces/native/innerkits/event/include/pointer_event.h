@@ -183,6 +183,7 @@ public:
     bool IsButtonPressed(int buttonId) const;
     void SetButtonPressed(int buttonId);
     void DeleteReleaseButton(int buttonId);
+    void ClearButtonPressed();
 
     // Get all Pointers in the current pointer event
     std::vector<int32_t> GetPointersIdList() const;
@@ -199,10 +200,10 @@ public:
     void SetAxisValue(AxisType axis, double axisValue);
     bool HasAxis(AxisType axis) const;
     int32_t GetAxes() const;
-    
+
     void SetPressedKeys(const std::vector<int32_t> pressedKeys);
     std::vector<int32_t> GetPressedKeys() const;
-    
+
     bool IsValidCheckMouseFunc() const;
     bool IsValidCheckMouse() const;
     bool IsValidCheckTouchFunc() const;
