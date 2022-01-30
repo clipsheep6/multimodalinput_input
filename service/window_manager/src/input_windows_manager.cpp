@@ -873,7 +873,6 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
              "globalX is:%{public}d,globalY:%{public}d,localX:%{public}d,localY:%{public}d",
              static_cast<int32_t>(size.size()), focusWindow->pid, fd,
              globalX, globalY, pointerItem.GetLocalX(), pointerItem.GetLocalY());
->>>>>>> bdf16606c123903b9ddcaa26f4b82bd980ed9356
     return fd;
 }
 
