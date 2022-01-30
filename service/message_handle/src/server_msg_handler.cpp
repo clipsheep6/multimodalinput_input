@@ -124,12 +124,12 @@ void OHOS::MMI::ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
     OHOS::MMI::TimeCostChk chk("ServerMsgHandler::OnMsgHandler", "overtime 300(us)", MAX_OVER_TIME, id);
     auto fun = GetFun(id);
     if (!fun) {
-        MMI_LOGE("ServerMsgHandler::OnMsgHandler Unknown msg id[%{public}d]. errCode:%{public}d", id, UNKNOWN_MSG_ID);
+        MMI_LOGE("ServerMsgHandler::OnMsgHandler Unknown msg id:%{public}d,errCode:%{public}d", id, UNKNOWN_MSG_ID);
         return;
     }
     auto ret = (*fun)(sess, pkt);
     if (ret < 0) {
-        MMI_LOGE("ServerMsgHandler::OnMsgHandler Msg handling failed. id[%{public}d] errCode:%{public}d", id, ret);
+        MMI_LOGE("ServerMsgHandler::OnMsgHandler Msg handling failed. id:%{public}d,errCode:%{public}d", id, ret);
     }
 }
 
@@ -156,12 +156,12 @@ int32_t OHOS::MMI::ServerMsgHandler::OnSeniorInputFuncProc(SessionPtr SessionPtr
             } else if (devType == INPUT_DEVICE_CAP_KNUCKLE) {
                 ptr = SeniorInputFuncProcBase::Create<KnuckleFuncProc>();
             } else {
-                MMI_LOGE("unknown devType: %{public}d. replyCode: %{public}d.", devType, processResult);
+                MMI_LOGE("unknown devType:%{public}d,replyCode:%{public}d", devType, processResult);
                 break;
             }
 
             if (ptr == nullptr) {
-                MMI_LOGE("ptr is null, devType: %{public}d. replyCode: %{public}d.", devType, processResult);
+                MMI_LOGE("ptr is null, devType:%{public}d,replyCode:%{public}d", devType, processResult);
                 break;
             }
 
@@ -169,25 +169,25 @@ int32_t OHOS::MMI::ServerMsgHandler::OnSeniorInputFuncProc(SessionPtr SessionPtr
         } else if (msgType == MSG_TYPE_DEVICE_INFO) {
             RawInputEvent seniorInputEvent = {};
             pkt >> seniorInputEvent;
-            MMI_LOGD("recived data: type = %{public}d,code = %{public}d,value = %{public}d.",
+            MMI_LOGD("recived data: type:%{puiblic}d,code:%{puiblic}d,value:%{puiblic}d.",
                      seniorInputEvent.ev_type, seniorInputEvent.ev_code, seniorInputEvent.ev_value);
             processResult = seniorInput_->DeviceEventDispatch(fd, seniorInputEvent);
         } else {
-            MMI_LOGE("unknown msgType: %{public}d. replyCode: %{public}d.", msgType, processResult);
+            MMI_LOGE("unknown msgType:%{puiblic}d,replyCode:%{puiblic}d", msgType, processResult);
         }
     } while (0);
 
     if (processResult) {
         MMI_LOGI("process success");
     } else {
-        MMI_LOGE("process fail, fd: %{public}d, msgType: %{public}d, processResult: %{public}d.",
+        MMI_LOGE("process fail, fd:%{puiblic}d,msgType:%{puiblic}d,processResult:%{puiblic}d.",
                  fd, msgType, processResult);
     }
 
     const int responseCode = seniorInput_->ReplyMessage(SessionPtr, processResult);
     if (responseCode == RET_ERR) {
-        MMI_LOGW("reply msg to client fail, fd: %{public}d, msgType: %{public}d,"
-                 " processResult: %{public}d, replyCode: %{public}d.",
+        MMI_LOGW("reply msg to client fail, fd:%{puiblic}d,msgType:%{puiblic}d,"
+                 "processResult:%{puiblic}d,replyCode:%{puiblic}d",
                  fd, msgType, processResult, responseCode);
         return responseCode;
     }
@@ -231,7 +231,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRegisterAppInfo(SessionPtr sess, NetPacke
     WinMgr->SetFocusSurfaceId(windowId);
     WinMgr->SetTouchFocusSurfaceId(windowId);
 #endif
-    MMI_LOGD("OnRegisterAppInfo fd:%{public}d bundlerName:%{public}s "
+    MMI_LOGD("OnRegisterAppInfo fd:%{public}d,bundlerName:%{public}s"
         "appName:%{public}s", fd, bundlerName.c_str(), appName.c_str());
     return RET_OK;
 }
@@ -250,8 +250,8 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRegisterMsgHandler(SessionPtr sess, NetPa
     if (winId > 0) {
         AppRegs->RegisterAppInfoforServer({abilityId, winId, fd, bundlerName, appName});
     }
-    MMI_LOGD("OnRegisterMsgHandler fd:%{public}d eventType:%{public}d"
-             " bundlerName:%{public}s appName:%{public}s",
+    MMI_LOGD("OnRegisterMsgHandler fd:%{public}d,eventType:%{public}d"
+             "bundlerName:%{public}s,appName:%{public}s",
              fd, eventType, bundlerName.c_str(), appName.c_str());
     return RET_OK;
 }
@@ -290,11 +290,11 @@ int32_t OHOS::MMI::ServerMsgHandler::OnVirtualKeyEvent(SessionPtr sess, NetPacke
     VirtualKey virtualKeyEvent;
     pkt >> virtualKeyEvent;
     if (virtualKeyEvent.keyCode == HOS_KEY_HOME) {
-        MMI_LOGD(" home press");
+        MMI_LOGD("home press");
     } else if (virtualKeyEvent.keyCode == HOS_KEY_BACK) {
-        MMI_LOGD(" back press");
+        MMI_LOGD("back press");
     } else if (virtualKeyEvent.keyCode == HOS_KEY_VIRTUAL_MULTITASK) {
-        MMI_LOGD(" multitask press");
+        MMI_LOGD("multitask press");
     }
     return RET_OK;
 }
@@ -330,9 +330,9 @@ int32_t OHOS::MMI::ServerMsgHandler::CheckReplyMessageFormClient(SessionPtr sess
     MMIEventDump->InsertFormat("MsgDump: msgId=%d fd=%d inputExpendTime=%llu(us) westonExpendTime=%d(us) "
                                "serverExpendTime=%d(us) clientExpendTime=%d(us) allTime=%d(us)", idMsg, fd,
                                waitData.inputTime, westonExpendTime, serverExpendTime, clientExpendTime, allTime);
-    MMI_LOGT("CheckReplyMessageFormClient msgId=%{public}d fd=%{public}d inputExpendTime=%{public}" PRIu64 "(us) "
-             "westonExpendTime=%{public}d(us) serverExpendTime=%{public}d(us) clientExpendTime=%{public}d(us) "
-             "allTime=%{public}d(us)", idMsg, fd, waitData.inputTime, westonExpendTime, serverExpendTime,
+    MMI_LOGT("CheckReplyMessageFormClient msgId:%{puiblic}d,fd:%{puiblic}d,inputExpendTime:%{puiblic}" PRIu64 "(us),"
+             "westonExpendTime:%{puiblic}d(us),serverExpendTime:%{puiblic}d(us),clientExpendTime:%{puiblic}d(us),"
+             "allTime:%{puiblic}d(us)", idMsg, fd, waitData.inputTime, westonExpendTime, serverExpendTime,
              clientExpendTime, allTime);
     return RET_OK;
 }
@@ -375,7 +375,7 @@ int32_t OHOS::MMI::ServerMsgHandler::GetMultimodeInputInfo(SessionPtr sess, NetP
         NetPacket pktAck(MmiMessageId::GET_MMI_INFO_ACK);
         pktAck << tagPackHeadAck;
         if (!udsServer_->SendMsg(fd, pktAck)) {
-            MMI_LOGE("Sending message failed ");
+            MMI_LOGE("Sending message failed");
             return MSG_SEND_FAIL;
         }
     }
@@ -397,7 +397,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnNewInjectKeyEvent(SessionPtr sess, NetPac
 
     if (nPtr->HasFlag(OHOS::MMI::InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
         if (INTERCEPTORMANAGERGLOBAL.OnKeyEvent(nPtr)) {
-            MMI_LOGD("keyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d",
+            MMI_LOGD("keyEvent filter find a keyEvent from Original event keyCode:%{puiblic}d",
                 nPtr->GetKeyCode());
             return RET_OK;
         }
@@ -405,10 +405,10 @@ int32_t OHOS::MMI::ServerMsgHandler::OnNewInjectKeyEvent(SessionPtr sess, NetPac
 
     auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, nPtr, preHandlerTime);
     if (eventDispatchResult != RET_OK) {
-        MMI_LOGE("Key event dispatch failed... ret:%{public}d errCode:%{public}d",
+        MMI_LOGE("Key event dispatch failed. ret:%{public}d,errCode:%{public}d",
             eventDispatchResult, KEY_EVENT_DISP_FAIL);
     }
-    MMI_LOGD("Inject keyCode = %{public}d,action = %{public}d", nPtr->GetKeyCode(), nPtr->GetKeyAction());
+    MMI_LOGD("Inject keyCode:%{puiblic}d,action:%{puiblic}d", nPtr->GetKeyCode(), nPtr->GetKeyAction());
     return RET_OK;
 }
 
@@ -433,8 +433,8 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
         MMI_LOGE("keyCode is invalid");
         return RET_ERR;
     }
-    MMI_LOGT("time:%{public}u,keycode:%{public}u,state:%{public}u,\
-        isIntercepted:%{public}d", event.keyDownDuration, event.keyCode,
+    MMI_LOGT("time:%{public}u,keycode:%{public}u,state:%{public}u,"
+        "isIntercepted:%{public}d", event.keyDownDuration, event.keyCode,
         event.isPressed, event.isIntercepted);
     EventKeyboard key = {};
     auto packageResult = EventPackage::PackageVirtualKeyEvent(event, key);
@@ -444,7 +444,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
 
     if (event.isIntercepted) {
         if (ServerKeyFilter->OnKeyEvent(key)) {
-            MMI_LOGD("key event filter find a  key event from Original event  keyCode : %{puiblic}d", key.key);
+            MMI_LOGD("key event filter find a  key event from Original event. keyCode:%{puiblic}d", key.key);
             return RET_OK;
         }
     }
@@ -454,7 +454,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
     EventPackage::KeyboardToKeyEvent(key, keyEvent_);
     auto eventDispatchResult = eventDispatch_.DispatchKeyEventByPid(*udsServer_, keyEvent_, preHandlerTime);
     if (eventDispatchResult != RET_OK) {
-        MMI_LOGE("Key event dispatch failed... ret:%{public}d errCode:%{public}d",
+        MMI_LOGE("Key event dispatch failed. ret:%{public}d,errCode:%{public}d",
                  eventDispatchResult, KEY_EVENT_DISP_FAIL);
     }
     int32_t focusId = WinMgr->GetFocusSurfaceId();
@@ -466,14 +466,14 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
 #ifdef DEBUG_CODE_TEST
     int32_t pid = udsServer_->GetPidByFd(appInfo.fd);
     if (pid != RET_ERR) {
-        MMI_LOGT("Inject keyCode = %{public}d,action = %{public}d,focusPid = %{public}d",
+        MMI_LOGT("Inject keyCode:%{puiblic}d,action:%{puiblic}d,focusPid:%{puiblic}d",
             key.key, key.state, pid);
     }
 #endif
 #ifdef DEBUG_CODE_TEST
-    MMI_LOGT("4.event dispatcher of server:eventKeyboard:time=%{public}" PRId64 ";sourceType=%{public}d;key=%{public}u;"
-             "seat_key_count=%{public}u;state=%{public}d;fd=%{public}d;abilityId=%{public}d;"
-             "windowId=%{public}s(%{public}d).*******************************************************",
+    MMI_LOGT("4.event dispatcher of server:eventKeyboard:time:%{puiblic}" PRId64 ",sourceType:%{puiblic}d,key:%{puiblic}u,"
+             "seat_key_count:%{puiblic}u,state:%{puiblic}d,fd:%{puiblic}d,abilityId:%{puiblic}d,"
+             "windowId:%{puiblic}s(%{public}d)",
              key.time, LIBINPUT_EVENT_KEYBOARD_KEY, key.key, key.seat_key_count, key.state, appInfo.fd,
              appInfo.abilityId, WinMgr->GetSurfaceIdListString().c_str(), focusId);
 #endif
@@ -491,7 +491,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket
 
 int32_t OHOS::MMI::ServerMsgHandler::OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt)
 {
-    MMI_LOGD("Inject-pointer-event received, processing ...");
+    MMI_LOGD("Inject-pointer-event received, processing");
     auto pointerEvent = OHOS::MMI::PointerEvent::Create();
     CHKR((RET_OK == InputEventDataTransformation::DeserializePointerEvent(false, pointerEvent, pkt)),
         STREAM_BUF_READ_FAIL, RET_ERR);
@@ -645,7 +645,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnAddInputHandler(SessionPtr sess, NetPacke
     int32_t handlerId { };
     InputHandlerType handlerType { };
     pkt >> handlerId >> handlerType;
-    MMI_LOGD("OnAddInputHandler handlerId : %{public}d handlerType : %{public}d", handlerId, handlerType);
+    MMI_LOGD("OnAddInputHandler handlerId:%{puiblic}d,handlerType:%{puiblic}d", handlerId, handlerType);
     InputHandlerManagerGlobal::GetInstance().AddInputHandler(handlerId, handlerType, sess);
     return RET_OK;
 }
@@ -655,7 +655,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, NetPa
     int32_t handlerId { };
     InputHandlerType handlerType { };
     pkt >> handlerId >> handlerType;
-    MMI_LOGD("OnRemoveInputHandler handlerId : %{public}d handlerType : %{public}d", handlerId, handlerType);
+    MMI_LOGD("OnRemoveInputHandler handlerId:%{puiblic}d,handlerType:%{puiblic}d", handlerId, handlerType);
     InputHandlerManagerGlobal::GetInstance().RemoveInputHandler(handlerId, handlerType, sess);
     return RET_OK;
 }
