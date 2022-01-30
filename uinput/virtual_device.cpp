@@ -29,7 +29,7 @@ namespace {
 using namespace OHOS::HiviewDFX;
 constexpr HiLogLabel LABEL = { LOG_CORE, 0xD002800, "VirtualDevice" };
 }
-bool DoIoctl(int32_t fd, int32_t request, const uint32_t value)
+static bool DoIoctl(int32_t fd, int32_t request, const uint32_t value)
 {
     int32_t rc = ioctl(fd, request, value);
     if (rc < 0) {
@@ -73,39 +73,9 @@ bool VirtualDevice::SetUp()
     dev_.id.vendor = vendorId_;
     dev_.id.product = productId_;
     dev_.id.version = version_;
-    for (uint32_t evt_type : GetEventTypes()) {
-        if (!DoIoctl(fd_, UI_SET_EVBIT, evt_type)) {
-            HiLog::Error(LABEL, "%{public}s Error setting event type: %{public}u", __func__, evt_type);
-            return false;
-        }
-    }
-
-    for (uint32_t key : GetKeys()) {
-        if (!DoIoctl(fd_, UI_SET_KEYBIT, key)) {
-            HiLog::Error(LABEL, "%{public}s Error setting key: %{public}u", __func__, key);
-            return false;
-        }
-    }
-
-    for (uint32_t property : GetProperties()) {
-        if (!DoIoctl(fd_, UI_SET_PROPBIT, property)) {
-            HiLog::Error(LABEL, "%{public}s Error setting property: %{public}u", __func__, property);
-            return false;
-        }
-    }
-
-    for (uint32_t abs : GetAbs()) {
-        if (!DoIoctl(fd_, UI_SET_ABSBIT, abs)) {
-            HiLog::Error(LABEL, "%{public}s Error setting property: %{public}u", __func__, abs);
-            return false;
-        }
-    }
-
-    for (uint32_t rel : GetRelBits()) {
-        if (!DoIoctl(fd_, UI_SET_RELBIT, rel)) {
-            HiLog::Error(LABEL, "%{public}s Error setting rel: %{public}u", __func__, rel);
-            return false;
-        }
+    
+    if (!SetDeviceAttributes(fd_)) {
+        return false;
     }
 
     if (write(fd_, &dev_, sizeof(dev_)) < 0) {
@@ -126,7 +96,7 @@ bool VirtualDevice::EmitEvent(uint16_t type, uint16_t code, uint32_t value) cons
     event.code = code;
     event.value = value;
 #ifndef __MUSL__
-    gettimeofday(&event.time, NULL);
+    gettimeofday(&event.time, nullptr);
 #endif
     if (write(fd_, &event, sizeof(event)) < static_cast<ssize_t>(sizeof(event))) {
         HiLog::Error(LABEL, "Event write failed %{public}s aborting", __func__);
@@ -163,4 +133,44 @@ const std::vector<uint32_t> &VirtualDevice::GetRelBits() const
 {
     static const std::vector<uint32_t> relBits {};
     return relBits;
+}
+
+bool VirtualDevice::SetDeviceAttributes(int32_t fd)
+{
+    for (uint32_t evt_type : GetEventTypes()) {
+        if (!DoIoctl(fd, UI_SET_EVBIT, evt_type)) {
+            HiLog::Error(LABEL, "%{public}s Error setting event type: %{public}u", __func__, evt_type);
+            return false;
+        }
+    }
+
+    for (uint32_t key : GetKeys()) {
+        if (!DoIoctl(fd, UI_SET_KEYBIT, key)) {
+            HiLog::Error(LABEL, "%{public}s Error setting key: %{public}u", __func__, key);
+            return false;
+        }
+    }
+
+    for (uint32_t property : GetProperties()) {
+        if (!DoIoctl(fd, UI_SET_PROPBIT, property)) {
+            HiLog::Error(LABEL, "%{public}s Error setting property: %{public}u", __func__, property);
+            return false;
+        }
+    }
+
+    for (uint32_t abs : GetAbs()) {
+        if (!DoIoctl(fd, UI_SET_ABSBIT, abs)) {
+            HiLog::Error(LABEL, "%{public}s Error setting property: %{public}u", __func__, abs);
+            return false;
+        }
+    }
+
+    for (uint32_t rel : GetRelBits()) {
+        if (!DoIoctl(fd, UI_SET_RELBIT, rel)) {
+            HiLog::Error(LABEL, "%{public}s Error setting rel: %{public}u", __func__, rel);
+            return false;
+        }
+    }
+
+    return true;
 }

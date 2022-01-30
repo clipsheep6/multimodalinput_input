@@ -60,15 +60,18 @@ VirtualTouchScreen::VirtualTouchScreen(const uint32_t maxX, const uint32_t maxY)
     dev_.absmax[ABS_Y] = maxY;
 
     dev_.absmin[ABS_PRESSURE] = 0;
-    dev_.absmax[ABS_PRESSURE] = 100;
+    constexpr int32_t pressureMax = 100;
+    dev_.absmax[ABS_PRESSURE] = pressureMax;
 
     dev_.absmin[ABS_MT_TOUCH_MAJOR] = 0;
     dev_.absmax[ABS_MT_TOUCH_MAJOR] = 1;
     dev_.absmin[ABS_MT_TOUCH_MINOR] = 0;
     dev_.absmax[ABS_MT_TOUCH_MINOR] = 1;
 
-    dev_.absmin[ABS_MT_ORIENTATION] = -90;
-    dev_.absmax[ABS_MT_ORIENTATION] = 90;
+    constexpr int32_t orientationMin = -90;
+    dev_.absmin[ABS_MT_ORIENTATION] = orientationMin;
+    constexpr int32_t orientationMax = 90;
+    dev_.absmax[ABS_MT_ORIENTATION] = orientationMax;
 
     dev_.absmin[ABS_MT_POSITION_X] = 0;
     dev_.absmax[ABS_MT_POSITION_X] = maxX;
@@ -76,9 +79,12 @@ VirtualTouchScreen::VirtualTouchScreen(const uint32_t maxX, const uint32_t maxY)
     dev_.absmax[ABS_MT_POSITION_Y] = maxY;
 
     dev_.absmin[ABS_MT_BLOB_ID] = 0;
-    dev_.absmax[ABS_MT_BLOB_ID] = 10;
+    constexpr int32_t mtBlobId = 10;
+    dev_.absmax[ABS_MT_BLOB_ID] = mtBlobId;
     dev_.absmin[ABS_MT_TRACKING_ID] = 0;
-    dev_.absmax[ABS_MT_TRACKING_ID] = 9;
+    constexpr int32_t mtTrackingId = 9;
+    dev_.absmax[ABS_MT_TRACKING_ID] = mtTrackingId;
     dev_.absmin[ABS_MT_PRESSURE] = 0;
-    dev_.absmax[ABS_MT_PRESSURE] = 100;
+    constexpr int32_t mtPressureMax = 100;
+    dev_.absmax[ABS_MT_PRESSURE] = mtPressureMax;
 }

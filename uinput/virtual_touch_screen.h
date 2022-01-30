@@ -18,20 +18,18 @@
 
 #include <cstdint>
 
-#include "linux/input.h"
-
 #include "virtual_device.h"
 
 class VirtualTouchScreen : public VirtualDevice {
 public:
     VirtualTouchScreen(const uint32_t maxX, const uint32_t maxY);
-    virtual ~VirtualTouchScreen(){};
+    virtual ~VirtualTouchScreen() = default;
 
 protected:
-    virtual const std::vector<uint32_t>& GetEventTypes() const;
-    virtual const std::vector<uint32_t>& GetKeys() const;
-    virtual const std::vector<uint32_t>& GetProperties() const;
-    virtual const std::vector<uint32_t>& GetAbs() const;
+    const std::vector<uint32_t>& GetEventTypes() const override;
+    const std::vector<uint32_t>& GetKeys() const override;
+    const std::vector<uint32_t>& GetProperties() const override;
+    const std::vector<uint32_t>& GetAbs() const override;
 };
 
 
