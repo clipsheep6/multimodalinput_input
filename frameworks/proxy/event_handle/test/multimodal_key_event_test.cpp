@@ -88,14 +88,14 @@ std::vector<std::string> MultimodalKeyEventTest::SearchForLog(const std::string 
 std::vector<std::string> MultimodalKeyEventTest::SearchForLog(const std::string &command,
     const std::vector<std::string> &excludes, bool noWait)
 {
-    MMI_LOGD("excludes.size() = %{public}d.", excludes.size());
+    MMI_LOGD("excludes.size():%{public}d.", excludes.size());
     int32_t nTries { N_TRIES_FOR_LOG };
     std::vector<std::string> results;
 
     while (true) {
         std::vector<std::string> logs;
         (void)g_runCommand.RunShellCommand(command, logs);
-        MMI_LOGD("logs.size() = %{public}d.", logs.size());
+        MMI_LOGD("logs.size():%{public}d.", logs.size());
         for (std::vector<std::string>::const_iterator cItr = logs.cbegin();
             cItr != logs.cend(); ++cItr) {
             MMI_LOGD("[log]: %{public}s.", cItr->c_str());
@@ -109,7 +109,7 @@ std::vector<std::string> MultimodalKeyEventTest::SearchForLog(const std::string 
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
     }
-    MMI_LOGD("results.size() = %{public}d.", results.size());
+    MMI_LOGD("results.size():%{public}d.", results.size());
     return results;
 }
 

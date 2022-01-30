@@ -41,7 +41,7 @@ void HdfDeviceEventDispatch::GetEventCallbackDispatch(
     const EventPackage **pkgs, uint32_t count, uint32_t devIndex)
 {
     if (pkgs == nullptr) {
-        HiLog::Error(LABEL, " %{public}s fail! pkgs is nullptr", __func__);
+        HiLog::Error(LABEL, "%{public}s fail! pkgs is nullptr", __func__);
         return;
     }
     for (uint32_t i = 0; i < count; i++) {
