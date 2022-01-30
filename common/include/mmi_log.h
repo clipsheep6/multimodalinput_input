@@ -27,27 +27,27 @@ static constexpr HiviewDFX::HiLogLabel MMI_COMMON_LABEL = { LOG_CORE, COMMON, "M
 const std::string DOUBLE_COLON = "::";
 #if defined(DEBUG)
 #define MMI_LOGD(fmt, ...) \
-    HiviewDFX::HiLog::Debug(MMI_COMMON_LABEL, "File:%{public}s, Line:%{public}d, Function:%{public}s " fmt,\
+    HiviewDFX::HiLog::Debug(MMI_COMMON_LABEL, "File:%{public}s, Line:%{public}d, Function:%{public}s " fmt, \
                                                            __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__)
 
 #define MMI_LOGI(fmt, ...) \
-    HiviewDFX::HiLog::Info(MMI_COMMON_LABEL, "File:%{public}s, Line:%{public}d, Function:%{public}s " fmt,\
+    HiviewDFX::HiLog::Info(MMI_COMMON_LABEL, "File:%{public}s, Line:%{public}d, Function:%{public}s " fmt, \
                                                           __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__)
 
 #define MMI_LOGW(fmt, ...) \
-    HiviewDFX::HiLog::Warn(MMI_COMMON_LABEL, "File:%{public}s, Line:%{public}d, Function:%{public}s " fmt,\
+    HiviewDFX::HiLog::Warn(MMI_COMMON_LABEL, "File:%{public}s, Line:%{public}d, Function:%{public}s " fmt, \
                                                           __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__)
 
 #define MMI_LOGE(fmt, ...) \
-    HiviewDFX::HiLog::Error(MMI_COMMON_LABEL, "File:%{public}s, Line:%{public}d, Function:%{public}s " fmt,\
+    HiviewDFX::HiLog::Error(MMI_COMMON_LABEL, "File:%{public}s, Line:%{public}d, Function:%{public}s " fmt, \
                                                            __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__)
 
 #define MMI_LOGF(fmt, ...) \
-    HiviewDFX::HiLog::Fatal(MMI_COMMON_LABEL, "File:%{public}s, Line:%{public}d, Function:%{public}s " fmt,\
+    HiviewDFX::HiLog::Fatal(MMI_COMMON_LABEL, "File:%{public}s, Line:%{public}d, Function:%{public}s " fmt, \
                                                            __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__)
 #else
 
-static const char* _FuncName(std::string &&funcName)
+static const char* _LogFuncName(std::string &&funcName)
 {
     auto pos = funcName.find('(');
     if (pos != std::string::npos) {
@@ -62,7 +62,7 @@ static const char* _FuncName(std::string &&funcName)
     return funcName.c_str();
 }
 
-#define CLASS_FUNCTION _FuncName(std::string(__PRETTY_FUNCTION__))
+#define CLASS_FUNCTION _LogFuncName(std::string(__PRETTY_FUNCTION__))
 
 #define MMI_LOGD(fmt, ...) \
     HiviewDFX::HiLog::Debug(MMI_COMMON_LABEL, "%{public}s: " fmt, CLASS_FUNCTION, ##__VA_ARGS__)
