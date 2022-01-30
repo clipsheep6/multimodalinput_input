@@ -130,4 +130,3 @@ LABEL="autosuspend_enable"
 TEST=="power/control", ATTR{power/control}="auto", GOTO="autosuspend_end"
 
 LABEL="autosuspend_end"
-

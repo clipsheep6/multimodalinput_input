@@ -27,6 +27,7 @@ public:
 };
 
 KeyEvent g_keyEvent;
+
 HWTEST_F(KeyEventTest, Initialize_001, TestSize.Level1)
 {
     int32_t windowId = 1;

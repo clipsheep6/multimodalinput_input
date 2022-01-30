@@ -178,6 +178,7 @@ int32_t EventPackage::PackageTabletToolOtherParams(libinput_event *event, EventT
     }
     return RET_OK;
 }
+
 void EventPackage::PackageTabletToolTypeParam(libinput_event *event, EventTabletTool& tableTool)
 {
     CHK(event, PARAM_INPUT_INVALID);
@@ -250,6 +251,7 @@ int32_t EventPackage::PackageTabletToolEvent(libinput_event *event, EventTabletT
     }
     return ret;
 }
+
 void EventPackage::PackageTabletPadOtherParams(libinput_event *event, EventTabletPad& tabletPad)
 {
     CHK(event, PARAM_INPUT_INVALID);

@@ -33,6 +33,7 @@ HWTEST_F(SystemEventHandlerTest, Test_AbnormalInvalidMsgId, TestSize.Level1)
     auto rt = SysEveHdl->OnSystemEventHandler(MmiMessageId::INVALID);
     EXPECT_EQ(rt, PARAM_INPUT_INVALID);
 }
+
 HWTEST_F(SystemEventHandlerTest, Test_AbnormalUnknownMsgId, TestSize.Level1)
 {
     auto rt = SysEveHdl->OnSystemEventHandler(MmiMessageId::BEGIN);
@@ -50,41 +51,49 @@ HWTEST_F(SystemEventHandlerTest, Test_OnScreenShot, TestSize.Level1)
     auto rt = SysEveHdl->OnSystemEventHandler(MmiMessageId::ON_SCREEN_SHOT);
     EXPECT_EQ(rt, RET_OK);
 }
+
 HWTEST_F(SystemEventHandlerTest, Test_OnScreenSplit, TestSize.Level1)
 {
     auto rt = SysEveHdl->OnSystemEventHandler(MmiMessageId::ON_SCREEN_SPLIT);
     EXPECT_EQ(rt, RET_OK);
 }
+
 HWTEST_F(SystemEventHandlerTest, Test_OnStopScreenRecord, TestSize.Level1)
 {
     auto rt = SysEveHdl->OnSystemEventHandler(MmiMessageId::ON_STOP_SCREEN_RECORD);
     EXPECT_EQ(rt, RET_OK);
 }
+
 HWTEST_F(SystemEventHandlerTest, Test_OnStartScreenRecord, TestSize.Level1)
 {
     auto rt = SysEveHdl->OnSystemEventHandler(MmiMessageId::ON_START_SCREEN_RECORD);
     EXPECT_EQ(rt, RET_OK);
 }
+
 HWTEST_F(SystemEventHandlerTest, Test_OnShowNotification, TestSize.Level1)
 {
     auto rt = SysEveHdl->OnSystemEventHandler(MmiMessageId::ON_SHOW_NOTIFICATION);
     EXPECT_EQ(rt, RET_OK);
 }
+
 HWTEST_F(SystemEventHandlerTest, Test_OnRecent, TestSize.Level1)
 {
     auto rt = SysEveHdl->OnSystemEventHandler(MmiMessageId::ON_RECENT);
     EXPECT_EQ(rt, RET_OK);
 }
+
 HWTEST_F(SystemEventHandlerTest, Test_OnLockScreen, TestSize.Level1)
 {
     auto rt = SysEveHdl->OnSystemEventHandler(MmiMessageId::ON_LOCK_SCREEN);
     EXPECT_EQ(rt, RET_OK);
 }
+
 HWTEST_F(SystemEventHandlerTest, Test_OnSearch, TestSize.Level1)
 {
     auto rt = SysEveHdl->OnSystemEventHandler(MmiMessageId::ON_SEARCH);
     EXPECT_EQ(rt, RET_OK);
 }
+
 HWTEST_F(SystemEventHandlerTest, Test_OnClosePage, TestSize.Level1)
 {
     auto rt = SysEveHdl->OnSystemEventHandler(MmiMessageId::ON_CLOSE_PAGE);

@@ -73,7 +73,6 @@ describe('ts_unit_test', function () {
     expect(ret).assertEqual(UNIT_TEST_SUCCESS);
   })
 
-
   it('inputEventClient::answer_test-02', 0, function () {
     const registerResult = inputEventClient.on(WINDOW_ID, 'answer', 32323);
     expect(registerResult).assertEqual(REGISTERED_FAILED);
@@ -276,8 +275,6 @@ describe('ts_unit_test', function () {
       expect(unregisterResult).assertEqual(REGISTERED_FAILED);
     }
   })
-
-
 
   // 成功测试
   it('inputEventClient::answer_test-01', 0, function () {
@@ -819,5 +816,4 @@ describe('ts_unit_test', function () {
       expect(unregisterResult).assertEqual(REGISTERED_SUCCESS);
     }
   })
-
 })

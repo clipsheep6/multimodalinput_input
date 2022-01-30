@@ -31,4 +31,3 @@ private:
 } // namespace OHOS
 
 #endif // INJECT_EVENT_COMMAND_H
-

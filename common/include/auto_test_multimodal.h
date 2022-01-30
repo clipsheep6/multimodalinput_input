@@ -118,5 +118,4 @@ struct AutoTestClientListPkt {
     int32_t windowId;                        // 窗口Id
     int32_t abilityId;                       // 应用Id
 };
-
 #endif

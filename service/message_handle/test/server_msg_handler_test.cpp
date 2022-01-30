@@ -572,7 +572,6 @@ HWTEST_F(ServerMsgHandlerTest, OnListInjectTest_010, TestSize.Level1)
     serverMsgHandlerTest.OnListInjectTest(sess, newPacket);
 }
 
-
 HWTEST_F(ServerMsgHandlerTest, OnWindowsTest_01, TestSize.Level1)
 {
     ServerMsgHandlerUnitTest serverMsgHandlerTest;

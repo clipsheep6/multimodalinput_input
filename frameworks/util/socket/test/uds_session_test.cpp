@@ -35,6 +35,7 @@ public:
     void SetUp() override;
     void TearDown()  override;
 };
+
 void UDSSessionTest::SetUp()
 {
     UDSSessionTest::pid_ = getpid();

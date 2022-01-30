@@ -40,10 +40,12 @@ enum hdf_event_type {
     HDF_ADD_DEVICE,
     HDF_RMV_DEVICE,
 };
+
 struct Devcmd {
     int index;
     int cmd;
 };
+
 class HdfEventManager {
 public:
     bool Init();
@@ -63,6 +65,7 @@ public:
     int HdfdevtypeMapLibinputType(uint32_t devIndex, uint32_t devType);
     static libinput *HdfLibinputInit();
     static int HdfDevHandle(int index, hdf_event_type cmd);
+
 private:
     libinput *hdiinput_ = nullptr;
     std::list<uhdf *> hdflist_;

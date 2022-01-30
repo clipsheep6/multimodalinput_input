@@ -102,7 +102,7 @@ private:
     int32_t highestId_ {0};
     Authority highestAuthority_ {NO_AUTHORITY};
     static int32_t idManager_;
-
+        
     std::list<TouchEventFilter> touchEventFilterList_;
     std::list<PointerEventInterceptor> PointerEventInterceptorList_;
     int32_t pHighestId_ {0};

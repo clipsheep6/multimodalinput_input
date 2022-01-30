@@ -362,7 +362,7 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
 
     int32_t kac = keyEvent_->GetKeyAction();
     KEY_STATE kacState = (kac == KeyEvent::KEY_ACTION_DOWN) ? KEY_STATE_PRESSED : KEY_STATE_RELEASED;
-
+    
 #ifdef OHOS_WESTEN_MODEL
     int16_t lowKeyCode = static_cast<int16_t>(keyEvent_->GetKeyCode());
     auto oKey = KeyValueTransformationByInput(lowKeyCode);

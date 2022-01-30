@@ -78,7 +78,7 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
         } else {
             MMI_LOGE("AddInputEventFilter has send to server fail, ret = %{public}d", ret);
             return RET_ERR;
-        }
+        }        
     }
 
     MMI_LOGT("leave, success with hasSendToMmiServer is already true");

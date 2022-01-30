@@ -27,6 +27,7 @@ public:
 };
 
 SpeechEvent speechEvent;
+
 HWTEST_F(SpeechEventTest, Initialize_01, TestSize.Level1)
 {
     speechEvent.Initialize(1, 1, 1, 1, "1", 1, "1", 1, 1, "1", 1, false);

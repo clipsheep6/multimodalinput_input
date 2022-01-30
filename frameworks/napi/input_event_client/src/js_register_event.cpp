@@ -719,7 +719,7 @@ bool AppTouchEventHandle::SendEvent(const std::string& name, const TouchEvent& e
             return false;
         }
     }
-
+    
     return true;
 }
 

@@ -189,6 +189,7 @@ HWTEST_F(StreamBufferTest, wbuf, TestSize.Level1)
     StreamBuffer streamBuffer;
     streamBuffer.ResetBuf();
 }
+
 HWTEST_F(StreamBufferTest, operatorLeft, TestSize.Level1)
 {
     StreamBuffer streamBufferSrc;
