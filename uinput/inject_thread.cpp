@@ -17,7 +17,6 @@
 
 #include <condition_variable>
 #include <mutex>
-#include <unistd.h>
 
 namespace OHOS {
 namespace MMIS {
