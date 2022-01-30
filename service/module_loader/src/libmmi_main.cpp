@@ -117,7 +117,7 @@ void OnThread()
 #ifdef DEBUG_CODE_TEST
     g_isAllRun = false;
 #endif
-    MMI_LOGI("libmmi_main OnThread end...");
+    MMI_LOGI("libmmi_main OnThread end");
 }
 }
 #endif

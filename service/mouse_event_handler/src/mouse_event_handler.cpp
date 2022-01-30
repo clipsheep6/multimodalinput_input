@@ -204,17 +204,17 @@ void MouseEventHandler::Normalize(libinput_event *event)
 
 void MouseEventHandler::DumpInner()
 {
-    MMI_LOGD("PointerAction: %{public}d, PointerId: %{public}d, SourceType: %{public}d,"
-        "ButtonId: %{public}d, VerticalAxisValue: %{public}lf, HorizontalAxisValue: %{public}lf",
+    MMI_LOGD("PointerAction:%{public}d,PointerId:%{public}d,SourceType:%{public}d,"
+        "ButtonId:%{public}d,VerticalAxisValue:%{public}lf,HorizontalAxisValue:%{public}lf",
         pointerEvent_->GetPointerAction(), pointerEvent_->GetPointerId(), pointerEvent_->GetSourceType(),
         pointerEvent_->GetButtonId(), pointerEvent_->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
         pointerEvent_->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
 
     PointerEvent::PointerItem item;
     pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item);
-    MMI_LOGD("item: DownTime: %{public}d, IsPressed: %{public}s,"
-        "GlobalX: %{public}d, GlobalY: %{public}d, LocalX: %{public}d, LocalY: %{public}d, Width: %{public}d,"
-        "Height: %{public}d, Pressure: %{public}d, DeviceId: %{public}d",
+    MMI_LOGD("item: DownTime:%{public}d,IsPressed:%{public}s,"
+        "GlobalX:%{public}d,GlobalY:%{public}d,LocalX:%{public}d,LocalY:%{public}d,Width:%{public}d,"
+        "Height:%{public}d,Pressure:%{public}d,DeviceId:%{public}d",
         item.GetDownTime(), (item.IsPressed() ? "true" : "false"), item.GetGlobalX(), item.GetGlobalY(),
         item.GetLocalX(), item.GetLocalY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
         item.GetDeviceId());
