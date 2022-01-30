@@ -135,7 +135,7 @@ const std::vector<uint32_t> &VirtualDevice::GetRelBits() const
     return relBits;
 }
 
-const bool VirtualDevice::SetDeviceAttributes(int32_t fd)
+bool VirtualDevice::SetDeviceAttributes(int32_t fd)
 {
     for (uint32_t evt_type : GetEventTypes()) {
         if (!DoIoctl(fd, UI_SET_EVBIT, evt_type)) {
