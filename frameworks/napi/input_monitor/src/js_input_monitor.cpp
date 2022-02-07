@@ -174,7 +174,7 @@ int32_t JsInputMonitor::IsMatch(napi_env jsEnv, napi_value receiver)
             return NAPI_ERR;
         }
         if (isEquals) {
-            MMI_LOGE("isEquals = %{public}d", isEquals);
+            MMI_LOGE("isEquals:%{public}d", isEquals);
             return RET_OK;
         }
         return RET_ERR;
@@ -195,9 +195,9 @@ void JsInputMonitor::printfPointerEvent(const std::shared_ptr<PointerEvent> poin
     CHK(pointerEvent != nullptr, ERROR_NULL_POINTER);
     PointerEvent::PointerItem item;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item);
-    MMI_LOGD("type:%{public}d, timestamp:%{public}d, deviceId:%{public}d,\
-        globalX:%{public}d, globalY:%{public}d, localX:%{public}d, localY:%{public}d, \
-        size:%{public}d, force:%{public}d", pointerEvent->GetSourceType(), item.GetDownTime(),
+    MMI_LOGD("type:%{public}d,timestamp:%{public}d,deviceId:%{public}d,"
+        "globalX:%{public}d,globalY:%{public}d,localX:%{public}d,localY:%{public}d,"
+        "size:%{public}d,force:%{public}d", pointerEvent->GetSourceType(), item.GetDownTime(),
         item.GetDeviceId(), item.GetGlobalX(), item.GetGlobalY(), item.GetLocalX(),
         item.GetLocalY(), item.GetWidth()+item.GetHeight()/2, item.GetPressure());
 }
