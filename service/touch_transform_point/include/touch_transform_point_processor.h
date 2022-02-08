@@ -32,6 +32,7 @@ private:
     bool OnEventTouchDown(libinput_event *event);
     bool OnEventTouchMotion(libinput_event *event);
     bool OnEventTouchUp(libinput_event *event);
+    int32_t deviceId_;
     std::shared_ptr<PointerEvent> pointerEvent_;
     Direction direction_ {Direction0};
 };
