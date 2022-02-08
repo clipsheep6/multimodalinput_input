@@ -206,14 +206,14 @@ void InputEventHandler::OnEvent(void *event)
     if (idSeed_ >= maxUInt64) {
         idSeed_ = 1;
     }
-    MMI_LOGT("Event reporting. id:%{public}" PRId64 ", tid:%{public}" PRId64 ", eventType:%{public}d, initSysClock:%{public}" PRId64,
-             idSeed_, tid, eventType_, initSysClock_);
+    MMI_LOGT("Event reporting. id:%{public}" PRId64 ", tid:%{public}" PRId64 ", eventType:%{public}d, "
+             "initSysClock:%{public}" PRId64, idSeed_, tid, eventType_, initSysClock_);
 
     OnEventHandler(*lpMmiEvent);
     lastSysClock_ = GetSysClockTime();
     uint64_t lostTime = lastSysClock_ - initSysClock_;
-    MMI_LOGT("Event handling completed. id:%{public}" PRId64 ", lastSynClock:%{public}" PRId64 ", lostTime:%{public}" PRId64,
-             idSeed_, lastSysClock_, lostTime);
+    MMI_LOGT("Event handling completed. id:%{public}" PRId64 ", lastSynClock:%{public}" PRId64
+             ", lostTime:%{public}" PRId64, idSeed_, lastSysClock_, lostTime);
 }
 
 int32_t InputEventHandler::OnEventHandler(const multimodal_libinput_event& ev)
