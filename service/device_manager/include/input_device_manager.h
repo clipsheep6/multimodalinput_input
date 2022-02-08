@@ -19,7 +19,7 @@
 #include <string>
 #include "util.h"
 #include "singleton.h"
-#include "observer.h"
+#include "../../../common/include/observer.h"
 #include "msg_handler.h"
 #include "event_dispatch.h"
 #include "event_package.h"
@@ -39,7 +39,7 @@ public:
     int32_t FindInputDeviceId(libinput_device* inputDevice);
     void Attach(Observer* observer); 
     void Detach(Observer* observer);
-    void Notify();
+    void Notify(bool hasPointerDevice);
 
 private:
     void Init(weston_compositor *wc);
@@ -50,7 +50,7 @@ private:
     std::map<int32_t, libinput_device*> inputDeviceMap_;
     bool initFlag_ {false};
     int32_t nextId_ {0};
-    std::list<Observer*> observers;
+    std::list<Observer*> observers_;
 };
 }
 }

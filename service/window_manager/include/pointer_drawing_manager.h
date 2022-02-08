@@ -18,7 +18,7 @@
 
 #include <iostream>
 #include "singleton.h"
-#include "observer.h"
+#include "../../../common/include/observer.h"
 #include "struct_multimodal.h"
 #include "pixel_map.h"
 #include "window.h"
@@ -40,7 +40,7 @@ public:
 private:
     void DoDraw(uint8_t *addr, uint32_t width, uint32_t height);
     void DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas);
-    void Init();
+    void DrawManager();
 
 private:
     sptr<OHOS::Rosen::Window> drawWindow_;
