@@ -36,7 +36,7 @@ int32_t InputHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
         return RET_ERR;
     }
     MMI_LOGT("Register monitor(%{public}d)", handlerId);
-    SessionMonitor mon { handlerId, session };
+    SessionMonitor mon { handlerId, handlerType, session };
     return monitors_.AddMonitor(mon);
     if (InputHandlerType::INTERCEPTOR != handlerType) {
         MMI_LOGW("Invalid handler type");
@@ -135,7 +135,7 @@ void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<Poi
     MMI_LOGD("Service SendToClient id=%{public}d,InputHandlerType=%{public}d.", id_, handlerType_);
     CHK(pkt.Write(id_), STREAM_BUF_WRITE_FAIL);
     CHK(pkt.Write(handlerType_), STREAM_BUF_WRITE_FAIL);
-    CHK((RET_OK == OHOS::MMI::InputEventDataTransformation::SerializePointerEvent(pointerEvent, pkt)),
+    CHK((RET_OK == OHOS::MMI::InputEventDataTransformation::Marshalling(pointerEvent, pkt)),
         STREAM_BUF_WRITE_FAIL);
     CHK(session_->SendMsg(pkt), MSG_SEND_FAIL);
 }
@@ -148,11 +148,11 @@ int32_t InputHandlerManagerGlobal::MonitorCollection::AddMonitor(const SessionHa
                  static_cast<int32_t>(monitors_.size()), INVALID_MONITOR_MON);
         return RET_ERR;
     }
-    auto iter = monitors_.find(mon);
+    auto iter = monitors_.find(monitor);
     if (iter != monitors_.end()) {
         MMI_LOGW("repeate register, errCode:%{public}d", INVALID_MONITOR_MON);
     }
-    auto ret = monitors_.insert(mon);
+    auto ret = monitors_.insert(monitor);
     if (ret.second) {
         MMI_LOGD("Service AddMonitor Success.");
     } else {
@@ -257,8 +257,8 @@ void InputHandlerManagerGlobal::MonitorCollection::Monitor(std::shared_ptr<Point
 {
     std::lock_guard<std::mutex> guard(lockMonitors_);
     MMI_LOGT("There are currently %{public}d monitors", static_cast<int32_t>(monitors_.size()));
-    for (const SessionMonitor& mon : monitors_) {
-        mon.SendToClient(pointerEvent);
+    for (const SessionMonitor& monitor : monitors_) {
+        monitor.SendToClient(pointerEvent);
     }
 }
 
