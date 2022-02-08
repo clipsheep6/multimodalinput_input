@@ -78,7 +78,7 @@ bool OHOS::MMI::InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<Pointer
              pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
              pointerEvent->GetPointerId(), pointer.GetGlobalX(), pointer.GetGlobalY(), pointer.IsPressed());
     NetPacket newPkt(MmiMessageId::TOUCHPAD_EVENT_INTERCEPTOR);
-    InputEventDataTransformation::SerializePointerEvent(pointerEvent, newPkt);
+    InputEventDataTransformation::Marshalling(pointerEvent, newPkt);
     std::list<InterceptorItem>::iterator iter;
     for (iter = interceptor_.begin(); iter != interceptor_.end(); iter++) {
         newPkt << iter->session->GetPid() <<iter->id;
