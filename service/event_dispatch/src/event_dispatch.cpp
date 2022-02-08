@@ -391,7 +391,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         }
     }
     NetPacket newPacket(MmiMessageId::ON_POINTER_EVENT);
-    InputEventDataTransformation::SerializePointerEvent(point, newPacket);
+    InputEventDataTransformation::Marshalling(point, newPacket);
     auto udsServer = InputHandler->GetUDSServer();
     if (udsServer == nullptr) {
         MMI_LOGE("UdsServer is a nullptr");
@@ -460,7 +460,7 @@ int32_t EventDispatch::DispatchTouchTransformPointEvent(UDSServer& udsServer,
         return FOCUS_ID_OBTAIN_FAIL;
     }
     NetPacket newPacket(MmiMessageId::ON_POINTER_EVENT);
-    InputEventDataTransformation::SerializePointerEvent(point, newPacket);
+    InputEventDataTransformation::Marshalling(point, newPacket);
     if (!udsServer.SendMsg(appInfo.fd, newPacket)) {
         MMI_LOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
