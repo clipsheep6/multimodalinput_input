@@ -171,6 +171,10 @@ public:
     bool IsCheckDisplayIdIfExist(int32_t& displayId);
     bool GetLogicalDisplayById(int32_t displayId, LogicalDisplayInfo& logicalDisplayInfo);
     int32_t UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent);
+    void TurnTouchScreen(PhysicalDisplayInfo* info, Direction direction,
+    int32_t& logicalX, int32_t& logicalY);
+    bool TransformTouchPointToDisplayPoint(libinput_event_touch* touch, Direction& direction,
+    int32_t& targetDisplayId, int32_t& displayX, int32_t& displayY);
     bool TpPointLogicDisplayPoint(libinput_event_touch* touch,
     int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId);
     bool TansformTouchscreePointToLogicalDisplayPoint(libinput_event_touch* touch,
