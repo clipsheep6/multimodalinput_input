@@ -29,12 +29,11 @@ public:
     std::shared_ptr<PointerEvent> OnLibinputTouchEvent(libinput_event *event);
     void SetPointEventSource(int32_t sourceType);
 private:
-    void OnEventTouchDown(libinput_event *event);
-    void OnEventTouchMotion(libinput_event *event);
-    void OnEventTouchUp(libinput_event *event);
-private:
-    int32_t deviceId_;
+    bool OnEventTouchDown(libinput_event *event);
+    bool OnEventTouchMotion(libinput_event *event);
+    bool OnEventTouchUp(libinput_event *event);
     std::shared_ptr<PointerEvent> pointerEvent_;
+    Direction direction_ {Direction0};
 };
 }
 }
