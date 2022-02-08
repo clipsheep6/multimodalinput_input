@@ -42,4 +42,4 @@ private:
 
 }
 
-#endif
+#endif // UTILS_BASE_NOCOPYABLE_H
