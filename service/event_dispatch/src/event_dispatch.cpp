@@ -656,6 +656,7 @@ int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *
                          preHandlerTime);
                 DispatchTouchEventTrace(touchTemp);
                 newPacket << touchTemp;
+
             }
         }
         if (touch.eventType == LIBINPUT_EVENT_TOUCH_UP) {

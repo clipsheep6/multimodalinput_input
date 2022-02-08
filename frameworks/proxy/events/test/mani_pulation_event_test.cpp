@@ -28,6 +28,7 @@ public:
 };
 
 ManipulationEvent maniPulationEvent;
+
 HWTEST_F(ManipulationEventTest, Initialize_003, TestSize.Level1)
 {
     ManipulationEvent maniPulationEventTmp;

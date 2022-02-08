@@ -30,6 +30,7 @@ public:
 };
 
 MouseEvent mouseEvent;
+
 HWTEST_F(MouseEventTest, Initialize_001, TestSize.Level1)
 {
     int32_t windowId = 1;

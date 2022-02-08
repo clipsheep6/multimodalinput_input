@@ -289,7 +289,6 @@ bool LogManager::SemWait(int32_t timeout)
             LOGLOG("LogManager::SemWait sem_timedwait()succeeded");
             return true;
         }
-
         return false;
     }
     return true;

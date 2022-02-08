@@ -55,10 +55,12 @@ struct ShortcutKey {
 };
 
 class AbilityLaunchManager : public DelayedSingleton<AbilityLaunchManager> {
+    
 public:
     AbilityLaunchManager();
     ~AbilityLaunchManager() = default;
     bool CheckLaunchAbility(const std::shared_ptr<KeyEvent> &event);
+
 private:
     void ResolveConfig(std::string configFile);
     bool ConvertToShortcutKey(const json &jsonData, ShortcutKey &shortcutKey);

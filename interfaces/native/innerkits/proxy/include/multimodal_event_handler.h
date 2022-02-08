@@ -25,6 +25,7 @@ enum RES_STATUS : uint8_t {
     REG_STATUS_NOT_SYNC = 0, // 未同步
     REG_STATUS_SYNCED = 1,   // 以同步
 };
+
 struct EventRegesterInfo {
     RES_STATUS sync;
     sptr<IRemoteObject> token;

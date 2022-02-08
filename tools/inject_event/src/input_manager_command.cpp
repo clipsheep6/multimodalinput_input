@@ -507,7 +507,6 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
     return ERR_OK;
 }
 
-
 void InputManagerCommand::ShowUsage()
 {
     std::cout << "Usage: injectevent <option> <command> <arg>..." << std::endl;

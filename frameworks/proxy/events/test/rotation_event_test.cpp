@@ -27,6 +27,7 @@ public:
 };
 
 RotationEvent rotationEvent;
+
 HWTEST_F(RotationEventTest, Initialize_01, TestSize.Level1)
 {
     rotationEvent.Initialize(1, 1, 1, "1", 1, 1, "1", 1, false);

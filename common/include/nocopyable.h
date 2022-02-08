@@ -30,7 +30,6 @@ namespace OHOS {
     className(className&&) = delete;\
     className& operator= (className&&) = delete
 
-
 class NoCopyable {
 protected:
     NoCopyable() {};

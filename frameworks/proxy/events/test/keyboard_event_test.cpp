@@ -30,6 +30,7 @@ public:
 };
 
 KeyBoardEvent g_keyBoardEvent;
+
 HWTEST_F(KeyboardEventTest, Initialize_true, TestSize.Level1)
 {
     int32_t windowId = 1;

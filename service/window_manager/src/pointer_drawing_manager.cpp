@@ -32,7 +32,6 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN,
 
 using namespace OHOS::Media;
 
-
 OHOS::MMI::MouseDrawingManager::MouseDrawingManager() {}
 
 OHOS::MMI::MouseDrawingManager::~MouseDrawingManager() {}

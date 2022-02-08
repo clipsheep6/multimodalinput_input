@@ -112,7 +112,6 @@ std::vector<std::string> MultimodalKeyEventTest::SearchForLog(const std::string 
     return results;
 }
 
-
 HWTEST_F(MultimodalKeyEventTest, MultimodalEventHandler_InjectKeyEvent_001, TestSize.Level1)
 {
     RunShellUtil runCommand;

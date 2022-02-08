@@ -34,6 +34,7 @@ public:
     void TipUpStandardEvent(struct libinput_event_tablet_tool& szPoint, StandardTouchStruct& data);
     void TipDownStandardEvent(struct libinput_event_tablet_tool& szPoint, StandardTouchStruct& data);
     void TipMotionStandardEvent(libinput_event *event, StandardTouchStruct& data);
+
 private:
     libinput_button_state leftButtonState_ = {};
     uint32_t leftButton_ = 0;

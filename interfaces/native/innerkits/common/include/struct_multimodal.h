@@ -25,6 +25,7 @@ namespace {
     constexpr int SYSTEMUID = 1000;
     constexpr int MAX_SOLTED_COORDS_NUMS = 10;
 }
+
 enum SENIOR_DEVICE_TYPE {
     INPUT_DEVICE_AISENSOR = 31,
     INPUT_DEVICE_KNUCKLE = 41

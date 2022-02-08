@@ -502,4 +502,3 @@ void OHOS::MMI::UDSServer::NotifySessionDeleted(SessionPtr ses)
     }
     MMI_LOGD("Leave");
 }
-

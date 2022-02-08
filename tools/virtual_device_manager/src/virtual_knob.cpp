@@ -69,4 +69,3 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualKnob::GetMscs() const
     };
     return mscs;
 }
-

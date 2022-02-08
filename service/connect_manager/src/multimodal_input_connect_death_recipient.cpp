@@ -30,4 +30,3 @@ void MultimodalInputConnectDeathRecipient::OnRemoteDied(const OHOS::wptr<OHOS::I
 }
 } // namespace MMI
 } // namespace OHOS
-

@@ -146,4 +146,3 @@ std::shared_ptr<PointerEvent> TouchTransformPointProcessor::OnLibinputTouchEvent
     return pointerEvent_;
 }
 }
-

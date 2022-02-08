@@ -53,4 +53,3 @@ const std::vector<uint32_t>& OHOS::MMI::VirtualTrackball::GetMscs() const
     };
     return mscs;
 }
-

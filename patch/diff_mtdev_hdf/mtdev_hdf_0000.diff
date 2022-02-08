@@ -249,3 +249,4 @@ diff -Naur old/src/iobuf.c new/src/iobuf.c
  void mtdev_get_event(struct mtdev *dev, struct input_event* ev)
  {
  	evbuf_get(&dev->state->outbuf, ev);
+ }

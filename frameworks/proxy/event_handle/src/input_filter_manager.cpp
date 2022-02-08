@@ -414,7 +414,5 @@ int32_t InputFilterManager::OnPointerEvent(MouseEvent event, int32_t id_)
     }
     return 0;
 }
-
 }
 }
-
