@@ -187,7 +187,7 @@ int32_t DelEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
             napi_delete_reference(env, (*it)->callback[0]);
             KeyEventMonitorInfo *monitorInfo = *it;
             iter->second.erase(it);
-            if (iter->second.size() <= 0) {
+            if (iter->second.empty()) {
                 subscribeId = monitorInfo->subscribeId;
             }
             delete monitorInfo;

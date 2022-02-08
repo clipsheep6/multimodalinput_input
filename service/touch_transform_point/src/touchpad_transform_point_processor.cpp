@@ -45,7 +45,7 @@ void TouchPadTransformPointProcessor::OnEventTouchPadDown(libinput_event *event)
     auto logicalY = libinput_event_touchpad_get_y(data);
 
     auto pointIds = pointerEvent_->GetPointersIdList();
-    if (pointIds.size() == 0) {
+    if (pointIds.empty()) {
         pointerEvent_->SetActionStartTime(time);
     }
     pointerEvent_->SetActionTime(time);
@@ -76,7 +76,7 @@ void TouchPadTransformPointProcessor::OnEventTouchPadMotion(libinput_event *even
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     PointerEvent::PointerItem pointer;
-    pointerEvent_->GetPointerItem(seatSlot, pointer);
+    CHK(pointerEvent_->GetPointerItem(seatSlot, pointer), PARAM_INPUT_FAIL);
     pointer.SetGlobalX((int32_t)logicalX);
     pointer.SetGlobalY((int32_t)logicalY);
     pointerEvent_->UpdatePointerItem(seatSlot, pointer);
@@ -98,7 +98,7 @@ void TouchPadTransformPointProcessor::OnEventTouchPadUp(libinput_event *event)
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
 
     PointerEvent::PointerItem pointer;
-    pointerEvent_->GetPointerItem(seatSlot, pointer);
+    CHK(pointerEvent_->GetPointerItem(seatSlot, pointer), PARAM_INPUT_FAIL);
     pointer.SetPressed(false);
     pointer.SetGlobalX((int32_t)logicalX);
     pointer.SetGlobalY((int32_t)logicalY);
