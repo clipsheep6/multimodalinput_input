@@ -44,23 +44,35 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
         napi_throw_error(env, nullptr, "Get param failed");
         return ERROR_CODE;
     }
-    NAPI_ASSERT(env, argc == ARGC_NUM, "requires 3 parameter");
+    if (argc != ARGC_NUM) {
+        napi_throw_error(env, nullptr, "requires 3 parameter");
+        return ERROR_CODE;
+    }
     napi_valuetype valueType = napi_undefined;
     if (napi_typeof(env, argv[ARGV_FIRST], &valueType) != napi_ok) {
         napi_throw_error(env, nullptr, "Get type of first param failed");
         return ERROR_CODE;
     }
-    NAPI_ASSERT(env, valueType == napi_string, "parameter1 is not napi_string");
+    if (valueType != napi_string) {
+        napi_throw_error(env, nullptr, "Parameter1 is not napi_string");
+        return ERROR_CODE;
+    }
     if (napi_typeof(env, argv[ARGV_SECOND], &valueType) != napi_ok) {
         napi_throw_error(env, nullptr, "Get type of second param failed");
         return ERROR_CODE;
     }
-    NAPI_ASSERT(env, valueType == napi_object, "parameter2 is not napi_object");
+    if (valueType != napi_object) {
+        napi_throw_error(env, nullptr, "Parameter2 is not napi_object");
+        return ERROR_CODE;
+    }
     if (napi_typeof(env, argv[ARGV_THIRD], &valueType) != napi_ok) {
         napi_throw_error(env, nullptr, "Get type of third param failed");
         return ERROR_CODE;
     }
-    NAPI_ASSERT(env, valueType == napi_function, "parameter2 is not napi_function");
+    if (valueType != napi_function) {
+        napi_throw_error(env, nullptr, "Parameter3 is not napi_function");
+        return ERROR_CODE;
+    }
     char eventName[EVENT_NAME_LEN] = { 0 };
     size_t typeLen = 0;
     if (napi_get_value_string_utf8(env, argv[ARGV_FIRST], eventName, NAPI_AUTO_LENGTH, &typeLen) != napi_ok) {
@@ -73,14 +85,14 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
         napi_throw_error(env, nullptr, "Get preKeys failed");
         return ERROR_CODE;
     }
-    std::vector<int32_t> preKeys = GetIntArray(receiceValue, env);
+    std::vector<int32_t> preKeys = GetIntArray(env, receiceValue);
     MMI_LOGD("PreKeys size:%{public}d", static_cast<int32_t>(preKeys.size()));
     std::vector<int32_t> sortPrekeys = preKeys;
     sort(sortPrekeys.begin(), sortPrekeys.end());
     keyOption->SetPreKeys(preKeys);
 
     std::string subKeyNames = "";
-    for (int32_t i = 0; i < sortPrekeys.size(); i++){
+    for (int32_t i = 0; i < sortPrekeys.size(); ++i){
         subKeyNames += std::to_string(sortPrekeys[i]);
         subKeyNames += ",";
         MMI_LOGD("PreKeys = %{public}d", preKeys[i]);
@@ -268,7 +280,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
         delete event;
         event = nullptr;
         MMI_LOGE("DelEventCallback failed");
-        return result;
+        return nullptr;
     }
     MMI_LOGD("SubscribeId: %{public}d", subscribeId);
     if (subscribeId > 0) {

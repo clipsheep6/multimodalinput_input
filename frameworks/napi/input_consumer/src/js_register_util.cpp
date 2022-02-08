@@ -140,7 +140,7 @@ int32_t AddEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
     }
     for (const auto &iter : it) {
         napi_value handler2 = nullptr;
-        status = napi_get_reference_value(env, (*iter)->callback[0], &handler2);
+        status = napi_get_reference_value(env, (*iter).callback[0], &handler2);
         if (status != napi_ok) {
             napi_throw_error(env, nullptr, "Handler2 get reference value failed");
             return JS_CALLBACK_EVENT_FAILED;
@@ -152,15 +152,15 @@ int32_t AddEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
             return JS_CALLBACK_EVENT_FAILED;
         }
         if (isEqual) {
-            napi_throw_error(env, nullptr, "Callback already exists in %{public}s", event->eventType.c_str());
+            napi_throw_error(env, nullptr, "Callback already exists in %{public}s");
             return JS_CALLBACK_EVENT_FAILED;
         }
     }
-    if (!it->second.empty()) {
-        CHKPR(it->second.front(), ERROR_NULL_POINTER, JS_CALLBACK_EVENT_FAILED);
-        preSubscribeId = it->second.front()->subscribeId;
+    if (!it.second.empty()) {
+        CHKPR(it.second.front(), ERROR_NULL_POINTER, JS_CALLBACK_EVENT_FAILED);
+        preSubscribeId = it.second.front()->subscribeId;
     }
-    it->second.push_back(event);
+    it.second.push_back(event);
     return JS_CALLBACK_EVENT_SUCCESS;
 }
 
