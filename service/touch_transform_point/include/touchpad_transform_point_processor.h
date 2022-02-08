@@ -37,4 +37,4 @@ private:
 }
 }
 
-#endif
+#endif // TOUCHPAD_TRANSFORM_POINT_PROCESSOR_H

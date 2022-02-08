@@ -36,4 +36,4 @@ private:
 }
 }
 
-#endif
+#endif // TOUCH_TRANSFORM_POINT_PROCESSOR_H
