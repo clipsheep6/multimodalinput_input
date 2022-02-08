@@ -14,7 +14,6 @@
  */
 
 #include "input_device_manager.h"
-#include "pointer_drawing_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -176,17 +175,20 @@ bool InputDeviceManager::IsPointerDevice(struct libinput_device* device)
 
 void InputDeviceManager::Attach(Observer* observer)
 {
-    observers.push_back(observer);
+    MMI_LOGI("begin");
+    observers_.push_back(observer);
 }
 
 void InputDeviceManager::Detach(Observer* observer)
 {
-    observers.remove(observer);
+    MMI_LOGI("begin");
+    observers_.remove(observer);
 }
 
 void InputDeviceManager::Notify(bool hasPointerDevice)
 {
-    for (auto observer = observers.begin(); observer != observers.end(); observer++) {
+    MMI_LOGI("observers_ size:%{public}d", static_cast<int32_t>(observers_.size()));
+    for (auto observer = observers_.begin(); observer != observers_.end(); observer++) {
         (*observer)->Update(hasPointerDevice);
     }
 }

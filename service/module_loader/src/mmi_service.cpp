@@ -212,7 +212,7 @@ int32_t MMIService::Init()
     CHKR(DevRegister->Init(), DEV_REG_INIT_FAIL, DEV_REG_INIT_FAIL);
 
     MMI_LOGD("MouseDrawingManager Init");
-    CHKR(MouseDrawingManager::GetInstance()->Init(), DEV_REG_INIT_FAIL, POINTER_DRAW_MANAGER_FAIL);
+    CHKR(MouseDrawingManager::GetInstance()->Init(), POINTER_DRAW_INIT_FAIL, POINTER_DRAW_INIT_FAIL);
 
     mmiFd_ = EpollCreat(MAX_EVENT_SIZE);
     CHKR(mmiFd_ >= 0, EPOLL_CREATE_FAIL, EPOLL_CREATE_FAIL);
