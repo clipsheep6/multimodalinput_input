@@ -21,6 +21,7 @@
 #include "pixel_map.h"
 #include "log.h"
 #include "image/bitmap.h"
+#include "input_device_manager.h"
 
 namespace OHOS::MMI {
     static const std::string IMAGE_POINTER_JPEG_PATH = "/system/etc/multimodalinput/mouse_icon/angle.png";
@@ -189,20 +190,20 @@ void OHOS::MMI::MouseDrawingManager::TellDisplayInfo(int32_t displayId, int32_t 
     displayId_ = displayId;
     displayWidth_ = width;
     displayHeight_ = height;
-    Init();
+    DrawManager();
 }
 
 void OHOS::MMI::MouseDrawingManager::Update(bool hasPointerDevice) 
 {
     MMI_LOGD("enter");
     hasPointerDevice_ = hasPointerDevice;
-    Init();
+    DrawManager();
 }
 
-void OHOS::MMI::MouseDrawingManager::Init() 
+void OHOS::MMI::MouseDrawingManager::DrawManager() 
 {
     if (hasDisplay_ && hasPointerDevice_ && drawWindow_ == nullptr) {
-        MMI_LOGD("init draw pointer");
+        MMI_LOGD("draw pointer begin");
         DrawPointer(displayId_, displayWidth_/2, displayHeight_/2);
         return;
     }
@@ -216,5 +217,7 @@ void OHOS::MMI::MouseDrawingManager::Init()
 
 bool OHOS::MMI::MouseDrawingManager::Init()
 {
-    InputDeviceManager::GetInstance()->Attach(this);
+    MMI_LOGD("enter");
+    InputDevMgr->Attach(GetInstance().get());
+    return true;
 }

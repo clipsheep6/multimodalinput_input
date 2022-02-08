@@ -25,7 +25,7 @@ public:
 
 class Subject {
 public:
-    virtual void Attach(Observer* observer) = 0; 
+    virtual void Attach(Observer* observer) = 0;
     virtual void Detach(Observer* observer) = 0;
     virtual void Notify(bool) = 0;
 };

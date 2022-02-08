@@ -21,15 +21,14 @@
 #include "mmi_server.h"
 #include "util.h"
 
-
 namespace OHOS::MMI {
 namespace {
 [[maybe_unused]]static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputWindowsManagerStub"};
 }
 }
 
-using namespace OHOS::MMI;
-
+namespace OHOS {
+namespace MMI {
 #ifndef OHOS_WESTEN_MODEL
 #define MAX_LENGTH 1024
 
@@ -176,8 +175,10 @@ void SetScreenListener(const ScreenInfoChangeListener listener)
     MMI_LOGT("SetScreenListener...");
 }
 
-void OHOS::MMI::SetLibInputEventListener(const LibInputEventListener listener)
+void SetLibInputEventListener(const LibInputEventListener listener)
 {
     MMI_LOGT("SetLibInputEventListener...");
 }
+} // namespace OHOS
+} // namespace MMI
 #endif
