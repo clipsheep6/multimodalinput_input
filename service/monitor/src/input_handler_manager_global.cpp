@@ -38,10 +38,10 @@ int32_t InputHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
     MMI_LOGT("Register monitor(%{public}d)", handlerId);
     SessionMonitor mon { handlerId, session };
     return monitors_.AddMonitor(mon);
-    if (InputHandlerType::INTERCEPTOR £¡= handlerType) {
-	 	MMI_LOGW("Invalid handler type");
-    	return RET_ERR;
-	}
+    if (InputHandlerType::INTERCEPTOR != handlerType) {
+        MMI_LOGW("Invalid handler type");
+        return RET_ERR;
+    }
     MMI_LOGD("Register interceptor(%{public}d).", handlerId);
     SessionHandler interceptor { handlerId, handlerType, session };
     return interceptors_.AddInterceptor(interceptor);
@@ -51,13 +51,13 @@ void InputHandlerManagerGlobal::RemoveInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
 {
     if (InputHandlerType::MONITOR != handlerType) {
-		MMI_LOGE("RemoveInputHandler InputHandlerType Not MONITOR:%{public}d", handlerType);
+        MMI_LOGE("RemoveInputHandler InputHandlerType Not MONITOR:%{public}d", handlerType);
         return;
-	}
+    }
     MMI_LOGD("Unregister monitor(%{public}d).", handlerId);
     SessionHandler monitor { handlerId, handlerType, session };
     monitors_.RemoveMonitor(monitor);
-	if (InputHandlerType::INTERCEPTOR == handlerType) {
+    if (InputHandlerType::INTERCEPTOR == handlerType) {
         MMI_LOGD("Unregister interceptor(%{public}d).", handlerId);
         SessionHandler interceptor { handlerId, handlerType, session };
         interceptors_.RemoveInterceptor(interceptor);
@@ -148,7 +148,7 @@ int32_t InputHandlerManagerGlobal::MonitorCollection::AddMonitor(const SessionHa
                  static_cast<int32_t>(monitors_.size()), INVALID_MONITOR_MON);
         return RET_ERR;
     }
-	auto iter = monitors_.find(mon);
+    auto iter = monitors_.find(mon);
     if (iter != monitors_.end()) {
         MMI_LOGW("repeate register, errCode:%{public}d", INVALID_MONITOR_MON);
     }
