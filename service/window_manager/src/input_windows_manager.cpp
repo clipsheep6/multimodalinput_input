@@ -854,12 +854,21 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
     int32_t globalY = pointerItem.GetGlobalY();
     FixCursorPosition(globalX, globalY, IMAGE_SIZE, IMAGE_SIZE);
     DrawWgr->DrawPointer(displayId, globalX, globalY);
+
     WindowInfo *focusWindow = nullptr;
-    for (auto it : logicalDisplayInfo.windowsInfo_) {
-        if (IsTouchWindow(globalX, globalY, it)) {
-            focusWindow = &it;
-            break;
-        }
+    int32_t action = pointerEvent->GetPointerAction();
+    if ((firstBtnDownWindow_.pid == 0)
+        || (action == PointerEvent::POINTER_ACTION_BUTTON_DOWN && pointerEvent->GetPressedButtons().size() == 1)
+        || (action == PointerEvent::POINTER_ACTION_MOVE && pointerEvent->GetPressedButtons().empty())) {
+        for (auto it : logicalDisplayInfo.windowsInfo_) {
+            if (IsTouchWindow(globalX, globalY, it)) {
+                focusWindow = &it;       
+                firstBtnDownWindow_ = *focusWindow;    
+                break;
+            }
+        }   
+    } else {
+        focusWindow = &firstBtnDownWindow_ ;
     }
     if (focusWindow == nullptr) {
         MMI_LOGE("Find foucusWindow failed");
@@ -869,10 +878,9 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
     pointerEvent->SetAgentWindowId(focusWindow->agentWindowId);
     auto fd = udsServer_->GetFdByPid(focusWindow->pid);
     auto size = pointerEvent->GetPressedButtons();
-    MMI_LOGD("pressedButtons size : %{public}d, pid :%{public}d, fd :%{public}d,"
-             "globalX is:%{public}d, globalY :%{public}d, localX :%{public}d, localY :%{public}d",
-             static_cast<int32_t>(size.size()), focusWindow->pid, fd,
-             globalX, globalY, pointerItem.GetLocalX(), pointerItem.GetLocalY());
+    MMI_LOGD("pressedButtons size is: %{public}d, pid is:%{public}d, fd is:%{public}d, globalX is:%{public}d, globalY "
+             "is:%{public}d, localX is:%{public}d, localY is:%{public}d", static_cast<int32_t>(size.size()),
+             focusWindow->pid, fd, globalX, globalY, pointerItem.GetLocalX(), pointerItem.GetLocalY());
     return fd;
 }
 
