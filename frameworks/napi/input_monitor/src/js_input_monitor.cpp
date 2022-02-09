@@ -393,7 +393,7 @@ void JsInputMonitor::OnPointerEventInJsThread()
         MMI_LOGE("js monitor stop");
         return;
     }
-    if (jsEnv_ == nullptr || receiver_ == nullptr) {
+    if ((jsEnv_ == nullptr) || (receiver_ == nullptr)) {
         MMI_LOGE("jsEnv_ or receiver_ is null");
         return;
     }

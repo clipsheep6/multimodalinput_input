@@ -33,7 +33,7 @@ int32_t InputFilterManager::FilterKeyEvent(std::string name, Authority authority
         return RET_ERR;
     }
     MMI_LOGD("******************* the authority is %{public}d", authority);
-    if (authority < NO_AUTHORITY || authority > HIGH_AUTHORITY) {
+    if ((authority < NO_AUTHORITY) || (authority > HIGH_AUTHORITY)) {
         MMI_LOGD("the input authority is incorrect");
         return RET_ERR;
     }
@@ -181,7 +181,7 @@ int32_t InputFilterManager::FilterTouchEvent(std::string name, Authority authori
         return RET_ERR;
     }
 
-    if (authority < NO_AUTHORITY || authority > HIGH_AUTHORITY) {
+    if ((authority < NO_AUTHORITY) || (authority > HIGH_AUTHORITY)) {
         MMI_LOGE("the input authority is incorrect");
         return RET_ERR;
     }
@@ -300,7 +300,7 @@ int32_t InputFilterManager::RegisterPointerEventInterceptor(std::string name_, A
         return RET_ERR;
     }
     MMI_LOGD("******************* the authority is %{public}d", authority_);
-    if (authority_ < NO_AUTHORITY || authority_ > HIGH_AUTHORITY) {
+    if ((authority_ < NO_AUTHORITY) || (authority_ > HIGH_AUTHORITY)) {
         MMI_LOGD("the input authority is incorrect");
         return RET_ERR;
     }

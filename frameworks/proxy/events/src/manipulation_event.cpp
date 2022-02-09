@@ -30,7 +30,7 @@ void ManipulationEvent::Initialize(int32_t windowId, int32_t startTime, int32_t 
                                    int32_t sourceType, uint64_t occurredTime, const std::string& deviceId,
                                    int32_t inputDeviceId,  bool isHighLevelEvent, uint16_t deviceUdevTags)
 {
-    if (pointerCount < 0 || pointerCount > FINGER_NUM) {
+    if ((pointerCount < 0) || (pointerCount > FINGER_NUM)) {
         return;
     }
 
@@ -72,7 +72,7 @@ int32_t ManipulationEvent::GetPhase() const
 
 MmiPoint ManipulationEvent::GetPointerPosition(int32_t index) const
 {
-    if (index < 0 || index >= FINGER_NUM) {
+    if ((index < 0) || (index >= FINGER_NUM)) {
         return MmiPoint(0, 0, 0);
     }
     for (int i = 0; i < mPointerCount_; i++) {
@@ -94,7 +94,7 @@ void ManipulationEvent::SetScreenOffset(float offsetX, float offsetY)
 
 MmiPoint ManipulationEvent::GetPointerScreenPosition(int32_t index) const
 {
-    if (index < 0 || index >= FINGER_NUM) {
+    if ((index < 0) || (index >= FINGER_NUM)) {
         return MmiPoint(0, 0, 0);
     }
     return mfingersInfos_[index].mMp;
@@ -107,7 +107,7 @@ int32_t ManipulationEvent::GetPointerCount() const
 
 int32_t ManipulationEvent::GetPointerId(int32_t index) const
 {
-    if (index < 0 || index >= FINGER_NUM) {
+    if ((index < 0) || (index >= FINGER_NUM)) {
         return -1;
     }
     return mfingersInfos_[index].mPointerId;
@@ -115,7 +115,7 @@ int32_t ManipulationEvent::GetPointerId(int32_t index) const
 
 float ManipulationEvent::GetForce(int32_t index) const
 {
-    if (index < 0 || index >= FINGER_NUM) {
+    if ((index < 0) || (index >= FINGER_NUM)) {
         return 0.0F;
     }
     return mfingersInfos_[index].mTouchPressure;
@@ -123,7 +123,7 @@ float ManipulationEvent::GetForce(int32_t index) const
 
 float ManipulationEvent::GetRadius(int32_t index) const
 {
-    if (index < 0 || index >= FINGER_NUM) {
+    if ((index < 0) || (index >= FINGER_NUM)) {
         return 0.0F;
     }
     return mfingersInfos_[index].mTouchArea;
