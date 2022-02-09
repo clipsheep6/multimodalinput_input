@@ -35,8 +35,8 @@ int32_t InputHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
         MMI_LOGE("AddInputHandler InputHandlerType Not MONITOR:%{public}d", handlerType);
         return RET_ERR;
     }
-    MMI_LOGT("Register monitor(%{public}d)", handlerId);
-    SessionMonitor mon { handlerId, handlerType, session };
+    MMI_LOGD("Register monitor(%{public}d)", handlerId);
+    SessionHandler mon { handlerId, handlerType, session };
     return monitors_.AddMonitor(mon);
     if (InputHandlerType::INTERCEPTOR != handlerType) {
         MMI_LOGW("Invalid handler type");
@@ -57,12 +57,12 @@ void InputHandlerManagerGlobal::RemoveInputHandler(int32_t handlerId,
     MMI_LOGD("Unregister monitor(%{public}d).", handlerId);
     SessionHandler monitor { handlerId, handlerType, session };
     monitors_.RemoveMonitor(monitor);
-    if (InputHandlerType::INTERCEPTOR == handlerType) {
-        MMI_LOGD("Unregister interceptor(%{public}d).", handlerId);
-        SessionHandler interceptor { handlerId, handlerType, session };
-        interceptors_.RemoveInterceptor(interceptor);
+    if (InputHandlerType::INTERCEPTOR != handlerType) {
+        MMI_LOGW("Invalid handler type.");
     }
-    MMI_LOGW("Invalid handler type.");
+    MMI_LOGD("Unregister interceptor(%{public}d).", handlerId);
+    SessionHandler interceptor { handlerId, handlerType, session };
+    interceptors_.RemoveInterceptor(interceptor);
 }
 
 void InputHandlerManagerGlobal::MarkConsumed(int32_t handlerId, int32_t eventId, SessionPtr session)
@@ -229,7 +229,7 @@ bool InputHandlerManagerGlobal::MonitorCollection::HasMonitor(int32_t monitorId,
 
 void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGT("Update consumption state");
+    MMI_LOGD("Update consumption state");
     CHKP(pointerEvent, PARAM_INPUT_INVALID);
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         MMI_LOGE("This is not a touch-screen event");
@@ -243,11 +243,11 @@ void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::s
         return;
     }
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
-        MMI_LOGT("Press for the first time");
+        MMI_LOGD("Press for the first time");
         downEventId_ = pointerEvent->GetId();
         monitorConsumed_ = false;
     } else if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
-        MMI_LOGT("the last time lift");
+        MMI_LOGD("the last time lift");
         downEventId_ = -1;
         lastPointerEvent_.reset();
     }
@@ -256,8 +256,8 @@ void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::s
 void InputHandlerManagerGlobal::MonitorCollection::Monitor(std::shared_ptr<PointerEvent> pointerEvent)
 {
     std::lock_guard<std::mutex> guard(lockMonitors_);
-    MMI_LOGT("There are currently %{public}d monitors", static_cast<int32_t>(monitors_.size()));
-    for (const SessionMonitor& monitor : monitors_) {
+    MMI_LOGD("There are currently %{public}d monitors", static_cast<int32_t>(monitors_.size()));
+    for (const SessionHandler& monitor : monitors_) {
         monitor.SendToClient(pointerEvent);
     }
 }
