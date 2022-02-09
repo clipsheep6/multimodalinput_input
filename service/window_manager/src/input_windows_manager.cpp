@@ -542,7 +542,6 @@ void OHOS::MMI::InputWindowsManager::UpdateDisplayInfo(const std::vector<Physica
     if (!logicalDisplays.empty()) {
         DrawWgr->TellDisplayInfo(logicalDisplays[0].id, logicalDisplays[0].width, logicalDisplays_[0].height);
     }
-    physicalDisplays_[0].direction = Direction90;
     PrintDisplayDebugInfo();
     MMI_LOGD("InputWindowsManager::UpdateDisplayInfo leave");
 }
