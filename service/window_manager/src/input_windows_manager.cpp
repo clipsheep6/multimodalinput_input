@@ -542,6 +542,7 @@ void OHOS::MMI::InputWindowsManager::UpdateDisplayInfo(const std::vector<Physica
     if (!logicalDisplays.empty()) {
         DrawWgr->TellDisplayInfo(logicalDisplays[0].id, logicalDisplays[0].width, logicalDisplays_[0].height);
     }
+    physicalDisplays_[0].direction = Direction180;
     PrintDisplayDebugInfo();
     MMI_LOGD("InputWindowsManager::UpdateDisplayInfo leave");
 }
@@ -581,7 +582,7 @@ void OHOS::MMI::InputWindowsManager::PrintDisplayDebugInfo()
     }
 }
 
-bool OHOS::MMI::InputWindowsManager::TouchPadPointToDisplayPoint_2(libinput_event_touch* touch,
+bool OHOS::MMI::InputWindowsManager::TpPoint2LogicDisplayPoint2(libinput_event_touch* touch,
     int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId)
 {
     if (screensInfo_ != nullptr) {
@@ -614,7 +615,96 @@ OHOS::MMI::PhysicalDisplayInfo* OHOS::MMI::InputWindowsManager::FindMatchedPhysi
     return nullptr;
 }
 
-bool OHOS::MMI::InputWindowsManager::TransformTouchPointToDisplayPoint(libinput_event_touch* touch,
+void OHOS::MMI::InputWindowsManager::TurnTouchScreen(PhysicalDisplayInfo* info, Direction direction,
+    int32_t& logicalX, int32_t& logicalY)
+{
+    if (direction == Direction0){
+        return;
+    }
+    if(direction == Direction90) {
+        int32_t temp = logicalX;
+        logicalX = info->logicHeight - logicalY;
+        logicalY = temp;
+        return;
+    } 
+    if (direction == Direction180) {
+        logicalX = info->logicWidth - logicalX;
+        logicalY = info->logicHeight - logicalY;
+        return;
+    }
+    if (direction == Direction270) {
+        int32_t temp = logicalY;
+        logicalY = info->logicWidth - logicalX;
+        logicalX = temp;
+    }
+}
+
+bool OHOS::MMI::InputWindowsManager::TransformTouchPointToDisplayPoint(libinput_event_touch* touch, Direction& direction,
+    int32_t& targetDisplayId, int32_t& displayX, int32_t& displayY)
+{
+    auto info = FindMatchedPhysicalDisplayInfo("seat0","default0");
+    if (info == nullptr) {
+        MMI_LOGD("info is a nullptr, find display seat0:default0  failed by Physical");
+        return false;
+    }
+    if (info->width <= 0 || info->height <= 0 || info->logicWidth <= 0 || info->logicHeight <= 0) {
+        return false;
+    }
+
+    int32_t localPhysicalX = static_cast<int32_t>(libinput_event_touch_get_x_transformed(touch, info->width) + info->topLeftX);
+    int32_t localPhysicalY = static_cast<int32_t>(libinput_event_touch_get_y_transformed(touch, info->height) + info->topLeftY);
+
+    int32_t localLogcialX = (int32_t)(1L * info->logicWidth * localPhysicalX / info->width);
+    int32_t localLogcialY = (int32_t)(1L * info->logicHeight * localPhysicalY / info->height);
+
+    direction = info->direction;
+    TurnTouchScreen(info, direction, localLogcialX, localLogcialY);
+
+    int32_t globalLogicalX = localLogcialX;
+    int32_t globalLogicalY = localLogcialY;
+
+    
+
+    for (const PhysicalDisplayInfo* left =  GetPhysicalDisplayById(info->leftDisplayId); left != nullptr; left = GetPhysicalDisplayById(left->leftDisplayId)) {
+        if (direction == Direction0 || direction == Direction180) {
+            globalLogicalX += left->logicWidth;
+        }  
+        if (direction == Direction90 || direction == Direction270) {
+            globalLogicalX += left->logicHeight;
+        } 
+    }
+
+    for (const PhysicalDisplayInfo* upper =  GetPhysicalDisplayById(info->upDisplayId); upper != nullptr; upper = GetPhysicalDisplayById(upper->upDisplayId)) {
+        if (direction == Direction0 || direction == Direction180) {
+            globalLogicalY += upper->logicHeight;
+        }
+        if (direction == Direction90 || direction == Direction270) {
+            globalLogicalY += upper->logicWidth;
+        }
+    }
+
+    for (const auto& display : logicalDisplays_) {
+        if (targetDisplayId < 0) {
+            if (globalLogicalX < display.topLeftX || globalLogicalX > display.topLeftX + display.width) {
+                continue;
+            }
+            if (globalLogicalY < display.topLeftY || globalLogicalY > display.topLeftY + display.height) {
+                continue;
+            }
+            targetDisplayId = display.id;
+            displayX = globalLogicalX - display.topLeftX;
+            displayY = globalLogicalY - display.topLeftY;   
+            return true;
+        } else if(targetDisplayId == display.id) {
+            displayX = globalLogicalX - display.topLeftX;
+            displayY = globalLogicalY - display.topLeftY;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool OHOS::MMI::InputWindowsManager::TansformTouchscreePointToLogicalDisplayPoint(libinput_event_touch* touch,
     int32_t targetDisplayId, int32_t& displayX, int32_t& displayY)
 {
 
@@ -655,14 +745,14 @@ bool OHOS::MMI::InputWindowsManager::TransformTouchPointToDisplayPoint(libinput_
         if (targetDisplayId == display.id ) {
             displayX = globalLogicalX - display.topLeftX;
             displayY = globalLogicalY - display.topLeftY;
+            return true;
         }
-        return true;
     }
 
     return false;
 }
 
-bool OHOS::MMI::InputWindowsManager::TouchPadPointToDisplayPoint(libinput_event_touch* touch,
+bool OHOS::MMI::InputWindowsManager::TpPointLogicDisplayPoint(libinput_event_touch* touch,
     int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId)
 {
 
