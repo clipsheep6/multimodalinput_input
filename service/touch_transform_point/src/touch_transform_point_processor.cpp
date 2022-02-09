@@ -49,7 +49,6 @@ bool TouchTransformPointProcessor::OnEventTouchDown(libinput_event *event)
         return false;
     }
     auto pointIds = pointerEvent_->GetPointersIdList();
-    auto time = libinput_event_touch_get_time(data);
     pointerEvent_->SetActionTime(time);
     if (pointIds.empty()) {
         pointerEvent_->SetActionStartTime(time);
@@ -130,7 +129,7 @@ bool TouchTransformPointProcessor::OnEventTouchUp(libinput_event *event)
     if (pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL) {
         pointerEvent_->RemovePointerItem(seatSlot);
         if (pointerEvent_->GetPointersIdList().empty()) {
-            pointerEvent_->Init();
+            pointerEvent_->Reset();
         }
         return false;
     }
