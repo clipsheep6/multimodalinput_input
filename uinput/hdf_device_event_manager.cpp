@@ -41,7 +41,7 @@ void HdfDeviceEventManager::ConnectHDFInit()
         return;
     }
 
-    if (inputInterface_ == nullptr || inputInterface_->iInputManager == nullptr) {
+    if ((inputInterface_ == nullptr) || (inputInterface_->iInputManager == nullptr)) {
         HiLog::Error(LABEL, "%{public}s inputInterface_ or iInputManager is nullptr", __func__);
         return;
     }

@@ -155,7 +155,7 @@ bool OHOS::MMI::VirtualDevice::SetAbsResolution(const std::string deviceName)
 {
     const int ABS_RESOLUTION = 200;
     const int ABS_RESOLUTION_FINGER = 40;
-    if (deviceName == "Virtual Stylus" || deviceName == "Virtual Touchpad") {
+    if ((deviceName == "Virtual Stylus") || (deviceName == "Virtual Touchpad")) {
         absTemp_.code = 0x00;
         absTemp_.absinfo.resolution = ABS_RESOLUTION;
         absInit_.push_back(absTemp_);

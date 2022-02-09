@@ -227,7 +227,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRegisterAppInfo(SessionPtr sess, NetPacke
     AppInfo appInfo = { abilityId, windowId, fd, bundlerName, appName };
 
     AppRegs->RegisterAppInfoforServer(appInfo);
-#if !defined(OHOS_BUILD) || !defined(OHOS_WESTEN_MODEL)
+#if (!defined(OHOS_BUILD)) || (!defined(OHOS_WESTEN_MODEL))
     WinMgr->SetFocusSurfaceId(windowId);
     WinMgr->SetTouchFocusSurfaceId(windowId);
 #endif

@@ -25,7 +25,7 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchEvent(l
 {
     CHKR(event, PARAM_INPUT_INVALID, nullptr);
     auto type = libinput_event_get_type(event);
-    if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
+    if ((type == LIBINPUT_EVENT_TOUCH_CANCEL) || (type == LIBINPUT_EVENT_TOUCH_FRAME)) {
         MMI_LOGT("This touch event is canceled type:%{public}d", type); 
         return nullptr;
     }
