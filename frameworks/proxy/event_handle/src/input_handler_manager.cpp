@@ -28,6 +28,7 @@ namespace {
 int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
     std::shared_ptr<IInputEventConsumer> consumer)
 {
+    CHKPR(consumer, ERROR_NULL_POINTER, RET_ERR);
     if (inputHandlers_.size() >= MAX_N_INPUT_HANDLERS) {
         MMI_LOGE("The number of handlers exceeds the maximum");
         return INVALID_HANDLER_ID;
@@ -58,7 +59,7 @@ void InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType hand
 
 void InputHandlerManager::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
-    MMI_LOGD("Mark consumed state:monitorId=%{public}d, eventId=%{public}d", monitorId, eventId);
+    MMI_LOGD("Mark consumed state, monitor:%{public}d, event:%{public}d", monitorId, eventId);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     if (client == nullptr) {
         MMI_LOGE("Get MMIClint false");
@@ -105,11 +106,12 @@ int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType han
     std::lock_guard<std::mutex> guard(lockHandlers_);
     auto tItr = inputHandlers_.find(handlerId);
     if (tItr == inputHandlers_.end()) {
-        MMI_LOGE("No handler with specified ID");
+        MMI_LOGE("No handler with specified");
         return RET_ERR;
     }
-    if (tItr->second.handlerType_ != handlerType) {
-        MMI_LOGE("Unmatched handler type");
+    if (handlerType != tItr->second.handlerType_) {
+        MMI_LOGE("Unmatched handler type, InputHandlerType:%{public}d, FindHandlerType:%{public}d",
+                  handlerType, tItr->second.handlerType_);
         return RET_ERR;
     }
     inputHandlers_.erase(tItr);
@@ -119,7 +121,7 @@ int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType han
 void InputHandlerManager::RemoveFromServer(int32_t handlerId, InputHandlerType handlerType)
 {
     MMI_LOGD("Remove handler:%{public}d from server", handlerId);
-    MMIClientPtr client { MMIEventHdl.GetMMIClient() };
+    MMIClientPtr client = MMIEventHdl.GetMMIClient();
     if (client == nullptr) {
         MMI_LOGE("RemoveFromServer Get MMIClint false");
         return;
@@ -152,7 +154,7 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEve
 
 void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("Enter handlerId:%{public}d", handlerId);
+    MMI_LOGD("Enter handler:%{public}d", handlerId);
     std::map<int32_t, InputHandler>::iterator tItr;
     std::map<int32_t, InputHandler>::iterator tItrEnd;
     {
