@@ -78,7 +78,7 @@ void AbilityLaunchManager::ResolveConfig(const std::string configFile)
         return;
     }
     json shortkeys = configJson["Shortkeys"];
-    if (!shortkeys.is_array() || shortkeys.empty()) {
+    if ((!shortkeys.is_array()) || (shortkeys.empty())) {
         MMI_LOGE("shortkeys in config file is empty");
         return;
     }
@@ -98,13 +98,13 @@ void AbilityLaunchManager::ResolveConfig(const std::string configFile)
 bool AbilityLaunchManager::ConvertToShortcutKey(const json &jsonData, ShortcutKey &shortcutKey)
 {
     json preKey = jsonData["preKey"];
-    if (!preKey.is_array() || preKey.size() > MAX_PREKEYS_NUM) {
+    if ((!preKey.is_array()) || (preKey.size() > MAX_PREKEYS_NUM)) {
         MMI_LOGE("preKey number must less and equal four");
         return false;
     }
 
     for (size_t i = 0; i < preKey.size(); i++) {
-        if (!preKey[i].is_number() || preKey[i] < 0) {
+        if ((!preKey[i].is_number()) || (preKey[i] < 0)) {
             MMI_LOGE("preKey must be number and bigger and equal 0");
             return false;
         }
@@ -120,7 +120,8 @@ bool AbilityLaunchManager::ConvertToShortcutKey(const json &jsonData, ShortcutKe
     }
     shortcutKey.finalKey = jsonData["finalKey"];
     if ((!jsonData["trigger"].is_string()) ||
-        (jsonData["trigger"].get<std::string>() != "key_up" && jsonData["trigger"].get<std::string>() != "key_down")) {
+        ((jsonData["trigger"].get<std::string>() != "key_up") &&
+        (jsonData["trigger"].get<std::string>() != "key_down"))) {
         MMI_LOGE("trigger must be one of [key_up, key_down]");
         return false;
     }
@@ -227,7 +228,8 @@ bool AbilityLaunchManager::CheckLaunchAbility(const std::shared_ptr<KeyEvent> &k
 }
 
 bool AbilityLaunchManager::Match(const ShortcutKey &shortcutKey, const std::shared_ptr<KeyEvent> &key) {
-    if (key->GetKeyCode() != shortcutKey.finalKey || shortcutKey.triggerType != key->GetKeyAction()) {
+    if ((key->GetKeyCode() != shortcutKey.finalKey) ||
+        (shortcutKey.triggerType != key->GetKeyAction())) {
         return false;
     }
     if ((shortcutKey.preKeys.size()) != (key->GetKeyItems().size() - 1)) {  // KeyItems contain finalkey, so decrease 1

@@ -225,7 +225,7 @@ int OHOS::MMI::HdfEventManager::GetDeviceCount()
     if (ret != EOK) {
         MMI_LOGE("call memset_s fail. ret = %d", ret);
     }
-    if (inputInterface_ != nullptr || inputInterface_->iInputManager != nullptr) {
+    if ((inputInterface_ != nullptr) || (inputInterface_->iInputManager != nullptr)) {
         int32_t ret = inputInterface_->iInputManager->ScanInputDevice(mountDevIndex_, MAX_INPUT_DEVICE_COUNT);
         if (ret) {
             MMI_LOGE("---- %{public}s:%{public}d Error:ScanInputDevice failed. ----", __func__, __LINE__);
@@ -239,7 +239,7 @@ int OHOS::MMI::HdfEventManager::GetDeviceCount()
         }
     }
     int jectcount = 0;
-    if (injectInterface_ != nullptr || injectInterface_->iInputManager != nullptr) {
+    if ((injectInterface_ != nullptr) || (injectInterface_->iInputManager != nullptr)) {
         int32_t ret = injectInterface_->iInputManager->ScanInputDevice(&mountDevIndex_[devcount],
                                                                        MAX_INPUT_DEVICE_COUNT);
         if (ret) {
@@ -260,16 +260,16 @@ void OHOS::MMI::HdfEventManager::SetupCallback()
 {
     MMI_LOGD("---- %{public}s:%{public}d ThreadSetupCallback start ! ----", __func__, __LINE__);
     uint32_t ret = GetInputInterface(&inputInterface_);
-    if (ret != 0 || inputInterface_ == nullptr
-        || inputInterface_->iInputManager == nullptr
-        || inputInterface_->iInputReporter == nullptr) {
+    if ((ret != 0) || (inputInterface_ == nullptr)
+        || (inputInterface_->iInputManager == nullptr)
+        || (inputInterface_->iInputReporter == nullptr)) {
         MMI_LOGD("---- %{public}s:%{public}d inputInterface_ init fail! ----", __func__, __LINE__);
     }
 
     ret = GetInputInterfaceFromInject(&injectInterface_);
-    if (ret != 0 || injectInterface_ == nullptr
-        || injectInterface_->iInputManager == nullptr
-        || injectInterface_->iInputReporter == nullptr) {
+    if (ret != 0 || (injectInterface_ == nullptr)
+        || (injectInterface_->iInputManager == nullptr)
+        || (injectInterface_->iInputReporter == nullptr)) {
         MMI_LOGD("---- %{public}s:%{public}d injectInterface_ init fail! ----", __func__, __LINE__);
     }
 

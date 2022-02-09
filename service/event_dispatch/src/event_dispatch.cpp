@@ -170,7 +170,7 @@ int32_t EventDispatch::KeyBoardRegEveHandler(EventKeyboard& key, UDSServer& udsS
     }
     auto ret1 = RET_OK;
     auto ret2 = RET_OK;
-    if ((key.key == KEY_ENTER || key.key == KEY_KPENTER) && (key.state == KEY_STATE_PRESSED)) {
+    if (((key.key == KEY_ENTER) || (key.key == KEY_KPENTER)) && (key.state == KEY_STATE_PRESSED)) {
         ret1 = DispatchRegEvent(MmiMessageId::ON_SEND, udsServer, eve, INPUT_DEVICE_CAP_KEYBOARD, preHandlerTime);
         if (ret1 != RET_OK) {
             MMI_LOGW("Dispatching ON_SEND event has failed, ret:%{public}d, errCode:%{public}d", ret1,

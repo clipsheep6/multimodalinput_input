@@ -128,7 +128,7 @@ static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
     int32_t infoFinalKey = keyOption->GetFinalKey();
     int32_t keyEventFinalKey = keyEvent->GetKeyCode();
     MMI_LOGD("infoFinalKey:%{public}d, keyEventFinalKey:%{public}d", infoFinalKey, keyEventFinalKey);
-    if (infoFinalKey != keyEventFinalKey || items.size() > 4) {
+    if ((infoFinalKey != keyEventFinalKey) || (items.size() > 4)) {
         MMI_LOGD("%{public}d", __LINE__);
         return false;
     }
@@ -226,7 +226,7 @@ static napi_value SubscribeKeyEventMonitor(napi_env env, napi_callback_info info
         .asyncWork = nullptr,
     };
     auto keyOption = std::shared_ptr<KeyOption>(new KeyOption());
-    if (GetEventInfo(env, info, event, keyOption) == nullptr || !CheckPara(keyOption)) {
+    if ((GetEventInfo(env, info, event, keyOption) == nullptr) || (!CheckPara(keyOption))) {
         delete event;
         event = nullptr;
         MMI_LOGE("GetEventInfo failed");
