@@ -358,27 +358,27 @@ int32_t OHOS::MMI::InputEventHandler::OnKeyboardEvent(libinput_event& event)
     }
 #endif  // OHOS_AUTO_TEST_FRAME
 
-    auto hosKey = KeyValueTransformationByInput(key.key); // libinput key transformed into HOS key
+    auto oKey = KeyValueTransformationByInput(key.key); // libinput key transformed into HOS key
     key.mUnicode = 0;
 #ifndef OHOS_AUTO_TEST_FRAME
-    if (hosKey.isSystemKey) { // Judging whether key is system key.
-        OnSystemEvent(hosKey, key.state);
+    if (oKey.isSystemKey) { // Judging whether key is system key.
+        OnSystemEvent(oKey, key.state);
     }
 #else
     AutoTestKeyTypePkt autoTestKeyTypePkt = {};
-    bool retSystemEvent = OnSystemEvent(hosKey, key.state, autoTestKeyTypePkt);
+    bool retSystemEvent = OnSystemEvent(oKey, key.state, autoTestKeyTypePkt);
     auto retAutoTestTypePktPkt = eventDispatch_.SendKeyTypePktToAutoTest(*udsServer_, autoTestKeyTypePkt);
     if (retAutoTestTypePktPkt != RET_OK) {
         MMI_LOGE("Send event to auto-test failed! errCode:%{public}d", KEY_EVENT_DISP_FAIL);
     }
-    if (hosKey.isSystemKey && retSystemEvent) {
+    if (oKey.isSystemKey && retSystemEvent) {
         return RET_OK;
     }
 #endif  // OHOS_AUTO_TEST_FRAME
     if (keyEvent == nullptr) {
         keyEvent = OHOS::MMI::KeyEvent::Create();
     }
-    key.key = static_cast<uint32_t>(hosKey.keyValueOfHos);
+    key.key = static_cast<uint32_t>(oKey.keyValueOfHos);
     if (EventPackage::KeyboardToKeyEvent(key, keyEvent, *udsServer_) == RET_ERR) {
         MMI_LOGE("on OnKeyboardEvent translate key event error!\n");
         return RET_ERR;
@@ -439,24 +439,24 @@ int32_t OHOS::MMI::InputEventHandler::OnEventKeyboard(multimodal_libinput_event 
     }
 #endif  // OHOS_AUTO_TEST_FRAME
 
-    auto hosKey = KeyValueTransformationByInput(key.key); // libinput key transformed into HOS key
+    auto oKey = KeyValueTransformationByInput(key.key); // libinput key transformed into HOS key
     key.mUnicode = 0;
 #ifndef OHOS_AUTO_TEST_FRAME
-    if (hosKey.isSystemKey && OnSystemEvent(hosKey, key.state)) { // Judging whether key is system key.
+    if (oKey.isSystemKey && OnSystemEvent(oKey, key.state)) { // Judging whether key is system key.
         return RET_OK;
     }
 #else
     AutoTestKeyTypePkt autoTestKeyTypePkt = {};
-    bool retSystemEvent = OnSystemEvent(hosKey, key.state, autoTestKeyTypePkt);
+    bool retSystemEvent = OnSystemEvent(oKey, key.state, autoTestKeyTypePkt);
     auto retAutoTestTypePktPkt = eventDispatch_.SendKeyTypePktToAutoTest(*udsServer_, autoTestKeyTypePkt);
     if (retAutoTestTypePktPkt != RET_OK) {
         MMI_LOGE("Send event to auto-test failed! errCode:%{public}d", KEY_EVENT_DISP_FAIL);
     }
-    if (hosKey.isSystemKey && retSystemEvent) {
+    if (oKey.isSystemKey && retSystemEvent) {
         return RET_OK;
     }
 #endif  // OHOS_AUTO_TEST_FRAME
-    auto eventDispatchResult = eventDispatch_.DispatchKeyEvent(*udsServer_, *ev.event, hosKey, key, preHandlerTime);
+    auto eventDispatchResult = eventDispatch_.DispatchKeyEvent(*udsServer_, *ev.event, oKey, key, preHandlerTime);
     if (eventDispatchResult != RET_OK) {
         MMI_LOGE("Key event dispatch failed... ret:%{public}d errCode:%{public}d",
                  eventDispatchResult, KEY_EVENT_DISP_FAIL);
@@ -835,24 +835,24 @@ int32_t OHOS::MMI::InputEventHandler::OnEventTabletPadKey(multimodal_libinput_ev
         MMI_LOGE("Send event to auto-test failed! errCode:%{public}d", KEY_EVENT_DISP_FAIL);
     }
 #endif  // OHOS_AUTO_TEST_FRAME
-    auto hosKey = KeyValueTransformationByInput(key.key);           // libinput key transformed into HOS key
+    auto oKey = KeyValueTransformationByInput(key.key);           // libinput key transformed into HOS key
 #ifndef OHOS_AUTO_TEST_FRAME // Send event to auto-test frame
-    if (hosKey.isSystemKey && OnSystemEvent(hosKey, key.state)) {   // Judging whether key is system key.
+    if (oKey.isSystemKey && OnSystemEvent(oKey, key.state)) {   // Judging whether key is system key.
         return RET_OK;
     }
 #else
     AutoTestKeyTypePkt autoTestKeyTypePkt = {};
-    bool retSystemEvent = OnSystemEvent(hosKey, key.state, autoTestKeyTypePkt);
+    bool retSystemEvent = OnSystemEvent(oKey, key.state, autoTestKeyTypePkt);
     auto retAutoTestTypePktPkt = eventDispatch_.SendKeyTypePktToAutoTest(*udsServer_, autoTestKeyTypePkt);
     if (retAutoTestTypePktPkt != RET_OK) {
         MMI_LOGE("Send event to auto-test failed! errCode:%{public}d", KEY_EVENT_DISP_FAIL);
     }
-    if (hosKey.isSystemKey && retSystemEvent) {
+    if (oKey.isSystemKey && retSystemEvent) {
         return RET_OK;
     }
 #endif  // OHOS_AUTO_TEST_FRAME
 
-    auto eventDispatchResult = eventDispatch_.DispatchKeyEvent(*udsServer_, *ev.event, hosKey, key, preHandlerTime);
+    auto eventDispatchResult = eventDispatch_.DispatchKeyEvent(*udsServer_, *ev.event, oKey, key, preHandlerTime);
     if (eventDispatchResult != RET_OK) {
         MMI_LOGE("Key event dispatch failed... ret:%{public}d errCode:%{public}d",
                  eventDispatchResult, TABLETPAD_KEY_EVENT_DISP_FAIL);
@@ -885,25 +885,25 @@ int32_t OHOS::MMI::InputEventHandler::OnEventJoyStickKey(multimodal_libinput_eve
     }
 #endif  // OHOS_AUTO_TEST_FRAME
     // libinput key transformed into HOS key
-    auto hosKey = KeyValueTransformationByInput(key.key);
+    auto oKey = KeyValueTransformationByInput(key.key);
     key.mUnicode = 0;
     // Judging whether key is system key.
 #ifndef OHOS_AUTO_TEST_FRAME
-    if (hosKey.isSystemKey && OnSystemEvent(hosKey, key.state)) {
+    if (oKey.isSystemKey && OnSystemEvent(oKey, key.state)) {
         return RET_OK;
     }
 #else
     AutoTestKeyTypePkt autoTestKeyTypePkt = {};
-    bool retSystemEvent = OnSystemEvent(hosKey, key.state, autoTestKeyTypePkt);
+    bool retSystemEvent = OnSystemEvent(oKey, key.state, autoTestKeyTypePkt);
     auto retAutoTestTypePktPkt = eventDispatch_.SendKeyTypePktToAutoTest(*udsServer_, autoTestKeyTypePkt);
     if (retAutoTestTypePktPkt != RET_OK) {
         MMI_LOGE("Send event to auto-test failed! errCode:%{public}d", KEY_EVENT_DISP_FAIL);
     }
-    if (hosKey.isSystemKey && retSystemEvent) {
+    if (oKey.isSystemKey && retSystemEvent) {
         return RET_OK;
     }
 #endif  // OHOS_AUTO_TEST_FRAME
-    auto eventDispatchResult = eventDispatch_.DispatchKeyEvent(*udsServer_, *ev.event, hosKey, key, time);
+    auto eventDispatchResult = eventDispatch_.DispatchKeyEvent(*udsServer_, *ev.event, oKey, key, time);
     if (eventDispatchResult != RET_OK) {
         MMI_LOGE("JoyStick event dispatch failed... ret:%{public}d errCode:%{public}d",
                  eventDispatchResult, JOYSTICK_EVENT_DISP_FAIL);
