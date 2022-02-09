@@ -29,7 +29,7 @@ extern "C" {
 #include <libinput-seat-export.h>
 }
 #else
-struct SurfaceInfo {
+SurfaceInfo {
     int surfaceId;
     int dstX;
     int dstY;
@@ -44,7 +44,7 @@ struct SurfaceInfo {
     int onLayerId;
 };
 
-struct LayerInfo {
+LayerInfo {
     int layerId;
     int dstX;
     int dstY;
@@ -58,43 +58,43 @@ struct LayerInfo {
     int visibility; // 0 or 1
     int onScreenId;
     int nSurfaces;
-    struct SurfaceInfo** surfaces;
+    SurfaceInfo** surfaces;
 };
 
-struct ScreenInfo {
+ScreenInfo {
     int screenId;
     char* connectorName;
     int width;
     int height;
     int nLayers;
-    struct LayerInfo** layers;
+    LayerInfo** layers;
 };
 
-struct SeatInfo {
+SeatInfo {
     char* seatName;
     int deviceFlags;
     int focusWindowId;
 };
 
-struct multimodal_libinput_event {
-    struct libinput_event *event;
+multimodal_libinput_event {
+    libinput_event *event;
     void *userdata;
 };
 
-struct SeatInfo** GetSeatsInfo(void);
-struct ScreenInfo** GetScreensInfo(void);
-void FreeSurfaceInfo(struct SurfaceInfo* pSurface);
-void FreeLayerInfo(struct LayerInfo* pLayer);
-void FreeScreenInfo(struct ScreenInfo* pScreen);
-void FreeScreensInfo(struct ScreenInfo** screens);
-void FreeSeatsInfo(struct SeatInfo** seats);
+SeatInfo** GetSeatsInfo(void);
+ScreenInfo** GetScreensInfo(void);
+void FreeSurfaceInfo(SurfaceInfo* pSurface);
+void FreeLayerInfo(LayerInfo* pLayer);
+void FreeScreenInfo(ScreenInfo* pScreen);
+void FreeScreensInfo(ScreenInfo** screens);
+void FreeSeatsInfo(SeatInfo** seats);
 using SeatInfoChangeListener = void (*)();
 using ScreenInfoChangeListener = void (*)();
 void SetSeatListener(const SeatInfoChangeListener listener);
 void SetScreenListener(const ScreenInfoChangeListener listener);
 
-struct multimodal_libinput_event;
-typedef void (*LibInputEventListener)(struct multimodal_libinput_event *event);
+multimodal_libinput_event;
+typedef void (*LibInputEventListener)(multimodal_libinput_event *event);
 namespace OHOS {
 namespace MMI {
 void SetLibInputEventListener(const LibInputEventListener listener);
@@ -102,14 +102,14 @@ void SetLibInputEventListener(const LibInputEventListener listener);
 }
 #endif
 
-struct MMISurfaceInfo : public SurfaceInfo {
+MMISurfaceInfo : public SurfaceInfo {
     int32_t screenId;
 };
 
 namespace OHOS {
 namespace MMI {
 
-struct MouseLocation {
+MouseLocation {
     int32_t globleX;
     int32_t globleY;
     int32_t localX;
@@ -162,7 +162,7 @@ public:
         const std::vector<LogicalDisplayInfo> &logicalDisplays);
     bool TouchPadPointToDisplayPoint_2(libinput_event_touch* touch,
     int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId);
-    const std::vector<struct LogicalDisplayInfo>& GetLogicalDisplayInfo() const;
+    const std::vector<LogicalDisplayInfo>& GetLogicalDisplayInfo() const;
     const std::map<int32_t, WindowInfo>& GetWindowInfo() const;
     bool FindWindow(std::shared_ptr<PointerEvent> pointerEvent);
     MouseLocation GetMouseInfo();
@@ -204,14 +204,14 @@ private:
     int32_t focusInfoID_ = 0;
     int32_t touchFocusId_ = 0;
     std::vector<int32_t> surfacesList_; // surfaces ids list
-    std::vector<struct ScreenInfo> screenInfoVec_ = {};
+    std::vector<ScreenInfo> screenInfoVec_ = {};
     std::map<int32_t, LayerInfo> layers_ = {};
     std::map<int32_t, MMISurfaceInfo> surfaces_ = {};
     UDSServer* udsServer_ = nullptr;
 
     /* *********************************新框架接口添加*************************** */
-    std::vector<struct PhysicalDisplayInfo> physicalDisplays_ = {};
-    std::vector<struct LogicalDisplayInfo> logicalDisplays_ = {};
+    std::vector<PhysicalDisplayInfo> physicalDisplays_ = {};
+    std::vector<LogicalDisplayInfo> logicalDisplays_ = {};
     std::map<int32_t, WindowInfo> windowInfos_ = {};
     MouseLocation mouseLoction_ = {};
     const int32_t INVALID_LOCATION = 0;
