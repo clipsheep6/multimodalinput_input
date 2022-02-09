@@ -1,0 +1,4591 @@
+[33mcommit 175a978bedb0b9fd7872246fde68796b666dc717[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/xiaozhuohan_02_09_struct[m[33m)[m
+Author: zhxiap <xiaozhuohan@huawei.com>
+Date:   Wed Feb 9 16:43:43 2022 +0800
+
+    更新了struct的代码检视
+    
+    Signed-off-by: zhxiap <xiaozhuohan@huawei.com>
+
+[33mcommit b9bb8b062e6e3341828bb7b873b7ab99fd9bc024[m
+Author: zhxiap <xiaozhuohan@huawei.com>
+Date:   Wed Feb 9 15:41:42 2022 +0800
+
+    修改了部分struct检视问题
+    
+    Signed-off-by: zhxiap <xiaozhuohan@huawei.com>
+
+[33mcommit f7425a9656d89d34f663a7b80d667fc66148aa02[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Merge: acc7d68 e5536a8
+Author: openharmony_ci <120357966@qq.com>
+Date:   Wed Feb 9 06:07:17 2022 +0000
+
+    !463 日志修改，空指针判断使用宏CHKPR、CHKP
+    Merge pull request !463 from liangzhicheng/lwx1115850_code
+
+[33mcommit e5536a89d9e2f280e178886354c7870ba50305d8[m
+Author: mr-liang2504 <liangzhicheng10@huawei.com>
+Date:   Tue Feb 8 15:54:30 2022 +0800
+
+    日志修改，空指针判断使用宏CHKPR、CHKP
+    
+    Signed-off-by: mr-liang2504 <liangzhicheng10@huawei.com>
+
+[33mcommit acc7d680ad86e1943589530d04a13ef86f117a77[m
+Merge: 3709630 2bafbd6
+Author: openharmony_ci <120357966@qq.com>
+Date:   Wed Feb 9 03:21:14 2022 +0000
+
+    !386 修改检视意见
+    Merge pull request !386 from lifenghui/lifenghui_review_0129
+
+[33mcommit 37096301cf2699b7b60f4b2d8c8742a0d5006852[m
+Merge: eba670b 6b0aaab
+Author: openharmony_ci <120357966@qq.com>
+Date:   Wed Feb 9 03:00:02 2022 +0000
+
+    !452 单例类的命名规则大驼峰
+    Merge pull request !452 from lisong/codeReview_0208
+
+[33mcommit eba670b5ff7934e089cbaf505a51cb57048224d1[m
+Merge: cb4de09 3219509
+Author: openharmony_ci <120357966@qq.com>
+Date:   Wed Feb 9 02:52:52 2022 +0000
+
+    !459 process for loop statement
+    Merge pull request !459 from hhh2/master
+
+[33mcommit 3219509dee724e859172bb8472b20111ae3d7fd6[m
+Merge: cadcb04 cb4de09
+Author: hhh2 <pengfei.hou@huawei.com>
+Date:   Wed Feb 9 01:55:11 2022 +0000
+
+    Signed-off-by:hhh2<pengfei.hou@huawei.com>
+
+[33mcommit cadcb0430e903dc3fb94c43dd23a329e78f0110f[m
+Author: houpengfei <pengfei.hou@huawei.com>
+Date:   Tue Feb 8 15:27:26 2022 +0000
+
+    Signed-off-by:hhh2<pengfei.hou@huawei.com>
+    
+    Signed-off-by: houpengfei <pengfei.hou@huawei.com>
+    Change-Id: I1842ae64e6aa6affb06305f2c5b2456b8f346dc2
+    Signed-off-by: houpengfei <pengfei.hou@huawei.com>
+
+[33mcommit cb4de0988978cd910f927ad2cb482c7025308c74[m
+Merge: 471d43a 6d858c8
+Author: openharmony_ci <120357966@qq.com>
+Date:   Tue Feb 8 15:25:15 2022 +0000
+
+    !454 memcpy_s、strcpy_s等安全函数不要放在if判断与CHKx宏中
+    Merge pull request !454 from baiwei/baiwei_fix_warning
+
+[33mcommit 471d43a4ed63807bd88438afce2b013f235a57bf[m
+Merge: f4515e6 6f01b74
+Author: openharmony_ci <120357966@qq.com>
+Date:   Tue Feb 8 11:40:02 2022 +0000
+
+    !448 input_manager.h接口添加注解
+    Merge pull request !448 from 白露/innerkits
+
+[33mcommit f4515e6f6339252895872419120e6f9f1b6e40e1[m
+Merge: fa684f5 4c7a448
+Author: openharmony_ci <120357966@qq.com>
+Date:   Tue Feb 8 09:52:50 2022 +0000
+
+    !435 订阅系统按键 按键抬起触发优化
+    Merge pull request !435 from mayunteng/master
+
+[33mcommit 6b0aaab40e2fbf8b5ce070fe180d20a68495e524[m
+Author: lisong <lisong92@huawei.com>
+Date:   Tue Feb 8 17:45:59 2022 +0800
+
+    单例类的命名规则大驼峰
+    
+    Signed-off-by: lisong <lisong92@huawei.com>
+
+[33mcommit fa684f553b2a5f818c212967dbbec5ef1d65a85b[m
+Merge: 44f2d75 8585791
+Author: openharmony_ci <120357966@qq.com>
+Date:   Tue Feb 8 09:34:25 2022 +0000
+
+    !450 监视意见整改
+    Merge pull request !450 from Mrdeng_xianyu/test()
+
+[33mcommit 6f01b743c5a10c9428fb81ae032c3a4d8da13c16[m
+Author: 白露 <bailu27@huawei.com>
+Date:   Tue Feb 8 17:29:15 2022 +0800
+
+    input_manager.h接口添加注解
+    
+    Signed-off-by: bailu1992 <bailu27@huawei.com>
+
+[33mcommit 44f2d75508862f33a7ed89cba6f8a2faa06a5fa1[m[33m ([m[1;31morigin/weekly_20220208[m[33m)[m
+Merge: 109b149 9063ef9
+Author: openharmony_ci <120357966@qq.com>
+Date:   Tue Feb 8 08:36:19 2022 +0000
+
+    !443 stl 判断由size改为empty
+    Merge pull request !443 from hhh2/master
+
+[33mcommit 8585791784aed6abccec7d1bc4168ccb36b86093[m
+Author: Mrdeng_xianyu <dengxianyu@huawei.com>
+Date:   Tue Feb 8 16:18:40 2022 +0800
+
+    触摸屏基本功能整改：空指针判断、函数名修改、变量就近、日志修改
+    
+    Signed-off-by: Mrdeng_xianyu <dengxianyu@huawei.com>
+
+[33mcommit 58cbf65b73a3119d5f5ead4d3e6c8e3be97d59b2[m
+Author: 白露 <bailu27@huawei.com>
+Date:   Tue Feb 8 16:17:33 2022 +0800
+
+    input_manager.h接口添加注解
+    
+    Signed-off-by: bailu1992 <bailu27@huawei.com>
+
+[33mcommit 109b149034124aaada3de59642cfe94bae7efac6[m
+Merge: cc262d1 586ae12
+Author: openharmony_ci <120357966@qq.com>
+Date:   Tue Feb 8 07:37:14 2022 +0000
+
+    !437 检视修改
+    Merge pull request !437 from 李邦武/libangwu
+
+[33mcommit 9063ef95c6828f960376407c81cdf06438efa355[m
+Author: houpengfei <pengfei.hou@huawei.com>
+Date:   Tue Feb 8 07:36:05 2022 +0000
+
+    Signed-off-by:hhh2<pengfei.hou@huawei.com>
+    
+    Signed-off-by: houpengfei <pengfei.hou@huawei.com>
+    Change-Id: I6c70a1000e15c1abb8486282f5979fa3ad3b9f7d
+
+[33mcommit 8e8a9411a7b60e32d8300d7cf3077b7e18059049[m
+Author: houpengfei <pengfei.hou@huawei.com>
+Date:   Tue Feb 8 07:20:24 2022 +0000
+
+    Signed-off-by:hhh2<pengfei.hou@huawei.com>
+    
+    Signed-off-by: houpengfei <pengfei.hou@huawei.com>
+    Change-Id: Ib5f362b2e3363caae02c55ddf0aa687ec9aef31d
+
+[33mcommit 586ae12ffe5a2cd47db189c1ee49b4636bf6e1ed[m
+Author: libangwu <libangwu@huawei.com>
+Date:   Tue Feb 8 14:24:12 2022 +0800
+
+    日志级别修改
+    
+    Signed-off-by: libangwu <libangwu@huawei.com>
+
+[33mcommit cc262d10d073d5d0d4fcfd0544692d3983c31b01[m
+Merge: 3e2a1dd 83c0026
+Author: openharmony_ci <120357966@qq.com>
+Date:   Tue Feb 8 06:11:58 2022 +0000
+
+    !440 触摸屏事件监听修改构建
+    Merge pull request !440 from yirenjie1/master
+
+[33mcommit 83c002670d6318ac1816dc1cc4719eb84a5f2b5b[m
+Author: yirenjie1 <yirenjie1@huawei.com>
+Date:   Tue Feb 8 05:08:21 2022 +0000
+
+    Signed-off-by:yirenjie1<yirenjie1@huawei.com>
+    
+    Signed-off-by: yirenjie1 <yirenjie1@huawei.com>
+
+[33mcommit e15bd51479945095e953ff7df6868b9e48d89294[m
+Author: yirenjie1 <yirenjie1@huawei.com>
+Date:   Tue Feb 8 05:06:47 2022 +0000
+
+    Signed-off-by:yirenjie1<yirenjie1@huawei.com>
+    
+    Signed-off-by: yirenjie1 <yirenjie1@huawei.com>
+
+[33mcommit 921fc0438add6c6b75ca5e49bef043e7f68e4ad0[m
+Author: yirenjie1 <yirenjie1@huawei.com>
+Date:   Tue Feb 8 05:06:04 2022 +0000
+
+    Signed-off-by:yirenjie1<yirenjie1@huawei.com>
+    
+    Signed-off-by: yirenjie1 <yirenjie1@huawei.com>
+
+[33mcommit 7e597126f2d56d4a2d7b23ada716bb3ecbca6495[m
+Author: yirenjie1 <yirenjie1@huawei.com>
+Date:   Tue Feb 8 04:55:11 2022 +0000
+
+    Signed-off-by:yirenjie1<yirenjie1@huawei.com>
+    
+    Signed-off-by: yirenjie1 <yirenjie1@huawei.com>
+
+[33mcommit 03b45c7f8abe56c2e0664165c01ac1fb0fadc505[m
+Author: libangwu <libangwu@huawei.com>
+Date:   Tue Feb 8 12:41:19 2022 +0800
+
+    编译错误修改
+    
+    Signed-off-by: libangwu <libangwu@huawei.com>
+
+[33mcommit 3e2a1ddb2d3231be3381ce3faf8f12cd6ac2c3f3[m
+Merge: e89d17a 7e5e1c8
+Author: openharmony_ci <120357966@qq.com>
+Date:   Tue Feb 8 04:01:47 2022 +0000
+
+    !436 按键监听监视意见修改
+    Merge pull request !436 from 白露/0129
+
+[33mcommit 0acbdc3fbdd7ad168a17044f1401d8af9101641d[m
+Author: yirenjie1 <yirenjie1@huawei.com>
+Date:   Tue Feb 8 03:46:54 2022 +0000
+
+    Signed-off-by:yirenjie1<yirenjie1@huawei.com>
+    
+    Signed-off-by: yirenjie1 <yirenjie1@huawei.com>
+
+[33mcommit b823aa9f906cd0539deddc92139e032c9db94c9e[m
+Author: yirenjie1 <yirenjie1@huawei.com>
+Date:   Tue Feb 8 03:45:27 2022 +0000
+
+    Signed-off-by:yirenjie1<yirenjie1@huawei.com>
+    
+    Signed-off-by: yirenjie1 <yirenjie1@huawei.com>
+
+[33mcommit 902136855352ea245994a07cef57464caf1a4fcd[m
+Author: libangwu <libangwu@huawei.com>
+Date:   Tue Feb 8 11:31:57 2022 +0800
+
+    编译错误修改
+    
+    Signed-off-by: libangwu <libangwu@huawei.com>
+
+[33mcommit 878dd05faee652a1458d5cc7de90a912f2a78d57[m
+Author: libangwu <libangwu@huawei.com>
+Date:   Tue Feb 8 11:07:41 2022 +0800
+
+    编译错误修改
+    
+    Signed-off-by: libangwu <libangwu@huawei.com>
+
+[33mcommit 6d858c8ba239672a0bff41744f2d63f206fa1ca4[m
+Merge: c78c086 e89d17a
+Author: baiwei <baiwei28@huawei.com>
+Date:   Tue Feb 8 02:58:28 2022 +0000
+
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit eae793e63540605f3196e24b980e09d87c58358c[m
+Author: libangwu <libangwu@huawei.com>
+Date:   Tue Feb 8 10:52:16 2022 +0800
+
+    错误修改
+    
+    Signed-off-by: libangwu <libangwu@huawei.com>
+
+[33mcommit e89d17a253fc24b0c0522eb39c0b9a3fd93a632f[m
+Merge: 521de9c b99edcf
+Author: openharmony_ci <120357966@qq.com>
+Date:   Tue Feb 8 02:38:22 2022 +0000
+
+    !433 统一输入事件监听器实现
+    Merge pull request !433 from blueyouh/blueyouth
+
+[33mcommit 6a68fb39da0b82af6e781e07d41d391feb1d5fd6[m
+Author: libangwu <libangwu@huawei.com>
+Date:   Tue Feb 8 10:28:11 2022 +0800
+
+    检视意见修改提交
+    
+    Signed-off-by: libangwu <libangwu@huawei.com>
+
+[33mcommit 4c7a448830a20c357539df36773b3f8dff8a8522[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Tue Feb 8 02:04:54 2022 +0000
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+    Change-Id: I444124f9d0b1b0d0fcada2ec3ebede5db2bd5c7a
+
+[33mcommit 521de9c3193a0238a384d008dae59a83581d869e[m
+Merge: 70e959b 124b82b
+Author: openharmony_ci <120357966@qq.com>
+Date:   Tue Feb 8 01:06:32 2022 +0000
+
+    !432 add napi env manager
+    Merge pull request !432 from hhh2/master
+
+[33mcommit b99edcf271440a118c76b552dca86e077c75ec8b[m
+Author: blueyouth <bailiang18@huawei.com>
+Date:   Mon Feb 7 09:41:53 2022 +0000
+
+    normalize event interceptors
+    
+    Signed-off-by: blueyouth <bailiang18@huawei.com>
+    Change-Id: I8166c9cb5e5054dad64b396845f13e1a4230610e
+
+[33mcommit 124b82bbeaa63f93814c9c719879254a3cce22c9[m
+Author: houpengfei <pengfei.hou@huawei.com>
+Date:   Mon Feb 7 09:10:46 2022 +0000
+
+    Signed-off-by:hhh2<pengfei.hou@huawei.com>
+    
+    Signed-off-by: houpengfei <pengfei.hou@huawei.com>
+
+[33mcommit 70e959bd8ae10bc0f3b6ab97a01644e87de6f1e3[m
+Merge: 3b2b0cf 11e5e90
+Author: openharmony_ci <120357966@qq.com>
+Date:   Mon Feb 7 08:46:35 2022 +0000
+
+    !431 anr modify
+    Merge pull request !431 from mayunteng/master
+
+[33mcommit 11e5e90e4e42cbfa87cca37f7f773b632a0fb966[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Mon Feb 7 07:45:54 2022 +0000
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+    Change-Id: I4cad5a61df7aca98d16ef7d3e6bb15e43c439b55
+
+[33mcommit 380a349e9fd5fe0057a107271f3776566c7e0bab[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Mon Feb 7 06:38:13 2022 +0000
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+    Change-Id: I907765bb14416329c5c116087c6796615b386961
+
+[33mcommit 3b2b0cfa4f830b17d1b39b07cdbf140447c05171[m
+Merge: fee330e 878ee8d
+Author: openharmony_ci <120357966@qq.com>
+Date:   Mon Feb 7 03:18:33 2022 +0000
+
+    !407 修改日志，多行合并一行&敏感信息改为DEBUG级别
+    Merge pull request !407 from mayunteng/master
+
+[33mcommit fee330ebaf4d008097034a21005a3e1e6e478e07[m
+Merge: 832dff6 5cf024e
+Author: openharmony_ci <120357966@qq.com>
+Date:   Mon Feb 7 02:00:50 2022 +0000
+
+    !423 log support multi parameters
+    Merge pull request !423 from hhh2/master
+
+[33mcommit c78c086fd26ed21ae3ee9869ef93e7aac2da5455[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Sun Jan 30 09:41:00 2022 +0000
+
+    update service/window_manager/include/input_windows_manager.h.
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 5cf024e7f1092a09b4ef5961f37cdb985f68867b[m
+Author: houpengfei <pengfei.hou@huawei.com>
+Date:   Sun Jan 30 08:56:07 2022 +0000
+
+    Signed-off-by:hhh2<pengfei.hou@huawei.com>
+    
+    Signed-off-by: houpengfei <pengfei.hou@huawei.com>
+    Change-Id: I20c4360fa755846e50d24cb746ae0e85f57f3087
+
+[33mcommit 934368e1ea4eaf357fdbcbb44a37da38a09ee82c[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Sun Jan 30 08:54:31 2022 +0000
+
+    update service/window_manager/include/input_windows_manager.h.
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit cbd0ad525527c40f7a4677fe29e9eab174d2f678[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Sun Jan 30 08:51:54 2022 +0000
+
+    update service/window_manager/src/input_windows_manager.cpp.
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 7aa25e77737e3230328e87ba0596bf6a7e190edb[m
+Author: houpengfei <pengfei.hou@huawei.com>
+Date:   Sun Jan 30 08:47:08 2022 +0000
+
+    Signed-off-by:hhh2<pengfei.hou@huawei.com>
+    
+    Signed-off-by: houpengfei <pengfei.hou@huawei.com>
+    Change-Id: I8c719f92dd1d31b749c4d538632ae3574ecc2877
+
+[33mcommit 170a6d303b8482a65a023e6af718b9b628c93c7e[m
+Author: houpengfei <pengfei.hou@huawei.com>
+Date:   Sun Jan 30 08:28:30 2022 +0000
+
+    Signed-off-by:hhh2<pengfei.hou@huawei.com>
+    
+    Signed-off-by: houpengfei <pengfei.hou@huawei.com>
+    Change-Id: I54e0ba993592a4433154901c90f6552a8009bc11
+
+[33mcommit 832dff641576311668f69d7977e3c879525e727b[m[33m ([m[1;31morigin/weekly_20220201[m[33m)[m
+Merge: f95c984 61725eb
+Author: openharmony_ci <120357966@qq.com>
+Date:   Sun Jan 30 07:53:18 2022 +0000
+
+    !417 添加触摸板双指捏合数据管理
+    Merge pull request !417 from 亚军/master
+
+[33mcommit 61725ebbacd70ccd05eb6064ee27f60b1976ce9f[m
+Author: yajunstrong <wangyajun29@huawei.com>
+Date:   Sun Jan 30 14:58:30 2022 +0800
+
+    添加触摸板双指捏合数据管理
+    
+    Signed-off-by: yajunstrong <wangyajun29@huawei.com>
+
+[33mcommit f95c9842d6a7e0197b2684c7c2f9824cbd12cab7[m
+Merge: a2b0314 6189d3d
+Author: openharmony_ci <120357966@qq.com>
+Date:   Sun Jan 30 06:39:18 2022 +0000
+
+    !414 提交，合入，容器vector改list
+    Merge pull request !414 from ouliang/test0
+
+[33mcommit 6189d3da87a036e6299baf27b126d566d3f167bf[m
+Author: ouliang333 <ouliangliang@huawei.com>
+Date:   Sun Jan 30 12:54:00 2022 +0800
+
+    容器vector改list
+    Signed-off-by: ouliang333 <ouliangliang@huawei.com>
+
+[33mcommit a2b03140d1a67e500099b887d10cd7a243c59d9f[m
+Merge: c2a1bf5 ec4f915
+Author: openharmony_ci <120357966@qq.com>
+Date:   Sun Jan 30 03:46:17 2022 +0000
+
+    !408 修改触摸板双指捏合获取鼠标状态的文件结构
+    Merge pull request !408 from 亚军/master
+
+[33mcommit ad36392d80d446243614dedead647cfe917680cb[m
+Merge: 08132b6 c2a1bf5
+Author: baiwei <baiwei28@huawei.com>
+Date:   Sun Jan 30 03:36:06 2022 +0000
+
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 08132b64cb2c827e230db0555424efe38e0ce89b[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Sun Jan 30 03:26:30 2022 +0000
+
+    update frameworks/proxy/events/src/manipulation_event.cpp.
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 4d55675213a8fc6b8cf26d0d7c086433aa44d937[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Sun Jan 30 03:22:59 2022 +0000
+
+    update service/window_manager/src/input_windows_manager.cpp.
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit ec4f915364b286857ec69a0c07ac46f072fcae90[m
+Author: yajunstrong <wangyajun29@huawei.com>
+Date:   Sun Jan 30 10:09:37 2022 +0800
+
+    修改触摸板双指捏合获取鼠标状态的文件结构
+    
+    Signed-off-by: yajunstrong <wangyajun29@huawei.com>
+
+[33mcommit 0f07ed373429fc3c47fef4bd9657f27c24dedeac[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Sun Jan 30 02:02:45 2022 +0000
+
+    update service/window_manager/src/pointer_drawing_manager.cpp.
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 878ee8d61bc4b302bbf4e837d11efcdbfd6603dc[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Sun Jan 30 01:59:08 2022 +0000
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+    Change-Id: Ie97900da89b4f785e9a5fe46866f01ce2e2e4ad8
+
+[33mcommit 4e17f6e21935d9fae2bca19d9462bedb44d6f5e6[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Sun Jan 30 01:56:28 2022 +0000
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+    Change-Id: I27f063ab19352ab1e9543c19ac07d54a11ef5177
+
+[33mcommit c2a1bf505725d2126ee4dcc16561964e5421d620[m
+Merge: 7f04a8f 0b2872e
+Author: openharmony_ci <120357966@qq.com>
+Date:   Sun Jan 30 01:53:02 2022 +0000
+
+    !396 global touch event
+    Merge pull request !396 from hhh2/master
+
+[33mcommit 977287c9558ea42fcdd118e8ebefb1ce00d0748f[m
+Merge: 8b78e3c 7f04a8f
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Sun Jan 30 01:52:46 2022 +0000
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+    Change-Id: I45702ce39d1c1d3d9a8aa6c2f156dd64b830c427
+
+[33mcommit 8b78e3c61189ba7e25d2d70be3d0e550ebc26615[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Sun Jan 30 01:47:31 2022 +0000
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+    Change-Id: I4758c0115f9ff36a278918dee2123bb24ee9bbcd
+
+[33mcommit 41de3c266fb3956930a9418f432c3617caed76da[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Sun Jan 30 01:44:19 2022 +0000
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+    Change-Id: I73c5fa3588b286f360f069b2b02d0e5625f844c5
+
+[33mcommit 67e2142fd6d83aa3f61e85e026288f6a23fc784a[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Sat Jan 29 14:08:56 2022 +0000
+
+    update service/window_manager/src/pointer_drawing_manager.cpp.
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 0b2872e5d6383ef03f2049b538ea83987e7aa18f[m
+Author: houpengfei <pengfei.hou@huawei.com>
+Date:   Sat Jan 29 11:02:27 2022 +0000
+
+    Signed-off-by:hhh2<pengfei.hou@huawei.com>
+    
+    Signed-off-by: houpengfei <pengfei.hou@huawei.com>
+    Change-Id: I40c25253c47405770b5f523d1e1db8aee39e70f2
+
+[33mcommit 7f04a8f1273ab0d4136b1f8745b04be96fa069d1[m
+Merge: bdf1660 1c55fc2
+Author: openharmony_ci <120357966@qq.com>
+Date:   Sat Jan 29 10:43:05 2022 +0000
+
+    !384 检视：修改订阅单系统按键不符合规范的代码
+    Merge pull request !384 from guang19/yangguang
+
+[33mcommit bdf16606c123903b9ddcaa26f4b82bd980ed9356[m
+Merge: fb3f02a 953b5fd
+Author: openharmony_ci <120357966@qq.com>
+Date:   Sat Jan 29 10:05:22 2022 +0000
+
+    !356 socket设置非阻塞模式
+    Merge pull request !356 from BobZ/input_blockmode01
+
+[33mcommit 2bafbd6ed09f834dad49fa4e14e70174ab518bbd[m
+Author: lifenghui <lifenghui3@huawei.com>
+Date:   Sat Jan 29 17:18:58 2022 +0800
+
+    修改监视意见函数出参修改成指针。
+    
+    Signed-off-by: lifenghui <lifenghui3@huawei.com>
+
+[33mcommit c7fdec2f266fbf0c2618503653326f27444041f3[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Sat Jan 29 08:48:31 2022 +0000
+
+    update service/window_manager/src/pointer_drawing_manager.cpp.
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 5c533bcbcaf3b760ba4726138b0c1cc049aca7ee[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Sat Jan 29 08:04:50 2022 +0000
+
+    update service/window_manager/src/pointer_drawing_manager.cpp.
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 7e5e1c8a3b9d8128ae5882ba9588a9f515973271[m
+Author: 白露 <bailu27@huawei.com>
+Date:   Sat Jan 29 14:58:47 2022 +0800
+
+    按键监听检视意见修改
+    
+    Signed-off-by: bailu1992 <bailu27@huawei.com>
+
+[33mcommit 953b5fd01b0ad04d56b5b80364154d9441f218e6[m
+Merge: 039b2e5 fb3f02a
+Author: BobZ <zhangbo374@huawei.com>
+Date:   Sat Jan 29 06:12:19 2022 +0000
+
+    Merge branch 'master' of gitee.com:openharmony/multimodalinput_input into input_blockmode01
+    
+    Signed-off-by: bobz202 <zhangbo374@huawei.com>
+
+[33mcommit 1c55fc2837b0581bf3d3828eb6cd3cd849fd501d[m
+Author: guang19 <yangguang120@huawei.com>
+Date:   Sat Jan 29 14:07:57 2022 +0800
+
+    检视：修改订阅单系统按键需求不规范代码
+    
+    Signed-off-by: guang19 <yangguang120@huawei.com>
+
+[33mcommit fb3f02addde1a0544b6f16287f66bd20557e4293[m
+Merge: ed327a6 5d296d5
+Author: openharmony_ci <120357966@qq.com>
+Date:   Sat Jan 29 06:02:39 2022 +0000
+
+    !374 修改监视意见日志中displayId去掉Id；修改函数名；-1改为RET_ERR；日志中去掉is；修改else为else if；if条件中<=改为<。
+    Merge pull request !374 from lifenghui/0129-lifenghui
+
+[33mcommit ed327a69ba26a3cdd66b5fd9ef2341103f02d253[m
+Merge: 9a2b1d3 c597bea
+Author: openharmony_ci <120357966@qq.com>
+Date:   Sat Jan 29 04:48:59 2022 +0000
+
+    !373 删除无意义的this
+    Merge pull request !373 from zhxiaop/zhxiao_del_this_01_29
+
+[33mcommit 9a2b1d33fcb753d69c96b11a8b4bf9cd77aa662a[m
+Merge: 1fe1894 3d6c13e
+Author: openharmony_ci <120357966@qq.com>
+Date:   Sat Jan 29 04:48:39 2022 +0000
+
+    !375 modify for loop
+    Merge pull request !375 from hhh2/master
+
+[33mcommit c205ee76aaf45570001728cb77cab9e277657d35[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Sat Jan 29 04:09:21 2022 +0000
+
+    update service/window_manager/src/pointer_drawing_manager.cpp.
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 1fe1894b27cb571665d22cc6302a178f77fdac70[m
+Merge: fcb7a0d 19da25d
+Author: openharmony_ci <120357966@qq.com>
+Date:   Sat Jan 29 04:01:39 2022 +0000
+
+    !363 代码检视修改：frameworks中命名空间统一放置
+    Merge pull request !363 from hailong/upPr
+
+[33mcommit 21317f11be28c5707d37de056fe86deae7a5b7a9[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Sat Jan 29 03:44:57 2022 +0000
+
+    update frameworks/proxy/event_handle/test/client_msg_handler_test.cpp.
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 9c3258640ffa92e7535a0299f37ed662cd8b8bc3[m
+Merge: 181949e f28ab0f
+Author: baiwei <baiwei28@huawei.com>
+Date:   Sat Jan 29 10:52:26 2022 +0800
+
+    memcpy_s、strcpy_s等安全函数不要放在if判断与CHKx宏中
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 3d6c13e7785394c41b760ffb26a6ea4c6dcde460[m
+Author: houpengfei <pengfei.hou@huawei.com>
+Date:   Sat Jan 29 02:40:18 2022 +0000
+
+    Signed-off-by:hhh2<pengfei.hou@huawei.com>
+    
+    Signed-off-by: houpengfei <pengfei.hou@huawei.com>
+    Change-Id: I5ea8313ad5e5c84dca9f78800f834f55affe4f01
+
+[33mcommit fcb7a0d927696fcf9e2dd3f77c9cb75432975e1e[m
+Merge: f28ab0f 39fecfb
+Author: openharmony_ci <120357966@qq.com>
+Date:   Sat Jan 29 02:33:19 2022 +0000
+
+    !347 订阅系统按键支持重复订阅
+    Merge pull request !347 from mayunteng/master
+
+[33mcommit 181949ebac78e4b3d93e3ea5abde8b932be32ca9[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Sat Jan 29 10:27:33 2022 +0800
+
+    memcpy_s、strcpy_s等安全函数不要放在if判断与CHKx宏中
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit df8a6875578e7f911772a0da781ec117aa97fe34[m
+Author: houpengfei <pengfei.hou@huawei.com>
+Date:   Sat Jan 29 02:22:08 2022 +0000
+
+    Signed-off-by:hhh2<pengfei.hou@huawei.com>
+    
+    Signed-off-by: houpengfei <pengfei.hou@huawei.com>
+    Change-Id: I276444a1b0d3a81ce2661b00db64341978a58342
+
+[33mcommit 5d296d51ab32845304edc35ed7842d9c9eb0ab9d[m
+Author: lifenghui <lifenghui3@huawei.com>
+Date:   Sat Jan 29 10:10:42 2022 +0800
+
+    修改监视意见日志中displayId去掉Id；修改函数名；-1改为RET_ERR；日志中去掉is；修改else为else if；if条件中<=改为<。
+    
+    Signed-off-by: lifenghui <lifenghui3@huawei.com>
+
+[33mcommit c597beab9b938860fbdbba37e8b9f1020efa5010[m
+Author: zhxiaop <xiaozhuohan@huawei.com>
+Date:   Sat Jan 29 10:08:01 2022 +0800
+
+    删除无意义的this
+    
+    Signed-off-by: zhxiaop <xiaozhuohan@huawei.com>
+
+[33mcommit f28ab0f8a31cdfccf51dbab41f467f3705e4a83f[m
+Merge: 995d49c 6c40160
+Author: openharmony_ci <120357966@qq.com>
+Date:   Sat Jan 29 01:56:30 2022 +0000
+
+    !367 检视修改
+    Merge pull request !367 from 李邦武/libangwu
+
+[33mcommit 995d49c8abe2fb71b5b1b3eb0eb4513988de20d6[m
+Merge: 0f9970c 66d27b2
+Author: openharmony_ci <120357966@qq.com>
+Date:   Sat Jan 29 01:43:45 2022 +0000
+
+    !309 修改为事件唯一ID ---鼠标
+    Merge pull request !309 from jinzhen/0126_commit0
+
+[33mcommit 66d27b2940faddfa44266d0403bd81190a8be704[m
+Author: jinzhen6 <jinzhen6@huawei.com>
+Date:   Fri Jan 28 22:38:17 2022 +0800
+
+    加Debug日志
+    
+    Signed-off-by: jinzhen6 <jinzhen6@huawei.com>
+
+[33mcommit d6a6d9dbf437716709efc88167b0112d0a8c2d79[m
+Author: jinzhen6 <jinzhen6@huawei.com>
+Date:   Fri Jan 28 21:44:16 2022 +0800
+
+    加Debug日志
+    
+    Signed-off-by: jinzhen6 <jinzhen6@huawei.com>
+
+[33mcommit c34da28e3a021c0b4eeb661baeafacdb30a455cd[m
+Author: jinzhen6 <jinzhen6@huawei.com>
+Date:   Fri Jan 28 21:26:23 2022 +0800
+
+    加Debug日志
+    
+    Signed-off-by: jinzhen6 <jinzhen6@huawei.com>
+
+[33mcommit 6ec1162197b31d7681db629b3f54a5d4dc90abca[m
+Author: jinzhen6 <jinzhen6@huawei.com>
+Date:   Fri Jan 28 21:06:26 2022 +0800
+
+    加Debug日志
+    
+    Signed-off-by: jinzhen6 <jinzhen6@huawei.com>
+
+[33mcommit 6c40160a7684275513dc0c56f337ce253059939c[m
+Author: libangwu <libangwu@huawei.com>
+Date:   Fri Jan 28 20:46:48 2022 +0800
+
+    修改告警
+    
+    Signed-off-by: libangwu <libangwu@huawei.com>
+
+[33mcommit 249e511c4ef0c03c3ef927e9e153e3b271f4138e[m
+Author: libangwu <libangwu@huawei.com>
+Date:   Fri Jan 28 20:33:57 2022 +0800
+
+    触摸板基本功能业务日志的整改，CHKPR校验函数的修改
+    
+    Signed-off-by: libangwu <libangwu@huawei.com>
+
+[33mcommit 0f9970c01f72bacc75105a48add56e0aec7eb1df[m
+Merge: 1510331 088a754
+Author: openharmony_ci <120357966@qq.com>
+Date:   Fri Jan 28 12:18:13 2022 +0000
+
+    !351 按键监听检视意见修改
+    Merge pull request !351 from 17349030869/0128wzh1
+
+[33mcommit 6fa0cc5f7862c28f378bac2858bce9eaa9b1d2bf[m
+Author: jinzhen6 <jinzhen6@huawei.com>
+Date:   Fri Jan 28 19:43:05 2022 +0800
+
+    加Debug日志
+    
+    Signed-off-by: jinzhen6 <jinzhen6@huawei.com>
+
+[33mcommit 19da25d8696bce9150981c17dfe30d9cce4decd8[m
+Author: lilong <lilong121@huawei.com>
+Date:   Fri Jan 28 14:55:07 2022 +0800
+
+    代码检视修改：frameworks, 命名空间统一放置
+    
+    Signed-off-by: lilong <lilong121@huawei.com>
+
+[33mcommit 151033163ef6f281c9585db9500a0c51a8b2176e[m
+Merge: f1b0475 c40e6d1
+Author: openharmony_ci <120357966@qq.com>
+Date:   Fri Jan 28 10:16:39 2022 +0000
+
+    !353 提交，合入，入参校验，Init修改为Reset
+    Merge pull request !353 from ouliang/test0
+
+[33mcommit f1b04751e92275b7ff926dcfcddd71400e2a28d3[m
+Merge: ba348d0 e06c7e9
+Author: openharmony_ci <120357966@qq.com>
+Date:   Fri Jan 28 10:06:41 2022 +0000
+
+    !355 类成员变量命名修改
+    Merge pull request !355 from yangli198/yangli_class_member_variable_01_28
+
+[33mcommit ba348d0e968c11d427ed7bdff10afd14ad77e3a0[m
+Merge: 3838bfb fdf8b85
+Author: openharmony_ci <120357966@qq.com>
+Date:   Fri Jan 28 10:03:37 2022 +0000
+
+    !354 鼠标无法选到边界修改
+    Merge pull request !354 from Justin_Hu/master
+
+[33mcommit 039b2e5113d7bfb060fdc8a01da10516aeedd135[m
+Author: bobz202 <zhangbo374@huawei.com>
+Date:   Fri Jan 28 17:24:54 2022 +0800
+
+    socket设置非阻塞模式
+    
+    Signed-off-by: bobz202 <zhangbo374@huawei.com>
+
+[33mcommit 088a7547db4d02aa1e72559571bdb6c345c08c5e[m
+Author: wuzhihuitmac <wuzhihui4@huawei.com>
+Date:   Fri Jan 28 16:39:01 2022 +0800
+
+    按键监听检视意见修改
+    
+    Signed-off-by: wuzhihuitmac <wuzhihui4@huawei.com>
+
+[33mcommit ccc3e32ee46b7c7213e8b2567a11fde0fdda0aec[m
+Author: wuzhihuitmac <wuzhihui4@huawei.com>
+Date:   Fri Jan 28 16:20:48 2022 +0800
+
+    按键监听检视意见修改
+    
+    Signed-off-by: wuzhihuitmac <wuzhihui4@huawei.com>
+
+[33mcommit e06c7e9c15828c09dbcefe6047bac3c512884591[m
+Author: yangli <yangli198@huawei.com>
+Date:   Fri Jan 28 16:12:22 2022 +0800
+
+    类成员变量命名修改
+    
+    Signed-off-by: yangli <yangli198@huawei.com>
+
+[33mcommit 19e4b30961701dd2540445137e50b4b915b4c1ae[m
+Author: bobz202 <zhangbo374@huawei.com>
+Date:   Fri Jan 28 16:11:10 2022 +0800
+
+    socket设置非阻塞模式
+    
+    Signed-off-by: bobz202 <zhangbo374@huawei.com>
+
+[33mcommit fdf8b85d1512352993f3c8968c43269f4fb90ac4[m
+Author: Justin_Hu <hugongcheng@huawei.com>
+Date:   Fri Jan 28 08:00:43 2022 +0000
+
+    鼠标边界问题，静态检查处理
+    
+    Signed-off-by: Justin_Hu <hugongcheng@huawei.com>
+
+[33mcommit 4be775f785eb4a1f4f3230821c1141322df8ba2d[m
+Author: wuzhihuitmac <wuzhihui4@huawei.com>
+Date:   Fri Jan 28 15:54:57 2022 +0800
+
+    按键监听检视意见修改
+    
+    Signed-off-by: wuzhihuitmac <wuzhihui4@huawei.com>
+
+[33mcommit d6fafb1b7121d725155bef2069ee4c5c9203e780[m
+Author: wuzhihuitmac <wuzhihui4@huawei.com>
+Date:   Fri Jan 28 15:46:29 2022 +0800
+
+    按键监听检视意见修改
+    Signed-off-by: wuzhihuitmac <wuzhihui4@huawei.com>
+
+[33mcommit c40e6d141866a40eddf2cba90a0c78813508986b[m
+Author: ouliang333 <ouliangliang@huawei.com>
+Date:   Fri Jan 28 15:33:49 2022 +0800
+
+    入参做校验，Init修改为Reset
+    Signed-off-by: ouliang333 <ouliangliang@huawei.com>
+
+[33mcommit 3f98657a109870385cee53390f6c64a0de141d1e[m
+Author: wuzhihuitmac <wuzhihui4@huawei.com>
+Date:   Fri Jan 28 15:27:57 2022 +0800
+
+    按键监听检视意见修改
+    Signed-off-by: wuzhihuitmac <wuzhihui4@huawei.com>
+
+[33mcommit ec7ad98406a0c152595c0296ccca5c493b3b802f[m
+Author: wuzhihuitmac <wuzhihui4@huawei.com>
+Date:   Fri Jan 28 15:12:03 2022 +0800
+
+    按键监听检视意见修改
+    
+    Signed-off-by: wuzhihuitmac <wuzhihui4@huawei.com>
+
+[33mcommit 3838bfb28cac1af70869a481617467fb64eeaecb[m
+Merge: 5ff4ff2 6ee854e
+Author: openharmony_ci <120357966@qq.com>
+Date:   Fri Jan 28 06:52:21 2022 +0000
+
+    !341 提交触摸屏输入监听事件检视代码
+    Merge pull request !341 from 杨鹏/yangpengCodeReview_01_27
+
+[33mcommit ba6e75f52d4877822cf2c6a65dcf1d669f47ce84[m
+Author: jinzhen6 <jinzhen6@huawei.com>
+Date:   Fri Jan 28 14:00:30 2022 +0800
+
+    加Debug日志
+    
+    Signed-off-by: jinzhen6 <jinzhen6@huawei.com>
+
+[33mcommit 83bb72c0ae77eefcdf717e5e794dafe2ed162520[m
+Author: jinzhen6 <jinzhen6@huawei.com>
+Date:   Fri Jan 28 12:59:27 2022 +0800
+
+    加Debug日志
+    
+    Signed-off-by: jinzhen6 <jinzhen6@huawei.com>
+
+[33mcommit 0538a57a259d8165ddf44b660828cff5dedbe38c[m
+Author: Justin_Hu <hugongcheng@huawei.com>
+Date:   Fri Jan 28 03:59:59 2022 +0000
+
+    鼠标边界无法选中问题
+    
+    Signed-off-by: Justin_Hu <hugongcheng@huawei.com>
+
+[33mcommit 39fecfba7c76f2187c65e1abd2dc526cf1dcb226[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Fri Jan 28 11:57:06 2022 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit fecb5ce997fdfe528bf3f624b74bfebc05eec326[m
+Author: jinzhen6 <jinzhen6@huawei.com>
+Date:   Fri Jan 28 11:55:05 2022 +0800
+
+    加Debug日志
+    
+    Signed-off-by: jinzhen6 <jinzhen6@huawei.com>
+
+[33mcommit f67a7297a5b7be9bf7f76f9994d1ef51dc00dc83[m
+Author: jinzhen6 <jinzhen6@huawei.com>
+Date:   Fri Jan 28 11:29:48 2022 +0800
+
+    加Debug日志
+    
+    Signed-off-by: jinzhen6 <jinzhen6@huawei.com>
+
+[33mcommit 6ee854eb5a5d9c35919c1e5ae80c516a6cd94eb7[m
+Author: pengyanggit <yangpeng177@huawei.com>
+Date:   Fri Jan 28 11:00:54 2022 +0800
+
+    触摸屏输入事件监听功能的修改意见
+    
+    Signed-off-by: pengyanggit <yangpeng177@huawei.com>
+
+[33mcommit 7b3bf80cb891a72988c509bc199cc8feabc76b10[m
+Author: jinzhen6 <jinzhen6@huawei.com>
+Date:   Fri Jan 28 10:44:47 2022 +0800
+
+    加Debug日志
+    
+    Signed-off-by: jinzhen6 <jinzhen6@huawei.com>
+
+[33mcommit 8ea5f2da6cfbd4947be68b6ed7e1a42ae51e0ede[m
+Author: pengyanggit <yangpeng177@huawei.com>
+Date:   Thu Jan 27 20:59:26 2022 +0800
+
+    触摸屏输入事件监听功能的修改意见
+    
+    Signed-off-by: pengyanggit <yangpeng177@huawei.com>
+
+[33mcommit 5ff4ff2d9db711d2606384bf601c4d2e6cc43eff[m
+Merge: 779d940 84e2638
+Author: openharmony_ci <120357966@qq.com>
+Date:   Thu Jan 27 12:49:38 2022 +0000
+
+    !336 提交，合入
+    Merge pull request !336 from ouliang/test0
+
+[33mcommit 779d940d738dd5be541c0cdbba326b74a746f04f[m
+Merge: 95fbe5b 6cf411a
+Author: openharmony_ci <120357966@qq.com>
+Date:   Thu Jan 27 12:49:14 2022 +0000
+
+    !321 [检视意见修改]NAPI统一使用MMI_LOG
+    Merge pull request !321 from 刘伟/0121
+
+[33mcommit 4e83a05997ac9e1d46e0988393cc8444cee0302a[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Thu Jan 27 19:14:58 2022 +0800
+
+    添加鼠标选窗口的逻辑
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit f375bac04c3e688124f3870ba833196f25da229b[m
+Author: jinzhen6 <jinzhen6@huawei.com>
+Date:   Thu Jan 27 18:21:51 2022 +0800
+
+    增加了：从pressedButtons_中删除已抬起的按键
+    
+    Signed-off-by: jinzhen6 <jinzhen6@huawei.com>
+
+[33mcommit 95fbe5b5a338d14dc4e210f32336ed7125434d5d[m
+Merge: bbefcb0 e8794d0
+Author: openharmony_ci <120357966@qq.com>
+Date:   Thu Jan 27 10:08:23 2022 +0000
+
+    !320 触摸板原始数据、触屏修改deviceId获取方式
+    Merge pull request !320 from 亚军/master
+
+[33mcommit bbefcb0c15212c4a39269294f164aebce77a02ab[m
+Merge: cdea7bc 9b53d57
+Author: openharmony_ci <120357966@qq.com>
+Date:   Thu Jan 27 09:40:32 2022 +0000
+
+    !334 拉起ability优化 & keyevent时间优化
+    Merge pull request !334 from mayunteng/master
+
+[33mcommit 84e26387d91b192b855db3588512773fa4eae547[m
+Author: ouliang333 <ouliangliang@huawei.com>
+Date:   Thu Jan 27 17:22:18 2022 +0800
+
+    将input_event_data_transformation.cpp和.h文件中得所有inputE,pck变量名改为event，packet
+    
+    Signed-off-by: ouliang333 <ouliangliang@huawei.com>
+
+[33mcommit 9b53d575f09526199bd582182eda0f622658cd13[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Thu Jan 27 16:34:48 2022 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit cdea7bcc8260957687c25ac54104bf9f1c980cdc[m
+Merge: 2911a02 fe6bedb
+Author: openharmony_ci <120357966@qq.com>
+Date:   Thu Jan 27 06:02:52 2022 +0000
+
+    !325 监视意见整改
+    Merge pull request !325 from Mrdeng_xianyu/test
+
+[33mcommit fe6bedbefb5f45bc70adcf5fbed413ae4e08f4dc[m
+Author: Mrdeng_xianyu <dengxianyu@huawei.com>
+Date:   Thu Jan 27 11:37:04 2022 +0800
+
+    1、g_nextEventId修改为int64_t
+    2、变量放到匿名空间内
+    
+    Signed-off-by: Mrdeng_xianyu <dengxianyu@huawei.com>
+
+[33mcommit 0e4afd29461ca7f0a38edda68880c2706601b314[m
+Author: Mrdeng_xianyu <dengxianyu@huawei.com>
+Date:   Thu Jan 27 11:26:23 2022 +0800
+
+    1、g_nextEventId修改为int64_t
+    2、变量放到匿名空间内
+    Signed-off-by: Mrdeng_xianyu <dengxianyu@huawei.com>
+
+[33mcommit 6cf411a80130a9d627f562035f1fee30c5f26171[m
+Author: liuwei <liuwei595@huawei.com>
+Date:   Thu Jan 27 11:01:35 2022 +0800
+
+    【检视意见修改】NAPI统一使用MMI_LOG
+    
+    Signed-off-by: liuwei <liuwei595@huawei.com>
+
+[33mcommit 2911a029e7b45660c8efbb68ffc9e2d29e55e835[m
+Merge: 17c0187 1664321
+Author: openharmony_ci <120357966@qq.com>
+Date:   Thu Jan 27 02:55:39 2022 +0000
+
+    !317 合入张海峰日志修改代码
+    Merge pull request !317 from 邢江盼/test1
+
+[33mcommit f81300dfc815b26f0d472e75c02da6360bc4d3d7[m
+Author: liuwei <liuwei595@huawei.com>
+Date:   Thu Jan 27 09:28:46 2022 +0800
+
+    【检视意见修改】NAPI统一使用MMI_LOG
+    
+    Signed-off-by: liuwei <liuwei595@huawei.com>
+
+[33mcommit 17c01875da4c2db33da3a4527c9a2b5e7fbf1a14[m
+Merge: 6ad7364 5be13d0
+Author: openharmony_ci <120357966@qq.com>
+Date:   Thu Jan 27 00:54:31 2022 +0000
+
+    !297 处理代码检视意见
+    Merge pull request !297 from baiwei/baiwei_0124
+
+[33mcommit b483f15bc0f0c175b1fdbc9673974fa4f8d2a316[m
+Author: liuwei <liuwei595@huawei.com>
+Date:   Thu Jan 27 08:44:15 2022 +0800
+
+    【检视意见修改】NAPI统一使用MMI_LOG
+    
+    Signed-off-by: liuwei <liuwei595@huawei.com>
+
+[33mcommit e8794d0c3133ac359ba09f7b2be888169a83eb6e[m
+Author: yajunstrong <wangyajun29@huawei.com>
+Date:   Wed Jan 26 22:44:43 2022 +0800
+
+    触摸板原始数据、触屏修改deviceId获取方式
+    
+    Signed-off-by: yajunstrong <wangyajun29@huawei.com>
+
+[33mcommit 745396fc74c26df5a5ef3ac2352aee154c1a4a25[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Tue Jan 25 22:04:34 2022 +0800
+
+    鼠标选窗口新需求
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 16643219e699f3964d607d682e5b67ecf0d2ce71[m
+Author: xing-jiangpan <xingjiangpan2@huawei.com>
+Date:   Wed Jan 26 20:54:30 2022 +0800
+
+    合入张海峰日志修改代码
+    Signed-off-by: xing-jiangpan <xingjiangpan2@huawei.com>
+
+[33mcommit 5be13d0c7129ead5b4e73c270016489428412ddf[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Wed Jan 26 12:43:41 2022 +0000
+
+    update service/device_manager/src/device_register.cpp.
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 6ad73641ea6262386fd844c73c153b668be92882[m
+Merge: 4b30ae6 c279fe5
+Author: openharmony_ci <120357966@qq.com>
+Date:   Wed Jan 26 12:08:34 2022 +0000
+
+    !310 删除OHOS_MOUSE_READY相关内容
+    Merge pull request !310 from jinzhen/0126_commit_1
+
+[33mcommit 4b30ae6f3735d7e21722202c3e9e223e4f714068[m
+Merge: 7e9d37f d91d141
+Author: openharmony_ci <120357966@qq.com>
+Date:   Wed Jan 26 12:07:55 2022 +0000
+
+    !313 函数名、返回值修改，函数合并，const引用，卫语句
+    Merge pull request !313 from liangzhicheng/lwx1115850_code5
+
+[33mcommit d91d1419ac69eab8d82850f76b4285cfe100e686[m
+Author: mr-liang2504 <liangzhicheng10@huawei.com>
+Date:   Wed Jan 26 17:45:19 2022 +0800
+
+    函数名、返回值修改，函数合并，const引用，卫语句
+    
+    Signed-off-by: mr-liang2504 <liangzhicheng10@huawei.com>
+
+[33mcommit 7e9d37fc6949f1f15e9e29ef136799b724245acf[m
+Merge: d806e31 07511e3
+Author: openharmony_ci <120357966@qq.com>
+Date:   Wed Jan 26 09:37:45 2022 +0000
+
+    !304 log modify(delete address and \n)
+    Merge pull request !304 from mayunteng/master
+
+[33mcommit c279fe5ccb197422db4e286b913423536b49b6a1[m
+Author: jinzhen6 <jinzhen6@huawei.com>
+Date:   Wed Jan 26 17:01:13 2022 +0800
+
+    删除OHOS_MOUSE_READY相关内容
+    
+    Signed-off-by: jinzhen6 <jinzhen6@huawei.com>
+
+[33mcommit d806e318f9967de2eea380332bab62698fa324f0[m
+Merge: 2f0f4a9 5c41a9e
+Author: openharmony_ci <120357966@qq.com>
+Date:   Wed Jan 26 08:19:27 2022 +0000
+
+    !305 函数名修改，去this
+    Merge pull request !305 from liangzhicheng/lwx1115850_code
+
+[33mcommit 4995cb76375901d7d31a42e806d5ae580be14d01[m
+Merge: 777331e 2f0f4a9
+Author: baiwei <baiwei28@huawei.com>
+Date:   Wed Jan 26 07:53:40 2022 +0000
+
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 07511e37f4c8e3aa1f4e3d854c287fe48cb8992f[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Wed Jan 26 15:53:36 2022 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit 777331ef81c66ded4c4cfee9726e19f7fbb8934f[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Wed Jan 26 07:51:48 2022 +0000
+
+    update service/device_manager/src/device_register.cpp.
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit ca234ddc85c23aaba6bc2f46401f361644096617[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Wed Jan 26 15:51:12 2022 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit 5c41a9e8b1c1c399d9a3ae9d24b14d9d22d08f20[m
+Author: mr-liang2504 <liangzhicheng10@huawei.com>
+Date:   Wed Jan 26 15:44:55 2022 +0800
+
+    函数名修改，去this
+    
+    Signed-off-by: mr-liang2504 <liangzhicheng10@huawei.com>
+
+[33mcommit 62d7692d02625880db9dbf1c99f71cdcfdc17552[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Wed Jan 26 15:36:23 2022 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit 8238a60df9841c0e6c4904d47559876ed7beaf0d[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Tue Jan 25 22:04:34 2022 +0800
+
+    鼠标选窗口新需求
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 2f0f4a997aa32431961ff9851d72c27506ae6c93[m
+Merge: 41c3f94 08be017
+Author: openharmony_ci <120357966@qq.com>
+Date:   Wed Jan 26 06:48:51 2022 +0000
+
+    !302 修改日志，变量修改，枚举名称修改，函数名修改，函数参数修改
+    Merge pull request !302 from liangzhicheng/lwx1115850_code11
+
+[33mcommit 41c3f9498e94de22c18f3e63c03a4326152b61e9[m
+Merge: 30dc3a4 28d2db9
+Author: openharmony_ci <120357966@qq.com>
+Date:   Wed Jan 26 06:48:05 2022 +0000
+
+    !300 替欧亮亮提交检视意见整改代码：包括修改变量类型为constexpr声明，以及用namespace{}修改命名空间为OHOS::MMI
+    Merge pull request !300 from 邢江盼/test0
+
+[33mcommit 08be01737567d5320edc7fccb2fe04387ea6fa7a[m
+Author: mr-liang2504 <liangzhicheng10@huawei.com>
+Date:   Wed Jan 26 12:23:31 2022 +0800
+
+    修改日志，变量修改，枚举名称修改，函数名修改，函数参数修改
+    
+    Signed-off-by: mr-liang2504 <liangzhicheng10@huawei.com>
+
+[33mcommit 01adc47c10447e5b4c0ecf2374ef3deb9499a455[m
+Author: mr-liang2504 <liangzhicheng10@huawei.com>
+Date:   Wed Jan 26 12:02:52 2022 +0800
+
+    修改日志，变量修改，枚举名称修改，函数名修改，函数参数修改
+    
+    Signed-off-by: mr-liang2504 <liangzhicheng10@huawei.com>
+
+[33mcommit b8ba28c0dbd53d77e3515eba1d11c155737592bf[m
+Author: mr-liang2504 <liangzhicheng10@huawei.com>
+Date:   Wed Jan 26 11:44:19 2022 +0800
+
+    修改日志，变量修改，枚举名称修改，函数名修改，函数参数修改
+    
+    Signed-off-by: mr-liang2504 <liangzhicheng10@huawei.com>
+
+[33mcommit 28d2db986b7acdfb37c28a5d43af2842e5851539[m
+Author: xing-jiangpan <xingjiangpan2@huawei.com>
+Date:   Wed Jan 26 11:29:20 2022 +0800
+
+    替欧亮亮提交检视意见整改代码：包括修改变量类型为constexpr声明，以及用namespace{}修改命名空间为OHOS::MMI
+    Signed-off-by: xing-jiangpan <xingjiangpan2@huawei.com>
+
+[33mcommit 2913b069b4b6af45fed9bf76d70cf56e95850ebe[m
+Author: jinzhen6 <jinzhen6@huawei.com>
+Date:   Wed Jan 26 11:05:39 2022 +0800
+
+    解决事件唯一Id问题
+    
+    Signed-off-by: jinzhen6 <jinzhen6@huawei.com>
+
+[33mcommit 2705d85d8812f60bd7175aa12acdaed1dd798b0c[m
+Author: mr-liang2504 <liangzhicheng10@huawei.com>
+Date:   Wed Jan 26 10:38:19 2022 +0800
+
+    修改日志，变量修改，枚举名称修改，函数名修改，函数参数修改
+    
+    Signed-off-by: mr-liang2504 <liangzhicheng10@huawei.com>
+
+[33mcommit cd66a7aa1b23ad603c54c6ae87367dfbd1481463[m
+Author: xing-jiangpan <xingjiangpan2@huawei.com>
+Date:   Wed Jan 26 10:19:07 2022 +0800
+
+    替欧亮亮提交检视意见整改代码：包括修改变量类型为constexpr声明，以及用namespace{}修改命名空间为OHOS::MMI
+    Signed-off-by: xing-jiangpan <xingjiangpan2@huawei.com>
+
+[33mcommit cd2928f5e3104ccdc409f0bb59eb1cc6008ffeb0[m
+Author: xing-jiangpan <xingjiangpan2@huawei.com>
+Date:   Wed Jan 26 10:07:17 2022 +0800
+
+    替欧亮亮提交检视意见整改代码：包括constexpr声明，用namespace{}修改命名空间为OHOS::MMI
+    Signed-off-by: xing-jiangpan <xingjiangpan2@huawei.com>
+
+[33mcommit 30dc3a4e035f0b5f6e47dff1598f2d576471e637[m
+Merge: 53d31d1 87fce8f
+Author: openharmony_ci <120357966@qq.com>
+Date:   Tue Jan 25 14:27:30 2022 +0000
+
+    !295 按键订阅给服务端发消息之前需要初始化一次client
+    Merge pull request !295 from biu媛/personal/zhaoxueyuan/power
+
+[33mcommit dafaaee639da9bf537bf4a17ad0a50a4b27b0b63[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Tue Jan 25 22:04:34 2022 +0800
+
+    鼠标选窗口新需求
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 0200d2b1e526c78b303e6e1e72e7b5436fb28e97[m
+Merge: 3009d1e 53d31d1
+Author: baiwei <baiwei28@huawei.com>
+Date:   Tue Jan 25 13:16:14 2022 +0000
+
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 53d31d11049889c3fc3efaf1c53cf6e12d2d787f[m
+Merge: 7b15a3c 04bd105
+Author: openharmony_ci <120357966@qq.com>
+Date:   Tue Jan 25 13:04:05 2022 +0000
+
+    !235 无用需删除，udsServer参数
+    Merge pull request !235 from baiwei/baiwei_fix_0120
+
+[33mcommit 87fce8f5adba989f211ed66fec9dbaa02a7d4783[m
+Author: xueyuanzhao <zhaoxueyuan@huawei.com>
+Date:   Tue Jan 25 19:53:48 2022 +0800
+
+    Signed-off-by:xueyuanzhao<zhaoxueyuan@huawei.com>
+    
+    Signed-off-by: xueyuanzhao <zhaoxueyuan@huawei.com>
+
+[33mcommit 880bb826236412598798f77ded102f3059a6ea42[m
+Author: xueyuanzhao <zhaoxueyuan@huawei.com>
+Date:   Tue Jan 25 19:29:45 2022 +0800
+
+    Signed-off-by:xueyuanzhao<zhaoxueyuan@huawei.com>
+    
+    Signed-off-by: xueyuanzhao <zhaoxueyuan@huawei.com>
+
+[33mcommit 7b15a3c5b07ade1a7643ff489db728090445323a[m
+Merge: 9137064 49d3ee7
+Author: openharmony_ci <120357966@qq.com>
+Date:   Tue Jan 25 11:24:36 2022 +0000
+
+    !275 MouseEvent结构调整
+    Merge pull request !275 from jinzhen/Mouse_event_Atructural_Adjustment_0122
+
+[33mcommit 04bd105d220ea3125a6e0bb4ebe47d24060a89e7[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Tue Jan 25 11:14:55 2022 +0000
+
+    update service/event_handle/src/input_event_handler.cpp.
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 91370649a2cb662710fb8708112d28f720bace87[m
+Merge: 07ed23f 8ba48af
+Author: openharmony_ci <120357966@qq.com>
+Date:   Tue Jan 25 10:40:14 2022 +0000
+
+    !268 signal 捕获
+    Merge pull request !268 from biu媛/personal/z00520849/signal
+
+[33mcommit 3009d1e19c29e3f1634d6356b97010ac14e73633[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Tue Jan 25 08:52:49 2022 +0000
+
+    update service/event_handle/src/input_event_handler.cpp.
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 3479d6510f8d888d4d5c63db44ad03a39a6a4a5d[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Tue Jan 25 08:49:57 2022 +0000
+
+    update service/event_dispatch/src/event_dispatch.cpp.
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 35c52810a9a703e2fa9195abfa7a4022353c64cf[m
+Merge: f57b580 07ed23f
+Author: baiwei <baiwei28@huawei.com>
+Date:   Tue Jan 25 08:22:26 2022 +0000
+
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 31a8ebea993820ffffd754b889dd0fedbf2323fd[m
+Merge: 5f5ce8c 07ed23f
+Author: baiwei <baiwei28@huawei.com>
+Date:   Tue Jan 25 08:14:37 2022 +0000
+
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 8ba48afd51e5936fadadf4f60066dd0e4433baea[m
+Author: xueyuanzhao <zhaoxueyuan@huawei.com>
+Date:   Tue Jan 25 16:11:58 2022 +0800
+
+    Signed-off-by:xueyuanzhao<zhaoxueyuan@huawei.com>
+    
+    Signed-off-by: xueyuanzhao <zhaoxueyuan@huawei.com>
+
+[33mcommit ebeca96dd85dab5e3c9b909f5d3ffeacc5d154fa[m
+Author: xueyuanzhao <zhaoxueyuan@huawei.com>
+Date:   Tue Jan 25 14:48:06 2022 +0800
+
+    Signed-off-by:xueyuanzhao<zhaoxueyuan@huawei.com>
+    
+    Signed-off-by: xueyuanzhao <zhaoxueyuan@huawei.com>
+
+[33mcommit 5a4b75d70fe828cc23f9835711e6aacaf3d853c3[m
+Author: xueyuanzhao <zhaoxueyuan@huawei.com>
+Date:   Tue Jan 25 14:32:25 2022 +0800
+
+    Signed-off-by:xueyuanzhao<zhaoxueyuan@huawei.com>
+    
+    Signed-off-by: xueyuanzhao <zhaoxueyuan@huawei.com>
+
+[33mcommit 5caf6f8afdd81ad153f7930152ae2323630ce446[m
+Author: xueyuanzhao <zhaoxueyuan@huawei.com>
+Date:   Tue Jan 25 14:08:08 2022 +0800
+
+    Signed-off-by:xueyuanzhao<zhaoxueyuan@huawei.com>
+    
+    Signed-off-by: xueyuanzhao <zhaoxueyuan@huawei.com>
+
+[33mcommit bd05b7b78e12f39c7387c128f216b4ab319ee014[m
+Author: xueyuanzhao <zhaoxueyuan@huawei.com>
+Date:   Tue Jan 25 10:48:11 2022 +0800
+
+    Signed-off-by:xueyuanzhao<zhaoxueyuan@huawei.com>
+    
+    Signed-off-by: xueyuanzhao <zhaoxueyuan@huawei.com>
+
+[33mcommit 49d3ee71efc597c755d55e7eecaa6fdd984524f0[m
+Author: jinzhen <jinzhen6@huawei.com>
+Date:   Tue Jan 25 01:44:53 2022 +0000
+
+    Signed-off-by: jinzhen6 <jinzhen6@huawei.com>
+    解决冲突
+
+[33mcommit 38a065ffbc0223f4325415de99b10f471baeb329[m
+Author: jinzhen <jinzhen6@huawei.com>
+Date:   Tue Jan 25 01:18:48 2022 +0000
+
+    Signed-off-by: jinzhen6 <jinzhen6@huawei.com>
+
+[33mcommit 8d6f81c5778af68741f99f5cb46171fa853abc90[m
+Merge: aa60a7e 07ed23f
+Author: jinzhen <jinzhen6@huawei.com>
+Date:   Tue Jan 25 00:47:27 2022 +0000
+
+    解决冲突
+    
+    
+    Signed-off-by: jinzhen6 <jinzhen6@huawei.com>
+
+[33mcommit 07ed23ff4652c51232b31cdfe0491e1b6be773a6[m[33m ([m[1;31morigin/weekly_20220125[m[33m)[m
+Merge: 7e1aa92 ac3b6e1
+Author: openharmony_ci <120357966@qq.com>
+Date:   Tue Jan 25 00:28:16 2022 +0000
+
+    !294 键盘、鼠标、触摸板、触摸屏排查下列检视意见
+    Merge pull request !294 from 李邦武/libangwu
+
+[33mcommit ac3b6e172f6b53478d5d6ba68131f71da52691ca[m
+Author: libangwu <libangwu@huawei.com>
+Date:   Mon Jan 24 22:56:32 2022 +0800
+
+    1、排查按键、鼠标、触摸板、触摸屏基本功能业务下的函数入参是否需要添加const
+    2、排查的过程中如果入参有指针的，添加了CHKPR验证入参指针
+    3、去掉冗余的参数，基本上都是udsServer
+    4、触摸屏按到cancel和frame的时候，日志中把类型加上
+    5、排查了函数命名小驼峰，修改为大驼峰
+    
+    Signed-off-by: libangwu <libangwu@huawei.com>
+
+[33mcommit 7e1aa922ed6a289a33858bd2feecf97294e0ab54[m
+Merge: 6a13840 6af759c
+Author: openharmony_ci <120357966@qq.com>
+Date:   Mon Jan 24 14:25:05 2022 +0000
+
+    !292  编码规范修改：删除重复引用的命名空间。
+    Merge pull request !292 from dongzhanwu/dzw_delete_repetitious_command_space_0124
+
+[33mcommit 6a138404dc8a4d8b9e538d6bef5fbc6e28c287e7[m
+Merge: f5e812f 133c781
+Author: openharmony_ci <120357966@qq.com>
+Date:   Mon Jan 24 14:23:58 2022 +0000
+
+    !287 替梁志成上库检视意见修改
+    Merge pull request !287 from lifenghui/liangzhicheng
+
+[33mcommit f5e812f5884cd2cdd8a25fd09b0bc0dcc87135b2[m
+Merge: 5ffc33c f33668a
+Author: openharmony_ci <120357966@qq.com>
+Date:   Mon Jan 24 13:49:52 2022 +0000
+
+    !288 替白伟上库检视意见代码修改;添加日志,MMI_LOGW打印type;用日志写明三指需求使用，保留代码
+    Merge pull request !288 from hailong/localPr
+
+[33mcommit f57b58023ffa31877ba019753c4a25a5a447d9d8[m
+Merge: 15c3ca9 90a9316
+Author: baiwei <baiwei28@huawei.com>
+Date:   Mon Jan 24 17:19:23 2022 +0800
+
+    Merge branch 'baiwei_0124' of gitee.com:baiyingwei_2009/multimodalinput_input
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 6af759c40b80bbc563a5de5ed31e39f0566cfffb[m
+Author: dongzhanwu <dongzhanwu@huawei.com>
+Date:   Mon Jan 24 17:18:47 2022 +0800
+
+    编码规范修改：删除重复引用的命名空间。
+    
+    Signed-off-by: dongzhanwu <dongzhanwu@huawei.com>
+
+[33mcommit 15c3ca925515108578303f203a55242a00c76f57[m
+Merge: 7c89d0c 1c094a0
+Author: baiwei <baiwei28@huawei.com>
+Date:   Mon Jan 24 15:24:00 2022 +0800
+
+    Merge branch 'baiwei_0124' of gitee.com:baiyingwei_2009/multimodalinput_input
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 5ffc33cdecaf7430434b9a2af63bd9080ebcb9ab[m
+Merge: 4744a5c d0c7e01
+Author: openharmony_ci <120357966@qq.com>
+Date:   Mon Jan 24 08:38:49 2022 +0000
+
+    !284 替王愿提交检视意见整改代码
+    Merge pull request !284 from 邢江盼/test0
+
+[33mcommit 133c781609c8e426307fbf60ab444dbd05a04a56[m
+Author: lifenghui <lifenghui3@huawei.com>
+Date:   Mon Jan 24 16:04:39 2022 +0800
+
+    替梁志成上库检视意见修改代码，恢复patch
+    
+    Signed-off-by: lifenghui <lifenghui3@huawei.com>
+
+[33mcommit e6fc5c33d07dedad227ec4bd92653665071603db[m
+Author: lifenghui <lifenghui3@huawei.com>
+Date:   Mon Jan 24 15:40:38 2022 +0800
+
+    替梁志成上库检视意见修改代码
+    
+    Signed-off-by: lifenghui <lifenghui3@huawei.com>
+
+[33mcommit f33668a43b83be307ccdbdd8163b6c6a47467a91[m
+Author: hailong <lilong121@huawei.com>
+Date:   Mon Jan 24 15:38:58 2022 +0800
+
+    替邢白伟上库检视意见代码修改;添加日志,MMI_LOGW打印type;用日志写明三指需求使用，保留代码
+    
+    Signed-off-by: hailong <lilong121@huawei.com>
+
+[33mcommit 4744a5c789374d8ac0d7bf743510fa79929b2000[m
+Merge: fd4b9eb 45014ff
+Author: openharmony_ci <120357966@qq.com>
+Date:   Mon Jan 24 07:32:40 2022 +0000
+
+    !269 删除power键亮灭屏临时方案
+    Merge pull request !269 from 野生毛霉君/master
+
+[33mcommit 90a93169986ce936c88322f334c4d09aa8aaecb6[m
+Merge: 7c89d0c 1c094a0
+Author: baiwei <baiwei28@huawei.com>
+Date:   Mon Jan 24 15:24:00 2022 +0800
+
+    Merge branch 'baiwei_0124' of gitee.com:baiyingwei_2009/multimodalinput_input
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 7c89d0cd6df72d265d0da1dd7932537f92618434[m
+Merge: 71c966f 0899c35
+Author: baiwei <baiwei28@huawei.com>
+Date:   Mon Jan 24 11:29:58 2022 +0800
+
+    Merge branch 'baiwei_0124' of gitee.com:baiyingwei_2009/multimodalinput_input
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit d0c7e0171b62bda9d62ed97e6ae84161daaa2a4e[m
+Author: xing-jiangpan <xingjiangpan2@huawei.com>
+Date:   Mon Jan 24 15:22:05 2022 +0800
+
+    替王愿提交检视意见整改代码：包括函数格式调整、变量格式，返回值类型具体化
+    
+    Signed-off-by: xing-jiangpan <xingjiangpan2@huawei.com>
+
+[33mcommit e9c0a40509e46455ec13a00d393cc423420a0da6[m
+Author: dongzhanwu <dongzhanwu@huawei.com>
+Date:   Mon Jan 24 15:02:40 2022 +0800
+
+    编码规范修改：删除重复引用的命名空间。
+    
+    Signed-off-by: dongzhanwu <dongzhanwu@huawei.com>
+
+[33mcommit 3114b5b06ca14811ba76a3378694988fa7eb3d86[m
+Author: xing-jiangpan <xingjiangpan2@huawei.com>
+Date:   Mon Jan 24 15:01:25 2022 +0800
+
+    替王愿提交检视意见整改代码：包括函数格式调整、变量格式，返回值类型具体化
+    
+    Signed-off-by: xing-jiangpan <xingjiangpan2@huawei.com>
+
+[33mcommit 0733315ff7a29042311dee384cd3c47765478609[m
+Author: xing-jiangpan <xingjiangpan2@huawei.com>
+Date:   Mon Jan 24 14:51:06 2022 +0800
+
+    替王愿提交检视意见整改代码：包括函数格式调整、变量格式，返回值类型具体化
+    
+    Signed-off-by: xing-jiangpan <xingjiangpan2@huawei.com>
+
+[33mcommit 45014ffd4acaf33b28015ac6027c905ef01ea5d5[m
+Author: mucor <mucorwang@gmail.com>
+Date:   Sat Jan 22 19:02:12 2022 +0800
+
+    fix: remove temp power key feature
+    
+    re: #I4RVGL
+    Signed-off-by: mucor <mucorwang@gmail.com>
+
+[33mcommit fd4b9eba78f6724f68936dfb298bdfcb5ddc0681[m
+Merge: bbb2104 af43059
+Author: openharmony_ci <120357966@qq.com>
+Date:   Mon Jan 24 05:06:35 2022 +0000
+
+    !281 替梁志成上库检视意见修改
+    Merge pull request !281 from lifenghui/liangzhicheng
+
+[33mcommit bbb210419d3b87131a23b38ee709dbae9a9efc4d[m
+Merge: f3ec693 015d03e
+Author: openharmony_ci <120357966@qq.com>
+Date:   Mon Jan 24 04:20:18 2022 +0000
+
+    !197  change header file of napi
+    Merge pull request !197 from zhanghaibo/ndk
+
+[33mcommit af43059ca6d85e588ce3d1f23a0d1f3e4c96f5de[m
+Author: lifenghui <lifenghui3@huawei.com>
+Date:   Mon Jan 24 11:59:00 2022 +0800
+
+    替梁志成上库检视意见代码
+    
+    Signed-off-by: lifenghui <lifenghui3@huawei.com>
+
+[33mcommit 1c094a03ff8f9148d85cf7b779e716f8644e73d2[m
+Merge: 71c966f 0899c35
+Author: baiwei <baiwei28@huawei.com>
+Date:   Mon Jan 24 11:29:58 2022 +0800
+
+    Merge branch 'baiwei_0124' of gitee.com:baiyingwei_2009/multimodalinput_input
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 71c966f6168e804719272c6cc8a13eddfaa57030[m
+Merge: 322d024 f3ec693
+Author: baiwei <baiwei28@huawei.com>
+Date:   Mon Jan 24 10:53:07 2022 +0800
+
+    处理冲突
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 0899c35a361cfc4b3d80c3d6debbc531e22735a0[m
+Merge: 322d024 f3ec693
+Author: baiwei <baiwei28@huawei.com>
+Date:   Mon Jan 24 10:53:07 2022 +0800
+
+    处理冲突
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit aa60a7e58deb96db75ac92d7597764873fabd867[m
+Author: jinzhen6 <jinzhen6@huawei.com>
+Date:   Sat Jan 22 22:48:05 2022 +0800
+
+    MouseEvent结构调整
+    
+    Signed-off-by: jinzhen6 <jinzhen6@huawei.com>
+
+[33mcommit 326aef6c467afe3d10dd954ca6d68fc61391bcca[m
+Author: jinzhen6 <jinzhen6@huawei.com>
+Date:   Sat Jan 22 22:10:06 2022 +0800
+
+    MouseEvent结构调整
+    
+    Signed-off-by: jinzhen6 <jinzhen6@huawei.com>
+
+[33mcommit f3ec69323ad030408d53f08f73f12cc92ca20779[m
+Merge: a0d25ef 8d64501
+Author: openharmony_ci <120357966@qq.com>
+Date:   Sat Jan 22 13:54:07 2022 +0000
+
+    !273 anr modified & epoll time change to 1ms
+    Merge pull request !273 from mayunteng/master
+
+[33mcommit 8d645015abc90b264444689284827aa5fb7c8d47[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Sat Jan 22 21:04:04 2022 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit a0d25eff9e8b9c0152519df1496583a213ed620c[m
+Merge: 136e0c6 a8ecdca
+Author: openharmony_ci <120357966@qq.com>
+Date:   Sat Jan 22 12:10:36 2022 +0000
+
+    !263 替邢江盼上库检视意见代码修改
+    Merge pull request !263 from 17349030869/0122xjp
+
+[33mcommit a8ecdcaf96df28953743459a572823db5d365047[m
+Author: wuzhihuitmac <wuzhihui4@huawei.com>
+Date:   Sat Jan 22 19:34:19 2022 +0800
+
+    替邢江盼上库检视意见修改代码
+    
+    Signed-off-by: wuzhihuitmac <wuzhihui4@huawei.com>
+
+[33mcommit 136e0c69c4755d657bd26bb53e04ba4e25b2960c[m
+Merge: b68d438 db2a79b
+Author: openharmony_ci <120357966@qq.com>
+Date:   Sat Jan 22 11:10:25 2022 +0000
+
+    !256 napi - inputEventClient目录日志整改
+    Merge pull request !256 from 刘伟/0121
+
+[33mcommit b68d4381d89dc0417b6167c4d7c340ba9ad97227[m
+Merge: 1c46187 e2cdf15
+Author: openharmony_ci <120357966@qq.com>
+Date:   Sat Jan 22 10:39:37 2022 +0000
+
+    !264 CLMAP这些宏定义去掉
+    Merge pull request !264 from BobZ/input-del-clmap
+
+[33mcommit 3d471f9eb6c1b132e4ad5b7a0826318e1d81593a[m
+Author: wuzhihuitmac <wuzhihui4@huawei.com>
+Date:   Sat Jan 22 18:19:08 2022 +0800
+
+    替邢江盼上库检视意见修改代码
+    
+    Signed-off-by: wuzhihuitmac <wuzhihui4@huawei.com>
+
+[33mcommit ebcc7fedbc5cf3f368f60ff28bb860724fc7a57c[m
+Author: wuzhihuitmac <wuzhihui4@huawei.com>
+Date:   Sat Jan 22 17:56:47 2022 +0800
+
+    替邢江盼上库检视意见修改代码
+    
+    Signed-off-by: wuzhihuitmac <wuzhihui4@huawei.com>
+
+[33mcommit 1c461875b1d266d2774fb9b649c76672f328127d[m
+Merge: e632854 805e849
+Author: openharmony_ci <120357966@qq.com>
+Date:   Sat Jan 22 09:31:27 2022 +0000
+
+    !267 检视意见修改小驼峰就近定义
+    Merge pull request !267 from 红尘and客栈/test22
+
+[33mcommit 5f5ce8cd7086727e191759869cf9ccbbf0dd93ae[m
+Merge: e48c00c e632854
+Author: baiwei <baiwei28@huawei.com>
+Date:   Sat Jan 22 09:30:47 2022 +0000
+
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit e141f52bbe6fc82e1595d280465643d79adddc59[m
+Author: wuzhihuitmac <wuzhihui4@huawei.com>
+Date:   Sat Jan 22 17:28:19 2022 +0800
+
+    替邢江盼上库检视意见修改代码
+    Signed-off-by: wuzhihuitmac <wuzhihui4@huawei.com>
+
+[33mcommit 8c9da2cea172a777602be874a59da4d7f769aa40[m
+Author: xueyuanzhao <zhaoxueyuan@huawei.com>
+Date:   Sat Jan 22 17:00:52 2022 +0800
+
+    Signed-off-by:xueyuanzhao<zhaoxueyuan@huawei.com>
+    
+    Signed-off-by: xueyuanzhao <zhaoxueyuan@huawei.com>
+
+[33mcommit 5ee60937bc91ce3cd8615b79d5c6c585828de12c[m
+Author: wuzhihuitmac <wuzhihui4@huawei.com>
+Date:   Sat Jan 22 16:59:09 2022 +0800
+
+    替邢江盼上库检视意见修改代码
+    Signed-off-by: wuzhihuitmac <wuzhihui4@huawei.com>
+
+[33mcommit e87e239370ccb94e10f7b6909a16b0e7a855d080[m
+Author: xueyuanzhao <zhaoxueyuan@huawei.com>
+Date:   Sat Jan 22 16:58:04 2022 +0800
+
+    Signed-off-by:xueyuanzhao<zhaoxueyuan@huawei.com>
+    
+    Signed-off-by: xueyuanzhao <zhaoxueyuan@huawei.com>
+
+[33mcommit 805e8490d27cc681eb9a37577dd22f60f0a7a004[m
+Author: the-world-of-mortals-and-inn <wangcaiyi@huawei.com>
+Date:   Sat Jan 22 16:52:09 2022 +0800
+
+    Signed-off-by: the-world-of-mortals-and-inn <wangcaiyi@huawei.com>
+    修改检视意见变量改成小驼峰，打印字符串改成打印变量值
+
+[33mcommit e632854ae94725c90f6013ac1e29f9937d81b8a1[m
+Merge: f81af3d f6c6892
+Author: openharmony_ci <120357966@qq.com>
+Date:   Sat Jan 22 08:45:14 2022 +0000
+
+    !266 OHOS::MMI命名空间放上去，并分开 input_event_handler.cpp
+    Merge pull request !266 from BobZ/input-ohos-mmi-nm
+
+[33mcommit 276112db19f83e7ec13092e28f01eddd98285408[m
+Author: xueyuanzhao <zhaoxueyuan@huawei.com>
+Date:   Sat Jan 22 16:23:00 2022 +0800
+
+    Signed-off-by:xueyuanzhao<zhaoxueyuan@huawei.com>
+    
+    Signed-off-by: xueyuanzhao <zhaoxueyuan@huawei.com>
+
+[33mcommit 9430fc412eda2fc3bad3c4b8b95ad1051d3bdcf7[m
+Author: the-world-of-mortals-and-inn <wangcaiyi@huawei.com>
+Date:   Sat Jan 22 16:17:29 2022 +0800
+
+    Signed-off-by: the-world-of-mortals-and-inn <wangcaiyi@huawei.com>
+    代码监视意见修改为小驼峰就近定义
+
+[33mcommit f6c6892eefbb768f546199e591c82351debe0102[m
+Author: bobz202 <zhangbo374@huawei.com>
+Date:   Sat Jan 22 16:00:44 2022 +0800
+
+    OHOS::MMI命名空间放上去，并分开 input_event_handler.cpp
+    
+    Signed-off-by: bobz202 <zhangbo374@huawei.com>
+
+[33mcommit f81af3d0bd2d8c52a5fb5cd75711b2e7f04c7bf0[m
+Merge: 0a8df10 66887a6
+Author: openharmony_ci <120357966@qq.com>
+Date:   Sat Jan 22 07:56:49 2022 +0000
+
+    !251 替王豪上库测试用例代码
+    Merge pull request !251 from wangningning/0120
+
+[33mcommit e2cdf1532fbcd9f43c29d769f5cccfcb54c7df9b[m
+Merge: ee13021 0a8df10
+Author: bobz202 <zhangbo374@huawei.com>
+Date:   Sat Jan 22 15:26:50 2022 +0800
+
+    Merge branch 'master' of gitee.com:bobz202/multimodalinput_input into input-del-clmap
+    
+    # Conflicts:
+    #       service/event_dispatch/src/event_dispatch.cpp
+    #       service/server_input_filter_manager/src/server_input_filter_manager.cpp
+    
+    Signed-off-by: bobz202 <zhangbo374@huawei.com>
+
+[33mcommit 015d03e8c35b55d1560cde75a5ff936b4ea4f687[m
+Author: zhanghaibo <zhanghaibo0@huawei.com>
+Date:   Mon Jan 17 21:00:43 2022 +0800
+
+    change header file of napi
+    
+    Signed-off-by: zhanghaibo <zhanghaibo0@huawei.com>
+    Change-Id: Ib29a4424dac02a90e427b7d81dc4d85d87cc9ecd
+
+[33mcommit ee130215a7a9a3b97065421e3bd87a6f88c0c9fb[m
+Author: bobz202 <zhangbo374@huawei.com>
+Date:   Sat Jan 22 15:21:25 2022 +0800
+
+    CLMAP这些宏定义去掉
+    
+    Signed-off-by: bobz202 <zhangbo374@huawei.com>
+
+[33mcommit d62b9d4d7959c03dbf663892c8dd85bd58cd7ca2[m
+Author: wuzhihuitmac <wuzhihui4@huawei.com>
+Date:   Sat Jan 22 15:17:48 2022 +0800
+
+    替邢江盼上库检视意见修改
+    
+    Signed-off-by: wuzhihuitmac <wuzhihui4@huawei.com>
+
+[33mcommit 0a8df10a11987e617c759e61d58fe79cc78a38a3[m
+Merge: 633f0d6 416af24
+Author: openharmony_ci <120357966@qq.com>
+Date:   Sat Jan 22 06:29:34 2022 +0000
+
+    !260 替梁志成上库函数参数引用改指针，去除struct，去掉auto，空指针判断
+    Merge pull request !260 from 17349030869/0122lzc
+
+[33mcommit 416af24303a77218e285ef4617f1f1ea82d237b6[m
+Author: wuzhihuitmac <wuzhihui4@huawei.com>
+Date:   Sat Jan 22 11:31:57 2022 +0800
+
+    替梁志成上库函数参数引用改指针，去除struct，去掉auto，空指针判断
+    Signed-off-by: wuzhihuitmac <wuzhihui4@huawei.com>
+
+[33mcommit 633f0d64f6f3b582373575ced2b24701fc3b66a8[m
+Merge: b3a7b96 7117ff7
+Author: openharmony_ci <120357966@qq.com>
+Date:   Sat Jan 22 02:15:15 2022 +0000
+
+    !250 替梁志成上库if语句格式修改
+    Merge pull request !250 from 17349030869/0121lzc1
+
+[33mcommit db2a79b70ff5016e2f829ea5c0041e60000a86c9[m
+Author: liuwei <liuwei595@huawei.com>
+Date:   Sat Jan 22 09:52:08 2022 +0800
+
+    add for napi 日志整改
+    
+    Signed-off-by: liuwei <liuwei595@huawei.com>
+
+[33mcommit b3a7b96a0c50cc240861a1b828eee6fe02b69e3e[m
+Merge: 0a2ff1a 4c20adc
+Author: openharmony_ci <120357966@qq.com>
+Date:   Fri Jan 21 16:12:45 2022 +0000
+
+    !253 代码检视意见修改0118
+    Merge pull request !253 from lisong/codeReview2_0118
+
+[33mcommit 0a2ff1ac1a23ccd6c0e0ff5085f04247acb8c1ee[m
+Merge: c289711 758efde
+Author: openharmony_ci <120357966@qq.com>
+Date:   Fri Jan 21 16:11:27 2022 +0000
+
+    !252 事件id自增修改
+    Merge pull request !252 from 胡枭/master
+
+[33mcommit c289711d3b4ed10314c077f54a1d1095cdd10347[m
+Merge: d4af00c a752cfc
+Author: openharmony_ci <120357966@qq.com>
+Date:   Fri Jan 21 16:10:07 2022 +0000
+
+    !246 删除日志，在return RET_ERR;前添加日志打印pid
+    Merge pull request !246 from BobZ/master
+
+[33mcommit 201095bb7bffed99f245e29d752d5386afe7535a[m
+Author: liuwei <liuwei595@huawei.com>
+Date:   Fri Jan 21 22:41:40 2022 +0800
+
+    add for napi 日志整改
+    
+    Signed-off-by: liuwei <liuwei595@huawei.com>
+
+[33mcommit c7594c38e86f1336c21fd55664d65e7c617e08b3[m
+Author: liuwei <liuwei595@huawei.com>
+Date:   Fri Jan 21 22:39:48 2022 +0800
+
+    add for napi 日志整改
+    
+    Signed-off-by: liuwei <liuwei595@huawei.com>
+
+[33mcommit a752cfc44d1afa1b631524b40c2bcc85efe4624d[m
+Author: bobz202 <zhangbo374@huawei.com>
+Date:   Fri Jan 21 21:39:53 2022 +0800
+
+    删除日志，在return RET_ERR;前添加日志打印pid
+    
+    Signed-off-by: bobz202 <zhangbo374@huawei.com>
+
+[33mcommit e48c00c8ab6c2b172a141cb98f2a21cb804bde1b[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Fri Jan 21 11:04:04 2022 +0000
+
+    update service/key_event_input_subscribe_filter/src/key_event_input_subscribe_filter.cpp.
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 5f2cbf9930067c334fbf8e655853994b9cd20977[m
+Author: liuwei <liuwei595@huawei.com>
+Date:   Fri Jan 21 17:55:50 2022 +0800
+
+    add for napi 日志整改
+    
+    Signed-off-by: liuwei <liuwei595@huawei.com>
+
+[33mcommit d13c3544d9cb9b5299c4e6f9ac0ecf3fba037c57[m
+Author: liuwei <liuwei595@huawei.com>
+Date:   Fri Jan 21 17:55:04 2022 +0800
+
+    add for napi 日志整改
+    
+    Signed-off-by: liuwei <liuwei595@huawei.com>
+
+[33mcommit c9016dfcb1fa7e9e023d844b9975976279bb903d[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Fri Jan 21 09:37:57 2022 +0000
+
+    update service/key_event_input_subscribe_filter/src/key_event_input_subscribe_filter.cpp.
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit d4af00c52390708b644ef6f1a9d7baa262441c6f[m
+Merge: 4c70626 9a93cf8
+Author: openharmony_ci <120357966@qq.com>
+Date:   Fri Jan 21 09:34:54 2022 +0000
+
+    !242 清理告警
+    Merge pull request !242 from biu媛/personal/zhaoxueyuan/clean_code
+
+[33mcommit e433a4c6f904708592f12f4d8dc47accf24672ac[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Fri Jan 21 09:33:10 2022 +0000
+
+    update service/event_dispatch/src/event_dispatch.cpp.
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 4c20adc53bc07d558542223904ce0095d6591fa2[m
+Author: lisong <lisong92@huawei.com>
+Date:   Fri Jan 21 16:08:36 2022 +0800
+
+    解决编译问题
+    
+    Signed-off-by: lisong <lisong92@huawei.com>
+
+[33mcommit 6e06d845debe36414cd6176f740aae5923c9831f[m
+Author: lisong <lisong92@huawei.com>
+Date:   Fri Jan 21 15:39:21 2022 +0800
+
+    代码检视意见修改
+    
+    Signed-off-by: lisong <lisong92@huawei.com>
+
+[33mcommit 88716a951a442d5520a4de347bfda6dc23a5774d[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Fri Jan 21 07:15:46 2022 +0000
+
+    update service/event_package/include/event_package.h.
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit c8718f376d79c20ac747f3cc68f3674307b888f9[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Fri Jan 21 07:02:30 2022 +0000
+
+    update service/event_package/src/event_package.cpp.
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit b8f9d492191ce31e105e88dc27b94dd7d5675ff4[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Fri Jan 21 04:26:43 2022 +0000
+
+    update service/event_dispatch/src/event_dispatch.cpp.
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 758efdeac3d87b7f0fc523dc39a266cf36d65061[m
+Author: hungry_feiwei <huxiao31@huawei.com>
+Date:   Fri Jan 21 12:18:54 2022 +0800
+
+    Signed-off-by:hungry_feiwei<huxiao31@huawei.com>
+    
+    Signed-off-by: hungry_feiwei <huxiao31@huawei.com>
+
+[33mcommit 66887a675bf11836ae2e41dc989d2c83d7733ec8[m
+Author: wangningning1024 <wangningning8@huawei.com>
+Date:   Fri Jan 21 10:33:53 2022 +0800
+
+    替王豪上库测试用例代码
+    
+    Signed-off-by: wangningning1024 <wangningning8@huawei.com>
+
+[33mcommit 7117ff70bc8e0d0d4905b9ef1eea4aa3031357b7[m
+Author: wuzhihuitmac <wuzhihui4@huawei.com>
+Date:   Fri Jan 21 10:28:16 2022 +0800
+
+    替梁志成上库if语句格式修改
+    
+    Signed-off-by: wuzhihuitmac <wuzhihui4@huawei.com>
+
+[33mcommit 39701d954c9e56c72e3d6e4a16f8482970bdcfd8[m
+Merge: 54dee89 4c70626
+Author: baiwei <baiwei28@huawei.com>
+Date:   Thu Jan 20 15:52:54 2022 +0000
+
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 4c70626edd686671348a451d8c261d28f3a7cff2[m
+Merge: eb1e15c dbe8572
+Author: openharmony_ci <120357966@qq.com>
+Date:   Thu Jan 20 14:24:32 2022 +0000
+
+    !229 修改对wm的依赖
+    Merge pull request !229 from xiahaiqin/master
+
+[33mcommit 54dee89d1b6d58a55fb2386e9eb8ed71de39f558[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Thu Jan 20 14:23:15 2022 +0000
+
+    update service/event_dispatch/src/event_dispatch.cpp.
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit eb1e15c80e99e4c890b32cb8e2287a9e1de389a4[m
+Merge: fb1fdad 7b6d5e4
+Author: openharmony_ci <120357966@qq.com>
+Date:   Thu Jan 20 13:12:48 2022 +0000
+
+    !245 input device 查询接口优化
+    Merge pull request !245 from 胡枭/master
+
+[33mcommit fb1fdad3a8d62e7d1e10ea53bbb3c1cc43c33802[m
+Merge: 03225f7 2f54972
+Author: openharmony_ci <120357966@qq.com>
+Date:   Thu Jan 20 11:59:45 2022 +0000
+
+    !248 替梁志成上库变量名称修改，变量就近声明，函数出参放在参数列表最后，宏修改
+    Merge pull request !248 from 17349030869/0120lzc2
+
+[33mcommit e2a473a945215d8ce8be94fca896394145ff1703[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Thu Jan 20 11:49:50 2022 +0000
+
+    update service/event_package/include/event_package.h.
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 9c112689bd180c358507c2b226df7bd04a1761da[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Thu Jan 20 11:48:25 2022 +0000
+
+    update service/event_package/src/event_package.cpp.
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 2f5497297b23176bb79218075cc7d3ad842a083d[m
+Author: wuzhihuitmac <wuzhihui4@huawei.com>
+Date:   Thu Jan 20 19:11:15 2022 +0800
+
+    替梁志成上库变量名称修改，变量就近声明，函数出参放在参数列表最后，宏修改
+    
+    Signed-off-by: wuzhihuitmac <wuzhihui4@huawei.com>
+
+[33mcommit 03225f79afe63aa1f2b6fed4ea0437ff3c8861bc[m
+Merge: f5fe7c6 a48db76
+Author: openharmony_ci <120357966@qq.com>
+Date:   Thu Jan 20 10:57:59 2022 +0000
+
+    !243 trace打印添加字符串说明
+    Merge pull request !243 from 红尘and客栈/test20
+
+[33mcommit 322d0243cd6c3812a35cabd27e4ff5767daf7426[m
+Merge: 37ae4ac f5fe7c6
+Author: baiwei <baiwei28@huawei.com>
+Date:   Thu Jan 20 18:54:38 2022 +0800
+
+    逻辑改为32位递增数
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 7b6d5e46af6f3ad846f3579591bc1808d0e9ba58[m
+Author: hungry_feiwei <huxiao31@huawei.com>
+Date:   Thu Jan 20 18:52:17 2022 +0800
+
+    Signed-off-by:hungry_feiwei<huxiao31@huawei.com>
+    
+    Signed-off-by: hungry_feiwei <huxiao31@huawei.com>
+
+[33mcommit 37ae4accfd383a4e9424d7ce52eb1efd2956a828[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Thu Jan 20 18:42:37 2022 +0800
+
+    处理'逻辑改为32位递增数'问题
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 57cd44d0e4ae160dd099d68d44c740ad695dacf9[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Thu Jan 20 10:38:50 2022 +0000
+
+    update service/event_handle/src/input_event_handler.cpp.
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 9892069872aa81890887e49961c84e25c784b95e[m
+Author: bobz202 <zhangbo374@huawei.com>
+Date:   Thu Jan 20 18:03:58 2022 +0800
+
+    删除日志，在return RET_ERR;前添加日志打印pid
+    
+    Signed-off-by: bobz202 <zhangbo374@huawei.com>
+
+[33mcommit ae11fabc001524b1d5d3af64cad66b651b204778[m
+Author: bobz202 <zhangbo374@huawei.com>
+Date:   Thu Jan 20 17:57:25 2022 +0800
+
+    删除日志，在return RET_ERR;前添加日志打印pid
+    
+    Signed-off-by: bobz202 <zhangbo374@huawei.com>
+
+[33mcommit 0842a2eeb8fda84ef101e3835df812913dbdfbb1[m
+Author: hungry_feiwei <huxiao31@huawei.com>
+Date:   Thu Jan 20 17:41:18 2022 +0800
+
+    Signed-off-by:hungry_feiwei<huxiao31@huawei.com>
+    
+    Signed-off-by: hungry_feiwei <huxiao31@huawei.com>
+
+[33mcommit bab2b2b2ad86e8f0d3befe4783e142681c96ca28[m
+Author: hungry_feiwei <huxiao31@huawei.com>
+Date:   Thu Jan 20 17:37:26 2022 +0800
+
+    Signed-off-by:hungry_feiwei<huxiao31@huawei.com>
+    
+    Signed-off-by: hungry_feiwei <huxiao31@huawei.com>
+
+[33mcommit dbe85722ba64cac08694c22a6048724d45c9c775[m
+Author: xiahaiqin <xiahaiqin1@huawei.com>
+Date:   Wed Jan 19 16:54:14 2022 +0800
+
+    split dm from libwm
+    
+    Signed-off-by: xiahaiqin <xiahaiqin1@huawei.com>
+    Change-Id: I0dc63357824c71f0be32285b1568312fda58bbf1
+
+[33mcommit a48db760645e18339b3903cd7d95f8bef1f21ee3[m
+Author: the-world-of-mortals-and-inn <wangcaiyi@huawei.com>
+Date:   Thu Jan 20 17:28:13 2022 +0800
+
+    Signed-off-by: the-world-of-mortals-and-inn <wangcaiyi@huawei.com>
+    trace打印添加字符串说明
+
+[33mcommit f5fe7c62dd93e91da82baa130ae4f59ea2e2a891[m
+Merge: 1543cf4 e28ff83
+Author: openharmony_ci <120357966@qq.com>
+Date:   Thu Jan 20 09:21:02 2022 +0000
+
+    !236 多模服务进程重启后可正常操作
+    Merge pull request !236 from biu媛/personal/zhaoxueyuan/server_killed_nomal
+
+[33mcommit d7d50065dbdf7f3aa2e24e085d74ac01de9a6c19[m
+Author: bobz202 <zhangbo374@huawei.com>
+Date:   Thu Jan 20 17:16:51 2022 +0800
+
+    删除日志，在return RET_ERR;前添加日志打印pid
+    
+    Signed-off-by: bobz202 <zhangbo374@huawei.com>
+
+[33mcommit cad9d45e744b4ede65347dc36bd1f30c667a2a52[m
+Author: hungry_feiwei <huxiao31@huawei.com>
+Date:   Thu Jan 20 17:10:14 2022 +0800
+
+    Signed-off-by:hungry_feiwei<huxiao31@huawei.com>
+    
+    Signed-off-by: hungry_feiwei <huxiao31@huawei.com>
+
+[33mcommit d347ba8cb6894b33b53e9049d5d7eeb00f5a9b68[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Thu Jan 20 09:07:39 2022 +0000
+
+    update service/event_package/src/event_package.cpp.
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 4a4667db92cda945c8e4414d2e1fd8bda3bff836[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Thu Jan 20 09:04:34 2022 +0000
+
+    update service/event_package/include/event_package.h.
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 32d1c9f4f23c480b411bd8e68b26ee9197ca07db[m
+Author: the-world-of-mortals-and-inn <wangcaiyi@huawei.com>
+Date:   Thu Jan 20 16:56:33 2022 +0800
+
+    Signed-off-by: the-world-of-mortals-and-inn <wangcaiyi@huawei.com>
+    trace打印添加字符串说明
+
+[33mcommit 9a93cf8ba302d5de1bddea0ea23dbe5f74816b0f[m
+Author: xueyuanzhao <zhaoxueyuan@huawei.com>
+Date:   Thu Jan 20 16:45:47 2022 +0800
+
+    Signed-off-by:xueyuanzhao<zhaoxueyuan@huawei.com>
+    
+    Signed-off-by: xueyuanzhao <zhaoxueyuan@huawei.com>
+
+[33mcommit 1543cf4f76db915667d6ec3c923b0c0a6e2e55f5[m
+Merge: cf2ae2c 3dc0a0c
+Author: openharmony_ci <120357966@qq.com>
+Date:   Thu Jan 20 08:26:07 2022 +0000
+
+    !238 替梁志成上库修改匿名空间代码
+    Merge pull request !238 from 17349030869/0120lzc
+
+[33mcommit ea5bc68d256788fbddd985066bdb54d8e4cdc317[m
+Author: the-world-of-mortals-and-inn <wangcaiyi@huawei.com>
+Date:   Thu Jan 20 16:18:05 2022 +0800
+
+    Signed-off-by: the-world-of-mortals-and-inn <wangcaiyi@huawei.com>
+    trace打印功能添加字符串说明
+
+[33mcommit f6f9a1045c5a54b9b65123940702a42afeaeff17[m
+Author: xueyuanzhao <zhaoxueyuan@huawei.com>
+Date:   Thu Jan 20 16:08:19 2022 +0800
+
+    Signed-off-by:xueyuanzhao<zhaoxueyuan@huawei.com>
+    
+    Signed-off-by: xueyuanzhao <zhaoxueyuan@huawei.com>
+
+[33mcommit c60f1b4ad791fe93e6e89d698a8823329163c979[m
+Author: xueyuanzhao <zhaoxueyuan@huawei.com>
+Date:   Thu Jan 20 16:03:28 2022 +0800
+
+    Signed-off-by:xueyuanzhao<zhaoxueyuan@huawei.com>
+    
+    Signed-off-by: xueyuanzhao <zhaoxueyuan@huawei.com>
+
+[33mcommit e28ff83cd03e9a71352a96f3c453f9ef259656b8[m
+Author: xueyuanzhao <zhaoxueyuan@huawei.com>
+Date:   Thu Jan 20 15:55:26 2022 +0800
+
+    Signed-off-by:xueyuanzhao<zhaoxueyuan@huawei.com>
+    
+    Signed-off-by: xueyuanzhao <zhaoxueyuan@huawei.com>
+
+[33mcommit 5dab8aecbdf143befd762da74cba709cba11c49a[m
+Author: xueyuanzhao <zhaoxueyuan@huawei.com>
+Date:   Thu Jan 20 15:50:22 2022 +0800
+
+    Signed-off-by:xueyuanzhao<zhaoxueyuan@huawei.com>
+    
+    Signed-off-by: xueyuanzhao <zhaoxueyuan@huawei.com>
+
+[33mcommit b68c146efa1824d6b2fcbc1ab87821bc72ad52af[m
+Author: xueyuanzhao <zhaoxueyuan@huawei.com>
+Date:   Thu Jan 20 15:49:34 2022 +0800
+
+    Signed-off-by:xueyuanzhao<zhaoxueyuan@huawei.com>
+    
+    Signed-off-by: xueyuanzhao <zhaoxueyuan@huawei.com>
+
+[33mcommit 3dc0a0c0e5c1a801a6cb250aefe7ebb4e4698384[m
+Author: wuzhihuitmac <wuzhihui4@huawei.com>
+Date:   Thu Jan 20 15:24:52 2022 +0800
+
+    替梁志成上库修改匿名空间代码
+    
+    Signed-off-by: wuzhihuitmac <wuzhihui4@huawei.com>
+
+[33mcommit d6684b63470fd202b998281e68c5dcff58aaf827[m
+Author: xueyuanzhao <zhaoxueyuan@huawei.com>
+Date:   Thu Jan 20 15:21:45 2022 +0800
+
+    Signed-off-by:xueyuanzhao<zhaoxueyuan@huawei.com>
+    
+    Signed-off-by: xueyuanzhao <zhaoxueyuan@huawei.com>
+
+[33mcommit 912c33531f54e778d25c833b202dc71297e2ff5c[m
+Author: wuzhihuitmac <wuzhihui4@huawei.com>
+Date:   Thu Jan 20 14:34:41 2022 +0800
+
+    替梁志成上库修改匿名空间代码
+    
+    Signed-off-by: wuzhihuitmac <wuzhihui4@huawei.com>
+
+[33mcommit cf2ae2cc187fe20e10e1ba274d1af0020e08dd59[m
+Merge: c97083f bc1138d
+Author: openharmony_ci <120357966@qq.com>
+Date:   Thu Jan 20 05:14:38 2022 +0000
+
+    !227 替邢江盼上库注入的数据项冲突检测，检测PointEvent和KeyEvent的数据合法
+    Merge pull request !227 from 17349030869/0119xjp
+
+[33mcommit bc1138d6561d2f55b11aa0d210fb2e3316370c91[m
+Author: wuzhihuitmac <wuzhihui4@huawei.com>
+Date:   Thu Jan 20 12:34:43 2022 +0800
+
+    替邢江盼上库注入的数据项冲突检测，检测PointEvent和KeyEvent的数据合法
+    
+    Signed-off-by: wuzhihuitmac <wuzhihui4@huawei.com>
+
+[33mcommit 9bf3edc06facaa68c88a92eba002e742690e2954[m
+Author: wuzhihuitmac <wuzhihui4@huawei.com>
+Date:   Thu Jan 20 12:01:15 2022 +0800
+
+    替邢江盼上库注入的数据项冲突检测，检测PointEvent和KeyEvent的数据合法
+    
+    Signed-off-by: wuzhihuitmac <wuzhihui4@huawei.com>
+
+[33mcommit 3754ba5b4644d09d28bd68c7a8a753beabae0b25[m
+Author: wuzhihuitmac <wuzhihui4@huawei.com>
+Date:   Thu Jan 20 11:47:59 2022 +0800
+
+    替邢江盼上库注入的数据项冲突检测，检测PointEvent和KeyEvent的数据合法
+    Signed-off-by: wuzhihuitmac <wuzhihui4@huawei.com>
+
+[33mcommit 839c05a6dc3a8a05be3aff7170208d402bfd939a[m
+Author: xueyuanzhao <zhaoxueyuan@huawei.com>
+Date:   Thu Jan 20 11:17:50 2022 +0800
+
+    Signed-off-by:xueyuanzhao<zhaoxueyuan@huawei.com>
+    
+    Signed-off-by: xueyuanzhao <zhaoxueyuan@huawei.com>
+
+[33mcommit 8cb3c96a3e87058d46a137c4b846bb2d2094f6ed[m
+Merge: 11db359 c97083f
+Author: baiwei <baiwei28@huawei.com>
+Date:   Thu Jan 20 02:34:45 2022 +0000
+
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit ae29478712a9fc746729ec4e9125ca66e22879ed[m
+Author: xueyuanzhao <zhaoxueyuan@huawei.com>
+Date:   Thu Jan 20 10:23:46 2022 +0800
+
+    Signed-off-by:xueyuanzhao<zhaoxueyuan@huawei.com>
+    
+    Signed-off-by: xueyuanzhao <zhaoxueyuan@huawei.com>
+
+[33mcommit 11db359476357e4f9ad43f4bad532ef91a3175df[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Thu Jan 20 10:16:21 2022 +0800
+
+    处理'无用需删除，udsServer参数'问题
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit c97083f6dd5aef10d7fc75e6261e0e3ab31dfe50[m
+Merge: 6b7cb9f f41e484
+Author: openharmony_ci <120357966@qq.com>
+Date:   Wed Jan 19 16:12:26 2022 +0000
+
+    !233 Add ANR Test
+    Merge pull request !233 from 胡枭/master
+
+[33mcommit 6b7cb9f6eaf7e9c6205f35666fdea913ff535cec[m
+Merge: 9bbc802 12ed812
+Author: openharmony_ci <120357966@qq.com>
+Date:   Wed Jan 19 12:06:12 2022 +0000
+
+    !218 对应元能力部件化修改
+    Merge pull request !218 from njupthan/update_master_0119
+
+[33mcommit 12ed81247520a8bbadb3878a7845af2a0f67a417[m
+Author: hanhaibin <hanhaibin@huawei.com>
+Date:   Wed Jan 19 21:40:37 2022 +0800
+
+    Fix codex
+    
+    Signed-off-by: hanhaibin <hanhaibin@huawei.com>
+
+[33mcommit 9bbc802e3a5aeb4d55091cf27cb00460e62da09b[m
+Merge: 411e1a6 12ed812
+Author: openharmony_ci <120357966@qq.com>
+Date:   Wed Jan 19 12:06:12 2022 +0000
+
+    !218 对应元能力部件化修改
+    Merge pull request !218 from njupthan/update_master_0119
+
+[33mcommit f41e484183ba6c454381bdf7c3e062196a040deb[m
+Author: hungry_feiwei <huxiao31@huawei.com>
+Date:   Wed Jan 19 18:29:16 2022 +0800
+
+    Signed-off-by:hungry_feiwei<huxiao31@huawei.com>
+    
+    Signed-off-by: hungry_feiwei <huxiao31@huawei.com>
+
+[33mcommit 9e5974c7a5e74135e2e122a724cb6efe24b6e3fd[m
+Author: wuzhihuitmac <wuzhihui4@huawei.com>
+Date:   Wed Jan 19 16:40:43 2022 +0800
+
+    替邢江盼上库“注入的数据项冲突检测，检测PointEvent和KeyEvent的数据合法”
+    Signed-off-by: wuzhihuitmac <wuzhihui4@huawei.com>
+
+[33mcommit f20c5759ba60e5425d309a519bacf51932bf1ffc[m
+Merge: 60086c4 3478b5b
+Author: baiwei <baiwei28@huawei.com>
+Date:   Wed Jan 19 15:47:47 2022 +0800
+
+    Merge branch 'baiwei_fix_0118' of gitee.com:baiyingwei_2009/multimodalinput_input
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 60086c4e450e4fb71fad3b1ba701a52beebb536a[m
+Merge: 7f49777 556a2b6
+Author: baiwei <baiwei28@huawei.com>
+Date:   Wed Jan 19 00:32:05 2022 +0800
+
+    删除关于window_switch的所有代码和文件
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 411e1a6ad5bc24bff01ed75b7b8ce1291e27b7a2[m
+Merge: 70d17f4 e4790b6
+Author: openharmony_ci <120357966@qq.com>
+Date:   Wed Jan 19 07:37:40 2022 +0000
+
+    !222 替梁志成上库检视意见代码修改
+    Merge pull request !222 from 17349030869/0119lzc
+
+[33mcommit 70d17f42f4d15f5a3782268514189b298c70e197[m
+Merge: 322178e a595cce
+Author: openharmony_ci <120357966@qq.com>
+Date:   Wed Jan 19 07:36:22 2022 +0000
+
+    !223 Add session judgment.
+    Merge pull request !223 from 胡枭/master
+
+[33mcommit 322178e98480b8fc4dc42a3f33612395731af63c[m
+Merge: a8da5e4 68bc55a
+Author: openharmony_ci <120357966@qq.com>
+Date:   Wed Jan 19 07:19:47 2022 +0000
+
+    !221 删除csingleton， 使用基础库的singleton.h
+    Merge pull request !221 from zhangpengcheng/remove_csingleton
+
+[33mcommit a595cce359fd3f4a8e9a5c42a2cba9abc0fc83c0[m
+Author: hungry_feiwei <huxiao31@huawei.com>
+Date:   Wed Jan 19 14:20:31 2022 +0800
+
+    Signed-off-by:hungry_feiwei<huxiao31@huawei.com>
+    
+    Signed-off-by: hungry_feiwei <huxiao31@huawei.com>
+
+[33mcommit a8da5e4bec19b7dbf8181b300f533ee2cadee41a[m
+Merge: 411a0a4 4421953
+Author: openharmony_ci <120357966@qq.com>
+Date:   Wed Jan 19 05:20:26 2022 +0000
+
+    !220 trace功能提交
+    Merge pull request !220 from 红尘and客栈/test20
+
+[33mcommit 68bc55a2d019326aaa02737412929361fcf6df8e[m
+Author: zhangpengcheng <zhangpengcheng31@huawei.com>
+Date:   Wed Jan 19 12:13:18 2022 +0800
+
+    删除csingleton， 使用基础库的singleton.h
+    
+    Signed-off-by: zhangpengcheng <zhangpengcheng31@huawei.com>
+
+[33mcommit e4790b6e620ef8dd33abab4b330985d355fb2dfa[m
+Author: wuzhihuitmac <wuzhihui4@huawei.com>
+Date:   Wed Jan 19 12:05:07 2022 +0800
+
+    替梁志成上库检视意见修改代码
+    Signed-off-by: wuzhihuitmac <wuzhihui4@huawei.com>
+
+[33mcommit 41d24d1b8f230dd1dfa840ba5d0d6788eef902c7[m
+Author: zhangpengcheng <zhangpengcheng31@huawei.com>
+Date:   Wed Jan 19 11:38:25 2022 +0800
+
+    删除csingleton， 使用基础库的singleton.h
+    
+    Signed-off-by: zhangpengcheng <zhangpengcheng31@huawei.com>
+
+[33mcommit 44219533d1a6f48a5bb6b5bd65ebca429ea07e36[m
+Author: the-world-of-mortals-and-inn <wangcaiyi@huawei.com>
+Date:   Wed Jan 19 11:37:28 2022 +0800
+
+    Signed-off-by: the-world-of-mortals-and-inn <wangcaiyi@huawei.com>
+    trace功能提交
+
+[33mcommit 411a0a410d8a6fa2dfdc5f7aa9ea96c88e1f2c07[m
+Merge: 6391f51 3478b5b
+Author: openharmony_ci <120357966@qq.com>
+Date:   Wed Jan 19 02:26:29 2022 +0000
+
+    !201 处理代码检视
+    Merge pull request !201 from baiwei/baiwei_fix_0118
+
+[33mcommit 3478b5bf764ef73ddf04e6885142d227858bac28[m
+Merge: 7f49777 556a2b6
+Author: baiwei <baiwei28@huawei.com>
+Date:   Wed Jan 19 00:32:05 2022 +0800
+
+    删除关于window_switch的所有代码和文件
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 7f49777c6b4709f640ccf796c2deaa8068b9e67b[m
+Merge: fcee25a df21df3
+Author: baiwei <baiwei28@huawei.com>
+Date:   Tue Jan 18 21:18:00 2022 +0800
+
+    删除window_switch.cpp window_switch.h window_switch_test.cpp文件
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 6391f51f4a2ad92f3562eab98a83adce5ae90991[m
+Merge: fd85137 5938bd4
+Author: openharmony_ci <120357966@qq.com>
+Date:   Tue Jan 18 15:42:49 2022 +0000
+
+    !216 input 注入工具
+    Merge pull request !216 from wangningning/0118
+
+[33mcommit 5938bd434ac9d4a88ddbb89b3a5e8fbcf8276e01[m
+Author: wangningning1024 <wangningning8@huawei.com>
+Date:   Tue Jan 18 22:57:06 2022 +0800
+
+    input注入工具
+    
+    Signed-off-by: wangningning1024 <wangningning8@huawei.com>
+
+[33mcommit fd851374708eb6fc0ac9e65a17ad6bb5c89752b3[m
+Merge: 6a25019 ea53689
+Author: openharmony_ci <120357966@qq.com>
+Date:   Tue Jan 18 14:43:54 2022 +0000
+
+    !212 替欧亮亮上库innerkit代码
+    Merge pull request !212 from 17349030869/0118oll
+
+[33mcommit ea53689efb406f35a4035750454490101a35f54b[m
+Author: wuzhihuitmac <wuzhihui4@huawei.com>
+Date:   Tue Jan 18 22:22:42 2022 +0800
+
+    给欧亮亮上库innerkit代码
+    
+    Signed-off-by: wuzhihuitmac <wuzhihui4@huawei.com>
+
+[33mcommit 556a2b6870baa6f50ed039caec2e757ef2b8e844[m
+Merge: fcee25a df21df3
+Author: baiwei <baiwei28@huawei.com>
+Date:   Tue Jan 18 21:18:00 2022 +0800
+
+    Merge branch 'baiwei_fix_0118' of gitee.com:baiyingwei_2009/multimodalinput_input
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit fcee25a34e74dbf9565ed0fae78bdea167e10686[m
+Merge: 4c061e3 e47cbd2
+Author: baiwei <baiwei28@huawei.com>
+Date:   Tue Jan 18 09:46:37 2022 +0000
+
+    删除window_switch相关代码
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 97237a53b16f39c6c93ca8273b156c074dcebe98[m
+Author: wuzhihuitmac <wuzhihui4@huawei.com>
+Date:   Tue Jan 18 20:46:38 2022 +0800
+
+    给欧亮亮上库innerkit代码
+    
+    Signed-off-by: wuzhihuitmac <wuzhihui4@huawei.com>
+
+[33mcommit 1667765c6e017eb2cceeb28fe35ffe3a21c89ebf[m
+Author: wuzhihuitmac <wuzhihui4@huawei.com>
+Date:   Tue Jan 18 19:22:01 2022 +0800
+
+    替欧亮亮上库innerkit代码
+    
+    Signed-off-by: wuzhihuitmac <wuzhihui4@huawei.com>
+
+[33mcommit 6a250195cd8fab6efd108422514394ea070d6e47[m
+Merge: e47cbd2 336be93
+Author: openharmony_ci <120357966@qq.com>
+Date:   Tue Jan 18 10:27:34 2022 +0000
+
+    !178 提交指针宏定义
+    Merge pull request !178 from zhaoqil/test2
+
+[33mcommit df21df3223caf32c3a9c2c4b46731f5f6a7b0d2c[m
+Merge: 4c061e3 e47cbd2
+Author: baiwei <baiwei28@huawei.com>
+Date:   Tue Jan 18 09:46:37 2022 +0000
+
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit ca142b99a9c7a270fcee9007cbd7bfbdfcf2d9d4[m
+Author: wuzhihuitmac <wuzhihui4@huawei.com>
+Date:   Tue Jan 18 17:30:12 2022 +0800
+
+    替欧亮亮上库innerkit代码
+    
+    Signed-off-by: wuzhihuitmac <wuzhihui4@huawei.com>
+
+[33mcommit 4c061e34e591f590b0540283533dfadd2aa290ec[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Tue Jan 18 09:16:11 2022 +0000
+
+    处理冲突
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit e47cbd2b0c63623c14b3a8a9ea1cf2a8f9e7ed48[m
+Merge: 5bfcd88 b782e62
+Author: openharmony_ci <120357966@qq.com>
+Date:   Tue Jan 18 09:09:35 2022 +0000
+
+    !198 检视意见修改
+    Merge pull request !198 from jinzhen/Review_opinion_modification_0117
+
+[33mcommit 5bfcd88c77d7e07dfd85af78f40e6738a1d11b04[m
+Merge: b46f6da 08417b7
+Author: openharmony_ci <120357966@qq.com>
+Date:   Tue Jan 18 09:08:19 2022 +0000
+
+    !191 检视意见修改
+    Merge pull request !191 from lisong/codeReview_0115
+
+[33mcommit b46f6da18067bcfaf47d5f682b6753b261d42aea[m
+Merge: 02b5456 1e802a1
+Author: openharmony_ci <120357966@qq.com>
+Date:   Tue Jan 18 08:48:43 2022 +0000
+
+    !210 替梁志成上库检视意见修改代码
+    Merge pull request !210 from 17349030869/0118lzc
+
+[33mcommit 8a42c4dcce782428e7788ba15eb142b9b7914e93[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Tue Jan 18 08:10:38 2022 +0000
+
+    处理冲突
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 1e802a17dee0cdff3bbfe09a7375e112a35fdff5[m
+Author: wuzhihuitmac <wuzhihui4@huawei.com>
+Date:   Tue Jan 18 16:07:23 2022 +0800
+
+    替梁志成上库检视意见修改代码
+    Signed-off-by: wuzhihuitmac <wuzhihui4@huawei.com>
+
+[33mcommit 02b5456328722ab37978ad749359189f422b6015[m
+Merge: 5f9f8be 2c60a92
+Author: openharmony_ci <120357966@qq.com>
+Date:   Tue Jan 18 07:34:02 2022 +0000
+
+    !204 ANR暂时增加清理事件逻辑
+    Merge pull request !204 from 胡枭/master
+
+[33mcommit 5f9f8be25aff84b8b1809213f41261678f8ff2db[m
+Merge: 79a8da3 07815d6
+Author: openharmony_ci <120357966@qq.com>
+Date:   Tue Jan 18 07:07:34 2022 +0000
+
+    !208 替李邦武上库监听器代码整改
+    Merge pull request !208 from 17349030869/0118lbw
+
+[33mcommit a69247c0637db473a0cdca486360918208e24029[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Tue Jan 18 06:35:16 2022 +0000
+
+    处理冲突
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 07815d65b9c018fe8512c5fbbd2c235c71888797[m
+Author: wuzhihuitmac <wuzhihui4@huawei.com>
+Date:   Tue Jan 18 14:24:16 2022 +0800
+
+    替李邦武上库监听器代码整改
+    Signed-off-by: wuzhihuitmac <wuzhihui4@huawei.com>
+
+[33mcommit 91d42caf921582609529cdcda3cf81ac2e96972f[m
+Author: wuzhihuitmac <wuzhihui4@huawei.com>
+Date:   Tue Jan 18 13:59:56 2022 +0800
+
+    替李邦武上库监听器代码整改
+    Signed-off-by: wuzhihuitmac <wuzhihui4@huawei.com>
+
+[33mcommit 79a8da3465897927ad0e555cf85eb79df25387d3[m
+Merge: fb107be efb809f
+Author: openharmony_ci <120357966@qq.com>
+Date:   Tue Jan 18 03:45:26 2022 +0000
+
+    !202 处理代码检视意见
+    Merge pull request !202 from baiwei/baiwei_fix_0117
+
+[33mcommit 2c60a9268cccbdb65c2343aba2c6c6cc2297646d[m
+Author: hungry_feiwei <huxiao31@huawei.com>
+Date:   Tue Jan 18 11:42:28 2022 +0800
+
+    Signed-off-by:hungry_feiwei<huxiao31@huawei.com>
+    Signed-off-by:hungry_feiwei<huxiao31@huawei.com>
+
+[33mcommit 52361c13758ca4b728de635d995865f1851d4fa2[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Tue Jan 18 03:33:31 2022 +0000
+
+    处理冲突
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit dfff60a908610fdc964e5743272d77b955eccc2b[m
+Author: wuzhihuitmac <wuzhihui4@huawei.com>
+Date:   Tue Jan 18 11:22:16 2022 +0800
+
+    替李邦武上库监听器整改代码
+    
+    Signed-off-by: wuzhihuitmac <wuzhihui4@huawei.com>
+
+[33mcommit 7d0f6b84e703e43658d5358bc4b01867fd8a3570[m
+Author: hungry_feiwei <huxiao31@huawei.com>
+Date:   Tue Jan 18 11:21:32 2022 +0800
+
+    Signed-off-by:hungry_feiwei<huxiao31@huawei.com>
+    Signed-off-by:hungry_feiwei<huxiao31@huawei.com>
+
+[33mcommit 990cea41164b3cc4ebb9c119e4f8364b4a915175[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Tue Jan 18 03:06:24 2022 +0000
+
+    处理冲突
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 32770b086283acfa0dea478b71a66123b2c63c32[m
+Author: hungry_feiwei <huxiao31@huawei.com>
+Date:   Tue Jan 18 11:00:45 2022 +0800
+
+    Signed-off-by:hungry_feiwei<huxiao31@huawei.com>
+    Signed-off-by:hungry_feiwei<huxiao31@huawei.com>
+
+[33mcommit 72f86bf1bade8167c9b101d2f40d4d19a521fa68[m
+Author: hungry_feiwei <huxiao31@huawei.com>
+Date:   Tue Jan 18 10:56:40 2022 +0800
+
+    Signed-off-by:hungry_feiwei<huxiao31@huawei.com>
+    Signed-off-by:hungry_feiwei<huxiao31@huawei.com>
+
+[33mcommit e65c72e93bb2564964ed0d1408968ddd98ca130f[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Tue Jan 18 02:39:20 2022 +0000
+
+    update service/event_standard/include/standard_event_handler.h.
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit ef516c6bf981756d05557a37387ddfd7d15ee26b[m
+Author: hungry_feiwei <huxiao31@huawei.com>
+Date:   Tue Jan 18 10:38:41 2022 +0800
+
+    Signed-off-by:hungry_feiwei<huxiao31@huawei.com>
+    Signed-off-by:hungry_feiwei<huxiao31@huawei.com>
+
+[33mcommit fb88a5d3b27fc420eeb130e8b9f291693b7868c4[m
+Author: hungry_feiwei <huxiao31@huawei.com>
+Date:   Tue Jan 18 10:33:57 2022 +0800
+
+    Signed-off-by:hungry_feiwei<huxiao31@huawei.com>
+    Signed-off-by:hungry_feiwei<huxiao31@huawei.com>
+
+[33mcommit 63bc9ce6641a2637cd4abea30b5e85733da31e12[m
+Author: hungry_feiwei <huxiao31@huawei.com>
+Date:   Tue Jan 18 10:25:36 2022 +0800
+
+    Signed-off-by:hungry_feiwei<huxiao31@huawei.com>
+    Signed-off-by:hungry_feiwei<huxiao31@huawei.com>
+
+[33mcommit 4130970b3cf07bd8819a5e8bdcfec12018ef21d6[m
+Merge: 96f559a fb107be
+Author: baiwei <baiwei28@huawei.com>
+Date:   Tue Jan 18 09:53:14 2022 +0800
+
+    处理冲突
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 08417b7b59a6540ab3ebac0fb9f61ab879b186e8[m
+Author: lisong <lisong92@huawei.com>
+Date:   Tue Jan 18 09:50:49 2022 +0800
+
+    修改告警
+    
+    Signed-off-by: lisong <lisong92@huawei.com>
+
+[33mcommit 96f559a2a534b27e6f50fe75d76c28de8b4a7883[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Tue Jan 18 09:25:05 2022 +0800
+
+    去掉window_switch类的依赖
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 98cdd3247583e248a3a8ab29355fc29317075652[m
+Author: lisong <lisong92@huawei.com>
+Date:   Tue Jan 18 09:17:23 2022 +0800
+
+    增加编译宏
+    
+    Signed-off-by: lisong <lisong92@huawei.com>
+
+[33mcommit fb107be1fff4b9feccd247878afae49fa91078b0[m[33m ([m[1;31morigin/weekly_20220118[m[33m)[m
+Merge: cee99e8 3ea6a8b
+Author: openharmony_ci <120357966@qq.com>
+Date:   Mon Jan 17 16:38:20 2022 +0000
+
+    !200 multimodalinput anr
+    Merge pull request !200 from 胡枭/master
+
+[33mcommit cee99e82acc50a0be0fe2800f27eb78b202cf423[m
+Merge: cf80366 3ea6a8b
+Author: openharmony_ci <120357966@qq.com>
+Date:   Mon Jan 17 16:38:20 2022 +0000
+
+    !200 multimodalinput anr
+    Merge pull request !200 from 胡枭/master
+
+[33mcommit 3ea6a8b3f9996dc1399e7abc850a7d09ac25016f[m
+Author: hungry_feiwei <huxiao31@huawei.com>
+Date:   Mon Jan 17 23:30:03 2022 +0800
+
+    Signed-off-by:hungry_feiwei<huxiao31@huawei.com>
+    Signed-off-by:hungry_feiwei<huxiao31@huawei.com>
+
+[33mcommit cf803661f60cd864d6fbe77e803c8f3c5c5c213c[m
+Merge: b687e18 fdea681
+Author: openharmony_ci <120357966@qq.com>
+Date:   Mon Jan 17 14:47:40 2022 +0000
+
+    !185 事件过滤BINDER
+    Merge pull request !185 from zhangpengcheng/AddInputEventFilter_binder_0117_2
+
+[33mcommit b782e62b8dd9da1456bf1acb46521777ad29b2cb[m
+Author: jinzhen6 <jinzhen6@huawei.com>
+Date:   Mon Jan 17 21:34:24 2022 +0800
+
+    检视意见修改
+    
+    Signed-off-by: jinzhen6 <jinzhen6@huawei.com>
+
+[33mcommit 336be93a160107a887dd35abfbf09f84abe06077[m
+Merge: bbc1403 b687e18
+Author: zhaoqil <zhaoqi70@huawei.com>
+Date:   Mon Jan 17 13:32:30 2022 +0000
+
+    Merge branch 'master' of gitee.com:openharmony/multimodalinput_input into test2 Signed-off-by: zhaoqi70 <zhaoqi70@huawei.com>
+
+[33mcommit b687e18900ef2d93e07db67ccb0a08f05281e047[m
+Merge: 5017498 f908b32
+Author: openharmony_ci <120357966@qq.com>
+Date:   Mon Jan 17 13:23:25 2022 +0000
+
+    !195 替梁志成上库检视意见代码修改
+    Merge pull request !195 from 17349030869/0117lzc-2
+
+[33mcommit efb809fd6718bbf5876c0ae27044f7f6261ce8e3[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Mon Jan 17 12:57:23 2022 +0000
+
+    修改checkcode报错
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit d6961529cf61bfbc2813c7903e2f999a4a152207[m
+Merge: ffdd186 6fdb8be
+Author: baiwei <baiwei28@huawei.com>
+Date:   Mon Jan 17 20:06:37 2022 +0800
+
+    Merge branch 'baiwei_fix_0117' of gitee.com:baiyingwei_2009/multimodalinput_input
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit ffdd1860151bcaf3e2b62c2fdbb85449268bae15[m
+Merge: 576e303 60bc341
+Author: baiwei <baiwei28@huawei.com>
+Date:   Mon Jan 17 19:08:20 2022 +0800
+
+    Merge branch 'baiwei_fix_0117' of gitee.com:baiyingwei_2009/multimodalinput_input
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit fdea68134399542ddc2cc29a6bf4677819b4c08c[m
+Author: zhangpengcheng <zhangpengcheng31@huawei.com>
+Date:   Mon Jan 17 19:59:13 2022 +0800
+
+    事件过滤BINDER
+    
+    Signed-off-by: zhangpengcheng <zhangpengcheng31@huawei.com>
+
+[33mcommit f908b32c9a23262b55d85eccf7e7e8bf7131d43c[m
+Author: wuzhihuitmac <wuzhihui4@huawei.com>
+Date:   Mon Jan 17 19:31:50 2022 +0800
+
+    替梁志成上库检视意见代码修改
+    
+    Signed-off-by: wuzhihuitmac <wuzhihui4@huawei.com>
+
+[33mcommit 6fdb8be4c00892fc2e9389934e938aa1df66ea09[m
+Merge: 576e303 60bc341
+Author: baiwei <baiwei28@huawei.com>
+Date:   Mon Jan 17 19:08:20 2022 +0800
+
+    Merge branch 'baiwei_fix_0117' of gitee.com:baiyingwei_2009/multimodalinput_input
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 576e303f1731160702b7e14874fd7528802cb738[m
+Merge: c80e4ec 8cfa249
+Author: baiwei <baiwei28@huawei.com>
+Date:   Mon Jan 17 15:54:49 2022 +0800
+
+    处理冲突
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 501749885541ebceb2822a6b9ad490892962e52a[m
+Merge: 0596dff 68b7411
+Author: openharmony_ci <120357966@qq.com>
+Date:   Mon Jan 17 10:30:49 2022 +0000
+
+    !192 替李峰辉上库鼠标监听器和ut用例代码
+    Merge pull request !192 from 17349030869/0117lfh
+
+[33mcommit 3fc6aebacf084b41c0a1b5afe0f01ed745346e4a[m
+Author: zhangpengcheng <zhangpengcheng31@huawei.com>
+Date:   Mon Jan 17 18:25:51 2022 +0800
+
+    事件过滤BINDER
+    
+    Signed-off-by: zhangpengcheng <zhangpengcheng31@huawei.com>
+
+[33mcommit 5f2c4173b593496872b80d202e666a94b89428b0[m
+Author: zhangpengcheng <zhangpengcheng31@huawei.com>
+Date:   Mon Jan 17 17:48:03 2022 +0800
+
+    事件过滤BINDER
+    
+    Signed-off-by: zhangpengcheng <zhangpengcheng31@huawei.com>
+
+[33mcommit 218cce674cf62fced2ed1604d5171eee41955bfc[m
+Author: zhangpengcheng <zhangpengcheng31@huawei.com>
+Date:   Mon Jan 17 17:41:29 2022 +0800
+
+    事件过滤BINDER
+    
+    Signed-off-by: zhangpengcheng <zhangpengcheng31@huawei.com>
+
+[33mcommit bd9305128615b54c6af4d5ba52fc86df4b9eeb39[m
+Merge: 9bc6715 0596dff
+Author: zhangpengcheng <zhangpengcheng31@huawei.com>
+Date:   Mon Jan 17 17:19:44 2022 +0800
+
+    Merge branch 'master' of gitee.com:openharmony/multimodalinput_input into AddInputEventFilter_binder_0117_2
+    
+    Signed-off-by: zhangpengcheng <zhangpengcheng31@huawei.com>
+
+[33mcommit 9bc67153426d696c5b6033390b23d991f70db094[m
+Author: zhangpengcheng <zhangpengcheng31@huawei.com>
+Date:   Mon Jan 17 17:19:10 2022 +0800
+
+    事件过滤BINDER
+    
+    Signed-off-by: zhangpengcheng <zhangpengcheng31@huawei.com>
+
+[33mcommit 68b7411faa6dac334b7867aadd3803f3fea17683[m
+Author: wuzhihuitmac <wuzhihui4@huawei.com>
+Date:   Mon Jan 17 17:12:12 2022 +0800
+
+    替李峰辉上库鼠标监听器和ut用例代码
+    
+    Signed-off-by: wuzhihuitmac <wuzhihui4@huawei.com>
+
+[33mcommit 1a819c5253985bdcbdf49ab5e1f8ee18859b46da[m
+Author: lisong <lisong92@huawei.com>
+Date:   Mon Jan 17 16:49:45 2022 +0800
+
+    检视意见修改
+    
+    Signed-off-by: lisong <lisong92@huawei.com>
+
+[33mcommit 5cd3af8f0594351dc4998f2cd56a1b0c9a5a440e[m
+Author: wuzhihuitmac <wuzhihui4@huawei.com>
+Date:   Mon Jan 17 16:49:38 2022 +0800
+
+    替李峰辉上库鼠标监听器和ut用例代码
+    Signed-off-by: wuzhihuitmac <wuzhihui4@huawei.com>
+
+[33mcommit 0596dffe3f23fe4344abd46e950c94ae6fbc165c[m
+Merge: 8cfa249 b3631d3
+Author: openharmony_ci <120357966@qq.com>
+Date:   Mon Jan 17 08:36:34 2022 +0000
+
+    !187 部件化整改，添加segment
+    Merge pull request !187 from mayunteng/master
+
+[33mcommit d52a0820ba08aab5d4e33e8d7f68f4fe37d8ab01[m
+Merge: 067e181 8cfa249
+Author: zhangpengcheng <zhangpengcheng31@huawei.com>
+Date:   Mon Jan 17 16:05:25 2022 +0800
+
+    Merge branch 'master' of gitee.com:openharmony/multimodalinput_input into AddInputEventFilter_binder_0117_2
+    
+    Signed-off-by: zhangpengcheng <zhangpengcheng31@huawei.com>
+
+[33mcommit 067e181e6c62aab63a5a29703fd1d8018a81f886[m
+Author: zhangpengcheng <zhangpengcheng31@huawei.com>
+Date:   Mon Jan 17 15:59:43 2022 +0800
+
+    事件过滤BINDER
+    
+    Signed-off-by: zhangpengcheng <zhangpengcheng31@huawei.com>
+
+[33mcommit 60bc3416ef6ffea86f44b257c185a1f71f3f895a[m
+Merge: c80e4ec 8cfa249
+Author: baiwei <baiwei28@huawei.com>
+Date:   Mon Jan 17 15:54:49 2022 +0800
+
+    处理冲突
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit b3631d365efd4f7753bae4bfe936d76f25f64307[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Mon Jan 17 15:49:59 2022 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit bbc140346285a3b7334a45ea5d03f1c00ca98f4a[m
+Merge: f82b6de 8cfa249
+Author: zhaoqil <zhaoqi70@huawei.com>
+Date:   Mon Jan 17 07:11:27 2022 +0000
+
+    Merge branch 'master' of gitee.com:openharmony/multimodalinput_input into test2
+    Signed-off-by: zhaoqi70 <zhaoqi70@huawei.com>
+
+[33mcommit 8cfa2496e7dff432c81e580c4c3c31aafa80cac5[m
+Merge: afd658a 576b944
+Author: openharmony_ci <120357966@qq.com>
+Date:   Mon Jan 17 06:48:15 2022 +0000
+
+    !183 The libinput_event reference is changed to a pointer
+    Merge pull request !183 from BobZ/master
+
+[33mcommit 391b4441c4e3abb071ec6910aa03dcff135f2453[m
+Author: zhangpengcheng <zhangpengcheng31@huawei.com>
+Date:   Mon Jan 17 14:35:46 2022 +0800
+
+    事件过滤BINDER
+    
+    Signed-off-by: zhangpengcheng <zhangpengcheng31@huawei.com>
+
+[33mcommit 576b9445ed5cb3f42d0b34ba29206b73b1f9dbfd[m
+Author: bobz202 <zhangbo374@huawei.com>
+Date:   Mon Jan 17 13:52:01 2022 +0800
+
+    The warning to clean up
+    
+    Signed-off-by: bobz202 <zhangbo374@huawei.com>
+
+[33mcommit 5ccf92009246d901941b936e79b118356fcf31c2[m
+Author: bobz202 <zhangbo374@huawei.com>
+Date:   Mon Jan 17 13:22:49 2022 +0800
+
+    The warning to clean up
+    
+    Signed-off-by: bobz202 <zhangbo374@huawei.com>
+
+[33mcommit 9485dfc0af9f45cee06233bcc5d06152a487f01f[m
+Author: bobz202 <zhangbo374@huawei.com>
+Date:   Mon Jan 17 12:15:23 2022 +0800
+
+    The warning to clean up
+    
+    Signed-off-by: bobz202 <zhangbo374@huawei.com>
+
+[33mcommit afd658acdb4b2b32550182c65e07c5105f4ae642[m
+Merge: 4c2b1f0 8d27916
+Author: openharmony_ci <120357966@qq.com>
+Date:   Mon Jan 17 04:06:32 2022 +0000
+
+    !174 Add a find input device ID interface.
+    Merge pull request !174 from 胡枭/master
+
+[33mcommit 624c826d6df42fa2364bdf338da6876ce5302743[m
+Author: bobz202 <zhangbo374@huawei.com>
+Date:   Mon Jan 17 11:36:09 2022 +0800
+
+    The warning to clean up
+    
+    Signed-off-by: bobz202 <zhangbo374@huawei.com>
+
+[33mcommit 3dd1895d0a4cc72bbe5c35670fe2fd9c03b6b743[m
+Author: bobz202 <zhangbo374@huawei.com>
+Date:   Mon Jan 17 10:56:25 2022 +0800
+
+    The libinput_event reference is changed to a pointer
+    
+    Signed-off-by: bobz202 <zhangbo374@huawei.com>
+
+[33mcommit c80e4ec07cd8136772ed12fc4f5d6e1feb3849e4[m
+Merge: 3b5d973 f0c84b4
+Author: baiwei <baiwei28@huawei.com>
+Date:   Mon Jan 17 10:45:00 2022 +0800
+
+    Merge branch 'baiwei_0117' of gitee.com:baiyingwei_2009/multimodalinput_input
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 3b5d973db7560a331262bb0aa1fdc644d496be4c[m
+Merge: 7a50513 2f2c3b9
+Author: baiwei <baiwei28@huawei.com>
+Date:   Mon Jan 17 09:56:31 2022 +0800
+
+    处理'找不到的按键，不返回unknown，建立不认识的按键码（如10000开始），加日志（不识别的按键）'问题
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 4c2b1f02ce6c33f3dae4606e1bff102d2d4ec4c1[m
+Merge: 2f2c3b9 f23255b
+Author: openharmony_ci <120357966@qq.com>
+Date:   Mon Jan 17 02:25:12 2022 +0000
+
+    !170 Add PID to search FD index MAP
+    Merge pull request !170 from BobZ/master
+
+[33mcommit f0c84b463bb57112f1a853d4e1d31aa37a58b818[m
+Merge: 7a50513 2f2c3b9
+Author: baiwei <baiwei28@huawei.com>
+Date:   Mon Jan 17 09:56:31 2022 +0800
+
+    处理pr冲突
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit f82b6de15e7688c09e60d83604214e3e789e0021[m
+Author: zhaoqil <zhaoqi70@huawei.com>
+Date:   Mon Jan 17 09:32:09 2022 +0800
+
+    增加判断指针宏定义
+    Signed-off-by: zhaoqil <zhaoqi70@huawei.com>
+
+[33mcommit 16d23f9652902ed9475c274e33061f989547a463[m
+Author: zhaoqil <zhaoqi70@huawei.com>
+Date:   Sun Jan 16 13:25:56 2022 +0800
+
+    修改日志打印长度
+    Signed-off-by: zhaoqil <zhaoqi70@huawei.com>
+
+[33mcommit 52551d997331ebf02b8664c7bed6b39fd02fedd3[m
+Author: zhaoqil <zhaoqi70@huawei.com>
+Date:   Sun Jan 16 13:19:51 2022 +0800
+
+    修改指针宏定义
+    Signed-off-by: zhaoqil <zhaoqi70@huawei.com>
+
+[33mcommit 8d2791648a06b0c41e5500e93f3092218769d47a[m
+Author: hungry_feiwei <huxiao31@huawei.com>
+Date:   Sun Jan 16 11:53:32 2022 +0800
+
+    Signed-off-by:hungry_feiwei<huxiao31@huawei.com>
+    Signed-off-by:hungry_feiwei<huxiao31@huawei.com>
+
+[33mcommit e6e0472f24f2229afaaba25c728dd1a333c32815[m
+Author: zhaoqil <zhaoqi70@huawei.com>
+Date:   Sat Jan 15 20:22:32 2022 +0800
+
+    修改检查指针宏定义
+    Signed-off-by: zhaoqil <zhaoqi70@huawei.com>
+
+[33mcommit f23255b2e21def854f9aca8bd791ea9eaf492d8f[m
+Author: bobz202 <zhangbo374@huawei.com>
+Date:   Sat Jan 15 20:06:08 2022 +0800
+
+    Add PID to search FD index MAP
+    
+    Signed-off-by: bobz202 <zhangbo374@huawei.com>
+
+[33mcommit d959248e5607349f16ad2e033ab5f83d4b1923fd[m
+Author: bobz202 <zhangbo374@huawei.com>
+Date:   Sat Jan 15 20:02:50 2022 +0800
+
+    Signed-off-by:bobz202<zhangbo374@huawei.com>
+    
+    Signed-off-by: bobz202 <zhangbo374@huawei.com>
+
+[33mcommit 2f2c3b9b73622443d8665d855617659236ca6dab[m
+Merge: 693a00f 6476a2d
+Author: openharmony_ci <120357966@qq.com>
+Date:   Sat Jan 15 08:49:03 2022 +0000
+
+    !168 add signal check
+    Merge pull request !168 from mayunteng/master
+
+[33mcommit 6476a2d6b89fa8e4aa6df1d70105238fa9365ecc[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Sat Jan 15 15:25:19 2022 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit 693a00f0f3ee27590755727cd7f87e275556f283[m
+Merge: fa7e09e 4e2a9e4
+Author: openharmony_ci <120357966@qq.com>
+Date:   Sat Jan 15 07:24:03 2022 +0000
+
+    !161 show mouse icon
+    Merge pull request !161 from mayunteng/master
+
+[33mcommit 4e2a9e492757c64b42c4ca1c57af6b5ff9c166c8[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Sat Jan 15 14:47:44 2022 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit fa7e09eb8bc490f60024ce7b5e1c4e5c64989049[m
+Merge: 5fbb99f 93549c6
+Author: openharmony_ci <120357966@qq.com>
+Date:   Sat Jan 15 03:22:46 2022 +0000
+
+    !166 删除：OHOS_AUTO_TEST_FRAME 相关代码
+    Merge pull request !166 from jinzhen/Delete_OHOS_AUTO_TEST_FRAME_Source_0114
+
+[33mcommit 7a50513cd4018e4395b3fbbb7d10e07e6ac03345[m
+Merge: c414d54 d2aaf54
+Author: baiwei <baiwei28@huawei.com>
+Date:   Sat Jan 15 11:00:35 2022 +0800
+
+    Merge branch into my branch
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit c414d547a1d403388d346d16fe77f8b68e865768[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Sat Jan 15 08:07:33 2022 +0800
+
+    处理编译报错和checkcode报错
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 93549c61d965f551542d5c916ef7a6b718dfad32[m
+Author: jinzhen6 <jinzhen6@huawei.com>
+Date:   Sat Jan 15 09:28:56 2022 +0800
+
+    修改遗漏的补充修改
+    
+    Signed-off-by: jinzhen6 <jinzhen6@huawei.com>
+
+[33mcommit 17ddccec5ed9ce571525a289bcf03dc36af498b5[m
+Author: jinzhen6 <jinzhen6@huawei.com>
+Date:   Sat Jan 15 09:20:31 2022 +0800
+
+    修改遗漏的补充修改
+    
+    Signed-off-by: jinzhen6 <jinzhen6@huawei.com>
+
+[33mcommit d2aaf544c102d2fffca71f5ade1ba23fcb61f373[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Sat Jan 15 08:07:33 2022 +0800
+
+    处理编译报错
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 029a8d9e28f08fe58b26b52e345f3aa97af139fe[m
+Author: jinzhen6 <jinzhen6@huawei.com>
+Date:   Fri Jan 14 23:09:35 2022 +0800
+
+    门禁报错修正
+    
+    Signed-off-by: jinzhen6 <jinzhen6@huawei.com>
+
+[33mcommit f4c591c860e9dde9ba0ecd5f95fc478c0205a36e[m
+Author: jinzhen6 <jinzhen6@huawei.com>
+Date:   Fri Jan 14 22:44:08 2022 +0800
+
+    检视意见：关于OHOS_AUTO_TEST_FRAME 删掉
+    
+    Signed-off-by: jinzhen6 <jinzhen6@huawei.com>
+
+[33mcommit cd88e5b1b60dac17bdd73710bc1a78aa92714346[m
+Merge: b461289 5fbb99f
+Author: baiwei <baiwei28@huawei.com>
+Date:   Fri Jan 14 22:28:07 2022 +0800
+
+    my branch merged into openharmony/master
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit b4612890aa2c8fe314ec77afde0dd8f89a41d337[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Fri Jan 14 22:26:26 2022 +0800
+
+    白伟处理代码检视意见
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 5fbb99f508f2a0a9250be1c9d97dff7e6858f5ce[m
+Merge: 7302164 7878201
+Author: openharmony_ci <120357966@qq.com>
+Date:   Fri Jan 14 13:23:10 2022 +0000
+
+    !157 处理代码检视
+    Merge pull request !157 from baiwei/baiwei_fix_5
+
+[33mcommit 730216400e135d1ce10a011b6eb7f2cb2bacbadd[m
+Merge: cdbf80b c5ef58c
+Author: openharmony_ci <120357966@qq.com>
+Date:   Fri Jan 14 11:54:36 2022 +0000
+
+    !141 update  multimodalinput test case
+    Merge pull request !141 from dongbing/master
+
+[33mcommit cdbf80b44b46456d644353bf141c86c7ff6b71e1[m
+Merge: 7235ae2 9ab3664
+Author: openharmony_ci <120357966@qq.com>
+Date:   Fri Jan 14 11:54:14 2022 +0000
+
+    !147 update  multimodalinput testcase
+    Merge pull request !147 from danwangcl/master
+
+[33mcommit 7235ae29cceecdf5ffbfc973f7a1ad7c4089d7c9[m
+Merge: 6b72771 782c98b
+Author: openharmony_ci <120357966@qq.com>
+Date:   Fri Jan 14 11:53:45 2022 +0000
+
+    !150 update multimodalinput test case
+    Merge pull request !150 from wendy/guwenjin_20220113
+
+[33mcommit 6b72771b64276b9b76dbb06bc3a701abbeb12e4f[m
+Merge: 0d95e7f 8a38202
+Author: openharmony_ci <120357966@qq.com>
+Date:   Fri Jan 14 11:45:46 2022 +0000
+
+    !164 删除多余的依赖
+    Merge pull request !164 from xiahaiqin/master
+
+[33mcommit 408853d7dc5cd9239097d41553e3d4778276793f[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Fri Jan 14 19:20:51 2022 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit b6ce148d3fe732f745bedba36585052d4ea4ba13[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Fri Jan 14 19:18:48 2022 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit 8a38202e1cd97efdd01c3c1466c8bd20afeb22cc[m
+Author: xiahaiqin <xiahaiqin1@huawei.com>
+Date:   Fri Jan 14 17:05:29 2022 +0800
+
+    delete libwmutil dependency
+    
+    Signed-off-by: xiahaiqin <xiahaiqin1@huawei.com>
+    Change-Id: I5b7ece73125c300da03f7e5bb5dfa6bd1ba28acc
+
+[33mcommit 094db8614e677dc0b008d6d7d157573ee8ae65e7[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Fri Jan 14 15:43:51 2022 +0800
+
+    添加const
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit d389f45ed9cb2e9cdd2fe3ecc6b1dfcd2432c668[m
+Merge: fa11cae 0d95e7f
+Author: baiwei <baiwei28@huawei.com>
+Date:   Fri Jan 14 15:20:51 2022 +0800
+
+    merge master into my local branch
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit fa11cae5430c270e4e90044b2515aa6c61b466b4[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Fri Jan 14 15:20:42 2022 +0800
+
+    添加日志
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit b57e70908be60c189d6feebf05049ed9f88d5513[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Fri Jan 14 15:06:15 2022 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit 0d95e7f1e307134847e98f57457fd98e03322df8[m
+Merge: f602681 3f95d5b
+Author: openharmony_ci <120357966@qq.com>
+Date:   Fri Jan 14 06:19:28 2022 +0000
+
+    !158 部件化整改
+    Merge pull request !158 from mayunteng/master
+
+[33mcommit c5ef58c430f9c8eb31dbfefb884ffb247ff308cf[m
+Author: dongbing <dongbing5@huawei.com>
+Date:   Fri Jan 14 11:52:46 2022 +0800
+
+    update multimodalinput_input test case
+    Signed-off-by: dongbing <dongbing5@huawei.com>
+
+[33mcommit 3f95d5b3c763bd89e8b737ff7e8cbf99fc81fb4d[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Fri Jan 14 11:48:59 2022 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit a5ff94cbc312223a5712e6771339c2c91cd92f73[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Fri Jan 14 10:56:48 2022 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit 7878201ee992395744a0a2cc6aa1c4990cc72a14[m
+Merge: 498cfc1 f602681
+Author: baiwei <baiwei28@huawei.com>
+Date:   Fri Jan 14 01:46:04 2022 +0800
+
+    处理冲突
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit f602681c9b5bf1c06adf632d76c62328f54d1f20[m
+Merge: 64cd092 ee9d5ed
+Author: openharmony_ci <120357966@qq.com>
+Date:   Thu Jan 13 16:50:42 2022 +0000
+
+    !139 sync multimodalinput code to master
+    Merge pull request !139 from mayunteng/master
+
+[33mcommit 498cfc12206b2af8c9875457efa40cd8e84292e6[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Thu Jan 13 20:40:17 2022 +0800
+
+    处理'key名字重新起'问题
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit ee9d5edc5792c9f38ee012d901217a1462655ef5[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Thu Jan 13 22:53:20 2022 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit 3580069d5d133cd372646d0e6c697708cd8ad442[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Thu Jan 13 22:18:58 2022 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit 64cd0923501ccc227bc683683c94be4007f237d3[m
+Merge: 6a9f350 437e5da
+Author: openharmony_ci <120357966@qq.com>
+Date:   Thu Jan 13 14:09:07 2022 +0000
+
+    !149 The default timeout of the main loop is changed to 50 milliseconds
+    Merge pull request !149 from BobZ/master
+
+[33mcommit 67f88f42c0e8b67f711287cda2b49a225991c212[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Thu Jan 13 22:03:26 2022 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit 782c98b290059d2495c49cd8a8f4de2fb2c4b017[m
+Author: guwenjinw <guwenjin2@huawei.com>
+Date:   Thu Jan 13 21:46:51 2022 +0800
+
+    update multimodalinput test case
+    
+    Signed-off-by: guwenjinw <guwenjin2@huawei.com>
+
+[33mcommit 437e5daa48e9e06de72e44ad416fdbf714f6b761[m
+Author: bobz202 <zhangbo374@huawei.com>
+Date:   Thu Jan 13 21:38:57 2022 +0800
+
+    Signed-off-by:bobz202<zhangbo374@huawei.com>
+    
+    Signed-off-by: bobz202 <zhangbo374@huawei.com>
+
+[33mcommit 9ab366495d6fda21076d17295722235c3d320c64[m
+Author: wangdan231 <wangdan231@huawei.com>
+Date:   Thu Jan 13 20:52:08 2022 +0800
+
+    updata multimodalinput testcase
+    
+    Signed-off-by: wangdan231 <wangdan231@huawei.com>
+
+[33mcommit 4c67f4c4cee2b5b3a5d5213f4717a5ae4bf8f82c[m
+Author: dongbing <dongbing5@huawei.com>
+Date:   Thu Jan 13 19:59:58 2022 +0800
+
+    update multimodalinput_input test case
+    
+    Signed-off-by: dongbing <dongbing5@huawei.com>
+
+[33mcommit 15afcdeebbc53d0f12424c1f49198c98fad3c7e8[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Thu Jan 13 19:34:57 2022 +0800
+
+    处理'找不到的按键，不返回unknown，建立不认识的按键码（如10000开始），加日志（不识别的按键）'问题
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 537add203dcee8442df14183c1b6d1b6ed0d7002[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Thu Jan 13 19:07:08 2022 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit 6a9f3508e53557faf6c3d6deb1bce9f0ae649137[m
+Merge: 0959fae 0f5fd1d
+Author: openharmony_ci <120357966@qq.com>
+Date:   Thu Jan 13 03:36:39 2022 +0000
+
+    !117 update  multimodalinput test case
+    Merge pull request !117 from danwangcl/master
+
+[33mcommit 0959fae587042b069a6a0e80e4ee74644757b63c[m
+Merge: 7376804 7e1f106
+Author: openharmony_ci <120357966@qq.com>
+Date:   Thu Jan 13 03:36:24 2022 +0000
+
+    !116 add  multimodalinput test case
+    Merge pull request !116 from dongbing/master
+
+[33mcommit d108a15a960252241f18f9783f3a2a1992df6e90[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Wed Jan 12 21:33:48 2022 +0800
+
+    处理'参数顺序：输出参数在最后（发现一个修改一个，下来找工具排查）'问题
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 21912389399cf6dd03b6d28b4cf6d93fd06a147e[m
+Author: baiwei <baiwei28@huawei.com>
+Date:   Wed Jan 12 20:34:27 2022 +0800
+
+    处理'm开头为安卓的风格，直接取名字（成员变量）'问题
+    
+    Signed-off-by: baiwei <baiwei28@huawei.com>
+
+[33mcommit 0f5fd1daafb2395fd30da8aa95b9c1ce79979e07[m
+Author: wangdan231 <wangdan231@huawei.com>
+Date:   Wed Jan 12 17:37:02 2022 +0800
+
+    update multimodulinput testcase
+    
+    Signed-off-by: wangdan231 <wangdan231@huawei.com>
+
+[33mcommit 737680458f431a59609656c42e4fa17a2babf3a5[m[33m ([m[1;31morigin/weekly_20220111[m[33m)[m
+Merge: 77bb827 a38dd87
+Author: openharmony_ci <120357966@qq.com>
+Date:   Mon Jan 10 16:14:35 2022 +0000
+
+    !126 modify tmp param powerkey
+    Merge pull request !126 from mayunteng/master
+
+[33mcommit a38dd8744f6245906dada5cdb64ad957dac3f5e3[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Mon Jan 10 23:53:52 2022 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit ae2abf544be7a1f92dae4b48f1357479c2f8c4e4[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Mon Jan 10 23:47:43 2022 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit ec41eda44889de249550018f042d5434941e41b6[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Mon Jan 10 23:21:14 2022 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit 77bb8270dd832971fc09c9fd7fcffde8cbcd695f[m
+Merge: 59e0b9d 1ec6486
+Author: openharmony_ci <120357966@qq.com>
+Date:   Mon Jan 10 13:34:15 2022 +0000
+
+    !125 add key_power param
+    Merge pull request !125 from mayunteng/master
+
+[33mcommit 1ec6486b21c17cd366b53d83a296fa51b4fae1b6[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Mon Jan 10 21:14:18 2022 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit 59e0b9df7c3837ee587670fead0eda4d0dc6c590[m
+Merge: abce8b2 6c2150b
+Author: openharmony_ci <120357966@qq.com>
+Date:   Mon Jan 10 12:24:54 2022 +0000
+
+    !121 回退 'Pull Request !119 : inject back key failed'
+    Merge pull request !121 from hhh2/revert-merge-119-weekly_20220105
+
+[33mcommit 6c2150b2bc3bf9b93bafe071b35f8e63d3519b3c[m
+Author: hhh2 <pengfei.hou@huawei.com>
+Date:   Mon Jan 10 12:23:43 2022 +0000
+
+    回退 'Pull Request !119 : inject back key failed'
+
+[33mcommit abce8b2aeca65fc3551c0be8c656c20964d8831f[m
+Merge: bf16b43 f6bb683
+Author: openharmony_ci <120357966@qq.com>
+Date:   Mon Jan 10 12:08:09 2022 +0000
+
+    !120 sync multimodalinput code to master
+    Merge pull request !120 from mayunteng/master
+
+[33mcommit f6bb6837bd115777c46a5a0f5ea1a561af67df14[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Mon Jan 10 19:28:00 2022 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit e79f737595457ca611573e03f50b79d803f00faf[m
+Merge: e319813 a772679
+Author: openharmony_ci <120357966@qq.com>
+Date:   Mon Jan 10 11:07:04 2022 +0000
+
+    !119 inject back key failed
+    Merge pull request !119 from mayunteng/master
+
+[33mcommit bf16b439700bbc4b69f609c7bf8071f92fcb271e[m
+Merge: 007cdd7 a772679
+Author: openharmony_ci <120357966@qq.com>
+Date:   Mon Jan 10 09:52:44 2022 +0000
+
+    !118 inject back key failed
+    Merge pull request !118 from mayunteng/master
+
+[33mcommit a7726795f30e36332bc9238635d98f7a1ce4fef8[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Mon Jan 10 17:21:44 2022 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit 95c19d0124d8d3b505c9f2c43e184d9acdeff17f[m
+Author: wangdan231 <wangdan231@huawei.com>
+Date:   Mon Jan 10 15:10:47 2022 +0800
+
+    update  multimodalinput test case
+    Signed-off-by: wangdan231 <wangdan231@huawei.com>
+
+[33mcommit 7e1f106cd5c03402ebb2608308361a0e16cfcdf4[m
+Author: dongbing <dongbing5@huawei.com>
+Date:   Fri Jan 7 11:19:58 2022 +0800
+
+    多模UT用例更新
+    Signed-off-by: dongbing <dongbing5@huawei.com>
+
+[33mcommit 4a2a710d2bdd4b06d96de805c1f81e15a10cf3b0[m
+Author: dongbing <dongbing5@huawei.com>
+Date:   Fri Jan 7 10:17:24 2022 +0800
+
+    修改TDD失败的用例
+    Signed-off-by: dongbing <dongbing5@huawei.com>
+
+[33mcommit 007cdd72f5ac8e102ca2f4e542787de1297732ca[m
+Merge: e5f3284 0ae97c0
+Author: openharmony_ci <120357966@qq.com>
+Date:   Thu Jan 6 14:36:17 2022 +0000
+
+    !95 modify packet size to 10k
+    Merge pull request !95 from mayunteng/master
+
+[33mcommit e5f3284b365ad9d952fe52d1cb154accf89103ea[m
+Merge: 8bdc3e0 0ae97c0
+Author: openharmony_ci <120357966@qq.com>
+Date:   Thu Jan 6 14:36:17 2022 +0000
+
+    !95 modify packet size to 10k
+    Merge pull request !95 from mayunteng/master
+
+[33mcommit 0ae97c03d4451bf21115bacde4f3b0d540052a6b[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Thu Jan 6 22:16:14 2022 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit 8bdc3e049452736633a90bca755d19562c432d81[m
+Merge: e319813 3860a0a
+Author: openharmony_ci <120357966@qq.com>
+Date:   Wed Jan 5 14:01:33 2022 +0000
+
+    !69 cancel weston
+    Merge pull request !69 from mayunteng/master
+
+[33mcommit 3860a0a2dd1a1ed54363496b02b967a657d46a83[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Tue Jan 4 15:00:22 2022 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit e319813856de2bb9f323ac64b145123bda4fbe3f[m
+Merge: 7d26c0e 7381efb
+Author: openharmony_ci <120357966@qq.com>
+Date:   Mon Jan 3 13:03:12 2022 +0000
+
+    !68 fix bug without weston
+    Merge pull request !68 from mayunteng/master
+
+[33mcommit 7381efbe8d5fe0115e26c0804e6073206e9a92c1[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Mon Jan 3 20:36:04 2022 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit 7d26c0efc4fcfe23ccbe1543624fd2b33511aa74[m
+Merge: f96779c 17f1d26
+Author: openharmony_ci <120357966@qq.com>
+Date:   Mon Jan 3 12:04:08 2022 +0000
+
+    !67 modify multimodalinput compile error without weston
+    Merge pull request !67 from mayunteng/master
+
+[33mcommit 17f1d267618f79e00e0a518950c52c6e837b7e8e[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Mon Jan 3 19:42:31 2022 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit 8157ba54cec0314dd6ac1159304b5b22839e6ba2[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Mon Jan 3 18:05:52 2022 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit f96779c6d0966291e207147e28bfad63593e5426[m
+Merge: 3fe57e2 8a95d06
+Author: openharmony_ci <120357966@qq.com>
+Date:   Mon Jan 3 05:01:22 2022 +0000
+
+    !66 sync multimodalinput code to master
+    Merge pull request !66 from mayunteng/master
+
+[33mcommit 8a95d06be4178e22fc67afe74d747a9345cf5ae5[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Mon Jan 3 11:56:42 2022 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit ed69866565dd8fce5e3c5de1046feea7dbc397ab[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Mon Jan 3 11:34:08 2022 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit 9aed5c430972cc6b2afc335d798dc07784c54bfc[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Mon Jan 3 11:24:33 2022 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit 1e99df9d1d8f9dbd75ab6ed6cb46166487ecbdc6[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Mon Jan 3 11:06:39 2022 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit 3fe57e2d060c50133c95849598fb4e34dde9bf0b[m
+Merge: b1a499a 110b36a
+Author: openharmony_ci <120357966@qq.com>
+Date:   Wed Dec 29 14:25:07 2021 +0000
+
+    !63 delete useless test file in gn
+    Merge pull request !63 from mayunteng/OpenHarmony-3.1-Beta
+
+[33mcommit 110b36a5e86e3bc90f04995d4f2c576d341b3200[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Wed Dec 29 22:23:17 2021 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit b1a499aebd86a7146fe6506d8b6e5169f0349267[m
+Merge: d4872eb ad61a12
+Author: openharmony_ci <120357966@qq.com>
+Date:   Wed Dec 29 14:11:42 2021 +0000
+
+    !62 delete useless test file
+    Merge pull request !62 from mayunteng/OpenHarmony-3.1-Beta
+
+[33mcommit ad61a122bf52e3cd41aa3a65fb0f37df5266072a[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Wed Dec 29 20:14:33 2021 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit d4872eb0ad49ffc4f4f29a6bbb18d0b2fae07bb4[m
+Merge: 1cf82e9 5d18f2c
+Author: openharmony_ci <120357966@qq.com>
+Date:   Wed Dec 29 06:43:50 2021 +0000
+
+    !61 fix bug of multitouch_coordinate
+    Merge pull request !61 from mayunteng/OpenHarmony-3.1-Beta
+
+[33mcommit 5d18f2c6f39c67de7f68773efdf8eb1c3fe17e53[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Tue Dec 28 17:01:15 2021 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit 1cf24eddbbb547592d5c3d4f17ae18765c0ff634[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Tue Dec 28 16:11:00 2021 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit 1d18a5d9379fc894196a01ee958f407f9ef525a1[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Tue Dec 28 16:08:47 2021 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit b25e536fb205f821b5d00a90f34a209d4a9ed3bd[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Tue Dec 28 15:39:47 2021 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit 04507669ee06c2d66cab2987bf6fbf0c3022ea7b[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Tue Dec 28 14:57:01 2021 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit 1cf82e99934c92237a5eec10bbe22ea133e29773[m
+Merge: 5308e07 44a5c78
+Author: openharmony_ci <120357966@qq.com>
+Date:   Sat Dec 25 03:43:33 2021 +0000
+
+    !59 delete debug file
+    Merge pull request !59 from mayunteng/master
+
+[33mcommit 44a5c784a4e9ddc516cf339ec50e7fe3c807ddd4[m
+Author: mayunteng_1 <mayunteng@huawei.com>
+Date:   Fri Dec 24 17:25:22 2021 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng_1 <mayunteng@huawei.com>
+
+[33mcommit 5308e0708ecc530a590e3f7babdc74de3fecec43[m
+Merge: 0785324 c993cb0
+Author: openharmony_ci <120357966@qq.com>
+Date:   Tue Dec 21 07:24:11 2021 +0000
+
+    !57 回退 'Pull Request !56 : sync code to multimodainput'
+    Merge pull request !57 from hhh2/revert-merge-56-master
+
+[33mcommit c993cb01691b7f56a0270887b3df102a0918a479[m[33m ([m[1;31morigin/revert-merge-56-master[m[33m)[m
+Author: hhh2 <pengfei.hou@huawei.com>
+Date:   Tue Dec 21 06:59:44 2021 +0000
+
+    回退 'Pull Request !56 : sync code to multimodainput'
+
+[33mcommit 0785324ebe589ab37c65a985622c266ade17d708[m
+Merge: 084c0b6 74fba1a
+Author: openharmony_ci <120357966@qq.com>
+Date:   Tue Dec 21 06:58:44 2021 +0000
+
+    !56 sync code to multimodainput
+    Merge pull request !56 from mayunteng/master
+
+[33mcommit 74fba1ae3f98195d3637ce74bba4531582b39720[m
+Author: mayunteng <mayunteng@huawei.com>
+Date:   Tue Dec 21 14:52:46 2021 +0800
+
+    Signed-off-by:mayunteng_1<mayunteng@huawei.com>
+    
+    Signed-off-by: mayunteng <mayunteng@huawei.com>
+
+[33mcommit 084c0b67bed42713460cc528d3f4482d448601cb[m
+Merge: e894344 8125a9b
+Author: openharmony_ci <120357966@qq.com>
+Date:   Thu Dec 16 12:59:48 2021 +0000
+
+    !54 修改多模测试用例
+    Merge pull request !54 from SUE/master
+
+[33mcommit 8125a9b3765f6c48db5cfd8f9ae794a23f440df3[m
+Author: h00514358 <huiyuehong@huawei.com>
+Date:   Thu Dec 16 12:03:50 2021 +0000
+
+    Signed-off-by:hellohyh001<huiyuehong@huawei.com>
+    
+    Signed-off-by: h00514358 <huiyuehong@huawei.com>
+
+[33mcommit e89434417b1e6b57b7d00b66d1c478f259ceb03f[m
+Merge: 17303b7 131bd39
+Author: openharmony_ci <120357966@qq.com>
+Date:   Thu Dec 9 09:56:43 2021 +0000
+
+    !52 修改多模测试用例
+    Merge pull request !52 from SUE/master
+
+[33mcommit 131bd39888f668d705e547d63c9863a2e73cbafd[m
+Author: h00514358 <huiyuehong@huawei.com>
+Date:   Wed Dec 8 02:03:55 2021 +0000
+
+    Signed-off-by:hellohyh001<huiyuehong@huawei.com>
+    
+    Signed-off-by: h00514358 <huiyuehong@huawei.com>
+
+[33mcommit f47720d3300f2bc80fbbbc82c9fd40c6f2ee9801[m
+Author: h00514358 <huiyuehong@huawei.com>
+Date:   Tue Dec 7 12:06:31 2021 +0000
+
+    Signed-off-by:hellohyh001<huiyuehong@huawei.com>
+    
+    Signed-off-by: h00514358 <huiyuehong@huawei.com>
+
+[33mcommit ee23ea1b7bf7cae88ef131a54a83b4eef9788dbc[m
+Author: h00514358 <huiyuehong@huawei.com>
+Date:   Tue Dec 7 11:49:43 2021 +0000
+
+    Signed-off-by:hellohyh001<huiyuehong@huawei.com>
+    
+    Signed-off-by: h00514358 <huiyuehong@huawei.com>
+
+[33mcommit 301d0110a92753ed3f175398f725c7e1fc31a5ba[m
+Author: h00514358 <huiyuehong@huawei.com>
+Date:   Tue Dec 7 07:04:49 2021 +0000
+
+    Signed-off-by:hellohyh001<huiyuehong@huawei.com>
+    
+    Signed-off-by: h00514358 <huiyuehong@huawei.com>
+
+[33mcommit 17303b7662d0382f27c972ad7d149bee61a14f23[m
+Merge: d521ea4 f8ee3d8
+Author: openharmony_ci <120357966@qq.com>
+Date:   Thu Nov 25 08:20:44 2021 +0000
+
+    !51 修改multimodalinput_input readme描述
+    Merge pull request !51 from SUE/master
+
+[33mcommit f8ee3d861b6e5e2c376408d9164d43b5268d22e0[m
+Author: SUE <huiyuehong@huawei.com>
+Date:   Thu Nov 25 08:01:34 2021 +0000
+
+    git commit -sm "Signed-off-by:hellohyh001<huiyuehong@huawei.com>"
+
+[33mcommit e5fa73fa3a2221ae4b7cacf0f6a90f241d5de2fd[m
+Author: SUE <huiyuehong@huawei.com>
+Date:   Thu Nov 25 07:41:09 2021 +0000
+
+    git commit -sm "Signed-off-by:hellohyh001<huiyuehong@huawei.com>"
+
+[33mcommit 715837a4372d63508dd881f951c162f890f9cda4[m
+Author: SUE <huiyuehong@huawei.com>
+Date:   Thu Nov 25 07:39:34 2021 +0000
+
+    git commit -sm "Signed-off-by:hellohyh001<huiyuehong@huawei.com>"
+
+[33mcommit d521ea42fca9f864e3aec3bf17c9f41552a1c228[m
+Merge: 2c67855 7a775ff
+Author: openharmony_ci <7387629+openharmony_ci@user.noreply.gitee.com>
+Date:   Wed Nov 24 09:02:36 2021 +0000
+
+    !50 modify bug
+    Merge pull request !50 from SUE/master
+
+[33mcommit 7a775ff819f4b5ab6cdc17a778192c73c65e74a9[m
+Author: SUE <huiyuehong@huawei.com>
+Date:   Wed Nov 24 06:45:09 2021 +0000
+
+    git commit -sm "Signed-off-by:hellohyh001<huiyuehong@huawei.com>"
+
+[33mcommit 2c67855adb4227d03cff99d6b2814b64e8d64f38[m
+Merge: 322134a 50ee93c
+Author: openharmony_ci <7387629+openharmony_ci@user.noreply.gitee.com>
+Date:   Fri Nov 12 11:35:50 2021 +0000
+
+    !43 多模代码更新
+    Merge pull request !43 from licheng_1123/multimodal_update_1109
+
+[33mcommit 50ee93cdd29219c065c230ce8db6697018d24fa1[m
+Author: songliy <songliy@isoftstone.com>
+Date:   Fri Nov 12 17:12:41 2021 +0800
+
+    更新多模代码
+    Signed-off-by: licheng.li <licheng.li@huawei.com>
+
+[33mcommit bd33c7db0cca024acf48b6b59f0996de10235c75[m
+Author: songliy <songliy@isoftstone.com>
+Date:   Fri Nov 12 16:57:11 2021 +0800
+
+    更新多模代码
+    Signed-off-by: licheng.li <licheng.li@huawei.com>
+
+[33mcommit b58d7d254c3efececa2c408af43721aef03a85e1[m
+Author: songliy <songliy@isoftstone.com>
+Date:   Fri Nov 12 16:38:00 2021 +0800
+
+    更新多模代码
+    Signed-off-by: licheng.li <licheng.li@huawei.com>
+
+[33mcommit 60f2b51808bb78db0165c4af56029a567570228a[m
+Author: songliy <songliy@isoftstone.com>
+Date:   Fri Nov 12 16:16:51 2021 +0800
+
+    更新多模代码
+    Signed-off-by: licheng.li <licheng.li@huawei.com>
+
+[33mcommit 2320c685ccc25bed28c2f67f73bed06505aea988[m
+Author: songliy <songliy@isoftstone.com>
+Date:   Fri Nov 12 15:50:14 2021 +0800
+
+    更新多模代码
+    Signed-off-by: licheng.li <licheng.li@huawei.com>
+
+[33mcommit 54df5b250978aac5ffb02dbd566873e55b41a581[m
+Author: songliy <songliy@isoftstone.com>
+Date:   Fri Nov 12 14:45:10 2021 +0800
+
+    更新多模代码
+    Signed-off-by: licheng.li <licheng.li@huawei.com>
+
+[33mcommit a333e4b129aee686a07cdb3c2a7373aa58242415[m
+Author: songliy <songliy@isoftstone.com>
+Date:   Fri Nov 12 14:23:45 2021 +0800
+
+    更新多模代码
+    Signed-off-by: licheng.li <licheng.li@huawei.com>
+
+[33mcommit 43ceb10a567f7b6516aaaf3c7e0a3b3aae4c6ffb[m
+Author: songliy <songliy@isoftstone.com>
+Date:   Thu Nov 11 10:50:41 2021 +0800
+
+    更新多模代码
+    Signed-off-by: licheng.li <licheng.li@huawei.com>
+
+[33mcommit 2b46ce227ad91377f8a4dd554cfa5922db021624[m
+Author: songliy <songliy@isoftstone.com>
+Date:   Tue Nov 9 17:13:51 2021 +0800
+
+    格式化问题
+    Signed-off-by: licheng.li <licheng.li@huawei.com>
+
+[33mcommit 3fb338416f3bcb2332ffd93c0ce209c6c865dc39[m
+Author: songliy <songliy@isoftstone.com>
+Date:   Tue Nov 9 16:49:22 2021 +0800
+
+    更新多模代码
+    Signed-off-by: licheng.li <licheng.li@huawei.com>
+
+[33mcommit 322134a65a5c3345028fa4c007f74143f82b1119[m
+Merge: 7bb02f0 347c502
+Author: openharmony_ci <7387629+openharmony_ci@user.noreply.gitee.com>
+Date:   Wed Nov 3 08:40:19 2021 +0000
+
+    !37 multimodalinput_update1103
+    Merge pull request !37 from licheng_1123/multmodal_update1103
+
+[33mcommit 347c502f7af7811bf28f138c68a00a8c72ae4e1d[m
+Author: licheng <licheng.li@huawei.com>
+Date:   Wed Nov 3 09:18:56 2021 +0800
+
+    修改日志开关
+    
+    Signed-off-by: licheng <licheng.li@huawei.com>
+
+[33mcommit 7bb02f08f20b9070a2677038eee27f68db972d09[m
+Merge: 911d989 cdc7892
+Author: openharmony_ci <7387629+openharmony_ci@user.noreply.gitee.com>
+Date:   Tue Nov 2 11:25:48 2021 +0000
+
+    !33 多模修复client端，注入逻辑的bug
+    Merge pull request !33 from licheng_1123/multimodal_1029_bugFix
+
+[33mcommit 911d989fa5de2906fda8e1a4aa81409c60dfbce4[m
+Merge: 2eea0df 0a9df1c
+Author: openharmony_ci <7387629+openharmony_ci@user.noreply.gitee.com>
+Date:   Mon Nov 1 09:23:10 2021 +0000
+
+    !34 multimodalinput_input
+    Merge pull request !34 from licheng_1123/multmodal_code_1101
+
+[33mcommit 0a9df1cead4768e806a2eb47c3cbdc887635a5c4[m
+Author: licheng <licheng.li@huawei.com>
+Date:   Mon Nov 1 15:53:45 2021 +0800
+
+    解决多模反注册异常导致应用崩溃
+    
+    Signed-off-by: licheng <licheng.li@huawei.com>
+
+[33mcommit f03bd861ec70cf891627ca1278e480ffa7890e87[m
+Author: licheng <licheng.li@huawei.com>
+Date:   Mon Nov 1 14:45:41 2021 +0800
+
+    解决多模反注册异常导致应用崩溃
+    
+    Signed-off-by: licheng <licheng.li@huawei.com>
+
+[33mcommit cdc7892771f45e9909741d5e2c2b67604cacc7f7[m
+Author: songliy <songliy@isoftstone.com>
+Date:   Fri Oct 29 14:25:52 2021 +0800
+
+    多模修改注入逻辑
+    Signed-off-by: licheng.li <licheng.li@huawei.com>
+
+[33mcommit 2eea0dfad8433bf716b54f9bf188c68a5613d278[m
+Merge: adca847 d9e239c
+Author: openharmony_ci <7387629+openharmony_ci@user.noreply.gitee.com>
+Date:   Tue Oct 26 08:40:18 2021 +0000
+
+    !32 多模提交ts接口
+    Merge pull request !32 from licheng_1123/multimodal_tsBug_1025
+
+[33mcommit d9e239cad8340e212372cedeaf2f966b316b8dbc[m
+Author: songliy <songliy@isoftstone.com>
+Date:   Mon Oct 25 16:41:28 2021 +0800
+
+    多模修改ts接口
+    Signed-off-by: licheng.li <licheng.li@huawei.com>
+
+[33mcommit 73983ccf2386fff037c4ddf6097c6378bff0d4f6[m
+Author: songliy <songliy@isoftstone.com>
+Date:   Mon Oct 25 09:53:44 2021 +0800
+
+    多模修改ts接口
+    Signed-off-by: licheng.li <licheng.li@huawei.com>
+
+[33mcommit adca84714b244d296120f4a8def8c783e0fdad5c[m
+Merge: e866349 5b4e0ab
+Author: openharmony_ci <7387629+openharmony_ci@user.noreply.gitee.com>
+Date:   Mon Oct 25 01:30:26 2021 +0000
+
+    !31 samgr part name rectify
+    Merge pull request !31 from zmx/master-dev
+
+[33mcommit e866349078fa7a05f74e08d450ba2e15c1640b43[m
+Merge: a91007f 28b9832
+Author: openharmony_ci <7387629+openharmony_ci@user.noreply.gitee.com>
+Date:   Fri Oct 22 11:29:48 2021 +0000
+
+    !30 多模修复告警
+    Merge pull request !30 from licheng_1123/multimodal_warning_1022
+
+[33mcommit 28b9832938d5d9be2f319940c196a045a815ea5f[m
+Author: songliy <songliy@isoftstone.com>
+Date:   Fri Oct 22 18:37:39 2021 +0800
+
+    多模修改告警
+    Signed-off-by: licheng.li <licheng.li@huawei.com>
+
+[33mcommit 1905d513d3872cd142bf0c23555fea86d1d08ae4[m
+Author: songliy <songliy@isoftstone.com>
+Date:   Fri Oct 22 18:21:16 2021 +0800
+
+    多模修改告警
+    Signed-off-by: licheng.li <licheng.li@huawei.com>
+
+[33mcommit 2c86feef743c2d9c026229d3876c01b30dd5a8b3[m
+Author: songliy <songliy@isoftstone.com>
+Date:   Fri Oct 22 17:51:17 2021 +0800
+
+    多模修改告警
+    Signed-off-by: licheng.li <licheng.li@huawei.com>
+
+[33mcommit 5b4e0abd854d0b9cef75facfef4186fa186435d3[m
+Author: zmx <1029211721@qq.com>
+Date:   Fri Oct 22 16:48:12 2021 +0800
+
+    samgr part name rectify
+    
+    Signed-off-by: zmx <1029211721@qq.com>
+    Change-Id: Ic04561bd57e8d0cf41253163012ce48d709b074c
+
+[33mcommit 4fbb66937d1f4e83c538ffaf42aeb9a93b6a2a68[m
+Author: songliy <songliy@isoftstone.com>
+Date:   Fri Oct 22 16:43:23 2021 +0800
+
+    多模修改告警
+    Signed-off-by: licheng.li <licheng.li@huawei.com>
+
+[33mcommit 900d616fa3b9335f6494f77aece591d260a38c02[m
+Author: songliy <songliy@isoftstone.com>
+Date:   Fri Oct 22 15:56:24 2021 +0800
+
+    多模修改告警
+    Signed-off-by: licheng.li <licheng.li@huawei.com>
+
+[33mcommit c28fbf45116e3a1d7066bd3550d92a5ca34cc7b8[m
+Author: songliy <songliy@isoftstone.com>
+Date:   Fri Oct 22 15:14:09 2021 +0800
+
+    多模修改告警
+    Signed-off-by: licheng.li <licheng.li@huawei.com>
+
+[33mcommit a91007f371c3a4aed03e38a4ae54deb3d4c1f454[m
+Merge: 9c04b3f 42a2c14
+Author: openharmony_ci <7387629+openharmony_ci@user.noreply.gitee.com>
+Date:   Thu Oct 21 11:18:35 2021 +0000
+
+    !29 多模修改HDF的bug
+    Merge pull request !29 from licheng_1123/multimodal_hdfBUG_1021
+
+[33mcommit 42a2c1446f000547bc5460cb8122a303f8e25aa7[m
+Author: songliy <songliy@isoftstone.com>
+Date:   Thu Oct 21 17:55:17 2021 +0800
+
+    多模修改diff patch
+    Signed-off-by: licheng.li <licheng.li@huawei.com>
+
+[33mcommit 9c04b3f303971f0c54aa914cc8111e25eef84a15[m
+Merge: bc6cb23 b15fc89
+Author: openharmony_ci <7387629+openharmony_ci@user.noreply.gitee.com>
+Date:   Wed Oct 20 08:37:08 2021 +0000
+
+    !26 多模binder验证，不合入
+    Merge pull request !26 from licheng_1123/multimodal_1018_binder
+
+[33mcommit b15fc89c7797c77c40e0b049b211fe3bfd9311a9[m
+Author: songliy <songliy@isoftstone.com>
+Date:   Mon Oct 18 22:01:55 2021 +0800
+
+    多模提交联调代码 step02
+    Signed-off-by: licheng.li <licheng.li@huawei.com>
+
+[33mcommit d23e4ae55a929bde929371def4e0e3fedb36d7d4[m
+Author: songliy <songliy@isoftstone.com>
+Date:   Mon Oct 18 21:55:27 2021 +0800
+
+    多模提交联调代码 step01
+    Signed-off-by: licheng.li <licheng.li@huawei.com>
+
+[33mcommit 729dc35e5f866343f99fa6fea2977052e99e02df[m
+Author: songliy <songliy@isoftstone.com>
+Date:   Mon Oct 18 19:10:24 2021 +0800
+
+    适配master代码
+    
+    Signed-off-by: licheng.li <licheng.li@huawei.com>
+
+[33mcommit 1b682b00e51d25c9cdc7188482ec26d326d139f3[m
+Author: songliy <songliy@isoftstone.com>
+Date:   Mon Oct 18 18:53:21 2021 +0800
+
+    适配master代码
+    
+    Signed-off-by: licheng.li <licheng.li@huawei.com>
+
+[33mcommit 7abbefd28c7c7e28b13d3aaa3b932f3298c9c201[m
+Author: songliy <songliy@isoftstone.com>
+Date:   Mon Oct 18 17:32:42 2021 +0800
+
+    多模验证binder step02
+    
+    Signed-off-by: licheng.li <licheng.li@huawei.com>
+
+[33mcommit fbdca66a1109647a34a8205c5112832cbf74a72d[m
+Author: songliy <songliy@isoftstone.com>
+Date:   Mon Oct 18 17:30:39 2021 +0800
+
+    多模验证binder step01
+    
+    Signed-off-by: licheng.li <licheng.li@huawei.com>
+
+[33mcommit bc6cb236ad5ffb242b4a72decc7bef5481b850bb[m
+Merge: 1a1a989 77fff28
+Author: openharmony_ci <7387629+openharmony_ci@user.noreply.gitee.com>
+Date:   Mon Oct 18 06:28:19 2021 +0000
+
+    !22 samgr part name rectify
+    Merge pull request !22 from zmx/master-dev
+
+[33mcommit 77fff286e3c082843e65945cdbaede430cc22963[m
+Author: zmx <1029211721@qq.com>
+Date:   Mon Oct 18 12:14:08 2021 +0800
+
+    samgr part name rectify
+    
+    Signed-off-by: zmx <1029211721@qq.com>
+    Change-Id: I699a09a547bda8ea16ea95aab558f0244a0d7e13
+
+[33mcommit 1a1a98985507fb7c6368b067f96f18c64423ac97[m
+Merge: 0060202 3d6a1c5
+Author: openharmony_ci <7387629+openharmony_ci@user.noreply.gitee.com>
+Date:   Tue Sep 28 08:34:38 2021 +0000
+
+    !15 修改multimodalinput_input仓的OAT扫描配置
+    Merge pull request !15 from SUE/master
+
+[33mcommit 3d6a1c55ca41190b598dd9e903cc2e0a1ca8ee8f[m
+Author: SUE <huiyuehong@huawei.com>
+Date:   Tue Sep 28 08:20:55 2021 +0000
+
+    git commit -sm "Signed-off-by:hellohyh001<huiyuehong@huawei.com>"
+
+[33mcommit 0060202ec975464fc43f096a6b03c9a92a07c4f7[m
+Merge: a35194d 12154e4
+Author: openharmony_ci <7387629+openharmony_ci@user.noreply.gitee.com>
+Date:   Tue Sep 7 09:18:34 2021 +0000
+
+    !12 多模添加//third_party/eudev:udevadm"进程支持
+    Merge pull request !12 from addy.ke/master
+
+[33mcommit 12154e4e965808080de28a1ddea469aa2d490470[m
+Author: Addy Ke <kefx_turz@163.com>
+Date:   Tue Sep 7 09:06:29 2021 +0800
+
+    buildin: add udevadm
+    
+    Signed-off-by: Addy Ke <kefx_turz@163.com>
+    Change-Id: Ie2b05bf59a96d22afcff422dfc46a9c021a16652
+
+[33mcommit a35194dd64cc02900d472140915d271f8f8b1c97[m[33m ([m[1;33mtag: OpenHarmony-v3.0-Beta1[m[33m)[m
+Merge: 3f420d3 87f211d
+Author: openharmony_ci <7387629+openharmony_ci@user.noreply.gitee.com>
+Date:   Mon Aug 2 06:09:57 2021 +0000
+
+    !8 OAT 文件刷新
+    Merge pull request !8 from dengyi2021/master
+
+[33mcommit 87f211d3952d09b52c2e52415b70f252b25b4125[m
+Author: dengyi2021 <dengyi14@huawei.com>
+Date:   Mon Aug 2 04:43:25 2021 +0000
+
+    update OAT.xml.
+    Signed-off-by: dengyi2021 <dengyi14@huawei.com>
+
+[33mcommit 51d22443fbf0b257f3165707bafcdbafbed82d36[m
+Author: dengyi2021 <dengyi14@huawei.com>
+Date:   Mon Aug 2 04:40:25 2021 +0000
+
+    add OAT.xml.
+    Signed-off-by: dengyi2021 <dengyi14@huawei.com>
+
+[33mcommit 3f420d36c1d8dae0bc371176d321d809904d46ae[m[33m ([m[1;33mtag: OpenHarmony-v2.2-Beta2[m[33m)[m
+Merge: 21dde8e f61df87
+Author: openharmony_ci <7387629+openharmony_ci@user.noreply.gitee.com>
+Date:   Fri Jul 9 09:32:12 2021 +0000
+
+    !6 启动时序问题解决
+    Merge pull request !6 from dengyi2021/master
+
+[33mcommit f61df876a9239a0a8ea01e7d4956b447e7e55291[m
+Author: dengyi2021 <dengyi14@huawei.com>
+Date:   Fri Jul 9 14:45:36 2021 +0800
+
+    using a rc
+    
+    Signed-off-by: dengyi2021 <dengyi14@huawei.com>
+
+[33mcommit 21dde8e58aec351eb37e6a8b1ef38b496e667d03[m
+Merge: 9156050 d5f2d08
+Author: openharmony_ci <7387629+openharmony_ci@user.noreply.gitee.com>
+Date:   Wed Jul 7 07:46:33 2021 +0000
+
+    !5 适配不同分辨率
+    Merge pull request !5 from dengyi2021/master
+
+[33mcommit d5f2d08733a38f59eaf523697ab760d31715f014[m
+Author: dengyi2021 <dengyi14@huawei.com>
+Date:   Tue Jul 6 19:46:10 2021 +0800
+
+    适配不同分辨率
+    
+    Signed-off-by: dengyi2021 <dengyi14@huawei.com>
+
+[33mcommit 9156050af09f3105598b902221c64d1ce4f5bd31[m
+Merge: 82d012a 587a7ff
+Author: openharmony_ci <7387629+openharmony_ci@user.noreply.gitee.com>
+Date:   Sat Jun 26 10:10:08 2021 +0000
+
+    !3 MUSL编译器适配
+    Merge pull request !3 from dengyi2021/master
+
+[33mcommit 587a7ff03ff555a97dd8c7b5279e3aac3da507d9[m
+Author: dengyi <dengyi14@huawei.com>
+Date:   Sat Jun 26 15:40:04 2021 +0800
+
+    Adaptive musl compiler
+    
+    Signed-off-by: dengyi <dengyi14@huawei.com>
+
+[33mcommit 82d012af7499888828ab8c11c0220a87cb237350[m[33m ([m[1;31morigin/OpenHarmony-v2.2-Beta[m[33m)[m
+Merge: 5eddaf1 bd1059f
+Author: openharmony_ci <7387629+openharmony_ci@user.noreply.gitee.com>
+Date:   Fri Jun 18 16:16:08 2021 +0800
+
+    !1 input L1-L2 code sync
+    Merge pull request !1 from 黄凯/master
+
+[33mcommit bd1059f1986d8218e363f39f1d5722c51114bf31[m
+Author: huangkai71 <huangkai71@huawei.com>
+Date:   Fri Jun 18 02:21:27 2021 +0000
+
+    L1-L2 code sync
+    
+    Signed-off-by: huangkai71 <huangkai71@huawei.com>
+
+[33mcommit 5eddaf1eb03af5d43639db27a4715ab665f56f2e[m[33m ([m[1;33mtag: OpenHarmony-2.0-Canary[m[33m)[m
+Author: mamingshuai <mamingshuai1@huawei.com>
+Date:   Wed Jun 2 00:06:16 2021 +0800
+
+    update OpenHarmony 2.0 Canary
+
+[33mcommit dd2561ac1e95629944393bbd49719c3662fe8691[m
+Author: 马明帅 <mamingshuai1@huawei.com>
+Date:   Tue Jun 1 18:56:20 2021 +0800
+
+    Initial commit

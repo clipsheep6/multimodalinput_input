@@ -29,7 +29,7 @@ extern "C" {
 #include <libinput-seat-export.h>
 }
 #else
-SurfaceInfo {
+struct SurfaceInfo {
     int surfaceId;
     int dstX;
     int dstY;
@@ -44,7 +44,7 @@ SurfaceInfo {
     int onLayerId;
 };
 
-LayerInfo {
+struct LayerInfo {
     int layerId;
     int dstX;
     int dstY;
@@ -58,26 +58,26 @@ LayerInfo {
     int visibility; // 0 or 1
     int onScreenId;
     int nSurfaces;
-    SurfaceInfo** surfaces;
+    struct SurfaceInfo** surfaces;
 };
 
-ScreenInfo {
+struct ScreenInfo {
     int screenId;
     char* connectorName;
     int width;
     int height;
     int nLayers;
-    LayerInfo** layers;
+    struct LayerInfo** layers;
 };
 
-SeatInfo {
+struct SeatInfo {
     char* seatName;
     int deviceFlags;
     int focusWindowId;
 };
 
-multimodal_libinput_event {
-    libinput_event *event;
+struct multimodal_libinput_event {
+    struct libinput_event *event;
     void *userdata;
 };
 
@@ -93,7 +93,7 @@ using ScreenInfoChangeListener = void (*)();
 void SetSeatListener(const SeatInfoChangeListener listener);
 void SetScreenListener(const ScreenInfoChangeListener listener);
 
-multimodal_libinput_event;
+struct multimodal_libinput_event;
 typedef void (*LibInputEventListener)(multimodal_libinput_event *event);
 namespace OHOS {
 namespace MMI {
@@ -102,14 +102,14 @@ void SetLibInputEventListener(const LibInputEventListener listener);
 }
 #endif
 
-MMISurfaceInfo : public SurfaceInfo {
+struct MMISurfaceInfo : public SurfaceInfo {
     int32_t screenId;
 };
 
 namespace OHOS {
 namespace MMI {
 
-MouseLocation {
+struct MouseLocation {
     int32_t globleX;
     int32_t globleY;
     int32_t localX;
