@@ -628,6 +628,7 @@ void OHOS::MMI::InputWindowsManager::TurnTouchScreen(PhysicalDisplayInfo* info, 
         return;
     } 
     if (direction == Direction180) {
+        MMI_LOGE("MMMMM %{public}d", __LINE__);
         logicalX = info->logicWidth - logicalX;
         logicalY = info->logicHeight - logicalY;
         return;
