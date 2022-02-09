@@ -482,7 +482,7 @@ void InputEventHandler::OnEventKeyboardTrace(const EventKeyboard& keyBoard)
     char keyUuid[MAX_UUIDSIZE] = {0};
     int32_t ret = memcpy_s(keyUuid, sizeof(keyUuid), keyBoard.uuid, sizeof(keyBoard.uuid));
     CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
-    MMI_LOGT(" OnEventKeyboard service reported keyUuid = %{public}s", keyUuid);
+    MMI_LOGT("OnEventKeyboard service reported keyUuid=%{public}s", keyUuid);
     std::string keyEvent = keyUuid;
     keyEvent = "OnEventKeyboard service reported keyUuid: " + keyEvent;
     int32_t eventKey = 1;
@@ -537,7 +537,7 @@ void InputEventHandler::OnEventPointerTrace(const EventPointer& point)
     char pointerUuid[MAX_UUIDSIZE] = {0};
     int32_t ret = memcpy_s(pointerUuid, sizeof(pointerUuid), point.uuid, sizeof(point.uuid));
     CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
-    MMI_LOGT(" OnEventPointer service reported pointerUuid = %{public}s", pointerUuid);
+    MMI_LOGT("OnEventPointer service reported pointerUuid=%{public}s", pointerUuid);
     std::string pointerEvent = pointerUuid;
     pointerEvent = "OnEventPointer service reported pointerUuid: " + pointerEvent;
     int32_t eventPointer = 17;
