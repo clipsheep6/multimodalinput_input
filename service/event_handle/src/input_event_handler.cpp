@@ -178,8 +178,8 @@ bool InputEventHandler::Init(UDSServer& udsServer)
             std::bind(&InputEventHandler::OnEventSwitchToggle, this, std::placeholders::_1)
         },
     };
-    for (auto& it : funs) {
-        CHKC(RegistrationEvent(it), EVENT_REG_FAIL);
+    for (auto &item : funs) {
+        CHKC(RegistrationEvent(item), EVENT_REG_FAIL);
     }
     return true;
 }
@@ -273,7 +273,7 @@ int32_t InputEventHandler::OnEventDeviceAdded(const multimodal_libinput_event& e
 {
     CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(ev.event);
-    inputDeviceManager->OnInputDeviceAdded(device);
+    InputDevMgr->OnInputDeviceAdded(device);
 
     uint64_t sysStartProcessTime = GetSysClockTime();
     DeviceManage deviceManage = {};
@@ -310,7 +310,7 @@ int32_t InputEventHandler::OnEventDeviceRemoved(const multimodal_libinput_event&
 {
     CHKR(ev.event, ERROR_NULL_POINTER, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(ev.event);
-    inputDeviceManager->OnInputDeviceRemoved(device);
+    InputDevMgr->OnInputDeviceRemoved(device);
 
     uint64_t sysStartProcessTime = GetSysClockTime();
     CHKR(udsServer_, ERROR_NULL_POINTER, RET_ERR);
@@ -403,7 +403,7 @@ int32_t InputEventHandler::OnKeyEventDispatch(const multimodal_libinput_event& e
         return KEY_EVENT_PKG_FAIL;
     }
 #ifndef OHOS_WESTEN_MODEL
-    if (INTERCEPTORMANAGERGLOBAL.OnKeyEvent(keyEvent_)) {
+    if (InterceptorMgrGbl.OnKeyEvent(keyEvent_)) {
         MMI_LOGD("key event filter find a key event from Original event keyCode : %{puiblic}d",
             keyEvent_->GetKeyCode());
         return RET_OK;
@@ -480,10 +480,8 @@ int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
 void InputEventHandler::OnEventKeyboardTrace(const EventKeyboard& keyBoard)
 {
     char keyUuid[MAX_UUIDSIZE] = {0};
-    if (EOK != memcpy_s(keyUuid, sizeof(keyUuid), keyBoard.uuid, sizeof(keyBoard.uuid))) {
-        MMI_LOGT("%{public}s copy data failed", __func__);
-        return;
-    }
+    int32_t ret = memcpy_s(keyUuid, sizeof(keyUuid), keyBoard.uuid, sizeof(keyBoard.uuid));
+    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
     MMI_LOGT(" OnEventKeyboard service reported keyUuid = %{public}s", keyUuid);
     std::string keyEvent = keyUuid;
     keyEvent = "OnEventKeyboard service reported keyUuid: " + keyEvent;
@@ -537,10 +535,8 @@ int32_t InputEventHandler::OnEventKeyboard(const multimodal_libinput_event& ev)
 void InputEventHandler::OnEventPointerTrace(const EventPointer& point)
 {
     char pointerUuid[MAX_UUIDSIZE] = {0};
-    if (EOK != memcpy_s(pointerUuid, sizeof(pointerUuid), point.uuid, sizeof(point.uuid))) {
-        MMI_LOGT("%{public}s copy data failed", __func__);
-        return;
-    }
+    int32_t ret = memcpy_s(pointerUuid, sizeof(pointerUuid), point.uuid, sizeof(point.uuid));
+    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
     MMI_LOGT(" OnEventPointer service reported pointerUuid = %{public}s", pointerUuid);
     std::string pointerEvent = pointerUuid;
     pointerEvent = "OnEventPointer service reported pointerUuid: " + pointerEvent;
@@ -658,10 +654,8 @@ int32_t InputEventHandler::OnEventTouchPadSecond(libinput_event *event)
 void InputEventHandler::OnEventTouchTrace(const EventTouch& touch)
 {
     char touchUuid[MAX_UUIDSIZE] = {0};
-    if (memcpy_s(touchUuid, sizeof(touchUuid), touch.uuid, sizeof(touch.uuid))) {
-        MMI_LOGT("%{public}s copy data failed", __func__);
-        return;
-    }
+    int32_t ret = memcpy_s(touchUuid, sizeof(touchUuid), touch.uuid, sizeof(touch.uuid));
+    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
     MMI_LOGT("OnEventTouch service reported touchUuid:%{public}s", touchUuid);
     std::string touchEvent = touchUuid;
     touchEvent = "OnEventTouch service reported touchUuid:" + touchEvent;

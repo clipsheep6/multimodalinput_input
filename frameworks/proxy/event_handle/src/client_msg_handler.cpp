@@ -205,11 +205,11 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     if (pressedKeys.empty()) {
         MMI_LOGI("Pressed keys is empty");
     } else {
-        for (int32_t keyCode : pressedKeys) {
-            MMI_LOGI("Pressed keyCode=%{public}d", keyCode);
+        for (auto &item : pressedKeys) {
+            MMI_LOGI("Pressed keyCode=%{public}d", item);
         }
     }
-    for (int32_t pointerId : pointerIds) {
+    for (auto &pointerId : pointerIds) {
         PointerEvent::PointerItem item;
         CHKR(pointerEvent->GetPointerItem(pointerId, item), PARAM_INPUT_FAIL, RET_ERR);
 
@@ -717,7 +717,7 @@ int32_t ClientMsgHandler::KeyEventFilter(const UDSClient& client, NetPacket& pkt
     int32_t deviceEventType = KEY_EVENT;
     event.Initialize(windowId, 0, 0, 0, 0, 0, key.state, key.key, 0, 0, key.uuid, key.eventType,
                      key.time, "", static_cast<int32_t>(key.deviceId), 0, key.deviceType, deviceEventType);
-    return inputFilterManager.OnKeyEvent(event, id);
+    return InputFilterMgr.OnKeyEvent(event, id);
 }
 
 int32_t ClientMsgHandler::TouchEventFilter(const UDSClient& client, NetPacket& pkt)
@@ -765,7 +765,7 @@ int32_t ClientMsgHandler::TouchEventFilter(const UDSClient& client, NetPacket& p
         static_cast<int32_t>(touchData.deviceId), 0, false, touchData.deviceType, deviceEventType);
 
     pkt >> id;
-    return inputFilterManager.OnTouchEvent(event, id);
+    return InputFilterMgr.OnTouchEvent(event, id);
 }
 
 int32_t ClientMsgHandler::PointerEventInterceptor(const UDSClient& client, NetPacket& pkt)
@@ -793,7 +793,7 @@ int32_t ClientMsgHandler::PointerEventInterceptor(const UDSClient& client, NetPa
         static_cast<float>(pointData.discrete.x), static_cast<float>(pointData.discrete.y),
         0, 0, 0, pointData.uuid, pointData.eventType, static_cast<int32_t>(pointData.time),
         "", static_cast<int32_t>(pointData.deviceId), 0, pointData.deviceType, eventJoyStickAxis);
-    return (inputFilterManager.OnPointerEvent(mouse_event, id));
+    return (InputFilterMgr.OnPointerEvent(mouse_event, id));
 }
 
 int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt)
@@ -840,7 +840,7 @@ int32_t ClientMsgHandler::TouchpadEventInterceptor(const UDSClient& client, NetP
     pkt >> pid >> id;
     MMI_LOGD("client receive the msg from server: pointId = %{public}d, pid = %{public}d",
              pointerEvent->GetPointerId(), pid);
-    return INTERCEPTORMANAGER.OnPointerEvent(pointerEvent, id);
+    return InterceptorMgr.OnPointerEvent(pointerEvent, id);
 }
 
 int32_t ClientMsgHandler::KeyEventInterceptor(const UDSClient& client, NetPacket& pkt)
@@ -855,7 +855,7 @@ int32_t ClientMsgHandler::KeyEventInterceptor(const UDSClient& client, NetPacket
     pkt >> pid;
     MMI_LOGD("client receive the msg from server: keyCode = %{public}d, pid = %{public}d",
         keyEvent->GetKeyCode(), pid);
-    return INTERCEPTORMANAGER.OnKeyEvent(keyEvent);
+    return InterceptorMgr.OnKeyEvent(keyEvent);
 }
 
 void ClientMsgHandler::AnalysisPointEvent(const UDSClient& client, NetPacket& pkt) const
@@ -1220,11 +1220,9 @@ void ClientMsgHandler::AnalysisGestureEvent(const UDSClient& client, NetPacket& 
 void ClientMsgHandler::TraceKeyEvent(const EventKeyboard& key) const
 {
     char keyUuid[MAX_UUIDSIZE] = {0};
-    if (EOK != memcpy_s(keyUuid, sizeof(keyUuid), key.uuid, sizeof(key.uuid))) {
-        MMI_LOGD("%{public}s copy data failed", __func__);
-        return;
-    }
-    MMI_LOGD(" nevent dispatcher of client: keyUuid = %{public}s", keyUuid);
+    int32_t ret = memcpy_s(keyUuid, sizeof(keyUuid), key.uuid, sizeof(key.uuid));
+    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
+    MMI_LOGT(" nevent dispatcher of client: keyUuid = %{public}s", keyUuid);
     std::string keyEvent = keyUuid;
     keyEvent = " nevent dispatcher of client keyUuid: " + keyEvent;
     int32_t eventKey = 1;
@@ -1234,11 +1232,9 @@ void ClientMsgHandler::TraceKeyEvent(const EventKeyboard& key) const
 void ClientMsgHandler::TracePointerEvent(const EventPointer& pointData) const
 {
     char pointerUuid[MAX_UUIDSIZE] = {0};
-    if (EOK != memcpy_s(pointerUuid, sizeof(pointerUuid), pointData.uuid, sizeof(pointData.uuid))) {
-        MMI_LOGE("%{public}s copy data failed", __func__);
-        return;
-    }
-    MMI_LOGD(" nevent dispatcher of client: pointerUuid = %{public}s", pointerUuid);
+    int32_t ret = memcpy_s(pointerUuid, sizeof(pointerUuid), pointData.uuid, sizeof(pointData.uuid));
+    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
+    MMI_LOGT(" nevent dispatcher of client: pointerUuid = %{public}s", pointerUuid);
     std::string pointerEvent = pointerUuid;
     pointerEvent = " nevent dispatcher of client pointerUuid: " + pointerEvent;
     int32_t eventPointer = 17;
@@ -1248,11 +1244,9 @@ void ClientMsgHandler::TracePointerEvent(const EventPointer& pointData) const
 void ClientMsgHandler::TraceTouchEvent(const EventTouch& touchData) const
 {
     char touchUuid[MAX_UUIDSIZE] = {0};
-    if (EOK != memcpy_s(touchUuid, sizeof(touchUuid), touchData.uuid, sizeof(touchData.uuid))) {
-        MMI_LOGE("%{public}s copy data failed", __func__);
-        return;
-    }
-    MMI_LOGD(" nevent dispatcher of client: touchUuid = %{public}s", touchUuid);
+    int32_t ret = memcpy_s(touchUuid, sizeof(touchUuid), touchData.uuid, sizeof(touchData.uuid));
+    CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
+    MMI_LOGT(" nevent dispatcher of client: touchUuid = %{public}s", touchUuid);
     std::string touchEventString = touchUuid;
     touchEventString = " nevent dispatcher of client touchUuid: " + touchEventString;
     int32_t eventTouch = 9;
