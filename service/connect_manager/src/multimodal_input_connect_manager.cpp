@@ -39,7 +39,7 @@ std::shared_ptr<MultimodalInputConnectManager> MultimodalInputConnectManager::Ge
         g_instance.reset(new MultimodalInputConnectManager());
     });
 
-    if (g_instance != nullptr)) {
+    if (g_instance != nullptr) {
         g_instance->ConnectMultimodalInputService();
     }
 
