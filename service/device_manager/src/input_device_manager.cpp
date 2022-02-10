@@ -35,7 +35,7 @@ void InputDeviceManager::Init(weston_compositor* wc)
         if (item == NULL) {
             continue;
         }
-        inputDeviceMap_.insert(std::pair<int32_t, libinput_device*>(nextId_,
+        inputDevice_.insert(std::pair<int32_t, libinput_device*>(nextId_,
             static_cast<struct libinput_device*>(devices[i])));
         nextId_++;
     }
@@ -64,7 +64,7 @@ std::vector<int32_t> InputDeviceManager::GetInputDeviceIdsSync(weston_compositor
     MMI_LOGI("GetDeviceIdList enter");
     Init(wc);
     std::vector<int32_t> ids;
-    for (const auto& it : inputDeviceMap_) {
+    for (const auto& it : inputDevice_) {
         ids.push_back(it.first);
     }
     return ids;
@@ -74,8 +74,8 @@ std::shared_ptr<InputDevice> InputDeviceManager::FindInputDeviceByIdSync(weston_
 {
     MMI_LOGI("FindDeviceByIdSync enter");
     Init(wc);
-    auto item = inputDeviceMap_.find(deviceId);
-    if (item == inputDeviceMap_.end()) {
+    auto item = inputDevice_.find(deviceId);
+    if (item == inputDevice_.end()) {
         return nullptr;
     }
 
@@ -94,8 +94,8 @@ std::shared_ptr<InputDevice> InputDeviceManager::FindInputDeviceByIdSync(weston_
 std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id)
 {
     MMI_LOGI("FindDeviceById enter");
-    auto item = inputDeviceMap_.find(id);
-    if (item == inputDeviceMap_.end()) {
+    auto item = inputDevice_.find(id);
+    if (item == inputDevice_.end()) {
         MMI_LOGE("find device by id failed");
         return nullptr;
     }
@@ -106,10 +106,9 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id)
         return nullptr;
     }
     inputDevice->SetId(item->first);
-    int32_t deviceType = static_cast<int32_t>(libinput_device_get_tags(
-        static_cast<struct libinput_device *>(item->second)));
+    int32_t deviceType = static_cast<int32_t>(libinput_device_get_tags(item->second));
     inputDevice->SetType(deviceType);
-    auto libinputDevice = static_cast<struct libinput_device *>(item->second);
+    auto libinputDevice = item->second;
     std::string name = libinput_device_get_name(libinputDevice);
     inputDevice->SetName(name);
     return inputDevice;
@@ -119,7 +118,7 @@ std::vector<int32_t> InputDeviceManager::GetInputDeviceIds()
 {
     MMI_LOGI("GetDeviceIdList enter");
     std::vector<int32_t> ids;
-    for (const auto &it : inputDeviceMap_) {
+    for (const auto &it : inputDevice_) {
         ids.push_back(it.first);
     }
     return ids;
@@ -133,13 +132,12 @@ void InputDeviceManager::OnInputDeviceAdded(libinput_device* inputDevice)
         return;
     }
 #endif
-    for (const auto& it : inputDeviceMap_) {
-        if (static_cast<struct libinput_device *>(it.second) == inputDevice) {
+    for (const auto& it : inputDevice_) {
+        if (it.second == inputDevice) {
             return;
         }
     }
-    inputDeviceMap_.insert(std::pair<int32_t, libinput_device*>(nextId_,
-        static_cast<struct libinput_device *>(inputDevice)));
+    inputDevice_[nextId_] = inputDevice;
     nextId_++;
 
     if (IsPointerDevice(static_cast<struct libinput_device *>(inputDevice))) {
@@ -155,9 +153,9 @@ void InputDeviceManager::OnInputDeviceRemoved(libinput_device* inputDevice)
         return;
     }
 #endif
-    for (auto it = inputDeviceMap_.begin(); it != inputDeviceMap_.end(); it++) {
+    for (auto it = inputDevice_.begin(); it != inputDevice_.end(); it++) {
         if (it->second == inputDevice) {
-            inputDeviceMap_.erase(it);
+            inputDevice_.erase(it);
             if (IsPointerDevice(inputDevice)) {
                 DrawWgr->TellDeviceInfo(false);
             }
@@ -181,8 +179,8 @@ int32_t InputDeviceManager::FindInputDeviceId(libinput_device* inputDevice)
         MMI_LOGI("Libinput_device is nullptr");
         return -1;
     }
-    for (const auto& it : inputDeviceMap_) {
-        if (static_cast<struct libinput_device *>(it.second) == inputDevice) {
+    for (const auto& it : inputDevice_) {
+        if (it.second == inputDevice) {
             MMI_LOGI("Find input device id success");
             return it.first;
         }
