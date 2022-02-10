@@ -34,11 +34,13 @@ public:
     void Initialize(MultimodalProperty &multimodalStruct,
         ManipulationProperty &manipulationProperty, TouchProperty touchProperty);
 
-    void SetMultimodalEvent(std::shared_ptr<MultimodalEvent> multimodalEvent) {
+    void SetMultimodalEvent(std::shared_ptr<MultimodalEvent> multimodalEvent)
+    {
         touchProperty_.multimodalEvent = multimodalEvent;
     }
 
-    const std::shared_ptr<MultimodalEvent> GetMultimodalEvent() {
+    const std::shared_ptr<MultimodalEvent> GetMultimodalEvent()
+    {
         return touchProperty_.multimodalEvent;
     }
 
@@ -53,6 +55,8 @@ public:
     virtual float GetTapCount();
 
     int GetPhase() override;
+
+    bool MarshallingSupplement(Parcel &parcel) const override;
 
     bool Marshalling(Parcel &parcel) const override;
     static TouchEvent *Unmarshalling(Parcel &parcel);

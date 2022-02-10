@@ -41,8 +41,8 @@ private:
     void OnDeath();
     void Clean();
     void NotifyDeath();
-    sptr<IMultimodalInputService> multimodalInputService_{nullptr};
-    sptr<IRemoteObject::DeathRecipient> multimodalRecipient_{nullptr};
+    sptr<IMultimodalInputService> multimodalInputService_ {nullptr};
+    sptr<IRemoteObject::DeathRecipient> multimodalRecipient_ {nullptr};
     std::mutex lock_;
 };
 } // namespace OHOS
