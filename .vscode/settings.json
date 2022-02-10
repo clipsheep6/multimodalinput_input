@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "xtree": "cpp",
+        "iosfwd": "cpp",
+        "xlocbuf": "cpp"
+    }
+}

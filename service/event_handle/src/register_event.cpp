@@ -220,7 +220,7 @@ int32_t RegisterEvent::OnEventPointButton(const int32_t buttonCode, const uint64
 {
     CHKF(buttonCode >= 0, PARAM_INPUT_INVALID);
     CHKF(timeNow > 0, PARAM_INPUT_INVALID);
-    CHKF(stateValue == 0 || stateValue == BIT1, PARAM_INPUT_INVALID);
+    CHKF((stateValue == 0) || (stateValue == BIT1), PARAM_INPUT_INVALID);
     if (buttonCode == BTN_MIDDLE && stateValue == BUTTON_STATE_PRESSED) {
         if (timeCount_ == 0) {
             timeCount_ = timeNow;
@@ -328,7 +328,7 @@ int32_t RegisterEvent::OnEventGestureUpdateGetSign(const EventGesture& gesture, 
 {
     CHKF(gesture.time >= gestureInfo_.beginTime, OHOS::PARAM_INPUT_INVALID);
     CHKF(gesture.fingerCount > 0, OHOS::PARAM_INPUT_INVALID);
-    if (!gestureInfo_.enabled || gestureInfo_.fingerCount != gesture.fingerCount) {
+    if ((!gestureInfo_.enabled) || (gestureInfo_.fingerCount != gesture.fingerCount)) {
         return RET_OK;
     }
     gestureInfo_.endTime = gesture.time;
