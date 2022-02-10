@@ -728,8 +728,8 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInputDeviceIds(SessionPtr sess, NetPacket
     int32_t size = ids.size();
     CHKR(pkt2.Write(taskId), STREAM_BUF_WRITE_FAIL, RET_ERR);
     CHKR(pkt2.Write(size), STREAM_BUF_WRITE_FAIL, RET_ERR);
-    for (auto it : ids) {
-        CHKR(pkt2.Write(it), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    for (const auto &item : ids) {
+        CHKR(pkt2.Write(item), STREAM_BUF_WRITE_FAIL, RET_ERR);
     }
     if (!sess->SendMsg(pkt2)) {
         MMI_LOGE("Sending failed!");
