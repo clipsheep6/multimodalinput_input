@@ -18,13 +18,13 @@ import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 module_output_path = "multimodalinput/unit_out"
 config("libmmi_util_public_config") {
   include_dirs = [
+    "//drivers/peripheral/input/interfaces/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
+    "//utils/native/base/include",
     "common/include",
     "network/include",
     "socket/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
-    "//drivers/peripheral/input/interfaces/include",
-    "//utils/native/base/include",
   ]
 
   cflags = [ "-DOHOS_BUILD" ]
@@ -85,22 +85,22 @@ ohos_shared_library("libmmi-util") {
 ohos_unittest("ut-mmi-util-out") {
   module_out_path = module_output_path
   include_dirs = [
-    "//utils/native/base/include",
     "//third_party/googletest/googletest/include",
+    "//utils/native/base/include",
+    "${mmi_path}/common/include",
+    "${mmi_path}/frameworks/proxy/event_handle",
+    "${mmi_path}/frameworks/proxy/event_handle/include",
+    "${mmi_path}/frameworks/proxy/module_loader",
+    "${mmi_path}/frameworks/proxy/module_loader/include",
     "${mmi_path}/frameworks/util/common",
     "${mmi_path}/frameworks/util/common/include",
     "${mmi_path}/frameworks/util/network",
     "${mmi_path}/frameworks/util/network/include",
     "${mmi_path}/frameworks/util/socket",
     "${mmi_path}/frameworks/util/socket/include",
-    "${mmi_path}/frameworks/proxy/event_handle",
-    "${mmi_path}/frameworks/proxy/event_handle/include",
-    "${mmi_path}/frameworks/proxy/module_loader",
-    "${mmi_path}/frameworks/proxy/module_loader/include",
-    "${mmi_path}/common/include",
     "${mmi_path}/interfaces/native/innerkits/common/include",
-    "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
   ]
 
   if (is_mmi_have_libinput) {
@@ -148,23 +148,23 @@ ohos_unittest("ut-mmi-util-out") {
 ohos_unittest("RunShellUtilTest") {
   module_out_path = module_output_path
   include_dirs = [
-    "//utils/native/base/include",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//third_party/googletest/googletest/include",
+    "//utils/native/base/include",
+    "${mmi_path}/common/include",
+    "${mmi_path}/frameworks/proxy/event_handle",
+    "${mmi_path}/frameworks/proxy/event_handle/include",
+    "${mmi_path}/frameworks/proxy/module_loader",
+    "${mmi_path}/frameworks/proxy/module_loader/include",
     "${mmi_path}/frameworks/util/common",
     "${mmi_path}/frameworks/util/common/include",
     "${mmi_path}/frameworks/util/network",
     "${mmi_path}/frameworks/util/network/include",
     "${mmi_path}/frameworks/util/socket",
     "${mmi_path}/frameworks/util/socket/include",
-    "${mmi_path}/frameworks/proxy/event_handle",
-    "${mmi_path}/frameworks/proxy/event_handle/include",
-    "${mmi_path}/frameworks/proxy/module_loader",
-    "${mmi_path}/frameworks/proxy/module_loader/include",
-    "${mmi_path}/common/include",
     "${mmi_path}/interfaces/native/innerkits/common/include",
-    "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
   ]
 
   if (is_mmi_have_libinput) {
