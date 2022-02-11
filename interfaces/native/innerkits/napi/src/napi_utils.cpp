@@ -16,7 +16,7 @@
 #include "napi_utils.h"
 
 namespace {
-int32_t IsMatchType(napi_value value, napi_valuetype type, napi_env env)
+[[maybe_unused]] int32_t IsMatchType(napi_value value, napi_valuetype type, napi_env env)
 {
     napi_valuetype paramType;
     napi_typeof(env, value, &paramType);
