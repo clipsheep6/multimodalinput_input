@@ -248,7 +248,7 @@ int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consum
     if (consumer == nullptr) {
         MMI_LOGE("InputManagerImpl::%{public}s param should not be null!", __func__);
         return InputEventMonitorManager::INVALID_MONITOR_ID;
-    }   
+    }
     int32_t monitorId = InputMonitorManager::GetInstance().AddMonitor(consumer);
     monitorId = monitorId * ADD_MASK_BASE + MASK_TOUCH;
     return monitorId;
