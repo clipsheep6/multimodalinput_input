@@ -26,28 +26,28 @@ namespace {
     return EVENT_OK;
 }
 
-napi_value GetNapiInt32_t(int32_t number, napi_env env)
+[[maybe_unused]] napi_value GetNapiInt32_t(int32_t number, napi_env env)
 {
     napi_value value;
     napi_create_int32(env, number, &value);
     return value;
 }
 
-int32_t GetCppInt32_t(napi_value value, napi_env env)
+[[maybe_unused]] int32_t GetCppInt32_t(napi_value value, napi_env env)
 {
     int32_t number;
     napi_get_value_int32(env, value, &number);
     return number;
 }
 
-bool GetCppBool(napi_value value, napi_env env)
+[[maybe_unused]] bool GetCppBool(napi_value value, napi_env env)
 {
     bool number = false;
     napi_get_value_bool(env, value, &number);
     return number;
 }
 
-void EmitAsyncCallbackWork(napi_env env, AsyncCallbackInfo *asyncCallbackInfo)
+[[maybe_unused]] void EmitAsyncCallbackWork(napi_env env, AsyncCallbackInfo *asyncCallbackInfo)
 {
     if (asyncCallbackInfo == nullptr) {
         return;
@@ -69,7 +69,7 @@ void EmitAsyncCallbackWork(napi_env env, AsyncCallbackInfo *asyncCallbackInfo)
     napi_queue_async_work(env, asyncCallbackInfo->asyncWork);
 }
 
-void EmitPromiseWork(napi_env env, AsyncCallbackInfo *asyncCallbackInfo)
+[[maybe_unused]] void EmitPromiseWork(napi_env env, AsyncCallbackInfo *asyncCallbackInfo)
 {
     if (asyncCallbackInfo == nullptr) {
         return;
