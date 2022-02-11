@@ -15,7 +15,6 @@
 
 #include "key_event.h"
 
-#include <memory>
 namespace OHOS {
 void KeyEvent::Initialize(MultimodalProperty &multimodalProperty, KeyProperty &keyProperty)
 {

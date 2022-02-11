@@ -14,8 +14,6 @@
  */
 
 #include "mmi_point.h"
-#include <iostream>
-
 #include "hilog/log.h"
 
 namespace OHOS {

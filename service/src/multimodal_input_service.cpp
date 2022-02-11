@@ -92,5 +92,4 @@ void MultimodalInputService::OnAddSystemAbility(int32_t systemAbilityId, const s
 void MultimodalInputService::OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
 }
-
 } // namespace OHOS
