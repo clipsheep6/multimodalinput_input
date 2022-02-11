@@ -25,7 +25,7 @@
 class VirtualTouchScreen : public VirtualDevice {
 public:
     VirtualTouchScreen(const uint32_t maxX, const uint32_t maxY);
-    virtual ~VirtualTouchScreen(){};
+    virtual ~VirtualTouchScreen() {};
 
 protected:
     virtual const std::vector<uint32_t>& GetEventTypes() const;
