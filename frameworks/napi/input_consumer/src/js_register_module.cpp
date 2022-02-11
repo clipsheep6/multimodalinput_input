@@ -87,20 +87,20 @@ static napi_value GetEventInfo(napi_env env, napi_callback_info info, KeyEventMo
     for (size_t i = 0; i < sortPrekeys.size(); i++){
         subKeyNames += std::to_string(sortPrekeys[i]);
         subKeyNames += ",";
-        MMI_LOGD("preKeys = %{public}d", preKeys[i]);
+        MMI_LOGD("preKeys:%{public}d", preKeys[i]);
     }
 
     int32_t finalKey = GetNamedPropertyInt32(env, argv[ARGV_SECOND], "finalKey");
     subKeyNames += std::to_string(finalKey);
     subKeyNames += ",";
     keyOption->SetFinalKey(finalKey);
-    MMI_LOGD("finalKey = %{public}d", finalKey);
+    MMI_LOGD("finalKey:%{public}d", finalKey);
     bool isFinalKeyDown = GetNamedPropertyBool(env, argv[ARGV_SECOND], "isFinalKeyDown");
     subKeyNames += std::to_string(isFinalKeyDown);
     subKeyNames += ",";
     keyOption->SetFinalKeyDown(isFinalKeyDown);
 
-    MMI_LOGD("isFinalKeyDown: %{public}d, map_key: %{public}s",
+    MMI_LOGD("isFinalKeyDown:%{public}d, map_key:%{public}s",
         (isFinalKeyDown == true?1:0), subKeyNames.c_str());
 
     int32_t finalKeyDownDuriation = GetNamedPropertyInt32(env, argv[ARGV_SECOND], "finalKeyDownDuration");
@@ -108,7 +108,7 @@ static napi_value GetEventInfo(napi_env env, napi_callback_info info, KeyEventMo
     subKeyNames += std::to_string(finalKeyDownDuriation);
     keyOption->SetFinalKeyDownDuration(finalKeyDownDuriation);
     event->eventType = subKeyNames;
-    MMI_LOGD("finalKeyDownDuriation = %{public}d", finalKeyDownDuriation);
+    MMI_LOGD("finalKeyDownDuriation:%{public}d", finalKeyDownDuriation);
 
     if (napi_create_reference(env, argv[ARGV_THIRD], 1, &event->callback[0]) != napi_ok) {
         MMI_LOGE("napi_create_reference failed");
@@ -244,16 +244,16 @@ static napi_value SubscribeKeyEventMonitor(napi_env env, napi_callback_info info
     }
 
     if (preSubscribeId <= 0) {
-        MMI_LOGD("eventType: %{public}s, eventName: %{public}s", event->eventType.c_str(),  event->name.c_str());
+        MMI_LOGD("eventType:%{public}s, eventName:%{public}s", event->eventType.c_str(),  event->name.c_str());
         int32_t subscribeId = -1;
         subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, SubKeyEventCallback);
         if (subscribeId < 0) {
-            MMI_LOGD("subscribeId invalid = %{public}d", subscribeId);
+            MMI_LOGD("subscribeId invalid:%{public}d", subscribeId);
             event->status = -1;
             EmitAsyncCallbackWork(event);
             return nullptr;
         }
-        MMI_LOGD("subscribeId = %{public}d", subscribeId);
+        MMI_LOGD("subscribeId:%{public}d", subscribeId);
         event->subscribeId = subscribeId;
     } else {
         event->subscribeId = preSubscribeId;
@@ -295,7 +295,7 @@ static napi_value UnsubscribeKeyEventMonitor(napi_env env, napi_callback_info in
     }
 
     int32_t response = MMI_STANDARD_EVENT_INVALID_PARAMETER;
-    MMI_LOGD("in for remove subscribeId = %{public}d", subscribeId);
+    MMI_LOGD("in for remove subscribeId:%{public}d", subscribeId);
     if (subscribeId > 0) {
         InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
     }

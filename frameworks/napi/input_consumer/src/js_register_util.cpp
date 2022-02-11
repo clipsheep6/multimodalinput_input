@@ -168,7 +168,7 @@ int32_t DelEventCallback(const napi_env &env, OHOS::MMI::CallbackMaps &callbackM
         MMI_LOGD("%{public}s has no callback function.", event->eventType.c_str());
         return JS_CALLBACK_EVENT_FAILED;
     }
-    MMI_LOGD("event=%{public}s, callbackMaps second size:%{public}d", event->eventType.c_str(),
+    MMI_LOGD("event:%{public}s, callbackMaps second size:%{public}d", event->eventType.c_str(),
         static_cast<int32_t>(iter->second.size()));
     auto it = iter->second.begin();
     while (it != iter->second.end()) {
@@ -187,13 +187,13 @@ int32_t DelEventCallback(const napi_env &env, OHOS::MMI::CallbackMaps &callbackM
             }
             delete monitorInfo;
             monitorInfo = nullptr;
-            MMI_LOGD("success. callback exists. size=%{public}d",
+            MMI_LOGD("success. callback exists. size:%{public}d",
                 static_cast<int32_t>(iter->second.size()));
             return JS_CALLBACK_EVENT_SUCCESS;
         }
         it++;
     }
-    MMI_LOGD("callback size=%{public}d", static_cast<int32_t>(iter->second.size()));
+    MMI_LOGD("callback size:%{public}d", static_cast<int32_t>(iter->second.size()));
     return JS_CALLBACK_EVENT_NOT_EXIST;
 }
 
