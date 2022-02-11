@@ -616,7 +616,7 @@ bool OHOS::MMI::InputWindowsManager::TransformTouchPointToDisplayPoint(libinput_
         return false;
     }
 
-    if (info->logicWidth <= 0 || info->logicHeight <= 0) {
+    if ((info->logicWidth <= 0) || (info->logicHeight <= 0)) {
         return false;
     }
     int32_t localPhysicalX = static_cast<int32_t>(libinput_event_touch_get_x_transformed(touch, info->width) + info->topLeftX);
@@ -661,7 +661,7 @@ bool OHOS::MMI::InputWindowsManager::TouchPadPointToDisplayPoint(libinput_event_
         return false;
     }
 
-    if (info->logicWidth <= 0 || info->logicHeight <= 0) {
+    if ((info->logicWidth <= 0) || (info->logicHeight <= 0)) {
         return false;
     }
     int32_t localPhysicalX = static_cast<int32_t>(libinput_event_touch_get_x_transformed(touch, info->width) + info->topLeftX);
@@ -682,11 +682,11 @@ bool OHOS::MMI::InputWindowsManager::TouchPadPointToDisplayPoint(libinput_event_
     }
 
     for (auto &display : logicalDisplays_) {
-        if (globalLogicalX < display.topLeftX || globalLogicalX > display.topLeftX + display.width) {
+        if ((globalLogicalX < display.topLeftX) || (globalLogicalX > display.topLeftX + display.width)) {
             continue;
         }
 
-        if (globalLogicalY < display.topLeftY || globalLogicalY > display.topLeftY + display.height) {
+        if ((globalLogicalY < display.topLeftY) || (globalLogicalY > display.topLeftY + display.height)) {
             continue;
         }
 

@@ -164,7 +164,7 @@ std::vector<std::string> InputManagerTest::SearchForLog(const std::string &comma
                 results.push_back(s);
             }
         }
-        if (noWait || !results.empty() || (--nTries <= 0)) {
+        if ((noWait) || (!results.empty()) || (--nTries <= 0)) {
             break;
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
@@ -501,7 +501,7 @@ void InputManagerTest::TestSimulateInputEvent(std::shared_ptr<PointerEvent> poin
                 states.set(3);
             }
         }
-        if (states.all() || (--nTries <= 0)) {
+        if ((states.all()) || (--nTries <= 0)) {
             break;
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
@@ -678,7 +678,7 @@ void InputManagerTest::TestSimulateInputEvent_2(std::shared_ptr<PointerEvent> po
                 states.set(2);
             }
         }
-        if (states.all() || (--nTries <= 0)) {
+        if ((states.all()) || ((--nTries <= 0))) {
             break;
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
@@ -1966,7 +1966,7 @@ void InputManagerTest::TestInputEventInterceptor(std::shared_ptr<PointerEvent> p
                 states.set(2);
             }
         }
-        if (states.all() || (--nTries <= 0)) {
+        if ((states.all()) || (--nTries <= 0)) {
             break;
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
@@ -2193,7 +2193,7 @@ void InputManagerTest::TestInputEventInterceptor2(std::shared_ptr<PointerEvent> 
                 states.set(3);
             }
         }
-        if (states.all() || (--nTries <= 0)) {
+        if ((states.all()) || (--nTries <= 0)) {
             break;
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));

@@ -68,7 +68,7 @@ void InputManagerImpl::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> 
     const std::vector<LogicalDisplayInfo> &logicalDisplays)
 {
     MMI_LOGD("enter");
-    if (physicalDisplays.empty() || logicalDisplays.empty()) {
+    if ((physicalDisplays.empty()) || (logicalDisplays.empty())) {
         MMI_LOGE("display info check failed! physicalDisplays size is %{public}d, logicalDisplays size is %{public}d",
             static_cast<int32_t>(physicalDisplays.size()), static_cast<int32_t>(logicalDisplays.size()));
         return;
@@ -365,7 +365,7 @@ void InputManagerImpl::OnConnected()
 {
     MMI_LOGD("enter");
 
-    if (physicalDisplays_.empty() || logicalDisplays_.empty()) {
+    if ((physicalDisplays_.empty()) || (logicalDisplays_.empty())) {
         MMI_LOGE("display info check failed! physicalDisplays_ size is %{public}d, logicalDisplays_ size is %{public}d",
             static_cast<int32_t>(physicalDisplays_.size()), static_cast<int32_t>(logicalDisplays_.size()));
         return;

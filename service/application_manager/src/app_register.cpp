@@ -179,7 +179,7 @@ WaitQueueEvent AppRegister::GetWaitQueueEvent(int32_t fd, int32_t idMsg)
 {
     std::lock_guard<std::mutex> lock(mu_);
     auto find_fun = [fd, idMsg](const WaitQueueEvent &ev) -> bool {
-        if (fd != ev.fd || idMsg != ev.event) {
+        if ((fd != ev.fd) || (idMsg != ev.event)) {
             return false;
         }
         return true;

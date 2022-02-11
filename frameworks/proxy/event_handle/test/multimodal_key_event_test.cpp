@@ -102,7 +102,7 @@ std::vector<std::string> MultimodalKeyEventTest::SearchForLog(const std::string 
                 results.push_back(item);
             }
         }
-        if (noWait || !results.empty() || (--nTries <= 0)) {
+        if ((noWait) || (!results.empty()) || (--nTries <= 0)) {
             break;
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));

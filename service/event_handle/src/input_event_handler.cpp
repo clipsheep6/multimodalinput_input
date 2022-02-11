@@ -1022,8 +1022,8 @@ bool InputEventHandler::OnSystemEvent(const KeyEventValueTransformations& temp,
             break;
         }
         case MMI_SYSTEM_SERVICE_AND_APP: {
-            if (OuterInterface::SystemEventHandler(temp, state, systemEventAttr) ||
-                OuterInterface::DistributedEventHandler(temp, state, systemEventAttr)) {
+            if ((OuterInterface::SystemEventHandler(temp, state, systemEventAttr)) ||
+                (OuterInterface::DistributedEventHandler(temp, state, systemEventAttr)) {
                 retCode = 1;
             }
             break;

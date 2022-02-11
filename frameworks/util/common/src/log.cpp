@@ -647,7 +647,7 @@ bool LogManager::Stop()
 
 bool LogManager::PushLog(LogDataPtr pLog)
 {
-    if (!runing_ || (pLog == nullptr)) {
+    if (((!runing_) || (pLog == nullptr)) {
         if (pLog != nullptr) {
             // 直接写到控制台
             WriteFile(pLog);
@@ -666,7 +666,7 @@ bool LogManager::PushLog(LogDataPtr pLog)
 
 bool LogManager::PushString(const int32_t level, const std::string& file, const int32_t line, const std::string& buf)
 {
-    if (buf.empty() || file.empty()) {
+    if ((buf.empty()) || (file.empty())) {
         LOGLOG("LogManager::PushString buf is empty or file is empty");
         return false;
     }
