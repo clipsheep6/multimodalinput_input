@@ -195,7 +195,7 @@ WaitQueueEvent AppRegister::GetWaitQueueEvent(int32_t fd, int32_t idMsg)
 bool AppRegister::CheckFindFdError(const int32_t findFd)
 {
     if (findFd < 0) {
-        MMI_LOGE(" IsMultimodeInputReady: Find fd error! errCode:%{public}d ", FD_FIND_FAIL);
+        MMI_LOGE(" IsMultimodeInputReady: Find fd error! errCode:%{public}d", FD_FIND_FAIL);
         return false;
     }
     return true;
@@ -204,7 +204,7 @@ bool AppRegister::CheckFindFdError(const int32_t findFd)
 bool AppRegister::CheckConnectionIsDead(const int32_t findFd)
 {
     if (mapConnectState_.find(findFd) == mapConnectState_.end()) {
-        MMI_LOGE("IsMultimodeInputReady: The connection is dead! fd:%{public}d errCode:%{public}d",
+        MMI_LOGE("IsMultimodeInputReady: The connection is dead! fd:%{public}d, errCode:%{public}d",
                  findFd, CONN_BREAK);
         return false;
     }
@@ -216,7 +216,7 @@ bool AppRegister::CheckWaitQueueBlock(ssize_t currentTime, ssize_t timeOut, cons
     for (auto iter = waitQueue_.begin(); iter != waitQueue_.end(); iter++) {
         if (findFd == iter->fd) {
             if (currentTime >= (iter->serverTime + timeOut)) {
-                MMI_LOGE("IsMultimodeInputReady: The wait queue is blocked! fd:%{public}d idMsg:%{public}d "
+                MMI_LOGE("IsMultimodeInputReady: The wait queue is blocked! fd:%{public}d, idMsg:%{public}d, "
                          "errCode:%{public}d", findFd, iter->event, WAITING_QUEUE_FULL);
                 waitQueue_.erase(iter);
                 return false;
@@ -240,7 +240,7 @@ void AppRegister::DeleteEventFromWaitQueue(int32_t fd, int32_t idMsg)
 
 bool AppRegister::OnAnrLocked(int32_t fd) const
 {
-    MMI_LOGE("Dispatch Timeout! The Application Not Responding !!! The fd is %{public}d. errCode:%{public}d ",
+    MMI_LOGE("Dispatch Timeout. The Application Not Responding. fd:%{public}d, errCode:%{public}d ",
              fd, APP_NOT_RESP);
     return true;
 }
