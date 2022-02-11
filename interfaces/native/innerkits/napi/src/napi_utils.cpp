@@ -15,7 +15,8 @@
 
 #include "napi_utils.h"
 
-static int32_t IsMatchType(napi_value value, napi_valuetype type, napi_env env)
+namespace {
+int32_t IsMatchType(napi_value value, napi_valuetype type, napi_env env)
 {
     napi_valuetype paramType;
     napi_typeof(env, value, &paramType);
@@ -25,28 +26,28 @@ static int32_t IsMatchType(napi_value value, napi_valuetype type, napi_env env)
     return EVENT_OK;
 }
 
-static napi_value GetNapiInt32_t(int32_t number, napi_env env)
+napi_value GetNapiInt32_t(int32_t number, napi_env env)
 {
     napi_value value;
     napi_create_int32(env, number, &value);
     return value;
 }
 
-static int32_t GetCppInt32_t(napi_value value, napi_env env)
+int32_t GetCppInt32_t(napi_value value, napi_env env)
 {
     int32_t number;
     napi_get_value_int32(env, value, &number);
     return number;
 }
 
-static bool GetCppBool(napi_value value, napi_env env)
+bool GetCppBool(napi_value value, napi_env env)
 {
     bool number = false;
     napi_get_value_bool(env, value, &number);
     return number;
 }
 
-static void EmitAsyncCallbackWork(napi_env env, AsyncCallbackInfo *asyncCallbackInfo)
+void EmitAsyncCallbackWork(napi_env env, AsyncCallbackInfo *asyncCallbackInfo)
 {
     if (asyncCallbackInfo == nullptr) {
         return;
@@ -68,7 +69,7 @@ static void EmitAsyncCallbackWork(napi_env env, AsyncCallbackInfo *asyncCallback
     napi_queue_async_work(env, asyncCallbackInfo->asyncWork);
 }
 
-static void EmitPromiseWork(napi_env env, AsyncCallbackInfo *asyncCallbackInfo)
+void EmitPromiseWork(napi_env env, AsyncCallbackInfo *asyncCallbackInfo)
 {
     if (asyncCallbackInfo == nullptr) {
         return;
@@ -85,4 +86,5 @@ static void EmitPromiseWork(napi_env env, AsyncCallbackInfo *asyncCallbackInfo)
         },
         (void*)asyncCallbackInfo, &asyncCallbackInfo->asyncWork);
     napi_queue_async_work(env, asyncCallbackInfo->asyncWork);
+}
 }
