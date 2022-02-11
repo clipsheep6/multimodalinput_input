@@ -73,10 +73,6 @@ int32_t InputManager::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> 
 
 int32_t InputManager::AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor)
 {
-    if (monitor == nullptr) {
-        MMI_LOGE("InputManager::%{public}s param should not be null!", __func__);
-        return InputEventMonitorManager::INVALID_MONITOR_ID;
-    }
     return InputManagerImpl::GetInstance()->AddMontior(monitor);
 }
 
