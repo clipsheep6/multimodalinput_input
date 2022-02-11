@@ -14,7 +14,6 @@
  */
 
 #include "napi_utils.h"
-#include <iostream>
 
 int32_t IsMatchType(napi_value value, napi_valuetype type, napi_env env)
 {

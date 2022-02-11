@@ -27,7 +27,7 @@ struct KeyBoardProperty {
     bool isThreeNonCharacters;
 };
 
-class KeyBoardEvent :public KeyEvent {
+class KeyBoardEvent : public KeyEvent {
 public:
     void Initialize(MultimodalProperty &multiProperty, KeyProperty &keyProperty, KeyBoardProperty &keyBoardProperty);
 
