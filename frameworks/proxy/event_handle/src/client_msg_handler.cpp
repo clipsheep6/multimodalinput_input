@@ -16,7 +16,6 @@
 #include <inttypes.h>
 #include <iostream>
 #include "mmi_func_callback.h"
-#include "auto_test_multimodal.h"
 #include "bytrace.h"
 #include "event_factory.h"
 #include "input_device_event.h"
@@ -1252,10 +1251,7 @@ void ClientMsgHandler::TracePointerEvent(const EventPointer& pointData) const
 void ClientMsgHandler::OnEventProcessed(int32_t eventId)
 {
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    if (client == nullptr) {
-        MMI_LOGE("Get MMIClint false");
-        return;
-    }
+    CHKP(client);
     NetPacket pkt(MmiMessageId::NEW_CHECK_REPLY_MESSAGE);
     pkt << eventId;
     CHK(client->SendMessage(pkt), MSG_SEND_FAIL);
