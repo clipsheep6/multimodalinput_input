@@ -21,7 +21,7 @@
 
 namespace OHOS {
 namespace MMI {
-class JsInputDeviceManager : public EventTarget, public std::enable_shared_from_this<JsInputDeviceManager> {
+class JsInputDeviceManager : public JsEventTarget, public std::enable_shared_from_this<JsInputDeviceManager> {
 public:
     void ResetEnv();
     void GetDeviceIdsAsync(napi_env env, napi_value handle);

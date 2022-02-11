@@ -33,7 +33,7 @@ void JsInputDeviceManager::GetDeviceAsync(int32_t id, napi_env env, napi_value h
 
 void JsInputDeviceManager::ResetEnv()
 {
-    EventTarget::ResetEnv();
+    JsEventTarget::ResetEnv();
 }
 } // namespace MMI
 } // namespace OHOS

@@ -26,7 +26,7 @@
 
 namespace OHOS {
 namespace MMI {
-class EventTarget {
+class JsEventTarget {
 public:
     static void EmitJsIdsAsync(std::vector<int32_t> ids);
     static void EmitJsDevAsync(std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device);
