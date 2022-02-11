@@ -24,7 +24,7 @@ namespace {
     constexpr uint32_t COMMON = 0xD002800;
 }
 static constexpr HiviewDFX::HiLogLabel MMI_COMMON_LABEL = { LOG_CORE, COMMON, "MMI" };
-const std::string DOUBLE_COLON = "::";
+constexpr std::string DOUBLE_COLON = "::";
 #if defined(DEBUG)
 #define MMI_LOGD(fmt, ...) \
     OHOS::HiviewDFX::HiLog::Debug(MMI_COMMON_LABEL, "File:%{public}s, Line:%{public}d, Function:%{public}s" fmt, \
