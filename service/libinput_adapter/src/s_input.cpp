@@ -30,7 +30,7 @@ namespace OHOS::MMI {
         static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SInput" };
     }
 
-static void HiLogFunc(struct libinput* input, enum libinput_log_priority priority, const char* fmt, va_list args)
+static void HiLogFunc(libinput* input, enum libinput_log_priority priority, const char* fmt, va_list args)
 {
     char buffer[256];
     (void)vsnprintf_s(buffer, sizeof(buffer), sizeof(buffer) - 1, fmt, args);
@@ -38,7 +38,7 @@ static void HiLogFunc(struct libinput* input, enum libinput_log_priority priorit
     va_end(args);
 }
 
-static void InitHiLogFunc(struct libinput* input)
+static void InitHiLogFunc(libinput* input)
 {
     static bool initFlag = false;
     if (initFlag) {
@@ -145,7 +145,7 @@ void OHOS::MMI::SInput::OnEventHandler()
 {
     CHK(funInputEvent_, ERROR_NULL_POINTER);
 #ifndef OHOS_WESTEN_MODEL
-    struct multimodal_libinput_event ev = { nullptr, nullptr };
+    multimodal_libinput_event ev = { nullptr, nullptr };
     while ((ev.event = libinput_get_event(input_))) {
         funInputEvent_(&ev);
         libinput_event_destroy(ev.event);
