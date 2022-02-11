@@ -19,8 +19,8 @@ config("virtual_device_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "include",
     "//utils/native/base/include",
+    "include",
   ]
 
   cflags = [
@@ -56,8 +56,8 @@ config("virtual_device_config") {
 
 config("virtual_device_public_config") {
   include_dirs = [
-    "include",
     "//utils/native/base/include",
+    "include",
   ]
 }
 
@@ -118,7 +118,6 @@ module_output_path = "multimodalinput/unit_out"
 ohos_unittest("ut-virtual-device-out") {
   module_out_path = module_output_path
   include_dirs = [
-    "${mmi_path}/tools/virtual_device_manager/include",
     "//utils/native/base/include",
     "${mmi_path}/common/include",
     "${mmi_path}/frameworks/util/common",
@@ -127,6 +126,7 @@ ohos_unittest("ut-virtual-device-out") {
     "${mmi_path}/frameworks/util/network/include",
     "${mmi_path}/frameworks/util/socket",
     "${mmi_path}/frameworks/util/socket/include",
+    "${mmi_path}/tools/virtual_device_manager/include",
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
