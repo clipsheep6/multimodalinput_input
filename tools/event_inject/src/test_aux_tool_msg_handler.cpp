@@ -19,8 +19,8 @@
 #include "proto.h"
 #include "time_cost_chk.h"
 
-using namespace OHOS::MMI;
-
+namespace OHOS {
+namespace MMI {
 namespace {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TestAuxToolMsgHandler" };
 }
@@ -42,7 +42,7 @@ bool TestAuxToolMsgHandler::Init()
 void TestAuxToolMsgHandler::OnMsgHandler(const UDSClient &client, NetPacket &pkt)
 {
     const MmiMessageId id = pkt.GetMsgId();
-    OHOS::MMI::TimeCostChk chk("TestAuxToolMsgHandler::OnMsgHandler", "overtime 200(us)", CHECK_TIME, id);
+    TimeCostChk chk("TestAuxToolMsgHandler::OnMsgHandler", "overtime 200(us)", CHECK_TIME, id);
     auto fun = GetFun(id);
     if (!fun) {
         MMI_LOGE("TestAuxToolMsgHandler::OnMsgHandler Unknown msg id[%{public}d]. errCode:%{public}d",
@@ -69,7 +69,7 @@ int32_t TestAuxToolMsgHandler::OnAiServerReply([[maybe_unused]] const UDSClient 
     return RET_OK;
 }
 
-int32_t OHOS::MMI::TestAuxToolMsgHandler::OnHdiServerReply([[maybe_unused]] const UDSClient& client, NetPacket& pkt)
+int32_t TestAuxToolMsgHandler::OnHdiServerReply([[maybe_unused]] const UDSClient& client, NetPacket& pkt)
 {
     int32_t replyCode = 0;
     pkt >> replyCode;
@@ -81,3 +81,5 @@ int32_t OHOS::MMI::TestAuxToolMsgHandler::OnHdiServerReply([[maybe_unused]] cons
     MMI_LOGI("hdi inject successed.");
     return RET_OK;
 }
+} // namespace MMI
+} // namespace OHOS
