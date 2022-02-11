@@ -50,7 +50,7 @@ int32_t MultimodalStandardizedEventManager::RegisterStandardizedEventHandle(cons
     auto range = mapEvents_.equal_range(messageId);
     for (auto it = range.first; it != range.second; ++it) {
         if (it->second.eventCallBack == standardizedEventHandle) {
-            MMI_LOGE("Duplicate registration information, registration failed,errCode:%{public}d",
+            MMI_LOGE("Duplicate registration information, registration failed, errCode:%{public}d",
                      MMI_STANDARD_EVENT_EXIST);
             return OHOS::MMI_STANDARD_EVENT_EXIST;
         }
@@ -87,7 +87,7 @@ int32_t MultimodalStandardizedEventManager::UnregisterStandardizedEventHandle(co
 
     std::string registerhandle;
     if (!MakeRegisterHandle(typeId, windowId, registerhandle)) {
-        MMI_LOGE("Invalid unregistration parameter, typeId:%{public}d,windowId:%{public}d,errCode:%{public}d",
+        MMI_LOGE("Invalid unregistration parameter, typeId:%{public}d, windowId:%{public}d, errCode:%{public}d",
                  typeId, windowId, MMI_STANDARD_EVENT_INVALID_PARAMETER);
         return MMI_STANDARD_EVENT_INVALID_PARAMETER;
     }
@@ -101,7 +101,7 @@ int32_t MultimodalStandardizedEventManager::UnregisterStandardizedEventHandle(co
         }
     }
     if (!isHandleExist) {
-        MMI_LOGE("Unregistration does not exist, Unregistration failed. typeId:%{public}d,windowId:%{public}d,"
+        MMI_LOGE("Unregistration does not exist, Unregistration failed. typeId:%{public}d, windowId:%{public}d, "
                  "errCode:%{public}d", typeId, windowId, MMI_STANDARD_EVENT_NOT_EXIST);
         return MMI_STANDARD_EVENT_NOT_EXIST;
     }
@@ -158,7 +158,7 @@ int32_t OHOS::MMI::MultimodalStandardizedEventManager::OnKey(const OHOS::KeyEven
     MMI_LOGD("MultimodalStandardizedEventManagerkey::OnKey");
 #ifdef DEBUG_CODE_TEST
     if (event.GetDeviceUdevTags() == DEVICE_TYPE_VIRTUAL_KEYBOARD) {
-        MMI_LOGD("Inject, keyCode:%{public}d,action:%{public}d,revPid:%{public}d",
+        MMI_LOGD("Inject, keyCode:%{public}d, action:%{public}d, revPid:%{public}d",
             event.GetKeyCode(), event.IsKeyDown(), GetPid());
     }
 #endif
@@ -691,10 +691,10 @@ int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<P
     CHKR(pointerEvent, ERROR_NULL_POINTER, RET_ERR);
     pointerEvent->UpdateId();
     std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
-    MMI_LOGD("pointer event dispatcher of client:eventType:%{public}d,actionTime:%{public}d,"
-             "action:%{public}d,actionStartTime:%{public}d,"
-             "flag:%{public}d,pointerAction:%{public}d,sourceType:%{public}d,"
-             "VerticalAxisValue:%{public}.2f,HorizontalAxisValue:%{public}.2f,"
+    MMI_LOGD("pointer event dispatcher of client:eventType:%{public}d, actionTime:%{public}d, "
+             "action:%{public}d, actionStartTime:%{public}d, "
+             "flag:%{public}d, pointerAction:%{public}d, sourceType:%{public}d, "
+             "VerticalAxisValue:%{public}.2f, HorizontalAxisValue:%{public}.2f, "
              "pointerCount:%{public}d",
              pointerEvent->GetEventType(), pointerEvent->GetActionTime(),
              pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
@@ -708,9 +708,9 @@ int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<P
         OHOS::MMI::PointerEvent::PointerItem item;
         CHKR(pointerEvent->GetPointerItem(pointerId, item), PARAM_INPUT_FAIL, RET_ERR);
 
-        MMI_LOGD("downTime:%{public}d,isPressed:%{public}s,"
-                "globalX:%{public}d,globalY:%{public}d,localX:%{public}d,localY:%{public}d,"
-                "width:%{public}d,height:%{public}d,pressure:%{public}d",
+        MMI_LOGD("downTime:%{public}d, isPressed:%{public}s, "
+                "globalX:%{public}d, globalY:%{public}d, localX:%{public}d, localY:%{public}d, "
+                "width:%{public}d, height:%{public}d, pressure:%{public}d",
                  item.GetDownTime(), (item.IsPressed() ? "true" : "false"),
                  item.GetGlobalX(), item.GetGlobalY(), item.GetLocalX(), item.GetLocalY(),
                  item.GetWidth(), item.GetHeight(), item.GetPressure());

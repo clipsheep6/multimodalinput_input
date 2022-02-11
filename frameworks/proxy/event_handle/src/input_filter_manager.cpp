@@ -273,7 +273,7 @@ std::function<void(TouchEvent)> InputFilterManager::TouchEventFilter::GetHandler
 
 int32_t InputFilterManager::OnTouchEvent(TouchEvent event, int32_t id)
 {
-    MMI_LOGE("client on touch event call function handler, id=%{public}d", id);
+    MMI_LOGE("client on touch event call function handler, id:%{public}d", id);
     for (auto iter : touchEventFilterList_) {
         if (id == iter.GetId()) {
             iter.GetHandler()(event);

@@ -95,9 +95,9 @@ int32_t InterceptorManager::OnPointerEvent(std::shared_ptr<PointerEvent> pointer
     }
     PointerEvent::PointerItem pointer;
     CHKR(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer), PARAM_INPUT_FAIL, RET_ERR);
-    MMI_LOGD("interceptor-clienteventTouchpad:actionTime:%{public}d,"
-             "sourceType:%{public}d,pointerAction:%{public}d,"
-             "pointerId:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
+    MMI_LOGD("interceptor-clienteventTouchpad:actionTime:%{public}d, "
+             "sourceType:%{public}d, pointerAction:%{public}d, "
+             "pointerId:%{public}d, point.x:%{public}d, point.y:%{public}d, press:%{public}d",
              pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
              pointerEvent->GetPointerId(), pointer.GetGlobalX(), pointer.GetGlobalY(), pointer.IsPressed());
     InterceptorItem interceptorItem;

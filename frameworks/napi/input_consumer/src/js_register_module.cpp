@@ -241,7 +241,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
     }
 
     if (preSubscribeId < 0) {
-        MMI_LOGD("eventType:%{public}s,eventName:%{public}s", event->eventType.c_str(),  event->name.c_str());
+        MMI_LOGD("eventType:%{public}s, eventName:%{public}s", event->eventType.c_str(),  event->name.c_str());
         int32_t subscribeId = -1;
         subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, SubKeyEventCallback);
         if (subscribeId < 0) {
