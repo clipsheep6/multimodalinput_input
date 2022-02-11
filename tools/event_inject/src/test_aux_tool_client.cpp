@@ -20,9 +20,9 @@
 #include "proto.h"
 #include "util.h"
 
+namespace OHOS {
+namespace MMI {
 using namespace std;
-using namespace OHOS::MMI;
-
 namespace {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "TestAuxToolClient"};
 }
@@ -60,7 +60,7 @@ void TestAuxToolClient::OnDisconnected()
     MMI_LOGT("Disconnected from server... fd:%{public}d", GetFd());
 }
 
-void OHOS::MMI::TestAuxToolClient::OnThreadLoop()
+void TestAuxToolClient::OnThreadLoop()
 {
     MMI_LOGT("enter isConnected_:%{public}d", isConnected_);
     if (isConnected_) {
@@ -76,7 +76,7 @@ void TestAuxToolClient::OnConnected()
     MMI_LOGD("Connection to server succeeded... fd:%{public}d", GetFd());
 }
 
-uint32_t OHOS::MMI::TestAuxToolClient::GetAiSensorAllowProcCodes(uint32_t item) const
+uint32_t TestAuxToolClient::GetAiSensorAllowProcCodes(uint32_t item) const
 {
     static const vector<MmiMessageId> aiSensorAllowProcCodes {
     MmiMessageId::ON_SHOW_MENU,
@@ -117,7 +117,7 @@ uint32_t OHOS::MMI::TestAuxToolClient::GetAiSensorAllowProcCodes(uint32_t item) 
     return static_cast<uint32_t>(aiSensorAllowProcCodes[item]);
 }
 
-int32_t OHOS::MMI::TestAuxToolClient::Socket()
+int32_t TestAuxToolClient::Socket()
 {
     MMI_LOGT("enter");
     const int32_t ret = MultimodalInputConnectManager::GetInstance()->
@@ -137,7 +137,9 @@ int32_t OHOS::MMI::TestAuxToolClient::Socket()
     return fd_;
 }
 
-bool OHOS::MMI::TestAuxToolClient::IsFirstConnectFailExit()
+bool TestAuxToolClient::IsFirstConnectFailExit()
 {
     return true;
 }
+} // namespace MMI
+} // namespace OHOS

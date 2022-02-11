@@ -15,10 +15,10 @@
 #include <gtest/gtest.h>
 #include "virtual_device.h"
 
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
-using namespace OHOS::MMI;
-
 class VirtualDeviceTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
@@ -269,7 +269,7 @@ HWTEST_F(VirtualDeviceTest, Test_FunctionalShunt_closeTrue01, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
     std::string symbolFileTest;
-    symbolFileTest.append(OHOS::MMI::g_folderpath).append("1111111").append("_").append("testDevice");
+    symbolFileTest.append(g_folderpath).append("1111111").append("_").append("testDevice");
     std::ofstream flagFile;
     flagFile.open(symbolFileTest.c_str());
 
@@ -361,3 +361,5 @@ HWTEST_F(VirtualDeviceTest, Test_SetUp_01, TestSize.Level1)
     EXPECT_TRUE(ret);
 }
 }
+} // namespace MMI
+} // namespace OHOS
