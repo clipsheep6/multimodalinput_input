@@ -25,7 +25,6 @@
 
 namespace OHOS {
 namespace MMI {
-
 class JsInputMonitorManager {
 public:
     static JsInputMonitorManager& GetInstance();
