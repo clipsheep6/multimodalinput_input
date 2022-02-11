@@ -593,7 +593,8 @@ OHOS::MMI::PhysicalDisplayInfo* OHOS::MMI::InputWindowsManager::GetPhysicalDispl
     return nullptr;
 }
 
-OHOS::MMI::PhysicalDisplayInfo* OHOS::MMI::InputWindowsManager::FindPhysicalDisplayInfo(const std::string seatId, const std::string seatName)
+OHOS::MMI::PhysicalDisplayInfo* OHOS::MMI::InputWindowsManager::FindPhysicalDisplayInfo(const std::string seatId,
+    const std::string seatName)
 {
     for (auto &it : physicalDisplays_) {
         if (it.seatId == seatId && it.seatName == seatName) {
@@ -607,7 +608,7 @@ bool OHOS::MMI::InputWindowsManager::TransformTouchPointToDisplayPoint(libinput_
     int32_t& targetDisplayId, int32_t& displayX, int32_t& displayY)
 {
     CHKPF(touch, ERROR_NULL_POINTER);
-    auto info = FindPhysicalDisplayInfo("seat0","default0");
+    auto info = FindPhysicalDisplayInfo("seat0", "default0");
     CHKPF(info);
 
     if ((info->width <= 0) || (info->height <= 0) || (info->logicWidth <= 0) || (info->logicHeight <= 0)) {
@@ -689,7 +690,8 @@ bool OHOS::MMI::InputWindowsManager::IsTouchWindow(int32_t x, int32_t y, const W
         (y <= (info.topLeftY + info.height));
 }
 
-void OHOS::MMI::InputWindowsManager::AdjustGlobalCoordinate(int32_t& globalX, int32_t& globalY, int32_t width, int32_t height)
+void OHOS::MMI::InputWindowsManager::AdjustGlobalCoordinate(int32_t& globalX, int32_t& globalY,
+    int32_t width, int32_t height)
 {
     if (globalX <= 0) {
         globalX = 0;
@@ -903,7 +905,8 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<
     MMI_LOGD("the pid :%{public}d, the fd :%{public}d, the globalX01 : %{public}d, "
              "the globalY01 : %{public}d, the localX : %{public}d, the localY : %{public}d,"
              "the TargetWindowId : %{public}d, the AgentWindowId : %{public}d",
-            touchWindow->pid, fd, globalX, globalY, localX, localY, pointerEvent->GetTargetWindowId(), pointerEvent->GetAgentWindowId());
+             touchWindow->pid, fd, globalX, globalY, localX, localY,
+             pointerEvent->GetTargetWindowId(), pointerEvent->GetAgentWindowId());
     return fd;
 }
 
