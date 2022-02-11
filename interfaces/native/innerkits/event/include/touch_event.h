@@ -56,7 +56,7 @@ public:
 
     int GetPhase() override;
 
-    bool MarshallingSupplement(Parcel &parcel) const override;
+    bool MarshallingSupplement(Parcel &parcel) const;
 
     bool Marshalling(Parcel &parcel) const override;
     static TouchEvent *Unmarshalling(Parcel &parcel);
