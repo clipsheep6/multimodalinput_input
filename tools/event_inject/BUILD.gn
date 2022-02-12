@@ -217,6 +217,5 @@ ohos_unittest("ut-event-injection-out") {
 
 group("ut-event-injection") {
   testonly = true
-  deps = []
-  deps += [ ":ut-event-injection-out" ]
+  deps = [ ":ut-event-injection-out" ]
 }

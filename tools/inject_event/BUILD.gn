@@ -24,10 +24,10 @@ ohos_executable("inject_event_zhu") {
   ]
 
   include_dirs = [
-    "include",
-    "$SUBSYSTEM_FRAMEWORKS_DIR/test/tools/inject_event/include",
-    "out\ohos-arm-release\innerkits\ohos-arm\utils_base\utils\include\include\string_ex.h",
     "$SUBSYSTEM_DIR/interfaces/native/innerkits/multimodalinput_proxy/include",
+    "$SUBSYSTEM_FRAMEWORKS_DIR/test/tools/inject_event/include",
+    "include",
+    "out\ohos-arm-release\innerkits\ohos-arm\utils_base\utils\include\include\string_ex.h",
   ]
 
   cflags = [ "-DOHOS_BUILD" ]

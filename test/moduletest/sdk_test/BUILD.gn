@@ -19,8 +19,8 @@ module_output_path = "multimodalinput/moduletest_out"
 ohos_moduletest("sdk-test-out") {
   module_out_path = module_output_path
   include_dirs = [
-    "//foundation/multimodalinput/input/test/moduletest/include",
     "//foundation/multimodalinput/input/service/event_dump/include",
+    "//foundation/multimodalinput/input/test/moduletest/include",
   ]
 
   sources = [ "dfx_sdk_test.cpp" ]
