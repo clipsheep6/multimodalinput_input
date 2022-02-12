@@ -21,9 +21,9 @@ config("event_injection_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "include",
-    "//foundation/multimodalinput/input/common/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//foundation/multimodalinput/input/common/include",
+    "include",
   ]
 
   cflags = [
@@ -59,10 +59,10 @@ config("event_injection_config") {
 
 config("event_injection_public_config") {
   include_dirs = [
-    "include",
     "//third_party/FreeBSD/sys/dev/evdev",
     "//third_party/json/include",
     "//third_party/json/include/nlohmann",
+    "include",
   ]
 }
 
@@ -109,52 +109,52 @@ ohos_shared_library("event-injection") {
 ohos_unittest("ut-event-injection-out") {
   module_out_path = module_output_path
   include_dirs = [
-    "//drivers/peripheral/input/interfaces/include",
     "//drivers/adapter/uhdf2/adapter/osal/include",
-    "//utils/native/base/include",
+    "//drivers/peripheral/input/interfaces/include",
     "//third_party/googletest/googletest/include",
     "//third_party/wayland-ivi-extension/include",
+    "//utils/native/base/include",
+    "${mmi_path}/common/include",
+    "${mmi_path}/frameworks/proxy/event_handle",
+    "${mmi_path}/frameworks/proxy/event_handle/include",
+    "${mmi_path}/frameworks/proxy/module_loader",
+    "${mmi_path}/frameworks/proxy/module_loader/include",
     "${mmi_path}/frameworks/util/common",
     "${mmi_path}/frameworks/util/common/include",
     "${mmi_path}/frameworks/util/network",
     "${mmi_path}/frameworks/util/network/include",
     "${mmi_path}/frameworks/util/socket",
     "${mmi_path}/frameworks/util/socket/include",
-    "${mmi_path}/frameworks/proxy/event_handle",
-    "${mmi_path}/frameworks/proxy/event_handle/include",
-    "${mmi_path}/frameworks/proxy/module_loader",
-    "${mmi_path}/frameworks/proxy/module_loader/include",
-    "${mmi_path}/common/include",
     "${mmi_path}/interfaces/native/innerkits/common/include",
-    "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
-    "${mmi_path}/service/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/service/ai_sensor_adapter/include",
     "${mmi_path}/service/application_manager/include",
     "${mmi_path}/service/device_scalability/include",
     "${mmi_path}/service/event_dispatch/include",
     "${mmi_path}/service/event_handle/include",
     "${mmi_path}/service/event_standard/include",
-    "${mmi_path}/service/hdi_inject/include",
     "${mmi_path}/service/hdf_adapter/include",
+    "${mmi_path}/service/hdi_inject/include",
+    "${mmi_path}/service/include",
     "${mmi_path}/service/libinput_adapter/include",
     "${mmi_path}/service/message_handle/include",
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/tools/event_inject/include",
     "${mmi_path}/uinput",
-    "$HDF_FWKS/include/utils",
-    "$HDF_FWKS/include/osal",
-    "$HDF_FWKS/core/adapter/syscall/include",
-    "$HDF_FWKS/include/core",
     "$HDF_FWKS/ability/sbuf/include",
+    "$HDF_FWKS/core/adapter/syscall/include",
     "$HDF_FWKS/core/shared/include",
-    "$HDF_FWKS/utils/include",
+    "$HDF_FWKS/include/core",
+    "$HDF_FWKS/include/osal",
+    "$HDF_FWKS/include/utils",
     "$HDF_FWKS/inclue",
+    "$HDF_FWKS/utils/include",
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/src" ]
+    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
   sources = [
