@@ -560,7 +560,7 @@ void OHOS::MMI::InputWindowsManager::PrintDisplayDebugInfo()
     MMI_LOGD("window info,num:%{public}d", static_cast<int32_t>(windowInfos_.size()));
     for (const auto &item : windowInfos_) {
         MMI_LOGD("windowId:%{public}d, id:%{public}d, pid:%{public}d, uid:%{public}d, topLeftX:%{public}d, "
-            "topLeftY:%{public}d, width:%{public}d, height:%{public}d, display:%{public}d, agentWindowId:%{public}d"
+            "topLeftY:%{public}d, width:%{public}d, height:%{public}d, display:%{public}d, agentWindowId:%{public}d, "
             "winTopLeftX:%{public}d, winTopLeftY:%{public}d",
             item.first, item.second.id, item.second.pid, item.second.uid, item.second.topLeftX, item.second.topLeftY,
             item.second.width, item.second.height, item.second.displayId, item.second.agentWindowId,
@@ -852,6 +852,11 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
     }
     pointerEvent->SetTargetWindowId(focusWindow->id);
     pointerEvent->SetAgentWindowId(focusWindow->agentWindowId);
+    int32_t localX = globalX - focusWindow->winTopLeftX;
+    int32_t localY = globalY - focusWindow->winTopLeftY;
+    pointerItem.SetLocalX(localX);
+    pointerItem.SetLocalY(localY);
+    pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     auto fd = udsServer_->GetFdByPid(focusWindow->pid);
     auto size = pointerEvent->GetPressedButtons();
     MMI_LOGD("pressedButtons size:%{public}d, id:%{public}d, agentWindowId:%{public}d, pid:%{public}d, "
@@ -1056,7 +1061,7 @@ void OHOS::MMI::InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, doub
                 (isOutsideOfTopRightX != true) && (isOutsideOfTopRightY != true)) {
                 mouseLoction_.globleX = x;
                 mouseLoction_.globleY = y;
-                SetLocalInfo(integerX, integerY);
+                // SetLocalInfo(integerX, integerY);
                 break;
             }
         } else {
