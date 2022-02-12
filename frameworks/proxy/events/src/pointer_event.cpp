@@ -241,7 +241,58 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
 
 PointerEvent::PointerEvent(int32_t eventType) : InputEvent(eventType) {}
 
+PointerEvent::PointerEvent(const PointerEvent& other)
+    : InputEvent(other), pointerId_(other.pointerId_), pointers_(other.pointers_),
+    pressedButtons_(other.pressedButtons_), sourceType_(other.sourceType_),
+    pointerAction_(other.pointerAction_), buttonId_(other.buttonId_),
+    axes_(other.axes_), axisValues_(other.axisValues_),
+    pressedKeys_(other.pressedKeys_)
+{ }
+
+PointerEvent::PointerEvent(PointerEvent&& other)
+    : InputEvent(std::move(other)),
+    pointerId_(std::move(other.pointerId_)),
+    pointers_(std::move(other.pointers_)),
+    pressedButtons_(std::move(other.pressedButtons_)),
+    sourceType_(std::move(other.sourceType_)),
+    pointerAction_(std::move(other.pointerAction_)),
+    buttonId_(std::move(other.buttonId_)),
+    axes_(std::move(other.axes_)),
+    axisValues_(std::move(other.axisValues_)),
+    pressedKeys_(std::move(other.pressedKeys_))
+{ }
+
 PointerEvent::~PointerEvent() {}
+
+PointerEvent& PointerEvent::operator=(const PointerEvent& other)
+{
+    InputEvent::operator=(other);
+    pointerId_ = other.pointerId_;
+    pointers_ = other.pointers_;
+    pressedButtons_ = other.pressedButtons_;
+    sourceType_ = other.sourceType_;
+    pointerAction_ = other.pointerAction_;
+    buttonId_ = other.buttonId_;
+    axes_ = other.axes_;
+    axisValues_ = other.axisValues_;
+    pressedKeys_ = other.pressedKeys_;
+    return *this;
+}
+
+PointerEvent& PointerEvent::operator=(PointerEvent&& other)
+{
+    InputEvent::operator=(std::move(other));
+    pointerId_ = std::move(other.pointerId_);
+    pointers_ = std::move(other.pointers_);
+    pressedButtons_ = std::move(other.pressedButtons_);
+    sourceType_ = std::move(other.sourceType_);
+    pointerAction_ = std::move(other.pointerAction_);
+    buttonId_ = std::move(other.buttonId_);
+    axes_ = std::move(other.axes_);
+    axisValues_ = std::move(other.axisValues_);
+    pressedKeys_ = std::move(other.pressedKeys_);
+    return *this;
+}
 
 std::shared_ptr<PointerEvent> PointerEvent::Create()
 {
@@ -256,6 +307,43 @@ int32_t PointerEvent::GetPointerAction() const
 void PointerEvent::SetPointerAction(int32_t pointerAction)
 {
     pointerAction_ = pointerAction;
+}
+
+const char* PointerEvent::DumpPointerAction() const
+{
+    switch (pointerAction_) {
+        case PointerEvent::POINTER_ACTION_CANCEL:
+            return "cancel";
+        case PointerEvent::POINTER_ACTION_DOWN:
+            return "down";
+        case PointerEvent::POINTER_ACTION_MOVE:
+            return "move";
+        case PointerEvent::POINTER_ACTION_UP:
+            return "up";
+        case PointerEvent::POINTER_ACTION_AXIS_BEGIN:
+            return "axis-begin";
+        case PointerEvent::POINTER_ACTION_AXIS_UPDATE:
+            return "axis-update";
+        case PointerEvent::POINTER_ACTION_AXIS_END:
+            return "axis-end";
+        case PointerEvent::POINTER_ACTION_BUTTON_DOWN:
+            return "button-down";
+        case PointerEvent::POINTER_ACTION_BUTTON_UP:
+            return "button-up";
+        default:
+            break;
+    }
+    return "unknown";
+}
+
+void PointerEvent::SetSkipInspection(bool skipInspection)
+{
+    skipInspection_ = skipInspection;
+}
+
+bool PointerEvent::NeedSkipInspection()
+{
+    return skipInspection_;
 }
 
 int32_t PointerEvent::GetPointerId() const
@@ -352,6 +440,21 @@ int32_t PointerEvent::GetSourceType() const
 void PointerEvent::SetSourceType(int32_t sourceType)
 {
     sourceType_ = sourceType;
+}
+
+const char* PointerEvent::DumpSourceType() const
+{
+    switch (sourceType_) {
+        case PointerEvent::SOURCE_TYPE_MOUSE:
+            return "mouse";
+        case PointerEvent::SOURCE_TYPE_TOUCHSCREEN:
+            return "touch-screen";
+        case PointerEvent::SOURCE_TYPE_TOUCHPAD:
+            return "touch-pad";
+        default:
+            break;
+    }
+    return "unknown";
 }
 
 int32_t PointerEvent::GetButtonId() const
