@@ -17,16 +17,15 @@ config("libinputdevice_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "//foundation/multimodalinput/input/frameworks/napi/input_device/include",
     "//foundation/ace/napi",
     "//foundation/ace/napi/interfaces/kits/napi",
+    "//foundation/multimodalinput/input/common/include",
+    "//foundation/multimodalinput/input/frameworks/napi/input_device/include",
+    "//foundation/multimodalinput/input/tools/event_inject/include",
     "//third_party/node/src",
     "//third_party/quickjs",
     "//utils/native/base/include",
-    "//foundation/multimodalinput/input/common/include",
-    "//foundation/multimodalinput/input/tools/event_inject/include",
   ]
-
 
   cflags = [ "-DOHOS_BUILD" ]
   if (is_mmi_have_libinput) {
@@ -42,7 +41,7 @@ config("libinputdevice_config") {
   }
 }
 
-ohos_shared_library("libinputdevice") {
+ohos_shared_library("inputdevice") {
   sources = [
     "src/js_event_target.cpp",
     "src/js_input_device_context.cpp",
