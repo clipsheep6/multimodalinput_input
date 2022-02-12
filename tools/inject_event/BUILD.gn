@@ -35,11 +35,6 @@ ohos_executable("inject_event_zhu") {
     "-DOHOS_AUTO_TEST_FRAME",
   ]
 
-  #OHOS_deps = [
-  #  "shared_library:libbinder",
-  #  "ohos_prebuilt_shared_library:libutils",
-  #]
-
   deps = [
     "$SUBSYSTEM_FRAMEWORKS_DIR/proxy:libmmi-client",
     "$SUBSYSTEM_FRAMEWORKS_DIR/util:libmmi-util",
