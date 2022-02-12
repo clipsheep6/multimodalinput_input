@@ -35,8 +35,8 @@ int32_t KeyEventSubscriber::SubscribeKeyEvent(
 {
     MMI_LOGT("Enter");
     CHKR(subscribeId >= 0, PARAM_INPUT_INVALID, RET_ERR);
-    CHKPR(sess, ERROR_NULL_POINTER, RET_ERR);
-    CHKPR(keyOption, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    CHKPR(keyOption, ERROR_NULL_POINTER);
     int32_t preKeySize = keyOption->GetPreKeys().size();
     if (preKeySize > MAX_PRE_KEY_COUNT) {
         MMI_LOGE("Leave, pre key size %{public}d more than %{public}d", preKeySize, MAX_PRE_KEY_COUNT);
@@ -193,7 +193,7 @@ bool KeyEventSubscriber::AddTimer(const std::shared_ptr<Subscriber>& subscriber,
 void KeyEventSubscriber::ClearTimer(const std::shared_ptr<Subscriber>& subscriber)
 {
     MMI_LOGT("Enter");
-    CHKP(subscriber, ERROR_NULL_POINTER);
+    CHKP(subscriber);
 
     if (subscriber->timerId_ < 0) {
         MMI_LOGE("Leave, subscribeId:%{public}d, null timerId < 0", subscriber->id_);
@@ -210,7 +210,7 @@ void KeyEventSubscriber::ClearTimer(const std::shared_ptr<Subscriber>& subscribe
 void KeyEventSubscriber::OnTimer(const std::shared_ptr<Subscriber> subscriber)
 {
     MMI_LOGT("Enter");
-    CHKP(subscriber, ERROR_NULL_POINTER);
+    CHKP(subscriber);
 
     subscriber->timerId_ = -1;
     if (subscriber->keyEvent_ == nullptr) {
