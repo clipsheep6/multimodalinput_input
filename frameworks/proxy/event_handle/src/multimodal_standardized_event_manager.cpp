@@ -667,10 +667,7 @@ int32_t MultimodalStandardizedEventManager::InjectEvent(const OHOS::MMI::KeyEven
 int32_t MultimodalStandardizedEventManager::InjectEvent(const std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr)
 {
     MMI_LOGD("InjectEvent begin");
-    if (keyEventPtr == nullptr) {
-        MMI_LOGE("KeyEventPtr is nullptr");
-        return RET_ERR;
-    }
+    CHKPR(keyEventPtr, ERROR_NULL_POINTER);
     keyEventPtr->UpdateId();
     if (keyEventPtr->GetKeyCode() < 0) {
         MMI_LOGE("keyCode is invalid %{public}u", keyEventPtr->GetKeyCode());
