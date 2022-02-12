@@ -30,7 +30,7 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, 
 
 using namespace OHOS::MMI;
 
-static void SeatsInfoDebugPrint(const struct SeatInfo** seats)
+static void SeatsInfoDebugPrint(const SeatInfo** seats)
 {
     MMI_LOGD("Seats:");
     for (int i = 0; seats[i]; i++) {
@@ -697,7 +697,7 @@ bool OHOS::MMI::InputWindowsManager::TouchPadPointToDisplayPoint(libinput_event_
 
     return false;
 }
-const std::vector<struct LogicalDisplayInfo>& OHOS::MMI::InputWindowsManager::GetLogicalDisplayInfo() const
+const std::vector<LogicalDisplayInfo>& OHOS::MMI::InputWindowsManager::GetLogicalDisplayInfo() const
 {
     return logicalDisplays_;
 }
@@ -826,10 +826,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
         return RET_ERR;
     }
     LogicalDisplayInfo *logicalDisplayInfo = GetLogicalDisplayById(displayId);
-    if (logicalDisplayInfo == nullptr) {
-        MMI_LOGE("logicalDisplayInfo is null");
-        return RET_ERR;
-    }
+    CHKPR(logicalDisplayInfo, ERROR_NULL_POINTER);
     int32_t globalX = pointerItem.GetGlobalX();
     int32_t globalY = pointerItem.GetGlobalY();
     FixCursorPosition(globalX, globalY, IMAGE_SIZE, IMAGE_SIZE);
@@ -886,10 +883,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<
     }
     MMI_LOGD("UpdateTouchScreenTarget, display:%{public}d", displayId);
     LogicalDisplayInfo *logicalDisplayInfo = GetLogicalDisplayById(displayId);
-      if (logicalDisplayInfo == nullptr) {
-        MMI_LOGE("logicalDisplayInfo is null");
-        return RET_ERR;
-    }
+    CHKPR(logicalDisplayInfo, ERROR_NULL_POINTER);
     int32_t globalX = pointerItem.GetGlobalX();
     int32_t globalY = pointerItem.GetGlobalY();
     MMI_LOGD("UpdateTouchScreenTarget, globalX:%{public}d, globalY:%{public}d", globalX, globalY);
@@ -1015,7 +1009,7 @@ void OHOS::MMI::InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, doub
     int32_t integerX = static_cast<int32_t>(x);
     int32_t integerY = static_cast<int32_t>(y);
     MMI_LOGD("Mosue Input x = %{public}d, Mouse Input y = %{public}d", integerX, integerY);
-    const std::vector<struct LogicalDisplayInfo> logicalDisplayInfo = GetLogicalDisplayInfo();
+    const std::vector<LogicalDisplayInfo> logicalDisplayInfo = GetLogicalDisplayInfo();
     if (logicalDisplayInfo.empty()) {
         MMI_LOGE("logicalDisplayInfo is empty");
         return;
