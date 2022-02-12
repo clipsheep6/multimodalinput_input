@@ -90,7 +90,7 @@ bool UDSSession::SendMsg(NetPacket& pkt) const
 
 void UDSSession::RecordEvent(int32_t id, uint64_t time)
 {
-    MMI_LOGI("begin");
+    MMI_LOGI("begin %{public}d", id);
     EventTime eventTime = {id, time};
     events_.push_back(eventTime);
     MMI_LOGI("end");
