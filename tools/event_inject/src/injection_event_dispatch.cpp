@@ -113,7 +113,7 @@ void InjectionEventDispatch::HandleInjectCommandItems()
 bool InjectionEventDispatch::VirifyArgvs(const int32_t &argc, const vector<string> &argv)
 {
     MMI_LOGT("enter");
-    if (argc < ARGV_VALID || argv.at(ARGVS_TARGET_INDEX).empty()) {
+    if ((argc < ARGV_VALID) || (argv.at(ARGVS_TARGET_INDEX).empty())) {
         MMI_LOGE("Invaild Input Para, Plase Check the validity of the para! errCode:%{public}d", PARAM_INPUT_FAIL);
         return false;
     }

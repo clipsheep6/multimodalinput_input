@@ -609,7 +609,7 @@ int32_t ClientMsgHandler::PackedData(MultimodalEvent& multEvent, const UDSClient
     uint32_t occurredTime = 0;
     std::string uuid = "";
     pkt >> type;
-    if (type == INPUT_DEVICE_CAP_AISENSOR || type == INPUT_DEVICE_CAP_KNUCKLE) {
+    if ((type == INPUT_DEVICE_CAP_AISENSOR) || (type == INPUT_DEVICE_CAP_KNUCKLE)) {
         pkt >> idMsg >> deviceId >> fd >> windowId >> abilityId >> serverStartTime >> uuid >> occurredTime;
         MMI_LOGD("event dispatcher of client: manager_aisensor"
                  "Msg=%{public}d,fd=%{public}d,"
@@ -756,8 +756,8 @@ int32_t ClientMsgHandler::TouchEventFilter(const UDSClient& client, NetPacket& p
     TouchEvent event;
     int32_t deviceEventType = TOUCH_EVENT;
     int32_t fingerIndex = 0;
-    if (PRIMARY_POINT_DOWN == eventAction || PRIMARY_POINT_UP == eventAction ||
-        OTHER_POINT_DOWN == eventAction || OTHER_POINT_UP == eventAction) {
+    if ((PRIMARY_POINT_DOWN == eventAction) || (PRIMARY_POINT_UP == eventAction) ||
+        (OTHER_POINT_DOWN == eventAction) || (OTHER_POINT_UP == eventAction)) {
         fingerIndex = fingersInfos[0].mPointerId;
     }
     event.Initialize(windowId, eventAction, fingerIndex, 0, 0, 0, 0, 0, fingerCount, fingersInfos, 0,

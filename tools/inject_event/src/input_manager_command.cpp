@@ -106,7 +106,7 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
                                 ShowUsage();
                                 return -1;
                             }
-                            if (!StrToInt(optarg, px) || !StrToInt(argv[optind], py)) {
+                            if ((!StrToInt(optarg, px)) || (!StrToInt(argv[optind], py))) {
                                 std::cout << "invalid command to move mouse" << std::endl;
                                 return -1;
                             }
@@ -372,8 +372,8 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
                                 ShowUsage();
                                 return -1;
                             }
-                            if (!StrToInt(optarg, px1) || !StrToInt(argv[optind], py1) || !StrToInt(
-                                argv[optind + oneNumber], px2) || !StrToInt(argv[optind + twoNumber], py2)) {
+                            if ((!StrToInt(optarg, px1)) || (!StrToInt(argv[optind], py1)) || (!StrToInt(
+                                argv[optind + oneNumber], px2)) || (!StrToInt(argv[optind + twoNumber], py2))) {
                                 std::cout << "invalid command to input value" << std::endl;
                                 return -1;
                             }
@@ -411,7 +411,7 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
                             }
                             std::cout << "-T -d argc is," << argc << std::endl;
                             std::cout << "-T -d optind is," << optind << std::endl;
-                            if (!StrToInt(optarg, px1) || !StrToInt(argv[optind], py1)) {
+                            if ((!StrToInt(optarg, px1)) || (!StrToInt(argv[optind], py1))) {
                                 std::cout << "262 row invalid command to input value" << std::endl;
                                 return -1;
                             }
@@ -446,7 +446,7 @@ int32_t InputManagerCommand::ParseCommand(int argc, char *argv[])
                                 return -1;
                             }
                            
-                            if (!StrToInt(optarg, px1) || !StrToInt(argv[optind], py1)) {
+                            if ((!StrToInt(optarg, px1)) || (!StrToInt(argv[optind], py1))) {
                                 std::cout << "invalid command to input value" << std::endl;
                                 return -1;
                             }

@@ -195,7 +195,7 @@ int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent>
 
 int32_t MultimodalEventHandler::AddKeyEventFIlter(int32_t id, std::string name, Authority authority)
 {
-    if (authority < NO_AUTHORITY || authority > HIGH_AUTHORITY) {
+    if ((authority < NO_AUTHORITY) || (authority > HIGH_AUTHORITY)) {
         MMI_LOGD("the input authority is incorrect");
         return RET_ERR;
     }
@@ -243,7 +243,7 @@ int32_t MultimodalEventHandler::RemoveTouchEventFilter(int32_t id)
 
 int32_t MultimodalEventHandler::AddEventInterceptor(int32_t id, std::string name, Authority authority)
 {
-    if (authority < NO_AUTHORITY || authority > HIGH_AUTHORITY) {
+    if ((authority < NO_AUTHORITY) || (authority > HIGH_AUTHORITY)) {
         MMI_LOGD("the input authority is incorrect");
         return RET_ERR;
     }

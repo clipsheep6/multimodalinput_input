@@ -585,8 +585,8 @@ bool PointerEvent::IsValidCheckMouseFunc() const
     }
 
     int32_t buttonId = GetButtonId();
-    if (pointAction == POINTER_ACTION_BUTTON_DOWN || pointAction == POINTER_ACTION_BUTTON_UP) {
-        if (buttonId != MOUSE_BUTTON_LEFT && buttonId != MOUSE_BUTTON_RIGHT && buttonId != MOUSE_BUTTON_MIDDLE) {
+    if ((pointAction == POINTER_ACTION_BUTTON_DOWN) || (pointAction == POINTER_ACTION_BUTTON_UP)) {
+        if ((buttonId != MOUSE_BUTTON_LEFT) && (buttonId != MOUSE_BUTTON_RIGHT) && (buttonId != MOUSE_BUTTON_MIDDLE)) {
             HiLog::Error(LABEL, "ButtonId is invalid");
             return false;
         }

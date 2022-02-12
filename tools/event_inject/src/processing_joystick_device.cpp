@@ -149,7 +149,7 @@ void ProcessingJoystickDevice::TransformRocker1Event(const JoystickEvent& joysti
 {
     string direction = joystickEvent.direction;
     for (const auto &item : joystickEvent.gameEvents) {
-        if ((direction == "left")||(direction == "right")) {
+        if ((direction == "left") || (direction == "right")) {
             SetEvAbsX(inputEventArray, 0, item);
         } else if ((direction == "up") || (direction == "down")) {
             SetEvAbsY(inputEventArray, 0, item);
