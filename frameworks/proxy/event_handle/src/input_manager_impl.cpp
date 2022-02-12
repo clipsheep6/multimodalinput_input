@@ -19,8 +19,6 @@
 #include "error_multimodal.h"
 #include "event_filter_service.h"
 #include "input_event_monitor_manager.h"
-#include "input_monitor_manager.h"
-#include "input_interceptor_manager.h"
 #include "interceptor_manager.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
@@ -270,7 +268,7 @@ int32_t InputManagerImpl::AddMontior(std::function<void(std::shared_ptr<PointerE
 
 int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consumer)
 {
-    int32_t monitorId = InputMonitorManager::GetInstance().AddMonitor(consumer);
+    int32_t monitorId = monitorManager_.AddMonitor(consumer);
     monitorId = monitorId * ADD_MASK_BASE + MASK_TOUCH;
     return monitorId;
 }
@@ -285,7 +283,7 @@ void InputManagerImpl::RemoveMonitor(int32_t monitorId)
             InputMonitorMgr.RemoveInputEventMontior(monitorId);
             break;
         case MASK_TOUCH:
-            InputMonitorManager::GetInstance().RemoveMonitor(monitorId);
+            monitorManager_.RemoveMonitor(monitorId);
             break;
         case MASK_TOUCHPAD:
             InputMonitorMgr.RemoveInputEventTouchpadMontior(monitorId);
@@ -298,12 +296,12 @@ void InputManagerImpl::RemoveMonitor(int32_t monitorId)
 
 void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
-    InputMonitorManager::GetInstance().MarkConsumed(monitorId, eventId);
+    monitorManager_.MarkConsumed(monitorId, eventId);
 }
 
 int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
 {
-    int32_t interceptorId = InputInterceptorManager::GetInstance().AddInterceptor(interceptor);
+    int32_t interceptorId = interceptorManager_.AddInterceptor(interceptor);
     if (interceptorId >= 0) {
         interceptorId = interceptorId * ADD_MASK_BASE + MASK_TOUCH;
     }
@@ -339,7 +337,7 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
     interceptorId /= ADD_MASK_BASE;
     switch (mask) {
         case MASK_TOUCH:
-            InputInterceptorManager::GetInstance().RemoveInterceptor(interceptorId);
+            interceptorManager_.RemoveInterceptor(interceptorId);
             break;
         case MASK_KEY:
             InterceptorMgr.RemoveInterceptor(interceptorId);
