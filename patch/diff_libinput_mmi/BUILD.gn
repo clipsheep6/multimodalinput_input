@@ -94,8 +94,8 @@ config("libinput-third_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "$gen_dst_dir/src",
     "$gen_dst_dir/include",
+    "$gen_dst_dir/src",
   ]
 
   if (is_mmi_have_libinput) {
@@ -124,9 +124,9 @@ config("libinput-third_config") {
 
 config("libinput-third_public_config") {
   include_dirs = [
+    "//third_party/FreeBSD/sys/dev/evdev",
     "$gen_dst_dir/export_include",
     "$gen_dst_dir/include",
-    "//third_party/FreeBSD/sys/dev/evdev",
     "$gen_dst_dir/src",
   ]
 
