@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifdef OHOS_WESTEN_MODEL
 #ifndef MESSAGE_POST_H
 #define MESSAGE_POST_H
 
@@ -43,3 +44,4 @@ private:
 }
 #define MMIMsgPost OHOS::MMI::MessagePost::GetInstance()
 #endif // MESSAGE_POST_H
+#endif
