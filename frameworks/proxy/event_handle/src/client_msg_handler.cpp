@@ -18,7 +18,7 @@
 #include "mmi_func_callback.h"
 #include "bytrace.h"
 #include "event_factory.h"
-#include "input_device_event.h"
+#include "input_device_impl.h"
 #include "input_event_data_transformation.h"
 #include "input_event_monitor_manager.h"
 #include "input_filter_manager.h"
@@ -137,7 +137,7 @@ void ClientMsgHandler::OnMsgHandler(const UDSClient& client, NetPacket& pkt)
 int32_t ClientMsgHandler::OnKeyMonitor(const UDSClient& client, NetPacket& pkt)
 {
     auto key = KeyEvent::Create();
-    CHKPR(key, ERROR_NULL_POINTER, RET_ERR);
+    CHKPR(key, ERROR_NULL_POINTER);
     int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(fSkipId, key, pkt);
     if (ret != RET_OK) {
         MMI_LOGE("OnKeyMonitor read netPacket failed");
@@ -670,35 +670,33 @@ int32_t ClientMsgHandler::DeviceRemove(const UDSClient& client, NetPacket& pkt)
 int32_t ClientMsgHandler::OnInputDeviceIds(const UDSClient& client, NetPacket& pkt)
 {
     MMI_LOGD("ClientMsgHandler::OnInputDeviceIds enter");
-    int32_t taskId;
-    int32_t size = 0;
+    int32_t userData;
+    int32_t size;
     std::vector<int32_t> inputDeviceIds;
-    CHKR(pkt.Read(taskId), STREAM_BUF_READ_FAIL, RET_ERR);
+    CHKR(pkt.Read(userData), STREAM_BUF_READ_FAIL, RET_ERR);
     CHKR(pkt.Read(size), STREAM_BUF_READ_FAIL, RET_ERR);
     for (int32_t i = 0; i < size; i++) {
         int32_t deviceId = 0;
         CHKR(pkt.Read(deviceId), STREAM_BUF_READ_FAIL, RET_ERR);
         inputDeviceIds.push_back(deviceId);
     }
-    auto& instance = InputDeviceEvent::GetInstance();
-    instance.OnInputDeviceIds(taskId, inputDeviceIds);
+    InputDeviceImpl::GetInstance().OnInputDeviceIds(userData, inputDeviceIds);
     return RET_OK;
 }
 
 int32_t ClientMsgHandler::OnInputDevice(const UDSClient& client, NetPacket& pkt)
 {
     MMI_LOGD("ClientMsgHandler::OnInputDevice enter");
-    int32_t taskId;
+    int32_t userData;
     int32_t id;
     std::string name;
     int32_t deviceType;
-    CHKR(pkt.Read(taskId), STREAM_BUF_READ_FAIL, RET_ERR);
+    CHKR(pkt.Read(userData), STREAM_BUF_READ_FAIL, RET_ERR);
     CHKR(pkt.Read(id), STREAM_BUF_READ_FAIL, RET_ERR);
     CHKR(pkt.Read(name), STREAM_BUF_READ_FAIL, RET_ERR);
     CHKR(pkt.Read(deviceType), STREAM_BUF_READ_FAIL, RET_ERR);
 
-    auto& instance = InputDeviceEvent::GetInstance();
-    instance.OnInputDevice(taskId, id, name, deviceType);
+    InputDeviceImpl::GetInstance().OnInputDevice(userData, id, name, deviceType);
     return RET_OK;
 }
 
@@ -872,7 +870,7 @@ void ClientMsgHandler::AnalysisPointEvent(const UDSClient& client, NetPacket& pk
     StandardTouchStruct standardTouch = {};
     EventJoyStickAxis eventJoyStickAxis = {};
     MultimodalEventPtr mousePtr = EventFactory::CreateEvent(EventType::EVENT_MOUSE);
-    CHK(mousePtr, ERROR_NULL_POINTER);
+    CHKP(mousePtr);
     pkt >> ret >> pointData >> abilityId >> windowId >> fd >> serverStartTime;
     MMI_LOGD("event dispatcher of client: mouse_data eventPointer:time:%{public}" PRId64 ", eventType:%{public}d, "
              "buttonCode:%{public}u, deviceType:%{public}u, seat_button_count:%{public}u, "
@@ -970,7 +968,7 @@ void ClientMsgHandler::AnalysisJoystickEvent(const UDSClient& client, NetPacket&
     uint64_t serverStartTime = 0;
     MmiPoint mmiPoint;
     MultimodalEventPtr mousePtr = EventFactory::CreateEvent(EventType::EVENT_MOUSE);
-    CHK(mousePtr, ERROR_NULL_POINTER);
+    CHKP(mousePtr);
     pkt >> eventJoyStickData >> abilityId >> windowId >> fd >> serverStartTime;
     MMI_LOGD("event dispatcher of client: "
         "event JoyStick: fd:%{public}d", fd);
@@ -1002,7 +1000,7 @@ void ClientMsgHandler::AnalysisTouchPadEvent(const UDSClient& client, NetPacket&
     std::string nullUUid = "";
     EventJoyStickAxis eventJoyStickAxis = {};
     MultimodalEventPtr mousePtr = EventFactory::CreateEvent(EventType::EVENT_MOUSE);
-    CHK(mousePtr, ERROR_NULL_POINTER);
+    CHKP(mousePtr);
     pkt >> tabletPad >> abilityId >> windowId >> fd >> serverStartTime;
     MMI_LOGD("event dispatcher of client: event tablet Pad :time:%{public}" PRId64 ", deviceType:%{public}u, "
              "deviceName:%{public}s, eventType:%{public}d, "
@@ -1109,10 +1107,10 @@ void ClientMsgHandler::AnalysisStandardTabletToolEvent(NetPacket& pkt, int32_t c
     EventJoyStickAxis eventJoyStickAxis = {};
     MmiPoint mmiPoint;
     auto mousePtr = EventFactory::CreateEvent(EventType::EVENT_MOUSE);
-    CHK(mousePtr, ERROR_NULL_POINTER);
+    CHKP(mousePtr);
     auto mouseEvent = reinterpret_cast<MouseEvent*>(mousePtr.GetRefPtr());
     auto stylusPtr = EventFactory::CreateEvent(EventType::EVENT_STYLUS);
-    CHK(stylusPtr, ERROR_NULL_POINTER);
+    CHKP(stylusPtr);
     auto stylusEvent = reinterpret_cast<StylusEvent*>(stylusPtr.GetRefPtr());
 
     StandardTouchStruct standardTouchEvent = {};
@@ -1184,7 +1182,7 @@ void ClientMsgHandler::AnalysisGestureEvent(const UDSClient& client, NetPacket& 
     EventJoyStickAxis eventJoyStickAxis = {};
     MultimodalEventPtr mousePtr = EventFactory::CreateEvent(EventType::EVENT_MOUSE);
     fingerInfos fingersInfos[FINGER_NUM] = {};
-    CHK(mousePtr, ERROR_NULL_POINTER);
+    CHKP(mousePtr);
     pkt >> gesture >> abilityId >> windowId >> fd >> serverStartTime;
     MMI_LOGD("event dispatcher of client: event Gesture :time:%{public}" PRId64 ", "
              "deviceType:%{public}u, deviceName:%{public}s, devNode:%{public}s, eventType:%{public}d, "
