@@ -16,27 +16,29 @@
 #include "message_send_recv_stat_mgr.h"
 #include "log.h"
 
+namespace OHOS {
+namespace MMI {
 using namespace std;
-using namespace OHOS::MMI;
-
 namespace {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MessageSendRecvStatMgr" };
 }
 
-void OHOS::MMI::MessageSendRecvStatMgr::Increase()
+void MessageSendRecvStatMgr::Increase()
 {
     ++sendMessageCount_;
     MMI_LOGF("sendMessageCount_ = %zu", sendMessageCount_);
 }
 
-void OHOS::MMI::MessageSendRecvStatMgr::Decrease()
+void MessageSendRecvStatMgr::Decrease()
 {
     ++recvMessageCount_;
     MMI_LOGF("recvMessageCount_ = %zu", recvMessageCount_);
 }
 
-bool OHOS::MMI::MessageSendRecvStatMgr::IsNoWaitMessage()
+bool MessageSendRecvStatMgr::IsNoWaitMessage()
 {
     MMI_LOGF("(%zu, %zu) = %d", sendMessageCount_, recvMessageCount_, (sendMessageCount_ == recvMessageCount_));
     return (sendMessageCount_ == recvMessageCount_);
 }
+} // namespace MMI
+} // namespace OHOS
