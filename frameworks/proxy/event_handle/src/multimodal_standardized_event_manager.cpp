@@ -687,7 +687,7 @@ int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<P
     MMI_LOGD("Inject pointer event.");
     CHKPR(pointerEvent, RET_ERR);
     std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
-    MMI_LOGD("pointer event dispatcher of client:eventType:%{public}s, actionTime:%{public}d, "
+    MMI_LOGD("pointer event dispatcher of client:eventType:%{public}d, actionTime:%{public}d, "
              "action:%{public}d, actionStartTime:%{public}d, "
              "flag:%{public}d, pointerAction:%{public}s, sourceType:%{public}s, "
              "VerticalAxisValue:%{public}.2f, HorizontalAxisValue:%{public}.2f, "
