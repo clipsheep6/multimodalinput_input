@@ -23,7 +23,7 @@ config("libmmi_server_public_config") {
     "device_scalability/include",
     "event_dispatch/include",
     "event_package/include",
-    "event_handle/include",
+    "event_handler/include",
     "event_standard/include",
     "event_dump/include",
     "monitor/include",
@@ -38,7 +38,7 @@ config("libmmi_server_public_config") {
     "subscriber/include",
     "timer_manager/include",
     "${mmi_service_path}/connect_manager/include",
-    "${mmi_service_path}/event_filter_binder/include",
+    "${mmi_service_path}/filter/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "mouse_event_handler/include",
@@ -65,12 +65,12 @@ config("libmmi_server_public_config") {
 
   if (is_mmi_have_hdf) {
     include_dirs += [
-      "hdf_adapter/include",
-      "hdi_inject/include",
-      "$root_out_dir/diff_libinput_mmi/export_include",
       "//third_party/eudev/export_include/",
       "$root_out_dir/diff_libevdev_hdf/export_include",
+      "$root_out_dir/diff_libinput_mmi/export_include",
       "$root_out_dir/diff_libinput_mmi/include/linux",
+      "hdf_adapter/include",
+      "hdi_inject/include",
     ]
   }
 
@@ -94,8 +94,8 @@ config("libmmi_server_public_config") {
 
   if (is_mmi_have_weston) {
     include_dirs += [
-      "//third_party/weston/libweston",
       "//foundation/graphic/standard/frameworks/wmserver/src",
+      "//third_party/weston/libweston",
     ]
     cflags += [ "-DOHOS_WESTEN_MODEL" ]
   }
@@ -126,11 +126,11 @@ ohos_shared_library("libmmi-server") {
     "device_scalability/src/expansibility_operation.cpp",
     "event_dispatch/src/event_dispatch.cpp",
     "event_dump/src/event_dump.cpp",
-    "event_handle/src/input_event_handler.cpp",
-    "event_handle/src/key_event_value_transformation.cpp",
-    "event_handle/src/register_event.cpp",
-    "event_handle/src/register_eventhandle_manager.cpp",
-    "event_handle/src/system_event_handler.cpp",
+    "event_handler/src/input_event_handler.cpp",
+    "event_handler/src/key_event_value_transformation.cpp",
+    "event_handler/src/register_event.cpp",
+    "event_handler/src/register_eventhandle_manager.cpp",
+    "event_handler/src/system_event_handler.cpp",
     "event_package/src/event_package.cpp",
     "event_standard/src/standard_event_handler.cpp",
     "interceptor/src/interceptor_manager_global.cpp",
@@ -199,7 +199,7 @@ ohos_shared_library("libmmi-server") {
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_service",
-    "//foundation/multimodalinput/input/service/event_filter_binder:mmi_event_filter_proxy",
+    "//foundation/multimodalinput/input/service/filter:mmi_event_filter_proxy",
     "//foundation/windowmanager/wm:libwm",
     "//third_party/libxkbcommon:libxkbcommon",
     "//third_party/wayland_standard:libwayland_server",
@@ -248,50 +248,50 @@ HDF_FWKS = "//drivers/framework"
 ohos_unittest("ut-mmi-service-out") {
   module_out_path = module_output_path
   include_dirs = [
-    "//drivers/peripheral/input/interfaces/include",
     "//drivers/adapter/uhdf2/adapter/osal/include",
-    "//utils/native/base/include",
+    "//drivers/peripheral/input/interfaces/include",
     "//third_party/googletest/googletest/include",
     "//third_party/wayland-ivi-extension/include",
+    "//utils/native/base/include",
+    "${mmi_path}/common/include",
+    "${mmi_path}/frameworks/proxy/event_handle",
+    "${mmi_path}/frameworks/proxy/event_handle/include",
+    "${mmi_path}/frameworks/proxy/module_loader",
+    "${mmi_path}/frameworks/proxy/module_loader/include",
     "${mmi_path}/frameworks/util/common",
     "${mmi_path}/frameworks/util/common/include",
     "${mmi_path}/frameworks/util/network",
     "${mmi_path}/frameworks/util/network/include",
     "${mmi_path}/frameworks/util/socket",
     "${mmi_path}/frameworks/util/socket/include",
-    "${mmi_path}/frameworks/proxy/event_handle",
-    "${mmi_path}/frameworks/proxy/event_handle/include",
-    "${mmi_path}/frameworks/proxy/module_loader",
-    "${mmi_path}/frameworks/proxy/module_loader/include",
-    "${mmi_path}/common/include",
     "${mmi_path}/interfaces/native/innerkits/common/include",
-    "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
-    "${mmi_path}/service/include",
-    "${mmi_path}/service/senior_input_func_proc/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/service/application_manager/include",
     "${mmi_path}/service/device_manager/include",
     "${mmi_path}/service/device_scalability/include",
     "${mmi_path}/service/event_dispatch/include",
-    "${mmi_path}/service/event_package/include",
-    "${mmi_path}/service/event_handle/include",
-    "${mmi_path}/service/event_standard/include",
-    "${mmi_path}/service/hdi_inject/include",
     "${mmi_path}/service/event_dump/include",
+    "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/service/event_package/include",
+    "${mmi_path}/service/event_standard/include",
     "${mmi_path}/service/hdf_adapter/include",
+    "${mmi_path}/service/hdi_inject/include",
+    "${mmi_path}/service/include",
     "${mmi_path}/service/libinput_adapter/include",
     "${mmi_path}/service/message_handle/include",
     "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/service/senior_input_func_proc/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/uinput",
-    "$HDF_FWKS/include/utils",
-    "$HDF_FWKS/include/osal",
-    "$HDF_FWKS/core/adapter/syscall/include",
-    "$HDF_FWKS/include/core",
     "$HDF_FWKS/ability/sbuf/include",
+    "$HDF_FWKS/core/adapter/syscall/include",
     "$HDF_FWKS/core/shared/include",
-    "$HDF_FWKS/utils/include",
+    "$HDF_FWKS/include/core",
+    "$HDF_FWKS/include/osal",
+    "$HDF_FWKS/include/utils",
     "$HDF_FWKS/inclue",
+    "$HDF_FWKS/utils/include",
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
@@ -302,9 +302,9 @@ ohos_unittest("ut-mmi-service-out") {
     #"application_manager/test/app_register_test.cpp",
     "device_scalability/test/expansibility_operation_test.cpp",
     "event_dispatch/test/event_dispatch_test.cpp",
-    "event_handle/test/register_event_test.cpp",
+    "event_handler/test/register_event_test.cpp",
 
-    #"event_handle/test/system_event_handler_test.cpp",
+    #"event_handler/test/system_event_handler_test.cpp",
     "event_standard/test/standard_event_handler_test.cpp",
     "hdi_inject/test/hdi_inject_test.cpp",
     "message_handle/test/input_test.cpp",
@@ -315,7 +315,7 @@ ohos_unittest("ut-mmi-service-out") {
     "window_manager/test/outer_interface_test.cpp",
   ]
   if (is_mmi_have_weston) {
-    sources += [ "event_handle/test/input_event_handler_test.cpp" ]
+    sources += [ "event_handler/test/input_event_handler_test.cpp" ]
   }
   cflags = [ "-DOHOS_BUILD" ]
 
@@ -365,6 +365,5 @@ ohos_unittest("ut-mmi-service-out") {
 
 group("ut-mmi-service") {
   testonly = true
-  deps = []
-  deps += [ ":ut-mmi-service-out" ]
+  deps = [ ":ut-mmi-service-out" ]
 }
