@@ -16,6 +16,12 @@
 #ifdef OHOS_WESTEN_MODEL
 #include "message_post.h"
 #include "uds_socket.h"
+#include "log.h"
+
+namespace OHOS::MMI {
+    namespace {
+        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MessagePost" };
+    }
 
 namespace OHOS {
 namespace MMI {

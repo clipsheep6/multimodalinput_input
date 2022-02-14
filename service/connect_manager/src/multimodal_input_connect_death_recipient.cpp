@@ -14,6 +14,12 @@
  */
 
 #include "multimodal_input_connect_death_recipient.h"
+#include "log.h"
+
+namespace OHOS::MMI {
+    namespace {
+        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectDeathRecipient" };
+    }
 
 namespace OHOS {
 namespace MMI {
