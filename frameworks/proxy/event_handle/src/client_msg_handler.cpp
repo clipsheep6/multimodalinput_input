@@ -188,8 +188,8 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     }
 
     std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
-    MMI_LOGD("pointer event dispatcher of client, eventType:%{public}d,actionTime:%{public}d, "
-             "action:%{public}d, actionStartTime:%{public}d, "
+    MMI_LOGD("pointer event dispatcher of client, eventType:%{public}d,actionTime:%{public}d,"
+             " action:%{public}d, actionStartTime:%{public}d, "
              "flag:%{public}d, pointerAction:%{public}s, sourceType:%{public}s, "
              "VerticalAxisValue:%{public}.2f, HorizontalAxisValue:%{public}.2f, "
              "PinchAxisValue:%{public}.2f, pointerCount:%{public}d, eventNumber:%{public}d",
