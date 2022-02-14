@@ -16,12 +16,13 @@
 #include "multimodal_input_connect_def_parcel.h"
 #include "log.h"
 
-namespace OHOS::MMI {
-    namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectDefParcel" };
-    }
 namespace OHOS {
 namespace MMI {
+    namespace {
+        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
+            LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectDefParcel"
+        };
+    }
 bool ConnectDefReqParcel::Marshalling(Parcel& out) const
 {
     MMI_LOGT("enter");
