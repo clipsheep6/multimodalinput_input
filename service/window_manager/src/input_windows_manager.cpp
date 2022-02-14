@@ -576,6 +576,7 @@ void OHOS::MMI::InputWindowsManager::PrintDisplayDebugInfo()
 bool OHOS::MMI::InputWindowsManager::TouchPadPointToDisplayPoint_2(libinput_event_touch* touch,
     int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId)
 {
+    CHKPF(touch, ERROR_NULL_POINTER);
     if (screensInfo_ != nullptr) {
         if ((*screensInfo_) != nullptr)
         logicalDisplayId = (*screensInfo_)->screenId;
@@ -586,7 +587,7 @@ bool OHOS::MMI::InputWindowsManager::TouchPadPointToDisplayPoint_2(libinput_even
     return false;
 }
 
-OHOS::MMI::PhysicalDisplayInfo* OHOS::MMI::InputWindowsManager::GetPhysicalDisplayById(int32_t id)
+OHOS::MMI::PhysicalDisplayInfo* OHOS::MMI::InputWindowsManager::GetPhysicalDisplay(int32_t id)
 {
     for (auto &it : physicalDisplays_) {
         if (it.id == id) {
@@ -596,7 +597,8 @@ OHOS::MMI::PhysicalDisplayInfo* OHOS::MMI::InputWindowsManager::GetPhysicalDispl
     return nullptr;
 }
 
-OHOS::MMI::PhysicalDisplayInfo* OHOS::MMI::InputWindowsManager::FindMatchedPhysicalDisplayInfo(const std::string seatId, const std::string seatName)
+OHOS::MMI::PhysicalDisplayInfo* OHOS::MMI::InputWindowsManager::FindPhysicalDisplayInfo(const std::string seatId,
+    const std::string seatName)
 {
     for (auto &it : physicalDisplays_) {
         if (it.seatId == seatId && it.seatName == seatName) {
@@ -607,101 +609,69 @@ OHOS::MMI::PhysicalDisplayInfo* OHOS::MMI::InputWindowsManager::FindMatchedPhysi
 }
 
 bool OHOS::MMI::InputWindowsManager::TransformTouchPointToDisplayPoint(libinput_event_touch* touch,
-    int32_t targetDisplayId, int32_t& displayX, int32_t& displayY)
+    int32_t& targetDisplayId, int32_t& displayX, int32_t& displayY)
 {
-
-    auto info = FindMatchedPhysicalDisplayInfo("seat0","default0");
+    CHKPF(touch, ERROR_NULL_POINTER);
+    auto info = FindPhysicalDisplayInfo("seat0", "default0");
     CHKPF(info);
-    if (info->width <= 0) {
+
+    if ((info->width <= 0) || (info->height <= 0) || (info->logicWidth <= 0) || (info->logicHeight <= 0)) {
+        MMI_LOGE("Get DisplayInfo is error");
         return false;
     }
 
-    if (info->height <= 0) {
+    auto width = libinput_event_touch_get_x_transformed(touch, info->width) + info->topLeftX;
+    auto height = libinput_event_touch_get_y_transformed(touch, info->height) + info->topLeftY;
+    if ((width >= INT32_MAX) || (height >= INT32_MAX)) {
+        MMI_LOGE("Physical display coordinates are out of range");
         return false;
     }
+    int32_t localPhysicalX = static_cast<int32_t>(width);
+    int32_t localPhysicalY = static_cast<int32_t>(height);
 
-    if (info->logicWidth <= 0 || info->logicHeight <= 0) {
+    auto logicX = (1L * info->logicWidth * localPhysicalX / info->width);
+    auto logicY = (1L * info->logicHeight * localPhysicalY / info->height);
+    if ((logicX >= INT32_MAX) || (logicY >= INT32_MAX)) {
+        MMI_LOGE("Physical display logical coordinates out of range");
         return false;
     }
-    int32_t localPhysicalX = static_cast<int32_t>(libinput_event_touch_get_x_transformed(touch, info->width) + info->topLeftX);
-    int32_t localPhysicalY = static_cast<int32_t>(libinput_event_touch_get_y_transformed(touch, info->height) + info->topLeftY);
-
-    int32_t localLogcialX = (int32_t)(1L * info->logicWidth * localPhysicalX / info->width);
-    int32_t localLogcialY = (int32_t)(1L * info->logicHeight * localPhysicalY / info->height);
+    int32_t localLogcialX = (int32_t)(logicX);
+    int32_t localLogcialY = (int32_t)(logicY);
 
     int32_t globalLogicalX = localLogcialX;
     int32_t globalLogicalY = localLogcialY;
 
-    for (auto left =  GetPhysicalDisplayById(info->leftDisplayId); left != nullptr; left = GetPhysicalDisplayById(left->leftDisplayId)) {
+    for (auto left = GetPhysicalDisplay(info->leftDisplayId); left != nullptr;
+        left = GetPhysicalDisplay(left->leftDisplayId)) {
         globalLogicalX += left->logicWidth;
     }
 
-    for (auto upper =  GetPhysicalDisplayById(info->upDisplayId); upper != nullptr; upper = GetPhysicalDisplayById(upper->upDisplayId)) {
+    for (auto upper = GetPhysicalDisplay(info->upDisplayId); upper != nullptr;
+        upper = GetPhysicalDisplay(upper->upDisplayId)) {
         globalLogicalY += upper->logicHeight;
     }
 
-    for (auto &display : logicalDisplays_) {
-        if (targetDisplayId == display.id ) {
+    for (const auto& display : logicalDisplays_) {
+        if (targetDisplayId < 0) {
+            if ((globalLogicalX < display.topLeftX) || (globalLogicalX > display.topLeftX + display.width)) {
+                continue;
+            }
+            if ((globalLogicalY < display.topLeftY) || (globalLogicalY > display.topLeftY + display.height)) {
+                continue;
+            }
+            targetDisplayId = display.id;
             displayX = globalLogicalX - display.topLeftX;
             displayY = globalLogicalY - display.topLeftY;
+            return true;
+        } else if (targetDisplayId == display.id) {
+            displayX = globalLogicalX - display.topLeftX;
+            displayY = globalLogicalY - display.topLeftY;
+            return true;
         }
-        return true;
     }
-
     return false;
 }
 
-bool OHOS::MMI::InputWindowsManager::TouchPadPointToDisplayPoint(libinput_event_touch* touch,
-    int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId)
-{
-
-    auto info = FindMatchedPhysicalDisplayInfo("seat0","default0");
-    CHKPF(info);
-    if (info->width <= 0) {
-        return false;
-    }
-
-    if (info->height <= 0) {
-        return false;
-    }
-
-    if (info->logicWidth <= 0 || info->logicHeight <= 0) {
-        return false;
-    }
-    int32_t localPhysicalX = static_cast<int32_t>(libinput_event_touch_get_x_transformed(touch, info->width) + info->topLeftX);
-    int32_t localPhysicalY = static_cast<int32_t>(libinput_event_touch_get_y_transformed(touch, info->height) + info->topLeftY);
-
-    int32_t localLogcialX = (int32_t)(1L * info->logicWidth * localPhysicalX / info->width);
-    int32_t localLogcialY = (int32_t)(1L * info->logicHeight * localPhysicalY / info->height);
-
-    int32_t globalLogicalX = localLogcialX;
-    int32_t globalLogicalY = localLogcialY;
-
-    for (auto left =  GetPhysicalDisplayById(info->leftDisplayId); left != nullptr; left = GetPhysicalDisplayById(left->leftDisplayId)) {
-        globalLogicalX += left->logicWidth;
-    }
-
-    for (auto upper =  GetPhysicalDisplayById(info->upDisplayId); upper != nullptr; upper = GetPhysicalDisplayById(upper->upDisplayId)) {
-        globalLogicalY += upper->logicHeight;
-    }
-
-    for (auto &display : logicalDisplays_) {
-        if (globalLogicalX < display.topLeftX || globalLogicalX > display.topLeftX + display.width) {
-            continue;
-        }
-
-        if (globalLogicalY < display.topLeftY || globalLogicalY > display.topLeftY + display.height) {
-            continue;
-        }
-
-        logicalDisplayId = display.id;
-        logicalX = globalLogicalX - display.topLeftX;
-        logicalY = globalLogicalY - display.topLeftY;
-        return true;
-    }
-
-    return false;
-}
 const std::vector<LogicalDisplayInfo>& OHOS::MMI::InputWindowsManager::GetLogicalDisplayInfo() const
 {
     return logicalDisplays_;
@@ -718,7 +688,8 @@ bool OHOS::MMI::InputWindowsManager::IsTouchWindow(int32_t x, int32_t y, const W
         (y <= (info.topLeftY + info.height));
 }
 
-void OHOS::MMI::InputWindowsManager::AdjustGlobalCoordinate(int32_t& globalX, int32_t& globalY, int32_t width, int32_t height)
+void OHOS::MMI::InputWindowsManager::AdjustGlobalCoordinate(int32_t& globalX, int32_t& globalY,
+    int32_t width, int32_t height)
 {
     if (globalX <= 0) {
         globalX = 0;
@@ -932,7 +903,8 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<
     MMI_LOGD("the pid:%{public}d, the fd:%{public}d, the globalX01:%{public}d, "
              "the globalY01:%{public}d, the localX:%{public}d, the localY:%{public}d,"
              "the TargetWindowId:%{public}d, the AgentWindowId:%{public}d",
-            touchWindow->pid, fd, globalX, globalY, localX, localY, pointerEvent->GetTargetWindowId(), pointerEvent->GetAgentWindowId());
+             touchWindow->pid, fd, globalX, globalY, localX, localY, pointerEvent->GetTargetWindowId(),
+             pointerEvent->GetAgentWindowId());
     return fd;
 }
 

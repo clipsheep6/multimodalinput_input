@@ -44,7 +44,7 @@ void TouchTransformPointProcessor::OnEventTouchDown(libinput_event *event)
     int32_t logicalY = -1;
     int32_t logicalX = -1;
     int32_t logicalDisplayId = -1;
-    WinMgr->TouchPadPointToDisplayPoint(data, logicalX, logicalY, logicalDisplayId);
+    WinMgr->TransformTouchPointToDisplayPoint(data, logicalDisplayId, logicalX, logicalY);
     auto pointIds = pointerEvent_->GetPointersIdList();
     auto time = libinput_event_touch_get_time(data);
     if (pointIds.empty()) {
