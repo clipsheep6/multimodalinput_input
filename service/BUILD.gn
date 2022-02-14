@@ -65,12 +65,12 @@ config("libmmi_server_public_config") {
 
   if (is_mmi_have_hdf) {
     include_dirs += [
-      "hdf_adapter/include",
-      "hdi_inject/include",
-      "$root_out_dir/diff_libinput_mmi/export_include",
       "//third_party/eudev/export_include/",
       "$root_out_dir/diff_libevdev_hdf/export_include",
+      "$root_out_dir/diff_libinput_mmi/export_include",
       "$root_out_dir/diff_libinput_mmi/include/linux",
+      "hdf_adapter/include",
+      "hdi_inject/include",
     ]
   }
 
@@ -94,8 +94,8 @@ config("libmmi_server_public_config") {
 
   if (is_mmi_have_weston) {
     include_dirs += [
-      "//third_party/weston/libweston",
       "//foundation/graphic/standard/frameworks/wmserver/src",
+      "//third_party/weston/libweston",
     ]
     cflags += [ "-DOHOS_WESTEN_MODEL" ]
   }
@@ -248,50 +248,50 @@ HDF_FWKS = "//drivers/framework"
 ohos_unittest("ut-mmi-service-out") {
   module_out_path = module_output_path
   include_dirs = [
-    "//drivers/peripheral/input/interfaces/include",
     "//drivers/adapter/uhdf2/adapter/osal/include",
-    "//utils/native/base/include",
+    "//drivers/peripheral/input/interfaces/include",
     "//third_party/googletest/googletest/include",
     "//third_party/wayland-ivi-extension/include",
+    "//utils/native/base/include",
+    "${mmi_path}/common/include",
+    "${mmi_path}/frameworks/proxy/event_handle",
+    "${mmi_path}/frameworks/proxy/event_handle/include",
+    "${mmi_path}/frameworks/proxy/module_loader",
+    "${mmi_path}/frameworks/proxy/module_loader/include",
     "${mmi_path}/frameworks/util/common",
     "${mmi_path}/frameworks/util/common/include",
     "${mmi_path}/frameworks/util/network",
     "${mmi_path}/frameworks/util/network/include",
     "${mmi_path}/frameworks/util/socket",
     "${mmi_path}/frameworks/util/socket/include",
-    "${mmi_path}/frameworks/proxy/event_handle",
-    "${mmi_path}/frameworks/proxy/event_handle/include",
-    "${mmi_path}/frameworks/proxy/module_loader",
-    "${mmi_path}/frameworks/proxy/module_loader/include",
-    "${mmi_path}/common/include",
     "${mmi_path}/interfaces/native/innerkits/common/include",
-    "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
-    "${mmi_path}/service/include",
-    "${mmi_path}/service/senior_input_func_proc/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/service/application_manager/include",
     "${mmi_path}/service/device_manager/include",
     "${mmi_path}/service/device_scalability/include",
     "${mmi_path}/service/event_dispatch/include",
-    "${mmi_path}/service/event_package/include",
-    "${mmi_path}/service/event_handle/include",
-    "${mmi_path}/service/event_standard/include",
-    "${mmi_path}/service/hdi_inject/include",
     "${mmi_path}/service/event_dump/include",
+    "${mmi_path}/service/event_handle/include",
+    "${mmi_path}/service/event_package/include",
+    "${mmi_path}/service/event_standard/include",
     "${mmi_path}/service/hdf_adapter/include",
+    "${mmi_path}/service/hdi_inject/include",
+    "${mmi_path}/service/include",
     "${mmi_path}/service/libinput_adapter/include",
     "${mmi_path}/service/message_handle/include",
     "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/service/senior_input_func_proc/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/uinput",
-    "$HDF_FWKS/include/utils",
-    "$HDF_FWKS/include/osal",
-    "$HDF_FWKS/core/adapter/syscall/include",
-    "$HDF_FWKS/include/core",
     "$HDF_FWKS/ability/sbuf/include",
+    "$HDF_FWKS/core/adapter/syscall/include",
     "$HDF_FWKS/core/shared/include",
-    "$HDF_FWKS/utils/include",
+    "$HDF_FWKS/include/core",
+    "$HDF_FWKS/include/osal",
+    "$HDF_FWKS/include/utils",
     "$HDF_FWKS/inclue",
+    "$HDF_FWKS/utils/include",
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
@@ -365,6 +365,5 @@ ohos_unittest("ut-mmi-service-out") {
 
 group("ut-mmi-service") {
   testonly = true
-  deps = []
-  deps += [ ":ut-mmi-service-out" ]
+  deps = [ ":ut-mmi-service-out" ]
 }
