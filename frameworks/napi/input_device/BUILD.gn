@@ -13,7 +13,6 @@
 
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
-## Build libmmi.so {{{
 config("libinputdevice_config") {
   visibility = [ ":*" ]
 
@@ -27,6 +26,7 @@ config("libinputdevice_config") {
     "//foundation/multimodalinput/input/common/include",
     "//foundation/multimodalinput/input/tools/event_inject/include",
   ]
+
 
   cflags = [ "-DOHOS_BUILD" ]
   if (is_mmi_have_libinput) {
