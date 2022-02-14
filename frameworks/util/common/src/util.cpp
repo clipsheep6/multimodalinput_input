@@ -41,7 +41,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Util"};
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Util"};
 }
 
 const std::map<int32_t, std::string> ERROR_STRING_MAP = {
@@ -83,20 +83,17 @@ int64_t GetMicrotime()
 {
     timeval currentTime = {};
     gettimeofday(&currentTime, nullptr);
-    return currentTime.tv_sec * static_cast<int32_t>(1e6) + currentTime.tv_usec;
+    return static_cast<int64_t>(currentTime.tv_sec) * S2US + currentTime.tv_usec;
 }
 
-uint64_t GetSysClockTime()
+int64_t GetSysClockTime()
 {
-    const int32_t conversionStep = 1000;
     timespec ts = { 0, 0 };
-
     if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
         MMI_LOGT("clock_gettime failed:%{public}s", strerror(errno));
         return 0;
     }
-
-    return (ts.tv_sec * static_cast<uint64_t>(1e6)) + (ts.tv_nsec / conversionStep);
+    return static_cast<int64_t>(ts.tv_sec) * S2US + (ts.tv_nsec / US2NS);
 }
 
 int64_t GetMillisTime()
