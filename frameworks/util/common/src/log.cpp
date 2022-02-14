@@ -503,7 +503,7 @@ void LogManager::ParseLogLimitSize(const std::string& str)
     size_t limit = atoi(str.c_str());
     const size_t minLimitSize = 10;
     const size_t maxLimitSize = 1024;
-    limit = (limit <= 0) ? minLimitSize : limit;
+    limit = (limit == 0) ? minLimitSize : limit;
     limit = (limit > maxLimitSize) ? maxLimitSize : limit;
     limitSize_ = limit * ONE_MILLION;
     if (LOG_MAX_FILE_SIZE != size && size != limitSize_) {
