@@ -442,6 +442,7 @@ const std::multimap<int16_t, KeyEventValueTransformations> MAP_KEY_EVENT_VALUE_T
 
 KeyEventValueTransformations KeyValueTransformationByInput(int16_t keyValueOfInput)
 {
+    MMI_LOGT("enter");
     auto it = MAP_KEY_EVENT_VALUE_TRANSFORMATION.find(keyValueOfInput);
     if (it == MAP_KEY_EVENT_VALUE_TRANSFORMATION.end()) {
         const int16_t UNKNOWN_KEY_BASE = 10000;
@@ -467,6 +468,7 @@ KeyEventValueTransformation::~KeyEventValueTransformation()
 
 bool KeyEventValueTransformation::Init()
 {
+    MMI_LOGT("enter");
     xkb_context* context = nullptr;
     xkb_keymap* keyMap = nullptr;
     int32_t ctxFlags = XKB_CONTEXT_NO_DEFAULT_INCLUDES;
@@ -508,6 +510,7 @@ bool KeyEventValueTransformation::Init()
 
 uint32_t KeyEventValueTransformation::KeyboardHandleKeySym(uint32_t keyboardKey)
 {
+    MMI_LOGT("enter");
     const uint32_t XKB_EVDEV_OFFSET = 8;
     uint32_t code = keyboardKey + XKB_EVDEV_OFFSET;
     xkb_keysym_t syms = XKB_KEY_NoSymbol;

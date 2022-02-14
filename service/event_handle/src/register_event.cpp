@@ -50,6 +50,7 @@ RegisterEvent::~RegisterEvent()
 
 void RegisterEvent::OnEventKeyGetSign(const EventKeyboard& key, MmiMessageId& msg, EventKeyboard& prevKey)
 {
+    MMI_LOGT("enter");
     CHK((key.state == 0) || (key.state == BIT1), PARAM_INPUT_INVALID);
     int32_t temp = modTask_;
     GetModeCode getModeCode[] = {
@@ -104,6 +105,7 @@ void RegisterEvent::OnEventKeyGetSign(const EventKeyboard& key, MmiMessageId& ms
 
 bool RegisterEvent::OnGetRepeatKetState(const uint32_t keyCode, MmiMessageId& msgId)
 {
+    MMI_LOGT("enter");
     EventHandle taskCode[] = {
         {KEY_SCREENRECORD, BIT4, MmiMessageId::ON_STOP_SCREEN_RECORD},
         {KEY_VIDEO, BIT5, MmiMessageId::ON_STOP_SCREEN_RECORD}
@@ -121,6 +123,7 @@ bool RegisterEvent::OnGetRepeatKetState(const uint32_t keyCode, MmiMessageId& ms
 
 int32_t RegisterEvent::SetPrevKeyValue(EventKeyboard& prevKey)
 {
+    MMI_LOGT("enter");
     prevKey.deviceType = key_.deviceType;
     prevKey.eventType = key_.eventType;
     prevKey.deviceId = key_.deviceId;
@@ -133,6 +136,7 @@ int32_t RegisterEvent::SetPrevKeyValue(EventKeyboard& prevKey)
 
 int32_t RegisterEvent::OnEventKeyJudge(const EventKeyboard& key, MmiMessageId& msgId, EventKeyboard& prevKey)
 {
+    MMI_LOGT("enter");
     EventHandle eventHandle[] = {
         {KEY_SEARCH, 0, MmiMessageId::ON_SEARCH}, {KEY_PAUSE, 0, MmiMessageId::ON_PAUSE},
         {KEY_PLAY, 0, MmiMessageId::ON_PLAY}, {KEY_CHANNELUP, 0, MmiMessageId::ON_PREVIOUS},
@@ -181,12 +185,14 @@ int32_t RegisterEvent::OnEventKeyJudge(const EventKeyboard& key, MmiMessageId& m
 
 int32_t RegisterEvent::GetBitNum(const int32_t bitCode) const
 {
+    MMI_LOGT("enter");
     CHKF(bitCode >= 0, PARAM_INPUT_INVALID);
     return BIT1 << bitCode;
 }
 
 int32_t RegisterEvent::BitSetZero(const int32_t signCode, const int32_t bitCode) const
 {
+    MMI_LOGT("enter");
     CHKF(bitCode >= 0, PARAM_INPUT_INVALID);
     CHKF(signCode >= 0, PARAM_INPUT_INVALID);
     return signCode & ~(BIT1 << bitCode);
@@ -194,6 +200,7 @@ int32_t RegisterEvent::BitSetZero(const int32_t signCode, const int32_t bitCode)
 
 int32_t RegisterEvent::BitSetOne(const int32_t signCode, const int32_t bitCode) const
 {
+    MMI_LOGT("enter");
     CHKF(bitCode >= 0, PARAM_INPUT_INVALID);
     CHKF(signCode >= 0, PARAM_INPUT_INVALID);
     return signCode | (BIT1 << bitCode);
@@ -201,6 +208,7 @@ int32_t RegisterEvent::BitSetOne(const int32_t signCode, const int32_t bitCode) 
 
 void RegisterEvent::TouchInfoBegin(const uint64_t time, const double x, const double y, TouchInfo& touchinfo)
 {
+    MMI_LOGT("enter");
     CHK(time > 0, PARAM_INPUT_INVALID);
     touchinfo.beginTime = time;
     touchinfo.beginX = x;
@@ -209,6 +217,7 @@ void RegisterEvent::TouchInfoBegin(const uint64_t time, const double x, const do
 
 void RegisterEvent::TouchInfoEnd(const uint64_t time, const double x, const double y, TouchInfo& touchinfo)
 {
+    MMI_LOGT("enter");
     CHK(time > 0, PARAM_INPUT_INVALID);
     touchinfo.endTime = time;
     touchinfo.endX = x;
@@ -218,6 +227,7 @@ void RegisterEvent::TouchInfoEnd(const uint64_t time, const double x, const doub
 int32_t RegisterEvent::OnEventPointButton(const int32_t buttonCode, const uint64_t timeNow,
                                           const BUTTON_STATE stateValue, MmiMessageId& msgId)
 {
+    MMI_LOGT("enter");
     CHKF(buttonCode >= 0, PARAM_INPUT_INVALID);
     CHKF(timeNow > 0, PARAM_INPUT_INVALID);
     CHKF(stateValue == 0 || stateValue == BIT1, PARAM_INPUT_INVALID);
@@ -253,6 +263,7 @@ int32_t RegisterEvent::OnEventPointButton(const int32_t buttonCode, const uint64
 
 int32_t RegisterEvent::OnEventPointAxis(const EventPointer& point, MmiMessageId& msgId)
 {
+    MMI_LOGT("enter");
     if (point.axis == POINTER_AXIS_SCROLL_VERTICAL && point.delta.y < 0) {
         msgId = MmiMessageId::ON_PREVIOUS;
     }
@@ -264,6 +275,7 @@ int32_t RegisterEvent::OnEventPointAxis(const EventPointer& point, MmiMessageId&
 
 void RegisterEvent::OnEventGestureGetSign(const EventGesture& gesture, MmiMessageId& msgId)
 {
+    MMI_LOGT("enter");
     CHK(gesture.time > 0, PARAM_INPUT_INVALID);
     CHK(gesture.fingerCount > 0, PARAM_INPUT_INVALID);
     CHK(gesture.eventType > 0, PARAM_INPUT_INVALID);
@@ -288,6 +300,7 @@ void RegisterEvent::OnEventGestureGetSign(const EventGesture& gesture, MmiMessag
 
 void RegisterEvent::OnEventTouchGetSign(const EventTouch& touch, MmiMessageId& msgId)
 {
+    MMI_LOGT("enter");
     CHK(touch.time > 0, PARAM_INPUT_INVALID);
     CHK(touch.seatSlot >= 0, PARAM_INPUT_INVALID);
     CHK(touch.eventType >= 0, PARAM_INPUT_INVALID);
@@ -310,6 +323,7 @@ void RegisterEvent::OnEventTouchGetSign(const EventTouch& touch, MmiMessageId& m
 
 int32_t RegisterEvent::OnEventGestureBeginGetSign(const EventGesture& gesture)
 {
+    MMI_LOGT("enter");
     CHKF(gesture.time > 0, PARAM_INPUT_INVALID);
     CHKF(gesture.fingerCount > 0, PARAM_INPUT_INVALID);
     gestureInfo_.enabled = true;
@@ -326,6 +340,7 @@ int32_t RegisterEvent::OnEventGestureBeginGetSign(const EventGesture& gesture)
 
 int32_t RegisterEvent::OnEventGestureUpdateGetSign(const EventGesture& gesture, MmiMessageId& msgId)
 {
+    MMI_LOGT("enter");
     CHKF(gesture.time >= gestureInfo_.beginTime, OHOS::PARAM_INPUT_INVALID);
     CHKF(gesture.fingerCount > 0, OHOS::PARAM_INPUT_INVALID);
     if (!gestureInfo_.enabled || gestureInfo_.fingerCount != gesture.fingerCount) {
@@ -367,6 +382,7 @@ int32_t RegisterEvent::OnEventGestureUpdateGetSign(const EventGesture& gesture, 
 
 int32_t RegisterEvent::OnEventGestureEndGetSign(const EventGesture& gesture, MmiMessageId& msgId)
 {
+    MMI_LOGT("enter");
     CHKF(gesture.time > 0, OHOS::PARAM_INPUT_INVALID);
     CHKF(gesture.fingerCount > 0, OHOS::PARAM_INPUT_INVALID);
     if (!gestureInfo_.enabled) {
@@ -383,6 +399,7 @@ int32_t RegisterEvent::OnEventGestureEndGetSign(const EventGesture& gesture, Mmi
 
 int32_t RegisterEvent::OnEventTouchDownGetSign(const EventTouch& touch)
 {
+    MMI_LOGT("enter");
     CHKF(touch.time > 0, PARAM_INPUT_INVALID);
     CHKF(touch.seatSlot >= 0, PARAM_INPUT_INVALID);
     TouchInfo touchDownInfo = {};
@@ -405,6 +422,7 @@ int32_t RegisterEvent::OnEventTouchDownGetSign(const EventTouch& touch)
 
 int32_t RegisterEvent::OnEventOneFingerHandlerGetSign(MmiMessageId& msgId, TouchInfo& touchUpInfo)
 {
+    MMI_LOGT("enter");
     if (((touchUpInfo.beginX >= MINX) && (touchUpInfo.beginX < MINX + REGION) &&
         (touchUpInfo.endX - touchUpInfo.beginX > MOVEXDISTANCE)) ||
         ((touchUpInfo.beginX <= MAXX) && (touchUpInfo.beginX > MAXX - REGION) &&
@@ -424,6 +442,7 @@ int32_t RegisterEvent::OnEventOneFingerHandlerGetSign(MmiMessageId& msgId, Touch
 
 int32_t RegisterEvent::OnEventThreeFingerHandlerGetSign(MmiMessageId& msgId, TouchInfo& touchUpInfo)
 {
+    MMI_LOGT("enter");
     int32_t touchState = 1;
     for (const auto &item : touchInfos_) {
         if ((item.second.deviceId == touchUpInfo.deviceId) &&
@@ -443,6 +462,7 @@ int32_t RegisterEvent::OnEventThreeFingerHandlerGetSign(MmiMessageId& msgId, Tou
 
 int32_t RegisterEvent::OnEventTouchUpGetSign(const EventTouch& touch, MmiMessageId& msgId)
 {
+    MMI_LOGT("enter");
     CHKF(touch.time > 0, PARAM_INPUT_INVALID);
     CHKF(touch.seatSlot >= 0, PARAM_INPUT_INVALID);
     TouchInfo touchUpInfo = {};
@@ -465,6 +485,7 @@ int32_t RegisterEvent::OnEventTouchUpGetSign(const EventTouch& touch, MmiMessage
 
 int32_t RegisterEvent::OnEventTouchMotionGetSign(const EventTouch& touch, MmiMessageId& msgId)
 {
+    MMI_LOGT("enter");
     CHKF(touch.time > 0, PARAM_INPUT_INVALID);
     CHKF(touch.seatSlot >= 0, PARAM_INPUT_INVALID);
     auto iter = touchInfos_.find(std::make_pair(touch.deviceId, touch.seatSlot));
@@ -499,6 +520,7 @@ int32_t RegisterEvent::OnEventTouchMotionGetSign(const EventTouch& touch, MmiMes
 
 void RegisterEvent::GetTouchInfo(const std::pair<uint32_t, int32_t> key, EventTouch& touch)
 {
+    MMI_LOGT("enter");
     auto iter = touchInfos_.find(key);
     if (iter == touchInfos_.end()) {
         MMI_LOGE("Touch event not found");
@@ -517,6 +539,7 @@ void RegisterEvent::GetTouchInfo(const std::pair<uint32_t, int32_t> key, EventTo
 
 void RegisterEvent::GetTouchIds(std::vector<std::pair<uint32_t, int32_t>>& touchIds, const uint32_t deviceId)
 {
+    MMI_LOGT("enter");
     auto iter = touchInfos_.begin();
     while (iter != touchInfos_.end()) {
         if (iter->second.deviceId == deviceId) {
@@ -528,6 +551,7 @@ void RegisterEvent::GetTouchIds(std::vector<std::pair<uint32_t, int32_t>>& touch
 
 int32_t RegisterEvent::GetTouchInfoSizeByDeviceId(uint32_t deviceId)
 {
+    MMI_LOGT("enter");
     int32_t count = 0;
     for (const auto &item : touchInfos_) {
         if (item.second.deviceId == deviceId) {
@@ -539,6 +563,7 @@ int32_t RegisterEvent::GetTouchInfoSizeByDeviceId(uint32_t deviceId)
 
 void RegisterEvent::DeleteTouchInfoByDeviceId(uint32_t deviceId)
 {
+    MMI_LOGT("enter");
     auto it = touchInfos_.begin();
     while (it != touchInfos_.end()) {
         if (it->second.deviceId == deviceId) {
