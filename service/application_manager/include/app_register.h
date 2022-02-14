@@ -33,9 +33,9 @@ struct AppInfo {
 struct WaitQueueEvent {
     int32_t fd;
     int32_t event;
-    uint64_t inputTime;
-    uint64_t westonTime;
-    uint64_t serverTime;
+    int64_t inputTime;
+    int64_t westonTime;
+    int64_t serverTime;
 };
 
 class AppRegister : public DelayedSingleton<AppRegister> {

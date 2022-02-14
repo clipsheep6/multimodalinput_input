@@ -32,7 +32,7 @@ namespace {
     constexpr bool ACTION_DOWN = true;
     constexpr bool ACTION_UP = false;
     constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
-    constexpr int32_t SEC_TO_NANOSEC = 1000000000;
+    constexpr int64_t SEC_TO_NANOSEC = 1000000000;
     constexpr bool ISINTERCEPTED_TRUE = true;
     constexpr int32_t SLEEP = 3000;
     const std::regex REGEX_FIND_PID(" ");
@@ -114,9 +114,8 @@ int64_t MultimodalEventHandlerTest::GetNanoTime()
 {
     timespec time = { 0 };
     clock_gettime(CLOCK_MONOTONIC, &time);
-    return static_cast<uint64_t>(time.tv_sec) * SEC_TO_NANOSEC + time.tv_nsec;
+    return static_cast<int64_t>(time.tv_sec) * SEC_TO_NANOSEC + time.tv_nsec;
 }
-
 
 HWTEST_F(MultimodalEventHandlerTest, TEST_GetAbilityInfoVec, TestSize.Level1)
 {
@@ -139,14 +138,14 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_InjectKeyEvent_001, 
     ASSERT_TRUE(runCommand.RunShellCommand(command, log) == RET_OK);
     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP));
     OHOS::KeyEvent injectDownEvent;
-    uint64_t downTime = static_cast<uint64_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
+    int32_t downTime = static_cast<int32_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
     injectDownEvent.Initialize(0, ACTION_DOWN, HOS_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
         ISINTERCEPTED_TRUE);
     int32_t response = MMIEventHdl.InjectEvent(injectDownEvent);
     EXPECT_TRUE(response);
 
     OHOS::KeyEvent injectUpEvent;
-    downTime = static_cast<uint64_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
+    downTime = static_cast<int32_t>(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
     injectUpEvent.Initialize(0, ACTION_UP, HOS_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
         ISINTERCEPTED_TRUE);
     response = MMIEventHdl.InjectEvent(injectUpEvent);
