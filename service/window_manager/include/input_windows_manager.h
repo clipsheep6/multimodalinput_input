@@ -171,8 +171,6 @@ public:
     int32_t UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent);
     bool TransformTouchPointToDisplayPoint(libinput_event_touch* touch,
     int32_t& targetDisplayId, int32_t& displayX, int32_t& displayY);
-    bool GetDisplayCoordinate(int32_t globalLogicalX, int32_t globalLogicalY,
-    int32_t& displayX, int32_t& displayY, int32_t& targetDisplayId);
 
     void AdjustCoordinate(double &coordinateX, double &coordinateY);
     void FixCursorPosition(int32_t &globalX, int32_t &globalY, int cursorW, int cursorH);

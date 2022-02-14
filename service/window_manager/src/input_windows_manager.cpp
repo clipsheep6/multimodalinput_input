@@ -641,22 +641,16 @@ bool OHOS::MMI::InputWindowsManager::TransformTouchPointToDisplayPoint(libinput_
     int32_t globalLogicalX = localLogcialX;
     int32_t globalLogicalY = localLogcialY;
 
-    for (const PhysicalDisplayInfo* left = GetPhysicalDisplay(info->leftDisplayId); left != nullptr;
+    for (auto left = GetPhysicalDisplay(info->leftDisplayId); left != nullptr;
         left = GetPhysicalDisplay(left->leftDisplayId)) {
         globalLogicalX += left->logicWidth;
     }
 
-    for (const PhysicalDisplayInfo* upper = GetPhysicalDisplay(info->upDisplayId);
-        upper != nullptr; upper = GetPhysicalDisplay(upper->upDisplayId)) {
+    for (auto upper = GetPhysicalDisplay(info->upDisplayId); upper != nullptr;
+        upper = GetPhysicalDisplay(upper->upDisplayId)) {
         globalLogicalY += upper->logicHeight;
     }
-    auto isTargetId = GetDisplayCoordinate(globalLogicalX, globalLogicalY, displayX, displayY, targetDisplayId);
-    return isTargetId;
-}
 
-bool OHOS::MMI::InputWindowsManager::GetDisplayCoordinate(int32_t globalLogicalX, int32_t globalLogicalY,
-    int32_t& displayX, int32_t& displayY, int32_t& targetDisplayId)
-{
     for (const auto& display : logicalDisplays_) {
         if (targetDisplayId < 0) {
             if ((globalLogicalX < display.topLeftX) || (globalLogicalX > display.topLeftX + display.width)) {
