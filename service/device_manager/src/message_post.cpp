@@ -26,6 +26,7 @@ void MessagePost::SetFd(int fd)
 
 void MessagePost::RunOnWestonThread(std::function<void(weston_compositor *)> taskItem)
 {
+    MMI_LOGT("enter");
     {
         std::lock_guard<std::mutex> guard(lk_);
         asyncTasks_.push_back(taskItem);
@@ -35,6 +36,7 @@ void MessagePost::RunOnWestonThread(std::function<void(weston_compositor *)> tas
 
 void MessagePost::NotifyWestonThread()
 {
+    MMI_LOGT("enter");
     if (fd_ == -1) {
         return;
     }
@@ -44,6 +46,7 @@ void MessagePost::NotifyWestonThread()
 
 void MessagePost::RunTasks()
 {
+    MMI_LOGT("enter");
     while (true) {
         std::function<void(weston_compositor *)> taskItem;
         {
@@ -60,6 +63,7 @@ void MessagePost::RunTasks()
 
 int MessagePost::RunTaskOnWestonThread(int fd, uint32_t mask, void *data)
 {
+    MMI_LOGT("enter");
     int32_t value = 0;
     read(fd, &value, sizeof(value));
     MMIMsgPost.RunTasks();
@@ -68,6 +72,7 @@ int MessagePost::RunTaskOnWestonThread(int fd, uint32_t mask, void *data)
 
 void MessagePost::SetWestonCompositor(weston_compositor *ec)
 {
+    MMI_LOGT("enter");
     ec_ = ec;
 }
 } // namespace MMI

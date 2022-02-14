@@ -38,6 +38,7 @@ OHOS::MMI::ExpansibilityOperation::~ExpansibilityOperation()
 
 std::string OHOS::MMI::ExpansibilityOperation::GetFileName(const std::string& line)
 {
+    MMI_LOGT("enter");
     std::istringstream stream(line);
     std::string deviceName;
     std::string fileName;
@@ -50,6 +51,7 @@ std::string OHOS::MMI::ExpansibilityOperation::GetFileName(const std::string& li
 int32_t OHOS::MMI::ExpansibilityOperation::GetNewDeviceFd(const std::string& fileName)
 {
     // load dyn file
+    MMI_LOGT("enter");
     std::string filePath;
     filePath.append(libPath_).append(fileName);
     void *libmHandle = dlopen(filePath.c_str(), RTLD_LAZY);
@@ -83,6 +85,7 @@ int32_t OHOS::MMI::ExpansibilityOperation::GetNewDeviceFd(const std::string& fil
 
 void OHOS::MMI::ExpansibilityOperation::LoadExteralLibrary(const std::string& cfg, const std::string& libPath)
 {
+    MMI_LOGT("enter");
     CHK(cfg.length() > 1, PARAM_INPUT_INVALID);
     CHK(libPath.length() > 1, PARAM_INPUT_INVALID);
     libPath_ = libPath;
@@ -113,6 +116,7 @@ void OHOS::MMI::ExpansibilityOperation::LoadExteralLibrary(const std::string& cf
 
 bool OHOS::MMI::ExpansibilityOperation::RegistDeviceEventFd(int32_t deviceEventFd)
 {
+    MMI_LOGT("enter");
     MMI_LOGD("The New Device fd:[%{public}d]", deviceEventFd);
     return true;
 }

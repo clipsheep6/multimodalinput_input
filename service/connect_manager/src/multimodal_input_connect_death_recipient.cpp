@@ -24,6 +24,7 @@ MultimodalInputConnectDeathRecipient::MultimodalInputConnectDeathRecipient(
 
 void MultimodalInputConnectDeathRecipient::OnRemoteDied(const OHOS::wptr<OHOS::IRemoteObject> &object)
 {
+    MMI_LOGT("enter");
     if (deathCallback_) {
         deathCallback_(object);
     }

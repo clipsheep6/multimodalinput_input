@@ -34,6 +34,7 @@ namespace {
 
 std::shared_ptr<MultimodalInputConnectManager> MultimodalInputConnectManager::GetInstance()
 {
+    MMI_LOGT("enter");
     static std::once_flag flag;
     std::call_once(flag, [&]() {
         g_instance.reset(new MultimodalInputConnectManager());
@@ -75,6 +76,7 @@ int MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair() const
 
 int32_t MultimodalInputConnectManager::AddInputEventFilter(sptr<IEventFilter> filter)
 {
+    MMI_LOGT("enter");
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ == nullptr) {
         MMI_LOGE("multimodalInputConnectService_ is nullptr");
@@ -145,6 +147,7 @@ void MultimodalInputConnectManager::Clean()
 
 void MultimodalInputConnectManager::NotifyDeath()
 {
+    MMI_LOGT("enter");
     MMI_LOGT("multimodal input connect service is dead, connect again");
     for (uint32_t i = 0; i < CONNECT_MAX_TRY_COUNT; i++) {
         std::this_thread::sleep_for(std::chrono::milliseconds(CONNECT_SERVICE_WAIT_TIME));

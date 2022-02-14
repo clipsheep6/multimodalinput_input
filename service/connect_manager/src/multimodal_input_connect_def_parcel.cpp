@@ -19,6 +19,7 @@ namespace OHOS {
 namespace MMI {
 bool ConnectDefReqParcel::Marshalling(Parcel& out) const
 {
+    MMI_LOGT("enter");
     if (!out.WriteInt32(data.moduleId)) {
         return false;
     }
@@ -30,6 +31,7 @@ bool ConnectDefReqParcel::Marshalling(Parcel& out) const
 
 ConnectDefReqParcel *ConnectDefReqParcel::Unmarshalling(Parcel& in)
 {
+    MMI_LOGT("enter");
     auto* request = new (std::nothrow) ConnectDefReqParcel();
     if (request == nullptr) {
         return nullptr;
@@ -47,6 +49,7 @@ ConnectDefReqParcel *ConnectDefReqParcel::Unmarshalling(Parcel& in)
 
 bool ConnectDefRespParcel::Marshalling(Parcel &out) const
 {
+    MMI_LOGT("enter");
     if (!out.WriteInt32(data.returnCode)) {
         return false;
     }
@@ -58,6 +61,7 @@ bool ConnectDefRespParcel::Marshalling(Parcel &out) const
 
 ConnectDefRespParcel *ConnectDefRespParcel::Unmarshalling(Parcel &in)
 {
+    MMI_LOGT("enter");
     auto *response = new (std::nothrow) ConnectDefRespParcel();
     if (response == nullptr) {
         return nullptr;

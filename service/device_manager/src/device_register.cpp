@@ -32,6 +32,7 @@ DeviceRegister::~DeviceRegister()
 
 bool DeviceRegister::Init()
 {
+    MMI_LOGT("enter");
     setDeviceId_.clear();
     mapDeviceInfo_.clear();
     if (mu_.try_lock()) {
@@ -48,6 +49,7 @@ bool DeviceRegister::Init()
 
 bool DeviceRegister::FindDeviceId(const std::string& physical, uint32_t& deviceId)
 {
+    MMI_LOGT("enter");
     std::lock_guard<std::mutex> lock(mu_);
     const uint32_t DEFAULT_DEVICE_ID = 0;
     auto it = mapDeviceInfo_.find(physical);
@@ -61,6 +63,7 @@ bool DeviceRegister::FindDeviceId(const std::string& physical, uint32_t& deviceI
 
 uint32_t DeviceRegister::AddDeviceInfo(const std::string& physical)
 {
+    MMI_LOGT("enter");
     std::lock_guard<std::mutex> lock(mu_);
     const uint32_t BEGIN_NUM = 1;
     auto it = setDeviceId_.find(BEGIN_NUM);
@@ -83,6 +86,7 @@ uint32_t DeviceRegister::AddDeviceInfo(const std::string& physical)
 
 bool DeviceRegister::DeleteDeviceInfo(const std::string& physical)
 {
+    MMI_LOGT("enter");
     std::lock_guard<std::mutex> lock(mu_);
     auto it = mapDeviceInfo_.find(physical);
     if (it != mapDeviceInfo_.end()) {

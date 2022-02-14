@@ -53,6 +53,7 @@ int32_t IMultimodalInputConnectStub::OnRemoteRequest(
 
 bool IMultimodalInputConnectStub::IsAuthorizedCalling() const
 {
+    MMI_LOGT("enter");
     int callingUid = IPCSkeleton::GetCallingUid();
     MMI_LOGIK("Calling uid: %{public}d", callingUid);
     return true;
@@ -60,11 +61,13 @@ bool IMultimodalInputConnectStub::IsAuthorizedCalling() const
 
 int32_t IMultimodalInputConnectStub::GetCallingUid() const
 {
+    MMI_LOGT("enter");
     return IPCSkeleton::GetCallingUid();
 }
 
 int32_t IMultimodalInputConnectStub::GetCallingPid() const
 {
+    MMI_LOGT("enter");
     return IPCSkeleton::GetCallingPid();
 }
 
