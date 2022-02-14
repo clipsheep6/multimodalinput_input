@@ -1756,7 +1756,7 @@ void InputEventInterceptor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEv
 {
     std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
     MMI_LOGD("Pointer event intercepted:");
-    MMI_LOGD("eventType:%{public}s,actionTime:%{public}d,"
+    MMI_LOGD("eventType:%{public}d,actionTime:%{public}d,"
              "action:%{public}d,actionStartTime:%{public}d,"
              "flag:%{public}d,pointerAction:%{public}s,sourceType:%{public}s,"
              "VerticalAxisValue:%{public}.2f,HorizontalAxisValue:%{public}.2f,"
