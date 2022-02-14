@@ -50,7 +50,7 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
     if (ret < 0) {
         const int errNoSaved = errno;
         MMI_LOGE("UDSSession::SendMsg write return %{public}zu, fd_: %{public}d, errNoSaved: %{public}d, %{public}s",
-                ret, fd_, errNoSaved, strerror(errNoSaved));
+                 ret, fd_, errNoSaved, strerror(errNoSaved));
         return false;
     }
     return true;
