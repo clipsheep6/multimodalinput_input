@@ -46,10 +46,10 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
     CHKPF(buf);
     CHKF(size > 0 && size <= MAX_PACKET_BUF_SIZE, PARAM_INPUT_INVALID);
     CHKF(fd_ >= 0, PARAM_INPUT_INVALID);
-    size_t ret = write(fd_, static_cast<void *>(const_cast<char *>(buf)), size);
+    ssize_t ret = write(fd_, static_cast<void *>(const_cast<char *>(buf)), size);
     if (ret < 0) {
         const int errNoSaved = errno;
-        MMI_LOGE("UDSSession::SendMsg write return %{public}zu, fd_: %{public}d, errNoSaved: %{public}d, %{public}s",
+        MMI_LOGE("UDSSession::SendMsg write return %{public}zd, fd_: %{public}d, errNoSaved: %{public}d, %{public}s",
                  ret, fd_, errNoSaved, strerror(errNoSaved));
         return false;
     }
