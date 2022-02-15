@@ -19,8 +19,6 @@
 #include "error_multimodal.h"
 #include "event_filter_service.h"
 #include "input_event_monitor_manager.h"
-#include "input_monitor_manager.h"
-#include "input_interceptor_manager.h"
 #include "interceptor_manager.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
@@ -65,7 +63,7 @@ void InputManagerImpl::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> 
 {
     MMI_LOGD("enter");
     if (physicalDisplays.empty() || logicalDisplays.empty()) {
-        MMI_LOGE("display info check failed! physicalDisplays size is %{public}d, logicalDisplays size is %{public}d",
+        MMI_LOGE("display info check failed! physicalDisplays size:%{public}d, logicalDisplays size:%{public}d",
             static_cast<int32_t>(physicalDisplays.size()), static_cast<int32_t>(logicalDisplays.size()));
         return;
     }
@@ -96,7 +94,7 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
     if (!hasSendToMmiServer) {
         int32_t ret = MultimodalInputConnectManager::GetInstance()->AddInputEventFilter(eventFilterService_);
         if (ret != RET_OK) {
-            MMI_LOGE("AddInputEventFilter has send to server fail, ret = %{public}d", ret);
+            MMI_LOGE("AddInputEventFilter has send to server fail, ret:%{public}d", ret);
             return RET_ERR;
         }
         hasSendToMmiServer = true;
@@ -124,9 +122,9 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     std::string keyCodestring = "client dispatchKeyCode = " + std::to_string(getKeyCode);
     MMI_LOGT(" OnKeyEvent client trace getKeyCode:%{public}d", getKeyCode);
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring);
-    int32_t eventKey = 4;
-    keyCodestring = "KeyEventDispatchAsync";
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, eventKey);
+    int32_t keyId = keyEvent->GetId();
+    keyCodestring = "KeyEventDispatch";
+    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyCodestring, keyId);
     if (consumer_ != nullptr) {
         CHKP(keyEvent);
         consumer_->OnInputEvent(keyEvent);
@@ -139,12 +137,21 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 void InputManagerImpl::OnPointerEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
 {
     MMI_LOGD("Pointer event received, processing ...");
-    int32_t eventPointer = 20;
-    std::string pointerCodestring = "PointerEventDispatchAsync";
-    FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerCodestring, eventPointer);
+    int32_t pointerDispatch = 1;
+    int32_t touchDispatch = 2;
+    if (pointerDispatch == pointerEvent->GetSourceType()) {
+        int32_t pointerId = pointerEvent->GetId();
+        std::string pointerEventstring = "PointerEventDispatch";
+        FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, pointerEventstring, pointerId);
+    }
+    if (touchDispatch == pointerEvent->GetSourceType()) {
+        int32_t touchId = pointerEvent->GetId();
+        std::string touchEvent = "touchEventDispatch";
+        FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, touchEvent, touchId);
+    }
     if (consumer_ != nullptr) {
         CHKP(pointerEvent);
-        MMI_LOGD("Passed on to consumer ...");
+        MMI_LOGD("Passed on to consumer");
         consumer_->OnInputEvent(pointerEvent);
         return;
     }
@@ -211,9 +218,9 @@ void InputManagerImpl::PrintDisplayDebugInfo()
     MMI_LOGD("physicalDisplays,num:%{public}d", static_cast<int32_t>(physicalDisplays_.size()));
     for (const auto &item : physicalDisplays_) {
         MMI_LOGD("physicalDisplays,id:%{public}d, leftDisplayId:%{public}d, upDisplayId:%{public}d, "
-            "topLeftX:%{public}d, topLeftY:%{public}d, width:%{public}d,height:%{public}d,name:%{public}s,"
-            "seatId:%{public}s, seatName:%{public}s, logicWidth:%{public}d, logicHeight:%{public}d, "
-            "direction:%{public}d",
+            "topLeftX:%{public}d, topLeftY:%{public}d, width:%{public}d, height:%{public}d, "
+            "name:%{public}s, seatId:%{public}s, seatName:%{public}s, logicWidth:%{public}d, "
+            "logicHeight:%{public}d, direction:%{public}d",
             item.id, item.leftDisplayId, item.upDisplayId,
             item.topLeftX, item.topLeftY, item.width,
             item.height, item.name.c_str(), item.seatId.c_str(),
@@ -223,22 +230,22 @@ void InputManagerImpl::PrintDisplayDebugInfo()
 
     MMI_LOGD("logicalDisplays,num:%{public}d", static_cast<int32_t>(logicalDisplays_.size()));
     for (const auto &item : logicalDisplays_) {
-        MMI_LOGD("logicalDisplays, id:%{public}d,topLeftX:%{public}d, topLeftY:%{public}d, "
-            "width:%{public}d,height:%{public}d,name:%{public}s,"
-            "seatId:%{public}s, seatName:%{public}s,focusWindowId:%{public}d,window num:%{public}d",
+        MMI_LOGD("logicalDisplays, id:%{public}d, topLeftX:%{public}d, topLeftY:%{public}d, "
+            "width:%{public}d, height:%{public}d, name:%{public}s, "
+            "seatId:%{public}s, seatName:%{public}s, focusWindowId:%{public}d, window num:%{public}d",
             item.id, item.topLeftX, item.topLeftY,
             item.width, item.height, item.name.c_str(),
             item.seatId.c_str(), item.seatName.c_str(),
             item.focusWindowId, static_cast<int32_t>(item.windowsInfo_.size()));
 
         for (const auto &win : item.windowsInfo_) {
-            MMI_LOGD("windowid:%{public}d, pid:%{public}d,uid:%{public}d,topLeftX:%{public}d,"
-                "topLeftY:%{public}d,width:%{public}d,height:%{public}d,displayId:%{public}d,agentWindowId:%{public}d,"
-                "winTopLeftX:%{public}d, winTopLeftY:%{public}d",
+            MMI_LOGD("windowid:%{public}d, pid:%{public}d, uid:%{public}d, hotZoneTopLeftX:%{public}d, "
+                "hotZoneTopLeftY:%{public}d, hotZoneWidth:%{public}d, hotZoneHeight:%{public}d, displayId:%{public}d, "
+                "agentWindowId:%{public}d, winTopLeftX:%{public}d, winTopLeftY:%{public}d",
                 win.id, win.pid,
-                win.uid, win.topLeftX,
-                win.topLeftY, win.width,
-                win.height, win.displayId,
+                win.uid, win.hotZoneTopLeftX,
+                win.hotZoneTopLeftY, win.hotZoneWidth,
+                win.hotZoneHeight, win.displayId,
                 win.agentWindowId,
                 win.winTopLeftX, win.winTopLeftY);
         }
@@ -247,6 +254,7 @@ void InputManagerImpl::PrintDisplayDebugInfo()
 
 int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor)
 {
+    CHKPR(monitor, ERROR_NULL_POINTER);
     int32_t monitorId = InputMonitorMgr.AddInputEventMontior(monitor);
     monitorId = monitorId * ADD_MASK_BASE + MASK_KEY;
     return monitorId;
@@ -254,10 +262,7 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent
 
 int32_t InputManagerImpl::AddMontior(std::function<void(std::shared_ptr<PointerEvent>)> monitor)
 {
-    if (monitor == nullptr) {
-        MMI_LOGE("InputManagerImpl::%{public}s param should not be null", __func__);
-        return InputEventMonitorManager::INVALID_MONITOR_ID;
-    }
+    CHKPR(monitor, ERROR_NULL_POINTER);
     std::shared_ptr<IInputEventConsumer> consumer =
         std::make_shared<PublicIInputEventConsumer>(monitor);
     return InputManagerImpl::AddMonitor(consumer);
@@ -265,7 +270,8 @@ int32_t InputManagerImpl::AddMontior(std::function<void(std::shared_ptr<PointerE
 
 int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consumer)
 {
-    int32_t monitorId = InputMonitorManager::GetInstance().AddMonitor(consumer);
+    CHKPR(consumer, ERROR_NULL_POINTER);
+    int32_t monitorId = monitorManager_.AddMonitor(consumer);
     monitorId = monitorId * ADD_MASK_BASE + MASK_TOUCH;
     return monitorId;
 }
@@ -280,7 +286,7 @@ void InputManagerImpl::RemoveMonitor(int32_t monitorId)
             InputMonitorMgr.RemoveInputEventMontior(monitorId);
             break;
         case MASK_TOUCH:
-            InputMonitorManager::GetInstance().RemoveMonitor(monitorId);
+            monitorManager_.RemoveMonitor(monitorId);
             break;
         case MASK_TOUCHPAD:
             InputMonitorMgr.RemoveInputEventTouchpadMontior(monitorId);
@@ -293,12 +299,12 @@ void InputManagerImpl::RemoveMonitor(int32_t monitorId)
 
 void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
-    InputMonitorManager::GetInstance().MarkConsumed(monitorId, eventId);
+    monitorManager_.MarkConsumed(monitorId, eventId);
 }
 
 int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
 {
-    int32_t interceptorId = InputInterceptorManager::GetInstance().AddInterceptor(interceptor);
+    int32_t interceptorId = interceptorManager_.AddInterceptor(interceptor);
     if (interceptorId >= 0) {
         interceptorId = interceptorId * ADD_MASK_BASE + MASK_TOUCH;
     }
@@ -334,13 +340,13 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
     interceptorId /= ADD_MASK_BASE;
     switch (mask) {
         case MASK_TOUCH:
-            InputInterceptorManager::GetInstance().RemoveInterceptor(interceptorId);
+            interceptorManager_.RemoveInterceptor(interceptorId);
             break;
         case MASK_KEY:
             InterceptorMgr.RemoveInterceptor(interceptorId);
             break;
         default:
-            MMI_LOGE("Can't find the mask,mask:%{public}d", mask);
+            MMI_LOGE("Can't find the mask, mask:%{public}d", mask);
             break;
     }
 }
@@ -364,7 +370,7 @@ void InputManagerImpl::OnConnected()
     MMI_LOGD("enter");
 
     if (physicalDisplays_.empty() || logicalDisplays_.empty()) {
-        MMI_LOGE("display info check failed! physicalDisplays_ size is %{public}d, logicalDisplays_ size is %{public}d",
+        MMI_LOGE("display info check failed! physicalDisplays_ size:%{public}d, logicalDisplays_ size:%{public}d",
             static_cast<int32_t>(physicalDisplays_.size()), static_cast<int32_t>(logicalDisplays_.size()));
         return;
     }

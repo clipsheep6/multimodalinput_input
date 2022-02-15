@@ -35,7 +35,7 @@ int32_t MultimodalInputConnectService::AllocSocketFd(const std::string &programN
                                                      int &toReturnClientFd)
 {
     MMI_LOGT("enter");
-    MMI_LOGI("MultimodalInputConnectService::AllocSocketFd enter, programName: %{public}s, moduleType: %{public}d",
+    MMI_LOGI("MultimodalInputConnectService::AllocSocketFd enter, programName:%{public}s, moduleType:%{public}d",
              programName.c_str(), moduleType);
     if (udsServer_ == nullptr) {
         MMI_LOGE("called, udsServer_ is nullptr.");
@@ -51,7 +51,7 @@ int32_t MultimodalInputConnectService::AllocSocketFd(const std::string &programN
         return RET_ERR;
     }
 
-    MMI_LOGIK("leave, programName: %{public}s, moduleType: %{public}d, alloc success.",
+    MMI_LOGIK("leave, programName:%{public}s, moduleType:%{public}d, alloc success.",
         programName.c_str(), moduleType);
 
     return RET_OK;
@@ -112,7 +112,7 @@ bool MultimodalInputConnectService::Initialize() const
     return true;
 }
 
-int32_t MultimodalInputConnectService::HandleAllocSocketFd(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& reply)
 {
     MMI_LOGT("enter");
     int32_t ret;

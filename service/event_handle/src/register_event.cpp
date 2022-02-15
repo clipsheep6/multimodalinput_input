@@ -420,7 +420,7 @@ int32_t RegisterEvent::OnEventTouchDownGetSign(const EventTouch& touch)
     return RET_OK;
 }
 
-int32_t RegisterEvent::OnEventOneFingerHandlerGetSign(MmiMessageId& msgId, TouchInfo& touchUpInfo)
+int32_t RegisterEvent::OnEventOneFingerHandlerGetSign(const TouchInfo& touchUpInfo, MmiMessageId& msgId)
 {
     MMI_LOGT("enter");
     if (((touchUpInfo.beginX >= MINX) && (touchUpInfo.beginX < MINX + REGION) &&
@@ -440,7 +440,7 @@ int32_t RegisterEvent::OnEventOneFingerHandlerGetSign(MmiMessageId& msgId, Touch
     return RET_OK;
 }
 
-int32_t RegisterEvent::OnEventThreeFingerHandlerGetSign(MmiMessageId& msgId, TouchInfo& touchUpInfo)
+int32_t RegisterEvent::OnEventThreeFingerHandlerGetSign(const TouchInfo& touchUpInfo, MmiMessageId& msgId)
 {
     MMI_LOGT("enter");
     int32_t touchState = 1;
@@ -467,18 +467,18 @@ int32_t RegisterEvent::OnEventTouchUpGetSign(const EventTouch& touch, MmiMessage
     CHKF(touch.seatSlot >= 0, PARAM_INPUT_INVALID);
     TouchInfo touchUpInfo = {};
     auto iter = touchInfos_.find(std::make_pair(touch.deviceId, touch.seatSlot));
-    if (iter != touchInfos_.end()) {
-        touchUpInfo = iter->second;
-        touchInfos_.erase(iter);
-    } else {
+    if (iter == touchInfos_.end()) {
+        MMI_LOGE("Failed to find touch event.");
         return RET_ERR;
     }
+    touchUpInfo = iter->second;
+    touchInfos_.erase(iter);
 
     if ((GetTouchInfoSizeByDeviceId(touchUpInfo.deviceId) + 1) == THREEFINGER) {
-        return OnEventThreeFingerHandlerGetSign(msgId, touchUpInfo);
+        return OnEventThreeFingerHandlerGetSign(touchUpInfo, msgId);
     }
     if ((GetTouchInfoSizeByDeviceId(touchUpInfo.deviceId) + 1) == ONEFINGER) {
-        return OnEventOneFingerHandlerGetSign(msgId, touchUpInfo);
+        return OnEventOneFingerHandlerGetSign(touchUpInfo, msgId);
     }
     return RET_OK;
 }
@@ -573,5 +573,5 @@ void RegisterEvent::DeleteTouchInfoByDeviceId(uint32_t deviceId)
         }
     }
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
