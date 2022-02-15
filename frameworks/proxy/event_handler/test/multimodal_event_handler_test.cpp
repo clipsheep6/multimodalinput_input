@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include "multimodal_event_handler.h"
 #include <gtest/gtest.h>
 #include "input_filter_manager.h"
 #include "key_event_handler.h"
@@ -21,6 +20,7 @@
 #include "mmi_token.h"
 #include "proto.h"
 #include "run_shell_util.h"
+#include "multimodal_event_handler.h"
 
 namespace {
 using namespace testing::ext;
