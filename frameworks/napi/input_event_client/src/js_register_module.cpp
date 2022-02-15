@@ -14,7 +14,7 @@
  */
 
 #include "js_register_module.h"
-#include <cinttypes>
+#include <inttypes.h>
 #include "js_register_event.h"
 #include "js_register_handle.h"
 #include "js_register_util.h"
