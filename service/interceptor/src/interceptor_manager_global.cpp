@@ -71,7 +71,7 @@ bool OHOS::MMI::InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<Pointer
     }
     PointerEvent::PointerItem pointer;
     CHKF(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer), PARAM_INPUT_FAIL);
-    MMI_LOGT("interceptor-servereventTouchpad:actionTime=%{public}d;"
+    MMI_LOGD("interceptor-servereventTouchpad:actionTime=%{public}d;"
              "sourceType=%{public}d;pointerAction=%{public}d;"
              "pointerId=%{public}d;point.x=%{public}d;point.y=%{public}d;press=%{public}d"
              "*********************************************************",

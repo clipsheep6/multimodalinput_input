@@ -19,7 +19,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
         LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectDeathRecipient"
     };
 }
@@ -31,10 +31,11 @@ MultimodalInputConnectDeathRecipient::MultimodalInputConnectDeathRecipient(
 
 void MultimodalInputConnectDeathRecipient::OnRemoteDied(const OHOS::wptr<OHOS::IRemoteObject> &object)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     if (deathCallback_) {
         deathCallback_(object);
     }
+    MMI_LOGD("leave");
 }
 } // namespace MMI
 } // namespace OHOS

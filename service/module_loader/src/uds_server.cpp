@@ -134,7 +134,7 @@ int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, 
                                                 int& toReturnClientFd, const int32_t uid, const int32_t pid)
 {
     std::lock_guard<std::mutex> lock(mux_);
-    MMI_LOGT("enter.");
+    MMI_LOGD("enter.");
     const int NUMBER_TWO = 2;
     int sockFds[NUMBER_TWO] = {};
 

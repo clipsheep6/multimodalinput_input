@@ -35,7 +35,7 @@ using namespace OHOS::MMI;
 
 struct SeatInfo** GetSeatsInfo()
 {
-    MMI_LOGT("GetSeatsInfo...");
+    MMI_LOGD("GetSeatsInfo...");
     const int32_t TEST_VAL = 2;
     const int32_t TEST_SEATNAME_SIZE = 32;
     auto setInfo = static_cast<SeatInfo**>(malloc(sizeof(SeatInfo*) * TEST_VAL));
@@ -54,7 +54,7 @@ struct SeatInfo** GetSeatsInfo()
 
 struct ScreenInfo** GetScreensInfo()
 {
-    MMI_LOGT("GetScreensInfo...");
+    MMI_LOGD("GetScreensInfo...");
     const int32_t TEST_VAL = 2;
     const int32_t TEST_LAYER_ID = 2;
     const int32_t TEST_WIDTH = 1920;
@@ -104,7 +104,7 @@ struct ScreenInfo** GetScreensInfo()
 
 void FreeSurfaceInfo(struct SurfaceInfo* pSurface)
 {
-    MMI_LOGT("FreeSurfaceInfo...");
+    MMI_LOGD("FreeSurfaceInfo...");
     if (pSurface) {
         free(const_cast<SurfaceInfo*>(pSurface));
     }
@@ -112,7 +112,7 @@ void FreeSurfaceInfo(struct SurfaceInfo* pSurface)
 
 void FreeLayerInfo(struct LayerInfo* pLayer)
 {
-    MMI_LOGT("FreeLayerInfo...");
+    MMI_LOGD("FreeLayerInfo...");
     if (pLayer) {
         if (pLayer->surfaces) {
             for (int i = 0; i < pLayer->nSurfaces; i++) {
@@ -126,7 +126,7 @@ void FreeLayerInfo(struct LayerInfo* pLayer)
 
 void FreeScreenInfo(struct ScreenInfo* pScreen)
 {
-    MMI_LOGT("FreeScreenInfo...");
+    MMI_LOGD("FreeScreenInfo...");
     if (pScreen) {
         if (pScreen->layers) {
             for (int i = 0; i < pScreen->nLayers; i++) {
@@ -143,7 +143,7 @@ void FreeScreenInfo(struct ScreenInfo* pScreen)
 
 void FreeScreensInfo(struct ScreenInfo** screens)
 {
-    MMI_LOGT("FreeScreensInfo...");
+    MMI_LOGD("FreeScreensInfo...");
     if (!screens) {
         MMI_LOGE("screens is null.");
         return;
@@ -156,7 +156,7 @@ void FreeScreensInfo(struct ScreenInfo** screens)
 
 void FreeSeatsInfo(struct SeatInfo** seats)
 {
-    MMI_LOGT("FreeSeatsInfo...");
+    MMI_LOGD("FreeSeatsInfo...");
     if (!seats) {
         MMI_LOGE("seats is null.");
         return;
@@ -172,16 +172,16 @@ void FreeSeatsInfo(struct SeatInfo** seats)
 
 void SetSeatListener(const SeatInfoChangeListener listener)
 {
-    MMI_LOGT("SetSeatListener...");
+    MMI_LOGD("SetSeatListener...");
 }
 
 void SetScreenListener(const ScreenInfoChangeListener listener)
 {
-    MMI_LOGT("SetScreenListener...");
+    MMI_LOGD("SetScreenListener...");
 }
 
 void OHOS::MMI::SetLibInputEventListener(const LibInputEventListener listener)
 {
-    MMI_LOGT("SetLibInputEventListener...");
+    MMI_LOGD("SetLibInputEventListener...");
 }
 #endif

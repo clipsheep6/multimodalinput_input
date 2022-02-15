@@ -25,14 +25,14 @@
 namespace OHOS {
 namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
             LOG_CORE, MMI_LOG_DOMAIN, "IMultimodalInputConnectStub"
         };
     }
 int32_t IMultimodalInputConnectStub::OnRemoteRequest(
     uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
-    MMI_LOGT("enter, code: %{public}d", code);
+    MMI_LOGD("enter, code: %{public}d", code);
 
     std::u16string descriptor = data.ReadInterfaceToken();
     if (descriptor != IMultimodalInputConnect::GetDescriptor()) {
@@ -47,33 +47,37 @@ int32_t IMultimodalInputConnectStub::OnRemoteRequest(
             return StubAddInputEventFilter(data, reply);
         default:
             MMI_LOGE("unknown code: %{public}u, go switch defaut", code);
+            MMI_LOGD("leave");
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
 }
 
 bool IMultimodalInputConnectStub::IsAuthorizedCalling() const
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     int callingUid = IPCSkeleton::GetCallingUid();
     MMI_LOGIK("Calling uid: %{public}d", callingUid);
+    MMI_LOGD("leave");
     return true;
 }
 
 int32_t IMultimodalInputConnectStub::GetCallingUid() const
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
+    MMI_LOGD("leave");
     return IPCSkeleton::GetCallingUid();
 }
 
 int32_t IMultimodalInputConnectStub::GetCallingPid() const
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
+    MMI_LOGD("leave");
     return IPCSkeleton::GetCallingPid();
 }
 
 int32_t IMultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     int32_t ret = RET_OK;
 
     do {
@@ -98,7 +102,7 @@ int32_t IMultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data
             break;
         }
 
-        MMI_LOGT("filter iface_cast succeeded");
+        MMI_LOGD("filter iface_cast succeeded");
 
         ret = AddInputEventFilter(filter);
     } while (0);
@@ -108,7 +112,7 @@ int32_t IMultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data
         return IPC_STUB_WRITE_PARCEL_ERR;
     }
 
-    MMI_LOGT("leave, ret = %{public}d", ret);
+    MMI_LOGD("leave, ret = %{public}d", ret);
     return RET_OK;
 }
 } // namespace MMI

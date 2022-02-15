@@ -506,7 +506,7 @@ HWTEST_F(LogTest, LogManager_UpdateFile_001, TestSize.Level1)
     LogManagerUnitTest logObj;
     bool retResult = logObj.UpdateFileUnitTest();
     EXPECT_TRUE(retResult);
-    MMI_LOGT("arvs invalid.");
+    MMI_LOGD("arvs invalid.");
 }
 
 HWTEST_F(LogTest, LogManager_UpdateFile_002, TestSize.Level1)

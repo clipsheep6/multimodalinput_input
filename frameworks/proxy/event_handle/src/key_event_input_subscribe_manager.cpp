@@ -44,7 +44,7 @@ KeyEventInputSubscribeManager::SubscribeKeyEventInfo::SubscribeKeyEventInfo(
 int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<OHOS::MMI::KeyOption> keyOption,
     std::function<void(std::shared_ptr<OHOS::MMI::KeyEvent>)> callback)
 {
-    MMI_LOGT("Enter");
+    MMI_LOGD("Enter");
     CHKPR(keyOption, INVALID_SUBSCRIBE_ID);
     CHKPR(callback, INVALID_SUBSCRIBE_ID);
     for (auto preKey : keyOption->GetPreKeys()) {
@@ -68,7 +68,7 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<OHOS::M
         return INVALID_SUBSCRIBE_ID;
     }
     subscribeInfos_.push_back(subscribeInfo);
-    MMI_LOGT("Leave");
+    MMI_LOGD("Leave");
     FinishTrace(BYTRACE_TAG_MULTIMODALINPUT);
     ++eventKey;
     FinishAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEvent, eventKey);
@@ -77,7 +77,7 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<OHOS::M
 
 int32_t KeyEventInputSubscribeManager::UnSubscribeKeyEvent(int32_t subscribeId)
 {
-    MMI_LOGT("Enter");
+    MMI_LOGD("Enter");
     if (subscribeId < 0) {
         MMI_LOGE("the subscribe id is less than 0");
         return RET_ERR;
@@ -91,7 +91,7 @@ int32_t KeyEventInputSubscribeManager::UnSubscribeKeyEvent(int32_t subscribeId)
         if (it->GetSubscribeId() == subscribeId) {
             if (EventManager.UnSubscribeKeyEvent(subscribeId) == RET_OK) {
                 subscribeInfos_.erase(it);
-                MMI_LOGT("Leave");
+                MMI_LOGD("Leave");
                 return RET_OK;
             } else {
                 MMI_LOGE("Leave, unsubscribe key event failed");
@@ -105,7 +105,7 @@ int32_t KeyEventInputSubscribeManager::UnSubscribeKeyEvent(int32_t subscribeId)
 
 int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_ptr<KeyEvent> event, int32_t subscribeId)
 {
-    MMI_LOGT("Enter");
+    MMI_LOGD("Enter");
     if (subscribeId < 0) {
         MMI_LOGE("Leave, the subscribe id is less than 0");
         return RET_ERR;
@@ -113,7 +113,7 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
     for (const auto& subscriber : subscribeInfos_) {
         if (subscriber.GetSubscribeId() == subscribeId) {
             subscriber.GetCallback()(event);
-            MMI_LOGT("Leave, client executes subscribe callback function success");
+            MMI_LOGD("Leave, client executes subscribe callback function success");
             return RET_OK;
         }
     }
