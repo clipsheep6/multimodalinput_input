@@ -75,10 +75,10 @@ private:
     NotifyDeviceChange notifyDeviceChange_;
     std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent_;
 
-    uint64_t idSeed_ = 0;
+    int64_t idSeed_ = 0;
     int32_t eventType_ = 0;
-    uint64_t initSysClock_ = 0;
-    uint64_t lastSysClock_ = 0;
+    int64_t initSysClock_ = 0;
+    int64_t lastSysClock_ = 0;
 };
 }
 }
