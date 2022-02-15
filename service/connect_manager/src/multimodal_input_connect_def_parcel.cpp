@@ -19,25 +19,26 @@
 namespace OHOS {
 namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
-            LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectDefParcel"
-        };
-    }
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
+        LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectDefParcel"
+    };
+}
 bool ConnectDefReqParcel::Marshalling(Parcel& out) const
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     if (!out.WriteInt32(data.moduleId)) {
         return false;
     }
     if (!out.WriteString(data.clientName)) {
         return false;
     }
+    MMI_LOGD("leave");
     return true;
 }
 
 ConnectDefReqParcel *ConnectDefReqParcel::Unmarshalling(Parcel& in)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     auto* request = new (std::nothrow) ConnectDefReqParcel();
     if (request == nullptr) {
         return nullptr;
@@ -50,24 +51,26 @@ ConnectDefReqParcel *ConnectDefReqParcel::Unmarshalling(Parcel& in)
     }
 
     request->data.clientName = in.ReadString();
+    MMI_LOGD("leave");
     return request;
 }
 
 bool ConnectDefRespParcel::Marshalling(Parcel &out) const
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     if (!out.WriteInt32(data.returnCode)) {
         return false;
     }
     if (!out.WriteInt32(data.allocedSocketId)) {
         return false;
     }
+    MMI_LOGD("leave");
     return true;
 }
 
 ConnectDefRespParcel *ConnectDefRespParcel::Unmarshalling(Parcel &in)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     auto *response = new (std::nothrow) ConnectDefRespParcel();
     if (response == nullptr) {
         return nullptr;
@@ -84,7 +87,7 @@ ConnectDefRespParcel *ConnectDefRespParcel::Unmarshalling(Parcel &in)
         response = nullptr;
         return nullptr;
     }
-
+    MMI_LOGD("leave");
     return response;
 }
 } // namespace MMI

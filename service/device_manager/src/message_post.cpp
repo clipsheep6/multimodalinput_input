@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
         LOG_CORE, MMI_LOG_DOMAIN, "MessagePost"
     };
 }
@@ -32,17 +32,18 @@ void MessagePost::SetFd(int fd)
 
 void MessagePost::RunOnWestonThread(std::function<void(weston_compositor *)> taskItem)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     {
         std::lock_guard<std::mutex> guard(lk_);
         asyncTasks_.push_back(taskItem);
     }
     NotifyWestonThread();
+    MMI_LOGD("leave");
 }
 
 void MessagePost::NotifyWestonThread()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     if (fd_ == -1) {
         return;
     }
@@ -52,7 +53,7 @@ void MessagePost::NotifyWestonThread()
 
 void MessagePost::RunTasks()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     while (true) {
         std::function<void(weston_compositor *)> taskItem;
         {
@@ -65,20 +66,23 @@ void MessagePost::RunTasks()
         }
         taskItem(ec_);
     }
+    MMI_LOGD("leave");
 }
 
 int MessagePost::RunTaskOnWestonThread(int fd, uint32_t mask, void *data)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     int32_t value = 0;
     read(fd, &value, sizeof(value));
     MMIMsgPost.RunTasks();
+    MMI_LOGD("leave");
     return 0;
 }
 
 void MessagePost::SetWestonCompositor(weston_compositor *ec)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
+    MMI_LOGD("leave");
     ec_ = ec;
 }
 } // namespace MMI

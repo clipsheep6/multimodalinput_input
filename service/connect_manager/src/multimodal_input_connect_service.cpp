@@ -26,7 +26,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectService" };
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectService" };
 }
 const bool REGISTER_RESULT =
     SystemAbility::MakeAndRegisterAbility(DelayedSingleton<MultimodalInputConnectService>::GetInstance().get());
@@ -34,7 +34,7 @@ const bool REGISTER_RESULT =
 int32_t MultimodalInputConnectService::AllocSocketFd(const std::string &programName, const int moduleType,
                                                      int &toReturnClientFd)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     MMI_LOGI("MultimodalInputConnectService::AllocSocketFd enter, programName: %{public}s, moduleType: %{public}d",
              programName.c_str(), moduleType);
     if (udsServer_ == nullptr) {
@@ -76,7 +76,7 @@ MultimodalInputConnectService::~MultimodalInputConnectService()
 
 void MultimodalInputConnectService::OnStart()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     if (state_ == ServiceRunningState::STATE_RUNNING) {
         MMI_LOGI("MultimodalInputConnectService has already started!");
         return;
@@ -93,28 +93,32 @@ void MultimodalInputConnectService::OnStart()
     }
     state_ = ServiceRunningState::STATE_RUNNING;
     MMI_LOGIK("Congratulations, MultimodalInputConnectService start successfully!");
+    MMI_LOGD("leave");
 }
 
 void MultimodalInputConnectService::OnStop()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     state_ = ServiceRunningState::STATE_NOT_START;
+    MMI_LOGD("leave");
 }
 
 void MultimodalInputConnectService::OnDump()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
+    MMI_LOGD("leave");
 }
 
 bool MultimodalInputConnectService::Initialize() const
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
+    MMI_LOGD("leave");
     return true;
 }
 
 int32_t MultimodalInputConnectService::HandleAllocSocketFd(MessageParcel& data, MessageParcel& reply)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     int32_t ret;
 
     sptr<ConnectDefReqParcel> req = data.ReadParcelable<ConnectDefReqParcel>();
@@ -151,19 +155,20 @@ int32_t MultimodalInputConnectService::HandleAllocSocketFd(MessageParcel& data, 
     close(clientFd);
     clientFd = -1;
     MMI_LOGI(" clientFd = %d, has closed in server", clientFd);
-
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 void MultimodalInputConnectService::SetUdsServer(IUdsServer *server)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     udsServer_ = server;
+    MMI_LOGD("leave");
 }
 
 int32_t MultimodalInputConnectServiceSetUdsServer(IUdsServer* server)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     auto s = DelayedSingleton<MultimodalInputConnectService>::GetInstance();
     if (s == nullptr) {
         MMI_LOGE("MultimodalInputConnectService not initialize.");
@@ -171,12 +176,13 @@ int32_t MultimodalInputConnectServiceSetUdsServer(IUdsServer* server)
     }
 
     s->SetUdsServer(server);
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t MultimodalInputConnectServiceStart()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     auto s = DelayedSingleton<MultimodalInputConnectService>::GetInstance();
     if (s == nullptr) {
         MMI_LOGE("MultimodalInputConnectService not initialize.");
@@ -184,13 +190,13 @@ int32_t MultimodalInputConnectServiceStart()
     }
 
     s->OnStart();
-
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t MultimodalInputConnectServiceStop()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     auto s = DelayedSingleton<MultimodalInputConnectService>::GetInstance();
     if (s == nullptr) {
         MMI_LOGE("MultimodalInputConnectService not initialize.");
@@ -198,7 +204,7 @@ int32_t MultimodalInputConnectServiceStop()
     }
 
     s->OnStop();
-
+    MMI_LOGD("leave");
     return RET_OK;
 }
 } // namespace Security
