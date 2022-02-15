@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include "telephone_event_handler.h"
 #include <codecvt>
 #include <locale>
 #include <gtest/gtest.h>
@@ -24,6 +23,7 @@
 #include "proto.h"
 #include "string_ex.h"
 #include "util_ex.h"
+#include "system_event_handler.h"
 
 namespace {
 using namespace testing::ext;
@@ -31,7 +31,7 @@ using namespace OHOS::MMI;
 using namespace OHOS;
 
 
-class EventHandleTelephoneTest : public testing::Test {
+class EventHandleSystemTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
@@ -39,228 +39,236 @@ protected:
     const unsigned int surFaceId_ = 10;
 };
 
-class TelephoneEventHandleUnitTest : public TelephoneEventHandler {
+class SystemEventHandleUnitTest : public SystemEventHandler {
 public:
-    TelephoneEventHandleUnitTest() {}
-    ~TelephoneEventHandleUnitTest() {}
+    SystemEventHandleUnitTest() {}
+    ~SystemEventHandleUnitTest() {}
 
-    virtual bool OnAnswerUnitTest(const MultimodalEvent& multiModalEvent)
+    virtual bool OnClosePageUnitTest(const MultimodalEvent& multiModalEvent)
     {
-        return OnAnswer(multiModalEvent);
+        return OnClosePage(multiModalEvent);
     }
 
-    virtual bool OnRefuseUnitTest(const MultimodalEvent& multiModalEvent)
+    virtual bool OnLaunchVoiceAssistantUnitTest(const MultimodalEvent& multiModalEvent)
     {
-        return OnRefuse(multiModalEvent);
+        return OnLaunchVoiceAssistant(multiModalEvent);
     }
 
-    virtual bool OnHangupUnitTest(const MultimodalEvent& multiModalEvent)
+    virtual bool OnMuteUnitTest(const MultimodalEvent& multiModalEvent)
     {
-        return OnHangup(multiModalEvent);
+        return OnMute(multiModalEvent);
     }
 
-    virtual bool OnTelephoneControlUnitTest(const MultimodalEvent& multiModalEvent)
+    virtual bool OnScreenShotUnitTest(const MultimodalEvent& multiModalEvent)
     {
-        return OnTelephoneControl(multiModalEvent);
+        return OnScreenShot(multiModalEvent);
+    }
+
+    virtual bool OnScreenSplitUnitTest(const MultimodalEvent& multiModalEvent)
+    {
+        return OnScreenSplit(multiModalEvent);
+    }
+
+    virtual bool OnStartScreenRecordUnitTest(const MultimodalEvent& multiModalEvent)
+    {
+        return OnStartScreenRecord(multiModalEvent);
+    }
+
+    virtual bool OnStopScreenRecordUnitTest(const MultimodalEvent& multiModalEvent)
+    {
+        return OnStopScreenRecord(multiModalEvent);
+    }
+
+    virtual bool OnGotoDesktopUnitTest(const MultimodalEvent& multiModalEvent)
+    {
+        return OnGotoDesktop(multiModalEvent);
+    }
+
+    virtual bool OnRecentUnitTest(const MultimodalEvent& multiModalEvent)
+    {
+        return OnRecent(multiModalEvent);
+    }
+
+    virtual bool OnShowNotificationUnitTest(const MultimodalEvent& multiModalEvent)
+    {
+        return OnShowNotification(multiModalEvent);
+    }
+
+    virtual bool OnLockScreenUnitTest(const MultimodalEvent& multiModalEvent)
+    {
+        return OnLockScreen(multiModalEvent);
+    }
+
+    virtual bool OnSearchUnitTest(const MultimodalEvent& multiModalEvent)
+    {
+        return OnSearch(multiModalEvent);
     }
 };
 
-HWTEST_F(EventHandleTelephoneTest, RegisterStandardizedEventHandle_tmp_err001, TestSize.Level1)
+HWTEST_F(EventHandleSystemTest, RegisterStandardizedEventHandle_tmp_err001, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    auto telephoneHandleTmp = StandardizedEventHandler::Create<TelephoneEventHandleUnitTest>();
-    telephoneHandleTmp->SetType(EnumAdd(MmiMessageId::TELEPHONE_EVENT_BEGIN, 1));
+    auto systemHandleTmp = StandardizedEventHandler::Create<SystemEventHandleUnitTest>();
+    systemHandleTmp->SetType(EnumAdd(MmiMessageId::SYSTEM_EVENT_BEGIN, 1));
     int32_t regResult = MMIEventHdl.RegisterStandardizedEventHandle(
-        iRemote, surFaceId_, telephoneHandleTmp);
+        iRemote, surFaceId_, systemHandleTmp);
     EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, regResult);
 }
 
-HWTEST_F(EventHandleTelephoneTest, RegisterStandardizedEventHandle_tmp_err002, TestSize.Level1)
+HWTEST_F(EventHandleSystemTest, RegisterStandardizedEventHandle_tmp_err002, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    auto telephoneHandleTmp = StandardizedEventHandler::Create<TelephoneEventHandleUnitTest>();
+    auto systemHandleTmp = StandardizedEventHandler::Create<SystemEventHandleUnitTest>();
 
     MMIEventHdl.RegisterStandardizedEventHandle(
-        iRemote, surFaceId_, telephoneHandleTmp);
-    int32_t regResultII = MMIEventHdl.RegisterStandardizedEventHandle(
-        iRemote, surFaceId_, telephoneHandleTmp);
-    EXPECT_NE(MMI_STANDARD_EVENT_EXIST, regResultII);
+        iRemote, surFaceId_, systemHandleTmp);
+    int32_t regResult = MMIEventHdl.RegisterStandardizedEventHandle(
+        iRemote, surFaceId_, systemHandleTmp);
+    EXPECT_NE(MMI_STANDARD_EVENT_EXIST, regResult);
 }
 
-HWTEST_F(EventHandleTelephoneTest, UnregisterStandardizedEventHandle_tmp_err001, TestSize.Level1)
+HWTEST_F(EventHandleSystemTest, UnregisterStandardizedEventHandle_tmp_err001, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    auto telephoneHandleTmp = StandardizedEventHandler::Create<TelephoneEventHandleUnitTest>();
-    telephoneHandleTmp->SetType(EnumAdd(MmiMessageId::TELEPHONE_EVENT_BEGIN, 1));
+    auto systemHandleTmp = StandardizedEventHandler::Create<SystemEventHandleUnitTest>();
+    systemHandleTmp->SetType(EnumAdd(MmiMessageId::SYSTEM_EVENT_BEGIN, 1));
     int32_t regResult = MMIEventHdl.UnregisterStandardizedEventHandle(
-        iRemote, surFaceId_, telephoneHandleTmp);
+        iRemote, surFaceId_, systemHandleTmp);
     EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, regResult);
 }
 
-HWTEST_F(EventHandleTelephoneTest, UnregisterStandardizedEventHandle_tmp_err002, TestSize.Level1)
+// ?1?7?1?7?0?0?1?7?1?7?1?7
+HWTEST_F(EventHandleSystemTest, UnregisterStandardizedEventHandle_tmp_err002, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    auto telephoneHandleTmp = StandardizedEventHandler::Create<TelephoneEventHandleUnitTest>();
+    auto systemHandleTmp = StandardizedEventHandler::Create<SystemEventHandleUnitTest>();
     int32_t regResult = MMIEventHdl.UnregisterStandardizedEventHandle(
-        iRemote, surFaceId_, telephoneHandleTmp);
+        iRemote, surFaceId_, systemHandleTmp);
+    EXPECT_NE(MMI_STANDARD_EVENT_EXIST, regResult);
+}
+
+auto g_systemHandle = StandardizedEventHandler::Create<SystemEventHandleUnitTest>();
+HWTEST_F(EventHandleSystemTest, RegisterStandardizedEventHandle_suc001, TestSize.Level1)
+{
+    const std::string strDesc = "hello world!";
+    const std::u16string u16Desc = Str8ToStr16(strDesc);
+    auto iRemote = MMIToken::Create(u16Desc);
+    int32_t regResult = MMIEventHdl.RegisterStandardizedEventHandle(
+        iRemote, surFaceId_, g_systemHandle);
     EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, regResult);
 }
 
-auto g_telephoneHandle = StandardizedEventHandler::Create<TelephoneEventHandleUnitTest>();
-HWTEST_F(EventHandleTelephoneTest, RegisterStandardizedEventHandle_sec001, TestSize.Level1)
+HWTEST_F(EventHandleSystemTest, RegisterStandardizedEventHandle_suc002, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
     int32_t unregResult = MMIEventHdl.RegisterStandardizedEventHandle(
-        iRemote, surFaceId_, g_telephoneHandle);
-    EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, unregResult);
-}
-
-HWTEST_F(EventHandleTelephoneTest, RegisterStandardizedEventHandle_sec002, TestSize.Level1)
-{
-    const std::string strDesc = "hello world!";
-    const std::u16string u16Desc = Str8ToStr16(strDesc);
-    auto iRemote = MMIToken::Create(u16Desc);
-    int32_t unregResult = MMIEventHdl.RegisterStandardizedEventHandle(
-        iRemote, surFaceId_, g_telephoneHandle);
+        iRemote, surFaceId_, g_systemHandle);
     EXPECT_NE(MMI_STANDARD_EVENT_EXIST, unregResult);
 }
 
-HWTEST_F(EventHandleTelephoneTest, UnregisterStandardizedEventHandle_sec001, TestSize.Level1)
+HWTEST_F(EventHandleSystemTest, UnregisterStandardizedEventHandle_suc001, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
     int32_t unregResult = MMIEventHdl.UnregisterStandardizedEventHandle(
-        iRemote, surFaceId_, g_telephoneHandle);
+        iRemote, surFaceId_, g_systemHandle);
     EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, unregResult);
 }
 
-HWTEST_F(EventHandleTelephoneTest, UnregisterStandardizedEventHandle_sec002, TestSize.Level1)
+HWTEST_F(EventHandleSystemTest, UnregisterStandardizedEventHandle_suc002, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
     int32_t unregResult = MMIEventHdl.UnregisterStandardizedEventHandle(
-        iRemote, surFaceId_, g_telephoneHandle);
+        iRemote, surFaceId_, g_systemHandle);
     EXPECT_NE(MMI_STANDARD_EVENT_NOT_EXIST, unregResult);
 }
 
-HWTEST_F(EventHandleTelephoneTest, RegisterAndUnregister_001, TestSize.Level1)
+HWTEST_F(EventHandleSystemTest, RegisterAndUnregister_001, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    auto telephoneHandleTmp = StandardizedEventHandler::Create<TelephoneEventHandleUnitTest>();
+    auto systemHandleTmp = StandardizedEventHandler::Create<SystemEventHandleUnitTest>();
+
     int32_t regResult = MMIEventHdl.RegisterStandardizedEventHandle(
-        iRemote, surFaceId_, telephoneHandleTmp);
+        iRemote, surFaceId_, systemHandleTmp);
     EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, regResult);
 
     int32_t unregResult = MMIEventHdl.UnregisterStandardizedEventHandle(
-        iRemote, surFaceId_, telephoneHandleTmp);
+        iRemote, surFaceId_, systemHandleTmp);
     EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, unregResult);
 }
 
-HWTEST_F(EventHandleTelephoneTest, RegisterAndUnregister_002, TestSize.Level1)
+HWTEST_F(EventHandleSystemTest, RegisterAndUnregister_002, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    auto telephoneHandleTmp = StandardizedEventHandler::Create<TelephoneEventHandleUnitTest>();
+    auto systemHandleTmp = StandardizedEventHandler::Create<SystemEventHandleUnitTest>();
+
     int32_t regResult = MMIEventHdl.RegisterStandardizedEventHandle(
-        iRemote, surFaceId_, telephoneHandleTmp);
+        iRemote, surFaceId_, systemHandleTmp);
     EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, regResult);
 
     int32_t regResult2 = MMIEventHdl.RegisterStandardizedEventHandle(
-        iRemote, surFaceId_, telephoneHandleTmp);
+        iRemote, surFaceId_, systemHandleTmp);
     EXPECT_NE(MMI_STANDARD_EVENT_EXIST, regResult2);
 }
 
-HWTEST_F(EventHandleTelephoneTest, RegisterAndUnregister_003, TestSize.Level1)
+HWTEST_F(EventHandleSystemTest, RegisterAndUnregister_003, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    auto telephoneHandleTmp = StandardizedEventHandler::Create<TelephoneEventHandleUnitTest>();
+    auto systemHandleTmp = StandardizedEventHandler::Create<SystemEventHandleUnitTest>();
+
     int32_t regResult = MMIEventHdl.RegisterStandardizedEventHandle(
-        iRemote, surFaceId_, telephoneHandleTmp);
+        iRemote, surFaceId_, systemHandleTmp);
     EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, regResult);
 
     int32_t unregResult = MMIEventHdl.UnregisterStandardizedEventHandle(
-        iRemote, surFaceId_,
-        telephoneHandleTmp);
+        iRemote, surFaceId_, systemHandleTmp);
     EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, unregResult);
 
     int32_t unregResult2 = MMIEventHdl.UnregisterStandardizedEventHandle(
-        iRemote, surFaceId_, telephoneHandleTmp);
+        iRemote, surFaceId_, systemHandleTmp);
     EXPECT_NE(MMI_STANDARD_EVENT_NOT_EXIST, unregResult2);
 }
 
-HWTEST_F(EventHandleTelephoneTest, RegisterAndUnregister_004, TestSize.Level1)
+HWTEST_F(EventHandleSystemTest, RegisterAndUnregister_004, TestSize.Level1)
 {
     const std::string strDesc = "hello world!";
     const std::u16string u16Desc = Str8ToStr16(strDesc);
     auto iRemote = MMIToken::Create(u16Desc);
-    auto telephoneHandleTmp = StandardizedEventHandler::Create<TelephoneEventHandleUnitTest>();
+    auto systemHandleTmp = StandardizedEventHandler::Create<SystemEventHandleUnitTest>();
+
     int32_t regResult = MMIEventHdl.RegisterStandardizedEventHandle(
-        iRemote, surFaceId_, telephoneHandleTmp);
+        iRemote, surFaceId_, systemHandleTmp);
     EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, regResult);
 
     int32_t regResult2 = MMIEventHdl.RegisterStandardizedEventHandle(
-        iRemote, surFaceId_, telephoneHandleTmp);
+        iRemote, surFaceId_, systemHandleTmp);
     EXPECT_NE(MMI_STANDARD_EVENT_EXIST, regResult2);
 
     int32_t unregResult = MMIEventHdl.UnregisterStandardizedEventHandle(
-        iRemote, surFaceId_, telephoneHandleTmp);
+        iRemote, surFaceId_, systemHandleTmp);
     EXPECT_NE(MMI_STANDARD_EVENT_SUCCESS, unregResult);
 
     int32_t unregResult2 = MMIEventHdl.UnregisterStandardizedEventHandle(
-        iRemote, surFaceId_, telephoneHandleTmp);
+        iRemote, surFaceId_, systemHandleTmp);
     EXPECT_NE(MMI_STANDARD_EVENT_NOT_EXIST, unregResult2);
-}
-
-HWTEST_F(EventHandleTelephoneTest, OnAnswer, TestSize.Level1)
-{
-    TelephoneEventHandler telephoneEventHandler;
-    MultimodalEvent multiModalEvent;
-
-    bool retResult = telephoneEventHandler.OnAnswer(multiModalEvent);
-    EXPECT_FALSE(retResult);
-}
-
-HWTEST_F(EventHandleTelephoneTest, OnRefuse, TestSize.Level1)
-{
-    TelephoneEventHandler telephoneEventHandler;
-    MultimodalEvent multiModalEvent;
-
-    bool retResult = telephoneEventHandler.OnRefuse(multiModalEvent);
-    EXPECT_FALSE(retResult);
-}
-
-HWTEST_F(EventHandleTelephoneTest, OnHangup, TestSize.Level1)
-{
-    TelephoneEventHandler telephoneEventHandler;
-    MultimodalEvent multiModalEvent;
-
-    bool retResult = telephoneEventHandler.OnHangup(multiModalEvent);
-    EXPECT_FALSE(retResult);
-}
-
-HWTEST_F(EventHandleTelephoneTest, OnTelephoneControl, TestSize.Level1)
-{
-    TelephoneEventHandler telephoneEventHandler;
-    MultimodalEvent multiModalEvent;
-
-    bool retResult = telephoneEventHandler.OnTelephoneControl(multiModalEvent);
-    EXPECT_FALSE(retResult);
 }
 } // namespace
