@@ -421,9 +421,9 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
 int32_t EventDispatch::DispatchTouchTransformPointEvent(UDSServer& udsServer,
     std::shared_ptr<PointerEvent> point)
 {
+    MMI_LOGD("call  DispatchTouchTransformPointEvent begin");
     CHKPR(point, ERROR_NULL_POINTER);
     InputHandlerManagerGlobal::GetInstance().HandleEvent(point);
-    MMI_LOGD("call  DispatchTouchTransformPointEvent begin");
     auto appInfo = AppRegs->FindByWinId(point->GetAgentWindowId()); // obtain application information
     if (appInfo.fd == RET_ERR) {
         MMI_LOGE("Failed to find fd, errCode:%{public}d", FOCUS_ID_OBTAIN_FAIL);
@@ -720,8 +720,8 @@ void EventDispatch::OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, i
 int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
     std::shared_ptr<KeyEvent> key, const uint64_t preHandlerTime)
 {
-    CHKPR(key, PARAM_INPUT_INVALID);
     MMI_LOGD("DispatchKeyEventByPid begin");
+    CHKPR(key, PARAM_INPUT_INVALID);
     if (AbilityMgr->CheckLaunchAbility(key)) {
         MMI_LOGD("The keyEvent start launch an ability, keyCode:%{public}d", key->GetKeyCode());
         int32_t checkLaunchAbility = 1;

@@ -133,8 +133,8 @@ bool  OHOS::MMI::UDSServer::ClearDeadSessionInMap(const int serverFd, const int 
 int32_t OHOS::MMI::UDSServer::AddSocketPairInfo(const std::string& programName, const int moduleType, int& serverFd,
                                                 int& toReturnClientFd, const int32_t uid, const int32_t pid)
 {
+    MMI_LOGD("enter.");
     std::lock_guard<std::mutex> lock(mux_);
-    MMI_LOGT("enter.");
     const int NUMBER_TWO = 2;
     int sockFds[NUMBER_TWO] = {};
 
