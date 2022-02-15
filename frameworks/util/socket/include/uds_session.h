@@ -58,9 +58,9 @@ public:
     }
 
     void UpdateDescript();
-    void RecordEvent(int32_t id, uint64_t time);
+    void RecordEvent(int32_t id, int64_t time);
     void ClearEventList(int32_t id);
-    uint64_t GetFirstEventTime();
+    int64_t GetFirstEventTime();
     void ClearEventsVct();
 
 #ifdef OHOS_BUILD_MMI_DEBUG
@@ -74,7 +74,7 @@ public:
 protected:
     struct EventTime {
         int32_t id;
-        uint64_t eventTime;
+        int64_t eventTime;
     };
     std::vector<EventTime> events_;
     std::string descript_;
