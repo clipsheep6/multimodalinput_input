@@ -124,14 +124,14 @@ void ClientMsgHandler::OnMsgHandler(const UDSClient& client, NetPacket& pkt)
         MMI_LOGE("CClientMsgHandler::OnMsgHandler Unknown msg id:%{public}d.", id);
         return;
     }
-    
-    uint64_t clientTime = GetSysClockTime();
+
+    int64_t clientTime = GetSysClockTime();
     auto ret = (*fun)(client, pkt);
     if (ret < 0) {
         MMI_LOGE("CClientMsgHandler::OnMsgHandler Msg handling failed. id:%{public}d,  ret:%{public}d", id, ret);
         return;
     }
-    uint64_t endTime = GetSysClockTime();
+    int64_t endTime = GetSysClockTime();
     ((MMIClient *)&client)->ReplyMessageToServer(pkt.GetMsgId(), clientTime, endTime);
 }
 
@@ -153,7 +153,7 @@ int32_t ClientMsgHandler::OnKeyMonitor(const UDSClient& client, NetPacket& pkt)
 int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
 {
     int32_t fd = 0;
-    uint64_t serverStartTime = 0;
+    int64_t serverStartTime = 0;
     auto key = KeyEvent::Create();
     int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(fSkipId, key, pkt);
     if (ret != RET_OK) {
@@ -283,7 +283,7 @@ int32_t ClientMsgHandler::OnKey(const UDSClient& client, NetPacket& pkt)
     int32_t abilityId = 0;
     int32_t windowId = 0;
     int32_t fd = 0;
-    uint64_t serverStartTime = 0;
+    int64_t serverStartTime = 0;
     EventKeyboard key = {};
     pkt >> key >> abilityId >> windowId >> fd >> serverStartTime;
     MMI_LOGD("Event dispatcher of client:eventKeyboard:time:%{public}" PRId64 ", key:%{public}u, "
@@ -615,7 +615,7 @@ int32_t ClientMsgHandler::PackedData(MultimodalEvent& multEvent, const UDSClient
     int16_t idMsg = 0;
     int32_t windowId = 0;
     int32_t abilityId = 0;
-    uint64_t serverStartTime = 0;
+    int64_t serverStartTime = 0;
     int32_t type = 0;
     int32_t deviceId = 0;
     uint32_t occurredTime = 0;
@@ -738,7 +738,7 @@ int32_t ClientMsgHandler::TouchEventFilter(const UDSClient& client, NetPacket& p
     int32_t fd = 0;
     int32_t fingerCount = 0;
     int32_t eventAction = 0;
-    uint64_t serverStartTime = 0;
+    int64_t serverStartTime = 0;
     EventTouch touchData = {};
     MmiPoint mmiPoint;
     pkt >> fingerCount >> eventAction >> abilityId >> windowId >> fd >> serverStartTime;
@@ -888,7 +888,7 @@ void ClientMsgHandler::AnalysisPointEvent(const UDSClient& client, NetPacket& pk
     int32_t windowId = 0;
     int32_t fd = 0;
     int32_t deviceEventType = 0;
-    uint64_t serverStartTime = 0;
+    int64_t serverStartTime = 0;
     int32_t ret = RET_ERR;
     EventPointer pointData = {};
     StandardTouchStruct standardTouch = {};
@@ -948,7 +948,7 @@ void ClientMsgHandler::AnalysisTouchEvent(const UDSClient& client, NetPacket& pk
     int32_t fingerCount = 0;
     int32_t eventAction = 0;
     int32_t seatSlot = 0;
-    uint64_t serverStartTime = 0;
+    int64_t serverStartTime = 0;
     EventTouch touchData = {};
     MmiPoint mmiPoint;
     pkt >> fingerCount >> eventAction >> abilityId >> windowId >> fd >> serverStartTime >> seatSlot;
@@ -989,7 +989,7 @@ void ClientMsgHandler::AnalysisJoystickEvent(const UDSClient& client, NetPacket&
     int32_t touchAction = 0;
     int32_t deviceEventType = 0;
     std::string nullUUid = "";
-    uint64_t serverStartTime = 0;
+    int64_t serverStartTime = 0;
     MmiPoint mmiPoint;
     MultimodalEventPtr mousePtr = EventFactory::CreateEvent(EventType::EVENT_MOUSE);
     CHKP(mousePtr);
@@ -1017,7 +1017,7 @@ void ClientMsgHandler::AnalysisTouchPadEvent(const UDSClient& client, NetPacket&
     int32_t abilityId = 0;
     int32_t windowId = 0;
     int32_t fd = 0;
-    uint64_t serverStartTime = 0;
+    int64_t serverStartTime = 0;
     int32_t touchAction = 0;
     int32_t deviceEventType = 0;
     MmiPoint mmiPoint;
@@ -1051,7 +1051,7 @@ void ClientMsgHandler::AnalysisTouchPadEvent(const UDSClient& client, NetPacket&
     EventManager.OnTouch(touchEvent);
 }
 
-void ClientMsgHandler::PrintEventTabletToolInfo(EventTabletTool tableTool, uint64_t serverStartTime,
+void ClientMsgHandler::PrintEventTabletToolInfo(EventTabletTool tableTool, int64_t serverStartTime,
                                                 int32_t abilityId, int32_t windowId, int32_t fd) const
 {
     MMI_LOGD("event dispatcher of client: event tablet Tool :time:%{public}" PRId64 ", deviceType:%{public}u, "
@@ -1186,7 +1186,7 @@ void ClientMsgHandler::AnalysisTabletToolEvent(const UDSClient& client, NetPacke
     int32_t abilityId = 0;
     int32_t windowId = 0;
     int32_t fd = 0;
-    uint64_t serverStartTime = 0;
+    int64_t serverStartTime = 0;
 
     pkt >> curRventType >> tableTool >> abilityId >> windowId >> fd >> serverStartTime;
     PrintEventTabletToolInfo(tableTool, serverStartTime, abilityId, windowId, fd);
@@ -1202,7 +1202,7 @@ void ClientMsgHandler::AnalysisGestureEvent(const UDSClient& client, NetPacket& 
     int32_t abilityId = 0;
     int32_t windowId = 0;
     int32_t fd = 0;
-    uint64_t serverStartTime = 0;
+    int64_t serverStartTime = 0;
     EventJoyStickAxis eventJoyStickAxis = {};
     MultimodalEventPtr mousePtr = EventFactory::CreateEvent(EventType::EVENT_MOUSE);
     fingerInfos fingersInfos[FINGER_NUM] = {};
