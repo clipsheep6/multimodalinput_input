@@ -20,7 +20,9 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    static int64_t g_nextEventId = 1;
+    int64_t g_nextEventId = 1;
+    constexpr int64_t S2MS = 1000;
+    constexpr int64_t MS2NS = 1000000;
 }
 const int32_t InputEvent::EVENT_TYPE_KEY;
 const int32_t InputEvent::EVENT_TYPE_POINTER;
@@ -42,15 +44,13 @@ InputEvent::~InputEvent() {}
 
 void InputEvent::Reset()
 {
-    int32_t conversionStep = 1000000;
     timespec ts = { 0, 0 };
     if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
         actionTime_ = 0;
     }
     id_ = DEFALUTID;
-    uint64_t nowTime = (ts.tv_sec * static_cast<uint64_t>(1e3)) + (ts.tv_nsec / conversionStep);
-    int32_t actionTime = static_cast<int32_t>(nowTime);
-    actionTime_ = actionTime;
+    int64_t nowTime = static_cast<int64_t>(ts.tv_sec) * S2MS + ts.tv_nsec / MS2NS;
+    actionTime_ = static_cast<int32_t>(nowTime);
     action_ = ACTION_UNKNOWN;
     actionStartTime_ = actionTime_;
     deviceId_ = DEFALUTID;
