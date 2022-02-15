@@ -284,12 +284,6 @@ private:
 bool VerifyLogManagerRun();
 OHOS::MMI::LogManager& GetLogManager();
 
-#define MMI_LOGT(fmt, ...) do { \
-    OHOS::MMI::LogManager::GetInstance().PushFormat(OHOS::MMI::LL_TRACE, __FILE__, __LINE__, \
-                                                    MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
-    OHOS::HiviewDFX::HiLog::Debug(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
-} while (0)
-
 #define MMI_LOGD(fmt, ...) do { \
     OHOS::MMI::LogManager::GetInstance().PushFormat(OHOS::MMI::LL_DEBUG, __FILE__, __LINE__, MMI_FUNC_FMT fmt, \
                                                     MMI_FUNC_INFO, ##__VA_ARGS__); \
@@ -326,13 +320,10 @@ OHOS::MMI::LogManager& GetLogManager();
     OHOS::HiviewDFX::HiLog::Fatal(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 
-#define PRINT_STACK() MMI_LOGT("stack info:\n%s", GetStackInfo().c_str())
+#define PRINT_STACK() MMI_LOGD("stack info:\n%s", GetStackInfo().c_str())
 
 #else
 
-#define MMI_LOGT(fmt, ...) do { \
-    OHOS::HiviewDFX::HiLog::Debug(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
-} while (0)
 #define MMI_LOGD(fmt, ...) do { \
     OHOS::HiviewDFX::HiLog::Debug(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
@@ -354,9 +345,9 @@ OHOS::MMI::LogManager& GetLogManager();
 
 #endif // OHOS_BUILD_MMI_DEBUG
 
-#define MMI_LOGTK(fmt, ...) do { \
+#define MMI_LOGDK(fmt, ...) do { \
     KMSG_LOGT(fmt, ##__VA_ARGS__); \
-    MMI_LOGT(fmt, ##__VA_ARGS__); \
+    MMI_LOGD(fmt, ##__VA_ARGS__); \
 } while (0)
 
 #define MMI_LOGDK(fmt, ...) do { \

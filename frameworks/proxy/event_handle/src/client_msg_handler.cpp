@@ -1222,7 +1222,7 @@ void ClientMsgHandler::TraceKeyEvent(const EventKeyboard& key) const
     char keyUuid[MAX_UUIDSIZE] = {0};
     int32_t ret = memcpy_s(keyUuid, sizeof(keyUuid), key.uuid, sizeof(key.uuid));
     CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
-    MMI_LOGT(" nevent filter of client: keyUuid = %{public}s", keyUuid);
+    MMI_LOGD(" nevent filter of client: keyUuid = %{public}s", keyUuid);
     keyEvent = keyUuid;
     keyEvent = "client keyUuid = " + keyEvent;
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, keyEvent);
@@ -1236,7 +1236,7 @@ void ClientMsgHandler::TracePointerEvent(const EventPointer& pointData) const
     char pointerUuid[MAX_UUIDSIZE] = {0};
     int32_t ret = memcpy_s(pointerUuid, sizeof(pointerUuid), pointData.uuid, sizeof(pointData.uuid));
     CHK(ret == EOK, MEMCPY_SEC_FUN_FAIL);
-    MMI_LOGT(" nevent filter of client: pointerUuid=%{public}s", pointerUuid);
+    MMI_LOGD(" nevent filter of client: pointerUuid=%{public}s", pointerUuid);
     pointerEvent = pointerUuid;
     pointerEvent = "client pointerUuid = " + pointerEvent;
     BYTRACE_NAME(BYTRACE_TAG_MULTIMODALINPUT, pointerEvent);

@@ -57,12 +57,12 @@ bool TestAuxToolClient::Start(bool detachMode)
 
 void TestAuxToolClient::OnDisconnected()
 {
-    MMI_LOGT("Disconnected from server... fd:%{public}d", GetFd());
+    MMI_LOGD("Disconnected from server... fd:%{public}d", GetFd());
 }
 
 void OHOS::MMI::TestAuxToolClient::OnThreadLoop()
 {
-    MMI_LOGT("enter isConnected_:%{public}d", isConnected_);
+    MMI_LOGD("enter isConnected_:%{public}d", isConnected_);
     if (isConnected_) {
         if (MessageSendRecvStatMgr::GetInstance().IsNoWaitMessage()) {
             MMI_LOGW("IsNoWaitMessage, and set to exit.");
@@ -119,7 +119,7 @@ uint32_t OHOS::MMI::TestAuxToolClient::GetAiSensorAllowProcCodes(uint32_t item) 
 
 int32_t OHOS::MMI::TestAuxToolClient::Socket()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     const int32_t ret = MultimodalInputConnectManager::GetInstance()->
                         AllocSocketPair(IMultimodalInputConnect::CONNECT_MODULE_TYPE_SIMULATE_INJECT);
     if (ret != RET_OK) {

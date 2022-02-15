@@ -112,7 +112,7 @@ void InjectionEventDispatch::HandleInjectCommandItems()
 
 bool InjectionEventDispatch::VirifyArgvs(const int32_t &argc, const vector<string> &argv)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     if (argc < ARGV_VALID || argv.at(ARGVS_TARGET_INDEX).empty()) {
         MMI_LOGE("Invaild Input Para, Plase Check the validity of the para! errCode:%{public}d", PARAM_INPUT_FAIL);
         return false;
@@ -140,7 +140,7 @@ bool InjectionEventDispatch::VirifyArgvs(const int32_t &argc, const vector<strin
 
 bool InjectionEventDispatch::StartSocket()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     return TestAuxToolClient::GetInstance().Start(false);
 }
 
@@ -156,7 +156,7 @@ bool InjectionEventDispatch::SendMsg(NetPacket ckt)
 
 void InjectionEventDispatch::Run()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     string id = GetFunId();
     auto fun = GetFun(id);
     if (!fun) {
@@ -226,7 +226,7 @@ int32_t InjectionEventDispatch::OnAisensor()
 
 int32_t InjectionEventDispatch::OnAisensorOne(MmiMessageId code, uint32_t value)
 {
-    MMI_LOGT("enter, code = %u, value = %u", code, value);
+    MMI_LOGD("enter, code = %u, value = %u", code, value);
     timeval time;
     RawInputEvent rawEvent = {};
     int32_t msgType = MSG_TYPE_DEVICE_INFO;
@@ -364,7 +364,7 @@ int32_t InjectionEventDispatch::OnHelp()
 
 int32_t InjectionEventDispatch::OnAisensorAll()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     uint16_t cycleNum = 0;
     if (argvNum_ == AI_SENSOR_DEFAULT_NUMS) {
         cycleNum = AI_SENSOR_DEFAULT_CYCLE_NUMS;
@@ -568,7 +568,7 @@ int32_t InjectionEventDispatch::GetDevIndexByType(int32_t devType)
 
 void OHOS::MMI::InjectionEventDispatch::ProcessAiSensorInfoByCycleNum(uint16_t cycleNum)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     static const vector<MmiMessageId> aiSensorAllowProcCodes {
         MmiMessageId::ON_SHOW_MENU,
         MmiMessageId::ON_SEND,

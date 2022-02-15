@@ -24,14 +24,14 @@ namespace {
 
 UDSClient::UDSClient()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
 }
 
 UDSClient::~UDSClient()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     Stop();
-    MMI_LOGT("leave");
+    MMI_LOGD("leave");
 }
 
 int32_t UDSClient::ConnectTo()
@@ -85,7 +85,7 @@ bool UDSClient::ThreadIsEnd()
 
 bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
 {
-    MMI_LOGT("enter detachMode = %d", detachMode);
+    MMI_LOGD("enter detachMode = %d", detachMode);
     recvFun_ = fun;
     isRun_ = true;
     isConnected_ = true;
@@ -109,7 +109,7 @@ bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
 
 void UDSClient::Stop()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     Close();
     isRun_ = false;
     epoll_event ev = {};
@@ -118,10 +118,10 @@ void UDSClient::Stop()
     }
     EpollClose();
     if (t_.joinable()) {
-        MMI_LOGT("thread join");
+        MMI_LOGD("thread join");
         t_.join();
     }
-    MMI_LOGT("leave");
+    MMI_LOGD("leave");
 }
 
 void UDSClient::OnRecv(const char *buf, size_t size)
