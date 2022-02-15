@@ -20,7 +20,7 @@ namespace OHOS {
 StylusEvent::~StylusEvent() {}
 void StylusEvent::Initialize(int32_t windowId, int32_t action, int32_t buttons, int32_t startTime,
                              int32_t operationState, int32_t pointerCount, fingerInfos fingersInfos[],
-                             int32_t highLevelEvent, const std::string& uuid, int32_t sourceType, int32_t occurredTime,
+                             int32_t highLevelEvent, const std::string& uuid, int32_t sourceType, int64_t occurredTime,
                              const std::string& deviceId, int32_t inputDeviceId, bool isHighLevelEvent,
                              uint16_t deviceUdevTags)
 {
