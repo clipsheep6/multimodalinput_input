@@ -14,7 +14,7 @@
  */
 
 #include <algorithm>
-#include <inttypes>
+#include <inttypes.h>
 #include "input_manager.h"
 #include "js_register_module.h"
 #include "js_register_util.h"
