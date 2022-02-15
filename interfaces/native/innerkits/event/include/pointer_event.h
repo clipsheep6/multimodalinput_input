@@ -161,10 +161,7 @@ public:
 
 public:
     PointerEvent(const PointerEvent& other);
-    PointerEvent(PointerEvent&& other) = delete;
     virtual ~PointerEvent();
-    virtual PointerEvent& operator=(const PointerEvent& other) = delete;
-    virtual PointerEvent& operator=(PointerEvent&& other) = delete;
 
     static std::shared_ptr<PointerEvent> Create();
     // Get or set the action of pointer type input event

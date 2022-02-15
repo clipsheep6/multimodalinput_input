@@ -46,10 +46,7 @@ public:
 
 public:
     InputEvent(const InputEvent& other);
-    InputEvent(InputEvent&& other) = delete;
     virtual ~InputEvent();
-    virtual InputEvent& operator=(const InputEvent& other) = delete;
-    virtual InputEvent& operator=(InputEvent&& other) = delete;
     static std::shared_ptr<InputEvent> Create();
 
     void Reset();
