@@ -26,7 +26,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectService" };
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectService" };
 }
 const bool REGISTER_RESULT =
     SystemAbility::MakeAndRegisterAbility(DelayedSingleton<MultimodalInputConnectService>::GetInstance().get());
@@ -34,7 +34,8 @@ const bool REGISTER_RESULT =
 int32_t MultimodalInputConnectService::AllocSocketFd(const std::string &programName, const int moduleType,
                                                      int &toReturnClientFd)
 {
-    MMI_LOGI("MultimodalInputConnectService::AllocSocketFd enter, programName:%{public}s, moduleType:%{public}d",
+    MMI_LOGD("enter");
+    MMI_LOGI("MultimodalInputConnectService::AllocSocketFd enter, programName: %{public}s, moduleType: %{public}d",
              programName.c_str(), moduleType);
     if (udsServer_ == nullptr) {
         MMI_LOGE("called, udsServer_ is nullptr.");
@@ -92,22 +93,26 @@ void MultimodalInputConnectService::OnStart()
     }
     state_ = ServiceRunningState::STATE_RUNNING;
     MMI_LOGIK("Congratulations, MultimodalInputConnectService start successfully!");
+    MMI_LOGD("leave");
 }
 
 void MultimodalInputConnectService::OnStop()
 {
     MMI_LOGD("enter");
     state_ = ServiceRunningState::STATE_NOT_START;
+    MMI_LOGD("leave");
 }
 
 void MultimodalInputConnectService::OnDump()
 {
     MMI_LOGD("enter");
+    MMI_LOGD("leave");
 }
 
 bool MultimodalInputConnectService::Initialize() const
 {
     MMI_LOGD("enter");
+    MMI_LOGD("leave");
     return true;
 }
 
@@ -141,6 +146,7 @@ int32_t MultimodalInputConnectService::StubHandleAllocSocketFd(MessageParcel& da
 
     MMI_LOGI("send clientFd to client, clientFd = %d", clientFd);
     close(clientFd);
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
@@ -148,6 +154,7 @@ void MultimodalInputConnectService::SetUdsServer(IUdsServer *server)
 {
     MMI_LOGD("enter");
     udsServer_ = server;
+    MMI_LOGD("leave");
 }
 
 int32_t MultimodalInputConnectServiceSetUdsServer(IUdsServer* server)
@@ -160,6 +167,7 @@ int32_t MultimodalInputConnectServiceSetUdsServer(IUdsServer* server)
     }
 
     s->SetUdsServer(server);
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
@@ -173,7 +181,7 @@ int32_t MultimodalInputConnectServiceStart()
     }
 
     s->OnStart();
-
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
@@ -187,7 +195,7 @@ int32_t MultimodalInputConnectServiceStop()
     }
 
     s->OnStop();
-
+    MMI_LOGD("leave");
     return RET_OK;
 }
 } // namespace Security
