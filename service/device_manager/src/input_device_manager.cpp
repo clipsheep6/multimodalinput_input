@@ -47,6 +47,7 @@ void InputDeviceManager::Init(weston_compositor* wc)
 
 void InputDeviceManager::GetInputDeviceIdsAsync(std::function<void(std::vector<int32_t>)> callback)
 {
+    MMI_LOGT("enter");
     MMIMsgPost.RunOnWestonThread([this, callback](weston_compositor* wc) {
         auto ids = GetInputDeviceIdsSync(wc);
         callback(ids);
@@ -56,6 +57,7 @@ void InputDeviceManager::GetInputDeviceIdsAsync(std::function<void(std::vector<i
 void InputDeviceManager::FindInputDeviceByIdAsync(int32_t deviceId,
     std::function<void(std::shared_ptr<InputDevice>)> callback)
 {
+    MMI_LOGT("enter");
     MMIMsgPost.RunOnWestonThread([this, deviceId, callback](weston_compositor* wc) {
         auto device = FindInputDeviceByIdSync(wc, deviceId);
         callback(device);
@@ -181,6 +183,7 @@ void InputDeviceManager::OnInputDeviceRemoved(libinput_device* inputDevice)
 
 bool InputDeviceManager::IsPointerDevice(libinput_device* device)
 {
+    MMI_LOGT("enter");
     enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
     MMI_LOGD("udev tag:%{public}d", static_cast<int32_t>(udevTags));
     return udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK | 

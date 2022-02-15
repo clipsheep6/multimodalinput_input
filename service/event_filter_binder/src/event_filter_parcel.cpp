@@ -23,6 +23,7 @@ namespace {
 }
 bool PointerEventParcel::Marshalling(Parcel& out) const
 {
+    MMI_LOGT("enter");
     if (data_ == nullptr) {
         data_ = PointerEvent::Create();
     }
@@ -36,6 +37,7 @@ bool PointerEventParcel::Marshalling(Parcel& out) const
 
 PointerEventParcel *PointerEventParcel::Unmarshalling(Parcel& in)
 {
+    MMI_LOGT("enter");
     auto* request = new (std::nothrow) PointerEventParcel();
     if (request == nullptr) {
         return nullptr;

@@ -38,11 +38,13 @@ EventFilterService::~EventFilterService()
 
 void EventFilterService::SetPointerEventPtr(std::function<bool(std::shared_ptr<PointerEvent>)> pointerFilter)
 {
+    MMI_LOGT("enter");
     pointerFilter_ = pointerFilter;
 }
 
 bool EventFilterService::HandlePointerEvent(const std::shared_ptr<PointerEvent> event)
 {
+    MMI_LOGT("enter");
     CHKPF(pointerFilter_);
     return pointerFilter_(event);
 }

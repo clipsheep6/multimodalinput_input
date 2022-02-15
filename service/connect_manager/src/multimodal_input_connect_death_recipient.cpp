@@ -14,9 +14,16 @@
  */
 
 #include "multimodal_input_connect_death_recipient.h"
+#include "log.h"
 
 namespace OHOS {
 namespace MMI {
+namespace {
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
+        LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectDeathRecipient"
+    };
+}
+
 MultimodalInputConnectDeathRecipient::MultimodalInputConnectDeathRecipient(
     const std::function<void(const wptr<IRemoteObject> &object)> &deathCallback)
     : deathCallback_(deathCallback)
@@ -24,6 +31,7 @@ MultimodalInputConnectDeathRecipient::MultimodalInputConnectDeathRecipient(
 
 void MultimodalInputConnectDeathRecipient::OnRemoteDied(const OHOS::wptr<OHOS::IRemoteObject> &object)
 {
+    MMI_LOGT("enter");
     if (deathCallback_) {
         deathCallback_(object);
     }

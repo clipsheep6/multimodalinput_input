@@ -33,6 +33,7 @@ namespace MMI {
 
 void ChkConfig(int32_t fd)
 {
+    MMI_LOGT("enter");
     mprintf(fd, "ChkMMIConfig: ");
 #ifdef OHOS_BUILD
     mprintf(fd, "\tOHOS_BUILD");
@@ -65,6 +66,7 @@ void ChkConfig(int32_t fd)
 
 void ChkAppInfos(int32_t fd)
 {
+    MMI_LOGT("enter");
     auto focusId = WinMgr->GetFocusSurfaceId();
     auto touchFocusId = WinMgr->GetTouchFocusSurfaceId();
     auto appInfo = AppRegs->FindByWinId(focusId);
@@ -82,11 +84,13 @@ void ChkAppInfos(int32_t fd)
 
 void EventDump::Init(UDSServer& udss)
 {
+    MMI_LOGT("enter");
     udsServer_ = &udss;
 }
 
 void EventDump::Dump(int32_t fd)
 {
+    MMI_LOGT("enter");
     std::lock_guard<std::mutex> lock(mu_);
 
     auto strCurTime = Strftime();
@@ -110,6 +114,7 @@ void EventDump::Dump(int32_t fd)
 
 void EventDump::TestDump()
 {
+    MMI_LOGT("enter");
     constexpr int32_t MAX_PATH_SIZE = 128;
     char szPath[MAX_PATH_SIZE] = {};
     CHK(sprintf_s(szPath, MAX_PATH_SIZE, "%s/mmidump-%s.txt", DEF_MMI_DATA_ROOT, Strftime("%y%m%d%H%M%S").c_str()) >= 0,
@@ -127,6 +132,7 @@ void EventDump::TestDump()
 
 void EventDump::InsertDumpInfo(const std::string& str)
 {
+    MMI_LOGT("enter");
     CHK(!str.empty(), PARAM_INPUT_INVALID);
     std::lock_guard<std::mutex> lock(mu_);
 
@@ -139,6 +145,7 @@ void EventDump::InsertDumpInfo(const std::string& str)
 
 void EventDump::InsertFormat(std::string str, ...)
 {
+    MMI_LOGT("enter");
     CHK(!str.empty(), INVALID_PARAM);
     va_list args;
     va_start(args, str);

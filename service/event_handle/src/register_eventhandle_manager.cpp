@@ -35,6 +35,7 @@ OHOS::MMI::RegisterEventHandleManager::~RegisterEventHandleManager()
 
 int32_t OHOS::MMI::RegisterEventHandleManager::RegisterEvent(MmiMessageId messageId, int32_t fd)
 {
+    MMI_LOGT("enter");
     std::lock_guard<std::mutex> lock(mu_);
     CHKR(messageId >= MmiMessageId::INVALID, PARAM_INPUT_INVALID, UNKNOWN_EVENT);
     switch (messageId) {
@@ -66,6 +67,7 @@ int32_t OHOS::MMI::RegisterEventHandleManager::RegisterEvent(MmiMessageId messag
 
 int32_t OHOS::MMI::RegisterEventHandleManager::UnregisterEventHandleManager(MmiMessageId messageId, int32_t fd)
 {
+    MMI_LOGT("enter");
     std::lock_guard<std::mutex> lock(mu_);
     CHKR(messageId >= MmiMessageId::INVALID, PARAM_INPUT_INVALID, UNKNOWN_EVENT);
     switch (messageId) {
@@ -97,6 +99,7 @@ int32_t OHOS::MMI::RegisterEventHandleManager::UnregisterEventHandleManager(MmiM
 
 void OHOS::MMI::RegisterEventHandleManager::UnregisterEventHandleBySocketFd(int32_t fd)
 {
+    MMI_LOGT("enter");
     std::lock_guard<std::mutex> lock(mu_);
     CHK(fd >= 0, PARAM_INPUT_INVALID);
     auto iter = mapRegisterManager_.begin();
@@ -111,6 +114,7 @@ void OHOS::MMI::RegisterEventHandleManager::UnregisterEventHandleBySocketFd(int3
 
 void OHOS::MMI::RegisterEventHandleManager::FindSocketFds(const MmiMessageId messageId, std::vector<int32_t>& fds)
 {
+    MMI_LOGT("enter");
     std::lock_guard<std::mutex> lock(mu_);
     auto it = mapRegisterManager_.equal_range(messageId);
     if (it.first == std::end(mapRegisterManager_)) {
@@ -124,6 +128,7 @@ void OHOS::MMI::RegisterEventHandleManager::FindSocketFds(const MmiMessageId mes
 
 void OHOS::MMI::RegisterEventHandleManager::PrintfMap()
 {
+    MMI_LOGT("enter");
     std::lock_guard<std::mutex> lock(mu_);
     for (const auto &item : mapRegisterManager_) {
         std::cout << "event handle is "
@@ -134,6 +139,7 @@ void OHOS::MMI::RegisterEventHandleManager::PrintfMap()
 
 void OHOS::MMI::RegisterEventHandleManager::Dump(int32_t fd)
 {
+    MMI_LOGT("enter");
     std::lock_guard<std::mutex> lock(mu_);
     std::string strTmp;
     mprintf(fd, "RegsEvent: count=%d", mapRegisterManager_.size());
@@ -154,6 +160,7 @@ void OHOS::MMI::RegisterEventHandleManager::Dump(int32_t fd)
 
 void OHOS::MMI::RegisterEventHandleManager::Clear()
 {
+    MMI_LOGT("enter");
     if (mu_.try_lock()) {
         mu_.unlock();
     }
@@ -164,6 +171,7 @@ void OHOS::MMI::RegisterEventHandleManager::RegisterEventHandleByIdMsage(const M
                                                                          const MmiMessageId idMsgEnd,
                                                                          const int32_t fd)
 {
+    MMI_LOGT("enter");
     const int32_t messageIdBeginTemp = static_cast<int32_t>(idMsgBegin);
     const int32_t messageIdEndTemp = static_cast<int32_t>(idMsgEnd);
     for (auto it = messageIdBeginTemp + 1; it < messageIdEndTemp; it++) {
@@ -176,6 +184,7 @@ void OHOS::MMI::RegisterEventHandleManager::UnregisterEventHandleByIdMsage(const
                                                                            const MmiMessageId idMsgEnd,
                                                                            const int32_t fd)
 {
+    MMI_LOGT("enter");
     MmiMessageId idMsg = static_cast<MmiMessageId>(static_cast<int32_t>(idMsgBegin) + 1);
     auto it = mapRegisterManager_.find(idMsg);
     while (it != mapRegisterManager_.end()) {

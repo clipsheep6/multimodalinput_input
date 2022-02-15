@@ -34,6 +34,7 @@ const bool REGISTER_RESULT =
 int32_t MultimodalInputConnectService::AllocSocketFd(const std::string &programName, const int moduleType,
                                                      int &toReturnClientFd)
 {
+    MMI_LOGT("enter");
     MMI_LOGI("MultimodalInputConnectService::AllocSocketFd enter, programName:%{public}s, moduleType:%{public}d",
              programName.c_str(), moduleType);
     if (udsServer_ == nullptr) {

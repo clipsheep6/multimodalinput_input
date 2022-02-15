@@ -51,6 +51,7 @@ InputEventHandler::~InputEventHandler()
 
 bool InputEventHandler::Init(UDSServer& udsServer)
 {
+    MMI_LOGT("enter");
     udsServer_ = &udsServer;
     MsgCallback funs[] = {
         {
@@ -186,6 +187,7 @@ bool InputEventHandler::Init(UDSServer& udsServer)
 
 void InputEventHandler::OnEvent(void *event)
 {
+    MMI_LOGT("enter");
     CHKP(event);
     std::lock_guard<std::mutex> lock(mu_);
     auto *lpMmiEvent = static_cast<multimodal_libinput_event *>(event);
@@ -218,6 +220,7 @@ void InputEventHandler::OnEvent(void *event)
 
 int32_t InputEventHandler::OnEventHandler(const multimodal_libinput_event& ev)
 {
+    MMI_LOGT("enter");
     CHKPR(ev.event, ERROR_NULL_POINTER);
     auto type = libinput_event_get_type(ev.event);
     TimeCostChk chk("InputEventHandler::OnEventHandler", "overtime 1000(us)", MAX_INPUT_EVENT_TIME, type);
@@ -236,6 +239,7 @@ int32_t InputEventHandler::OnEventHandler(const multimodal_libinput_event& ev)
 
 void InputEventHandler::OnCheckEventReport()
 {
+    MMI_LOGT("enter");
     std::lock_guard<std::mutex> lock(mu_);
     if (initSysClock_ == 0) {
         return;
@@ -256,21 +260,25 @@ void InputEventHandler::OnCheckEventReport()
 
 void InputEventHandler::RegistnotifyDeviceChange(NotifyDeviceChange cb)
 {
+    MMI_LOGT("enter");
     notifyDeviceChange_ = cb;
 }
 
 UDSServer* InputEventHandler::GetUDSServer()
 {
+    MMI_LOGT("enter");
     return udsServer_;
 }
 
 int32_t InputEventHandler::AddInputEventFilter(sptr<IEventFilter> filter)
 {
+    MMI_LOGT("enter");
     return eventDispatch_.AddInputEventFilter(filter);
 }
 
 int32_t InputEventHandler::OnEventDeviceAdded(const multimodal_libinput_event& ev)
 {
+    MMI_LOGT("enter");
     CHKPR(ev.event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(ev.event);
     InputDevMgr->OnInputDeviceAdded(device);
@@ -308,6 +316,7 @@ int32_t InputEventHandler::OnEventDeviceAdded(const multimodal_libinput_event& e
 
 int32_t InputEventHandler::OnEventDeviceRemoved(const multimodal_libinput_event& ev)
 {
+    MMI_LOGT("enter");
     CHKPR(ev.event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(ev.event);
     InputDevMgr->OnInputDeviceRemoved(device);
@@ -344,6 +353,7 @@ int32_t InputEventHandler::OnEventDeviceRemoved(const multimodal_libinput_event&
 
 int32_t InputEventHandler::OnEventKey(libinput_event *event)
 {
+    MMI_LOGT("enter");
     CHKPR(event, PARAM_INPUT_INVALID);
     uint64_t sysStartProcessTime = GetSysClockTime();
     if (keyEvent_ == nullptr) {
@@ -392,6 +402,7 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
 
 int32_t InputEventHandler::OnKeyEventDispatch(const multimodal_libinput_event& ev)
 {
+    MMI_LOGT("enter");
 #ifdef OHOS_WESTEN_MODEL
     uint64_t sysStartProcessTime = GetSysClockTime();
 #endif
@@ -449,6 +460,7 @@ int32_t InputEventHandler::OnKeyEventDispatch(const multimodal_libinput_event& e
 
 int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
 {
+    MMI_LOGT("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     uint64_t sysStartProcessTime = GetSysClockTime();
     CHKPR(udsServer_, ERROR_NULL_POINTER);
@@ -494,6 +506,7 @@ int32_t InputEventHandler::OnKeyboardEvent(libinput_event *event)
 
 int32_t InputEventHandler::OnEventKeyboard(const multimodal_libinput_event& ev)
 {
+    MMI_LOGT("enter");
     CHKPR(ev.event, ERROR_NULL_POINTER);
 #ifdef OHOS_WESTEN_MODEL
     uint64_t sysStartProcessTime = GetSysClockTime();
@@ -537,6 +550,7 @@ int32_t InputEventHandler::OnEventKeyboard(const multimodal_libinput_event& ev)
 
 int32_t InputEventHandler::OnEventPointer(const multimodal_libinput_event& ev)
 {
+    MMI_LOGT("enter");
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     CHKPR(ev.event, ERROR_NULL_POINTER);
     uint64_t sysStartProcessTime = GetSysClockTime();
@@ -596,6 +610,7 @@ int32_t InputEventHandler::OnEventPointer(const multimodal_libinput_event& ev)
 
 int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
 {
+    MMI_LOGT("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     MMI_LOGD("Enter");
     auto point = TouchTransformPointManger->OnLibinputTouchEvent(event);
@@ -621,6 +636,7 @@ int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
 
 int32_t InputEventHandler::OnEventTouchPadSecond(libinput_event *event)
 {
+    MMI_LOGT("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     MMI_LOGD("Enter");
 
@@ -645,6 +661,7 @@ int32_t InputEventHandler::OnEventTouchPadSecond(libinput_event *event)
 
 int32_t InputEventHandler::OnEventTouch(const multimodal_libinput_event& ev)
 {
+    MMI_LOGT("enter");
     CHKPR(ev.event, ERROR_NULL_POINTER);
     SInput::LoginfoPackagingTool(ev.event);
 #ifndef OHOS_WESTEN_MODEL
@@ -676,6 +693,7 @@ int32_t InputEventHandler::OnEventTouch(const multimodal_libinput_event& ev)
 
 int32_t InputEventHandler::OnEventTouchpad(const multimodal_libinput_event& ev)
 {
+    MMI_LOGT("enter");
 #ifndef OHOS_WESTEN_MODEL
     OnEventTouchPadSecond(ev.event);
 #endif
@@ -685,6 +703,7 @@ int32_t InputEventHandler::OnEventTouchpad(const multimodal_libinput_event& ev)
 
 int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
 {
+    MMI_LOGT("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     MMI_LOGT("InputEventHandler::OnGestureEvent");
     auto pointer = TouchTransformPointManger->OnTouchPadGestrueEvent(event);
@@ -720,6 +739,7 @@ int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
 
 int32_t InputEventHandler::OnEventGesture(const multimodal_libinput_event& ev)
 {
+    MMI_LOGT("enter");
     CHKPR(ev.event, ERROR_NULL_POINTER);
 #ifndef OHOS_WESTEN_MODEL
     OnGestureEvent(ev.event);
@@ -747,6 +767,7 @@ int32_t InputEventHandler::OnEventGesture(const multimodal_libinput_event& ev)
 
 int32_t InputEventHandler::OnEventTabletTool(const multimodal_libinput_event& ev)
 {
+    MMI_LOGT("enter");
     CHKPR(ev.event, ERROR_NULL_POINTER);
     uint64_t sysStartProcessTime = GetSysClockTime();
     EventTabletTool tableTool = {};
@@ -773,6 +794,7 @@ int32_t InputEventHandler::OnEventTabletTool(const multimodal_libinput_event& ev
 
 int32_t InputEventHandler::OnEventTabletPad(const multimodal_libinput_event& ev)
 {
+    MMI_LOGT("enter");
     CHKPR(ev.event, ERROR_NULL_POINTER);
     uint64_t sysStartProcessTime = GetSysClockTime();
     CHKPR(udsServer_, ERROR_NULL_POINTER);
@@ -794,6 +816,7 @@ int32_t InputEventHandler::OnEventTabletPad(const multimodal_libinput_event& ev)
 
 int32_t InputEventHandler::OnEventSwitchToggle(const multimodal_libinput_event& ev)
 {
+    MMI_LOGT("enter");
     CHKPR(ev.event, ERROR_NULL_POINTER);
     auto type = libinput_event_get_type(ev.event);
     MMI_LOGT("Function is OnEventSwitchToggle, sourceType is LIBINPUT_EVENT_SWITCH_TOGGLE:%{public}d", type);
@@ -802,6 +825,7 @@ int32_t InputEventHandler::OnEventSwitchToggle(const multimodal_libinput_event& 
 
 int32_t InputEventHandler::OnEventTabletPadKey(const multimodal_libinput_event& ev)
 {
+    MMI_LOGT("enter");
     CHKPR(ev.event, ERROR_NULL_POINTER);
     uint64_t sysStartProcessTime = GetSysClockTime();
     CHKPR(udsServer_, ERROR_NULL_POINTER);
@@ -833,6 +857,7 @@ int32_t InputEventHandler::OnEventTabletPadKey(const multimodal_libinput_event& 
 
 int32_t InputEventHandler::OnEventJoyStickKey(const multimodal_libinput_event& ev, const uint64_t time)
 {
+    MMI_LOGT("enter");
     CHKPR(ev.event, ERROR_NULL_POINTER);
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     EventKeyboard key = {};
@@ -862,6 +887,7 @@ int32_t InputEventHandler::OnEventJoyStickKey(const multimodal_libinput_event& e
 
 int32_t InputEventHandler::OnEventJoyStickAxis(const multimodal_libinput_event& ev, const uint64_t time)
 {
+    MMI_LOGT("enter");
     CHKPR(ev.event, ERROR_NULL_POINTER);
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     EventJoyStickAxis eventJoyStickAxis = {};
@@ -881,6 +907,7 @@ int32_t InputEventHandler::OnEventJoyStickAxis(const multimodal_libinput_event& 
 
 int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
 {
+    MMI_LOGT("enter");
     CHKPR(event, ERROR_NULL_POINTER);
     MMI_LOGD("Libinput Events reported");
 
@@ -920,10 +947,8 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
 
 int32_t InputEventHandler::OnMouseEventEndTimerHandler(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    if (pointerEvent == nullptr) {
-        MMI_LOGE("PointerEvent is nullptr");
-        return RET_ERR;
-    }
+    MMI_LOGT("enter");
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
     // Mouse Axis Data
     MMI_LOGI("MouseEvent Normalization Results, PointerAction:%{public}d, PointerId:%{public}d, "
              "SourceType:%{public}d, ButtonId:%{public}d, "
@@ -946,6 +971,7 @@ int32_t InputEventHandler::OnMouseEventEndTimerHandler(std::shared_ptr<PointerEv
 
 bool InputEventHandler::SendMsg(const int32_t fd, NetPacket& pkt) const
 {
+    MMI_LOGT("enter");
     CHKPF(udsServer_, OHOS::ERROR_NULL_POINTER);
     return udsServer_->SendMsg(fd, pkt);
 }

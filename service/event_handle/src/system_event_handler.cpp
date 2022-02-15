@@ -90,6 +90,7 @@ OHOS::MMI::SystemEventHandler::~SystemEventHandler()
 
 int32_t OHOS::MMI::SystemEventHandler::OnSystemEventHandler(MmiMessageId idMsg)
 {
+    MMI_LOGT("enter");
     if (idMsg == MmiMessageId::INVALID) {
         return PARAM_INPUT_INVALID;
     }
@@ -104,7 +105,7 @@ int32_t OHOS::MMI::SystemEventHandler::OnSystemEventHandler(MmiMessageId idMsg)
 
 void OHOS::MMI::SystemEventHandler::OnGotoDesktop()
 {
-    MMI_LOGI("SystemEventHandler::OnGotoDesktop");
+    MMI_LOGT("enter");
     Want want;
     want.AddEntity(Want::FLAG_HOME_INTENT_FROM_SYSTEM);
     AbilityManager::GetInstance().StartAbility(want, 0);
