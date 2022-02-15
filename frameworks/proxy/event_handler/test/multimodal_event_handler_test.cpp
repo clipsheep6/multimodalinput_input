@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include "multimodal_event_handler.h"
 #include <gtest/gtest.h>
 #include "input_filter_manager.h"
 #include "key_event_handler.h"
@@ -21,6 +20,7 @@
 #include "mmi_token.h"
 #include "proto.h"
 #include "run_shell_util.h"
+#include "multimodal_event_handler.h"
 
 namespace {
 using namespace testing::ext;
@@ -508,7 +508,7 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_filterAbnormal_001, 
 HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_AddPointerFilter_001, TestSize.Level1)
 {
     std::string name = "PointerFilter";
-    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](MouseEvent event){
+    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](MouseEvent event) {
         MMI_LOGD("filter 1 receive pointercode:%{public}d", event.GetActionButton());
     });
     sleep(20);
@@ -525,10 +525,10 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_AddPointerFilter_001
 HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_AddPointerFilter_002, TestSize.Level1)
 {
     std::string name = "PointerFilter";
-    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](MouseEvent event){
+    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](MouseEvent event) {
         MMI_LOGD("filter 1 receive pointercode:%{public}d", event.GetActionButton());
     });
-    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](MouseEvent event){
+    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](MouseEvent event) {
         EXPECT_TRUE(false);
         MMI_LOGD("filter 2 receive pointercode:%{public}d", event.GetActionButton());
     });
@@ -547,11 +547,11 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_AddPointerFilter_002
 HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_AddPointerFilter_003, TestSize.Level1)
 {
     std::string name = "PointerFilter";
-    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](MouseEvent event){
+    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](MouseEvent event) {
         EXPECT_TRUE(false);
         MMI_LOGD("filter 1 receive pointercode:%{public}d", event.GetActionButton());
     });
-    InputFilterMgr.RegisterPointerEventInterceptor(name, MIDDLE_AUTHORITY, [](MouseEvent event){
+    InputFilterMgr.RegisterPointerEventInterceptor(name, MIDDLE_AUTHORITY, [](MouseEvent event) {
         MMI_LOGD("filter 2 receive pointercode:%{public}d", event.GetActionButton());
     });
     sleep(20);
@@ -569,7 +569,7 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_AddPointerFilter_003
 HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_RemovePointerFilter_001, TestSize.Level1)
 {
     std::string name = "PointerFilter";
-    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](MouseEvent event){
+    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](MouseEvent event) {
         EXPECT_TRUE(false);
         MMI_LOGD("filter 1 receive pointercode:%{public}d", event.GetActionButton());
     });
@@ -587,7 +587,7 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_RemovePointerFilter_
 HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_RemovePointerFilter_002, TestSize.Level1)
 {
     std::string name = "PointerFilter";
-    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](MouseEvent event){
+    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](MouseEvent event) {
         MMI_LOGD("filter 1 receive pointercode:%{public}d", event.GetActionButton());
     });
     InputFilterMgr.RegisterPointerEventInterceptor(name, MIDDLE_AUTHORITY, [](MouseEvent event){
@@ -609,14 +609,14 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_RemovePointerFilter_
 HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_RemovePointerFilter_003, TestSize.Level1)
 {
     std::string name = "PointerFilter";
-    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](MouseEvent event){
+    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](MouseEvent event) {
         EXPECT_TRUE(false);
         MMI_LOGD("filter 1 receive pointercode:%{public}d", event.GetActionButton());
     });
-    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](MouseEvent event){
+    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](MouseEvent event) {
         MMI_LOGD("filter 2 receive pointercode:%{public}d", event.GetActionButton());
     });
-    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](MouseEvent event){
+    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](MouseEvent event) {
         EXPECT_TRUE(false);
         MMI_LOGD("filter 3 receive pointercode:%{public}d", event.GetActionButton());
     });
@@ -638,10 +638,10 @@ HWTEST_F(MultimodalEventHandlerTest, MultimodalEventHandler_PointerInterceptorAb
     std::string name = "PointerFilter";
     EXPECT_TRUE(InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, nullptr) == RET_ERR);
 
-    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](MouseEvent event){
+    InputFilterMgr.RegisterPointerEventInterceptor(name, LOW_AUTHORITY, [](MouseEvent event) {
         MMI_LOGD("filter 1 receive pointercode:%{public}d", event.GetActionButton());
     });
-    InputFilterMgr.RegisterPointerEventInterceptor(name, MIDDLE_AUTHORITY, [](MouseEvent event){
+    InputFilterMgr.RegisterPointerEventInterceptor(name, MIDDLE_AUTHORITY, [](MouseEvent event) {
         MMI_LOGD("filter 2 receive pointercode:%{public}d", event.GetActionButton());
     });
     EXPECT_TRUE(InputFilterMgr.UnRegisterPointerEventInterceptor(40) == RET_ERR);
