@@ -189,16 +189,13 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     }
 
     std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
-    MMI_LOGD("pointer event dispatcher of client, eventType:%{public}s, actionTime:%{public}d, "
-             "action:%{public}d, actionStartTime:%{public}d, "
-             "flag:%{public}d, pointerAction:%{public}s, sourceType:%{public}s, "
+    MMI_LOGD("pointer event dispatcher of client, eventType:%{public}s, actionTime:%{public}d, action:%{public}d, "
+             "actionStartTime:%{public}d, flag:%{public}d, pointerAction:%{public}s, sourceType:%{public}s, "
              "VerticalAxisValue:%{public}.2f, HorizontalAxisValue:%{public}.2f, "
              "PinchAxisValue:%{public}.2f, pointerCount:%{public}d,  eventNumber:%{public}d",
-             pointerEvent->DumpEventType(), pointerEvent->GetActionTime(),
-             pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
-             pointerEvent->GetFlag(), pointerEvent->DumpPointerAction(),
-             pointerEvent->DumpSourceType(),
-             pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
+             pointerEvent->DumpEventType(), pointerEvent->GetActionTime(), pointerEvent->GetAction(),
+             pointerEvent->GetActionStartTime(), pointerEvent->GetFlag(), pointerEvent->DumpPointerAction(),
+             pointerEvent->DumpSourceType(), pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
              pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH),
              static_cast<int32_t>(pointerIds.size()), pointerEvent->GetId());
@@ -1190,8 +1187,6 @@ void ClientMsgHandler::AnalysisTabletToolEvent(const UDSClient& client, NetPacke
 
     pkt >> curRventType >> tableTool >> abilityId >> windowId >> fd >> serverStartTime;
     PrintEventTabletToolInfo(tableTool, serverStartTime, abilityId, windowId, fd);
-
-
     // 如果是标准化消息，则获取standardTouchEvent
     AnalysisStandardTabletToolEvent(pkt, curRventType, tableTool, windowId);
 }
@@ -1219,9 +1214,9 @@ void ClientMsgHandler::AnalysisGestureEvent(const UDSClient& client, NetPacket& 
 
     const MmiPoint mmiPoint(gesture.deltaUnaccel.x, gesture.deltaUnaccel.y);
     auto mouseEvent = reinterpret_cast<MouseEvent*>(mousePtr.GetRefPtr());
-    mouseEvent->Initialize(windowId, static_cast<int32_t>(MouseActionEnum::MOVE), 0, 0, mmiPoint, 0, 0, 0, 0, 0, "", gesture.eventType,
-                           static_cast<int32_t>(gesture.time), "", static_cast<int32_t>(gesture.deviceId),
-                           false, gesture.deviceType, eventJoyStickAxis);
+    mouseEvent->Initialize(windowId, static_cast<int32_t>(MouseActionEnum::MOVE), 0, 0,
+                           mmiPoint, 0, 0, 0, 0, 0, "", gesture.eventType, static_cast<int32_t>(gesture.time), "",
+                           static_cast<int32_t>(gesture.deviceId), false, gesture.deviceType, eventJoyStickAxis);
 
     int j = 0;
     for (int i = 0; i < FINGER_NUM; i++) {
