@@ -26,7 +26,7 @@
 namespace OHOS {
 namespace MMI {
 class StreamBuffer {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "StreamBuffer"};
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "StreamBuffer"};
 public:
     explicit StreamBuffer();
     StreamBuffer(const StreamBuffer& buf);
