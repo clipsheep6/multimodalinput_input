@@ -22,7 +22,7 @@
 using namespace OHOS::MMI;
 
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TestAuxToolMsgHandler" };
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TestAuxToolMsgHandler" };
 }
 
 bool TestAuxToolMsgHandler::Init()

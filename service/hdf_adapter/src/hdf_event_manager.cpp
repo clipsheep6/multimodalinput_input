@@ -27,7 +27,7 @@
 
 namespace {
     using namespace OHOS::MMI;
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "HdfEventManager"};
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "HdfEventManager"};
 }
 
 OHOS::MMI::HdfEventManager *OHOS::MMI::HdfEventManager::m_globleThis;
