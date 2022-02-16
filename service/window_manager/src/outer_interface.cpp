@@ -18,7 +18,7 @@
 namespace OHOS {
 namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "OuterInterface" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "OuterInterface" };
     }
 const std::map<int16_t, int16_t> MAP_SYSTEM_EVENT_ATTR = {
     {HOS_KEY_MUTE, MMI_SYSTEM_SERVICE_AND_APP},

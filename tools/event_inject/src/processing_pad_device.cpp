@@ -19,7 +19,7 @@ using namespace std;
 using namespace OHOS::MMI;
 
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingPadDevice" };
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingPadDevice" };
 }
 
 int32_t ProcessingPadDevice::TransformJsonDataToInputData(const Json& fingerEventArrays,
