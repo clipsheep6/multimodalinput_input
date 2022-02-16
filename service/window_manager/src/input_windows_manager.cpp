@@ -743,7 +743,7 @@ bool OHOS::MMI::InputWindowsManager::TouchDownPointToDisplayPoint(libinput_event
         logicalDisplayId = display.id;
         logicalX = globalLogicalX - display.topLeftX;
         logicalY = globalLogicalY - display.topLeftY;
-        MMI_LOGD("targetDisplayId is %{public}d, displayX is %{public}d, displayY is %{public}d ", targetDisplayId, displayX, displayY);
+        MMI_LOGD("targetDisplayId is %{public}d, displayX is %{public}d, displayY is %{public}d ", logicalDisplayId, logicalX, logicalY);
         return true;
     }
 
