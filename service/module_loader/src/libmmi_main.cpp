@@ -27,15 +27,16 @@
 #include "uds_command_queue.h"
 #endif // OHOS_BUILD_MMI_DEBUG
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     namespace {
 #ifdef OHOS_WESTEN_MODEL
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "libmmi_main" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "libmmi_main" };
         static bool g_bThreadTerm = false;
 #endif
     }
 }
-
+}
 
 static std::atomic_bool g_isRun(false);
 
@@ -63,18 +64,21 @@ int64_t GetMmiServerStartTime()
 namespace {
 void OnThreadTermination(int32_t outTime, uint64_t tid, const std::string& remark)
 {
+    MMI_LOGD("enter");
     using namespace OHOS::MMI;
-    MMI_LOGE("OnThreadTermination tid:%{public}" PRId64 ", %{public}s, %{public}d/%{public}d",
+    MMI_LOGE("OnThreadTermination tid:%{public}" PRId64 ",%{public}s,%{public}d/%{public}d",
         tid, remark.c_str(), outTime, MAX_THREAD_DEATH_TIME);
     MMIEventDump->InsertFormat("OnThreadTermination tid=%llu, remark=%s %d/%d",
         tid, remark.c_str(), outTime, MAX_THREAD_DEATH_TIME);
     MMIEventDump->TestDump();
     MMIEventDump->Dump(-1);
     g_bThreadTerm = true;
+    MMI_LOGD("leave");
 }
 
 void OnThread()
 {
+    MMI_LOGD("enter");
     using namespace OHOS::MMI;
 
     while (true) {
@@ -118,6 +122,7 @@ void OnThread()
 #endif
     MMI_LOGI("libmmi_main OnThread end...");
 }
+    MMI_LOGD("leave");
 }
 #endif
 
@@ -128,9 +133,11 @@ void Dump(int fd)
 
 int GetMultimodeInputinformation(void)
 {
+    MMI_LOGD("enter");
     if (!g_isRun) {
         return OHOS::MMI_SERVICE_INVALID;
     }
+    MMI_LOGD("leave");
     return OHOS::MMI_SERVICE_RUNNING;
 }
 
@@ -145,8 +152,7 @@ void StartMmiServer(void)
     using namespace OHOS::MMI;
     uint64_t tid = OHOS::MMI::GetThisThreadIdOfLL();
     g_llStartTime = OHOS::MMI::GetMillisTime();
-    MMI_LOGI("The server starts to start tid:%" PRId64 ". The current timestamp is %" PRId64
-            " Ms", tid, g_llStartTime);
+    MMI_LOGI("start tid:%" PRId64 ",current timestamp:%" PRId64" Ms", tid, g_llStartTime);
 #endif
     g_isRun = true;
     static std::thread t(&OnThread);
@@ -156,6 +162,7 @@ void StartMmiServer(void)
 // weston启动入口函数
 WL_EXPORT int wet_module_init(weston_compositor *ec, int *argc, char *argv[])
 {
+    MMI_LOGD("enter");
 #ifdef OHOS_WESTEN_MODEL
     int socketPair[2];
     socketpair(AF_UNIX, SOCK_STREAM, 0, socketPair);
@@ -169,5 +176,6 @@ WL_EXPORT int wet_module_init(weston_compositor *ec, int *argc, char *argv[])
     MMIMsgPost.SetFd(socketPair[0]);
     StartMmiServer();
 #endif
+    MMI_LOGD("leave");
     return RET_OK;
 }
