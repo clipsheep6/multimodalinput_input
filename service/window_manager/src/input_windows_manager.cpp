@@ -32,8 +32,8 @@ static constexpr uint8_t TOP_RIGHT_X = 2;
 static constexpr uint8_t TOP_RIGHT_Y = 3;
 static constexpr uint8_t CORNER = 4;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 using namespace OHOS::MMI;
 
@@ -466,7 +466,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTarget(std::shared_ptr<InputEvent>
     int32_t pid = GetPidUpdateTarget(inputEvent);
     CHKR(pid > 0, PID_OBTAIN_FAIL, RET_ERR);
     int32_t fd = udsServer_->GetFdByPid(pid);
-    CHKR(fd > 0, FD_OBTAIN_FAIL, RET_ERR);
+    CHKR(fd >= 0, FD_OBTAIN_FAIL, RET_ERR);
     MMI_LOGD("leave");
     return fd;
 #endif

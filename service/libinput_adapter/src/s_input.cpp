@@ -52,8 +52,8 @@ static void InitHiLogFunc(struct libinput* input)
     initFlag = true;
     MMI_LOGD("leave");
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 void OHOS::MMI::SInput::LoginfoPackagingTool(libinput_event *event)
 {

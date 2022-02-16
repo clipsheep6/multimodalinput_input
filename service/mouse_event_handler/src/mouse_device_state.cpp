@@ -116,5 +116,5 @@ void MouseDeviceState::ChangeMouseState(const BUTTON_STATE btnState, int32_t &bt
     }
     MMI_LOGD("leave");
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
