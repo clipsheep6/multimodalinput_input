@@ -14,7 +14,7 @@
  */
 #ifndef NET_PACKET_H
 #define NET_PACKET_H
-
+#include "nocopyable.h"
 #include "proto.h"
 #include "stream_buffer.h"
 
