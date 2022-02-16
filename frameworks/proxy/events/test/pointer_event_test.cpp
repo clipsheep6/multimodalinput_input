@@ -45,7 +45,7 @@ int64_t PointerEventTest::GetMillisTime()
 {
     timespec time = { 0 };
     clock_gettime(CLOCK_MONOTONIC, &time);
-    return ((static_cast<uint64_t>(time.tv_sec) * 1000000000 + time.tv_nsec) / 1000000);
+    return ((static_cast<int64_t>(time.tv_sec) * 1000000000 + time.tv_nsec) / 1000000);
 }
 
 std::shared_ptr<PointerEvent> PointerEventTest::createPointEvent()

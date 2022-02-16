@@ -44,10 +44,10 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchBegin(libinput_event_ge
     auto time = libinput_event_gesture_get_time(data);
     auto scale = libinput_event_gesture_get_scale(data);
     pointerEvent_->SetActionTime(static_cast<int64_t>(GetSysClockTime()));
-    pointerEvent_->SetActionStartTime(time);
+    pointerEvent_->SetActionStartTime(static_cast<int64_t>(time));
 
     PointerEvent::PointerItem pointerItem;
-    pointerItem.SetDownTime(time);
+    pointerItem.SetDownTime(static_cast<int64_t>(time));
     pointerItem.SetGlobalX(MouseState->GetMouseCoordsX());
     pointerItem.SetGlobalY(MouseState->GetMouseCoordsY());
     pointerItem.SetDeviceId(deviceId_);
@@ -77,7 +77,7 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchUpdate(libinput_event_g
     auto time = libinput_event_gesture_get_time(data);
     auto scale = libinput_event_gesture_get_scale(data);
     pointerEvent_->SetActionTime(static_cast<int64_t>(GetSysClockTime()));
-    pointerEvent_->SetActionStartTime(time);
+    pointerEvent_->SetActionStartTime(static_cast<int64_t>(time));
 
     PointerEvent::PointerItem pointerItem;
     pointerEvent_->GetPointerItem(defaultPointerId, pointerItem);
@@ -102,7 +102,7 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchEnd(libinput_event_gest
     auto time = libinput_event_gesture_get_time(data);
     auto scale = libinput_event_gesture_get_scale(data);
     pointerEvent_->SetActionTime(static_cast<int64_t>(GetSysClockTime()));
-    pointerEvent_->SetActionStartTime(time);
+    pointerEvent_->SetActionStartTime(static_cast<int64_t>(time));
 
     PointerEvent::PointerItem pointerItem;
     pointerEvent_->GetPointerItem(defaultPointerId, pointerItem);
