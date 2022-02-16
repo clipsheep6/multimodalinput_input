@@ -80,7 +80,7 @@ int32_t KeyEventInputSubscribeManager::UnSubscribeKeyEvent(int32_t subscribeId)
         if (it->GetSubscribeId() == subscribeId) {
             if (EventManager.UnSubscribeKeyEvent(subscribeId) == RET_OK) {
                 subscribeInfos_.erase(it);
-                MMI_LOGT("Leave");
+                MMI_LOGD("Leave");
                 return RET_OK;
             } else {
                 MMI_LOGE("Leave, unsubscribe key event failed");
@@ -105,7 +105,7 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
     for (const auto& subscriber : subscribeInfos_) {
         if (subscriber.GetSubscribeId() == subscribeId) {
             subscriber.GetCallback()(event);
-            MMI_LOGT("Leave, client executes subscribe callback function success");
+            MMI_LOGD("Leave, client executes subscribe callback function success");
             return RET_OK;
         }
     }
