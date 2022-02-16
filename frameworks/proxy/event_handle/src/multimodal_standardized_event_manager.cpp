@@ -114,7 +114,7 @@ int32_t MultimodalStandardizedEventManager::UnregisterStandardizedEventHandle(co
 int32_t MultimodalStandardizedEventManager::SubscribeKeyEvent(
     const KeyEventInputSubscribeManager::SubscribeKeyEventInfo &subscribeInfo)
 {
-    MMI_LOGT("Enter");
+    MMI_LOGD("Enter");
     OHOS::MMI::NetPacket pkt(MmiMessageId::SUBSCRIBE_KEY_EVENT);
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption = subscribeInfo.GetKeyOption();
     uint32_t preKeySize = keyOption->GetPreKeys().size();
@@ -138,7 +138,7 @@ int32_t MultimodalStandardizedEventManager::SubscribeKeyEvent(
 
 int32_t MultimodalStandardizedEventManager::UnSubscribeKeyEvent(int32_t subscribeId)
 {
-    MMI_LOGT("Enter");
+    MMI_LOGD("Enter");
     OHOS::MMI::NetPacket pkt(MmiMessageId::UNSUBSCRIBE_KEY_EVENT);
     pkt << subscribeId;
     if (MMIEventHdl.GetMMIClient() == nullptr) {
