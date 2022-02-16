@@ -45,7 +45,7 @@ int32_t InputHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
         return interceptors_.AddInterceptor(interceptor);
     }
     MMI_LOGW("Invalid handler type");
-	MMI_LOGD("leave");
+    MMI_LOGD("leave");
     return RET_ERR;
 }
 
