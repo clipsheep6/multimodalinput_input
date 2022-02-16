@@ -614,20 +614,24 @@ void OHOS::MMI::InputWindowsManager::TurnTouchScreen(PhysicalDisplayInfo* info, 
     int32_t& logicalX, int32_t& logicalY)
 {
     if (direction == Direction0) {
+        MMI_LOGD("direction is Direction0");
         return;
     }
     if (direction == Direction90) {
+        MMI_LOGD("direction is Direction90");
         int32_t temp = logicalX;
         logicalX = info->logicWidth - logicalY;
         logicalY = temp;
         return;
     }
     if (direction == Direction180) {
+        MMI_LOGD("direction is Direction180");
         logicalX = info->logicHeight - logicalX;
         logicalY = info->logicWidth - logicalY;
         return;
     }
     if (direction == Direction270) {
+        MMI_LOGD("direction is Direction270");
         int32_t temp = logicalY;
         logicalY = info->logicHeight - logicalX;
         logicalX = temp;
@@ -706,6 +710,7 @@ bool OHOS::MMI::InputWindowsManager::TouchMotionPointToDisplayPoint(libinput_eve
 
     for (const auto &display : logicalDisplays_) {
         if (targetDisplayId == display.id ) {
+            MMI_LOGD("targetDisplayId is %{public}d, displayX is %{public}d, displayY is %{public}d ", targetDisplayId, displayX, displayY);
             displayX = globalLogicalX - display.topLeftX;
             displayY = globalLogicalY - display.topLeftY;
         }
@@ -738,6 +743,7 @@ bool OHOS::MMI::InputWindowsManager::TouchDownPointToDisplayPoint(libinput_event
         logicalDisplayId = display.id;
         logicalX = globalLogicalX - display.topLeftX;
         logicalY = globalLogicalY - display.topLeftY;
+        MMI_LOGD("targetDisplayId is %{public}d, displayX is %{public}d, displayY is %{public}d ", targetDisplayId, displayX, displayY);
         return true;
     }
 
@@ -788,6 +794,7 @@ bool OHOS::MMI::InputWindowsManager::IsCheckDisplayIdIfExist(int32_t& displayId)
         return true;
     }
     for (const auto &item : logicalDisplays_) {
+        MMI_LOGD("logicalDisplays_is %{public}d, itemid is %{public}d", displayId, item.id);
         if (item.id == displayId) {
             return true;
         }
