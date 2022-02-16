@@ -610,7 +610,31 @@ OHOS::MMI::PhysicalDisplayInfo* OHOS::MMI::InputWindowsManager::FindPhysicalDisp
     return nullptr;
 }
 
-bool OHOS::MMI::InputWindowsManager::TransformOfDisplayPoint(libinput_event_touch* touch,
+void OHOS::MMI::InputWindowsManager::TurnTouchScreen(PhysicalDisplayInfo* info, Direction direction,
+    int32_t& logicalX, int32_t& logicalY)
+{
+    if (direction == Direction0) {
+        return;
+    }
+    if (direction == Direction90) {
+        int32_t temp = logicalX;
+        logicalX = info->logicWidth - logicalY;
+        logicalY = temp;
+        return;
+    }
+    if (direction == Direction180) {
+        logicalX = info->logicHeight - logicalX;
+        logicalY = info->logicWidth - logicalY;
+        return;
+    }
+    if (direction == Direction270) {
+        int32_t temp = logicalY;
+        logicalY = info->logicHeight - logicalX;
+        logicalX = temp;
+    }
+}
+
+bool OHOS::MMI::InputWindowsManager::TransformOfDisplayPoint(libinput_event_touch* touch, Direction& direction,
     int32_t &globalLogicalX, int32_t &globalLogicalY)
 {
     CHKPF(touch);
@@ -640,29 +664,42 @@ bool OHOS::MMI::InputWindowsManager::TransformOfDisplayPoint(libinput_event_touc
     int32_t localLogcialX = (int32_t)(logicX);
     int32_t localLogcialY = (int32_t)(logicY);
 
+    direction = info->direction;
+    TurnTouchScreen(info, direction, localLogcialX, localLogcialY);
+
     globalLogicalX = localLogcialX;
     globalLogicalY = localLogcialY;
 
     for (auto left = GetPhysicalDisplay(info->leftDisplayId); left != nullptr;
         left = GetPhysicalDisplay(left->leftDisplayId)) {
-        globalLogicalX += left->logicWidth;
+        if (direction == Direction0 || direction == Direction180) {
+            globalLogicalX += left->logicWidth;
+        }
+        if (direction == Direction90 || direction == Direction270) {
+            globalLogicalX += left->logicHeight;
+        }
     }
 
     for (auto upper = GetPhysicalDisplay(info->upDisplayId); upper != nullptr;
         upper = GetPhysicalDisplay(upper->upDisplayId)) {
-        globalLogicalY += upper->logicHeight;
+        if (direction == Direction0 || direction == Direction180) {
+            globalLogicalY += upper->logicHeight;
+        }
+        if (direction == Direction90 || direction == Direction270) {
+            globalLogicalY += upper->logicWidth;
+        }
     }
 
     return true;
 }
 
-bool OHOS::MMI::InputWindowsManager::TouchMotionPointToDisplayPoint(libinput_event_touch* touch,
+bool OHOS::MMI::InputWindowsManager::TouchMotionPointToDisplayPoint(libinput_event_touch* touch, Direction& direction,
     int32_t targetDisplayId, int32_t& displayX, int32_t& displayY)
 {
     CHKPF(touch);
     int32_t globalLogicalX;
     int32_t globalLogicalY;
-    auto isTransform = TransformOfDisplayPoint(touch, globalLogicalX, globalLogicalY);
+    auto isTransform = TransformOfDisplayPoint(touch, direction, globalLogicalX, globalLogicalY);
     if (!isTransform) {
         return isTransform;
     }
@@ -678,13 +715,13 @@ bool OHOS::MMI::InputWindowsManager::TouchMotionPointToDisplayPoint(libinput_eve
     return false;
 }
 
-bool OHOS::MMI::InputWindowsManager::TouchDownPointToDisplayPoint(libinput_event_touch* touch,
+bool OHOS::MMI::InputWindowsManager::TouchDownPointToDisplayPoint(libinput_event_touch* touch, Direction& direction,
     int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId)
 {
     CHKPF(touch);
     int32_t globalLogicalX;
     int32_t globalLogicalY;
-    auto isTransform = TransformOfDisplayPoint(touch, globalLogicalX, globalLogicalY);
+    auto isTransform = TransformOfDisplayPoint(touch, direction, globalLogicalX, globalLogicalY);
     if (!isTransform) {
         return isTransform;
     }
