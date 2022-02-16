@@ -32,19 +32,19 @@ namespace MMI {
 template<class ...Ts>
 void CheckDefineOutput(const char* fmt, Ts... args)
 {
+    MMI_LOGD("enter");
     using namespace OHOS::MMI;
     CHKP(fmt);
     int32_t ret = 0;
-
     char buf[MAX_STREAM_BUF_SIZE] = {};
     ret = snprintf_s(buf, MAX_STREAM_BUF_SIZE, MAX_STREAM_BUF_SIZE - 1, fmt, args...);
     if (ret < 0) {
         KMSG_LOGI("call snprintf_s fail.ret = %d", ret);
         return;
     }
-
     KMSG_LOGI("%s", buf);
     MMI_LOGI("%s", buf);
+    MMI_LOGD("leave");
 }
 
 static void CheckDefine()
@@ -79,11 +79,12 @@ OHOS::MMI::MMIServer::MMIServer()
 
 OHOS::MMI::MMIServer::~MMIServer()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
 }
 
 int32_t OHOS::MMI::MMIServer::Start()
 {
+    MMI_LOGD("enter");
     CheckDefine();
     uint64_t tid = GetThisThreadIdOfLL();
     MMI_LOGD("Main Thread tid:%{public}" PRId64 "", tid);
@@ -128,11 +129,13 @@ int32_t OHOS::MMI::MMIServer::Start()
     MMI_LOGW("The server started successfully, time consumed:%{public}" PRId64
             " Ms curTime:%{public}" PRId64 "", consumeTime, curTime);
 #endif
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t OHOS::MMI::MMIServer::InitExpSoLibrary()
 {
+    MMI_LOGD("enter");
     MMI_LOGD("Load Expansibility Operation");
     auto expConf = GetEnv("EXP_CONF");
     if (expConf.empty()) {
@@ -143,11 +146,13 @@ int32_t OHOS::MMI::MMIServer::InitExpSoLibrary()
         expSOPath = DEF_EXP_SOPATH;
     }
     expOper_.LoadExteralLibrary(expConf.c_str(), expSOPath.c_str());
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t OHOS::MMI::MMIServer::InitLibinput()
 {
+    MMI_LOGD("enter");
     MMI_LOGD("Libinput event handle init");
     CHKR(InputHandler->Init(*this), INPUT_EVENT_HANDLER_INIT_FAIL, INPUT_EVENT_HANDLER_INIT_FAIL);
 
@@ -177,13 +182,16 @@ int32_t OHOS::MMI::MMIServer::InitLibinput()
         MMI_LOGD("libinput start");
     #endif
 #endif
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 void OHOS::MMI::MMIServer::OnTimer()
 {
+    MMI_LOGD("enter");
     InputHandler->OnCheckEventReport();
     TimerMgr->ProcessTimers();
+    MMI_LOGD("leave");
 }
 
 void OHOS::MMI::MMIServer::StopAll()
@@ -204,7 +212,7 @@ void OHOS::MMI::MMIServer::StopAll()
 
 int32_t OHOS::MMI::MMIServer::SaConnectServiceRegister()
 {
-    MMI_LOGT("enter.");
+    MMI_LOGD("enter.");
 
     int32_t ret;
 
@@ -219,46 +227,49 @@ int32_t OHOS::MMI::MMIServer::SaConnectServiceRegister()
         MMI_LOGE("call EpollCreat fail");
         return RET_ERR;
     }
-
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t OHOS::MMI::MMIServer::SaConnectServiceStart()
 {
-    MMI_LOGT("enter.");
+    MMI_LOGD("enter");
 
     int32_t ret = MultimodalInputConnectServiceStart();
     if (ret != RET_OK) {
         MMI_LOGE("call MultimodalInputConnectServiceStart fail, ret:%{public}d", ret);
         return RET_ERR;
     }
-
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t OHOS::MMI::MMIServer::SaConnectServiceStop()
 {
-    MMI_LOGT("enter.");
+    MMI_LOGD("enter");
 
     int32_t ret = MultimodalInputConnectServiceStop();
     if (ret != RET_OK) {
         MMI_LOGE("call MultimodalInputConnectServiceStop fail, ret:%{public}d", ret);
         return RET_ERR;
     }
-
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 void OHOS::MMI::MMIServer::OnConnected(SessionPtr s)
 {
+    MMI_LOGD("enter");
     CHKP(s);
     int32_t fd = s->GetFd();
     MMI_LOGI("MMIServer::_OnConnected fd:%{public}d", fd);
     AppRegs->RegisterConnectState(fd);
+    MMI_LOGD("leave");
 }
 
 void OHOS::MMI::MMIServer::OnDisconnected(SessionPtr s)
 {
+    MMI_LOGD("enter");
     CHKP(s);
     MMI_LOGW("MMIServer::OnDisconnected enter, session desc:%{public}s", s->GetDescript().c_str());
     int32_t fd = s->GetFd();
@@ -269,5 +280,6 @@ void OHOS::MMI::MMIServer::OnDisconnected(SessionPtr s)
 #ifdef  OHOS_BUILD_AI
     seniorInput_.DeviceDisconnect(fd);
 #endif // OHOS_BUILD_AI
+    MMI_LOGD("leave");
 }
 
