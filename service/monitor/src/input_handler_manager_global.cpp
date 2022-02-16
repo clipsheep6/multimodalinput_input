@@ -30,6 +30,7 @@ namespace {
 int32_t InputHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
 {
+    MMI_LOGD("enter");
     InitSessionLostCallback();
     CHKR(IsValidHandlerId(handlerId), PARAM_INPUT_INVALID, RET_ERR);
     CHKPR(session, RET_ERR);
@@ -50,6 +51,7 @@ int32_t InputHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
 void InputHandlerManagerGlobal::RemoveInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
 {
+    MMI_LOGD("enter");
     if (handlerType == InputHandlerType::MONITOR) {
         MMI_LOGD("Unregister monitor:%{public}d", handlerId);
         SessionHandler monitor { handlerId, handlerType, session };
@@ -59,16 +61,20 @@ void InputHandlerManagerGlobal::RemoveInputHandler(int32_t handlerId,
         SessionHandler interceptor { handlerId, handlerType, session };
         interceptors_.RemoveInterceptor(interceptor);
     }
+    MMI_LOGD("leave");
 }
 
 void InputHandlerManagerGlobal::MarkConsumed(int32_t handlerId, int32_t eventId, SessionPtr session)
 {
+    MMI_LOGD("enter");
     MMI_LOGD("Mark consumed state, monitor:%{public}d", handlerId);
     monitors_.MarkConsumed(handlerId, eventId, session);
+    MMI_LOGD("leave");
 }
 
 bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
+    MMI_LOGD("enter");
     MMI_LOGD("Handle KeyEvent");
     CHKPF(keyEvent);
     if (interceptors_.HandleEvent(keyEvent)) {
@@ -79,11 +85,13 @@ bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
         MMI_LOGD("Key event was consumed");
         return true;
     }
+    MMI_LOGD("leave");
     return false;
 }
 
 bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    MMI_LOGD("enter");
     MMI_LOGD("Handle PointerEvent");
     CHKPF(pointerEvent);
     if (interceptors_.HandleEvent(pointerEvent)) {
@@ -94,11 +102,13 @@ bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointe
         MMI_LOGD("Pointer event was consumed");
         return true;
     }
+    MMI_LOGD("leave");
     return false;
 }
 
 void InputHandlerManagerGlobal::InitSessionLostCallback()
 {
+    MMI_LOGD("enter");
     if (sessionLostCallbackInitialized_)  {
         return;
     }
@@ -108,25 +118,31 @@ void InputHandlerManagerGlobal::InitSessionLostCallback()
         &InputHandlerManagerGlobal::OnSessionLost, this, std::placeholders::_1));
     sessionLostCallbackInitialized_ = true;
     MMI_LOGD("The callback on session deleted is registered successfully");
+    MMI_LOGD("leave");
 }
 
 void InputHandlerManagerGlobal::OnSessionLost(SessionPtr session)
 {
+    MMI_LOGD("enter");
     monitors_.OnSessionLost(session);
     interceptors_.OnSessionLost(session);
+    MMI_LOGD("leave");
 }
 
 void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<KeyEvent> keyEvent) const
 {
+    MMI_LOGD("enter");
     NetPacket pkt(MmiMessageId::REPORT_KEY_EVENT);
     CHK(pkt.Write(id_), STREAM_BUF_WRITE_FAIL);
     CHK((InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt) == RET_OK),
         STREAM_BUF_WRITE_FAIL);
     CHK(session_->SendMsg(pkt), MSG_SEND_FAIL);
+    MMI_LOGD("leave");
 }
 
 void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const
 {
+    MMI_LOGD("enter");
     NetPacket pkt(MmiMessageId::REPORT_POINTER_EVENT);
     MMI_LOGD("Service SendToClient id:%{public}d,InputHandlerType:%{public}d", id_, handlerType_);
     CHK(pkt.Write(id_), STREAM_BUF_WRITE_FAIL);
@@ -134,10 +150,12 @@ void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<Poi
     CHK((OHOS::MMI::InputEventDataTransformation::Marshalling(pointerEvent, pkt) == RET_OK),
         STREAM_BUF_WRITE_FAIL);
     CHK(session_->SendMsg(pkt), MSG_SEND_FAIL);
+    MMI_LOGD("leave");
 }
 
 int32_t InputHandlerManagerGlobal::MonitorCollection::AddMonitor(const SessionHandler& monitor)
 {
+    MMI_LOGD("enter");
     std::lock_guard<std::mutex> guard(lockMonitors_);
     if (monitors_.size() >= MAX_N_INPUT_MONITORS) {
         MMI_LOGE("The number of monitors exceeds the maximum:%{public}d,monitors,errCode:%{public}d",
@@ -150,21 +168,25 @@ int32_t InputHandlerManagerGlobal::MonitorCollection::AddMonitor(const SessionHa
     } else {
         MMI_LOGW("Duplicate monitors");
     }
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 void InputHandlerManagerGlobal::MonitorCollection::RemoveMonitor(const SessionHandler& monitor)
 {
+    MMI_LOGD("enter");
     std::lock_guard<std::mutex> guard(lockMonitors_);
     std::set<SessionHandler>::const_iterator tItr = monitors_.find(monitor);
     if (tItr != monitors_.end()) {
         monitors_.erase(tItr);
         MMI_LOGD("Service RemoveMonitor Success");
     }
+    MMI_LOGD("leave");
 }
 
 void InputHandlerManagerGlobal::MonitorCollection::MarkConsumed(int32_t monitorId, int32_t eventId, SessionPtr session)
 {
+    MMI_LOGD("enter");
     if (!HasMonitor(monitorId, session)) {
         MMI_LOGW("Specified monitor does not exist, monitor:%{public}d", monitorId);
         return;
@@ -189,38 +211,47 @@ void InputHandlerManagerGlobal::MonitorCollection::MarkConsumed(int32_t monitorI
     pointerEvent->SetSkipInspection(true);
     EventDispatch eDispatch;
     eDispatch.HandlePointerEvent(pointerEvent);
+    MMI_LOGD("leave");
 }
 
 int32_t InputHandlerManagerGlobal::MonitorCollection::GetPriority() const
 {
+    MMI_LOGD("enter");
     return IInputEventHandler::DEFAULT_MONITOR;
 }
 
 bool InputHandlerManagerGlobal::MonitorCollection::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
+    MMI_LOGD("enter");
     std::lock_guard<std::mutex> guard(lockMonitors_);
     for (const auto &mon : monitors_) {
         mon.SendToClient(keyEvent);
     }
+    MMI_LOGD("leave");
     return false;
 }
 
 bool InputHandlerManagerGlobal::MonitorCollection::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    MMI_LOGD("enter");
     UpdateConsumptionState(pointerEvent);
     Monitor(pointerEvent);
+    MMI_LOGD("leave");
     return monitorConsumed_;
 }
 
 bool InputHandlerManagerGlobal::MonitorCollection::HasMonitor(int32_t monitorId, SessionPtr session)
 {
+    MMI_LOGD("enter");
     std::lock_guard<std::mutex> guard(lockMonitors_);
     SessionHandler monitor { monitorId, InputHandlerType::MONITOR, session };
+    MMI_LOGD("leave");
     return (monitors_.find(monitor) != monitors_.end());
 }
 
 void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    MMI_LOGD("enter");
     MMI_LOGD("Update consumption state");
     CHKP(pointerEvent);
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
@@ -243,19 +274,23 @@ void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::s
         downEventId_ = -1;
         lastPointerEvent_.reset();
     }
+    MMI_LOGD("leave");
 }
 
 void InputHandlerManagerGlobal::MonitorCollection::Monitor(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    MMI_LOGD("enter");
     std::lock_guard<std::mutex> guard(lockMonitors_);
     MMI_LOGD("There are currently %{public}d monitors", static_cast<int32_t>(monitors_.size()));
     for (const auto &monitor : monitors_) {
         monitor.SendToClient(pointerEvent);
     }
+    MMI_LOGD("leave");
 }
 
 void InputHandlerManagerGlobal::MonitorCollection::OnSessionLost(SessionPtr session)
 {
+    MMI_LOGD("enter");
     std::lock_guard<std::mutex> guard(lockMonitors_);
     std::set<SessionHandler>::const_iterator cItr = monitors_.cbegin();
     while (cItr != monitors_.cend()) {
@@ -265,15 +300,18 @@ void InputHandlerManagerGlobal::MonitorCollection::OnSessionLost(SessionPtr sess
             cItr = monitors_.erase(cItr);
         }
     }
+    MMI_LOGD("leave");
 }
 
 int32_t InputHandlerManagerGlobal::InterceptorCollection::GetPriority() const
 {
+    MMI_LOGD("enter");
     return IInputEventHandler::DEFAULT_INTERCEPTOR;
 }
 
 bool InputHandlerManagerGlobal::InterceptorCollection::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
+    MMI_LOGD("enter");
     std::lock_guard<std::mutex> guard(lockInterceptors_);
     if (interceptors_.empty()) {
         return false;
@@ -283,11 +321,13 @@ bool InputHandlerManagerGlobal::InterceptorCollection::HandleEvent(std::shared_p
     for (const auto &interceptor : interceptors_) {
         interceptor.SendToClient(keyEvent);
     }
+    MMI_LOGD("leave");
     return true;
 }
 
 bool InputHandlerManagerGlobal::InterceptorCollection::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    MMI_LOGD("enter");
     std::lock_guard<std::mutex> guard(lockInterceptors_);
     if (interceptors_.empty()) {
         return false;
@@ -297,11 +337,13 @@ bool InputHandlerManagerGlobal::InterceptorCollection::HandleEvent(std::shared_p
     for (const auto &interceptor : interceptors_) {
         interceptor.SendToClient(pointerEvent);
     }
+    MMI_LOGD("leave");
     return true;
 }
 
 int32_t InputHandlerManagerGlobal::InterceptorCollection::AddInterceptor(const SessionHandler& interceptor)
 {
+    MMI_LOGD("enter");
     std::lock_guard<std::mutex> guard(lockInterceptors_);
     if (interceptors_.size() >= MAX_N_INPUT_INTERCEPTORS) {
         MMI_LOGE("The number of interceptors exceeds limit");
@@ -313,21 +355,25 @@ int32_t InputHandlerManagerGlobal::InterceptorCollection::AddInterceptor(const S
     } else {
         MMI_LOGW("Duplicate interceptors");
     }
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 void InputHandlerManagerGlobal::InterceptorCollection::RemoveInterceptor(const SessionHandler& interceptor)
 {
+    MMI_LOGD("enter");
     std::lock_guard<std::mutex> guard(lockInterceptors_);
     std::set<SessionHandler>::const_iterator tItr = interceptors_.find(interceptor);
     if (tItr != interceptors_.cend()) {
         interceptors_.erase(tItr);
         MMI_LOGD("Unregister interceptor successfully");
     }
+    MMI_LOGD("leave");
 }
 
 void InputHandlerManagerGlobal::InterceptorCollection::OnSessionLost(SessionPtr session)
 {
+    MMI_LOGD("enter");
     std::lock_guard<std::mutex> guard(lockInterceptors_);
     std::set<SessionHandler>::const_iterator cItr = interceptors_.cbegin();
     while (cItr != interceptors_.cend()) {
@@ -337,6 +383,7 @@ void InputHandlerManagerGlobal::InterceptorCollection::OnSessionLost(SessionPtr 
             cItr = interceptors_.erase(cItr);
         }
     }
+    MMI_LOGD("leave");
 }
 } // namespace MMI
 } // namespace OHOS

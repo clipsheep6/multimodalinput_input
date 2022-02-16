@@ -47,6 +47,7 @@ struct mmi_epoll_event {
 template<class ...Ts>
 void CheckDefineOutput(const char* fmt, Ts... args)
 {
+    MMI_LOGD("enter");
     using namespace OHOS::MMI;
     CHKP(fmt);
     int32_t ret = 0;
@@ -59,6 +60,7 @@ void CheckDefineOutput(const char* fmt, Ts... args)
 
     KMSG_LOGI("%s", buf);
     MMI_LOGI("%{public}s", buf);
+    MMI_LOGD("leave");
 }
 
 static void CheckDefine()
@@ -97,6 +99,7 @@ MMIService::~MMIService()
 
 int32_t MMIService::EpollCtlAdd(EpollEventType type, int32_t fd)
 {
+    MMI_LOGD("enter");
     CHKR((type >= EPOLL_EVENT_BEGIN && type < EPOLL_EVENT_END), PARAM_INPUT_INVALID, RET_ERR);
     CHKR(fd >= 0, PARAM_INPUT_INVALID, RET_ERR);
     CHKR(mmiFd_ >= 0, PARAM_INPUT_INVALID, RET_ERR);
@@ -117,19 +120,23 @@ int32_t MMIService::EpollCtlAdd(EpollEventType type, int32_t fd)
         return ret;
     }
     authFds_.emplace(fd);
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 bool MMIService::ChkAuthFd(int32_t fd) const
 {
+    MMI_LOGD("enter");
     if (authFds_.find(fd) == authFds_.end()) {
         return false;
     }
+    MMI_LOGD("leave");
     return true;
 }
 
 bool MMIService::InitLibinputService()
 {
+    MMI_LOGD("enter");
 #ifdef OHOS_BUILD_HDF
     MMI_LOGD("HDF Init");
     hdfEventManager.SetupCallback();
@@ -144,11 +151,13 @@ bool MMIService::InitLibinputService()
         return false;
     }
     MMI_LOGD("MMIService::InitLibinputService EpollCtlAdd, epollfd:%{public}d,fd:%{public}d", mmiFd_, inputFd);
+    MMI_LOGD("leave");
     return true;
 }
 
 bool MMIService::InitSAService()
 {
+    MMI_LOGD("enter");
     CHKF(state_ == ServiceRunningState::STATE_NOT_START, SASERVICE_INIT_FAIL);
     CHKF(Publish(DelayedSingleton<MMIService>::GetInstance().get()), SASERVICE_INIT_FAIL);
     CHKF(EpollCreat(MAX_EVENT_SIZE) >= 0, SASERVICE_INIT_FAIL);
@@ -159,11 +168,13 @@ bool MMIService::InitSAService()
         return false;
     }
     MMI_LOGD("MMIService::InitLibinputService EpollCtlAdd, epollfd:%{public}d,fd:%{public}d", mmiFd_, epollFd_);
+    MMI_LOGD("leave");
     return true;
 }
 
 bool MMIService::InitExpSoLibrary()
 {
+    MMI_LOGD("enter");
     MMI_LOGD("Load Expansibility Operation");
     auto expConf = GetEnv("EXP_CONF");
     if (expConf.empty()) {
@@ -174,11 +185,13 @@ bool MMIService::InitExpSoLibrary()
         expSOPath = DEF_EXP_SOPATH;
     }
     expOper_.LoadExteralLibrary(expConf.c_str(), expSOPath.c_str());
+    MMI_LOGD("leave");
     return true;
 }
 
 int32_t MMIService::Init()
 {
+    MMI_LOGD("enter");
     CheckDefine();
     CHKR(InitExpSoLibrary(), EXP_SO_LIBY_INIT_FAIL, EXP_SO_LIBY_INIT_FAIL);
 
@@ -216,11 +229,13 @@ int32_t MMIService::Init()
     CHKR(InitLibinputService(), LIBINPUT_INIT_FAIL, LIBINPUT_INIT_FAIL);
     CHKR(InitSignalHandler(), INIT_SIGNAL_HANDLER_FAIL, INIT_SIGNAL_HANDLER_FAIL);
     SetRecvFun(std::bind(&ServerMsgHandler::OnMsgHandler, &sMsgHandler_, std::placeholders::_1, std::placeholders::_2));
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 void MMIService::OnStart()
 {
+    MMI_LOGD("enter");
     auto tid = GetThisThreadIdOfLL();
     MMI_LOGD("SA_OnStart Thread tid:%{public}" PRId64 "", tid);
 
@@ -230,10 +245,12 @@ void MMIService::OnStart()
     MMI_LOGD("MMIService Started successfully");
     t_ = std::thread(std::bind(&MMIService::OnThread, this));
     t_.detach();
+    MMI_LOGD("leave");
 }
 
 void MMIService::OnStop()
 {
+    MMI_LOGD("enter");
     auto tid = GetThisThreadIdOfLL();
     MMI_LOGD("SA_OnStop Thread tid:%{public}" PRId64 "", tid);
 
@@ -243,25 +260,31 @@ void MMIService::OnStop()
     }
     input_.Stop();
     state_ = ServiceRunningState::STATE_NOT_START;
+    MMI_LOGD("leave");
 }
 
 void MMIService::OnDump()
 {
+    MMI_LOGD("enter");
     auto tid = GetThisThreadIdOfLL();
     MMI_LOGD("SA_OnDump Thread tid:%{public}" PRId64 "", tid);
     MMIEventDump->Dump();
+    MMI_LOGD("leave");
 }
 
 void MMIService::OnConnected(SessionPtr s)
 {
+    MMI_LOGD("enter");
     CHKP(s);
     int32_t fd = s->GetFd();
     MMI_LOGI("MMIService::_OnConnected fd:%{public}d", fd);
     AppRegs->RegisterConnectState(fd);
+    MMI_LOGD("leave");
 }
 
 void MMIService::OnDisconnected(SessionPtr s)
 {
+    MMI_LOGD("enter");
     CHKP(s);
     MMI_LOGW("MMIService::OnDisconnected enter, session desc:%{public}s", s->GetDescript().c_str());
     int32_t fd = s->GetFd();
@@ -271,10 +294,12 @@ void MMIService::OnDisconnected(SessionPtr s)
 #ifdef  OHOS_BUILD_AI
     seniorInput_.DeviceDisconnect(fd);
 #endif // OHOS_BUILD_AI
+    MMI_LOGD("leave");
 }
 
 int32_t MMIService::AllocSocketFd(const std::string &programName, const int moduleType, int &toReturnClientFd)
 {
+    MMI_LOGD("enter");
     MMI_LOGI("MMIService::AllocSocketFd enter, programName:%{public}s,moduleType:%{public}d",
              programName.c_str(), moduleType);
 
@@ -290,12 +315,13 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int modu
 
     MMI_LOGIK("leave, programName:%{public}s,moduleType:%{public}d,alloc success",
         programName.c_str(), moduleType);
-
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t MMIService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& reply)
 {
+    MMI_LOGD("enter");
     int32_t ret = RET_OK;
     sptr<ConnectDefReqParcel> req = data.ReadParcelable<ConnectDefReqParcel>();
     if (req == nullptr) {
@@ -325,29 +351,34 @@ int32_t MMIService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& 
     close(clientFd);
     clientFd = -1;
     MMI_LOGI(" clientFd = %d, has closed in server", clientFd);
-
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter)
 {
+    MMI_LOGD("enter");
     if (inputEventHdr_ == nullptr) {
         MMI_LOGE("inputEventHdr_ is nullptr");
         return ERROR_NULL_POINTER;
     }
+    MMI_LOGD("leave");
     return inputEventHdr_->AddInputEventFilter(filter);
 }
 
 void MMIService::OnTimer()
 {
+    MMI_LOGD("enter");
     if (inputEventHdr_ != nullptr) {
         inputEventHdr_->OnCheckEventReport();
     }
     TimerMgr->ProcessTimers();
+    MMI_LOGD("leave");
 }
 
 void MMIService::OnThread()
 {
+    MMI_LOGD("enter");
     OHOS::MMI::SetThreadName(std::string("mmi_service"));
     uint64_t tid = GetThisThreadIdOfLL();
     CHK(tid > 0, VAL_NOT_EXP);
@@ -387,6 +418,7 @@ void MMIService::OnThread()
         OnTimer();
     }
     MMI_LOGI("Main worker thread stop. tid:%{public}" PRId64 "", tid);
+    MMI_LOGD("leave");
 }
 
 bool MMIService::InitSignalHandler()
@@ -417,8 +449,7 @@ bool MMIService::InitSignalHandler()
         close(fdSignal);
         return false;
     }
-
-    MMI_LOGD("success");
+    MMI_LOGD("leave");
     return true;
 }
 

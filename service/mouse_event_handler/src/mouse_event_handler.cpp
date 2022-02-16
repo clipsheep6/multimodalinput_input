@@ -51,11 +51,12 @@ void MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
     WinMgr->UpdateAndAdjustMouseLoction(absolutionX_, absolutionY_);
 
     MMI_LOGD("Change Coordinate : x:%{public}lf,y:%{public}lf",  absolutionX_, absolutionY_);
+    MMI_LOGD("leave");
 }
 
 void MouseEventHandler::HandleButonInner(libinput_event_pointer* data, PointerEvent::PointerItem& pointerItem)
 {
-    MMI_LOGT("enter, current action:%{public}d", pointerEvent_->GetPointerAction());
+    MMI_LOGD("enter, current action:%{public}d", pointerEvent_->GetPointerAction());
 
     auto button = libinput_event_pointer_get_button(data);
     if (button == BTN_LEFT) {
@@ -84,10 +85,12 @@ void MouseEventHandler::HandleButonInner(libinput_event_pointer* data, PointerEv
     } else {
         MMI_LOGW("unknown state, state:%{public}u", state);
     }
+    MMI_LOGD("leave");
 }
 
 void MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
 {
+    MMI_LOGD("enter");
     if (TimerMgr->IsExist(timerId_)) {
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
         TimerMgr->ResetTimer(timerId_);
@@ -120,12 +123,13 @@ void MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
         auto axisValue = libinput_event_pointer_get_axis_value(data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL);
         pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, axisValue);
     }
+    MMI_LOGD("leave");
 }
 
 void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t deviceId,
                                         PointerEvent::PointerItem& pointerItem)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
 
     auto mouseInfo = WinMgr->GetMouseInfo();
     MouseState->SetMouseCoords(mouseInfo.globleX, mouseInfo.globleY);
@@ -153,12 +157,12 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
     pointerEvent_->SetTargetWindowId(-1);
     pointerEvent_->SetAgentWindowId(-1);
 
-    MMI_LOGT("leave");
+    MMI_LOGD("leave");
 }
 
 void MouseEventHandler::Normalize(libinput_event *event)
 {
-    MMI_LOGD("Enter");
+    MMI_LOGD("enter");
     CHKP(event);
     auto data = libinput_event_get_pointer_event(event);
     CHKP(data);
@@ -186,11 +190,12 @@ void MouseEventHandler::Normalize(libinput_event *event)
     int32_t deviceId = InputDevMgr->FindInputDeviceId(libinput_event_get_device(event));
     HandlePostInner(data, deviceId, pointerItem);
     DumpInner();
-    MMI_LOGD("Leave");
+    MMI_LOGD("leave");
 }
 
 void MouseEventHandler::DumpInner()
 {
+    MMI_LOGD("enter");
     MMI_LOGD("PointerAction:%{public}d,PointerId:%{public}d,SourceType:%{public}d,"
         "ButtonId:%{public}d,VerticalAxisValue:%{public}lf,HorizontalAxisValue:%{public}lf",
         pointerEvent_->GetPointerAction(), pointerEvent_->GetPointerId(), pointerEvent_->GetSourceType(),
@@ -203,6 +208,7 @@ void MouseEventHandler::DumpInner()
         "Width:%{public}d,Height:%{public}d,Pressure:%{public}d,DeviceId:%{public}d",
         item.GetDownTime(), (item.IsPressed() ? "true" : "false"), item.GetGlobalX(), item.GetGlobalY(),
         item.GetWidth(), item.GetHeight(), item.GetPressure(), item.GetDeviceId());
+    MMI_LOGD("leave");
 }
 } // namespace MMI
 } // namespace OHOS

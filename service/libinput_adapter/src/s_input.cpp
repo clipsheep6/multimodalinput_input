@@ -33,29 +33,36 @@ namespace MMI {
 
 static void HiLogFunc(struct libinput* input, enum libinput_log_priority priority, const char* fmt, va_list args)
 {
+    MMI_LOGD("enter");
     char buffer[256];
     (void)vsnprintf_s(buffer, sizeof(buffer), sizeof(buffer) - 1, fmt, args);
     MMI_LOGE("PrintLog_Info:%{public}s", buffer);
     va_end(args);
+    MMI_LOGD("leave");
 }
 
 static void InitHiLogFunc(struct libinput* input)
 {
+    MMI_LOGD("enter");
     static bool initFlag = false;
     if (initFlag) {
         return;
     }
     libinput_log_set_handler(input, &OHOS::MMI::HiLogFunc);
     initFlag = true;
+    MMI_LOGD("leave");
+}
 }
 }
 }
 
 void OHOS::MMI::SInput::LoginfoPackagingTool(libinput_event *event)
 {
+    MMI_LOGD("enter");
     CHKP(event);
     auto context = libinput_event_get_context(event);
     InitHiLogFunc(context);
+    MMI_LOGD("leave");
 }
 
 const static libinput_interface LIBINPUT_INTERFACE = {
@@ -89,6 +96,7 @@ OHOS::MMI::SInput::~SInput()
 
 bool OHOS::MMI::SInput::Init(FunInputEvent funInputEvent, const std::string& seat_id)
 {
+    MMI_LOGD("enter");
     CHKPF(funInputEvent);
     funInputEvent_ = funInputEvent;
     seat_id_ = seat_id;
@@ -112,11 +120,13 @@ bool OHOS::MMI::SInput::Init(FunInputEvent funInputEvent, const std::string& sea
         lfd_ = -1;
         return false;
     }
+    MMI_LOGD("leave");
     return true;
 }
 
 void OHOS::MMI::SInput::EventDispatch(epoll_event& ev)
 {
+    MMI_LOGD("enter");
     CHKP(ev.data.ptr);
     auto fd = *static_cast<int*>(ev.data.ptr);
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
@@ -131,20 +141,24 @@ void OHOS::MMI::SInput::EventDispatch(epoll_event& ev)
         return;
     }
     OnEventHandler();
+    MMI_LOGD("leave");
 }
 
 void OHOS::MMI::SInput::Stop()
 {
+    MMI_LOGD("enter");
     if (lfd_ >= 0) {
         close(lfd_);
         lfd_ = -1;
     }
     libinput_unref(input_);
     udev_unref(udev_);
+    MMI_LOGD("leave");
 }
 
 void OHOS::MMI::SInput::OnEventHandler()
 {
+    MMI_LOGD("enter");
     CHKP(funInputEvent_);
 #ifndef OHOS_WESTEN_MODEL
     multimodal_libinput_event ev = { nullptr, nullptr };
@@ -153,4 +167,5 @@ void OHOS::MMI::SInput::OnEventHandler()
         libinput_event_destroy(ev.event);
     }
 #endif
+    MMI_LOGD("leave");
 }
