@@ -80,7 +80,7 @@ private:
     int64_t initSysClock_ = 0;
     int64_t lastSysClock_ = 0;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #define InputHandler OHOS::MMI::InputEventHandler::GetInstance()
 #endif // INPUT_EVENT_HANDLER_H
