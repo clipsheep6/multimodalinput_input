@@ -180,6 +180,7 @@ int32_t GetNamePropertyInt32(const napi_env& env, const napi_value& object, cons
     napi_value napiValue = {};
     napi_valuetype tmpType = napi_undefined;
     napi_get_named_property(env, object, name.c_str(), &napiValue);
+
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
         MMI_LOGD("GetNamePropertyInt32: call napi_typeof fail.");
         return value;
