@@ -17,6 +17,7 @@
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "immi_token.h"
+#include <inttypes.h>
 #include "input_event_data_transformation.h"
 #include "multimodal_event_handler.h"
 #include "net_packet.h"
@@ -686,8 +687,8 @@ int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<P
     MMI_LOGD("Inject pointer event.");
     CHKPR(pointerEvent, RET_ERR);
     std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
-    MMI_LOGD("pointer event dispatcher of client:eventType:%{public}s, actionTime:%{public}d,"
-             "action:%{public}d, actionStartTime:%{public}d, "
+    MMI_LOGD("Pointer event dispatcher of client:eventType:%{public}s, actionTime:%{public}" PRId64 ","
+             "action:%{public}d, actionStartTime:%{public}" PRId64 ", "
              "flag:%{public}d, pointerAction:%{public}s, sourceType:%{public}s, "
              "VerticalAxisValue:%{public}f, HorizontalAxisValue:%{public}f, "
              "pointerCount:%{public}d",
@@ -703,7 +704,7 @@ int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<P
         OHOS::MMI::PointerEvent::PointerItem item;
         CHKR(pointerEvent->GetPointerItem(pointerId, item), PARAM_INPUT_FAIL, RET_ERR);
 
-        MMI_LOGD("downTime:%{public}d,isPressed:%{public}s, "
+        MMI_LOGD("DownTime:%{public}" PRId64 ",isPressed:%{public}s, "
                 "globalX:%{public}d, globalY:%{public}d, localX:%{public}d, localY:%{public}d,"
                 "width:%{public}d, height:%{public}d, pressure:%{public}d",
                  item.GetDownTime(), (item.IsPressed() ? "true" : "false"),
