@@ -54,6 +54,7 @@ static void InitHiLogFunc(struct libinput* input)
 }
 }
 }
+}
 
 void OHOS::MMI::SInput::LoginfoPackagingTool(libinput_event *event)
 {
