@@ -44,7 +44,7 @@ constexpr bool ACTION_UP = false;
 constexpr int32_t DEFAULT_DEVICE_ID = 1;
 constexpr int32_t DEFAULT_POINTER_ID = 0;
 constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
-constexpr int32_t SEC_TO_NANOSEC = 1000000000;
+constexpr int64_t SEC_TO_NANOSEC = 1000000000;
 constexpr int32_t TIME_WAIT_FOR_OP = 500;
 constexpr int32_t TIME_WAIT_FOR_LOG = 100;
 constexpr int32_t N_TRIES_FOR_LOG = 10;
@@ -101,7 +101,7 @@ int64_t InputManagerTest::GetNanoTime()
 {
     timespec time = { 0 };
     clock_gettime(CLOCK_MONOTONIC, &time);
-    return static_cast<uint64_t>(time.tv_sec) * SEC_TO_NANOSEC + time.tv_nsec;
+    return static_cast<int64_t>(time.tv_sec) * SEC_TO_NANOSEC + time.tv_nsec;
 }
 
 class InputEventCallback : public OHOS::MMI::IInputEventConsumer {

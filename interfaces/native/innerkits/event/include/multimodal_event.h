@@ -206,7 +206,7 @@ public:
     * @since 1
     */
     void Initialize(int32_t windowId, int32_t highLevelEvent, const std::string& uuid, int32_t sourceType,
-                    uint64_t occurredTime, const std::string& deviceId, int32_t inputDeviceId,  bool isHighLevelEvent,
+                    int64_t occurredTime, const std::string& deviceId, int32_t inputDeviceId,  bool isHighLevelEvent,
                     uint16_t deviceUdevTags = 0, bool isIntercepted = true);
 
     /**
@@ -299,7 +299,7 @@ public:
      * @return Returns the time (in ms) when the current event is generated.
      * @since 1
      */
-    uint64_t GetOccurredTime() const;
+    int64_t GetOccurredTime() const;
 
     /**
      * Obtains the device tags.
@@ -327,7 +327,7 @@ private:
     std::string mDeviceId_ = "";
     int32_t mHighLevelEvent_ = 0;
     int32_t mSourceDevice_ = 0;
-    uint64_t mOccurredTime_ = 0;
+    int64_t mOccurredTime_ = 0;
     int32_t mInputDeviceId_ = 0;
     bool mIsHighLevelEvent_ = false;
     uint16_t mDeviceUdevTags_ = 0;

@@ -44,7 +44,7 @@ public:
         }
     }
 
-    void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const { }
+    void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const {}
     void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
     {
         if (monitor_ != nullptr) {
@@ -52,7 +52,7 @@ public:
         }
     }
 
-    void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const { }
+    void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const {}
 
 private:
     std::function<void(std::shared_ptr<PointerEvent>)> monitor_;

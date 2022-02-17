@@ -111,7 +111,7 @@ void EventDispatch::OnEventTouchGetPointEventType(const EventTouch& touch,
 int32_t EventDispatch::GestureRegisteredEventDispatch(const MmiMessageId& idMsg,
                                                       UDSServer& udsServer,
                                                       RegisteredEvent& registeredEvent,
-                                                      uint64_t preHandlerTime)
+                                                      int64_t preHandlerTime)
 {
     MMI_LOGD("enter");
     auto ret = RET_OK;
@@ -140,7 +140,7 @@ int32_t EventDispatch::GestureRegisteredEventDispatch(const MmiMessageId& idMsg,
 }
 
 int32_t EventDispatch::DispatchRegEvent(const MmiMessageId& idMsg, UDSServer& udsServer,
-    const RegisteredEvent& registeredEvent, int32_t inputDeviceType, uint64_t preHandlerTime)
+    const RegisteredEvent& registeredEvent, int32_t inputDeviceType, int64_t preHandlerTime)
 {
     MMI_LOGD("enter");
     CHKR(idMsg > MmiMessageId::INVALID, PARAM_INPUT_INVALID, PARAM_INPUT_INVALID);
@@ -172,7 +172,7 @@ int32_t EventDispatch::DispatchRegEvent(const MmiMessageId& idMsg, UDSServer& ud
 }
 
 int32_t EventDispatch::KeyBoardRegEveHandler(const EventKeyboard& key, UDSServer& udsServer,
-    libinput_event *event, int32_t inputDeviceType, uint64_t preHandlerTime)
+    libinput_event *event, int32_t inputDeviceType, int64_t preHandlerTime)
 {
     MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
@@ -227,7 +227,7 @@ int32_t EventDispatch::KeyBoardRegEveHandler(const EventKeyboard& key, UDSServer
 }
 
 int32_t EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, libinput_event *event,
-    const EventTabletPad& tabletPad, const uint64_t preHandlerTime)
+    const EventTabletPad& tabletPad, const int64_t preHandlerTime)
 {
     MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
@@ -280,7 +280,7 @@ int32_t EventDispatch::DispatchTabletPadEvent(UDSServer& udsServer, libinput_eve
 }
 
 int32_t EventDispatch::DispatchJoyStickEvent(UDSServer &udsServer, libinput_event *event,
-    const EventJoyStickAxis& eventJoyStickAxis, const uint64_t preHandlerTime)
+    const EventJoyStickAxis& eventJoyStickAxis, const int64_t preHandlerTime)
 {
     MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
@@ -315,7 +315,7 @@ int32_t EventDispatch::DispatchJoyStickEvent(UDSServer &udsServer, libinput_even
 }
 
 int32_t EventDispatch::DispatchTabletToolEvent(UDSServer& udsServer, libinput_event *event,
-    const EventTabletTool& tableTool, const uint64_t preHandlerTime)
+    const EventTabletTool& tableTool, const int64_t preHandlerTime)
 {
     MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
@@ -448,7 +448,7 @@ int32_t EventDispatch::DispatchTouchTransformPointEvent(UDSServer& udsServer,
 }
 
 int32_t EventDispatch::DispatchPointerEvent(UDSServer &udsServer, libinput_event *event,
-    EventPointer &point, const uint64_t preHandlerTime)
+    EventPointer &point, const int64_t preHandlerTime)
 {
     MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
@@ -528,7 +528,7 @@ int32_t EventDispatch::DispatchPointerEvent(UDSServer &udsServer, libinput_event
 }
 
 int32_t EventDispatch::DispatchGestureEvent(UDSServer& udsServer, libinput_event *event,
-    const EventGesture& gesture, const uint64_t preHandlerTime)
+    const EventGesture& gesture, const int64_t preHandlerTime)
 {
     MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
@@ -586,7 +586,7 @@ int32_t EventDispatch::DispatchGestureEvent(UDSServer& udsServer, libinput_event
 }
 
 int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *event,
-    const EventTouch& touch, const uint64_t preHandlerTime)
+    const EventTouch& touch, const int64_t preHandlerTime)
 {
     MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
@@ -677,8 +677,9 @@ int32_t EventDispatch::DispatchTouchEvent(UDSServer& udsServer, libinput_event *
     MMI_LOGD("leave");
     return ret;
 }
+
 int32_t EventDispatch::DispatchCommonPointEvent(UDSServer& udsServer, libinput_event *event,
-    const EventPointer& point, const uint64_t preHandlerTime)
+    const EventPointer& point, const int64_t preHandlerTime)
 {
     MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
@@ -735,7 +736,7 @@ void EventDispatch::OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, i
 }
 
 int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
-    std::shared_ptr<KeyEvent> key, const uint64_t preHandlerTime)
+    std::shared_ptr<KeyEvent> key, const int64_t preHandlerTime)
 {
     CHKPR(key, PARAM_INPUT_INVALID);
     MMI_LOGD("DispatchKeyEventByPid begin");
@@ -792,7 +793,7 @@ int32_t EventDispatch::DispatchKeyEventByPid(UDSServer& udsServer,
 }
 
 int32_t EventDispatch::DispatchKeyEvent(UDSServer& udsServer, libinput_event *event,
-    const KeyEventValueTransformations& trs, EventKeyboard& key, const uint64_t preHandlerTime)
+    const KeyEventValueTransformations& trs, EventKeyboard& key, const int64_t preHandlerTime)
 {
     MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);
@@ -857,7 +858,7 @@ int32_t EventDispatch::AddInputEventFilter(sptr<IEventFilter> filter)
 }
 
 int32_t EventDispatch::DispatchGestureNewEvent(UDSServer& udsServer, libinput_event *event,
-    std::shared_ptr<PointerEvent> pointerEvent, const uint64_t preHandlerTime)
+    std::shared_ptr<PointerEvent> pointerEvent, const int64_t preHandlerTime)
 {
     MMI_LOGD("enter");
     CHKPR(event, ERROR_NULL_POINTER);

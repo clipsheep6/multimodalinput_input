@@ -89,7 +89,7 @@ bool UDSSession::SendMsg(NetPacket& pkt) const
     return SendMsg(buf.Data(), buf.Size());
 }
 
-void UDSSession::AddEvent(int32_t id, uint64_t time)
+void UDSSession::AddEvent(int32_t id, int64_t time)
 {
     MMI_LOGI("begin");
     EventTime eventTime = {id, time};
@@ -111,7 +111,7 @@ void UDSSession::DelEvents(int32_t id)
     MMI_LOGI("end");
 }
 
-uint64_t UDSSession::GetFirstEventTime()
+int64_t UDSSession::GetFirstEventTime()
 {
     MMI_LOGI("begin");
     if (events_.empty()) {
