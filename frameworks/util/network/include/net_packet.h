@@ -14,7 +14,7 @@
  */
 #ifndef NET_PACKET_H
 #define NET_PACKET_H
-
+#include "nocopyable.h"
 #include "proto.h"
 #include "stream_buffer.h"
 
@@ -33,6 +33,7 @@ public:
     explicit NetPacket(MmiMessageId idMsg);
     NetPacket(const NetPacket& pack);
     NetPacket& operator = (const NetPacket& pack);
+    DISALLOW_MOVE(NetPacket);
     virtual ~NetPacket();
 
     virtual void MakeData(StreamBuffer& buf) const;
