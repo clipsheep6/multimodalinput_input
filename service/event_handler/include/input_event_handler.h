@@ -56,7 +56,7 @@ protected:
     int32_t OnEventTabletPadKey(const multimodal_libinput_event& event);
     int32_t OnEventJoyStickAxis(const multimodal_libinput_event& event, const uint64_t time);
     int32_t OnKeyboardEvent(libinput_event *event);
-    int32_t OnKeyEventDispatch(const multimodal_libinput_event& event);
+    int32_t OnKeyEvent(const multimodal_libinput_event& event);
     
     int32_t OnMouseEventHandler(libinput_event *event);
     bool SendMsg(const int32_t fd, NetPacket& pkt) const;
@@ -66,7 +66,6 @@ protected:
 
 private:
     int32_t OnEventHandler(const multimodal_libinput_event& ev);
-    int32_t OnEventKey(libinput_event *event);
     std::mutex mu_;
     UDSServer *udsServer_ = nullptr;
     EventDispatch eventDispatch_;
