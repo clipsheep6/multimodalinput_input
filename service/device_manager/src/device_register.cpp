@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,7 @@
 namespace OHOS {
 namespace MMI {
     namespace {
-        [[maybe_unused]] static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
+        [[maybe_unused]] constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
             LOG_CORE, MMI_LOG_DOMAIN, "DeviceRegister"
         };
     }
@@ -32,26 +32,26 @@ DeviceRegister::~DeviceRegister()
 
 bool DeviceRegister::Init()
 {
-    setDeviceId_.clear();
-    mapDeviceInfo_.clear();
+    deviceId_.clear();
+    deviceInfo_.clear();
     if (mu_.try_lock()) {
         mu_.unlock();
     }
-    SeniorDeviceInfo sensor = { "hos_input_device_aisensor", INPUT_DEVICE_AISENSOR };
-    SeniorDeviceInfo knuckle = { "hos_input_device_knuckle", INPUT_DEVICE_KNUCKLE };
-    setDeviceId_.insert(sensor.seniorDeviceType);
-    mapDeviceInfo_.insert(std::pair<std::string, uint32_t>(sensor.physical, sensor.seniorDeviceType));
-    setDeviceId_.insert(knuckle.seniorDeviceType);
-    mapDeviceInfo_.insert(std::pair<std::string, uint32_t>(knuckle.physical, knuckle.seniorDeviceType));
+    SeniorDeviceInfo sensor = { "input_device_aisensor", INPUT_DEVICE_AISENSOR };
+    deviceId_.insert(sensor.seniorDeviceType);
+    deviceInfo_.insert(std::pair<std::string, uint32_t>(sensor.physical, sensor.seniorDeviceType));
+    SeniorDeviceInfo knuckle = { "input_device_knuckle", INPUT_DEVICE_KNUCKLE };
+    deviceId_.insert(knuckle.seniorDeviceType);
+    deviceInfo_.insert(std::pair<std::string, uint32_t>(knuckle.physical, knuckle.seniorDeviceType));
     return true;
 }
 
 bool DeviceRegister::FindDeviceId(const std::string& physical, uint32_t& deviceId)
 {
     std::lock_guard<std::mutex> lock(mu_);
-    const uint32_t DEFAULT_DEVICE_ID = 0;
-    auto it = mapDeviceInfo_.find(physical);
-    if (it == mapDeviceInfo_.end()) {
+    constexpr uint32_t DEFAULT_DEVICE_ID = 0;
+    auto it = deviceInfo_.find(physical);
+    if (it == deviceInfo_.end()) {
         deviceId = DEFAULT_DEVICE_ID;
         return false;
     }
@@ -62,21 +62,21 @@ bool DeviceRegister::FindDeviceId(const std::string& physical, uint32_t& deviceI
 uint32_t DeviceRegister::AddDeviceInfo(const std::string& physical)
 {
     std::lock_guard<std::mutex> lock(mu_);
-    const uint32_t BEGIN_NUM = 1;
-    auto it = setDeviceId_.find(BEGIN_NUM);
-    if (it == setDeviceId_.end()) {
-        setDeviceId_.insert(BEGIN_NUM);
-        mapDeviceInfo_.insert(std::pair<std::string, uint32_t>(physical, BEGIN_NUM));
+    constexpr uint32_t BEGIN_NUM = 1;
+    auto it = deviceId_.find(BEGIN_NUM);
+    if (it == deviceId_.end()) {
+        deviceId_.insert(BEGIN_NUM);
+        deviceInfo_.insert(std::pair<std::string, uint32_t>(physical, BEGIN_NUM));
         return BEGIN_NUM;
     } else {
-        auto addDeviceId = *setDeviceId_.rbegin() + 1;
+        auto addDeviceId = *deviceId_.rbegin() + 1;
         if (addDeviceId >= std::numeric_limits<uint32_t>::max()) {
             MMI_LOGE("Device number exceeds bounds of uint32_t");
             return 0;
         }
-        setDeviceId_.insert(addDeviceId);
-        mapDeviceInfo_.insert(std::pair<std::string, uint32_t>(physical, addDeviceId));
-        MMI_LOGT("Adding Device number succeed");
+        deviceId_.insert(addDeviceId);
+        deviceInfo_.insert(std::pair<std::string, uint32_t>(physical, addDeviceId));
+        MMI_LOGD("Adding Device number succeed");
         return addDeviceId;
     }
 }
@@ -84,15 +84,15 @@ uint32_t DeviceRegister::AddDeviceInfo(const std::string& physical)
 bool DeviceRegister::DeleteDeviceInfo(const std::string& physical)
 {
     std::lock_guard<std::mutex> lock(mu_);
-    auto it = mapDeviceInfo_.find(physical);
-    if (it != mapDeviceInfo_.end()) {
+    auto it = deviceInfo_.find(physical);
+    if (it != deviceInfo_.end()) {
         uint32_t deviceId = it->second;
-        mapDeviceInfo_.erase(it);
-        setDeviceId_.erase(deviceId);
+        deviceInfo_.erase(it);
+        deviceId_.erase(deviceId);
         return true;
     }
     MMI_LOGE("Failed to delete device info");
     return false;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

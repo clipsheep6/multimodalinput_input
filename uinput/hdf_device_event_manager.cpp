@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,7 +37,7 @@ void HdfDeviceEventManager::ConnectHDFInit()
 {
     uint32_t ret = GetInputInterface(&inputInterface_);
     if (ret != 0) {
-        HiLog::Error(LABEL, "Initialize %{public}s fail! ret is %{public}u", __func__, ret);
+        HiLog::Error(LABEL, "Initialize:%{public}s fail. ret:%{public}u", __func__, ret);
         return;
     }
 
@@ -64,13 +64,13 @@ void HdfDeviceEventManager::ConnectHDFInit()
         ret = inputInterface_->iInputReporter->RegisterReportCallback(TOUCH_DEV_ID, &callback_);
     }
 }
-}  // namespace MMIS
-}  // namespace OHOS
+} // namespace MMIS
+} // namespace OHOS
 
 int32_t main()
 {
     static std::int32_t usleepTime = 1500000;
-    HiLog::Info(OHOS::MMIS::LABEL, "%{public}s running !", __func__);
+    HiLog::Info(OHOS::MMIS::LABEL, "%{public}s running", __func__);
     OHOS::MMIS::HdfDeviceEventManager iHdfDeviceEventManager;
     iHdfDeviceEventManager.ConnectHDFInit();
     while (true) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,22 +22,24 @@
 #include "util.h"
 
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 namespace {
-[[maybe_unused]]static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputWindowsManagerStub"};
+[[maybe_unused]]constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputWindowsManagerStub"};
 }
-}
+} // namespace MMI
+} // namespace OHOS
 
-using namespace OHOS::MMI;
-
+namespace OHOS {
+namespace MMI {
 #ifndef OHOS_WESTEN_MODEL
 #define MAX_LENGTH 1024
 
 struct SeatInfo** GetSeatsInfo()
 {
-    MMI_LOGT("GetSeatsInfo...");
-    const int32_t TEST_VAL = 2;
-    const int32_t TEST_SEATNAME_SIZE = 32;
+    MMI_LOGD("Enter");
+    constexpr int32_t TEST_VAL = 2;
+    constexpr int32_t TEST_SEATNAME_SIZE = 32;
     auto setInfo = static_cast<SeatInfo**>(malloc(sizeof(SeatInfo*) * TEST_VAL));
     CHKF(setInfo, OHOS::MALLOC_FAIL);
     setInfo[0] = static_cast<SeatInfo*>(malloc(sizeof(SeatInfo)));
@@ -54,13 +56,13 @@ struct SeatInfo** GetSeatsInfo()
 
 struct ScreenInfo** GetScreensInfo()
 {
-    MMI_LOGT("GetScreensInfo...");
-    const int32_t TEST_VAL = 2;
-    const int32_t TEST_LAYER_ID = 2;
-    const int32_t TEST_WIDTH = 1920;
-    const int32_t TEST_HEIGHT = 1080;
-    const int32_t TEST_SURFACE_ID = 3;
-    const int32_t TEST_ON_LAYER_ID = 2;
+    MMI_LOGD("Enter");
+    constexpr int32_t TEST_VAL = 2;
+    constexpr int32_t TEST_LAYER_ID = 2;
+    constexpr int32_t TEST_WIDTH = 1920;
+    constexpr int32_t TEST_HEIGHT = 1080;
+    constexpr int32_t TEST_SURFACE_ID = 3;
+    constexpr int32_t TEST_ON_LAYER_ID = 2;
 
     auto screenInfo = static_cast<ScreenInfo**>(malloc(sizeof(ScreenInfo*) * TEST_VAL));
     CHKF(screenInfo, OHOS::MALLOC_FAIL);
@@ -104,7 +106,7 @@ struct ScreenInfo** GetScreensInfo()
 
 void FreeSurfaceInfo(struct SurfaceInfo* pSurface)
 {
-    MMI_LOGT("FreeSurfaceInfo...");
+    MMI_LOGD("Enter");
     if (pSurface) {
         free(const_cast<SurfaceInfo*>(pSurface));
     }
@@ -112,10 +114,10 @@ void FreeSurfaceInfo(struct SurfaceInfo* pSurface)
 
 void FreeLayerInfo(struct LayerInfo* pLayer)
 {
-    MMI_LOGT("FreeLayerInfo...");
+    MMI_LOGD("Enter");
     if (pLayer) {
         if (pLayer->surfaces) {
-            for (int i = 0; i < pLayer->nSurfaces; i++) {
+            for (int32_t i = 0; i < pLayer->nSurfaces; i++) {
                 FreeSurfaceInfo(const_cast<SurfaceInfo*>(pLayer->surfaces[i]));
             }
             free(pLayer->surfaces);
@@ -126,10 +128,10 @@ void FreeLayerInfo(struct LayerInfo* pLayer)
 
 void FreeScreenInfo(struct ScreenInfo* pScreen)
 {
-    MMI_LOGT("FreeScreenInfo...");
+    MMI_LOGD("Enter");
     if (pScreen) {
         if (pScreen->layers) {
-            for (int i = 0; i < pScreen->nLayers; i++) {
+            for (int32_t i = 0; i < pScreen->nLayers; i++) {
                 FreeLayerInfo(const_cast<LayerInfo*>(pScreen->layers[i]));
             }
             free(pScreen->layers);
@@ -143,12 +145,12 @@ void FreeScreenInfo(struct ScreenInfo* pScreen)
 
 void FreeScreensInfo(struct ScreenInfo** screens)
 {
-    MMI_LOGT("FreeScreensInfo...");
+    MMI_LOGD("Enter");
     if (!screens) {
         MMI_LOGE("screens is null.");
         return;
     }
-    for (int i = 0; screens[i]; i++) {
+    for (int32_t i = 0; screens[i]; i++) {
         FreeScreenInfo(screens[i]);
     }
     free(screens);
@@ -156,12 +158,12 @@ void FreeScreensInfo(struct ScreenInfo** screens)
 
 void FreeSeatsInfo(struct SeatInfo** seats)
 {
-    MMI_LOGT("FreeSeatsInfo...");
+    MMI_LOGD("Enter");
     if (!seats) {
         MMI_LOGE("seats is null.");
         return;
     }
-    for (int i = 0; seats[i]; i++) {
+    for (int32_t i = 0; seats[i]; i++) {
         if (seats[i]->seatName) {
             free(seats[i]->seatName);
         }
@@ -172,16 +174,18 @@ void FreeSeatsInfo(struct SeatInfo** seats)
 
 void SetSeatListener(const SeatInfoChangeListener listener)
 {
-    MMI_LOGT("SetSeatListener...");
+    MMI_LOGD("Enter");
 }
 
 void SetScreenListener(const ScreenInfoChangeListener listener)
 {
-    MMI_LOGT("SetScreenListener...");
+    MMI_LOGD("Enter");
 }
 
-void OHOS::MMI::SetLibInputEventListener(const LibInputEventListener listener)
+void SetLibInputEventListener(const LibInputEventListener listener)
 {
-    MMI_LOGT("SetLibInputEventListener...");
+    MMI_LOGD("Enter");
 }
+} // namespace OHOS
+} // namespace MMI
 #endif

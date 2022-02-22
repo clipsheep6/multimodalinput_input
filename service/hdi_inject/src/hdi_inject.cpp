@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,7 +37,7 @@ bool HdiInject::Init(UDSServer &sess)
 
 int32_t HdiInject::ManageHdfInject(const SessionPtr sess, NetPacket &pkt)
 {
-    MMI_LOGI("into function ManageHdfInject.");
+    MMI_LOGI("into function ManageHdfInject");
     int32_t sendType = 0;
     uint32_t devIndex = 0;
     uint32_t devSatatus = 0;
@@ -50,7 +50,7 @@ int32_t HdiInject::ManageHdfInject(const SessionPtr sess, NetPacket &pkt)
             break;
         case SET_EVENT_INJECT:
             pkt >> devIndex >> speechEvent;
-            MMI_LOGI("hdi server recv massage: devIndex = %{public}d.", devIndex);
+            MMI_LOGI("hdi server recv massage: devIndex:%{public}d", devIndex);
             OnSetEventInject(speechEvent, devIndex);
             break;
         case SHOW_DEVICE_INFO:
@@ -58,11 +58,11 @@ int32_t HdiInject::ManageHdfInject(const SessionPtr sess, NetPacket &pkt)
             break;
         case SET_HOT_PLUGS:
             pkt >> devIndex >> devSatatus;
-            MMI_LOGI("recv inject tool hot data, devIndex = %{public}d, status = %{public}d.", devIndex, devSatatus);
+            MMI_LOGI("recv inject tool hot data, devIndex:%{public}d,status:%{public}d", devIndex, devSatatus);
             OnSetHotPlugs(devIndex, devSatatus);
             break;
         default:
-            MMI_LOGE("The message type:%{public}d cannot be processed.", sendType);
+            MMI_LOGE("The message type:%{public}d cannot be processed", sendType);
             return RET_ERR;
     }
     return RET_OK;
@@ -70,7 +70,7 @@ int32_t HdiInject::ManageHdfInject(const SessionPtr sess, NetPacket &pkt)
 
 int32_t HdiInject::OnSetEventInject(const RawInputEvent& allEvent, int32_t devIndex)
 {
-    MMI_LOGI("Enter funtion OnSetEventInject");
+    MMI_LOG("enter");
     EventPackage* pack[EVENT_PACKAGE_ARROW_SIZE];
     pack[0] = (EventPackage*)malloc(sizeof(EventPackage));
     pack[0]->type = (int32_t)allEvent.ev_type;
@@ -79,18 +79,17 @@ int32_t HdiInject::OnSetEventInject(const RawInputEvent& allEvent, int32_t devIn
     pack[0]->timestamp = GetSysClockTime();
     MMIHdiInject->eventcallback_.EventPkgCallback((const EventPackage**)pack, 1, devIndex);
     free(pack[0]);
-    MMI_LOGI("Leave funtion OnSetEventInject");
-
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 void HdiInject::OnSetHotPlugs(uint32_t devIndex, uint32_t devSatatus)
 {
     if (!(ReportHotPlugEvent(devIndex, devSatatus))) {
-        MMI_LOGE("OnSetHotPlugs ReportHotPlugEvent faild. ");
+        MMI_LOGE("OnSetHotPlugs ReportHotPlugEvent faild");
         return;
     }
-    MMI_LOGI("OnSetHotPlugs ReportHotPlugEvent success. ");
+    MMI_LOGI("OnSetHotPlugs ReportHotPlugEvent success");
 }
 
 void HdiInject::InitDeviceInfo()
@@ -138,7 +137,7 @@ void HdiInject::OnInitHdiServerStatus()
 void HdiInject::ShowAllDeviceInfo()
 {
     for (const auto &item : deviceArray_) {
-        MMI_LOGI("deviceName = %{public}s, devIndex = %{public}d, status = %{public}d, devType = %{public}d",
+        MMI_LOGI("deviceName:%{public}s,devIndex:%{public}d,status:%{public}d,devType:%{public}d",
             item.chipName, item.devIndex, item.status, item.devType);
     }
 }
@@ -152,15 +151,14 @@ bool HdiInject::SetDeviceHotStatus(int32_t devIndex, int32_t status)
 {
     for (auto iter = deviceArray_.begin(); iter != deviceArray_.end(); ++iter) {
         if (iter->devIndex == devIndex) {
-            if (iter->status != status) {
-                iter->status = ~status + 1;
-                return true;
-            } else {
+            if (iter->status == status) {
+                MMI_LOGE("Failed to find status");
                 return false;
             }
+            iter->status = ~status + 1;
+            return true;
         }
     }
-
     return false;
 }
 
@@ -182,14 +180,13 @@ bool HdiInject::ReportHotPlugEvent()
 {
     SyncDeviceHotStatus();
     MMIHdiInject->hotPlugcallback_.HotPlugCallback(*event_);
-
     return true;
 }
 
 bool HdiInject::ReportHotPlugEvent(uint32_t devIndex, uint32_t status)
 {
     if (!(SetDeviceHotStatus(devIndex, status))) {
-        MMI_LOGE("SetDeviceHotStatus error devIndex = %{public}d, status = %{public}d.", devIndex, status);
+        MMI_LOGE("SetDeviceHotStatus error devIndex:%{public}d,status:%{public}d", devIndex, status);
         return false;
     }
     int32_t devType = GetDevTypeByIndex(devIndex);
@@ -202,7 +199,6 @@ bool HdiInject::ReportHotPlugEvent(uint32_t devIndex, uint32_t status)
         static_cast<uint32_t>(status)
     };
     MMIHdiInject->hotPlugcallback_.HotPlugCallback(&event);
-
     return true;
 }
 
@@ -227,7 +223,7 @@ int32_t HdiInject::GetDevIndexByType(int32_t devType)
     return RET_ERR;
 }
 
-int32_t HdiInject::ScanInputDevice(DevDesc *staArr, uint32_t arrLen)
+int32_t HdiInject::ScanInputDevice(uint32_t arrLen, DevDesc *staArr)
 {
     uint16_t count = static_cast<uint16_t>(deviceArray_.size());
     int32_t index = 0;
@@ -239,13 +235,12 @@ int32_t HdiInject::ScanInputDevice(DevDesc *staArr, uint32_t arrLen)
         staArr[index].devType = deviceArray_[i].devType;
         index++;
     }
-
     return 0;
 }
 
-static int32_t ScanInputDevice(DevDesc *staArr, uint32_t arrLen)
+static int32_t ScanInputDevice(uint32_t arrLen, DevDesc *staArr)
 {
-    return MMIHdiInject->ScanInputDevice(staArr, arrLen);
+    return MMIHdiInject->ScanInputDevice(arrLen, staArr);
 }
 
 static int32_t OpenInputDevice(uint32_t devIndex)
@@ -317,7 +312,6 @@ static int32_t RunExtraCommand(uint32_t devIndex, InputExtraCmd *cmd)
 static int32_t RegisterReportCallback(uint32_t devIndex, InputEventCb *callback)
 {
     MMIHdiInject->eventcallback_.EventPkgCallback = callback->EventPkgCallback;
-
     return 0;
 }
 
@@ -329,7 +323,6 @@ static int32_t UnregisterReportCallback(uint32_t devIndex)
 static int32_t RegisterHotPlugCallback(InputHostCb *callback)
 {
     MMIHdiInject->hotPlugcallback_.HotPlugCallback = callback->HotPlugCallback;
-
     return 0;
 }
 
@@ -374,7 +367,6 @@ int32_t GetInputInterfaceFromInject(IInputInterface **interface)
     injectInterface->iInputController = &interfaceControl;
     injectInterface->iInputManager = &interfaceManager;
     injectInterface->iInputReporter = &interfaceReport;
-
     return ret;
 }
 #endif

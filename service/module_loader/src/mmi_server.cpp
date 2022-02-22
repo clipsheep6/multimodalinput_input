@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,24 +14,26 @@
  */
 
 #include "mmi_server.h"
-#include <inttypes.h>
+#include <cinttypes>
 #include "event_dump.h"
-#include "log.h"
+#include "mmi_log.h"
 #include "multimodal_input_connect_service.h"
-#include "util.h"
 #include "timer_manager.h"
+#include "util.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIServer" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIServer" };
     }
-}
+} // namespace MMI
+} // namespace OHOS
 
 template<class ...Ts>
 void CheckDefineOutput(const char* fmt, Ts... args)
 {
     using namespace OHOS::MMI;
-    CHKP(fmt);
+    CHKPV(fmt);
     int32_t ret = 0;
 
     char buf[MAX_STREAM_BUF_SIZE] = {};
@@ -77,7 +79,6 @@ OHOS::MMI::MMIServer::MMIServer()
 
 OHOS::MMI::MMIServer::~MMIServer()
 {
-    MMI_LOGT("enter");
 }
 
 int32_t OHOS::MMI::MMIServer::Start()
@@ -88,9 +89,6 @@ int32_t OHOS::MMI::MMIServer::Start()
 
     int32_t ret = RET_OK;
     ret = SaConnectServiceRegister();
-    CHKR((ret == RET_OK), ret, ret);
-
-    ret = InitExpSoLibrary();
     CHKR((ret == RET_OK), ret, ret);
 
     MMI_LOGD("Screen_Manager Init");
@@ -123,24 +121,9 @@ int32_t OHOS::MMI::MMIServer::Start()
 #ifdef DEBUG_CODE_TEST
     uint64_t curTime = OHOS::MMI::GetMillisTime();
     uint64_t consumeTime = curTime - GetMmiServerStartTime();
-    MMI_LOGW("The server started successfully, the time consumed was %{public}" PRId64
+    MMI_LOGW("The server started successfully, time consumed:%{public}" PRId64
             " Ms curTime:%{public}" PRId64 "", consumeTime, curTime);
 #endif
-    return RET_OK;
-}
-
-int32_t OHOS::MMI::MMIServer::InitExpSoLibrary()
-{
-    MMI_LOGD("Load Expansibility Operation");
-    auto expConf = GetEnv("EXP_CONF");
-    if (expConf.empty()) {
-        expConf = DEF_EXP_CONFIG;
-    }
-    auto expSOPath = GetEnv("EXP_SOPATH");
-    if (expSOPath.empty()) {
-        expSOPath = DEF_EXP_SOPATH;
-    }
-    expOper_.LoadExteralLibrary(expConf.c_str(), expSOPath.c_str());
     return RET_OK;
 }
 
@@ -157,7 +140,7 @@ int32_t OHOS::MMI::MMIServer::InitLibinput()
     hdfEventManager.SetupCallback();
 #else
     #ifdef OHOS_WESTEN_MODEL
-        MMI_LOGD("InitLibinput WestonInit...");
+        MMI_LOGD("InitLibinput WestonInit");
         SetLibInputEventListener([](struct multimodal_libinput_event *event) {
             InputHandler->OnEvent(event);
         });
@@ -186,10 +169,9 @@ void OHOS::MMI::MMIServer::OnTimer()
 
 void OHOS::MMI::MMIServer::StopAll()
 {
-    MMI_LOGD("enter");
     int32_t ret = SaConnectServiceStop();
     if (ret != RET_OK) {
-        MMI_LOGE("call SaConnectServiceStop fail, ret = %{public}d.", ret);
+        MMI_LOGE("call SaConnectServiceStop fail, ret:%{public}d", ret);
     }
     UdsStop();
     RegEventHM->Clear();
@@ -197,18 +179,17 @@ void OHOS::MMI::MMIServer::StopAll()
 #ifndef OHOS_WESTEN_MODEL
     input_.Stop();
 #endif
-    MMI_LOGD("leave");
 }
 
 int32_t OHOS::MMI::MMIServer::SaConnectServiceRegister()
 {
-    MMI_LOGT("enter.");
+    MMI_LOGD("enter.");
 
     int32_t ret;
 
     ret = MultimodalInputConnectServiceSetUdsServer(this);
     if (ret != RET_OK) {
-        MMI_LOGE("MultimodalInputConnectServiceSetUdsServer fail, ret = %{public}d.", ret);
+        MMI_LOGE("MultimodalInputConnectServiceSetUdsServer fail, ret:%{public}d", ret);
         return RET_ERR;
     }
 
@@ -223,33 +204,29 @@ int32_t OHOS::MMI::MMIServer::SaConnectServiceRegister()
 
 int32_t OHOS::MMI::MMIServer::SaConnectServiceStart()
 {
-    MMI_LOGT("enter.");
-
+    MMI_LOGD("enter");
     int32_t ret = MultimodalInputConnectServiceStart();
     if (ret != RET_OK) {
-        MMI_LOGE("call MultimodalInputConnectServiceStart fail, ret = %{public}d.", ret);
+        MMI_LOGE("call MultimodalInputConnectServiceStart fail, ret:%{public}d", ret);
         return RET_ERR;
     }
-
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t OHOS::MMI::MMIServer::SaConnectServiceStop()
 {
-    MMI_LOGT("enter.");
-
     int32_t ret = MultimodalInputConnectServiceStop();
     if (ret != RET_OK) {
-        MMI_LOGE("call MultimodalInputConnectServiceStop fail, ret = %{public}d.", ret);
+        MMI_LOGE("call MultimodalInputConnectServiceStop fail, ret:%{public}d", ret);
         return RET_ERR;
     }
-
     return RET_OK;
 }
 
 void OHOS::MMI::MMIServer::OnConnected(SessionPtr s)
 {
-    CHKP(s);
+    CHKPV(s);
     int32_t fd = s->GetFd();
     MMI_LOGI("MMIServer::_OnConnected fd:%{public}d", fd);
     AppRegs->RegisterConnectState(fd);
@@ -257,7 +234,7 @@ void OHOS::MMI::MMIServer::OnConnected(SessionPtr s)
 
 void OHOS::MMI::MMIServer::OnDisconnected(SessionPtr s)
 {
-    CHKP(s);
+    CHKPV(s);
     MMI_LOGW("MMIServer::OnDisconnected enter, session desc:%{public}s", s->GetDescript().c_str());
     int32_t fd = s->GetFd();
     auto appInfo = AppRegs->FindBySocketFd(fd);

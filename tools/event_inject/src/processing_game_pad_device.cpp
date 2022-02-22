@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,17 +25,17 @@ namespace {
 int32_t ProcessingGamePadDevice::TransformJsonDataToInputData(const Json& originalEvent,
     InputEventArray& inputEventArray)
 {
-    MMI_LOGI("Enter TransformJsonDataForGamePad function.");
+    MMI_LOGD("Enter");
     if (originalEvent.empty()) {
         return RET_ERR;
     }
     if (originalEvent.find("events") == originalEvent.end()) {
-        MMI_LOGE("manage game pad array faild, inputData is empty.");
+        MMI_LOGE("manage game pad array faild, inputData is empty");
         return RET_ERR;
     }
     Json inputData = originalEvent.at("events");
     if (inputData.empty()) {
-        MMI_LOGE("manage finger array faild, inputData is empty.");
+        MMI_LOGE("manage finger array faild, inputData is empty");
         return RET_ERR;
     }
     vector<GamePadEvent> padEventArray;
@@ -43,7 +43,7 @@ int32_t ProcessingGamePadDevice::TransformJsonDataToInputData(const Json& origin
         return RET_ERR;
     }
     TransformPadEventToInputEvent(padEventArray, inputEventArray);
-    MMI_LOGI("Leave TransformJsonDataForTouchPad function.");
+    MMI_LOGD("Leave");
 
     return RET_OK;
 }
@@ -60,24 +60,24 @@ int32_t ProcessingGamePadDevice::AnalysisGamePadEvent(const Json& inputData, std
         if ((eventType == "KEY_EVENT_CLICK") || (eventType == "KEY_EVENT_PRESS") ||
             (eventType == "KEY_EVENT_RELEASE")) {
             if ((item.find("keyValue")) == item.end()) {
-                MMI_LOGE("function AnalysisGamePadEvent not find keyValue On Event: %{public}s.", eventType.c_str());
+                MMI_LOGE("function AnalysisGamePadEvent not find keyValue On Event:%{public}s", eventType.c_str());
                 return RET_ERR;
             }
             padEvent.keyValue = item.at("keyValue").get<int32_t>();
         } else if ((eventType == "ROCKER_1") || (eventType == "ROCKER_2")) {
             if ((item.find("event")) == item.end()) {
-                MMI_LOGE("function AnalysisGamePadEvent not find event On Event: %{public}s.", eventType.c_str());
+                MMI_LOGE("function AnalysisGamePadEvent not find event On Event:%{public}s", eventType.c_str());
                 return RET_ERR;
             }
             if ((item.find("direction")) == item.end()) {
-                MMI_LOGE("function AnalysisGamePadEvent not find direction On Event: %{public}s.", eventType.c_str());
+                MMI_LOGE("function AnalysisGamePadEvent not find direction On Event:%{public}s", eventType.c_str());
                 return RET_ERR;
             }
             padEvent.gameEvents = item.at("event").get<std::vector<int32_t>>();
             padEvent.direction = item.at("direction").get<std::string>();
         } else if (eventType == "DERECTION_KEY") {
             if ((item.find("direction")) == item.end()) {
-                MMI_LOGE("function AnalysisGamePadEvent not find direction On Event: %{public}s.", eventType.c_str());
+                MMI_LOGE("function AnalysisGamePadEvent not find direction On Event:%{public}s", eventType.c_str());
                 return RET_ERR;
             }
             padEvent.direction = item.at("direction").get<std::string>();

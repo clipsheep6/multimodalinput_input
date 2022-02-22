@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,13 +14,14 @@
  */
 
 #include "mmi_client.h"
-#include "log.h"
+#include "mmi_log.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
 #include "proto.h"
 #include "util.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 namespace {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIClient" };
 }
@@ -46,7 +47,7 @@ bool MMIClient::GetCurrentConnectedStatus() const
 
 bool MMIClient::Start(IClientMsgHandlerPtr msgHdl, bool detachMode)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     EventManager.SetClientHandle(GetPtr());
     CHKF(msgHdl->Init(), MSG_HANDLER_INIT_FAIL);
     auto msgHdlImp = static_cast<ClientMsgHandler *>(msgHdl.get());
@@ -90,7 +91,7 @@ void MMIClient::SdkGetMultimodeInputInfo()
 
 void MMIClient::OnDisconnected()
 {
-    MMI_LOGD("Disconnected from server... fd:%{public}d", GetFd());
+    MMI_LOGD("Disconnected from server, fd:%{public}d", GetFd());
     if (funDisconnected_) {
         funDisconnected_(*this);
     }
@@ -100,7 +101,7 @@ void MMIClient::OnDisconnected()
 
 void MMIClient::OnConnected()
 {
-    MMI_LOGD("Connection to server succeeded... fd:%{public}d", GetFd());
+    MMI_LOGD("Connection to server succeeded, fd:%{public}d", GetFd());
     if (funConnected_) {
         funConnected_(*this);
     }
@@ -109,22 +110,24 @@ void MMIClient::OnConnected()
 
 int32_t MMIClient::Socket()
 {
-    MMI_LOGT("enter");
-    const int32_t ret = MultimodalInputConnectManager::GetInstance()->
+    MMI_LOGD("enter");
+    int32_t ret = MultimodalInputConnectManager::GetInstance()->
                         AllocSocketPair(IMultimodalInputConnect::CONNECT_MODULE_TYPE_MMI_CLIENT);
     if (ret != RET_OK) {
         MMI_LOGE("UDSSocket::Socket, call MultimodalInputConnectManager::AllocSocketPair return %{public}d", ret);
+        return -1;
     }
     fd_ = MultimodalInputConnectManager::GetInstance()->GetClientSocketFdOfAllocedSocketPair();
     if (fd_ == IMultimodalInputConnect::INVALID_SOCKET_FD) {
         MMI_LOGE("UDSSocket::Socket, call MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair"
-                 " return invalid fd.");
+                 " return invalid fd");
     } else {
         MMI_LOGT("UDSSocket::Socket, call MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair"
-                 " return fd = %{public}d.", fd_);
+                 " return fd:%{public}d", fd_);
     }
 
     return fd_;
 }
-}
+} // namespace MMI
+} // namespace OHOS
 

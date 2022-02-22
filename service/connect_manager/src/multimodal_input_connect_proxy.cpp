@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,8 +14,8 @@
  */
 
 #include "multimodal_input_connect_proxy.h"
-#include "log.h"
 #include "message_option.h"
+#include "mmi_log.h"
 #include "multimodal_input_connect_def_parcel.h"
 #include "multimodal_input_connect_define.h"
 #include "string_ex.h"
@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectProxy" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectProxy" };
 }
 
 // 获取其他设备注册的SA的Proxy
@@ -38,9 +38,10 @@ MultimodalInputConnectProxy::~MultimodalInputConnectProxy()
     MMI_LOGI("~MultimodalInputConnectProxy()");
 }
 
-int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programName, const int moduleType, int &socketFd)
+int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programName,
+    const int32_t moduleType, int32_t &socketFd)
 {
-    MMI_LOGE("enter");
+    MMI_LOGD("enter");
     MessageParcel data;
     MessageParcel reply;
     MessageOption option; // (MessageOption::TF_ASYNC);
@@ -50,7 +51,7 @@ int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programNam
         return ERR_INVALID_VALUE;
     }
 
-    ConnectDefReqParcel req;
+    ConnectReqParcel req;
     req.data.moduleId = moduleType;
     req.data.clientName = programName;
     if (!data.WriteParcelable(&req)) {
@@ -58,29 +59,29 @@ int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programNam
         return ERR_INVALID_VALUE;
     }
 
-    int requestResult = Remote()->SendRequest(ALLOC_SOCKET_FD, data, reply, option);
+    int32_t requestResult = Remote()->SendRequest(ALLOC_SOCKET_FD, data, reply, option);
     if (requestResult != NO_ERROR) {
-        MMI_LOGE("send request fail, result: %{public}d", requestResult);
+        MMI_LOGE("send request fail, result:%{public}d", requestResult);
         return RET_ERR;
     }
 
-    MMI_LOGE("have recieve message from server");
+    MMI_LOGD("have recieve message from server");
 
-    int result = reply.ReadInt32();
-    MMI_LOGE("result = %{public}d", result);
+    int32_t result = reply.ReadInt32();
+    MMI_LOGD("result:%{public}d", result);
     if (result != RET_OK) {
-        MMI_LOGE("responce return error: %{public}d", result);
+        MMI_LOGE("responce return error:%{public}d", result);
         return RET_ERR;
     }
     socketFd = reply.ReadFileDescriptor();
-    MMI_LOGE("socketFd = %{public}d", socketFd);
-
+    MMI_LOGD("socketFd:%{public}d", socketFd);
+    MMI_LOGD("leave");
     return RET_OK;
 }
 
 int32_t MultimodalInputConnectProxy::AddInputEventFilter(sptr<IEventFilter> filter)
 {
-    MMI_LOGE("enter");
+    MMI_LOGD("enter");
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -97,15 +98,15 @@ int32_t MultimodalInputConnectProxy::AddInputEventFilter(sptr<IEventFilter> filt
 
     int32_t requestResult = Remote()->SendRequest(SET_EVENT_POINTER_FILTER, data, reply, option);
     if (requestResult != NO_ERROR) {
-        MMI_LOGE("send request fail, result: %{public}d", requestResult);
+        MMI_LOGE("send request fail, result:%{public}d", requestResult);
         return RET_ERR;
     }
 
     int32_t result = reply.ReadInt32();
     if (result != RET_OK) {
-        MMI_LOGE("responce return error: %{public}d", result);
+        MMI_LOGE("responce return error:%{public}d", result);
     }
-
+    MMI_LOGD("leave");
     return result;
 }
 } // namespace MMI

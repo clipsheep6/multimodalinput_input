@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,12 +20,12 @@ namespace MMI {
 VirtualJoystick::VirtualJoystick() : VirtualDevice("Virtual Joystick",
     BUS_USB, 0x44f, 0xb10a)
 {
-    const int ABS_MAX_XY = 16383;
-    const int ABS_FUZZ = 63;
-    const int ABS_FLAT = 1023;
-    const int ABS_MAX_RZ = 255;
-    const int ABS_FLAT_RZ = 15;
-    const int ABS_MIN_HAT = -1;
+    constexpr int32_t ABS_MAX_XY = 16383;
+    constexpr int32_t ABS_FUZZ = 63;
+    constexpr int32_t ABS_FLAT = 1023;
+    constexpr int32_t ABS_MAX_RZ = 255;
+    constexpr int32_t ABS_FLAT_RZ = 15;
+    constexpr int32_t ABS_MIN_HAT = -1;
 
     dev_.absmin[ABS_X] = 0;
     dev_.absmax[ABS_X] = ABS_MAX_XY;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -57,7 +57,7 @@ bool TestAuxToolClient::Start(bool detachMode)
 
 void TestAuxToolClient::OnDisconnected()
 {
-    MMI_LOGT("Disconnected from server... fd:%{public}d", GetFd());
+    MMI_LOGT("Disconnected from server. fd:%{public}d", GetFd());
 }
 
 void TestAuxToolClient::OnThreadLoop()
@@ -73,7 +73,7 @@ void TestAuxToolClient::OnThreadLoop()
 
 void TestAuxToolClient::OnConnected()
 {
-    MMI_LOGD("Connection to server succeeded... fd:%{public}d", GetFd());
+    MMI_LOGD("Connection to server succeeded. fd:%{public}d", GetFd());
 }
 
 uint32_t TestAuxToolClient::GetAiSensorAllowProcCodes(uint32_t item) const
@@ -119,7 +119,7 @@ uint32_t TestAuxToolClient::GetAiSensorAllowProcCodes(uint32_t item) const
 
 int32_t TestAuxToolClient::Socket()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     const int32_t ret = MultimodalInputConnectManager::GetInstance()->
                         AllocSocketPair(IMultimodalInputConnect::CONNECT_MODULE_TYPE_SIMULATE_INJECT);
     if (ret != RET_OK) {
@@ -128,10 +128,10 @@ int32_t TestAuxToolClient::Socket()
     fd_ = MultimodalInputConnectManager::GetInstance()->GetClientSocketFdOfAllocedSocketPair();
     if (fd_ == IMultimodalInputConnect::INVALID_SOCKET_FD) {
         MMI_LOGE("UDSSocket::Socket, call MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair"
-                 " return invalid fd.");
+                 " return invalid fd");
     } else {
         MMI_LOGD("UDSSocket::Socket, call MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair"
-                 " return fd = %{public}d.", fd_);
+                 " return fd:%{public}d", fd_);
     }
 
     return fd_;

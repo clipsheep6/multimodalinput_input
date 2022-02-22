@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -155,8 +155,8 @@ bool VirtualDevice::CreateKey()
 
 bool VirtualDevice::SetAbsResolution(const std::string deviceName)
 {
-    const int ABS_RESOLUTION = 200;
-    const int ABS_RESOLUTION_FINGER = 40;
+    constexpr int32_t ABS_RESOLUTION = 200;
+    constexpr int32_t ABS_RESOLUTION_FINGER = 40;
     if (deviceName == "Virtual Stylus" || deviceName == "Virtual Touchpad") {
         absTemp_.code = 0x00;
         absTemp_.absinfo.resolution = ABS_RESOLUTION;
@@ -257,10 +257,10 @@ void VirtualDevice::CloseAllDevice(const std::vector<std::string>& fileList)
 {
     for (auto it : fileList) {
         kill(atoi(it.c_str()), SIGKILL);
-        it.insert(0, g_folderpath.c_str());
-        const int ret = remove(it.c_str());
+        it.insert(0, OHOS::MMI::g_folderpath.c_str());
+        const int32_t ret = remove(it.c_str());
         if (ret == -1) {
-            const int errnoSaved = errno;
+            const int32_t errnoSaved = errno;
             printf("remove file fail. file name: %s, errno: %d, error message: %s\n",
                 it.c_str(), errnoSaved, strerror(errnoSaved));
         }
@@ -335,12 +335,11 @@ bool VirtualDevice::SelectDevice(std::vector<std::string> &fileList)
         return false;
     }
 
-    if (fileList.size()) {
-        return true;
-    } else {
+    if (fileList.size() == 0) {
         printf("No device is currently on");
         return false;
     }
+    return true;
 }
 
 bool VirtualDevice::CreateHandle(const std::string deviceArgv)
@@ -422,9 +421,8 @@ bool VirtualDevice::AddDevice(const std::vector<std::string>& fileList)
     if (!flagFile.is_open()) {
         printf("Failed to create file");
         return false;
-    } else {
-        return true;
     }
+    return true;
 }
 
 bool VirtualDevice::CloseDevice(const std::vector<std::string>& fileList)
@@ -440,17 +438,17 @@ bool VirtualDevice::CloseDevice(const std::vector<std::string>& fileList)
     if (!result) {
         return false;
     } else {
-        if (closePid.find("all") == 0) {
+        if (closePid.compare("all_") == 0) {
             CloseAllDevice(alldevice);
             return true;
         }
         for (auto it : alldevice) {
             if (it.find(closePid) == 0) {
                 kill(atoi(it.c_str()), SIGKILL);
-                it.insert(0, g_folderpath.c_str());
-                const int ret = remove(it.c_str());
+                it.insert(0, OHOS::MMI::g_folderpath.c_str());
+                const int32_t ret = remove(it.c_str());
                 if (ret == -1) {
-                    const int errnoSaved = errno;
+                    const int32_t errnoSaved = errno;
                     printf("remove file fail. file name: %s, errno: %d, error message: %s\n",
                         it.c_str(), errnoSaved, strerror(errnoSaved));
                 }
@@ -470,10 +468,10 @@ bool VirtualDevice::FunctionalShunt(const std::string firstArgv, std::vector<std
     if (firstArgv == "start") {
         bool result = AddDevice(argvList);
         if (!result) {
+            printf("Failed to create device");
             return false;
-        } else {
-            return true;
         }
+        return true;
     } else if (firstArgv == "list") {
         bool result = SelectDevice(argvList);
         if (!result) {

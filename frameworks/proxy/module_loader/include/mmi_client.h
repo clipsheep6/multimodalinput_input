@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,8 @@
 #include "client_msg_handler.h"
 #include "if_mmi_client.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 class MMIClient : public UDSClient, public IfMMIClient, public std::enable_shared_from_this<IfMMIClient> {
 public:
     MMIClient();
@@ -48,5 +49,6 @@ protected:
     ConnectCallback funConnected_;
     ConnectCallback funDisconnected_;
 };
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // MMI_CLIENT_H

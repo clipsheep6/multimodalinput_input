@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,7 +29,7 @@ class MultimodalInputConnectProxy final : public IRemoteProxy<IMultimodalInputCo
 public:
     explicit MultimodalInputConnectProxy(const sptr<IRemoteObject> &impl);
     virtual ~MultimodalInputConnectProxy() override;
-    virtual int32_t AllocSocketFd(const std::string &programName, const int moduleType, int &socketFd) override;
+    virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &socketFd) override;
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;

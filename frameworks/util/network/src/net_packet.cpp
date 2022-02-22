@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,7 @@
  */
 
 #include "net_packet.h"
-#include "log.h"
+#include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {
@@ -38,5 +38,5 @@ void NetPacket::MakeData(StreamBuffer& buf) const
         CHK(buf.Write(&szBuff_[0], wIdx_), STREAM_BUF_WRITE_FAIL);
     }
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

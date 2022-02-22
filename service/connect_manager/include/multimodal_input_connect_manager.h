@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,8 +29,8 @@ class MultimodalInputConnectManager : public std::enable_shared_from_this<Multim
 public:
     virtual ~MultimodalInputConnectManager() = default;
     static std::shared_ptr<MultimodalInputConnectManager> GetInstance();
-    int32_t AllocSocketPair(const int moduleType);
-    int GetClientSocketFdOfAllocedSocketPair() const;
+    int32_t AllocSocketPair(const int32_t moduleType);
+    int32_t GetClientSocketFdOfAllocedSocketPair() const;
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
 private:
     MultimodalInputConnectManager() = default;
@@ -46,7 +46,7 @@ private:
     sptr<IMultimodalInputConnect> multimodalInputConnectService_ = nullptr;
     sptr<IRemoteObject::DeathRecipient> multimodalInputConnectRecipient_ = nullptr;
     std::mutex lock_;
-    int socketFd_ = IMultimodalInputConnect::INVALID_SOCKET_FD;
+    int32_t socketFd_ = IMultimodalInputConnect::INVALID_SOCKET_FD;
 };
 } // namespace MMI
 } // namespace OHOS

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,12 +34,12 @@ public:
 
 private:
     static std::unique_ptr<InjectThread> injectThread_;
-    std::map<int, int> keyCodeMap_ = {};
+    std::map<int32_t, int32_t> keyCodeMap_ = {};
     static std::mutex mutex_;
-    static constexpr int INPUT_KEY_BACK = 2;
-    static constexpr int LINUX_KEY_BACK = 158;
+    static constexpr int32_t INPUT_KEY_BACK = 2;
+    static constexpr int32_t LINUX_KEY_BACK = 158;
 };
-}  // namespace MMIS
-}  // namespace OHOS
+} // namespace MMIS
+} // namespace OHOS
 
 #endif // KEYBOARD_INJECT_H

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,8 +15,8 @@
 
 #ifndef MMI_TOKEN_H
 #define MMI_TOKEN_H
-
 #include "immi_token.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
@@ -25,13 +25,15 @@ public:
     MMIToken(std::u16string descriptor = nullptr) : IMMIToken(descriptor)
     {
     }
+    DISALLOW_COPY_AND_MOVE(MMIToken);
     virtual ~MMIToken() = default;
 
     virtual int32_t GetObjectRefCount() override
     {
         return 0;
     }
-    virtual int SendRequest(uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option) override
+    virtual int32_t SendRequest(uint32_t code, MessageParcel& data,
+        MessageParcel& reply, MessageOption& option) override
     {
         return 0;
     }
@@ -43,7 +45,7 @@ public:
     {
         return false;
     }
-    virtual int Dump(int fd, const std::vector<std::u16string>& args) override
+    virtual int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override
     {
         return 0;
     }
@@ -72,6 +74,6 @@ private:
     std::string bundlerName_ = "DefaultBundlerName";
     std::string name_ = "DefaultName";
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // MMI_TOKEN_H

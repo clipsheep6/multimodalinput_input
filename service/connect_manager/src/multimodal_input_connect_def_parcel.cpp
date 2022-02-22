@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,10 +14,11 @@
  */
 
 #include "multimodal_input_connect_def_parcel.h"
+#include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {
-bool ConnectDefReqParcel::Marshalling(Parcel& out) const
+bool ConnectReqParcel::Marshalling(Parcel& out) const
 {
     if (!out.WriteInt32(data.moduleId)) {
         return false;
@@ -28,9 +29,9 @@ bool ConnectDefReqParcel::Marshalling(Parcel& out) const
     return true;
 }
 
-ConnectDefReqParcel *ConnectDefReqParcel::Unmarshalling(Parcel& in)
+ConnectReqParcel *ConnectReqParcel::Unmarshalling(Parcel& in)
 {
-    auto* request = new (std::nothrow) ConnectDefReqParcel();
+    auto* request = new (std::nothrow) ConnectReqParcel();
     if (request == nullptr) {
         return nullptr;
     }
@@ -45,7 +46,7 @@ ConnectDefReqParcel *ConnectDefReqParcel::Unmarshalling(Parcel& in)
     return request;
 }
 
-bool ConnectDefRespParcel::Marshalling(Parcel &out) const
+bool ConnectRespParcel::Marshalling(Parcel &out) const
 {
     if (!out.WriteInt32(data.returnCode)) {
         return false;
@@ -56,9 +57,9 @@ bool ConnectDefRespParcel::Marshalling(Parcel &out) const
     return true;
 }
 
-ConnectDefRespParcel *ConnectDefRespParcel::Unmarshalling(Parcel &in)
+ConnectRespParcel *ConnectRespParcel::Unmarshalling(Parcel &in)
 {
-    auto *response = new (std::nothrow) ConnectDefRespParcel();
+    auto *response = new (std::nothrow) ConnectRespParcel();
     if (response == nullptr) {
         return nullptr;
     }
@@ -74,7 +75,6 @@ ConnectDefRespParcel *ConnectDefRespParcel::Unmarshalling(Parcel &in)
         response = nullptr;
         return nullptr;
     }
-
     return response;
 }
 } // namespace MMI

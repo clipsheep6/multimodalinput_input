@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -69,14 +69,14 @@ private:
 
     bool CloneKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
 
-    void RemoveKeyCode(std::vector<int32_t>& keyCodes, int32_t keyCode);
+    void RemoveKeyCode(int32_t keyCode, std::vector<int32_t>& keyCodes);
 
 private:
     std::list<std::shared_ptr<Subscriber>> subscribers_ {};
     bool callbackInitialized_ { false };
     std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #define KeyEventSubscriber_ OHOS::MMI::KeyEventSubscriber::GetInstance()
 #endif  // KEY_EVENT_SUBSCRIBER_H

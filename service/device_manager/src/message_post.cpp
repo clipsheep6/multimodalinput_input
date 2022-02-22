@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,10 +16,16 @@
 #ifdef OHOS_WESTEN_MODEL
 #include "message_post.h"
 #include "uds_socket.h"
+#include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {
-void MessagePost::SetFd(int fd)
+namespace {
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
+        LOG_CORE, MMI_LOG_DOMAIN, "MessagePost"
+    };
+}
+void MessagePost::SetFd(int32_t fd)
 {
     fd_ = fd;
 }
@@ -58,7 +64,7 @@ void MessagePost::RunTasks()
     }
 }
 
-int MessagePost::RunTaskOnWestonThread(int fd, uint32_t mask, void *data)
+int32_t MessagePost::RunTaskOnWestonThread(int32_t fd, uint32_t mask, void *data)
 {
     int32_t value = 0;
     read(fd, &value, sizeof(value));

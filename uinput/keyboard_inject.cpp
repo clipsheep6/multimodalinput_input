@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -41,7 +41,7 @@ KeyboardInject::KeyboardInject()
     auto it = keyCodeMap_.find(INPUT_KEY_BACK);
     if (it == keyCodeMap_.end()) {
         auto ret = keyCodeMap_.insert(std::make_pair(INPUT_KEY_BACK, LINUX_KEY_BACK));
-        HiLog::Debug(LABEL, "%{public}s ret.second: %{public}d", __func__, ret.second);
+        HiLog::Debug(LABEL, "%{public}s ret.second:%{public}d", __func__, ret.second);
     }
     injectThread_ = std::make_unique<InjectThread>();
     if (injectThread_ == nullptr) {
@@ -64,5 +64,5 @@ void KeyboardInject::InjectKeyEvent(uint16_t code, uint32_t value) const
     InjectInputEvent injectInputSync = {injectThread_->KEYBOARD_DEVICE_ID, EV_SYN, SYN_REPORT, 0};
     injectThread_->WaitFunc(injectInputSync);
 }
-}  // namespace MMIS
-}  // namespace OHOS
+} // namespace MMIS
+} // namespace OHOS

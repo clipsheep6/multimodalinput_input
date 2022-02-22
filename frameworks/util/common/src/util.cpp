@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,7 +20,7 @@
 #include <sstream>
 #include <thread>
 #include <fcntl.h>
-#include <inttypes.h>
+#include <cinttypes>
 #include <sys/prctl.h>
 #include <sys/stat.h>
 #include <sys/syscall.h>
@@ -34,18 +34,16 @@
 #include "config_multimodal.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
-#include "log.h"
+#include "mmi_log.h"
 #include "securec.h"
 #include "uuid.h"
 
-namespace OHOS::MMI {
-    namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Util"};
-    }
-}
-
 namespace OHOS {
 namespace MMI {
+namespace {
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Util"};
+}
+
 const std::map<int32_t, std::string> ERROR_STRING_MAP = {
     {MSG_SEND_FAIL, "Send Message Failed"},
     {NON_STD_EVENT, "Non-Standardized Event"},
@@ -85,20 +83,17 @@ int64_t GetMicrotime()
 {
     timeval currentTime = {};
     gettimeofday(&currentTime, nullptr);
-    return currentTime.tv_sec * static_cast<int32_t>(1e6) + currentTime.tv_usec;
+    return currentTime.tv_sec * S2US + currentTime.tv_usec;
 }
 
 uint64_t GetSysClockTime()
 {
-    const int32_t conversionStep = 1000;
     timespec ts = { 0, 0 };
-
     if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
-        MMI_LOGT("clock_gettime failed: %{public}s", strerror(errno));
+        MMI_LOGT("clock_gettime failed:%{public}s", strerror(errno));
         return 0;
     }
-
-    return (ts.tv_sec * static_cast<uint64_t>(1e6)) + (ts.tv_nsec / conversionStep);
+    return (ts.tv_sec * S2US) + (ts.tv_nsec / US2NS);
 }
 
 int64_t GetMillisTime()
@@ -128,9 +123,9 @@ std::string GetThisThreadIdOfString()
     thread_local std::string threadLocalId;
     if (threadLocalId.empty()) {
         long tid = syscall(SYS_gettid);
-        const size_t bufSize = 10;
+        constexpr size_t bufSize = 10;
         char buf[bufSize] = {};
-        const int ret = sprintf_s(buf, bufSize, "%06d", tid);
+        const int32_t ret = sprintf_s(buf, bufSize, "%06d", tid);
         if (ret < 0) {
             printf("ERR: in %s, #%d, call sprintf_s fail, ret = %d.", __func__, __LINE__, ret);
             return threadLocalId;
@@ -227,9 +222,9 @@ std::string Strftime(const std::string &format, time_t curTime)
 
 static void PrintEventJoyStickAxisInfo(const std::string &axisName, const EventJoyStickAxisAbsInfo &r)
 {
-    MMI_LOGT("%{public}s: {code: %{public}d; value: %{public}d; min: %{public}d; max: %{public}d, "
-             "fuzz: %{public}d, flat: %{public}d, resolution: %{public}d,"
-             "standardValue: %{public}lf, isChanged: %{public}d}, ",
+    MMI_LOGT("%{public}s: {code:%{public}d,value:%{public}d,min:%{public}d,max:%{public}d,"
+             "fuzz:%{public}d,flat:%{public}d,resolution:%{public}d,"
+             "standardValue:%{public}lf,isChanged:%{public}d}, ",
              axisName.c_str(), r.code, r.value, r.minimum, r.maximum, r.fuzz, r.flat, r.resolution,
              r.standardValue, r.isChanged);
 }
@@ -237,9 +232,9 @@ static void PrintEventJoyStickAxisInfo(const std::string &axisName, const EventJ
 void PrintEventJoyStickAxisInfo(const EventJoyStickAxis& r, const int32_t fd,
     const int32_t abilityId, const int32_t focusId, const uint64_t preHandlerTime)
 {
-    MMI_LOGT("4.event dispatcher of server, EventJoyStickAxis:physical:%{public}s, "
-             "fd:%{public}d, preHandlerTime:%{public}" PRId64 ", "
-             "time:%{public}" PRId64 ", deviceType:%{public}u, eventType:%{public}d, deviceName:%{public}s",
+    MMI_LOGT("4.event dispatcher of server, EventJoyStickAxis:physical:%{public}s,"
+             "fd:%{public}d,preHandlerTime:%{public}" PRId64 ","
+             "time:%{public}" PRId64 ",deviceType:%{public}u,eventType:%{public}d,deviceName:%{public}s",
              r.physical, fd, preHandlerTime, r.time, r.deviceType,
              r.eventType, r.deviceName);
 
@@ -256,18 +251,18 @@ void PrintEventJoyStickAxisInfo(const EventJoyStickAxis& r, const int32_t fd,
 
 void PrintWMSInfo(const std::string& str, const int32_t fd, const int32_t abilityId, const int32_t focusId)
 {
-    MMI_LOGT("MMIWMS:windowId=[%{public}s]", str.c_str());
+    MMI_LOGT("MMIWMS:windowId:%{public}s", str.c_str());
     if (focusId == -1) {
         MMI_LOGT("WMS:windowId = ''");
     } else {
-        MMI_LOGT("WMS:windowId = %{public}d", focusId);
+        MMI_LOGT("WMS:windowId:%{public}d", focusId);
     }
-    MMI_LOGT("CALL_AMS, fd: %{public}d abilityID: %{public}d", fd, abilityId);
+    MMI_LOGT("CALL_AMS, fd:%{public}d,abilityID:%{public}d", fd, abilityId);
 }
 
-int GetPid()
+int32_t GetPid()
 {
-    return (int)getpid();
+    return static_cast<int32_t>(getpid());
 }
 
 std::string GetFileName(const std::string& strPath)
@@ -282,13 +277,13 @@ std::string GetFileName(const std::string& strPath)
 
 const char* GetProgramName()
 {
-    const size_t programNameSize = 256;
+    constexpr size_t programNameSize = 256;
     static char programName[programNameSize] = {};
     if (programName[0] != '\0') {
         return programName;
     }
 
-    const size_t bufSize = 512;
+    constexpr size_t bufSize = 512;
     char buf[bufSize] = { 0 };
     if (sprintf_s(buf, bufSize, "/proc/%d/cmdline", static_cast<int32_t>(getpid())) == -1) {
         KMSG_LOGE("GetProcessInfo sprintf_s /proc/.../cmdline error");
@@ -299,7 +294,7 @@ const char* GetProgramName()
         KMSG_LOGE("fp is nullptr, filename = %s.", buf);
         return "";
     }
-    const size_t bufLineSize = 512;
+    constexpr size_t bufLineSize = 512;
     char bufLine[bufLineSize] = { 0 };
     if ((fgets(bufLine, bufLineSize, fp) == nullptr)) {
         KMSG_LOGE("fgets fail.");
@@ -321,11 +316,10 @@ const char* GetProgramName()
         KMSG_LOGE("copySize is 0.");
         return "";
     }
-    int ret = memcpy_s(programName, programNameSize, tempName.c_str(), copySize);
+    int32_t ret = memcpy_s(programName, programNameSize, tempName.c_str(), copySize);
     if (RET_OK != ret) {
         return "";
     }
-
     KMSG_LOGI("GetProgramName success. programName = %s", programName);
 
     return programName;
@@ -352,17 +346,17 @@ std::string GetStackInfo()
 {
 #ifndef OHOS_BUILD
     std::ostringstream oss;
-    const size_t bufferSize = 1024;
+    constexpr size_t bufferSize = 1024;
     void* buffer[bufferSize];
 
-    const int nptrs = backtrace(buffer, bufferSize);
+    const int32_t nptrs = backtrace(buffer, bufferSize);
     char** strings = backtrace_symbols(buffer, nptrs);
     if (strings == nullptr) {
         perror("backtrace_symbols");
         return std::string();
     }
 
-    for (int i = 1; i < nptrs; i++) {
+    for (int32_t i = 1; i < nptrs; i++) {
         oss << strings[i] << std::endl;
     }
     free(strings);
@@ -386,7 +380,7 @@ const std::string& GetThreadName()
         return g_threadName;
     }
 
-    const size_t MAX_THREAD_NAME_SIZE = 16;
+    constexpr size_t MAX_THREAD_NAME_SIZE = 16;
     char thisThreadName[MAX_THREAD_NAME_SIZE + 1];
 
     // Get current thread name and compare with the specified one.
@@ -395,7 +389,7 @@ const std::string& GetThreadName()
         thisThreadName[MAX_THREAD_NAME_SIZE] = '\0';
         g_threadName = thisThreadName;
     } else {
-        const int errnoSaved = errno;
+        const int32_t errnoSaved = errno;
         printf("in GetThreadName, call prctl get name fail, errno: %d, error msg: %s.\n",
                errnoSaved, strerror(errnoSaved));
     }
@@ -434,5 +428,20 @@ size_t CalculateDifference(const std::vector<int32_t> &list1, std::vector<int32_
     return difList.size();
 }
 
+std::string StringFmt(const char* str, ...)
+{
+    CHKR(str != nullptr, PARAM_INPUT_INVALID, "");
+    va_list args;
+    va_start(args, str);
+    char buf[MAX_PACKET_BUF_SIZE] = {};
+    if (vsnprintf_s(buf, sizeof(buf), sizeof(buf) - 1, str, args) == -1) {
+        MMI_LOGE("vsnprintf_s error");
+        va_end(args);
+        return "";
+    }
+    va_end(args);
+    return buf;
 }
-}
+
+} // namespace MMI
+} // namespace OHOS

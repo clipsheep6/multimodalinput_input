@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,9 +23,9 @@ namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
 
-    const unsigned int DEVICE_FD_INDEX_1 = 1;
-    const unsigned int DEVICE_FD_INDEX_2 = 2;
-    const int DEVICE_FD_ERROR = -1;
+    const uint32_t DEVICE_FD_INDEX_1 = 1;
+    const uint32_t DEVICE_FD_INDEX_2 = 2;
+    const int32_t DEVICE_FD_ERROR = -1;
     class SeniorInputFuncProcBaseTest : public testing::Test {
     public:
         static void SetUpTestCase(void) {}
@@ -115,4 +115,4 @@ using namespace OHOS::MMI;
         const RawInputEvent event = { 0 };
         seniorInputFunc.DeviceEventDispatchProcess(event);
     }
-}
+} // namespace

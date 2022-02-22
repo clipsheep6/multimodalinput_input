@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,9 +20,10 @@
 #include <list>
 
 #include "display_info.h"
-#include "i_input_event_consumer.h"
 #include "error_multimodal.h"
+#include "i_input_event_consumer.h"
 #include "key_option.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
@@ -183,8 +184,9 @@ public:
 
 private:
     InputManager() = default;
-    static InputManager *mInstance_;
+    DISALLOW_COPY_AND_MOVE(InputManager);
+    static InputManager *instance_;
 };
-}
-} // namespace OHOS::MMI
+} // namespace MMI
+} // namespace OHOS
 #endif // INPUT_MANAGER_H

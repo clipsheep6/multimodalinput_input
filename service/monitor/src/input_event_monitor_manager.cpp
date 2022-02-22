@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,14 +14,17 @@
  */
 
 #include "input_event_monitor_manager.h"
+#include <cinttypes>
 #include "input_event_data_transformation.h"
 #include "proto.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventMonitorManager" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventMonitorManager" };
     }
-}
+} // namespace MMI
+} // namespace OHOS
 
 OHOS::MMI::InputEventMonitorManager::InputEventMonitorManager()
 {
@@ -41,20 +44,18 @@ int32_t OHOS::MMI::InputEventMonitorManager::AddInputEventMontior(SessionPtr ses
     monitorItem.session =  session;
     auto iter = std::find(monitors_.begin(), monitors_.end(), monitorItem);
     if (iter != monitors_.end()) {
-        MMI_LOGE("SetEventKeyMonitor: repeate register");
+        MMI_LOGE("Key register repeat");
         return RET_ERR;
-    } else {
-        iter = monitors_.insert(iter, monitorItem);
-        MMI_LOGD("eventType: %{public}d, fd: %{public}d register in server", eventType, session->GetFd());
-        return RET_OK;
     }
-    MMI_LOGD("Leave");
+    iter = monitors_.insert(iter, monitorItem);
+    MMI_LOGD("eventType:%{public}d,fd:%{public}d register in server", eventType, session->GetFd());
+    return RET_OK;
 }
 
 void OHOS::MMI::InputEventMonitorManager::RemoveInputEventMontior(SessionPtr session, int32_t eventType)
 {
     MMI_LOGD("Enter");
-    CHKP(session);
+    CHKPV(session);
     std::lock_guard<std::mutex> lock(mu_);
     MonitorItem monitorItem;
     monitorItem.eventType = eventType;
@@ -62,16 +63,16 @@ void OHOS::MMI::InputEventMonitorManager::RemoveInputEventMontior(SessionPtr ses
     auto it = std::find(monitors_.begin(), monitors_.end(), monitorItem);
     if (it != monitors_.end()) {
         monitors_.erase(it);
-        MMI_LOGW("EventType: %{public}d, fd: %{public}d remove from server", eventType, session->GetFd());
+        MMI_LOGW("EventType:%{public}d,fd:%{public}d remove from server", eventType, session->GetFd());
     }
     MMI_LOGD("Leave");
 }
 
 void OHOS::MMI::InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 {
-    CHKP(keyEvent);
-    MMI_LOGD("KeyEvent from libinput, keyCode: %{public}d, keyAction: %{public}d, action: %{public}d, "
-             "deviceId: %{private}d, actionTime: %{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction(),
+    CHKPV(keyEvent);
+    MMI_LOGD("KeyEvent from libinput, keyCode:%{public}d, keyAction:%{public}d, action:%{public}d, "
+             "device:%{private}d, actionTime:%{public}" PRId64 "", keyEvent->GetKeyCode(), keyEvent->GetKeyAction(),
              keyEvent->GetAction(), keyEvent->GetDeviceId(), keyEvent->GetActionTime());
     if (monitors_.empty()) {
         MMI_LOGE("No monitor to send msg");
@@ -81,9 +82,9 @@ void OHOS::MMI::InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<OH
     InputEventDataTransformation::KeyEventToNetPacket(keyEvent, newPkt);
     std::list<MonitorItem>::iterator iter;
     for (const auto &item : monitors_) {
-        CHKP(item.session);
+        CHKPV(item.session);
         newPkt << item.session->GetPid();
-        MMI_LOGD("server send the msg to client: keyCode = %{public}d, pid = %{public}d", keyEvent->GetKeyCode(),
+        MMI_LOGD("server send the msg to client: keyCode:%{public}d,pid:%{public}d", keyEvent->GetKeyCode(),
             item.session->GetPid());
         item.session->SendMsg(newPkt);
     }
@@ -98,15 +99,13 @@ int32_t OHOS::MMI::InputEventMonitorManager::AddInputEventTouchpadMontior(int32_
     monitorItemTouchpad.session = session;
     auto iter = std::find(monitorsTouch_.begin(), monitorsTouch_.end(), monitorItemTouchpad);
     if (iter != monitorsTouch_.end()) {
-        MMI_LOGE("SetEventTouchpadMonitor:repeate register");
+        MMI_LOGE("Touchpad register repeat");
         return RET_ERR;
-    } else {
-        iter = monitorsTouch_.insert(iter, monitorItemTouchpad);
-        MMI_LOGD("AddInputEventTouchpadMontior, Success, eventType: %{public}d, fd: %{public}d register in server",
-            eventType, session->GetFd());
-        return RET_OK;
     }
-    MMI_LOGD("Leave");
+    iter = monitorsTouch_.insert(iter, monitorItemTouchpad);
+    MMI_LOGD("AddInputEventTouchpadMontior, Success, eventType:%{public}d,fd:%{public}d register in server",
+        eventType, session->GetFd());
+    return RET_OK;
 }
 
 void OHOS::MMI::InputEventMonitorManager::RemoveInputEventTouchpadMontior(int32_t eventType, SessionPtr session)
@@ -118,9 +117,9 @@ void OHOS::MMI::InputEventMonitorManager::RemoveInputEventTouchpadMontior(int32_
     monitorItemtouchpad.session = session;
     auto iter = std::find(monitorsTouch_.begin(), monitorsTouch_.end(), monitorItemtouchpad);
     if (iter == monitorsTouch_.end()) {
-        MMI_LOGE("RemoveInputEventTouchpadMontior::monitorItemtouchpad does not exist");
+        MMI_LOGE("monitorItemtouchpad does not exist");
     } else {
-        MMI_LOGD("eventType: %{public}d, fd: %{public}d remove from server", eventType, session->GetFd());
+        MMI_LOGD("eventType:%{public}d,fd:%{public}d remove from server", eventType, session->GetFd());
         iter = monitorsTouch_.erase(iter);
         MMI_LOGD("Service RemoveInputEventTouchpadMontior Success");
     }
@@ -139,7 +138,7 @@ void OHOS::MMI::InputEventMonitorManager::OnTouchpadMonitorInputEvent(
     std::list<MonitorItem>::iterator iter;
     for (const auto &item :  monitorsTouch_) {
         newPkt << item.session->GetPid();
-        MMI_LOGD("server send the msg to client: EventType = %{public}d, pid = %{public}d",
+        MMI_LOGD("server send the msg to client: EventType:%{public}d,pid:%{public}d",
             pointerEvent->GetEventType(), item.session->GetPid());
         item.session->SendMsg(newPkt);
         MMI_LOGD("Service SendMsg Success");
@@ -151,9 +150,9 @@ bool OHOS::MMI::InputEventMonitorManager::ReportTouchpadEvent(std::shared_ptr<OH
 {
     PointerEvent::PointerItem pointer;
     CHKF(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer), PARAM_INPUT_FAIL);
-    MMI_LOGD("monitor-serviceeventTouchpad:time=%{public}d;"
-             "sourceType=%{public}d;action=%{public}d;"
-             "pointerId=%{public}d;point.x=%{public}d;point.y=%{public}d;press=%{public}d",
+    MMI_LOGD("Monitor-serviceeventTouchpad:time:%{public}" PRId64 ","
+             "sourceType:%{public}d,action:%{public}d,"
+             "pointer:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
              pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
              pointerEvent->GetPointerId(), pointer.GetGlobalX(), pointer.GetGlobalY(), pointer.IsPressed());
     OnTouchpadMonitorInputEvent(pointerEvent);

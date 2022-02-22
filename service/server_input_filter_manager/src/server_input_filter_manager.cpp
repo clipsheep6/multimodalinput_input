@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,12 +15,12 @@
 
 #include "server_input_filter_manager.h"
 #include <cinttypes>
-#include "bytrace.h"
 #include "input_event_data_transformation.h"
 #include "mmi_server.h"
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ServerInputFilterManager" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ServerInputFilterManager" };
 }
 
 ServerInputFilterManager::KeyEventFilter::KeyEventFilter(int32_t id, std::string name,
@@ -35,7 +35,7 @@ ServerInputFilterManager::PointerEventFilter::PointerEventFilter(int32_t id, std
 
 void ServerInputFilterManager::DeleteFilterFromSess(SessionPtr sess)
 {
-    CHKP(sess);
+    CHKPV(sess);
     auto it = keyEventFilterMap_.find(sess);
     if (it == keyEventFilterMap_.end()) {
         MMI_LOGD("This sess have not any filter");
@@ -171,7 +171,8 @@ void ServerInputFilterManager::TouchEventFilter::SetAuthority(Authority authorit
 }
 
 void ServerInputFilterManager::OnEventTouchGetPointEventType(const EventTouch& touch,
-    POINT_EVENT_TYPE& pointEventType, const int32_t fingerCount)
+                                                             const int32_t fingerCount,
+                                                             POINT_EVENT_TYPE& pointEventType)
 {
     CHK(fingerCount > 0, PARAM_INPUT_INVALID);
     CHK(touch.time > 0, PARAM_INPUT_INVALID);
@@ -219,10 +220,10 @@ void ServerInputFilterManager::OnEventTouchGetPointEventType(const EventTouch& t
 }
 
 bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
-    EventTouch& touch, const uint64_t preHandlerTime)
+    const EventTouch& touch, const uint64_t preHandlerTime)
 {
-    CHKPF(event);
     MMI_LOGD("Enter");
+    CHKPF(event);
     if (touchEventFilterMap_.empty()) {
         MMI_LOGE("touchEventFilterMap_ is empty");
         return false;
@@ -268,22 +269,22 @@ bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
         }
         newPacket << fingerCount;
         POINT_EVENT_TYPE pointEventType = EVENT_TYPE_INVALID;
-        OnEventTouchGetPointEventType(touch, pointEventType, fingerCount);
+        OnEventTouchGetPointEventType(touch, fingerCount, pointEventType);
         int32_t eventType = pointEventType;
         newPacket << eventType << appInfo.abilityId << touchFocusId << appInfo.fd << preHandlerTime;
 
         std::vector<std::pair<uint32_t, int32_t>> touchIds;
-        MMIRegEvent->GetTouchIds(touchIds, touch.deviceId);
+        MMIRegEvent->GetTouchIds(touch.deviceId, touchIds);
         if (!touchIds.empty()) {
             for (std::pair<uint32_t, int32_t> touchId : touchIds) {
                 EventTouch touchTemp = {};
                 errno_t retErr = memcpy_s(&touchTemp, sizeof(touchTemp), &touch, sizeof(touch));
                 CHKF(retErr == EOK, MEMCPY_SEC_FUN_FAIL);
                 MMIRegEvent->GetTouchInfo(touchId, touchTemp);
-                MMI_LOGD("4.event filter of server 1:eventTouch:time=%{public}" PRId64 ",deviceType=%{public}u,"
-                         "deviceName=%{public}s,physical=%{public}s,eventType=%{public}d,"
-                         "slot=%{public}d,seatSlot=%{public}d,pressure=%{public}lf,point.x=%{public}lf,"
-                         "point.y=%{public}lf,fd=%{public}d,preHandlerTime=%{public}" PRId64,
+                MMI_LOGD("4.event filter of server 1:eventTouch:time:%{public}" PRId64 ",deviceType:%{public}u,"
+                         "deviceName:%{public}s,physical:%{public}s,eventType:%{public}d,"
+                         "slot:%{public}d,seatSlot:%{public}d,pressure:%{public}lf,point.x:%{public}lf,"
+                         "point.y:%{public}lf,fd:%{public}d,preHandlerTime:%{public}" PRId64,
                          touchTemp.time, touchTemp.deviceType, touchTemp.deviceName,
                          touchTemp.physical, touchTemp.eventType, touchTemp.slot, touchTemp.seatSlot,
                          touchTemp.pressure, touchTemp.point.x, touchTemp.point.y, appInfo.fd,
@@ -293,17 +294,17 @@ bool ServerInputFilterManager::OnTouchEvent(libinput_event *event,
         }
         if (touch.eventType == LIBINPUT_EVENT_TOUCH_UP) {
             newPacket << touch;
-            MMI_LOGD("4.event filter of server 2:eventTouch:time=%{public}" PRId64 ",deviceType=%{public}u,"
-                     "deviceName=%{public}s,physical=%{public}s,eventType=%{public}d,"
-                     "slot=%{public}d,seatSlot=%{public}d,pressure=%{public}lf,point.x=%{public}lf,"
-                     "point.y=%{public}lf,fd=%{public}d,preHandlerTime=%{public}" PRId64,
+            MMI_LOGD("4.event filter of server 2:eventTouch:time:%{public}" PRId64 ", deviceType:%{public}u,"
+                     "deviceName:%{public}s,physical:%{public}s,eventType:%{public}d,"
+                     "slot:%{public}d,seatSlot:%{public}d,pressure:%{public}lf,point.x:%{public}lf,"
+                     "point.y:%{public}lf,fd:%{public}d,preHandlerTime:%{public}" PRId64,
                      touch.time, touch.deviceType, touch.deviceName,
                      touch.physical, touch.eventType, touch.slot, touch.seatSlot, touch.pressure,
                      touch.point.x, touch.point.y, appInfo.fd, preHandlerTime);
         }
         newPacket << id;
         if (!temp->SendMsg(newPacket)) {
-            MMI_LOGE("Sending Interceptor EventTouch failed,session.fd:%{public}d", temp->GetFd());
+            MMI_LOGE("Sending Interceptor EventTouch failed, session.fd:%{public}d", temp->GetFd());
             return false;
         }
     }
@@ -422,7 +423,7 @@ int32_t ServerInputFilterManager::UnregisterEventInterceptorforServer(const Sess
 
 void ServerInputFilterManager::DeleteInterceptorFormSess(const SessionPtr& sess)
 {
-    CHKP(sess);
+    CHKPV(sess);
     auto it = pointerEventFilterMap_.find(sess);
     if (it == pointerEventFilterMap_.end()) {
         MMI_LOGD("This sess have not any interceptor");
@@ -461,4 +462,5 @@ void ServerInputFilterManager::PointerEventFilter::SetAuthority(Authority author
 {
     authority_ = authority;
 }
-}
+} // namespace MMI
+} // namespace OHOS

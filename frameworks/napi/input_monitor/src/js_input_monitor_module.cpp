@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,13 +25,14 @@ namespace OHOS {
 namespace MMI {
 namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitorModule" };
-    constexpr uint32_t MAX_STRING_LEN = 1024;
+    constexpr size_t MAX_STRING_LEN = 1024;
 }
+
 static napi_value JsOn(napi_env env, napi_callback_info info)
 {
     MMI_LOGD("Enter");
+    size_t argc = 2;
     size_t requireArgc = 2;
-    size_t argc;
     napi_value argv[requireArgc];
     napi_status status = napi_generic_failure;
 
@@ -89,9 +90,10 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
 static napi_value JsOff(napi_env env, napi_callback_info info)
 {
     MMI_LOGD("Enter");
-    size_t requireArgc = 2;
-    size_t argc;
-    napi_value argv[requireArgc];
+    size_t argc = 2;
+    napi_value argv[argc];
+    argv[0] = nullptr;
+    argv[1] = nullptr;
     napi_status status = napi_generic_failure;
 
     status = napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
@@ -99,11 +101,15 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
         MMI_LOGE("Unregister js monitor failed, get cb info failed");
         return nullptr;
     }
-    if (argc < requireArgc) {
+    size_t minArgc = 1;
+    if (argc < minArgc) {
         MMI_LOGE("Unregister js monitor failed, the number of parameter is error");
         return nullptr;
     }
-
+    if (argv[0] == nullptr) {
+        MMI_LOGE("Unregister js monitor failed, the first parameter is null");
+        return nullptr;
+    }
     napi_valuetype valueType = napi_undefined;
     status = napi_typeof(env, argv[0], &valueType);
     if (status != napi_ok) {
@@ -126,15 +132,20 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
         MMI_LOGE("Unregister js monitor failed, the first parameter is error");
         return nullptr;
     }
+    if (argv[1] == nullptr) {
+        JSIMM.RemoveMonitor(env);
+        MMI_LOGD("remove all monitor");
+        return nullptr;
+    }
+
     status = napi_typeof(env, argv[1], &valueType);
     if (status != napi_ok) {
         MMI_LOGE("Unregister js monitor failed, typeof failed");
         return nullptr;
     }
     if (valueType != napi_function) {
-        MMI_LOGD("remove all monitor begin");
         JSIMM.RemoveMonitor(env);
-        MMI_LOGD("remove all monitor end");
+        MMI_LOGD("remove all monitor");
         return nullptr;
     }
 
@@ -146,13 +157,13 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
 EXTERN_C_START
 static napi_value MmiInputMonitorInit(napi_env env, napi_value exports)
 {
-    MMI_LOGD("MmiInputMonitorInit: Enter");
+    MMI_LOGD("Enter");
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("on", JsOn),
         DECLARE_NAPI_FUNCTION("off", JsOff),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
-    MMI_LOGD("MmiInputMonitorInit: success");
+    MMI_LOGD("Leave");
     return exports;
 }
 EXTERN_C_END

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,17 +25,17 @@ namespace {
 int32_t ProcessingJoystickDevice::TransformJsonDataToInputData(const Json& originalEvent,
                                                                InputEventArray& inputEventArray)
 {
-    MMI_LOGI("Enter TransformJsonDataForJoystick function.");
+    MMI_LOGD("Enter");
     if (originalEvent.empty()) {
         return RET_ERR;
     }
     if (originalEvent.find("events") == originalEvent.end()) {
-        MMI_LOGE("manage joystick array faild, inputData is empty.");
+        MMI_LOGE("manage joystick array faild, inputData is empty");
         return RET_ERR;
     }
     Json inputData = originalEvent.at("events");
     if (inputData.empty()) {
-        MMI_LOGE("manage finger array faild, inputData is empty.");
+        MMI_LOGE("manage finger array faild, inputData is empty");
         return RET_ERR;
     }
     vector<JoystickEvent> JoystickEventArray;
@@ -43,7 +43,7 @@ int32_t ProcessingJoystickDevice::TransformJsonDataToInputData(const Json& origi
         return RET_ERR;
     }
     TransformPadEventToInputEvent(JoystickEventArray, inputEventArray);
-    MMI_LOGI("Leave TransformJsonDataForJoystick function.");
+    MMI_LOGD("Leave");
 
     return RET_OK;
 }
@@ -62,30 +62,30 @@ int32_t ProcessingJoystickDevice::AnalysisJoystickEvent(const Json& inputData,
         if ((eventType == "KEY_EVENT_CLICK") || (eventType == "KEY_EVENT_PRESS") ||
             (eventType == "KEY_EVENT_RELEASE")) {
             if ((item.find("keyValue")) == item.end()) {
-                MMI_LOGE("function AnalysisJoystickEvent not find keyValue On Event: %{public}s.", eventType.c_str());
+                MMI_LOGE("function AnalysisJoystickEvent not find keyValue On Event:%{public}s", eventType.c_str());
                 return RET_ERR;
             }
             joystickEvent.keyValue = item.at("keyValue").get<int32_t>();
         } else if (eventType == "THROTTLE") {
             if ((item.find("keyValue")) == item.end()) {
-                MMI_LOGE("function AnalysisJoystickEvent not find keyValue On Event: %{public}s.", eventType.c_str());
+                MMI_LOGE("function AnalysisJoystickEvent not find keyValue On Event:%{public}s", eventType.c_str());
                 return RET_ERR;
             }
             joystickEvent.keyValue = item.at("keyValue").get<int32_t>();
         } else if ((eventType == "ROCKER_1")) {
             if ((item.find("event")) == item.end()) {
-                MMI_LOGE("function AnalysisJoystickEvent not find event On Event: %{public}s.", eventType.c_str());
+                MMI_LOGE("function AnalysisJoystickEvent not find event On Event:%{public}s", eventType.c_str());
                 return RET_ERR;
             }
             if ((item.find("direction")) == item.end()) {
-                MMI_LOGE("function AnalysisJoystickEvent not find direction On Event: %{public}s.", eventType.c_str());
+                MMI_LOGE("function AnalysisJoystickEvent not find direction On Event:%{public}s", eventType.c_str());
                 return RET_ERR;
             }
             joystickEvent.gameEvents = item.at("event").get<std::vector<int32_t>>();
             joystickEvent.direction = item.at("direction").get<std::string>();
         } else if (eventType == "DERECTION_KEY") {
             if ((item.find("direction")) == item.end()) {
-                MMI_LOGE("function AnalysisJoystickEvent not find direction On Event: %{public}s.", eventType.c_str());
+                MMI_LOGE("function AnalysisJoystickEvent not find direction On Event:%{public}s", eventType.c_str());
                 return RET_ERR;
             }
             joystickEvent.direction = item.at("direction").get<std::string>();

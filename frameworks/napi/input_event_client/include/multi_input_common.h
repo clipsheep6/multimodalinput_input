@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,7 +28,7 @@
 #include <fstream>
 #include <unistd.h>
 #include <sys/stat.h>
-#include <stdio.h>
+#include <cstdio>
 #include "libmmi_util.h"
 namespace OHOS {
 namespace MMI {
@@ -38,6 +38,6 @@ public:
                       const std::string &jsonEventValue);
     void SetIniFile(const std::string &fileName, const std::string &jsonEventValue);
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // MULTI_INPUT_COMMON_H

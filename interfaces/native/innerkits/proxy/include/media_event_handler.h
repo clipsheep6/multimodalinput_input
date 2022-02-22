@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,6 +28,6 @@ public:
     virtual bool OnPause(const MultimodalEvent& event) override;
     virtual bool OnMediaControl(const MultimodalEvent& event) override;
 };
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif // MEDIA_EVENT_HANDLER_H

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 #include "js_register_util.h"
-#include <inttypes.h>
+#include <cinttypes>
 
 namespace OHOS {
 namespace MMI {
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterUtil" };
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterUtil" };
 }
 
 void SetNamedProperty(const napi_env &env, napi_value &object, const std::string &name, int32_t value)
@@ -28,7 +28,7 @@ void SetNamedProperty(const napi_env &env, napi_value &object, const std::string
     napi_value napiValue;
     status = napi_create_int32(env, value, &napiValue);
     if (status != napi_ok) {
-        MMI_LOGE("%{public}s=%{public}d failed.", name.c_str(), value);
+        MMI_LOGE("%{public}s=%{public}d failed", name.c_str(), value);
         return;
     }
     NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), napiValue));
@@ -41,7 +41,7 @@ void SetNamedProperty(const napi_env &env, napi_value &object, const std::string
     napi_value napiValue;
     status = napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &napiValue);
     if (status != napi_ok) {
-        MMI_LOGE("%{public}s=%{public}s failed.", name.c_str(), value.c_str());
+        MMI_LOGE("%{public}s=%{public}s failed", name.c_str(), value.c_str());
         return;
     }
     NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), napiValue));
@@ -51,10 +51,10 @@ bool GetNamedPropertyBool(const napi_env &env, const napi_value &object, const s
 {
     bool value = false;
     napi_value napiValue = {};
-    napi_valuetype tmpType = napi_undefined;
     napi_get_named_property(env, object, name.c_str(), &napiValue);
+    napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-        MMI_LOGE("call napi_typeof fail.");
+        MMI_LOGE("call napi_typeof fail");
         return false;
     }
     if (tmpType != napi_boolean) {
@@ -71,10 +71,10 @@ int32_t GetNamedPropertyInt32(const napi_env &env, const napi_value &object, con
 {
     int32_t value = 0;
     napi_value napiValue = {};
-    napi_valuetype tmpType = napi_undefined;
     napi_get_named_property(env, object, name.c_str(), &napiValue);
+    napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-        napi_throw_error(env, nullptr, "call napi_typeof fail.");
+        napi_throw_error(env, nullptr, "call napi_typeof fail");
         return value;
     }
     if (tmpType != napi_number) {
@@ -95,7 +95,7 @@ std::vector<int32_t> GetIntArray(const napi_env &env, const napi_value &value)
         return {};
     }
     std::vector<int32_t> paramArrays;
-    for (size_t i = 0; i < arrayLength; i++) {
+    for (uint32_t i = 0; i < arrayLength; i++) {
         napi_value napiElement;
         if (napi_get_element(env, value, i, &napiElement) != napi_ok) {
             MMI_LOGE("Get element failed");
@@ -116,7 +116,7 @@ std::vector<int32_t> GetIntArray(const napi_env &env, const napi_value &value)
             MMI_LOGE("NapiElement get int32 value failed");
             return {};
         }
-        MMI_LOGD("Get int array number: %{public}d", value);
+        MMI_LOGD("Get int array number:%{public}d", value);
         paramArrays.push_back(value);
     }
     MMI_LOGD("leave");
@@ -131,14 +131,14 @@ int32_t AddEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
         MMI_LOGD("No callback in %{public}s", event->eventType.c_str());
         callbacks[event->eventType] = {};
     }
-    auto it = callbacks[event->eventType];
     napi_value handler1 = nullptr;
     napi_status status = napi_get_reference_value(env, event->callback[0], &handler1);
     if (status != napi_ok) {
         napi_throw_error(env, nullptr, "Handler1 get reference value failed");
         return JS_CALLBACK_EVENT_FAILED;
     }
-    for (const auto &iter : it) {
+    auto it = callbacks.find(event->eventType);
+    for (const auto &iter : it->second) {
         napi_value handler2 = nullptr;
         status = napi_get_reference_value(env, (*iter).callback[0], &handler2);
         if (status != napi_ok) {
@@ -152,15 +152,15 @@ int32_t AddEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
             return JS_CALLBACK_EVENT_FAILED;
         }
         if (isEqual) {
-            napi_throw_error(env, nullptr, "Callback already exists in %{public}s");
+            napi_throw_error(env, nullptr, "Callback already exist");
             return JS_CALLBACK_EVENT_FAILED;
         }
     }
-    if (!it.empty()) {
-        CHKPR(it.front(), ERROR_NULL_POINTER);
-        preSubscribeId = it.front()->subscribeId;
+    if (!it->second.empty()) {
+        CHKPR(it->second.front(), ERROR_NULL_POINTER);
+        preSubscribeId = it->second.front()->subscribeId;
     }
-    it.push_back(event);
+    it->second.push_back(event);
     return JS_CALLBACK_EVENT_SUCCESS;
 }
 
@@ -168,44 +168,99 @@ int32_t DelEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
     OHOS::MMI::KeyEventMonitorInfo *event, int32_t &subscribeId)
 {
     MMI_LOGD("enter");
-    auto iter = callbacks.find(event->eventType);
-    if (iter == callbacks.end()) {
-        MMI_LOGD("No callback in %{public}s", event->eventType.c_str());
+    if (callbacks.count(event->eventType) <= 0) {
+        MMI_LOGE("Callback doesn't exists");
         return JS_CALLBACK_EVENT_FAILED;
     }
-    MMI_LOGD("EventType: %{public}s, keyEventMonitorInfos: %{public}d", event->eventType.c_str(),
-        static_cast<int32_t>(iter->second.size()));
-    auto it = iter->second.begin();
-    while (it != iter->second.end()) {
+    auto it = callbacks[event->eventType];
+    MMI_LOGD("EventType: %{public}s, keyEventMonitorInfos: %{public}zu",
+        event->eventType.c_str(), it.size());
+    napi_value handler1 = nullptr;
+    napi_status status = napi_get_reference_value(env, event->callback[0], &handler1);
+    if (status != napi_ok) {
+        napi_throw_error(env, nullptr, "Handler1 get reference value failed");
+        return JS_CALLBACK_EVENT_FAILED;
+    }
+    for (auto iter = it.begin(); iter != it.end();) {
+        napi_value handler2 = nullptr;
+        status = napi_get_reference_value(env, (*iter)->callback[0], &handler2);
+        if (status != napi_ok) {
+            napi_throw_error(env, nullptr, "Handler2 get reference value failed");
+            return JS_CALLBACK_EVENT_FAILED;
+        }
         bool isEquals = false;
-        napi_value handlerTemp = nullptr;
-        napi_get_reference_value(env, (*it)->callback[0], &handlerTemp);
-        napi_value handlerParam = nullptr;
-        napi_get_reference_value(env, event->callback[0], &handlerParam);
-        napi_strict_equals(env, handlerTemp, handlerParam, &isEquals);
+        status = napi_strict_equals(env, handler1, handler2, &isEquals);
+        if (status != napi_ok) {
+            napi_throw_error(env, nullptr, "Compare two handler failed");
+            return JS_CALLBACK_EVENT_FAILED;
+        }
         if (isEquals) {
-            napi_delete_reference(env, (*it)->callback[0]);
-            KeyEventMonitorInfo *monitorInfo = *it;
-            iter->second.erase(it);
-            if (iter->second.empty()) {
+            status = napi_delete_reference(env, (*iter)->callback[0]);
+            if (status != napi_ok) {
+                napi_throw_error(env, nullptr, "Delete reference failed");
+                return JS_CALLBACK_EVENT_FAILED;
+            }
+            KeyEventMonitorInfo *monitorInfo = *iter;
+            it.erase(iter++);
+            if (it.empty()) {
                 subscribeId = monitorInfo->subscribeId;
             }
             delete monitorInfo;
             monitorInfo = nullptr;
-            MMI_LOGD("Callback already exists, size: %{public}d",
-                static_cast<int32_t>(iter->second.size()));
+            MMI_LOGD("Callback has deleted, size: %{public}zu", it.size());
             return JS_CALLBACK_EVENT_SUCCESS;
         }
-        it++;
+        iter++;
     }
-    MMI_LOGD("callback size=%{public}d", static_cast<int32_t>(iter->second.size()));
+    MMI_LOGD("Callback size: %{public}zu", it.size());
     return JS_CALLBACK_EVENT_NOT_EXIST;
+}
+
+static void AsyncWorkFn(napi_env env, OHOS::MMI::KeyEventMonitorInfo *event, napi_value result[2])
+{
+    if (event->status < 0) {
+        MMI_LOGD("Status < 0 enter");
+        napi_value code = nullptr;
+        napi_create_string_utf8(env, "-1", NAPI_AUTO_LENGTH, &code);
+        napi_value message = nullptr;
+        napi_create_string_utf8(env, "failed", NAPI_AUTO_LENGTH, &message);
+        napi_create_error(env, code, message, &result[0]);
+        napi_get_undefined(env, &result[1]);
+    } else if (event->status == 0) {
+        MMI_LOGD("Status = 0 enter");
+        napi_get_undefined(env, &result[0]);
+        napi_get_undefined(env, &result[1]);
+    } else {
+        MMI_LOGD("Status > 0 enter");
+        if (napi_create_object(env, &result[1]) != napi_ok) {
+            MMI_LOGE("Result1 create object failed");
+            return;
+        }
+        napi_value arr;
+        napi_value value;
+        napi_create_array(env, &arr);
+        std::vector<int32_t> preKeys = event->keyOption->GetPreKeys();
+        for (size_t i = 0; i < preKeys.size(); i++) {
+            napi_create_int32(env, preKeys[i], &value);
+            napi_set_element(env, arr, i, value);
+        }
+        std::string preKeysStr = "preKeys";
+        NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, result[1], preKeysStr.c_str(), arr));
+        MMI::SetNamedProperty(env, result[1], "finalKey", event->keyOption->GetFinalKey());
+        MMI::SetNamedProperty(env, result[1], "isFinalKeyDown", event->keyOption->IsFinalKeyDown());
+        MMI::SetNamedProperty(env, result[1], "finalKeyDownDuration",
+            event->keyOption->GetFinalKeyDownDuration());
+        if (napi_get_undefined(env, &result[0]) != napi_ok) {
+            MMI_LOGE("Result0 get undefined failed");
+            return;
+        }
+    }
 }
 
 void EmitAsyncCallbackWork(OHOS::MMI::KeyEventMonitorInfo *reportEvent)
 {
-    MMI_LOGD("%{public}s begin", __func__);
-    CHKP(reportEvent);
+    MMI_LOGD("enter");
+    CHKPV(reportEvent);
     napi_value resourceName;
     napi_status status = napi_create_string_utf8(reportEvent->env, "AsyncCallback", NAPI_AUTO_LENGTH, &resourceName);
     if (status != napi_ok) {
@@ -222,50 +277,13 @@ void EmitAsyncCallbackWork(OHOS::MMI::KeyEventMonitorInfo *reportEvent)
                 MMI_LOGE("Event get reference value failed");
                 return;
             }
-            napi_value callResult = nullptr;
             napi_value result[2] = { 0 };
-            if (event->status < 0) {
-                MMI_LOGD("Status < 0 enter");
-                napi_value code = nullptr;
-                napi_value message = nullptr;
-                napi_create_string_utf8(env, "-1", NAPI_AUTO_LENGTH, &code);
-                napi_create_string_utf8(env, "failed", NAPI_AUTO_LENGTH, &message);
-                napi_create_error(env, code, message, &result[0]);
-                napi_get_undefined(env, &result[1]);
-            } else if (event->status == 0) {
-                MMI_LOGD("Status = 0 enter");
-                napi_get_undefined(env, &result[0]);
-                napi_get_undefined(env, &result[1]);
-            } else {
-                MMI_LOGD("Status > 0 enter");
-                if (napi_create_object(env, &result[1]) != napi_ok) {
-                    MMI_LOGE("Result1 create object failed");
-                    return;
-                }
-                napi_value arr;
-                napi_value value;
-                napi_create_array(env, &arr);
-                std::vector<int32_t> preKeys = event->keyOption->GetPreKeys();
-                for (size_t i = 0; i < preKeys.size(); i++) {
-                    napi_create_int32(env, preKeys[i], &value);
-                    napi_set_element(env, arr, i, value);
-                }
-
-                std::string preKeysStr = "preKeys";
-                NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, result[1], preKeysStr.c_str(), arr));
-                MMI::SetNamedProperty(env, result[1], "finalKey", event->keyOption->GetFinalKey());
-                MMI::SetNamedProperty(env, result[1], "isFinalKeyDown", event->keyOption->IsFinalKeyDown());
-                MMI::SetNamedProperty(env, result[1], "finalKeyDownDuration",
-                    event->keyOption->GetFinalKeyDownDuration());
-                if (napi_get_undefined(env, &result[0]) != napi_ok) {
-                    MMI_LOGE("Result0 get undefined failed");
-                    return;
-                }
-            }
+            AsyncWorkFn(env, event, result);
+            napi_value callResult = nullptr;
             auto callFunResult = napi_call_function(env, nullptr, callback, 2, result, &callResult);
-            MMI_LOGD("CallFunResult: %{public}d", static_cast<int32_t>(callFunResult));
+            MMI_LOGD("CallFunResult:%{public}d", static_cast<int32_t>(callFunResult));
             if (callFunResult != napi_ok) {
-                MMI_LOGE("Call function fail, callFunResult: %{public}d", callFunResult);
+                MMI_LOGE("Call function fail, callFunResult:%{public}d", callFunResult);
                 return;
             }
             if (event->status <= 0) {
@@ -275,10 +293,9 @@ void EmitAsyncCallbackWork(OHOS::MMI::KeyEventMonitorInfo *reportEvent)
                 event = nullptr;
             }
             MMI_LOGD("Napi async work left");
-        },
-        reportEvent, &reportEvent->asyncWork);
+        }, reportEvent, &reportEvent->asyncWork);
     napi_queue_async_work(reportEvent->env, reportEvent->asyncWork);
     MMI_LOGD("EmitAsyncCallbackWork left");
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -41,12 +41,12 @@ void PointerEvent::PointerItem::SetPointerId(int32_t pointerId)
     pointerId_ = pointerId;
 }
 
-int32_t PointerEvent::PointerItem::GetDownTime() const
+int64_t PointerEvent::PointerItem::GetDownTime() const
 {
     return downTime_;
 }
 
-void PointerEvent::PointerItem::SetDownTime(int32_t downTime)
+void PointerEvent::PointerItem::SetDownTime(int64_t downTime)
 {
     downTime_ = downTime;
 }
@@ -147,7 +147,7 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         return false;
     }
 
-    if (!out.WriteInt32(downTime_)) {
+    if (!out.WriteInt64(downTime_)) {
         return false;
     }
 
@@ -196,7 +196,7 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         return false;
     }
 
-    if (!in.ReadInt32(downTime_)) {
+    if (!in.ReadInt64(downTime_)) {
         return false;
     }
 
@@ -356,17 +356,17 @@ std::set<int32_t> PointerEvent::GetPressedButtons() const
     return pressedButtons_;
 }
 
-bool PointerEvent::IsButtonPressed(int buttonId) const
+bool PointerEvent::IsButtonPressed(int32_t buttonId) const
 {
     return (pressedButtons_.find(buttonId) != pressedButtons_.end());
 }
 
-void PointerEvent::SetButtonPressed(int buttonId)
+void PointerEvent::SetButtonPressed(int32_t buttonId)
 {
     pressedButtons_.insert(buttonId);
 }
 
-void PointerEvent::DeleteReleaseButton(int buttonId)
+void PointerEvent::DeleteReleaseButton(int32_t buttonId)
 {
     if (pressedButtons_.find(buttonId) != pressedButtons_.end()) {
         pressedButtons_.erase(buttonId);
@@ -808,5 +808,5 @@ bool PointerEvent::IsValid() const
     HiLog::Debug(LABEL, "PointerEvent::IsValid end");
     return true;
 }
-}
-} // namespace OHOS::MMI
+} // namespace MMI
+} // namespace OHOS

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,17 +16,18 @@
 #include "uds_session.h"
 #include <sstream>
 #include <fcntl.h>
-#include <inttypes.h>
+#include <cinttypes>
 #include <sys/types.h>
 #include <sys/un.h>
 #include <unistd.h>
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 namespace {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSession" };
 }
 
-UDSSession::UDSSession(const std::string& programName, const int moduleType, const int32_t fd,
+UDSSession::UDSSession(const std::string& programName, const int32_t moduleType, const int32_t fd,
     const int32_t uid, const int32_t pid)
     : programName_(programName),
       moduleType_(moduleType),
@@ -44,14 +45,17 @@ UDSSession::~UDSSession()
 bool UDSSession::SendMsg(const char *buf, size_t size) const
 {
     CHKPF(buf);
-    CHKF(size > 0 && size <= MAX_PACKET_BUF_SIZE, PARAM_INPUT_INVALID);
+    if ((size == 0) || (size > MAX_PACKET_BUF_SIZE)) {
+        MMI_LOGD("buf size:%{public}zu", size);
+        return PARAM_INPUT_INVALID;
+    }
     CHKF(fd_ >= 0, PARAM_INPUT_INVALID);
-    uint64_t ret = write(fd_, static_cast<void *>(const_cast<char *>(buf)), size);
+    ssize_t ret = write(fd_, static_cast<void *>(const_cast<char *>(buf)), size);
     if (ret < 0) {
-        const int errNoSaved = errno;
-        MMI_LOGE("UDSSession::SendMsg write return %{public}" PRId64
-                ", fd_: %{public}d, errNoSaved: %{public}d, %{public}s.",
-                ret, fd_, errNoSaved, strerror(errNoSaved));
+        const int32_t errNoSaved = errno;
+        MMI_LOGE("UDSSession::SendMsg write return %{public}zd,"
+                 "fd_:%{public}d,errNoSaved:%{public}d,strerror:%{public}s",
+                 ret, fd_, errNoSaved, strerror(errNoSaved));
         return false;
     }
     return true;
@@ -59,7 +63,7 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
 
 void UDSSession::Close()
 {
-    MMI_LOGT("enter fd_ = %{public}d, bHasClosed_ = %d.", fd_, bHasClosed_);
+    MMI_LOGT("enter fd_:%{public}d,bHasClosed_ = %d.", fd_, bHasClosed_);
     if (!bHasClosed_ && fd_ != -1) {
         close(fd_);
         bHasClosed_ = true;
@@ -83,12 +87,13 @@ void UDSSession::UpdateDescript()
 
 bool UDSSession::SendMsg(NetPacket& pkt) const
 {
+    CHKF(!pkt.ChkError(), PACKET_WRITE_FAIL);
     StreamBuffer buf;
     pkt.MakeData(buf);
     return SendMsg(buf.Data(), buf.Size());
 }
 
-void UDSSession::RecordEvent(int32_t id, uint64_t time)
+void UDSSession::AddEvent(int32_t id, uint64_t time)
 {
     MMI_LOGI("begin");
     EventTime eventTime = {id, time};
@@ -96,15 +101,15 @@ void UDSSession::RecordEvent(int32_t id, uint64_t time)
     MMI_LOGI("end");
 }
 
-void UDSSession::ClearEventList(int32_t id)
+void UDSSession::DelEvents(int32_t id)
 {
     MMI_LOGI("begin");
     int32_t count = 0;
     for (auto &item : events_) {
-        count++;
+        ++count;
         if (item.id == id) {
             events_.erase(events_.begin(), events_.begin() + count);
-            MMI_LOGI("Delete events.");
+            MMI_LOGI("Delete events");
         }
     }
     MMI_LOGI("end");
@@ -125,4 +130,5 @@ void UDSSession::ClearEventsVct()
 {
     std::vector<EventTime>().swap(events_);
 }
-}
+} // namespace MMI
+} // namespace OHOS

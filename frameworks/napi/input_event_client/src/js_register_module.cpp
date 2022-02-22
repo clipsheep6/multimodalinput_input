@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,14 +23,13 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterMoudle" };
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterMoudle" };
+    constexpr size_t EVENT_NAME_LEN = 64;
+    constexpr size_t ARGC_NUM = 2;
+    constexpr size_t ARGC_UT_NUM = 2;
+    constexpr size_t ARGV_FIRST = 0;
+    constexpr size_t ARGV_SECOND = 1;
 }
-
-const uint32_t EVENT_NAME_LEN = 64;
-const uint32_t ARGC_NUM = 2;
-const uint32_t ARGC_UT_NUM = 2;
-const uint32_t ARGV_FIRST = 0;
-const uint32_t ARGV_SECOND = 1;
 
 template<class T>
 static StandEventPtr CreateEvent(napi_env env)
@@ -76,7 +75,7 @@ static napi_value GetEventInfo(napi_env env, napi_callback_info info, EventInfo&
     event.name = eventName;
     event.type = GetHandleType(event.name);
     event.winId = 0;
-    MMI_LOGD("event info, type=%{public}d, name=%{public}s", event.type, event.name.c_str());
+    MMI_LOGD("event info, type:%{public}d,name:%{public}s", event.type, event.name.c_str());
 
     napi_value result = {};
     napi_create_int32(env, SUCCESS_CODE, &result);
@@ -117,13 +116,13 @@ static napi_value OnEvent(napi_env env, napi_callback_info info)
     napi_value result = nullptr;
     napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAMETER, &result);
 
-    static EventInfo event = {};
+    EventInfo event = {};
     if (GetEventInfo(env, info, event) == nullptr) {
         MMI_LOGE("GetEventInfo failed");
         return result;
     }
     if (event.type == INVALID_TYPE_CODE) {
-        MMI_LOGE("invalid registerHandle type=%{public}d", event.type);
+        MMI_LOGE("invalid registerHandle type:%{public}d", event.type);
         return result;
     }
 
@@ -158,7 +157,7 @@ static napi_value OffEvent(napi_env env, napi_callback_info info)
     napi_value result = nullptr;
     napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAMETER, &result);
 
-    static EventInfo event = {};
+    EventInfo event = {};
     if (GetEventInfo(env, info, event) == nullptr) {
         MMI_LOGE("GetEventInfo failed");
         return result;
@@ -196,14 +195,13 @@ static napi_value OffEvent(napi_env env, napi_callback_info info)
 
 static napi_value InjectEvent(napi_env env, napi_callback_info info)
 {
-    size_t argc = 1;
-    napi_value argv[1] = { 0 };
-    napi_valuetype tmpType = napi_undefined;
     napi_value result = nullptr;
     if (napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAMETER, &result) != napi_ok) {
         MMI_LOGE("call napi_create_int32 fail");
         return result;
     }
+    size_t argc = 1;
+    napi_value argv[1] = { 0 };
     if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok) {
         MMI_LOGE("call napi_get_cb_info fail");
         return result;
@@ -212,6 +210,7 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
 
     napi_value keyHandle = nullptr;
     napi_get_named_property(env, argv[0], "KeyEvent", &keyHandle);
+    napi_valuetype tmpType = napi_undefined;
     napi_typeof(env, keyHandle, &tmpType);
     NAPI_ASSERT(env, tmpType == napi_object, "parameter1 is not napi_object");
 
@@ -219,11 +218,11 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     int32_t keyCode = GetNamedPropertyInt32(env, keyHandle, "keyCode");
     bool isIntercepted = GetNamedPropertyBool(env, keyHandle, "isIntercepted");
     int32_t keyDownDuration = GetNamedPropertyInt32(env, keyHandle, "keyDownDuration");
+    isIntercepted = false;
 
     OHOS::KeyEvent injectEvent;
-    injectEvent.Initialize(0, isPressed, keyCode, keyDownDuration, 0, "", 0, 0, "", 0, false, 0, isIntercepted);
+    injectEvent.Initialize(0, isPressed, keyCode, keyDownDuration, 0, "", 0, 0, "", 0, false, 0, 0, isIntercepted);
     int32_t response = MMIEventHdl.InjectEvent(injectEvent);
-
     if (napi_create_int32(env, response, &result) != napi_ok) {
         MMI_LOGE("call napi_create_int32 fail");
         return result;
@@ -234,13 +233,13 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
 // only support common/telephone/media/system event
 static napi_value UnitTest(napi_env env, napi_callback_info info)
 {
-    size_t argc;
-    napi_value argv[ARGC_UT_NUM] = { 0 };
     napi_value result = nullptr;
     if (napi_create_int32(env, ERROR_CODE, &result) != napi_ok) {
         MMI_LOGE("call napi_create_int32 fail");
         return result;
     }
+    size_t argc;
+    napi_value argv[ARGC_UT_NUM] = { 0 };
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
     NAPI_ASSERT(env, argc == ARGC_UT_NUM, "paramater num error");
 
@@ -279,13 +278,13 @@ static napi_value UnitTest(napi_env env, napi_callback_info info)
 
 static napi_value SetInjectFile(napi_env env, napi_callback_info info)
 {
-    size_t argc;
-    napi_value argv[ARGC_UT_NUM] = { 0 };
     napi_value result = nullptr;
     if (napi_create_int32(env, ERROR_CODE, &result) != napi_ok) {
         MMI_LOGE("call napi_create_int32 fail");
         return result;
     }
+    size_t argc;
+    napi_value argv[ARGC_UT_NUM] = { 0 };
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
 
     napi_valuetype eventWinIdType = napi_undefined;
@@ -340,6 +339,6 @@ extern "C" __attribute__((constructor)) void RegisterModule(void)
 {
     napi_module_register(&mmiModule);
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
 

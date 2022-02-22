@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,7 +17,8 @@
 
 #include "singleton.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 class MessageSendRecvStatMgr : public OHOS::Singleton<OHOS::MMI::MessageSendRecvStatMgr> {
 public:
     MessageSendRecvStatMgr() = default;
@@ -30,6 +31,7 @@ protected:
     size_t sendMessageCount_ = 0;
     size_t recvMessageCount_ = 0;
 };
-}
+} // namespace MMI
+} // namespace OHOS
 
 #endif // MESSAGE_SEND_RECV_STAT_MGR_H

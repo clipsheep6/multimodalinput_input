@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -58,11 +58,11 @@ void InjectionEventDispatch::InitManageFunction()
 
 int32_t InjectionEventDispatch::OnJson()
 {
-    MMI_LOGI("Enter onJson function.");
+    MMI_LOGD("Enter");
     const string path = injectArgvs_.at(JSON_FILE_PATH_INDEX);
     std::ifstream reader(path);
     if (!reader) {
-        MMI_LOGE("json file is empty!");
+        MMI_LOGE("json file is empty");
         return RET_ERR;
     }
     Json inputEventArrays;
@@ -70,14 +70,14 @@ int32_t InjectionEventDispatch::OnJson()
     reader.close();
 
     int32_t ret = manageInjectDevice_.TransformJsonData(inputEventArrays);
-    MMI_LOGI("Leave onJson function.");
+    MMI_LOGI("Leave");
     return ret;
 }
 
 bool InjectionEventDispatch::GetStartSocketPermission(string id)
 {
-    auto it = mapNeedStartSocket_.find(id);
-    if (it == mapNeedStartSocket_.end()) {
+    auto it = needStartSocket_.find(id);
+    if (it == needStartSocket_.end()) {
         return false;
     }
 
@@ -91,20 +91,20 @@ string InjectionEventDispatch::GetFunId()
 
 void InjectionEventDispatch::HandleInjectCommandItems()
 {
-    MMI_LOGI("InjectionEventDispatch::HandleInjectCommandItems.");
+    MMI_LOGD("Enter");
 
     string id = GetFunId();
     auto fun = GetFun(id);
     if (!fun) {
-        MMI_LOGE("event injection Unknown fuction id[%{public}s]", id.c_str());
+        MMI_LOGE("event injection Unknown fuction id:%{public}s", id.c_str());
         return;
     }
 
     auto ret = (*fun)();
     if (ret == RET_OK) {
-        MMI_LOGI("injecte function success id=[%{public}s]", id.c_str());
+        MMI_LOGI("injecte function success id:%{public}s", id.c_str());
     } else {
-        MMI_LOGE("injecte function faild id=[%{public}s]", id.c_str());
+        MMI_LOGE("injecte function faild id:%{public}s", id.c_str());
     }
 
     return;
@@ -112,14 +112,14 @@ void InjectionEventDispatch::HandleInjectCommandItems()
 
 bool InjectionEventDispatch::VirifyArgvs(const int32_t &argc, const vector<string> &argv)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     if (argc < ARGV_VALID || argv.at(ARGVS_TARGET_INDEX).empty()) {
-        MMI_LOGE("Invaild Input Para, Plase Check the validity of the para! errCode:%{public}d", PARAM_INPUT_FAIL);
+        MMI_LOGE("Invaild Input Para, Plase Check the validity of the para. errCode:%{public}d", PARAM_INPUT_FAIL);
         return false;
     }
 
     bool result = false;
-    for (const auto &item : mapFuns_) {
+    for (const auto &item : injectFuns_) {
         string temp(argv.at(ARGVS_TARGET_INDEX));
         if (temp == item.first) {
             funId_ = temp;
@@ -140,7 +140,7 @@ bool InjectionEventDispatch::VirifyArgvs(const int32_t &argc, const vector<strin
 
 bool InjectionEventDispatch::StartSocket()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     return TestAuxToolClient::GetInstance().Start(false);
 }
 
@@ -156,27 +156,27 @@ bool InjectionEventDispatch::SendMsg(NetPacket ckt)
 
 void InjectionEventDispatch::Run()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     string id = GetFunId();
     auto fun = GetFun(id);
     if (!fun) {
-        MMI_LOGE("event injection Unknown fuction id[%{public}s]", id.c_str());
+        MMI_LOGE("event injection Unknown fuction id:%{public}s", id.c_str());
         return;
     }
     bool needStartSocket = GetStartSocketPermission(id);
     int32_t ret = RET_ERR;
     if (needStartSocket) {
         if (!StartSocket()) {
-            MMI_LOGE("inject tools start socket error.");
+            MMI_LOGE("inject tools start socket error");
             return;
         }
         HandleInjectCommandItems();
     } else {
         ret = (*fun)();
         if (ret == RET_OK) {
-            MMI_LOGI("injecte function success id=[%{public}s]", id.c_str());
+            MMI_LOGI("injecte function success id:%{public}s", id.c_str());
         } else {
-            MMI_LOGE("injecte function faild id=[%{public}s]", id.c_str());
+            MMI_LOGE("injecte function faild id:%{public}s", id.c_str());
         }
     }
 }
@@ -188,16 +188,16 @@ int32_t InjectionEventDispatch::ExecuteFunction(string funId)
     }
     auto fun = GetFun(funId);
     if (!fun) {
-        MMI_LOGE("event injection Unknown fuction id[%{public}s]", funId.c_str());
+        MMI_LOGE("event injection Unknown fuction id:%{public}s", funId.c_str());
         return false;
     }
     int32_t ret = RET_ERR;
-    MMI_LOGI("Inject tools into function: [%{public}s]", funId.c_str());
+    MMI_LOGI("Inject tools into function:%{public}s", funId.c_str());
     ret = (*fun)();
     if (ret == RET_OK) {
-        MMI_LOGI("injecte function success id=[%{public}s]", funId.c_str());
+        MMI_LOGI("injecte function success id:%{public}s", funId.c_str());
     } else {
-        MMI_LOGE("injecte function faild id=[%{public}s]", funId.c_str());
+        MMI_LOGE("injecte function faild id:%{public}s", funId.c_str());
     }
 
     return ret;
@@ -205,11 +205,11 @@ int32_t InjectionEventDispatch::ExecuteFunction(string funId)
 
 int32_t InjectionEventDispatch::OnAisensor()
 {
-    MMI_LOGI("into function: OnAisensor()");
+    MMI_LOGD("Enter");
     int32_t exRet = RET_ERR;
 
     if (argvNum_ < AI_SENDOR_MIN_ARGV_NUMS) {
-        MMI_LOGE("Wrong number of input parameters! errCode:%{public}d", PARAM_INPUT_FAIL);
+        MMI_LOGE("Wrong number of input parameters. errCode:%{public}d", PARAM_INPUT_FAIL);
         return RET_ERR;
     }
     string flag = injectArgvs_[AI_SENSOR_TARGET_INDEX];
@@ -237,12 +237,11 @@ int32_t InjectionEventDispatch::OnAisensorOne(MmiMessageId code, uint32_t value)
     rawEvent.stamp = static_cast<uint32_t>(time.tv_usec);
     NetPacket cktAi(MmiMessageId::SENIOR_INPUT_FUNC);
     cktAi << msgType << rawEvent;
-    if (SendMsg(cktAi)) {
-        return RET_OK;
-    } else {
-        MMI_LOGE("Send AI Msg fail! errCode:%{public}d", MSG_SEND_FAIL);
+    if (!SendMsg(cktAi)) {
+        MMI_LOGE("Send AI Msg fail. errCode:%{public}d", MSG_SEND_FAIL);
         return RET_ERR;
     }
+    return RET_OK;
 }
 
 int32_t InjectionEventDispatch::OnKnuckleOne(MmiMessageId code, uint32_t value)
@@ -257,18 +256,17 @@ int32_t InjectionEventDispatch::OnKnuckleOne(MmiMessageId code, uint32_t value)
     rawEvent.stamp = static_cast<uint32_t>(time.tv_usec);
     NetPacket cktKnuckle(MmiMessageId::SENIOR_INPUT_FUNC);
     cktKnuckle << msgType << rawEvent;
-    if (SendMsg(cktKnuckle)) {
-        return RET_OK;
-    } else {
-        MMI_LOGE("Send Knuckle Msg fail! errCode:%{public}d", MSG_SEND_FAIL);
+    if (!SendMsg(cktKnuckle)) {
+        MMI_LOGE("Send Knuckle Msg fail. errCode:%{public}d", MSG_SEND_FAIL);
         return RET_ERR;
     }
+    return RET_OK;
 }
 
 int32_t InjectionEventDispatch::OnAisensorEach()
 {
     if (argvNum_ != AI_EACH_ARGV_INVALID) {
-        MMI_LOGE("Wrong number of input parameters! errCode:%{public}d", PARAM_INPUT_FAIL);
+        MMI_LOGE("Wrong number of input parameters. errCode:%{public}d", PARAM_INPUT_FAIL);
         return RET_ERR;
     }
 
@@ -277,7 +275,7 @@ int32_t InjectionEventDispatch::OnAisensorEach()
         return isdigit(c);
         });
     if (!ret) {
-        MMI_LOGE("Invaild Input Para, Plase Check the validity of the para! errCode:%{public}d", PARAM_INPUT_FAIL);
+        MMI_LOGE("Invaild Input Para, Plase Check the validity of the para. errCode:%{public}d", PARAM_INPUT_FAIL);
         return RET_ERR;
     }
 
@@ -288,7 +286,7 @@ int32_t InjectionEventDispatch::OnAisensorEach()
     NetPacket cktAiInit(MmiMessageId::SENIOR_INPUT_FUNC);
     cktAiInit << msgType << devIndex << devType;
     if (!SendMsg(cktAiInit)) {
-        MMI_LOGE("Send AI Msg fail! errCode:%{public}d", MSG_SEND_FAIL);
+        MMI_LOGE("Send AI Msg fail. errCode:%{public}d", MSG_SEND_FAIL);
     }
 
     timeval time;
@@ -301,9 +299,7 @@ int32_t InjectionEventDispatch::OnAisensorEach()
     rawEvent.stamp = static_cast<uint32_t>(time.tv_usec);
     NetPacket cktAi(MmiMessageId::SENIOR_INPUT_FUNC);
     cktAi << msgType << rawEvent;
-    if (SendMsg(cktAi)) {
-        return RET_OK;
-    } else {
+    if (!SendMsg(cktAi)) {
         MMI_LOGE("Send AI Msg fail! errCode:%{public}d", MSG_SEND_FAIL);
         return RET_ERR;
     }
@@ -313,7 +309,7 @@ int32_t InjectionEventDispatch::OnAisensorEach()
 int32_t InjectionEventDispatch::OnKnuckleEach()
 {
     if (argvNum_ != AI_EACH_ARGV_INVALID) {
-        MMI_LOGE("Wrong number of input parameters! errCode:%{public}d", PARAM_INPUT_FAIL);
+        MMI_LOGE("Wrong number of input parameters. errCode:%{public}d", PARAM_INPUT_FAIL);
         return RET_ERR;
     }
 
@@ -322,7 +318,7 @@ int32_t InjectionEventDispatch::OnKnuckleEach()
         return isdigit(c);
         });
     if (!ret) {
-        MMI_LOGE("Invaild Input Para, Plase Check the validity of the para! errCode:%{public}d", PARAM_INPUT_FAIL);
+        MMI_LOGE("Invaild Input Para, Plase Check the validity of the para. errCode:%{public}d", PARAM_INPUT_FAIL);
         return RET_ERR;
     }
 
@@ -344,9 +340,7 @@ int32_t InjectionEventDispatch::OnKnuckleEach()
     rawEvent.stamp = static_cast<uint32_t>(time.tv_usec);
     NetPacket cktKnuckle(MmiMessageId::SENIOR_INPUT_FUNC);
     cktKnuckle << msgType << rawEvent;
-    if (SendMsg(cktKnuckle)) {
-        return RET_OK;
-    } else {
+    if (!SendMsg(cktKnuckle)) {
         MMI_LOGE("Send AI Msg fail! errCode:%{public}d", MSG_SEND_FAIL);
         return RET_ERR;
     }
@@ -364,7 +358,7 @@ int32_t InjectionEventDispatch::OnHelp()
 
 int32_t InjectionEventDispatch::OnAisensorAll()
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     uint16_t cycleNum = 0;
     if (argvNum_ == AI_SENSOR_DEFAULT_NUMS) {
         cycleNum = AI_SENSOR_DEFAULT_CYCLE_NUMS;
@@ -397,7 +391,7 @@ int32_t InjectionEventDispatch::OnKnuckleAll()
 
 int32_t InjectionEventDispatch::OnHdi()
 {
-    MMI_LOGI("into Onhdi function.");
+    MMI_LOGD("Enter");
     if ((injectArgvs_.size() < HDI_MIN_ARGV_NUMS) || (injectArgvs_.size() > HDI_MAX_ARGV_NUMS)) {
         MMI_LOGE("Wrong number of input parameters! errCode:%{public}d", PARAM_INPUT_FAIL);
         return RET_ERR;
@@ -410,7 +404,7 @@ int32_t InjectionEventDispatch::OnHdi()
 
 int32_t InjectionEventDispatch::OnHdiStatus()
 {
-    MMI_LOGI("into function: OnHdiStatus()");
+    MMI_LOGD("Enter");
     if (injectArgvs_.size() != HDI_STATUS_COUNTS) {
         MMI_LOGE("Wrong number of input parameters! errCode:%{public}d", PARAM_INPUT_FAIL);
         return RET_ERR;
@@ -454,10 +448,10 @@ int32_t InjectionEventDispatch::OnHdiHot()
     NetPacket cktHdi(MmiMessageId::HDI_INJECT);
     cktHdi << sendType << devIndex << devSatatus;
     if (!(SendMsg(cktHdi))) {
-        MMI_LOGE("hdi hot plug to server error.");
+        MMI_LOGE("hdi hot plug to server error");
         return RET_OK;
     }
-    MMI_LOGI("On hdi hot SendMsg......");
+    MMI_LOGI("On hdi hot SendMsg");
     return RET_OK;
 }
 
@@ -499,7 +493,7 @@ int32_t InjectionEventDispatch::OnSendEvent()
 
     string deviceNode = injectArgvs_[SEND_EVENT_DEV_NODE_INDEX];
     if (deviceNode.empty()) {
-        MMI_LOGE("device node:%s is not exit.", deviceNode.c_str());
+        MMI_LOGE("device node:%s is not exit", deviceNode.c_str());
         return RET_ERR;
     }
     timeval tm;
@@ -513,11 +507,11 @@ int32_t InjectionEventDispatch::OnSendEvent()
 
     int32_t fd = open(deviceNode.c_str(), O_RDWR);
     if (fd < 0) {
-        MMI_LOGE("open device node:%s faild.", deviceNode.c_str());
+        MMI_LOGE("open device node:%s faild", deviceNode.c_str());
         return RET_ERR;
     }
     write(fd, &event, sizeof(event));
-    if (fd > 0) {
+    if (fd >= 0) {
         close(fd);
     }
     return RET_OK;
@@ -568,7 +562,7 @@ int32_t InjectionEventDispatch::GetDevIndexByType(int32_t devType)
 
 void OHOS::MMI::InjectionEventDispatch::ProcessAiSensorInfoByCycleNum(uint16_t cycleNum)
 {
-    MMI_LOGT("enter");
+    MMI_LOGD("enter");
     static const vector<MmiMessageId> aiSensorAllowProcCodes {
         MmiMessageId::ON_SHOW_MENU,
         MmiMessageId::ON_SEND,

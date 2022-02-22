@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,10 +16,12 @@
 #include "mmi_service.h"
 #include "mmi_interface.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "HosMmiServiceDemo" };
+        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MmiServiceDemo" };
     }
+}
 }
 
 int32_t main(int32_t argc, const char *argv[])
@@ -28,9 +30,9 @@ int32_t main(int32_t argc, const char *argv[])
 #ifdef OHOS_BUILD_MMI_DEBUG
     VerifyLogManagerRun();
 #endif
-    const int sleepTime = 10 * 60;
     auto service = OHOS::DelayedSingleton<MMIService>::GetInstance();
     service->OnStart();
+    constexpr int32_t sleepTime = 10 * 60;
     while (1) {
         std::this_thread::sleep_for(std::chrono::seconds(sleepTime));
         
@@ -38,6 +40,6 @@ int32_t main(int32_t argc, const char *argv[])
     service->OnStop();
     service->OnDump();
 
-    MMI_LOGD("hosmmi-service stopping... argc:%{public}d, argv:%{public}s", argc, argv[0]);
+    MMI_LOGD("hosmmi-service stopping. argc:%{public}d, argv:%{public}s", argc, argv[0]);
     return RET_OK;
 }

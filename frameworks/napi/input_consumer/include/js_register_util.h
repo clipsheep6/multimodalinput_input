@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,7 +31,7 @@ int32_t AddEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
 int32_t DelEventCallback(const napi_env &env, OHOS::MMI::Callbacks &callbacks,
     OHOS::MMI::KeyEventMonitorInfo *event, int32_t &subscribeId);
 void EmitAsyncCallbackWork(OHOS::MMI::KeyEventMonitorInfo *event);
-}
-}
+} // namespace MMI
+} // namespace OHOS
 
 #endif // JS_REGISTER_UTIL_H

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,10 +19,9 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterUtil" };
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterUtil" };
+    constexpr size_t MAX_STRING_LEN = 1024;
 }
-
-const uint32_t MAX_STRING_LEN = 1024;
 
 void SetNamedProperty(const napi_env& env, napi_value object, const std::string& name, bool value)
 {
@@ -129,8 +128,8 @@ bool GetNamedPropertyBool(const napi_env& env, const napi_value& object, const s
 {
     bool value = false;
     napi_value napiValue = {};
-    napi_valuetype tmpType = napi_undefined;
     napi_get_named_property(env, object, name.c_str(), &napiValue);
+    napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
         MMI_LOGE("call napi_typeof fail");
         return false;
@@ -148,8 +147,8 @@ std::string GetNamedPropertyString(const napi_env& env, const napi_value& object
 {
     std::string value = "";
     napi_value napiValue = {};
-    napi_valuetype tmpType = napi_undefined;
     napi_get_named_property(env, object, name.c_str(), &napiValue);
+    napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
         MMI_LOGE("call napi_typeof fail");
         return value;
@@ -170,8 +169,8 @@ int32_t GetNamedPropertyInt32(const napi_env& env, const napi_value& object, con
 {
     int32_t value = 0;
     napi_value napiValue = {};
-    napi_valuetype tmpType = napi_undefined;
     napi_get_named_property(env, object, name.c_str(), &napiValue);
+    napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
         MMI_LOGE("call napi_typeof fail");
         return value;
@@ -188,8 +187,8 @@ int64_t GetNamedPropertyInt64(const napi_env& env, const napi_value& object, con
 {
     int64_t value = 0;
     napi_value napiValue = {};
-    napi_valuetype tmpType = napi_undefined;
     napi_get_named_property(env, object, name.c_str(), &napiValue);
+    napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
         MMI_LOGE("call napi_typeof fail");
         return value;
@@ -206,8 +205,8 @@ uint32_t GetNamedPropertyUint32(const napi_env& env, const napi_value& object, c
 {
     uint32_t value = 0;
     napi_value napiValue = {};
-    napi_valuetype tmpType = napi_undefined;
     napi_get_named_property(env, object, name.c_str(), &napiValue);
+    napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
         MMI_LOGE("call napi_typeof fail");
         return value;
@@ -219,6 +218,6 @@ uint32_t GetNamedPropertyUint32(const napi_env& env, const napi_value& object, c
     napi_get_value_uint32(env, napiValue, &value);
     return value;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,11 +14,12 @@
  */
 
 #include "touchpad_transform_point_processor.h"
-#include "log.h"
+#include "mmi_log.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN,
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN,
             "TouchPadTransformPointProcessor"};
     }
 
@@ -36,15 +37,15 @@ void TouchPadTransformPointProcessor::SetPointEventSource(int32_t sourceType)
 
 void TouchPadTransformPointProcessor::OnEventTouchPadDown(libinput_event *event)
 {
-    CHKP(event);
-    MMI_LOGT("Enter OnEventTouchPadDown");
+    MMI_LOGD("Enter");
+    CHKPV(event);
     auto data = libinput_event_get_touchpad_event(event);
-    CHKP(data);
+    CHKPV(data);
     auto seatSlot = libinput_event_touchpad_get_seat_slot(data);
     auto logicalX = libinput_event_touchpad_get_x(data);
     auto logicalY = libinput_event_touchpad_get_y(data);
 
-    auto time = libinput_event_touchpad_get_time(data);
+    int64_t time = static_cast<int64_t>(GetSysClockTime());
     auto pointIds = pointerEvent_->GetPointersIdList();
     if (pointIds.empty()) {
         pointerEvent_->SetActionStartTime(time);
@@ -61,20 +62,20 @@ void TouchPadTransformPointProcessor::OnEventTouchPadDown(libinput_event *event)
     pointerEvent_->SetDeviceId(deviceId_);
     pointerEvent_->AddPointerItem(pointer);
     pointerEvent_->SetPointerId(seatSlot);
-    MMI_LOGT("End OnEventTouchPadDown");
+    MMI_LOGD("End");
 }
 
 void TouchPadTransformPointProcessor::OnEventTouchPadMotion(libinput_event *event)
 {
     MMI_LOGD("Enter");
-    CHKP(event);
+    CHKPV(event);
     auto data = libinput_event_get_touchpad_event(event);
-    CHKP(data);
+    CHKPV(data);
     auto seatSlot = libinput_event_touchpad_get_seat_slot(data);
     auto logicalX = libinput_event_touchpad_get_x(data);
     auto logicalY = libinput_event_touchpad_get_y(data);
 
-    auto time = libinput_event_touchpad_get_time(data);
+    int64_t time = static_cast<int64_t>(GetSysClockTime());
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     PointerEvent::PointerItem pointer;
@@ -89,14 +90,14 @@ void TouchPadTransformPointProcessor::OnEventTouchPadMotion(libinput_event *even
 void TouchPadTransformPointProcessor::OnEventTouchPadUp(libinput_event *event)
 {
     MMI_LOGD("Enter");
-    CHKP(event);
+    CHKPV(event);
     auto data = libinput_event_get_touchpad_event(event);
-    CHKP(data);
+    CHKPV(data);
     auto seatSlot = libinput_event_touchpad_get_seat_slot(data);
     auto logicalX = libinput_event_touchpad_get_x(data);
     auto logicalY = libinput_event_touchpad_get_y(data);
 
-    auto time = libinput_event_touchpad_get_time(data);
+    int64_t time = static_cast<int64_t>(GetSysClockTime());
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
 
@@ -113,8 +114,8 @@ void TouchPadTransformPointProcessor::OnEventTouchPadUp(libinput_event *event)
 std::shared_ptr<PointerEvent> TouchPadTransformPointProcessor::OnLibinputTouchPadEvent(
     libinput_event *event)
 {
-    CHKPRP(event, nullptr);
-    MMI_LOGT("call onLibinputTouchPadEvent begin");
+    MMI_LOGD("begin");
+    CHKPP(event, nullptr);
     auto type = libinput_event_get_type(event);
     pointerEvent_->UpdateId();
     switch (type) {
@@ -134,7 +135,8 @@ std::shared_ptr<PointerEvent> TouchPadTransformPointProcessor::OnLibinputTouchPa
             return nullptr;
         }
     }
-    MMI_LOGT("call onLibinputTouchPadEvent end");
+    MMI_LOGD("end");
     return pointerEvent_;
 }
-}
+} // namespace MMI
+} // namespace OHOS

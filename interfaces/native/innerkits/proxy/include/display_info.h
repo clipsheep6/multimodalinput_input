@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -45,17 +45,17 @@ struct WindowInfo {
     // The uid of the process where the window is located
     int32_t uid;
 
-    // The x coordinate of the upper left corner of the window in the logical display
-    int32_t topLeftX;
+    // The x coordinate of the upper left corner of the hot zone window in the logical display
+    int32_t hotZoneTopLeftX;
 
-    // The y coordinate of the upper left corner of the window in the logical display
-    int32_t topLeftY;
+    // The y coordinate of the upper left corner of the hot zone window in the logical display
+    int32_t hotZoneTopLeftY;
 
-    // Logical width of the window
-    int32_t width;
+    // Logical width of the hot zone window
+    int32_t hotZoneWidth;
 
-    // Logical height of the window
-    int32_t height;
+    // Logical height of the hot zone window
+    int32_t hotZoneHeight;
 
     // The logical display id to which the window belongs
     int32_t displayId;
@@ -140,7 +140,7 @@ struct LogicalDisplayInfo {
     // List of window information arranged in Z order, with the top window at the top
     std::vector<WindowInfo> windowsInfo_;
 };
-}
-} // namespace OHOS::MMI
+} // namespace MMI
+} // namespace OHOS
 
 #endif // DISPLAY_INFO_H

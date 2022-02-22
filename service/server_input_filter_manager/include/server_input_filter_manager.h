@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,16 +14,19 @@
  */
 #ifndef SERVER_INPUT_FILTER_MANAGER_H
 #define SERVER_INPUT_FILTER_MANAGER_H
+
 #include <vector>
 #include <string>
-#include "proto.h"
-#include "uds_server.h"
-#include "singleton.h"
-#include "register_event.h"
 #include "event_package.h"
-#include "log.h"
 #include "key_event.h"
-namespace OHOS::MMI {
+#include "mmi_log.h"
+#include "proto.h"
+#include "register_event.h"
+#include "singleton.h"
+#include "uds_server.h"
+
+namespace OHOS {
+namespace MMI {
 class ServerInputFilterManager : public DelayedSingleton<ServerInputFilterManager> {
 public:
     class KeyEventFilter {
@@ -64,7 +67,7 @@ public:
         std::string name_;
         Authority authority_;
     };
-    bool OnTouchEvent(libinput_event *event, EventTouch& touch, const uint64_t preHandlerTime);
+    bool OnTouchEvent(libinput_event *event, const EventTouch& touch, const uint64_t preHandlerTime);
     int32_t AddTouchEventFilter(SessionPtr sess, std::string name, int32_t id, Authority authority);
     int32_t RemoveTouchEventFilter(SessionPtr sess, int32_t id);
     int32_t RemoveTouchEventFilter(SessionPtr sess);
@@ -93,8 +96,8 @@ public:
     void DeleteInterceptorFormSess(const SessionPtr& sess);
 
 protected:
-    void OnEventTouchGetPointEventType(const EventTouch& touch, POINT_EVENT_TYPE& pointEventType,
-        const int32_t fingerCount);
+    void OnEventTouchGetPointEventType(const EventTouch& touch, const int32_t fingerCount,
+        POINT_EVENT_TYPE& pointEventType);
 
 protected:
     EventPackage eventPackage_;
@@ -105,6 +108,7 @@ private:
     std::map<SessionPtr, PointerEventFilter> pointerEventFilterMap_;
 };
 #define ServerKeyFilter OHOS::MMI::ServerInputFilterManager::GetInstance()
-}
+} // namespace MMI
+} // namespace OHOS
 
 #endif // SERVER_INPUT_FILTER_MANAGER_H

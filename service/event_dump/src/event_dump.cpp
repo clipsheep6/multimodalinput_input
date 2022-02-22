@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,7 +28,7 @@
 namespace OHOS {
 namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDump" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDump" };
     }
 
 void ChkConfig(int32_t fd)
@@ -57,7 +57,6 @@ void ChkConfig(int32_t fd)
 #endif // OHOS_BUILD_MMI_DEBUG
 
     mprintf(fd, "\tDEF_MMI_DATA_ROOT: %s\n", DEF_MMI_DATA_ROOT);
-    mprintf(fd, "\tLOG_CONFIG: %s\n", DEF_LOG_CONFIG);
     mprintf(fd, "\tEXP_CONFIG: %s\n", DEF_EXP_CONFIG);
     mprintf(fd, "\tEXP_SOPATH: %s\n", DEF_EXP_SOPATH);
     mprintf(fd, "\tXKB_CONFIG_PATH: %s\n", DEF_XKB_CONFIG);
@@ -80,9 +79,9 @@ void ChkAppInfos(int32_t fd)
     AppRegs->Dump(fd);
 }
 
-void EventDump::Init(UDSServer& udss)
+void EventDump::Init(UDSServer& uds)
 {
-    udsServer_ = &udss;
+    udsServer_ = &uds;
 }
 
 void EventDump::Dump(int32_t fd)
@@ -92,9 +91,11 @@ void EventDump::Dump(int32_t fd)
     auto strCurTime = Strftime();
     mprintf(fd, "MMIDumpsBegin: %s", strCurTime.c_str());
     ChkConfig(fd);
+#ifdef OHOS_WESTEN_MODEL
     ChkAppInfos(fd);
     WinMgr->Dump(fd);
     RegEventHM->Dump(fd);
+#endif
     if (udsServer_) {
         udsServer_->Dump(fd);
     }
@@ -116,7 +117,7 @@ void EventDump::TestDump()
         SPRINTF_S_SEC_FUN_FAIL);
     char path[PATH_MAX] = {};
     if (realpath(szPath, path) == nullptr) {
-        MMI_LOGE("path is error, szPath = %{public}s", szPath);
+        MMI_LOGE("path is error, szPath:%{public}s", szPath);
         return;
     }
     auto fd = open(path, O_WRONLY | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
@@ -130,8 +131,8 @@ void EventDump::InsertDumpInfo(const std::string& str)
     CHK(!str.empty(), PARAM_INPUT_INVALID);
     std::lock_guard<std::mutex> lock(mu_);
 
-    const int32_t VECMAXSIZE = 300;
-    while (dumpInfo_.size() > VECMAXSIZE) {
+    constexpr int32_t VECMAXSIZE = 300;
+    if (dumpInfo_.size() > VECMAXSIZE) {
         dumpInfo_.erase(dumpInfo_.begin());
     }
     dumpInfo_.push_back(str);
@@ -151,5 +152,5 @@ void EventDump::InsertFormat(std::string str, ...)
     va_end(args);
     InsertDumpInfo(buf);
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

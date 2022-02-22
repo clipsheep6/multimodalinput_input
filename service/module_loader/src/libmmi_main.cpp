@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,7 @@
  */
 
 #include <sys/ioctl.h>
-#include <inttypes.h>
+#include <cinttypes>
 #include "event_dump.h"
 #include "input_device_manager.h"
 #include "mmi_interface.h"
@@ -27,15 +27,16 @@
 #include "uds_command_queue.h"
 #endif // OHOS_BUILD_MMI_DEBUG
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
     namespace {
 #ifdef OHOS_WESTEN_MODEL
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "libmmi_main" };
+        constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "libmmi_main" };
         static bool g_bThreadTerm = false;
 #endif
     }
-}
-
+} // namespace MMI
+} // namespace OHOS
 
 static std::atomic_bool g_isRun(false);
 
@@ -64,7 +65,7 @@ namespace {
 void OnThreadTermination(int32_t outTime, uint64_t tid, const std::string& remark)
 {
     using namespace OHOS::MMI;
-    MMI_LOGE("OnThreadTermination tid:%{public}" PRId64 " %{public}s %{public}d/%{public}d",
+    MMI_LOGE("OnThreadTermination tid:%{public}" PRId64 ",%{public}s,%{public}d/%{public}d",
         tid, remark.c_str(), outTime, MAX_THREAD_DEATH_TIME);
     MMIEventDump->InsertFormat("OnThreadTermination tid=%llu, remark=%s %d/%d",
         tid, remark.c_str(), outTime, MAX_THREAD_DEATH_TIME);
@@ -121,12 +122,12 @@ void OnThread()
 }
 #endif
 
-void Dump(int fd)
+void Dump(int32_t fd)
 {
     MMIEventDump->Dump(fd);
 }
 
-int GetMultimodeInputinformation(void)
+int32_t GetMultimodeInputinformation(void)
 {
     if (!g_isRun) {
         return OHOS::MMI_SERVICE_INVALID;
@@ -145,8 +146,7 @@ void StartMmiServer(void)
     using namespace OHOS::MMI;
     uint64_t tid = OHOS::MMI::GetThisThreadIdOfLL();
     g_llStartTime = OHOS::MMI::GetMillisTime();
-    MMI_LOGI("The server starts to start tid:%" PRId64 ". The current timestamp is %" PRId64
-            " Ms", tid, g_llStartTime);
+    MMI_LOGI("start tid:%" PRId64 ",current timestamp:%" PRId64" Ms", tid, g_llStartTime);
 #endif
     g_isRun = true;
     static std::thread t(&OnThread);
@@ -154,10 +154,10 @@ void StartMmiServer(void)
 }
 #endif
 // weston启动入口函数
-WL_EXPORT int wet_module_init(weston_compositor *ec, int *argc, char *argv[])
+WL_EXPORT int32_t wet_module_init(weston_compositor *ec, int32_t *argc, char *argv[])
 {
 #ifdef OHOS_WESTEN_MODEL
-    int socketPair[2];
+    int32_t socketPair[2];
     socketpair(AF_UNIX, SOCK_STREAM, 0, socketPair);
     MMIMsgPost.SetWestonCompositor(ec);
 
