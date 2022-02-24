@@ -133,7 +133,7 @@ static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
     int32_t infoFinalKey = keyOption->GetFinalKey();
     int32_t keyEventFinalKey = keyEvent->GetKeyCode();
     MMI_LOGD("infoFinalKey:%{public}d,keyEventFinalKey:%{public}d", infoFinalKey, keyEventFinalKey);
-    if (infoFinalKey != keyEventFinalKey || items.size() > 4) {
+    if (infoFinalKey != keyEventFinalKey || items.size() > PRE_KEY_MAX_COUNT) {
         MMI_LOGD("%{public}d", __LINE__);
         return false;
     }
@@ -221,7 +221,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         .env = env,
         .asyncWork = nullptr,
     };
-    auto keyOption = std::shared_ptr<KeyOption>(new KeyOption());
+    auto keyOption = std::make_shared<KeyOption>();
     if (GetEventInfo(env, info, event, keyOption) < 0 || !CheckPara(keyOption)) {
         delete event;
         event = nullptr;
