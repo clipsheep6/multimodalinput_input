@@ -12,12 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "js_register_module.h"
 
 #include <algorithm>
 #include <cinttypes>
+
 #include "input_manager.h"
 #include "js_register_util.h"
-#include "js_register_module.h"
 #include "key_event_pre.h"
 
 namespace OHOS {
@@ -92,7 +93,7 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
     keyOption->SetPreKeys(preKeys);
 
     std::string subKeyNames = "";
-    for (const auto &item : sortPrekeys){
+    for (const auto &item : sortPrekeys) {
         subKeyNames += std::to_string(item);
         subKeyNames += ",";
         MMI_LOGD("preKeys:%{public}d", item);
@@ -204,7 +205,7 @@ bool CheckPara(const std::shared_ptr<KeyOption> keyOption)
             MMI_LOGE("preKey:%{public}d is less 0, can not process", item);
             return false;
         }
-        if (std::find(checkRepeat.begin(), checkRepeat.end(), item) != checkRepeat.end()){
+        if (std::find(checkRepeat.begin(), checkRepeat.end(), item) != checkRepeat.end()) {
             MMI_LOGE("preKey is repeat, can not process");
             return false;
         }
