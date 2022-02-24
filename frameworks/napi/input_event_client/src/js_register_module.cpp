@@ -13,8 +13,10 @@
  * limitations under the License.
  */
 
-#include "js_register_module.h"
 #include <cinttypes>
+
+#include "js_register_module.h"
+
 #ifdef OHOS_WESTEN_MODEL
     #include "js_register_event.h"
     #include "js_register_handle.h"

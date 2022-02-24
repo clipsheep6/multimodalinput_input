@@ -23,13 +23,17 @@
  */
 #ifndef MULTI_INPUT_COMMON_H
 #define MULTI_INPUT_COMMON_H
-#include <string>
-#include <iostream>
-#include <fstream>
-#include <unistd.h>
-#include <sys/stat.h>
+
 #include <cstdio>
+#include <fstream>
+#include <iostream>
+#include <string>
+
+#include <sys/stat.h>
+#include <unistd.h>
+
 #include "libmmi_util.h"
+
 namespace OHOS {
 namespace MMI {
 class MultiInputCommon {

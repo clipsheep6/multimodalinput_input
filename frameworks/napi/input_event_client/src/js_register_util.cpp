@@ -12,9 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "js_register_util.h"
-#include "js_register_module.h"
+
 #include <cinttypes>
+
+#include "js_register_module.h"
+#include "js_register_util.h"
 
 namespace OHOS {
 namespace MMI {

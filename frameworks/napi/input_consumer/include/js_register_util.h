@@ -12,11 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef JS_REGISTER_UTIL_H
 #define JS_REGISTER_UTIL_H
+#include <array>
+
 #include "js_register_module.h"
 #include "key_event.h"
-#include <array>
+
 namespace OHOS {
 namespace MMI {
 void SetNamedProperty(const napi_env &env, napi_value &object, const std::string &name, int32_t value);

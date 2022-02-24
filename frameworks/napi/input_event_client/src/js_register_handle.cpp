@@ -12,10 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "js_register_handle.h"
-#include "js_register_event.h"
-#include "mmi_token.h"
+
 #include <cinttypes>
+
+#include "js_register_event.h"
+#include "js_register_handle.h"
+#include "mmi_token.h"
 
 namespace OHOS {
 namespace MMI {
