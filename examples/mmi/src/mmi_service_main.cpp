@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-#include "mmi_service.h"
 #include "mmi_interface.h"
+#include "mmi_service.h"
 
 namespace OHOS {
 namespace MMI {
     namespace {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MmiServiceDemo" };
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MmiServiceDemo" }; // namespace
     }
 }
 }
@@ -40,6 +40,6 @@ int32_t main(int32_t argc, const char *argv[])
     service->OnStop();
     service->OnDump();
 
-    MMI_LOGD("hosmmi-service stopping. argc:%{public}d, argv:%{public}s", argc, argv[0]);
+    MMI_LOGD("mmi-service stopping. argc:%{public}d, argv:%{public}s", argc, argv[0]);
     return RET_OK;
 }

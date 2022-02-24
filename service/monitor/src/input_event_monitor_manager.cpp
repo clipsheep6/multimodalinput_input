@@ -26,13 +26,9 @@ namespace MMI {
 } // namespace MMI
 } // namespace OHOS
 
-OHOS::MMI::InputEventMonitorManager::InputEventMonitorManager()
-{
-}
+OHOS::MMI::InputEventMonitorManager::InputEventMonitorManager() {}
 
-OHOS::MMI::InputEventMonitorManager::~InputEventMonitorManager()
-{
-}
+OHOS::MMI::InputEventMonitorManager::~InputEventMonitorManager() {}
 
 int32_t OHOS::MMI::InputEventMonitorManager::AddInputEventMontior(SessionPtr session, int32_t eventType)
 {
@@ -78,15 +74,15 @@ void OHOS::MMI::InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<OH
         MMI_LOGE("No monitor to send msg");
         return;
     }
-    NetPacket newPkt(MmiMessageId::ON_KEYMONITOR);
-    InputEventDataTransformation::KeyEventToNetPacket(keyEvent, newPkt);
+    NetPacket pkt(MmiMessageId::ON_KEYMONITOR);
+    InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt);
     std::list<MonitorItem>::iterator iter;
     for (const auto &item : monitors_) {
         CHKPV(item.session);
-        newPkt << item.session->GetPid();
+        pkt << item.session->GetPid();
         MMI_LOGD("server send the msg to client: keyCode:%{public}d,pid:%{public}d", keyEvent->GetKeyCode(),
             item.session->GetPid());
-        item.session->SendMsg(newPkt);
+        item.session->SendMsg(pkt);
     }
 }
 
@@ -133,14 +129,14 @@ void OHOS::MMI::InputEventMonitorManager::OnTouchpadMonitorInputEvent(
     if (monitorsTouch_.empty()) {
         MMI_LOGE("InputEventMonitorManager::%{public}s no monitor to send msg", __func__);
     }
-    NetPacket newPkt(MmiMessageId::ON_TOUCHPAD_MONITOR);
-    InputEventDataTransformation::Marshalling(pointerEvent, newPkt);
+    NetPacket pkt(MmiMessageId::ON_TOUCHPAD_MONITOR);
+    InputEventDataTransformation::Marshalling(pointerEvent, pkt);
     std::list<MonitorItem>::iterator iter;
     for (const auto &item :  monitorsTouch_) {
-        newPkt << item.session->GetPid();
+        pkt << item.session->GetPid();
         MMI_LOGD("server send the msg to client: EventType:%{public}d,pid:%{public}d",
             pointerEvent->GetEventType(), item.session->GetPid());
-        item.session->SendMsg(newPkt);
+        item.session->SendMsg(pkt);
         MMI_LOGD("Service SendMsg Success");
     }
     MMI_LOGD("Leave");

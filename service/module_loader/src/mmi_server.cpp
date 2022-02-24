@@ -73,13 +73,9 @@ static void CheckDefine()
 #endif
 }
 
-OHOS::MMI::MMIServer::MMIServer()
-{
-}
+OHOS::MMI::MMIServer::MMIServer() {}
 
-OHOS::MMI::MMIServer::~MMIServer()
-{
-}
+OHOS::MMI::MMIServer::~MMIServer() {}
 
 int32_t OHOS::MMI::MMIServer::Start()
 {
@@ -237,9 +233,9 @@ void OHOS::MMI::MMIServer::OnDisconnected(SessionPtr s)
     CHKPV(s);
     MMI_LOGW("MMIServer::OnDisconnected enter, session desc:%{public}s", s->GetDescript().c_str());
     int32_t fd = s->GetFd();
-    auto appInfo = AppRegs->FindBySocketFd(fd);
-    RegEventHM->UnregisterEventHandleBySocketFd(fd);
-    AppRegs->UnregisterAppInfoBySocketFd(fd);
+    auto appInfo = AppRegs->FindSocketFd(fd);
+    RegEventHM->UnregisterEventHandleSocketFd(fd);
+    AppRegs->UnregisterAppInfoSocketFd(fd);
     AppRegs->UnregisterConnectState(fd);
 #ifdef  OHOS_BUILD_AI
     seniorInput_.DeviceDisconnect(fd);

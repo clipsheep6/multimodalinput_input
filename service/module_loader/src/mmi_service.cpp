@@ -88,13 +88,9 @@ static void CheckDefine()
 #endif
 }
 
-MMIService::MMIService() : SystemAbility(MULTIMODAL_INPUT_CONNECT_SERVICE_ID, true)
-{
-}
+MMIService::MMIService() : SystemAbility(MULTIMODAL_INPUT_CONNECT_SERVICE_ID, true) {}
 
-MMIService::~MMIService()
-{
-}
+MMIService::~MMIService() {}
 
 int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
 {
@@ -251,7 +247,7 @@ void MMIService::OnDisconnected(SessionPtr s)
     MMI_LOGW("enter, session desc:%{public}s", s->GetDescript().c_str());
     int32_t fd = s->GetFd();
 
-    auto appInfo = AppRegs->FindBySocketFd(fd);
+    auto appInfo = AppRegs->FindSocketFd(fd);
     AppRegs->UnregisterConnectState(fd);
 #ifdef  OHOS_BUILD_AI
     seniorInput_.DeviceDisconnect(fd);

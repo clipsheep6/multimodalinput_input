@@ -48,6 +48,7 @@ void InputMonitor::Stop()
     MMI_LOGD("Enter");
     std::lock_guard<std::mutex> guard(mutex_);
     if (monitorId_ < 0) {
+        MMI_LOGE("Invalid values");
         return;
     }
     InputMgr->RemoveMonitor(monitorId_);
@@ -103,6 +104,7 @@ void InputMonitor::MarkConsumed(int32_t eventId)
         return;
     }
     if (monitorId_ < 0) {
+        MMI_LOGE("Invalid values");
         return;
     }
     InputMgr->MarkConsumed(monitorId_, eventId);
@@ -258,7 +260,7 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
                 CALL_NAPI_API_ERR, RET_ERR);
             CHKR(SetNameProperty(jsEnv_, currentPointer, "force", it.GetPressure()) == napi_ok,
                 CALL_NAPI_API_ERR, RET_ERR);
-            CHKR(SetNameProperty(jsEnv_, result, "timestamp", it.GetDownTime()) == napi_ok,
+            CHKR(SetNameProperty(jsEnv_, result, "timestamp", pointerEvent->GetActionTime()) == napi_ok,
                 CALL_NAPI_API_ERR, RET_ERR);
             CHKR(SetNameProperty(jsEnv_, result, "deviceId", it.GetDeviceId()) == napi_ok,
                 CALL_NAPI_API_ERR, RET_ERR);

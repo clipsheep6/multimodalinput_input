@@ -39,7 +39,7 @@ public:
         const uint64_t preHandlerTime);
     int32_t DispatchKeyEvent(UDSServer& udsServer, libinput_event *event, const KeyEventValueTransformations& trs,
         EventKeyboard& key, const uint64_t preHandlerTime);
-    int32_t DispatchKeyEventByPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key,
+    int32_t DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key,
         const uint64_t preHandlerTime);
     int32_t DispatchTouchEvent(UDSServer& udsServer, libinput_event *event,
         const EventTouch& touch, const uint64_t preHandlerTime);
@@ -66,10 +66,9 @@ protected:
         const RegisteredEvent& data, int32_t inputDeviceType, uint64_t preHandlerTime);
     int32_t KeyBoardRegEveHandler(const EventKeyboard& key, UDSServer& udsServer,
         libinput_event *event, int32_t inputDeviceType, uint64_t preHandlerTime);
-    int32_t IsANRProcess(UDSServer* udsServer, int32_t fd, int32_t id);
+    bool IsANRProcess(int64_t time, SessionPtr ss);
 
-protected:
-    int32_t touchDownFocusSurfaceId_ = 0;
+private:
     EventPackage eventPackage_;
     StandardEventHandler standardEvent_;
     /*
@@ -78,9 +77,11 @@ protected:
     enum IsEventHandler {
         KEY_FILTER_EVENT = 1,
         KEY_CHECKLAUNABILITY_EVENT = 2,
-        KEY_SUBSCRIBE_EVENT = 3
+        KEY_SUBSCRIBE_EVENT = 3,
+        KEY_DISPATCH_EVENT = 4
     };
     void OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, IsEventHandler isEventHandler);
+    void HandlePointerEventTrace(const std::shared_ptr<PointerEvent> &point);
 #ifdef DEBUG_CODE_TEST
 private:
     const size_t windowCount_ = 2;

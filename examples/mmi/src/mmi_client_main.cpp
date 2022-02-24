@@ -14,9 +14,11 @@
  */
 
 #include "mmi_client.h"
+
 #include <codecvt>
 #include <csignal>
 #include <locale>
+
 #include "common_event_handler.h"
 #include "key_event_handler.h"
 #include "media_event_handler.h"
@@ -30,7 +32,7 @@ namespace {
 using namespace OHOS;
 using namespace OHOS::MMI;
 
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIClientDemo" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIClientDemo" }; // namespace
 
 class AppKeyEventHandle : public KeyEventHandler {
 public:
