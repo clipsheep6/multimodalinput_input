@@ -16,6 +16,7 @@
 #define JS_REGISTER_EVENT_H
 
 #include <array>
+
 #include "event_factory.h"
 #include "js_register_module.h"
 

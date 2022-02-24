@@ -15,6 +15,7 @@
 
 #include <algorithm>
 #include <cinttypes>
+
 #include "input_manager.h"
 #include "js_register_util.h"
 #include "js_register_module.h"
