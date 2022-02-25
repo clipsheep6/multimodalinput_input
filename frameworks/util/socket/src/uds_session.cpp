@@ -110,6 +110,7 @@ void UDSSession::DelEvents(int32_t id)
         if (item.id == id) {
             events_.erase(events_.begin(), events_.begin() + count);
             MMI_LOGI("Delete events");
+            break;
         }
     }
     MMI_LOGI("end");
