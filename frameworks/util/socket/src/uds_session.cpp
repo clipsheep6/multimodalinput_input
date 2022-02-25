@@ -124,7 +124,7 @@ uint64_t UDSSession::GetFirstEventTime()
         return 0;
     }
     MMI_LOGI("end");
-    return events_[0].eventTime;
+    return events_.begin()->eventTime;
 }
 
 void UDSSession::ClearEventsVct()
