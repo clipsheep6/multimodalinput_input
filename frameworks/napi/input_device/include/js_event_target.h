@@ -16,6 +16,8 @@
 #ifndef JS_EVENT_TARGET_H
 #define JS_EVENT_TARGET_H
 
+#include <map>
+
 #include "libmmi_util.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
@@ -23,7 +25,6 @@
 #include "input_device_impl.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
-#include <map>
 
 namespace OHOS {
 namespace MMI {

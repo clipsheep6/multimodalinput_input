@@ -28,7 +28,8 @@ InputDeviceImpl& InputDeviceImpl::GetInstance()
     return instance;
 }
 
-void InputDeviceImpl::GetInputDeviceIdsAsync(int32_t userData, std::function<void(int32_t, std::vector<int32_t>)> callback)
+void InputDeviceImpl::GetInputDeviceIdsAsync(int32_t userData,
+    std::function<void(int32_t, std::vector<int32_t>)> callback)
 {
     MMI_LOGD("begin");
     std::lock_guard<std::mutex> guard(mtx_);
