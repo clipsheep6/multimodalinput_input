@@ -17,6 +17,7 @@
 #include <cinttypes>
 #include "input-event-codes.h"
 #include "ability_launch_manager.h"
+#include "ability_manager_client.h"
 #include "bytrace.h"
 #include "event_filter_wrap.h"
 #include "hisysevent.h"
