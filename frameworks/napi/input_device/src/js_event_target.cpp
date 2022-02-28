@@ -597,9 +597,9 @@ napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle)
 
     napi_status status = napi_generic_failure;
     if (handle == nullptr) {
-        status = napi_create_promise(env, &cb->deferred, &cb->promise);
+        status = napi_create_promise(env_, &cb->deferred, &cb->promise);
         if (status != napi_ok) {
-            napi_throw_error(env, nullptr, "JsEventTarget: failed to create promise");
+            napi_throw_error(env_, nullptr, "JsEventTarget: failed to create promise");
             MMI_LOGE("failed to create promise");
             return nullptr;
         }
@@ -610,7 +610,7 @@ napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle)
 
     status = napi_create_reference(env_, handle, 1, &cb->ref);
     if (status != napi_ok) {
-        napi_throw_error(env, nullptr, "JsEventTarget: call to napi_create_reference failed");
+        napi_throw_error(env_, nullptr, "JsEventTarget: call to napi_create_reference failed");
         MMI_LOGE("call to napi_create_reference failed");
         return nullptr;
     }
