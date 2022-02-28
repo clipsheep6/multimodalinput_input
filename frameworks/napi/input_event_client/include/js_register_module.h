@@ -14,28 +14,32 @@
  */
 #ifndef JS_REGISTER_MODULE_H
 #define JS_REGISTER_MODULE_H
+
 #include <cstdio>
-#include <map>
-#include <list>
 #include <cstring>
 #include <iostream>
+#include <list>
+#include <map>
+
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
-#include "libmmi_util.h"
 #include "utils/log.h"
+
 #include "client_msg_handler.h"
+#include "libmmi_util.h"
 
 #ifdef OHOS_WESTEN_MODEL
-#include "multimodal_event_handler.h"
-#include "multimodal_event.h"
-#include "standardized_event_handler.h"
+
 #include "common_event_handler.h"
-#include "system_event_handler.h"
-#include "telephone_event_handler.h"
-#include "touch_event_handler.h"
 #include "device_handler.h"
 #include "key_event_handler.h"
 #include "media_event_handler.h"
+#include "multimodal_event.h"
+#include "multimodal_event_handler.h"
+#include "standardized_event_handler.h"
+#include "system_event_handler.h"
+#include "telephone_event_handler.h"
+#include "touch_event_handler.h"
 
 #define SUCCESS_CODE 0
 #define ERROR_CODE (-1)

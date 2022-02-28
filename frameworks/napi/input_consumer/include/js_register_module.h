@@ -14,18 +14,21 @@
  */
 #ifndef JS_REGISTER_MODULE_H
 #define JS_REGISTER_MODULE_H
+
 #include <cstdio>
-#include <map>
-#include <list>
 #include <cstring>
 #include <iostream>
-#include "multimodal_event_handler.h"
-#include "key_event.h"
-#include "key_option.h"
-#include "libmmi_util.h"
+#include <list>
+#include <map>
+
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "utils/log.h"
+
+#include "key_event.h"
+#include "key_option.h"
+#include "libmmi_util.h"
+#include "multimodal_event_handler.h"
 
 #define SUCCESS_CODE 0
 #define ERROR_CODE (-1)
@@ -45,6 +48,8 @@
 
 #define INVALID_APP_HANDLE 255
 #define MAX_EVENT_NUM 65535
+
+#define PRE_KEY_MAX_COUNT 4
 
 enum JS_CALLBACK_EVENT {
     JS_CALLBACK_EVENT_FAILED = -1,

@@ -12,12 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "js_register_module.h"
 
 #include <algorithm>
 #include <cinttypes>
+
 #include "input_manager.h"
 #include "js_register_util.h"
-#include "js_register_module.h"
 #include "key_event_pre.h"
 
 namespace OHOS {
@@ -104,7 +105,7 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
     keyOption->SetPreKeys(preKeys);
 
     std::string subKeyNames = "";
-    for (const auto &item : sortPrekeys){
+    for (const auto &item : sortPrekeys) {
         subKeyNames += std::to_string(item);
         subKeyNames += ",";
         MMI_LOGD("preKeys:%{public}d", item);
@@ -147,7 +148,7 @@ static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
     int32_t infoFinalKey = keyOption->GetFinalKey();
     int32_t keyEventFinalKey = keyEvent->GetKeyCode();
     MMI_LOGD("infoFinalKey:%{public}d,keyEventFinalKey:%{public}d", infoFinalKey, keyEventFinalKey);
-    if (infoFinalKey != keyEventFinalKey || items.size() > 4) {
+    if (infoFinalKey != keyEventFinalKey || items.size() > PRE_KEY_MAX_COUNT) {
         MMI_LOGD("%{public}d", __LINE__);
         return false;
     }
@@ -221,7 +222,7 @@ bool CheckPara(const std::shared_ptr<KeyOption> keyOption)
             MMI_LOGE("preKey:%{public}d is less 0, can not process", item);
             return false;
         }
-        if (std::find(checkRepeat.begin(), checkRepeat.end(), item) != checkRepeat.end()){
+        if (std::find(checkRepeat.begin(), checkRepeat.end(), item) != checkRepeat.end()) {
             MMI_LOGE("preKey is repeat, can not process");
             return false;
         }
@@ -237,7 +238,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         .env = env,
         .asyncWork = nullptr,
     };
-    auto keyOption = std::shared_ptr<KeyOption>(new KeyOption());
+    auto keyOption = std::make_shared<KeyOption>();
     if (GetEventInfo(env, info, event, keyOption) < 0 || !CheckPara(keyOption)) {
         delete event;
         event = nullptr;

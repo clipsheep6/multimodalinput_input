@@ -12,15 +12,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "multi_input_common.h"
+
 #include <climits>
 #include <cstdlib>
 #include <cstdio>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <string>
+
 #include "utils/log.h"
+
 #include "libmmi_util.h"
+
 namespace OHOS {
 namespace MMI {
 namespace {
