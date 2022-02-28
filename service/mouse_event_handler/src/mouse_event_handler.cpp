@@ -43,6 +43,7 @@ std::shared_ptr<PointerEvent> MouseEventHandler::GetPointerEvent()
 void MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
 {
     MMI_LOGD("enter");
+    CHKPV(data);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent_->SetButtonId(buttionId_);
 
@@ -56,6 +57,7 @@ void MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
 
 void MouseEventHandler::HandleButonInner(libinput_event_pointer* data, PointerEvent::PointerItem& pointerItem)
 {
+    CHKPV(data);
     MMI_LOGD("enter, current action:%{public}d", pointerEvent_->GetPointerAction());
 
     auto button = libinput_event_pointer_get_button(data);
@@ -89,6 +91,7 @@ void MouseEventHandler::HandleButonInner(libinput_event_pointer* data, PointerEv
 
 void MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
 {
+    CHKPV(data);
     if (TimerMgr->IsExist(timerId_)) {
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
         TimerMgr->ResetTimer(timerId_);
@@ -127,7 +130,7 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
                                         PointerEvent::PointerItem& pointerItem)
 {
     MMI_LOGD("enter");
-
+    CHKPV(data);
     auto mouseInfo = WinMgr->GetMouseInfo();
     MouseState->SetMouseCoords(mouseInfo.globalX, mouseInfo.globalY);
     pointerItem.SetGlobalX(mouseInfo.globalX);
@@ -136,7 +139,7 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
     pointerItem.SetLocalY(0);
     pointerItem.SetPointerId(0);
 
-    int64_t time = static_cast<int64_t>(GetSysClockTime());
+    int64_t time = GetSysClockTime();
     pointerItem.SetDownTime(time);
     pointerItem.SetWidth(0);
     pointerItem.SetHeight(0);
@@ -157,7 +160,7 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
     MMI_LOGD("leave");
 }
 
-void MouseEventHandler::Normalize(libinput_event *event)
+void MouseEventHandler::Normalize(struct libinput_event *event)
 {
     MMI_LOGD("enter");
     CHKPV(event);

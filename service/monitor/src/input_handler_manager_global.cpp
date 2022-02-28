@@ -93,13 +93,21 @@ bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
-    if (interceptors_.HandleEvent(pointerEvent)) {
-        MMI_LOGD("Pointer event was intercepted");
-        return true;
+    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
+        MMI_LOGD("This event has been tagged as not to be intercepted");
+    } else {
+        if (interceptors_.HandleEvent(pointerEvent)) {
+            MMI_LOGD("Pointer event was intercepted");
+            return true;
+        }
     }
-    if (monitors_.HandleEvent(pointerEvent)) {
-        MMI_LOGD("Pointer event was consumed");
-        return true;
+    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_NO_MONITOR)) {
+        MMI_LOGD("This event has been tagged as not to be monitored");
+    } else {
+        if (monitors_.HandleEvent(pointerEvent)) {
+            MMI_LOGD("Pointer event was consumed");
+            return true;
+        }
     }
     return false;
 }
@@ -125,6 +133,7 @@ void InputHandlerManagerGlobal::OnSessionLost(SessionPtr session)
 
 void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<KeyEvent> keyEvent) const
 {
+    CHKPV(keyEvent);
     NetPacket pkt(MmiMessageId::REPORT_KEY_EVENT);
     CHK(pkt.Write(id_), STREAM_BUF_WRITE_FAIL);
     CHK((InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt) == RET_OK),
@@ -134,6 +143,7 @@ void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<Key
 
 void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const
 {
+    CHKPV(pointerEvent);
     NetPacket pkt(MmiMessageId::REPORT_POINTER_EVENT);
     MMI_LOGD("Service SendToClient id:%{public}d,InputHandlerType:%{public}d", id_, handlerType_);
     CHK(pkt.Write(id_), STREAM_BUF_WRITE_FAIL);
@@ -192,8 +202,8 @@ void InputHandlerManagerGlobal::MonitorCollection::MarkConsumed(int32_t monitorI
     MMI_LOGD("Cancel operation");
     std::shared_ptr<PointerEvent> pointerEvent = std::make_shared<PointerEvent>(*lastPointerEvent_);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
-    pointerEvent->SetActionTime(static_cast<int32_t>(GetSysClockTime()));
-    pointerEvent->SetSkipInspection(true);
+    pointerEvent->SetActionTime(GetSysClockTime());
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT | InputEvent::EVENT_FLAG_NO_MONITOR);
     EventDispatch eDispatch;
     eDispatch.HandlePointerEvent(pointerEvent);
 }
@@ -205,6 +215,7 @@ int32_t InputHandlerManagerGlobal::MonitorCollection::GetPriority() const
 
 bool InputHandlerManagerGlobal::MonitorCollection::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
+    CHKPF(keyEvent);
     std::lock_guard<std::mutex> guard(lockMonitors_);
     MMI_LOGD("There are currently %{public}zu monitors", monitors_.size());
     for (const auto &mon : monitors_) {
@@ -215,6 +226,7 @@ bool InputHandlerManagerGlobal::MonitorCollection::HandleEvent(std::shared_ptr<K
 
 bool InputHandlerManagerGlobal::MonitorCollection::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CHKPF(pointerEvent);
     UpdateConsumptionState(pointerEvent);
     Monitor(pointerEvent);
     return monitorConsumed_;
@@ -254,6 +266,7 @@ void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::s
 
 void InputHandlerManagerGlobal::MonitorCollection::Monitor(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CHKPV(pointerEvent);
     std::lock_guard<std::mutex> guard(lockMonitors_);
     MMI_LOGD("There are currently %{public}zu monitors", monitors_.size());
     for (const auto &monitor : monitors_) {
@@ -281,6 +294,7 @@ int32_t InputHandlerManagerGlobal::InterceptorCollection::GetPriority() const
 
 bool InputHandlerManagerGlobal::InterceptorCollection::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
+    CHKPF(keyEvent);
     std::lock_guard<std::mutex> guard(lockInterceptors_);
     if (interceptors_.empty()) {
         return false;
@@ -294,6 +308,7 @@ bool InputHandlerManagerGlobal::InterceptorCollection::HandleEvent(std::shared_p
 
 bool InputHandlerManagerGlobal::InterceptorCollection::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CHKPF(pointerEvent);
     std::lock_guard<std::mutex> guard(lockInterceptors_);
     if (interceptors_.empty()) {
         return false;

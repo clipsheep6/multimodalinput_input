@@ -76,10 +76,10 @@ int32_t KeyEventSubscriber::UnSubscribeKeyEvent(SessionPtr sess, int32_t subscri
     return RET_ERR;
 }
 
-bool KeyEventSubscriber::FilterSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+bool KeyEventSubscriber::SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_LOGD("Enter");
-    CHKPF(keyEvent, ERROR_NULL_POINTER);
+    CHKPF(keyEvent);
     int32_t keyAction = keyEvent->GetKeyAction();
     MMI_LOGD("keyCode:%{public}d,keyAction:%{public}s", keyEvent->GetKeyCode(), KeyEvent::ActionToString(keyAction));
     for (const auto &keyCode : keyEvent->GetPressedKeys()) {
@@ -90,8 +90,10 @@ bool KeyEventSubscriber::FilterSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEv
         handled = HandleKeyDown(keyEvent);
     } else if (keyAction == KeyEvent::KEY_ACTION_UP) {
         handled = HandleKeyUp(keyEvent);
-    } else {
+    } else if (keyAction == KeyEvent::KEY_ACTION_CANCEL) {
         handled = HandleKeyCanel(keyEvent);
+    } else {
+        MMI_LOGW("keyAction exception");
     }
     keyEvent_.reset();
 
@@ -135,6 +137,8 @@ void KeyEventSubscriber::NotifySubscriber(std::shared_ptr<OHOS::MMI::KeyEvent> k
         const std::shared_ptr<Subscriber>& subscriber)
 {
     MMI_LOGD("Enter");
+    CHKPV(keyEvent);
+    CHKPV(subscriber);
     auto udsServerPtr = InputHandler->GetUDSServer();
     CHKPV(udsServerPtr);
     OHOS::MMI::NetPacket pkt(MmiMessageId::ON_SUBSCRIBE_KEY);
@@ -152,7 +156,8 @@ bool KeyEventSubscriber::AddTimer(const std::shared_ptr<Subscriber>& subscriber,
         const std::shared_ptr<KeyEvent>& keyEvent)
 {
     MMI_LOGD("Enter");
-    CHKPF(subscriber, ERROR_NULL_POINTER);
+    CHKPF(keyEvent);
+    CHKPF(subscriber);
 
     if (subscriber->timerId_ >= 0) {
         MMI_LOGW("Leave, timer already added, it may have been added by injection");
@@ -242,6 +247,7 @@ bool KeyEventSubscriber::InitSessionDeleteCallback()
 bool KeyEventSubscriber::HandleKeyDown(const std::shared_ptr<KeyEvent>& keyEvent)
 {
     MMI_LOGD("Enter");
+    CHKPF(keyEvent);
     bool handled = false;
     auto keyCode = keyEvent->GetKeyCode();
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
@@ -292,6 +298,7 @@ bool KeyEventSubscriber::HandleKeyDown(const std::shared_ptr<KeyEvent>& keyEvent
 bool KeyEventSubscriber::HandleKeyUp(const std::shared_ptr<KeyEvent>& keyEvent)
 {
     MMI_LOGD("Enter");
+    CHKPF(keyEvent);
     bool handled = false;
     auto keyCode = keyEvent->GetKeyCode();
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
@@ -351,6 +358,7 @@ bool KeyEventSubscriber::HandleKeyUp(const std::shared_ptr<KeyEvent>& keyEvent)
 bool KeyEventSubscriber::HandleKeyCanel(const std::shared_ptr<KeyEvent>& keyEvent)
 {
     MMI_LOGD("Enter");
+    CHKPF(keyEvent);
     for (const auto &subscriber : subscribers_) {
         ClearTimer(subscriber);
     }
@@ -360,7 +368,7 @@ bool KeyEventSubscriber::HandleKeyCanel(const std::shared_ptr<KeyEvent>& keyEven
 
 bool KeyEventSubscriber::CloneKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-    CHKPF(keyEvent, ERROR_NULL_POINTER);
+    CHKPF(keyEvent);
     if (keyEvent_ == nullptr) {
         MMI_LOGW("keyEvent_ is nullptr");
         keyEvent_ = KeyEvent::Clone(keyEvent);
