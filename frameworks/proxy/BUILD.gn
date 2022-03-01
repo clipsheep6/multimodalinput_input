@@ -23,6 +23,8 @@ config("libmmi_client_config") {
     "event_handle/include",
     "module_loader/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
+    "//foundation/multimodalinput/input/common/include",
+    "//foundation/multimodalinput/input/frameworks/util/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
@@ -31,6 +33,17 @@ config("libmmi_client_config") {
     "//utils/native/base/include",
     "event_handler/include",
     "module_loader/include",
+  ]
+}
+
+config("libmmi_public_client_config") {
+  include_dirs = [
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
+    "//foundation/multimodalinput/input/common/include",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//utils/native/base/include",
   ]
 }
 
@@ -49,7 +62,7 @@ ohos_source_set("libmmi-common") {
 
   configs = [ ":libmmi_client_config" ]
 
-  public_configs = [ ":libmmi_client_config" ]
+  public_configs = [ ":libmmi_public_client_config" ]
 
   deps = [ "//utils/native/base:utils" ]
 
@@ -84,19 +97,22 @@ ohos_shared_library("libmmi-client") {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
   }
 
-  configs = [ ":libmmi_client_config" ]
+  configs = [ ":libmmi_client_config", 
+              "//foundation/multimodalinput/input/frameworks/util:libmmi_util_public_config",
+              "//foundation/multimodalinput/input/service/filter:mmi_event_filter_config",
+              "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_config"
+  ]
 
-  public_configs = [ ":libmmi_client_config" ]
+  public_configs = [ ":libmmi_public_client_config" ]
+
+  public_deps = [ "//utils/native/base:utils" ]
 
   deps = [
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
-  ]
-
-  public_deps = [
-    ":libmmi-common",
-    "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
-    "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_proxy",
-    "//foundation/multimodalinput/input/service/filter:mmi_event_filter_service",
+     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
+     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_proxy",
+     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_service",
+     "//drivers/peripheral/input/hal:hdi_input"
   ]
 
   part_name = "multimodalinput_base"
