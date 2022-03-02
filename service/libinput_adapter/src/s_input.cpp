@@ -20,11 +20,8 @@
 #include <sys/epoll.h>
 #include <unistd.h>
 #include "libmmi_util.h"
-#include "safe_keeper.h"
 #include "util.h"
-#ifndef OHOS_WESTEN_MODEL
 #include "input_windows_manager.h"
-#endif
 namespace OHOS {
 namespace MMI {
     namespace {
@@ -122,7 +119,7 @@ void OHOS::MMI::SInput::EventDispatch(struct epoll_event& ev)
     CHKPV(ev.data.ptr);
     auto fd = *static_cast<int*>(ev.data.ptr);
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_LOGF("SInput::OnEventDispatch epoll unrecoverable error,"
+        MMI_LOGF("epoll unrecoverable error,"
             "The service must be restarted. fd:%{public}d", fd);
         free(ev.data.ptr);
         ev.data.ptr = nullptr;
@@ -152,12 +149,10 @@ void OHOS::MMI::SInput::OnEventHandler()
 {
     MMI_LOGD("enter");
     CHKPV(funInputEvent_);
-#ifndef OHOS_WESTEN_MODEL
     multimodal_libinput_event ev = { nullptr, nullptr };
     while ((ev.event = libinput_get_event(input_))) {
         funInputEvent_(&ev);
         libinput_event_destroy(ev.event);
     }
-#endif
     MMI_LOGD("leave");
 }

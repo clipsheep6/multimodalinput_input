@@ -26,17 +26,18 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    std::shared_ptr<MultimodalInputConnectManager> g_instance = nullptr;
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectManager" };
-}
+std::shared_ptr<MultimodalInputConnectManager> g_instance = nullptr;
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectManager"};
+} // namespace
 
 std::shared_ptr<MultimodalInputConnectManager> MultimodalInputConnectManager::GetInstance()
 {
     static std::once_flag flag;
     std::call_once(flag, [&]() {
-        g_instance.reset(new MultimodalInputConnectManager());
+        g_instance.reset(new (std::nothrow) MultimodalInputConnectManager());
     });
 
+    CHKPP(g_instance);
     if (g_instance != nullptr) {
         g_instance->ConnectMultimodalInputService();
     }
@@ -105,7 +106,8 @@ bool MultimodalInputConnectManager::ConnectMultimodalInputService()
         }
     };
 
-    multimodalInputConnectRecipient_ = new MultimodalInputConnectDeathRecipient(deathCallback);
+    multimodalInputConnectRecipient_ = new (std::nothrow) MultimodalInputConnectDeathRecipient(deathCallback);
+    CHKPF(multimodalInputConnectRecipient_);
     sa->AddDeathRecipient(multimodalInputConnectRecipient_);
     multimodalInputConnectService_ = iface_cast<IMultimodalInputConnect>(sa);
     if (multimodalInputConnectService_ == nullptr) {

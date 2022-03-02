@@ -20,8 +20,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include "input_windows_manager.h"
-#include "register_event.h"
-#include "register_eventhandle_manager.h"
 #include "util.h"
 #include "util_ex.h"
 
@@ -37,20 +35,11 @@ void ChkConfig(int32_t fd)
 #ifdef OHOS_BUILD
     mprintf(fd, "\tOHOS_BUILD");
 #endif
-#ifdef OHOS_WESTEN_MODEL
-    mprintf(fd, "\tOHOS_WESTEN_MODEL");
-#endif
 #ifdef OHOS_BUILD_LIBINPUT
     mprintf(fd, "\tOHOS_BUILD_LIBINPUT");
 #endif
 #ifdef OHOS_BUILD_HDF
     mprintf(fd, "\tOHOS_BUILD_HDF");
-#endif
-#ifdef OHOS_BUILD_AI
-    mprintf(fd, "\tOHOS_BUILD_AI");
-#endif
-#ifdef DEBUG_CODE_TEST
-    mprintf(fd, "\tDEBUG_CODE_TEST");
 #endif
 #ifdef OHOS_BUILD_MMI_DEBUG
     mprintf(fd, "\tOHOS_BUILD_MMI_DEBUG");
@@ -60,23 +49,6 @@ void ChkConfig(int32_t fd)
     mprintf(fd, "\tEXP_CONFIG: %s\n", DEF_EXP_CONFIG);
     mprintf(fd, "\tEXP_SOPATH: %s\n", DEF_EXP_SOPATH);
     mprintf(fd, "\tXKB_CONFIG_PATH: %s\n", DEF_XKB_CONFIG);
-}
-
-void ChkAppInfos(int32_t fd)
-{
-    auto focusId = WinMgr->GetFocusSurfaceId();
-    auto touchFocusId = WinMgr->GetTouchFocusSurfaceId();
-    auto appInfo = AppRegs->FindWinId(focusId);
-    mprintf(fd, "FocusInfo: winId=%d fd=%d abilityId=%d surfaceId=%d bundlerName=%s appName=%s",
-            focusId, appInfo.fd, appInfo.abilityId, appInfo.windowId, appInfo.bundlerName.c_str(),
-            appInfo.appName.c_str());
-    if (focusId != touchFocusId) {
-        appInfo = AppRegs->FindWinId(touchFocusId);
-        mprintf(fd, "TouchFocusInfo: winId=%d fd=%d abilityId=%d surfaceId=%d bundlerName=%s appName=%s",
-                touchFocusId, appInfo.fd, appInfo.abilityId, appInfo.windowId, appInfo.bundlerName.c_str(),
-                appInfo.appName.c_str());
-    }
-    AppRegs->Dump(fd);
 }
 
 void EventDump::Init(UDSServer& uds)
@@ -91,11 +63,6 @@ void EventDump::Dump(int32_t fd)
     auto strCurTime = Strftime();
     mprintf(fd, "MMIDumpsBegin: %s", strCurTime.c_str());
     ChkConfig(fd);
-#ifdef OHOS_WESTEN_MODEL
-    ChkAppInfos(fd);
-    WinMgr->Dump(fd);
-    RegEventHM->Dump(fd);
-#endif
     if (udsServer_) {
         udsServer_->Dump(fd);
     }
@@ -113,22 +80,32 @@ void EventDump::TestDump()
 {
     constexpr int32_t MAX_PATH_SIZE = 128;
     char szPath[MAX_PATH_SIZE] = {};
-    CHK(sprintf_s(szPath, MAX_PATH_SIZE, "%s/mmidump-%s.txt", DEF_MMI_DATA_ROOT, Strftime("%y%m%d%H%M%S").c_str()) >= 0,
-        SPRINTF_S_SEC_FUN_FAIL);
+    auto ret = sprintf_s(szPath, MAX_PATH_SIZE, "%s/mmidump-%s.txt",
+                         DEF_MMI_DATA_ROOT, Strftime("%y%m%d%H%M%S").c_str());
+    if (ret < 0) {
+        MMI_LOGE("The function sprintf_s perform error, errCode:%{public}d", SPRINTF_S_SEC_FUN_FAIL);
+        return;
+    }
     char path[PATH_MAX] = {};
     if (realpath(szPath, path) == nullptr) {
         MMI_LOGE("path is error, szPath:%{public}s", szPath);
         return;
     }
     auto fd = open(path, O_WRONLY | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
-    CHK(fd >= 0, FILE_OPEN_FAIL);
+    if (fd < 0) {
+        MMI_LOGE("The fd less than 0, errCode:%{public}d", FILE_OPEN_FAIL);
+        return;
+    }
     Dump(fd);
     close(fd);
 }
 
 void EventDump::InsertDumpInfo(const std::string& str)
 {
-    CHK(!str.empty(), PARAM_INPUT_INVALID);
+    if (str.empty()) {
+        MMI_LOGE("The in parameter str is empty, errCode:%{public}d", PARAM_INPUT_INVALID);
+        return;
+    }
     std::lock_guard<std::mutex> lock(mu_);
 
     constexpr int32_t VECMAXSIZE = 300;
@@ -140,7 +117,10 @@ void EventDump::InsertDumpInfo(const std::string& str)
 
 void EventDump::InsertFormat(std::string str, ...)
 {
-    CHK(!str.empty(), INVALID_PARAM);
+    if (str.empty()) {
+        MMI_LOGE("The in parameter str is empty, errCode:%{public}d", PARAM_INPUT_INVALID);
+        return;
+    }
     va_list args;
     va_start(args, str);
     char buf[MAX_STREAM_BUF_SIZE] = {};

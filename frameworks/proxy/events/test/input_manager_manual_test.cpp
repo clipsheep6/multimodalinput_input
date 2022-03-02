@@ -20,20 +20,21 @@
 #include "input_handler_manager.h"
 #include "input_manager.h"
 #include "interceptor_manager.h"
-#include "key_event_pre.h"
 #include "multimodal_event_handler.h"
 #include "pointer_event.h"
 #include "proto.h"
 #include "run_shell_util.h"
 
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS;
 using namespace MMI;
 namespace {
 constexpr int32_t TIME_WAIT_FOR_OP = 500;
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerManualTest" };
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerManualTest" };
+} // namespace
 
 class InputManagerManualTest : public testing::Test {
 public:
@@ -122,4 +123,5 @@ HWTEST_F(InputManagerManualTest, HandlePointerEventFilter_001, TestSize.Level1)
     SimulateInputEventHelper(10, 10, 1); // set global x and global y are 10, will expect value is 1
     SimulateInputEventHelper(0, 0, 2); // set global x and global y are not 10, will expect value is 2
 }
-} // namespace
+} // namespace MMI
+} // namespace OHOS

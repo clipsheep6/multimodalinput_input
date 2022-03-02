@@ -119,13 +119,14 @@ bool JsInputMonitorManager::AddEnv(napi_env env, napi_callback_info cbInfo)
     }
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    int32_t *id = new int32_t;
+    int32_t *id = new (std::nothrow) int32_t;
+    CHKPF(id);
     *id = 0;
     napi_get_cb_info(env, cbInfo, nullptr, nullptr, &thisVar, &data);
     auto status = napi_wrap(env, thisVar, static_cast<void*>(id),
                             [](napi_env env, void *data, void *hint) {
                                 MMI_LOGD("napi_wrap enter");
-                                int32_t *id = (int32_t *)data;
+                                int32_t *id = static_cast<int32_t *>(data);
                                 delete id;
                                 id = nullptr;
                                 JSIMM.RemoveMonitor(env);
@@ -144,7 +145,11 @@ bool JsInputMonitorManager::AddEnv(napi_env env, napi_callback_info cbInfo)
         delete id;
         return false;
     }
-    envManager_.insert(std::pair<napi_env, napi_ref>(env, ref));
+    auto iter = envManager_.insert(std::pair<napi_env, napi_ref>(env, ref));
+    if (!iter.second) {
+        MMI_LOGE("Insert value failed");
+        return false;
+    }
     MMI_LOGD("Leave");
     return true;
 }

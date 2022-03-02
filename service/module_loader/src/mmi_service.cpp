@@ -17,25 +17,20 @@
 #include <cinttypes>
 #include <csignal>
 #include <sys/signalfd.h>
-
-#include "app_register.h"
-#include "device_register.h"
 #include "event_dump.h"
 #include "input_windows_manager.h"
 #include "mmi_log.h"
 #include "multimodal_input_connect_def_parcel.h"
 #include "pointer_drawing_manager.h"
-#include "register_eventhandle_manager.h"
-#include "safe_keeper.h"
 #include "timer_manager.h"
 #include "util.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIService" };
-static const std::string DEF_INPUT_SEAT = "seat0";
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIService" };
+const std::string DEF_INPUT_SEAT = "seat0";
+} // namespace
 
 const bool REGISTER_RESULT =
     SystemAbility::MakeAndRegisterAbility(DelayedSingleton<MMIService>::GetInstance().get());
@@ -68,20 +63,11 @@ static void CheckDefine()
 #ifdef OHOS_BUILD
     CheckDefineOutput("%-40s", "OHOS_BUILD");
 #endif
-#ifdef OHOS_WESTEN_MODEL
-    CheckDefineOutput("%-40s", "OHOS_WESTEN_MODEL");
-#endif
 #ifdef OHOS_BUILD_LIBINPUT
     CheckDefineOutput("%-40s", "OHOS_BUILD_LIBINPUT");
 #endif
 #ifdef OHOS_BUILD_HDF
     CheckDefineOutput("%-40s", "OHOS_BUILD_HDF");
-#endif
-#ifdef OHOS_BUILD_AI
-    CheckDefineOutput("%-40s", "OHOS_BUILD_AI");
-#endif
-#ifdef DEBUG_CODE_TEST
-    CheckDefineOutput("%-40s", "DEBUG_CODE_TEST");
 #endif
 #ifdef OHOS_BUILD_MMI_DEBUG
     CheckDefineOutput("%-40s", "OHOS_BUILD_MMI_DEBUG");
@@ -113,7 +99,11 @@ int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
         ev.data.ptr = nullptr;
         return ret;
     }
-    authFds_.emplace(fd);
+    auto iter = authFds_.emplace(fd);
+    if (!iter.second) {
+        MMI_LOGE("Emplace to failed, fd:%{public}d", fd);
+        return RET_ERR;
+    }
     return RET_OK;
 }
 
@@ -131,8 +121,11 @@ bool MMIService::InitLibinputService()
     MMI_LOGD("HDF Init");
     hdfEventManager.SetupCallback();
 #endif
-    CHKF(input_.Init(std::bind(&InputEventHandler::OnEvent, InputHandler, std::placeholders::_1),
-         DEF_INPUT_SEAT), LIBINPUT_INIT_FAIL);
+    if (!(input_.Init(std::bind(&InputEventHandler::OnEvent, inputEventHdr_, std::placeholders::_1),
+        DEF_INPUT_SEAT))) {
+        MMI_LOGE("libinput initialization failed");
+        return false;
+    }
     auto inputFd = input_.GetInputFd();
     auto ret = AddEpoll(EPOLL_EVENT_INPUT, inputFd);
     if (ret <  0) {
@@ -146,9 +139,18 @@ bool MMIService::InitLibinputService()
 
 bool MMIService::InitService()
 {
-    CHKF(state_ == ServiceRunningState::STATE_NOT_START, SASERVICE_INIT_FAIL);
-    CHKF(Publish(this), SASERVICE_INIT_FAIL);
-    CHKF(EpollCreat(MAX_EVENT_SIZE) >= 0, SASERVICE_INIT_FAIL);
+    if (state_ != ServiceRunningState::STATE_NOT_START) {
+        MMI_LOGE("Service running status is not enabled");
+        return false;
+    }
+    if (!(Publish(this))) {
+        MMI_LOGE("Service initialization failed");
+        return false;
+    }
+    if (EpollCreat(MAX_EVENT_SIZE) < 0) {
+        MMI_LOGE("epoll create failed");
+        return false;
+    }
     auto ret = AddEpoll(EPOLL_EVENT_SOCKET, epollFd_);
     if (ret <  0) {
         MMI_LOGE("AddEpoll error ret:%{public}d", ret);
@@ -163,12 +165,6 @@ int32_t MMIService::Init()
 {
     CheckDefine();
 
-#ifdef  OHOS_BUILD_AI
-    MMI_LOGD("SeniorInput Init");
-    CHKR(seniorInput_.Init(*this), SENIOR_INPUT_DEV_INIT_FAIL, SENIOR_INPUT_DEV_INIT_FAIL);
-    sMsgHandler_.SetSeniorInputHandle(seniorInput_);
-#endif // OHOS_BUILD_AI
-
     MMI_LOGD("InputEventHandler Init");
     InputHandler->Init(*this);
 
@@ -180,13 +176,7 @@ int32_t MMIService::Init()
 
     MMI_LOGD("WindowsManager Init");
     CHKR(WinMgr->Init(*this), WINDOWS_MSG_INIT_FAIL, WINDOWS_MSG_INIT_FAIL);
-#ifdef OHOS_WESTEN_MODEL
-    MMI_LOGD("AppRegister Init");
-    CHKR(AppRegs->Init(*this), APP_REG_INIT_FAIL, APP_REG_INIT_FAIL);
 
-    MMI_LOGD("DeviceRegister Init");
-    CHKR(DevRegister->Init(), DEV_REG_INIT_FAIL, DEV_REG_INIT_FAIL);
-#endif
     MMI_LOGD("PointerDrawingManager Init");
     CHKR(PointerDrawingManager::GetInstance()->Init(), POINTER_DRAW_INIT_FAIL, POINTER_DRAW_INIT_FAIL);
 
@@ -205,9 +195,12 @@ void MMIService::OnStart()
     MMI_LOGD("Thread tid:%{public}" PRId64 "", tid);
 
     int32_t ret = Init();
-    CHK(RET_OK == ret, ret);
+    if (RET_OK != ret) {
+        MMI_LOGE("Init mmi_service failed");
+        return;
+    }
     state_ = ServiceRunningState::STATE_RUNNING;
-    MMI_LOGD("MMIService Started successfully");
+    MMI_LOGD("Started successfully");
     t_ = std::thread(std::bind(&MMIService::OnThread, this));
     t_.detach();
 }
@@ -237,20 +230,13 @@ void MMIService::OnConnected(SessionPtr s)
     CHKPV(s);
     int32_t fd = s->GetFd();
     MMI_LOGI("fd:%{public}d", fd);
-    AppRegs->RegisterConnectState(fd);
 }
 
 void MMIService::OnDisconnected(SessionPtr s)
 {
     CHKPV(s);
-    MMI_LOGW("enter, session desc:%{public}s", s->GetDescript().c_str());
     int32_t fd = s->GetFd();
-
-    auto appInfo = AppRegs->FindSocketFd(fd);
-    AppRegs->UnregisterConnectState(fd);
-#ifdef  OHOS_BUILD_AI
-    seniorInput_.DeviceDisconnect(fd);
-#endif // OHOS_BUILD_AI
+    MMI_LOGW("enter, session desc:%{public}s, fd: %{public}d", s->GetDescript().c_str(), fd);
 }
 
 int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd)
@@ -322,9 +308,11 @@ void MMIService::OnThread()
 {
     OHOS::MMI::SetThreadName(std::string("mmi_service"));
     uint64_t tid = GetThisThreadIdOfLL();
-    CHK(tid > 0, VAL_NOT_EXP);
+    if (tid <= 0) {
+        MMI_LOGE("The tid is error, errCode:%{public}d", VAL_NOT_EXP);
+        return;
+    }
     MMI_LOGI("Main worker thread start. tid:%{public}" PRId64 "", tid);
-    SafeKpr->RegisterEvent(tid, "mmi_service");
 
     int32_t count = 0;
     constexpr int32_t timeOut = 20;
@@ -355,7 +343,6 @@ void MMIService::OnThread()
             }
             OnEpollRecv(it.first, it.second.sBuf.Data(), it.second.sBuf.Size());
         }
-        SafeKpr->ReportHealthStatus(tid);
         OnTimer();
     }
     MMI_LOGI("Main worker thread stop. tid:%{public}" PRId64 "", tid);

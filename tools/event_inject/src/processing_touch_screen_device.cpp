@@ -15,7 +15,6 @@
 
 #include "processing_touch_screen_device.h"
 
-using namespace std;
 using namespace OHOS::MMI;
 
 namespace {
@@ -30,7 +29,7 @@ int32_t ProcessingTouchScreenDevice::TransformJsonDataToInputData(const Json& to
         return RET_ERR;
     }
     if (touchScreenEventArrays.find("singleEvent") != touchScreenEventArrays.end()) {
-        return TransformJsonDataForSingleTouchScreen(touchScreenEventArrays, inputEventArray);
+        return TransformJsonDataSingleTouchScreen(touchScreenEventArrays, inputEventArray);
     }
     Json inputData = touchScreenEventArrays.at("events");
     if (inputData.empty()) {
@@ -52,7 +51,7 @@ int32_t ProcessingTouchScreenDevice::TransformJsonDataToInputData(const Json& to
     return RET_OK;
 }
 
-int32_t ProcessingTouchScreenDevice::TransformJsonDataForSingleTouchScreen(const Json& touchScreenEventArrays,
+int32_t ProcessingTouchScreenDevice::TransformJsonDataSingleTouchScreen(const Json& touchScreenEventArrays,
     InputEventArray& inputEventArray)
 {
     MMI_LOGD("Enter");
