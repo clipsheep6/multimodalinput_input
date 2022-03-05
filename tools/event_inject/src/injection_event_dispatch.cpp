@@ -14,12 +14,13 @@
  */
 
 #include "injection_event_dispatch.h"
+#include <cstdio>
 #include "error_multimodal.h"
 #include "proto.h"
 #include "util.h"
 
-using namespace OHOS::MMI;
-
+namespace OHOS {
+namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InjectionEventDispatch" };
 } // namespace
@@ -45,10 +46,42 @@ void InjectionEventDispatch::InitManageFunction()
     }
 }
 
+int64_t InjectionEventDispatch::GetFileSize(const std::string strFileName)
+{
+    FILE* pFile = fopen(strFileName.c_str(),"rb");
+    if (pFile) {
+        fseek(pFile, 0, SEEK_END);
+        int64_t size = ftell(pFile);
+        fclose(pFile);
+        return size;
+    }
+    return 0;
+}
+
+std::string InjectionEventDispatch::GetFileExtendName(const std::string& strName)
+{
+    if (strName.empty())
+        return "";
+    size_t nPos = strName.find_last_of('.');
+    if (strName.npos == nPos)
+        return strName;
+
+    return strName.substr(nPos + 1, strName.npos);
+}
+
 int32_t InjectionEventDispatch::OnJson()
 {
     MMI_LOGD("Enter");
     const std::string path = injectArgvs_.at(JSON_FILE_PATH_INDEX);
+    if (GetFileExtendName(path) != "json") {
+        MMI_LOGE("Unable to parse files other than json format.");
+        return RET_ERR;
+    }
+    int64_t fileSize = GetFileSize(path);
+    if ((fileSize <= 0) || (fileSize > JSON_FILE_SIZE)) {
+        MMI_LOGE("The file size is out of range 2M or empty.");
+        return RET_ERR;
+    }
     std::ifstream reader(path);
     if (!reader) {
         MMI_LOGE("json file is empty");
@@ -101,16 +134,13 @@ void InjectionEventDispatch::Run()
     MMI_LOGD("enter");
     std::string id = GetFunId();
     auto fun = GetFun(id);
-    if (!fun) {
-        MMI_LOGE("event injection Unknown fuction id:%{public}s", id.c_str());
-        return;
-    }
+    CHKPV(fun);
 
     auto ret = (*fun)();
     if (ret == RET_OK) {
-        MMI_LOGI("injecte function success id:%{public}s", id.c_str());
+        MMI_LOGI("inject function success id:%{public}s", id.c_str());
     } else {
-        MMI_LOGE("injecte function faild id:%{public}s", id.c_str());
+        MMI_LOGE("inject function failed id:%{public}s", id.c_str());
     }
 }
 
@@ -128,11 +158,10 @@ int32_t InjectionEventDispatch::ExecuteFunction(std::string funId)
     int32_t ret = RET_ERR;
     ret = (*fun)();
     if (ret == RET_OK) {
-        MMI_LOGI("injecte function success id:%{public}s", funId.c_str());
+        MMI_LOGI("inject function success id:%{public}s", funId.c_str());
     } else {
-        MMI_LOGE("injecte function faild id:%{public}s", funId.c_str());
+        MMI_LOGE("inject function failed id:%{public}s", funId.c_str());
     }
-
     return ret;
 }
 
@@ -140,7 +169,7 @@ int32_t InjectionEventDispatch::OnHelp()
 {
     InjectionToolsHelpFunc helpFunc;
     std::string ret = helpFunc.GetHelpText();
-    MMI_LOGI("%s", ret.c_str());
+    MMI_LOGI("%{public}s", ret.c_str());
 
     return RET_OK;
 }
@@ -162,18 +191,18 @@ int32_t InjectionEventDispatch::GetDeviceIndex(const std::string& deviceNameText
 int32_t InjectionEventDispatch::OnSendEvent()
 {
     if (injectArgvs_.size() != SEND_EVENT_ARGV_COUNTS) {
-        MMI_LOGE("Wrong number of input parameters, errCode:%d", PARAM_INPUT_FAIL);
+        MMI_LOGE("Wrong number of input parameters, errCode:%{public}d", PARAM_INPUT_FAIL);
         return RET_ERR;
     }
 
     std::string deviceNode = injectArgvs_[SEND_EVENT_DEV_NODE_INDEX];
     if (deviceNode.empty()) {
-        MMI_LOGE("device node:%s is not exit", deviceNode.c_str());
+        MMI_LOGE("device node:%{public}s is not exit", deviceNode.c_str());
         return RET_ERR;
     }
     int32_t fd = open(deviceNode.c_str(), O_RDWR);
     if (fd < 0) {
-        MMI_LOGE("open device node:%s faild", deviceNode.c_str());
+        MMI_LOGE("open device node:%{public}s faild, errCode:%{public}d", deviceNode.c_str(), FILE_OPEN_FAIL);
         return RET_ERR;
     }
 
@@ -185,7 +214,11 @@ int32_t InjectionEventDispatch::OnSendEvent()
     event.type = static_cast<uint16_t>(std::stoi(injectArgvs_[SEND_EVENT_TYPE_INDEX]));
     event.code = static_cast<uint16_t>(std::stoi(injectArgvs_[SEND_EVENT_CODE_INDEX]));
     event.value = static_cast<int32_t>(std::stoi(injectArgvs_[SEND_EVENT_VALUE_INDEX]));
-    write(fd, &event, sizeof(event));
+    int32_t ret = write(fd, &event, sizeof(event));
+    if (ret < 0) {
+        MMI_LOGE("send event to device node faild.");
+        return RET_ERR;
+    }
     if (fd >= 0) {
         close(fd);
     }
@@ -211,3 +244,6 @@ int32_t InjectionEventDispatch::GetDevIndexType(int32_t devType)
     }
     return RET_ERR;
 }
+} // namespace MMI
+} // namespace OHOS
+
