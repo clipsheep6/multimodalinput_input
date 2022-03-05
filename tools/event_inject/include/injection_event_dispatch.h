@@ -72,6 +72,9 @@ private:
     std::map<std::string, InjectFunction> injectFuns_;
     std::map<std::string, int32_t> sendEventType_;
     std::vector<DeviceInformation> allDevices_ = {};
+    std::string GetFileExtendName(const std::string& strName);
+    int64_t GetFileSize(const std::string strFileName);
+
 private:
     static constexpr uint32_t SEND_EVENT_ARGV_COUNTS = 5;
     static constexpr uint32_t SEND_EVENT_DEV_NODE_INDEX = 1;
@@ -82,6 +85,7 @@ private:
     static constexpr int32_t ARGVS_CODE_INDEX = 2;
     static constexpr int32_t SEND_EVENT_TO_DEVICE = 0;
     static constexpr int32_t JSON_FILE_PATH_INDEX = 1;
+    static constexpr int64_t JSON_FILE_SIZE = 2097152;
 };
 } // namespace MMI
 } // namespace OHOS
