@@ -58,10 +58,12 @@ void InputEventHandler::Init(UDSServer& udsServer)
             MmiMessageId::LIBINPUT_EVENT_DEVICE_REMOVED,
             MsgCallbackBind1(&InputEventHandler::OnEventDeviceRemoved, this)
         },
+#ifdef OHOS_WESTEN_MODEL
         {
             MmiMessageId::LIBINPUT_EVENT_KEYBOARD_KEY,
             std::bind(&InputEventHandler::OnKeyboardEvent, this, std::placeholders::_1)
         },
+#endif
         {
             MmiMessageId::LIBINPUT_EVENT_POINTER_MOTION,
             MsgCallbackBind1(&InputEventHandler::OnEventPointer, this)
@@ -239,9 +241,9 @@ int32_t InputEventHandler::OnEventDeviceRemoved(const multimodal_libinput_event&
     return RET_OK;
 }
 
-int32_t InputEventHandler::OnEventKey(struct libinput_event *event)
+int32_t InputEventHandler::OnKeyEvent(const multimodal_libinput_event& ev)
 {
-    CHKPR(event, PARAM_INPUT_INVALID);
+    CHKPR(ev.event, ERROR_NULL_POINTER);
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     if (keyEvent_ == nullptr) {
         keyEvent_ = KeyEvent::Create();
@@ -287,6 +289,7 @@ int32_t InputEventHandler::OnKeyEventDispatch(const multimodal_libinput_event& e
         MMI_LOGE("KeyEvent package failed. ret:%{public}d,errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
         return KEY_EVENT_PKG_FAIL;
     }
+
     int32_t keyId = keyEvent_->GetId();
     std::string keyEventString = "OnKeyEvent";
     StartAsyncTrace(BYTRACE_TAG_MULTIMODALINPUT, keyEventString, keyId);
