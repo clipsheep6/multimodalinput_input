@@ -17,6 +17,7 @@
 #define JS_INPUT_MONITOR_MANAGER_H
 
 #include <list>
+#include <map>
 #include <mutex>
 #include <cinttypes>
 #include "js_input_monitor.h"
@@ -29,11 +30,11 @@ class JsInputMonitorManager {
 public:
     static JsInputMonitorManager& GetInstance();
 
-    ~JsInputMonitorManager();
+    ~JsInputMonitorManager() = default;
 
-    void AddMonitor(napi_env jsEnv, napi_value receiver);
+    void AddMonitor(napi_env jsEnv, napi_value callback);
 
-    void RemoveMonitor(napi_env jsEnv, napi_value receiver);
+    void RemoveMonitor(napi_env jsEnv, napi_value callback);
 
     void RemoveMonitor(napi_env jsEnv);
 
@@ -50,11 +51,8 @@ private:
     void RemoveAllEnv();
 
     JsInputMonitorManager() = default;
-
     JsInputMonitorManager(const JsInputMonitorManager&) = delete;
-
     JsInputMonitorManager(JsInputMonitorManager&&) = delete;
-
     JsInputMonitorManager& operator=(const JsInputMonitorManager&) = delete;
 
 private:
@@ -64,7 +62,7 @@ private:
     std::map<napi_env, napi_ref> envManager_;
 };
 
-#define JSIMM JsInputMonitorManager::GetInstance()
+#define JsInputMonMgr JsInputMonitorManager::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // JS_INPUT_MONITOR_MANAGER_H

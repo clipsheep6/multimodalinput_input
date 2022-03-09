@@ -24,21 +24,11 @@ config("event_injection_config") {
     "include",
     "//foundation/multimodalinput/input/common/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//foundation/multimodalinput/input/frameworks/util/common/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
   ]
 
-  cflags = [
-    "-DOHOS_BUILD",
-    "-Wno-unused-parameter",
-    "-Wno-implicit-int",
-    "-Wno-return-type",
-    "-Wno-unused-function",
-    "-Wno-string-conversion",
-    "-Wheader-hygiene",
-    "-Wunused-private-field",
-    "-Wsign-compare",
-    "-Wformat",
-    "-Wdeprecated-declarations",
-  ]
+  cflags = [ "-DOHOS_BUILD" ]
 
   if (is_mmi_have_debug) {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
@@ -103,7 +93,6 @@ ohos_unittest("ut-event-injection-out") {
     "//drivers/adapter/uhdf2/adapter/osal/include",
     "//utils/native/base/include",
     "//third_party/googletest/googletest/include",
-    "//third_party/wayland-ivi-extension/include",
     "//utils/native/base/include",
     "${mmi_path}/common/include",
     "${mmi_path}/frameworks/proxy/event_handler",
@@ -182,9 +171,6 @@ ohos_unittest("ut-event-injection-out") {
     "${mmi_path}/tools/event_inject:event-injection",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
-    "//third_party/libxkbcommon:libxkbcommon",
-    "//third_party/wayland-ivi-extension:ivi-controller",
-    "//third_party/wayland-ivi-extension:libscreen-info-module",
     "//utils/native/base:utils",
   ]
 

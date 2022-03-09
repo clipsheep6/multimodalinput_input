@@ -17,10 +17,13 @@
 #include <gtest/gtest.h>
 #include "error_multimodal.h"
 
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::MMI;
+} // namespace
 
 class UtilTest : public testing::Test {
 public:
@@ -61,12 +64,6 @@ HWTEST_F(UtilTest, getEnumString_005, TestSize.Level1)
     const int32_t errorCodeEnum = UNKNOWN_MSG_ID;
     const char *retResult = GetMmiErrorTypeDesc(errorCodeEnum);
     EXPECT_STREQ(retResult, "Unknown Message Id");
-}
-
-HWTEST_F(UtilTest, GetEnv, TestSize.Level1)
-{
-    std::string retResult = OHOS::MMI::GetEnv("123");
-    EXPECT_STREQ(retResult.c_str(), "");
 }
 
 HWTEST_F(UtilTest, GetMicrotime, TestSize.Level1)
@@ -136,4 +133,5 @@ HWTEST_F(UtilTest, StringSplit, TestSize.Level1)
     std::vector<std::string> vecList;
     OHOS::MMI::StringSplit(str, sep, vecList);
 }
-} // namespace
+} // namespace MMI
+} // namespace OHOS

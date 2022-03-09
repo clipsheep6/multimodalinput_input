@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include "multimodal_standardized_event_manager.h"
-#include <cinttypes>
+#include "standardized_event_manager.h"
+#include <sstream>
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "immi_token.h"
@@ -22,29 +22,30 @@
 #include "multimodal_event_handler.h"
 #include "net_packet.h"
 #include "proto.h"
+#include "util.h"
 
 namespace OHOS {
 namespace MMI {
     namespace {
         constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
-            LOG_CORE, MMI_LOG_DOMAIN, "MultimodalStandardizedEventManager"
+            LOG_CORE, MMI_LOG_DOMAIN, "StandardizedEventManager"
         };
     }
 
-MultimodalStandardizedEventManager::MultimodalStandardizedEventManager() {}
+StandardizedEventManager::StandardizedEventManager() {}
 
-MultimodalStandardizedEventManager::~MultimodalStandardizedEventManager() {}
+StandardizedEventManager::~StandardizedEventManager() {}
 
-void MultimodalStandardizedEventManager::SetClientHandle(MMIClientPtr client)
+void StandardizedEventManager::SetClientHandle(MMIClientPtr client)
 {
-    MMI_LOGD("enter");
+    CALL_LOG_ENTER;
     client_ = client;
 }
 
-int32_t MultimodalStandardizedEventManager::SubscribeKeyEvent(
+int32_t StandardizedEventManager::SubscribeKeyEvent(
     const KeyEventInputSubscribeManager::SubscribeKeyEventInfo &subscribeInfo)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     OHOS::MMI::NetPacket pkt(MmiMessageId::SUBSCRIBE_KEY_EVENT);
     std::shared_ptr<OHOS::MMI::KeyOption> keyOption = subscribeInfo.GetKeyOption();
     uint32_t preKeySize = keyOption->GetPreKeys().size();
@@ -66,9 +67,9 @@ int32_t MultimodalStandardizedEventManager::SubscribeKeyEvent(
     return RET_OK;
 }
 
-int32_t MultimodalStandardizedEventManager::UnSubscribeKeyEvent(int32_t subscribeId)
+int32_t StandardizedEventManager::UnSubscribeKeyEvent(int32_t subscribeId)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     OHOS::MMI::NetPacket pkt(MmiMessageId::UNSUBSCRIBE_KEY_EVENT);
     pkt << subscribeId;
     if (MMIEventHdl.GetMMIClient() == nullptr) {
@@ -82,10 +83,10 @@ int32_t MultimodalStandardizedEventManager::UnSubscribeKeyEvent(int32_t subscrib
     return RET_OK;
 }
 
-int32_t MultimodalStandardizedEventManager::InjectionVirtual(bool isPressed, int32_t keyCode,
-                                                             int32_t keyDownDuration, int32_t maxKeyCode)
+int32_t StandardizedEventManager::InjectionVirtual(bool isPressed, int32_t keyCode,
+    int64_t keyDownDuration, int32_t maxKeyCode)
 {
-    MMI_LOGD("Enter");
+    CALL_LOG_ENTER;
     VirtualKey virtualEvent;
     virtualEvent.isPressed = isPressed;
     virtualEvent.keyCode = keyCode;
@@ -100,9 +101,9 @@ int32_t MultimodalStandardizedEventManager::InjectionVirtual(bool isPressed, int
     return RET_OK;
 }
 
-int32_t MultimodalStandardizedEventManager::InjectEvent(const std::shared_ptr<KeyEvent> key)
+int32_t StandardizedEventManager::InjectEvent(const std::shared_ptr<KeyEvent> key)
 {
-    MMI_LOGD("begin");
+    CALL_LOG_ENTER;
     CHKPR(key, RET_ERR);
     key->UpdateId();
     if (key->GetKeyCode() < 0) {
@@ -123,46 +124,22 @@ int32_t MultimodalStandardizedEventManager::InjectEvent(const std::shared_ptr<Ke
     return RET_OK;
 }
 
-int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+int32_t StandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_LOGD("enter");
-    CHKPR(pointerEvent, RET_ERR);
-    std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
-    MMI_LOGD("Pointer event dispatcher of client:eventType:%{public}s,actionTime:%{public}" PRId64 ","
-             "action:%{public}d,actionStartTime:%{public}" PRId64 ","
-             "flag:%{public}u,pointerAction:%{public}s,sourceType:%{public}s,"
-             "VerticalAxisValue:%{public}f,HorizontalAxisValue:%{public}f,pointerCount:%{public}zu",
-             pointerEvent->DumpEventType(), pointerEvent->GetActionTime(),
-             pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
-             pointerEvent->GetFlag(), pointerEvent->DumpPointerAction(),
-             pointerEvent->DumpSourceType(),
-             pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
-             pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
-             pointerIds.size());
-
-    for (const auto &pointerId : pointerIds) {
-        OHOS::MMI::PointerEvent::PointerItem item;
-        if (!pointerEvent->GetPointerItem(pointerId, item)) {
-            MMI_LOGE("Get pointer item failed. pointer:%{public}d", pointerId);
-            return RET_ERR;
-        }
-        MMI_LOGD("DownTime:%{public}" PRId64 ",isPressed:%{public}s,"
-                "globalX:%{public}d,globalY:%{public}d,localX:%{public}d,localY:%{public}d,"
-                "width:%{public}d,height:%{public}d,pressure:%{public}d",
-                 item.GetDownTime(), (item.IsPressed() ? "true" : "false"),
-                 item.GetGlobalX(), item.GetGlobalY(), item.GetLocalX(), item.GetLocalY(),
-                 item.GetWidth(), item.GetHeight(), item.GetPressure());
-    }
-    std::vector<int32_t> pressedKeys = pointerEvent->GetPressedKeys();
-    for (auto &keyCode : pressedKeys) {
-        MMI_LOGI("Pressed keyCode:%{public}d", keyCode);
+    CALL_LOG_ENTER;
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    MMI_LOGD("Inject pointer event:");
+    std::stringstream sStream;
+    sStream << *pointerEvent;
+    std::string sLine;
+    while (std::getline(sStream, sLine)) {
+        MMI_LOGD("%{public}s", sLine.c_str());
     }
     OHOS::MMI::NetPacket pkt(MmiMessageId::INJECT_POINTER_EVENT);
     if (InputEventDataTransformation::Marshalling(pointerEvent, pkt) != RET_OK) {
         MMI_LOGE("Marshalling pointer event failed");
         return RET_ERR;
     }
-    MMI_LOGD("leave");
     if (!SendMsg(pkt)) {
         MMI_LOGE("SendMsg failed");
         return RET_ERR;
@@ -170,21 +147,21 @@ int32_t MultimodalStandardizedEventManager::InjectPointerEvent(std::shared_ptr<P
     return RET_OK;
 }
 
-int32_t MultimodalStandardizedEventManager::GetDeviceIds(int32_t userData)
+int32_t StandardizedEventManager::GetDeviceIds(int32_t userData)
 {
     OHOS::MMI::NetPacket pkt(MmiMessageId::INPUT_DEVICE_IDS);
     pkt << userData;
     return SendMsg(pkt);
 }
 
-int32_t MultimodalStandardizedEventManager::GetDevice(int32_t userData, int32_t deviceId)
+int32_t StandardizedEventManager::GetDevice(int32_t userData, int32_t deviceId)
 {
     OHOS::MMI::NetPacket pkt(MmiMessageId::INPUT_DEVICE);
     pkt << userData << deviceId;
     return SendMsg(pkt);
 }
 
-bool MultimodalStandardizedEventManager::SendMsg(NetPacket& pkt) const
+bool StandardizedEventManager::SendMsg(NetPacket& pkt) const
 {
     CHKPF(client_);
     return client_->SendMessage(pkt);

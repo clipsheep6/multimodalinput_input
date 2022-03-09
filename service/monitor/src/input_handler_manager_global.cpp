@@ -46,7 +46,7 @@ int32_t InputHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
         SessionHandler interceptor { handlerId, handlerType, session };
         return interceptors_.AddInterceptor(interceptor);
     }
-    MMI_LOGW("Invalid handler type");
+    MMI_LOGW("Invalid handler type:%{public}d", handlerType);
     return RET_ERR;
 }
 
@@ -108,10 +108,11 @@ bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointe
         MMI_LOGD("This event has been tagged as not to be monitored");
     } else {
         if (monitors_.HandleEvent(pointerEvent)) {
-            MMI_LOGD("Pointer event was consumed");
+            MMI_LOGD("Pointer event was monitor");
             return true;
         }
     }
+    MMI_LOGD("Interception and monitor failed");
     return false;
 }
 
@@ -173,7 +174,6 @@ void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<Poi
 
 int32_t InputHandlerManagerGlobal::MonitorCollection::AddMonitor(const SessionHandler& monitor)
 {
-    std::lock_guard<std::mutex> guard(lockMonitors_);
     if (monitors_.size() >= MAX_N_INPUT_MONITORS) {
         MMI_LOGE("The number of monitors exceeds the maximum:%{public}zu,monitors,errCode:%{public}d",
                  monitors_.size(), INVALID_MONITOR_MON);
@@ -190,7 +190,6 @@ int32_t InputHandlerManagerGlobal::MonitorCollection::AddMonitor(const SessionHa
 
 void InputHandlerManagerGlobal::MonitorCollection::RemoveMonitor(const SessionHandler& monitor)
 {
-    std::lock_guard<std::mutex> guard(lockMonitors_);
     std::set<SessionHandler>::const_iterator tItr = monitors_.find(monitor);
     if (tItr != monitors_.end()) {
         monitors_.erase(tItr);
@@ -234,7 +233,6 @@ int32_t InputHandlerManagerGlobal::MonitorCollection::GetPriority() const
 bool InputHandlerManagerGlobal::MonitorCollection::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPF(keyEvent);
-    std::lock_guard<std::mutex> guard(lockMonitors_);
     MMI_LOGD("There are currently %{public}zu monitors", monitors_.size());
     for (const auto &mon : monitors_) {
         mon.SendToClient(keyEvent);
@@ -252,7 +250,6 @@ bool InputHandlerManagerGlobal::MonitorCollection::HandleEvent(std::shared_ptr<P
 
 bool InputHandlerManagerGlobal::MonitorCollection::HasMonitor(int32_t monitorId, SessionPtr session)
 {
-    std::lock_guard<std::mutex> guard(lockMonitors_);
     SessionHandler monitor { monitorId, InputHandlerType::MONITOR, session };
     return (monitors_.find(monitor) != monitors_.end());
 }
@@ -267,15 +264,15 @@ void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::s
     lastPointerEvent_ = pointerEvent;
 
     if (pointerEvent->GetPointersIdList().size() != 1) {
-        MMI_LOGD("First down and last up intermediate process");
+        MMI_LOGD("First press down and last press up intermediate process");
         return;
     }
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
-        MMI_LOGD("Press for the first time");
+        MMI_LOGD("First press down");
         downEventId_ = pointerEvent->GetId();
         isMonitorConsumed_ = false;
     } else if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
-        MMI_LOGD("The last time lift");
+        MMI_LOGD("Last press up");
         downEventId_ = -1;
         lastPointerEvent_.reset();
     }
@@ -284,7 +281,6 @@ void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::s
 void InputHandlerManagerGlobal::MonitorCollection::Monitor(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
-    std::lock_guard<std::mutex> guard(lockMonitors_);
     MMI_LOGD("There are currently %{public}zu monitors", monitors_.size());
     for (const auto &monitor : monitors_) {
         monitor.SendToClient(pointerEvent);
@@ -293,7 +289,6 @@ void InputHandlerManagerGlobal::MonitorCollection::Monitor(std::shared_ptr<Point
 
 void InputHandlerManagerGlobal::MonitorCollection::OnSessionLost(SessionPtr session)
 {
-    std::lock_guard<std::mutex> guard(lockMonitors_);
     std::set<SessionHandler>::const_iterator cItr = monitors_.cbegin();
     while (cItr != monitors_.cend()) {
         if (cItr->session_ != session) {

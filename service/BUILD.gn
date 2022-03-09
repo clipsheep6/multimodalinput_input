@@ -15,7 +15,7 @@ import("//build/ohos.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 mmi_service_path = "${mmi_path}/service"
 
-config("libmmi_server_public_config") {
+config("libmmi_server_config") {
   include_dirs = [
     "device_manager/include",
     "device_scalability/include",
@@ -35,10 +35,10 @@ config("libmmi_server_public_config") {
     "timer_manager/include",
     "${mmi_service_path}/connect_manager/include",
     "${mmi_service_path}/filter/include",
+    "${mmi_service_path}/module_loader/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "mouse_event_handler/include",
-    "//third_party/libxkbcommon/",
     "//third_party/FreeBSD/sys/dev/evdev",
     "//third_party/json/include",
     "//third_party/json/include/nlohmann",
@@ -48,16 +48,16 @@ config("libmmi_server_public_config") {
     "//foundation/aafwk/standard/interfaces/innerkits/want/include",
     "//foundation/aafwk/standard/services/abilitymgr/include",
     "//foundation/aafwk/standard/interfaces/innerkits/base/include",
-    "//third_party/weston/include",
-    "//third_party/weston/include/libweston",
     "//third_party/pixman/pixman",
-    "//third_party/wayland_standard/src",
-    "//third_party/weston",
-    "$root_out_dir/gen/third_party/wayland_standard/protocol",
     "//foundation/multimodalinput/interfaces/native/innerkits/event/include",
     "//foundation/graphic/standard/rosen/modules/2d_graphics/include",
     "//foundation/graphic/standard/rosen/modules/2d_graphics/src",
     "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
+    "//foundation/multimodalinput/input/frameworks/util/common/include",
+    "//foundation/multimodalinput/input/frameworks/util/socket/include",
+    "//foundation/multimodalinput/input/frameworks/util/network/include",
+    "//foundation/multimodalinput/input/common/include",
   ]
 
   if (is_mmi_have_hdf) {
@@ -109,7 +109,6 @@ ohos_shared_library("libmmi-server") {
     "event_dump/src/event_dump.cpp",
     "event_handler/src/input_event_handler.cpp",
     "event_handler/src/key_event_value_transformation.cpp",
-    "event_handler/src/system_event_handler.cpp",
     "event_package/src/event_package.cpp",
     "interceptor/src/interceptor_manager_global.cpp",
     "libinput_adapter/src/s_input.cpp",
@@ -139,7 +138,7 @@ ohos_shared_library("libmmi-server") {
 
   sources += [ "module_loader/src/mmi_service.cpp" ]
 
-  public_configs = [ ":libmmi_server_public_config" ]
+  configs = [ ":libmmi_server_config" ]
 
   deps = [
     ":drawing_pointer_image",
@@ -163,9 +162,6 @@ ohos_shared_library("libmmi-server") {
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_service",
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_proxy",
     "//foundation/windowmanager/wm:libwm",
-    "//third_party/libxkbcommon:libxkbcommon",
-    "//third_party/wayland_standard:libwayland_server",
-    "//third_party/weston:libweston",
     "//utils/native/base:utils",
   ]
 
@@ -205,7 +201,6 @@ ohos_unittest("ut-mmi-service-out") {
     "//drivers/adapter/uhdf2/adapter/osal/include",
     "//utils/native/base/include",
     "//third_party/googletest/googletest/include",
-    "//third_party/wayland-ivi-extension/include",
     "//utils/native/base/include",
     "${mmi_path}/common/include",
     "${mmi_path}/frameworks/proxy/event_handler",
@@ -276,6 +271,8 @@ ohos_unittest("ut-mmi-service-out") {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
+  configs = [ ":libmmi_server_config" ]
+
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/frameworks/util:libmmi-util",
@@ -285,7 +282,6 @@ ohos_unittest("ut-mmi-service-out") {
     "//foundation/aafwk/standard/interfaces/innerkits/ability_manager:ability_manager",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
-    "//third_party/libxkbcommon:libxkbcommon",
     "//utils/native/base:utils",
   ]
 

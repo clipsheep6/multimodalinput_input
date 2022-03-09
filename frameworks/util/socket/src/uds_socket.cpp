@@ -15,6 +15,7 @@
 
 #include "uds_socket.h"
 #include <cinttypes>
+#include "error_multimodal.h"
 #include "mmi_log.h"
 
 namespace OHOS {
@@ -44,17 +45,22 @@ int32_t UDSSocket::EpollCreat(int32_t size)
 
 int32_t UDSSocket::EpollCtl(int32_t fd, int32_t op, struct epoll_event& event, int32_t epollFd)
 {
-    CHKR(fd >= 0, PARAM_INPUT_INVALID, RET_ERR);
+    if (fd < 0) {
+        MMI_LOGE("Invalid fd");
+        return RET_ERR;
+    }
     if (epollFd < 0) {
         epollFd = epollFd_;
     }
-    CHKR(epollFd >= 0, PARAM_INPUT_INVALID, RET_ERR);
+    if (epollFd < 0) {
+        MMI_LOGE("Invalid param epollFd");
+        return RET_ERR;
+    }
     auto ret = epoll_ctl(epollFd, op, fd, &event);
     if (ret < 0) {
-        const int32_t errnoSaved = errno;
         MMI_LOGE("epoll_ctl retrun %{public}d,epollFd_:%{public}d,"
-                 "op:%{public}d,fd:%{public}d,errno:%{public}d,error msg: %{public}s",
-                 ret, epollFd, op, fd, errnoSaved, strerror(errnoSaved));
+                 "op:%{public}d,fd:%{public}d,errno:%{public}d",
+                 ret, epollFd, op, fd, errno);
     }
     return ret;
 }
@@ -64,34 +70,39 @@ int32_t UDSSocket::EpollWait(struct epoll_event& events, int32_t maxevents, int3
     if (epollFd < 0) {
         epollFd = epollFd_;
     }
-    CHKR(epollFd >= 0, PARAM_INPUT_INVALID, RET_ERR);
+    if (epollFd < 0) {
+        MMI_LOGE("Invalid param epollFd");
+        return RET_ERR;
+    }
     auto ret = epoll_wait(epollFd, &events, maxevents, timeout);
     if (ret < 0) {
-        const int errnoSaved = errno;
-        MMI_LOGE("epoll_wait retrun %{public}d,errno:%{public}d,%{public}s",
-            ret, errnoSaved, strerror(errnoSaved));
+        MMI_LOGE("epoll_wait ret:%{public}d,errno:%{public}d", ret, errno);
     }
     return ret;
 }
 
-int32_t UDSSocket::SetBlockMode(int32_t fd, bool isBlock)
+int32_t UDSSocket::SetNonBlockMode(int32_t fd, bool isBlock)
 {
-    CHKR(fd >= 0, PARAM_INPUT_INVALID, RET_ERR);
+    if (fd < 0) {
+        MMI_LOGE("Invalid fd");
+        return RET_ERR;
+    }
     int32_t flags = fcntl(fd, F_GETFL);
     if (flags < 0) {
-        MMI_LOGE("fcntl F_GETFL fail. fd:%{public}d,flags:%{public}d,msg:%{public}s,errCode:%{public}d",
-            fd, flags, strerror(errno), FCNTL_FAIL);
+        MMI_LOGE("fcntl F_GETFL fail. fd:%{public}d,flags:%{public}d,errno:%{public}d,errCode:%{public}d",
+            fd, flags, errno, FCNTL_FAIL);
         return flags;
     }
     MMI_LOGD("F_GETFL fd:%{public}d,flags:%{public}d", fd, flags);
-    flags |= O_NONBLOCK; // 非阻塞模式
+    uint32_t mask = static_cast<uint32_t>(flags);
+    mask |= O_NONBLOCK;
     if (isBlock) {
-        flags &= ~O_NONBLOCK; // 阻塞模式
+        mask &= ~O_NONBLOCK;
     }
-    flags = fcntl(fd, F_SETFL, flags);
+    flags = fcntl(fd, F_SETFL, static_cast<int32_t>(mask));
     if (flags < 0) {
-        MMI_LOGE("fcntl F_SETFL fail. fd:%{public}d,flags:%{public}d,msg:%{public}s,errCode:%{public}d",
-            fd, flags, strerror(errno), FCNTL_FAIL);
+        MMI_LOGE("fcntl F_SETFL fail. fd:%{public}d,flags:%{public}d,errno:%{public}d,errCode:%{public}d",
+            fd, flags, errno, FCNTL_FAIL);
         return flags;
     }
     MMI_LOGD("F_SETFL fd:%{public}d,flags:%{public}d", fd, flags);
@@ -109,8 +120,14 @@ void UDSSocket::EpollClose()
 size_t UDSSocket::Read(char *buf, size_t size)
 {
     CHKPR(buf, -1);
-    CHKR(size > 0, PARAM_INPUT_INVALID, -1);
-    CHKR(fd_ >= 0, PARAM_INPUT_INVALID, -1);
+    if (size <= 0) {
+        MMI_LOGE("Invalid param size");
+        return -1;
+    }
+    if (fd_ < 0) {
+        MMI_LOGE("Invalid param fd_");
+        return -1;
+    }
     ssize_t ret = read(fd_, static_cast<void *>(buf), size);
     if (ret < 0) {
         MMI_LOGE("read return %{public}zd", ret);
@@ -121,8 +138,14 @@ size_t UDSSocket::Read(char *buf, size_t size)
 size_t UDSSocket::Write(const char *buf, size_t size)
 {
     CHKPR(buf, -1);
-    CHKR(size > 0, PARAM_INPUT_INVALID, -1);
-    CHKR(fd_ >= 0, PARAM_INPUT_INVALID, -1);
+    if (size <= 0) {
+        MMI_LOGE("Invalid param size");
+        return -1;
+    }
+    if (fd_ < 0) {
+        MMI_LOGE("Invalid param fd_");
+        return -1;
+    }
     ssize_t ret = write(fd_, buf, size);
     if (ret < 0) {
         MMI_LOGE("write return %{public}zd", ret);
@@ -133,7 +156,10 @@ size_t UDSSocket::Write(const char *buf, size_t size)
 size_t UDSSocket::Send(const char *buf, size_t size, int32_t flags)
 {
     CHKPR(buf, -1);
-    CHKR(size > 0, PARAM_INPUT_INVALID, -1);
+    if (size <= 0) {
+        MMI_LOGE("Invalid param size");
+        return -1;
+    }
     ssize_t ret = send(fd_, buf, size, flags);
     if (ret < 0) {
         MMI_LOGE("send return %{public}zd", ret);
@@ -144,7 +170,10 @@ size_t UDSSocket::Send(const char *buf, size_t size, int32_t flags)
 size_t UDSSocket::Recv(char *buf, size_t size, int32_t flags)
 {
     CHKPR(buf, -1);
-    CHKR(size > 0, PARAM_INPUT_INVALID, -1);
+    if (size <= 0) {
+        MMI_LOGE("Invalid param size");
+        return -1;
+    }
     ssize_t ret = recv(fd_, static_cast<void *>(buf), size, flags);
     if (ret < 0) {
         MMI_LOGE("recv return %{public}zd", ret);
@@ -155,8 +184,14 @@ size_t UDSSocket::Recv(char *buf, size_t size, int32_t flags)
 size_t UDSSocket::Recvfrom(char *buf, size_t size, uint32_t flags, sockaddr *addr, size_t *addrlen)
 {
     CHKPR(buf, -1);
-    CHKR(size > 0, PARAM_INPUT_INVALID, -1);
-    CHKR(fd_ >= 0, PARAM_INPUT_INVALID, -1);
+    if (size <= 0) {
+        MMI_LOGE("Invalid param size");
+        return -1;
+    }
+    if (fd_ < 0) {
+        MMI_LOGE("Invalid param fd_");
+        return -1;
+    }
     ssize_t ret = recvfrom(fd_, static_cast<void *>(buf), size, flags, addr, reinterpret_cast<socklen_t *>(addrlen));
     if (ret < 0) {
         MMI_LOGE("recvfrom return %{public}zd", ret);
@@ -167,8 +202,14 @@ size_t UDSSocket::Recvfrom(char *buf, size_t size, uint32_t flags, sockaddr *add
 size_t UDSSocket::Sendto(const char *buf, size_t size, uint32_t flags, sockaddr *addr, size_t addrlen)
 {
     CHKPR(buf, -1);
-    CHKR(size > 0, PARAM_INPUT_INVALID, -1);
-    CHKR(fd_ >= 0, PARAM_INPUT_INVALID, -1);
+    if (size <= 0) {
+        MMI_LOGE("Invalid param size");
+        return -1;
+    }
+    if (fd_ < 0) {
+        MMI_LOGE("Invalid param fd_");
+        return -1;
+    }
     ssize_t ret = sendto(fd_, static_cast<const void *>(buf), size, flags, addr, static_cast<socklen_t>(addrlen));
     if (ret < 0) {
         MMI_LOGE("sendto return %{public}zd", ret);

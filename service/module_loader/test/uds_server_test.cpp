@@ -17,9 +17,12 @@
 #include <gtest/gtest.h>
 #include "proto.h"
 
+namespace OHOS {
+namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
+} // namespace
 
 class UDSServerTest : public testing::Test {
 public:
@@ -98,42 +101,6 @@ HWTEST_F(UDSServerTest, SendMsg_003, TestSize.Level1)
     ASSERT_FALSE(retResult);
 }
 
-HWTEST_F(UDSServerTest, Broadcast_001, TestSize.Level1)
-{
-    MmiMessageId msgId = MmiMessageId::INVALID;
-    NetPacket pkt(msgId);
-
-    UDSServer serObj;
-    serObj.Broadcast(pkt);
-}
-
-HWTEST_F(UDSServerTest, Broadcast_002, TestSize.Level1)
-{
-    MmiMessageId msgId = MmiMessageId::BEGIN;
-    NetPacket pkt(msgId);
-
-    UDSServer serObj;
-    serObj.Broadcast(pkt);
-}
-
-HWTEST_F(UDSServerTest, Broadcast_003, TestSize.Level1)
-{
-    MmiMessageId msgId = MmiMessageId::REGISTER_APP_INFO;
-    NetPacket pkt(msgId);
-
-    UDSServer serObj;
-    serObj.Broadcast(pkt);
-}
-
-HWTEST_F(UDSServerTest, Broadcast_004, TestSize.Level1)
-{
-    MmiMessageId msgId = MmiMessageId::REGISTER_MSG_HANDLER;
-    NetPacket pkt(msgId);
-
-    UDSServer serObj;
-    serObj.Broadcast(pkt);
-}
-
 HWTEST_F(UDSServerTest, Multicast, TestSize.Level1)
 {
     MmiMessageId msgId = MmiMessageId::INVALID;
@@ -201,4 +168,5 @@ HWTEST_F(UDSServerTest, GetSession_003, TestSize.Level1)
     EXPECT_TRUE(retResult == nullptr);
 }
 #endif
-} // namespace
+} // namespace MMI
+} // namespace OHOS
