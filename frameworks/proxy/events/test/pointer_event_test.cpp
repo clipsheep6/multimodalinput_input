@@ -171,6 +171,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_003, TestSiz
 HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_001, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_UNKNOWN);
     ASSERT_TRUE(!pointerEvent->IsValid());
 
@@ -189,6 +190,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_001, TestSize.L
     ASSERT_TRUE(!pointerEvent->IsValid());
 
     auto pointerEvent1 = PointerEvent::Create();
+    ASSERT_NE(pointerEvent1, nullptr);
     pointerEvent1->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent1->SetPointerId(0);
     pointerEvent1->SetButtonPressed(PointerEvent::BUTTON_NONE);
@@ -209,6 +211,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_001, TestSize.L
 HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_002, TestSize.Level1)
 {
     auto pointerEvent1 = PointerEvent::Create();
+    ASSERT_NE(pointerEvent1, nullptr);
     pointerEvent1->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent1->SetPointerId(0);
     pointerEvent1->SetButtonPressed(PointerEvent::BUTTON_NONE);
@@ -218,6 +221,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_002, TestSize.L
     ASSERT_TRUE(!pointerEvent1->IsValid());
 
     auto pointerEvent2 = PointerEvent::Create();
+    ASSERT_NE(pointerEvent2, nullptr);
     pointerEvent2->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent2->SetPointerId(0);
     pointerEvent2->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
@@ -227,6 +231,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_002, TestSize.L
     ASSERT_TRUE(!pointerEvent2->IsValid());
 
     auto pointerEvent3 = PointerEvent::Create();
+    ASSERT_NE(pointerEvent3, nullptr);
     pointerEvent3->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent3->SetPointerId(0);
     pointerEvent3->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
@@ -246,6 +251,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_002, TestSize.L
 HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_003, TestSize.Level1)
 {
     auto pointerEvent1 = PointerEvent::Create();
+    ASSERT_NE(pointerEvent1, nullptr);
     pointerEvent1->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent1->SetPointerId(0);
     pointerEvent1->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
@@ -257,6 +263,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_003, TestSize.L
     ASSERT_TRUE(!pointerEvent1->IsValid());
 
     auto pointerEvent2 = PointerEvent::Create();
+    ASSERT_NE(pointerEvent2, nullptr);
     pointerEvent2->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent2->SetPointerId(0);
     pointerEvent2->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
@@ -276,6 +283,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_003, TestSize.L
 HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_004, TestSize.Level1)
 {
     auto pointerEvent1 = PointerEvent::Create();
+    ASSERT_NE(pointerEvent1, nullptr);
     pointerEvent1->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent1->SetPointerId(0);
     pointerEvent1->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
@@ -287,6 +295,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_004, TestSize.L
     ASSERT_TRUE(!pointerEvent1->IsValid());
 
     auto pointerEvent2 = PointerEvent::Create();
+    ASSERT_NE(pointerEvent2, nullptr);
     pointerEvent2->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent2->SetPointerId(0);
     pointerEvent2->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
@@ -298,6 +307,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_004, TestSize.L
     ASSERT_TRUE(!pointerEvent2->IsValid());
 
     auto pointerEvent3 = PointerEvent::Create();
+    ASSERT_NE(pointerEvent3, nullptr);
     pointerEvent3->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent3->SetPointerId(0);
     pointerEvent3->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
@@ -319,6 +329,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_004, TestSize.L
 HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_005, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerId(0);
     pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
@@ -341,6 +352,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_005, TestSize.L
 HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_001, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent->SetPointerId(-1);
     ASSERT_TRUE(!pointerEvent->IsValid());
@@ -351,12 +363,14 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_001, TestSize.L
     ASSERT_TRUE(!pointerEvent->IsValid());
 
     auto pointerEvent1 = PointerEvent::Create();
+    ASSERT_NE(pointerEvent1, nullptr);
     pointerEvent1->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent1->SetPointerId(0);
     pointerEvent1->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
     ASSERT_TRUE(!pointerEvent1->IsValid());
     
     auto pointerEvent2 = PointerEvent::Create();
+    ASSERT_NE(pointerEvent2, nullptr);
     pointerEvent2->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent2->SetPointerId(0);
     pointerEvent2->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
@@ -373,6 +387,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_001, TestSize.L
 HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_002, TestSize.Level1)
 {
     auto pointerEvent1 = PointerEvent::Create();
+    ASSERT_NE(pointerEvent1, nullptr);
     pointerEvent1->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent1->SetPointerId(0);
     pointerEvent1->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
@@ -383,6 +398,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_002, TestSize.L
     ASSERT_TRUE(!pointerEvent1->IsValid());
 
     auto pointerEvent2 = PointerEvent::Create();
+    ASSERT_NE(pointerEvent2, nullptr);
     pointerEvent2->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent2->SetPointerId(0);
     pointerEvent2->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
@@ -403,6 +419,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_002, TestSize.L
 HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_003, TestSize.Level1)
 {
     auto pointerEvent1 = PointerEvent::Create();
+    ASSERT_NE(pointerEvent1, nullptr);
     pointerEvent1->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent1->SetPointerId(0);
     pointerEvent1->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
@@ -415,6 +432,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_003, TestSize.L
     ASSERT_TRUE(!pointerEvent1->IsValid());
 
     auto pointerEvent2 = PointerEvent::Create();
+    ASSERT_NE(pointerEvent2, nullptr);
     pointerEvent2->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent2->SetPointerId(0);
     pointerEvent2->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
@@ -441,6 +459,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_003, TestSize.L
 HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_004, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent->SetPointerId(0);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
@@ -467,6 +486,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_004, TestSize.L
 HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_005, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent->SetPointerId(0);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);

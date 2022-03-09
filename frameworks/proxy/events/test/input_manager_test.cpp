@@ -249,7 +249,7 @@ void InputManagerTest::TestMarkConsumedStep3(int32_t monitorId, int32_t eventId)
 void InputManagerTest::TestMarkConsumedStep4()
 {
     auto pointerEvent = PointerEvent::Create();
-    CHKPV(pointerEvent);
+    ASSERT_NE(pointerEvent, nullptr);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
     item.SetGlobalX(1123);  // test code，set the GlobalX = 823
@@ -280,7 +280,7 @@ void InputManagerTest::TestMarkConsumedStep5()
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     auto pointerEvent = PointerEvent::Create();
-    CHKPV(pointerEvent);
+    ASSERT_NE(pointerEvent, nullptr);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
     item.SetGlobalX(0);  // test code，set the GlobalX = 823
@@ -311,7 +311,7 @@ void InputManagerTest::TestMarkConsumedStep6()
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     auto pointerEvent = PointerEvent::Create();
-    CHKPV(pointerEvent);
+    ASSERT_NE(pointerEvent, nullptr);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
     item.SetGlobalX(823);   // test code，set the GlobalX = 823
@@ -350,6 +350,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_001, TestSize.L
     std::vector<std::string> slogs {SearchLog(command, true)};
     int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
     std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_NE(injectDownEvent, nullptr);
     KeyEvent::KeyItem kitDown;
     kitDown.SetKeyCode(KeyEvent::KEYCODE_BACK);
     kitDown.SetPressed(true);
@@ -360,6 +361,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_001, TestSize.L
     InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
 
     std::shared_ptr<KeyEvent> injectUpEvent = KeyEvent::Create();
+    ASSERT_NE(injectUpEvent, nullptr);
     downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
     KeyEvent::KeyItem kitUp;
     kitUp.SetKeyCode(KeyEvent::KEYCODE_BACK);
@@ -382,6 +384,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_001, TestSize.L
 HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_002, TestSize.Level1)
 {
     std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_NE(injectDownEvent, nullptr);
     int64_t downTime = -1;
     KeyEvent::KeyItem kitDown;
     kitDown.SetKeyCode(KeyEvent::KEYCODE_HOME);
@@ -404,6 +407,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_003, TestSize.L
     std::string command = "Inject keyCode:2, action:2";
     std::vector<std::string> slogs {SearchLog(command, true)};
     std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_NE(injectDownEvent, nullptr);
     int64_t downTime = 0;
     KeyEvent::KeyItem kitDown;
     kitDown.SetKeyCode(KeyEvent::KEYCODE_BACK);
@@ -415,6 +419,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_003, TestSize.L
     InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
 
     std::shared_ptr<KeyEvent> injectUpEvent = KeyEvent::Create();
+    ASSERT_NE(injectUpEvent, nullptr);
     KeyEvent::KeyItem kitUp;
     kitUp.SetKeyCode(KeyEvent::KEYCODE_BACK);
     kitUp.SetPressed(false);
@@ -436,6 +441,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_003, TestSize.L
 HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_004, TestSize.Level1)
 {
     std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_NE(injectDownEvent, nullptr);
     int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
     KeyEvent::KeyItem kitDown;
     kitDown.SetKeyCode(KeyEvent::KEYCODE_UNKNOWN);
@@ -460,6 +466,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_005, TestSize.L
     std::string command = "Inject keyCode:0, action:2";
     std::vector<std::string> slogs {SearchLog(command, true)};
     std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_NE(injectDownEvent, nullptr);
     int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
     KeyEvent::KeyItem kitDown;
     kitDown.SetKeyCode(KeyEvent::KEYCODE_FN);
@@ -476,6 +483,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_005, TestSize.L
     MMI_LOGD("MMIEventHdl.InjectEvent end!");
 
     std::shared_ptr<KeyEvent> injectUpEvent = KeyEvent::Create();
+    ASSERT_NE(injectUpEvent, nullptr);
     downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
     KeyEvent::KeyItem kitUp;
     kitUp.SetKeyCode(KeyEvent::KEYCODE_FN);
@@ -779,6 +787,7 @@ HWTEST_F(InputManagerTest, InputManager_ANR_TEST_001, TestSize.Level1)
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(20000));
     auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
 
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
@@ -832,6 +841,7 @@ HWTEST_F(InputManagerTest, InputManager_ANR_TEST_002, TestSize.Level1)
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(20000));
     auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
 
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
@@ -2301,6 +2311,7 @@ void InputManagerTest::TestInputEventInterceptor(std::shared_ptr<PointerEvent> p
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_001, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
     PointerEvent::PointerItem item;
     item.SetPointerId(DEFAULT_POINTER_ID);
     item.SetDownTime(10010);
@@ -2334,6 +2345,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_001, TestSize.Level1)
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_002, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
     item.SetDownTime(10010);
@@ -2464,6 +2476,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_004, TestSize.Level1)
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_005, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
     pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
@@ -2555,6 +2568,7 @@ void InputManagerTest::TestInputEventInterceptor2(std::shared_ptr<PointerEvent> 
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_006, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
     item.SetGlobalX(823);   // test code，set the GlobalX = 823
@@ -2604,6 +2618,7 @@ void InputManagerTest::TouchPadMonitorCallBack(std::shared_ptr<PointerEvent> poi
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_001, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
     item.SetDownTime(10010);
@@ -2647,6 +2662,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_001, TestSize.L
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_002, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
     item.SetDownTime(10010);
@@ -2690,6 +2706,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_002, TestSize.L
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_003, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
     item.SetDownTime(10010);
@@ -2733,6 +2750,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_003, TestSize.L
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
     item.SetDownTime(10010);
@@ -2794,6 +2812,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.L
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_005, TestSize.Level1)
 {
     auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
     item.SetDownTime(10010);
@@ -2847,6 +2866,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_001, TestSize
 
     int64_t actionTime = GetSysClockTime();
     auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
     PointerEvent::PointerItem item { };
     item.SetPointerId(DEFAULT_POINTER_ID);
     item.SetDownTime(actionTime);
@@ -2893,6 +2913,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_002, TestSize
 
     int64_t actionTime = GetSysClockTime();
     auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
     PointerEvent::PointerItem item { };
     item.SetPointerId(DEFAULT_POINTER_ID);
     item.SetDownTime(actionTime);
@@ -2939,6 +2960,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_003, TestSize
 
     int64_t actionTime = GetSysClockTime();
     auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
     PointerEvent::PointerItem item { };
     item.SetPointerId(DEFAULT_POINTER_ID);
     item.SetDownTime(actionTime);
@@ -2985,6 +3007,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_004, TestSize
 
     int64_t actionTime = GetSysClockTime();
     auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
     PointerEvent::PointerItem item { };
     item.SetPointerId(DEFAULT_POINTER_ID);
     item.SetDownTime(actionTime);
