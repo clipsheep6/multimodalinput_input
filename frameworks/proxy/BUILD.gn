@@ -63,7 +63,7 @@ ohos_source_set("libmmi-common") {
   public_deps =
       [ "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog" ]
 
-  part_name = "multimodalinput_base"
+  part_name = "input"
 }
 
 ohos_shared_library("libmmi-client") {
@@ -111,7 +111,7 @@ ohos_shared_library("libmmi-client") {
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_service",
   ]
 
-  part_name = "multimodalinput_base"
+  part_name = "input"
   external_deps = [ "bytrace_standard:bytrace_core" ]
 }
 
