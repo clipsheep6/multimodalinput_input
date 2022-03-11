@@ -60,7 +60,7 @@ diff -Naur old/BUILD.gn new/BUILD.gn
 +    "//third_party/patch_mtdev_hdf:libmtdev-hdf",
    ]
  
-   part_name = "multimodalinput_base"
+   part_name = "input"
 @@ -86,92 +91,3 @@
  ## Build libinput-third.so }}}
  
@@ -92,7 +92,7 @@ diff -Naur old/BUILD.gn new/BUILD.gn
 -    "//third_party/mtdev:libmtdev",
 -  ]
 -
--  part_name = "multimodalinput_base"
+-  part_name = "input"
 -}
 -
 -ohos_executable("libinput-list") {
@@ -122,7 +122,7 @@ diff -Naur old/BUILD.gn new/BUILD.gn
 -    "//third_party/mtdev:libmtdev",
 -  ]
 -
--  part_name = "multimodalinput_base"
+-  part_name = "input"
 -}
 -
 -ohos_executable("libinput-tablet") {
@@ -152,7 +152,7 @@ diff -Naur old/BUILD.gn new/BUILD.gn
 -    "//third_party/mtdev:libmtdev",
 -  ]
 -
--  part_name = "multimodalinput_base"
+-  part_name = "input"
 -}
 \ No newline at end of file
 diff -Naur old/export_include/libinput.h new/export_include/libinput.h

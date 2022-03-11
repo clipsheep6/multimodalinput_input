@@ -223,7 +223,7 @@ ohos_shared_library("libinput-third-mmi") {
     ]
   }
 
-  part_name = "multimodalinput_base"
+  part_name = "input"
 }
 
 if (is_mmi_have_libinput) {
@@ -267,7 +267,7 @@ if (is_mmi_have_libinput) {
       "//third_party/mtdev:libmtdev",
     ]
 
-    part_name = "multimodalinput_base"
+    part_name = "input"
   }
 
   ohos_source_set("patch_gen_libinput-list") {
@@ -310,7 +310,7 @@ if (is_mmi_have_libinput) {
       "//third_party/mtdev:libmtdev",
     ]
 
-    part_name = "multimodalinput_base"
+    part_name = "input"
   }
 
   ohos_source_set("patch_gen_libinput-tablet") {
@@ -353,7 +353,7 @@ if (is_mmi_have_libinput) {
       "//third_party/mtdev:libmtdev",
     ]
 
-    part_name = "multimodalinput_base"
+    part_name = "input"
   }
 
   ohos_source_set("patch_gen_libinput-record") {
@@ -397,7 +397,7 @@ if (is_mmi_have_libinput) {
       "//third_party/mtdev:libmtdev",
     ]
 
-    part_name = "multimodalinput_base"
+    part_name = "input"
   }
 
   ohos_source_set("patch_gen_libinput-analyze") {
@@ -440,7 +440,7 @@ if (is_mmi_have_libinput) {
       "//third_party/mtdev:libmtdev",
     ]
 
-    part_name = "multimodalinput_base"
+    part_name = "input"
   }
 
   ohos_source_set("patch_gen_libinput-measure") {
@@ -483,7 +483,7 @@ if (is_mmi_have_libinput) {
       "//third_party/mtdev:libmtdev",
     ]
 
-    part_name = "multimodalinput_base"
+    part_name = "input"
   }
 
   ohos_source_set("patch_gen_libinput-quirks") {
@@ -526,6 +526,6 @@ if (is_mmi_have_libinput) {
       "//third_party/mtdev:libmtdev",
     ]
 
-    part_name = "multimodalinput_base"
+    part_name = "input"
   }
 }
