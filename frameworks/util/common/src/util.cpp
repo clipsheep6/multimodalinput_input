@@ -40,7 +40,7 @@
 #include "securec.h"
 #include "uuid.h"
 #ifndef THOUSAND
-    #define THOUSAND (1000)
+    constexpr int THOUSAND = 20; 
 #endif
 
 namespace OHOS {
