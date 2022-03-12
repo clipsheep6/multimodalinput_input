@@ -40,6 +40,11 @@
 #include "securec.h"
 #include "uuid.h"
 
+#ifndef THOUSAND
+    constexpr int THOUSAND = 1000;
+#endif
+
+
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -75,7 +80,7 @@ int64_t GetMicrotime()
 {
     struct timeval currentTime = {};
     gettimeofday(&currentTime, nullptr);
-    return currentTime.tv_sec * 1000 * 1000 + currentTime.tv_usec;
+    return currentTime.tv_sec * THOUSAND * THOUSAND + currentTime.tv_usec;
 }
 
 int64_t GetSysClockTime()
@@ -85,7 +90,7 @@ int64_t GetSysClockTime()
         MMI_LOGD("clock_gettime failed:%{public}d", errno);
         return 0;
     }
-    return (ts.tv_sec * 1000 * 1000) + (ts.tv_nsec / 1000);
+    return (ts.tv_sec * THOUSAND * THOUSAND) + (ts.tv_nsec / THOUSAND);
 }
 
 int64_t GetMillisTime()
@@ -431,5 +436,51 @@ std::string StringFmt(const char* str, ...)
     return buf;
 }
 
+int32_t ExistFile(const std::string& fileName)
+{
+    if ((access(fileName.c_str(), F_OK)) == 0) {
+        return RET_OK;
+    }
+    return RET_ERR;
+}
+
+int32_t VerifyFile(const std::string& fileName)
+{
+    std::string findcmd = "find /data -name " + fileName;
+    FILE* findJson = popen(findcmd.c_str(), "r");
+    if (!findJson) {
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+std::string GetFileExtendName(const std::string& fileName)
+{
+    if (fileName.empty()) {
+        return "";
+    }
+    size_t nPos = fileName.find_last_of('.');
+    if (fileName.npos == nPos) {
+        return fileName;
+    }
+    return fileName.substr(nPos + 1, fileName.npos);
+}
+
+int32_t GetFileSize(const std::string& fileName)
+{
+    FILE* pFile = fopen(fileName.c_str(), "rb");
+    if (pFile) {
+        fseek(pFile, 0, SEEK_END);
+        long fileSize = ftell(pFile);
+        if (fileSize > INT32_MAX) {
+            MMI_LOGE("The file is too large for 32-bit systems, filesize:%{public}ld", fileSize);
+            fclose(pFile);
+            return RET_ERR;
+        }
+        fclose(pFile);
+        return fileSize;
+    }
+    return RET_ERR;
+}
 } // namespace MMI
 } // namespace OHOS
