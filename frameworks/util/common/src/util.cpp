@@ -39,6 +39,7 @@
 #include "mmi_log.h"
 #include "securec.h"
 #include "uuid.h"
+
 #ifndef THOUSAND
     constexpr int THOUSAND = 1000; 
 #endif
