@@ -18,7 +18,7 @@
 #include <cstring>
 #include <functional>
 #include <unistd.h>
-
+#include "parameter.h"
 #include "hdf_device_event_dispatch.h"
 #include "mmi_log.h"
 
@@ -70,6 +70,8 @@ int32_t main()
 {
     OHOS::MMI::HdfDeviceEventManager iHdfDeviceEventManager;
     iHdfDeviceEventManager.ConnectHDFInit();
+    usleep(2000000);
+    SetParameter("input.uinput.ready", "true");
     static std::int32_t usleepTime = 1500000;
     while (true) {
         usleep(usleepTime);
