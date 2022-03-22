@@ -466,6 +466,9 @@ void JsEventTarget::ResetEnv()
         delete item.second;
         item.second = nullptr;
     }
+    std::map<int32_t, JsUtil::CallbackInfo*> empty_map;
+    callback_.swap(empty_map);
+    callback_.clear();
 }
 
 bool JsEventTarget::CheckEnv(napi_env env)
