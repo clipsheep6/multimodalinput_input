@@ -18,7 +18,8 @@ config("libinputdevice_config") {
 
   include_dirs = [
     "//foundation/multimodalinput/input/frameworks/napi/input_device/include",
-    "//foundation/multimodalinput/input/util/common/include",
+    "//foundation/multimodalinput/input/frameworks/util/common/include",
+    "//foundation/multimodalinput/input/common/include",
   ]
 
   cflags = [ "-DOHOS_BUILD" ]
@@ -37,15 +38,14 @@ ohos_shared_library("inputdevice") {
     "src/js_input_device_context.cpp",
     "src/js_input_device_manager.cpp",
     "src/native_register_module.cpp",
+    "src/js_util.cpp",
   ]
 
   configs = [ ":libinputdevice_config" ]
 
   deps = [
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
-    "//foundation/multimodalinput/input/tools/event_inject:event-injection",
     "//foundation/multimodalinput/input/util:libmmi-util",
-    "//third_party/libuv:uv_static",
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
@@ -54,10 +54,7 @@ ohos_shared_library("inputdevice") {
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
-    "input_device_driver:hdi_input",
-    "ipc:ipc_core",
     "napi:ace_napi",
-    "utils_base:utils",
   ]
 
   relative_install_dir = "module/multimodalinput"
