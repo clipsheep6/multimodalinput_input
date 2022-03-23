@@ -52,7 +52,7 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputData, Tes
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    FILE* fp = fopen(path.c_str(),"r");
+    FILE* fp = fopen(path.c_str(), "r");
     if (fp == nullptr) {
         ASSERT_TRUE(false) << "can not open " << path;
     }
@@ -61,7 +61,9 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputData, Tes
     while (fgets(buf, sizeof(buf), fp) != NULL) {
         jsonBuf = jsonBuf + buf;
     }
-    fclose(fp);
+    if (fclose(fp) < 0) {
+        ASSERT_TRUE(false) << "close file error";
+    }
     cJSON* inputEventArrays = cJSON_Parse(jsonBuf.c_str());
     if (inputEventArrays == nullptr) {
         ASSERT_TRUE(false) << "inputEventArrays is null";
@@ -93,7 +95,7 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataEvent
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    FILE* fp = fopen(path.c_str(),"r");
+    FILE* fp = fopen(path.c_str(), "r");
     if (fp == nullptr) {
         ASSERT_TRUE(false) << "can not open " << path;
     }
@@ -102,7 +104,9 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataEvent
     while (fgets(buf, sizeof(buf), fp) != NULL) {
         jsonBuf = jsonBuf + buf;
     }
-    fclose(fp);
+    if (fclose(fp) < 0) {
+        ASSERT_TRUE(false) << "close file error";
+    }
     cJSON* inputEventArrays = cJSON_Parse(jsonBuf.c_str());
     if (inputEventArrays == nullptr) {
         ASSERT_TRUE(false) << "inputEventArrays is null";
@@ -134,7 +138,7 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataSingl
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    FILE* fp = fopen(path.c_str(),"r");
+    FILE* fp = fopen(path.c_str(), "r");
     if (fp == nullptr) {
         ASSERT_TRUE(false) << "can not open " << path;
     }
@@ -143,7 +147,9 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataSingl
     while (fgets(buf, sizeof(buf), fp) != NULL) {
         jsonBuf = jsonBuf + buf;
     }
-    fclose(fp);
+    if (fclose(fp) < 0) {
+        ASSERT_TRUE(false) << "close file error";
+    }
     cJSON* inputEventArrays = cJSON_Parse(jsonBuf.c_str());
     if (inputEventArrays == nullptr) {
         ASSERT_TRUE(false) << "inputEventArrays is null";

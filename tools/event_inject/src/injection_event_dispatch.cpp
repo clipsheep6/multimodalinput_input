@@ -138,7 +138,9 @@ int32_t InjectionEventDispatch::OnJson()
     while (fgets(buf, sizeof(buf), fp) != NULL) {
         jsonBuf = jsonBuf + buf;
     }
-    fclose(fp);
+    if (fclose(fp) < 0) {
+         MMI_LOGE("close file failed");
+    }
     cJSON* inputEventArrays = cJSON_Parse(jsonBuf.c_str());
     CHKPR(inputEventArrays, RET_ERR);
     int32_t ret = manageInjectDevice_.TransformJsonData(inputEventArrays);

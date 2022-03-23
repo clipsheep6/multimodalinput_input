@@ -29,9 +29,9 @@ int32_t ProcessingTouchScreenDevice::TransformJsonDataToInputData(const cJSON* t
     CHKPR(inputData, RET_ERR);
     TouchScreenInputEvents touchScreenInputEvents = {};
     AnalysisTouchScreenDate(inputData, touchScreenInputEvents);
-     if (touchScreenInputEvents.eventArray.size() < 1) {
-         return RET_ERR;
-     }
+    if (touchScreenInputEvents.eventArray.size() < 1) {
+        return RET_ERR;
+    }
     TouchScreenInputEvent pressEvents = touchScreenInputEvents.eventArray[0];
     AnalysisTouchScreenPressData(inputEventArray, pressEvents);
     for (uint64_t i = 1; i < static_cast<uint64_t>(touchScreenInputEvents.eventNumber); i++) {

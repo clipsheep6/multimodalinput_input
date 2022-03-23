@@ -66,27 +66,27 @@ int32_t ProcessingMouseDevice::AnalysisMouseEvent(const cJSON* inputData,
         cJSON* event = cJSON_GetArrayItem(inputData, i);
         CHKPR(event, RET_ERR);
         cJSON* eventType = cJSON_GetObjectItemCaseSensitive(event, "eventType");
-        if(eventType) {
+        if (eventType) {
             mouseEvent.eventType = eventType->valuestring;
         }
         cJSON* blockTime = cJSON_GetObjectItemCaseSensitive(event, "blockTime");
-        if(blockTime) {
+        if (blockTime) {
             mouseEvent.blockTime = blockTime->valueint;
         }
         cJSON* xPos = cJSON_GetObjectItemCaseSensitive(event, "xPos");
-        if(xPos) {
+        if (xPos) {
             mouseEvent.xPos = xPos->valueint;
         }
         cJSON* yPos = cJSON_GetObjectItemCaseSensitive(event, "yPos");
-        if(yPos) {
+        if (yPos) {
             mouseEvent.yPos = yPos->valueint;
         }
         cJSON* direction = cJSON_GetObjectItemCaseSensitive(event, "direction");
-        if(direction) {
+        if (direction) {
             mouseEvent.direction = direction->valuestring;
         }
         cJSON* distance = cJSON_GetObjectItemCaseSensitive(event, "distance");
-        if(distance) {
+        if (distance) {
             mouseEvent.distance = distance->valueint;
         }
         mouseEventArray.push_back(mouseEvent);

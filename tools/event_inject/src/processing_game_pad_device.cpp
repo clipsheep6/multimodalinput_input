@@ -57,32 +57,20 @@ int32_t ProcessingGamePadDevice::AnalysisGamePadEvent(const cJSON* inputData, st
             padEvent.keyValue = keyValue->valueint;
         }
         if ((padEvent.eventType == "ROCKER_1") || (padEvent.eventType == "ROCKER_2")) {
-            if (cJSON_HasObjectItem(inputData, "event")) {
-                MMI_LOGE("not find event On Event:%{public}s", padEvent.eventType.c_str());
-                return RET_ERR;
-            }
-            if (cJSON_HasObjectItem(inputData, "direction")) {
-                MMI_LOGE("not find direction On Event:%{public}s", padEvent.eventType.c_str());
-                return RET_ERR;
-            }
             cJSON* direction = cJSON_GetObjectItemCaseSensitive(eventData, "direction");
             if (direction) {
                 padEvent.direction = direction->valuestring;
             }
             cJSON* gameEvents = cJSON_GetObjectItemCaseSensitive(eventData, "event");
-            if (gameEvents) {
-                for (int32_t j = 0; j < cJSON_GetArraySize(gameEvents); j++) {
-                    if (cJSON_GetArrayItem(gameEvents, j)) {
-                        padEvent.gameEvents.push_back(cJSON_GetArrayItem(gameEvents, j)->valueint);
-                    }
+            CHKPB(gameEvents);
+            for (int32_t j = 0; j < cJSON_GetArraySize(gameEvents); j++) {
+                if (cJSON_GetArrayItem(gameEvents, j)) {
+                    padEvent.gameEvents.push_back(cJSON_GetArrayItem(gameEvents, j)->valueint);
                 }
             }
+
         }
         if (padEvent.eventType == "DERECTION_KEY") {
-            if (cJSON_HasObjectItem(inputData, "direction")) {
-                MMI_LOGE("not find direction On Event:%{public}s", padEvent.eventType.c_str());
-                return RET_ERR;
-            }
             cJSON* direction = cJSON_GetObjectItemCaseSensitive(eventData, "direction");
             if (direction) {
                 padEvent.direction = direction->valuestring;
@@ -92,6 +80,7 @@ int32_t ProcessingGamePadDevice::AnalysisGamePadEvent(const cJSON* inputData, st
     }
     return RET_OK;
 }
+
 void ProcessingGamePadDevice::TransformPadEventToInputEvent(const std::vector<GamePadEvent>& padEventArray,
                                                             InputEventArray& inputEventArray)
 {

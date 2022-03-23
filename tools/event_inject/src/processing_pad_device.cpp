@@ -58,23 +58,21 @@ int32_t ProcessingPadDevice::AnalysisPadEvent(const cJSON* inputData, std::vecto
     PadEvent padEvent = {};
     for (int32_t i = 0; i < cJSON_GetArraySize(inputData); i++) {
         cJSON* event = cJSON_GetArrayItem(inputData, i);
-        if (event) {
-            cJSON* eventType = cJSON_GetObjectItemCaseSensitive(event, "eventType");
-            if (eventType) {
-                padEvent.eventType = eventType->valuestring;
-            }
-            cJSON* keyValue = cJSON_GetObjectItemCaseSensitive(event, "keyValue");
-            if (keyValue) {
-                padEvent.keyValue = keyValue->valueint;
-            }
-            cJSON* ringEvents = cJSON_GetObjectItemCaseSensitive(event, "ringEvents");
-            if (ringEvents) {
-                for (int32_t j = 0; j < cJSON_GetArraySize(ringEvents); j++) {
-                    padEvent.ringEvents.push_back(cJSON_GetArrayItem(ringEvents, j)->valueint);
-                }
-            }
-            padEventArray.push_back(padEvent);
+        CHKPB(event);
+        cJSON* eventType = cJSON_GetObjectItemCaseSensitive(event, "eventType");
+        if (eventType) {
+            padEvent.eventType = eventType->valuestring;
         }
+        cJSON* keyValue = cJSON_GetObjectItemCaseSensitive(event, "keyValue");
+        if (keyValue) {
+            padEvent.keyValue = keyValue->valueint;
+        }
+        cJSON* ringEvents = cJSON_GetObjectItemCaseSensitive(event, "ringEvents");
+        CHKPB(ringEvents);
+        for (int32_t j = 0; j < cJSON_GetArraySize(ringEvents); j++) {
+            padEvent.ringEvents.push_back(cJSON_GetArrayItem(ringEvents, j)->valueint);
+        }
+        padEventArray.push_back(padEvent);
     }
     return RET_OK;
 }

@@ -40,7 +40,8 @@ int32_t ProcessingFingerDevice::TransformJsonDataToInputData(const cJSON* finger
     return RET_OK;
 }
 
-void ProcessingFingerDevice::AnalysisTouchPadFingerDate(const cJSON* inputData, TouchPadInputEvents& touchPadInputEvents)
+void ProcessingFingerDevice::AnalysisTouchPadFingerDate(const cJSON* inputData,
+    TouchPadInputEvents& touchPadInputEvents)
 {
     TouchPadCoordinates touchPadCoordinates = {};
     TouchPadInputEvent touchPadInputEvent = {};

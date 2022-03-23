@@ -52,7 +52,7 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputData, 
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    FILE* fp = fopen(path.c_str(),"r");
+    FILE* fp = fopen(path.c_str(), "r");
     if (fp == nullptr) {
         ASSERT_TRUE(false) << "can not open " << path;
     }
@@ -61,7 +61,9 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputData, 
     while (fgets(buf, sizeof(buf), fp) != NULL) {
         jsonBuf = jsonBuf + buf;
     }
-    fclose(fp);
+    if (fclose(fp) < 0) {
+        ASSERT_TRUE(false) << "close file error";
+    }
     cJSON* inputEventArrays = cJSON_Parse(jsonBuf.c_str());
     if (inputEventArrays == nullptr) {
         ASSERT_TRUE(false) << "inputEventArrays is null";
@@ -93,7 +95,7 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    FILE* fp = fopen(path.c_str(),"r");
+    FILE* fp = fopen(path.c_str(), "r");
     if (fp == nullptr) {
         ASSERT_TRUE(false) << "can not open " << path;
     }
@@ -102,7 +104,9 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
     while (fgets(buf, sizeof(buf), fp) != NULL) {
         jsonBuf = jsonBuf + buf;
     }
-    fclose(fp);
+    if (fclose(fp) < 0) {
+        ASSERT_TRUE(false) << "close file error";
+    }
     cJSON* inputEventArrays = cJSON_Parse(jsonBuf.c_str());
     if (inputEventArrays == nullptr) {
         ASSERT_TRUE(false) << "inputEventArrays is null";
@@ -134,7 +138,7 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataEv
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    FILE* fp = fopen(path.c_str(),"r");
+    FILE* fp = fopen(path.c_str(), "r");
     if (fp == nullptr) {
         ASSERT_TRUE(false) << "can not open " << path;
     }
@@ -143,7 +147,9 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataEv
     while (fgets(buf, sizeof(buf), fp) != NULL) {
         jsonBuf = jsonBuf + buf;
     }
-    fclose(fp);
+    if (fclose(fp) < 0) {
+        ASSERT_TRUE(false) << "close file error";
+    }
     cJSON* inputEventArrays = cJSON_Parse(jsonBuf.c_str());
     if (inputEventArrays == nullptr) {
         ASSERT_TRUE(false) << "inputEventArrays is null";
@@ -175,7 +181,7 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    FILE* fp = fopen(path.c_str(),"r");
+    FILE* fp = fopen(path.c_str(), "r");
     if (fp == nullptr) {
         ASSERT_TRUE(false) << "can not open " << path;
     }
@@ -184,7 +190,9 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
     while (fgets(buf, sizeof(buf), fp) != NULL) {
         jsonBuf = jsonBuf + buf;
     }
-    fclose(fp);
+    if (fclose(fp) < 0) {
+        ASSERT_TRUE(false) << "close file error";
+    }
     cJSON* inputEventArrays = cJSON_Parse(jsonBuf.c_str());
     if (inputEventArrays == nullptr) {
         ASSERT_TRUE(false) << "inputEventArrays is null";
@@ -216,7 +224,7 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    FILE* fp = fopen(path.c_str(),"r");
+    FILE* fp = fopen(path.c_str(), "r");
     if (fp == nullptr) {
         ASSERT_TRUE(false) << "can not open " << path;
     }
@@ -225,7 +233,9 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
     while (fgets(buf, sizeof(buf), fp) != NULL) {
         jsonBuf = jsonBuf + buf;
     }
-    fclose(fp);
+        if (fclose(fp) < 0) {
+        ASSERT_TRUE(false) << "close file error";
+    }
     cJSON* inputEventArrays = cJSON_Parse(jsonBuf.c_str());
     if (inputEventArrays == nullptr) {
         ASSERT_TRUE(false) << "inputEventArrays is null";
@@ -257,7 +267,7 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    FILE* fp = fopen(path.c_str(),"r");
+    FILE* fp = fopen(path.c_str(), "r");
     if (fp == nullptr) {
         ASSERT_TRUE(false) << "can not open " << path;
     }
@@ -266,7 +276,9 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
     while (fgets(buf, sizeof(buf), fp) != NULL) {
         jsonBuf = jsonBuf + buf;
     }
-    fclose(fp);
+    if (fclose(fp) < 0) {
+        ASSERT_TRUE(false) << "close file error";
+    }
     cJSON* inputEventArrays = cJSON_Parse(jsonBuf.c_str());
     if (inputEventArrays == nullptr) {
         ASSERT_TRUE(false) << "inputEventArrays is null";
@@ -300,7 +312,7 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    FILE* fp = fopen(path.c_str(),"r");
+    FILE* fp = fopen(path.c_str(), "r");
     if (fp == nullptr) {
         ASSERT_TRUE(false) << "can not open " << path;
     }
@@ -309,7 +321,9 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
     while (fgets(buf, sizeof(buf), fp) != NULL) {
         jsonBuf = jsonBuf + buf;
     }
-    fclose(fp);
+    if (fclose(fp) < 0) {
+        ASSERT_TRUE(false) << "close file error";
+    }
     cJSON* inputEventArrays = cJSON_Parse(jsonBuf.c_str());
     if (inputEventArrays == nullptr) {
         ASSERT_TRUE(false) << "inputEventArrays is null";
