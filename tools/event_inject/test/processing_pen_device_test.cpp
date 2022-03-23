@@ -52,17 +52,23 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputData, TestSize
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::ifstream reader(path);
-    if (!reader.is_open()) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        system(closeDeviceCmd.c_str());
+    FILE* fp = fopen(path.c_str(),"r");
+    if (fp == nullptr) {
         ASSERT_TRUE(false) << "can not open " << path;
     }
-    Json inputEventArrays;
-    reader >> inputEventArrays;
-    reader.close();
+    char buf[256] = {};
+    std::string jsonBuf;
+    while (fgets(buf, sizeof(buf), fp) != NULL) {
+        jsonBuf = jsonBuf + buf;
+    }
+    fclose(fp);
+    cJSON* inputEventArrays = cJSON_Parse(jsonBuf.c_str());
+    if (inputEventArrays == nullptr) {
+        ASSERT_TRUE(false) << "inputEventArrays is null";
+    }
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    cJSON_Delete(inputEventArrays);
     std::this_thread::sleep_for(std::chrono::seconds(1));
     system(closeDeviceCmd.c_str());
     EXPECT_EQ(ret, RET_OK);
@@ -87,17 +93,23 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataNotfindEve
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::ifstream reader(path);
-    if (!reader.is_open()) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        system(closeDeviceCmd.c_str());
+    FILE* fp = fopen(path.c_str(),"r");
+    if (fp == nullptr) {
         ASSERT_TRUE(false) << "can not open " << path;
     }
-    Json inputEventArrays;
-    reader >> inputEventArrays;
-    reader.close();
+    char buf[256] = {};
+    std::string jsonBuf;
+    while (fgets(buf, sizeof(buf), fp) != NULL) {
+        jsonBuf = jsonBuf + buf;
+    }
+    fclose(fp);
+    cJSON* inputEventArrays = cJSON_Parse(jsonBuf.c_str());
+    if (inputEventArrays == nullptr) {
+        ASSERT_TRUE(false) << "inputEventArrays is null";
+    }
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    cJSON_Delete(inputEventArrays);
     std::this_thread::sleep_for(std::chrono::seconds(1));
     system(closeDeviceCmd.c_str());
     EXPECT_EQ(ret, RET_ERR);
@@ -122,17 +134,23 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataEventsIsEm
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::ifstream reader(path);
-    if (!reader.is_open()) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        system(closeDeviceCmd.c_str());
+    FILE* fp = fopen(path.c_str(),"r");
+    if (fp == nullptr) {
         ASSERT_TRUE(false) << "can not open " << path;
     }
-    Json inputEventArrays;
-    reader >> inputEventArrays;
-    reader.close();
+    char buf[256] = {};
+    std::string jsonBuf;
+    while (fgets(buf, sizeof(buf), fp) != NULL) {
+        jsonBuf = jsonBuf + buf;
+    }
+    fclose(fp);
+    cJSON* inputEventArrays = cJSON_Parse(jsonBuf.c_str());
+    if (inputEventArrays == nullptr) {
+        ASSERT_TRUE(false) << "inputEventArrays is null";
+    }
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    cJSON_Delete(inputEventArrays);
     std::this_thread::sleep_for(std::chrono::seconds(1));
     system(closeDeviceCmd.c_str());
     EXPECT_EQ(ret, RET_ERR);
@@ -157,17 +175,23 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataApprochEve
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::ifstream reader(path);
-    if (!reader.is_open()) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        system(closeDeviceCmd.c_str());
+    FILE* fp = fopen(path.c_str(),"r");
+    if (fp == nullptr) {
         ASSERT_TRUE(false) << "can not open " << path;
     }
-    Json inputEventArrays;
-    reader >> inputEventArrays;
-    reader.close();
+    char buf[256] = {};
+    std::string jsonBuf;
+    while (fgets(buf, sizeof(buf), fp) != NULL) {
+        jsonBuf = jsonBuf + buf;
+    }
+    fclose(fp);
+    cJSON* inputEventArrays = cJSON_Parse(jsonBuf.c_str());
+    if (inputEventArrays == nullptr) {
+        ASSERT_TRUE(false) << "inputEventArrays is null";
+    }
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    cJSON_Delete(inputEventArrays);
     std::this_thread::sleep_for(std::chrono::seconds(1));
     system(closeDeviceCmd.c_str());
     EXPECT_EQ(ret, RET_ERR);
@@ -192,17 +216,23 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataSlideEvent
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::ifstream reader(path);
-    if (!reader.is_open()) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        system(closeDeviceCmd.c_str());
+    FILE* fp = fopen(path.c_str(),"r");
+    if (fp == nullptr) {
         ASSERT_TRUE(false) << "can not open " << path;
     }
-    Json inputEventArrays;
-    reader >> inputEventArrays;
-    reader.close();
+    char buf[256] = {};
+    std::string jsonBuf;
+    while (fgets(buf, sizeof(buf), fp) != NULL) {
+        jsonBuf = jsonBuf + buf;
+    }
+    fclose(fp);
+    cJSON* inputEventArrays = cJSON_Parse(jsonBuf.c_str());
+    if (inputEventArrays == nullptr) {
+        ASSERT_TRUE(false) << "inputEventArrays is null";
+    }
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    cJSON_Delete(inputEventArrays);
     std::this_thread::sleep_for(std::chrono::seconds(1));
     system(closeDeviceCmd.c_str());
     EXPECT_EQ(ret, RET_ERR);
@@ -227,17 +257,23 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataLeaveEvent
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::ifstream reader(path);
-    if (!reader.is_open()) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        system(closeDeviceCmd.c_str());
+    FILE* fp = fopen(path.c_str(),"r");
+    if (fp == nullptr) {
         ASSERT_TRUE(false) << "can not open " << path;
     }
-    Json inputEventArrays;
-    reader >> inputEventArrays;
-    reader.close();
+    char buf[256] = {};
+    std::string jsonBuf;
+    while (fgets(buf, sizeof(buf), fp) != NULL) {
+        jsonBuf = jsonBuf + buf;
+    }
+    fclose(fp);
+    cJSON* inputEventArrays = cJSON_Parse(jsonBuf.c_str());
+    if (inputEventArrays == nullptr) {
+        ASSERT_TRUE(false) << "inputEventArrays is null";
+    }
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    cJSON_Delete(inputEventArrays);
     std::this_thread::sleep_for(std::chrono::seconds(1));
     system(closeDeviceCmd.c_str());
     EXPECT_EQ(ret, RET_ERR);
@@ -262,17 +298,23 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataApprochEve
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::ifstream reader(path);
-    if (!reader.is_open()) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        system(closeDeviceCmd.c_str());
+    FILE* fp = fopen(path.c_str(),"r");
+    if (fp == nullptr) {
         ASSERT_TRUE(false) << "can not open " << path;
     }
-    Json inputEventArrays;
-    reader >> inputEventArrays;
-    reader.close();
+    char buf[256] = {};
+    std::string jsonBuf;
+    while (fgets(buf, sizeof(buf), fp) != NULL) {
+        jsonBuf = jsonBuf + buf;
+    }
+    fclose(fp);
+    cJSON* inputEventArrays = cJSON_Parse(jsonBuf.c_str());
+    if (inputEventArrays == nullptr) {
+        ASSERT_TRUE(false) << "inputEventArrays is null";
+    }
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    cJSON_Delete(inputEventArrays);
     std::this_thread::sleep_for(std::chrono::seconds(1));
     system(closeDeviceCmd.c_str());
     EXPECT_EQ(ret, RET_ERR);
@@ -297,17 +339,23 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataLeaveEvent
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::ifstream reader(path);
-    if (!reader.is_open()) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        system(closeDeviceCmd.c_str());
+    FILE* fp = fopen(path.c_str(),"r");
+    if (fp == nullptr) {
         ASSERT_TRUE(false) << "can not open " << path;
     }
-    Json inputEventArrays;
-    reader >> inputEventArrays;
-    reader.close();
+    char buf[256] = {};
+    std::string jsonBuf;
+    while (fgets(buf, sizeof(buf), fp) != NULL) {
+        jsonBuf = jsonBuf + buf;
+    }
+    fclose(fp);
+    cJSON* inputEventArrays = cJSON_Parse(jsonBuf.c_str());
+    if (inputEventArrays == nullptr) {
+        ASSERT_TRUE(false) << "inputEventArrays is null";
+    }
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    cJSON_Delete(inputEventArrays);
     std::this_thread::sleep_for(std::chrono::seconds(1));
     system(closeDeviceCmd.c_str());
     EXPECT_EQ(ret, RET_ERR);

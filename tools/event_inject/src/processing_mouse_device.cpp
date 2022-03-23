@@ -21,18 +21,12 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "ProcessingMouseDevice" };
 } // namespace
 
-int32_t ProcessingMouseDevice::TransformJsonDataToInputData(const Json& fingerEventArrays,
+int32_t ProcessingMouseDevice::TransformJsonDataToInputData(const cJSON* fingerEventArrays,
                                                             InputEventArray& inputEventArray)
 {
     CALL_LOG_ENTER;
-    if (fingerEventArrays.empty()) {
-        return RET_ERR;
-    }
-    Json inputData = fingerEventArrays.at("events");
-    if (inputData.empty()) {
-        MMI_LOGE("manage KeyBoard array faild, inputData is empty.");
-        return RET_ERR;
-    }
+    cJSON* inputData = cJSON_GetObjectItemCaseSensitive(fingerEventArrays, "events");
+    CHKPR(inputData, RET_ERR);
     std::vector<MouseEvent> mouseEventArray;
     if (AnalysisMouseEvent(inputData, mouseEventArray) == RET_ERR) {
         return RET_ERR;
@@ -63,30 +57,37 @@ void ProcessingMouseDevice::TransformMouseEventToInputEvent(const std::vector<Mo
     }
 }
 
-int32_t ProcessingMouseDevice::AnalysisMouseEvent(const Json& inputData,
+int32_t ProcessingMouseDevice::AnalysisMouseEvent(const cJSON* inputData,
     std::vector<MouseEvent>& mouseEventArray)
 {
     MouseEvent mouseEvent = {};
-    for (const auto &item : inputData) {
+    for (int32_t i = 0; i < cJSON_GetArraySize(inputData); i++) {
         mouseEvent = {};
-        mouseEvent.eventType = item.at("eventType").get<std::string>();
-        if ((item.find("keyValue")) != item.end()) {
-            mouseEvent.keyValue = item.at("keyValue").get<int32_t>();
+        cJSON* event = cJSON_GetArrayItem(inputData, i);
+        CHKPR(event, RET_ERR);
+        cJSON* eventType = cJSON_GetObjectItemCaseSensitive(event, "eventType");
+        if(eventType) {
+            mouseEvent.eventType = eventType->valuestring;
         }
-        if ((item.find("blockTime")) != item.end()) {
-            mouseEvent.blockTime = item.at("blockTime").get<int64_t>();
+        cJSON* blockTime = cJSON_GetObjectItemCaseSensitive(event, "blockTime");
+        if(blockTime) {
+            mouseEvent.blockTime = blockTime->valueint;
         }
-        if ((item.find("xPos")) != item.end()) {
-            mouseEvent.xPos = item.at("xPos").get<int32_t>();
+        cJSON* xPos = cJSON_GetObjectItemCaseSensitive(event, "xPos");
+        if(xPos) {
+            mouseEvent.xPos = xPos->valueint;
         }
-        if ((item.find("yPos")) != item.end()) {
-            mouseEvent.yPos = item.at("yPos").get<int32_t>();
+        cJSON* yPos = cJSON_GetObjectItemCaseSensitive(event, "yPos");
+        if(yPos) {
+            mouseEvent.yPos = yPos->valueint;
         }
-        if ((item.find("distance")) != item.end()) {
-            mouseEvent.distance = item.at("distance").get<int32_t>();
+        cJSON* direction = cJSON_GetObjectItemCaseSensitive(event, "direction");
+        if(direction) {
+            mouseEvent.direction = direction->valuestring;
         }
-        if ((item.find("direction")) != item.end()) {
-            mouseEvent.direction = item.at("direction").get<std::string>();
+        cJSON* distance = cJSON_GetObjectItemCaseSensitive(event, "distance");
+        if(distance) {
+            mouseEvent.distance = distance->valueint;
         }
         mouseEventArray.push_back(mouseEvent);
     }

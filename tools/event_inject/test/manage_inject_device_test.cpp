@@ -41,7 +41,7 @@ public:
  */
 HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataCheckFileIsEmpty, TestSize.Level1)
 {
-    Json inputEventArrays;
+    cJSON* inputEventArrays;
     inputEventArrays.clear();
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
@@ -67,17 +67,23 @@ HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataCheckFileNotEmpty, TestSi
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::ifstream reader(path);
-    if (!reader.is_open()) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        system(closeDeviceCmd.c_str());
+    FILE* fp = fopen(path.c_str(),"r");
+    if (fp == nullptr) {
         ASSERT_TRUE(false) << "can not open " << path;
     }
-    Json inputEventArrays;
-    reader >> inputEventArrays;
-    reader.close();
+    char buf[256] = {};
+    std::string jsonBuf;
+    while (fgets(buf, sizeof(buf), fp) != NULL) {
+        jsonBuf = jsonBuf + buf;
+    }
+    fclose(fp);
+    cJSON* inputEventArrays = cJSON_Parse(jsonBuf.c_str());
+    if (inputEventArrays == nullptr) {
+        ASSERT_TRUE(false) << "inputEventArrays is null";
+    }
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    cJSON_Delete(inputEventArrays);
     std::this_thread::sleep_for(std::chrono::seconds(1));
     system(closeDeviceCmd.c_str());
     EXPECT_EQ(ret, RET_OK);
@@ -102,17 +108,23 @@ HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataGetDeviceNodeError, TestS
 #endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::ifstream reader(path);
-    if (!reader.is_open()) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        system(closeDeviceCmd.c_str());
+    FILE* fp = fopen(path.c_str(),"r");
+    if (fp == nullptr) {
         ASSERT_TRUE(false) << "can not open " << path;
     }
-    Json inputEventArrays;
-    reader >> inputEventArrays;
-    reader.close();
+    char buf[256] = {};
+    std::string jsonBuf;
+    while (fgets(buf, sizeof(buf), fp) != NULL) {
+        jsonBuf = jsonBuf + buf;
+    }
+    fclose(fp);
+    cJSON* inputEventArrays = cJSON_Parse(jsonBuf.c_str());
+    if (inputEventArrays == nullptr) {
+        ASSERT_TRUE(false) << "inputEventArrays is null";
+    }
     ManageInjectDevice manageInjectDevice;
     auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    cJSON_Delete(inputEventArrays);
     std::this_thread::sleep_for(std::chrono::seconds(1));
     system(closeDeviceCmd.c_str());
     EXPECT_EQ(ret, RET_ERR);

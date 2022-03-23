@@ -25,6 +25,7 @@
 #include "error_multimodal.h"
 #include "proto.h"
 #include "util.h"
+#include "cJSON.h"
 
 namespace OHOS {
 namespace MMI {
@@ -130,16 +131,18 @@ int32_t InjectionEventDispatch::OnJson()
         MMI_LOGE("The file size is out of range 2M or empty. filesize:%{public}d", fileSize);
         return RET_ERR;
     }
-    std::ifstream reader(jsonFile);
-    if (!reader) {
-        MMI_LOGE("json file is empty");
-        return RET_ERR;
+    FILE* fp = fopen(jsonFile.c_str(),"r");
+    CHKPR(fp, RET_ERR);
+    char buf[256] = {};
+    std::string jsonBuf;
+    while (fgets(buf, sizeof(buf), fp) != NULL) {
+        jsonBuf = jsonBuf + buf;
     }
-    Json inputEventArrays;
-    reader >> inputEventArrays;
-    reader.close();
-
+    fclose(fp);
+    cJSON* inputEventArrays = cJSON_Parse(jsonBuf.c_str());
+    CHKPR(inputEventArrays, RET_ERR);
     int32_t ret = manageInjectDevice_.TransformJsonData(inputEventArrays);
+    cJSON_Delete(inputEventArrays);
     return ret;
 }
 
@@ -155,7 +158,6 @@ bool InjectionEventDispatch::VirifyArgvs(const int32_t &argc, const std::vector<
         MMI_LOGE("Invaild Input Para, Plase Check the validity of the para. errCode:%{public}d", PARAM_INPUT_FAIL);
         return false;
     }
-
     bool result = false;
     for (const auto &item : injectFuns_) {
         std::string temp(argv.at(ARGVS_TARGET_INDEX));
@@ -172,7 +174,6 @@ bool InjectionEventDispatch::VirifyArgvs(const int32_t &argc, const std::vector<
         }
         argvNum_ = argc - 1;
     }
-
     return result;
 }
 
@@ -182,7 +183,6 @@ void InjectionEventDispatch::Run()
     std::string id = GetFunId();
     auto fun = GetFun(id);
     CHKPV(fun);
-
     auto ret = (*fun)();
     if (ret == RET_OK) {
         MMI_LOGI("inject function success id:%{public}s", id.c_str());
@@ -209,7 +209,6 @@ int32_t InjectionEventDispatch::ExecuteFunction(std::string funId)
     } else {
         MMI_LOGE("inject function failed id:%{public}s", funId.c_str());
     }
-
     return ret;
 }
 
@@ -218,7 +217,6 @@ int32_t InjectionEventDispatch::OnHelp()
     InjectionToolsHelpFunc helpFunc;
     std::string ret = helpFunc.GetHelpText();
     MMI_LOGI("%{public}s", ret.c_str());
-
     return RET_OK;
 }
 
@@ -233,6 +231,7 @@ int32_t InjectionEventDispatch::GetDeviceIndex(const std::string& deviceNameText
             return item.devIndex;
         }
     }
+    MMI_LOGE("Get device index failed");
     return RET_ERR;
 }
 

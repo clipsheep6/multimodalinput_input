@@ -21,72 +21,77 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingGamePadDevice" };
 } // namespace
 
-int32_t ProcessingGamePadDevice::TransformJsonDataToInputData(const Json& originalEvent,
+int32_t ProcessingGamePadDevice::TransformJsonDataToInputData(const cJSON* originalEvent,
     InputEventArray& inputEventArray)
 {
     CALL_LOG_ENTER;
-    if (originalEvent.empty()) {
-        return RET_ERR;
-    }
-    if (originalEvent.find("events") == originalEvent.end()) {
-        MMI_LOGE("manage game pad array faild, inputData is empty");
-        return RET_ERR;
-    }
-    Json inputData = originalEvent.at("events");
-    if (inputData.empty()) {
-        MMI_LOGE("manage finger array faild, inputData is empty");
-        return RET_ERR;
-    }
+    cJSON* inputData = cJSON_GetObjectItemCaseSensitive(originalEvent, "events");
+    CHKPR(inputData, RET_ERR);
     std::vector<GamePadEvent> padEventArray;
     if (AnalysisGamePadEvent(inputData, padEventArray) == RET_ERR) {
+        MMI_LOGE("TransformJsonDataToInputData as AnalysisGamePadEvent is error");
         return RET_ERR;
     }
     TransformPadEventToInputEvent(padEventArray, inputEventArray);
     return RET_OK;
 }
 
-int32_t ProcessingGamePadDevice::AnalysisGamePadEvent(const Json& inputData, std::vector<GamePadEvent>& padEventArray)
+int32_t ProcessingGamePadDevice::AnalysisGamePadEvent(const cJSON* inputData, std::vector<GamePadEvent>& padEventArray)
 {
-    for (const auto &item : inputData) {
+    for (int32_t i = 0; i < cJSON_GetArraySize(inputData); i++) {
         GamePadEvent padEvent = {};
-        std::string eventType = item.at("eventType").get<std::string>();
-        padEvent.eventType = eventType;
-        if ((item.find("blockTime")) != item.end()) {
-            padEvent.blockTime = item.at("blockTime").get<int64_t>();
+        cJSON* eventData = cJSON_GetArrayItem(inputData, i);
+        CHKPR(eventData, RET_ERR);
+        cJSON* eventType = cJSON_GetObjectItemCaseSensitive(eventData, "eventType");
+        if (eventType) {
+            padEvent.eventType = eventType->valuestring;
         }
-        if ((eventType == "KEY_EVENT_CLICK") || (eventType == "KEY_EVENT_PRESS") ||
-            (eventType == "KEY_EVENT_RELEASE")) {
-            if ((item.find("keyValue")) == item.end()) {
-                MMI_LOGE("not find keyValue On Event:%{public}s", eventType.c_str());
+        cJSON* blockTime = cJSON_GetObjectItemCaseSensitive(eventData, "blockTime");
+        if (blockTime) {
+            padEvent.blockTime = blockTime->valueint;
+        }
+        if ((padEvent.eventType == "KEY_EVENT_CLICK") || (padEvent.eventType == "KEY_EVENT_PRESS") ||
+            (padEvent.eventType == "KEY_EVENT_RELEASE")) {
+            cJSON* keyValue = cJSON_GetObjectItemCaseSensitive(eventData, "keyValue");
+            CHKPR(keyValue, RET_ERR);
+            padEvent.keyValue = keyValue->valueint;
+        }
+        if ((padEvent.eventType == "ROCKER_1") || (padEvent.eventType == "ROCKER_2")) {
+            if (cJSON_HasObjectItem(inputData, "event")) {
+                MMI_LOGE("not find event On Event:%{public}s", padEvent.eventType.c_str());
                 return RET_ERR;
             }
-            padEvent.keyValue = item.at("keyValue").get<int32_t>();
-        } else if ((eventType == "ROCKER_1") || (eventType == "ROCKER_2")) {
-            if ((item.find("event")) == item.end()) {
-                MMI_LOGE("not find event On Event:%{public}s", eventType.c_str());
+            if (cJSON_HasObjectItem(inputData, "direction")) {
+                MMI_LOGE("not find direction On Event:%{public}s", padEvent.eventType.c_str());
                 return RET_ERR;
             }
-            if ((item.find("direction")) == item.end()) {
-                MMI_LOGE("not find direction On Event:%{public}s", eventType.c_str());
+            cJSON* direction = cJSON_GetObjectItemCaseSensitive(eventData, "direction");
+            if (direction) {
+                padEvent.direction = direction->valuestring;
+            }
+            cJSON* gameEvents = cJSON_GetObjectItemCaseSensitive(eventData, "event");
+            if (gameEvents) {
+                for (int32_t j = 0; j < cJSON_GetArraySize(gameEvents); j++) {
+                    if (cJSON_GetArrayItem(gameEvents, j)) {
+                        padEvent.gameEvents.push_back(cJSON_GetArrayItem(gameEvents, j)->valueint);
+                    }
+                }
+            }
+        }
+        if (padEvent.eventType == "DERECTION_KEY") {
+            if (cJSON_HasObjectItem(inputData, "direction")) {
+                MMI_LOGE("not find direction On Event:%{public}s", padEvent.eventType.c_str());
                 return RET_ERR;
             }
-            padEvent.gameEvents = item.at("event").get<std::vector<uint32_t>>();
-            padEvent.direction = item.at("direction").get<std::string>();
-        } else if (eventType == "DERECTION_KEY") {
-            if ((item.find("direction")) == item.end()) {
-                MMI_LOGE("not find direction On Event:%{public}s", eventType.c_str());
-                return RET_ERR;
+            cJSON* direction = cJSON_GetObjectItemCaseSensitive(eventData, "direction");
+            if (direction) {
+                padEvent.direction = direction->valuestring;
             }
-            padEvent.direction = item.at("direction").get<std::string>();
-        } else {
-            continue;
         }
         padEventArray.push_back(padEvent);
     }
-
     return RET_OK;
 }
-
 void ProcessingGamePadDevice::TransformPadEventToInputEvent(const std::vector<GamePadEvent>& padEventArray,
                                                             InputEventArray& inputEventArray)
 {
@@ -152,6 +157,8 @@ void ProcessingGamePadDevice::TransformRocker1Event(const GamePadEvent& padEvent
         } else if (direction == "lt") {
             value = item;
             SetEvAbsZ(inputEventArray, 0, value);
+        } else {
+            MMI_LOGE("direction is error");
         }
         SetSynReport(inputEventArray);
     }
@@ -167,7 +174,7 @@ void ProcessingGamePadDevice::TransformRocker1Event(const GamePadEvent& padEvent
     } else if (direction == "lt") {
         SetEvAbsZ(inputEventArray, 0, 0);
     } else {
-        // nothint to do.
+        MMI_LOGE("direction is error");
     }
     SetSynReport(inputEventArray);
 }
@@ -192,6 +199,8 @@ void ProcessingGamePadDevice::TransformRocker2Event(const GamePadEvent& padEvent
         } else if (direction == "rt") {
             value = item;
             SetEvAbsRz(inputEventArray, 0, value);
+        } else {
+            MMI_LOGE("direction is error");
         }
         SetSynReport(inputEventArray);
     }
@@ -207,7 +216,7 @@ void ProcessingGamePadDevice::TransformRocker2Event(const GamePadEvent& padEvent
     } else if (direction == "rt") {
         SetEvAbsRz(inputEventArray, 0, 0);
     } else {
-        // nothint to do.
+        MMI_LOGE("direction is error");
     }
     SetSynReport(inputEventArray);
 }
@@ -236,6 +245,6 @@ void ProcessingGamePadDevice::TransformDerectionKeyEvent(const GamePadEvent& pad
         SetEvAbsHat0Y(inputEventArray, padEvent.blockTime, 0);
         SetSynReport(inputEventArray);
     }  else {
-        // nothint to do.
+        MMI_LOGE("direction is error");
     }
 }

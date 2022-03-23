@@ -33,9 +33,9 @@ public:
     ProcessingGamePadDevice() = default;
     ~ProcessingGamePadDevice() = default;
     DISALLOW_COPY_AND_MOVE(ProcessingGamePadDevice);
-    int32_t TransformJsonDataToInputData(const Json& originalEvent, InputEventArray& inputEventArray);
+    int32_t TransformJsonDataToInputData(const cJSON* originalEvent, InputEventArray& inputEventArray);
 private:
-    int32_t AnalysisGamePadEvent(const Json& inputData, std::vector<GamePadEvent>& padEventArray);
+    int32_t AnalysisGamePadEvent(const cJSON* inputData, std::vector<GamePadEvent>& padEventArray);
     void TransformPadEventToInputEvent(const std::vector<GamePadEvent>& padEventArray,
                                        InputEventArray& inputEventArray);
     void TransformKeyPressEvent(const GamePadEvent& padEvent, InputEventArray& inputEventArray);

@@ -29,13 +29,11 @@ struct InjectFunctionMap {
 };
 
 constexpr int32_t ARGV_VALID = 2;
-
 class InjectionEventDispatch {
 public:
     InjectionEventDispatch() = default;
     ~InjectionEventDispatch() = default;
     DISALLOW_COPY_AND_MOVE(InjectionEventDispatch);
-
     void Init();
     void InitManageFunction();
     void Run();

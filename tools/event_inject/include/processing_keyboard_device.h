@@ -31,9 +31,9 @@ public:
     ProcessingKeyboardDevice() = default;
     ~ProcessingKeyboardDevice() = default;
     DISALLOW_COPY_AND_MOVE(ProcessingKeyboardDevice);
-    int32_t TransformJsonDataToInputData(const Json& inputEventArrays, InputEventArray& inputEventArray);
+    int32_t TransformJsonDataToInputData(const cJSON* inputEventArrays, InputEventArray& inputEventArray);
 private:
-    int32_t AnalysisKeyBoardEvent(const Json& inputData, std::vector<KeyBoardEvent>& keyBoardEvent);
+    int32_t AnalysisKeyBoardEvent(const cJSON* inputData, std::vector<KeyBoardEvent>& keyBoardEvent);
     void TransformKeyBoardEventToInputEvent(const std::vector<KeyBoardEvent>& keyBoardEventArray,
                                             InputEventArray& inputEventArray);
     void TransformKeyPressEvent(const KeyBoardEvent& keyBoardEvent, InputEventArray& inputEventArray);

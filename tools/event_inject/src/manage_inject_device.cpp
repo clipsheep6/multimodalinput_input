@@ -17,6 +17,7 @@
 
 #include <chrono>
 #include <thread>
+#include "cJSON.h"
 
 using namespace OHOS::MMI;
 
@@ -24,30 +25,31 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "ManageInjectDevice" };
 } // namespace
 
-int32_t ManageInjectDevice::TransformJsonData(const Json& configData)
+int32_t ManageInjectDevice::TransformJsonData(const cJSON* configData)
 {
     CALL_LOG_ENTER;
-    if (configData.empty()) {
-        MMI_LOGE("input data from json file is empty");
-        return RET_ERR;
-    }
-    for (const auto &item : configData) {
-        std::string deviceName = item.at("deviceName").get<std::string>();
-        uint16_t devIndex = 0;
-        if (item.find("devIndex") != item.end()) {
-            devIndex = item.at("devIndex").get<uint16_t>();
+    for (int32_t i = 0; i < cJSON_GetArraySize(configData); i++) {
+        cJSON* Arrayjson = cJSON_GetArrayItem(configData, i);
+        CHKPR(Arrayjson, RET_ERR);
+        InputEventArray inputEventArray = {};
+        cJSON* deviceName = cJSON_GetObjectItemCaseSensitive(Arrayjson, "deviceName");
+        if (deviceName) {
+            inputEventArray.deviceName = deviceName->valuestring;
+        }
+        uint16_t index = 0;
+        cJSON* devIndex = cJSON_GetObjectItemCaseSensitive(Arrayjson, "devIndex");
+        if (devIndex) {
+            index = devIndex->valueint;
         }
         std::string deviceNode;
-        if (getDeviceNodeObject_.GetDeviceNodeName(deviceName, devIndex, deviceNode) == RET_ERR) {
-            MMI_LOGE("fail get device:%{public}s node", deviceName.c_str());
+        if (getDeviceNodeObject_.GetDeviceNodeName(inputEventArray.deviceName, index, deviceNode) == RET_ERR) {
+            MMI_LOGE("fail get device:%{public}s node", inputEventArray.deviceName.c_str());
             return RET_ERR;
         }
-        InputEventArray inputEventArray = {};
-        inputEventArray.deviceName = deviceName;
         inputEventArray.target = deviceNode;
-        auto devicePtr = GetDeviceObject::CreateDeviceObject(deviceName);
+        auto devicePtr = GetDeviceObject::CreateDeviceObject(inputEventArray.deviceName);
         CHKPR(devicePtr, RET_ERR);
-        int32_t ret = devicePtr->TransformJsonDataToInputData(item, inputEventArray);
+        int32_t ret = devicePtr->TransformJsonDataToInputData(Arrayjson, inputEventArray);
         if (devicePtr != nullptr) {
             delete devicePtr;
             devicePtr = nullptr;
@@ -62,7 +64,6 @@ int32_t ManageInjectDevice::TransformJsonData(const Json& configData)
             return ret;
         }
     }
-
     return RET_OK;
 }
 

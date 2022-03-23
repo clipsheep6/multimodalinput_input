@@ -21,18 +21,12 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingFingerDevice" };
 } // namespace
 
-int32_t ProcessingFingerDevice::TransformJsonDataToInputData(const Json& fingerEventArrays,
+int32_t ProcessingFingerDevice::TransformJsonDataToInputData(const cJSON* fingerEventArrays,
     InputEventArray& inputEventArray)
 {
     CALL_LOG_ENTER;
-    if (fingerEventArrays.empty()) {
-        return RET_ERR;
-    }
-    Json inputData = fingerEventArrays.at("events");
-    if (inputData.empty()) {
-        MMI_LOGE("manage finger array faild, inputData is empty.");
-        return RET_ERR;
-    }
+    cJSON* inputData = cJSON_GetObjectItemCaseSensitive(fingerEventArrays, "events");
+    CHKPR(inputData, RET_ERR);
     TouchPadInputEvents touchPadInputEvents = {};
     AnalysisTouchPadFingerDate(inputData, touchPadInputEvents);
     TouchPadInputEvent pressEvents = touchPadInputEvents.eventArray[0];
@@ -46,20 +40,26 @@ int32_t ProcessingFingerDevice::TransformJsonDataToInputData(const Json& fingerE
     return RET_OK;
 }
 
-void ProcessingFingerDevice::AnalysisTouchPadFingerDate(const Json& inputData, TouchPadInputEvents& touchPadInputEvents)
+void ProcessingFingerDevice::AnalysisTouchPadFingerDate(const cJSON* inputData, TouchPadInputEvents& touchPadInputEvents)
 {
     TouchPadCoordinates touchPadCoordinates = {};
     TouchPadInputEvent touchPadInputEvent = {};
-    for (uint32_t i = 0; i < inputData.size(); i++) {
-        for (uint32_t j = 0; j < inputData[i].size(); j++) {
-            int32_t xPos = inputData[i][j][0].get<int32_t>();
-            int32_t yPos = inputData[i][j][1].get<int32_t>();
-            touchPadCoordinates.xPos = xPos;
-            touchPadCoordinates.yPos = yPos;
+    for (int32_t i = 0; i < cJSON_GetArraySize(inputData); i++) {
+        cJSON* inputDataI = cJSON_GetArrayItem(inputData, i);
+        CHKPV(inputDataI);
+        for (int32_t j = 0; j < cJSON_GetArraySize(inputDataI); j++) {
+            cJSON* inputDataJ = cJSON_GetArrayItem(inputDataI, j);
+            CHKPV(inputDataJ);
+            cJSON* xPos = cJSON_GetArrayItem(inputDataJ, 0);
+            CHKPV(xPos);
+            cJSON* yPos = cJSON_GetArrayItem(inputDataJ, 1);
+            CHKPV(yPos);
+            touchPadCoordinates.xPos = xPos->valueint;
+            touchPadCoordinates.yPos = yPos->valueint;
             touchPadInputEvent.events.push_back(touchPadCoordinates);
             touchPadInputEvent.groupNumber = j + 1;
         }
-        touchPadInputEvents.eventNumber = inputData.size();
+        touchPadInputEvents.eventNumber = cJSON_GetArraySize(inputData);
         touchPadInputEvents.eventArray.push_back(touchPadInputEvent);
         touchPadInputEvent.events.clear();
     }

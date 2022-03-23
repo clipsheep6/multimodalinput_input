@@ -21,23 +21,17 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingTouchScreenDevice" };
 } // namespace
 
-int32_t ProcessingTouchScreenDevice::TransformJsonDataToInputData(const Json& touchScreenEventArrays,
+int32_t ProcessingTouchScreenDevice::TransformJsonDataToInputData(const cJSON* touchScreenEventArrays,
                                                                   InputEventArray& inputEventArray)
 {
     CALL_LOG_ENTER;
-    if (touchScreenEventArrays.empty()) {
-        return RET_ERR;
-    }
-    if (touchScreenEventArrays.find("singleEvent") != touchScreenEventArrays.end()) {
-        return TransformJsonDataSingleTouchScreen(touchScreenEventArrays, inputEventArray);
-    }
-    Json inputData = touchScreenEventArrays.at("events");
-    if (inputData.empty()) {
-        MMI_LOGE("manage touchScreen array faild, inputData is empty.");
-        return RET_ERR;
-    }
+    cJSON* inputData = cJSON_GetObjectItemCaseSensitive(touchScreenEventArrays, "events");
+    CHKPR(inputData, RET_ERR);
     TouchScreenInputEvents touchScreenInputEvents = {};
     AnalysisTouchScreenDate(inputData, touchScreenInputEvents);
+     if (touchScreenInputEvents.eventArray.size() < 1) {
+         return RET_ERR;
+     }
     TouchScreenInputEvent pressEvents = touchScreenInputEvents.eventArray[0];
     AnalysisTouchScreenPressData(inputEventArray, pressEvents);
     for (uint64_t i = 1; i < static_cast<uint64_t>(touchScreenInputEvents.eventNumber); i++) {
@@ -49,19 +43,12 @@ int32_t ProcessingTouchScreenDevice::TransformJsonDataToInputData(const Json& to
     return RET_OK;
 }
 
-int32_t ProcessingTouchScreenDevice::TransformJsonDataSingleTouchScreen(const Json& touchScreenEventArrays,
+int32_t ProcessingTouchScreenDevice::TransformJsonDataSingleTouchScreen(const cJSON* touchScreenEventArrays,
     InputEventArray& inputEventArray)
 {
     CALL_LOG_ENTER;
-    if (touchScreenEventArrays.empty()) {
-        return RET_ERR;
-    }
-    Json inputData = touchScreenEventArrays.at("singleEvent");
-    if (inputData.empty()) {
-        MMI_LOGE("manage touchScreen array faild, inputData is empty.");
-        return RET_ERR;
-    }
-
+    cJSON* inputData = cJSON_GetObjectItemCaseSensitive(touchScreenEventArrays, "singleEvent");
+    CHKPR(inputData, RET_ERR);
     std::vector<TouchSingleEventData> touchSingleEventDatas;
     AnalysisSingleTouchScreenDate(inputData, touchSingleEventDatas);
     for (const auto &item : touchSingleEventDatas) {
@@ -70,42 +57,65 @@ int32_t ProcessingTouchScreenDevice::TransformJsonDataSingleTouchScreen(const Js
     return RET_OK;
 }
 
-void ProcessingTouchScreenDevice::AnalysisTouchScreenDate(const Json& inputData,
+void ProcessingTouchScreenDevice::AnalysisTouchScreenDate(const cJSON* inputData,
                                                           TouchScreenInputEvents& touchScreenInputEvents)
 {
     TouchScreenCoordinates touchScreenCoordinates = {};
     TouchScreenInputEvent touchScreenInputEvent = {};
-    for (uint32_t i = 0; i < inputData.size(); i++) {
-        for (uint32_t j = 0; j < inputData[i].size(); j++) {
-            int32_t xPos = inputData[i][j][0].get<int32_t>();
-            int32_t yPos = inputData[i][j][1].get<int32_t>();
-            touchScreenCoordinates.xPos = xPos;
-            touchScreenCoordinates.yPos = yPos;
+    for (int32_t i = 0; i < cJSON_GetArraySize(inputData); i++) {
+        cJSON* inputDataI = cJSON_GetArrayItem(inputData, i);
+        CHKPV(inputDataI);
+        for (int32_t j = 0; j < cJSON_GetArraySize(inputDataI); j++) {
+            cJSON* inputDataJ = cJSON_GetArrayItem(inputDataI, j);
+            CHKPV(inputDataJ);
+            cJSON* xPos = cJSON_GetArrayItem(inputData, 0);
+            CHKPV(xPos);
+            cJSON* yPos = cJSON_GetArrayItem(inputData, 1);
+            CHKPV(yPos);
+            touchScreenCoordinates.xPos = xPos->valueint;
+            touchScreenCoordinates.yPos = yPos->valueint;
             touchScreenInputEvent.events.push_back(touchScreenCoordinates);
             touchScreenInputEvent.groupNumber = j + 1;
         }
-        touchScreenInputEvents.eventNumber = static_cast<uint32_t>(inputData.size());
+        touchScreenInputEvents.eventNumber = cJSON_GetArraySize(inputData);
         touchScreenInputEvents.eventArray.push_back(touchScreenInputEvent);
         touchScreenInputEvent.events.clear();
     }
 }
 
-void ProcessingTouchScreenDevice::AnalysisSingleTouchScreenDate(const Json& inputData,
+void ProcessingTouchScreenDevice::AnalysisSingleTouchScreenDate(const cJSON* inputData,
     std::vector<TouchSingleEventData>& touchSingleEventDatas)
 {
     TouchSingleEventData touchSingleEventData = {};
-    for (auto item : inputData) {
+    for (int32_t i = 0; i < cJSON_GetArraySize(inputData); i++) {
         touchSingleEventData = {};
-        touchSingleEventData.eventType = item.at("eventType").get<std::string>();
-        touchSingleEventData.trackingId = item.at("trackingId").get<int32_t>();
+        cJSON* event = cJSON_GetArrayItem(inputData, i);
+        CHKPV(event);
+        cJSON* eventType = cJSON_GetObjectItemCaseSensitive(event, "eventType");
+        CHKPV(eventType);
+        touchSingleEventData.eventType = eventType->valuestring;
+        cJSON* trackingId = cJSON_GetObjectItemCaseSensitive(event, "trackingId");
+        if (trackingId) {
+            touchSingleEventData.trackingId = trackingId->valueint;
+        }
         if (touchSingleEventData.eventType != "release") {
-            touchSingleEventData.xPos = item.at("xPos").get<int32_t>();
-            touchSingleEventData.yPos = item.at("yPos").get<int32_t>();
+            cJSON* xPos = cJSON_GetObjectItemCaseSensitive(event, "xPos");
+            if (xPos) {
+                touchSingleEventData.xPos = xPos->valueint;
+            }
+            cJSON* yPos = cJSON_GetObjectItemCaseSensitive(event, "yPos");
+            if (yPos) {
+                touchSingleEventData.yPos = yPos->valueint;
+            }
         }
-        if ((item.find("blockTime")) != item.end()) {
-            touchSingleEventData.blockTime = item.at("blockTime").get<int64_t>();
+        cJSON* blockTime = cJSON_GetObjectItemCaseSensitive(event, "blockTime");
+        if (blockTime) {
+            touchSingleEventData.blockTime = blockTime->valueint;
         }
-        touchSingleEventData.reportType = item.at("reportType").get<std::string>();
+        cJSON* reportType = cJSON_GetObjectItemCaseSensitive(event, "reportType");
+        if (reportType) {
+            touchSingleEventData.reportType = reportType->valuestring;
+        }
         touchSingleEventDatas.push_back(touchSingleEventData);
     }
 }
@@ -115,6 +125,7 @@ void ProcessingTouchScreenDevice::AnalysisTouchScreenPressData(InputEventArray& 
 {
     int32_t xPos = 0;
     int32_t yPos = 0;
+    MMI_LOGE(" touchScreenInputEvent.groupNumber:%{public}d",  touchScreenInputEvent.groupNumber);
     for (uint32_t i = 0; i < touchScreenInputEvent.groupNumber; i++) {
         xPos = touchScreenInputEvent.events[i].xPos;
         yPos = touchScreenInputEvent.events[i].yPos;
