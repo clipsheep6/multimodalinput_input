@@ -65,8 +65,6 @@ void JsEventTarget::CallIdsAsyncWork(napi_env env, napi_status status, void* dat
     CHKRV(env, napi_get_reference_value(env, cbTemp.ref, &handlerTemp), "napi_get_reference_value");
     napi_value result = nullptr;
     CHKRV(env, napi_call_function(env, nullptr, handlerTemp, 1, &arr, &result), "napi_call_function");
-    CHKRV(env, napi_delete_reference(env, cbTemp.ref), "napi_delete_reference");
-    CHKRV(env, napi_delete_async_work(env, cbTemp.asyncWork), "napi_delete_async_work");
 }
 
 void JsEventTarget::CallIdsPromiseWork(napi_env env, napi_status status, void* data)
@@ -89,7 +87,6 @@ void JsEventTarget::CallIdsPromiseWork(napi_env env, napi_status status, void* d
     }
 
     CHKRV(env, napi_resolve_deferred(env, cbTemp.deferred, arr), "napi_resolve_deferred");
-    CHKRV(env, napi_delete_async_work(env, cbTemp.asyncWork), "napi_delete_async_work");
 }
 
 void JsEventTarget::EmitJsIds(int32_t userData, std::vector<int32_t> ids)
@@ -167,8 +164,6 @@ void JsEventTarget::CallDevAsyncWork(napi_env env, napi_status status, void* dat
     CHKRV(env, napi_get_reference_value(env, cbTemp.ref, &handlerTemp), "napi_get_reference_value");
     napi_value result = nullptr;
     CHKRV(env, napi_call_function(env, nullptr, handlerTemp, 1, &object, &result), "napi_call_function");
-    CHKRV(env, napi_delete_reference(env, cbTemp.ref), "napi_delete_reference");
-    CHKRV(env, napi_delete_async_work(env, cbTemp.asyncWork), "napi_delete_async_work");
 }
 
 void JsEventTarget::EmitJsDev(int32_t userData, std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device)
@@ -247,7 +242,6 @@ void JsEventTarget::CallDevPromiseWork(napi_env env, napi_status status, void* d
     CHKRV(env, napi_create_array(env, &axisRanges), "napi_create_array");
     CHKRV(env, napi_set_named_property(env, object, "axisRanges", axisRanges), "napi_set_named_property");
     CHKRV(env, napi_resolve_deferred(env, cbTemp.deferred, object), "napi_resolve_deferred");
-    CHKRV(env, napi_delete_async_work(env, cbTemp.asyncWork), "napi_delete_async_work");
 }
 
 void JsEventTarget::EmitJsKeystrokeAbility(int32_t userData, std::vector<int32_t> keystrokeAbility)
@@ -308,7 +302,6 @@ void JsEventTarget::CallKeystrokeAbilityPromise(napi_env env, napi_status status
         ++index1;
     }
     CHKRV(env, napi_resolve_deferred(env, cbTemp.deferred, keyAbility), "napi_resolve_deferred");
-    CHKRV(env, napi_delete_async_work(env, cbTemp.asyncWork), "napi_delete_async_work");
 }
 
 void JsEventTarget::CallKeystrokeAbilityAsync(napi_env env, napi_status status, void* data)
@@ -343,8 +336,6 @@ void JsEventTarget::CallKeystrokeAbilityAsync(napi_env env, napi_status status, 
     CHKRV(env, napi_get_reference_value(env, cbTemp.ref, &handlerTemp), "napi_get_reference_value");
     napi_value result = nullptr;
     CHKRV(env, napi_call_function(env, nullptr, handlerTemp, 1, &keyAbility, &result), "napi_call_function");
-    CHKRV(env, napi_delete_reference(env, cbTemp.ref), "napi_delete_reference");
-    CHKRV(env, napi_delete_async_work(env, cbTemp.asyncWork), "napi_delete_async_work");
 }
 
 napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle)
@@ -377,11 +368,11 @@ napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle)
         cb = nullptr;
         CHKRP(env_, state, "napi_create_reference");
     }
-    callback_[userData_] = cb;
     if (userData_ == INT32_MAX) {
         MMI_LOGE("userData_ exceeds the maximum");
         return nullptr;
     }
+    callback_[userData_] = cb;
     ++userData_;
     return nullptr;
 }

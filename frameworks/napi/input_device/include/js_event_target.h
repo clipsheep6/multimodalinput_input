@@ -18,13 +18,12 @@
 
 #include "define_multimodal.h"
 #include "error_multimodal.h"
-#include "input_device_impl.h"
 #include "js_util.h"
+#include "input_device_impl.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
-#include "utils/log.h"
 #include "util_napi.h"
-
+#include "utils/log.h"
 
 namespace OHOS {
 namespace MMI {
