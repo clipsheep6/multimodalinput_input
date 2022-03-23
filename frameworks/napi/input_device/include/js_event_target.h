@@ -38,17 +38,12 @@ public:
     napi_value CreateCallbackInfo(napi_env env, napi_value handle);
     void ResetEnv();
     static int32_t userData_;
+    static napi_env env_;
 
     struct DeviceType {
         std::string deviceTypeName;
         uint32_t typeBit;
     };
-    static constexpr uint32_t EVDEV_UDEV_TAG_KEYBOARD = (1 << 1);
-    static constexpr uint32_t EVDEV_UDEV_TAG_MOUSE = (1 << 2);
-    static constexpr uint32_t EVDEV_UDEV_TAG_TOUCHPAD = (1 << 3);
-    static constexpr uint32_t EVDEV_UDEV_TAG_TOUCHSCREEN = (1 << 4);
-    static constexpr uint32_t EVDEV_UDEV_TAG_JOYSTICK = (1 << 6);
-    static constexpr uint32_t EVDEV_UDEV_TAG_TRACKBALL = (1 << 10);
 
 private:
     static bool CheckEnv(napi_env env);
@@ -58,7 +53,6 @@ private:
     static void CallDevPromiseWork(napi_env env, napi_status status, void* data);
     static void CallKeystrokeAbilityPromise(napi_env env, napi_status status, void* data);
     static void CallKeystrokeAbilityAsync(napi_env env, napi_status status, void* data);
-    static napi_env env_;
 };
 } // namespace MMI
 } // namespace OHOS

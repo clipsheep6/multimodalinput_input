@@ -21,13 +21,20 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsEventTarget" };
+constexpr uint32_t EVDEV_UDEV_TAG_KEYBOARD = (1 << 1);
+constexpr uint32_t EVDEV_UDEV_TAG_MOUSE = (1 << 2);
+constexpr uint32_t EVDEV_UDEV_TAG_TOUCHPAD = (1 << 3);
+constexpr uint32_t EVDEV_UDEV_TAG_TOUCHSCREEN = (1 << 4);
+constexpr uint32_t EVDEV_UDEV_TAG_JOYSTICK = (1 << 6);
+constexpr uint32_t EVDEV_UDEV_TAG_TRACKBALL = (1 << 10);
+
 JsEventTarget::DeviceType g_deviceType[] = {
-    {"keyboard", JsEventTarget::EVDEV_UDEV_TAG_KEYBOARD},
-    {"mouse", JsEventTarget::EVDEV_UDEV_TAG_MOUSE},
-    {"touchpad", JsEventTarget::EVDEV_UDEV_TAG_TOUCHPAD},
-    {"touchscreen", JsEventTarget::EVDEV_UDEV_TAG_TOUCHSCREEN},
-    {"joystick", JsEventTarget::EVDEV_UDEV_TAG_JOYSTICK},
-    {"trackball", JsEventTarget::EVDEV_UDEV_TAG_TRACKBALL},
+    {"keyboard", EVDEV_UDEV_TAG_KEYBOARD},
+    {"mouse", EVDEV_UDEV_TAG_MOUSE},
+    {"touchpad", EVDEV_UDEV_TAG_TOUCHPAD},
+    {"touchscreen", EVDEV_UDEV_TAG_TOUCHSCREEN},
+    {"joystick", EVDEV_UDEV_TAG_JOYSTICK},
+    {"trackball", EVDEV_UDEV_TAG_TRACKBALL},
 };
 } // namespace
 
@@ -39,12 +46,9 @@ void JsEventTarget::CallIdsAsyncWork(napi_env env, napi_status status, void* dat
 {
     CALL_LOG_ENTER;
     CHKPV(data);
-    JsUtil::CallbackInfo cbTemp;
+    JsUtil::CallbackInfo cbTemp(env);
     JsUtil jsUtil;
     jsUtil.GetCallbackInfo(data, cbTemp);
-
-    napi_handle_scope scope = nullptr;
-    CHKRV(env, napi_open_handle_scope(env, &scope), "napi_open_handle_scope");
 
     napi_value arr = nullptr;
     CHKRV(env, napi_create_array(env, &arr), "napi_create_array");
@@ -60,29 +64,18 @@ void JsEventTarget::CallIdsAsyncWork(napi_env env, napi_status status, void* dat
     napi_value handlerTemp = nullptr;
     CHKRV(env, napi_get_reference_value(env, cbTemp.ref, &handlerTemp), "napi_get_reference_value");
     napi_value result = nullptr;
-    napi_status state = napi_call_function(env, nullptr, handlerTemp, 1, &arr, &result);
-    if (state != napi_ok) {
-        napi_delete_reference(env, cbTemp.ref);
-        napi_delete_async_work(env, cbTemp.asyncWork);
-        napi_throw_error(env, nullptr, "JsEventTarget: napi_call_function failed");
-        MMI_LOGE("napi_call_function failed");
-        return;
-    }
+    CHKRV(env, napi_call_function(env, nullptr, handlerTemp, 1, &arr, &result), "napi_call_function");
     CHKRV(env, napi_delete_reference(env, cbTemp.ref), "napi_delete_reference");
     CHKRV(env, napi_delete_async_work(env, cbTemp.asyncWork), "napi_delete_async_work");
-    CHKRV(env, napi_close_handle_scope(env, scope), "napi_close_handle_scope");
 }
 
 void JsEventTarget::CallIdsPromiseWork(napi_env env, napi_status status, void* data)
 {
     CALL_LOG_ENTER;
     CHKPV(data);
-    JsUtil::CallbackInfo cbTemp;
+    JsUtil::CallbackInfo cbTemp(env);
     JsUtil jsUtil;
     jsUtil.GetCallbackInfo(data, cbTemp);
-
-    napi_handle_scope scope = nullptr;
-    CHKRV(env, napi_open_handle_scope(env, &scope), "napi_open_handle_scope");
 
     napi_value arr = nullptr;
     CHKRV(env, napi_create_array(env, &arr), "napi_create_array");
@@ -95,15 +88,8 @@ void JsEventTarget::CallIdsPromiseWork(napi_env env, napi_status status, void* d
         index++;
     }
 
-    napi_status state = napi_resolve_deferred(env, cbTemp.deferred, arr);
-    if (state != napi_ok) {
-        napi_delete_async_work(env, cbTemp.asyncWork);
-        napi_throw_error(env, nullptr, "JsEventTarget: napi_call_function failed");
-        MMI_LOGE("napi_call_function failed");
-        return;
-    }
+    CHKRV(env, napi_resolve_deferred(env, cbTemp.deferred, arr), "napi_resolve_deferred");
     CHKRV(env, napi_delete_async_work(env, cbTemp.asyncWork), "napi_delete_async_work");
-    CHKRV(env, napi_close_handle_scope(env, scope), "napi_close_handle_scope");
 }
 
 void JsEventTarget::EmitJsIds(int32_t userData, std::vector<int32_t> ids)
@@ -140,13 +126,10 @@ void JsEventTarget::CallDevAsyncWork(napi_env env, napi_status status, void* dat
 {
     CALL_LOG_ENTER;
     CHKPV(data);
-    JsUtil::CallbackInfo cbTemp;
+    JsUtil::CallbackInfo cbTemp(env);
     JsUtil jsUtil;
     jsUtil.GetCallbackInfo(data, cbTemp);
     CHKPV(cbTemp.data.device);
-
-    napi_handle_scope scope = nullptr;
-    CHKRV(env, napi_open_handle_scope(env, &scope), "napi_open_handle_scope");
 
     napi_value id = nullptr;
     CHKRV(env, napi_create_int32(env, cbTemp.data.device->id, &id), "napi_create_int32");
@@ -183,18 +166,9 @@ void JsEventTarget::CallDevAsyncWork(napi_env env, napi_status status, void* dat
     napi_value handlerTemp = nullptr;
     CHKRV(env, napi_get_reference_value(env, cbTemp.ref, &handlerTemp), "napi_get_reference_value");
     napi_value result = nullptr;
-    napi_status state = napi_call_function(env, nullptr, handlerTemp, 1, &object, &result);
-    if (state != napi_ok) {
-        napi_delete_reference(env, cbTemp.ref);
-        napi_delete_async_work(env, cbTemp.asyncWork);
-        napi_throw_error(env, nullptr, "JsEventTarget: napi_call_function failed");
-        MMI_LOGE("napi_call_function failed");
-        return;
-    }
+    CHKRV(env, napi_call_function(env, nullptr, handlerTemp, 1, &object, &result), "napi_call_function");
     CHKRV(env, napi_delete_reference(env, cbTemp.ref), "napi_delete_reference");
     CHKRV(env, napi_delete_async_work(env, cbTemp.asyncWork), "napi_delete_async_work");
-
-    CHKRV(env, napi_close_handle_scope(env, scope), "napi_close_handle_scope");
 }
 
 void JsEventTarget::EmitJsDev(int32_t userData, std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device)
@@ -232,22 +206,18 @@ void JsEventTarget::CallDevPromiseWork(napi_env env, napi_status status, void* d
 {
     CALL_LOG_ENTER;
     CHKPV(data);
-    JsUtil::CallbackInfo cbTemp;
+    JsUtil::CallbackInfo cbTemp(env);
     JsUtil jsUtil;
     jsUtil.GetCallbackInfo(data, cbTemp);
     CHKPV(cbTemp.data.device);
-
-    napi_handle_scope scope = nullptr;
-    CHKRV(env, napi_open_handle_scope(env, &scope), "napi_open_handle_scope");
 
     napi_value id = nullptr;
     CHKRV(env, napi_create_int32(env, cbTemp.data.device->id, &id), "napi_create_int32");
     napi_value name = nullptr;
     CHKRV(env, napi_create_string_utf8(env, (cbTemp.data.device->name).c_str(), NAPI_AUTO_LENGTH, &name),
-        "napi_create_string_utf8");
+          "napi_create_string_utf8");
     napi_value object = nullptr;
     CHKRV(env, napi_create_object(env, &object), "napi_create_object");
-
     CHKRV(env, napi_set_named_property(env, object, "id", id), "napi_set_named_property");
     CHKRV(env, napi_set_named_property(env, object, "name", name), "napi_set_named_property");
 
@@ -276,16 +246,8 @@ void JsEventTarget::CallDevPromiseWork(napi_env env, napi_status status, void* d
     napi_value axisRanges = nullptr;
     CHKRV(env, napi_create_array(env, &axisRanges), "napi_create_array");
     CHKRV(env, napi_set_named_property(env, object, "axisRanges", axisRanges), "napi_set_named_property");
-
-    napi_status state = napi_resolve_deferred(env, cbTemp.deferred, object);
-    if (state != napi_ok) {
-        napi_delete_async_work(env, cbTemp.asyncWork);
-        napi_throw_error(env, nullptr, "JsEventTarget: napi_call_function failed");
-        MMI_LOGE("napi_call_function failed");
-        return;
-    }
+    CHKRV(env, napi_resolve_deferred(env, cbTemp.deferred, object), "napi_resolve_deferred");
     CHKRV(env, napi_delete_async_work(env, cbTemp.asyncWork), "napi_delete_async_work");
-    CHKRV(env, napi_close_handle_scope(env, scope), "napi_close_handle_scope");
 }
 
 void JsEventTarget::EmitJsKeystrokeAbility(int32_t userData, std::vector<int32_t> keystrokeAbility)
@@ -322,12 +284,9 @@ void JsEventTarget::CallKeystrokeAbilityPromise(napi_env env, napi_status status
 {
     CALL_LOG_ENTER;
     CHKPV(data);
-    JsUtil::CallbackInfo cbTemp;
+    JsUtil::CallbackInfo cbTemp(env);
     JsUtil jsUtil;
     jsUtil.GetCallbackInfo(data, cbTemp);
-
-    napi_handle_scope scope = nullptr;
-    CHKRV(env, napi_open_handle_scope(env, &scope), "napi_open_handle_scope");
 
     napi_value keyAbility = nullptr;
     CHKRV(env, napi_create_array(env, &keyAbility), "napi_create_array");
@@ -348,29 +307,17 @@ void JsEventTarget::CallKeystrokeAbilityPromise(napi_env env, napi_status status
         CHKRV(env, napi_set_element(env, keyAbility, index1, abilityRet), "napi_set_element");
         ++index1;
     }
-
     CHKRV(env, napi_resolve_deferred(env, cbTemp.deferred, keyAbility), "napi_resolve_deferred");
     CHKRV(env, napi_delete_async_work(env, cbTemp.asyncWork), "napi_delete_async_work");
-    CHKRV(env, napi_close_handle_scope(env, scope), "napi_close_handle_scope");
 }
 
 void JsEventTarget::CallKeystrokeAbilityAsync(napi_env env, napi_status status, void* data)
 {
     CALL_LOG_ENTER;
     CHKPV(data);
-    JsUtil::CallbackInfo cbTemp;
+    JsUtil::CallbackInfo cbTemp(env);
     JsUtil jsUtil;
     jsUtil.GetCallbackInfo(data, cbTemp);
-
-    napi_handle_scope scope = nullptr;
-    napi_status state = napi_open_handle_scope(env, &scope);
-    if (state != napi_ok) {
-        napi_delete_reference(env, cbTemp.ref);
-        napi_delete_async_work(env, cbTemp.asyncWork);
-        napi_throw_error(env, nullptr, "JsEventTarget: failed to open scope");
-        MMI_LOGE("failed to open scope");
-        return;
-    }
 
     napi_value keyAbility = nullptr;
     CHKRV(env, napi_create_array(env, &keyAbility), "napi_create_array");
@@ -393,33 +340,18 @@ void JsEventTarget::CallKeystrokeAbilityAsync(napi_env env, napi_status status, 
     }
 
     napi_value handlerTemp = nullptr;
-    state = napi_get_reference_value(env, cbTemp.ref, &handlerTemp);
-    if (state != napi_ok) {
-        napi_delete_reference(env, cbTemp.ref);
-        napi_delete_async_work(env, cbTemp.asyncWork);
-        napi_throw_error(env, nullptr, "JsEventTarget: napi_get_reference_value failed");
-        MMI_LOGE("napi_get_reference_value failed");
-        return;
-    }
+    CHKRV(env, napi_get_reference_value(env, cbTemp.ref, &handlerTemp), "napi_get_reference_value");
     napi_value result = nullptr;
-    state = napi_call_function(env, nullptr, handlerTemp, 1, &keyAbility, &result);
-    if (state != napi_ok) {
-        napi_delete_reference(env, cbTemp.ref);
-        napi_delete_async_work(env, cbTemp.asyncWork);
-        napi_throw_error(env, nullptr, "JsEventTarget: napi_call_function failed");
-        MMI_LOGE("napi_call_function failed");
-        return;
-    }
+    CHKRV(env, napi_call_function(env, nullptr, handlerTemp, 1, &keyAbility, &result), "napi_call_function");
     CHKRV(env, napi_delete_reference(env, cbTemp.ref), "napi_delete_reference");
     CHKRV(env, napi_delete_async_work(env, cbTemp.asyncWork), "napi_delete_async_work");
-    CHKRV(env, napi_close_handle_scope(env, scope), "napi_close_handle_scope");
 }
 
 napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle)
 {
     CALL_LOG_ENTER;
     env_ = env;
-    JsUtil::CallbackInfo* cb = new (std::nothrow) JsUtil::CallbackInfo;
+    JsUtil::CallbackInfo* cb = new (std::nothrow) JsUtil::CallbackInfo(env);
     CHKPP(cb);
 
     napi_status state = napi_generic_failure;

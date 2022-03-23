@@ -199,7 +199,6 @@ napi_value JsInputDeviceContext::GetKeystrokeAbility(napi_env env, napi_callback
         return nullptr;
     }
 
-    int32_t deviceId = 0;
     napi_valuetype valueType = napi_undefined;
     CHKRP(env, napi_typeof(env, argv[0], &valueType), "napi_typeof");
     if (valueType != napi_number) {
@@ -207,6 +206,7 @@ napi_value JsInputDeviceContext::GetKeystrokeAbility(napi_env env, napi_callback
         napi_throw_error(env, nullptr, "JsInputDeviceContext: the first parameter is not a number");
         return nullptr;
     }
+    int32_t deviceId = 0;
     CHKRP(env, napi_get_value_int32(env, argv[0], &deviceId), "napi_get_value_int32");
 
     for (size_t i = 0; i < argc; ++i) {
@@ -263,8 +263,6 @@ napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
         return nullptr;
     }
     napi_property_descriptor desc[] = {
-        // DECLARE_NAPI_STATIC_FUNCTION("on", On),
-        // DECLARE_NAPI_STATIC_FUNCTION("off", Off),
         DECLARE_NAPI_STATIC_FUNCTION("getDevice", GetDevice),
         DECLARE_NAPI_STATIC_FUNCTION("getDeviceIds", GetDeviceIds),
         DECLARE_NAPI_STATIC_FUNCTION("getKeystrokeAbility", GetKeystrokeAbility),

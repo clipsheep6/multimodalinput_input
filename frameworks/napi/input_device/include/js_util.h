@@ -26,11 +26,22 @@ class JsUtil {
 public:
     struct CallbackData {
         std::vector<int32_t> ids;
-        std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device;
+        std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device = nullptr;
         std::vector<int32_t> keystrokeAbility;
     };
 
     struct CallbackInfo {
+        CallbackInfo(napi_env env) : env(env){}
+        ~CallbackInfo()
+        {
+            if (ref != nullptr) {
+                napi_delete_reference(env, ref);
+            }
+            if (asyncWork != nullptr) {
+                napi_delete_async_work(env, asyncWork);
+            }
+        }
+        napi_env env = nullptr;
         napi_ref ref = nullptr;
         napi_async_work asyncWork = nullptr;
         napi_deferred deferred = nullptr;
