@@ -102,7 +102,7 @@ bool VirtualDevice::ReadFile(const std::string catName, std::string& temp)
         return false;
     }
     char buf[32] = { 0 };
-    if(fgets(buf, sizeof(buf), cmdName) == nullptr) {
+    if (fgets(buf, sizeof(buf), cmdName) == nullptr) {
         printf("read file failed");
         return false;
     }

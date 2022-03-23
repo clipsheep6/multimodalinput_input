@@ -64,11 +64,10 @@ int32_t ProcessingGamePadDevice::AnalysisGamePadEvent(const cJSON* inputData, st
             cJSON* gameEvents = cJSON_GetObjectItemCaseSensitive(eventData, "event");
             CHKPB(gameEvents);
             for (int32_t j = 0; j < cJSON_GetArraySize(gameEvents); j++) {
-                if (cJSON_GetArrayItem(gameEvents, j)) {
-                    padEvent.gameEvents.push_back(cJSON_GetArrayItem(gameEvents, j)->valueint);
-                }
+                cJSON *gameEvents = cJSON_GetArrayItem(gameEvents, j);
+                CHKPB(gameEvents);
+                padEvent.gameEvents.push_back(gameEvents->valueint);
             }
-
         }
         if (padEvent.eventType == "DERECTION_KEY") {
             cJSON* direction = cJSON_GetObjectItemCaseSensitive(eventData, "direction");

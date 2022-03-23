@@ -131,15 +131,18 @@ int32_t InjectionEventDispatch::OnJson()
         MMI_LOGE("The file size is out of range 2M or empty. filesize:%{public}d", fileSize);
         return RET_ERR;
     }
-    FILE* fp = fopen(jsonFile.c_str(),"r");
-    CHKPR(fp, RET_ERR);
+    FILE* fp = fopen(jsonFile.c_str(), "r");
+    if (fp == nullptr) {
+        MMI_LOGE("fopen file failed");
+        return RET_ERR;
+    }
     char buf[256] = {};
     std::string jsonBuf;
     while (fgets(buf, sizeof(buf), fp) != NULL) {
         jsonBuf = jsonBuf + buf;
     }
     if (fclose(fp) < 0) {
-         MMI_LOGE("close file failed");
+        MMI_LOGE("close file failed");
     }
     cJSON* inputEventArrays = cJSON_Parse(jsonBuf.c_str());
     CHKPR(inputEventArrays, RET_ERR);
