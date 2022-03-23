@@ -41,14 +41,8 @@ public:
     int32_t DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key);
     int32_t DispatchTouchEvent(UDSServer& udsServer, struct libinput_event *event,
         const EventTouch& touch, const int64_t preHandlerTime);
-    int32_t DispatchTabletPadEvent(UDSServer& udsServer, struct libinput_event *event,
-        const EventTabletPad& tabletPad, const int64_t preHandlerTime);
-    int32_t DispatchCommonPointEvent(UDSServer& udsServer, struct libinput_event *event,
-        const EventPointer& point, const int64_t preHandlerTime);
     int32_t DispatchPointerEvent(UDSServer& udsServer, struct libinput_event *event,
         EventPointer& point, const int64_t preHandlerTime);
-    int32_t DispatchTabletToolEvent(UDSServer& udsServer, struct libinput_event *event,
-        const EventTabletTool& tableTool, const int64_t preHandlerTime);
     int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> point);
 
 protected:
