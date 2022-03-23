@@ -43,8 +43,6 @@ public:
         const EventTouch& touch, const int64_t preHandlerTime);
     int32_t DispatchTabletPadEvent(UDSServer& udsServer, struct libinput_event *event,
         const EventTabletPad& tabletPad, const int64_t preHandlerTime);
-    int32_t DispatchJoyStickEvent(UDSServer& udsServer, struct libinput_event *event,
-        const EventJoyStickAxis& eventJoyStickAxis, const int64_t preHandlerTime);
     int32_t DispatchCommonPointEvent(UDSServer& udsServer, struct libinput_event *event,
         const EventPointer& point, const int64_t preHandlerTime);
     int32_t DispatchPointerEvent(UDSServer& udsServer, struct libinput_event *event,
