@@ -31,7 +31,7 @@ public:
     };
 
     struct CallbackInfo {
-        CallbackInfo(napi_env env) : env(env){}
+        CallbackInfo(napi_env env) : env(env) {}
         ~CallbackInfo()
         {
             if (ref != nullptr) {
