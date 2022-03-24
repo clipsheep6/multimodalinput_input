@@ -46,6 +46,7 @@ constexpr int32_t MOUSE_ID = 2;
 constexpr int32_t TWO_MORE_COMMAND = 2;
 constexpr int32_t THREE_MORE_COMMAND = 3;
 constexpr int32_t MAX_PRESSED_COUNT = 30;
+constexpr int32_t ACTION_TIME = 3000;
 } // namespace
 
 int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
@@ -182,7 +183,11 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             CHKPR(pointerEvent, ERROR_NULL_POINTER);
                             PointerEvent::PointerItem item;
                             item.SetPointerId(0);
+                            item.SetGlobalX(px);
+                            item.SetGlobalY(py);
                             item.SetPressed(false);
+                            int64_t time = pointerEvent->GetActionStartTime();
+                            pointerEvent->SetActionTime(time + ACTION_TIME);
                             pointerEvent->SetPointerId(0);
                             pointerEvent->AddPointerItem(item);
                             pointerEvent->SetButtonPressed(buttonId);
@@ -353,17 +358,27 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             item.SetGlobalY(py1);
                             pointerEvent->SetPointerId(0);
                             pointerEvent->AddPointerItem(item);
+                            int64_t time = pointerEvent->GetActionStartTime();
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-                            item.SetGlobalX(px2);
-                            item.SetGlobalY(py2);
+                            item.SetGlobalX((px2+px2)/2);
+                            item.SetGlobalY((py1+py2)/2);
+                            pointerEvent->SetActionTime(time + ACTION_TIME);
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             item.SetGlobalX(px2);
                             item.SetGlobalY(py2);
+                            pointerEvent->SetActionTime(time + ACTION_TIME*2);
+                            pointerEvent->UpdatePointerItem(0, item);
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+                            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            item.SetGlobalX(px2);
+                            item.SetGlobalY(py2);
+                            pointerEvent->SetActionTime(time + ACTION_TIME*2);
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
