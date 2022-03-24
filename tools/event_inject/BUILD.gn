@@ -42,8 +42,7 @@ config("event_injection_public_config") {
   include_dirs = [
     "include",
     "//third_party/FreeBSD/sys/dev/evdev",
-    "//third_party/json/include",
-    "//third_party/json/include/nlohmann",
+    "//third_party/cJSON",
     "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
   ]
@@ -51,6 +50,7 @@ config("event_injection_public_config") {
 
 ohos_shared_library("event-injection") {
   sources = [
+    "//third_party/cJSON/cJSON.c",
     "src/device_base.cpp",
     "src/get_device_node.cpp",
     "src/get_device_object.cpp",
@@ -95,8 +95,7 @@ ohos_unittest("ut-event-injection-out") {
     "//drivers/adapter/uhdf2/adapter/osal/include",
     "//utils/native/base/include",
     "//third_party/googletest/googletest/include",
-    "//third_party/json/include",
-    "//third_party/json/include/nlohmann",
+    "//third_party/cJSON",
     "${mmi_path}/frameworks/proxy/event_handler",
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_path}/frameworks/proxy/module_loader",

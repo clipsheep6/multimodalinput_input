@@ -21,22 +21,12 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "ProcessingJoystickDevice" };
 } // namespace
 
-int32_t ProcessingJoystickDevice::TransformJsonDataToInputData(const Json& originalEvent,
+int32_t ProcessingJoystickDevice::TransformJsonDataToInputData(const cJSON* originalEvent,
                                                                InputEventArray& inputEventArray)
 {
     CALL_LOG_ENTER;
-    if (originalEvent.empty()) {
-        return RET_ERR;
-    }
-    if (originalEvent.find("events") == originalEvent.end()) {
-        MMI_LOGE("manage joystick array faild, inputData is empty");
-        return RET_ERR;
-    }
-    Json inputData = originalEvent.at("events");
-    if (inputData.empty()) {
-        MMI_LOGE("manage finger array faild, inputData is empty");
-        return RET_ERR;
-    }
+    cJSON* inputData = cJSON_GetObjectItemCaseSensitive(originalEvent, "events");
+    CHKPR(inputData, RET_ERR);
     std::vector<JoystickEvent> JoystickEventArray;
     if (AnalysisJoystickEvent(inputData, JoystickEventArray) == RET_ERR) {
         return RET_ERR;
@@ -45,53 +35,48 @@ int32_t ProcessingJoystickDevice::TransformJsonDataToInputData(const Json& origi
     return RET_OK;
 }
 
-int32_t ProcessingJoystickDevice::AnalysisJoystickEvent(const Json& inputData,
+int32_t ProcessingJoystickDevice::AnalysisJoystickEvent(const cJSON* inputData,
                                                         std::vector<JoystickEvent>& JoystickEventArray)
 {
     JoystickEvent joystickEvent = {};
-    for (const auto &item : inputData) {
+    for (int i = 0; i < cJSON_GetArraySize(inputData); i++) {
+        cJSON* event = cJSON_GetArrayItem(inputData, i);
+        CHKPR(event, RET_ERR);
+        cJSON* eventType = cJSON_GetObjectItemCaseSensitive(event, "eventType");
+        CHKPR(eventType, RET_ERR);
         joystickEvent = {};
-        std::string eventType = item.at("eventType").get<std::string>();
-        if ((item.find("blockTime")) != item.end()) {
-            joystickEvent.blockTime = item.at("blockTime").get<int64_t>();
+        joystickEvent.eventType = eventType->valuestring;
+        cJSON* blockTime = cJSON_GetObjectItemCaseSensitive(event, "blockTime");
+        if (blockTime) {
+            joystickEvent.blockTime = blockTime->valueint;
         }
-        joystickEvent.eventType = eventType;
-        if ((eventType == "KEY_EVENT_CLICK") || (eventType == "KEY_EVENT_PRESS") ||
-            (eventType == "KEY_EVENT_RELEASE")) {
-            if ((item.find("keyValue")) == item.end()) {
-                MMI_LOGE("not find keyValue On Event:%{public}s", eventType.c_str());
-                return RET_ERR;
+        if ((joystickEvent.eventType == "KEY_EVENT_CLICK") || (joystickEvent.eventType == "KEY_EVENT_PRESS") ||
+            (joystickEvent.eventType == "KEY_EVENT_RELEASE")) {
+            cJSON* keyValue = cJSON_GetObjectItemCaseSensitive(event, "keyValue");
+            CHKPR(keyValue, RET_ERR);
+            joystickEvent.keyValue = keyValue->valueint;
+        } else if (joystickEvent.eventType == "THROTTLE") {
+            cJSON* keyValue = cJSON_GetObjectItemCaseSensitive(event, "keyValue");
+            CHKPR(keyValue, RET_ERR);
+            joystickEvent.keyValue = keyValue->valueint;
+        } else if ((joystickEvent.eventType == "ROCKER_1")) {
+            cJSON* gameEvents = cJSON_GetObjectItemCaseSensitive(event, "event");
+            CHKPR(gameEvents, RET_ERR);
+            for (int32_t j = 0; j < cJSON_GetArraySize(gameEvents); j++) {
+                joystickEvent.gameEvents.push_back(cJSON_GetArrayItem(gameEvents, j)->valueint);
             }
-            joystickEvent.keyValue = item.at("keyValue").get<int32_t>();
-        } else if (eventType == "THROTTLE") {
-            if ((item.find("keyValue")) == item.end()) {
-                MMI_LOGE("not find keyValue On Event:%{public}s", eventType.c_str());
-                return RET_ERR;
-            }
-            joystickEvent.keyValue = item.at("keyValue").get<int32_t>();
-        } else if ((eventType == "ROCKER_1")) {
-            if ((item.find("event")) == item.end()) {
-                MMI_LOGE("not find event On Event:%{public}s", eventType.c_str());
-                return RET_ERR;
-            }
-            if ((item.find("direction")) == item.end()) {
-                MMI_LOGE("not find direction On Event:%{public}s", eventType.c_str());
-                return RET_ERR;
-            }
-            joystickEvent.gameEvents = item.at("event").get<std::vector<int32_t>>();
-            joystickEvent.direction = item.at("direction").get<std::string>();
-        } else if (eventType == "DERECTION_KEY") {
-            if ((item.find("direction")) == item.end()) {
-                MMI_LOGE("not find direction On Event:%{public}s", eventType.c_str());
-                return RET_ERR;
-            }
-            joystickEvent.direction = item.at("direction").get<std::string>();
+            cJSON* direction = cJSON_GetObjectItemCaseSensitive(event, "direction");
+            CHKPR(direction, RET_ERR);
+            joystickEvent.direction = direction->valuestring;
+        } else if (joystickEvent.eventType == "DERECTION_KEY") {
+            cJSON* direction = cJSON_GetObjectItemCaseSensitive(event, "direction");
+            CHKPR(direction, RET_ERR);
+            joystickEvent.direction = direction->valuestring;
         } else {
-            continue;
+            MMI_LOGE("eventType is error");
         }
         JoystickEventArray.push_back(joystickEvent);
     }
-
     return RET_OK;
 }
 
@@ -111,6 +96,8 @@ void ProcessingJoystickDevice::TransformPadEventToInputEvent(const std::vector<J
             TransformRocker1Event(item, inputEventArray);
         } else if (item.eventType == "THROTTLE") {
             TransformThrottle1Event(item, inputEventArray);
+        } else {
+            MMI_LOGE("eventType is error");
         }
     }
 }
@@ -152,6 +139,8 @@ void ProcessingJoystickDevice::TransformRocker1Event(const JoystickEvent& joysti
             SetEvAbsY(inputEventArray, 0, item);
         } else if (direction == "lt") {
             SetEvAbsRz(inputEventArray, 0, item);
+        } else {
+            MMI_LOGE("direction is error");
         }
         SetSynReport(inputEventArray);
     }
@@ -163,7 +152,7 @@ void ProcessingJoystickDevice::TransformRocker1Event(const JoystickEvent& joysti
     } else if (direction == "lt") {
         SetEvAbsRz(inputEventArray, 0, default_absz_value);
     } else {
-        // nothint to do.
+        MMI_LOGE("direction is error");
     }
     SetSynReport(inputEventArray);
 }
@@ -194,7 +183,7 @@ void ProcessingJoystickDevice::TransformDerectionKeyEvent(const JoystickEvent& j
         SetEvAbsHat0Y(inputEventArray, 0, 0);
         SetSynReport(inputEventArray);
     }  else {
-        // nothint to do.
+        MMI_LOGE("direction is error");
     }
 }
 

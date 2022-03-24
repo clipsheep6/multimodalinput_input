@@ -21,18 +21,12 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingPadDevice" };
 } // namespace
 
-int32_t ProcessingPadDevice::TransformJsonDataToInputData(const Json& fingerEventArrays,
+int32_t ProcessingPadDevice::TransformJsonDataToInputData(const cJSON* fingerEventArrays,
     InputEventArray& inputEventArray)
 {
     CALL_LOG_ENTER;
-    if (fingerEventArrays.empty()) {
-        return RET_ERR;
-    }
-    Json inputData = fingerEventArrays.at("events");
-    if (inputData.empty()) {
-        MMI_LOGE("manage finger array faild, inputData is empty.");
-        return RET_ERR;
-    }
+    cJSON* inputData = cJSON_GetObjectItemCaseSensitive(fingerEventArrays, "events");
+    CHKPR(inputData, RET_ERR);
     std::vector<PadEvent> padEventArray;
     if (AnalysisPadEvent(inputData, padEventArray) == RET_ERR) {
         return RET_ERR;
@@ -59,16 +53,24 @@ void ProcessingPadDevice::TransformPadEventToInputEvent(const std::vector<PadEve
     }
 }
 
-int32_t ProcessingPadDevice::AnalysisPadEvent(const Json& inputData, std::vector<PadEvent>& padEventArray)
+int32_t ProcessingPadDevice::AnalysisPadEvent(const cJSON* inputData, std::vector<PadEvent>& padEventArray)
 {
     PadEvent padEvent = {};
-    for (const auto &item : inputData) {
-        padEvent.eventType = item.at("eventType").get<std::string>();
-        if ((item.find("keyValue")) != item.end()) {
-            padEvent.keyValue = item.at("keyValue").get<int32_t>();
+    for (int32_t i = 0; i < cJSON_GetArraySize(inputData); i++) {
+        cJSON* event = cJSON_GetArrayItem(inputData, i);
+        CHKPB(event);
+        cJSON* eventType = cJSON_GetObjectItemCaseSensitive(event, "eventType");
+        if (eventType) {
+            padEvent.eventType = eventType->valuestring;
         }
-        if ((item.find("ringEvents")) != item.end()) {
-            padEvent.ringEvents = item.at("ringEvents").get<std::vector<int32_t>>();
+        cJSON* keyValue = cJSON_GetObjectItemCaseSensitive(event, "keyValue");
+        if (keyValue) {
+            padEvent.keyValue = keyValue->valueint;
+        }
+        cJSON* ringEvents = cJSON_GetObjectItemCaseSensitive(event, "ringEvents");
+        CHKPB(ringEvents);
+        for (int32_t j = 0; j < cJSON_GetArraySize(ringEvents); j++) {
+            padEvent.ringEvents.push_back(cJSON_GetArrayItem(ringEvents, j)->valueint);
         }
         padEventArray.push_back(padEvent);
     }

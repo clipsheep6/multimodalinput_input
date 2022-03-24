@@ -21,16 +21,13 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingKeyboardDevice" };
 } // namespace
 
-int32_t ProcessingKeyboardDevice::TransformJsonDataToInputData(const Json& fingerEventArrays,
+int32_t ProcessingKeyboardDevice::TransformJsonDataToInputData(const cJSON* fingerEventArrays,
     InputEventArray& inputEventArray)
 {
     CALL_LOG_ENTER;
-    if (fingerEventArrays.empty()) {
-        return RET_ERR;
-    }
-    Json inputData = fingerEventArrays.at("events");
-    if (inputData.empty()) {
-        MMI_LOGE("manage KeyBoard array faild, inputData is empty.");
+    cJSON* inputData = cJSON_GetObjectItemCaseSensitive(fingerEventArrays, "events");
+    if (inputData == nullptr) {
+        MMI_LOGE("manage finger array faild, inputData is empty.");
         return RET_ERR;
     }
     std::vector<KeyBoardEvent> keyBoardEventArray;
@@ -59,22 +56,29 @@ void ProcessingKeyboardDevice::TransformKeyBoardEventToInputEvent(const std::vec
     }
 }
 
-int32_t ProcessingKeyboardDevice::AnalysisKeyBoardEvent(const Json& inputData,
+int32_t ProcessingKeyboardDevice::AnalysisKeyBoardEvent(const cJSON* inputData,
                                                         std::vector<KeyBoardEvent>& keyBoardEventArray)
 {
     KeyBoardEvent keyBoardEvent = {};
-    for (const auto &item : inputData) {
+    for (int32_t i = 0; i < cJSON_GetArraySize(inputData); i++) {
         keyBoardEvent = {};
-        keyBoardEvent.eventType = item.at("eventType").get<std::string>();
-        if ((item.find("keyValue")) != item.end()) {
-            keyBoardEvent.keyValue = item.at("keyValue").get<int32_t>();
-        }
-        if ((item.find("blockTime")) != item.end()) {
-            keyBoardEvent.blockTime = item.at("blockTime").get<int64_t>();
+        cJSON* event = cJSON_GetArrayItem(inputData, i);
+        if (event) {
+            cJSON* eventType = cJSON_GetObjectItemCaseSensitive(event, "eventType");
+            if (eventType) {
+                keyBoardEvent.eventType = eventType->valuestring;
+            }
+            cJSON* keyValue = cJSON_GetObjectItemCaseSensitive(event, "keyValue");
+            if (keyValue) {
+                keyBoardEvent.keyValue = keyValue->valueint;
+            }
+            cJSON* blockTime = cJSON_GetObjectItemCaseSensitive(event, "blockTime");
+            if (blockTime) {
+                keyBoardEvent.blockTime = blockTime->valueint;
+            }
         }
         keyBoardEventArray.push_back(keyBoardEvent);
     }
-
     return RET_OK;
 }
 

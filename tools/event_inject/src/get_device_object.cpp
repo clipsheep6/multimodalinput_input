@@ -72,6 +72,5 @@ DeviceBase* GetDeviceObject::CreateDeviceObject(const std::string deviceName)
     } else {
         MMI_LOGI("Not supported device :%s", deviceName.c_str());
     }
-
     return deviceBasePtr;
 }
