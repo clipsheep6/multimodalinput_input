@@ -14,6 +14,7 @@
  */
 
 #include "input_device_manager.h"
+#include "softbus_bus_center.h"
 
 namespace OHOS {
 namespace MMI {
@@ -137,5 +138,107 @@ int32_t InputDeviceManager::FindInputDeviceId(struct libinput_device* inputDevic
     MMI_LOGE("find input device id failed");
     return INVALID_DEVICE_ID;
 }
+
+std::shared_ptr<InputDevice> InputDeviceManager::GetVirtualDevice(int32_t id)
+{
+    MMI_LOGI("GetVirtualDevice enter");
+    auto item = virtualDeviceMap_.find(id);
+    if (item == virtualDeviceMap_.end()) {
+        MMI_LOGE("GetVirtualDevice failed");
+        return nullptr;
+    }
+    
+    std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
+    if (inputDevice == nullptr) {
+        MMI_LOGE("create InputDevice ptr failed");
+        return nullptr;
+    }
+
+    inputDevice->SetId(item->first);
+    int32_t deviceType = static_cast<int32_t>(libinput_device_get_tags(
+        static_cast<struct libinput_device *>(item->second)));
+    inputDevice->SetType(deviceType);
+    auto libinputDevice = static_cast<struct libinput_device *>(item->second);
+    std::string name = libinput_device_get_name(libinputDevice);
+    inputDevice->SetName(name);
+    MMI_LOGD("Distribute Virtual Device: id:%{public}d,type:%{public}d,name:%{public}s", item->first,deviceType,name.c_str());
+
+    return inputDevice;
+}
+
+std::vector<int32_t> InputDeviceManager::GetVirtualDeviceIds()
+{
+    MMI_LOGI("GetVirtualDeviceIdList enter");
+
+    std::vector<int32_t> ids;
+    for (const auto &it : virtualDeviceMap_) {
+        ids.push_back(it.first);
+    }
+
+    MMI_LOGD("Distribute Virtual Device Num: id size:%{public}d", ids.size());
+    return ids;
+}
+
+void InputDeviceManager::OnVirtualDeviceAdded(libinput_device* inputDevice)
+{
+    MMI_LOGI("OnVirtualDeviceAdded enter");
+    for (const auto& it : virtualDeviceMap_) {
+        if (static_cast<struct libinput_device *>(it.second) == inputDevice) {
+            return;
+        }
+    }
+    virtualDeviceMap_.insert(std::pair<int32_t, libinput_device*>(nextVirtualId_,
+        static_cast<struct libinput_device *>(inputDevice)));
+    nextVirtualId_++;
+}
+
+void InputDeviceManager::OnVirtualDeviceRemoved(libinput_device* inputDevice)
+{
+    MMI_LOGI("OnVirtualDeviceRemoved enter");
+    for (auto it = virtualDeviceMap_.begin(); it != virtualDeviceMap_.end(); it++) {
+        if (it->second == inputDevice) {
+            virtualDeviceMap_.erase(it);
+            break;
+        }
+    }
+}
+
+int32_t InputDeviceManager::FindVirtualDeviceId(libinput_device* inputDevice)
+{
+    MMI_LOGD("begin");
+    CHKPR(inputDevice, INVALID_DEVICE_ID);
+    for (const auto& item : virtualDeviceMap_) {
+        if (item.second == inputDevice) {
+            MMI_LOGI("find virtual device id success");
+            return item.first;
+        }
+    }
+    MMI_LOGE("find virtual device id failed");
+    return INVALID_DEVICE_ID;
+}
+
+std::vector<std::string> InputDeviceManager::GetAllNodeDeviceInfoFromDM()
+{
+    MMI_LOGI("enter");
+    std::vector<std::string> ids;
+    NodeBasicInfo *info = NULL;
+    int32_t infoNum = 0;
+    GetAllNodeDeviceInfo("ohos.distributedhardware.devicemanager", &info, &infoNum);
+    MMI_LOGD("GetAllNodeDeviceInfo:DeviceInfoNum:%{public}d",infoNum);
+    if (info == NULL)
+    {
+        MMI_LOGD("GetAllNodeDeviceInfo:AllNodeDeviceInfo is null");
+        return ids;
+    }   
+    std::string strId;
+    for (int32_t i = 0; i < infoNum; i++) {
+        strId = info->networkId;
+        ids.push_back(strId);
+        MMI_LOGD("DeviceInfo:%{public}d, %{public}s",i,strId.c_str());
+        info++;
+    }
+    return ids;
+}
+
 } // namespace MMI
 } // namespace OHOS

@@ -63,6 +63,17 @@ bool ClientMsgHandler::Init()
         {MmiMessageId::REPORT_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportPointerEvent, this)},
         {MmiMessageId::TOUCHPAD_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::TouchpadEventInterceptor, this)},
         {MmiMessageId::KEYBOARD_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::KeyEventInterceptor, this)},
+        {MmiMessageId::INPUT_VIRTUAL_DEVICE_IDS, MsgCallbackBind2(&ClientMsgHandler::OnInputVirtualDeviceIds, this)},
+        {MmiMessageId::INPUT_VIRTUAL_DEVICE, MsgCallbackBind2(&ClientMsgHandler::OnInputVirtualDevice, this)},        
+        {MmiMessageId::GET_ALL_NODE_DEVICE_INFO, MsgCallbackBind2(&ClientMsgHandler::OnGetAllNodeDeviceInfo, this)},        
+        {MmiMessageId::SHOW_MOUSE, MsgCallbackBind2(&ClientMsgHandler::OnShowMouse, this)},
+        {MmiMessageId::HIDE_MOUSE, MsgCallbackBind2(&ClientMsgHandler::OnHideMouse, this)},
+        {MmiMessageId::INPUT_MOUSE_LOCATION, MsgCallbackBind2(&ClientMsgHandler::OnMouseLocation, this)},
+        {MmiMessageId::INPUT_PREPARE_REMOTE, MsgCallbackBind2(&ClientMsgHandler::OnPrepareRemoteInput, this)},
+        {MmiMessageId::INPUT_UNPREPARE_REMOTE, MsgCallbackBind2(&ClientMsgHandler::OnUnprepareRemoteInput, this)},
+        {MmiMessageId::INPUT_START_REMOTE, MsgCallbackBind2(&ClientMsgHandler::OnStartRemoteInput, this)},
+        {MmiMessageId::INPUT_STOP_REMOTE, MsgCallbackBind2(&ClientMsgHandler::OnStopRemoteInput, this)},
+        {MmiMessageId::SIMULATE_CROSS_LOCATION, MsgCallbackBind2(&ClientMsgHandler::OnCrossLocation, this)},       
     };
     // LCOV_EXCL_STOP
     for (auto& it : funs) {
@@ -360,5 +371,266 @@ void ClientMsgHandler::OnEventProcessed(int32_t eventId)
     pkt << eventId;
     CHK(client->SendMessage(pkt), MSG_SEND_FAIL);
 }
+
+int32_t OHOS::MMI::ClientMsgHandler::OnInputVirtualDeviceIds(const UDSClient& client, NetPacket& pkt)
+{
+    MMI_LOGT("ClientMsgHandler::OnInputVirtualDeviceIds enter");
+    int32_t taskId;
+    int32_t size = 0;
+    std::vector<int32_t> virtualDeviceIds;
+    if (!pkt.Read(taskId)) {
+        MMI_LOGE("Packet read taskId failed");
+        return RET_ERR;
+    }
+    if (!pkt.Read(size)) {
+        MMI_LOGE("Packet read size failed");
+        return RET_ERR;
+    }
+    for (int32_t i = 0; i < size; i++) {
+        int32_t deviceId = 0;
+        if (!pkt.Read(deviceId)) {
+            MMI_LOGE("Packet read deviceId failed");
+            return RET_ERR;
+        }    
+        virtualDeviceIds.push_back(deviceId);
+    }
+    InputManagerImpl::GetInstance()->OnVirtualDeviceIds(taskId, virtualDeviceIds);
+    return RET_OK;
+}
+
+int32_t OHOS::MMI::ClientMsgHandler::OnInputVirtualDevice(const UDSClient& client, NetPacket& pkt)
+{
+    MMI_LOGT("ClientMsgHandler::OnInputVirtualDevice enter");
+    int32_t taskId;
+    int32_t id;
+    std::string name;
+    int32_t deviceType;
+    if (!pkt.Read(taskId)) {
+        MMI_LOGE("Packet read taskId failed");
+        return RET_ERR;
+    }
+    if (!pkt.Read(id)) {
+        MMI_LOGE("Packet read id failed");
+        return RET_ERR;
+    }
+    if (!pkt.Read(name)) {
+        MMI_LOGE("Packet read name failed");
+        return RET_ERR;
+    }    
+    if (!pkt.Read(deviceType)) {
+        MMI_LOGE("Packet read deviceType failed");
+        return RET_ERR;
+    }    
+
+    InputManagerImpl::GetInstance()->OnVirtualDevice(taskId, id, name, deviceType);
+    return RET_OK;
+}
+
+int32_t OHOS::MMI::ClientMsgHandler::OnGetAllNodeDeviceInfo(const UDSClient& client, NetPacket& pkt)
+{
+    MMI_LOGT("ClientMsgHandler::OnGetAllNodeDeviceInfo enter");
+    int32_t taskId;
+    int32_t size = 0;
+    std::vector<std::string> deviceInfos;
+    if (!pkt.Read(size)) {
+        MMI_LOGE("Packet read size failed");
+        return RET_ERR;
+    }
+    if (!pkt.Read(taskId)) {
+        MMI_LOGE("Packet read taskId failed");
+        return RET_ERR;
+    }
+    for (int32_t i = 0; i < size; i++) {
+        std::string deviceId = "";
+        if (!pkt.Read(deviceId)) {
+            MMI_LOGE("Packet read deviceId failed");
+            return RET_ERR;
+        }
+        deviceInfos.push_back(deviceId);
+    }
+    InputManagerImpl::GetInstance()->OnGetAllNodeDeviceInfo(taskId, deviceInfos);
+    return RET_OK;
+}
+
+int32_t OHOS::MMI::ClientMsgHandler::OnShowMouse(const UDSClient& client, NetPacket& pkt)
+{
+    MMI_LOGT("ClientMsgHandler::OnShowMouse enter");
+    int32_t taskId;
+    if (!pkt.Read(taskId)) {
+        MMI_LOGE("Packet read taskId failed");
+        return RET_ERR;
+    }
+    auto& instance = InputDeviceImpl::GetInstance();
+    instance.OnShowMouse(taskId);
+    return RET_OK;
+}
+
+int32_t OHOS::MMI::ClientMsgHandler::OnHideMouse(const UDSClient& client, NetPacket& pkt)
+{
+    MMI_LOGT("ClientMsgHandler::OnHideMouse enter");
+    int32_t taskId;
+    if (!pkt.Read(taskId)) {
+        MMI_LOGE("Packet read taskId failed");
+        return RET_ERR;
+    }
+    auto& instance = InputDeviceImpl::GetInstance();
+    instance.OnHideMouse(taskId);
+    return RET_OK;
+}
+
+int32_t OHOS::MMI::ClientMsgHandler::OnMouseLocation(const UDSClient& client, NetPacket& pkt)
+{
+    MMI_LOGT("ClientMsgHandler::OnMouseLocation enter");
+    int32_t taskId;
+    int32_t globalX;
+    int32_t globalY;
+    int32_t displayId;
+    int32_t dx;
+    int32_t dy;
+
+    int32_t logicalDisplayWidth;
+    int32_t logicalDisplayHeight;
+    int32_t logicalDisplayTopLeftX;
+    int32_t logicalDisplayTopLeftY;
+    if(!pkt.Read(taskId)){
+        MMI_LOGE("Packet Read taskId failed");
+        return RET_ERR;
+    }
+    if(!pkt.Read(globalX)){
+        MMI_LOGE("Packet Read globalX failed");
+        return RET_ERR;
+    }
+    if(!pkt.Read(globalY)){
+        MMI_LOGE("Packet Read globalY failed");
+        return RET_ERR;
+    }
+    if(!pkt.Read(displayId)){
+        MMI_LOGE("Packet Read displayId failed");
+        return RET_ERR;
+    }
+    if(!pkt.Read(dx)){
+        MMI_LOGE("Packet Read dx failed");
+        return RET_ERR;
+    }    
+    if(!pkt.Read(dy)){
+        MMI_LOGE("Packet Read dy failed");
+        return RET_ERR;
+    }        
+    if(!pkt.Read(logicalDisplayWidth)){
+        MMI_LOGE("Packet Read logicalDisplayWidth failed");
+        return RET_ERR;
+    }        
+    if(!pkt.Read(logicalDisplayHeight)){
+        MMI_LOGE("Packet Read logicalDisplayHeight failed");
+        return RET_ERR;
+    }     
+    if(!pkt.Read(logicalDisplayTopLeftX)){
+        MMI_LOGE("Packet Read logicalDisplayTopLeftX failed");
+        return RET_ERR;
+    }        
+    if(!pkt.Read(logicalDisplayTopLeftY)){
+        MMI_LOGE("Packet Read logicalDisplayTopLeftY failed");
+        return RET_ERR;
+    }
+
+    auto mouseLocation = std::make_shared<DMouseLocation>();
+    mouseLocation->globalX = globalX;
+    mouseLocation->globalY = globalY;
+    mouseLocation->displayId = displayId;
+    mouseLocation->dx = dx;
+    mouseLocation->dy = dy;
+    mouseLocation->logicalDisplayWidth = logicalDisplayWidth;
+    mouseLocation->logicalDisplayHeight = logicalDisplayHeight;
+    mouseLocation->logicalDisplayTopLeftX = logicalDisplayTopLeftX;
+    mouseLocation->logicalDisplayTopLeftY = logicalDisplayTopLeftY;
+    InputManagerImpl::GetInstance()->OnMouseLocation(taskId, mouseLocation);
+    return RET_OK;
+}
+
+int32_t OHOS::MMI::ClientMsgHandler::OnPrepareRemoteInput(const UDSClient& client, NetPacket& pkt)
+{
+    MMI_LOGT("ClientMsgHandler::OnPrepareRemoteInput enter");
+    int32_t taskId;
+    int32_t dinputState;
+    if(!pkt.Read(taskId)){
+        MMI_LOGE("Packet Read taskId failed");
+        return RET_ERR;
+    }
+    if(!pkt.Read(dinputState)){
+        MMI_LOGE("Packet Read dinputState failed");
+        return RET_ERR;
+    }
+    InputManagerImpl::GetInstance()->OnPrepareRemoteInput(taskId, dinputState);
+    return RET_OK;
+}
+
+int32_t OHOS::MMI::ClientMsgHandler::OnUnprepareRemoteInput(const UDSClient& client, NetPacket& pkt)
+{
+    MMI_LOGT("ClientMsgHandler::OnUnprepareRemoteInput enter");
+    int32_t taskId;
+    int32_t dinputState;
+    if(!pkt.Read(taskId)){
+        MMI_LOGE("Packet Read taskId failed");
+        return RET_ERR;
+    }
+    if(!pkt.Read(dinputState)){
+        MMI_LOGE("Packet Read dinputState failed");
+        return RET_ERR;
+    }
+    InputManagerImpl::GetInstance()->OnUnprepareRemoteInput(taskId, dinputState);
+    return RET_OK;
+}
+
+int32_t OHOS::MMI::ClientMsgHandler::OnStartRemoteInput(const UDSClient& client, NetPacket& pkt)
+{
+    MMI_LOGT("ClientMsgHandler::OnStartRemoteInput enter");
+    int32_t taskId;
+    int32_t dinputState;
+    if(!pkt.Read(taskId)){
+        MMI_LOGE("Packet Read taskId failed");
+        return RET_ERR;
+    }
+    if(!pkt.Read(dinputState)){
+        MMI_LOGE("Packet Read dinputState failed");
+        return RET_ERR;
+    }
+    InputManagerImpl::GetInstance()->OnStartRemoteInput(taskId, dinputState);
+    return RET_OK;
+}
+
+int32_t OHOS::MMI::ClientMsgHandler::OnStopRemoteInput(const UDSClient& client, NetPacket& pkt)
+{
+    MMI_LOGT("ClientMsgHandler::OnStopRemoteInput enter");
+    int32_t taskId;
+    int32_t dinputState;
+    if(!pkt.Read(taskId)){
+        MMI_LOGE("Packet Read taskId failed");
+        return RET_ERR;
+    }
+    if(!pkt.Read(dinputState)){
+        MMI_LOGE("Packet Read dinputState failed");
+        return RET_ERR;
+    }
+    InputManagerImpl::GetInstance()->OnStopRemoteInput(taskId, dinputState);
+    return RET_OK;
+}
+
+int32_t OHOS::MMI::ClientMsgHandler::OnCrossLocation(const UDSClient& client, NetPacket& pkt)
+{
+    MMI_LOGT("ClientMsgHandler::OnCrossLocation enter");
+    int32_t taskId = 0;
+    int32_t status = 0;
+    if(!pkt.Read(taskId)){
+        MMI_LOGE("Packet Read taskId failed");
+        return RET_ERR;
+    }
+    if(!pkt.Read(status)){
+        MMI_LOGE("Packet Read status failed");
+        return RET_ERR;
+    }
+    InputManagerImpl::GetInstance()->OnCrossLocation(taskId, status);
+    return RET_OK;
+}
+
 } // namespace MMI
 } // namespace OHOS

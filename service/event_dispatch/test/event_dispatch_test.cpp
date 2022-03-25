@@ -25,5 +25,36 @@ class EventDispatchTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
+    void SetUp(){
+        key = KeyEvent::Create();  
+        // std::shared_ptr<MockInputWindowsManager> temp(&mockInputWindowsManager_);
+        // InputWindowsManager::instance_ = temp;
+        // MMI_LOGD("mockInputWindowsManager_::ptr = %{public}p", (void*)&mockInputWindowsManager_);
+        // MMI_LOGD("InputWindowsManager::instance_ = %{public}p", (void*)InputWindowsManager::instance_ .get());
+        // MMI_LOGD("WinMgr.get() = %{public}p", (void*)(WinMgr.get()));
+    }
+
+    // class MockInputWindowsManager : public InputWindowsManager{
+    // public:
+    //     MOCK_METHOD1(UpdateTarget, int32_t(std::shared_ptr<InputEvent>));
+    // }mockInputWindowsManager_;
+
+    class MockEventDispatch : public EventDispatch{
+    protected:
+        bool IsNeedFilterOut(const std::string& deviceId, const OHOS::DistributedHardware::DistributedInput::BusinessEvent& businessEvent) override{
+            return isNeedFilterOut_;
+        }
+        OHOS::DistributedHardware::DistributedInput::DInputServerType IsStartDistributedInput() override{
+            return type_;
+        }
+       
+    public:
+        bool isNeedFilterOut_;
+        OHOS::DistributedHardware::DistributedInput::DInputServerType type_;
+    }eventDispatch_;
+
+public:
+    UDSServer udsServer_;
+    std::shared_ptr<KeyEvent> key;
 };
 } // namespace

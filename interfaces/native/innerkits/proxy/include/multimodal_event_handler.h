@@ -44,8 +44,18 @@ public:
     void RemoveInputEventTouchpadMontior(int32_t pointerEventType);
     int32_t AddInterceptor(int32_t sourceType, int32_t id);
     int32_t RemoveInterceptor(int32_t id);
-
-/**
+    int32_t GetVirtualDeviceIds(int32_t taskId);
+    int32_t GetVirtualDevice(int32_t taskId, int32_t deviceId);
+    int32_t GetAllNodeDeviceInfo(int32_t taskId);
+    int32_t ShowMouse(int32_t taskId);
+    int32_t HideMouse(int32_t taskId);
+    int32_t GetMouseLocation(int32_t taskId);
+    int32_t PrepareRemoteInput(int32_t taskId ,const std::string& deviceId);
+    int32_t UnprepareRemoteInput(int32_t taskId ,const std::string& deviceId);
+    int32_t StartRemoteInput(int32_t taskId ,const std::string& deviceId);
+    int32_t StopRemoteInput(int32_t taskId ,const std::string& deviceId);
+    int32_t SimulateCrossLocation(int32_t taskId, int32_t x , int32_t y);
+/*
 * Default constructor used to create a {@code MultimodalEventHandler} instance.
 */
 private:

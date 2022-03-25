@@ -39,12 +39,20 @@ public:
     void Attach(std::shared_ptr<DeviceObserver> observer);
     void Detach(std::shared_ptr<DeviceObserver> observer);
     void NotifyPointerDevice(bool hasPointerDevice);
+    int32_t FindVirtualDeviceId(libinput_device* inputDevice);
+    void OnVirtualDeviceAdded(libinput_device* inputDevice);
+    void OnVirtualDeviceRemoved(libinput_device* inputDevice);
+    std::vector<int32_t> GetVirtualDeviceIds();
+    std::shared_ptr<InputDevice> GetVirtualDevice(int32_t id);
+    std::vector<std::string> GetAllNodeDeviceInfoFromDM();
 
 private:
     bool IsPointerDevice(libinput_device* device);
     std::map<int32_t, struct libinput_device*> inputDevice_;
+    std::map<int32_t, libinput_device*> virtualDeviceMap_;
     bool initFlag_ {false};
     int32_t nextId_ {0};
+    int32_t nextVirtualId_ {1000};
     std::list<std::shared_ptr<DeviceObserver>> observers_;
 };
 } // namespace MMI

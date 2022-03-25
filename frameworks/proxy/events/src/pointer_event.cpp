@@ -141,6 +141,15 @@ void PointerEvent::PointerItem::SetDeviceId(int32_t deviceId)
     deviceId_ = deviceId;
 }
 
+RawData PointerEvent::PointerItem::GetRawData() const
+{
+    return rawData_;
+}
+
+void PointerEvent::PointerItem::SetRawData(const RawData& rawData){
+    rawData_ = rawData;
+}
+
 bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
 {
     if (!out.WriteInt32(pointerId_)) {
@@ -187,6 +196,10 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         return false;
     }
 
+    if (!rawData_.WriteToParcel(out)) {
+        return false;
+    }
+    
     return true;
 }
 
@@ -233,6 +246,10 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
     }
 
     if (!in.ReadInt32(deviceId_)) {
+        return false;
+    }
+
+    if (!rawData_.ReadFromParcel(in)) {
         return false;
     }
 
