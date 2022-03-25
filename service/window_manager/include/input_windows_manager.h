@@ -75,6 +75,7 @@ struct multimodal_libinput_event {
 struct MouseLocation {
     int32_t globalX;
     int32_t globalY;
+    int32_t displayId;
 };
 
 class InputWindowsManager : public DelayedSingleton<InputWindowsManager> {
@@ -117,6 +118,11 @@ public:
         int32_t& logicalX, int32_t& logicalY);
     void AdjustCoordinate(double &coordinateX, double &coordinateY);
 
+    //分布式输入添加
+    void ShowMouse();
+    void HideMouse();
+    int32_t GetDisplayIdBySeatId(std::string seatId);
+    void UpdateDmouseLocation();
 private:
     void SetFocusId(int32_t id);
     void PrintDebugInfo();

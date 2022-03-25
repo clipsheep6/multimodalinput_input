@@ -35,7 +35,9 @@ public:
     void TellDisplayInfo(int32_t displayId, int32_t width, int32_t height);
     void UpdatePointerDevice(bool hasPointerDevice);
     bool Init();
-
+    //分布式输入添加
+    void ShowMouse();
+    void HideMouse();
 public:
     static const int32_t IMAGE_WIDTH = 64;
     static const int32_t IMAGE_HEIGHT = 64;
@@ -59,6 +61,8 @@ private:
     bool hasPointerDevice_ = false;
     int32_t lastGlobalX_ = -1;
     int32_t lastGlobalY_ = -1;
+    //分布式输入添加
+    bool showMousePointer_ { true };
 };
 } // namespace MMI
 } // namespace OHOS

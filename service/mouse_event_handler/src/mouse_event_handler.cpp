@@ -15,6 +15,7 @@
 
 #include "mouse_event_handler.h"
 #include <cinttypes>
+#include "dinput_manager.h"
 #include "libmmi_util.h"
 #include "input-event-codes.h"
 #include "util.h"
@@ -23,6 +24,7 @@
 #include "timer_manager.h"
 #include "mouse_device_state.h"
 #include "input_device_manager.h"
+#include "pointer_drawing_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -145,7 +147,9 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
     pointerItem.SetHeight(0);
     pointerItem.SetPressure(0);
     pointerItem.SetDeviceId(deviceId);
-
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    SetDxDyForDInput(pointerItem, data);
+#endif
     pointerEvent_->UpdateId();
     pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
@@ -153,11 +157,38 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
     pointerEvent_->SetActionStartTime(time);
     pointerEvent_->SetDeviceId(deviceId);
     pointerEvent_->SetPointerId(0);
-    pointerEvent_->SetTargetDisplayId(-1);
+    pointerEvent_->SetTargetDisplayId(mouseInfo.displayId);
     pointerEvent_->SetTargetWindowId(-1);
     pointerEvent_->SetAgentWindowId(-1);
 
     MMI_LOGD("leave");
+}
+
+void MouseEventHandler::SetDxDyForDInput(PointerEvent::PointerItem& pointerItem, libinput_event_pointer* data){
+    double dx = libinput_event_pointer_get_dx(data);
+    double dy = libinput_event_pointer_get_dy(data);
+    int32_t rawDataDx = static_cast<int32_t>(dx);
+    int32_t rawDataDy = static_cast<int32_t>(dy);
+    pointerItem.SetRawData(RawData(rawDataDx, rawDataDy));
+    DInputMgr->GetMouseLocation().dx = rawDataDx;
+    DInputMgr->GetMouseLocation().dy = rawDataDy;
+    MMI_LOGD("MouseEventHandler SetDxDyForDInput : dx:%{public}d, dy:%{public}d", rawDataDx, rawDataDy);       
+}
+
+void MouseEventHandler::SetAbsolutionLocation(double absX,double absY)
+{
+    MMI_LOGD("MouseEventHandler cross screen location : x:%{public}lf, y:%{public}lf", absX, absY);        
+    absolutionX_ = absX;
+    absolutionY_ = absY;
+
+    WinMgr->UpdateAndAdjustMouseLoction(absolutionX_, absolutionY_);
+
+    int32_t displayId = WinMgr->GetMouseInfo().displayId;
+    int32_t globalX = WinMgr->GetMouseInfo().globalX;
+    int32_t globalY = WinMgr->GetMouseInfo().globalY;
+
+    PointerDrawMgr->DrawPointer(displayId,globalX,globalY);
+    WinMgr->ShowMouse();
 }
 
 void MouseEventHandler::Normalize(struct libinput_event *event)
@@ -189,6 +220,14 @@ void MouseEventHandler::Normalize(struct libinput_event *event)
         }
     }
     int32_t deviceId = InputDevMgr->FindInputDeviceId(libinput_event_get_device(event));
+
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    if ( deviceId < 0 )
+    {
+        deviceId = InputDevMgr->FindVirtualDeviceId(libinput_event_get_device(event));
+    }
+#endif
+
     HandlePostInner(data, deviceId, pointerItem);
     DumpInner();
     MMI_LOGD("Leave");

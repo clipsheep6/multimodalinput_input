@@ -46,6 +46,18 @@ protected:
     virtual int32_t OnInputDeviceIds(const UDSClient& client, NetPacket& pkt);
     virtual int32_t TouchpadEventInterceptor(const UDSClient& client, NetPacket& pkt);
     virtual int32_t KeyEventInterceptor(const UDSClient& client, NetPacket& pkt);
+    virtual int32_t OnInputVirtualDeviceIds(const UDSClient& client, NetPacket& pkt);
+    virtual int32_t OnGetAllNodeDeviceInfo(const UDSClient& client, NetPacket& pkt);
+    virtual int32_t OnInputVirtualDevice(const UDSClient& client, NetPacket& pkt);
+    virtual int32_t OnShowMouse(const UDSClient& client, NetPacket& pkt);
+    virtual int32_t OnHideMouse(const UDSClient& client, NetPacket& pkt);
+
+    virtual int32_t OnMouseLocation(const UDSClient& client, NetPacket& pkt);
+    virtual int32_t OnPrepareRemoteInput(const UDSClient& client, NetPacket& pkt); 
+    virtual int32_t OnUnprepareRemoteInput(const UDSClient& client, NetPacket& pkt); 
+    virtual int32_t OnStartRemoteInput(const UDSClient& client, NetPacket& pkt); 
+    virtual int32_t OnStopRemoteInput(const UDSClient& client, NetPacket& pkt); 
+    virtual int32_t OnCrossLocation(const UDSClient& client, NetPacket& pkt);
 
 private:
     static void OnEventProcessed(int32_t eventId);
