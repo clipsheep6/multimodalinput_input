@@ -161,7 +161,8 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetVirtualDevice(int32_t id)
     auto libinputDevice = static_cast<struct libinput_device *>(item->second);
     std::string name = libinput_device_get_name(libinputDevice);
     inputDevice->SetName(name);
-    MMI_LOGD("Distribute Virtual Device: id:%{public}d,type:%{public}d,name:%{public}s", item->first,deviceType,name.c_str());
+    MMI_LOGD("Distribute Virtual Device: id:%{public}d, type:%{public}d, name:%{public}s", 
+        item->first, deviceType, name.c_str());
 
     return inputDevice;
 }
@@ -225,8 +226,7 @@ std::vector<std::string> InputDeviceManager::GetAllNodeDeviceInfoFromDM()
     int32_t infoNum = 0;
     GetAllNodeDeviceInfo("ohos.distributedhardware.devicemanager", &info, &infoNum);
     MMI_LOGD("GetAllNodeDeviceInfo:DeviceInfoNum:%{public}d",infoNum);
-    if (info == NULL)
-    {
+    if (info == NULL) {
         MMI_LOGD("GetAllNodeDeviceInfo:AllNodeDeviceInfo is null");
         return ids;
     }   

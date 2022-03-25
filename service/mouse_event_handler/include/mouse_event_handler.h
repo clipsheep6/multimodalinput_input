@@ -31,7 +31,7 @@ public:
 
     std::shared_ptr<PointerEvent> GetPointerEvent();
     void Normalize(struct libinput_event *event);
-    void SetAbsolutionLocation(double absX,double absY);
+    void SetAbsolutionLocation(double absX, double absY);
     void SetDxDyForDInput(PointerEvent::PointerItem& pointerItem, libinput_event_pointer* data);
 private:
     void HandleMotionInner(libinput_event_pointer* data);

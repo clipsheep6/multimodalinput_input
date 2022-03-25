@@ -21,40 +21,67 @@ namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
 
+class MockEventDispatch : public EventDispatch
+{
+public:
+    bool IsNeedFilterOut(const std::string& deviceId, 
+                            const OHOS::DistributedHardware::DistributedInput::BusinessEvent& businessEvent) override
+    {
+        return isNeedFilterOut_;
+    }
+    OHOS::DistributedHardware::DistributedInput::DInputServerType IsStartDistributedInput() override
+    {
+        return type_;
+    }
+    
+public:
+    bool isNeedFilterOut_;
+    OHOS::DistributedHardware::DistributedInput::DInputServerType type_;
+}eventDispatch_;
+
 class EventDispatchTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
-    void SetUp(){
-        key = KeyEvent::Create();  
-        // std::shared_ptr<MockInputWindowsManager> temp(&mockInputWindowsManager_);
-        // InputWindowsManager::instance_ = temp;
-        // MMI_LOGD("mockInputWindowsManager_::ptr = %{public}p", (void*)&mockInputWindowsManager_);
-        // MMI_LOGD("InputWindowsManager::instance_ = %{public}p", (void*)InputWindowsManager::instance_ .get());
-        // MMI_LOGD("WinMgr.get() = %{public}p", (void*)(WinMgr.get()));
+    void SetUp()
+    {
+        key = KeyEvent::Create();
     }
-
-    // class MockInputWindowsManager : public InputWindowsManager{
-    // public:
-    //     MOCK_METHOD1(UpdateTarget, int32_t(std::shared_ptr<InputEvent>));
-    // }mockInputWindowsManager_;
-
-    class MockEventDispatch : public EventDispatch{
-    protected:
-        bool IsNeedFilterOut(const std::string& deviceId, const OHOS::DistributedHardware::DistributedInput::BusinessEvent& businessEvent) override{
-            return isNeedFilterOut_;
-        }
-        OHOS::DistributedHardware::DistributedInput::DInputServerType IsStartDistributedInput() override{
-            return type_;
-        }
-       
-    public:
-        bool isNeedFilterOut_;
-        OHOS::DistributedHardware::DistributedInput::DInputServerType type_;
-    }eventDispatch_;
-
 public:
     UDSServer udsServer_;
     std::shared_ptr<KeyEvent> key;
 };
+HWTEST_F(EventDispatchTest, Test_DispatchKeyEventPid_1, TestSize.Level1)
+{
+
+    eventDispatch_.type_ = OHOS::DistributedHardware::DistributedInput::DInputServerType::NULL_SERVER_TYPE;
+    int32_t actual = eventDispatch_.DispatchKeyEventPid(udsServer_, key, 0);
+    ASSERT_EQ(RET_ERR, actual);
+
+}
+
+HWTEST_F(EventDispatchTest, Test_DispatchKeyEventPid_2, TestSize.Level1)
+{
+    eventDispatch_.type_ = OHOS::DistributedHardware::DistributedInput::DInputServerType::SOURCE_SERVER_TYPE;
+    int32_t actual = eventDispatch_.DispatchKeyEventPid(udsServer_, key, 0);
+    ASSERT_EQ(RET_ERR, actual);
+}
+
+HWTEST_F(EventDispatchTest, Test_DispatchKeyEventPid_3, TestSize.Level1)
+{
+    eventDispatch_.type_ = OHOS::DistributedHardware::DistributedInput::DInputServerType::SINK_SERVER_TYPE;
+    eventDispatch_.isNeedFilterOut_ = false;
+
+    int32_t actual = eventDispatch_.DispatchKeyEventPid(udsServer_, key, 0);
+    ASSERT_EQ(RET_OK, actual);
+}
+
+HWTEST_F(EventDispatchTest, Test_DispatchKeyEventPid_4, TestSize.Level1)
+{
+    eventDispatch_.type_ = OHOS::DistributedHardware::DistributedInput::DInputServerType::SINK_SERVER_TYPE;
+    eventDispatch_.isNeedFilterOut_ = true;
+
+    int32_t actual = eventDispatch_.DispatchKeyEventPid(udsServer_, key, 0);
+    ASSERT_EQ(RET_ERR, actual);
+}
 } // namespace

@@ -105,7 +105,7 @@ void InputManager::RemoveInterceptor(int32_t interceptorId)
     InputManagerImpl::GetInstance()->RemoveInterceptor(interceptorId);
 }
 
-void InputManager::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent) 
+void InputManager::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     InputManagerImpl::GetInstance()->SimulateInputEvent(keyEvent);
 }
@@ -120,9 +120,10 @@ void InputManager::GetVirtualDeviceIdListAsync(std::function<void(std::vector<in
     InputManagerImpl::GetInstance()->GetVirtualDeviceIdListAsync(callback);
 }
 
-void InputManager::GetVirtualDeviceAsync(int32_t deviceId,std::function<void(std::shared_ptr<InputDeviceImpl::InputDeviceInfo>)> callback)
+void InputManager::GetVirtualDeviceAsync(int32_t deviceId,
+    std::function<void(std::shared_ptr<InputDeviceImpl::InputDeviceInfo>)> callback)
 {
-    InputManagerImpl::GetInstance()->GetVirtualDeviceAsync(deviceId,callback);
+    InputManagerImpl::GetInstance()->GetVirtualDeviceAsync(deviceId, callback);
 }
 
 void InputManager::GetAllNodeDeviceInfo(std::function<void(std::vector<std::string>)> callback)
@@ -130,7 +131,7 @@ void InputManager::GetAllNodeDeviceInfo(std::function<void(std::vector<std::stri
     InputManagerImpl::GetInstance()->GetAllNodeDeviceInfo(callback);
 }
 
-void InputManager::GetMouseLocation(std::function<void(std::shared_ptr<DMouseLocation>)> callback )
+void InputManager::GetMouseLocation(std::function<void(std::shared_ptr<DMouseLocation>)> callback)
 {
     InputManagerImpl::GetInstance()->GetMouseLocation(callback);
 }
@@ -145,29 +146,29 @@ void InputManager::ShowMouse(std::function<void(bool)> callback)
     InputManagerImpl::GetInstance()->ShowMouse(callback);
 }
 
-void InputManager::PrepareRemoteInput(const std::string& deviceId ,std::function<void(int32_t)> callback)
+void InputManager::PrepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback)
 {
-    InputManagerImpl::GetInstance()->PrepareRemoteInput(deviceId ,callback);
+    InputManagerImpl::GetInstance()->PrepareRemoteInput(deviceId, callback);
 }
 
-void InputManager::UnprepareRemoteInput(const std::string& deviceId ,std::function<void(int32_t)> callback)
+void InputManager::UnprepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback)
 {
-    InputManagerImpl::GetInstance()->UnprepareRemoteInput(deviceId ,callback);
+    InputManagerImpl::GetInstance()->UnprepareRemoteInput(deviceId, callback);
 }
 
-void InputManager::StartRemoteInput(const std::string& deviceId ,std::function<void(int32_t)> callback)
+void InputManager::StartRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback)
 {
-    InputManagerImpl::GetInstance()->StartRemoteInput(deviceId ,callback);
+    InputManagerImpl::GetInstance()->StartRemoteInput(deviceId, callback);
 }
 
-void InputManager::StopRemoteInput(const std::string& deviceId ,std::function<void(int32_t)> callback)
+void InputManager::StopRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback)
 {
-    InputManagerImpl::GetInstance()->StopRemoteInput(deviceId ,callback);
+    InputManagerImpl::GetInstance()->StopRemoteInput(deviceId, callback);
 }
 
-void InputManager::SimulateCrossLocation(int32_t x,int32_t y,std::function<void(int32_t)> callback)
+void InputManager::SimulateCrossLocation(int32_t x, int32_t y, std::function<void(int32_t)> callback)
 {
-    InputManagerImpl::GetInstance()->SimulateCrossLocation(x,y,callback);
+    InputManagerImpl::GetInstance()->SimulateCrossLocation(x, y, callback);
 }
 
 } // namespace MMI

@@ -146,7 +146,7 @@ RawData PointerEvent::PointerItem::GetRawData() const
     return rawData_;
 }
 
-void PointerEvent::PointerItem::SetRawData(const RawData& rawData){
+void PointerEvent::PointerItem::SetRawData(const RawData& rawData) {
     rawData_ = rawData;
 }
 

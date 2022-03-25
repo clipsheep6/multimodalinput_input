@@ -192,8 +192,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer,
     CHKPR(key, PARAM_INPUT_INVALID);
     bool jumpIntercept = false;
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
-    if (CheckWhiteList(jumpIntercept, key))
-    {
+    if (CheckWhiteList(jumpIntercept, key)) {
         return RET_OK;
     }
 #endif // OHOS_DISTRIBUTED_INPUT_MODEL
@@ -262,25 +261,25 @@ bool EventDispatch::IsRemoteDevice(const int32_t deviceId)
     if (inputDevice == nullptr) {
         ret = true;
     }
-    MMI_LOGE("IsRemoteDevice:%{public}s", true == ret ? "true" :  "false");
+    MMI_LOGE("IsRemoteDevice:%{public}s", ret == true ? "true" :  "false");
 
     return ret;
 }
 
-bool EventDispatch::CheckWhiteList(bool &jumpIntercept, const std::shared_ptr<KeyEvent> key){
+bool EventDispatch::CheckWhiteList(bool &jumpIntercept, const std::shared_ptr<KeyEvent> key)
+{
     jumpIntercept = false;
     std::string deviceId = "";
     DistributedHardware::DistributedInput::DInputServerType type = GetDInputServerType();
-    if (DistributedHardware::DistributedInput::DInputServerType::SOURCE_SERVER_TYPE == type ){
-        if (IsRemoteDevice(key->GetDeviceId())){
+    if (DistributedHardware::DistributedInput::DInputServerType::SOURCE_SERVER_TYPE == type ) {
+        if (IsRemoteDevice(key->GetDeviceId())) {
             deviceId = DInputMgr->GetDeviceId();
-            if(!IsNeedFilterOut(deviceId,key)){
+            if(!IsNeedFilterOut(deviceId,key)) {
                 return true;
             }
         }
-        
     }else if (DistributedHardware::DistributedInput::DInputServerType::SINK_SERVER_TYPE == type) {
-        if (!IsNeedFilterOut(deviceId,key)){
+        if (!IsNeedFilterOut(deviceId,key)) {
             return true;
         }
         jumpIntercept = true;
@@ -303,14 +302,14 @@ OHOS::DistributedHardware::DistributedInput::DInputServerType EventDispatch::IsS
     return OHOS::DistributedHardware::DistributedInput::DistributedInputKit::IsStartDistributedInput();
 }
 
-bool EventDispatch::IsNeedFilterOut(const std::string deviceId,const std::shared_ptr<KeyEvent> key)
+bool EventDispatch::IsNeedFilterOut(const std::string deviceId, const std::shared_ptr<KeyEvent> key)
 {
     MMI_LOGD("Enter");
     // 调用分布式接口，判定是否是命中白名单
     std::vector<OHOS::MMI::KeyEvent::KeyItem> pressedKeys = key->GetKeyItems();
     std::vector<int32_t> pressedKeysForDInput;
     pressedKeysForDInput.reserve(pressedKeys.size());
-    for (int i = 0; i < pressedKeys.size(); i++){
+    for (int i = 0; i < pressedKeys.size(); i++) {
         pressedKeysForDInput.push_back(pressedKeys[i].GetKeyCode());
     }
     using namespace OHOS::DistributedHardware::DistributedInput;
@@ -318,17 +317,19 @@ bool EventDispatch::IsNeedFilterOut(const std::string deviceId,const std::shared
     businessEvent.keyCode = key->GetKeyCode();
     businessEvent.keyAction = key->GetKeyAction();
     businessEvent.pressedKeys = pressedKeysForDInput;
-    for(const auto &item : businessEvent.pressedKeys){
+    for(const auto &item : businessEvent.pressedKeys) {
         MMI_LOGD("pressedKeys :%{public}d", item);
     }
 
-    MMI_LOGD("istributedInputKit::IsNeedFilterOut deviceId:%{public}s, keyCode :%{public}d, keyAction :%{public}d", deviceId.c_str(), businessEvent.keyCode, businessEvent.keyAction);
+    MMI_LOGD("istributedInputKit::IsNeedFilterOut deviceId:%{public}s, keyCode :%{public}d, keyAction :%{public}d",
+        deviceId.c_str(), businessEvent.keyCode, businessEvent.keyAction);
     bool ret = IsNeedFilterOut(deviceId, businessEvent);
-    MMI_LOGD("istributedInputKit::IsNeedFilterOut:%{public}s", true == ret ? "true" : "false");
+    MMI_LOGD("istributedInputKit::IsNeedFilterOut:%{public}s", ret == true ? "true" : "false");
     return ret;
 }
 
-bool EventDispatch::IsNeedFilterOut(const std::string& deviceId, const OHOS::DistributedHardware::DistributedInput::BusinessEvent& businessEvent)
+bool EventDispatch::IsNeedFilterOut(const std::string& deviceId, 
+    const OHOS::DistributedHardware::DistributedInput::BusinessEvent& businessEvent)
 {
     return OHOS::DistributedHardware::DistributedInput::DistributedInputKit::IsNeedFilterOut(deviceId, businessEvent);
 }

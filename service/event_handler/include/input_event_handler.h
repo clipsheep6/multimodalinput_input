@@ -37,7 +37,7 @@ public:
     UDSServer *GetUDSServer();
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
     void AddHandleTimer(int32_t timeout = 300);
-    void SetAbsolutionLocation(double absX,double absY);
+    void SetAbsolutionLocation(double absX, double absY);
 protected:
     int32_t OnEventDeviceAdded(const multimodal_libinput_event& event);
     int32_t OnEventDeviceRemoved(const multimodal_libinput_event& event);
@@ -53,7 +53,6 @@ protected:
     int32_t OnMouseEventHandler(struct libinput_event *event);
     bool SendMsg(const int32_t fd, NetPacket& pkt) const;
     bool IsControllerSide();
-    int32_t IsHistScreenEdge(double dx,double dy);
     virtual OHOS::DistributedHardware::DistributedInput::DInputServerType IsStartDistributedInput();
 
 private:

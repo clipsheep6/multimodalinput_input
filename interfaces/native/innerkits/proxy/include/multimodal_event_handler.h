@@ -37,7 +37,7 @@ public:
     int32_t InjectEvent(const std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr);
     int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t GetDevice(int32_t taskId, int32_t deviceId);
-    int32_t GetDeviceIds(int32_t taskId);    
+    int32_t GetDeviceIds(int32_t taskId);
     int32_t AddInputEventMontior(int32_t keyEventType);
     void RemoveInputEventMontior(int32_t keyEventType);
     int32_t AddInputEventTouchpadMontior(int32_t pointerEventType);
@@ -50,11 +50,11 @@ public:
     int32_t ShowMouse(int32_t taskId);
     int32_t HideMouse(int32_t taskId);
     int32_t GetMouseLocation(int32_t taskId);
-    int32_t PrepareRemoteInput(int32_t taskId ,const std::string& deviceId);
-    int32_t UnprepareRemoteInput(int32_t taskId ,const std::string& deviceId);
-    int32_t StartRemoteInput(int32_t taskId ,const std::string& deviceId);
-    int32_t StopRemoteInput(int32_t taskId ,const std::string& deviceId);
-    int32_t SimulateCrossLocation(int32_t taskId, int32_t x , int32_t y);
+    int32_t PrepareRemoteInput(int32_t taskId, const std::string& deviceId);
+    int32_t UnprepareRemoteInput(int32_t taskId, const std::string& deviceId);
+    int32_t StartRemoteInput(int32_t taskId, const std::string& deviceId);
+    int32_t StopRemoteInput(int32_t taskId, const std::string& deviceId);
+    int32_t SimulateCrossLocation(int32_t taskId, int32_t x, int32_t y);
 /*
 * Default constructor used to create a {@code MultimodalEventHandler} instance.
 */

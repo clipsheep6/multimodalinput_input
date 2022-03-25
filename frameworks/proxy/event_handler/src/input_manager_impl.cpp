@@ -414,15 +414,15 @@ void InputManagerImpl::OnVirtualDeviceIds(int32_t taskId, std::vector<int32_t> i
     InputDeviceImpl::GetInstance().OnVirtualDeviceIds(taskId,ids);
     MMI_LOGD("taskId:%{public}d, DeviceId Num:%{public}d" ,taskId ,size);
     int32_t count = 0;
-    if ( size > 0 )
-    {
-        for(auto it : ids){
-            MMI_LOGD("DeviceId[%{public}d]: %{public}d",count++,it);
+    if ( size > 0 ) {
+        for(auto it : ids) {
+            MMI_LOGD("DeviceId[%{public}d]: %{public}d", count++, it);
         }
     }
 }
 
-void InputManagerImpl::GetVirtualDeviceAsync(int32_t deviceId,std::function<void(std::shared_ptr<InputDeviceImpl::InputDeviceInfo>)> callback)
+void InputManagerImpl::GetVirtualDeviceAsync(int32_t deviceId,
+    std::function<void(std::shared_ptr<InputDeviceImpl::InputDeviceInfo>)> callback)
 {
     if (callback == nullptr) {
         MMI_LOGE("InputManagerImpl::%{public}s param should not be null!", __func__);
@@ -432,7 +432,8 @@ void InputManagerImpl::GetVirtualDeviceAsync(int32_t deviceId,std::function<void
 
 void InputManagerImpl::OnVirtualDevice(int32_t taskId, int32_t id, std::string name, int32_t deviceType)
 {
-    MMI_LOGD("taskId:%{public}d, DeviceId:%{public}d, DeviceName:%{public}s, deviceType:%{public}d",taskId,id,name.c_str(),deviceType);
+    MMI_LOGD("taskId:%{public}d, DeviceId:%{public}d, DeviceName:%{public}s, deviceType:%{public}d",
+        taskId,id,name.c_str(),deviceType);
     InputDeviceImpl::GetInstance().OnVirtualDevice(taskId,id,name,deviceType);
 }
 
@@ -452,34 +453,28 @@ void InputManagerImpl::OnGetAllNodeDeviceInfo(int32_t taskId, std::vector<std::s
     InputDeviceImpl::GetInstance().OnGetAllNodeDeviceInfo(taskId,ids);
     MMI_LOGD("taskId:%{public}d, DeviceId Num:%{public}d" ,taskId ,size);
     int32_t count = 0;
-    if ( size > 0 )
-    {
-        for(auto it : ids){
-            MMI_LOGD("DeviceId[%{public}d]: %{public}s",count++,it.c_str());
+    if ( size > 0 ) {
+        for(auto it : ids) {
+            MMI_LOGD("DeviceId[%{public}d]: %{public}s", count++, it.c_str());
         }
     }
 }
 
 void InputManagerImpl::HideMouse(std::function<void(bool)> callback)
 {
-    if (callback == nullptr) 
-    {
+    if (callback == nullptr) {
         MMI_LOGE("InputManagerImpl::%{public}s param should not be null!", __func__);
     }
-    else
-    {
+    else {
         InputDeviceImpl::GetInstance().HideMouse(callback);
     }
 }
 
 void InputManagerImpl::ShowMouse(std::function<void(bool)> callback)
 {
-    if (callback == nullptr) 
-    {
+    if (callback == nullptr) {
         MMI_LOGE("InputManagerImpl::%{public}s param should not be null!", __func__);
-    }
-    else
-    {
+    } else {
         InputDeviceImpl::GetInstance().ShowMouse(callback);
     }
 }
@@ -489,7 +484,7 @@ void InputManagerImpl::GetMouseLocation(std::function<void(std::shared_ptr<DMous
     std::lock_guard<std::mutex> guard(lk_);
     mouseLocationRequests_.insert(std::pair<int32_t,
         std::function<void(std::shared_ptr<DMouseLocation>)>>(mouseLocationTaskId_, callback));
-    if(MMIEventHdl.GetMouseLocation(mouseLocationTaskId_) != RET_OK){
+    if(MMIEventHdl.GetMouseLocation(mouseLocationTaskId_) != RET_OK) {
         MMI_LOGE("Failed to GetMouseLocation");
     };
     mouseLocationTaskId_++;
@@ -510,8 +505,7 @@ void InputManagerImpl::OnMouseLocation(int32_t taskId, std::shared_ptr<DMouseLoc
 
 void InputManagerImpl::SimulateCrossLocation(int32_t x,int32_t y,std::function<void(int32_t)> callback)
 {
-    if (callback == nullptr) 
-    {
+    if (callback == nullptr) {
         MMI_LOGD("InputManagerImpl::%{public}s param should not be null!", __func__);
         return;
     }
@@ -519,7 +513,7 @@ void InputManagerImpl::SimulateCrossLocation(int32_t x,int32_t y,std::function<v
     std::lock_guard<std::mutex> guard(lk_);
     simulateCrossLocationRequests_.insert(std::pair<int32_t,
         std::function<void(int32_t)>>(simulateCrossLocationTaskId_, callback));
-    if(MMIEventHdl.SimulateCrossLocation(simulateCrossLocationTaskId_,x,y) != RET_OK){
+    if(MMIEventHdl.SimulateCrossLocation(simulateCrossLocationTaskId_,x,y) != RET_OK) {
         MMI_LOGE("MMIEventHdl:Failed to SimulateCrossLocation id: %{publiuc}id",simulateCrossLocationTaskId_);
     };
     simulateCrossLocationTaskId_++;
@@ -543,7 +537,7 @@ void InputManagerImpl::PrepareRemoteInput(const std::string& deviceId ,std::func
     std::lock_guard<std::mutex> guard(lk_);
     remoteInputStateRequests_.insert(std::pair<int32_t,
         std::function<void(int32_t)>>(remoteInputStateTaskId_, callback));
-    if(MMIEventHdl.PrepareRemoteInput(remoteInputStateTaskId_, deviceId) != RET_OK){
+    if(MMIEventHdl.PrepareRemoteInput(remoteInputStateTaskId_, deviceId) != RET_OK) {
         MMI_LOGE("Failed to PrepareRemoteInput");
     };
     remoteInputStateTaskId_++;
@@ -568,7 +562,7 @@ void InputManagerImpl::UnprepareRemoteInput(const std::string& deviceId ,std::fu
     std::lock_guard<std::mutex> guard(lk_);
     remoteInputStateRequests_.insert(std::pair<int32_t,
         std::function<void(int32_t)>>(remoteInputStateTaskId_, callback));
-    if(MMIEventHdl.UnprepareRemoteInput(remoteInputStateTaskId_, deviceId) != RET_OK){
+    if(MMIEventHdl.UnprepareRemoteInput(remoteInputStateTaskId_, deviceId) != RET_OK) {
         MMI_LOGE("Failed to UnprepareRemoteInput");
     };
     remoteInputStateTaskId_++;
@@ -593,7 +587,7 @@ void InputManagerImpl::StartRemoteInput(const std::string& deviceId ,std::functi
     std::lock_guard<std::mutex> guard(lk_);
     remoteInputStateRequests_.insert(std::pair<int32_t,
         std::function<void(int32_t)>>(remoteInputStateTaskId_, callback));
-    if(MMIEventHdl.StartRemoteInput(remoteInputStateTaskId_, deviceId) != RET_OK){
+    if(MMIEventHdl.StartRemoteInput(remoteInputStateTaskId_, deviceId) != RET_OK) {
         MMI_LOGE("Failed to StartRemoteInput");
     };
     remoteInputStateTaskId_++;
@@ -618,7 +612,7 @@ void InputManagerImpl::StopRemoteInput(const std::string& deviceId ,std::functio
     std::lock_guard<std::mutex> guard(lk_);
     remoteInputStateRequests_.insert(std::pair<int32_t,
         std::function<void(int32_t)>>(remoteInputStateTaskId_, callback));
-    if(MMIEventHdl.StopRemoteInput(remoteInputStateTaskId_, deviceId) != RET_OK){
+    if(MMIEventHdl.StopRemoteInput(remoteInputStateTaskId_, deviceId) != RET_OK) {
         MMI_LOGE("Failed to StartRemoteInput");
     };
     remoteInputStateTaskId_++;

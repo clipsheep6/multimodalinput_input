@@ -41,7 +41,7 @@ public:
     void OnInputDevice(int32_t userData, int32_t id, std::string name, int32_t deviceId);
     void OnInputDeviceIds(int32_t userData, std::vector<int32_t> ids);
 
-   void GetVirtualDeviceIdsAsync(std::function<void(std::vector<int32_t>)> callback);
+    void GetVirtualDeviceIdsAsync(std::function<void(std::vector<int32_t>)> callback);
     void GetVirtualDeviceAsync(int32_t deviceId, std::function<void(std::shared_ptr<InputDeviceInfo>)> callback);
     void OnVirtualDevice(int32_t taskId, int32_t id, std::string name, int32_t deviceId);
     void OnVirtualDeviceIds(int32_t taskId, std::vector<int32_t> ids);
@@ -62,7 +62,7 @@ private:
     int32_t virtualDeviceTaskId_ {1};
     int32_t virtualIdsTaskId_ {1};
     std::map<int32_t, std::function<void(std::vector<std::string>)>> nodeDeviceInfoRequests_;
-    int32_t nodeDeviceInfoTaskId_{1};
+    int32_t nodeDeviceInfoTaskId_ {1};
 
     std::map<int32_t, std::function<void(bool)>> showMouseRequests_;
     std::map<int32_t, std::function<void(bool)>> hideMouseRequests_;
