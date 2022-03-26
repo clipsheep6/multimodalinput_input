@@ -18,17 +18,16 @@
 
 #include <string>
 #include <vector>
+#include "prepare_dinput_callback.h"
 #include "singleton.h"
-//#include "uds_session.h"
-#include "mmi_prepare_d_input_call_back_stub.h"
-#include "mmi_start_d_input_call_back_stub.h"
-#include "mmi_stop_d_input_call_back_stub.h"
-#include "mmi_unprepare_d_input_call_back_stub.h"
+#include "start_dinput_callback.h"
+#include "stop_dinput_callback.h"
+#include "unprepare_dinput_callback.h"
 
 namespace OHOS {
 namespace MMI {
 
-struct DMouseLocation{
+struct DMouseLocation {
     int32_t globalX;
     int32_t globalY;
     int32_t dx;
@@ -47,19 +46,14 @@ public:
     void SetMouseLocation(DMouseLocation info);
     DMouseLocation& GetMouseLocation();
     std::vector<int32_t> GetInputVirtualDeviceIds();
-    // int32_t PrepareRemoteInput(int32_t taskId ,const std::string& deviceId, SessionPtr session);
-    // int32_t UnprepareRemoteInput(int32_t taskId ,const std::string& deviceId, SessionPtr session);
-    // int32_t StartRemoteInput(int32_t taskId ,const std::string& deviceId, SessionPtr session);
-    // int32_t StopRemoteInput(int32_t taskId ,const std::string& deviceId, SessionPtr session);
     std::string GetDeviceId();
-    virtual int32_t PrepareRemoteInputToDinput(const std::string& deviceId, sptr<MultimodalPrepareDInputCallback> callback);
-    virtual int32_t UnPrepareRemoteInputToDinput(const std::string& deviceId, sptr<MultimodalUnPrepareDInputCallback> callback);
-    virtual int32_t StartRemoteInputToDinput(const std::string& deviceId, sptr<MultimodalStartDInputCallback> callback);
-    virtual int32_t StopRemoteInputToDinput(const std::string& deviceId, sptr<MultimodalStopDInputCallback> callback);
+    virtual int32_t PrepareRemoteInput(const std::string& deviceId, sptr<PrepareDInputCallback> callback);
+    virtual int32_t UnPrepareRemoteInput(const std::string& deviceId, sptr<UnprepareDInputCallback> callback);
+    virtual int32_t StartRemoteInput(const std::string& deviceId, sptr<StartDInputCallback> callback);
+    virtual int32_t StopRemoteInput(const std::string& deviceId, sptr<StopDInputCallback> callback);
 
 private:
     int32_t fd_ = 0;
-    //SessionPtr sess_ = nullptr;
     DMouseLocation mouseLocation = {};
     std::string deviceId_ = "";
 };

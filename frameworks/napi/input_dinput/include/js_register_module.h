@@ -37,16 +37,24 @@
 namespace OHOS {
 namespace MMI {
 #define IM_NAPI_BUF_LENGTH (256)
-    class HandleNapi{
-        public:
-        static void GetParameter(napi_env env, napi_callback_info info, napi_ref& first);
-        static void GetParameter(napi_env env, napi_callback_info info, int32_t& first, napi_ref& second);
-        static void GetParameter(napi_env env, napi_callback_info info, std::string& first, napi_ref& second);
-        static void GetParameter(napi_env env, napi_callback_info info, int32_t& first, int32_t& second, napi_ref& third);
-        static void HandleCallBack(uv_work_t* work, bool returnResult);
-        static void HandleCallBack(uv_work_t* work, int32_t returnResult);
+class JsRegisterModule{
+public:
+    static void GetParameter(napi_env env, napi_callback_info info, napi_ref& first);
+    static void GetParameter(napi_env env, napi_callback_info info, int32_t& first, napi_ref& second);
+    static void GetParameter(napi_env env, napi_callback_info info, std::string& first, napi_ref& second);
+    static void GetParameter(napi_env env, napi_callback_info info, int32_t& first, int32_t& second, napi_ref& third);
+    static void HandleCallBack(uv_work_t* work, bool returnResult);
+    static void HandleCallBack(uv_work_t* work, int32_t returnResult);
 
-    };
+};
+template <class T>
+class CallbackInfo {
+public:
+    napi_env env;
+    napi_ref handleRef;
+    uv_loop_s* loop {nullptr};
+    T returnResult;
+};
 } // namespace MMI
 } // namespace OHOS
 

@@ -35,7 +35,7 @@ public:
     void TellDisplayInfo(int32_t displayId, int32_t width, int32_t height);
     void UpdatePointerDevice(bool hasPointerDevice);
     bool Init();
-    //分布式输入添加
+    // 分布式输入添加
     void ShowMouse();
     void HideMouse();
 public:

@@ -44,7 +44,7 @@ public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
     void SetUp()
-    {
+    {   
         key = KeyEvent::Create();
     }
 public:

@@ -245,8 +245,7 @@ void PointerDrawingManager::DrawManager()
 
 void PointerDrawingManager::ShowMouse()
 {
-    if (pointerWindow_ != nullptr )
-    {
+    if (pointerWindow_ != nullptr) {
         pointerWindow_->Show();
     }
     showMousePointer_ = true;
@@ -254,8 +253,7 @@ void PointerDrawingManager::ShowMouse()
 
 void PointerDrawingManager::HideMouse()
 {
-    if (pointerWindow_ != nullptr )
-    {
+    if (pointerWindow_ != nullptr) {
         pointerWindow_->Hide();
     }
     showMousePointer_ = false;

@@ -274,7 +274,7 @@ bool EventDispatch::CheckWhiteList(bool &jumpIntercept, const std::shared_ptr<Ke
     if (DistributedHardware::DistributedInput::DInputServerType::SOURCE_SERVER_TYPE == type ) {
         if (IsRemoteDevice(key->GetDeviceId())) {
             deviceId = DInputMgr->GetDeviceId();
-            if(!IsNeedFilterOut(deviceId,key)) {
+            if (!IsNeedFilterOut(deviceId,key)) {
                 return true;
             }
         }
@@ -317,7 +317,7 @@ bool EventDispatch::IsNeedFilterOut(const std::string deviceId, const std::share
     businessEvent.keyCode = key->GetKeyCode();
     businessEvent.keyAction = key->GetKeyAction();
     businessEvent.pressedKeys = pressedKeysForDInput;
-    for(const auto &item : businessEvent.pressedKeys) {
+    for (const auto &item : businessEvent.pressedKeys) {
         MMI_LOGD("pressedKeys :%{public}d", item);
     }
 
@@ -328,7 +328,7 @@ bool EventDispatch::IsNeedFilterOut(const std::string deviceId, const std::share
     return ret;
 }
 
-bool EventDispatch::IsNeedFilterOut(const std::string& deviceId, 
+bool EventDispatch::IsNeedFilterOut(const std::string& deviceId,
     const OHOS::DistributedHardware::DistributedInput::BusinessEvent& businessEvent)
 {
     return OHOS::DistributedHardware::DistributedInput::DistributedInputKit::IsNeedFilterOut(deviceId, businessEvent);

@@ -29,7 +29,8 @@ namespace MMI {
 
 OHOS::MMI::RawData::RawData() {}
 OHOS::MMI::RawData::~RawData() {}
-OHOS::MMI::RawData::RawData(const int32_t dx, const int32_t dy){
+OHOS::MMI::RawData::RawData(const int32_t dx, const int32_t dy)
+{
     dx_ = dx;
     dy_ = dy;
 }
@@ -67,7 +68,8 @@ bool OHOS::MMI::RawData::WriteToParcel(Parcel &out) const
     return true;
 }
 
-bool OHOS::MMI::RawData::ReadFromParcel(Parcel &in){
+bool OHOS::MMI::RawData::ReadFromParcel(Parcel &in)
+{
      if (!in.ReadInt32(dx_)) {
         return false;
     }

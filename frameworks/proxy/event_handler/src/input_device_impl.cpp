@@ -83,7 +83,7 @@ void InputDeviceImpl::GetVirtualDeviceIdsAsync(std::function<void(std::vector<in
 }
 
 void InputDeviceImpl::GetVirtualDeviceAsync(int32_t deviceId,
-                                           std::function<void(std::shared_ptr<InputDeviceInfo>)> callback)
+    std::function<void(std::shared_ptr<InputDeviceInfo>)> callback)
 {
     MMI_LOGI("GetVirtualDeviceAsync begin");
     std::lock_guard<std::mutex> guard(mtx_);
