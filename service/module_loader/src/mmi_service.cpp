@@ -297,7 +297,7 @@ int32_t MMIService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& 
     reply.WriteInt32(RET_OK);
     reply.WriteFileDescriptor(clientFd);
 
-    MMI_HILOGI("send clientFd to client, clientFd = %d", clientFd);
+    MMI_HILOGI("send clientFd to client, clientFd = %{public}d", clientFd);
     close(clientFd);
     return RET_OK;
 }

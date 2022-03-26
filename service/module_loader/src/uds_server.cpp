@@ -388,11 +388,11 @@ void UDSServer::OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap, struct ep
 
 void UDSServer::DumpSession(const std::string &title)
 {
-    MMI_HILOGD("in %s: %s", __func__, title.c_str());
+    MMI_HILOGD("in %{public}s: %{public}s", __func__, title.c_str());
     int32_t i = 0;
     for (auto& [key, value] : sessionsMap_) {
         CHKPV(value);
-        MMI_HILOGD("%d, %s", i, value->GetDescript().c_str());
+        MMI_HILOGD("%{public}d, %{public}s", i, value->GetDescript().c_str());
         i++;
     }
 }
