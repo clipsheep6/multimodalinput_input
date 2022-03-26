@@ -141,10 +141,10 @@ ohos_shared_library("libmmi-server") {
     "window_manager/src/input_windows_manager.cpp",
     "window_manager/src/pointer_drawing_manager.cpp",
     "dinput/src/dinput_manager.cpp",
-    "dinput/src/mmi_prepare_d_input_call_back_stub.cpp",
-    "dinput/src/mmi_start_d_input_call_back_stub.cpp",
-    "dinput/src/mmi_stop_d_input_call_back_stub.cpp",
-    "dinput/src/mmi_unprepare_d_input_call_back_stub.cpp",
+    "dinput/src/prepare_dinput_callback.cpp",
+    "dinput/src/start_dinput_callback.cpp",
+    "dinput/src/stop_dinput_callback.cpp",
+    "dinput/src/unprepare_dinput_callback.cpp",
   ]
 
   if (is_mmi_have_hdf) {

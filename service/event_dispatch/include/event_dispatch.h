@@ -64,7 +64,8 @@ protected:
     bool IsANRProcess(int64_t time, SessionPtr ss);
     bool IsRemoteDevice(const int32_t deviceId);
     bool IsNeedFilterOut(const std::string deviceId,const std::shared_ptr<KeyEvent> key);
-    virtual bool IsNeedFilterOut(const std::string& deviceId, const OHOS::DistributedHardware::DistributedInput::BusinessEvent& businessEvent);
+    virtual bool IsNeedFilterOut(const std::string& deviceId,
+        const OHOS::DistributedHardware::DistributedInput::BusinessEvent& businessEvent);
     virtual OHOS::DistributedHardware::DistributedInput::DInputServerType IsStartDistributedInput();
     bool CheckWhiteList(bool &jumpIntercept, const std::shared_ptr<KeyEvent> key);
     OHOS::DistributedHardware::DistributedInput::DInputServerType GetDInputServerType();

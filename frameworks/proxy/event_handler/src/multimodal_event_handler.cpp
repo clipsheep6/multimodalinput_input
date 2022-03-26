@@ -195,13 +195,13 @@ int32_t MultimodalEventHandler::GetVirtualDeviceIds(int32_t taskId)
     return EventManager.GetVirtualDeviceIds(taskId);
 }
 
-int32_t MultimodalEventHandler::GetVirtualDevice(int32_t taskId ,int32_t deviceId)
+int32_t MultimodalEventHandler::GetVirtualDevice(int32_t taskId, int32_t deviceId)
 {
     MMI_LOGD("MultimodalEventHandler::GetVirtualDevice");
     if (!InitClient()) {
         return MMI_SERVICE_INVALID;
     }
-    return EventManager.GetVirtualDevice(taskId,deviceId);
+    return EventManager.GetVirtualDevice(taskId, deviceId);
 }
 
 int32_t MultimodalEventHandler::GetAllNodeDeviceInfo(int32_t taskId)
@@ -255,7 +255,7 @@ int32_t MultimodalEventHandler::HideMouse(int32_t taskId)
     return RET_OK;
 }
 
-int32_t MultimodalEventHandler::PrepareRemoteInput(int32_t taskId ,const std::string& deviceId)
+int32_t MultimodalEventHandler::PrepareRemoteInput(int32_t taskId, const std::string& deviceId)
 {
     MMI_LOGD("MultimodalEventHandler::PrepareRemoteInput");
     if (!InitClient()) {
@@ -269,7 +269,7 @@ int32_t MultimodalEventHandler::PrepareRemoteInput(int32_t taskId ,const std::st
     return RET_OK;
 }
 
-int32_t MultimodalEventHandler::UnprepareRemoteInput(int32_t taskId ,const std::string& deviceId)
+int32_t MultimodalEventHandler::UnprepareRemoteInput(int32_t taskId, const std::string& deviceId)
 {
     MMI_LOGD("MultimodalEventHandler::UnprepareRemoteInput");
     if (!InitClient()) {
@@ -283,7 +283,7 @@ int32_t MultimodalEventHandler::UnprepareRemoteInput(int32_t taskId ,const std::
     return RET_OK;
 }
 
-int32_t MultimodalEventHandler::StartRemoteInput(int32_t taskId ,const std::string& deviceId)
+int32_t MultimodalEventHandler::StartRemoteInput(int32_t taskId, const std::string& deviceId)
 {
     MMI_LOGD("MultimodalEventHandler::StartRemoteInput");
     if (!InitClient()) {
@@ -297,7 +297,7 @@ int32_t MultimodalEventHandler::StartRemoteInput(int32_t taskId ,const std::stri
     return RET_OK;
 }
 
-int32_t MultimodalEventHandler::StopRemoteInput(int32_t taskId ,const std::string& deviceId)
+int32_t MultimodalEventHandler::StopRemoteInput(int32_t taskId, const std::string& deviceId)
 {
     MMI_LOGD("MultimodalEventHandler::StopRemoteInput");
     if (!InitClient()) {
@@ -311,10 +311,10 @@ int32_t MultimodalEventHandler::StopRemoteInput(int32_t taskId ,const std::strin
     return RET_OK;
 }
 
-int32_t MultimodalEventHandler::SimulateCrossLocation(int32_t taskId, int32_t x , int32_t y)
+int32_t MultimodalEventHandler::SimulateCrossLocation(int32_t taskId, int32_t x, int32_t y)
 {
     MMI_LOGD("MultimodalEventHandler::SimulateCrossLocation");
-    if (!InitClient()) {    
+    if (!InitClient()) {
         return MMI_SERVICE_INVALID;
     }
     NetPacket ck(MmiMessageId::SIMULATE_CROSS_LOCATION);

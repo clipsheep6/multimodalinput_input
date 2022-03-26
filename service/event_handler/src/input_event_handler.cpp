@@ -230,16 +230,15 @@ int32_t InputEventHandler::OnEventDeviceAdded(const multimodal_libinput_event& e
     auto device = libinput_event_get_device(ev.event);
  #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
     const std::string vDeviceName = libinput_device_get_name(device);
-    MMI_LOGD("Distribute_Input On Mode,Add Device Name:%{public}s",
-            vDeviceName.c_str());
+    MMI_LOGD("Distribute_Input On Mode,Add Device Name:%{public}s", vDeviceName.c_str());
 
     std::string::size_type pos = vDeviceName.find(VIRTUAL_DEVICE_NAME);
-    if( pos != vDeviceName.npos)
+    if (pos != vDeviceName.npos)
     {
         InputDevMgr->OnVirtualDeviceAdded(device);
         return RET_OK;
     }
- #endif  
+ #endif
     InputDevMgr->OnInputDeviceAdded(device);
     return RET_OK;
 }
@@ -249,16 +248,15 @@ int32_t InputEventHandler::OnEventDeviceRemoved(const multimodal_libinput_event&
     auto device = libinput_event_get_device(ev.event);
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
     const std::string vDeviceName = libinput_device_get_name(device);
-    MMI_LOGD("Distribute_Input On Mode,Add Device Name:%{public}s",
-            vDeviceName.c_str());
-
+    MMI_LOGD("Distribute_Input On Mode,Add Device Name:%{public}s",vDeviceName.c_str());
+    
     std::string::size_type pos = vDeviceName.find(VIRTUAL_DEVICE_NAME);
-    if( pos != vDeviceName.npos)
+    if (pos != vDeviceName.npos)
     {
         InputDevMgr->OnVirtualDeviceRemoved(device);
         return RET_OK;
     }
- #endif  
+ #endif
     InputDevMgr->OnInputDeviceRemoved(device);
     return RET_OK;
 }
@@ -328,9 +326,9 @@ int32_t InputEventHandler::OnEventKey(const multimodal_libinput_event& ev)
     return RET_OK;
 }
 
-void InputEventHandler::SetAbsolutionLocation(double absX,double absY)
+void InputEventHandler::SetAbsolutionLocation(double absX, double absY)
 {
-    MouseEventHdr->SetAbsolutionLocation(absX,absY);
+    MouseEventHdr->SetAbsolutionLocation(absX, absY);
 }
 
 bool InputEventHandler::IsControllerSide()
@@ -340,7 +338,7 @@ bool InputEventHandler::IsControllerSide()
     using namespace OHOS::DistributedHardware::DistributedInput;
     DInputServerType type = IsStartDistributedInput();
     MMI_LOGD("DistributedInputKit::IsStartDistributedInput():%{public}d", type);
-    if (DInputServerType::SINK_SERVER_TYPE != type){
+    if (DInputServerType::SINK_SERVER_TYPE != type) {
         return true;
     }
     return false;
@@ -354,9 +352,9 @@ int32_t InputEventHandler::OnEventPointer(const multimodal_libinput_event& ev)
     CHKPR(ev.event, ERROR_NULL_POINTER);
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
     // 如果是被控端，则丢弃鼠标事件.
-    if (!IsControllerSide()){
-       MMI_LOGD("OnEventPointer::dinput controlled point event droped");
-       return RET_OK;
+    if (!IsControllerSide()) {
+        MMI_LOGD("OnEventPointer::dinput controlled point event droped");
+        return RET_OK;
     }
 #endif
     return OnMouseEventHandler(ev.event);
@@ -419,10 +417,9 @@ int32_t InputEventHandler::OnEventTouch(const multimodal_libinput_event& ev)
 {
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
     // 如果是被控端，则丢弃触摸屏事件.
-    if (!IsControllerSide())
-    {
-       MMI_LOGD("OnEventTouch::dinput controlled touch event droped");
-       return RET_OK;
+    if (!IsControllerSide()) {
+        MMI_LOGD("OnEventTouch::dinput controlled touch event droped");
+        return RET_OK;
     } 	
 #endif
     CHKPR(ev.event, ERROR_NULL_POINTER);
@@ -434,10 +431,9 @@ int32_t InputEventHandler::OnEventTouchpad(const multimodal_libinput_event& ev)
 {
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
     // 如果是被控端，则丢弃触摸板事件.
-    if (!IsControllerSide())
-    {
-       MMI_LOGD("OnEventTouchpad::dinput controlled touchpad event droped");
-       return RET_OK;
+    if (!IsControllerSide()) {
+        MMI_LOGD("OnEventTouchpad::dinput controlled touchpad event droped");
+        return RET_OK;
     }
 #endif
     OnEventTouchPadSecond(ev.event);

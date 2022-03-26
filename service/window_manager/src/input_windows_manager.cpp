@@ -307,7 +307,7 @@ bool OHOS::MMI::InputWindowsManager::TouchMotionPointToDisplayPoint(struct libin
     }
 
     for (const auto &display : logicalDisplays_) {
-        if (targetDisplayId == display.id ) {
+        if (targetDisplayId == display.id) {
             MMI_LOGD("targetDisplay is %{public}d, displayX is %{public}d, displayY is %{public}d ",
                 targetDisplayId, displayX, displayY);
             displayX = globalLogicalX - display.topLeftX;

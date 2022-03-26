@@ -13,20 +13,20 @@
  * limitations under the License.
  */
 
-#ifndef MMI_PREPARE_D_INPUT_CALL_BACK_STUB_H
-#define MMI_PREPARE_D_INPUT_CALL_BACK_STUB_H
-
-#include "iremote_proxy.h"
+#ifndef STOP_DINPUT_CALLBACK_H
+#define STOP_DINPUT_CALLBACK_H
 #include <string>
-#include "prepare_d_input_call_back_stub.h"
+#include "iremote_proxy.h"
+#include "stop_d_input_call_back_stub.h"
 #include "uds_session.h"
+
 namespace OHOS {
 namespace MMI {
-class MultimodalPrepareDInputCallback : public OHOS::DistributedHardware::DistributedInput::PrepareDInputCallbackStub {
+class StopDInputCallback : public OHOS::DistributedHardware::DistributedInput::StopDInputCallbackStub {
     public:
-        MultimodalPrepareDInputCallback();
-        MultimodalPrepareDInputCallback(const int32_t& taskId, SessionPtr &sess);
-        virtual ~MultimodalPrepareDInputCallback();
+        StopDInputCallback() {}
+        StopDInputCallback(const int32_t& taskId, SessionPtr& sess);
+        virtual ~StopDInputCallback() {}
         void OnResult(const std::string& deviceId, const int32_t& status);
         int32_t taskId_;
         SessionPtr sess_;
@@ -34,4 +34,4 @@ class MultimodalPrepareDInputCallback : public OHOS::DistributedHardware::Distri
 }  // namespace MMI
 }  // namespace OHOS
 
-#endif  // MMI_PREPARE_D_INPUT_CALL_BACK_STUB_H
+#endif  // STOP_DINPUT_CALLBACK_H

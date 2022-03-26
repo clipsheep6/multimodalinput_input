@@ -13,45 +13,31 @@
  * limitations under the License.
  */
 
-#include "mmi_stop_d_input_call_back_stub.h"
+#include "stop_dinput_callback.h"
 #include "define_multimodal.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalStopDInputCallback" };
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "StopDInputCallback" };
 }
 
-MultimodalStopDInputCallback::MultimodalStopDInputCallback()
-{
-    
-}
-
-MultimodalStopDInputCallback::MultimodalStopDInputCallback(const int32_t& taskId, SessionPtr& sess)
+StopDInputCallback::StopDInputCallback(const int32_t& taskId, SessionPtr& sess)
 {
     taskId_ = taskId;
     sess_ = sess;
 }
 
-MultimodalStopDInputCallback::~MultimodalStopDInputCallback()
+void StopDInputCallback::OnResult(const std::string& deviceId,const int32_t& status)
 {
-    
-}
-
-void MultimodalStopDInputCallback::OnResult(const std::string& deviceId,const int32_t& status)
-{
-    MMI_LOGI("MultimodalStopDInputCallback::OnResult");
+    MMI_LOGI("StopDInputCallback::OnResult");
     NetPacket pkt2(MmiMessageId::INPUT_STOP_REMOTE);
-    if(!pkt2.Write(taskId_)){
-        MMI_LOGE("Packet Write taskId failed");
-    }
-    if(!pkt2.Write(status)){
-        MMI_LOGE("Packet Write status failed");
-    }
+    CHK(pkt2.Write(taskId_), STREAM_BUF_WRITE_FAIL);
+    CHK(pkt2.Write(status), STREAM_BUF_WRITE_FAIL);
     if (!sess_->SendMsg(pkt2)) {
-        MMI_LOGE("MultimodalStopDInputCallback::OnResult Sending failed!\n");
+        MMI_LOGE("StopDInputCallback::OnResult Sending failed!\n");
     }
-    MMI_LOGD("MultimodalStopDInputCallback::OnResult end");
+    MMI_LOGD("StopDInputCallback::OnResult end");
 }
 }  // namespace MMI
 }  // namespace OHOS
