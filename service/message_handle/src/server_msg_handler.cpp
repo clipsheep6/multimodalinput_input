@@ -16,18 +16,26 @@
 #include "server_msg_handler.h"
 #include <cinttypes>
 #include "ability_launch_manager.h"
+#include "dinput_manager.h"
+#include "distributed_input_kit.h"
 #include "event_dump.h"
 #include "event_package.h"
 #include "input_device_manager.h"
 #include "input_event_data_transformation.h"
 #include "input_event.h"
+#include "input_event_handler.h"
 #include "input_event_monitor_manager.h"
 #include "input_handler_manager_global.h"
 #include "input_windows_manager.h"
 #include "interceptor_manager_global.h"
 #include "key_event_subscriber.h"
 #include "mmi_func_callback.h"
+#include "prepare_dinput_callback.h"
+#include "start_dinput_callback.h"
+#include "stop_dinput_callback.h"
 #include "time_cost_chk.h"
+#include "unprepare_dinput_callback.h"
+
 
 #ifdef OHOS_BUILD_HDF
 #include "hdi_inject.h"
@@ -77,6 +85,18 @@ bool OHOS::MMI::ServerMsgHandler::Init(UDSServer& udsServer)
             MsgCallbackBind2(&ServerMsgHandler::OnAddTouchpadEventFilter, this)},
         {MmiMessageId::REMOVE_EVENT_INTERCEPTOR,
             MsgCallbackBind2(&ServerMsgHandler::OnRemoveTouchpadEventFilter, this)},
+        {MmiMessageId::INPUT_VIRTUAL_DEVICE_IDS, MsgCallbackBind2(&ServerMsgHandler::OnInputVirtualDeviceIds, this)},
+	{MmiMessageId::INPUT_VIRTUAL_DEVICE, MsgCallbackBind2(&ServerMsgHandler::OnInputVirtualDevice, this)},
+	{MmiMessageId::GET_ALL_NODE_DEVICE_INFO, MsgCallbackBind2(&ServerMsgHandler::OnGetAllNodeDeviceInfo, this)},
+        {MmiMessageId::SHOW_MOUSE, MsgCallbackBind2(&ServerMsgHandler::OnShowMouse, this)},
+        {MmiMessageId::HIDE_MOUSE, MsgCallbackBind2(&ServerMsgHandler::OnHideMouse, this)},
+        {MmiMessageId::INPUT_MOUSE_LOCATION, MsgCallbackBind2(&ServerMsgHandler::OnGetMouseLocation, this)},
+        {MmiMessageId::INPUT_PREPARE_REMOTE, MsgCallbackBind2(&ServerMsgHandler::OnPrepareRemoteInput, this)},      
+        {MmiMessageId::INPUT_UNPREPARE_REMOTE, MsgCallbackBind2(&ServerMsgHandler::OnUnprepareRemoteInput, this)},
+        {MmiMessageId::INPUT_START_REMOTE, MsgCallbackBind2(&ServerMsgHandler::OnStartRemoteInput, this)},        
+        {MmiMessageId::INPUT_STOP_REMOTE, MsgCallbackBind2(&ServerMsgHandler::OnStopRemoteInput, this)},        
+        {MmiMessageId::SIMULATE_CROSS_LOCATION, MsgCallbackBind2(&ServerMsgHandler::OnSimulateCrossLocation, this)},
+
 #ifdef OHOS_BUILD_HDF
         {MmiMessageId::HDI_INJECT, MsgCallbackBind2(&ServerMsgHandler::OnHdiInject, this)},
 #endif // OHOS_BUILD_HDF
@@ -469,4 +489,228 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRemoveTouchpadEventFilter(SessionPtr sess
     InterceptorMgrGbl.OnRemoveInterceptor(id);
     return RET_OK;
 }
+
+int32_t OHOS::MMI::ServerMsgHandler::OnInputVirtualDeviceIds(SessionPtr sess, NetPacket& pkt)
+{
+    MMI_LOGI("OnInputVirtualDeviceIds begin");
+    CHKPR(sess, ERROR_NULL_POINTER);
+    int32_t taskId = 0;
+    CHKR(pkt.Read(taskId), STREAM_BUF_READ_FAIL, RET_ERR);
+    std::vector<int32_t> ids = InputDevMgr->GetVirtualDeviceIds();
+    NetPacket pkt2(MmiMessageId::INPUT_VIRTUAL_DEVICE_IDS);
+    int32_t size = ids.size();
+    CHKR(pkt2.Write(taskId), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    CHKR(pkt2.Write(size), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    for (auto it : ids) {
+        CHKR(pkt2.Write(it), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    }
+    if (!sess->SendMsg(pkt2)) {
+        MMI_LOGE("Sending failed!\n");
+        return MSG_SEND_FAIL;
+    }
+    MMI_LOGE("OnInputVirtualDeviceIds end");
+    return RET_OK;
+}
+
 // LCOV_EXCL_STOP
+int32_t OHOS::MMI::ServerMsgHandler::OnInputVirtualDevice(SessionPtr sess, NetPacket& pkt)
+{
+    MMI_LOGI("OnInputVirtualDevice begin");
+    CHKPR(sess, ERROR_NULL_POINTER);
+    int32_t taskId = 0;
+    int deviceId = 0;
+    CHKR(pkt.Read(taskId), STREAM_BUF_READ_FAIL, RET_ERR);
+    CHKR(pkt.Read(deviceId), STREAM_BUF_READ_FAIL, RET_ERR);
+
+    std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetVirtualDevice(deviceId);
+    NetPacket pkt2(MmiMessageId::INPUT_VIRTUAL_DEVICE);
+    CHKR(pkt2.Write(taskId), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    int32_t id = -1;
+    std::string name = "null";
+    int32_t deviceType = -1;
+    if (inputDevice == nullptr) {
+        MMI_LOGI("Input virtual device not found.");
+    } else {
+        int32_t id = inputDevice->GetId();
+        std::string name = inputDevice->GetName();
+        int32_t deviceType = inputDevice->GetType();
+    }
+    CHKR(pkt2.Write(id), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    CHKR(pkt2.Write(name), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    CHKR(pkt2.Write(deviceType), STREAM_BUF_WRITE_FAIL, RET_ERR);
+
+    if (!sess->SendMsg(pkt2)) {
+        MMI_LOGE("Sending failed!\n");
+        return MSG_SEND_FAIL;
+    }
+    MMI_LOGI("end");
+    return RET_OK;
+}
+
+int32_t OHOS::MMI::ServerMsgHandler::OnGetAllNodeDeviceInfo(SessionPtr sess, NetPacket& pkt)
+{
+    MMI_LOGI("begin");
+    CHKPR(sess, ERROR_NULL_POINTER);
+    int32_t taskId = 0;
+    CHKR(pkt.Read(taskId), STREAM_BUF_READ_FAIL, RET_ERR);
+
+    std::vector<std::string> ids = InputDevMgr->GetAllNodeDeviceInfoFromDM();
+    NetPacket pkt2(MmiMessageId::GET_ALL_NODE_DEVICE_INFO);
+    int32_t size = ids.size();
+    CHKR(pkt2.Write(taskId), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    CHKR(pkt2.Write(size), STREAM_BUF_WRITE_FAIL, RET_ERR);
+
+    for (auto it : ids) {
+        CHKR(pkt2.Write(it), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    }
+    if (!sess->SendMsg(pkt2)) {
+        MMI_LOGE("Sending failed!\n");
+        return MSG_SEND_FAIL;
+    }
+    MMI_LOGE("end");
+    return RET_OK;
+}
+
+int32_t OHOS::MMI::ServerMsgHandler::OnShowMouse(SessionPtr sess, NetPacket& pkt)
+{
+    MMI_LOGI("OnShowMouse begin");
+    CHKPR(sess, ERROR_NULL_POINTER);
+    int32_t taskId = 0;
+    CHKR(pkt.Read(taskId), STREAM_BUF_READ_FAIL, RET_ERR);
+
+    OHOS::MMI::InputWindowsManager::GetInstance()->ShowMouse();
+
+    NetPacket pkt2(MmiMessageId::SHOW_MOUSE);
+    CHKR(pkt2.Write(taskId), STREAM_BUF_WRITE_FAIL, RET_ERR);
+
+    if (!sess->SendMsg(pkt2)) {
+        MMI_LOGE("Sending failed!\n");
+        return MSG_SEND_FAIL;
+    }
+    return RET_OK;
+}
+
+int32_t OHOS::MMI::ServerMsgHandler::OnHideMouse(SessionPtr sess, NetPacket& pkt)
+{
+    MMI_LOGI("OnHideMouse begin");
+    CHKPR(sess, ERROR_NULL_POINTER);
+    int32_t taskId = 0;
+    CHKR(pkt.Read(taskId), STREAM_BUF_READ_FAIL, RET_ERR);
+
+    OHOS::MMI::InputWindowsManager::GetInstance()->HideMouse();
+
+    NetPacket pkt2(MmiMessageId::HIDE_MOUSE);
+    CHKR(pkt2.Write(taskId), STREAM_BUF_WRITE_FAIL, RET_ERR);
+
+    if (!sess->SendMsg(pkt2)) {
+        MMI_LOGE("Sending failed!\n");
+        return MSG_SEND_FAIL;
+    }
+    return RET_OK;
+}
+
+int32_t OHOS::MMI::ServerMsgHandler::OnGetMouseLocation(SessionPtr sess, NetPacket& pkt)
+{
+    MMI_LOGI("OnGetMouseLocation begin");
+    CHKPR(sess, ERROR_NULL_POINTER);
+    int32_t taskId = 0;
+    CHKR(pkt.Read(taskId), STREAM_BUF_READ_FAIL, RET_ERR);
+
+    DMouseLocation mouseLocation = DInputMgr->GetMouseLocation();
+    NetPacket pkt2(MmiMessageId::INPUT_MOUSE_LOCATION);
+    CHKR(pkt2.Write(taskId), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    CHKR(pkt2.Write(mouseLocation.globalX), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    CHKR(pkt2.Write(mouseLocation.globalY), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    CHKR(pkt2.Write(mouseLocation.displayId), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    CHKR(pkt2.Write(mouseLocation.dx), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    CHKR(pkt2.Write(mouseLocation.dy), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    CHKR(pkt2.Write(mouseLocation.logicalDisplayWidth), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    CHKR(pkt2.Write(mouseLocation.logicalDisplayHeight), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    CHKR(pkt2.Write(mouseLocation.logicalDisplayTopLeftX), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    CHKR(pkt2.Write(mouseLocation.logicalDisplayTopLeftY), STREAM_BUF_WRITE_FAIL, RET_ERR);
+
+    if (!sess->SendMsg(pkt2)) {
+        MMI_LOGE("Sending structure of OnGetMouseLocation failed!\n");
+        return MSG_SEND_FAIL;
+    }
+    MMI_LOGE("OnGetMouseLocation end");
+    return RET_OK;
+}
+
+int32_t OHOS::MMI::ServerMsgHandler::OnSimulateCrossLocation(SessionPtr sess, NetPacket& pkt)
+{
+    MMI_LOGI("OnSimulateCrossLocation begin");
+    CHKPR(sess, ERROR_NULL_POINTER);
+    int32_t taskId = 0;
+    int32_t absX = 0;
+    int32_t absY = 0;
+    int32_t status = 0;
+    CHKR(pkt.Read(taskId), STREAM_BUF_READ_FAIL, RET_ERR);
+    CHKR(pkt.Read(absX), STREAM_BUF_READ_FAIL, RET_ERR);
+    CHKR(pkt.Read(absY), STREAM_BUF_READ_FAIL, RET_ERR);
+
+    InputHandler->SetAbsolutionLocation(static_cast<double>(absX), static_cast<double>(absY));
+    
+    NetPacket pkt2(MmiMessageId::SIMULATE_CROSS_LOCATION);
+    CHKR(pkt2.Write(taskId), STREAM_BUF_WRITE_FAIL, RET_ERR);
+    CHKR(pkt2.Write(status), STREAM_BUF_WRITE_FAIL, RET_ERR);
+  
+    if (!sess->SendMsg(pkt2)) {
+        MMI_LOGE("Sending failed!\n");
+        return MSG_SEND_FAIL;
+    }
+    return RET_OK;
+}
+
+int32_t OHOS::MMI::ServerMsgHandler::OnPrepareRemoteInput(SessionPtr sess, NetPacket& pkt)
+{
+    MMI_LOGI("OnPrepareRemoteInput begin");
+    CHKPR(sess, ERROR_NULL_POINTER);
+    int32_t taskId = 0;
+    std::string deviceId;
+
+    pkt >> taskId >> deviceId;
+    CHKR(!pkt.ChkRWError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
+    MMI_LOGI("OnPrepareRemoteInput end");
+    sptr<PrepareDInputCallback> callback(new PrepareDInputCallback(taskId, sess));
+    return DInputMgr->PrepareRemoteInput(deviceId ,callback);
+}
+
+int32_t OHOS::MMI::ServerMsgHandler::OnUnprepareRemoteInput(SessionPtr sess, NetPacket& pkt)
+{
+    MMI_LOGI("OnUnprepareRemoteInput begin");
+    CHKPR(sess, ERROR_NULL_POINTER);
+    int32_t taskId = 0;
+    std::string deviceId;
+    pkt >> taskId >> deviceId;
+    CHKR(!pkt.ChkRWError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
+    MMI_LOGI("OnUnprepareRemoteInput end");
+    sptr<UnprepareDInputCallback> callback(new UnprepareDInputCallback(taskId, sess));
+    return DInputMgr->UnPrepareRemoteInput(deviceId ,callback);
+}
+
+int32_t OHOS::MMI::ServerMsgHandler::OnStartRemoteInput(SessionPtr sess, NetPacket& pkt)
+{
+    MMI_LOGI("OnStartRemoteInput begin");
+    CHKPR(sess, ERROR_NULL_POINTER);
+    int32_t taskId = 0;
+    std::string deviceId;
+    pkt >> taskId >> deviceId;
+    CHKR(!pkt.ChkRWError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
+    MMI_LOGI("OnStartRemoteInput end");
+    sptr<StartDInputCallback> callback(new StartDInputCallback(taskId, sess));
+    return DInputMgr->StartRemoteInput(deviceId ,callback);
+}
+
+int32_t OHOS::MMI::ServerMsgHandler::OnStopRemoteInput(SessionPtr sess, NetPacket& pkt)
+{
+    MMI_LOGI("OnStopRemoteInput begin");
+    CHKPR(sess, ERROR_NULL_POINTER);
+    int32_t taskId = 0;
+    std::string deviceId;
+    pkt >> taskId >> deviceId;
+    CHKR(!pkt.ChkRWError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
+    MMI_LOGI("OnStopRemoteInput end");
+    sptr<StopDInputCallback> callback(new StopDInputCallback(taskId, sess));
+    return DInputMgr->StopRemoteInput(deviceId ,callback);
+}

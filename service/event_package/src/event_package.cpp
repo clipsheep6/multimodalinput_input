@@ -38,6 +38,11 @@ int32_t EventPackage::PackageKeyEvent(struct libinput_event *event, std::shared_
 
     auto device = libinput_event_get_device(event);
     int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    if (deviceId < 0) {
+        deviceId = InputDevMgr->FindVirtualDeviceId(device);
+    }
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
     int32_t keyCode = static_cast<int32_t>(libinput_event_keyboard_get_key(data));
     auto Okey = KeyValueTransformationInput(keyCode);
     keyCode = static_cast<int32_t>(Okey.keyValueOfSys);

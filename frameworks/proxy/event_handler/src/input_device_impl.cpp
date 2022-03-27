@@ -70,5 +70,126 @@ void InputDeviceImpl::OnInputDeviceIds(int32_t userData, std::vector<int32_t> id
     iter->second(userData, ids);
     MMI_LOGD("end");
 }
+
+void InputDeviceImpl::GetVirtualDeviceIdsAsync(std::function<void(std::vector<int32_t>)> callback)
+{
+    MMI_LOGI("GetVirtualDeviceIdsAsync begin");
+    std::lock_guard<std::mutex> guard(mtx_);
+    virtualIdsRequests_.insert(std::pair<int32_t,
+        std::function<void(std::vector<int32_t>)>>(virtualIdsTaskId_, callback));
+    MMIEventHdl.GetVirtualDeviceIds(virtualIdsTaskId_);
+    virtualIdsTaskId_++;
+    MMI_LOGI("end");
+}
+
+void InputDeviceImpl::GetVirtualDeviceAsync(int32_t deviceId,
+    std::function<void(std::shared_ptr<InputDeviceInfo>)> callback)
+{
+    MMI_LOGI("GetVirtualDeviceAsync begin");
+    std::lock_guard<std::mutex> guard(mtx_);
+    virtualDevciceRequests_.insert(std::pair<int32_t,
+        std::function<void(std::shared_ptr<InputDeviceInfo>)>>(virtualDeviceTaskId_, callback));
+    MMIEventHdl.GetVirtualDevice(virtualDeviceTaskId_, deviceId);
+    virtualDeviceTaskId_++;
+    MMI_LOGI("end");
+}
+
+void InputDeviceImpl::OnVirtualDevice(int32_t taskId, int32_t id, std::string name, int32_t deviceType)
+{
+    MMI_LOGI("OnVirtualDevice begin");
+    auto inputDeviceInfo = std::make_shared<InputDeviceInfo>(id, name, deviceType);
+    inputDeviceInfo->id = id;
+    inputDeviceInfo->name = name;
+    inputDeviceInfo->devcieType = deviceType;
+
+    for (auto it = virtualDevciceRequests_.begin(); it != virtualDevciceRequests_.end(); it++) {
+        if (it->first == taskId) {
+            it->second(inputDeviceInfo);
+            break;
+        }
+    }
+    MMI_LOGI("end");
+}
+
+void InputDeviceImpl::OnVirtualDeviceIds(int32_t taskId, std::vector<int32_t> ids)
+{
+    MMI_LOGI("OnVirtualDeviceIds begin");
+    for (auto it = virtualIdsRequests_.begin(); it != virtualIdsRequests_.end(); it++) {
+        if (it->first == taskId) {
+            it->second(ids);
+            break;
+        }
+    }
+    MMI_LOGI("end");
+}
+
+void InputDeviceImpl::GetAllNodeDeviceInfo(std::function<void(std::vector<std::string>)> callback)
+{
+    MMI_LOGI("GetAllNodeDeviceInfo begin");
+    std::lock_guard<std::mutex> guard(mtx_);
+    nodeDeviceInfoRequests_.insert(std::pair<int32_t,
+        std::function<void(std::vector<std::string>)>>(nodeDeviceInfoTaskId_, callback));
+    MMIEventHdl.GetAllNodeDeviceInfo(nodeDeviceInfoTaskId_);
+    nodeDeviceInfoTaskId_++;
+    MMI_LOGI("end");
+}
+
+void InputDeviceImpl::OnGetAllNodeDeviceInfo(int32_t taskId, std::vector<std::string> ids)
+{
+    MMI_LOGI("OnVirtualDeviceIds begin");
+    for (auto it = nodeDeviceInfoRequests_.begin(); it != nodeDeviceInfoRequests_.end(); it++) {
+        if (it->first == taskId) {
+            it->second(ids);
+            break;
+        }
+    }
+    MMI_LOGI("end");
+}
+
+void InputDeviceImpl::ShowMouse(std::function<void(bool)> callback)
+{
+    MMI_LOGI("ShowMouse begin");
+    std::lock_guard<std::mutex> guard(mtx_);
+    showMouseRequests_.insert(std::pair<int32_t,
+        std::function<void(bool)>>(showMouseTaskId_, callback));
+    MMIEventHdl.ShowMouse(showMouseTaskId_);
+    showMouseTaskId_++;
+    MMI_LOGI("end");
+}
+
+void InputDeviceImpl::HideMouse(std::function<void(bool)> callback)
+{
+    MMI_LOGI("HideMouse begin");
+    std::lock_guard<std::mutex> guard(mtx_);
+    hideMouseRequests_.insert(std::pair<int32_t,
+        std::function<void(bool)>>(hideMouseTaskId_, callback));
+    MMIEventHdl.HideMouse(hideMouseTaskId_);
+    hideMouseTaskId_++;
+    MMI_LOGI("end");
+}
+
+void InputDeviceImpl::OnShowMouse(int32_t taskId)
+{
+    MMI_LOGI("ShowMouse begin");
+    for (auto it = showMouseRequests_.begin(); it != showMouseRequests_.end(); it++) {
+        if (it->first == taskId) {
+            it->second(true);
+            break;
+        }
+    }
+    MMI_LOGI("end");
+}
+
+void InputDeviceImpl::OnHideMouse(int32_t taskId)
+{
+    MMI_LOGI("HideMouse begin");
+    for (auto it = hideMouseRequests_.begin(); it != hideMouseRequests_.end(); it++) {
+        if (it->first == taskId) {
+            it->second(true);
+            break;
+        }
+    }
+    MMI_LOGI("end");
+}
 } // namespace MMI
 } // namespace OHOS

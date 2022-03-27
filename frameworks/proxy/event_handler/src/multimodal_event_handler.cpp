@@ -185,5 +185,146 @@ int32_t MultimodalEventHandler::AddInputEventTouchpadMontior(int32_t pointerEven
         MMI_LOGD("sendAdd msg Success");
     return RET_OK;
 }
+
+int32_t MultimodalEventHandler::GetVirtualDeviceIds(int32_t taskId)
+{
+    MMI_LOGD("MultimodalEventHandler::GetVirtualDeviceIds");
+    if (!InitClient()) {
+        return MMI_SERVICE_INVALID;
+    }
+    return EventManager.GetVirtualDeviceIds(taskId);
+}
+
+int32_t MultimodalEventHandler::GetVirtualDevice(int32_t taskId, int32_t deviceId)
+{
+    MMI_LOGD("MultimodalEventHandler::GetVirtualDevice");
+    if (!InitClient()) {
+        return MMI_SERVICE_INVALID;
+    }
+    return EventManager.GetVirtualDevice(taskId, deviceId);
+}
+
+int32_t MultimodalEventHandler::GetAllNodeDeviceInfo(int32_t taskId)
+{
+    MMI_LOGD("MultimodalEventHandler::GetAllNodeDeviceInfo");
+    if (!InitClient()) {
+        return MMI_SERVICE_INVALID;
+    }
+    
+    bool isSuc =  EventManager.GetAllNodeDeviceInfo(taskId);
+    if (isSuc)
+        MMI_LOGD("send ShowMouse msg Success");
+    return RET_OK;
+
+}
+
+int32_t MultimodalEventHandler::GetMouseLocation(int32_t taskId)
+{
+    MMI_LOGD("MultimodalEventHandler::GetMouseLocation");
+    if (!InitClient()) {
+    return MMI_SERVICE_INVALID;
+    }
+    return EventManager.GetMouseLocation(taskId);
+}
+
+int32_t MultimodalEventHandler::ShowMouse(int32_t taskId)
+{
+    MMI_LOGD("MultimodalEventHandler::ShowMouse");
+    if (!InitClient()) {
+        return MMI_SERVICE_INVALID;
+    }
+    NetPacket ck(MmiMessageId::SHOW_MOUSE);
+    ck << taskId;
+    bool isSuc = client_->SendMessage(ck);
+    if (isSuc) {
+        MMI_LOGD("send ShowMouse msg Success");
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalEventHandler::HideMouse(int32_t taskId)
+{
+    MMI_LOGD("MultimodalEventHandler::HideMouse");
+    if (!InitClient()) {
+        return MMI_SERVICE_INVALID;
+    }
+    NetPacket ck(MmiMessageId::HIDE_MOUSE);
+    ck << taskId;
+        bool isSuc = client_->SendMessage(ck);
+    if (isSuc)
+        MMI_LOGD("send HideMouse msg Success");
+    return RET_OK;
+}
+
+int32_t MultimodalEventHandler::PrepareRemoteInput(int32_t taskId, const std::string& deviceId)
+{
+    MMI_LOGD("MultimodalEventHandler::PrepareRemoteInput");
+    if (!InitClient()) {
+        return MMI_SERVICE_INVALID;
+    }
+    NetPacket ck(MmiMessageId::INPUT_PREPARE_REMOTE);
+    ck << taskId << deviceId;
+        bool isSuc = client_->SendMessage(ck);
+    if (isSuc)
+        MMI_LOGD("send PrepareRemoteInput msg Success");
+    return RET_OK;
+}
+
+int32_t MultimodalEventHandler::UnprepareRemoteInput(int32_t taskId, const std::string& deviceId)
+{
+    MMI_LOGD("MultimodalEventHandler::UnprepareRemoteInput");
+    if (!InitClient()) {
+        return MMI_SERVICE_INVALID;
+    }
+    NetPacket ck(MmiMessageId::INPUT_UNPREPARE_REMOTE);
+    ck << taskId << deviceId;
+        bool isSuc = client_->SendMessage(ck);
+    if (isSuc)
+        MMI_LOGD("send UnprepareRemoteInput msg Success");
+    return RET_OK;
+}
+
+int32_t MultimodalEventHandler::StartRemoteInput(int32_t taskId, const std::string& deviceId)
+{
+    MMI_LOGD("MultimodalEventHandler::StartRemoteInput");
+    if (!InitClient()) {
+        return MMI_SERVICE_INVALID;
+    }
+    NetPacket ck(MmiMessageId::INPUT_START_REMOTE);
+    ck << taskId << deviceId;
+        bool isSuc = client_->SendMessage(ck);
+    if (isSuc)
+        MMI_LOGD("send StartRemoteInput msg Success");
+    return RET_OK;
+}
+
+int32_t MultimodalEventHandler::StopRemoteInput(int32_t taskId, const std::string& deviceId)
+{
+    MMI_LOGD("MultimodalEventHandler::StopRemoteInput");
+    if (!InitClient()) {
+        return MMI_SERVICE_INVALID;
+    }
+    NetPacket ck(MmiMessageId::INPUT_STOP_REMOTE);
+    ck << taskId << deviceId;
+        bool isSuc = client_->SendMessage(ck);
+    if (isSuc)
+        MMI_LOGD("send StopRemoteInput msg Success");
+    return RET_OK;
+}
+
+int32_t MultimodalEventHandler::SimulateCrossLocation(int32_t taskId, int32_t x, int32_t y)
+{
+    MMI_LOGD("MultimodalEventHandler::SimulateCrossLocation");
+    if (!InitClient()) {
+        return MMI_SERVICE_INVALID;
+    }
+    NetPacket ck(MmiMessageId::SIMULATE_CROSS_LOCATION);
+    ck << taskId << x << y;
+        bool isSuc = client_->SendMessage(ck);
+    if (isSuc)
+        MMI_LOGD("send SimulateCrossLocation msg Success");
+    return RET_OK;
+}
+
 } // namespace MMI
 } // namespace OHOS
