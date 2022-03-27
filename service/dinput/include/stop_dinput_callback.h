@@ -23,13 +23,13 @@
 namespace OHOS {
 namespace MMI {
 class StopDInputCallback : public OHOS::DistributedHardware::DistributedInput::StopDInputCallbackStub {
-    public:
-        StopDInputCallback() {}
-        StopDInputCallback(const int32_t& taskId, SessionPtr& sess);
-        virtual ~StopDInputCallback() {}
-        void OnResult(const std::string& deviceId, const int32_t& status);
-        int32_t taskId_;
-        SessionPtr sess_;
+public:
+    StopDInputCallback() {}
+    StopDInputCallback(const int32_t& taskId, SessionPtr& sess);
+    virtual ~StopDInputCallback() {}
+    void OnResult(const std::string& deviceId, const int32_t& status);
+    int32_t taskId_;
+    SessionPtr sess_;
 };
 }  // namespace MMI
 }  // namespace OHOS

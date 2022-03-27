@@ -23,7 +23,6 @@ using namespace OHOS;
 using namespace MMI;
 using namespace OHOS::DistributedHardware::DistributedInput;
 namespace {
-
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerTest" };
 }
 
@@ -51,7 +50,7 @@ public:
     template<typename T>
     int32_t StartThread(const std::string& deviceId, sptr<T> callback)
     {
-        if (nullptr == callback) {
+        if (callback == nullptr) {
             return -1;
         }
         std::thread t([callback, deviceId](){
@@ -73,11 +72,10 @@ public:
         mockDInputManager_ = new MockDInputManager();
         std::shared_ptr<MockDInputManager> temp(mockDInputManager_);
         DInputManager::instance_ = temp;
-        sessionPtr = std::make_shared<UDSSession>("programName", 1,-1,1,1);
+        sessionPtr = std::make_shared<UDSSession>("programName", 1, -1, 1, 1);
     }
     void TearDown()
     {
-        MMI_LOGD("wuwu5");
         DInputMgr->DestroyInstance();
         mockDInputManager_ = nullptr;
         sessionPtr.reset();
@@ -89,22 +87,22 @@ public:
 
 HWTEST_F(DinputManagerTest, InputManagerTest_PrepareRemoteInput_001, TestSize.Level1)
 {
-    EXPECT_EQ(1,mockDInputManager_->PrepareRemoteInput(100 ,"id", sessionPtr));
+    EXPECT_EQ(1,mockDInputManager_->PrepareRemoteInput(100, "id", sessionPtr));
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 }
 HWTEST_F(DinputManagerTest, InputManagerTest_UnprepareRemoteInput_001, TestSize.Level1)
 {
-    EXPECT_EQ(1,mockDInputManager_->UnprepareRemoteInput(90 ,"id", sessionPtr));
+    EXPECT_EQ(1,mockDInputManager_->UnprepareRemoteInput(90, "id", sessionPtr));
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 }
 HWTEST_F(DinputManagerTest, InputManagerTest_StopRemoteInput_001, TestSize.Level1)
 {
-    EXPECT_EQ(1,mockDInputManager_->StopRemoteInput(80 ,"id", sessionPtr));
+    EXPECT_EQ(1,mockDInputManager_->StopRemoteInput(80, "id", sessionPtr));
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 }
 HWTEST_F(DinputManagerTest, InputManagerTest_StartRemoteInput_001, TestSize.Level1)
 {
-    EXPECT_EQ(1,mockDInputManager_->StartRemoteInput(70 ,"id", sessionPtr));
+    EXPECT_EQ(1,mockDInputManager_->StartRemoteInput(70, "id", sessionPtr));
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 }
 } // namespace

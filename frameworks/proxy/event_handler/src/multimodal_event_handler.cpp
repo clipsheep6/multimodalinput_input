@@ -224,7 +224,7 @@ int32_t MultimodalEventHandler::GetMouseLocation(int32_t taskId)
     if (!InitClient()) {
     return MMI_SERVICE_INVALID;
     }
-    return EventManager.GetMouseLocation(taskId);;
+    return EventManager.GetMouseLocation(taskId);
 }
 
 int32_t MultimodalEventHandler::ShowMouse(int32_t taskId)
@@ -236,8 +236,9 @@ int32_t MultimodalEventHandler::ShowMouse(int32_t taskId)
     NetPacket ck(MmiMessageId::SHOW_MOUSE);
     ck << taskId;
     bool isSuc = client_->SendMessage(ck);
-    if (isSuc)
+    if (isSuc) {
         MMI_LOGD("send ShowMouse msg Success");
+    }
     return RET_OK;
 }
 

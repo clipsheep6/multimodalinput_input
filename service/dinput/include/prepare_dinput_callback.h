@@ -23,13 +23,13 @@
 namespace OHOS {
 namespace MMI {
 class PrepareDInputCallback : public OHOS::DistributedHardware::DistributedInput::PrepareDInputCallbackStub {
-    public:
-        PrepareDInputCallback() {}
-        PrepareDInputCallback(const int32_t& taskId, SessionPtr &sess);
-        virtual ~PrepareDInputCallback() {}
-        void OnResult(const std::string& deviceId, const int32_t& status);
-        int32_t taskId_;
-        SessionPtr sess_;
+public:
+    PrepareDInputCallback() {}
+    PrepareDInputCallback(const int32_t& taskId, SessionPtr &sess);
+    virtual ~PrepareDInputCallback() {}
+    void OnResult(const std::string& deviceId, const int32_t& status);
+    int32_t taskId_;
+    SessionPtr sess_;
 };
 }  // namespace MMI
 }  // namespace OHOS

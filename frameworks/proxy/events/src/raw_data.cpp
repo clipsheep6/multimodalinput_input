@@ -1,12 +1,4 @@
 /*
- * @Descripttion: 
- * @version: 
- * @Author: sueRimn
- * @Date: 2022-01-30 15:51:29
- * @LastEditors: sueRimn
- * @LastEditTime: 2022-02-08 16:24:58
- */
-/*
  * Copyright (c) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +17,6 @@
 
 namespace OHOS {
 namespace MMI {
-
-
 OHOS::MMI::RawData::RawData() {}
 OHOS::MMI::RawData::~RawData() {}
 OHOS::MMI::RawData::RawData(const int32_t dx, const int32_t dy)

@@ -41,11 +41,10 @@ std::string DInputManager::GetDeviceId()
 int32_t DInputManager::PrepareRemoteInput(const std::string& deviceId, sptr<PrepareDInputCallback> callback) {
     MMI_LOGI("DInputManager::PrepareRemoteInput deviceId = %{public}s", deviceId.c_str());
     if (!deviceId.empty()) {
-         deviceId_ = deviceId;
-    } 
-    else {
+        deviceId_ = deviceId;
+    } else {
         std::vector<std::string> ids = InputDevMgr->GetAllNodeDeviceInfoFromDM();
-        if(ids.size() > 0){
+        if(ids.size() > 0) {
             deviceId_ = ids[0];
         }
     }
@@ -58,15 +57,12 @@ int32_t DInputManager::UnPrepareRemoteInput(const std::string& deviceId, sptr<Un
     return OHOS::DistributedHardware::DistributedInput::DistributedInputKit::UnprepareRemoteInput(deviceId, callback);
 }
 
-
 int32_t DInputManager::StartRemoteInput(const std::string& deviceId, sptr<StartDInputCallback> callback) {
     return OHOS::DistributedHardware::DistributedInput::DistributedInputKit::StartRemoteInput(deviceId, callback);
 }
 
-
 int32_t DInputManager::StopRemoteInput(const std::string& deviceId, sptr<StopDInputCallback> callback) {
     return OHOS::DistributedHardware::DistributedInput::DistributedInputKit::StopRemoteInput(deviceId, callback);
 }
-
 }
 }

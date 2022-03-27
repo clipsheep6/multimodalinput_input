@@ -44,5 +44,5 @@ private:
     int32_t dy_ = 0;
 };
 }
-}// namespace OHOS::MMI
+} // namespace OHOS::MMI
 #endif // OHOS_MULTIMDOALINPUT_RAW_DATA_H

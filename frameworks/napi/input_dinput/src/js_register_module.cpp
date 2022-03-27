@@ -80,7 +80,7 @@ static napi_value ShowMouse(napi_env env, napi_callback_info info)
     work->data = (void*)cb;
     auto *instance = InputManager::GetInstance();
     instance->ShowMouse([work](bool returnResult) {
-    JsRegisterModule::HandleCallBack(work, returnResult);
+        JsRegisterModule::HandleCallBack(work, returnResult);
     });
     MMI_LOGI("ShowMouse end");
     return nullptr;
@@ -170,42 +170,14 @@ static napi_value GetVirtualDeviceIdListAsync(napi_env env, napi_callback_info i
             work = nullptr;
 
             napi_value typeArr;
-            if (napi_create_array(env, &typeArr) != napi_ok) {
-                napi_throw_error(env, nullptr, 
-                     "GetVirtualDeviceIdListAsync:uv_queue_work call to napi_create_array failed");
-                return;
-            }
+            napi_create_array(env, &typeArr);
             napi_value returnResult_;
             for (size_t i = 0; i < returnResult.size(); i++) {
-                if (napi_create_int32(env, returnResult[i], &returnResult_) != napi_ok) {
-                    napi_throw_error(env, nullptr,
-                        "GetVirtualDeviceIdListAsync:uv_queue_work call to napi_create_string_utf8 failed");
-                    return;
-                }
-                if (napi_set_element(env, typeArr, i, returnResult_) != napi_ok) {
-                    napi_throw_error(env, nullptr,
-                        "GetVirtualDeviceIdListAsync:uv_queue_work call to napi_set_element failed");
-                }
+                napi_create_int32(env, returnResult[i], &returnResult_);
+                napi_set_element(env, typeArr, i, returnResult_);
             }
-            napi_value handler;
-            if (napi_get_reference_value(env, handleRef, &handler) != napi_ok) {
-                napi_throw_error(env, nullptr,
-                    "GetVirtualDeviceIdListAsync:uv_queue_work call to napi_get_reference_value failed");
-                return;
-            }
+            JsRegisterModule::CallFunction(env, handleRef, typeArr);
 
-            napi_value result;
-            if (napi_call_function(env, nullptr, handler, PARAMETER_NUM, &typeArr, &result) != napi_ok) {
-                napi_throw_error(env, nullptr,
-                    "GetVirtualDeviceIdListAsync:uv_queue_work call to napi_call_function failed");
-                return;
-            }
-            uint32_t refCount {0};
-            if (napi_reference_unref(env, handleRef, &refCount) != napi_ok) {
-                napi_throw_error(env, nullptr,
-                    "GetVirtualDeviceIdListAsync:uv_queue_work call to napi_reference_unref failed");
-                return;
-            }
             MMI_LOGI("uv_queue_work end");
         });
     });
@@ -219,9 +191,7 @@ static napi_value GetVirtualDeviceAsync(napi_env env, napi_callback_info info)
     MMI_LOGI("begin");
     int32_t deviceId;
     napi_ref handlerRef {nullptr};
-    MMI_LOGI("GetParameter begin");
     JsRegisterModule::GetParameter(env, info, deviceId, handlerRef);
-    MMI_LOGI("GetParameter end");
     auto* cb = new CallbackInfo<std::shared_ptr<InputDeviceImpl::InputDeviceInfo>>;
     cb->env = env;
 
@@ -234,7 +204,6 @@ static napi_value GetVirtualDeviceAsync(napi_env env, napi_callback_info info)
     uv_work_t* work = new uv_work_t;
     work->data = (void*)cb;
     auto *ins = InputManager::GetInstance();
-    MMI_LOGI("InputManager::GetVirtualDeviceAsync begin");
     ins->GetVirtualDeviceAsync(deviceId, [work](std::shared_ptr<InputDeviceImpl::InputDeviceInfo> returnResult) {
         auto callbackInfo = (CallbackInfo<std::shared_ptr<InputDeviceImpl::InputDeviceInfo>>*)work->data;
         callbackInfo->returnResult = returnResult;
@@ -249,55 +218,13 @@ static napi_value GetVirtualDeviceAsync(napi_env env, napi_callback_info info)
             cbInfo = nullptr;
             work = nullptr;
 
-            napi_value id_;
-            if (napi_create_int32(env, returnResult->id, &id_) != napi_ok) {
-                napi_throw_error(env, nullptr, ":uv_queue_work call to napi_create_int32 failed");
-                return;
-            }
-            napi_value name_;
-            if (napi_create_string_utf8(env, (returnResult->name).c_str(), NAPI_AUTO_LENGTH, &name_) 
-                != napi_ok) {
-                napi_throw_error(env, nullptr, "uv_queue_work call to napi_create_string_utf8 failed");
-                return;
-            }
-            napi_value devcieType_;
-            if (napi_create_int32(env, returnResult->devcieType, &devcieType_) != napi_ok) {
-                napi_throw_error(env, nullptr, "uv_queue_work call to napi_create_int32 failed");
-                return;
-            }
             napi_value object;
-            if (napi_create_object(env, &object) != napi_ok) {
-                napi_throw_error(env, nullptr, "uv_queue_work call to napi_create_object failed");
-                return;
-            }
-            if (napi_set_named_property(env, object, "id", id_) != napi_ok) {
-                napi_throw_error(env, nullptr, "uv_queue_work call to napi_set_named_property failed");
-                return;
-            }
-            if (napi_set_named_property(env, object, "name", name_) != napi_ok) {
-                napi_throw_error(env, nullptr, "uv_queue_work call to napi_set_named_property failed");
-                return;
-            }
-            if (napi_set_named_property(env, object, "devcieType", devcieType_) != napi_ok) {
-            napi_throw_error(env, nullptr, "uv_queue_work call to napi_set_named_property failed");
-            return;
-            }
-            napi_value handler;
-            if (napi_get_reference_value(env, handleRef, &handler) != napi_ok) {
-                napi_throw_error(env, nullptr, "uv_queue_work call to napi_get_reference_value failed");
-                return;
-            }
 
-            napi_value result;
-            if (napi_call_function(env, nullptr, handler, PARAMETER_NUM, &object, &result) != napi_ok) {
-                napi_throw_error(env, nullptr, "uv_queue_work call to napi_call_function failed");
-                return;
-            }
-            uint32_t refCount {0};
-            if (napi_reference_unref(env, handleRef, &refCount) != napi_ok) {
-                napi_throw_error(env, nullptr, "uv_queue_work call to napi_reference_unref failed");
-                return;
-            }
+            napi_create_object(env, &object);
+            JsRegisterModule::SetValueInt32(env, "id", returnResult->id, object);
+            JsRegisterModule::SetValueUtf8String(env, "name", returnResult->name, object);
+            JsRegisterModule::SetValueInt32(env, "devcieType", returnResult->devcieType, object);
+            JsRegisterModule::CallFunction(env, handleRef, object);
             MMI_LOGI("uv_queue_work end");
         });
     });
@@ -338,38 +265,13 @@ static napi_value GetAllNodeDeviceInfo(napi_env env, napi_callback_info info)
             work = nullptr;
 
             napi_value typeArr;
-            if (napi_create_array(env, &typeArr) != napi_ok) {
-                napi_throw_error(env, nullptr, "uv_queue_work call to napi_create_array failed");
-                return;
-            }
+            napi_create_array(env, &typeArr);
             napi_value returnResult_;
             for (size_t i = 0; i < returnResult.size(); i++) {
-                MMI_LOGI("returnResult %{public}d, deviceId =  %{public}s", i, returnResult[i].c_str());
-                if (napi_create_string_utf8(env, returnResult[i].c_str(), NAPI_AUTO_LENGTH, &returnResult_)
-                        != napi_ok) {
-                    napi_throw_error(env, nullptr, "uv_queue_work call to napi_create_string_utf8 failed");
-                    return;
-                }            
-                if (napi_set_element(env, typeArr, i, returnResult_) != napi_ok) {
-                    napi_throw_error(env, nullptr, "uv_queue_work call to napi_set_element failed");
-                }
+                napi_create_string_utf8(env, returnResult[i].c_str(), NAPI_AUTO_LENGTH, &returnResult_);
+                napi_set_element(env, typeArr, i, returnResult_);
             }
-            napi_value handler;
-            if (napi_get_reference_value(env, handleRef, &handler) != napi_ok) {
-                napi_throw_error(env, nullptr, "uv_queue_work call to napi_get_reference_value failed");
-                return;
-            }
-
-            napi_value result;
-            if (napi_call_function(env, nullptr, handler, PARAMETER_NUM, &typeArr, &result) != napi_ok) {
-                napi_throw_error(env, nullptr, "uv_queue_work call to napi_call_function failed");
-                return;
-            }
-            uint32_t refCount {0};
-            if (napi_reference_unref(env, handleRef, &refCount) != napi_ok) {
-                napi_throw_error(env, nullptr, "uv_queue_work call to napi_reference_unref failed");
-                return;
-            }
+            JsRegisterModule::CallFunction(env, handleRef, typeArr);
             MMI_LOGI("uv_queue_work end");
         });
     });
@@ -408,118 +310,18 @@ static napi_value GetMouseLocation(napi_env env, napi_callback_info info)
             cbInfo = nullptr;
             work = nullptr;
 
-            napi_value globalX_;
-            napi_value globalY_;
-            napi_value dx_;
-            napi_value dy_;
-            napi_value displayId_;
-            napi_value logicalDisplayWidth_;
-            napi_value logicalDisplayHeight_;
-            napi_value logicalDisplayTopLeftX_;
-            napi_value logicalDisplayTopLeftY_;
-            MMI_LOGI("GetMouseLocation: globalX = %{public}d, globalY = %{public}d, dx = %{public}d,"
-            "dy = %{public}d, displayId = %{public}d,logicalDisplayWidth = %{public}d,"
-            "logicalDisplayHeight = %{public}d, logicalDisplayTopLeftX = %{public}d,"
-            "logicalDisplayTopLeftY = %{public}d",
-            returnResult->globalX, returnResult->globalY, returnResult->dx, returnResult->dy, 
-            returnResult->displayId, returnResult->logicalDisplayWidth, returnResult->logicalDisplayHeight,
-            returnResult->logicalDisplayTopLeftX, returnResult->logicalDisplayTopLeftY);
-
-            if (napi_create_int32(env, returnResult->globalX, &globalX_) != napi_ok) {
-                napi_throw_error(env, nullptr, "uv_queue_work call to napi_create_int32 failed");
-                return;
-            }
-            if (napi_create_int32(env, returnResult->globalY, &globalY_) != napi_ok) {
-                napi_throw_error(env, nullptr, "uv_queue_work call to napi_create_int32 failed");
-                return;
-            }
-            if (napi_create_int32(env, returnResult->dx, &dx_) != napi_ok) {
-                napi_throw_error(env, nullptr, "uv_queue_work call to napi_create_int32 failed");
-                return;
-            }
-            if (napi_create_int32(env, returnResult->dy, &dy_) != napi_ok) {
-                napi_throw_error(env, nullptr, "uv_queue_work call to napi_create_int32 failed");
-                return;
-            }
-            if (napi_create_int32(env, returnResult->displayId, &displayId_) != napi_ok) {
-                napi_throw_error(env, nullptr, "uv_queue_work call to napi_create_int32 failed");
-                return;
-            }
-            if (napi_create_int32(env, returnResult->logicalDisplayWidth, &logicalDisplayWidth_) != napi_ok) {
-                napi_throw_error(env, nullptr, "uv_queue_work call to napi_create_int32 failed");
-                return;
-            }
-            if (napi_create_int32(env, returnResult->logicalDisplayHeight, &logicalDisplayHeight_) != napi_ok) {
-                napi_throw_error(env, nullptr, "uv_queue_work call to napi_create_int32 failed");
-                return;
-            }
-            if (napi_create_int32(env, returnResult->logicalDisplayTopLeftX, &logicalDisplayTopLeftX_) != napi_ok) {
-                napi_throw_error(env, nullptr, "uv_queue_work call to napi_create_int32 failed");
-                return;
-            }
-            if (napi_create_int32(env, returnResult->logicalDisplayTopLeftY, &logicalDisplayTopLeftY_) != napi_ok) {
-                napi_throw_error(env, nullptr, "uv_queue_work call to napi_create_int32 failed");
-                return;
-            }
             napi_value object;
-            if (napi_create_object(env, &object) != napi_ok) {
-                napi_throw_error(env, nullptr, "uv_queue_work call to napi_create_object failed");
-                return;
-            }
-            if (napi_set_named_property(env, object, "globleX", globalX_) != napi_ok) {
-                napi_throw_error(env, nullptr, "uv_queue_work call to napi_set_named_property failed");
-                return;
-            }
-
-            if (napi_set_named_property(env, object, "globleY", globalY_) != napi_ok) {
-                napi_throw_error(env, nullptr, "uv_queue_work call to napi_set_named_property failed");
-                return;
-            }
-            if (napi_set_named_property(env, object, "dx", dx_) != napi_ok) {
-                napi_throw_error(env, nullptr, "uv_queue_work call to napi_set_named_property failed");
-                return;
-            }
-            if (napi_set_named_property(env, object, "dy", dy_) != napi_ok) {
-                napi_throw_error(env, nullptr, "uv_queue_work call to napi_set_named_property failed");
-                return;
-            }
-            if (napi_set_named_property(env, object, "displayId", displayId_) != napi_ok) {
-                napi_throw_error(env, nullptr, "uv_queue_work call to napi_set_named_property failed");
-                return;
-            }
-
-            if (napi_set_named_property(env, object, "logicalDisplayWidth", logicalDisplayWidth_) != napi_ok) {
-                napi_throw_error(env, nullptr, "uv_queue_work call to napi_set_named_property failed");
-                return;
-            }
-            if (napi_set_named_property(env, object, "logicalDisplayHeight", logicalDisplayHeight_) != napi_ok) {
-                napi_throw_error(env, nullptr, "uv_queue_work call to napi_set_named_property failed");
-                return;
-            }
-            if (napi_set_named_property(env, object, "logicalDisplayTopLeftX", logicalDisplayTopLeftX_) != napi_ok) {
-                napi_throw_error(env, nullptr, "uv_queue_work call to napi_set_named_property failed");
-                return;
-            }
-            if (napi_set_named_property(env, object, "logicalDisplayTopLeftY", logicalDisplayTopLeftY_) != napi_ok) {
-                napi_throw_error(env, nullptr, "uv_queue_work call to napi_set_named_property failed");
-                return;
-            }
-            napi_value handler;
-            if (napi_get_reference_value(env, handleRef, &handler) != napi_ok) {
-                napi_throw_error(env, nullptr, "uv_queue_work call to napi_get_reference_value failed");
-                return;
-            }
-
-            napi_value result;
-            if (napi_call_function(env, nullptr, handler, PARAMETER_NUM, &object, &result) != napi_ok) {
-                napi_throw_error(env, nullptr, "GetMouseLocation:uv_queue_work call to napi_call_function failed");
-                return;
-            }
-            uint32_t refCount {0};
-            if (napi_reference_unref(env, handleRef, &refCount) != napi_ok) {
-                napi_throw_error(env, nullptr, "uv_queue_work call to napi_reference_unref failed");
-                return;
-            }
+            napi_create_object(env, &object);
+            JsRegisterModule::SetValueInt32(env, "globleX", returnResult->globalX, object);
+            JsRegisterModule::SetValueInt32(env, "globleY", returnResult->globalY, object);
+            JsRegisterModule::SetValueInt32(env, "dx", returnResult->dx, object);
+            JsRegisterModule::SetValueInt32(env, "dy", returnResult->dy, object);
+            JsRegisterModule::SetValueInt32(env, "displayId", returnResult->displayId, object);
+            JsRegisterModule::SetValueInt32(env, "logicalDisplayWidth", returnResult->logicalDisplayWidth, object);
+            JsRegisterModule::SetValueInt32(env, "logicalDisplayHeight", returnResult->logicalDisplayHeight, object);
+            JsRegisterModule::SetValueInt32(env, "logicalDisplayTopLeftX", returnResult->logicalDisplayTopLeftX, object);
+            JsRegisterModule::SetValueInt32(env, "logicalDisplayTopLeftY", returnResult->logicalDisplayTopLeftY, object);
+            JsRegisterModule::CallFunction(env, handleRef, object);
             MMI_LOGI("uv_queue_work end");
         });
     });
@@ -583,6 +385,7 @@ static napi_value StartRemoteInput(napi_env env, napi_callback_info info)
     MMI_LOGI("StartRemoteInput end");
     return nullptr;
 }
+
 static napi_value StopRemoteInput(napi_env env, napi_callback_info info)
 {
     MMI_LOGI("StopRemoteInput begin");
@@ -632,6 +435,39 @@ static napi_value SimulateCrossLocation(napi_env env, napi_callback_info info)
     });
     MMI_LOGI("SimulateCrossLocation end");
     return nullptr;
+}
+
+void JsRegisterModule::CallFunction(napi_env env, napi_ref& handleRef, napi_value& object)
+{
+    napi_value handler;
+    napi_get_reference_value(env, handleRef, &handler);
+    napi_value result;
+    if (handler != nullptr) {
+        napi_call_function(env, nullptr, handler, PARAMETER_NUM, &object, &result);
+    } else {
+        MMI_LOGI("handler is nullptr");
+    }
+    uint32_t refCount {0};
+    if (napi_reference_unref(env, handleRef, &refCount) != napi_ok) {
+        napi_throw_error(env, nullptr, "uv_queue_work call to napi_reference_unref failed");
+        return;
+    }
+}
+
+void JsRegisterModule::SetValueInt32(const napi_env &env, const std::string &fieldStr, const int32_t intValue,
+    napi_value &result)
+{
+    napi_value value = nullptr;
+    napi_create_int32(env, intValue, &value);
+    napi_set_named_property(env, result, fieldStr.c_str(), value);
+}
+
+void JsRegisterModule::SetValueUtf8String(const napi_env &env, const std::string &fieldStr, const std::string &str,
+                                           napi_value &result)
+{
+    napi_value value = nullptr;
+    napi_create_string_utf8(env, str.c_str(), NAPI_AUTO_LENGTH, &value);
+    napi_set_named_property(env, result, fieldStr.c_str(), value);
 }
 
 void JsRegisterModule::GetParameter(napi_env env, napi_callback_info info, std::string& first, napi_ref& second)

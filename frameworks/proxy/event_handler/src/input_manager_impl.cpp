@@ -464,8 +464,7 @@ void InputManagerImpl::HideMouse(std::function<void(bool)> callback)
 {
     if (callback == nullptr) {
         MMI_LOGE("InputManagerImpl::%{public}s param should not be null!", __func__);
-    }
-    else {
+    } else {
         InputDeviceImpl::GetInstance().HideMouse(callback);
     }
 }
@@ -474,7 +473,7 @@ void InputManagerImpl::ShowMouse(std::function<void(bool)> callback)
 {
     if (callback == nullptr) {
         MMI_LOGE("InputManagerImpl::%{public}s param should not be null!", __func__);
-    }else {
+    } else {
         InputDeviceImpl::GetInstance().ShowMouse(callback);
     }
 }

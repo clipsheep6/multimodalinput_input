@@ -29,8 +29,8 @@ StartDInputCallback::StartDInputCallback(const int32_t& taskId, SessionPtr& sess
 }
 
 
-void StartDInputCallback::OnResult(const std::string& deviceId,const int32_t& status)
-{
+void StartDInputCallback::OnResult(const std::string& deviceId, const int32_t& status)
+{ 
     MMI_LOGI("StartDInputCallback::OnResult");
     NetPacket pkt2(MmiMessageId::INPUT_START_REMOTE);
     CHK(pkt2.Write(taskId_), STREAM_BUF_WRITE_FAIL);

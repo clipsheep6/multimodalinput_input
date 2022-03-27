@@ -28,7 +28,7 @@ UnprepareDInputCallback::UnprepareDInputCallback(const int32_t& taskId, SessionP
     sess_ = sess;
 }
 
-void UnprepareDInputCallback::OnResult(const std::string& deviceId,const int32_t& status)
+void UnprepareDInputCallback::OnResult(const std::string& deviceId, const int32_t& status)
 {
     MMI_LOGI("UnprepareDInputCallback::OnResult");
     NetPacket pkt2(MmiMessageId::INPUT_UNPREPARE_REMOTE);

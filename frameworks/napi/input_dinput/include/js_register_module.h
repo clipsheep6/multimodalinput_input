@@ -1,12 +1,4 @@
 /*
- * @Descripttion: 
- * @version: 
- * @Author: sueRimn
- * @Date: 2022-02-11 15:10:15
- * @LastEditors: sueRimn
- * @LastEditTime: 2022-02-18 08:59:15
- */
-/*
  * Copyright (c) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +37,12 @@ public:
     static void GetParameter(napi_env env, napi_callback_info info, int32_t& first, int32_t& second, napi_ref& third);
     static void HandleCallBack(uv_work_t* work, bool returnResult);
     static void HandleCallBack(uv_work_t* work, int32_t returnResult);
+    static void CallFunction(napi_env env, napi_ref& handleRef, napi_value& object);
+    static void SetValueInt32(const napi_env& env, const std::string& fieldStr, const int32_t intValue,
+        napi_value &result);
+    static void SetValueUtf8String(const napi_env &env, const std::string &fieldStr,
+        const std::string &str, napi_value &result);
+
 
 };
 template <class T>

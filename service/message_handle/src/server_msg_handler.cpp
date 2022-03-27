@@ -530,7 +530,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnInputVirtualDevice(SessionPtr sess, NetPa
     int32_t deviceType = -1;
     if (inputDevice == nullptr) {
         MMI_LOGI("Input virtual device not found.");
-    }else {
+    } else {
         int32_t id = inputDevice->GetId();
         std::string name = inputDevice->GetName();
         int32_t deviceType = inputDevice->GetType();
@@ -563,7 +563,6 @@ int32_t OHOS::MMI::ServerMsgHandler::OnGetAllNodeDeviceInfo(SessionPtr sess, Net
     for (auto it : ids) {
         CHKR(pkt2.Write(it), STREAM_BUF_WRITE_FAIL, RET_ERR);
     }
-
     if (!sess->SendMsg(pkt2)) {
         MMI_LOGE("Sending failed!\n");
         return MSG_SEND_FAIL;

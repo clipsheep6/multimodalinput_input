@@ -28,7 +28,7 @@ PrepareDInputCallback::PrepareDInputCallback(const int32_t& taskId, SessionPtr &
     sess_ = sess;
 }
 
-void PrepareDInputCallback::OnResult(const std::string& deviceId,const int32_t& status)
+void PrepareDInputCallback::OnResult(const std::string& deviceId, const int32_t& status)
 {
     MMI_LOGI("PrepareDInputCallback::OnResult");
     NetPacket pkt2(MmiMessageId::INPUT_PREPARE_REMOTE);

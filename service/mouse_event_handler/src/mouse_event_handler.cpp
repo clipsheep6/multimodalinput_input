@@ -164,7 +164,8 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
     MMI_LOGD("leave");
 }
 
-void MouseEventHandler::SetDxDyForDInput(PointerEvent::PointerItem& pointerItem, libinput_event_pointer* data){
+void MouseEventHandler::SetDxDyForDInput(PointerEvent::PointerItem& pointerItem, libinput_event_pointer* data)
+{
     double dx = libinput_event_pointer_get_dx(data);
     double dy = libinput_event_pointer_get_dy(data);
     int32_t rawDataDx = static_cast<int32_t>(dx);
@@ -175,9 +176,9 @@ void MouseEventHandler::SetDxDyForDInput(PointerEvent::PointerItem& pointerItem,
     MMI_LOGD("MouseEventHandler SetDxDyForDInput : dx:%{public}d, dy:%{public}d", rawDataDx, rawDataDy);       
 }
 
-void MouseEventHandler::SetAbsolutionLocation(double absX,double absY)
+void MouseEventHandler::SetAbsolutionLocation(double absX, double absY)
 {
-    MMI_LOGD("MouseEventHandler cross screen location : x:%{public}lf, y:%{public}lf", absX, absY);        
+    MMI_LOGD("MouseEventHandler cross screen location : x:%{public}lf, y:%{public}lf", absX, absY);
     absolutionX_ = absX;
     absolutionY_ = absY;
 
@@ -187,7 +188,7 @@ void MouseEventHandler::SetAbsolutionLocation(double absX,double absY)
     int32_t globalX = WinMgr->GetMouseInfo().globalX;
     int32_t globalY = WinMgr->GetMouseInfo().globalY;
 
-    PointerDrawMgr->DrawPointer(displayId,globalX,globalY);
+    PointerDrawMgr->DrawPointer(displayId, globalX, globalY);
     WinMgr->ShowMouse();
 }
 
@@ -222,8 +223,7 @@ void MouseEventHandler::Normalize(struct libinput_event *event)
     int32_t deviceId = InputDevMgr->FindInputDeviceId(libinput_event_get_device(event));
 
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
-    if ( deviceId < 0 )
-    {
+    if (deviceId < 0) {
         deviceId = InputDevMgr->FindVirtualDeviceId(libinput_event_get_device(event));
     }
 #endif

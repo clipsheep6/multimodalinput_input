@@ -28,7 +28,7 @@ StopDInputCallback::StopDInputCallback(const int32_t& taskId, SessionPtr& sess)
     sess_ = sess;
 }
 
-void StopDInputCallback::OnResult(const std::string& deviceId,const int32_t& status)
+void StopDInputCallback::OnResult(const std::string& deviceId, const int32_t& status)
 {
     MMI_LOGI("StopDInputCallback::OnResult");
     NetPacket pkt2(MmiMessageId::INPUT_STOP_REMOTE);

@@ -191,6 +191,5 @@ void InputDeviceImpl::OnHideMouse(int32_t taskId)
     }
     MMI_LOGI("end");
 }
-
 } // namespace MMI
 } // namespace OHOS

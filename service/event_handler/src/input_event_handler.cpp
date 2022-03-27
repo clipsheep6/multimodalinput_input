@@ -233,8 +233,7 @@ int32_t InputEventHandler::OnEventDeviceAdded(const multimodal_libinput_event& e
     MMI_LOGD("Distribute_Input On Mode,Add Device Name:%{public}s", vDeviceName.c_str());
 
     std::string::size_type pos = vDeviceName.find(VIRTUAL_DEVICE_NAME);
-    if (pos != vDeviceName.npos)
-    {
+    if (pos != vDeviceName.npos) {
         InputDevMgr->OnVirtualDeviceAdded(device);
         return RET_OK;
     }

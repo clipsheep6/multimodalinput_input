@@ -41,8 +41,8 @@ struct DMouseLocation {
 
 class DInputManager : public DelayedSingleton<DInputManager> {
 public:
-    DInputManager();
-    virtual ~DInputManager();
+    DInputManager() {}
+    virtual ~DInputManager() {}
     void SetMouseLocation(DMouseLocation info);
     DMouseLocation& GetMouseLocation();
     std::vector<int32_t> GetInputVirtualDeviceIds();

@@ -118,7 +118,7 @@ public:
         int32_t& logicalX, int32_t& logicalY);
     void AdjustCoordinate(double &coordinateX, double &coordinateY);
 
-    //分布式输入添加
+    // 分布式输入添加
     void ShowMouse();
     void HideMouse();
     int32_t GetDisplayIdBySeatId(std::string seatId);

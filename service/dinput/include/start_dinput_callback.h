@@ -24,13 +24,13 @@
 namespace OHOS {
 namespace MMI {
 class StartDInputCallback : public OHOS::DistributedHardware::DistributedInput::StartDInputCallbackStub {
-    public:
-        StartDInputCallback() {}
-        StartDInputCallback(const int32_t& taskId, SessionPtr& sess);
-        virtual ~StartDInputCallback() {}
-        void OnResult(const std::string& deviceId, const int32_t& status);
-        int32_t taskId_;
-        SessionPtr sess_;
+public:
+    StartDInputCallback() {}
+    StartDInputCallback(const int32_t& taskId, SessionPtr& sess);
+    virtual ~StartDInputCallback() {}
+    void OnResult(const std::string& deviceId, const int32_t& status);
+    int32_t taskId_;
+    SessionPtr sess_;
 };
 }  // namespace MMI
 }  // namespace OHOS
