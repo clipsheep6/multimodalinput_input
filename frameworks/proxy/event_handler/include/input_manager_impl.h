@@ -17,7 +17,10 @@
 #define INPUT_MANAGER_IMPL_H
 
 #include <vector>
+
+#include "nocopyable.h"
 #include "singleton.h"
+#include "dinput_manager.h"
 #include "display_info.h"
 #include "i_input_event_consumer.h"
 #include "pointer_event.h"
@@ -25,6 +28,7 @@
 #include "net_packet.h"
 #include "if_client_msg_handler.h"
 #include "event_filter_service.h"
+#include "input_device_impl.h"
 #include "input_monitor_manager.h"
 #include "input_interceptor_manager.h"
 
@@ -60,12 +64,32 @@ public:
     void SimulateInputEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent);
     void OnConnected();
 
+    void GetVirtualDeviceIdListAsync(std::function<void(std::vector<int32_t>)> callback);
+    void OnVirtualDeviceIds(int32_t taskId, std::vector<int32_t> ids);
+    void GetVirtualDeviceAsync(int32_t deviceId,
+        std::function<void(std::shared_ptr<InputDeviceImpl::InputDeviceInfo>)> callback);
+    void OnVirtualDevice(int32_t taskId, int32_t id, std::string name, int32_t deviceType);
+    void GetAllNodeDeviceInfo(std::function<void(std::vector<std::string>)> callback);
+    void OnGetAllNodeDeviceInfo(int32_t taskId, std::vector<std::string> ids);
+    void HideMouse(std::function<void(bool)> callback);
+    void ShowMouse(std::function<void(bool)> callback);
+    void GetMouseLocation(std::function<void(std::shared_ptr<DMouseLocation>)> callback);
+    void OnMouseLocation(int32_t taskId, std::shared_ptr<DMouseLocation> mouseLocation);
+    void PrepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
+    void OnPrepareRemoteInput(int32_t taskId, int32_t status);
+    void UnprepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
+    void OnUnprepareRemoteInput(int32_t taskId, int32_t status);
+    void StartRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
+    void OnStartRemoteInput(int32_t taskId, int32_t status);
+    void StopRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
+    void OnStopRemoteInput(int32_t taskId, int32_t status);
+    void SimulateCrossLocation(int32_t x, int32_t y, std::function<void(int32_t)> callback);
+    void OnCrossLocation(int32_t taskId, int32_t status);
 private:
     int32_t PackPhysicalDisplay(NetPacket &pkt);
     int32_t PackLogicalDisplay(NetPacket &pkt);
     void PrintDisplayDebugInfo();
     void SendDisplayInfo();
-
 private:
     sptr<EventFilterService> eventFilterService_ {nullptr};
     std::shared_ptr<OHOS::MMI::IInputEventConsumer> consumer_ = nullptr;
@@ -73,6 +97,14 @@ private:
     std::vector<LogicalDisplayInfo> logicalDisplays_;
     InputMonitorManager monitorManager_;
     InputInterceptorManager interceptorManager_;
+
+    std::mutex lk_;
+    std::map<int32_t, std::function<void(std::shared_ptr<DMouseLocation>)>> mouseLocationRequests_;
+    int32_t mouseLocationTaskId_ {1};
+    std::map<int32_t, std::function<void(int32_t)>> remoteInputStateRequests_;
+    int32_t remoteInputStateTaskId_ {1};
+    std::map<int32_t, std::function<void(int32_t)>> simulateCrossLocationRequests_;
+    int32_t simulateCrossLocationTaskId_ {1};
 };
 } // namespace MMI
 } // namespace OHOS

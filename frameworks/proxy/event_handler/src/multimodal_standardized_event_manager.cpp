@@ -170,6 +170,38 @@ int32_t MultimodalStandardizedEventManager::GetDevice(int32_t userData, int32_t 
     pkt << userData << deviceId;
     return SendMsg(pkt);
 }
+int32_t MultimodalStandardizedEventManager::GetVirtualDeviceIds(int32_t taskId)
+{
+    MMI_LOGD("MultimodalStandardizedEventManager:GetVirtualDeviceIds");
+    OHOS::MMI::NetPacket ckv(MmiMessageId::INPUT_VIRTUAL_DEVICE_IDS);
+    ckv << taskId;
+    return SendMsg(ckv);
+}
+
+int32_t MultimodalStandardizedEventManager::GetAllNodeDeviceInfo(int32_t taskId)
+{
+    MMI_LOGD("begin");
+    OHOS::MMI::NetPacket ckv(MmiMessageId::GET_ALL_NODE_DEVICE_INFO);
+    ckv << taskId;
+    return SendMsg(ckv);
+}
+
+int32_t MultimodalStandardizedEventManager::GetVirtualDevice(int32_t taskId, int32_t deviceId)
+{
+    MMI_LOGD("MultimodalStandardizedEventManager:GetVirtualDevice");
+    OHOS::MMI::NetPacket ckv(MmiMessageId::INPUT_VIRTUAL_DEVICE);
+    ckv << taskId << deviceId;
+    return SendMsg(ckv);
+}
+
+
+int32_t MultimodalStandardizedEventManager::GetMouseLocation(int32_t taskId)
+{
+    MMI_LOGD("MultimodalStandardizedEventManager:GetMouseLocation");
+    OHOS::MMI::NetPacket ckv(MmiMessageId::INPUT_MOUSE_LOCATION);
+    ckv << taskId;
+    return SendMsg(ckv);
+}
 
 bool MultimodalStandardizedEventManager::SendMsg(NetPacket& pkt) const
 {

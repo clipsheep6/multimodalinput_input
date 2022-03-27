@@ -243,6 +243,22 @@ void PointerDrawingManager::DrawManager()
     }
 }
 
+void PointerDrawingManager::ShowMouse()
+{
+    if (pointerWindow_ != nullptr) {
+        pointerWindow_->Show();
+    }
+    showMousePointer_ = true;
+}
+
+void PointerDrawingManager::HideMouse()
+{
+    if (pointerWindow_ != nullptr) {
+        pointerWindow_->Hide();
+    }
+    showMousePointer_ = false;
+}
+
 bool PointerDrawingManager::Init()
 {
     MMI_LOGD("enter");
