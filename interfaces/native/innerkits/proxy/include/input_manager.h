@@ -191,16 +191,17 @@ public:
      * @since 8
      */
     void GetVirtualDeviceIdListAsync(std::function<void(std::vector<int32_t>)> callback);
-    void GetVirtualDeviceAsync(int32_t deviceId, std::function<void(std::shared_ptr<InputDeviceImpl::InputDeviceInfo>)> callback);
+    void GetVirtualDeviceAsync(int32_t deviceId,
+        std::function<void(std::shared_ptr<InputDeviceImpl::InputDeviceInfo>)> callback);
     void GetAllNodeDeviceInfo(std::function<void(std::vector<std::string>)> callback);
     void HideMouse(std::function<void(bool)> callback);
     void ShowMouse(std::function<void(bool)> callback);
-    void GetMouseLocation(std::function<void(std::shared_ptr<DMouseLocation>)> callback );
-    void PrepareRemoteInput(const std::string& deviceId ,std::function<void(int32_t)> callback);
-    void UnprepareRemoteInput(const std::string& deviceId ,std::function<void(int32_t)> callback);
-    void StartRemoteInput(const std::string& deviceId ,std::function<void(int32_t)> callback);
-    void StopRemoteInput(const std::string& deviceId ,std::function<void(int32_t)> callback);
-    void SimulateCrossLocation(int32_t x,int32_t y,std::function<void(int32_t)> callback);
+    void GetMouseLocation(std::function<void(std::shared_ptr<DMouseLocation>)> callback);
+    void PrepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
+    void UnprepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
+    void StartRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
+    void StopRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
+    void SimulateCrossLocation(int32_t x, int32_t y, std::function<void(int32_t)> callback);
 
 private:
     InputManager() = default;

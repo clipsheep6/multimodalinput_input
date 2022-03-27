@@ -26,7 +26,6 @@
 
 namespace OHOS {
 namespace MMI {
-
 struct DMouseLocation {
     int32_t globalX;
     int32_t globalY;

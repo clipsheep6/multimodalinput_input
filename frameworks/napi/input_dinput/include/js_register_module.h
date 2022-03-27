@@ -29,7 +29,7 @@
 namespace OHOS {
 namespace MMI {
 #define IM_NAPI_BUF_LENGTH (256)
-class JsRegisterModule{
+class JsRegisterModule {
 public:
     static void GetParameter(napi_env env, napi_callback_info info, napi_ref& first);
     static void GetParameter(napi_env env, napi_callback_info info, int32_t& first, napi_ref& second);
@@ -42,8 +42,6 @@ public:
         napi_value &result);
     static void SetValueUtf8String(const napi_env &env, const std::string &fieldStr,
         const std::string &str, napi_value &result);
-
-
 };
 template <class T>
 class CallbackInfo {

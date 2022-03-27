@@ -228,7 +228,7 @@ int32_t InputEventHandler::OnEventDeviceAdded(const multimodal_libinput_event& e
 {
     CHKPR(ev.event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(ev.event);
- #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
     const std::string vDeviceName = libinput_device_get_name(device);
     MMI_LOGD("Distribute_Input On Mode,Add Device Name:%{public}s", vDeviceName.c_str());
 
@@ -237,7 +237,7 @@ int32_t InputEventHandler::OnEventDeviceAdded(const multimodal_libinput_event& e
         InputDevMgr->OnVirtualDeviceAdded(device);
         return RET_OK;
     }
- #endif
+#endif
     InputDevMgr->OnInputDeviceAdded(device);
     return RET_OK;
 }
@@ -247,15 +247,14 @@ int32_t InputEventHandler::OnEventDeviceRemoved(const multimodal_libinput_event&
     auto device = libinput_event_get_device(ev.event);
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
     const std::string vDeviceName = libinput_device_get_name(device);
-    MMI_LOGD("Distribute_Input On Mode,Add Device Name:%{public}s",vDeviceName.c_str());
+    MMI_LOGD("Distribute_Input On Mode,Add Device Name:%{public}s", vDeviceName.c_str());
     
     std::string::size_type pos = vDeviceName.find(VIRTUAL_DEVICE_NAME);
-    if (pos != vDeviceName.npos)
-    {
+    if (pos != vDeviceName.npos) {
         InputDevMgr->OnVirtualDeviceRemoved(device);
         return RET_OK;
     }
- #endif
+#endif
     InputDevMgr->OnInputDeviceRemoved(device);
     return RET_OK;
 }
@@ -343,7 +342,8 @@ bool InputEventHandler::IsControllerSide()
     return false;
 }
 
-OHOS::DistributedHardware::DistributedInput::DInputServerType InputEventHandler::IsStartDistributedInput(){
+OHOS::DistributedHardware::DistributedInput::DInputServerType InputEventHandler::IsStartDistributedInput()
+{
     return OHOS::DistributedHardware::DistributedInput::DistributedInputKit::IsStartDistributedInput();
 }
 int32_t InputEventHandler::OnEventPointer(const multimodal_libinput_event& ev)
@@ -419,7 +419,7 @@ int32_t InputEventHandler::OnEventTouch(const multimodal_libinput_event& ev)
     if (!IsControllerSide()) {
         MMI_LOGD("OnEventTouch::dinput controlled touch event droped");
         return RET_OK;
-    } 	
+    }
 #endif
     CHKPR(ev.event, ERROR_NULL_POINTER);
     SInput::LoginfoPackagingTool(ev.event);

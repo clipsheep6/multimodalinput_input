@@ -170,6 +170,5 @@ void InputManager::SimulateCrossLocation(int32_t x, int32_t y, std::function<voi
 {
     InputManagerImpl::GetInstance()->SimulateCrossLocation(x, y, callback);
 }
-
 } // namespace MMI
 } // namespace OHOS

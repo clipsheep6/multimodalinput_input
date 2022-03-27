@@ -271,15 +271,15 @@ bool EventDispatch::CheckWhiteList(bool &jumpIntercept, const std::shared_ptr<Ke
     jumpIntercept = false;
     std::string deviceId = "";
     DistributedHardware::DistributedInput::DInputServerType type = GetDInputServerType();
-    if (DistributedHardware::DistributedInput::DInputServerType::SOURCE_SERVER_TYPE == type ) {
+    if (DistributedHardware::DistributedInput::DInputServerType::SOURCE_SERVER_TYPE == type) {
         if (IsRemoteDevice(key->GetDeviceId())) {
             deviceId = DInputMgr->GetDeviceId();
-            if (!IsNeedFilterOut(deviceId,key)) {
+            if (!IsNeedFilterOut(deviceId, key)) {
                 return true;
             }
         }
-    }else if (DistributedHardware::DistributedInput::DInputServerType::SINK_SERVER_TYPE == type) {
-        if (!IsNeedFilterOut(deviceId,key)) {
+    } else if (DistributedHardware::DistributedInput::DInputServerType::SINK_SERVER_TYPE == type) {
+        if (!IsNeedFilterOut(deviceId, key)) {
             return true;
         }
         jumpIntercept = true;

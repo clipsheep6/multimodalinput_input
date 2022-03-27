@@ -139,6 +139,8 @@ private:
     PhysicalDisplayInfo* GetPhysicalDisplay(int32_t id);
     PhysicalDisplayInfo* FindPhysicalDisplayInfo(const std::string seatId, const std::string seatName);
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent);
+    LogicalDisplayInfo* UpdateX(double& x);
+    void UpdateY(LogicalDisplayInfo& logicalDisplayInfo, double& y);
 
 private:
     std::mutex mu_;

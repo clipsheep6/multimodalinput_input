@@ -64,8 +64,8 @@ bool ClientMsgHandler::Init()
         {MmiMessageId::TOUCHPAD_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::TouchpadEventInterceptor, this)},
         {MmiMessageId::KEYBOARD_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::KeyEventInterceptor, this)},
         {MmiMessageId::INPUT_VIRTUAL_DEVICE_IDS, MsgCallbackBind2(&ClientMsgHandler::OnInputVirtualDeviceIds, this)},
-        {MmiMessageId::INPUT_VIRTUAL_DEVICE, MsgCallbackBind2(&ClientMsgHandler::OnInputVirtualDevice, this)},       
-        {MmiMessageId::GET_ALL_NODE_DEVICE_INFO, MsgCallbackBind2(&ClientMsgHandler::OnGetAllNodeDeviceInfo, this)},    
+        {MmiMessageId::INPUT_VIRTUAL_DEVICE, MsgCallbackBind2(&ClientMsgHandler::OnInputVirtualDevice, this)},
+        {MmiMessageId::GET_ALL_NODE_DEVICE_INFO, MsgCallbackBind2(&ClientMsgHandler::OnGetAllNodeDeviceInfo, this)},
         {MmiMessageId::SHOW_MOUSE, MsgCallbackBind2(&ClientMsgHandler::OnShowMouse, this)},
         {MmiMessageId::HIDE_MOUSE, MsgCallbackBind2(&ClientMsgHandler::OnHideMouse, this)},
         {MmiMessageId::INPUT_MOUSE_LOCATION, MsgCallbackBind2(&ClientMsgHandler::OnMouseLocation, this)},
@@ -73,7 +73,7 @@ bool ClientMsgHandler::Init()
         {MmiMessageId::INPUT_UNPREPARE_REMOTE, MsgCallbackBind2(&ClientMsgHandler::OnUnprepareRemoteInput, this)},
         {MmiMessageId::INPUT_START_REMOTE, MsgCallbackBind2(&ClientMsgHandler::OnStartRemoteInput, this)},
         {MmiMessageId::INPUT_STOP_REMOTE, MsgCallbackBind2(&ClientMsgHandler::OnStopRemoteInput, this)},
-        {MmiMessageId::SIMULATE_CROSS_LOCATION, MsgCallbackBind2(&ClientMsgHandler::OnCrossLocation, this)},     
+        {MmiMessageId::SIMULATE_CROSS_LOCATION, MsgCallbackBind2(&ClientMsgHandler::OnCrossLocation, this)},
     };
     // LCOV_EXCL_STOP
     for (auto& it : funs) {
@@ -399,7 +399,7 @@ int32_t OHOS::MMI::ClientMsgHandler::OnInputVirtualDevice(const UDSClient& clien
     CHKR(pkt.Read(taskId), STREAM_BUF_READ_FAIL, RET_ERR);
     CHKR(pkt.Read(id), STREAM_BUF_READ_FAIL, RET_ERR);
     CHKR(pkt.Read(name), STREAM_BUF_READ_FAIL, RET_ERR);
-    CHKR(pkt.Read(deviceType), STREAM_BUF_READ_FAIL, RET_ERR);  
+    CHKR(pkt.Read(deviceType), STREAM_BUF_READ_FAIL, RET_ERR);
 
     InputManagerImpl::GetInstance()->OnVirtualDevice(taskId, id, name, deviceType);
     return RET_OK;
@@ -520,6 +520,5 @@ int32_t OHOS::MMI::ClientMsgHandler::OnCrossLocation(const UDSClient& client, Ne
     InputManagerImpl::GetInstance()->OnCrossLocation(taskId, status);
     return RET_OK;
 }
-
 } // namespace MMI
 } // namespace OHOS

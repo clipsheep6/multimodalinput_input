@@ -86,15 +86,15 @@ bool OHOS::MMI::ServerMsgHandler::Init(UDSServer& udsServer)
         {MmiMessageId::REMOVE_EVENT_INTERCEPTOR,
             MsgCallbackBind2(&ServerMsgHandler::OnRemoveTouchpadEventFilter, this)},
         {MmiMessageId::INPUT_VIRTUAL_DEVICE_IDS, MsgCallbackBind2(&ServerMsgHandler::OnInputVirtualDeviceIds, this)},
-	{MmiMessageId::INPUT_VIRTUAL_DEVICE, MsgCallbackBind2(&ServerMsgHandler::OnInputVirtualDevice, this)},
-	{MmiMessageId::GET_ALL_NODE_DEVICE_INFO, MsgCallbackBind2(&ServerMsgHandler::OnGetAllNodeDeviceInfo, this)},
+	    {MmiMessageId::INPUT_VIRTUAL_DEVICE, MsgCallbackBind2(&ServerMsgHandler::OnInputVirtualDevice, this)},
+	    {MmiMessageId::GET_ALL_NODE_DEVICE_INFO, MsgCallbackBind2(&ServerMsgHandler::OnGetAllNodeDeviceInfo, this)},
         {MmiMessageId::SHOW_MOUSE, MsgCallbackBind2(&ServerMsgHandler::OnShowMouse, this)},
         {MmiMessageId::HIDE_MOUSE, MsgCallbackBind2(&ServerMsgHandler::OnHideMouse, this)},
         {MmiMessageId::INPUT_MOUSE_LOCATION, MsgCallbackBind2(&ServerMsgHandler::OnGetMouseLocation, this)},
-        {MmiMessageId::INPUT_PREPARE_REMOTE, MsgCallbackBind2(&ServerMsgHandler::OnPrepareRemoteInput, this)},      
+        {MmiMessageId::INPUT_PREPARE_REMOTE, MsgCallbackBind2(&ServerMsgHandler::OnPrepareRemoteInput, this)},
         {MmiMessageId::INPUT_UNPREPARE_REMOTE, MsgCallbackBind2(&ServerMsgHandler::OnUnprepareRemoteInput, this)},
-        {MmiMessageId::INPUT_START_REMOTE, MsgCallbackBind2(&ServerMsgHandler::OnStartRemoteInput, this)},        
-        {MmiMessageId::INPUT_STOP_REMOTE, MsgCallbackBind2(&ServerMsgHandler::OnStopRemoteInput, this)},        
+        {MmiMessageId::INPUT_START_REMOTE, MsgCallbackBind2(&ServerMsgHandler::OnStartRemoteInput, this)},
+        {MmiMessageId::INPUT_STOP_REMOTE, MsgCallbackBind2(&ServerMsgHandler::OnStopRemoteInput, this)},
         {MmiMessageId::SIMULATE_CROSS_LOCATION, MsgCallbackBind2(&ServerMsgHandler::OnSimulateCrossLocation, this)},
 
 #ifdef OHOS_BUILD_HDF
@@ -673,7 +673,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnPrepareRemoteInput(SessionPtr sess, NetPa
     CHKR(!pkt.ChkRWError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
     MMI_LOGI("OnPrepareRemoteInput end");
     sptr<PrepareDInputCallback> callback(new PrepareDInputCallback(taskId, sess));
-    return DInputMgr->PrepareRemoteInput(deviceId ,callback);
+    return DInputMgr->PrepareRemoteInput(deviceId, callback);
 }
 
 int32_t OHOS::MMI::ServerMsgHandler::OnUnprepareRemoteInput(SessionPtr sess, NetPacket& pkt)
@@ -686,7 +686,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnUnprepareRemoteInput(SessionPtr sess, Net
     CHKR(!pkt.ChkRWError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
     MMI_LOGI("OnUnprepareRemoteInput end");
     sptr<UnprepareDInputCallback> callback(new UnprepareDInputCallback(taskId, sess));
-    return DInputMgr->UnPrepareRemoteInput(deviceId ,callback);
+    return DInputMgr->UnPrepareRemoteInput(deviceId, callback);
 }
 
 int32_t OHOS::MMI::ServerMsgHandler::OnStartRemoteInput(SessionPtr sess, NetPacket& pkt)
@@ -699,7 +699,7 @@ int32_t OHOS::MMI::ServerMsgHandler::OnStartRemoteInput(SessionPtr sess, NetPack
     CHKR(!pkt.ChkRWError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
     MMI_LOGI("OnStartRemoteInput end");
     sptr<StartDInputCallback> callback(new StartDInputCallback(taskId, sess));
-    return DInputMgr->StartRemoteInput(deviceId ,callback);
+    return DInputMgr->StartRemoteInput(deviceId, callback);
 }
 
 int32_t OHOS::MMI::ServerMsgHandler::OnStopRemoteInput(SessionPtr sess, NetPacket& pkt)
@@ -712,5 +712,5 @@ int32_t OHOS::MMI::ServerMsgHandler::OnStopRemoteInput(SessionPtr sess, NetPacke
     CHKR(!pkt.ChkRWError(), PACKET_READ_FAIL, PACKET_READ_FAIL);
     MMI_LOGI("OnStopRemoteInput end");
     sptr<StopDInputCallback> callback(new StopDInputCallback(taskId, sess));
-    return DInputMgr->StopRemoteInput(deviceId ,callback);
+    return DInputMgr->StopRemoteInput(deviceId, callback);
 }

@@ -20,7 +20,6 @@
 
 namespace OHOS {
 namespace MMI {
-
 class RawData {
 public:
     RawData();

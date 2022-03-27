@@ -61,7 +61,7 @@ private:
     bool hasPointerDevice_ = false;
     int32_t lastGlobalX_ = -1;
     int32_t lastGlobalY_ = -1;
-    //分布式输入添加
+    // 分布式输入添加
     bool showMousePointer_ { true };
 };
 } // namespace MMI

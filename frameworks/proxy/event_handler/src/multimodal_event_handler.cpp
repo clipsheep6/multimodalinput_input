@@ -215,7 +215,6 @@ int32_t MultimodalEventHandler::GetAllNodeDeviceInfo(int32_t taskId)
     if (isSuc)
         MMI_LOGD("send ShowMouse msg Success");
     return RET_OK;
-
 }
 
 int32_t MultimodalEventHandler::GetMouseLocation(int32_t taskId)
@@ -325,6 +324,5 @@ int32_t MultimodalEventHandler::SimulateCrossLocation(int32_t taskId, int32_t x,
         MMI_LOGD("send SimulateCrossLocation msg Success");
     return RET_OK;
 }
-
 } // namespace MMI
 } // namespace OHOS

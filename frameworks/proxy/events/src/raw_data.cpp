@@ -60,7 +60,7 @@ bool OHOS::MMI::RawData::WriteToParcel(Parcel &out) const
 
 bool OHOS::MMI::RawData::ReadFromParcel(Parcel &in)
 {
-     if (!in.ReadInt32(dx_)) {
+    if (!in.ReadInt32(dx_)) {
         return false;
     }
 

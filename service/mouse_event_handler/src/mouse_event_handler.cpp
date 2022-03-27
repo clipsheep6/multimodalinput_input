@@ -173,7 +173,7 @@ void MouseEventHandler::SetDxDyForDInput(PointerEvent::PointerItem& pointerItem,
     pointerItem.SetRawData(RawData(rawDataDx, rawDataDy));
     DInputMgr->GetMouseLocation().dx = rawDataDx;
     DInputMgr->GetMouseLocation().dy = rawDataDy;
-    MMI_LOGD("MouseEventHandler SetDxDyForDInput : dx:%{public}d, dy:%{public}d", rawDataDx, rawDataDy);       
+    MMI_LOGD("MouseEventHandler SetDxDyForDInput : dx:%{public}d, dy:%{public}d", rawDataDx, rawDataDy);
 }
 
 void MouseEventHandler::SetAbsolutionLocation(double absX, double absY)
@@ -221,7 +221,6 @@ void MouseEventHandler::Normalize(struct libinput_event *event)
         }
     }
     int32_t deviceId = InputDevMgr->FindInputDeviceId(libinput_event_get_device(event));
-
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
     if (deviceId < 0) {
         deviceId = InputDevMgr->FindVirtualDeviceId(libinput_event_get_device(event));

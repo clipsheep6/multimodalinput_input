@@ -310,18 +310,18 @@ static napi_value GetMouseLocation(napi_env env, napi_callback_info info)
             cbInfo = nullptr;
             work = nullptr;
 
-            napi_value object;
-            napi_create_object(env, &object);
-            JsRegisterModule::SetValueInt32(env, "globleX", returnResult->globalX, object);
-            JsRegisterModule::SetValueInt32(env, "globleY", returnResult->globalY, object);
-            JsRegisterModule::SetValueInt32(env, "dx", returnResult->dx, object);
-            JsRegisterModule::SetValueInt32(env, "dy", returnResult->dy, object);
-            JsRegisterModule::SetValueInt32(env, "displayId", returnResult->displayId, object);
-            JsRegisterModule::SetValueInt32(env, "logicalDisplayWidth", returnResult->logicalDisplayWidth, object);
-            JsRegisterModule::SetValueInt32(env, "logicalDisplayHeight", returnResult->logicalDisplayHeight, object);
-            JsRegisterModule::SetValueInt32(env, "logicalDisplayTopLeftX", returnResult->logicalDisplayTopLeftX, object);
-            JsRegisterModule::SetValueInt32(env, "logicalDisplayTopLeftY", returnResult->logicalDisplayTopLeftY, object);
-            JsRegisterModule::CallFunction(env, handleRef, object);
+            napi_value obj;
+            napi_create_object(env, &obj);
+            JsRegisterModule::SetValueInt32(env, "globleX", returnResult->globalX, obj);
+            JsRegisterModule::SetValueInt32(env, "globleY", returnResult->globalY, obj);
+            JsRegisterModule::SetValueInt32(env, "dx", returnResult->dx, obj);
+            JsRegisterModule::SetValueInt32(env, "dy", returnResult->dy, obj);
+            JsRegisterModule::SetValueInt32(env, "displayId", returnResult->displayId, obj);
+            JsRegisterModule::SetValueInt32(env, "logicalDisplayWidth", returnResult->logicalDisplayWidth, obj);
+            JsRegisterModule::SetValueInt32(env, "logicalDisplayHeight", returnResult->logicalDisplayHeight, obj);
+            JsRegisterModule::SetValueInt32(env, "logicalDisplayTopLeftX", returnResult->logicalDisplayTopLeftX, obj);
+            JsRegisterModule::SetValueInt32(env, "logicalDisplayTopLeftY", returnResult->logicalDisplayTopLeftY, obj);
+            JsRegisterModule::CallFunction(env, handleRef, obj);
             MMI_LOGI("uv_queue_work end");
         });
     });
@@ -329,7 +329,8 @@ static napi_value GetMouseLocation(napi_env env, napi_callback_info info)
     return nullptr;
 }
 
-static napi_value SubscribeKeyEvent(napi_env env, napi_callback_info info) {
+static napi_value SubscribeKeyEvent(napi_env env, napi_callback_info info)
+{
     MMI_LOGI("SubscribeKeyEvent begin");
     napi_ref handlerRef {nullptr};
     int32_t preKey;
@@ -463,7 +464,7 @@ void JsRegisterModule::SetValueInt32(const napi_env &env, const std::string &fie
 }
 
 void JsRegisterModule::SetValueUtf8String(const napi_env &env, const std::string &fieldStr, const std::string &str,
-                                           napi_value &result)
+    napi_value &result)
 {
     napi_value value = nullptr;
     napi_create_string_utf8(env, str.c_str(), NAPI_AUTO_LENGTH, &value);
@@ -543,7 +544,7 @@ void JsRegisterModule::GetParameter(napi_env env, napi_callback_info info, int32
 }
 
 void JsRegisterModule::GetParameter(napi_env env, napi_callback_info info,
-        int32_t& first, int32_t& second, napi_ref& third)
+    int32_t& first, int32_t& second, napi_ref& third)
 {
     MMI_LOGI("begin");
     size_t argc = ARGC_NUM_3;
@@ -615,7 +616,7 @@ void JsRegisterModule::GetParameter(napi_env env, napi_callback_info info, napi_
 
 void JsRegisterModule::HandleCallBack(uv_work_t* work, bool returnResult)
 {
-    MMI_LOGI("begin"); 
+    MMI_LOGI("begin");
     auto callbackInfo = (CallbackInfo<bool>*)work->data;
     callbackInfo->returnResult = returnResult;
     uv_queue_work(callbackInfo->loop, work, [](uv_work_t *work) {}, [](uv_work_t *work, int32_t status) {
@@ -656,7 +657,7 @@ void JsRegisterModule::HandleCallBack(uv_work_t* work, bool returnResult)
 
 void JsRegisterModule::HandleCallBack(uv_work_t* work, int32_t returnResult)
 {
-    MMI_LOGI("begin");    
+    MMI_LOGI("begin");
     auto callbackInfo = (CallbackInfo<int32_t>*)work->data;
     callbackInfo->returnResult = returnResult;
     uv_queue_work(callbackInfo->loop, work, [](uv_work_t *work) {}, [](uv_work_t *work, int32_t status) {

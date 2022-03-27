@@ -85,14 +85,11 @@ public:
     void OnStopRemoteInput(int32_t taskId, int32_t status);
     void SimulateCrossLocation(int32_t x, int32_t y, std::function<void(int32_t)> callback);
     void OnCrossLocation(int32_t taskId, int32_t status);
-    
-
 private:
     int32_t PackPhysicalDisplay(NetPacket &pkt);
     int32_t PackLogicalDisplay(NetPacket &pkt);
     void PrintDisplayDebugInfo();
     void SendDisplayInfo();
-
 private:
     sptr<EventFilterService> eventFilterService_ {nullptr};
     std::shared_ptr<OHOS::MMI::IInputEventConsumer> consumer_ = nullptr;

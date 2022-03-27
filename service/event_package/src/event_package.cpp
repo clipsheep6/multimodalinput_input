@@ -67,27 +67,32 @@ int32_t EventPackage::PackageKeyEvent(struct libinput_event *event, std::shared_
         key->SetActionStartTime(time);
     }
 
-    KeyEvent::KeyItem item;
     bool isKeyPressed = (libinput_event_keyboard_get_key_state(data) != KEYSTATUS);
-    item.SetDownTime(time);
-    item.SetKeyCode(keyCode);
-    item.SetDeviceId(deviceId);
-    item.SetPressed(isKeyPressed);
+    PackageKeyItem(key, isKeyPressed);
+    return RET_OK;
+}
 
+void EventPackage::PackageKeyItem(std::shared_ptr<KeyEvent> key, bool isKeyPressed)
+{
+    KeyEvent::KeyItem item;
+    item.SetDownTime(key->GetActionTime());
+    item.SetKeyCode(key->GetKeyCode());
+    item.SetDeviceId(key->GetDeviceId());
+    item.SetPressed(isKeyPressed);
+    int32_t keyAction = key->GetKeyAction();
     if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
         key->AddPressedKeyItems(item);
     }
     if (keyAction == KeyEvent::KEY_ACTION_UP) {
-        auto pressedKeyItem = key->GetKeyItem(keyCode);
+        auto pressedKeyItem = key->GetKeyItem(key->GetKeyCode());
         if (pressedKeyItem != nullptr) {
             item.SetDownTime(pressedKeyItem->GetDownTime());
         } else {
-            MMI_LOGE("Find pressed key failed, keyCode:%{public}d", keyCode);
+            MMI_LOGE("Find pressed key failed, keyCode:%{public}d", key->GetKeyCode());
         }
         key->RemoveReleasedKeyItems(item);
         key->AddPressedKeyItems(item);
     }
-    return RET_OK;
 }
 
 int32_t EventPackage::PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& key)

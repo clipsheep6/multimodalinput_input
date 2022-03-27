@@ -224,7 +224,7 @@ std::vector<std::string> InputDeviceManager::GetAllNodeDeviceInfoFromDM()
     NodeBasicInfo *info = NULL;
     int32_t infoNum = 0;
     GetAllNodeDeviceInfo("ohos.distributedhardware.devicemanager", &info, &infoNum);
-    MMI_LOGD("GetAllNodeDeviceInfo:DeviceInfoNum:%{public}d",infoNum);
+    MMI_LOGD("GetAllNodeDeviceInfo:DeviceInfoNum:%{public}d", infoNum);
     if (info == NULL) {
         MMI_LOGD("GetAllNodeDeviceInfo:AllNodeDeviceInfo is null");
         return ids;

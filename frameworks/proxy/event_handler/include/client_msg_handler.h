@@ -53,10 +53,10 @@ protected:
     virtual int32_t OnHideMouse(const UDSClient& client, NetPacket& pkt);
 
     virtual int32_t OnMouseLocation(const UDSClient& client, NetPacket& pkt);
-    virtual int32_t OnPrepareRemoteInput(const UDSClient& client, NetPacket& pkt); 
-    virtual int32_t OnUnprepareRemoteInput(const UDSClient& client, NetPacket& pkt); 
-    virtual int32_t OnStartRemoteInput(const UDSClient& client, NetPacket& pkt); 
-    virtual int32_t OnStopRemoteInput(const UDSClient& client, NetPacket& pkt); 
+    virtual int32_t OnPrepareRemoteInput(const UDSClient& client, NetPacket& pkt);
+    virtual int32_t OnUnprepareRemoteInput(const UDSClient& client, NetPacket& pkt);
+    virtual int32_t OnStartRemoteInput(const UDSClient& client, NetPacket& pkt);
+    virtual int32_t OnStopRemoteInput(const UDSClient& client, NetPacket& pkt);
     virtual int32_t OnCrossLocation(const UDSClient& client, NetPacket& pkt);
 
 private:

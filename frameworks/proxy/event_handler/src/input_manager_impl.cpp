@@ -416,7 +416,7 @@ void InputManagerImpl::OnVirtualDeviceIds(int32_t taskId, std::vector<int32_t> i
     int32_t count = 0;
     if (size > 0) {
         for (auto it : ids) {
-            MMI_LOGD("DeviceId[%{public}d]: %{public}d",count++,it);
+            MMI_LOGD("DeviceId[%{public}d]: %{public}d", count++, it);
         }
     }
 }
@@ -427,14 +427,14 @@ void InputManagerImpl::GetVirtualDeviceAsync(int32_t deviceId,
     if (callback == nullptr) {
         MMI_LOGE("InputManagerImpl::%{public}s param should not be null!", __func__);
     }
-    InputDeviceImpl::GetInstance().GetVirtualDeviceAsync(deviceId,callback);
+    InputDeviceImpl::GetInstance().GetVirtualDeviceAsync(deviceId, callback);
 }
 
 void InputManagerImpl::OnVirtualDevice(int32_t taskId, int32_t id, std::string name, int32_t deviceType)
 {
     MMI_LOGD("taskId:%{public}d, DeviceId:%{public}d, DeviceName:%{public}s, deviceType:%{public}d",
-    taskId, id, name.c_str(), deviceType);
-    InputDeviceImpl::GetInstance().OnVirtualDevice(taskId,id,name,deviceType);
+        taskId, id, name.c_str(), deviceType);
+    InputDeviceImpl::GetInstance().OnVirtualDevice(taskId,id, name, deviceType);
 }
 
 
@@ -629,6 +629,5 @@ void InputManagerImpl::OnStopRemoteInput(int32_t taskId, int32_t status)
     }
     MMI_LOGI("OnStartRemoteInput end");
 }
-
 } // namespace MMI
 } // namespace OHOS
