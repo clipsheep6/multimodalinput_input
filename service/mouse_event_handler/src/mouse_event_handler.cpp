@@ -99,7 +99,6 @@ void MouseEventHandler::HandleButonInner(libinput_event_pointer* data)
         MMI_HILOGW("unknown btn, btn:%{public}u", button);
     }
 
-
     auto state = libinput_event_pointer_get_button_state(data);
     if (state == LIBINPUT_BUTTON_STATE_RELEASED) {
         MouseState->MouseBtnStateCounts(button, BUTTON_STATE_RELEASED);
