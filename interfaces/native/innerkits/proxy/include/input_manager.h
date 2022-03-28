@@ -20,8 +20,10 @@
 #include <list>
 
 #include "display_info.h"
+#include "dinput_manager.h"
 #include "error_multimodal.h"
 #include "i_input_event_consumer.h"
+#include "input_device_impl.h"
 #include "key_option.h"
 #include "nocopyable.h"
 
@@ -181,6 +183,25 @@ public:
      * @since 8
      */
     void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
+
+ /**
+     * @brief Get a virtual device id list
+     * @param callback Indicates the callback function address of virtual device id list.
+     * @return void
+     * @since 8
+     */
+    void GetVirtualDeviceIdListAsync(std::function<void(std::vector<int32_t>)> callback);
+    void GetVirtualDeviceAsync(int32_t deviceId,
+        std::function<void(std::shared_ptr<InputDeviceImpl::InputDeviceInfo>)> callback);
+    void GetAllNodeDeviceInfo(std::function<void(std::vector<std::string>)> callback);
+    void HideMouse(std::function<void(bool)> callback);
+    void ShowMouse(std::function<void(bool)> callback);
+    void GetMouseLocation(std::function<void(std::shared_ptr<DMouseLocation>)> callback);
+    void PrepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
+    void UnprepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
+    void StartRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
+    void StopRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
+    void SimulateCrossLocation(int32_t x, int32_t y, std::function<void(int32_t)> callback);
 
 private:
     InputManager() = default;

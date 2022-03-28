@@ -29,6 +29,7 @@ config("libmmi_server_public_config") {
     "message_handle/include",
     "module_loader/include",
     "window_manager/include",
+    "dinput/include",
     "touch_transform_point/include",
     "ability_launch/include",
     "subscriber/include",
@@ -58,6 +59,13 @@ config("libmmi_server_public_config") {
     "//foundation/graphic/standard/rosen/modules/2d_graphics/include",
     "//foundation/graphic/standard/rosen/modules/2d_graphics/src",
     "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
+    "//foundation/distributedhardware/distributedinput/interfaces/inner_kits/include/",
+    "//foundation/distributedhardware/distributedinput/common/include",
+    "//foundation/distributedhardware/distributedinput/frameworks/include",
+    "//foundation/distributedhardware/distributedinput/interfaces/inner_kits/include",
+    "//foundation/distributedhardware/distributedinput/interfaces/inner_kits/src",
+    "//foundation/distributedhardware/distributedhardwarefwk/common/utils/include",
+
   ]
 
   if (is_mmi_have_hdf) {
@@ -83,6 +91,10 @@ config("libmmi_server_public_config") {
 
   if (is_mmi_have_hdf) {
     cflags += [ "-DOHOS_BUILD_HDF" ]
+  }
+
+  if (is_mmi_have_dinput) {
+    cflags += [ "-DOHOS_DISTRIBUTED_INPUT_MODEL" ]
   }
 }
 
@@ -128,6 +140,11 @@ ohos_shared_library("libmmi-server") {
     "touch_transform_point/src/touchpad_transform_point_processor.cpp",
     "window_manager/src/input_windows_manager.cpp",
     "window_manager/src/pointer_drawing_manager.cpp",
+    "dinput/src/dinput_manager.cpp",
+    "dinput/src/prepare_dinput_callback.cpp",
+    "dinput/src/start_dinput_callback.cpp",
+    "dinput/src/stop_dinput_callback.cpp",
+    "dinput/src/unprepare_dinput_callback.cpp",
   ]
 
   if (is_mmi_have_hdf) {
@@ -182,6 +199,8 @@ ohos_shared_library("libmmi-server") {
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
+    "distributed_input:libdinput_sdk",
+    "dsoftbus_standard:softbus_client"
   ]
 
   part_name = "multimodalinput_base"
@@ -240,6 +259,7 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/service/message_handle/include",
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/window_manager/include",
+    "${mmi_path}/service/dinput/include",
     "${mmi_path}/uinput",
     "$HDF_FWKS/include/utils",
     "$HDF_FWKS/include/osal",
@@ -277,6 +297,9 @@ ohos_unittest("ut-mmi-service-out") {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
+  if (is_mmi_have_dinput) {
+    cflags += [ "-DOHOS_DISTRIBUTED_INPUT_MODEL" ]
+  }
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/frameworks/util:libmmi-util",
