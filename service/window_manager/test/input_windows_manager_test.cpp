@@ -28,16 +28,21 @@ public:
     static void TearDownTestCase(void) {}
     void SetUp()
     {
+        const int32_t TOP_LEFT_X1 = 0;
+        const int32_t WIDTH1 = 500;
+        const int32_t TOP_LEFT_Y1 = 0;
+        const int32_t HEIGHT1 = 200;
+        const int32_t ID1 = 1;
         LogicalDisplayInfo info1;
-        info1.topLeftX = 0;
-        info1.width = 500;
-        info1.topLeftY = 0;
-        info1.height = 200;
-        info1.id = 1;
+        info1.topLeftX = TOP_LEFT_X1;
+        info1.width = WIDTH1;
+        info1.topLeftY = TOP_LEFT_Y1;
+        info1.height = HEIGHT1;
+        info1.id = ID1;
         LogicalDisplayInfo info2 = info1;
-        info2.topLeftX = 500;
-        info2.topLeftY = 200;
-        info2.id = 2;
+        info2.topLeftX = WIDTH1;
+        info2.topLeftY = HEIGHT1;
+        info2.id = ID1 + 1;
         WinMgr->logicalDisplays_.push_back(info1);
         WinMgr->logicalDisplays_.push_back(info2);
     }
@@ -69,7 +74,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateAndAdjustMouseLo
 {
     double x = 100;
     double y = 70;
-    WinMgr->UpdateAndAdjustMouseLoction(x, y);   
+    WinMgr->UpdateAndAdjustMouseLoction(x, y);
     MouseLocation mouseInfo = WinMgr->GetMouseInfo();
     EXPECT_EQ(mouseInfo.globalX, 100);
     EXPECT_EQ(mouseInfo.globalY, 70);
@@ -102,7 +107,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateAndAdjustMouseLo
 {
     double x = 600;
     double y = 200;
-    WinMgr->UpdateAndAdjustMouseLoction(x, y); 
+    WinMgr->UpdateAndAdjustMouseLoction(x, y);
     MouseLocation mouseInfo = WinMgr->GetMouseInfo();
     EXPECT_EQ(mouseInfo.globalX, 600);
     EXPECT_EQ(mouseInfo.globalY, 200);

@@ -14,9 +14,9 @@
  */
 
 #include "define_multimodal.h"
-#include "dinput_manager.h"
 #include "distributed_input_kit.h"
 #include "input_device_manager.h"
+#include "dinput_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -54,7 +54,7 @@ int32_t DInputManager::PrepareRemoteInput(const std::string& deviceId, sptr<Prep
 }
 
 int32_t DInputManager::UnPrepareRemoteInput(const std::string& deviceId, sptr<UnprepareDInputCallback> callback)
-{ 
+{
     deviceId_ = "";
     return OHOS::DistributedHardware::DistributedInput::DistributedInputKit::UnprepareRemoteInput(deviceId, callback);
 }

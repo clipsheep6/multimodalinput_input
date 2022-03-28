@@ -434,7 +434,7 @@ void InputManagerImpl::OnVirtualDevice(int32_t taskId, int32_t id, std::string n
 {
     MMI_LOGD("taskId:%{public}d, DeviceId:%{public}d, DeviceName:%{public}s, deviceType:%{public}d",
         taskId, id, name.c_str(), deviceType);
-    InputDeviceImpl::GetInstance().OnVirtualDevice(taskId,id, name, deviceType);
+    InputDeviceImpl::GetInstance().OnVirtualDevice(taskId, id, name, deviceType);
 }
 
 

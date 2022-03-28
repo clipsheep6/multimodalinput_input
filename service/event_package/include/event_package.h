@@ -37,7 +37,6 @@ namespace MMI {
         static int32_t KeyboardToKeyEvent(const EventKeyboard& key, std::shared_ptr<KeyEvent> keyEventPtr);
     private:
         void PackageKeyItem(std::shared_ptr<KeyEvent> key, bool isKeyPressed);
-
     };
 } // namespace MMI
 } // namespace OHOS

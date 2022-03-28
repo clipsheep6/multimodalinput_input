@@ -20,14 +20,13 @@ namespace OHOS {
 namespace MMI {
 namespace {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "StartDInputCallback" };
-}  
+}
 
 StartDInputCallback::StartDInputCallback(const int32_t& taskId, SessionPtr& sess)
 {
     taskId_ = taskId;
     sess_ = sess;
 }
-
 
 void StartDInputCallback::OnResult(const std::string& deviceId, const int32_t& status)
 {

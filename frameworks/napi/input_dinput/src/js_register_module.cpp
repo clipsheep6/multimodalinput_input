@@ -192,7 +192,7 @@ static napi_value GetVirtualDeviceAsync(napi_env env, napi_callback_info info)
     int32_t deviceId;
     napi_ref handlerRef {nullptr};
     JsRegisterModule::GetParameter(env, info, deviceId, handlerRef);
-    auto* cb = new CallbackInfo<std::shared_ptr<InputDeviceImpl::InputDeviceInfo>>;
+    auto* cb = new CallbackInfo<std::shared_ptr<InputDeviceImpl::InputDeviceInfo>>();
     cb->env = env;
 
     uv_loop_s* loop {nullptr};
@@ -284,7 +284,7 @@ static napi_value GetMouseLocation(napi_env env, napi_callback_info info)
     MMI_LOGI("GetMouseLocation begin");
     napi_ref handlerRef {nullptr};
     JsRegisterModule::GetParameter(env, info, handlerRef);
-    auto* cb = new CallbackInfo<std::shared_ptr<DMouseLocation>>;
+    auto* cb = new CallbackInfo<std::shared_ptr<DMouseLocation>>();
     cb->env = env;
 
     uv_loop_s* loop {nullptr};

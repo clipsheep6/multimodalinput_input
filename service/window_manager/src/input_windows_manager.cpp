@@ -611,8 +611,7 @@ void OHOS::MMI::InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, doub
         return;
     }
     LogicalDisplayInfo* pLogical = UpdateX(x);
-    if (pLogical != nullptr)
-    {
+    if (pLogical != nullptr) {
         displayId = pLogical->id;
         UpdateY(*pLogical, y);
     }
@@ -659,11 +658,11 @@ void OHOS::MMI::InputWindowsManager::UpdateY(LogicalDisplayInfo& logicalDisplayI
             mouseLoction_.globalY = integerY;
         }
     }
-} 
+}
 
 void OHOS::MMI::InputWindowsManager::UpdateDmouseLocation()
 {
-    MMI_LOGD("Enter");  
+    MMI_LOGD("Enter");
     DInputMgr->GetMouseLocation().globalX = mouseLoction_.globalX;
     DInputMgr->GetMouseLocation().globalY = mouseLoction_.globalY;
     int32_t displayId = mouseLoction_.displayId;
