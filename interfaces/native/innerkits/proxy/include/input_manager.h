@@ -194,8 +194,8 @@ public:
     void GetVirtualDeviceAsync(int32_t deviceId,
         std::function<void(std::shared_ptr<InputDeviceImpl::InputDeviceInfo>)> callback);
     void GetAllNodeDeviceInfo(std::function<void(std::vector<std::string>)> callback);
-    void HideMouse(std::function<void(bool)> callback);
-    void ShowMouse(std::function<void(bool)> callback);
+    int32_t HideMouse(std::function<void(bool)> callback);
+    int32_t ShowMouse(std::function<void(bool)> callback);
     void GetMouseLocation(std::function<void(std::shared_ptr<DMouseLocation>)> callback);
     void PrepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
     void UnprepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);

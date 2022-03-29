@@ -146,26 +146,28 @@ void InputDeviceImpl::OnGetAllNodeDeviceInfo(int32_t taskId, std::vector<std::st
     MMI_LOGI("end");
 }
 
-void InputDeviceImpl::ShowMouse(std::function<void(bool)> callback)
+int32_t InputDeviceImpl::ShowMouse(std::function<void(bool)> callback)
 {
     MMI_LOGI("ShowMouse begin");
     std::lock_guard<std::mutex> guard(mtx_);
     showMouseRequests_.insert(std::pair<int32_t,
         std::function<void(bool)>>(showMouseTaskId_, callback));
-    MMIEventHdl.ShowMouse(showMouseTaskId_);
+    int32_t ret = MMIEventHdl.ShowMouse(showMouseTaskId_);
     showMouseTaskId_++;
     MMI_LOGI("end");
+    return ret;
 }
 
-void InputDeviceImpl::HideMouse(std::function<void(bool)> callback)
+int32_t InputDeviceImpl::HideMouse(std::function<void(bool)> callback)
 {
     MMI_LOGI("HideMouse begin");
     std::lock_guard<std::mutex> guard(mtx_);
     hideMouseRequests_.insert(std::pair<int32_t,
         std::function<void(bool)>>(hideMouseTaskId_, callback));
-    MMIEventHdl.HideMouse(hideMouseTaskId_);
+    int32_t ret = MMIEventHdl.HideMouse(hideMouseTaskId_);
     hideMouseTaskId_++;
     MMI_LOGI("end");
+    return ret;
 }
 
 void InputDeviceImpl::OnShowMouse(int32_t taskId)

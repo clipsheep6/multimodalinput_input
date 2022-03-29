@@ -136,14 +136,14 @@ void InputManager::GetMouseLocation(std::function<void(std::shared_ptr<DMouseLoc
     InputManagerImpl::GetInstance()->GetMouseLocation(callback);
 }
 
-void InputManager::HideMouse(std::function<void(bool)> callback)
+int32_t InputManager::HideMouse(std::function<void(bool)> callback)
 {
-    InputManagerImpl::GetInstance()->HideMouse(callback);
+    return InputManagerImpl::GetInstance()->HideMouse(callback);
 }
 
-void InputManager::ShowMouse(std::function<void(bool)> callback)
+int32_t InputManager::ShowMouse(std::function<void(bool)> callback)
 {
-    InputManagerImpl::GetInstance()->ShowMouse(callback);
+    return InputManagerImpl::GetInstance()->ShowMouse(callback);
 }
 
 void InputManager::PrepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback)

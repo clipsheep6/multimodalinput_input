@@ -43,23 +43,17 @@ static napi_value HideMouse(napi_env env, napi_callback_info info)
     MMI_LOGI("HideMouse begin");
     napi_ref handlerRef {nullptr};
     JsRegisterModule::GetParameter(env, info, handlerRef);
-    CallbackInfo<bool>* cb = new CallbackInfo<bool>;
-    cb->env = env;
-
-    uv_loop_s* loop {nullptr};
-    if (napi_get_uv_event_loop(env, &loop) != napi_ok) {
-        napi_throw_error(env, nullptr, "HideMouse: call to napi_get_uv_event_loop failed");
-    }
-    cb->loop = loop;
-    cb->handleRef = handlerRef;
-    uv_work_t* work = new uv_work_t;
-    work->data = (void*)cb;
     auto *instance = InputManager::GetInstance();
-    instance->HideMouse([work](bool returnResult) {
-    JsRegisterModule::HandleCallBack(work, returnResult);
+    int32_t ret = instance->HideMouse([](bool returnResult) {
     });
+    napi_value result = nullptr;
+    if (ret != 0) {
+        return result;
+    }
+    napi_get_undefined(env, &result);
     MMI_LOGI("HideMouse end");
-    return nullptr;
+    return result;
+
 }
 
 static napi_value ShowMouse(napi_env env, napi_callback_info info)
@@ -67,23 +61,16 @@ static napi_value ShowMouse(napi_env env, napi_callback_info info)
     MMI_LOGI("ShowMouse begin");
     napi_ref handlerRef {nullptr};
     JsRegisterModule::GetParameter(env, info, handlerRef);
-    CallbackInfo<bool>* cb = new CallbackInfo<bool>;
-    cb->env = env;
-
-    uv_loop_s* loop {nullptr};
-    if (napi_get_uv_event_loop(env, &loop) != napi_ok) {
-        napi_throw_error(env, nullptr, "ShowMouse: call to napi_get_uv_event_loop failed");
-    }
-    cb->loop = loop;
-    cb->handleRef = handlerRef;
-    uv_work_t* work = new uv_work_t;
-    work->data = (void*)cb;
     auto *instance = InputManager::GetInstance();
-    instance->ShowMouse([work](bool returnResult) {
-        JsRegisterModule::HandleCallBack(work, returnResult);
+    int32_t ret = instance->ShowMouse([](bool returnResult) {
     });
+    napi_value result = nullptr;
+    if (ret != 0) {
+        return result;
+    }
+    napi_get_undefined(env, &result);
     MMI_LOGI("ShowMouse end");
-    return nullptr;
+    return result;
 }
 
 static napi_value PrepareRemoteInput(napi_env env, napi_callback_info info)

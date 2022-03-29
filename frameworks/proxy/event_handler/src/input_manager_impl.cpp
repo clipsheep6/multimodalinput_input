@@ -460,22 +460,16 @@ void InputManagerImpl::OnGetAllNodeDeviceInfo(int32_t taskId, std::vector<std::s
     }
 }
 
-void InputManagerImpl::HideMouse(std::function<void(bool)> callback)
+int32_t InputManagerImpl::HideMouse(std::function<void(bool)> callback)
 {
-    if (callback == nullptr) {
-        MMI_LOGE("InputManagerImpl::%{public}s param should not be null!", __func__);
-    } else {
-        InputDeviceImpl::GetInstance().HideMouse(callback);
-    }
+    CHKPR(callback, ERROR_NULL_POINTER);
+    return InputDeviceImpl::GetInstance().HideMouse(callback);
 }
 
-void InputManagerImpl::ShowMouse(std::function<void(bool)> callback)
+int32_t InputManagerImpl::ShowMouse(std::function<void(bool)> callback)
 {
-    if (callback == nullptr) {
-        MMI_LOGE("InputManagerImpl::%{public}s param should not be null!", __func__);
-    } else {
-        InputDeviceImpl::GetInstance().ShowMouse(callback);
-    }
+    CHKPR(callback, ERROR_NULL_POINTER);
+    return InputDeviceImpl::GetInstance().ShowMouse(callback);
 }
 
 void InputManagerImpl::GetMouseLocation(std::function<void(std::shared_ptr<DMouseLocation>)> callback)

@@ -71,8 +71,8 @@ public:
     void OnVirtualDevice(int32_t taskId, int32_t id, std::string name, int32_t deviceType);
     void GetAllNodeDeviceInfo(std::function<void(std::vector<std::string>)> callback);
     void OnGetAllNodeDeviceInfo(int32_t taskId, std::vector<std::string> ids);
-    void HideMouse(std::function<void(bool)> callback);
-    void ShowMouse(std::function<void(bool)> callback);
+    int32_t HideMouse(std::function<void(bool)> callback);
+    int32_t ShowMouse(std::function<void(bool)> callback);
     void GetMouseLocation(std::function<void(std::shared_ptr<DMouseLocation>)> callback);
     void OnMouseLocation(int32_t taskId, std::shared_ptr<DMouseLocation> mouseLocation);
     void PrepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);

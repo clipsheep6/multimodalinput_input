@@ -46,7 +46,13 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int3
     lastGlobalY_ = globalY;
     if (pointerWindow_ != nullptr) {
         pointerWindow_->MoveTo(globalX, globalY);
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+        if (showMousePointer_) {
+            pointerWindow_->Show();
+        }
+#else
         pointerWindow_->Show();
+#endif
         MMI_LOGD("leave, display:%{public}d,globalX:%{public}d,globalY:%{public}d", displayId, globalX, globalY);
         return;
     }

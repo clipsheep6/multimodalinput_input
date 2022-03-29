@@ -47,8 +47,8 @@ public:
     void OnVirtualDeviceIds(int32_t taskId, std::vector<int32_t> ids);
     void GetAllNodeDeviceInfo(std::function<void(std::vector<std::string>)> callback);
     void OnGetAllNodeDeviceInfo(int32_t taskId, std::vector<std::string> ids);
-    void ShowMouse(std::function<void(bool)> callback);
-    void HideMouse(std::function<void(bool)> callback);
+    int32_t ShowMouse(std::function<void(bool)> callback);
+    int32_t HideMouse(std::function<void(bool)> callback);
     void OnShowMouse(int32_t taskId);
     void OnHideMouse(int32_t taskId);
 private:
