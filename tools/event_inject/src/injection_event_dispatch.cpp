@@ -21,6 +21,7 @@
 #include <regex>
 #include <string>
 #include <typeinfo>
+#include <unistd.h>
 
 #include "error_multimodal.h"
 #include "proto.h"
@@ -43,6 +44,7 @@ void InjectionEventDispatch::InitManageFunction()
         {"help", std::bind(&InjectionEventDispatch::OnHelp, this)},
         {"sendevent", std::bind(&InjectionEventDispatch::OnSendEvent, this)},
         {"json", std::bind(&InjectionEventDispatch::OnJson, this)},
+        {"toserver", std::bind(&InjectionEventDispatch::OnSendEventToServer, this)},
     };
 
     for (auto &it : funs) {
@@ -155,7 +157,6 @@ bool InjectionEventDispatch::VirifyArgvs(const int32_t &argc, const std::vector<
         MMI_HILOGE("Invaild Input Para, Plase Check the validity of the para. errCode:%{public}d", PARAM_INPUT_FAIL);
         return false;
     }
-
     bool result = false;
     for (const auto &item : injectFuns_) {
         std::string temp(argv.at(ARGVS_TARGET_INDEX));
@@ -172,7 +173,6 @@ bool InjectionEventDispatch::VirifyArgvs(const int32_t &argc, const std::vector<
         }
         argvNum_ = argc - 1;
     }
-
     return result;
 }
 
@@ -340,6 +340,109 @@ int32_t InjectionEventDispatch::OnSendEvent()
         MMI_HILOGE("send event to device node faild.");
         return RET_ERR;
     }
+    if (fd >= 0) {
+        close(fd);
+    }
+    return RET_OK;
+}
+
+int32_t InjectionEventDispatch::ExectueTouch(int32_t fd, uint16_t ev_type, uint16_t ev_code, int32_t ev_value)
+{
+    struct input_event event;
+    memset(&event, 0, sizeof(event));
+    struct timeval tm;
+    gettimeofday(&tm, 0);
+    event.input_event_sec = tm.tv_sec;
+    event.input_event_usec = tm.tv_usec;
+    event.type = ev_type;
+    event.code = ev_code;
+    event.value = ev_value;
+    int32_t ret =  write(fd, &event, sizeof(event));
+    if (ret != sizeof(event)) {
+        MMI_HILOGE("send touch screen event to server faild.");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t InjectionEventDispatch::Sliding(int32_t fd, std::string& startABSx, std::string& startABSy,
+    std::string& endABSx, std::string& endABSy)
+{
+    uint32_t i = 0;
+    uint32_t vecX = static_cast<uint32_t>(std::stoi(startABSx));
+    uint32_t vecY = static_cast<uint32_t>(std::stoi(startABSy));
+    MMI_HILOGI("write touch screen start.");
+    ExectueTouch(fd, EV_ABS, ABS_MT_POSITION_X, vecX);
+    ExectueTouch(fd, EV_ABS, ABS_MT_POSITION_Y, vecY);
+    ExectueTouch(fd, EV_ABS, ABS_MT_TRACKING_ID, 0);
+    ExectueTouch(fd, 0, 2, 0);
+    ExectueTouch(fd, EV_KEY, BTN_TOUCH, 1);
+    ExectueTouch(fd, 0, 2, 0);
+    ExectueTouch(fd, 0, 0, 0);
+    usleep(BLOCK_TIME);
+    for(i = 0; i <= 25; ++i) {
+        vecY = vecY + 30;
+        ExectueTouch(fd, EV_ABS, ABS_MT_POSITION_X, vecX);
+        ExectueTouch(fd, EV_ABS, ABS_MT_POSITION_Y, vecY);
+        ExectueTouch(fd, EV_ABS, ABS_MT_TRACKING_ID, 0);
+        ExectueTouch(fd, 0, 2, 0);
+        ExectueTouch(fd, 0, 2, 0);
+        ExectueTouch(fd, 0, 0, 0);
+        usleep(BLOCK_TIME);
+    }
+    ExectueTouch(fd, EV_KEY, BTN_TOUCH, 0);
+    ExectueTouch(fd, 0, 2, 0);
+    ExectueTouch(fd, 0, 0, 0);
+    usleep(BLOCK_TIME);
+    ExectueTouch(fd, 0, 2, 0);
+    ExectueTouch(fd, 0, 0, 0);
+    usleep(BLOCK_TIME);
+    ExectueTouch(fd, 0, 2, 0);
+    ExectueTouch(fd, 0, 0, 0);
+    usleep(BLOCK_TIME);
+    MMI_HILOGI("write touch screen end.");
+    return RET_OK;
+}
+
+int32_t InjectionEventDispatch::OnSendEventToServer()
+{
+    if (injectArgvs_.size() != SEND_EVENT_TOSERVER_ARGV_COUNTS) {
+        MMI_HILOGE("Wrong number of input parameters, errCode:%{public}d", PARAM_INPUT_FAIL);
+        return RET_ERR;
+    }
+    std::string deviceNode = injectArgvs_[SEND_EVENT_DEV_NODE_INDEX];
+    if (deviceNode.empty()) {
+        MMI_HILOGE("device node:%{public}s is not exit", deviceNode.c_str());
+        return RET_ERR;
+    }
+    char realPath[PATH_MAX] = {};
+    if (realpath(deviceNode.c_str(), realPath) == nullptr) {
+        MMI_HILOGE("path is error, path:%{public}s", deviceNode.c_str());
+        return RET_ERR;
+    }
+    int32_t fd = open(realPath, O_RDWR);
+    if (fd < 0) {
+        MMI_HILOGE("open device node:%{public}s failed, errCode:%{public}d", deviceNode.c_str(), FILE_OPEN_FAIL);
+        return RET_ERR;
+    }
+    if (!(CheckValue(injectArgvs_[START_ABS_X]))) {
+        MMI_HILOGE("input error START_ABS_X:%{public}s", injectArgvs_[START_ABS_X].c_str());
+        return RET_ERR;
+    }
+    if (!(CheckValue(injectArgvs_[START_ABS_Y]))) {
+        MMI_HILOGE("input error START_ABS_Y:%{public}s", injectArgvs_[START_ABS_Y].c_str());
+        return RET_ERR;
+    }
+    if (!(CheckValue(injectArgvs_[END_ABS_X]))) {
+        MMI_HILOGE("input error END_ABS_X:%{public}s", injectArgvs_[END_ABS_X].c_str());
+        return RET_ERR;
+    }
+    if (!(CheckValue(injectArgvs_[END_ABS_Y]))) {
+        MMI_HILOGE("input error END_ABS_Y:%{public}s", injectArgvs_[END_ABS_Y].c_str());
+        return RET_ERR;
+    }
+    Sliding(fd, injectArgvs_[START_ABS_X], injectArgvs_[START_ABS_Y],
+            injectArgvs_[END_ABS_X], injectArgvs_[END_ABS_Y]);
     if (fd >= 0) {
         close(fd);
     }

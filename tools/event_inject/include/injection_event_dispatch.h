@@ -42,6 +42,7 @@ public:
     int32_t OnSendEvent();
     int32_t OnJson();
     int32_t OnHelp();
+    int32_t OnSendEventToServer();
     int32_t ExecuteFunction(std::string funId);
     int32_t GetDevTypeIndex(int32_t devIndex) const;
     int32_t GetDevIndexType(int32_t devType) const;
@@ -83,6 +84,9 @@ private:
     bool CheckValue(const std::string& inputValue);
     bool CheckEventValue(const std::string& inputType, const std::string& inputCode,
     const std::string& inputValue);
+    int32_t ExectueTouch(int32_t fd, uint16_t ev_type, uint16_t ev_code, int32_t ev_value);
+    int32_t Sliding(int32_t fd, std::string& startABSx, std::string& startABSy,
+    std::string& endABSx, std::string& endABSy);
 
 private:
     static constexpr uint32_t SEND_EVENT_ARGV_COUNTS = 5;
@@ -99,6 +103,13 @@ private:
     static constexpr uint16_t INPUT_TYPE_MAX = 100;
     static constexpr uint32_t INPUT_CODE_LENGTH = 6;
     static constexpr uint32_t INPUT_VALUE_LENGTH = 11;
+    static constexpr uint32_t SEND_EVENT_TOSERVER_ARGV_COUNTS = 6;
+    static constexpr uint32_t START_ABS_X = 2;
+    static constexpr uint32_t START_ABS_Y = 3;
+    static constexpr uint32_t END_ABS_X = 4;
+    static constexpr uint32_t END_ABS_Y = 5;
+    static constexpr uint32_t BLOCK_TIME = 15000;
+
 };
 } // namespace MMI
 } // namespace OHOS
