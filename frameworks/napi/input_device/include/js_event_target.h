@@ -45,9 +45,9 @@ public:
 
     napi_value CreateCallbackInfo(napi_env env, napi_value handle);
     void ResetEnv();
-    static bool CheckEnv(napi_env env);
 
     struct CallbackInfo {
+        napi_env env = nullptr;
         napi_ref ref = nullptr;
         napi_async_work asyncWork = nullptr;
         napi_deferred deferred = nullptr;
@@ -72,7 +72,6 @@ public:
     static constexpr uint32_t EVDEV_UDEV_TAG_TRACKBALL = (1 << 10);
     static constexpr uint32_t EVDEV_UDEV_TAG_SWITCH = (1 << 11);
 
-    static napi_env env_;
     static int32_t userData_;
 };
 } // namespace MMI
