@@ -795,11 +795,11 @@ bool PointerEvent::IsValid() const
     return true;
 }
 
-std::ostream& operator<<(std::ostream& ostream, PointerEvent& pointerEvent)
+std::ostream& operator<<(std::ostream& os, const PointerEvent& pointerEvent)
 {
     const int precision = 2;
     std::vector<int32_t> pointerIds { pointerEvent.GetPointersIdList() };
-    ostream << "EventType:" << pointerEvent.DumpEventType()
+    os << "EventType:" << pointerEvent.DumpEventType()
          << ",ActionTime:" << pointerEvent.GetActionTime()
          << ",Action:" << pointerEvent.GetAction()
          << ",ActionStartTime:" << pointerEvent.GetActionStartTime()
@@ -819,9 +819,10 @@ std::ostream& operator<<(std::ostream& ostream, PointerEvent& pointerEvent)
         PointerEvent::PointerItem item;
         if (!pointerEvent.GetPointerItem(pointerId, item)) {
             MMI_HILOGE("Invalid pointer: %{public}d.", pointerId);
-            return ostream;
+            return os;
         }
-        ostream << "DownTime:" << item.GetDownTime()
+        os << "DownTime:" << item.GetDownTime()
+            << ",pointerId:" << pointerId
             << ",IsPressed:" << std::boolalpha << item.IsPressed()
             << ",GlobalX:" << item.GetGlobalX() << ",GlobalY:" << item.GetGlobalY()
             << ",LocalX:" << item.GetLocalX() << ",LocalY:" << item.GetLocalY()
@@ -830,13 +831,13 @@ std::ostream& operator<<(std::ostream& ostream, PointerEvent& pointerEvent)
     }
     std::vector<int32_t> pressedKeys = pointerEvent.GetPressedKeys();
     if (!pressedKeys.empty()) {
-        ostream << "Pressed keyCode: [";
+        os << "Pressed keyCode: [";
         for (const auto& keyCode : pressedKeys) {
-            ostream << keyCode << ",";
+            os << keyCode << ",";
         }
-        ostream << "]" << std::endl;
+        os << "]" << std::endl;
     }
-    return ostream;
+    return os;
 }
 } // namespace MMI
 } // namespace OHOS
