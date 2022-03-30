@@ -403,11 +403,26 @@ public:
     };
 
 public:
+    /**
+     * @brief Copy constructor function for PointerEvent
+     * @since 8
+     */
     PointerEvent(const PointerEvent& other);
+
+    /**
+     * Virtual destructor of PointerEvent
+     *
+     * @since 8
+     */
     virtual ~PointerEvent();
+
     PointerEvent& operator=(const PointerEvent& other) = delete;
     DISALLOW_MOVE(PointerEvent);
 
+    /**
+     * @brief Create PointerEvent object
+     * @since 8
+     */
     static std::shared_ptr<PointerEvent> Create();
 
     /**
@@ -581,7 +596,7 @@ public:
     void SetAxisValue(AxisType axis, double axisValue);
 
     /**
-     * @brief Clear the axis value.
+     * @brief Clear the axis value of PointerEvent when a mouse event is received.
      * @return void
      * @since 8
      */
@@ -651,6 +666,10 @@ public:
     bool ReadFromParcel(Parcel &in);
 
 protected:
+    /**
+     * @brief Constructs an input event object by using the specified input event type. Generally, this method is used to construct a base class object when constructing a derived class object.
+     * @since 8
+     */
     explicit PointerEvent(int32_t eventType);
 
 private:

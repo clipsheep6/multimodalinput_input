@@ -66,6 +66,22 @@ std::shared_ptr<InputEvent> InputEvent::Create()
     return event;
 }
 
+const char* InputEvent::EventTypeToString(int32_t eventType)
+{
+    switch (eventType) {
+        case InputEvent::EVENT_TYPE_BASE:
+            return "base";
+        case InputEvent::EVENT_TYPE_KEY:
+            return "key";
+        case InputEvent::EVENT_TYPE_POINTER:
+            return "pointer";
+        case InputEvent::EVENT_TYPE_AXIS:
+            return "axis";
+        default:
+            return "unknown";
+    }
+}
+
 int32_t InputEvent::GetId() const
 {
     return id_;
@@ -154,23 +170,6 @@ void InputEvent::SetTargetWindowId(int32_t windowId)
 int32_t InputEvent::GetEventType() const
 {
     return eventType_;
-}
-
-const char* InputEvent::DumpEventType() const
-{
-    switch (eventType_) {
-        case InputEvent::EVENT_TYPE_BASE:
-            return "base";
-        case InputEvent::EVENT_TYPE_KEY:
-            return "key";
-        case InputEvent::EVENT_TYPE_POINTER:
-            return "pointer";
-        case InputEvent::EVENT_TYPE_AXIS:
-            return "axis";
-        default:
-            break;
-    }
-    return "unknown";
 }
 
 uint32_t InputEvent::GetFlag() const
