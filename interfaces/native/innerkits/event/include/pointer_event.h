@@ -111,14 +111,16 @@ public:
         AXIS_TYPE_UNKNOWN,
 
         /**
-         * Indicates the vertical scroll axis. When you scrall the mouse wheel or make certain gestures on the touchpad, the status of the vertical scroll axis changes.
+         * Indicates the vertical scroll axis. When you scrall the mouse wheel or make certain gestures on the touchpad, 
+         * the status of the vertical scroll axis changes.
          * 
          * @since 8
          */
         AXIS_TYPE_SCROLL_VERTICAL,
 
         /**
-         * Indicates the horizontal scroll axis. When you scrall the mouse wheel or make certain gestures on the touchpad, the status of the horizontal scroll axis changes.
+         * Indicates the horizontal scroll axis. When you scrall the mouse wheel or make certain gestures on the touchpad, 
+         * the status of the horizontal scroll axis changes.
          * 
          * @since 8
          */
@@ -244,7 +246,8 @@ public:
 
         /**
          * @brief Sets whether to enable the pressed state for the pointer.
-         * @param pressed Specifies whether to set the pressed state for the pointer. The value <b>true</b> means to set the pressed state for the pointer, and the <b>false</b> means the opposite.
+         * @param pressed Specifies whether to set the pressed state for the pointer. 
+         * The value <b>true</b> means to set the pressed state for the pointer, and the <b>false</b> means the opposite.
          * @return void
          * @since 8
          */
@@ -252,7 +255,8 @@ public:
 
         /**
          * @brief Obtains the x coordinate relative to the upper left corner of the screen.
-         * For a touchpad input event, the value is the absolute x coordinate on the touchpad. For other pointer input events, the value is the x coordinate on the target screen.
+         * For a touchpad input event, the value is the absolute x coordinate on the touchpad. 
+         * For other pointer input events, the value is the x coordinate on the target screen.
          * @return Returns the x coordinate.
          * @since 8
          */
@@ -268,7 +272,8 @@ public:
 
         /**
          * @brief Obtains the y coordinate relative to the upper left corner of the screen.
-         * For a touchpad input event, the value is the absolute y coordinate on the touchpad. For other pointer input events, the value is the y coordinate on the target screen.
+         * For a touchpad input event, the value is the absolute y coordinate on the touchpad. 
+         * For other pointer input events, the value is the y coordinate on the target screen.
          * @return Returns the y coordinate.
          * @since 8
          */
