@@ -36,7 +36,8 @@ public:
     std::set<int32_t> GetPreKeys() const;
 
     /**
-     * @brief Sets previous keys, that is, the keys that are pressed first in a combination key. There is no requirement on the sequence of previous keys.
+     * @brief Sets previous keys, that is, the keys that are pressed first in a combination key. 
+     * There is no requirement on the sequence of previous keys.
      * @param preKeys Indicates the previous keys to set.
      * @return void
      * @since 8
@@ -67,26 +68,33 @@ public:
 
     /**
      * @brief Sets whether the final key in a combination key is pressed or released.
-     * @param pressed Indicates whether the key is pressed. The value <b>true</b> means that the key is pressed, and the value <b>false</b> means that the key is released.
+     * @param pressed Indicates whether the key is pressed. The value <b>true</b> means that the key
+     * is pressed, and the value <b>false</b> means that the key is released.
      * @return void
      * @since 8
      */
     void SetFinalKeyDown(bool pressed);
 
     /**
-     * @brief Obtains the duration when the final key is held down or the maximum duration between when the key is pressed and when the key is released.
+     * @brief Obtains the duration when the final key is held down or the maximum duration between
+     * when the key is pressed and when the key is released.
      * If the final key is pressed, this parameter indicates the duration when the final key is held down.
-     * If the last key is released, this parameter indicates the maximum duration between when the key is pressed and when the key is released.
-     * @return Returns the duration when the final key is held down or the maximum duration between when the key is pressed and when the key is released.
+     * If the last key is released, this parameter indicates the maximum duration between when the key 
+     * is pressed and when the key is released.
+     * @return Returns the duration when the final key is held down or the maximum duration between 
+     * when the key is pressed and when the key is released.
      * @since 8
      */
     int32_t GetFinalKeyDownDuration() const;
 
     /**
-     * @brief Sets the duration when the final key is held down or the maximum duration between when the key is pressed and when the key is released.
+     * @brief Sets the duration when the final key is held down or the maximum duration between when 
+     * the key is pressed and when the key is released.
      * If the final key is pressed, this parameter indicates the duration when the final key is held down.
-     * If the last key is released, this parameter indicates the maximum duration between when the key is pressed and when the key is released.
-     * @param duration Indicates the duration when the final key is held down or the maximum duration between when the key is pressed and when the key is released.
+     * If the last key is released, this parameter indicates the maximum duration between when the key 
+     * is pressed and when the key is released.
+     * @param duration Indicates the duration when the final key is held down or the maximum duration 
+     * between when the key is pressed and when the key is released.
      * @return void
      * @since 8
      */

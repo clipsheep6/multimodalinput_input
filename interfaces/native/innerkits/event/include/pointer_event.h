@@ -149,7 +149,8 @@ public:
     static constexpr int32_t SOURCE_TYPE_UNKNOWN = 0;
 
     /**
-     * Indicates that the input source generates events similar to mouse cursor movement, button press and release, and wheel scrolling.
+     * Indicates that the input source generates events similar to mouse cursor movement, 
+     * button press and release, and wheel scrolling.
      * 
      * @since 8
      */
@@ -247,7 +248,8 @@ public:
         /**
          * @brief Sets whether to enable the pressed state for the pointer.
          * @param pressed Specifies whether to set the pressed state for the pointer. 
-         * The value <b>true</b> means to set the pressed state for the pointer, and the <b>false</b> means the opposite.
+         * The value <b>true</b> means to set the pressed state for the pointer, and the 
+         * value <b>false</b> means the opposite.
          * @return void
          * @since 8
          */

@@ -121,7 +121,8 @@ public:
 
 protected:
     /**
-     * @brief Constructs an input event object by using the specified input event type. Generally, this method is used to construct a base class object when constructing a derived class object.
+     * @brief Constructs an input event object by using the specified input event type. Generally, this method 
+     * is used to construct a base class object when constructing a derived class object.
      * @since 8
      */
     explicit AxisEvent(int32_t eventType);
