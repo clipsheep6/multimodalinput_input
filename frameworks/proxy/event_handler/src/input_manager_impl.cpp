@@ -477,9 +477,7 @@ void InputManagerImpl::GetMouseLocation(std::function<void(std::shared_ptr<DMous
     std::lock_guard<std::mutex> guard(lk_);
     mouseLocationRequests_.insert(std::pair<int32_t,
         std::function<void(std::shared_ptr<DMouseLocation>)>>(mouseLocationTaskId_, callback));
-    if (MMIEventHdl.GetMouseLocation(mouseLocationTaskId_) != RET_OK) {
-        MMI_LOGE("Failed to GetMouseLocation");
-    };
+    MMIEventHdl.GetMouseLocation(mouseLocationTaskId_);
     mouseLocationTaskId_++;
 }
 

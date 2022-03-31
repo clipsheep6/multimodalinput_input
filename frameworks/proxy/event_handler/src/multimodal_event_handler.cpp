@@ -213,7 +213,7 @@ int32_t MultimodalEventHandler::GetAllNodeDeviceInfo(int32_t taskId)
     
     bool isSuc =  EventManager.GetAllNodeDeviceInfo(taskId);
     if (isSuc)
-        MMI_LOGD("send ShowMouse msg Success");
+        MMI_LOGD("send GetAllNodeDeviceInfo msg Success");
     return RET_OK;
 }
 
@@ -221,7 +221,7 @@ int32_t MultimodalEventHandler::GetMouseLocation(int32_t taskId)
 {
     MMI_LOGD("MultimodalEventHandler::GetMouseLocation");
     if (!InitClient()) {
-    return MMI_SERVICE_INVALID;
+        return MMI_SERVICE_INVALID;
     }
     return EventManager.GetMouseLocation(taskId);
 }
