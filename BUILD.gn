@@ -14,13 +14,6 @@
 import("//build/ohos.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
-ohos_prebuilt_etc("mmi_uinput.rc") {
-  source = "mmi_uinput.rc"
-  relative_install_dir = "init"
-  part_name = "input"
-  subsystem_name = "multimodalinput"
-}
-
 ohos_prebuilt_etc("multimodalinput.rc") {
   source = "multimodalinput.cfg"
   relative_install_dir = "init"
@@ -135,3 +128,11 @@ group("unittests") {
     "util:ut-mmi-util",
   ]
 }
+
+group("mmi_tests") {
+  testonly = true
+  deps = [
+    ":unittests",
+    "test/moduletest:moduletest",
+  ]
+} 

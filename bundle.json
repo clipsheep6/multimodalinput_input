@@ -45,7 +45,6 @@
         "image_native",
         "libwm",
         "libwmutil",
-        "wmserver",
         "hisysevent_native",
         "libinput"
       ],
@@ -72,8 +71,7 @@
         "//third_party/mtdev:libmtdev",
         "//third_party/libevdev:libevdev",
         "//foundation/multimodalinput/input:uinput_inject",
-        "//foundation/multimodalinput/input:mmi_uinject",
-        "//foundation/multimodalinput/input:mmi_uinput.rc"
+        "//foundation/multimodalinput/input:mmi_uinject"
       ],
       "inner_kits": [
         {
@@ -92,8 +90,7 @@
         }
       ],
       "test": [
-        "//foundation/multimodalinput/input:unittests",
-        "//foundation/multimodalinput/input/test/moduletest:moduletest"
+        "//foundation/multimodalinput/input:mmi_tests"
       ]
     }
   }
