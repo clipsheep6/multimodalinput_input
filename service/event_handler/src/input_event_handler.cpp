@@ -427,6 +427,14 @@ int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
     return RET_OK;
 }
 
+int32_t InputEventHandler::OnMouseMove(int32_t offsetX, int32_t offsetY)
+{  
+    MouseEventHdr->NormalizeMouseMove(offsetX, offsetY);
+    auto pointerEvent = MouseEventHdr->GetPointerEvent();
+    eventDispatch_.HandlePointerEvent(pointerEvent);
+    return RET_OK;
+}
+
 int32_t InputEventHandler::OnMouseEventEndTimerHandler(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);

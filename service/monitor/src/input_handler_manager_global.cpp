@@ -380,5 +380,10 @@ void InputHandlerManagerGlobal::InterceptorCollection::OnSessionLost(SessionPtr 
         }
     }
 }
+
+void InputHandlerManagerGlobal::MoveMouse(int32_t offsetX, int32_t offsetY)
+{
+    InputHandler->OnMouseMove(offsetX, offsetY);
+}
 } // namespace MMI
 } // namespace OHOS
