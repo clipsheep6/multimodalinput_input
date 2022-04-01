@@ -493,7 +493,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             struct timeval tm;
                             gettimeofday(&tm, 0);
                             int64_t blockTime = tm.tv_usec + 16000;
-                            for(int32_t i = 1; i <= ContStepTime; ++i) {
+                            for (int32_t i = 1; i <= ContStepTime; ++i) {
                                 if (!vecX) {
                                     item.SetGlobalX(px1);
                                 } else {
