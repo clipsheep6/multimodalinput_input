@@ -53,7 +53,6 @@ static napi_value HideMouse(napi_env env, napi_callback_info info)
     napi_get_undefined(env, &result);
     MMI_LOGI("HideMouse end");
     return result;
-
 }
 
 static napi_value ShowMouse(napi_env env, napi_callback_info info)
