@@ -43,6 +43,7 @@ public:
     UDSServer *GetUDSServer() const;
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
     void AddHandleTimer(int32_t timeout = 300);
+    int32_t OnMouseMove(int32_t offsetX, int32_t offsetY);
 protected:
     int32_t OnEventDeviceAdded(libinput_event *event);
     int32_t OnEventDeviceRemoved(libinput_event *event);

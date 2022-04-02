@@ -37,7 +37,7 @@ public:
     void MarkConsumed(int32_t handlerId, int32_t eventId, SessionPtr session);
     bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent);
     bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent);
-
+    void MoveMouse(int32_t offsetX, int32_t offsetY);
 private:
     void InitSessionLostCallback();
     void OnSessionLost(SessionPtr session);
