@@ -340,11 +340,11 @@ int32_t ServerMsgHandler::OnMoveMouse(SessionPtr sess, NetPacket& pkt)
     CALL_LOG_ENTER;
     int32_t offsetX, offsetY;
     if (!pkt.Read(offsetX)) {
-        MMI_LOGE("Packet read monitor failed");
+        MMI_HILOGE("Packet read monitor failed");
         return RET_ERR;
     }
     if (!pkt.Read(offsetY)) {
-        MMI_LOGE("Packet read event failed");
+        MMI_HILOGE("Packet read event failed");
         return RET_ERR;
     }
 
