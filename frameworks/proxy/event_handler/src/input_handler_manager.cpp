@@ -81,11 +81,11 @@ void InputHandlerManager::MoveMouse(int32_t offsetX, int32_t offsetY)
     CHKPV(client);
     NetPacket pkt(MmiMessageId::MOVE_MOUSE_BY_OFFSET);
     if (!pkt.Write(offsetX) || !pkt.Write(offsetY)) {
-        MMI_LOGE("Packet write is error, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+        MMI_HILOGE("Packet write is error, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
         return;
     }
     if (!client->SendMessage(pkt)) {
-        MMI_LOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
         return;
     }
 }
