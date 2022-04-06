@@ -473,7 +473,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-
                             uint32_t stepTime = 16;
                             int32_t ContStepTime = totalTime / stepTime;
                             int32_t vecX = px2 - px1;
@@ -572,7 +571,7 @@ void InputManagerCommand::ShowUsage()
     std::cout << "-d <dx1> <dy1>             --down   <dx1> <dy1> -press down a position  dx1 dy1, " << std::endl;
     std::cout << "-u <dx1> <dy1>             --up     <dx1> <dy1> -release a position dx1 dy1" << std::endl;
     std::cout << "-m <dx1> <dy1> <dx2> <dy2> --move   <dx1> <dy1> <dx2> <dy2> -move dx1 dy1 to dx2 dy2 " << std::endl;
-    std::cout << "-s <dx1> <dy1> <dx2> <dy2> <smooth time> --smooth   <dx1> <dy1> <dx2> <dy2> -smooth dx1 dy1 to dx2 dy2 smooth time" << std::endl;
+    std::cout << "-s <dx1> <dy1> <dx2> <dy2> <smooth time> --smooth   dx1 dy1 to dx2 dy2 smooth time" << std::endl;
     std::cout << "                                                                  " << std::endl;
     std::cout << "-?  --help                                                        " << std::endl;
 }
