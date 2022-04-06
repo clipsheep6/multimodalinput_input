@@ -72,6 +72,8 @@ private:
     PhysicalDisplayInfo* GetPhysicalDisplay(int32_t id);
     PhysicalDisplayInfo* FindPhysicalDisplayInfo(const std::string seatId, const std::string seatName);
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
+    WindowInfo* GetFirstBtnDownWindow(int32_t globalX, int32_t globalY,
+        LogicalDisplayInfo *logicalDisplayInfo, std::shared_ptr<PointerEvent> pointerEvent);
 
 private:
     UDSServer* udsServer_ = nullptr;

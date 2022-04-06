@@ -110,7 +110,7 @@ std::shared_ptr<JsInputMonitor> JsInputMonitorManager::GetMonitor(int32_t id) {
         if ((item != nullptr) && (item->GetId() == id)) {
             return item;
         }
-    } 
+    }
     MMI_HILOGD("No monitor found");
     return nullptr;
 }

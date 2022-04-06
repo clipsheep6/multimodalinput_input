@@ -403,6 +403,28 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     int32_t globalX = pointerItem.GetGlobalX();
     int32_t globalY = pointerItem.GetGlobalY();
     PointerDrawMgr->DrawPointer(displayId, globalX, globalY);
+    WindowInfo* firstBtnDownWindow = GetFirstBtnDownWindow(globalX, globalY, logicalDisplayInfo, pointerEvent);
+    CHKPR(firstBtnDownWindow, ERROR_NULL_POINTER);
+    pointerEvent->SetTargetWindowId(firstBtnDownWindow->id);
+    pointerEvent->SetAgentWindowId(firstBtnDownWindow->agentWindowId);
+    int32_t localX = globalX - firstBtnDownWindow->winTopLeftX;
+    int32_t localY = globalY - firstBtnDownWindow->winTopLeftY;
+    pointerItem.SetLocalX(localX);
+    pointerItem.SetLocalY(localY);
+    pointerEvent->UpdatePointerItem(pointerId, pointerItem);
+    CHKPR(udsServer_, ERROR_NULL_POINTER);
+    auto fd = udsServer_->GetClientFd(firstBtnDownWindow->pid);
+
+    MMI_HILOGD("fd:%{public}d,pid:%{public}d,id:%{public}d,agentWindowId:%{public}d,"
+               "globalX:%{public}d,globalY:%{public}d,localX:%{public}d,localY:%{public}d",
+               fd, firstBtnDownWindow->pid, firstBtnDownWindow->id, firstBtnDownWindow->agentWindowId,
+               globalX, globalY, localX, localY);
+    return fd;
+}
+
+WindowInfo* InputWindowsManager::GetFirstBtnDownWindow(int32_t globalX, int32_t globalY,
+    LogicalDisplayInfo *logicalDisplayInfo, std::shared_ptr<PointerEvent> pointerEvent)
+{
     int32_t action = pointerEvent->GetPointerAction();
     bool isFirstBtnDown = (action == PointerEvent::POINTER_ACTION_BUTTON_DOWN)
         && (pointerEvent->GetPressedButtons().size() == 1);
@@ -425,22 +447,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             break;
         }
     }
-    CHKPR(firstBtnDownWindow, ERROR_NULL_POINTER);
-    pointerEvent->SetTargetWindowId(firstBtnDownWindow->id);
-    pointerEvent->SetAgentWindowId(firstBtnDownWindow->agentWindowId);
-    int32_t localX = globalX - firstBtnDownWindow->winTopLeftX;
-    int32_t localY = globalY - firstBtnDownWindow->winTopLeftY;
-    pointerItem.SetLocalX(localX);
-    pointerItem.SetLocalY(localY);
-    pointerEvent->UpdatePointerItem(pointerId, pointerItem);
-    CHKPR(udsServer_, ERROR_NULL_POINTER);
-    auto fd = udsServer_->GetClientFd(firstBtnDownWindow->pid);
-
-    MMI_HILOGD("fd:%{public}d,pid:%{public}d,id:%{public}d,agentWindowId:%{public}d,"
-               "globalX:%{public}d,globalY:%{public}d,localX:%{public}d,localY:%{public}d",
-               fd, firstBtnDownWindow->pid, firstBtnDownWindow->id, firstBtnDownWindow->agentWindowId,
-               globalX, globalY, localX, localY);
-    return fd;
+    return firstBtnDownWindow;
 }
 
 int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent)

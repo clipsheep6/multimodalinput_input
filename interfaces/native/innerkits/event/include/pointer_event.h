@@ -658,6 +658,7 @@ private:
     bool IsValidCheckMouse() const;
     bool IsValidCheckTouchFunc() const;
     bool IsValidCheckTouch() const;
+    bool ReadPointersAndButtons(Parcel &in);
 
 private:
     int32_t pointerId_ { 0 };
