@@ -85,6 +85,16 @@ void MouseEventHandler::HandleButonInner(libinput_event_pointer* data)
         pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_RIGHT);
     } else if (button == BTN_MIDDLE) {
         pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_MIDDLE);
+    } else if (button == BTN_SIDE) {
+        pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_SIDE);
+    } else if (button == BTN_EXTRA) {
+        pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_EXTRA);
+    } else if (button == BTN_FORWARD) {
+        pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_FORWARD);
+    } else if (button == BTN_BACK) {
+        pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_BACK);
+    } else if (button == BTN_TASK) {
+        pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_TASK);
     } else {
         MMI_HILOGW("unknown btn, btn:%{public}u", button);
     }
