@@ -22,6 +22,9 @@
 
 #include "define_multimodal.h"
 #include "error_multimodal.h"
+#include "run_shell_util.h"
+#include "proto.h"
+
 #include "input_event_monitor_manager.h"
 #include "input_handler_type.h"
 #include "input_manager.h"
@@ -29,8 +32,6 @@
 #include "multimodal_event_handler.h"
 #include "mmi_client.h"
 #include "pointer_event.h"
-#include "proto.h"
-#include "run_shell_util.h"
 
 namespace OHOS {
 namespace MMI {
@@ -819,10 +820,10 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent006()
     item.SetDownTime(downTime);
     item.SetPressed(true);
 
-    item.SetGlobalX(50);
-    item.SetGlobalY(50);
-    item.SetLocalX(70);
-    item.SetLocalY(70);
+    item.SetGlobalX(10);
+    item.SetGlobalY(10);
+    item.SetLocalX(20);
+    item.SetLocalY(20);
 
     item.SetWidth(0);
     item.SetHeight(0);
@@ -1515,8 +1516,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_008, TestSize.Leve
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_010, TestSize.Level1)
 {
-    MMI_HILOGD("start InputManagerTest_SubscribeKeyEvent_010");
-    if (MultimodalEventHandler::GetInstance().GetMMIClient() == nullptr) {
+    if (!MMIEventHdl.StartClient()) {
         MMI_HILOGD("get mmi client failed");
         return;
     }
