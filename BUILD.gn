@@ -51,6 +51,7 @@ ohos_executable("uinput_inject") {
     "hiviewdfx_hilog_native:libhilog",
     "input_device_driver:hdi_input",
     "utils_base:utils",
+    "startup_l2:syspara",
   ]
 
   part_name = "input"
@@ -81,6 +82,7 @@ ohos_shared_library("mmi_uinject") {
     "hiviewdfx_hilog_native:libhilog",
     "input_device_driver:hdi_input",
     "utils_base:utils",
+    "startup_l2:syspara",
   ]
 
   part_name = "input"
