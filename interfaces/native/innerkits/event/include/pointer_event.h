@@ -47,21 +47,21 @@ public:
     static constexpr int32_t POINTER_ACTION_CANCEL = 1;
 
     /**
-     * Indicates a pointer action representing that a funger is pressed on a touchscreen or touchpad.
+     * Indicates a pointer action representing that a finger is pressed on a touchscreen or touchpad.
      * 
      * @since 8
      */
     static constexpr int32_t POINTER_ACTION_DOWN = 2;
 
     /**
-     * Indicates a pointer action representing that a funger moves on a touchscreen or touchpad or a mouse pointer moves.
+     * Indicates a pointer action representing that a finger moves on a touchscreen or touchpad or a mouse pointer moves.
      * 
      * @since 8
      */
     static constexpr int32_t POINTER_ACTION_MOVE = 3;
 
     /**
-     * Indicates a pointer action representing that a funger leaves  the touchscreen or touchpad.
+     * Indicates a pointer action representing that a finger leaves  the touchscreen or touchpad.
      * 
      * @since 8
      */
@@ -197,6 +197,41 @@ public:
      * @since 8
      */
     static constexpr int32_t MOUSE_BUTTON_MIDDLE = 2;
+
+    /**
+     * 表示鼠标SIDE按钮.
+     * 
+     * @since 9
+     */
+    static constexpr int32_t MOUSE_BUTTON_SIDE = 3;
+
+    /**
+     * 表示鼠标EXTRA按钮.
+     * 
+     * @since 9
+     */
+    static constexpr int32_t MOUSE_BUTTON_EXTRA = 4;
+
+    /**
+     * 表示鼠标FORWARD按钮.
+     * 
+     * @since 9
+     */
+    static constexpr int32_t MOUSE_BUTTON_FORWARD = 5;
+
+    /**
+     * 表示鼠标BACK按钮.
+     * 
+     * @since 9
+     */
+    static constexpr int32_t MOUSE_BUTTON_BACK = 6;
+
+    /**
+     * 表示鼠标TASK按钮.
+     * 
+     * @since 9
+     */
+    static constexpr int32_t MOUSE_BUTTON_TASK = 7;
 
 public:
     static std::shared_ptr<PointerEvent> from(std::shared_ptr<InputEvent> inputEvent);
