@@ -547,34 +547,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
         return false;
     }
 
-    const int32_t pointersSize = in.ReadInt32();
-    if (pointersSize < 0) {
-        return false;
-    }
-
-    for (int32_t i = 0; i < pointersSize; i++) {
-        PointerItem val = {};
-        if (!val.ReadFromParcel(in)) {
-            return false;
-        }
-        pointers_.push_back(val);
-    }
-
-    const int32_t pressedButtonsSize = in.ReadInt32();
-    if (pressedButtonsSize < 0) {
-        return false;
-    }
-
-    for (int32_t i = 0; i < pressedButtonsSize; i++) {
-        int32_t val = 0;
-        if (!in.ReadInt32(val)) {
-            return false;
-        }
-        auto iter = pressedButtons_.insert(val);
-        if (!iter.second) {
-            MMI_HILOGE("Insert value failed, button:%{public}d", val);
-        }
-    }
+    ReadPointersAndButtons(in);
 
     if (!in.ReadInt32(sourceType_)) {
         return false;
@@ -607,6 +580,40 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
             return false;
         }
         axisValues_[i] = val;
+    }
+
+    return true;
+}
+
+bool PointerEvent::ReadPointersAndButtons(Parcel &in)
+{
+    const int32_t pointersSize = in.ReadInt32();
+    if (pointersSize < 0) {
+        return false;
+    }
+
+    for (int32_t i = 0; i < pointersSize; i++) {
+        PointerItem val = {};
+        if (!val.ReadFromParcel(in)) {
+            return false;
+        }
+        pointers_.push_back(val);
+    }
+
+    const int32_t pressedButtonsSize = in.ReadInt32();
+    if (pressedButtonsSize < 0) {
+        return false;
+    }
+
+    for (int32_t i = 0; i < pressedButtonsSize; i++) {
+        int32_t val = 0;
+        if (!in.ReadInt32(val)) {
+            return false;
+        }
+        auto iter = pressedButtons_.insert(val);
+        if (!iter.second) {
+            MMI_HILOGE("Insert value failed, button:%{public}d", val);
+        }
     }
 
     return true;
