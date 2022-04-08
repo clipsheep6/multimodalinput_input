@@ -454,7 +454,7 @@ public:
      * @return Returns <b>true</b> if the data of the pointer with the specified ID exists; returns <b>false</b> otherwise.
      * @since 8
      */
-    bool GetPointerItem(int32_t pointerId, PointerItem &pointerItem);
+    bool GetPointerItem(int32_t pointerId, PointerItem &pointerItem) const;
 
     /**
      * @brief Adds a pointer item.
@@ -681,7 +681,7 @@ inline uint32_t PointerEvent::GetAxes() const
     return axes_;
 }
 
-std::ostream& operator<<(std::ostream&, PointerEvent&);
+std::ostream& operator<<(std::ostream&, const PointerEvent&);
 } // namespace MMI
 } // namespace OHOS
 #endif // POINTER_EVENT_H
