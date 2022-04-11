@@ -32,6 +32,7 @@ public:
     {
         return true;
     }
+    virtual void SetPointerSpeed(int32_t speed) {}
 
 public:
     static inline std::shared_ptr<IPointerDrawingManager> iPointDrawMgr_ = nullptr;

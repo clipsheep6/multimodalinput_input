@@ -49,6 +49,7 @@ public:
     void RemoveInputEventTouchpadMontior(int32_t pointerEventType);
     int32_t AddInterceptor(int32_t sourceType, int32_t id);
     int32_t RemoveInterceptor(int32_t id);
+    int32_t SetMouseSpeed(int32_t mouseSpeed);
 
 private:
     bool InitClient();

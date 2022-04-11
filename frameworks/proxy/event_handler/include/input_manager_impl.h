@@ -69,6 +69,7 @@ public:
     void SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent);
     void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void OnConnected();
+    void SetMouseSpeed(int32_t mouseSpeed);
 
 private:
     int32_t PackPhysicalDisplay(NetPacket &pkt);

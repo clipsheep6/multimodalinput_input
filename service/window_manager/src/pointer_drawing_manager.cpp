@@ -258,5 +258,12 @@ std::shared_ptr<IPointerDrawingManager> IPointerDrawingManager::GetInstance()
     }
     return iPointDrawMgr_;
 }
+
+void PointerDrawingManager::SetPointerSpeed(int32_t speed)
+{
+    CALL_LOG_ENTER;
+    pSpeed_ = speed;
+    MMI_HILOGD("pSpeed: %{public}d", pSpeed_);
+}
 } // namespace MMI
 } // namespace OHOS

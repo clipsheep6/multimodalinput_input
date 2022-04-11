@@ -116,5 +116,9 @@ void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent
 {
     InputMgrImpl->SimulateInputEvent(pointerEvent);
 }
+void InputManager::SetMouseSpeed(int32_t mouseSpeed)
+{
+    InputMgrImpl->SetMouseSpeed(mouseSpeed);
+}
 } // namespace MMI
 } // namespace OHOS

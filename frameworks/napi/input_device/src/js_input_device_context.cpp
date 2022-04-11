@@ -200,6 +200,35 @@ napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info
     return jsInputDeviceMgr->GetDevice(env, id, argv[1]);
 }
 
+napi_value JsInputDeviceContext::SetMouseSpeed(napi_env env, napi_callback_info info)
+{
+    CALL_LOG_ENTER;
+    size_t argc = 1;
+    napi_value argv[1];
+    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc != 1) {
+        MMI_HILOGE("the number of parameter is not as expected");
+        napi_throw_error(env, nullptr, "the number of parameter is not as expected");
+        return nullptr;
+    }
+
+    napi_valuetype valueType = napi_undefined;
+    CHKRP(env, napi_typeof(env, argv[0], &valueType), TYPEOF);
+    if (valueType != napi_number) {
+        MMI_HILOGE("the first parameter is not a number");
+        napi_throw_error(env, nullptr, "JsInputDeviceContext: the first parameter is not a number");
+        return nullptr;
+    }
+    int32_t speed = 1;
+    CHKRP(env, napi_get_value_int32(env, argv[0], &speed), GET_INT32);
+    JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
+    CHKPP(jsDev);
+    auto jsInputDeviceMgr = jsDev->GetJsInputDeviceMgr();
+    CHKPP(jsInputDeviceMgr);
+    jsInputDeviceMgr->SetMouseSpeed(speed);
+    return nullptr;
+}
+
 napi_value JsInputDeviceContext::GetKeystrokeAbility(napi_env env, napi_callback_info info)
 {
     CALL_LOG_ENTER;
@@ -279,6 +308,7 @@ napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getDevice", GetDevice),
         DECLARE_NAPI_STATIC_FUNCTION("getDeviceIds", GetDeviceIds),
         DECLARE_NAPI_STATIC_FUNCTION("getKeystrokeAbility", GetKeystrokeAbility),
+        DECLARE_NAPI_STATIC_FUNCTION("getMouseSpeed", SetMouseSpeed),
     };
     CHKRP(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     return exports;

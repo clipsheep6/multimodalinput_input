@@ -182,6 +182,7 @@ public:
      * @since 9
      */
     void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    void SetMouseSpeed(int32_t mouseSpeed);
 
 private:
     InputManager() = default;

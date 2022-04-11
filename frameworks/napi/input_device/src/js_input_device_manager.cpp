@@ -14,6 +14,7 @@
  */
 
 #include "js_input_device_manager.h"
+#include "input_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -45,6 +46,13 @@ napi_value JsInputDeviceManager::GetKeystrokeAbility(napi_env env, int32_t id, s
     InputDeviceImpl::GetInstance().GetKeystrokeAbility(JsEventTarget::userData_ - 1, id, keyCodes,
                                                        EmitJsKeystrokeAbility);
     return ret;
+}
+
+napi_value JsInputDeviceManager::SetMouseSpeed(int32_t mouseSpeed)
+{
+    CALL_LOG_ENTER;
+    InputManager::GetInstance()->SetMouseSpeed(mouseSpeed);
+    return nullptr;
 }
 
 void JsInputDeviceManager::ResetEnv()
