@@ -36,21 +36,43 @@ int32_t TouchEventHandler::HandleLibinputEvent(libinput_event* event)
         MMI_HILOGD("This touch event is canceled type:%{public}d", type);
         return RET_OK;
     }
-    auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH);
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
-
-    CHKPR(nextHandler_, ERROR_NULL_POINTER);
-    nextHandler_->HandleTouchEvent(pointerEvent);
-    if (type == LIBINPUT_EVENT_TOUCH_UP){
-        pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
-        MMI_HILOGD("This touch event is up remove this finger");
-        if (pointerEvent->GetPointersIdList().empty()) {
-            MMI_HILOGD("This touch event is final finger up remove this finger");
-            pointerEvent->Reset();
-        } 
-        return RET_OK;
-    }
+    switch (type) {
+        case LIBINPUT_EVENT_TOUCH_DOWN:
+        case LIBINPUT_EVENT_TOUCH_UP:
+        case LIBINPUT_EVENT_TOUCH_MOTION: {
+            auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH);
+            CHKPR(pointerEvent, ERROR_NULL_POINTER);
+            BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
+            CHKPR(nextHandler_, ERROR_NULL_POINTER);
+            nextHandler_->HandleTouchEvent(pointerEvent);
+            if (type == LIBINPUT_EVENT_TOUCH_UP){
+                pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
+                MMI_HILOGD("This touch event is up remove this finger");
+                if (pointerEvent->GetPointersIdList().empty()) {
+                    MMI_HILOGD("This touch event is final finger up remove this finger");
+                    pointerEvent->Reset();
+                 } 
+                 return RET_OK;
+            }
+            break;
+        }
+        case LIBINPUT_EVENT_TABLET_TOOL_AXIS:
+        case LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY:
+        case LIBINPUT_EVENT_TABLET_TOOL_TIP: {
+            auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TABLET_TOOL);
+            CHKPR(pointerEvent, ERROR_NULL_POINTER);
+            BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
+            CHKPR(nextHandler_, ERROR_NULL_POINTER);
+            nextHandler_->HandleTouchEvent(pointerEvent);  
+            if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
+                pointerEvent->Reset();
+            }
+            break;
+        }
+        default: {            
+            break;
+        }       
+    } 
     return RET_OK;
 }
 

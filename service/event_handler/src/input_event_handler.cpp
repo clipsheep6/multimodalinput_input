@@ -388,13 +388,8 @@ int32_t InputEventHandler::OnTabletToolEvent(libinput_event *event)
 {
     CALL_LOG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
-    LibinputAdapter::LoginfoPackagingTool(event);
-    auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TABLET_TOOL);
-    CHKPR(pointerEvent, RET_ERR);
-    eventDispatch_.HandlePointerEvent(pointerEvent);
-    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
-        pointerEvent->Reset();
-    }
+    CHKPR(iTouchEventHandler_, ERROR_NULL_POINTER);
+    iTouchEventHandler_->HandleLibinputEvent(event);
     return RET_OK;
 }
 } // namespace MMI
