@@ -126,6 +126,18 @@ void InputEventHandler::Init(UDSServer& udsServer)
             MsgCallbackBind1(&InputEventHandler::OnEventTouchpad, this)
         },
         {
+            static_cast<MmiMessageId>(LIBINPUT_EVENT_TABLET_TOOL_AXIS),
+            MsgCallbackBind1(&InputEventHandler::OnTabletToolEvent, this)
+        },
+        {
+            static_cast<MmiMessageId>(LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY),
+            MsgCallbackBind1(&InputEventHandler::OnTabletToolEvent, this)
+        },
+        {
+            static_cast<MmiMessageId>(LIBINPUT_EVENT_TABLET_TOOL_TIP),
+            MsgCallbackBind1(&InputEventHandler::OnTabletToolEvent, this)
+        },
+        {
             static_cast<MmiMessageId>(LIBINPUT_EVENT_GESTURE_SWIPE_BEGIN),
             MsgCallbackBind1(&InputEventHandler::OnEventGesture, this)
         },
@@ -371,10 +383,19 @@ int32_t InputEventHandler::OnEventTouch(libinput_event *event)
     return iTouchEventHandler_->HandleLibinputEvent(event);
 }
 
-// bool InputEventHandler::SendMsg(const int32_t fd, NetPacket& pkt) const
-// {
-//     CHKPF(udsServer_);
-//     return udsServer_->SendMsg(fd, pkt);
-// }
+
+int32_t InputEventHandler::OnTabletToolEvent(libinput_event *event)
+{
+    CALL_LOG_ENTER;
+    CHKPR(event, ERROR_NULL_POINTER);
+    LibinputAdapter::LoginfoPackagingTool(event);
+    auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TABLET_TOOL);
+    CHKPR(pointerEvent, RET_ERR);
+    eventDispatch_.HandlePointerEvent(pointerEvent);
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
+        pointerEvent->Reset();
+    }
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

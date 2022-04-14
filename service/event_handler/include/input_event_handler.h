@@ -52,6 +52,7 @@ protected:
     int32_t OnEventTouch(libinput_event *event);
     int32_t OnEventGesture(libinput_event *event);
     int32_t OnEventTouchpad(libinput_event *event);
+    int32_t OnTabletToolEvent(libinput_event *event);
     int32_t OnEventKey(libinput_event *event);
 
 private:
