@@ -17,6 +17,7 @@
 
 #include <cinttypes>
 
+#include "bytrace_adapter.h"
 #include "input_event_data_transformation.h"
 #include "proto.h"
 
@@ -29,6 +30,20 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Inter
 InterceptorManagerGlobal::InterceptorManagerGlobal() {}
 
 InterceptorManagerGlobal::~InterceptorManagerGlobal() {}
+
+int32_t InterceptorManagerGlobal::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+{
+    if (!keyEvent->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
+        if (OnKeyEvent(keyEvent)) {
+            MMI_HILOGD("keyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d",
+                keyEvent->GetKeyCode());
+            BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_INTERCEPT_EVENT);
+            return RET_OK;
+        }
+    }
+    CHKPR(nextHandler_, ERROR_NULL_POINTER);
+    return nextHandler_->HandleKeyEvent(keyEvent);  
+}
 
 void InterceptorManagerGlobal::OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session)
 {

@@ -28,10 +28,16 @@
 #include "libinput.h"
 
 #include "bytrace_adapter.h"
+#include "event_filter_wrap.h"
 #include "input_device_manager.h"
+#include "input_handler_manager_global.h"
 #include "interceptor_manager_global.h"
+#include "i_key_command_manager.h"
+#include "key_event_handler.h"
+#include "key_event_subscriber.h"
 #include "mmi_func_callback.h"
-#include "mouse_event_handler.h"
+#include "pointer_event_handler.h"
+#include "touch_event_handler.h"
 #include "libinput_adapter.h"
 #include "time_cost_chk.h"
 #include "timer_manager.h"
@@ -55,6 +61,9 @@ InputEventHandler::~InputEventHandler() {}
 void InputEventHandler::Init(UDSServer& udsServer)
 {
     udsServer_ = &udsServer;
+    iKeyEventHandler_ = BuildKeyHandlerChain();
+    iPointerEventHandler_ = BuildPointerHandlerChain();
+    iTouchEventHandler_ = BuildTouchHandlerChain();  
     MsgCallback funs[] = {
         {
             static_cast<MmiMessageId>(LIBINPUT_EVENT_DEVICE_ADDED),
@@ -150,6 +159,57 @@ void InputEventHandler::Init(UDSServer& udsServer)
     return;
 }
 
+std::shared_ptr<IInputEventHandler> InputEventHandler::BuildKeyHandlerChain()
+{
+#ifdef OHOS_BUILD_KEYBOARD
+    auto keyEventHandler = std::make_shared<KeyEventHandler>();
+    CHKPP(keyEventHandler);
+    keyEventHandler->SetNext(InterceptorMgrGbl);
+    CHKPP(InterceptorMgrGbl);
+    auto keyCommandHandler = IKeyCommandManager::GetInstance();
+    InterceptorMgrGbl->SetNext(keyCommandHandler);
+    CHKPP(keyCommandHandler);
+    keyCommandHandler->SetNext(KeyEventSubscriber_);
+    CHKPP(KeyEventSubscriber_);
+    KeyEventSubscriber_->SetNext(EventDispatcher);
+    return keyEventHandler;
+#else
+    return std::make_shared<IInputEventHandler>();
+#endif
+}
+
+std::shared_ptr<IInputEventHandler> InputEventHandler::BuildPointerHandlerChain()
+{
+#ifdef OHOS_BUILD_POINTER
+    auto mouseEventHandler = std::make_shared<PointerEventHandler>();
+    CHKPP(mouseEventHandler);
+    mouseEventHandler->SetNext(EventFilterWraper);
+    CHKPP(EventFilterWraper);
+    EventFilterWraper->SetNext(InputHandlerMgrGlobal);
+    CHKPP(InputHandlerMgrGlobal);
+    InputHandlerMgrGlobal->SetNext(EventDispatcher);
+    return mouseEventHandler;
+#else
+    return std::make_shared<IInputEventHandler>();
+#endif 
+}
+
+std::shared_ptr<IInputEventHandler> InputEventHandler::BuildTouchHandlerChain()
+{
+#ifdef OHOS_BUILD_TOUCH
+    auto touchEventHandler = std::make_shared<TouchEventHandler>();
+    CHKPP(touchEventHandler);
+    touchEventHandler->SetNext(EventFilterWraper);
+    CHKPP(EventFilterWraper);
+    EventFilterWraper->SetNext(InputHandlerMgrGlobal);
+    CHKPP(InputHandlerMgrGlobal);
+    InputHandlerMgrGlobal->SetNext(EventDispatcher);
+    return touchEventHandler;
+#else
+    return std::make_shared<IInputEventHandler>();
+#endif
+}
+
 void InputEventHandler::OnEvent(void *event)
 {
     CHKPV(event);
@@ -220,9 +280,29 @@ UDSServer* InputEventHandler::GetUDSServer() const
     return udsServer_;
 }
 
+std::shared_ptr<KeyEvent> InputEventHandler::GetKeyEvent() const
+{
+    return keyEvent_;
+}
+
+std::shared_ptr<IInputEventHandler> InputEventHandler::GetKeyEventHandler() const
+{
+   return iKeyEventHandler_;
+}
+
+std::shared_ptr<IInputEventHandler> InputEventHandler::GetPointerEventHandler() const
+{
+    return iPointerEventHandler_;
+}
+
+std::shared_ptr<IInputEventHandler> InputEventHandler::GetTouchEventHandler() const
+{
+    return iTouchEventHandler_;
+}
+
 int32_t InputEventHandler::AddInputEventFilter(sptr<IEventFilter> filter)
 {
-    return eventDispatch_.AddInputEventFilter(filter);
+    return EventDispatcher->AddInputEventFilter(filter);
 }
 
 int32_t InputEventHandler::OnEventDeviceAdded(libinput_event *event)
@@ -240,113 +320,45 @@ int32_t InputEventHandler::OnEventDeviceRemoved(libinput_event *event)
     return RET_OK;
 }
 
-void InputEventHandler::AddHandleTimer(int32_t timeout)
-{
-    timerId_ = TimerMgr->AddTimer(timeout, 1, [this]() {
-        MMI_HILOGD("enter");
-        if (this->keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
-            MMI_HILOGD("key up");
-            return;
-        }
-        auto ret = eventDispatch_.DispatchKeyEventPid(*(this->udsServer_), this->keyEvent_);
-        if (ret != RET_OK) {
-            MMI_HILOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
-        }
-        constexpr int32_t triggerTime = 100;
-        this->AddHandleTimer(triggerTime);
-        MMI_HILOGD("leave");
-    });
-}
 int32_t InputEventHandler::OnEventKey(libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
-    CHKPR(udsServer_, ERROR_NULL_POINTER);
     if (keyEvent_ == nullptr) {
         keyEvent_ = KeyEvent::Create();
     }
-
-    auto packageResult = eventPackage_.PackageKeyEvent(event, keyEvent_);
-    if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
-        MMI_HILOGD("The same event reported by multi_device should be discarded");
-        return RET_OK;
-    }
-    if (packageResult != RET_OK) {
-        MMI_HILOGE("KeyEvent package failed. ret:%{public}d,errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
-        return KEY_EVENT_PKG_FAIL;
-    }
-
-    BytraceAdapter::StartBytrace(keyEvent_);
-
-    auto ret = eventDispatch_.DispatchKeyEventPid(*udsServer_, keyEvent_);
-    if (ret != RET_OK) {
-        MMI_HILOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
-        return KEY_EVENT_DISP_FAIL;
-    }
-    if (keyEvent_->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_UP ||
-        keyEvent_->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_DOWN ||
-        keyEvent_->GetKeyCode() == KeyEvent::KEYCODE_DEL) {
-        if (!TimerMgr->IsExist(timerId_) && keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
-            AddHandleTimer();
-            MMI_HILOGD("add a timer");
-        }
-        if (keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_UP && TimerMgr->IsExist(timerId_)) {
-            TimerMgr->RemoveTimer(timerId_);
-            timerId_ = -1;
-        }
-    }
-
-    MMI_HILOGD("keyCode:%{public}d,action:%{public}d", keyEvent_->GetKeyCode(), keyEvent_->GetKeyAction());
+    CHKPR(iKeyEventHandler_, ERROR_NULL_POINTER);
+    iKeyEventHandler_->HandleLibinputEvent(event);
     return RET_OK;
 }
 
 int32_t InputEventHandler::OnEventPointer(libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
-    return OnMouseEventHandler(event);
-}
-
-int32_t InputEventHandler::OnEventTouchSecond(libinput_event *event)
-{
-    CALL_LOG_ENTER;
-    CHKPR(event, ERROR_NULL_POINTER);
-    auto type = libinput_event_get_type(event);
-    if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
-        MMI_HILOGD("This touch event is canceled type:%{public}d", type);
-        return RET_OK;
+      if (keyEvent_ == nullptr) {
+        keyEvent_ = KeyEvent::Create();
     }
-    auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH);
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
-    eventDispatch_.HandlePointerEvent(pointerEvent);
-    if (type == LIBINPUT_EVENT_TOUCH_UP) {
-        pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
-        MMI_HILOGD("This touch event is up remove this finger");
-        if (pointerEvent->GetPointersIdList().empty()) {
-            MMI_HILOGD("This touch event is final finger up remove this finger");
-            pointerEvent->Reset();
-        }
-        return RET_OK;
-    }
+    CHKPR(iPointerEventHandler_, ERROR_NULL_POINTER);
+    iPointerEventHandler_->HandleLibinputEvent(event);
     return RET_OK;
 }
 
-int32_t InputEventHandler::OnEventTouchPadSecond(libinput_event *event)
+int32_t InputEventHandler::OnEventTouchpad(libinput_event *event)
 {
     CALL_LOG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
+    CHKPR(iPointerEventHandler_, ERROR_NULL_POINTER);
+    iPointerEventHandler_->HandleLibinputEvent(event); 
+    return RET_OK;
+}
 
-    auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH_PAD);
-    CHKPR(pointerEvent, RET_ERR);
-    eventDispatch_.HandlePointerEvent(pointerEvent);
-    auto type = libinput_event_get_type(event);
-    if (type == LIBINPUT_EVENT_TOUCHPAD_UP) {
-        pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
-        MMI_HILOGD("This touch pad event is up remove this finger");
-        if (pointerEvent->GetPointersIdList().empty()) {
-            MMI_HILOGD("This touch pad event is final finger up remove this finger");
-            pointerEvent->Reset();
-        }
-        return RET_OK;
+int32_t InputEventHandler::OnEventGesture(libinput_event *event)
+{
+    CHKPR(event, ERROR_NULL_POINTER);
+    CHKPR(iPointerEventHandler_, ERROR_NULL_POINTER);
+    int32_t ret = iPointerEventHandler_->HandleLibinputEvent(event);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Gesture event dispatch failed, errCode:%{public}d", GESTURE_EVENT_DISP_FAIL);
+        return GESTURE_EVENT_DISP_FAIL;
     }
     return RET_OK;
 }
@@ -355,105 +367,14 @@ int32_t InputEventHandler::OnEventTouch(libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     LibinputAdapter::LoginfoPackagingTool(event);
-    return OnEventTouchSecond(event);
+    CHKPR(iTouchEventHandler_, ERROR_NULL_POINTER);
+    return iTouchEventHandler_->HandleLibinputEvent(event);
 }
 
-int32_t InputEventHandler::OnEventTouchpad(libinput_event *event)
-{
-    OnEventTouchPadSecond(event);
-    return RET_OK;
-}
-
-int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
-{
-    CHKPR(event, ERROR_NULL_POINTER);
-    auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_GESTURE);
-    CHKPR(pointerEvent, GESTURE_EVENT_PKG_FAIL);
-    MMI_HILOGD("GestrueEvent package, eventType:%{public}d,actionTime:%{public}" PRId64 ","
-               "action:%{public}d,actionStartTime:%{public}" PRId64 ","
-               "pointerAction:%{public}d,sourceType:%{public}d,"
-               "PinchAxisValue:%{public}.2f",
-               pointerEvent->GetEventType(), pointerEvent->GetActionTime(),
-               pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
-               pointerEvent->GetPointerAction(), pointerEvent->GetSourceType(),
-               pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH));
-
-    PointerEvent::PointerItem item;
-    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item);
-    MMI_HILOGD("Item:DownTime:%{public}" PRId64 ",IsPressed:%{public}s,"
-               "GlobalX:%{public}d,GlobalY:%{public}d,LocalX:%{public}d,LocalY:%{public}d,"
-               "Width:%{public}d,Height:%{public}d",
-               item.GetDownTime(), (item.IsPressed() ? "true" : "false"),
-               item.GetGlobalX(), item.GetGlobalY(), item.GetLocalX(), item.GetLocalY(),
-               item.GetWidth(), item.GetHeight());
-
-    int32_t ret = eventDispatch_.HandlePointerEvent(pointerEvent);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Gesture event dispatch failed, errCode:%{public}d", GESTURE_EVENT_DISP_FAIL);
-        return GESTURE_EVENT_DISP_FAIL;
-    }
-    return RET_OK;
-}
-
-int32_t InputEventHandler::OnEventGesture(libinput_event *event)
-{
-    CHKPR(event, ERROR_NULL_POINTER);
-    OnGestureEvent(event);
-    return RET_OK;
-}
-
-int32_t InputEventHandler::OnMouseEventHandler(libinput_event *event)
-{
-    CHKPR(event, ERROR_NULL_POINTER);
-
-    MouseEventHdr->Normalize(event);
-
-    auto pointerEvent = MouseEventHdr->GetPointerEvent();
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
-
-    if (keyEvent_ == nullptr) {
-        keyEvent_ = KeyEvent::Create();
-    }
-    CHKPR(keyEvent_, ERROR_NULL_POINTER);
-    std::vector<int32_t> pressedKeys = keyEvent_->GetPressedKeys();
-    for (const int32_t& keyCode : pressedKeys) {
-        MMI_HILOGI("Pressed keyCode:%{public}d", keyCode);
-    }
-    pointerEvent->SetPressedKeys(pressedKeys);
-    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
-    eventDispatch_.HandlePointerEvent(pointerEvent);
-    return RET_OK;
-}
-
-int32_t InputEventHandler::OnMouseEventEndTimerHandler(std::shared_ptr<PointerEvent> pointerEvent)
-{
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    MMI_HILOGI("MouseEvent Normalization Results, PointerAction:%{public}d,PointerId:%{public}d,"
-               "SourceType:%{public}d,ButtonId:%{public}d,"
-               "VerticalAxisValue:%{public}lf,HorizontalAxisValue:%{public}lf",
-               pointerEvent->GetPointerAction(), pointerEvent->GetPointerId(), pointerEvent->GetSourceType(),
-               pointerEvent->GetButtonId(), pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
-               pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
-    PointerEvent::PointerItem item;
-    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
-        MMI_HILOGE("Get pointer item failed. pointer:%{public}d", pointerEvent->GetPointerId());
-        return RET_ERR;
-    }
-    MMI_HILOGI("MouseEvent Item Normalization Results, DownTime:%{public}" PRId64 ",IsPressed:%{public}d,"
-               "GlobalX:%{public}d,GlobalY:%{public}d,LocalX:%{public}d,LocalY:%{public}d,"
-               "Width:%{public}d,Height:%{public}d,Pressure:%{public}d,Device:%{public}d",
-               item.GetDownTime(), static_cast<int32_t>(item.IsPressed()), item.GetGlobalX(), item.GetGlobalY(),
-               item.GetLocalX(), item.GetLocalY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
-               item.GetDeviceId());
-
-    eventDispatch_.HandlePointerEvent(pointerEvent);
-    return RET_OK;
-}
-
-bool InputEventHandler::SendMsg(const int32_t fd, NetPacket& pkt) const
-{
-    CHKPF(udsServer_);
-    return udsServer_->SendMsg(fd, pkt);
-}
+// bool InputEventHandler::SendMsg(const int32_t fd, NetPacket& pkt) const
+// {
+//     CHKPF(udsServer_);
+//     return udsServer_->SendMsg(fd, pkt);
+// }
 } // namespace MMI
 } // namespace OHOS

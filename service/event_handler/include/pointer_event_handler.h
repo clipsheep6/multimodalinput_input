@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,34 +13,27 @@
  * limitations under the License.
  */
 
-#ifndef EVENT_FILTER_WRAP_H
-#define EVENT_FILTER_WRAP_H
+#ifndef POINTER_EVENT_HANDLER_H
+#define POINTER_EVENT_HANDLER_H
 
-#include <mutex>
-
-#include "nocopyable.h"
-#include "singleton.h"
-
-#include "i_event_filter.h"
+#include <memory>
 
 #include "i_input_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
-class EventFilterWrap : public IInputEventHandler {
+class PointerEventHandler : public IInputEventHandler {
 public:
-    EventFilterWrap();
-    DISALLOW_COPY_AND_MOVE(EventFilterWrap);
-    ~EventFilterWrap();
+    PointerEventHandler() = default;
+    ~PointerEventHandler() = default;
+    int32_t HandleLibinputEvent(libinput_event* event) override;
     int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
-    int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
-    int32_t AddInputEventFilter(sptr<IEventFilter> filter);
-    bool HandlePointerEventFilter(std::shared_ptr<PointerEvent> point);
+
 private:
-    std::mutex lockFilter_;
-    sptr<IEventFilter> filter_ {nullptr};
+    int32_t HandleTouchPadEvent(libinput_event* event);
+    int32_t HandleGestureEvent(libinput_event* event);
+    int32_t HandleMouseEvent(libinput_event* event);
 };
-#define EventFilterWraper OHOS::DelayedSingleton<EventFilterWrap>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#endif // EVENT_FILTER_WRAP_H
+#endif // POINTER_EVENT_HANDLER_H

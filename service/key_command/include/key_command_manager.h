@@ -62,7 +62,8 @@ public:
     KeyCommandManager();
     DISALLOW_COPY_AND_MOVE(KeyCommandManager);
     ~KeyCommandManager() = default;
-    bool HandlerEvent(const std::shared_ptr<KeyEvent> event);
+    bool HandlerEvent(const std::shared_ptr<KeyEvent> event) override;
+    int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
 private:
     void ResolveConfig(std::string configFile);
     bool ConvertToShortcutKey(const json &jsonData, ShortcutKey &shortcutKey);

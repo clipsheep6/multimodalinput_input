@@ -42,6 +42,7 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibInput(
 
 std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchEvent(struct libinput_event *event)
 {
+#ifdef OHOS_BUILD_TOUCH
     CHKPP(event);
     auto device = libinput_event_get_device(event);
     CHKPP(device);
@@ -60,10 +61,14 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchEvent(s
         }
     }
     return processor->OnLibinputTouchEvent(event);
+#else
+    return nullptr;
+#endif
 }
 
 std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchPadEvent(struct libinput_event *event)
 {
+#ifdef OHOS_BUILD_POINTER
     CHKPP(event);
     auto device = libinput_event_get_device(event);
     CHKPP(device);
@@ -83,10 +88,14 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchPadEven
         }
     }
     return processor->OnLibinputTouchPadEvent(event);
+#else
+    return nullptr;
+#endif
 }
 
 std::shared_ptr<PointerEvent> TouchTransformPointManager::OnTouchPadGestrueEvent(struct libinput_event *event)
 {
+#ifdef OHOS_BUILD_POINTER
     CHKPP(event);
     auto device = libinput_event_get_device(event);
     CHKPP(device);
@@ -106,6 +115,9 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnTouchPadGestrueEvent
         }
     }
     return processor->OnTouchPadGestrueEvent(event);
+#else
+    return nullptr;
+#endif
 }
 } // namespace MMI
 } // namespace OHOS

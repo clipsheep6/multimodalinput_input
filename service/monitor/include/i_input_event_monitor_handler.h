@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef I_INPUT_EVENT_HANDLER_H
-#define I_INPUT_EVENT_HANDLER_H
+#ifndef I_INPUT_EVENT_MONITOR_HANDLER_H
+#define I_INPUT_EVENT_MONITOR_HANDLER_H
 
 #include <mutex>
 
@@ -24,7 +24,7 @@
 
 namespace OHOS {
 namespace MMI {
-struct IInputEventHandler {
+struct IInputEventMonitorHandler {
     static constexpr int32_t DEFAULT_INTERCEPTOR = 10;
     static constexpr int32_t DEFAULT_MONITOR = 20;
     virtual int32_t GetPriority() const = 0;
@@ -33,4 +33,4 @@ struct IInputEventHandler {
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // I_INPUT_EVENT_HANDLER_H
+#endif // I_INPUT_EVENT_MONITOR_HANDLER_H

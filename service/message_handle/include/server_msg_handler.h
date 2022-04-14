@@ -18,7 +18,8 @@
 
 #include "nocopyable.h"
 
-#include "event_dispatch.h"
+#include "uds_session.h"
+#include "uds_server.h"
 #include "msg_handler.h"
 
 
@@ -63,8 +64,8 @@ protected:
 
 private:
     UDSServer *udsServer_ = nullptr;
-    EventDispatch eventDispatch_;
-    std::shared_ptr<KeyEvent> keyEvent_ = nullptr;
+    //EventDispatch eventDispatch_;
+    //std::shared_ptr<KeyEvent> keyEvent_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS

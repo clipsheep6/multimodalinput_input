@@ -27,11 +27,10 @@
 #include "event_filter_wrap.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
-#include "input_event_monitor_manager.h"
 #include "input_handler_manager_global.h"
-#include "interceptor_manager_global.h"
-#include "key_event_subscriber.h"
+#include "input_windows_manager.h"
 #include "util.h"
+
 
 namespace OHOS {
 namespace MMI {
@@ -93,32 +92,88 @@ void EventDispatch::OnEventTouchGetPointEventType(const EventTouch& touch,
     }
 }
 
-bool EventDispatch::HandlePointerEventFilter(std::shared_ptr<PointerEvent> point)
+int32_t EventDispatch::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-    return EventFilterWrap::GetInstance().HandlePointerEventFilter(point);
+#ifdef OHOS_BUILD_KEYBOARD
+    CALL_LOG_ENTER;
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    auto fd = WinMgr->UpdateTarget(keyEvent);
+    if (fd < 0) {
+        MMI_HILOGE("Invalid fd, fd: %{public}d", fd);
+        return RET_ERR;
+    }
+    MMI_HILOGD("event dispatcher of server:KeyEvent:KeyCode:%{public}d,"
+               "ActionTime:%{public}" PRId64 ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ","
+               "EventType:%{public}d,Flag:%{public}u,"
+               "KeyAction:%{public}d,Fd:%{public}d",
+               keyEvent->GetKeyCode(), keyEvent->GetActionTime(), keyEvent->GetAction(),
+               keyEvent->GetActionStartTime(),
+               keyEvent->GetEventType(),
+               keyEvent->GetFlag(), keyEvent->GetKeyAction(), fd);
+
+    InputHandlerMgrGlobal->HandleEvent(keyEvent);
+    auto udsServer = InputHandler->GetUDSServer();
+    CHKPR(udsServer, ERROR_NULL_POINTER);
+    auto session = udsServer->GetSession(fd);
+    CHKPF(session);
+    if (session->isANRProcess_) {
+        MMI_HILOGD("is ANR process");
+        return RET_OK;
+    }
+
+    auto currentTime = GetSysClockTime();
+    if (TriggerANR(currentTime, session)) {
+        session->isANRProcess_ = true;
+        MMI_HILOGW("the key event does not report normally, triggering ANR");
+         return RET_OK;
+    }
+
+    NetPacket pkt(MmiMessageId::ON_KEYEVENT);
+    InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt);
+    BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_DISPATCH_EVENT);
+    pkt << fd;
+    if (!udsServer->SendMsg(fd, pkt)) {
+        MMI_HILOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
+        return MSG_SEND_FAIL;
+    }
+    session->AddEvent(keyEvent->GetId(), currentTime);
+#endif
+     return RET_OK;
 }
 
-int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
+int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> pointEvent)
 {
+#ifdef OHOS_BUILD_MOUSE
     CALL_LOG_ENTER;
-    CHKPR(point, ERROR_NULL_POINTER);
-    if (HandlePointerEventFilter(point)) {
-        MMI_HILOGI("Pointer event Filter succeeded");
-        return RET_OK;
-    }
-    if (InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
-        BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
-        MMI_HILOGD("Interception and monitor succeeded");
-        return RET_OK;
-    }
-    auto fd = WinMgr->UpdateTargetPointer(point);
+    CHKPR(pointEvent, ERROR_NULL_POINTER);
+    return DispatchPointerEvent(pointEvent);
+#else
+    return RET_OK;
+#endif
+}
+
+int32_t EventDispatch::HandleTouchEvent(std::shared_ptr<PointerEvent> pointEvent)
+{
+#ifdef OHOS_BUILD_TOUCH
+    CALL_LOG_ENTER;
+    CHKPR(pointEvent, ERROR_NULL_POINTER);
+    return DispatchPointerEvent(pointEvent);
+#else
+    return RET_OK;
+#endif
+}
+
+int32_t EventDispatch::DispatchPointerEvent(std::shared_ptr<PointerEvent> pointEvent)
+{
+    CHKPR(pointEvent, ERROR_NULL_POINTER);
+    auto fd = WinMgr->UpdateTargetPointer(pointEvent);
     if (fd < 0) {
         MMI_HILOGE("The fd less than 0, fd: %{public}d", fd);
         return RET_ERR;
     }
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
-    InputEventDataTransformation::Marshalling(point, pkt);
-    BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
+    InputEventDataTransformation::Marshalling(pointEvent, pkt);
+    BytraceAdapter::StartBytrace(pointEvent, BytraceAdapter::TRACE_STOP);
     auto udsServer = InputHandler->GetUDSServer();
     if (udsServer == nullptr) {
         MMI_HILOGE("UdsServer is a nullptr");
@@ -143,76 +198,13 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return RET_ERR;
     }
-    session->AddEvent(point->GetId(), currentTime);
-    return RET_OK;
-}
-
-int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key)
-{
-    CALL_LOG_ENTER;
-    CHKPR(key, PARAM_INPUT_INVALID);
-    if (!key->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
-        if (InterceptorMgrGbl.OnKeyEvent(key)) {
-            MMI_HILOGD("keyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d",
-                key->GetKeyCode());
-            BytraceAdapter::StartBytrace(key, BytraceAdapter::KEY_INTERCEPT_EVENT);
-            return RET_OK;
-        }
-    }
-    if (IKeyCommandManager::GetInstance()->HandlerEvent(key)) {
-        MMI_HILOGD("The keyEvent start launch an ability, keyCode:%{public}d", key->GetKeyCode());
-        BytraceAdapter::StartBytrace(key, BytraceAdapter::KEY_LAUNCH_EVENT);
-        return RET_OK;
-    }
-    if (KeyEventSubscriber_.SubscribeKeyEvent(key)) {
-        MMI_HILOGD("Subscribe keyEvent filter success. keyCode:%{public}d", key->GetKeyCode());
-        BytraceAdapter::StartBytrace(key, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
-        return RET_OK;
-    }
-    auto fd = WinMgr->UpdateTarget(key);
-    if (fd < 0) {
-        MMI_HILOGE("Invalid fd, fd: %{public}d", fd);
-        return RET_ERR;
-    }
-    MMI_HILOGD("event dispatcher of server:KeyEvent:KeyCode:%{public}d,"
-               "ActionTime:%{public}" PRId64 ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ","
-               "EventType:%{public}d,Flag:%{public}u,"
-               "KeyAction:%{public}d,Fd:%{public}d",
-               key->GetKeyCode(), key->GetActionTime(), key->GetAction(),
-               key->GetActionStartTime(),
-               key->GetEventType(),
-               key->GetFlag(), key->GetKeyAction(), fd);
-
-    InputHandlerManagerGlobal::GetInstance().HandleEvent(key);
-    auto session = udsServer.GetSession(fd);
-    CHKPF(session);
-    if (session->isANRProcess_) {
-        MMI_HILOGD("is ANR process");
-        return RET_OK;
-    }
-
-    auto currentTime = GetSysClockTime();
-    if (TriggerANR(currentTime, session)) {
-        session->isANRProcess_ = true;
-        MMI_HILOGW("the key event does not report normally, triggering ANR");
-        return RET_OK;
-    }
-
-    NetPacket pkt(MmiMessageId::ON_KEYEVENT);
-    InputEventDataTransformation::KeyEventToNetPacket(key, pkt);
-    BytraceAdapter::StartBytrace(key, BytraceAdapter::KEY_DISPATCH_EVENT);
-    pkt << fd;
-    if (!udsServer.SendMsg(fd, pkt)) {
-        MMI_HILOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
-        return MSG_SEND_FAIL;
-    }
-    session->AddEvent(key->GetId(), currentTime);
+    session->AddEvent(pointEvent->GetId(), currentTime);
     return RET_OK;
 }
 
 int32_t EventDispatch::AddInputEventFilter(sptr<IEventFilter> filter)
 {
-    return EventFilterWrap::GetInstance().AddInputEventFilter(filter);
+    return EventFilterWraper->AddInputEventFilter(filter);
 }
 
 bool EventDispatch::TriggerANR(int64_t time, SessionPtr sess)

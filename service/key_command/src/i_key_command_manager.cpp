@@ -17,12 +17,23 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IKeyCommandManager" };
+} // namespace
+
 std::shared_ptr<IKeyCommandManager> IKeyCommandManager::GetInstance()
 {
     if (keyCommand_ == nullptr) {
         keyCommand_ = std::make_shared<IKeyCommandManager>();
     }
     return keyCommand_;
+}
+
+int32_t IKeyCommandManager::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    CHKPR(nextHandler_, ERROR_NULL_POINTER);
+    return nextHandler_->HandleKeyEvent(keyEvent);
 }
 } // namespace MMI
 } // namespace OHOS

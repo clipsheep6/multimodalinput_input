@@ -22,8 +22,8 @@
 #include "singleton.h"
 
 #include "event_dispatch.h"
-#include "event_package.h"
 #include "i_event_filter.h"
+#include "i_input_event_handler.h"
 #include "mouse_event_handler.h"
 #include "msg_handler.h"
 
@@ -39,38 +39,38 @@ public:
     void Init(UDSServer& udsServer);
     void OnEvent(void *event);
     void OnCheckEventReport();
-    int32_t OnMouseEventEndTimerHandler(std::shared_ptr<PointerEvent> pointerEvent);
     UDSServer *GetUDSServer() const;
-    int32_t AddInputEventFilter(sptr<IEventFilter> filter);
-    void AddHandleTimer(int32_t timeout = 300);
+    int32_t AddInputEventFilter(sptr<IEventFilter> filter); 
+    std::shared_ptr<KeyEvent> GetKeyEvent() const;
+    std::shared_ptr<IInputEventHandler> GetKeyEventHandler() const;
+    std::shared_ptr<IInputEventHandler> GetPointerEventHandler() const;
+    std::shared_ptr<IInputEventHandler> GetTouchEventHandler() const;
 protected:
     int32_t OnEventDeviceAdded(libinput_event *event);
     int32_t OnEventDeviceRemoved(libinput_event *event);
     int32_t OnEventPointer(libinput_event *event);
     int32_t OnEventTouch(libinput_event *event);
-    int32_t OnEventTouchSecond(libinput_event *event);
-    int32_t OnEventTouchPadSecond(libinput_event *event);
     int32_t OnEventGesture(libinput_event *event);
     int32_t OnEventTouchpad(libinput_event *event);
-    int32_t OnGestureEvent(libinput_event *event);
     int32_t OnEventKey(libinput_event *event);
-    
-    int32_t OnMouseEventHandler(struct libinput_event *event);
-    bool SendMsg(const int32_t fd, NetPacket& pkt) const;
 
 private:
     int32_t OnEventHandler(libinput_event *event);
+    std::shared_ptr<IInputEventHandler> BuildKeyHandlerChain();
+    std::shared_ptr<IInputEventHandler> BuildPointerHandlerChain();
+    std::shared_ptr<IInputEventHandler> BuildTouchHandlerChain();
+
     UDSServer *udsServer_ = nullptr;
-    EventDispatch eventDispatch_;
-    EventPackage eventPackage_;
     NotifyDeviceChange notifyDeviceChange_;
     std::shared_ptr<KeyEvent> keyEvent_ = nullptr;
+    std::shared_ptr<IInputEventHandler> iKeyEventHandler_;
+    std::shared_ptr<IInputEventHandler> iPointerEventHandler_;
+    std::shared_ptr<IInputEventHandler> iTouchEventHandler_;
 
     uint64_t idSeed_ = 0;
     int32_t eventType_ = 0;
     int64_t initSysClock_ = 0;
-    int64_t lastSysClock_ = 0;
-    int32_t timerId_ = -1;
+    int64_t lastSysClock_ = 0;  
 };
 
 #define InputHandler InputEventHandler::GetInstance()

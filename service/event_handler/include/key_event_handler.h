@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,31 +13,32 @@
  * limitations under the License.
  */
 
-#ifndef I_KEY_COMMAND_MANAGER_H
-#define I_KEY_COMMAND_MANAGER_H
+#ifndef KEY_EVENT_HANDLER_H
+#define KEY_EVENT_HANDLER_H
 
-#include "bytrace.h"
-#include "bytrace_adapter.h"
-#include "define_multimodal.h"
+#include <memory>
+
 #include "i_input_event_handler.h"
-#include "key_event.h"
+
+#define KEYSTATUS 0
 
 namespace OHOS {
 namespace MMI {
-class IKeyCommandManager : public IInputEventHandler {
+class KeyEventHandler : public IInputEventHandler {
 public:
-    IKeyCommandManager() = default;
-    virtual ~IKeyCommandManager() = default;
-    static std::shared_ptr<IKeyCommandManager> GetInstance();   
-    virtual bool HandlerEvent(const std::shared_ptr<KeyEvent> key) {
-        return false;
-    }
+    KeyEventHandler() = default;
+    ~KeyEventHandler() = default;
+    int32_t HandleLibinputEvent(libinput_event* event) override;
     int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
-     
 
-public:
-    static inline std::shared_ptr<IKeyCommandManager> keyCommand_ = nullptr;
+private:
+    int32_t Normalize(libinput_event *event, std::shared_ptr<KeyEvent> keyEvent);
+    void Repeat(const std::shared_ptr<KeyEvent> keyEvent);
+    void AddHandleTimer(int32_t timeout = 300);
+
+private:    
+    int32_t timerId_ = -1;
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // I_KEY_COMMAND_MANAGER_H
+#endif // KEY_EVENT_HANDLER_H

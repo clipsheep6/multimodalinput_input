@@ -20,13 +20,14 @@
 #include "nocopyable.h"
 #include "singleton.h"
 
+#include "i_input_event_handler.h"
 #include "key_event.h"
 #include "pointer_event.h"
 #include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
-class InterceptorManagerGlobal {
+class InterceptorManagerGlobal : public IInputEventHandler {
 public:
     static constexpr int32_t SOURCETYPE_KEY = 4;
 
@@ -38,6 +39,7 @@ public:
     void OnRemoveInterceptor(int32_t id);
     bool OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
     bool OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
+    int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
 private:
     struct InterceptorItem {
         int32_t sourceType;
@@ -52,7 +54,7 @@ private:
     std::list<InterceptorItem> interceptors_;
 };
 
-#define InterceptorMgrGbl OHOS::Singleton<InterceptorManagerGlobal>::GetInstance()
+#define InterceptorMgrGbl OHOS::DelayedSingleton<InterceptorManagerGlobal>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // INTERCEPTOR_MANAGER_GLOBAL_H

@@ -23,18 +23,21 @@
 #include "singleton.h"
 
 #include "i_input_event_handler.h"
+#include "i_input_event_monitor_handler.h"
 #include "input_handler_type.h"
 #include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
-class InputHandlerManagerGlobal : public Singleton<InputHandlerManagerGlobal> {
+class InputHandlerManagerGlobal : public IInputEventHandler {
 public:
     InputHandlerManagerGlobal() = default;
     DISALLOW_COPY_AND_MOVE(InputHandlerManagerGlobal);
     int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     void MarkConsumed(int32_t handlerId, int32_t eventId, SessionPtr session);
+    int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+    int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
     bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent);
     bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent);
 
@@ -63,7 +66,7 @@ private:
         SessionPtr session_ = nullptr;
     };
 
-    struct MonitorCollection : public IInputEventHandler, protected NoCopyable {
+    struct MonitorCollection : public IInputEventMonitorHandler, protected NoCopyable {
         virtual int32_t GetPriority() const override;
         virtual bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent) override;
         virtual bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent) override;
@@ -83,7 +86,7 @@ private:
         bool isMonitorConsumed_ { false };
     };
 
-    struct InterceptorCollection : public IInputEventHandler, protected NoCopyable {
+    struct InterceptorCollection : public IInputEventMonitorHandler, protected NoCopyable {
         virtual int32_t GetPriority() const override;
         virtual bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent) override;
         virtual bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent) override;
@@ -101,6 +104,7 @@ private:
     MonitorCollection monitors_;
     InterceptorCollection interceptors_;
 };
+#define InputHandlerMgrGlobal OHOS::DelayedSingleton<InputHandlerManagerGlobal>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_HANDLER_MANAGER_GLOBAL_H
