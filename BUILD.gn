@@ -135,3 +135,18 @@ group("unittests") {
     "util:ut-mmi-util",
   ]
 }
+
+group("mmi_tests") {
+  testonly = true
+  deps = [
+    ":unittests",
+    "test/moduletest:moduletest",
+  ]
+}
+
+group("mmi_tests_manual") {
+  testonly = true
+  deps = [
+    "frameworks/proxy:InputManagerManualTest",
+  ]
+}
