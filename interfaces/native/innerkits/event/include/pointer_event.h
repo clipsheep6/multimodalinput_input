@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -198,6 +198,41 @@ public:
      */
     static constexpr int32_t MOUSE_BUTTON_MIDDLE = 2;
 
+    /**
+     * Indicates the side button on a mouse.
+     *
+     * @since 9
+     */
+    static constexpr int32_t MOUSE_BUTTON_SIDE = 3;
+
+    /**
+     * Indicates the extra button on a mouse.
+     *
+     * @since 9
+     */
+    static constexpr int32_t MOUSE_BUTTON_EXTRA = 4;
+
+    /**
+     * Indicates the forward button on a mouse.
+     *
+     * @since 9
+     */
+    static constexpr int32_t MOUSE_BUTTON_FORWARD = 5;
+
+    /**
+     * Indicates the back button on a mouse.
+     *
+     * @since 9
+     */
+    static constexpr int32_t MOUSE_BUTTON_BACK = 6;
+
+    /**
+     * Indicates the task button on a mouse.
+     *
+     * @since 9
+     */
+    static constexpr int32_t MOUSE_BUTTON_TASK = 7;
+
 public:
     static std::shared_ptr<PointerEvent> from(std::shared_ptr<InputEvent> inputEvent);
 
@@ -349,11 +384,6 @@ public:
          */
         void SetHeight(int32_t height);
 
-        double GetTiltX() const;
-        void SetTiltX(double tiltX);
-        double GetTiltY() const;
-        void SetTiltY(double tiltY);
-
         /**
          * @brief Obtains the pressure in this event.
          * @return Returns the pressure.
@@ -383,7 +413,7 @@ public:
          * @since 9
          */
         void SetDeviceId(int32_t deviceId);
-
+    public:
         /**
          * @brief Writes data to a <b>Parcel</b> obejct.
          * @param out Indicates the object into which data will be written.
@@ -409,8 +439,6 @@ public:
         int32_t localY_ { 0 };
         int32_t width_ { 0 };
         int32_t height_ { 0 };
-        double  tiltX_ { 0.0 };
-        double  tiltY_ { 0.0 };
         int32_t pressure_ { 0 };
         int32_t deviceId_ { 0 };
         int64_t downTime_ { 0 };
@@ -438,8 +466,6 @@ public:
      * @since 9
      */
     static std::shared_ptr<PointerEvent> Create();
-
-    virtual void Reset() override;
 
     /**
      * @brief Obtains the pointer action in this event.
@@ -696,14 +722,14 @@ private:
     bool IsValidCheckTouch() const;
 
 private:
-    int32_t pointerId_ { -1 };
+    int32_t pointerId_ { 0 };
     std::list<PointerItem> pointers_;
     std::set<int32_t> pressedButtons_;
-    int32_t sourceType_ { SOURCE_TYPE_UNKNOWN };
-    int32_t pointerAction_ { POINTER_ACTION_UNKNOWN };
+    int32_t sourceType_ { 0 };
+    int32_t pointerAction_ { 0 };
     int32_t buttonId_ { -1 };
-    uint32_t axes_ { 0U };
-    std::array<double, AXIS_TYPE_MAX>   axisValues_ {};
+    uint32_t axes_ { 0 };
+    std::array<double, AXIS_TYPE_MAX>   axisValues_ { };
     std::vector<int32_t> pressedKeys_;
 };
 
