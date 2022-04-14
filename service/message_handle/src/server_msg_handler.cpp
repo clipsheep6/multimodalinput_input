@@ -214,14 +214,13 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket& pkt)
     CHKPR(iKeyEventHandler, ERROR_NULL_POINTER);
     auto result = iKeyEventHandler->HandleKeyEvent(creKey);
     if (result != RET_OK) {
-       MMI_HILOGE("Key event dispatch failed. ret:%{public}d,errCode:%{public}d", result, KEY_EVENT_DISP_FAIL);
+        MMI_HILOGE("Key event dispatch failed. ret:%{public}d,errCode:%{public}d", result, KEY_EVENT_DISP_FAIL);
     }
     MMI_HILOGD("Inject keyCode:%{public}d, action:%{public}d", creKey->GetKeyCode(), creKey->GetKeyAction());
     return RET_OK;
 #else
     return RET_OK;
 #endif
-
 }
 
 int32_t ServerMsgHandler::OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt)
@@ -241,24 +240,24 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt)
             auto iTouchEventHandler = InputHandler->GetTouchEventHandler();
             CHKPR(iTouchEventHandler, ERROR_NULL_POINTER);
             if (iTouchEventHandler->HandleTouchEvent(pointerEvent) != RET_OK) {
-               MMI_HILOGE("HandlePointerEvent failed");
-               return RET_ERR;
+                MMI_HILOGE("HandlePointerEvent failed");
+                return RET_ERR;
             }
 #endif
             break;
-         }
+        }
         case PointerEvent::SOURCE_TYPE_MOUSE:
         case PointerEvent::SOURCE_TYPE_TOUCHPAD : {
 #ifdef OHOS_BUILD_POINTER
             auto iPointerEventHandler = InputHandler->GetPointerEventHandler();
             CHKPR(iPointerEventHandler, ERROR_NULL_POINTER);
             if (iPointerEventHandler->HandlePointerEvent(pointerEvent) != RET_OK) {
-               MMI_HILOGE("HandlePointerEvent failed");
-               return RET_ERR;
+                MMI_HILOGE("HandlePointerEvent failed");
+                return RET_ERR;
             }
 #endif
             break;
-        }        
+        }
         default: {
             MMI_HILOGW("Source type is unknown, source:%{public}d", source);
             break;

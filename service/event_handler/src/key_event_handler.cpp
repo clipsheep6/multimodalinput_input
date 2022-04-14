@@ -48,7 +48,7 @@ int32_t KeyEventHandler::HandleLibinputEvent(libinput_event* event)
     BytraceAdapter::StartBytrace(keyEvent);
     CHKPR(nextHandler_, ERROR_NULL_POINTER);
 
-    auto ret = nextHandler_->HandleKeyEvent(keyEvent); 
+    auto ret = nextHandler_->HandleKeyEvent(keyEvent);
     if (ret != RET_OK) {
         MMI_HILOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
         return KEY_EVENT_DISP_FAIL;
@@ -62,7 +62,7 @@ int32_t KeyEventHandler::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     CHKPR(nextHandler_, ERROR_NULL_POINTER);
-    return nextHandler_->HandleKeyEvent(keyEvent);  
+    return nextHandler_->HandleKeyEvent(keyEvent);
 }
 
 int32_t KeyEventHandler::Normalize(libinput_event* event, std::shared_ptr<KeyEvent> keyEvent)
@@ -122,13 +122,13 @@ int32_t KeyEventHandler::Normalize(libinput_event* event, std::shared_ptr<KeyEve
 
 void KeyEventHandler::Repeat(const std::shared_ptr<KeyEvent> keyEvent)
 {
-       if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_UP ||
-        keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_DOWN ||
-        keyEvent->GetKeyCode() == KeyEvent::KEYCODE_DEL) {
-        if (!TimerMgr->IsExist(timerId_) && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
-            AddHandleTimer();
-            MMI_HILOGD("add a timer");
-        }
+        if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_UP ||
+            keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_DOWN ||
+            keyEvent->GetKeyCode() == KeyEvent::KEYCODE_DEL) {
+            if (!TimerMgr->IsExist(timerId_) && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
+                AddHandleTimer();
+                MMI_HILOGD("add a timer");
+            }
         if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP && TimerMgr->IsExist(timerId_)) {
             TimerMgr->RemoveTimer(timerId_);
             timerId_ = -1;
@@ -146,10 +146,10 @@ void KeyEventHandler::AddHandleTimer(int32_t timeout)
             MMI_HILOGD("key up");
             return;
         }
-       auto ret = HandleKeyEvent(keyEvent);
+        auto ret = HandleKeyEvent(keyEvent);
         if (ret != RET_OK) {
-           MMI_HILOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
-       }
+            MMI_HILOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
+        }
         constexpr int32_t triggerTime = 100;
         this->AddHandleTimer(triggerTime);
         MMI_HILOGD("leave");

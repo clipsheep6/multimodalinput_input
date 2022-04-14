@@ -146,7 +146,5 @@ group("mmi_tests") {
 
 group("mmi_tests_manual") {
   testonly = true
-  deps = [
-    "frameworks/proxy:InputManagerManualTest",
-  ]
+  deps = [ "frameworks/proxy:InputManagerManualTest" ]
 }

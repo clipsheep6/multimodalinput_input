@@ -37,11 +37,11 @@ EventFilterWrap::~EventFilterWrap()
 int32_t EventFilterWrap::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (HandlePointerEventFilter(pointerEvent)) {
-         MMI_HILOGI("Pointer event Filter succeeded");
+        MMI_HILOGI("Pointer event Filter succeeded");
         return RET_OK;
-    } 
+    }
     CHKPR(nextHandler_, ERROR_NULL_POINTER);
-    return nextHandler_->HandlePointerEvent(pointerEvent);  
+    return nextHandler_->HandlePointerEvent(pointerEvent);
 }
 
 int32_t EventFilterWrap::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
@@ -49,7 +49,7 @@ int32_t EventFilterWrap::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerE
     if (HandlePointerEventFilter(pointerEvent)) {
         MMI_HILOGI("Pointer event Filter succeeded");
         return RET_OK;
-    } 
+    }
     CHKPR(nextHandler_, ERROR_NULL_POINTER);
     return nextHandler_->HandleTouchEvent(pointerEvent);
 }

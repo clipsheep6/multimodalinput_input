@@ -36,7 +36,7 @@ private:
     void Repeat(const std::shared_ptr<KeyEvent> keyEvent);
     void AddHandleTimer(int32_t timeout = 300);
 
-private:    
+private:
     int32_t timerId_ = -1;
 };
 } // namespace MMI

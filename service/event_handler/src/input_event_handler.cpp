@@ -63,7 +63,7 @@ void InputEventHandler::Init(UDSServer& udsServer)
     udsServer_ = &udsServer;
     iKeyEventHandler_ = BuildKeyHandlerChain();
     iPointerEventHandler_ = BuildPointerHandlerChain();
-    iTouchEventHandler_ = BuildTouchHandlerChain();  
+    iTouchEventHandler_ = BuildTouchHandlerChain();
     MsgCallback funs[] = {
         {
             static_cast<MmiMessageId>(LIBINPUT_EVENT_DEVICE_ADDED),
@@ -203,7 +203,7 @@ std::shared_ptr<IInputEventHandler> InputEventHandler::BuildPointerHandlerChain(
     return mouseEventHandler;
 #else
     return std::make_shared<IInputEventHandler>();
-#endif 
+#endif
 }
 
 std::shared_ptr<IInputEventHandler> InputEventHandler::BuildTouchHandlerChain()
@@ -299,7 +299,7 @@ std::shared_ptr<KeyEvent> InputEventHandler::GetKeyEvent() const
 
 std::shared_ptr<IInputEventHandler> InputEventHandler::GetKeyEventHandler() const
 {
-   return iKeyEventHandler_;
+    return iKeyEventHandler_;
 }
 
 std::shared_ptr<IInputEventHandler> InputEventHandler::GetPointerEventHandler() const
@@ -346,7 +346,7 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
 int32_t InputEventHandler::OnEventPointer(libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
-      if (keyEvent_ == nullptr) {
+    if (keyEvent_ == nullptr) {
         keyEvent_ = KeyEvent::Create();
     }
     CHKPR(iPointerEventHandler_, ERROR_NULL_POINTER);
@@ -359,7 +359,7 @@ int32_t InputEventHandler::OnEventTouchpad(libinput_event *event)
     CALL_LOG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
     CHKPR(iPointerEventHandler_, ERROR_NULL_POINTER);
-    iPointerEventHandler_->HandleLibinputEvent(event); 
+    iPointerEventHandler_->HandleLibinputEvent(event);
     return RET_OK;
 }
 

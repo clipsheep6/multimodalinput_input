@@ -45,14 +45,14 @@ int32_t TouchEventHandler::HandleLibinputEvent(libinput_event* event)
             BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
             CHKPR(nextHandler_, ERROR_NULL_POINTER);
             nextHandler_->HandleTouchEvent(pointerEvent);
-            if (type == LIBINPUT_EVENT_TOUCH_UP){
+            if (type == LIBINPUT_EVENT_TOUCH_UP) {
                 pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
                 MMI_HILOGD("This touch event is up remove this finger");
                 if (pointerEvent->GetPointersIdList().empty()) {
                     MMI_HILOGD("This touch event is final finger up remove this finger");
                     pointerEvent->Reset();
-                 } 
-                 return RET_OK;
+                }
+                return RET_OK;
             }
             break;
         }
@@ -63,16 +63,16 @@ int32_t TouchEventHandler::HandleLibinputEvent(libinput_event* event)
             CHKPR(pointerEvent, ERROR_NULL_POINTER);
             BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
             CHKPR(nextHandler_, ERROR_NULL_POINTER);
-            nextHandler_->HandleTouchEvent(pointerEvent);  
+            nextHandler_->HandleTouchEvent(pointerEvent);
             if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
                 pointerEvent->Reset();
             }
             break;
         }
-        default: {            
+        default: { 
             break;
-        }       
-    } 
+        }  
+    }
     return RET_OK;
 }
 

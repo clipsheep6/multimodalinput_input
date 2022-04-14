@@ -125,7 +125,7 @@ int32_t EventDispatch::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     if (TriggerANR(currentTime, session)) {
         session->isANRProcess_ = true;
         MMI_HILOGW("the key event does not report normally, triggering ANR");
-         return RET_OK;
+        return RET_OK;
     }
 
     NetPacket pkt(MmiMessageId::ON_KEYEVENT);

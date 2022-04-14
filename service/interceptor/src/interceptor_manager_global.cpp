@@ -42,7 +42,7 @@ int32_t InterceptorManagerGlobal::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEv
         }
     }
     CHKPR(nextHandler_, ERROR_NULL_POINTER);
-    return nextHandler_->HandleKeyEvent(keyEvent);  
+    return nextHandler_->HandleKeyEvent(keyEvent);
 }
 
 void InterceptorManagerGlobal::OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session)

@@ -33,14 +33,13 @@ public:
     int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
     int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
     int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
-    virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter);  
+    virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter); 
 
 protected:
     void OnEventTouchGetPointEventType(const EventTouch& touch, const int32_t fingerCount,
         POINT_EVENT_TYPE& pointEventType);
     int32_t DispatchPointerEvent(std::shared_ptr<PointerEvent> point);
     bool TriggerANR(int64_t time, SessionPtr sess);
-
 };
 #define EventDispatcher OHOS::DelayedSingleton<EventDispatch>::GetInstance()
 } // namespace MMI

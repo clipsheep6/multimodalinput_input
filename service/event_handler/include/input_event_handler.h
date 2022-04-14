@@ -40,7 +40,7 @@ public:
     void OnEvent(void *event);
     void OnCheckEventReport();
     UDSServer *GetUDSServer() const;
-    int32_t AddInputEventFilter(sptr<IEventFilter> filter); 
+    int32_t AddInputEventFilter(sptr<IEventFilter> filter);
     std::shared_ptr<KeyEvent> GetKeyEvent() const;
     std::shared_ptr<IInputEventHandler> GetKeyEventHandler() const;
     std::shared_ptr<IInputEventHandler> GetPointerEventHandler() const;
@@ -71,7 +71,7 @@ private:
     uint64_t idSeed_ = 0;
     int32_t eventType_ = 0;
     int64_t initSysClock_ = 0;
-    int64_t lastSysClock_ = 0;  
+    int64_t lastSysClock_ = 0;
 };
 
 #define InputHandler InputEventHandler::GetInstance()

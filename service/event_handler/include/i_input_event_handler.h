@@ -31,11 +31,24 @@ public:
     IInputEventHandler() = default;
     DISALLOW_COPY_AND_MOVE(IInputEventHandler);
     virtual ~IInputEventHandler() = default;
-    virtual int32_t HandleLibinputEvent(libinput_event* event) {return RET_OK;}; 
-    virtual int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) {return RET_OK;};
-    virtual int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) {return RET_OK;};
-    virtual int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) {return RET_OK;};
-    virtual void SetNext(std::shared_ptr<IInputEventHandler> nextHandler) {
+    virtual int32_t HandleLibinputEvent(libinput_event* event)
+    {
+        return RET_OK;
+    };
+    virtual int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+    {
+        return RET_OK;
+    };
+    virtual int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+    {
+        return RET_OK;
+    };
+    virtual int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
+    {
+        return RET_OK;
+    };
+    virtual void SetNext(std::shared_ptr<IInputEventHandler> nextHandler)
+    {
         nextHandler_ = nextHandler;
     };
 

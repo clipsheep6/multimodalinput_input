@@ -28,12 +28,12 @@ class IKeyCommandManager : public IInputEventHandler {
 public:
     IKeyCommandManager() = default;
     virtual ~IKeyCommandManager() = default;
-    static std::shared_ptr<IKeyCommandManager> GetInstance();   
-    virtual bool HandlerEvent(const std::shared_ptr<KeyEvent> key) {
+    static std::shared_ptr<IKeyCommandManager> GetInstance();
+    virtual bool HandlerEvent(const std::shared_ptr<KeyEvent> key)
+    {
         return false;
     }
     int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
-     
 
 public:
     static inline std::shared_ptr<IKeyCommandManager> keyCommand_ = nullptr;

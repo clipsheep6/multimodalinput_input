@@ -37,7 +37,7 @@ class KeyEventSubscriber : public IInputEventHandler {
 public:
     KeyEventSubscriber() = default;
     ~KeyEventSubscriber() = default;
-    DISALLOW_COPY_AND_MOVE(KeyEventSubscriber);  
+    DISALLOW_COPY_AND_MOVE(KeyEventSubscriber);
     int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
     int32_t SubscribeKeyEvent(SessionPtr sess, int32_t subscribeId,
             const std::shared_ptr<KeyOption> keyOption);
