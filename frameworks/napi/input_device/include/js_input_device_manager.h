@@ -23,8 +23,8 @@ namespace OHOS {
 namespace MMI {
 class JsInputDeviceManager : public JsEventTarget {
 public:
-    JsInputDeviceManager() = default;
-    ~JsInputDeviceManager() = default;
+    JsInputDeviceManager();
+    ~JsInputDeviceManager();
     DISALLOW_COPY_AND_MOVE(JsInputDeviceManager);
 
     void ResetEnv();
@@ -33,6 +33,8 @@ public:
     napi_value GetKeystrokeAbility(napi_env env, int32_t id, std::vector<int32_t> keyCodes,
                                    napi_value handle = nullptr);
     napi_value SetMouseSpeed(int32_t mouseSpeed);
+    void RegisterInputDeviceMonitor(napi_env env, std::string type, napi_value handle);
+    void UnRegisterInputDeviceMonitor(napi_env env, std::string type, napi_value handle = nullptr);
 };
 } // namespace MMI
 } // namespace OHOS
