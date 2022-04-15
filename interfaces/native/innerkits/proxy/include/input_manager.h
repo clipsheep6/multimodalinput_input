@@ -16,6 +16,7 @@
 #ifndef INPUT_MANAGER_H
 #define INPUT_MANAGER_H
 
+#include <map>
 #include <memory>
 #include <list>
 
@@ -183,6 +184,16 @@ public:
      */
     void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void SetMouseSpeed(int32_t mouseSpeed);
+
+    /**
+     * @brief Checks whether the specified key codes of an input device are supported.
+     * @param deviceId ID of the input device.
+     * @param keyCodes Key codes of the input device.
+     * @return Returns a result indicating whether the specified key codes are supported.
+     * @since 9
+     */
+    void GetKeystrokeAbility(int32_t deviceId, std::vector<int32_t> keyCodes,
+        std::function<void(std::map<int32_t, bool>)> callback);
 
 private:
     InputManager() = default;

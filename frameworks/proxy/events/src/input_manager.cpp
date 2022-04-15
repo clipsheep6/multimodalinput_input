@@ -119,6 +119,11 @@ void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent
 void InputManager::SetMouseSpeed(int32_t mouseSpeed)
 {
     InputMgrImpl->SetMouseSpeed(mouseSpeed);
+
+void InputManager::GetKeystrokeAbility(int32_t deviceId, std::vector<int32_t> keyCodes,
+    std::function<void(std::map<int32_t, bool>)> callback)
+{
+    InputMgrImpl->GetKeystrokeAbility(deviceId, keyCodes, callback);
 }
 } // namespace MMI
 } // namespace OHOS
