@@ -76,7 +76,9 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
             if (pointerEvent->GetPointersIdList().size() == 1) {
                 if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
+#ifdef OHOS_BUILD_TOUCH
                     consumed_ = false;
+#endif
                 }
             }
         }
@@ -451,8 +453,8 @@ void JsInputMonitor::OnPointerEventInJsThread()
             return;
         }
         if (retValue) {
-            auto eventId = pointerEvent->GetId();
 #ifdef OHOS_BUILD_TOUCH
+            auto eventId = pointerEvent->GetId();
             MarkConsumed(eventId);
 #endif
         }

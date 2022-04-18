@@ -59,7 +59,9 @@ private:
     mutable std::mutex mutex_;
     int32_t monitorId_ {-1};
     std::function<void(std::shared_ptr<PointerEvent>)> callback_;
+#ifdef OHOS_BUILD_TOUCH
     mutable bool consumed_ {false};
+#endif
 };
 
 
