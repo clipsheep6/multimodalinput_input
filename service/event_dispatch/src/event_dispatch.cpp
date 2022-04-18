@@ -43,6 +43,7 @@ EventDispatch::EventDispatch() {}
 
 EventDispatch::~EventDispatch() {}
 
+#ifdef OHOS_BUILD_TOUCH
 void EventDispatch::OnEventTouchGetPointEventType(const EventTouch& touch,
                                                   const int32_t fingerCount,
                                                   POINT_EVENT_TYPE& pointEventType)
@@ -91,10 +92,11 @@ void EventDispatch::OnEventTouchGetPointEventType(const EventTouch& touch,
         }
     }
 }
+#endif
 
+#ifdef OHOS_BUILD_KEYBOARD
 int32_t EventDispatch::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-#ifdef OHOS_BUILD_KEYBOARD
     CALL_LOG_ENTER;
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     auto fd = WinMgr->UpdateTarget(keyEvent);
@@ -110,8 +112,6 @@ int32_t EventDispatch::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
                keyEvent->GetActionStartTime(),
                keyEvent->GetEventType(),
                keyEvent->GetFlag(), keyEvent->GetKeyAction(), fd);
-
-    InputHandlerMgrGlobal->HandleEvent(keyEvent);
     auto udsServer = InputHandler->GetUDSServer();
     CHKPR(udsServer, ERROR_NULL_POINTER);
     auto session = udsServer->GetSession(fd);
@@ -137,32 +137,29 @@ int32_t EventDispatch::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
         return MSG_SEND_FAIL;
     }
     session->AddEvent(keyEvent->GetId(), currentTime);
-#endif
-     return RET_OK;
+    return RET_OK;
 }
+#endif
 
+#ifdef OHOS_BUILD_MOUSE
 int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> pointEvent)
 {
-#ifdef OHOS_BUILD_MOUSE
     CALL_LOG_ENTER;
     CHKPR(pointEvent, ERROR_NULL_POINTER);
     return DispatchPointerEvent(pointEvent);
-#else
-    return RET_OK;
-#endif
 }
+#endif
 
+#ifdef OHOS_BUILD_TOUCH
 int32_t EventDispatch::HandleTouchEvent(std::shared_ptr<PointerEvent> pointEvent)
 {
-#ifdef OHOS_BUILD_TOUCH
     CALL_LOG_ENTER;
     CHKPR(pointEvent, ERROR_NULL_POINTER);
     return DispatchPointerEvent(pointEvent);
-#else
-    return RET_OK;
-#endif
 }
+#endif
 
+#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
 int32_t EventDispatch::DispatchPointerEvent(std::shared_ptr<PointerEvent> pointEvent)
 {
     CHKPR(pointEvent, ERROR_NULL_POINTER);
@@ -201,11 +198,7 @@ int32_t EventDispatch::DispatchPointerEvent(std::shared_ptr<PointerEvent> pointE
     session->AddEvent(pointEvent->GetId(), currentTime);
     return RET_OK;
 }
-
-int32_t EventDispatch::AddInputEventFilter(sptr<IEventFilter> filter)
-{
-    return EventFilterWraper->AddInputEventFilter(filter);
-}
+#endif
 
 bool EventDispatch::TriggerANR(int64_t time, SessionPtr sess)
 {

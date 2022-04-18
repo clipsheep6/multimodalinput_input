@@ -56,34 +56,46 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
     }
 #endif
     MsgCallback funs[] = {
+#ifdef OHOS_BUILD_KEYBOARD
         {MmiMessageId::ON_VIRTUAL_KEY, MsgCallbackBind2(&ServerMsgHandler::OnVirtualKeyEvent, this)},
+#endif
         {MmiMessageId::MARK_PROCESS,
             MsgCallbackBind2(&ServerMsgHandler::MarkProcessed, this)},
         {MmiMessageId::ON_DUMP, MsgCallbackBind2(&ServerMsgHandler::OnDump, this)},
         {MmiMessageId::GET_MMI_INFO_REQ, MsgCallbackBind2(&ServerMsgHandler::GetMultimodeInputInfo, this)},
+#ifdef OHOS_BUILD_KEYBOARD
         {MmiMessageId::INJECT_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnInjectKeyEvent, this) },
+#endif
+#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
         {MmiMessageId::INJECT_POINTER_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnInjectPointerEvent, this) },
+#endif
         {MmiMessageId::INPUT_DEVICE, MsgCallbackBind2(&ServerMsgHandler::OnInputDevice, this)},
         {MmiMessageId::INPUT_DEVICE_IDS, MsgCallbackBind2(&ServerMsgHandler::OnInputDeviceIds, this)},
         {MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY, MsgCallbackBind2(&ServerMsgHandler::GetKeystrokeAbility, this)},
         {MmiMessageId::ADD_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnAddInputDeviceMontior, this)},
         {MmiMessageId::REMOVE_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputDeviceMontior, this)},
         {MmiMessageId::DISPLAY_INFO, MsgCallbackBind2(&ServerMsgHandler::OnDisplayInfo, this)},
+#ifdef OHOS_BUILD_KEYBOARD
         {MmiMessageId::ADD_INPUT_EVENT_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnAddInputEventMontior, this)},
         {MmiMessageId::REMOVE_INPUT_EVENT_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputEventMontior, this)},
+#endif
+#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
         {MmiMessageId::ADD_INPUT_EVENT_TOUCHPAD_MONITOR,
             MsgCallbackBind2(&ServerMsgHandler::OnAddInputEventTouchpadMontior, this)},
         {MmiMessageId::REMOVE_INPUT_EVENT_TOUCHPAD_MONITOR,
             MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputEventTouchpadMontior, this)},
+#endif
         {MmiMessageId::ADD_INPUT_HANDLER, MsgCallbackBind2(&ServerMsgHandler::OnAddInputHandler, this)},
         {MmiMessageId::REMOVE_INPUT_HANDLER, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputHandler, this)},
         {MmiMessageId::MARK_CONSUMED, MsgCallbackBind2(&ServerMsgHandler::OnMarkConsumed, this)},
+#ifdef OHOS_BUILD_KEYBOARD
         {MmiMessageId::SUBSCRIBE_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnSubscribeKeyEvent, this)},
         {MmiMessageId::UNSUBSCRIBE_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnUnSubscribeKeyEvent, this)},
         {MmiMessageId::ADD_EVENT_INTERCEPTOR,
             MsgCallbackBind2(&ServerMsgHandler::OnAddTouchpadEventFilter, this)},
         {MmiMessageId::REMOVE_EVENT_INTERCEPTOR,
             MsgCallbackBind2(&ServerMsgHandler::OnRemoveTouchpadEventFilter, this)},
+#endif
 #ifdef OHOS_BUILD_HDF
         {MmiMessageId::HDI_INJECT, MsgCallbackBind2(&ServerMsgHandler::OnHdiInject, this)},
 #endif // OHOS_BUILD_HDF
@@ -129,6 +141,7 @@ int32_t ServerMsgHandler::OnHdiInject(SessionPtr sess, NetPacket& pkt)
 }
 #endif
 
+#ifdef OHOS_BUILD_KEYBOARD
 int32_t ServerMsgHandler::OnVirtualKeyEvent(SessionPtr sess, NetPacket& pkt)
 {
     VirtualKey virtualKeyEvent;
@@ -146,6 +159,7 @@ int32_t ServerMsgHandler::OnVirtualKeyEvent(SessionPtr sess, NetPacket& pkt)
     }
     return RET_OK;
 }
+#endif
 
 int32_t ServerMsgHandler::OnDump(SessionPtr sess, NetPacket& pkt)
 {
@@ -198,9 +212,9 @@ int32_t ServerMsgHandler::GetMultimodeInputInfo(SessionPtr sess, NetPacket& pkt)
     return RET_OK;
 }
 
+#ifdef OHOS_BUILD_KEYBOARD
 int32_t ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket& pkt)
 {
-#ifdef OHOS_BUILD_KEYBOARD
     CHKPR(sess, ERROR_NULL_POINTER);
     auto creKey = KeyEvent::Create();
     CHKPR(creKey, ERROR_NULL_POINTER);
@@ -218,11 +232,10 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket& pkt)
     }
     MMI_HILOGD("Inject keyCode:%{public}d, action:%{public}d", creKey->GetKeyCode(), creKey->GetKeyAction());
     return RET_OK;
-#else
-    return RET_OK;
-#endif
 }
+#endif
 
+#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
 int32_t ServerMsgHandler::OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt)
 {
     CALL_LOG_ENTER;
@@ -265,6 +278,7 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt)
     }
     return RET_OK;
 }
+#endif
 
 int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
 {
@@ -335,7 +349,22 @@ int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, NetPacket& pkt)
         return RET_ERR;
     }
     MMI_HILOGD("OnAddInputHandler handler:%{public}d,handlerType:%{public}d", handlerId, handlerType);
-    return InputHandlerMgrGlobal->AddInputHandler(handlerId, handlerType, sess);
+#ifdef OHOS_BUILD_KEYBOARD
+    auto keyInputHandlerMgr = InputHandler->GetKeyInputHandlerMgr();
+    CHKPR(keyInputHandlerMgr, ERROR_NULL_POINTER);
+    keyInputHandlerMgr->AddInputHandler(handlerId, handlerType, sess);
+#endif
+#ifdef OHOS_BUILD_POINTER
+    auto pointerInputHandlerMgr = InputHandler->GetPointerInputHandlerMgr();
+    CHKPR(pointerInputHandlerMgr, ERROR_NULL_POINTER);
+    pointerInputHandlerMgr->AddInputHandler(handlerId, handlerType, sess);
+#endif
+#ifdef OHOS_BUILD_TOUCH
+    auto touchInputHandlerMgr = InputHandler->GetTouchInputHandlerMgr();
+    CHKPR(touchInputHandlerMgr, ERROR_NULL_POINTER);
+    touchInputHandlerMgr->AddInputHandler(handlerId, handlerType, sess);
+#endif
+    return RET_OK;
 }
 
 int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, NetPacket& pkt)
@@ -351,7 +380,21 @@ int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, NetPacket& pkt)
         return RET_ERR;
     }
     MMI_HILOGD("OnRemoveInputHandler handler:%{public}d,handlerType:%{public}d", handlerId, handlerType);
-    InputHandlerMgrGlobal->RemoveInputHandler(handlerId, handlerType, sess);
+#ifdef OHOS_BUILD_KEYBOARD
+    auto keyInputHandlerMgr = InputHandler->GetKeyInputHandlerMgr();
+    CHKPR(keyInputHandlerMgr, ERROR_NULL_POINTER);
+    keyInputHandlerMgr->RemoveInputHandler(handlerId, handlerType, sess);
+#endif
+#ifdef OHOS_BUILD_POINTER    
+    auto pointerInputHandlerMgr = InputHandler->GetPointerInputHandlerMgr();
+    CHKPR(pointerInputHandlerMgr, ERROR_NULL_POINTER);
+    pointerInputHandlerMgr->RemoveInputHandler(handlerId, handlerType, sess);
+#endif
+#ifdef OHOS_BUILD_TOUCH    
+    auto touchInputHandlerMgr = InputHandler->GetTouchInputHandlerMgr();
+    CHKPR(touchInputHandlerMgr, ERROR_NULL_POINTER);
+    touchInputHandlerMgr->RemoveInputHandler(handlerId, handlerType, sess);
+#endif
     return RET_OK;
 }
 
@@ -366,13 +409,22 @@ int32_t ServerMsgHandler::OnMarkConsumed(SessionPtr sess, NetPacket& pkt)
         MMI_HILOGE("Packet read event failed");
         return RET_ERR;
     }
-    InputHandlerMgrGlobal->MarkConsumed(monitorId, eventId, sess);
+#ifdef OHOS_BUILD_POINTER
+    auto pointerInputHandlerMgr = InputHandler->GetPointerInputHandlerMgr();
+    CHKPR(pointerInputHandlerMgr, ERROR_NULL_POINTER);
+    pointerInputHandlerMgr->MarkConsumed(monitorId, eventId, sess);
+#endif
+#ifdef OHOS_BUILD_TOUCH
+    auto touchInputHandlerMgr = InputHandler->GetTouchInputHandlerMgr();
+    CHKPR(touchInputHandlerMgr, ERROR_NULL_POINTER);
+    touchInputHandlerMgr->MarkConsumed(monitorId, eventId, sess);
+#endif
     return RET_OK;
 }
 
+#ifdef OHOS_BUILD_KEYBOARD
 int32_t ServerMsgHandler::OnSubscribeKeyEvent(SessionPtr sess, NetPacket &pkt)
 {
-#ifdef OHOS_BUILD_KEYBOARD
     int32_t subscribeId = -1;
     uint32_t preKeySize = 0;
     int32_t finalKey = -1;
@@ -396,28 +448,24 @@ int32_t ServerMsgHandler::OnSubscribeKeyEvent(SessionPtr sess, NetPacket &pkt)
     keyOption->SetFinalKey(finalKey);
     keyOption->SetFinalKeyDown(isFinalKeyDown);
     keyOption->SetFinalKeyDownDuration(finalKeyDownDuration);
-    int32_t ret = KeyEventSubscriber_->SubscribeKeyEvent(sess, subscribeId, keyOption);
-    return ret;
-#else
-    return RET_OK;
-#endif
+    auto keySubscriber = InputHandler->GetKeySubscriber();
+    CHKPR(keySubscriber, ERROR_NULL_POINTER);
+    return keySubscriber->SubscribeKeyEvent(sess, subscribeId, keyOption);
 }
 
 int32_t ServerMsgHandler::OnUnSubscribeKeyEvent(SessionPtr sess, NetPacket &pkt)
 {
-#ifdef OHOS_BUILD_KEYBOARD
     int32_t subscribeId = -1;
     pkt >> subscribeId;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read subscribe failed");
         return PACKET_READ_FAIL;
     }
-    int32_t ret = KeyEventSubscriber_->UnSubscribeKeyEvent(sess, subscribeId);
-    return ret;
-#else
-    return RET_OK;
-#endif
+    auto keySubscriber = InputHandler->GetKeySubscriber();
+    CHKPR(keySubscriber, ERROR_NULL_POINTER);
+    return keySubscriber->UnSubscribeKeyEvent(sess, subscribeId);
 }
+#endif
 
 int32_t ServerMsgHandler::OnInputDeviceIds(SessionPtr sess, NetPacket& pkt)
 {
@@ -612,6 +660,7 @@ int32_t ServerMsgHandler::OnRemoveInputDeviceMontior(SessionPtr sess, NetPacket&
     return RET_OK;
 }
 
+#ifdef OHOS_BUILD_KEYBOARD
 int32_t ServerMsgHandler::OnAddInputEventMontior(SessionPtr sess, NetPacket& pkt)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
@@ -628,7 +677,9 @@ int32_t ServerMsgHandler::OnAddInputEventMontior(SessionPtr sess, NetPacket& pkt
     InputMonitorServiceMgr.AddInputEventMontior(sess, eventType);
     return RET_OK;
 }
+#endif
 
+#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
 int32_t ServerMsgHandler::OnAddInputEventTouchpadMontior(SessionPtr sess, NetPacket& pkt)
 {
     CALL_LOG_ENTER;
@@ -646,7 +697,9 @@ int32_t ServerMsgHandler::OnAddInputEventTouchpadMontior(SessionPtr sess, NetPac
     InputMonitorServiceMgr.AddInputEventTouchpadMontior(eventType, sess);
     return RET_OK;
 }
+#endif
 
+#ifdef OHOS_BUILD_KEYBOARD
 int32_t ServerMsgHandler::OnRemoveInputEventMontior(SessionPtr sess, NetPacket& pkt)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
@@ -663,7 +716,9 @@ int32_t ServerMsgHandler::OnRemoveInputEventMontior(SessionPtr sess, NetPacket& 
     InputMonitorServiceMgr.RemoveInputEventMontior(sess, eventType);
     return RET_OK;
 }
+#endif
 
+#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
 int32_t ServerMsgHandler::OnRemoveInputEventTouchpadMontior(SessionPtr sess, NetPacket& pkt)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
@@ -680,9 +735,11 @@ int32_t ServerMsgHandler::OnRemoveInputEventTouchpadMontior(SessionPtr sess, Net
     InputMonitorServiceMgr.RemoveInputEventMontior(sess, eventType);
     return RET_OK;
 }
+#endif
+
+#ifdef OHOS_BUILD_KEYBOARD
 int32_t ServerMsgHandler::OnAddTouchpadEventFilter(SessionPtr sess, NetPacket& pkt)
 {
-#ifdef OHOS_BUILD_KEYBOARD
     CHKPR(sess, ERROR_NULL_POINTER);
     int32_t sourceType = 0;
     int32_t id = 0;
@@ -691,14 +748,14 @@ int32_t ServerMsgHandler::OnAddTouchpadEventFilter(SessionPtr sess, NetPacket& p
         MMI_HILOGE("Packet read sourceType failed");
         return PACKET_READ_FAIL;
     }
-    InterceptorMgrGbl->OnAddInterceptor(sourceType, id, sess);
-#endif
+    auto keyInterceptor = InputHandler->GetKeyInterceptor();
+    CHKPR(keyInterceptor, ERROR_NULL_POINTER);
+    keyInterceptor->OnAddInterceptor(sourceType, id, sess);
     return RET_OK;
 }
 
 int32_t ServerMsgHandler::OnRemoveTouchpadEventFilter(SessionPtr sess, NetPacket& pkt)
 {
-#ifdef OHOS_BUILD_KEYBOARD
     CHKPR(sess, ERROR_NULL_POINTER);
     int32_t id = 0;
     pkt  >> id;
@@ -706,9 +763,11 @@ int32_t ServerMsgHandler::OnRemoveTouchpadEventFilter(SessionPtr sess, NetPacket
         MMI_HILOGE("Packet read data failed");
         return PACKET_READ_FAIL;
     }
-    InterceptorMgrGbl->OnRemoveInterceptor(id);
-#endif
+    auto keyInterceptor = InputHandler->GetKeyInterceptor();
+    CHKPR(keyInterceptor, ERROR_NULL_POINTER);
+    keyInterceptor->OnRemoveInterceptor(id);
     return RET_OK;
 }
+#endif
 } // namespace MMI
 } // namespace OHOS

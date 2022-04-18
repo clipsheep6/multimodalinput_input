@@ -30,6 +30,17 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputHandlerManagerGlobal" };
 } // namespace
 
+#ifdef OHOS_BUILD_KEYBOARD
+int32_t InputHandlerManagerGlobal::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    HandleEvent(keyEvent);
+    CHKPR(nextHandler_, ERROR_NULL_POINTER);
+    return nextHandler_->HandleKeyEvent(keyEvent);
+}
+#endif
+
+#ifdef OHOS_BUILD_POINTER
 int32_t InputHandlerManagerGlobal::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
  {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -41,7 +52,9 @@ int32_t InputHandlerManagerGlobal::HandlePointerEvent(std::shared_ptr<PointerEve
     CHKPR(nextHandler_, ERROR_NULL_POINTER);
     return nextHandler_->HandlePointerEvent(pointerEvent);
 }
+#endif
 
+#ifdef OHOS_BUILD_TOUCH
 int32_t InputHandlerManagerGlobal::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -53,6 +66,7 @@ int32_t InputHandlerManagerGlobal::HandleTouchEvent(std::shared_ptr<PointerEvent
     CHKPR(nextHandler_, ERROR_NULL_POINTER);
     return nextHandler_->HandleTouchEvent(pointerEvent);
 }
+#endif
 
 int32_t InputHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
@@ -105,9 +119,9 @@ void InputHandlerManagerGlobal::MarkConsumed(int32_t handlerId, int32_t eventId,
     monitors_.MarkConsumed(handlerId, eventId, session);
 }
 
+#ifdef OHOS_BUILD_KEYBOARD
 bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-#ifdef OHOS_BUILD_KEYBOARD
     MMI_HILOGD("Handle KeyEvent");
     CHKPF(keyEvent);
     if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
@@ -126,10 +140,11 @@ bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
             return true;
         }
     }
-#endif
     return false;
 }
+#endif
 
+#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
 bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
@@ -152,6 +167,7 @@ bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointe
     MMI_HILOGD("Interception and monitor failed");
     return false;
 }
+#endif
 
 void InputHandlerManagerGlobal::InitSessionLostCallback()
 {
@@ -268,25 +284,29 @@ int32_t InputHandlerManagerGlobal::MonitorCollection::GetPriority() const
     return IInputEventMonitorHandler::DEFAULT_MONITOR;
 }
 
+#ifdef OHOS_BUILD_KEYBOARD
 bool InputHandlerManagerGlobal::MonitorCollection::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-#ifdef OHOS_BUILD_KEYBOARD
     CHKPF(keyEvent);
     MMI_HILOGD("There are currently %{public}zu monitors", monitors_.size());
     for (const auto &mon : monitors_) {
         mon.SendToClient(keyEvent);
     }
-#endif
     return false;
 }
+#endif
 
+#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
 bool InputHandlerManagerGlobal::MonitorCollection::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
+#ifdef OHOS_BUILD_TOUCH
     UpdateConsumptionState(pointerEvent);
+#endif
     Monitor(pointerEvent);
     return isMonitorConsumed_;
 }
+#endif
 
 bool InputHandlerManagerGlobal::MonitorCollection::HasMonitor(int32_t monitorId, SessionPtr session)
 {
@@ -294,6 +314,7 @@ bool InputHandlerManagerGlobal::MonitorCollection::HasMonitor(int32_t monitorId,
     return (monitors_.find(monitor) != monitors_.end());
 }
 
+#ifdef OHOS_BUILD_TOUCH
 void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
@@ -317,7 +338,9 @@ void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::s
         lastPointerEvent_.reset();
     }
 }
+#endif
 
+#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
 void InputHandlerManagerGlobal::MonitorCollection::Monitor(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
@@ -326,6 +349,7 @@ void InputHandlerManagerGlobal::MonitorCollection::Monitor(std::shared_ptr<Point
         monitor.SendToClient(pointerEvent);
     }
 }
+#endif
 
 void InputHandlerManagerGlobal::MonitorCollection::OnSessionLost(SessionPtr session)
 {
@@ -344,9 +368,9 @@ int32_t InputHandlerManagerGlobal::InterceptorCollection::GetPriority() const
     return IInputEventMonitorHandler::DEFAULT_INTERCEPTOR;
 }
 
+#ifdef OHOS_BUILD_KEYBOARD
 bool InputHandlerManagerGlobal::InterceptorCollection::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-#ifdef OHOS_BUILD_KEYBOARD
     CHKPF(keyEvent);
     std::lock_guard<std::mutex> guard(lockInterceptors_);
     if (interceptors_.empty()) {
@@ -356,10 +380,11 @@ bool InputHandlerManagerGlobal::InterceptorCollection::HandleEvent(std::shared_p
     for (const auto &interceptor : interceptors_) {
         interceptor.SendToClient(keyEvent);
     }
-#endif
     return true;
 }
+#endif
 
+#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
 bool InputHandlerManagerGlobal::InterceptorCollection::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
@@ -373,6 +398,7 @@ bool InputHandlerManagerGlobal::InterceptorCollection::HandleEvent(std::shared_p
     }
     return true;
 }
+#endif
 
 int32_t InputHandlerManagerGlobal::InterceptorCollection::AddInterceptor(const SessionHandler& interceptor)
 {

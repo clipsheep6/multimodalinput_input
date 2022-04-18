@@ -83,8 +83,6 @@ private:
     bool callbackInitialized_ { false };
     std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
 };
-
-#define KeyEventSubscriber_ OHOS::DelayedSingleton<KeyEventSubscriber>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif  // KEY_EVENT_SUBSCRIBER_H

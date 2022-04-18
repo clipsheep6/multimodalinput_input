@@ -20,6 +20,7 @@
 #include "i_event_filter.h"
 #include "i_input_event_handler.h"
 #include "key_event.h"
+#include "key_event_value_transformation.h"
 #include "pointer_event.h"
 #include "uds_server.h"
 
@@ -30,18 +31,26 @@ public:
     EventDispatch();
     DISALLOW_COPY_AND_MOVE(EventDispatch);
     virtual ~EventDispatch();
+#ifdef OHOS_BUILD_KEYBOARD
     int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
+#endif
+#ifdef OHOS_BUILD_MOUSE
     int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+#endif
+#ifdef OHOS_BUILD_TOUCH
     int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
-    virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter); 
+#endif
 
 protected:
+#ifdef OHOS_BUILD_TOUCH
     void OnEventTouchGetPointEventType(const EventTouch& touch, const int32_t fingerCount,
         POINT_EVENT_TYPE& pointEventType);
+#endif
+#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
     int32_t DispatchPointerEvent(std::shared_ptr<PointerEvent> point);
+#endif
     bool TriggerANR(int64_t time, SessionPtr sess);
 };
-#define EventDispatcher OHOS::DelayedSingleton<EventDispatch>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // EVENT_DISPATCH_H

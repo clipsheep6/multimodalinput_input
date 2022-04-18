@@ -28,8 +28,12 @@ struct IInputEventMonitorHandler {
     static constexpr int32_t DEFAULT_INTERCEPTOR = 10;
     static constexpr int32_t DEFAULT_MONITOR = 20;
     virtual int32_t GetPriority() const = 0;
+#ifdef OHOS_BUILD_KEYBOARD
     virtual bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent) = 0;
+#endif
+#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
     virtual bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent) = 0;
+#endif
 };
 } // namespace MMI
 } // namespace OHOS

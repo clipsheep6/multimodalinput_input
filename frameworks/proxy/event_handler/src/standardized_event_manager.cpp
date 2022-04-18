@@ -44,6 +44,7 @@ void StandardizedEventManager::SetClientHandle(MMIClientPtr client)
     client_ = client;
 }
 
+#ifdef OHOS_BUILD_KEYBOARD
 int32_t StandardizedEventManager::SubscribeKeyEvent(
     const KeyEventInputSubscribeManager::SubscribeKeyEventInfo &subscribeInfo)
 {
@@ -115,7 +116,9 @@ int32_t StandardizedEventManager::InjectEvent(const std::shared_ptr<KeyEvent> ke
     }
     return RET_OK;
 }
+#endif
 
+#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
 int32_t StandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_LOG_ENTER;
@@ -138,6 +141,7 @@ int32_t StandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEven
     }
     return RET_OK;
 }
+#endif
 
 int32_t StandardizedEventManager::GetDeviceIds(int32_t userData)
 {

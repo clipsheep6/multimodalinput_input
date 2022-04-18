@@ -21,12 +21,10 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IKeyCommandManager" };
 } // namespace
 
-std::shared_ptr<IKeyCommandManager> IKeyCommandManager::GetInstance()
+std::shared_ptr<IKeyCommandManager> IKeyCommandManager::CreateIstance()
 {
-    if (keyCommand_ == nullptr) {
-        keyCommand_ = std::make_shared<IKeyCommandManager>();
-    }
-    return keyCommand_;
+    return std::make_shared<IKeyCommandManager>();    
+
 }
 
 int32_t IKeyCommandManager::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)

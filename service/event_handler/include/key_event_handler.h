@@ -19,8 +19,9 @@
 #include <memory>
 
 #include "i_input_event_handler.h"
-
-#define KEYSTATUS 0
+#include "interceptor_manager_global.h"
+#include "key_event_subscriber.h"
+#include "event_package.h"
 
 namespace OHOS {
 namespace MMI {
@@ -32,12 +33,13 @@ public:
     int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
 
 private:
-    int32_t Normalize(libinput_event *event, std::shared_ptr<KeyEvent> keyEvent);
     void Repeat(const std::shared_ptr<KeyEvent> keyEvent);
     void AddHandleTimer(int32_t timeout = 300);
 
-private:
+private:  
     int32_t timerId_ = -1;
+    EventPackage eventPackage_;
+     
 };
 } // namespace MMI
 } // namespace OHOS

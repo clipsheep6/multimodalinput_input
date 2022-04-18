@@ -73,8 +73,7 @@ ohos_shared_library("libmmi-client") {
     "event_handler/src/input_interceptor_manager.cpp",
     "event_handler/src/input_manager_impl.cpp",
     "event_handler/src/input_monitor_manager.cpp",
-    "event_handler/src/interceptor_manager.cpp",
-    "event_handler/src/key_event_input_subscribe_manager.cpp",
+    "event_handler/src/interceptor_manager.cpp",    
     "event_handler/src/multimodal_event_handler.cpp",
     "event_handler/src/standardized_event_manager.cpp",
     "events/src/axis_event.cpp",
@@ -89,6 +88,22 @@ ohos_shared_library("libmmi-client") {
 
   if (is_mmi_have_debug) {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+  }
+
+  if (mmi_enable_keyboard) {
+    cflags += [ "-DOHOS_BUILD_KEYBOARD" ]
+  }
+
+  if (mmi_enable_mouse) {
+    cflags += [ "-DOHOS_BUILD_POINTER" ]
+  }
+
+  if (mmi_enable_tp) {
+    cflags += [ "-DOHOS_BUILD_TOUCH" ]
+  }
+
+  if (mmi_enable_keyboard) {
+    sources += [ "event_handler/src/key_event_input_subscribe_manager.cpp" ]
   }
 
   configs = [

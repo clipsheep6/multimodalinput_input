@@ -77,6 +77,7 @@ void InterceptorManagerGlobal::OnRemoveInterceptor(int32_t id)
     }
 }
 
+#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
 bool InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_LOG_ENTER;
@@ -104,6 +105,7 @@ bool InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<PointerEvent> poin
     }
     return true;
 }
+#endif
 
 bool InterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {

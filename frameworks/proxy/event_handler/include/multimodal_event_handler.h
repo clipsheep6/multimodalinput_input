@@ -37,9 +37,12 @@ public:
 
     MMIClientPtr GetMMIClient();
     bool StartClient();
-    
+ #ifdef OHOS_BUILD_KEYBOARD   
     int32_t InjectEvent(const std::shared_ptr<KeyEvent> keyEventPtr);
+#endif
+#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
     int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
+#endif
     int32_t GetDevice(int32_t userData, int32_t deviceId);
     int32_t GetDeviceIds(int32_t userData);
     int32_t GetKeystrokeAbility(int32_t userData, int32_t deviceId, std::vector<int32_t> keyCodes);
@@ -47,8 +50,10 @@ public:
     int32_t UnRegisterInputDeviceMonitor();
     int32_t AddInputEventMontior(int32_t keyEventType);
     void RemoveInputEventMontior(int32_t keyEventType);
+#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
     int32_t AddInputEventTouchpadMontior(int32_t pointerEventType);
     void RemoveInputEventTouchpadMontior(int32_t pointerEventType);
+#endif
     int32_t AddInterceptor(int32_t sourceType, int32_t id);
     int32_t RemoveInterceptor(int32_t id);
 

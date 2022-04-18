@@ -24,6 +24,7 @@
 #include "event_filter_service.h"
 #include "input_event_monitor_manager.h"
 #include "interceptor_manager.h"
+#include "key_event_input_subscribe_manager.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
@@ -145,6 +146,7 @@ void InputManagerImpl::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> 
 
 int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter)
 {
+#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH) 
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
     bool hasSendToMmiServer = true;
@@ -166,6 +168,7 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
         MMI_HILOGI("AddInputEventFilter has send to server success");
         return RET_OK;
     }
+#endif
     return RET_OK;
 }
 
@@ -182,6 +185,7 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventCo
     eventHandler_ = InputMgrImpl->GetCurrentEventHandler();
 }
 
+#ifdef OHOS_BUILD_KEYBOARD
 void InputManagerImpl::OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consumer,
     std::shared_ptr<KeyEvent> keyEvent)
 {
@@ -205,7 +209,9 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     }
     MMI_HILOGD("key event keyCode:%{public}d", keyEvent->GetKeyCode());
 }
+#endif
 
+#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
 void InputManagerImpl::OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer,
     std::shared_ptr<PointerEvent> pointerEvent)
 {
@@ -230,6 +236,7 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     }
     MMI_HILOGD("pointer event pointerId:%{public}d", pointerEvent->GetPointerId());
 }
+#endif
 
 int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt)
 {
@@ -401,22 +408,49 @@ void InputManagerImpl::PrintDisplayInfo()
     }
 }
 
+
+int32_t InputManagerImpl::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
+    std::function<void(std::shared_ptr<KeyEvent>)> callback) 
+{
+#ifdef OHOS_BUILD_KEYBOARD
+    return KeyEventInputSubscribeMgr.SubscribeKeyEvent(keyOption, callback);
+#else
+   return RET_OK;
+#endif
+}
+
+void InputManagerImpl::UnsubscribeKeyEvent(int32_t subscriberId)
+{
+#ifdef OHOS_BUILD_KEYBOARD
+    KeyEventInputSubscribeMgr.UnSubscribeKeyEvent(subscriberId);
+#endif
+}
+
 int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor)
 {
+#ifdef OHOS_BUILD_KEYBOARD
     CHKPR(monitor, ERROR_NULL_POINTER);
     std::lock_guard<std::mutex> guard(mtx_);
     auto consumer = std::make_shared<MonitorEventConsumer>(monitor);
     CHKPR(consumer, ERROR_NULL_POINTER);
     return InputManagerImpl::AddMonitor(consumer);
+#else 
+   return RET_OK;
+#endif
 }
+
 
 int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor)
 {
+#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
     CHKPR(monitor, ERROR_NULL_POINTER);
     std::lock_guard<std::mutex> guard(mtx_);
     auto consumer = std::make_shared<MonitorEventConsumer>(monitor);
     CHKPR(consumer, ERROR_NULL_POINTER);
     return InputManagerImpl::AddMonitor(consumer);
+#else
+   return RET_OK;
+#endif
 }
 
 int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consumer)
@@ -457,6 +491,7 @@ int32_t InputManagerImpl::AddInterceptor(int32_t sourceType,
 
 int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
 {
+#ifdef OHOS_BUILD_KEYBOARD
     std::lock_guard<std::mutex> guard(mtx_);
     if (interceptor == nullptr) {
         MMI_HILOGE("%{public}s param should not be null", __func__);
@@ -467,6 +502,9 @@ int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyE
         interceptorId = interceptorId * ADD_MASK_BASE + MASK_KEY;
     }
     return interceptorId;
+#else
+    return RET_ERR;
+#endif
 }
 
 void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
@@ -480,10 +518,14 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
     interceptorId /= ADD_MASK_BASE;
     switch (mask) {
         case MASK_TOUCH:
+#ifdef OHOS_BUILD_TOUCH
             interceptorManager_.RemoveInterceptor(interceptorId);
+#endif
             break;
         case MASK_KEY:
+#ifdef OHOS_BUILD_KEYBOARD
             InterceptorMgr.RemoveInterceptor(interceptorId);
+#endif
             break;
         default:
             MMI_HILOGE("Can't find the mask, mask:%{public}d", mask);
@@ -493,20 +535,24 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
 
 void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
+#ifdef OHOS_BUILD_KEYBOARD
     CHKPV(keyEvent);
     std::lock_guard<std::mutex> guard(mtx_);
     if (MMIEventHdl.InjectEvent(keyEvent) != RET_OK) {
         MMI_HILOGE("Failed to inject keyEvent");
     }
+#endif
 }
 
 void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
+#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
     CHKPV(pointerEvent);
     std::lock_guard<std::mutex> guard(mtx_);
     if (MMIEventHdl.InjectPointerEvent(pointerEvent) != RET_OK) {
         MMI_HILOGE("Failed to inject pointer event");
     }
+#endif
 }
 
 void InputManagerImpl::OnConnected()

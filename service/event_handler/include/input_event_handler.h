@@ -24,7 +24,11 @@
 #include "event_dispatch.h"
 #include "i_event_filter.h"
 #include "i_input_event_handler.h"
+#include "input_handler_manager_global.h"
+#include "interceptor_manager_global.h"
+#include "key_event_subscriber.h"
 #include "mouse_event_handler.h"
+#include "event_filter_wrap.h"
 #include "msg_handler.h"
 
 namespace OHOS {
@@ -45,6 +49,14 @@ public:
     std::shared_ptr<IInputEventHandler> GetKeyEventHandler() const;
     std::shared_ptr<IInputEventHandler> GetPointerEventHandler() const;
     std::shared_ptr<IInputEventHandler> GetTouchEventHandler() const;
+    std::shared_ptr<InterceptorManagerGlobal> GetKeyInterceptor() const;
+    std::shared_ptr<KeyEventSubscriber> GetKeySubscriber() const;
+    std::shared_ptr<InputHandlerManagerGlobal> GetKeyInputHandlerMgr() const;
+    std::shared_ptr<EventFilterWrap> GetPointerEventFilter() const;
+    std::shared_ptr<InputHandlerManagerGlobal> GetPointerInputHandlerMgr() const;
+    std::shared_ptr<EventFilterWrap> GetTouchEventFilter() const;
+    std::shared_ptr<InputHandlerManagerGlobal> GetTouchInputHandlerMgr() const;
+
 protected:
     int32_t OnEventDeviceAdded(libinput_event *event);
     int32_t OnEventDeviceRemoved(libinput_event *event);
@@ -67,7 +79,13 @@ private:
     std::shared_ptr<IInputEventHandler> iKeyEventHandler_;
     std::shared_ptr<IInputEventHandler> iPointerEventHandler_;
     std::shared_ptr<IInputEventHandler> iTouchEventHandler_;
-
+    std::shared_ptr<InterceptorManagerGlobal> keyInterceptor_ = nullptr;
+    std::shared_ptr<KeyEventSubscriber> keySubscriber_ = nullptr;    
+    std::shared_ptr<InputHandlerManagerGlobal> keyInputHandlerMgr_ = nullptr;
+    std::shared_ptr<EventFilterWrap> pointerEventFilter_ = nullptr;
+    std::shared_ptr<InputHandlerManagerGlobal> pointerInputHandlerMgr_ = nullptr;
+    std::shared_ptr<EventFilterWrap> touchEventFilter_ = nullptr;
+    std::shared_ptr<InputHandlerManagerGlobal> touchInputHandlerMgr_ = nullptr;
     uint64_t idSeed_ = 0;
     int32_t eventType_ = 0;
     int64_t initSysClock_ = 0;

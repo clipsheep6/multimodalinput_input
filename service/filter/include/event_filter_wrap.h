@@ -32,15 +32,18 @@ public:
     EventFilterWrap();
     DISALLOW_COPY_AND_MOVE(EventFilterWrap);
     ~EventFilterWrap();
+#ifdef OHOS_BUILD_POINTER
     int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+#endif
+#ifdef OHOS_BUILD_TOUCH
     int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+#endif
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
     bool HandlePointerEventFilter(std::shared_ptr<PointerEvent> point);
 private:
     std::mutex lockFilter_;
     sptr<IEventFilter> filter_ {nullptr};
 };
-#define EventFilterWraper OHOS::DelayedSingleton<EventFilterWrap>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // EVENT_FILTER_WRAP_H

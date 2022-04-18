@@ -138,6 +138,7 @@ ohos_shared_library("libmmi-server") {
   if (mmi_enable_keyboard) {
     sources += [
       "event_handler/src/key_event_handler.cpp",
+      "event_package/src/event_package.cpp",
       "interceptor/src/interceptor_manager_global.cpp",
       "subscriber/src/key_event_subscriber.cpp",
     ]

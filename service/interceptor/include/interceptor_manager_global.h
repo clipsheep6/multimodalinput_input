@@ -37,7 +37,9 @@ public:
     ~InterceptorManagerGlobal();
     void OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session);
     void OnRemoveInterceptor(int32_t id);
+#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
     bool OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
+#endif
     bool OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
     int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
 private:
@@ -53,8 +55,6 @@ private:
 private:
     std::list<InterceptorItem> interceptors_;
 };
-
-#define InterceptorMgrGbl OHOS::DelayedSingleton<InterceptorManagerGlobal>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // INTERCEPTOR_MANAGER_GLOBAL_H

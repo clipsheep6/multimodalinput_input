@@ -28,13 +28,9 @@
 #include "libinput.h"
 
 #include "bytrace_adapter.h"
-#include "event_filter_wrap.h"
 #include "input_device_manager.h"
-#include "input_handler_manager_global.h"
-#include "interceptor_manager_global.h"
 #include "i_key_command_manager.h"
 #include "key_event_handler.h"
-#include "key_event_subscriber.h"
 #include "mmi_func_callback.h"
 #include "pointer_event_handler.h"
 #include "touch_event_handler.h"
@@ -171,57 +167,6 @@ void InputEventHandler::Init(UDSServer& udsServer)
     return;
 }
 
-std::shared_ptr<IInputEventHandler> InputEventHandler::BuildKeyHandlerChain()
-{
-#ifdef OHOS_BUILD_KEYBOARD
-    auto keyEventHandler = std::make_shared<KeyEventHandler>();
-    CHKPP(keyEventHandler);
-    keyEventHandler->SetNext(InterceptorMgrGbl);
-    CHKPP(InterceptorMgrGbl);
-    auto keyCommandHandler = IKeyCommandManager::GetInstance();
-    InterceptorMgrGbl->SetNext(keyCommandHandler);
-    CHKPP(keyCommandHandler);
-    keyCommandHandler->SetNext(KeyEventSubscriber_);
-    CHKPP(KeyEventSubscriber_);
-    KeyEventSubscriber_->SetNext(EventDispatcher);
-    return keyEventHandler;
-#else
-    return std::make_shared<IInputEventHandler>();
-#endif
-}
-
-std::shared_ptr<IInputEventHandler> InputEventHandler::BuildPointerHandlerChain()
-{
-#ifdef OHOS_BUILD_POINTER
-    auto mouseEventHandler = std::make_shared<PointerEventHandler>();
-    CHKPP(mouseEventHandler);
-    mouseEventHandler->SetNext(EventFilterWraper);
-    CHKPP(EventFilterWraper);
-    EventFilterWraper->SetNext(InputHandlerMgrGlobal);
-    CHKPP(InputHandlerMgrGlobal);
-    InputHandlerMgrGlobal->SetNext(EventDispatcher);
-    return mouseEventHandler;
-#else
-    return std::make_shared<IInputEventHandler>();
-#endif
-}
-
-std::shared_ptr<IInputEventHandler> InputEventHandler::BuildTouchHandlerChain()
-{
-#ifdef OHOS_BUILD_TOUCH
-    auto touchEventHandler = std::make_shared<TouchEventHandler>();
-    CHKPP(touchEventHandler);
-    touchEventHandler->SetNext(EventFilterWraper);
-    CHKPP(EventFilterWraper);
-    EventFilterWraper->SetNext(InputHandlerMgrGlobal);
-    CHKPP(InputHandlerMgrGlobal);
-    InputHandlerMgrGlobal->SetNext(EventDispatcher);
-    return touchEventHandler;
-#else
-    return std::make_shared<IInputEventHandler>();
-#endif
-}
-
 void InputEventHandler::OnEvent(void *event)
 {
     CHKPV(event);
@@ -272,6 +217,71 @@ int32_t InputEventHandler::OnEventHandler(libinput_event *event)
     return ret;
 }
 
+std::shared_ptr<IInputEventHandler> InputEventHandler::BuildKeyHandlerChain()
+{
+#ifdef OHOS_BUILD_KEYBOARD
+    auto keyEventHandler = std::make_shared<KeyEventHandler>();
+    CHKPP(keyEventHandler);
+    keyInterceptor_ = std::make_shared<InterceptorManagerGlobal>();
+    CHKPP(keyInterceptor_);
+    keyEventHandler->SetNext(keyInterceptor_);    
+    auto keyCommandHandler = IKeyCommandManager::CreateInstance();
+    CHKPP(keyCommandHandler);
+    keyInterceptor_->SetNext(keyCommandHandler);
+    keySubscriber_ = std::make_shared<KeyEventSubscriber>();
+    CHKPP(keySubscriber_);
+    keyCommandHandler->SetNext(keySubscriber_);
+    keyInputHandlerMgr_ = std::make_shared<InputHandlerManagerGlobal>();
+    CHKPP(keyInputHandlerMgr_);
+    keySubscriber_->SetNext(keyInputHandlerMgr_);    
+    auto keyDispatch = std::make_shared<EventDispatch>();
+    keyInputHandlerMgr_->SetNext(keyDispatch);
+    return keyEventHandler;
+#else
+    return std::make_shared<IInputEventHandler>();
+#endif
+}
+
+std::shared_ptr<IInputEventHandler> InputEventHandler::BuildPointerHandlerChain()
+{
+#ifdef OHOS_BUILD_POINTER
+    auto pointerEventHandler = std::make_shared<PointerEventHandler>();
+    CHKPP(pointerEventHandler);
+    pointerEventFilter_ = std::make_shared<EventFilterWrap>();
+    CHKPP(pointerEventFilter_);    
+    pointerEventHandler->SetNext(pointerEventFilter_);
+    pointerInputHandlerMgr_ = std::make_shared<InputHandlerManagerGlobal>();
+    CHKPP(pointerInputHandlerMgr_); 
+    pointerEventFilter_->SetNext(pointerInputHandlerMgr_);
+    auto pointerDispatch = std::make_shared<EventDispatch>();
+    CHKPP(pointerDispatch);
+    pointerInputHandlerMgr_->SetNext(pointerDispatch);
+    return pointerEventHandler;
+#else
+    return std::make_shared<IInputEventHandler>();
+#endif
+}
+
+std::shared_ptr<IInputEventHandler> InputEventHandler::BuildTouchHandlerChain()
+{
+#ifdef OHOS_BUILD_TOUCH
+    auto touchEventHandler = std::make_shared<TouchEventHandler>();
+    CHKPP(touchEventHandler);
+    touchEventFilter_ = std::make_shared<EventFilterWrap>();
+    CHKPP(touchEventFilter_);    
+    touchEventHandler->SetNext(touchEventFilter_);
+    touchInputHandlerMgr_ = std::make_shared<InputHandlerManagerGlobal>();
+    CHKPP(touchInputHandlerMgr_); 
+    touchEventFilter_->SetNext(touchInputHandlerMgr_);
+    auto touchDispatch = std::make_shared<EventDispatch>();
+    CHKPP(touchDispatch);
+    touchInputHandlerMgr_->SetNext(touchDispatch);
+    return touchEventHandler;
+#else
+    return std::make_shared<IInputEventHandler>();
+#endif
+}
+
 void InputEventHandler::OnCheckEventReport()
 {
     if (initSysClock_ == 0 || lastSysClock_ != 0) {
@@ -312,9 +322,52 @@ std::shared_ptr<IInputEventHandler> InputEventHandler::GetTouchEventHandler() co
     return iTouchEventHandler_;
 }
 
+std::shared_ptr<InterceptorManagerGlobal> InputEventHandler::GetKeyInterceptor() const
+{
+    return keyInterceptor_;
+}
+
+std::shared_ptr<KeyEventSubscriber> InputEventHandler::GetKeySubscriber() const
+{
+    return keySubscriber_;
+}
+
+std::shared_ptr<InputHandlerManagerGlobal> InputEventHandler::GetKeyInputHandlerMgr() const
+{
+    return keyInputHandlerMgr_;
+}
+
+std::shared_ptr<EventFilterWrap> InputEventHandler::GetPointerEventFilter() const
+{
+    return pointerEventFilter_;
+}
+
+std::shared_ptr<InputHandlerManagerGlobal> InputEventHandler::GetPointerInputHandlerMgr() const
+{
+    return pointerInputHandlerMgr_;
+}
+
+std::shared_ptr<EventFilterWrap> InputEventHandler::GetTouchEventFilter() const
+{
+    return touchEventFilter_;
+}
+
+std::shared_ptr<InputHandlerManagerGlobal> InputEventHandler::GetTouchInputHandlerMgr() const
+{
+    return touchInputHandlerMgr_;
+}
+
 int32_t InputEventHandler::AddInputEventFilter(sptr<IEventFilter> filter)
 {
-    return EventDispatcher->AddInputEventFilter(filter);
+#ifdef OHOS_BUILD_POINTER
+    CHKPR(pointerEventFilter_, ERROR_NULL_POINTER);
+    pointerEventFilter_->AddInputEventFilter(filter);
+#endif
+#ifdef OHOS_BUILD_TOUCH
+    CHKPR(touchEventFilter_, ERROR_NULL_POINTER);
+    touchEventFilter_->AddInputEventFilter(filter);
+#endif
+    return RET_OK;
 }
 
 int32_t InputEventHandler::OnEventDeviceAdded(libinput_event *event)

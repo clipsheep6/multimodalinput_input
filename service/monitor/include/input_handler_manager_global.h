@@ -36,10 +36,21 @@ public:
     int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     void MarkConsumed(int32_t handlerId, int32_t eventId, SessionPtr session);
+#ifdef OHOS_BUILD_KEYBOARD
+    int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
+#endif
+#ifdef OHOS_BUILD_POINTER
     int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+#endif
+#ifdef OHOS_BUILD_TOUCH
     int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+#endif
+#ifdef OHOS_BUILD_KEYBOARD
     bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent);
+#endif
+#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
     bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent);
+#endif
 
 private:
     void InitSessionLostCallback();
@@ -68,16 +79,23 @@ private:
 
     struct MonitorCollection : public IInputEventMonitorHandler, protected NoCopyable {
         virtual int32_t GetPriority() const override;
+#ifdef OHOS_BUILD_KEYBOARD
         virtual bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent) override;
+#endif
+#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
         virtual bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent) override;
-
+#endif
         int32_t AddMonitor(const SessionHandler& mon);
         void RemoveMonitor(const SessionHandler& mon);
         void MarkConsumed(int32_t monitorId, int32_t eventId, SessionPtr session);
 
         bool HasMonitor(int32_t monitorId, SessionPtr session);
+#ifdef OHOS_BUILD_TOUCH
         void UpdateConsumptionState(std::shared_ptr<PointerEvent> pointerEvent);
+#endif
+#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
         void Monitor(std::shared_ptr<PointerEvent> pointerEvent);
+#endif
         void OnSessionLost(SessionPtr session);
 
         std::set<SessionHandler> monitors_;
@@ -88,8 +106,12 @@ private:
 
     struct InterceptorCollection : public IInputEventMonitorHandler, protected NoCopyable {
         virtual int32_t GetPriority() const override;
+#ifdef OHOS_BUILD_KEYBOARD
         virtual bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent) override;
+#endif
+#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
         virtual bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent) override;
+#endif
 
         int32_t AddInterceptor(const SessionHandler& interceptor);
         void RemoveInterceptor(const SessionHandler& interceptor);
@@ -104,7 +126,6 @@ private:
     MonitorCollection monitors_;
     InterceptorCollection interceptors_;
 };
-#define InputHandlerMgrGlobal OHOS::DelayedSingleton<InputHandlerManagerGlobal>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_HANDLER_MANAGER_GLOBAL_H

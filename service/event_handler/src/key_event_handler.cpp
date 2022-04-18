@@ -36,12 +36,12 @@ int32_t KeyEventHandler::HandleLibinputEvent(libinput_event* event)
     CHKPR(event, ERROR_NULL_POINTER);
     auto keyEvent = InputHandler->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
-    auto result = Normalize(event, keyEvent);
-    if (result == MULTIDEVICE_SAME_EVENT_MARK) {
+    auto packageResult = eventPackage_.PackageKeyEvent(event, keyEvent);
+    if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
         MMI_HILOGD("The same event reported by multi_device should be discarded");
         return RET_OK;
     }
-    if (result != RET_OK) {
+    if (packageResult != RET_OK) {
         MMI_HILOGE("KeyEvent package failed. ret:%{public}d,errCode:%{public}d", result, KEY_EVENT_PKG_FAIL);
         return KEY_EVENT_PKG_FAIL;
     }
@@ -63,61 +63,6 @@ int32_t KeyEventHandler::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     CHKPR(nextHandler_, ERROR_NULL_POINTER);
     return nextHandler_->HandleKeyEvent(keyEvent);
-}
-
-int32_t KeyEventHandler::Normalize(libinput_event* event, std::shared_ptr<KeyEvent> keyEvent)
-{
-    keyEvent->UpdateId();
-    auto data = libinput_event_get_keyboard_event(event);
-    CHKPR(data, ERROR_NULL_POINTER);
-
-    auto device = libinput_event_get_device(event);
-    int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
-    int32_t keyCode = static_cast<int32_t>(libinput_event_keyboard_get_key(data));
-    auto Okey = TransferKeyValue(keyCode);
-    keyCode = Okey.sysKeyValue;
-    int32_t keyAction = (libinput_event_keyboard_get_key_state(data) == 0) ?
-        (KeyEvent::KEY_ACTION_UP) : (KeyEvent::KEY_ACTION_DOWN);
-    auto preAction = keyEvent->GetAction();
-    if (preAction == KeyEvent::KEY_ACTION_UP) {
-        auto preUpKeyItem = keyEvent->GetKeyItem();
-        if (preUpKeyItem != nullptr) {
-            keyEvent->RemoveReleasedKeyItems(*preUpKeyItem);
-        } else {
-            MMI_HILOGE("preUpKeyItem is null");
-        }
-    }
-    int64_t time = GetSysClockTime();
-    keyEvent->SetActionTime(time);
-    keyEvent->SetAction(keyAction);
-    keyEvent->SetDeviceId(deviceId);
-    keyEvent->SetKeyCode(keyCode);
-    keyEvent->SetKeyAction(keyAction);
-    if (keyEvent->GetPressedKeys().empty()) {
-        keyEvent->SetActionStartTime(time);
-    }
-
-    KeyEvent::KeyItem item;
-    bool isKeyPressed = (libinput_event_keyboard_get_key_state(data) != KEYSTATUS);
-    item.SetDownTime(time);
-    item.SetKeyCode(keyCode);
-    item.SetDeviceId(deviceId);
-    item.SetPressed(isKeyPressed);
-
-    if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
-        keyEvent->AddPressedKeyItems(item);
-    }
-    if (keyAction == KeyEvent::KEY_ACTION_UP) {
-        auto pressedKeyItem = keyEvent->GetKeyItem(keyCode);
-        if (pressedKeyItem != nullptr) {
-            item.SetDownTime(pressedKeyItem->GetDownTime());
-        } else {
-            MMI_HILOGE("Find pressed key failed, keyCode:%{public}d", keyCode);
-        }
-        keyEvent->RemoveReleasedKeyItems(item);
-        keyEvent->AddPressedKeyItems(item);
-    }
-    return RET_OK;
 }
 
 void KeyEventHandler::Repeat(const std::shared_ptr<KeyEvent> keyEvent)
