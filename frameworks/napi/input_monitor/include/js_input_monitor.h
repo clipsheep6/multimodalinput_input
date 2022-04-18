@@ -39,8 +39,10 @@ public:
     bool Start();
 
     void Stop();
-
+	
+#ifdef OHOS_BUILD_TOUCH
     void MarkConsumed(int32_t eventId);
+#endif
 
     void SetCallback(std::function<void(std::shared_ptr<PointerEvent>)> callback);
 
@@ -70,8 +72,9 @@ public:
     bool Start();
 
     void Stop();
-
+#ifdef OHOS_BUILD_TOUCH
     void MarkConsumed(const int32_t eventId);
+#endif
 
     int32_t IsMatch(const napi_env jsEnv, napi_value callback);
 

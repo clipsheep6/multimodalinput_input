@@ -23,9 +23,10 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterMoudle" };
+[[maybe_unused]] constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterMoudle" };
 } // namespace
 
+#ifdef OHOS_BUILD_KEYBOARD
 static napi_value InjectEvent(napi_env env, napi_callback_info info)
 {
     CALL_LOG_ENTER;
@@ -73,12 +74,15 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     napi_create_int32(env, 0, &result);
     return result;
 }
+#endif
 
 EXTERN_C_START
 static napi_value MmiInit(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
+#ifdef OHOS_BUILD_KEYBOARD
         DECLARE_NAPI_FUNCTION("injectEvent", InjectEvent),
+#endif
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;

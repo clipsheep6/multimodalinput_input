@@ -31,6 +31,10 @@ config("libinputeventclient_config") {
   if (is_mmi_have_hdf) {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
+
+  if (mmi_enable_keyboard) {
+    cflags += [ "-DOHOS_BUILD_KEYBOARD" ]
+  }
 }
 
 ohos_shared_library("inputeventclient") {
