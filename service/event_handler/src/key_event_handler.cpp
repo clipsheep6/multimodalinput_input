@@ -42,7 +42,7 @@ int32_t KeyEventHandler::HandleLibinputEvent(libinput_event* event)
         return RET_OK;
     }
     if (packageResult != RET_OK) {
-        MMI_HILOGE("KeyEvent package failed. ret:%{public}d,errCode:%{public}d", result, KEY_EVENT_PKG_FAIL);
+        MMI_HILOGE("KeyEvent package failed. ret:%{public}d,errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
         return KEY_EVENT_PKG_FAIL;
     }
     BytraceAdapter::StartBytrace(keyEvent);
