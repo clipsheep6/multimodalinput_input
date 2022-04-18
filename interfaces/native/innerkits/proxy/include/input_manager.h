@@ -183,6 +183,7 @@ public:
      * @since 9
      */
     void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    void SetMouseSpeed(int32_t mouseSpeed);
 
     /**
      * @brief Checks whether the specified key codes of an input device are supported.

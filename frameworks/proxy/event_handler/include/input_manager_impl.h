@@ -70,6 +70,7 @@ public:
     void SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent);
     void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void OnConnected();
+    void SetMouseSpeed(int32_t mouseSpeed);
 
     void GetKeystrokeAbility(int32_t deviceId, std::vector<int32_t> &keyCodes,
         std::function<void(std::map<int32_t, bool>)> callback);

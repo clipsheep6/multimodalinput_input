@@ -553,6 +553,13 @@ void InputManagerImpl::OnConnected()
     PrintDisplayInfo();
 }
 
+void InputManagerImpl::SetMouseSpeed(int32_t mouseSpeed)
+{
+    if(MMIEventHdl.SetMouseSpeed(mouseSpeed)) {
+        MMI_HILOGE("Failed to set mouse speed");
+    }
+}
+
 void InputManagerImpl::SendDisplayInfo()
 {
     MMIClientPtr client = MMIEventHdl.GetMMIClient();

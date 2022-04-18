@@ -51,6 +51,7 @@ protected:
     int32_t OnMarkConsumed(SessionPtr sess, NetPacket& pkt);
     int32_t OnInputDevice(SessionPtr sess, NetPacket& pkt);
     int32_t OnInputDeviceIds(SessionPtr sess, NetPacket& pkt);
+    int32_t OnInputMouseSpeed(SessionPtr sess, NetPacket& pkt);
     int32_t GetKeystrokeAbility(SessionPtr sess, NetPacket& pkt);
     int32_t OnAddInputDeviceMontior(SessionPtr sess, NetPacket& pkt);
     int32_t OnRemoveInputDeviceMontior(SessionPtr sess, NetPacket& pkt);
