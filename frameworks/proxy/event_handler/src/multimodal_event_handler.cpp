@@ -130,7 +130,6 @@ int32_t MultimodalEventHandler::UnRegisterInputDeviceMonitor()
     }
     return EventManager.UnRegisterInputDeviceMonitor();
 }
-
 #if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
 int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {

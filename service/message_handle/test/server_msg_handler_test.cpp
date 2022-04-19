@@ -32,10 +32,12 @@ public:
 
 class ServerMsgHandlerUnitTest : public ServerMsgHandler {
 public:
+#ifdef OHOS_BUILD_KEYBOARD
     int32_t OnVirtualKeyEventTest(SessionPtr sess, NetPacket& pkt)
     {
         return OnVirtualKeyEvent(sess, pkt);
     }
+#endif
 
 #ifdef OHOS_BUILD_HDF
     int32_t OnHdiInjectTest(SessionPtr sess, NetPacket& pkt)
@@ -53,14 +55,17 @@ public:
     {
         return GetMultimodeInputInfo(sess, pkt);
     }
-
+    
+#ifdef OHOS_BUILD_KEYBOARD
     int32_t OnInjectKeyEventTest(SessionPtr sess, NetPacket pkt)
     {
         int32_t retResult = OnInjectKeyEvent(sess, pkt);
         return retResult;
     }
+#endif
 };
 
+#ifdef OHOS_BUILD_KEYBOARD
 /**
  * @tc.name:OnVirtualKeyEventTest_01
  * @tc.desc:Verify virtual key
@@ -200,6 +205,7 @@ HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_010, TestSize.Level1)
     NetPacket pkt(static_cast<MmiMessageId>(-10000));
     serverMsgHandlerTest.OnVirtualKeyEventTest(sess, pkt);
 }
+#endif
 
 /**
  * @tc.name:OnDumpTest_01

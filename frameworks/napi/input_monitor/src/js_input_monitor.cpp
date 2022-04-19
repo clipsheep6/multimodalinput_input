@@ -63,7 +63,7 @@ void InputMonitor::SetCallback(std::function<void(std::shared_ptr<PointerEvent>)
 
 void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
 {
-#if defined(OHOS_BUILD_POINTERE) || defined(OHOS_BUILD_TOUCH) 
+#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
     CALL_LOG_ENTER;
     CHKPV(pointerEvent);
     if (JsInputMonMgr.GetMonitor(id_) == nullptr) {

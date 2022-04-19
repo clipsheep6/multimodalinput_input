@@ -39,7 +39,7 @@ protected:
     int32_t OnKeyEvent(const UDSClient& client, NetPacket& pkt);
     int32_t OnKeyMonitor(const UDSClient& client, NetPacket& pkt);
 #endif
-#if defined(OHOS_BUILD_POINTERE) || defined(OHOS_BUILD_TOUCH) 
+#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
     int32_t OnTouchPadMonitor(const UDSClient& client, NetPacket& pkt);
     int32_t OnPointerEvent(const UDSClient& client, NetPacket& pkt);
 #endif
@@ -50,14 +50,14 @@ protected:
 #ifdef OHOS_BUILD_KEYBOARD
     int32_t ReportKeyEvent(const UDSClient& client, NetPacket& pkt);
 #endif
-#if defined(OHOS_BUILD_POINTERE) || defined(OHOS_BUILD_TOUCH) 
+#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
     int32_t ReportPointerEvent(const UDSClient& client, NetPacket& pkt);
 #endif
     int32_t OnInputDevice(const UDSClient& client, NetPacket& pkt);
     int32_t OnInputDeviceIds(const UDSClient& client, NetPacket& pkt);
     int32_t OnKeyList(const UDSClient& client, NetPacket& pkt);
     int32_t OnDevMonitor(const UDSClient& client, NetPacket& pkt);
-#if defined(OHOS_BUILD_POINTERE) || defined(OHOS_BUILD_TOUCH) 
+#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
     int32_t TouchpadEventInterceptor(const UDSClient& client, NetPacket& pkt);
 #endif
 #ifdef OHOS_BUILD_KEYBOARD

@@ -37,7 +37,7 @@ public:
 
     MMIClientPtr GetMMIClient();
     bool StartClient();
- #ifdef OHOS_BUILD_KEYBOARD   
+#ifdef OHOS_BUILD_KEYBOARD
     int32_t InjectEvent(const std::shared_ptr<KeyEvent> keyEventPtr);
 #endif
 #if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)

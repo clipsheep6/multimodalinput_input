@@ -101,7 +101,7 @@ group("multimodalinput_mmi_packages") {
     "tools/inject_event:input",
   ]
    if (mmi_enable_keyboard) {
-     deps += [ "frameworks/napi/input_consumer:inputconsumer" ]
+      deps += [ "frameworks/napi/input_consumer:inputconsumer" ]
    }
 }
 
@@ -148,5 +148,11 @@ group("mmi_tests") {
 
 group("mmi_tests_manual") {
   testonly = true
-  deps = [ "frameworks/proxy:InputManagerManualTest" ]
+  deps = []
+  if (mmi_enable_mouse || mmi_enable_tp) {
+    deps += [ "frameworks/proxy:InputManagerManualTest" ]
+  }
+  if (mmi_enable_tp) {
+    deps += [ "service:TransformPointTest" ]
+  }
 }

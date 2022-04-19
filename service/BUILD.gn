@@ -293,6 +293,22 @@ ohos_unittest("ut-mmi-service-out") {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
+    if (is_mmi_have_hdf) {
+    cflags += [ "-DOHOS_BUILD_HDF" ]
+  }
+
+  if (mmi_enable_keyboard) {
+    cflags += [ "-DOHOS_BUILD_KEYBOARD" ]
+  }
+
+  if (mmi_enable_mouse) {
+    cflags += [ "-DOHOS_BUILD_POINTER" ]
+  }
+
+  if (mmi_enable_tp) {
+    cflags += [ "-DOHOS_BUILD_TOUCH" ]
+  }
+
   configs = [ ":libmmi_server_config" ]
 
   deps = [
