@@ -79,7 +79,9 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
             }
             if (pointerEvent->GetPointersIdList().size() == 1) {
                 if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
+#ifdef OHOS_BUILD_TOUCH
                     consumed_ = false;
+#endif
                 }
             }
         }

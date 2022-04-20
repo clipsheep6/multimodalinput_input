@@ -75,7 +75,7 @@ protected:
     int32_t OnRemoveTouchpadEventFilter(SessionPtr sess, NetPacket& pkt);
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
     int32_t OnMoveMouse(SessionPtr sess, NetPacket& pkt);
 #endif
 

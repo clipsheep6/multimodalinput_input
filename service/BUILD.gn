@@ -118,7 +118,6 @@ ohos_shared_library("libmmi-server") {
     "monitor/src/input_handler_manager_global.cpp",
     "subscriber/src/key_option.cpp",
     "timer_manager/src/timer_manager.cpp",
-    "touch_transform_point/src/tablet_tool_processor.cpp",
     "window_manager/src/input_windows_manager.cpp",
   ]
 
@@ -127,12 +126,6 @@ ohos_shared_library("libmmi-server") {
       "hdf_adapter/src/hdf_event_manager.cpp",
       "hdi_inject/src/hdi_inject.cpp",
     ]
-  }
-
-  if (mmi_enable_pointer_drawing) {
-    sources += [ "window_manager/src/pointer_drawing_manager.cpp" ]
-  } else {
-    sources += [ "window_manager/src/i_pointer_drawing_manager.cpp" ]
   }
 
   if (mmi_enable_keyboard) {
@@ -159,13 +152,19 @@ ohos_shared_library("libmmi-server") {
         "mouse_event_handler/src/mouse_event_handler.cpp",
         "touch_transform_point/src/touchpad_transform_point_processor.cpp",
         "touch_transform_point/src/gesture_transform_point_processor.cpp",
-         "mouse_event_handler/src/mouse_device_state.cpp",
+        "mouse_event_handler/src/mouse_device_state.cpp",
       ]
+      if (mmi_enable_pointer_drawing) {
+        sources += [ "window_manager/src/pointer_drawing_manager.cpp" ]
+      } else {
+        sources += [ "window_manager/src/i_pointer_drawing_manager.cpp" ]
+      }
     } 
     if (mmi_enable_tp) {
       sources += [ 
         "event_handler/src/touch_event_handler.cpp",
         "touch_transform_point/src/touch_transform_point_processor.cpp",
+        "touch_transform_point/src/tablet_tool_processor.cpp",
        ]
     }
   }
