@@ -39,7 +39,7 @@ public:
 #ifdef OHOS_BUILD_KEYBOARD
     void OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEvent> keyEvent);
 #endif
-#if defined(OHOS_BUILD_POINTERE) || defined(OHOS_BUILD_TOUCH) 
+#if defined(OHOS_BUILD_POINTERE) || defined(OHOS_BUILD_TOUCH)
     void OnInputEvent(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent);
 #endif
     void OnConnected();

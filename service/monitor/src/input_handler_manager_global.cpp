@@ -42,7 +42,7 @@ int32_t InputHandlerManagerGlobal::HandleKeyEvent(std::shared_ptr<KeyEvent> keyE
 
 #ifdef OHOS_BUILD_POINTER
 int32_t InputHandlerManagerGlobal::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
- {
+{
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (HandleEvent(pointerEvent)) {
         BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP);

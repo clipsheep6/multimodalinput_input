@@ -23,14 +23,13 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IKeyC
 
 std::shared_ptr<IKeyCommandManager> IKeyCommandManager::CreateIstance()
 {
-    return std::make_shared<IKeyCommandManager>();    
-
+    return std::make_shared<IKeyCommandManager>();
 }
 
 int32_t IKeyCommandManager::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPR(keyEvent, ERROR_NULL_POINTER);
-    MMI_HILOGI("Combination key is not supported");   
+    MMI_HILOGI("Combination key is not supported");
     CHKPR(nextHandler_, ERROR_NULL_POINTER);
     return nextHandler_->HandleKeyEvent(keyEvent);
 }

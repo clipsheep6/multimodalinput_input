@@ -58,14 +58,12 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
     MsgCallback funs[] = {
 #ifdef OHOS_BUILD_KEYBOARD
         {MmiMessageId::ON_VIRTUAL_KEY, MsgCallbackBind2(&ServerMsgHandler::OnVirtualKeyEvent, this)},
+        {MmiMessageId::INJECT_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnInjectKeyEvent, this) },
 #endif
         {MmiMessageId::MARK_PROCESS,
             MsgCallbackBind2(&ServerMsgHandler::MarkProcessed, this)},
         {MmiMessageId::ON_DUMP, MsgCallbackBind2(&ServerMsgHandler::OnDump, this)},
         {MmiMessageId::GET_MMI_INFO_REQ, MsgCallbackBind2(&ServerMsgHandler::GetMultimodeInputInfo, this)},
-#ifdef OHOS_BUILD_KEYBOARD
-        {MmiMessageId::INJECT_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnInjectKeyEvent, this) },
-#endif
 #if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
         {MmiMessageId::INJECT_POINTER_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnInjectPointerEvent, this) },
 #endif
@@ -88,7 +86,7 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
         {MmiMessageId::ADD_INPUT_HANDLER, MsgCallbackBind2(&ServerMsgHandler::OnAddInputHandler, this)},
         {MmiMessageId::REMOVE_INPUT_HANDLER, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputHandler, this)},
         {MmiMessageId::MARK_CONSUMED, MsgCallbackBind2(&ServerMsgHandler::OnMarkConsumed, this)},
-#ifdef OHOS_BUILD_POINTER    
+#ifdef OHOS_BUILD_POINTER
         {MmiMessageId::MOVE_MOUSE_BY_OFFSET, MsgCallbackBind2(&ServerMsgHandler::OnMoveMouse, this)},
 #endif
 #ifdef OHOS_BUILD_KEYBOARD
@@ -388,12 +386,12 @@ int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, NetPacket& pkt)
     CHKPR(keyInputHandlerMgr, ERROR_NULL_POINTER);
     keyInputHandlerMgr->RemoveInputHandler(handlerId, handlerType, sess);
 #endif
-#ifdef OHOS_BUILD_POINTER    
+#ifdef OHOS_BUILD_POINTER
     auto pointerInputHandlerMgr = InputHandler->GetPointerInputHandlerMgr();
     CHKPR(pointerInputHandlerMgr, ERROR_NULL_POINTER);
     pointerInputHandlerMgr->RemoveInputHandler(handlerId, handlerType, sess);
 #endif
-#ifdef OHOS_BUILD_TOUCH    
+#ifdef OHOS_BUILD_TOUCH
     auto touchInputHandlerMgr = InputHandler->GetTouchInputHandlerMgr();
     CHKPR(touchInputHandlerMgr, ERROR_NULL_POINTER);
     touchInputHandlerMgr->RemoveInputHandler(handlerId, handlerType, sess);
@@ -438,10 +436,9 @@ int32_t ServerMsgHandler::OnMoveMouse(SessionPtr sess, NetPacket& pkt)
     if (!MouseEventHdr->NormalizeMoveMouse(offsetX, offsetY)) {
         MMI_HILOGE("There hasn't any pointer device");
         return RET_ERR;
-    } 
+    }
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);    
     auto iPointerEventHandler = InputHandler->GetPointerEventHandler();
     CHKPR(iPointerEventHandler, ERROR_NULL_POINTER);
     iPointerEventHandler->HandlePointerEvent(pointerEvent);

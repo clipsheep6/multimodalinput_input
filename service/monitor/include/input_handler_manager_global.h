@@ -52,7 +52,6 @@ public:
     bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent);
 #endif
 
-
 private:
     void InitSessionLostCallback();
     void OnSessionLost(SessionPtr session);

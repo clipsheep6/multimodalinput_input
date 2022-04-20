@@ -55,7 +55,7 @@ public:
 #ifdef OHOS_BUILD_KEYBOARD
     void OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
 #endif
-#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH) 
+#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
     void OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
 #endif
     int32_t PackDisplayData(NetPacket &pkt);
@@ -90,7 +90,7 @@ private:
     void OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consumer,
         std::shared_ptr<KeyEvent> keyEvent);
 #endif
-#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH) 
+#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
     void OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer,
         std::shared_ptr<PointerEvent> pointerEvent);
 #endif

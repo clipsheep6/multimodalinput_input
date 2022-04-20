@@ -567,7 +567,7 @@ void ShortcutKey::Print() const
 
 std::shared_ptr<IKeyCommandManager> IKeyCommandManager::CreateInstance()
 {
-    return std::make_shared<KeyCommandManager>();   
+    return std::make_shared<KeyCommandManager>();
 }
 } // namespace MMI
 } // namespace OHOS

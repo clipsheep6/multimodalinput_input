@@ -69,9 +69,9 @@ int32_t TouchEventHandler::HandleLibinputEvent(libinput_event* event)
             }
             break;
         }
-        default: { 
+        default: {
             break;
-        }  
+        }
     }
     return RET_OK;
 }

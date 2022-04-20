@@ -152,7 +152,7 @@ void InputManagerImpl::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> 
 
 int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter)
 {
-#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH) 
+#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
     bool hasSendToMmiServer = true;
@@ -416,7 +416,7 @@ void InputManagerImpl::PrintDisplayInfo()
 
 
 int32_t InputManagerImpl::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
-    std::function<void(std::shared_ptr<KeyEvent>)> callback) 
+    std::function<void(std::shared_ptr<KeyEvent>)> callback)
 {
 #ifdef OHOS_BUILD_KEYBOARD
     return KeyEventInputSubscribeMgr.SubscribeKeyEvent(keyOption, callback);
@@ -440,7 +440,7 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent
     auto consumer = std::make_shared<MonitorEventConsumer>(monitor);
     CHKPR(consumer, ERROR_NULL_POINTER);
     return InputManagerImpl::AddMonitor(consumer);
-#else 
+#else
    return RET_OK;
 #endif
 }

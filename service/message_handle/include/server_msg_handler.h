@@ -46,7 +46,7 @@ protected:
     int32_t OnDump(SessionPtr sess, NetPacket& pkt);
     int32_t MarkProcessed(SessionPtr sess, NetPacket& pkt);
     int32_t GetMultimodeInputInfo(SessionPtr sess, NetPacket& pkt);
-#ifdef OHOS_BUILD_KEYBOARD    
+#ifdef OHOS_BUILD_KEYBOARD
     int32_t OnInjectKeyEvent(SessionPtr sess, NetPacket& pkt);
 #endif
 #if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)

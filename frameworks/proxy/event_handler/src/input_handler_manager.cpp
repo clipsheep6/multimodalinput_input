@@ -218,7 +218,7 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEve
 }
 #endif
 
-#if defined(OHOS_BUILD_POINTERE) || defined(OHOS_BUILD_TOUCH) 
+#if defined(OHOS_BUILD_POINTERE) || defined(OHOS_BUILD_TOUCH)
 void InputHandlerManager::OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer, int32_t handlerId,
     std::shared_ptr<PointerEvent> pointerEvent)
 {

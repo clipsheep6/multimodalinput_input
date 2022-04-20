@@ -80,7 +80,7 @@ private:
     std::shared_ptr<IInputEventHandler> iPointerEventHandler_;
     std::shared_ptr<IInputEventHandler> iTouchEventHandler_;
     std::shared_ptr<InterceptorManagerGlobal> keyInterceptor_ = nullptr;
-    std::shared_ptr<KeyEventSubscriber> keySubscriber_ = nullptr;    
+    std::shared_ptr<KeyEventSubscriber> keySubscriber_ = nullptr;
     std::shared_ptr<InputHandlerManagerGlobal> keyInputHandlerMgr_ = nullptr;
     std::shared_ptr<EventFilterWrap> pointerEventFilter_ = nullptr;
     std::shared_ptr<InputHandlerManagerGlobal> pointerInputHandlerMgr_ = nullptr;

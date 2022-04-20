@@ -224,7 +224,7 @@ std::shared_ptr<IInputEventHandler> InputEventHandler::BuildKeyHandlerChain()
     CHKPP(keyEventHandler);
     keyInterceptor_ = std::make_shared<InterceptorManagerGlobal>();
     CHKPP(keyInterceptor_);
-    keyEventHandler->SetNext(keyInterceptor_);    
+    keyEventHandler->SetNext(keyInterceptor_);
     auto keyCommandHandler = IKeyCommandManager::CreateInstance();
     CHKPP(keyCommandHandler);
     keyInterceptor_->SetNext(keyCommandHandler);
@@ -233,7 +233,7 @@ std::shared_ptr<IInputEventHandler> InputEventHandler::BuildKeyHandlerChain()
     keyCommandHandler->SetNext(keySubscriber_);
     keyInputHandlerMgr_ = std::make_shared<InputHandlerManagerGlobal>();
     CHKPP(keyInputHandlerMgr_);
-    keySubscriber_->SetNext(keyInputHandlerMgr_);    
+    keySubscriber_->SetNext(keyInputHandlerMgr_); 
     auto keyDispatch = std::make_shared<EventDispatch>();
     keyInputHandlerMgr_->SetNext(keyDispatch);
     return keyEventHandler;
@@ -248,10 +248,10 @@ std::shared_ptr<IInputEventHandler> InputEventHandler::BuildPointerHandlerChain(
     auto pointerEventHandler = std::make_shared<PointerEventHandler>();
     CHKPP(pointerEventHandler);
     pointerEventFilter_ = std::make_shared<EventFilterWrap>();
-    CHKPP(pointerEventFilter_);    
+    CHKPP(pointerEventFilter_);
     pointerEventHandler->SetNext(pointerEventFilter_);
     pointerInputHandlerMgr_ = std::make_shared<InputHandlerManagerGlobal>();
-    CHKPP(pointerInputHandlerMgr_); 
+    CHKPP(pointerInputHandlerMgr_);
     pointerEventFilter_->SetNext(pointerInputHandlerMgr_);
     auto pointerDispatch = std::make_shared<EventDispatch>();
     CHKPP(pointerDispatch);
@@ -268,10 +268,10 @@ std::shared_ptr<IInputEventHandler> InputEventHandler::BuildTouchHandlerChain()
     auto touchEventHandler = std::make_shared<TouchEventHandler>();
     CHKPP(touchEventHandler);
     touchEventFilter_ = std::make_shared<EventFilterWrap>();
-    CHKPP(touchEventFilter_);    
+    CHKPP(touchEventFilter_); 
     touchEventHandler->SetNext(touchEventFilter_);
     touchInputHandlerMgr_ = std::make_shared<InputHandlerManagerGlobal>();
-    CHKPP(touchInputHandlerMgr_); 
+    CHKPP(touchInputHandlerMgr_);
     touchEventFilter_->SetNext(touchInputHandlerMgr_);
     auto touchDispatch = std::make_shared<EventDispatch>();
     CHKPP(touchDispatch);

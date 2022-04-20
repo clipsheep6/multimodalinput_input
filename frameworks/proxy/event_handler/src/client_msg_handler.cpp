@@ -59,7 +59,7 @@ void ClientMsgHandler::Init()
                                                    this, std::placeholders::_1, std::placeholders::_2)},
         {MmiMessageId::ON_KEYMONITOR, MsgCallbackBind2(&ClientMsgHandler::OnKeyMonitor, this)},
 #endif
-#if defined(OHOS_BUILD_POINTERE) || defined(OHOS_BUILD_TOUCH) 
+#if defined(OHOS_BUILD_POINTERE) || defined(OHOS_BUILD_TOUCH)
         {MmiMessageId::ON_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::OnPointerEvent, this)},
         {MmiMessageId::ON_TOUCHPAD_MONITOR, MsgCallbackBind2(&ClientMsgHandler::OnTouchPadMonitor, this)},
 #endif
@@ -75,7 +75,7 @@ void ClientMsgHandler::Init()
         {MmiMessageId::REPORT_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportPointerEvent, this)},
         {MmiMessageId::TOUCHPAD_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::TouchpadEventInterceptor, this)},
 #endif
-#ifdef OHOS_BUILD_KEYBOARD        
+#ifdef OHOS_BUILD_KEYBOARD
         {MmiMessageId::KEYBOARD_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::KeyEventInterceptor, this)},
 #endif
     };
@@ -153,7 +153,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
 }
 #endif
 
-#if defined(OHOS_BUILD_POINTERE) || defined(OHOS_BUILD_TOUCH) 
+#if defined(OHOS_BUILD_POINTERE) || defined(OHOS_BUILD_TOUCH)
 int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt)
 {
     CALL_LOG_ENTER;
@@ -208,7 +208,7 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
 }
 #endif
 
-#if defined(OHOS_BUILD_POINTERE) || defined(OHOS_BUILD_TOUCH) 
+#if defined(OHOS_BUILD_POINTERE) || defined(OHOS_BUILD_TOUCH)
 int32_t ClientMsgHandler::OnTouchPadMonitor(const UDSClient& client, NetPacket& pkt)
 {
     auto pointer = PointerEvent::Create();
