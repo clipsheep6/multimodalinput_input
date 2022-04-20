@@ -47,21 +47,22 @@ public:
     static constexpr int32_t POINTER_ACTION_CANCEL = 1;
 
     /**
-     * Indicates a pointer action representing that a funger is pressed on a touchscreen or touchpad.
+     * Indicates a pointer action representing that a finger is pressed on a touchscreen or touchpad.
      * 
      * @since 9
      */
     static constexpr int32_t POINTER_ACTION_DOWN = 2;
 
     /**
-     * Indicates a pointer action representing that a funger moves on a touchscreen or touchpad or a mouse pointer moves.
+     * Indicates a pointer action representing that a finger moves on a touchscreen or touchpad or a mouse
+     * pointer moves.
      * 
      * @since 9
      */
     static constexpr int32_t POINTER_ACTION_MOVE = 3;
 
     /**
-     * Indicates a pointer action representing that a funger leaves  the touchscreen or touchpad.
+     * Indicates a pointer action representing that a finger leaves  the touchscreen or touchpad.
      * 
      * @since 9
      */
@@ -359,7 +360,7 @@ public:
          * @return Returns the pressure.
          * @since 9
          */
-        int32_t GetPressure() const;
+        double GetPressure() const;
 
         /**
          * @brief Sets the pressure for this event.
@@ -367,7 +368,7 @@ public:
          * @return void
          * @since 9
          */
-        void SetPressure(int32_t pressure);
+        void SetPressure(double pressure);
 
         /**
          * @brief Obtains the ID of the current device.
@@ -411,7 +412,7 @@ public:
         int32_t height_ { 0 };
         double  tiltX_ { 0.0 };
         double  tiltY_ { 0.0 };
-        int32_t pressure_ { 0 };
+        double  pressure_ { 0.0 };
         int32_t deviceId_ { 0 };
         int64_t downTime_ { 0 };
     };

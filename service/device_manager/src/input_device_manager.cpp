@@ -62,7 +62,9 @@ std::map<int32_t, bool> InputDeviceManager::GetKeystrokeAbility(int32_t deviceId
     std::map<int32_t, bool> keystrokeAbility;
     auto iter = inputDevice_.find(deviceId);
     if (iter == inputDevice_.end()) {
-        keystrokeAbility[INVALID_DEVICE_ID] = false;
+        for (const auto &item : keyCodes) {
+            keystrokeAbility[item] = false;
+        }
         return keystrokeAbility;
     }
     for (const auto& item : keyCodes) {
@@ -90,6 +92,16 @@ void InputDeviceManager::RemoveDevMonitor(SessionPtr sess)
         MMI_HILOGE("session does not exist");
     }
     devMonitor_.erase(iter);
+}
+
+bool InputDeviceManager::HasPointerDevice()
+{
+    for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
+        if (IsPointerDevice(it->second)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void InputDeviceManager::OnInputDeviceAdded(struct libinput_device* inputDevice)

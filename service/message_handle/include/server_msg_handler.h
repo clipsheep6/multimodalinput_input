@@ -75,6 +75,10 @@ protected:
     int32_t OnRemoveTouchpadEventFilter(SessionPtr sess, NetPacket& pkt);
 #endif
 
+#ifdef OHOS_BUILD_MOUSE
+    int32_t OnMoveMouse(SessionPtr sess, NetPacket& pkt);
+#endif
+
 private:
     UDSServer *udsServer_ = nullptr;
 };

@@ -50,6 +50,7 @@ JsEventTarget::DeviceType g_deviceType[] = {
 };
 
 std::mutex mutex_;
+const std::string CHANGED_TYPE = "changed";
 const std::string ADD_EVENT = "add";
 const std::string REMOVE_EVENT = "remove";
 } // namespace
@@ -57,9 +58,7 @@ const std::string REMOVE_EVENT = "remove";
 JsEventTarget::JsEventTarget()
 {
     CALL_LOG_ENTER;
-    auto ret = devMonitor_.insert({ ADD_EVENT, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>() });
-    CK(ret.second, VAL_NOT_EXP);
-    ret = devMonitor_.insert({ REMOVE_EVENT, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>() });
+    auto ret = devMonitor_.insert({ CHANGED_TYPE, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>() });
     CK(ret.second, VAL_NOT_EXP);
 }
 
@@ -74,9 +73,9 @@ void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
     auto temp = static_cast<std::unique_ptr<JsUtil::CallbackInfo>*>(work->data);
     delete work;
     
-    auto addEvent = devMonitor_.find(ADD_EVENT);
+    auto addEvent = devMonitor_.find(CHANGED_TYPE);
     if (addEvent == devMonitor_.end()) {
-        MMI_HILOGE("find add event failed");
+        MMI_HILOGE("find changed event failed");
         return;
     }
 
@@ -104,9 +103,9 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
     auto temp = static_cast<std::unique_ptr<JsUtil::CallbackInfo>*>(work->data);
     delete work;
     
-    auto removeEvent = devMonitor_.find(REMOVE_EVENT);
+    auto removeEvent = devMonitor_.find(CHANGED_TYPE);
     if (removeEvent == devMonitor_.end()) {
-        MMI_HILOGE("find remove event failed");
+        MMI_HILOGE("find changed event failed");
         return;
     }
 
@@ -130,9 +129,9 @@ void JsEventTarget::TargetOn(std::string type, int32_t deviceId)
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
-    auto iter = devMonitor_.find(type);
+    auto iter = devMonitor_.find(CHANGED_TYPE);
     if (iter == devMonitor_.end()) {
-        MMI_HILOGE("type is wrong, type:%{public}s", type.c_str());
+        MMI_HILOGE("find %{public}s failed", CHANGED_TYPE.c_str());
         return;
     }
 
@@ -435,11 +434,11 @@ void JsEventTarget::CallKeystrokeAbilityPromise(uv_work_t *work, int32_t status)
         napi_value abilityRet = nullptr;
         CHKRV(cbTemp->env, napi_create_object(cbTemp->env, &abilityRet), CREATE_OBJECT);
         napi_value keyCode = nullptr;
-        CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, *it, &keyCode), CREATE_INT32);
+        CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, it->first, &keyCode), CREATE_INT32);
         CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, abilityRet, "keyCode", keyCode), SET_NAMED_PROPERTY);
         napi_value ret = nullptr;
         napi_value isSupport = nullptr;
-        CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, *(++it), &ret), CREATE_INT32);
+        CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, it->second, &ret), CREATE_INT32);
         CHKRV(cbTemp->env, napi_coerce_to_bool(cbTemp->env, ret, &isSupport), COERCE_TO_BOOL);
         CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, abilityRet, "isSupport", isSupport),
             SET_NAMED_PROPERTY);
@@ -473,11 +472,11 @@ void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
         napi_value abilityRet = nullptr;
         CHKRV(cbTemp->env, napi_create_object(cbTemp->env, &abilityRet), CREATE_OBJECT);
         napi_value keyCode = nullptr;
-        CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, *it, &keyCode), CREATE_INT32);
+        CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, it->first, &keyCode), CREATE_INT32);
         CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, abilityRet, "keyCode", keyCode), SET_NAMED_PROPERTY);
         napi_value ret = nullptr;
         napi_value isSupport = nullptr;
-        CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, *(++it), &ret), CREATE_INT32);
+        CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, it->second, &ret), CREATE_INT32);
         CHKRV(cbTemp->env, napi_coerce_to_bool(cbTemp->env, ret, &isSupport), COERCE_TO_BOOL);
         CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, abilityRet, "isSupport", isSupport),
             SET_NAMED_PROPERTY);
@@ -493,7 +492,7 @@ void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
           CALL_FUNCTION);
 }
 
-void JsEventTarget::EmitJsKeystrokeAbility(int32_t userData, std::vector<int32_t> keystrokeAbility)
+void JsEventTarget::EmitJsKeystrokeAbility(int32_t userData, std::map<int32_t, bool> keystrokeAbility)
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -535,6 +534,10 @@ void JsEventTarget::AddMonitor(napi_env env, std::string type, napi_value handle
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     auto iter = devMonitor_.find(type);
+    if (iter == devMonitor_.end()) {
+        MMI_HILOGE("find %{public}s failed", type.c_str());
+        return;
+    }
 
     JsUtil jsUtil;
     for (const auto &temp : iter->second) {
@@ -578,7 +581,7 @@ void JsEventTarget::RemoveMonitor(napi_env env, std::string type, napi_value han
     }
 }
 
-napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle)
+napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, int32_t userData)
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -588,22 +591,12 @@ napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle)
     if (handle == nullptr) {
         napi_value promise = nullptr;
         CHKRP(env, napi_create_promise(env, &cb->deferred, &promise), CREATE_PROMISE);
-        if (userData_ == INT32_MAX) {
-            MMI_HILOGE("userData_ exceeds the maximum");
-            return nullptr;
-        }
-        callback_.emplace(userData_, std::move(cb));
-        ++userData_;
+        callback_.emplace(userData, std::move(cb));
         return promise;
     }
 
     CHKRP(env, napi_create_reference(env, handle, 1, &cb->ref), CREATE_REFERENCE);
-    if (userData_ == INT32_MAX) {
-        MMI_HILOGE("userData_ exceeds the maximum");
-        return nullptr;
-    }
-    callback_.emplace(userData_, std::move(cb));
-    ++userData_;
+    callback_.emplace(userData, std::move(cb));
     return nullptr;
 }
 
