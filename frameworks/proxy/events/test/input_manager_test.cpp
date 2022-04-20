@@ -758,7 +758,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_004, TestSize.Level1)
 }
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 void InputManagerTest::TestSimulateInputEvent_2(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_LOG_ENTER;
@@ -826,7 +826,7 @@ void InputManagerTest::TestSimulateInputEvent_2(std::shared_ptr<PointerEvent> po
 }
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent006()
 {
     auto pointerEvent = PointerEvent::Create();
@@ -858,7 +858,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent006()
 }
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent007()
 {
     auto pointerEvent = PointerEvent::Create();
@@ -888,7 +888,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent007()
 }
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent008()
 {
     auto pointerEvent = PointerEvent::Create();
@@ -921,7 +921,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent008()
 }
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent009()
 {
     auto pointerEvent = PointerEvent::Create();
@@ -952,7 +952,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent009()
 }
 #endif
 
-#ifdef OHOS_BUILD_TP
+#ifdef OHOS_BUILD_TOUCH
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent010()
 {
     auto pointerEvent = PointerEvent::Create();
@@ -992,7 +992,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent010()
 }
 #endif
 
-#ifdef OHOS_BUILD_TP
+#ifdef OHOS_BUILD_TOUCH
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent011()
 {
     auto pointerEvent = PointerEvent::Create();
@@ -1032,7 +1032,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent011()
 }
 #endif
 
-#ifdef OHOS_BUILD_TP
+#ifdef OHOS_BUILD_TOUCH
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent013()
 {
     auto pointerEvent = PointerEvent::Create();
@@ -1072,7 +1072,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent013()
 }
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 /**
  * @tc.name:InputManager_Pencil2InputEvent_001
  * @tc.desc:Verify simulate pointer event
@@ -1090,7 +1090,7 @@ HWTEST_F(InputManagerTest, InputManager_Pencil2InputEvent_001, TestSize.Level1)
 }
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 /**
  * @tc.name:InputManager_Pencil2InputEvent_002
  * @tc.desc:Verify simulate pointer event
@@ -1108,7 +1108,7 @@ HWTEST_F(InputManagerTest, InputManager_Pencil2InputEvent_002, TestSize.Level1)
 }
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 /**
  * @tc.name:InputManager_Pencil2InputEvent_003
  * @tc.desc:Verify simulate pointer event
@@ -1126,7 +1126,7 @@ HWTEST_F(InputManagerTest, InputManager_Pencil2InputEvent_003, TestSize.Level1)
 }
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 /**
  * @tc.name:InputManager_SimulateInputEvent_006
  * @tc.desc:Verify simulate mouse event
@@ -1144,7 +1144,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_006, TestSize.Level1)
 }
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 /**
  * @tc.name:InputManager_SimulateInputEvent_007
  * @tc.desc:Verify simulate mouse event
@@ -1161,7 +1161,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_007, TestSize.Level1)
 }
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 /**
  * @tc.name:InputManager_SimulateInputEvent_008
  * @tc.desc:Verify simulate mouse event
@@ -1178,7 +1178,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_008, TestSize.Level1)
 }
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 /**
  * @tc.name:InputManager_SimulateInputEvent_009
  * @tc.desc:Verify simulate mouse event
@@ -1195,7 +1195,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_009, TestSize.Level1)
 }
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent012()
 {
     auto pointerEvent = PointerEvent::Create();
@@ -1227,7 +1227,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent012()
 }
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 /**
  * @tc.name:InputManager_SimulateInputEvent_012
  * @tc.desc:Verify simulate mouse event
@@ -1244,7 +1244,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_012, TestSize.Level1)
 }
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 /**
  * @tc.name:InputManager_SimulateInputEvent_013
  * @tc.desc:Verify simulate mouse event
@@ -1287,7 +1287,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_013, TestSize.Level1)
 }
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 /**
  * @tc.name:InputManager_SimulateInputEvent_014
  * @tc.desc:Verify simulate mouse event
@@ -1330,7 +1330,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_014, TestSize.Level1)
 }
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 /**
  * @tc.name:InputManager_SimulateInputEvent_015
  * @tc.desc:Verify simulate mouse event
@@ -1942,7 +1942,7 @@ void InputManagerTest::TestInputEventInterceptor(std::shared_ptr<PointerEvent> p
     EXPECT_TRUE(states.test(2));
 }
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 /**
  * @tc.name:TestInputEventInterceptor_001
  * @tc.desc:Verify interceptor
@@ -1979,7 +1979,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_001, TestSize.Level1)
 }
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 /**
  * @tc.name:TestInputEventInterceptor_002
  * @tc.desc:Verify interceptor
@@ -2115,7 +2115,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_004, TestSize.Level1)
     EXPECT_TRUE(!tLogs.empty());
 }
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 /**
  * @tc.name:TestInputEventInterceptor_005
  * @tc.desc:Verify interceptor
@@ -2271,7 +2271,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_006, TestSize.Level1)
 }
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 void InputManagerTest::TouchPadMonitorCallBack(std::shared_ptr<PointerEvent> pointerEvent)
 {
     int32_t pointerId = pointerEvent->GetPointerId();
@@ -2283,7 +2283,7 @@ void InputManagerTest::TouchPadMonitorCallBack(std::shared_ptr<PointerEvent> poi
 }
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 /**
  * @tc.name:InputManagerTest_OnAddTouchPadMonitor_001
  * @tc.desc:Verify touchpad monitor
@@ -2330,7 +2330,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_001, TestSize.L
 }
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 /**
  * @tc.name:InputManagerTest_OnAddTouchPadMonitor_002
  * @tc.desc:Verify touchpad monitor
@@ -2377,7 +2377,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_002, TestSize.L
 }
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 
 /**
  * @tc.name:InputManagerTest_OnAddTouchPadMonitor_003
@@ -2425,7 +2425,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_003, TestSize.L
 }
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 /**
  * @tc.name:InputManagerTest_OnAddTouchPadMonitor_004
  * @tc.desc:Verify touchpad monitor
@@ -2490,7 +2490,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.L
 }
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 /**
  * @tc.name:InputManagerTest_OnAddTouchPadMonitor_005
  * @tc.desc:Verify touchpad monitor
@@ -2540,7 +2540,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_005, TestSize.L
 }
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 /**
  * @tc.name:InputManager_TouchPadSimulateInputEvent_001
  * @tc.desc:Verify touchpad simulate and monitor
@@ -2590,7 +2590,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_001, TestSize
 }
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 /**
  * @tc.name:InputManager_TouchPadSimulateInputEvent_002
  * @tc.desc:Verify touchpad simulate and monitor
@@ -2640,7 +2640,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_002, TestSize
 }
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 /**
  * @tc.name:InputManager_TouchPadSimulateInputEvent_003
  * @tc.desc:Verify touchpad simulate and monitor
@@ -2690,7 +2690,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_003, TestSize
 }
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 /**
  * @tc.name:InputManager_TouchPadSimulateInputEvent_004
  * @tc.desc:Verify touchpad simulate and monitor
@@ -2756,7 +2756,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_004, TestSize
 }
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 /**
  * @tc.name:InputManagerTest_AddMouseMonitor_001
  * @tc.desc:Verify touchpad simulate and monitor
@@ -2784,7 +2784,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_001, TestSize.Level1
 }
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 /**
  * @tc.name:InputManagerTest_AddMouseMonitor_002
  * @tc.desc:Verify mouse monitor
@@ -2815,7 +2815,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_002, TestSize.Level1
 }
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 /**
  * @tc.name:InputManagerTest_AddMouseMonitor_003
  * @tc.desc:Verify mouse monitor
@@ -2856,7 +2856,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_003, TestSize.Level1
 }
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 
 /**
  * @tc.name:InputManagerTest_AddMouseMonitor_004

@@ -34,7 +34,7 @@ public:
 #ifdef OHOS_BUILD_KEYBOARD
     int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
 #endif
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
     int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif
 #ifdef OHOS_BUILD_TOUCH

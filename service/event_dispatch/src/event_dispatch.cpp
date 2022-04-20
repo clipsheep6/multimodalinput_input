@@ -141,7 +141,7 @@ int32_t EventDispatch::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 }
 #endif
 
-#ifdef OHOS_BUILD_MOUSE
+#ifdef OHOS_BUILD_POINTER
 int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> pointEvent)
 {
     CALL_LOG_ENTER;
