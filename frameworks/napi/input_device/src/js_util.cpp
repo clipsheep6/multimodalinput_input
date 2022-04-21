@@ -119,7 +119,7 @@ bool JsUtil::GetDeviceAxisInfo(std::unique_ptr<CallbackInfo> &cbTemp, napi_value
                 napi_value axisType = nullptr;
                 CHKRB(cbTemp->env, napi_create_string_utf8(cbTemp->env, axisTemp.axisTypeName.c_str(),
                     NAPI_AUTO_LENGTH, &axisType), CREATE_STRING_UTF8);
-                CHKRB(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "axisType", axisType), 
+                CHKRB(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "axisType", axisType),
                     SET_NAMED_PROPERTY);
                 napi_value min = nullptr;
                 CHKRB(cbTemp->env, napi_create_int32(cbTemp->env, item.min, &min), CREATE_INT32);
@@ -135,7 +135,8 @@ bool JsUtil::GetDeviceAxisInfo(std::unique_ptr<CallbackInfo> &cbTemp, napi_value
                 CHKRB(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "flat", flat), SET_NAMED_PROPERTY);
                 napi_value resolution = nullptr;
                 CHKRB(cbTemp->env, napi_create_int32(cbTemp->env, item.resolution, &resolution), CREATE_INT32);
-                CHKRB(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "resolution", resolution), SET_NAMED_PROPERTY);
+                CHKRB(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "resolution", resolution),
+                    SET_NAMED_PROPERTY);
                 CHKRB(cbTemp->env, napi_set_element(cbTemp->env, axisRanges, i, axisRange), SET_ELEMENT);
                 ++i;
             }
