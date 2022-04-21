@@ -257,24 +257,43 @@ int32_t ClientMsgHandler::OnInputDevice(const UDSClient& client, NetPacket& pkt)
     int32_t id;
     std::string name;
     int32_t deviceType;
-    if (!pkt.Read(userData)) {
-        MMI_HILOGE("Packet read userData failed");
-        return RET_ERR;
-    }
-    if (!pkt.Read(id)) {
-        MMI_HILOGE("Packet read data failed");
-        return RET_ERR;
-    }
-    if (!pkt.Read(name)) {
-        MMI_HILOGE("Packet read name failed");
-        return RET_ERR;
-    }
-    if (!pkt.Read(deviceType)) {
-        MMI_HILOGE("Packet read deviceType failed");
-        return RET_ERR;
+    int32_t busType;
+    int32_t product;
+    int32_t vendor;
+    int32_t version;
+    size_t size;
+    pkt >> userData >> id >> name >> deviceType >> busType >> product >> vendor >> version >> size;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read input device info failed");
+        return PACKET_READ_FAIL;
     }
 
-    InputDevImp.OnInputDevice(userData, id, name, deviceType);
+    int32_t axisType;
+    int32_t min;
+    int32_t max;
+    int32_t fuzz;
+    int32_t flat;
+    int32_t resolution;
+    std::vector<InputDeviceImpl::AxisInfo> axisInfo;
+    InputDeviceImpl::AxisInfo axis;
+    for (size_t i = 0; i < size; ++i) {
+        pkt >> axisType >> min >> max >> fuzz >> flat >> resolution;
+        if (pkt.ChkRWError()) {
+            MMI_HILOGE("Packet read input device axis failed");
+            return PACKET_READ_FAIL;
+        }
+        axis.axisType = axisType;
+        axis.min = min;
+        axis.max = max;
+        axis.fuzz = fuzz;
+        axis.flat = flat;
+        axis.resolution = resolution;
+        axisInfo.push_back(axis);
+    }
+    auto devData = std::make_shared<InputDeviceImpl::InputDeviceInfo>(id, name, deviceType, busType, product, vendor,
+        version, axisInfo);
+    CHKPR(devData, RET_ERR);
+    InputDevImp.OnInputDevice(userData, devData);
     return RET_OK;
 }
 
@@ -306,7 +325,7 @@ int32_t ClientMsgHandler::OnKeyList(const UDSClient& client, NetPacket& pkt)
         abilityRet[keyCode] = isSupport == 1 ? true : false;
         i += 2;
     }
-    InputDeviceImpl::GetInstance().OnKeystrokeAbility(userData, abilityRet);
+    InputDevImp.OnKeystrokeAbility(userData, abilityRet);
     return RET_OK;
 }
 

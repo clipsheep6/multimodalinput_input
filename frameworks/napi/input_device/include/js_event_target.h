@@ -50,6 +50,10 @@ public:
         std::string deviceTypeName;
         uint32_t typeBit;
     };
+    struct AxisType {
+        std::string axisTypeName;
+        int32_t axisType;
+    };
 
 private:
     static void CallIdsPromiseWork(uv_work_t *work, int32_t status);

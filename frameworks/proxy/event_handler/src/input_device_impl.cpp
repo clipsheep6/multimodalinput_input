@@ -132,18 +132,18 @@ void InputDeviceImpl::GetKeystrokeAbility(int32_t deviceId, std::vector<int32_t>
 }
 
 void InputDeviceImpl::OnInputDeviceTask(InputDeviceImpl::DevInfo devInfo, int32_t userData,
-    int32_t id, std::string name, int32_t deviceType)
+    std::shared_ptr<InputDeviceInfo> devData)
 {
     CHK_PIDANDTID();
-    auto devData = std::make_shared<InputDeviceInfo>(id, name, deviceType);
     CHKPV(devData);
     devInfo.second(userData, devData);
-    MMI_HILOGD("report device info task, userData:%{public}d device:%{public}d name:%{public}s type:%{public}d",
-        userData, id, name.c_str(), deviceType);
+    MMI_HILOGD("device info callback userData:%{public}d identification:%{public}d name:%{public}s type:%{public}d",
+        userData, devData->id, devData->name.c_str(), devData->devcieType);
 }
 
-void InputDeviceImpl::OnInputDevice(int32_t userData, int32_t id, const std::string &name, int32_t deviceType)
+void InputDeviceImpl::OnInputDevice(int32_t userData, std::shared_ptr<InputDeviceInfo> &devData)
 {
+    CALL_LOG_ENTER;
     CHK_PIDANDTID();
     std::lock_guard<std::mutex> guard(mtx_);
     auto iter = inputDevices_.find(userData);
@@ -152,7 +152,6 @@ void InputDeviceImpl::OnInputDevice(int32_t userData, int32_t id, const std::str
         return;
     }
     if (iter->second.cppDev != nullptr) {
-        auto devData = std::make_shared<InputDeviceInfo>(id, name, deviceType);
         CHKPV(devData);
         iter->second.cppDev(devData);
         MMI_HILOGD("innerkits interface");
@@ -161,11 +160,11 @@ void InputDeviceImpl::OnInputDevice(int32_t userData, int32_t id, const std::str
     auto devInfo = GetDeviceInfo(userData);
     CHKPV(devInfo);
     if (!MMIEventHandler::PostTask(devInfo->first,
-        std::bind(&InputDeviceImpl::OnInputDeviceTask, this, *devInfo, userData, id, name, deviceType))) {
+        std::bind(&InputDeviceImpl::OnInputDeviceTask, this, *devInfo, userData, devData))) {
         MMI_HILOGE("post task failed");
     }
-    MMI_HILOGD("report device info, userData:%{public}d device:%{public}d name:%{public}s type:%{public}d",
-        userData, id, name.c_str(), deviceType);
+    MMI_HILOGD("report device info userData:%{public}d identification:%{public}d name:%{public}s type:%{public}d",
+        userData, devData->id, devData->name.c_str(), devData->devcieType);
 }
 
 void InputDeviceImpl::OnInputDeviceIdsTask(InputDeviceImpl::DevIds devIds, int32_t userData, std::vector<int32_t> ids)
@@ -260,5 +259,14 @@ int32_t InputDeviceImpl::GetUserData()
 {
     return userData_;
 }
+
+InputDeviceImpl::InputDeviceInfo::InputDeviceInfo(int32_t id, std::string name, uint32_t devcieType, int32_t busType,
+    int32_t product, int32_t vendor, int32_t version, std::vector<AxisInfo> axisInfo)
+    : id(id), name(name), devcieType(devcieType), busType(busType), product(product), vendor(vendor), version(version)
+{
+    axis = axisInfo;
+}
+
+InputDeviceImpl::InputDeviceInfo::~InputDeviceInfo() {}
 } // namespace MMI
 } // namespace OHOS

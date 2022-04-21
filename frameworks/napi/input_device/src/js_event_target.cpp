@@ -26,6 +26,15 @@ constexpr uint32_t EVDEV_UDEV_TAG_TOUCHSCREEN = (1 << 4);
 constexpr uint32_t EVDEV_UDEV_TAG_JOYSTICK = (1 << 6);
 constexpr uint32_t EVDEV_UDEV_TAG_TRACKBALL = (1 << 10);
 
+constexpr int32_t ABS_MT_TOUCH_MAJOR = 0x30;
+constexpr int32_t ABS_MT_TOUCH_MINOR = 0x31;
+constexpr int32_t ABS_MT_ORIENTATION = 0x34;
+constexpr int32_t ABS_MT_POSITION_X  = 0x35;
+constexpr int32_t ABS_MT_POSITION_Y = 0x36;
+constexpr int32_t ABS_MT_PRESSURE = 0x3a;
+constexpr int32_t ABS_MT_TOOL_X = 0x3c;
+constexpr int32_t ABS_MT_TOOL_Y = 0x3d;
+
 const std::string CREATE_ARRAY = "napi_create_array";
 const std::string CREATE_INT32 = "napi_create_int32";
 const std::string SET_ELEMENT = "napi_set_element";
@@ -47,6 +56,17 @@ JsEventTarget::DeviceType g_deviceType[] = {
     {"touchscreen", EVDEV_UDEV_TAG_TOUCHSCREEN},
     {"joystick", EVDEV_UDEV_TAG_JOYSTICK},
     {"trackball", EVDEV_UDEV_TAG_TRACKBALL},
+};
+
+JsEventTarget::AxisType g_axisType[] = {
+    {"touch_major", ABS_MT_TOUCH_MAJOR},
+    {"touch_minor", ABS_MT_TOUCH_MINOR},
+    {"orientation", ABS_MT_ORIENTATION},
+    {"position_x", ABS_MT_POSITION_X},
+    {"position_y", ABS_MT_POSITION_Y},
+    {"pressure", ABS_MT_PRESSURE},
+    {"tool_x", ABS_MT_TOOL_X},
+    {"tool_y", ABS_MT_TOOL_Y},
 };
 
 std::mutex mutex_;
@@ -287,6 +307,18 @@ void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
     CHKRV(cbTemp->env, napi_create_object(cbTemp->env, &object), CREATE_OBJECT);
     CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, object, "id", id), SET_NAMED_PROPERTY);
     CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, object, "name", name), SET_NAMED_PROPERTY);
+    napi_value busType = nullptr;
+    CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, cbTemp->data.device->busType, &busType), CREATE_INT32);
+    CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, object, "busType", busType), SET_NAMED_PROPERTY);
+    napi_value product = nullptr;
+    CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, cbTemp->data.device->product, &product), CREATE_INT32);
+    CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, object, "product", product), SET_NAMED_PROPERTY);
+    napi_value vendor = nullptr;
+    CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, cbTemp->data.device->vendor, &vendor), CREATE_INT32);
+    CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, object, "vendor", vendor), SET_NAMED_PROPERTY);
+    napi_value version = nullptr;
+    CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, cbTemp->data.device->version, &version), CREATE_INT32);
+    CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, object, "version", version), SET_NAMED_PROPERTY);
 
     uint32_t types = cbTemp->data.device->devcieType;
     std::vector<std::string> sources;
@@ -297,17 +329,49 @@ void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
     }
     napi_value devSources = nullptr;
     CHKRV(cbTemp->env, napi_create_array(cbTemp->env, &devSources), CREATE_ARRAY);
-    uint32_t index = 0;
+    uint32_t i = 0;
     napi_value value = nullptr;
     for (const auto &item : sources) {
         CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, item.c_str(), NAPI_AUTO_LENGTH, &value),
             CREATE_STRING_UTF8);
-        CHKRV(cbTemp->env, napi_set_element(cbTemp->env, devSources, index, value), SET_ELEMENT);
+        CHKRV(cbTemp->env, napi_set_element(cbTemp->env, devSources, i, value), SET_ELEMENT);
+        ++i;
     }
     CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, object, "sources", devSources), SET_NAMED_PROPERTY);
 
     napi_value axisRanges = nullptr;
     CHKRV(cbTemp->env, napi_create_array(cbTemp->env, &axisRanges), CREATE_ARRAY);
+    napi_value axisRange = nullptr;
+    uint32_t j = 0;
+    for (const auto &item : cbTemp->data.device->axis) {
+        for (const auto &axisTemp : g_axisType) {
+            if (item.axisType == axisTemp.axisType) {
+                CHKRV(cbTemp->env, napi_create_object(cbTemp->env, &axisRange), CREATE_OBJECT);
+                napi_value axisType = nullptr;
+                CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, axisTemp.axisTypeName.c_str(),
+                    NAPI_AUTO_LENGTH, &axisType), CREATE_STRING_UTF8);
+                CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "axisType", axisType), 
+                    SET_NAMED_PROPERTY);
+                napi_value min = nullptr;
+                CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, item.min, &min), CREATE_INT32);
+                CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "min", min), SET_NAMED_PROPERTY);
+                napi_value max = nullptr;
+                CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, item.max, &max), CREATE_INT32);
+                CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "max", max), SET_NAMED_PROPERTY);
+                napi_value fuzz = nullptr;
+                CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, item.fuzz, &fuzz), CREATE_INT32);
+                CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "fuzz", fuzz), SET_NAMED_PROPERTY);
+                napi_value flat = nullptr;
+                CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, item.flat, &flat), CREATE_INT32);
+                CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "flat", flat), SET_NAMED_PROPERTY);
+                napi_value resolution = nullptr;
+                CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, item.resolution, &resolution), CREATE_INT32);
+                CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "resolution", resolution), SET_NAMED_PROPERTY);
+                CHKRV(cbTemp->env, napi_set_element(cbTemp->env, axisRanges, j, axisRange), SET_ELEMENT);
+                ++j;
+            }
+        }
+    }
     CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, object, "axisRanges", axisRanges), SET_NAMED_PROPERTY);
 
     napi_value handlerTemp = nullptr;
@@ -342,6 +406,18 @@ void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
     CHKRV(cbTemp->env, napi_create_object(cbTemp->env, &object), CREATE_OBJECT);
     CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, object, "id", id), SET_NAMED_PROPERTY);
     CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, object, "name", name), SET_NAMED_PROPERTY);
+    napi_value busType = nullptr;
+    CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, cbTemp->data.device->busType, &busType), CREATE_INT32);
+    CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, object, "busType", busType), SET_NAMED_PROPERTY);
+    napi_value product = nullptr;
+    CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, cbTemp->data.device->product, &product), CREATE_INT32);
+    CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, object, "product", product), SET_NAMED_PROPERTY);
+    napi_value vendor = nullptr;
+    CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, cbTemp->data.device->vendor, &vendor), CREATE_INT32);
+    CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, object, "vendor", vendor), SET_NAMED_PROPERTY);
+    napi_value version = nullptr;
+    CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, cbTemp->data.device->version, &version), CREATE_INT32);
+    CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, object, "version", version), SET_NAMED_PROPERTY);
 
     uint32_t types = cbTemp->data.device->devcieType;
     if (types == 0) {
@@ -357,17 +433,49 @@ void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
     napi_value devSources = nullptr;
     CHKRV(cbTemp->env, napi_create_array(cbTemp->env, &devSources), CREATE_ARRAY);
 
-    uint32_t index = 0;
+    uint32_t i = 0;
     napi_value value = nullptr;
     for (const auto &item : sources) {
         CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, item.c_str(), NAPI_AUTO_LENGTH, &value),
               CREATE_STRING_UTF8);
-        CHKRV(cbTemp->env, napi_set_element(cbTemp->env, devSources, index, value), SET_ELEMENT);
+        CHKRV(cbTemp->env, napi_set_element(cbTemp->env, devSources, i, value), SET_ELEMENT);
+        ++i;
     }
     CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, object, "sources", devSources), SET_NAMED_PROPERTY);
 
     napi_value axisRanges = nullptr;
     CHKRV(cbTemp->env, napi_create_array(cbTemp->env, &axisRanges), CREATE_ARRAY);
+    napi_value axisRange = nullptr;
+    uint32_t j = 0;
+    for (const auto &item : cbTemp->data.device->axis) {
+        for (const auto &axisTemp : g_axisType) {
+            if (item.axisType == axisTemp.axisType) {
+                CHKRV(cbTemp->env, napi_create_object(cbTemp->env, &axisRange), CREATE_OBJECT);
+                napi_value axisType = nullptr;
+                CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, axisTemp.axisTypeName.c_str(),
+                    NAPI_AUTO_LENGTH, &axisType), CREATE_STRING_UTF8);
+                CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "axisType", axisType), 
+                    SET_NAMED_PROPERTY);
+                napi_value min = nullptr;
+                CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, item.min, &min), CREATE_INT32);
+                CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "min", min), SET_NAMED_PROPERTY);
+                napi_value max = nullptr;
+                CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, item.max, &max), CREATE_INT32);
+                CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "max", max), SET_NAMED_PROPERTY);
+                napi_value fuzz = nullptr;
+                CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, item.fuzz, &fuzz), CREATE_INT32);
+                CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "fuzz", fuzz), SET_NAMED_PROPERTY);
+                napi_value flat = nullptr;
+                CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, item.flat, &flat), CREATE_INT32);
+                CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "flat", flat), SET_NAMED_PROPERTY);
+                napi_value resolution = nullptr;
+                CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, item.resolution, &resolution), CREATE_INT32);
+                CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "resolution", resolution), SET_NAMED_PROPERTY);
+                CHKRV(cbTemp->env, napi_set_element(cbTemp->env, axisRanges, j, axisRange), SET_ELEMENT);
+                ++j;
+            }
+        }
+    }
     CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, object, "axisRanges", axisRanges), SET_NAMED_PROPERTY);
     CHKRV(cbTemp->env, napi_resolve_deferred(cbTemp->env, cbTemp->deferred, object), RESOLVE_DEFERRED);
 }
