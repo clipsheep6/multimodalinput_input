@@ -464,8 +464,9 @@ int32_t ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& pkt)
         }
         return RET_OK;
     }
-    pkt2 << userData << inputDevice->GetId() << inputDevice->GetName() << inputDevice->GetType() << inputDevice->GetBustype()
-        << inputDevice->GetProduct() << inputDevice->GetVendor() << inputDevice->GetVersion();
+    pkt2 << userData << inputDevice->GetId() << inputDevice->GetName() << inputDevice->GetType()
+        << inputDevice->GetBustype() << inputDevice->GetProduct() << inputDevice->GetVendor()
+        << inputDevice->GetVersion();
     auto axis = inputDevice->GetAxisInfo();
     pkt2 << axis.size();
     for (const auto &item : axis) {

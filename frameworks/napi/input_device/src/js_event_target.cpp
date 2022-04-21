@@ -350,7 +350,7 @@ void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
                 napi_value axisType = nullptr;
                 CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, axisTemp.axisTypeName.c_str(),
                     NAPI_AUTO_LENGTH, &axisType), CREATE_STRING_UTF8);
-                CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "axisType", axisType), 
+                CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "axisType", axisType),
                     SET_NAMED_PROPERTY);
                 napi_value min = nullptr;
                 CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, item.min, &min), CREATE_INT32);
@@ -366,7 +366,8 @@ void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
                 CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "flat", flat), SET_NAMED_PROPERTY);
                 napi_value resolution = nullptr;
                 CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, item.resolution, &resolution), CREATE_INT32);
-                CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "resolution", resolution), SET_NAMED_PROPERTY);
+                CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "resolution", resolution),
+                    SET_NAMED_PROPERTY);
                 CHKRV(cbTemp->env, napi_set_element(cbTemp->env, axisRanges, j, axisRange), SET_ELEMENT);
                 ++j;
             }
@@ -454,7 +455,7 @@ void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
                 napi_value axisType = nullptr;
                 CHKRV(cbTemp->env, napi_create_string_utf8(cbTemp->env, axisTemp.axisTypeName.c_str(),
                     NAPI_AUTO_LENGTH, &axisType), CREATE_STRING_UTF8);
-                CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "axisType", axisType), 
+                CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "axisType", axisType),
                     SET_NAMED_PROPERTY);
                 napi_value min = nullptr;
                 CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, item.min, &min), CREATE_INT32);
@@ -470,7 +471,8 @@ void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
                 CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "flat", flat), SET_NAMED_PROPERTY);
                 napi_value resolution = nullptr;
                 CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, item.resolution, &resolution), CREATE_INT32);
-                CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "resolution", resolution), SET_NAMED_PROPERTY);
+                CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, axisRange, "resolution", resolution),
+                    SET_NAMED_PROPERTY);
                 CHKRV(cbTemp->env, napi_set_element(cbTemp->env, axisRanges, j, axisRange), SET_ELEMENT);
                 ++j;
             }
