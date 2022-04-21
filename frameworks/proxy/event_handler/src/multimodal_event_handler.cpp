@@ -52,15 +52,6 @@ int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyE
 }
 #endif
 
-bool MultimodalEventHandler::StartClient()
-{
-    CALL_LOG_ENTER;
-    if (client_ == nullptr) {
-        return InitClient();
-    }
-    return true;
-}
-
 bool MultimodalEventHandler::InitClient()
 {
     CALL_LOG_ENTER;

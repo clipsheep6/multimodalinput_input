@@ -134,7 +134,7 @@ void InputManagerImpl::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> 
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.StartClient()) {
+    if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("get mmi client is nullptr");
         return;
     }
@@ -183,7 +183,7 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventCo
     CALL_LOG_ENTER;
     CHKPV(inputEventConsumer);
     std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.StartClient()) {
+    if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
         return;
     }
@@ -447,7 +447,7 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<PointerE
 int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consumer)
 {
     CHKPR(consumer, ERROR_NULL_POINTER);
-    if (!MMIEventHdl.StartClient()) {
+    if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
         return -1;
     }
@@ -458,7 +458,7 @@ int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consum
 void InputManagerImpl::RemoveMonitor(int32_t monitorId)
 {
     std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.StartClient()) {
+    if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
         return;
     }
@@ -468,7 +468,7 @@ void InputManagerImpl::RemoveMonitor(int32_t monitorId)
 void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
     std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.StartClient()) {
+    if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
         return;
     }
@@ -479,7 +479,7 @@ void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
 {
 #ifdef OHOS_BUILD_POINTER
     std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.StartClient()) {
+    if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
         return;
     }
@@ -492,7 +492,7 @@ void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
 int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
 {
     CHKPR(interceptor, INVALID_HANDLER_ID);
-    if (!MMIEventHdl.StartClient()) {
+    if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
         return -1;
     }
@@ -518,7 +518,7 @@ int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyE
         MMI_HILOGE("%{public}s param should not be null", __func__);
         return MMI_STANDARD_EVENT_INVALID_PARAM;
     }
-    if (!MMIEventHdl.StartClient()) {
+    if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
         return -1;
     }
@@ -539,7 +539,7 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
         MMI_HILOGE("Specified interceptor does not exist");
         return;
     }
-    if (!MMIEventHdl.StartClient()) {
+    if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
         return;
     }
@@ -570,7 +570,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 #ifdef OHOS_BUILD_KEYBOARD
     CHKPV(keyEvent);
     std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.StartClient()) {
+    if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
         return;
     }
@@ -585,7 +585,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
 #if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
     CHKPV(pointerEvent);
     std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.StartClient()) {
+    if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
         return;
     }

@@ -36,7 +36,7 @@ public:
     DISALLOW_COPY_AND_MOVE(MultimodalEventHandler);
 
     MMIClientPtr GetMMIClient();
-    bool StartClient();
+    bool InitClient();
 #ifdef OHOS_BUILD_KEYBOARD
     int32_t InjectEvent(const std::shared_ptr<KeyEvent> keyEventPtr);
 #endif
@@ -57,9 +57,6 @@ public:
     int32_t AddInterceptor(int32_t sourceType, int32_t id);
     int32_t RemoveInterceptor(int32_t id);
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY);
-
-private:
-    bool InitClient();
 
 private:
     MMIClientPtr client_ = nullptr;

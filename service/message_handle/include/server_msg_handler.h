@@ -22,7 +22,6 @@
 #include "uds_server.h"
 #include "msg_handler.h"
 
-
 namespace OHOS {
 namespace MMI {
 typedef std::function<int32_t(SessionPtr sess, NetPacket& pkt)> ServerMsgFun;
@@ -79,6 +78,9 @@ protected:
     int32_t OnMoveMouse(SessionPtr sess, NetPacket& pkt);
 #endif
 
+#ifdef OHOS_BUILD_MMI_DEBUG
+    int32_t OnBigPacketTest(SessionPtr sess, NetPacket& pkt);
+#endif // OHOS_BUILD_MMI_DEBUG
 private:
     UDSServer *udsServer_ = nullptr;
 };
