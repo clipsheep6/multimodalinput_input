@@ -24,7 +24,6 @@
 #include "event_filter_service.h"
 #include "input_event_monitor_manager.h"
 #include "interceptor_manager.h"
-#include "key_event_input_subscribe_manager.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
@@ -178,7 +177,8 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
     return RET_OK;
 }
 
-void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer)
+void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
+    std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
 {
     CALL_LOG_ENTER;
     CHKPV(inputEventConsumer);
@@ -188,7 +188,10 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventCo
         return;
     }
     consumer_ = inputEventConsumer;
-    eventHandler_ = InputMgrImpl->GetCurrentEventHandler();
+    eventHandler_ = eventHandler;
+    if (eventHandler_ == nullptr) {
+        eventHandler_ = InputMgrImpl->GetCurrentEventHandler();
+    }
 }
 
 #ifdef OHOS_BUILD_KEYBOARD
@@ -414,24 +417,6 @@ void InputManagerImpl::PrintDisplayInfo()
     }
 }
 
-
-int32_t InputManagerImpl::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
-    std::function<void(std::shared_ptr<KeyEvent>)> callback)
-{
-#ifdef OHOS_BUILD_KEYBOARD
-    return KeyEventInputSubscribeMgr.SubscribeKeyEvent(keyOption, callback);
-#else
-   return RET_OK;
-#endif
-}
-
-void InputManagerImpl::UnsubscribeKeyEvent(int32_t subscriberId)
-{
-#ifdef OHOS_BUILD_KEYBOARD
-    KeyEventInputSubscribeMgr.UnSubscribeKeyEvent(subscriberId);
-#endif
-}
-
 int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor)
 {
 #ifdef OHOS_BUILD_KEYBOARD
@@ -495,10 +480,12 @@ void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
 #ifdef OHOS_BUILD_POINTER
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.StartClient()) {
-        MMI_HILOGE("get mmi client is nullptr");
+        MMI_HILOGE("client init failed");
         return;
     }
-    monitorManager_.MoveMouse(offsetX, offsetY);
+    if (MMIEventHdl.MoveMouseEvent(offsetX, offsetY) != RET_OK) {
+        MMI_HILOGE("Failed to inject move mouse offset event");
+    }
 #endif
 }
 
@@ -559,19 +546,22 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
     int32_t mask = interceptorId % ADD_MASK_BASE;
     interceptorId /= ADD_MASK_BASE;
     switch (mask) {
-        case MASK_TOUCH:
+        case MASK_TOUCH: {
 #ifdef OHOS_BUILD_TOUCH
             interceptorManager_.RemoveInterceptor(interceptorId);
 #endif
             break;
-        case MASK_KEY:
+        }
+        case MASK_KEY: {
 #ifdef OHOS_BUILD_KEYBOARD
             InterceptorMgr.RemoveInterceptor(interceptorId);
 #endif
             break;
-        default:
+        }
+        default: {
             MMI_HILOGE("Can't find the mask, mask:%{public}d", mask);
             break;
+        }
     }
 }
 

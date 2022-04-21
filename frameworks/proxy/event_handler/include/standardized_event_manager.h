@@ -52,7 +52,10 @@ public:
     int32_t SubscribeKeyEvent(const KeyEventInputSubscribeManager::SubscribeKeyEventInfo& subscribeInfo);
     int32_t UnSubscribeKeyEvent(int32_t subscribeId);
 #endif
-protected:
+#ifdef OHOS_BUILD_POINTER
+    int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY);
+#endif
+	protected:
     bool SendMsg(NetPacket& pkt) const;
 
 protected:

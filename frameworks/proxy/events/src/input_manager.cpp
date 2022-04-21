@@ -19,13 +19,17 @@
 #include "input_event_monitor_manager.h"
 #include "input_manager_impl.h"
 #include "interceptor_manager.h"
+#include "key_event_input_subscribe_manager.h"
 #include "define_multimodal.h"
 #include "multimodal_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
-InputManager *InputManager::instance_ = nullptr;
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManager" };
+} // namespace
 
+InputManager *InputManager::instance_ = nullptr;
 InputManager *InputManager::GetInstance()
 {
     if (instance_ == nullptr) {
@@ -47,18 +51,25 @@ int32_t InputManager::AddInputEventFilter(std::function<bool(std::shared_ptr<Poi
 
 void InputManager::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer)
 {
-    InputMgrImpl->SetWindowInputEventConsumer(inputEventConsumer);
+    InputMgrImpl->SetWindowInputEventConsumer(inputEventConsumer, nullptr);
+}
+
+void InputManager::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
+    std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
+{
+    CHKPV(eventHandler);
+    InputMgrImpl->SetWindowInputEventConsumer(inputEventConsumer, eventHandler);
 }
 
 int32_t InputManager::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
     std::function<void(std::shared_ptr<KeyEvent>)> callback)
 {
-    return InputMgrImpl->SubscribeKeyEvent(keyOption, callback);
+    return KeyEventInputSubscribeMgr.SubscribeKeyEvent(keyOption, callback);
 }
 
 void InputManager::UnsubscribeKeyEvent(int32_t subscriberId)
 {
-    InputMgrImpl->UnsubscribeKeyEvent(subscriberId);
+    KeyEventInputSubscribeMgr.UnSubscribeKeyEvent(subscriberId);
 }
 
 int32_t InputManager::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor)
@@ -84,6 +95,11 @@ void InputManager::RemoveMonitor(int32_t monitorId)
 void InputManager::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
     InputMgrImpl->MarkConsumed(monitorId, eventId);
+}
+
+void InputManager::MoveMouse(int32_t offsetX, int32_t offsetY)
+{
+    InputMgrImpl->MoveMouse(offsetX, offsetY);
 }
 
 int32_t InputManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
