@@ -438,7 +438,7 @@ int32_t ServerMsgHandler::OnMoveMouse(SessionPtr sess, NetPacket& pkt)
         return RET_ERR;
     }
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);    
+    CHKPR(pointerEvent, ERROR_NULL_POINTER); 
     auto iPointerEventHandler = InputHandler->GetPointerEventHandler();
     CHKPR(iPointerEventHandler, ERROR_NULL_POINTER);
     iPointerEventHandler->HandlePointerEvent(pointerEvent);

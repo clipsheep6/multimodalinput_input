@@ -55,7 +55,8 @@ public:
 #ifdef OHOS_BUILD_POINTER
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY);
 #endif
-	protected:
+
+protected:
     bool SendMsg(NetPacket& pkt) const;
 
 protected:

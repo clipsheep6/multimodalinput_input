@@ -233,7 +233,7 @@ std::shared_ptr<IInputEventHandler> InputEventHandler::BuildKeyHandlerChain()
     keyCommandHandler->SetNext(keySubscriber_);
     keyInputHandlerMgr_ = std::make_shared<InputHandlerManagerGlobal>();
     CHKPP(keyInputHandlerMgr_);
-    keySubscriber_->SetNext(keyInputHandlerMgr_); 
+    keySubscriber_->SetNext(keyInputHandlerMgr_);
     auto keyDispatch = std::make_shared<EventDispatch>();
     keyInputHandlerMgr_->SetNext(keyDispatch);
     return keyEventHandler;
@@ -268,7 +268,7 @@ std::shared_ptr<IInputEventHandler> InputEventHandler::BuildTouchHandlerChain()
     auto touchEventHandler = std::make_shared<TouchEventHandler>();
     CHKPP(touchEventHandler);
     touchEventFilter_ = std::make_shared<EventFilterWrap>();
-    CHKPP(touchEventFilter_); 
+    CHKPP(touchEventFilter_);
     touchEventHandler->SetNext(touchEventFilter_);
     touchInputHandlerMgr_ = std::make_shared<InputHandlerManagerGlobal>();
     CHKPP(touchInputHandlerMgr_);
