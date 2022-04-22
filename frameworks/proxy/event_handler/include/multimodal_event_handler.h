@@ -56,7 +56,9 @@ public:
 #endif
     int32_t AddInterceptor(int32_t sourceType, int32_t id);
     int32_t RemoveInterceptor(int32_t id);
+#ifdef OHOS_BUILD_POINTER
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY);
+#endif
 
 private:
     MMIClientPtr client_ = nullptr;
