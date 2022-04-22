@@ -22,10 +22,10 @@
 #include "bytrace_adapter.h"
 #include "input_device_impl.h"
 #include "input_event_data_transformation.h"
-#include "input_event_monitor_manager.h"
+#include "i_input_event_monitor_manager.h"
 #include "input_handler_manager.h"
 #include "input_manager_impl.h"
-#include "input_monitor_manager.h"
+#include "i_input_monitor_manager.h"
 #include "interceptor_manager.h"
 #include "mmi_client.h"
 #include "mmi_func_callback.h"
@@ -109,7 +109,7 @@ int32_t ClientMsgHandler::OnKeyMonitor(const UDSClient& client, NetPacket& pkt)
         return PACKET_READ_FAIL;
     }
     MMI_HILOGD("Client receive the msg from server, keyCode:%{public}d,pid:%{public}d", key->GetKeyCode(), pid);
-    return InputMonitorMgr.OnMonitorInputEvent(key);
+    return IInputEventMonitorManager::GetInstance()->OnMonitorInputEvent(key);
 }
 
 int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
@@ -209,7 +209,7 @@ int32_t ClientMsgHandler::OnTouchPadMonitor(const UDSClient& client, NetPacket& 
     }
     MMI_HILOGD("client receive the msg from server: EventType:%{public}d,pid:%{public}d",
         pointer->GetEventType(), pid);
-    return InputMonitorMgr.OnTouchpadMonitorInputEvent(pointer);
+    return IInputEventMonitorManager::GetInstance()->OnTouchpadMonitorInputEvent(pointer);
 }
 
 int32_t ClientMsgHandler::GetMultimodeInputInfo(const UDSClient& client, NetPacket& pkt)

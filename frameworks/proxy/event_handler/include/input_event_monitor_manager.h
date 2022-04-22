@@ -18,12 +18,12 @@
 #include <list>
 
 #include "nocopyable.h"
-#include "singleton.h"
 
 #include "key_event.h"
 #include "multimodal_event_handler.h"
 #include "pointer_event.h"
 #include "proto.h"
+#include "i_input_event_monitor_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -38,20 +38,20 @@ struct MonitorItem {
     std::function<void (std::shared_ptr<PointerEvent>)> TouchPadEventMonitor;
 };
 
-class InputEventMonitorManager {
+class InputEventMonitorManager : public IInputEventMonitorManager{
 public:
     InputEventMonitorManager();
     DISALLOW_COPY_AND_MOVE(InputEventMonitorManager);
-    virtual ~InputEventMonitorManager();
+    ~InputEventMonitorManager();
 
-    int32_t AddInputEventMontior(std::function<void (std::shared_ptr<KeyEvent>)> keyEventMonitor);
-    void RemoveInputEventMontior(int32_t monitorId);
-    int32_t OnMonitorInputEvent(std::shared_ptr<KeyEvent> keyEvent);
+    int32_t AddInputEventMontior(std::function<void (std::shared_ptr<KeyEvent>)> keyEventMonitor) override;
+    void RemoveInputEventMontior(int32_t monitorId) override;
+    int32_t OnMonitorInputEvent(std::shared_ptr<KeyEvent> keyEvent) override;
 
     int32_t AddInputEventTouchpadMontior(std::function<void (std::shared_ptr<PointerEvent>)>
-                                        TouchPadEventMonitor);
-    void RemoveInputEventTouchpadMontior(int32_t monitorId);
-    int32_t OnTouchpadMonitorInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
+                                        TouchPadEventMonitor) override;
+    void RemoveInputEventTouchpadMontior(int32_t monitorId) override;
+    int32_t OnTouchpadMonitorInputEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
 
 public:
     static constexpr int32_t INVALID_MONITOR_ID { -1 };
@@ -60,7 +60,6 @@ private:
     std::list<MonitorItem> monitors_;
 };
 
-#define InputMonitorMgr OHOS::Singleton<InputEventMonitorManager>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_EVENT_MONITOR_MANAGER_H
