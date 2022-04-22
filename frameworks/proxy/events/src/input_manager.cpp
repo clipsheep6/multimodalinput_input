@@ -64,12 +64,18 @@ void InputManager::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsum
 int32_t InputManager::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
     std::function<void(std::shared_ptr<KeyEvent>)> callback)
 {
+#ifdef OHOS_BUILD_KEYBOARD
     return KeyEventInputSubscribeMgr.SubscribeKeyEvent(keyOption, callback);
+#else
+    return RET_ERR;
+#endif
 }
 
 void InputManager::UnsubscribeKeyEvent(int32_t subscriberId)
 {
+#ifdef OHOS_BUILD_KEYBOARD
     KeyEventInputSubscribeMgr.UnSubscribeKeyEvent(subscriberId);
+#endif
 }
 
 int32_t InputManager::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor)
