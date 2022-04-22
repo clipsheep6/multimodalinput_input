@@ -21,28 +21,72 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceManager"};
-constexpr int32_t INVALID_DEVICE_ID {-1};
+constexpr int32_t INVALID_DEVICE_ID = -1;
+
+constexpr int32_t ABS_MT_TOUCH_MAJOR = 0x30;
+constexpr int32_t ABS_MT_TOUCH_MINOR = 0x31;
+constexpr int32_t ABS_MT_ORIENTATION = 0x34;
+constexpr int32_t ABS_MT_POSITION_X  = 0x35;
+constexpr int32_t ABS_MT_POSITION_Y = 0x36;
+constexpr int32_t ABS_MT_PRESSURE = 0x3a;
+constexpr int32_t ABS_MT_TOOL_X = 0x3c;
+constexpr int32_t ABS_MT_TOOL_Y = 0x3d;
+
+std::list<int32_t> axisType = {
+    ABS_MT_TOUCH_MAJOR,
+    ABS_MT_TOUCH_MINOR,
+    ABS_MT_ORIENTATION,
+    ABS_MT_POSITION_X,
+    ABS_MT_POSITION_Y,
+    ABS_MT_PRESSURE,
+    ABS_MT_TOOL_X,
+    ABS_MT_TOOL_Y,
+};
 } // namespace
 
 std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) const
 {
     CALL_LOG_ENTER;
-    auto item = inputDevice_.find(id);
-    if (item == inputDevice_.end()) {
+    auto iter = inputDevice_.find(id);
+    if (iter == inputDevice_.end()) {
         MMI_HILOGE("failed to search for the device");
         return nullptr;
     }
 
     std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
-    if (inputDevice == nullptr) {
-        MMI_HILOGE("create InputDevice ptr failed");
-        return nullptr;
-    }
-    inputDevice->SetId(item->first);
-    int32_t deviceType = static_cast<int32_t>(libinput_device_get_tags(item->second));
+    CHKPP(inputDevice);
+    inputDevice->SetId(iter->first);
+    int32_t deviceType = static_cast<int32_t>(libinput_device_get_tags(iter->second));
     inputDevice->SetType(deviceType);
-    std::string name = libinput_device_get_name(item->second);
+    std::string name = libinput_device_get_name(iter->second);
     inputDevice->SetName(name);
+    int32_t busType = libinput_device_get_id_bustype(iter->second);
+    inputDevice->SetBustype(busType);
+    int32_t version = libinput_device_get_id_version(iter->second);
+    inputDevice->SetVersion(version);
+    int32_t product = libinput_device_get_id_product(iter->second);
+    inputDevice->SetProduct(product);
+    int32_t vendor = libinput_device_get_id_vendor(iter->second);
+    inputDevice->SetVendor(vendor);
+
+    InputDevice::AxisInfo axis;
+    for (const auto &item : axisType) {
+        auto min = libinput_device_get_axis_min(iter->second, item);
+        if (min == -1) {
+            continue;
+        }
+        axis.SetAxisType(item);
+        axis.SetMinimum(min);
+        auto max = libinput_device_get_axis_max(iter->second, item);
+        axis.SetMaximum(max);
+        auto fuzz = libinput_device_get_axis_fuzz(iter->second, item);
+        axis.SetFuzz(fuzz);
+        auto flat = libinput_device_get_axis_flat(iter->second, item);
+        axis.SetFlat(flat);
+        auto resolution = libinput_device_get_axis_resolution(iter->second, item);
+        axis.SetResolution(resolution);
+    }
+    inputDevice->AddAxisInfo(axis);
     return inputDevice;
 }
 
