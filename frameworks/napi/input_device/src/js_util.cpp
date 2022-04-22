@@ -29,13 +29,8 @@ const std::string CREATE_ARRAY = "napi_create_array";
 const std::string CREATE_INT32 = "napi_create_int32";
 const std::string SET_ELEMENT = "napi_set_element";
 const std::string SET_NAMED_PROPERTY = "napi_set_named_property";
-const std::string CREATE_REFERENCE = "napi_create_reference";
-const std::string CALL_FUNCTION = "napi_call_function";
-const std::string RESOLVE_DEFERRED = "napi_resolve_deferred";
 const std::string CREATE_STRING_UTF8 = "napi_create_string_utf8";
 const std::string CREATE_OBJECT = "napi_create_object";
-const std::string COERCE_TO_BOOL = "napi_coerce_to_bool";
-const std::string CREATE_PROMISE = "napi_create_promise";
 
 constexpr int32_t ABS_MT_TOUCH_MAJOR = 0x30;
 constexpr int32_t ABS_MT_TOUCH_MINOR = 0x31;
