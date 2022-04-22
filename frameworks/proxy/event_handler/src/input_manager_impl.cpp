@@ -174,7 +174,7 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
         return RET_OK;
     }
 #endif
-    return RET_OK;
+    return RET_ERR;
 }
 
 void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
@@ -426,7 +426,7 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent
     CHKPR(consumer, ERROR_NULL_POINTER);
     return InputManagerImpl::AddMonitor(consumer);
 #else
-   return RET_OK;
+    return RET_ERR;
 #endif
 }
 
@@ -440,7 +440,7 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<PointerE
     CHKPR(consumer, ERROR_NULL_POINTER);
     return InputManagerImpl::AddMonitor(consumer);
 #else
-   return RET_OK;
+    return RET_ERR;
 #endif
 }
 
