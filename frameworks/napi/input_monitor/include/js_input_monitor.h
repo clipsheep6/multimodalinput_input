@@ -40,10 +40,8 @@ public:
     bool Start();
 
     void Stop();
-	
-#ifdef OHOS_BUILD_TOUCH
+
     void MarkConsumed(int32_t eventId);
-#endif
 
     void SetCallback(std::function<void(std::shared_ptr<PointerEvent>)> callback);
 
@@ -60,9 +58,7 @@ private:
     mutable std::mutex mutex_;
     int32_t monitorId_ {-1};
     std::function<void(std::shared_ptr<PointerEvent>)> callback_;
-#ifdef OHOS_BUILD_TOUCH
     mutable bool consumed_ {false};
-#endif
 };
 
 
@@ -75,9 +71,8 @@ public:
     bool Start();
 
     void Stop();
-#ifdef OHOS_BUILD_TOUCH
+
     void MarkConsumed(const int32_t eventId);
-#endif
 
     int32_t IsMatch(const napi_env jsEnv, napi_value callback);
 

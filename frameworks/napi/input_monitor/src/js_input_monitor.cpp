@@ -63,7 +63,6 @@ void InputMonitor::SetCallback(std::function<void(std::shared_ptr<PointerEvent>)
 
 void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
 {
-#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
     CALL_LOG_ENTER;
     CHKPV(pointerEvent);
     if (JsInputMonMgr.GetMonitor(id_) == nullptr) {
@@ -79,9 +78,7 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
             }
             if (pointerEvent->GetPointersIdList().size() == 1) {
                 if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
-#ifdef OHOS_BUILD_TOUCH
                     consumed_ = false;
-#endif
                 }
             }
         }
@@ -91,9 +88,7 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
             }
             if (pointerEvent->GetPointersIdList().size() == 1) {
                 if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
-#ifdef OHOS_BUILD_TOUCH
                     consumed_ = false;
-#endif
                 }
             }
         }
@@ -101,7 +96,6 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
     }
     CHKPV(callback);
     callback(pointerEvent);
-#endif
 }
 
 void InputMonitor::SetId(int32_t id) {
@@ -112,7 +106,6 @@ void InputMonitor::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const {}
 
 void InputMonitor::OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const {}
 
-#ifdef OHOS_BUILD_TOUCH
 void InputMonitor::MarkConsumed(int32_t eventId)
 {
     std::lock_guard<std::mutex> guard(mutex_);
@@ -127,7 +120,6 @@ void InputMonitor::MarkConsumed(int32_t eventId)
     InputMgr->MarkConsumed(monitorId_, eventId);
     consumed_ = true;
 }
-#endif
 
 JsInputMonitor::JsInputMonitor(napi_env jsEnv, const std::string &typeName, napi_value callback, int32_t id)
     : monitor_(std::make_shared<InputMonitor>()),
@@ -160,13 +152,11 @@ void JsInputMonitor::SetCallback(napi_value callback)
     }
 }
 
-#ifdef OHOS_BUILD_TOUCH
 void JsInputMonitor::MarkConsumed(int32_t eventId)
 {
     CHKPV(monitor_);
     monitor_->MarkConsumed(eventId);
 }
-#endif
 
 int32_t JsInputMonitor::IsMatch(napi_env jsEnv, napi_value callback)
 {
@@ -597,10 +587,8 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
             return;
         }
         if (retValue) {
-#ifdef OHOS_BUILD_TOUCH
             auto eventId = pointerEvent->GetId();
             MarkConsumed(eventId);
-#endif
         }
         napi_close_handle_scope(jsEnv_, scope);
     }

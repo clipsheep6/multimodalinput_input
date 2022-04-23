@@ -577,6 +577,8 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
     if (MMIEventHdl.InjectEvent(keyEvent) != RET_OK) {
         MMI_HILOGE("Failed to inject keyEvent");
     }
+#else
+    MMI_HILOGI("The keyboard device is not supported, simulate key failed");
 #endif
 }
 

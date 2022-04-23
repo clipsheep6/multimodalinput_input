@@ -67,7 +67,7 @@ int32_t InputManager::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
 #ifdef OHOS_BUILD_KEYBOARD
     return KeyEventInputSubscribeMgr.SubscribeKeyEvent(keyOption, callback);
 #else
-    return RET_ERR;
+    return RET_OK;
 #endif
 }
 
