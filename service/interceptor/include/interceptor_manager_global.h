@@ -35,13 +35,13 @@ public:
     InterceptorManagerGlobal();
     DISALLOW_COPY_AND_MOVE(InterceptorManagerGlobal);
     ~InterceptorManagerGlobal();
+    int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
     void OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session);
     void OnRemoveInterceptor(int32_t id);
 #if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
     bool OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
 #endif
     bool OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
-    int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
 private:
     struct InterceptorItem {
         int32_t sourceType;

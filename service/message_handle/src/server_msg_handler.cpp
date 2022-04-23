@@ -58,7 +58,6 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
     MsgCallback funs[] = {
 #ifdef OHOS_BUILD_KEYBOARD
         {MmiMessageId::ON_VIRTUAL_KEY, MsgCallbackBind2(&ServerMsgHandler::OnVirtualKeyEvent, this)},
-        {MmiMessageId::INJECT_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnInjectKeyEvent, this) },
 #endif
         {MmiMessageId::MARK_PROCESS,
             MsgCallbackBind2(&ServerMsgHandler::MarkProcessed, this)},
@@ -416,11 +415,10 @@ int32_t ServerMsgHandler::OnMarkConsumed(SessionPtr sess, NetPacket& pkt)
         MMI_HILOGE("Packet read event failed");
         return RET_ERR;
     }
-#ifdef OHOS_BUILD_TOUCH
+
     auto touchInputHandlerMgr = InputHandler->GetTouchInputHandlerMgr();
     CHKPR(touchInputHandlerMgr, ERROR_NULL_POINTER);
     touchInputHandlerMgr->MarkConsumed(monitorId, eventId, sess);
-#endif
     return RET_OK;
 }
 

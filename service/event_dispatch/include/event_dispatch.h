@@ -42,10 +42,6 @@ public:
 #endif
 
 protected:
-#ifdef OHOS_BUILD_TOUCH
-    void OnEventTouchGetPointEventType(const EventTouch& touch, const int32_t fingerCount,
-        POINT_EVENT_TYPE& pointEventType);
-#endif
 #if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
     int32_t DispatchPointerEvent(std::shared_ptr<PointerEvent> point);
 #endif

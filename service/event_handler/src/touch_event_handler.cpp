@@ -40,33 +40,13 @@ int32_t TouchEventHandler::HandleLibinputEvent(libinput_event* event)
         case LIBINPUT_EVENT_TOUCH_DOWN:
         case LIBINPUT_EVENT_TOUCH_UP:
         case LIBINPUT_EVENT_TOUCH_MOTION: {
-            auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH);
-            CHKPR(pointerEvent, ERROR_NULL_POINTER);
-            BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
-            CHKPR(nextHandler_, ERROR_NULL_POINTER);
-            nextHandler_->HandleTouchEvent(pointerEvent);
-            if (type == LIBINPUT_EVENT_TOUCH_UP) {
-                pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
-                MMI_HILOGD("This touch event is up remove this finger");
-                if (pointerEvent->GetPointersIdList().empty()) {
-                    MMI_HILOGD("This touch event is final finger up remove this finger");
-                    pointerEvent->Reset();
-                }
-                return RET_OK;
-            }
+            HandleTouchEvent(event);
             break;
         }
         case LIBINPUT_EVENT_TABLET_TOOL_AXIS:
         case LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY:
         case LIBINPUT_EVENT_TABLET_TOOL_TIP: {
-            auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TABLET_TOOL);
-            CHKPR(pointerEvent, ERROR_NULL_POINTER);
-            BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
-            CHKPR(nextHandler_, ERROR_NULL_POINTER);
-            nextHandler_->HandleTouchEvent(pointerEvent);
-            if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
-                pointerEvent->Reset();
-            }
+            HandleTableToolEvent(event);
             break;
         }
         default: {
@@ -81,6 +61,38 @@ int32_t TouchEventHandler::HandleTouchEvent(std::shared_ptr<PointerEvent> pointe
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     CHKPR(nextHandler_, ERROR_NULL_POINTER);
     return nextHandler_->HandleTouchEvent(pointerEvent);
+}
+
+int32_t TouchEventHandler::HandleTouchEvent(libinput_event* event)
+{     
+    auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH);
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
+    CHKPR(nextHandler_, ERROR_NULL_POINTER);
+    nextHandler_->HandleTouchEvent(pointerEvent);
+    auto type = libinput_event_get_type(event);
+    if (type == LIBINPUT_EVENT_TOUCH_UP) {
+        pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
+        MMI_HILOGD("This touch event is up remove this finger");
+        if (pointerEvent->GetPointersIdList().empty()) {
+            MMI_HILOGD("This touch event is final finger up remove this finger");
+            pointerEvent->Reset();
+        }         
+    }
+    return RET_OK;
+}
+
+int32_t TouchEventHandler::HandleTableToolEvent(libinput_event* event)
+{
+    auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TABLET_TOOL);
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
+    CHKPR(nextHandler_, ERROR_NULL_POINTER);
+    nextHandler_->HandleTouchEvent(pointerEvent);
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
+        pointerEvent->Reset();
+    }
+    return RET_OK;
 }
 }
 // namespace MMI

@@ -29,11 +29,11 @@ public:
     IKeyCommandManager() = default;
     virtual ~IKeyCommandManager() = default;
     static std::shared_ptr<IKeyCommandManager> CreateInstance();
+    int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
     virtual bool HandlerEvent(const std::shared_ptr<KeyEvent> key)
     {
         return false;
     }
-    int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
 };
 } // namespace MMI
 } // namespace OHOS

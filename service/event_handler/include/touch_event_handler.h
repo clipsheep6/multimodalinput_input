@@ -28,6 +28,10 @@ public:
     ~TouchEventHandler() = default;
     int32_t HandleLibinputEvent(libinput_event* event) override;
     int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+
+private:
+    int32_t HandleTouchEvent(libinput_event* event);
+    int32_t HandleTableToolEvent(libinput_event* event);
 };
 } // namespace MMI
 } // namespace OHOS

@@ -393,6 +393,9 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
     }
     CHKPR(iKeyEventHandler_, ERROR_NULL_POINTER);
     iKeyEventHandler_->HandleLibinputEvent(event);
+#ifndef OHOS_BUILD_KEYBOARD
+    MMI_HILOGI("The keyboard device is not supported");
+#endif
     return RET_OK;
 }
 
@@ -404,6 +407,9 @@ int32_t InputEventHandler::OnEventPointer(libinput_event *event)
     }
     CHKPR(iPointerEventHandler_, ERROR_NULL_POINTER);
     iPointerEventHandler_->HandleLibinputEvent(event);
+#ifndef OHOS_BUILD_POINTER
+    MMI_HILOGI("The pointer device is not supported");
+#endif
     return RET_OK;
 }
 
@@ -413,6 +419,9 @@ int32_t InputEventHandler::OnEventTouchpad(libinput_event *event)
     CHKPR(event, ERROR_NULL_POINTER);
     CHKPR(iPointerEventHandler_, ERROR_NULL_POINTER);
     iPointerEventHandler_->HandleLibinputEvent(event);
+#ifndef OHOS_BUILD_POINTER
+    MMI_HILOGI("The pointer device is not supported");
+#endif
     return RET_OK;
 }
 
@@ -425,6 +434,9 @@ int32_t InputEventHandler::OnEventGesture(libinput_event *event)
         MMI_HILOGE("Gesture event dispatch failed, errCode:%{public}d", GESTURE_EVENT_DISP_FAIL);
         return GESTURE_EVENT_DISP_FAIL;
     }
+#ifndef OHOS_BUILD_POINTER
+    MMI_HILOGI("The pointer device is not supported");
+#endif
     return RET_OK;
 }
 
@@ -433,7 +445,11 @@ int32_t InputEventHandler::OnEventTouch(libinput_event *event)
     CHKPR(event, ERROR_NULL_POINTER);
     LibinputAdapter::LoginfoPackagingTool(event);
     CHKPR(iTouchEventHandler_, ERROR_NULL_POINTER);
-    return iTouchEventHandler_->HandleLibinputEvent(event);
+    iTouchEventHandler_->HandleLibinputEvent(event);
+#ifndef OHOS_BUILD_TOUCH
+    MMI_HILOGI("The touch device is not supported");
+#endif
+    return RET_OK;
 }
 
 
@@ -443,6 +459,9 @@ int32_t InputEventHandler::OnTabletToolEvent(libinput_event *event)
     CHKPR(event, ERROR_NULL_POINTER);
     CHKPR(iTouchEventHandler_, ERROR_NULL_POINTER);
     iTouchEventHandler_->HandleLibinputEvent(event);
+#ifndef OHOS_BUILD_TOUCH
+    MMI_HILOGI("The touch device is not supported");
+#endif
     return RET_OK;
 }
 } // namespace MMI

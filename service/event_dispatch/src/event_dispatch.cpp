@@ -43,57 +43,6 @@ EventDispatch::EventDispatch() {}
 
 EventDispatch::~EventDispatch() {}
 
-#ifdef OHOS_BUILD_TOUCH
-void EventDispatch::OnEventTouchGetPointEventType(const EventTouch& touch,
-                                                  const int32_t fingerCount,
-                                                  POINT_EVENT_TYPE& pointEventType)
-{
-    if (fingerCount <= 0 || touch.time <= 0 || touch.seatSlot < 0 || touch.eventType < 0) {
-        MMI_HILOGE("The in parameter is error, fingerCount:%{public}d, touch.time:%{public}" PRId64 ","
-                   "touch.seatSlot:%{public}d, touch.eventType:%{public}d",
-                   fingerCount, touch.time, touch.seatSlot, touch.eventType);
-        return;
-    }
-    if (fingerCount == 1) {
-        switch (touch.eventType) {
-            case LIBINPUT_EVENT_TOUCH_DOWN: {
-                pointEventType = PRIMARY_POINT_DOWN;
-                break;
-            }
-            case LIBINPUT_EVENT_TOUCH_UP: {
-                pointEventType = PRIMARY_POINT_UP;
-                break;
-            }
-            case LIBINPUT_EVENT_TOUCH_MOTION: {
-                pointEventType = POINT_MOVE;
-                break;
-            }
-            default: {
-                break;
-            }
-        }
-    } else {
-        switch (touch.eventType) {
-            case LIBINPUT_EVENT_TOUCH_DOWN: {
-                pointEventType = OTHER_POINT_DOWN;
-                break;
-            }
-            case LIBINPUT_EVENT_TOUCH_UP: {
-                pointEventType = OTHER_POINT_UP;
-                break;
-            }
-            case LIBINPUT_EVENT_TOUCH_MOTION: {
-                pointEventType = POINT_MOVE;
-                break;
-            }
-            default: {
-                break;
-            }
-        }
-    }
-}
-#endif
-
 #ifdef OHOS_BUILD_KEYBOARD
 int32_t EventDispatch::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {

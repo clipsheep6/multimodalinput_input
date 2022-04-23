@@ -33,9 +33,6 @@ class InputHandlerManagerGlobal : public IInputEventHandler {
 public:
     InputHandlerManagerGlobal() = default;
     DISALLOW_COPY_AND_MOVE(InputHandlerManagerGlobal);
-    int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
-    void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
-    void MarkConsumed(int32_t handlerId, int32_t eventId, SessionPtr session);
 #ifdef OHOS_BUILD_KEYBOARD
     int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
 #endif
@@ -45,6 +42,9 @@ public:
 #ifdef OHOS_BUILD_TOUCH
     int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif
+    int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
+    void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
+    void MarkConsumed(int32_t handlerId, int32_t eventId, SessionPtr session);
 #ifdef OHOS_BUILD_KEYBOARD
     bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent);
 #endif
