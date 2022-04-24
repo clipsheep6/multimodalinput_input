@@ -452,7 +452,6 @@ int32_t InputEventHandler::OnEventTouch(libinput_event *event)
     return RET_OK;
 }
 
-
 int32_t InputEventHandler::OnTabletToolEvent(libinput_event *event)
 {
     CALL_LOG_ENTER;

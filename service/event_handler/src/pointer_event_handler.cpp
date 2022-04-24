@@ -61,25 +61,24 @@ int32_t PointerEventHandler::HandleLibinputEvent(libinput_event* event)
 int32_t PointerEventHandler::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_UPDATE) {
-        CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_END) {
         MMI_HILOGI("MouseEvent Normalization Results, PointerAction:%{public}d,PointerId:%{public}d,"
-                   "SourceType:%{public}d,ButtonId:%{public}d,"
-                   "VerticalAxisValue:%{public}lf,HorizontalAxisValue:%{public}lf",
-                   pointerEvent->GetPointerAction(), pointerEvent->GetPointerId(), pointerEvent->GetSourceType(),
-                   pointerEvent->GetButtonId(), pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
-                   pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
+               "SourceType:%{public}d,ButtonId:%{public}d,"
+               "VerticalAxisValue:%{public}lf,HorizontalAxisValue:%{public}lf",
+               pointerEvent->GetPointerAction(), pointerEvent->GetPointerId(), pointerEvent->GetSourceType(),
+               pointerEvent->GetButtonId(), pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
+               pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
         PointerEvent::PointerItem item;
         if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
             MMI_HILOGE("Get pointer item failed. pointer:%{public}d", pointerEvent->GetPointerId());
             return RET_ERR;
         }
         MMI_HILOGI("MouseEvent Item Normalization Results, DownTime:%{public}" PRId64 ",IsPressed:%{public}d,"
-                   "GlobalX:%{public}d,GlobalY:%{public}d,LocalX:%{public}d,LocalY:%{public}d,"
-                   "Width:%{public}d,Height:%{public}d,Pressure:%{public}lf,Device:%{public}d",
-                   item.GetDownTime(), static_cast<int32_t>(item.IsPressed()), item.GetGlobalX(), item.GetGlobalY(),
-                   item.GetLocalX(), item.GetLocalY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
-                   item.GetDeviceId());
+               "GlobalX:%{public}d,GlobalY:%{public}d,LocalX:%{public}d,LocalY:%{public}d,"
+               "Width:%{public}d,Height:%{public}d,Pressure:%{public}f,Device:%{public}d",
+               item.GetDownTime(), static_cast<int32_t>(item.IsPressed()), item.GetGlobalX(), item.GetGlobalY(),
+               item.GetLocalX(), item.GetLocalY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
+               item.GetDeviceId());
     }
     CHKPR(nextHandler_, ERROR_NULL_POINTER);
     return nextHandler_->HandlePointerEvent(pointerEvent);
