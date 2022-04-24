@@ -136,7 +136,7 @@ void UDSSocket::OnReadPackets(CircleStreamBuffer& circBuf, UDSSocket::PacketCall
         NetPacket pkt(head->idMsg);
         if ((head->size > 0) && (!pkt.Write(&buf[headSize], head->size))) {
             MMI_HILOGW("Error writing data in the NetPacket. It will be retried next time. messageid: %{public}d,"
-                "size:%{public}d", head->idMsg ,head->size);
+                "size:%{public}d", head->idMsg, head->size);
             break;
         }
         if (!circBuf.SeekReadPos(pkt.GetPacketLength())) {
