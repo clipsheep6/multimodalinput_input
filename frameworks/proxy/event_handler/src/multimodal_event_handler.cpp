@@ -34,7 +34,7 @@ void OnConnected(const IfMMIClient& client)
     InputMgrImpl->OnConnected();
 #ifdef OHOS_BUILD_KEYBOARD
     KeyEventInputSubscribeMgr.OnConnected();
-#endif
+#endif // OHOS_BUILD_KEYBOARD
     InputHandlerManager::GetInstance().OnConnected();
 }
 
@@ -50,7 +50,7 @@ int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyE
     }
     return EventManager.InjectEvent(keyEventPtr);
 }
-#endif
+#endif // OHOS_BUILD_KEYBOARD
 
 bool MultimodalEventHandler::InitClient()
 {
@@ -131,7 +131,7 @@ int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent>
     }
     return EventManager.InjectPointerEvent(pointerEvent);
 }
-#endif
+#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
 
 #ifdef OHOS_BUILD_POINTER
 int32_t MultimodalEventHandler::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
@@ -142,7 +142,7 @@ int32_t MultimodalEventHandler::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
     }
     return EventManager.MoveMouseEvent(offsetX, offsetY);
 }
-#endif
+#endif // OHOS_BUILD_POINTER
 
 int32_t MultimodalEventHandler::AddInterceptor(int32_t sourceType, int32_t id)
 {
@@ -210,7 +210,9 @@ void MultimodalEventHandler::RemoveInputEventTouchpadMontior(int32_t pointerEven
     pkt << InputEvent::EVENT_TYPE_POINTER;
     client_->SendMessage(pkt);
 }
+#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
 
+#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
 int32_t MultimodalEventHandler::AddInputEventTouchpadMontior(int32_t pointerEventType)
 {
     CALL_LOG_ENTER;
@@ -226,6 +228,6 @@ int32_t MultimodalEventHandler::AddInputEventTouchpadMontior(int32_t pointerEven
         MMI_HILOGD("sendAdd msg Success");
     return RET_OK;
 }
-#endif
+#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
 } // namespace MMI
 } // namespace OHOS

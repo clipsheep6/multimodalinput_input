@@ -37,7 +37,7 @@ public:
     {
         return OnVirtualKeyEvent(sess, pkt);
     }
-#endif
+#endif // OHOS_BUILD_KEYBOARD
 
 #ifdef OHOS_BUILD_HDF
     int32_t OnHdiInjectTest(SessionPtr sess, NetPacket& pkt)
@@ -62,7 +62,7 @@ public:
         int32_t retResult = OnInjectKeyEvent(sess, pkt);
         return retResult;
     }
-#endif
+#endif // OHOS_BUILD_KEYBOARD
 };
 
 #ifdef OHOS_BUILD_KEYBOARD
@@ -205,7 +205,7 @@ HWTEST_F(ServerMsgHandlerTest, OnVirtualKeyEventTest_010, TestSize.Level1)
     NetPacket pkt(static_cast<MmiMessageId>(-10000));
     serverMsgHandlerTest.OnVirtualKeyEventTest(sess, pkt);
 }
-#endif
+#endif // OHOS_BUILD_KEYBOARD
 
 /**
  * @tc.name:OnDumpTest_01

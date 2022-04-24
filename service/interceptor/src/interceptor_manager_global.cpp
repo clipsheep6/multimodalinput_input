@@ -105,7 +105,7 @@ bool InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<PointerEvent> poin
     }
     return true;
 }
-#endif
+#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
 
 bool InterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {

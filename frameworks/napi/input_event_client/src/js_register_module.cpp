@@ -76,7 +76,7 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
 #else
     MMI_HILOGI("The keyboard device is not supported, simulate key failed");
     return nullptr;
-#endif
+#endif // OHOS_BUILD_KEYBOARD
 }
 
 EXTERN_C_START

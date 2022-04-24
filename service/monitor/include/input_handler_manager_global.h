@@ -35,22 +35,22 @@ public:
     DISALLOW_COPY_AND_MOVE(InputHandlerManagerGlobal);
 #ifdef OHOS_BUILD_KEYBOARD
     int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
-#endif
+#endif // OHOS_BUILD_KEYBOARD
 #ifdef OHOS_BUILD_POINTER
     int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
-#endif
+#endif // OHOS_BUILD_POINTER
 #ifdef OHOS_BUILD_TOUCH
     int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
-#endif
+#endif // OHOS_BUILD_TOUCH
     int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     void MarkConsumed(int32_t handlerId, int32_t eventId, SessionPtr session);
 #ifdef OHOS_BUILD_KEYBOARD
     bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent);
-#endif
+#endif // OHOS_BUILD_KEYBOARD
 #if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
     bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent);
-#endif
+#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
 
 private:
     void InitSessionLostCallback();
@@ -81,10 +81,10 @@ private:
         virtual int32_t GetPriority() const override;
 #ifdef OHOS_BUILD_KEYBOARD
         virtual bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent) override;
-#endif
+#endif // OHOS_BUILD_KEYBOARD
 #if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
         virtual bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent) override;
-#endif
+#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
         int32_t AddMonitor(const SessionHandler& mon);
         void RemoveMonitor(const SessionHandler& mon);
         void MarkConsumed(int32_t monitorId, int32_t eventId, SessionPtr session);
@@ -92,10 +92,10 @@ private:
         bool HasMonitor(int32_t monitorId, SessionPtr session);
 #ifdef OHOS_BUILD_TOUCH
         void UpdateConsumptionState(std::shared_ptr<PointerEvent> pointerEvent);
-#endif
+#endif // OHOS_BUILD_TOUCH
 #if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
         void Monitor(std::shared_ptr<PointerEvent> pointerEvent);
-#endif
+#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
         void OnSessionLost(SessionPtr session);
 
         std::set<SessionHandler> monitors_;
@@ -108,10 +108,10 @@ private:
         virtual int32_t GetPriority() const override;
 #ifdef OHOS_BUILD_KEYBOARD
         virtual bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent) override;
-#endif
+#endif // OHOS_BUILD_KEYBOARD
 #if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
         virtual bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent) override;
-#endif
+#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
 
         int32_t AddInterceptor(const SessionHandler& interceptor);
         void RemoveInterceptor(const SessionHandler& interceptor);

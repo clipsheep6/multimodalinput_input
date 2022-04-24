@@ -88,7 +88,7 @@ int32_t EventDispatch::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     session->AddEvent(keyEvent->GetId(), currentTime);
     return RET_OK;
 }
-#endif
+#endif // OHOS_BUILD_KEYBOARD
 
 #ifdef OHOS_BUILD_POINTER
 int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> pointEvent)
@@ -97,7 +97,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> pointEve
     CHKPR(pointEvent, ERROR_NULL_POINTER);
     return DispatchPointerEvent(pointEvent);
 }
-#endif
+#endif // OHOS_BUILD_POINTER
 
 #ifdef OHOS_BUILD_TOUCH
 int32_t EventDispatch::HandleTouchEvent(std::shared_ptr<PointerEvent> pointEvent)
@@ -106,7 +106,7 @@ int32_t EventDispatch::HandleTouchEvent(std::shared_ptr<PointerEvent> pointEvent
     CHKPR(pointEvent, ERROR_NULL_POINTER);
     return DispatchPointerEvent(pointEvent);
 }
-#endif
+#endif // OHOS_BUILD_TOUCH
 
 #if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
 int32_t EventDispatch::DispatchPointerEvent(std::shared_ptr<PointerEvent> pointEvent)
@@ -147,7 +147,7 @@ int32_t EventDispatch::DispatchPointerEvent(std::shared_ptr<PointerEvent> pointE
     session->AddEvent(pointEvent->GetId(), currentTime);
     return RET_OK;
 }
-#endif
+#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
 
 bool EventDispatch::TriggerANR(int64_t time, SessionPtr sess)
 {

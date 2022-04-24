@@ -30,10 +30,10 @@ struct IInputEventMonitorHandler {
     virtual int32_t GetPriority() const = 0;
 #ifdef OHOS_BUILD_KEYBOARD
     virtual bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent) = 0;
-#endif
+#endif // OHOS_BUILD_KEYBOARD
 #if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
     virtual bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent) = 0;
-#endif
+#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
 };
 } // namespace MMI
 } // namespace OHOS

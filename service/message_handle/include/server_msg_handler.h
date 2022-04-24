@@ -37,7 +37,7 @@ public:
 protected:
 #ifdef OHOS_BUILD_KEYBOARD
     int32_t OnVirtualKeyEvent(SessionPtr sess, NetPacket& pkt);
-#endif
+#endif // OHOS_BUILD_KEYBOARD
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
 #ifdef OHOS_BUILD_HDF
     int32_t OnHdiInject(SessionPtr sess, NetPacket& pkt);
@@ -47,10 +47,10 @@ protected:
     int32_t GetMultimodeInputInfo(SessionPtr sess, NetPacket& pkt);
 #ifdef OHOS_BUILD_KEYBOARD
     int32_t OnInjectKeyEvent(SessionPtr sess, NetPacket& pkt);
-#endif
+#endif // OHOS_BUILD_KEYBOARD
 #if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
     int32_t OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt);
-#endif
+#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
     int32_t OnDisplayInfo(SessionPtr sess, NetPacket& pkt);
     int32_t OnAddInputHandler(SessionPtr sess, NetPacket& pkt);
     int32_t OnRemoveInputHandler(SessionPtr sess, NetPacket& pkt);
@@ -62,25 +62,25 @@ protected:
     int32_t OnRemoveInputDeviceMontior(SessionPtr sess, NetPacket& pkt);
 #ifdef OHOS_BUILD_KEYBOARD
     int32_t OnAddInputEventMontior(SessionPtr sess, NetPacket& pkt);
-#endif
+#endif // OHOS_BUILD_KEYBOARD
 #ifdef OHOS_BUILD_KEYBOARD
     int32_t OnRemoveInputEventMontior(SessionPtr sess, NetPacket& pkt);
-#endif
+#endif // OHOS_BUILD_KEYBOARD
 
 #if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
     int32_t OnAddInputEventTouchpadMontior(SessionPtr sess, NetPacket& pkt);
     int32_t OnRemoveInputEventTouchpadMontior(SessionPtr sess, NetPacket& pkt);
-#endif
+#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
 #ifdef OHOS_BUILD_KEYBOARD
     int32_t OnSubscribeKeyEvent(SessionPtr sess, NetPacket& pkt);
     int32_t OnUnSubscribeKeyEvent(SessionPtr sess, NetPacket& pkt);
     int32_t OnAddTouchpadEventFilter(SessionPtr sess, NetPacket& pkt);
     int32_t OnRemoveTouchpadEventFilter(SessionPtr sess, NetPacket& pkt);
-#endif
+#endif // OHOS_BUILD_KEYBOARD
 
 #ifdef OHOS_BUILD_POINTER
     int32_t OnMoveMouse(SessionPtr sess, NetPacket& pkt);
-#endif
+#endif // OHOS_BUILD_POINTER
 
 #ifdef OHOS_BUILD_MMI_DEBUG
     int32_t OnBigPacketTest(SessionPtr sess, NetPacket& pkt);

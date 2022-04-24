@@ -33,18 +33,18 @@ public:
     virtual ~EventDispatch();
 #ifdef OHOS_BUILD_KEYBOARD
     int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
-#endif
+#endif // OHOS_BUILD_KEYBOARD
 #ifdef OHOS_BUILD_POINTER
     int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
-#endif
+#endif // OHOS_BUILD_POINTER
 #ifdef OHOS_BUILD_TOUCH
     int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
-#endif
+#endif // OHOS_BUILD_TOUCH
 
 protected:
 #if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
     int32_t DispatchPointerEvent(std::shared_ptr<PointerEvent> point);
-#endif
+#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
     bool TriggerANR(int64_t time, SessionPtr sess);
 };
 } // namespace MMI

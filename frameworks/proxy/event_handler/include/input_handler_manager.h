@@ -38,7 +38,7 @@ public:
     void MarkConsumed(int32_t monitorId, int32_t eventId);
 #ifdef OHOS_BUILD_KEYBOARD
     void OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEvent> keyEvent);
-#endif
+#endif // OHOS_BUILD_KEYBOARD
 #if defined(OHOS_BUILD_POINTERE) || defined(OHOS_BUILD_TOUCH)
     void OnInputEvent(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent);
 #endif
@@ -65,7 +65,7 @@ private:
 #ifdef OHOS_BUILD_KEYBOARD
     void OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consumer, int32_t handlerId,
         std::shared_ptr<KeyEvent> keyEvent);
-#endif
+#endif // OHOS_BUILD_KEYBOARD
 #if defined(OHOS_BUILD_POINTERE) || defined(OHOS_BUILD_TOUCH)
     void OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer, int32_t handlerId,
         std::shared_ptr<PointerEvent> pointerEvent);

@@ -39,10 +39,10 @@ public:
 #ifdef OHOS_BUILD_KEYBOARD
     int32_t InjectionVirtual(bool isPressed, int32_t keyCode, int64_t keyDownDuration, int32_t maxKeyCode);
     int32_t InjectEvent(const std::shared_ptr<KeyEvent> keyEventPtr);
-#endif
+#endif // OHOS_BUILD_KEYBOARD
 #if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
     int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
-#endif
+#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
     int32_t GetDevice(int32_t userData, int32_t deviceId);
     int32_t GetDeviceIds(int32_t userData);
     int32_t GetKeystrokeAbility(int32_t userData, int32_t deviceId, std::vector<int32_t> keyCodes);
@@ -51,10 +51,10 @@ public:
 #ifdef OHOS_BUILD_KEYBOARD
     int32_t SubscribeKeyEvent(const KeyEventInputSubscribeManager::SubscribeKeyEventInfo& subscribeInfo);
     int32_t UnSubscribeKeyEvent(int32_t subscribeId);
-#endif
+#endif // OHOS_BUILD_KEYBOARD
 #ifdef OHOS_BUILD_POINTER
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY);
-#endif
+#endif // OHOS_BUILD_POINTER
 
 protected:
     bool SendMsg(NetPacket& pkt) const;

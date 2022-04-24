@@ -36,19 +36,19 @@ public:
     ~InterceptorManager();
 #if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
     int32_t AddInterceptor(int32_t sourceType, std::function<void(std::shared_ptr<PointerEvent>)> interceptor);
-#endif
+#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
 #ifdef OHOS_BUILD_KEYBOARD
     int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor);
-#endif
+#endif // OHOS_BUILD_KEYBOARD
     void RemoveInterceptor(int32_t interceptorId);
 #if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
     int32_t OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t id);
-#endif
+#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
 public:
     static constexpr int32_t INVALID_INTERCEPTOR_ID { -1 };
 #ifdef OHOS_BUILD_KEYBOARD
     int32_t OnKeyEvent(std::shared_ptr<KeyEvent> pointerEvent);
-#endif
+#endif // OHOS_BUILD_KEYBOARD
     
 private:
     struct InterceptorItem {

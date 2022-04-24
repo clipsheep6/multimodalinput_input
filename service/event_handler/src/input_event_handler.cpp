@@ -239,7 +239,7 @@ std::shared_ptr<IInputEventHandler> InputEventHandler::BuildKeyHandlerChain()
     return keyEventHandler;
 #else
     return std::make_shared<IInputEventHandler>();
-#endif
+#endif // OHOS_BUILD_KEYBOARD
 }
 
 std::shared_ptr<IInputEventHandler> InputEventHandler::BuildPointerHandlerChain()
@@ -259,7 +259,7 @@ std::shared_ptr<IInputEventHandler> InputEventHandler::BuildPointerHandlerChain(
     return pointerEventHandler;
 #else
     return std::make_shared<IInputEventHandler>();
-#endif
+#endif // OHOS_BUILD_POINTER
 }
 
 std::shared_ptr<IInputEventHandler> InputEventHandler::BuildTouchHandlerChain()
@@ -279,7 +279,7 @@ std::shared_ptr<IInputEventHandler> InputEventHandler::BuildTouchHandlerChain()
     return touchEventHandler;
 #else
     return std::make_shared<IInputEventHandler>();
-#endif
+#endif // OHOS_BUILD_TOUCH
 }
 
 void InputEventHandler::OnCheckEventReport()
@@ -362,11 +362,11 @@ int32_t InputEventHandler::AddInputEventFilter(sptr<IEventFilter> filter)
 #ifdef OHOS_BUILD_POINTER
     CHKPR(pointerEventFilter_, ERROR_NULL_POINTER);
     pointerEventFilter_->AddInputEventFilter(filter);
-#endif
+#endif // OHOS_BUILD_POINTER
 #ifdef OHOS_BUILD_TOUCH
     CHKPR(touchEventFilter_, ERROR_NULL_POINTER);
     touchEventFilter_->AddInputEventFilter(filter);
-#endif
+#endif // OHOS_BUILD_TOUCH
     return RET_OK;
 }
 

@@ -47,13 +47,13 @@ public:
     int32_t AddInputEventMontior(std::function<void (std::shared_ptr<KeyEvent>)> keyEventMonitor);
     void RemoveInputEventMontior(int32_t monitorId);
     int32_t OnMonitorInputEvent(std::shared_ptr<KeyEvent> keyEvent);
-#endif
+#endif // OHOS_BUILD_KEYBOARD
 #if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
     int32_t AddInputEventTouchpadMontior(std::function<void (std::shared_ptr<PointerEvent>)>
                                         TouchPadEventMonitor);
     void RemoveInputEventTouchpadMontior(int32_t monitorId);
     int32_t OnTouchpadMonitorInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
-#endif
+#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
 
 public:
     static constexpr int32_t INVALID_MONITOR_ID { -1 };

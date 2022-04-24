@@ -173,8 +173,11 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
         MMI_HILOGI("AddInputEventFilter has send to server success");
         return RET_OK;
     }
-#endif
-    return RET_ERR;
+    return RET_OK;
+#else
+    MMI_HILOGI("The pointer and tp device is not supported, add filter failed");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
 }
 
 void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
@@ -203,7 +206,9 @@ void InputManagerImpl::OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consu
     consumer->OnInputEvent(keyEvent);
     MMI_HILOGD("key event callback keyCode:%{public}d", keyEvent->GetKeyCode());
 }
+#endif // OHOS_BUILD_KEYBOARD
 
+#ifdef OHOS_BUILD_KEYBOARD
 void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHK_PIDANDTID();
@@ -218,7 +223,7 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     }
     MMI_HILOGD("key event keyCode:%{public}d", keyEvent->GetKeyCode());
 }
-#endif
+#endif // OHOS_BUILD_KEYBOARD
 
 #if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
 void InputManagerImpl::OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer,
@@ -245,7 +250,7 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     }
     MMI_HILOGD("pointer event pointerId:%{public}d", pointerEvent->GetPointerId());
 }
-#endif
+#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
 
 int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt)
 {
@@ -426,8 +431,9 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent
     CHKPR(consumer, ERROR_NULL_POINTER);
     return InputManagerImpl::AddMonitor(consumer);
 #else
-    return RET_ERR;
-#endif
+    MMI_HILOGI("The keyboard device is not supported, add monitor failed");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_KEYBOARD
 }
 
 
@@ -440,8 +446,9 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<PointerE
     CHKPR(consumer, ERROR_NULL_POINTER);
     return InputManagerImpl::AddMonitor(consumer);
 #else
-    return RET_ERR;
-#endif
+    MMI_HILOGI("The pointer and tp device is not supported, add monitor failed");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
 }
 
 int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consumer)
@@ -486,7 +493,9 @@ void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
     if (MMIEventHdl.MoveMouseEvent(offsetX, offsetY) != RET_OK) {
         MMI_HILOGE("Failed to inject move mouse offset event");
     }
-#endif
+#else
+    MMI_HILOGI("The pointer device is not supported, move mouse failed");
+#endif // OHOS_BUILD_POINTER
 }
 
 int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
@@ -528,8 +537,9 @@ int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyE
     }
     return interceptorId;
 #else
-    return RET_ERR;
-#endif
+    MMI_HILOGI("The keyboard device is not supported, add interceptor failed");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_KEYBOARD
 }
 
 void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
@@ -549,13 +559,17 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
         case MASK_TOUCH: {
 #ifdef OHOS_BUILD_TOUCH
             interceptorManager_.RemoveInterceptor(interceptorId);
-#endif
+#else
+            MMI_HILOGI("The tp device is not supported, remove interceptor failed");
+#endif // OHOS_BUILD_TOUCH
             break;
         }
         case MASK_KEY: {
 #ifdef OHOS_BUILD_KEYBOARD
             InterceptorMgr.RemoveInterceptor(interceptorId);
-#endif
+#else
+            MMI_HILOGI("The keyboard device is not supported, remove interceptor failed");
+#endif // OHOS_BUILD_KEYBOARD
             break;
         }
         default: {
@@ -578,8 +592,8 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
         MMI_HILOGE("Failed to inject keyEvent");
     }
 #else
-    MMI_HILOGI("The keyboard device is not supported, simulate key failed");
-#endif
+    MMI_HILOGI("The keyboard device is not supported, simulate keyEvent failed");
+#endif // OHOS_BUILD_KEYBOARD
 }
 
 void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
@@ -594,7 +608,9 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
     if (MMIEventHdl.InjectPointerEvent(pointerEvent) != RET_OK) {
         MMI_HILOGE("Failed to inject pointer event");
     }
-#endif
+#else
+    MMI_HILOGI("The pointer and tp device is not supported, simulate pointEvent failed");
+#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
 }
 
 void InputManagerImpl::OnConnected()

@@ -76,7 +76,7 @@ int32_t InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<KeyEvent> 
     }
     return RET_OK;
 }
-#endif
+#endif // OHOS_BUILD_KEYBOARD
 
 #if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
 int32_t InputEventMonitorManager::AddInputEventTouchpadMontior(
@@ -132,6 +132,6 @@ int32_t InputEventMonitorManager::OnTouchpadMonitorInputEvent(std::shared_ptr<Po
                pointerEvent->GetPointerId(), item.GetGlobalX(), item.GetGlobalY(), item.IsPressed());
     return MMI_STANDARD_EVENT_SUCCESS;
 }
-#endif
+#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
 } // namespace MMI
 } // namespace OHOS

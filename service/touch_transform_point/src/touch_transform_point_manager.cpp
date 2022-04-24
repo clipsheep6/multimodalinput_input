@@ -31,22 +31,22 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibInput(
         case INPUT_DEVICE_CAP_TOUCH: {
 #ifdef OHOS_BUILD_TOUCH
             return OnLibinputTouchEvent(event);
-#endif
+#endif // OHOS_BUILD_TOUCH
         }
         case INPUT_DEVICE_CAP_TABLET_TOOL: {
 #ifdef OHOS_BUILD_TOUCH
             return OnLibinputTabletToolEvent(event);
-#endif
+#endif // OHOS_BUILD_TOUCH
         }
         case INPUT_DEVICE_CAP_TOUCH_PAD: {
 #ifdef OHOS_BUILD_POINTER
             return OnLibinputTouchPadEvent(event);
-#endif
+#endif // OHOS_BUILD_POINTER
         }
         case INPUT_DEVICE_CAP_GESTURE: {
 #ifdef OHOS_BUILD_POINTER
             return OnTouchPadGestrueEvent(event);
-#endif
+#endif // OHOS_BUILD_POINTER
         }
         default: {
             MMI_HILOGE("The in parameter deviceType is error, deviceType:%{public}d", deviceType);
@@ -77,7 +77,7 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchEvent(s
     }
     return processor->OnLibinputTouchEvent(event);
 }
-#endif
+#endif // OHOS_BUILD_TOUCH
 
 #ifdef OHOS_BUILD_TOUCH
 std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTabletToolEvent(struct libinput_event *event)
@@ -100,7 +100,7 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTabletToolEv
     }
     return processor->OnEvent(event);
 }
-#endif
+#endif // OHOS_BUILD_TOUCH
 
 #ifdef OHOS_BUILD_POINTER
 std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchPadEvent(struct libinput_event *event)
@@ -124,7 +124,7 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchPadEven
     }
     return processor->OnLibinputTouchPadEvent(event);
 }
-#endif
+#endif // OHOS_BUILD_POINTER
 
 #ifdef OHOS_BUILD_POINTER
 std::shared_ptr<PointerEvent> TouchTransformPointManager::OnTouchPadGestrueEvent(struct libinput_event *event)
@@ -148,6 +148,6 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnTouchPadGestrueEvent
     }
     return processor->OnTouchPadGestrueEvent(event);
 }
-#endif
+#endif // OHOS_BUILD_POINTER
 } // namespace MMI
 } // namespace OHOS

@@ -40,7 +40,7 @@ public:
     void OnRemoveInterceptor(int32_t id);
 #if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
     bool OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
-#endif
+#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
     bool OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
 private:
     struct InterceptorItem {

@@ -48,7 +48,7 @@ int32_t InterceptorManager::AddInterceptor(int32_t sourceType,
     MMI_HILOGD("Add sourceType:%{public}d Touchpad to InterceptorManager success", sourceType);
     return interceptorItem.id_;
 }
-#endif
+#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
 
 #ifdef OHOS_BUILD_KEYBOARD
 int32_t InterceptorManager::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
@@ -65,7 +65,7 @@ int32_t InterceptorManager::AddInterceptor(std::function<void(std::shared_ptr<Ke
     }
     return MMI_STANDARD_EVENT_INVALID_PARAM;
 }
-#endif
+#endif // OHOS_BUILD_KEYBOARD
 
 void InterceptorManager::RemoveInterceptor(int32_t interceptorId)
 {
@@ -108,7 +108,7 @@ int32_t InterceptorManager::OnPointerEvent(std::shared_ptr<PointerEvent> pointer
     }
     return MMI_STANDARD_EVENT_SUCCESS;
 }
-#endif
+#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
 
 #ifdef OHOS_BUILD_KEYBOARD
 int32_t InterceptorManager::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
@@ -123,6 +123,6 @@ int32_t InterceptorManager::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     }
     return MMI_STANDARD_EVENT_SUCCESS;
 }
-#endif
+#endif // OHOS_BUILD_KEYBOARD
 } // namespace MMI
 } // namespace OHOS
