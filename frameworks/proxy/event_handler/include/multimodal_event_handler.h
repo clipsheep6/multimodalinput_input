@@ -45,10 +45,6 @@ public:
     int32_t GetKeystrokeAbility(int32_t userData, int32_t deviceId, std::vector<int32_t> keyCodes);
     int32_t RegisterInputDeviceMonitor();
     int32_t UnRegisterInputDeviceMonitor();
-    int32_t AddInputEventMontior(int32_t keyEventType);
-    void RemoveInputEventMontior(int32_t keyEventType);
-    int32_t AddInputEventTouchpadMontior(int32_t pointerEventType);
-    void RemoveInputEventTouchpadMontior(int32_t pointerEventType);
     int32_t AddInterceptor(int32_t sourceType, int32_t id);
     int32_t RemoveInterceptor(int32_t id);
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY);

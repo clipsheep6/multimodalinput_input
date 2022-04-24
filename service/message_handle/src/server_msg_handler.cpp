@@ -23,7 +23,6 @@
 #include "input_device_manager.h"
 #include "input_event.h"
 #include "input_event_data_transformation.h"
-#include "input_event_monitor_manager.h"
 #include "input_handler_manager_global.h"
 #include "input_windows_manager.h"
 #include "interceptor_manager_global.h"
@@ -68,12 +67,6 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
         {MmiMessageId::ADD_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnAddInputDeviceMontior, this)},
         {MmiMessageId::REMOVE_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputDeviceMontior, this)},
         {MmiMessageId::DISPLAY_INFO, MsgCallbackBind2(&ServerMsgHandler::OnDisplayInfo, this)},
-        {MmiMessageId::ADD_INPUT_EVENT_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnAddInputEventMontior, this)},
-        {MmiMessageId::REMOVE_INPUT_EVENT_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputEventMontior, this)},
-        {MmiMessageId::ADD_INPUT_EVENT_TOUCHPAD_MONITOR,
-            MsgCallbackBind2(&ServerMsgHandler::OnAddInputEventTouchpadMontior, this)},
-        {MmiMessageId::REMOVE_INPUT_EVENT_TOUCHPAD_MONITOR,
-            MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputEventTouchpadMontior, this)},
         {MmiMessageId::ADD_INPUT_HANDLER, MsgCallbackBind2(&ServerMsgHandler::OnAddInputHandler, this)},
         {MmiMessageId::REMOVE_INPUT_HANDLER, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputHandler, this)},
         {MmiMessageId::MARK_CONSUMED, MsgCallbackBind2(&ServerMsgHandler::OnMarkConsumed, this)},
@@ -594,74 +587,6 @@ int32_t ServerMsgHandler::OnRemoveInputDeviceMontior(SessionPtr sess, NetPacket&
     return RET_OK;
 }
 
-int32_t ServerMsgHandler::OnAddInputEventMontior(SessionPtr sess, NetPacket& pkt)
-{
-    CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t eventType = 0;
-    pkt >> eventType;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read eventType failed");
-        return PACKET_READ_FAIL;
-    }
-    if (eventType != InputEvent::EVENT_TYPE_KEY) {
-        MMI_HILOGE("Wrong event type, eventType:%{public}d", eventType);
-        return RET_ERR;
-    }
-    InputMonitorServiceMgr.AddInputEventMontior(sess, eventType);
-    return RET_OK;
-}
-
-int32_t ServerMsgHandler::OnAddInputEventTouchpadMontior(SessionPtr sess, NetPacket& pkt)
-{
-    CALL_LOG_ENTER;
-    CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t eventType = 0;
-    pkt >> eventType;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read eventType failed");
-        return PACKET_READ_FAIL;
-    }
-    if (eventType != InputEvent::EVENT_TYPE_POINTER) {
-        MMI_HILOGE("Wrong event type, eventType:%{public}d", eventType);
-        return RET_ERR;
-    }
-    InputMonitorServiceMgr.AddInputEventTouchpadMontior(eventType, sess);
-    return RET_OK;
-}
-
-int32_t ServerMsgHandler::OnRemoveInputEventMontior(SessionPtr sess, NetPacket& pkt)
-{
-    CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t eventType = 0;
-    pkt >> eventType;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read eventType failed");
-        return PACKET_READ_FAIL;
-    }
-    if (eventType != InputEvent::EVENT_TYPE_KEY) {
-        MMI_HILOGE("Wrong event type, eventType:%{public}d", eventType);
-        return RET_ERR;
-    }
-    InputMonitorServiceMgr.RemoveInputEventMontior(sess, eventType);
-    return RET_OK;
-}
-
-int32_t ServerMsgHandler::OnRemoveInputEventTouchpadMontior(SessionPtr sess, NetPacket& pkt)
-{
-    CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t eventType = 0;
-    pkt >> eventType;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read eventType failed");
-        return PACKET_READ_FAIL;
-    }
-    if (eventType != InputEvent::EVENT_TYPE_POINTER) {
-        MMI_HILOGE("Wrong event type, eventType:%{public}d", eventType);
-        return RET_ERR;
-    }
-    InputMonitorServiceMgr.RemoveInputEventMontior(sess, eventType);
-    return RET_OK;
-}
 int32_t ServerMsgHandler::OnAddTouchpadEventFilter(SessionPtr sess, NetPacket& pkt)
 {
     CHKPR(sess, ERROR_NULL_POINTER);

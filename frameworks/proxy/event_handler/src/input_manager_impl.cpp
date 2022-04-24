@@ -22,7 +22,6 @@
 
 #include "bytrace_adapter.h"
 #include "event_filter_service.h"
-#include "input_event_monitor_manager.h"
 #include "interceptor_manager.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
