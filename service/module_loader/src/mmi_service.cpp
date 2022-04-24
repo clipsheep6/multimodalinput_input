@@ -161,6 +161,21 @@ bool MMIService::InitService()
     return true;
 }
 
+bool MMIService::InitEntrustTasks()
+{
+    if (!entrustTasks_.Init()) {
+        MMI_HILOGE("entrust task init failed");
+        return false;
+    }
+    auto ret = AddEpoll(EPOLL_EVENT_ETASK, entrustTasks_.GetReadFd());
+    if (ret <  0) {
+        MMI_HILOGE("AddEpoll error ret:%{public}d", ret);
+        EpollClose();
+        return false;
+    }
+    return true;
+}
+
 int32_t MMIService::Init()
 {
     CheckDefine();
@@ -196,6 +211,10 @@ int32_t MMIService::Init()
     if (!InitLibinputService()) {
         MMI_HILOGE("Libinput init failed");
         return LIBINPUT_INIT_FAIL;
+    }
+    if (!InitEntrustTasks()) {
+        MMI_HILOGE("Entrust tasks init failed");
+        return ETASKS_INIT_FAIL;
     }
     SetRecvFun(std::bind(&ServerMsgHandler::OnMsgHandler, &sMsgHandler_, std::placeholders::_1, std::placeholders::_2));
     return RET_OK;
@@ -244,6 +263,23 @@ void MMIService::OnDisconnected(SessionPtr s)
     CHKPV(s);
     int32_t fd = s->GetFd();
     MMI_HILOGW("enter, session desc:%{public}s, fd: %{public}d", s->GetDescript().c_str(), fd);
+}
+
+int32_t MMIService::StubHandlerRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply,
+    MessageOption& options)
+{
+    switch (code) {
+        case IMultimodalInputConnect::ALLOC_SOCKET_FD: {
+            return StubHandleAllocSocketFd(data, reply);
+        }
+        case IMultimodalInputConnect::ADD_INPUT_EVENT_FILTER: {
+            return StubAddInputEventFilter(data, reply);
+        }
+        default: {
+            MMI_HILOGE("unknown code:%{public}u, go switch defaut", code);
+            return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+        }
+    }
 }
 
 int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd)
@@ -305,6 +341,21 @@ void MMIService::OnTimer()
     TimerMgr->ProcessTimers();
 }
 
+void MMIService::OnEntrustTask(epoll_event& ev)
+{
+    if ((ev.events & EPOLLIN) == 0) {
+        return;
+    }
+    EntrustTasks::TaskData data = {};
+    auto res = read(entrustTasks_.GetReadFd(), &data, sizeof(data));
+    if (res == -1) {
+        MMI_HILOGW("read failed erron:%{public}d", errno);
+    }
+    MMI_HILOGD("tid:%{public}" PRId64 " stid:%{public}" PRId64 " taskId:%{public}d", GetThisThreadId(),
+        data.tid, data.taskId);
+    entrustTasks_.ProcessTasks(data.tid);
+}
+
 void MMIService::OnThread()
 {
     SetThreadName(std::string("mmi_service"));
@@ -313,7 +364,7 @@ void MMIService::OnThread()
 
     int32_t count = 0;
     constexpr int32_t timeOut = 1;
-    struct epoll_event ev[MAX_EVENT_SIZE] = {};
+    epoll_event ev[MAX_EVENT_SIZE] = {};
     while (state_ == ServiceRunningState::STATE_RUNNING) {
         count = EpollWait(ev[0], MAX_EVENT_SIZE, timeOut, mmiFd_);
         for (int32_t i = 0; i < count && state_ == ServiceRunningState::STATE_RUNNING; i++) {
@@ -325,6 +376,8 @@ void MMIService::OnThread()
                 OnEpollEvent(ev[i]);
             } else if (mmiEd->event_type == EPOLL_EVENT_SIGNAL) {
                 OnSignalEvent(mmiEd->fd);
+            } else if (mmiEd->event_type == EPOLL_EVENT_ETASK) {
+                OnEntrustTask(ev[i]);
             } else {
                 MMI_HILOGW("unknown epoll event type:%{public}d", mmiEd->event_type);
             }

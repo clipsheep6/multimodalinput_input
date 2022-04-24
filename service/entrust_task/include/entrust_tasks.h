@@ -35,7 +35,7 @@ class EntrustTasks : public IdFactroy<int32_t> {
     using Future = std::future<void>;
 public:
     struct TaskData {
-        int64_t tid;
+        uint64_t tid;
         int32_t taskId;
     };
     class Task : public std::enable_shared_from_this<Task> {
@@ -76,7 +76,7 @@ public:
     virtual ~EntrustTasks() = default;
 
     bool Init();
-    void ProcessTasks(int32_t stid = 0);
+    void ProcessTasks(uint64_t stid = 0);
     bool PostSyncTask(ETaskCallback callback, int32_t timeout = ET_DEFINE_TIMEOUT);
     bool PostAsyncTask(ETaskCallback callback);
 

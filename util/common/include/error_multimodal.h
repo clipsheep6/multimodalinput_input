@@ -134,6 +134,7 @@ enum {
     PACKET_WRITE_FAIL,                          // 写入数据错误
     PACKET_READ_FAIL,                           // 读取数据错误
     POINTER_DRAW_INIT_FAIL,                     // 初始化画鼠标失败
+    ETASKS_INIT_FAIL,                           // 代理任务启动失败
 };
 // Error code for util
 constexpr ErrCode UTIL_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_UTIL);

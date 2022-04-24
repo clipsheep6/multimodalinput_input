@@ -24,6 +24,7 @@
 #include "singleton.h"
 #include "system_ability.h"
 
+#include "entrust_tasks.h"
 #include "input_event_handler.h"
 #include "multimodal_input_connect_stub.h"
 #include "libinput_adapter.h"
@@ -53,6 +54,8 @@ public:
 protected:
     virtual void OnConnected(SessionPtr s) override;
     virtual void OnDisconnected(SessionPtr s) override;
+    virtual int32_t StubHandlerRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply,
+        MessageOption& options) override;
     virtual int32_t StubHandleAllocSocketFd(MessageParcel &data, MessageParcel &reply) override;
 
     virtual int32_t AddEpoll(EpollEventType type, int32_t fd) override;
@@ -60,11 +63,13 @@ protected:
     bool InitLibinputService();
     bool InitService();
     bool InitSignalHandler();
+    bool InitEntrustTasks();
     int32_t Init();
 
     void OnTimer();
     void OnThread();
     void OnSignalEvent(int32_t signalFd);
+    void OnEntrustTask(epoll_event& ev);
 
 private:
     ServiceRunningState state_ = ServiceRunningState::STATE_NOT_START;
@@ -72,6 +77,7 @@ private:
     std::mutex mu_;
     std::thread t_;
 
+    EntrustTasks entrustTasks_;
     LibinputAdapter libinputAdapter_;
     ServerMsgHandler sMsgHandler_;
 };

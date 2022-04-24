@@ -17,40 +17,20 @@
 #include <sys/syscall.h>
 #include <unistd.h>
 
-std::string GetThisThreadIdOfString2()
-{
-    thread_local std::string threadLocalId;
-    if (threadLocalId.empty()) {
-        long tid = syscall(SYS_gettid);
-        constexpr size_t bufSize = 10;
-        char buf[bufSize] = {};
-        const int32_t ret = sprintf(buf, "%06d", tid);
-        if (ret < 0) {
-            printf("ERR: in %s, #%d, call sprintf_s fail, ret = %d.\n", __func__, __LINE__, ret);
-            return threadLocalId;
-        }
-        buf[bufSize - 1] = '\0';
-        threadLocalId = buf;
-    }
-
-    return threadLocalId;
-}
-
-uint64_t GetThisThreadId2()
-{
-    std::string stid = GetThisThreadIdOfString2();
-    auto tid = std::stoull(stid);
-    return tid;
-}
+#include "util.h"
 
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EntrustTasks" };
+} // namespace
+
 bool EntrustTasks::Task::WaitFor(int32_t ms)
 {
     std::chrono::milliseconds span(ms);
     auto res = future_.wait_for(span);
     if (res == std::future_status::timeout) {
-        printf("Task timeout id:%d\n", id_);
+        MMI_HILOGW("Task timeout id:%{public}d", id_);
     }
     hasWaited_ = true;
     return (res == std::future_status::ready);
@@ -70,16 +50,16 @@ bool EntrustTasks::Init()
 {
     int32_t res = pipe(fds_);
     if (res == -1) {
-        printf("pipe create error:%d\n", errno);
+        MMI_HILOGE("pipe create error:%{public}d", errno);
         return false;
     }
     return true;
 }
 
-void EntrustTasks::ProcessTasks(int32_t stid)
+void EntrustTasks::ProcessTasks(uint64_t stid)
 {
-    auto tid = GetThisThreadId2();
-    printf("ProcessTasks this tid:%d stid:%d\n", tid, stid);
+    auto tid = GetThisThreadId();
+    MMI_HILOGD("tid:%{public}" PRId64 " stid:%{public}" PRId64 "", tid, stid);
     std::lock_guard<std::mutex> guard(mux_);
     if (tasks_.empty()) {
         return;
@@ -105,7 +85,7 @@ bool EntrustTasks::PostSyncTask(ETaskCallback callback, int32_t timeout)
 {
     auto task = PostTask(callback);
     if (task == nullptr) {
-        printf("Post task failed\n");
+        MMI_HILOGE("Post aync task failed");
         return false;
     }
     return task->WaitFor(timeout);
@@ -116,7 +96,7 @@ bool EntrustTasks::PostAsyncTask(ETaskCallback callback)
 {
     auto task = PostTask(callback, true);
     if (task == nullptr) {
-        printf("Post task failed\n");
+        MMI_HILOGE("Post async task failed");
         return false;
     }
     return true;
@@ -127,14 +107,15 @@ EntrustTasks::TaskPtr EntrustTasks::PostTask(ETaskCallback callback, bool asyncT
     std::lock_guard<std::mutex> guard(mux_);
     auto tsize = tasks_.size();
     if (tsize > ET_MAX_TASK_LIMIT) {
+        MMI_HILOGE("Queue is full, not allowed. size:%{public}zu/%{public}d", tsize, ET_MAX_TASK_LIMIT);
         return nullptr;
     }
     int32_t id = GenerateId();
-    TaskData data = {GetThisThreadId2(), id};
+    TaskData data = {GetThisThreadId(), id};
     auto res = write(fds_[1], &data, sizeof(data));
     if (res == -1) {
         RecoveryId(id);
-        printf("write error:%d\n", errno);
+        MMI_HILOGE("write error:%{public}d", errno);
         return nullptr;
     }
     auto task = std::make_shared<Task>(id, callback, asyncTask);
