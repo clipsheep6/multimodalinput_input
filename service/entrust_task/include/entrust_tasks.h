@@ -16,64 +16,68 @@
 #define ENTRUST_TASKS_H
 #include <atomic>
 #include <cinttypes>
-#include <future>
 #include <functional>
-#include <iterator>
-#include <queue>
+#include <future>
+#include <list>
 #include <memory>
 #include <mutex>
-#include <vector>
 
 #include "id_factory.h"
 
 namespace OHOS {
 namespace MMI {
 using ETaskCallback = std::function<void()>;
-using Promise = std::promise<void>;
-using Future = std::future<void>;
 #define ET_DEFINE_TIMEOUT 3000
 #define ET_MAX_TASK_LIMIT 1000
+#define ET_ONCE_PROCESS_TASK_LIMIT 10
 class EntrustTasks : public IdFactroy<int32_t> {
+    using Promise = std::promise<void>;
+    using Future = std::future<void>;
 public:
+    struct TaskData {
+        int64_t tid;
+        int32_t taskId;
+    };
     class Task : public std::enable_shared_from_this<Task> {
     public:
         using TaskPtr = std::shared_ptr<EntrustTasks::Task>;
-        using TaskVec = std::vector<TaskPtr>;
-        using TaskVecIter = TaskVec::iterator;
-        Task(ETaskCallback fun);
+        Task(int32_t id, ETaskCallback fun, bool asyncTask = false)
+            : id_(id), fun_(fun), hasWaited_(asyncTask) {}
         ~Task() = default;
+
+        bool WaitFor(int32_t ms);
         void ProcessTask();
 
-        Future& GetFuture()
+        int32_t GetId() const
         {
-            return future_;
+            return id_;
         }
         TaskPtr GetPtr()
         {
             return shared_from_this();
         }
-        void Timeout()
+        bool HasReady() const
         {
-            isTimeout_ = true;
+            return (hasNotified_ && hasWaited_);
         }
+
     private:
-        std::atomic_bool isTimeout_ = false;
+        int32_t id_ = 0;
+        std::atomic_bool hasNotified_ = false;
+        std::atomic_bool hasWaited_ = false;
         ETaskCallback fun_;
         Promise promise_;
         Future future_ = promise_.get_future();
     };
     using TaskPtr = Task::TaskPtr;
-    using TaskVec = Task::TaskVec;
-    using TaskVecIter = TaskVec::iterator;
     
 public:
-    EntrustTasks();
-    virtual ~EntrustTasks();
+    EntrustTasks() = default;
+    virtual ~EntrustTasks() = default;
 
     bool Init();
-    void ProcessTasks();
+    void ProcessTasks(int32_t stid = 0);
     bool PostSyncTask(ETaskCallback callback, int32_t timeout = ET_DEFINE_TIMEOUT);
-    bool PostSyncTaskEx(ETaskCallback callback, int32_t timeout = ET_DEFINE_TIMEOUT);
     bool PostAsyncTask(ETaskCallback callback);
 
     int32_t GetReadFd() const
@@ -82,15 +86,12 @@ public:
     }
 
 private:
-    TaskPtr PostTask(ETaskCallback callback);
-    TaskPtr PostTaskEx(ETaskCallback callback);
-    void DelTask(int32_t id);
+    TaskPtr PostTask(ETaskCallback callback, bool asyncTask = false);
 
 private:
     int32_t fds_[2] = {};
     std::mutex mux_;
-    std::queue<TaskPtr> tasks_;
-    TaskVec vecTasks_;
+    std::list<TaskPtr> tasks_;
 };
 } // namespace MMI
 } // namespace OHOS

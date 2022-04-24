@@ -26,22 +26,29 @@ public:
     explicit IdFactroy(T seed) : seed_(seed) {}
     virtual ~IdFactroy() = default;
 
-    T GetId()
+    T GenerateId()
     {
         if (ids_.empty()) {
+            if (seed_ == maxLimit_) {
+                return 0;
+            }
             return seed_++;
         }
         T id = *ids_.begin();
         ids_.erase(ids_.begin());
         return id;
     }
-    void ReleaseId(T id)
+    void RecoveryId(T id)
     {
+        if (id > seed_) {
+            return;
+        }
         ids_.insert(id);
     }
 
 private:
     T seed_ = 0;
+    const T maxLimit_ = std::numeric_limits<T>::max();
     std::set<T> ids_;
 };
 } // namespace MMI

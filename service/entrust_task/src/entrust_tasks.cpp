@@ -14,13 +14,56 @@
  */
 #include "entrust_tasks.h"
 
+#include <sys/syscall.h>
 #include <unistd.h>
+
+std::string GetThisThreadIdOfString2()
+{
+    thread_local std::string threadLocalId;
+    if (threadLocalId.empty()) {
+        long tid = syscall(SYS_gettid);
+        constexpr size_t bufSize = 10;
+        char buf[bufSize] = {};
+        const int32_t ret = sprintf(buf, "%06d", tid);
+        if (ret < 0) {
+            printf("ERR: in %s, #%d, call sprintf_s fail, ret = %d.\n", __func__, __LINE__, ret);
+            return threadLocalId;
+        }
+        buf[bufSize - 1] = '\0';
+        threadLocalId = buf;
+    }
+
+    return threadLocalId;
+}
+
+uint64_t GetThisThreadId2()
+{
+    std::string stid = GetThisThreadIdOfString2();
+    auto tid = std::stoull(stid);
+    return tid;
+}
 
 namespace OHOS {
 namespace MMI {
-EntrustTasks::Task::Task(ETaskCallback fun) : fun_(fun)
+bool EntrustTasks::Task::WaitFor(int32_t ms)
 {
+    std::chrono::milliseconds span(ms);
+    auto res = future_.wait_for(span);
+    if (res == std::future_status::timeout) {
+        printf("Task timeout id:%d\n", id_);
+    }
+    hasWaited_ = true;
+    return (res == std::future_status::ready);
+}
 
+void EntrustTasks::Task::ProcessTask()
+{
+    if (hasNotified_) {
+        return;
+    }
+    fun_();
+    promise_.set_value();
+    hasNotified_ = true;
 }
 
 bool EntrustTasks::Init()
@@ -33,35 +76,27 @@ bool EntrustTasks::Init()
     return true;
 }
 
-void EntrustTasks::Task::ProcessTask()
+void EntrustTasks::ProcessTasks(int32_t stid)
 {
-    if (isTimeout_) {
-        return;
-    }
-    fun_();
-    promise_.set_value();
-}
-
-EntrustTasks::EntrustTasks()
-{
-
-}
-EntrustTasks::~EntrustTasks()
-{
-
-}
-
-void EntrustTasks::ProcessTasks()
-{
+    auto tid = GetThisThreadId2();
+    printf("ProcessTasks this tid:%d stid:%d\n", tid, stid);
     std::lock_guard<std::mutex> guard(mux_);
     if (tasks_.empty()) {
         return;
     }
-    for (int32_t i = 0; i < 10; i++) {
-        auto task = tasks_.front();
-        if (task) {
+
+    int32_t count = 0;
+    for (auto it = tasks_.begin(); it != tasks_.end(); count++) {
+        if (count > ET_ONCE_PROCESS_TASK_LIMIT) {
+            break;
+        }
+        auto task = *it;
+        if (task->HasReady()) {
+            RecoveryId(task->GetId());
+            it = tasks_.erase(it);
+        } else {
             task->ProcessTask();
-            tasks_.pop();
+            it++;
         }
     }
 }
@@ -70,76 +105,41 @@ bool EntrustTasks::PostSyncTask(ETaskCallback callback, int32_t timeout)
 {
     auto task = PostTask(callback);
     if (task == nullptr) {
+        printf("Post task failed\n");
         return false;
     }
-    std::chrono::milliseconds span(timeout);
-    auto res = task->GetFuture().wait_for(span);
-    if (res == std::future_status::timeout) {
-        task->Timeout();
-        return false;
-    }
-    return true;
+    return task->WaitFor(timeout);
 }
 
-bool EntrustTasks::PostSyncTaskEx(ETaskCallback callback, int32_t timeout)
-{
-    auto task = PostTask(callback);
-    if (task == nullptr) {
-        return false;
-    }
-    std::chrono::milliseconds span(timeout);
-    auto res = task->GetFuture().wait_for(span);
-    if (res == std::future_status::timeout) {
-        task->Timeout();
-        return false;
-    }
-    return true;
-}
 
 bool EntrustTasks::PostAsyncTask(ETaskCallback callback)
 {
-
+    auto task = PostTask(callback, true);
+    if (task == nullptr) {
+        printf("Post task failed\n");
+        return false;
+    }
     return true;
 }
 
-EntrustTasks::TaskPtr EntrustTasks::PostTask(ETaskCallback callback)
+EntrustTasks::TaskPtr EntrustTasks::PostTask(ETaskCallback callback, bool asyncTask)
 {
     std::lock_guard<std::mutex> guard(mux_);
     auto tsize = tasks_.size();
     if (tsize > ET_MAX_TASK_LIMIT) {
         return nullptr;
     }
-    auto res = write(fds_[1], reinterpret_cast<void*>(tsize), sizeof(tsize));
+    int32_t id = GenerateId();
+    TaskData data = {GetThisThreadId2(), id};
+    auto res = write(fds_[1], &data, sizeof(data));
     if (res == -1) {
+        RecoveryId(id);
         printf("write error:%d\n", errno);
         return nullptr;
     }
-    auto task = std::make_shared<Task>(callback);
-    tasks_.push(task);
+    auto task = std::make_shared<Task>(id, callback, asyncTask);
+    tasks_.push_back(task);
     return task->GetPtr();
 }
-
-EntrustTasks::TaskPtr EntrustTasks::PostTaskEx(ETaskCallback callback)
-{
-    std::lock_guard<std::mutex> guard(mux_);
-    auto tsize = vecTasks_.size();
-    if (tsize > ET_MAX_TASK_LIMIT) {
-        return nullptr;
-    }
-    auto res = write(fds_[1], reinterpret_cast<void *>(tsize), sizeof(tsize));
-    if (res == -1) {
-        printf("write error:%d\n", errno);
-        return nullptr;
-    }
-    auto task = std::make_shared<Task>(callback);
-    vecTasks_.push_back(task);
-    return task->GetPtr();
-}
-
-void EntrustTasks::DelTask(int32_t id)
-{
-    std::lock_guard<std::mutex> guard(mux_);
-}
-
 } // namespace MMI
 } // namespace OHOS
