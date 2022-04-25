@@ -47,46 +47,23 @@ std::list<int32_t> axisType = {
 std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) const
 {
     CALL_LOG_ENTER;
-    auto iter = inputDevice_.find(id);
-    if (iter == inputDevice_.end()) {
+    auto item = inputDevice_.find(id);
+    if (item == inputDevice_.end()) {
         MMI_HILOGE("failed to search for the device");
         return nullptr;
     }
 
     std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
     CHKPP(inputDevice);
-    inputDevice->SetId(iter->first);
-    int32_t deviceType = static_cast<int32_t>(libinput_device_get_tags(iter->second));
-    inputDevice->SetType(deviceType);
-    std::string name = libinput_device_get_name(iter->second);
-    inputDevice->SetName(name);
-    int32_t busType = libinput_device_get_id_bustype(iter->second);
-    inputDevice->SetBustype(busType);
-    int32_t version = libinput_device_get_id_version(iter->second);
-    inputDevice->SetVersion(version);
-    int32_t product = libinput_device_get_id_product(iter->second);
-    inputDevice->SetProduct(product);
-    int32_t vendor = libinput_device_get_id_vendor(iter->second);
-    inputDevice->SetVendor(vendor);
-
-    InputDevice::AxisInfo axis;
-    for (const auto &item : axisType) {
-        auto min = libinput_device_get_axis_min(iter->second, item);
-        if (min == -1) {
-            continue;
-        }
-        axis.SetAxisType(item);
-        axis.SetMinimum(min);
-        auto max = libinput_device_get_axis_max(iter->second, item);
-        axis.SetMaximum(max);
-        auto fuzz = libinput_device_get_axis_fuzz(iter->second, item);
-        axis.SetFuzz(fuzz);
-        auto flat = libinput_device_get_axis_flat(iter->second, item);
-        axis.SetFlat(flat);
-        auto resolution = libinput_device_get_axis_resolution(iter->second, item);
-        axis.SetResolution(resolution);
+    if (inputDevice == nullptr) {
+        MMI_HILOGE("create InputDevice ptr failed");
+        return nullptr;
     }
-    inputDevice->AddAxisInfo(axis);
+    inputDevice->SetId(item->first);
+    int32_t deviceType = static_cast<int32_t>(libinput_device_get_tags(item->second));
+    inputDevice->SetType(deviceType);
+    std::string name = libinput_device_get_name(item->second);
+    inputDevice->SetName(name);
     return inputDevice;
 }
 
