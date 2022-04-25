@@ -105,7 +105,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         MMI_HILOGI("Pointer event Filter succeeded");
         return RET_OK;
     }
-    if (InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
+    if (IInputHandlerManagerGlobal::GetInstance()->HandleEvent(point)) {
         BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
         MMI_HILOGD("Interception and monitor succeeded");
         return RET_OK;
@@ -182,7 +182,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
                key->GetEventType(),
                key->GetFlag(), key->GetKeyAction(), fd);
 
-    InputHandlerManagerGlobal::GetInstance().HandleEvent(key);
+    IInputHandlerManagerGlobal::GetInstance()->HandleEvent(key);
     auto session = udsServer.GetSession(fd);
     CHKPF(session);
     if (session->isANRProcess_) {

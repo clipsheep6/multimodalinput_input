@@ -24,7 +24,7 @@
 #include "input_event_data_transformation.h"
 #include "input_handler_manager.h"
 #include "input_manager_impl.h"
-#include "input_monitor_manager.h"
+#include "i_input_monitor_manager.h"
 #include "interceptor_manager.h"
 #include "mmi_client.h"
 #include "mmi_func_callback.h"

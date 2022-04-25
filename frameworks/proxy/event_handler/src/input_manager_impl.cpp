@@ -435,8 +435,7 @@ int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consum
         MMI_HILOGE("client init failed");
         return -1;
     }
-    int32_t monitorId = monitorManager_.AddMonitor(consumer);
-    return monitorId;
+    return IInputMonitorManager::GetInstance()->AddMonitor(consumer);
 }
 
 void InputManagerImpl::RemoveMonitor(int32_t monitorId)
@@ -446,7 +445,7 @@ void InputManagerImpl::RemoveMonitor(int32_t monitorId)
         MMI_HILOGE("client init failed");
         return;
     }
-    monitorManager_.RemoveMonitor(monitorId);
+    IInputMonitorManager::GetInstance()->RemoveMonitor(monitorId);
 }
 
 void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
@@ -456,7 +455,7 @@ void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
         MMI_HILOGE("client init failed");
         return;
     }
-    monitorManager_.MarkConsumed(monitorId, eventId);
+    IInputMonitorManager::GetInstance()->MarkConsumed(monitorId, eventId);
 }
 
 void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
