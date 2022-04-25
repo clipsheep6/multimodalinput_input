@@ -20,7 +20,6 @@
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 
-
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -128,6 +127,14 @@ int32_t InputEventMonitorManager::OnTouchpadMonitorInputEvent(std::shared_ptr<Po
                pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
                pointerEvent->GetPointerId(), item.GetGlobalX(), item.GetGlobalY(), item.IsPressed());
     return MMI_STANDARD_EVENT_SUCCESS;
+}
+
+std::shared_ptr<IInputEventMonitorManager> IInputEventMonitorManager::GetInstance()
+{
+    if (iInputEventMonitorManager_ == nullptr) {
+        iInputEventMonitorManager_ = std::make_shared<IInputEventMonitorManager>();
+    }
+    return iInputEventMonitorManager_;
 }
 } // namespace MMI
 } // namespace OHOS

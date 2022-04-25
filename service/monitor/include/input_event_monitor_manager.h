@@ -29,6 +29,8 @@
 #include "struct_multimodal.h"
 #include "uds_session.h"
 
+#include "i_input_event_monitor_service_manager.h"
+
 namespace OHOS {
 namespace MMI {
 struct MonitorItem {
@@ -40,7 +42,7 @@ struct MonitorItem {
     }
 };
 
-class InputEventMonitorManager {
+class InputEventMonitorManager : public IInputEventMonitorServiceManager  {
 public:
     InputEventMonitorManager();
     DISALLOW_COPY_AND_MOVE(InputEventMonitorManager);

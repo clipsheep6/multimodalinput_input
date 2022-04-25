@@ -23,8 +23,8 @@
 #include "input_device_manager.h"
 #include "input_event.h"
 #include "input_event_data_transformation.h"
-#include "input_event_monitor_manager.h"
-#include "input_handler_manager_global.h"
+#include "i_input_event_monitor_service_manager.h"
+#include "i_input_handler_manager_global.h"
 #include "input_windows_manager.h"
 #include "interceptor_manager_global.h"
 #include "key_event_subscriber.h"
@@ -305,7 +305,7 @@ int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, NetPacket& pkt)
         return RET_ERR;
     }
     MMI_HILOGD("OnAddInputHandler handler:%{public}d,handlerType:%{public}d", handlerId, handlerType);
-    return InputHandlerManagerGlobal::GetInstance().AddInputHandler(handlerId, handlerType, sess);
+    return IInputHandlerManagerGlobal::GetInstance()->AddInputHandler(handlerId, handlerType, sess);
 }
 
 int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, NetPacket& pkt)
@@ -321,7 +321,7 @@ int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, NetPacket& pkt)
         return RET_ERR;
     }
     MMI_HILOGD("OnRemoveInputHandler handler:%{public}d,handlerType:%{public}d", handlerId, handlerType);
-    InputHandlerManagerGlobal::GetInstance().RemoveInputHandler(handlerId, handlerType, sess);
+    IInputHandlerManagerGlobal::GetInstance()->RemoveInputHandler(handlerId, handlerType, sess);
     return RET_OK;
 }
 
@@ -336,7 +336,7 @@ int32_t ServerMsgHandler::OnMarkConsumed(SessionPtr sess, NetPacket& pkt)
         MMI_HILOGE("Packet read event failed");
         return RET_ERR;
     }
-    InputHandlerManagerGlobal::GetInstance().MarkConsumed(monitorId, eventId, sess);
+    IInputHandlerManagerGlobal::GetInstance()->MarkConsumed(monitorId, eventId, sess);
     return RET_OK;
 }
 
@@ -360,6 +360,7 @@ int32_t ServerMsgHandler::OnMoveMouse(SessionPtr sess, NetPacket& pkt)
     }
     return RET_OK;
 }
+
 int32_t ServerMsgHandler::OnSubscribeKeyEvent(SessionPtr sess, NetPacket &pkt)
 {
     int32_t subscribeId = -1;
@@ -607,7 +608,7 @@ int32_t ServerMsgHandler::OnAddInputEventMontior(SessionPtr sess, NetPacket& pkt
         MMI_HILOGE("Wrong event type, eventType:%{public}d", eventType);
         return RET_ERR;
     }
-    InputMonitorServiceMgr.AddInputEventMontior(sess, eventType);
+    IInputEventMonitorServiceManager::GetInstance()->AddInputEventMontior(sess, eventType);
     return RET_OK;
 }
 
@@ -625,7 +626,7 @@ int32_t ServerMsgHandler::OnAddInputEventTouchpadMontior(SessionPtr sess, NetPac
         MMI_HILOGE("Wrong event type, eventType:%{public}d", eventType);
         return RET_ERR;
     }
-    InputMonitorServiceMgr.AddInputEventTouchpadMontior(eventType, sess);
+    IInputEventMonitorServiceManager::GetInstance()->AddInputEventTouchpadMontior(eventType, sess);
     return RET_OK;
 }
 
@@ -642,7 +643,7 @@ int32_t ServerMsgHandler::OnRemoveInputEventMontior(SessionPtr sess, NetPacket& 
         MMI_HILOGE("Wrong event type, eventType:%{public}d", eventType);
         return RET_ERR;
     }
-    InputMonitorServiceMgr.RemoveInputEventMontior(sess, eventType);
+    IInputEventMonitorServiceManager::GetInstance()->RemoveInputEventMontior(sess, eventType);
     return RET_OK;
 }
 
@@ -659,7 +660,7 @@ int32_t ServerMsgHandler::OnRemoveInputEventTouchpadMontior(SessionPtr sess, Net
         MMI_HILOGE("Wrong event type, eventType:%{public}d", eventType);
         return RET_ERR;
     }
-    InputMonitorServiceMgr.RemoveInputEventMontior(sess, eventType);
+    IInputEventMonitorServiceManager::GetInstance()->RemoveInputEventMontior(sess, eventType);
     return RET_OK;
 }
 int32_t ServerMsgHandler::OnAddTouchpadEventFilter(SessionPtr sess, NetPacket& pkt)

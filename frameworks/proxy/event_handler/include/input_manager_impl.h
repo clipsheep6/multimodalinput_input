@@ -94,7 +94,6 @@ private:
 
     std::vector<PhysicalDisplayInfo> physicalDisplays_;
     std::vector<LogicalDisplayInfo> logicalDisplays_;
-    InputMonitorManager monitorManager_;
     InputInterceptorManager interceptorManager_;
 
     std::mutex mtx_;

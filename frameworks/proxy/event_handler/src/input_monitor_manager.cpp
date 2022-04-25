@@ -42,5 +42,13 @@ void InputMonitorManager::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
     InputHandlerManager::GetInstance().MarkConsumed(monitorId, eventId);
 }
+
+std::shared_ptr<IInputMonitorManager> IInputMonitorManager::GetInstance()
+{
+    if (iInputMonitorManager_ == nullptr) {
+        iInputMonitorManager_ = std::make_shared<IInputMonitorManager>();
+    }
+    return iInputMonitorManager_;
+}
 } // namespace MMI
 } // namespace OHOS

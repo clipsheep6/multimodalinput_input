@@ -22,7 +22,7 @@
 
 #include "bytrace_adapter.h"
 #include "event_filter_service.h"
-#include "input_event_monitor_manager.h"
+#include "i_input_event_monitor_manager.h"
 #include "interceptor_manager.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
@@ -436,7 +436,7 @@ int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consum
         MMI_HILOGE("client init failed");
         return -1;
     }
-    int32_t monitorId = monitorManager_.AddMonitor(consumer);
+    int32_t monitorId = IInputMonitorManager::GetInstance()->AddMonitor(consumer);
     return monitorId;
 }
 
@@ -447,7 +447,7 @@ void InputManagerImpl::RemoveMonitor(int32_t monitorId)
         MMI_HILOGE("client init failed");
         return;
     }
-    monitorManager_.RemoveMonitor(monitorId);
+    IInputMonitorManager::GetInstance()->RemoveMonitor(monitorId);
 }
 
 void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
@@ -457,7 +457,7 @@ void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
         MMI_HILOGE("client init failed");
         return;
     }
-    monitorManager_.MarkConsumed(monitorId, eventId);
+    IInputMonitorManager::GetInstance()->MarkConsumed(monitorId, eventId);
 }
 
 void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
@@ -467,7 +467,7 @@ void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
         MMI_HILOGE("client init failed");
         return;
     }
-    if (MMIEventHdl.MoveMouseEvent(offsetX, offsetY) != RET_OK) {
+	if (IInputMonitorManager::GetInstance()->MoveMouse(offsetX, offsetY) != RET_OK) {
         MMI_HILOGE("Failed to inject move mouse offset event");
     }
 }

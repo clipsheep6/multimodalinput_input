@@ -152,5 +152,13 @@ bool InputEventMonitorManager::ReportTouchpadEvent(std::shared_ptr<PointerEvent>
     OnTouchpadMonitorInputEvent(pointerEvent);
     return true;
 }
+
+std::shared_ptr<IInputEventMonitorServiceManager> IInputEventMonitorServiceManager::GetInstance()
+{
+    if (iInputEventMonitorServiceManager_ == nullptr) {
+        iInputEventMonitorServiceManager_ = std::make_shared<IInputEventMonitorServiceManager>();
+    }
+    return iInputEventMonitorServiceManager_;
+}
 } // namespace MMI
 } // namespace OHOS
