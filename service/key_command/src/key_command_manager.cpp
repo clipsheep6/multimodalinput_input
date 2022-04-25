@@ -45,10 +45,9 @@ int32_t KeyCommandManager::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
         MMI_HILOGD("The keyEvent start launch an ability, keyCode:%{public}d", keyEvent->GetKeyCode());
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_LAUNCH_EVENT);
         return RET_OK;
-    } 
+    }
     CHKPR(nextHandler_, ERROR_NULL_POINTER);
     return nextHandler_->HandleKeyEvent(keyEvent);
-    
 }
 
 std::string KeyCommandManager::GenerateKey(const ShortcutKey& key)

@@ -495,7 +495,7 @@ void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
     }
 #else
     MMI_HILOGI("Pointer device dose not support, move mouse failed");
-#endif //OHOS_BUILD_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif // OHOS_BUILD_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
 int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
@@ -601,7 +601,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
 #if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
     CHKPV(pointerEvent);
 #ifndef OHOS_BUILD_POINTER
-    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE || 
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE ||
         pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
         MMI_HILOGI("Pointer device dose not support, simulate pointEvent failed");
         return;

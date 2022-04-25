@@ -157,7 +157,7 @@ int32_t StandardizedEventManager::MoveMouseEvent(int32_t offsetX, int32_t offset
     pkt << offsetX << offsetY;
     return SendMsg(pkt);
 }
-#endif  //OHOS_BUILD_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif //OHOS_BUILD_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 int32_t StandardizedEventManager::GetDeviceIds(int32_t userData)
 {

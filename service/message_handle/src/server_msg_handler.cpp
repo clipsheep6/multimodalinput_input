@@ -90,7 +90,7 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
         {MmiMessageId::MARK_CONSUMED, MsgCallbackBind2(&ServerMsgHandler::OnMarkConsumed, this)},
 #if defined(OHOS_BUILD_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
         {MmiMessageId::MOVE_MOUSE_BY_OFFSET, MsgCallbackBind2(&ServerMsgHandler::OnMoveMouse, this)},
-#endif //OHOS_BUILD_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif // OHOS_BUILD_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 #ifdef OHOS_BUILD_KEYBOARD
         {MmiMessageId::SUBSCRIBE_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnSubscribeKeyEvent, this)},
@@ -449,7 +449,7 @@ int32_t ServerMsgHandler::OnMoveMouse(SessionPtr sess, NetPacket& pkt)
     iPointerEventHandler->HandlePointerEvent(pointerEvent);
     return RET_OK;
 }
-#endif  //OHOS_BUILD_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif // OHOS_BUILD_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 #ifdef OHOS_BUILD_KEYBOARD
 int32_t ServerMsgHandler::OnSubscribeKeyEvent(SessionPtr sess, NetPacket &pkt)
