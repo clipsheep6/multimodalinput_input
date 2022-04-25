@@ -90,8 +90,8 @@ ohos_shared_library("libmmi-client") {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
   }
 
-  if (mmi_enable_keyboard) {
-    sources += [ "event_handler/src/key_event_input_subscribe_manager.cpp" ]
+  if (mmi_enable_pointer_drawing) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER_DRAWING" ]
   }
 
   if (mmi_enable_keyboard) {
@@ -105,6 +105,11 @@ ohos_shared_library("libmmi-client") {
   if (mmi_enable_tp) {
     cflags += [ "-DOHOS_BUILD_TOUCH" ]
   }
+
+  if (mmi_enable_keyboard) {
+    sources += [ "event_handler/src/key_event_input_subscribe_manager.cpp" ]
+  }
+
   configs = [
     ":libmmi_client_config",
     "//foundation/multimodalinput/input/util:libmmi_util_public_config",

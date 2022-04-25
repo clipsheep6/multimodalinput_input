@@ -447,7 +447,7 @@ int32_t InputEventHandler::OnEventTouch(libinput_event *event)
     CHKPR(iTouchEventHandler_, ERROR_NULL_POINTER);
     iTouchEventHandler_->HandleLibinputEvent(event);
 #ifndef OHOS_BUILD_TOUCH
-    MMI_HILOGI("The touch device is not supported");
+    MMI_HILOGI("The tp device is not supported");
 #endif
     return RET_OK;
 }
@@ -459,7 +459,7 @@ int32_t InputEventHandler::OnTabletToolEvent(libinput_event *event)
     CHKPR(iTouchEventHandler_, ERROR_NULL_POINTER);
     iTouchEventHandler_->HandleLibinputEvent(event);
 #ifndef OHOS_BUILD_TOUCH
-    MMI_HILOGI("The touch device is not supported");
+    MMI_HILOGI("The tp device is not supported");
 #endif
     return RET_OK;
 }

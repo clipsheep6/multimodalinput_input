@@ -149,7 +149,7 @@ int32_t StandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEven
 }
 #endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
 
-#ifdef OHOS_BUILD_POINTER
+#if defined(OHOS_BUILD_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 int32_t StandardizedEventManager::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
 {
     CALL_LOG_ENTER;
@@ -157,7 +157,7 @@ int32_t StandardizedEventManager::MoveMouseEvent(int32_t offsetX, int32_t offset
     pkt << offsetX << offsetY;
     return SendMsg(pkt);
 }
-#endif // OHOS_BUILD_POINTER
+#endif  //OHOS_BUILD_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 int32_t StandardizedEventManager::GetDeviceIds(int32_t userData)
 {

@@ -484,7 +484,7 @@ void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
 
 void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
 {
-#ifdef OHOS_BUILD_POINTER
+#if defined(OHOS_BUILD_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
@@ -495,7 +495,7 @@ void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
     }
 #else
     MMI_HILOGI("Pointer device dose not support, move mouse failed");
-#endif // OHOS_BUILD_POINTER
+#endif //OHOS_BUILD_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
 int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
@@ -600,15 +600,15 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
 {
 #if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
     CHKPV(pointerEvent);
-    auto type = pointerEvent->GetSourceType();
 #ifndef OHOS_BUILD_POINTER
-    if (type == PointerEvent::SOURCE_TYPE_MOUSE || type == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE || 
+        pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
         MMI_HILOGI("Pointer device dose not support, simulate pointEvent failed");
         return;
     }
 #endif // OHOS_BUILD_POINTER
 #ifndef OHOS_BUILD_TOUCH
-    if (type == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         MMI_HILOGI("Tp device dose not support, simulate pointEvent failed");
         return;
     }

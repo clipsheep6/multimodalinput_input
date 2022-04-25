@@ -401,9 +401,34 @@ public:
          */
         void SetHeight(int32_t height);
 
+        /**
+         * @brief Obtains the tilt angle of the x axis.
+         * @return Returns the tilt angle of the x axis.
+         * @since 9
+         */
         double GetTiltX() const;
+
+        /**
+         * @brief Sets the tilt angle of the x axis.
+         * @param tiltX Indicates the tilt angle to set.
+         * @return void
+         * @since 9
+         */
         void SetTiltX(double tiltX);
+
+        /**
+         * @brief Obtains the tilt angle of the y axis.
+         * @return Returns the tilt angle of the y axis.
+         * @since 9
+         */
         double GetTiltY() const;
+
+        /**
+         * @brief Sets the tilt angle of the y axis.
+         * @param tiltY Indicates the tilt angle to set.
+         * @return void
+         * @since 9
+         */
         void SetTiltY(double tiltY);
 
         /**
@@ -420,6 +445,14 @@ public:
          * @since 9
          */
         void SetPressure(double pressure);
+
+        int32_t GetAxisLong() const;
+
+        void SetAxisLong(int32_t axisLong);
+
+        int32_t GetAxisShort() const;
+
+        void SetAxisShort(int32_t axisShort);
 
         /**
          * @brief Obtains the ID of the current device.
@@ -468,6 +501,8 @@ public:
         double  tiltX_ { 0.0 };
         double  tiltY_ { 0.0 };
         double  pressure_ { 0.0 };
+        int32_t axisLong_ { 0 };
+        int32_t axisShort_ { 0 };
         int32_t deviceId_ { 0 };
         int64_t downTime_ { 0 };
         int32_t toolType_ { 0 };
@@ -539,7 +574,8 @@ public:
      * @brief Obtains the pointer item of a specified pointer ID.
      * @param pointerId Indicates the pointer ID.
      * @param pointerItem Indicates the item used to receive the data of the pointer.
-     * @return Returns <b>true</b> if the data of the pointer with the specified ID exists; returns <b>false</b> otherwise.
+     * @return Returns <b>true</b> if the data of the pointer with the specified ID exists;
+     * returns <b>false</b> otherwise.
      * @since 9
      */
     bool GetPointerItem(int32_t pointerId, PointerItem &pointerItem);

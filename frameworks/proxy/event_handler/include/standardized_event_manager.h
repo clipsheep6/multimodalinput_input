@@ -52,9 +52,9 @@ public:
     int32_t SubscribeKeyEvent(const KeyEventInputSubscribeManager::SubscribeKeyEventInfo& subscribeInfo);
     int32_t UnSubscribeKeyEvent(int32_t subscribeId);
 #endif // OHOS_BUILD_KEYBOARD
-#ifdef OHOS_BUILD_POINTER
+#if defined(OHOS_BUILD_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY);
-#endif // OHOS_BUILD_POINTER
+#endif // OHOS_BUILD_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWIN
 
 protected:
     bool SendMsg(NetPacket& pkt) const;
