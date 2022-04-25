@@ -175,7 +175,7 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
     }
     return RET_OK;
 #else
-    MMI_HILOGI("The pointer and tp device is not supported, add filter failed");
+    MMI_HILOGI("Pointer and tp device dose not support, add filter failed");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
 }
@@ -431,7 +431,7 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent
     CHKPR(consumer, ERROR_NULL_POINTER);
     return InputManagerImpl::AddMonitor(consumer);
 #else
-    MMI_HILOGI("The keyboard device is not supported, add monitor failed");
+    MMI_HILOGI("Keyboard device dose not support, add monitor failed");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_KEYBOARD
 }
@@ -446,7 +446,7 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<PointerE
     CHKPR(consumer, ERROR_NULL_POINTER);
     return InputManagerImpl::AddMonitor(consumer);
 #else
-    MMI_HILOGI("The pointer and tp device is not supported, add monitor failed");
+    MMI_HILOGI("Pointer and tp device dose not support, add monitor failed");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
 }
@@ -494,7 +494,7 @@ void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
         MMI_HILOGE("Failed to inject move mouse offset event");
     }
 #else
-    MMI_HILOGI("The pointer device is not supported, move mouse failed");
+    MMI_HILOGI("Pointer device dose not support, move mouse failed");
 #endif // OHOS_BUILD_POINTER
 }
 
@@ -537,7 +537,7 @@ int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyE
     }
     return interceptorId;
 #else
-    MMI_HILOGI("The keyboard device is not supported, add interceptor failed");
+    MMI_HILOGI("Keyboard device dose not support, add interceptor failed");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_KEYBOARD
 }
@@ -560,7 +560,7 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
 #ifdef OHOS_BUILD_TOUCH
             interceptorManager_.RemoveInterceptor(interceptorId);
 #else
-            MMI_HILOGI("The tp device is not supported, remove interceptor failed");
+            MMI_HILOGI("Tp device dose not support, remove interceptor failed");
 #endif // OHOS_BUILD_TOUCH
             break;
         }
@@ -568,7 +568,7 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
 #ifdef OHOS_BUILD_KEYBOARD
             InterceptorMgr.RemoveInterceptor(interceptorId);
 #else
-            MMI_HILOGI("The keyboard device is not supported, remove interceptor failed");
+            MMI_HILOGI("Keyboard device dose not support, remove interceptor failed");
 #endif // OHOS_BUILD_KEYBOARD
             break;
         }
@@ -592,7 +592,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
         MMI_HILOGE("Failed to inject keyEvent");
     }
 #else
-    MMI_HILOGI("The keyboard device is not supported, simulate keyEvent failed");
+    MMI_HILOGI("Keyboard device dose not support, simulate keyEvent failed");
 #endif // OHOS_BUILD_KEYBOARD
 }
 
@@ -600,6 +600,19 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
 {
 #if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
     CHKPV(pointerEvent);
+    auto type = pointerEvent->GetSourceType();
+#ifndef OHOS_BUILD_POINTER
+    if (type == PointerEvent::SOURCE_TYPE_MOUSE || type == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
+        MMI_HILOGI("Pointer device dose not support, simulate pointEvent failed");
+        return;
+    }
+#endif // OHOS_BUILD_POINTER
+#ifndef OHOS_BUILD_TOUCH
+    if (type == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        MMI_HILOGI("Tp device dose not support, simulate pointEvent failed");
+        return;
+    }
+#endif // OHOS_BUILD_POINTER
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
@@ -609,7 +622,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
         MMI_HILOGE("Failed to inject pointer event");
     }
 #else
-    MMI_HILOGI("The pointer and tp device is not supported, simulate pointEvent failed");
+    MMI_HILOGI("Pointer and tp device dose not support, simulate pointEvent failed");
 #endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
 }
 

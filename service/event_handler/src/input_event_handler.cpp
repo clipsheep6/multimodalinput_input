@@ -394,7 +394,7 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
     CHKPR(iKeyEventHandler_, ERROR_NULL_POINTER);
     iKeyEventHandler_->HandleLibinputEvent(event);
 #ifndef OHOS_BUILD_KEYBOARD
-    MMI_HILOGI("The keyboard device is not supported");
+    MMI_HILOGI("Keyboard device dose not support");
 #endif
     return RET_OK;
 }
@@ -408,7 +408,7 @@ int32_t InputEventHandler::OnEventPointer(libinput_event *event)
     CHKPR(iPointerEventHandler_, ERROR_NULL_POINTER);
     iPointerEventHandler_->HandleLibinputEvent(event);
 #ifndef OHOS_BUILD_POINTER
-    MMI_HILOGI("The pointer device is not supported");
+    MMI_HILOGI("Pointer device dose not support");
 #endif
     return RET_OK;
 }
@@ -420,7 +420,7 @@ int32_t InputEventHandler::OnEventTouchpad(libinput_event *event)
     CHKPR(iPointerEventHandler_, ERROR_NULL_POINTER);
     iPointerEventHandler_->HandleLibinputEvent(event);
 #ifndef OHOS_BUILD_POINTER
-    MMI_HILOGI("The pointer device is not supported");
+    MMI_HILOGI("Pointer device dose not support");
 #endif
     return RET_OK;
 }
@@ -435,7 +435,7 @@ int32_t InputEventHandler::OnEventGesture(libinput_event *event)
         return GESTURE_EVENT_DISP_FAIL;
     }
 #ifndef OHOS_BUILD_POINTER
-    MMI_HILOGI("The pointer device is not supported");
+    MMI_HILOGI("Pointer device dose not support");
 #endif
     return RET_OK;
 }

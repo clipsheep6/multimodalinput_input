@@ -67,7 +67,7 @@ int32_t InputManager::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
 #ifdef OHOS_BUILD_KEYBOARD
     return KeyEventInputSubscribeMgr.SubscribeKeyEvent(keyOption, callback);
 #else
-    MMI_HILOGI("The keyboard device is not supported, subscribe keyEvent failed");
+    MMI_HILOGI("Keyboard device dose not support, subscribe keyEvent failed");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_KEYBOARD
 }
@@ -77,7 +77,7 @@ void InputManager::UnsubscribeKeyEvent(int32_t subscriberId)
 #ifdef OHOS_BUILD_KEYBOARD
     KeyEventInputSubscribeMgr.UnSubscribeKeyEvent(subscriberId);
 #else
-    MMI_HILOGI("The keyboard device is not supported, unsubscribe keyEvent failed");
+    MMI_HILOGI("Keyboard device dose not support, unsubscribe keyEvent failed");
 #endif // OHOS_BUILD_KEYBOARD
 }
 
