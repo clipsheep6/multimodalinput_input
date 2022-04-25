@@ -21,7 +21,27 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceManager"};
-constexpr int32_t INVALID_DEVICE_ID {-1};
+constexpr int32_t INVALID_DEVICE_ID = -1;
+
+constexpr int32_t ABS_MT_TOUCH_MAJOR = 0x30;
+constexpr int32_t ABS_MT_TOUCH_MINOR = 0x31;
+constexpr int32_t ABS_MT_ORIENTATION = 0x34;
+constexpr int32_t ABS_MT_POSITION_X  = 0x35;
+constexpr int32_t ABS_MT_POSITION_Y = 0x36;
+constexpr int32_t ABS_MT_PRESSURE = 0x3a;
+constexpr int32_t ABS_MT_TOOL_X = 0x3c;
+constexpr int32_t ABS_MT_TOOL_Y = 0x3d;
+
+std::list<int32_t> axisType = {
+    ABS_MT_TOUCH_MAJOR,
+    ABS_MT_TOUCH_MINOR,
+    ABS_MT_ORIENTATION,
+    ABS_MT_POSITION_X,
+    ABS_MT_POSITION_Y,
+    ABS_MT_PRESSURE,
+    ABS_MT_TOOL_X,
+    ABS_MT_TOOL_Y,
+};
 } // namespace
 
 std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) const
@@ -34,6 +54,7 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
     }
 
     std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
+    CHKPP(inputDevice);
     if (inputDevice == nullptr) {
         MMI_HILOGE("create InputDevice ptr failed");
         return nullptr;

@@ -257,24 +257,30 @@ int32_t ClientMsgHandler::OnInputDevice(const UDSClient& client, NetPacket& pkt)
     int32_t id;
     std::string name;
     int32_t deviceType;
-    if (!pkt.Read(userData)) {
-        MMI_HILOGE("Packet read userData failed");
-        return RET_ERR;
+    int32_t busType;
+    int32_t product;
+    int32_t vendor;
+    int32_t version;
+    size_t size;
+    pkt >> userData >> id >> name >> deviceType >> busType >> product >> vendor >> version >> size;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read input device info failed");
+        return PACKET_READ_FAIL;
     }
-    if (!pkt.Read(id)) {
-        MMI_HILOGE("Packet read data failed");
-        return RET_ERR;
+    std::vector<InputDeviceImpl::AxisInfo> axisInfo;
+    InputDeviceImpl::AxisInfo axis;
+    for (size_t i = 0; i < size; ++i) {
+        pkt >> axis.axisType >> axis.min >> axis.max >> axis.fuzz >> axis.flat >> axis.resolution;
+        if (pkt.ChkRWError()) {
+            MMI_HILOGE("Packet read input device axis failed");
+            return PACKET_READ_FAIL;
+        }
+        axisInfo.push_back(axis);
     }
-    if (!pkt.Read(name)) {
-        MMI_HILOGE("Packet read name failed");
-        return RET_ERR;
-    }
-    if (!pkt.Read(deviceType)) {
-        MMI_HILOGE("Packet read deviceType failed");
-        return RET_ERR;
-    }
-
-    InputDevImp.OnInputDevice(userData, id, name, deviceType);
+    auto devData = std::make_shared<InputDeviceImpl::InputDeviceInfo>(id, name, deviceType, busType, product, vendor,
+        version, axisInfo);
+    CHKPR(devData, RET_ERR);
+    InputDevImp.OnInputDevice(userData, devData);
     return RET_OK;
 }
 
@@ -288,7 +294,7 @@ int32_t ClientMsgHandler::OnKeyList(const UDSClient& client, NetPacket& pkt)
     }
     size_t size;
     if (!pkt.Read(size)) {
-        MMI_HILOGE("Packet read userData failed");
+        MMI_HILOGE("Packet read size failed");
         return RET_ERR;
     }
     int32_t keyCode;
@@ -306,7 +312,7 @@ int32_t ClientMsgHandler::OnKeyList(const UDSClient& client, NetPacket& pkt)
         abilityRet[keyCode] = isSupport == 1 ? true : false;
         i += 2;
     }
-    InputDeviceImpl::GetInstance().OnKeystrokeAbility(userData, abilityRet);
+    InputDevImp.OnKeystrokeAbility(userData, abilityRet);
     return RET_OK;
 }
 
@@ -315,12 +321,12 @@ int32_t ClientMsgHandler::OnDevMonitor(const UDSClient& client, NetPacket& pkt)
     CALL_LOG_ENTER;
     std::string type;
     if (!pkt.Read(type)) {
-        MMI_HILOGE("Packet read userData failed");
+        MMI_HILOGE("Packet read type failed");
         return RET_ERR;
     }
     int32_t deviceId;
     if (!pkt.Read(deviceId)) {
-        MMI_HILOGE("Packet read userData failed");
+        MMI_HILOGE("Packet read deviceId failed");
         return RET_ERR;
     }
     InputDeviceImpl::GetInstance().OnDevMonitor(type, deviceId);

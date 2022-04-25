@@ -32,7 +32,6 @@ public:
         std::map<int32_t, bool> keystrokeAbility;
         int32_t deviceId = 0;
     };
-
     struct CallbackInfo {
         CallbackInfo();
         ~CallbackInfo();
@@ -41,9 +40,15 @@ public:
         napi_deferred deferred = nullptr;
         CallbackData data;
     };
+    struct AxisType {
+        std::string axisTypeName;
+        int32_t axisType = 0;
+    };
 
-    int32_t GetInt32(uv_work_t *work);
+    int32_t GetUserData(uv_work_t *work);
     bool IsHandleEquals(napi_env env, napi_value handle, napi_ref ref);
+    bool GetDeviceInfo(std::unique_ptr<CallbackInfo> &cbTemp, napi_value &object);
+    bool GetDeviceAxisInfo(std::unique_ptr<CallbackInfo> &cbTemp, napi_value &object);
 };
 } // namespace MMI
 } // namespace OHOS

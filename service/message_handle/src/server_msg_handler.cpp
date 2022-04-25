@@ -444,15 +444,8 @@ int32_t ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& pkt)
     CALL_LOG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
     int32_t userData = 0;
-    if (!pkt.Read(userData)) {
-        MMI_HILOGE("Packet read userData failed");
-        return RET_ERR;
-    }
     int32_t deviceId = 0;
-    if (!pkt.Read(deviceId)) {
-        MMI_HILOGE("Packet read device failed");
-        return RET_ERR;
-    }
+    pkt >> userData >> deviceId;
     std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetInputDevice(deviceId);
     NetPacket pkt2(MmiMessageId::INPUT_DEVICE);
     if (inputDevice == nullptr) {
@@ -460,20 +453,14 @@ int32_t ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& pkt)
         int32_t id = -1;
         std::string name = "null";
         int32_t deviceType = -1;
-        if (!pkt2.Write(userData)) {
-            MMI_HILOGE("Packet write userData failed");
-            return RET_ERR;
-        }
-        if (!pkt2.Write(id)) {
-            MMI_HILOGE("Packet write data failed");
-            return RET_ERR;
-        }
-        if (!pkt2.Write(name)) {
-            MMI_HILOGE("Packet write name failed");
-            return RET_ERR;
-        }
-        if (!pkt2.Write(deviceType)) {
-            MMI_HILOGE("Packet write deviceType failed");
+        int32_t busType = -1;
+        int32_t product = -1;
+        int32_t vendor = -1;
+        int32_t version = -1;
+        size_t size = 0;
+        pkt2 << userData << id << name << deviceType << busType << product << vendor << version << size;
+        if (pkt2.ChkRWError()) {
+            MMI_HILOGE("packet write data failed");
             return RET_ERR;
         }
         if (!sess->SendMsg(pkt2)) {
@@ -482,23 +469,17 @@ int32_t ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& pkt)
         }
         return RET_OK;
     }
-    int32_t id = inputDevice->GetId();
-    std::string name = inputDevice->GetName();
-    int32_t deviceType = inputDevice->GetType();
-    if (!pkt2.Write(userData)) {
-        MMI_HILOGE("Packet write userData failed");
-        return RET_ERR;
+    pkt2 << userData << inputDevice->GetId() << inputDevice->GetName() << inputDevice->GetType()
+        << inputDevice->GetBustype() << inputDevice->GetProduct() << inputDevice->GetVendor()
+        << inputDevice->GetVersion();
+    auto axis = inputDevice->GetAxisInfo();
+    pkt2 << axis.size();
+    for (const auto &item : axis) {
+        pkt2 << item.GetAxisType() << item.GetMinimum() << item.GetMaximum() << item.GetFuzz() << item.GetFlat()
+            << item.GetResolution();
     }
-    if (!pkt2.Write(id)) {
-        MMI_HILOGE("Packet write data failed");
-        return RET_ERR;
-    }
-    if (!pkt2.Write(name)) {
-        MMI_HILOGE("Packet write name failed");
-        return RET_ERR;
-    }
-    if (!pkt2.Write(deviceType)) {
-        MMI_HILOGE("Packet write deviceType failed");
+    if (pkt2.ChkRWError()) {
+        MMI_HILOGE("packet write data failed");
         return RET_ERR;
     }
     if (!sess->SendMsg(pkt2)) {
