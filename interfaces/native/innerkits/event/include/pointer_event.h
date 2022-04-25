@@ -199,41 +199,6 @@ public:
      */
     static constexpr int32_t MOUSE_BUTTON_MIDDLE = 2;
 
-     /**
-     * Indicates the side button on a mouse.
-     *
-     * @since 9
-     */
-    static constexpr int32_t MOUSE_BUTTON_SIDE = 3;
-
-    /**
-     * Indicates the extra button on a mouse.
-     *
-     * @since 9
-     */
-    static constexpr int32_t MOUSE_BUTTON_EXTRA = 4;
-
-    /**
-     * Indicates the forward button on a mouse.
-     *
-     * @since 9
-     */
-    static constexpr int32_t MOUSE_BUTTON_FORWARD = 5;
-
-    /**
-     * Indicates the back button on a mouse.
-     *
-     * @since 9
-     */
-    static constexpr int32_t MOUSE_BUTTON_BACK = 6;
-
-    /**
-     * Indicates the task button on a mouse.
-     *
-     * @since 9
-     */
-    static constexpr int32_t MOUSE_BUTTON_TASK = 7;
-    
     static constexpr int32_t TOOL_TYPE_PEN = 0;
 
     static constexpr int32_t TOOL_TYPE_RUBBER = 1;
@@ -401,9 +366,34 @@ public:
          */
         void SetHeight(int32_t height);
 
+        /**
+         * @brief Obtains the tilt angle of the x axis.
+         * @return Returns the tilt angle of the x axis.
+         * @since 9
+         */
         double GetTiltX() const;
+
+        /**
+         * @brief Sets the tilt angle of the x axis.
+         * @param tiltX Indicates the tilt angle to set.
+         * @return void
+         * @since 9
+         */
         void SetTiltX(double tiltX);
+
+        /**
+         * @brief Obtains the tilt angle of the y axis.
+         * @return Returns the tilt angle of the y axis.
+         * @since 9
+         */
         double GetTiltY() const;
+
+        /**
+         * @brief Sets the tilt angle of the y axis.
+         * @param tiltY Indicates the tilt angle to set.
+         * @return void
+         * @since 9
+         */
         void SetTiltY(double tiltY);
 
         /**
