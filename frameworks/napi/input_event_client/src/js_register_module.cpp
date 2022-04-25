@@ -74,7 +74,7 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     napi_create_int32(env, 0, &result);
     return result;
 #else
-    MMI_HILOGI("Keyboard device dose not support, simulate key failed");
+    MMI_HILOGI("Keyboard device dose not support, inject keyevent failed");
     return nullptr;
 #endif // OHOS_BUILD_KEYBOARD
 }

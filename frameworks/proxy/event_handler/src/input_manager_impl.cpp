@@ -592,7 +592,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
         MMI_HILOGE("Failed to inject keyEvent");
     }
 #else
-    MMI_HILOGI("Keyboard device dose not support, simulate keyEvent failed");
+    MMI_HILOGI("Keyboard device dose not support, simulate keyevent failed");
 #endif // OHOS_BUILD_KEYBOARD
 }
 
@@ -603,13 +603,13 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
 #ifndef OHOS_BUILD_POINTER
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE ||
         pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
-        MMI_HILOGI("Pointer device dose not support, simulate pointEvent failed");
+        MMI_HILOGI("Pointer device dose not support, simulate poinevent failed");
         return;
     }
 #endif // OHOS_BUILD_POINTER
 #ifndef OHOS_BUILD_TOUCH
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        MMI_HILOGI("Tp device dose not support, simulate pointEvent failed");
+        MMI_HILOGI("Tp device dose not support, simulate poinevent failed");
         return;
     }
 #endif // OHOS_BUILD_POINTER
@@ -622,7 +622,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
         MMI_HILOGE("Failed to inject pointer event");
     }
 #else
-    MMI_HILOGI("Pointer and tp device dose not support, simulate pointEvent failed");
+    MMI_HILOGI("Pointer and tp device dose not support, simulate poinevent failed");
 #endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
 }
 
