@@ -333,6 +333,7 @@ int32_t ServerMsgHandler::OnMarkConsumed(SessionPtr sess, NetPacket& pkt)
     return RET_OK;
 }
 
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 int32_t ServerMsgHandler::OnMoveMouse(SessionPtr sess, NetPacket& pkt)
 {
     CALL_LOG_ENTER;
