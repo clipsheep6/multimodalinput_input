@@ -42,7 +42,7 @@ public:
     public:
         using TaskPtr = std::shared_ptr<EntrustTasks::Task>;
         Task(int32_t id, ETaskCallback fun, bool asyncTask = false)
-            : id_(id), fun_(fun), hasWaited_(asyncTask) {}
+            : id_(id), hasWaited_(asyncTask), fun_(fun) {}
         ~Task() = default;
 
         bool WaitFor(int32_t ms);

@@ -22,23 +22,27 @@
 
 namespace OHOS {
 namespace MMI {
-template<typename T>
+template<typename K, typename V>
 class MsgHandler {
 public:
     void Clear()
     {
         callbacks_.clear();
     }
+    bool ChkKey(K id)
+    {
+        return (GetMsgCallback(id) != nullptr);
+    }
 
 protected:
     struct MsgCallback {
-        MmiMessageId id;
-        T fun;
+        K id;
+        V fun;
     };
 
 protected:
     virtual ~MsgHandler() {};
-    T *GetMsgCallback(MmiMessageId id)
+    T *GetMsgCallback(K id)
     {
         auto it = callbacks_.find(id);
         if (it == callbacks_.end()) {
@@ -57,7 +61,7 @@ protected:
     }
 
 protected:
-    std::map<MmiMessageId, T> callbacks_;
+    std::map<K, V> callbacks_;
 };
 } // namespace MMI
 } // namespace OHOS

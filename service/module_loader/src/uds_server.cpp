@@ -104,6 +104,23 @@ void UDSServer::Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt)
     }
 }
 
+int32_t UDSServer::AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd)
+{
+    MMI_HILOGI("enter, programName:%{public}s,moduleType:%{public}d", programName.c_str(), moduleType);
+    toReturnClientFd = INVALID_SOCKET_FD;
+    int32_t serverFd = INVALID_SOCKET_FD;
+    int32_t uid = GetCallingUid();
+    int32_t pid = GetCallingPid();
+    const int32_t ret = AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd);
+    if (ret != RET_OK) {
+        MMI_HILOGE("call AddSocketPairInfo return %{public}d", ret);
+        return RET_ERR;
+    }
+    MMI_HILOGIK("leave, programName:%{public}s,moduleType:%{public}d,alloc success",
+        programName.c_str(), moduleType);
+    return RET_OK;
+}
+
 int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     const int32_t moduleType, const int32_t uid, const int32_t pid,
     int32_t& serverFd, int32_t& toReturnClientFd)
@@ -329,6 +346,15 @@ SessionPtr UDSServer::GetSession(int32_t fd) const
     }
     CHKPP(it->second);
     return it->second->GetSharedPtr();
+}
+
+SessionPtr UDSServer::GetSessionByPid(int32_t pid) const
+{
+    int32_t fd = GetClientFd(pid);
+    if (fd <= 0) {
+        return nullptr;
+    }
+    return GetSession(fd);
 }
 
 bool UDSServer::AddSession(SessionPtr ses)

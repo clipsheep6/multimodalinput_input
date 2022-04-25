@@ -36,8 +36,6 @@ public:
     int32_t OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& options) override;
 
 protected:
-    virtual int32_t StubHandlerRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply,
-        MessageOption& options) = 0;
     virtual int32_t StubHandleAllocSocketFd(MessageParcel &data, MessageParcel &reply) = 0;
     int32_t StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply);
 

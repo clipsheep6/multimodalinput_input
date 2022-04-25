@@ -53,10 +53,9 @@ public:
     int32_t GetClientPid(int32_t fd);
     void AddSessionDeletedCallback(std::function<void(SessionPtr)> callback);
 
-public:
-    virtual int32_t AddSocketPairInfo(const std::string& programName, const int32_t moduleType, const int32_t uid,
-                                      const int32_t pid, int32_t& serverFd, int32_t& toReturnClientFd);
+    int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd);
     SessionPtr GetSession(int32_t fd) const;
+    SessionPtr GetSessionByPid(int32_t pid) const;
 
 protected:
     virtual void OnConnected(SessionPtr s);
@@ -73,6 +72,8 @@ protected:
     void DumpSession(const std::string& title);
     void NotifySessionDeleted(SessionPtr ses);
     void AddPermission(SessionPtr sess);
+    int32_t AddSocketPairInfo(const std::string& programName, const int32_t moduleType, const int32_t uid,
+        const int32_t pid, int32_t& serverFd, int32_t& toReturnClientFd);
 
 protected:
     std::mutex mux_;

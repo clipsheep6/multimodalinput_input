@@ -185,6 +185,8 @@ int32_t MMIService::Init()
 
     MMI_HILOGD("ServerMsgHandler Init");
     sMsgHandler_.Init(*this);
+    MMI_HILOGD("RemoteMsgHandler Init");
+    rMsgHandler_.Init(*this);
     MMI_HILOGD("EventDump Init");
     MMIEventDump->Init(*this);
 
@@ -251,6 +253,32 @@ void MMIService::OnDump()
     MMIEventDump->Dump();
 }
 
+int32_t MMIService::OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply,
+    MessageOption& options)
+{
+    int32_t pid = GetCallingPid();
+    TimeCostChk chk("IPC-RemoteRequest", "overtime 300(us)", MAX_OVER_TIME, pid,
+        static_cast<int64_t>(code));
+    uint64_t tid = GetThisThreadId();
+    MMI_HILOGD("request code:%{public}d tid:%{public}" PRId64 "", code, tid);
+
+    std::u16string descriptor = data.ReadInterfaceToken();
+    if (descriptor != IMultimodalInputConnect::GetDescriptor()) {
+        MMI_HILOGE("get unexpect descriptor:%{public}s", Str16ToStr8(descriptor).c_str());
+        return ERR_INVALID_STATE;
+    }
+    if (!rMsgHandler_.ChkKey(code)) {
+        MMI_HILOGE("unknown code:%{public}u, go switch defaut", code);
+        return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+    }
+    int32_t uid = GetCallingUid();
+    if (!entrustTasks_.PostSyncTask(std::bind(&RemoteMsgHandler::OnMsgHandler, this, uid, pid, code,
+        std::ref(data), std::ref(reply)))) {
+        return ERR_INVALID_STATE;
+    }
+    return RET_OK;
+}
+
 void MMIService::OnConnected(SessionPtr s)
 {
     CHKPV(s);
@@ -263,74 +291,6 @@ void MMIService::OnDisconnected(SessionPtr s)
     CHKPV(s);
     int32_t fd = s->GetFd();
     MMI_HILOGW("enter, session desc:%{public}s, fd: %{public}d", s->GetDescript().c_str(), fd);
-}
-
-int32_t MMIService::StubHandlerRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply,
-    MessageOption& options)
-{
-    switch (code) {
-        case IMultimodalInputConnect::ALLOC_SOCKET_FD: {
-            return StubHandleAllocSocketFd(data, reply);
-        }
-        case IMultimodalInputConnect::ADD_INPUT_EVENT_FILTER: {
-            return StubAddInputEventFilter(data, reply);
-        }
-        default: {
-            MMI_HILOGE("unknown code:%{public}u, go switch defaut", code);
-            return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
-        }
-    }
-}
-
-int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd)
-{
-    CALL_LOG_ENTER;
-    MMI_HILOGI("enter, programName:%{public}s,moduleType:%{public}d", programName.c_str(), moduleType);
-
-    toReturnClientFd = INVALID_SOCKET_FD;
-    int32_t serverFd = INVALID_SOCKET_FD;
-    int32_t uid = GetCallingUid();
-    int32_t pid = GetCallingPid();
-    const int32_t ret = AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd);
-    if (ret != RET_OK) {
-        MMI_HILOGE("call AddSocketPairInfo return %{public}d", ret);
-        return RET_ERR;
-    }
-
-    MMI_HILOGIK("leave, programName:%{public}s,moduleType:%{public}d,alloc success",
-        programName.c_str(), moduleType);
-
-    return RET_OK;
-}
-
-int32_t MMIService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& reply)
-{
-    sptr<ConnectReqParcel> req = data.ReadParcelable<ConnectReqParcel>();
-    CHKPR(req, RET_ERR);
-    MMI_HILOGIK("clientName:%{public}s,moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
-
-    int32_t clientFd = INVALID_SOCKET_FD;
-    int32_t ret = AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd);
-    if (ret != RET_OK) {
-        MMI_HILOGE("call AddSocketPairInfo return %{public}d", ret);
-        reply.WriteInt32(RET_ERR);
-        return RET_ERR;
-    }
-
-    MMI_HILOGI("call AllocSocketFd success");
-
-    reply.WriteInt32(RET_OK);
-    reply.WriteFileDescriptor(clientFd);
-
-    MMI_HILOGI("send clientFd to client, clientFd = %d", clientFd);
-    close(clientFd);
-    return RET_OK;
-}
-
-int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter)
-{
-    CHKPR(InputHandler, ERROR_NULL_POINTER);
-    return InputHandler->AddInputEventFilter(filter);
 }
 
 void MMIService::OnTimer()

@@ -19,15 +19,19 @@
 #include <mutex>
 #include <thread>
 
-#include "iremote_object.h"
+#include "ipc_skeleton.h"
+#include "iremote_stub.h"
+#include "message_parcel.h"
 #include "nocopyable.h"
 #include "singleton.h"
 #include "system_ability.h"
 
 #include "entrust_tasks.h"
 #include "input_event_handler.h"
-#include "multimodal_input_connect_stub.h"
+#include "i_multimodal_input_connect.h"
 #include "libinput_adapter.h"
+#include "multimodal_input_connect_define.h"
+#include "remote_msg_handler.h"
 #include "server_msg_handler.h"
 #include "uds_server.h"
 
@@ -39,7 +43,7 @@ namespace OHOS {
 namespace MMI {
 
 enum class ServiceRunningState { STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
-class MMIService : public UDSServer, public SystemAbility, public MultimodalInputConnectStub {
+class MMIService : public UDSServer, public SystemAbility, public IRemoteStub<IMultimodalInputConnect> {
     DECLARE_DELAYED_SINGLETON(MMIService);
     DECLEAR_SYSTEM_ABILITY(MMIService);
     DISALLOW_COPY_AND_MOVE(MMIService);
@@ -48,16 +52,12 @@ public:
     virtual void OnStart() override;
     virtual void OnStop() override;
     virtual void OnDump() override;
-    virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &socketFd) override;
-    virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
+    virtual int32_t OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply,
+        MessageOption& options) override;
 
 protected:
     virtual void OnConnected(SessionPtr s) override;
     virtual void OnDisconnected(SessionPtr s) override;
-    virtual int32_t StubHandlerRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply,
-        MessageOption& options) override;
-    virtual int32_t StubHandleAllocSocketFd(MessageParcel &data, MessageParcel &reply) override;
-
     virtual int32_t AddEpoll(EpollEventType type, int32_t fd) override;
 
     bool InitLibinputService();
@@ -80,6 +80,7 @@ private:
     EntrustTasks entrustTasks_;
     LibinputAdapter libinputAdapter_;
     ServerMsgHandler sMsgHandler_;
+    RemoteMsgHandler rMsgHandler_;
 };
 } // namespace MMI
 } // namespace OHOS

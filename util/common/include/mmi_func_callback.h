@@ -31,6 +31,12 @@ auto MsgCallbackBind2(MemberFunType func, ClassType* obj)
 {
     return std::bind(func, obj, std::placeholders::_1, std::placeholders::_2);
 }
+
+template<class MemberFunType, class ClassType>
+auto MsgCallbackBind3(MemberFunType func, ClassType* obj)
+{
+    return std::bind(func, obj, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+}
 } // namespace MMI
 } // namespace OHOS
 #endif // MMI_FUNC_CALLBACK_H

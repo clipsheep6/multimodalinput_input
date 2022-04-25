@@ -41,7 +41,19 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         MMI_HILOGE("get unexpect descriptor:%{public}s", Str16ToStr8(descriptor).c_str());
         return ERR_INVALID_STATE;
     }
-    return StubHandlerRemoteRequest(code, data, reply, option);
+
+    switch (code) {
+        case IMultimodalInputConnect::ALLOC_SOCKET_FD: {
+            return StubHandleAllocSocketFd(data, reply);
+        }
+        case IMultimodalInputConnect::ADD_INPUT_EVENT_FILTER: {
+            return StubAddInputEventFilter(data, reply);
+        }
+        default: {
+            MMI_HILOGE("unknown code:%{public}u, go switch defaut", code);
+            return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+        }
+    }
 }
 
 int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply)
