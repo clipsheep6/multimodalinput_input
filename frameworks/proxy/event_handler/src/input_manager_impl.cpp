@@ -460,6 +460,7 @@ void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
 
 void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
 {
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
@@ -468,6 +469,9 @@ void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
     if (MMIEventHdl.MoveMouseEvent(offsetX, offsetY) != RET_OK) {
         MMI_HILOGE("Failed to inject move mouse offset event");
     }
+#else
+    MMI_HILOGI("Pointer drawing module dose not support, move mouse failed");
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
 int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
@@ -562,6 +566,21 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
     if (MMIEventHdl.InjectPointerEvent(pointerEvent) != RET_OK) {
         MMI_HILOGE("Failed to inject pointer event");
     }
+}
+
+int32_t InputManagerImpl::SetPointerVisible(bool visible)
+{
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+    CALL_LOG_ENTER;
+    int32_t ret = MultimodalInputConnectManager::GetInstance()->SetPointerVisible(visible);
+    if (ret != RET_OK) {
+        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
+    }
+    return ret;
+#else
+    MMI_HILOGD("disable pointer drawing");
+    return RET_ERR;
+#endif
 }
 
 void InputManagerImpl::OnConnected()
