@@ -35,9 +35,9 @@ public:
     int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
     void OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session) override;
     void OnRemoveInterceptor(int32_t id) override;
-#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
-#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     bool OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
 private:
     struct InterceptorItem {

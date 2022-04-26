@@ -34,7 +34,7 @@ EventFilterWrap::~EventFilterWrap()
     CALL_LOG_ENTER;
 }
 
-#ifdef OHOS_BUILD_POINTER
+#ifdef OHOS_BUILD_ENABLE_POINTER
 int32_t EventFilterWrap::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (HandlePointerEventFilter(pointerEvent)) {
@@ -44,9 +44,9 @@ int32_t EventFilterWrap::HandlePointerEvent(std::shared_ptr<PointerEvent> pointe
     CHKPR(nextHandler_, ERROR_NULL_POINTER);
     return nextHandler_->HandlePointerEvent(pointerEvent);
 }
-#endif // OHOS_BUILD_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER
 
-#ifdef OHOS_BUILD_TOUCH
+#ifdef OHOS_BUILD_ENABLE_TOUCH
 int32_t EventFilterWrap::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (HandlePointerEventFilter(pointerEvent)) {
@@ -56,7 +56,7 @@ int32_t EventFilterWrap::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerE
     CHKPR(nextHandler_, ERROR_NULL_POINTER);
     return nextHandler_->HandleTouchEvent(pointerEvent);
 }
-#endif // OHOS_BUILD_TOUCH
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
 int32_t EventFilterWrap::AddInputEventFilter(sptr<IEventFilter> filter)
 {

@@ -24,6 +24,7 @@
 #include "define_interceptor_manager.h"
 #include "event_filter_service.h"
 #include "input_event_monitor_manager.h"
+#include "key_event_input_subscribe_manager.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
@@ -151,7 +152,7 @@ void InputManagerImpl::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> 
 
 int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter)
 {
-#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
     bool hasSendToMmiServer = true;
@@ -175,9 +176,9 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
     }
     return RET_OK;
 #else
-    MMI_HILOGI("Pointer and tp device dose not support, add filter failed");
+    MMI_HILOGW("Pointer and tp device dose not support");
     return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 
 void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
@@ -197,7 +198,31 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventCo
     }
 }
 
-#ifdef OHOS_BUILD_KEYBOARD
+
+int32_t InputManagerImpl::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
+    std::function<void(std::shared_ptr<KeyEvent>)> callback)
+{
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    CHK_PIDANDTID();
+    CHKPR(callback, ERROR_NULL_POINTER);
+    return KeyEventInputSubscribeMgr.SubscribeKeyEvent(keyOption, callback);
+#else
+    MMI_HILOGW("Keyboard device dose not support");
+    return ERROR_UNSUPPORT;
+#endif
+}
+
+void InputManagerImpl::UnsubscribeKeyEvent(int32_t subscriberId)
+{
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    CHK_PIDANDTID();
+    KeyEventInputSubscribeMgr.UnSubscribeKeyEvent(subscriberId);
+#else
+    MMI_HILOGW("Keyboard device dose not support");
+#endif
+}
+
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void InputManagerImpl::OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consumer,
     std::shared_ptr<KeyEvent> keyEvent)
 {
@@ -206,9 +231,7 @@ void InputManagerImpl::OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consu
     consumer->OnInputEvent(keyEvent);
     MMI_HILOGD("key event callback keyCode:%{public}d", keyEvent->GetKeyCode());
 }
-#endif // OHOS_BUILD_KEYBOARD
 
-#ifdef OHOS_BUILD_KEYBOARD
 void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHK_PIDANDTID();
@@ -223,9 +246,9 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     }
     MMI_HILOGD("key event keyCode:%{public}d", keyEvent->GetKeyCode());
 }
-#endif // OHOS_BUILD_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
-#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 void InputManagerImpl::OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer,
     std::shared_ptr<PointerEvent> pointerEvent)
 {
@@ -250,7 +273,7 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     }
     MMI_HILOGD("pointer event pointerId:%{public}d", pointerEvent->GetPointerId());
 }
-#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt)
 {
@@ -424,31 +447,31 @@ void InputManagerImpl::PrintDisplayInfo()
 
 int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor)
 {
-#ifdef OHOS_BUILD_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPR(monitor, ERROR_NULL_POINTER);
     std::lock_guard<std::mutex> guard(mtx_);
     auto consumer = std::make_shared<MonitorEventConsumer>(monitor);
     CHKPR(consumer, ERROR_NULL_POINTER);
     return AddMonitor(consumer);
 #else
-    MMI_HILOGI("Keyboard device dose not support, add monitor failed");
+    MMI_HILOGW("Keyboard device dose not support");
     return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 
 int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor)
 {
-#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     CHKPR(monitor, ERROR_NULL_POINTER);
     std::lock_guard<std::mutex> guard(mtx_);
     auto consumer = std::make_shared<MonitorEventConsumer>(monitor);
     CHKPR(consumer, ERROR_NULL_POINTER);
     return AddMonitor(consumer);
 #else
-    MMI_HILOGI("Pointer and tp device dose not support, add monitor failed");
+    MMI_HILOGW("Pointer and tp device dose not support");
     return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 
 int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consumer)
@@ -483,7 +506,7 @@ void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
 
 void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
 {
-#if defined(OHOS_BUILD_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
@@ -493,8 +516,8 @@ void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
         MMI_HILOGE("Failed to inject move mouse offset event");
     }
 #else
-    MMI_HILOGI("Pointer device dose not support, move mouse failed");
-#endif // OHOS_BUILD_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+    MMI_HILOGW("Pointer device dose not support");
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
 int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
@@ -520,7 +543,7 @@ int32_t InputManagerImpl::AddInterceptor(int32_t sourceType,
 
 int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
 {
-#ifdef OHOS_BUILD_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     std::lock_guard<std::mutex> guard(mtx_);
     if (interceptor == nullptr) {
         MMI_HILOGE("%{public}s param should not be null", __func__);
@@ -536,9 +559,9 @@ int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyE
     }
     return interceptorId;
 #else
-    MMI_HILOGI("Keyboard device dose not support, add interceptor failed");
+    MMI_HILOGW("Keyboard device dose not support");
     return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
@@ -556,19 +579,19 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
     interceptorId /= ADD_MASK_BASE;
     switch (mask) {
         case MASK_TOUCH: {
-#ifdef OHOS_BUILD_TOUCH
+#ifdef OHOS_BUILD_ENABLE_TOUCH
             InputInterMgr->RemoveInterceptor(interceptorId);
 #else
-            MMI_HILOGI("Tp device dose not support, remove interceptor failed");
-#endif // OHOS_BUILD_TOUCH
+            MMI_HILOGW("Tp device dose not support");
+#endif // OHOS_BUILD_ENABLE_TOUCH
             break;
         }
         case MASK_KEY: {
-#ifdef OHOS_BUILD_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
             InterMgr->RemoveInterceptor(interceptorId);
 #else
-            MMI_HILOGI("Keyboard device dose not support, remove interceptor failed");
-#endif // OHOS_BUILD_KEYBOARD
+            MMI_HILOGW("Keyboard device dose not support");
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
             break;
         }
         default:
@@ -579,7 +602,7 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
 
 void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-#ifdef OHOS_BUILD_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPV(keyEvent);
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
@@ -590,27 +613,27 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
         MMI_HILOGE("Failed to inject keyEvent");
     }
 #else
-    MMI_HILOGI("Keyboard device dose not support, simulate keyevent failed");
-#endif // OHOS_BUILD_KEYBOARD
+    MMI_HILOGW("Keyboard device dose not support");
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     CHKPV(pointerEvent);
-#ifndef OHOS_BUILD_POINTER
+#ifndef OHOS_BUILD_ENABLE_POINTER
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE ||
         pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
-        MMI_HILOGI("Pointer device dose not support, simulate poinevent failed");
+        MMI_HILOGW("Pointer device dose not support");
         return;
     }
-#endif // OHOS_BUILD_POINTER
-#ifndef OHOS_BUILD_TOUCH
+#endif // OHOS_BUILD_ENABLE_POINTER
+#ifndef OHOS_BUILD_ENABLE_TOUCH
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        MMI_HILOGI("Tp device dose not support, simulate poinevent failed");
+        MMI_HILOGW("Tp device dose not support");
         return;
     }
-#endif // OHOS_BUILD_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
@@ -620,8 +643,8 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
         MMI_HILOGE("Failed to inject pointer event");
     }
 #else
-    MMI_HILOGI("Pointer and tp device dose not support, simulate poinevent failed");
-#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
+    MMI_HILOGW("Pointer and tp device dose not support");
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 
 int32_t InputManagerImpl::SetPointerVisible(bool visible)

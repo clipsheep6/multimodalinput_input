@@ -32,12 +32,12 @@ public:
     EventFilterWrap();
     DISALLOW_COPY_AND_MOVE(EventFilterWrap);
     ~EventFilterWrap();
-#ifdef OHOS_BUILD_POINTER
+#ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
-#endif // OHOS_BUILD_POINTER
-#ifdef OHOS_BUILD_TOUCH
+#endif // OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCH
     int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
-#endif // OHOS_BUILD_TOUCH
+#endif // OHOS_BUILD_ENABLE_TOUCH
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
     bool HandlePointerEventFilter(std::shared_ptr<PointerEvent> point);
 private:

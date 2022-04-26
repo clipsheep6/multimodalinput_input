@@ -30,7 +30,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputHandlerManagerGlobal" };
 } // namespace
 
-#ifdef OHOS_BUILD_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t InputHandlerManagerGlobal::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPR(keyEvent, ERROR_NULL_POINTER);
@@ -38,9 +38,9 @@ int32_t InputHandlerManagerGlobal::HandleKeyEvent(std::shared_ptr<KeyEvent> keyE
     CHKPR(nextHandler_, ERROR_NULL_POINTER);
     return nextHandler_->HandleKeyEvent(keyEvent);
 }
-#endif // OHOS_BUILD_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
-#ifdef OHOS_BUILD_POINTER
+#ifdef OHOS_BUILD_ENABLE_POINTER
 int32_t InputHandlerManagerGlobal::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -52,9 +52,9 @@ int32_t InputHandlerManagerGlobal::HandlePointerEvent(std::shared_ptr<PointerEve
     CHKPR(nextHandler_, ERROR_NULL_POINTER);
     return nextHandler_->HandlePointerEvent(pointerEvent);
 }
-#endif // OHOS_BUILD_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER
 
-#ifdef OHOS_BUILD_TOUCH
+#ifdef OHOS_BUILD_ENABLE_TOUCH
 int32_t InputHandlerManagerGlobal::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -66,7 +66,7 @@ int32_t InputHandlerManagerGlobal::HandleTouchEvent(std::shared_ptr<PointerEvent
     CHKPR(nextHandler_, ERROR_NULL_POINTER);
     return nextHandler_->HandleTouchEvent(pointerEvent);
 }
-#endif // OHOS_BUILD_TOUCH
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
 int32_t InputHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
@@ -110,7 +110,7 @@ void InputHandlerManagerGlobal::MarkConsumed(int32_t handlerId, int32_t eventId,
     monitors_.MarkConsumed(handlerId, eventId, session);
 }
 
-#ifdef OHOS_BUILD_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_HILOGD("Handle KeyEvent");
@@ -125,9 +125,9 @@ bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
     }
     return false;
 }
-#endif // OHOS_BUILD_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
-#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
@@ -142,7 +142,7 @@ bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointe
     MMI_HILOGD("Interception and monitor failed");
     return false;
 }
-#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 void InputHandlerManagerGlobal::InitSessionLostCallback()
 {
@@ -258,7 +258,7 @@ int32_t InputHandlerManagerGlobal::MonitorCollection::GetPriority() const
     return IInputEventMonitorHandler::DEFAULT_MONITOR;
 }
 
-#ifdef OHOS_BUILD_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 bool InputHandlerManagerGlobal::MonitorCollection::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPF(keyEvent);
@@ -268,19 +268,19 @@ bool InputHandlerManagerGlobal::MonitorCollection::HandleEvent(std::shared_ptr<K
     }
     return false;
 }
-#endif // OHOS_BUILD_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
-#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 bool InputHandlerManagerGlobal::MonitorCollection::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
-#ifdef OHOS_BUILD_TOUCH
+#ifdef OHOS_BUILD_ENABLE_TOUCH
     UpdateConsumptionState(pointerEvent);
-#endif // OHOS_BUILD_TOUCH
+#endif // OHOS_BUILD_ENABLE_TOUCH
     Monitor(pointerEvent);
     return isMonitorConsumed_;
 }
-#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 bool InputHandlerManagerGlobal::MonitorCollection::HasMonitor(int32_t monitorId, SessionPtr session)
 {
@@ -288,7 +288,7 @@ bool InputHandlerManagerGlobal::MonitorCollection::HasMonitor(int32_t monitorId,
     return (monitors_.find(monitor) != monitors_.end());
 }
 
-#ifdef OHOS_BUILD_TOUCH
+#ifdef OHOS_BUILD_ENABLE_TOUCH
 void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
@@ -312,9 +312,9 @@ void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::s
         lastPointerEvent_.reset();
     }
 }
-#endif // OHOS_BUILD_TOUCH
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
-#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 void InputHandlerManagerGlobal::MonitorCollection::Monitor(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
@@ -323,7 +323,7 @@ void InputHandlerManagerGlobal::MonitorCollection::Monitor(std::shared_ptr<Point
         monitor.SendToClient(pointerEvent);
     }
 }
-#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 void InputHandlerManagerGlobal::MonitorCollection::OnSessionLost(SessionPtr session)
 {

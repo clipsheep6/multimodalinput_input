@@ -178,13 +178,13 @@ int32_t MMIService::Init()
         MMI_HILOGE("Windows message init failed");
         return WINDOWS_MSG_INIT_FAIL;
     }
-#ifdef OHOS_BUILD_POINTER
+#ifdef OHOS_BUILD_ENABLE_POINTER
     MMI_HILOGD("PointerDrawingManager Init");
     if (!IPointerDrawingManager::GetInstance()->Init()) {
         MMI_HILOGE("Pointer draw init failed");
         return POINTER_DRAW_INIT_FAIL;
     }
-#endif // OHOS_BUILD_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER
     mmiFd_ = EpollCreat(MAX_EVENT_SIZE);
     if (mmiFd_ < 0) {
         MMI_HILOGE("Epoll creat failed");

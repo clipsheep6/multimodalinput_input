@@ -76,7 +76,7 @@ void InterceptorManagerGlobal::OnRemoveInterceptor(int32_t id)
     interceptors_.erase(iter);
 }
 
-#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 bool InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_LOG_ENTER;
@@ -104,7 +104,7 @@ bool InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<PointerEvent> poin
     }
     return true;
 }
-#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 bool InterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {

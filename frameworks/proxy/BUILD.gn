@@ -98,15 +98,15 @@ ohos_shared_library("libmmi-client") {
 
 
   if (mmi_enable_keyboard) {
-    cflags += [ "-DOHOS_BUILD_KEYBOARD" ]
+    cflags += [ "-DOHOS_BUILD_ENABLE_KEYBOARD" ]
   }
 
   if (mmi_enable_mouse) {
-    cflags += [ "-DOHOS_BUILD_POINTER" ]
+    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER" ]
   }
 
   if (mmi_enable_tp) {
-    cflags += [ "-DOHOS_BUILD_TOUCH" ]
+    cflags += [ "-DOHOS_BUILD_ENABLE_TOUCH" ]
   }
 
   if (mmi_enable_interceptor) {
@@ -314,15 +314,15 @@ ohos_unittest("InputManagerTest") {
   }
 
   if (mmi_enable_keyboard) {
-    cflags += [ "-DOHOS_BUILD_KEYBOARD" ]
+    cflags += [ "-DOHOS_BUILD_ENABLE_KEYBOARD" ]
   }
 
   if (mmi_enable_mouse) {
-    cflags += [ "-DOHOS_BUILD_POINTER" ]
+    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER" ]
   }
 
   if (mmi_enable_tp) {
-    cflags += [ "-DOHOS_BUILD_TOUCH" ]
+    cflags += [ "-DOHOS_BUILD_ENABLE_TOUCH" ]
   }
 
   sources = [ "events/test/input_manager_test.cpp" ]

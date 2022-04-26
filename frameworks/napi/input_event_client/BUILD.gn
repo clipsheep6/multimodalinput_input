@@ -33,7 +33,7 @@ config("libinputeventclient_config") {
   }
 
   if (mmi_enable_keyboard) {
-    cflags += [ "-DOHOS_BUILD_KEYBOARD" ]
+    cflags += [ "-DOHOS_BUILD_ENABLE_KEYBOARD" ]
   }
 }
 

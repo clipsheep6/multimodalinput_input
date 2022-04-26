@@ -33,14 +33,14 @@ public:
     std::shared_ptr<PointerEvent> OnLibInput(struct libinput_event *event, INPUT_DEVICE_TYPE deviceType);
 
 private:
-#ifdef OHOS_BUILD_TOUCH
+#ifdef OHOS_BUILD_ENABLE_TOUCH
     std::shared_ptr<PointerEvent> OnLibinputTouchEvent(struct libinput_event *event);
     std::shared_ptr<PointerEvent> OnLibinputTabletToolEvent(struct libinput_event *event);
-#endif // OHOS_BUILD_TOUCH
-#ifdef OHOS_BUILD_POINTER
+#endif // OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_POINTER
     std::shared_ptr<PointerEvent> OnLibinputTouchPadEvent(struct libinput_event *event);
     std::shared_ptr<PointerEvent> OnTouchPadGestrueEvent(struct libinput_event *event);
-#endif // OHOS_BUILD_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER
 
 private:
     std::map<int32_t, std::shared_ptr<TransformPointProcessor>> processors_;

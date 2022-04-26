@@ -178,7 +178,7 @@ bool InputHandlerManager::PostTask(int32_t handlerId, const AppExecFwk::EventHan
     return MMIEventHandler::PostTask(eventHandler, callback);
 }
 
-#ifdef OHOS_BUILD_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void InputHandlerManager::OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consumer, int32_t handlerId,
     std::shared_ptr<KeyEvent> keyEvent)
 {
@@ -202,9 +202,9 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEve
     }
     MMI_HILOGD("key event id:%{public}d keyCode:%{public}d", handlerId, keyEvent->GetKeyCode());
 }
-#endif // OHOS_BUILD_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
-#if defined(OHOS_BUILD_POINTERE) || defined(OHOS_BUILD_TOUCH)
+#if defined(OHOS_BUILD_POINTERE) || defined(OHOS_BUILD_ENABLE_TOUCH)
 void InputHandlerManager::OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer, int32_t handlerId,
     std::shared_ptr<PointerEvent> pointerEvent)
 {

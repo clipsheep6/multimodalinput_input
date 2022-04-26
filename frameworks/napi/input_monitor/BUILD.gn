@@ -32,15 +32,15 @@ config("libinputmonitor_config") {
   }
 
   if (mmi_enable_keyboard) {
-    cflags += [ "-DOHOS_BUILD_KEYBOARD" ]
+    cflags += [ "-DOHOS_BUILD_ENABLE_KEYBOARD" ]
   }
 
   if (mmi_enable_mouse) {
-    cflags += [ "-DOHOS_BUILD_POINTER" ]
+    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER" ]
   }
 
   if (mmi_enable_tp) {
-    cflags += [ "-DOHOS_BUILD_TOUCH" ]
+    cflags += [ "-DOHOS_BUILD_ENABLE_TOUCH" ]
   }
 }
 

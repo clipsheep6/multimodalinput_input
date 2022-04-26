@@ -19,7 +19,6 @@
 #include "input_event_monitor_manager.h"
 #include "input_manager_impl.h"
 #include "interceptor_manager.h"
-#include "key_event_input_subscribe_manager.h"
 #include "define_multimodal.h"
 #include "multimodal_event_handler.h"
 
@@ -64,21 +63,12 @@ void InputManager::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsum
 int32_t InputManager::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
     std::function<void(std::shared_ptr<KeyEvent>)> callback)
 {
-#ifdef OHOS_BUILD_KEYBOARD
-    return KeyEventInputSubscribeMgr.SubscribeKeyEvent(keyOption, callback);
-#else
-    MMI_HILOGI("Keyboard device dose not support, subscribe keyEvent failed");
-    return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_KEYBOARD
+    return InputMgrImpl->SubscribeKeyEvent(keyOption, callback);
 }
 
 void InputManager::UnsubscribeKeyEvent(int32_t subscriberId)
 {
-#ifdef OHOS_BUILD_KEYBOARD
-    KeyEventInputSubscribeMgr.UnSubscribeKeyEvent(subscriberId);
-#else
-    MMI_HILOGI("Keyboard device dose not support, unsubscribe keyEvent failed");
-#endif // OHOS_BUILD_KEYBOARD
+    InputMgrImpl->UnsubscribeKeyEvent(subscriberId);
 }
 
 int32_t InputManager::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor)

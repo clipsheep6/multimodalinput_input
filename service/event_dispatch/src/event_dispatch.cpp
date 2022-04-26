@@ -43,7 +43,7 @@ EventDispatch::EventDispatch() {}
 
 EventDispatch::~EventDispatch() {}
 
-#ifdef OHOS_BUILD_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t EventDispatch::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_LOG_ENTER;
@@ -88,27 +88,27 @@ int32_t EventDispatch::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     session->AddEvent(keyEvent->GetId(), currentTime);
     return RET_OK;
 }
-#endif // OHOS_BUILD_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
-#ifdef OHOS_BUILD_POINTER
+#ifdef OHOS_BUILD_ENABLE_POINTER
 int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_LOG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     return DispatchPointerEvent(pointerEvent);
 }
-#endif // OHOS_BUILD_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER
 
-#ifdef OHOS_BUILD_TOUCH
+#ifdef OHOS_BUILD_ENABLE_TOUCH
 int32_t EventDispatch::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_LOG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     return DispatchPointerEvent(pointerEvent);
 }
-#endif // OHOS_BUILD_TOUCH
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
-#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t EventDispatch::DispatchPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -146,7 +146,7 @@ int32_t EventDispatch::DispatchPointerEvent(std::shared_ptr<PointerEvent> pointe
     session->AddEvent(pointerEvent->GetId(), currentTime);
     return RET_OK;
 }
-#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 bool EventDispatch::TriggerANR(int64_t time, SessionPtr sess)
 {
