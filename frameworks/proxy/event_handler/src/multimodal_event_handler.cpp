@@ -144,6 +144,7 @@ int32_t MultimodalEventHandler::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
 }
 #endif //OHOS_BUILD_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
 int32_t MultimodalEventHandler::AddInterceptor(int32_t sourceType, int32_t id)
 {
     if (!InitClient()) {
@@ -157,8 +158,9 @@ int32_t MultimodalEventHandler::AddInterceptor(int32_t sourceType, int32_t id)
     MMI_HILOGD("client add a touchpad event interceptor");
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 
-
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
 int32_t MultimodalEventHandler::RemoveInterceptor(int32_t id)
 {
     if (!InitClient()) {
@@ -172,6 +174,7 @@ int32_t MultimodalEventHandler::RemoveInterceptor(int32_t id)
     MMI_HILOGD("client remove a touchpad event interceptor");
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 
 int32_t MultimodalEventHandler::AddInputEventMontior(int32_t keyEventType)
 {

@@ -79,6 +79,10 @@ config("libmmi_server_config") {
     cflags += [ "-DOHOS_BUILD_ENABLE_POINTER_DRAWING" ]
   }
 
+  if (mmi_enable_interceptor) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_INTERCEPTOR" ]
+  }
+
   if (mmi_enable_keyboard) {
     cflags += [ "-DOHOS_BUILD_KEYBOARD" ]
   }
@@ -135,14 +139,18 @@ ohos_shared_library("libmmi-server") {
   if (mmi_enable_keyboard) {
     sources += [
       "event_handler/src/key_event_handler.cpp",
-      "event_package/src/event_package.cpp",
-      "interceptor/src/interceptor_manager_global.cpp",
+      "event_package/src/event_package.cpp",      
       "subscriber/src/key_event_subscriber.cpp",
     ]
     if (mmi_enable_combinationkey) {
       sources += [ "key_command/src/key_command_manager.cpp" ]
     } else {
       sources += [ "key_command/src/i_key_command_manager.cpp" ]
+    }
+    if (mmi_enable_interceptor) {
+      sources += [ "interceptor/src/interceptor_manager_global.cpp" ]
+    } else {
+      sources += [ "interceptor/src/i_interceptor_manager_global.cpp" ]
     }
   }
 
@@ -169,6 +177,16 @@ ohos_shared_library("libmmi-server") {
         "touch_transform_point/src/touch_transform_point_processor.cpp",
       ]
     }
+  }
+
+  if (mmi_enable_interceptor) {
+    sources += [
+      "interceptor/src/interceptor_handler_global.cpp",
+    ]
+  } else {
+    sources += [
+      "interceptor/src/i_interceptor_handler_global.cpp"
+    ]
   }
 
   sources += [ "module_loader/src/mmi_service.cpp" ]

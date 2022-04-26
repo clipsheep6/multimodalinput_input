@@ -13,25 +13,26 @@
  * limitations under the License.
  */
 
-#include "i_key_command_manager.h"
+#include "i_input_interceptor_manager.h"
+#include "input_handler_type.h"
+#include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IKeyCommandManager" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IInputInterceptorManager" };
 } // namespace
 
-std::shared_ptr<IKeyCommandManager> IKeyCommandManager::CreateInstance()
+int32_t IInputInterceptorManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
 {
-    return std::make_shared<IKeyCommandManager>();
+    MMI_HILOGD("Add input module dose not support");
+    return INVALID_HANDLER_ID;
 }
 
-int32_t IKeyCommandManager::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+void IInputInterceptorManager::RemoveInterceptor(int32_t interceptorId)
 {
-    CHKPR(keyEvent, ERROR_NULL_POINTER);
-    MMI_HILOGI("Combination key is not supported");
-    CHKPR(nextHandler_, ERROR_NULL_POINTER);
-    return nextHandler_->HandleKeyEvent(keyEvent);
+    MMI_HILOGD("Remove input module dose not support");
+    return;
 }
 } // namespace MMI
 } // namespace OHOS

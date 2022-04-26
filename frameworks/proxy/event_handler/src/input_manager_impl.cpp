@@ -21,9 +21,9 @@
 #include "error_multimodal.h"
 
 #include "bytrace_adapter.h"
+#include "define_interceptor_manager.h"
 #include "event_filter_service.h"
 #include "input_event_monitor_manager.h"
-#include "interceptor_manager.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
@@ -429,7 +429,7 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent
     std::lock_guard<std::mutex> guard(mtx_);
     auto consumer = std::make_shared<MonitorEventConsumer>(monitor);
     CHKPR(consumer, ERROR_NULL_POINTER);
-    return InputManagerImpl::AddMonitor(consumer);
+    return AddMonitor(consumer);
 #else
     MMI_HILOGI("Keyboard device dose not support, add monitor failed");
     return ERROR_UNSUPPORT;
@@ -444,7 +444,7 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<PointerE
     std::lock_guard<std::mutex> guard(mtx_);
     auto consumer = std::make_shared<MonitorEventConsumer>(monitor);
     CHKPR(consumer, ERROR_NULL_POINTER);
-    return InputManagerImpl::AddMonitor(consumer);
+    return AddMonitor(consumer);
 #else
     MMI_HILOGI("Pointer and tp device dose not support, add monitor failed");
     return ERROR_UNSUPPORT;
@@ -458,8 +458,7 @@ int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consum
         MMI_HILOGE("client init failed");
         return -1;
     }
-    int32_t monitorId = monitorManager_.AddMonitor(consumer);
-    return monitorId;
+    return monitorManager_.AddMonitor(consumer);
 }
 
 void InputManagerImpl::RemoveMonitor(int32_t monitorId)
@@ -506,7 +505,7 @@ int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> in
         return -1;
     }
     std::lock_guard<std::mutex> guard(mtx_);
-    int32_t interceptorId = interceptorManager_.AddInterceptor(interceptor);
+    int32_t interceptorId = InputInterMgr->AddInterceptor(interceptor);
     if (interceptorId >= 0) {
         interceptorId = interceptorId * ADD_MASK_BASE + MASK_TOUCH;
     }
@@ -531,7 +530,7 @@ int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyE
         MMI_HILOGE("client init failed");
         return -1;
     }
-    int32_t interceptorId = InterceptorMgr.AddInterceptor(interceptor);
+    int32_t interceptorId = InterMgr->AddInterceptor(interceptor);
     if (interceptorId >= 0) {
         interceptorId = interceptorId * ADD_MASK_BASE + MASK_KEY;
     }
@@ -558,7 +557,7 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
     switch (mask) {
         case MASK_TOUCH: {
 #ifdef OHOS_BUILD_TOUCH
-            interceptorManager_.RemoveInterceptor(interceptorId);
+            InputInterMgr->RemoveInterceptor(interceptorId);
 #else
             MMI_HILOGI("Tp device dose not support, remove interceptor failed");
 #endif // OHOS_BUILD_TOUCH
@@ -566,16 +565,15 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
         }
         case MASK_KEY: {
 #ifdef OHOS_BUILD_KEYBOARD
-            InterceptorMgr.RemoveInterceptor(interceptorId);
+            InterMgr->RemoveInterceptor(interceptorId);
 #else
             MMI_HILOGI("Keyboard device dose not support, remove interceptor failed");
 #endif // OHOS_BUILD_KEYBOARD
             break;
         }
-        default: {
+        default:
             MMI_HILOGE("Can't find the mask, mask:%{public}d", mask);
             break;
-        }
     }
 }
 

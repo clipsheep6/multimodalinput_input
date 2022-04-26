@@ -104,27 +104,9 @@ private:
         bool isMonitorConsumed_ { false };
     };
 
-    struct InterceptorCollection : public IInputEventMonitorHandler, protected NoCopyable {
-        virtual int32_t GetPriority() const override;
-#ifdef OHOS_BUILD_KEYBOARD
-        virtual bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent) override;
-#endif // OHOS_BUILD_KEYBOARD
-#if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
-        virtual bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent) override;
-#endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
-
-        int32_t AddInterceptor(const SessionHandler& interceptor);
-        void RemoveInterceptor(const SessionHandler& interceptor);
-        void OnSessionLost(SessionPtr session);
-
-        std::mutex lockInterceptors_;
-        std::set<SessionHandler> interceptors_;
-    };
-
 private:
     bool sessionLostCallbackInitialized_ { false };
     MonitorCollection monitors_;
-    InterceptorCollection interceptors_;
 };
 } // namespace MMI
 } // namespace OHOS

@@ -20,6 +20,8 @@
 #include "event_dump.h"
 #include "event_package.h"
 #include "hos_key_event.h"
+#include "i_interceptor_handler_global.h"
+#include "i_interceptor_manager_global.h"
 #include "input_device_manager.h"
 #include "input_event.h"
 #include "input_event_data_transformation.h"
@@ -27,7 +29,6 @@
 #include "input_event_monitor_manager.h"
 #include "input_handler_manager_global.h"
 #include "input_windows_manager.h"
-#include "interceptor_manager_global.h"
 #include "key_event_subscriber.h"
 #include "mmi_func_callback.h"
 #include "time_cost_chk.h"
@@ -345,6 +346,7 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
 
 int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, NetPacket& pkt)
 {
+    CHKPR(sess, ERROR_NULL_POINTER);
     int32_t handlerId;
     InputHandlerType handlerType;
     if (!pkt.Read(handlerId)) {
@@ -362,11 +364,17 @@ int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, NetPacket& pkt)
     keyInputHandlerMgr->AddInputHandler(handlerId, handlerType, sess);
 #endif // OHOS_BUILD_KEYBOARD
 #ifdef OHOS_BUILD_POINTER
+    auto pointerInterceptorMgr = InputHandler->GetPointerInterceptorMgr();
+    CHKPR(pointerInterceptorMgr, ERROR_NULL_POINTER);
+    pointerInterceptorMgr->AddInputHandler(handlerId, handlerType, sess);
     auto pointerInputHandlerMgr = InputHandler->GetPointerInputHandlerMgr();
     CHKPR(pointerInputHandlerMgr, ERROR_NULL_POINTER);
     pointerInputHandlerMgr->AddInputHandler(handlerId, handlerType, sess);
 #endif // OHOS_BUILD_POINTER
 #ifdef OHOS_BUILD_TOUCH
+    auto touchInterceptorMgr = InputHandler->GetTouchInterceptorMgr();
+    CHKPR(touchInterceptorMgr, ERROR_NULL_POINTER);
+    touchInterceptorMgr->AddInputHandler(handlerId, handlerType, sess);
     auto touchInputHandlerMgr = InputHandler->GetTouchInputHandlerMgr();
     CHKPR(touchInputHandlerMgr, ERROR_NULL_POINTER);
     touchInputHandlerMgr->AddInputHandler(handlerId, handlerType, sess);
@@ -376,6 +384,7 @@ int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, NetPacket& pkt)
 
 int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, NetPacket& pkt)
 {
+    CHKPR(sess, ERROR_NULL_POINTER);
     int32_t handlerId;
     InputHandlerType handlerType;
     if (!pkt.Read(handlerId)) {
@@ -393,11 +402,17 @@ int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, NetPacket& pkt)
     keyInputHandlerMgr->RemoveInputHandler(handlerId, handlerType, sess);
 #endif // OHOS_BUILD_KEYBOARD
 #ifdef OHOS_BUILD_POINTER
+    auto pointerInterceptorMgr = InputHandler->GetPointerInterceptorMgr();
+    CHKPR(pointerInterceptorMgr, ERROR_NULL_POINTER);
+    pointerInterceptorMgr->RemoveInputHandler(handlerId, handlerType, sess);
     auto pointerInputHandlerMgr = InputHandler->GetPointerInputHandlerMgr();
     CHKPR(pointerInputHandlerMgr, ERROR_NULL_POINTER);
     pointerInputHandlerMgr->RemoveInputHandler(handlerId, handlerType, sess);
 #endif // OHOS_BUILD_POINTER
 #ifdef OHOS_BUILD_TOUCH
+    auto touchInterceptorMgr = InputHandler->GetTouchInterceptorMgr();
+    CHKPR(touchInterceptorMgr, ERROR_NULL_POINTER);
+    touchInterceptorMgr->RemoveInputHandler(handlerId, handlerType, sess);
     auto touchInputHandlerMgr = InputHandler->GetTouchInputHandlerMgr();
     CHKPR(touchInputHandlerMgr, ERROR_NULL_POINTER);
     touchInputHandlerMgr->RemoveInputHandler(handlerId, handlerType, sess);
@@ -787,7 +802,7 @@ int32_t ServerMsgHandler::OnRemoveTouchpadEventFilter(SessionPtr sess, NetPacket
 {
     CHKPR(sess, ERROR_NULL_POINTER);
     int32_t id = 0;
-    pkt  >> id;
+    pkt >> id;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read data failed");
         return PACKET_READ_FAIL;

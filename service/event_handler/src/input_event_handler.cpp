@@ -222,7 +222,7 @@ std::shared_ptr<IInputEventHandler> InputEventHandler::BuildKeyHandlerChain()
 #ifdef OHOS_BUILD_KEYBOARD
     auto keyEventHandler = std::make_shared<KeyEventHandler>();
     CHKPP(keyEventHandler);
-    keyInterceptor_ = std::make_shared<InterceptorManagerGlobal>();
+    keyInterceptor_ = IInterceptorManagerGlobal::CreateInstance();
     CHKPP(keyInterceptor_);
     keyEventHandler->SetNext(keyInterceptor_);
     auto keyCommandHandler = IKeyCommandManager::CreateInstance();
@@ -250,9 +250,12 @@ std::shared_ptr<IInputEventHandler> InputEventHandler::BuildPointerHandlerChain(
     pointerEventFilter_ = std::make_shared<EventFilterWrap>();
     CHKPP(pointerEventFilter_);
     pointerEventHandler->SetNext(pointerEventFilter_);
+    pointerInterceptorMgr_ = IInterceptorHandlerGlobal::CreateInstance();
+    CHKPP(pointerInterceptorMgr_);
+    pointerEventFilter_->SetNext(pointerInterceptorMgr_);
     pointerInputHandlerMgr_ = std::make_shared<InputHandlerManagerGlobal>();
     CHKPP(pointerInputHandlerMgr_);
-    pointerEventFilter_->SetNext(pointerInputHandlerMgr_);
+    pointerInterceptorMgr_->SetNext(pointerInputHandlerMgr_);  
     auto pointerDispatch = std::make_shared<EventDispatch>();
     CHKPP(pointerDispatch);
     pointerInputHandlerMgr_->SetNext(pointerDispatch);
@@ -270,6 +273,8 @@ std::shared_ptr<IInputEventHandler> InputEventHandler::BuildTouchHandlerChain()
     touchEventFilter_ = std::make_shared<EventFilterWrap>();
     CHKPP(touchEventFilter_);
     touchEventHandler->SetNext(touchEventFilter_);
+    touchInterceptorMgr_ = IInterceptorHandlerGlobal::CreateInstance();
+    CHKPP(touchInterceptorMgr_);
     touchInputHandlerMgr_ = std::make_shared<InputHandlerManagerGlobal>();
     CHKPP(touchInputHandlerMgr_);
     touchEventFilter_->SetNext(touchInputHandlerMgr_);
@@ -322,7 +327,7 @@ std::shared_ptr<IInputEventHandler> InputEventHandler::GetTouchEventHandler() co
     return iTouchEventHandler_;
 }
 
-std::shared_ptr<InterceptorManagerGlobal> InputEventHandler::GetKeyInterceptor() const
+std::shared_ptr<IInterceptorManagerGlobal> InputEventHandler::GetKeyInterceptor() const
 {
     return keyInterceptor_;
 }
@@ -342,6 +347,11 @@ std::shared_ptr<EventFilterWrap> InputEventHandler::GetPointerEventFilter() cons
     return pointerEventFilter_;
 }
 
+std::shared_ptr<IInterceptorHandlerGlobal> InputEventHandler::GetPointerInterceptorMgr() const
+{
+    return pointerInterceptorMgr_;
+}
+
 std::shared_ptr<InputHandlerManagerGlobal> InputEventHandler::GetPointerInputHandlerMgr() const
 {
     return pointerInputHandlerMgr_;
@@ -350,6 +360,11 @@ std::shared_ptr<InputHandlerManagerGlobal> InputEventHandler::GetPointerInputHan
 std::shared_ptr<EventFilterWrap> InputEventHandler::GetTouchEventFilter() const
 {
     return touchEventFilter_;
+}
+
+std::shared_ptr<IInterceptorHandlerGlobal> InputEventHandler::GetTouchInterceptorMgr() const
+{
+   return touchInterceptorMgr_;
 }
 
 std::shared_ptr<InputHandlerManagerGlobal> InputEventHandler::GetTouchInputHandlerMgr() const

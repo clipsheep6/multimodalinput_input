@@ -91,41 +91,40 @@ int32_t EventDispatch::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 #endif // OHOS_BUILD_KEYBOARD
 
 #ifdef OHOS_BUILD_POINTER
-int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> pointEvent)
+int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_LOG_ENTER;
-    CHKPR(pointEvent, ERROR_NULL_POINTER);
-    return DispatchPointerEvent(pointEvent);
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    return DispatchPointerEvent(pointerEvent);
 }
 #endif // OHOS_BUILD_POINTER
 
 #ifdef OHOS_BUILD_TOUCH
-int32_t EventDispatch::HandleTouchEvent(std::shared_ptr<PointerEvent> pointEvent)
+int32_t EventDispatch::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_LOG_ENTER;
-    CHKPR(pointEvent, ERROR_NULL_POINTER);
-    return DispatchPointerEvent(pointEvent);
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    return DispatchPointerEvent(pointerEvent);
 }
 #endif // OHOS_BUILD_TOUCH
 
 #if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
-int32_t EventDispatch::DispatchPointerEvent(std::shared_ptr<PointerEvent> pointEvent)
+int32_t EventDispatch::DispatchPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CHKPR(pointEvent, ERROR_NULL_POINTER);
-    auto fd = WinMgr->UpdateTargetPointer(pointEvent);
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    auto fd = WinMgr->UpdateTargetPointer(pointerEvent);
     if (fd < 0) {
         MMI_HILOGE("The fd less than 0, fd: %{public}d", fd);
         return RET_ERR;
     }
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
-    InputEventDataTransformation::Marshalling(pointEvent, pkt);
-    BytraceAdapter::StartBytrace(pointEvent, BytraceAdapter::TRACE_STOP);
+    InputEventDataTransformation::Marshalling(pointerEvent, pkt);
+    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP);
     auto udsServer = InputHandler->GetUDSServer();
     if (udsServer == nullptr) {
         MMI_HILOGE("UdsServer is a nullptr");
         return RET_ERR;
     }
-
     auto session = udsServer->GetSession(fd);
     CHKPF(session);
     if (session->isANRProcess_) {
@@ -144,7 +143,7 @@ int32_t EventDispatch::DispatchPointerEvent(std::shared_ptr<PointerEvent> pointE
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return RET_ERR;
     }
-    session->AddEvent(pointEvent->GetId(), currentTime);
+    session->AddEvent(pointerEvent->GetId(), currentTime);
     return RET_OK;
 }
 #endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH

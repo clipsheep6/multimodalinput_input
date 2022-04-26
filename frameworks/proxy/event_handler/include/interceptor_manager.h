@@ -21,19 +21,19 @@
 #include "nocopyable.h"
 #include "singleton.h"
 
-#include "multimodal_event_handler.h"
+#include "i_interceptor_manager.h"
 #include "pointer_event.h"
 
 namespace OHOS {
 namespace MMI {
-class InterceptorManager {
+class InterceptorManager : public DelayedSingleton<InterceptorManager> {
 public:
     static constexpr int32_t SOURCETYPE_KEY = 4;
 
 public:
     InterceptorManager();
     DISALLOW_COPY_AND_MOVE(InterceptorManager);
-    ~InterceptorManager();
+    ~InterceptorManager() = default;
 #if defined(OHOS_BUILD_POINTER) || defined(OHOS_BUILD_TOUCH)
     int32_t AddInterceptor(int32_t sourceType, std::function<void(std::shared_ptr<PointerEvent>)> interceptor);
 #endif // OHOS_BUILD_POINTER || OHOS_BUILD_TOUCH
@@ -62,11 +62,9 @@ private:
         std::function<void(std::shared_ptr<KeyEvent>)> callback_;
     };
 private:
-    int32_t InterceptorItemId;
+    int32_t InterceptorItemId = 0;
     std::list<InterceptorItem> interceptor_;
 };
-
-#define InterceptorMgr OHOS::Singleton<InterceptorManager>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // INTERCEPTOR_MANAGER_H
