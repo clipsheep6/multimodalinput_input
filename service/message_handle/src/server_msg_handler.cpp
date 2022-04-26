@@ -17,6 +17,7 @@
 
 #include <cinttypes>
 
+#include "define_interceptor_global.h"
 #include "event_dump.h"
 #include "event_package.h"
 #include "hos_key_event.h"
@@ -25,7 +26,6 @@
 #include "input_event_data_transformation.h"
 #include "i_input_handler_manager_global.h"
 #include "input_windows_manager.h"
-#include "interceptor_manager_global.h"
 #include "key_event_subscriber.h"
 #include "mmi_func_callback.h"
 #include "time_cost_chk.h"
@@ -289,6 +289,7 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
 
 int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, NetPacket& pkt)
 {
+    CHKPR(sess, ERROR_NULL_POINTER);
     int32_t handlerId;
     InputHandlerType handlerType;
     if (!pkt.Read(handlerId)) {
@@ -305,6 +306,7 @@ int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, NetPacket& pkt)
 
 int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, NetPacket& pkt)
 {
+    CHKPR(sess, ERROR_NULL_POINTER);
     int32_t handlerId;
     InputHandlerType handlerType;
     if (!pkt.Read(handlerId)) {
@@ -602,7 +604,7 @@ int32_t ServerMsgHandler::OnAddTouchpadEventFilter(SessionPtr sess, NetPacket& p
         MMI_HILOGE("Packet read sourceType failed");
         return PACKET_READ_FAIL;
     }
-    InterceptorMgrGbl.OnAddInterceptor(sourceType, id, sess);
+    InterMgrGl->OnAddInterceptor(sourceType, id, sess);
     return RET_OK;
 }
 
@@ -610,12 +612,12 @@ int32_t ServerMsgHandler::OnRemoveTouchpadEventFilter(SessionPtr sess, NetPacket
 {
     CHKPR(sess, ERROR_NULL_POINTER);
     int32_t id = 0;
-    pkt  >> id;
+    pkt >> id;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read data failed");
         return PACKET_READ_FAIL;
     }
-    InterceptorMgrGbl.OnRemoveInterceptor(id);
+    InterMgrGl->OnRemoveInterceptor(id);
     return RET_OK;
 }
 

@@ -23,12 +23,12 @@
 #include "hisysevent.h"
 
 #include "bytrace_adapter.h"
+#include "define_interceptor_global.h"
 #include "error_multimodal.h"
 #include "event_filter_wrap.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "input_handler_manager_global.h"
-#include "interceptor_manager_global.h"
 #include "key_event_subscriber.h"
 #include "util.h"
 
@@ -107,7 +107,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
     }
     if (IInputHandlerManagerGlobal::GetInstance()->HandleEvent(point)) {
         BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
-        MMI_HILOGD("Interception and monitor succeeded");
+        MMI_HILOGD("Monitor is succeeded");
         return RET_OK;
     }
     auto fd = WinMgr->UpdateTargetPointer(point);
@@ -151,7 +151,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
     CALL_LOG_ENTER;
     CHKPR(key, PARAM_INPUT_INVALID);
     if (!key->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
-        if (InterceptorMgrGbl.OnKeyEvent(key)) {
+        if (InterMgrGl->OnKeyEvent(key)) {
             MMI_HILOGD("keyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d",
                 key->GetKeyCode());
             BytraceAdapter::StartBytrace(key, BytraceAdapter::KEY_INTERCEPT_EVENT);
