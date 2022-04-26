@@ -23,6 +23,7 @@
 #include "error_multimodal.h"
 #include "mmi_log.h"
 #include "multimodal_input_connect_define.h"
+#include "time_cost_chk.h"
 
 namespace OHOS {
 namespace MMI {
@@ -33,67 +34,26 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Multi
 int32_t MultimodalInputConnectStub::OnRemoteRequest(
     uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
-    CALL_LOG_ENTER;
-    MMI_HILOGD("request ode:%{public}d", code);
+    int32_t pid = GetCallingPid();
+    TimeCostChk chk("IPC-RemoteRequest", "overtime 300(us)", MAX_OVER_TIME, pid,
+        static_cast<int64_t>(code));
+    uint64_t tid = GetThisThreadId();
+    MMI_HILOGD("request code:%{public}d tid:%{public}" PRId64 "", code, tid);
 
     std::u16string descriptor = data.ReadInterfaceToken();
     if (descriptor != IMultimodalInputConnect::GetDescriptor()) {
         MMI_HILOGE("get unexpect descriptor:%{public}s", Str16ToStr8(descriptor).c_str());
         return ERR_INVALID_STATE;
     }
-
-    switch (code) {
-        case IMultimodalInputConnect::ALLOC_SOCKET_FD: {
-            return StubHandleAllocSocketFd(data, reply);
-        }
-        case IMultimodalInputConnect::ADD_INPUT_EVENT_FILTER: {
-            return StubAddInputEventFilter(data, reply);
-        }
-        default: {
-            MMI_HILOGE("unknown code:%{public}u, go switch defaut", code);
-            return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
-        }
+    if (!rMsgHandler_.ChkKey(code)) {
+        MMI_HILOGE("unknown code:%{public}u, go switch defaut", code);
+        return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
-}
-
-int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply)
-{
-    CALL_LOG_ENTER;
-    int32_t ret = RET_OK;
-
-    do {
-        const int32_t uid = GetCallingUid();
-        if (uid != SYSTEM_UID && uid != ROOT_UID) {
-            MMI_HILOGE("check failed, uid is not root or system");
-            ret = SASERVICE_PERMISSION_FAIL;
-            break;
-        }
-
-        sptr<IRemoteObject> client = data.ReadRemoteObject();
-        if (client == nullptr) {
-            MMI_HILOGE("mouse client is nullptr");
-            ret = ERR_INVALID_VALUE;
-            break;
-        }
-
-        sptr<IEventFilter> filter = iface_cast<IEventFilter>(client);
-        if (filter == nullptr) {
-            MMI_HILOGE("filter is nullptr");
-            ret = ERROR_NULL_POINTER;
-            break;
-        }
-
-        MMI_HILOGD("filter iface_cast succeeded");
-
-        ret = AddInputEventFilter(filter);
-    } while (0);
-    
-    if (!reply.WriteInt32(ret)) {
-        MMI_HILOGE("WriteInt32:%{public}d fail", ret);
-        return IPC_STUB_WRITE_PARCEL_ERR;
+    int32_t uid = GetCallingUid();
+    if (!entrustTasks_.PostSyncTask(std::bind(&RemoteMsgHandler::OnMsgHandler, &rMsgHandler_, uid, pid, code,
+        std::ref(data), std::ref(reply)))) {
+        return ERR_INVALID_STATE;
     }
-
-    MMI_HILOGD("ret:%{public}d", ret);
     return RET_OK;
 }
 } // namespace MMI

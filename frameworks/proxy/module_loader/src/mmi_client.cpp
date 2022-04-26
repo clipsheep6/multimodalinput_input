@@ -253,7 +253,7 @@ int32_t MMIClient::Socket()
         return RET_ERR;
     }
     fd_ = MultimodalInputConnectManager::GetInstance()->GetClientSocketFdOfAllocedSocketPair();
-    if (fd_ == IMultimodalInputConnect::INVALID_SOCKET_FD) {
+    if (fd_ == -1) {
         MMI_HILOGE("call GetClientSocketFdOfAllocedSocketPair return invalid fd");
     } else {
         MMI_HILOGD("call GetClientSocketFdOfAllocedSocketPair return fd:%{public}d", fd_);

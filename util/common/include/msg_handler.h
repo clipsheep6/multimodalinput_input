@@ -42,7 +42,7 @@ protected:
 
 protected:
     virtual ~MsgHandler() {};
-    T *GetMsgCallback(K id)
+    V *GetMsgCallback(K id)
     {
         auto it = callbacks_.find(id);
         if (it == callbacks_.end()) {

@@ -49,11 +49,10 @@ public:
     bool SendMsg(int32_t fd, NetPacket& pkt);
     void Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt);
     void Dump(int32_t fd);
-    int32_t GetClientFd(int32_t pid);
-    int32_t GetClientPid(int32_t fd);
+    int32_t GetClientFd(int32_t pid) const;
+    int32_t GetClientPid(int32_t fd) const;
     void AddSessionDeletedCallback(std::function<void(SessionPtr)> callback);
 
-    int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd);
     SessionPtr GetSession(int32_t fd) const;
     SessionPtr GetSessionByPid(int32_t pid) const;
 
@@ -76,7 +75,6 @@ protected:
         const int32_t pid, int32_t& serverFd, int32_t& toReturnClientFd);
 
 protected:
-    std::mutex mux_;
     bool isRunning_ = false;
     MsgServerFunCallback recvFun_ = nullptr;
     std::map<int32_t, SessionPtr> sessionsMap_;

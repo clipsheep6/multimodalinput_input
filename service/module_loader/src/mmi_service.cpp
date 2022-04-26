@@ -117,6 +117,8 @@ int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
 
 bool MMIService::InitLibinputService()
 {
+    MMI_HILOGD("input msg handler Init");
+    InputHandler->Init(*this);
 #ifdef OHOS_BUILD_HDF
     MMI_HILOGD("HDF Init");
     hdfEventManager.SetupCallback();
@@ -139,6 +141,8 @@ bool MMIService::InitLibinputService()
 
 bool MMIService::InitService()
 {
+    MMI_HILOGD("server msg handler Init");
+    sMsgHandler_.Init(*this);
     if (state_ != ServiceRunningState::STATE_NOT_START) {
         MMI_HILOGE("Service running status is not enabled");
         return false;
@@ -163,6 +167,8 @@ bool MMIService::InitService()
 
 bool MMIService::InitEntrustTasks()
 {
+    MMI_HILOGD("remote msg handler Init");
+    rMsgHandler_.Init(*this);
     if (!entrustTasks_.Init()) {
         MMI_HILOGE("entrust task init failed");
         return false;
@@ -173,23 +179,15 @@ bool MMIService::InitEntrustTasks()
         EpollClose();
         return false;
     }
+    MMI_HILOGD("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, entrustTasks_.GetReadFd());
     return true;
 }
 
 int32_t MMIService::Init()
 {
     CheckDefine();
-
-    MMI_HILOGD("InputEventHandler Init");
-    InputHandler->Init(*this);
-
-    MMI_HILOGD("ServerMsgHandler Init");
-    sMsgHandler_.Init(*this);
-    MMI_HILOGD("RemoteMsgHandler Init");
-    rMsgHandler_.Init(*this);
     MMI_HILOGD("EventDump Init");
     MMIEventDump->Init(*this);
-
     MMI_HILOGD("WindowsManager Init");
     if (!WinMgr->Init(*this)) {
         MMI_HILOGE("Windows message init failed");
@@ -253,30 +251,27 @@ void MMIService::OnDump()
     MMIEventDump->Dump();
 }
 
-int32_t MMIService::OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply,
-    MessageOption& options)
+int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd)
 {
-    int32_t pid = GetCallingPid();
-    TimeCostChk chk("IPC-RemoteRequest", "overtime 300(us)", MAX_OVER_TIME, pid,
-        static_cast<int64_t>(code));
-    uint64_t tid = GetThisThreadId();
-    MMI_HILOGD("request code:%{public}d tid:%{public}" PRId64 "", code, tid);
-
-    std::u16string descriptor = data.ReadInterfaceToken();
-    if (descriptor != IMultimodalInputConnect::GetDescriptor()) {
-        MMI_HILOGE("get unexpect descriptor:%{public}s", Str16ToStr8(descriptor).c_str());
-        return ERR_INVALID_STATE;
-    }
-    if (!rMsgHandler_.ChkKey(code)) {
-        MMI_HILOGE("unknown code:%{public}u, go switch defaut", code);
-        return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
-    }
+    MMI_HILOGI("enter, programName:%{public}s,moduleType:%{public}d", programName.c_str(), moduleType);
+    toReturnClientFd = -1;
+    int32_t serverFd = -1;
     int32_t uid = GetCallingUid();
-    if (!entrustTasks_.PostSyncTask(std::bind(&RemoteMsgHandler::OnMsgHandler, this, uid, pid, code,
-        std::ref(data), std::ref(reply)))) {
-        return ERR_INVALID_STATE;
+    int32_t pid = GetCallingPid();
+    const int32_t ret = AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd);
+    if (ret != RET_OK) {
+        MMI_HILOGE("call AddSocketPairInfo return %{public}d", ret);
+        return RET_ERR;
     }
+    MMI_HILOGIK("leave, programName:%{public}s,moduleType:%{public}d,alloc success",
+        programName.c_str(), moduleType);
     return RET_OK;
+}
+
+int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter)
+{
+    CHKPR(filter, INVALID_PARAM);
+    return InputHandler->AddInputEventFilter(filter);
 }
 
 void MMIService::OnConnected(SessionPtr s)

@@ -15,22 +15,22 @@
 
 #ifndef REMOTE_MSG_HANDLER_H
 #define REMOTE_MSG_HANDLER_H
-#include "message_parcel.h"
-#include "nocopyable.h"
+#include "iremote_object.h"
 
 #include "msg_handler.h"
-#include "uds_server.h"
+#include "i_multimodal_input_connect.h"
+#include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
-typedef std::function<int32_t(SessionPtr sess, NetPacket& pkt)> RemoteMsgFun;
-class RemoteMsgHandler : public MsgHandler<uint32_t, RemoteMsgHandler>{
+using RemoteMsgFun = std::function<void(SessionPtr, MessageParcel &, MessageParcel &)>;
+class RemoteMsgHandler : public MsgHandler<int32_t, RemoteMsgFun> {
 public:
     RemoteMsgHandler() = default;
     DISALLOW_COPY_AND_MOVE(RemoteMsgHandler);
     virtual ~RemoteMsgHandler() = default;
 
-    void Init(UDSServer& udsServer);
+    void Init(IMultimodalInputConnect& multStub);
     void OnMsgHandler(int32_t uid, int32_t pid, uint32_t code, MessageParcel& data, MessageParcel& reply);
 
 private:
@@ -38,7 +38,7 @@ private:
     void OnAddInputEventFilter(SessionPtr session, MessageParcel& data, MessageParcel& reply);
 
 private:
-    UDSServer* udsServer_ = nullptr;
+    IMultimodalInputConnect* multStub_ = nullptr;
     int32_t lastClientPid_ = 0;
     int32_t lastClientUid_ = 0;
 };

@@ -91,7 +91,6 @@ bool EntrustTasks::PostSyncTask(ETaskCallback callback, int32_t timeout)
     return task->WaitFor(timeout);
 }
 
-
 bool EntrustTasks::PostAsyncTask(ETaskCallback callback)
 {
     auto task = PostTask(callback, true);

@@ -25,6 +25,7 @@
 
 #include "i_multimodal_input_connect.h"
 #include "mmi_log.h"
+#include "multimodal_input_connect_def_parcel.h"
 #include "util.h"
 #include "util_ex.h"
 
@@ -44,7 +45,6 @@ UDSServer::~UDSServer()
 
 void UDSServer::UdsStop()
 {
-    std::lock_guard<std::mutex> lock(mux_);
     isRunning_ = false;
     if (epollFd_ != -1) {
         close(epollFd_);
@@ -57,9 +57,8 @@ void UDSServer::UdsStop()
     sessionsMap_.clear();
 }
 
-int32_t UDSServer::GetClientFd(int32_t pid)
+int32_t UDSServer::GetClientFd(int32_t pid) const
 {
-    std::lock_guard<std::mutex> lock(mux_);
     auto it = idxPidMap_.find(pid);
     if (it == idxPidMap_.end()) {
         MMI_HILOGE("find fd error, Invalid input parameter pid:%{public}d,errCode:%{public}d",
@@ -69,9 +68,8 @@ int32_t UDSServer::GetClientFd(int32_t pid)
     return it->second;
 }
 
-int32_t UDSServer::GetClientPid(int32_t fd)
+int32_t UDSServer::GetClientPid(int32_t fd) const
 {
-    std::lock_guard<std::mutex> lock(mux_);
     auto it = sessionsMap_.find(fd);
     if (it == sessionsMap_.end()) {
         MMI_HILOGE("find pid error, Invalid input parameter fd:%{public}d,errCode:%{public}d",
@@ -83,7 +81,6 @@ int32_t UDSServer::GetClientPid(int32_t fd)
 
 bool UDSServer::SendMsg(int32_t fd, NetPacket& pkt)
 {
-    std::lock_guard<std::mutex> lock(mux_);
     if (fd < 0) {
         MMI_HILOGE("fd is less than 0");
         return false;
@@ -104,29 +101,11 @@ void UDSServer::Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt)
     }
 }
 
-int32_t UDSServer::AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd)
-{
-    MMI_HILOGI("enter, programName:%{public}s,moduleType:%{public}d", programName.c_str(), moduleType);
-    toReturnClientFd = INVALID_SOCKET_FD;
-    int32_t serverFd = INVALID_SOCKET_FD;
-    int32_t uid = GetCallingUid();
-    int32_t pid = GetCallingPid();
-    const int32_t ret = AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd);
-    if (ret != RET_OK) {
-        MMI_HILOGE("call AddSocketPairInfo return %{public}d", ret);
-        return RET_ERR;
-    }
-    MMI_HILOGIK("leave, programName:%{public}s,moduleType:%{public}d,alloc success",
-        programName.c_str(), moduleType);
-    return RET_OK;
-}
-
 int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     const int32_t moduleType, const int32_t uid, const int32_t pid,
     int32_t& serverFd, int32_t& toReturnClientFd)
 {
     CALL_LOG_ENTER;
-    std::lock_guard<std::mutex> lock(mux_);
     int32_t sockFds[2] = {};
 
     if (socketpair(AF_UNIX, SOCK_STREAM, 0, sockFds) != 0) {
@@ -152,8 +131,8 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     auto closeSocketFdWhenError = [&serverFd, &toReturnClientFd] {
         close(serverFd);
         close(toReturnClientFd);
-        serverFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
-        toReturnClientFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
+        serverFd = -1;
+        toReturnClientFd = -1;
     };
 
     std::list<std::function<void()> > cleanTaskList;
@@ -213,7 +192,6 @@ void UDSServer::AddPermission(SessionPtr sess)
 
 void UDSServer::Dump(int32_t fd)
 {
-    std::lock_guard<std::mutex> lock(mux_);
     mprintf(fd, "Sessions: count=%d", sessionsMap_.size());
     std::string strTmp = "fds:[";
     if (sessionsMap_.empty()) {

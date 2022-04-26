@@ -17,13 +17,16 @@
 #define MULTIMODAL_INPUT_CONNECT_STUB_H
 
 #include "ipc_skeleton.h"
+#include "iremote_object.h"
 #include "iremote_stub.h"
 #include "message_parcel.h"
 #include "nocopyable.h"
 
+#include "entrust_tasks.h"
 #include "i_multimodal_input_connect.h"
 #include "mmi_log.h"
 #include "multimodal_input_connect_define.h"
+#include "remote_msg_handler.h"
 
 namespace OHOS {
 namespace MMI {
@@ -33,15 +36,14 @@ public:
     DISALLOW_COPY_AND_MOVE(MultimodalInputConnectStub);
     ~MultimodalInputConnectStub() = default;
 
-    int32_t OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& options) override;
+    virtual int32_t OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply,
+        MessageOption& options) override;
+
+    virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
 
 protected:
-    virtual int32_t StubHandleAllocSocketFd(MessageParcel &data, MessageParcel &reply) = 0;
-    int32_t StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply);
-
-private:
-    static constexpr int32_t SYSTEM_UID = 1000;
-    static constexpr int32_t ROOT_UID = 0;
+    EntrustTasks entrustTasks_;
+    RemoteMsgHandler rMsgHandler_;
 };
 } // namespace MMI
 } // namespace OHOS
