@@ -26,7 +26,7 @@
 
 namespace OHOS {
 namespace MMI {
-class InputMonitorManager : public IInputMonitorManager{
+class InputMonitorManager : public IInputMonitorManager {
 public:
     InputMonitorManager() = default;
     DISALLOW_COPY_AND_MOVE(InputMonitorManager);

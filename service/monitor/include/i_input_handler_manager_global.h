@@ -13,14 +13,14 @@
  * limitations under the License.
  */
  
+#ifndef I_INPUT_HANDLER_MANAGER_GLOBAL_H
+#define I_INPUT_HANDLER_MANAGER_GLOBAL_H
+
 #include "define_multimodal.h"
 #include "uds_session.h"
 #include "key_event.h"
 #include "pointer_event.h"
 #include "input_handler_type.h"
-
-#ifndef I_INPUT_HANDLER_MANAGER_GLOBAL_H
-#define I_INPUT_HANDLER_MANAGER_GLOBAL_H
 
 namespace OHOS {
 namespace MMI {
@@ -41,11 +41,11 @@ public:
     {
         return;
     }
-   virtual bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent)
+    virtual bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent)
     {
         return false;
     }
-    virtual bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent) 
+    virtual bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent)
     {
         return false;
     }

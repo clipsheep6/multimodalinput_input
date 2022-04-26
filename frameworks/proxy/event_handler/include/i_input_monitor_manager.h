@@ -21,7 +21,6 @@
 #include "nocopyable.h"
 
 #include "i_input_event_consumer.h"
-#include "i_input_monitor_manager.h"
 #include "define_multimodal.h"
 
 namespace OHOS {
