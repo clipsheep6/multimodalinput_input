@@ -105,14 +105,6 @@ group("unittests") {
   ]
 }
 
-group("mmi_tests") {
-  testonly = true
-  deps = [
-    ":unittests",
-    "test/moduletest:moduletest",
-  ]
-}
-
 group("mmi_tests_manual") {
   testonly = true
   deps = []
@@ -123,3 +115,10 @@ group("mmi_tests_manual") {
     deps += [ "service:TransformPointTest" ]
   }
 }
+
+group("mmi_tests") {
+  testonly = true
+  deps = [ ":unittests" ]
+}
+
+
