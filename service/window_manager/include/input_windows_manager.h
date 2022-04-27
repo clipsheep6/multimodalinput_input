@@ -68,11 +68,11 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     bool TouchDownPointToDisplayPoint(struct libinput_event_touch* touch,
-        int32_t& logicalX, int32_t& logicalY, int32_t& logicalDisplayId);
+        EventTouch& touchInfo, int32_t& logicalDisplayId);
     bool TouchMotionPointToDisplayPoint(struct libinput_event_touch* touch,
-        int32_t targetDisplayId, int32_t& displayX, int32_t& displayY);
-    bool TransformDisplayPoint(struct libinput_event_touch* touch, int32_t& globalLogicalX, int32_t& globalLogicalY);
-    void RotateTouchScreen(const PhysicalDisplayInfo* info, int32_t& logicalX, int32_t& logicalY) const;
+        int32_t targetDisplayId, EventTouch& touchInfo);
+    bool TransformDisplayPoint(struct libinput_event_touch* touch, EventTouch& touchInfo);
+    void RotateTouchScreen(const PhysicalDisplayInfo* info, LogicalCoordinate& coord) const;
     bool Physical2Logical(const PhysicalDisplayInfo* physInfo,
         const PhysicalCoordinate& phys, LogicalCoordinate& logical) const;
     bool TransformTipPoint(struct libinput_event_tablet_tool* tip, LogicalCoordinate& coord) const;

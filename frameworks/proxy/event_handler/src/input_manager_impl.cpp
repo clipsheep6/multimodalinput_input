@@ -656,9 +656,9 @@ int32_t InputManagerImpl::SetPointerVisible(bool visible)
     }
     return ret;
 #else
-    MMI_HILOGD("disable pointer drawing");
-    return RET_ERR;
-#endif
+    MMI_HILOGW("Pointer drawing module dose not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
 void InputManagerImpl::OnConnected()

@@ -20,7 +20,10 @@
 
 namespace OHOS {
 namespace MMI {
-static const int32_t ERROR_UNSUPPORT = -2;
+namespace {
+constexpr int32_t ERROR_UNSUPPORT = -2;
+}
+
 enum MmiModuleType {
     MODULE_CLIENT = 0x00,
     MODULE_EVENT_SIMULATE = 0x01,
