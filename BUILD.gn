@@ -120,5 +120,3 @@ group("mmi_tests") {
   testonly = true
   deps = [ ":unittests" ]
 }
-
-
