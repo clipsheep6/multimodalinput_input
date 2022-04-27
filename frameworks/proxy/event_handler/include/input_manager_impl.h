@@ -48,11 +48,11 @@ public:
     
     void UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
         const std::vector<LogicalDisplayInfo> &logicalDisplays);
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    int32_t SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
-    std::function<void(std::shared_ptr<KeyEvent>)> callback);
+    int32_t SubscribeKeyEvent(
+		std::shared_ptr<KeyOption> keyOption,
+        std::function<void(std::shared_ptr<KeyEvent>)> callback
+	);
     void UnsubscribeKeyEvent(int32_t subscriberId);
-#endif
     int32_t AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter);
 
     void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,

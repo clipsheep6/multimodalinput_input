@@ -83,20 +83,21 @@ private:
     UDSServer *udsServer_ = nullptr;
     NotifyDeviceChange notifyDeviceChange_;
     std::shared_ptr<KeyEvent> keyEvent_ = nullptr;
-    std::shared_ptr<IInputEventHandler> iKeyEventHandler_;
-    std::shared_ptr<IInputEventHandler> iPointerEventHandler_;
-    std::shared_ptr<IInputEventHandler> iTouchEventHandler_;
+    std::shared_ptr<IInputEventHandler> keyEventHandler_ = nullptr;
+    std::shared_ptr<IInputEventHandler> pointerEventHandler_ = nullptr;
+    std::shared_ptr<IInputEventHandler> touchEventHandler_ = nullptr;
+
     std::shared_ptr<IInterceptorManagerGlobal> keyInterceptor_ = nullptr;
     std::shared_ptr<KeyEventSubscriber> keySubscriber_ = nullptr;
-    std::shared_ptr<InputHandlerManagerGlobal> keyInputHandlerMgr_ = nullptr;
+    std::shared_ptr<InputHandlerManagerGlobal> keyMonitorHandler_ = nullptr;
 
     std::shared_ptr<EventFilterWrap> pointerEventFilter_ = nullptr;
-    std::shared_ptr<IInterceptorHandlerGlobal> pointerInterceptorMgr_ = nullptr;
-    std::shared_ptr<InputHandlerManagerGlobal> pointerInputHandlerMgr_ = nullptr;
+    std::shared_ptr<IInterceptorHandlerGlobal> pointerInterceptor_ = nullptr;
+    std::shared_ptr<InputHandlerManagerGlobal> pointerMonitorHandler_ = nullptr;
 
     std::shared_ptr<EventFilterWrap> touchEventFilter_ = nullptr;
-    std::shared_ptr<IInterceptorHandlerGlobal> touchInterceptorMgr_ = nullptr;
-    std::shared_ptr<InputHandlerManagerGlobal> touchInputHandlerMgr_ = nullptr;
+    std::shared_ptr<IInterceptorHandlerGlobal> touchInterceptor_ = nullptr;
+    std::shared_ptr<InputHandlerManagerGlobal> touchIMonitorHandler_ = nullptr;
     uint64_t idSeed_ = 0;
     int32_t eventType_ = 0;
     int64_t initSysClock_ = 0;

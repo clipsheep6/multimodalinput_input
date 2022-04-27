@@ -213,9 +213,7 @@ void MultimodalEventHandler::RemoveInputEventTouchpadMontior(int32_t pointerEven
     pkt << InputEvent::EVENT_TYPE_POINTER;
     client_->SendMessage(pkt);
 }
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t MultimodalEventHandler::AddInputEventTouchpadMontior(int32_t pointerEventType)
 {
     CALL_LOG_ENTER;

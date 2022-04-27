@@ -32,6 +32,7 @@ InterceptorManagerGlobal::InterceptorManagerGlobal() {}
 
 int32_t InterceptorManagerGlobal::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
     if (!keyEvent->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
         if (OnKeyEvent(keyEvent)) {
             MMI_HILOGD("keyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d",

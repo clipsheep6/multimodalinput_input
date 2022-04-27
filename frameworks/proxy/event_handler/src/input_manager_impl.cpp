@@ -152,8 +152,8 @@ void InputManagerImpl::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> 
 
 int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter)
 {
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     CALL_LOG_ENTER;
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     std::lock_guard<std::mutex> guard(mtx_);
     bool hasSendToMmiServer = true;
     if (eventFilterService_ == nullptr) {
@@ -198,12 +198,12 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventCo
     }
 }
 
-
 int32_t InputManagerImpl::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
     std::function<void(std::shared_ptr<KeyEvent>)> callback)
 {
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHK_PIDANDTID();
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    CHKPR(keyOption, ERROR_NULL_POINTER);
     CHKPR(callback, ERROR_NULL_POINTER);
     return KeyEventInputSubscribeMgr.SubscribeKeyEvent(keyOption, callback);
 #else
@@ -214,8 +214,8 @@ int32_t InputManagerImpl::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption
 
 void InputManagerImpl::UnsubscribeKeyEvent(int32_t subscriberId)
 {
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHK_PIDANDTID();
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     KeyEventInputSubscribeMgr.UnSubscribeKeyEvent(subscriberId);
 #else
     MMI_HILOGW("Keyboard device dose not support");
@@ -621,16 +621,15 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
 {
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     CHKPV(pointerEvent);
-#ifndef OHOS_BUILD_ENABLE_POINTER
+#if defined(OHOS_BUILD_ENABLE_POINTER)
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        MMI_HILOGW("Tp device dose not support");
+        return;
+    }
+#elif defined(OHOS_BUILD_ENABLE_TOUCH)
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE ||
         pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
         MMI_HILOGW("Pointer device dose not support");
-        return;
-    }
-#endif // OHOS_BUILD_ENABLE_POINTER
-#ifndef OHOS_BUILD_ENABLE_TOUCH
-    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        MMI_HILOGW("Tp device dose not support");
         return;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -643,7 +642,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
         MMI_HILOGE("Failed to inject pointer event");
     }
 #else
-    MMI_HILOGW("Pointer and tp device dose not support");
+    MMI_HILOGW("Pointer or tp device dose not support");
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 

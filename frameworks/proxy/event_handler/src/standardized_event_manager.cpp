@@ -65,9 +65,7 @@ int32_t StandardizedEventManager::SubscribeKeyEvent(
     }
     return RET_OK;
 }
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t StandardizedEventManager::UnSubscribeKeyEvent(int32_t subscribeId)
 {
     CALL_LOG_ENTER;
@@ -79,9 +77,7 @@ int32_t StandardizedEventManager::UnSubscribeKeyEvent(int32_t subscribeId)
     }
     return RET_OK;
 }
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t StandardizedEventManager::InjectionVirtual(bool isPressed, int32_t keyCode,
     int64_t keyDownDuration, int32_t maxKeyCode)
 {
@@ -98,9 +94,7 @@ int32_t StandardizedEventManager::InjectionVirtual(bool isPressed, int32_t keyCo
     }
     return RET_OK;
 }
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t StandardizedEventManager::InjectEvent(const std::shared_ptr<KeyEvent> key)
 {
     CALL_LOG_ENTER;

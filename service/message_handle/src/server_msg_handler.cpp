@@ -357,27 +357,33 @@ int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, NetPacket& pkt)
         MMI_HILOGE("Packet read handlerType failed");
         return RET_ERR;
     }
-    MMI_HILOGD("OnAddInputHandler handler:%{public}d,handlerType:%{public}d", handlerId, handlerType);
+    MMI_HILOGD("handler:%{public}d,handlerType:%{public}d", handlerId, handlerType);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    auto keyInputHandlerMgr = InputHandler->GetKeyInputHandlerMgr();
-    CHKPR(keyInputHandlerMgr, ERROR_NULL_POINTER);
-    keyInputHandlerMgr->AddInputHandler(handlerId, handlerType, sess);
+    do {
+        auto keyInputHandlerMgr = InputHandler->GetKeyInputHandlerMgr();
+        CHKPB(keyInputHandlerMgr);
+        keyInputHandlerMgr->AddInputHandler(handlerId, handlerType, sess);
+    } while(0);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    auto pointerInterceptorMgr = InputHandler->GetPointerInterceptorMgr();
-    CHKPR(pointerInterceptorMgr, ERROR_NULL_POINTER);
-    pointerInterceptorMgr->AddInputHandler(handlerId, handlerType, sess);
-    auto pointerInputHandlerMgr = InputHandler->GetPointerInputHandlerMgr();
-    CHKPR(pointerInputHandlerMgr, ERROR_NULL_POINTER);
-    pointerInputHandlerMgr->AddInputHandler(handlerId, handlerType, sess);
+    do {
+        auto pointerInterceptorMgr = InputHandler->GetPointerInterceptorMgr();
+        CHKPR(pointerInterceptorMgr, ERROR_NULL_POINTER);
+        pointerInterceptorMgr->AddInputHandler(handlerId, handlerType, sess);
+        auto pointerInputHandlerMgr = InputHandler->GetPointerInputHandlerMgr();
+        CHKPR(pointerInputHandlerMgr, ERROR_NULL_POINTER);
+        pointerInputHandlerMgr->AddInputHandler(handlerId, handlerType, sess);
+    } while(0);
 #endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    auto touchInterceptorMgr = InputHandler->GetTouchInterceptorMgr();
-    CHKPR(touchInterceptorMgr, ERROR_NULL_POINTER);
-    touchInterceptorMgr->AddInputHandler(handlerId, handlerType, sess);
-    auto touchInputHandlerMgr = InputHandler->GetTouchInputHandlerMgr();
-    CHKPR(touchInputHandlerMgr, ERROR_NULL_POINTER);
-    touchInputHandlerMgr->AddInputHandler(handlerId, handlerType, sess);
+    do {
+        auto touchInterceptorMgr = InputHandler->GetTouchInterceptorMgr();
+        CHKPR(touchInterceptorMgr, ERROR_NULL_POINTER);
+        touchInterceptorMgr->AddInputHandler(handlerId, handlerType, sess);
+        auto touchInputHandlerMgr = InputHandler->GetTouchInputHandlerMgr();
+        CHKPR(touchInputHandlerMgr, ERROR_NULL_POINTER);
+        touchInputHandlerMgr->AddInputHandler(handlerId, handlerType, sess);
+    } while (0);
 #endif // OHOS_BUILD_ENABLE_TOUCH
     return RET_OK;
 }
@@ -397,25 +403,31 @@ int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, NetPacket& pkt)
     }
     MMI_HILOGD("OnRemoveInputHandler handler:%{public}d,handlerType:%{public}d", handlerId, handlerType);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    auto keyInputHandlerMgr = InputHandler->GetKeyInputHandlerMgr();
-    CHKPR(keyInputHandlerMgr, ERROR_NULL_POINTER);
-    keyInputHandlerMgr->RemoveInputHandler(handlerId, handlerType, sess);
+    do {
+        auto keyInputHandlerMgr = InputHandler->GetKeyInputHandlerMgr();
+        CHKPR(keyInputHandlerMgr, ERROR_NULL_POINTER);
+        keyInputHandlerMgr->RemoveInputHandler(handlerId, handlerType, sess);
+    } while (0);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    auto pointerInterceptorMgr = InputHandler->GetPointerInterceptorMgr();
-    CHKPR(pointerInterceptorMgr, ERROR_NULL_POINTER);
-    pointerInterceptorMgr->RemoveInputHandler(handlerId, handlerType, sess);
-    auto pointerInputHandlerMgr = InputHandler->GetPointerInputHandlerMgr();
-    CHKPR(pointerInputHandlerMgr, ERROR_NULL_POINTER);
-    pointerInputHandlerMgr->RemoveInputHandler(handlerId, handlerType, sess);
+    do {
+        auto pointerInterceptorMgr = InputHandler->GetPointerInterceptorMgr();
+        CHKPR(pointerInterceptorMgr, ERROR_NULL_POINTER);
+        pointerInterceptorMgr->RemoveInputHandler(handlerId, handlerType, sess);
+        auto pointerInputHandlerMgr = InputHandler->GetPointerInputHandlerMgr();
+        CHKPR(pointerInputHandlerMgr, ERROR_NULL_POINTER);
+        pointerInputHandlerMgr->RemoveInputHandler(handlerId, handlerType, sess);
+    } while (0);
 #endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    auto touchInterceptorMgr = InputHandler->GetTouchInterceptorMgr();
-    CHKPR(touchInterceptorMgr, ERROR_NULL_POINTER);
-    touchInterceptorMgr->RemoveInputHandler(handlerId, handlerType, sess);
-    auto touchInputHandlerMgr = InputHandler->GetTouchInputHandlerMgr();
-    CHKPR(touchInputHandlerMgr, ERROR_NULL_POINTER);
-    touchInputHandlerMgr->RemoveInputHandler(handlerId, handlerType, sess);
+    do {
+        auto touchInterceptorMgr = InputHandler->GetTouchInterceptorMgr();
+        CHKPR(touchInterceptorMgr, ERROR_NULL_POINTER);
+        touchInterceptorMgr->RemoveInputHandler(handlerId, handlerType, sess);
+        auto touchInputHandlerMgr = InputHandler->GetTouchInputHandlerMgr();
+        CHKPR(touchInputHandlerMgr, ERROR_NULL_POINTER);
+        touchInputHandlerMgr->RemoveInputHandler(handlerId, handlerType, sess);
+    } while (0);
 #endif // OHOS_BUILD_ENABLE_TOUCH
     return RET_OK;
 }
