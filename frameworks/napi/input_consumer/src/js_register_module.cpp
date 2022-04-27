@@ -29,6 +29,7 @@ constexpr size_t EVENT_NAME_LEN = 64;
 constexpr size_t PRE_KEYS_SIZE = 4;
 } // namespace
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 static Callbacks callbacks = {};
 
 int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo* event,
@@ -209,10 +210,12 @@ static void SubKeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
         }
     }
 }
+#endif
 
 static napi_value JsOn(napi_env env, napi_callback_info info)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     KeyEventMonitorInfo *event = new (std::nothrow) KeyEventMonitorInfo {
         .env = env,
         .asyncWork = nullptr,
@@ -250,12 +253,16 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         MMI_HILOGE("AddEventCallback failed");
         return nullptr;
     }
+#else
+    MMI_HILOGW("Keyboard device dose not support");
+#endif
     return nullptr;
 }
 
 static napi_value JsOff(napi_env env, napi_callback_info info)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     KeyEventMonitorInfo *event = new (std::nothrow) KeyEventMonitorInfo {
         .env = env,
         .asyncWork = nullptr,
@@ -285,6 +292,9 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     }
     delete event;
     event = nullptr;
+#else
+    MMI_HILOGW("Keyboard device dose not support");
+#endif
     return nullptr;
 }
 

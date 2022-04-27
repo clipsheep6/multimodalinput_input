@@ -281,6 +281,7 @@ napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info
 napi_value JsInputDeviceContext::SetPointerVisible(napi_env env, napi_callback_info info)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
     size_t argc = 2;
     napi_value argv[2];
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -309,6 +310,10 @@ napi_value JsInputDeviceContext::SetPointerVisible(napi_env env, napi_callback_i
         return nullptr;
     }
     return jsInputDeviceMgr->SetPointerVisible(env, visible, argv[1]);
+#else
+    MMI_HILOGW("Keyboard device dose not support");
+    return nullptr;
+#endif
 }
 
 napi_value JsInputDeviceContext::GetKeystrokeAbility(napi_env env, napi_callback_info info)
