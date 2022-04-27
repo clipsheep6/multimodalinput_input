@@ -363,7 +363,7 @@ int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, NetPacket& pkt)
         auto keyInputHandlerMgr = InputHandler->GetKeyInputHandlerMgr();
         CHKPB(keyInputHandlerMgr);
         keyInputHandlerMgr->AddInputHandler(handlerId, handlerType, sess);
-    } while(0);
+    } while (0);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_POINTER
     do {
@@ -373,7 +373,7 @@ int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, NetPacket& pkt)
         auto pointerInputHandlerMgr = InputHandler->GetPointerInputHandlerMgr();
         CHKPR(pointerInputHandlerMgr, ERROR_NULL_POINTER);
         pointerInputHandlerMgr->AddInputHandler(handlerId, handlerType, sess);
-    } while(0);
+    } while (0);
 #endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     do {

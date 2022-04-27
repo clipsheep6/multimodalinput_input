@@ -365,7 +365,7 @@ std::shared_ptr<EventFilterWrap> InputEventHandler::GetTouchEventFilter() const
 
 std::shared_ptr<IInterceptorHandlerGlobal> InputEventHandler::GetTouchInterceptorMgr() const
 {
-   return touchInterceptor_;
+    return touchInterceptor_;
 }
 
 std::shared_ptr<InputHandlerManagerGlobal> InputEventHandler::GetTouchInputHandlerMgr() const
@@ -379,13 +379,13 @@ int32_t InputEventHandler::AddInputEventFilter(sptr<IEventFilter> filter)
     do {
         CHKPB(pointerEventFilter_);
         pointerEventFilter_->AddInputEventFilter(filter);
-    } while(0);
+    } while (0);
 #endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     do {
         CHKPB(touchEventFilter_);
         touchEventFilter_->AddInputEventFilter(filter);
-    } while(0);
+    } while (0);
 #endif // OHOS_BUILD_ENABLE_TOUCH
     return RET_OK;
 }

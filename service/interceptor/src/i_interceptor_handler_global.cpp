@@ -30,7 +30,7 @@ int32_t IInterceptorHandlerGlobal::HandlePointerEvent(std::shared_ptr<PointerEve
     return nextHandler_->HandlePointerEvent(pointerEvent);
 }
 
-int32_t IInterceptorHandlerGlobal::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) 
+int32_t IInterceptorHandlerGlobal::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     HandleEvent(pointerEvent);

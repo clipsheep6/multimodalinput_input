@@ -44,10 +44,10 @@ int32_t InterceptorHandlerGlobal::HandlePointerEvent(std::shared_ptr<PointerEven
     return nextHandler_->HandlePointerEvent(pointerEvent);
 }
 
-int32_t InterceptorHandlerGlobal::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) 
+int32_t InterceptorHandlerGlobal::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-   if (HandleEvent(pointerEvent)) {
+    if (HandleEvent(pointerEvent)) {
         BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP);
         MMI_HILOGD("Interception is succeeded");
         return RET_OK;

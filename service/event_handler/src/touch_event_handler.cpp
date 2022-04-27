@@ -64,7 +64,7 @@ int32_t TouchEventHandler::HandleTouchEvent(std::shared_ptr<PointerEvent> pointe
 }
 
 int32_t TouchEventHandler::HandleTouchEvent(libinput_event* event)
-{  
+{
     auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
@@ -77,7 +77,7 @@ int32_t TouchEventHandler::HandleTouchEvent(libinput_event* event)
         if (pointerEvent->GetPointersIdList().empty()) {
             MMI_HILOGD("This touch event is final finger up remove this finger");
             pointerEvent->Reset();
-        }     
+        }
     }
     return RET_OK;
 }
