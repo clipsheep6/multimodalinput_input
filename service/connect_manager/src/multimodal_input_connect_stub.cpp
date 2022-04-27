@@ -34,27 +34,34 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Multi
 int32_t MultimodalInputConnectStub::OnRemoteRequest(
     uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
+    CALL_LOG_ENTER;
     int32_t pid = GetCallingPid();
     TimeCostChk chk("IPC-RemoteRequest", "overtime 300(us)", MAX_OVER_TIME, pid,
         static_cast<int64_t>(code));
     uint64_t tid = GetThisThreadId();
-    MMI_HILOGD("request code:%{public}d tid:%{public}" PRId64 "", code, tid);
+    MMI_HILOGD("RemoteRequest recv code:%{public}d tid:%{public}" PRId64 " pid:%{public}d", code, tid, pid);
 
     std::u16string descriptor = data.ReadInterfaceToken();
     if (descriptor != IMultimodalInputConnect::GetDescriptor()) {
         MMI_HILOGE("get unexpect descriptor:%{public}s", Str16ToStr8(descriptor).c_str());
         return ERR_INVALID_STATE;
     }
+    if (!IsRunning()) {
+        MMI_HILOGE("service is not running. code:%{public}u, go switch defaut", code);
+        return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+    }
     if (!rMsgHandler_.ChkKey(code)) {
-        MMI_HILOGE("unknown code:%{public}u, go switch defaut", code);
+        MMI_HILOGE("unknown code:%{public}u ids:(%{public}s), go switch defaut", code,
+            rMsgHandler_.GetDebugInfo().c_str());
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
     int32_t uid = GetCallingUid();
-    if (!entrustTasks_.PostSyncTask(std::bind(&RemoteMsgHandler::OnMsgHandler, &rMsgHandler_, uid, pid, code,
-        std::ref(data), std::ref(reply)))) {
-        return ERR_INVALID_STATE;
+    if (!entrustTasks_.PostSyncTask(std::bind(&RemoteMsgHandler::OnMsgHandler, &rMsgHandler_, std::placeholders::_1,
+        uid, pid, tid, code, std::ref(data), std::ref(reply)))) {
+        MMI_HILOGE("post task failed code:%{public}u, go switch defaut", code);
+        return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
-    return RET_OK;
+    return NO_ERROR;
 }
 } // namespace MMI
 } // namespace OHOS

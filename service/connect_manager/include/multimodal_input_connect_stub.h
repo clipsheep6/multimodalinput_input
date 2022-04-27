@@ -27,6 +27,7 @@
 #include "mmi_log.h"
 #include "multimodal_input_connect_define.h"
 #include "remote_msg_handler.h"
+#include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
@@ -36,10 +37,10 @@ public:
     DISALLOW_COPY_AND_MOVE(MultimodalInputConnectStub);
     ~MultimodalInputConnectStub() = default;
 
+    virtual bool IsRunning() const = 0;
+    virtual SessionPtr GetSessionByPid(int32_t pid) const = 0;
     virtual int32_t OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply,
         MessageOption& options) override;
-
-    virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
 
 protected:
     EntrustTasks entrustTasks_;

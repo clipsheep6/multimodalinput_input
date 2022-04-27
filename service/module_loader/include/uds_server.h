@@ -53,6 +53,7 @@ public:
     int32_t GetClientPid(int32_t fd) const;
     void AddSessionDeletedCallback(std::function<void(SessionPtr)> callback);
 
+    void DumpSession(const std::string& title);
     SessionPtr GetSession(int32_t fd) const;
     SessionPtr GetSessionByPid(int32_t pid) const;
 
@@ -68,7 +69,7 @@ protected:
     void OnEpollEvent(epoll_event& ev);
     bool AddSession(SessionPtr ses);
     void DelSession(int32_t fd);
-    void DumpSession(const std::string& title);
+    // void DumpSession(const std::string& title);
     void NotifySessionDeleted(SessionPtr ses);
     void AddPermission(SessionPtr sess);
     int32_t AddSocketPairInfo(const std::string& programName, const int32_t moduleType, const int32_t uid,

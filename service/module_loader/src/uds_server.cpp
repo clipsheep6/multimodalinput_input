@@ -307,11 +307,16 @@ void UDSServer::OnEpollEvent(epoll_event& ev)
 
 void UDSServer::DumpSession(const std::string &title)
 {
-    MMI_HILOGD("in %s: %s", __func__, title.c_str());
+    MMI_HILOGD("in %{public}s: %{public}s size:%{public}zu idxSize:%{public}zu", __func__,
+        title.c_str(), sessionsMap_.size(), idxPidMap_.size());
     int32_t i = 0;
-    for (auto& [key, value] : sessionsMap_) {
-        CHKPV(value);
-        MMI_HILOGD("%d, %s", i, value->GetDescript().c_str());
+    for (const auto& it : sessionsMap_) {
+        MMI_HILOGD("%{public}d, [%{public}d, %{public}s]", i, it.first, it.second->GetDescript().c_str());
+        i++;
+    }
+    i = 0;
+    for (const auto& it : idxPidMap_) {
+        MMI_HILOGD("pidIdx: %{public}d, [%{public}d, %{public}d]", i, it.first, it.second);
         i++;
     }
 }

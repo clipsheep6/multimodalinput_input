@@ -23,24 +23,26 @@
 
 namespace OHOS {
 namespace MMI {
-using RemoteMsgFun = std::function<void(SessionPtr, MessageParcel &, MessageParcel &)>;
-class RemoteMsgHandler : public MsgHandler<int32_t, RemoteMsgFun> {
+using RemoteMsgFun = std::function<void(MessageParcel &, MessageParcel &)>;
+class RemoteMsgHandler : public MsgHandler<uint32_t, RemoteMsgFun> {
 public:
     RemoteMsgHandler() = default;
     DISALLOW_COPY_AND_MOVE(RemoteMsgHandler);
     virtual ~RemoteMsgHandler() = default;
 
     void Init(IMultimodalInputConnect& multStub);
-    void OnMsgHandler(int32_t uid, int32_t pid, uint32_t code, MessageParcel& data, MessageParcel& reply);
+    void OnMsgHandler(int32_t taskId, int32_t uid, int32_t pid, uint64_t stid, uint32_t code,
+        MessageParcel& data, MessageParcel& reply);
 
 private:
-    void OnAllocSocketFd(SessionPtr session, MessageParcel &data, MessageParcel &reply);
-    void OnAddInputEventFilter(SessionPtr session, MessageParcel& data, MessageParcel& reply);
+    void OnAllocSocketFd(MessageParcel &data, MessageParcel &reply);
+    void OnAddInputEventFilter(MessageParcel& data, MessageParcel& reply);
 
 private:
-    IMultimodalInputConnect* multStub_ = nullptr;
     int32_t lastClientPid_ = 0;
     int32_t lastClientUid_ = 0;
+    SessionPtr lastSession_ = nullptr;
+    IMultimodalInputConnect* multStub_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS

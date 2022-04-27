@@ -115,6 +115,16 @@ int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
     return RET_OK;
 }
 
+bool MMIService::IsRunning() const
+{
+    return (state_ == ServiceRunningState::STATE_RUNNING);
+}
+
+SessionPtr MMIService::GetSessionByPid(int32_t pid) const
+{
+    return UDSServer::GetSessionByPid(pid);
+}
+
 bool MMIService::InitLibinputService()
 {
     MMI_HILOGD("input msg handler Init");
@@ -167,7 +177,7 @@ bool MMIService::InitService()
 
 bool MMIService::InitEntrustTasks()
 {
-    MMI_HILOGD("remote msg handler Init");
+    CALL_LOG_ENTER;
     rMsgHandler_.Init(*this);
     if (!entrustTasks_.Init()) {
         MMI_HILOGE("entrust task init failed");
@@ -189,10 +199,7 @@ int32_t MMIService::Init()
     MMI_HILOGD("EventDump Init");
     MMIEventDump->Init(*this);
     MMI_HILOGD("WindowsManager Init");
-    if (!WinMgr->Init(*this)) {
-        MMI_HILOGE("Windows message init failed");
-        return WINDOWS_MSG_INIT_FAIL;
-    }
+    WinMgr->Init(*this);
     MMI_HILOGD("PointerDrawingManager Init");
     if (!IPointerDrawingManager::GetInstance()->Init()) {
         MMI_HILOGE("Pointer draw init failed");
@@ -251,13 +258,12 @@ void MMIService::OnDump()
     MMIEventDump->Dump();
 }
 
-int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd)
+int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd,
+    int32_t pid, int32_t uid)
 {
     MMI_HILOGI("enter, programName:%{public}s,moduleType:%{public}d", programName.c_str(), moduleType);
     toReturnClientFd = -1;
     int32_t serverFd = -1;
-    int32_t uid = GetCallingUid();
-    int32_t pid = GetCallingPid();
     const int32_t ret = AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd);
     if (ret != RET_OK) {
         MMI_HILOGE("call AddSocketPairInfo return %{public}d", ret);
@@ -299,6 +305,7 @@ void MMIService::OnTimer()
 void MMIService::OnEntrustTask(epoll_event& ev)
 {
     if ((ev.events & EPOLLIN) == 0) {
+        MMI_HILOGW("not epollin");
         return;
     }
     EntrustTasks::TaskData data = {};
@@ -306,8 +313,8 @@ void MMIService::OnEntrustTask(epoll_event& ev)
     if (res == -1) {
         MMI_HILOGW("read failed erron:%{public}d", errno);
     }
-    MMI_HILOGD("tid:%{public}" PRId64 " stid:%{public}" PRId64 " taskId:%{public}d", GetThisThreadId(),
-        data.tid, data.taskId);
+    MMI_HILOGD("RemoteRequest notify tid:%{public}" PRId64 " stid:%{public}" PRId64 " taskId:%{public}d",
+        GetThisThreadId(), data.tid, data.taskId);
     entrustTasks_.ProcessTasks(data.tid);
 }
 

@@ -41,13 +41,14 @@ void EntrustTasks::Task::ProcessTask()
     if (hasNotified_) {
         return;
     }
-    fun_();
+    fun_(id_);
     promise_.set_value();
     hasNotified_ = true;
 }
 
 bool EntrustTasks::Init()
 {
+    CALL_LOG_ENTER;
     int32_t res = pipe(fds_);
     if (res == -1) {
         MMI_HILOGE("pipe create error:%{public}d", errno);
@@ -58,6 +59,7 @@ bool EntrustTasks::Init()
 
 void EntrustTasks::ProcessTasks(uint64_t stid)
 {
+    CALL_LOG_ENTER;
     auto tid = GetThisThreadId();
     MMI_HILOGD("tid:%{public}" PRId64 " stid:%{public}" PRId64 "", tid, stid);
     std::lock_guard<std::mutex> guard(mux_);
@@ -68,6 +70,7 @@ void EntrustTasks::ProcessTasks(uint64_t stid)
     int32_t count = 0;
     for (auto it = tasks_.begin(); it != tasks_.end(); count++) {
         if (count > ET_ONCE_PROCESS_TASK_LIMIT) {
+            MMI_HILOGW("process too many task");
             break;
         }
         auto task = *it;
@@ -83,6 +86,7 @@ void EntrustTasks::ProcessTasks(uint64_t stid)
 
 bool EntrustTasks::PostSyncTask(ETaskCallback callback, int32_t timeout)
 {
+    CALL_LOG_ENTER;
     auto task = PostTask(callback);
     if (task == nullptr) {
         MMI_HILOGE("Post aync task failed");
@@ -93,6 +97,7 @@ bool EntrustTasks::PostSyncTask(ETaskCallback callback, int32_t timeout)
 
 bool EntrustTasks::PostAsyncTask(ETaskCallback callback)
 {
+    CALL_LOG_ENTER;
     auto task = PostTask(callback, true);
     if (task == nullptr) {
         MMI_HILOGE("Post async task failed");
@@ -103,6 +108,7 @@ bool EntrustTasks::PostAsyncTask(ETaskCallback callback)
 
 EntrustTasks::TaskPtr EntrustTasks::PostTask(ETaskCallback callback, bool asyncTask)
 {
+    CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mux_);
     auto tsize = tasks_.size();
     if (tsize > ET_MAX_TASK_LIMIT) {

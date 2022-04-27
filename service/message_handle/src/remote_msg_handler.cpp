@@ -19,6 +19,7 @@
 #include "input_event_handler.h"
 #include "mmi_func_callback.h"
 #include "multimodal_input_connect_def_parcel.h"
+#include "multimodal_input_connect_stub.h"
 #include "time_cost_chk.h"
 
 namespace OHOS {
@@ -33,14 +34,14 @@ void RemoteMsgHandler::Init(IMultimodalInputConnect& multStub)
 {
     multStub_ = &multStub;
     callbacks_ = {
-        {IMultimodalInputConnect::ALLOC_SOCKET_FD, MsgCallbackBind3(&RemoteMsgHandler::OnAllocSocketFd, this)},
+        {IMultimodalInputConnect::ALLOC_SOCKET_FD, MsgCallbackBind2(&RemoteMsgHandler::OnAllocSocketFd, this)},
         {IMultimodalInputConnect::ADD_INPUT_EVENT_FILTER, 
-            MsgCallbackBind3(&RemoteMsgHandler::OnAddInputEventFilter, this)},
+            MsgCallbackBind2(&RemoteMsgHandler::OnAddInputEventFilter, this)},
     };
 }
 
-void RemoteMsgHandler::OnMsgHandler(int32_t uid, int32_t pid, uint32_t code, MessageParcel& data,
-    MessageParcel& reply)
+void RemoteMsgHandler::OnMsgHandler(int32_t taskId, int32_t uid, int32_t pid, uint64_t stid, uint32_t code,
+    MessageParcel& data, MessageParcel& reply)
 {
     TimeCostChk chk("IPC-RemoteHandler", "overtime 300(us)", MAX_OVER_TIME, pid,
         static_cast<int64_t>(code));
@@ -54,21 +55,24 @@ void RemoteMsgHandler::OnMsgHandler(int32_t uid, int32_t pid, uint32_t code, Mes
         MMI_HILOGE("Unknown remote msg id:%{public}d", code);
         return;
     }
-    auto udsServer = reinterpret_cast<UDSServer*>(multStub_);
-    CHKPV(udsServer);
-    auto session = udsServer->GetSessionByPid(pid);
-    if (session == nullptr && code != IMultimodalInputConnect::ALLOC_SOCKET_FD) {
+    auto multStub = static_cast<MultimodalInputConnectStub*>(multStub_);
+    CHKPV(multStub);
+    lastSession_ = multStub->GetSessionByPid(pid);
+    if (lastSession_ == nullptr && code != IMultimodalInputConnect::ALLOC_SOCKET_FD) {
         MMI_HILOGE("invalid request session=nullptr");
         return;
     }
     lastClientPid_ = pid;
     lastClientUid_ = uid;
-    (*callback)(session, data, reply);
+    MMI_HILOGD("RemoteRequest handler uid:%{public}d taskId:%{public}d code:%{public}d tid:%{public}" PRId64 ""
+        " stid:%{public}" PRId64 "", uid, taskId, code, GetThisThreadId(), stid);
+    (*callback)(data, reply);
 }
 
-void RemoteMsgHandler::OnAllocSocketFd(SessionPtr session, MessageParcel &data, MessageParcel &reply)
+void RemoteMsgHandler::OnAllocSocketFd(MessageParcel &data, MessageParcel &reply)
 {
-    if (session != nullptr) {
+    CALL_LOG_ENTER;
+    if (lastSession_ != nullptr) {
         MMI_HILOGE("Repeat request clientIdx:%{public}d", lastClientPid_);
         return;
     }
@@ -78,7 +82,8 @@ void RemoteMsgHandler::OnAllocSocketFd(SessionPtr session, MessageParcel &data, 
     MMI_HILOGD("clientName:%{public}s,moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
 
     int32_t clientFd = -1;
-    int32_t ret = multStub_->AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd);
+    int32_t ret = multStub_->AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd,
+        lastClientPid_, lastClientUid_);
     if (ret != RET_OK) {
         MMI_HILOGE("call AddSocketPairInfo return %{public}d", ret);
         if (!reply.WriteInt32(RET_ERR)) {
@@ -94,14 +99,14 @@ void RemoteMsgHandler::OnAllocSocketFd(SessionPtr session, MessageParcel &data, 
     if (!reply.WriteFileDescriptor(clientFd)) {
         MMI_HILOGE("WriteFileDescriptor clientFd:%{public}d fail", clientFd);
     }
-    MMI_HILOGI("send clientFd to client, clientFd = %d", clientFd);
+    MMI_HILOGI("send clientFd to client, clientFd = %{public}d", clientFd);
     close(clientFd);
 }
 
-void RemoteMsgHandler::OnAddInputEventFilter(SessionPtr session, MessageParcel& data, MessageParcel& reply)
+void RemoteMsgHandler::OnAddInputEventFilter(MessageParcel& data, MessageParcel& reply)
 {
     CALL_LOG_ENTER;
-    CHKPV(session);
+    CHKPV(lastSession_);
     CHKPV(multStub_);
     if (lastClientUid_ != SYSTEM_UID && lastClientUid_ != ROOT_UID) {
         MMI_HILOGE("check failed, uid is not root or system");

@@ -17,6 +17,7 @@
 
 #include <functional>
 #include <map>
+#include <string>
 
 #include "proto.h"
 
@@ -32,6 +33,19 @@ public:
     bool ChkKey(K id)
     {
         return (GetMsgCallback(id) != nullptr);
+    }
+
+    const std::string& GetDebugInfo() const
+    {
+        std::string str;
+        for (auto& it : callbacks_) {
+            str += std::to_string(it.first);
+            str += ',';
+        }
+        if (str.size() > 0) {
+            str.resize(str.size()-1);
+        }
+        return std::move(str);
     }
 
 protected:

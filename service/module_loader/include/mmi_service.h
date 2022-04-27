@@ -16,6 +16,7 @@
 #ifndef MMI_SERVICE_H
 #define MMI_SERVICE_H
 
+#include <atomic>
 #include <mutex>
 #include <thread>
 
@@ -48,13 +49,15 @@ public:
     virtual void OnStop() override;
     virtual void OnDump() override;
     virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
-        int32_t &toReturnClientFd) override;
+        int32_t &toReturnClientFd, int32_t pid = 0, int32_t uid = 0) override;
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
 
 protected:
     virtual void OnConnected(SessionPtr s) override;
     virtual void OnDisconnected(SessionPtr s) override;
     virtual int32_t AddEpoll(EpollEventType type, int32_t fd) override;
+    virtual bool IsRunning() const override;
+    virtual SessionPtr GetSessionByPid(int32_t pid) const override;
 
     bool InitLibinputService();
     bool InitService();
@@ -68,7 +71,7 @@ protected:
     void OnEntrustTask(epoll_event& ev);
 
 private:
-    ServiceRunningState state_ = ServiceRunningState::STATE_NOT_START;
+    std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t mmiFd_ = -1;
     std::mutex mu_;
     std::thread t_;
