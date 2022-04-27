@@ -100,6 +100,15 @@ int32_t MultimodalEventHandler::GetKeystrokeAbility(int32_t userData, int32_t de
     return EventManager.GetKeystrokeAbility(userData, deviceId, keyCodes);
 }
 
+int32_t MultimodalEventHandler::GetKeyboardType(int32_t userData, int32_t deviceId)
+{
+    if (!InitClient()) {
+        MMI_HILOGE("Init client faild");
+        return MMI_SERVICE_INVALID;
+    }
+    return EventManager.GetKeyboardType(userData, deviceId);
+}
+
 int32_t MultimodalEventHandler::RegisterInputDeviceMonitor()
 {
     if (!InitClient()) {
@@ -128,6 +137,7 @@ int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent>
     return EventManager.InjectPointerEvent(pointerEvent);
 }
 
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 int32_t MultimodalEventHandler::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
 {
     if (!InitClient()) {
@@ -136,7 +146,9 @@ int32_t MultimodalEventHandler::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
     }
     return EventManager.MoveMouseEvent(offsetX, offsetY);
 }
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
 int32_t MultimodalEventHandler::AddInterceptor(int32_t sourceType, int32_t id)
 {
     if (!InitClient()) {
@@ -150,8 +162,9 @@ int32_t MultimodalEventHandler::AddInterceptor(int32_t sourceType, int32_t id)
     MMI_HILOGD("client add a touchpad event interceptor");
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 
-
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
 int32_t MultimodalEventHandler::RemoveInterceptor(int32_t id)
 {
     if (!InitClient()) {
@@ -165,6 +178,7 @@ int32_t MultimodalEventHandler::RemoveInterceptor(int32_t id)
     MMI_HILOGD("client remove a touchpad event interceptor");
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 
 int32_t MultimodalEventHandler::AddInputEventMontior(int32_t keyEventType)
 {

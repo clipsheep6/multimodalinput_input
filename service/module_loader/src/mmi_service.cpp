@@ -294,6 +294,13 @@ void MMIService::OnDisconnected(SessionPtr s)
     MMI_HILOGW("enter, session desc:%{public}s, fd: %{public}d", s->GetDescript().c_str(), fd);
 }
 
+int32_t MMIService::SetPointerVisible(bool visible)
+{
+    CALL_LOG_ENTER;
+    IPointerDrawingManager::GetInstance()->SetPointerVisible(GetCallingPid(), visible);
+    return RET_OK;
+}
+
 void MMIService::OnTimer()
 {
     if (InputHandler != nullptr) {

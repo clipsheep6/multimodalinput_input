@@ -43,8 +43,11 @@ public:
         MessageOption& options) override;
 
 protected:
+    int32_t StubSetPointerVisible(MessageParcel& data, MessageParcel& reply);
     EntrustTasks entrustTasks_;
     RemoteMsgHandler rMsgHandler_;
+
+    bool CheckPermission();
 };
 } // namespace MMI
 } // namespace OHOS

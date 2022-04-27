@@ -30,10 +30,12 @@ public:
     virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &socketFd,
         int32_t pid = 0, int32_t uid = 0) = 0;
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) = 0;
+    virtual int32_t SetPointerVisible(bool visible) = 0;
 
     enum {
         ALLOC_SOCKET_FD = 0,
         ADD_INPUT_EVENT_FILTER = 1,
+        SET_POINTER_VISIBLE = 2,
     };
 
     enum {

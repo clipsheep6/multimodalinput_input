@@ -199,6 +199,41 @@ public:
      */
     static constexpr int32_t MOUSE_BUTTON_MIDDLE = 2;
 
+     /**
+     * Indicates the side button on a mouse.
+     *
+     * @since 9
+     */
+    static constexpr int32_t MOUSE_BUTTON_SIDE = 3;
+
+    /**
+     * Indicates the extra button on a mouse.
+     *
+     * @since 9
+     */
+    static constexpr int32_t MOUSE_BUTTON_EXTRA = 4;
+
+    /**
+     * Indicates the forward button on a mouse.
+     *
+     * @since 9
+     */
+    static constexpr int32_t MOUSE_BUTTON_FORWARD = 5;
+
+    /**
+     * Indicates the back button on a mouse.
+     *
+     * @since 9
+     */
+    static constexpr int32_t MOUSE_BUTTON_BACK = 6;
+
+    /**
+     * Indicates the task button on a mouse.
+     *
+     * @since 9
+     */
+    static constexpr int32_t MOUSE_BUTTON_TASK = 7;
+    
     static constexpr int32_t TOOL_TYPE_PEN = 0;
 
     static constexpr int32_t TOOL_TYPE_RUBBER = 1;
@@ -358,6 +393,30 @@ public:
          */
         int32_t GetHeight() const;
 
+        int32_t GetToolGlobalX() const;
+
+        void SetToolGlobalX(int32_t globalX);
+
+        int32_t GetToolGlobalY() const;
+
+        void SetToolGlobalY(int32_t globalY);
+
+        int32_t GetToolLocalX() const;
+
+        void SetToolLocalX(int32_t x);
+
+        int32_t GetToolLocalY() const;
+
+        void SetToolLocalY(int32_t y);
+
+        int32_t GetToolWidth() const;
+
+        void SetToolWidth(int32_t width);
+
+        int32_t GetToolHeight() const;
+
+        void SetToolHeight(int32_t height);
+
         /**
          * @brief Sets the height of the pressed area.
          * @param height Indicates the height to set.
@@ -366,9 +425,34 @@ public:
          */
         void SetHeight(int32_t height);
 
+        /**
+         * @brief Obtains the tilt angle of the x axis.
+         * @return Returns the tilt angle of the x axis.
+         * @since 9
+         */
         double GetTiltX() const;
+
+        /**
+         * @brief Sets the tilt angle of the x axis.
+         * @param tiltX Indicates the tilt angle to set.
+         * @return void
+         * @since 9
+         */
         void SetTiltX(double tiltX);
+
+        /**
+         * @brief Obtains the tilt angle of the y axis.
+         * @return Returns the tilt angle of the y axis.
+         * @since 9
+         */
         double GetTiltY() const;
+
+        /**
+         * @brief Sets the tilt angle of the y axis.
+         * @param tiltY Indicates the tilt angle to set.
+         * @return void
+         * @since 9
+         */
         void SetTiltY(double tiltY);
 
         /**
@@ -385,6 +469,14 @@ public:
          * @since 9
          */
         void SetPressure(double pressure);
+
+        int32_t GetAxisLong() const;
+
+        void SetAxisLong(int32_t axisLong);
+
+        int32_t GetAxisShort() const;
+
+        void SetAxisShort(int32_t axisShort);
 
         /**
          * @brief Obtains the ID of the current device.
@@ -432,7 +524,15 @@ public:
         int32_t height_ { 0 };
         double  tiltX_ { 0.0 };
         double  tiltY_ { 0.0 };
+        int32_t toolGlobalX_ { 0 };
+        int32_t toolGlobalY_ { 0 };
+        int32_t toolLocalX_ { 0 };
+        int32_t toolLocalY_ { 0 };
+        int32_t toolWidth_ { 0 };
+        int32_t toolHeight_ { 0 };
         double  pressure_ { 0.0 };
+        int32_t axisLong_ { 0 };
+        int32_t axisShort_ { 0 };
         int32_t deviceId_ { 0 };
         int64_t downTime_ { 0 };
         int32_t toolType_ { 0 };
@@ -504,7 +604,8 @@ public:
      * @brief Obtains the pointer item of a specified pointer ID.
      * @param pointerId Indicates the pointer ID.
      * @param pointerItem Indicates the item used to receive the data of the pointer.
-     * @return Returns <b>true</b> if the data of the pointer with the specified ID exists; returns <b>false</b> otherwise.
+     * @return Returns <b>true</b> if the data of the pointer with the specified ID exists;
+     * returns <b>false</b> otherwise.
      * @since 9
      */
     bool GetPointerItem(int32_t pointerId, PointerItem &pointerItem);

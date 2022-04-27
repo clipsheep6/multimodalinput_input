@@ -139,6 +139,7 @@ int32_t StandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEven
     return RET_OK;
 }
 
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 int32_t StandardizedEventManager::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
 {
     CALL_LOG_ENTER;
@@ -146,6 +147,7 @@ int32_t StandardizedEventManager::MoveMouseEvent(int32_t offsetX, int32_t offset
     pkt << offsetX << offsetY;
     return SendMsg(pkt);
 }
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 int32_t StandardizedEventManager::GetDeviceIds(int32_t userData)
 {
@@ -168,6 +170,17 @@ int32_t StandardizedEventManager::GetKeystrokeAbility(int32_t userData, int32_t 
     pkt << userData << deviceId << size;
     for (auto item : keyCodes) {
         pkt << item;
+    }
+    return SendMsg(pkt);
+}
+
+int32_t StandardizedEventManager::GetKeyboardType(int32_t userData, int32_t deviceId) const
+{
+    NetPacket pkt(MmiMessageId::INPUT_DEVICE_KEYBOARD_TYPE);
+    pkt << userData << deviceId;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write userData failed");
+        return PACKET_WRITE_FAIL;
     }
     return SendMsg(pkt);
 }

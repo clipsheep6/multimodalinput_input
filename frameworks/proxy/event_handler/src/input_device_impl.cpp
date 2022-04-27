@@ -49,8 +49,7 @@ void InputDeviceImpl::OnDevMonitorTask(DevMonitor devMonitor, std::string type, 
 {
     CALL_LOG_ENTER;
     devMonitor.second(type, deviceId);
-    MMI_HILOGD("report device changed task, event type:%{public}s device:%{public}d",
-        type.c_str(), deviceId);
+    MMI_HILOGD("report device changed task, event type:%{public}s", type.c_str());
 }
 
 void InputDeviceImpl::OnDevMonitor(std::string type, int32_t deviceId)
@@ -61,8 +60,7 @@ void InputDeviceImpl::OnDevMonitor(std::string type, int32_t deviceId)
         std::bind(&InputDeviceImpl::OnDevMonitorTask, this, devMonitor_, type, deviceId))) {
         MMI_HILOGE("post task failed");
     }
-    MMI_HILOGD("report device changed, event type:%{public}s device:%{public}d",
-        type.c_str(), deviceId);
+    MMI_HILOGD("report device changed, event type:%{public}s", type.c_str());
 }
 
 void InputDeviceImpl::GetInputDeviceIdsAsync(std::function<void(int32_t, std::vector<int32_t>)> callback)
@@ -131,6 +129,22 @@ void InputDeviceImpl::GetKeystrokeAbility(int32_t deviceId, std::vector<int32_t>
     ++userData_;
 }
 
+void InputDeviceImpl::GetKeyboardTypeAsync(int32_t deviceId, std::function<void(int32_t, int32_t)> callback)
+{
+    CALL_LOG_ENTER;
+    auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
+    CHKPV(eventHandler);
+    InputDeviceData data;
+    data.kbTypes = std::make_pair(eventHandler, callback);
+    if (userData_ == INT32_MAX) {
+        MMI_HILOGE("userData exceeds the maximum");
+        return;
+    }
+    inputDevices_[userData_] = data;
+    MMIEventHdl.GetKeyboardType(userData_, deviceId);
+    ++userData_;
+}
+
 void InputDeviceImpl::OnInputDeviceTask(InputDeviceImpl::DevInfo devInfo, int32_t userData,
     int32_t id, std::string name, int32_t deviceType)
 {
@@ -138,8 +152,8 @@ void InputDeviceImpl::OnInputDeviceTask(InputDeviceImpl::DevInfo devInfo, int32_
     auto devData = std::make_shared<InputDeviceInfo>(id, name, deviceType);
     CHKPV(devData);
     devInfo.second(userData, devData);
-    MMI_HILOGD("report device info task, userData:%{public}d device:%{public}d name:%{public}s type:%{public}d",
-        userData, id, name.c_str(), deviceType);
+    MMI_HILOGD("report device info task, userData:%{public}d name:%{public}s type:%{public}d",
+        userData, name.c_str(), deviceType);
 }
 
 void InputDeviceImpl::OnInputDevice(int32_t userData, int32_t id, const std::string &name, int32_t deviceType)
@@ -164,8 +178,8 @@ void InputDeviceImpl::OnInputDevice(int32_t userData, int32_t id, const std::str
         std::bind(&InputDeviceImpl::OnInputDeviceTask, this, *devInfo, userData, id, name, deviceType))) {
         MMI_HILOGE("post task failed");
     }
-    MMI_HILOGD("report device info, userData:%{public}d device:%{public}d name:%{public}s type:%{public}d",
-        userData, id, name.c_str(), deviceType);
+    MMI_HILOGD("report device info, userData:%{public}d name:%{public}s type:%{public}d",
+        userData, name.c_str(), deviceType);
 }
 
 void InputDeviceImpl::OnInputDeviceIdsTask(InputDeviceImpl::DevIds devIds, int32_t userData, std::vector<int32_t> ids)
@@ -229,6 +243,33 @@ void InputDeviceImpl::OnKeystrokeAbility(int32_t userData, const std::map<int32_
     }
 }
 
+void InputDeviceImpl::OnKeyboardTypeTask(InputDeviceImpl::DevKeyboardTypes kbTypes, int32_t userData,
+    int32_t keyboardType)
+{
+    CHK_PIDANDTID();
+    kbTypes.second(userData, keyboardType);
+    MMI_HILOGD("Keyboard type event callback userData:%{public}d keyboardType:(%{public}d)",
+        userData, keyboardType);
+}
+
+void InputDeviceImpl::OnKeyboardType(int32_t userData, int32_t keyboardType)
+{
+    CHK_PIDANDTID();
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (auto iter = inputDevices_.find(userData); iter == inputDevices_.end()) {
+        MMI_HILOGD("find userData failed");
+        return;
+    }
+    auto devKbTypes = GetKeyboardTypes(userData);
+    CHKPV(devKbTypes);
+    if (!MMIEventHandler::PostTask(devKbTypes->first,
+        std::bind(&InputDeviceImpl::OnKeyboardTypeTask, this, *devKbTypes, userData, keyboardType))) {
+        MMI_HILOGE("post task failed");
+    }
+    MMI_HILOGD("Keyboard type event userData:%{public}d keyboardType:%{public}d",
+        userData, keyboardType);
+}
+
 const InputDeviceImpl::DevInfo* InputDeviceImpl::GetDeviceInfo(int32_t userData) const
 {
     auto iter = inputDevices_.find(userData);
@@ -254,6 +295,12 @@ const InputDeviceImpl::DevKeys* InputDeviceImpl::GetDeviceKeys(int32_t userData)
         return nullptr;
     }
     return &iter->second.keys;
+}
+
+const InputDeviceImpl::DevKeyboardTypes* InputDeviceImpl::GetKeyboardTypes(int32_t userData) const
+{
+    auto iter = inputDevices_.find(userData);
+    return iter == inputDevices_.end()? nullptr : &iter->second.kbTypes;
 }
 
 int32_t InputDeviceImpl::GetUserData()

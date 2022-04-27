@@ -51,6 +51,7 @@ public:
     virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &toReturnClientFd, int32_t pid = 0, int32_t uid = 0) override;
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
+    virtual int32_t SetPointerVisible(bool visible) override;
 
 protected:
     virtual void OnConnected(SessionPtr s) override;
