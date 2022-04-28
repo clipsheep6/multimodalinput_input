@@ -23,7 +23,6 @@
 #include "nocopyable.h"
 
 #include "circle_stream_buffer.h"
-#include "i_uds_server.h"
 #include "uds_session.h"
 #include "uds_socket.h"
 
@@ -40,7 +39,7 @@ enum EpollEventType {
 };
 
 using MsgServerFunCallback = std::function<void(SessionPtr, NetPacket&)>;
-class UDSServer : public UDSSocket, public IUdsServer {
+class UDSServer : public UDSSocket {
 public:
     UDSServer();
     DISALLOW_COPY_AND_MOVE(UDSServer);

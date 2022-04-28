@@ -37,6 +37,7 @@ public:
 private:
     void OnAllocSocketFd(MessageParcel &data, MessageParcel &reply);
     void OnAddInputEventFilter(MessageParcel& data, MessageParcel& reply);
+    void StubSetPointerVisible(MessageParcel& data, MessageParcel& reply);
 
 private:
     int32_t lastClientPid_ = 0;

@@ -42,12 +42,12 @@ public:
     virtual int32_t OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply,
         MessageOption& options) override;
 
+private:
+    bool CheckPermission();
+
 protected:
-    int32_t StubSetPointerVisible(MessageParcel& data, MessageParcel& reply);
     EntrustTasks entrustTasks_;
     RemoteMsgHandler rMsgHandler_;
-
-    bool CheckPermission();
 };
 } // namespace MMI
 } // namespace OHOS

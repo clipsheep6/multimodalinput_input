@@ -123,5 +123,23 @@ void RemoteMsgHandler::OnAddInputEventFilter(MessageParcel& data, MessageParcel&
         return;
     }
 }
+
+void RemoteMsgHandler::StubSetPointerVisible(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_LOG_ENTER;
+    CHKPV(lastSession_);
+    CHKPV(multStub_);
+    bool visible;
+    if (!data.ReadBool(visible)) {
+        MMI_HILOGE("data ReadBool fail");
+        return;
+    }
+    int32_t ret = multStub_->SetPointerVisible(visible);
+    if (!reply.WriteInt32(ret)) {
+        MMI_HILOGE("WriteInt32:%{public}d fail", ret);
+        return;
+    }
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS
