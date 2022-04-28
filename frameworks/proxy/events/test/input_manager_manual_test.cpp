@@ -118,7 +118,6 @@ void InputManagerManualTest::SimulateInputEventHelper(int32_t globalX, int32_t g
 #else
     EXPECT_EQ(callbackRet, 0);
 #endif
-
 }
 
 /**
