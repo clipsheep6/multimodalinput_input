@@ -62,7 +62,7 @@ private:
         std::function<void(std::shared_ptr<KeyEvent>)> callback_;
     };
 private:
-    int32_t InterceptorItemId = 0;
+[[maybe_unused]] int32_t InterceptorItemId = 0;
     std::list<InterceptorItem> interceptor_;
 };
 } // namespace MMI

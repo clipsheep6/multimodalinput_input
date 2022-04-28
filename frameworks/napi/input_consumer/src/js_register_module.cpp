@@ -25,8 +25,8 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterMoudle" };
-constexpr size_t EVENT_NAME_LEN = 64;
-constexpr size_t PRE_KEYS_SIZE = 4;
+[[maybe_unused]] constexpr size_t EVENT_NAME_LEN = 64;
+[[maybe_unused]] constexpr size_t PRE_KEYS_SIZE = 4;
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD

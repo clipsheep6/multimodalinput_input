@@ -32,6 +32,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Inter
 
 InterceptorHandlerGlobal::InterceptorHandlerGlobal() {}
 
+#ifdef OHOS_BUILD_ENABLE_POINTER 
 int32_t InterceptorHandlerGlobal::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -43,7 +44,9 @@ int32_t InterceptorHandlerGlobal::HandlePointerEvent(std::shared_ptr<PointerEven
     CHKPR(nextHandler_, ERROR_NULL_POINTER);
     return nextHandler_->HandlePointerEvent(pointerEvent);
 }
+#endif // OHOS_BUILD_ENABLE_POINTER
 
+#ifdef OHOS_BUILD_ENABLE_TOUCH
 int32_t InterceptorHandlerGlobal::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -55,6 +58,7 @@ int32_t InterceptorHandlerGlobal::HandleTouchEvent(std::shared_ptr<PointerEvent>
     CHKPR(nextHandler_, ERROR_NULL_POINTER);
     return nextHandler_->HandlePointerEvent(pointerEvent);
 }
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
 int32_t InterceptorHandlerGlobal::AddInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
@@ -84,7 +88,7 @@ void InterceptorHandlerGlobal::RemoveInputHandler(int32_t handlerId,
         interceptors_.RemoveInterceptor(interceptor);
     }
 }
-
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 bool InterceptorHandlerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_HILOGD("Handle KeyEvent");
@@ -95,7 +99,9 @@ bool InterceptorHandlerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
     }
     return interceptors_.HandleEvent(keyEvent);
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 bool InterceptorHandlerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
@@ -105,6 +111,7 @@ bool InterceptorHandlerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointer
     }
     return interceptors_.HandleEvent(pointerEvent);
 }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 void InterceptorHandlerGlobal::InitSessionLostCallback()
 {
@@ -167,6 +174,7 @@ int32_t InterceptorHandlerGlobal::InterceptorCollection::GetPriority() const
     return IInputEventMonitorHandler::DEFAULT_INTERCEPTOR;
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPF(keyEvent);
@@ -181,7 +189,9 @@ bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_pt
     MMI_HILOGD("Key event was intercepted");
     return true;
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
@@ -196,6 +206,7 @@ bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_pt
     MMI_HILOGD("Pointer event was intercepted");
     return true;
 }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 int32_t InterceptorHandlerGlobal::InterceptorCollection::AddInterceptor(const SessionHandler& interceptor)
 {

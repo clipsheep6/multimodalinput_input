@@ -31,8 +31,12 @@ public:
     IInterceptorHandlerGlobal() = default;
     ~IInterceptorHandlerGlobal() = default;
     DISALLOW_COPY_AND_MOVE(IInterceptorHandlerGlobal);
+#ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+#endif // OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCH
     int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+#endif // OHOS_BUILD_ENABLE_TOUCH
     static std::shared_ptr<IInterceptorHandlerGlobal> CreateInstance();
     virtual int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     virtual void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);

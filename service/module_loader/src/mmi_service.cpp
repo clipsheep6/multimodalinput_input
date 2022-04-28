@@ -245,7 +245,9 @@ void MMIService::OnDisconnected(SessionPtr s)
     CHKPV(s);
     int32_t fd = s->GetFd();
     MMI_HILOGW("enter, session desc:%{public}s, fd: %{public}d", s->GetDescript().c_str(), fd);
+#ifdef OHOS_BUILD_ENABLE_POINTER
     IPointerDrawingManager::GetInstance()->DeletePointerVisible(s->GetPid());
+#endif // OHOS_BUILD_ENABLE_POINTER
 }
 
 int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd)
@@ -302,7 +304,9 @@ int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter)
 int32_t MMIService::SetPointerVisible(bool visible)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
     IPointerDrawingManager::GetInstance()->SetPointerVisible(GetCallingPid(), visible);
+#endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
 }
 
