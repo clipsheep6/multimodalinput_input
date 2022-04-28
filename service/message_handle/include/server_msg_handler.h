@@ -55,6 +55,18 @@ protected:
     int32_t OnUnSubscribeKeyEvent(SessionPtr sess, NetPacket& pkt);
     int32_t OnAddTouchpadEventFilter(SessionPtr sess, NetPacket& pkt);
     int32_t OnRemoveTouchpadEventFilter(SessionPtr sess, NetPacket& pkt);
+    
+    int32_t OnInputVirtualDeviceIds(SessionPtr sess, NetPacket& pkt);
+    int32_t OnInputVirtualDevice(SessionPtr sess, NetPacket& pkt);
+    int32_t OnGetAllNodeDeviceInfo(SessionPtr sess, NetPacket& pkt);
+    int32_t OnShowMouse(SessionPtr sess, NetPacket& pkt);
+    int32_t OnHideMouse(SessionPtr sess, NetPacket& pkt);
+    int32_t OnGetMouseLocation(SessionPtr sess, NetPacket& pkt);
+    int32_t OnPrepareRemoteInput(SessionPtr sess, NetPacket& pkt);
+    int32_t OnUnprepareRemoteInput(SessionPtr sess, NetPacket& pkt);
+    int32_t OnStartRemoteInput(SessionPtr sess, NetPacket& pkt);
+    int32_t OnStopRemoteInput(SessionPtr sess, NetPacket& pkt);
+    int32_t OnSimulateCrossLocation(SessionPtr sess, NetPacket& pkt);
 
 private:
     UDSServer *udsServer_ = nullptr; // External references, do not delete

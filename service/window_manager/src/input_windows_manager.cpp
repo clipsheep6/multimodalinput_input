@@ -15,6 +15,7 @@
 #include "input_windows_manager.h"
 #include <cstdio>
 #include <cstdlib>
+#include "dinput_manager.h"
 #include "event_dump.h"
 #include "util.h"
 #include "util_ex.h"
@@ -306,7 +307,7 @@ bool OHOS::MMI::InputWindowsManager::TouchMotionPointToDisplayPoint(struct libin
     }
 
     for (const auto &display : logicalDisplays_) {
-        if (targetDisplayId == display.id ) {
+        if (targetDisplayId == display.id) {
             MMI_LOGD("targetDisplay is %{public}d, displayX is %{public}d, displayY is %{public}d ",
                 targetDisplayId, displayX, displayY);
             displayX = globalLogicalX - display.topLeftX;
@@ -448,6 +449,9 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
     }
     pointerEvent->SetTargetDisplayId(displayId);
 
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    DInputMgr->GetMouseLocation().displayId = displayId;
+#endif
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
@@ -601,56 +605,97 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTargetPointer(std::shared_ptr<Poin
 
 void OHOS::MMI::InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, double& y)
 {
-    int32_t integerX = static_cast<int32_t>(x);
-    int32_t integerY = static_cast<int32_t>(y);
-    const std::vector<LogicalDisplayInfo> logicalDisplayInfo = GetLogicalDisplayInfo();
-    if (logicalDisplayInfo.empty()) {
+    int32_t displayId = -1;
+    if (logicalDisplays_.empty()) {
         MMI_LOGE("logicalDisplayInfo is empty");
         return;
     }
-    for (const auto &item : logicalDisplayInfo) {
+    LogicalDisplayInfo* pLogical = UpdateX(x);
+    if (pLogical != nullptr) {
+        displayId = pLogical->id;
+        UpdateY(*pLogical, y);
+    }
+    mouseLoction_.displayId = displayId;
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL 
+    UpdateDmouseLocation();
+#endif
+    MMI_LOGD("Mouse Data: displayId = %{public}d, globalX:%{public}d,globalY:%{public}d",
+        mouseLoction_.displayId, mouseLoction_.globalX, mouseLoction_.globalY);
+}
+
+LogicalDisplayInfo* OHOS::MMI::InputWindowsManager::UpdateX(double& x)
+{
+    int32_t integerX = static_cast<int32_t>(x);
+    LogicalDisplayInfo* pLogical = nullptr;
+    for (auto &item : logicalDisplays_) {
         bool isOutside[CORNER] = { false, false, false, false };
         if (item.id >= 0) {
+            pLogical = &item;
             if (integerX < item.topLeftX) {
-                mouseLoction_.globalX = item.topLeftX;
-                x = item.topLeftX;
-                isOutside[TOP_LEFT_X] = true;
+                x = mouseLoction_.globalX = item.topLeftX;
+                break;
+            } else if (integerX > (item.topLeftX + item.width)) {
+                x = mouseLoction_.globalX = item.topLeftX + item.width;
+                continue;
             } else {
-                isOutside[TOP_LEFT_X] = false;
-            }
-            if (integerX > (item.topLeftX + item.width)) {
-                mouseLoction_.globalX = item.topLeftX + item.width;
-                x = item.topLeftX + item.width;
-                isOutside[TOP_RIGHT_X] = true;
-            } else {
-                isOutside[TOP_RIGHT_X] = false;
-            }
-            if (integerY < item.topLeftY) {
-                mouseLoction_.globalY = item.topLeftY;
-                y = item.topLeftY;
-                isOutside[TOP_LEFT_Y] = true;
-            } else {
-                isOutside[TOP_LEFT_Y] = false;
-            }
-            if (integerY > (item.topLeftY + item.height)) {
-                mouseLoction_.globalY = item.topLeftY + item.height;
-                y = item.topLeftY + item.height;
-                isOutside[TOP_RIGHT_Y] = true;
-            } else {
-                isOutside[TOP_RIGHT_Y] = false;
-            }
-            if ((isOutside[TOP_LEFT_X] != true) && (isOutside[TOP_LEFT_Y] != true) &&
-                (isOutside[TOP_RIGHT_X] != true) && (isOutside[TOP_RIGHT_Y] != true)) {
-                mouseLoction_.globalX = x;
-                mouseLoction_.globalY = y;
+                mouseLoction_.globalX = integerX;
                 break;
             }
         }
     }
-    MMI_LOGD("Mouse Data: globalX:%{public}d,globalY:%{public}d", mouseLoction_.globalX, mouseLoction_.globalY);
+    return pLogical;
+}
+
+void OHOS::MMI::InputWindowsManager::UpdateY(LogicalDisplayInfo& logicalDisplayInfo, double& y)
+{
+    int32_t integerY = static_cast<int32_t>(y);
+    if (logicalDisplayInfo.id >= 0) {
+        if (integerY < logicalDisplayInfo.topLeftY) {
+            y = mouseLoction_.globalY = logicalDisplayInfo.topLeftY;
+        } else if (integerY > (logicalDisplayInfo.topLeftY + logicalDisplayInfo.height)) {
+            y = mouseLoction_.globalY = logicalDisplayInfo.topLeftY + logicalDisplayInfo.height;
+        } else {
+            mouseLoction_.globalY = integerY;
+        }
+    }
+}
+
+void OHOS::MMI::InputWindowsManager::UpdateDmouseLocation()
+{
+    MMI_LOGD("Enter");
+    DInputMgr->GetMouseLocation().globalX = mouseLoction_.globalX;
+    DInputMgr->GetMouseLocation().globalY = mouseLoction_.globalY;
+    int32_t displayId = mouseLoction_.displayId;
+    if (UpdataDisplayId(displayId)) {
+        LogicalDisplayInfo* p = GetLogicalDisplayId(displayId);
+        if (p != nullptr) {
+            DInputMgr->GetMouseLocation().displayId = displayId;
+            DInputMgr->GetMouseLocation().logicalDisplayHeight = p->height;
+            DInputMgr->GetMouseLocation().logicalDisplayWidth = p->width;
+            DInputMgr->GetMouseLocation().logicalDisplayTopLeftX = p->topLeftX;
+            DInputMgr->GetMouseLocation().logicalDisplayTopLeftY = p->topLeftY;
+            MMI_LOGE("displayId = %{public}d, logicalDisplayHeight = %{public}d, logicalDisplayWidth = %{public}d,"
+                "logicalDisplayTopLeftX = %{public}d, logicalDisplayTopLeftY = %{public}d,", displayId,
+                p->height, p->width, p->topLeftX, p->topLeftY);
+        } else {
+            MMI_LOGE("logicalDisplayInfo not exist, displayId = %{public}d", displayId);
+        }
+    } else {
+        MMI_LOGE("logicalDisplayInfo not exist, displayId = %{public}d", displayId);
+    }
 }
 
 MouseLocation OHOS::MMI::InputWindowsManager::GetMouseInfo()
 {
     return mouseLoction_;
+}
+
+void InputWindowsManager::ShowMouse()
+{
+    PointerDrawMgr->ShowMouse();
+}
+
+void InputWindowsManager::HideMouse()
+{
+    PointerDrawMgr->HideMouse();
 }

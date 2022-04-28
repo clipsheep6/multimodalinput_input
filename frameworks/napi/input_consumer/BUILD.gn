@@ -13,7 +13,7 @@
 
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
-config("libinputeventclient_config") {
+config("libinputconsumer_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
@@ -46,7 +46,7 @@ ohos_shared_library("inputconsumer") {
     "src/js_register_util.cpp",
   ]
 
-  configs = [ ":libinputeventclient_config" ]
+  configs = [ ":libinputconsumer_config" ]
 
   deps = [
     "//drivers/peripheral/input/hal:hdi_input",

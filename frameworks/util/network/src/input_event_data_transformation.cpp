@@ -154,6 +154,8 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
         CHKR(pkt.Write(item.GetHeight()), STREAM_BUF_WRITE_FAIL, RET_ERR);
         CHKR(pkt.Write(item.GetPressure()), STREAM_BUF_WRITE_FAIL, RET_ERR);
         CHKR(pkt.Write(item.GetDeviceId()), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(item.GetRawData().GetDx()), STREAM_BUF_WRITE_FAIL, RET_ERR);
+        CHKR(pkt.Write(item.GetRawData().GetDy()), STREAM_BUF_WRITE_FAIL, RET_ERR);
     }
 
     std::vector<int32_t> pressedKeys = event->GetPressedKeys();
@@ -246,6 +248,11 @@ int32_t InputEventDataTransformation::DeserializePointerItem(NetPacket &pkt, Poi
     item.SetPressure(tField);
     CHKR(pkt.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
     item.SetDeviceId(tField);
+    CHKR(pkt.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
+    int32_t dx = tField;
+    CHKR(pkt.Read(tField), STREAM_BUF_READ_FAIL, RET_ERR);
+    int32_t dy = tField;
+    item.SetRawData(RawData(dx, dy));
     return RET_OK;
 }
 } // namespace MMI

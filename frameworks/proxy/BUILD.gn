@@ -29,6 +29,10 @@ config("libmmi_client_config") {
     "//utils/native/base/include",
     "//foundation/multimodalinput/input/service/input_interceptor/include",
     "//utils/native/base/include",
+    "//foundation/multimodalinput/input/common/include",
+    "//foundation/distributedhardware/distributedinput/interfaces/inner_kits/src",
+    "//foundation/distributedhardware/distributedinput/frameworks/include",
+    "//foundation/multimodalinput/input/service/dinput/include",
     "event_handler/include",
     "module_loader/include",
   ]
@@ -39,6 +43,7 @@ ohos_source_set("libmmi-common") {
     "events/src/input_event.cpp",
     "events/src/key_event.cpp",
     "events/src/pointer_event.cpp",
+    "events/src/raw_data.cpp",
   ]
 
   cflags = [ "-DOHOS_BUILD" ]
@@ -83,7 +88,9 @@ ohos_shared_library("libmmi-client") {
   if (is_mmi_have_debug) {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
   }
-
+  if (is_mmi_have_dinput) {
+    cflags += [ "-DOHOS_DISTRIBUTED_INPUT_MODEL" ]
+  }
   configs = [ ":libmmi_client_config" ]
 
   public_configs = [ ":libmmi_client_config" ]
@@ -100,7 +107,8 @@ ohos_shared_library("libmmi-client") {
   ]
 
   part_name = "multimodalinput_base"
-  external_deps = [ "bytrace_standard:bytrace_core" ]
+  external_deps = [ "bytrace_standard:bytrace_core" ,
+                    "dsoftbus_standard:softbus_client"]
 }
 
 ohos_unittest("ut-mmi-proxy-out") {
@@ -245,6 +253,7 @@ ohos_unittest("InputManagerTest") {
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//foundation/multimodalinput/input/service/dinput/include",
   ]
 
   if (is_mmi_have_libinput) {

@@ -67,9 +67,15 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
         using namespace OHOS::MMI;
         CHKPR(path, errno);
         char realPath[PATH_MAX] = {};
+        int32_t const WAIT_TIME = 2000;
         if (realpath(path, realPath) == nullptr) {
-            MMI_LOGE("path is error, path:%{public}s", path);
-            return RET_ERR;
+            MMI_LOGE("get realpath failed from path %{public}s :waiting %{public}d ms,try again", path, WAIT_TIME);
+            std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME));
+            if (realpath(path, realPath) == nullptr)
+            {
+                MMI_LOGE("path is error, path:%{public}s", path);
+                return RET_ERR;
+            }
         }
         int32_t fd = open(realPath, flags);
         MMI_LOGD("libinput .open_restricted path:%{public}s,fd:%{public}d", path, fd);

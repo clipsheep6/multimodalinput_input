@@ -13,8 +13,10 @@
  * limitations under the License.
  */
 
-#include "input_windows_manager.h"
 #include <gtest/gtest.h>
+#define private public
+#include "input_windows_manager.h"
+
 
 namespace {
 using namespace testing::ext;
@@ -24,5 +26,102 @@ class InputWindowsManagerTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
+    void SetUp()
+    {
+        const int32_t TOP_LEFT_X1 = 0;
+        const int32_t WIDTH1 = 500;
+        const int32_t TOP_LEFT_Y1 = 0;
+        const int32_t HEIGHT1 = 200;
+        const int32_t ID1 = 1;
+        LogicalDisplayInfo info1;
+        info1.topLeftX = TOP_LEFT_X1;
+        info1.width = WIDTH1;
+        info1.topLeftY = TOP_LEFT_Y1;
+        info1.height = HEIGHT1;
+        info1.id = ID1;
+        LogicalDisplayInfo info2 = info1;
+        info2.topLeftX = WIDTH1;
+        info2.topLeftY = HEIGHT1;
+        info2.id = ID1 + 1;
+        WinMgr->logicalDisplays_.push_back(info1);
+        WinMgr->logicalDisplays_.push_back(info2);
+    }
 };
+
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateAndAdjustMouseLoction_001, TestSize.Level1)
+{
+    double x = 0;
+    double y = 100;
+    WinMgr->UpdateAndAdjustMouseLoction(x, y);
+    MouseLocation mouseInfo = WinMgr->GetMouseInfo();
+    EXPECT_EQ(mouseInfo.globalX, 0);
+    EXPECT_EQ(mouseInfo.globalY, 100);
+    EXPECT_EQ(mouseInfo.displayId, 1);
+}
+
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateAndAdjustMouseLoction_002, TestSize.Level1)
+{
+    double x = 200;
+    double y = 0;
+    WinMgr->UpdateAndAdjustMouseLoction(x, y);
+    MouseLocation mouseInfo = WinMgr->GetMouseInfo();
+    EXPECT_EQ(mouseInfo.globalX, 200);
+    EXPECT_EQ(mouseInfo.globalY, 0);
+    EXPECT_EQ(mouseInfo.displayId, 1);
+}
+
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateAndAdjustMouseLoction_003, TestSize.Level1)
+{
+    double x = 100;
+    double y = 70;
+    WinMgr->UpdateAndAdjustMouseLoction(x, y);
+    MouseLocation mouseInfo = WinMgr->GetMouseInfo();
+    EXPECT_EQ(mouseInfo.globalX, 100);
+    EXPECT_EQ(mouseInfo.globalY, 70);
+    EXPECT_EQ(mouseInfo.displayId, 1);
+}
+
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateAndAdjustMouseLoction_004, TestSize.Level1)
+{
+    double x = -100;
+    double y = 100;
+    WinMgr->UpdateAndAdjustMouseLoction(x, y);
+    MouseLocation mouseInfo = WinMgr->GetMouseInfo();
+    EXPECT_EQ(mouseInfo.globalX, 0);
+    EXPECT_EQ(mouseInfo.globalY, 100);
+    EXPECT_EQ(mouseInfo.displayId, 1);
+}
+
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateAndAdjustMouseLoction_005, TestSize.Level1)
+{
+    double x = 500;
+    double y = 200;
+    WinMgr->UpdateAndAdjustMouseLoction(x, y);
+    MouseLocation mouseInfo = WinMgr->GetMouseInfo();
+    EXPECT_EQ(mouseInfo.globalX, 500);
+    EXPECT_EQ(mouseInfo.globalY, 200);
+    EXPECT_EQ(mouseInfo.displayId, 1);
+}
+
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateAndAdjustMouseLoction_006, TestSize.Level1)
+{
+    double x = 600;
+    double y = 200;
+    WinMgr->UpdateAndAdjustMouseLoction(x, y);
+    MouseLocation mouseInfo = WinMgr->GetMouseInfo();
+    EXPECT_EQ(mouseInfo.globalX, 600);
+    EXPECT_EQ(mouseInfo.globalY, 200);
+    EXPECT_EQ(mouseInfo.displayId, 2);
+}
+
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateAndAdjustMouseLoction_007, TestSize.Level1)
+{
+    double x = 1100;
+    double y = 300;
+    WinMgr->UpdateAndAdjustMouseLoction(x, y);
+    MouseLocation mouseInfo = WinMgr->GetMouseInfo();
+    EXPECT_EQ(mouseInfo.globalX, 1000);
+    EXPECT_EQ(mouseInfo.globalY, 300);
+    EXPECT_EQ(mouseInfo.displayId, 2);
+}
 } // namespace

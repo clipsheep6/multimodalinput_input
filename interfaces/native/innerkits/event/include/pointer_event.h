@@ -24,7 +24,7 @@
 #include <set>
 #include "parcel.h"
 #include "input_event.h"
-#include "nocopyable.h"
+#include "raw_data.h"
 
 namespace OHOS {
 namespace MMI {
@@ -369,6 +369,19 @@ public:
          * @since 8
          */
         void SetDeviceId(int32_t deviceId);
+        /**
+         * @brief Obtains the RawData of the current device.
+         * @return Returns the RawData.
+         * @since 8
+         */
+        RawData GetRawData() const;
+        /**
+         * @brief Sets the RawData for the current device.
+         * @param rawData Indicates the rawData to set.
+         * @return void
+         * @since 8
+         */
+        void SetRawData(const RawData& rawData);
     public:
         /**
          * @brief Writes data to a <b>Parcel</b> obejct.
@@ -398,6 +411,7 @@ public:
         int32_t pressure_ { 0 };
         int32_t deviceId_ { 0 };
         int64_t downTime_ { 0 };
+        RawData rawData_;
     };
 
 public:
