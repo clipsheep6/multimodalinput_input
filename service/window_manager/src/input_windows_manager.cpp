@@ -576,7 +576,6 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     pointerItem.SetToolLocalY(pointerItem.GetToolGlobalY() - touchWindow->winTopLeftY);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     auto fd = udsServer_->GetClientFd(touchWindow->pid);
-    udsServer_->DumpSession("UpdateTouchScreenTarget");
     MMI_HILOGD("pid:%{public}d,fd:%{public}d,globalX01:%{public}d,"
                "globalY01:%{public}d,localX:%{public}d,localY:%{public}d,"
                "TargetWindowId:%{public}d,AgentWindowId:%{public}d",

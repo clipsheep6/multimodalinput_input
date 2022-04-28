@@ -192,19 +192,19 @@ void UDSServer::AddPermission(SessionPtr sess)
 
 void UDSServer::Dump(int32_t fd)
 {
-    mprintf(fd, "Sessions: count=%d", sessionsMap_.size());
-    std::string strTmp = "fds:[";
-    if (sessionsMap_.empty()) {
-        strTmp = "fds:[]";
-        mprintf(fd, "\t%s", strTmp.c_str());
-        return;
+    mprintf(fd, "Sessions: count=%d, idxMap count=%d", sessionsMap_.size());
+    int32_t i = 0;
+    mprintf(fd, "Sessions:");
+    for (const auto& [key, value] : sessionsMap_) {
+        mprintf(fd, "\t%d, [%d, %s]", i, key, value->GetDescript().c_str());
+        i++;
     }
-    for (const auto& item : sessionsMap_) {
-        strTmp += std::to_string(item.second->GetFd()) + ",";
+    i = 0;
+    mprintf(fd, "IdxMap:");
+    for (const auto& [key, value] : idxPidMap_) {
+        mprintf(fd, "\t%d, [%d, %d]", i, key, value);
+        i++;
     }
-    strTmp.resize(strTmp.size() - 1);
-    strTmp += "]";
-    mprintf(fd, "\t%s", strTmp.c_str());
 }
 
 void UDSServer::OnConnected(SessionPtr s)
@@ -317,6 +317,17 @@ void UDSServer::DumpSession(const std::string &title)
     i = 0;
     for (const auto& it : idxPidMap_) {
         MMI_HILOGD("pidIdx: %{public}d, [%{public}d, %{public}d]", i, it.first, it.second);
+        i++;
+    }
+}
+
+void UDSServer::DumpSession(const std::string &title)
+{
+    MMI_HILOGD("in %s: %s", __func__, title.c_str());
+    int32_t i = 0;
+    for (auto& [key, value] : sessionsMap_) {
+        CHKPV(value);
+        MMI_HILOGD("%d, %s", i, value->GetDescript().c_str());
         i++;
     }
 }

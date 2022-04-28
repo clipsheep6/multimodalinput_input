@@ -139,7 +139,6 @@ void RemoteMsgHandler::StubSetPointerVisible(MessageParcel& data, MessageParcel&
         MMI_HILOGE("WriteInt32:%{public}d fail", ret);
         return;
     }
-    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS
