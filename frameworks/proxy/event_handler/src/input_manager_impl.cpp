@@ -622,16 +622,20 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     CHKPV(pointerEvent);
 #if defined(OHOS_BUILD_ENABLE_POINTER)
-    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        MMI_HILOGW("Tp device dose not support");
-        return;
-    }
+    do {
+        if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+            MMI_HILOGW("Tp device dose not support");
+            break;
+        }
+    } while (0);
 #elif defined(OHOS_BUILD_ENABLE_TOUCH)
-    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE ||
-        pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
-        MMI_HILOGW("Pointer device dose not support");
-        return;
-    }
+    do {
+        if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE ||
+            pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
+            MMI_HILOGW("Pointer device dose not support");
+            return;
+        }
+    } while (0);   
 #endif // OHOS_BUILD_ENABLE_POINTER
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {

@@ -80,7 +80,7 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
         {MmiMessageId::ADD_INPUT_EVENT_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnAddInputEventMontior, this)},
         {MmiMessageId::REMOVE_INPUT_EVENT_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputEventMontior, this)},
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+#if 
         {MmiMessageId::ADD_INPUT_EVENT_TOUCHPAD_MONITOR,
             MsgCallbackBind2(&ServerMsgHandler::OnAddInputEventTouchpadMontior, this)},
         {MmiMessageId::REMOVE_INPUT_EVENT_TOUCHPAD_MONITOR,
