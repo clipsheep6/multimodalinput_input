@@ -55,7 +55,7 @@ protected:
     };
 
 protected:
-    virtual ~MsgHandler() {};
+    virtual ~MsgHandler() = default;
     V *GetMsgCallback(K id)
     {
         auto it = callbacks_.find(id);

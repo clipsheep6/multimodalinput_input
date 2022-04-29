@@ -23,26 +23,29 @@
 #include <mutex>
 
 #include "id_factory.h"
+#include "log4z.h"
 
 namespace OHOS {
 namespace MMI {
+using namespace zsummer::log4z;
 using ETaskCallback = std::function<void(int32_t)>;
 #define ET_DEFINE_TIMEOUT 3000
 #define ET_MAX_TASK_LIMIT 1000
 #define ET_ONCE_PROCESS_TASK_LIMIT 10
 class EntrustTasks : public IdFactroy<int32_t> {
-    using Promise = std::promise<void>;
-    using Future = std::future<void>;
 public:
     struct TaskData {
         uint64_t tid;
+        int32_t pid;
         int32_t taskId;
     };
     class Task : public std::enable_shared_from_this<Task> {
     public:
+        using Promise = std::promise<void>;
+        using Future = std::future<void>;
         using TaskPtr = std::shared_ptr<EntrustTasks::Task>;
-        Task(int32_t id, ETaskCallback fun, bool asyncTask = false)
-            : id_(id), hasWaited_(asyncTask), fun_(fun) {}
+        Task(int32_t id, Promise &promise, Future &future, ETaskCallback fun, bool asyncTask = false)
+            : id_(id), hasWaited_(asyncTask), fun_(fun), promise_(&promise), future_(&future) {}
         ~Task() = default;
 
         bool WaitFor(int32_t ms);
@@ -56,6 +59,14 @@ public:
         {
             return shared_from_this();
         }
+        bool HasNotified() const
+        {
+            return hasNotified_;
+        }
+        bool HasWaited() const
+        {
+            return hasWaited_;
+        }
         bool HasReady() const
         {
             return (hasNotified_ && hasWaited_);
@@ -66,19 +77,21 @@ public:
         std::atomic_bool hasNotified_ = false;
         std::atomic_bool hasWaited_ = false;
         ETaskCallback fun_;
-        Promise promise_;
-        Future future_ = promise_.get_future();
+        Promise* promise_ = nullptr;
+        Future* future_ = nullptr;
     };
     using TaskPtr = Task::TaskPtr;
+    using Promise = Task::Promise;
+    using Future = Task::Future;
     
 public:
     EntrustTasks() = default;
     virtual ~EntrustTasks() = default;
 
     bool Init();
-    void ProcessTasks(uint64_t stid = 0);
-    bool PostSyncTask(ETaskCallback callback, int32_t timeout = ET_DEFINE_TIMEOUT);
-    bool PostAsyncTask(ETaskCallback callback);
+    void ProcessTasks(uint64_t stid, int32_t pid);
+    bool PostSyncTask(int32_t pid, Promise &promise, Future &future, ETaskCallback callback, int32_t timeout = ET_DEFINE_TIMEOUT);
+    // bool PostAsyncTask(ETaskCallback callback);
 
     int32_t GetReadFd() const
     {
@@ -86,7 +99,8 @@ public:
     }
 
 private:
-    TaskPtr PostTask(ETaskCallback callback, bool asyncTask = false);
+    TaskPtr PostTask(int32_t pid, Promise &promise, Future &future, ETaskCallback callback, bool asyncTask = false);
+    void PrintDebugInfo();
 
 private:
     int32_t fds_[2] = {};

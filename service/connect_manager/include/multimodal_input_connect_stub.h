@@ -44,6 +44,7 @@ public:
 
 private:
     bool CheckPermission();
+    bool CheckPermission(uint32_t code);
 
 protected:
     EntrustTasks entrustTasks_;

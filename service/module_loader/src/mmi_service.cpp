@@ -196,6 +196,7 @@ bool MMIService::InitEntrustTasks()
 int32_t MMIService::Init()
 {
     CheckDefine();
+    ILog4zManager::getRef().start();
     MMI_HILOGD("EventDump Init");
     MMIEventDump->Init(*this);
     MMI_HILOGD("WindowsManager Init");
@@ -262,8 +263,8 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
     int32_t pid, int32_t uid)
 {
     MMI_HILOGI("enter, programName:%{public}s,moduleType:%{public}d", programName.c_str(), moduleType);
-    toReturnClientFd = -1;
-    int32_t serverFd = -1;
+    toReturnClientFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
+    int32_t serverFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
     const int32_t ret = AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd);
     if (ret != RET_OK) {
         MMI_HILOGE("call AddSocketPairInfo return %{public}d", ret);
@@ -311,6 +312,7 @@ void MMIService::OnTimer()
 
 void MMIService::OnEntrustTask(epoll_event& ev)
 {
+    CALL_LOG_ENTER;
     if ((ev.events & EPOLLIN) == 0) {
         MMI_HILOGW("not epollin");
         return;
@@ -320,9 +322,11 @@ void MMIService::OnEntrustTask(epoll_event& ev)
     if (res == -1) {
         MMI_HILOGW("read failed erron:%{public}d", errno);
     }
-    MMI_HILOGD("RemoteRequest notify tid:%{public}" PRId64 " stid:%{public}" PRId64 " taskId:%{public}d",
-        GetThisThreadId(), data.tid, data.taskId);
-    entrustTasks_.ProcessTasks(data.tid);
+    LOGFMTD("RemoteRequest notify tid:%" PRId64 " stid:%" PRId64 " pid:%d taskId:%d",
+        GetThisThreadId(), data.tid, data.pid, data.taskId);
+    MMI_HILOGD("RemoteRequest notify tid:%{public}" PRId64 " stid:%{public}" PRId64 " pid:%{public}d taskId:%{public}d",
+        GetThisThreadId(), data.tid, data.pid, data.taskId);
+    entrustTasks_.ProcessTasks(data.tid, data.pid);
 }
 
 void MMIService::OnThread()

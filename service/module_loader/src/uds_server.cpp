@@ -61,8 +61,6 @@ int32_t UDSServer::GetClientFd(int32_t pid) const
 {
     auto it = idxPidMap_.find(pid);
     if (it == idxPidMap_.end()) {
-        MMI_HILOGE("find fd error, Invalid input parameter pid:%{public}d,errCode:%{public}d",
-            pid, SESSION_NOT_FOUND);
         return RET_ERR;
     }
     return it->second;
@@ -72,8 +70,6 @@ int32_t UDSServer::GetClientPid(int32_t fd) const
 {
     auto it = sessionsMap_.find(fd);
     if (it == sessionsMap_.end()) {
-        MMI_HILOGE("find pid error, Invalid input parameter fd:%{public}d,errCode:%{public}d",
-            fd, SESSION_NOT_FOUND);
         return RET_ERR;
     }
     return it->second->GetPid();
@@ -131,8 +127,8 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     auto closeSocketFdWhenError = [&serverFd, &toReturnClientFd] {
         close(serverFd);
         close(toReturnClientFd);
-        serverFd = -1;
-        toReturnClientFd = -1;
+        serverFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
+        toReturnClientFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
     };
 
     std::list<std::function<void()> > cleanTaskList;
@@ -302,22 +298,6 @@ void UDSServer::OnEpollEvent(epoll_event& ev)
         ReleaseSession(fd, ev);
     } else if (ev.events & EPOLLIN) {
         OnEpollRecv(fd, ev);
-    }
-}
-
-void UDSServer::DumpSession(const std::string &title)
-{
-    MMI_HILOGD("in %{public}s: %{public}s size:%{public}zu idxSize:%{public}zu", __func__,
-        title.c_str(), sessionsMap_.size(), idxPidMap_.size());
-    int32_t i = 0;
-    for (const auto& it : sessionsMap_) {
-        MMI_HILOGD("%{public}d, [%{public}d, %{public}s]", i, it.first, it.second->GetDescript().c_str());
-        i++;
-    }
-    i = 0;
-    for (const auto& it : idxPidMap_) {
-        MMI_HILOGD("pidIdx: %{public}d, [%{public}d, %{public}d]", i, it.first, it.second);
-        i++;
     }
 }
 

@@ -46,7 +46,7 @@ private:
     sptr<IMultimodalInputConnect> multimodalInputConnectService_ = nullptr;
     sptr<IRemoteObject::DeathRecipient> multimodalInputConnectRecipient_ = nullptr;
     std::mutex lock_;
-    int32_t socketFd_ = -1;
+    int32_t socketFd_ = IMultimodalInputConnect::INVALID_SOCKET_FD;
 };
 } // namespace MMI
 } // namespace OHOS

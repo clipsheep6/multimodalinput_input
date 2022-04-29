@@ -37,35 +37,45 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
 {
     CALL_LOG_ENTER;
     int32_t pid = GetCallingPid();
-    TimeCostChk chk("IPC-RemoteRequest", "overtime 300(us)", MAX_OVER_TIME, pid,
+    TimeCostChk chk("IPC-OnRemoteRequest", "overtime 300(us)", MAX_OVER_TIME, pid,
         static_cast<int64_t>(code));
     uint64_t tid = GetThisThreadId();
+    LOGFMTD("RemoteRequest recv code:%d tid:%" PRId64 " pid:%d", code, tid, pid);
     MMI_HILOGD("RemoteRequest recv code:%{public}d tid:%{public}" PRId64 " pid:%{public}d", code, tid, pid);
 
+    MMI_HILOGD("step 1 pid:%{public}d", pid);
     std::u16string descriptor = data.ReadInterfaceToken();
     if (descriptor != IMultimodalInputConnect::GetDescriptor()) {
         MMI_HILOGE("get unexpect descriptor:%{public}s", Str16ToStr8(descriptor).c_str());
         return ERR_INVALID_STATE;
     }
-    if (!CheckPermission()) {
+    MMI_HILOGD("step 2 pid:%{public}d", pid);
+    if (!CheckPermission(code)) {
         MMI_HILOGE("check permission failed");
-        return CHECK_PERMISSION_FAIL;
+        // return CHECK_PERMISSION_FAIL;
+        return ERR_INVALID_STATE;
     }
+    MMI_HILOGD("step 3 pid:%{public}d", pid);
     if (!IsRunning()) {
         MMI_HILOGE("service is not running. code:%{public}u, go switch defaut", code);
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
+    MMI_HILOGD("step 4 pid:%{public}d", pid);
     if (!rMsgHandler_.ChkKey(code)) {
         MMI_HILOGE("unknown code:%{public}u ids:(%{public}s), go switch defaut", code,
             rMsgHandler_.GetDebugInfo().c_str());
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
+    MMI_HILOGD("step 5 pid:%{public}d", pid);
     int32_t uid = GetCallingUid();
-    if (!entrustTasks_.PostSyncTask(std::bind(&RemoteMsgHandler::OnMsgHandler, &rMsgHandler_, std::placeholders::_1,
-        uid, pid, tid, code, std::ref(data), std::ref(reply)))) {
+    EntrustTasks::Promise promise;
+    EntrustTasks::Future future = promise.get_future();
+    if (!entrustTasks_.PostSyncTask(pid, promise, future, std::bind(&RemoteMsgHandler::OnMsgHandler, &rMsgHandler_,
+        std::placeholders::_1, uid, pid, tid, code, std::ref(data), std::ref(reply)))) {
         MMI_HILOGE("post task failed code:%{public}u, go switch defaut", code);
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
+    MMI_HILOGD("step 6 pid:%{public}d", pid);
     return NO_ERROR;
 }
 
@@ -100,6 +110,17 @@ bool MultimodalInputConnectStub::CheckPermission()
     } else {
         MMI_HILOGE("unsupported token type:%{public}d", tokenType);
         return false;
+    }
+    return true;
+}
+
+bool MultimodalInputConnectStub::CheckPermission(uint32_t code)
+{
+    switch (code) {
+        case IMultimodalInputConnect::SET_POINTER_VISIBLE:
+        {
+            return CheckPermission();
+        }
     }
     return true;
 }

@@ -27,8 +27,9 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Entru
 
 bool EntrustTasks::Task::WaitFor(int32_t ms)
 {
+    CALL_LOG_ENTER;
     std::chrono::milliseconds span(ms);
-    auto res = future_.wait_for(span);
+    auto res = future_->wait_for(span);
     if (res == std::future_status::timeout) {
         MMI_HILOGW("Task timeout id:%{public}d", id_);
     }
@@ -38,11 +39,12 @@ bool EntrustTasks::Task::WaitFor(int32_t ms)
 
 void EntrustTasks::Task::ProcessTask()
 {
+    CALL_LOG_ENTER;
     if (hasNotified_) {
         return;
     }
     fun_(id_);
-    promise_.set_value();
+    promise_->set_value();
     hasNotified_ = true;
 }
 
@@ -57,56 +59,72 @@ bool EntrustTasks::Init()
     return true;
 }
 
-void EntrustTasks::ProcessTasks(uint64_t stid)
+void EntrustTasks::ProcessTasks(uint64_t stid, int32_t pid)
 {
     CALL_LOG_ENTER;
     auto tid = GetThisThreadId();
-    MMI_HILOGD("tid:%{public}" PRId64 " stid:%{public}" PRId64 "", tid, stid);
+    LOGFMTD("tid:%" PRId64 " stid:%" PRId64 " pid:%d", tid, stid, pid);
+    MMI_HILOGD("tid:%{public}" PRId64 " stid:%{public}" PRId64 " pid:%{public}d", tid, stid, pid);
     std::lock_guard<std::mutex> guard(mux_);
     if (tasks_.empty()) {
+        MMI_HILOGE("tasks is empty pid:%{public}d", pid);
         return;
     }
-
-    int32_t count = 0;
-    for (auto it = tasks_.begin(); it != tasks_.end(); count++) {
-        if (count > ET_ONCE_PROCESS_TASK_LIMIT) {
-            MMI_HILOGW("process too many task");
+    for (int32_t i = 0; i < ET_ONCE_PROCESS_TASK_LIMIT; i++) {
+        auto it = tasks_.begin();
+        if (it == tasks_.end()) {
             break;
         }
         auto task = *it;
-        if (task->HasReady()) {
-            RecoveryId(task->GetId());
-            it = tasks_.erase(it);
-        } else {
-            task->ProcessTask();
-            it++;
-        }
+        task->ProcessTask();
+        tasks_.erase(it);
     }
+    // int32_t count = 0;
+    // for (auto it = tasks_.begin(); it != tasks_.end(); count++) {
+    //     if (count > ET_ONCE_PROCESS_TASK_LIMIT) {
+    //         MMI_HILOGE("process too many times pid:%{public}d", pid);
+    //         break;
+    //     }
+    //     auto task = *it;
+    //     if (task->HasReady()) {
+    //         RecoveryId(task->GetId());
+    //         it = tasks_.erase(it);
+    //     } else {
+    //         task->ProcessTask();
+    //         it++;
+    //     }
+    // }
+    PrintDebugInfo();
 }
 
-bool EntrustTasks::PostSyncTask(ETaskCallback callback, int32_t timeout)
+bool EntrustTasks::PostSyncTask(int32_t pid, Promise &promise, Future &future, ETaskCallback callback, int32_t timeout)
 {
     CALL_LOG_ENTER;
-    auto task = PostTask(callback);
+    auto task = PostTask(pid, promise, future, callback);
     if (task == nullptr) {
         MMI_HILOGE("Post aync task failed");
         return false;
     }
-    return task->WaitFor(timeout);
-}
-
-bool EntrustTasks::PostAsyncTask(ETaskCallback callback)
-{
-    CALL_LOG_ENTER;
-    auto task = PostTask(callback, true);
-    if (task == nullptr) {
-        MMI_HILOGE("Post async task failed");
-        return false;
+    std::chrono::milliseconds span(timeout);
+    auto res = future.wait_for(span);
+    if (res == std::future_status::timeout) {
+        MMI_HILOGW("Task timeout pid:%{public}d", pid);
     }
-    return true;
+    return (res == std::future_status::ready);
 }
 
-EntrustTasks::TaskPtr EntrustTasks::PostTask(ETaskCallback callback, bool asyncTask)
+// bool EntrustTasks::PostAsyncTask(ETaskCallback callback)
+// {
+//     CALL_LOG_ENTER;
+//     auto task = PostTask(callback, true);
+//     if (task == nullptr) {
+//         MMI_HILOGE("Post async task failed");
+//         return false;
+//     }
+//     return true;
+// }
+
+EntrustTasks::TaskPtr EntrustTasks::PostTask(int32_t pid, Promise &promise, Future &future, ETaskCallback callback, bool asyncTask)
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mux_);
@@ -116,16 +134,31 @@ EntrustTasks::TaskPtr EntrustTasks::PostTask(ETaskCallback callback, bool asyncT
         return nullptr;
     }
     int32_t id = GenerateId();
-    TaskData data = {GetThisThreadId(), id};
+    TaskData data = {GetThisThreadId(), pid, id};
     auto res = write(fds_[1], &data, sizeof(data));
     if (res == -1) {
         RecoveryId(id);
         MMI_HILOGE("write error:%{public}d", errno);
         return nullptr;
     }
-    auto task = std::make_shared<Task>(id, callback, asyncTask);
+    auto task = std::make_shared<Task>(id, promise, future, callback, asyncTask);
     tasks_.push_back(task);
     return task->GetPtr();
+}
+
+void EntrustTasks::PrintDebugInfo()
+{
+    CALL_LOG_ENTER;
+    LOGFMTD("EntrustTasks: size:%zu", tasks_.size());
+    MMI_HILOGD("EntrustTasks: size:%{public}zu", tasks_.size());
+    int32_t i = 0;
+    for (const auto& it : tasks_) {
+        LOGFMTD("task:%d id:%d, notified:%d, waited:%d",
+            i, it->GetId(), it->HasNotified(), it->HasWaited());
+        MMI_HILOGD("task:%{public}d id:%{public}d, notified:%{public}d, waited:%{public}d",
+            i, it->GetId(), it->HasNotified(), it->HasWaited());
+        i++;
+    }
 }
 } // namespace MMI
 } // namespace OHOS

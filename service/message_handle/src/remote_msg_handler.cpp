@@ -16,6 +16,7 @@
 
 #include "string_ex.h"
 
+#include "entrust_tasks.h"
 #include "input_event_handler.h"
 #include "mmi_func_callback.h"
 #include "multimodal_input_connect_def_parcel.h"
@@ -32,17 +33,20 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Remote
 
 void RemoteMsgHandler::Init(IMultimodalInputConnect& multStub)
 {
+    CALL_LOG_ENTER;
     multStub_ = &multStub;
     callbacks_ = {
         {IMultimodalInputConnect::ALLOC_SOCKET_FD, MsgCallbackBind2(&RemoteMsgHandler::OnAllocSocketFd, this)},
         {IMultimodalInputConnect::ADD_INPUT_EVENT_FILTER, 
             MsgCallbackBind2(&RemoteMsgHandler::OnAddInputEventFilter, this)},
+        {IMultimodalInputConnect::SET_POINTER_VISIBLE, MsgCallbackBind2(&RemoteMsgHandler::OnSetPointerVisible, this)},
     };
 }
 
 void RemoteMsgHandler::OnMsgHandler(int32_t taskId, int32_t uid, int32_t pid, uint64_t stid, uint32_t code,
     MessageParcel& data, MessageParcel& reply)
 {
+    CALL_LOG_ENTER;
     TimeCostChk chk("IPC-RemoteHandler", "overtime 300(us)", MAX_OVER_TIME, pid,
         static_cast<int64_t>(code));
     CHKPV(multStub_);
@@ -64,9 +68,15 @@ void RemoteMsgHandler::OnMsgHandler(int32_t taskId, int32_t uid, int32_t pid, ui
     }
     lastClientPid_ = pid;
     lastClientUid_ = uid;
-    MMI_HILOGD("RemoteRequest handler uid:%{public}d taskId:%{public}d code:%{public}d tid:%{public}" PRId64 ""
-        " stid:%{public}" PRId64 "", uid, taskId, code, GetThisThreadId(), stid);
+    LOGFMTD("RemoteRequest handler begin pid:%d taskId:%d code:%d tid:%" PRId64 ""
+        " stid:%" PRId64 "", pid, taskId, code, GetThisThreadId(), stid);
+    MMI_HILOGD("RemoteRequest handler begin pid:%{public}d taskId:%{public}d code:%{public}d tid:%{public}" PRId64 ""
+        " stid:%{public}" PRId64 "", pid, taskId, code, GetThisThreadId(), stid);
     (*callback)(data, reply);
+    LOGFMTD("RemoteRequest handler end pid:%d taskId:%d code:%d tid:%" PRId64 ""
+        " stid:%" PRId64 "", pid, taskId, code, GetThisThreadId(), stid);
+    MMI_HILOGD("RemoteRequest handler end pid:%{public}d taskId:%{public}d code:%{public}d tid:%{public}" PRId64 ""
+        " stid:%{public}" PRId64 "", pid, taskId, code, GetThisThreadId(), stid);
 }
 
 void RemoteMsgHandler::OnAllocSocketFd(MessageParcel &data, MessageParcel &reply)
@@ -79,9 +89,12 @@ void RemoteMsgHandler::OnAllocSocketFd(MessageParcel &data, MessageParcel &reply
     CHKPV(multStub_);
     sptr<ConnectReqParcel> req = data.ReadParcelable<ConnectReqParcel>();
     CHKPV(req);
-    MMI_HILOGD("clientName:%{public}s,moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
+    LOGFMTD("clientName:%s,moduleId:%d,pid:%d",
+        req->data.clientName.c_str(), req->data.moduleId, lastClientPid_);
+    MMI_HILOGD("clientName:%{public}s,moduleId:%{public}d,pid:%{public}d",
+        req->data.clientName.c_str(), req->data.moduleId, lastClientPid_);
 
-    int32_t clientFd = -1;
+    int32_t clientFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
     int32_t ret = multStub_->AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd,
         lastClientPid_, lastClientUid_);
     if (ret != RET_OK) {
@@ -116,7 +129,7 @@ void RemoteMsgHandler::OnAddInputEventFilter(MessageParcel& data, MessageParcel&
     CHKPV(client);
     sptr<IEventFilter> filter = iface_cast<IEventFilter>(client);
     CHKPV(filter);
-    MMI_HILOGD("filter iface_cast succeeded");
+    MMI_HILOGD("pid:%{public}d filter iface_cast succeeded", lastClientPid_);
     int32_t ret = multStub_->AddInputEventFilter(filter);
     if (!reply.WriteInt32(ret)) {
         MMI_HILOGE("WriteInt32 ret:%{public}d fail", ret);
@@ -124,7 +137,7 @@ void RemoteMsgHandler::OnAddInputEventFilter(MessageParcel& data, MessageParcel&
     }
 }
 
-void RemoteMsgHandler::StubSetPointerVisible(MessageParcel& data, MessageParcel& reply)
+void RemoteMsgHandler::OnSetPointerVisible(MessageParcel& data, MessageParcel& reply)
 {
     CALL_LOG_ENTER;
     CHKPV(lastSession_);
@@ -139,6 +152,7 @@ void RemoteMsgHandler::StubSetPointerVisible(MessageParcel& data, MessageParcel&
         MMI_HILOGE("WriteInt32:%{public}d fail", ret);
         return;
     }
+    MMI_HILOGD("set pointer visible:%{public}d pid:%{public}d", visible, lastClientPid_);
 }
 } // namespace MMI
 } // namespace OHOS
