@@ -30,7 +30,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventHandler" };
 }
 
-int32_t KeyEventHandler::HandleLibinputEvent(libinput_event* event)
+int32_t KeyEventHandler::HandleEvent(libinput_event* event)
 {
     CALL_LOG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
@@ -63,6 +63,27 @@ int32_t KeyEventHandler::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     CHKPR(nextHandler_, ERROR_NULL_POINTER);
     return nextHandler_->HandleKeyEvent(keyEvent);
+}
+
+void KeyEventHandler::AddHandler(int priority, const std::shared_ptr<IInputEventHandler> handlerPtr)
+{
+    CHKPV(handlerPtr);
+    keyHandlerMap_.emplace(priority, handlerPtr);
+}
+
+void KeyEventHandler::AddFinish()
+{
+    std::shared_ptr<IInputEventHandler> tmpHandler = nullptr;
+    for(auto & handler : keyHandlerMap_) {
+        MMI_HILOGD("handlerId: %{public}d", handler.first);           
+        if (tmpHandler == nullptr) {
+            tmpHandler = handler.second;
+            SetNext(tmpHandler);
+        } else {
+            tmpHandler->SetNext(handler.second);
+            tmpHandler = handler.second;
+        }
+    }
 }
 
 void KeyEventHandler::Repeat(const std::shared_ptr<KeyEvent> keyEvent)

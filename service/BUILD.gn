@@ -128,6 +128,7 @@ ohos_shared_library("libmmi-server") {
     "subscriber/src/key_option.cpp",
     "timer_manager/src/timer_manager.cpp",
     "window_manager/src/input_windows_manager.cpp",
+    "event_handler/src/i_input_event_handler.cpp",
   ]
 
   if (is_mmi_have_hdf) {

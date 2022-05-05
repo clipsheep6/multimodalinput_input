@@ -248,9 +248,15 @@ void InputHandlerManagerGlobal::MonitorCollection::MarkConsumed(int32_t monitorI
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
     pointerEvent->SetActionTime(GetSysClockTime());
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT | InputEvent::EVENT_FLAG_NO_MONITOR);
+#ifdef OHOS_BUILD_ENABLE_TOUCH
     auto iTouchEventHandler = InputHandler->GetTouchEventHandler();
     CHKPV(iTouchEventHandler);
     iTouchEventHandler->HandleTouchEvent(pointerEvent);
+#else
+    auto inputHandler = InputHandler->GetInputHandlerChain();
+    CHKPV(inputHandler);
+    inputHandler->HandleTouchEvent(nullptr);
+#endif // OHOS_BUILD_ENABLE_TOUCH
 }
 
 int32_t InputHandlerManagerGlobal::MonitorCollection::GetPriority() const

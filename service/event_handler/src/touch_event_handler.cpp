@@ -27,7 +27,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TouchEventHandler" };
 }
 
-int32_t TouchEventHandler::HandleLibinputEvent(libinput_event* event)
+int32_t TouchEventHandler::HandleEvent(libinput_event* event)
 {
     CALL_LOG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
@@ -80,6 +80,26 @@ int32_t TouchEventHandler::HandleTouchEvent(libinput_event* event)
         }
     }
     return RET_OK;
+}
+
+void TouchEventHandler::AddHandler(int priority, const std::shared_ptr<IInputEventHandler> handlerPtr)
+{
+    CHKPV(handlerPtr);
+    touchHandlerMap_.emplace(priority, handlerPtr);
+}
+
+void TouchEventHandler::AddFinish()
+{
+    std::shared_ptr<IInputEventHandler> tmpHandler = nullptr;
+    for(auto & handler : touchHandlerMap_) {
+        if (tmpHandler == nullptr) {
+            tmpHandler = handler.second;
+            SetNext(tmpHandler);
+        } else {
+            tmpHandler->SetNext(handler.second);
+            tmpHandler = handler.second;
+        }
+    }
 }
 
 int32_t TouchEventHandler::HandleTableToolEvent(libinput_event* event)

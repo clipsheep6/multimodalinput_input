@@ -29,8 +29,10 @@ class KeyEventHandler : public IInputEventHandler {
 public:
     KeyEventHandler() = default;
     ~KeyEventHandler() = default;
-    int32_t HandleLibinputEvent(libinput_event* event) override;
+    int32_t HandleEvent(libinput_event* event);
     int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
+    void AddHandler(int priority, const std::shared_ptr<IInputEventHandler> handler);
+    void AddFinish();
 
 private:
     void Repeat(const std::shared_ptr<KeyEvent> keyEvent);
@@ -39,6 +41,7 @@ private:
 private:
     int32_t timerId_ = -1;
     EventPackage eventPackage_;
+    std::map<int32_t, std::shared_ptr<IInputEventHandler>> keyHandlerMap_;
 };
 } // namespace MMI
 } // namespace OHOS

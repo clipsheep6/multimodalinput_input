@@ -30,10 +30,7 @@
 #include "bytrace_adapter.h"
 #include "input_device_manager.h"
 #include "i_key_command_manager.h"
-#include "key_event_handler.h"
 #include "mmi_func_callback.h"
-#include "pointer_event_handler.h"
-#include "touch_event_handler.h"
 #include "libinput_adapter.h"
 #include "time_cost_chk.h"
 #include "timer_manager.h"
@@ -57,9 +54,7 @@ InputEventHandler::~InputEventHandler() {}
 void InputEventHandler::Init(UDSServer& udsServer)
 {
     udsServer_ = &udsServer;
-    keyEventHandler_ = BuildKeyHandlerChain();
-    pointerEventHandler_ = BuildPointerHandlerChain();
-    touchEventHandler_ = BuildTouchHandlerChain();
+    inputEventHandler_ = BuildInputHandlerChain();
     MsgCallback funs[] = {
         {
             static_cast<MmiMessageId>(LIBINPUT_EVENT_DEVICE_ADDED),
@@ -217,75 +212,50 @@ int32_t InputEventHandler::OnEventHandler(libinput_event *event)
     return ret;
 }
 
-std::shared_ptr<IInputEventHandler> InputEventHandler::BuildKeyHandlerChain()
+std::shared_ptr<IInputEventHandler> InputEventHandler::BuildInputHandlerChain()
 {
+    inputEventHandler_ = std::make_shared<IInputEventHandler>();
+    CHKPP(inputEventHandler_);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    auto keyEventHandler = std::make_shared<KeyEventHandler>();
-    CHKPP(keyEventHandler);
+    keyEventHandler_ = std::make_shared<KeyEventHandler>();
+    CHKPP(keyEventHandler_);
     keyInterceptor_ = IInterceptorManagerGlobal::CreateInstance();
-    CHKPP(keyInterceptor_);
-    keyEventHandler->SetNext(keyInterceptor_);
     auto keyCommandHandler = IKeyCommandManager::CreateInstance();
-    CHKPP(keyCommandHandler);
-    keyInterceptor_->SetNext(keyCommandHandler);
     keySubscriber_ = std::make_shared<KeyEventSubscriber>();
-    CHKPP(keySubscriber_);
-    keyCommandHandler->SetNext(keySubscriber_);
     keyMonitorHandler_ = std::make_shared<InputHandlerManagerGlobal>();
-    CHKPP(keyMonitorHandler_);
-    keySubscriber_->SetNext(keyMonitorHandler_);
     auto keyDispatch = std::make_shared<EventDispatch>();
-    keyMonitorHandler_->SetNext(keyDispatch);
-    return keyEventHandler;
-#else
-    return std::make_shared<IInputEventHandler>();
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-}
-
-std::shared_ptr<IInputEventHandler> InputEventHandler::BuildPointerHandlerChain()
-{
+    keyEventHandler_->AddHandler(1, keyInterceptor_);
+    keyEventHandler_->AddHandler(2, keyCommandHandler);
+    keyEventHandler_->AddHandler(3, keySubscriber_);
+    keyEventHandler_->AddHandler(4, keyMonitorHandler_);
+    keyEventHandler_->AddHandler(5, keyDispatch);
+    keyEventHandler_->AddFinish();
+#endif
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    auto pointerEventHandler = std::make_shared<PointerEventHandler>();
-    CHKPP(pointerEventHandler);
+    pointerEventHandler_ = std::make_shared<PointerEventHandler>();
     pointerEventFilter_ = std::make_shared<EventFilterWrap>();
-    CHKPP(pointerEventFilter_);
-    pointerEventHandler->SetNext(pointerEventFilter_);
     pointerInterceptor_ = IInterceptorHandlerGlobal::CreateInstance();
-    CHKPP(pointerInterceptor_);
-    pointerEventFilter_->SetNext(pointerInterceptor_);
     pointerMonitorHandler_ = std::make_shared<InputHandlerManagerGlobal>();
-    CHKPP(pointerMonitorHandler_);
-    pointerInterceptor_->SetNext(pointerMonitorHandler_);
     auto pointerDispatch = std::make_shared<EventDispatch>();
-    CHKPP(pointerDispatch);
-    pointerMonitorHandler_->SetNext(pointerDispatch);
-    return pointerEventHandler;
-#else
-    return std::make_shared<IInputEventHandler>();
-#endif // OHOS_BUILD_ENABLE_POINTER
-}
-
-std::shared_ptr<IInputEventHandler> InputEventHandler::BuildTouchHandlerChain()
-{
+    pointerEventHandler_->AddHandler(1, pointerEventFilter_);
+    pointerEventHandler_->AddHandler(2, pointerInterceptor_);
+    pointerEventHandler_->AddHandler(3, pointerMonitorHandler_);
+    pointerEventHandler_->AddHandler(4, pointerDispatch);
+    pointerEventHandler_->AddFinish();
+#endif
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    auto touchEventHandler = std::make_shared<TouchEventHandler>();
-    CHKPP(touchEventHandler);
+    touchEventHandler_ = std::make_shared<TouchEventHandler>();
     touchEventFilter_ = std::make_shared<EventFilterWrap>();
-    CHKPP(touchEventFilter_);
-    touchEventHandler->SetNext(touchEventFilter_);
     touchInterceptor_ = IInterceptorHandlerGlobal::CreateInstance();
-    CHKPP(touchInterceptor_);
-    touchEventFilter_->SetNext(touchInterceptor_);
     touchIMonitorHandler_ = std::make_shared<InputHandlerManagerGlobal>();
-    CHKPP(touchIMonitorHandler_);
-    touchInterceptor_->SetNext(touchIMonitorHandler_);
     auto touchDispatch = std::make_shared<EventDispatch>();
-    CHKPP(touchDispatch);
-    touchIMonitorHandler_->SetNext(touchDispatch);
-    return touchEventHandler;
-#else
-    return std::make_shared<IInputEventHandler>();
-#endif // OHOS_BUILD_ENABLE_TOUCH
+    touchEventHandler_->AddHandler(1, touchEventFilter_);
+    touchEventHandler_->AddHandler(2, touchInterceptor_);
+    touchEventHandler_->AddHandler(3, touchIMonitorHandler_);
+    touchEventHandler_->AddHandler(4, touchDispatch);
+    touchEventHandler_->AddFinish();
+#endif
+    return inputEventHandler_;
 }
 
 void InputEventHandler::OnCheckEventReport()
@@ -313,17 +283,22 @@ std::shared_ptr<KeyEvent> InputEventHandler::GetKeyEvent() const
     return keyEvent_;
 }
 
-std::shared_ptr<IInputEventHandler> InputEventHandler::GetKeyEventHandler() const
+std::shared_ptr<IInputEventHandler> InputEventHandler::GetInputHandlerChain() const
+{
+    return inputEventHandler_;
+}
+
+std::shared_ptr<KeyEventHandler> InputEventHandler::GetKeyEventHandler() const
 {
     return keyEventHandler_;
 }
 
-std::shared_ptr<IInputEventHandler> InputEventHandler::GetPointerEventHandler() const
+std::shared_ptr<PointerEventHandler> InputEventHandler::GetPointerEventHandler() const
 {
     return pointerEventHandler_;
 }
 
-std::shared_ptr<IInputEventHandler> InputEventHandler::GetTouchEventHandler() const
+std::shared_ptr<TouchEventHandler> InputEventHandler::GetTouchEventHandler() const
 {
     return touchEventHandler_;
 }
@@ -411,11 +386,13 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
     if (keyEvent_ == nullptr) {
         keyEvent_ = KeyEvent::Create();
     }
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPR(keyEventHandler_, ERROR_NULL_POINTER);
-    keyEventHandler_->HandleLibinputEvent(event);
-#ifndef OHOS_BUILD_ENABLE_KEYBOARD
-    MMI_HILOGW("Keyboard device dose not support");
-#endif
+    keyEventHandler_->HandleEvent(event);
+#else
+    CHKPR(inputEventHandler_, ERROR_NULL_POINTER);
+    inputEventHandler_->HandleKeyEvent(nullptr);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
 }
 
@@ -425,11 +402,13 @@ int32_t InputEventHandler::OnEventPointer(libinput_event *event)
     if (keyEvent_ == nullptr) {
         keyEvent_ = KeyEvent::Create();
     }
+#ifdef OHOS_BUILD_ENABLE_POINTER
     CHKPR(pointerEventHandler_, ERROR_NULL_POINTER);
-    pointerEventHandler_->HandleLibinputEvent(event);
-#ifndef OHOS_BUILD_ENABLE_POINTER
-    MMI_HILOGW("Pointer device dose not support");
-#endif
+    pointerEventHandler_->HandleEvent(event);
+#else
+    CHKPR(inputEventHandler_, ERROR_NULL_POINTER);
+    inputEventHandler_->HandlePointerEvent(nullptr);
+#endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
 }
 
@@ -437,26 +416,30 @@ int32_t InputEventHandler::OnEventTouchpad(libinput_event *event)
 {
     CALL_LOG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
+#ifdef OHOS_BUILD_ENABLE_POINTER
     CHKPR(pointerEventHandler_, ERROR_NULL_POINTER);
-    pointerEventHandler_->HandleLibinputEvent(event);
-#ifndef OHOS_BUILD_ENABLE_POINTER
-    MMI_HILOGW("Pointer device dose not support");
-#endif
+    pointerEventHandler_->HandleEvent(event);
+#else
+    CHKPR(inputEventHandler_, ERROR_NULL_POINTER);
+    inputEventHandler_->HandlePointerEvent(nullptr);
+#endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
 }
 
 int32_t InputEventHandler::OnEventGesture(libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
+#ifdef OHOS_BUILD_ENABLE_POINTER
     CHKPR(pointerEventHandler_, ERROR_NULL_POINTER);
-    int32_t ret = pointerEventHandler_->HandleLibinputEvent(event);
+    int32_t ret = pointerEventHandler_->HandleEvent(event);
     if (ret != RET_OK) {
         MMI_HILOGE("Gesture event dispatch failed, errCode:%{public}d", GESTURE_EVENT_DISP_FAIL);
         return GESTURE_EVENT_DISP_FAIL;
     }
-#ifndef OHOS_BUILD_ENABLE_POINTER
-    MMI_HILOGW("Pointer device dose not support");
-#endif
+#else
+    CHKPR(inputEventHandler_, ERROR_NULL_POINTER);
+    inputEventHandler_->HandlePointerEvent(nullptr);
+#endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
 }
 
@@ -464,11 +447,13 @@ int32_t InputEventHandler::OnEventTouch(libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     LibinputAdapter::LoginfoPackagingTool(event);
+#ifdef OHOS_BUILD_ENABLE_TOUCH
     CHKPR(touchEventHandler_, ERROR_NULL_POINTER);
-    touchEventHandler_->HandleLibinputEvent(event);
-#ifndef OHOS_BUILD_ENABLE_TOUCH
-    MMI_HILOGW("Tp device dose not support");
-#endif
+    touchEventHandler_->HandleEvent(event);
+#else
+    CHKPR(inputEventHandler_, ERROR_NULL_POINTER);
+    inputEventHandler_->HandleTouchEvent(nullptr);
+#endif // OHOS_BUILD_ENABLE_TOUCH
     return RET_OK;
 }
 
@@ -476,11 +461,13 @@ int32_t InputEventHandler::OnTabletToolEvent(libinput_event *event)
 {
     CALL_LOG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
+#ifdef OHOS_BUILD_ENABLE_TOUCH
     CHKPR(touchEventHandler_, ERROR_NULL_POINTER);
-    touchEventHandler_->HandleLibinputEvent(event);
-#ifndef OHOS_BUILD_ENABLE_TOUCH
-    MMI_HILOGW("Tp device dose not support");
-#endif
+    touchEventHandler_->HandleEvent(event);
+#else
+    CHKPR(inputEventHandler_, ERROR_NULL_POINTER);
+    inputEventHandler_->HandleTouchEvent(nullptr);
+#endif // OHOS_BUILD_ENABLE_TOUCH
     return RET_OK;
 }
 } // namespace MMI

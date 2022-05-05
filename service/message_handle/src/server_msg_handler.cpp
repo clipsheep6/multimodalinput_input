@@ -264,7 +264,11 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt)
                 MMI_HILOGE("HandlePointerEvent failed");
                 return RET_ERR;
             }
-#endif // OHOS_BUILD_ENABLE_TOUCH
+#else 
+        auto inputHandler = InputHandler->GetInputHandlerChain();
+        CHKPR(inputHandler, ERROR_NULL_POINTER);
+        inputHandler->HandleTouchEvent(nullptr);
+#endif  // OHOS_BUILD_ENABLE_TOUCH
             break;
         }
         case PointerEvent::SOURCE_TYPE_MOUSE:
@@ -276,6 +280,10 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt)
                 MMI_HILOGE("HandlePointerEvent failed");
                 return RET_ERR;
             }
+#else
+        auto inputHandler = InputHandler->GetInputHandlerChain();
+        CHKPR(inputHandler, ERROR_NULL_POINTER);
+        inputHandler->HandlePointerEvent(nullptr);
 #endif // OHOS_BUILD_ENABLE_POINTER
             break;
         }

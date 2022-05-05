@@ -31,6 +31,9 @@
 #include "mouse_event_handler.h"
 #include "event_filter_wrap.h"
 #include "msg_handler.h"
+#include "key_event_handler.h"
+#include "pointer_event_handler.h"
+#include "touch_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
@@ -47,10 +50,12 @@ public:
     UDSServer *GetUDSServer() const;
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
     std::shared_ptr<KeyEvent> GetKeyEvent() const;
+
+    std::shared_ptr<IInputEventHandler> GetInputHandlerChain() const;
     
-    std::shared_ptr<IInputEventHandler> GetKeyEventHandler() const;
-    std::shared_ptr<IInputEventHandler> GetPointerEventHandler() const;
-    std::shared_ptr<IInputEventHandler> GetTouchEventHandler() const;
+    std::shared_ptr<KeyEventHandler> GetKeyEventHandler() const;
+    std::shared_ptr<PointerEventHandler> GetPointerEventHandler() const;
+    std::shared_ptr<TouchEventHandler> GetTouchEventHandler() const;
     
     std::shared_ptr<IInterceptorManagerGlobal> GetKeyInterceptor() const;
     std::shared_ptr<KeyEventSubscriber> GetKeySubscriber() const;
@@ -76,16 +81,16 @@ protected:
 
 private:
     int32_t OnEventHandler(libinput_event *event);
-    std::shared_ptr<IInputEventHandler> BuildKeyHandlerChain();
-    std::shared_ptr<IInputEventHandler> BuildPointerHandlerChain();
-    std::shared_ptr<IInputEventHandler> BuildTouchHandlerChain();
+    std::shared_ptr<IInputEventHandler> BuildInputHandlerChain();
 
     UDSServer *udsServer_ = nullptr;
     NotifyDeviceChange notifyDeviceChange_;
     std::shared_ptr<KeyEvent> keyEvent_ = nullptr;
-    std::shared_ptr<IInputEventHandler> keyEventHandler_ = nullptr;
-    std::shared_ptr<IInputEventHandler> pointerEventHandler_ = nullptr;
-    std::shared_ptr<IInputEventHandler> touchEventHandler_ = nullptr;
+    std::shared_ptr<IInputEventHandler> inputEventHandler_ = nullptr;
+
+    std::shared_ptr<KeyEventHandler> keyEventHandler_ = nullptr;
+    std::shared_ptr<PointerEventHandler> pointerEventHandler_ = nullptr;
+    std::shared_ptr<TouchEventHandler> touchEventHandler_ = nullptr;
 
     std::shared_ptr<IInterceptorManagerGlobal> keyInterceptor_ = nullptr;
     std::shared_ptr<KeyEventSubscriber> keySubscriber_ = nullptr;

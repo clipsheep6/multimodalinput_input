@@ -26,12 +26,15 @@ class TouchEventHandler : public IInputEventHandler {
 public:
     TouchEventHandler() = default;
     ~TouchEventHandler() = default;
-    int32_t HandleLibinputEvent(libinput_event* event) override;
+    int32_t HandleEvent(libinput_event* event);
     int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+    void AddHandler(int priority, const std::shared_ptr<IInputEventHandler> handler);
+    void AddFinish();
 
 private:
     int32_t HandleTouchEvent(libinput_event* event);
     int32_t HandleTableToolEvent(libinput_event* event);
+    std::map<int32_t, std::shared_ptr<IInputEventHandler>> touchHandlerMap_;
 };
 } // namespace MMI
 } // namespace OHOS

@@ -28,7 +28,7 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerEventHandler" };
 }
-int32_t PointerEventHandler::HandleLibinputEvent(libinput_event* event)
+int32_t PointerEventHandler::HandleEvent(libinput_event* event)
 {
     CALL_LOG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
@@ -81,6 +81,26 @@ int32_t PointerEventHandler::HandlePointerEvent(std::shared_ptr<PointerEvent> po
     }
     CHKPR(nextHandler_, ERROR_NULL_POINTER);
     return nextHandler_->HandlePointerEvent(pointerEvent);
+}
+
+void PointerEventHandler::AddHandler(int priority, const std::shared_ptr<IInputEventHandler> handlerPtr)
+{
+    CHKPV(handlerPtr);
+    pointerHandlerMap_.emplace(priority, handlerPtr);
+}
+
+void PointerEventHandler::AddFinish()
+{
+    std::shared_ptr<IInputEventHandler> tmpHandler = nullptr;
+    for(auto & handler : pointerHandlerMap_) {
+        if (tmpHandler == nullptr) {
+            tmpHandler = handler.second;
+            SetNext(tmpHandler);
+        } else {
+            tmpHandler->SetNext(handler.second);
+            tmpHandler = handler.second;
+        }
+    }
 }
 
 int32_t PointerEventHandler::HandleTouchPadEvent(libinput_event* event)
