@@ -73,6 +73,21 @@ static void CheckDefine()
 #ifdef OHOS_BUILD_MMI_DEBUG
     CheckDefineOutput("%-40s", "OHOS_BUILD_MMI_DEBUG");
 #endif
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+    CheckDefineOutput("%-40s", "OHOS_BUILD_ENABLE_POINTER_DRAWING");
+#endif
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+    CheckDefineOutput("%-40s", "OHOS_BUILD_ENABLE_INTERCEPTOR");
+#endif
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    CheckDefineOutput("%-40s", "OHOS_BUILD_ENABLE_KEYBOARD");
+#endif
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    CheckDefineOutput("%-40s", "OHOS_BUILD_ENABLE_POINTER");
+#endif
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    CheckDefineOutput("%-40s", "OHOS_BUILD_ENABLE_TOUCH");
+#endif
 }
 
 MMIService::MMIService() : SystemAbility(MULTIMODAL_INPUT_CONNECT_SERVICE_ID, true) {}

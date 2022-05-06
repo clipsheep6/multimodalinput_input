@@ -26,8 +26,10 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InterceptorManager" };
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 constexpr int32_t SOURCETYPE_KEY = 4;
 constexpr int32_t INVALID_INTERCEPTOR_ID = -1;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 } // namespace
 
 InterceptorManager::InterceptorManager() {}

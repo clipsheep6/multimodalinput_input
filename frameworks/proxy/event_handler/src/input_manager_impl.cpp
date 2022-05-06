@@ -39,6 +39,7 @@ constexpr int32_t MASK_KEY = 1;
 constexpr int32_t MASK_TOUCH = 2;
 constexpr int32_t ADD_MASK_BASE = 10;
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 struct MonitorEventConsumer : public IInputEventConsumer {
 public:
     explicit MonitorEventConsumer(const std::function<void(std::shared_ptr<PointerEvent>)>& monitor)
@@ -81,6 +82,7 @@ private:
     std::function<void(std::shared_ptr<KeyEvent>)> keyMonitor_;
     std::function<void(std::shared_ptr<AxisEvent>)> axisMonitor_;
 };
+#endif
 
 bool InputManagerImpl::InitEventHandler()
 {

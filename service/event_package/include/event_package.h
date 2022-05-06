@@ -35,10 +35,7 @@ namespace MMI {
         EventPackage();
         DISALLOW_COPY_AND_MOVE(EventPackage);
         virtual ~EventPackage();
-        int32_t PackageKeyEvent(libinput_event *event, EventKeyboard& key);
         int32_t PackageKeyEvent(libinput_event *event, std::shared_ptr<KeyEvent> kevnPtr);
-        static int32_t PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& key);
-        static int32_t KeyboardToKeyEvent(const EventKeyboard& key, std::shared_ptr<KeyEvent> keyEventPtr);
     };
 } // namespace MMI
 } // namespace OHOS
