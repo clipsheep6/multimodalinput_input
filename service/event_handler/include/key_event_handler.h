@@ -19,8 +19,6 @@
 #include <memory>
 
 #include "i_input_event_handler.h"
-//#include "interceptor_manager_global.h"
-//#include "key_event_subscriber.h"
 #include "event_package.h"
 
 namespace OHOS {
