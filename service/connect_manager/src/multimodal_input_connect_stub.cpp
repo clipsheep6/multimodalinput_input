@@ -35,7 +35,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Multi
 int32_t MultimodalInputConnectStub::OnRemoteRequest(
     uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
-    CALL_LOG_ENTER;
+    CALL_LOG_ENTER2;
     int32_t pid = GetCallingPid();
     TimeCostChk chk("IPC-OnRemoteRequest", "overtime 300(us)", MAX_OVER_TIME, pid,
         static_cast<int64_t>(code));
@@ -43,39 +43,43 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
     LOGFMTD("RemoteRequest recv code:%d tid:%" PRId64 " pid:%d", code, tid, pid);
     MMI_HILOGD("RemoteRequest recv code:%{public}d tid:%{public}" PRId64 " pid:%{public}d", code, tid, pid);
 
-    MMI_HILOGD("step 1 pid:%{public}d", pid);
+    LOGFMTD("step 1 pid:%d", pid);
     std::u16string descriptor = data.ReadInterfaceToken();
     if (descriptor != IMultimodalInputConnect::GetDescriptor()) {
+        LOGFMTE("get unexpect descriptor:%s", Str16ToStr8(descriptor).c_str());
         MMI_HILOGE("get unexpect descriptor:%{public}s", Str16ToStr8(descriptor).c_str());
         return ERR_INVALID_STATE;
     }
-    MMI_HILOGD("step 2 pid:%{public}d", pid);
+    LOGFMTD("step 2 pid:%d", pid);
     if (!CheckPermission(code)) {
+        LOGFMTE("check permission failed");
         MMI_HILOGE("check permission failed");
         // return CHECK_PERMISSION_FAIL;
         return ERR_INVALID_STATE;
     }
-    MMI_HILOGD("step 3 pid:%{public}d", pid);
+    LOGFMTD("step 3 pid:%d", pid);
     if (!IsRunning()) {
+        LOGFMTE("service is not running. code:%u, go switch defaut", code);
         MMI_HILOGE("service is not running. code:%{public}u, go switch defaut", code);
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
-    MMI_HILOGD("step 4 pid:%{public}d", pid);
+    LOGFMTD("step 4 pid:%d", pid);
     if (!rMsgHandler_.ChkKey(code)) {
+        LOGFMTE("unknown code:%u ids:(%s), go switch defaut", code,
+            rMsgHandler_.GetDebugInfo().c_str());
         MMI_HILOGE("unknown code:%{public}u ids:(%{public}s), go switch defaut", code,
             rMsgHandler_.GetDebugInfo().c_str());
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
-    MMI_HILOGD("step 5 pid:%{public}d", pid);
+    LOGFMTD("step 5 pid:%d", pid);
     int32_t uid = GetCallingUid();
-    EntrustTasks::Promise promise;
-    EntrustTasks::Future future = promise.get_future();
-    if (!entrustTasks_.PostSyncTask(pid, promise, future, std::bind(&RemoteMsgHandler::OnMsgHandler, &rMsgHandler_,
+    if (!entrustTasks_.PostSyncTask(pid, std::bind(&RemoteMsgHandler::OnMsgHandler, &rMsgHandler_,
         std::placeholders::_1, uid, pid, tid, code, std::ref(data), std::ref(reply)))) {
+        LOGFMTE("post task failed code:%u, go switch defaut", code);
         MMI_HILOGE("post task failed code:%{public}u, go switch defaut", code);
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
-    MMI_HILOGD("step 6 pid:%{public}d", pid);
+    LOGFMTD("step 6 pid:%d", pid);
     return NO_ERROR;
 }
 

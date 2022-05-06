@@ -27,6 +27,7 @@
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
+#include "log4z.h"
 
 namespace OHOS {
 namespace MMI {
@@ -198,6 +199,7 @@ void InputManagerImpl::OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consu
     CHK_PIDANDTID();
     CHKPV(consumer);
     consumer->OnInputEvent(keyEvent);
+    LOGFMTD("key event callback keyCode:%d", keyEvent->GetKeyCode());
     MMI_HILOGD("key event callback keyCode:%{public}d", keyEvent->GetKeyCode());
 }
 

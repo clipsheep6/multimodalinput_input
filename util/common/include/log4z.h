@@ -158,8 +158,6 @@
  *  support system: windows, linux, mac, iOS
  *  
  */
-
-
 #pragma once
 #ifndef _ZSUMMER_LOG4Z_H_
 #define _ZSUMMER_LOG4Z_H_
@@ -177,7 +175,6 @@
 #include <list>
 #include <queue>
 #include <deque>
-
 
 //! logger ID type. DO NOT TOUCH
 typedef int LoggerId;
@@ -249,10 +246,6 @@ const bool LOG4Z_DEFAULT_SHOWSUFFIX = true;
 //! -----------------------------------------------------------------------
 //////////////////////////////////////////////////////////////////////////
 
-
-
-
-
 #ifndef _ZSUMMER_BEGIN
 #define _ZSUMMER_BEGIN namespace zsummer {
 #endif  
@@ -261,9 +254,6 @@ const bool LOG4Z_DEFAULT_SHOWSUFFIX = true;
 #endif
 _ZSUMMER_BEGIN
 _ZSUMMER_LOG4Z_BEGIN
-
-
-
 
 //! log4z class
 class ILog4zManager
@@ -313,7 +303,6 @@ public:
     virtual bool setLoggerLimitsize(LoggerId id, unsigned int limitsize) = 0;
     virtual bool setLoggerMonthdir(LoggerId id, bool enable) = 0;
     
-
     //! Update logger's attribute from config file, thread safe.
     virtual bool setAutoUpdate(int interval/*per second, 0 is disable auto update*/) = 0;
     virtual bool updateConfig() = 0;
@@ -339,8 +328,6 @@ class Log4zBinary;
 _ZSUMMER_LOG4Z_END
 _ZSUMMER_END
 
-
-
 //! base micro.
 #define LOG_STREAM(id, level, log)\
 do{\
@@ -352,7 +339,6 @@ do{\
         zsummer::log4z::ILog4zManager::getPtr()->pushLog(id, level, logBuf, __FILE__, __FUNCTION__, __LINE__);\
     }\
 } while (0)
-
 
 //! fast micro
 #define LOG_TRACE(id, log) LOG_STREAM(id, LOG_LEVEL_TRACE, log)
@@ -371,7 +357,6 @@ do{\
 #define LOGE( log ) LOG_ERROR(LOG4Z_MAIN_LOGGER_ID, log )
 #define LOGA( log ) LOG_ALARM(LOG4Z_MAIN_LOGGER_ID, log )
 #define LOGF( log ) LOG_FATAL(LOG4Z_MAIN_LOGGER_ID, log )
-
 
 //! format input log.
 #ifdef LOG4Z_FORMAT_INPUT_ENABLE
@@ -429,7 +414,6 @@ inline void empty_log_format_function2(const char*, ...){}
 #define LOGFMTA LOGFMTT
 #define LOGFMTF LOGFMTT
 #endif
-
 
 _ZSUMMER_BEGIN
 _ZSUMMER_LOG4Z_BEGIN
@@ -632,6 +616,25 @@ inline zsummer::log4z::Log4zStream & zsummer::log4z::Log4zStream::writeWString(c
     return *this;
 }
 
+class InnerFuncTracer {
+public:
+    InnerFuncTracer(LoggerId id, int32_t level, const char *file, const char *func, int32_t line)
+        : id_(id), level_(level), file_(file), func_(func), line_(line)
+    {
+        zsummer::log4z::ILog4zManager::getPtr()->pushLog(id_, level_, ", enter", file_, func_, line_);
+    }
+    ~InnerFuncTracer()
+    {
+        zsummer::log4z::ILog4zManager::getPtr()->pushLog(id_, level_, ", leave", file_, func_, line_);
+    }
+private:
+    LoggerId id_ = 0;
+    int32_t level_ = 0;
+    const char* file_ = nullptr;
+    const char* func_ = nullptr;
+    int32_t line_ = 0;
+};
+#define CALL_LOG_ENTER2 InnerFuncTracer ___innerFuncTracer___ { LOG4Z_MAIN_LOGGER_ID, LOG_LEVEL_DEBUG, __FILE__, __FUNCTION__, __LINE__ }
 
 #ifdef WIN32
 #pragma warning(pop)

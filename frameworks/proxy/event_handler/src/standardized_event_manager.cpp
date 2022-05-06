@@ -25,6 +25,7 @@
 
 #include "input_event_data_transformation.h"
 #include "multimodal_event_handler.h"
+#include "log4z.h"
 
 namespace OHOS {
 namespace MMI {
@@ -54,14 +55,24 @@ int32_t StandardizedEventManager::SubscribeKeyEvent(
     pkt << subscribeInfo.GetSubscribeId() << keyOption->GetFinalKey() << keyOption->IsFinalKeyDown()
     << keyOption->GetFinalKeyDownDuration() << preKeySize;
 
+    std::string logBuf = StringFmt("subId:%d finalKey:%d finalDown:%d finalDownDuration:%d preKeySize:%d [",
+        subscribeInfo.GetSubscribeId(), keyOption->GetFinalKey(), keyOption->IsFinalKeyDown(),
+        keyOption->GetFinalKeyDownDuration(), preKeySize);
     std::set<int32_t> preKeys = keyOption->GetPreKeys();
     for (const auto &item : preKeys) {
         pkt << item;
+        logBuf += std::to_string(item) + ", ";
     }
+    if (preKeySize > 0) {
+        logBuf.resize(logBuf.size()-2);
+    }
+    logBuf += "]";
     if (!SendMsg(pkt)) {
         MMI_HILOGE("Client failed to send message");
         return RET_ERR;
     }
+    LOGD(logBuf);
+    MMI_HILOGD("%{public}s", logBuf.c_str());
     return RET_OK;
 }
 

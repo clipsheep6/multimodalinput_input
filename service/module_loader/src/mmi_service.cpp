@@ -312,14 +312,16 @@ void MMIService::OnTimer()
 
 void MMIService::OnEntrustTask(epoll_event& ev)
 {
-    CALL_LOG_ENTER;
+    CALL_LOG_ENTER2;
     if ((ev.events & EPOLLIN) == 0) {
+        LOGFMTE("not epollin");
         MMI_HILOGW("not epollin");
         return;
     }
     EntrustTasks::TaskData data = {};
     auto res = read(entrustTasks_.GetReadFd(), &data, sizeof(data));
     if (res == -1) {
+        LOGFMTW("read failed erron:%d", errno);
         MMI_HILOGW("read failed erron:%{public}d", errno);
     }
     LOGFMTD("RemoteRequest notify tid:%" PRId64 " stid:%" PRId64 " pid:%d taskId:%d",

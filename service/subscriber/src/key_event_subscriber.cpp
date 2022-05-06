@@ -22,6 +22,7 @@
 #include "net_packet.h"
 #include "proto.h"
 #include "timer_manager.h"
+#include "log4z.h"
 
 namespace OHOS {
 namespace MMI {
@@ -49,6 +50,10 @@ int32_t KeyEventSubscriber::SubscribeKeyEvent(
     for (const auto &keyCode : keyOption->GetPreKeys()) {
         MMI_HILOGD("keyOption->prekey:%{public}d", keyCode);
     }
+    LOGFMTD("subscribeId:%d,keyOption->finalKey:%d,"
+        "keyOption->isFinalKeyDown:%s,keyOption->finalKeyDownDuriation:%d",
+        subscribeId, keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
+        keyOption->GetFinalKeyDownDuration());
     MMI_HILOGD("subscribeId:%{public}d,keyOption->finalKey:%{public}d,"
         "keyOption->isFinalKeyDown:%{public}s,keyOption->finalKeyDownDuriation:%{public}d",
         subscribeId, keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
@@ -237,7 +242,7 @@ void KeyEventSubscriber::OnTimer(const std::shared_ptr<Subscriber> subscriber)
 bool KeyEventSubscriber::InitSessionDeleteCallback()
 {
     CALL_LOG_ENTER;
-    if (callbackInitialized_)  {
+    if (callbackInitialized_) {
         MMI_HILOGD("session delete callback has already been initialized");
         return true;
     }
@@ -260,6 +265,10 @@ bool KeyEventSubscriber::HandleKeyDown(const std::shared_ptr<KeyEvent>& keyEvent
     RemoveKeyCode(keyCode, pressedKeys);
     for (const auto &subscriber : subscribers_) {
         auto& keyOption = subscriber->keyOption_;
+        LOGFMTD("subscribeId:%d,keyOption->finalKey:%d,"
+            "keyOption->isFinalKeyDown:%s,keyOption->finalKeyDownDuriation:%d",
+            subscriber->id_, keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
+            keyOption->GetFinalKeyDownDuration());
         MMI_HILOGD("subscribeId:%{public}d,keyOption->finalKey:%{public}d,"
             "keyOption->isFinalKeyDown:%{public}s,keyOption->finalKeyDownDuriation:%{public}d",
             subscriber->id_, keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
@@ -296,7 +305,7 @@ bool KeyEventSubscriber::HandleKeyDown(const std::shared_ptr<KeyEvent>& keyEvent
             MMI_HILOGE("Leave, add timer failed");
         }
     }
-
+    LOGFMTD("%s", handled ? "true" : "false");
     MMI_HILOGD("%{public}s", handled ? "true" : "false");
     return handled;
 }
@@ -311,6 +320,10 @@ bool KeyEventSubscriber::HandleKeyUp(const std::shared_ptr<KeyEvent>& keyEvent)
     RemoveKeyCode(keyCode, pressedKeys);
     for (const auto &subscriber : subscribers_) {
         auto& keyOption = subscriber->keyOption_;
+        LOGFMTD("subscribeId:%d,keyOption->finalKey:%d,"
+            "keyOption->isFinalKeyDown:%s,keyOption->finalKeyDownDuriation:%d",
+            subscriber->id_, keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
+            keyOption->GetFinalKeyDownDuration());
         MMI_HILOGD("subscribeId:%{public}d,keyOption->finalKey:%{public}d,"
             "keyOption->isFinalKeyDown:%{public}s,keyOption->finalKeyDownDuriation:%{public}d",
             subscriber->id_, keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
@@ -351,12 +364,12 @@ bool KeyEventSubscriber::HandleKeyUp(const std::shared_ptr<KeyEvent>& keyEvent)
             MMI_HILOGE("upTime - downTime >= duration");
             continue;
         }
-
+        LOGFMTD("upTime - downTime < duration");
         MMI_HILOGD("upTime - downTime < duration");
         NotifySubscriber(keyEvent, subscriber);
         handled = true;
     }
-
+    LOGFMTD("%s", handled ? "true" : "false");
     MMI_HILOGD("%{public}s", handled ? "true" : "false");
     return handled;
 }

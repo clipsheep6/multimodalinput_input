@@ -24,6 +24,7 @@
 #include "input_handler_type.h"
 #include "input_manager_impl.h"
 #include "multimodal_event_handler.h"
+#include "log4z.h"
 
 namespace OHOS {
 namespace MMI {
@@ -185,6 +186,7 @@ void InputHandlerManager::OnKeyEventTask(std::shared_ptr<IInputEventConsumer> co
     CHKPV(consumer);
     CHKPV(keyEvent);
     consumer->OnInputEvent(keyEvent);
+    LOGFMTD("key event callback id:%d keyCode:%d", handlerId, keyEvent->GetKeyCode());
     MMI_HILOGD("key event callback id:%{public}d keyCode:%{public}d", handlerId, keyEvent->GetKeyCode());
 }
 

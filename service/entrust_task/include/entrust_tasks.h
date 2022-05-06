@@ -14,13 +14,12 @@
  */
 #ifndef ENTRUST_TASKS_H
 #define ENTRUST_TASKS_H
-#include <atomic>
 #include <cinttypes>
 #include <functional>
 #include <future>
-#include <list>
 #include <memory>
 #include <mutex>
+#include <queue>
 
 #include "id_factory.h"
 #include "log4z.h"
@@ -39,46 +38,25 @@ public:
         int32_t pid;
         int32_t taskId;
     };
-    class Task : public std::enable_shared_from_this<Task> {
+    class Task {
     public:
         using Promise = std::promise<void>;
         using Future = std::future<void>;
         using TaskPtr = std::shared_ptr<EntrustTasks::Task>;
-        Task(int32_t id, Promise &promise, Future &future, ETaskCallback fun, bool asyncTask = false)
-            : id_(id), hasWaited_(asyncTask), fun_(fun), promise_(&promise), future_(&future) {}
+        Task(int32_t id, Promise *promise, ETaskCallback fun)
+            : id_(id), fun_(fun), promise_(promise) {}
         ~Task() = default;
-
-        bool WaitFor(int32_t ms);
         void ProcessTask();
 
         int32_t GetId() const
         {
             return id_;
         }
-        TaskPtr GetPtr()
-        {
-            return shared_from_this();
-        }
-        bool HasNotified() const
-        {
-            return hasNotified_;
-        }
-        bool HasWaited() const
-        {
-            return hasWaited_;
-        }
-        bool HasReady() const
-        {
-            return (hasNotified_ && hasWaited_);
-        }
 
     private:
         int32_t id_ = 0;
-        std::atomic_bool hasNotified_ = false;
-        std::atomic_bool hasWaited_ = false;
         ETaskCallback fun_;
         Promise* promise_ = nullptr;
-        Future* future_ = nullptr;
     };
     using TaskPtr = Task::TaskPtr;
     using Promise = Task::Promise;
@@ -90,8 +68,7 @@ public:
 
     bool Init();
     void ProcessTasks(uint64_t stid, int32_t pid);
-    bool PostSyncTask(int32_t pid, Promise &promise, Future &future, ETaskCallback callback, int32_t timeout = ET_DEFINE_TIMEOUT);
-    // bool PostAsyncTask(ETaskCallback callback);
+    bool PostSyncTask(int32_t pid, ETaskCallback callback, int32_t timeout = ET_DEFINE_TIMEOUT);
 
     int32_t GetReadFd() const
     {
@@ -99,13 +76,12 @@ public:
     }
 
 private:
-    TaskPtr PostTask(int32_t pid, Promise &promise, Future &future, ETaskCallback callback, bool asyncTask = false);
-    void PrintDebugInfo();
+    bool PostTask(int32_t pid, Promise *promise, ETaskCallback callback);
 
 private:
     int32_t fds_[2] = {};
     std::mutex mux_;
-    std::list<TaskPtr> tasks_;
+    std::queue<TaskPtr> tasks_;
 };
 } // namespace MMI
 } // namespace OHOS
