@@ -17,6 +17,7 @@
 
 namespace OHOS {
 namespace MMI {
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
 static napi_module mmiInputDeviceModule = {
     .nm_version = 1,
     .nm_flags = 0,
@@ -26,10 +27,13 @@ static napi_module mmiInputDeviceModule = {
     .nm_priv = ((void*)0),
     .reserved = { 0 },
 };
+#endif
 
 extern "C" __attribute__((constructor)) void RegisterModule(void)
 {
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     napi_module_register(&mmiInputDeviceModule);
+#endif
 }
 } // namespace MMI
 } // namespace OHOS

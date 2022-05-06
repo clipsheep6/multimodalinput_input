@@ -58,8 +58,10 @@ const std::string REMOVE_EVENT = "remove";
 JsEventTarget::JsEventTarget()
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     auto ret = devMonitor_.insert({ CHANGED_TYPE, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>() });
     CK(ret.second, VAL_NOT_EXP);
+#endif
 }
 
 JsEventTarget::~JsEventTarget() {}
@@ -67,6 +69,7 @@ JsEventTarget::~JsEventTarget() {}
 void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(work);
     CHKPV(work->data);
@@ -93,11 +96,13 @@ void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
         napi_value ret = nullptr;
         CHKRV(item->env, napi_call_function(item->env, nullptr, handlerTemp, 2, result, &ret), CALL_FUNCTION);
     }
+#endif
 }
 
 void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(work);
     CHKPV(work->data);
@@ -124,11 +129,13 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
         napi_value ret = nullptr;
         CHKRV(item->env, napi_call_function(item->env, nullptr, handlerTemp, 2, result, &ret), CALL_FUNCTION);
     }
+#endif
 }
 
 void JsEventTarget::TargetOn(std::string type, int32_t deviceId)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     std::lock_guard<std::mutex> guard(mutex_);
     auto iter = devMonitor_.find(CHANGED_TYPE);
     if (iter == devMonitor_.end()) {
@@ -159,11 +166,13 @@ void JsEventTarget::TargetOn(std::string type, int32_t deviceId)
             return;
         }
     }
+#endif
 }
 
 void JsEventTarget::CallIdsAsyncWork(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     CHKPV(work);
     CHKPV(work->data);
     std::unique_ptr<JsUtil::CallbackInfo> cbTemp = nullptr;
@@ -196,11 +205,13 @@ void JsEventTarget::CallIdsAsyncWork(uv_work_t *work, int32_t status)
     CHKRV(cbTemp->env, napi_get_reference_value(cbTemp->env, cbTemp->ref, &handlerTemp), GET_REFERENCE);
     napi_value result = nullptr;
     CHKRV(cbTemp->env, napi_call_function(cbTemp->env, nullptr, handlerTemp, 1, &arr, &result), CALL_FUNCTION);
+#endif
 }
 
 void JsEventTarget::CallIdsPromiseWork(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     CHKPV(work);
     CHKPV(work->data);
     std::unique_ptr<JsUtil::CallbackInfo> cbTemp = nullptr;
@@ -229,11 +240,13 @@ void JsEventTarget::CallIdsPromiseWork(uv_work_t *work, int32_t status)
         ++index;
     }
     CHKRV(cbTemp->env, napi_resolve_deferred(cbTemp->env, cbTemp->deferred, arr), RESOLVE_DEFERRED);
+#endif
 }
 
 void JsEventTarget::EmitJsIds(int32_t userData, std::vector<int32_t> ids)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     std::lock_guard<std::mutex> guard(mutex_);
     auto iter = callback_.find(userData);
     if (iter == callback_.end()) {
@@ -267,11 +280,13 @@ void JsEventTarget::EmitJsIds(int32_t userData, std::vector<int32_t> ids)
         MMI_HILOGE("uv_queue_work failed");
         return;
     }
+#endif
 }
 
 void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     CHKPV(work);
     CHKPV(work->data);
     std::unique_ptr<JsUtil::CallbackInfo> cbTemp = nullptr;
@@ -327,11 +342,13 @@ void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
     CHKRV(cbTemp->env, napi_get_reference_value(cbTemp->env, cbTemp->ref, &handlerTemp), GET_REFERENCE);
     napi_value result = nullptr;
     CHKRV(cbTemp->env, napi_call_function(cbTemp->env, nullptr, handlerTemp, 1, &object, &result), CALL_FUNCTION);
+#endif
 }
 
 void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     CHKPV(work);
     CHKPV(work->data);
     std::unique_ptr<JsUtil::CallbackInfo> cbTemp = nullptr;
@@ -387,11 +404,13 @@ void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
     CHKRV(cbTemp->env, napi_create_array(cbTemp->env, &axisRanges), CREATE_ARRAY);
     CHKRV(cbTemp->env, napi_set_named_property(cbTemp->env, object, "axisRanges", axisRanges), SET_NAMED_PROPERTY);
     CHKRV(cbTemp->env, napi_resolve_deferred(cbTemp->env, cbTemp->deferred, object), RESOLVE_DEFERRED);
+#endif
 }
 
 void JsEventTarget::EmitJsDev(int32_t userData, std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(device);
     auto iter = callback_.find(userData);
@@ -425,11 +444,13 @@ void JsEventTarget::EmitJsDev(int32_t userData, std::shared_ptr<InputDeviceImpl:
         MMI_HILOGE("uv_queue_work failed");
         return;
     }
+#endif
 }
 
 void JsEventTarget::CallKeystrokeAbilityPromise(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     CHKPV(work);
     CHKPV(work->data);
     std::unique_ptr<JsUtil::CallbackInfo> cbTemp = nullptr;
@@ -467,11 +488,13 @@ void JsEventTarget::CallKeystrokeAbilityPromise(uv_work_t *work, int32_t status)
         ++i;
     }
     CHKRV(cbTemp->env, napi_resolve_deferred(cbTemp->env, cbTemp->deferred, keyAbility), RESOLVE_DEFERRED);
+#endif
 }
 
 void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     CHKPV(work);
     CHKPV(work->data);
     std::unique_ptr<JsUtil::CallbackInfo> cbTemp = nullptr;
@@ -515,11 +538,13 @@ void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
     napi_value result = nullptr;
     CHKRV(cbTemp->env, napi_call_function(cbTemp->env, nullptr, handlerTemp, 1, &keyAbility, &result),
           CALL_FUNCTION);
+#endif
 }
 
 void JsEventTarget::EmitJsKeystrokeAbility(int32_t userData, std::map<int32_t, bool> keystrokeAbility)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     std::lock_guard<std::mutex> guard(mutex_);
     auto iter = callback_.find(userData);
     if (iter == callback_.end()) {
@@ -552,11 +577,13 @@ void JsEventTarget::EmitJsKeystrokeAbility(int32_t userData, std::map<int32_t, b
         MMI_HILOGE("uv_queue_work failed");
         return;
     }
+#endif
 }
 
 void JsEventTarget::EmitJsKeyboardType(int32_t userData, int32_t keyboardType)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     std::lock_guard<std::mutex> guard(mutex_);
     auto iter = callback_.find(userData);
     if (iter == callback_.end()) {
@@ -591,11 +618,13 @@ void JsEventTarget::EmitJsKeyboardType(int32_t userData, int32_t keyboardType)
         MMI_HILOGE("uv_queue_work failed");
         return;
     }
+#endif
 }
 
 void JsEventTarget::CallKeyboardTypeAsync(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     CHKPV(work);
     CHKPV(work->data);
     std::unique_ptr<JsUtil::CallbackInfo> cbTemp = GetCallbackInfo(work);
@@ -608,11 +637,13 @@ void JsEventTarget::CallKeyboardTypeAsync(uv_work_t *work, int32_t status)
     CHKRV(cbTemp->env, napi_get_reference_value(cbTemp->env, cbTemp->ref, &handlerTemp), GET_REFERENCE);
     napi_value result = nullptr;
     CHKRV(cbTemp->env, napi_call_function(cbTemp->env, nullptr, handlerTemp, 1, &keyboardType, &result), CALL_FUNCTION);
+#endif
 }
 
 void JsEventTarget::CallKeyboardTypePromise(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     CHKPV(work);
     CHKPV(work->data);
     std::unique_ptr<JsUtil::CallbackInfo> cbTemp = GetCallbackInfo(work);
@@ -622,11 +653,13 @@ void JsEventTarget::CallKeyboardTypePromise(uv_work_t *work, int32_t status)
     napi_value keyboardType = nullptr;
     CHKRV(cbTemp->env, napi_create_int32(cbTemp->env, cbTemp->data.keyboardType, &keyboardType), CREATE_INT32);
     CHKRV(cbTemp->env, napi_resolve_deferred(cbTemp->env, cbTemp->deferred, keyboardType), RESOLVE_DEFERRED);
+#endif
 }
 
 void JsEventTarget::AddMonitor(napi_env env, std::string type, napi_value handle)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     std::lock_guard<std::mutex> guard(mutex_);
     auto iter = devMonitor_.find(type);
     if (iter == devMonitor_.end()) {
@@ -649,11 +682,13 @@ void JsEventTarget::AddMonitor(napi_env env, std::string type, napi_value handle
     monitor->env = env;
     monitor->ref = ref;
     iter->second.push_back(std::move(monitor));
+#endif
 }
 
 void JsEventTarget::RemoveMonitor(napi_env env, std::string type, napi_value handle)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     std::lock_guard<std::mutex> guard(mutex_);
     auto iter = devMonitor_.find(type);
     if (iter == devMonitor_.end()) {
@@ -674,11 +709,13 @@ void JsEventTarget::RemoveMonitor(napi_env env, std::string type, napi_value han
             return;
         }
     }
+#endif
 }
 
 napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, int32_t userData)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     std::lock_guard<std::mutex> guard(mutex_);
     auto cb = std::make_unique<JsUtil::CallbackInfo>();
     CHKPP(cb);
@@ -693,10 +730,15 @@ napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, in
     CHKRP(env, napi_create_reference(env, handle, 1, &cb->ref), CREATE_REFERENCE);
     callback_.emplace(userData, std::move(cb));
     return nullptr;
+#else
+    return nullptr;
+#endif
 }
 
 std::unique_ptr<JsUtil::CallbackInfo> JsEventTarget::GetCallbackInfo(uv_work_t *work)
 {
+    CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     std::lock_guard<std::mutex> guard(mutex_);
     int32_t *uData = static_cast<int32_t*>(work->data);
     int32_t userData = *uData;
@@ -711,14 +753,19 @@ std::unique_ptr<JsUtil::CallbackInfo> JsEventTarget::GetCallbackInfo(uv_work_t *
     auto cbTemp = std::move(iter->second);
     callback_.erase(iter);
     return cbTemp;
+#else
+    return nullptr;
+#endif
 }
 
 void JsEventTarget::ResetEnv()
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     std::lock_guard<std::mutex> guard(mutex_);
     callback_.clear();
     devMonitor_.clear();
+#endif
 }
 } // namespace MMI
 } // namespace OHOS

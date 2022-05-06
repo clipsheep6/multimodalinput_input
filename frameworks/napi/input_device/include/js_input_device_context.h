@@ -41,7 +41,9 @@ private:
     static napi_value JsConstructor(napi_env env, napi_callback_info info);
     std::shared_ptr<JsInputDeviceManager> mgr_ {nullptr};
     std::mutex mtx_;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     napi_ref contextRef_ {nullptr};
+#endif
 };
 } // namespace MMI
 } // namespace OHOS

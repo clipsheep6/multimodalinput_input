@@ -19,7 +19,9 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputDeviceContext" };
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
 constexpr size_t MAX_STRING_LEN = 32;
+#endif
 const std::string CHANGED_TYPE = "changed";
 
 const std::string GET_GLOBLE = "napi_get_global";
@@ -60,6 +62,7 @@ JsInputDeviceContext::~JsInputDeviceContext()
 napi_value JsInputDeviceContext::CreateInstance(napi_env env)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     napi_value global = nullptr;
     CHKRP(env, napi_get_global(env, &global), GET_GLOBLE);
 
@@ -85,11 +88,15 @@ napi_value JsInputDeviceContext::CreateInstance(napi_env env)
     uint32_t refCount = 0;
     CHKRP(env, napi_reference_ref(env, jsContext->contextRef_, &refCount), REFERENCE_REF);
     return jsInstance;
+#else
+    return nullptr;
+#endif
 }
 
 napi_value JsInputDeviceContext::JsConstructor(napi_env env, napi_callback_info info)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     napi_value thisVar = nullptr;
     void *data = nullptr;
     CHKRP(env, napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data), GET_CB_INFO);
@@ -103,11 +110,15 @@ napi_value JsInputDeviceContext::JsConstructor(napi_env env, napi_callback_info 
     }, nullptr, nullptr);
     CHKRP(env, status, WRAP);
     return thisVar;
+#else
+    return nullptr;
+#endif
 }
 
 JsInputDeviceContext* JsInputDeviceContext::GetInstance(napi_env env)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     napi_value global = nullptr;
     CHKRP(env, napi_get_global(env, &global), GET_GLOBLE);
 
@@ -132,6 +143,9 @@ JsInputDeviceContext* JsInputDeviceContext::GetInstance(napi_env env)
         return nullptr;
     }
     return instance;
+#else
+    return nullptr;
+#endif
 }
 
 std::shared_ptr<JsInputDeviceManager> JsInputDeviceContext::GetJsInputDeviceMgr() const
@@ -142,6 +156,7 @@ std::shared_ptr<JsInputDeviceManager> JsInputDeviceContext::GetJsInputDeviceMgr(
 napi_value JsInputDeviceContext::On(napi_env env, napi_callback_info info)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     size_t argc = 2;
     napi_value argv[2];
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -175,11 +190,15 @@ napi_value JsInputDeviceContext::On(napi_env env, napi_callback_info info)
     auto jsInputDeviceMgr = jsIds->GetJsInputDeviceMgr();
     jsInputDeviceMgr->RegisterInputDeviceMonitor(env, type, argv[1]);
     return nullptr;
+#else
+    return nullptr;
+#endif
 }
 
 napi_value JsInputDeviceContext::Off(napi_env env, napi_callback_info info)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     size_t argc = 2;
     napi_value argv[2];
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -217,11 +236,15 @@ napi_value JsInputDeviceContext::Off(napi_env env, napi_callback_info info)
     }
     jsInputDeviceMgr->UnRegisterInputDeviceMonitor(env, type, argv[1]);
     return nullptr;
+#else
+    return nullptr;
+#endif
 }
 
 napi_value JsInputDeviceContext::GetDeviceIds(napi_env env, napi_callback_info info)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     size_t argc = 1;
     napi_value argv[1];
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -243,11 +266,15 @@ napi_value JsInputDeviceContext::GetDeviceIds(napi_env env, napi_callback_info i
         return nullptr;
     }
     return jsInputDeviceMgr->GetDeviceIds(env, argv[0]);
+#else
+    return nullptr;
+#endif
 }
 
 napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     size_t argc = 2;
     napi_value argv[2];
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -276,11 +303,15 @@ napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info
         return nullptr;
     }
     return jsInputDeviceMgr->GetDevice(env, id, argv[1]);
+#else
+    return nullptr;
+#endif
 }
 
 napi_value JsInputDeviceContext::SetPointerVisible(napi_env env, napi_callback_info info)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     size_t argc = 2;
     napi_value argv[2];
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -309,11 +340,15 @@ napi_value JsInputDeviceContext::SetPointerVisible(napi_env env, napi_callback_i
         return nullptr;
     }
     return jsInputDeviceMgr->SetPointerVisible(env, visible, argv[1]);
+#else
+    return nullptr;
+#endif
 }
 
 napi_value JsInputDeviceContext::GetKeystrokeAbility(napi_env env, napi_callback_info info)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     size_t argc = 3;
     napi_value argv[3];
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -364,11 +399,15 @@ napi_value JsInputDeviceContext::GetKeystrokeAbility(napi_env env, napi_callback
         return nullptr;
     }
     return jsInputDeviceMgr->GetKeystrokeAbility(env, deviceId, keyCode, argv[2]);
+#else
+    return nullptr;
+#endif
 }
 
 napi_value JsInputDeviceContext::GetKeyboardType(napi_env env, napi_callback_info info)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     size_t argc = 2;
     napi_value argv[2];
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -397,11 +436,15 @@ napi_value JsInputDeviceContext::GetKeyboardType(napi_env env, napi_callback_inf
         return nullptr;
     }
     return jsInputDeviceMgr->GetKeyboardType(env, id, argv[1]);
+#else
+    return nullptr;
+#endif
 }
 
 napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     auto instance = CreateInstance(env);
     if (instance == nullptr) {
         THROWERR(env, "failed to create instance");
@@ -418,6 +461,9 @@ napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
     };
     CHKRP(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     return exports;
+#else
+    return nullptr;
+#endif
 }
 } // namespace MMI
 } // namespace OHOS

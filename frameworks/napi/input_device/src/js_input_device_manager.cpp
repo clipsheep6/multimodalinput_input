@@ -33,7 +33,9 @@ const std::string CALL_FUNCTION = "napi_call_function";
 JsInputDeviceManager::JsInputDeviceManager()
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     InputDevImp.RegisterInputDeviceMonitor(TargetOn);
+#endif
 }
 
 JsInputDeviceManager::~JsInputDeviceManager() {}
@@ -41,38 +43,51 @@ JsInputDeviceManager::~JsInputDeviceManager() {}
 void JsInputDeviceManager::RegisterInputDeviceMonitor(napi_env env, std::string type, napi_value handle)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     AddMonitor(env, type, handle);
+#endif
 }
 
 void JsInputDeviceManager::UnRegisterInputDeviceMonitor(napi_env env, std::string type, napi_value handle)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     RemoveMonitor(env, type, handle);
+#endif
 }
 
 napi_value JsInputDeviceManager::GetDeviceIds(napi_env env, napi_value handle)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     std::lock_guard<std::mutex> guard(mutex_);
     int32_t userData = InputDevImp.GetUserData();
     napi_value ret = CreateCallbackInfo(env, handle, userData);
     InputDevImp.GetInputDeviceIdsAsync(EmitJsIds);
     return ret;
+#else
+    return nullptr;
+#endif
 }
 
 napi_value JsInputDeviceManager::GetDevice(napi_env env, int32_t id, napi_value handle)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     std::lock_guard<std::mutex> guard(mutex_);
     int32_t userData = InputDevImp.GetUserData();
     napi_value ret = CreateCallbackInfo(env, handle, userData);
     InputDevImp.GetInputDeviceAsync(id, EmitJsDev);
     return ret;
+#else
+    return nullptr;
+#endif
 }
 
 void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     CHKPV(asyncContext);
     CHKPV(asyncContext->env);
     napi_env env = asyncContext->env;
@@ -116,11 +131,13 @@ void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
         MMI_HILOGE("create async work fail");
         asyncContext->DecStrongRef(nullptr);
     }
+#endif
 }
 
 napi_value JsInputDeviceManager::SetPointerVisible(napi_env env, bool visible, napi_value handle)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
     if (asyncContext == nullptr) {
         THROWERR(env, "create AsyncContext failed");
@@ -137,33 +154,46 @@ napi_value JsInputDeviceManager::SetPointerVisible(napi_env env, bool visible, n
     }
     AsyncCallbackWork(asyncContext);
     return promise;
+#else
+    return nullptr;
+#endif
 }
 
 napi_value JsInputDeviceManager::GetKeystrokeAbility(napi_env env, int32_t id, std::vector<int32_t> keyCodes,
                                                      napi_value handle)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     std::lock_guard<std::mutex> guard(mutex_);
     int32_t userData = InputDevImp.GetUserData();
     napi_value ret = CreateCallbackInfo(env, handle, userData);
     InputDevImp.GetKeystrokeAbility(id, keyCodes, EmitJsKeystrokeAbility);
     return ret;
+#else
+    return nullptr;
+#endif
 }
 
 napi_value JsInputDeviceManager::GetKeyboardType(napi_env env, int32_t id, napi_value handle)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     int32_t userData = InputDevImp.GetUserData();
     napi_value ret = CreateCallbackInfo(env, handle, userData);
     InputDevImp.GetKeyboardTypeAsync(id, EmitJsKeyboardType);
     return ret;
+#else
+    return nullptr;
+#endif
 }
 
 void JsInputDeviceManager::ResetEnv()
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     InputDevImp.UnRegisterInputDeviceMonitor();
     JsEventTarget::ResetEnv();
+#endif
 }
 } // namespace MMI
 } // namespace OHOS
