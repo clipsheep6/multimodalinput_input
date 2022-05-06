@@ -86,7 +86,6 @@ config("libmmi_server_config") {
   if (resource_schedule_service_enabled) {
     cflags += [ "-DOHOS_RSS_CLIENT" ]
   }
-}
 
   if (mmi_enable_keyboard) {
     cflags += [ "-DOHOS_BUILD_ENABLE_KEYBOARD" ]
