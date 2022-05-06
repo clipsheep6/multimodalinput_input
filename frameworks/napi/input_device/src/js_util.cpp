@@ -17,9 +17,6 @@
 
 #include "mmi_log.h"
 #include "util_napi.h"
-#ifndef OHOS_BUILD_DEVICE_MANAGER_API
-#include "error_multimodal.h"
-#endif
 
 namespace OHOS {
 namespace MMI {
@@ -88,6 +85,8 @@ bool JsUtil::IsSameHandle(napi_env env, napi_value handle, napi_ref ref)
 
 napi_value JsUtil::GetDeviceInfo(const std::unique_ptr<CallbackInfo> &cb)
 {
+    CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     CHKPP(cb);
     CHKPP(cb->env);
     napi_value object = nullptr;
@@ -129,10 +128,15 @@ napi_value JsUtil::GetDeviceInfo(const std::unique_ptr<CallbackInfo> &cb)
         return nullptr;
     }
     return object;
+#else
+    return nullptr;
+#endif
 }
 
 bool JsUtil::GetDeviceAxisInfo(const std::unique_ptr<CallbackInfo> &cb, napi_value &object)
 {
+    CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     CHKPF(cb);
     CHKPF(cb->env);
     napi_value sourceType = nullptr;
@@ -179,10 +183,15 @@ bool JsUtil::GetDeviceAxisInfo(const std::unique_ptr<CallbackInfo> &cb, napi_val
     }
     CHKRF(cb->env, napi_set_named_property(cb->env, object, "axisRanges", axisRanges), SET_NAMED_PROPERTY);
     return true;
+#else
+    return false;
+#endif
 }
 
 bool JsUtil::GetDeviceSourceType(const std::unique_ptr<CallbackInfo> &cb, napi_value &object)
 {
+    CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     CHKPF(cb);
     CHKPF(cb->env);
     uint32_t types = cb->data.device->deviceType;
@@ -202,16 +211,24 @@ bool JsUtil::GetDeviceSourceType(const std::unique_ptr<CallbackInfo> &cb, napi_v
     }
     CHKRF(cb->env, napi_set_named_property(cb->env, object, "sources", devSources), SET_NAMED_PROPERTY);
     return true;
+#else
+    return false;
+#endif
 }
 
 bool JsUtil::TypeOf(napi_env env, napi_value value, napi_valuetype type)
 {
+    CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     napi_valuetype valueType = napi_undefined;
     CHKRF(env, napi_typeof(env, value, &valueType), TYPEOF);
     if (valueType != type) {
         return false;
     }
     return true;
+#else
+    return false;
+#endif
 }
 
 JsUtil::CallbackInfo::CallbackInfo() {}

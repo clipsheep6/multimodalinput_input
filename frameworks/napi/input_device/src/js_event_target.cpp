@@ -177,6 +177,7 @@ void JsEventTarget::CallIdsAsyncWork(uv_work_t *work, int32_t status)
     CHKRV(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE);
     napi_value result = nullptr;
     CHKRV(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &arr, &result), CALL_FUNCTION);
+#endif
 }
 
 void JsEventTarget::CallIdsPromiseWork(uv_work_t *work, int32_t status)
@@ -199,6 +200,7 @@ void JsEventTarget::CallIdsPromiseWork(uv_work_t *work, int32_t status)
         ++index;
     }
     CHKRV(cb->env, napi_resolve_deferred(cb->env, cb->deferred, arr), RESOLVE_DEFERRED);
+#endif
 }
 
 void JsEventTarget::EmitJsIds(int32_t userData, std::vector<int32_t> &ids)
@@ -257,6 +259,7 @@ void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
     CHKRV(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE);
     napi_value result = nullptr;
     CHKRV(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &object, &result), CALL_FUNCTION);
+#endif
 }
 
 void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
@@ -272,6 +275,7 @@ void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
     napi_value object = JsUtil::GetDeviceInfo(cb);
     CHKPV(object);
     CHKRV(cb->env, napi_resolve_deferred(cb->env, cb->deferred, object), RESOLVE_DEFERRED);
+#endif
 }
 
 void JsEventTarget::EmitJsDev(int32_t userData, std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device)
@@ -337,6 +341,7 @@ void JsEventTarget::CallKeystrokeAbilityPromise(uv_work_t *work, int32_t status)
             SET_ELEMENT);
     }
     CHKRV(cb->env, napi_resolve_deferred(cb->env, cb->deferred, keyAbility), RESOLVE_DEFERRED);
+#endif
 }
 
 void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
@@ -467,6 +472,7 @@ void JsEventTarget::CallKeyboardTypeAsync(uv_work_t *work, int32_t status)
     CHKRV(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE);
     napi_value result = nullptr;
     CHKRV(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &keyboardType, &result), CALL_FUNCTION);
+#endif
 }
 
 void JsEventTarget::CallKeyboardTypePromise(uv_work_t *work, int32_t status)
@@ -482,6 +488,7 @@ void JsEventTarget::CallKeyboardTypePromise(uv_work_t *work, int32_t status)
     napi_value keyboardType = nullptr;
     CHKRV(cb->env, napi_create_int32(cb->env, cb->data.keyboardType, &keyboardType), CREATE_INT32);
     CHKRV(cb->env, napi_resolve_deferred(cb->env, cb->deferred, keyboardType), RESOLVE_DEFERRED);
+#endif
 }
 
 void JsEventTarget::AddMonitor(napi_env env, std::string type, napi_value handle)
@@ -513,6 +520,7 @@ void JsEventTarget::AddMonitor(napi_env env, std::string type, napi_value handle
         isMonitorProcess_ = true;
         InputDevImpl.RegisterInputDeviceMonitor(TargetOn);
     }
+#endif
 }
 
 void JsEventTarget::RemoveMonitor(napi_env env, std::string type, napi_value handle)
@@ -542,6 +550,7 @@ monitorLabel:
         isMonitorProcess_ = false;
         InputDevImpl.UnRegisterInputDeviceMonitor();
     }
+#endif
 }
 
 napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, const int32_t userData)
@@ -585,6 +594,9 @@ std::unique_ptr<JsUtil::CallbackInfo> JsEventTarget::GetCallbackInfo(uv_work_t *
     auto cb = std::move(iter->second);
     callback_.erase(iter);
     return cb;
+#else
+    return nullptr;
+#endif
 }
 
 void JsEventTarget::ResetEnv()
@@ -595,6 +607,7 @@ void JsEventTarget::ResetEnv()
     callback_.clear();
     devMonitor_.clear();
     InputDevImpl.UnRegisterInputDeviceMonitor();
+#endif
 }
 } // namespace MMI
 } // namespace OHOS

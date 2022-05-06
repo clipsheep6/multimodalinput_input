@@ -44,18 +44,22 @@ const std::string GET_BOOL = "napi_get_boolean";
 
 JsInputDeviceContext::JsInputDeviceContext()
 {
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     mgr_ = std::make_shared<JsInputDeviceManager>();
     CHKPL(mgr_);
+#endif
 }
 
 JsInputDeviceContext::~JsInputDeviceContext()
 {
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     std::lock_guard<std::mutex> guard(mtx_);
     auto jsInputDeviceMgr = mgr_;
     mgr_.reset();
     if (jsInputDeviceMgr) {
         jsInputDeviceMgr->ResetEnv();
     }
+#endif
 }
 
 napi_value JsInputDeviceContext::CreateInstance(napi_env env)
@@ -377,6 +381,9 @@ napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info in
         return nullptr;
     }
     return jsInputDeviceMgr->SupportKeys(env, deviceId, keyCode, argv[2]);
+#else
+    return nullptr;
+#endif
 }
 
 napi_value JsInputDeviceContext::GetKeyboardType(napi_env env, napi_callback_info info)

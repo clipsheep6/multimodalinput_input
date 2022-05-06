@@ -62,7 +62,9 @@ private:
     static std::unique_ptr<JsUtil::CallbackInfo> GetCallbackInfo(uv_work_t *work);
 
 private:
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     bool isMonitorProcess_ {false};
+#endif
 };
 } // namespace MMI
 } // namespace OHOS

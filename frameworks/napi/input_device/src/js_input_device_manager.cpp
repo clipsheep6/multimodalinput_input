@@ -167,6 +167,7 @@ napi_value JsInputDeviceManager::SupportKeys(napi_env env, int32_t id, std::vect
 napi_value JsInputDeviceManager::GetKeyboardType(napi_env env, int32_t id, napi_value handle)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     int32_t userData = InputDevImpl.GetUserData();
     napi_value ret = CreateCallbackInfo(env, handle, userData);
     InputDevImpl.GetKeyboardTypeAsync(id, EmitJsKeyboardType);
@@ -179,6 +180,7 @@ napi_value JsInputDeviceManager::GetKeyboardType(napi_env env, int32_t id, napi_
 void JsInputDeviceManager::ResetEnv()
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     JsEventTarget::ResetEnv();
 #endif
 }
