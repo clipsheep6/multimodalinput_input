@@ -16,7 +16,6 @@
 #ifndef I_KEY_COMMAND_MANAGER_H
 #define I_KEY_COMMAND_MANAGER_H
 
-#include "bytrace.h"
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "i_input_event_handler.h"

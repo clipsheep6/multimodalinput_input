@@ -95,28 +95,24 @@ group("ut_mmi_debug_tools") {
   ]
 }
 
-group("unittests") {
-  testonly = true
-  deps = [
-    "frameworks/proxy:ut-mmi-proxy",
-    "service:ut-mmi-service",
-    "tools/inject_event:inject_event",
-    "util:ut-mmi-util",
-  ]
-}
-
 group("mmi_tests_manual") {
   testonly = true
-  deps = []
-  if (mmi_enable_mouse || mmi_enable_tp) {
-    deps += [ "frameworks/proxy:InputManagerManualTest" ]
-  }
-  if (mmi_enable_tp) {
-    deps += [ "service:TransformPointTest" ]
-  }
+  deps = [
+    "frameworks/proxy:InputManagerManualTest",
+    "service:TransformPointTest",
+  ]
 }
 
 group("mmi_tests") {
   testonly = true
-  deps = [ ":unittests" ]
+  deps = [
+    "frameworks/proxy:InputManagerTest",
+    "frameworks/proxy:KeyEventTest",
+    "frameworks/proxy:PointerEventTest",
+    "frameworks/proxy:ut-mmi-proxy-out",
+    "service:ut-mmi-service-out",
+    "tools/inject_event:InjectEventTest",
+    "util:RunShellUtilTest",
+    "util:ut-mmi-util-out",
+  ]
 }

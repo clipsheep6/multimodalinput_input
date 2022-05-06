@@ -18,7 +18,7 @@
 #include <cinttypes>
 
 #include "ability_manager_client.h"
-#include "bytrace.h"
+#include "hitrace_meter.h"
 #include "input-event-codes.h"
 #include "hisysevent.h"
 
@@ -62,7 +62,10 @@ int32_t EventDispatch::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
                keyEvent->GetEventType(),
                keyEvent->GetFlag(), keyEvent->GetKeyAction(), fd);
     auto udsServer = InputHandler->GetUDSServer();
-    CHKPR(udsServer, ERROR_NULL_POINTER);
+    if (udsServer == nullptr) {
+        MMI_HILOGE("UdsServer is a nullptr");
+        return RET_ERR;
+    }
     auto session = udsServer->GetSession(fd);
     CHKPF(session);
     if (session->isANRProcess_) {

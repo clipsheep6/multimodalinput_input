@@ -35,7 +35,6 @@ public:
     virtual void OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session);
     virtual void OnRemoveInterceptor(int32_t id);
 private:
-    bool OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
     bool OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
 };
 } // namespace MMI

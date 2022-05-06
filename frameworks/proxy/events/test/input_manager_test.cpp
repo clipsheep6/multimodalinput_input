@@ -514,7 +514,11 @@ std::string InputManagerTest::DumpPointerItem(const PointerEvent::PointerItem &i
          << ",Width:" << item.GetWidth() << ",Height:" << item.GetHeight()
          << ",TiltX:" << std::fixed << std::setprecision(precision) << item.GetTiltX()
          << ",TiltY:" << std::fixed << std::setprecision(precision) << item.GetTiltY()
-         << ",Pressure:" << std::fixed << std::setprecision(precision) << item.GetPressure();
+         << ",ToolGlobalX:" << item.GetToolGlobalX() << ",ToolGlobalY:" << item.GetToolGlobalY()
+         << ",ToolLocalX:" << item.GetToolLocalX() << ",ToolLocalY:" << item.GetToolLocalY()
+         << ",ToolWidth:" << item.GetToolWidth() << ",ToolHeight:" << item.GetToolHeight()
+         << ",Pressure:" << item.GetPressure() << ",ToolType:" << item.GetToolType()
+         << ",AxisLong:" << item.GetAxisLong() << ",AxisShort:" << item.GetAxisShort();
     return strm.str();
 }
 
@@ -1117,6 +1121,35 @@ HWTEST_F(InputManagerTest, InputManager_Pencil2InputEvent_003, TestSize.Level1)
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent013() };
     ASSERT_TRUE(pointerEvent != nullptr);
     TestSimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name:InputManager_Pencil2InputEvent_004
+ * @tc.desc:Verify simulate pointer event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManager_Pencil2InputEvent_004, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    MMI_HILOGD("start InputManager_Pencil2InputEvent_004");
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerId(-1);
+
+    std::string command {
+        "InputWindowsManager: in UpdateTouchScreenTarget, "
+        "Can.t find pointer item, pointer:[[:digit:]]\\{1,\\}"
+    };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
+
+    MMI_HILOGD("Call InputManager::SimulateInputEvent");
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+    EXPECT_TRUE(!tLogs.empty());
 }
 
 /**
@@ -2143,7 +2176,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_005, TestSize.Level1)
 
 /**
  * @tc.name:TestGetKeystrokeAbility_001
- * @tc.desc:Verify GetKeystrokeAbility
+ * @tc.desc:Verify SupportKeys
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2151,7 +2184,7 @@ HWTEST_F(InputManagerTest, TestGetKeystrokeAbility_001, TestSize.Level1)
 {
     MMI_HILOGD("start TestGetKeystrokeAbility_001");
     std::vector<int32_t> keyCodes = {17, 22, 2055};
-    InputManager::GetInstance()->GetKeystrokeAbility(0, keyCodes, [](std::map<int32_t, bool> keystrokeAbility) {
+    InputManager::GetInstance()->SupportKeys(0, keyCodes, [](std::vector<bool> keystrokeAbility) {
         MMI_HILOGD("TestGetKeystrokeAbility_001 callback ok");
     });
     MMI_HILOGD("stop TestGetKeystrokeAbility_001");

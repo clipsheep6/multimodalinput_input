@@ -55,11 +55,8 @@ protected:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     int32_t OnInputDevice(const UDSClient& client, NetPacket& pkt);
     int32_t OnInputDeviceIds(const UDSClient& client, NetPacket& pkt);
-    int32_t OnKeyList(const UDSClient& client, NetPacket& pkt);
+    int32_t OnSupportKeys(const UDSClient& client, NetPacket& pkt);
     int32_t OnDevMonitor(const UDSClient& client, NetPacket& pkt);
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    int32_t TouchpadEventInterceptor(const UDSClient& client, NetPacket& pkt);
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t KeyEventInterceptor(const UDSClient& client, NetPacket& pkt);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
