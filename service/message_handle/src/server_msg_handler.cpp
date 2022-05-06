@@ -265,9 +265,9 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt)
                 return RET_ERR;
             }
 #else 
-        auto inputHandler = InputHandler->GetInputHandlerChain();
-        CHKPR(inputHandler, ERROR_NULL_POINTER);
-        inputHandler->HandleTouchEvent(nullptr);
+            auto inputHandler = InputHandler->GetInputHandlerChain();
+            CHKPR(inputHandler, ERROR_NULL_POINTER);
+            inputHandler->HandleTouchEvent(nullptr);
 #endif  // OHOS_BUILD_ENABLE_TOUCH
             break;
         }
@@ -281,9 +281,9 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt)
                 return RET_ERR;
             }
 #else
-        auto inputHandler = InputHandler->GetInputHandlerChain();
-        CHKPR(inputHandler, ERROR_NULL_POINTER);
-        inputHandler->HandlePointerEvent(nullptr);
+            auto inputHandler = InputHandler->GetInputHandlerChain();
+            CHKPR(inputHandler, ERROR_NULL_POINTER);
+            inputHandler->HandlePointerEvent(nullptr);
 #endif // OHOS_BUILD_ENABLE_POINTER
             break;
         }

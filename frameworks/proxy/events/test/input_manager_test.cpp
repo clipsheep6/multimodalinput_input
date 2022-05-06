@@ -1798,7 +1798,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_010, TestSize.Leve
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     EXPECT_TRUE(subscribeId1 >= 0);
 #else
-   EXPECT_TRUE(subscribeId1 == ERROR_UNSUPPORT);    
+   EXPECT_TRUE(subscribeId1 == ERROR_UNSUPPORT);
 #endif
     // 电源键抬起订阅
     std::shared_ptr<KeyOption> keyOption2 = std::make_shared<KeyOption>();
@@ -1820,7 +1820,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_010, TestSize.Leve
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     EXPECT_TRUE(subscribeId2 >= 0);
 #else
-   EXPECT_TRUE(subscribeId2 == ERROR_UNSUPPORT);    
+   EXPECT_TRUE(subscribeId2 == ERROR_UNSUPPORT);
 #endif
     std::this_thread::sleep_for(std::chrono::milliseconds(10000));
     InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId1);
@@ -2341,7 +2341,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_001, TestSize.L
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 #else
-    EXPECT_EQ(ERROR_UNSUPPORT, response); 
+    EXPECT_EQ(ERROR_UNSUPPORT, response);
 #endif
 
     InputManager::GetInstance()->RemoveMonitor(monitorId);
@@ -2390,7 +2390,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_002, TestSize.L
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 #else
-    EXPECT_EQ(ERROR_UNSUPPORT, response); 
+    EXPECT_EQ(ERROR_UNSUPPORT, response);
 #endif
 
     InputManager::GetInstance()->RemoveMonitor(monitorId);
@@ -2432,14 +2432,14 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_003, TestSize.L
     EXPECT_TRUE(IsValidHandlerId(monitorId));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    int32_t response = MMIEventHdl.InjectPointerEvent(pointerEvent);    
+    int32_t response = MMIEventHdl.InjectPointerEvent(pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_POINTER
     EXPECT_EQ(RET_OK, response);
 
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 #else
-    EXPECT_EQ(ERROR_UNSUPPORT, response); 
+    EXPECT_EQ(ERROR_UNSUPPORT, response);
 #endif
     InputManager::GetInstance()->RemoveMonitor(monitorId);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));

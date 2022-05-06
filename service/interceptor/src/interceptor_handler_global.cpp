@@ -32,7 +32,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Inter
 
 InterceptorHandlerGlobal::InterceptorHandlerGlobal() {}
 
-#ifdef OHOS_BUILD_ENABLE_POINTER 
+#ifdef OHOS_BUILD_ENABLE_POINTER
 int32_t InterceptorHandlerGlobal::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
