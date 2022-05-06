@@ -18,7 +18,7 @@
 #include <cinttypes>
 
 #include "ability_manager_client.h"
-#include "bytrace.h"
+#include "hitrace_meter.h"
 #include "input-event-codes.h"
 #include "hisysevent.h"
 
@@ -187,7 +187,6 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
                key->GetActionStartTime(),
                key->GetEventType(),
                key->GetFlag(), key->GetKeyAction(), fd);
-    InterHdlGl->HandleEvent(key);
     InputHandlerManagerGlobal::GetInstance().HandleEvent(key);
     auto session = udsServer.GetSession(fd);
     CHKPF(session);

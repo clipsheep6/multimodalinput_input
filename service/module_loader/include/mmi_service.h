@@ -52,6 +52,9 @@ public:
         int32_t &toReturnClientFd, int32_t pid = 0, int32_t uid = 0) override;
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
     virtual int32_t SetPointerVisible(bool visible) override;
+#ifdef OHOS_RSS_CLIENT
+    virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+#endif
 
 protected:
     virtual void OnConnected(SessionPtr s) override;
@@ -76,6 +79,9 @@ private:
     int32_t mmiFd_ = -1;
     std::mutex mu_;
     std::thread t_;
+#ifdef OHOS_RSS_CLIENT
+    std::atomic<uint64_t> tid_ = 0;
+#endif
 
     LibinputAdapter libinputAdapter_;
     ServerMsgHandler sMsgHandler_;

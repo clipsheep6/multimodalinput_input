@@ -34,9 +34,9 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Remote
 void RemoteMsgHandler::Init(IMultimodalInputConnect& multStub)
 {
     CALL_LOG_ENTER;
-    multStub_ = &multStub;
+    multStub_ = &multStub;,
     callbacks_ = {
-        {IMultimodalInputConnect::ALLOC_SOCKET_FD, MsgCallbackBind2(&RemoteMsgHandler::OnAllocSocketFd, this)},
+        {IMultimodalInputConnect::ALLOC_SOCKET_FD, MsgCallbackBind2(&RemoteMsgHandler::OnAllocSocketFd, this)}
         {IMultimodalInputConnect::ADD_INPUT_EVENT_FILTER, 
             MsgCallbackBind2(&RemoteMsgHandler::OnAddInputEventFilter, this)},
         {IMultimodalInputConnect::SET_POINTER_VISIBLE, MsgCallbackBind2(&RemoteMsgHandler::OnSetPointerVisible, this)},
