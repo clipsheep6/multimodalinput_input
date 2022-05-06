@@ -82,10 +82,10 @@ int32_t TouchEventHandler::HandleTouchEvent(libinput_event* event)
     return RET_OK;
 }
 
-void TouchEventHandler::AddHandler(int priority, const std::shared_ptr<IInputEventHandler> handlerPtr)
+void TouchEventHandler::AddHandler(int priority, const std::shared_ptr<IInputEventHandler> handler)
 {
-    CHKPV(handlerPtr);
-    touchHandlerMap_.emplace(priority, handlerPtr);
+    CHKPV(handler);
+    touchHandlerMap_.emplace(priority, handler);
 }
 
 void TouchEventHandler::AddFinish()

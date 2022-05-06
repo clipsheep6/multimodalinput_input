@@ -51,23 +51,22 @@ public:
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
     std::shared_ptr<KeyEvent> GetKeyEvent() const;
 
-    std::shared_ptr<IInputEventHandler> GetInputHandlerChain() const;
-    
+    std::shared_ptr<IInputEventHandler> GetInputEventHandler() const;    
     std::shared_ptr<KeyEventHandler> GetKeyEventHandler() const;
     std::shared_ptr<PointerEventHandler> GetPointerEventHandler() const;
     std::shared_ptr<TouchEventHandler> GetTouchEventHandler() const;
     
-    std::shared_ptr<IInterceptorManagerGlobal> GetKeyInterceptor() const;
-    std::shared_ptr<KeyEventSubscriber> GetKeySubscriber() const;
-    std::shared_ptr<InputHandlerManagerGlobal> GetKeyInputHandlerMgr() const;
+    std::shared_ptr<IInterceptorManagerGlobal> GetKeyInterceptorHandler() const;
+    std::shared_ptr<KeyEventSubscriber> GetKeySubscriberHandler() const;
+    std::shared_ptr<InputHandlerManagerGlobal> GetKeyMonitorHandler() const;
 
-    std::shared_ptr<EventFilterWrap> GetPointerEventFilter() const;
-    std::shared_ptr<IInterceptorHandlerGlobal> GetPointerInterceptorMgr() const;
-    std::shared_ptr<InputHandlerManagerGlobal> GetPointerInputHandlerMgr() const;
+    std::shared_ptr<EventFilterWrap> GetPointerEventFilterHanlder() const;
+    std::shared_ptr<IInterceptorHandlerGlobal> GetPointerInterceptorHandler() const;
+    std::shared_ptr<InputHandlerManagerGlobal> GetPointerMonitorHandler() const;
 
-    std::shared_ptr<EventFilterWrap> GetTouchEventFilter() const;
-    std::shared_ptr<IInterceptorHandlerGlobal> GetTouchInterceptorMgr() const;
-    std::shared_ptr<InputHandlerManagerGlobal> GetTouchInputHandlerMgr() const;
+    std::shared_ptr<EventFilterWrap> GetTouchEventFilterHandler() const;
+    std::shared_ptr<IInterceptorHandlerGlobal> GetTouchInterceptorHandler() const;
+    std::shared_ptr<InputHandlerManagerGlobal> GetTouchMonitorHandler() const;
 
 protected:
     int32_t OnEventDeviceAdded(libinput_event *event);
@@ -86,23 +85,24 @@ private:
     UDSServer *udsServer_ = nullptr;
     NotifyDeviceChange notifyDeviceChange_;
     std::shared_ptr<KeyEvent> keyEvent_ = nullptr;
-    std::shared_ptr<IInputEventHandler> inputEventHandler_ = nullptr;
 
+    std::shared_ptr<IInputEventHandler> inputEventHandler_ = nullptr;
     std::shared_ptr<KeyEventHandler> keyEventHandler_ = nullptr;
     std::shared_ptr<PointerEventHandler> pointerEventHandler_ = nullptr;
     std::shared_ptr<TouchEventHandler> touchEventHandler_ = nullptr;
 
-    std::shared_ptr<IInterceptorManagerGlobal> keyInterceptor_ = nullptr;
-    std::shared_ptr<KeyEventSubscriber> keySubscriber_ = nullptr;
+    std::shared_ptr<IInterceptorManagerGlobal> keyInterceptorHandler_ = nullptr;
+    std::shared_ptr<KeyEventSubscriber> keySubscriberHandler_ = nullptr;
     std::shared_ptr<InputHandlerManagerGlobal> keyMonitorHandler_ = nullptr;
 
-    std::shared_ptr<EventFilterWrap> pointerEventFilter_ = nullptr;
-    std::shared_ptr<IInterceptorHandlerGlobal> pointerInterceptor_ = nullptr;
+    std::shared_ptr<EventFilterWrap> pointerEventFilterHandler_ = nullptr;
+    std::shared_ptr<IInterceptorHandlerGlobal> pointerInterceptorHandler_ = nullptr;
     std::shared_ptr<InputHandlerManagerGlobal> pointerMonitorHandler_ = nullptr;
 
-    std::shared_ptr<EventFilterWrap> touchEventFilter_ = nullptr;
-    std::shared_ptr<IInterceptorHandlerGlobal> touchInterceptor_ = nullptr;
-    std::shared_ptr<InputHandlerManagerGlobal> touchIMonitorHandler_ = nullptr;
+    std::shared_ptr<EventFilterWrap> touchEventFilterHandler_ = nullptr;
+    std::shared_ptr<IInterceptorHandlerGlobal> touchInterceptorHandler_ = nullptr;
+    std::shared_ptr<InputHandlerManagerGlobal> touchMonitorHandler_ = nullptr;
+
     uint64_t idSeed_ = 0;
     int32_t eventType_ = 0;
     int64_t initSysClock_ = 0;

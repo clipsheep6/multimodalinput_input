@@ -83,10 +83,10 @@ int32_t PointerEventHandler::HandlePointerEvent(std::shared_ptr<PointerEvent> po
     return nextHandler_->HandlePointerEvent(pointerEvent);
 }
 
-void PointerEventHandler::AddHandler(int priority, const std::shared_ptr<IInputEventHandler> handlerPtr)
+void PointerEventHandler::AddHandler(int priority, const std::shared_ptr<IInputEventHandler> handler)
 {
-    CHKPV(handlerPtr);
-    pointerHandlerMap_.emplace(priority, handlerPtr);
+    CHKPV(handler);
+    pointerHandlerMap_.emplace(priority, handler);
 }
 
 void PointerEventHandler::AddFinish()

@@ -65,10 +65,10 @@ int32_t KeyEventHandler::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     return nextHandler_->HandleKeyEvent(keyEvent);
 }
 
-void KeyEventHandler::AddHandler(int priority, const std::shared_ptr<IInputEventHandler> handlerPtr)
+void KeyEventHandler::AddHandler(int priority, const std::shared_ptr<IInputEventHandler> handler)
 {
-    CHKPV(handlerPtr);
-    keyHandlerMap_.emplace(priority, handlerPtr);
+    CHKPV(handler);
+    keyHandlerMap_.emplace(priority, handler);
 }
 
 void KeyEventHandler::AddFinish()

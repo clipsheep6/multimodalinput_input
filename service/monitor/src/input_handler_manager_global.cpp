@@ -253,7 +253,7 @@ void InputHandlerManagerGlobal::MonitorCollection::MarkConsumed(int32_t monitorI
     CHKPV(iTouchEventHandler);
     iTouchEventHandler->HandleTouchEvent(pointerEvent);
 #else
-    auto inputHandler = InputHandler->GetInputHandlerChain();
+    auto inputHandler = InputHandler->GetInputEventHandler();
     CHKPV(inputHandler);
     inputHandler->HandleTouchEvent(nullptr);
 #endif // OHOS_BUILD_ENABLE_TOUCH
