@@ -57,8 +57,6 @@ private:
     std::list<std::shared_ptr<IDeviceObserver>> observers_;
     std::map<SessionPtr, std::function<void(std::string, int32_t)>> devMonitor_;
 };
-
-#define InputDevMgr InputDeviceManager::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_DEVICE_MANAGER_H

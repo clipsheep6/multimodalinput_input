@@ -20,7 +20,7 @@
 #include "input-event-codes.h"
 
 #include "define_multimodal.h"
-#include "input_device_manager.h"
+#include "define_device_manager.h"
 #include "input_event_handler.h"
 #include "input_windows_manager.h"
 #include "mouse_device_state.h"

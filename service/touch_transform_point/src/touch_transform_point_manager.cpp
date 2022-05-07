@@ -15,7 +15,7 @@
 
 #include "touch_transform_point_manager.h"
 #include "tablet_tool_processor.h"
-#include "input_device_manager.h"
+#include "define_device_manager.h"
 
 namespace OHOS {
 namespace MMI {

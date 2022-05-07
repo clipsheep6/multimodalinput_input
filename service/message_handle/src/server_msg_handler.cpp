@@ -21,7 +21,7 @@
 #include "event_dump.h"
 #include "event_package.h"
 #include "hos_key_event.h"
-#include "input_device_manager.h"
+#include "define_device_manager.h"
 #include "input_event.h"
 #include "input_event_data_transformation.h"
 #include "input_event_monitor_manager.h"
