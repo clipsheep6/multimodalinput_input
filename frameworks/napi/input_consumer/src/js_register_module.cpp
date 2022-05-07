@@ -25,8 +25,10 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterMoudle" };
-[[maybe_unused]] constexpr size_t EVENT_NAME_LEN = 64;
-[[maybe_unused]] constexpr size_t PRE_KEYS_SIZE = 4;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+constexpr size_t EVENT_NAME_LEN = 64;
+constexpr size_t PRE_KEYS_SIZE = 4;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -210,7 +212,7 @@ static void SubKeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
         }
     }
 }
-#endif
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 static napi_value JsOn(napi_env env, napi_callback_info info)
 {
@@ -294,7 +296,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     event = nullptr;
 #else
     MMI_HILOGW("Keyboard device dose not support");
-#endif
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     return nullptr;
 }
 
