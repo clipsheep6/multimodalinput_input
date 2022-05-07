@@ -128,6 +128,7 @@ ohos_shared_library("libmmi-server") {
     "device_manager/src/input_device_manager.cpp",
     "event_dispatch/src/event_dispatch.cpp",
     "event_dump/src/event_dump.cpp",
+    "event_handler/src/i_input_event_handler.cpp",
     "event_handler/src/input_event_handler.cpp",
     "event_handler/src/key_event_value_transformation.cpp",
     "libinput_adapter/src/libinput_adapter.cpp",
@@ -139,7 +140,6 @@ ohos_shared_library("libmmi-server") {
     "subscriber/src/key_option.cpp",
     "timer_manager/src/timer_manager.cpp",
     "window_manager/src/input_windows_manager.cpp",
-    "event_handler/src/i_input_event_handler.cpp",
   ]
 
   if (is_mmi_have_hdf) {
@@ -152,7 +152,7 @@ ohos_shared_library("libmmi-server") {
   if (mmi_enable_keyboard) {
     sources += [
       "event_handler/src/key_event_handler.cpp",
-      "event_package/src/event_package.cpp",      
+      "event_package/src/event_package.cpp",
       "subscriber/src/key_event_subscriber.cpp",
     ]
     if (mmi_enable_combinationkey) {
@@ -197,7 +197,7 @@ ohos_shared_library("libmmi-server") {
   } else {
     sources += [ "interceptor/src/i_interceptor_handler_global.cpp" ]
   }
-  
+
   configs = [ ":libmmi_server_config" ]
 
   deps = [
