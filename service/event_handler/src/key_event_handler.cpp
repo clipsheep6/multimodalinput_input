@@ -74,7 +74,7 @@ void KeyEventHandler::AddHandler(int priority, const std::shared_ptr<IInputEvent
 void KeyEventHandler::AddFinish()
 {
     std::shared_ptr<IInputEventHandler> tmpHandler = nullptr;
-    for(const auto &handler : keyHandlerMap_) {
+    for (const auto &handler : keyHandlerMap_) {
         if (tmpHandler == nullptr) {
             tmpHandler = handler.second;
             SetNext(tmpHandler);

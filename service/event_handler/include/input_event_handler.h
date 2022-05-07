@@ -51,7 +51,7 @@ public:
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
     std::shared_ptr<KeyEvent> GetKeyEvent() const;
 
-    std::shared_ptr<IInputEventHandler> GetInputEventHandler() const;    
+    std::shared_ptr<IInputEventHandler> GetInputEventHandler() const;  
     std::shared_ptr<KeyEventHandler> GetKeyEventHandler() const;
     std::shared_ptr<PointerEventHandler> GetPointerEventHandler() const;
     std::shared_ptr<TouchEventHandler> GetTouchEventHandler() const;

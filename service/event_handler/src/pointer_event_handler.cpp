@@ -92,7 +92,7 @@ void PointerEventHandler::AddHandler(int priority, const std::shared_ptr<IInputE
 void PointerEventHandler::AddFinish()
 {
     std::shared_ptr<IInputEventHandler> tmpHandler = nullptr;
-    for(const auto &handler : pointerHandlerMap_) {
+    for (const auto &handler : pointerHandlerMap_) {
         if (tmpHandler == nullptr) {
             tmpHandler = handler.second;
             SetNext(tmpHandler);

@@ -257,34 +257,34 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt)
     auto source = pointerEvent->GetSourceType();
     switch (source) {
         case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
-#ifdef OHOS_BUILD_ENABLE_TOUCH
+    #ifdef OHOS_BUILD_ENABLE_TOUCH
             auto iTouchEventHandler = InputHandler->GetTouchEventHandler();
             CHKPR(iTouchEventHandler, ERROR_NULL_POINTER);
             if (iTouchEventHandler->HandleTouchEvent(pointerEvent) != RET_OK) {
                 MMI_HILOGE("HandlePointerEvent failed");
                 return RET_ERR;
             }
-#else 
+    #else
             auto inputHandler = InputHandler->GetInputEventHandler();
             CHKPR(inputHandler, ERROR_NULL_POINTER);
             inputHandler->HandleTouchEvent(nullptr);
-#endif  // OHOS_BUILD_ENABLE_TOUCH
+    #endif  // OHOS_BUILD_ENABLE_TOUCH
             break;
         }
         case PointerEvent::SOURCE_TYPE_MOUSE:
         case PointerEvent::SOURCE_TYPE_TOUCHPAD : {
-#ifdef OHOS_BUILD_ENABLE_POINTER
+    #ifdef OHOS_BUILD_ENABLE_POINTER
             auto iPointerEventHandler = InputHandler->GetPointerEventHandler();
             CHKPR(iPointerEventHandler, ERROR_NULL_POINTER);
             if (iPointerEventHandler->HandlePointerEvent(pointerEvent) != RET_OK) {
                 MMI_HILOGE("HandlePointerEvent failed");
                 return RET_ERR;
             }
-#else
+    #else
             auto inputHandler = InputHandler->GetInputEventHandler();
             CHKPR(inputHandler, ERROR_NULL_POINTER);
             inputHandler->HandlePointerEvent(nullptr);
-#endif // OHOS_BUILD_ENABLE_POINTER
+    #endif // OHOS_BUILD_ENABLE_POINTER
             break;
         }
         default: {

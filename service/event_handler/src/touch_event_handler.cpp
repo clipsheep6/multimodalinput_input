@@ -91,7 +91,7 @@ void TouchEventHandler::AddHandler(int priority, const std::shared_ptr<IInputEve
 void TouchEventHandler::AddFinish()
 {
     std::shared_ptr<IInputEventHandler> tmpHandler = nullptr;
-    for(const auto &handler : touchHandlerMap_) {
+    for (const auto &handler : touchHandlerMap_) {
         if (tmpHandler == nullptr) {
             tmpHandler = handler.second;
             SetNext(tmpHandler);
