@@ -495,7 +495,11 @@ std::string InputManagerTest::DumpPointerItem(const PointerEvent::PointerItem &i
          << ",Width:" << item.GetWidth() << ",Height:" << item.GetHeight()
          << ",TiltX:" << std::fixed << std::setprecision(precision) << item.GetTiltX()
          << ",TiltY:" << std::fixed << std::setprecision(precision) << item.GetTiltY()
-         << ",Pressure:" << std::fixed << std::setprecision(precision) << item.GetPressure();
+         << ",ToolGlobalX:" << item.GetToolGlobalX() << ",ToolGlobalY:" << item.GetToolGlobalY()
+         << ",ToolLocalX:" << item.GetToolLocalX() << ",ToolLocalY:" << item.GetToolLocalY()
+         << ",ToolWidth:" << item.GetToolWidth() << ",ToolHeight:" << item.GetToolHeight()
+         << ",Pressure:" << item.GetPressure() << ",ToolType:" << item.GetToolType()
+         << ",AxisLong:" << item.GetAxisLong() << ",AxisShort:" << item.GetAxisShort();
     return strm.str();
 }
 
@@ -1095,6 +1099,35 @@ HWTEST_F(InputManagerTest, InputManager_Pencil2InputEvent_003, TestSize.Level1)
 }
 
 /**
+ * @tc.name:InputManager_Pencil2InputEvent_004
+ * @tc.desc:Verify simulate pointer event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManager_Pencil2InputEvent_004, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    MMI_HILOGD("start InputManager_Pencil2InputEvent_004");
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerId(-1);
+
+    std::string command {
+        "InputWindowsManager: in UpdateTouchScreenTarget, "
+        "Can.t find pointer item, pointer:[[:digit:]]\\{1,\\}"
+    };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
+
+    MMI_HILOGD("Call InputManager::SimulateInputEvent");
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+    EXPECT_TRUE(!tLogs.empty());
+}
+
+/**
  * @tc.name:InputManager_SimulateInputEvent_006
  * @tc.desc:Verify simulate mouse event
  * @tc.type: FUNC
@@ -1334,7 +1367,6 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_015, TestSize.Level1)
 HWTEST_F(InputManagerTest, InputManager_ANR_TEST_001, TestSize.Level1)
 {
     MMI_HILOGD("start InputManager_ANR_TEST_001");
-    std::this_thread::sleep_for(std::chrono::milliseconds(20000));
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
 
@@ -1345,36 +1377,8 @@ HWTEST_F(InputManagerTest, InputManager_ANR_TEST_001, TestSize.Level1)
     item.SetPressure(5);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent->SetSourceType(-1);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent->SetPointerId(0);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    MMI_HILOGD("InputManager_ANR_TEST_001 wait 2s");
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-
-    item.SetPointerId(1);
-    item.SetGlobalX(823);
-    item.SetGlobalY(723);
-    item.SetPressure(5);
-    pointerEvent->AddPointerItem(item);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent->SetSourceType(-1);
-    pointerEvent->SetPointerId(1);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    MMI_HILOGD("InputManager_ANR_TEST_001 wait 5s");
-    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
-
-    item.SetPointerId(2);
-    item.SetGlobalX(823);
-    item.SetGlobalY(723);
-    item.SetPressure(5);
-    pointerEvent->AddPointerItem(item);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent->SetSourceType(-1);
-    pointerEvent->SetPointerId(2);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -1389,7 +1393,6 @@ HWTEST_F(InputManagerTest, InputManager_ANR_TEST_001, TestSize.Level1)
 HWTEST_F(InputManagerTest, InputManager_ANR_TEST_002, TestSize.Level1)
 {
     MMI_HILOGD("start InputManager_ANR_TEST_002");
-    std::this_thread::sleep_for(std::chrono::milliseconds(20000));
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
 
@@ -1400,36 +1403,8 @@ HWTEST_F(InputManagerTest, InputManager_ANR_TEST_002, TestSize.Level1)
     item.SetPressure(5);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent->SetSourceType(-1);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent->SetPointerId(0);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    MMI_HILOGD("InputManager_ANR_TEST_001 wait 2s");
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-
-    item.SetPointerId(1);
-    item.SetGlobalX(823);
-    item.SetGlobalY(723);
-    item.SetPressure(5);
-    pointerEvent->AddPointerItem(item);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent->SetSourceType(-1);
-    pointerEvent->SetPointerId(1);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    MMI_HILOGD("InputManager_ANR_TEST_001 wait 5s");
-    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
-
-    item.SetPointerId(2);
-    item.SetGlobalX(823);
-    item.SetGlobalY(723);
-    item.SetPressure(5);
-    pointerEvent->AddPointerItem(item);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent->SetSourceType(-1);
-    pointerEvent->SetPointerId(2);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -2090,7 +2065,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_005, TestSize.Level1)
 
 /**
  * @tc.name:TestGetKeystrokeAbility_001
- * @tc.desc:Verify GetKeystrokeAbility
+ * @tc.desc:Verify SupportKeys
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2098,7 +2073,7 @@ HWTEST_F(InputManagerTest, TestGetKeystrokeAbility_001, TestSize.Level1)
 {
     MMI_HILOGD("start TestGetKeystrokeAbility_001");
     std::vector<int32_t> keyCodes = {17, 22, 2055};
-    InputManager::GetInstance()->GetKeystrokeAbility(0, keyCodes, [](std::map<int32_t, bool> keystrokeAbility) {
+    InputManager::GetInstance()->SupportKeys(0, keyCodes, [](std::vector<bool> keystrokeAbility) {
         MMI_HILOGD("TestGetKeystrokeAbility_001 callback ok");
     });
     MMI_HILOGD("stop TestGetKeystrokeAbility_001");

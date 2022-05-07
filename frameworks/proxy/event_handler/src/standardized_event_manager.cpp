@@ -163,13 +163,24 @@ int32_t StandardizedEventManager::GetDevice(int32_t userData, int32_t deviceId)
     return SendMsg(pkt);
 }
 
-int32_t StandardizedEventManager::GetKeystrokeAbility(int32_t userData, int32_t deviceId, std::vector<int32_t> keyCodes)
+int32_t StandardizedEventManager::SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> keyCodes)
 {
     NetPacket pkt(MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY);
     size_t size = keyCodes.size();
     pkt << userData << deviceId << size;
     for (auto item : keyCodes) {
         pkt << item;
+    }
+    return SendMsg(pkt);
+}
+
+int32_t StandardizedEventManager::GetKeyboardType(int32_t userData, int32_t deviceId) const
+{
+    NetPacket pkt(MmiMessageId::INPUT_DEVICE_KEYBOARD_TYPE);
+    pkt << userData << deviceId;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write userData failed");
+        return PACKET_WRITE_FAIL;
     }
     return SendMsg(pkt);
 }

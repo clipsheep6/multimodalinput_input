@@ -471,7 +471,7 @@ void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
         MMI_HILOGE("Failed to inject move mouse offset event");
     }
 #else
-    MMI_HILOGI("Pointer drawing module dose not support, move mouse failed");
+    MMI_HILOGW("Pointer drawing module dose not support");
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
@@ -578,9 +578,9 @@ int32_t InputManagerImpl::SetPointerVisible(bool visible)
     }
     return ret;
 #else
-    MMI_HILOGD("disable pointer drawing");
-    return RET_ERR;
-#endif
+    MMI_HILOGW("Pointer drawing module dose not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
 void InputManagerImpl::OnConnected()
@@ -609,10 +609,10 @@ void InputManagerImpl::SendDisplayInfo()
     }
 }
 
-void InputManagerImpl::GetKeystrokeAbility(int32_t deviceId, std::vector<int32_t> &keyCodes,
-    std::function<void(std::map<int32_t, bool>)> callback)
+void InputManagerImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes,
+    std::function<void(std::vector<bool>&)> callback)
 {
-    InputDevImp.GetKeystrokeAbility(deviceId, keyCodes, callback);
+    InputDevImpl.SupportKeys(deviceId, keyCodes, callback);
 }
 } // namespace MMI
 } // namespace OHOS
