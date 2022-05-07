@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,27 +13,28 @@
  * limitations under the License.
  */
 
-#ifndef INPUT_DEVICE_MANAGER_H
-#define INPUT_DEVICE_MANAGER_H
+#ifndef I_INPUT_DEVICE_MANAGER_H
+#define I_INPUT_DEVICE_MANAGER_H
 
+#include <memory>
+#include <vector>
 #include <list>
-#include <string>
 
-#include "device_observer.h"
-#include "event_dispatch.h"
-#include "event_package.h"
-#include "input_device.h"
-#include "msg_handler.h"
+#include "libinput.h"
 #include "nocopyable.h"
 #include "singleton.h"
-#include "util.h"
+#include "device_observer.h"
+#include "input_device.h"
+#include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
-class InputDeviceManager : public DelayedSingleton<InputDeviceManager>, public IDeviceObject {
+class IInputDeviceManager : public DelayedSingleton<IInputDeviceManager>, public IDeviceObject {
 public:
-    InputDeviceManager() = default;
-    DISALLOW_COPY_AND_MOVE(InputDeviceManager);
+    IInputDeviceManager() = default;
+    DISALLOW_COPY_AND_MOVE(IInputDeviceManager);
+     ~IInputDeviceManager() = default;
+
     void OnInputDeviceAdded(struct libinput_device *inputDevice);
     void OnInputDeviceRemoved(struct libinput_device *inputDevice);
     std::vector<int32_t> GetInputDeviceIds() const;
@@ -45,19 +46,13 @@ public:
     void NotifyPointerDevice(bool hasPointerDevice);
     void AddDevMonitor(SessionPtr sess, std::function<void(std::string, int32_t)> callback);
     void RemoveDevMonitor(SessionPtr sess);
-
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool HasPointerDevice();
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 private:
-    bool IsPointerDevice(struct libinput_device* device);
-    void ScanPointerDevice();
-    std::map<int32_t, struct libinput_device *> inputDevice_;
-    int32_t nextId_ {0};
     std::list<std::shared_ptr<IDeviceObserver>> observers_;
-    std::map<SessionPtr, std::function<void(std::string, int32_t)>> devMonitor_;
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // INPUT_DEVICE_MANAGER_H
+#endif // I_INPUT_DEVICE_MANAGER_H
