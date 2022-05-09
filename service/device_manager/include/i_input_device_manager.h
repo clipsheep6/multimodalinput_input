@@ -33,7 +33,7 @@ class IInputDeviceManager : public DelayedSingleton<IInputDeviceManager>, public
 public:
     IInputDeviceManager() = default;
     DISALLOW_COPY_AND_MOVE(IInputDeviceManager);
-     ~IInputDeviceManager() = default;
+    ~IInputDeviceManager() = default;
 
     void OnInputDeviceAdded(struct libinput_device *inputDevice);
     void OnInputDeviceRemoved(struct libinput_device *inputDevice);

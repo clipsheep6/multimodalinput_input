@@ -45,6 +45,8 @@ JsEventTarget::JsEventTarget()
 #ifdef OHOS_BUILD_DEVICE_MANAGER_API
     auto ret = devMonitor_.insert({ CHANGED_TYPE, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>() });
     CK(ret.second, VAL_NOT_EXP);
+#else
+    MMI_HILOGW("device manager dose not support");
 #endif
 }
 
@@ -86,6 +88,8 @@ void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
         napi_value ret = nullptr;
         CHKRV(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret), CALL_FUNCTION);
     }
+#else
+    MMI_HILOGW("device manager dose not support");
 #endif
 }
 
@@ -125,6 +129,8 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
         napi_value ret = nullptr;
         CHKRV(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret), CALL_FUNCTION);
     }
+#else
+    MMI_HILOGW("device manager dose not support");
 #endif
 }
 
@@ -162,6 +168,8 @@ void JsEventTarget::TargetOn(std::string type, int32_t deviceId)
             return;
         }
     }
+#else
+    MMI_HILOGW("device manager dose not support");
 #endif
 }
 
@@ -189,6 +197,8 @@ void JsEventTarget::CallIdsAsyncWork(uv_work_t *work, int32_t status)
     CHKRV(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE);
     napi_value result = nullptr;
     CHKRV(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &arr, &result), CALL_FUNCTION);
+#else
+    MMI_HILOGW("device manager dose not support");
 #endif
 }
 
@@ -212,6 +222,8 @@ void JsEventTarget::CallIdsPromiseWork(uv_work_t *work, int32_t status)
         ++index;
     }
     CHKRV(cb->env, napi_resolve_deferred(cb->env, cb->deferred, arr), RESOLVE_DEFERRED);
+#else
+    MMI_HILOGW("device manager dose not support");
 #endif
 }
 
@@ -252,6 +264,8 @@ void JsEventTarget::EmitJsIds(int32_t userData, std::vector<int32_t> &ids)
         MMI_HILOGE("uv_queue_work failed");
         return;
     }
+#else
+    MMI_HILOGW("device manager dose not support");
 #endif
 }
 
@@ -271,6 +285,8 @@ void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
     CHKRV(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE);
     napi_value result = nullptr;
     CHKRV(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &object, &result), CALL_FUNCTION);
+#else
+    MMI_HILOGW("device manager dose not support");
 #endif
 }
 
@@ -287,6 +303,8 @@ void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
     napi_value object = JsUtil::GetDeviceInfo(cb);
     CHKPV(object);
     CHKRV(cb->env, napi_resolve_deferred(cb->env, cb->deferred, object), RESOLVE_DEFERRED);
+#else
+    MMI_HILOGW("device manager dose not support");
 #endif
 }
 
@@ -328,6 +346,8 @@ void JsEventTarget::EmitJsDev(int32_t userData, std::shared_ptr<InputDeviceImpl:
         MMI_HILOGE("uv_queue_work failed");
         return;
     }
+#else
+    MMI_HILOGW("device manager dose not support");
 #endif
 }
 
@@ -353,6 +373,8 @@ void JsEventTarget::CallKeystrokeAbilityPromise(uv_work_t *work, int32_t status)
             SET_ELEMENT);
     }
     CHKRV(cb->env, napi_resolve_deferred(cb->env, cb->deferred, keyAbility), RESOLVE_DEFERRED);
+#else
+    MMI_HILOGW("device manager dose not support");
 #endif
 }
 
@@ -384,6 +406,8 @@ void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
     napi_value result = nullptr;
     CHKRV(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &keyAbility, &result),
           CALL_FUNCTION);
+#else
+    MMI_HILOGW("device manager dose not support");
 #endif
 }
 
@@ -424,6 +448,8 @@ void JsEventTarget::EmitJsKeystrokeAbility(int32_t userData, std::vector<bool> &
         MMI_HILOGE("uv_queue_work failed");
         return;
     }
+#else
+    MMI_HILOGW("device manager dose not support");
 #endif
 }
 
@@ -465,6 +491,8 @@ void JsEventTarget::EmitJsKeyboardType(int32_t userData, int32_t keyboardType)
         MMI_HILOGE("uv_queue_work failed");
         return;
     }
+#else
+    MMI_HILOGW("device manager dose not support");
 #endif
 }
 
@@ -484,6 +512,8 @@ void JsEventTarget::CallKeyboardTypeAsync(uv_work_t *work, int32_t status)
     CHKRV(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE);
     napi_value result = nullptr;
     CHKRV(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &keyboardType, &result), CALL_FUNCTION);
+#else
+    MMI_HILOGW("device manager dose not support");
 #endif
 }
 
@@ -500,6 +530,8 @@ void JsEventTarget::CallKeyboardTypePromise(uv_work_t *work, int32_t status)
     napi_value keyboardType = nullptr;
     CHKRV(cb->env, napi_create_int32(cb->env, cb->data.keyboardType, &keyboardType), CREATE_INT32);
     CHKRV(cb->env, napi_resolve_deferred(cb->env, cb->deferred, keyboardType), RESOLVE_DEFERRED);
+#else
+    MMI_HILOGW("device manager dose not support");
 #endif
 }
 
@@ -532,6 +564,8 @@ void JsEventTarget::AddMonitor(napi_env env, std::string type, napi_value handle
         isMonitorProcess_ = true;
         InputDevImpl.RegisterInputDeviceMonitor(TargetOn);
     }
+#else
+    MMI_HILOGW("device manager dose not support");
 #endif
 }
 
@@ -562,6 +596,8 @@ monitorLabel:
         isMonitorProcess_ = false;
         InputDevImpl.UnRegisterInputDeviceMonitor();
     }
+#else
+    MMI_HILOGW("device manager dose not support");
 #endif
 }
 
@@ -582,10 +618,10 @@ napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, co
 
     CHKRP(env, napi_create_reference(env, handle, 1, &cb->ref), CREATE_REFERENCE);
     callback_.emplace(userData, std::move(cb));
-    return nullptr;
 #else
-    return nullptr;
+    MMI_HILOGW("device manager dose not support");
 #endif
+    return nullptr;
 }
 
 std::unique_ptr<JsUtil::CallbackInfo> JsEventTarget::GetCallbackInfo(uv_work_t *work)
@@ -607,6 +643,7 @@ std::unique_ptr<JsUtil::CallbackInfo> JsEventTarget::GetCallbackInfo(uv_work_t *
     callback_.erase(iter);
     return cb;
 #else
+    MMI_HILOGW("device manager dose not support");
     return nullptr;
 #endif
 }
@@ -619,6 +656,8 @@ void JsEventTarget::ResetEnv()
     callback_.clear();
     devMonitor_.clear();
     InputDevImpl.UnRegisterInputDeviceMonitor();
+#else
+    MMI_HILOGW("device manager dose not support");
 #endif
 }
 } // namespace MMI

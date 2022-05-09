@@ -54,7 +54,7 @@ std::vector<bool> IInputDeviceManager::SupportKeys(int32_t deviceId, std::vector
 int32_t IInputDeviceManager::FindInputDeviceId(struct libinput_device *inputDevice)
 {
     CALL_LOG_ENTER;
-    return ERROR_UNSUPPORT; 
+    return ERROR_UNSUPPORT;
 }
 
 void IInputDeviceManager::AddDevMonitor(SessionPtr sess, std::function<void(std::string, int32_t)> callback)

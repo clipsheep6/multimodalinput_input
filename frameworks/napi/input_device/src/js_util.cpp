@@ -79,6 +79,7 @@ bool JsUtil::IsSameHandle(napi_env env, napi_value handle, napi_ref ref)
     CHKRF(env, napi_strict_equals(env, handle, handlerTemp, &isEqual), STRICT_EQUALS);
     return isEqual;
 #else
+    MMI_HILOGW("device manager dose not support");
     return false;
 #endif
 }
@@ -129,6 +130,7 @@ napi_value JsUtil::GetDeviceInfo(const std::unique_ptr<CallbackInfo> &cb)
     }
     return object;
 #else
+    MMI_HILOGW("device manager dose not support");
     return nullptr;
 #endif
 }
@@ -184,6 +186,7 @@ bool JsUtil::GetDeviceAxisInfo(const std::unique_ptr<CallbackInfo> &cb, napi_val
     CHKRF(cb->env, napi_set_named_property(cb->env, object, "axisRanges", axisRanges), SET_NAMED_PROPERTY);
     return true;
 #else
+    MMI_HILOGW("device manager dose not support");
     return false;
 #endif
 }
@@ -212,6 +215,7 @@ bool JsUtil::GetDeviceSourceType(const std::unique_ptr<CallbackInfo> &cb, napi_v
     CHKRF(cb->env, napi_set_named_property(cb->env, object, "sources", devSources), SET_NAMED_PROPERTY);
     return true;
 #else
+    MMI_HILOGW("device manager dose not support");
     return false;
 #endif
 }
@@ -227,6 +231,7 @@ bool JsUtil::TypeOf(napi_env env, napi_value value, napi_valuetype type)
     }
     return true;
 #else
+    MMI_HILOGW("device manager dose not support");
     return false;
 #endif
 }
@@ -241,6 +246,8 @@ JsUtil::CallbackInfo::~CallbackInfo()
         CHKRV(env, napi_delete_reference(env, ref), DELETE_REFERENCE);
         env = nullptr;
     }
+#else
+    MMI_HILOGW("device manager dose not support");
 #endif
 }
 
@@ -255,6 +262,8 @@ AsyncContext::~AsyncContext()
         CHKRV(env, napi_delete_reference(env, callback), DELETE_REFERENCE);
         env = nullptr;
     }
+#else
+    MMI_HILOGW("device manager dose not support");
 #endif
 }
 } // namespace MMI

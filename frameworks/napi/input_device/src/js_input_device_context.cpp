@@ -47,6 +47,8 @@ JsInputDeviceContext::JsInputDeviceContext()
 #ifdef OHOS_BUILD_DEVICE_MANAGER_API
     mgr_ = std::make_shared<JsInputDeviceManager>();
     CHKPL(mgr_);
+#else
+    MMI_HILOGW("device manager dose not support");
 #endif
 }
 
@@ -59,6 +61,8 @@ JsInputDeviceContext::~JsInputDeviceContext()
     if (jsInputDeviceMgr) {
         jsInputDeviceMgr->ResetEnv();
     }
+#else
+    MMI_HILOGW("device manager dose not support");
 #endif
 }
 
@@ -92,6 +96,7 @@ napi_value JsInputDeviceContext::CreateInstance(napi_env env)
     CHKRP(env, napi_reference_ref(env, jsContext->contextRef_, &refCount), REFERENCE_REF);
     return jsInstance;
 #else
+    MMI_HILOGW("device manager dose not support");
     return nullptr;
 #endif
 }
@@ -114,6 +119,7 @@ napi_value JsInputDeviceContext::JsConstructor(napi_env env, napi_callback_info 
     CHKRP(env, status, WRAP);
     return thisVar;
 #else
+    MMI_HILOGW("device manager dose not support");
     return nullptr;
 #endif
 }
@@ -147,6 +153,7 @@ JsInputDeviceContext* JsInputDeviceContext::GetInstance(napi_env env)
     }
     return instance;
 #else
+    MMI_HILOGW("device manager dose not support");
     return nullptr;
 #endif
 }
@@ -188,10 +195,10 @@ napi_value JsInputDeviceContext::On(napi_env env, napi_callback_info info)
     JsInputDeviceContext *jsIds = JsInputDeviceContext::GetInstance(env);
     auto jsInputDeviceMgr = jsIds->GetJsInputDeviceMgr();
     jsInputDeviceMgr->RegisterInputDeviceMonitor(env, type, argv[1]);
-    return nullptr;
 #else
-    return nullptr;
+    MMI_HILOGW("device manager dose not support");
 #endif
+    return nullptr;
 }
 
 napi_value JsInputDeviceContext::Off(napi_env env, napi_callback_info info)
@@ -230,10 +237,10 @@ napi_value JsInputDeviceContext::Off(napi_env env, napi_callback_info info)
         return nullptr;
     }
     jsInputDeviceMgr->UnRegisterInputDeviceMonitor(env, type, argv[1]);
-    return nullptr;
 #else
-    return nullptr;
+    MMI_HILOGW("device manager dose not support");
 #endif
+    return nullptr;
 }
 
 napi_value JsInputDeviceContext::GetDeviceIds(napi_env env, napi_callback_info info)
@@ -259,6 +266,7 @@ napi_value JsInputDeviceContext::GetDeviceIds(napi_env env, napi_callback_info i
     }
     return jsInputDeviceMgr->GetDeviceIds(env, argv[0]);
 #else
+    MMI_HILOGW("device manager dose not support");
     return nullptr;
 #endif
 }
@@ -292,6 +300,7 @@ napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info
     }
     return jsInputDeviceMgr->GetDevice(env, id, argv[1]);
 #else
+    MMI_HILOGW("device manager dose not support");
     return nullptr;
 #endif
 }
@@ -325,6 +334,7 @@ napi_value JsInputDeviceContext::SetPointerVisible(napi_env env, napi_callback_i
     }
     return jsInputDeviceMgr->SetPointerVisible(env, visible, argv[1]);
 #else
+    MMI_HILOGW("device manager dose not support");
     return nullptr;
 #endif
 }
@@ -382,6 +392,7 @@ napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info in
     }
     return jsInputDeviceMgr->SupportKeys(env, deviceId, keyCode, argv[2]);
 #else
+    MMI_HILOGW("device manager dose not support");
     return nullptr;
 #endif
 }
@@ -416,6 +427,7 @@ napi_value JsInputDeviceContext::GetKeyboardType(napi_env env, napi_callback_inf
     }
     return jsInputDeviceMgr->GetKeyboardType(env, id, argv[1]);
 #else
+    MMI_HILOGW("device manager dose not support");
     return nullptr;
 #endif
 }
@@ -441,6 +453,7 @@ napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
     CHKRP(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     return exports;
 #else
+    MMI_HILOGW("device manager dose not support");
     return nullptr;
 #endif
 }

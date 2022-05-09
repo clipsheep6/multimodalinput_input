@@ -34,6 +34,8 @@ void JsInputDeviceManager::RegisterInputDeviceMonitor(napi_env env, std::string 
     CALL_LOG_ENTER;
 #ifdef OHOS_BUILD_DEVICE_MANAGER_API
     AddMonitor(env, type, handle);
+#else
+    MMI_HILOGW("device manager dose not support");
 #endif
 }
 
@@ -42,6 +44,8 @@ void JsInputDeviceManager::UnRegisterInputDeviceMonitor(napi_env env, std::strin
     CALL_LOG_ENTER;
 #ifdef OHOS_BUILD_DEVICE_MANAGER_API
     RemoveMonitor(env, type, handle);
+#else
+    MMI_HILOGW("device manager dose not support");
 #endif
 }
 
@@ -55,6 +59,7 @@ napi_value JsInputDeviceManager::GetDeviceIds(napi_env env, napi_value handle)
     InputDevImpl.GetInputDeviceIdsAsync(EmitJsIds);
     return ret;
 #else
+    MMI_HILOGW("device manager dose not support");
     return nullptr;
 #endif
 }
@@ -69,6 +74,7 @@ napi_value JsInputDeviceManager::GetDevice(napi_env env, int32_t id, napi_value 
     InputDevImpl.GetInputDeviceAsync(id, EmitJsDev);
     return ret;
 #else
+    MMI_HILOGW("device manager dose not support");
     return nullptr;
 #endif
 }
@@ -120,6 +126,8 @@ void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
         MMI_HILOGE("create async work fail");
         asyncContext->DecStrongRef(nullptr);
     }
+#else
+    MMI_HILOGW("device manager dose not support");
 #endif
 }
 
@@ -144,6 +152,7 @@ napi_value JsInputDeviceManager::SetPointerVisible(napi_env env, bool visible, n
     AsyncCallbackWork(asyncContext);
     return promise;
 #else
+    MMI_HILOGW("device manager dose not support");
     return nullptr;
 #endif
 }
@@ -160,6 +169,7 @@ napi_value JsInputDeviceManager::SupportKeys(napi_env env, int32_t id, std::vect
     InputManager::GetInstance()->SupportKeys(id, keyCodes, callback);
     return ret;
 #else
+    MMI_HILOGW("device manager dose not support");
     return nullptr;
 #endif
 }
@@ -173,6 +183,7 @@ napi_value JsInputDeviceManager::GetKeyboardType(napi_env env, int32_t id, napi_
     InputDevImpl.GetKeyboardTypeAsync(id, EmitJsKeyboardType);
     return ret;
 #else
+    MMI_HILOGW("device manager dose not support");
     return nullptr;
 #endif
 }
@@ -182,6 +193,8 @@ void JsInputDeviceManager::ResetEnv()
     CALL_LOG_ENTER;
 #ifdef OHOS_BUILD_DEVICE_MANAGER_API
     JsEventTarget::ResetEnv();
+#else
+    MMI_HILOGW("device manager dose not support");
 #endif
 }
 } // namespace MMI
