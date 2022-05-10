@@ -112,11 +112,9 @@ void InputWindowsManager::UpdateDisplayInfo(const std::vector<PhysicalDisplayInf
             if (!iter.second) {
                 MMI_HILOGE("Insert value failed, Window:%{public}d", window.id);
             }
-            MMI_HILOGE("into UpdateDisplayInfo 114");
             for (const auto &hotAres : window.hotArea) {
                 hotArea_.push_back(hotAres);
             }
-            MMI_HILOGE("into UpdateDisplayInfo 119");
         }
     }
     if (!logicalDisplays.empty()) {
