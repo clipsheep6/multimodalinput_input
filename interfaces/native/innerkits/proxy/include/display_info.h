@@ -35,6 +35,22 @@ enum Direction {
     Direction270
 };
 
+
+struct HotArea {
+    // Logical width of the hot zone window
+    int32_t hotZoneWidth;
+
+    // Logical height of the hot zone window
+    int32_t hotZoneHeight;
+
+    // The x coordinate of the upper left corner of the hot zone window in the logical display
+    int32_t hotZoneTopLeftX;
+
+    // The y coordinate of the upper left corner of the hot zone window in the logical display
+    int32_t hotZoneTopLeftY;
+    
+};
+
 struct WindowInfo {
     // The Bit0 of the flags field represents Touchable or not state
     static constexpr uint32_t FLAG_BIT_UNTOUCHABLE = 1;
@@ -74,6 +90,9 @@ struct WindowInfo {
 
     // The current state of the window
     uint32_t flags;
+
+    // List of hotArea
+    std::vector<HotArea> hotArea;
 };
 
 struct PhysicalDisplayInfo {

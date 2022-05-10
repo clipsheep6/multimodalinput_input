@@ -364,9 +364,52 @@ int32_t InputManagerImpl::PackLogicalDisplay(NetPacket &pkt)
             return RET_ERR;
         }
         for (int32_t j = 0; j < numWindow; j++) {
-            if (!pkt.Write(logicalDisplays_[i].windowsInfo[j])) {
-                MMI_HILOGE("Packet write logical windowsInfo failed");
+            if (!pkt.Write(logicalDisplays_[i].windowsInfo[j].id)) {
+                MMI_HILOGE("Packet write windowsinfo id failed");
+            }
+            if (!pkt.Write(logicalDisplays_[i].windowsInfo[j].pid)) {
+                MMI_HILOGE("Packet write windowsinfo pid failed");
+            }
+            if (!pkt.Write(logicalDisplays_[i].windowsInfo[j].uid)) {
+                MMI_HILOGE("Packet write windowsinfo uid failed");
+            }
+            if (!pkt.Write(logicalDisplays_[i].windowsInfo[j].hotZoneTopLeftX)) {
+                MMI_HILOGE("Packet write windowsinfo hotZoneTopLeftX failed");
+            }
+            if (!pkt.Write(logicalDisplays_[i].windowsInfo[j].hotZoneTopLeftY)) {
+                MMI_HILOGE("Packet write windowsinfo hotZoneTopLeftY failed");
+            }
+            if (!pkt.Write(logicalDisplays_[i].windowsInfo[j].hotZoneWidth)) {
+                MMI_HILOGE("Packet write windowsinfo hotZoneWidth failed");
+            }
+            if (!pkt.Write(logicalDisplays_[i].windowsInfo[j].hotZoneHeight)) {
+                MMI_HILOGE("Packet write windowsinfo hotZoneHeight failed");
+            }
+            if (!pkt.Write(logicalDisplays_[i].windowsInfo[j].displayId)) {
+                MMI_HILOGE("Packet write windowsinfo displayId failed");
+            }
+            if (!pkt.Write(logicalDisplays_[i].windowsInfo[j].agentWindowId)) {
+                MMI_HILOGE("Packet write windowsinfo agentWindowId failed");
+            }
+            if (!pkt.Write(logicalDisplays_[i].windowsInfo[j].winTopLeftX)) {
+                MMI_HILOGE("Packet write windowsinfo agentWindowId failed");
+            }
+            if (!pkt.Write(logicalDisplays_[i].windowsInfo[j].winTopLeftY)) {
+                MMI_HILOGE("Packet write windowsinfo agentWindowId failed");
+            }
+            if (!pkt.Write(logicalDisplays_[i].windowsInfo[j].flags)) {
+                MMI_HILOGE("Packet write windowsinfo agentWindowId failed");
+            }
+            int32_t numhotArea = static_cast<int32_t>(logicalDisplays_[i].windowsInfo[j].hotArea.size());
+            if (!pkt.Write(numhotArea)) {
+                MMI_HILOGE("Packet write numhotArea failed");
                 return RET_ERR;
+            }
+            for (int32_t k = 0; k < numhotArea; k++) {
+                if (!pkt.Write(logicalDisplays_[i].windowsInfo[j].hotArea[k])) {
+                    MMI_HILOGE("Packet write hotAreaInfo failed");
+                    return RET_ERR;
+                }
             }
         }
     }
@@ -407,6 +450,12 @@ void InputManagerImpl::PrintDisplayInfo()
                 win.hotZoneHeight, win.displayId,
                 win.agentWindowId,
                 win.winTopLeftX, win.winTopLeftY, win.flags);
+            for(const auto &hotarea : win.hotArea) {
+                MMI_HILOGD("hotZoneWidth1:%{public}d,hotZoneHeight1:%{public}d,hotZoneTopLeftX1:%{public}d,"
+                    "hotZoneTopLeftY1:%{public}d",
+                    hotarea.hotZoneWidth, hotarea.hotZoneHeight,
+                    hotarea.hotZoneTopLeftX, hotarea.hotZoneTopLeftY);
+            }
         }
     }
 }
@@ -616,6 +665,17 @@ void InputManagerImpl::SendDisplayInfo()
 {
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
+
+    for (const auto &item : logicalDisplays_) {
+        for (const auto &win : item.windowsInfo) {
+            if (win.hotArea.size() >= 10) {
+                MMI_HILOGE("There are too many hot zones:%{public}zu", win.hotArea.size());
+                return;
+            }
+        }
+    }
+
+    MMI_HILOGE("into SendDisplayInfo 546");
     NetPacket pkt(MmiMessageId::DISPLAY_INFO);
     if (PackDisplayData(pkt) == RET_ERR) {
         MMI_HILOGE("pack display info failed");

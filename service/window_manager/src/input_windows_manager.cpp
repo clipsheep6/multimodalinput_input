@@ -105,12 +105,18 @@ void InputWindowsManager::UpdateDisplayInfo(const std::vector<PhysicalDisplayInf
     physicalDisplays_ = physicalDisplays;
     logicalDisplays_ = logicalDisplays;
     windowInfos_.clear();
+    hotArea_.clear();
     for (const auto &item : logicalDisplays) {
         for (const auto &window : item.windowsInfo) {
             auto iter = windowInfos_.insert(std::pair<int32_t, WindowInfo>(window.id, window));
             if (!iter.second) {
                 MMI_HILOGE("Insert value failed, Window:%{public}d", window.id);
             }
+            MMI_HILOGE("into UpdateDisplayInfo 114");
+            for (const auto &hotAres : window.hotArea) {
+                hotArea_.push_back(hotAres);
+            }
+            MMI_HILOGE("into UpdateDisplayInfo 119");
         }
     }
     if (!logicalDisplays.empty()) {
@@ -155,6 +161,13 @@ void InputWindowsManager::PrintDisplayInfo()
             item.second.displayId, item.second.agentWindowId, item.second.winTopLeftX, item.second.winTopLeftY,
             item.second.flags);
     }
+       
+    MMI_HILOGD("hotArea info,num:%{public}zu", hotArea_.size());
+    for (const auto &item : hotArea_) {
+        MMI_HILOGD("hotArea, hotZoneWidth1:%{public}d,hotZoneHeight1:%{public}d,hotZoneTopLeftX1:%{public}d,hotZoneTopLeftY1:%{public}d",
+        item.hotZoneWidth, item.hotZoneHeight, item.hotZoneTopLeftX, item.hotZoneTopLeftY);
+    }
+    MMI_HILOGD("hotArea info print end");
 }
 
 const PhysicalDisplayInfo* InputWindowsManager::GetPhysicalDisplay(int32_t id) const
