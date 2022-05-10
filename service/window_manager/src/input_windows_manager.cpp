@@ -165,7 +165,6 @@ void InputWindowsManager::PrintDisplayInfo()
         MMI_HILOGD("hotArea, hotZoneWidth1:%{public}d,hotZoneHeight1:%{public}d,hotZoneTopLeftX1:%{public}d,hotZoneTopLeftY1:%{public}d",
         item.hotZoneWidth, item.hotZoneHeight, item.hotZoneTopLeftX, item.hotZoneTopLeftY);
     }
-    MMI_HILOGD("hotArea info print end");
 }
 
 const PhysicalDisplayInfo* InputWindowsManager::GetPhysicalDisplay(int32_t id) const

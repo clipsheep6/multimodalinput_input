@@ -675,7 +675,6 @@ void InputManagerImpl::SendDisplayInfo()
         }
     }
 
-    MMI_HILOGE("into SendDisplayInfo 546");
     NetPacket pkt(MmiMessageId::DISPLAY_INFO);
     if (PackDisplayData(pkt) == RET_ERR) {
         MMI_HILOGE("pack display info failed");
