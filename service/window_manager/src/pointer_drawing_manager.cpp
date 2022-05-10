@@ -326,5 +326,12 @@ void PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
     UpdataPidInfo(pid, visible);
     UpdataPointerVisible();
 }
+
+void PointerDrawingManager::SetPointerSpeed(int32_t pointerSpeed)
+{
+    CALL_LOG_ENTER;
+    pSpeed_ = pointerSpeed;
+    MMI_HILOGD("pSpeed: %{public}d", pSpeed_);
+}
 } // namespace MMI
 } // namespace OHOS

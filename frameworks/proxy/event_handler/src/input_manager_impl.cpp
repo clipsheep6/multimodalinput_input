@@ -584,6 +584,13 @@ int32_t InputManagerImpl::SetPointerVisible(bool visible)
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
+void InputManagerImpl::SetPointerSpeed(int32_t pointerSpeed)
+{
+    if (MMIEventHdl.SetPointerSpeed(pointerSpeed)) {
+        MMI_HILOGE("Failed to set pointer speed");
+    }
+}
+
 bool InputManagerImpl::IsPointerVisible()
 {
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING

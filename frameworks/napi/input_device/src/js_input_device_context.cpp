@@ -397,6 +397,31 @@ napi_value JsInputDeviceContext::GetKeyboardType(napi_env env, napi_callback_inf
     return jsInputDeviceMgr->GetKeyboardType(env, id, argv[1]);
 }
 
+napi_value JsInputDeviceContext::SetPointerSpeed(napi_env env, napi_callback_info info)
+{
+    CALL_LOG_ENTER;
+    size_t argc = 1;
+    napi_value argv[1];
+    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc != 1) {
+        THROWERR(env, "the number of parameter is not as expected");
+        return nullptr;
+    }
+
+    if (!JsUtil::TypeOf(env, argv[0], napi_number)) {
+        THROWERR(env, "The first parameter type is wrong");
+        return nullptr;
+    }
+    int32_t speed = 1;
+    CHKRP(env, napi_get_value_int32(env, argv[0], &speed), GET_INT32);
+    JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
+    CHKPP(jsDev);
+    auto jsInputDeviceMgr = jsDev->GetJsInputDeviceMgr();
+    CHKPP(jsInputDeviceMgr);
+    jsInputDeviceMgr->SetPointerSpeed(speed);
+    return nullptr;
+}
+
 napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
 {
     CALL_LOG_ENTER;
@@ -414,6 +439,7 @@ napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("isPointerVisible", IsPointerVisible),
         DECLARE_NAPI_STATIC_FUNCTION("supportKeys", SupportKeys),
         DECLARE_NAPI_STATIC_FUNCTION("getKeyboardType", GetKeyboardType),
+        DECLARE_NAPI_STATIC_FUNCTION("setPointerSpeed", SetPointerSpeed),
     };
     CHKRP(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     return exports;

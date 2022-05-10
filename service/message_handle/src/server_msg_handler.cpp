@@ -30,6 +30,7 @@
 #include "key_event_subscriber.h"
 #include "mmi_func_callback.h"
 #include "time_cost_chk.h"
+#include "i_pointer_drawing_manager.h"
 #include "mouse_event_handler.h"
 #ifdef OHOS_BUILD_HDF
 #include "hdi_inject.h"
@@ -64,6 +65,7 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
         {MmiMessageId::INJECT_POINTER_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnInjectPointerEvent, this) },
         {MmiMessageId::INPUT_DEVICE, MsgCallbackBind2(&ServerMsgHandler::OnInputDevice, this)},
         {MmiMessageId::INPUT_DEVICE_IDS, MsgCallbackBind2(&ServerMsgHandler::OnInputDeviceIds, this)},
+        {MmiMessageId::INPUT_POINTER_SPEED, MsgCallbackBind2(&ServerMsgHandler::OnInputPointerSpeed, this)},
         {MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY, MsgCallbackBind2(&ServerMsgHandler::OnSupportKeys, this)},
         {MmiMessageId::ADD_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnAddInputDeviceMontior, this)},
         {MmiMessageId::REMOVE_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputDeviceMontior, this)},
@@ -441,6 +443,20 @@ int32_t ServerMsgHandler::OnInputDeviceIds(SessionPtr sess, NetPacket& pkt)
         MMI_HILOGE("Sending failed");
         return MSG_SEND_FAIL;
     }
+    return RET_OK;
+}
+
+int32_t ServerMsgHandler::OnInputPointerSpeed(SessionPtr sess, NetPacket& pkt)
+{
+    CALL_LOG_ENTER;
+    CHKPR(sess, ERROR_NULL_POINTER);
+    int32_t pointerSpeed = 0;
+    if (!pkt.Read(pointerSpeed)) {
+        MMI_HILOGE("Failed to read the pointer speed");
+        return RET_ERR;
+    }
+    IPointerDrawingManager::GetInstance()->SetPointerSpeed(pointerSpeed);
+    MMI_HILOGD("Set pointer speed success, pointerSpeed:%{public}d", pointerSpeed);
     return RET_OK;
 }
 

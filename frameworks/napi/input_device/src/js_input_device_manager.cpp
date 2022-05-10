@@ -14,6 +14,7 @@
  */
 
 #include "js_input_device_manager.h"
+#include "input_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -152,6 +153,13 @@ napi_value JsInputDeviceManager::SetPointerVisible(napi_env env, bool visible, n
     }
     AsyncCallbackWork(asyncContext);
     return promise;
+}
+
+napi_value JsInputDeviceManager::SetPointerSpeed(int32_t pointerSpeed)
+{
+    CALL_LOG_ENTER;
+    InputManager::GetInstance()->SetPointerSpeed(pointerSpeed);
+    return nullptr;
 }
 
 napi_value JsInputDeviceManager::IsPointerVisible(napi_env env, napi_value handle)

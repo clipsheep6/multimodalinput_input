@@ -45,6 +45,7 @@ public:
     bool Init();
     void DeletePointerVisible(int32_t pid);
     void SetPointerVisible(int32_t pid, bool visible);
+    void SetPointerSpeed(int32_t pointerSpeed);
     bool IsPointerVisible();
 
 public:
@@ -73,6 +74,7 @@ private:
     bool hasPointerDevice_ = false;
     int32_t lastGlobalX_ = -1;
     int32_t lastGlobalY_ = -1;
+    int32_t pSpeed_ = 1;
 
     std::mutex mutex_;
     struct PidInfo {

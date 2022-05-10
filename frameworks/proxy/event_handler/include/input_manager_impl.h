@@ -77,6 +77,7 @@ public:
 
     int32_t SetPointerVisible(bool visible);
     bool IsPointerVisible();
+    void SetPointerSpeed(int32_t pointerSpeed);
 
 private:
     int32_t PackPhysicalDisplay(NetPacket &pkt);
