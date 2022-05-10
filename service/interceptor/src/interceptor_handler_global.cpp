@@ -56,7 +56,7 @@ int32_t InterceptorHandlerGlobal::HandleTouchEvent(std::shared_ptr<PointerEvent>
         return RET_OK;
     }
     CHKPR(nextHandler_, ERROR_NULL_POINTER);
-    return nextHandler_->HandlePointerEvent(pointerEvent);
+    return nextHandler_->HandleTouchEvent(pointerEvent);
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
