@@ -34,7 +34,9 @@ int32_t KeyEventHandler::HandleEvent(libinput_event* event)
 {
     CALL_LOG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
-    auto keyEvent = InputHandler->GetKeyEvent();
+    auto udsServer = IUdsServer::GetUdsServer();
+    CHKPV(udsServer);
+    auto keyEvent = udsServer->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     auto packageResult = eventPackage_.PackageKeyEvent(event, keyEvent);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
@@ -105,7 +107,9 @@ void KeyEventHandler::AddHandleTimer(int32_t timeout)
 {
     timerId_ = TimerMgr->AddTimer(timeout, 1, [this]() {
         MMI_HILOGD("enter");
-        auto keyEvent = InputHandler->GetKeyEvent();
+        auto udsServer = IUdsServer::GetUdsServer();
+        CHKPV(udsServer);
+        auto keyEvent = udsServer->GetKeyEvent();
         CHKPV(keyEvent);
         if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
             MMI_HILOGD("key up");

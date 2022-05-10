@@ -28,17 +28,59 @@ namespace OHOS {
 namespace MMI {
 class IInputEventHandler {
 public:
-    IInputEventHandler() = default;
+    enum class CreateMethod {
+        CONTRUCTOR,
+        CREATE_INSTANCE,
+    };
+    enum class HandlerType {
+        NORMAL,
+        INTERCEPTOR,
+        SUBSCRIBER,
+        MONITOR,
+        FILTER
+    };
+public:
+    IInputEventHandler(int32_t priority = 0);
     DISALLOW_COPY_AND_MOVE(IInputEventHandler);
     virtual ~IInputEventHandler() = default;
+    virtual HandlerType GetHandlerType() const { return HandlerType::NORMAL; }
     virtual int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
     virtual int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
     virtual int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent);
-    virtual void SetNext(std::shared_ptr<IInputEventHandler> nextHandler);
 
+    int32_t GetPriority() const;
+    int32_t AddMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
+    int32_t AddInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;    
+    int32_t AddSubscriber(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
+    int32_t RemoveMonitor(int32_t handlerId) = 0;
+    int32_t RemoveInterceptor(int32_t handlerId) = 0;    
+    int32_t RemoveSubscriber(int32_t handlerId) = 0;
+
+    template<class T, CreateMethod method = CreateMethod::CONTRUCTOR>
+    uint32_t AddHandler(int32_t priority = 0);
+protected:
+    void SetNext(std::shared_ptr<IInputEventHandler> nextHandler);
 protected:
     std::shared_ptr<IInputEventHandler> nextHandler_ = nullptr;
+private:
+    int32_t priority_;
 };
+
+template<class T, CreateMethod method>
+uint32_t IInputEventHandler::AddHandler(int32_t priority = 0)
+{
+    std::shared_ptr<PointerEvent> handler = nullptr;
+    if (method == CreateMethod::CONTRUCTOR) {
+        handler = std::make_shared<T>(priority);
+    } else {
+        handler = T::CreateInstance(priority);
+    }
+
+    if (handler == nullptr) {
+        return RET_ERR;
+    }
+    return SetNext(handler);
+}
 } // namespace MMI
 } // namespace OHOS
 #endif // I_INPUT_EVENT_HANDLER_H

@@ -149,7 +149,7 @@ void InputHandlerManagerGlobal::InitSessionLostCallback()
     if (sessionLostCallbackInitialized_)  {
         return;
     }
-    auto udsServerPtr = InputHandler->GetUDSServer();
+    auto udsServerPtr = IUDSServer::GetInstance();
     CHKPV(udsServerPtr);
     udsServerPtr->AddSessionDeletedCallback(std::bind(
         &InputHandlerManagerGlobal::OnSessionLost, this, std::placeholders::_1));
@@ -248,14 +248,10 @@ void InputHandlerManagerGlobal::MonitorCollection::MarkConsumed(int32_t monitorI
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
     pointerEvent->SetActionTime(GetSysClockTime());
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT | InputEvent::EVENT_FLAG_NO_MONITOR);
+    auto udsServer = IUdsServer::GetUdsServer();
+    CHKPV(udsServer);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    auto iTouchEventHandler = InputHandler->GetTouchEventHandler();
-    CHKPV(iTouchEventHandler);
-    iTouchEventHandler->HandleTouchEvent(pointerEvent);
-#else
-    auto inputHandler = InputHandler->GetInputEventHandler();
-    CHKPV(inputHandler);
-    inputHandler->HandleTouchEvent(nullptr);
+    udsServer->HandleNonConsumedTouchEvent(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 }
 

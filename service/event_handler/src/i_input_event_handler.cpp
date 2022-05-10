@@ -23,22 +23,94 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IInpu
 }
 int32_t IInputEventHandler::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-    MMI_HILOGW("Keyboard device dose not support");
-    return RET_OK;
+    if (nextHandler_ == nullptr) {
+        MMI_HILOGW("Keyboard device dose not support");
+        return RET_OK;
+    }
+    return nextHandler_->HandleTouchEvent(pointerEvent);
 }
 int32_t IInputEventHandler::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_HILOGW("Pointer device dose not support");
-    return RET_OK;
+    if (nextHandler_ == nullptr) {
+        MMI_HILOGW("Pointer device dose not support");
+        return RET_OK;
+    }
+    return nextHandler_->HandleTouchEvent(pointerEvent);
 }
 int32_t IInputEventHandler::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_HILOGW("Tp device dose not support");
+    if (nextHandler_ == nullptr) {
+        MMI_HILOGW("touch device dose not support");
+        return RET_OK;
+    }
+    return nextHandler_->HandleTouchEvent(pointerEvent);
+}
+
+int32_t IInputEventHandler::AddMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session)
+{
+    std::shared_ptr<IInputEventHandler> cur = this;
+    bool 
+    while (cur != nullptr) {
+        if (cur->GetHandlerType() == HandlerType::MONITOR) {
+            cur->AddMonitor(handlerId, handlerType, session);
+            return;
+        }
+        cur = cur->nextHandler_;
+    }
+}
+
+int32_t IInputEventHandler::AddMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session)
+{
+    std::shared_ptr<IInputEventHandler> cur = this;
+    bool 
+    while (cur != nullptr) {
+        if (cur->GetHandlerType() == HandlerType::MONITOR) {
+            cur->AddMonitor(handlerId, handlerType, session);
+            return;
+        }
+        cur = cur->nextHandler_;
+    }
+}
+
+int32_t IInputEventHandler::AddSubscriber(int32_t handlerId, InputHandlerType handlerType, SessionPtr session)
+{
+    std::shared_ptr<IInputEventHandler> cur = this;
+    bool 
+    while (cur != nullptr) {
+        if (cur->GetHandlerType() == HandlerType::SUBSCRIBER) {
+            auto subscriber = static_cast<ISubscriberEventHandler>(cur);
+            return subscriber->SubscribeKeyEvent(handlerId, handlerType, session);
+        }
+        cur = cur->nextHandler_;
+    }
     return RET_OK;
 }
+
 void IInputEventHandler::SetNext(std::shared_ptr<IInputEventHandler> nextHandler)
 {
-    nextHandler_ = nextHandler;
+    std::shared_ptr<IInputEventHandler> cur = this;
+    std::shared_ptr<IInputEventHandler> next = cur->nextHandler_;
+
+    if (next == nullptr) {
+        cur->nextHandler_ = nextHandler;
+        return;
+    }
+
+    auto tmpPrioty = nextHandler->GetPriority();
+    while (next != nullptr) {
+        if (tmpPrioty < next->GetPriority()) {
+            next->nextHandler_ = nextHandler;
+            break;
+        }
+
+        cur = next;
+        next = next->nextHandler_;
+
+        if (next == nullptr) {
+            cur->nextHandler_ = nextHandler;
+            break;
+        }        
+    }
 }
 } // namespace MMI
 } // namespace OHOS

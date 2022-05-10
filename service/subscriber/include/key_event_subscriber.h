@@ -33,15 +33,15 @@
 
 namespace OHOS {
 namespace MMI {
-class KeyEventSubscriber : public IInputEventHandler {
+class KeyEventSubscriber : public IInputEventHandler, public ISubscriberEventHandler {
 public:
     KeyEventSubscriber() = default;
     ~KeyEventSubscriber() = default;
     DISALLOW_COPY_AND_MOVE(KeyEventSubscriber);
     int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
     int32_t SubscribeKeyEvent(SessionPtr sess, int32_t subscribeId,
-            const std::shared_ptr<KeyOption> keyOption);
-    int32_t UnSubscribeKeyEvent(SessionPtr sess, int32_t subscribeId);
+            const std::shared_ptr<KeyOption> keyOption) override;
+    int32_t UnSubscribeKeyEvent(SessionPtr sess, int32_t subscribeId) override;
     bool SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
 
 private:

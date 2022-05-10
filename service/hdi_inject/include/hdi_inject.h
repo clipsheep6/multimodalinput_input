@@ -65,7 +65,7 @@ class HdiInject {
         char chipName[32];
     };
 public:
-    bool Init(UDSServer &sess);
+    bool Init();
     void StartHdiserver();
     void ShowAllDeviceInfo();
     void InitDeviceInfo();
@@ -87,7 +87,6 @@ public:
 private:
     bool initStatus_ = false;
     HotPlugEvent** event_ = nullptr;
-    MMI::UDSServer* udsServerPtr_ = nullptr;
     std::vector<DeviceInformation> deviceArray_ = {};
 };
 

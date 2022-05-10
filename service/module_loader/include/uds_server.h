@@ -45,17 +45,17 @@ public:
     DISALLOW_COPY_AND_MOVE(UDSServer);
     virtual ~UDSServer();
     void UdsStop();
-    bool SendMsg(int32_t fd, NetPacket& pkt);
+    bool SendMsg(int32_t fd, NetPacket& pkt) override;
     void Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt);
-    void Dump(int32_t fd);
-    int32_t GetClientFd(int32_t pid);
+    void Dump(int32_t fd) override;
+    int32_t GetClientFd(int32_t pid) override;
     int32_t GetClientPid(int32_t fd);
-    void AddSessionDeletedCallback(std::function<void(SessionPtr)> callback);
+    void AddSessionDeletedCallback(std::function<void(SessionPtr)> callback) override;
 
 public:
     virtual int32_t AddSocketPairInfo(const std::string& programName, const int32_t moduleType, const int32_t uid,
                                       const int32_t pid, int32_t& serverFd, int32_t& toReturnClientFd);
-    SessionPtr GetSession(int32_t fd) const;
+    SessionPtr GetSession(int32_t fd) const override;
 
 protected:
     virtual void OnConnected(SessionPtr s);

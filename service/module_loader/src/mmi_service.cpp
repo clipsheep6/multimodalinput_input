@@ -98,6 +98,40 @@ static void CheckDefine()
 #endif
 }
 
+IUdsServer *IUdsServer::GetInstance()
+{
+    // auto sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    // if (sm == nullptr) {
+    //     MMI_HILOGE("get system ability manager fail");
+    //     return false;
+    // }
+    // auto sa = sm->GetSystemAbility(IMultimodalInputConnect::MULTIMODAL_INPUT_CONNECT_SERVICE_ID);
+    // if (sa == nullptr) {
+    //     MMI_HILOGE("get sa fail");
+    //     return false;
+    // }
+
+    // std::weak_ptr<MultimodalInputConnectManager> weakPtr = shared_from_this();
+    // auto deathCallback = [weakPtr](const wptr<IRemoteObject> &object) {
+    //     auto sharedPtr = weakPtr.lock();
+    //     if (sharedPtr != nullptr) {
+    //         sharedPtr->OnDeath();
+    //     }
+    // };
+
+    // multimodalInputConnectRecipient_ = new (std::nothrow) MultimodalInputConnectDeathRecipient(deathCallback);
+    // CHKPF(multimodalInputConnectRecipient_);
+    // sa->AddDeathRecipient(multimodalInputConnectRecipient_);
+    // multimodalInputConnectService_ = iface_cast<IMultimodalInputConnect>(sa);
+    // if (multimodalInputConnectService_ == nullptr) {
+    //     MMI_HILOGE("get multimodalinput service fail");
+    //     return false;
+    // }
+
+    auto service = OHOS::DelayedSingleton<MMIService>::GetInstance();
+    return service;
+}
+
 MMIService::MMIService() : SystemAbility(MULTIMODAL_INPUT_CONNECT_SERVICE_ID, true) {}
 
 MMIService::~MMIService() {}
@@ -144,7 +178,7 @@ bool MMIService::InitLibinputService()
     MMI_HILOGD("HDF Init");
     hdfEventManager.SetupCallback();
 #endif
-    if (!(libinputAdapter_.Init(std::bind(&InputEventHandler::OnEvent, InputHandler, std::placeholders::_1),
+    if (!(libinputAdapter_.Init(std::bind(&InputEventHandler::OnEvent, southEventHandler_, std::placeholders::_1),
         DEF_INPUT_SEAT))) {
         MMI_HILOGE("libinput init, bind failed");
         return false;
@@ -189,15 +223,15 @@ int32_t MMIService::Init()
     CheckDefine();
 
     MMI_HILOGD("InputEventHandler Init");
-    InputHandler->Init(*this);
+    southEventHandler_->Init();
 
     MMI_HILOGD("ServerMsgHandler Init");
-    sMsgHandler_.Init(*this);
+    sMsgHandler_.Init(&southEventHandler_);
     MMI_HILOGD("EventDump Init");
-    MMIEventDump->Init(*this);
+    MMIEventDump->Init();
 
     MMI_HILOGD("WindowsManager Init");
-    if (!WinMgr->Init(*this)) {
+    if (!WinMgr->Init()) {
         MMI_HILOGE("Windows message init failed");
         return WINDOWS_MSG_INIT_FAIL;
     }
@@ -248,7 +282,7 @@ void MMIService::OnStop()
 {
     CHK_PIDANDTID();
     UdsStop();
-    InputHandler->Clear();
+    southEventHandler_.Clear();
     libinputAdapter_.Stop();
     state_ = ServiceRunningState::STATE_NOT_START;
 #ifdef OHOS_RSS_CLIENT
@@ -326,8 +360,7 @@ int32_t MMIService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& 
 
 int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter)
 {
-    CHKPR(InputHandler, ERROR_NULL_POINTER);
-    return InputHandler->AddInputEventFilter(filter);
+    return southEventHandler_.AddInputEventFilter(filter);
 }
 
 int32_t MMIService::SetPointerVisible(bool visible)
@@ -348,6 +381,21 @@ int32_t MMIService::IsPointerVisible(bool &visible)
     return RET_OK;
 }
 
+int32_t MMIService::HandleNonConsumedTouchEvent(std::shared_ptr<PointerEvent> event)
+{
+    return southEventHandler_->HandleTouchEvent(event);
+}
+
+int32_t MMIService::HandleTimerPointerEvent(std::shared_ptr<PointerEvent> event)
+{
+    return southEventHandler_->HandlePointerEvent(event);
+}
+
+std::shared_ptr<KeyEvent> MMIService::GetKeyEvent() const
+{
+    return southEventHandler_->GetKeyEvent();    
+}
+
 #ifdef OHOS_RSS_CLIENT
 void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
@@ -366,9 +414,7 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& 
 
 void MMIService::OnTimer()
 {
-    if (InputHandler != nullptr) {
-        InputHandler->OnCheckEventReport();
-    }
+    southEventHandler_.OnCheckEventReport();
     TimerMgr->ProcessTimers();
 }
 

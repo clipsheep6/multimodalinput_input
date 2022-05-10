@@ -28,7 +28,7 @@ class EventDump : public DelayedSingleton<EventDump> {
 public:
     EventDump() = default;
     DISALLOW_COPY_AND_MOVE(EventDump);
-    void Init(UDSServer& udss);
+    void Init();
     void Dump(int32_t fd = 0);
     void TestDump();
     void InsertDumpInfo(const std::string& str);
@@ -37,7 +37,6 @@ public:
 private:
     std::mutex mu_;
     std::vector<std::string> dumpInfo_;
-    UDSServer* udsServer_ = nullptr;
 };
 
 #define MMIEventDump EventDump::GetInstance()

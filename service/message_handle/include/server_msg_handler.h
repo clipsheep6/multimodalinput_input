@@ -31,7 +31,7 @@ public:
     DISALLOW_COPY_AND_MOVE(ServerMsgHandler);
     virtual ~ServerMsgHandler() override;
 
-    void Init(UDSServer& udsServer);
+    void Init(InputSouthEventHandler *southEventHandler);
     void OnMsgHandler(SessionPtr sess, NetPacket& pkt);
 
 protected:
@@ -84,7 +84,7 @@ protected:
     int32_t OnBigPacketTest(SessionPtr sess, NetPacket& pkt);
 #endif // OHOS_BUILD_MMI_DEBUG
 private:
-    UDSServer *udsServer_ = nullptr;
+    InputSouthEventHandler *southEventHandler_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS

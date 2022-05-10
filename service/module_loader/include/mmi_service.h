@@ -54,6 +54,9 @@ public:
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
     virtual int32_t SetPointerVisible(bool visible) override;
     virtual int32_t IsPointerVisible(bool &visible) override;
+    virtual int32_t HandleNonConsumedTouchEvent(std::shared_ptr<PointerEvent> event) override;
+    virtual int32_t HandleTimerPointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+    virtual std::shared_ptr<KeyEvent> GetKeyEvent() const override;
 #ifdef OHOS_RSS_CLIENT
     virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
 #endif
@@ -84,6 +87,7 @@ private:
 #endif
 
     LibinputAdapter libinputAdapter_;
+    InputEventHandler southEventHandler_;
     ServerMsgHandler sMsgHandler_;
 };
 } // namespace MMI

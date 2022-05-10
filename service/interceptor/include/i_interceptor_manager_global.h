@@ -30,6 +30,7 @@ public:
     IInterceptorManagerGlobal() = default;
     ~IInterceptorManagerGlobal() = default;
     DISALLOW_COPY_AND_MOVE(IInterceptorManagerGlobal);
+    HandlerType GetHandlerType() const override { return HandlerType::INTERCEPTOR; }
     int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
     static std::shared_ptr<IInterceptorManagerGlobal> CreateInstance();
     virtual void OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session);

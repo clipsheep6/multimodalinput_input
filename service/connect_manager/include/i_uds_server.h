@@ -22,8 +22,17 @@ namespace OHOS {
 namespace MMI {
 class IUdsServer : public RefBase {
 public:
+    static IUdsServer *GetInstance();
+    virtual bool SendMsg(int32_t fd, NetPacket& pkt) = 0;
     virtual int32_t AddSocketPairInfo(const std::string& programName, const int32_t moduleType, const int32_t uid,
-                                      const int32_t pid, int32_t& serverFd, int32_t& toReturnClientFd) = 0;
+        const int32_t pid, int32_t& serverFd, int32_t& toReturnClientFd) = 0;
+    virtual int32_t GetClientFd(int32_t pid) = 0;
+    virtual SessionPtr GetSession(int32_t fd) const = 0;
+    virtual void AddSessionDeletedCallback(std::function<void(SessionPtr)> callback) = 0;
+    virtual int32_t HandleNonConsumedTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) = 0;
+    virtual int32_t HandleTimerPointerEvent(std::shared_ptr<PointerEvent> pointerEvent) = 0;
+    virtual std::shared_ptr<KeyEvent> GetKeyEvent() const = 0;
+    virtual void Dump(int32_t fd) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

@@ -153,7 +153,9 @@ int32_t PointerEventHandler::HandleMouseEvent(libinput_event* event)
     MouseEventHdr->Normalize(event);
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    auto keyEvent = InputHandler->GetKeyEvent();
+    auto udsServer = IUdsServer::GetUdsServer();
+    CHKPV(udsServer);
+    auto keyEvent = udsServer->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
     for (const int32_t& keyCode : pressedKeys) {

@@ -32,9 +32,8 @@ InputWindowsManager::InputWindowsManager() {}
 
 InputWindowsManager::~InputWindowsManager() {}
 
-bool InputWindowsManager::Init(UDSServer& udsServer)
+bool InputWindowsManager::Init()
 {
-    udsServer_ = &udsServer;
     return true;
 }
 
@@ -48,7 +47,9 @@ int32_t InputWindowsManager::UpdateTarget(std::shared_ptr<InputEvent> inputEvent
         MMI_HILOGE("Invalid pid");
         return RET_ERR;
     }
-    int32_t fd = udsServer_->GetClientFd(pid);
+    auto udsServer = IUdsServer::GetInstance();
+    CHKPR(udsServer, ERROR_NULL_POINTER);
+    int32_t fd = udsServer->GetClientFd(pid);
     if (fd < 0) {
         MMI_HILOGE("Invalid fd");
         return RET_ERR;
@@ -542,8 +543,9 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     pointerItem.SetLocalX(localX);
     pointerItem.SetLocalY(localY);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
-    CHKPR(udsServer_, ERROR_NULL_POINTER);
-    auto fd = udsServer_->GetClientFd(touchWindow->pid);
+    auto udsServer = IUdsServer::GetInstance();
+    CHKPR(udsServer, ERROR_NULL_POINTER);
+    auto fd = udsServer->GetClientFd(touchWindow->pid);
 
     MMI_HILOGD("fd:%{public}d,pid:%{public}d,id:%{public}d,agentWindowId:%{public}d,"
                "globalX:%{public}d,globalY:%{public}d,localX:%{public}d,localY:%{public}d",
@@ -614,7 +616,9 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     pointerItem.SetToolLocalX(pointerItem.GetToolGlobalX() - touchWindow->winTopLeftX);
     pointerItem.SetToolLocalY(pointerItem.GetToolGlobalY() - touchWindow->winTopLeftY);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
-    auto fd = udsServer_->GetClientFd(touchWindow->pid);
+    auto udsServer = IUdsServer::GetInstance();
+    CHKPR(udsServer, ERROR_NULL_POINTER);
+    auto fd = udsServer->GetClientFd(touchWindow->pid);
     MMI_HILOGD("pid:%{public}d,fd:%{public}d,globalX01:%{public}d,"
                "globalY01:%{public}d,localX:%{public}d,localY:%{public}d,"
                "TargetWindowId:%{public}d,AgentWindowId:%{public}d",

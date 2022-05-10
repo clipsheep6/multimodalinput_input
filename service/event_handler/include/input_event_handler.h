@@ -39,35 +39,23 @@ namespace OHOS {
 namespace MMI {
 using EventFun = std::function<int32_t(libinput_event *event)>;
 using NotifyDeviceChange = std::function<void(int32_t, int32_t, char *)>;
-class InputEventHandler : public MsgHandler<EventFun>, public DelayedSingleton<InputEventHandler> {
+class InputEventHandler : public IInputSouthEventHandler, public MsgHandler<EventFun>, public DelayedSingleton<InputEventHandler> {
 public:
     InputEventHandler();
     DISALLOW_COPY_AND_MOVE(InputEventHandler);
     virtual ~InputEventHandler() override;
-    void Init(UDSServer& udsServer);
+    void Init();
     void OnEvent(void *event);
     void OnCheckEventReport();
-    UDSServer *GetUDSServer() const;
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
     std::shared_ptr<KeyEvent> GetKeyEvent() const;
 
-    std::shared_ptr<IInputEventHandler> GetInputEventHandler() const;  
-    std::shared_ptr<KeyEventHandler> GetKeyEventHandler() const;
-    std::shared_ptr<PointerEventHandler> GetPointerEventHandler() const;
-    std::shared_ptr<TouchEventHandler> GetTouchEventHandler() const;
-    
-    std::shared_ptr<IInterceptorManagerGlobal> GetKeyInterceptorHandler() const;
-    std::shared_ptr<KeyEventSubscriber> GetKeySubscriberHandler() const;
-    std::shared_ptr<InputHandlerManagerGlobal> GetKeyMonitorHandler() const;
+    int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
+    int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+    int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
 
-    std::shared_ptr<EventFilterWrap> GetPointerEventFilterHanlder() const;
-    std::shared_ptr<IInterceptorHandlerGlobal> GetPointerInterceptorHandler() const;
-    std::shared_ptr<InputHandlerManagerGlobal> GetPointerMonitorHandler() const;
-
-    std::shared_ptr<EventFilterWrap> GetTouchEventFilterHandler() const;
-    std::shared_ptr<IInterceptorHandlerGlobal> GetTouchInterceptorHandler() const;
-    std::shared_ptr<InputHandlerManagerGlobal> GetTouchMonitorHandler() const;
-
+    // TODO:
+    int32_t AddSubscriber(SessionPtr sess, int32_t subscribeId, const std::shared_ptr<KeyOption> keyOption) override;
 protected:
     int32_t OnEventDeviceAdded(libinput_event *event);
     int32_t OnEventDeviceRemoved(libinput_event *event);
@@ -80,28 +68,14 @@ protected:
 
 private:
     int32_t OnEventHandler(libinput_event *event);
-    std::shared_ptr<IInputEventHandler> BuildInputHandlerChain();
+    void BuildInputHandlerChain();
 
-    UDSServer *udsServer_ = nullptr;
     NotifyDeviceChange notifyDeviceChange_;
     std::shared_ptr<KeyEvent> keyEvent_ = nullptr;
 
-    std::shared_ptr<IInputEventHandler> inputEventHandler_ = nullptr;
-    std::shared_ptr<KeyEventHandler> keyEventHandler_ = nullptr;
-    std::shared_ptr<PointerEventHandler> pointerEventHandler_ = nullptr;
-    std::shared_ptr<TouchEventHandler> touchEventHandler_ = nullptr;
-
-    std::shared_ptr<IInterceptorManagerGlobal> keyInterceptorHandler_ = nullptr;
-    std::shared_ptr<KeyEventSubscriber> keySubscriberHandler_ = nullptr;
-    std::shared_ptr<InputHandlerManagerGlobal> keyMonitorHandler_ = nullptr;
-
-    std::shared_ptr<EventFilterWrap> pointerEventFilterHandler_ = nullptr;
-    std::shared_ptr<IInterceptorHandlerGlobal> pointerInterceptorHandler_ = nullptr;
-    std::shared_ptr<InputHandlerManagerGlobal> pointerMonitorHandler_ = nullptr;
-
-    std::shared_ptr<EventFilterWrap> touchEventFilterHandler_ = nullptr;
-    std::shared_ptr<IInterceptorHandlerGlobal> touchInterceptorHandler_ = nullptr;
-    std::shared_ptr<InputHandlerManagerGlobal> touchMonitorHandler_ = nullptr;
+    std::shared_ptr<IInputEventHandler> keyEventHandler_ = nullptr;
+    std::shared_ptr<IInputEventHandler> pointerEventHandler_ = nullptr;
+    std::shared_ptr<IInputEventHandler> touchEventHandler_ = nullptr;
 
     uint64_t idSeed_ = 0;
     int32_t eventType_ = 0;
@@ -109,7 +83,6 @@ private:
     int64_t lastSysClock_ = 0;
 };
 
-#define InputHandler InputEventHandler::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_EVENT_HANDLER_H

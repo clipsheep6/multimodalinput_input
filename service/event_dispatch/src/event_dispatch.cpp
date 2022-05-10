@@ -61,7 +61,7 @@ int32_t EventDispatch::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
                keyEvent->GetActionStartTime(),
                keyEvent->GetEventType(),
                keyEvent->GetFlag(), keyEvent->GetKeyAction(), fd);
-    auto udsServer = InputHandler->GetUDSServer();
+    auto udsServer = IUDSServer::GetInstance();
     if (udsServer == nullptr) {
         MMI_HILOGE("UdsServer is a nullptr");
         return RET_ERR;
@@ -123,7 +123,7 @@ int32_t EventDispatch::DispatchPointerEvent(std::shared_ptr<PointerEvent> pointe
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
     InputEventDataTransformation::Marshalling(pointerEvent, pkt);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP);
-    auto udsServer = InputHandler->GetUDSServer();
+    auto udsServer = IUDSServer::GetInstance();
     if (udsServer == nullptr) {
         MMI_HILOGE("UdsServer is a nullptr");
         return RET_ERR;

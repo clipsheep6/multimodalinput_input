@@ -32,9 +32,8 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "HdiInject" };
 } // namespace
 
-bool HdiInject::Init(UDSServer &sess)
+bool HdiInject::Init()
 {
-    udsServerPtr_ = &sess;
     StartHdiserver();
     return true;
 }

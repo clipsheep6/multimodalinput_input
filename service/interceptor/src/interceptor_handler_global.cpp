@@ -119,7 +119,7 @@ void InterceptorHandlerGlobal::InitSessionLostCallback()
         MMI_HILOGE("Init session is failed");
         return;
     }
-    auto udsServerPtr = InputHandler->GetUDSServer();
+    auto udsServerPtr = IUDSServer::GetInstance();
     CHKPV(udsServerPtr);
     udsServerPtr->AddSessionDeletedCallback(std::bind(
         &InterceptorHandlerGlobal::OnSessionLost, this, std::placeholders::_1));

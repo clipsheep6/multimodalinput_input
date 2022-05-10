@@ -161,7 +161,7 @@ void KeyEventSubscriber::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
     CALL_LOG_ENTER;
     CHKPV(keyEvent);
     CHKPV(subscriber);
-    auto udsServerPtr = InputHandler->GetUDSServer();
+    auto udsServerPtr = IUDSServer::GetInstance();
     CHKPV(udsServerPtr);
     NetPacket pkt(MmiMessageId::ON_SUBSCRIBE_KEY);
     InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt);
@@ -254,7 +254,7 @@ bool KeyEventSubscriber::InitSessionDeleteCallback()
         MMI_HILOGD("session delete callback has already been initialized");
         return true;
     }
-    auto udsServerPtr = InputHandler->GetUDSServer();
+    auto udsServerPtr = IUDSServer::GetInstance();
     CHKPF(udsServerPtr);
     std::function<void(SessionPtr)> callback =
         std::bind(&KeyEventSubscriber::OnSessionDelete, this, std::placeholders::_1);

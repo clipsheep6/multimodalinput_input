@@ -53,9 +53,8 @@ void ChkConfig(int32_t fd)
     mprintf(fd, "EXP_SOPATH: %s\n", DEF_EXP_SOPATH);
 }
 
-void EventDump::Init(UDSServer& uds)
+void EventDump::Init()
 {
-    udsServer_ = &uds;
 }
 
 void EventDump::Dump(int32_t fd)
@@ -65,8 +64,9 @@ void EventDump::Dump(int32_t fd)
     auto strCurTime = Strftime();
     mprintf(fd, "MMIDumpsBegin: %s", strCurTime.c_str());
     ChkConfig(fd);
-    if (udsServer_) {
-        udsServer_->Dump(fd);
+    auto udsServer = IUdsServer::GetInstance();
+    if (udsServer != nullptr) {
+        udsServer->Dump(fd);
     }
 
     mprintf(fd, "MMI_MSGDumps:");
