@@ -342,7 +342,9 @@ int32_t MMIService::SetPointerVisible(bool visible)
 int32_t MMIService::IsPointerVisible(bool &visible)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
     visible = IPointerDrawingManager::GetInstance()->IsPointerVisible();
+#endif
     return RET_OK;
 }
 

@@ -154,7 +154,7 @@ napi_value JsInputDeviceManager::SetPointerVisible(napi_env env, bool visible, n
     AsyncCallbackWork(asyncContext);
     return promise;
 }
-#endif
+
 napi_value JsInputDeviceManager::IsPointerVisible(napi_env env, napi_value handle)
 {
     CALL_LOG_ENTER;
@@ -178,6 +178,7 @@ napi_value JsInputDeviceManager::IsPointerVisible(napi_env env, napi_value handl
     AsyncCallbackWork(asyncContext);
     return promise;
 }
+#endif
 
 napi_value JsInputDeviceManager::SupportKeys(napi_env env, int32_t id, std::vector<int32_t> keyCodes,
     napi_value handle)
