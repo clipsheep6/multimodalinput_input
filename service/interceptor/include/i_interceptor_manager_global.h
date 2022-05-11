@@ -18,7 +18,6 @@
 #include "nocopyable.h"
 #include "singleton.h"
 
-#include "i_input_event_handler.h"
 #include "i_interceptor_manager_event_handler.h"
 #include "key_event.h"
 #include "pointer_event.h"
@@ -26,7 +25,7 @@
 
 namespace OHOS {
 namespace MMI {
-class IInterceptorManagerGlobal : public IIncterceptorManagerEventHandler, public IInputEventHandler {
+class IInterceptorManagerGlobal : public IIncterceptorManagerEventHandler {
 public:
     IInterceptorManagerGlobal(int32_t priority);
     ~IInterceptorManagerGlobal() = default;

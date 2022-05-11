@@ -17,12 +17,13 @@
 
 #include <memory>
 
+#include "i_input_event_handler.h"
 #include "key_option.h"
 #include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
-class IIncterceptorManagerEventHandler {
+class IIncterceptorManagerEventHandler : public IInputEventHandler {
 public:
     virtual void OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session) = 0;
     virtual void OnRemoveInterceptor(int32_t id) = 0;

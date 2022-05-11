@@ -18,7 +18,6 @@
 #include <cinttypes>
 
 #include "bytrace_adapter.h"
-#include "i_input_event_handler.h"
 #include "input_event_data_transformation.h"
 #include "proto.h"
 

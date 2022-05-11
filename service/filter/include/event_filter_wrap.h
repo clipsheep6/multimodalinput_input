@@ -21,12 +21,11 @@
 #include "nocopyable.h"
 #include "i_event_filter.h"
 #include "i_filter_event_handler.h"
-#include "i_input_event_handler.h"
 #include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
-class EventFilterWrap : public IFilterEventHandler, public IInputEventHandler {
+class EventFilterWrap : public IFilterEventHandler {
 public:
     EventFilterWrap(int32_t priority);
     DISALLOW_COPY_AND_MOVE(EventFilterWrap);

@@ -16,11 +16,14 @@
 #define I_FILTER_EVENT_HANDLER_H
 
 #include "i_event_filter.h"
+
 #include "refbase.h"
+
+#include "i_input_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
-class IFilterEventHandler {
+class IFilterEventHandler : public IInputEventHandler {
 public:
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) = 0;
 };

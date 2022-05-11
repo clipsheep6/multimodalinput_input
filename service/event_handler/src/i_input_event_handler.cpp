@@ -77,7 +77,6 @@ int32_t IInputEventHandler::AddInterceptor(int32_t handlerId, InputHandlerType h
     return RET_OK;
 }
 
-#if 0
 void IInputEventHandler::TouchMonitorHandlerMarkConsumed(int32_t monitorId, int32_t eventId, SessionPtr sess)
 {
     std::shared_ptr<IInputEventHandler> cur = std::shared_ptr<IInputEventHandler>(this);
@@ -197,7 +196,6 @@ int32_t IInputEventHandler::AddFilter(sptr<IEventFilter> filter)
     }
     return RET_OK;
 }
-#endif
 
 uint32_t IInputEventHandler::SetNext(std::shared_ptr<IInputEventHandler> nextHandler)
 {
