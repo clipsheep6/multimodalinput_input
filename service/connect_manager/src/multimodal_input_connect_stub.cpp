@@ -50,6 +50,25 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         MMI_HILOGE("get unexpect descriptor:%{public}s", Str16ToStr8(descriptor).c_str());
         return ERR_INVALID_STATE;
     }
+
+    switch (code) {
+        case IMultimodalInputConnect::ALLOC_SOCKET_FD: {
+            return StubHandleAllocSocketFd(data, reply);
+        }
+        case IMultimodalInputConnect::ADD_INPUT_EVENT_FILTER: {
+            return StubAddInputEventFilter(data, reply);
+        }
+        case IMultimodalInputConnect::SET_POINTER_VISIBLE: {
+            return StubSetPointerVisible(data, reply);
+        }
+        case IMultimodalInputConnect::IS_POINTER_VISIBLE: {
+            return StubIsPointerVisible(data, reply);
+        }
+        default: {
+            MMI_HILOGE("unknown code:%{public}u, go switch defaut", code);
+            return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+        }
+    }
     LOGFMTD("step 2 pid:%d", pid);
     if (!CheckPermission(code)) {
         LOGFMTE("check permission failed");
@@ -83,50 +102,34 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
     return NO_ERROR;
 }
 
-bool MultimodalInputConnectStub::CheckPermission()
+int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& reply)
 {
-    auto tokenId = IPCSkeleton::GetCallingTokenID();
-    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
-    if (tokenType == OHOS::Security::AccessToken::TOKEN_HAP) {
-        OHOS::Security::AccessToken::HapTokenInfo findInfo;
-        if (OHOS::Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenId, findInfo) != 0) {
-            MMI_HILOGE("GetHapTokenInfo failed");
-            return false;
-        }
-        if (findInfo.apl != OHOS::Security::AccessToken::APL_SYSTEM_BASIC &&
-            findInfo.apl != OHOS::Security::AccessToken::APL_SYSTEM_CORE) {
-            MMI_HILOGE("check hap permisson failed");
-            return false;
-        }
-        MMI_HILOGD("check hap permisson success");
-    } else if (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE) {
-        OHOS::Security::AccessToken::NativeTokenInfo findInfo;
-        if (OHOS::Security::AccessToken::AccessTokenKit::GetNativeTokenInfo(tokenId, findInfo) != 0) {
-            MMI_HILOGE("GetNativeTokenInfo failed");
-            return false;
-        }
-        if (findInfo.apl != OHOS::Security::AccessToken::APL_SYSTEM_BASIC &&
-            findInfo.apl != OHOS::Security::AccessToken::APL_SYSTEM_CORE) {
-            MMI_HILOGE("check native permisson failed");
-            return false;
-        }
-        MMI_HILOGD("check native permisson success");
-    } else {
-        MMI_HILOGE("unsupported token type:%{public}d", tokenType);
-        return false;
-    }
-    return true;
-}
+    sptr<ConnectReqParcel> req = data.ReadParcelable<ConnectReqParcel>();
+    CHKPR(req, RET_ERR);
+    MMI_HILOGIK("clientName:%{public}s,moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
 
-bool MultimodalInputConnectStub::CheckPermission(uint32_t code)
-{
-    switch (code) {
-        case IMultimodalInputConnect::SET_POINTER_VISIBLE:
-        {
-            return CheckPermission();
-        }
+    int32_t clientFd = INVALID_SOCKET_FD;
+    // int32_t ret = AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd);
+    // if (ret != RET_OK) {
+    //     MMI_HILOGE("call AddSocketPairInfo return %{public}d", ret);
+    //     reply.WriteInt32(RET_ERR);
+    //     return RET_ERR;
+    // }
+    if (!entrustTasks_.PostSyncTask(pid, std::bind(&IMultimodalInputConnect::AllocSocketFd, this,
+        req->data.clientName, req->data.moduleId, std::ref(clientFd), pid, uid))) {
+        LOGFMTE("post task AllocSocketFd failed code:%u, go switch defaut", code);
+        MMI_HILOGE("post task AllocSocketFd failed code:%{public}u, go switch defaut", code);
+        return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
-    return true;
+
+    MMI_HILOGI("call AllocSocketFd success");
+
+    reply.WriteInt32(RET_OK);
+    reply.WriteFileDescriptor(clientFd);
+
+    MMI_HILOGI("send clientFd to client, clientFd = %d", clientFd);
+    close(clientFd);
+    return RET_OK;
 }
 
 int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply)
@@ -158,7 +161,12 @@ int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data,
 
         MMI_HILOGD("filter iface_cast succeeded");
 
-        ret = AddInputEventFilter(filter);
+        // ret = AddInputEventFilter(filter);
+        if (!entrustTasks_.PostSyncTask(pid, std::bind(&IMultimodalInputConnect::AddInputEventFilter, this, filter))) {
+            LOGFMTE("post task AddInputEventFilter failed, go switch defaut");
+            MMI_HILOGE("post task AddInputEventFilter failed, go switch defaut");
+            return ERR_INVALID_STATE;
+        }
     } while (0);
     
     if (!reply.WriteInt32(ret)) {
@@ -168,6 +176,43 @@ int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data,
 
     MMI_HILOGD("ret:%{public}d", ret);
     return RET_OK;
+}
+
+bool MultimodalInputConnectStub::CheckPermission()
+{
+    auto tokenId = IPCSkeleton::GetCallingTokenID();
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    if (tokenType == OHOS::Security::AccessToken::TOKEN_HAP) {
+        OHOS::Security::AccessToken::HapTokenInfo findInfo;
+        if (OHOS::Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenId, findInfo) != 0) {
+            MMI_HILOGE("GetHapTokenInfo failed");
+            return false;
+        }
+        if (findInfo.apl == OHOS::Security::AccessToken::APL_SYSTEM_BASIC ||
+            findInfo.apl == OHOS::Security::AccessToken::APL_SYSTEM_CORE) {
+            MMI_HILOGI("check hap permisson success");
+            return true;
+        }
+        MMI_HILOGE("check hap permisson failed");
+        return false;
+    }
+    if (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE) {
+        OHOS::Security::AccessToken::NativeTokenInfo findInfo;
+        if (OHOS::Security::AccessToken::AccessTokenKit::GetNativeTokenInfo(tokenId, findInfo) != 0) {
+            MMI_HILOGE("GetNativeTokenInfo failed");
+            return false;
+        }
+        if (findInfo.apl == OHOS::Security::AccessToken::APL_SYSTEM_BASIC ||
+            findInfo.apl == OHOS::Security::AccessToken::APL_SYSTEM_CORE) {
+            MMI_HILOGI("check native permisson success");
+            return true;
+        }
+        MMI_HILOGE("check native permisson failed");
+        return false;
+    }
+    
+    MMI_HILOGE("unsupported token type:%{public}d", tokenType);
+    return false;
 }
 
 int32_t MultimodalInputConnectStub::StubSetPointerVisible(MessageParcel& data, MessageParcel& reply)

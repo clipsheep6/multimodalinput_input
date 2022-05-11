@@ -28,9 +28,13 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Entru
 void EntrustTasks::Task::ProcessTask()
 {
     CALL_LOG_ENTER2;
-    fun_(id_);
+    LOGFMTD("process task Begin id:%d", id_);
+    MMI_HILOGD("process task Begin id:%{public}d", id_);
+    int32_t ret = fun_();
+    LOGFMTD("process task End id:%d", id_);
+    MMI_HILOGD("process task End id:%{public}d", id_);
     if (promise_) {
-        promise_->set_value();
+        promise_->set_value(ret);
     }
 }
 
@@ -68,7 +72,7 @@ bool EntrustTasks::PostSyncTask(int32_t pid, ETaskCallback callback, int32_t tim
     CALL_LOG_ENTER2;
     Promise promise;
     Future future = promise.get_future();
-    auto ret = PostTask(pid, &promise, callback);
+    auto ret = PostTask(pid, callback, &promise);
     if (!ret) {
         LOGFMTE("Post aync task failed");
         MMI_HILOGE("Post aync task failed");
@@ -83,20 +87,21 @@ bool EntrustTasks::PostSyncTask(int32_t pid, ETaskCallback callback, int32_t tim
     return (res == std::future_status::ready);
 }
 
-template<typename T>
-bool EntrustTasks::PostSyncTask(ETaskCallback callback, T& ret, int32_t timeout)
+bool EntrustTasks::PostAsyncTask(int32_t pid, ETaskCallback callback)
 {
-    std::promise<T> promise;
-    auto future = promise.get_future();
+    CALL_LOG_ENTER2;
+    auto ret = PostTask(pid, callback);
+    if (!ret) {
+        LOGFMTE("Post aync task failed");
+        MMI_HILOGE("Post aync task failed");
+        return false;
+    }
+    LOGFMTD("Post async task pid:%d", pid);
+    MMI_HILOGD("Post async task pid:%{public}d", pid);
     return true;
 }
 
-bool EntrustTasks::PostAsyncTask(ETaskCallback callback)
-{
-    return true;
-}
-
-bool EntrustTasks::PostTask(int32_t pid, Promise *promise, ETaskCallback callback)
+bool EntrustTasks::PostTask(int32_t pid, ETaskCallback callback, Promise *promise)
 {
     CALL_LOG_ENTER2;
     std::lock_guard<std::mutex> guard(mux_);
@@ -115,7 +120,7 @@ bool EntrustTasks::PostTask(int32_t pid, Promise *promise, ETaskCallback callbac
         MMI_HILOGE("write error:%{public}d", errno);
         return false;
     }
-    tasks_.push(std::make_shared<Task>(id, promise, callback));
+    tasks_.push(std::make_shared<Task>(id, callback, promise));
     return true;
 }
 } // namespace MMI

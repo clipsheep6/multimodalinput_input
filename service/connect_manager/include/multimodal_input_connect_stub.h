@@ -43,14 +43,13 @@ public:
         MessageOption& options) override;
 
 protected:
-    virtual int32_t StubHandleAllocSocketFd(MessageParcel &data, MessageParcel &reply) = 0;
+    int32_t StubHandleAllocSocketFd(MessageParcel &data, MessageParcel &reply);
     int32_t StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPointerVisible(MessageParcel& data, MessageParcel& reply);
     int32_t StubIsPointerVisible(MessageParcel& data, MessageParcel& reply);
 
 private:
     bool CheckPermission();
-    bool CheckPermission(uint32_t code);
 
 protected:
     EntrustTasks entrustTasks_;
