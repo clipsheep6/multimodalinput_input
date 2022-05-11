@@ -28,7 +28,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Inter
 constexpr int32_t SOURCETYPE_KEY = 4;
 } // namespace
 
-InterceptorManagerGlobal::InterceptorManagerGlobal() {}
+InterceptorManagerGlobal::InterceptorManagerGlobal(int32_t priority) : IInterceptorManagerGlobal(priority) {}
 
 int32_t InterceptorManagerGlobal::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
@@ -97,9 +97,9 @@ bool InterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     return true;
 }
 
-std::shared_ptr<IInterceptorManagerGlobal> IInterceptorManagerGlobal::CreateInstance()
+std::shared_ptr<IInterceptorManagerGlobal> IInterceptorManagerGlobal::CreateInstance(int32_t priority)
 {
-    return std::make_shared<InterceptorManagerGlobal>();
+    return std::make_shared<InterceptorManagerGlobal>(priority);
 }
 } // namespace MMI
 } // namespace OHOS

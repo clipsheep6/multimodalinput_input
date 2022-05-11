@@ -363,7 +363,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_001, TestSize.L
     std::vector<std::string> tlogs {SearchLog(command, slogs)};
     EXPECT_TRUE(!tlogs.empty());
 #else
-    std::string command1 = "Keyboard device dose not support";
+    std::string command1 = "Keyboard device does not support";
     std::vector<std::string> tlogs1 {SearchLog(command1, slogs)};
     EXPECT_TRUE(!tlogs1.empty());
 #endif
@@ -426,7 +426,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_003, TestSize.L
     std::vector<std::string> tlogs {SearchLog(command, slogs)};
     EXPECT_TRUE(!tlogs.empty());
 #else
-    std::string command1 = "Keyboard device dose not support";
+    std::string command1 = "Keyboard device does not support";
     std::vector<std::string> tlogs1 {SearchLog(command1, slogs)};
     EXPECT_TRUE(!tlogs1.empty());
 #endif
@@ -497,7 +497,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_005, TestSize.L
     std::vector<std::string> tlogs {SearchLog(command, slogs)};
     EXPECT_TRUE(!tlogs.empty());
 #else
-    std::string command1 = "Keyboard device dose not support";
+    std::string command1 = "Keyboard device does not support";
     std::vector<std::string> tlogs1 {SearchLog(command1, slogs)};
     EXPECT_TRUE(!tlogs1.empty());
 #endif
@@ -771,7 +771,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_004, TestSize.Level1)
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 #else
-    std::string command1 = "Tp device dose not support";
+    std::string command1 = "Tp device does not support";
     std::vector<std::string> tlogs1 {SearchLog(command1, sLogs)};
     EXPECT_TRUE(!tlogs1.empty());
 #endif
@@ -1299,7 +1299,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_013, TestSize.Level1)
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 #else
-    std::string command1 = "Pointer device dose not support";
+    std::string command1 = "Pointer device does not support";
     std::vector<std::string> tlogs1 {SearchLog(command1, sLogs)};
     EXPECT_TRUE(!tlogs1.empty());
 #endif
@@ -1346,7 +1346,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_014, TestSize.Level1)
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 #else
-    std::string command1 = "Pointer device dose not support";
+    std::string command1 = "Pointer device does not support";
     std::vector<std::string> tlogs1 {SearchLog(command1, sLogs)};
     EXPECT_TRUE(!tlogs1.empty());
 #endif
@@ -1394,7 +1394,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_015, TestSize.Level1)
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
 #else
-    std::string command1 = "Pointer device dose not support";
+    std::string command1 = "Pointer device does not support";
     std::vector<std::string> tlogs1 {SearchLog(command1, sLogs)};
     EXPECT_TRUE(!tlogs1.empty());
 #endif

@@ -291,7 +291,7 @@ napi_value JsInputDeviceContext::SetPointerVisible(napi_env env, napi_callback_i
     }
     return jsInputDeviceMgr->SetPointerVisible(env, visible, argv[1]);
 #else
-    MMI_HILOGW("Pointer device dose not support");
+    MMI_HILOGW("Pointer device does not support");
     return nullptr;
 #endif
 }
@@ -320,7 +320,7 @@ napi_value JsInputDeviceContext::IsPointerVisible(napi_env env, napi_callback_in
 
     return jsInputDeviceMgr->IsPointerVisible(env, argv[0]);
 #else
-    MMI_HILOGW("Pointer device dose not support");
+    MMI_HILOGW("Pointer device does not support");
     return nullptr;
 #endif
 }

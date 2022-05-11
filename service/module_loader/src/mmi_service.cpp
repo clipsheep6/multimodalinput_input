@@ -360,7 +360,7 @@ int32_t MMIService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& 
 
 int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter)
 {
-    return southEventHandler_.AddInputEventFilter(filter);
+    return southEventHandler_.AddFilter(filter);
 }
 
 int32_t MMIService::SetPointerVisible(bool visible)

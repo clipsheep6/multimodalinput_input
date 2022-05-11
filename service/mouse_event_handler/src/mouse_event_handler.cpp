@@ -162,7 +162,7 @@ int32_t MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
             auto pointerEvent = sharedPtr->GetPointerEvent();
             CHKPV(pointerEvent);
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
-            auto udsServer = IUdsServer::GetUdsServer();
+            auto udsServer = IUdsServer::GetInstance();
             CHKPV(udsServer);
             udsServer->HandleTimerPointerEvent(pointerEvent);
         });

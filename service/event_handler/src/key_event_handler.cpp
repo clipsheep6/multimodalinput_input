@@ -30,12 +30,14 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventHandler" };
 }
 
-int32_t KeyEventHandler::HandleEvent(libinput_event* event)
+KeyEventHandler::KeyEventHandler(int32_t priority) : IInputEventHandler(priority) {}
+
+int32_t KeyEventHandler::HandleLibinputEvent(libinput_event* event)
 {
     CALL_LOG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
-    auto udsServer = IUdsServer::GetUdsServer();
-    CHKPV(udsServer);
+    auto udsServer = IUdsServer::GetInstance();
+    CHKPR(udsServer, ERROR_NULL_POINTER);
     auto keyEvent = udsServer->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     auto packageResult = eventPackage_.PackageKeyEvent(event, keyEvent);
@@ -67,26 +69,6 @@ int32_t KeyEventHandler::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     return nextHandler_->HandleKeyEvent(keyEvent);
 }
 
-void KeyEventHandler::AddHandler(int priority, const std::shared_ptr<IInputEventHandler> handler)
-{
-    CHKPV(handler);
-    keyHandlerMap_.emplace(priority, handler);
-}
-
-void KeyEventHandler::AddFinish()
-{
-    std::shared_ptr<IInputEventHandler> tmpHandler = nullptr;
-    for (const auto &handler : keyHandlerMap_) {
-        if (tmpHandler == nullptr) {
-            tmpHandler = handler.second;
-            SetNext(tmpHandler);
-        } else {
-            tmpHandler->SetNext(handler.second);
-            tmpHandler = handler.second;
-        }
-    }
-}
-
 void KeyEventHandler::Repeat(const std::shared_ptr<KeyEvent> keyEvent)
 {
         if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_UP ||
@@ -107,7 +89,7 @@ void KeyEventHandler::AddHandleTimer(int32_t timeout)
 {
     timerId_ = TimerMgr->AddTimer(timeout, 1, [this]() {
         MMI_HILOGD("enter");
-        auto udsServer = IUdsServer::GetUdsServer();
+        auto udsServer = IUdsServer::GetInstance();
         CHKPV(udsServer);
         auto keyEvent = udsServer->GetKeyEvent();
         CHKPV(keyEvent);

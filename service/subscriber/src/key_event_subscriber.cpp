@@ -31,6 +31,8 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "KeyEve
 constexpr uint32_t MAX_PRE_KEY_COUNT = 4;
 } // namespace
 
+KeyEventSubscriber::KeyEventSubscriber(int32_t priority) : IInputEventHandler(priority) {}
+
 int32_t KeyEventSubscriber::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPR(keyEvent, ERROR_NULL_POINTER);
@@ -161,7 +163,7 @@ void KeyEventSubscriber::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
     CALL_LOG_ENTER;
     CHKPV(keyEvent);
     CHKPV(subscriber);
-    auto udsServerPtr = IUDSServer::GetInstance();
+    auto udsServerPtr = IUdsServer::GetInstance();
     CHKPV(udsServerPtr);
     NetPacket pkt(MmiMessageId::ON_SUBSCRIBE_KEY);
     InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt);
@@ -254,7 +256,7 @@ bool KeyEventSubscriber::InitSessionDeleteCallback()
         MMI_HILOGD("session delete callback has already been initialized");
         return true;
     }
-    auto udsServerPtr = IUDSServer::GetInstance();
+    auto udsServerPtr = IUdsServer::GetInstance();
     CHKPF(udsServerPtr);
     std::function<void(SessionPtr)> callback =
         std::bind(&KeyEventSubscriber::OnSessionDelete, this, std::placeholders::_1);

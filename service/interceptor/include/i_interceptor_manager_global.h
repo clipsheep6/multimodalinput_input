@@ -19,22 +19,23 @@
 #include "singleton.h"
 
 #include "i_input_event_handler.h"
+#include "i_interceptor_manager_event_handler.h"
 #include "key_event.h"
 #include "pointer_event.h"
 #include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
-class IInterceptorManagerGlobal : public IInputEventHandler {
+class IInterceptorManagerGlobal : public IIncterceptorManagerEventHandler, public IInputEventHandler {
 public:
-    IInterceptorManagerGlobal() = default;
+    IInterceptorManagerGlobal(int32_t priority);
     ~IInterceptorManagerGlobal() = default;
     DISALLOW_COPY_AND_MOVE(IInterceptorManagerGlobal);
-    HandlerType GetHandlerType() const override { return HandlerType::INTERCEPTOR; }
+    EventHandlerType GetHandlerType() const override { return EventHandlerType::INTERCEPTOR; }
     int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
-    static std::shared_ptr<IInterceptorManagerGlobal> CreateInstance();
-    virtual void OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session);
-    virtual void OnRemoveInterceptor(int32_t id);
+    static std::shared_ptr<IInterceptorManagerGlobal> CreateInstance(int32_t priority);
+    void OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session) override;
+    void OnRemoveInterceptor(int32_t id) override;
 private:
     bool OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
 };

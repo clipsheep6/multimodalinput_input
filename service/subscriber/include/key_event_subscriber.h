@@ -27,6 +27,7 @@
 #include "singleton.h"
 
 #include "i_input_event_handler.h"
+#include "i_subscriber_event_handler.h"
 #include "key_event.h"
 #include "key_option.h"
 #include "uds_server.h"
@@ -35,9 +36,10 @@ namespace OHOS {
 namespace MMI {
 class KeyEventSubscriber : public IInputEventHandler, public ISubscriberEventHandler {
 public:
-    KeyEventSubscriber() = default;
+    KeyEventSubscriber(int32_t priority);
     ~KeyEventSubscriber() = default;
     DISALLOW_COPY_AND_MOVE(KeyEventSubscriber);
+    EventHandlerType GetHandlerType() const override { return EventHandlerType::SUBSCRIBER; }
     int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
     int32_t SubscribeKeyEvent(SessionPtr sess, int32_t subscribeId,
             const std::shared_ptr<KeyOption> keyOption) override;

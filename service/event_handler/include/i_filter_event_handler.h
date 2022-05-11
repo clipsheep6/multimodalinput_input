@@ -12,20 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef I_SUBSCRIBER_EVENT_HANDLER_H
-#define I_SUBSCRIBER_EVENT_HANDLER_H
-#include <memory>
+#ifndef I_FILTER_EVENT_HANDLER_H
+#define I_FILTER_EVENT_HANDLER_H
 
-#include "key_option.h"
-#include "uds_session.h"
+#include "i_event_filter.h"
+#include "refbase.h"
 
 namespace OHOS {
 namespace MMI {
-class ISubscriberEventHandler {
+class IFilterEventHandler {
 public:
-    virtual int32_t SubscribeKeyEvent(SessionPtr sess, int32_t subscribeId, const std::shared_ptr<KeyOption> keyOption) = 0;
-    virtual int32_t UnSubscribeKeyEvent(SessionPtr sess, int32_t subscribeId) = 0;
+    virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) = 0;
 };
 } // namespace MMI
 } // namespace OHOS
-#endif  // I_SUBSCRIBER_EVENT_HANDLER_H
+#endif  // I_INTERCEPTOR_EVENT_HANDLER_H

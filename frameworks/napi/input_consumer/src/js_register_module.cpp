@@ -256,7 +256,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         return nullptr;
     }
 #else
-    MMI_HILOGW("Keyboard device dose not support");
+    MMI_HILOGW("Keyboard device does not support");
 #endif
     return nullptr;
 }
@@ -295,7 +295,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     delete event;
     event = nullptr;
 #else
-    MMI_HILOGW("Keyboard device dose not support");
+    MMI_HILOGW("Keyboard device does not support");
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     return nullptr;
 }

@@ -266,7 +266,7 @@ bool ConvertToShortcutKey(cJSON* jsonData, ShortcutKey &shortcutKey)
 }
 } // namespace
 
-KeyCommandManager::KeyCommandManager()
+KeyCommandManager::KeyCommandManager(int32_t priority) : IKeyCommandManager(priority)
 {
     std::string configFile = GetConfigFilePath();
     if (!FileExists(configFile)) {
@@ -515,9 +515,9 @@ void ShortcutKey::Print() const
         finalKey, ability.bundleName.c_str());
 }
 
-std::shared_ptr<IKeyCommandManager> IKeyCommandManager::CreateInstance()
+std::shared_ptr<IKeyCommandManager> IKeyCommandManager::CreateInstance(int32_t priority)
 {
-    return std::make_shared<KeyCommandManager>();
+    return std::make_shared<KeyCommandManager>(priority);
 }
 } // namespace MMI
 } // namespace OHOS

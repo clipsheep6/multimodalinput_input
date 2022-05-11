@@ -19,8 +19,12 @@
 #include <memory>
 
 #include "define_multimodal.h"
+#include "i_event_filter.h"
+#include "input_handler_type.h"
 #include "key_event.h"
+#include "key_option.h"
 #include "pointer_event.h"
+#include "uds_session.h"
 
 struct libinput_event;
 
@@ -28,11 +32,7 @@ namespace OHOS {
 namespace MMI {
 class IInputEventHandler {
 public:
-    enum class CreateMethod {
-        CONTRUCTOR,
-        CREATE_INSTANCE,
-    };
-    enum class HandlerType {
+    enum class EventHandlerType {
         NORMAL,
         INTERCEPTOR,
         SUBSCRIBER,
@@ -43,39 +43,50 @@ public:
     IInputEventHandler(int32_t priority = 0);
     DISALLOW_COPY_AND_MOVE(IInputEventHandler);
     virtual ~IInputEventHandler() = default;
-    virtual HandlerType GetHandlerType() const { return HandlerType::NORMAL; }
+    virtual EventHandlerType GetHandlerType() const { return EventHandlerType::NORMAL; }
+    virtual int32_t HandleLibinputEvent(libinput_event* event);
     virtual int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
     virtual int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
     virtual int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent);
 
     int32_t GetPriority() const;
-    int32_t AddMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
-    int32_t AddInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;    
-    int32_t AddSubscriber(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
-    int32_t RemoveMonitor(int32_t handlerId) = 0;
-    int32_t RemoveInterceptor(int32_t handlerId) = 0;    
-    int32_t RemoveSubscriber(int32_t handlerId) = 0;
 
-    template<class T, CreateMethod method = CreateMethod::CONTRUCTOR>
-    uint32_t AddHandler(int32_t priority = 0);
+    int32_t AddMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
+    int32_t RemoveMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
+    int32_t AddInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
+    void RemoveInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
+    void AddKeyInterceptor(int32_t sourceType, int32_t id, SessionPtr session) ;
+    void RemoveKeyInterceptor(int32_t id) ;
+    int32_t AddSubscriber(SessionPtr sess, int32_t subscribeId, const std::shared_ptr<KeyOption> keyOption);
+    int32_t RemoveSubscriber(SessionPtr sess, int32_t subscribeId) ;
+    int32_t AddFilter(sptr<IEventFilter> filter);
+
+    template<class T>
+    uint32_t AddConstructHandler(int32_t priority = 0);
+    template<class T>
+    uint32_t AddInstanceHandler(int32_t priority = 0);
 protected:
-    void SetNext(std::shared_ptr<IInputEventHandler> nextHandler);
+    uint32_t SetNext(std::shared_ptr<IInputEventHandler> nextHandler);
 protected:
     std::shared_ptr<IInputEventHandler> nextHandler_ = nullptr;
 private:
     int32_t priority_;
 };
 
-template<class T, CreateMethod method>
-uint32_t IInputEventHandler::AddHandler(int32_t priority = 0)
+template<class T>
+uint32_t IInputEventHandler::AddConstructHandler(int32_t priority)
 {
-    std::shared_ptr<PointerEvent> handler = nullptr;
-    if (method == CreateMethod::CONTRUCTOR) {
-        handler = std::make_shared<T>(priority);
-    } else {
-        handler = T::CreateInstance(priority);
+    auto handler = std::make_shared<T>(priority);
+    if (handler == nullptr) {
+        return RET_ERR;
     }
+    return SetNext(handler);
+}
 
+template<class T>
+uint32_t IInputEventHandler::AddInstanceHandler(int32_t priority)
+{
+    auto handler = T::CreateInstance(priority);
     if (handler == nullptr) {
         return RET_ERR;
     }

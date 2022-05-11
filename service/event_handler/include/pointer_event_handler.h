@@ -26,10 +26,8 @@ class PointerEventHandler : public IInputEventHandler {
 public:
     PointerEventHandler() = default;
     ~PointerEventHandler() = default;
-    int32_t HandleEvent(libinput_event* event);
+    int32_t HandleLibinputEvent(libinput_event* event) override;
     int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
-    void AddHandler(int priority, const std::shared_ptr<IInputEventHandler> handler);
-    void AddFinish();
 
 private:
     int32_t HandleTouchPadEvent(libinput_event* event);

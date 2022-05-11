@@ -25,13 +25,11 @@ namespace OHOS {
 namespace MMI {
 class KeyEventHandler : public IInputEventHandler {
 public:
-    KeyEventHandler() = default;
+    KeyEventHandler(int32_t priority);
     ~KeyEventHandler() = default;
-    int32_t HandleEvent(libinput_event* event);
+    int32_t HandleLibinputEvent(libinput_event* event) override;
     int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
-    void AddHandler(int priority, const std::shared_ptr<IInputEventHandler> handler);
-    void AddFinish();
-
+   
 private:
     void Repeat(const std::shared_ptr<KeyEvent> keyEvent);
     void AddHandleTimer(int32_t timeout = 300);

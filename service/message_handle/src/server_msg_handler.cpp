@@ -335,19 +335,19 @@ int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, NetPacket& pkt)
     CHKPB(southEventHandler_);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     do {
-        southEventHandler_->AddKeyMonitorHandler(handlerId, handlerType, sess);
+        southEventHandler_->AddKeyMonitor(handlerId, handlerType, sess);
     } while (0);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_POINTER
     do {
-        southEventHandler_->AddPointerInterceptorHandler(handlerId, handlerType, sess);
-        southEventHandler_->AddPointerMonitorHandler(handlerId, handlerType, sess);
+        southEventHandler_->AddPointerInterceptor(handlerId, handlerType, sess);
+        southEventHandler_->AddPointerMonitor(handlerId, handlerType, sess);
     } while (0);
 #endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     do {
-        southEventHandler_->AddTouchInterceptorHandler(handlerId, handlerType, sess);
-        southEventHandler_->AddTouchMonitorHandler(handlerId, handlerType, sess);
+        southEventHandler_->AddTouchInterceptor(handlerId, handlerType, sess);
+        southEventHandler_->AddTouchMonitor(handlerId, handlerType, sess);
     } while (0);
 #endif // OHOS_BUILD_ENABLE_TOUCH
     return RET_OK;
@@ -370,19 +370,19 @@ int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, NetPacket& pkt)
     CHKPR(southEventHandler_, ERROR_NULL_POINTER);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     do {
-        southEventHandler_->RemoveKeyMonitorHandler(handlerId, handlerType, sess);
+        southEventHandler_->RemoveKeyMonitor(handlerId, handlerType, sess);
     } while (0);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_POINTER
     do {
-        southEventHandler_->RemovePointerInterceptorHandler(handlerId, handlerType, sess);
-        southEventHandler_->RemovePointerMonitorHandler(handlerId, handlerType, sess);
+        southEventHandler_->RemovePointerInterceptor(handlerId, handlerType, sess);
+        southEventHandler_->RemovePointerMonitor(handlerId, handlerType, sess);
     } while (0);
 #endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     do {
-        southEventHandler_->RemoveTouchInterceptorHandler(handlerId, handlerType, sess);
-        southEventHandler_->RemoveTouchMonitorHandler(handlerId, handlerType, sess);
+        southEventHandler_->RemoveTouchInterceptor(handlerId, handlerType, sess);
+        southEventHandler_->RemoveTouchMonitor(handlerId, handlerType, sess);
     } while (0);
 #endif // OHOS_BUILD_ENABLE_TOUCH
     return RET_OK;
@@ -459,7 +459,7 @@ int32_t ServerMsgHandler::OnSubscribeKeyEvent(SessionPtr sess, NetPacket &pkt)
     keyOption->SetFinalKeyDown(isFinalKeyDown);
     keyOption->SetFinalKeyDownDuration(finalKeyDownDuration);
     CHKPR(southEventHandler_, ERROR_NULL_POINTER);
-    return southEventHandler_->SubscribeKeyEvent(sess, subscribeId, keyOption);
+    return southEventHandler_->AddSubscriber(sess, subscribeId, keyOption);
 }
 
 int32_t ServerMsgHandler::OnUnSubscribeKeyEvent(SessionPtr sess, NetPacket &pkt)
@@ -471,7 +471,7 @@ int32_t ServerMsgHandler::OnUnSubscribeKeyEvent(SessionPtr sess, NetPacket &pkt)
         return PACKET_READ_FAIL;
     }
     CHKPR(southEventHandler_, ERROR_NULL_POINTER);
-    return southEventHandler_->UnSubscribeKeyEvent(sess, subscribeId);
+    return southEventHandler_->RemoveSubscriber(sess, subscribeId);
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
@@ -742,7 +742,7 @@ int32_t ServerMsgHandler::OnAddTouchpadEventFilter(SessionPtr sess, NetPacket& p
         return PACKET_READ_FAIL;
     }
     CHKPR(southEventHandler_, ERROR_NULL_POINTER);
-    southEventHandler_->OnAddInterceptor(sourceType, id, sess);
+    southEventHandler_->AddKeyInterceptor(sourceType, id, sess);
     return RET_OK;
 }
 
@@ -756,7 +756,7 @@ int32_t ServerMsgHandler::OnRemoveTouchpadEventFilter(SessionPtr sess, NetPacket
         return PACKET_READ_FAIL;
     }
     CHKPR(southEventHandler_, ERROR_NULL_POINTER);
-    southEventHandler_->OnRemoveInterceptor(id);
+    southEventHandler_->RemoveKeyInterceptor(id);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD

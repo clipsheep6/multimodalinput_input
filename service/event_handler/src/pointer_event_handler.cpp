@@ -28,7 +28,7 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerEventHandler" };
 }
-int32_t PointerEventHandler::HandleEvent(libinput_event* event)
+int32_t PointerEventHandler::HandleLibinputEvent(libinput_event* event)
 {
     CALL_LOG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
@@ -83,26 +83,6 @@ int32_t PointerEventHandler::HandlePointerEvent(std::shared_ptr<PointerEvent> po
     return nextHandler_->HandlePointerEvent(pointerEvent);
 }
 
-void PointerEventHandler::AddHandler(int priority, const std::shared_ptr<IInputEventHandler> handler)
-{
-    CHKPV(handler);
-    pointerHandlerMap_.emplace(priority, handler);
-}
-
-void PointerEventHandler::AddFinish()
-{
-    std::shared_ptr<IInputEventHandler> tmpHandler = nullptr;
-    for (const auto &handler : pointerHandlerMap_) {
-        if (tmpHandler == nullptr) {
-            tmpHandler = handler.second;
-            SetNext(tmpHandler);
-        } else {
-            tmpHandler->SetNext(handler.second);
-            tmpHandler = handler.second;
-        }
-    }
-}
-
 int32_t PointerEventHandler::HandleTouchPadEvent(libinput_event* event)
 {
     auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH_PAD);
@@ -153,8 +133,8 @@ int32_t PointerEventHandler::HandleMouseEvent(libinput_event* event)
     MouseEventHdr->Normalize(event);
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    auto udsServer = IUdsServer::GetUdsServer();
-    CHKPV(udsServer);
+    auto udsServer = IUdsServer::GetInstance();
+    CHKPR(udsServer, ERROR_NULL_POINTER);
     auto keyEvent = udsServer->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();

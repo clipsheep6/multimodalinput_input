@@ -26,6 +26,7 @@
 #include "i_input_event_handler.h"
 #include "i_interceptor_handler_global.h"
 #include "i_interceptor_manager_global.h"
+#include "i_input_south_event_handler.h"
 #include "input_handler_manager_global.h"
 #include "key_event_subscriber.h"
 #include "mouse_event_handler.h"
@@ -47,15 +48,32 @@ public:
     void Init();
     void OnEvent(void *event);
     void OnCheckEventReport();
-    int32_t AddInputEventFilter(sptr<IEventFilter> filter);
-    std::shared_ptr<KeyEvent> GetKeyEvent() const;
+    std::shared_ptr<KeyEvent> GetKeyEvent() const override;
 
     int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
     int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
     int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
 
     // TODO:
+    int32_t AddPointerInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
+    void RemovePointerInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
+    int32_t AddTouchInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
+    void RemoveTouchInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;    
+    void AddKeyInterceptor(int32_t sourceType, int32_t id, SessionPtr session) override;
+    void RemoveKeyInterceptor(int32_t id) override;
+
+    void AddKeyMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
+    void RemoveKeyMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
+    void AddPointerMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
+    void RemovePointerMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
+    void AddTouchMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
+    void RemoveTouchMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
+
     int32_t AddSubscriber(SessionPtr sess, int32_t subscribeId, const std::shared_ptr<KeyOption> keyOption) override;
+    int32_t RemoveSubscriber(SessionPtr sess, int32_t subscribeId) override;
+
+    int32_t AddFilter(sptr<IEventFilter> filter) override;
+
 protected:
     int32_t OnEventDeviceAdded(libinput_event *event);
     int32_t OnEventDeviceRemoved(libinput_event *event);

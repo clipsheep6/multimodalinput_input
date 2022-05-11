@@ -17,6 +17,10 @@
 #define I_UDS_SERVER_H
 
 #include "iremote_broker.h"
+#include "key_event.h"
+#include "net_packet.h"
+#include "pointer_event.h"
+#include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {

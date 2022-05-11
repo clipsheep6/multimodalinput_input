@@ -22,6 +22,9 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IInterceptorManagerGlobal" };
 } // namespace
+
+IInterceptorManagerGlobal::IInterceptorManagerGlobal(int32_t priority) : IInputEventHandler(priority) {}
+
 int32_t IInterceptorManagerGlobal::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPR(keyEvent, ERROR_NULL_POINTER);
@@ -31,25 +34,25 @@ int32_t IInterceptorManagerGlobal::HandleKeyEvent(std::shared_ptr<KeyEvent> keyE
 }
 void IInterceptorManagerGlobal::OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session)
 {
-    MMI_HILOGD("Add inter module dose not support");
+    MMI_HILOGD("Add inter module does not support");
     return;
 }
 
 void IInterceptorManagerGlobal::OnRemoveInterceptor(int32_t id)
 {
-    MMI_HILOGD("Remove inter module dose not support");
+    MMI_HILOGD("Remove inter module does not support");
     return;
 }
 
 bool IInterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-    MMI_HILOGD("Key inter module dose not support");
+    MMI_HILOGD("Key inter module does not support");
     return false;
 }
 
-std::shared_ptr<IInterceptorManagerGlobal> IInterceptorManagerGlobal::CreateInstance()
+std::shared_ptr<IInterceptorManagerGlobal> IInterceptorManagerGlobal::CreateInstance(int32_t priority)
 {
-    return std::make_shared<IInterceptorManagerGlobal>();
+    return std::make_shared<IInterceptorManagerGlobal>(priority);
 }
 } // namespace MMI
 } // namespace OHOS

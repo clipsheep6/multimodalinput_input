@@ -19,26 +19,26 @@
 #include <mutex>
 
 #include "nocopyable.h"
-#include "singleton.h"
-
 #include "i_event_filter.h"
-
+#include "i_filter_event_handler.h"
 #include "i_input_event_handler.h"
+#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
-class EventFilterWrap : public IInputEventHandler {
+class EventFilterWrap : public IFilterEventHandler, public IInputEventHandler {
 public:
     EventFilterWrap();
     DISALLOW_COPY_AND_MOVE(EventFilterWrap);
     ~EventFilterWrap();
+    EventHandlerType GetHandlerType() const override { return EventHandlerType::FILTER; }
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
-    int32_t AddInputEventFilter(sptr<IEventFilter> filter);
+    int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
     bool HandlePointerEventFilter(std::shared_ptr<PointerEvent> point);
 private:
     std::mutex lockFilter_;

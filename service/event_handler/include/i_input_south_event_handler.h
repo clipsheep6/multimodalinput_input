@@ -18,22 +18,12 @@
 
 #include <memory>
 
-#include "nocopyable.h"
-#include "singleton.h"
-
-#include "event_dispatch.h"
 #include "i_event_filter.h"
-#include "i_input_event_handler.h"
-#include "i_interceptor_handler_global.h"
-#include "i_interceptor_manager_global.h"
-#include "input_handler_manager_global.h"
-#include "key_event_subscriber.h"
-#include "mouse_event_handler.h"
-#include "event_filter_wrap.h"
-#include "msg_handler.h"
-#include "key_event_handler.h"
-#include "pointer_event_handler.h"
-#include "touch_event_handler.h"
+#include "input_handler_type.h"
+#include "key_event.h"
+#include "key_option.h"
+#include "pointer_event.h"
+#include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
@@ -43,29 +33,27 @@ public:
     virtual int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) = 0;
 
-    virtual int32_t AddMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
-    virtual int32_t AddInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
+    virtual int32_t AddPointerInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
+    virtual void RemovePointerInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
+    virtual int32_t AddTouchInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
+    virtual void RemoveTouchInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;    
+    virtual void AddKeyInterceptor(int32_t sourceType, int32_t id, SessionPtr session) = 0;
+    virtual void RemoveKeyInterceptor(int32_t id) = 0;
+
+    virtual void AddKeyMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
+    virtual void RemoveKeyMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
+    virtual void AddPointerMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
+    virtual void RemovePointerMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
+    virtual void AddTouchMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
+    virtual void RemoveTouchMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
+
     virtual int32_t AddSubscriber(SessionPtr sess, int32_t subscribeId, const std::shared_ptr<KeyOption> keyOption) = 0;
-    virtual int32_t AddFilter(SessionPtr sess, int32_t subscribeId, const std::shared_ptr<KeyOption> keyOption) = 0;
+    virtual int32_t RemoveSubscriber(SessionPtr sess, int32_t subscribeId) = 0;
 
-    std::shared_ptr<KeyEvent> GetKeyEvent() const;
-    std::shared_ptr<IInputEventHandler> GetInputEventHandler() const;  
+    virtual int32_t AddFilter(sptr<IEventFilter> filter) = 0;
 
-    // std::shared_ptr<KeyEventHandler> GetKeyEventHandler() const;
-    // std::shared_ptr<PointerEventHandler> GetPointerEventHandler() const;
-    // std::shared_ptr<TouchEventHandler> GetTouchEventHandler() const;
-    
-    std::shared_ptr<IInterceptorManagerGlobal> GetKeyInterceptorHandler() const;
-    std::shared_ptr<KeyEventSubscriber> GetKeySubscriberHandler() const;
-    std::shared_ptr<InputHandlerManagerGlobal> GetKeyMonitorHandler() const;
+    virtual std::shared_ptr<KeyEvent> GetKeyEvent() const = 0;
 
-    std::shared_ptr<EventFilterWrap> GetPointerEventFilterHanlder() const;
-    std::shared_ptr<IInterceptorHandlerGlobal> GetPointerInterceptorHandler() const;
-    std::shared_ptr<InputHandlerManagerGlobal> GetPointerMonitorHandler() const;
-
-    std::shared_ptr<EventFilterWrap> GetTouchEventFilterHandler() const;
-    std::shared_ptr<IInterceptorHandlerGlobal> GetTouchInterceptorHandler() const;
-    std::shared_ptr<InputHandlerManagerGlobal> GetTouchMonitorHandler() const;
 };
 } // namespace MMI
 } // namespace OHOS

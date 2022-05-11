@@ -57,7 +57,7 @@ struct ShortcutKey {
 
 class KeyCommandManager : public IKeyCommandManager {
 public:
-    KeyCommandManager();
+    KeyCommandManager(int32_t priority);
     DISALLOW_COPY_AND_MOVE(KeyCommandManager);
     ~KeyCommandManager() = default;
     int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;

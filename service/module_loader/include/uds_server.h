@@ -54,7 +54,7 @@ public:
 
 public:
     virtual int32_t AddSocketPairInfo(const std::string& programName, const int32_t moduleType, const int32_t uid,
-                                      const int32_t pid, int32_t& serverFd, int32_t& toReturnClientFd);
+                                      const int32_t pid, int32_t& serverFd, int32_t& toReturnClientFd) override;
     SessionPtr GetSession(int32_t fd) const override;
 
 protected:

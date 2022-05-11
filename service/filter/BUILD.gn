@@ -17,10 +17,15 @@ event_filter_path = "${mmi_path}/service/filter"
 
 config("mmi_event_filter_config") {
   include_dirs = [
+    "//foundation/multimodalinput/input/frameworks/proxy/event_handler/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
+    "//foundation/multimodalinput/input/service/connect_manager/include",
     "//foundation/multimodalinput/input/service/event_handler/include",
+    "//foundation/multimodalinput/input/service/module_loader/include",
     "//foundation/multimodalinput/input/util/common/include",
+    "//foundation/multimodalinput/input/util/network/include",
+    "//foundation/multimodalinput/input/util/socket/include",
     "${event_filter_path}/include",
   ]
 }
