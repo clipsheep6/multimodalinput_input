@@ -17,8 +17,8 @@
 #define JS_UTIL_H
 
 #include <uv.h>
-#include <sstream>
 
+#include "stream_buffer.h"
 #include "define_device_impl.h"
 #include "input_device_impl_type.h"
 #include "napi/native_api.h"
@@ -56,14 +56,13 @@ public:
     static bool TypeOf(napi_env env, napi_value value, napi_valuetype type);
 };
 
-class AsyncContext : public RefBase {
-public:
+struct AsyncContext : RefBase {
     napi_env env = nullptr;
     napi_async_work work = nullptr;
     napi_deferred deferred = nullptr;
     napi_ref callback = nullptr;
     int32_t errorCode {-1};
-    std::stringstream reserve;
+    StreamBuffer reserve;
     AsyncContext(napi_env env) : env(env) {}
     ~AsyncContext();
 };
