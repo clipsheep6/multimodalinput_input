@@ -1,0 +1,25 @@
+{
+    "comment": "this file used to do xxxx",
+    "key": {
+        "KeyEventHandler": 1,
+        "IInterceptorManagerGlobal": 2,
+        "IKeyCommandManager": 2,
+        "KeyEventSubscriber": 2,
+        "InputHandlerManagerGlobal": 2,
+        "EventDispatch": 2
+    },
+    "pointer": {
+        "PointerEventHandler": 1,
+        "EventFilterWrap": 2,
+        "IInterceptorHandlerGlobal": 2,
+        "InputHandlerManagerGlobal": 2,
+        "EventDispatch": 2
+    },
+    "touch": {
+        "TouchEventHandler": 1,
+        "EventFilterWrap": 2,
+        "IInterceptorHandlerGlobal": 2,
+        "InputHandlerManagerGlobal": 2,
+        "EventDispatch": 2
+    },
+  }

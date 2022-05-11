@@ -212,6 +212,10 @@ int32_t InputEventHandler::OnEventHandler(libinput_event *event)
 
 void InputEventHandler::BuildInputHandlerChain()
 {
+    EventHandlerBuilder build;
+    build.ParseConfigFile();
+    keyEventHandler_ = build.BuildChainKey();
+
     keyEventHandler_ = std::make_shared<IInputEventHandler>();
     pointerEventHandler_ = std::make_shared<IInputEventHandler>();
     touchEventHandler_ = std::make_shared<IInputEventHandler>();
