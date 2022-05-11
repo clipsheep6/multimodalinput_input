@@ -16,12 +16,13 @@
 #define I_SUBSCRIBER_EVENT_HANDLER_H
 #include <memory>
 
+#include "i_input_event_handler.h"
 #include "key_option.h"
 #include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
-class ISubscriberEventHandler {
+class ISubscriberEventHandler : public IInputEventHandler {
 public:
     virtual int32_t SubscribeKeyEvent(SessionPtr sess, int32_t subscribeId,
             const std::shared_ptr<KeyOption> keyOption) = 0;

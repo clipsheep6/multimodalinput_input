@@ -30,7 +30,7 @@
 
 namespace OHOS {
 namespace MMI {
-class InputHandlerManagerGlobal : public IMonitorEventHandler, public IInputEventHandler {
+class InputHandlerManagerGlobal : public IMonitorEventHandler {
 public:
     InputHandlerManagerGlobal(int priority);
     virtual ~InputHandlerManagerGlobal() = default;

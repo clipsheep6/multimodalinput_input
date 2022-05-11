@@ -27,7 +27,7 @@
 
 namespace OHOS {
 namespace MMI {
-class IInterceptorHandlerGlobal : public IInterceptorEventHandler, public IInputEventHandler {
+class IInterceptorHandlerGlobal : public IInterceptorEventHandler {
 public:
     IInterceptorHandlerGlobal(int32_t priority);
     ~IInterceptorHandlerGlobal() = default;
