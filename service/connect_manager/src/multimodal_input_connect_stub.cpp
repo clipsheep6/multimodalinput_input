@@ -19,11 +19,11 @@
 #include <sys/socket.h>
 
 #include "string_ex.h"
-#include "accesstoken_kit.h"
 
 #include "error_multimodal.h"
 #include "mmi_log.h"
 #include "multimodal_input_connect_define.h"
+#include "permission_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -104,47 +104,12 @@ int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data,
     return RET_OK;
 }
 
-bool MultimodalInputConnectStub::CheckPermission()
-{
-    auto tokenId = IPCSkeleton::GetCallingTokenID();
-    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
-    if (tokenType == OHOS::Security::AccessToken::TOKEN_HAP) {
-        OHOS::Security::AccessToken::HapTokenInfo findInfo;
-        if (OHOS::Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenId, findInfo) != 0) {
-            MMI_HILOGE("GetHapTokenInfo failed");
-            return false;
-        }
-        if (findInfo.apl == OHOS::Security::AccessToken::APL_SYSTEM_BASIC ||
-            findInfo.apl == OHOS::Security::AccessToken::APL_SYSTEM_CORE) {
-            MMI_HILOGI("check hap permisson success");
-            return true;
-        }
-        MMI_HILOGE("check hap permisson failed");
-        return false;
-    }
-    if (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE) {
-        OHOS::Security::AccessToken::NativeTokenInfo findInfo;
-        if (OHOS::Security::AccessToken::AccessTokenKit::GetNativeTokenInfo(tokenId, findInfo) != 0) {
-            MMI_HILOGE("GetNativeTokenInfo failed");
-            return false;
-        }
-        if (findInfo.apl == OHOS::Security::AccessToken::APL_SYSTEM_BASIC ||
-            findInfo.apl == OHOS::Security::AccessToken::APL_SYSTEM_CORE) {
-            MMI_HILOGI("check native permisson success");
-            return true;
-        }
-        MMI_HILOGE("check native permisson failed");
-        return false;
-    }
-    
-    MMI_HILOGE("unsupported token type:%{public}d", tokenType);
-    return false;
-}
-
 int32_t MultimodalInputConnectStub::StubSetPointerVisible(MessageParcel& data, MessageParcel& reply)
 {
     CALL_LOG_ENTER;
-    if (!CheckPermission()) {
+    int32_t required = (1 << OHOS::Security::AccessToken::APL_SYSTEM_BASIC) +
+        (1 << OHOS::Security::AccessToken::APL_SYSTEM_CORE);
+    if (!PermissionManager::GetInstance()->CheckPermission(required)) {
         MMI_HILOGE("permission check fail");
         return CHECK_PERMISSION_FAIL;
     }
