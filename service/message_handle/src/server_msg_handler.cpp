@@ -279,14 +279,13 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
         pkt.Read(info.focusWindowId);
 
         std::vector<WindowInfo> windowInfos;
-        pkt >> windowInfos;
-        // int32_t numWindow = 0;
-        // pkt.Read(numWindow);
-        // for (int32_t j = 0; j < numWindow; j++) {
-        //     WindowInfo info;
-        //     pkt.Read(info);
-        //     windowInfos.push_back(info);
-        // }
+        int32_t numWindow = 0;
+        pkt.Read(numWindow);
+        for (int32_t j = 0; j < numWindow; j++) {
+            WindowInfo info;
+            pkt.Read(info);
+            windowInfos.push_back(info);
+        }
         info.windowsInfo = windowInfos;
         logicalDisplays.push_back(info);
     }
@@ -510,47 +509,53 @@ int32_t ServerMsgHandler::OnSupportKeys(SessionPtr sess, NetPacket& pkt)
 {
     CALL_LOG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
+    // int32_t userData;
+    // if (!pkt.Read(userData)) {
+    //     MMI_HILOGE("Packet read userData failed");
+    //     return RET_ERR;
+    // }
+    // int32_t deviceId;
+    // if (!pkt.Read(deviceId)) {
+    //     MMI_HILOGE("Packet read device failed");
+    //     return RET_ERR;
+    // }
+    // size_t size;
+    // if (!pkt.Read(size)) {
+    //     MMI_HILOGE("Packet read size failed");
+    //     return RET_ERR;
+    // }
+    // int32_t sysKeyValue;
+    // std::vector<int32_t> keyCode;
+    // for (size_t i = 0 ; i < size; ++i) {
+    //     if (!pkt.Read(sysKeyValue)) {
+    //         MMI_HILOGE("Packet read nativeKeyValue failed");
+    //         return RET_ERR;
+    //     }
+    //     keyCode.push_back(sysKeyValue);
+    // }
     int32_t userData;
-    if (!pkt.Read(userData)) {
-        MMI_HILOGE("Packet read userData failed");
-        return RET_ERR;
-    }
     int32_t deviceId;
-    if (!pkt.Read(deviceId)) {
-        MMI_HILOGE("Packet read device failed");
-        return RET_ERR;
-    }
-    size_t size;
-    if (!pkt.Read(size)) {
-        MMI_HILOGE("Packet read size failed");
-        return RET_ERR;
-    }
-    int32_t sysKeyValue;
     std::vector<int32_t> keyCode;
-    for (size_t i = 0 ; i < size; ++i) {
-        if (!pkt.Read(sysKeyValue)) {
-            MMI_HILOGE("Packet read nativeKeyValue failed");
-            return RET_ERR;
-        }
-        keyCode.push_back(sysKeyValue);
-    }
+    pkt >> userData >> deviceId >> keyCode;
 
     std::vector<bool> keystroke = InputDevMgr->SupportKeys(deviceId, keyCode);
+    // NetPacket pkt2(MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY);
+    // if (!pkt2.Write(userData)) {
+    //     MMI_HILOGE("Packet write userData failed");
+    //     return RET_ERR;
+    // }
+    // if (!pkt2.Write(keystroke.size())) {
+    //     MMI_HILOGE("Packet write size failed");
+    //     return RET_ERR;
+    // }
+    // for (const auto &item : keystroke) {
+    //     if (!pkt2.Write(static_cast<bool>(item))) {
+    //         MMI_HILOGE("Packet write keystroke failed");
+    //         return RET_ERR;
+    //     }
+    // }
     NetPacket pkt2(MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY);
-    if (!pkt2.Write(userData)) {
-        MMI_HILOGE("Packet write userData failed");
-        return RET_ERR;
-    }
-    if (!pkt2.Write(keystroke.size())) {
-        MMI_HILOGE("Packet write size failed");
-        return RET_ERR;
-    }
-    for (const auto &item : keystroke) {
-        if (!pkt2.Write(static_cast<bool>(item))) {
-            MMI_HILOGE("Packet write keystroke failed");
-            return RET_ERR;
-        }
-    }
+    pkt2 << userData << keystroke;
     if (!sess->SendMsg(pkt2)) {
         MMI_HILOGE("Sending failed");
         return MSG_SEND_FAIL;

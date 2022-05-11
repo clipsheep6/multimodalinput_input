@@ -129,6 +129,68 @@ bool MultimodalInputConnectStub::CheckPermission(uint32_t code)
     return true;
 }
 
+int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_LOG_ENTER;
+    int32_t ret = RET_OK;
+
+    do {
+        const int32_t uid = GetCallingUid();
+        if (uid != SYSTEM_UID && uid != ROOT_UID) {
+            MMI_HILOGE("check failed, uid is not root or system");
+            ret = SASERVICE_PERMISSION_FAIL;
+            break;
+        }
+
+        sptr<IRemoteObject> client = data.ReadRemoteObject();
+        if (client == nullptr) {
+            MMI_HILOGE("mouse client is nullptr");
+            ret = ERR_INVALID_VALUE;
+            break;
+        }
+
+        sptr<IEventFilter> filter = iface_cast<IEventFilter>(client);
+        if (filter == nullptr) {
+            MMI_HILOGE("filter is nullptr");
+            ret = ERROR_NULL_POINTER;
+            break;
+        }
+
+        MMI_HILOGD("filter iface_cast succeeded");
+
+        ret = AddInputEventFilter(filter);
+    } while (0);
+    
+    if (!reply.WriteInt32(ret)) {
+        MMI_HILOGE("WriteInt32:%{public}d fail", ret);
+        return IPC_STUB_WRITE_PARCEL_ERR;
+    }
+
+    MMI_HILOGD("ret:%{public}d", ret);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetPointerVisible(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_LOG_ENTER;
+    if (!CheckPermission()) {
+        MMI_HILOGE("permission check fail");
+        return CHECK_PERMISSION_FAIL;
+    }
+    int32_t ret;
+    bool visible;
+    if (!data.ReadBool(visible)) {
+        MMI_HILOGE("data ReadBool fail");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+    ret = SetPointerVisible(visible);
+    if (!reply.WriteInt32(ret)) {
+        MMI_HILOGE("WriteInt32:%{public}d fail", ret);
+        return IPC_STUB_WRITE_PARCEL_ERR;
+    }
+    return RET_OK;
+}
+
 int32_t MultimodalInputConnectStub::StubIsPointerVisible(MessageParcel& data, MessageParcel& reply)
 {
     CALL_LOG_ENTER;
