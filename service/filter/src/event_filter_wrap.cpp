@@ -24,7 +24,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventFilterWrap" };
 } // namespace
 
-EventFilterWrap::EventFilterWrap(int32_t priority) : IInputEventHandler(priority)
+EventFilterWrap::EventFilterWrap(int32_t priority) : IFilterEventHandler(priority)
 {
     CALL_LOG_ENTER;
 }

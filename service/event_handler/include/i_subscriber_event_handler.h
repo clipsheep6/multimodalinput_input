@@ -24,6 +24,7 @@ namespace OHOS {
 namespace MMI {
 class ISubscriberEventHandler : public IInputEventHandler {
 public:
+    ISubscriberEventHandler(int32_t priority) : IInputEventHandler(priority) {};
     virtual int32_t SubscribeKeyEvent(SessionPtr sess, int32_t subscribeId,
             const std::shared_ptr<KeyOption> keyOption) = 0;
     virtual int32_t UnSubscribeKeyEvent(SessionPtr sess, int32_t subscribeId) = 0;

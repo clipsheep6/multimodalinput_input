@@ -29,7 +29,7 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputHandlerManagerGlobal" };
 } // namespace
-InputHandlerManagerGlobal::InputHandlerManagerGlobal(int32_t priority) : IInputEventHandler(priority) {}
+InputHandlerManagerGlobal::InputHandlerManagerGlobal(int32_t priority) : IMonitorEventHandler(priority) {}
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t InputHandlerManagerGlobal::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)

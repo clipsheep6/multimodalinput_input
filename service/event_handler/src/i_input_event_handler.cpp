@@ -28,6 +28,11 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IInputEventHandler" };
 }
 
+IInputEventHandler::IInputEventHandler(int32_t priority) 
+{
+    priority_ = priority;
+};
+
 int32_t IInputEventHandler::HandleLibinputEvent(libinput_event* event)
 {
     if (nextHandler_ == nullptr) {
@@ -64,6 +69,10 @@ int32_t IInputEventHandler::HandleTouchEvent(std::shared_ptr<PointerEvent> point
     return nextHandler_->HandleTouchEvent(pointerEvent);
 }
 
+int32_t IInputEventHandler::GetPriority() const
+{
+    return priority_;
+}
 int32_t IInputEventHandler::AddInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session)
 {
     std::shared_ptr<IInputEventHandler> cur = std::shared_ptr<IInputEventHandler>(this);

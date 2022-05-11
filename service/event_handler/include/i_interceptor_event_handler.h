@@ -26,6 +26,7 @@ namespace OHOS {
 namespace MMI {
 class IInterceptorEventHandler : public IInputEventHandler {
 public:
+    IInterceptorEventHandler(int32_t priority) : IInputEventHandler(priority) {};
     virtual int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
     virtual void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
 };

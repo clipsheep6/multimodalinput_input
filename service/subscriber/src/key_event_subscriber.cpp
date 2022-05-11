@@ -31,7 +31,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "KeyEve
 constexpr uint32_t MAX_PRE_KEY_COUNT = 4;
 } // namespace
 
-KeyEventSubscriber::KeyEventSubscriber(int32_t priority) : IInputEventHandler(priority) {}
+KeyEventSubscriber::KeyEventSubscriber(int32_t priority) : ISubscriberEventHandler(priority) {}
 
 int32_t KeyEventSubscriber::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
