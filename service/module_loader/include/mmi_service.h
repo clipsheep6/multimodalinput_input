@@ -52,6 +52,7 @@ public:
         int32_t &toReturnClientFd, int32_t pid = 0, int32_t uid = 0) override;
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
     virtual int32_t SetPointerVisible(bool visible) override;
+    virtual int32_t IsPointerVisible(bool &visible) override;
 #ifdef OHOS_RSS_CLIENT
     virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
 #endif
