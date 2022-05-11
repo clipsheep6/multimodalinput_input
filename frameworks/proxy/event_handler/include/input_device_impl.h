@@ -23,6 +23,7 @@
 #include "nocopyable.h"
 
 #include "mmi_event_handler.h"
+#include "input_device_impl_type.h"
 
 namespace OHOS {
 namespace MMI {
@@ -31,27 +32,6 @@ public:
     static InputDeviceImpl& GetInstance();
     DISALLOW_COPY_AND_MOVE(InputDeviceImpl);
     ~InputDeviceImpl() = default;
-
-    struct AxisInfo {
-        int32_t axisType = 0;
-        int32_t min = 0;
-        int32_t max = 0;
-        int32_t fuzz = 0;
-        int32_t flat = 0;
-        int32_t resolution = 0;
-    };
-    struct InputDeviceInfo {
-        int32_t id = -1;
-        std::string name = "null";
-        uint32_t deviceType = 0;
-        int32_t busType = 0;
-        int32_t product = 0;
-        int32_t vendor = 0;
-        int32_t version = 0;
-        std::string phys = "null";
-        std::string uniq = "null";
-        std::vector<AxisInfo> axis;
-    };
 
     using CppFunInputDevInfo = std::function<void(const std::shared_ptr<InputDeviceInfo>)>;
     using CppFunInputDevIds = std::function<void(std::vector<int32_t>&)>;
@@ -113,5 +93,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#define InputDevImpl OHOS::MMI::InputDeviceImpl::GetInstance()
 #endif // OHOS_INPUT_DEVICE_EVENT_H

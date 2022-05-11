@@ -21,7 +21,8 @@
 
 #include "bytrace_adapter.h"
 #include "define_interceptor_manager.h"
-#include "input_device_impl.h"
+#include "define_device_impl.h"
+#include "input_device_impl_type.h"
 #include "input_event_data_transformation.h"
 #include "input_event_monitor_manager.h"
 #include "input_handler_manager.h"
@@ -254,15 +255,15 @@ int32_t ClientMsgHandler::OnInputDevice(const UDSClient& client, NetPacket& pkt)
     CALL_LOG_ENTER;
     int32_t userData;
     size_t size;
-    auto devData = std::make_shared<InputDeviceImpl::InputDeviceInfo>();
+    auto devData = std::make_shared<InputDeviceInfo>();
     pkt >> userData >> devData->id >> devData->name >> devData->deviceType >> devData->busType >> devData->product
         >> devData->vendor >> devData->version >> devData->phys >> devData->uniq >> size;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read basic data failed");
         return PACKET_READ_FAIL;
     }
-    std::vector<InputDeviceImpl::AxisInfo> axisInfo;
-    InputDeviceImpl::AxisInfo axis;
+    std::vector<ImplAxisInfo> axisInfo;
+    ImplAxisInfo axis;
     for (size_t i = 0; i < size; ++i) {
         pkt >> axis.axisType >> axis.min >> axis.max >> axis.fuzz >> axis.flat >> axis.resolution;
         if (pkt.ChkRWError()) {
@@ -316,7 +317,7 @@ int32_t ClientMsgHandler::OnDevMonitor(const UDSClient& client, NetPacket& pkt)
         MMI_HILOGE("Packet read deviceId failed");
         return RET_ERR;
     }
-    InputDeviceImpl::GetInstance().OnDevMonitor(type, deviceId);
+    InputDevImpl.OnDevMonitor(type, deviceId);
     return RET_OK;
 }
 

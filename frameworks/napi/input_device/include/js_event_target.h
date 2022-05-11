@@ -23,7 +23,8 @@
 
 #include "define_multimodal.h"
 #include "error_multimodal.h"
-#include "input_device_impl.h"
+#include "define_device_impl.h"
+#include "input_device_impl_type.h"
 #include "input_manager.h"
 
 #include "js_util.h"
@@ -37,7 +38,7 @@ public:
     DISALLOW_COPY_AND_MOVE(JsEventTarget);
     static void TargetOn(std::string type, int32_t deviceId);
     static void EmitJsIds(int32_t userData, std::vector<int32_t> &ids);
-    static void EmitJsDev(int32_t userData, std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device);
+    static void EmitJsDev(int32_t userData, std::shared_ptr<InputDeviceInfo> device);
     static void EmitJsKeystrokeAbility(int32_t userData, std::vector<bool> &keystrokeAbility);
     static void EmitJsKeyboardType(int32_t userData, int32_t keyboardType);
     void AddMonitor(napi_env env, std::string type, napi_value handle);

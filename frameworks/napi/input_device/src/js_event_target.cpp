@@ -308,7 +308,7 @@ void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
 #endif
 }
 
-void JsEventTarget::EmitJsDev(int32_t userData, std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device)
+void JsEventTarget::EmitJsDev(int32_t userData, std::shared_ptr<InputDeviceInfo> device)
 {
     CALL_LOG_ENTER;
 #ifdef OHOS_BUILD_DEVICE_MANAGER_API
