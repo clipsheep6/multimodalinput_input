@@ -360,17 +360,18 @@ int32_t InputManagerImpl::PackLogicalDisplay(NetPacket &pkt)
             MMI_HILOGE("Packet write logical focusWindow failed");
             return RET_ERR;
         }
-        int32_t numWindow = static_cast<int32_t>(logicalDisplays_[i].windowsInfo.size());
-        if (!pkt.Write(numWindow)) {
-            MMI_HILOGE("Packet write logical numWindow failed");
-            return RET_ERR;
-        }
-        for (int32_t j = 0; j < numWindow; j++) {
-            if (!pkt.Write(logicalDisplays_[i].windowsInfo[j])) {
-                MMI_HILOGE("Packet write logical windowsInfo failed");
-                return RET_ERR;
-            }
-        }
+        pkt << logicalDisplays_[i].windowsInfo;
+        // int32_t numWindow = static_cast<int32_t>(logicalDisplays_[i].windowsInfo.size());
+        // if (!pkt.Write(numWindow)) {
+        //     MMI_HILOGE("Packet write logical numWindow failed");
+        //     return RET_ERR;
+        // }
+        // for (int32_t j = 0; j < numWindow; j++) {
+        //     if (!pkt.Write(logicalDisplays_[i].windowsInfo[j])) {
+        //         MMI_HILOGE("Packet write logical windowsInfo failed");
+        //         return RET_ERR;
+        //     }
+        // }
     }
     return RET_OK;
 }

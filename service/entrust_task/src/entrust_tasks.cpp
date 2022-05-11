@@ -83,6 +83,19 @@ bool EntrustTasks::PostSyncTask(int32_t pid, ETaskCallback callback, int32_t tim
     return (res == std::future_status::ready);
 }
 
+template<typename T>
+bool EntrustTasks::PostSyncTask(ETaskCallback callback, T& ret, int32_t timeout)
+{
+    std::promise<T> promise;
+    auto future = promise.get_future();
+    return true;
+}
+
+bool EntrustTasks::PostAsyncTask(ETaskCallback callback)
+{
+    return true;
+}
+
 bool EntrustTasks::PostTask(int32_t pid, Promise *promise, ETaskCallback callback)
 {
     CALL_LOG_ENTER2;

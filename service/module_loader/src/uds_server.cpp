@@ -45,7 +45,6 @@ UDSServer::~UDSServer()
 
 void UDSServer::UdsStop()
 {
-    isRunning_ = false;
     if (epollFd_ != -1) {
         close(epollFd_);
         epollFd_ = -1;

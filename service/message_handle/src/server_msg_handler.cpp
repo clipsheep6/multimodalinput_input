@@ -279,13 +279,14 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
         pkt.Read(info.focusWindowId);
 
         std::vector<WindowInfo> windowInfos;
-        int32_t numWindow = 0;
-        pkt.Read(numWindow);
-        for (int32_t j = 0; j < numWindow; j++) {
-            WindowInfo info;
-            pkt.Read(info);
-            windowInfos.push_back(info);
-        }
+        pkt >> windowInfos;
+        // int32_t numWindow = 0;
+        // pkt.Read(numWindow);
+        // for (int32_t j = 0; j < numWindow; j++) {
+        //     WindowInfo info;
+        //     pkt.Read(info);
+        //     windowInfos.push_back(info);
+        // }
         info.windowsInfo = windowInfos;
         logicalDisplays.push_back(info);
     }

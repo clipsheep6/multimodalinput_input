@@ -38,10 +38,11 @@ public:
         int32_t pid;
         int32_t taskId;
     };
+    template<typename T>
     class Task {
     public:
-        using Promise = std::promise<void>;
-        using Future = std::future<void>;
+        using Promise = std::promise<T>;
+        using Future = std::future<T>;
         using TaskPtr = std::shared_ptr<EntrustTasks::Task>;
         Task(int32_t id, Promise *promise, ETaskCallback fun)
             : id_(id), fun_(fun), promise_(promise) {}
@@ -56,7 +57,7 @@ public:
     private:
         int32_t id_ = 0;
         ETaskCallback fun_;
-        Promise* promise_ = nullptr;
+        std::promise<T>* promise_ = nullptr;
     };
     using TaskPtr = Task::TaskPtr;
     using Promise = Task::Promise;
@@ -68,6 +69,10 @@ public:
 
     bool Init();
     void ProcessTasks(uint64_t stid, int32_t pid);
+    template<typename T>
+    bool PostSyncTask(ETaskCallback callback, T& ret, int32_t timeout = ET_DEFINE_TIMEOUT);
+    bool PostAsyncTask(ETaskCallback callback);
+
     bool PostSyncTask(int32_t pid, ETaskCallback callback, int32_t timeout = ET_DEFINE_TIMEOUT);
 
     int32_t GetReadFd() const
