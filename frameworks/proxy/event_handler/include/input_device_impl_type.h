@@ -15,7 +15,6 @@
 #ifndef INPUT_DEVICE_IMPL_TYPE_H
 #define INPUT_DEVICE_IMPL_TYPE_H
 
-#include <vector>
 #include <string>
 
 namespace OHOS {

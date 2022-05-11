@@ -90,6 +90,7 @@ napi_value JsInputDeviceManager::GetDevice(napi_env env, int32_t id, napi_value 
 napi_value getResult(sptr<AsyncContext> asyncContext)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     napi_env env = asyncContext->env;
     napi_value results;
     ReturnType resultType;
@@ -106,6 +107,10 @@ napi_value getResult(sptr<AsyncContext> asyncContext)
         CHKRP(env, napi_get_undefined(env, &results), GET_UNDEFINED);
     }
     return results;
+#else
+    MMI_HILOGW("device manager dose not support");
+    return nullptr;
+#endif
 }
 
 void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
@@ -175,11 +180,16 @@ napi_value JsInputDeviceManager::SetPointerVisible(napi_env env, bool visible, n
     }
     AsyncCallbackWork(asyncContext);
     return promise;
+#else
+    MMI_HILOGW("device manager dose not support");
+    return nullptr;
+#endif
 }
 
 napi_value JsInputDeviceManager::IsPointerVisible(napi_env env, napi_value handle)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
     if (asyncContext == nullptr) {
         THROWERR(env, "create AsyncContext failed");
