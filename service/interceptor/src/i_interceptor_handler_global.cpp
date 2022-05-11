@@ -22,6 +22,9 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IInterceptorHandlerGlobal" };
 } // namespace
+
+IInterceptorHandlerGlobal::IInterceptorHandlerGlobal(int32_t priority) : IInputEventHandler(priority) {}
+
 int32_t IInterceptorHandlerGlobal::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(keyEvent, ERROR_NULL_POINTER);
@@ -64,9 +67,9 @@ bool IInterceptorHandlerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointe
     return false;
 }
 
-std::shared_ptr<IInterceptorHandlerGlobal> IInterceptorHandlerGlobal::CreateInstance()
+std::shared_ptr<IInterceptorHandlerGlobal> IInterceptorHandlerGlobal::CreateInstance(int32_t priority)
 {
-    return std::make_shared<IInterceptorHandlerGlobal>();
+    return std::make_shared<IInterceptorHandlerGlobal>(priority);
 }
 } // namespace MMI
 } // namespace OHOS

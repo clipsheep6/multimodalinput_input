@@ -98,7 +98,7 @@ static void CheckDefine()
 #endif
 }
 
-IUdsServer *IUdsServer::GetInstance()
+std::shared_ptr<IUdsServer> IUdsServer::GetInstance()
 {
     // auto sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     // if (sm == nullptr) {
@@ -178,7 +178,7 @@ bool MMIService::InitLibinputService()
     MMI_HILOGD("HDF Init");
     hdfEventManager.SetupCallback();
 #endif
-    if (!(libinputAdapter_.Init(std::bind(&InputEventHandler::OnEvent, southEventHandler_, std::placeholders::_1),
+    if (!(libinputAdapter_.Init(std::bind(&InputEventHandler::OnEvent, &southEventHandler_, std::placeholders::_1),
         DEF_INPUT_SEAT))) {
         MMI_HILOGE("libinput init, bind failed");
         return false;
@@ -223,7 +223,7 @@ int32_t MMIService::Init()
     CheckDefine();
 
     MMI_HILOGD("InputEventHandler Init");
-    southEventHandler_->Init();
+    southEventHandler_.Init();
 
     MMI_HILOGD("ServerMsgHandler Init");
     sMsgHandler_.Init(&southEventHandler_);
@@ -383,17 +383,17 @@ int32_t MMIService::IsPointerVisible(bool &visible)
 
 int32_t MMIService::HandleNonConsumedTouchEvent(std::shared_ptr<PointerEvent> event)
 {
-    return southEventHandler_->HandleTouchEvent(event);
+    return southEventHandler_.HandleTouchEvent(event);
 }
 
 int32_t MMIService::HandleTimerPointerEvent(std::shared_ptr<PointerEvent> event)
 {
-    return southEventHandler_->HandlePointerEvent(event);
+    return southEventHandler_.HandlePointerEvent(event);
 }
 
 std::shared_ptr<KeyEvent> MMIService::GetKeyEvent() const
 {
-    return southEventHandler_->GetKeyEvent();    
+    return southEventHandler_.GetKeyEvent();    
 }
 
 #ifdef OHOS_RSS_CLIENT

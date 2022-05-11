@@ -32,7 +32,7 @@ namespace OHOS {
 namespace MMI {
 class InputHandlerManagerGlobal : public IMonitorEventHandler, public IInputEventHandler {
 public:
-    InputHandlerManagerGlobal() = default;
+    InputHandlerManagerGlobal(int priority);
     virtual ~InputHandlerManagerGlobal() = default;
     DISALLOW_COPY_AND_MOVE(InputHandlerManagerGlobal);
     EventHandlerType GetHandlerType() const override { return EventHandlerType::MONITOR; }
@@ -47,7 +47,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_TOUCH
     int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
     void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
-    void MarkConsumed(int32_t handlerId, int32_t eventId, SessionPtr session);
+    void MarkConsumed(int32_t handlerId, int32_t eventId, SessionPtr session) override;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD

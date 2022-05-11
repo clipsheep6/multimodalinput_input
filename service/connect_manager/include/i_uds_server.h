@@ -26,7 +26,7 @@ namespace OHOS {
 namespace MMI {
 class IUdsServer : public RefBase {
 public:
-    static IUdsServer *GetInstance();
+    static std::shared_ptr<IUdsServer> GetInstance();
     virtual bool SendMsg(int32_t fd, NetPacket& pkt) = 0;
     virtual int32_t AddSocketPairInfo(const std::string& programName, const int32_t moduleType, const int32_t uid,
         const int32_t pid, int32_t& serverFd, int32_t& toReturnClientFd) = 0;

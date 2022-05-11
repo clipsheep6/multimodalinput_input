@@ -18,6 +18,7 @@
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "event_dispatch.h"
+#include "i_input_event_handler.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "mmi_log.h"
@@ -30,7 +31,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InterceptorHandlerGlobal" };
 } // namespace
 
-InterceptorHandlerGlobal::InterceptorHandlerGlobal() {}
+InterceptorHandlerGlobal::InterceptorHandlerGlobal(int32_t priority) : IInterceptorHandlerGlobal(priority) {}
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
 int32_t InterceptorHandlerGlobal::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
@@ -119,7 +120,7 @@ void InterceptorHandlerGlobal::InitSessionLostCallback()
         MMI_HILOGE("Init session is failed");
         return;
     }
-    auto udsServerPtr = IUDSServer::GetInstance();
+    auto udsServerPtr = IUdsServer::GetInstance();
     CHKPV(udsServerPtr);
     udsServerPtr->AddSessionDeletedCallback(std::bind(
         &InterceptorHandlerGlobal::OnSessionLost, this, std::placeholders::_1));
@@ -244,9 +245,9 @@ void InterceptorHandlerGlobal::InterceptorCollection::OnSessionLost(SessionPtr s
     }
 }
 
-std::shared_ptr<IInterceptorHandlerGlobal> IInterceptorHandlerGlobal::CreateInstance()
+std::shared_ptr<IInterceptorHandlerGlobal> IInterceptorHandlerGlobal::CreateInstance(int32_t priority)
 {
-    return std::make_shared<InterceptorHandlerGlobal>();
+    return std::make_shared<InterceptorHandlerGlobal>(priority);
 }
 } // namespace MMI
 } // namespace OHOS

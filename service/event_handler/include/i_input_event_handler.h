@@ -52,7 +52,8 @@ public:
     int32_t GetPriority() const;
 
     int32_t AddMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
-    int32_t RemoveMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
+    void RemoveMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
+    void TouchMonitorHandlerMarkConsumed(int32_t monitorId, int32_t eventId, SessionPtr sess);
     int32_t AddInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     void RemoveInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     void AddKeyInterceptor(int32_t sourceType, int32_t id, SessionPtr session) ;

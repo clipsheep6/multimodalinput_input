@@ -28,7 +28,7 @@ namespace OHOS {
 namespace MMI {
 class EventFilterWrap : public IFilterEventHandler, public IInputEventHandler {
 public:
-    EventFilterWrap();
+    EventFilterWrap(int32_t priority);
     DISALLOW_COPY_AND_MOVE(EventFilterWrap);
     ~EventFilterWrap();
     EventHandlerType GetHandlerType() const override { return EventHandlerType::FILTER; }

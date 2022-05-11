@@ -47,7 +47,7 @@ ServerMsgHandler::ServerMsgHandler() {}
 
 ServerMsgHandler::~ServerMsgHandler() {}
 
-void ServerMsgHandler::Init(InputSouthEventHandler *southEventHandler)
+void ServerMsgHandler::Init(IInputSouthEventHandler *southEventHandler)
 {
     southEventHandler_ = southEventHandler;
 #ifdef OHOS_BUILD_HDF
@@ -332,7 +332,7 @@ int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, NetPacket& pkt)
         return RET_ERR;
     }
     MMI_HILOGD("handler:%{public}d,handlerType:%{public}d", handlerId, handlerType);
-    CHKPB(southEventHandler_);
+    CHKPR(southEventHandler_, ERROR_NULL_POINTER);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     do {
         southEventHandler_->AddKeyMonitor(handlerId, handlerType, sess);

@@ -29,7 +29,7 @@ namespace OHOS {
 namespace MMI {
 class IInterceptorHandlerGlobal : public IInterceptorEventHandler, public IInputEventHandler {
 public:
-    IInterceptorHandlerGlobal() = default;
+    IInterceptorHandlerGlobal(int32_t priority);
     ~IInterceptorHandlerGlobal() = default;
     DISALLOW_COPY_AND_MOVE(IInterceptorHandlerGlobal);
     EventHandlerType GetHandlerType() const override { return EventHandlerType::INTERCEPTOR; }
@@ -39,7 +39,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
-    static std::shared_ptr<IInterceptorHandlerGlobal> CreateInstance();
+    static std::shared_ptr<IInterceptorHandlerGlobal> CreateInstance(int32_t priority);
     int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
     void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
 private:

@@ -24,7 +24,7 @@ namespace OHOS {
 namespace MMI {
 class TouchEventHandler : public IInputEventHandler {
 public:
-    TouchEventHandler() = default;
+    TouchEventHandler(int32_t priority);
     ~TouchEventHandler() = default;
     int32_t HandleLibinputEvent(libinput_event* event) override;
     int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;

@@ -34,7 +34,7 @@
 
 namespace OHOS {
 namespace MMI {
-class KeyEventSubscriber : public IInputEventHandler, public ISubscriberEventHandler {
+class KeyEventSubscriber : public ISubscriberEventHandler, IInputEventHandler {
 public:
     KeyEventSubscriber(int32_t priority);
     ~KeyEventSubscriber() = default;

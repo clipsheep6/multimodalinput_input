@@ -26,6 +26,7 @@ class IMonitorEventHandler {
 public:
     virtual int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
     virtual void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
+    virtual void MarkConsumed(int32_t handlerId, int32_t eventId, SessionPtr session) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

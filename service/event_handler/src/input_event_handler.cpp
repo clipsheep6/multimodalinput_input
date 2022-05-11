@@ -212,9 +212,9 @@ int32_t InputEventHandler::OnEventHandler(libinput_event *event)
 
 void InputEventHandler::BuildInputHandlerChain()
 {
-    EventHandlerBuilder build;
-    build.ParseConfigFile();
-    keyEventHandler_ = build.BuildChainKey();
+    //EventHandlerBuilder build;
+    //build.ParseConfigFile();
+    //keyEventHandler_ = build.BuildChainKey();
 
     keyEventHandler_ = std::make_shared<IInputEventHandler>();
     pointerEventHandler_ = std::make_shared<IInputEventHandler>();
@@ -331,6 +331,11 @@ void InputEventHandler::RemoveTouchMonitor(int32_t handlerId, InputHandlerType h
 {
     CHKPV(touchEventHandler_);
     touchEventHandler_->RemoveMonitor(handlerId, handlerType, session);
+}
+void InputEventHandler::TouchMonitorHandlerMarkConsumed(int32_t monitorId, int32_t eventId, SessionPtr sess)
+{
+    CHKPV(touchEventHandler_);
+    touchEventHandler_->TouchMonitorHandlerMarkConsumed(monitorId, eventId, sess);
 }
 
 int32_t InputEventHandler::AddSubscriber(SessionPtr sess, int32_t subscribeId, const std::shared_ptr<KeyOption> keyOption) 

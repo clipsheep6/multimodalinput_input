@@ -27,6 +27,8 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TouchEventHandler" };
 }
 
+TouchEventHandler::TouchEventHandler(int32_t priority) : IInputEventHandler(priority) {}
+
 int32_t TouchEventHandler::HandleLibinputEvent(libinput_event* event)
 {
     CALL_LOG_ENTER;

@@ -28,7 +28,7 @@ namespace OHOS {
 namespace MMI {
 class EventDispatch : public IInputEventHandler {
 public:
-    EventDispatch();
+    EventDispatch(int priority);
     DISALLOW_COPY_AND_MOVE(EventDispatch);
     virtual ~EventDispatch();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD

@@ -29,6 +29,7 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputHandlerManagerGlobal" };
 } // namespace
+InputHandlerManagerGlobal::InputHandlerManagerGlobal(int32_t priority) : IInputEventHandler(priority) {}
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t InputHandlerManagerGlobal::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
@@ -149,7 +150,7 @@ void InputHandlerManagerGlobal::InitSessionLostCallback()
     if (sessionLostCallbackInitialized_)  {
         return;
     }
-    auto udsServerPtr = IUDSServer::GetInstance();
+    auto udsServerPtr = IUdsServer::GetInstance();
     CHKPV(udsServerPtr);
     udsServerPtr->AddSessionDeletedCallback(std::bind(
         &InputHandlerManagerGlobal::OnSessionLost, this, std::placeholders::_1));
@@ -248,7 +249,7 @@ void InputHandlerManagerGlobal::MonitorCollection::MarkConsumed(int32_t monitorI
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
     pointerEvent->SetActionTime(GetSysClockTime());
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT | InputEvent::EVENT_FLAG_NO_MONITOR);
-    auto udsServer = IUdsServer::GetUdsServer();
+    auto udsServer = IUdsServer::GetInstance();
     CHKPV(udsServer);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     udsServer->HandleNonConsumedTouchEvent(pointerEvent);

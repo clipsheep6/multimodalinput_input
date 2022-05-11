@@ -23,9 +23,9 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IKeyC
 
 IKeyCommandManager::IKeyCommandManager(int32_t priority) : IInputEventHandler(priority) {}
 
-std::shared_ptr<IKeyCommandManager> IKeyCommandManager::CreateInstance()
+std::shared_ptr<IKeyCommandManager> IKeyCommandManager::CreateInstance(int32_t priority)
 {
-    return std::make_shared<IKeyCommandManager>();
+    return std::make_shared<IKeyCommandManager>(priority);
 }
 
 int32_t IKeyCommandManager::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
