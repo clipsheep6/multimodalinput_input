@@ -115,7 +115,7 @@ int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data,
     //     reply.WriteInt32(RET_ERR);
     //     return RET_ERR;
     // }
-    if (!entrustTasks_.PostSyncTask(pid, std::bind(&IMultimodalInputConnect::AllocSocketFd, this,
+    if (!entrustTasks_.PostAsyncTask(pid, std::bind(&IMultimodalInputConnect::AllocSocketFd, this,
         req->data.clientName, req->data.moduleId, std::ref(clientFd), pid, uid))) {
         LOGFMTE("post task AllocSocketFd failed code:%u, go switch defaut", code);
         MMI_HILOGE("post task AllocSocketFd failed code:%{public}u, go switch defaut", code);
