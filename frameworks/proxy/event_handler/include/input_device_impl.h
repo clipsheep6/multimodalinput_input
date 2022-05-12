@@ -109,7 +109,9 @@ private:
     std::map<int32_t, InputDeviceData> inputDevices_;
     DevMonitor devMonitor_;
     std::mutex mtx_;
+#ifdef OHOS_BUILD_DEVICE_MANAGER_API
     int32_t userData_ {0};
+#endif
 };
 } // namespace MMI
 } // namespace OHOS
