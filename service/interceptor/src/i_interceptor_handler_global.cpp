@@ -23,8 +23,6 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IInterceptorHandlerGlobal" };
 } // namespace
 
-IInterceptorHandlerGlobal::IInterceptorHandlerGlobal(int32_t priority) : IInterceptorEventHandler(priority) {}
-
 int32_t IInterceptorHandlerGlobal::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(keyEvent, ERROR_NULL_POINTER);

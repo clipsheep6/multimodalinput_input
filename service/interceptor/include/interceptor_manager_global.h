@@ -29,7 +29,7 @@ namespace OHOS {
 namespace MMI {
 class InterceptorManagerGlobal : public IInterceptorManagerGlobal {
 public:
-    InterceptorManagerGlobal(int32_t priority);
+    InterceptorManagerGlobal(int32_t priority) : IInterceptorManagerGlobal(priority) {};
     DISALLOW_COPY_AND_MOVE(InterceptorManagerGlobal);
     ~InterceptorManagerGlobal() = default;
     int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;

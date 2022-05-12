@@ -28,8 +28,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Inter
 constexpr int32_t SOURCETYPE_KEY = 4;
 } // namespace
 
-InterceptorManagerGlobal::InterceptorManagerGlobal(int32_t priority) : IInterceptorManagerGlobal(priority) {}
-
 int32_t InterceptorManagerGlobal::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPR(keyEvent, ERROR_NULL_POINTER);
