@@ -30,7 +30,7 @@ struct libinput_event;
 
 namespace OHOS {
 namespace MMI {
-class IInputEventHandler {
+class IInputEventHandler : public std::enable_shared_from_this<IInputEventHandler> {
 public:
     enum class EventHandlerType {
         NORMAL,

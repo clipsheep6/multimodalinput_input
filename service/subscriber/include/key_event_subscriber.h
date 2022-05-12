@@ -35,7 +35,7 @@ namespace OHOS {
 namespace MMI {
 class KeyEventSubscriber : public ISubscriberEventHandler {
 public:
-    KeyEventSubscriber(int32_t priority);
+    KeyEventSubscriber(int32_t priority) : ISubscriberEventHandler(priority) {};
     ~KeyEventSubscriber() = default;
     DISALLOW_COPY_AND_MOVE(KeyEventSubscriber);
     EventHandlerType GetHandlerType() const override { return EventHandlerType::SUBSCRIBER; }

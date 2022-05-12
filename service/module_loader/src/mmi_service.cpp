@@ -174,6 +174,7 @@ int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
 
 bool MMIService::InitLibinputService()
 {
+    CALL_LOG_ENTER;
 #ifdef OHOS_BUILD_HDF
     MMI_HILOGD("HDF Init");
     hdfEventManager.SetupCallback();
@@ -196,6 +197,7 @@ bool MMIService::InitLibinputService()
 
 bool MMIService::InitService()
 {
+    CALL_LOG_ENTER;
     if (state_ != ServiceRunningState::STATE_NOT_START) {
         MMI_HILOGE("Service running status is not enabled");
         return false;
@@ -220,6 +222,7 @@ bool MMIService::InitService()
 
 int32_t MMIService::Init()
 {
+    CALL_LOG_ENTER;
     CheckDefine();
 
     MMI_HILOGD("InputEventHandler Init");
@@ -242,25 +245,31 @@ int32_t MMIService::Init()
         return POINTER_DRAW_INIT_FAIL;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
+    MMI_HILOGD("Create epoll Init");
     mmiFd_ = EpollCreat(MAX_EVENT_SIZE);
     if (mmiFd_ < 0) {
         MMI_HILOGE("Epoll creat failed");
         return EPOLL_CREATE_FAIL;
     }
+    MMI_HILOGD("InitService Init");
     if (!InitService()) {
         MMI_HILOGE("Saservice init failed");
         return SASERVICE_INIT_FAIL;
     }
+    MMI_HILOGD("InitLibinputService Init");
     if (!InitLibinputService()) {
         MMI_HILOGE("Libinput init failed");
         return LIBINPUT_INIT_FAIL;
     }
+    MMI_HILOGD("Server Message Handler Bind");
     SetRecvFun(std::bind(&ServerMsgHandler::OnMsgHandler, &sMsgHandler_, std::placeholders::_1, std::placeholders::_2));
+    MMI_HILOGD("Init eave");
     return RET_OK;
 }
 
 void MMIService::OnStart()
 {
+    CALL_LOG_ENTER;
     int sleepSeconds = 3;
     sleep(sleepSeconds);
     CHK_PIDANDTID();
@@ -280,6 +289,7 @@ void MMIService::OnStart()
 
 void MMIService::OnStop()
 {
+    CALL_LOG_ENTER;
     CHK_PIDANDTID();
     UdsStop();
     southEventHandler_.Clear();
@@ -292,6 +302,7 @@ void MMIService::OnStop()
 
 void MMIService::OnDump()
 {
+    CALL_LOG_ENTER;
     CHK_PIDANDTID();
     MMIEventDump->Dump();
 }
@@ -353,7 +364,7 @@ int32_t MMIService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& 
     reply.WriteInt32(RET_OK);
     reply.WriteFileDescriptor(clientFd);
 
-    MMI_HILOGI("send clientFd to client, clientFd = %d", clientFd);
+    MMI_HILOGI("send clientFd to client, clientFd = %{public}d", clientFd);
     close(clientFd);
     return RET_OK;
 }

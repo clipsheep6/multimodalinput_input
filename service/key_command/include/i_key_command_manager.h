@@ -25,7 +25,7 @@ namespace OHOS {
 namespace MMI {
 class IKeyCommandManager : public IInputEventHandler {
 public:
-    IKeyCommandManager(int32_t priority) : IInputEventHandler(priority) {};
+    IKeyCommandManager(int32_t priority) : IInputEventHandler(priority) {}
     virtual ~IKeyCommandManager() = default;
     static std::shared_ptr<IKeyCommandManager> CreateInstance(int32_t priority);
     int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
