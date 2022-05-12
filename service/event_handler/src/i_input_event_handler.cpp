@@ -73,6 +73,7 @@ int32_t IInputEventHandler::GetPriority() const
 {
     return priority_;
 }
+
 int32_t IInputEventHandler::AddInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session)
 {
     std::shared_ptr<IInputEventHandler> cur = std::shared_ptr<IInputEventHandler>(this);
@@ -151,7 +152,6 @@ int32_t IInputEventHandler::AddMonitor(int32_t handlerId, InputHandlerType handl
     }
     return RET_OK;
 }
-
 
 void IInputEventHandler::RemoveMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session)
 {

@@ -84,26 +84,6 @@ int32_t TouchEventHandler::HandleTouchEvent(libinput_event* event)
     return RET_OK;
 }
 
-void TouchEventHandler::AddHandler(int priority, const std::shared_ptr<IInputEventHandler> handler)
-{
-    CHKPV(handler);
-    touchHandlerMap_.emplace(priority, handler);
-}
-
-void TouchEventHandler::AddFinish()
-{
-    std::shared_ptr<IInputEventHandler> tmpHandler = nullptr;
-    for (const auto &handler : touchHandlerMap_) {
-        if (tmpHandler == nullptr) {
-            tmpHandler = handler.second;
-            SetNext(tmpHandler);
-        } else {
-            tmpHandler->SetNext(handler.second);
-            tmpHandler = handler.second;
-        }
-    }
-}
-
 int32_t TouchEventHandler::HandleTableToolEvent(libinput_event* event)
 {
     auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TABLET_TOOL);
