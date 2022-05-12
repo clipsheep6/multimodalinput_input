@@ -364,49 +364,51 @@ int32_t InputManagerImpl::PackLogicalDisplay(NetPacket &pkt)
             return RET_ERR;
         }
         for (int32_t j = 0; j < numWindow; j++) {
-            if (!pkt.Write(logicalDisplays_[i].windowsInfo[j].id)) {
+            auto windowInfo = logicalDisplays_[i].windowsInfo[j]
+
+            if (!pkt.Write(windowInfo.id)) {
                 MMI_HILOGE("Packet write windowsinfo id failed");
             }
-            if (!pkt.Write(logicalDisplays_[i].windowsInfo[j].pid)) {
+            if (!pkt.Write(windowInfo.pid)) {
                 MMI_HILOGE("Packet write windowsinfo pid failed");
             }
-            if (!pkt.Write(logicalDisplays_[i].windowsInfo[j].uid)) {
+            if (!pkt.Write(windowInfo.uid)) {
                 MMI_HILOGE("Packet write windowsinfo uid failed");
             }
-            if (!pkt.Write(logicalDisplays_[i].windowsInfo[j].hotZoneTopLeftX)) {
+            if (!pkt.Write(windowInfo.hotZoneTopLeftX)) {
                 MMI_HILOGE("Packet write windowsinfo hotZoneTopLeftX failed");
             }
-            if (!pkt.Write(logicalDisplays_[i].windowsInfo[j].hotZoneTopLeftY)) {
+            if (!pkt.Write(windowInfo.hotZoneTopLeftY)) {
                 MMI_HILOGE("Packet write windowsinfo hotZoneTopLeftY failed");
             }
-            if (!pkt.Write(logicalDisplays_[i].windowsInfo[j].hotZoneWidth)) {
+            if (!pkt.Write(windowInfo.hotZoneWidth)) {
                 MMI_HILOGE("Packet write windowsinfo hotZoneWidth failed");
             }
-            if (!pkt.Write(logicalDisplays_[i].windowsInfo[j].hotZoneHeight)) {
+            if (!pkt.Write(windowInfo.hotZoneHeight)) {
                 MMI_HILOGE("Packet write windowsinfo hotZoneHeight failed");
             }
-            if (!pkt.Write(logicalDisplays_[i].windowsInfo[j].displayId)) {
+            if (!pkt.Write(windowInfo.displayId)) {
                 MMI_HILOGE("Packet write windowsinfo displayId failed");
             }
-            if (!pkt.Write(logicalDisplays_[i].windowsInfo[j].agentWindowId)) {
+            if (!pkt.Write(windowInfo.agentWindowId)) {
                 MMI_HILOGE("Packet write windowsinfo agentWindowId failed");
             }
-            if (!pkt.Write(logicalDisplays_[i].windowsInfo[j].winTopLeftX)) {
+            if (!pkt.Write(windowInfo.winTopLeftX)) {
                 MMI_HILOGE("Packet write windowsinfo agentWindowId failed");
             }
-            if (!pkt.Write(logicalDisplays_[i].windowsInfo[j].winTopLeftY)) {
+            if (!pkt.Write(windowInfo.winTopLeftY)) {
                 MMI_HILOGE("Packet write windowsinfo agentWindowId failed");
             }
-            if (!pkt.Write(logicalDisplays_[i].windowsInfo[j].flags)) {
+            if (!pkt.Write(windowInfo.flags)) {
                 MMI_HILOGE("Packet write windowsinfo agentWindowId failed");
             }
-            int32_t numhotArea = static_cast<int32_t>(logicalDisplays_[i].windowsInfo[j].hotArea.size());
+            int32_t numhotArea = static_cast<int32_t>(windowInfo.hotArea.size());
             if (!pkt.Write(numhotArea)) {
                 MMI_HILOGE("Packet write numhotArea failed");
                 return RET_ERR;
             }
             for (int32_t k = 0; k < numhotArea; k++) {
-                if (!pkt.Write(logicalDisplays_[i].windowsInfo[j].hotArea[k])) {
+                if (!pkt.Write(windowInfo.hotArea[k])) {
                     MMI_HILOGE("Packet write hotAreaInfo failed");
                     return RET_ERR;
                 }
