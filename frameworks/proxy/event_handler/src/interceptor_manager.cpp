@@ -26,12 +26,15 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InterceptorManager" };
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 constexpr int32_t SOURCETYPE_KEY = 4;
 constexpr int32_t INVALID_INTERCEPTOR_ID = -1;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 } // namespace
 
 InterceptorManager::InterceptorManager() {}
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t InterceptorManager::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
 {
     CHKPR(interceptor, INVALID_INTERCEPTOR_ID);
@@ -44,6 +47,7 @@ int32_t InterceptorManager::AddInterceptor(std::function<void(std::shared_ptr<Ke
     MMI_HILOGD("Add AddInterceptor KeyEvent to InterceptorManager success");
     return interceptorItem.id_;
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 void InterceptorManager::RemoveInterceptor(int32_t interceptorId)
 {
@@ -63,6 +67,7 @@ void InterceptorManager::RemoveInterceptor(int32_t interceptorId)
     MMI_HILOGD("InterceptorItem id:%{public}d removed success", interceptorId);
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t InterceptorManager::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPR(keyEvent, ERROR_NULL_POINTER);
@@ -75,5 +80,6 @@ int32_t InterceptorManager::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     }
     return MMI_STANDARD_EVENT_SUCCESS;
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 } // namespace MMI
 } // namespace OHOS

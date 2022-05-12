@@ -60,7 +60,8 @@ public:
     KeyCommandManager();
     DISALLOW_COPY_AND_MOVE(KeyCommandManager);
     ~KeyCommandManager() = default;
-    bool HandlerEvent(const std::shared_ptr<KeyEvent> event);
+    int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
+    bool HandlerEvent(const std::shared_ptr<KeyEvent> event) override;
 private:
     bool ParseJson(const std::string &configFile);
     std::string GetConfigFilePath() const;

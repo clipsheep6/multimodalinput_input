@@ -359,8 +359,14 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_001, TestSize.L
     injectUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     injectUpEvent->RemoveReleasedKeyItems(kitUp);
     InputManager::GetInstance()->SimulateInputEvent(injectUpEvent);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     std::vector<std::string> tlogs {SearchLog(command, slogs)};
     EXPECT_TRUE(!tlogs.empty());
+#else
+    std::string command1 = "Keyboard device dose not support";
+    std::vector<std::string> tlogs1 {SearchLog(command1, slogs)};
+    EXPECT_TRUE(!tlogs1.empty());
+#endif
 }
 
 /**
@@ -416,8 +422,14 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_003, TestSize.L
     injectUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     injectUpEvent->RemoveReleasedKeyItems(kitUp);
     InputManager::GetInstance()->SimulateInputEvent(injectUpEvent);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     std::vector<std::string> tlogs {SearchLog(command, slogs)};
     EXPECT_TRUE(!tlogs.empty());
+#else
+    std::string command1 = "Keyboard device dose not support";
+    std::vector<std::string> tlogs1 {SearchLog(command1, slogs)};
+    EXPECT_TRUE(!tlogs1.empty());
+#endif
 }
 
 /**
@@ -481,8 +493,14 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_005, TestSize.L
     injectUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     injectUpEvent->RemoveReleasedKeyItems(kitUp);
     InputManager::GetInstance()->SimulateInputEvent(injectUpEvent);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     std::vector<std::string> tlogs {SearchLog(command, slogs)};
     EXPECT_TRUE(!tlogs.empty());
+#else
+    std::string command1 = "Keyboard device dose not support";
+    std::vector<std::string> tlogs1 {SearchLog(command1, slogs)};
+    EXPECT_TRUE(!tlogs1.empty());
+#endif
 }
 
 std::string InputManagerTest::DumpPointerItem(const PointerEvent::PointerItem &item)
@@ -749,8 +767,14 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_004, TestSize.Level1)
     MMI_HILOGD("Call InputManager::SimulateInputEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
+#ifdef OHOS_BUILD_ENABLE_TOUCH
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
+#else
+    std::string command1 = "Tp device dose not support";
+    std::vector<std::string> tlogs1 {SearchLog(command1, sLogs)};
+    EXPECT_TRUE(!tlogs1.empty());
+#endif
 }
 
 void InputManagerTest::TestSimulateInputEvent_2(std::shared_ptr<PointerEvent> pointerEvent)
@@ -1271,8 +1295,14 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_013, TestSize.Level1)
     MMI_HILOGD("Inject POINTER_ACTION_AXIS_BEGIN");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
+#ifdef OHOS_BUILD_ENABLE_MOUSE
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
+#else
+    std::string command1 = "Pointer device dose not support";
+    std::vector<std::string> tlogs1 {SearchLog(command1, sLogs)};
+    EXPECT_TRUE(!tlogs1.empty());
+#endif
 }
 
 /**
@@ -1312,8 +1342,14 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_014, TestSize.Level1)
     MMI_HILOGD("Inject POINTER_ACTION_AXIS_UPDATE");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
+#ifdef OHOS_BUILD_ENABLE_MOUSE
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
+#else
+    std::string command1 = "Pointer device dose not support";
+    std::vector<std::string> tlogs1 {SearchLog(command1, sLogs)};
+    EXPECT_TRUE(!tlogs1.empty());
+#endif
 }
 
 /**
@@ -1354,8 +1390,14 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_015, TestSize.Level1)
     MMI_HILOGD("Inject POINTER_ACTION_AXIS_END");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
+#ifdef OHOS_BUILD_ENABLE_MOUSE
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
+#else
+    std::string command1 = "Pointer device dose not support";
+    std::vector<std::string> tlogs1 {SearchLog(command1, sLogs)};
+    EXPECT_TRUE(!tlogs1.empty());
+#endif
 }
 
 
@@ -1656,7 +1698,11 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_008, TestSize.Leve
     keyOption->SetFinalKeyDownDuration(0);
     int32_t response = -1;
     response = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, nullptr);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     EXPECT_TRUE(response < 0);
+#else
+   EXPECT_TRUE(response == ERROR_UNSUPPORT);
+#endif
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -1691,8 +1737,11 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_010, TestSize.Leve
                    keyEvent->GetEventType(), keyEvent->GetFlag());
         MMI_HILOGD("subscribe key event KEYCODE_POWER down trigger callback");
     });
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     EXPECT_TRUE(subscribeId1 >= 0);
-
+#else
+   EXPECT_TRUE(subscribeId1 == ERROR_UNSUPPORT);
+#endif
     // 电源键抬起订阅
     std::shared_ptr<KeyOption> keyOption2 = std::make_shared<KeyOption>();
     keyOption2->SetPreKeys(preKeys);
@@ -1710,8 +1759,11 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_010, TestSize.Leve
                    keyEvent->GetEventType(), keyEvent->GetFlag());
         MMI_HILOGD("subscribe key event KEYCODE_POWER up trigger callback");
     });
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     EXPECT_TRUE(subscribeId2 >= 0);
-
+#else
+   EXPECT_TRUE(subscribeId2 == ERROR_UNSUPPORT);
+#endif
     std::this_thread::sleep_for(std::chrono::milliseconds(10000));
     InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId1);
     InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId2);
@@ -2225,10 +2277,14 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_001, TestSize.L
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int32_t response = MMIEventHdl.InjectPointerEvent(pointerEvent);
+#ifdef OHOS_BUILD_ENABLE_POINTER
     EXPECT_EQ(RET_OK, response);
 
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
+#else
+    EXPECT_EQ(ERROR_UNSUPPORT, response);
+#endif
 
     InputManager::GetInstance()->RemoveMonitor(monitorId);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -2270,10 +2326,14 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_002, TestSize.L
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int32_t response = MMIEventHdl.InjectPointerEvent(pointerEvent);
+#ifdef OHOS_BUILD_ENABLE_POINTER
     EXPECT_EQ(RET_OK, response);
 
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
+#else
+    EXPECT_EQ(ERROR_UNSUPPORT, response);
+#endif
 
     InputManager::GetInstance()->RemoveMonitor(monitorId);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -2315,11 +2375,14 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_003, TestSize.L
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int32_t response = MMIEventHdl.InjectPointerEvent(pointerEvent);
+#ifdef OHOS_BUILD_ENABLE_POINTER
     EXPECT_EQ(RET_OK, response);
 
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
-
+#else
+    EXPECT_EQ(ERROR_UNSUPPORT, response);
+#endif
     InputManager::GetInstance()->RemoveMonitor(monitorId);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }

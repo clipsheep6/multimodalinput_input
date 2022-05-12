@@ -34,7 +34,11 @@ class ServerMsgHandlerUnitTest : public ServerMsgHandler {
 public:
     int32_t OnVirtualKeyEventTest(SessionPtr sess, NetPacket& pkt)
     {
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
         return OnVirtualKeyEvent(sess, pkt);
+#else
+        return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     }
 
 #ifdef OHOS_BUILD_HDF
@@ -56,8 +60,12 @@ public:
 
     int32_t OnInjectKeyEventTest(SessionPtr sess, NetPacket pkt)
     {
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
         int32_t retResult = OnInjectKeyEvent(sess, pkt);
         return retResult;
+#else
+        return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     }
 };
 

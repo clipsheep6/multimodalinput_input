@@ -53,20 +53,30 @@ ClientMsgHandler::~ClientMsgHandler()
 void ClientMsgHandler::Init()
 {
     MsgCallback funs[] = {
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
         {MmiMessageId::ON_KEYEVENT, MsgCallbackBind2(&ClientMsgHandler::OnKeyEvent, this)},
         {MmiMessageId::ON_SUBSCRIBE_KEY, std::bind(&ClientMsgHandler::OnSubscribeKeyEventCallback,
                                                    this, std::placeholders::_1, std::placeholders::_2)},
         {MmiMessageId::ON_KEYMONITOR, MsgCallbackBind2(&ClientMsgHandler::OnKeyMonitor, this)},
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_POINTERE) || defined(OHOS_BUILD_ENABLE_TOUCH)
         {MmiMessageId::ON_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::OnPointerEvent, this)},
         {MmiMessageId::ON_TOUCHPAD_MONITOR, MsgCallbackBind2(&ClientMsgHandler::OnTouchPadMonitor, this)},
+#endif
         {MmiMessageId::GET_MMI_INFO_ACK, MsgCallbackBind2(&ClientMsgHandler::GetMultimodeInputInfo, this)},
         {MmiMessageId::INPUT_DEVICE, MsgCallbackBind2(&ClientMsgHandler::OnInputDevice, this)},
         {MmiMessageId::INPUT_DEVICE_IDS, MsgCallbackBind2(&ClientMsgHandler::OnInputDeviceIds, this)},
         {MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY, MsgCallbackBind2(&ClientMsgHandler::OnSupportKeys, this)},
         {MmiMessageId::ADD_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ClientMsgHandler::OnDevMonitor, this)},
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
         {MmiMessageId::REPORT_KEY_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportKeyEvent, this)},
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_POINTERE) || defined(OHOS_BUILD_ENABLE_TOUCH)
         {MmiMessageId::REPORT_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportPointerEvent, this)},
+#endif
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
         {MmiMessageId::KEYBOARD_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::KeyEventInterceptor, this)},
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     };
     for (auto& it : funs) {
         if (!RegistrationEvent(it)) {
@@ -92,6 +102,7 @@ void ClientMsgHandler::OnMsgHandler(const UDSClient& client, NetPacket& pkt)
     }
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t ClientMsgHandler::OnKeyMonitor(const UDSClient& client, NetPacket& pkt)
 {
     auto key = KeyEvent::Create();
@@ -139,7 +150,9 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
     key->MarkProcessed();
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+#if defined(OHOS_BUILD_POINTERE) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt)
 {
     CALL_LOG_ENTER;
@@ -164,7 +177,9 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     InputMgrImpl->OnPointerEvent(pointerEvent);
     return RET_OK;
 }
+#endif
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, NetPacket &pkt)
 {
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
@@ -190,7 +205,9 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
     return KeyEventInputSubscribeMgr.OnSubscribeKeyEventCallback(keyEvent, subscribeId);
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+#if defined(OHOS_BUILD_POINTERE) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t ClientMsgHandler::OnTouchPadMonitor(const UDSClient& client, NetPacket& pkt)
 {
     auto pointer = PointerEvent::Create();
@@ -210,6 +227,7 @@ int32_t ClientMsgHandler::OnTouchPadMonitor(const UDSClient& client, NetPacket& 
         pointer->GetEventType(), pid);
     return InputMonitorMgr.OnTouchpadMonitorInputEvent(pointer);
 }
+#endif
 
 int32_t ClientMsgHandler::GetMultimodeInputInfo(const UDSClient& client, NetPacket& pkt)
 {
@@ -320,6 +338,7 @@ int32_t ClientMsgHandler::OnDevMonitor(const UDSClient& client, NetPacket& pkt)
     return RET_OK;
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt)
 {
     CALL_LOG_ENTER;
@@ -337,7 +356,9 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
     InputHandlerManager::GetInstance().OnInputEvent(handlerId, keyEvent);
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+#if defined(OHOS_BUILD_POINTERE) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket& pkt)
 {
     CALL_LOG_ENTER;
@@ -363,6 +384,8 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
     return RET_OK;
 }
 
+#endif
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t ClientMsgHandler::KeyEventInterceptor(const UDSClient& client, NetPacket& pkt)
 {
     auto keyEvent = KeyEvent::Create();
@@ -383,6 +406,7 @@ int32_t ClientMsgHandler::KeyEventInterceptor(const UDSClient& client, NetPacket
         keyEvent->GetKeyCode(), pid);
     return InterMgr->OnKeyEvent(keyEvent);
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 void ClientMsgHandler::OnEventProcessed(int32_t eventId)
 {

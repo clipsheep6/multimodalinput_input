@@ -38,6 +38,7 @@ bool InputWindowsManager::Init(UDSServer& udsServer)
     return true;
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t InputWindowsManager::UpdateTarget(std::shared_ptr<InputEvent> inputEvent)
 {
     CHKPR(inputEvent, ERROR_NULL_POINTER);
@@ -54,6 +55,7 @@ int32_t InputWindowsManager::UpdateTarget(std::shared_ptr<InputEvent> inputEvent
     }
     return fd;
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 int32_t InputWindowsManager::GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const
 {
@@ -113,10 +115,12 @@ void InputWindowsManager::UpdateDisplayInfo(const std::vector<PhysicalDisplayInf
             }
         }
     }
+#ifdef OHOS_BUILD_ENABLE_POINTER
     if (!logicalDisplays.empty()) {
         IPointerDrawingManager::GetInstance()->OnDisplayInfo(logicalDisplays[0].id,
             logicalDisplays[0].width, logicalDisplays_[0].height);
     }
+#endif // OHOS_BUILD_ENABLE_POINTER
     PrintDisplayInfo();
 }
 
@@ -180,6 +184,7 @@ const PhysicalDisplayInfo* InputWindowsManager::FindPhysicalDisplayInfo(
     return nullptr;
 }
 
+#ifdef OHOS_BUILD_ENABLE_TOUCH
 void InputWindowsManager::RotateTouchScreen(const PhysicalDisplayInfo* info, LogicalCoordinate& coord) const
 {
     CHKPV(info);
@@ -212,6 +217,7 @@ void InputWindowsManager::RotateTouchScreen(const PhysicalDisplayInfo* info, Log
 }
 
 bool InputWindowsManager::TransformDisplayPoint(struct libinput_event_touch* touch, EventTouch& touchInfo)
+
 {
     CHKPF(touch);
     auto info = FindPhysicalDisplayInfo("seat0", "default0");
@@ -399,11 +405,14 @@ bool InputWindowsManager::CalculateTipPoint(struct libinput_event_tablet_tool* t
     }
     return false;
 }
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
 const std::vector<LogicalDisplayInfo>& InputWindowsManager::GetLogicalDisplayInfo() const
 {
     return logicalDisplays_;
 }
+#endif // OHOS_BUILD_ENABLE_POINTER
 
 bool InputWindowsManager::IsInsideWindow(int32_t x, int32_t y, const WindowInfo &info) const
 {
@@ -411,6 +420,7 @@ bool InputWindowsManager::IsInsideWindow(int32_t x, int32_t y, const WindowInfo 
         (y >= info.hotZoneTopLeftY) && (y <= (info.hotZoneTopLeftY + info.hotZoneHeight));
 }
 
+#ifdef OHOS_BUILD_ENABLE_TOUCH
 void InputWindowsManager::AdjustGlobalCoordinate(
     const LogicalDisplayInfo& displayInfo, LogicalCoordinate& coord) const
 {
@@ -427,7 +437,9 @@ void InputWindowsManager::AdjustGlobalCoordinate(
         coord.y = displayInfo.height - 1;
     }
 }
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 bool InputWindowsManager::UpdataDisplayId(int32_t& displayId)
 {
     if (logicalDisplays_.empty()) {
@@ -445,6 +457,7 @@ bool InputWindowsManager::UpdataDisplayId(int32_t& displayId)
     }
     return false;
 }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 LogicalDisplayInfo* InputWindowsManager::GetLogicalDisplayId(int32_t displayId)
 {
@@ -456,6 +469,7 @@ LogicalDisplayInfo* InputWindowsManager::GetLogicalDisplayId(int32_t displayId)
     return nullptr;
 }
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
 void InputWindowsManager::SelectWindowInfo(const int32_t& globalX, const int32_t& globalY,
     const std::shared_ptr<PointerEvent>& pointerEvent, LogicalDisplayInfo* const logicalDisplayInfo,
     WindowInfo*& touchWindow)
@@ -537,7 +551,9 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
                globalX, globalY, localX, localY);
     return fd;
 }
+#endif // OHOS_BUILD_ENABLE_POINTER
 
+#ifdef OHOS_BUILD_ENABLE_TOUCH
 int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -606,28 +622,36 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                pointerEvent->GetTargetWindowId(), pointerEvent->GetAgentWindowId());
     return fd;
 }
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
 int32_t InputWindowsManager::UpdateTouchPadTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_LOG_ENTER;
     return RET_ERR;
 }
+#endif // OHOS_BUILD_ENABLE_POINTER
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_LOG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     auto source = pointerEvent->GetSourceType();
     switch (source) {
+#ifdef OHOS_BUILD_ENABLE_TOUCH
         case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
             return UpdateTouchScreenTarget(pointerEvent);
         }
+#endif // OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_POINTER
         case PointerEvent::SOURCE_TYPE_MOUSE: {
             return UpdateMouseTarget(pointerEvent);
         }
         case PointerEvent::SOURCE_TYPE_TOUCHPAD: {
             return UpdateTouchPadTarget(pointerEvent);
         }
+#endif // OHOS_BUILD_ENABLE_POINTER
         default: {
             MMI_HILOGW("Source type is unknown, source:%{public}d", source);
             break;
@@ -636,7 +660,9 @@ int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> p
     MMI_HILOGE("Source is not of the correct type, source:%{public}d", source);
     return RET_ERR;
 }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
 void InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, double& y)
 {
     const std::vector<LogicalDisplayInfo> logicalDisplayInfo = GetLogicalDisplayInfo();
@@ -672,7 +698,9 @@ void InputWindowsManager::UpdateAndAdjustMouseLoction(double& x, double& y)
     }
     MMI_HILOGD("Mouse Data: globalX:%{public}d,globalY:%{public}d", mouseLoction_.globalX, mouseLoction_.globalY);
 }
+#endif // OHOS_BUILD_ENABLE_POINTER
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
 MouseLocation InputWindowsManager::GetMouseInfo()
 {
     if (mouseLoction_.globalX == -1 || mouseLoction_.globalY == -1) {
@@ -683,5 +711,6 @@ MouseLocation InputWindowsManager::GetMouseInfo()
     }
     return mouseLoction_;
 }
+#endif // OHOS_BUILD_ENABLE_POINTER
 } // namespace MMI
 } // namespace OHOS

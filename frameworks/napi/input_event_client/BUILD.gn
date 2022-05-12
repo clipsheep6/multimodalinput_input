@@ -31,13 +31,17 @@ config("libinputeventclient_config") {
   if (is_mmi_have_hdf) {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
+
+  if (mmi_enable_keyboard) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_KEYBOARD" ]
+  }
 }
 
 ohos_shared_library("inputeventclient") {
-  sources = [
-    "src/js_register_module.cpp",
-    "src/js_register_util.cpp",
-  ]
+  sources = [ "src/js_register_module.cpp" ]
+  if (mmi_enable_keyboard) {
+    sources += [ "src/js_register_util.cpp" ]
+  }
 
   configs = [ ":libinputeventclient_config" ]
 

@@ -12,31 +12,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef I_INTERCEPTOR_MANAGER_GLOBAL_H
-#define I_INTERCEPTOR_MANAGER_GLOBAL_H
 
-#include "nocopyable.h"
-#include "singleton.h"
+#ifndef KEY_EVENT_HANDLER_H
+#define KEY_EVENT_HANDLER_H
+
+#include <memory>
 
 #include "i_input_event_handler.h"
-#include "key_event.h"
-#include "pointer_event.h"
-#include "uds_session.h"
+#include "event_package.h"
 
 namespace OHOS {
 namespace MMI {
-class IInterceptorManagerGlobal : public IInputEventHandler {
+class KeyEventHandler : public IInputEventHandler {
 public:
-    IInterceptorManagerGlobal() = default;
-    ~IInterceptorManagerGlobal() = default;
-    DISALLOW_COPY_AND_MOVE(IInterceptorManagerGlobal);
+    KeyEventHandler() = default;
+    ~KeyEventHandler() = default;
+    int32_t HandleEvent(libinput_event* event);
     int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
-    static std::shared_ptr<IInterceptorManagerGlobal> CreateInstance();
-    virtual void OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session);
-    virtual void OnRemoveInterceptor(int32_t id);
+    void AddHandler(int priority, const std::shared_ptr<IInputEventHandler> handler);
+    void AddFinish();
+
 private:
-    bool OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
+    void Repeat(const std::shared_ptr<KeyEvent> keyEvent);
+    void AddHandleTimer(int32_t timeout = 300);
+
+private:
+    int32_t timerId_ = -1;
+    EventPackage eventPackage_;
+    std::map<int32_t, std::shared_ptr<IInputEventHandler>> keyHandlerMap_;
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // I_INTERCEPTOR_MANAGER_GLOBAL_H
+#endif // KEY_EVENT_HANDLER_H

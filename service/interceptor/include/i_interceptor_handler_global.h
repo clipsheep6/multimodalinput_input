@@ -21,17 +21,26 @@
 
 #include "i_input_event_handler.h"
 #include "input_handler_type.h"
+#include "pointer_event.h"
 #include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
-class IInterceptorHandlerGlobal : public DelayedSingleton<IInterceptorHandlerGlobal> {
+class IInterceptorHandlerGlobal : public IInputEventHandler {
 public:
     IInterceptorHandlerGlobal() = default;
     ~IInterceptorHandlerGlobal() = default;
     DISALLOW_COPY_AND_MOVE(IInterceptorHandlerGlobal);
-    int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
-    void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+#endif // OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+#endif // OHOS_BUILD_ENABLE_TOUCH
+    static std::shared_ptr<IInterceptorHandlerGlobal> CreateInstance();
+    virtual int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
+    virtual void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
+private:
     bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent);
     bool HandleEvent(std::shared_ptr<PointerEvent> pointerEvent);
 };

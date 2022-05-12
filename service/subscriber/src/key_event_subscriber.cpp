@@ -15,6 +15,7 @@
 
 #include "key_event_subscriber.h"
 
+#include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "input_event_data_transformation.h"
@@ -29,6 +30,18 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "KeyEventSubscriber"};
 constexpr uint32_t MAX_PRE_KEY_COUNT = 4;
 } // namespace
+
+int32_t KeyEventSubscriber::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    if (SubscribeKeyEvent(keyEvent)) {
+        MMI_HILOGD("Subscribe keyEvent filter success. keyCode:%{public}d", keyEvent->GetKeyCode());
+        BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
+        return RET_OK;
+    }
+    CHKPR(nextHandler_, ERROR_NULL_POINTER);
+    return nextHandler_->HandleKeyEvent(keyEvent);
+}
 
 int32_t KeyEventSubscriber::SubscribeKeyEvent(
     SessionPtr sess, int32_t subscribeId, std::shared_ptr<KeyOption> keyOption)

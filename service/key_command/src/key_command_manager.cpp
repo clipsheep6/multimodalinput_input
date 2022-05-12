@@ -356,6 +356,18 @@ void KeyCommandManager::Print()
     }
 }
 
+int32_t KeyCommandManager::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    if (HandlerEvent(keyEvent)) {
+        MMI_HILOGD("The keyEvent start launch an ability, keyCode:%{public}d", keyEvent->GetKeyCode());
+        BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_LAUNCH_EVENT);
+        return RET_OK;
+    }
+    CHKPR(nextHandler_, ERROR_NULL_POINTER);
+    return nextHandler_->HandleKeyEvent(keyEvent);
+}
+
 bool KeyCommandManager::HandlerEvent(const std::shared_ptr<KeyEvent> key)
 {
     CALL_LOG_ENTER;
@@ -503,12 +515,9 @@ void ShortcutKey::Print() const
         finalKey, ability.bundleName.c_str());
 }
 
-std::shared_ptr<IKeyCommandManager> IKeyCommandManager::GetInstance()
+std::shared_ptr<IKeyCommandManager> IKeyCommandManager::CreateInstance()
 {
-    if (keyCommand_ == nullptr) {
-        keyCommand_ = std::make_shared<KeyCommandManager>();
-    }
-    return keyCommand_;
+    return std::make_shared<KeyCommandManager>();
 }
 } // namespace MMI
 } // namespace OHOS

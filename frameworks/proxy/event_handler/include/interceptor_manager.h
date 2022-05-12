@@ -30,9 +30,13 @@ public:
     InterceptorManager();
     DISALLOW_COPY_AND_MOVE(InterceptorManager);
     ~InterceptorManager() = default;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     void RemoveInterceptor(int32_t interceptorId);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 private:
     struct InterceptorItem {
@@ -46,7 +50,7 @@ private:
         std::function<void(std::shared_ptr<KeyEvent>)> callback_;
     };
 private:
-    int32_t InterceptorItemId = 0;
+[[maybe_unused]] int32_t InterceptorItemId = 0;
     std::list<InterceptorItem> interceptor_;
 };
 } // namespace MMI

@@ -22,6 +22,21 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IInterceptorHandlerGlobal" };
 } // namespace
+int32_t IInterceptorHandlerGlobal::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    HandleEvent(pointerEvent);
+    CHKPR(nextHandler_, ERROR_NULL_POINTER);
+    return nextHandler_->HandlePointerEvent(pointerEvent);
+}
+
+int32_t IInterceptorHandlerGlobal::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    HandleEvent(pointerEvent);
+    CHKPR(nextHandler_, ERROR_NULL_POINTER);
+    return nextHandler_->HandlePointerEvent(pointerEvent);
+}
 
 int32_t IInterceptorHandlerGlobal::AddInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
@@ -47,6 +62,11 @@ bool IInterceptorHandlerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointe
 {
     MMI_HILOGD("Pointer handle module dose not support");
     return false;
+}
+
+std::shared_ptr<IInterceptorHandlerGlobal> IInterceptorHandlerGlobal::CreateInstance()
+{
+    return std::make_shared<IInterceptorHandlerGlobal>();
 }
 } // namespace MMI
 } // namespace OHOS

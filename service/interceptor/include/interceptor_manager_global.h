@@ -20,19 +20,23 @@
 #include "nocopyable.h"
 #include "singleton.h"
 
+#include "i_interceptor_manager_global.h"
 #include "key_event.h"
 #include "pointer_event.h"
 #include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
-class InterceptorManagerGlobal : public DelayedSingleton<InterceptorManagerGlobal> {
+class InterceptorManagerGlobal : public IInterceptorManagerGlobal {
 public:
     InterceptorManagerGlobal();
     DISALLOW_COPY_AND_MOVE(InterceptorManagerGlobal);
     ~InterceptorManagerGlobal() = default;
-    void OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session);
-    void OnRemoveInterceptor(int32_t id);
+    int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
+    void OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session) override;
+    void OnRemoveInterceptor(int32_t id) override;
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     bool OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
 private:
     struct InterceptorItem {

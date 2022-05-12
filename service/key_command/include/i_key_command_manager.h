@@ -16,21 +16,23 @@
 #ifndef I_KEY_COMMAND_MANAGER_H
 #define I_KEY_COMMAND_MANAGER_H
 
+#include "bytrace_adapter.h"
+#include "define_multimodal.h"
+#include "i_input_event_handler.h"
 #include "key_event.h"
 
 namespace OHOS {
 namespace MMI {
-class IKeyCommandManager {
+class IKeyCommandManager : public IInputEventHandler {
 public:
     IKeyCommandManager() = default;
     virtual ~IKeyCommandManager() = default;
-    static std::shared_ptr<IKeyCommandManager> GetInstance();
+    static std::shared_ptr<IKeyCommandManager> CreateInstance();
+    int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
     virtual bool HandlerEvent(const std::shared_ptr<KeyEvent> key)
     {
         return false;
     }
-public:
-    static inline std::shared_ptr<IKeyCommandManager> keyCommand_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS

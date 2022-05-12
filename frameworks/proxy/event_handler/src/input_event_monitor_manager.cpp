@@ -24,13 +24,14 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventMonitorManager" };
+[[maybe_unused]] constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventMonitorManager" };
 } // namespace
 
 InputEventMonitorManager::InputEventMonitorManager() {}
 
 InputEventMonitorManager::~InputEventMonitorManager() {}
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t InputEventMonitorManager::AddInputEventMontior(
     std::function<void (std::shared_ptr<KeyEvent>)> keyEventMonitor)
 {
@@ -75,7 +76,9 @@ int32_t InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<KeyEvent> 
     }
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t InputEventMonitorManager::AddInputEventTouchpadMontior(
     std::function<void (std::shared_ptr<PointerEvent>)> TouchPadEventMonitor)
 {
@@ -129,5 +132,6 @@ int32_t InputEventMonitorManager::OnTouchpadMonitorInputEvent(std::shared_ptr<Po
                pointerEvent->GetPointerId(), item.GetGlobalX(), item.GetGlobalY(), item.IsPressed());
     return MMI_STANDARD_EVENT_SUCCESS;
 }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace MMI
 } // namespace OHOS

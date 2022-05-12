@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,20 +16,28 @@
 #ifndef I_INPUT_EVENT_HANDLER_H
 #define I_INPUT_EVENT_HANDLER_H
 
-#include <mutex>
+#include <memory>
 
+#include "define_multimodal.h"
 #include "key_event.h"
 #include "pointer_event.h"
-#include "uds_session.h"
+
+struct libinput_event;
 
 namespace OHOS {
 namespace MMI {
-struct IInputEventHandler {
-    static constexpr int32_t DEFAULT_INTERCEPTOR = 10;
-    static constexpr int32_t DEFAULT_MONITOR = 20;
-    virtual int32_t GetPriority() const = 0;
-    virtual bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent) = 0;
-    virtual bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent) = 0;
+class IInputEventHandler {
+public:
+    IInputEventHandler() = default;
+    DISALLOW_COPY_AND_MOVE(IInputEventHandler);
+    virtual ~IInputEventHandler() = default;
+    virtual int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
+    virtual int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    virtual int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    virtual void SetNext(std::shared_ptr<IInputEventHandler> nextHandler);
+
+protected:
+    std::shared_ptr<IInputEventHandler> nextHandler_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS

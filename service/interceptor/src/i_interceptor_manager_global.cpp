@@ -22,7 +22,13 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IInterceptorManagerGlobal" };
 } // namespace
-
+int32_t IInterceptorManagerGlobal::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    OnKeyEvent(keyEvent);
+    CHKPR(nextHandler_, ERROR_NULL_POINTER);
+    return nextHandler_->HandleKeyEvent(keyEvent);
+}
 void IInterceptorManagerGlobal::OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session)
 {
     MMI_HILOGD("Add inter module dose not support");
@@ -39,6 +45,11 @@ bool IInterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_HILOGD("Key inter module dose not support");
     return false;
+}
+
+std::shared_ptr<IInterceptorManagerGlobal> IInterceptorManagerGlobal::CreateInstance()
+{
+    return std::make_shared<IInterceptorManagerGlobal>();
 }
 } // namespace MMI
 } // namespace OHOS

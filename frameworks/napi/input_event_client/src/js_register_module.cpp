@@ -29,6 +29,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSReg
 static napi_value InjectEvent(napi_env env, napi_callback_info info)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     napi_value result = nullptr;
     size_t argc = 1;
     napi_value argv[1] = { 0 };
@@ -72,6 +73,10 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     InputManager::GetInstance()->SimulateInputEvent(keyEvent);
     napi_create_int32(env, 0, &result);
     return result;
+#else
+    MMI_HILOGW("Keyboard device dose not support");
+    return nullptr;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 EXTERN_C_START

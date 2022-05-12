@@ -21,20 +21,29 @@
 #include "nocopyable.h"
 #include "singleton.h"
 
-#include "i_input_event_handler.h"
+#include "i_input_event_monitor_handler.h"
+#include "i_interceptor_handler_global.h"
 #include "input_handler_type.h"
 #include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
-class InterceptorHandlerGlobal : public DelayedSingleton<InterceptorHandlerGlobal> {
+class InterceptorHandlerGlobal : public IInterceptorHandlerGlobal {
 public:
     InterceptorHandlerGlobal();
     DISALLOW_COPY_AND_MOVE(InterceptorHandlerGlobal);
     ~InterceptorHandlerGlobal() = default;
-    int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
-    void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+#endif // OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+#endif // OHOS_BUILD_ENABLE_TOUCH
+    int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
+    void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     bool HandleEvent(std::shared_ptr<PointerEvent> pointerEvent);
 
 private:
@@ -62,11 +71,14 @@ private:
         SessionPtr session_ = nullptr;
     };
 
-    struct InterceptorCollection : public IInputEventHandler, protected NoCopyable {
+    struct InterceptorCollection : public IInputEventMonitorHandler, protected NoCopyable {
         virtual int32_t GetPriority() const override;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
         virtual bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent) override;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
         virtual bool HandleEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
-
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
         int32_t AddInterceptor(const SessionHandler& interceptor);
         void RemoveInterceptor(const SessionHandler& interceptor);
         void OnSessionLost(SessionPtr session);
