@@ -66,6 +66,7 @@ ohos_shared_library("libmmi-client") {
   sources = [
     "event_handler/src/bytrace_adapter.cpp",
     "event_handler/src/client_msg_handler.cpp",
+    "event_handler/src/input_device_impl.cpp",
     "event_handler/src/input_event_monitor_manager.cpp",
     "event_handler/src/input_handler_manager.cpp",
     "event_handler/src/input_manager_impl.cpp",
@@ -105,13 +106,6 @@ ohos_shared_library("libmmi-client") {
       "event_handler/src/i_input_interceptor_manager.cpp",
       "event_handler/src/i_interceptor_manager.cpp",
     ]
-  }
-
-  if (mmi_enable_device_manager_api) {
-    cflags += [ "-DOHOS_BUILD_DEVICE_MANAGER_API" ]
-    sources += [ "event_handler/src/input_device_impl.cpp" ]
-  } else {
-    sources += [ "event_handler/src/i_input_device_impl.cpp" ]
   }
 
   configs = [

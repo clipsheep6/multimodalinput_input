@@ -19,8 +19,7 @@
 #include <uv.h>
 
 #include "stream_buffer.h"
-#include "define_device_impl.h"
-#include "input_device_impl_type.h"
+#include "input_device_impl.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "refbase.h"
@@ -31,7 +30,7 @@ class JsUtil {
 public:
     struct CallbackData {
         std::vector<int32_t> ids;
-        std::shared_ptr<InputDeviceInfo> device = nullptr;
+        std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device = nullptr;
         std::vector<bool> keystrokeAbility;
         int32_t deviceId = 0;
         int32_t keyboardType = 0;

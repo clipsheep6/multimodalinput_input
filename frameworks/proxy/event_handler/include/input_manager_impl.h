@@ -27,8 +27,7 @@
 #include "event_filter_service.h"
 
 #include "if_mmi_client.h"
-#include "define_device_impl.h"
-#include "input_device_impl_type.h"
+#include "input_device_impl.h"
 #include "input_monitor_manager.h"
 #include "i_input_event_consumer.h"
 #include "mmi_event_handler.h"
