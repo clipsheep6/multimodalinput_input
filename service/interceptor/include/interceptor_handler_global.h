@@ -30,7 +30,7 @@ namespace OHOS {
 namespace MMI {
 class InterceptorHandlerGlobal : public IInterceptorHandlerGlobal {
 public:
-    InterceptorHandlerGlobal(int32_t priority) : IInterceptorHandlerGlobal(priority) {};
+    InterceptorHandlerGlobal(int32_t priority) : IInterceptorHandlerGlobal(priority) {}
     DISALLOW_COPY_AND_MOVE(InterceptorHandlerGlobal);
     ~InterceptorHandlerGlobal() = default;
 #ifdef OHOS_BUILD_ENABLE_POINTER

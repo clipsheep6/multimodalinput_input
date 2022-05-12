@@ -31,7 +31,7 @@ namespace OHOS {
 namespace MMI {
 class InputHandlerManagerGlobal : public IMonitorEventHandler {
 public:
-    InputHandlerManagerGlobal(int priority);
+    InputHandlerManagerGlobal(int priority) : IMonitorEventHandler(priority) {}
     virtual ~InputHandlerManagerGlobal() = default;
     DISALLOW_COPY_AND_MOVE(InputHandlerManagerGlobal);
     EventHandlerType GetHandlerType() const override { return EventHandlerType::MONITOR; }

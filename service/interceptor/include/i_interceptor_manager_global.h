@@ -27,7 +27,7 @@ namespace OHOS {
 namespace MMI {
 class IInterceptorManagerGlobal : public IIncterceptorManagerEventHandler {
 public:
-    IInterceptorManagerGlobal(int32_t priority) : IIncterceptorManagerEventHandler(priority) {};
+    IInterceptorManagerGlobal(int32_t priority) : IIncterceptorManagerEventHandler(priority) {}
     ~IInterceptorManagerGlobal() = default;
     DISALLOW_COPY_AND_MOVE(IInterceptorManagerGlobal);
     EventHandlerType GetHandlerType() const override { return EventHandlerType::INTERCEPTOR; }
