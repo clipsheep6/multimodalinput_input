@@ -79,7 +79,7 @@ struct WindowInfo {
     /**
      * A 32-bit flag that represents the window status. If the 0th bit is 1, the window is untouchable;
      * if the 0th bit is 0, the window is touchable.
-     * 
+     *
      * @since 9
     */
     uint32_t flags;
