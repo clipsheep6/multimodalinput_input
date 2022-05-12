@@ -68,7 +68,8 @@ public:
 
     bool Init();
     void ProcessTasks(uint64_t stid, int32_t pid);
-    bool PostSyncTask(int32_t pid, ETaskCallback callback, int32_t timeout = ET_DEFINE_TIMEOUT);
+    int32_t PostSyncTask(int32_t pid, ETaskCallback callback, int32_t timeout = ET_DEFINE_TIMEOUT);
+    bool PostAsyncTask(int32_t pid, ETaskCallback callback);
 
     int32_t GetReadFd() const
     {
@@ -76,7 +77,7 @@ public:
     }
 
 private:
-    bool PostTask(int32_t pid, ETaskCallback callback, Promise *promise = nullptr);
+    int32_t PostTask(int32_t pid, ETaskCallback callback, Promise *promise = nullptr);
 
 private:
     int32_t fds_[2] = {};

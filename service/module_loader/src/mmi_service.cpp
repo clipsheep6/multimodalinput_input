@@ -128,11 +128,6 @@ bool MMIService::IsRunning() const
     return (state_ == ServiceRunningState::STATE_RUNNING);
 }
 
-SessionPtr MMIService::GetSessionByPid(int32_t pid) const
-{
-    return UDSServer::GetSessionByPid(pid);
-}
-
 bool MMIService::InitLibinputService()
 {
     MMI_HILOGD("input msg handler Init");
@@ -186,7 +181,6 @@ bool MMIService::InitService()
 bool MMIService::InitEntrustTasks()
 {
     CALL_LOG_ENTER;
-    rMsgHandler_.Init(*this);
     if (!entrustTasks_.Init()) {
         MMI_HILOGE("entrust task init failed");
         return false;

@@ -17,7 +17,6 @@
 #define MULTIMODAL_INPUT_CONNECT_STUB_H
 
 #include "ipc_skeleton.h"
-#include "iremote_object.h"
 #include "iremote_stub.h"
 #include "message_parcel.h"
 #include "nocopyable.h"
@@ -26,8 +25,6 @@
 #include "i_multimodal_input_connect.h"
 #include "mmi_log.h"
 #include "multimodal_input_connect_define.h"
-#include "remote_msg_handler.h"
-#include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
@@ -38,7 +35,6 @@ public:
     ~MultimodalInputConnectStub() = default;
 
     virtual bool IsRunning() const = 0;
-    virtual SessionPtr GetSessionByPid(int32_t pid) const = 0;
     virtual int32_t OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply,
         MessageOption& options) override;
 
@@ -49,11 +45,13 @@ protected:
     int32_t StubIsPointerVisible(MessageParcel& data, MessageParcel& reply);
 
 private:
+    static constexpr int32_t SYSTEM_UID = 1000;
+    static constexpr int32_t ROOT_UID = 0;
+
     bool CheckPermission();
 
 protected:
     EntrustTasks entrustTasks_;
-    RemoteMsgHandler rMsgHandler_;
 };
 } // namespace MMI
 } // namespace OHOS

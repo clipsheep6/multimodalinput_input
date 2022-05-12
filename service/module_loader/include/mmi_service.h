@@ -62,7 +62,6 @@ protected:
     virtual void OnDisconnected(SessionPtr s) override;
     virtual int32_t AddEpoll(EpollEventType type, int32_t fd) override;
     virtual bool IsRunning() const override;
-    virtual SessionPtr GetSessionByPid(int32_t pid) const override;
 
     bool InitLibinputService();
     bool InitService();

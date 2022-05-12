@@ -31,10 +31,12 @@ void EntrustTasks::Task::ProcessTask()
     LOGFMTD("process task Begin id:%d", id_);
     MMI_HILOGD("process task Begin id:%{public}d", id_);
     int32_t ret = fun_();
-    LOGFMTD("process task End id:%d", id_);
-    MMI_HILOGD("process task End id:%{public}d", id_);
+    LOGFMTD("process task End id:%d ret:%d", id_, ret);
+    MMI_HILOGD("process task End id:%{public}d ret:%{public}d", id_, ret);
     if (promise_) {
         promise_->set_value(ret);
+        LOGFMTD("process task set_value id:%d ret:%d", id_, ret);
+        MMI_HILOGD("process task set_value id:%{public}d ret:%{public}d", id_, ret);
     }
 }
 
@@ -67,31 +69,37 @@ void EntrustTasks::ProcessTasks(uint64_t stid, int32_t pid)
     }
 }
 
-bool EntrustTasks::PostSyncTask(int32_t pid, ETaskCallback callback, int32_t timeout)
+int32_t EntrustTasks::PostSyncTask(int32_t pid, ETaskCallback callback, int32_t timeout)
 {
     CALL_LOG_ENTER2;
     Promise promise;
     Future future = promise.get_future();
     auto ret = PostTask(pid, callback, &promise);
-    if (!ret) {
+    if (ret != RET_OK) {
         LOGFMTE("Post aync task failed");
         MMI_HILOGE("Post aync task failed");
-        return false;
+        return ret;
     }
     std::chrono::milliseconds span(timeout);
     auto res = future.wait_for(span);
     if (res == std::future_status::timeout) {
         LOGFMTW("Task timeout pid:%d", pid);
         MMI_HILOGW("Task timeout pid:%{public}d", pid);
+        return ETASKS_WAIT_TIMEOUT;
+    } else if (res == std::future_status::deferred) {
+        LOGFMTW("Task deferred pid:%d", pid);
+        MMI_HILOGW("Task deferred pid:%{public}d", pid);
+        return ETASKS_WAIT_DEFERRED;
     }
-    return (res == std::future_status::ready);
+    ret = future.get();
+    return ret;
 }
 
 bool EntrustTasks::PostAsyncTask(int32_t pid, ETaskCallback callback)
 {
     CALL_LOG_ENTER2;
     auto ret = PostTask(pid, callback);
-    if (!ret) {
+    if (ret != RET_OK) {
         LOGFMTE("Post aync task failed");
         MMI_HILOGE("Post aync task failed");
         return false;
@@ -101,7 +109,7 @@ bool EntrustTasks::PostAsyncTask(int32_t pid, ETaskCallback callback)
     return true;
 }
 
-bool EntrustTasks::PostTask(int32_t pid, ETaskCallback callback, Promise *promise)
+int32_t EntrustTasks::PostTask(int32_t pid, ETaskCallback callback, Promise *promise)
 {
     CALL_LOG_ENTER2;
     std::lock_guard<std::mutex> guard(mux_);
@@ -109,7 +117,7 @@ bool EntrustTasks::PostTask(int32_t pid, ETaskCallback callback, Promise *promis
     if (tsize > ET_MAX_TASK_LIMIT) {
         LOGFMTE("Queue is full, not allowed. size:%zu/%d", tsize, ET_MAX_TASK_LIMIT);
         MMI_HILOGE("Queue is full, not allowed. size:%{public}zu/%{public}d", tsize, ET_MAX_TASK_LIMIT);
-        return false;
+        return ETASKS_QUEUE_FULL;
     }
     int32_t id = GenerateId();
     TaskData data = {GetThisThreadId(), pid, id};
@@ -118,10 +126,10 @@ bool EntrustTasks::PostTask(int32_t pid, ETaskCallback callback, Promise *promis
         RecoveryId(id);
         LOGFMTE("write error:%d", errno);
         MMI_HILOGE("write error:%{public}d", errno);
-        return false;
+        return ETASKS_PIPE_WAITE_FAIL;
     }
     tasks_.push(std::make_shared<Task>(id, callback, promise));
-    return true;
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

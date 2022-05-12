@@ -25,7 +25,6 @@
 
 #include "i_multimodal_input_connect.h"
 #include "mmi_log.h"
-#include "multimodal_input_connect_def_parcel.h"
 #include "util.h"
 #include "util_ex.h"
 
