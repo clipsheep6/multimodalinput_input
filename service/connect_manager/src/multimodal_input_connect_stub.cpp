@@ -15,10 +15,9 @@
 
 #include "multimodal_input_connect_stub.h"
 
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 
 #include "string_ex.h"
 #include "accesstoken_kit.h"
