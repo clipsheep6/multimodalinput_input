@@ -162,8 +162,9 @@ void InputWindowsManager::PrintDisplayInfo()
        
     MMI_HILOGD("hotArea info,num:%{public}zu", hotArea_.size());
     for (const auto &item : hotArea_) {
-        MMI_HILOGD("hotArea, hotZoneWidth1:%{public}d,hotZoneHeight1:%{public}d,hotZoneTopLeftX1:%{public}d,hotZoneTopLeftY1:%{public}d",
-        item.hotZoneWidth, item.hotZoneHeight, item.hotZoneTopLeftX, item.hotZoneTopLeftY);
+        MMI_HILOGD("hotArea, hotZoneWidth1:%{public}d,hotZoneHeight1:%{public}d,"
+            "hotZoneTopLeftX1:%{public}d,hotZoneTopLeftY1:%{public}d",
+            item.hotZoneWidth, item.hotZoneHeight, item.hotZoneTopLeftX, item.hotZoneTopLeftY);
     }
 }
 

@@ -364,7 +364,7 @@ int32_t InputManagerImpl::PackLogicalDisplay(NetPacket &pkt)
             return RET_ERR;
         }
         for (int32_t j = 0; j < numWindow; j++) {
-            auto windowInfo = logicalDisplays_[i].windowsInfo[j]
+            auto windowInfo = logicalDisplays_[i].windowsInfo[j];
 
             if (!pkt.Write(windowInfo.id)) {
                 MMI_HILOGE("Packet write windowsinfo id failed");
@@ -452,7 +452,7 @@ void InputManagerImpl::PrintDisplayInfo()
                 win.hotZoneHeight, win.displayId,
                 win.agentWindowId,
                 win.winTopLeftX, win.winTopLeftY, win.flags);
-            for(const auto &hotarea : win.hotArea) {
+            for (const auto &hotarea : win.hotArea) {
                 MMI_HILOGD("hotZoneWidth1:%{public}d,hotZoneHeight1:%{public}d,hotZoneTopLeftX1:%{public}d,"
                     "hotZoneTopLeftY1:%{public}d",
                     hotarea.hotZoneWidth, hotarea.hotZoneHeight,

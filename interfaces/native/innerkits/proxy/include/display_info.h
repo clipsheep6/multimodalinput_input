@@ -48,7 +48,6 @@ struct HotArea {
 
     // The y coordinate of the upper left corner of the hot zone window in the logical display
     int32_t hotZoneTopLeftY;
-    
 };
 
 struct WindowInfo {
