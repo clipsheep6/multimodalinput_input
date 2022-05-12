@@ -23,11 +23,11 @@ struct EventHandlerInfo {
     int32_t priority;
 };
 
-class EventHandlerBuilder {
+class EventHandlerBuild {
 public:
-    EventHandlerBuilder() = default;
-    DISALLOW_COPY_AND_MOVE(EventHandlerBuilder);
-    virtual ~EventHandlerBuilder() = default;
+    EventHandlerBuild() = default;
+    DISALLOW_COPY_AND_MOVE(EventHandlerBuild);
+    virtual ~EventHandlerBuild() = default;
     int32_t Build();
 private:
     int32_t ParseConfigFile();
@@ -44,7 +44,6 @@ private:
     EventHandlerInfos PointerInfos;
     EventHandlerInfos TouchInfos;
 };
-
 } // namespace MMI
 } // namespace OHOS
 #endif // EVENT_HANDLER_BUILD_H

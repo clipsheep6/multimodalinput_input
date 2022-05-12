@@ -43,7 +43,10 @@ public:
     IInputEventHandler(int32_t priority = 0);
     DISALLOW_COPY_AND_MOVE(IInputEventHandler);
     virtual ~IInputEventHandler() = default;
-    virtual EventHandlerType GetHandlerType() const { return EventHandlerType::NORMAL; }
+    virtual EventHandlerType GetHandlerType() const
+    {
+        return EventHandlerType::NORMAL; 
+    }
     virtual int32_t HandleLibinputEvent(libinput_event* event);
     virtual int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
     virtual int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent);

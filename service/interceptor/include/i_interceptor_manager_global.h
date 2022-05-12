@@ -25,12 +25,15 @@
 
 namespace OHOS {
 namespace MMI {
-class IInterceptorManagerGlobal : public IIncterceptorManagerEventHandler {
+class IInterceptorManagerGlobal : public IInterceptorManagerEventHandler {
 public:
-    IInterceptorManagerGlobal(int32_t priority) : IIncterceptorManagerEventHandler(priority) {}
+    IInterceptorManagerGlobal(int32_t priority) : IInterceptorManagerEventHandler(priority) {}
     ~IInterceptorManagerGlobal() = default;
     DISALLOW_COPY_AND_MOVE(IInterceptorManagerGlobal);
-    EventHandlerType GetHandlerType() const override { return EventHandlerType::INTERCEPTOR; }
+    EventHandlerType GetHandlerType() const override
+    {
+        return EventHandlerType::INTERCEPTOR;
+    }
     int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
     static std::shared_ptr<IInterceptorManagerGlobal> CreateInstance(int32_t priority);
     void OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session) override;

@@ -28,10 +28,10 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IInputEventHandler" };
 }
 
-IInputEventHandler::IInputEventHandler(int32_t priority) 
+IInputEventHandler::IInputEventHandler(int32_t priority)
 {
     priority_ = priority;
-};
+}
 
 int32_t IInputEventHandler::HandleLibinputEvent(libinput_event* event)
 {
@@ -76,7 +76,7 @@ int32_t IInputEventHandler::GetPriority() const
 
 int32_t IInputEventHandler::AddInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session)
 {
-    std::shared_ptr<IInputEventHandler> cur = shared_from_this(); 
+    std::shared_ptr<IInputEventHandler> cur = shared_from_this();
     while (cur != nullptr) {
         if (cur->GetHandlerType() == EventHandlerType::INTERCEPTOR) {
             auto interceptor = std::static_pointer_cast<IInterceptorEventHandler>(cur);
@@ -89,7 +89,7 @@ int32_t IInputEventHandler::AddInterceptor(int32_t handlerId, InputHandlerType h
 
 void IInputEventHandler::TouchMonitorHandlerMarkConsumed(int32_t monitorId, int32_t eventId, SessionPtr sess)
 {
-    std::shared_ptr<IInputEventHandler> cur = shared_from_this(); 
+    std::shared_ptr<IInputEventHandler> cur = shared_from_this();
     while (cur != nullptr) {
         if (cur->GetHandlerType() == EventHandlerType::MONITOR) {
             auto monitor = std::static_pointer_cast<IMonitorEventHandler>(cur);
@@ -102,7 +102,7 @@ void IInputEventHandler::TouchMonitorHandlerMarkConsumed(int32_t monitorId, int3
 
 void IInputEventHandler::RemoveInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session)
 {
-    std::shared_ptr<IInputEventHandler> cur = shared_from_this(); 
+    std::shared_ptr<IInputEventHandler> cur = shared_from_this();
     while (cur != nullptr) {
         if (cur->GetHandlerType() == EventHandlerType::INTERCEPTOR) {
             auto interceptor = std::static_pointer_cast<IInterceptorEventHandler>(cur);
@@ -115,10 +115,10 @@ void IInputEventHandler::RemoveInterceptor(int32_t handlerId, InputHandlerType h
 
 void IInputEventHandler::AddKeyInterceptor(int32_t sourceType, int32_t id, SessionPtr session)
 {
-    std::shared_ptr<IInputEventHandler> cur = shared_from_this(); 
+    std::shared_ptr<IInputEventHandler> cur = shared_from_this();
     while (cur != nullptr) {
         if (cur->GetHandlerType() == EventHandlerType::INTERCEPTOR) {
-            auto interceptor = std::static_pointer_cast<IIncterceptorManagerEventHandler>(cur);
+            auto interceptor = std::static_pointer_cast<IInterceptorManagerEventHandler>(cur);
             interceptor->OnAddInterceptor(sourceType, id, session);
             return;
         }
@@ -128,10 +128,10 @@ void IInputEventHandler::AddKeyInterceptor(int32_t sourceType, int32_t id, Sessi
 
 void IInputEventHandler::RemoveKeyInterceptor(int32_t id)
 {
-    std::shared_ptr<IInputEventHandler> cur = shared_from_this(); 
+    std::shared_ptr<IInputEventHandler> cur = shared_from_this();
     while (cur != nullptr) {
         if (cur->GetHandlerType() == EventHandlerType::INTERCEPTOR) {
-            auto interceptor = std::static_pointer_cast<IIncterceptorManagerEventHandler>(cur);
+            auto interceptor = std::static_pointer_cast<IInterceptorManagerEventHandler>(cur);
             interceptor->OnRemoveInterceptor(id);
             return;
         }
@@ -141,12 +141,11 @@ void IInputEventHandler::RemoveKeyInterceptor(int32_t id)
 
 int32_t IInputEventHandler::AddMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session)
 {
-    std::shared_ptr<IInputEventHandler> cur = shared_from_this(); 
+    std::shared_ptr<IInputEventHandler> cur = shared_from_this();
     while (cur != nullptr) {
         if (cur->GetHandlerType() == EventHandlerType::MONITOR) {
             auto monitor = std::static_pointer_cast<IMonitorEventHandler>(cur);
             return monitor->AddInputHandler(handlerId, handlerType, session);
-
         }
         cur = cur->nextHandler_;
     }
@@ -155,7 +154,7 @@ int32_t IInputEventHandler::AddMonitor(int32_t handlerId, InputHandlerType handl
 
 void IInputEventHandler::RemoveMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session)
 {
-    std::shared_ptr<IInputEventHandler> cur = shared_from_this(); 
+    std::shared_ptr<IInputEventHandler> cur = shared_from_this();
     while (cur != nullptr) {
         if (cur->GetHandlerType() == EventHandlerType::MONITOR) {
             auto monitor = std::static_pointer_cast<IMonitorEventHandler>(cur);
@@ -166,9 +165,10 @@ void IInputEventHandler::RemoveMonitor(int32_t handlerId, InputHandlerType handl
     }
 }
 
-int32_t IInputEventHandler::AddSubscriber(SessionPtr sess, int32_t subscribeId, const std::shared_ptr<KeyOption> keyOption)
+int32_t IInputEventHandler::AddSubscriber(SessionPtr sess, int32_t subscribeId,
+    const std::shared_ptr<KeyOption> keyOption)
 {
-    std::shared_ptr<IInputEventHandler> cur = shared_from_this(); 
+    std::shared_ptr<IInputEventHandler> cur = shared_from_this();
     while (cur != nullptr) {
         if (cur->GetHandlerType() == EventHandlerType::SUBSCRIBER) {
             auto subscriber = std::static_pointer_cast<ISubscriberEventHandler>(cur);
@@ -181,7 +181,7 @@ int32_t IInputEventHandler::AddSubscriber(SessionPtr sess, int32_t subscribeId, 
 
 int32_t IInputEventHandler::RemoveSubscriber(SessionPtr sess, int32_t subscribeId)
 {
-    std::shared_ptr<IInputEventHandler> cur = shared_from_this(); 
+    std::shared_ptr<IInputEventHandler> cur = shared_from_this();
     while (cur != nullptr) {
         if (cur->GetHandlerType() == EventHandlerType::SUBSCRIBER) {
             auto subscriber = std::static_pointer_cast<ISubscriberEventHandler>(cur);
@@ -194,7 +194,7 @@ int32_t IInputEventHandler::RemoveSubscriber(SessionPtr sess, int32_t subscribeI
 
 int32_t IInputEventHandler::AddFilter(sptr<IEventFilter> filter)
 {
-    std::shared_ptr<IInputEventHandler> cur = shared_from_this(); 
+    std::shared_ptr<IInputEventHandler> cur = shared_from_this();
     while (cur != nullptr) {
         if (cur->GetHandlerType() == EventHandlerType::FILTER) {
             auto filterHalder = std::static_pointer_cast<IFilterEventHandler>(cur);
@@ -207,15 +207,15 @@ int32_t IInputEventHandler::AddFilter(sptr<IEventFilter> filter)
 
 uint32_t IInputEventHandler::SetNext(std::shared_ptr<IInputEventHandler> nextHandler)
 {
-    std::shared_ptr<IInputEventHandler> cur = shared_from_this();  
-    std::shared_ptr<IInputEventHandler> next = cur->nextHandler_; 
+    std::shared_ptr<IInputEventHandler> cur = shared_from_this();
+    std::shared_ptr<IInputEventHandler> next = cur->nextHandler_;
 
-    if (next == nullptr) { 
-        cur->nextHandler_ = nextHandler; 
-        return RET_OK; 
-    }  
+    if (next == nullptr) {
+        cur->nextHandler_ = nextHandler;
+        return RET_OK;
+    }
 
-    auto tmpPrioty = nextHandler->GetPriority(); 
+    auto tmpPrioty = nextHandler->GetPriority();
     while (next != nullptr) {
         if (tmpPrioty < next->GetPriority()) {
             next->nextHandler_ = nextHandler;
@@ -228,11 +228,9 @@ uint32_t IInputEventHandler::SetNext(std::shared_ptr<IInputEventHandler> nextHan
         if (next == nullptr) {
             cur->nextHandler_ = nextHandler;
             break;
-        }        
+        }
     }
-
     return RET_OK;
 }
-
 } // namespace MMI
 } // namespace OHOS

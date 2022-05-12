@@ -31,7 +31,10 @@ public:
     IInterceptorHandlerGlobal(int32_t priority) : IInterceptorEventHandler(priority) {}
     ~IInterceptorHandlerGlobal() = default;
     DISALLOW_COPY_AND_MOVE(IInterceptorHandlerGlobal);
-    EventHandlerType GetHandlerType() const override { return EventHandlerType::INTERCEPTOR; }
+    EventHandlerType GetHandlerType() const override
+    {
+        return EventHandlerType::INTERCEPTOR;
+    }
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_POINTER

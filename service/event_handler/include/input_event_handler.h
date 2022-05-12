@@ -40,7 +40,8 @@ namespace OHOS {
 namespace MMI {
 using EventFun = std::function<int32_t(libinput_event *event)>;
 using NotifyDeviceChange = std::function<void(int32_t, int32_t, char *)>;
-class InputEventHandler : public IInputSouthEventHandler, public MsgHandler<EventFun>, public DelayedSingleton<InputEventHandler> {
+class InputEventHandler : public IInputSouthEventHandler, public MsgHandler<EventFun>,
+    public DelayedSingleton<InputEventHandler> {
 public:
     InputEventHandler();
     DISALLOW_COPY_AND_MOVE(InputEventHandler);
@@ -54,11 +55,10 @@ public:
     int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
     int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
 
-    // TODO:
     int32_t AddPointerInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
     void RemovePointerInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
     int32_t AddTouchInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
-    void RemoveTouchInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;    
+    void RemoveTouchInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;  
     void AddKeyInterceptor(int32_t sourceType, int32_t id, SessionPtr session) override;
     void RemoveKeyInterceptor(int32_t id) override;
 
@@ -73,7 +73,6 @@ public:
     int32_t RemoveSubscriber(SessionPtr sess, int32_t subscribeId) override;
 
     int32_t AddFilter(sptr<IEventFilter> filter) override;
-    
 
 protected:
     int32_t OnEventDeviceAdded(libinput_event *event);
@@ -101,7 +100,6 @@ private:
     int64_t initSysClock_ = 0;
     int64_t lastSysClock_ = 0;
 };
-
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_EVENT_HANDLER_H

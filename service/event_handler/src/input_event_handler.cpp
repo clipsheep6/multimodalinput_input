@@ -157,7 +157,6 @@ void InputEventHandler::Init()
             continue;
         }
     }
-    return;
 }
 
 void InputEventHandler::OnEvent(void *event)
@@ -212,10 +211,6 @@ int32_t InputEventHandler::OnEventHandler(libinput_event *event)
 
 void InputEventHandler::BuildInputHandlerChain()
 {
-    //EventHandlerBuilder build;
-    //build.ParseConfigFile();
-    //keyEventHandler_ = build.BuildChainKey();
-
     keyEventHandler_ = std::make_shared<IInputEventHandler>();
     pointerEventHandler_ = std::make_shared<IInputEventHandler>();
     touchEventHandler_ = std::make_shared<IInputEventHandler>();
@@ -288,37 +283,37 @@ void InputEventHandler::RemoveTouchInterceptor(int32_t handlerId, InputHandlerTy
 void InputEventHandler::AddKeyInterceptor(int32_t sourceType, int32_t id, SessionPtr session)
 {
     CHKPV(keyEventHandler_);
-    keyEventHandler_->AddKeyInterceptor(sourceType, id, session);  
+    keyEventHandler_->AddKeyInterceptor(sourceType, id, session);
 }
 
 void InputEventHandler::RemoveKeyInterceptor(int32_t id)
 {
     CHKPV(keyEventHandler_);
-    keyEventHandler_->RemoveKeyInterceptor(id);  
+    keyEventHandler_->RemoveKeyInterceptor(id);
 }
 
 void InputEventHandler::AddKeyMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session)
 {
     CHKPV(keyEventHandler_);
-    keyEventHandler_->AddMonitor(handlerId, handlerType, session);    
+    keyEventHandler_->AddMonitor(handlerId, handlerType, session); 
 }
 
 void InputEventHandler::RemoveKeyMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session)
 {
     CHKPV(keyEventHandler_);
-    keyEventHandler_->RemoveMonitor(handlerId, handlerType, session);  
+    keyEventHandler_->RemoveMonitor(handlerId, handlerType, session);
 }
 
 void InputEventHandler::AddPointerMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session)
 {
     CHKPV(pointerEventHandler_);
-    pointerEventHandler_->AddMonitor(handlerId, handlerType, session);    
+    pointerEventHandler_->AddMonitor(handlerId, handlerType, session);
 }
 
 void InputEventHandler::RemovePointerMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session)
 {
     CHKPV(pointerEventHandler_);
-    pointerEventHandler_->RemoveMonitor(handlerId, handlerType, session);    
+    pointerEventHandler_->RemoveMonitor(handlerId, handlerType, session);
 }
 
 void InputEventHandler::AddTouchMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session)
@@ -338,7 +333,8 @@ void InputEventHandler::TouchMonitorHandlerMarkConsumed(int32_t monitorId, int32
     touchEventHandler_->TouchMonitorHandlerMarkConsumed(monitorId, eventId, sess);
 }
 
-int32_t InputEventHandler::AddSubscriber(SessionPtr sess, int32_t subscribeId, const std::shared_ptr<KeyOption> keyOption) 
+int32_t InputEventHandler::AddSubscriber(SessionPtr sess, int32_t subscribeId,
+    const std::shared_ptr<KeyOption> keyOption)
 {
     CHKPR(keyEventHandler_, ERROR_NULL_POINTER);
     return keyEventHandler_->AddSubscriber(sess, subscribeId, keyOption);
@@ -346,7 +342,7 @@ int32_t InputEventHandler::AddSubscriber(SessionPtr sess, int32_t subscribeId, c
 
 int32_t InputEventHandler::RemoveSubscriber(SessionPtr sess, int32_t subscribeId)
 {
-    return keyEventHandler_->RemoveSubscriber(sess, subscribeId);    
+    return keyEventHandler_->RemoveSubscriber(sess, subscribeId);
 }
 
 void InputEventHandler::OnCheckEventReport()

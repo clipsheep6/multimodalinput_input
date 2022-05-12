@@ -36,7 +36,7 @@ public:
     virtual int32_t AddPointerInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
     virtual void RemovePointerInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
     virtual int32_t AddTouchInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
-    virtual void RemoveTouchInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;    
+    virtual void RemoveTouchInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;  
     virtual void AddKeyInterceptor(int32_t sourceType, int32_t id, SessionPtr session) = 0;
     virtual void RemoveKeyInterceptor(int32_t id) = 0;
 
@@ -52,9 +52,7 @@ public:
     virtual void TouchMonitorHandlerMarkConsumed(int32_t monitorId, int32_t eventId, SessionPtr sess) = 0;
 
     virtual int32_t AddFilter(sptr<IEventFilter> filter) = 0;
-
     virtual std::shared_ptr<KeyEvent> GetKeyEvent() const = 0;
-
 };
 } // namespace MMI
 } // namespace OHOS

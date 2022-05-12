@@ -16,7 +16,7 @@
 #include "event_handler_build.h"
 
 
-int32_t EventHandlerBuilder::Build()
+int32_t EventHandlerBuild::Build()
 {
     // 判断 /etc/input_handler_config.json
     if (!ParseConfigFile()) {
@@ -24,12 +24,11 @@ int32_t EventHandlerBuilder::Build()
     }
 }
 
-int32_t EventHandlerBuilder::ParseConfigFile()
+int32_t EventHandlerBuild::ParseConfigFile()
 {
-
 }
 
-std::shared_ptr<IInputEventHandler> EventHandlerBuilder::BuildChainKey()
+std::shared_ptr<IInputEventHandler> EventHandlerBuild::BuildChainKey()
 {
     auto keyEventHandler_ = std::make_shared<IInputEventHandler>();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -39,7 +38,7 @@ std::shared_ptr<IInputEventHandler> EventHandlerBuilder::BuildChainKey()
                 keyEventHandler_->AddConstructHandler<KeyEventHandler>(info.priority);
             } else if (info.name == "IInterceptorManagerGlobal") {
                 keyEventHandler_->AddInstanceHandler<IInterceptorManagerGlobal>(info.priority);
-            } 
+            }
         }
     } else {
         keyEventHandler_->AddConstructHandler<KeyEventHandler>(1);
@@ -53,11 +52,11 @@ std::shared_ptr<IInputEventHandler> EventHandlerBuilder::BuildChainKey()
     return keyEventHandler_;
 }
 
-std::shared_ptr<IInputEventHandler> EventHandlerBuilder::BuildChainPointer()
+std::shared_ptr<IInputEventHandler> EventHandlerBuild::BuildChainPointer()
 {
 
 }
-std::shared_ptr<IInputEventHandler> EventHandlerBuilder::BuildChainTouch()
+std::shared_ptr<IInputEventHandler> EventHandlerBuild::BuildChainTouch()
 {
 
 }

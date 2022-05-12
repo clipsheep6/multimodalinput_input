@@ -100,36 +100,7 @@ static void CheckDefine()
 
 std::shared_ptr<IUdsServer> IUdsServer::GetInstance()
 {
-    // auto sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    // if (sm == nullptr) {
-    //     MMI_HILOGE("get system ability manager fail");
-    //     return false;
-    // }
-    // auto sa = sm->GetSystemAbility(IMultimodalInputConnect::MULTIMODAL_INPUT_CONNECT_SERVICE_ID);
-    // if (sa == nullptr) {
-    //     MMI_HILOGE("get sa fail");
-    //     return false;
-    // }
-
-    // std::weak_ptr<MultimodalInputConnectManager> weakPtr = shared_from_this();
-    // auto deathCallback = [weakPtr](const wptr<IRemoteObject> &object) {
-    //     auto sharedPtr = weakPtr.lock();
-    //     if (sharedPtr != nullptr) {
-    //         sharedPtr->OnDeath();
-    //     }
-    // };
-
-    // multimodalInputConnectRecipient_ = new (std::nothrow) MultimodalInputConnectDeathRecipient(deathCallback);
-    // CHKPF(multimodalInputConnectRecipient_);
-    // sa->AddDeathRecipient(multimodalInputConnectRecipient_);
-    // multimodalInputConnectService_ = iface_cast<IMultimodalInputConnect>(sa);
-    // if (multimodalInputConnectService_ == nullptr) {
-    //     MMI_HILOGE("get multimodalinput service fail");
-    //     return false;
-    // }
-
-    auto service = OHOS::DelayedSingleton<MMIService>::GetInstance();
-    return service;
+    return OHOS::DelayedSingleton<MMIService>::GetInstance();
 }
 
 MMIService::MMIService() : SystemAbility(MULTIMODAL_INPUT_CONNECT_SERVICE_ID, true) {}
@@ -404,7 +375,7 @@ int32_t MMIService::HandleTimerPointerEvent(std::shared_ptr<PointerEvent> event)
 
 std::shared_ptr<KeyEvent> MMIService::GetKeyEvent() const
 {
-    return southEventHandler_.GetKeyEvent();    
+    return southEventHandler_.GetKeyEvent();
 }
 
 #ifdef OHOS_RSS_CLIENT
