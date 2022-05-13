@@ -56,9 +56,6 @@ void ServerMsgHandler::Init(IInputSouthEventHandler *southEventHandler)
     }
 #endif
     MsgCallback funs[] = {
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-        {MmiMessageId::ON_VIRTUAL_KEY, MsgCallbackBind2(&ServerMsgHandler::OnVirtualKeyEvent, this)},
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
         {MmiMessageId::MARK_PROCESS,
             MsgCallbackBind2(&ServerMsgHandler::MarkProcessed, this)},
         {MmiMessageId::ON_DUMP, MsgCallbackBind2(&ServerMsgHandler::OnDump, this)},
@@ -142,26 +139,6 @@ int32_t ServerMsgHandler::OnHdiInject(SessionPtr sess, NetPacket& pkt)
     return RET_OK;
 }
 #endif // OHOS_BUILD_HDF
-
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-int32_t ServerMsgHandler::OnVirtualKeyEvent(SessionPtr sess, NetPacket& pkt)
-{
-    VirtualKey virtualKeyEvent;
-    pkt >> virtualKeyEvent;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read virtualKeyEvent failed");
-        return PACKET_READ_FAIL;
-    }
-    if (virtualKeyEvent.keyCode == HOS_KEY_HOME) {
-        MMI_HILOGD(" home press");
-    } else if (virtualKeyEvent.keyCode == HOS_KEY_BACK) {
-        MMI_HILOGD(" back press");
-    } else if (virtualKeyEvent.keyCode == HOS_KEY_VIRTUAL_MULTITASK) {
-        MMI_HILOGD(" multitask press");
-    }
-    return RET_OK;
-}
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 int32_t ServerMsgHandler::OnDump(SessionPtr sess, NetPacket& pkt)
 {

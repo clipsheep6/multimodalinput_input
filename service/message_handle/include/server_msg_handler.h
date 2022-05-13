@@ -37,9 +37,6 @@ public:
     void OnMsgHandler(SessionPtr sess, NetPacket& pkt);
 
 protected:
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    int32_t OnVirtualKeyEvent(SessionPtr sess, NetPacket& pkt);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
 #ifdef OHOS_BUILD_HDF
     int32_t OnHdiInject(SessionPtr sess, NetPacket& pkt);

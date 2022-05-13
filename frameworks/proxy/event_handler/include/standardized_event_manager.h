@@ -36,8 +36,6 @@ public:
 
     void SetClientHandle(MMIClientPtr client);
     const std::set<std::string> *GetRegisterEvent();
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    int32_t InjectionVirtual(bool isPressed, int32_t keyCode, int64_t keyDownDuration, int32_t maxKeyCode);
     int32_t InjectEvent(const std::shared_ptr<KeyEvent> keyEventPtr);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
