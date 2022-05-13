@@ -46,10 +46,6 @@ public:
     int32_t GetKeyboardType(int32_t userData, int32_t deviceId);
     int32_t RegisterInputDeviceMonitor();
     int32_t UnRegisterInputDeviceMonitor();
-    int32_t AddInputEventMontior(int32_t keyEventType);
-    void RemoveInputEventMontior(int32_t keyEventType);
-    int32_t AddInputEventTouchpadMontior(int32_t pointerEventType);
-    void RemoveInputEventTouchpadMontior(int32_t pointerEventType);
     int32_t AddInterceptor(int32_t sourceType, int32_t id);
     int32_t RemoveInterceptor(int32_t id);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING

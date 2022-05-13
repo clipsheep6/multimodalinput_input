@@ -178,59 +178,5 @@ int32_t MultimodalEventHandler::RemoveInterceptor(int32_t id)
     MMI_HILOGD("client remove a touchpad event interceptor");
     return RET_OK;
 }
-#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
-
-int32_t MultimodalEventHandler::AddInputEventMontior(int32_t keyEventType)
-{
-    CALL_LOG_ENTER;
-    if (!InitClient()) {
-        MMI_HILOGE("Init client faild");
-        return MMI_SERVICE_INVALID;
-    }
-    NetPacket pkt(MmiMessageId::ADD_INPUT_EVENT_MONITOR);
-    pkt << keyEventType;
-    client_->SendMessage(pkt);
-    return RET_OK;
-}
-
-void MultimodalEventHandler::RemoveInputEventMontior(int32_t keyEventType)
-{
-    CALL_LOG_ENTER;
-    if (!InitClient()) {
-        MMI_HILOGE("Init client faild");
-        return;
-    }
-    NetPacket pkt(MmiMessageId::REMOVE_INPUT_EVENT_MONITOR);
-    pkt << keyEventType;
-    client_->SendMessage(pkt);
-}
-
-void MultimodalEventHandler::RemoveInputEventTouchpadMontior(int32_t pointerEventType)
-{
-    CALL_LOG_ENTER;
-    if (!InitClient()) {
-        MMI_HILOGE("Init client faild");
-        return;
-    }
-    NetPacket pkt(MmiMessageId::REMOVE_INPUT_EVENT_TOUCHPAD_MONITOR);
-    pkt << InputEvent::EVENT_TYPE_POINTER;
-    client_->SendMessage(pkt);
-}
-
-int32_t MultimodalEventHandler::AddInputEventTouchpadMontior(int32_t pointerEventType)
-{
-    CALL_LOG_ENTER;
-    if (!InitClient()) {
-        MMI_HILOGE("Init client faild");
-        return MMI_SERVICE_INVALID;
-    }
-    NetPacket pkt(MmiMessageId::ADD_INPUT_EVENT_TOUCHPAD_MONITOR);
-    pkt << InputEvent::EVENT_TYPE_POINTER;
-    MMI_HILOGE("send msg before");
-    bool isSuc = client_->SendMessage(pkt);
-    if (isSuc)
-        MMI_HILOGD("sendAdd msg Success");
-    return RET_OK;
-}
 } // namespace MMI
 } // namespace OHOS

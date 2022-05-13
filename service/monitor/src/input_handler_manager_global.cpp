@@ -282,5 +282,85 @@ void InputHandlerManagerGlobal::MonitorCollection::OnSessionLost(SessionPtr sess
         }
     }
 }
+
+int32_t InputHandlerManagerGlobal::InterceptorCollection::GetPriority() const
+{
+    return IInputEventHandler::DEFAULT_INTERCEPTOR;
+}
+
+bool InputHandlerManagerGlobal::InterceptorCollection::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CHKPF(keyEvent);
+    std::lock_guard<std::mutex> guard(lockInterceptors_);
+    if (interceptors_.empty()) {
+        return false;
+    }
+    MMI_HILOGD("There are currently:%{public}zu interceptors", interceptors_.size());
+    for (const auto &interceptor : interceptors_) {
+        interceptor.SendToClient(keyEvent);
+    }
+    return true;
+}
+
+bool InputHandlerManagerGlobal::InterceptorCollection::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPF(pointerEvent);
+    std::lock_guard<std::mutex> guard(lockInterceptors_);
+    if (interceptors_.empty()) {
+        return false;
+    }
+    MMI_HILOGD("There are currently:%{public}zu interceptors", interceptors_.size());
+    for (const auto &interceptor : interceptors_) {
+        interceptor.SendToClient(pointerEvent);
+    }
+    return true;
+}
+
+int32_t InputHandlerManagerGlobal::InterceptorCollection::AddInterceptor(const SessionHandler& interceptor)
+{
+    std::lock_guard<std::mutex> guard(lockInterceptors_);
+    if (interceptors_.size() >= MAX_N_INPUT_INTERCEPTORS) {
+        MMI_HILOGE("The number of interceptors exceeds limit");
+        return RET_ERR;
+    }
+    auto ret = interceptors_.insert(interceptor);
+    if (ret.second) {
+        MMI_HILOGD("Register interceptor successfully");
+    } else {
+        MMI_HILOGW("Duplicate interceptors");
+    }
+    return RET_OK;
+}
+
+void InputHandlerManagerGlobal::InterceptorCollection::RemoveInterceptor(const SessionHandler& interceptor)
+{
+    std::lock_guard<std::mutex> guard(lockInterceptors_);
+    std::set<SessionHandler>::const_iterator tItr = interceptors_.find(interceptor);
+    if (tItr != interceptors_.cend()) {
+        interceptors_.erase(tItr);
+        MMI_HILOGD("Unregister interceptor successfully");
+    }
+}
+
+void InputHandlerManagerGlobal::InterceptorCollection::OnSessionLost(SessionPtr session)
+{
+    std::lock_guard<std::mutex> guard(lockInterceptors_);
+    std::set<SessionHandler>::const_iterator cItr = interceptors_.cbegin();
+    while (cItr != interceptors_.cend()) {
+        if (cItr->session_ != session) {
+            ++cItr;
+        } else {
+            cItr = interceptors_.erase(cItr);
+        }
+    }
+}
+
+std::shared_ptr<IInputHandlerManagerGlobal> IInputHandlerManagerGlobal::GetInstance()
+{
+    if (iInputHandlerManagerGlobal_ == nullptr) {
+        iInputHandlerManagerGlobal_ = std::make_shared<InputHandlerManagerGlobal>();
+    }
+    return iInputHandlerManagerGlobal_;
+}
 } // namespace MMI
 } // namespace OHOS

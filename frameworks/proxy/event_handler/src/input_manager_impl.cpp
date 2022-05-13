@@ -23,7 +23,7 @@
 #include "bytrace_adapter.h"
 #include "define_interceptor_manager.h"
 #include "event_filter_service.h"
-#include "input_event_monitor_manager.h"
+#include "interceptor_manager.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
@@ -436,8 +436,7 @@ int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consum
         MMI_HILOGE("client init failed");
         return -1;
     }
-    int32_t monitorId = monitorManager_.AddMonitor(consumer);
-    return monitorId;
+    return IInputMonitorManager::GetInstance()->AddMonitor(consumer);
 }
 
 void InputManagerImpl::RemoveMonitor(int32_t monitorId)
@@ -447,7 +446,7 @@ void InputManagerImpl::RemoveMonitor(int32_t monitorId)
         MMI_HILOGE("client init failed");
         return;
     }
-    monitorManager_.RemoveMonitor(monitorId);
+    IInputMonitorManager::GetInstance()->RemoveMonitor(monitorId);
 }
 
 void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
@@ -457,7 +456,7 @@ void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
         MMI_HILOGE("client init failed");
         return;
     }
-    monitorManager_.MarkConsumed(monitorId, eventId);
+    IInputMonitorManager::GetInstance()->MarkConsumed(monitorId, eventId);
 }
 
 void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
