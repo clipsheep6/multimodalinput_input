@@ -19,8 +19,8 @@
 #include "i_filter_event_handler.h"
 #include "i_interceptor_event_handler.h"
 #include "i_interceptor_manager_event_handler.h"
-#include "i_subscriber_event_handler.h"
 #include "i_monitor_event_handler.h"
+#include "i_subscriber_event_handler.h"
 
 namespace OHOS {
 namespace MMI {

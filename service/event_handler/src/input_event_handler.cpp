@@ -28,10 +28,10 @@
 #include "libinput.h"
 
 #include "bytrace_adapter.h"
-#include "input_device_manager.h"
 #include "i_key_command_manager.h"
-#include "mmi_func_callback.h"
+#include "input_device_manager.h"
 #include "libinput_adapter.h"
+#include "mmi_func_callback.h"
 #include "time_cost_chk.h"
 #include "timer_manager.h"
 #include "touch_transform_point_manager.h"
@@ -342,6 +342,7 @@ int32_t InputEventHandler::AddSubscriber(SessionPtr sess, int32_t subscribeId,
 
 int32_t InputEventHandler::RemoveSubscriber(SessionPtr sess, int32_t subscribeId)
 {
+    CHKPR(keyEventHandler_, ERROR_NULL_POINTER);
     return keyEventHandler_->RemoveSubscriber(sess, subscribeId);
 }
 
