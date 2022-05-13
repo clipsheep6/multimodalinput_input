@@ -46,7 +46,7 @@ int32_t InputHandlerManagerGlobal::HandlePointerEvent(std::shared_ptr<PointerEve
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (HandleEvent(pointerEvent)) {
         BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP);
-        MMI_HILOGD("Interception and monitor succeeded");
+        MMI_HILOGD("Monitor is succeeded");
         return RET_OK;
     }
     CHKPR(nextHandler_, ERROR_NULL_POINTER);
@@ -60,7 +60,7 @@ int32_t InputHandlerManagerGlobal::HandleTouchEvent(std::shared_ptr<PointerEvent
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (HandleEvent(pointerEvent)) {
         BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP);
-        MMI_HILOGD("Interception and monitor succeeded");
+        MMI_HILOGD("Monitor is succeeded");
         return RET_OK;
     }
     CHKPR(nextHandler_, ERROR_NULL_POINTER);

@@ -25,7 +25,6 @@
 #include "i_event_filter.h"
 #include "i_input_event_handler.h"
 #include "i_interceptor_handler_global.h"
-#include "i_interceptor_manager_global.h"
 #include "i_input_south_event_handler.h"
 #include "input_handler_manager_global.h"
 #include "key_event_subscriber.h"
@@ -55,12 +54,12 @@ public:
     int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
     int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
 
+    int32_t AddKeyInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
+    void RemoveKeyInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
     int32_t AddPointerInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
     void RemovePointerInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
     int32_t AddTouchInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
     void RemoveTouchInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;  
-    void AddKeyInterceptor(int32_t sourceType, int32_t id, SessionPtr session) override;
-    void RemoveKeyInterceptor(int32_t id) override;
 
     void AddKeyMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
     void RemoveKeyMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;

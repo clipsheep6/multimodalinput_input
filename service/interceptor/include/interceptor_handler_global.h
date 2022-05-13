@@ -42,6 +42,7 @@ public:
     int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
     void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
     bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     bool HandleEvent(std::shared_ptr<PointerEvent> pointerEvent);

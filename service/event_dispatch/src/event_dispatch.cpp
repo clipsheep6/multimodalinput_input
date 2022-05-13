@@ -69,14 +69,14 @@ int32_t EventDispatch::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     auto session = udsServer->GetSession(fd);
     CHKPF(session);
     if (session->isANRProcess_) {
-        MMI_HILOGD("application not responsing");
+        MMI_HILOGD("is ANR process");
         return RET_OK;
     }
 
     auto currentTime = GetSysClockTime();
     if (TriggerANR(currentTime, session)) {
         session->isANRProcess_ = true;
-        MMI_HILOGW("the key event does not report normally, application not response");
+        MMI_HILOGW("the key event does not report normally, triggering ANR");
         return RET_OK;
     }
 

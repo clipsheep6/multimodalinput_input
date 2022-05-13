@@ -58,8 +58,6 @@ public:
     void TouchMonitorHandlerMarkConsumed(int32_t monitorId, int32_t eventId, SessionPtr sess);
     int32_t AddInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     void RemoveInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
-    void AddKeyInterceptor(int32_t sourceType, int32_t id, SessionPtr session) ;
-    void RemoveKeyInterceptor(int32_t id) ;
     int32_t AddSubscriber(SessionPtr sess, int32_t subscribeId, const std::shared_ptr<KeyOption> keyOption);
     int32_t RemoveSubscriber(SessionPtr sess, int32_t subscribeId) ;
     int32_t AddFilter(sptr<IEventFilter> filter);

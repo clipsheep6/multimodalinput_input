@@ -21,7 +21,6 @@
 #include "event_package.h"
 #include "hos_key_event.h"
 #include "i_interceptor_handler_global.h"
-#include "i_interceptor_manager_global.h"
 #include "input_device_manager.h"
 #include "input_event.h"
 #include "input_event_data_transformation.h"
@@ -96,10 +95,6 @@ void ServerMsgHandler::Init(IInputSouthEventHandler *southEventHandler)
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
         {MmiMessageId::SUBSCRIBE_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnSubscribeKeyEvent, this)},
         {MmiMessageId::UNSUBSCRIBE_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnUnSubscribeKeyEvent, this)},
-        {MmiMessageId::ADD_EVENT_INTERCEPTOR,
-            MsgCallbackBind2(&ServerMsgHandler::OnAddTouchpadEventFilter, this)},
-        {MmiMessageId::REMOVE_EVENT_INTERCEPTOR,
-            MsgCallbackBind2(&ServerMsgHandler::OnRemoveTouchpadEventFilter, this)},
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_MMI_DEBUG
         {MmiMessageId::BIGPACKET_TEST, MsgCallbackBind2(&ServerMsgHandler::OnBigPacketTest, this)},
@@ -335,6 +330,7 @@ int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, NetPacket& pkt)
     CHKPR(southEventHandler_, ERROR_NULL_POINTER);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     do {
+        southEventHandler_->AddKeyInterceptor(handlerId, handlerType, sess);
         southEventHandler_->AddKeyMonitor(handlerId, handlerType, sess);
     } while (0);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -370,6 +366,7 @@ int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, NetPacket& pkt)
     CHKPR(southEventHandler_, ERROR_NULL_POINTER);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     do {
+        southEventHandler_->RemoveKeyInterceptor(handlerId, handlerType, sess);
         southEventHandler_->RemoveKeyMonitor(handlerId, handlerType, sess);
     } while (0);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -729,37 +726,6 @@ int32_t ServerMsgHandler::OnRemoveInputEventTouchpadMontior(SessionPtr sess, Net
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-int32_t ServerMsgHandler::OnAddTouchpadEventFilter(SessionPtr sess, NetPacket& pkt)
-{
-    CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t sourceType = 0;
-    int32_t id = 0;
-    pkt >> sourceType >> id;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read sourceType failed");
-        return PACKET_READ_FAIL;
-    }
-    CHKPR(southEventHandler_, ERROR_NULL_POINTER);
-    southEventHandler_->AddKeyInterceptor(sourceType, id, sess);
-    return RET_OK;
-}
-
-int32_t ServerMsgHandler::OnRemoveTouchpadEventFilter(SessionPtr sess, NetPacket& pkt)
-{
-    CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t id = 0;
-    pkt >> id;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read data failed");
-        return PACKET_READ_FAIL;
-    }
-    CHKPR(southEventHandler_, ERROR_NULL_POINTER);
-    southEventHandler_->RemoveKeyInterceptor(id);
-    return RET_OK;
-}
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #ifdef OHOS_BUILD_MMI_DEBUG
 int32_t ServerMsgHandler::OnBigPacketTest(SessionPtr sess, NetPacket& pkt)

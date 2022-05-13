@@ -35,24 +35,16 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerImpl" };
 } // namespace
 
-constexpr int32_t MASK_KEY = 1;
-constexpr int32_t MASK_TOUCH = 2;
-constexpr int32_t ADD_MASK_BASE = 10;
-
 struct MonitorEventConsumer : public IInputEventConsumer {
 public:
     explicit MonitorEventConsumer(const std::function<void(std::shared_ptr<PointerEvent>)>& monitor)
+        : monitor_ (monitor)
     {
-        if (monitor != nullptr) {
-            monitor_ = monitor;
-        }
     }
 
     explicit MonitorEventConsumer(const std::function<void(std::shared_ptr<KeyEvent>)>& monitor)
+        : keyMonitor_ (monitor)
     {
-        if (monitor != nullptr) {
-            keyMonitor_ = monitor;
-        }
     }
 
     void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
@@ -529,11 +521,7 @@ int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> in
         return -1;
     }
     std::lock_guard<std::mutex> guard(mtx_);
-    int32_t interceptorId = InputInterMgr->AddInterceptor(interceptor);
-    if (interceptorId >= 0) {
-        interceptorId = interceptorId * ADD_MASK_BASE + MASK_TOUCH;
-    }
-    return interceptorId;
+    return InputInterMgr->AddInterceptor(interceptor);
 }
 
 int32_t InputManagerImpl::AddInterceptor(int32_t sourceType,
@@ -546,19 +534,11 @@ int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyE
 {
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     std::lock_guard<std::mutex> guard(mtx_);
-    if (interceptor == nullptr) {
-        MMI_HILOGE("%{public}s param should not be null", __func__);
-        return MMI_STANDARD_EVENT_INVALID_PARAM;
-    }
-    if (!MMIEventHdl.InitClient()) {
-        MMI_HILOGE("client init failed");
-        return -1;
-    }
-    int32_t interceptorId = InterMgr->AddInterceptor(interceptor);
-    if (interceptorId >= 0) {
-        interceptorId = interceptorId * ADD_MASK_BASE + MASK_KEY;
-    }
-    return interceptorId;
+    CHKPR(interceptor, ERROR_NULL_POINTER);
+
+    auto consumer = std::make_shared<MonitorEventConsumer>(interceptor);
+    CHKPR(consumer, ERROR_NULL_POINTER);
+    return InputManagerImpl::AddInterceptor(consumer);
 #else
     MMI_HILOGW("Keyboard device does not support");
     return ERROR_UNSUPPORT;
@@ -568,37 +548,11 @@ int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyE
 void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
 {
     std::lock_guard<std::mutex> guard(mtx_);
-    if (interceptorId <= 0) {
-        MMI_HILOGE("Specified interceptor does not exist");
-        return;
-    }
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
         return;
     }
-    int32_t mask = interceptorId % ADD_MASK_BASE;
-    interceptorId /= ADD_MASK_BASE;
-    switch (mask) {
-        case MASK_TOUCH: {
-#ifdef OHOS_BUILD_ENABLE_TOUCH
-            InputInterMgr->RemoveInterceptor(interceptorId);
-#else
-            MMI_HILOGW("Tp device does not support");
-#endif // OHOS_BUILD_ENABLE_TOUCH
-            break;
-        }
-        case MASK_KEY: {
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-            InterMgr->RemoveInterceptor(interceptorId);
-#else
-            MMI_HILOGW("Keyboard device does not support");
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-            break;
-        }
-        default:
-            MMI_HILOGE("Can't find the mask, mask:%{public}d", mask);
-            break;
-    }
+    InputInterMgr->RemoveInterceptor(interceptorId);
 }
 
 void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)

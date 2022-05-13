@@ -33,13 +33,13 @@ public:
     virtual int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) = 0;
 
+    virtual int32_t AddKeyInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
+    virtual void RemoveKeyInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
     virtual int32_t AddPointerInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
     virtual void RemovePointerInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
     virtual int32_t AddTouchInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
     virtual void RemoveTouchInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;  
-    virtual void AddKeyInterceptor(int32_t sourceType, int32_t id, SessionPtr session) = 0;
-    virtual void RemoveKeyInterceptor(int32_t id) = 0;
-
+ 
     virtual void AddKeyMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
     virtual void RemoveKeyMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
     virtual void AddPointerMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;

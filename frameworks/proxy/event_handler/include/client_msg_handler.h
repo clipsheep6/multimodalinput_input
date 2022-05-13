@@ -57,9 +57,6 @@ protected:
     int32_t OnInputDeviceIds(const UDSClient& client, NetPacket& pkt);
     int32_t OnSupportKeys(const UDSClient& client, NetPacket& pkt);
     int32_t OnDevMonitor(const UDSClient& client, NetPacket& pkt);
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    int32_t KeyEventInterceptor(const UDSClient& client, NetPacket& pkt);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 private:
     static void OnEventProcessed(int32_t eventId);

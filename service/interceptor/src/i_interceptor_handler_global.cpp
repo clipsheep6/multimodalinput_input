@@ -23,6 +23,14 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IInterceptorHandlerGlobal" };
 } // namespace
 
+int32_t IInterceptorHandlerGlobal::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    HandleEvent(keyEvent);
+    CHKPR(nextHandler_, ERROR_NULL_POINTER);
+    return nextHandler_->HandleKeyEvent(keyEvent);
+}
+
 int32_t IInterceptorHandlerGlobal::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(keyEvent, ERROR_NULL_POINTER);
@@ -42,26 +50,26 @@ int32_t IInterceptorHandlerGlobal::HandleTouchEvent(std::shared_ptr<PointerEvent
 int32_t IInterceptorHandlerGlobal::AddInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
 {
-    MMI_HILOGD("Add hdl module does not support");
+    MMI_HILOGW("Add interceptor module does not support");
     return RET_ERR;
 }
 
 void IInterceptorHandlerGlobal::RemoveInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
 {
-    MMI_HILOGD("Remove hdl module does not support");
+    MMI_HILOGW("Remove interceptor module does not support");
     return;
 }
 
 bool IInterceptorHandlerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-    MMI_HILOGD("Key handle module does not support");
+    MMI_HILOGW("Key interceptor module does not support");
     return false;
 }
 
 bool IInterceptorHandlerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_HILOGD("Pointer handle module does not support");
+    MMI_HILOGW("Pointer interceptor module does not support");
     return false;
 }
 

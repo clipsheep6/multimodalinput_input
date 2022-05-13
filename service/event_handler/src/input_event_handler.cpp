@@ -216,7 +216,7 @@ void InputEventHandler::BuildInputHandlerChain()
     touchEventHandler_ = std::make_shared<IInputEventHandler>();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     keyEventHandler_->AddConstructHandler<KeyEventHandler>(1);
-    keyEventHandler_->AddInstanceHandler<IInterceptorManagerGlobal>(1);
+    keyEventHandler_->AddInstanceHandler<IInterceptorHandlerGlobal>(1);
     keyEventHandler_->AddInstanceHandler<IKeyCommandManager>(1);
     keyEventHandler_->AddConstructHandler<KeyEventSubscriber>(1);
     keyEventHandler_->AddConstructHandler<InputHandlerManagerGlobal>(1);
@@ -256,10 +256,22 @@ int32_t InputEventHandler::HandleTouchEvent(std::shared_ptr<PointerEvent> pointe
     return touchEventHandler_->HandleTouchEvent(pointerEvent);
 }
 
+int32_t InputEventHandler::AddKeyInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session)
+{
+    CHKPR(keyEventHandler_, ERROR_NULL_POINTER);
+    return keyEventHandler_->AddInterceptor(handlerId, handlerType, session);
+}
+
 int32_t InputEventHandler::AddPointerInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session)
 {
     CHKPR(pointerEventHandler_, ERROR_NULL_POINTER);
     return pointerEventHandler_->AddInterceptor(handlerId, handlerType, session);
+}
+
+void InputEventHandler::RemoveKeyInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session)
+{
+    CHKPV(keyEventHandler_);
+    keyEventHandler_->RemoveInterceptor(handlerId, handlerType, session);
 }
 
 void InputEventHandler::RemovePointerInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session)
@@ -278,18 +290,6 @@ void InputEventHandler::RemoveTouchInterceptor(int32_t handlerId, InputHandlerTy
 {
     CHKPV(touchEventHandler_);
     touchEventHandler_->RemoveInterceptor(handlerId, handlerType, session);
-}
-
-void InputEventHandler::AddKeyInterceptor(int32_t sourceType, int32_t id, SessionPtr session)
-{
-    CHKPV(keyEventHandler_);
-    keyEventHandler_->AddKeyInterceptor(sourceType, id, session);
-}
-
-void InputEventHandler::RemoveKeyInterceptor(int32_t id)
-{
-    CHKPV(keyEventHandler_);
-    keyEventHandler_->RemoveKeyInterceptor(id);
 }
 
 void InputEventHandler::AddKeyMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session)

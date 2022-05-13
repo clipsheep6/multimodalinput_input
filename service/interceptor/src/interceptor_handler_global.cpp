@@ -30,6 +30,21 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InterceptorHandlerGlobal" };
 } // namespace
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+int32_t InterceptorHandlerGlobal::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    if (HandleEvent(keyEvent)) {
+            MMI_HILOGD("keyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d",
+                keyEvent->GetKeyCode());
+            BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_INTERCEPT_EVENT);
+        return RET_OK;
+    }
+    CHKPR(nextHandler_, ERROR_NULL_POINTER);
+    return nextHandler_->HandleKeyEvent(keyEvent);
+}
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+
 #ifdef OHOS_BUILD_ENABLE_POINTER
 int32_t InterceptorHandlerGlobal::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
@@ -194,7 +209,7 @@ bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_pt
 {
     CHKPF(pointerEvent);
     if (interceptors_.empty()) {
-        MMI_HILOGW("Pointer interceptors is empty");
+        MMI_HILOGE("Pointer interceptors is empty");
         return false;
     }
     MMI_HILOGD("There are currently:%{public}zu interceptors", interceptors_.size());
@@ -213,11 +228,10 @@ int32_t InterceptorHandlerGlobal::InterceptorCollection::AddInterceptor(const Se
         return RET_ERR;
     }
     auto ret = interceptors_.insert(interceptor);
-    if (ret.second) {
-        MMI_HILOGD("Register interceptor successfully");
-    } else {
+    if (!ret.second) {
         MMI_HILOGW("Duplicate interceptors");
     }
+    MMI_HILOGD("Register interceptor successfully");
     return RET_OK;
 }
 
@@ -226,8 +240,8 @@ void InterceptorHandlerGlobal::InterceptorCollection::RemoveInterceptor(const Se
     std::set<SessionHandler>::const_iterator tItr = interceptors_.find(interceptor);
     if (tItr != interceptors_.cend()) {
         interceptors_.erase(tItr);
-        MMI_HILOGD("Unregister interceptor successfully");
     }
+    MMI_HILOGD("Unregister interceptor successfully");
 }
 
 void InterceptorHandlerGlobal::InterceptorCollection::OnSessionLost(SessionPtr session)

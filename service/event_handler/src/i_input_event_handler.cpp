@@ -87,19 +87,6 @@ int32_t IInputEventHandler::AddInterceptor(int32_t handlerId, InputHandlerType h
     return RET_OK;
 }
 
-void IInputEventHandler::TouchMonitorHandlerMarkConsumed(int32_t monitorId, int32_t eventId, SessionPtr sess)
-{
-    std::shared_ptr<IInputEventHandler> cur = shared_from_this();
-    while (cur != nullptr) {
-        if (cur->GetHandlerType() == EventHandlerType::MONITOR) {
-            auto monitor = std::static_pointer_cast<IMonitorEventHandler>(cur);
-            monitor->MarkConsumed(monitorId, eventId, sess);
-            return;
-        }
-        cur = cur->nextHandler_;
-    }
-}
-
 void IInputEventHandler::RemoveInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session)
 {
     std::shared_ptr<IInputEventHandler> cur = shared_from_this();
@@ -113,26 +100,13 @@ void IInputEventHandler::RemoveInterceptor(int32_t handlerId, InputHandlerType h
     }
 }
 
-void IInputEventHandler::AddKeyInterceptor(int32_t sourceType, int32_t id, SessionPtr session)
+void IInputEventHandler::TouchMonitorHandlerMarkConsumed(int32_t monitorId, int32_t eventId, SessionPtr sess)
 {
     std::shared_ptr<IInputEventHandler> cur = shared_from_this();
     while (cur != nullptr) {
-        if (cur->GetHandlerType() == EventHandlerType::INTERCEPTOR) {
-            auto interceptor = std::static_pointer_cast<IInterceptorManagerEventHandler>(cur);
-            interceptor->OnAddInterceptor(sourceType, id, session);
-            return;
-        }
-        cur = cur->nextHandler_;
-    }
-}
-
-void IInputEventHandler::RemoveKeyInterceptor(int32_t id)
-{
-    std::shared_ptr<IInputEventHandler> cur = shared_from_this();
-    while (cur != nullptr) {
-        if (cur->GetHandlerType() == EventHandlerType::INTERCEPTOR) {
-            auto interceptor = std::static_pointer_cast<IInterceptorManagerEventHandler>(cur);
-            interceptor->OnRemoveInterceptor(id);
+        if (cur->GetHandlerType() == EventHandlerType::MONITOR) {
+            auto monitor = std::static_pointer_cast<IMonitorEventHandler>(cur);
+            monitor->MarkConsumed(monitorId, eventId, sess);
             return;
         }
         cur = cur->nextHandler_;
