@@ -634,7 +634,7 @@ private:
     const char* func_ = nullptr;
     int32_t line_ = 0;
 };
-#define CALL_LOG_ENTER2 InnerFuncTracer ___innerFuncTracer___ { LOG4Z_MAIN_LOGGER_ID, LOG_LEVEL_DEBUG, __FILE__, __FUNCTION__, __LINE__ }
+#define CALL_LOG_ENTER2 InnerFuncTracer ___innerFuncTracer2___ { LOG4Z_MAIN_LOGGER_ID, LOG_LEVEL_DEBUG, __FILE__, __FUNCTION__, __LINE__ }
 
 #ifdef WIN32
 #pragma warning(pop)

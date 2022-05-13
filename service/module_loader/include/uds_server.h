@@ -26,6 +26,8 @@
 #include "uds_session.h"
 #include "uds_socket.h"
 
+#include "i_uds_server.h"
+
 namespace OHOS {
 namespace MMI {
 enum EpollEventType {

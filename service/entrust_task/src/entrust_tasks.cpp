@@ -17,6 +17,7 @@
 #include <sys/syscall.h>
 #include <unistd.h>
 
+#include "error_multimodal.h"
 #include "util.h"
 
 namespace OHOS {

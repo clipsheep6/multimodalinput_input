@@ -64,6 +64,8 @@ public:
     bool Read(std::vector<T> &data);
     template<typename T>
     bool Write(const std::vector<T> &data);
+    bool Read(std::vector<bool> &data);
+    bool Write(const std::vector<bool> &data);
     template<typename T>
     bool Read(T& data);
     template<typename T>
