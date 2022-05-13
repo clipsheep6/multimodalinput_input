@@ -19,7 +19,6 @@
 
 #include "define_multimodal.h"
 #include "error_multimodal.h"
-
 #include "bytrace_adapter.h"
 #include "define_interceptor_manager.h"
 #include "event_filter_service.h"
