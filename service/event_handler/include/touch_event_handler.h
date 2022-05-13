@@ -32,7 +32,6 @@ public:
 private:
     int32_t HandleTouchEvent(libinput_event* event);
     int32_t HandleTableToolEvent(libinput_event* event);
-    std::map<int32_t, std::shared_ptr<IInputEventHandler>> touchHandlerMap_;
 };
 } // namespace MMI
 } // namespace OHOS

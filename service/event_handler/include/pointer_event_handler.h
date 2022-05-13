@@ -33,7 +33,6 @@ private:
     int32_t HandleTouchPadEvent(libinput_event* event);
     int32_t HandleGestureEvent(libinput_event* event);
     int32_t HandleMouseEvent(libinput_event* event);
-    std::map<int32_t, std::shared_ptr<IInputEventHandler>> pointerHandlerMap_;
 };
 } // namespace MMI
 } // namespace OHOS

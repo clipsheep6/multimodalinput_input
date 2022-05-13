@@ -53,7 +53,6 @@ public:
     virtual int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent);
 
     int32_t GetPriority() const;
-
     int32_t AddMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     void RemoveMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     void TouchMonitorHandlerMarkConsumed(int32_t monitorId, int32_t eventId, SessionPtr sess);

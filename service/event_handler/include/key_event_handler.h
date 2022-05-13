@@ -37,7 +37,6 @@ private:
 private:
     int32_t timerId_ = -1;
     EventPackage eventPackage_;
-    std::map<int32_t, std::shared_ptr<IInputEventHandler>> keyHandlerMap_;
 };
 } // namespace MMI
 } // namespace OHOS
