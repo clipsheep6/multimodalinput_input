@@ -261,6 +261,7 @@ void InputManagerImpl::OnPointerEventTask(std::shared_ptr<IInputEventConsumer> c
 
 void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CALL_LOG_ENTER;
     CHK_PIDANDTID();
     CHKPV(pointerEvent);
     CHKPV(eventHandler_);
