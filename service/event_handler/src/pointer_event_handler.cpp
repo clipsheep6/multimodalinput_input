@@ -18,7 +18,6 @@
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
-#include "input_event_handler.h"
 #include "mmi_log.h"
 #include "mouse_event_handler.h"
 #include "touch_transform_point_manager.h"

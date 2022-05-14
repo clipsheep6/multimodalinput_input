@@ -15,6 +15,8 @@
 
 #include "i_input_event_handler.h"
 
+#include "libinput.h"
+
 #include "error_multimodal.h"
 #include "i_filter_event_handler.h"
 #include "i_interceptor_event_handler.h"
@@ -36,7 +38,7 @@ IInputEventHandler::IInputEventHandler(int32_t priority)
 int32_t IInputEventHandler::HandleLibinputEvent(libinput_event* event)
 {
     if (nextHandler_ == nullptr) {
-        MMI_HILOGW("nextHandler_ is nullptr");
+        RecordLog(event);
         return RET_OK;
     }
     return nextHandler_->HandleLibinputEvent(event);
@@ -205,6 +207,46 @@ uint32_t IInputEventHandler::SetNext(std::shared_ptr<IInputEventHandler> nextHan
         }
     }
     return RET_OK;
+}
+void IInputEventHandler::RecordLog(libinput_event* event)
+{
+    CHKPV(event);
+    auto type = libinput_event_get_type(event);
+    switch(type) {
+        case LIBINPUT_EVENT_KEYBOARD_KEY: {
+            MMI_HILOGW("Keyboard device does not support");
+            break;
+        }
+        case LIBINPUT_EVENT_POINTER_MOTION:
+        case LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE:
+        case LIBINPUT_EVENT_POINTER_BUTTON:
+        case LIBINPUT_EVENT_POINTER_AXIS:
+        case LIBINPUT_EVENT_TOUCHPAD_DOWN:
+        case LIBINPUT_EVENT_TOUCHPAD_UP:
+        case LIBINPUT_EVENT_TOUCHPAD_MOTION:
+        case LIBINPUT_EVENT_GESTURE_SWIPE_BEGIN:
+        case LIBINPUT_EVENT_GESTURE_SWIPE_UPDATE:
+        case LIBINPUT_EVENT_GESTURE_SWIPE_END:
+        case LIBINPUT_EVENT_GESTURE_PINCH_BEGIN:
+        case LIBINPUT_EVENT_GESTURE_PINCH_UPDATE:
+        case LIBINPUT_EVENT_GESTURE_PINCH_END: {
+            MMI_HILOGW("Pointer device does not support");
+            break;
+        }
+        case LIBINPUT_EVENT_TOUCH_DOWN:
+        case LIBINPUT_EVENT_TOUCH_UP:
+        case LIBINPUT_EVENT_TOUCH_MOTION:
+        case LIBINPUT_EVENT_TABLET_TOOL_AXIS:
+        case LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY:
+        case LIBINPUT_EVENT_TABLET_TOOL_TIP: {
+            MMI_HILOGW("Touch device does not support");
+            break;
+        }
+        default: {
+            MMI_HILOGW("nextHandler_ == nullptr");
+        break;
+        }
+    }
 }
 } // namespace MMI
 } // namespace OHOS

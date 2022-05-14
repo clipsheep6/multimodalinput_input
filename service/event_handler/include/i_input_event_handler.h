@@ -68,8 +68,11 @@ public:
     uint32_t AddInstanceHandler(int32_t priority = 0);
 protected:
     uint32_t SetNext(std::shared_ptr<IInputEventHandler> nextHandler);
+private:
+     void RecordLog(libinput_event* event);
 protected:
     std::shared_ptr<IInputEventHandler> nextHandler_ = nullptr;
+
 private:
     int32_t priority_;
 };
