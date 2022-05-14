@@ -375,7 +375,7 @@ int32_t ServerMsgHandler::OnMarkConsumed(SessionPtr sess, NetPacket& pkt)
     }
 
     CHKPR(southEventHandler_, ERROR_NULL_POINTER);
-    southEventHandler_->TouchMonitorHandlerMarkConsumed(monitorId, eventId, sess);
+    southEventHandler_->MarkTouchConsumed(monitorId, eventId, sess);
     return RET_OK;
 }
 
@@ -433,7 +433,7 @@ int32_t ServerMsgHandler::OnSubscribeKeyEvent(SessionPtr sess, NetPacket &pkt)
     keyOption->SetFinalKeyDown(isFinalKeyDown);
     keyOption->SetFinalKeyDownDuration(finalKeyDownDuration);
     CHKPR(southEventHandler_, ERROR_NULL_POINTER);
-    return southEventHandler_->AddSubscriber(sess, subscribeId, keyOption);
+    return southEventHandler_->AddKeySubscriber(sess, subscribeId, keyOption);
 }
 
 int32_t ServerMsgHandler::OnUnSubscribeKeyEvent(SessionPtr sess, NetPacket &pkt)
@@ -445,7 +445,7 @@ int32_t ServerMsgHandler::OnUnSubscribeKeyEvent(SessionPtr sess, NetPacket &pkt)
         return PACKET_READ_FAIL;
     }
     CHKPR(southEventHandler_, ERROR_NULL_POINTER);
-    return southEventHandler_->RemoveSubscriber(sess, subscribeId);
+    return southEventHandler_->RemoveKeySubscriber(sess, subscribeId);
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 

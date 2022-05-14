@@ -30,8 +30,6 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventHandler" };
 }
 
-KeyEventHandler::KeyEventHandler(int32_t priority) : IInputEventHandler(priority) {}
-
 int32_t KeyEventHandler::HandleLibinputEvent(libinput_event* event)
 {
     CALL_LOG_ENTER;

@@ -28,8 +28,6 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerEventHandler" };
 }
 
-PointerEventHandler::PointerEventHandler(int32_t priority) : IInputEventHandler(priority) {}
-
 int32_t PointerEventHandler::HandleLibinputEvent(libinput_event* event)
 {
     CALL_LOG_ENTER;
@@ -149,6 +147,5 @@ int32_t PointerEventHandler::HandleMouseEvent(libinput_event* event)
     nextHandler_->HandlePointerEvent(pointerEvent);
     return RET_OK;
 }
-}
-// namespace MMI
+} // namespace MMI
 } // namespace OHOS

@@ -30,4 +30,4 @@ public:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif  // I_INTERCEPTOR_EVENT_HANDLER_H
+#endif  // I_FILTER_EVENT_HANDLER_H

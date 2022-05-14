@@ -20,7 +20,6 @@
 #include "error_multimodal.h"
 #include "i_filter_event_handler.h"
 #include "i_interceptor_event_handler.h"
-#include "i_interceptor_manager_event_handler.h"
 #include "i_monitor_event_handler.h"
 #include "i_subscriber_event_handler.h"
 
@@ -33,6 +32,11 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IInpu
 IInputEventHandler::IInputEventHandler(int32_t priority)
 {
     priority_ = priority;
+}
+
+int32_t IInputEventHandler::GetPriority() const
+{
+    return priority_;
 }
 
 int32_t IInputEventHandler::HandleLibinputEvent(libinput_event* event)
@@ -65,15 +69,10 @@ int32_t IInputEventHandler::HandlePointerEvent(std::shared_ptr<PointerEvent> poi
 int32_t IInputEventHandler::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (nextHandler_ == nullptr) {
-        MMI_HILOGW("touch device does not support");
+        MMI_HILOGW("Touch device does not support");
         return RET_OK;
     }
     return nextHandler_->HandleTouchEvent(pointerEvent);
-}
-
-int32_t IInputEventHandler::GetPriority() const
-{
-    return priority_;
 }
 
 int32_t IInputEventHandler::AddInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session)
@@ -102,19 +101,6 @@ void IInputEventHandler::RemoveInterceptor(int32_t handlerId, InputHandlerType h
     }
 }
 
-void IInputEventHandler::TouchMonitorHandlerMarkConsumed(int32_t monitorId, int32_t eventId, SessionPtr sess)
-{
-    std::shared_ptr<IInputEventHandler> cur = shared_from_this();
-    while (cur != nullptr) {
-        if (cur->GetHandlerType() == EventHandlerType::MONITOR) {
-            auto monitor = std::static_pointer_cast<IMonitorEventHandler>(cur);
-            monitor->MarkConsumed(monitorId, eventId, sess);
-            return;
-        }
-        cur = cur->nextHandler_;
-    }
-}
-
 int32_t IInputEventHandler::AddMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session)
 {
     std::shared_ptr<IInputEventHandler> cur = shared_from_this();
@@ -135,6 +121,19 @@ void IInputEventHandler::RemoveMonitor(int32_t handlerId, InputHandlerType handl
         if (cur->GetHandlerType() == EventHandlerType::MONITOR) {
             auto monitor = std::static_pointer_cast<IMonitorEventHandler>(cur);
             monitor->RemoveInputHandler(handlerId, handlerType, session);
+            return;
+        }
+        cur = cur->nextHandler_;
+    }
+}
+
+void IInputEventHandler::MarkConsumed(int32_t monitorId, int32_t eventId, SessionPtr sess)
+{
+    std::shared_ptr<IInputEventHandler> cur = shared_from_this();
+    while (cur != nullptr) {
+        if (cur->GetHandlerType() == EventHandlerType::MONITOR) {
+            auto monitor = std::static_pointer_cast<IMonitorEventHandler>(cur);
+            monitor->MarkConsumed(monitorId, eventId, sess);
             return;
         }
         cur = cur->nextHandler_;
@@ -208,6 +207,7 @@ uint32_t IInputEventHandler::SetNext(std::shared_ptr<IInputEventHandler> nextHan
     }
     return RET_OK;
 }
+
 void IInputEventHandler::RecordLog(libinput_event* event)
 {
     CHKPV(event);

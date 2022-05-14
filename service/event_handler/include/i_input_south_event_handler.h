@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef INPUT_SOUTH_EVENT_HANDLER_H
-#define INPUT_SOUTH_EVENT_HANDLER_H
+#ifndef I_INPUT_SOUTH_EVENT_HANDLER_H
+#define I_INPUT_SOUTH_EVENT_HANDLER_H
 
 #include <memory>
 
@@ -46,14 +46,13 @@ public:
     virtual void RemovePointerMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
     virtual void AddTouchMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
     virtual void RemoveTouchMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
-
-    virtual int32_t AddSubscriber(SessionPtr sess, int32_t subscribeId, const std::shared_ptr<KeyOption> keyOption) = 0;
-    virtual int32_t RemoveSubscriber(SessionPtr sess, int32_t subscribeId) = 0;
-    virtual void TouchMonitorHandlerMarkConsumed(int32_t monitorId, int32_t eventId, SessionPtr sess) = 0;
+    virtual void MarkTouchConsumed(int32_t monitorId, int32_t eventId, SessionPtr sess) = 0;
+    virtual int32_t AddKeySubscriber(SessionPtr sess, int32_t subscribeId, const std::shared_ptr<KeyOption> keyOption) = 0;
+    virtual int32_t RemoveKeySubscriber(SessionPtr sess, int32_t subscribeId) = 0;
 
     virtual int32_t AddFilter(sptr<IEventFilter> filter) = 0;
     virtual std::shared_ptr<KeyEvent> GetKeyEvent() const = 0;
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // INPUT_SOUTH_EVENT_HANDLER_H
+#endif // I_INPUT_SOUTH_EVENT_HANDLER_H

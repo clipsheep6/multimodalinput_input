@@ -43,6 +43,7 @@ public:
     IInputEventHandler(int32_t priority = 0);
     DISALLOW_COPY_AND_MOVE(IInputEventHandler);
     virtual ~IInputEventHandler() = default;
+    int32_t GetPriority() const;
     virtual EventHandlerType GetHandlerType() const
     {
         return EventHandlerType::NORMAL; 
@@ -52,10 +53,9 @@ public:
     virtual int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
     virtual int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent);
 
-    int32_t GetPriority() const;
     int32_t AddMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     void RemoveMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
-    void TouchMonitorHandlerMarkConsumed(int32_t monitorId, int32_t eventId, SessionPtr sess);
+    void MarkConsumed(int32_t monitorId, int32_t eventId, SessionPtr sess);
     int32_t AddInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     void RemoveInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     int32_t AddSubscriber(SessionPtr sess, int32_t subscribeId, const std::shared_ptr<KeyOption> keyOption);

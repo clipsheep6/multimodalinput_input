@@ -215,26 +215,26 @@ void InputEventHandler::BuildInputHandlerChain()
     pointerEventHandler_ = std::make_shared<IInputEventHandler>();
     touchEventHandler_ = std::make_shared<IInputEventHandler>();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    keyEventHandler_->AddConstructHandler<KeyEventHandler>(1);
-    keyEventHandler_->AddInstanceHandler<IInterceptorHandlerGlobal>(1);
-    keyEventHandler_->AddInstanceHandler<IKeyCommandManager>(1);
-    keyEventHandler_->AddConstructHandler<KeyEventSubscriber>(1);
-    keyEventHandler_->AddConstructHandler<InputHandlerManagerGlobal>(1);
-    keyEventHandler_->AddConstructHandler<EventDispatch>(1);
+    keyEventHandler_->AddConstructHandler<KeyEventHandler>();
+    keyEventHandler_->AddInstanceHandler<IInterceptorHandlerGlobal>();
+    keyEventHandler_->AddInstanceHandler<IKeyCommandManager>();
+    keyEventHandler_->AddConstructHandler<KeyEventSubscriber>();
+    keyEventHandler_->AddConstructHandler<InputHandlerManagerGlobal>();
+    keyEventHandler_->AddConstructHandler<EventDispatch>();
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    pointerEventHandler_->AddConstructHandler<PointerEventHandler>(1);
-    pointerEventHandler_->AddConstructHandler<EventFilterWrap>(1);
-    pointerEventHandler_->AddInstanceHandler<IInterceptorHandlerGlobal>(1);
-    pointerEventHandler_->AddConstructHandler<InputHandlerManagerGlobal>(1);
-    pointerEventHandler_->AddConstructHandler<EventDispatch>(1);
+    pointerEventHandler_->AddConstructHandler<PointerEventHandler>();
+    pointerEventHandler_->AddConstructHandler<EventFilterWrap>();
+    pointerEventHandler_->AddInstanceHandler<IInterceptorHandlerGlobal>();
+    pointerEventHandler_->AddConstructHandler<InputHandlerManagerGlobal>();
+    pointerEventHandler_->AddConstructHandler<EventDispatch>();
 #endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    touchEventHandler_->AddConstructHandler<TouchEventHandler>(1);
-    touchEventHandler_->AddConstructHandler<EventFilterWrap>(1);
-    touchEventHandler_->AddInstanceHandler<IInterceptorHandlerGlobal>(1);
-    touchEventHandler_->AddConstructHandler<InputHandlerManagerGlobal>(1);
-    touchEventHandler_->AddConstructHandler<EventDispatch>(1);
+    touchEventHandler_->AddConstructHandler<TouchEventHandler>();
+    touchEventHandler_->AddConstructHandler<EventFilterWrap>();
+    touchEventHandler_->AddInstanceHandler<IInterceptorHandlerGlobal>();
+    touchEventHandler_->AddConstructHandler<InputHandlerManagerGlobal>();
+    touchEventHandler_->AddConstructHandler<EventDispatch>();
 #endif // OHOS_BUILD_ENABLE_TOUCH
 }
 
@@ -262,16 +262,16 @@ int32_t InputEventHandler::AddKeyInterceptor(int32_t handlerId, InputHandlerType
     return keyEventHandler_->AddInterceptor(handlerId, handlerType, session);
 }
 
-int32_t InputEventHandler::AddPointerInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session)
-{
-    CHKPR(pointerEventHandler_, ERROR_NULL_POINTER);
-    return pointerEventHandler_->AddInterceptor(handlerId, handlerType, session);
-}
-
 void InputEventHandler::RemoveKeyInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session)
 {
     CHKPV(keyEventHandler_);
     keyEventHandler_->RemoveInterceptor(handlerId, handlerType, session);
+}
+
+int32_t InputEventHandler::AddPointerInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session)
+{
+    CHKPR(pointerEventHandler_, ERROR_NULL_POINTER);
+    return pointerEventHandler_->AddInterceptor(handlerId, handlerType, session);
 }
 
 void InputEventHandler::RemovePointerInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session)
@@ -327,20 +327,21 @@ void InputEventHandler::RemoveTouchMonitor(int32_t handlerId, InputHandlerType h
     CHKPV(touchEventHandler_);
     touchEventHandler_->RemoveMonitor(handlerId, handlerType, session);
 }
-void InputEventHandler::TouchMonitorHandlerMarkConsumed(int32_t monitorId, int32_t eventId, SessionPtr sess)
+
+void InputEventHandler::MarkTouchConsumed(int32_t monitorId, int32_t eventId, SessionPtr sess)
 {
     CHKPV(touchEventHandler_);
-    touchEventHandler_->TouchMonitorHandlerMarkConsumed(monitorId, eventId, sess);
+    touchEventHandler_->MarkConsumed(monitorId, eventId, sess);
 }
 
-int32_t InputEventHandler::AddSubscriber(SessionPtr sess, int32_t subscribeId,
+int32_t InputEventHandler::AddKeySubscriber(SessionPtr sess, int32_t subscribeId,
     const std::shared_ptr<KeyOption> keyOption)
 {
     CHKPR(keyEventHandler_, ERROR_NULL_POINTER);
     return keyEventHandler_->AddSubscriber(sess, subscribeId, keyOption);
 }
 
-int32_t InputEventHandler::RemoveSubscriber(SessionPtr sess, int32_t subscribeId)
+int32_t InputEventHandler::RemoveKeySubscriber(SessionPtr sess, int32_t subscribeId)
 {
     CHKPR(keyEventHandler_, ERROR_NULL_POINTER);
     return keyEventHandler_->RemoveSubscriber(sess, subscribeId);
