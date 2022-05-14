@@ -260,13 +260,33 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
         pkt.Read(numWindow);
         for (int32_t j = 0; j < numWindow; j++) {
             WindowInfo info;
-            pkt.Read(info);
+            pkt.Read(info.id);
+            pkt.Read(info.pid);
+            pkt.Read(info.uid);
+            pkt.Read(info.hotZoneTopLeftX);
+            pkt.Read(info.hotZoneTopLeftY);
+            pkt.Read(info.hotZoneWidth);
+            pkt.Read(info.hotZoneHeight);
+            pkt.Read(info.displayId);
+            pkt.Read(info.agentWindowId);
+            pkt.Read(info.winTopLeftX);
+            pkt.Read(info.winTopLeftY);
+            pkt.Read(info.flags);
+
+            std::vector<HotArea> hotAreas;
+            int32_t numhotArea = 0;
+            pkt.Read(numhotArea);
+            for (int32_t j = 0; j < numhotArea; j++) {
+                HotArea info;
+                pkt.Read(info);
+                hotAreas.push_back(info);
+            }
+            info.hotArea = hotAreas;
             windowInfos.push_back(info);
         }
         info.windowsInfo = windowInfos;
         logicalDisplays.push_back(info);
     }
-
     InputWindowsManager::GetInstance()->UpdateDisplayInfo(physicalDisplays, logicalDisplays);
     return RET_OK;
 }

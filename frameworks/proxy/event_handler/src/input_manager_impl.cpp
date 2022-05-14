@@ -356,9 +356,54 @@ int32_t InputManagerImpl::PackLogicalDisplay(NetPacket &pkt)
             return RET_ERR;
         }
         for (int32_t j = 0; j < numWindow; j++) {
-            if (!pkt.Write(logicalDisplays_[i].windowsInfo[j])) {
-                MMI_HILOGE("Packet write logical windowsInfo failed");
+            auto windowInfo = logicalDisplays_[i].windowsInfo[j];
+
+            if (!pkt.Write(windowInfo.id)) {
+                MMI_HILOGE("Packet write windowsinfo id failed");
+            }
+            if (!pkt.Write(windowInfo.pid)) {
+                MMI_HILOGE("Packet write windowsinfo pid failed");
+            }
+            if (!pkt.Write(windowInfo.uid)) {
+                MMI_HILOGE("Packet write windowsinfo uid failed");
+            }
+            if (!pkt.Write(windowInfo.hotZoneTopLeftX)) {
+                MMI_HILOGE("Packet write windowsinfo hotZoneTopLeftX failed");
+            }
+            if (!pkt.Write(windowInfo.hotZoneTopLeftY)) {
+                MMI_HILOGE("Packet write windowsinfo hotZoneTopLeftY failed");
+            }
+            if (!pkt.Write(windowInfo.hotZoneWidth)) {
+                MMI_HILOGE("Packet write windowsinfo hotZoneWidth failed");
+            }
+            if (!pkt.Write(windowInfo.hotZoneHeight)) {
+                MMI_HILOGE("Packet write windowsinfo hotZoneHeight failed");
+            }
+            if (!pkt.Write(windowInfo.displayId)) {
+                MMI_HILOGE("Packet write windowsinfo displayId failed");
+            }
+            if (!pkt.Write(windowInfo.agentWindowId)) {
+                MMI_HILOGE("Packet write windowsinfo agentWindowId failed");
+            }
+            if (!pkt.Write(windowInfo.winTopLeftX)) {
+                MMI_HILOGE("Packet write windowsinfo agentWindowId failed");
+            }
+            if (!pkt.Write(windowInfo.winTopLeftY)) {
+                MMI_HILOGE("Packet write windowsinfo agentWindowId failed");
+            }
+            if (!pkt.Write(windowInfo.flags)) {
+                MMI_HILOGE("Packet write windowsinfo agentWindowId failed");
+            }
+            int32_t numhotArea = static_cast<int32_t>(windowInfo.hotArea.size());
+            if (!pkt.Write(numhotArea)) {
+                MMI_HILOGE("Packet write numhotArea failed");
                 return RET_ERR;
+            }
+            for (int32_t k = 0; k < numhotArea; k++) {
+                if (!pkt.Write(windowInfo.hotArea[k])) {
+                    MMI_HILOGE("Packet write hotAreaInfo failed");
+                    return RET_ERR;
+                }
             }
         }
     }
@@ -399,6 +444,12 @@ void InputManagerImpl::PrintDisplayInfo()
                 win.hotZoneHeight, win.displayId,
                 win.agentWindowId,
                 win.winTopLeftX, win.winTopLeftY, win.flags);
+            for (const auto &hotarea : win.hotArea) {
+                MMI_HILOGD("hotZoneWidth1:%{public}d,hotZoneHeight1:%{public}d,hotZoneTopLeftX1:%{public}d,"
+                    "hotZoneTopLeftY1:%{public}d",
+                    hotarea.hotZoneWidth, hotarea.hotZoneHeight,
+                    hotarea.hotZoneTopLeftX, hotarea.hotZoneTopLeftY);
+            }
         }
     }
 }
@@ -578,6 +629,16 @@ void InputManagerImpl::SendDisplayInfo()
 {
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
+
+    for (const auto &item : logicalDisplays_) {
+        for (const auto &win : item.windowsInfo) {
+            if (win.hotArea.size() >= 10) {
+                MMI_HILOGE("There are too many hot zones:%{public}zu", win.hotArea.size());
+                return;
+            }
+        }
+    }
+
     NetPacket pkt(MmiMessageId::DISPLAY_INFO);
     if (PackDisplayData(pkt) == RET_ERR) {
         MMI_HILOGE("pack display info failed");
