@@ -59,7 +59,7 @@ public:
     int32_t AddPointerInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
     void RemovePointerInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
     int32_t AddTouchInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
-    void RemoveTouchInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;  
+    void RemoveTouchInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
 
     void AddKeyMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
     void RemoveKeyMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
