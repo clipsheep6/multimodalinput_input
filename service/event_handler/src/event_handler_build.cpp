@@ -54,9 +54,7 @@ std::shared_ptr<IInputEventHandler> EventHandlerBuild::BuildChainKey()
 
 std::shared_ptr<IInputEventHandler> EventHandlerBuild::BuildChainPointer()
 {
-
 }
 std::shared_ptr<IInputEventHandler> EventHandlerBuild::BuildChainTouch()
 {
-
 }

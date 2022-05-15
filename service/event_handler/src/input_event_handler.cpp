@@ -295,7 +295,7 @@ void InputEventHandler::RemoveTouchInterceptor(int32_t handlerId, InputHandlerTy
 void InputEventHandler::AddKeyMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session)
 {
     CHKPV(keyEventHandler_);
-    keyEventHandler_->AddMonitor(handlerId, handlerType, session); 
+    keyEventHandler_->AddMonitor(handlerId, handlerType, session);
 }
 
 void InputEventHandler::RemoveKeyMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session)

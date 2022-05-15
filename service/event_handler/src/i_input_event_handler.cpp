@@ -212,7 +212,7 @@ void IInputEventHandler::RecordLog(libinput_event* event)
 {
     CHKPV(event);
     auto type = libinput_event_get_type(event);
-    switch(type) {
+    switch (type) {
         case LIBINPUT_EVENT_KEYBOARD_KEY: {
             MMI_HILOGW("Keyboard device does not support");
             break;
@@ -244,7 +244,7 @@ void IInputEventHandler::RecordLog(libinput_event* event)
         }
         default: {
             MMI_HILOGW("nextHandler_ == nullptr");
-        break;
+            break;
         }
     }
 }

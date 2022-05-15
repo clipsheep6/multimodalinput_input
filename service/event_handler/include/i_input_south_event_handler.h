@@ -38,7 +38,7 @@ public:
     virtual int32_t AddPointerInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
     virtual void RemovePointerInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
     virtual int32_t AddTouchInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
-    virtual void RemoveTouchInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;  
+    virtual void RemoveTouchInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
  
     virtual void AddKeyMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
     virtual void RemoveKeyMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
@@ -47,7 +47,8 @@ public:
     virtual void AddTouchMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
     virtual void RemoveTouchMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
     virtual void MarkTouchConsumed(int32_t monitorId, int32_t eventId, SessionPtr sess) = 0;
-    virtual int32_t AddKeySubscriber(SessionPtr sess, int32_t subscribeId, const std::shared_ptr<KeyOption> keyOption) = 0;
+    virtual int32_t AddKeySubscriber(SessionPtr sess, int32_t subscribeId,
+        const std::shared_ptr<KeyOption> keyOption) = 0;
     virtual int32_t RemoveKeySubscriber(SessionPtr sess, int32_t subscribeId) = 0;
 
     virtual int32_t AddFilter(sptr<IEventFilter> filter) = 0;

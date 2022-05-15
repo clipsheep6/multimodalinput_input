@@ -46,7 +46,7 @@ public:
     int32_t GetPriority() const;
     virtual EventHandlerType GetHandlerType() const
     {
-        return EventHandlerType::NORMAL; 
+        return EventHandlerType::NORMAL;
     }
     virtual int32_t HandleLibinputEvent(libinput_event* event);
     virtual int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
@@ -59,7 +59,7 @@ public:
     int32_t AddInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     void RemoveInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     int32_t AddSubscriber(SessionPtr sess, int32_t subscribeId, const std::shared_ptr<KeyOption> keyOption);
-    int32_t RemoveSubscriber(SessionPtr sess, int32_t subscribeId) ;
+    int32_t RemoveSubscriber(SessionPtr sess, int32_t subscribeId);
     int32_t AddFilter(sptr<IEventFilter> filter);
 
     template<class T>
@@ -68,10 +68,12 @@ public:
     uint32_t AddInstanceHandler(int32_t priority = 0);
 protected:
     uint32_t SetNext(std::shared_ptr<IInputEventHandler> nextHandler);
-private:
-     void RecordLog(libinput_event* event);
+
 protected:
     std::shared_ptr<IInputEventHandler> nextHandler_ = nullptr;
+
+private:
+    void RecordLog(libinput_event* event);
 
 private:
     int32_t priority_;
