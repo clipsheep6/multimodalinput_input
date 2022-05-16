@@ -113,6 +113,7 @@ int32_t EventDispatch::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEve
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t EventDispatch::DispatchPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CALL_LOG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     auto fd = WinMgr->UpdateTargetPointer(pointerEvent);
     if (fd < 0) {
@@ -127,10 +128,11 @@ int32_t EventDispatch::DispatchPointerEvent(std::shared_ptr<PointerEvent> pointe
         MMI_HILOGE("UdsServer is a nullptr");
         return RET_ERR;
     }
+
     auto session = udsServer->GetSession(fd);
     CHKPF(session);
     if (session->isANRProcess_) {
-        MMI_HILOGD("is ANR process");
+        MMI_HILOGD("application not responsing");
         return RET_OK;
     }
 
