@@ -267,8 +267,8 @@ void MMIService::OnDump()
     MMIEventDump->Dump();
 }
 
-int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd,
-    int32_t pid, int32_t uid)
+int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType,
+    int32_t &toReturnClientFd, int32_t pid, int32_t uid)
 {
     LOGFMTD("enter, programName:%s,moduleType:%d", programName.c_str(), moduleType);
     MMI_HILOGI("enter, programName:%{public}s,moduleType:%{public}d", programName.c_str(), moduleType);

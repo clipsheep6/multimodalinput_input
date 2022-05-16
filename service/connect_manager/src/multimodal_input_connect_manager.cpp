@@ -56,8 +56,10 @@ int32_t MultimodalInputConnectManager::AllocSocketPair(const int32_t moduleType)
         return RET_ERR;
     }
 
+    int32_t uid = GetCallingUid();
+    int32_t pid = GetCallingPid();
     const std::string programName(GetProgramName());
-    int32_t result = multimodalInputConnectService_->AllocSocketFd(programName, moduleType, socketFd_);
+    int32_t result = multimodalInputConnectService_->AllocSocketFd(programName, moduleType, socketFd_, pid, uid);
     if (result != RET_OK) {
         MMI_HILOGE("AllocSocketFd has error:%{public}d", result);
         return RET_ERR;
