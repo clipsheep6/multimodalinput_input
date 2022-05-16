@@ -226,7 +226,8 @@ int32_t MMIService::Init()
         MMI_HILOGE("Entrust tasks init failed");
         return ETASKS_INIT_FAIL;
     }
-    SetRecvFun(std::bind(&ServerMsgHandler::OnMsgHandler, &sMsgHandler_, std::placeholders::_1, std::placeholders::_2));
+    SetRecvFun(std::bind(&ServerMsgHandler::OnMsgHandler, &sMsgHandler_, std::placeholders::_1,
+        std::placeholders::_2));
     return RET_OK;
 }
 
@@ -365,8 +366,8 @@ void MMIService::OnEntrustTask(epoll_event& ev)
     }
     LOGFMTD("RemoteRequest notify tid:%" PRId64 " stid:%" PRId64 " pid:%d taskId:%d",
         GetThisThreadId(), data.tid, data.pid, data.taskId);
-    MMI_HILOGD("RemoteRequest notify tid:%{public}" PRId64 " stid:%{public}" PRId64 " pid:%{public}d taskId:%{public}d",
-        GetThisThreadId(), data.tid, data.pid, data.taskId);
+    MMI_HILOGD("RemoteRequest notify tid:%{public}" PRId64 " stid:%{public}" PRId64 " pid:%{public}d "
+        "taskId:%{public}d", GetThisThreadId(), data.tid, data.pid, data.taskId);
     entrustTasks_.ProcessTasks(data.tid, data.pid);
 }
 
