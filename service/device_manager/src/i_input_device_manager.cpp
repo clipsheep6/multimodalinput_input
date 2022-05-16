@@ -23,59 +23,57 @@ namespace MMI {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "IInputDeviceManager"};
 void IInputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
 {
-    CALL_LOG_ENTER;
+    MMI_HILOGW("device manager dose not support");
 }
 
 void IInputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevice)
 {
-    CALL_LOG_ENTER;
+    MMI_HILOGW("device manager dose not support");
 }
 
 std::vector<int32_t> IInputDeviceManager::GetInputDeviceIds() const
 {
-    CALL_LOG_ENTER;
-    std::vector<int32_t> deviceId = { ERROR_UNSUPPORT };
-    return deviceId;
+    MMI_HILOGW("device manager dose not support");
+    return {};
 }
 
 std::shared_ptr<InputDevice> IInputDeviceManager::GetInputDevice(int32_t id) const
 {
-    CALL_LOG_ENTER;
+    MMI_HILOGW("device manager dose not support");
     return nullptr;
 }
 
 std::vector<bool> IInputDeviceManager::SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes)
 {
-    CALL_LOG_ENTER;
-    std::vector<bool> key = { false };
-    return key;
+    MMI_HILOGW("device manager dose not support");
+    return {};
 }
 
 int32_t IInputDeviceManager::FindInputDeviceId(struct libinput_device *inputDevice)
 {
-    CALL_LOG_ENTER;
+    MMI_HILOGW("device manager dose not support");
     return ERROR_UNSUPPORT;
 }
 
 void IInputDeviceManager::AddDevMonitor(SessionPtr sess, std::function<void(std::string, int32_t)> callback)
 {
-    CALL_LOG_ENTER;
+    MMI_HILOGW("device manager dose not support");
 }
 
 void IInputDeviceManager::RemoveDevMonitor(SessionPtr sess)
 {
-    CALL_LOG_ENTER;
+    MMI_HILOGW("device manager dose not support");
 }
 
 void IInputDeviceManager::Attach(std::shared_ptr<IDeviceObserver> observer)
 {
-    CALL_LOG_ENTER;
+    MMI_HILOGW("device manager dose not support");
     observers_.push_back(observer);
 }
 
 void IInputDeviceManager::Detach(std::shared_ptr<IDeviceObserver> observer)
 {
-    CALL_LOG_ENTER;
+    MMI_HILOGW("device manager dose not support");
     observers_.remove(observer);
 }
 
@@ -90,7 +88,7 @@ void IInputDeviceManager::NotifyPointerDevice(bool hasPointerDevice)
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 bool IInputDeviceManager::HasPointerDevice()
 {
-    CALL_LOG_ENTER;
+    MMI_HILOGW("device manager dose not support");
     return false;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
