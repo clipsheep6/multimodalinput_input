@@ -180,7 +180,7 @@ int32_t IInputEventHandler::AddFilter(sptr<IEventFilter> filter)
     return RET_OK;
 }
 
-uint32_t IInputEventHandler::SetNext(std::shared_ptr<IInputEventHandler> nextHandler)
+int32_t IInputEventHandler::SetNext(std::shared_ptr<IInputEventHandler> nextHandler)
 {
     std::shared_ptr<IInputEventHandler> cur = shared_from_this();
     std::shared_ptr<IInputEventHandler> next = cur->nextHandler_;

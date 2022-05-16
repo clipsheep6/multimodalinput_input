@@ -38,10 +38,6 @@ public:
     KeyEventSubscriber(int32_t priority) : ISubscriberEventHandler(priority) {}
     ~KeyEventSubscriber() = default;
     DISALLOW_COPY_AND_MOVE(KeyEventSubscriber);
-    EventHandlerType GetHandlerType() const override
-    {
-        return EventHandlerType::SUBSCRIBER;
-    }
     int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
     int32_t SubscribeKeyEvent(SessionPtr sess, int32_t subscribeId,
             const std::shared_ptr<KeyOption> keyOption) override;

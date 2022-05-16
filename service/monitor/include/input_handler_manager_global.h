@@ -34,10 +34,6 @@ public:
     InputHandlerManagerGlobal(int priority) : IMonitorEventHandler(priority) {}
     virtual ~InputHandlerManagerGlobal() = default;
     DISALLOW_COPY_AND_MOVE(InputHandlerManagerGlobal);
-    EventHandlerType GetHandlerType() const override
-    {
-        return EventHandlerType::MONITOR;
-    }
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD

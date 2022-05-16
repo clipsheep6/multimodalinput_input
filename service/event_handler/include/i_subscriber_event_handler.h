@@ -28,6 +28,10 @@ public:
     virtual int32_t SubscribeKeyEvent(SessionPtr sess, int32_t subscribeId,
             const std::shared_ptr<KeyOption> keyOption) = 0;
     virtual int32_t UnSubscribeKeyEvent(SessionPtr sess, int32_t subscribeId) = 0;
+    EventHandlerType GetHandlerType() const override
+    {
+        return EventHandlerType::SUBSCRIBER;
+    }
 };
 } // namespace MMI
 } // namespace OHOS

@@ -63,11 +63,11 @@ public:
     int32_t AddFilter(sptr<IEventFilter> filter);
 
     template<class T>
-    uint32_t AddConstructHandler(int32_t priority = 0);
+    int32_t AddConstructHandler(int32_t priority = 0);
     template<class T>
-    uint32_t AddInstanceHandler(int32_t priority = 0);
+    int32_t AddInstanceHandler(int32_t priority = 0);
 protected:
-    uint32_t SetNext(std::shared_ptr<IInputEventHandler> nextHandler);
+    int32_t SetNext(std::shared_ptr<IInputEventHandler> nextHandler);
 
 protected:
     std::shared_ptr<IInputEventHandler> nextHandler_ = nullptr;
@@ -80,7 +80,7 @@ private:
 };
 
 template<class T>
-uint32_t IInputEventHandler::AddConstructHandler(int32_t priority)
+int32_t IInputEventHandler::AddConstructHandler(int32_t priority)
 {
     auto handler = std::make_shared<T>(priority);
     if (handler == nullptr) {
@@ -90,7 +90,7 @@ uint32_t IInputEventHandler::AddConstructHandler(int32_t priority)
 }
 
 template<class T>
-uint32_t IInputEventHandler::AddInstanceHandler(int32_t priority)
+int32_t IInputEventHandler::AddInstanceHandler(int32_t priority)
 {
     auto handler = T::CreateInstance(priority);
     if (handler == nullptr) {

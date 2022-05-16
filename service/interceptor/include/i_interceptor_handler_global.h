@@ -31,10 +31,6 @@ public:
     IInterceptorHandlerGlobal(int32_t priority) : IInterceptorEventHandler(priority) {}
     ~IInterceptorHandlerGlobal() = default;
     DISALLOW_COPY_AND_MOVE(IInterceptorHandlerGlobal);
-    EventHandlerType GetHandlerType() const override
-    {
-        return EventHandlerType::INTERCEPTOR;
-    }
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD

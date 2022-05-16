@@ -27,6 +27,10 @@ class IFilterEventHandler : public IInputEventHandler {
 public:
     IFilterEventHandler(int32_t priority) : IInputEventHandler(priority) {}
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) = 0;
+    EventHandlerType GetHandlerType() const override
+    {
+        return EventHandlerType::FILTER;
+    }
 };
 } // namespace MMI
 } // namespace OHOS

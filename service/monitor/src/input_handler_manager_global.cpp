@@ -248,9 +248,9 @@ void InputHandlerManagerGlobal::MonitorCollection::MarkConsumed(int32_t monitorI
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
     pointerEvent->SetActionTime(GetSysClockTime());
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT | InputEvent::EVENT_FLAG_NO_MONITOR);
+#ifdef OHOS_BUILD_ENABLE_TOUCH
     auto udsServer = IUdsServer::GetInstance();
     CHKPV(udsServer);
-#ifdef OHOS_BUILD_ENABLE_TOUCH
     udsServer->HandleNonConsumedTouchEvent(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 }
