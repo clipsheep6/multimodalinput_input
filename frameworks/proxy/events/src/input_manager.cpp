@@ -18,7 +18,6 @@
 #include "error_multimodal.h"
 #include "input_event_monitor_manager.h"
 #include "input_manager_impl.h"
-#include "interceptor_manager.h"
 #include "key_event_input_subscribe_manager.h"
 #include "define_multimodal.h"
 #include "multimodal_event_handler.h"
@@ -29,12 +28,9 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManager" };
 } // namespace
 
-InputManager *InputManager::instance_ = nullptr;
+InputManager *InputManager::instance_ = new (std::nothrow) InputManager();
 InputManager *InputManager::GetInstance()
 {
-    if (instance_ == nullptr) {
-        instance_ = new (std::nothrow) InputManager();
-    }
     return instance_;
 }
 
