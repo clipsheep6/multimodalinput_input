@@ -20,11 +20,11 @@
 namespace OHOS {
 namespace MMI {
 template<typename T>
-class IdFactroy {
+class IdFactory {
 public:
-    IdFactroy() : IdFactroy(1) {}
-    explicit IdFactroy(T seed) : seed_(seed) {}
-    virtual ~IdFactroy() = default;
+    IdFactory() : IdFactory(1) {}
+    explicit IdFactory(T seed) : seed_(seed) {}
+    virtual ~IdFactory() = default;
 
     T GenerateId()
     {
