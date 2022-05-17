@@ -271,18 +271,14 @@ void MMIService::OnDump()
 int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType,
     int32_t &toReturnClientFd, int32_t pid, int32_t uid)
 {
-    LOGFMTD("enter, programName:%s,moduleType:%d", programName.c_str(), moduleType);
     MMI_HILOGI("enter, programName:%{public}s,moduleType:%{public}d", programName.c_str(), moduleType);
     toReturnClientFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
     int32_t serverFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
     const int32_t ret = AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd);
     if (ret != RET_OK) {
-        LOGFMTE("call AddSocketPairInfo return %d", ret);
         MMI_HILOGE("call AddSocketPairInfo return %{public}d", ret);
         return RET_ERR;
     }
-    LOGFMTD("leave, programName:%s,moduleType:%d,alloc success",
-        programName.c_str(), moduleType);
     MMI_HILOGIK("leave, programName:%{public}s,moduleType:%{public}d,alloc success",
         programName.c_str(), moduleType);
     return RET_OK;
@@ -298,7 +294,6 @@ void MMIService::OnConnected(SessionPtr s)
 {
     CHKPV(s);
     int32_t fd = s->GetFd();
-    LOGFMTD("fd:%d", fd);
     MMI_HILOGI("fd:%{public}d", fd);
 }
 
@@ -306,14 +301,12 @@ void MMIService::OnDisconnected(SessionPtr s)
 {
     CHKPV(s);
     int32_t fd = s->GetFd();
-    LOGFMTD("enter, session desc:%s, fd: %d", s->GetDescript().c_str(), fd);
     MMI_HILOGW("enter, session desc:%{public}s, fd: %{public}d", s->GetDescript().c_str(), fd);
 }
 
 int32_t MMIService::SetPointerVisible(bool visible)
 {
     CALL_LOG_ENTER;
-    CALL_LOG_ENTER2;
     IPointerDrawingManager::GetInstance()->SetPointerVisible(GetCallingPid(), visible);
     return RET_OK;
 }
@@ -321,7 +314,6 @@ int32_t MMIService::SetPointerVisible(bool visible)
 int32_t MMIService::IsPointerVisible(bool &visible)
 {
     CALL_LOG_ENTER;
-    CALL_LOG_ENTER2;
     visible = IPointerDrawingManager::GetInstance()->IsPointerVisible();
     return RET_OK;
 }
@@ -352,9 +344,7 @@ void MMIService::OnTimer()
 
 void MMIService::OnEntrustTask(epoll_event& ev)
 {
-    CALL_LOG_ENTER2;
     if ((ev.events & EPOLLIN) == 0) {
-        LOGFMTE("not epollin");
         MMI_HILOGW("not epollin");
         return;
     }
@@ -364,8 +354,6 @@ void MMIService::OnEntrustTask(epoll_event& ev)
         LOGFMTW("read failed erron:%d", errno);
         MMI_HILOGW("read failed erron:%{public}d", errno);
     }
-    LOGFMTD("RemoteRequest notify tid:%" PRId64 " stid:%" PRId64 " pid:%d taskId:%d",
-        GetThisThreadId(), data.tid, data.pid, data.taskId);
     MMI_HILOGD("RemoteRequest notify tid:%{public}" PRId64 " stid:%{public}" PRId64 " pid:%{public}d "
         "taskId:%{public}d", GetThisThreadId(), data.tid, data.pid, data.taskId);
     entrustTasks_.ProcessTasks(data.tid, data.pid);

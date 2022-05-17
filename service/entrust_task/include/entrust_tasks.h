@@ -22,7 +22,6 @@
 #include <queue>
 
 #include "id_factory.h"
-#include "log4z.h"
 
 namespace OHOS {
 namespace MMI {

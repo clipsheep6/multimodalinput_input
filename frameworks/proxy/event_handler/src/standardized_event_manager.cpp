@@ -25,7 +25,6 @@
 
 #include "input_event_data_transformation.h"
 #include "multimodal_event_handler.h"
-#include "log4z.h"
 
 namespace OHOS {
 namespace MMI {

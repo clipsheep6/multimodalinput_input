@@ -25,7 +25,6 @@
 #include "error_multimodal.h"
 #include "multimodal_input_connect_def_parcel.h"
 #include "time_cost_chk.h"
-#include "log4z.h"
 
 namespace OHOS {
 namespace MMI {
@@ -36,23 +35,17 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Multi
 int32_t MultimodalInputConnectStub::OnRemoteRequest(
     uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
-    CALL_LOG_ENTER2;
     int32_t pid = GetCallingPid();
     TimeCostChk chk("IPC-OnRemoteRequest", "overtime 300(us)", MAX_OVER_TIME, pid,
         static_cast<int64_t>(code));
     uint64_t tid = GetThisThreadId();
-    LOGFMTD("RemoteRequest recv code:%d tid:%" PRId64 " pid:%d", code, tid, pid);
     MMI_HILOGD("RemoteRequest recv code:%{public}d tid:%{public}" PRId64 " pid:%{public}d", code, tid, pid);
 
-    LOGFMTD("step 1 pid:%d", pid);
     std::u16string descriptor = data.ReadInterfaceToken();
     if (descriptor != IMultimodalInputConnect::GetDescriptor()) {
-        LOGFMTE("get unexpect descriptor:%s", Str16ToStr8(descriptor).c_str());
         MMI_HILOGE("get unexpect descriptor:%{public}s", Str16ToStr8(descriptor).c_str());
         return ERR_INVALID_STATE;
     }
-
-    LOGFMTD("step 2 pid:%d", pid);
     switch (code) {
         case IMultimodalInputConnect::ALLOC_SOCKET_FD: {
             return StubHandleAllocSocketFd(data, reply);
@@ -67,7 +60,6 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
             return StubIsPointerVisible(data, reply);
         }
         default: {
-            LOGFMTE("unknown code:%u, go switch defaut", code);
             MMI_HILOGE("unknown code:%{public}u, go switch defaut", code);
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
         }
@@ -78,13 +70,11 @@ int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data,
 {
     int32_t pid = GetCallingPid();
     if (!IsRunning()) {
-        LOGFMTE("service is not running. pid:%d, go switch defaut", pid);
         MMI_HILOGE("service is not running. pid:%{public}d, go switch defaut", pid);
         return MMISERVICE_NOT_RUNNING;
     }
     sptr<ConnectReqParcel> req = data.ReadParcelable<ConnectReqParcel>();
     CHKPR(req, ERR_NULL_OBJECT);
-    LOGFMTD("clientName:%s,moduleId:%d", req->data.clientName.c_str(), req->data.moduleId);
     MMI_HILOGI("clientName:%{public}s,moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
     
     int32_t clientFd = INVALID_SOCKET_FD;
@@ -92,18 +82,14 @@ int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data,
     int32_t ret = entrustTasks_.PostSyncTask(pid, std::bind(&IMultimodalInputConnect::AllocSocketFd, this,
         req->data.clientName, req->data.moduleId, std::ref(clientFd), pid, uid));
     if (ret != RET_OK) {
-        LOGFMTE("post task AllocSocketFd failed pid:%d, go switch defaut", pid);
         MMI_HILOGE("post task AllocSocketFd failed pid:%{public}d, go switch defaut", pid);
         reply.WriteInt32(RET_ERR);
         return ret;
     }
-    LOGD("call AllocSocketFd success");
     MMI_HILOGI("call AllocSocketFd success");
 
     reply.WriteInt32(RET_OK);
     reply.WriteFileDescriptor(clientFd);
-
-    LOGFMTD("send clientFd to client, clientFd = %d", clientFd);
     MMI_HILOGI("send clientFd to client, clientFd = %d", clientFd);
     close(clientFd);
     return RET_OK;
@@ -112,38 +98,31 @@ int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data,
 int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply)
 {
     CALL_LOG_ENTER;
-    CALL_LOG_ENTER2;
     const int32_t uid = GetCallingUid();
     if (uid != SYSTEM_UID && uid != ROOT_UID) {
-        LOGE("check failed, uid is not root or system");
         MMI_HILOGE("check failed, uid is not root or system");
         return SASERVICE_PERMISSION_FAIL;
     }
 
     sptr<IRemoteObject> client = data.ReadRemoteObject();
     if (client == nullptr) {
-        LOGE("mouse client is nullptr");
         MMI_HILOGE("mouse client is nullptr");
         return ERR_INVALID_VALUE;
     }
 
     sptr<IEventFilter> filter = iface_cast<IEventFilter>(client);
     if (filter == nullptr) {
-        LOGE("filter is nullptr");
         MMI_HILOGE("filter is nullptr");
         return ERROR_NULL_POINTER;
     }
 
-    LOGD("filter iface_cast succeeded");
     MMI_HILOGD("filter iface_cast succeeded");
     int32_t ret = entrustTasks_.PostSyncTask(GetCallingPid(),
         std::bind(&IMultimodalInputConnect::AddInputEventFilter, this, filter));
     if (!reply.WriteInt32(ret)) {
-        LOGFMTE("WriteInt32:%d fail", ret);
         MMI_HILOGE("WriteInt32:%{public}d fail", ret);
         return IPC_STUB_WRITE_PARCEL_ERR;
     }
-    LOGFMTD("ret:%d", ret);
     MMI_HILOGD("ret:%{public}d", ret);
     return RET_OK;
 }
@@ -188,23 +167,19 @@ bool MultimodalInputConnectStub::CheckPermission()
 int32_t MultimodalInputConnectStub::StubSetPointerVisible(MessageParcel& data, MessageParcel& reply)
 {
     CALL_LOG_ENTER;
-    CALL_LOG_ENTER2;
     if (!CheckPermission()) {
-        LOGE("permission check fail");
         MMI_HILOGE("permission check fail");
         return CHECK_PERMISSION_FAIL;
     }
 
     bool visible = false;
     if (!data.ReadBool(visible)) {
-        LOGE("data ReadBool fail");
         MMI_HILOGE("data ReadBool fail");
         return IPC_PROXY_DEAD_OBJECT_ERR;
     }
     int32_t ret = entrustTasks_.PostSyncTask(GetCallingPid(),
         std::bind(&IMultimodalInputConnect::SetPointerVisible, this, visible));
     if (!reply.WriteInt32(ret)) {
-        LOGFMTE("WriteInt32:%d fail", ret);
         MMI_HILOGE("WriteInt32:%{public}d fail", ret);
         return IPC_STUB_WRITE_PARCEL_ERR;
     }
@@ -214,9 +189,7 @@ int32_t MultimodalInputConnectStub::StubSetPointerVisible(MessageParcel& data, M
 int32_t MultimodalInputConnectStub::StubIsPointerVisible(MessageParcel& data, MessageParcel& reply)
 {
     CALL_LOG_ENTER;
-    CALL_LOG_ENTER2;
     if (!CheckPermission()) {
-        LOGE("permission check fail");
         MMI_HILOGE("permission check fail");
         return CHECK_PERMISSION_FAIL;
     }
@@ -225,7 +198,6 @@ int32_t MultimodalInputConnectStub::StubIsPointerVisible(MessageParcel& data, Me
     int32_t ret = entrustTasks_.PostSyncTask(GetCallingPid(),
         std::bind(&IMultimodalInputConnect::IsPointerVisible, this, std::ref(visible)));
     if (!reply.WriteBool(visible)) {
-        LOGFMTE("WriteBool:%d fail", ret);
         MMI_HILOGE("WriteBool:%{public}d fail", ret);
         return IPC_STUB_WRITE_PARCEL_ERR;
     }

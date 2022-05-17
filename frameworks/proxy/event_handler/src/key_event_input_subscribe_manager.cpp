@@ -25,7 +25,6 @@
 #include "mmi_event_handler.h"
 #include "multimodal_event_handler.h"
 #include "standardized_event_manager.h"
-#include "log4z.h"
 
 namespace OHOS {
 namespace MMI {
@@ -68,11 +67,6 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
     auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
     CHKPR(eventHandler, INVALID_SUBSCRIBE_ID);
     SubscribeKeyEventInfo subscribeInfo(keyOption, callback, eventHandler);
-
-    LOGFMTD("subscribeId:%d,keyOption->finalKey:%d,"
-        "keyOption->isFinalKeyDown:%s,keyOption->finalKeyDownDuriation:%d",
-        subscribeInfo.GetSubscribeId(), keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
-        keyOption->GetFinalKeyDownDuration());
     MMI_HILOGD("subscribeId:%{public}d,keyOption->finalKey:%{public}d,"
         "keyOption->isFinalKeyDown:%{public}s,keyOption->finalKeyDownDuriation:%{public}d",
         subscribeInfo.GetSubscribeId(), keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
@@ -132,7 +126,6 @@ void KeyEventInputSubscribeManager::OnSubscribeKeyEventCallbackTask(
     CHK_PIDANDTID();
     CHKPV(event);
     info.GetCallback()(event);
-    LOGFMTD("key event callback id:%d keyCode:%d", subscribeId, event->GetKeyCode());
     MMI_HILOGD("key event callback id:%{public}d keyCode:%{public}d", subscribeId, event->GetKeyCode());
 }
 
@@ -155,7 +148,6 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
         MMI_HILOGE("post task failed");
         return RET_ERR;
     }
-    LOGFMTD("key event id:%d keyCode:%d", subscribeId, event->GetKeyCode());
     MMI_HILOGD("key event id:%{public}d keyCode:%{public}d", subscribeId, event->GetKeyCode());
     return RET_OK;
 }

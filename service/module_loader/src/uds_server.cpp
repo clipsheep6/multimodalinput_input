@@ -27,7 +27,6 @@
 #include "mmi_log.h"
 #include "util.h"
 #include "util_ex.h"
-#include "log4z.h"
 
 namespace OHOS {
 namespace MMI {
@@ -101,11 +100,9 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     int32_t& serverFd, int32_t& toReturnClientFd)
 {
     CALL_LOG_ENTER;
-    CALL_LOG_ENTER2;
     int32_t sockFds[2] = {};
 
     if (socketpair(AF_UNIX, SOCK_STREAM, 0, sockFds) != 0) {
-        LOGFMTE("call socketpair fail, errno:%d", errno);
         MMI_HILOGE("call socketpair fail, errno:%{public}d", errno);
         return RET_ERR;
     }
@@ -113,7 +110,6 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     serverFd = sockFds[0];
     toReturnClientFd = sockFds[1];
     if (toReturnClientFd < 0) {
-        LOGFMTE("call fcntl fail, errno:%d", errno);
         MMI_HILOGE("call fcntl fail, errno:%{public}d", errno);
         return RET_ERR;
     }
@@ -123,9 +119,6 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     setsockopt(sockFds[0], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
     setsockopt(sockFds[1], SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));
     setsockopt(sockFds[1], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
-
-    LOGFMTD("alloc socketpair, serverFd:%d,clientFd:%d(%d)",
-               serverFd, toReturnClientFd, sockFds[1]);
     MMI_HILOGD("alloc socketpair, serverFd:%{public}d,clientFd:%{public}d(%{public}d)",
                serverFd, toReturnClientFd, sockFds[1]);
     auto closeSocketFdWhenError = [&serverFd, &toReturnClientFd] {
@@ -148,7 +141,6 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     ret = AddEpoll(EPOLL_EVENT_SOCKET, serverFd);
     if (ret != RET_OK) {
         cleanTaskWhenError();
-        LOGFMTE("epoll_ctl EPOLL_CTL_ADD return %d,errCode:%d", ret, EPOLL_MODIFY_FAIL);
         MMI_HILOGE("epoll_ctl EPOLL_CTL_ADD return %{public}d,errCode:%{public}d", ret, EPOLL_MODIFY_FAIL);
         return ret;
     }
@@ -156,8 +148,6 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     SessionPtr sess = std::make_shared<UDSSession>(programName, moduleType, serverFd, uid, pid);
     if (sess == nullptr) {
         cleanTaskWhenError();
-        LOGFMTE("make_shared fail. progName:%s,pid:%d,errCode:%d",
-            programName.c_str(), pid, MAKE_SHARED_FAIL);
         MMI_HILOGE("make_shared fail. progName:%{public}s,pid:%{public}d,errCode:%{public}d",
             programName.c_str(), pid, MAKE_SHARED_FAIL);
         return RET_ERR;
@@ -169,7 +159,6 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
 
     if (!AddSession(sess)) {
         cleanTaskWhenError();
-        LOGFMTE("AddSession fail errCode:%d", ADD_SESSION_FAIL);
         MMI_HILOGE("AddSession fail errCode:%{public}d", ADD_SESSION_FAIL);
         return RET_ERR;
     }
@@ -213,13 +202,11 @@ void UDSServer::Dump(int32_t fd)
 
 void UDSServer::OnConnected(SessionPtr s)
 {
-    LOGFMTD("session desc:%s", s->GetDescript().c_str());
     MMI_HILOGI("session desc:%{public}s", s->GetDescript().c_str());
 }
 
 void UDSServer::OnDisconnected(SessionPtr s)
 {
-    LOGFMTD("session desc:%s", s->GetDescript().c_str());
     MMI_HILOGI("session desc:%{public}s", s->GetDescript().c_str());
 }
 

@@ -25,7 +25,6 @@
 #include "mmi_fd_listener.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
-#include "log4z.h"
 
 namespace OHOS {
 namespace MMI {
