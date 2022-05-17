@@ -18,7 +18,6 @@
 #include <chrono>
 #include <thread>
 
-#include "ipc_skeleton.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 
@@ -57,10 +56,8 @@ int32_t MultimodalInputConnectManager::AllocSocketPair(const int32_t moduleType)
         return RET_ERR;
     }
 
-    int32_t uid = IPCSkeleton::GetCallingUid();
-    int32_t pid = IPCSkeleton::GetCallingPid();
     const std::string programName(GetProgramName());
-    int32_t result = multimodalInputConnectService_->AllocSocketFd(programName, moduleType, socketFd_, pid, uid);
+    int32_t result = multimodalInputConnectService_->AllocSocketFd(programName, moduleType, socketFd_);
     if (result != RET_OK) {
         MMI_HILOGE("AllocSocketFd has error:%{public}d", result);
         return RET_ERR;

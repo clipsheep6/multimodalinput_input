@@ -25,6 +25,7 @@
 #include "singleton.h"
 #include "system_ability.h"
 
+#include "entrust_tasks.h"
 #include "input_event_handler.h"
 #include "multimodal_input_connect_stub.h"
 #include "libinput_adapter.h"
@@ -49,7 +50,7 @@ public:
     virtual void OnStop() override;
     virtual void OnDump() override;
     virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
-        int32_t &toReturnClientFd, int32_t pid, int32_t uid) override;
+        int32_t &toReturnClientFd) override;
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
     virtual int32_t SetPointerVisible(bool visible) override;
     virtual int32_t IsPointerVisible(bool &visible) override;
@@ -62,6 +63,7 @@ protected:
     virtual void OnDisconnected(SessionPtr s) override;
     virtual int32_t AddEpoll(EpollEventType type, int32_t fd) override;
     virtual bool IsRunning() const override;
+    int32_t CheckPointerVisible(bool &visible);
 
     bool InitLibinputService();
     bool InitService();
@@ -85,6 +87,7 @@ private:
 
     LibinputAdapter libinputAdapter_;
     ServerMsgHandler sMsgHandler_;
+    EntrustTasks entrustTasks_;
 };
 } // namespace MMI
 } // namespace OHOS

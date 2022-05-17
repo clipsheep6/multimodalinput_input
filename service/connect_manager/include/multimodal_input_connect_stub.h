@@ -21,7 +21,6 @@
 #include "message_parcel.h"
 #include "nocopyable.h"
 
-#include "entrust_tasks.h"
 #include "i_multimodal_input_connect.h"
 #include "mmi_log.h"
 #include "multimodal_input_connect_define.h"
@@ -49,9 +48,6 @@ private:
     static constexpr int32_t ROOT_UID = 0;
 
     bool CheckPermission();
-
-protected:
-    EntrustTasks entrustTasks_;
 };
 } // namespace MMI
 } // namespace OHOS

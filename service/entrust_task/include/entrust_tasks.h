@@ -33,7 +33,6 @@ class EntrustTasks : public IdFactroy<int32_t> {
 public:
     struct TaskData {
         uint64_t tid;
-        int32_t pid;
         int32_t taskId;
     };
     class Task {
@@ -65,9 +64,9 @@ public:
     virtual ~EntrustTasks() = default;
 
     bool Init();
-    void ProcessTasks(uint64_t stid, int32_t pid);
-    int32_t PostSyncTask(int32_t pid, ETaskCallback callback, int32_t timeout = ET_DEFINE_TIMEOUT);
-    bool PostAsyncTask(int32_t pid, ETaskCallback callback);
+    void ProcessTasks();
+    int32_t PostSyncTask(ETaskCallback callback);
+    bool PostAsyncTask(ETaskCallback callback);
 
     int32_t GetReadFd() const
     {
@@ -75,7 +74,8 @@ public:
     }
 
 private:
-    int32_t PostTask(int32_t pid, ETaskCallback callback, Promise *promise = nullptr);
+    void PopPendingTaskList(std::vector<TaskPtr> &tasks);
+    int32_t PostTask(ETaskCallback callback, Promise *promise = nullptr);
 
 private:
     int32_t fds_[2] = {};

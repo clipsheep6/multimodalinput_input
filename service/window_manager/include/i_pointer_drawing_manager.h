@@ -33,11 +33,8 @@ public:
         return true;
     }
     virtual void DeletePointerVisible(int32_t pid) {}
-    virtual void SetPointerVisible(int32_t pid, bool visible) {}
-    virtual bool IsPointerVisible()
-    {
-        return false;
-    }
+    virtual int32_t SetPointerVisible(int32_t pid, bool visible) { return 0; }
+    virtual bool IsPointerVisible() { return 0; }
 
 public:
     static inline std::shared_ptr<IPointerDrawingManager> iPointDrawMgr_ = nullptr;

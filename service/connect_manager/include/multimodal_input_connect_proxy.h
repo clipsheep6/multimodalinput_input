@@ -31,8 +31,8 @@ public:
     explicit MultimodalInputConnectProxy(const sptr<IRemoteObject> &impl);
     DISALLOW_COPY_AND_MOVE(MultimodalInputConnectProxy);
     virtual ~MultimodalInputConnectProxy() override;
-    virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &socketFd,
-        int32_t pid, int32_t uid) override;
+    virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
+        int32_t &socketFd) override;
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
     virtual int32_t SetPointerVisible(bool visible) override;
     virtual int32_t IsPointerVisible(bool &visible) override;

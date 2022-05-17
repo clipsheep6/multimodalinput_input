@@ -46,55 +46,62 @@ bool EntrustTasks::Init()
     return true;
 }
 
-void EntrustTasks::ProcessTasks(uint64_t stid, int32_t pid)
+void EntrustTasks::ProcessTasks()
 {
-    auto tid = GetThisThreadId();
-    MMI_HILOGD("tid:%{public}" PRId64 " stid:%{public}" PRId64 " pid:%{public}d", tid, stid, pid);
-    std::lock_guard<std::mutex> guard(mux_);
-    int32_t count = 0;
-    while (!tasks_.empty() && ((count++) < ET_ONCE_PROCESS_TASK_LIMIT)) {
-        auto task = tasks_.front();
-        CHKPB(task);
-        task->ProcessTask();
-        RecoveryId(task->GetId());
-        tasks_.pop();
+    std::vector<TaskPtr> tasks;
+    PopPendingTaskList(tasks);
+    for (auto& it : tasks) {
+        it->ProcessTask();
+        RecoveryId(it->GetId());
     }
 }
 
-int32_t EntrustTasks::PostSyncTask(int32_t pid, ETaskCallback callback, int32_t timeout)
+int32_t EntrustTasks::PostSyncTask(ETaskCallback callback)
 {
     Promise promise;
     Future future = promise.get_future();
-    auto ret = PostTask(pid, callback, &promise);
+    auto ret = PostTask(callback, &promise);
     if (ret != RET_OK) {
         MMI_HILOGE("Post aync task failed");
         return ret;
     }
+    constexpr int32_t timeout = 3000;
     std::chrono::milliseconds span(timeout);
     auto res = future.wait_for(span);
     if (res == std::future_status::timeout) {
-        MMI_HILOGW("Task timeout pid:%{public}d", pid);
+        MMI_HILOGE("Task timeout");
         return ETASKS_WAIT_TIMEOUT;
     } else if (res == std::future_status::deferred) {
-        MMI_HILOGW("Task deferred pid:%{public}d", pid);
+        MMI_HILOGE("Task deferred");
         return ETASKS_WAIT_DEFERRED;
     }
     ret = future.get();
     return ret;
 }
 
-bool EntrustTasks::PostAsyncTask(int32_t pid, ETaskCallback callback)
+bool EntrustTasks::PostAsyncTask(ETaskCallback callback)
 {
-    auto ret = PostTask(pid, callback);
+    auto ret = PostTask(callback);
     if (ret != RET_OK) {
         MMI_HILOGE("Post aync task failed");
         return false;
     }
-    MMI_HILOGD("Post async task pid:%{public}d", pid);
     return true;
 }
 
-int32_t EntrustTasks::PostTask(int32_t pid, ETaskCallback callback, Promise *promise)
+void EntrustTasks::PopPendingTaskList(std::vector<TaskPtr> &tasks)
+{
+    std::lock_guard<std::mutex> guard(mux_);
+    int32_t count = 0;
+    while (!tasks_.empty() && ((count++) < ET_ONCE_PROCESS_TASK_LIMIT)) {
+        auto task = tasks_.front();
+        CHKPB(task);
+        tasks.push_back(task);
+        tasks_.pop();
+    }
+}
+
+int32_t EntrustTasks::PostTask(ETaskCallback callback, Promise *promise)
 {
     std::lock_guard<std::mutex> guard(mux_);
     auto tsize = tasks_.size();
@@ -103,7 +110,7 @@ int32_t EntrustTasks::PostTask(int32_t pid, ETaskCallback callback, Promise *pro
         return ETASKS_QUEUE_FULL;
     }
     int32_t id = GenerateId();
-    TaskData data = {GetThisThreadId(), pid, id};
+    TaskData data = {GetThisThreadId(), id};
     auto res = write(fds_[1], &data, sizeof(data));
     if (res == -1) {
         RecoveryId(id);
