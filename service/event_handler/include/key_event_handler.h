@@ -25,7 +25,7 @@ namespace OHOS {
 namespace MMI {
 class KeyEventHandler : public IInputEventHandler {
 public:
-    KeyEventHandler(int32_t priority) : IInputEventHandler(priority) {}
+    KeyEventHandler() = default;
     ~KeyEventHandler() = default;
     int32_t HandleLibinputEvent(libinput_event* event) override;
     int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;

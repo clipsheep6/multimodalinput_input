@@ -18,7 +18,6 @@
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "input_event_data_transformation.h"
-#include "i_input_event_monitor_handler.h"
 #include "input_event_handler.h"
 #include "mmi_log.h"
 #include "net_packet.h"
@@ -149,7 +148,7 @@ void InputHandlerManagerGlobal::InitSessionLostCallback()
     if (sessionLostCallbackInitialized_)  {
         return;
     }
-    auto udsServerPtr = IUdsServer::GetInstance();
+    auto udsServerPtr = InputHandler->GetUDSServer();
     CHKPV(udsServerPtr);
     udsServerPtr->AddSessionDeletedCallback(std::bind(
         &InputHandlerManagerGlobal::OnSessionLost, this, std::placeholders::_1));
@@ -251,9 +250,10 @@ void InputHandlerManagerGlobal::MonitorCollection::MarkConsumed(int32_t monitorI
     pointerEvent->SetActionTime(GetSysClockTime());
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT | InputEvent::EVENT_FLAG_NO_MONITOR);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    auto udsServer = IUdsServer::GetInstance();
-    CHKPV(udsServer);
-    udsServer->HandleNonConsumedTouchEvent(pointerEvent);
+    auto iTouchEventHandler = InputHandler->GetTouchEventHandler();
+    CHKPV(iTouchEventHandler);
+    iTouchEventHandler->HandleTouchEvent(pointerEvent);
+
 #endif // OHOS_BUILD_ENABLE_TOUCH
 }
 

@@ -22,16 +22,16 @@
 #include "nocopyable.h"
 #include "singleton.h"
 
+#include "i_input_event_handler.h"
 #include "i_input_event_monitor_handler.h"
-#include "i_monitor_event_handler.h"
 #include "input_handler_type.h"
 #include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
-class InputHandlerManagerGlobal : public IMonitorEventHandler {
+class InputHandlerManagerGlobal : public IInputEventHandler {
 public:
-    InputHandlerManagerGlobal(int priority) : IMonitorEventHandler(priority) {}
+    InputHandlerManagerGlobal() = default;
     virtual ~InputHandlerManagerGlobal() = default;
     DISALLOW_COPY_AND_MOVE(InputHandlerManagerGlobal);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -43,9 +43,9 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
-    int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
-    void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
-    void MarkConsumed(int32_t handlerId, int32_t eventId, SessionPtr session) override;
+    int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
+    void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
+    void MarkConsumed(int32_t handlerId, int32_t eventId, SessionPtr session);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD

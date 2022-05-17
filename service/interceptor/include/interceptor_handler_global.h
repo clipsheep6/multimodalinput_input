@@ -18,19 +18,19 @@
 
 #include <set>
 
-#include "nocopyable.h"
-#include "singleton.h"
 
 #include "i_input_event_monitor_handler.h"
-#include "i_interceptor_handler_global.h"
 #include "input_handler_type.h"
+#include "i_interceptor_handler_global.h"
+#include "nocopyable.h"
+#include "singleton.h"
 #include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
 class InterceptorHandlerGlobal : public IInterceptorHandlerGlobal {
 public:
-    InterceptorHandlerGlobal(int32_t priority) : IInterceptorHandlerGlobal(priority) {}
+    InterceptorHandlerGlobal() = default;
     DISALLOW_COPY_AND_MOVE(InterceptorHandlerGlobal);
     ~InterceptorHandlerGlobal() = default;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD

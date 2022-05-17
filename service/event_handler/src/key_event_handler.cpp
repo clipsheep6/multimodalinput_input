@@ -34,9 +34,7 @@ int32_t KeyEventHandler::HandleLibinputEvent(libinput_event* event)
 {
     CALL_LOG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
-    auto udsServer = IUdsServer::GetInstance();
-    CHKPR(udsServer, ERROR_NULL_POINTER);
-    auto keyEvent = udsServer->GetKeyEvent();
+    auto keyEvent = InputHandler->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     auto packageResult = eventPackage_.PackageKeyEvent(event, keyEvent);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
@@ -48,9 +46,7 @@ int32_t KeyEventHandler::HandleLibinputEvent(libinput_event* event)
         return KEY_EVENT_PKG_FAIL;
     }
     BytraceAdapter::StartBytrace(keyEvent);
-    CHKPR(nextHandler_, ERROR_NULL_POINTER);
-
-    auto ret = nextHandler_->HandleKeyEvent(keyEvent);
+    auto ret = HandleKeyEvent(keyEvent);
     if (ret != RET_OK) {
         MMI_HILOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
         return KEY_EVENT_DISP_FAIL;
@@ -62,8 +58,11 @@ int32_t KeyEventHandler::HandleLibinputEvent(libinput_event* event)
 
 int32_t KeyEventHandler::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
+    if (nextHandler_ == nullptr) {
+        MMI_HILOGW("Keyboard device does not support");
+        return ERROR_UNSUPPORT;
+    }
     CHKPR(keyEvent, ERROR_NULL_POINTER);
-    CHKPR(nextHandler_, ERROR_NULL_POINTER);
     return nextHandler_->HandleKeyEvent(keyEvent);
 }
 
@@ -87,9 +86,7 @@ void KeyEventHandler::AddHandleTimer(int32_t timeout)
 {
     timerId_ = TimerMgr->AddTimer(timeout, 1, [this]() {
         MMI_HILOGD("enter");
-        auto udsServer = IUdsServer::GetInstance();
-        CHKPV(udsServer);
-        auto keyEvent = udsServer->GetKeyEvent();
+        auto keyEvent = InputHandler->GetKeyEvent();
         CHKPV(keyEvent);
         if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
             MMI_HILOGD("key up");

@@ -64,9 +64,8 @@ private:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void OnTouchpadMonitorInputEvent(std::shared_ptr<PointerEvent> PointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-};
-
 #define InputMonitorServiceMgr OHOS::Singleton<InputEventMonitorManager>::GetInstance()
+};
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_EVENT_MONITOR_H

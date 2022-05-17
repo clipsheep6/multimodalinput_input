@@ -58,8 +58,11 @@ int32_t TouchEventHandler::HandleLibinputEvent(libinput_event* event)
 
 int32_t TouchEventHandler::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    if (nextHandler_ == nullptr) {
+        MMI_HILOGW("Touch device does not support");
+        return ERROR_UNSUPPORT;
+    }
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    CHKPR(nextHandler_, ERROR_NULL_POINTER);
     return nextHandler_->HandleTouchEvent(pointerEvent);
 }
 
@@ -68,8 +71,7 @@ int32_t TouchEventHandler::HandleTouchEvent(libinput_event* event)
     auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
-    CHKPR(nextHandler_, ERROR_NULL_POINTER);
-    nextHandler_->HandleTouchEvent(pointerEvent);
+    HandleTouchEvent(pointerEvent);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_UP) {
         pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
@@ -87,8 +89,7 @@ int32_t TouchEventHandler::HandleTableToolEvent(libinput_event* event)
     auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TABLET_TOOL);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
-    CHKPR(nextHandler_, ERROR_NULL_POINTER);
-    nextHandler_->HandleTouchEvent(pointerEvent);
+    HandleTouchEvent(pointerEvent);
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
         pointerEvent->Reset();
     }

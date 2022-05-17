@@ -81,11 +81,16 @@ bool IInterceptorHandlerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointe
     MMI_HILOGW("Pointer interceptor module does not support");
     return false;
 }
-#endif // OHOS_BUILD_ENABLE_POINTERE || OHOS_BUILD_ENABLE_TOUCH
+#endif // defined(OHOS_BUILD_ENABLE_POINTERE) || defined(OHOS_BUILD_ENABLE_TOUCH)
 
-std::shared_ptr<IInterceptorHandlerGlobal> IInterceptorHandlerGlobal::CreateInstance(int32_t priority)
+std::shared_ptr<IInterceptorHandlerGlobal> IInterceptorHandlerGlobal::CreateInstance()
 {
-    return std::make_shared<IInterceptorHandlerGlobal>(priority);
+    return std:makeP
+}
+
+std::shared_ptr<IInterceptorHandlerGlobal> IInterceptorHandlerGlobal::CreateInstance()
+{
+    return std::make_shared<IInterceptorHandlerGlobal>();
 }
 } // namespace MMI
 } // namespace OHOS

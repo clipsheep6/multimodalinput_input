@@ -26,22 +26,22 @@
 #include "nocopyable.h"
 #include "singleton.h"
 
-#include "i_subscriber_event_handler.h"
+#include "i_input_event_handler.h"
 #include "key_event.h"
 #include "key_option.h"
 #include "uds_server.h"
 
 namespace OHOS {
 namespace MMI {
-class KeyEventSubscriber : public ISubscriberEventHandler {
+class KeyEventSubscriber :  public IInputEventHandler, public Singleton<KeyEventSubscriber> {
 public:
-    KeyEventSubscriber(int32_t priority) : ISubscriberEventHandler(priority) {}
+    KeyEventSubscriber() = default;
     ~KeyEventSubscriber() = default;
     DISALLOW_COPY_AND_MOVE(KeyEventSubscriber);
     int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
     int32_t SubscribeKeyEvent(SessionPtr sess, int32_t subscribeId,
-            const std::shared_ptr<KeyOption> keyOption) override;
-    int32_t UnSubscribeKeyEvent(SessionPtr sess, int32_t subscribeId) override;
+            const std::shared_ptr<KeyOption> keyOption);
+    int32_t UnSubscribeKeyEvent(SessionPtr sess, int32_t subscribeId);
     bool SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
 
 private:
@@ -83,6 +83,8 @@ private:
     bool callbackInitialized_ { false };
     std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
 };
+
+#define KeyEventSubscriber_ KeyEventSubscriber::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif  // KEY_EVENT_SUBSCRIBER_H

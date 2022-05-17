@@ -24,7 +24,7 @@ namespace OHOS {
 namespace MMI {
 class PointerEventHandler : public IInputEventHandler {
 public:
-    PointerEventHandler(int32_t priority) : IInputEventHandler(priority) {}
+    PointerEventHandler() = default;
     ~PointerEventHandler() = default;
     int32_t HandleLibinputEvent(libinput_event* event) override;
     int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;

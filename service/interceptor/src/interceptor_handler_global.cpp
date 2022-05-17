@@ -132,7 +132,7 @@ void InterceptorHandlerGlobal::InitSessionLostCallback()
         MMI_HILOGE("Init session is failed");
         return;
     }
-    auto udsServerPtr = IUdsServer::GetInstance();
+    auto udsServerPtr = InputHandler->GetUDSServer();
     CHKPV(udsServerPtr);
     udsServerPtr->AddSessionDeletedCallback(std::bind(
         &InterceptorHandlerGlobal::OnSessionLost, this, std::placeholders::_1));
@@ -258,9 +258,10 @@ void InterceptorHandlerGlobal::InterceptorCollection::OnSessionLost(SessionPtr s
     }
 }
 
-std::shared_ptr<IInterceptorHandlerGlobal> IInterceptorHandlerGlobal::CreateInstance(int32_t priority)
+std::shared_ptr<IInterceptorHandlerGlobal> IInterceptorHandlerGlobal::CreateInstance()
 {
-    return std::make_shared<InterceptorHandlerGlobal>(priority);
+    return std::make_shared<InterceptorHandlerGlobal>();
 }
+
 } // namespace MMI
 } // namespace OHOS

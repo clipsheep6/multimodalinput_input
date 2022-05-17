@@ -31,16 +31,19 @@ constexpr int32_t MAX_PREKEYS_NUM = 4;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandManager" };
 struct JsonParser {
     JsonParser() = default;
+
     ~JsonParser()
     {
         if (json_ != nullptr) {
             cJSON_Delete(json_);
         }
     }
+
     operator cJSON *()
     {
         return json_;
     }
+
     cJSON *json_ = nullptr;
 };
 
@@ -266,7 +269,7 @@ bool ConvertToShortcutKey(cJSON* jsonData, ShortcutKey &shortcutKey)
 }
 } // namespace
 
-KeyCommandManager::KeyCommandManager(int32_t priority) : IKeyCommandManager(priority)
+KeyCommandManager::KeyCommandManager()
 {
     std::string configFile = GetConfigFilePath();
     if (!FileExists(configFile)) {
@@ -515,9 +518,12 @@ void ShortcutKey::Print() const
         finalKey, ability.bundleName.c_str());
 }
 
-std::shared_ptr<IKeyCommandManager> IKeyCommandManager::CreateInstance(int32_t priority)
+std::shared_ptr<IKeyCommandManager> IKeyCommandManager::GetInstance()
 {
-    return std::make_shared<KeyCommandManager>(priority);
+    if (keyCommand_ == nullptr) {
+        keyCommand_ = std::make_shared<KeyCommandManager>();
+    }
+    return keyCommand_;
 }
 } // namespace MMI
 } // namespace OHOS

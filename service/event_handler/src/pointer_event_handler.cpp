@@ -18,6 +18,7 @@
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
+#include "input_event_handler.h"
 #include "mmi_log.h"
 #include "mouse_event_handler.h"
 #include "touch_transform_point_manager.h"
@@ -59,6 +60,10 @@ int32_t PointerEventHandler::HandleLibinputEvent(libinput_event* event)
 
 int32_t PointerEventHandler::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    if (nextHandler_ == nullptr) {
+        MMI_HILOGW("Pointer device does not support");
+        return ERROR_UNSUPPORT;
+    }
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_END) {
         MMI_HILOGI("MouseEvent Normalization Results, PointerAction:%{public}d,PointerId:%{public}d,"
@@ -87,8 +92,7 @@ int32_t PointerEventHandler::HandleTouchPadEvent(libinput_event* event)
 {
     auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH_PAD);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    CHKPR(nextHandler_, ERROR_NULL_POINTER);
-    nextHandler_->HandlePointerEvent(pointerEvent);
+    HandlePointerEvent(pointerEvent);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCHPAD_UP) {
         pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
@@ -122,9 +126,7 @@ int32_t PointerEventHandler::HandleGestureEvent(libinput_event* event)
                item.GetDownTime(), (item.IsPressed() ? "true" : "false"),
                item.GetGlobalX(), item.GetGlobalY(), item.GetLocalX(), item.GetLocalY(),
                item.GetWidth(), item.GetHeight());
-
-    CHKPR(nextHandler_, ERROR_NULL_POINTER);
-    nextHandler_->HandlePointerEvent(pointerEvent);
+    HandlePointerEvent(pointerEvent);
     return RET_OK;
 }
 
@@ -133,9 +135,7 @@ int32_t PointerEventHandler::HandleMouseEvent(libinput_event* event)
     MouseEventHdr->Normalize(event);
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    auto udsServer = IUdsServer::GetInstance();
-    CHKPR(udsServer, ERROR_NULL_POINTER);
-    auto keyEvent = udsServer->GetKeyEvent();
+    auto keyEvent = InputHandler->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
     for (const int32_t& keyCode : pressedKeys) {
@@ -143,8 +143,7 @@ int32_t PointerEventHandler::HandleMouseEvent(libinput_event* event)
     }
     pointerEvent->SetPressedKeys(pressedKeys);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
-    CHKPR(nextHandler_, ERROR_NULL_POINTER);
-    nextHandler_->HandlePointerEvent(pointerEvent);
+    HandlePointerEvent(pointerEvent);
     return RET_OK;
 }
 } // namespace MMI

@@ -19,16 +19,16 @@
 #include "nocopyable.h"
 #include "singleton.h"
 
-#include "i_interceptor_event_handler.h"
+#include "i_input_event_handler.h"
 #include "input_handler_type.h"
 #include "pointer_event.h"
 #include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
-class IInterceptorHandlerGlobal : public IInterceptorEventHandler {
+class IInterceptorHandlerGlobal : public IInputEventHandler {
 public:
-    IInterceptorHandlerGlobal(int32_t priority) : IInterceptorEventHandler(priority) {}
+    IInterceptorHandlerGlobal() = default;
     ~IInterceptorHandlerGlobal() = default;
     DISALLOW_COPY_AND_MOVE(IInterceptorHandlerGlobal);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -40,10 +40,9 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
-    static std::shared_ptr<IInterceptorHandlerGlobal> CreateInstance(int32_t priority);
-    int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
-    void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
-private:
+    static std::shared_ptr<IInterceptorHandlerGlobal> CreateInstance();
+    virtual int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
+    virtual void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) = 0;
     bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent);
     bool HandleEvent(std::shared_ptr<PointerEvent> pointerEvent);
 };

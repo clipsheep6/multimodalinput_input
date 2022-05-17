@@ -17,17 +17,17 @@
 #define EVENT_FILTER_WRAP_H
 
 #include <mutex>
-
 #include "nocopyable.h"
-#include "i_event_filter.h"
-#include "i_filter_event_handler.h"
 #include "singleton.h"
+
+#include "i_event_filter.h"
+#include "i_input_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
-class EventFilterWrap : public IFilterEventHandler {
+class EventFilterWrap : public IInputEventHandler {
 public:
-    EventFilterWrap(int32_t priority);
+    EventFilterWrap();
     DISALLOW_COPY_AND_MOVE(EventFilterWrap);
     ~EventFilterWrap();
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -36,7 +36,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
-    int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
+    int32_t AddInputEventFilter(sptr<IEventFilter> filter);
     bool HandlePointerEventFilter(std::shared_ptr<PointerEvent> point);
 private:
     std::mutex lockFilter_;

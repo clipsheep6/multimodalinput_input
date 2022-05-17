@@ -98,11 +98,6 @@ static void CheckDefine()
 #endif
 }
 
-std::shared_ptr<IUdsServer> IUdsServer::GetInstance()
-{
-    return OHOS::DelayedSingleton<MMIService>::GetInstance();
-}
-
 MMIService::MMIService() : SystemAbility(MULTIMODAL_INPUT_CONNECT_SERVICE_ID, true) {}
 
 MMIService::~MMIService() {}
@@ -145,12 +140,11 @@ int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
 
 bool MMIService::InitLibinputService()
 {
-    CALL_LOG_ENTER;
 #ifdef OHOS_BUILD_HDF
     MMI_HILOGD("HDF Init");
     hdfEventManager.SetupCallback();
 #endif
-    if (!(libinputAdapter_.Init(std::bind(&InputEventHandler::OnEvent, &southEventHandler_, std::placeholders::_1),
+    if (!(libinputAdapter_.Init(std::bind(&InputEventHandler::OnEvent, InputHandler, std::placeholders::_1),
         DEF_INPUT_SEAT))) {
         MMI_HILOGE("libinput init, bind failed");
         return false;
@@ -168,7 +162,6 @@ bool MMIService::InitLibinputService()
 
 bool MMIService::InitService()
 {
-    CALL_LOG_ENTER;
     if (state_ != ServiceRunningState::STATE_NOT_START) {
         MMI_HILOGE("Service running status is not enabled");
         return false;
@@ -193,19 +186,18 @@ bool MMIService::InitService()
 
 int32_t MMIService::Init()
 {
-    CALL_LOG_ENTER;
     CheckDefine();
 
     MMI_HILOGD("InputEventHandler Init");
-    southEventHandler_.Init();
+    InputHandler->Init(*this);
 
     MMI_HILOGD("ServerMsgHandler Init");
-    sMsgHandler_.Init(&southEventHandler_);
+    sMsgHandler_.Init(*this);
     MMI_HILOGD("EventDump Init");
-    MMIEventDump->Init();
+    MMIEventDump->Init(*this);
 
     MMI_HILOGD("WindowsManager Init");
-    if (!WinMgr->Init()) {
+    if (!WinMgr->Init(*this)) {
         MMI_HILOGE("Windows message init failed");
         return WINDOWS_MSG_INIT_FAIL;
     }
@@ -216,31 +208,25 @@ int32_t MMIService::Init()
         return POINTER_DRAW_INIT_FAIL;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
-    MMI_HILOGD("Create epoll Init");
     mmiFd_ = EpollCreat(MAX_EVENT_SIZE);
     if (mmiFd_ < 0) {
         MMI_HILOGE("Epoll creat failed");
         return EPOLL_CREATE_FAIL;
     }
-    MMI_HILOGD("InitService Init");
     if (!InitService()) {
         MMI_HILOGE("Saservice init failed");
         return SASERVICE_INIT_FAIL;
     }
-    MMI_HILOGD("InitLibinputService Init");
     if (!InitLibinputService()) {
         MMI_HILOGE("Libinput init failed");
         return LIBINPUT_INIT_FAIL;
     }
-    MMI_HILOGD("Server Message Handler Bind");
     SetRecvFun(std::bind(&ServerMsgHandler::OnMsgHandler, &sMsgHandler_, std::placeholders::_1, std::placeholders::_2));
-    MMI_HILOGD("Init eave");
     return RET_OK;
 }
 
 void MMIService::OnStart()
 {
-    CALL_LOG_ENTER;
     int sleepSeconds = 3;
     sleep(sleepSeconds);
     CHK_PIDANDTID();
@@ -260,10 +246,9 @@ void MMIService::OnStart()
 
 void MMIService::OnStop()
 {
-    CALL_LOG_ENTER;
     CHK_PIDANDTID();
     UdsStop();
-    southEventHandler_.Clear();
+    InputHandler->Clear();
     libinputAdapter_.Stop();
     state_ = ServiceRunningState::STATE_NOT_START;
 #ifdef OHOS_RSS_CLIENT
@@ -273,7 +258,6 @@ void MMIService::OnStop()
 
 void MMIService::OnDump()
 {
-    CALL_LOG_ENTER;
     CHK_PIDANDTID();
     MMIEventDump->Dump();
 }
@@ -342,7 +326,8 @@ int32_t MMIService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& 
 
 int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter)
 {
-    return southEventHandler_.AddFilter(filter);
+    CHKPR(InputHandler, ERROR_NULL_POINTER);
+    return InputHandler->AddInputEventFilter(filter);
 }
 
 int32_t MMIService::SetPointerVisible(bool visible)
@@ -363,21 +348,6 @@ int32_t MMIService::IsPointerVisible(bool &visible)
     return RET_OK;
 }
 
-int32_t MMIService::HandleNonConsumedTouchEvent(std::shared_ptr<PointerEvent> event)
-{
-    return southEventHandler_.HandleTouchEvent(event);
-}
-
-int32_t MMIService::HandleTimerPointerEvent(std::shared_ptr<PointerEvent> event)
-{
-    return southEventHandler_.HandlePointerEvent(event);
-}
-
-std::shared_ptr<KeyEvent> MMIService::GetKeyEvent() const
-{
-    return southEventHandler_.GetKeyEvent();
-}
-
 #ifdef OHOS_RSS_CLIENT
 void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
@@ -396,7 +366,9 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& 
 
 void MMIService::OnTimer()
 {
-    southEventHandler_.OnCheckEventReport();
+    if (InputHandler != nullptr) {
+        InputHandler->OnCheckEventReport();
+    }
     TimerMgr->ProcessTimers();
 }
 

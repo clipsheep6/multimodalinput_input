@@ -39,7 +39,7 @@ public:
     virtual ~InputWindowsManager();
     DISALLOW_COPY_AND_MOVE(InputWindowsManager);
 
-    bool Init();
+    bool Init(UDSServer& udsServer);
     void UpdateSeatsInfo();
     void UpdateScreensInfo();
 
@@ -100,6 +100,7 @@ private:
         WindowInfo*& touchWindow);
 
 private:
+    UDSServer* udsServer_ = nullptr;
     int32_t firstBtnDownWindowId_ = -1;
     std::vector<PhysicalDisplayInfo> physicalDisplays_ = {};
     std::vector<LogicalDisplayInfo> logicalDisplays_ = {};

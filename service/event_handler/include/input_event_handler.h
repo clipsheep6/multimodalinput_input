@@ -25,7 +25,6 @@
 #include "i_event_filter.h"
 #include "i_input_event_handler.h"
 #include "i_interceptor_handler_global.h"
-#include "i_input_south_event_handler.h"
 #include "input_handler_manager_global.h"
 #include "key_event_subscriber.h"
 #include "mouse_event_handler.h"
@@ -39,39 +38,33 @@ namespace OHOS {
 namespace MMI {
 using EventFun = std::function<int32_t(libinput_event *event)>;
 using NotifyDeviceChange = std::function<void(int32_t, int32_t, char *)>;
-class InputEventHandler : public IInputSouthEventHandler, public MsgHandler<EventFun>,
-    public DelayedSingleton<InputEventHandler> {
+class InputEventHandler : public MsgHandler<EventFun>, public DelayedSingleton<InputEventHandler> {
 public:
     InputEventHandler();
     DISALLOW_COPY_AND_MOVE(InputEventHandler);
     virtual ~InputEventHandler() override;
-    void Init();
+    void Init(UDSServer& udsServer);
     void OnEvent(void *event);
     void OnCheckEventReport();
-    std::shared_ptr<KeyEvent> GetKeyEvent() const override;
+    UDSServer *GetUDSServer() const;
+    std::shared_ptr<KeyEvent> GetKeyEvent() const;
+    int32_t AddInputEventFilter(sptr<IEventFilter> filter);
 
-    int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
-    int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
-    int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+    std::shared_ptr<IInputEventHandler> GetKeyEventHandler() const;
+    std::shared_ptr<IInputEventHandler> GetPointerEventHandler() const;
+    std::shared_ptr<IInputEventHandler> GetTouchEventHandler() const;
 
-    int32_t AddKeyInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
-    void RemoveKeyInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
-    int32_t AddPointerInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
-    void RemovePointerInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
-    int32_t AddTouchInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
-    void RemoveTouchInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
+    std::shared_ptr<IInterceptorHandlerGlobal> GetKeyInterceptorHandler() const;
+    std::shared_ptr<KeyEventSubscriber> GetKeySubscriberHandler() const;
+    std::shared_ptr<InputHandlerManagerGlobal> GetKeyMonitorHandler() const;
 
-    void AddKeyMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
-    void RemoveKeyMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
-    void AddPointerMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
-    void RemovePointerMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
-    void AddTouchMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
-    void RemoveTouchMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
-    void MarkTouchConsumed(int32_t monitorId, int32_t eventId, SessionPtr sess) override;
-    int32_t AddKeySubscriber(SessionPtr sess, int32_t subscribeId, const std::shared_ptr<KeyOption> keyOption) override;
-    int32_t RemoveKeySubscriber(SessionPtr sess, int32_t subscribeId) override;
+    std::shared_ptr<EventFilterWrap> GetPointerFilterHandler() const;
+    std::shared_ptr<IInterceptorHandlerGlobal> GetPointerInterceptorHandler() const;
+    std::shared_ptr<InputHandlerManagerGlobal> GetPointerMonitorHandler() const;
 
-    int32_t AddFilter(sptr<IEventFilter> filter) override;
+    std::shared_ptr<EventFilterWrap> GetTouchFilterHandler() const;
+    std::shared_ptr<IInterceptorHandlerGlobal> GetTouchInterceptorHandler() const;
+    std::shared_ptr<InputHandlerManagerGlobal> GetTouchMonitorHandler() const;
 
 protected:
     int32_t OnEventDeviceAdded(libinput_event *event);
@@ -87,6 +80,7 @@ private:
     int32_t OnEventHandler(libinput_event *event);
     void BuildInputHandlerChain();
 
+    UDSServer *udsServer_ = nullptr;
     NotifyDeviceChange notifyDeviceChange_;
     std::shared_ptr<KeyEvent> keyEvent_ = nullptr;
 
@@ -94,11 +88,24 @@ private:
     std::shared_ptr<IInputEventHandler> pointerEventHandler_ = nullptr;
     std::shared_ptr<IInputEventHandler> touchEventHandler_ = nullptr;
 
+    std::shared_ptr<IInterceptorHandlerGlobal> keyInterceptorHandler_ = nullptr;
+    std::shared_ptr<KeyEventSubscriber> keySubscriberHandler_ = nullptr;
+    std::shared_ptr<InputHandlerManagerGlobal> keyMonitorHandler_ = nullptr;
+
+    std::shared_ptr<EventFilterWrap> pointerFilterHandler_ = nullptr;
+    std::shared_ptr<IInterceptorHandlerGlobal> pointerInterceptorHandler_ = nullptr;
+    std::shared_ptr<InputHandlerManagerGlobal> pointerMonitorHandler_ = nullptr;
+
+    std::shared_ptr<EventFilterWrap> touchFilterHandler_ = nullptr;
+    std::shared_ptr<IInterceptorHandlerGlobal> touchInterceptorHandler_ = nullptr;
+    std::shared_ptr<InputHandlerManagerGlobal> touchMonitorHandler_ = nullptr;
+
     uint64_t idSeed_ = 0;
     int32_t eventType_ = 0;
     int64_t initSysClock_ = 0;
     int64_t lastSysClock_ = 0;
 };
+#define InputHandler InputEventHandler::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_EVENT_HANDLER_H

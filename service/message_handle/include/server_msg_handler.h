@@ -18,7 +18,6 @@
 
 #include "nocopyable.h"
 
-#include "i_input_south_event_handler.h"
 #include "uds_session.h"
 #include "uds_server.h"
 #include "msg_handler.h"
@@ -33,7 +32,7 @@ public:
     DISALLOW_COPY_AND_MOVE(ServerMsgHandler);
     virtual ~ServerMsgHandler() override;
 
-    void Init(IInputSouthEventHandler *southEventHandler);
+    void Init(UDSServer& udsServer);
     void OnMsgHandler(SessionPtr sess, NetPacket& pkt);
 
 protected:
@@ -81,7 +80,7 @@ protected:
     int32_t OnBigPacketTest(SessionPtr sess, NetPacket& pkt);
 #endif // OHOS_BUILD_MMI_DEBUG
 private:
-    IInputSouthEventHandler *southEventHandler_ = nullptr;
+    UDSServer *udsServer_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS

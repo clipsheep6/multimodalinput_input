@@ -38,7 +38,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatch" };
 } // namespace
 
-EventDispatch::EventDispatch(int32_t priority) : IInputEventHandler(priority) {}
+EventDispatch::EventDispatch() {}
 
 EventDispatch::~EventDispatch() {}
 
@@ -60,11 +60,8 @@ int32_t EventDispatch::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
                keyEvent->GetActionStartTime(),
                keyEvent->GetEventType(),
                keyEvent->GetFlag(), keyEvent->GetKeyAction(), fd);
-    auto udsServer = IUdsServer::GetInstance();
-    if (udsServer == nullptr) {
-        MMI_HILOGE("UdsServer is a nullptr");
-        return RET_ERR;
-    }
+    auto udsServer = InputHandler->GetUDSServer();
+    CHKPR(udsServer, ERROR_NULL_POINTER);
     auto session = udsServer->GetSession(fd);
     CHKPF(session);
     if (session->isANRProcess_) {
@@ -123,12 +120,11 @@ int32_t EventDispatch::DispatchPointerEvent(std::shared_ptr<PointerEvent> pointe
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
     InputEventDataTransformation::Marshalling(pointerEvent, pkt);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP);
-    auto udsServer = IUdsServer::GetInstance();
+    auto udsServer = InputHandler->GetUDSServer();
     if (udsServer == nullptr) {
         MMI_HILOGE("UdsServer is a nullptr");
         return RET_ERR;
     }
-
     auto session = udsServer->GetSession(fd);
     CHKPF(session);
     if (session->isANRProcess_) {

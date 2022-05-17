@@ -19,85 +19,29 @@
 #include <memory>
 
 #include "define_multimodal.h"
-#include "i_event_filter.h"
-#include "input_handler_type.h"
 #include "key_event.h"
-#include "key_option.h"
 #include "pointer_event.h"
-#include "uds_session.h"
 
 struct libinput_event;
 
 namespace OHOS {
 namespace MMI {
-class IInputEventHandler : public std::enable_shared_from_this<IInputEventHandler> {
+class IInputEventHandler {
 public:
-    enum class EventHandlerType {
-        NORMAL,
-        INTERCEPTOR,
-        SUBSCRIBER,
-        MONITOR,
-        FILTER
-    };
-public:
-    IInputEventHandler(int32_t priority = 0);
+    IInputEventHandler() = default;
     DISALLOW_COPY_AND_MOVE(IInputEventHandler);
     virtual ~IInputEventHandler() = default;
-    int32_t GetPriority() const;
-    virtual EventHandlerType GetHandlerType() const
-    {
-        return EventHandlerType::NORMAL;
-    }
-    virtual int32_t HandleLibinputEvent(libinput_event* event);
-    virtual int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
-    virtual int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
-    virtual int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent);
-
-    int32_t AddMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
-    void RemoveMonitor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
-    void MarkConsumed(int32_t monitorId, int32_t eventId, SessionPtr sess);
-    int32_t AddInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
-    void RemoveInterceptor(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
-    int32_t AddSubscriber(SessionPtr sess, int32_t subscribeId, const std::shared_ptr<KeyOption> keyOption);
-    int32_t RemoveSubscriber(SessionPtr sess, int32_t subscribeId);
-    int32_t AddFilter(sptr<IEventFilter> filter);
-
-    template<class T>
-    int32_t AddConstructHandler(int32_t priority = 0);
-    template<class T>
-    int32_t AddInstanceHandler(int32_t priority = 0);
-protected:
-    int32_t SetNext(std::shared_ptr<IInputEventHandler> nextHandler);
+    virtual int32_t HandleLibinputEvent(libinput_event* event) {return RET_OK;};
+    virtual int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) {return RET_OK;};
+    virtual int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) {return RET_OK;};
+    virtual int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) {return RET_OK;};
+    virtual void SetNext(std::shared_ptr<IInputEventHandler> nextHandler) {
+        nextHandler_ = nextHandler;
+    };
 
 protected:
     std::shared_ptr<IInputEventHandler> nextHandler_ = nullptr;
-
-private:
-    void RecordLog(libinput_event* event);
-
-private:
-    int32_t priority_;
 };
-
-template<class T>
-int32_t IInputEventHandler::AddConstructHandler(int32_t priority)
-{
-    auto handler = std::make_shared<T>(priority);
-    if (handler == nullptr) {
-        return RET_ERR;
-    }
-    return SetNext(handler);
-}
-
-template<class T>
-int32_t IInputEventHandler::AddInstanceHandler(int32_t priority)
-{
-    auto handler = T::CreateInstance(priority);
-    if (handler == nullptr) {
-        return RET_ERR;
-    }
-    return SetNext(handler);
-}
 } // namespace MMI
 } // namespace OHOS
 #endif // I_INPUT_EVENT_HANDLER_H
