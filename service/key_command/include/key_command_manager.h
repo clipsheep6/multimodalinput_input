@@ -57,13 +57,13 @@ struct ShortcutKey {
 
 class KeyCommandManager : public IKeyCommandManager {
 public:
-    KeyCommandManager();
+    KeyCommandManager() = default;
     DISALLOW_COPY_AND_MOVE(KeyCommandManager);
     ~KeyCommandManager() = default;
     int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
-    bool HandlerEvent(const std::shared_ptr<KeyEvent> event) override;
+    bool HandleEvent(const std::shared_ptr<KeyEvent> event);
 private:
-    bool ParseJson(const std::string &configFile);
+    bool ParseJson();
     std::string GetConfigFilePath() const;
     void LaunchAbility(ShortcutKey key);
     std::string GenerateKey(const ShortcutKey& key);

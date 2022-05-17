@@ -31,19 +31,16 @@ constexpr int32_t MAX_PREKEYS_NUM = 4;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandManager" };
 struct JsonParser {
     JsonParser() = default;
-
     ~JsonParser()
     {
         if (json_ != nullptr) {
             cJSON_Delete(json_);
         }
     }
-
     operator cJSON *()
     {
         return json_;
     }
-
     cJSON *json_ = nullptr;
 };
 
@@ -269,25 +266,6 @@ bool ConvertToShortcutKey(cJSON* jsonData, ShortcutKey &shortcutKey)
 }
 } // namespace
 
-KeyCommandManager::KeyCommandManager()
-{
-    std::string configFile = GetConfigFilePath();
-    if (!FileExists(configFile)) {
-        MMI_HILOGE("config file %{public}s not exist", configFile.c_str());
-        return;
-    }
-    int32_t fileSize = GetFileSize(configFile);
-    if ((fileSize <= 0) || (fileSize > JSON_FILE_SIZE)) {
-        MMI_HILOGE("The file size is out of range 20KB or empty. filesize:%{public}d", fileSize);
-        return;
-    }
-    MMI_HILOGD("config file path:%{public}s", configFile.c_str());
-    if (!ParseJson(configFile)) {
-        MMI_HILOGW("Parse configFile to failed");
-    }
-    Print();
-}
-
 std::string KeyCommandManager::GenerateKey(const ShortcutKey& key)
 {
     std::set<int32_t> preKeys = key.preKeys;
@@ -306,9 +284,10 @@ std::string KeyCommandManager::GetConfigFilePath() const
     return FileExists(defaultConfig) ? defaultConfig : "/system/etc/multimodalinput/ability_launch_config.json";
 }
 
-bool KeyCommandManager::ParseJson(const std::string &configFile)
+bool KeyCommandManager::ParseJson()
 {
-    std::string jsonStr = ReadFile(configFile);
+    CALL_LOG_ENTER;
+    std::string jsonStr = ReadJsonFile(GetConfigFilePath());
     if (jsonStr.empty()) {
         MMI_HILOGE("configFile read failed");
         return false;
@@ -359,19 +338,7 @@ void KeyCommandManager::Print()
     }
 }
 
-int32_t KeyCommandManager::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
-{
-    CHKPR(keyEvent, ERROR_NULL_POINTER);
-    if (HandlerEvent(keyEvent)) {
-        MMI_HILOGD("The keyEvent start launch an ability, keyCode:%{public}d", keyEvent->GetKeyCode());
-        BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_LAUNCH_EVENT);
-        return RET_OK;
-    }
-    CHKPR(nextHandler_, ERROR_NULL_POINTER);
-    return nextHandler_->HandleKeyEvent(keyEvent);
-}
-
-bool KeyCommandManager::HandlerEvent(const std::shared_ptr<KeyEvent> key)
+bool KeyCommandManager::HandleEvent(const std::shared_ptr<KeyEvent> key)
 {
     CALL_LOG_ENTER;
     if (IsKeyMatch(lastMatchedKey_, key)) {
@@ -383,6 +350,13 @@ bool KeyCommandManager::HandlerEvent(const std::shared_ptr<KeyEvent> key)
         TimerMgr->RemoveTimer(lastMatchedKey_.timerId);
     }
     ResetLastMatchedKey();
+    if (shortcutKeys_.empty()) {
+        if (!ParseJson()) {
+            MMI_HILOGE("Parse configFile failed");
+            return false;
+        }
+        Print();
+    }
     for (auto& item : shortcutKeys_) {
         ShortcutKey &shortcutKey = item.second;
         if (!IsKeyMatch(shortcutKey, key)) {

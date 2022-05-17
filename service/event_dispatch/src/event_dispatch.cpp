@@ -42,52 +42,7 @@ EventDispatch::EventDispatch() {}
 
 EventDispatch::~EventDispatch() {}
 
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-int32_t EventDispatch::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
-{
-    CALL_LOG_ENTER;
-    CHKPR(keyEvent, ERROR_NULL_POINTER);
-    auto fd = WinMgr->UpdateTarget(keyEvent);
-    if (fd < 0) {
-        MMI_HILOGE("Invalid fd, fd: %{public}d", fd);
-        return RET_ERR;
-    }
-    MMI_HILOGD("event dispatcher of server:KeyEvent:KeyCode:%{public}d,"
-               "ActionTime:%{public}" PRId64 ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ","
-               "EventType:%{public}d,Flag:%{public}u,"
-               "KeyAction:%{public}d,Fd:%{public}d",
-               keyEvent->GetKeyCode(), keyEvent->GetActionTime(), keyEvent->GetAction(),
-               keyEvent->GetActionStartTime(),
-               keyEvent->GetEventType(),
-               keyEvent->GetFlag(), keyEvent->GetKeyAction(), fd);
-    auto udsServer = InputHandler->GetUDSServer();
-    CHKPR(udsServer, ERROR_NULL_POINTER);
-    auto session = udsServer->GetSession(fd);
-    CHKPF(session);
-    if (session->isANRProcess_) {
-        MMI_HILOGD("is ANR process");
-        return RET_OK;
-    }
 
-    auto currentTime = GetSysClockTime();
-    if (TriggerANR(currentTime, session)) {
-        session->isANRProcess_ = true;
-        MMI_HILOGW("the key event does not report normally, triggering ANR");
-        return RET_OK;
-    }
-
-    NetPacket pkt(MmiMessageId::ON_KEYEVENT);
-    InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt);
-    BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_DISPATCH_EVENT);
-    pkt << fd;
-    if (!udsServer->SendMsg(fd, pkt)) {
-        MMI_HILOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
-        return MSG_SEND_FAIL;
-    }
-    session->AddEvent(keyEvent->GetId(), currentTime);
-    return RET_OK;
-}
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
 int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
@@ -147,6 +102,57 @@ int32_t EventDispatch::DispatchPointerEvent(std::shared_ptr<PointerEvent> pointe
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+int32_t EventDispatch::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_LOG_ENTER;
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    auto fd = WinMgr->UpdateTarget(keyEvent);
+    if (fd < 0) {
+        MMI_HILOGE("Invalid fd, fd: %{public}d", fd);
+        return RET_ERR;
+    }
+    MMI_HILOGD("event dispatcher of server:KeyEvent:KeyCode:%{public}d,"
+               "ActionTime:%{public}" PRId64 ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ","
+               "EventType:%{public}d,Flag:%{public}u,"
+               "KeyAction:%{public}d,Fd:%{public}d",
+               keyEvent->GetKeyCode(), keyEvent->GetActionTime(), keyEvent->GetAction(),
+               keyEvent->GetActionStartTime(),
+               keyEvent->GetEventType(),
+               keyEvent->GetFlag(), keyEvent->GetKeyAction(), fd);
+    auto udsServer = InputHandler->GetUDSServer();
+    CHKPR(udsServer, ERROR_NULL_POINTER);
+    auto session = udsServer->GetSession(fd);
+    CHKPF(session);
+    if (session->isANRProcess_) {
+        MMI_HILOGD("is ANR process");
+        return RET_OK;
+    }
+
+    auto currentTime = GetSysClockTime();
+    if (TriggerANR(currentTime, session)) {
+        session->isANRProcess_ = true;
+        MMI_HILOGW("the key event does not report normally, triggering ANR");
+        return RET_OK;
+    }
+
+    NetPacket pkt(MmiMessageId::ON_KEYEVENT);
+    InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt);
+    BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_DISPATCH_EVENT);
+    pkt << fd;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write structure of EventKeyboard failed");
+        return RET_ERR;
+    }
+    if (!udsServer->SendMsg(fd, pkt)) {
+        MMI_HILOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
+        return MSG_SEND_FAIL;
+    }
+    session->AddEvent(keyEvent->GetId(), currentTime);
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 bool EventDispatch::TriggerANR(int64_t time, SessionPtr sess)
 {

@@ -444,12 +444,6 @@ int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> in
     return InputInterMgr->AddInterceptor(interceptor);
 }
 
-int32_t InputManagerImpl::AddInterceptor(int32_t sourceType,
-                                         std::function<void(std::shared_ptr<PointerEvent>)> interceptor)
-{
-    return -1;
-}
-
 int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
 {
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
