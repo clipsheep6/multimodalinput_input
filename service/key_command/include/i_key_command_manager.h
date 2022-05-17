@@ -32,6 +32,7 @@ public:
     {
         return false;
     }
+    
 public:
     static inline std::shared_ptr<IKeyCommandManager> keyCommand_ = nullptr;
 };

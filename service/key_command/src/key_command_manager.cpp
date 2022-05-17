@@ -31,16 +31,19 @@ constexpr int32_t MAX_PREKEYS_NUM = 4;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandManager" };
 struct JsonParser {
     JsonParser() = default;
+
     ~JsonParser()
     {
         if (json_ != nullptr) {
             cJSON_Delete(json_);
         }
     }
+
     operator cJSON *()
     {
         return json_;
     }
+
     cJSON *json_ = nullptr;
 };
 
@@ -336,6 +339,18 @@ void KeyCommandManager::Print()
             shortcutKey.keyDownDuration, shortcutKey.triggerType,
             shortcutKey.ability.bundleName.c_str(), shortcutKey.ability.abilityName.c_str());
     }
+}
+
+int32_t KeyCommandManager::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    if (HandleEvent(keyEvent)) {
+        MMI_HILOGD("The keyEvent start launch an ability, keyCode:%{public}d", keyEvent->GetKeyCode());
+        BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_LAUNCH_EVENT);
+        return RET_OK;
+    }
+    CHKPR(nextHandler_, ERROR_NULL_POINTER);
+    return nextHandler_->HandleKeyEvent(keyEvent);
 }
 
 bool KeyCommandManager::HandleEvent(const std::shared_ptr<KeyEvent> key)
