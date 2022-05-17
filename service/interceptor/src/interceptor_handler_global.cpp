@@ -257,11 +257,5 @@ void InterceptorHandlerGlobal::InterceptorCollection::OnSessionLost(SessionPtr s
         }
     }
 }
-
-std::shared_ptr<IInterceptorHandlerGlobal> IInterceptorHandlerGlobal::CreateInstance()
-{
-    return std::make_shared<InterceptorHandlerGlobal>();
-}
-
 } // namespace MMI
 } // namespace OHOS

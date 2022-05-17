@@ -31,6 +31,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "KeyEve
 constexpr uint32_t MAX_PRE_KEY_COUNT = 4;
 } // namespace
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t KeyEventSubscriber::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPR(keyEvent, ERROR_NULL_POINTER);
@@ -42,6 +43,23 @@ int32_t KeyEventSubscriber::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     CHKPR(nextHandler_, ERROR_NULL_POINTER);
     return nextHandler_->HandleKeyEvent(keyEvent);
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+#ifdef OHOS_BUILD_ENABLE_POINTER
+int32_t KeyEventSubscriber::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPR(nextHandler_, ERROR_NULL_POINTER);
+    return nextHandler_->HandlePointerEvent(pointerEvent);
+}
+#endif // OHOS_BUILD_ENABLE_POINTER
+
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+int32_t KeyEventSubscriber::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPR(nextHandler_, ERROR_NULL_POINTER);
+    return nextHandler_->HandleTouchEvent(pointerEvent);
+}
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
 int32_t KeyEventSubscriber::SubscribeKeyEvent(
     SessionPtr sess, int32_t subscribeId, std::shared_ptr<KeyOption> keyOption)

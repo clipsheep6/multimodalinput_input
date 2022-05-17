@@ -42,8 +42,6 @@ EventDispatch::EventDispatch() {}
 
 EventDispatch::~EventDispatch() {}
 
-
-
 #ifdef OHOS_BUILD_ENABLE_POINTER
 int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {

@@ -23,9 +23,6 @@
 #include <set>
 #include <thread>
 
-#include "nocopyable.h"
-#include "singleton.h"
-
 #include "i_input_event_handler.h"
 #include "key_event.h"
 #include "key_option.h"
@@ -33,12 +30,20 @@
 
 namespace OHOS {
 namespace MMI {
-class KeyEventSubscriber :  public IInputEventHandler, public Singleton<KeyEventSubscriber> {
+class KeyEventSubscriber :  public IInputEventHandler {
 public:
     KeyEventSubscriber() = default;
     ~KeyEventSubscriber() = default;
     DISALLOW_COPY_AND_MOVE(KeyEventSubscriber);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+#endif // OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+#endif // OHOS_BUILD_ENABLE_TOUCH
     int32_t SubscribeKeyEvent(SessionPtr sess, int32_t subscribeId,
             const std::shared_ptr<KeyOption> keyOption);
     int32_t UnSubscribeKeyEvent(SessionPtr sess, int32_t subscribeId);
@@ -83,8 +88,6 @@ private:
     bool callbackInitialized_ { false };
     std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
 };
-
-#define KeyEventSubscriber_ KeyEventSubscriber::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif  // KEY_EVENT_SUBSCRIBER_H

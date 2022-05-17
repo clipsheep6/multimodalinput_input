@@ -250,7 +250,7 @@ void InputHandlerManagerGlobal::MonitorCollection::MarkConsumed(int32_t monitorI
     pointerEvent->SetActionTime(GetSysClockTime());
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT | InputEvent::EVENT_FLAG_NO_MONITOR);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    auto iTouchEventHandler = InputHandler->GetTouchEventHandler();
+    auto iTouchEventHandler = InputHandler->GetInputEventNormalizeHandler();
     CHKPV(iTouchEventHandler);
     iTouchEventHandler->HandleTouchEvent(pointerEvent);
 

@@ -126,11 +126,12 @@ ohos_prebuilt_etc("drawing_pointer_image") {
 ohos_shared_library("libmmi-server") {
   sources = [
     "//foundation/multimodalinput/input/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
-    "device_manager/src/input_device.cpp",
     "device_manager/src/input_device_manager.cpp",
+    "device_manager/src/input_device.cpp",
     "event_dispatch/src/event_dispatch.cpp",
     "event_dump/src/event_dump.cpp",
     "event_handler/src/input_event_handler.cpp",
+    "event_handler/src/input_event_normalize_handler.cpp",
     "event_handler/src/key_event_value_transformation.cpp",
     "libinput_adapter/src/libinput_adapter.cpp",
     "message_handle/src/server_msg_handler.cpp",
@@ -152,7 +153,6 @@ ohos_shared_library("libmmi-server") {
 
   if (mmi_enable_keyboard) {
     sources += [
-      "event_handler/src/key_event_handler.cpp",
       "event_package/src/event_package.cpp",
       "subscriber/src/key_event_subscriber.cpp",
     ]
@@ -167,7 +167,6 @@ ohos_shared_library("libmmi-server") {
     sources += [ "touch_transform_point/src/touch_transform_point_manager.cpp" ]
     if (mmi_enable_mouse) {
       sources += [
-        "event_handler/src/pointer_event_handler.cpp",
         "mouse_event_handler/src/mouse_device_state.cpp",
         "mouse_event_handler/src/mouse_event_handler.cpp",
         "touch_transform_point/src/gesture_transform_point_processor.cpp",
@@ -181,7 +180,6 @@ ohos_shared_library("libmmi-server") {
     }
     if (mmi_enable_tp) {
       sources += [
-        "event_handler/src/touch_event_handler.cpp",
         "touch_transform_point/src/tablet_tool_processor.cpp",
         "touch_transform_point/src/touch_transform_point_processor.cpp",
       ]

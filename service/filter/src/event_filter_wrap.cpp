@@ -33,6 +33,13 @@ EventFilterWrap::~EventFilterWrap()
 {
     CALL_LOG_ENTER;
 }
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CHKPR(nextHandler_, ERROR_NULL_POINTER);
+    return nextHandler_->HandleKeyEvent(keyEvent);
+}
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
 int32_t EventFilterWrap::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)

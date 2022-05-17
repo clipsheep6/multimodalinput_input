@@ -18,17 +18,16 @@
 
 #include <set>
 
-
+#include "i_input_event_handler.h"
 #include "i_input_event_monitor_handler.h"
 #include "input_handler_type.h"
-#include "i_interceptor_handler_global.h"
 #include "nocopyable.h"
 #include "singleton.h"
 #include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
-class InterceptorHandlerGlobal : public IInterceptorHandlerGlobal {
+class InterceptorHandlerGlobal : public IInputEventHandler {
 public:
     InterceptorHandlerGlobal() = default;
     DISALLOW_COPY_AND_MOVE(InterceptorHandlerGlobal);
@@ -42,8 +41,8 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
-    int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
-    void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
+    int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
+    void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
