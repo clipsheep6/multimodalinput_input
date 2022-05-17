@@ -179,6 +179,7 @@ int32_t MultimodalInputConnectStub::StubSetPointerVisible(MessageParcel& data, M
         MMI_HILOGE("WriteInt32:%{public}d fail", ret);
         return IPC_STUB_WRITE_PARCEL_ERR;
     }
+    MMI_HILOGD("visible:%{public}d ret:%{public}d", visible, ret);
     return RET_OK;
 }
 
@@ -196,6 +197,7 @@ int32_t MultimodalInputConnectStub::StubIsPointerVisible(MessageParcel& data, Me
         MMI_HILOGE("WriteBool:%{public}d fail", ret);
         return IPC_STUB_WRITE_PARCEL_ERR;
     }
+    MMI_HILOGD("visible:%{public}d ret:%{public}d", visible, ret);
     return ret;
 }
 } // namespace MMI
