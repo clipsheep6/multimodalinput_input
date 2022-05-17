@@ -91,8 +91,8 @@ bool EntrustTasks::PostAsyncTask(ETaskCallback callback)
 
 void EntrustTasks::PopPendingTaskList(std::vector<TaskPtr> &tasks)
 {
-    std::lock_guard<std::mutex> guard(mux_);
     int32_t count = 0;
+    std::lock_guard<std::mutex> guard(mux_);
     while (!tasks_.empty() && ((count++) < ET_ONCE_PROCESS_TASK_LIMIT)) {
         auto task = tasks_.front();
         CHKPB(task);
