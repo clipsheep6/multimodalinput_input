@@ -25,7 +25,6 @@
 
 namespace OHOS {
 namespace MMI {
-using namespace zsummer::log4z;
 using ETaskCallback = std::function<int32_t()>;
 #define ET_DEFINE_TIMEOUT 3000
 #define ET_MAX_TASK_LIMIT 1000

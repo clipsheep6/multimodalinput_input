@@ -33,7 +33,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMICl
 } // namespace
 
 using namespace AppExecFwk;
-using namespace zsummer::log4z;
 MMIClient::MMIClient()
 {
     CALL_LOG_ENTER;
@@ -63,7 +62,6 @@ MMIClientPtr MMIClient::GetSharedPtr()
 bool MMIClient::Start()
 {
     CALL_LOG_ENTER;
-    ILog4zManager::getRef().start();
     msgHandler_.Init();
     EventManager.SetClientHandle(GetSharedPtr());
     auto callback = std::bind(&ClientMsgHandler::OnMsgHandler, &msgHandler_,

@@ -198,7 +198,6 @@ bool MMIService::InitEntrustTasks()
 int32_t MMIService::Init()
 {
     CheckDefine();
-    ILog4zManager::getRef().start();
     MMI_HILOGD("EventDump Init");
     MMIEventDump->Init(*this);
     MMI_HILOGD("WindowsManager Init");
@@ -351,7 +350,6 @@ void MMIService::OnEntrustTask(epoll_event& ev)
     EntrustTasks::TaskData data = {};
     auto res = read(entrustTasks_.GetReadFd(), &data, sizeof(data));
     if (res == -1) {
-        LOGFMTW("read failed erron:%d", errno);
         MMI_HILOGW("read failed erron:%{public}d", errno);
     }
     MMI_HILOGD("RemoteRequest notify tid:%{public}" PRId64 " stid:%{public}" PRId64 " pid:%{public}d "
