@@ -15,7 +15,6 @@
 
 #include "key_command_manager.h"
 
-#include "cJSON.h"
 
 #include "ability_manager_client.h"
 #include "cJSON.h"
@@ -39,7 +38,6 @@ struct JsonParser {
             cJSON_Delete(json_);
         }
     }
-
     operator cJSON *()
     {
         return json_;

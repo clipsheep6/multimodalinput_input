@@ -160,6 +160,7 @@ void InputEventHandler::Init(UDSServer& udsServer)
             continue;
         }
     }
+    return;
 }
 
 void InputEventHandler::OnEvent(void *event)
