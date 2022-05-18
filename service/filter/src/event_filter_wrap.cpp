@@ -36,6 +36,8 @@ EventFilterWrap::~EventFilterWrap()
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void EventFilterWrap::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
+    CALL_LOG_ENTER;
+    CHKPV(keyEvent);
     CHKPV(nextHandler_);
     nextHandler_->HandleKeyEvent(keyEvent);
 }
@@ -44,6 +46,7 @@ void EventFilterWrap::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 #ifdef OHOS_BUILD_ENABLE_POINTER
 void EventFilterWrap::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CHKPV(pointerEvent);
     if (HandlePointerEventFilter(pointerEvent)) {
         MMI_HILOGI("Pointer event Filter succeeded");
         return;
@@ -56,6 +59,7 @@ void EventFilterWrap::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEv
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 void EventFilterWrap::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CHKPV(pointerEvent);
     if (HandlePointerEventFilter(pointerEvent)) {
         MMI_HILOGI("Pointer event Filter succeeded");
         return;
