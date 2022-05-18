@@ -30,40 +30,40 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-int32_t InputHandlerManagerGlobal::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+void InputHandlerManagerGlobal::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    CHKPV(keyEvent);
     HandleEvent(keyEvent);
-    CHKPR(nextHandler_, ERROR_NULL_POINTER);
-    return nextHandler_->HandleKeyEvent(keyEvent);
+    CHKPV(nextHandler_);
+    nextHandler_->HandleKeyEvent(keyEvent);
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-int32_t InputHandlerManagerGlobal::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void InputHandlerManagerGlobal::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    CHKPV(pointerEvent);
     if (HandleEvent(pointerEvent)) {
         BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP);
         MMI_HILOGD("Monitor is succeeded");
-        return RET_OK;
+        return;
     }
-    CHKPR(nextHandler_, ERROR_NULL_POINTER);
-    return nextHandler_->HandlePointerEvent(pointerEvent);
+    CHKPV(nextHandler_,);
+    nextHandler_->HandlePointerEvent(pointerEvent);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-int32_t InputHandlerManagerGlobal::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void InputHandlerManagerGlobal::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    CHKPV(pointerEvent);
     if (HandleEvent(pointerEvent)) {
         BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP);
         MMI_HILOGD("Monitor is succeeded");
-        return RET_OK;
+        return;
     }
-    CHKPR(nextHandler_, ERROR_NULL_POINTER);
-    return nextHandler_->HandleTouchEvent(pointerEvent);
+    CHKPV(nextHandler_);
+    nextHandler_->HandleTouchEvent(pointerEvent);
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
@@ -250,9 +250,9 @@ void InputHandlerManagerGlobal::MonitorCollection::MarkConsumed(int32_t monitorI
     pointerEvent->SetActionTime(GetSysClockTime());
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT | InputEvent::EVENT_FLAG_NO_MONITOR);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    auto iTouchEventHandler = InputHandler->GetInputEventNormalizeHandler();
-    CHKPV(iTouchEventHandler);
-    iTouchEventHandler->HandleTouchEvent(pointerEvent);
+    auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
+    CHKPV(inputEventNormalizeHandler);
+    inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
 
 #endif // OHOS_BUILD_ENABLE_TOUCH
 }

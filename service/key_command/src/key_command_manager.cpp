@@ -270,32 +270,32 @@ bool ConvertToShortcutKey(cJSON* jsonData, ShortcutKey &shortcutKey)
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-int32_t KeyCommandManager::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+void KeyCommandManager::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    CHKPV(keyEvent);
     if (HandleEvent(keyEvent)) {
         MMI_HILOGD("The keyEvent start launch an ability, keyCode:%{public}d", keyEvent->GetKeyCode());
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_LAUNCH_EVENT);
-        return RET_OK;
+        return;
     }
-    CHKPR(nextHandler_, ERROR_NULL_POINTER);
-    return nextHandler_->HandleKeyEvent(keyEvent);
+    CHKPV(nextHandler_);
+    nextHandler_->HandleKeyEvent(keyEvent);
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-int32_t KeyCommandManager::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void KeyCommandManager::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CHKPR(nextHandler_, ERROR_NULL_POINTER);
-    return nextHandler_->HandlePointerEvent(pointerEvent);
+    CHKPV(nextHandler_);
+    nextHandler_->HandlePointerEvent(pointerEvent);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-int32_t KeyCommandManager::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void KeyCommandManager::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CHKPR(nextHandler_, ERROR_NULL_POINTER);
-    return nextHandler_->HandleTouchEvent(pointerEvent);
+    CHKPV(nextHandler_);
+    nextHandler_->HandleTouchEvent(pointerEvent);
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 

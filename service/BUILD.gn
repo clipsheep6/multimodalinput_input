@@ -77,6 +77,10 @@ config("libmmi_server_config") {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
+  if (mmi_enable_combinationkey) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_COMBINATION_KEY" ]
+  }
+
   if (mmi_enable_pointer_drawing) {
     cflags += [ "-DOHOS_BUILD_ENABLE_POINTER_DRAWING" ]
   }

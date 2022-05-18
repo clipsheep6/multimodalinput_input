@@ -54,6 +54,7 @@ InputEventHandler::~InputEventHandler() {}
 void InputEventHandler::Init(UDSServer& udsServer)
 {
     udsServer_ = &udsServer;
+    BuildInputHandlerChain();
     MsgCallback funs[] = {
         {
             static_cast<MmiMessageId>(LIBINPUT_EVENT_DEVICE_ADDED),
@@ -152,7 +153,6 @@ void InputEventHandler::Init(UDSServer& udsServer)
             MsgCallbackBind1(&InputEventHandler::OnEventGesture, this)
         },
     };
-    BuildInputHandlerChain();
     for (auto &item : funs) {
         if (!RegistrationEvent(item)) {
             MMI_HILOGW("Failed to register event errCode:%{public}d", EVENT_REG_FAIL);
@@ -212,24 +212,45 @@ int32_t InputEventHandler::OnEventHandler(libinput_event *event)
 }
 
 int32_t InputEventHandler::BuildInputHandlerChain()
-{    
+{
     inputEventNormalizeHandler_ = std::make_shared<InputEventNormalizeHandler>();
     CHKPR(inputEventNormalizeHandler_, ERROR_NULL_POINTER);
+#if !defined(OHOS_BUILD_ENABLE_KEYBOARD) && !defined(OHOS_BUILD_ENABLE_POINTER) && !defined(OHOS_BUILD_ENABLE_TOUCH)
+    return RET_OK;
+#endif
+
+    std::shared_ptr<IInputEventHandler> tmp = inputEventNormalizeHandler_;
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     eventfilterHandler_ = std::make_shared<EventFilterWrap>();
     CHKPR(eventfilterHandler_, ERROR_NULL_POINTER);
-    inputEventNormalizeHandler_->SetNext(eventfilterHandler_);
+    tmp->SetNext(eventfilterHandler_);
+    tmp = eventfilterHandler_;
+#endif
+
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     interceptorHandler_  = std::make_shared<InterceptorHandlerGlobal>();
     CHKPR(interceptorHandler_, ERROR_NULL_POINTER);
-    eventfilterHandler_->SetNext(interceptorHandler_);
-	auto keyCommandHandler = std::make_shared<KeyCommandManager>();
+    tmp->SetNext(interceptorHandler_); 
+    tmp = interceptorHandler_;
+#endif
+
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
+    auto keyCommandHandler = std::make_shared<KeyCommandManager>();
     CHKPR(keyCommandHandler, ERROR_NULL_POINTER);
-    interceptorHandler_->SetNext(keyCommandHandler);
+    tmp->SetNext(keyCommandHandler);
+    tmp = keyCommandHandler;
+#endif
     subscriberHandler_ = std::make_shared<KeyEventSubscriber>();
     CHKPR(subscriberHandler_, ERROR_NULL_POINTER);
-    keyCommandHandler->SetNext(subscriberHandler_);
+    tmp->SetNext(subscriberHandler_);
+    tmp = subscriberHandler_;
+#endif
+
     monitorHandler_ = std::make_shared<InputHandlerManagerGlobal>();
     CHKPR(monitorHandler_, ERROR_NULL_POINTER);
-    subscriberHandler_->SetNext(monitorHandler_);
+    tmp->SetNext(monitorHandler_);
+    
     auto dispatchHandler = std::make_shared<EventDispatch>();
     CHKPR(dispatchHandler, ERROR_NULL_POINTER);
     monitorHandler_->SetNext(dispatchHandler);
@@ -339,11 +360,7 @@ int32_t InputEventHandler::OnEventGesture(libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     CHKPR(inputEventNormalizeHandler_, ERROR_NULL_POINTER);
-    int32_t ret = inputEventNormalizeHandler_->HandleLibinputEvent(event);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Gesture event dispatch failed, errCode:%{public}d", GESTURE_EVENT_DISP_FAIL);
-        return GESTURE_EVENT_DISP_FAIL;
-    }
+    inputEventNormalizeHandler_->HandleLibinputEvent(event);
     return RET_OK;
 }
 

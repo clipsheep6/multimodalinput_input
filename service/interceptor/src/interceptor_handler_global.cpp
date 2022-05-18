@@ -31,45 +31,45 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Inter
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-int32_t InterceptorHandlerGlobal::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+void InterceptorHandlerGlobal::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    CHKPV(keyEvent);
     if (HandleEvent(keyEvent)) {
             MMI_HILOGD("keyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d",
                 keyEvent->GetKeyCode());
             BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_INTERCEPT_EVENT);
-        return RET_OK;
+        return;
     }
-    CHKPR(nextHandler_, ERROR_NULL_POINTER);
-    return nextHandler_->HandleKeyEvent(keyEvent);
+    CHKPV(nextHandler);
+    nextHandler_->HandleKeyEvent(keyEvent);
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-int32_t InterceptorHandlerGlobal::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void InterceptorHandlerGlobal::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    CHKPV(pointerEvent);
     if (HandleEvent(pointerEvent)) {
         BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP);
         MMI_HILOGD("Interception is succeeded");
-        return RET_OK;
+        return;
     }
-    CHKPR(nextHandler_, ERROR_NULL_POINTER);
-    return nextHandler_->HandlePointerEvent(pointerEvent);
+    CHKPV(nextHandler_);
+    nextHandler_->HandlePointerEvent(pointerEvent);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-int32_t InterceptorHandlerGlobal::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void InterceptorHandlerGlobal::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    CHKPV(pointerEvent);
     if (HandleEvent(pointerEvent)) {
         BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP);
         MMI_HILOGD("Interception is succeeded");
-        return RET_OK;
+        return;
     }
-    CHKPR(nextHandler_, ERROR_NULL_POINTER);
-    return nextHandler_->HandleTouchEvent(pointerEvent);
+    CHKPV(nextHandler_);
+    nextHandler_->HandleTouchEvent(pointerEvent);
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 

@@ -212,12 +212,9 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket& pkt)
         return RET_ERR;
     }
 
-    auto iKeyEventHandler = InputHandler->GetInputEventNormalizeHandler();
-    CHKPR(iKeyEventHandler, ERROR_NULL_POINTER);
-    auto result = iKeyEventHandler->HandleKeyEvent(creKey);
-    if (result != RET_OK) {
-       MMI_HILOGE("Key event dispatch failed. ret:%{public}d,errCode:%{public}d", result, KEY_EVENT_DISP_FAIL);
-    }
+    auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
+    CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
+    inputEventNormalizeHandler->HandleKeyEvent(creKey);
     MMI_HILOGD("Inject keyCode:%{public}d, action:%{public}d", creKey->GetKeyCode(), creKey->GetKeyAction());
     return RET_OK;
 }
@@ -237,22 +234,16 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt)
     auto source = pointerEvent->GetSourceType();
     switch (source) {
         case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
-            auto iTouchEventHandler = InputHandler->GetInputEventNormalizeHandler();
-            CHKPR(iTouchEventHandler, ERROR_NULL_POINTER);
-            if (iTouchEventHandler->HandleTouchEvent(pointerEvent) != RET_OK) {
-                MMI_HILOGE("HandleTouchEvent failed");
-                return RET_ERR;
-            }
+            auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
+            CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
+            inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
             break;
         }
         case PointerEvent::SOURCE_TYPE_MOUSE:
         case PointerEvent::SOURCE_TYPE_TOUCHPAD : {
-            auto iPointerEventHandler = InputHandler->GetInputEventNormalizeHandler();
-            CHKPR(iPointerEventHandler, ERROR_NULL_POINTER);
-            if (iPointerEventHandler->HandlePointerEvent(pointerEvent) != RET_OK) {
-                MMI_HILOGE("HandlePointerEvent failed");
-                return RET_ERR;
-            }
+            auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
+            CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
+            inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
             break;
         }
         default: {
@@ -380,9 +371,9 @@ int32_t ServerMsgHandler::OnMoveMouse(SessionPtr sess, NetPacket& pkt)
     }
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    auto iPointerEventHandler = InputHandler->GetInputEventNormalizeHandler();
-    CHKPR(iPointerEventHandler, ERROR_NULL_POINTER);
-    iPointerEventHandler->HandlePointerEvent(pointerEvent);
+    auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
+    CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
+    inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING

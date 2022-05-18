@@ -31,14 +31,14 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventNormalizeHandler" };
 }
 
-int32_t InputEventNormalizeHandler::HandleLibinputEvent(libinput_event* event)
+void InputEventNormalizeHandler::HandleLibinputEvent(libinput_event* event)
 {
     CALL_LOG_ENTER;
-    CHKPR(event, ERROR_NULL_POINTER);
+    CHKPV(event);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
         MMI_HILOGD("This touch event is canceled type:%{public}d", type);
-        return RET_OK;
+        return;
     }
     switch (type) {
         case LIBINPUT_EVENT_KEYBOARD_KEY: {
@@ -84,26 +84,25 @@ int32_t InputEventNormalizeHandler::HandleLibinputEvent(libinput_event* event)
             break;
         }
     }
-    return RET_OK;
 }
 
-int32_t InputEventNormalizeHandler::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+void InputEventNormalizeHandler::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     if (nextHandler_ == nullptr) {
         MMI_HILOGW("Keyboard device does not support");
-        return ERROR_UNSUPPORT;
+        return;
     }
-    CHKPR(keyEvent, ERROR_NULL_POINTER);
-    return nextHandler_->HandleKeyEvent(keyEvent);
+    CHKPV(keyEvent);
+    nextHandler_->HandleKeyEvent(keyEvent);
 }
 
-int32_t InputEventNormalizeHandler::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void InputEventNormalizeHandler::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (nextHandler_ == nullptr) {
         MMI_HILOGW("Pointer device does not support");
-        return ERROR_UNSUPPORT;
+        return;
     }
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    CHKPV(pointerEvent);
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_END) {
         MMI_HILOGI("MouseEvent Normalization Results, PointerAction:%{public}d,PointerId:%{public}d,"
             "SourceType:%{public}d,ButtonId:%{public}d,"
@@ -114,7 +113,7 @@ int32_t InputEventNormalizeHandler::HandlePointerEvent(std::shared_ptr<PointerEv
         PointerEvent::PointerItem item;
         if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
             MMI_HILOGE("Get pointer item failed. pointer:%{public}d", pointerEvent->GetPointerId());
-            return RET_ERR;
+            return;
         }
         MMI_HILOGI("MouseEvent Item Normalization Results, DownTime:%{public}" PRId64 ",IsPressed:%{public}d,"
             "GlobalX:%{public}d,GlobalY:%{public}d,LocalX:%{public}d,LocalY:%{public}d,"
@@ -123,25 +122,28 @@ int32_t InputEventNormalizeHandler::HandlePointerEvent(std::shared_ptr<PointerEv
             item.GetLocalX(), item.GetLocalY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
             item.GetDeviceId());
     }
-    CHKPR(nextHandler_, ERROR_NULL_POINTER);
-    return nextHandler_->HandlePointerEvent(pointerEvent);
+    nextHandler_->HandlePointerEvent(pointerEvent);
 }
 
-int32_t InputEventNormalizeHandler::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void InputEventNormalizeHandler::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    if (nextHandler_ == nullptr) {
+        MMI_HILOGW("Touch device does not support");
+        return;
+    }
+    CHKPV(pointerEvent);
+    nextHandler_->HandleTouchEvent(pointerEvent);
+}
+
+int32_t InputEventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
 {
     if (nextHandler_ == nullptr) {
         MMI_HILOGW("Touch device does not support");
         return ERROR_UNSUPPORT;
     }
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    return nextHandler_->HandleTouchEvent(pointerEvent);
-}
-
-int32_t InputEventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
-{
-    CHKPR(event, ERROR_NULL_POINTER);
     auto keyEvent = InputHandler->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
+    CHKPR(event, ERROR_NULL_POINTER);
     auto packageResult = eventPackage_.PackageKeyEvent(event, keyEvent);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
         MMI_HILOGD("The same event reported by multi_device should be discarded");
@@ -152,11 +154,7 @@ int32_t InputEventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
         return KEY_EVENT_PKG_FAIL;
     }
     BytraceAdapter::StartBytrace(keyEvent);
-    auto ret = HandleKeyEvent(keyEvent);
-    if (ret != RET_OK) {
-        MMI_HILOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
-        return KEY_EVENT_DISP_FAIL;
-    }
+    nextHandler_->HandleKeyEvent(keyEvent);
     Repeat(keyEvent);
     MMI_HILOGD("keyCode:%{public}d,action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     return RET_OK;
@@ -188,21 +186,24 @@ void InputEventNormalizeHandler::AddHandleTimer(int32_t timeout)
             MMI_HILOGD("key up");
             return;
         }
-        auto ret = HandleKeyEvent(keyEvent);
-        if (ret != RET_OK) {
-            MMI_HILOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
-        }
+        CHKPV(nextHandler_);
+        nextHandler_->HandleKeyEvent(keyEvent);
         constexpr int32_t triggerTime = 100;
         this->AddHandleTimer(triggerTime);
         MMI_HILOGD("leave");
     });
 }
 
-int32_t InputEventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
-{
+int32_t InputEventNormalizeHandler::HandleTouchPadEvent(libinput_event* event){
+
+    if (nextHandler_ == nullptr) {
+        MMI_HILOGW("Pointer device does not support");
+        return ERROR_UNSUPPORT;
+    }
+    CHKPR(event, ERROR_NULL_POINTER);
     auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH_PAD);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    HandlePointerEvent(pointerEvent);
+    nextHandler_->HandlePointerEvent(pointerEvent);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCHPAD_UP) {
         pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
@@ -217,6 +218,11 @@ int32_t InputEventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
 
 int32_t InputEventNormalizeHandler::HandleGestureEvent(libinput_event* event)
 {
+    if (nextHandler_ == nullptr) {
+        MMI_HILOGW("Pointer device does not support");
+        return ERROR_UNSUPPORT;
+    }
+    CHKPR(event, ERROR_NULL_POINTER);
     auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_GESTURE);
     CHKPR(pointerEvent, GESTURE_EVENT_PKG_FAIL);
     MMI_HILOGD("GestrueEvent package, eventType:%{public}d,actionTime:%{public}" PRId64 ","
@@ -236,12 +242,16 @@ int32_t InputEventNormalizeHandler::HandleGestureEvent(libinput_event* event)
                item.GetDownTime(), (item.IsPressed() ? "true" : "false"),
                item.GetGlobalX(), item.GetGlobalY(), item.GetLocalX(), item.GetLocalY(),
                item.GetWidth(), item.GetHeight());
-    HandlePointerEvent(pointerEvent);
+    nextHandler_->HandlePointerEvent(pointerEvent);
     return RET_OK;
 }
 
 int32_t InputEventNormalizeHandler::HandleMouseEvent(libinput_event* event)
 {
+    if (nextHandler_ == nullptr) {
+        MMI_HILOGW("Pointer device does not support");
+        return ERROR_UNSUPPORT;
+    }
     MouseEventHdr->Normalize(event);
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -253,16 +263,21 @@ int32_t InputEventNormalizeHandler::HandleMouseEvent(libinput_event* event)
     }
     pointerEvent->SetPressedKeys(pressedKeys);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
-    HandlePointerEvent(pointerEvent);
+    nextHandler_->HandlePointerEvent(pointerEvent);
     return RET_OK;
 }
 
 int32_t InputEventNormalizeHandler::HandleTouchEvent(libinput_event* event)
 {
+    if (nextHandler_ == nullptr) {
+        MMI_HILOGW("TP device does not support");
+        return ERROR_UNSUPPORT;
+    }
+    CHKPR(event, ERROR_NULL_POINTER);
     auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
-    HandleTouchEvent(pointerEvent);
+    nextHandler_->HandleTouchEvent(pointerEvent);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_UP) {
         pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
@@ -277,10 +292,15 @@ int32_t InputEventNormalizeHandler::HandleTouchEvent(libinput_event* event)
 
 int32_t InputEventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
 {
+    if (nextHandler_ == nullptr) {
+        MMI_HILOGW("TP device does not support");
+        return ERROR_UNSUPPORT;
+    }
+    CHKPR(event, ERROR_NULL_POINTER);
     auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TABLET_TOOL);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
-    HandleTouchEvent(pointerEvent);
+    nextHandler_->HandleTouchEvent(pointerEvent);
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
         pointerEvent->Reset();
     }

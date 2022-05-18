@@ -61,13 +61,13 @@ public:
     DISALLOW_COPY_AND_MOVE(KeyCommandManager);
     ~KeyCommandManager() = default;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    int32_t HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
+    void HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    int32_t HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+    void HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    int32_t HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+    void HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
     bool HandleEvent(const std::shared_ptr<KeyEvent> keyEvent);
 private:

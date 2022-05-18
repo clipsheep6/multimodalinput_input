@@ -40,33 +40,31 @@ EventDispatch::EventDispatch() {}
 EventDispatch::~EventDispatch() {}
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-int32_t EventDispatch::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+void EventDispatch::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {    
-    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    CHKPV(keyEvent);
     auto udsServer = InputHandler->GetUDSServer();
-    CHKPR(udsServer, ERROR_NULL_POINTER);
+    CHKPV(udsServer);
     DispatchKeyEventPid(*udsServer, keyEvent);
-    return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-int32_t EventDispatch::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void EventDispatch::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    CHKPV(pointerEvent);
     HandlePointerEvent(pointerEvent);
-    return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
-int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
+void EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
 {
     CALL_LOG_ENTER;
-    CHKPR(point, ERROR_NULL_POINTER);
+    CHKPV(point);
     auto fd = WinMgr->UpdateTargetPointer(point);
     if (fd < 0) {
         MMI_HILOGE("The fd less than 0, fd: %{public}d", fd);
-        return RET_ERR;
+        return;
     }
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
     InputEventDataTransformation::Marshalling(point, pkt);
@@ -74,14 +72,13 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
     auto udsServer = InputHandler->GetUDSServer();
     if (udsServer == nullptr) {
         MMI_HILOGE("UdsServer is a nullptr");
-        return RET_ERR;
+        return;
     }
 
     if (!udsServer->SendMsg(fd, pkt)) {
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
-        return RET_ERR;
+        return;
     }
-    return RET_OK;
 }
 
 int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key)
