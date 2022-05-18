@@ -59,17 +59,8 @@ int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programNam
     MessageParcel reply;
     MessageOption option;
     int32_t requestResult = Remote()->SendRequest(ALLOC_SOCKET_FD, data, reply, option);
-    if (requestResult != NO_ERROR) {
+    if (requestResult != RET_OK) {
         MMI_HILOGE("send request fail, result:%{public}d", requestResult);
-        return RET_ERR;
-    }
-
-    MMI_HILOGD("recieved message from server");
-
-    int32_t result = reply.ReadInt32();
-    MMI_HILOGD("result:%{public}d", result);
-    if (result != RET_OK) {
-        MMI_HILOGE("responce return error:%{public}d", result);
         return RET_ERR;
     }
     socketFd = reply.ReadFileDescriptor();

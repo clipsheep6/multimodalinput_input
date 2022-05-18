@@ -376,8 +376,8 @@ void MMIService::OnEntrustTask(epoll_event& ev)
     if (res == -1) {
         MMI_HILOGW("read failed erron:%{public}d", errno);
     }
-    MMI_HILOGD("RemoteRequest notify tid:%{public}" PRId64 " stid:%{public}" PRId64 ""
-        "taskId:%{public}d", GetThisThreadId(), data.tid, data.taskId);
+    MMI_HILOGD("RemoteRequest notify tid:%{public}" PRId64 ",stid:%{public}" PRId64 ""
+        ",taskId:%{public}d", GetThisThreadId(), data.tid, data.taskId);
     entrustTasks_.ProcessTasks();
 }
 

@@ -29,8 +29,9 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Entru
 void EntrustTasks::Task::ProcessTask()
 {
     int32_t ret = fun_();
-    MMI_HILOGD("process task id:%{public}d ret:%{public}d", id_, ret);
-    if (promise_) {
+    std::string taskType = ((promise_ == nullptr) ? "Async" : "Sync");
+    MMI_HILOGD("process %{public}s task id:%{public}d,ret:%{public}d", taskType.c_str(), id_, ret);
+    if (promise_ != nullptr) {
         promise_->set_value(ret);
     }
 }
@@ -65,7 +66,7 @@ int32_t EntrustTasks::PostSyncTask(ETaskCallback callback)
         MMI_HILOGE("Post aync task failed");
         return ret;
     }
-    constexpr int32_t timeout = 3000;
+    static constexpr int32_t timeout = 3000;
     std::chrono::milliseconds span(timeout);
     auto res = future.wait_for(span);
     if (res == std::future_status::timeout) {
@@ -83,7 +84,7 @@ bool EntrustTasks::PostAsyncTask(ETaskCallback callback)
 {
     auto ret = PostTask(callback);
     if (ret != RET_OK) {
-        MMI_HILOGE("Post aync task failed");
+        MMI_HILOGE("Post async task failed");
         return false;
     }
     return true;
@@ -93,7 +94,8 @@ void EntrustTasks::PopPendingTaskList(std::vector<TaskPtr> &tasks)
 {
     int32_t count = 0;
     std::lock_guard<std::mutex> guard(mux_);
-    while (!tasks_.empty() && ((count++) < ET_ONCE_PROCESS_TASK_LIMIT)) {
+    static constexpr int32_t onceProcessTaskLimit = 10;
+    while (!tasks_.empty() && ((count++) < onceProcessTaskLimit)) {
         auto task = tasks_.front();
         CHKPB(task);
         tasks.push_back(task);
@@ -105,8 +107,9 @@ int32_t EntrustTasks::PostTask(ETaskCallback callback, Promise *promise)
 {
     std::lock_guard<std::mutex> guard(mux_);
     auto tsize = tasks_.size();
-    if (tsize > ET_MAX_TASK_LIMIT) {
-        MMI_HILOGE("Queue is full, not allowed. size:%{public}zu/%{public}d", tsize, ET_MAX_TASK_LIMIT);
+    static constexpr int32_t maxTasksLimit = 1000;
+    if (tsize > maxTasksLimit) {
+        MMI_HILOGE("Queue is full, not allowed. size:%{public}zu/%{public}d", tsize, maxTasksLimit);
         return ETASKS_QUEUE_FULL;
     }
     int32_t id = GenerateId();
@@ -118,6 +121,8 @@ int32_t EntrustTasks::PostTask(ETaskCallback callback, Promise *promise)
         return ETASKS_PIPE_WAITE_FAIL;
     }
     tasks_.push(std::make_shared<Task>(id, callback, promise));
+    std::string taskType = ((promise == nullptr) ? "Async" : "Sync");
+    MMI_HILOGD("post %{public}s task id:%{public}d,tid:%{public}" PRIu64 "", taskType.c_str(), id, data.tid);
     return RET_OK;
 }
 } // namespace MMI

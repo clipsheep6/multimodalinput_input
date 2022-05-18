@@ -38,8 +38,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
     int32_t pid = GetCallingPid();
     TimeCostChk chk("IPC-OnRemoteRequest", "overtime 300(us)", MAX_OVER_TIME, pid,
         static_cast<int64_t>(code));
-    uint64_t tid = GetThisThreadId();
-    MMI_HILOGD("RemoteRequest recv code:%{public}d tid:%{public}" PRId64 " pid:%{public}d", code, tid, pid);
+    MMI_HILOGD("RemoteRequest code:%{public}d tid:%{public}" PRIu64 " pid:%{public}d", code, GetThisThreadId(), pid);
 
     std::u16string descriptor = data.ReadInterfaceToken();
     if (descriptor != IMultimodalInputConnect::GetDescriptor()) {
@@ -74,19 +73,18 @@ int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data,
         return MMISERVICE_NOT_RUNNING;
     }
     sptr<ConnectReqParcel> req = data.ReadParcelable<ConnectReqParcel>();
-    CHKPR(req, ERR_NULL_OBJECT);
+    CHKPR(req, ERROR_NULL_POINTER);
     MMI_HILOGI("clientName:%{public}s,moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
     
     int32_t clientFd = INVALID_SOCKET_FD;
     int32_t ret = AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd);
     if (ret != RET_OK) {
         MMI_HILOGE("AllocSocketFd failed pid:%{public}d, go switch default", pid);
-        reply.WriteInt32(RET_ERR);
+        if (clientFd >= 0) {
+            close(clientFd);
+        }
         return ret;
     }
-    MMI_HILOGI("call AllocSocketFd success");
-
-    reply.WriteInt32(RET_OK);
     reply.WriteFileDescriptor(clientFd);
     MMI_HILOGI("send clientFd to client, clientFd = %d", clientFd);
     close(clientFd);
@@ -103,16 +101,9 @@ int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data,
     }
 
     sptr<IRemoteObject> client = data.ReadRemoteObject();
-    if (client == nullptr) {
-        MMI_HILOGE("mouse client is nullptr");
-        return ERR_INVALID_VALUE;
-    }
-
+    CHKPR(client, ERR_INVALID_VALUE);
     sptr<IEventFilter> filter = iface_cast<IEventFilter>(client);
-    if (filter == nullptr) {
-        MMI_HILOGE("filter is nullptr");
-        return ERROR_NULL_POINTER;
-    }
+    CHKPR(clifilterent, ERROR_NULL_POINTER);
 
     MMI_HILOGD("filter iface_cast succeeded");
     int32_t ret = AddInputEventFilter(filter);
@@ -120,7 +111,7 @@ int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data,
         MMI_HILOGE("WriteInt32:%{public}d fail", ret);
         return IPC_STUB_WRITE_PARCEL_ERR;
     }
-    MMI_HILOGD("ret:%{public}d", ret);
+    MMI_HILOGD("ret:%{public}d,pid:%{public}d", ret, GetCallingPid());
     return RET_OK;
 }
 
@@ -179,7 +170,7 @@ int32_t MultimodalInputConnectStub::StubSetPointerVisible(MessageParcel& data, M
         MMI_HILOGE("WriteInt32:%{public}d fail", ret);
         return IPC_STUB_WRITE_PARCEL_ERR;
     }
-    MMI_HILOGD("visible:%{public}d ret:%{public}d", visible, ret);
+    MMI_HILOGD("visible:%{public}d,ret:%{public}d,pid:%{public}d", visible, ret, GetCallingPid());
     return RET_OK;
 }
 
@@ -197,7 +188,7 @@ int32_t MultimodalInputConnectStub::StubIsPointerVisible(MessageParcel& data, Me
         MMI_HILOGE("WriteBool:%{public}d fail", ret);
         return IPC_STUB_WRITE_PARCEL_ERR;
     }
-    MMI_HILOGD("visible:%{public}d ret:%{public}d", visible, ret);
+    MMI_HILOGD("visible:%{public}d,ret:%{public}d,pid:%{public}d", visible, ret, GetCallingPid());
     return ret;
 }
 } // namespace MMI

@@ -26,9 +26,6 @@
 namespace OHOS {
 namespace MMI {
 using ETaskCallback = std::function<int32_t()>;
-#define ET_DEFINE_TIMEOUT 3000
-#define ET_MAX_TASK_LIMIT 1000
-#define ET_ONCE_PROCESS_TASK_LIMIT 10
 class EntrustTasks : public IdFactory<int32_t> {
 public:
     struct TaskData {
