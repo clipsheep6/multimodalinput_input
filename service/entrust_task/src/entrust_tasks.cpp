@@ -84,8 +84,7 @@ int32_t EntrustTasks::PostSyncTask(ETaskCallback callback)
         return ETASKS_WAIT_DEFERRED;
     }
     task->SetWaited();
-    ret = future.get();
-    return ret;
+    return future.get();
 }
 
 bool EntrustTasks::PostAsyncTask(ETaskCallback callback)
@@ -106,7 +105,7 @@ void EntrustTasks::PopPendingTaskList(std::vector<TaskPtr> &tasks)
     }
 }
 
-TaskPtr EntrustTasks::PostTask(ETaskCallback callback, Promise *promise)
+EntrustTasks::TaskPtr EntrustTasks::PostTask(ETaskCallback callback, Promise *promise)
 {
     std::lock_guard<std::mutex> guard(mux_);
     auto tsize = tasks_.size();
@@ -124,7 +123,7 @@ TaskPtr EntrustTasks::PostTask(ETaskCallback callback, Promise *promise)
         return nullptr;
     }
     TaskPtr task = std::make_shared<Task>(id, callback, promise);
-    CHKPR(task, nullptr);
+    CHKPP(task);
     tasks_.push(task);
     std::string taskType = ((promise == nullptr) ? "Async" : "Sync");
     MMI_HILOGD("post %{public}s task id:%{public}d,tid:%{public}" PRIu64 "", taskType.c_str(), id, data.tid);
