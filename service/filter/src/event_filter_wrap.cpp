@@ -34,7 +34,7 @@ EventFilterWrap::~EventFilterWrap()
     CALL_LOG_ENTER;
 }
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-void HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+void EventFilterWrap::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(nextHandler_);
     nextHandler_->HandleKeyEvent(keyEvent);
