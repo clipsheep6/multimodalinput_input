@@ -23,9 +23,7 @@
 #include "bytrace_adapter.h"
 #include "define_interceptor_manager.h"
 #include "event_filter_service.h"
-#include "interceptor_manager.h"
 #include "mmi_client.h"
-#include "mmi_log.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
 
@@ -400,7 +398,7 @@ void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
         MMI_HILOGE("Failed to inject move mouse offset event");
     }
 #else
-    MMI_HILOGW("Pointer drawing module dose not support");
+    MMI_HILOGW("Pointer drawing module does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
@@ -413,12 +411,6 @@ int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> in
     }
     std::lock_guard<std::mutex> guard(mtx_);
     return InputInterMgr->AddInterceptor(interceptor);
-}
-
-int32_t InputManagerImpl::AddInterceptor(int32_t sourceType,
-                                         std::function<void(std::shared_ptr<PointerEvent>)> interceptor)
-{
-    return -1;
 }
 
 int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)

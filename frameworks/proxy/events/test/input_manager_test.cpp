@@ -17,7 +17,7 @@
 #include <cinttypes>
 #include <regex>
 #include <sstream>
- 
+
 #include <gtest/gtest.h>
 
 #include "define_multimodal.h"
@@ -28,7 +28,6 @@
 #include "input_event.h"
 #include "input_handler_type.h"
 #include "input_manager.h"
-#include "interceptor_manager.h"
 #include "multimodal_event_handler.h"
 #include "mmi_client.h"
 #include "pointer_event.h"
@@ -225,7 +224,6 @@ void InputManagerTest::TestMarkConsumedStep3(int32_t monitorId, int32_t eventId)
         "ClientMsgHandler: in OnPointerEvent, "
         "Operation canceled"
     };
-
     std::vector<std::string> sLogs { SearchLog(command, true) };
 
     MMI_HILOGD("Call InputManager::MarkConsumed");
@@ -256,7 +254,6 @@ void InputManagerTest::TestMarkConsumedStep4()
         "InputHandlerManagerGlobal: in HandleEvent, "
         "Pointer event was monitor"
     };
-
     std::vector<std::string> sLogs { SearchLog(command, true) };
 
     MMI_HILOGD("Call InputManager::SimulatePointerEvent");
@@ -1118,7 +1115,7 @@ HWTEST_F(InputManagerTest, InputManager_Pencil2InputEvent_004, TestSize.Level1)
 
     std::string command {
         "InputWindowsManager: in UpdateTouchScreenTarget, "
-        "Can.t find pointer item, pointer:[[:digit:]]\\{1,\\}"
+        "Can.t find pointer item, pointer:"
     };
     std::vector<std::string> sLogs { SearchLog(command, true) };
 
@@ -1366,9 +1363,9 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_015, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:AR000GJG6G
  */
-HWTEST_F(InputManagerTest, InputManager_ANR_TEST_001, TestSize.Level1)
+HWTEST_F(InputManagerTest, InputManager_NotResponse_001, TestSize.Level1)
 {
-    MMI_HILOGD("start InputManager_ANR_TEST_001");
+    MMI_HILOGD("start InputManager_NotResponse_001");
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
 
@@ -1392,9 +1389,9 @@ HWTEST_F(InputManagerTest, InputManager_ANR_TEST_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:SR000GGN6G
  */
-HWTEST_F(InputManagerTest, InputManager_ANR_TEST_002, TestSize.Level1)
+HWTEST_F(InputManagerTest, InputManager_NotResponse_002, TestSize.Level1)
 {
-    MMI_HILOGD("start InputManager_ANR_TEST_002");
+    MMI_HILOGD("start InputManager_NotResponse_002");
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
 

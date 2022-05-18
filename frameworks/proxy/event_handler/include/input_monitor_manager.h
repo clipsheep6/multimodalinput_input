@@ -19,18 +19,19 @@
 #include <memory>
 
 #include "nocopyable.h"
+#include "singleton.h"
 
 #include "i_input_event_consumer.h"
 #include "input_handler_type.h"
 
 namespace OHOS {
 namespace MMI {
-class InputMonitorManager{
+class InputMonitorManager {
 public:
     InputMonitorManager() = default;
     DISALLOW_COPY_AND_MOVE(InputMonitorManager);
-    ~InputMonitorManager() = default;
 
+public:
     int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor);
     void RemoveMonitor(int32_t monitorId);
     void MarkConsumed(int32_t monitorId, int32_t eventId);
