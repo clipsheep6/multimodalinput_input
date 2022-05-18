@@ -44,7 +44,9 @@ private:
 
 private:
     int32_t timerId_ = -1;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     EventPackage eventPackage_;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 };
 } // namespace MMI
 } // namespace OHOS
