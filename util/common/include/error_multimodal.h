@@ -145,6 +145,8 @@ enum {
     ETASKS_PIPE_WAITE_FAIL,                     // 委托任务状态写入错误
     ETASKS_WAIT_TIMEOUT,                        // 委托任务wait超时
     ETASKS_WAIT_DEFERRED,                       // 委托任务wait延期
+    ETASKS_MAKETASK_FAIL,                       // 生成任务失败
+    ETASKS_POST_SYNCTASK_FAIL,                  // 生成同步任务失败
 };
 // Error code for util
 constexpr ErrCode UTIL_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_UTIL);

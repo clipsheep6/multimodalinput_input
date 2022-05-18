@@ -86,7 +86,7 @@ int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data,
         return ret;
     }
     reply.WriteFileDescriptor(clientFd);
-    MMI_HILOGI("send clientFd to client, clientFd = %d", clientFd);
+    MMI_HILOGI("send clientFd to client, clientFd = %{public}d", clientFd);
     close(clientFd);
     return RET_OK;
 }
@@ -107,11 +107,11 @@ int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data,
 
     MMI_HILOGD("filter iface_cast succeeded");
     int32_t ret = AddInputEventFilter(filter);
-    if (!reply.WriteInt32(ret)) {
-        MMI_HILOGE("WriteInt32:%{public}d fail", ret);
-        return IPC_STUB_WRITE_PARCEL_ERR;
+    if (ret != RET_OK) {
+        MMI_HILOGE("call AddInputEventFilter failed ret:%{public}d", ret);
+        return ret;
     }
-    MMI_HILOGD("ret:%{public}d,pid:%{public}d", ret, GetCallingPid());
+    MMI_HILOGD("success pid:%{public}d", GetCallingPid());
     return RET_OK;
 }
 
@@ -166,11 +166,11 @@ int32_t MultimodalInputConnectStub::StubSetPointerVisible(MessageParcel& data, M
         return IPC_PROXY_DEAD_OBJECT_ERR;
     }
     int32_t ret = SetPointerVisible(visible);
-    if (!reply.WriteInt32(ret)) {
-        MMI_HILOGE("WriteInt32:%{public}d fail", ret);
-        return IPC_STUB_WRITE_PARCEL_ERR;
+    if (ret != RET_OK) {
+        MMI_HILOGE("call SetPointerVisible failed ret:%{public}d", ret);
+        return ret;
     }
-    MMI_HILOGD("visible:%{public}d,ret:%{public}d,pid:%{public}d", visible, ret, GetCallingPid());
+    MMI_HILOGD("success visible:%{public}d,pid:%{public}d", visible, GetCallingPid());
     return RET_OK;
 }
 
@@ -184,12 +184,16 @@ int32_t MultimodalInputConnectStub::StubIsPointerVisible(MessageParcel& data, Me
 
     bool visible = false;
     int32_t ret = IsPointerVisible(visible);
+    if (ret != RET_OK) {
+        MMI_HILOGE("call IsPointerVisible failed ret:%{public}d", ret);
+        return ret;
+    }
     if (!reply.WriteBool(visible)) {
         MMI_HILOGE("WriteBool:%{public}d fail", ret);
         return IPC_STUB_WRITE_PARCEL_ERR;
     }
     MMI_HILOGD("visible:%{public}d,ret:%{public}d,pid:%{public}d", visible, ret, GetCallingPid());
-    return ret;
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

@@ -32,7 +32,7 @@ public:
         uint64_t tid;
         int32_t taskId;
     };
-    class Task {
+    class Task : public std::enable_shared_from_this<Task> {
     public:
         using Promise = std::promise<int32_t>;
         using Future = std::future<int32_t>;
@@ -46,8 +46,22 @@ public:
         {
             return id_;
         }
+        TaskPtr GetSharedPtr()
+        {
+            return shared_from_this();
+        }
+        void SetWaited()
+        {
+            hasWaited_ = true;
+        }
+        bool HasNotified() const
+        {
+            return hasNotified_;
+        }
 
     private:
+        std::atomic_bool hasNotified_ = false;
+        std::atomic_bool hasWaited_ = false;
         int32_t id_ = 0;
         ETaskCallback fun_;
         Promise* promise_ = nullptr;
@@ -72,7 +86,7 @@ public:
 
 private:
     void PopPendingTaskList(std::vector<TaskPtr> &tasks);
-    int32_t PostTask(ETaskCallback callback, Promise *promise = nullptr);
+    TaskPtr PostTask(ETaskCallback callback, Promise *promise = nullptr);
 
 private:
     int32_t fds_[2] = {};

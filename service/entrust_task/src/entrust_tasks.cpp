@@ -28,10 +28,19 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Entru
 
 void EntrustTasks::Task::ProcessTask()
 {
+    if (hasWaited_) {
+        MMI_HILOGE("hasWaited=true, Task expired, discarded. id:%{public}d", id_);
+        return;
+    }
+    if (hasNotified_) {
+        MMI_HILOGE("hasNotified_=true, The task has been processed. id:%{public}d", id_);
+        return;
+    }
     int32_t ret = fun_();
     std::string taskType = ((promise_ == nullptr) ? "Async" : "Sync");
     MMI_HILOGD("process %{public}s task id:%{public}d,ret:%{public}d", taskType.c_str(), id_, ret);
     if (promise_ != nullptr) {
+        hasNotified_ = true;
         promise_->set_value(ret);
     }
 }
@@ -61,11 +70,9 @@ int32_t EntrustTasks::PostSyncTask(ETaskCallback callback)
 {
     Promise promise;
     Future future = promise.get_future();
-    auto ret = PostTask(callback, &promise);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Post aync task failed");
-        return ret;
-    }
+    auto task = PostTask(callback, &promise);
+    CHKPR(task, ETASKS_POST_SYNCTASK_FAIL);
+
     static constexpr int32_t timeout = 3000;
     std::chrono::milliseconds span(timeout);
     auto res = future.wait_for(span);
@@ -76,18 +83,14 @@ int32_t EntrustTasks::PostSyncTask(ETaskCallback callback)
         MMI_HILOGE("Task deferred");
         return ETASKS_WAIT_DEFERRED;
     }
+    task->SetWaited();
     ret = future.get();
     return ret;
 }
 
 bool EntrustTasks::PostAsyncTask(ETaskCallback callback)
 {
-    auto ret = PostTask(callback);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Post async task failed");
-        return false;
-    }
-    return true;
+    return (PostTask(callback) != nullptr);
 }
 
 void EntrustTasks::PopPendingTaskList(std::vector<TaskPtr> &tasks)
@@ -98,32 +101,34 @@ void EntrustTasks::PopPendingTaskList(std::vector<TaskPtr> &tasks)
     while (!tasks_.empty() && ((count++) < onceProcessTaskLimit)) {
         auto task = tasks_.front();
         CHKPB(task);
-        tasks.push_back(task);
+        tasks.push_back(task->GetSharedPtr());
         tasks_.pop();
     }
 }
 
-int32_t EntrustTasks::PostTask(ETaskCallback callback, Promise *promise)
+TaskPtr EntrustTasks::PostTask(ETaskCallback callback, Promise *promise)
 {
     std::lock_guard<std::mutex> guard(mux_);
     auto tsize = tasks_.size();
     static constexpr int32_t maxTasksLimit = 1000;
     if (tsize > maxTasksLimit) {
         MMI_HILOGE("Queue is full, not allowed. size:%{public}zu/%{public}d", tsize, maxTasksLimit);
-        return ETASKS_QUEUE_FULL;
+        return nullptr;
     }
     int32_t id = GenerateId();
     TaskData data = {GetThisThreadId(), id};
     auto res = write(fds_[1], &data, sizeof(data));
     if (res == -1) {
         RecoveryId(id);
-        MMI_HILOGE("write error:%{public}d", errno);
-        return ETASKS_PIPE_WAITE_FAIL;
+        MMI_HILOGE("pipe write error:%{public}d", errno);
+        return nullptr;
     }
-    tasks_.push(std::make_shared<Task>(id, callback, promise));
+    TaskPtr task = std::make_shared<Task>(id, callback, promise);
+    CHKPR(task, nullptr);
+    tasks_.push(task);
     std::string taskType = ((promise == nullptr) ? "Async" : "Sync");
     MMI_HILOGD("post %{public}s task id:%{public}d,tid:%{public}" PRIu64 "", taskType.c_str(), id, data.tid);
-    return RET_OK;
+    return task->GetSharedPtr();
 }
 } // namespace MMI
 } // namespace OHOS
