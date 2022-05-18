@@ -23,6 +23,7 @@
 #include <unordered_map>
 #endif
 
+#include "config_key_value_transform.h"
 #include "event_dump.h"
 #include "input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
@@ -227,6 +228,7 @@ int32_t MMIService::Init()
     }
     SetRecvFun(std::bind(&ServerMsgHandler::OnMsgHandler, &sMsgHandler_, std::placeholders::_1,
         std::placeholders::_2));
+    KeyValueTransform->GetConfigKeyValue("default_key");
     return RET_OK;
 }
 
@@ -293,7 +295,7 @@ int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter)
         InputHandler, filter));
     if (ret != RET_OK) {
         MMI_HILOGE("add event filter return %{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
@@ -319,7 +321,7 @@ int32_t MMIService::SetPointerVisible(bool visible)
         IPointerDrawingManager::GetInstance(), GetCallingPid(), visible));
     if (ret != RET_OK) {
         MMI_HILOGE("set pointer visible return %{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
