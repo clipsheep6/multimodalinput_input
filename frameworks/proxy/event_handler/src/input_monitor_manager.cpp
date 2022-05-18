@@ -26,10 +26,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 
 int32_t InputMonitorManager::AddMonitor(std::shared_ptr<IInputEventConsumer> monitor)
 {
-    if (monitor == nullptr) {
-        MMI_HILOGE("No monitor was specified.");
-        return INVALID_HANDLER_ID;
-    }
+    CHKPR(monitor, INVALID_HANDLER_ID);
     return InputHandlerManager::GetInstance().AddHandler(InputHandlerType::MONITOR, monitor);
 }
 
@@ -41,14 +38,6 @@ void InputMonitorManager::RemoveMonitor(int32_t monitorId)
 void InputMonitorManager::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
     InputHandlerManager::GetInstance().MarkConsumed(monitorId, eventId);
-}
-
-std::shared_ptr<IInputMonitorManager> IInputMonitorManager::GetInstance()
-{
-    if (iInputMonitorManager_ == nullptr) {
-        iInputMonitorManager_ = std::make_shared<InputMonitorManager>();
-    }
-    return iInputMonitorManager_;
 }
 } // namespace MMI
 } // namespace OHOS

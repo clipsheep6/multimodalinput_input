@@ -28,12 +28,9 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManager" };
 } // namespace
 
-InputManager *InputManager::instance_ = nullptr;
+InputManager *InputManager::instance_ = new (std::nothrow) InputManager();
 InputManager *InputManager::GetInstance()
 {
-    if (instance_ == nullptr) {
-        instance_ = new (std::nothrow) InputManager();
-    }
     return instance_;
 }
 
@@ -140,6 +137,11 @@ void InputManager::SupportKeys(int32_t deviceId, std::vector<int32_t> keyCodes,
 int32_t InputManager::SetPointerVisible(bool visible)
 {
     return InputMgrImpl->GetInstance()->SetPointerVisible(visible);
+}
+
+bool InputManager::IsPointerVisible()
+{
+    return InputMgrImpl->GetInstance()->IsPointerVisible();
 }
 } // namespace MMI
 } // namespace OHOS

@@ -69,10 +69,10 @@ ohos_shared_library("libmmi-client") {
     "event_handler/src/input_device_impl.cpp",
     "event_handler/src/input_handler_manager.cpp",
     "event_handler/src/input_manager_impl.cpp",
-    "event_handler/src/interceptor_manager.cpp",
     "event_handler/src/key_event_input_subscribe_manager.cpp",
     "event_handler/src/multimodal_event_handler.cpp",
     "event_handler/src/standardized_event_manager.cpp",
+    "event_handler/src/input_monitor_manager.cpp",
     "events/src/axis_event.cpp",
     "events/src/input_manager.cpp",
     "events/src/key_option.cpp",
@@ -91,19 +91,21 @@ ohos_shared_library("libmmi-client") {
     cflags += [ "-DOHOS_BUILD_ENABLE_POINTER_DRAWING" ]
   }
 
-  if (mmi_enable_interceptor) {
-    cflags += [ "-DOHOS_BUILD_ENABLE_INTERCEPTOR" ]
+  if (mmi_enable_monitor) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_MONITOR"]
   }
 
   if (mmi_enable_interceptor) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_INTERCEPTOR" ]
+  }
+  
+  if (mmi_enable_interceptor) {
     sources += [
       "event_handler/src/input_interceptor_manager.cpp",
-      "event_handler/src/interceptor_manager.cpp",
     ]
   } else {
     sources += [
       "event_handler/src/i_input_interceptor_manager.cpp",
-      "event_handler/src/i_interceptor_manager.cpp",
     ]
   }
 
@@ -113,12 +115,6 @@ ohos_shared_library("libmmi-client") {
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_config",
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_config",
   ]
-
-  if (mmi_enable_monitor) {
-    sources += [ "event_handler/src/input_monitor_manager.cpp" ]
-  } else {
-    sources += [ "event_handler/src/i_input_monitor_manager.cpp" ]
-  }
 
   public_configs = [ ":libmmi_public_client_config" ]
 
@@ -299,6 +295,10 @@ ohos_unittest("InputManagerTest") {
 
   if (is_mmi_have_hdf) {
     cflags += [ "-DOHOS_BUILD_HDF" ]
+  }
+
+  if (mmi_enable_monitor) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_MONITOR"]
   }
 
   sources = [ "events/test/input_manager_test.cpp" ]

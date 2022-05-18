@@ -30,6 +30,7 @@ config("libinputmonitor_config") {
   if (is_mmi_have_hdf) {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
+
 }
 
 ohos_shared_library("inputmonitor") {
