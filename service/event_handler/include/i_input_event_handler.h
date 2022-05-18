@@ -35,7 +35,8 @@ public:
     virtual void HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) {};
     virtual void HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) {};
     virtual void HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) {};
-    virtual void SetNext(std::shared_ptr<IInputEventHandler> nextHandler) {
+    virtual void SetNext(std::shared_ptr<IInputEventHandler> nextHandler)
+    {
         nextHandler_ = nextHandler;
     };
 

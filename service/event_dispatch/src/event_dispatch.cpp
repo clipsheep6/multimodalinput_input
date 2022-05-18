@@ -41,7 +41,7 @@ EventDispatch::~EventDispatch() {}
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void EventDispatch::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
-{    
+{ 
     CHKPV(keyEvent);
     auto udsServer = InputHandler->GetUDSServer();
     CHKPV(udsServer);
@@ -85,7 +85,7 @@ void EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
 int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key)
 {
     CALL_LOG_ENTER;
-    CHKPR(key, PARAM_INPUT_INVALID); 
+    CHKPR(key, PARAM_INPUT_INVALID);
     auto fd = WinMgr->UpdateTarget(key);
     if (fd < 0) {
         MMI_HILOGE("Invalid fd, fd: %{public}d", fd);

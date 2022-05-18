@@ -230,7 +230,7 @@ int32_t InputEventHandler::BuildInputHandlerChain()
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     interceptorHandler_  = std::make_shared<InterceptorHandlerGlobal>();
     CHKPR(interceptorHandler_, ERROR_NULL_POINTER);
-    tmp->SetNext(interceptorHandler_); 
+    tmp->SetNext(interceptorHandler_);
     tmp = interceptorHandler_;
 #endif
 

@@ -202,8 +202,8 @@ void InputEventNormalizeHandler::AddHandleTimer(int32_t timeout)
     });
 }
 
-int32_t InputEventNormalizeHandler::HandleTouchPadEvent(libinput_event* event){
-
+int32_t InputEventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
+{
     if (nextHandler_ == nullptr) {
         MMI_HILOGW("Pointer device does not support");
         return ERROR_UNSUPPORT;
