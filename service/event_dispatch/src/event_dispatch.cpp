@@ -41,7 +41,7 @@ EventDispatch::~EventDispatch() {}
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void EventDispatch::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
-{ 
+{
     CHKPV(keyEvent);
     auto udsServer = InputHandler->GetUDSServer();
     CHKPV(udsServer);
