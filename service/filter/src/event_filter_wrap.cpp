@@ -54,13 +54,13 @@ void EventFilterWrap::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEv
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-int32_t EventFilterWrap::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void EventFilterWrap::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (HandlePointerEventFilter(pointerEvent)) {
         MMI_HILOGI("Pointer event Filter succeeded");
         return;
     }
-    CHKPV(nextHandler_,);
+    CHKPV(nextHandler_);
     nextHandler_->HandleTouchEvent(pointerEvent);
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH

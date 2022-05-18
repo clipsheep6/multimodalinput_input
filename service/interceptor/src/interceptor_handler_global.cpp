@@ -40,7 +40,7 @@ void InterceptorHandlerGlobal::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent
             BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_INTERCEPT_EVENT);
         return;
     }
-    CHKPV(nextHandler);
+    CHKPV(nextHandler_);
     nextHandler_->HandleKeyEvent(keyEvent);
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD

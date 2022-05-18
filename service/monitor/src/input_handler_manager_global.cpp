@@ -48,7 +48,7 @@ void InputHandlerManagerGlobal::HandlePointerEvent(std::shared_ptr<PointerEvent>
         MMI_HILOGD("Monitor is succeeded");
         return;
     }
-    CHKPV(nextHandler_,);
+    CHKPV(nextHandler_);
     nextHandler_->HandlePointerEvent(pointerEvent);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
