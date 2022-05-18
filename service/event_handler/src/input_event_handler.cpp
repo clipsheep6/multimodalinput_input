@@ -219,7 +219,7 @@ int32_t InputEventHandler::BuildInputHandlerChain()
     CHKPR(inputEventNormalizeHandler_, ERROR_NULL_POINTER);
 #if !defined(OHOS_BUILD_ENABLE_KEYBOARD) && !defined(OHOS_BUILD_ENABLE_POINTER) && !defined(OHOS_BUILD_ENABLE_TOUCH)
     return RET_OK;
-#endif
+#endif // !OHOS_BUILD_ENABLE_KEYBOARD && !OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_TOUCH
 
     std::shared_ptr<IInputEventHandler> tmp = inputEventNormalizeHandler_;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -227,14 +227,14 @@ int32_t InputEventHandler::BuildInputHandlerChain()
     CHKPR(eventfilterHandler_, ERROR_NULL_POINTER);
     tmp->SetNext(eventfilterHandler_);
     tmp = eventfilterHandler_;
-#endif
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     interceptorHandler_  = std::make_shared<InterceptorHandlerGlobal>();
     CHKPR(interceptorHandler_, ERROR_NULL_POINTER);
     tmp->SetNext(interceptorHandler_);
     tmp = interceptorHandler_;
-#endif
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
@@ -242,12 +242,12 @@ int32_t InputEventHandler::BuildInputHandlerChain()
     CHKPR(keyCommandHandler, ERROR_NULL_POINTER);
     tmp->SetNext(keyCommandHandler);
     tmp = keyCommandHandler;
-#endif
+#endif // OHOS_BUILD_ENABLE_COMBINATION_KEY
     subscriberHandler_ = std::make_shared<KeyEventSubscriber>();
     CHKPR(subscriberHandler_, ERROR_NULL_POINTER);
     tmp->SetNext(subscriberHandler_);
     tmp = subscriberHandler_;
-#endif
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
     monitorHandler_ = std::make_shared<InputHandlerManagerGlobal>();
     CHKPR(monitorHandler_, ERROR_NULL_POINTER);
