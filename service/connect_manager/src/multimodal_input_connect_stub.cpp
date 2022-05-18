@@ -103,7 +103,7 @@ int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data,
     sptr<IRemoteObject> client = data.ReadRemoteObject();
     CHKPR(client, ERR_INVALID_VALUE);
     sptr<IEventFilter> filter = iface_cast<IEventFilter>(client);
-    CHKPR(clifilterent, ERROR_NULL_POINTER);
+    CHKPR(filter, ERROR_NULL_POINTER);
 
     MMI_HILOGD("filter iface_cast succeeded");
     int32_t ret = AddInputEventFilter(filter);
