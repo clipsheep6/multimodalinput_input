@@ -24,89 +24,71 @@
 
 #include "bytrace_adapter.h"
 #include "error_multimodal.h"
-#include "event_filter_wrap.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
-#include "input_handler_manager_global.h"
-#include "input_windows_manager.h"
 #include "util.h"
-
 
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatch" };
+constexpr int64_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
 } // namespace
 
 EventDispatch::EventDispatch() {}
 
 EventDispatch::~EventDispatch() {}
 
-#ifdef OHOS_BUILD_ENABLE_POINTER
-int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
-{
-    CALL_LOG_ENTER;
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    return DispatchPointerEvent(pointerEvent);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+int32_t EventDispatch::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+{    
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    auto udsServer = InputHandler->GetUDSServer();
+    CHKPR(udsServer, ERROR_NULL_POINTER);
+    DispatchKeyEventPid(*udsServer, keyEvent);
+    return RET_OK;
 }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 int32_t EventDispatch::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CALL_LOG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    return DispatchPointerEvent(pointerEvent);
+    HandlePointerEvent(pointerEvent);
+    return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-int32_t EventDispatch::DispatchPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
 {
     CALL_LOG_ENTER;
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    auto fd = WinMgr->UpdateTargetPointer(pointerEvent);
+    CHKPR(point, ERROR_NULL_POINTER);
+    auto fd = WinMgr->UpdateTargetPointer(point);
     if (fd < 0) {
         MMI_HILOGE("The fd less than 0, fd: %{public}d", fd);
         return RET_ERR;
     }
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
-    InputEventDataTransformation::Marshalling(pointerEvent, pkt);
-    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP);
+    InputEventDataTransformation::Marshalling(point, pkt);
+    BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
     auto udsServer = InputHandler->GetUDSServer();
     if (udsServer == nullptr) {
         MMI_HILOGE("UdsServer is a nullptr");
         return RET_ERR;
-    }
-    auto session = udsServer->GetSession(fd);
-    CHKPF(session);
-    if (session->isANRProcess_) {
-        MMI_HILOGD("application not responsing");
-        return RET_OK;
-    }
-
-    auto currentTime = GetSysClockTime();
-    if (TriggerANR(currentTime, session)) {
-        session->isANRProcess_ = true;
-        MMI_HILOGW("the pointer event does not report normally, application not response");
-        return RET_OK;
     }
 
     if (!udsServer->SendMsg(fd, pkt)) {
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return RET_ERR;
     }
-    session->AddEvent(pointerEvent->GetId(), currentTime);
     return RET_OK;
 }
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-int32_t EventDispatch::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key)
 {
     CALL_LOG_ENTER;
-    CHKPR(keyEvent, ERROR_NULL_POINTER);
-    auto fd = WinMgr->UpdateTarget(keyEvent);
+    CHKPR(key, PARAM_INPUT_INVALID); 
+    auto fd = WinMgr->UpdateTarget(key);
     if (fd < 0) {
         MMI_HILOGE("Invalid fd, fd: %{public}d", fd);
         return RET_ERR;
@@ -115,42 +97,24 @@ int32_t EventDispatch::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
                "ActionTime:%{public}" PRId64 ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ","
                "EventType:%{public}d,Flag:%{public}u,"
                "KeyAction:%{public}d,Fd:%{public}d",
-               keyEvent->GetKeyCode(), keyEvent->GetActionTime(), keyEvent->GetAction(),
-               keyEvent->GetActionStartTime(),
-               keyEvent->GetEventType(),
-               keyEvent->GetFlag(), keyEvent->GetKeyAction(), fd);
-    auto udsServer = InputHandler->GetUDSServer();
-    CHKPR(udsServer, ERROR_NULL_POINTER);
-    auto session = udsServer->GetSession(fd);
-    CHKPF(session);
-    if (session->isANRProcess_) {
-        MMI_HILOGD("is ANR process");
-        return RET_OK;
-    }
-
-    auto currentTime = GetSysClockTime();
-    if (TriggerANR(currentTime, session)) {
-        session->isANRProcess_ = true;
-        MMI_HILOGW("the key event does not report normally, triggering ANR");
-        return RET_OK;
-    }
-
+               key->GetKeyCode(), key->GetActionTime(), key->GetAction(),
+               key->GetActionStartTime(),
+               key->GetEventType(),
+               key->GetFlag(), key->GetKeyAction(), fd);
     NetPacket pkt(MmiMessageId::ON_KEYEVENT);
-    InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt);
-    BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_DISPATCH_EVENT);
+    InputEventDataTransformation::KeyEventToNetPacket(key, pkt);
+    BytraceAdapter::StartBytrace(key, BytraceAdapter::KEY_DISPATCH_EVENT);
     pkt << fd;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write structure of EventKeyboard failed");
         return RET_ERR;
     }
-    if (!udsServer->SendMsg(fd, pkt)) {
+    if (!udsServer.SendMsg(fd, pkt)) {
         MMI_HILOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
-    session->AddEvent(keyEvent->GetId(), currentTime);
     return RET_OK;
 }
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 bool EventDispatch::TriggerANR(int64_t time, SessionPtr sess)
 {
@@ -162,7 +126,7 @@ bool EventDispatch::TriggerANR(int64_t time, SessionPtr sess)
         earlist = sess->GetEarlistEventTime();
     }
 
-    if (time >= 0) {
+    if (time < (earlist + INPUT_UI_TIMEOUT_TIME)) {
         sess->isANRProcess_ = false;
         MMI_HILOGD("the event reports normally");
         return false;

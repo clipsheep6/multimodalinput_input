@@ -18,12 +18,12 @@
 #include "cJSON.h"
 
 #include "ability_manager_client.h"
+#include "cJSON.h"
 #include "file_ex.h"
-#include "ohos/aafwk/base/string_wrapper.h"
-
 #include "bytrace_adapter.h"
 #include "error_multimodal.h"
 #include "mmi_log.h"
+#include "string_wrapper.h"
 #include "timer_manager.h"
 
 namespace OHOS {
@@ -33,7 +33,6 @@ constexpr int32_t MAX_PREKEYS_NUM = 4;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandManager" };
 struct JsonParser {
     JsonParser() = default;
-
     ~JsonParser()
     {
         if (json_ != nullptr) {
@@ -45,7 +44,6 @@ struct JsonParser {
     {
         return json_;
     }
-
     cJSON *json_ = nullptr;
 };
 
@@ -300,7 +298,6 @@ int32_t KeyCommandManager::HandleTouchEvent(std::shared_ptr<PointerEvent> pointe
     return nextHandler_->HandleTouchEvent(pointerEvent);
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
-
 
 std::string KeyCommandManager::GenerateKey(const ShortcutKey& key)
 {
