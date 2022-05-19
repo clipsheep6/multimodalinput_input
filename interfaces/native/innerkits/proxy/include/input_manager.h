@@ -40,6 +40,12 @@ public:
     static InputManager *GetInstance();
     virtual ~InputManager() = default;
 
+    bool IsSmoothenSwitch();
+
+    void EnableSmoothenSwitch(bool smoothenSwitch = false);
+
+    int32_t ConsumeInputEvent(int64_t frameTime, std::shared_ptr<PointerEvent>& pointEvent);
+
     /**
      * @brief Updates the screen and window information.
      * @param physicalDisplays Indicates the physical screen information.

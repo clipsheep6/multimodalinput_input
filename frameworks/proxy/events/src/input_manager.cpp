@@ -21,6 +21,7 @@
 #include "key_event_input_subscribe_manager.h"
 #include "define_multimodal.h"
 #include "multimodal_event_handler.h"
+#include "smoothen_motion.h"
 
 namespace OHOS {
 namespace MMI {
@@ -32,6 +33,21 @@ InputManager *InputManager::instance_ = new (std::nothrow) InputManager();
 InputManager *InputManager::GetInstance()
 {
     return instance_;
+}
+
+bool InputManager::IsSmoothenSwitch()
+{
+    return smoothenMotion->IsSmoothenSwitch();
+}
+
+void InputManager::EnableSmoothenSwitch(bool smoothenSwitch)
+{
+    smoothenMotion->EnableSmoothenSwitch(smoothenSwitch);
+}
+
+int32_t InputManager::ConsumeInputEvent(int64_t frameTime, std::shared_ptr<PointerEvent>& point)
+{
+    return smoothenMotion->ConsumeInputEvent(frameTime, point);
 }
 
 void InputManager::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
