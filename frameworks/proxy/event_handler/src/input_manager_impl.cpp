@@ -368,22 +368,32 @@ int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consum
 
 void InputManagerImpl::RemoveMonitor(int32_t monitorId)
 {
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
         return;
     }
     monitorManager_.RemoveMonitor(monitorId);
+#else
+    MMI_HILOGI("RemoveMonitor is not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_MONITOR
 }
 
 void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
         return;
     }
     monitorManager_.MarkConsumed(monitorId, eventId);
+#else
+    MMI_HILOGI("MarkConsumed is not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_MONITOR
 }
 
 void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
