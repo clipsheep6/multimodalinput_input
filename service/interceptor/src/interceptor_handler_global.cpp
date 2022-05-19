@@ -184,11 +184,6 @@ void InterceptorHandlerGlobal::SessionHandler::SendToClient(std::shared_ptr<Poin
     }
 }
 
-int32_t InterceptorHandlerGlobal::InterceptorCollection::GetPriority() const
-{
-    return IInputEventMonitorHandler::DEFAULT_INTERCEPTOR;
-}
-
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {

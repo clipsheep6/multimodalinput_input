@@ -74,7 +74,6 @@ private:
     };
 
     struct InterceptorCollection : public IInputEventMonitorHandler, protected NoCopyable {
-        virtual int32_t GetPriority() const override;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
         virtual bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD

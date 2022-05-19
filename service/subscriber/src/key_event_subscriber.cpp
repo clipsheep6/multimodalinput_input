@@ -35,7 +35,7 @@ constexpr uint32_t MAX_PRE_KEY_COUNT = 4;
 void KeyEventSubscriber::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
-    if (SubscribeKeyEvent(keyEvent)) {
+    if (SubscribeKeyEvent(keyEvent) == RET_OK) {
         MMI_HILOGD("Subscribe keyEvent filter success. keyCode:%{public}d", keyEvent->GetKeyCode());
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
         return;

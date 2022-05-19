@@ -266,9 +266,11 @@ int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, NetPacket& pkt)
         return RET_ERR;
     }
     MMI_HILOGD("handler:%{public}d,handlerType:%{public}d", handlerId, handlerType);
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     auto interceptorHandler = InputHandler->GetInterceptorHandler();
     CHKPR(interceptorHandler, ERROR_NULL_POINTER);
     interceptorHandler->AddInputHandler(handlerId, handlerType, sess);
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
     auto monitorHandler = InputHandler->GetMonitorHandler();
     CHKPR(monitorHandler, ERROR_NULL_POINTER);
     monitorHandler->AddInputHandler(handlerId, handlerType, sess);
@@ -287,9 +289,11 @@ int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, NetPacket& pkt)
         return RET_ERR;
     }
     MMI_HILOGD("OnRemoveInputHandler handler:%{public}d,handlerType:%{public}d", handlerId, handlerType);
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     auto interceptorHandler = InputHandler->GetInterceptorHandler();
     CHKPR(interceptorHandler, ERROR_NULL_POINTER);
     interceptorHandler->RemoveInputHandler(handlerId, handlerType, sess);
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
     auto monitorHandler = InputHandler->GetMonitorHandler();
     CHKPR(monitorHandler, ERROR_NULL_POINTER);
     monitorHandler->RemoveInputHandler(handlerId, handlerType, sess);

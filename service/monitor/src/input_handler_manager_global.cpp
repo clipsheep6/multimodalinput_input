@@ -253,13 +253,7 @@ void InputHandlerManagerGlobal::MonitorCollection::MarkConsumed(int32_t monitorI
     auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
     CHKPV(inputEventNormalizeHandler);
     inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
-
 #endif // OHOS_BUILD_ENABLE_TOUCH
-}
-
-int32_t InputHandlerManagerGlobal::MonitorCollection::GetPriority() const
-{
-    return IInputEventMonitorHandler::DEFAULT_MONITOR;
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD

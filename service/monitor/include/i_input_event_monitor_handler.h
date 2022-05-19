@@ -27,7 +27,6 @@ namespace MMI {
 struct IInputEventMonitorHandler {
     static constexpr int32_t DEFAULT_INTERCEPTOR = 10;
     static constexpr int32_t DEFAULT_MONITOR = 20;
-    virtual int32_t GetPriority() const = 0;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     virtual bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent) = 0;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
