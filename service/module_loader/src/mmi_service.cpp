@@ -280,7 +280,7 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
     int32_t ret = entrustTasks_.PostSyncTask(std::bind(&UDSServer::AddSocketPairInfo, this,
         programName, moduleType, uid, pid, serverFd, std::ref(toReturnClientFd)));
     if (ret != RET_OK) {
-        MMI_HILOGE("call AddSocketPairInfo return %{public}d", ret);
+        MMI_HILOGE("call AddSocketPairInfo failed,return %{public}d", ret);
         return RET_ERR;
     }
     MMI_HILOGIK("leave, programName:%{public}s,moduleType:%{public}d,alloc success",
@@ -294,7 +294,7 @@ int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter)
     int32_t ret = entrustTasks_.PostSyncTask(std::bind(&InputEventHandler::AddInputEventFilter,
         InputHandler, filter));
     if (ret != RET_OK) {
-        MMI_HILOGE("add event filter return %{public}d", ret);
+        MMI_HILOGE("add event filter failed,return %{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -303,15 +303,13 @@ int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter)
 void MMIService::OnConnected(SessionPtr s)
 {
     CHKPV(s);
-    int32_t fd = s->GetFd();
-    MMI_HILOGI("fd:%{public}d", fd);
+    MMI_HILOGI("fd:%{public}d", s->GetFd());
 }
 
 void MMIService::OnDisconnected(SessionPtr s)
 {
     CHKPV(s);
-    int32_t fd = s->GetFd();
-    MMI_HILOGW("enter, session desc:%{public}s, fd: %{public}d", s->GetDescript().c_str(), fd);
+    MMI_HILOGW("enter, session desc:%{public}s, fd: %{public}d", s->GetDescript().c_str(), s->GetFd());
 }
 
 int32_t MMIService::SetPointerVisible(bool visible)
@@ -320,7 +318,7 @@ int32_t MMIService::SetPointerVisible(bool visible)
     int32_t ret = entrustTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetPointerVisible,
         IPointerDrawingManager::GetInstance(), GetCallingPid(), visible));
     if (ret != RET_OK) {
-        MMI_HILOGE("set pointer visible return %{public}d", ret);
+        MMI_HILOGE("set pointer visible failed,return %{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -337,7 +335,7 @@ int32_t MMIService::IsPointerVisible(bool &visible)
     CALL_LOG_ENTER;
     int32_t ret = entrustTasks_.PostSyncTask(std::bind(&MMIService::CheckPointerVisible, this, std::ref(visible)));
     if (ret != RET_OK) {
-        MMI_HILOGE("is pointer visible return %{public}d", ret);
+        MMI_HILOGE("is pointer visible failed,return %{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -378,7 +376,7 @@ void MMIService::OnEntrustTask(epoll_event& ev)
     if (res == -1) {
         MMI_HILOGW("read failed erron:%{public}d", errno);
     }
-    MMI_HILOGD("RemoteRequest notify tid:%{public}" PRId64 ",stid:%{public}" PRId64 ""
+    MMI_HILOGD("RemoteRequest notify td:%{public}" PRId64 ",std:%{public}" PRId64 ""
         ",taskId:%{public}d", GetThisThreadId(), data.tid, data.taskId);
     entrustTasks_.ProcessTasks();
 }

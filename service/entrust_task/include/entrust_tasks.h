@@ -54,13 +54,8 @@ public:
         {
             hasWaited_ = true;
         }
-        bool HasNotified() const
-        {
-            return hasNotified_;
-        }
 
     private:
-        std::atomic_bool hasNotified_ = false;
         std::atomic_bool hasWaited_ = false;
         int32_t id_ = 0;
         ETaskCallback fun_;

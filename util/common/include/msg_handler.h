@@ -43,7 +43,7 @@ public:
             str += ',';
         }
         if (str.size() > 0) {
-            str.resize(str.size()-1);
+            str.resize(str.size() - 1);
         }
         return std::move(str);
     }

@@ -312,6 +312,7 @@ SessionPtr UDSServer::GetSession(int32_t fd) const
 {
     auto it = sessionsMap_.find(fd);
     if (it == sessionsMap_.end()) {
+        MMI_HILOGE("Session not found.fd:%{public}d", fd);
         return nullptr;
     }
     CHKPP(it->second);
@@ -322,6 +323,7 @@ SessionPtr UDSServer::GetSessionByPid(int32_t pid) const
 {
     int32_t fd = GetClientFd(pid);
     if (fd <= 0) {
+        MMI_HILOGE("Session not found.pid:%{public}d", pid);
         return nullptr;
     }
     return GetSession(fd);

@@ -87,6 +87,7 @@ int32_t MultimodalInputConnectProxy::AddInputEventFilter(sptr<IEventFilter> filt
     int32_t requestResult = Remote()->SendRequest(ADD_INPUT_EVENT_FILTER, data, reply, option);
     if (requestResult != RET_OK) {
         MMI_HILOGE("reply readint32 error:%{public}d", requestResult);
+        return requestResult;
     }
     return RET_OK;
 }

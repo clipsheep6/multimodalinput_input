@@ -17,6 +17,8 @@
 
 #include <set>
 
+#include "nocopyable.h"
+
 namespace OHOS {
 namespace MMI {
 template<typename T>
@@ -25,6 +27,7 @@ public:
     IdFactory() : IdFactory(1) {}
     explicit IdFactory(T seed) : seed_(seed) {}
     virtual ~IdFactory() = default;
+    DISALLOW_COPY_AND_MOVE(IdFactory);
 
     T GenerateId()
     {

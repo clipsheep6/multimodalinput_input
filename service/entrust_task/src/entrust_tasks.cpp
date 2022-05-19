@@ -28,19 +28,15 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Entru
 
 void EntrustTasks::Task::ProcessTask()
 {
+    CALL_LOG_ENTER;
     if (hasWaited_) {
-        MMI_HILOGE("hasWaited=true, Task expired, discarded. id:%{public}d", id_);
-        return;
-    }
-    if (hasNotified_) {
-        MMI_HILOGE("hasNotified_=true, The task has been processed. id:%{public}d", id_);
+        MMI_HILOGE("Expired tasks will be discarded. id:%{public}d", id_);
         return;
     }
     int32_t ret = fun_();
     std::string taskType = ((promise_ == nullptr) ? "Async" : "Sync");
     MMI_HILOGD("process %{public}s task id:%{public}d,ret:%{public}d", taskType.c_str(), id_, ret);
     if (promise_ != nullptr) {
-        hasNotified_ = true;
         promise_->set_value(ret);
     }
 }
@@ -50,7 +46,7 @@ bool EntrustTasks::Init()
     CALL_LOG_ENTER;
     int32_t res = pipe(fds_);
     if (res == -1) {
-        MMI_HILOGE("pipe create error:%{public}d", errno);
+        MMI_HILOGE("pipe create failed,errno:%{public}d", errno);
         return false;
     }
     return true;
@@ -58,9 +54,10 @@ bool EntrustTasks::Init()
 
 void EntrustTasks::ProcessTasks()
 {
+    CALL_LOG_ENTER;
     std::vector<TaskPtr> tasks;
     PopPendingTaskList(tasks);
-    for (auto& it : tasks) {
+    for (const auto &it : tasks) {
         it->ProcessTask();
         RecoveryId(it->GetId());
     }
@@ -68,6 +65,7 @@ void EntrustTasks::ProcessTasks()
 
 int32_t EntrustTasks::PostSyncTask(ETaskCallback callback)
 {
+    CALL_LOG_ENTER;
     Promise promise;
     Future future = promise.get_future();
     auto task = PostTask(callback, &promise);
@@ -76,6 +74,7 @@ int32_t EntrustTasks::PostSyncTask(ETaskCallback callback)
     static constexpr int32_t timeout = 3000;
     std::chrono::milliseconds span(timeout);
     auto res = future.wait_for(span);
+    task->SetWaited();
     if (res == std::future_status::timeout) {
         MMI_HILOGE("Task timeout");
         return ETASKS_WAIT_TIMEOUT;
@@ -83,7 +82,6 @@ int32_t EntrustTasks::PostSyncTask(ETaskCallback callback)
         MMI_HILOGE("Task deferred");
         return ETASKS_WAIT_DEFERRED;
     }
-    task->SetWaited();
     return future.get();
 }
 
@@ -94,8 +92,8 @@ bool EntrustTasks::PostAsyncTask(ETaskCallback callback)
 
 void EntrustTasks::PopPendingTaskList(std::vector<TaskPtr> &tasks)
 {
-    int32_t count = 0;
     std::lock_guard<std::mutex> guard(mux_);
+    int32_t count = 0;
     static constexpr int32_t onceProcessTaskLimit = 10;
     while (!tasks_.empty() && ((count++) < onceProcessTaskLimit)) {
         auto task = tasks_.front();
