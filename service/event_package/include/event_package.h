@@ -24,19 +24,15 @@
 #include "uds_server.h"
 #include "util.h"
 
-#define KEYSTATUS 0
-
 namespace OHOS {
 namespace MMI {
-    class EventPackage {
-        static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventPackage" };
-        static constexpr uint32_t TabletPadButtonNumberPrefix = 0x100;
+class EventPackage {
     public:
-        EventPackage();
-        DISALLOW_COPY_AND_MOVE(EventPackage);
-        virtual ~EventPackage();
-        int32_t PackageKeyEvent(libinput_event *event, std::shared_ptr<KeyEvent> kevnPtr);
-    };
+    EventPackage();
+    DISALLOW_COPY_AND_MOVE(EventPackage);
+    virtual ~EventPackage();
+    int32_t PackageKeyEvent(libinput_event *event, std::shared_ptr<KeyEvent> kevnPtr);
+};
 } // namespace MMI
 } // namespace OHOS
 #endif // EVENT_PACKAGE_H

@@ -264,10 +264,10 @@ void InputEventHandler::OnCheckEventReport()
     if (initSysClock_ == 0 || lastSysClock_ != 0) {
         return;
     }
-    constexpr int64_t MAX_DID_TIME = 1000 * 1000 * 3;
+    static constexpr int64_t maxDidTime = 1000 * 1000 * 3;
     auto curSysClock = GetSysClockTime();
     auto lostTime = curSysClock - initSysClock_;
-    if (lostTime < MAX_DID_TIME) {
+    if (lostTime < maxDidTime) {
         return;
     }
     MMI_HILOGE("Event not responding. id:%{public}" PRId64 ",eventType:%{public}d,initSysClock:%{public}" PRId64 ","
@@ -328,6 +328,7 @@ int32_t InputEventHandler::OnEventDeviceRemoved(libinput_event *event)
     InputDevMgr->OnInputDeviceRemoved(device);
     return RET_OK;
 }
+
 
 int32_t InputEventHandler::OnEventKey(libinput_event *event)
 {
