@@ -65,11 +65,14 @@ group("multimodalinput_mmi_packages") {
     "frameworks/napi/input_consumer:inputconsumer",
     "frameworks/napi/input_device:inputdevice",
     "frameworks/napi/input_event_client:inputeventclient",
-    "frameworks/napi/input_monitor:inputmonitor",
     "frameworks/proxy:libmmi-client",
     "service:libmmi-server",
     "tools/inject_event:uinput",
   ]
+
+  if (mmi_enable_monitor) {
+    deps += [ "frameworks/napi/input_monitor:inputmonitor" ]
+  }
 }
 
 group("mmi_debug_tools") {

@@ -20,23 +20,22 @@
 #include <set>
 
 #include "nocopyable.h"
-#include "singleton.h"
 
+#include "i_input_handler_manager_global.h"
 #include "i_input_event_handler.h"
-#include "input_handler_type.h"
 #include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
-class InputHandlerManagerGlobal : public Singleton<InputHandlerManagerGlobal> {
+class InputHandlerManagerGlobal : public IInputHandlerManagerGlobal {
 public:
     InputHandlerManagerGlobal() = default;
     DISALLOW_COPY_AND_MOVE(InputHandlerManagerGlobal);
-    int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
-    void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
-    void MarkConsumed(int32_t handlerId, int32_t eventId, SessionPtr session);
-    bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent);
-    bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent);
+    int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
+    void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session) override;
+    void MarkConsumed(int32_t handlerId, int32_t eventId, SessionPtr session) override;
+    bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent) override;
+    bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent) override;
 
 private:
     void InitSessionLostCallback();

@@ -284,5 +284,13 @@ void InputHandlerManagerGlobal::MonitorCollection::OnSessionLost(SessionPtr sess
         }
     }
 }
+
+std::shared_ptr<IInputHandlerManagerGlobal> IInputHandlerManagerGlobal::GetInstance()
+{
+    if (iInputHandlerManagerGlobal_ == nullptr) {
+        iInputHandlerManagerGlobal_ = std::make_shared<InputHandlerManagerGlobal>();
+    }
+    return iInputHandlerManagerGlobal_;
+}
 } // namespace MMI
 } // namespace OHOS
