@@ -106,6 +106,7 @@ void EventDispatch::OnEventTouchGetPointEventType(const EventTouch& touch,
     }
 }
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 void EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
 {
     CALL_LOG_ENTER;
@@ -129,7 +130,7 @@ void EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         return;
     }
 }
-
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key)
 {
