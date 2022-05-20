@@ -72,7 +72,10 @@ int32_t EntrustTasks::PostSyncTask(ETaskCallback callback)
     Promise promise;
     Future future = promise.get_future();
     auto task = PostTask(callback, &promise);
-    CHKPR(task, ETASKS_POST_SYNCTASK_FAIL);
+    if (task == nullptr) {
+        MMI_HILOGE("post sync task faild");
+        return ETASKS_POST_SYNCTASK_FAIL;
+    }
 
     static constexpr int32_t timeout = 3000;
     std::chrono::milliseconds span(timeout);
@@ -94,7 +97,10 @@ int32_t EntrustTasks::PostAsyncTask(ETaskCallback callback)
         return callback();
     }
     auto task = PostTask(callback);
-    CHKPR(task, ERROR_NULL_POINTER);
+    if (task == nullptr) {
+        MMI_HILOGE("post async task faild");
+        return ETASKS_POST_ASYNCTASK_FAIL;
+    }
     return RET_OK;
 }
 
@@ -121,7 +127,7 @@ EntrustTasks::TaskPtr EntrustTasks::PostTask(ETaskCallback callback, Promise *pr
     static constexpr int32_t maxTasksLimit = 1000;
     auto tsize = tasks_.size();
     if (tsize > maxTasksLimit) {
-        MMI_HILOGE("Queue is full, not allowed. size:%{public}zu/%{public}d", tsize, maxTasksLimit);
+        MMI_HILOGE("The task queue is full. size:%{public}zu/%{public}d", tsize, maxTasksLimit);
         return nullptr;
     }
     int32_t id = GenerateId();
@@ -129,11 +135,15 @@ EntrustTasks::TaskPtr EntrustTasks::PostTask(ETaskCallback callback, Promise *pr
     auto res = write(fds_[1], &data, sizeof(data));
     if (res == -1) {
         RecoveryId(id);
-        MMI_HILOGE("pipe write error:%{public}d", errno);
+        MMI_HILOGE("pipe write faild,errno:%{public}d", errno);
         return nullptr;
     }
     TaskPtr task = std::make_shared<Task>(id, callback, promise);
-    CHKPP(task);
+    if (task == nullptr) {
+        RecoveryId(id);
+        MMI_HILOGE("make task faild");
+        return nullptr;
+    }
     tasks_.push(task);
     std::string taskType = ((promise == nullptr) ? "Async" : "Sync");
     MMI_HILOGD("post %{public}s task id:%{public}d,tid:%{public}" PRIu64 "", taskType.c_str(), id, data.tid);
