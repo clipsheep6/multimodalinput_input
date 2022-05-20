@@ -45,6 +45,13 @@ void InputEventNormalizeHandler::HandleLibinputEvent(libinput_event* event)
             HandleKeyboardEvent(event);
             break;
         }
+        case LIBINPUT_EVENT_POINTER_MOTION:
+        case LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE:
+        case LIBINPUT_EVENT_POINTER_BUTTON:
+        case LIBINPUT_EVENT_POINTER_AXIS: {
+            HandleMouseEvent(event);
+            break;
+        }
         case LIBINPUT_EVENT_TOUCHPAD_DOWN:
         case LIBINPUT_EVENT_TOUCHPAD_UP:
         case LIBINPUT_EVENT_TOUCHPAD_MOTION: {
@@ -58,13 +65,6 @@ void InputEventNormalizeHandler::HandleLibinputEvent(libinput_event* event)
         case LIBINPUT_EVENT_GESTURE_PINCH_UPDATE:
         case LIBINPUT_EVENT_GESTURE_PINCH_END: {
             HandleGestureEvent(event);
-            break;
-        }
-        case LIBINPUT_EVENT_POINTER_MOTION:
-        case LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE:
-        case LIBINPUT_EVENT_POINTER_BUTTON:
-        case LIBINPUT_EVENT_POINTER_AXIS: {
-            HandleMouseEvent(event);
             break;
         }
         case LIBINPUT_EVENT_TOUCH_DOWN:
@@ -168,38 +168,27 @@ int32_t InputEventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     return RET_OK;
 }
 
-void InputEventNormalizeHandler::Repeat(const std::shared_ptr<KeyEvent> keyEvent)
+int32_t InputEventNormalizeHandler::HandleMouseEvent(libinput_event* event)
 {
-        if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_UP ||
-            keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_DOWN ||
-            keyEvent->GetKeyCode() == KeyEvent::KEYCODE_DEL) {
-            if (!TimerMgr->IsExist(timerId_) && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
-                AddHandleTimer();
-                MMI_HILOGD("add a timer");
-            }
-        if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP && TimerMgr->IsExist(timerId_)) {
-            TimerMgr->RemoveTimer(timerId_);
-            timerId_ = -1;
-        }
+    if (nextHandler_ == nullptr) {
+        MMI_HILOGW("Pointer device does not support");
+        return ERROR_UNSUPPORT;
     }
-}
-
-void InputEventNormalizeHandler::AddHandleTimer(int32_t timeout)
-{
-    timerId_ = TimerMgr->AddTimer(timeout, 1, [this]() {
-        MMI_HILOGD("enter");
-        auto keyEvent = InputHandler->GetKeyEvent();
-        CHKPV(keyEvent);
-        if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
-            MMI_HILOGD("key up");
-            return;
-        }
-        CHKPV(nextHandler_);
-        nextHandler_->HandleKeyEvent(keyEvent);
-        constexpr int32_t triggerTime = 100;
-        this->AddHandleTimer(triggerTime);
-        MMI_HILOGD("leave");
-    });
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    MouseEventHdr->Normalize(event);
+    auto pointerEvent = MouseEventHdr->GetPointerEvent();
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    auto keyEvent = InputHandler->GetKeyEvent();
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
+    for (const int32_t& keyCode : pressedKeys) {
+        MMI_HILOGI("Pressed keyCode:%{public}d", keyCode);
+    }
+    pointerEvent->SetPressedKeys(pressedKeys);
+    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
+    nextHandler_->HandlePointerEvent(pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
 }
 
 int32_t InputEventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
@@ -258,29 +247,6 @@ int32_t InputEventNormalizeHandler::HandleGestureEvent(libinput_event* event)
     return RET_OK;
 }
 
-int32_t InputEventNormalizeHandler::HandleMouseEvent(libinput_event* event)
-{
-    if (nextHandler_ == nullptr) {
-        MMI_HILOGW("Pointer device does not support");
-        return ERROR_UNSUPPORT;
-    }
-#ifdef OHOS_BUILD_ENABLE_POINTER
-    MouseEventHdr->Normalize(event);
-    auto pointerEvent = MouseEventHdr->GetPointerEvent();
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    auto keyEvent = InputHandler->GetKeyEvent();
-    CHKPR(keyEvent, ERROR_NULL_POINTER);
-    std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
-    for (const int32_t& keyCode : pressedKeys) {
-        MMI_HILOGI("Pressed keyCode:%{public}d", keyCode);
-    }
-    pointerEvent->SetPressedKeys(pressedKeys);
-    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
-    nextHandler_->HandlePointerEvent(pointerEvent);
-#endif // OHOS_BUILD_ENABLE_POINTER
-    return RET_OK;
-}
-
 int32_t InputEventNormalizeHandler::HandleTouchEvent(libinput_event* event)
 {
     if (nextHandler_ == nullptr) {
@@ -321,8 +287,42 @@ int32_t InputEventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
         pointerEvent->Reset();
     }
-#endif // ERROR_NULL_POINTER
+#endif // OHOS_BUILD_ENABLE_TOUCH
     return RET_OK;
+}
+
+void InputEventNormalizeHandler::Repeat(const std::shared_ptr<KeyEvent> keyEvent)
+{
+        if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_UP ||
+            keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_DOWN ||
+            keyEvent->GetKeyCode() == KeyEvent::KEYCODE_DEL) {
+            if (!TimerMgr->IsExist(timerId_) && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
+                AddHandleTimer();
+                MMI_HILOGD("add a timer");
+            }
+        if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP && TimerMgr->IsExist(timerId_)) {
+            TimerMgr->RemoveTimer(timerId_);
+            timerId_ = -1;
+        }
+    }
+}
+
+void InputEventNormalizeHandler::AddHandleTimer(int32_t timeout)
+{
+    timerId_ = TimerMgr->AddTimer(timeout, 1, [this]() {
+        MMI_HILOGD("enter");
+        auto keyEvent = InputHandler->GetKeyEvent();
+        CHKPV(keyEvent);
+        if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
+            MMI_HILOGD("key up");
+            return;
+        }
+        CHKPV(nextHandler_);
+        nextHandler_->HandleKeyEvent(keyEvent);
+        constexpr int32_t triggerTime = 100;
+        this->AddHandleTimer(triggerTime);
+        MMI_HILOGD("leave");
+    });
 }
 } // namespace MMI
 } // namespace OHOS

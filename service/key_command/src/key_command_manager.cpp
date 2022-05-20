@@ -284,6 +284,7 @@ void KeyCommandManager::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 #ifdef OHOS_BUILD_ENABLE_POINTER
 void KeyCommandManager::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CHKPV(pointerEvent);
     CHKPV(nextHandler_);
     nextHandler_->HandlePointerEvent(pointerEvent);
 }
@@ -292,6 +293,7 @@ void KeyCommandManager::HandlePointerEvent(std::shared_ptr<PointerEvent> pointer
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 void KeyCommandManager::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CHKPV(pointerEvent);
     CHKPV(nextHandler_);
     nextHandler_->HandleTouchEvent(pointerEvent);
 }
