@@ -33,6 +33,7 @@ config("libmmi_server_config") {
     "key_command/include",
     "subscriber/include",
     "timer_manager/include",
+    "permission_helper/include",
     "${mmi_service_path}/connect_manager/include",
 
     #"${mmi_service_path}/event_handler/include",
@@ -145,6 +146,7 @@ ohos_shared_library("libmmi-server") {
     "module_loader/src/uds_server.cpp",
     "monitor/src/input_event_monitor_manager.cpp",
     "monitor/src/input_handler_manager_global.cpp",
+    "permission_helper/src/permission_helper.cpp",
     "subscriber/src/key_option.cpp",
     "timer_manager/src/timer_manager.cpp",
     "window_manager/src/input_windows_manager.cpp",
