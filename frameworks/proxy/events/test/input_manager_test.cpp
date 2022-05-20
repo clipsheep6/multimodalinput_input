@@ -2275,8 +2275,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_001, TestSize.L
     EXPECT_TRUE(IsValidHandlerId(monitorId));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    int32_t response = InputManager::GetInstance()->InjectPointerEvent(pointerEvent);
+    int32_t response = ERROR_UNSUPPORT;
 #ifdef OHOS_BUILD_ENABLE_POINTER
+    response = MMIEventHdl.InjectPointerEvent(pointerEvent);
     EXPECT_EQ(RET_OK, response);
 
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
@@ -2324,8 +2325,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_002, TestSize.L
     EXPECT_TRUE(IsValidHandlerId(monitorId));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    int32_t response = InputManager::GetInstance()->InjectPointerEvent(pointerEvent);
+    int32_t response = ERROR_UNSUPPORT;
 #ifdef OHOS_BUILD_ENABLE_POINTER
+    response = MMIEventHdl.InjectPointerEvent(pointerEvent);
     EXPECT_EQ(RET_OK, response);
 
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
@@ -2373,8 +2375,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_003, TestSize.L
     EXPECT_TRUE(IsValidHandlerId(monitorId));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    int32_t response = InputManager::GetInstance()->InjectPointerEvent(pointerEvent);
+    int32_t response = ERROR_UNSUPPORT;
 #ifdef OHOS_BUILD_ENABLE_POINTER
+    response = MMIEventHdl.InjectPointerEvent(pointerEvent);
     EXPECT_EQ(RET_OK, response);
 
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
@@ -2487,12 +2490,16 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_005, TestSize.L
     EXPECT_TRUE(IsValidHandlerId(monitorId));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    int32_t response = InputManager::GetInstance()->InjectPointerEvent(pointerEvent);
+    int32_t response = ERROR_UNSUPPORT;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    response = MMIEventHdl.InjectPointerEvent(pointerEvent);
     EXPECT_EQ(RET_OK, response);
 
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     EXPECT_TRUE(!tLogs.empty());
-
+#else // OHOS_BUILD_ENABLE_POINTER
+    EXPECT_EQ(ERROR_UNSUPPORT, response);
+#endif
     InputManager::GetInstance()->RemoveMonitor(monitorId);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
