@@ -22,6 +22,7 @@
 #include <queue>
 
 #include "id_factory.h"
+#include "util.h"
 
 namespace OHOS {
 namespace MMI {
@@ -72,11 +73,19 @@ public:
     bool Init();
     void ProcessTasks();
     int32_t PostSyncTask(ETaskCallback callback);
-    bool PostAsyncTask(ETaskCallback callback);
+    int32_t PostAsyncTask(ETaskCallback callback);
 
     int32_t GetReadFd() const
     {
         return fds_[0];
+    }
+    void SetWorkerThreadId(uint64_t tid)
+    {
+        workerThreadId_ = tid;
+    }
+    bool IsCallFromWorkerThread() const
+    {
+        return (GetThisThreadId() == workerThreadId_);
     }
 
 private:
@@ -84,6 +93,7 @@ private:
     TaskPtr PostTask(ETaskCallback callback, Promise *promise = nullptr);
 
 private:
+    uint64_t workerThreadId_ = 0;
     int32_t fds_[2] = {};
     std::mutex mux_;
     std::queue<TaskPtr> tasks_;

@@ -66,6 +66,9 @@ void EntrustTasks::ProcessTasks()
 int32_t EntrustTasks::PostSyncTask(ETaskCallback callback)
 {
     CALL_LOG_ENTER;
+    if (IsCallFromWorkerThread()) {
+        return callback();
+    }
     Promise promise;
     Future future = promise.get_future();
     auto task = PostTask(callback, &promise);
@@ -85,9 +88,14 @@ int32_t EntrustTasks::PostSyncTask(ETaskCallback callback)
     return future.get();
 }
 
-bool EntrustTasks::PostAsyncTask(ETaskCallback callback)
+int32_t EntrustTasks::PostAsyncTask(ETaskCallback callback)
 {
-    return (PostTask(callback) != nullptr);
+    if (IsCallFromWorkerThread()) {
+        return callback();
+    }
+    auto task = PostTask(callback);
+    CHKPR(task, ERROR_NULL_POINTER);
+    return RET_OK;
 }
 
 void EntrustTasks::PopPendingTaskList(std::vector<TaskPtr> &tasks)
@@ -105,9 +113,13 @@ void EntrustTasks::PopPendingTaskList(std::vector<TaskPtr> &tasks)
 
 EntrustTasks::TaskPtr EntrustTasks::PostTask(ETaskCallback callback, Promise *promise)
 {
+    if (IsCallFromWorkerThread()) {
+        MMI_HILOGE("This interface cannot be called from a worker thread.");
+        return nullptr;
+    }
     std::lock_guard<std::mutex> guard(mux_);
-    auto tsize = tasks_.size();
     static constexpr int32_t maxTasksLimit = 1000;
+    auto tsize = tasks_.size();
     if (tsize > maxTasksLimit) {
         MMI_HILOGE("Queue is full, not allowed. size:%{public}zu/%{public}d", tsize, maxTasksLimit);
         return nullptr;
