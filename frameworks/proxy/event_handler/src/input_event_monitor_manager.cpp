@@ -25,7 +25,9 @@ namespace OHOS {
 namespace MMI {
 namespace {
 [[maybe_unused]] constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventMonitorManager" };
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 constexpr int32_t INVALID_MONITOR_ID = -1;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 } // namespace
 
 InputEventMonitorManager::InputEventMonitorManager() {}
