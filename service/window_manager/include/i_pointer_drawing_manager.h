@@ -34,6 +34,7 @@ public:
     }
     virtual void DeletePointerVisible(int32_t pid) {}
     virtual void SetPointerVisible(int32_t pid, bool visible) {}
+    virtual void SetMouseLocation(int32_t pid, int32_t x, int32_t y) {}
     virtual bool IsPointerVisible()
     {
         return false;

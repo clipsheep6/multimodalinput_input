@@ -19,6 +19,7 @@
 #include "iremote_broker.h"
 
 #include "i_event_filter.h"
+#include "i_call_dinput.h"
 
 namespace OHOS {
 namespace MMI {
@@ -32,12 +33,28 @@ public:
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) = 0;
     virtual int32_t SetPointerVisible(bool visible) = 0;
     virtual int32_t IsPointerVisible(bool &visible) = 0;
+    virtual int32_t SetPointerLocation(int32_t x, int32_t y) = 0;
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    virtual int32_t GetRemoteInputAbility(std::string deviceId, sptr<ICallDinput> ablitity) = 0;
+    virtual int32_t PrepareRemoteInput(const std::string& deviceId, sptr<ICallDinput> prepareDinput) = 0;
+    virtual int32_t UnprepareRemoteInput(const std::string& deviceId, sptr<ICallDinput> prepareDinput) = 0;
+    virtual int32_t StartRemoteInput(const std::string& deviceId, uint32_t inputAbility, sptr<ICallDinput> prepareDinput) = 0;
+    virtual int32_t StopRemoteInput(const std::string& deviceId, uint32_t inputAbility, sptr<ICallDinput> prepareDinput) = 0;
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
 
     enum {
         ALLOC_SOCKET_FD = 0,
         ADD_INPUT_EVENT_FILTER = 1,
         SET_POINTER_VISIBLE = 2,
         IS_POINTER_VISIBLE = 3,
+        SIMULATE_CROSS_LOCATION = 4,
+        START_REMOTE_INPUT = 5,
+        STOP_REMOTE_INPUT = 6,
+        GET_REMOTE_ABILITY = 7,
+        PREPARE_DINPUT = 8,
+        UNPREPARE_DINPUT = 9,
+        START_DINPUT = 10,
+        STOP_DINPUT = 11,
     };
 
     enum {
