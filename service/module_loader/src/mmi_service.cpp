@@ -227,12 +227,10 @@ void MMIService::OnStart()
 #ifdef OHOS_RSS_CLIENT
     AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
 #endif
-    t_.join();
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
-    std::thread t(std::bind(&MMIService::InitDeviceManager, this));
-    t.detach();
+    AddSystemAbilityListener(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
 #endif // OHOS_DISTRIBUTED_INPUT_MODEL
-
+    t_.join();
 }
 
 void MMIService::OnStop()
@@ -364,30 +362,12 @@ int32_t  MMIService::StopRemoteInput(const std::string& deviceId, uint32_t input
 {
     return DInputMgr->StopRemoteInput(deviceId, inputAbility, prepareDinput);
 }
-void MMIService::InitDeviceManager()
-{
-    bool isInit = false;
-    while (!isInit) {
-        PublishSA();
-        isInit = InputDevMgr->InitDeviceManager();
-    }
-}
-
-void MMIService::PublishSA()
-{
-    int32_t const WAIT_TIME = 1000;
-    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME));  
-    bool ret = SystemAbility::Publish(this);
-    if (!ret) {
-        MMI_HILOGW("Leave, publishing MMIService failed!");
-        return;
-    }
-}
 #endif // OHOS_DISTRIBUTED_INPUT_MODEL
 
-#ifdef OHOS_RSS_CLIENT
+#if (defined OHOS_RSS_CLIENT) || (defined OHOS_DISTRIBUTED_INPUT_MODEL)
 void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
+#ifdef OHOS_RSS_CLIENT
     if (systemAbilityId == RES_SCHED_SYS_ABILITY_ID) {
         int sleepSeconds = 1;
         sleep(sleepSeconds);
@@ -398,6 +378,15 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& 
         ResourceSchedule::ResSchedClient::GetInstance().ReportData(
             ResourceSchedule::ResType::RES_TYPE_REPORT_MMI_PROCESS, tid, payload);
     }
+#endif
+
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    if (DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID == systemAbilityId) {
+        int sleepSeconds = 1;
+        sleep(sleepSeconds);
+        InputDevMgr->InitDeviceManager();
+    }
+#endif
 }
 #endif
 
