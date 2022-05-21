@@ -55,7 +55,8 @@ public:
     virtual int32_t SetPointerVisible(bool visible) override;
     virtual int32_t IsPointerVisible(bool &visible) override;
     virtual int32_t SetPointerLocation(int32_t x, int32_t y) override;
-#ifdef OHOS_RSS_CLIENT
+
+#if (defined OHOS_RSS_CLIENT) || (defined OHOS_DISTRIBUTED_INPUT_MODEL)
     virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
 #endif
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
@@ -81,10 +82,6 @@ protected:
     void OnTimer();
     void OnThread();
     void OnSignalEvent(int32_t signalFd);
-#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
-    void PublishSA();
-    void InitDeviceManager();
-#endif // OHOS_DISTRIBUTED_INPUT_MODEL
 private:
     ServiceRunningState state_ = ServiceRunningState::STATE_NOT_START;
     int32_t mmiFd_ = -1;
