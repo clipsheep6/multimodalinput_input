@@ -209,6 +209,14 @@ std::unique_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixel
     if (pixelMap == nullptr) {
         MMI_HILOGE("pixelMap is nullptr");
     }
+    #ifdef OHOS_RW_RK
+    MMI_HILOGD("Running in RK!");
+    #else
+    if (ret != 0) {
+        MMI_HILOGD("Running in RK!");
+    }
+    MMI_HILOGD("Running in WAGNER!");
+    #endif
     return pixelMap;
 }
 
