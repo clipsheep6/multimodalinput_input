@@ -24,7 +24,8 @@
 
 namespace OHOS {
 namespace MMI {
-struct IInputEventMonitorHandler {
+class IInputEventMonitorHandler {
+public:
     static constexpr int32_t DEFAULT_INTERCEPTOR = 10;
     static constexpr int32_t DEFAULT_MONITOR = 20;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD

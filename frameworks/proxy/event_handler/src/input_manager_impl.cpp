@@ -36,7 +36,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 } // namespace
 
 struct MonitorEventConsumer : public IInputEventConsumer {
-public:
     explicit MonitorEventConsumer(const std::function<void(std::shared_ptr<PointerEvent>)>& monitor)
         : monitor_ (monitor)
     {
@@ -61,7 +60,7 @@ public:
         monitor_(pointerEvent);
     }
 
-    void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const 
+    void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const
     {
         CHKPV(axisEvent);
         CHKPV(axisMonitor_);

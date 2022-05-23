@@ -32,8 +32,8 @@ namespace MMI {
 class InputHandlerManagerGlobal : public IInputEventHandler {
 public:
     InputHandlerManagerGlobal() = default;
-    virtual ~InputHandlerManagerGlobal() = default;
     DISALLOW_COPY_AND_MOVE(InputHandlerManagerGlobal);
+    ~InputHandlerManagerGlobal() = default;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -58,7 +58,8 @@ private:
     void OnSessionLost(SessionPtr session);
 
 private:
-    struct SessionHandler {
+    class SessionHandler {
+    public:
         SessionHandler(int32_t id, InputHandlerType handlerType, SessionPtr session)
             : id_(id), handlerType_(handlerType), session_(session) { }
         void SendToClient(std::shared_ptr<KeyEvent> keyEvent) const;
@@ -78,7 +79,8 @@ private:
         SessionPtr session_ = nullptr;
     };
 
-    struct MonitorCollection : public IInputEventMonitorHandler, protected NoCopyable {
+    class MonitorCollection : public IInputEventMonitorHandler, protected NoCopyable {
+    public:
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
         virtual bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD

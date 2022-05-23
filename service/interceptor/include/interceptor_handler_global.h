@@ -53,7 +53,8 @@ private:
     void OnSessionLost(SessionPtr session);
 
 private:
-    struct SessionHandler {
+    class SessionHandler {
+    public:
         SessionHandler(int32_t id, InputHandlerType handlerType, SessionPtr session)
             : id_(id), handlerType_(handlerType), session_(session) { }
         void SendToClient(std::shared_ptr<KeyEvent> keyEvent) const;
@@ -73,7 +74,8 @@ private:
         SessionPtr session_ = nullptr;
     };
 
-    struct InterceptorCollection : public IInputEventMonitorHandler, protected NoCopyable {
+    class InterceptorCollection : public IInputEventMonitorHandler, protected NoCopyable {
+    public:
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
         virtual bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -83,7 +85,6 @@ private:
         int32_t AddInterceptor(const SessionHandler& interceptor);
         void RemoveInterceptor(const SessionHandler& interceptor);
         void OnSessionLost(SessionPtr session);
-
         std::set<SessionHandler> interceptors_;
     };
 

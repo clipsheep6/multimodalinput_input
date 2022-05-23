@@ -39,7 +39,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-#if defined(OHOS_BUILD_ENABLE_POINTERE) || defined(OHOS_BUILD_ENABLE_TOUCH)
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void OnInputEvent(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent);
 #endif
     void OnConnected();
@@ -66,10 +66,10 @@ private:
     void OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consumer, int32_t handlerId,
         std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-#if defined(OHOS_BUILD_ENABLE_POINTERE) || defined(OHOS_BUILD_ENABLE_TOUCH)
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer, int32_t handlerId,
         std::shared_ptr<PointerEvent> pointerEvent);
-#endif // OHOS_BUILD_ENABLE_POINTERE || OHOS_BUILD_ENABLE_TOUCH
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 private:
     std::mutex mtxHandlers_;
