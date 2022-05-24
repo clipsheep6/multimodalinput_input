@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
 #ifndef CALL_DINPUT_SERVICE_H
 #define CALL_DINPUT_SERVICE_H
 
@@ -45,3 +45,4 @@ private:
 } // namespace MMI
 } // namespace OHOS
 #endif // CALL_DINPUT_SERVICE_H
+#endif

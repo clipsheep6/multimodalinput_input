@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
 
 #ifndef DINPUT_CALLBACK_H
 #define DINPUT_CALLBACK_H
@@ -65,3 +66,4 @@ private:
 }
 }
 #endif // DINPUT_CALLBACK_H
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
