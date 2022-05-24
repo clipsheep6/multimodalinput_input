@@ -26,6 +26,13 @@ config("libmmi_client_config") {
     "event_handler/include",
     "module_loader/include",
   ]
+
+  if (is_mmi_have_key_mouse) {
+    include_dirs += [
+      "//foundation/multimodalinput/input/common/include",
+      "//foundation/multimodalinput/input/service/dinput/include",
+    ]
+  }
 }
 
 config("libmmi_public_client_config") {
@@ -46,10 +53,22 @@ ohos_source_set("libmmi-common") {
     "events/src/pointer_event.cpp",
   ]
 
+  if (is_mmi_have_key_mouse) {
+    sources += [ "events/src/raw_data.cpp" ]
+  }
+
   cflags = [ "-DOHOS_BUILD" ]
 
   if (is_mmi_have_debug) {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+  }
+
+  if (is_mmi_have_dinput) {
+    cflags += [ "-DOHOS_DISTRIBUTED_INPUT_MODEL" ]
+  }
+
+  if (is_mmi_have_dinput) {
+    cflags += [ "-DOHOS_DISTRIBUTED_INPUT_MODEL" ]
   }
 
   public_configs = [ ":libmmi_client_config" ]
@@ -86,6 +105,10 @@ ohos_shared_library("libmmi-client") {
 
   if (is_mmi_have_debug) {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+  }
+
+  if (is_mmi_have_dinput) {
+    cflags += [ "-DOHOS_DISTRIBUTED_INPUT_MODEL" ]
   }
 
   if (mmi_enable_pointer_drawing) {
@@ -165,6 +188,10 @@ ohos_unittest("ut-mmi-proxy-out") {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
   }
 
+  if (is_mmi_have_dinput) {
+    cflags += [ "-DOHOS_DISTRIBUTED_INPUT_MODEL" ]
+  }
+
   if (is_mmi_have_libinput) {
     cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
   }
@@ -224,6 +251,10 @@ ohos_unittest("KeyEventTest") {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
   }
 
+  if (is_mmi_have_dinput) {
+    cflags += [ "-DOHOS_DISTRIBUTED_INPUT_MODEL" ]
+  }
+
   if (is_mmi_have_libinput) {
     cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
   }
@@ -272,6 +303,10 @@ ohos_unittest("InputManagerTest") {
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
   ]
 
+  if (is_mmi_have_key_mouse) {
+    include_dirs += [ "//foundation/multimodalinput/input/service/dinput/include" ]
+  }
+
   if (is_mmi_have_libinput) {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
@@ -280,6 +315,10 @@ ohos_unittest("InputManagerTest") {
 
   if (is_mmi_have_debug) {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+  }
+
+  if (is_mmi_have_dinput) {
+    cflags += [ "-DOHOS_DISTRIBUTED_INPUT_MODEL" ]
   }
 
   if (is_mmi_have_libinput) {
@@ -339,6 +378,10 @@ ohos_unittest("InputManagerManualTest") {
 
   if (is_mmi_have_debug) {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+  }
+
+  if (is_mmi_have_dinput) {
+    cflags += [ "-DOHOS_DISTRIBUTED_INPUT_MODEL" ]
   }
 
   if (is_mmi_have_libinput) {
