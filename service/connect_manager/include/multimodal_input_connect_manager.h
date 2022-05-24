@@ -36,6 +36,17 @@ public:
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
     int32_t SetPointerVisible(bool visible);
     int32_t IsPointerVisible(bool &visible);
+#ifdef OHOS_BUILD_KEY_MOUSE
+    int32_t SetPointerLocation(int32_t x, int32_t y);
+#endif
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    int32_t GetRemoteInputAbility(std::string deviceId, sptr<ICallDinput> ablitity);
+    int32_t PrepareRemoteInput(const std::string& deviceId, sptr<ICallDinput> prepareDinput);
+    int32_t UnprepareRemoteInput(const std::string& deviceId, sptr<ICallDinput> prepareDinput);
+    int32_t StartRemoteInput(const std::string& deviceId, uint32_t inputAbility, sptr<ICallDinput> prepareDinput);
+    int32_t StopRemoteInput(const std::string& deviceId, uint32_t inputAbility, sptr<ICallDinput> prepareDinput);
+
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
 private:
     MultimodalInputConnectManager() = default;
     DISALLOW_COPY_AND_MOVE(MultimodalInputConnectManager);

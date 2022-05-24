@@ -507,5 +507,101 @@ void InputManagerImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCo
 {
     InputDevImpl.SupportKeys(deviceId, keyCodes, callback);
 }
+
+#ifdef OHOS_BUILD_KEY_MOUSE
+int32_t InputManagerImpl::SetPointerLocation(int32_t x, int32_t y)
+{
+    int32_t ret = MultimodalInputConnectManager::GetInstance()->SetPointerLocation(x, y);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SetPointerLocation has send to server fail, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    MMI_HILOGI("SetPointerLocation has send to server success");
+    return RET_OK;
+}
+#endif
+
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+int32_t InputManagerImpl::GetRemoteInputAbility(std::string deviceId,
+    std::function<void(std::set<int32_t>)> remoteTypes)
+{
+    CALL_LOG_ENTER;
+    if (callDinputService_ == nullptr) {
+        callDinputService_ = new CallDinputService();
+    }
+    callDinputService_->SetRemoteAbilityCallback(remoteTypes);
+    int32_t ret = MultimodalInputConnectManager::GetInstance()->GetRemoteInputAbility(deviceId, callDinputService_);
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetRemoteInputAbility has send to server fail, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    MMI_HILOGI("GetRemoteInputAbility has send to server success");
+    return RET_OK;
+}
+
+int32_t InputManagerImpl::PrepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback)
+{
+    CALL_LOG_ENTER;
+    if (callDinputService_ == nullptr) {
+        callDinputService_ = new CallDinputService();
+    }
+    callDinputService_->SetPrepareCallback(callback);
+    int32_t ret = MultimodalInputConnectManager::GetInstance()->PrepareRemoteInput(deviceId, callDinputService_);
+    if (ret != RET_OK) {
+        MMI_HILOGE("PrepareRemoteInput has send to server fail, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    MMI_HILOGI("PrepareRemoteInput has send to server success");
+    return RET_OK;
+}
+
+int32_t InputManagerImpl::UnprepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback)
+{
+    CALL_LOG_ENTER;
+    if (callDinputService_ == nullptr) {
+        callDinputService_ = new CallDinputService();
+    }
+    callDinputService_->SetUnprepareCallback(callback);
+    int32_t ret = MultimodalInputConnectManager::GetInstance()->UnprepareRemoteInput(deviceId, callDinputService_);
+    if (ret != RET_OK) {
+        MMI_HILOGE("UnprepareRemoteInput has send to server fail, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    MMI_HILOGD("UnprepareRemoteInput has send to server success");
+    return RET_OK;
+}
+
+int32_t InputManagerImpl::StartRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback)
+{
+    CALL_LOG_ENTER;
+    if (callDinputService_ == nullptr) {
+        callDinputService_ = new CallDinputService();
+    }
+    callDinputService_->SetStartCallback(callback);
+    int32_t ret = MultimodalInputConnectManager::GetInstance()->StartRemoteInput(deviceId, inputAbility, callDinputService_);
+    if (ret != RET_OK) {
+        MMI_HILOGE("StartRemoteInput has send to server fail, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    MMI_HILOGD("StartRemoteInput has send to server success");
+    return RET_OK;
+}
+
+int32_t InputManagerImpl::StopRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback)
+{
+    CALL_LOG_ENTER;
+    if (callDinputService_ == nullptr) {
+        callDinputService_ = new CallDinputService();
+    }
+    callDinputService_->SetStopCallback(callback);
+    int32_t ret = MultimodalInputConnectManager::GetInstance()->StopRemoteInput(deviceId, inputAbility, callDinputService_);
+    if (ret != RET_OK) {
+        MMI_HILOGE("StopRemoteInput has send to server fail, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    MMI_HILOGD("StopRemoteInput has send to server success");
+    return RET_OK;
+}
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
 } // namespace MMI
 } // namespace OHOS

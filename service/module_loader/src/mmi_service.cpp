@@ -22,7 +22,10 @@
 #ifdef OHOS_RSS_CLIENT
 #include <unordered_map>
 #endif
-
+#ifdef OHOS_BUILD_KEY_MOUSE
+#include "dinput_manager.h"
+#include "input_device_manager.h"
+#endif
 #include "event_dump.h"
 #include "input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
@@ -225,6 +228,9 @@ void MMIService::OnStart()
 #ifdef OHOS_RSS_CLIENT
     AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
 #endif
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    AddSystemAbilityListener(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
     t_.join();
 }
 
@@ -326,9 +332,45 @@ int32_t MMIService::IsPointerVisible(bool &visible)
     return RET_OK;
 }
 
-#ifdef OHOS_RSS_CLIENT
+#ifdef OHOS_BUILD_KEY_MOUSE
+int32_t MMIService::SetPointerLocation(int32_t x, int32_t y)
+{
+    InputHandler->SetAbsolutionLocation(GetCallingPid(), static_cast<double>(x), static_cast<double>(y));
+    return RET_OK;
+}
+#endif
+
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+int32_t MMIService::GetRemoteInputAbility(std::string deviceId, sptr<ICallDinput> ablitity)
+{
+    return InputDevMgr->GetRemoteInputAbility(deviceId, ablitity);
+}
+
+int32_t MMIService::PrepareRemoteInput(const std::string& deviceId, sptr<ICallDinput> prepareDinput)
+{
+    return DInputMgr->PrepareRemoteInput(deviceId, prepareDinput);
+}
+
+int32_t  MMIService::UnprepareRemoteInput(const std::string& deviceId, sptr<ICallDinput> prepareDinput)
+{
+    return DInputMgr->UnprepareRemoteInput(deviceId, prepareDinput);
+}
+
+int32_t  MMIService::StartRemoteInput(const std::string& deviceId, uint32_t inputAbility, sptr<ICallDinput> prepareDinput)
+{
+    return DInputMgr->StartRemoteInput(deviceId, inputAbility, prepareDinput);
+}
+
+int32_t  MMIService::StopRemoteInput(const std::string& deviceId, uint32_t inputAbility, sptr<ICallDinput> prepareDinput) 
+{
+    return DInputMgr->StopRemoteInput(deviceId, inputAbility, prepareDinput);
+}
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
+
+#if (defined OHOS_RSS_CLIENT) || (defined OHOS_DISTRIBUTED_INPUT_MODEL)
 void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
+#ifdef OHOS_RSS_CLIENT
     if (systemAbilityId == RES_SCHED_SYS_ABILITY_ID) {
         int sleepSeconds = 1;
         sleep(sleepSeconds);
@@ -339,6 +381,15 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& 
         ResourceSchedule::ResSchedClient::GetInstance().ReportData(
             ResourceSchedule::ResType::RES_TYPE_REPORT_MMI_PROCESS, tid, payload);
     }
+#endif
+
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    if (DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID == systemAbilityId) {
+        int sleepSeconds = 1;
+        sleep(sleepSeconds);
+        InputDevMgr->InitDeviceManager();
+    }
+#endif
 }
 #endif
 
