@@ -313,7 +313,7 @@ napi_value JsInputDeviceContext::IsPointerVisible(napi_env env, napi_callback_in
         return nullptr;
     }
 
-    return jsInputDeviceMgr->IsPointerVisible(env, argv[0]);nullptr;
+    return jsInputDeviceMgr->IsPointerVisible(env, argv[0]);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
