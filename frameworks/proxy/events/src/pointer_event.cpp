@@ -256,6 +256,18 @@ void PointerEvent::PointerItem::SetToolType(int32_t toolType)
     toolType_ = toolType;
 }
 
+#ifdef OHOS_BUILD_KEY_MOUSE
+RawData PointerEvent::PointerItem::GetRawData() const
+{
+    return rawData_;
+}
+
+void PointerEvent::PointerItem::SetRawData(const RawData& rawData)
+{
+    rawData_ = rawData;
+}
+#endif
+
 bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
 {
     return (
@@ -280,7 +292,12 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         out.WriteInt32(axisLong_) &&
         out.WriteInt32(axisShort_) &&
         out.WriteInt32(toolType_) &&
+#ifdef OHOS_BUILD_KEY_MOUSE
+        out.WriteInt32(deviceId_) &&
+        rawData_.WriteToParcel(out)
+#else
         out.WriteInt32(deviceId_)
+#endif
     );
 }
 
@@ -308,7 +325,12 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         in.ReadInt32(axisLong_) &&
         in.ReadInt32(axisShort_) &&
         in.ReadInt32(toolType_) &&
+#ifdef OHOS_BUILD_KEY_MOUSE
+        in.ReadInt32(deviceId_) &&
+        rawData_.ReadFromParcel(in)
+#else
         in.ReadInt32(deviceId_)
+#endif
     );
 }
 

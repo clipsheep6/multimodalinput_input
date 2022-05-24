@@ -34,6 +34,9 @@ public:
     }
     virtual void DeletePointerVisible(int32_t pid) {}
     virtual void SetPointerVisible(int32_t pid, bool visible) {}
+#ifdef OHOS_BUILD_KEY_MOUSE
+    virtual void SetMouseLocation(int32_t pid, int32_t x, int32_t y) {}
+#endif
     virtual bool IsPointerVisible()
     {
         return false;

@@ -18,6 +18,9 @@
 #include <cinttypes>
 
 #include "ability_manager_client.h"
+#ifdef OHOS_BUILD_KEY_MOUSE
+#include "dinput_manager.h"
+#endif
 #include "hitrace_meter.h"
 #include "input-event-codes.h"
 #include "hisysevent.h"
@@ -155,7 +158,13 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
 {
     CALL_LOG_ENTER;
     CHKPR(key, PARAM_INPUT_INVALID);
-    if (!key->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
+    bool jumpIntercept = false;
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    if (DInputMgr->CheckWhiteList(key, jumpIntercept)) {
+        return RET_OK;
+    }
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
+    if (!jumpIntercept && !key->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
         if (InterHdlGl->HandleEvent(key)) {
             MMI_HILOGD("keyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d",
                 key->GetKeyCode());

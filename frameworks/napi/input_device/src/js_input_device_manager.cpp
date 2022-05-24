@@ -178,6 +178,30 @@ napi_value JsInputDeviceManager::IsPointerVisible(napi_env env, napi_value handl
     return promise;
 }
 
+#ifdef OHOS_BUILD_KEY_MOUSE
+napi_value JsInputDeviceManager::SetPointerLocation(napi_env env, napi_value handle, int32_t x, int32_t y)
+{
+    CALL_LOG_ENTER;
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    if (asyncContext == nullptr) {
+        THROWERR(env, "create AsyncContext failed");
+        return nullptr;
+    }
+    int32_t returnResult = InputManager::GetInstance()->SetPointerLocation(x, y);
+    asyncContext->errorCode = ERR_OK;
+    asyncContext->reserve << ReturnType::NUMBER << returnResult;
+    napi_value promise = nullptr;
+    if (handle != nullptr) {
+        CHKRP(env, napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
+        CHKRP(env, napi_get_undefined(env, &promise), GET_UNDEFINED);
+    } else {
+        CHKRP(env, napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+    }
+    AsyncCallbackWork(asyncContext);
+    return promise;
+}
+#endif
+
 napi_value JsInputDeviceManager::SupportKeys(napi_env env, int32_t id, std::vector<int32_t> keyCodes,
     napi_value handle)
 {

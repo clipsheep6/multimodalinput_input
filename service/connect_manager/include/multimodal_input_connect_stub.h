@@ -40,6 +40,18 @@ protected:
     int32_t StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPointerVisible(MessageParcel& data, MessageParcel& reply);
     int32_t StubIsPointerVisible(MessageParcel& data, MessageParcel& reply);
+#ifdef OHOS_BUILD_KEY_MOUSE
+    int32_t StubSetPointerLocation(MessageParcel& data, MessageParcel& reply);
+#endif
+
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    int32_t StubGetRemoteAbility(MessageParcel& data, MessageParcel& reply);
+    int32_t StubPrepareRemoteInput(MessageParcel& data, MessageParcel& reply);
+    int32_t StubUnprepareRemoteInput(MessageParcel& data, MessageParcel& reply);
+    int32_t StubStartRemoteInput(MessageParcel& data, MessageParcel& reply);
+    int32_t StubStopRemoteInput(MessageParcel& data, MessageParcel& reply);
+
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
 
 private:
     static constexpr int32_t SYSTEM_UID = 1000;
