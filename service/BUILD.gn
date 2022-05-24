@@ -83,6 +83,10 @@ config("libmmi_server_config") {
   if (resource_schedule_service_enabled) {
     cflags += [ "-DOHOS_RSS_CLIENT" ]
   }
+
+  if (mmi_enable_device_manager_api) {
+    cflags += [ "-DOHOS_BUILD_DEVICE_MANAGER_API" ]
+  }
 }
 
 ohos_prebuilt_etc("multimodalinput_config_ability.json") {
@@ -111,7 +115,6 @@ ohos_shared_library("libmmi-server") {
   sources = [
     "//foundation/multimodalinput/input/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
     "device_manager/src/input_device.cpp",
-    "device_manager/src/input_device_manager.cpp",
     "event_dispatch/src/event_dispatch.cpp",
     "event_dump/src/event_dump.cpp",
     "event_handler/src/config_key_value_transform.cpp",
@@ -160,6 +163,12 @@ ohos_shared_library("libmmi-server") {
     sources += [ "interceptor/src/interceptor_handler_global.cpp" ]
   } else {
     sources += [ "interceptor/src/i_interceptor_handler_global.cpp" ]
+  }
+
+  if (mmi_enable_device_manager_api) {
+    sources += [ "device_manager/src/input_device_manager.cpp" ]
+  } else {
+    sources += [ "device_manager/src/i_input_device_manager.cpp" ]
   }
 
   sources += [ "module_loader/src/mmi_service.cpp" ]

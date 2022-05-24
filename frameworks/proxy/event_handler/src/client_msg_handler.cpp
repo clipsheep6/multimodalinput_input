@@ -289,7 +289,7 @@ int32_t ClientMsgHandler::OnDevMonitor(const UDSClient& client, NetPacket& pkt)
         MMI_HILOGE("Packet read type failed");
         return RET_ERR;
     }
-    InputDeviceImpl::GetInstance().OnDevMonitor(type, deviceId);
+    InputDevImpl.OnDevMonitor(type, deviceId);
     return RET_OK;
 }
 

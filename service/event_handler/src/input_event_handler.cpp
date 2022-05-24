@@ -29,7 +29,7 @@
 
 #include "bytrace_adapter.h"
 #include "config_key_value_transform.h"
-#include "input_device_manager.h"
+#include "define_device_manager.h"
 #include "mmi_func_callback.h"
 #include "mouse_event_handler.h"
 #include "libinput_adapter.h"

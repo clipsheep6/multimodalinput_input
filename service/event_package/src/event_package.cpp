@@ -16,7 +16,7 @@
 #include "event_package.h"
 
 #include "config_key_value_transform.h"
-#include "input_device_manager.h"
+#include "define_device_manager.h"
 
 namespace OHOS {
 namespace MMI {

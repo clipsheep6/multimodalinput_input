@@ -102,6 +102,10 @@ ohos_shared_library("libmmi-client") {
     sources += [ "event_handler/src/i_input_interceptor_manager.cpp" ]
   }
 
+  if (mmi_enable_device_manager_api) {
+    cflags += [ "-DOHOS_BUILD_DEVICE_MANAGER_API" ]
+  }
+
   configs = [
     ":libmmi_client_config",
     "//foundation/multimodalinput/input/util:libmmi_util_public_config",

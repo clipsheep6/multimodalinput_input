@@ -24,7 +24,7 @@
 #include "pixel_map.h"
 
 #include "define_multimodal.h"
-#include "input_device_manager.h"
+#include "define_device_manager.h"
 #include "mmi_log.h"
 
 namespace OHOS {
