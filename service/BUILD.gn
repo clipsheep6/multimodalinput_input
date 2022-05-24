@@ -222,7 +222,6 @@ ohos_shared_library("libmmi-server") {
     "multimedia_image_standard:image_native",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
-    "distributed_input:libdinput_sdk",
     "device_manager_base:devicemanagersdk",
   ]
 
@@ -230,6 +229,10 @@ ohos_shared_library("libmmi-server") {
     external_deps += [ "window_manager:libwm" ]
   }
 
+  if (is_mmi_have_dinput) {
+    external_deps += [ "distributed_input:libdinput_sdk"]
+  }
+  
   part_name = "input"
 }
 
