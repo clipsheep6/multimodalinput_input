@@ -94,8 +94,7 @@ OHOS::DistributedHardware::DistributedInput::DInputServerType DInputManager::Get
 OHOS::DistributedHardware::DistributedInput::DInputServerType DInputManager::IsStartDistributedInput(uint32_t inputAbility)
 {
     MMI_HILOGD("enter: inputAbility = %{public}d", inputAbility);
-    // return OHOS::DistributedHardware::DistributedInput::DistributedInputKit::IsStartDistributedInput(inputAbility);
-    return DistributedHardware::DistributedInput::DInputServerType::SOURCE_SERVER_TYPE;
+    return OHOS::DistributedHardware::DistributedInput::DistributedInputKit::IsStartDistributedInput(inputAbility);
 }
 
 bool DInputManager::IsNeedFilterOut(const std::string deviceId, const std::shared_ptr<KeyEvent> key)

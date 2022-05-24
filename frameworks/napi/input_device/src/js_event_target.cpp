@@ -51,12 +51,11 @@ JsEventTarget::~JsEventTarget() {}
 void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(work);
     CHKPV(work->data);
     auto temp = static_cast<std::unique_ptr<JsUtil::CallbackInfo>*>(work->data);
     delete work;
-    
+
     auto addEvent = devMonitor_.find(CHANGED_TYPE);
     if (addEvent == devMonitor_.end()) {
         MMI_HILOGE("find changed event failed");
@@ -73,22 +72,22 @@ void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
              CREATE_STRING_UTF8);
         napi_value deviceId = nullptr;
         CHKRV(item->env, napi_create_int32(item->env, item->data.deviceId, &deviceId), CREATE_INT32);
-        napi_value object = nullptr;
-        CHKRV(item->env, napi_create_object(item->env, &object), CREATE_OBJECT);
-        CHKRV(item->env, napi_set_named_property(item->env, object, "type", eventType), SET_NAMED_PROPERTY);
-        CHKRV(item->env, napi_set_named_property(item->env, object, "deviceId", deviceId), SET_NAMED_PROPERTY);
+        napi_value resultObj[2] = {0};
+        napi_get_undefined(item->env, &resultObj[0]);
+        CHKRV(item->env, napi_create_object(item->env, &resultObj[1]), CREATE_OBJECT);
+        CHKRV(item->env, napi_set_named_property(item->env, resultObj[1], "ChangedType", eventType), SET_NAMED_PROPERTY);
+        CHKRV(item->env, napi_set_named_property(item->env, resultObj[1], "deviceId", deviceId), SET_NAMED_PROPERTY);
 
         napi_value handler = nullptr;
         CHKRV(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE);
         napi_value ret = nullptr;
-        CHKRV(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret), CALL_FUNCTION);
+        CHKRV(item->env, napi_call_function(item->env, nullptr, handler, 2, &resultObj[0], &ret), CALL_FUNCTION);
     }
 }
 
 void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(work);
     CHKPV(work->data);
     auto temp = static_cast<std::unique_ptr<JsUtil::CallbackInfo>*>(work->data);
@@ -110,15 +109,16 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
              CREATE_STRING_UTF8);
         napi_value deviceId = nullptr;
         CHKRV(item->env, napi_create_int32(item->env, item->data.deviceId, &deviceId), CREATE_INT32);
-        napi_value object = nullptr;
-        CHKRV(item->env, napi_create_object(item->env, &object), CREATE_OBJECT);
-        CHKRV(item->env, napi_set_named_property(item->env, object, "type", eventType), SET_NAMED_PROPERTY);
-        CHKRV(item->env, napi_set_named_property(item->env, object, "deviceId", deviceId), SET_NAMED_PROPERTY);
+        napi_value resultObj[2] = {0};
+        napi_get_undefined(item->env, &resultObj[0]);
+        CHKRV(item->env, napi_create_object(item->env, &resultObj[1]), CREATE_OBJECT);
+        CHKRV(item->env, napi_set_named_property(item->env, resultObj[1], "ChangedType", eventType), SET_NAMED_PROPERTY);
+        CHKRV(item->env, napi_set_named_property(item->env, resultObj[1], "deviceId", deviceId), SET_NAMED_PROPERTY);
 
         napi_value handler = nullptr;
         CHKRV(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE);
         napi_value ret = nullptr;
-        CHKRV(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret), CALL_FUNCTION);
+        CHKRV(item->env, napi_call_function(item->env, nullptr, handler, 2, &resultObj[0], &ret), CALL_FUNCTION);
     }
 }
 
@@ -542,7 +542,7 @@ napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, co
         callback_.emplace(userData, std::move(cb));
         return promise;
     }
-
+    
     CHKRP(env, napi_create_reference(env, handle, 1, &cb->ref), CREATE_REFERENCE);
     callback_.emplace(userData, std::move(cb));
     return nullptr;

@@ -45,8 +45,12 @@ if (is_mmi_have_dinput) {
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
       "safwk:system_ability_fwk",
-      "distributed_input:libdinput_sdk",
     ]
+
+    if (is_mmi_have_dinput) {
+    external_deps += [ "distributed_input:libdinput_sdk"]
+    }
+    
   }
   ohos_source_set("mmi_dinput_proxy") {
     sources = [

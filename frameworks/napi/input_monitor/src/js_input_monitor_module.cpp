@@ -57,7 +57,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         THROWERR(env, "Register js monitor failed, the first parameter is invalid");
         return nullptr;
     }
-
+    
     CHKRP(env, napi_typeof(env, argv[1], &valueType), TYPEOF);
     if (valueType != napi_function) {
         THROWERR(env, "The second param is not napi_function");
