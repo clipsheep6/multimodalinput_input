@@ -16,7 +16,6 @@
 #ifndef MULTIMODAL_INPUT_CONNECT_STUB_H
 #define MULTIMODAL_INPUT_CONNECT_STUB_H
 
-#include "ipc_skeleton.h"
 #include "iremote_stub.h"
 #include "message_parcel.h"
 #include "nocopyable.h"
