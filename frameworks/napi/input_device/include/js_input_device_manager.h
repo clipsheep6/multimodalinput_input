@@ -33,7 +33,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_POINTER
     napi_value SetPointerVisible(napi_env env, bool visible, napi_value handle = nullptr);
     napi_value IsPointerVisible(napi_env env, napi_value handle = nullptr);
-#endif
+#endif // OHOS_BUILD_ENABLE_POINTER
     napi_value SupportKeys(napi_env env, int32_t id, std::vector<int32_t> keyCodes,
                                    napi_value handle = nullptr);
     napi_value GetKeyboardType(napi_env env, int32_t id, napi_value handle = nullptr);
