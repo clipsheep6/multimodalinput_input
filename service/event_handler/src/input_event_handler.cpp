@@ -28,8 +28,8 @@
 #include "libinput.h"
 
 #include "bytrace_adapter.h"
-#include "config_key_value_transform.h"
 #include "input_device_manager.h"
+#include "key_map_manager.h"
 #include "key_command_manager.h"
 #include "libinput_adapter.h"
 #include "mmi_func_callback.h"
@@ -317,16 +317,16 @@ int32_t InputEventHandler::OnEventDeviceAdded(libinput_event *event)
     auto device = libinput_event_get_device(event);
     CHKPR(device, ERROR_NULL_POINTER);
     InputDevMgr->OnInputDeviceAdded(device);
-    KeyValueTransform->ParseDeviceConfigFile(event);
+    KeyMapMgr->ParseDeviceConfigFile(device);
     return RET_OK;
 }
 
 int32_t InputEventHandler::OnEventDeviceRemoved(libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
-    KeyValueTransform->RemoveKeyValue(event);
     auto device = libinput_event_get_device(event);
     CHKPR(device, ERROR_NULL_POINTER);
+    KeyMapMgr->RemoveKeyValue(device);
     InputDevMgr->OnInputDeviceRemoved(device);
     return RET_OK;
 }
