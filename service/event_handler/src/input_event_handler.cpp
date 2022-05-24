@@ -28,6 +28,9 @@
 #include "libinput.h"
 
 #include "bytrace_adapter.h"
+#ifdef OHOS_BUILD_KEY_MOUSE
+#include "dinput_manager.h"
+#endif
 #include "input_device_manager.h"
 #include "key_map_manager.h"
 #include "mmi_func_callback.h"
@@ -317,9 +320,24 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
     return RET_OK;
 }
 
+#ifdef OHOS_BUILD_KEY_MOUSE
+void InputEventHandler::SetAbsolutionLocation(int32_t pid, double absX, double absY)
+{
+    MouseEventHdr->SetAbsolutionLocation(pid, absX, absY);
+}
+#endif
+
 int32_t InputEventHandler::OnEventPointer(libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
+
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    // SINK_SERVER_TYPE，discard event.
+    if (!DInputMgr->IsControllerSide(MOUSE_ABILITY | TOUCHPAD_ABILITY)) {
+        MMI_HILOGD("OnEventPointer::dinput controlled point event droped");
+        return RET_OK;
+    }
+#endif
     return OnMouseEventHandler(event);
 }
 
@@ -378,6 +396,12 @@ int32_t InputEventHandler::OnEventTouch(libinput_event *event)
 
 int32_t InputEventHandler::OnEventTouchpad(libinput_event *event)
 {
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    if (!DInputMgr->IsControllerSide(KEYBOARD_ABILITY)) {
+        MMI_HILOGD("OnEventTouchpad::dinput controlled touchpad event droped");
+        return RET_OK;
+    }
+#endif
     CHKPR(event, ERROR_NULL_POINTER);
     OnEventTouchPadSecond(event);
     return RET_OK;

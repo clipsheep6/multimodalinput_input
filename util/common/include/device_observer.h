@@ -20,14 +20,22 @@ namespace OHOS {
 namespace MMI {
 class IDeviceObserver {
 public:
+#ifdef OHOS_BUILD_KEY_MOUSE
+    virtual void UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible) = 0;
+#else
     virtual void UpdatePointerDevice(bool hasPointerDevice) = 0;
+#endif
 };
 
 class IDeviceObject {
 public:
     virtual void Attach(std::shared_ptr<IDeviceObserver> observer) = 0;
     virtual void Detach(std::shared_ptr<IDeviceObserver> observer) = 0;
+#ifdef OHOS_BUILD_KEY_MOUSE
+    virtual void NotifyPointerDevice(bool hasPointerDevice, bool isPointerVisible) = 0;
+#else
     virtual void NotifyPointerDevice(bool hasPointerDevice) = 0;
+#endif
 };
 } // namespace MMI
 } // namespace OHOS

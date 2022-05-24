@@ -58,6 +58,11 @@ ohos_executable("uinput_inject") {
 
 config("multimodalinput_mmi_public_config") {
   include_dirs = [ "util/common/include/" ]
+
+  cflags = [ "-DOHOS_BUILD" ]
+  if (is_mmi_have_key_mouse) {
+    cflags += [ "-DOHOS_BUILD_KEY_MOUSE" ]
+  }
 }
 
 group("multimodalinput_mmi_packages") {
@@ -70,6 +75,10 @@ group("multimodalinput_mmi_packages") {
     "service:libmmi-server",
     "tools/inject_event:uinput",
   ]
+  
+  if (is_mmi_have_dinput) {
+    deps += [ "frameworks/napi/distributed_input:distributedinput" ]
+  }
 }
 
 group("mmi_debug_tools") {
