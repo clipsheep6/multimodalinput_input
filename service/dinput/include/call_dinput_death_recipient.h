@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
 #ifndef CALL_DINPUT_DEATH_RECIPIENT_H
 #define CALL_DINPUT_DEATH_RECIPIENT_H
 
@@ -34,3 +34,4 @@ private:
 } // namespace OHOS
 
 #endif // REMOTE_INPUT_ABILITY_DEATH_RECIPIENT_H
+#endif

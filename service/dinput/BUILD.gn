@@ -21,11 +21,16 @@ config("mmi_dinput_config") {
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
     "//foundation/multimodalinput/input/util/common/include",
+    "${dinput_path}/include",
+  ]
+
+  if (is_mmi_have_dinput) {
+    include_dirs += [
     "//foundation/distributedhardware/distributedinput/common/include",
     "//foundation/distributedhardware/distributedinput/frameworks/include",
     "//foundation/distributedhardware/distributedinput/interfaces/ipc/include",
-    "${dinput_path}/include",
-  ]
+    ]
+  }
 }
 if (is_mmi_have_dinput) {
   ohos_source_set("mmi_dinput_service") {
@@ -50,7 +55,7 @@ if (is_mmi_have_dinput) {
     if (is_mmi_have_dinput) {
     external_deps += [ "distributed_input:libdinput_sdk"]
     }
-    
+
   }
   ohos_source_set("mmi_dinput_proxy") {
     sources = [

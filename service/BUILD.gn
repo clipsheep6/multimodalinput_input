@@ -49,14 +49,6 @@ config("libmmi_server_config") {
     "//foundation/multimodalinput/input/util/network/include",
     "//foundation/multimodalinput/input/frameworks/proxy/event_handler/include",
     "//third_party/cJSON",
-    "//foundation/distributedhardware/distributedinput/common/include",
-    "//foundation/distributedhardware/distributedinput/frameworks/include",
-    "//foundation/distributedhardware/distributedinput/interfaces/inner_kits/include",
-    "//foundation/distributedhardware/distributedinput/interfaces/ipc/include",
-    "//foundation/distributedhardware/distributedhardwarefwk/common/utils/include",
-    "//foundation/distributedhardware/distributedhardwarefwk/common/log/include",
-    "//foundation/distributedhardware/distributedhardwarefwk/utils/include/log",
-    "//foundation/distributedhardware/devicemanager/interfaces/inner_kits/native_cpp/include",
   ]
 
   if (is_mmi_have_hdf) {
@@ -69,7 +61,18 @@ config("libmmi_server_config") {
       "$root_out_dir/diff_libinput_mmi/include/linux",
     ]
   }
-
+  if (is_mmi_have_dinput) {
+    include_dirs += [
+    "//foundation/distributedhardware/distributedinput/common/include",
+    "//foundation/distributedhardware/distributedinput/frameworks/include",
+    "//foundation/distributedhardware/distributedinput/interfaces/inner_kits/include",
+    "//foundation/distributedhardware/distributedinput/interfaces/ipc/include",
+    "//foundation/distributedhardware/distributedhardwarefwk/common/utils/include",
+    "//foundation/distributedhardware/distributedhardwarefwk/common/log/include",
+    "//foundation/distributedhardware/distributedhardwarefwk/utils/include/log",
+    "//foundation/distributedhardware/devicemanager/interfaces/inner_kits/native_cpp/include",
+      ]
+  }
   cflags = [ "-DOHOS_BUILD" ]
 
   if (is_mmi_have_debug) {
@@ -232,7 +235,7 @@ ohos_shared_library("libmmi-server") {
   if (is_mmi_have_dinput) {
     external_deps += [ "distributed_input:libdinput_sdk"]
   }
-  
+
   part_name = "input"
 }
 

@@ -14,11 +14,15 @@
  */
 
 #include "input_device_manager.h"
-#include "constants_dinput.h"
+
 #include "device_manager.h"
-#include "dinput_manager.h"
 #include "key_event_value_transformation.h"
 #include "system_ability_definition.h"
+
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+#include "constants_dinput.h"
+#include "dinput_manager.h"
+#endif
 
 namespace OHOS {
 namespace MMI {
@@ -86,8 +90,11 @@ std::shared_ptr<InputDevice> InputDeviceManager::MakeInputDevice(int32_t id, str
     auto phys = libinput_device_get_phys(libinputDevice);
     inputDevice->SetPhys((phys == nullptr) ? ("null") : (phys));
     inputDevice->SetNetworkId((MakeNetworkId(inputDevice->GetPhys())));
+    inputDevice->SetRemote(false);
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
     std::string::size_type pos = inputDevice->GetName().find(VIRTUAL_DEVICE_NAME);
     inputDevice->SetRemote(pos != inputDevice->GetName().npos);
+#endif
     auto uniq = libinput_device_get_uniq(libinputDevice);
     inputDevice->SetUniq((uniq == nullptr) ? ("null") : (uniq));
 
@@ -207,10 +214,12 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     }
     inputDevice_[nextId_] = inputDevice;
     bool isRemote = false;
+    bool isDistributedInput = false;
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
     isRemote = IsRemote(inputDevice);
+    isDistributedInput = IsDistributedInput(inputDevice);
 #endif // OHOS_DISTRIBUTED_INPUT_MODEL
-    if (!isRemote || IsDistributedInput(inputDevice)) {
+    if (!isRemote || isDistributedInput) {
         HandleDeviceChanged(DEVICE_ADD, nextId_);
     }
     ++nextId_;
@@ -355,6 +364,7 @@ int32_t InputDeviceManager::FindInputDeviceId(struct libinput_device* inputDevic
 //     }
 // }
 
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
 bool InputDeviceManager::IsRemote(struct libinput_device* inputDevice) const
 {
     CHKPR(inputDevice, false);
@@ -368,7 +378,6 @@ bool InputDeviceManager::IsRemote(struct libinput_device* inputDevice) const
     return isRemote;
 }
 
-#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
 std::shared_ptr<InputDevice> InputDeviceManager::GetRemoteInputDevice(int32_t id)
 {
     CALL_LOG_ENTER;
