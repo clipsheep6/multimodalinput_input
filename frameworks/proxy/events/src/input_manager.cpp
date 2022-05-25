@@ -133,6 +133,12 @@ int32_t InputManager::SetPointerVisible(bool visible)
 {
     return InputMgrImpl->GetInstance()->SetPointerVisible(visible);
 }
+
+void InputManager::SetPointerSpeed(int32_t pointerSpeed)
+{
+    InputMgrImpl->SetPointerSpeed(pointerSpeed);
+}
+
 bool InputManager::IsPointerVisible()
 {
     return InputMgrImpl->GetInstance()->IsPointerVisible();

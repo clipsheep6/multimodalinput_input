@@ -216,5 +216,20 @@ int32_t MultimodalEventHandler::AddInputEventTouchpadMontior(int32_t pointerEven
         MMI_HILOGD("sendAdd msg Success");
     return RET_OK;
 }
+
+int32_t MultimodalEventHandler::SetPointerSpeed(int32_t pointerSpeed)
+{
+    CALL_LOG_ENTER;
+    if (!InitClient()) {
+        MMI_HILOGE("Init client faild");
+        return MMI_SERVICE_INVALID;
+    }
+    NetPacket pkt(MmiMessageId::INPUT_POINTER_SPEED);
+    pkt << pointerSpeed;
+    if (!client_->SendMessage(pkt)) {
+        MMI_HILOGE("Send pkt of pointer speed faild");
+    }
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

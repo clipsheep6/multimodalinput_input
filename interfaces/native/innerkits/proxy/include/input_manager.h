@@ -228,6 +228,14 @@ public:
      */
     bool IsPointerVisible();
 
+    /**
+     * @brief Sets the pointer speed.
+     * @param pointerSpeed indicates that the speed of pointer movement set by the client.
+     * @return void
+     * @since 9
+     */
+    void SetPointerSpeed(int32_t pointerSpeed);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);
