@@ -245,7 +245,7 @@ int32_t InputEventHandler::OnEventDeviceAdded(libinput_event *event)
     CHKPR(device, ERROR_NULL_POINTER);
     InputDevMgr->OnInputDeviceAdded(device);
     KeyMapMgr->ParseDeviceConfigFile(device);
-	KeyRepeat->AddDeviceConfig(device);
+    KeyRepeat->AddDeviceConfig(device);
     return RET_OK;
 }
 
@@ -255,7 +255,7 @@ int32_t InputEventHandler::OnEventDeviceRemoved(libinput_event *event)
     auto device = libinput_event_get_device(event);
     CHKPR(device, ERROR_NULL_POINTER);
     KeyMapMgr->RemoveKeyValue(device);
-	KeyRepeat->RemoveDeviceConfig(device);
+    KeyRepeat->RemoveDeviceConfig(device);
     InputDevMgr->OnInputDeviceRemoved(device);
     return RET_OK;
 }
