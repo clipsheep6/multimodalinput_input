@@ -314,6 +314,43 @@ napi_value JsInputDeviceContext::IsPointerVisible(napi_env env, napi_callback_in
 
     return jsInputDeviceMgr->IsPointerVisible(env, argv[0]);
 }
+
+#ifdef OHOS_BUILD_KEY_MOUSE
+napi_value JsInputDeviceContext::SetPointerLocation(napi_env env, napi_callback_info info)
+{
+    CALL_LOG_ENTER;
+    size_t argc = 3;
+    napi_value argv[3];
+    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc > 3 || argc < 2) {
+        THROWERR(env, "the number of parameters is not as expected");
+        return nullptr;
+    }
+    if (!JsUtil::TypeOf(env, argv[0], napi_number)) {
+        THROWERR(env, "The first parameter type is wrong");
+        return nullptr;
+    }
+    if (!JsUtil::TypeOf(env, argv[1], napi_number)) {
+        THROWERR(env, "The second parameter type is wrong");
+        return nullptr;
+    }
+    int32_t x = 0;
+    int32_t y = 0;
+    CHKRP(env, napi_get_value_int32(env, argv[0], &x), GET_INT32);
+    CHKRP(env, napi_get_value_int32(env, argv[1], &y), GET_INT32);
+    JsInputDeviceContext *jsPointer = JsInputDeviceContext::GetInstance(env);
+    auto jsInputDeviceMgr = jsPointer->GetJsInputDeviceMgr();
+    if (argc == 2) {
+        return jsInputDeviceMgr->SetPointerLocation(env, nullptr, x, y);
+    }
+    if (!JsUtil::TypeOf(env, argv[2], napi_function)) {
+        THROWERR(env, "The third parameter type is wrong");
+        return nullptr;
+    }
+    return jsInputDeviceMgr->SetPointerLocation(env, argv[2], x, y);
+}
+#endif
+
 napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info info)
 {
     CALL_LOG_ENTER;
@@ -414,6 +451,9 @@ napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("isPointerVisible", IsPointerVisible),
         DECLARE_NAPI_STATIC_FUNCTION("supportKeys", SupportKeys),
         DECLARE_NAPI_STATIC_FUNCTION("getKeyboardType", GetKeyboardType),
+#ifdef OHOS_BUILD_KEY_MOUSE 
+        DECLARE_NAPI_STATIC_FUNCTION("setPointerLocation", SetPointerLocation),
+#endif
     };
     CHKRP(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     return exports;

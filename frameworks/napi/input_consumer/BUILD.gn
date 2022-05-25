@@ -13,7 +13,17 @@
 
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
-config("libinputeventclient_config") {
+if (is_mmi_have_key_mouse) {
+  config("libinputconsumer_config") {
+  visibility = [ ":*" ]
+
+  include_dirs = [
+@@ -32,6 +33,27 @@ config("libinputeventclient_config") {
+    cflags += [ "-DOHOS_BUILD_HDF" ]
+  }
+}
+} else {
+  config("libinputeventclient_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
@@ -32,6 +42,7 @@ config("libinputeventclient_config") {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 }
+}
 
 ohos_shared_library("inputconsumer") {
   sources = [
@@ -39,7 +50,11 @@ ohos_shared_library("inputconsumer") {
     "src/js_register_util.cpp",
   ]
 
-  configs = [ ":libinputeventclient_config" ]
+  if (is_mmi_have_key_mouse) {
+    configs = [ ":libinputconsumer_config" ]
+  } else {
+    configs = [ ":libinputeventclient_config" ]
+  }
 
   deps = [
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
