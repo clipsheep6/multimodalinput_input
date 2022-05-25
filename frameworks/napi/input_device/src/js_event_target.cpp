@@ -51,7 +51,9 @@ JsEventTarget::~JsEventTarget() {}
 void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
+#ifndef OHOS_BUILD_KEY_MOUSE
     std::lock_guard<std::mutex> guard(mutex_);
+#endif
     CHKPV(work);
     CHKPV(work->data);
     auto temp = static_cast<std::unique_ptr<JsUtil::CallbackInfo>*>(work->data);
@@ -73,22 +75,37 @@ void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
              CREATE_STRING_UTF8);
         napi_value deviceId = nullptr;
         CHKRV(item->env, napi_create_int32(item->env, item->data.deviceId, &deviceId), CREATE_INT32);
+#ifdef OHOS_BUILD_KEY_MOUSE
+        napi_value resultObj[2] = {0};
+        napi_get_undefined(item->env, &resultObj[0]);
+        CHKRV(item->env, napi_create_object(item->env, &resultObj[1]), CREATE_OBJECT);
+        CHKRV(item->env, napi_set_named_property(item->env, resultObj[1], "ChangedType", eventType), SET_NAMED_PROPERTY);
+        CHKRV(item->env, napi_set_named_property(item->env, resultObj[1], "deviceId", deviceId), SET_NAMED_PROPERTY);
+#else
         napi_value object = nullptr;
         CHKRV(item->env, napi_create_object(item->env, &object), CREATE_OBJECT);
         CHKRV(item->env, napi_set_named_property(item->env, object, "type", eventType), SET_NAMED_PROPERTY);
         CHKRV(item->env, napi_set_named_property(item->env, object, "deviceId", deviceId), SET_NAMED_PROPERTY);
+#endif
 
         napi_value handler = nullptr;
         CHKRV(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE);
         napi_value ret = nullptr;
+#ifdef OHOS_BUILD_KEY_MOUSE
+        CHKRV(item->env, napi_call_function(item->env, nullptr, handler, 2, &resultObj[0], &ret), CALL_FUNCTION);
+#else
         CHKRV(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret), CALL_FUNCTION);
+#endif
     }
 }
+
 
 void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
 {
     CALL_LOG_ENTER;
+#ifndef OHOS_BUILD_KEY_MOUSE
     std::lock_guard<std::mutex> guard(mutex_);
+#endif
     CHKPV(work);
     CHKPV(work->data);
     auto temp = static_cast<std::unique_ptr<JsUtil::CallbackInfo>*>(work->data);
@@ -110,15 +127,26 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
              CREATE_STRING_UTF8);
         napi_value deviceId = nullptr;
         CHKRV(item->env, napi_create_int32(item->env, item->data.deviceId, &deviceId), CREATE_INT32);
+#ifdef OHOS_BUILD_KEY_MOUSE
+        napi_value resultObj[2] = {0};
+        napi_get_undefined(item->env, &resultObj[0]);
+        CHKRV(item->env, napi_create_object(item->env, &resultObj[1]), CREATE_OBJECT);
+        CHKRV(item->env, napi_set_named_property(item->env, resultObj[1], "ChangedType", eventType), SET_NAMED_PROPERTY);
+        CHKRV(item->env, napi_set_named_property(item->env, resultObj[1], "deviceId", deviceId), SET_NAMED_PROPERTY);
+#else
         napi_value object = nullptr;
         CHKRV(item->env, napi_create_object(item->env, &object), CREATE_OBJECT);
         CHKRV(item->env, napi_set_named_property(item->env, object, "type", eventType), SET_NAMED_PROPERTY);
         CHKRV(item->env, napi_set_named_property(item->env, object, "deviceId", deviceId), SET_NAMED_PROPERTY);
-
+#endif
         napi_value handler = nullptr;
         CHKRV(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE);
         napi_value ret = nullptr;
+#ifdef OHOS_BUILD_KEY_MOUSE
+        CHKRV(item->env, napi_call_function(item->env, nullptr, handler, 2, &resultObj[0], &ret), CALL_FUNCTION);
+#else
         CHKRV(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret), CALL_FUNCTION);
+#endif
     }
 }
 
