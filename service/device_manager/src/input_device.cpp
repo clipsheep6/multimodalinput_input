@@ -106,7 +106,24 @@ std::string InputDevice::GetUniq() const
 {
     return uniq_;
 }
-
+#ifdef OHOS_BUILD_KEY_MOUSE
+void InputDevice::SetNetworkId(std::string networkId)
+{
+    networkId_ = networkId;
+}
+std::string InputDevice::GetNetworkId() const
+{
+    return networkId_;
+}
+void InputDevice::SetRemote(bool isRemote)
+{
+    isRemote_ = isRemote;
+}
+bool InputDevice::IsRemote() const
+{
+    return isRemote_;
+}
+#endif
 void InputDevice::AddAxisInfo(AxisInfo axis)
 {
     axis_.push_back(axis);
