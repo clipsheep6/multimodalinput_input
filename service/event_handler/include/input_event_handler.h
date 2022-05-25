@@ -43,7 +43,6 @@ public:
     virtual ~InputEventHandler() override;
     void Init(UDSServer& udsServer);
     void OnEvent(void *event);
-    void OnCheckEventReport();
     UDSServer *GetUDSServer() const;
     std::shared_ptr<KeyEvent> GetKeyEvent() const;
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
@@ -78,9 +77,6 @@ private:
     std::shared_ptr<InputHandlerManagerGlobal> monitorHandler_ = nullptr;
 
     uint64_t idSeed_ = 0;
-    int32_t eventType_ = 0;
-    int64_t initSysClock_ = 0;
-    int64_t lastSysClock_ = 0;
 };
 #define InputHandler InputEventHandler::GetInstance()
 } // namespace MMI
