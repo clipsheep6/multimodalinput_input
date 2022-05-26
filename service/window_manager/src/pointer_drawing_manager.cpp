@@ -209,6 +209,14 @@ std::unique_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixel
     if (pixelMap == nullptr) {
         MMI_HILOGE("pixelMap is nullptr");
     }
+    #ifdef OHOS_RW_RK
+    MMI_HILOGD("Running in RK!");
+    #else
+    if (ret != 0) {
+        MMI_HILOGD("Running in RK!");
+    }
+    MMI_HILOGD("Running in WAGNER!");
+    #endif
     return pixelMap;
 }
 
@@ -222,12 +230,22 @@ void PointerDrawingManager::OnDisplayInfo(int32_t displayId, int32_t width, int3
     DrawManager();
 }
 
+#ifdef OHOS_BUILD_KEY_MOUSE
+void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible)
+{
+    CALL_LOG_ENTER;
+    hasPointerDevice_ = hasPointerDevice;
+    UpdataPidInfo(getpid(), isPointerVisible);
+    DrawManager();
+}
+#else
 void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice)
 {
     CALL_LOG_ENTER;
     hasPointerDevice_ = hasPointerDevice;
     DrawManager();
 }
+#endif
 
 void PointerDrawingManager::DrawManager()
 {
@@ -326,5 +344,19 @@ void PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
     UpdataPidInfo(pid, visible);
     UpdataPointerVisible();
 }
+
+#ifdef OHOS_BUILD_KEY_MOUSE
+void PointerDrawingManager::SetMouseLocation(int32_t pid, int32_t x, int32_t y)
+{
+    CALL_LOG_ENTER;
+    FixCursorPosition(x, y);
+    lastGlobalX_ = x;
+    lastGlobalY_ = y;
+    if (pointerWindow_ != nullptr) {
+        pointerWindow_->MoveTo(x, y);
+        SetPointerVisible(pid, true);
+    }
+}
+#endif
 } // namespace MMI
 } // namespace OHOS

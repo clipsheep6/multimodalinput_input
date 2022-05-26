@@ -42,6 +42,9 @@ public:
     UDSServer *GetUDSServer() const;
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
     void AddHandleTimer(int32_t timeout = 300);
+#ifdef OHOS_BUILD_KEY_MOUSE
+    void SetAbsolutionLocation(int32_t pid, double absX, double absY);
+#endif
 protected:
     int32_t OnEventDeviceAdded(libinput_event *event);
     int32_t OnEventDeviceRemoved(libinput_event *event);
