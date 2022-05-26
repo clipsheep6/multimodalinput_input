@@ -27,6 +27,9 @@
 #include "parcel.h"
 
 #include "input_event.h"
+#ifdef OHOS_BUILD_KEY_MOUSE
+#include "raw_data.h"
+#endif
 
 namespace OHOS {
 namespace MMI {
@@ -569,7 +572,21 @@ public:
          * @since 9
          */
         void SetToolType(int32_t toolType);
-
+#ifdef OHOS_BUILD_KEY_MOUSE
+        /**
+         * @brief Obtains the RawData of the active window.
+         * @return Returns the RawData.
+         * @since 9
+         */
+        RawData GetRawData() const;
+        /**
+         * @brief Sets the RawData for the active window.
+         * @param rawData Indicates the rawData to set.
+         * @return void
+         * @since 9
+         */
+        void SetRawData(const RawData& rawData);
+#endif
         /**
          * @brief Writes data to a <b>Parcel</b> obejct.
          * @param out Indicates the object into which data will be written.
@@ -609,6 +626,9 @@ public:
         int32_t deviceId_ {};
         int64_t downTime_ {};
         int32_t toolType_ {};
+#ifdef OHOS_BUILD_KEY_MOUSE
+        RawData rawData_;
+#endif
     };
 
 public:

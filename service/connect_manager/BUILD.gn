@@ -28,6 +28,14 @@ config("mmi_connect_manager_config") {
     "//foundation/multimodalinput/input/service/permission_helper/include",
     "${mmi_connect_manager_path}/include",
   ]
+
+  if (is_mmi_have_key_mouse) {
+    include_dirs += [ 
+      "//foundation/multimodalinput/input/service/dinput/include",
+      "//foundation/distributedhardware/distributedinput/frameworks/include",
+      "//foundation/multimodalinput/input/service/remote_input_ability/include",
+    ]
+  }
 }
 
 ohos_source_set("mmi_connect_manager_service") {
@@ -40,6 +48,10 @@ ohos_source_set("mmi_connect_manager_service") {
   configs = [ ":mmi_connect_manager_config" ]
 
   cflags = [ "-DOHOS_BUILD" ]
+
+  if (is_mmi_have_key_mouse) {
+    cflags += [ "-DOHOS_BUILD_KEY_MOUSE" ]
+  }
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
@@ -62,6 +74,10 @@ ohos_source_set("mmi_connect_manager_proxy") {
   configs = [ ":mmi_connect_manager_config" ]
 
   cflags = [ "-DOHOS_BUILD" ]
+  
+  if (is_mmi_have_key_mouse) {
+    cflags += [ "-DOHOS_BUILD_KEY_MOUSE" ]
+  }
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",

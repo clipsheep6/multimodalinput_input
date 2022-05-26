@@ -20,10 +20,16 @@
 #include "input-event-codes.h"
 
 #include "define_multimodal.h"
+#ifdef OHOS_BUILD_KEY_MOUSE
+#include "dinput_manager.h"
+#endif
 #include "input_device_manager.h"
 #include "input_event_handler.h"
 #include "input_windows_manager.h"
 #include "mouse_device_state.h"
+#ifdef OHOS_BUILD_KEY_MOUSE
+#include "pointer_drawing_manager.h"
+#endif
 #include "timer_manager.h"
 #include "util.h"
 
@@ -49,13 +55,14 @@ int32_t MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
     CHKPR(data, ERROR_NULL_POINTER);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent_->SetButtonId(buttionId_);
-
     InitAbsolution();
-    absolutionX_ += libinput_event_pointer_get_dx(data);
-    absolutionY_ += libinput_event_pointer_get_dy(data);
-
+    double x = libinput_event_pointer_get_dx(data);
+    double y = libinput_event_pointer_get_dy(data);
+    MMI_HILOGD("x:%{public}lf,y:%{public}lf,absolutionX_:%{public}lf,absolutionY_:%{public}lf",
+        x, y, absolutionX_, absolutionY_);
+    absolutionX_ += x;
+    absolutionY_ += y;
     WinMgr->UpdateAndAdjustMouseLoction(absolutionX_, absolutionY_);
-
     MMI_HILOGD("Change Coordinate : x:%{public}lf,y:%{public}lf",  absolutionX_, absolutionY_);
     return RET_OK;
 }
@@ -201,7 +208,9 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
     pointerItem.SetPressure(0);
     pointerItem.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
     pointerItem.SetDeviceId(deviceId);
-
+#ifdef OHOS_BUILD_KEY_MOUSE
+    SetDxDyForDInput(pointerItem, data);
+#endif
     pointerEvent_->UpdateId();
     pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
@@ -209,10 +218,39 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
     pointerEvent_->SetActionStartTime(time);
     pointerEvent_->SetDeviceId(deviceId);
     pointerEvent_->SetPointerId(0);
+#ifdef OHOS_BUILD_KEY_MOUSE
+    pointerEvent_->SetTargetDisplayId(mouseInfo.displayId);
+#else
     pointerEvent_->SetTargetDisplayId(-1);
+#endif
     pointerEvent_->SetTargetWindowId(-1);
     pointerEvent_->SetAgentWindowId(-1);
 }
+
+#ifdef OHOS_BUILD_KEY_MOUSE
+void MouseEventHandler::SetDxDyForDInput(PointerEvent::PointerItem& pointerItem, libinput_event_pointer* data)
+{
+    double dx = libinput_event_pointer_get_dx(data);
+    double dy = libinput_event_pointer_get_dy(data);
+    int32_t rawDataDx = static_cast<int32_t>(dx);
+    int32_t rawDataDy = static_cast<int32_t>(dy);
+    pointerItem.SetRawData(RawData(rawDataDx, rawDataDy));
+    DInputMgr->GetMouseLocation().dx = rawDataDx;
+    DInputMgr->GetMouseLocation().dy = rawDataDy;
+    MMI_HILOGD("MouseEventHandler SetDxDyForDInput : dx:%{public}d, dy:%{public}d", rawDataDx, rawDataDy);
+}
+
+void MouseEventHandler::SetAbsolutionLocation(int32_t pid, double absX, double absY)
+{
+    MMI_HILOGD("MouseEventHandler cross screen location : x:%{public}lf, y:%{public}lf", absX, absY);
+    absolutionX_ = absX;
+    absolutionY_ = absY;
+    WinMgr->UpdateAndAdjustMouseLoction(absolutionX_, absolutionY_);
+    int32_t globalX = WinMgr->GetMouseInfo().globalX;
+    int32_t globalY = WinMgr->GetMouseInfo().globalY;
+    IPointerDrawingManager::GetInstance()->SetPointerLocation(pid, globalX, globalY);
+}
+#endif
 
 int32_t MouseEventHandler::Normalize(struct libinput_event *event)
 {

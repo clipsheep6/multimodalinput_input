@@ -30,7 +30,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 std::shared_ptr<MultimodalInputConnectManager> g_instance = nullptr;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectManager"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectManager" };
 } // namespace
 
 std::shared_ptr<MultimodalInputConnectManager> MultimodalInputConnectManager::GetInstance()
@@ -94,6 +94,58 @@ int32_t MultimodalInputConnectManager::IsPointerVisible(bool &visible)
     CHKPR(multimodalInputConnectService_, RET_ERR);
     return multimodalInputConnectService_->IsPointerVisible(visible);
 }
+#ifdef OHOS_BUILD_KEY_MOUSE
+int32_t MultimodalInputConnectManager::SetPointerLocation(int32_t x, int32_t y)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->SetPointerLocation(x, y);
+}
+
+int32_t MultimodalInputConnectManager::GetRemoteInputAbility(std::string deviceId, sptr<ICallDinput> ablitity)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    int32_t ret = multimodalInputConnectService_->GetRemoteInputAbility(deviceId, ablitity);
+    return ret;
+}
+
+int32_t MultimodalInputConnectManager::PrepareRemoteInput(const std::string& deviceId,
+    sptr<ICallDinput> prepareDinput)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    int32_t ret = multimodalInputConnectService_->PrepareRemoteInput(deviceId, prepareDinput);
+    return ret;
+}
+
+int32_t MultimodalInputConnectManager::UnprepareRemoteInput(const std::string& deviceId,
+    sptr<ICallDinput> prepareDinput)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    int32_t ret = multimodalInputConnectService_->UnprepareRemoteInput(deviceId, prepareDinput);
+    return ret;
+}
+
+int32_t MultimodalInputConnectManager::StartRemoteInput(const std::string& deviceId,
+    uint32_t inputAbility, sptr<ICallDinput> prepareDinput)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    int32_t ret = multimodalInputConnectService_->StartRemoteInput(deviceId, inputAbility, prepareDinput);
+    return ret;
+}
+
+int32_t MultimodalInputConnectManager::StopRemoteInput(const std::string& deviceId,
+    uint32_t inputAbility, sptr<ICallDinput> prepareDinput)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    int32_t ret = multimodalInputConnectService_->StopRemoteInput(deviceId, inputAbility, prepareDinput);
+    return ret;
+}
+#endif // OHOS_BUILD_KEY_MOUSE
 
 bool MultimodalInputConnectManager::ConnectMultimodalInputService()
 {

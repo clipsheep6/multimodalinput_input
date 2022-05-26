@@ -41,11 +41,18 @@ public:
     DISALLOW_COPY_AND_MOVE(PointerDrawingManager);
     void DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY);
     void OnDisplayInfo(int32_t displayId, int32_t width, int32_t height);
+#ifdef OHOS_BUILD_KEY_MOUSE
+    void UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible);
+#else
     void UpdatePointerDevice(bool hasPointerDevice);
+#endif
     bool Init();
     void DeletePointerVisible(int32_t pid);
     int32_t SetPointerVisible(int32_t pid, bool visible);
     bool IsPointerVisible();
+#ifdef OHOS_BUILD_KEY_MOUSE
+    void SetPointerLocation(int32_t pid, int32_t x, int32_t y);
+#endif
 
 public:
     static const int32_t IMAGE_WIDTH = 64;
