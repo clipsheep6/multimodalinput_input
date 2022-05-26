@@ -70,7 +70,7 @@ group("multimodalinput_mmi_packages") {
     "tools/inject_event:uinput",
   ]
 
-  if (mmi_enable_device_manager_api) {
+  if (mmi_enable_input_device) {
     deps += [ "frameworks/napi/input_device:inputdevice" ]
   }
 }
