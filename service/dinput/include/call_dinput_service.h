@@ -25,11 +25,11 @@ class CallDinputService final : public CallDinputStub {
 public:
     CallDinputService();
     ~CallDinputService();
-    virtual bool HandlePrepareDinput(std::string deviceId, int32_t status) override;
-    virtual bool HandleUnprepareDinput(std::string deviceId, int32_t status) override;
-    virtual bool HandleStartDinput(std::string deviceId, uint32_t inputTypes, int32_t status) override;
-    virtual bool HandleStopDinput(std::string deviceId, uint32_t inputTypes, int32_t status) override;
-    virtual bool HandleRemoteInputAbility(const std::set<int32_t> remoteInputAbility) override;
+    virtual int32_t HandlePrepareDinput(std::string deviceId, int32_t status) override;
+    virtual int32_t HandleUnprepareDinput(std::string deviceId, int32_t status) override;
+    virtual int32_t HandleStartDinput(std::string deviceId, uint32_t inputTypes, int32_t status) override;
+    virtual int32_t HandleStopDinput(std::string deviceId, uint32_t inputTypes, int32_t status) override;
+    virtual int32_t HandleRemoteInputAbility(const std::set<int32_t> remoteInputAbility) override;
     virtual void SetPrepareCallback(const std::function<void(int32_t)> callback);
     virtual void SetUnprepareCallback(const std::function<void(int32_t)> callback);
     virtual void SetStartCallback(const std::function<void(int32_t)> callback);

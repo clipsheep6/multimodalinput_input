@@ -349,11 +349,11 @@ int32_t JsInputMonitor::GetMousePointerItem(const std::shared_ptr<PointerEvent> 
                 MMI_HILOGE("Set deviceId property failed");
                 return RET_ERR;
             }
-            if (SetNameProperty(jsEnv_, result, "screenX", item.GetGlobalX()) != napi_ok) {
+            if (SetNameProperty(jsEnv_, result, "globalX", item.GetGlobalX()) != napi_ok) {
                 MMI_HILOGE("Set globalX property failed");
                 return RET_ERR;
             }
-            if (SetNameProperty(jsEnv_, result, "screenY", item.GetGlobalY()) != napi_ok) {
+            if (SetNameProperty(jsEnv_, result, "globalY", item.GetGlobalY()) != napi_ok) {
                 MMI_HILOGE("Set globalY property failed");
                 return RET_ERR;
             }

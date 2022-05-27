@@ -30,7 +30,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputD
 constexpr int32_t INVALID_DEVICE_ID = -1;
 constexpr int32_t SUPPORT_KEY = 1;
 const char *SPLIT_SYMBOL = "|";
-// constexpr int32_t READ_CMD_BUFF_SIZE = 1024;
 
 constexpr int32_t ABS_MT_TOUCH_MAJOR = 0x30;
 constexpr int32_t ABS_MT_TOUCH_MINOR = 0x31;

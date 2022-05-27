@@ -59,8 +59,8 @@ int32_t CallDinputStub::StubHandlePrepareDinput(MessageParcel& data, MessageParc
     CALL_LOG_ENTER;
     std::string deviceId = data.ReadString();
     int32_t status = data.ReadInt32();
-    bool ret = HandlePrepareDinput(deviceId, status);
-    if (!reply.WriteBool(ret)) {
+    int32_t ret = HandlePrepareDinput(deviceId, status);
+    if (!reply.WriteInt32(ret)) {
         MMI_HILOGW("WriteBool:%{public}d fail", ret);
         return RET_ERR;
     }
@@ -74,8 +74,8 @@ int32_t CallDinputStub::StubHandleUnprepareDinput(MessageParcel& data, MessagePa
     CALL_LOG_ENTER;
     std::string deviceId = data.ReadString();
     int32_t status = data.ReadInt32();
-    bool ret = HandleUnprepareDinput(deviceId, status);
-    if (!reply.WriteBool(ret)) {
+    int32_t ret = HandleUnprepareDinput(deviceId, status);
+    if (!reply.WriteInt32(ret)) {
         MMI_HILOGW("WriteBool:%{public}d fail", ret);
         return RET_ERR;
     }
@@ -90,8 +90,8 @@ int32_t CallDinputStub::StubHandleStartDinput(MessageParcel& data, MessageParcel
     std::string deviceId = data.ReadString();
     int32_t inputAbility = data.ReadInt32();
     int32_t status = data.ReadInt32();
-    bool ret = HandleStartDinput(deviceId, inputAbility, status);
-    if (!reply.WriteBool(ret)) {
+    int32_t ret = HandleStartDinput(deviceId, inputAbility, status);
+    if (!reply.WriteInt32(ret)) {
         MMI_HILOGW("WriteBool:%{public}d fail", ret);
         return RET_ERR;
     }
@@ -106,8 +106,8 @@ int32_t CallDinputStub::StubHandleStopDinput(MessageParcel& data, MessageParcel&
     std::string deviceId = data.ReadString();
     int32_t inputAbility = data.ReadInt32();
     int32_t status = data.ReadInt32();
-    bool ret = HandleStopDinput(deviceId, inputAbility, status);
-    if (!reply.WriteBool(ret)) {
+    int32_t ret = HandleStopDinput(deviceId, inputAbility, status);
+    if (!reply.WriteInt32(ret)) {
         MMI_HILOGW("WriteBool:%{public}d fail", ret);
         return RET_ERR;
     }
@@ -124,8 +124,8 @@ int32_t CallDinputStub::StubHandleRemoteInputAbility(MessageParcel& data, Messag
     for (size_t i = 0; i < size; i++) {
         remoteInputAbility.insert(data.ReadInt32());
     }
-    bool ret = HandleRemoteInputAbility(remoteInputAbility);
-    if (!reply.WriteBool(ret)) {
+    int32_t ret = HandleRemoteInputAbility(remoteInputAbility);
+    if (!reply.WriteInt32(ret)) {
         MMI_HILOGW("WriteBool:%{public}d fail", ret);
         return RET_ERR;
     }

@@ -35,7 +35,7 @@ CallDinputProxy::~CallDinputProxy()
     MMI_HILOGD("~CallDinputProxy()");
 }
 
-bool CallDinputProxy::HandlePrepareDinput(std::string deviceId, int32_t status)
+int32_t CallDinputProxy::HandlePrepareDinput(std::string deviceId, int32_t status)
 {
     CALL_LOG_ENTER;
     MessageParcel data;
@@ -56,17 +56,17 @@ bool CallDinputProxy::HandlePrepareDinput(std::string deviceId, int32_t status)
 
     MMI_HILOGD("have recieve message from server");
 
-    bool result = false;
-    if (!reply.ReadBool(result)) {
+    int32_t result = RET_ERR;
+    if (!reply.ReadInt32(result)) {
         MMI_HILOGW("reply ReadBool fail");
-        return false;
+        return RET_ERR;
     }
 
     MMI_HILOGD("leave");
     return result;
 }
 
-bool CallDinputProxy::HandleUnprepareDinput(std::string deviceId, int32_t status)
+int32_t CallDinputProxy::HandleUnprepareDinput(std::string deviceId, int32_t status)
 {
     CALL_LOG_ENTER;
     MessageParcel data;
@@ -87,17 +87,17 @@ bool CallDinputProxy::HandleUnprepareDinput(std::string deviceId, int32_t status
 
     MMI_HILOGD("have recieve message from server");
 
-    bool result = false;
-    if (!reply.ReadBool(result)) {
+    int32_t result = RET_ERR;
+    if (!reply.ReadInt32(result)) {
         MMI_HILOGW("reply ReadBool fail");
-        return false;
+        return RET_ERR;
     }
 
     MMI_HILOGD("leave");
     return result;
 }
 
-bool CallDinputProxy::HandleStartDinput(std::string deviceId, uint32_t inputTypes, int32_t status)
+int32_t CallDinputProxy::HandleStartDinput(std::string deviceId, uint32_t inputTypes, int32_t status)
 {
     CALL_LOG_ENTER;
     MessageParcel data;
@@ -119,17 +119,17 @@ bool CallDinputProxy::HandleStartDinput(std::string deviceId, uint32_t inputType
 
     MMI_HILOGD("have recieve message from server");
 
-    bool result = false;
-    if (!reply.ReadBool(result)) {
+    int32_t result = RET_ERR;
+    if (!reply.ReadInt32(result)) {
         MMI_HILOGW("reply ReadBool fail");
-        return false;
+        return RET_ERR;
     }
 
     MMI_HILOGD("leave");
     return result;
 }
 
-bool CallDinputProxy::HandleStopDinput(std::string deviceId, uint32_t inputTypes, int32_t status)
+int32_t CallDinputProxy::HandleStopDinput(std::string deviceId, uint32_t inputTypes, int32_t status)
 {
     CALL_LOG_ENTER;
     MessageParcel data;
@@ -151,17 +151,17 @@ bool CallDinputProxy::HandleStopDinput(std::string deviceId, uint32_t inputTypes
 
     MMI_HILOGD("have recieve message from server");
 
-    bool result = false;
-    if (!reply.ReadBool(result)) {
+    int32_t result = RET_ERR;
+    if (!reply.ReadInt32(result)) {
         MMI_HILOGW("reply ReadBool fail");
-        return false;
+        return RET_ERR;
     }
 
     MMI_HILOGD("leave");
     return result;
 }
 
-bool CallDinputProxy::HandleRemoteInputAbility(const std::set<int32_t> remoteInputAbility)
+int32_t CallDinputProxy::HandleRemoteInputAbility(const std::set<int32_t> remoteInputAbility)
 {
     CALL_LOG_ENTER;
     MessageParcel data;
@@ -184,10 +184,10 @@ bool CallDinputProxy::HandleRemoteInputAbility(const std::set<int32_t> remoteInp
 
     MMI_HILOGD("have recieve message from server");
 
-    bool result = false;
-    if (!reply.ReadBool(result)) {
+    int32_t result = RET_ERR;
+    if (!reply.ReadInt32(result)) {
         MMI_HILOGW("reply ReadBool fail");
-        return false;
+        return RET_ERR;
     }
 
     MMI_HILOGD("leave");

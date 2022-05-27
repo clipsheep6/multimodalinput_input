@@ -53,11 +53,8 @@ int32_t MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
     pointerEvent_->SetButtonId(buttionId_);
 
     InitAbsolution();
-    double x = libinput_event_pointer_get_dx(data);
-    double y = libinput_event_pointer_get_dy(data);
-    MMI_HILOGD("x:%{public}lf,y:%{public}lf,absolutionX_:%{public}lf,absolutionY_:%{public}lf",  x, y, absolutionX_, absolutionY_);
-    absolutionX_ += x;
-    absolutionY_ += y;
+    absolutionX_ += libinput_event_pointer_get_dx(data);
+    absolutionY_ += libinput_event_pointer_get_dy(data);
 
     WinMgr->UpdateAndAdjustMouseLoction(absolutionX_, absolutionY_);
 
