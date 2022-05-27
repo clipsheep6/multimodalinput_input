@@ -26,7 +26,7 @@
 namespace OHOS {
 namespace MMI {
 typedef std::function<int32_t(SessionPtr sess, NetPacket& pkt)> ServerMsgFun;
-class ServerMsgHandler : public MsgHandler<ServerMsgFun> {
+class ServerMsgHandler : public MsgHandler<MmiMessageId, ServerMsgFun> {
 public:
     ServerMsgHandler();
     DISALLOW_COPY_AND_MOVE(ServerMsgHandler);

@@ -329,6 +329,7 @@ int32_t ServerMsgHandler::OnMoveMouse(SessionPtr sess, NetPacket& pkt)
     if (!MouseEventHdr->NormalizeMoveMouse(offsetX, offsetY)) {
         MMI_HILOGE("There hasn't any pointer device");
         return RET_ERR;
+        MMI_HILOGD("Mouse movement message processed successfully");
     }
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);

@@ -20,6 +20,7 @@
 #include "error_multimodal.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
+#include "key_autorepeat.h"
 #include "key_event_value_transformation.h"
 #include "mmi_log.h"
 #include "timer_manager.h"
@@ -151,6 +152,12 @@ int32_t InputEventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     auto keyEvent = InputHandler->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     CHKPR(event, ERROR_NULL_POINTER);
+    std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
+    int32_t lastPressedKey = -1;
+    if (!pressedKeys.empty()) {
+        lastPressedKey = pressedKeys.back();
+        MMI_HILOGD("The last repeat button, keyCode:%{public}d", lastPressedKey);
+    }
     auto packageResult = eventPackage_.PackageKeyEvent(event, keyEvent);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
         MMI_HILOGD("The same event reported by multi_device should be discarded");
@@ -160,13 +167,13 @@ int32_t InputEventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
         MMI_HILOGE("KeyEvent package failed. ret:%{public}d,errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
         return KEY_EVENT_PKG_FAIL;
     }
+
     BytraceAdapter::StartBytrace(keyEvent);
+
     nextHandler_->HandleKeyEvent(keyEvent);
-#ifndef OHOS_BUILD_ENABLE_INTERCEPTOR
-    MMI_HILOGW("Key handle module dose not support");
-#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
-    Repeat(keyEvent);
+    KeyRepeat->SelectAutoRepeat(keyEvent, lastPressedKey);
     MMI_HILOGD("keyCode:%{public}d,action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
 }
@@ -309,38 +316,18 @@ int32_t InputEventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
     return RET_OK;
 }
 
-void InputEventNormalizeHandler::Repeat(const std::shared_ptr<KeyEvent> keyEvent)
+int32_t InputEventNormalizeHandler::AddHandleTimer(int32_t timeout)
 {
-        if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_UP ||
-            keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_DOWN ||
-            keyEvent->GetKeyCode() == KeyEvent::KEYCODE_DEL) {
-            if (!TimerMgr->IsExist(timerId_) && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
-                AddHandleTimer();
-                MMI_HILOGD("add a timer");
-            }
-        if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP && TimerMgr->IsExist(timerId_)) {
-            TimerMgr->RemoveTimer(timerId_);
-            timerId_ = -1;
-        }
-    }
-}
-
-void InputEventNormalizeHandler::AddHandleTimer(int32_t timeout)
-{
+    CALL_LOG_ENTER;
     timerId_ = TimerMgr->AddTimer(timeout, 1, [this]() {
-        MMI_HILOGD("enter");
         auto keyEvent = InputHandler->GetKeyEvent();
         CHKPV(keyEvent);
-        if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
-            MMI_HILOGD("key up");
-            return;
-        }
         CHKPV(nextHandler_);
         nextHandler_->HandleKeyEvent(keyEvent);
-        constexpr int32_t triggerTime = 100;
-        this->AddHandleTimer(triggerTime);
-        MMI_HILOGD("leave");
+        int32_t triggertime = KeyRepeat->GetIntervalTime(keyEvent->GetDeviceId());
+        this->AddHandleTimer(triggertime);
     });
+    return timerId_;
 }
 } // namespace MMI
 } // namespace OHOS

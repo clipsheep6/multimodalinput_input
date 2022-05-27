@@ -31,11 +31,11 @@ public:
     void HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
     void HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
     void HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+    int32_t AddHandleTimer(int32_t timeout = 300);
    
 private:
     int32_t HandleKeyboardEvent(libinput_event* event);
     void Repeat(const std::shared_ptr<KeyEvent> keyEvent);
-    void AddHandleTimer(int32_t timeout = 300);
     int32_t HandleTouchPadEvent(libinput_event* event);
     int32_t HandleGestureEvent(libinput_event* event);
     int32_t HandleMouseEvent(libinput_event* event);

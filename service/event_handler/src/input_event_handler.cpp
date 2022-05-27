@@ -29,8 +29,9 @@
 
 #include "bytrace_adapter.h"
 #include "input_device_manager.h"
-#include "key_map_manager.h"
+#include "key_autorepeat.h"
 #include "key_command_manager.h"
+#include "key_map_manager.h"
 #include "libinput_adapter.h"
 #include "mmi_func_callback.h"
 #include "time_cost_chk.h"
@@ -296,6 +297,7 @@ int32_t InputEventHandler::OnEventDeviceAdded(libinput_event *event)
     CHKPR(device, ERROR_NULL_POINTER);
     InputDevMgr->OnInputDeviceAdded(device);
     KeyMapMgr->ParseDeviceConfigFile(device);
+    KeyRepeat->AddDeviceConfig(device);
     return RET_OK;
 }
 
@@ -305,6 +307,7 @@ int32_t InputEventHandler::OnEventDeviceRemoved(libinput_event *event)
     auto device = libinput_event_get_device(event);
     CHKPR(device, ERROR_NULL_POINTER);
     KeyMapMgr->RemoveKeyValue(device);
+    KeyRepeat->RemoveDeviceConfig(device);
     InputDevMgr->OnInputDeviceRemoved(device);
     return RET_OK;
 }
