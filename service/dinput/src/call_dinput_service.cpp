@@ -14,9 +14,12 @@
  */
 
 #include "call_dinput_service.h"
+
 #include <cstring>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include "error_multimodal.h"
 #include "mmi_log.h"
 #include "string_ex.h"
 
@@ -59,34 +62,34 @@ void CallDinputService::SetRemoteAbilityCallback(std::function<void(std::set<int
     remoteAbilityCallback_ = callback;
 }
 
-bool CallDinputService::HandlePrepareDinput(std::string deviceId, int32_t status)
+int32_t CallDinputService::HandlePrepareDinput(std::string deviceId, int32_t status)
 {
-    CHKPF(prepareCallback_);
+    CHKPR(prepareCallback_, ERROR_NULL_POINTER);
     prepareCallback_(status);
     return RET_OK;
 }
-bool CallDinputService::HandleUnprepareDinput(std::string deviceId, int32_t status)
+int32_t CallDinputService::HandleUnprepareDinput(std::string deviceId, int32_t status)
 {
-    CHKPF(unprepareCallback_);
+    CHKPR(unprepareCallback_, ERROR_NULL_POINTER);
     unprepareCallback_(status);
     return RET_OK;
 }
-bool CallDinputService::HandleStartDinput(std::string deviceId, uint32_t inputTypes, int32_t status)
+int32_t CallDinputService::HandleStartDinput(std::string deviceId, uint32_t inputTypes, int32_t status)
 {
-    CHKPF(startCallback_);
+    CHKPR(startCallback_, ERROR_NULL_POINTER);
     startCallback_(status);
     return RET_OK;
 }
-bool CallDinputService::HandleStopDinput(std::string deviceId, uint32_t inputTypes, int32_t status)
+int32_t CallDinputService::HandleStopDinput(std::string deviceId, uint32_t inputTypes, int32_t status)
 {
-    CHKPF(stopCallback_);
+    CHKPR(stopCallback_, ERROR_NULL_POINTER);
     stopCallback_(status);
     return RET_OK;
 }
 
-bool CallDinputService::HandleRemoteInputAbility(const std::set<int32_t> remoteInputAbility)
+int32_t CallDinputService::HandleRemoteInputAbility(const std::set<int32_t> remoteInputAbility)
 {
-    CHKPF(remoteAbilityCallback_);
+    CHKPR(remoteAbilityCallback_, ERROR_NULL_POINTER);
     remoteAbilityCallback_(remoteInputAbility);
     return RET_OK;
 }

@@ -25,11 +25,11 @@ namespace MMI {
 class ICallDinput : public IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.multimodalinput.ICallDinput");
-    virtual bool HandlePrepareDinput(std::string deviceId, int32_t status) = 0;
-    virtual bool HandleUnprepareDinput(std::string deviceId, int32_t status) = 0;
-    virtual bool HandleStartDinput(std::string deviceId, uint32_t inputTypes, int32_t status) = 0;
-    virtual bool HandleStopDinput(std::string deviceId, uint32_t inputTypes, int32_t status) = 0;
-    virtual bool HandleRemoteInputAbility(const std::set<int32_t> remoteInputAbility) = 0;
+    virtual int32_t HandlePrepareDinput(std::string deviceId, int32_t status) = 0;
+    virtual int32_t HandleUnprepareDinput(std::string deviceId, int32_t status) = 0;
+    virtual int32_t HandleStartDinput(std::string deviceId, uint32_t inputTypes, int32_t status) = 0;
+    virtual int32_t HandleStopDinput(std::string deviceId, uint32_t inputTypes, int32_t status) = 0;
+    virtual int32_t HandleRemoteInputAbility(const std::set<int32_t> remoteInputAbility) = 0;
     enum class OPERATOR_TYPE {
         HANDLE_PREPARE_DINPUT = 0,
         HANDLE_UNPREPARE_DINPUT = 1,
