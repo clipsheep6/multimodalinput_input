@@ -2848,53 +2848,53 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateInputEvent_003, TestSize.Lev
     EXPECT_TRUE(!tLogs.empty());
 }
 
-// HWTEST_F(InputManagerTest, InputManagerTest_SetPointerVisible_001, TestSize.Level1)
-// {
-//     MMI_HILOGD("InputManagerTest_SetPointerVisible_001");
-//     bool isVisable = true;
-//     std::string command {
-//         "MMIService: in SetPointerVisible, #[[:digit:]]\\{1,\\}, "
-//         "enter isVisable:1"
-//     };
-//     std::vector<std::string> sLogs { SearchLog(command, true) };
+HWTEST_F(InputManagerTest, InputManagerTest_SetPointerVisible_001, TestSize.Level1)
+{
+    MMI_HILOGD("InputManagerTest_SetPointerVisible_001");
+    bool isVisable = true;
+    std::string command {
+        "MMIService: in SetPointerVisible, #[[:digit:]]\\{1,\\}, "
+        "enter isVisable:1"
+    };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
 
-//     InputManager::GetInstance()->SetPointerVisible(isVisable);
-//     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
-//     EXPECT_TRUE(!tLogs.empty());
-// }
+    InputManager::GetInstance()->SetPointerVisible(isVisable);
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+    EXPECT_TRUE(!tLogs.empty());
+}
 
-// HWTEST_F(InputManagerTest, InputManagerTest_SetPointerVisible_002, TestSize.Level1)
-// {
-//     MMI_HILOGD("InputManagerTest_SetPointerVisible_002");
-//     bool isVisable = true;
-//     int32_t ret = InputManager::GetInstance()->SetPointerVisible(isVisable);
-//     EXPECT_EQ(RET_OK, ret); 
+HWTEST_F(InputManagerTest, InputManagerTest_SetPointerVisible_002, TestSize.Level1)
+{
+    MMI_HILOGD("InputManagerTest_SetPointerVisible_002");
+    bool isVisable = true;
+    int32_t ret = InputManager::GetInstance()->SetPointerVisible(isVisable);
+    EXPECT_EQ(RET_OK, ret); 
 
-// }
+}
 
-// HWTEST_F(InputManagerTest, InputManagerTest_SetPointerVisible_003, TestSize.Level1)
-// {
-//     MMI_HILOGD("InputManagerTest_SetPointerVisible_003");
-//     bool isVisable = false;
-//     std::string command {
-//         "MMIService: in SetPointerVisible, #[[:digit:]]\\{1,\\}, "
-//         "enter isVisable:0"
-//     };
-//     std::vector<std::string> sLogs { SearchLog(command, true) };
-//     InputManager::GetInstance()->SetPointerVisible(isVisable);
-//     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
-//     EXPECT_TRUE(!tLogs.empty());
+HWTEST_F(InputManagerTest, InputManagerTest_SetPointerVisible_003, TestSize.Level1)
+{
+    MMI_HILOGD("InputManagerTest_SetPointerVisible_003");
+    bool isVisable = false;
+    std::string command {
+        "MMIService: in SetPointerVisible, #[[:digit:]]\\{1,\\}, "
+        "enter isVisable:0"
+    };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
+    InputManager::GetInstance()->SetPointerVisible(isVisable);
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+    EXPECT_TRUE(!tLogs.empty());
 
-// }
+}
 
-// HWTEST_F(InputManagerTest, InputManagerTest_SetPointerVisible_004, TestSize.Level1)
-// {
-//     MMI_HILOGD("InputManagerTest_SetPointerVisible_004");
-//     bool isVisable = false;
-//     int32_t ret = InputManager::GetInstance()->SetPointerVisible(isVisable);
-//     EXPECT_EQ(RET_OK,ret);
+HWTEST_F(InputManagerTest, InputManagerTest_SetPointerVisible_004, TestSize.Level1)
+{
+    MMI_HILOGD("InputManagerTest_SetPointerVisible_004");
+    bool isVisable = false;
+    int32_t ret = InputManager::GetInstance()->SetPointerVisible(isVisable);
+    EXPECT_EQ(RET_OK,ret);
 
-// }
+}
 
 // HWTEST_F(InputManagerTest, InputManagerTest_AddDeviceListener_001, TestSize.Level1)
 // {
@@ -2904,12 +2904,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateInputEvent_003, TestSize.Lev
 //         "enter"
 //     };
 //     std::vector<std::string> sLogs { SearchLog(command, true) };
-//     int32_t ret = InputManager::GetInstance()->AddDeviceListener([](InputDeviceChangedType, int32_t){});
+//     int32_t ret = InputDeviceImpl::GetInstance()->RegisterInputDeviceMonitor([](std::string, int32_t){});
 //     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 //     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
 //     EXPECT_TRUE(!tLogs.empty());
 //     EXPECT_EQ(0, ret);
-//     InputManager::GetInstance()->RemoveDeviceListener(ret);
+//     InputManager::GetInstance()->UnRegisterInputDeviceMonitor(ret);
 // }
 
 // HWTEST_F(InputManagerTest, InputManagerTest_AddDeviceListener_002, TestSize.Level1)

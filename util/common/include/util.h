@@ -54,6 +54,8 @@ size_t CalculateDifference(const std::vector<int32_t> &list1, std::vector<int32_
 std::string StringFmt(const char* str, ...);
 std::string ReadJsonFile(const std::string &filePath);
 std::string ReadUinputToolFile(const std::string &filePath);
+std::string GetAnonyString(const std::string &value);
+std::string GetAnonyInt32(const int32_t value);
 inline bool IsNum(const std::string &str)
 {
     std::istringstream sin(str);

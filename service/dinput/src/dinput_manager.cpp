@@ -116,7 +116,7 @@ bool DInputManager::IsNeedFilterOut(const std::string deviceId, const std::share
     }
 
     MMI_HILOGD("istributedInputKit::IsNeedFilterOut deviceId:%{public}s, keyCode :%{public}d, keyAction :%{public}d",
-        deviceId.c_str(), businessEvent.keyCode, businessEvent.keyAction);
+        GetAnonyString(deviceId).c_str(), businessEvent.keyCode, businessEvent.keyAction);
     bool ret = IsNeedFilterOut(deviceId, businessEvent);
     MMI_HILOGD("istributedInputKit::IsNeedFilterOut:%{public}s", ret == true ? "true" : "false");
     return ret;

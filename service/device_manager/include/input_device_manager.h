@@ -69,6 +69,7 @@ public:
     int32_t GetRemoteInputAbility(std::string deviceId, sptr<ICallDinput> ablitity);
     void OnStartRemoteInputSucess(const std::string& deviceId, const uint32_t& inputTypes);
     void OnStopRemoteInputSucess(const std::string& deviceId, const uint32_t& inputTypes);
+    void SetPointerVisible(int32_t pid, bool visible);
     void OnDeviceOffline();
 
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId);

@@ -25,32 +25,32 @@ namespace {
 
 void PrepareDInputCallback::OnResult(const std::string& deviceId, const int32_t& status)
 {
-    MMI_HILOGD("begin deviceId = %{public}s, status = %{public}d", deviceId.c_str(), status);
+    MMI_HILOGD("begin deviceId = %{public}s, status = %{public}d", GetAnonyString(deviceId).c_str(), status);
     callback_->HandlePrepareDinput(deviceId, status);
 }
 
 
 void StartDInputCallback::OnResult(const std::string& deviceId, const uint32_t& inputTypes, const int32_t& status)
 {
-    MMI_HILOGD("begin deviceId = %{public}s, status = %{public}d", deviceId.c_str(), status);
+    MMI_HILOGD("begin deviceId = %{public}s, status = %{public}d", GetAnonyString(deviceId).c_str(), status);
+    callback_->HandleStartDinput(deviceId, inputTypes, status);
     if (status == 0) {
         DInputMgr->OnStartRemoteInputSucess(deviceId, inputTypes);
     }
-    callback_->HandleStartDinput(deviceId, inputTypes, status);
 }
 
 void StopDInputCallback::OnResult(const std::string& deviceId, const uint32_t& inputTypes, const int32_t& status)
 {
-    MMI_HILOGD("begin deviceId = %{public}s, status = %{public}d", deviceId.c_str(), status);
+    MMI_HILOGD("begin deviceId = %{public}s, status = %{public}d", GetAnonyString(deviceId).c_str(), status);
+    callback_->HandleStopDinput(deviceId, inputTypes, status);
     if (status == 0) {
         DInputMgr->OnStopRemoteInputSucess(deviceId, inputTypes);
     }
-    callback_->HandleStopDinput(deviceId, inputTypes, status);
 }
 
 void UnprepareDInputCallback::OnResult(const std::string& deviceId, const int32_t& status)
 {
-    MMI_HILOGD("begin deviceId = %{public}s, status = %{public}d", deviceId.c_str(), status);
+    MMI_HILOGD("begin deviceId = %{public}s, status = %{public}d", GetAnonyString(deviceId).c_str(), status);
     callback_->HandleUnprepareDinput(deviceId, status);
 }
 }
