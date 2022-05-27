@@ -46,7 +46,7 @@ public:
     void DeletePointerVisible(int32_t pid);
     void SetPointerVisible(int32_t pid, bool visible);
     bool IsPointerVisible();
-    void SetMouseLocation(int32_t pid, int32_t x, int32_t y);
+    void SetPointerLocation(int32_t pid, int32_t x, int32_t y);
 
 public:
     static const int32_t IMAGE_WIDTH = 64;

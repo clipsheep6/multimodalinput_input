@@ -328,7 +328,7 @@ void PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
     UpdataPointerVisible();
 }
 
-void PointerDrawingManager::SetMouseLocation(int32_t pid, int32_t x, int32_t y)
+void PointerDrawingManager::SetPointerLocation(int32_t pid, int32_t x, int32_t y)
 {
     CALL_LOG_ENTER;
     FixCursorPosition(x, y);
@@ -336,6 +336,7 @@ void PointerDrawingManager::SetMouseLocation(int32_t pid, int32_t x, int32_t y)
     lastGlobalY_ = y;
     if (pointerWindow_ != nullptr) {
         pointerWindow_->MoveTo(x, y);
+        UpdataPidInfo(pid, true);
         SetPointerVisible(pid, true);
     }
 }

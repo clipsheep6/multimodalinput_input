@@ -18,7 +18,6 @@
 #include "device_manager.h"
 #include "key_event_value_transformation.h"
 #include "system_ability_definition.h"
-
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
 #include "constants_dinput.h"
 #include "dinput_manager.h"
@@ -120,14 +119,14 @@ std::string InputDeviceManager::MakeNetworkId(const std::string& phys) const
 {
     uint64_t endPos = 0;
     uint64_t startPos = 0;
-
+    std::string networkId = "";
     std::size_t splitPos = phys.find(SPLIT_SYMBOL);
     if (std::string::npos != splitPos) {
         startPos = splitPos + 1;
-        endPos = phys.size() - 1;
-        return phys.substr(startPos,  endPos - startPos);
+        endPos = phys.size();
+        networkId = phys.substr(startPos,  endPos - startPos);
     }
-    return "";
+    return networkId;
 }
 
 std::vector<int32_t> InputDeviceManager::GetInputDeviceIds() const
@@ -313,57 +312,6 @@ int32_t InputDeviceManager::FindInputDeviceId(struct libinput_device* inputDevic
     return INVALID_DEVICE_ID;
 }
 
-// void InputDeviceManager::GetNetWorkIdFromNode(const std::string& sysname)
-// {
-//     std::string cmd = "cat /proc/bus/input/devices";
-//     std::vector<std::string> cmdResult;
-//     ExecuteCmd(cmd, cmdResult);
-//     GetNetworkIdCmdResult(cmdResult, sysname);
-// }
-
-// int32_t InputDeviceManager::ExecuteCmd(const std::string cmd, std::vector<std::string> &cmdResult)
-// {
-//     if (cmd.empty()) {
-//         return RET_ERR;
-//     }
-//     char buffer[READ_CMD_BUFF_SIZE] = {};
-//     FILE* pin = popen(cmd.c_str(), "r");
-//     if (pin == nullptr) {
-//         return RET_ERR;
-//     }
-//     cmdResult.clear();
-//     while (!feof(pin)) {
-//         if (fgets(buffer, sizeof(buffer), pin) != nullptr) {
-//             cmdResult.push_back(buffer);
-//         }
-//     }
-//     return pclose(pin);
-// }
-
-// void InputDeviceManager::GetNetworkIdCmdResult(const std::vector<std::string>& cmdResult, const std::string& sysname)
-// {
-//     std::string temp;
-//     uint64_t endPos = 0;
-//     uint64_t startPos = 0;
-//     for (const auto &item : cmdResult) {
-//         temp = item.substr(0, 1);
-//         if (temp == "P") {
-//             std::size_t splitPos = item.find(SPLIT_SYMBOL);
-//             if (std::string::npos != splitPos) {
-//                 startPos = splitPos + 1;
-//                 endPos = item.size() - 1;
-//                 networkId_ = item.substr(startPos,  endPos - startPos);
-//             }
-//         }else if (temp == "H") {
-//             std::size_t splitPos = item.find(sysname);
-//             if (std::string::npos != splitPos) {
-//                 MMI_HILOGD("sysname find! return");
-//                 return;
-//             }
-//         }
-//     }
-// }
-
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
 bool InputDeviceManager::IsRemote(struct libinput_device* inputDevice) const
 {
@@ -436,14 +384,14 @@ void InputDeviceManager::NotifyDeviceChanged(const std::string& deviceId, const 
         if (!IsRemote(item.second)) {
             continue;
         }
-        // if (IsPointerDevice(static_cast<struct libinput_device *>(item.second))) {
-        //     if (deviceType == DEVICE_ADD) {
-        //         ShowMouse();
-        //     }
-        //     if ((deviceType == DEVICE_REMOVE) && !HasPointerDevice()) {
-        //         HideMouse();
-        //     }
-        // }
+        if (IsPointerDevice(static_cast<struct libinput_device *>(item.second))) {
+            if (changedType == DEVICE_ADD) {
+                SetPointerVisible(getpid(), true);
+            }
+            if ((changedType == DEVICE_REMOVE) && !HasPointerDevice()) {
+                SetPointerVisible(getpid(), false);
+            }
+        }
         enum evdev_device_udev_tags udevTags = libinput_device_get_tags(item.second);
         uint32_t dinputType = DeviceUdevTagsToDinputType(udevTags);
         if (dinputType & inputTypes) {
@@ -455,11 +403,19 @@ void InputDeviceManager::NotifyDeviceChanged(const std::string& deviceId, const 
         }
     }
 }
+void InputDeviceManager::SetPointerVisible(int32_t pid, bool visible)
+{
+    MMI_HILOGW("observers_ size:%{public}zu", observers_.size());
+    for (auto observer = observers_.begin(); observer != observers_.end(); observer++) {
+        (*observer)->SetPointerVisible(pid, visible);
+    }
+}
+
 #endif // OHOS_DISTRIBUTED_INPUT_MODEL
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
 int32_t InputDeviceManager::GetRemoteInputAbility(std::string deviceId, sptr<ICallDinput> ablitity)
 {
-    MMI_HILOGD("deviceId: %{public}s", deviceId.c_str());
+    MMI_HILOGD("deviceId: %{public}s", GetAnonyString(deviceId).c_str());
     std::set<int32_t> remotInputAbility;
     for (const auto item : inputDevice_) {
         if (IsRemote(item.second)) {

@@ -277,13 +277,13 @@ int32_t MultimodalInputConnectStub::StubUnprepareRemoteInput(MessageParcel& data
         MMI_HILOGW("the client value is nullptr");
         return ERROR_NULL_POINTER;
     }
-    sptr<ICallDinput> prepareDinput = iface_cast<ICallDinput>(client);
-    if (prepareDinput == nullptr) {
-        MMI_HILOGW("prepareDinput is nullptr");
+    sptr<ICallDinput> unprepareDinput = iface_cast<ICallDinput>(client);
+    if (unprepareDinput == nullptr) {
+        MMI_HILOGW("unprepareDinput is nullptr");
         return ERROR_NULL_POINTER;
     }
-    MMI_HILOGD("prepareDinput iface_cast succeeded");
-    ret = UnprepareRemoteInput(networkId, prepareDinput);
+    MMI_HILOGD("unprepareDinput iface_cast succeeded");
+    ret = UnprepareRemoteInput(networkId, unprepareDinput);
     
     if (!reply.WriteInt32(ret)) {
         MMI_HILOGW("WriteInt32:%{public}d fail", ret);
@@ -304,13 +304,13 @@ int32_t MultimodalInputConnectStub::StubStartRemoteInput(MessageParcel& data, Me
         MMI_HILOGW("the client value is nullptr");
         return ERROR_NULL_POINTER;
     }
-    sptr<ICallDinput> prepareDinput = iface_cast<ICallDinput>(client);
-    if (prepareDinput == nullptr) {
-        MMI_HILOGW("prepareDinput is nullptr");
+    sptr<ICallDinput> startDinput = iface_cast<ICallDinput>(client);
+    if (startDinput == nullptr) {
+        MMI_HILOGW("startDinput is nullptr");
         return ERROR_NULL_POINTER;
     }
-    MMI_HILOGD("prepareDinput iface_cast succeeded");
-    ret = StartRemoteInput(networkId, inputAbility, prepareDinput);
+    MMI_HILOGD("startDinput iface_cast succeeded");
+    ret = StartRemoteInput(networkId, inputAbility, startDinput);
     
     if (!reply.WriteInt32(ret)) {
         MMI_HILOGW("WriteInt32:%{public}d fail", ret);
@@ -331,13 +331,13 @@ int32_t MultimodalInputConnectStub::StubStopRemoteInput(MessageParcel& data, Mes
         MMI_HILOGW("the client value is nullptr");
         return ERROR_NULL_POINTER;
     }
-    sptr<ICallDinput> prepareDinput = iface_cast<ICallDinput>(client);
-    if (prepareDinput == nullptr) {
-        MMI_HILOGW("prepareDinput is nullptr");
+    sptr<ICallDinput> stopDinput = iface_cast<ICallDinput>(client);
+    if (stopDinput == nullptr) {
+        MMI_HILOGW("stopDinput is nullptr");
         return ERROR_NULL_POINTER;
     }
-    MMI_HILOGD("prepareDinput iface_cast succeeded");
-    ret = StopRemoteInput(networkId, inputAbility, prepareDinput);
+    MMI_HILOGD("stopDinput iface_cast succeeded");
+    ret = StopRemoteInput(networkId, inputAbility, stopDinput);
     
     if (!reply.WriteInt32(ret)) {
         MMI_HILOGW("WriteInt32:%{public}d fail", ret);
