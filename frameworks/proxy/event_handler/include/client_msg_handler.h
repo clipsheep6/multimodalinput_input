@@ -55,6 +55,7 @@ protected:
     int32_t OnInputDevice(const UDSClient& client, NetPacket& pkt);
     int32_t OnInputDeviceIds(const UDSClient& client, NetPacket& pkt);
     int32_t OnSupportKeys(const UDSClient& client, NetPacket& pkt);
+    int32_t OnInputKeyboardType(const UDSClient& client, NetPacket& pkt);
     int32_t OnDevMonitor(const UDSClient& client, NetPacket& pkt);
 
 private:

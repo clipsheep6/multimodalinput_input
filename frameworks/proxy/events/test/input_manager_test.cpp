@@ -1634,7 +1634,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_008, TestSize.Leve
     EXPECT_TRUE(response < 0);
 #else
    EXPECT_TRUE(response == ERROR_UNSUPPORT);
-#endif
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -1673,7 +1673,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_010, TestSize.Leve
     EXPECT_TRUE(subscribeId1 >= 0);
 #else
    EXPECT_TRUE(subscribeId1 == ERROR_UNSUPPORT);
-#endif
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     // 电源键抬起订阅
     std::shared_ptr<KeyOption> keyOption2 = std::make_shared<KeyOption>();
     keyOption2->SetPreKeys(preKeys);
@@ -1695,7 +1695,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_010, TestSize.Leve
     EXPECT_TRUE(subscribeId2 >= 0);
 #else
    EXPECT_TRUE(subscribeId2 == ERROR_UNSUPPORT);
-#endif
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     std::this_thread::sleep_for(std::chrono::milliseconds(10000));
     InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId1);
     InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId2);
@@ -2208,7 +2208,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_001, TestSize.L
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
 #else
     EXPECT_EQ(ERROR_UNSUPPORT, response);
-#endif
+#endif // OHOS_BUILD_ENABLE_POINTER
 
     InputManager::GetInstance()->RemoveMonitor(monitorId);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -2257,7 +2257,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_002, TestSize.L
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
 #else
     EXPECT_EQ(ERROR_UNSUPPORT, response);
-#endif
+#endif // OHOS_BUILD_ENABLE_POINTER
 
     InputManager::GetInstance()->RemoveMonitor(monitorId);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -2306,7 +2306,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_003, TestSize.L
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
 #else
     EXPECT_EQ(ERROR_UNSUPPORT, response);
-#endif
+#endif // OHOS_BUILD_ENABLE_POINTER
     InputManager::GetInstance()->RemoveMonitor(monitorId);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
@@ -2419,7 +2419,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_005, TestSize.L
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
 #else // OHOS_BUILD_ENABLE_POINTER
     EXPECT_EQ(ERROR_UNSUPPORT, response);
-#endif
+#endif // OHOS_BUILD_ENABLE_POINTER
     InputManager::GetInstance()->RemoveMonitor(monitorId);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
@@ -2787,6 +2787,61 @@ HWTEST_F(InputManagerTest, InputManagerTest_MoveMouse_02, TestSize.Level1)
     std::vector<std::string> sLogs { SearchLog(command, true) };
     InputManager::GetInstance()->MoveMouse(-1000, 100);
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+}
+
+static int32_t deviceIDtest = 0;
+static void GetKeyboardTypeCallback(int32_t keyboardType)
+{
+    switch (keyboardType) {
+        case KEYBOARD_TYPE_NONE: {
+            MMI_HILOGD("deviceIDtest:%{public}d-->KeyboardType: %{public}s", deviceIDtest, "None");
+            break;
+            }
+        case KEYBOARD_TYPE_UNKNOWN: {
+            MMI_HILOGD("deviceIDtest:%{public}d-->KeyboardType: %{public}s", deviceIDtest, "unknown");
+            break;
+        }
+        case KEYBOARD_TYPE_ALPHABETICKEYBOARD: {
+            MMI_HILOGD("deviceIDtest:%{public}d-->KeyboardType: %{public}s", deviceIDtest, "alphabetickeyboard");
+            break;
+        }
+        case KEYBOARD_TYPE_DIGITALKEYBOARD: {
+            MMI_HILOGD("deviceIDtest:%{public}d-->KeyboardType: %{public}s", deviceIDtest, "digitalkeyboard");
+            break;
+        }
+        case KEYBOARD_TYPE_HANDWRITINGPEN: {
+            MMI_HILOGD("deviceIDtest:%{public}d-->KeyboardType: %{public}s", deviceIDtest, "handwritingpen");
+            break;
+        }
+        case KEYBOARD_TYPE_REMOTECONTROL: {
+            MMI_HILOGD("deviceIDtest:%{public}d-->KeyboardType: %{public}s", deviceIDtest, "remotecontrol");
+            break;
+        }
+        default: {
+            MMI_HILOGW("Error obtaining keyboard type");
+            break;
+        }
+    }
+}
+/**
+ * @tc.name:InputManagerTest_GetKeyboardType
+ * @tc.desc:Verify GetKeyboardType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+
+HWTEST_F(InputManagerTest, InputManagerTest_GetKeyboardType, TestSize.Level1)
+{
+    MMI_HILOGD("Start InputManagerTest_GetKeyboardType");
+    for (int32_t i = 0; i < 20; ++i)
+    {
+        deviceIDtest = i;
+        InputManager::GetInstance()->GetKeyboardType(deviceIDtest, GetKeyboardTypeCallback);
+        MMI_HILOGD("i:%{public}d", i);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
+    MMI_HILOGD("Stop InputManagerTest_GetKeyboardType");
 }
 } // namespace MMI
 } // namespace OHOS

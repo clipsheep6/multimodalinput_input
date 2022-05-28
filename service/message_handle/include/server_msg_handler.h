@@ -34,13 +34,13 @@ public:
 
     void Init(UDSServer& udsServer);
     void OnMsgHandler(SessionPtr sess, NetPacket& pkt);
+    int32_t MarkEventProcessed(SessionPtr sess, int32_t eventId);
 
 protected:
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
 #ifdef OHOS_BUILD_HDF
     int32_t OnHdiInject(SessionPtr sess, NetPacket& pkt);
 #endif
-    int32_t MarkProcessed(SessionPtr sess, NetPacket& pkt);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t OnInjectKeyEvent(SessionPtr sess, NetPacket& pkt);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -54,6 +54,7 @@ protected:
     int32_t OnInputDevice(SessionPtr sess, NetPacket& pkt);
     int32_t OnInputDeviceIds(SessionPtr sess, NetPacket& pkt);
     int32_t OnSupportKeys(SessionPtr sess, NetPacket& pkt);
+    int32_t OnInputKeyboardType(SessionPtr sess, NetPacket& pkt);
     int32_t OnAddInputDeviceMontior(SessionPtr sess, NetPacket& pkt);
     int32_t OnRemoveInputDeviceMontior(SessionPtr sess, NetPacket& pkt);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -73,7 +74,6 @@ protected:
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t OnMoveMouse(SessionPtr sess, NetPacket& pkt);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
-
 #ifdef OHOS_BUILD_MMI_DEBUG
     int32_t OnBigPacketTest(SessionPtr sess, NetPacket& pkt);
 #endif // OHOS_BUILD_MMI_DEBUG

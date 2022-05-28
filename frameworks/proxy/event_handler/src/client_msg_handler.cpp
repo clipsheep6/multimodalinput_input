@@ -30,6 +30,7 @@
 #include "mmi_client.h"
 #include "mmi_func_callback.h"
 #include "multimodal_event_handler.h"
+#include "multimodal_input_connect_manager.h"
 #include "proto.h"
 #include "time_cost_chk.h"
 #include "util.h"
@@ -66,6 +67,7 @@ void ClientMsgHandler::Init()
         {MmiMessageId::INPUT_DEVICE, MsgCallbackBind2(&ClientMsgHandler::OnInputDevice, this)},
         {MmiMessageId::INPUT_DEVICE_IDS, MsgCallbackBind2(&ClientMsgHandler::OnInputDeviceIds, this)},
         {MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY, MsgCallbackBind2(&ClientMsgHandler::OnSupportKeys, this)},
+        {MmiMessageId::INPUT_DEVICE_KEYBOARD_TYPE, MsgCallbackBind2(&ClientMsgHandler::OnInputKeyboardType, this)},
         {MmiMessageId::ADD_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ClientMsgHandler::OnDevMonitor, this)},
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
         {MmiMessageId::REPORT_KEY_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportKeyEvent, this)},
@@ -295,6 +297,20 @@ int32_t ClientMsgHandler::OnSupportKeys(const UDSClient& client, NetPacket& pkt)
     return RET_OK;
 }
 
+int32_t ClientMsgHandler::OnInputKeyboardType(const UDSClient& client, NetPacket& pkt)
+{
+    CALL_LOG_ENTER;
+    int32_t userData;
+    int32_t KeyboardType;
+    pkt >> userData >> KeyboardType;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read failed");
+        return PACKET_WRITE_FAIL;
+    }
+    InputDevImpl.OnKeyboardType(userData, KeyboardType);
+    return RET_OK;
+}
+
 int32_t ClientMsgHandler::OnDevMonitor(const UDSClient& client, NetPacket& pkt)
 {
     CALL_LOG_ENTER;
@@ -355,16 +371,9 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 void ClientMsgHandler::OnEventProcessed(int32_t eventId)
 {
-    MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    CHKPV(client);
-    NetPacket pkt(MmiMessageId::MARK_PROCESS);
-    pkt << eventId;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write event failed");
-        return;
-    }
-    if (!client->SendMessage(pkt)) {
-        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+    int32_t ret = MultimodalInputConnectManager::GetInstance()->MarkEventProcessed(eventId);
+    if (ret != 0) {
+        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
         return;
     }
 }
