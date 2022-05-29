@@ -70,7 +70,7 @@ int32_t KeyAutoRepeat::SelectAutoRepeat(std::shared_ptr<KeyEvent>& keyEvent_, in
                 TimerMgr->RemoveTimer(timerId_);
                 timerId_ = -1;
             }
-            std::shared_ptr<InputEventNormalizeHandler> inputEventNormailzeHanlder = InputHandler->GetInputEventNormalizeHandler();
+            auto inputEventNormailzeHanlder = InputHandler->GetInputEventNormalizeHandler();
             CHKPR(inputEventNormailzeHanlder, ERROR_NULL_POINTER);
             timerId_ = inputEventNormailzeHanlder->AddHandleTimer(devConf.delayTime);
             MMI_HILOGI("Add a timer, keyCode:%{public}d", keyEvent_->GetKeyCode());
@@ -84,7 +84,7 @@ int32_t KeyAutoRepeat::SelectAutoRepeat(std::shared_ptr<KeyEvent>& keyEvent_, in
                 keyEvent_->SetKeyCode(lastPressedKey);
                 keyEvent_->SetAction(KeyEvent::KEY_ACTION_DOWN);
                 keyEvent_->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-                std::shared_ptr<InputEventNormalizeHandler> inputEventNormailzeHanlder = InputHandler->GetInputEventNormalizeHandler();
+                auto inputEventNormailzeHanlder = InputHandler->GetInputEventNormalizeHandler();
                 CHKPR(inputEventNormailzeHanlder, ERROR_NULL_POINTER);
                 timerId_ = inputEventNormailzeHanlder->AddHandleTimer(devConf.delayTime);
                 MMI_HILOGD("The end keyboard autorepeat, keyCode:%{public}d", keyEvent_->GetKeyCode());
