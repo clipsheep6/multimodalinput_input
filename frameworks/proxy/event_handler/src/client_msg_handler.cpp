@@ -25,7 +25,9 @@
 #include "input_event_data_transformation.h"
 #include "input_handler_manager.h"
 #include "input_manager_impl.h"
+#ifdef OHOS_BUILD_ENABLE_MONITOR
 #include "input_monitor_manager.h"
+#endif // OHOS_BUILD_ENABLE_MONITOR
 #include "mmi_client.h"
 #include "mmi_func_callback.h"
 #include "multimodal_event_handler.h"

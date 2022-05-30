@@ -97,12 +97,15 @@ ohos_shared_library("libmmi-client") {
   if (mmi_enable_interceptor) {
     cflags += [ "-DOHOS_BUILD_ENABLE_INTERCEPTOR" ]
   }
-  
+
   if (mmi_enable_interceptor) {
     sources += [ "event_handler/src/input_interceptor_manager.cpp" ]
   } else {
     sources += [ "event_handler/src/i_input_interceptor_manager.cpp" ]
+  }
 
+  if (mmi_enable_monitor) {
+    sources += [ "event_handler/src/input_monitor_manager.cpp" ]
   }
 
   configs = [
@@ -294,7 +297,7 @@ ohos_unittest("InputManagerTest") {
   }
 
   if (mmi_enable_monitor) {
-    cflags += [ "-DOHOS_BUILD_ENABLE_MONITOR"]
+    cflags += [ "-DOHOS_BUILD_ENABLE_MONITOR" ]
   }
 
   sources = [ "events/test/input_manager_test.cpp" ]
