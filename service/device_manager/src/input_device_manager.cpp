@@ -228,6 +228,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
 }
 void InputDeviceManager::HandleDeviceChanged(std::string changedType, int32_t id)
 {
+    CALL_LOG_ENTER;
     for (const auto &item : devMonitor_) {
         CHKPC(item.first);
         item.second(changedType, id);
