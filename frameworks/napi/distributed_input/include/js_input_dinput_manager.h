@@ -44,7 +44,6 @@ typedef enum InputAbility {
     MOUSE = 1,
     KEYBOARD = 2,
     TOUCH_PAD = 4,
-    // TOUCH_SCREEN = 4,
 } InputAbilityType;
 
 class JsInputDinputManager {

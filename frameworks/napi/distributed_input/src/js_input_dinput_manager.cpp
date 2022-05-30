@@ -36,7 +36,6 @@ std::mutex mutex_;
 constexpr uint32_t EVDEV_UDEV_TAG_KEYBOARD = (1 << 1);
 constexpr uint32_t EVDEV_UDEV_TAG_MOUSE = (1 << 2);
 constexpr uint32_t EVDEV_UDEV_TAG_TOUCHPAD = (1 << 3);
-// constexpr uint32_t EVDEV_UDEV_TAG_TOUCHSCREEN = (1 << 4);
 std::map<int32_t, int32_t> deviceTypeMap = {
     {InputAbilityType::KEYBOARD, EVDEV_UDEV_TAG_KEYBOARD},
     {InputAbilityType::MOUSE, EVDEV_UDEV_TAG_MOUSE},
@@ -159,6 +158,7 @@ void JsInputDinputManager::HandleCallBack(CallbackInfo<int32_t>* cb)
                 CallFunctionAsync(cbInfo->env, cbInfo->ref, 1, &resultObj[0]);
             }
             MMI_HILOGI("uv_queue_work end");
+            napi_delete_reference(env, cbInfo->ref);
             napi_delete_async_work(env, cbInfo->asyncWork);
             delete cbInfo;
         }, (void *)cb, &cb->asyncWork);
@@ -187,6 +187,7 @@ void JsInputDinputManager::HandleCallBack(CallbackInfo<std::set<int32_t>>* cb)
                 CallFunctionAsync(cbInfo->env, cbInfo->ref, 2, &resultObj[0]);
             }
             MMI_HILOGI("uv_queue_work end");
+            napi_delete_reference(env, cbInfo->ref);
             napi_delete_async_work(env, cbInfo->asyncWork);
             delete cbInfo;
         }, (void *)cb, &cb->asyncWork);
