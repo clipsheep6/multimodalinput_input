@@ -195,9 +195,6 @@ void JsInputDinputManager::HandleCallBack(CallbackInfo<std::set<int32_t>>* cb)
 
 napi_value JsInputDinputManager::MakeInputAbilityObj(napi_env env, std::set<int32_t> types)
 {
-    for (auto deviceType : types) {
-        MMI_HILOGI("deviceType : %{public}d", deviceType);
-    }
     napi_value returnResult;
     napi_value resultArry;
     int32_t i = 0;
