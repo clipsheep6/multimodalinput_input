@@ -42,7 +42,8 @@ private:
     void OnSessionLost(SessionPtr session);
 
 private:
-    struct SessionHandler {
+    class SessionHandler {
+    public:
         SessionHandler(int32_t id, InputHandlerType handlerType, SessionPtr session)
             : id_(id), handlerType_(handlerType), session_(session) { }
         void SendToClient(std::shared_ptr<KeyEvent> keyEvent) const;
@@ -62,7 +63,8 @@ private:
         SessionPtr session_ = nullptr;
     };
 
-    struct MonitorCollection : public IInputEventHandler, protected NoCopyable {
+    class MonitorCollection : public IInputEventHandler, protected NoCopyable {
+    public:
         virtual int32_t GetPriority() const override;
         virtual bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent) override;
         virtual bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent) override;

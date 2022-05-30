@@ -136,5 +136,10 @@ bool InputManager::IsPointerVisible()
 {
     return InputMgrImpl->GetInstance()->IsPointerVisible();
 }
+
+void InputManager::GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback)
+{
+    InputMgrImpl->GetKeyboardType(deviceId, callback);
+}
 } // namespace MMI
 } // namespace OHOS

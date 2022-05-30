@@ -30,6 +30,8 @@
 #include "virtual_pen_mouse.h"
 #include "virtual_pen_keyboard.h"
 #include "virtual_remote_control.h"
+#include "virtual_single_finger.h"
+#include "virtual_single_touchscreen.h"
 #include "virtual_stylus.h"
 #include "virtual_trackball.h"
 #include "virtual_trackpad.h"
@@ -42,10 +44,15 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t READ_FILE_SIZE_MAX = 1000;
 constexpr int32_t ABSRANGE = 200;
 constexpr int32_t FINGERABSRANGE = 40;
 const std::string VIRTUAL_DEVICE_NAME = "mmi-virtual-device";
+#define SETRESOLUTION(codeTmp, value) do { \
+    g_absTemp_.code = codeTmp; \
+    g_absTemp_.absinfo.resolution = value; \
+    absInit_.push_back(g_absTemp_); \
+} while (0)
+
 bool CheckFileName(const std::string& fileName)
 {
     std::string::size_type pos = fileName.find("_");
@@ -182,12 +189,16 @@ void StartTouchPad()
     virtualTouchpad.SetUp();
     static VirtualFinger virtualFinger;
     virtualFinger.SetUp();
+    static VirtualSingleFinger virtualSingleFinger;
+    virtualSingleFinger.SetUp();
 }
 
 void StartTouchScreen()
 {
     static VirtualTouchScreen virtualTouchScreen;
     virtualTouchScreen.SetUp();
+    static VirtualSingleTouchScreen virtualSingleTouchScreen;
+    virtualSingleTouchScreen.SetUp();
 }
 
 void StartPen()
@@ -335,10 +346,10 @@ bool VirtualDevice::CreateKey()
     evt_type[UI_SET_PROPBIT] = GetProperties();
     evt_type[UI_SET_ABSBIT] = GetAbs();
     evt_type[UI_SET_RELBIT] = GetRelBits();
-    evt_type[UI_SET_MSCBIT] = GetMscs();
+    evt_type[UI_SET_MSCBIT] = GetMiscellaneous();
     evt_type[UI_SET_LEDBIT] = GetLeds();
-    evt_type[UI_SET_SWBIT] = GetSws();
-    evt_type[UI_SET_PHYS] = GetReps();
+    evt_type[UI_SET_SWBIT] = GetSwitchs();
+    evt_type[UI_SET_PHYS] = GetRepeats();
     for (auto &item : evt_type) {
         fun(item.first, item.second);
     }
@@ -348,26 +359,18 @@ bool VirtualDevice::CreateKey()
 bool VirtualDevice::SetAbsResolution(const std::string& deviceName)
 {
     if (deviceName == "Virtual Stylus" || deviceName == "Virtual Touchpad") {
-        g_absTemp_.code = 0x00;
-        g_absTemp_.absinfo.resolution = ABSRANGE;
-        absInit_.push_back(g_absTemp_);
-        g_absTemp_.code = 0x01;
-        g_absTemp_.absinfo.resolution = ABSRANGE;
-        absInit_.push_back(g_absTemp_);
+        SETRESOLUTION(ABS_X, ABSRANGE);
+        SETRESOLUTION(ABS_Y, ABSRANGE);
     } else if (deviceName == "Virtual Finger") {
-        g_absTemp_.code = 0x00;
-        g_absTemp_.absinfo.resolution = FINGERABSRANGE;
-        absInit_.push_back(g_absTemp_);
-        g_absTemp_.code = 0x01;
-        g_absTemp_.absinfo.resolution = FINGERABSRANGE;
-        absInit_.push_back(g_absTemp_);
+        SETRESOLUTION(ABS_X, FINGERABSRANGE);
+        SETRESOLUTION(ABS_Y, FINGERABSRANGE);
+        SETRESOLUTION(ABS_MT_POSITION_X, FINGERABSRANGE);
+        SETRESOLUTION(ABS_MT_POSITION_Y, FINGERABSRANGE);
+        SETRESOLUTION(ABS_MT_TOOL_X, FINGERABSRANGE);
+        SETRESOLUTION(ABS_MT_TOOL_Y, FINGERABSRANGE);
     } else if (deviceName == "V-Pencil") {
-        g_absTemp_.code = 0x00;
-        g_absTemp_.absinfo.resolution = ABSRANGE;
-        absInit_.push_back(g_absTemp_);
-        g_absTemp_.code = 0x01;
-        g_absTemp_.absinfo.resolution = ABSRANGE;
-        absInit_.push_back(g_absTemp_);
+        SETRESOLUTION(ABS_X, ABSRANGE);
+        SETRESOLUTION(ABS_Y, ABSRANGE);
     } else {
         printf("Not devide:deviceName:%s", deviceName.c_str());
         return false;
@@ -395,6 +398,7 @@ bool VirtualDevice::SetPhys(const std::string& deviceName)
         {"Virtual TrackPadMouse",        "trackpad"},
         {"Virtual TrackpadSysCtrl",      "trackpad"},
         {"Virtual Finger",               "touchpad"},
+        {"Virtual SingleFinger",         "touchpad"},
         {"Virtual Stylus",               "touchpad"},
         {"Virtual Touchpad",             "touchpad"},
         {"Virtual RemoteControl",        "remotecontrol"},
@@ -402,6 +406,7 @@ bool VirtualDevice::SetPhys(const std::string& deviceName)
         {"Virtual GamePad",              "gamepad"},
         {"Virtual Trackball",            "trackball"},
         {"Virtual TouchScreen",          "touchscreen"},
+        {"Virtual SingleTouchScreen",    "touchscreen"},
         {"V-Pencil",                     "pen"},
         {"V-Pencil-mouse",               "pen"},
         {"V-Pencil-keyboard",            "pen"},
@@ -614,25 +619,25 @@ const std::vector<uint32_t>& VirtualDevice::GetLeds() const
     return leds;
 }
 
-const std::vector<uint32_t>& VirtualDevice::GetReps() const
+const std::vector<uint32_t>& VirtualDevice::GetRepeats() const
 {
-    static const std::vector<uint32_t> reps {
+    static const std::vector<uint32_t> repeats {
     };
-    return reps;
+    return repeats;
 }
 
-const std::vector<uint32_t>& VirtualDevice::GetMscs() const
+const std::vector<uint32_t>& VirtualDevice::GetMiscellaneous() const
 {
-    static const std::vector<uint32_t> mscs {
+    static const std::vector<uint32_t> miscellaneous {
     };
-    return mscs;
+    return miscellaneous;
 }
 
-const std::vector<uint32_t>& VirtualDevice::GetSws() const
+const std::vector<uint32_t>& VirtualDevice::GetSwitchs() const
 {
-    static const std::vector<uint32_t> sws {
+    static const std::vector<uint32_t> switchs {
     };
-    return sws;
+    return switchs;
 }
 } // namespace MMI
 } // namespace OHOS
