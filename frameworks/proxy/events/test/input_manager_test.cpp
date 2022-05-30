@@ -2742,6 +2742,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_004, TestSize
 
     MMI_HILOGD("Call InputManager::SimulateInputEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
 
     InputManager::GetInstance()->RemoveMonitor(monitorId);
