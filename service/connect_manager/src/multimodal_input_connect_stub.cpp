@@ -15,15 +15,16 @@
 
 #include "multimodal_input_connect_stub.h"
 
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 
 #include "string_ex.h"
-#include "accesstoken_kit.h"
 
 #include "error_multimodal.h"
-#include "mmi_log.h"
-#include "multimodal_input_connect_define.h"
+#include "multimodal_input_connect_def_parcel.h"
+#include "time_cost_chk.h"
+#include "permission_helper.h"
 
 namespace OHOS {
 namespace MMI {
@@ -34,15 +35,16 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Multi
 int32_t MultimodalInputConnectStub::OnRemoteRequest(
     uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
-    CALL_LOG_ENTER;
-    MMI_HILOGD("request code:%{public}d", code);
+    int32_t pid = GetCallingPid();
+    TimeCostChk chk("IPC-OnRemoteRequest", "overtime 300(us)", MAX_OVER_TIME, pid,
+        static_cast<int64_t>(code));
+    MMI_HILOGD("RemoteRequest code:%{public}d tid:%{public}" PRIu64 " pid:%{public}d", code, GetThisThreadId(), pid);
 
     std::u16string descriptor = data.ReadInterfaceToken();
     if (descriptor != IMultimodalInputConnect::GetDescriptor()) {
         MMI_HILOGE("get unexpect descriptor:%{public}s", Str16ToStr8(descriptor).c_str());
         return ERR_INVALID_STATE;
     }
-
     switch (code) {
         case IMultimodalInputConnect::ALLOC_SOCKET_FD: {
             return StubHandleAllocSocketFd(data, reply);
@@ -56,128 +58,126 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         case IMultimodalInputConnect::IS_POINTER_VISIBLE: {
             return StubIsPointerVisible(data, reply);
         }
+        case IMultimodalInputConnect::MARK_EVENT_PROCESSED: {
+            return StubMarkEventProcessed(data, reply);
+        }
         default: {
-            MMI_HILOGE("unknown code:%{public}u, go switch defaut", code);
+            MMI_HILOGE("unknown code:%{public}u, go switch default", code);
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
         }
     }
 }
 
-int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& reply)
 {
-    CALL_LOG_ENTER;
-    int32_t ret = RET_OK;
-
-    do {
-        const int32_t uid = GetCallingUid();
-        if (uid != SYSTEM_UID && uid != ROOT_UID) {
-            MMI_HILOGE("check failed, uid is not root or system");
-            ret = SASERVICE_PERMISSION_FAIL;
-            break;
-        }
-
-        sptr<IRemoteObject> client = data.ReadRemoteObject();
-        if (client == nullptr) {
-            MMI_HILOGE("mouse client is nullptr");
-            ret = ERR_INVALID_VALUE;
-            break;
-        }
-
-        sptr<IEventFilter> filter = iface_cast<IEventFilter>(client);
-        if (filter == nullptr) {
-            MMI_HILOGE("filter is nullptr");
-            ret = ERROR_NULL_POINTER;
-            break;
-        }
-
-        MMI_HILOGD("filter iface_cast succeeded");
-
-        ret = AddInputEventFilter(filter);
-    } while (0);
-    
-    if (!reply.WriteInt32(ret)) {
-        MMI_HILOGE("WriteInt32:%{public}d fail", ret);
-        return IPC_STUB_WRITE_PARCEL_ERR;
+    int32_t pid = GetCallingPid();
+    if (!IsRunning()) {
+        MMI_HILOGE("service is not running. pid:%{public}d, go switch default", pid);
+        return MMISERVICE_NOT_RUNNING;
     }
-
-    MMI_HILOGD("ret:%{public}d", ret);
+    sptr<ConnectReqParcel> req = data.ReadParcelable<ConnectReqParcel>();
+    CHKPR(req, ERROR_NULL_POINTER);
+    MMI_HILOGD("clientName:%{public}s,moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
+    
+    int32_t clientFd = INVALID_SOCKET_FD;
+    int32_t ret = AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd);
+    if (ret != RET_OK) {
+        MMI_HILOGE("AllocSocketFd failed pid:%{public}d, go switch default", pid);
+        if (clientFd >= 0) {
+            close(clientFd);
+        }
+        return ret;
+    }
+    reply.WriteFileDescriptor(clientFd);
+    MMI_HILOGI("send clientFd to client, clientFd = %{public}d", clientFd);
+    close(clientFd);
     return RET_OK;
 }
 
-bool MultimodalInputConnectStub::CheckPermission()
+int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply)
 {
-    auto tokenId = IPCSkeleton::GetCallingTokenID();
-    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
-    if (tokenType == OHOS::Security::AccessToken::TOKEN_HAP) {
-        OHOS::Security::AccessToken::HapTokenInfo findInfo;
-        if (OHOS::Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenId, findInfo) != 0) {
-            MMI_HILOGE("GetHapTokenInfo failed");
-            return false;
-        }
-        if (findInfo.apl == OHOS::Security::AccessToken::APL_SYSTEM_BASIC ||
-            findInfo.apl == OHOS::Security::AccessToken::APL_SYSTEM_CORE) {
-            MMI_HILOGI("check hap permisson success");
-            return true;
-        }
-        MMI_HILOGE("check hap permisson failed");
-        return false;
+    CALL_LOG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_CORE)) {
+        MMI_HILOGE("permission check fail");
+        return CHECK_PERMISSION_FAIL;
     }
-    if (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE) {
-        OHOS::Security::AccessToken::NativeTokenInfo findInfo;
-        if (OHOS::Security::AccessToken::AccessTokenKit::GetNativeTokenInfo(tokenId, findInfo) != 0) {
-            MMI_HILOGE("GetNativeTokenInfo failed");
-            return false;
-        }
-        if (findInfo.apl == OHOS::Security::AccessToken::APL_SYSTEM_BASIC ||
-            findInfo.apl == OHOS::Security::AccessToken::APL_SYSTEM_CORE) {
-            MMI_HILOGI("check native permisson success");
-            return true;
-        }
-        MMI_HILOGE("check native permisson failed");
-        return false;
+
+    sptr<IRemoteObject> client = data.ReadRemoteObject();
+    CHKPR(client, ERR_INVALID_VALUE);
+    sptr<IEventFilter> filter = iface_cast<IEventFilter>(client);
+    CHKPR(filter, ERROR_NULL_POINTER);
+
+    int32_t ret = AddInputEventFilter(filter);
+    if (ret != RET_OK) {
+        MMI_HILOGE("call AddInputEventFilter failed ret:%{public}d", ret);
+        return ret;
     }
-    
-    MMI_HILOGE("unsupported token type:%{public}d", tokenType);
-    return false;
+    MMI_HILOGD("success pid:%{public}d", GetCallingPid());
+    return RET_OK;
 }
 
 int32_t MultimodalInputConnectStub::StubSetPointerVisible(MessageParcel& data, MessageParcel& reply)
 {
     CALL_LOG_ENTER;
-    if (!CheckPermission()) {
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
         MMI_HILOGE("permission check fail");
         return CHECK_PERMISSION_FAIL;
     }
-    int32_t ret;
-    bool visible;
+
+    bool visible = false;
     if (!data.ReadBool(visible)) {
         MMI_HILOGE("data ReadBool fail");
         return IPC_PROXY_DEAD_OBJECT_ERR;
     }
-    ret = SetPointerVisible(visible);
-    if (!reply.WriteInt32(ret)) {
-        MMI_HILOGE("WriteInt32:%{public}d fail", ret);
-        return IPC_STUB_WRITE_PARCEL_ERR;
+    int32_t ret = SetPointerVisible(visible);
+    if (ret != RET_OK) {
+        MMI_HILOGE("call SetPointerVisible failed ret:%{public}d", ret);
+        return ret;
     }
+    MMI_HILOGD("success visible:%{public}d,pid:%{public}d", visible, GetCallingPid());
     return RET_OK;
 }
 
 int32_t MultimodalInputConnectStub::StubIsPointerVisible(MessageParcel& data, MessageParcel& reply)
 {
     CALL_LOG_ENTER;
-    if (!CheckPermission()) {
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
         MMI_HILOGE("permission check fail");
         return CHECK_PERMISSION_FAIL;
     }
 
-    int32_t ret;
-    bool visible;
-    ret = IsPointerVisible(visible);
+    bool visible = false;
+    int32_t ret = IsPointerVisible(visible);
+    if (ret != RET_OK) {
+        MMI_HILOGE("call IsPointerVisible failed ret:%{public}d", ret);
+        return ret;
+    }
     if (!reply.WriteBool(visible)) {
         MMI_HILOGE("WriteBool:%{public}d fail", ret);
         return IPC_STUB_WRITE_PARCEL_ERR;
     }
-    return ret;
+    MMI_HILOGD("visible:%{public}d,ret:%{public}d,pid:%{public}d", visible, ret, GetCallingPid());
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubMarkEventProcessed(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_LOG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t eventId;
+    if (!data.ReadInt32(eventId)) {
+        MMI_HILOGE("Read eventId failed");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+    int32_t ret = MarkEventProcessed(eventId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("MarkEventProcessed failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

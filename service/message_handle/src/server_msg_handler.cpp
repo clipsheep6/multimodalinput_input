@@ -54,12 +54,12 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
     }
 #endif
     MsgCallback funs[] = {
-        {MmiMessageId::MARK_PROCESS, MsgCallbackBind2(&ServerMsgHandler::MarkProcessed, this)},
         {MmiMessageId::INJECT_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnInjectKeyEvent, this) },
         {MmiMessageId::INJECT_POINTER_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnInjectPointerEvent, this) },
         {MmiMessageId::INPUT_DEVICE, MsgCallbackBind2(&ServerMsgHandler::OnInputDevice, this)},
         {MmiMessageId::INPUT_DEVICE_IDS, MsgCallbackBind2(&ServerMsgHandler::OnInputDeviceIds, this)},
         {MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY, MsgCallbackBind2(&ServerMsgHandler::OnSupportKeys, this)},
+        {MmiMessageId::INPUT_DEVICE_KEYBOARD_TYPE, MsgCallbackBind2(&ServerMsgHandler::OnInputKeyboardType, this)},
         {MmiMessageId::ADD_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnAddInputDeviceMontior, this)},
         {MmiMessageId::REMOVE_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputDeviceMontior, this)},
         {MmiMessageId::DISPLAY_INFO, MsgCallbackBind2(&ServerMsgHandler::OnDisplayInfo, this)},
@@ -123,17 +123,10 @@ int32_t ServerMsgHandler::OnHdiInject(SessionPtr sess, NetPacket& pkt)
 }
 #endif // OHOS_BUILD_HDF
 
-int32_t ServerMsgHandler::MarkProcessed(SessionPtr sess, NetPacket& pkt)
+int32_t ServerMsgHandler::MarkEventProcessed(SessionPtr sess, int32_t eventId)
 {
     CALL_LOG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t eventId = 0;
-    pkt >> eventId;
-    MMI_HILOGD("event is: %{public}d", eventId);
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read data failed");
-        return PACKET_READ_FAIL;
-    }
     sess->DelEvents(eventId);
     return RET_OK;
 }
@@ -275,6 +268,7 @@ int32_t ServerMsgHandler::OnMoveMouse(SessionPtr sess, NetPacket& pkt)
     if (MouseEventHdr->NormalizeMoveMouse(offsetX, offsetY)) {
         auto pointerEvent = MouseEventHdr->GetPointerEvent();
         eventDispatch_.HandlePointerEvent(pointerEvent);
+        MMI_HILOGD("Mouse movement message processed successfully");
     }
     return RET_OK;
 }
@@ -438,6 +432,32 @@ int32_t ServerMsgHandler::OnSupportKeys(SessionPtr sess, NetPacket& pkt)
     }
     if (!sess->SendMsg(pkt2)) {
         MMI_HILOGE("Sending failed");
+        return MSG_SEND_FAIL;
+    }
+    return RET_OK;
+}
+
+int32_t ServerMsgHandler::OnInputKeyboardType(SessionPtr sess, NetPacket& pkt)
+{
+    CALL_LOG_ENTER;
+    CHKPR(sess, ERROR_NULL_POINTER);
+    int32_t userData;
+    int32_t deviceId;
+    pkt >> userData >> deviceId;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read key info failed");
+        return RET_ERR;
+    }
+    int32_t keyboardType = InputDevMgr->GetKeyboardType(deviceId);
+    MMI_HILOGD("Gets the keyboard type result:%{public}d", keyboardType);
+    NetPacket pkt2(MmiMessageId::INPUT_DEVICE_KEYBOARD_TYPE);
+    pkt2 << userData << keyboardType;
+    if (pkt2.ChkRWError()) {
+        MMI_HILOGE("Packet write keyboard type failed");
+        return RET_ERR;
+    }
+    if (!sess->SendMsg(pkt2)) {
+        MMI_HILOGE("Failed to send the keyboard package");
         return MSG_SEND_FAIL;
     }
     return RET_OK;
