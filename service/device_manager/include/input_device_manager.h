@@ -60,9 +60,7 @@ public:
     void NotifyPointerDevice(bool hasPointerDevice, bool isPointerVisible);
     void AddDevMonitor(SessionPtr sess, std::function<void(std::string, int32_t)> callback);
     void RemoveDevMonitor(SessionPtr sess);
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool HasPointerDevice();
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
     std::shared_ptr<InputDevice> GetRemoteInputDevice(int32_t id);
     bool IsDistributedInput(struct libinput_device* device) const;
@@ -81,10 +79,7 @@ private:
     std::shared_ptr<InputDevice> MakeInputDevice(int32_t id, struct libinput_device * libinputDevice) const;
     std::string MakeNetworkId(const std::string& phys) const;
     void HandleDeviceChanged(std::string changedType, int32_t id);
-    // void ShowMouse();
-    // void HideMouse();
     bool IsRemote(struct libinput_device* inputDevice) const;
-    bool HasPointerDevice();
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
     uint32_t DeviceUdevTagsToDinputType(enum evdev_device_udev_tags udevTags) const;
     void NotifyDeviceChanged(const std::string& deviceId, const uint32_t& inputTypes, std::string changedType);

@@ -320,8 +320,7 @@ int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter)
 int32_t MMIService::SetPointerVisible(bool visible)
 {
     CALL_LOG_ENTER;
-    IPointerDrawingManager::GetInstance()->SetPointerVisible(GetCallingPid(), visible);
-    return RET_OK;
+    return IPointerDrawingManager::GetInstance()->SetPointerVisible(GetCallingPid(), visible);
 }
 
 int32_t MMIService::IsPointerVisible(bool &visible)

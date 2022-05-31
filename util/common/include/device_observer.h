@@ -21,7 +21,9 @@ namespace MMI {
 class IDeviceObserver {
 public:
     virtual void UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible) = 0;
-    virtual void SetPointerVisible(int32_t pid, bool visible) = 0;
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    virtual int32_t SetPointerVisible(int32_t pid, bool visible) = 0;
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
 };
 
 class IDeviceObject {
@@ -29,7 +31,6 @@ public:
     virtual void Attach(std::shared_ptr<IDeviceObserver> observer) = 0;
     virtual void Detach(std::shared_ptr<IDeviceObserver> observer) = 0;
     virtual void NotifyPointerDevice(bool hasPointerDevice, bool isPointerVisible) = 0;
-    virtual void SetPointerVisible(int32_t pid, bool visible) = 0;
 };
 } // namespace MMI
 } // namespace OHOS
