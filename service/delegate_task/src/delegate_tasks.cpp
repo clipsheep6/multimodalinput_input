@@ -59,7 +59,6 @@ void DelegateTasks::ProcessTasks()
     PopPendingTaskList(tasks);
     for (const auto &it : tasks) {
         it->ProcessTask();
-        RecoveryId(it->GetId());
     }
 }
 
@@ -112,6 +111,7 @@ void DelegateTasks::PopPendingTaskList(std::vector<TaskPtr> &tasks)
     while (!tasks_.empty() && ((count++) < onceProcessTaskLimit)) {
         auto task = tasks_.front();
         CHKPB(task);
+        RecoveryId(task->GetId());
         tasks.push_back(task->GetSharedPtr());
         tasks_.pop();
     }
@@ -146,7 +146,7 @@ DelegateTasks::TaskPtr DelegateTasks::PostTask(DTaskCallback callback, Promise *
     }
     tasks_.push(task);
     std::string taskType = ((promise == nullptr) ? "Async" : "Sync");
-    MMI_HILOGD("post %{public}s task id:%{public}d,tid:%{public}" PRIu64 "", taskType.c_str(), id, data.tid);
+    MMI_HILOGD("post %{public}s task:%{public}d,thread:%{public}" PRIu64 "", taskType.c_str(), id, data.tid);
     return task->GetSharedPtr();
 }
 } // namespace MMI

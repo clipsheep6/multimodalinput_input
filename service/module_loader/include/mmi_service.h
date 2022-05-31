@@ -54,12 +54,15 @@ public:
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
     virtual int32_t SetPointerVisible(bool visible) override;
     virtual int32_t IsPointerVisible(bool &visible) override;
+    virtual int32_t MarkEventProcessed(int32_t eventId) override;
 #ifdef OHOS_BUILD_KEY_MOUSE
     virtual int32_t SetPointerLocation(int32_t x, int32_t y) override;
 #endif
+
 #if (defined OHOS_RSS_CLIENT) || (defined OHOS_BUILD_KEY_MOUSE)
     virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
 #endif
+
 #ifdef OHOS_BUILD_KEY_MOUSE
     virtual int32_t GetRemoteInputAbility(std::string deviceId, sptr<ICallDinput> ablitity) override;
     virtual int32_t PrepareRemoteInput(const std::string& deviceId, sptr<ICallDinput> prepareDinput) override;

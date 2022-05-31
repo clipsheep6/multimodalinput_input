@@ -46,6 +46,7 @@ public:
     virtual int32_t StopRemoteInput(const std::string& deviceId, uint32_t inputAbility,
         sptr<ICallDinput> prepareDinput) override;
 #endif // OHOS_BUILD_KEY_MOUSE
+    virtual int32_t MarkEventProcessed(int32_t eventId) override;
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;
 };

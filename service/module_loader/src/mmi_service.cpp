@@ -382,6 +382,20 @@ int32_t  MMIService::StopRemoteInput(const std::string& deviceId,
 }
 #endif // OHOS_BUILD_KEY_MOUSE
 
+int32_t MMIService::MarkEventProcessed(int32_t eventId)
+{
+    CALL_LOG_ENTER;
+    auto sess = GetSessionByPid(GetCallingPid());
+    CHKPR(sess, ERROR_NULL_POINTER);
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&ServerMsgHandler::MarkEventProcessed, &sMsgHandler_, sess, eventId));
+    if (ret != RET_OK) {
+        MMI_HILOGE("mark event processed failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 #if (defined OHOS_RSS_CLIENT) || (defined OHOS_BUILD_KEY_MOUSE)
 void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {

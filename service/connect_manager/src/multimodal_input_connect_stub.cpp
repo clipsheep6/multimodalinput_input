@@ -72,6 +72,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         case IMultimodalInputConnect::STOP_DINPUT:
             return StubStopRemoteInput(data, reply);
 #endif // OHOS_BUILD_KEY_MOUSE
+        case IMultimodalInputConnect::MARK_EVENT_PROCESSED: {
+            return StubMarkEventProcessed(data, reply);
+        }
         default: {
             MMI_HILOGE("unknown code:%{public}u, go switch default", code);
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -313,5 +316,24 @@ int32_t MultimodalInputConnectStub::StubStopRemoteInput(MessageParcel& data, Mes
     return RET_OK;
 }
 #endif // OHOS_BUILD_KEY_MOUSE
+int32_t MultimodalInputConnectStub::StubMarkEventProcessed(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_LOG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t eventId;
+    if (!data.ReadInt32(eventId)) {
+        MMI_HILOGE("Read eventId failed");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+    int32_t ret = MarkEventProcessed(eventId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("MarkEventProcessed failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

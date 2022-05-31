@@ -45,6 +45,7 @@ public:
     int32_t StopRemoteInput(const std::string& deviceId, uint32_t inputAbility, sptr<ICallDinput> prepareDinput);
 
 #endif // OHOS_BUILD_KEY_MOUSE
+    int32_t MarkEventProcessed(int32_t eventId);
 private:
     MultimodalInputConnectManager() = default;
     DISALLOW_COPY_AND_MOVE(MultimodalInputConnectManager);

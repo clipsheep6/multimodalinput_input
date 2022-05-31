@@ -147,6 +147,11 @@ int32_t MultimodalInputConnectManager::StopRemoteInput(const std::string& device
 }
 #endif // OHOS_BUILD_KEY_MOUSE
 
+int32_t MultimodalInputConnectManager::MarkEventProcessed(int32_t eventId)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->MarkEventProcessed(eventId);
+}
 bool MultimodalInputConnectManager::ConnectMultimodalInputService()
 {
     CALL_LOG_ENTER;

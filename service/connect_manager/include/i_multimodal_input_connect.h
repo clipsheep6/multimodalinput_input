@@ -47,6 +47,7 @@ public:
         sptr<ICallDinput> prepareDinput) = 0;
 #endif // OHOS_BUILD_KEY_MOUSE
 
+    virtual int32_t MarkEventProcessed(int32_t eventId) = 0;
     enum {
         ALLOC_SOCKET_FD = 0,
         ADD_INPUT_EVENT_FILTER = 1,
@@ -62,6 +63,7 @@ public:
         START_DINPUT = 11,
         STOP_DINPUT = 12,
 #endif
+        MARK_EVENT_PROCESSED = 4,
     };
 
     enum {

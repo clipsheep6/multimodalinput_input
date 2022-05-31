@@ -292,6 +292,13 @@ public:
 
     int32_t StopRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback);
 #endif
+    /**
+     * @brief Queries the keyboard type.
+     * @param deviceId Indicates the keyboard device ID.
+     * @return Returns the keyboard type.
+     * @since 9
+     */
+    void GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback);
 
 private:
     InputManager() = default;

@@ -172,5 +172,9 @@ int32_t InputManager::StopRemoteInput(const std::string& deviceId, uint32_t inpu
     return InputManagerImpl::GetInstance()->StopRemoteInput(deviceId, inputAbility, callback);
 }
 #endif
+void InputManager::GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback)
+{
+    InputMgrImpl->GetKeyboardType(deviceId, callback);
+}
 } // namespace MMI
 } // namespace OHOS
