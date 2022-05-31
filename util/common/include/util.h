@@ -67,6 +67,8 @@ std::string ReadJsonFile(const std::string &filePath);
 std::string ReadUinputToolFile(const std::string &filePath);
 int32_t ReadTomlFile(const std::string &filePath, DeviceConfig& devConf);
 int32_t ReadConfigFile(const std::string &realPath, DeviceConfig& devConf);
+std::string GetAnonyString(const std::string &value);
+std::string GetAnonyInt32(const int32_t value);
 inline bool IsNum(const std::string &str)
 {
     std::istringstream sin(str);

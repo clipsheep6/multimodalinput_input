@@ -31,6 +31,9 @@ namespace MMI {
 struct MouseLocation {
     int32_t globalX;
     int32_t globalY;
+#ifdef OHOS_BUILD_KEY_MOUSE
+    int32_t displayId;
+#endif
 };
 
 class InputWindowsManager : public DelayedSingleton<InputWindowsManager> {
@@ -66,6 +69,9 @@ public:
     bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
         int32_t& targetDisplayId, LogicalCoordinate& coord) const;
 
+#ifdef OHOS_BUILD_KEY_MOUSE
+    void UpdateDmouseLocation();
+#endif // OHOS_BUILD_KEY_MOUSE
 private:
     bool IsInsideWindow(int32_t x, int32_t y, const WindowInfo &info) const;
     void PrintDisplayInfo();
@@ -78,7 +84,10 @@ private:
     void SelectWindowInfo(const int32_t& globalX, const int32_t& globalY,
         const std::shared_ptr<PointerEvent>& pointerEvent, LogicalDisplayInfo * const logicalDisplayInfo,
         WindowInfo*& touchWindow);
-
+#ifdef OHOS_BUILD_KEY_MOUSE
+    std::set<LogicalDisplayInfo*> UpdateX(double& x);
+    int32_t UpdateY(std::set<LogicalDisplayInfo*> pLogicals, double& y);
+#endif
 private:
     UDSServer* udsServer_ = nullptr;
     int32_t firstBtnDownWindowId_ = -1;

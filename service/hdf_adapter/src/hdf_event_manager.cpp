@@ -134,7 +134,7 @@ int32_t HdfEventManager::EvdevIoctl(int32_t hdiindex, int32_t pcmd, void *iobuff
     MMI_HILOGD("index:%{public}d,cmd:%{public}02x,size:%{public}d,"
         "pcmd:%{public}04x", hdiindex, cmd, size, pcmd);
     DeviceInfo *deviceinfo = nullptr;
-    for (auto &item : globleThis_->hdflist_){
+    for (auto &item : globleThis_->hdflist_) {
         if (item.index == hdiindex) {
             deviceinfo = static_cast<DeviceInfo*>(item->deviceinfo);
             break;
