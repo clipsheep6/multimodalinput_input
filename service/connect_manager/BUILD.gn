@@ -21,6 +21,9 @@ config("mmi_connect_manager_config") {
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
     "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/service/filter/include",
+    "//foundation/multimodalinput/input/service/dinput/include",
+    "//foundation/distributedhardware/distributedinput/frameworks/include",
+    "//foundation/multimodalinput/input/service/remote_input_ability/include",
     "${mmi_connect_manager_path}/include",
   ]
 }
@@ -35,6 +38,10 @@ ohos_source_set("mmi_connect_manager_service") {
   configs = [ ":mmi_connect_manager_config" ]
 
   cflags = [ "-DOHOS_BUILD" ]
+
+  if (is_mmi_have_dinput) {
+    cflags += [ "-DOHOS_DISTRIBUTED_INPUT_MODEL" ]
+  }
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
@@ -57,6 +64,10 @@ ohos_source_set("mmi_connect_manager_proxy") {
   configs = [ ":mmi_connect_manager_config" ]
 
   cflags = [ "-DOHOS_BUILD" ]
+  
+  if (is_mmi_have_dinput) {
+    cflags += [ "-DOHOS_DISTRIBUTED_INPUT_MODEL" ]
+  }
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",

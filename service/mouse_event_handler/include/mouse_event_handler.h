@@ -35,6 +35,7 @@ public:
 
     std::shared_ptr<PointerEvent> GetPointerEvent() const;
     int32_t Normalize(struct libinput_event *event);
+    void SetAbsolutionLocation(int32_t pid, double absX, double absY);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool NormalizeMoveMouse(int32_t offsetX, int32_t offsetY);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -51,6 +52,9 @@ private:
     int32_t HandleButtonValueInner(libinput_event_pointer* data);
     void DumpInner();
     void InitAbsolution();
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    void SetDxDyForDInput(PointerEvent::PointerItem& pointerItem, libinput_event_pointer* data);
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
 
 private:
     std::shared_ptr<PointerEvent> pointerEvent_ = nullptr;

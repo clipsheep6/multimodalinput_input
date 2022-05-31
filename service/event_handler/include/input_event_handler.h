@@ -43,6 +43,7 @@ public:
     UDSServer *GetUDSServer() const;
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
     void AddHandleTimer(int32_t timeout = 300);
+    void SetAbsolutionLocation(int32_t pid, double absX, double absY);
 protected:
     int32_t OnEventDeviceAdded(libinput_event *event);
     int32_t OnEventDeviceRemoved(libinput_event *event);
