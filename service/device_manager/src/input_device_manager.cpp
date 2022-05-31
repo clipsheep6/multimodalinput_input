@@ -180,7 +180,6 @@ void InputDeviceManager::RemoveDevMonitor(SessionPtr sess)
     devMonitor_.erase(iter);
 }
 
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 bool InputDeviceManager::HasPointerDevice()
 {
     for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
@@ -190,7 +189,6 @@ bool InputDeviceManager::HasPointerDevice()
     }
     return false;
 }
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
 {
@@ -255,18 +253,6 @@ void InputDeviceManager::ScanPointerDevice()
     if (!HasPointerDevice()) {
         NotifyPointerDevice(false, true);
     }
-}
-
-bool InputDeviceManager::HasPointerDevice()
-{
-    bool hasPointerDevice = false;
-    for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
-        if (IsPointerDevice(it->second)) {
-            hasPointerDevice = true;
-            break;
-        }
-    }
-    return hasPointerDevice;
 }
 
 bool InputDeviceManager::IsPointerDevice(struct libinput_device* device)

@@ -321,11 +321,12 @@ void PointerDrawingManager::DeletePointerVisible(int32_t pid)
     UpdataPointerVisible();
 }
 
-void PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
+int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
 {
     CALL_LOG_ENTER;
     UpdataPidInfo(pid, visible);
     UpdataPointerVisible();
+    return RET_OK;
 }
 
 void PointerDrawingManager::SetPointerLocation(int32_t pid, int32_t x, int32_t y)
