@@ -26,7 +26,6 @@
 #include "proto.h"
 
 #include "input_event.h"
-#include "input_event_monitor_manager.h"
 #include "input_handler_type.h"
 #include "input_manager.h"
 #include "multimodal_event_handler.h"
@@ -1415,20 +1414,35 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_001, TestSize.Level1)
         "InputHandlerManagerGlobal: in AddMonitor, "
         "Service AddMonitor Success"
     };
+
+    std::string command1 {
+        "InputHandlerManagerGlobal: in AddMonitor, "
+        "AddMonitor is not support"
+    };
     std::vector<std::string> sLogs { SearchLog(command, true) };
 
+    std::vector<std::string> sLogs1 { SearchLog(command1, true) };
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
     MMI_HILOGD("InputManagerTest_AddHandler_001");
     int32_t id1 = InputManager::GetInstance()->AddMonitor(callBackPtr);
-    EXPECT_TRUE(IsValidHandlerId(id1));
-
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    EXPECT_TRUE(!IsValidHandlerId(id1));
+#else
+    EXPECT_EQ(id1, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_MONITOR
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
-
+    
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     if (IsValidHandlerId(id1)) {
         InputManager::GetInstance()->RemoveMonitor(id1);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
+#else
+   if (id1 == ERROR_UNSUPPORT) {
+       InputManager::GetInstance()->RemoveMonitor(id1);
+   }
+#endif // OHOS_BUILD_ENABLE_MONITOR
 }
 
 /**
@@ -1444,7 +1458,11 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_002, TestSize.Level1)
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
     int32_t id1 = InputManager::GetInstance()->AddMonitor(callBackPtr);
-    EXPECT_TRUE(IsValidHandlerId(id1));
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    EXPECT_TRUE(!IsValidHandlerId(id1));
+#else
+    EXPECT_EQ(id1, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     std::string command {
@@ -1453,10 +1471,18 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_002, TestSize.Level1)
     };
     std::vector<std::string> sLogs { SearchLog(command, true) };
     MMI_HILOGD("InputManagerTest_AddHandler_002");
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     if (IsValidHandlerId(id1)) {
         InputManager::GetInstance()->RemoveMonitor(id1);
     }
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+
+#else
+    if (id1 == ERROR_UNSUPPORT) {
+        InputManager::GetInstance()->RemoveMonitor(id1);
+    }
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+#endif // OHOS_BUILD_ENABLE_MONITOR
 }
 
 /**
@@ -1477,7 +1503,11 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_003, TestSize.Level1)
         cbs[i] = InputEventCallback::GetPtr();
         EXPECT_TRUE(cbs[i] != nullptr);
         ids[i] = InputManager::GetInstance()->AddMonitor(cbs[i]);
-        EXPECT_TRUE(IsValidHandlerId(ids[i]));
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+        EXPECT_TRUE(!IsValidHandlerId(ids[i]));
+#else
+        EXPECT_EQ(ids[i], ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_MONITOR
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 
@@ -1485,8 +1515,14 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_003, TestSize.Level1)
         "InputManagerTest: in OnInputEvent, "
         "PointerEvent received"
     };
+
+    std::string command1 {
+        "InputManagerTest: in OnInputEvent, "
+        "PointerEvent received"
+    };
     std::vector<std::string> sLogs { SearchLog(command, true) };
 
+    std::vector<std::string> sLogs1 { SearchLog(command1, true) };
     auto pointerEvent = SetupPointerEvent001();
     MMI_HILOGD("InputManagerTest_AddHandler_003");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -1506,13 +1542,22 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_003, TestSize.Level1)
         sLogs.insert(sLogs.end(), tLogs.begin(), tLogs.end());
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
     }
-
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
         if (IsValidHandlerId(ids[i])) {
             InputManager::GetInstance()->RemoveMonitor(ids[i]);
             std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
         }
     }
+#else
+    EXPECT_EQ(rLogs.size() >= N_TEST_CASES, false);
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
+        if (ids[i] == ERROR_UNSUPPORT) {
+            InputManager::GetInstance()->RemoveMonitor(ids[i]);
+            std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+        }
+    }
+#endif // OHOS_BUILD_ENABLE_MONITOR
 }
 
 /**
@@ -1529,8 +1574,14 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_004, TestSize.Level1)
         "InputHandlerManager: in AddHandler, "
         "The number of handlers exceeds the maximum"
     };
+
+    std::string command1 {
+        "InputHandlerManager: in AddHandler, "
+        "The number of handlers is null"
+    };
     std::vector<std::string> sLogs { SearchLog(command, true) };
 
+    std::vector<std::string> sLogs1 { SearchLog(command1, true) };
     const std::vector<int32_t>::size_type N_TEST_CASES { MAX_N_INPUT_HANDLERS };
     std::vector<int32_t> ids(N_TEST_CASES);
     std::shared_ptr<InputEventCallback> cb = InputEventCallback::GetPtr();
@@ -1538,21 +1589,38 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_004, TestSize.Level1)
 
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
         ids[i] = InputManager::GetInstance()->AddMonitor(cb);
-        EXPECT_TRUE(IsValidHandlerId(ids[i]));
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+        EXPECT_TRUE(!IsValidHandlerId(ids[i]));
+#else
+        EXPECT_EQ(ids[i], ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_MONITOR
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
     MMI_HILOGD("InputManagerTest_AddHandler_004");
     int32_t monitorId = InputManager::GetInstance()->AddMonitor(cb);
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     EXPECT_TRUE(!IsValidHandlerId(monitorId));
+#else
+    EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_MONITOR
 
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
-
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
         if (IsValidHandlerId(ids[i])) {
             InputManager::GetInstance()->RemoveMonitor(ids[i]);
             std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
         }
     }
+#else
+    EXPECT_EQ(!tLogs.empty(), false);
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
+        if (ids[i] == ERROR_UNSUPPORT) {
+            InputManager::GetInstance()->RemoveMonitor(ids[i]);
+            std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+        }
+    }
+#endif // OHOS_BUILD_ENABLE_MONITOR
 }
 
 /**
@@ -1569,7 +1637,11 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_005, TestSize.Level1)
     std::shared_ptr<InputEventCallback> cb = InputEventCallback::GetPtr();
     EXPECT_TRUE(cb != nullptr);
     int32_t monitorId = InputManager::GetInstance()->AddMonitor(cb);
-    EXPECT_TRUE(IsValidHandlerId(monitorId));
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    EXPECT_TRUE(!IsValidHandlerId(monitorId));
+#else
+    EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     MMI_HILOGD("InputManagerTest_AddHandler_005");
     TestMarkConsumedStep1();
@@ -1577,11 +1649,17 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_005, TestSize.Level1)
     TestMarkConsumedStep3(monitorId, pointerEvent->GetId());
     TestMarkConsumedStep4();
     TestMarkConsumedStep5();
-
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     if (IsValidHandlerId(monitorId)) {
         InputManager::GetInstance()->RemoveMonitor(monitorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
+#else
+    if (monitorId == ERROR_UNSUPPORT) {
+        InputManager::GetInstance()->RemoveMonitor(monitorId);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
+#endif // OHOS_BUILD_ENABLE_MONITOR
 }
 
 /**
@@ -1598,18 +1676,28 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_006, TestSize.Level1)
     std::shared_ptr<InputEventCallback> cb = InputEventCallback::GetPtr();
     EXPECT_TRUE(cb != nullptr);
     int32_t monitorId = InputManager::GetInstance()->AddMonitor(cb);
-    EXPECT_TRUE(IsValidHandlerId(monitorId));
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    EXPECT_TRUE(!IsValidHandlerId(monitorId));
+#else
+    EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     MMI_HILOGD("InputManagerTest_AddHandler_006");
     auto pointerEvent = TestMarkConsumedStep1();
     TestMarkConsumedStep3(monitorId, pointerEvent->GetId());
     TestMarkConsumedStep4();
     TestMarkConsumedStep6();
-
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     if (IsValidHandlerId(monitorId)) {
         InputManager::GetInstance()->RemoveMonitor(monitorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
+#else
+    if (monitorId == ERROR_UNSUPPORT) {
+        InputManager::GetInstance()->RemoveMonitor(monitorId);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
+#endif // OHOS_BUILD_ENABLE_MONITOR
 }
 
 /**
@@ -2181,13 +2269,21 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_001, TestSize.L
     MMI_HILOGD("Call MontiorManager");
 
     std::string command { "PointerEvent received" };
+
+    std::string command1 { "PointerEvent is not support" };
     std::vector<std::string> sLogs { SearchLog(command, true) };
 
+    std::vector<std::string> sLogs1 { SearchLog(command1, true) };
     int32_t monitorId { };
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
     monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
-    EXPECT_TRUE(IsValidHandlerId(monitorId));
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    EXPECT_TRUE(!IsValidHandlerId(monitorId));
+#else
+    EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_MONITOR
+
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int32_t response = MMIEventHdl.InjectPointerEvent(pointerEvent);
@@ -2225,13 +2321,21 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_002, TestSize.L
     MMI_HILOGD("Call MontiorManager");
 
     std::string command { "PointerEvent received" };
+
+    std::string command1 { "PointerEvent is not support" };
     std::vector<std::string> sLogs { SearchLog(command, true) };
+
+    std::vector<std::string> sLogs1 { SearchLog(command1, true) };
 
     int32_t monitorId { };
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
     monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
-    EXPECT_TRUE(IsValidHandlerId(monitorId));
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    EXPECT_TRUE(!IsValidHandlerId(monitorId));
+#else
+    EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int32_t response = MMIEventHdl.InjectPointerEvent(pointerEvent);
@@ -2269,13 +2373,20 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_003, TestSize.L
     MMI_HILOGD("Call MontiorManager");
 
     std::string command { "PointerEvent received" };
+
+    std::string command1 { "PointerEvent is not support" };
     std::vector<std::string> sLogs { SearchLog(command, true) };
 
+    std::vector<std::string> sLogs1 { SearchLog(command1, true) };
     int32_t monitorId { };
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
     monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
-    EXPECT_TRUE(IsValidHandlerId(monitorId));
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    EXPECT_TRUE(!IsValidHandlerId(monitorId));
+#else
+    EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int32_t response = MMIEventHdl.InjectPointerEvent(pointerEvent);
@@ -2319,7 +2430,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.L
     EXPECT_TRUE(callBackPtr != nullptr);
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
         ids[i] = InputManager::GetInstance()->AddMonitor(callBackPtr);
-        EXPECT_TRUE(IsValidHandlerId(ids[i]));
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+        EXPECT_TRUE(!IsValidHandlerId(ids[i]));
+#else
+        EXPECT_EQ(ids[i], ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_MONITOR
+        
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 
@@ -2327,6 +2443,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.L
         "InputManagerTest: in OnInputEvent, "
         "PointerEvent received"
     };
+
     std::vector<std::string> sLogs { SearchLog(command, true) };
 
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -2342,6 +2459,11 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.L
         sLogs.insert(sLogs.end(), tLogs.begin(), tLogs.end());
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
     }
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    EXPECT_TRUE(!(rLogs.size() >= N_TEST_CASES));
+#else
+    EXPECT_EQ(rLogs.size() >= N_TEST_CASES, false);
+#endif // OHOS_BUILD_ENABLE_MONITOR
 
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
         InputManager::GetInstance()->RemoveMonitor(ids[i]);
@@ -2378,13 +2500,23 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_005, TestSize.L
         "InputManagerTest: in OnInputEvent, "
         "PointerEvent received"
     };
+
+    std::string command1 {
+        "InputManagerTest: in OnInputEvent, "
+        "PointerEvent is not support"
+    };
     std::vector<std::string> sLogs { SearchLog(command, true) };
 
+    std::vector<std::string> sLogs1 { SearchLog(command1, true) };
     int32_t monitorId { };
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
     monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
-    EXPECT_TRUE(IsValidHandlerId(monitorId));
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    EXPECT_TRUE(!IsValidHandlerId(monitorId));
+#else
+    EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int32_t response = MMIEventHdl.InjectPointerEvent(pointerEvent);
@@ -2408,7 +2540,12 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_001, TestSize
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
     int32_t monitorId { InputManager::GetInstance()->AddMonitor(callBackPtr) };
-    EXPECT_TRUE(monitorId >= MIN_HANDLER_ID);
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    EXPECT_TRUE(!(monitorId >= MIN_HANDLER_ID));
+#else
+    EXPECT_EQ(monitorId >= MIN_HANDLER_ID, false);
+#endif // OHOS_BUILD_ENABLE_MONITOR
+    
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int64_t actionTime = GetSysClockTime();
@@ -2455,7 +2592,11 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_002, TestSize
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
     int32_t monitorId { InputManager::GetInstance()->AddMonitor(callBackPtr) };
-    EXPECT_TRUE(monitorId >= MIN_HANDLER_ID);
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    EXPECT_TRUE(!(monitorId >= MIN_HANDLER_ID));
+#else
+    EXPECT_EQ(monitorId >= MIN_HANDLER_ID, false);
+#endif // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int64_t actionTime = GetSysClockTime();
@@ -2502,7 +2643,11 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_003, TestSize
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
     int32_t monitorId { InputManager::GetInstance()->AddMonitor(callBackPtr) };
-    EXPECT_TRUE(monitorId >= MIN_HANDLER_ID);
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    EXPECT_TRUE(!(monitorId >= MIN_HANDLER_ID));
+#else
+    EXPECT_EQ(monitorId >= MIN_HANDLER_ID, false);
+#endif // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int64_t actionTime = GetSysClockTime();
@@ -2549,7 +2694,11 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_004, TestSize
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
     int32_t monitorId { InputManager::GetInstance()->AddMonitor(callBackPtr) };
-    EXPECT_TRUE(monitorId >= MIN_HANDLER_ID);
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    EXPECT_TRUE(!(monitorId >= MIN_HANDLER_ID));
+#else
+    EXPECT_EQ(monitorId >= MIN_HANDLER_ID, false);
+#endif // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int64_t actionTime = GetSysClockTime();
@@ -2618,12 +2767,23 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_001, TestSize.Level1
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
     int32_t id1 = InputManager::GetInstance()->AddMonitor(callBackPtr);
-    EXPECT_TRUE(IsValidHandlerId(id1));
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    EXPECT_TRUE(!IsValidHandlerId(id1));
+#else
+    EXPECT_EQ(id1, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_MONITOR
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     if (IsValidHandlerId(id1)) {
         InputManager::GetInstance()->RemoveMonitor(id1);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
+#else
+    if (id1 == ERROR_UNSUPPORT) {
+        InputManager::GetInstance()->RemoveMonitor(id1);
+    }
+#endif // OHOS_BUILD_ENABLE_MONITOR
 }
 
 /**
@@ -2639,19 +2799,38 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_002, TestSize.Level1
     EXPECT_TRUE(callBackPtr != nullptr);
 
     int32_t id1 = InputManager::GetInstance()->AddMonitor(callBackPtr);
-    EXPECT_TRUE(IsValidHandlerId(id1));
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    EXPECT_TRUE(!IsValidHandlerId(id1));
+#else
+    EXPECT_EQ(id1, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     std::string command {
         "InputHandlerManagerGlobal: in RemoveMonitor, "
         "Service RemoveMonitor Success"
     };
+
+    std::string command1 {
+        "InputManagerTest: in OnInputEvent, "
+        "PointerEvent is not support"
+    };
     std::vector<std::string> sLogs { SearchLog(command, true) };
+
+    std::vector<std::string> sLogs1 { SearchLog(command1, true) };
+
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     if (IsValidHandlerId(id1)) {
         InputManager::GetInstance()->RemoveMonitor(id1);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+#else
+    if (id1 == ERROR_UNSUPPORT) {
+        InputManager::GetInstance()->RemoveMonitor(id1);
+    }
+    std::vector<std::string> tLogs { SearchLog(command1, sLogs1) };
+#endif // OHOS_BUILD_ENABLE_MONITOR
 }
 
 /**
@@ -2676,13 +2855,24 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_003, TestSize.Level1
 
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
         ids[i] = InputManager::GetInstance()->AddMonitor(cb);
-        EXPECT_TRUE(IsValidHandlerId(ids[i]));
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+        EXPECT_TRUE(!IsValidHandlerId(ids[i]));
+#else
+        EXPECT_EQ(ids[i], ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_MONITOR
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 
     int32_t monitorId = InputManager::GetInstance()->AddMonitor(cb);
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     EXPECT_TRUE(!IsValidHandlerId(monitorId));
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+    EXPECT_TRUE(tLogs.empty());
+#else
+    EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
+    std::vector<std::string> tLogs { SearchLog(command1, sLogs1) };
+    EXPECT_TRUE(tLogs.empty());
+#endif // OHOS_BUILD_ENABLE_MONITOR
 
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
         if (IsValidHandlerId(ids[i])) {
@@ -2704,25 +2894,43 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_004, TestSize.Level1
     auto callBackPtr = InputEventCallback::GetPtr();
     EXPECT_TRUE(callBackPtr != nullptr);
     int32_t id1 = InputManager::GetInstance()->AddMonitor(callBackPtr);
-    EXPECT_TRUE(IsValidHandlerId(id1));
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    EXPECT_TRUE(!IsValidHandlerId(id1));
+#else
+    EXPECT_EQ(id1, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     std::string command {
         "InputManagerTest: in OnInputEvent, "
         "PointerEvent received"
     };
+
+    std::string command1 {
+        "InputManagerTest: in OnInputEvent, "
+        "PointerEvent received"
+        "InputManagerTest_AddMouseMonitor_004 is not support"
+    };
     std::vector<std::string> sLogs { SearchLog(command, true) };
 
+    std::vector<std::string> sLogs1 { SearchLog(command1, true) };
     auto pointerEvent = SetupPointerEvent006();
     EXPECT_TRUE(pointerEvent != nullptr);
     MMI_HILOGD("Call InputManager::SimulateInputEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
     if (IsValidHandlerId(id1)) {
         InputManager::GetInstance()->RemoveMonitor(id1);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
+#else
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+    if (id1 == ERROR_UNSUPPORT) {
+        InputManager::GetInstance()->RemoveMonitor(id1);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
+#endif // OHOS_BUILD_ENABLE_MONITOR
 }
 
 /**

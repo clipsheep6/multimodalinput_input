@@ -28,7 +28,6 @@
 #include "event_filter_wrap.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
-#include "input_event_monitor_manager.h"
 #include "input_handler_manager_global.h"
 #include "key_event_subscriber.h"
 #include "util.h"
@@ -111,7 +110,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         MMI_HILOGD("Interception is succeeded");
         return RET_OK;
     }
-    if (InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
+    if (IInputHandlerManagerGlobal::GetInstance()->HandleEvent(point)) {
         BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
         MMI_HILOGD("Monitor is succeeded");
         return RET_OK;
@@ -172,8 +171,8 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
                key->GetActionStartTime(),
                key->GetEventType(),
                key->GetFlag(), key->GetKeyAction(), fd);
-    InputHandlerManagerGlobal::GetInstance().HandleEvent(key);
 
+    IInputHandlerManagerGlobal::GetInstance()->HandleEvent(key);
     NetPacket pkt(MmiMessageId::ON_KEYEVENT);
     InputEventDataTransformation::KeyEventToNetPacket(key, pkt);
     BytraceAdapter::StartBytrace(key, BytraceAdapter::KEY_DISPATCH_EVENT);
