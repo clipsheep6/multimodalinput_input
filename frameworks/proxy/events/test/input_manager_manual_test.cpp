@@ -139,8 +139,8 @@ HWTEST_F(InputManagerManualTest, InputManagerTest_UpdateDisplayInfo_001, TestSiz
     std::vector<LogicalDisplayInfo> logicalDisplayInfo(1);
     std::vector<HotArea> haotArea(4);
     WindowInfo windowInfo;
-    HotArea hotArea1,hotArea2,hotArea3,hotArea4;
-    physicalDisplayInfo[0].id = 0; 
+    HotArea hotArea1, hotArea2, hotArea3, hotArea4;
+    physicalDisplayInfo[0].id = 0;
     physicalDisplayInfo[0].leftDisplayId = -1;
     physicalDisplayInfo[0].upDisplayId = -1;
     physicalDisplayInfo[0].topLeftX = 0;
@@ -203,7 +203,7 @@ HWTEST_F(InputManagerManualTest, InputManagerTest_UpdateDisplayInfo_001, TestSiz
     logicalDisplayInfo[0].windowsInfo[0].hotArea.push_back(hotArea3);
     logicalDisplayInfo[0].windowsInfo[0].hotArea.push_back(hotArea4);
     MMI_HILOGD("start UpdateDisplayInfo");
-    InputManager::GetInstance()->UpdateDisplayInfo(physicalDisplayInfo,logicalDisplayInfo);
+    InputManager::GetInstance()->UpdateDisplayInfo(physicalDisplayInfo, logicalDisplayInfo);
     MMI_HILOGD("end UpdateDisplayInfo");
 }
 } // namespace MMI
