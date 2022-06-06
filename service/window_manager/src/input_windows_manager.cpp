@@ -418,8 +418,8 @@ const std::vector<LogicalDisplayInfo>& InputWindowsManager::GetLogicalDisplayInf
 bool InputWindowsManager::IsInsideWindow(int32_t x, int32_t y, const WindowInfo &info) const
 {
     bool insideWindow = false;
-    MMI_HILOGD("You hotArea num %{public}d", info.hotArea.size());
-    for (int32_t i = 0; i < info.hotArea.size(); ++i) {
+    MMI_HILOGD("You hotArea num %{public}zu", info.hotArea.size());
+    for (size_t i = 0; i < info.hotArea.size(); ++i) {
         insideWindow = (x >= info.hotArea[i].hotZoneTopLeftX) &&
                        (x <= info.hotArea[i].hotZoneTopLeftX + info.hotArea[i].hotZoneWidth) &&
                        (y >= info.hotArea[i].hotZoneTopLeftY) &&
