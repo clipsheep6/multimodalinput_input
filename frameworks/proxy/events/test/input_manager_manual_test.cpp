@@ -16,11 +16,11 @@
 #include <gtest/gtest.h>
 
 #include "define_multimodal.h"
+#include "display_info.h"
 #include "error_multimodal.h"
 #include "input_event_monitor_manager.h"
 #include "input_handler_manager.h"
 #include "input_manager.h"
-#include "interceptor_manager.h"
 #include "multimodal_event_handler.h"
 #include "pointer_event.h"
 #include "proto.h"
@@ -124,6 +124,87 @@ HWTEST_F(InputManagerManualTest, HandlePointerEventFilter_001, TestSize.Level1)
     AddInputEventFilter();
     SimulateInputEventHelper(10, 10, 1); // set global x and global y are 10, will expect value is 1
     SimulateInputEventHelper(0, 0, 2); // set global x and global y are not 10, will expect value is 2
+}
+
+/**
+ * @tc.name:InputManagerTest_UpdateDisplayInfo_001
+ * @tc.desc:Verify mouse monitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerManualTest, InputManagerTest_UpdateDisplayInfo_001, TestSize.Level1)
+{
+    MMI_HILOGD("start InputManagerTest_UpdateDisplayInfo_001 11");
+    std::vector<PhysicalDisplayInfo> physicalDisplayInfo(1);
+    std::vector<LogicalDisplayInfo> logicalDisplayInfo(1);
+    std::vector<HotArea> haotArea(4);
+    WindowInfo windowInfo;
+    HotArea hotArea1,hotArea2,hotArea3,hotArea4;
+    physicalDisplayInfo[0].id = 0; 
+    physicalDisplayInfo[0].leftDisplayId = -1;
+    physicalDisplayInfo[0].upDisplayId = -1;
+    physicalDisplayInfo[0].topLeftX = 0;
+    physicalDisplayInfo[0].topLeftY = 0;
+    physicalDisplayInfo[0].width = 720;
+    physicalDisplayInfo[0].height = 1280;
+    physicalDisplayInfo[0].name = "physical_display0";
+    physicalDisplayInfo[0].seatId = "seat0";
+    physicalDisplayInfo[0].seatName = "default0";
+    physicalDisplayInfo[0].logicWidth = 720;
+    physicalDisplayInfo[0].logicHeight = 1280;
+    physicalDisplayInfo[0].direction = Direction0;
+
+    logicalDisplayInfo[0].id = 0;
+    logicalDisplayInfo[0].topLeftX = 0;
+    logicalDisplayInfo[0].topLeftY = 0;
+    logicalDisplayInfo[0].width = 720;
+    logicalDisplayInfo[0].height = 1280;
+    logicalDisplayInfo[0].name = "logical_display0";
+    logicalDisplayInfo[0].seatId = "seat0";
+    logicalDisplayInfo[0].seatName = "default0";
+    logicalDisplayInfo[0].focusWindowId = 0;
+
+    windowInfo.id = 1;
+    windowInfo.pid = 565;
+    windowInfo.uid = 0;
+    windowInfo.hotZoneTopLeftX = 0;
+    windowInfo.hotZoneTopLeftY = 0;
+    windowInfo.hotZoneWidth = 720;
+    windowInfo.hotZoneHeight = 1280;
+    windowInfo.displayId = 0;
+    windowInfo.agentWindowId = 1;
+    windowInfo.winTopLeftX = 0;
+    windowInfo.winTopLeftY = 0;
+    windowInfo.flags = 0;
+    logicalDisplayInfo[0].windowsInfo.push_back(windowInfo);
+
+    hotArea1.hotZoneWidth = 360;
+    hotArea1.hotZoneHeight = 640;
+    hotArea1.hotZoneTopLeftX = 0;
+    hotArea1.hotZoneTopLeftY = 0;
+
+    hotArea2.hotZoneWidth = 360;
+    hotArea2.hotZoneHeight = 640;
+    hotArea2.hotZoneTopLeftX = 360;
+    hotArea2.hotZoneTopLeftY = 0;
+
+    hotArea3.hotZoneWidth = 360;
+    hotArea3.hotZoneHeight = 640;
+    hotArea3.hotZoneTopLeftX = 0;
+    hotArea3.hotZoneTopLeftY = 640;
+
+    hotArea4.hotZoneWidth = 360;
+    hotArea4.hotZoneHeight = 640;
+    hotArea4.hotZoneTopLeftX = 360;
+    hotArea4.hotZoneTopLeftY = 640;
+
+    logicalDisplayInfo[0].windowsInfo[0].hotArea.push_back(hotArea1);
+    logicalDisplayInfo[0].windowsInfo[0].hotArea.push_back(hotArea2);
+    logicalDisplayInfo[0].windowsInfo[0].hotArea.push_back(hotArea3);
+    logicalDisplayInfo[0].windowsInfo[0].hotArea.push_back(hotArea4);
+    MMI_HILOGD("start UpdateDisplayInfo");
+    InputManager::GetInstance()->UpdateDisplayInfo(physicalDisplayInfo,logicalDisplayInfo);
+    MMI_HILOGD("end UpdateDisplayInfo");
 }
 } // namespace MMI
 } // namespace OHOS
