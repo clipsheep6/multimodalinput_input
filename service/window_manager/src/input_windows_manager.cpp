@@ -104,11 +104,15 @@ void InputWindowsManager::UpdateDisplayInfo(const std::vector<PhysicalDisplayInf
     physicalDisplays_ = physicalDisplays;
     logicalDisplays_ = logicalDisplays;
     windowInfos_.clear();
+    hotArea_.clear();
     for (const auto &item : logicalDisplays) {
         for (const auto &window : item.windowsInfo) {
             auto iter = windowInfos_.insert(std::pair<int32_t, WindowInfo>(window.id, window));
             if (!iter.second) {
                 MMI_HILOGE("Insert value failed, Window:%{public}d", window.id);
+            }
+            for (const auto &hotAres : window.hotArea) {
+                hotArea_.push_back(hotAres);
             }
         }
     }
@@ -153,6 +157,13 @@ void InputWindowsManager::PrintDisplayInfo()
             item.second.hotZoneTopLeftY, item.second.hotZoneWidth, item.second.hotZoneHeight,
             item.second.displayId, item.second.agentWindowId, item.second.winTopLeftX, item.second.winTopLeftY,
             item.second.flags);
+    }
+
+    MMI_HILOGD("hotArea info,num:%{public}zu", hotArea_.size());
+    for (const auto &item : hotArea_) {
+        MMI_HILOGD("hotArea, hotZoneWidth:%{public}d, hotZoneHeight:%{public}d,"
+            "hotZoneTopLeftX:%{public}d, hotZoneTopLeftY:%{public}d",
+            item.hotZoneWidth, item.hotZoneHeight, item.hotZoneTopLeftX, item.hotZoneTopLeftY);
     }
 }
 
@@ -406,8 +417,24 @@ const std::vector<LogicalDisplayInfo>& InputWindowsManager::GetLogicalDisplayInf
 
 bool InputWindowsManager::IsInsideWindow(int32_t x, int32_t y, const WindowInfo &info) const
 {
-    return (x >= info.hotZoneTopLeftX) && (x <= (info.hotZoneTopLeftX + info.hotZoneWidth)) &&
-        (y >= info.hotZoneTopLeftY) && (y <= (info.hotZoneTopLeftY + info.hotZoneHeight));
+    bool insideWindow = false;
+    MMI_HILOGD("You hotArea num %{public}zu", info.hotArea.size());
+    for (size_t i = 0; i < info.hotArea.size(); ++i) {
+        insideWindow = (x >= info.hotArea[i].hotZoneTopLeftX) &&
+                       (x <= info.hotArea[i].hotZoneTopLeftX + info.hotArea[i].hotZoneWidth) &&
+                       (y >= info.hotArea[i].hotZoneTopLeftY) &&
+                       (y <= info.hotArea[i].hotZoneTopLeftY + info.hotArea[i].hotZoneHeight);
+        MMI_HILOGD("You hotZoneTopLeftX %{public}d hot zone", info.hotArea[i].hotZoneTopLeftX);
+        MMI_HILOGD("You hotZoneWidth %{public}d hot zone", info.hotArea[i].hotZoneWidth);
+        MMI_HILOGD("You hotZoneTopLeftY %{public}d hot zone", info.hotArea[i].hotZoneTopLeftY);
+        MMI_HILOGD("You hotZoneHeight %{public}d hot zone", info.hotArea[i].hotZoneHeight);
+        MMI_HILOGD("You insideWindow %{public}d num is %{public}d", insideWindow, i + 1);
+        if (insideWindow == true) {
+            MMI_HILOGD("You hit the %{public}d hot zone", i + 1);
+            return insideWindow;
+        }
+    }
+    return insideWindow;
 }
 
 void InputWindowsManager::AdjustGlobalCoordinate(

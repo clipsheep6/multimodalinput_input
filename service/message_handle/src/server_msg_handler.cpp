@@ -208,8 +208,19 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
         LogicalDisplayInfo info;
         std::vector<WindowInfo> windowInfos;
         pkt >> info.id >> info.topLeftX >> info.topLeftY >> info.width >> info.height
-            >> info.name >> info.seatId >> info.seatName >> info.focusWindowId
-            >> windowInfos;
+            >> info.name >> info.seatId >> info.seatName >> info.focusWindowId;
+        int32_t windowInfosSize = 0;
+        pkt >> windowInfosSize;
+        for (int32_t j = 0; j < windowInfosSize; ++j) {
+            WindowInfo windowsInfo;
+            std::vector<HotArea> hotArea;
+            pkt >> windowsInfo.id >> windowsInfo.pid >> windowsInfo.uid >> windowsInfo.hotZoneTopLeftX
+            >> windowsInfo.hotZoneTopLeftY >> windowsInfo.hotZoneWidth >> windowsInfo.hotZoneHeight
+            >> windowsInfo.displayId >> windowsInfo.agentWindowId >> windowsInfo.winTopLeftX
+            >> windowsInfo.winTopLeftY >> windowsInfo.flags >> hotArea;
+            windowsInfo.hotArea = hotArea;
+            windowInfos.push_back(windowsInfo);
+        }
         info.windowsInfo = windowInfos;
         logicalDisplays.push_back(info);
     }

@@ -84,6 +84,7 @@ private:
     int32_t firstBtnDownWindowId_ = -1;
     std::vector<PhysicalDisplayInfo> physicalDisplays_ = {};
     std::vector<LogicalDisplayInfo> logicalDisplays_ = {};
+    std::vector<HotArea> hotArea_ = {};
     std::map<int32_t, WindowInfo> windowInfos_ = {};
     MouseLocation mouseLoction_ = {-1, -1};
 };

@@ -32,6 +32,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerImpl" };
+constexpr int32_t MAX_HOTAREA_NUM = 10;
 } // namespace
 
 struct MonitorEventConsumer : public IInputEventConsumer {
@@ -272,10 +273,26 @@ int32_t InputManagerImpl::PackLogicalDisplay(NetPacket &pkt)
     }
     pkt << num;
     for (int32_t i = 0; i < num; i++) {
+        int32_t windowsInfoSize = static_cast<int32_t>(logicalDisplays_[i].windowsInfo.size());
         pkt << logicalDisplays_[i].id << logicalDisplays_[i].topLeftX << logicalDisplays_[i].topLeftY
             << logicalDisplays_[i].width << logicalDisplays_[i].height << logicalDisplays_[i].name
             << logicalDisplays_[i].seatId << logicalDisplays_[i].seatName << logicalDisplays_[i].focusWindowId
-            << logicalDisplays_[i].windowsInfo;
+            << windowsInfoSize;
+        for (int32_t j = 0; j < windowsInfoSize; ++j) {
+            pkt << logicalDisplays_[i].windowsInfo[j].id
+                << logicalDisplays_[i].windowsInfo[j].pid
+                << logicalDisplays_[i].windowsInfo[j].uid
+                << logicalDisplays_[i].windowsInfo[j].hotZoneTopLeftX
+                << logicalDisplays_[i].windowsInfo[j].hotZoneTopLeftY
+                << logicalDisplays_[i].windowsInfo[j].hotZoneWidth
+                << logicalDisplays_[i].windowsInfo[j].hotZoneHeight
+                << logicalDisplays_[i].windowsInfo[j].displayId
+                << logicalDisplays_[i].windowsInfo[j].agentWindowId
+                << logicalDisplays_[i].windowsInfo[j].winTopLeftX
+                << logicalDisplays_[i].windowsInfo[j].winTopLeftY
+                << logicalDisplays_[i].windowsInfo[j].flags
+                << logicalDisplays_[i].windowsInfo[j].hotArea;
+        }
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write logical data failed");
@@ -488,6 +505,16 @@ void InputManagerImpl::SendDisplayInfo()
 {
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
+
+    for (const auto &item : logicalDisplays_) {
+        for (const auto &win : item.windowsInfo) {
+            if (win.hotArea.size() >= MAX_HOTAREA_NUM) {
+                MMI_HILOGE("There are too many hotArea, hotArea size:%{public}zu", win.hotArea.size());
+                return;
+            }
+        }
+    }
+
     NetPacket pkt(MmiMessageId::DISPLAY_INFO);
     if (PackDisplayData(pkt) == RET_ERR) {
         MMI_HILOGE("pack display info failed");
