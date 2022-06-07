@@ -17,10 +17,8 @@
 
 #include "define_multimodal.h"
 #include "error_multimodal.h"
-#include "input_event_monitor_manager.h"
 #include "input_handler_manager.h"
 #include "input_manager.h"
-#include "interceptor_manager.h"
 #include "multimodal_event_handler.h"
 #include "pointer_event.h"
 #include "proto.h"

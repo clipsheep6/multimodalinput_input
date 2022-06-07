@@ -242,14 +242,15 @@ int32_t InputEventHandler::BuildInputHandlerChain()
     tmp->SetNext(subscriberHandler_);
     tmp = subscriberHandler_;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     monitorHandler_ = std::make_shared<InputHandlerManagerGlobal>();
     CHKPR(monitorHandler_, ERROR_NULL_POINTER);
     tmp->SetNext(monitorHandler_);
-    
+    tmp = monitorHandler_;
+#endif // OHOS_BUILD_ENABLE_MONITOR
     auto dispatchHandler = std::make_shared<EventDispatch>();
     CHKPR(dispatchHandler, ERROR_NULL_POINTER);
-    monitorHandler_->SetNext(dispatchHandler);
+    tmp->SetNext(dispatchHandler);
     return RET_OK;
 }
 
@@ -311,7 +312,6 @@ int32_t InputEventHandler::OnEventDeviceRemoved(libinput_event *event)
     InputDevMgr->OnInputDeviceRemoved(device);
     return RET_OK;
 }
-
 
 int32_t InputEventHandler::OnEventKey(libinput_event *event)
 {

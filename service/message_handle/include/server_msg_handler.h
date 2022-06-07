@@ -20,6 +20,7 @@
 
 #include "uds_session.h"
 #include "uds_server.h"
+#include "input_handler_type.h"
 #include "msg_handler.h"
 
 
@@ -35,6 +36,9 @@ public:
     void Init(UDSServer& udsServer);
     void OnMsgHandler(SessionPtr sess, NetPacket& pkt);
     int32_t MarkEventProcessed(SessionPtr sess, int32_t eventId);
+    int32_t OnAddInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType);
+    int32_t OnRemoveInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType);
+    int32_t OnMarkConsumed(SessionPtr sess, int32_t monitorId, int32_t eventId);
 
 protected:
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
@@ -48,9 +52,6 @@ protected:
     int32_t OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     int32_t OnDisplayInfo(SessionPtr sess, NetPacket& pkt);
-    int32_t OnAddInputHandler(SessionPtr sess, NetPacket& pkt);
-    int32_t OnRemoveInputHandler(SessionPtr sess, NetPacket& pkt);
-    int32_t OnMarkConsumed(SessionPtr sess, NetPacket& pkt);
     int32_t OnInputDevice(SessionPtr sess, NetPacket& pkt);
     int32_t OnInputDeviceIds(SessionPtr sess, NetPacket& pkt);
     int32_t OnSupportKeys(SessionPtr sess, NetPacket& pkt);
@@ -58,17 +59,8 @@ protected:
     int32_t OnAddInputDeviceMontior(SessionPtr sess, NetPacket& pkt);
     int32_t OnRemoveInputDeviceMontior(SessionPtr sess, NetPacket& pkt);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    int32_t OnAddInputEventMontior(SessionPtr sess, NetPacket& pkt);
-    int32_t OnRemoveInputEventMontior(SessionPtr sess, NetPacket& pkt);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    int32_t OnAddInputEventTouchpadMontior(SessionPtr sess, NetPacket& pkt);
-    int32_t OnRemoveInputEventTouchpadMontior(SessionPtr sess, NetPacket& pkt);
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t OnSubscribeKeyEvent(SessionPtr sess, NetPacket& pkt);
-    int32_t OnUnSubscribeKeyEvent(SessionPtr sess, NetPacket& pkt);
+    int32_t OnUnsubscribeKeyEvent(SessionPtr sess, NetPacket& pkt);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
@@ -79,6 +71,7 @@ protected:
 #endif // OHOS_BUILD_MMI_DEBUG
 private:
     UDSServer *udsServer_ = nullptr;
+    int32_t targetWindowId_ = -1;
 };
 } // namespace MMI
 } // namespace OHOS

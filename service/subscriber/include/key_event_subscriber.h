@@ -46,7 +46,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_TOUCH
     int32_t SubscribeKeyEvent(SessionPtr sess, int32_t subscribeId,
             const std::shared_ptr<KeyOption> keyOption);
-    int32_t UnSubscribeKeyEvent(SessionPtr sess, int32_t subscribeId);
+    int32_t UnsubscribeKeyEvent(SessionPtr sess, int32_t subscribeId);
     bool OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
 
 private:
@@ -78,14 +78,14 @@ private:
     void OnTimer(const std::shared_ptr<Subscriber> subscriber);
     void OnSessionDelete(SessionPtr sess);
     bool InitSessionDeleteCallback();
-
     bool CloneKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
-
     void RemoveKeyCode(int32_t keyCode, std::vector<int32_t>& keyCodes);
+    bool IsRepeatedKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
 
 private:
     std::list<std::shared_ptr<Subscriber>> subscribers_ {};
     bool callbackInitialized_ { false };
+    bool hasEventExecuting { false };
     std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
 };
 } // namespace MMI

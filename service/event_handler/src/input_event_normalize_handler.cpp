@@ -152,12 +152,6 @@ int32_t InputEventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     auto keyEvent = InputHandler->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     CHKPR(event, ERROR_NULL_POINTER);
-    std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
-    int32_t lastPressedKey = -1;
-    if (!pressedKeys.empty()) {
-        lastPressedKey = pressedKeys.back();
-        MMI_HILOGD("The last repeat button, keyCode:%{public}d", lastPressedKey);
-    }
     auto packageResult = eventPackage_.PackageKeyEvent(event, keyEvent);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
         MMI_HILOGD("The same event reported by multi_device should be discarded");
@@ -171,7 +165,7 @@ int32_t InputEventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     BytraceAdapter::StartBytrace(keyEvent);
 
     nextHandler_->HandleKeyEvent(keyEvent);
-    KeyRepeat->SelectAutoRepeat(keyEvent, lastPressedKey);
+    KeyRepeat->SelectAutoRepeat(keyEvent);
     MMI_HILOGD("keyCode:%{public}d,action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
 
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
