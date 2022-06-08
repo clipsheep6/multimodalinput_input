@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include "standardized_event_manager.h"
 
 #include <sstream>

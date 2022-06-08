@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include "input_windows_manager.h"
 
 #include <cstdlib>

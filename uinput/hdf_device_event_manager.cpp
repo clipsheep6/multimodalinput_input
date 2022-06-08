@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include "hdf_device_event_manager.h"
 
 #include <cstring>

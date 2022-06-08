@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include "pointer_drawing_manager.h"
 
 #include <display_type.h>

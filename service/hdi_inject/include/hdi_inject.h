@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef HDI_INJECT_H
 #define HDI_INJECT_H
 #ifdef OHOS_BUILD_HDF

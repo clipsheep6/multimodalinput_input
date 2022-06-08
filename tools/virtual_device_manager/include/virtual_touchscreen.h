@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #ifndef VIRTUAL_TOUCHSCREEN_H
 #define VIRTUAL_TOUCHSCREEN_H
 #include "virtual_device.h"

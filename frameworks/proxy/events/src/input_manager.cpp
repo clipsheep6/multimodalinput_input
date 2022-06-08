@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include "input_manager.h"
 
 #include "error_multimodal.h"

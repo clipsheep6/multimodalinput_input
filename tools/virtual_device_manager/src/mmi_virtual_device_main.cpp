@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include "virtual_device.h"
 
 int32_t main(int32_t argc, const char *argv[])

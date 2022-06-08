@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include "virtual_touchscreen.h"
 
 namespace OHOS {

@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #ifndef GESTURE_TRANSFORM_POINT_PROCESSOR_H
 #define GESTURE_TRANSFORM_POINT_PROCESSOR_H
 

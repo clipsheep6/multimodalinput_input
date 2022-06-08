@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include "processing_joystick_device.h"
 
 using namespace OHOS::MMI;

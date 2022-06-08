@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include "multimodal_input_connect_death_recipient.h"
 
 #include "mmi_log.h"

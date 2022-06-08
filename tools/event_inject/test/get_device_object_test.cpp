@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include <gtest/gtest.h>
 
 #include "get_device_object.h"

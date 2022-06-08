@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include "touchpad_transform_point_processor.h"
 
 #include <sstream>

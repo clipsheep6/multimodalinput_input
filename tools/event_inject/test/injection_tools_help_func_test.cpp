@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include <gtest/gtest.h>
 
 #include "injection_tools_help_func.h"

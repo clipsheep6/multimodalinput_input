@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #ifndef VIRTUAL_TOUCHPAD_H
 #define VIRTUAL_TOUCHPAD_H
 #include "virtual_device.h"

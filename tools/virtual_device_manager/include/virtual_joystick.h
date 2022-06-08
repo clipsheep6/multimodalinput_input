@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #ifndef VIRTUAL_JOYSTICK_H
 #define VIRTUAL_JOYSTICK_H
 #include "virtual_device.h"

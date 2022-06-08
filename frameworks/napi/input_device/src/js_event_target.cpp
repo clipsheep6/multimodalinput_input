@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include "js_event_target.h"
 
 namespace OHOS {

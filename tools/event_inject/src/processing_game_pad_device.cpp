@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include "processing_game_pad_device.h"
 
 using namespace OHOS::MMI;

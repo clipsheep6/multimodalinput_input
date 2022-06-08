@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include <gtest/gtest.h>
 #include "input_manager.h"
 #include "input_manager_command.h"

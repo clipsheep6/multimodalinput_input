@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include "get_device_object.h"
 
 #include <chrono>

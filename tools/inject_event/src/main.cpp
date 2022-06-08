@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include "input_manager_command.h"
 
 int32_t main(int32_t argc, char** argv)

@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #ifndef VIRTUAL_TRACKBALL_H
 #define VIRTUAL_TRACKBALL_H
 #include "virtual_device.h"

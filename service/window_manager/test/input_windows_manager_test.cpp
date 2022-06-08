@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include <gtest/gtest.h>
 
 #include "input_windows_manager.h"

@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #ifndef VIRTUAL_DEVICE_H
 #define VIRTUAL_DEVICE_H
 

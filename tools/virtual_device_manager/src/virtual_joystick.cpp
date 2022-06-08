@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include "virtual_joystick.h"
 
 namespace OHOS {

@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include "virtual_mouse.h"
 
 namespace OHOS {

@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include "virtual_keyboard_ext.h"
 
 namespace OHOS {

@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #ifndef DEVICE_OBSERVER_H
 #define DEVICE_OBSERVER_H
 

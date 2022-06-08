@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef MULTIMODAL_EVENT_HANDLER_H
 #define MULTIMODAL_EVENT_HANDLER_H
 
