@@ -65,7 +65,8 @@ ohos_shared_library("libmmi-util") {
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
     "//utils/native/base:utils",
   ]
-
+  install_images = [ system_base_dir ]
+  relative_install_dir = "platformsdk"
   part_name = "input"
 }
 
