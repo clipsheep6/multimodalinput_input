@@ -628,6 +628,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                         CHKPR(pointerEvent, ERROR_NULL_POINTER);
                         PointerEvent::PointerItem item;
                         item.SetPointerId(0);
+                        item.SetPressed(true);
                         item.SetGlobalX(px1);
                         item.SetGlobalY(py1);
                         pointerEvent->SetPointerId(0);
@@ -637,8 +638,11 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                         InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                         std::this_thread::sleep_for(std::chrono::milliseconds(intervalTimeMs));
 
+                        item.SetPointerId(0);
+                        item.SetPressed(false);
                         item.SetGlobalX(px1);
                         item.SetGlobalY(py1);
+                        pointerEvent->SetPointerId(0);
                         pointerEvent->UpdatePointerItem(0, item);
                         pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
                         InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
