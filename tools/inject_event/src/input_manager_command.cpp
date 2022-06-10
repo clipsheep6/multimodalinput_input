@@ -593,8 +593,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 const int64_t minIntervalTimeMs = 1;
                                 const int64_t maxIntervalTimeMs = 450;
                                 if ((minIntervalTimeMs > intervalTimeMs) || (maxIntervalTimeMs < intervalTimeMs)) {
-                                    std::cout << "interval timeMs is out of range. ";
-                                    std::cout << minIntervalTimeMs << " < interval timeMs < " << maxIntervalTimeMs;
+                                    std::cout << "interval time is out of range. ";
+                                    std::cout << minIntervalTimeMs << "ms";
+                                    std::cout << " < interval time < ";
+                                    std::cout << maxIntervalTimeMs << "ms";
                                     std::cout << std::endl;
                                     return RET_ERR;
                                 }
@@ -603,8 +605,8 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 ShowUsage();
                                 return RET_ERR;
                             }
-                            std::cout << "argc click intervalTimeMs:" << intervalTimeMs << std::endl;
-                            std::cout << "single finger touch click " << px1 << " " << py1 << std::endl;
+                            std::cout << "touch screen click interval time:" << intervalTimeMs << "ms" << std::endl;
+                            std::cout << "single finger touch screen click " << px1 << " " << py1 << std::endl;
                             auto pointerEvent = PointerEvent::Create();
                             CHKPR(pointerEvent, ERROR_NULL_POINTER);
                             PointerEvent::PointerItem item;
@@ -619,11 +621,9 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             std::this_thread::sleep_for(std::chrono::milliseconds(intervalTimeMs));
 
-                            item.SetPointerId(0);
                             item.SetPressed(false);
                             item.SetGlobalX(px1);
                             item.SetGlobalY(py1);
-                            pointerEvent->SetPointerId(0);
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -701,7 +701,7 @@ void InputManagerCommand::ShowUsage()
     std::cout << "-m <dx1> <dy1> <dx2> <dy2> [smooth time]      --smooth movement"   << std::endl;
     std::cout << "   <dx1> <dy1> <dx2> <dy2> [smooth time]      -smooth movement, "  << std::endl;
     std::cout << "                                              dx1 dy1 to dx2 dy2 smooth movement"  << std::endl;
-    std::cout << "-c <dx1> <dy1> [click interval]               -touch screen click dx dy"           << std::endl;
+    std::cout << "-c <dx1> <dy1> [click interval]               -touch screen click dx1 dy1"           << std::endl;
     std::cout << "-i <time>                  --interval <time>  -the program interval for the (time) milliseconds";
     std::cout << std::endl;
     std::cout << "                                                              " << std::endl;
