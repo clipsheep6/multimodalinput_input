@@ -238,7 +238,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetButtonPressed(buttonId);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
                             pointerEvent->SetAxisValue(PointerEvent::AxisType::AXIS_TYPE_SCROLL_VERTICAL,
-                                                    scrollValue);
+                                scrollValue);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             time = pointerEvent->GetActionStartTime();
@@ -250,7 +250,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetButtonPressed(buttonId);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
                             pointerEvent->SetAxisValue(PointerEvent::AxisType::AXIS_TYPE_SCROLL_VERTICAL,
-                                                    scrollValue);
+                                scrollValue);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
@@ -261,7 +261,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetButtonPressed(buttonId);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
                             pointerEvent->SetAxisValue(PointerEvent::AxisType::AXIS_TYPE_SCROLL_VERTICAL,
-                                                    scrollValue);
+                                scrollValue);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             break;
