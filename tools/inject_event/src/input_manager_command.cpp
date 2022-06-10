@@ -132,7 +132,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
         ShowUsage();
         return EVENT_REG_FAIL;
     }
-	switch (c) {
+    switch (c) {
         case 'M': {
             int32_t px = 0;
             int32_t py = 0;
