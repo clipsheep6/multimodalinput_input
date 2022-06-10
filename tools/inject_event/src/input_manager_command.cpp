@@ -127,24 +127,39 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
     int32_t c = 0;
     int32_t optionIndex = 0;
     optind = 0;
-    if ((c = getopt_long(argc, argv, "MKT?", headOptions, &optionIndex)) == -1) {
-        std::cout << "too few arguments to function" << std::endl;
-        ShowUsage();
-        return EVENT_REG_FAIL;
-    }
-    switch (c) {
-        case 'M': {
-            int32_t px = 0;
-            int32_t py = 0;
-            int32_t buttonId = 0;
-            int32_t scrollValue = 0;
-            while ((c = getopt_long(argc, argv, "m:d:u:c:s:i:", mouseSensorOptions, &optionIndex)) != -1) {
-                switch (c) {
-                    case 'm': {
-                        if (optind >= argc) {
-                            std::cout << "too few arguments to function" << std::endl;
-                            ShowUsage();
-                            return EVENT_REG_FAIL;
+    if ((c = getopt_long(argc, argv, "MKT?", headOptions, &optionIndex)) != -1) {
+        switch (c) {
+            case 'M': {
+                int32_t px = 0;
+                int32_t py = 0;
+                int32_t buttonId;
+                int32_t scrollValue;
+                while ((c = getopt_long(argc, argv, "m:d:u:c:s:i:", mouseSensorOptions, &optionIndex)) != -1) {
+                    switch (c) {
+                        case 'm': {
+                            if (optind >= argc) {
+                                std::cout << "too few arguments to function" << std::endl;
+                                ShowUsage();
+                                return EVENT_REG_FAIL;
+                            }
+                            if (!StrToInt(optarg, px) || !StrToInt(argv[optind], py)) {
+                                std::cout << "invalid paremeter to move mouse" << std::endl;
+                                return EVENT_REG_FAIL;
+                            }
+                            std::cout << "move to " << px << " " << py << std::endl;
+                            auto pointerEvent = PointerEvent::Create();
+                            CHKPR(pointerEvent, ERROR_NULL_POINTER);
+                            PointerEvent::PointerItem item;
+                            item.SetPointerId(0);
+                            item.SetGlobalX(px);
+                            item.SetGlobalY(py);
+                            pointerEvent->AddPointerItem(item);
+                            pointerEvent->SetPointerId(0);
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+                            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            optind++;
+                            break;
                         }
                         if (!StrToInt(optarg, px) || !StrToInt(argv[optind], py)) {
                             std::cout << "invalid paremeter to move mouse" << std::endl;
