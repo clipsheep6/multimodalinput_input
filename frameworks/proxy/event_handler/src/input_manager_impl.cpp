@@ -358,9 +358,9 @@ void InputManagerImpl::PrintDisplayInfo()
 int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor)
 {
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_MONITOR)
-    CHKPR(monitor, ERROR_NULL_POINTER);
+    CHKPR(monitor, INVALID_HANDLER_ID);
     auto consumer = std::make_shared<MonitorEventConsumer>(monitor);
-    CHKPR(consumer, ERROR_NULL_POINTER);
+    CHKPR(consumer, INVALID_HANDLER_ID);
     return AddMonitor(consumer);
 #else
     MMI_HILOGW("Keyboard device does not support");
@@ -372,9 +372,9 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent
 int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor)
 {
 #if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && defined(OHOS_BUILD_ENABLE_MONITOR)
-    CHKPR(monitor, ERROR_NULL_POINTER);
+    CHKPR(monitor, INVALID_HANDLER_ID);
     auto consumer = std::make_shared<MonitorEventConsumer>(monitor);
-    CHKPR(consumer, ERROR_NULL_POINTER);
+    CHKPR(consumer, INVALID_HANDLER_ID);
     return AddMonitor(consumer);
 #else
     MMI_HILOGW("Pointer and tp device does not support");
@@ -385,11 +385,11 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<PointerE
 int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consumer)
 {
 #ifdef OHOS_BUILD_ENABLE_MONITOR
-    CHKPR(consumer, ERROR_NULL_POINTER);
+    CHKPR(consumer, INVALID_HANDLER_ID);
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
-        return -1;
+        return RET_ERR;
     }
     return monitorManager_.AddMonitor(consumer);
 #else
@@ -430,10 +430,6 @@ void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
 {
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.InitClient()) {
-        MMI_HILOGE("client init failed");
-        return;
-    }
     if (MMIEventHdl.MoveMouseEvent(offsetX, offsetY) != RET_OK) {
         MMI_HILOGE("Failed to inject move mouse offset event");
     }
@@ -445,21 +441,26 @@ void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
 int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
 {
     CHKPR(interceptor, INVALID_HANDLER_ID);
+    std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
-        return -1;
+        return RET_ERR;
     }
-    std::lock_guard<std::mutex> guard(mtx_);
-    return InputInterMgr->AddInterceptor(interceptor);
+    return InputInterMgr->AddInterceptor(interceptor, HandleEventType::ALL);
 }
 
 int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
 {
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    CHKPR(interceptor, ERROR_NULL_POINTER);
+    CHKPR(interceptor, INVALID_HANDLER_ID);
+    std::lock_guard<std::mutex> guard(mtx_);
     auto consumer = std::make_shared<MonitorEventConsumer>(interceptor);
-    CHKPR(consumer, ERROR_NULL_POINTER);
-    return InputManagerImpl::AddInterceptor(consumer);
+    CHKPR(consumer, INVALID_HANDLER_ID);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("client init failed");
+        return RET_ERR;
+    }
+    return InputInterMgr->AddInterceptor(consumer, HandleEventType::KEY);
 #else
     MMI_HILOGW("Keyboard device does not support");
     return ERROR_UNSUPPORT;

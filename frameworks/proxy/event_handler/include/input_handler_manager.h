@@ -33,7 +33,8 @@ class InputHandlerManager : public Singleton<InputHandlerManager> {
 public:
     InputHandlerManager() = default;
     DISALLOW_COPY_AND_MOVE(InputHandlerManager);
-    int32_t AddHandler(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer);
+    int32_t AddHandler(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer,
+        HandleEventType eventType = HandleEventType::ALL);
     void RemoveHandler(int32_t handlerId, InputHandlerType handlerType);
     void MarkConsumed(int32_t monitorId, int32_t eventId);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -48,14 +49,17 @@ private:
     struct Handler {
         int32_t handlerId_ = 0;
         InputHandlerType handlerType_ = NONE;
+        HandleEventType eventType_ = HandleEventType::ALL;
         std::shared_ptr<IInputEventConsumer> consumer_ = nullptr;
         EventHandlerPtr eventHandler_ = nullptr;
     };
 
 private:
     int32_t GetNextId();
-    int32_t AddLocal(int32_t handlerId, InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> monitor);
-    void AddToServer(int32_t handlerId, InputHandlerType handlerType);
+    int32_t AddLocal(int32_t handlerId, InputHandlerType handlerType,
+        HandleEventType eventType, std::shared_ptr<IInputEventConsumer> monitor);
+    void AddToServer(int32_t handlerId, InputHandlerType handlerType,
+        HandleEventType eventType);
     int32_t RemoveLocal(int32_t handlerId, InputHandlerType handlerType);
     void RemoveFromServer(int32_t handlerId, InputHandlerType handlerType);
 

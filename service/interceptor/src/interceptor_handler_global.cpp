@@ -74,7 +74,7 @@ void InterceptorHandlerGlobal::HandleTouchEvent(std::shared_ptr<PointerEvent> po
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 int32_t InterceptorHandlerGlobal::AddInputHandler(int32_t handlerId,
-    InputHandlerType handlerType, SessionPtr session)
+    InputHandlerType handlerType, HandleEventType eventType, SessionPtr session)
 {
     CHKPR(session, RET_ERR);
     if (!IsValidHandlerId(handlerId)) {
@@ -87,7 +87,7 @@ int32_t InterceptorHandlerGlobal::AddInputHandler(int32_t handlerId,
     }
     InitSessionLostCallback();
     MMI_HILOGD("Register interceptor:%{public}d", handlerId);
-    SessionHandler interceptor { handlerId, handlerType, session };
+    SessionHandler interceptor { handlerId, handlerType, eventType, session };
     return interceptors_.AddInterceptor(interceptor);
 }
 
@@ -97,7 +97,7 @@ void InterceptorHandlerGlobal::RemoveInputHandler(int32_t handlerId,
     CHKPV(session);
     if (handlerType == InputHandlerType::INTERCEPTOR) {
         MMI_HILOGD("Unregister interceptor:%{public}d", handlerId);
-        SessionHandler interceptor { handlerId, handlerType, session };
+        SessionHandler interceptor { handlerId, handlerType, HandleEventType::ALL, session };
         interceptors_.RemoveInterceptor(interceptor);
     }
 }
@@ -193,11 +193,16 @@ bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_pt
         return false;
     }
     MMI_HILOGD("There are currently:%{public}zu interceptors", interceptors_.size());
+    bool isInterceptor = false;
     for (const auto &interceptor : interceptors_) {
-        interceptor.SendToClient(keyEvent);
+        if (interceptor.eventType_ == HandleEventType::KEY
+            || interceptor.eventType_ == HandleEventType::ALL) {
+            interceptor.SendToClient(keyEvent);
+            MMI_HILOGD("Key event was intercepted");
+            isInterceptor = true;
+        }
     }
-    MMI_HILOGD("Key event was intercepted");
-    return true;
+    return isInterceptor;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
@@ -210,11 +215,15 @@ bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_pt
         return false;
     }
     MMI_HILOGD("There are currently:%{public}zu interceptors", interceptors_.size());
+    bool isInterceptor = false;
     for (const auto &interceptor : interceptors_) {
-        interceptor.SendToClient(pointerEvent);
+        if (interceptor.eventType_ == HandleEventType::ALL) {
+            interceptor.SendToClient(pointerEvent);
+            MMI_HILOGD("Pointer event was intercepted");
+            isInterceptor = true;
+        }
     }
-    MMI_HILOGD("Pointer event was intercepted");
-    return true;
+    return isInterceptor;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 

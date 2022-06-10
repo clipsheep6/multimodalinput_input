@@ -68,10 +68,7 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
         {MmiMessageId::ADD_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnAddInputDeviceMontior, this)},
         {MmiMessageId::REMOVE_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputDeviceMontior, this)},
         {MmiMessageId::DISPLAY_INFO, MsgCallbackBind2(&ServerMsgHandler::OnDisplayInfo, this)},
-#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-        {MmiMessageId::MOVE_MOUSE, MsgCallbackBind2(&ServerMsgHandler::OnMoveMouse, this)},
-#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
         {MmiMessageId::SUBSCRIBE_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnSubscribeKeyEvent, this)},
         {MmiMessageId::UNSUBSCRIBE_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnUnsubscribeKeyEvent, this)},
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -241,7 +238,8 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     return RET_OK;
 }
 
-int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType)
+int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType,
+    HandleEventType eventType)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
     MMI_HILOGD("OnAddInputHandler handler:%{public}d,handlerType:%{public}d", handlerId, handlerType);
@@ -249,7 +247,7 @@ int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, int32_t handlerId, 
     if (handlerType == InputHandlerType::INTERCEPTOR) {
         auto interceptorHandler = InputHandler->GetInterceptorHandler();
         CHKPR(interceptorHandler, ERROR_NULL_POINTER);
-        return interceptorHandler->AddInputHandler(handlerId, handlerType, sess);
+        return interceptorHandler->AddInputHandler(handlerId, handlerType, eventType, sess);
     }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 #ifdef OHOS_BUILD_ENABLE_MONITOR
@@ -295,16 +293,9 @@ int32_t ServerMsgHandler::OnMarkConsumed(SessionPtr sess, int32_t monitorId, int
 }
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-int32_t ServerMsgHandler::OnMoveMouse(SessionPtr sess, NetPacket& pkt)
+int32_t ServerMsgHandler::OnMoveMouse(int32_t offsetX, int32_t offsetY)
 {
     CALL_LOG_ENTER;
-    int32_t offsetX = 0;
-    int32_t offsetY = 0;
-    pkt >> offsetX >> offsetY;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read offset X Y data failed");
-        return RET_ERR;
-    }
     if (MouseEventHdr->NormalizeMoveMouse(offsetX, offsetY)) {
         auto pointerEvent = MouseEventHdr->GetPointerEvent();
         CHKPR(pointerEvent, ERROR_NULL_POINTER);
