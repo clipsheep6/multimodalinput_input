@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include "js_input_device_manager.h"
 
 namespace OHOS {

@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include "key_event.h"
 
 #include "mmi_log.h"

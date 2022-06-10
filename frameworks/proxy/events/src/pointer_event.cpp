@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include "pointer_event.h"
 
 #include <iomanip>

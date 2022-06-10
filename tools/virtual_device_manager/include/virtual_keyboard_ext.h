@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #ifndef VIRTUAL_KEYBOARD_EXT_H
 #define VIRTUAL_KEYBOARD_EXT_H
 #include "virtual_device.h"

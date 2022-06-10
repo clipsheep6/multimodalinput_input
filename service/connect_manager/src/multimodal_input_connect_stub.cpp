@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include "multimodal_input_connect_stub.h"
 
 #include <unistd.h>

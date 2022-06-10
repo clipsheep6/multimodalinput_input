@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #ifndef VIRTUAL_GAMEPAD_H
 #define VIRTUAL_GAMEPAD_H
 #include "virtual_device.h"

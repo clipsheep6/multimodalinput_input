@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include "event_filter_service.h"
 
 #include <cstring>

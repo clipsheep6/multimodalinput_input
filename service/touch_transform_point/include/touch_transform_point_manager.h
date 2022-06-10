@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #ifndef TOUCH_TRANSFORM_POINT_MANAGER_H
 #define TOUCH_TRANSFORM_POINT_MANAGER_H
 

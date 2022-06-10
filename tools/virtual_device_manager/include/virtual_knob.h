@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #ifndef VIRTUAL_KNOB_H
 #define VIRTUAL_KNOB_H
 #include "virtual_device.h"

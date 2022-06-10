@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include "input_device.h"
 
 namespace OHOS {

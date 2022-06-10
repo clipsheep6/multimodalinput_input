@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #ifndef VIRTUAL_STYLUS_H
 #define VIRTUAL_STYLUS_H
 #include "virtual_device.h"

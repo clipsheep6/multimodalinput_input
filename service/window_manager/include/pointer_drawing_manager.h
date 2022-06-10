@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #ifndef POINTER_DRAWING_MANAGER_H
 #define POINTER_DRAWING_MANAGER_H
 

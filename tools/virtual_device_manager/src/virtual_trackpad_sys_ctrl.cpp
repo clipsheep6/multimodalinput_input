@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include "virtual_trackpad_sys_ctrl.h"
 
 namespace OHOS {

@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include "libinput_adapter.h"
 
 #include <climits>

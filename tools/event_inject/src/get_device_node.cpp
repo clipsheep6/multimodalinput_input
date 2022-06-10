@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include "get_device_node.h"
 
 using namespace OHOS::MMI;

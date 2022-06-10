@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include "touch_transform_point_processor.h"
 
 #include "mmi_log.h"

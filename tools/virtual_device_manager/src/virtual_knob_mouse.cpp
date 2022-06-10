@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include "virtual_knob_mouse.h"
 
 namespace OHOS {

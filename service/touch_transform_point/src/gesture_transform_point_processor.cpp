@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include "gesture_transform_point_processor.h"
 
 #include "mmi_log.h"

@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #ifndef MULTIMODAL_INPUT_CONNECT_PROXY_H
 #define MULTIMODAL_INPUT_CONNECT_PROXY_H
 

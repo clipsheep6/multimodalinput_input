@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include "device_base.h"
 
 using namespace OHOS::MMI;

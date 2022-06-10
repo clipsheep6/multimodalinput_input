@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include "virtual_keyboard_consumer_ctrl.h"
 
 namespace OHOS {
