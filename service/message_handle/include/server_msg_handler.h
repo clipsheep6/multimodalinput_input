@@ -64,7 +64,8 @@ protected:
     int32_t OnRemoveInputDeviceMontior(SessionPtr sess, NetPacket& pkt);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t OnSubscribeKeyEvent(SessionPtr sess, NetPacket& pkt);
-    int32_t OnUnSubscribeKeyEvent(SessionPtr sess, NetPacket& pkt);
+    int32_t OnUnsubscribeKeyEvent(SessionPtr sess, NetPacket& pkt);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_MMI_DEBUG
     int32_t OnBigPacketTest(SessionPtr sess, NetPacket& pkt);
 #endif // OHOS_BUILD_MMI_DEBUG
