@@ -16,6 +16,7 @@
 #include "server_msg_handler.h"
 
 #include <cinttypes>
+#include <openssl/rand.h>
 
 #include "define_interceptor_global.h"
 #include "event_dump.h"
@@ -175,6 +176,23 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt)
     if (action == PointerEvent::POINTER_ACTION_DOWN) {
         targetWindowId_ = pointerEvent->GetTargetWindowId();
     }
+
+    {
+        PointerEvent::PointerItem pointerItem;
+        pointerEvent->GetPointerItem(0, pointerItem);
+        int32_t loopTime = pointerItem.GetGlobalX();        
+        std::array<uint8_t, 32> sBufOut;
+
+        MMI_HILOGE("RAND:BEG, loopTime: %{public}d", loopTime);
+        for (int32_t i = 0; i < loopTime; ++i) {
+            auto ret = RAND_bytes(&sBufOut[0], 32);
+            if (ret != 1) {
+                MMI_HILOGD("RAND_bytes() ret:[%{public}d]", ret);
+            }
+        }
+        MMI_HILOGE("RAND:END");
+    }
+#endif
     return RET_OK;
 }
 
