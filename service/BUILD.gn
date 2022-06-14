@@ -179,6 +179,7 @@ ohos_shared_library("libmmi-server") {
     "//third_party/cJSON:cjson_static",
     "//third_party/json:nlohmann_json_static",
   ]
+  deps += [ "//third_party/openssl:libcrypto_static", ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
