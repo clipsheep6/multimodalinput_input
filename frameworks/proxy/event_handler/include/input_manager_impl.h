@@ -79,6 +79,8 @@ public:
     int32_t SetPointerVisible(bool visible);
     bool IsPointerVisible();
 
+    int32_t TestOpenSSLRandBytes(std::vector<uint8_t> &data);
+
 private:
     int32_t PackPhysicalDisplay(NetPacket &pkt);
     int32_t PackLogicalDisplay(NetPacket &pkt);

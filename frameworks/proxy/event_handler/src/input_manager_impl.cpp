@@ -477,6 +477,16 @@ bool InputManagerImpl::IsPointerVisible()
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
+int32_t InputManagerImpl::TestOpenSSLRandBytes(std::vector<uint8_t> &data)
+{
+    CALL_LOG_ENTER;
+    int32_t ret = MultimodalInputConnectManager::GetInstance()->TestOpenSSLRandBytes(data);
+    if (ret != 0) {
+        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 void InputManagerImpl::OnConnected()
 {
     CALL_LOG_ENTER;

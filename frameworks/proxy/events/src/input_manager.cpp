@@ -142,5 +142,11 @@ void InputManager::GetKeyboardType(int32_t deviceId, std::function<void(int32_t)
 {
     InputMgrImpl->GetKeyboardType(deviceId, callback);
 }
+
+
+int32_t InputManager::TestOpenSSLRandBytes(std::vector<uint8_t> &data)
+{
+    return InputMgrImpl->TestOpenSSLRandBytes(data);
+}
 } // namespace MMI
 } // namespace OHOS

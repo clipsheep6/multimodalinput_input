@@ -257,5 +257,42 @@ int32_t MultimodalInputConnectProxy::MarkEventConsumed(int32_t monitorId, int32_
     }
     return RET_OK;
 }
+
+int32_t MultimodalInputConnectProxy::TestOpenSSLRandBytes(std::vector<uint8_t> &data)
+{
+    CALL_LOG_ENTER;
+    MessageParcel req;
+    if (!req.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(TEST_OPENSSL_RAND_BYTES, req, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        return ret;
+    }
+
+    if (!reply.ReadInt32(ret)) {
+        MMI_HILOGE("Failed to read ret");
+        return ERR_INVALID_VALUE;
+    }
+
+    if (ret != RET_OK) {
+        MMI_HILOGE("call TestOpenSSLRandBytes failed with binder, ret: %{public}d", ret);
+        return RET_ERR;
+    }
+
+    if (!reply.ReadUInt8Vector(&data)) {
+        MMI_HILOGE("read replay fail");
+        return ERR_INVALID_VALUE;
+    }
+
+    MMI_HILOGE("zpc: receive reply");
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

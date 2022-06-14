@@ -88,6 +88,7 @@ config("libmmi_server_config") {
   if (mmi_enable_pointer_drawing) {
     cflags += [ "-DOHOS_BUILD_ENABLE_POINTER_DRAWING" ]
   }
+  cflags += [ "-DOHOS_INPUT_ENABLE_OPENSSL" ]
 }
 
 ohos_prebuilt_etc("multimodalinput_config_ability.json") {
@@ -179,6 +180,7 @@ ohos_shared_library("libmmi-server") {
     "//third_party/cJSON:cjson_static",
     "//third_party/json:nlohmann_json_static",
   ]
+
   deps += [ "//third_party/openssl:libcrypto_static", ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {

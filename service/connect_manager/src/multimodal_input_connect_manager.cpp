@@ -120,6 +120,12 @@ int32_t MultimodalInputConnectManager::MarkEventConsumed(int32_t monitorId, int3
     return multimodalInputConnectService_->MarkEventConsumed(monitorId, eventId);
 }
 
+int32_t MultimodalInputConnectManager::TestOpenSSLRandBytes(std::vector<uint8_t> &data)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->TestOpenSSLRandBytes(data);    
+}
+
 bool MultimodalInputConnectManager::ConnectMultimodalInputService()
 {
     CALL_LOG_ENTER;

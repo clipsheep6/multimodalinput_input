@@ -235,6 +235,7 @@ public:
      * @since 9
      */
     void GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback);
+    int32_t TestOpenSSLRandBytes(std::vector<uint8_t> &data);
 
 private:
     InputManager() = default;

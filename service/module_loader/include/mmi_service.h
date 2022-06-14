@@ -59,6 +59,7 @@ public:
         HandleEventType eventType) override;
     virtual int32_t RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType) override;
     virtual int32_t MarkEventConsumed(int32_t monitorId, int32_t eventId) override;
+    virtual int32_t TestOpenSSLRandBytes(std::vector<uint8_t> &data) override;
 #ifdef OHOS_RSS_CLIENT
     virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
 #endif

@@ -54,7 +54,8 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         {IMultimodalInputConnect::MARK_EVENT_PROCESSED, &MultimodalInputConnectStub::StubMarkEventProcessed},
         {IMultimodalInputConnect::ADD_INPUT_HANDLER, &MultimodalInputConnectStub::StubAddInputHandler},
         {IMultimodalInputConnect::REMOVE_INPUT_HANDLER, &MultimodalInputConnectStub::StubRemoveInputHandler},
-        {IMultimodalInputConnect::MARK_EVENT_CONSUMED, &MultimodalInputConnectStub::StubMarkEventConsumed}
+        {IMultimodalInputConnect::MARK_EVENT_CONSUMED, &MultimodalInputConnectStub::StubMarkEventConsumed},
+        {IMultimodalInputConnect::TEST_OPENSSL_RAND_BYTES, &MultimodalInputConnectStub::StubTestOpenSSLRandBytes}
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -258,6 +259,32 @@ int32_t MultimodalInputConnectStub::StubMarkEventConsumed(MessageParcel& data, M
     if (ret != RET_OK) {
         MMI_HILOGE("call MarkEventConsumed failed ret:%{public}d", ret);
         return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubTestOpenSSLRandBytes(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_LOG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    std::vector<uint8_t> v;
+    int32_t ret = TestOpenSSLRandBytes(v);
+    if (ret != RET_OK) {
+        MMI_HILOGE("call MarkEventConsumed failed ret:%{public}d", ret);
+    }
+
+    if (!reply.WriteInt32(ret)) {
+        MMI_HILOGE("write ret to reply.");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+
+    if (!reply.WriteUInt8Vector(v)) {
+        MMI_HILOGE("write vector to reply.");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
     }
     return RET_OK;
 }

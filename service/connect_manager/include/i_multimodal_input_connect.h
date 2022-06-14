@@ -38,6 +38,7 @@ public:
         HandleEventType eventType) = 0;
     virtual int32_t RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType) = 0;
     virtual int32_t MarkEventConsumed(int32_t monitorId, int32_t eventId) = 0;
+    virtual int32_t TestOpenSSLRandBytes(std::vector<uint8_t> &data) = 0;
     enum {
         ALLOC_SOCKET_FD = 0,
         ADD_INPUT_EVENT_FILTER = 1,
@@ -46,7 +47,8 @@ public:
         MARK_EVENT_PROCESSED = 4,
         ADD_INPUT_HANDLER = 8,
         REMOVE_INPUT_HANDLER = 9,
-        MARK_EVENT_CONSUMED = 10
+        MARK_EVENT_CONSUMED = 10,
+        TEST_OPENSSL_RAND_BYTES = 1000,
     };
 
     enum {

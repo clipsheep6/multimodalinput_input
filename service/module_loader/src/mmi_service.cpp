@@ -19,6 +19,9 @@
 #include <csignal>
 
 #include <sys/signalfd.h>
+#ifdef OHOS_INPUT_ENABLE_OPENSSL
+#include <openssl/rand.h>
+#endif
 #ifdef OHOS_RSS_CLIENT
 #include <unordered_map>
 #endif
@@ -418,6 +421,18 @@ int32_t MMIService::MarkEventConsumed(int32_t monitorId, int32_t eventId)
         std::bind(&MMIService::CheckMarkConsumed, this, pid, monitorId, eventId));
     if (ret != RET_OK) {
         MMI_HILOGE("mark event consumed failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::TestOpenSSLRandBytes(std::vector<uint8_t> &data)
+{
+    CALL_LOG_ENTER;
+    data.resize(32);
+    auto ret = RAND_bytes(&data[0], 32);
+    if (ret != 1) {
+        MMI_HILOGD("RAND_bytes() ret:[%{public}d]", ret);
         return RET_ERR;
     }
     return RET_OK;

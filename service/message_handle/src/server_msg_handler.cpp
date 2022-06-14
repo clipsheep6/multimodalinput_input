@@ -16,7 +16,9 @@
 #include "server_msg_handler.h"
 
 #include <cinttypes>
+#ifdef OHOS_INPUT_ENABLE_OPENSSL
 #include <openssl/rand.h>
+#endif
 
 #include "define_interceptor_global.h"
 #include "event_dump.h"
@@ -177,10 +179,11 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt)
         targetWindowId_ = pointerEvent->GetTargetWindowId();
     }
 
+#ifdef OHOS_INPUT_ENABLE_OPENSSL
     {
         PointerEvent::PointerItem pointerItem;
         pointerEvent->GetPointerItem(0, pointerItem);
-        int32_t loopTime = pointerItem.GetGlobalX();        
+        int32_t loopTime = pointerItem.GetGlobalX() * 1000;
         std::array<uint8_t, 32> sBufOut;
 
         MMI_HILOGE("RAND:BEG, loopTime: %{public}d", loopTime);
