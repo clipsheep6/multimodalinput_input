@@ -55,12 +55,6 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
     }
 #endif
     MsgCallback funs[] = {
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-        {MmiMessageId::INJECT_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnInjectKeyEvent, this)},
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-        {MmiMessageId::INJECT_POINTER_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnInjectPointerEvent, this)},
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
         {MmiMessageId::INPUT_DEVICE, MsgCallbackBind2(&ServerMsgHandler::OnInputDevice, this)},
         {MmiMessageId::INPUT_DEVICE_IDS, MsgCallbackBind2(&ServerMsgHandler::OnInputDeviceIds, this)},
         {MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY, MsgCallbackBind2(&ServerMsgHandler::OnSupportKeys, this)},
@@ -132,36 +126,24 @@ int32_t ServerMsgHandler::MarkEventProcessed(SessionPtr sess, int32_t eventId)
     return RET_OK;
 }
 
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-int32_t ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket& pkt)
-{
-    CHKPR(sess, ERROR_NULL_POINTER);
-    auto creKey = KeyEvent::Create();
-    CHKPR(creKey, ERROR_NULL_POINTER);
-    int32_t errCode = InputEventDataTransformation::NetPacketToKeyEvent(pkt, creKey);
-    if (errCode != RET_OK) {
-        MMI_HILOGE("Deserialization is Failed, errCode:%{public}u", errCode);
-        return RET_ERR;
-    }
-
-    auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
-    CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
-    inputEventNormalizeHandler->HandleKeyEvent(creKey);
-    MMI_HILOGD("Inject keyCode:%{public}d, action:%{public}d", creKey->GetKeyCode(), creKey->GetKeyAction());
-    return RET_OK;
-}
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-int32_t ServerMsgHandler::OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt)
+int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_LOG_ENTER;
-    auto pointerEvent = PointerEvent::Create();
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
+    CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
+    inputEventNormalizeHandler->HandleKeyEvent(keyEvent);
+    MMI_HILOGD("Inject keyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+    return RET_OK;
+}
+
+int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CALL_LOG_ENTER;
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    if (InputEventDataTransformation::Unmarshalling(pkt, pointerEvent) != RET_OK) {
-        MMI_HILOGE("Unmarshalling failed");
-        return RET_ERR;
-    }
     pointerEvent->UpdateId();
     int32_t action = pointerEvent->GetPointerAction();
     if ((action == PointerEvent::POINTER_ACTION_MOVE || action == PointerEvent::POINTER_ACTION_UP)
@@ -191,9 +173,9 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt)
     if (action == PointerEvent::POINTER_ACTION_DOWN) {
         targetWindowId_ = pointerEvent->GetTargetWindowId();
     }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     return RET_OK;
 }
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
 {
@@ -292,10 +274,10 @@ int32_t ServerMsgHandler::OnMarkConsumed(SessionPtr sess, int32_t monitorId, int
     return RET_OK;
 }
 
-#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 int32_t ServerMsgHandler::OnMoveMouse(int32_t offsetX, int32_t offsetY)
 {
     CALL_LOG_ENTER;
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     if (MouseEventHdr->NormalizeMoveMouse(offsetX, offsetY)) {
         auto pointerEvent = MouseEventHdr->GetPointerEvent();
         CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -304,9 +286,9 @@ int32_t ServerMsgHandler::OnMoveMouse(int32_t offsetX, int32_t offsetY)
         inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
         MMI_HILOGD("Mouse movement message processed successfully");
     }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     return RET_OK;
 }
-#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t ServerMsgHandler::OnSubscribeKeyEvent(SessionPtr sess, NetPacket &pkt)

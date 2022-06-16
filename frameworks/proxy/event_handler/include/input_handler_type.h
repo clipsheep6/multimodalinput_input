@@ -16,6 +16,8 @@
 #ifndef INPUT_HANDLER_TYPE_H
 #define INPUT_HANDLER_TYPE_H
 
+#include <cinttypes>
+
 namespace OHOS {
 namespace MMI {
 namespace {

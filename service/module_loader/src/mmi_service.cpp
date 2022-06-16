@@ -329,7 +329,9 @@ void MMIService::OnDisconnected(SessionPtr s)
 {
     CHKPV(s);
     MMI_HILOGW("enter, session desc:%{public}s, fd: %{public}d", s->GetDescript().c_str(), s->GetFd());
+#ifdef OHOS_BUILD_ENABLE_POINTER
     IPointerDrawingManager::GetInstance()->DeletePointerVisible(s->GetPid());
+#endif // OHOS_BUILD_ENABLE_POINTER
 }
 
 int32_t MMIService::SetPointerVisible(bool visible)
@@ -459,6 +461,43 @@ int32_t MMIService::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
     }
     return RET_OK;
 }
+
+int32_t MMIService::InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_LOG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&MMIService::CheckInjectKeyEvent, this, keyEvent));
+    if (ret != RET_OK) {
+        MMI_HILOGE("inject key event failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::CheckInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
+{
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    return sMsgHandler_.OnInjectKeyEvent(keyEvent);
+}
+
+int32_t MMIService::CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    return sMsgHandler_.OnInjectPointerEvent(pointerEvent);
+}
+
+int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CALL_LOG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&MMIService::CheckInjectPointerEvent, this, pointerEvent));
+    if (ret != RET_OK) {
+    MMI_HILOGE("inject pointer event failed, ret:%{public}d", ret);
+    return RET_ERR;
+    }
+    return RET_OK;
+}
+
 #ifdef OHOS_RSS_CLIENT
 void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {

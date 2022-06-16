@@ -107,6 +107,7 @@ config("libmmi_server_config") {
   if (mmi_enable_tp) {
     cflags += [ "-DOHOS_BUILD_ENABLE_TOUCH" ]
   }
+  
   if (mmi_enable_monitor) {
     cflags += [ "-DOHOS_BUILD_ENABLE_MONITOR" ]
   }
@@ -228,7 +229,7 @@ ohos_shared_library("libmmi-server") {
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
-    "input_device_driver:hdi_input",
+    "input_device_driver_interface:hdi_input",
     "ipc:ipc_core",
     "multimedia_image_standard:image_native",
     "safwk:system_ability_fwk",
@@ -350,7 +351,7 @@ ohos_unittest("ut-mmi-service-out") {
   external_deps = [
     "ability_runtime:ability_manager",
     "hiviewdfx_hilog_native:libhilog",
-    "input_device_driver:hdi_input",
+    "input_device_driver_interface:hdi_input",
     "utils_base:utils",
   ]
 }

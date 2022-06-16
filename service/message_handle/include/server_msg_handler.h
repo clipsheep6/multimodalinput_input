@@ -18,11 +18,9 @@
 
 #include "nocopyable.h"
 
-#include "uds_session.h"
-#include "uds_server.h"
+#include "event_dispatch.h"
 #include "input_handler_type.h"
 #include "msg_handler.h"
-
 
 namespace OHOS {
 namespace MMI {
@@ -43,18 +41,13 @@ public:
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t OnMoveMouse(int32_t offsetX, int32_t offsetY);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-
+    int32_t OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
+    int32_t OnInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
 protected:
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
 #ifdef OHOS_BUILD_HDF
     int32_t OnHdiInject(SessionPtr sess, NetPacket& pkt);
 #endif
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    int32_t OnInjectKeyEvent(SessionPtr sess, NetPacket& pkt);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    int32_t OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt);
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     int32_t OnDisplayInfo(SessionPtr sess, NetPacket& pkt);
     int32_t OnInputDevice(SessionPtr sess, NetPacket& pkt);
     int32_t OnInputDeviceIds(SessionPtr sess, NetPacket& pkt);

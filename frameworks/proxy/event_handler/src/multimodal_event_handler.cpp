@@ -44,10 +44,6 @@ MultimodalEventHandler::MultimodalEventHandler() {}
 int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyEventPtr)
 {
     CHKPR(keyEventPtr, ERROR_NULL_POINTER);
-    if (!InitClient()) {
-        MMI_HILOGE("Init client faild");
-        return MMI_SERVICE_INVALID;
-    }
     return EventManager.InjectEvent(keyEventPtr);
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -134,10 +130,6 @@ int32_t MultimodalEventHandler::UnRegisterInputDeviceMonitor()
 int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    if (!InitClient()) {
-        MMI_HILOGE("Init client faild");
-        return MMI_SERVICE_INVALID;
-    }
     return EventManager.InjectPointerEvent(pointerEvent);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH

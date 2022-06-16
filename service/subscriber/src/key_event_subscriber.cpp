@@ -125,8 +125,10 @@ bool KeyEventSubscriber::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
         handled = HandleKeyDown(keyEvent);
     } else if (keyAction == KeyEvent::KEY_ACTION_UP) {
+        hasEventExecuting = false;
         handled = HandleKeyUp(keyEvent);
     } else if (keyAction == KeyEvent::KEY_ACTION_CANCEL) {
+        hasEventExecuting = false;
         handled = HandleKeyCanel(keyEvent);
     } else {
         MMI_HILOGW("keyAction exception");
@@ -275,7 +277,6 @@ void KeyEventSubscriber::OnTimer(const std::shared_ptr<Subscriber> subscriber)
 
     NotifySubscriber(subscriber->keyEvent_, subscriber);
     subscriber->keyEvent_.reset();
-    hasEventExecuting = false;
     MMI_HILOGD("subscribeId:%{public}d", subscriber->id_);
 }
 
