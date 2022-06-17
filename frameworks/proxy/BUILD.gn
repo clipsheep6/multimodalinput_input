@@ -41,6 +41,7 @@ config("libmmi_public_client_config") {
 
 ohos_source_set("libmmi-common") {
   sources = [
+    "events/src/input_device.cpp",
     "events/src/input_event.cpp",
     "events/src/key_event.cpp",
     "events/src/pointer_event.cpp",

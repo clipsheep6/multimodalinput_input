@@ -24,6 +24,7 @@
 #endif
 
 #include "event_dump.h"
+#include "input_device_manager.h"
 #include "input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "key_map_manager.h"
@@ -356,6 +357,222 @@ int32_t MMIService::MarkEventProcessed(int32_t eventId)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckEventProcessed, this, pid, eventId));
     if (ret != RET_OK) {
         MMI_HILOGE("mark event processed failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::OnSupportKeys(int32_t pid, int32_t userData, int32_t deviceId, std::vector<int32_t> keys)
+{
+    CALL_LOG_ENTER;
+    auto sess = GetSession(GetClientFd(pid));
+    CHKPR(sess, RET_ERR);
+    std::vector<bool> keystroke = InputDevMgr->SupportKeys(deviceId, keys);
+    if (keystroke.size() > MAX_SUPPORT_KEY) {
+        MMI_HILOGE("Device exceeds the max range");
+        return RET_ERR;
+    }
+
+    NetPacket pkt(MmiMessageId::INPUT_DEVICE_SUPPORT_KEYS);
+    pkt << userData << keystroke.size();
+    for (const bool &item : keystroke) {
+        pkt << item;
+    }
+    if (!sess->SendMsg(pkt)) {
+        MMI_HILOGE("Sending failed");
+        return MSG_SEND_FAIL;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> &keys)
+{
+    CALL_LOG_ENTER;
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnSupportKeys, this,
+        pid, userData, deviceId, keys));
+    if (ret != RET_OK) {
+        MMI_HILOGE("OnRegisterDevListener failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::OnGetDeviceIds(int32_t pid, int32_t userData)
+{
+    CALL_LOG_ENTER;
+    auto sess = GetSession(GetClientFd(pid));
+    CHKPR(sess, RET_ERR);
+    std::vector<int32_t> ids = InputDevMgr->GetInputDeviceIds();
+    if (ids.size() > MAX_INPUT_DEVICE) {
+        MMI_HILOGE("Device exceeds the max range");
+        return RET_ERR;
+    }
+    NetPacket pkt(MmiMessageId::INPUT_DEVICE_IDS);
+    pkt << userData << ids;
+    if (!sess->SendMsg(pkt)) {
+        MMI_HILOGE("Sending failed");
+        return MSG_SEND_FAIL;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::GetDeviceIds(int32_t userData)
+{
+    CALL_LOG_ENTER;
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetDeviceIds, this, pid, userData));
+    if (ret != RET_OK) {
+        MMI_HILOGE("OnRegisterDevListener failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::OnGetDevice(int32_t pid, int32_t userData, int32_t deviceId)
+{
+    CALL_LOG_ENTER;
+    auto sess = GetSession(GetClientFd(pid));
+    CHKPR(sess, RET_ERR);
+    std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetInputDevice(deviceId);
+    NetPacket pkt(MmiMessageId::INPUT_DEVICE);
+    if (inputDevice == nullptr) {
+        MMI_HILOGI("Input device not found");
+        int32_t id = -1;
+        std::string name = "null";
+        int32_t deviceType = -1;
+        int32_t busType = -1;
+        int32_t product = -1;
+        int32_t vendor = -1;
+        int32_t version = -1;
+        std::string phys = "null";
+        std::string uniq = "null";
+        size_t size = 0;
+        pkt << userData << id << name << deviceType << busType << product << vendor << version << phys << uniq << size;
+        if (pkt.ChkRWError()) {
+            MMI_HILOGE("packet write data failed");
+            return RET_ERR;
+        }
+        if (!sess->SendMsg(pkt)) {
+            MMI_HILOGE("Sending failed");
+            return MSG_SEND_FAIL;
+        }
+        return RET_OK;
+    }
+
+    pkt << userData << inputDevice->GetId() << inputDevice->GetName() << inputDevice->GetType()
+        << inputDevice->GetBustype() << inputDevice->GetProduct() << inputDevice->GetVendor()
+        << inputDevice->GetVersion() << inputDevice->GetPhys() << inputDevice->GetUniq()
+        << inputDevice->GetAxisInfo().size();
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("packet write basic data failed");
+        return RET_ERR;
+    }
+    for (const auto &item : inputDevice->GetAxisInfo()) {
+        pkt << item.GetAxisType() << item.GetMinimum() << item.GetMaximum() << item.GetFuzz() << item.GetFlat()
+            << item.GetResolution();
+        if (pkt.ChkRWError()) {
+            MMI_HILOGE("packet write axis data failed");
+            return RET_ERR;
+        }
+    }
+    if (!sess->SendMsg(pkt)) {
+        MMI_HILOGE("Sending failed");
+        return MSG_SEND_FAIL;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::GetDevice(int32_t userData, int32_t deviceId)
+{
+    CALL_LOG_ENTER;
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetDevice, this, pid, userData, deviceId));
+    if (ret != RET_OK) {
+        MMI_HILOGE("OnRegisterDevListener failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::OnRegisterDevListener(int32_t pid)
+{
+    auto sess = GetSession(GetClientFd(pid));
+    CHKPR(sess, RET_ERR);
+    InputDevMgr->AddDevListener(sess, [sess](std::string type, int32_t id) {
+        CALL_LOG_ENTER;
+        CHKPV(sess);
+        NetPacket pkt(MmiMessageId::ADD_INPUT_DEVICE_MONITOR);
+        pkt << type << id;
+        if (pkt.ChkRWError()) {
+            MMI_HILOGE("Packet write deviceId failed");
+            return;
+        }
+        if (!sess->SendMsg(pkt)) {
+            MMI_HILOGE("Sending failed");
+            return;
+        }
+    });
+    return RET_OK;
+}
+
+int32_t MMIService::RegisterDevListener()
+{
+    CALL_LOG_ENTER;
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnRegisterDevListener, this, pid));
+    if (ret != RET_OK) {
+        MMI_HILOGE("OnRegisterDevListener failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::OnUnregisterDevListener(int32_t pid)
+{
+    auto sess = GetSession(GetClientFd(pid));
+    InputDevMgr->RemoveDevListener(sess);
+    return RET_OK;
+}
+
+int32_t MMIService::UnregisterDevListener()
+{
+    CALL_LOG_ENTER;
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnUnregisterDevListener, this, pid));
+    if (ret != RET_OK) {
+        MMI_HILOGE("OnRegisterDevListener failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::OnGetKeyboardType(int32_t pid, int32_t userData, int32_t deviceId)
+{
+    auto sess = GetSession(GetClientFd(pid));
+    CHKPR(sess, RET_ERR);
+    int32_t keyboardType = InputDevMgr->GetKeyboardType(deviceId);
+    NetPacket pkt(MmiMessageId::INPUT_DEVICE_KEYBOARD_TYPE);
+    pkt << userData << keyboardType;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write keyboard type failed");
+        return RET_ERR;
+    }
+    if (!sess->SendMsg(pkt)) {
+        MMI_HILOGE("Failed to send the keyboard package");
+        return MSG_SEND_FAIL;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::GetKeyboardType(int32_t userData, int32_t deviceId)
+{
+    CALL_LOG_ENTER;
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetKeyboardType, this,
+        pid, userData, deviceId));
+    if (ret != RET_OK) {
+        MMI_HILOGE("OnRegisterDevListener failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;

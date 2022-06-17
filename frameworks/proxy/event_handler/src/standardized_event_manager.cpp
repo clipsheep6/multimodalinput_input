@@ -159,7 +159,7 @@ int32_t StandardizedEventManager::GetDevice(int32_t userData, int32_t deviceId)
 
 int32_t StandardizedEventManager::SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> keyCodes)
 {
-    NetPacket pkt(MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY);
+    NetPacket pkt(MmiMessageId::INPUT_DEVICE_SUPPORT_KEYS);
     pkt << userData << deviceId << keyCodes;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write keyCodes failed");
@@ -179,13 +179,13 @@ int32_t StandardizedEventManager::GetKeyboardType(int32_t userData, int32_t devi
     return SendMsg(pkt);
 }
 
-int32_t StandardizedEventManager::RegisterInputDeviceMonitor()
+int32_t StandardizedEventManager::RegisterDevListener()
 {
     NetPacket pkt(MmiMessageId::ADD_INPUT_DEVICE_MONITOR);
     return SendMsg(pkt);
 }
 
-int32_t StandardizedEventManager::UnRegisterInputDeviceMonitor()
+int32_t StandardizedEventManager::UnregisterDevListener()
 {
     NetPacket pkt(MmiMessageId::REMOVE_INPUT_DEVICE_MONITOR);
     return SendMsg(pkt);

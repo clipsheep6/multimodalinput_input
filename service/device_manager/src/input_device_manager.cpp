@@ -15,7 +15,7 @@
 
 #include "input_device_manager.h"
 
-#include "key_event_value_transformation.h"
+#include "key_map_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -75,12 +75,17 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
     for (const auto &item : axisType) {
         int32_t min = libinput_device_get_axis_min(iter->second, item);
         if (min == -1) {
-            MMI_HILOGW("The device does not support this axis");
+            MMI_HILOGD("The device does not support this axis");
             continue;
         }
+        if (item == ABS_MT_PRESSURE) {
+            axis.SetMinimum(0);
+            axis.SetMaximum(1);
+        } else {
+            axis.SetMinimum(min);
+            axis.SetMaximum(libinput_device_get_axis_max(iter->second, item));
+        }
         axis.SetAxisType(item);
-        axis.SetMinimum(min);
-        axis.SetMaximum(libinput_device_get_axis_max(iter->second, item));
         axis.SetFuzz(libinput_device_get_axis_fuzz(iter->second, item));
         axis.SetFlat(libinput_device_get_axis_flat(iter->second, item));
         axis.SetResolution(libinput_device_get_axis_resolution(iter->second, item));
@@ -109,8 +114,10 @@ std::vector<bool> InputDeviceManager::SupportKeys(int32_t deviceId, std::vector<
         return keystrokeAbility;
     }
     for (const auto& item : keyCodes) {
-        auto sysKeyCode = InputTransformationKeyValue(item);
-        bool ret = libinput_device_has_key(iter->second, sysKeyCode) == SUPPORT_KEY;
+        bool ret = false;
+        for (const auto &it : KeyMapMgr->InputTransferKeyValue(deviceId, item)) {
+            ret |= libinput_device_has_key(iter->second, it) == SUPPORT_KEY;
+        }
         keystrokeAbility.push_back(ret);
     }
     return keystrokeAbility;
@@ -194,24 +201,25 @@ int32_t InputDeviceManager::GetKeyboardType(int32_t deviceId)
     return keyboardType;
 }
 
-void InputDeviceManager::AddDevMonitor(SessionPtr sess, std::function<void(std::string, int32_t)> callback)
+void InputDeviceManager::AddDevListener(SessionPtr sess, std::function<void(std::string, int32_t)> callback)
 {
     CALL_LOG_ENTER;
-    auto iter = devMonitor_.find(sess);
-    if (iter == devMonitor_.end()) {
-        devMonitor_[sess] = callback;
+    auto ret = devListener_.insert({ sess, callback });
+    if (!ret.second) {
+        MMI_HILOGE("Failed to add a listener");
+        return;
     }
 }
 
-void InputDeviceManager::RemoveDevMonitor(SessionPtr sess)
+void InputDeviceManager::RemoveDevListener(SessionPtr sess)
 {
     CALL_LOG_ENTER;
-    auto iter = devMonitor_.find(sess);
-    if (iter == devMonitor_.end()) {
+    auto iter = devListener_.find(sess);
+    if (iter == devListener_.end()) {
         MMI_HILOGE("session does not exist");
         return;
     }
-    devMonitor_.erase(iter);
+    devListener_.erase(iter);
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -241,7 +249,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
         return;
     }
     inputDevice_[nextId_] = inputDevice;
-    for (const auto &item : devMonitor_) {
+    for (const auto &item : devListener_) {
         CHKPC(item.first);
         item.second("add", nextId_);
     }
@@ -264,7 +272,7 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
             break;
         }
     }
-    for (const auto &item : devMonitor_) {
+    for (const auto &item : devListener_) {
         CHKPC(item.first);
         item.second("remove", deviceId);
     }

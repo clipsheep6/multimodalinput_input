@@ -105,22 +105,22 @@ int32_t MultimodalEventHandler::GetKeyboardType(int32_t userData, int32_t device
     return EventManager.GetKeyboardType(userData, deviceId);
 }
 
-int32_t MultimodalEventHandler::RegisterInputDeviceMonitor()
+int32_t MultimodalEventHandler::RegisterDevListener()
 {
     if (!InitClient()) {
         MMI_HILOGE("Init client faild");
         return MMI_SERVICE_INVALID;
     }
-    return EventManager.RegisterInputDeviceMonitor();
+    return EventManager.RegisterDevListener();
 }
 
-int32_t MultimodalEventHandler::UnRegisterInputDeviceMonitor()
+int32_t MultimodalEventHandler::UnregisterDevListener()
 {
     if (!InitClient()) {
         MMI_HILOGE("Init client faild");
         return MMI_SERVICE_INVALID;
     }
-    return EventManager.UnRegisterInputDeviceMonitor();
+    return EventManager.UnregisterDevListener();
 }
 
 int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
