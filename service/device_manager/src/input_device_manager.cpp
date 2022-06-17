@@ -204,7 +204,7 @@ int32_t InputDeviceManager::GetKeyboardType(int32_t deviceId)
 void InputDeviceManager::AddDevListener(SessionPtr sess, std::function<void(std::string, int32_t)> callback)
 {
     CALL_LOG_ENTER;
-    auto ret = devListener_.insert({ sess, callback });
+    auto ret = devListener_.insert( { sess, callback } );
     if (!ret.second) {
         MMI_HILOGE("Failed to add a listener");
         return;
