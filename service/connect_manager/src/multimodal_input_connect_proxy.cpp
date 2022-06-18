@@ -181,7 +181,7 @@ int32_t MultimodalInputConnectProxy::RegisterDevListener()
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(INJECT_POINTER_EVENT, data, reply, option);
+    int32_t ret = remote->SendRequest(REGISTER_DEV_MONITOR, data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("send request fail, ret:%{public}d", ret);
         return ret;
@@ -201,7 +201,7 @@ int32_t MultimodalInputConnectProxy::UnregisterDevListener()
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(INJECT_POINTER_EVENT, data, reply, option);
+    int32_t ret = remote->SendRequest(UNREGISTER_DEV_MONITOR, data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("send request fail, ret:%{public}d", ret);
         return ret;
@@ -240,7 +240,7 @@ int32_t MultimodalInputConnectProxy::SupportKeys(int32_t userData, int32_t devic
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(INJECT_POINTER_EVENT, data, reply, option);
+    int32_t ret = remote->SendRequest(SUPPORT_KEYS, data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("send request fail, ret:%{public}d", ret);
         return ret;
@@ -264,7 +264,7 @@ int32_t MultimodalInputConnectProxy::GetDeviceIds(int32_t userData)
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(INJECT_POINTER_EVENT, data, reply, option);
+    int32_t ret = remote->SendRequest(GET_DEVICE_IDS, data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("send request fail, ret:%{public}d", ret);
         return ret;
@@ -292,7 +292,7 @@ int32_t MultimodalInputConnectProxy::GetDevice(int32_t userData, int32_t deviceI
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(INJECT_POINTER_EVENT, data, reply, option);
+    int32_t ret = remote->SendRequest(GET_DEVICE, data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("send request fail, ret:%{public}d", ret);
         return ret;
@@ -320,7 +320,7 @@ int32_t MultimodalInputConnectProxy::GetKeyboardType(int32_t userData, int32_t d
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(INJECT_POINTER_EVENT, data, reply, option);
+    int32_t ret = remote->SendRequest(GET_KEYBOARD_TYPE, data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("send request fail, ret:%{public}d", ret);
         return ret;
