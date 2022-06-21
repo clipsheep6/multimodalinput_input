@@ -37,6 +37,27 @@ const std::string DEFINE_PROPERTIES = "napi_define_properties";
 const std::string GET_STRING_UTF8 = "napi_get_value_string_utf8";
 const std::string GET_ARRAY_LENGTH = "napi_get_array_length";
 const std::string GET_ELEMENT = "napi_get_element";
+
+enum KeyCode {
+    KEYCODE_FN = 0,
+    KEYCODE_UNKNOWN = -1,
+    KEYCODE_HOME = 1,
+    KEYCODE_BACK = 2,
+    KEYCODE_MEDIA_PLAY_PAUSE = 10,
+    KEYCODE_MEDIA_STOP = 11,
+    KEYCODE_MEDIA_NEXT = 12,
+    KEYCODE_MEDIA_PREVIOUS = 13,
+    KEYCODE_MEDIA_REWIND = 14,
+    KEYCODE_MEDIA_FAST_FORWARD = 15,
+    KEYCODE_VOLUME_UP = 16,
+    KEYCODE_VOLUME_DOWN = 17,
+    KEYCODE_POWER = 18,
+    KEYCODE_CAMERA = 19,
+    KEYCODE_VOLUME_MUTE = 22,
+    KEYCODE_MUTE = 23,
+    KEYCODE_BRIGHTNESS_UP = 40,
+    KEYCODE_BRIGHTNESS_DOWN = 41,
+};
 } // namespace
 
 JsInputDeviceContext::JsInputDeviceContext()
@@ -344,6 +365,35 @@ napi_value JsInputDeviceContext::GetKeyboardType(napi_env env, napi_callback_inf
     return jsInputDeviceMgr->GetKeyboardType(env, id, argv[1]);
 }
 
+napi_value JsInputDeviceContext::GetNapiInt32(napi_env env, int32_t keyCode)
+{
+    napi_value value = nullptr;
+    CHKRP(env, napi_create_int32(env, keyCode, &value), "napi_create_int32");
+    return value;
+}
+
+napi_value JsInputDeviceContext::EnumClassConstructor(napi_env env, napi_callback_info info)
+{
+    size_t argc = 0;
+    napi_value args[1] = {0};
+    napi_value ret = nullptr;
+    void *data = nullptr;
+    CHKRP(env, napi_get_cb_info(env, info, &argc, args, &ret, &data), "napi_get_cb_info");
+    return ret;
+}
+
+napi_value JsInputDeviceContext::CreateKeyCodeEnum(napi_env env, napi_value exports)
+{
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("KEYCODE_VOLUME_DOWN", GetNapiInt32(env, KEYCODE_VOLUME_DOWN)),
+    };
+    napi_value result = nullptr;
+    CHKRP(env, napi_define_class(env, "KeyCodeEnum", NAPI_AUTO_LENGTH, JsInputDeviceContext::EnumClassConstructor, nullptr,
+        sizeof(desc) / sizeof(desc[0]), nullptr, &result), "napi_define_class");
+    CHKRP(env, napi_set_named_property(env, exports, "KeyCodeEnum", result), "napi_set_named_property");
+    return exports;
+}
+
 napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
 {
     CALL_LOG_ENTER;
@@ -361,6 +411,7 @@ napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getKeyboardType", GetKeyboardType),
     };
     CHKRP(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
+    CreateKeyCodeEnum(env, exports);
     return exports;
 }
 } // namespace MMI
