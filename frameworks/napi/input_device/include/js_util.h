@@ -36,8 +36,8 @@ public:
         std::vector<int32_t> ids;
         std::shared_ptr<InputDevice> device = nullptr;
         std::vector<bool> keystrokeAbility;
-        int32_t deviceId = 0;
-        int32_t keyboardType = 0;
+        int32_t deviceId { 0 };
+        int32_t keyboardType { 0 };
     };
     struct CallbackInfo {
         CallbackInfo();
@@ -51,7 +51,7 @@ public:
     };
     struct DeviceType {
         std::string sourceTypeName;
-        uint32_t typeBit;
+        uint32_t typeBit { 0 };
     };
 
     static bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
