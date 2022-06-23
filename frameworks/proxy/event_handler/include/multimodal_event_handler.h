@@ -40,12 +40,6 @@ public:
     
     int32_t InjectEvent(const std::shared_ptr<KeyEvent> keyEventPtr);
     int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
-    int32_t GetDevice(int32_t userData, int32_t deviceId);
-    int32_t GetDeviceIds(int32_t userData);
-    int32_t SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> keyCodes);
-    int32_t GetKeyboardType(int32_t userData, int32_t deviceId);
-    int32_t RegisterInputDeviceMonitor();
-    int32_t UnRegisterInputDeviceMonitor();
     int32_t AddInputEventMontior(int32_t keyEventType);
     void RemoveInputEventMontior(int32_t keyEventType);
     int32_t AddInputEventTouchpadMontior(int32_t pointerEventType);

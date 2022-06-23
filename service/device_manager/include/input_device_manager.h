@@ -49,8 +49,8 @@ public:
     void Attach(std::shared_ptr<IDeviceObserver> observer);
     void Detach(std::shared_ptr<IDeviceObserver> observer);
     void NotifyPointerDevice(bool hasPointerDevice);
-    void AddDevMonitor(SessionPtr sess, std::function<void(std::string, int32_t)> callback);
-    void RemoveDevMonitor(SessionPtr sess);
+    void AddDevListener(SessionPtr sess, std::function<void(std::string, int32_t)> callback);
+    void RemoveDevListener(SessionPtr sess);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool HasPointerDevice();
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -61,7 +61,7 @@ private:
     std::map<int32_t, struct libinput_device *> inputDevice_;
     int32_t nextId_ {0};
     std::list<std::shared_ptr<IDeviceObserver>> observers_;
-    std::map<SessionPtr, std::function<void(std::string, int32_t)>> devMonitor_;
+    std::map<SessionPtr, std::function<void(std::string, int32_t)>> devListener_;
 };
 
 #define InputDevMgr InputDeviceManager::GetInstance()
