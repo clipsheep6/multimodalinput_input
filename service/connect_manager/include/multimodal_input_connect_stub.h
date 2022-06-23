@@ -41,6 +41,16 @@ protected:
     int32_t StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPointerVisible(MessageParcel& data, MessageParcel& reply);
     int32_t StubIsPointerVisible(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetPointerLocation(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetInputDeviceSeatName(MessageParcel& data, MessageParcel& reply);
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    int32_t StubGetRemoteAbility(MessageParcel& data, MessageParcel& reply);
+    int32_t StubPrepareRemoteInput(MessageParcel& data, MessageParcel& reply);
+    int32_t StubUnprepareRemoteInput(MessageParcel& data, MessageParcel& reply);
+    int32_t StubStartRemoteInput(MessageParcel& data, MessageParcel& reply);
+    int32_t StubStopRemoteInput(MessageParcel& data, MessageParcel& reply);
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
+
     int32_t StubMarkEventProcessed(MessageParcel& data, MessageParcel& reply);
     int32_t StubAddInputHandler(MessageParcel& data, MessageParcel& reply);
     int32_t StubRemoveInputHandler(MessageParcel& data, MessageParcel& reply);

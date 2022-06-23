@@ -23,7 +23,11 @@
 #include <unordered_map>
 #endif
 
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+#include "dinput_manager.h"
+#endif
 #include "event_dump.h"
+#include "input_device_manager.h"
 #include "input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "key_map_manager.h"
@@ -249,6 +253,10 @@ void MMIService::OnStart()
 #ifdef OHOS_RSS_CLIENT
     AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
 #endif
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    std::thread t(std::bind(&MMIService::InitDeviceManager, this));
+    t.join();
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
     t_.join();
 }
 
@@ -358,6 +366,28 @@ int32_t MMIService::MarkEventProcessed(int32_t eventId)
     if (ret != RET_OK) {
         MMI_HILOGE("mark event processed failed, ret:%{public}d", ret);
         return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::SetPointerLocation(int32_t x, int32_t y)
+{
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputEventHandler::SetAbsolutionLocation,
+        InputHandler, GetCallingPid(), static_cast<double>(x), static_cast<double>(y)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set pointer location failed:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::SetInputDeviceSeatName(const std::string& seatName, DeviceUniqId& deviceUniqId)
+{
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputDeviceManager::SetInputDeviceSeatName,
+        InputDevMgr, seatName, deviceUniqId));
+    if (ret != RET_OK) {
+        MMI_HILOGE("set the device SeatName failed:%{public}d", ret);
+        return ret;
     }
     return RET_OK;
 }
@@ -472,7 +502,57 @@ int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> point
     return RET_OK;
 }
 
-#ifdef OHOS_RSS_CLIENT
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+int32_t MMIService::GetRemoteInputAbility(std::string deviceId, sptr<ICallDinput> ablitity)
+{
+    return InputDevMgr->GetRemoteInputAbility(deviceId, ablitity);
+}
+
+int32_t MMIService::PrepareRemoteInput(const std::string& deviceId, sptr<ICallDinput> prepareDinput)
+{
+    return DInputMgr->PrepareRemoteInput(deviceId, prepareDinput);
+}
+
+int32_t  MMIService::UnprepareRemoteInput(const std::string& deviceId, sptr<ICallDinput> prepareDinput)
+{
+    return DInputMgr->UnprepareRemoteInput(deviceId, prepareDinput);
+}
+
+int32_t  MMIService::StartRemoteInput(const std::string& deviceId,
+    uint32_t inputAbility, sptr<ICallDinput> prepareDinput)
+{
+    return DInputMgr->StartRemoteInput(deviceId, inputAbility, prepareDinput);
+}
+
+int32_t  MMIService::StopRemoteInput(const std::string& deviceId,
+    uint32_t inputAbility, sptr<ICallDinput> prepareDinput)
+{
+    return DInputMgr->StopRemoteInput(deviceId, inputAbility, prepareDinput);
+}
+
+void MMIService::InitDeviceManager()
+{
+    bool isInit = false;
+    while (!isInit) {
+        PublishSA();
+        isInit = InputDevMgr->InitDeviceManager();
+    }
+}
+
+void MMIService::PublishSA()
+{
+    int32_t const WAIT_TIME = 1000;
+    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME));  
+    bool ret = SystemAbility::Publish(this);
+    if (!ret) {
+        MMI_HILOGE("Leave, publishing MMIService failed!");
+        return;
+    }
+}
+
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
+
+#if (defined OHOS_RSS_CLIENT) || (defined OHOS_DISTRIBUTED_INPUT_MODEL)
 void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
     if (systemAbilityId == RES_SCHED_SYS_ABILITY_ID) {

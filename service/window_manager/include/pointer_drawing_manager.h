@@ -41,11 +41,12 @@ public:
     DISALLOW_COPY_AND_MOVE(PointerDrawingManager);
     void DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY);
     void OnDisplayInfo(int32_t displayId, int32_t width, int32_t height);
-    void UpdatePointerDevice(bool hasPointerDevice);
+    void UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible);
     bool Init();
     void DeletePointerVisible(int32_t pid);
     int32_t SetPointerVisible(int32_t pid, bool visible);
     bool IsPointerVisible();
+    void SetPointerLocation(int32_t pid, int32_t x, int32_t y);
 
 public:
     static const int32_t IMAGE_WIDTH = 64;
@@ -74,6 +75,7 @@ private:
     int32_t lastGlobalX_ = -1;
     int32_t lastGlobalY_ = -1;
 
+    std::mutex mutex_;
     struct PidInfo {
         int32_t pid { 0 };
         bool visible { false };

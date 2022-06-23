@@ -15,6 +15,7 @@
 
 #include "touch_transform_point_processor.h"
 
+#include "input_device_manager.h"
 #include "mmi_log.h"
 
 namespace OHOS {

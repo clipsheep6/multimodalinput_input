@@ -18,6 +18,9 @@
 
 #include "iremote_broker.h"
 
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+#include "i_call_dinput.h"
+#endif
 #include "i_event_filter.h"
 #include "input_handler_type.h"
 #include "key_event.h"
@@ -26,6 +29,7 @@
 
 namespace OHOS {
 namespace MMI {
+using DeviceUniqId = std::tuple<int32_t, int32_t, int32_t, int32_t, int32_t, std::string>;
 class IMultimodalInputConnect : public IRemoteBroker {
 public:
     static constexpr int32_t INVALID_SOCKET_FD = -1;
@@ -46,6 +50,17 @@ public:
     virtual int32_t SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option) = 0;
     virtual int32_t UnsubscribeKeyEvent(int32_t subscribeId) = 0;
     virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) = 0;
+    virtual int32_t SetPointerLocation(int32_t x, int32_t y) = 0;
+    virtual int32_t SetInputDeviceSeatName(const std::string& seatName, DeviceUniqId& deviceUniqId) = 0;
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    virtual int32_t GetRemoteInputAbility(std::string deviceId, sptr<ICallDinput> ablitity) = 0;
+    virtual int32_t PrepareRemoteInput(const std::string& deviceId, sptr<ICallDinput> prepareDinput) = 0;
+    virtual int32_t UnprepareRemoteInput(const std::string& deviceId, sptr<ICallDinput> prepareDinput) = 0;
+    virtual int32_t StartRemoteInput(const std::string& deviceId, uint32_t inputAbility,
+        sptr<ICallDinput> prepareDinput) = 0;
+    virtual int32_t StopRemoteInput(const std::string& deviceId, uint32_t inputAbility,
+        sptr<ICallDinput> prepareDinput) = 0;
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
     enum {
         ALLOC_SOCKET_FD = 0,
         ADD_INPUT_EVENT_FILTER = 1,
@@ -59,7 +74,15 @@ public:
         MARK_EVENT_CONSUMED = 10,
         MOVE_MOUSE = 11,
         INJECT_KEY_EVENT = 12,
-        INJECT_POINTER_EVENT = 13
+        INJECT_POINTER_EVENT = 13,
+        
+        GET_REMOTE_ABILITY = 30,
+        PREPARE_DINPUT = 31,
+        UNPREPARE_DINPUT = 32,
+        START_DINPUT = 33,
+        STOP_DINPUT = 34,
+        SIMULATE_CROSS_LOCATION = 35,
+        SET_INPUT_DEVICE_SEAT_NAME = 36,
     };
 
     enum {

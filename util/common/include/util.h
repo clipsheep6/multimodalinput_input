@@ -65,6 +65,8 @@ void ReadProConfigFile(const std::string &realPath, int32_t deviceId,
 std::string StringFmt(const char* str, ...);
 std::string ReadJsonFile(const std::string &filePath);
 std::string ReadUinputToolFile(const std::string &filePath);
+std::string GetAnonyString(const std::string &value);
+std::string GetAnonyInt32(const int32_t value);
 int32_t ReadTomlFile(const std::string &filePath, DeviceConfig& devConf);
 int32_t ReadConfigFile(const std::string &realPath, DeviceConfig& devConf);
 int32_t ConfigItemSwitch(const std::string &configItem, const std::string &value, DeviceConfig& devConf);
@@ -95,8 +97,7 @@ bool AddInt(T op1, T op2, T minVal, T maxVal, T &res)
         if (op2 > maxVal - op1) {
             return false;
         }
-    }
-    else {
+    } else {
         if (op2 < minVal - op1) {
             return false;
         }

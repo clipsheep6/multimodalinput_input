@@ -64,10 +64,21 @@ public:
     virtual int32_t SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option) override;
     virtual int32_t UnsubscribeKeyEvent(int32_t subscribeId) override;
     virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
-
+    virtual int32_t SetPointerLocation(int32_t x, int32_t y) override;
+    virtual int32_t SetInputDeviceSeatName(const std::string& seatName, DeviceUniqId& deviceUniqId) override;
 #ifdef OHOS_RSS_CLIENT
     virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
 #endif
+
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    virtual int32_t GetRemoteInputAbility(std::string deviceId, sptr<ICallDinput> ablitity) override;
+    virtual int32_t PrepareRemoteInput(const std::string& deviceId, sptr<ICallDinput> prepareDinput) override;
+    virtual int32_t UnprepareRemoteInput(const std::string& deviceId, sptr<ICallDinput> prepareDinput) override;
+    virtual int32_t StartRemoteInput(const std::string& deviceId, uint32_t inputAbility,
+        sptr<ICallDinput> prepareDinput) override;
+    virtual int32_t StopRemoteInput(const std::string& deviceId, uint32_t inputAbility,
+        sptr<ICallDinput> prepareDinput) override;
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
 
 protected:
     virtual void OnConnected(SessionPtr s) override;
@@ -91,7 +102,10 @@ protected:
     void OnThread();
     void OnSignalEvent(int32_t signalFd);
     void OnDelegateTask(epoll_event& ev);
-
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    void PublishSA();
+    void InitDeviceManager();
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
 private:
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t mmiFd_ = -1;

@@ -222,10 +222,11 @@ void PointerDrawingManager::OnDisplayInfo(int32_t displayId, int32_t width, int3
     DrawManager();
 }
 
-void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice)
+void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible)
 {
     CALL_LOG_ENTER;
     hasPointerDevice_ = hasPointerDevice;
+    UpdataPidInfo(getpid(), isPointerVisible);
     DrawManager();
 }
 
@@ -267,6 +268,7 @@ std::shared_ptr<IPointerDrawingManager> IPointerDrawingManager::GetInstance()
 void PointerDrawingManager::DeletePidInfo(int32_t pid)
 {
     CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
     for (auto it = pidInfos_.begin(); it != pidInfos_.end(); ++it) {
         if (it->pid == pid) {
             pidInfos_.erase(it);
@@ -278,6 +280,7 @@ void PointerDrawingManager::DeletePidInfo(int32_t pid)
 void PointerDrawingManager::UpdataPidInfo(int32_t pid, bool visible)
 {
     CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
     for (auto it = pidInfos_.begin(); it != pidInfos_.end(); ++it) {
         if (it->pid == pid) {
             pidInfos_.erase(it);
@@ -324,6 +327,19 @@ int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
     UpdataPidInfo(pid, visible);
     UpdataPointerVisible();
     return RET_OK;
+}
+
+void PointerDrawingManager::SetPointerLocation(int32_t pid, int32_t x, int32_t y)
+{
+    CALL_LOG_ENTER;
+    FixCursorPosition(x, y);
+    lastGlobalX_ = x;
+    lastGlobalY_ = y;
+    if (pointerWindow_ != nullptr) {
+        pointerWindow_->MoveTo(x, y);
+        UpdataPidInfo(pid, true);
+        SetPointerVisible(pid, true);
+    }
 }
 } // namespace MMI
 } // namespace OHOS

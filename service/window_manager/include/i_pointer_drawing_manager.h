@@ -37,6 +37,7 @@ public:
     {
         return 0;
     }
+    virtual void SetPointerLocation(int32_t pid, int32_t x, int32_t y) {}
     virtual bool IsPointerVisible()
     {
         return false;
