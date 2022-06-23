@@ -81,7 +81,7 @@ public:
 private:
     int32_t id_ {-1};
     std::string name_ {"null"};
-    int32_t deviceType_ {-1};
+    int32_t type_ {0};
     int32_t bus_ {-1};
     int32_t version_ {-1};
     int32_t product_ {-1};
