@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #ifndef INPUT_DEVICE_MANAGER_H
 #define INPUT_DEVICE_MANAGER_H
 
@@ -22,6 +21,7 @@
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
 #include "i_call_dinput.h"
 #endif
+
 #include "device_observer.h"
 #include "event_dispatch.h"
 #include "event_package.h"
@@ -85,7 +85,7 @@ public:
 private:
     bool IsPointerDevice(struct libinput_device* device);
     void ScanPointerDevice();
-    std::shared_ptr<InputDevice> MakeInputDevice(int32_t id, struct libinput_device * libinputDevice) const;
+    std::shared_ptr<InputDevice> MakeInputDevice(int32_t id, struct libinput_device* libinputDevice) const;
     std::string MakeNetworkId(const std::string& phys) const;
     void HandleDeviceChanged(std::string changedType, int32_t id);
     bool IsRemote(struct libinput_device* inputDevice) const;
@@ -105,7 +105,6 @@ private:
     std::map<SessionPtr, std::function<void(std::string, int32_t)>> devMonitor_;
     int32_t lastTouchDeviceID_ {-1};
 };
-
 #define InputDevMgr InputDeviceManager::GetInstance()
 } // namespace MMI
 } // namespace OHOS

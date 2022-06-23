@@ -51,7 +51,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         {IMultimodalInputConnect::ADD_INPUT_EVENT_FILTER, &MultimodalInputConnectStub::StubAddInputEventFilter},
         {IMultimodalInputConnect::SET_POINTER_VISIBLE, &MultimodalInputConnectStub::StubSetPointerVisible},
         {IMultimodalInputConnect::IS_POINTER_VISIBLE, &MultimodalInputConnectStub::StubIsPointerVisible},
-		{IMultimodalInputConnect::SIMULATE_CROSS_LOCATION, &MultimodalInputConnectStub::StubSetPointerLocation},
+        {IMultimodalInputConnect::SIMULATE_CROSS_LOCATION, &MultimodalInputConnectStub::StubSetPointerLocation},
         {IMultimodalInputConnect::SET_INPUT_DEVICE_SEAT_NAME, &MultimodalInputConnectStub::StubSetInputDeviceSeatName},
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
         {IMultimodalInputConnect::GET_REMOTE_ABILITY, &MultimodalInputConnectStub::StubGetRemoteAbility},
@@ -253,7 +253,6 @@ int32_t MultimodalInputConnectStub::StubSetPointerLocation(MessageParcel& data, 
         return CHECK_PERMISSION_FAIL;
     }
     int32_t ret = RET_OK;
-
     int32_t x = data.ReadInt32();
     int32_t y = data.ReadInt32();
     ret = SetPointerLocation(x, y);
@@ -268,11 +267,9 @@ int32_t MultimodalInputConnectStub::StubSetPointerLocation(MessageParcel& data, 
 int32_t MultimodalInputConnectStub::StubSetInputDeviceSeatName(MessageParcel& data, MessageParcel& reply)
 {
     int32_t ret = RET_OK;
-
     std::string seatName = data.ReadString();
     DeviceUniqId deviceUniqId;
     ret = SetInputDeviceSeatName(seatName, deviceUniqId);
-    
     if (ret != RET_OK) {
         MMI_HILOGE("call SetInputDeviceSeatName failed ret:%{public}d", ret);
         return ret;
@@ -296,14 +293,12 @@ int32_t MultimodalInputConnectStub::StubGetRemoteAbility(MessageParcel& data, Me
         return CHECK_PERMISSION_FAIL;
     }
     int32_t ret = RET_OK;
-
     std::string networkId = data.ReadString();
     sptr<IRemoteObject> client = data.ReadRemoteObject();
     CHKPR(client, ERR_INVALID_VALUE);
     sptr<ICallDinput> remoteAbility = iface_cast<ICallDinput>(client);
     CHKPR(remoteAbility, ERROR_NULL_POINTER);
     ret = GetRemoteInputAbility(networkId, remoteAbility);
-    
     if (ret != RET_OK) {
         MMI_HILOGE("call GetRemoteAbility failed ret:%{public}d", ret);
         return ret;
@@ -326,7 +321,6 @@ int32_t MultimodalInputConnectStub::StubPrepareRemoteInput(MessageParcel& data, 
     sptr<ICallDinput> prepareDinput = iface_cast<ICallDinput>(client);
     CHKPR(prepareDinput, ERROR_NULL_POINTER);
     ret = PrepareRemoteInput(networkId, prepareDinput);
-    
     if (ret != RET_OK) {
         MMI_HILOGE("call PrepareRemoteInput failed ret:%{public}d", ret);
         return ret;
@@ -349,7 +343,6 @@ int32_t MultimodalInputConnectStub::StubUnprepareRemoteInput(MessageParcel& data
     sptr<ICallDinput> unprepareDinput = iface_cast<ICallDinput>(client);
     CHKPR(unprepareDinput, ERROR_NULL_POINTER);
     ret = UnprepareRemoteInput(networkId, unprepareDinput);
-    
     if (ret != RET_OK) {
         MMI_HILOGE("call UnprepareRemoteInput failed ret:%{public}d", ret);
         return ret;
@@ -373,7 +366,6 @@ int32_t MultimodalInputConnectStub::StubStartRemoteInput(MessageParcel& data, Me
     sptr<ICallDinput> startDinput = iface_cast<ICallDinput>(client);
     CHKPR(startDinput, ERROR_NULL_POINTER);
     ret = StartRemoteInput(networkId, inputAbility, startDinput);
-    
     if (ret != RET_OK) {
         MMI_HILOGE("call StartRemoteInput failed ret:%{public}d", ret);
         return ret;
@@ -397,7 +389,6 @@ int32_t MultimodalInputConnectStub::StubStopRemoteInput(MessageParcel& data, Mes
     sptr<ICallDinput> stopDinput = iface_cast<ICallDinput>(client);
     CHKPR(stopDinput, ERROR_NULL_POINTER);
     ret = StopRemoteInput(networkId, inputAbility, stopDinput);
-    
     if (ret != RET_OK) {
         MMI_HILOGE("call StopRemoteInput failed ret:%{public}d", ret);
         return ret;
@@ -414,10 +405,8 @@ int32_t MultimodalInputConnectStub::StubSubscribeKeyEvent(MessageParcel& data, M
         MMI_HILOGE("service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-
     int32_t subscribeId;
     READINT32(data, subscribeId, IPC_PROXY_DEAD_OBJECT_ERR);
-
     auto keyOption = std::make_shared<KeyOption>();
     CHKPR(keyOption, IPC_STUB_WRITE_PARCEL_ERR);
     if (!keyOption->ReadFromParcel(data)) {
@@ -439,7 +428,6 @@ int32_t MultimodalInputConnectStub::StubUnsubscribeKeyEvent(MessageParcel& data,
         MMI_HILOGE("service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-
     int32_t subscribeId;
     READINT32(data, subscribeId, IPC_PROXY_DEAD_OBJECT_ERR);
 
@@ -458,7 +446,6 @@ int32_t MultimodalInputConnectStub::StubMoveMouseEvent(MessageParcel& data, Mess
         MMI_HILOGE("permission check fail");
         return CHECK_PERMISSION_FAIL;
     }
-
     if (!IsRunning()) {
         MMI_HILOGE("service is not running");
         return MMISERVICE_NOT_RUNNING;

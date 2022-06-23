@@ -100,14 +100,16 @@ int32_t MultimodalInputConnectManager::SetPointerLocation(int32_t x, int32_t y)
     return multimodalInputConnectService_->SetPointerLocation(x, y);
 }
 
-int32_t MultimodalInputConnectManager::SetInputDeviceSeatName(const std::string& seatName, DeviceUniqId& deviceUniqId)
+int32_t MultimodalInputConnectManager::SetInputDeviceSeatName(const std::string& seatName,
+    DeviceUniqId& deviceUniqId)
 {
     CHKPR(multimodalInputConnectService_, RET_ERR);
     return multimodalInputConnectService_->SetInputDeviceSeatName(seatName, deviceUniqId);
 }
 
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
-int32_t MultimodalInputConnectManager::GetRemoteInputAbility(const std::string& deviceId, sptr<ICallDinput> ablitity)
+int32_t MultimodalInputConnectManager::GetRemoteInputAbility(const std::string& deviceId,
+    sptr<ICallDinput> ablitity)
 {
     CHKPR(multimodalInputConnectService_, RET_ERR);
     return multimodalInputConnectService_->GetRemoteInputAbility(deviceId, ablitity);
@@ -119,19 +121,22 @@ int32_t MultimodalInputConnectManager::PrepareRemoteInput(const std::string& dev
     return multimodalInputConnectService_->PrepareRemoteInput(deviceId, prepareDinput);
 }
 
-int32_t MultimodalInputConnectManager::UnprepareRemoteInput(const std::string& deviceId, sptr<ICallDinput> prepareDinput)
+int32_t MultimodalInputConnectManager::UnprepareRemoteInput(const std::string& deviceId,
+    sptr<ICallDinput> prepareDinput)
 {
     CHKPR(multimodalInputConnectService_, RET_ERR);
     return multimodalInputConnectService_->UnprepareRemoteInput(deviceId, prepareDinput);
 }
 
-int32_t MultimodalInputConnectManager::StartRemoteInput(const std::string& deviceId, uint32_t inputAbility, sptr<ICallDinput> prepareDinput)
+int32_t MultimodalInputConnectManager::StartRemoteInput(const std::string& deviceId,
+    uint32_t inputAbility, sptr<ICallDinput> prepareDinput)
 {
     CHKPR(multimodalInputConnectService_, RET_ERR);
     return multimodalInputConnectService_->StartRemoteInput(deviceId, inputAbility, prepareDinput);
 }
 
-int32_t MultimodalInputConnectManager::StopRemoteInput(const std::string& deviceId, uint32_t inputAbility, sptr<ICallDinput> prepareDinput)
+int32_t MultimodalInputConnectManager::StopRemoteInput(const std::string& deviceId,
+    uint32_t inputAbility, sptr<ICallDinput> prepareDinput)
 {
     CHKPR(multimodalInputConnectService_, RET_ERR);
     return multimodalInputConnectService_->StopRemoteInput(deviceId, inputAbility, prepareDinput);

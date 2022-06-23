@@ -64,47 +64,45 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
         MMI_HILOGE("failed to search for the device");
         return nullptr;
     }
-    std::shared_ptr<InputDevice> inputDevice = MakeInputDevice(iter->first, iter->second);
-    return inputDevice;
-}
-
-std::shared_ptr<InputDevice> InputDeviceManager::MakeInputDevice(int32_t id,
-    struct libinput_device* libinputDevice) const
-{
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    if (IsRemote(iter->second) && !IsDistributedInput(iter->second)) {
+        return nullptr;
+    }
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
     std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
     CHKPP(inputDevice);
-    inputDevice->SetId(id);
-    inputDevice->SetType(static_cast<int32_t>(libinput_device_get_tags(libinputDevice)));
-    const char* name = libinput_device_get_name(libinputDevice);
+    inputDevice->SetId(iter->first);
+    inputDevice->SetType(static_cast<int32_t>(libinput_device_get_tags(iter->second)));
+    const char* name = libinput_device_get_name(iter->second);
     inputDevice->SetName((name == nullptr) ? ("null") : (name));
-    inputDevice->SetBustype(libinput_device_get_id_bustype(libinputDevice));
-    inputDevice->SetVersion(libinput_device_get_id_version(libinputDevice));
-    inputDevice->SetProduct(libinput_device_get_id_product(libinputDevice));
-    inputDevice->SetVendor(libinput_device_get_id_vendor(libinputDevice));
-    const char* phys = libinput_device_get_phys(libinputDevice);
+    inputDevice->SetBustype(libinput_device_get_id_bustype(iter->second));
+    inputDevice->SetVersion(libinput_device_get_id_version(iter->second));
+    inputDevice->SetProduct(libinput_device_get_id_product(iter->second));
+    inputDevice->SetVendor(libinput_device_get_id_vendor(iter->second));
+    const char* phys = libinput_device_get_phys(iter->second);
     inputDevice->SetPhys((phys == nullptr) ? ("null") : (phys));
     inputDevice->SetNetworkId((MakeNetworkId(inputDevice->GetPhys())));
     inputDevice->SetRemote(false);
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
     std::string::size_type pos = inputDevice->GetName().find(VIRTUAL_DEVICE_NAME);
     inputDevice->SetRemote(pos != inputDevice->GetName().npos);
-#endif
-    const char* uniq = libinput_device_get_uniq(libinputDevice);
-    inputDevice->SetUniq((uniq == nullptr) ? ("null") : (uniq));
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
 
+    const char* uniq = libinput_device_get_uniq(iter->second);
+    inputDevice->SetUniq((uniq == nullptr) ? ("null") : (uniq));
     InputDevice::AxisInfo axis;
     for (const auto &item : axisType) {
-        int32_t min = libinput_device_get_axis_min(libinputDevice, item);
+        int32_t min = libinput_device_get_axis_min(iter->second, item.first);
         if (min == -1) {
             MMI_HILOGW("The device does not support this axis");
             continue;
         }
-        axis.SetAxisType(item);
+        axis.SetAxisType(item.first);
         axis.SetMinimum(min);
-        axis.SetMaximum(libinput_device_get_axis_max(libinputDevice, item));
-        axis.SetFuzz(libinput_device_get_axis_fuzz(libinputDevice, item));
-        axis.SetFlat(libinput_device_get_axis_flat(libinputDevice, item));
-        axis.SetResolution(libinput_device_get_axis_resolution(libinputDevice, item));
+        axis.SetMaximum(libinput_device_get_axis_max(iter->second, item.first));
+        axis.SetFuzz(libinput_device_get_axis_fuzz(iter->second, item.first));
+        axis.SetFlat(libinput_device_get_axis_flat(iter->second, item.first));
+        axis.SetResolution(libinput_device_get_axis_resolution(iter->second, item.first));
         inputDevice->AddAxisInfo(axis);
     }
     return inputDevice;
@@ -129,6 +127,11 @@ std::vector<int32_t> InputDeviceManager::GetInputDeviceIds() const
     CALL_LOG_ENTER;
     std::vector<int32_t> ids;
     for (const auto &item : inputDevice_) {
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+        if (IsRemote(item.second) && !IsDistributedInput(item.second)) {
+            continue;
+        }
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
         ids.push_back(item.first);
     }
     return ids;
@@ -263,32 +266,41 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
 {
     CALL_LOG_ENTER;
     CHKPV(inputDevice);
-    bool hasPointerDevice = false;
     for (const auto& item : inputDevice_) {
         if (item.second == inputDevice) {
             MMI_HILOGI("the device already exists");
             return;
-        }
-        if (IsPointerDevice(static_cast<struct libinput_device *>(item.second))) {
-            hasPointerDevice = true;
-        }
+        } 
     }
     if (nextId_ == INT32_MAX) {
         MMI_HILOGE("the nextId_ exceeded the upper limit");
         return;
     }
     inputDevice_[nextId_] = inputDevice;
-    bool isRemote = false;
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
-    isRemote = IsRemote(inputDevice);
-#endif // OHOS_DISTRIBUTED_INPUT_MODEL
-    HandleDeviceChanged(DEVICE_ADD, nextId_);
-    ++nextId_;
+    bool hasPointerDevice = false;
+    bool isRemote = IsRemote(inputDevice);
+    bool isDistributedInput = IsDistributedInput(inputDevice);
+    if (isDistributedInput || !isRemote) {
+        HandleDeviceChanged(DEVICE_ADD, nextId_);
+    }
     if (IsPointerDevice(inputDevice)) {
         bool needShowMouse = hasPointerDevice || !isRemote;
         NotifyPointerDevice(true, needShowMouse);
     }
+#else
+    for (const auto &item : devMonitor_) {
+        CHKPC(item.first);
+        item.second("add", nextId_);
+    }
+    ++nextId_;
+    if (IsPointerDevice(inputDevice)) {
+        NotifyPointerDevice(true, true);
+        OHOS::system::SetParameter(INPUT_POINTER_DEVICE, "true");
+    }
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
 }
+
 void InputDeviceManager::HandleDeviceChanged(std::string changedType, int32_t id)
 {
     CALL_LOG_ENTER;
@@ -428,6 +440,17 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetRemoteInputDevice(int32_t id
     return inputDevice;
 }
 
+bool InputDeviceManager::IsDistributedInput(struct libinput_device* device) const
+{
+    CHKPF(device);
+    enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
+    uint32_t dinputType = DeviceUdevTagsToDinputType(udevTags);
+    if (dinputType != 0) {
+        return DInputMgr->IsDistributedInput(dinputType);
+    }
+    return false;
+}
+
 uint32_t InputDeviceManager::DeviceUdevTagsToDinputType(enum evdev_device_udev_tags udevTags) const
 {
     CALL_LOG_ENTER;
@@ -436,8 +459,6 @@ uint32_t InputDeviceManager::DeviceUdevTagsToDinputType(enum evdev_device_udev_t
         return MOUSE_ABILITY;
     } else if (udevTags & EVDEV_UDEV_TAG_KEYBOARD) {
         return KEYBOARD_ABILITY;
-    } else if (udevTags & EVDEV_UDEV_TAG_TOUCHPAD) {
-        return TOUCHPAD_ABILITY;
     }
     return DEFAULT_ABILITY;
 }
@@ -457,7 +478,7 @@ void InputDeviceManager::NotifyDeviceChanged(const std::string& deviceId,
 {
     CALL_LOG_ENTER;
     bool hasLocalPointer = false;
-    for (const auto& item : inputDevice_) { 
+    for (const auto& item : inputDevice_) {
         if (!IsRemote(item.second)) {
             hasLocalPointer = IsPointerDevice(item.second);
             continue;

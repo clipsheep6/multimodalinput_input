@@ -68,14 +68,14 @@ config("libmmi_server_config") {
   }
   if (input_enable_distributed) {
     include_dirs += [
-    "//foundation/distributedhardware/distributedinput/common/include",
-    "//foundation/distributedhardware/distributedinput/frameworks/include",
-    "//foundation/distributedhardware/distributedinput/interfaces/inner_kits/include",
-    "//foundation/distributedhardware/distributedinput/interfaces/ipc/include",
-    "//foundation/distributedhardware/distributedhardwarefwk/common/utils/include",
-    "//foundation/distributedhardware/distributedhardwarefwk/common/log/include",
-    "//foundation/distributedhardware/distributedhardwarefwk/utils/include/log",
-    "//foundation/distributedhardware/devicemanager/interfaces/inner_kits/native_cpp/include",
+      "//foundation/distributedhardware/distributedinput/common/include",
+      "//foundation/distributedhardware/distributedinput/frameworks/include",
+      "//foundation/distributedhardware/distributedinput/interfaces/inner_kits/include",
+      "//foundation/distributedhardware/distributedinput/interfaces/ipc/include",
+      "//foundation/distributedhardware/distributedhardwarefwk/common/utils/include",
+      "//foundation/distributedhardware/distributedhardwarefwk/common/log/include",
+      "//foundation/distributedhardware/distributedhardwarefwk/utils/include/log",
+      "//foundation/distributedhardware/devicemanager/interfaces/inner_kits/native_cpp/include",
     ]
   }
   cflags = [ "-DOHOS_BUILD" ]
@@ -99,7 +99,7 @@ config("libmmi_server_config") {
   if (resource_schedule_service_enabled) {
     cflags += [ "-DOHOS_RSS_CLIENT" ]
   }
-  
+
   if (input_enable_distributed) {
     cflags += [ "-DOHOS_DISTRIBUTED_INPUT_MODEL" ]
   }
@@ -155,9 +155,9 @@ ohos_shared_library("libmmi-server") {
   ]
   if (input_enable_distributed) {
     sources += [
-      "dinput/src/dinput_manager.cpp",
       "dinput/src/dinput_callback.cpp",
-      ]
+      "dinput/src/dinput_manager.cpp",
+    ]
   }
 
   if (is_mmi_have_hdf) {
@@ -213,9 +213,8 @@ ohos_shared_library("libmmi-server") {
   }
 
   if (input_enable_distributed) {
-    deps += [
-      "//foundation/multimodalinput/input/service/dinput:mmi_dinput_proxy",
-      ]
+    deps +=
+        [ "//foundation/multimodalinput/input/service/dinput:mmi_dinput_proxy" ]
   }
 
   external_deps = [
@@ -223,10 +222,10 @@ ohos_shared_library("libmmi-server") {
     "ability_base:want",
     "ability_runtime:ability_manager",
     "access_token:libaccesstoken_sdk",
+    "drivers_interface_input:hdi_input",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
-    "input_device_driver_interface:hdi_input",
     "ipc:ipc_core",
     "multimedia_image_standard:image_native",
     "safwk:system_ability_fwk",
@@ -239,7 +238,7 @@ ohos_shared_library("libmmi-server") {
   }
 
   if (input_enable_distributed) {
-    external_deps += [ "distributed_input:libdinput_sdk"]
+    external_deps += [ "distributed_input:libdinput_sdk" ]
   }
 
   part_name = "input"
@@ -329,7 +328,7 @@ ohos_unittest("ut-mmi-service-out") {
   configs = [ ":libmmi_server_config" ]
 
   deps = [
-    "${aafwk_kits_path}/appkit:appkit_native",
+    #"${aafwk_kits_path}/appkit:appkit_native",
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
@@ -342,9 +341,8 @@ ohos_unittest("ut-mmi-service-out") {
   }
 
   external_deps = [
-    "ability_runtime:ability_manager",
+    "drivers_interface_input:hdi_input",
     "hiviewdfx_hilog_native:libhilog",
-    "input_device_driver_interface:hdi_input",
     "utils_base:utils",
   ]
 }

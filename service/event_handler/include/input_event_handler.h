@@ -41,7 +41,6 @@ public:
     int32_t OnMouseEventEndTimerHandler(std::shared_ptr<PointerEvent> pointerEvent);
     UDSServer *GetUDSServer() const;
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
-    int32_t AddHandleTimer(int32_t timeout = 300);
     int32_t SetAbsolutionLocation(int32_t pid, double absX, double absY);
 protected:
     int32_t OnEventDeviceAdded(libinput_event *event);
@@ -68,7 +67,6 @@ private:
     std::shared_ptr<KeyEvent> keyEvent_ = nullptr;
 
     uint64_t idSeed_ = 0;
-    int32_t timerId_ = -1;
 };
 
 #define InputHandler InputEventHandler::GetInstance()

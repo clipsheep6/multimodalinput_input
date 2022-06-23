@@ -151,9 +151,8 @@ int32_t MultimodalInputConnectProxy::SetPointerLocation(int32_t x, int32_t y)
         MMI_HILOGW("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-
-    data.WriteInt32(x);
-    data.WriteInt32(y);
+    WRITEINT32(data, x, ERR_INVALID_VALUE);
+    WRITEINT32(data, y, ERR_INVALID_VALUE);
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(SIMULATE_CROSS_LOCATION, data, reply, option);
@@ -272,7 +271,8 @@ int32_t MultimodalInputConnectProxy::UnprepareRemoteInput(const std::string& dev
     }
     return RET_OK;
 }
-int32_t MultimodalInputConnectProxy::StartRemoteInput(const std::string& deviceId, uint32_t inputAbility, sptr<ICallDinput> prepareDinput)
+int32_t MultimodalInputConnectProxy::StartRemoteInput(const std::string& deviceId,
+    uint32_t inputAbility, sptr<ICallDinput> prepareDinput)
 {
     CALL_LOG_ENTER;
     MessageParcel data;
@@ -284,7 +284,7 @@ int32_t MultimodalInputConnectProxy::StartRemoteInput(const std::string& deviceI
         return ERR_INVALID_VALUE;
     }
     data.WriteString(deviceId);
-    data.WriteInt32(inputAbility);
+    WRITEINT32(data, inputAbility, ERR_INVALID_VALUE);
     if (!data.WriteRemoteObject(prepareDinput->AsObject().GetRefPtr())) {
         MMI_HILOGW("Failed to write monitor");
         return ERR_INVALID_VALUE;
@@ -311,7 +311,7 @@ int32_t MultimodalInputConnectProxy::StopRemoteInput(const std::string& deviceId
         return ERR_INVALID_VALUE;
     }
     data.WriteString(deviceId);
-    data.WriteInt32(inputAbility);
+    WRITEINT32(data, inputAbility, ERR_INVALID_VALUE);
     if (!data.WriteRemoteObject(prepareDinput->AsObject().GetRefPtr())) {
         MMI_HILOGW("Failed to write monitor");
         return ERR_INVALID_VALUE;

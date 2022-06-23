@@ -542,17 +542,16 @@ void MMIService::InitDeviceManager()
 void MMIService::PublishSA()
 {
     int32_t const WAIT_TIME = 1000;
-    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME));  
+    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME));
     bool ret = SystemAbility::Publish(this);
     if (!ret) {
         MMI_HILOGE("Leave, publishing MMIService failed!");
         return;
     }
 }
-
 #endif // OHOS_DISTRIBUTED_INPUT_MODEL
 
-#if (defined OHOS_RSS_CLIENT) || (defined OHOS_DISTRIBUTED_INPUT_MODEL)
+#if (defined OHOS_RSS_CLIENT)
 void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
     if (systemAbilityId == RES_SCHED_SYS_ABILITY_ID) {

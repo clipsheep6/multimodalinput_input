@@ -75,7 +75,6 @@ private:
     int32_t lastGlobalX_ = -1;
     int32_t lastGlobalY_ = -1;
 
-    std::mutex mutex_;
     struct PidInfo {
         int32_t pid { 0 };
         bool visible { false };
