@@ -333,6 +333,9 @@ std::shared_ptr<InputDevice> InputDeviceImpl::DevDataUnmarshalling(NetPacket &pk
     int32_t deviceId;
     pkt >> deviceId;
     devData->SetId(deviceId);
+    std::string name;
+    pkt >> name;
+    devData->SetName(name);
     int32_t deviceType;
     pkt >> deviceType;
     devData->SetType(deviceType);
@@ -348,9 +351,6 @@ std::shared_ptr<InputDevice> InputDeviceImpl::DevDataUnmarshalling(NetPacket &pk
     int32_t version;
     pkt >> version;
     devData->SetVersion(version);
-    std::string name;
-    pkt >> name;
-    devData->SetName(name);
     std::string phys;
     pkt >> phys;
     devData->SetPhys(phys);
