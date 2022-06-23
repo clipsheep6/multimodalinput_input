@@ -38,7 +38,7 @@ int32_t InputDeviceImpl::RegisterDevListener(const std::string &type, InputDevLi
     CALL_LOG_ENTER;
     CHKPR(listener, RET_ERR);
     if (type != CHANGED_TYPE) {
-        MMI_HILOGE("Failed to register, listening event must be \"change\"");
+        MMI_HILOGE("Failed to register, listener event must be \"change\"");
         return RET_ERR;
     }
     auto iter = devListener_.find(CHANGED_TYPE);
@@ -48,7 +48,7 @@ int32_t InputDeviceImpl::RegisterDevListener(const std::string &type, InputDevLi
     }
     for (const auto &item : iter->second) {
         if (item.second == listener) {
-            MMI_HILOGD("listener already exists");
+            MMI_HILOGW("listener already exists");
             return RET_ERR;
         }
     }
@@ -61,14 +61,14 @@ int32_t InputDeviceImpl::RegisterDevListener(const std::string &type, InputDevLi
         isListeningProcess_ = true;
         return MultimodalInputConnectManager::GetInstance()->RegisterDevListener();
     }
-    return RET_ERR;
+    return RET_OK;
 }
 
 int32_t InputDeviceImpl::UnregisterDevListener(const std::string &type, InputDevListenerPtr listener)
 {
     CALL_LOG_ENTER;
     if (type != CHANGED_TYPE) {
-        MMI_HILOGE("Failed to cancel registration, listening event must be \"change\"");
+        MMI_HILOGE("Failed to cancel registration, listener event must be \"change\"");
         return RET_ERR;
     }
     auto iter = devListener_.find(CHANGED_TYPE);
@@ -78,35 +78,35 @@ int32_t InputDeviceImpl::UnregisterDevListener(const std::string &type, InputDev
     }
     if (listener == nullptr) {
         iter->second.clear();
-        goto monitorLabel;
+        goto listenerLabel;
     }
     for (auto it = iter->second.begin(); it != iter->second.end(); ++it) {
         if (it->second == listener) {
             iter->second.erase(it);
-            goto monitorLabel;
+            goto listenerLabel;
         }
     }
 
-monitorLabel:
+listenerLabel:
     if (isListeningProcess_ && iter->second.empty()) {
         isListeningProcess_ = false;
         return MultimodalInputConnectManager::GetInstance()->UnregisterDevListener();
     }
-    return RET_ERR;
+    return RET_OK;
 }
 
 void InputDeviceImpl::OnDevListenerTask(const DevListener &devMonitor, const std::string &type, int32_t deviceId)
 {
     CALL_LOG_ENTER;
+    MMI_HILOGI("report device change task, event type:%{public}s", type.c_str());
     if (type == "add") {
-        devMonitor.second->OnDeviceAdded(type, deviceId);
-    } else {
-        devMonitor.second->OnDeviceRemoved(type, deviceId);
+        devMonitor.second->OnDeviceAdded(deviceId, type);
+        return;
     }
-    MMI_HILOGD("report device change task, event type:%{public}s", type.c_str());
+    devMonitor.second->OnDeviceRemoved(deviceId, type);
 }
 
-void InputDeviceImpl::OnDevListener(std::string type, int32_t deviceId)
+void InputDeviceImpl::OnDevListener(int32_t deviceId, const std::string &type)
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);

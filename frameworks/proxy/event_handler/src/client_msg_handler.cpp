@@ -228,7 +228,7 @@ int32_t ClientMsgHandler::OnInputDevice(const UDSClient& client, NetPacket& pkt)
     std::shared_ptr<InputDevice> devData = InputDevImpl.DevDataUnmarshalling(pkt);
     CHKPR(devData, RET_ERR);
     if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read device Data failed");
+        MMI_HILOGE("Packet read device data failed");
         return RET_ERR;
     }
     InputDevImpl.OnInputDevice(userData, devData);
@@ -283,7 +283,7 @@ int32_t ClientMsgHandler::OnDevListener(const UDSClient& client, NetPacket& pkt)
         MMI_HILOGE("Packet read type failed");
         return RET_ERR;
     }
-    InputDeviceImpl::GetInstance().OnDevListener(type, deviceId);
+    InputDeviceImpl::GetInstance().OnDevListener(deviceId, type);
     return RET_OK;
 }
 

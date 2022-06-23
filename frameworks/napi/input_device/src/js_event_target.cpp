@@ -130,7 +130,7 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
     }
 }
 
-void JsEventTarget::OnDeviceAdded(const std::string &type, int32_t deviceId)
+void JsEventTarget::OnDeviceAdded(int32_t deviceId, const std::string &type)
 {
     std::lock_guard<std::mutex> guard(mutex_);
     auto changeEvent = devListener_.find(CHANGED_TYPE);
@@ -157,7 +157,7 @@ void JsEventTarget::OnDeviceAdded(const std::string &type, int32_t deviceId)
     }
 }
 
-void JsEventTarget::OnDeviceRemoved(const std::string &type, int32_t deviceId)
+void JsEventTarget::OnDeviceRemoved(int32_t deviceId, const std::string &type)
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);

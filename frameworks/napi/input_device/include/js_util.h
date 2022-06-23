@@ -64,7 +64,6 @@ public:
     {
         if (ptr != nullptr) {
             delete ptr;
-            ptr = nullptr;
         }
     }
 };

@@ -60,7 +60,7 @@ public:
     void OnInputDevice(int32_t userData, std::shared_ptr<InputDevice> devData);
     void OnInputDeviceIds(int32_t userData, std::vector<int32_t> &ids);
     void OnSupportKeys(int32_t userData, const std::vector<bool> &keystrokeAbility);
-    void OnDevListener(std::string type, int32_t deviceId);
+    void OnDevListener(int32_t deviceId, const std::string &type);
     void OnKeyboardType(int32_t userData, int32_t keyboardType);
     int32_t GetUserData();
     std::shared_ptr<InputDevice> DevDataUnmarshalling(NetPacket &pkt);

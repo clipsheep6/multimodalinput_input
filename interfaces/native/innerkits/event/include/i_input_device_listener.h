@@ -24,9 +24,8 @@ class IInputDeviceListener {
 public:
     IInputDeviceListener() = default;
     virtual ~IInputDeviceListener() = default;
-
-    virtual void OnDeviceAdded(const std::string &type, int32_t deviceId) = 0;
-    virtual void OnDeviceRemoved(const std::string &type, int32_t deviceId) = 0;
+    virtual void OnDeviceAdded(int32_t deviceId, const std::string &type) = 0;
+    virtual void OnDeviceRemoved(int32_t deviceId, const std::string &type) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

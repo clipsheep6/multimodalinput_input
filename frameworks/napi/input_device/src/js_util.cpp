@@ -82,6 +82,7 @@ napi_value JsUtil::GetDeviceInfo(const std::unique_ptr<CallbackInfo> &cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);
+    CHKPP(cb->data.device);
     napi_value object = nullptr;
     CHKRP(cb->env, napi_create_object(cb->env, &object), CREATE_OBJECT);
     napi_value id = nullptr;
@@ -127,6 +128,7 @@ bool JsUtil::GetDeviceAxisInfo(const std::unique_ptr<CallbackInfo> &cb, napi_val
 {
     CHKPF(cb);
     CHKPF(cb->env);
+    CHKPF(cb->data.device);
     napi_value sourceType = nullptr;
     uint32_t types = cb->data.device->GetType();
     for (const auto & item : g_deviceType) {
@@ -177,6 +179,7 @@ bool JsUtil::GetDeviceSourceType(const std::unique_ptr<CallbackInfo> &cb, napi_v
 {
     CHKPF(cb);
     CHKPF(cb->env);
+    CHKPF(cb->data.device);
     uint32_t types = cb->data.device->GetType();
     std::vector<std::string> sources;
     for (const auto & item : g_deviceType) {
