@@ -27,6 +27,7 @@
 #include "parcel.h"
 
 #include "input_event.h"
+#include "raw_data.h"
 
 namespace OHOS {
 namespace MMI {
@@ -120,7 +121,8 @@ public:
         AXIS_TYPE_SCROLL_VERTICAL,
 
         /**
-         * Indicates the horizontal scroll axis. When you scrall the mouse wheel or make certain gestures on the touchpad,
+         * Indicates the horizontal scroll axis.
+         * When you scrall the mouse wheel or make certain gestures on the touchpad,
          * the status of the horizontal scroll axis changes.
          *
          * @since 9
@@ -643,7 +645,19 @@ public:
          * @since 9
          */
         void SetToolType(int32_t toolType);
-
+        /**
+         * @brief Obtains the RawData of the active window.
+         * @return Returns the RawData.
+         * @since 9
+         */
+        RawData GetRawData() const;
+        /**
+         * @brief Sets the RawData for the active window.
+         * @param rawData Indicates the rawData to set.
+         * @return void
+         * @since 9
+         */
+        void SetRawData(const RawData& rawData);
         /**
          * @brief Writes data to a <b>Parcel</b> obejct.
          * @param out Indicates the object into which data will be written.
@@ -683,6 +697,7 @@ public:
         int32_t deviceId_ {};
         int64_t downTime_ {};
         int32_t toolType_ {};
+        RawData rawData_;
     };
 
 public:

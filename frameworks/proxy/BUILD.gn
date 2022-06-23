@@ -23,6 +23,7 @@ config("libmmi_client_config") {
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
+    "//foundation/multimodalinput/input/service/dinput/include",
     "event_handler/include",
     "module_loader/include",
   ]
@@ -45,12 +46,17 @@ ohos_source_set("libmmi-common") {
     "events/src/key_event.cpp",
     "events/src/key_option.cpp",
     "events/src/pointer_event.cpp",
+    "events/src/raw_data.cpp",
   ]
 
   cflags = [ "-DOHOS_BUILD" ]
 
   if (is_mmi_have_debug) {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+  }
+
+  if (input_enable_distributed) {
+    cflags += [ "-DOHOS_DISTRIBUTED_INPUT_MODEL" ]
   }
 
   public_configs = [ ":libmmi_client_config" ]
@@ -88,6 +94,10 @@ ohos_shared_library("libmmi-client") {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
   }
 
+  if (input_enable_distributed) {
+    cflags += [ "-DOHOS_DISTRIBUTED_INPUT_MODEL" ]
+  }
+
   if (mmi_enable_pointer_drawing) {
     cflags += [ "-DOHOS_BUILD_ENABLE_POINTER_DRAWING" ]
   }
@@ -118,6 +128,12 @@ ohos_shared_library("libmmi-client") {
     "//foundation/multimodalinput/input/util:libmmi-util",
   ]
 
+  if (input_enable_distributed) {
+    deps += [
+      "//foundation/multimodalinput/input/service/dinput:mmi_dinput_service"
+    ]
+  }
+  
   part_name = "input"
   external_deps = [
     "eventhandler:libeventhandler",
@@ -171,6 +187,10 @@ ohos_unittest("ut-mmi-proxy-out") {
 
   if (is_mmi_have_hdf) {
     cflags += [ "-DOHOS_BUILD_HDF" ]
+  }
+
+  if (input_enable_distributed) {
+    cflags += [ "-DOHOS_DISTRIBUTED_INPUT_MODEL" ]
   }
 
   sources = [ "module_loader/test/mmi_client_test.cpp" ]
@@ -232,6 +252,10 @@ ohos_unittest("KeyEventTest") {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
+  if (input_enable_distributed) {
+    cflags += [ "-DOHOS_DISTRIBUTED_INPUT_MODEL" ]
+  }
+
   sources = [ "events/test/key_event_test.cpp" ]
 
   deps = [
@@ -258,6 +282,7 @@ ohos_unittest("InputManagerTest") {
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network/include",
     "${mmi_path}/util/socket/include",
+    #"${mmi_path}/tools/virtual_device_manager/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/include",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/src",
@@ -265,6 +290,7 @@ ohos_unittest("InputManagerTest") {
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
     "//foundation/windowmanager/wm/include",
     "//third_party/googletest/googletest/include",
+    "//foundation/multimodalinput/input/service/dinput/include",
   ]
 
   if (is_mmi_have_libinput) {
@@ -289,6 +315,10 @@ ohos_unittest("InputManagerTest") {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
+  if (input_enable_distributed) {
+    cflags += [ "-DOHOS_DISTRIBUTED_INPUT_MODEL" ]
+  }
+
   sources = [
     "events/test/input_manager_test.cpp",
     "events/test/window_utils_test.cpp",
@@ -296,6 +326,7 @@ ohos_unittest("InputManagerTest") {
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
+    #"${mmi_path}/tools/virtual_device_manager:libmmi-virtual-device",
     "${mmi_path}/util:libmmi-util",
     "//foundation/ability/ability_runtime/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics:2d_graphics",
@@ -353,6 +384,10 @@ ohos_unittest("InputManagerManualTest") {
 
   if (is_mmi_have_hdf) {
     cflags += [ "-DOHOS_BUILD_HDF" ]
+  }
+
+  if (input_enable_distributed) {
+    cflags += [ "-DOHOS_DISTRIBUTED_INPUT_MODEL" ]
   }
 
   sources = [ "events/test/input_manager_manual_test.cpp" ]
