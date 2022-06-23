@@ -37,6 +37,10 @@ int32_t InputDeviceImpl::RegisterDevListener(const std::string &type, InputDevLi
 {
     CALL_LOG_ENTER;
     CHKPR(listener, RET_ERR);
+    if (type != CHANGED_TYPE) {
+        MMI_HILOGE("Failed to register, listening event must be \"change\"");
+        return RET_ERR;
+    }
     auto iter = devListener_.find(CHANGED_TYPE);
     if (iter == devListener_.end()) {
         MMI_HILOGE("Find change failed");
@@ -63,6 +67,10 @@ int32_t InputDeviceImpl::RegisterDevListener(const std::string &type, InputDevLi
 int32_t InputDeviceImpl::UnregisterDevListener(const std::string &type, InputDevListenerPtr listener)
 {
     CALL_LOG_ENTER;
+    if (type != CHANGED_TYPE) {
+        MMI_HILOGE("Failed to cancel registration, listening event must be \"change\"");
+        return RET_ERR;
+    }
     auto iter = devListener_.find(CHANGED_TYPE);
     if (iter == devListener_.end()) {
         MMI_HILOGE("Find change failed");
