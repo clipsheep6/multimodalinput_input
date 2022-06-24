@@ -63,9 +63,6 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
         {MmiMessageId::REMOVE_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputDeviceMontior, this)},
         {MmiMessageId::DISPLAY_INFO, MsgCallbackBind2(&ServerMsgHandler::OnDisplayInfo, this)},
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-        {MmiMessageId::SUBSCRIBE_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnSubscribeKeyEvent, this)},
-        {MmiMessageId::UNSUBSCRIBE_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnUnsubscribeKeyEvent, this)},
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_MMI_DEBUG
         {MmiMessageId::BIGPACKET_TEST, MsgCallbackBind2(&ServerMsgHandler::OnBigPacketTest, this)},
 #endif // OHOS_BUILD_MMI_DEBUG
@@ -181,42 +178,40 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
 {
     CALL_LOG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
-
-    std::vector<PhysicalDisplayInfo> physicalDisplays;
-    int32_t num = 0;
+    DisplayGroupInfo displayGroupInfo;
+    pkt >> displayGroupInfo.width >> displayGroupInfo.height >> displayGroupInfo.focusWindowId;
+    uint32_t num = 0;
     pkt >> num;
-    if (num > MAX_PHYSICAL_SIZE) {
-        MMI_HILOGE("Physical exceeds the max range");
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read display info failed");
         return RET_ERR;
     }
-    for (int32_t i = 0; i < num; i++) {
-        PhysicalDisplayInfo info;
-        pkt >> info.id >> info.leftDisplayId >> info.upDisplayId >> info.topLeftX >> info.topLeftY
-            >> info.width >> info.height >> info.name >> info.seatId >> info.seatName >> info.logicWidth
-            >> info.logicHeight >> info.direction;
-        physicalDisplays.push_back(info);
-    }
-
-    std::vector<LogicalDisplayInfo> logicalDisplays;
-    pkt >> num;
-    if (num > MAX_LOGICAL_SIZE) {
-        MMI_HILOGE("Logical exceeds the max range");
+    for (uint32_t i = 0; i < num; i++) {
+        WindowInfo info;
+        pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
+            >> info.pointerHotAreas >> info.agentWindowId >> info.flags;
+        displayGroupInfo.windowsInfo.push_back(info);
+        if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read display info failed");
         return RET_ERR;
     }
-    for (int32_t i = 0; i < num; i++) {
-        LogicalDisplayInfo info;
-        std::vector<WindowInfo> windowInfos;
-        pkt >> info.id >> info.topLeftX >> info.topLeftY >> info.width >> info.height
-            >> info.name >> info.seatId >> info.seatName >> info.focusWindowId
-            >> windowInfos;
-        info.windowsInfo = windowInfos;
-        logicalDisplays.push_back(info);
+    }
+    pkt >> num;
+    for (uint32_t i = 0; i < num; i++) {
+        DisplayInfo info;
+        pkt >> info.id >> info.x >> info.y >> info.width >> info.height
+            >> info.name >> info.uniq >> info.direction;
+        displayGroupInfo.displaysInfo.push_back(info);
+        if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read display info failed");
+        return RET_ERR;
+    }
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read display info failed");
         return RET_ERR;
     }
-    InputWindowsManager::GetInstance()->UpdateDisplayInfo(physicalDisplays, logicalDisplays);
+    InputWindowsManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo);
     return RET_OK;
 }
 
@@ -290,45 +285,25 @@ int32_t ServerMsgHandler::OnMoveMouse(int32_t offsetX, int32_t offsetY)
     return RET_OK;
 }
 
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-int32_t ServerMsgHandler::OnSubscribeKeyEvent(SessionPtr sess, NetPacket &pkt)
+
+#ifdef OHOS_BUILD_ENABLE_KEYBOARDint32_t ServerMsgHandler::OnSubscribeKeyEvent(IUdsServer *server, int32_t pid,
+    int32_t subscribeId, const std::shared_ptr<KeyOption> option)
 {
-    int32_t subscribeId = -1;
-    uint32_t preKeySize = 0;
-    int32_t finalKey = -1;
-    bool isFinalKeyDown = true;
-    int32_t finalKeyDownDuration = 0;
-    pkt >> subscribeId >> finalKey >> isFinalKeyDown >> finalKeyDownDuration >> preKeySize;
-    std::set<int32_t> preKeys;
-    for (uint32_t i = 0; i < preKeySize; ++i) {
-        int32_t tmpKey = -1;
-        pkt >> tmpKey;
-        if (!(preKeys.insert(tmpKey).second)) {
-            MMI_HILOGE("Insert value failed, tmpKey:%{public}d", tmpKey);
-        }
-    }
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read subscribe failed");
-        return PACKET_READ_FAIL;
-    }
-    auto keyOption = std::make_shared<KeyOption>();
-    keyOption->SetPreKeys(preKeys);
-    keyOption->SetFinalKey(finalKey);
-    keyOption->SetFinalKeyDown(isFinalKeyDown);
-    keyOption->SetFinalKeyDownDuration(finalKeyDownDuration);
-    auto subscriberHandler = InputHandler->GetSubscriberHandler();
+    CALL_LOG_ENTER;
+    CHKPR(server, ERROR_NULL_POINTER);
+    auto sess = server->GetSessionByPid(pid);
+    CHKPR(sess, ERROR_NULL_POINTER);
+  auto subscriberHandler = InputHandler->GetSubscriberHandler();
     CHKPR(subscriberHandler, ERROR_NULL_POINTER);
     return subscriberHandler->SubscribeKeyEvent(sess, subscribeId, keyOption);
 }
 
-int32_t ServerMsgHandler::OnUnsubscribeKeyEvent(SessionPtr sess, NetPacket &pkt)
+int32_t ServerMsgHandler::OnUnsubscribeKeyEvent(IUdsServer *server, int32_t pid, int32_t subscribeId)
 {
-    int32_t subscribeId = -1;
-    pkt >> subscribeId;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read subscribe failed");
-        return PACKET_READ_FAIL;
-    }
+    CALL_LOG_ENTER;
+    CHKPR(server, ERROR_NULL_POINTER);
+    auto sess = server->GetSessionByPid(pid);
+    CHKPR(sess, ERROR_NULL_POINTER);
     auto subscriberHandler = InputHandler->GetSubscriberHandler();
     CHKPR(subscriberHandler, ERROR_NULL_POINTER);
     return subscriberHandler->UnsubscribeKeyEvent(sess, subscribeId);
@@ -516,37 +491,44 @@ int32_t ServerMsgHandler::OnRemoveInputDeviceMontior(SessionPtr sess, NetPacket&
 int32_t ServerMsgHandler::OnBigPacketTest(SessionPtr sess, NetPacket& pkt)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t pid = 0;
-    int32_t id = 0;
-    pkt >> pid >> id;
-    int32_t phyNum = 0;
-    pkt >> phyNum;
-    MMI_HILOGD("BigPacketsTest pid:%{public}d id:%{public}d phyNum:%{public}d size:%{public}zu",
-        pid, id, phyNum, pkt.Size());
-    for (auto i = 0; i < phyNum; i++) {
-        PhysicalDisplayInfo info = {};
-        pkt >> info.id >> info.leftDisplayId >> info.upDisplayId >> info.topLeftX >> info.topLeftY;
-        pkt >> info.width >> info.height >> info.name >> info.seatId >> info.seatName >> info.logicWidth;
-        pkt >> info.logicHeight >> info.direction;
-        MMI_HILOGD("\tPhysical: idx:%{public}d id:%{public}d seatId:%{public}s", i, info.id, info.seatId.c_str());
-    }
-    int32_t logcNum = 0;
-    pkt >> logcNum;
-    MMI_HILOGD("\tlogcNum:%{public}d", logcNum);
-    for (auto i = 0; i < logcNum; i++) {
-        LogicalDisplayInfo info = {};
-        pkt >> info.id >> info.topLeftX >> info.topLeftY;
-        pkt >> info.width >> info.height >> info.name >> info.seatId >> info.seatName >> info.focusWindowId;
-        MMI_HILOGD("\t\tLogical: idx:%{public}d id:%{public}d seatId:%{public}s", i, info.id, info.seatId.c_str());
-        int32_t winNum = 0;
-        pkt >> winNum;
-        MMI_HILOGD("\t\twinNum:%{public}d", winNum);
-        for (auto j = 0; j < winNum; j++) {
-            WindowInfo winInfo;
-            pkt >> winInfo;
-            MMI_HILOGD("\t\t\tWindows: idx:%{public}d id:%{public}d displayId:%{public}d",
-                j, winInfo.id, winInfo.displayId);
+    int32_t width = 0;
+    int32_t height = 0;
+    int32_t focusWindowId = 0;
+    pkt >> width >> height >> focusWindowId;
+    MMI_HILOGD("logicalInfo,width:%{public}d,height:%{public}d,focusWindowId:%{public}d",
+        width, height, focusWindowId);
+    uint32_t num = 0;
+    pkt >> num;
+    for (uint32_t i = 0; i < num; i++) {
+        WindowInfo info;
+        pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
+            >> info.pointerHotAreas >> info.agentWindowId >> info.flags;
+        MMI_HILOGD("windowsInfos,id:%{public}d,pid:%{public}d,uid:%{public}d,"
+            "area.x:%{public}d,area.y:%{public}d,area.width:%{public}d,area.height:%{public}d,"
+            "defaultHotAreas:size:%{public}zu,pointerHotAreas:size:%{public}zu,"
+            "agentWindowId:%{public}d,flags:%{public}d",
+            info.id, info.pid, info.uid, info.area.x, info.area.y, info.area.width,
+            info.area.height, info.defaultHotAreas.size(), info.pointerHotAreas.size(),
+            info.agentWindowId, info.flags);
+        for (const auto &win : info.defaultHotAreas) {
+            MMI_HILOGD("defaultHotAreas,x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
+                win.x, win.y, win.width, win.height);
         }
+        for (const auto &pointer : info.pointerHotAreas) {
+            MMI_HILOGD("pointerHotAreas,x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
+                pointer.x, pointer.y, pointer.width, pointer.height);
+        }
+    }
+    pkt >> num;
+    for (uint32_t i = 0; i < num; i++) {
+        DisplayInfo info;
+        pkt >> info.id >> info.x >> info.y >> info.width >> info.height
+            >> info.name >> info.uniq >> info.direction;
+        MMI_HILOGD("displaysInfos,id:%{public}d,x:%{public}d,y:%{public}d,"
+            "width:%{public}d,height:%{public}d,name:%{public}s,"
+            "uniq:%{public}s,direction:%{public}d",
+            info.id, info.x, info.y, info.width, info.height, info.name.c_str(),
+            info.uniq.c_str(), info.direction);
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read data failed");

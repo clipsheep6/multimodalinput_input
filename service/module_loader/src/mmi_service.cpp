@@ -17,7 +17,7 @@
 
 #include <cinttypes>
 #include <csignal>
-
+#include <parameters.h>
 #include <sys/signalfd.h>
 #ifdef OHOS_RSS_CLIENT
 #include <unordered_map>
@@ -48,8 +48,8 @@ const bool REGISTER_RESULT =
     SystemAbility::MakeAndRegisterAbility(DelayedSingleton<MMIService>::GetInstance().get());
 
 struct mmi_epoll_event {
-    int32_t fd;
-    EpollEventType event_type;
+    int32_t fd { 0 };
+    EpollEventType event_type { EPOLL_EVENT_BEGIN };
 };
 
 template<class ...Ts>
@@ -248,6 +248,7 @@ int32_t MMIService::Init()
     SetRecvFun(std::bind(&ServerMsgHandler::OnMsgHandler, &sMsgHandler_, std::placeholders::_1,
         std::placeholders::_2));
     KeyMapMgr->GetConfigKeyValue("default_keymap", KeyMapMgr->GetDefaultKeyId());
+    OHOS::system::SetParameter(INPUT_POINTER_DEVICE, "false");
     return RET_OK;
 }
 
@@ -513,6 +514,32 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& 
     }
 }
 #endif
+
+int32_t MMIService::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option)
+{
+    CALL_LOG_ENTER;
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&ServerMsgHandler::OnSubscribeKeyEvent, &sMsgHandler_, this, pid, subscribeId, option));
+    if (ret != RET_OK) {
+        MMI_HILOGE("subscribe key event event processed failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::UnsubscribeKeyEvent(int32_t subscribeId)
+{
+    CALL_LOG_ENTER;
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&ServerMsgHandler::OnUnsubscribeKeyEvent, &sMsgHandler_, this, pid, subscribeId));
+    if (ret != RET_OK) {
+        MMI_HILOGE("unsubscribe key event processed failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
 
 void MMIService::OnDelegateTask(epoll_event& ev)
 {

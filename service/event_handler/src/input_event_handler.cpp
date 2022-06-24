@@ -33,6 +33,7 @@
 #include "key_command_manager.h"
 #include "key_map_manager.h"
 #include "libinput_adapter.h"
+#include "key_auto_repeat.h"
 #include "mmi_func_callback.h"
 #include "time_cost_chk.h"
 #include "timer_manager.h"
