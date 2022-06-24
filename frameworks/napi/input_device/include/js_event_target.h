@@ -42,7 +42,6 @@ public:
     void RemoveListener(napi_env env, const std::string &type, napi_value handle);
     napi_value CreateCallbackInfo(napi_env env, napi_value handle, const int32_t userData);
     void ResetEnv();
-    inline static int32_t userData_ {0};
     virtual void OnDeviceAdded(int32_t deviceId, const std::string &type) override;
     virtual void OnDeviceRemoved(int32_t deviceId, const std::string &type) override;
 
