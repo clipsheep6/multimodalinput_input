@@ -93,8 +93,10 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
     CALL_LOG_ENTER;
     displayGroupInfo_ = displayGroupInfo;
     if (!displayGroupInfo.displaysInfo.empty()) {
+#ifdef OHOS_BUILD_ENABLE_POINTER
         IPointerDrawingManager::GetInstance()->OnDisplayInfo(displayGroupInfo.displaysInfo[0].id,
             displayGroupInfo.displaysInfo[0].width, displayGroupInfo.displaysInfo[0].height);
+#endif // OHOS_BUILD_ENABLE_POINTER
     }
     PrintDisplayInfo();
 }
@@ -356,7 +358,9 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     CHKPR(physicalDisplayInfo, ERROR_NULL_POINTER);
     int32_t globalLogicX = pointerItem.GetGlobalX() + physicalDisplayInfo->x;
     int32_t globalLogicY = pointerItem.GetGlobalY() + physicalDisplayInfo->y;
+#ifdef OHOS_BUILD_ENABLE_POINTER
     IPointerDrawingManager::GetInstance()->DrawPointer(displayId, pointerItem.GetGlobalX(), pointerItem.GetGlobalY());
+#endif // OHOS_BUILD_ENABLE_POINTER
     WindowInfo* touchWindow = nullptr;
     SelectWindowInfo(globalLogicX, globalLogicY, pointerEvent, touchWindow);
     if (touchWindow == nullptr) {

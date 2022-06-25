@@ -284,12 +284,14 @@ std::shared_ptr<InputHandlerManagerGlobal> InputEventHandler::GetMonitorHandler(
     return monitorHandler_;
 }
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t InputEventHandler::AddInputEventFilter(sptr<IEventFilter> filter)
 {
     CHKPR(eventfilterHandler_, ERROR_NULL_POINTER);
     eventfilterHandler_->AddInputEventFilter(filter);
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 int32_t InputEventHandler::OnEventDeviceAdded(libinput_event *event)
 {

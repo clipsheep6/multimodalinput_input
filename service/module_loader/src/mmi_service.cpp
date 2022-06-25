@@ -330,6 +330,8 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
 
 int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter)
 {
+    CALL_LOG_ENTER;
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     CHKPR(filter, ERROR_NULL_POINTER);
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputEventHandler::AddInputEventFilter,
         InputHandler, filter));
@@ -337,6 +339,7 @@ int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter)
         MMI_HILOGE("add event filter failed,return %{public}d", ret);
         return ret;
     }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     return RET_OK;
 }
 
@@ -409,6 +412,7 @@ int32_t MMIService::MarkEventProcessed(int32_t eventId)
     return RET_OK;
 }
 
+#if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
 int32_t MMIService::CheckAddInput(int32_t pid, int32_t handlerId, InputHandlerType handlerType,
     HandleEventType eventType)
 {
@@ -416,11 +420,13 @@ int32_t MMIService::CheckAddInput(int32_t pid, int32_t handlerId, InputHandlerTy
     CHKPR(sess, ERROR_NULL_POINTER);
     return sMsgHandler_.OnAddInputHandler(sess, handlerId, handlerType, eventType);
 }
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 
 int32_t MMIService::AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
     HandleEventType eventType)
 {
     CALL_LOG_ENTER;
+#if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&MMIService::CheckAddInput, this, pid, handlerId, handlerType, eventType));
@@ -428,19 +434,23 @@ int32_t MMIService::AddInputHandler(int32_t handlerId, InputHandlerType handlerT
         MMI_HILOGE("add input handler failed, ret:%{public}d", ret);
         return RET_ERR;
     }
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
 }
 
+#if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
 int32_t MMIService::CheckRemoveInput(int32_t pid, int32_t handlerId, InputHandlerType handlerType)
 {
     auto sess = GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
     return sMsgHandler_.OnRemoveInputHandler(sess, handlerId, handlerType);
 }
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 
 int32_t MMIService::RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType)
 {
     CALL_LOG_ENTER;
+#if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&MMIService::CheckRemoveInput, this, pid, handlerId, handlerType));
@@ -448,19 +458,23 @@ int32_t MMIService::RemoveInputHandler(int32_t handlerId, InputHandlerType handl
         MMI_HILOGE("remove input handler failed, ret:%{public}d", ret);
         return RET_ERR;
     }
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
 }
 
+#ifdef OHOS_BUILD_ENABLE_MONITOR
 int32_t MMIService::CheckMarkConsumed(int32_t pid, int32_t monitorId, int32_t eventId)
 {
     auto sess = GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
     return sMsgHandler_.OnMarkConsumed(sess, monitorId, eventId);
 }
+#endif // OHOS_BUILD_ENABLE_MONITOR
 
 int32_t MMIService::MarkEventConsumed(int32_t monitorId, int32_t eventId)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&MMIService::CheckMarkConsumed, this, pid, monitorId, eventId));
@@ -468,54 +482,65 @@ int32_t MMIService::MarkEventConsumed(int32_t monitorId, int32_t eventId)
         MMI_HILOGE("mark event consumed failed, ret:%{public}d", ret);
         return RET_ERR;
     }
+#endif // OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
 }
 
 int32_t MMIService::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
 {
     CALL_LOG_ENTER;
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&ServerMsgHandler::OnMoveMouse, &sMsgHandler_, offsetX, offsetY));
     if (ret != RET_OK) {
         MMI_HILOGE("movemouse event processed failed, ret:%{public}d", ret);
         return RET_ERR;
     }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     return RET_OK;
 }
 
 int32_t MMIService::InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&MMIService::CheckInjectKeyEvent, this, keyEvent));
     if (ret != RET_OK) {
         MMI_HILOGE("inject key event failed, ret:%{public}d", ret);
         return RET_ERR;
     }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t MMIService::CheckInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     return sMsgHandler_.OnInjectKeyEvent(keyEvent);
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
 int32_t MMIService::CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     return sMsgHandler_.OnInjectPointerEvent(pointerEvent);
 }
+#endif // OHOS_BUILD_ENABLE_POINTER
 
 int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&MMIService::CheckInjectPointerEvent, this, pointerEvent));
     if (ret != RET_OK) {
-    MMI_HILOGE("inject pointer event failed, ret:%{public}d", ret);
-    return RET_ERR;
+        MMI_HILOGE("inject pointer event failed, ret:%{public}d", ret);
+        return RET_ERR;
     }
+#endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
 }
 
@@ -538,6 +563,7 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& 
 int32_t MMIService::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&ServerMsgHandler::OnSubscribeKeyEvent, &sMsgHandler_, this, pid, subscribeId, option));
@@ -545,12 +571,14 @@ int32_t MMIService::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr
         MMI_HILOGE("subscribe key event event processed failed, ret:%{public}d", ret);
         return RET_ERR;
     }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
 }
 
 int32_t MMIService::UnsubscribeKeyEvent(int32_t subscribeId)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&ServerMsgHandler::OnUnsubscribeKeyEvent, &sMsgHandler_, this, pid, subscribeId));
@@ -558,6 +586,7 @@ int32_t MMIService::UnsubscribeKeyEvent(int32_t subscribeId)
         MMI_HILOGE("unsubscribe key event processed failed, ret:%{public}d", ret);
         return RET_ERR;
     }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
 }
 
