@@ -42,7 +42,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void OnInputEvent(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent);
-#endif
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     void OnConnected();
 
 private:

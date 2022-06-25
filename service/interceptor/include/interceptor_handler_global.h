@@ -48,6 +48,7 @@ public:
     bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     bool HandleEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    void Dump(int32_t fd, const std::vector<std::string> &args);
 
 private:
     void InitSessionLostCallback();
@@ -88,6 +89,7 @@ private:
         int32_t AddInterceptor(const SessionHandler& interceptor);
         void RemoveInterceptor(const SessionHandler& interceptor);
         void OnSessionLost(SessionPtr session);
+        void Dump(int32_t fd, const std::vector<std::string> &args);
         std::set<SessionHandler> interceptors_;
     };
 

@@ -23,6 +23,7 @@
 #include "net_packet.h"
 #include "proto.h"
 #include "timer_manager.h"
+#include "util_ex.h"
 
 namespace OHOS {
 namespace MMI {
@@ -35,7 +36,7 @@ constexpr uint32_t MAX_PRE_KEY_COUNT = 4;
 void KeyEventSubscriber::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
-    if (OnSubscribeKeyEvent(keyEvent)) {
+    if (SubscribeKeyEvent(keyEvent)) {
         MMI_HILOGD("Subscribe keyEvent filter success. keyCode:%{public}d", keyEvent->GetKeyCode());
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
         return;
@@ -106,7 +107,7 @@ int32_t KeyEventSubscriber::UnsubscribeKeyEvent(SessionPtr sess, int32_t subscri
     return RET_ERR;
 }
 
-bool KeyEventSubscriber::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+bool KeyEventSubscriber::SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_LOG_ENTER;
     CHKPF(keyEvent);
@@ -467,6 +468,31 @@ bool KeyEventSubscriber::IsRepeatedKeyEvent(std::shared_ptr<KeyEvent> keyEvent) 
         }
     }
     return true;
+}
+
+void KeyEventSubscriber::Dump(int32_t fd, const std::vector<std::string> &args)
+{
+    CALL_LOG_ENTER;
+    mprintf(fd, "--------------------------[Subscriber Information]-------------------------");
+    mprintf(fd, "subscribers: count=%d", subscribers_.size());
+    for (const auto &item : subscribers_) {
+        std::shared_ptr<Subscriber> subscriber = item;
+        CHKPV(subscriber);
+        SessionPtr session = item->sess_;
+        CHKPV(session);
+        std::shared_ptr<KeyOption> keyOption = item->keyOption_;
+        CHKPV(keyOption);
+        mprintf(fd,
+                "subscriber id:%d | timer id:%d | Pid:%d | Uid:%d | Fd:%d "
+                "| FinalKey:%d | finalKeyDownDuration:%d | IsFinalKeyDown:%s\t",
+                subscriber->id_, subscriber->timerId_, session->GetPid(),
+                session->GetUid(), session->GetFd(), keyOption->GetFinalKey(),
+                keyOption->GetFinalKeyDownDuration(), keyOption->IsFinalKeyDown() ? "true" : "false");
+        std::set<int32_t> preKeys = keyOption->GetPreKeys();
+        for (const auto &preKey : preKeys) {
+            mprintf(fd, "preKeys:%d\t", preKey);
+        }
+    }
 }
 } // namespace MMI
 } // namespace OHOS

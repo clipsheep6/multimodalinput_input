@@ -20,7 +20,7 @@
 #include "error_multimodal.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
-#include "key_autorepeat.h"
+#include "key_auto_repeat.h"
 #include "key_event_value_transformation.h"
 #include "mmi_log.h"
 #include "timer_manager.h"

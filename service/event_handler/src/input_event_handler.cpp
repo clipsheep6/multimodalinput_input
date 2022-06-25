@@ -29,7 +29,6 @@
 
 #include "bytrace_adapter.h"
 #include "input_device_manager.h"
-#include "key_autorepeat.h"
 #include "key_command_manager.h"
 #include "key_map_manager.h"
 #include "libinput_adapter.h"

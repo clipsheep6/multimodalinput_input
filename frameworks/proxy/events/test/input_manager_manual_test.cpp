@@ -89,7 +89,7 @@ void InputManagerManualTest::AddInputEventFilter()
     ASSERT_EQ(ret, RET_OK);
 #else
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
-#endif
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 
 void InputManagerManualTest::SimulateInputEventHelper(int32_t globalX, int32_t globalY, int32_t expectVal)
@@ -115,7 +115,7 @@ void InputManagerManualTest::SimulateInputEventHelper(int32_t globalX, int32_t g
     EXPECT_EQ(callbackRet, expectVal);
 #else
     EXPECT_EQ(callbackRet, 0);
-#endif
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 
 /**
