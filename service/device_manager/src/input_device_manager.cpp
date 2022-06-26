@@ -14,8 +14,12 @@
  */
 
 #include "input_device_manager.h"
+
 #include <parameters.h>
+#include <unordered_map>
+
 #include "key_event_value_transformation.h"
+#include "util_ex.h"
 
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
 #include "constants_dinput.h"
@@ -44,15 +48,15 @@ const std::string DEVICE_ADD = "add";
 const std::string DEVICE_REMOVE = "remove";
 constexpr int32_t BUS_BLUETOOTH = 0X5;
 
-std::list<int32_t> axisType = {
-    ABS_MT_TOUCH_MAJOR,
-    ABS_MT_TOUCH_MINOR,
-    ABS_MT_ORIENTATION,
-    ABS_MT_POSITION_X,
-    ABS_MT_POSITION_Y,
-    ABS_MT_PRESSURE,
-    ABS_MT_WIDTH_MAJOR,
-    ABS_MT_WIDTH_MINOR,
+std::unordered_map<int32_t, std::string> axisType = {
+    {ABS_MT_TOUCH_MAJOR, "TOUCH_MAJOR"},
+    {ABS_MT_TOUCH_MINOR, "TOUCH_MINOR"},
+    {ABS_MT_ORIENTATION, "ORIENTATION"},
+    {ABS_MT_POSITION_X, "POSITION_X"},
+    {ABS_MT_POSITION_Y, "POSITION_Y"},
+    {ABS_MT_PRESSURE, "PRESSURE"},
+    {ABS_MT_WIDTH_MAJOR, "WIDTH_MAJOR"},
+    {ABS_MT_WIDTH_MINOR, "WIDTH_MINOR"}
 };
 } // namespace
 
@@ -491,6 +495,36 @@ void InputDeviceManager::NotifyDeviceChanged(const std::string& deviceId,
     }
 }
 
+void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
+{
+    CALL_LOG_ENTER;
+    mprintf(fd, "--------------------------[Device Information]-------------------------");
+    mprintf(fd, "Input devices: count=%d", inputDevice_.size());
+    for (const auto &item : inputDevice_) {
+        std::shared_ptr<InputDevice> inputDevice = GetInputDevice(item.first);
+        CHKPV(inputDevice);
+        mprintf(fd,
+                "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d "
+                "| product:%d | vendor:%d | phys:%s\t",
+                inputDevice->GetId(), inputDevice->GetName().c_str(), inputDevice->GetType(),
+                inputDevice->GetBustype(), inputDevice->GetVersion(), inputDevice->GetProduct(),
+                inputDevice->GetVendor(), inputDevice->GetPhys().c_str());
+        std::vector<InputDevice::AxisInfo> axisinfo = inputDevice->GetAxisInfo();
+        mprintf(fd, "axis: count=%d \n", axisinfo.size());
+        for (const auto &axis : axisinfo) {
+            auto iter = axisType.find(axis.GetAxisType());
+            if (iter == axisType.end()) {
+                MMI_HILOGE("AxisType is not found");
+                return;
+            }
+            mprintf(fd,
+                    "axisType:%s | minimum:%d | maximum:%d | fuzz:%d | flat:%d | resolution:%d\t",
+                    iter->second.c_str(), axis.GetMinimum(), axis.GetMaximum(), axis.GetFuzz(),
+                    axis.GetFlat(), axis.GetResolution());
+        }
+    }
+}
+
 void InputDeviceManager::SetPointerVisible(int32_t pid, bool visible)
 {
     MMI_HILOGW("observers_ size:%{public}zu", observers_.size());
@@ -578,5 +612,22 @@ void InputDeviceManager::MmiDeviceStateCallback::OnDeviceReady(const Distributed
     CALL_LOG_ENTER;
 }
 #endif // OHOS_DISTRIBUTED_INPUT_MODEL
+
+void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::string> &args)
+{
+    CALL_LOG_ENTER;
+    mprintf(fd, "--------------------------[Device List Information]-------------------------");
+    std::vector<int32_t> ids = GetInputDeviceIds();
+    mprintf(fd, "Total device:%d, Device list:", ids.size());
+    for (const auto &item : inputDevice_) {
+        std::shared_ptr<InputDevice> inputDevice = GetInputDevice(item.first);
+        CHKPV(inputDevice);
+        int32_t deviceId = inputDevice->GetId();
+        mprintf(fd,
+                "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d | product:%d | vendor:%d\t",
+                deviceId, inputDevice->GetName().c_str(), inputDevice->GetType(), inputDevice->GetBustype(),
+                inputDevice->GetVersion(), inputDevice->GetProduct(), inputDevice->GetVendor());
+    }
+}
 } // namespace MMI
 } // namespace OHOS

@@ -60,6 +60,8 @@ public:
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
     void UpdateDMouseLocation(const int32_t& displayId);
 #endif // OHOS_DISTRIBUTED_INPUT_MODEL
+    void Dump(int32_t fd, const std::vector<std::string> &args);
+    
 private:
     bool IsInHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects) const;
     void PrintDisplayInfo();

@@ -20,7 +20,7 @@
 
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
 #include "i_call_dinput.h"
-#endif
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
 
 #include "device_observer.h"
 #include "event_dispatch.h"
@@ -66,6 +66,8 @@ public:
     void NotifyPointerDevice(bool hasPointerDevice, bool isPointerVisible);
     void AddDevMonitor(SessionPtr sess, std::function<void(std::string, int32_t)> callback);
     void RemoveDevMonitor(SessionPtr sess);
+    void Dump(int32_t fd, const std::vector<std::string> &args);
+    void DumpDeviceList(int32_t fd, const std::vector<std::string> &args);
     bool HasPointerDevice();
     std::string FindInputDeviceName(int32_t deviceId);
     void SetLastTouchDeviceId(int32_t lastTouchDeviceID);
