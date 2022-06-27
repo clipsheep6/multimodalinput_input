@@ -279,8 +279,8 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
 void InputDeviceManager::ScanPointerDevice()
 {
     bool hasPointerDevice = false;
-    for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
-        if (IsPointerDevice(it->second)) {
+    for (auto &it : inputDevice_) {
+        if (IsPointerDevice(it.second)) {
             hasPointerDevice = true;
             break;
         }
