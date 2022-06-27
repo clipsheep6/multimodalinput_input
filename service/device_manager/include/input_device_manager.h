@@ -49,8 +49,11 @@ public:
     void Attach(std::shared_ptr<IDeviceObserver> observer);
     void Detach(std::shared_ptr<IDeviceObserver> observer);
     void NotifyPointerDevice(bool hasPointerDevice);
-    void AddDevListener(SessionPtr sess, std::function<void(std::string, int32_t)> callback);
-    void RemoveDevListener(SessionPtr sess);
+    void AddDevMonitor(SessionPtr sess, std::function<void(std::string, int32_t)> callback);
+    void RemoveDevMonitor(SessionPtr sess);
+    void Dump(int32_t fd, const std::vector<std::string> &args);
+    void DumpDeviceList(int32_t fd, const std::vector<std::string> &args);
+    
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool HasPointerDevice();
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
