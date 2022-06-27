@@ -489,13 +489,13 @@ int32_t MMIService::OnRegisterDevListener(int32_t pid)
 {
     auto sess = GetSession(GetClientFd(pid));
     CHKPR(sess, RET_ERR);
-    InputDevMgr->AddDevListener(sess, [sess](std::string type, int32_t id) {
+    InputDevMgr->AddDevListener(sess, [sess](int32_t id, const std::string &type) {
         CALL_LOG_ENTER;
         CHKPV(sess);
-        NetPacket pkt(MmiMessageId::ADD_INPUT_DEVICE_MONITOR);
+        NetPacket pkt(MmiMessageId::ADD_INPUT_DEVICE_LISTENER);
         pkt << type << id;
         if (pkt.ChkRWError()) {
-            MMI_HILOGE("Packet write deviceId failed");
+            MMI_HILOGE("Packet write data failed");
             return;
         }
         if (!sess->SendMsg(pkt)) {

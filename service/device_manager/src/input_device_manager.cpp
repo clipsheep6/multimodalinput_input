@@ -82,17 +82,17 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
             MMI_HILOGD("The device does not support this axis");
             continue;
         }
-        if (item == ABS_MT_PRESSURE) {
+        if (item.first == ABS_MT_PRESSURE) {
             axis.SetMinimum(0);
             axis.SetMaximum(1);
         } else {
             axis.SetMinimum(min);
-            axis.SetMaximum(libinput_device_get_axis_max(iter->second, item));
+            axis.SetMaximum(libinput_device_get_axis_max(iter->second, item.first));
         }
-        axis.SetAxisType(item);
-        axis.SetFuzz(libinput_device_get_axis_fuzz(iter->second, item));
-        axis.SetFlat(libinput_device_get_axis_flat(iter->second, item));
-        axis.SetResolution(libinput_device_get_axis_resolution(iter->second, item));
+        axis.SetAxisType(item.first);
+        axis.SetFuzz(libinput_device_get_axis_fuzz(iter->second, item.first));
+        axis.SetFlat(libinput_device_get_axis_flat(iter->second, item.first));
+        axis.SetResolution(libinput_device_get_axis_resolution(iter->second, item.first));
         inputDevice->AddAxisInfo(axis);
     }
     return inputDevice;
@@ -205,7 +205,7 @@ int32_t InputDeviceManager::GetKeyboardType(int32_t deviceId)
     return keyboardType;
 }
 
-void InputDeviceManager::AddDevListener(SessionPtr sess, std::function<void(std::string, int32_t)> callback)
+void InputDeviceManager::AddDevListener(SessionPtr sess, std::function<void(int32_t, const std::string&)> callback)
 {
     CALL_LOG_ENTER;
     auto ret = devListener_.insert({ sess, callback });
@@ -255,7 +255,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     inputDevice_[nextId_] = inputDevice;
     for (const auto &item : devListener_) {
         CHKPC(item.first);
-        item.second("add", nextId_);
+        item.second(nextId_, "add");
     }
     ++nextId_;
 
@@ -279,7 +279,7 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
     }
     for (const auto &item : devListener_) {
         CHKPC(item.first);
-        item.second("remove", deviceId);
+        item.second(deviceId, "remove");
     }
     ScanPointerDevice();
 }
@@ -354,7 +354,7 @@ void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
                 "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d "
                 "| product:%d | vendor:%d | phys:%s\t",
                 inputDevice->GetId(), inputDevice->GetName().c_str(), inputDevice->GetType(),
-                inputDevice->GetBustype(), inputDevice->GetVersion(), inputDevice->GetProduct(),
+                inputDevice->GetBus(), inputDevice->GetVersion(), inputDevice->GetProduct(),
                 inputDevice->GetVendor(), inputDevice->GetPhys().c_str());
         std::vector<InputDevice::AxisInfo> axisinfo = inputDevice->GetAxisInfo();
         mprintf(fd, "axis: count=%d \n", axisinfo.size());
@@ -384,7 +384,7 @@ void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::strin
         int32_t deviceId = inputDevice->GetId();
         mprintf(fd,
                 "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d | product:%d | vendor:%d\t",
-                deviceId, inputDevice->GetName().c_str(), inputDevice->GetType(), inputDevice->GetBustype(),
+                deviceId, inputDevice->GetName().c_str(), inputDevice->GetType(), inputDevice->GetBus(),
                 inputDevice->GetVersion(), inputDevice->GetProduct(), inputDevice->GetVendor());
     }
 }

@@ -65,7 +65,7 @@ void ClientMsgHandler::Init()
         {MmiMessageId::INPUT_DEVICE_IDS, MsgCallbackBind2(&ClientMsgHandler::OnInputDeviceIds, this)},
         {MmiMessageId::INPUT_DEVICE_SUPPORT_KEYS, MsgCallbackBind2(&ClientMsgHandler::OnSupportKeys, this)},
         {MmiMessageId::INPUT_DEVICE_KEYBOARD_TYPE, MsgCallbackBind2(&ClientMsgHandler::OnInputKeyboardType, this)},
-        {MmiMessageId::ADD_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ClientMsgHandler::OnDevListener, this)},
+        {MmiMessageId::ADD_INPUT_DEVICE_LISTENER, MsgCallbackBind2(&ClientMsgHandler::OnDevListener, this)},
         {MmiMessageId::REPORT_KEY_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportKeyEvent, this)},
         {MmiMessageId::REPORT_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportPointerEvent, this)},
     };
