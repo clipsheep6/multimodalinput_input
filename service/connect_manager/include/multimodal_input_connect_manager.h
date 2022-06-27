@@ -36,6 +36,16 @@ public:
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
     int32_t SetPointerVisible(bool visible);
     int32_t IsPointerVisible(bool &visible);
+    int32_t SetPointerLocation(int32_t x, int32_t y);
+    int32_t SetInputDeviceSeatName(const std::string& seatName, DeviceUniqId& deviceUniqId);
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    int32_t GetRemoteInputAbility(const std::string& deviceId, sptr<ICallDinput> ablitity);
+    int32_t PrepareRemoteInput(const std::string& deviceId, sptr<ICallDinput> prepareDinput);
+    int32_t UnprepareRemoteInput(const std::string& deviceId, sptr<ICallDinput> prepareDinput);
+    int32_t StartRemoteInput(const std::string& deviceId, uint32_t inputAbility, sptr<ICallDinput> prepareDinput);
+    int32_t StopRemoteInput(const std::string& deviceId, uint32_t inputAbility, sptr<ICallDinput> prepareDinput);
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
+
     int32_t MarkEventProcessed(int32_t eventId);
     int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
         HandleEventType eventType);

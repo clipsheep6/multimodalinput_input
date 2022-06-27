@@ -51,13 +51,15 @@ public:
     void AdjustGlobalCoordinate(const DisplayInfo& displayInfo, int32_t& globalX, int32_t& globalY) const;
     bool UpdataDisplayId(int32_t& displayId);
     int32_t UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent);
-    bool TouchPointToDisplayPoint(struct libinput_event_touch* touch,
-        EventTouch& touchInfo, int32_t& targetDisplayId);
+    bool TouchPointToDisplayPoint(struct libinput_event_touch* touch, EventTouch& touchInfo, int32_t& targetDisplayId);
     void RotateTouchScreen(DisplayInfo info, LogicalCoordinate& coord) const;
     bool TransformTipPoint(struct libinput_event_tablet_tool* tip, LogicalCoordinate& coord, int32_t& displayId) const;
     bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
         int32_t& targetDisplayId, LogicalCoordinate& coord) const;
     const DisplayGroupInfo& GetDisplayGroupInfo();
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    void UpdateDMouseLocation(const int32_t& displayId);
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
     void Dump(int32_t fd, const std::vector<std::string> &args);
     
 private:

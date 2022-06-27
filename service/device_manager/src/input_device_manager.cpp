@@ -21,12 +21,18 @@
 #include "key_event_value_transformation.h"
 #include "util_ex.h"
 
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+#include "constants_dinput.h"
+#include "dinput_manager.h"
+#endif
+
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceManager"};
 constexpr int32_t INVALID_DEVICE_ID = -1;
 constexpr int32_t SUPPORT_KEY = 1;
+const char *SPLIT_SYMBOL = "|";
 
 constexpr int32_t ABS_MT_TOUCH_MAJOR = 0x30;
 constexpr int32_t ABS_MT_TOUCH_MINOR = 0x31;
@@ -37,6 +43,9 @@ constexpr int32_t ABS_MT_PRESSURE = 0x3a;
 constexpr int32_t ABS_MT_WIDTH_MAJOR = 0x32;
 constexpr int32_t ABS_MT_WIDTH_MINOR = 0x33;
 
+const std::string BUNDLE_NAME = "ohos.multimodalinput.input";
+const std::string DEVICE_ADD = "add";
+const std::string DEVICE_REMOVE = "remove";
 constexpr int32_t BUS_BLUETOOTH = 0X5;
 
 std::unordered_map<int32_t, std::string> axisType = {
@@ -59,7 +68,11 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
         MMI_HILOGE("failed to search for the device");
         return nullptr;
     }
-
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    if (IsRemote(iter->second) && !IsDistributedInput(iter->second)) {
+        return nullptr;
+    }
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
     std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
     CHKPP(inputDevice);
     inputDevice->SetId(iter->first);
@@ -72,9 +85,15 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
     inputDevice->SetVendor(libinput_device_get_id_vendor(iter->second));
     const char* phys = libinput_device_get_phys(iter->second);
     inputDevice->SetPhys((phys == nullptr) ? ("null") : (phys));
+    inputDevice->SetNetworkId((MakeNetworkId(inputDevice->GetPhys())));
+    inputDevice->SetRemote(false);
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    std::string::size_type pos = inputDevice->GetName().find(VIRTUAL_DEVICE_NAME);
+    inputDevice->SetRemote(pos != inputDevice->GetName().npos);
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
+
     const char* uniq = libinput_device_get_uniq(iter->second);
     inputDevice->SetUniq((uniq == nullptr) ? ("null") : (uniq));
-
     InputDevice::AxisInfo axis;
     for (const auto &item : axisType) {
         int32_t min = libinput_device_get_axis_min(iter->second, item.first);
@@ -93,11 +112,30 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
     return inputDevice;
 }
 
+std::string InputDeviceManager::MakeNetworkId(const std::string& phys) const
+{
+    uint64_t endPos = 0;
+    uint64_t startPos = 0;
+    std::string networkId = "";
+    std::size_t splitPos = phys.find(SPLIT_SYMBOL);
+    if (std::string::npos != splitPos) {
+        startPos = splitPos + 1;
+        endPos = phys.size();
+        networkId = phys.substr(startPos,  endPos - startPos);
+    }
+    return networkId;
+}
+
 std::vector<int32_t> InputDeviceManager::GetInputDeviceIds() const
 {
     CALL_LOG_ENTER;
     std::vector<int32_t> ids;
     for (const auto &item : inputDevice_) {
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+        if (IsRemote(item.second) && !IsDistributedInput(item.second)) {
+            continue;
+        }
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
         ids.push_back(item.first);
     }
     return ids;
@@ -218,7 +256,6 @@ void InputDeviceManager::RemoveDevMonitor(SessionPtr sess)
     devMonitor_.erase(iter);
 }
 
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 bool InputDeviceManager::HasPointerDevice()
 {
     for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
@@ -228,7 +265,6 @@ bool InputDeviceManager::HasPointerDevice()
     }
     return false;
 }
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
 {
@@ -238,25 +274,45 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
         if (item.second == inputDevice) {
             MMI_HILOGI("the device already exists");
             return;
-        }
+        } 
     }
     if (nextId_ == INT32_MAX) {
         MMI_HILOGE("the nextId_ exceeded the upper limit");
         return;
     }
     inputDevice_[nextId_] = inputDevice;
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    bool hasPointerDevice = false;
+    bool isRemote = IsRemote(inputDevice);
+    bool isDistributedInput = IsDistributedInput(inputDevice);
+    if (isDistributedInput || !isRemote) {
+        HandleDeviceChanged(DEVICE_ADD, nextId_);
+    }
+    if (IsPointerDevice(inputDevice)) {
+        bool needShowMouse = hasPointerDevice || !isRemote;
+        NotifyPointerDevice(true, needShowMouse);
+    }
+#else
     for (const auto &item : devMonitor_) {
         CHKPC(item.first);
         item.second("add", nextId_);
     }
     ++nextId_;
-
     if (IsPointerDevice(inputDevice)) {
-        NotifyPointerDevice(true);
+        NotifyPointerDevice(true, true);
         OHOS::system::SetParameter(INPUT_POINTER_DEVICE, "true");
     }
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
 }
 
+void InputDeviceManager::HandleDeviceChanged(std::string changedType, int32_t id)
+{
+    CALL_LOG_ENTER;
+    for (const auto& item : devMonitor_) {
+        CHKPC(item.first);
+        item.second(changedType, id);
+    }
+}
 void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevice)
 {
     CALL_LOG_ENTER;
@@ -269,25 +325,14 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
             break;
         }
     }
-    for (const auto &item : devMonitor_) {
-        CHKPC(item.first);
-        item.second("remove", deviceId);
-    }
+    HandleDeviceChanged(DEVICE_REMOVE, deviceId);
     ScanPointerDevice();
 }
 
 void InputDeviceManager::ScanPointerDevice()
 {
-    bool hasPointerDevice = false;
-    for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
-        if (IsPointerDevice(it->second)) {
-            hasPointerDevice = true;
-            break;
-        }
-    }
-    if (!hasPointerDevice) {
-        NotifyPointerDevice(false);
-        OHOS::system::SetParameter(INPUT_POINTER_DEVICE, "false");
+    if (!HasPointerDevice()) {
+        NotifyPointerDevice(false, true);
     }
 }
 
@@ -312,11 +357,11 @@ void InputDeviceManager::Detach(std::shared_ptr<IDeviceObserver> observer)
     observers_.remove(observer);
 }
 
-void InputDeviceManager::NotifyPointerDevice(bool hasPointerDevice)
+void InputDeviceManager::NotifyPointerDevice(bool hasPointerDevice, bool isPointerVisible)
 {
     MMI_HILOGI("observers_ size:%{public}zu", observers_.size());
     for (auto observer = observers_.begin(); observer != observers_.end(); observer++) {
-        (*observer)->UpdatePointerDevice(hasPointerDevice);
+        (*observer)->UpdatePointerDevice(hasPointerDevice, isPointerVisible);
     }
 }
 
@@ -332,6 +377,122 @@ int32_t InputDeviceManager::FindInputDeviceId(struct libinput_device* inputDevic
     }
     MMI_HILOGE("find input device id failed");
     return INVALID_DEVICE_ID;
+}
+
+std::string InputDeviceManager::FindInputDeviceName(int32_t deviceId)
+{
+    CALL_LOG_ENTER;
+    const std::string DEFAULT_SEAT_NAME = "default0";
+    auto iter = inputDeviceSeat_.find(deviceId);
+    if (iter == inputDeviceSeat_.end()) {
+        MMI_HILOGE("find input device id fail. return default seatName:%{public}s", DEFAULT_SEAT_NAME.c_str());
+        return DEFAULT_SEAT_NAME;
+    }
+    return iter->second;
+}
+
+void InputDeviceManager::SetLastTouchDeviceId(int32_t lastTouchDeviceID)
+{
+    lastTouchDeviceID_ = lastTouchDeviceID;
+}
+
+int32_t InputDeviceManager::SetInputDeviceSeatName(const std::string& seatName, DeviceUniqId& deviceUniqId)
+{
+    auto device = inputDevice_.find(lastTouchDeviceID_);
+    if (device == inputDevice_.end()) {
+        MMI_HILOGE("device does not exist");
+        return RET_ERR;
+    }
+    inputDeviceSeat_[lastTouchDeviceID_] = seatName;
+    auto bus = libinput_device_get_id_bustype(device->second);
+    auto version = libinput_device_get_id_version(device->second);
+    auto product = libinput_device_get_id_product(device->second);
+    auto vendor = libinput_device_get_id_vendor(device->second);
+    auto udevTags = libinput_device_get_tags(device->second);
+    auto deviceUniq = libinput_device_get_uniq(device->second);
+    auto uniq = (deviceUniq == nullptr) ? ("null") : (deviceUniq);
+    deviceUniqId = std::make_tuple(bus, version, product, vendor, udevTags, uniq);
+    return RET_OK;
+}
+
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+bool InputDeviceManager::IsRemote(struct libinput_device* inputDevice) const
+{
+    CHKPR(inputDevice, false);
+    bool isRemote = false;
+    std::string name = libinput_device_get_name(inputDevice);
+    std::string::size_type pos = name.find(VIRTUAL_DEVICE_NAME);
+    if (pos != name.npos) {
+        isRemote = true;
+    }
+    MMI_HILOGD("isRemote:%{public}s", isRemote == true ? "true" : "false");
+    return isRemote;
+}
+
+std::shared_ptr<InputDevice> InputDeviceManager::GetRemoteInputDevice(int32_t id)
+{
+    CALL_LOG_ENTER;
+    auto item = inputDevice_.find(id);
+    if (item == inputDevice_.end()) {
+        MMI_HILOGW("failed to search for the device");
+        return nullptr;
+    }
+    if (!IsRemote(item->second)) {
+        return nullptr;
+    }
+    std::shared_ptr<InputDevice> inputDevice = MakeInputDevice(item->first, item->second);
+    return inputDevice;
+}
+
+bool InputDeviceManager::IsDistributedInput(struct libinput_device* device) const
+{
+    CHKPF(device);
+    enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
+    uint32_t dinputType = DeviceUdevTagsToDinputType(udevTags);
+    if (dinputType != 0) {
+        return DInputMgr->IsDistributedInput(dinputType);
+    }
+    return false;
+}
+
+uint32_t InputDeviceManager::DeviceUdevTagsToDinputType(enum evdev_device_udev_tags udevTags) const
+{
+    CALL_LOG_ENTER;
+    MMI_HILOGD("udev tag:%{public}d", static_cast<int32_t>(udevTags));
+    if (udevTags & EVDEV_UDEV_TAG_MOUSE) {
+        return MOUSE_ABILITY;
+    } else if (udevTags & EVDEV_UDEV_TAG_KEYBOARD) {
+        return KEYBOARD_ABILITY;
+    }
+    return DEFAULT_ABILITY;
+}
+
+void InputDeviceManager::OnStartRemoteInput(const std::string& deviceId, const uint32_t& inputTypes)
+{
+    NotifyDeviceChanged(deviceId, inputTypes, DEVICE_ADD);
+}
+
+void InputDeviceManager::OnStopRemoteInput(const std::string& deviceId, const uint32_t& inputTypes)
+{
+    NotifyDeviceChanged(deviceId, inputTypes, DEVICE_REMOVE);
+}
+
+void InputDeviceManager::NotifyDeviceChanged(const std::string& deviceId,
+    const uint32_t& inputTypes, const std::string& changedType)
+{
+    CALL_LOG_ENTER;
+    bool hasLocalPointer = false;
+    for (const auto& item : inputDevice_) {
+        if (!IsRemote(item.second)) {
+            hasLocalPointer = IsPointerDevice(item.second);
+            continue;
+        }
+        if (MOUSE_ABILITY & inputTypes) {
+            if ((changedType == DEVICE_REMOVE) && !hasLocalPointer) {
+                SetPointerVisible(getpid(), hasLocalPointer);
+            }
+        }
+    }
 }
 
 void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
@@ -363,6 +524,94 @@ void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
         }
     }
 }
+
+void InputDeviceManager::SetPointerVisible(int32_t pid, bool visible)
+{
+    MMI_HILOGW("observers_ size:%{public}zu", observers_.size());
+    for (auto observer = observers_.begin(); observer != observers_.end(); observer++) {
+        CHKPV(*observer);
+        (*observer)->SetPointerVisible(pid, visible);
+    }
+}
+
+int32_t InputDeviceManager::GetRemoteInputAbility(std::string deviceId, sptr<ICallDinput> ablitity)
+{
+    MMI_HILOGD("deviceId:%{public}s", GetAnonyString(deviceId).c_str());
+    std::set<int32_t> remotInputAbility;
+    for (const auto& item : inputDevice_) {
+        if (IsRemote(item.second)) {
+            auto phys = libinput_device_get_phys(item.second);
+            std::string networkId = MakeNetworkId(phys);
+            if (networkId.compare(deviceId) == 0) {
+                int32_t type = static_cast<int32_t>(libinput_device_get_tags(item.second));
+                MMI_HILOGD("type:%{public}d", type);
+                remotInputAbility.insert(type);
+            }
+        }
+    }
+    CHKPR(ablitity, ERROR_NULL_POINTER);
+    return ablitity->HandleRemoteInputAbility(remotInputAbility);
+}
+
+void InputDeviceManager::OnDeviceOffline()
+{
+    bool hasLocalPointer = false;
+    for (const auto& item : inputDevice_) {
+        if (IsPointerDevice(item.second) && !IsRemote(item.second)) {
+            hasLocalPointer = true;
+            break;
+        }
+    }
+    SetPointerVisible(getpid(), hasLocalPointer);
+}
+
+bool InputDeviceManager::InitDeviceManager()
+{
+    CALL_LOG_ENTER;
+    initCallback_ = std::make_shared<DeviceInitCallBack>();
+    int32_t ret =
+        DistributedHardware::DeviceManager::GetInstance().InitDeviceManager(BUNDLE_NAME, initCallback_);
+    if (ret != 0) {
+        MMI_HILOGW("init device manager failed, ret:%{public}d", ret);
+        return false;
+    }
+    stateCallback_ = std::make_shared<MmiDeviceStateCallback>();
+    ret =
+        DistributedHardware::DeviceManager::GetInstance().RegisterDevStateCallback(BUNDLE_NAME, "", stateCallback_);
+    if (ret != 0) {
+        MMI_HILOGW("register devStateCallback failed, ret:%{public}d", ret);
+        return false;
+    }
+    MMI_HILOGD("register device manager success");
+    return true;
+}
+
+void InputDeviceManager::DeviceInitCallBack::OnRemoteDied()
+{
+    CALL_LOG_ENTER;
+}
+
+void InputDeviceManager::MmiDeviceStateCallback::OnDeviceOnline(const DistributedHardware::DmDeviceInfo &deviceInfo)
+{
+    CALL_LOG_ENTER;
+}
+
+void InputDeviceManager::MmiDeviceStateCallback::OnDeviceOffline(const DistributedHardware::DmDeviceInfo &deviceInfo)
+{
+    CALL_LOG_ENTER;
+    InputDevMgr->OnDeviceOffline();
+}
+
+void InputDeviceManager::MmiDeviceStateCallback::OnDeviceChanged(const DistributedHardware::DmDeviceInfo &deviceInfo)
+{
+    CALL_LOG_ENTER;
+}
+
+void InputDeviceManager::MmiDeviceStateCallback::OnDeviceReady(const DistributedHardware::DmDeviceInfo &deviceInfo)
+{
+    CALL_LOG_ENTER;
+}
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
 
 void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::string> &args)
 {

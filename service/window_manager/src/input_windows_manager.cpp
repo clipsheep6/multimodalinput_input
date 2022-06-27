@@ -18,6 +18,9 @@
 #include <cstdlib>
 #include <cstdio>
 
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+#include "dinput_manager.h"
+#endif
 #include "i_pointer_drawing_manager.h"
 #include "util.h"
 #include "util_ex.h"
@@ -525,6 +528,9 @@ void InputWindowsManager::UpdateAndAdjustMouseLoction(int32_t& displayId, double
     y = static_cast<double>(integerY);
     mouseLoction_.globalX = integerX;
     mouseLoction_.globalY = integerY;
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    UpdateDMouseLocation(displayId);
+#endif
     MMI_HILOGD("Mouse Data: globalX:%{public}d,globalY:%{public}d, displayId:%{public}d",
         mouseLoction_.globalX, mouseLoction_.globalY, displayId);
 }
@@ -539,6 +545,23 @@ MouseLocation InputWindowsManager::GetMouseInfo()
     }
     return mouseLoction_;
 }
+
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+void OHOS::MMI::InputWindowsManager::UpdateDMouseLocation(const int32_t& displayId)
+{
+    CALL_LOG_ENTER;
+    DInputMgr->GetMouseLocation().globalX = mouseLoction_.globalX;
+    DInputMgr->GetMouseLocation().globalY = mouseLoction_.globalY;
+    if (displayGroupInfo_.displaysInfo.empty()) {
+        MMI_HILOGW("logicalDisplays_is empty");
+        return;
+    }
+    if (displayId < 0) {
+        displayId = displayGroupInfo_.displaysInfo[0].id;
+    }
+    DInputMgr->GetMouseLocation().displayId = displayId;
+}
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
 
 void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
 {

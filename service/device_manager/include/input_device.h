@@ -46,7 +46,10 @@ public:
     std::string GetPhys() const;
     void SetUniq(std::string uniq);
     std::string GetUniq() const;
-
+    void SetNetworkId(std::string networkId);
+    std::string GetNetworkId() const;
+    void SetRemote(bool isRemote);
+    bool IsRemote() const;
     class AxisInfo {
     public:
         void SetAxisType(int32_t type);
@@ -83,7 +86,8 @@ private:
     int32_t vendor_ {0};
     std::string phys_ {"null"};
     std::string uniq_ {"null"};
-    
+    std::string networkId_;
+    bool isRemote_;
     std::vector<int32_t> deviceIdList_;
 };
 } // namespace MMI
