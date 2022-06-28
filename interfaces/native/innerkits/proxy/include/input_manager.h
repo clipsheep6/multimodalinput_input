@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -225,6 +225,69 @@ public:
      * @since 9
      */
     bool IsPointerVisible();
+	
+    /**
+     * @brief 设置鼠标光标的位置.
+     * @param x x 坐标
+     * @param y y 坐标
+     * @return 如果设置成功，则返回大于或等于 <b>0</b> 的值
+     * 否则返回小于 <b>0</b> 的值
+     */
+    int32_t SetPointerLocation(int32_t x, int32_t y);
+
+    /**
+     * @brief 取得远端输入能力.
+     * @param deviceId 远端的deviceId
+     * @param remoteTypes 返回远端输入能力
+     * @return 如果取得成功，则返回大于或等于 <b>0</b> 的值
+     * 否则返回小于 <b>0</b> 的值
+     * @since 9
+     */
+    int32_t GetRemoteInputAbility(std::string deviceId, std::function<void(std::set<int32_t>)> remoteTypes);
+
+    /**
+     * @brief 准备分布式.
+     * @param deviceId 准备分布式的那台设备的ID
+     * @param callback 准备分布式的回调，如果准备分布式执行完了，此回调被调用
+     * 如果准备分布式成功，则返回大于或等于 <b>0</b> 的值
+     * 否则返回小于 <b>0</b> 的值。
+     * @return 如果准备分布式被成功调用，则返回大于或等于 <b>0</b> 的值
+     * 否则返回小于 <b>0</b> 的值
+     */
+    int32_t PrepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
+
+    /**
+     * @brief 取消准备分布式.
+     * @param deviceId 取消准备分布式的那台设备的ID
+     * @param callback 取消准备分布式的回调，如果取消准备分布式执行完了，此回调被调用
+     * 如果取消准备分布式成功，则返回大于或等于 <b>0</b> 的值
+     * 否则返回小于 <b>0</b> 的值。
+     * @return 如果取消准备分布式被成功调用，则返回大于或等于 <b>0</b> 的值
+     * 否则返回小于 <b>0</b> 的值
+     */
+    int32_t UnprepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
+
+    /**
+     * @brief 开始分布式.
+     * @param deviceId 开始分布式的那台设备的ID
+     * @param callback 开始分布式的回调，如果开始分布式执行完了，此回调被调用
+     * 如果开始分布式成功，则返回大于或等于 <b>0</b> 的值
+     * 否则返回小于 <b>0</b> 的值。
+     * @return 如果取消准备分布式被成功调用，则返回大于或等于 <b>0</b> 的值
+     * 否则返回小于 <b>0</b> 的值
+     */
+    int32_t StartRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback);
+
+    /**
+     * @brief 取消分布式.
+     * @param deviceId 取消分布式的那台设备的ID
+     * @param callback 取消分布式的回调，如果取消分布式执行完了，此回调被调用
+     * 如果取消分布式成功，则返回大于或等于 <b>0</b> 的值
+     * 否则返回小于 <b>0</b> 的值。
+     * @return 如果取消分布式被成功调用，则返回大于或等于 <b>0</b> 的值
+     * 否则返回小于 <b>0</b> 的值
+     */
+    int32_t StopRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback);
 
     /**
      * @brief Queries the keyboard type.
@@ -233,6 +296,16 @@ public:
      * @since 9
      */
     void GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback);
+    
+    /**
+     * @brief 设定输入设备的席位名称.
+     * @param seatName 席位名称
+     * @param deviceUniqId 返回输入设备的唯一ID
+     * @return 如果设定输入设备的席位名称成功调用，则返回大于或等于 <b>0</b> 的值
+     * 否则返回小于 <b>0</b> 的值
+     */
+    using DeviceUniqId = std::tuple<int32_t, int32_t, int32_t, int32_t, int32_t, std::string>;
+    int32_t SetInputDeviceSeatName(const std::string& seatName, DeviceUniqId& deviceUniqId);
 
 private:
     InputManager() = default;
