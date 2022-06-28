@@ -62,6 +62,7 @@ config("multimodalinput_mmi_public_config") {
 
 group("multimodalinput_mmi_packages") {
   deps = [
+    "frameworks/napi/input_device:inputdevice",
     "frameworks/napi/key_code:keycode",
     "frameworks/proxy:libmmi-client",
     "service:libmmi-server",

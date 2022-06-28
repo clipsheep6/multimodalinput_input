@@ -39,8 +39,10 @@ public:
     int32_t OnAddInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType,
         HandleEventType eventType);
     int32_t OnRemoveInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType);
-#endif // OHOS_BUILD_ENABLE_INTERCEPTOR  || OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     int32_t OnMarkConsumed(SessionPtr sess, int32_t monitorId, int32_t eventId);
+#endif // OHOS_BUILD_ENABLE_MONITOR
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t OnSubscribeKeyEvent(IUdsServer *server, int32_t pid,
         int32_t subscribeId, const std::shared_ptr<KeyOption> option);
@@ -49,8 +51,12 @@ public:
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t OnMoveMouse(int32_t offsetX, int32_t offsetY);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t OnInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 protected:
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
 #ifdef OHOS_BUILD_HDF

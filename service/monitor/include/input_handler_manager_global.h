@@ -86,7 +86,7 @@ private:
         virtual bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-        virtual bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent) override;
+        virtual bool HandleEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
         int32_t AddMonitor(const SessionHandler& mon);
         void RemoveMonitor(const SessionHandler& mon);

@@ -37,6 +37,7 @@
 #include "system_ability_definition.h"
 #endif
 #include "timer_manager.h"
+#include "input_device_manager.h"
 #include "util.h"
 
 namespace OHOS {
@@ -174,8 +175,6 @@ bool MMIService::IsRunning() const
 
 bool MMIService::InitLibinputService()
 {
-    MMI_HILOGD("input msg handler Init");
-    InputHandler->Init(*this);
 #ifdef OHOS_BUILD_HDF
     MMI_HILOGD("HDF Init");
     hdfEventManager.SetupCallback();
@@ -262,6 +261,9 @@ int32_t MMIService::Init()
         MMI_HILOGE("Saservice init failed");
         return SASERVICE_INIT_FAIL;
     }
+
+    MMI_HILOGD("input msg handler Init");
+    InputHandler->Init(*this);
     if (!InitLibinputService()) {
         MMI_HILOGE("Libinput init failed");
         return LIBINPUT_INIT_FAIL;
@@ -718,7 +720,7 @@ void MMIService::AddReloadLibinputTimer()
             libinputAdapter_.Stop();
             MMI_HILOGI("libinput stop successful");
         }
-
+        InputDevMgr->RemoveAllDevice();
         if (!InitLibinputService()) {
             MMI_HILOGE("libinput init failed");
             return;

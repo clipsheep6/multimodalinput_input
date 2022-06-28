@@ -197,25 +197,21 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventCo
 int32_t InputManagerImpl::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
     std::function<void(std::shared_ptr<KeyEvent>)> callback)
 {
-    CHK_PIDANDTID();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    CHKPR(keyOption, ERROR_NULL_POINTER);
-    CHKPR(callback, ERROR_NULL_POINTER);
     return KeyEventInputSubscribeMgr.SubscribeKeyEvent(keyOption, callback);
 #else
     MMI_HILOGW("Keyboard device does not support");
     return ERROR_UNSUPPORT;
-#endif
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 void InputManagerImpl::UnsubscribeKeyEvent(int32_t subscriberId)
 {
-    CHK_PIDANDTID();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     KeyEventInputSubscribeMgr.UnsubscribeKeyEvent(subscriberId);
 #else
     MMI_HILOGW("Keyboard device does not support");
-#endif
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -257,7 +253,6 @@ void InputManagerImpl::OnPointerEventTask(std::shared_ptr<IInputEventConsumer> c
 
 void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CALL_LOG_ENTER;
     CHK_PIDANDTID();
     CHKPV(pointerEvent);
     CHKPV(eventHandler_);

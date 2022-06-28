@@ -125,7 +125,6 @@ int32_t ServerMsgHandler::MarkEventProcessed(SessionPtr sess, int32_t eventId)
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_LOG_ENTER;
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
     CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
