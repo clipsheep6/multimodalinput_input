@@ -158,6 +158,40 @@ napi_value JsMouseContext::IsPointerVisible(napi_env env, napi_callback_info inf
     return jsmouseMgr->IsPointerVisible(env, argv[0]);
 }
 
+napi_value JsMouseContext::SetPointerLocation(napi_env env, napi_callback_info info)
+{
+    CALL_LOG_ENTER;
+    size_t argc = 3;
+    napi_value argv[3];
+    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc > 3 || argc < 2) {
+        THROWERR(env, "the number of parameters is not as expected");
+        return nullptr;
+    }
+    if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
+        THROWERR(env, "The first parameter type is wrong");
+        return nullptr;
+    }
+    if (!JsCommon::TypeOf(env, argv[1], napi_number)) {
+        THROWERR(env, "The second parameter type is wrong");
+        return nullptr;
+    }
+    int32_t x = 0;
+    int32_t y = 0;
+    CHKRP(env, napi_get_value_int32(env, argv[0], &x), GET_INT32);
+    CHKRP(env, napi_get_value_int32(env, argv[1], &y), GET_INT32);
+    JsMouseContext *jsPointer = JsMouseContext::GetInstance(env);
+    auto jsMouseMgr = jsPointer->GetJsMouseMgr();
+    if (argc == 2) {
+        return jsMouseMgr->SetPointerLocation(env, nullptr, x, y);
+    }
+    if (!JsCommon::TypeOf(env, argv[2], napi_function)) {
+        THROWERR(env, "The third parameter type is wrong");
+        return nullptr;
+    }
+    return jsMouseMgr->SetPointerLocation(env, argv[2], x, y);
+}
+
 napi_value JsMouseContext::Export(napi_env env, napi_value exports)
 {
     CALL_LOG_ENTER;
@@ -169,6 +203,7 @@ napi_value JsMouseContext::Export(napi_env env, napi_value exports)
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_FUNCTION("setPointerVisible", SetPointerVisible),
         DECLARE_NAPI_STATIC_FUNCTION("isPointerVisible", IsPointerVisible),
+        DECLARE_NAPI_STATIC_FUNCTION("setPointerLocation", SetPointerLocation),
     };
     CHKRP(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     return exports;

@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -225,6 +225,68 @@ public:
      * @since 9
      */
     bool IsPointerVisible();
+	
+    /**
+     * @brief ����������λ��.
+     * @param x x ����
+     * @param y y ����
+     * @return ������óɹ����򷵻ش��ڻ���� <b>0</b> ��ֵ
+     * ���򷵻�С�� <b>0</b> ��ֵ
+     */
+    int32_t SetPointerLocation(int32_t x, int32_t y);
+    /**
+     * @brief ȡ��Զ����������.
+     * @param deviceId Զ�˵�deviceId
+     * @param remoteTypes ����Զ����������
+     * @return ���ȡ�óɹ����򷵻ش��ڻ���� <b>0</b> ��ֵ
+     * ���򷵻�С�� <b>0</b> ��ֵ
+     * @since 9
+     */
+    int32_t GetRemoteInputAbility(std::string deviceId, std::function<void(std::set<int32_t>)> remoteTypes);
+
+    /**
+     * @brief ׼���ֲ�ʽ.
+     * @param deviceId ׼���ֲ�ʽ����̨�豸��ID
+     * @param callback ׼���ֲ�ʽ�Ļص������׼���ֲ�ʽִ�����ˣ��˻ص�������
+     * ���׼���ֲ�ʽ�ɹ����򷵻ش��ڻ���� <b>0</b> ��ֵ
+     * ���򷵻�С�� <b>0</b> ��ֵ��
+     * @return ���׼���ֲ�ʽ���ɹ����ã��򷵻ش��ڻ���� <b>0</b> ��ֵ
+     * ���򷵻�С�� <b>0</b> ��ֵ
+     */
+    int32_t PrepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
+
+    /**
+     * @brief ȡ��׼���ֲ�ʽ.
+     * @param deviceId ȡ��׼���ֲ�ʽ����̨�豸��ID
+     * @param callback ȡ��׼���ֲ�ʽ�Ļص������ȡ��׼���ֲ�ʽִ�����ˣ��˻ص�������
+     * ���ȡ��׼���ֲ�ʽ�ɹ����򷵻ش��ڻ���� <b>0</b> ��ֵ
+     * ���򷵻�С�� <b>0</b> ��ֵ��
+     * @return ���ȡ��׼���ֲ�ʽ���ɹ����ã��򷵻ش��ڻ���� <b>0</b> ��ֵ
+     * ���򷵻�С�� <b>0</b> ��ֵ
+     */
+    int32_t UnprepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
+
+    /**
+     * @brief ��ʼ�ֲ�ʽ.
+     * @param deviceId ��ʼ�ֲ�ʽ����̨�豸��ID
+     * @param callback ��ʼ�ֲ�ʽ�Ļص��������ʼ�ֲ�ʽִ�����ˣ��˻ص�������
+     * �����ʼ�ֲ�ʽ�ɹ����򷵻ش��ڻ���� <b>0</b> ��ֵ
+     * ���򷵻�С�� <b>0</b> ��ֵ��
+     * @return ���ȡ��׼���ֲ�ʽ���ɹ����ã��򷵻ش��ڻ���� <b>0</b> ��ֵ
+     * ���򷵻�С�� <b>0</b> ��ֵ
+     */
+    int32_t StartRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback);
+
+    /**
+     * @brief ȡ���ֲ�ʽ.
+     * @param deviceId ȡ���ֲ�ʽ����̨�豸��ID
+     * @param callback ȡ���ֲ�ʽ�Ļص������ȡ���ֲ�ʽִ�����ˣ��˻ص�������
+     * ���ȡ���ֲ�ʽ�ɹ����򷵻ش��ڻ���� <b>0</b> ��ֵ
+     * ���򷵻�С�� <b>0</b> ��ֵ��
+     * @return ���ȡ���ֲ�ʽ���ɹ����ã��򷵻ش��ڻ���� <b>0</b> ��ֵ
+     * ���򷵻�С�� <b>0</b> ��ֵ
+     */
+    int32_t StopRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback);
 
     /**
      * @brief Queries the keyboard type.
@@ -233,6 +295,16 @@ public:
      * @since 9
      */
     void GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback);
+    
+    /**
+     * @brief �趨�����豸��ϯλ����.
+     * @param seatName ϯλ����
+     * @param deviceUniqId ���������豸��ΨһID
+     * @return ����趨�����豸��ϯλ���Ƴɹ����ã��򷵻ش��ڻ���� <b>0</b> ��ֵ
+     * ���򷵻�С�� <b>0</b> ��ֵ
+     */
+    using DeviceUniqId = std::tuple<int32_t, int32_t, int32_t, int32_t, int32_t, std::string>;
+    int32_t SetInputDeviceSeatName(const std::string& seatName, DeviceUniqId& deviceUniqId);
 
 private:
     InputManager() = default;
