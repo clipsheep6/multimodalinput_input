@@ -578,13 +578,163 @@ void InputManagerImpl::SendDisplayInfo()
 void InputManagerImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes,
     std::function<void(std::vector<bool>&)> callback)
 {
+    InputDevImpl.SupportKeys(deviceId, keyCodes, callback);
+}
+
+int32_t InputManagerImpl::SetPointerLocation(int32_t x, int32_t y)
+{
+    CALL_LOG_ENTER;
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnectManager::GetInstance()->SetPointerLocation(x, y);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SetPointerLocation has send to server fail, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    MMI_HILOGI("SetPointerLocation has send to server success");
+    return RET_OK;
+#else
+    MMI_HILOGW("SetPointerLocation dose not support");
+    return RET_OK;
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
+}
+
+int32_t InputManagerImpl::SetInputDeviceSeatName(const std::string& seatName, DeviceUniqId& deviceUniqId)
+{
+    CALL_LOG_ENTER;
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnectManager::GetInstance()->SetInputDeviceSeatName(seatName, deviceUniqId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SetInputDeviceSeatName has send to server fail, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    MMI_HILOGI("SetInputDeviceSeatName has send to server success");
+    return RET_OK;
+#else
+    MMI_HILOGW("SetInputDeviceSeatName dose not support");
+    return RET_OK;
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
+}
+
+int32_t InputManagerImpl::GetRemoteInputAbility(std::string deviceId,
+    std::function<void(std::set<int32_t>)> remoteTypes)
+{
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.InitClient()) {
-        MMI_HILOGE("client init failed");
-        return;
+    if (callDinputService_ == nullptr) {
+        callDinputService_ = new CallDinputService();
     }
-    InputDevImpl.SupportKeys(deviceId, keyCodes, callback);
+    CHKPR(callDinputService_, RET_ERR);
+    callDinputService_->SetRemoteAbilityCallback(remoteTypes);
+    int32_t ret = MultimodalInputConnectManager::GetInstance()->GetRemoteInputAbility(deviceId, callDinputService_);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send to server fail, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    MMI_HILOGD("Send to server success");
+    return RET_OK;
+#else
+    MMI_HILOGW("GetRemoteInputAbility dose not support");
+    return RET_OK;
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
+}
+
+int32_t InputManagerImpl::PrepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback)
+{
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (callDinputService_ == nullptr) {
+        callDinputService_ = new CallDinputService();
+    }
+    CHKPR(callDinputService_, RET_ERR);
+    callDinputService_->SetPrepareCallback(callback);
+    int32_t ret = MultimodalInputConnectManager::GetInstance()->PrepareRemoteInput(deviceId, callDinputService_);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send to server fail, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    MMI_HILOGD("Send to server success");
+    return RET_OK;
+#else
+    MMI_HILOGW("PrepareRemoteInput dose not support");
+    return RET_OK;
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
+}
+
+int32_t InputManagerImpl::UnprepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback)
+{
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (callDinputService_ == nullptr) {
+        callDinputService_ = new CallDinputService();
+    }
+    CHKPR(callDinputService_, RET_ERR);
+    callDinputService_->SetUnprepareCallback(callback);
+    int32_t ret = MultimodalInputConnectManager::GetInstance()->UnprepareRemoteInput(deviceId, callDinputService_);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send to server fail, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    MMI_HILOGD("Send to server success");
+    return RET_OK;
+#else
+    MMI_HILOGW("UnprepareRemoteInput dose not support");
+    return RET_OK;
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
+}
+
+int32_t InputManagerImpl::StartRemoteInput(const std::string& deviceId,
+    uint32_t inputAbility, std::function<void(int32_t)> callback)
+{
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (callDinputService_ == nullptr) {
+        callDinputService_ = new CallDinputService();
+    }
+    CHKPR(callDinputService_, RET_ERR);
+    callDinputService_->SetStartCallback(callback);
+    int32_t ret = MultimodalInputConnectManager::GetInstance()->StartRemoteInput(deviceId,
+        inputAbility, callDinputService_);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send to server fail, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    MMI_HILOGD("Send to server success");
+    return RET_OK;
+#else
+    MMI_HILOGW("StartRemoteInput dose not support");
+    return RET_OK;
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
+}
+
+int32_t InputManagerImpl::StopRemoteInput(const std::string& deviceId,
+    uint32_t inputAbility, std::function<void(int32_t)> callback)
+{
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (callDinputService_ == nullptr) {
+        callDinputService_ = new CallDinputService();
+    }
+    CHKPR(callDinputService_, RET_ERR);
+    callDinputService_->SetStopCallback(callback);
+    int32_t ret = MultimodalInputConnectManager::GetInstance()->StopRemoteInput(deviceId,
+        inputAbility, callDinputService_);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send to server fail, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    MMI_HILOGD("Send to server success");
+    return RET_OK;
+#else
+    MMI_HILOGW("StopRemoteInput dose not support");
+    return RET_OK;
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
 }
 
 void InputManagerImpl::GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback)
