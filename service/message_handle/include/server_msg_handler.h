@@ -53,12 +53,6 @@ protected:
     int32_t OnHdiInject(SessionPtr sess, NetPacket& pkt);
 #endif
     int32_t OnDisplayInfo(SessionPtr sess, NetPacket& pkt);
-    int32_t OnInputDevice(SessionPtr sess, NetPacket& pkt);
-    int32_t OnInputDeviceIds(SessionPtr sess, NetPacket& pkt);
-    int32_t OnSupportKeys(SessionPtr sess, NetPacket& pkt);
-    int32_t OnInputKeyboardType(SessionPtr sess, NetPacket& pkt);
-    int32_t OnAddInputDeviceMontior(SessionPtr sess, NetPacket& pkt);
-    int32_t OnRemoveInputDeviceMontior(SessionPtr sess, NetPacket& pkt);
     int32_t OnAddInputEventMontior(SessionPtr sess, NetPacket& pkt);
     int32_t OnRemoveInputEventMontior(SessionPtr sess, NetPacket& pkt);
     int32_t OnAddInputEventTouchpadMontior(SessionPtr sess, NetPacket& pkt);
