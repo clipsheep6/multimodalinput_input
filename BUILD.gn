@@ -63,7 +63,6 @@ config("multimodalinput_mmi_public_config") {
 group("multimodalinput_mmi_packages") {
   deps = [
     "frameworks/napi/input_consumer:inputconsumer",
-    "frameworks/napi/input_device:inputdevice",
     "frameworks/napi/input_event_client:inputeventclient",
     "frameworks/napi/input_monitor:inputmonitor",
     "frameworks/napi/key_code:keycode",
@@ -72,6 +71,10 @@ group("multimodalinput_mmi_packages") {
     "service:libmmi-server",
     "tools/inject_event:uinput",
   ]
+
+  if (mmi_enable_input_device) {
+    deps += [ "frameworks/napi/input_device:inputdevice" ]
+  }
 }
 
 group("mmi_debug_tools") {
