@@ -50,7 +50,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_POINTER
     MouseLocation GetMouseInfo();
     void UpdateAndAdjustMouseLoction(int32_t& displayId, double& x, double& y);
-#endif //OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void AdjustGlobalCoordinate(const DisplayInfo& displayInfo, int32_t& globalX, int32_t& globalY) const;
 #endif // OHOS_BUILD_ENABLE_TOUCH
