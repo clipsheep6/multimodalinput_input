@@ -38,7 +38,7 @@ public:
     {
         return OnHdiInject(sess, pkt);
     }
-#endif
+#endif // OHOS_BUILD_HDF
 
     int32_t OnInjectKeyEventTest(SessionPtr sess, std::shared_ptr<KeyEvent> keyEvent)
     {

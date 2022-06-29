@@ -108,7 +108,9 @@ private:
 #endif // OHOS_BUILD_ENABLE_POINTER
 private:
     UDSServer* udsServer_ = nullptr;
+#ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t firstBtnDownWindowId_ = -1;
+#endif // OHOS_BUILD_ENABLE_POINTER
     DisplayGroupInfo displayGroupInfo_;
     MouseLocation mouseLoction_ = {-1, -1}; // physical coord
 };

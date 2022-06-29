@@ -131,22 +131,22 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
                 break;
             }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+#ifdef OHOS_BUILD_ENABLE_MONITOR
             case 'o': {
+                auto monitorHandler = InputHandler->GetMonitorHandler();
+                CHKPV(monitorHandler);
+                monitorHandler->Dump(fd, args);
+                break;
+            }
+#endif // OHOS_BUILD_ENABLE_MONITOR
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+            case 'i': {
                 auto interceptorHandler = InputHandler->GetInterceptorHandler();
                 CHKPV(interceptorHandler);
                 interceptorHandler->Dump(fd, args);
                 break;
             }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
-#ifdef OHOS_BUILD_ENABLE_MONITOR
-            case 'i': {
-                auto interMonitorHandler = InputHandler->GetMonitorHandler();
-                CHKPV(interMonitorHandler);
-                interMonitorHandler->Dump(fd, args);
-                break;
-            }
-#endif // OHOS_BUILD_ENABLE_MONITOR
 #ifdef OHOS_BUILD_ENABLE_POINTER
             case 'm': {
                 MouseEventHdr->Dump(fd, args);

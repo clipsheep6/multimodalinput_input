@@ -107,7 +107,6 @@ config("libmmi_server_config") {
   if (mmi_enable_tp) {
     cflags += [ "-DOHOS_BUILD_ENABLE_TOUCH" ]
   }
-  
   if (mmi_enable_monitor) {
     cflags += [ "-DOHOS_BUILD_ENABLE_MONITOR" ]
   }

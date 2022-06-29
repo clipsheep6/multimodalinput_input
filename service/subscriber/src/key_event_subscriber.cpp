@@ -134,7 +134,6 @@ bool KeyEventSubscriber::SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     } else {
         MMI_HILOGW("keyAction exception");
     }
-    // keyEvent_.reset();
     return handled;
 }
 

@@ -68,17 +68,13 @@ bool MultimodalEventHandler::InitClient()
 
 MMIClientPtr MultimodalEventHandler::GetMMIClient()
 {
-    if (client_ != nullptr) {
-        return client_->GetSharedPtr();
-    }
-    MMI_HILOGE("Init client faild");
-    return nullptr;
+    CHKPP(client_);
+    return client_->GetSharedPtr();
 }
 
 int32_t MultimodalEventHandler::GetDeviceIds(int32_t userData)
 {
     if (!InitClient()) {
-        MMI_HILOGE("Init client faild");
         return MMI_SERVICE_INVALID;
     }
     return EventManager.GetDeviceIds(userData);

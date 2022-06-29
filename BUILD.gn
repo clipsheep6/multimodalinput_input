@@ -71,14 +71,14 @@ group("multimodalinput_mmi_packages") {
   if (mmi_enable_monitor) {
     deps += [ "frameworks/napi/input_monitor:inputmonitor" ]
   }
+  if (mmi_enable_mouse) {
+    deps += [ "frameworks/napi/mouse:mouse" ]
+  }
   if (mmi_enable_keyboard) {
     deps += [
       "frameworks/napi/input_consumer:inputconsumer",
       "frameworks/napi/input_event_client:inputeventclient",
     ]
-  }
-  if (mmi_enable_mouse) {
-      deps += [ "frameworks/napi/mouse:mouse" ]
   }
 }
 
