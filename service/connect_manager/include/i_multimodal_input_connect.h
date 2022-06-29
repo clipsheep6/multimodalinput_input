@@ -37,6 +37,12 @@ public:
     virtual int32_t SetPointerVisible(bool visible) = 0;
     virtual int32_t IsPointerVisible(bool &visible) = 0;
     virtual int32_t MarkEventProcessed(int32_t eventId) = 0;
+    virtual int32_t SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> &keys) = 0;
+    virtual int32_t GetDeviceIds(int32_t userData) = 0;
+    virtual int32_t GetDevice(int32_t userData, int32_t id) = 0;
+    virtual int32_t RegisterDevListener() = 0;
+    virtual int32_t UnregisterDevListener() = 0;
+    virtual int32_t GetKeyboardType(int32_t userData, int32_t deviceId) = 0;
     virtual int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
         HandleEventType eventType) = 0;
     virtual int32_t RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType) = 0;
@@ -59,7 +65,13 @@ public:
         MARK_EVENT_CONSUMED = 10,
         MOVE_MOUSE = 11,
         INJECT_KEY_EVENT = 12,
-        INJECT_POINTER_EVENT = 13
+        INJECT_POINTER_EVENT = 13,
+        SUPPORT_KEYS = 14,
+        GET_DEVICE_IDS = 15,
+        GET_DEVICE = 16,
+        REGISTER_DEV_MONITOR = 17,
+        UNREGISTER_DEV_MONITOR = 18,
+        GET_KEYBOARD_TYPE = 19,
     };
 
     enum {
