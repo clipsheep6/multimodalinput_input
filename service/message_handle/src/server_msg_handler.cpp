@@ -20,6 +20,9 @@
 #include "define_interceptor_global.h"
 #include "event_dump.h"
 #include "event_package.h"
+#ifdef OHOS_INPUT_ENABLE_OPENSSL
+#include "mmi_sign_helper.h"
+#endif
 #include "hos_key_event.h"
 #include "input_device_manager.h"
 #include "input_event.h"
@@ -156,6 +159,13 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
     if (action == PointerEvent::POINTER_ACTION_DOWN) {
         targetWindowId_ = pointerEvent->GetTargetWindowId();
     }
+
+#ifdef OHOS_INPUT_ENABLE_OPENSSL
+    uint8_t buf[11] = "0123456789";
+    MmiSignHelper m;
+    auto ret = MmiSignHelper::ToString(m.Sign(buf, 11));
+    MMI_HILOGE("HMAC: %{public}s", ret.c_str());
+#endif
     return RET_OK;
 }
 
