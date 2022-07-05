@@ -14,7 +14,6 @@
  */
 
 #include "event_package.h"
-
 #include "input_device_manager.h"
 #include "key_map_manager.h"
 
