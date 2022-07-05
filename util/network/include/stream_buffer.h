@@ -17,6 +17,7 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
 
 #include "nocopyable.h"
 #include "securec.h"
@@ -31,14 +32,15 @@ namespace MMI {
 class StreamBuffer {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "StreamBuffer"};
 public:
-    StreamBuffer() {}
-    StreamBuffer(const StreamBuffer& buf);
-    virtual ~StreamBuffer() {}
+    StreamBuffer() = default;
+    virtual ~StreamBuffer() = default;
+    explicit StreamBuffer(const StreamBuffer& buf);
     virtual StreamBuffer& operator=(const StreamBuffer& other);
     DISALLOW_MOVE(StreamBuffer);
-
+    
+    void Reset();
     void Clean();
-    bool SetReadIdx(int32_t idx);
+    bool SeekReadPos(int32_t n);
 
     bool Read(std::string& buf);
     bool Write(const std::string& buf);
@@ -47,11 +49,12 @@ public:
     bool Write(const StreamBuffer& buf);
 
     bool Read(char *buf, size_t size);
-    bool Write(const char *buf, size_t size);
+    virtual bool Write(const char *buf, size_t size);
 
-    bool IsEmpty();
+    bool IsEmpty() const;
     size_t Size() const;
-    size_t UnreadSize() const;
+    int32_t UnreadSize() const;
+    int32_t GetAvailableBufSize() const;
 
     bool ChkRWError() const;
     const std::string& GetErrorStatusRemark() const;
@@ -61,6 +64,13 @@ public:
     bool Read(T& data);
     template<typename T>
     bool Write(const T& data);
+    template<typename T>
+    bool Read(std::vector<T> &data);
+    template<typename T>
+    bool Write(const std::vector<T> &data);
+
+    const char *ReadBuf() const;
+    const char *WriteBuf() const;
 
     template<typename T>
     StreamBuffer& operator >> (T& data);
@@ -68,8 +78,6 @@ public:
     StreamBuffer& operator << (const T& data);
 
 protected:
-    const char *ReadBuf() const;
-    const char *WriteBuf() const;
     bool Clone(const StreamBuffer& buf);
 
 protected:
@@ -82,9 +90,9 @@ protected:
     int32_t rCount_ = 0;
     int32_t wCount_ = 0;
 
-    int32_t rIdx_ = 0;
-    int32_t wIdx_ = 0;
-    char szBuff_[MAX_STREAM_BUF_SIZE] = {};
+    int32_t rPos_ = 0;
+    int32_t wPos_ = 0;
+    char szBuff_[MAX_STREAM_BUF_SIZE+1] = {};
 };
 
 template<typename T>
@@ -101,10 +109,54 @@ bool StreamBuffer::Read(T &data)
 template<typename T>
 bool StreamBuffer::Write(const T &data)
 {
-    if (!Write(reinterpret_cast<char *>(const_cast<T *>(&data)), sizeof(data))) {
+    if (!Write(reinterpret_cast<const char *>(&data), sizeof(data))) {
         MMI_HILOGE("[%{public}s] size:%{public}zu,count:%{public}d,errCode:%{public}d",
             GetErrorStatusRemark().c_str(), sizeof(data), wCount_ + 1, STREAM_BUF_WRITE_FAIL);
         return false;
+    }
+    return true;
+}
+
+template<typename T>
+bool StreamBuffer::Read(std::vector<T> &data)
+{
+    int32_t size = 0;
+    if (!Read(size)) {
+        MMI_HILOGE("vector read size error");
+        return false;
+    }
+    if (size < 0 || size > MAX_VECTOR_SIZE) {
+        MMI_HILOGE("vector read size:%{public}d error", size);
+        return false;
+    }
+    for (int32_t i = 0; i < size; i++) {
+        T val;
+        if (!Read(val)) {
+            MMI_HILOGE("vector read data error");
+            return false;
+        }
+        data.push_back(val);
+    }
+    return true;
+}
+
+template<typename T>
+bool StreamBuffer::Write(const std::vector<T> &data)
+{
+    if (data.size() > INT32_MAX) {
+        MMI_HILOGE("vector exceeds the max range");
+        return false;
+    }
+    int32_t size = static_cast<int32_t>(data.size());
+    if (!Write(size)) {
+        MMI_HILOGE("vector write size error");
+        return false;
+    }
+    for (const auto &item : data) {
+        if (!Write(item)) {
+            MMI_HILOGE("vector write data error");
+            return false;
+        }
     }
     return true;
 }

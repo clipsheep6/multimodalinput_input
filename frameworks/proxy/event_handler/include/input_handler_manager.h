@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,35 +33,49 @@ class InputHandlerManager : public Singleton<InputHandlerManager> {
 public:
     InputHandlerManager() = default;
     DISALLOW_COPY_AND_MOVE(InputHandlerManager);
-    int32_t AddHandler(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer);
+    int32_t AddHandler(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer,
+        HandleEventType eventType = HandleEventType::ALL);
     void RemoveHandler(int32_t handlerId, InputHandlerType handlerType);
     void MarkConsumed(int32_t monitorId, int32_t eventId);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEvent> keyEvent);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void OnInputEvent(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent);
+#endif
+#if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     void OnConnected();
-    void MoveMouse(int32_t offsetX, int32_t offsetY);
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
+
 private:
     struct Handler {
-        int32_t handlerId_ = 0;
-        InputHandlerType handlerType_ = NONE;
-        std::shared_ptr<IInputEventConsumer> consumer_ = nullptr;
-        EventHandlerPtr eventHandler_ = nullptr;
+        int32_t handlerId_ { 0 };
+        InputHandlerType handlerType_ { NONE };
+        HandleEventType eventType_ { HandleEventType::ALL };
+        std::shared_ptr<IInputEventConsumer> consumer_ { nullptr };
+        EventHandlerPtr eventHandler_ { nullptr };
     };
 
 private:
     int32_t GetNextId();
-    int32_t AddLocal(int32_t handlerId, InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> monitor);
-    void AddToServer(int32_t handlerId, InputHandlerType handlerType);
+    int32_t AddLocal(int32_t handlerId, InputHandlerType handlerType,
+        HandleEventType eventType, std::shared_ptr<IInputEventConsumer> monitor);
+    void AddToServer(int32_t handlerId, InputHandlerType handlerType,
+        HandleEventType eventType);
     int32_t RemoveLocal(int32_t handlerId, InputHandlerType handlerType);
     void RemoveFromServer(int32_t handlerId, InputHandlerType handlerType);
 
     std::shared_ptr<IInputEventConsumer> FindHandler(int32_t handlerId);
     EventHandlerPtr GetEventHandler(int32_t handlerId);
     bool PostTask(int32_t handlerId, const AppExecFwk::EventHandler::Callback &callback);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consumer, int32_t handlerId,
         std::shared_ptr<KeyEvent> keyEvent);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer, int32_t handlerId,
         std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 private:
     std::mutex mtxHandlers_;
@@ -70,4 +84,5 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
+#define InputHandlerMgr InputHandlerManager::GetInstance()
 #endif // INPUT_HANDLER_MANAGER_H

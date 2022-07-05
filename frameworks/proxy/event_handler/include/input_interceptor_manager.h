@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MULTIMDOALINPUT_INPUT_INTERCEPTOR_MANAGER_H
-#define OHOS_MULTIMDOALINPUT_INPUT_INTERCEPTOR_MANAGER_H
+#ifndef INPUT_INTERCEPTOR_MANAGER_H
+#define INPUT_INTERCEPTOR_MANAGER_H
 
 #include <memory>
 
@@ -26,23 +26,14 @@
 
 namespace OHOS {
 namespace MMI {
-class InputInterceptorManager {
+class InputInterceptorManager : public DelayedSingleton<InputInterceptorManager> {
 public:
-    InputInterceptorManager() = default;
+    InputInterceptorManager();
     DISALLOW_COPY_AND_MOVE(InputInterceptorManager);
-
-public:
-    int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor);
+    ~InputInterceptorManager() = default;
+    int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor, HandleEventType eventType);
     void RemoveInterceptor(int32_t interceptorId);
-
-public:
-    static bool IsValidInterceptorId(int32_t interceptorId);
 };
-
-inline bool InputInterceptorManager::IsValidInterceptorId(int32_t interceptorId)
-{
-    return IsValidHandlerId(interceptorId);
-}
 } // namespace MMI
 } // namespace OHOS
-#endif // OHOS_MULTIMDOALINPUT_INPUT_INTERCEPTOR_MANAGER_H
+#endif // INPUT_INTERCEPTOR_MANAGER_H

@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,27 +23,44 @@
 #include "singleton.h"
 
 #include "i_input_event_handler.h"
+#include "i_input_event_monitor_handler.h"
 #include "input_handler_type.h"
 #include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
-class InputHandlerManagerGlobal : public Singleton<InputHandlerManagerGlobal> {
+class InputHandlerManagerGlobal : public IInputEventHandler {
 public:
     InputHandlerManagerGlobal() = default;
     DISALLOW_COPY_AND_MOVE(InputHandlerManagerGlobal);
+    ~InputHandlerManagerGlobal() = default;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    void HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    void HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+#endif // OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    void HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+#endif // OHOS_BUILD_ENABLE_TOUCH
     int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     void MarkConsumed(int32_t handlerId, int32_t eventId, SessionPtr session);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH    
+    void Dump(int32_t fd, const std::vector<std::string> &args);
 
 private:
     void InitSessionLostCallback();
     void OnSessionLost(SessionPtr session);
 
 private:
-    struct SessionHandler {
+    class SessionHandler {
+    public:
         SessionHandler(int32_t id, InputHandlerType handlerType, SessionPtr session)
             : id_(id), handlerType_(handlerType), session_(session) { }
         void SendToClient(std::shared_ptr<KeyEvent> keyEvent) const;
@@ -63,19 +80,27 @@ private:
         SessionPtr session_ = nullptr;
     };
 
-    struct MonitorCollection : public IInputEventHandler, protected NoCopyable {
-        virtual int32_t GetPriority() const override;
+    class MonitorCollection : public IInputEventMonitorHandler, protected NoCopyable {
+    public:
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
         virtual bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent) override;
-        virtual bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent) override;
-
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+        virtual bool HandleEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
         int32_t AddMonitor(const SessionHandler& mon);
         void RemoveMonitor(const SessionHandler& mon);
         void MarkConsumed(int32_t monitorId, int32_t eventId, SessionPtr session);
 
         bool HasMonitor(int32_t monitorId, SessionPtr session);
+#ifdef OHOS_BUILD_ENABLE_TOUCH
         void UpdateConsumptionState(std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_TOUCH
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
         void Monitor(std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
         void OnSessionLost(SessionPtr session);
+        void Dump(int32_t fd, const std::vector<std::string> &args);
 
         std::set<SessionHandler> monitors_;
         std::shared_ptr<PointerEvent> lastPointerEvent_ = nullptr;
@@ -83,23 +108,9 @@ private:
         bool isMonitorConsumed_ { false };
     };
 
-    struct InterceptorCollection : public IInputEventHandler, protected NoCopyable {
-        virtual int32_t GetPriority() const override;
-        virtual bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent) override;
-        virtual bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent) override;
-
-        int32_t AddInterceptor(const SessionHandler& interceptor);
-        void RemoveInterceptor(const SessionHandler& interceptor);
-        void OnSessionLost(SessionPtr session);
-
-        std::mutex lockInterceptors_;
-        std::set<SessionHandler> interceptors_;
-    };
-
 private:
     bool sessionLostCallbackInitialized_ { false };
     MonitorCollection monitors_;
-    InterceptorCollection interceptors_;
 };
 } // namespace MMI
 } // namespace OHOS

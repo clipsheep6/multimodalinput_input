@@ -39,23 +39,16 @@ public:
     bool IsExist(int32_t timerId);
     int32_t CalcNextDelay();
     void ProcessTimers();
-        
-private:
-    static constexpr int32_t MIN_DELAY = 36;
-    static constexpr int32_t MIN_INTERVAL = 50;
-    static constexpr int32_t MAX_INTERVAL = 4096;
-    static constexpr int32_t MAX_TIMER_COUNT = 32;
-    static constexpr int32_t NONEXISTENT_ID = -1;
-    
+
 private:
     struct TimerItem {
-        int32_t id;
-        int32_t intervalMs;
-        int32_t repeatCount;
-        int32_t callbackCount;
-        int64_t nextCallTime;
+        int32_t id { 0 };
+        int32_t intervalMs  { 0 };
+        int32_t repeatCount  { 0 };
+        int32_t callbackCount  { 0 };
+        int64_t nextCallTime  { 0 };
         std::function<void()> callback;
-    };      
+    };
 private:
     int32_t TakeNextTimerId();
     int32_t AddTimerInternal(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback);
@@ -65,7 +58,7 @@ private:
     std::unique_ptr<TimerItem>& InsertTimerInternal(std::unique_ptr<TimerItem>& timer);
     int32_t CalcNextDelayInternal();
     void ProcessTimersInternal();
-       
+
 private:
         std::list<std::unique_ptr<TimerItem>> timers_;
 };

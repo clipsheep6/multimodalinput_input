@@ -64,9 +64,49 @@ std::shared_ptr<PointerEvent> TabletToolProcessor::OnEvent(struct libinput_event
     return pointerEvent_;
 }
 
+int32_t TabletToolProcessor::GetToolType(struct libinput_event_tablet_tool* tabletEvent)
+{
+    int32_t toolType = libinput_event_tablet_tool_get_tool_type(tabletEvent);
+    if (toolType != 0) {
+        return PointerEvent::TOOL_TYPE_PEN;
+    }
+    auto tool = libinput_event_tablet_tool_get_tool(tabletEvent);
+    CHKPR(tool, PointerEvent::TOOL_TYPE_PEN);
+    int32_t type = libinput_tablet_tool_get_type(tool);
+    switch (type) {
+        case LIBINPUT_TABLET_TOOL_TYPE_PEN: {
+            return PointerEvent::TOOL_TYPE_PEN;
+        }
+        case LIBINPUT_TABLET_TOOL_TYPE_ERASER: {
+            return PointerEvent::TOOL_TYPE_RUBBER;
+        }
+        case LIBINPUT_TABLET_TOOL_TYPE_BRUSH: {
+            return PointerEvent::TOOL_TYPE_BRUSH;
+        }
+        case LIBINPUT_TABLET_TOOL_TYPE_PENCIL: {
+            return PointerEvent::TOOL_TYPE_PENCIL;
+        }
+        case LIBINPUT_TABLET_TOOL_TYPE_AIRBRUSH: {
+            return PointerEvent::TOOL_TYPE_AIRBRUSH;
+        }
+        case LIBINPUT_TABLET_TOOL_TYPE_MOUSE: {
+            return PointerEvent::TOOL_TYPE_MOUSE;
+        }
+        case LIBINPUT_TABLET_TOOL_TYPE_LENS: {
+            return PointerEvent::TOOL_TYPE_LENS;
+        }
+        default: {
+            MMI_HILOGW("Invalid type");
+            return PointerEvent::TOOL_TYPE_PEN;
+        }
+    }
+}
+
 bool TabletToolProcessor::OnTip(struct libinput_event* event)
 {
+    CHKPF(event);
     auto tabletEvent = libinput_event_get_tablet_tool_event(event);
+    CHKPF(tabletEvent);
     auto tipState = libinput_event_tablet_tool_get_tip_state(tabletEvent);
     bool ret = false;
     switch (tipState) {
@@ -94,17 +134,19 @@ bool TabletToolProcessor::OnTip(struct libinput_event* event)
 
 bool TabletToolProcessor::OnTipDown(struct libinput_event_tablet_tool* event)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
+    CHKPF(event);
     int32_t targetDisplayId = -1;
     LogicalCoordinate tCoord;
     if (!WinMgr->CalculateTipPoint(event, targetDisplayId, tCoord)) {
         MMI_HILOGE("CalculateTipPoint failed");
         return false;
     }
-    auto tiltX = libinput_event_tablet_tool_get_tilt_x(event);
-    auto tiltY = libinput_event_tablet_tool_get_tilt_y(event);
-    auto pressure = libinput_event_tablet_tool_get_pressure(event);
-
+    double tiltX = libinput_event_tablet_tool_get_tilt_x(event);
+    double tiltY = libinput_event_tablet_tool_get_tilt_y(event);
+    double pressure = libinput_event_tablet_tool_get_pressure(event);
+    int32_t toolType = GetToolType(event);
+    
     int64_t time = GetSysClockTime();
     pointerEvent_->SetActionStartTime(time);
     pointerEvent_->SetTargetDisplayId(targetDisplayId);
@@ -124,6 +166,7 @@ bool TabletToolProcessor::OnTipDown(struct libinput_event_tablet_tool* event)
     item.SetTiltX(tiltX);
     item.SetTiltY(tiltY);
     item.SetPressure(pressure);
+    item.SetToolType(toolType);
 
     pointerEvent_->SetDeviceId(deviceId_);
     pointerEvent_->AddPointerItem(item);
@@ -133,8 +176,10 @@ bool TabletToolProcessor::OnTipDown(struct libinput_event_tablet_tool* event)
 
 bool TabletToolProcessor::OnTipMotion(struct libinput_event* event)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
+    CHKPF(event);
     auto tabletEvent = libinput_event_get_tablet_tool_event(event);
+    CHKPF(tabletEvent);
     int64_t time = GetSysClockTime();
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
@@ -145,9 +190,10 @@ bool TabletToolProcessor::OnTipMotion(struct libinput_event* event)
         MMI_HILOGE("CalculateTipPoint failed");
         return false;
     }
-    auto tiltX = libinput_event_tablet_tool_get_tilt_x(tabletEvent);
-    auto tiltY = libinput_event_tablet_tool_get_tilt_y(tabletEvent);
-    auto pressure = libinput_event_tablet_tool_get_pressure(tabletEvent);
+    double tiltX = libinput_event_tablet_tool_get_tilt_x(tabletEvent);
+    double tiltY = libinput_event_tablet_tool_get_tilt_y(tabletEvent);
+    double pressure = libinput_event_tablet_tool_get_pressure(tabletEvent);
+    int32_t toolType = GetToolType(tabletEvent);
 
     PointerEvent::PointerItem item;
     if (!pointerEvent_->GetPointerItem(DEFAULT_POINTER_ID, item)) {
@@ -161,6 +207,7 @@ bool TabletToolProcessor::OnTipMotion(struct libinput_event* event)
         item.SetDeviceId(deviceId_);
         item.SetDownTime(time);
         item.SetPressed(true);
+        item.SetToolType(toolType);
     }
     item.SetGlobalX(tCoord.x);
     item.SetGlobalY(tCoord.y);
@@ -171,9 +218,10 @@ bool TabletToolProcessor::OnTipMotion(struct libinput_event* event)
     return true;
 }
 
-bool TabletToolProcessor::OnTipUp(struct libinput_event_tablet_tool*)
+bool TabletToolProcessor::OnTipUp(struct libinput_event_tablet_tool* event)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
+    CHKPF(event);
     int64_t time = GetSysClockTime();
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
@@ -184,7 +232,6 @@ bool TabletToolProcessor::OnTipUp(struct libinput_event_tablet_tool*)
         return false;
     }
     item.SetPressed(false);
-    item.SetPressure(0);
     pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, item);
     return true;
 }

@@ -30,13 +30,16 @@ public:
     static napi_value Off(napi_env env, napi_callback_info info);
     static napi_value GetDeviceIds(napi_env env, napi_callback_info info);
     static napi_value GetDevice(napi_env env, napi_callback_info info);
-    static napi_value GetKeystrokeAbility(napi_env env, napi_callback_info info);
+    static napi_value SupportKeys(napi_env env, napi_callback_info info);
+    static napi_value GetKeyboardType(napi_env env, napi_callback_info info);
     std::shared_ptr<JsInputDeviceManager> GetJsInputDeviceMgr() const;
 
 private:
     static napi_value CreateInstance(napi_env env);
     static JsInputDeviceContext* GetInstance(napi_env env);
     static napi_value JsConstructor(napi_env env, napi_callback_info info);
+    static napi_value EnumClassConstructor(napi_env env, napi_callback_info info);
+    static napi_value CreateEnumKeyboardType(napi_env env, napi_value exports);
     std::shared_ptr<JsInputDeviceManager> mgr_ {nullptr};
     std::mutex mtx_;
     napi_ref contextRef_ {nullptr};

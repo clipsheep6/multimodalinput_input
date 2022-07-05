@@ -31,6 +31,18 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InjectionEventDispatch" };
+constexpr uint32_t SEND_EVENT_ARGV_COUNTS = 5;
+constexpr uint32_t SEND_EVENT_DEV_NODE_INDEX = 1;
+constexpr uint32_t SEND_EVENT_TYPE_INDEX = 2;
+constexpr uint32_t SEND_EVENT_CODE_INDEX = 3;
+constexpr uint32_t SEND_EVENT_VALUE_INDEX = 4;
+constexpr int32_t ARGVS_TARGET_INDEX = 1;
+constexpr int32_t ARGVS_CODE_INDEX = 2;
+constexpr int32_t JSON_FILE_PATH_INDEX = 1;
+constexpr uint32_t INPUT_TYPE_LENGTH = 3;
+constexpr uint16_t INPUT_TYPE_MAX = 100;
+constexpr uint32_t INPUT_CODE_LENGTH = 6;
+constexpr uint32_t INPUT_VALUE_LENGTH = 11;
 } // namespace
 
 void InjectionEventDispatch::Init()
@@ -47,111 +59,22 @@ void InjectionEventDispatch::InitManageFunction()
     };
 
     for (auto &it : funs) {
-        if (!RegistInjectEvent(it)) {
+        if (!RegisterInjectEvent(it)) {
             MMI_HILOGW("Failed to register event errCode:%{public}d", EVENT_REG_FAIL);
             continue;
         }
     }
 }
 
-bool InjectionEventDispatch::IsFileExists(const std::string& fileName)
-{
-    if ((access(fileName.c_str(), F_OK)) == 0) {
-        return true;
-    }
-    return false;
-}
-
-int32_t InjectionEventDispatch::VerifyFile(const std::string& fileName)
-{
-    std::string findcmd = "find /data -name " + fileName;
-    FILE* findJson = popen(findcmd.c_str(), "r");
-    if (!findJson) {
-        return RET_ERR;
-    }
-    return RET_OK;
-}
-
-std::string InjectionEventDispatch::GetFileExtendName(const std::string& fileName)
-{
-    if (fileName.empty()) {
-        return "";
-    }
-    size_t nPos = fileName.find_last_of('.');
-    if (fileName.npos == nPos) {
-        return fileName;
-    }
-    return fileName.substr(nPos + 1, fileName.npos);
-}
-
-int32_t InjectionEventDispatch::GetFileSize(const std::string& fileName)
-{
-    char realPath[PATH_MAX] = {};
-    if (realpath(fileName.c_str(), realPath) == nullptr) {
-        MMI_HILOGE("path is error, path:%{public}s", fileName.c_str());
-        return RET_ERR;
-    }
-    FILE* pFile = fopen(realPath, "rb");
-    if (pFile) {
-        fseek(pFile, 0, SEEK_END);
-        long fileSize = ftell(pFile);
-        if (fileSize > INT32_MAX) {
-            MMI_HILOGE("The file is too large for 32-bit systems, filesize:%{public}ld", fileSize);
-            fclose(pFile);
-            return RET_ERR;
-        }
-        fclose(pFile);
-        return fileSize;
-    }
-    return RET_ERR;
-}
-
-bool InjectionEventDispatch::ReadFile(const std::string &jsonFile, std::string& jsonBuf)
-{
-    FILE* fp = fopen(jsonFile.c_str(), "r");
-    CHKPF(fp);
-    char buf[256] = {};
-    while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf += buf;
-    }
-    if (fclose(fp) < 0) {
-        MMI_HILOGW("close file failed");
-    }
-    return true;
-}
-
 int32_t InjectionEventDispatch::OnJson()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (injectArgvs_.size() < ARGVS_CODE_INDEX) {
         MMI_HILOGE("path is error");
         return RET_ERR;
     }
-    const std::string jsonFile = injectArgvs_.at(JSON_FILE_PATH_INDEX);
-    char Path[PATH_MAX] = {};
-    if (realpath(jsonFile.c_str(), Path) == nullptr) {
-        MMI_HILOGE("json path is error, jsonFile:%{public}s", jsonFile.c_str());
-        return RET_ERR;
-    }
-    if (!(IsFileExists(jsonFile))) {
-        MMI_HILOGE("This file does not exist, jsonFile:%{public}s", jsonFile.c_str());
-        return RET_ERR;
-    }
-    if (VerifyFile(jsonFile)) {
-        MMI_HILOGE("This file is not in data, jsonFile:%{public}s", jsonFile.c_str());
-        return RET_ERR;
-    }
-    if (GetFileExtendName(jsonFile) != "json") {
-        MMI_HILOGE("Unable to parse files other than json format jsonFile:%{public}s", jsonFile.c_str());
-        return RET_ERR;
-    }
-    int32_t fileSize = GetFileSize(jsonFile);
-    if ((fileSize <= 0) || (fileSize > JSON_FILE_SIZE)) {
-        MMI_HILOGE("The file size is out of range 2M or empty. filesize:%{public}d", fileSize);
-        return RET_ERR;
-    }
-    std::string jsonBuf;
-    if (!ReadFile(jsonFile, jsonBuf)) {
+    std::string jsonBuf = ReadJsonFile(injectArgvs_.at(JSON_FILE_PATH_INDEX));
+    if (jsonBuf.empty()) {
         MMI_HILOGE("read file failed");
         return RET_ERR;
     }
@@ -161,8 +84,7 @@ int32_t InjectionEventDispatch::OnJson()
             logStatus = true;
         }
     }
-    InputParse InputParse;
-    return manageInjectDevice_.TransformJsonData(InputParse.DataInit(jsonBuf, logStatus));
+    return manageInjectDevice_.TransformJsonData(DataInit(jsonBuf, logStatus));
 }
 
 std::string InjectionEventDispatch::GetFunId() const
@@ -170,11 +92,11 @@ std::string InjectionEventDispatch::GetFunId() const
     return funId_;
 }
 
-bool InjectionEventDispatch::VirifyArgvs(const int32_t &argc, const std::vector<std::string> &argv)
+bool InjectionEventDispatch::VerifyArgvs(const int32_t &argc, const std::vector<std::string> &argv)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (argc < ARGV_VALID || argv.at(ARGVS_TARGET_INDEX).empty()) {
-        MMI_HILOGE("Invaild Input Para, Plase Check the validity of the para. errCode:%{public}d", PARAM_INPUT_FAIL);
+        MMI_HILOGE("Invalid Input Para, Please Check the validity of the para. errCode:%{public}d", PARAM_INPUT_FAIL);
         return false;
     }
 
@@ -200,11 +122,10 @@ bool InjectionEventDispatch::VirifyArgvs(const int32_t &argc, const std::vector<
 
 void InjectionEventDispatch::Run()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::string id = GetFunId();
     auto fun = GetFun(id);
     CHKPV(fun);
-
     auto ret = (*fun)();
     if (ret == RET_OK) {
         MMI_HILOGI("inject function success id:%{public}s", id.c_str());
@@ -240,14 +161,13 @@ int32_t InjectionEventDispatch::OnHelp()
     InjectionToolsHelpFunc helpFunc;
     std::string ret = helpFunc.GetHelpText();
     MMI_HILOGI("%{public}s", ret.c_str());
-
     return RET_OK;
 }
 
 int32_t InjectionEventDispatch::GetDeviceIndex(const std::string& deviceNameText) const
 {
     if (deviceNameText.empty()) {
-        MMI_HILOGE("Get device index failed");
+        MMI_HILOGE("deviceNameText is empty");
         return RET_ERR;
     }
     for (const auto &item : allDevices_) {
@@ -360,7 +280,7 @@ int32_t InjectionEventDispatch::OnSendEvent()
     event.value = static_cast<int32_t>(std::stoi(injectArgvs_[SEND_EVENT_VALUE_INDEX]));
     int32_t ret = write(fd, &event, sizeof(event));
     if (ret != sizeof(event)) {
-        MMI_HILOGE("send event to device node faild.");
+        MMI_HILOGE("send event to device node failed.");
         return RET_ERR;
     }
     if (fd >= 0) {

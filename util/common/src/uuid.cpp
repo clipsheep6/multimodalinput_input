@@ -22,9 +22,34 @@
 
 #include <sys/time.h>
 
-
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr int32_t UUID_TIME_LOW_FIRST_BYTE = 0;
+constexpr int32_t UUID_TIME_LOW_SECOND_BYTE = 1;
+constexpr int32_t UUID_TIME_LOW_THIRD_BYTE = 2;
+constexpr int32_t UUID_TIME_LOW_FOURTH_BYTE = 3;
+constexpr int32_t UUID_TIME_MID_FIRST_BYTE = 4;
+constexpr int32_t UUID_TIME_MID_SECOND_BYTE = 5;
+constexpr int32_t UUID_VERSION = 6;
+constexpr int32_t UUID_TIME_HIGH = 7;
+constexpr int32_t UUID_VARIANT = 8;
+constexpr int32_t UUID_CLOCK_SEQ = 9;
+constexpr int32_t UUID_NODE_FIRST_BYTE = 10;
+constexpr int32_t UUID_NODE_THIRD_BYTE = 12;
+constexpr int32_t UUID_NODE_FOURTH_BYTE = 13;
+constexpr int32_t UUID_NODE_FIFTH_BYTE = 14;
+constexpr int32_t UUID_NODE_SIXTH_BYTE = 15;
+
+constexpr int32_t BASE_BIT_OPT_SIZE = 8;
+constexpr int32_t BIT_OPT_TWO_BYTE = 2;
+constexpr int32_t BIT_OPT_THREE_BYTE = 3;
+constexpr int32_t BIT_OPT_FOUR_BYTE = 4;
+constexpr int32_t BIT_OPT_FIVE_BYTE = 5;
+constexpr int32_t BIT_OPT_SIX_BYTE = 6;
+constexpr int32_t BIT_OPT_SEVEN_BYTE = 7;
+} // namespace
+
 Uuid::Uuid()
 {
     struct timeval tv;
@@ -58,7 +83,7 @@ Uuid::Uuid()
     // 4 - 6
     uuid_[UUID_VERSION] =
         static_cast<uint8_t>((static_cast<uint32_t>(randomTime.tm_sec) + randNum) & 0xFF);
-    uuid_[UUID_TIME_MID_SECEND_BYTE] =
+    uuid_[UUID_TIME_MID_SECOND_BYTE] =
         static_cast<uint8_t>((static_cast<uint32_t>(randomTime.tm_min) + (randNum >> BASE_BIT_OPT_SIZE)) & 0xFF);
     uuid_[UUID_TIME_MID_FIRST_BYTE] = static_cast<uint8_t>((static_cast<uint32_t>(randomTime.tm_hour) +
                                       (randNum >> BIT_OPT_TWO_BYTE * BASE_BIT_OPT_SIZE)) & 0xFF);
@@ -67,7 +92,7 @@ Uuid::Uuid()
                                        (randNum >> BIT_OPT_THREE_BYTE * BASE_BIT_OPT_SIZE)) & 0xFF);
     uuid_[UUID_TIME_LOW_THIRD_BYTE] =
         static_cast<uint8_t>(static_cast<uint32_t>(randomTime.tm_mon) & 0xFF);
-    uuid_[UUID_TIME_LOW_SECEND_BYTE] =
+    uuid_[UUID_TIME_LOW_SECOND_BYTE] =
         static_cast<uint8_t>(static_cast<uint32_t>(randomTime.tm_year) & 0xFF);
     uuid_[UUID_TIME_LOW_FIRST_BYTE] =
         static_cast<uint8_t>((static_cast<uint32_t>(randomTime.tm_year) & 0xFF00) >> BASE_BIT_OPT_SIZE);
@@ -86,7 +111,7 @@ char ConvertToHex(uint8_t c)
 
 void Uuid::ConvertToStdString(std::string& s) const
 {
-    constexpr int32_t uuidBufMaxSize = 37;
+    static constexpr int32_t uuidBufMaxSize = 37;
     char uuidBuf[uuidBufMaxSize + 1] = {0};
     int32_t writePos = 0;
     for (size_t i = 0; i < UUID128_BYTES_TYPE; i++) {

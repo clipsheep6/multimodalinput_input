@@ -25,6 +25,7 @@
 
 #include "input_event_data_transformation.h"
 #include "multimodal_event_handler.h"
+#include "multimodal_input_connect_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -40,85 +41,46 @@ StandardizedEventManager::~StandardizedEventManager() {}
 
 void StandardizedEventManager::SetClientHandle(MMIClientPtr client)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     client_ = client;
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t StandardizedEventManager::SubscribeKeyEvent(
     const KeyEventInputSubscribeManager::SubscribeKeyEventInfo &subscribeInfo)
 {
-    CALL_LOG_ENTER;
-    NetPacket pkt(MmiMessageId::SUBSCRIBE_KEY_EVENT);
-    std::shared_ptr<KeyOption> keyOption = subscribeInfo.GetKeyOption();
-    uint32_t preKeySize = keyOption->GetPreKeys().size();
-    pkt << subscribeInfo.GetSubscribeId() << keyOption->GetFinalKey() << keyOption->IsFinalKeyDown()
-    << keyOption->GetFinalKeyDownDuration() << preKeySize;
-
-    std::set<int32_t> preKeys = keyOption->GetPreKeys();
-    for (const auto &item : preKeys) {
-        pkt << item;
-    }
-    if (!SendMsg(pkt)) {
-        MMI_HILOGE("Client failed to send message");
-        return RET_ERR;
-    }
-    return RET_OK;
+    CALL_DEBUG_ENTER;
+    return MultimodalInputConnMgr->SubscribeKeyEvent(subscribeInfo.GetSubscribeId(), subscribeInfo.GetKeyOption());
 }
 
-int32_t StandardizedEventManager::UnSubscribeKeyEvent(int32_t subscribeId)
+int32_t StandardizedEventManager::UnsubscribeKeyEvent(int32_t subscribeId)
 {
-    CALL_LOG_ENTER;
-    NetPacket pkt(MmiMessageId::UNSUBSCRIBE_KEY_EVENT);
-    pkt << subscribeId;
-    if (!SendMsg(pkt)) {
-        MMI_HILOGE("Client failed to send message");
-        return RET_ERR;
-    }
-    return RET_OK;
+    CALL_DEBUG_ENTER;
+    return MultimodalInputConnMgr->UnsubscribeKeyEvent(subscribeId);
 }
 
-int32_t StandardizedEventManager::InjectionVirtual(bool isPressed, int32_t keyCode,
-    int64_t keyDownDuration, int32_t maxKeyCode)
+int32_t StandardizedEventManager::InjectEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_LOG_ENTER;
-    VirtualKey virtualEvent;
-    virtualEvent.isPressed = isPressed;
-    virtualEvent.keyCode = keyCode;
-    virtualEvent.keyDownDuration = keyDownDuration;
-    NetPacket pkt(MmiMessageId::ON_VIRTUAL_KEY);
-    pkt << virtualEvent;
-    if (!SendMsg(pkt)) {
-        MMI_HILOGE("Send virtual event Msg error");
+    CALL_DEBUG_ENTER;
+    CHKPR(keyEvent, RET_ERR);
+    keyEvent->UpdateId();
+    if (keyEvent->GetKeyCode() < 0) {
+        MMI_HILOGE("keyCode is invalid:%{public}u", keyEvent->GetKeyCode());
+        return RET_ERR;
+    }
+    int32_t ret = MultimodalInputConnMgr->InjectKeyEvent(keyEvent);
+    if (ret != 0) {
+        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
-int32_t StandardizedEventManager::InjectEvent(const std::shared_ptr<KeyEvent> key)
-{
-    CALL_LOG_ENTER;
-    CHKPR(key, RET_ERR);
-    key->UpdateId();
-    if (key->GetKeyCode() < 0) {
-        MMI_HILOGE("keyCode is invalid:%{public}u", key->GetKeyCode());
-        return RET_ERR;
-    }
-    NetPacket pkt(MmiMessageId::INJECT_KEY_EVENT);
-    int32_t errCode = InputEventDataTransformation::KeyEventToNetPacket(key, pkt);
-    if (errCode != RET_OK) {
-        MMI_HILOGE("Serialization is Failed, errCode:%{public}u", errCode);
-        return RET_ERR;
-    }
-    if (!SendMsg(pkt)) {
-        MMI_HILOGE("Send inject event Msg error");
-        return RET_ERR;
-    }
-    return RET_OK;
-}
-
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t StandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     MMI_HILOGD("Inject pointer event:");
     std::stringstream sStream;
@@ -127,22 +89,36 @@ int32_t StandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEven
     while (std::getline(sStream, sLine)) {
         MMI_HILOGD("%{public}s", sLine.c_str());
     }
-    NetPacket pkt(MmiMessageId::INJECT_POINTER_EVENT);
-    if (InputEventDataTransformation::Marshalling(pointerEvent, pkt) != RET_OK) {
-        MMI_HILOGE("Marshalling pointer event failed");
-        return RET_ERR;
-    }
-    if (!SendMsg(pkt)) {
-        MMI_HILOGE("SendMsg failed");
+    int32_t ret = MultimodalInputConnMgr->InjectPointerEvent(pointerEvent);
+    if (ret != 0) {
+        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+int32_t StandardizedEventManager::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = MultimodalInputConnMgr->MoveMouseEvent(offsetX, offsetY);
+    if (ret != 0) {
+        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 int32_t StandardizedEventManager::GetDeviceIds(int32_t userData)
 {
     NetPacket pkt(MmiMessageId::INPUT_DEVICE_IDS);
     pkt << userData;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write userData failed");
+        return RET_ERR;
+    }
     return SendMsg(pkt);
 }
 
@@ -150,16 +126,31 @@ int32_t StandardizedEventManager::GetDevice(int32_t userData, int32_t deviceId)
 {
     NetPacket pkt(MmiMessageId::INPUT_DEVICE);
     pkt << userData << deviceId;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write userData failed");
+        return RET_ERR;
+    }
     return SendMsg(pkt);
 }
 
-int32_t StandardizedEventManager::GetKeystrokeAbility(int32_t userData, int32_t deviceId, std::vector<int32_t> keyCodes)
+int32_t StandardizedEventManager::SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> keyCodes)
 {
     NetPacket pkt(MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY);
-    size_t size = keyCodes.size();
-    pkt << userData << deviceId << size;
-    for (auto item : keyCodes) {
-        pkt << item;
+    pkt << userData << deviceId << keyCodes;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write keyCodes failed");
+        return RET_ERR;
+    }
+    return SendMsg(pkt);
+}
+
+int32_t StandardizedEventManager::GetKeyboardType(int32_t userData, int32_t deviceId) const
+{
+    NetPacket pkt(MmiMessageId::INPUT_DEVICE_KEYBOARD_TYPE);
+    pkt << userData << deviceId;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write userData failed");
+        return PACKET_WRITE_FAIL;
     }
     return SendMsg(pkt);
 }

@@ -30,6 +30,21 @@ using namespace OHOS::MMI;
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "HdiInject" };
+constexpr int32_t HDF_MOUSE_DEV_TYPE = 5;
+constexpr int32_t HDF_KEYBOARD_DEV_TYPE = 3;
+constexpr int32_t HDF_TOUCH_DEV_TYPE = 17;
+constexpr int32_t HDF_TABLET_DEV_TYPE = 33;
+constexpr int32_t HDF_TABLET_PAD_DEV_TYPE = 289;
+constexpr int32_t HDF_SWITH_PAD_DEV_TYPE = 2089;
+constexpr int32_t HDF_TOUCH_FINGER_DEV_TYPE = 2089;
+constexpr int32_t HDF_SWITCH_DEV_TYPE = 7;
+constexpr int32_t HDF_TRACK_PAD_DEV_TYPE = 7;
+constexpr int32_t HDF_JOYSTICK_DEV_TYPE = 65;
+constexpr int32_t HDF_GAMEPAD_DEV_TYPE = 65;
+constexpr int32_t HDF_TOUCH_PAD_DEV_TYPE = 5;
+constexpr int32_t HDF_TRACK_BALL_DEV_TYPE = 3;
+constexpr int32_t HDF_DEVICE_FD_DEFAULT_STATUS = -1;
+constexpr int32_t EVENT_PACKAGE_ARROW_SIZE = 1;
 } // namespace
 
 bool HdiInject::Init(UDSServer &sess)
@@ -48,32 +63,44 @@ int32_t HdiInject::ManageHdfInject(const SessionPtr sess, NetPacket &pkt)
     uint32_t devSatatus = 0;
     RawInputEvent speechEvent = {};
     switch (sendType) {
-        case GET_STATUS_INFO:
+        case GET_STATUS_INFO: {
             OnInitHdiServerStatus();
-            break;
-        case SET_EVENT_INJECT:
+            return RET_OK;
+        }
+        case SET_EVENT_INJECT: {
             pkt >> devIndex >> speechEvent;
+            if (pkt.ChkRWError()) {
+                MMI_HILOGE("Packet read recv massage failed");
+                return RET_ERR;
+            }
             MMI_HILOGI("hdi server recv massage: devIndex:%{public}d", devIndex);
             OnSetEventInject(speechEvent, devIndex);
-            break;
-        case SHOW_DEVICE_INFO:
+            return RET_OK;
+        }
+        case SHOW_DEVICE_INFO: {
             ShowAllDeviceInfo();
-            break;
-        case SET_HOT_PLUGS:
+            return RET_OK;
+        }
+        case SET_HOT_PLUGS: {
             pkt >> devIndex >> devSatatus;
+            if (pkt.ChkRWError()) {
+                MMI_HILOGE("Packet read tool hot data failed");
+                return RET_ERR;
+            }
             MMI_HILOGI("recv inject tool hot data, devIndex:%{public}d,status:%{public}d", devIndex, devSatatus);
             OnSetHotPlugs(devIndex, devSatatus);
-            break;
-        default:
+            return RET_OK;
+        }
+        default: {
             MMI_HILOGE("The message type:%{public}d cannot be processed", sendType);
             return RET_ERR;
+        }
     }
-    return RET_OK;
 }
 
 int32_t HdiInject::OnSetEventInject(const RawInputEvent& allEvent, int32_t devIndex)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     EventPackage* pack[EVENT_PACKAGE_ARROW_SIZE];
     pack[0] = (EventPackage*)malloc(sizeof(EventPackage));
     pack[0]->type = static_cast<int32_t>(allEvent.ev_type);
@@ -88,7 +115,7 @@ int32_t HdiInject::OnSetEventInject(const RawInputEvent& allEvent, int32_t devIn
 void HdiInject::OnSetHotPlugs(uint32_t devIndex, uint32_t devSatatus)
 {
     if (!(ReportHotPlugEvent(devIndex, devSatatus))) {
-        MMI_HILOGE("ReportHotPlugEvent faild");
+        MMI_HILOGE("ReportHotPlugEvent failed");
         return;
     }
     MMI_HILOGI("ReportHotPlugEvent success");

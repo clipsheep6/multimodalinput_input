@@ -24,8 +24,8 @@ namespace MMI {
 class ProcessingKeyboardDevice : public DeviceBase {
     struct KeyBoardEvent {
         std::string eventType;
-        int32_t keyValue;
-        int64_t blockTime;
+        int32_t keyValue { 0 };
+        int64_t blockTime { 0 };
     };
 public:
     ProcessingKeyboardDevice() = default;
@@ -35,15 +35,11 @@ public:
 private:
     int32_t AnalysisKeyBoardEvent(const std::vector<DeviceEvent>& inputData, std::vector<KeyBoardEvent>& keyBoardEvent);
     void TransformKeyBoardEventToInputEvent(const std::vector<KeyBoardEvent>& keyBoardEventArray,
-                                            InputEventArray& inputEventArray);
+        InputEventArray& inputEventArray);
     void TransformKeyPressEvent(const KeyBoardEvent& keyBoardEvent, InputEventArray& inputEventArray);
     void TransformKeyLongPressEvent(const KeyBoardEvent& keyBoardEvent, InputEventArray& inputEventArray);
     void TransformKeyReleaseEvent(const KeyBoardEvent& keyBoardEvent, InputEventArray& inputEventArray);
     void TransformKeyClickEvent(const KeyBoardEvent& keyBoardEvent, InputEventArray& inputEventArray);
-private:
-    static constexpr int32_t EV_ABS_MISC_DEFAULT_VALUE = 15;
-    static constexpr int32_t EVENT_REPROT_COUNTS = 50;
-    static constexpr int64_t EVENT_REPROT_TIMES = 20;
 };
 } // namespace MMI
 } // namespace OHOS

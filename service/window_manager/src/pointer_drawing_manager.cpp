@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -40,14 +40,15 @@ namespace OHOS {
 namespace MMI {
 void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     MMI_HILOGD("display:%{public}d,globalX:%{public}d,globalY:%{public}d", displayId, globalX, globalY);
     FixCursorPosition(globalX, globalY);
     lastGlobalX_ = globalX;
     lastGlobalY_ = globalY;
     if (pointerWindow_ != nullptr) {
-        pointerWindow_->MoveTo(globalX, globalY);
-        pointerWindow_->Show();
+        if (IsPointerVisible()) {
+            pointerWindow_->MoveTo(globalX, globalY);
+        }
         MMI_HILOGD("leave, display:%{public}d,globalX:%{public}d,globalY:%{public}d", displayId, globalX, globalY);
         return;
     }
@@ -56,7 +57,7 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int3
     CHKPV(pointerWindow_);
     sptr<OHOS::Surface> layer = GetLayer();
     if (layer == nullptr) {
-        MMI_HILOGE("draw pointer is faild, get layer is nullptr");
+        MMI_HILOGE("draw pointer is failed, get layer is nullptr");
         pointerWindow_->Destroy();
         pointerWindow_ = nullptr;
         return;
@@ -64,7 +65,7 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int3
 
     sptr<OHOS::SurfaceBuffer> buffer = GetSurfaceBuffer(layer);
     if (buffer == nullptr || buffer->GetVirAddr() == nullptr) {
-        MMI_HILOGE("draw pointer is faild, buffer or virAddr is nullptr");
+        MMI_HILOGE("draw pointer is failed, buffer or virAddr is nullptr");
         pointerWindow_->Destroy();
         pointerWindow_ = nullptr;
         return;
@@ -80,7 +81,9 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int3
     };
     OHOS::SurfaceError ret = layer->FlushBuffer(buffer, -1, flushConfig);
     MMI_HILOGD("draw pointer FlushBuffer ret:%{public}s", SurfaceErrorStr(ret).c_str());
-    pointerWindow_->Show();
+    if (IsPointerVisible()) {
+        pointerWindow_->Show();
+    }
     MMI_HILOGD("display:%{public}d,globalX:%{public}d,globalY:%{public}d", displayId, globalX, globalY);
 }
 
@@ -127,7 +130,7 @@ sptr<OHOS::Surface> PointerDrawingManager::GetLayer()
 {
     std::shared_ptr<OHOS::Rosen::RSSurfaceNode> surfaceNode = pointerWindow_->GetSurfaceNode();
     if (surfaceNode == nullptr) {
-        MMI_HILOGE("draw pointer is faild, get node is nullptr");
+        MMI_HILOGE("draw pointer is failed, get node is nullptr");
         pointerWindow_->Destroy();
         pointerWindow_ = nullptr;
         return nullptr;
@@ -157,16 +160,16 @@ sptr<OHOS::SurfaceBuffer> PointerDrawingManager::GetSurfaceBuffer(sptr<OHOS::Sur
 
 void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t height)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     OHOS::Rosen::Drawing::Bitmap bitmap;
     OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
-        OHOS::Rosen::Drawing::ALPHATYPE_OPAQUYE };
+        OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE };
     bitmap.Build(width, height, format);
     OHOS::Rosen::Drawing::Canvas canvas;
     canvas.Bind(bitmap);
     canvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
     DrawPixelmap(canvas);
-    constexpr uint32_t stride = 4;
+    static constexpr uint32_t stride = 4;
     uint32_t addrSize = width * height * stride;
     errno_t ret = memcpy_s(addr, addrSize, bitmap.GetPixels(), addrSize);
     if (ret != EOK) {
@@ -177,7 +180,7 @@ void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t heigh
 
 void PointerDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::unique_ptr<OHOS::Media::PixelMap> pixelmap = DecodeImageToPixelMap(IMAGE_POINTER_JPEG_PATH);
     CHKPV(pixelmap);
     OHOS::Rosen::Drawing::Pen pen;
@@ -210,7 +213,7 @@ std::unique_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixel
 
 void PointerDrawingManager::OnDisplayInfo(int32_t displayId, int32_t width, int32_t height) 
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     hasDisplay_ = true;
     displayId_ = displayId;
     displayWidth_ = width;
@@ -220,7 +223,7 @@ void PointerDrawingManager::OnDisplayInfo(int32_t displayId, int32_t width, int3
 
 void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     hasPointerDevice_ = hasPointerDevice;
     DrawManager();
 }
@@ -246,8 +249,9 @@ void PointerDrawingManager::DrawManager()
 
 bool PointerDrawingManager::Init()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     InputDevMgr->Attach(shared_from_this());
+    pidInfos_.clear();
     return true;
 }
 
@@ -257,6 +261,68 @@ std::shared_ptr<IPointerDrawingManager> IPointerDrawingManager::GetInstance()
         iPointDrawMgr_ = std::make_shared<PointerDrawingManager>();
     }
     return iPointDrawMgr_;
+}
+
+void PointerDrawingManager::DeletePidInfo(int32_t pid)
+{
+    CALL_DEBUG_ENTER;
+    for (auto it = pidInfos_.begin(); it != pidInfos_.end(); ++it) {
+        if (it->pid == pid) {
+            pidInfos_.erase(it);
+            return;
+        }
+    }
+}
+
+void PointerDrawingManager::UpdatePidInfo(int32_t pid, bool visible)
+{
+    CALL_DEBUG_ENTER;
+    for (auto it = pidInfos_.begin(); it != pidInfos_.end(); ++it) {
+        if (it->pid == pid) {
+            pidInfos_.erase(it);
+            break;
+        }
+    }
+    PidInfo info = { .pid = pid, .visible = visible };
+    pidInfos_.push_back(info);
+}
+
+void PointerDrawingManager::UpdatePointerVisible()
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(pointerWindow_);
+    if (IsPointerVisible()) {
+        pointerWindow_->Show();
+    } else {
+        pointerWindow_->Hide();
+    }
+}
+
+bool PointerDrawingManager::IsPointerVisible()
+{
+    CALL_DEBUG_ENTER;
+    if (pidInfos_.empty()) {
+        MMI_HILOGD("visible property is true");
+        return true;
+    }
+    auto info = pidInfos_.back();
+    MMI_HILOGD("visible property:%{public}zu.%{public}d-%{public}d", pidInfos_.size(), info.pid, info.visible);
+    return info.visible;
+}
+
+void PointerDrawingManager::DeletePointerVisible(int32_t pid)
+{
+    CALL_DEBUG_ENTER;
+    DeletePidInfo(pid);
+    UpdatePointerVisible();
+}
+
+int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
+{
+    CALL_DEBUG_ENTER;
+    UpdatePidInfo(pid, visible);
+    UpdatePointerVisible();
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

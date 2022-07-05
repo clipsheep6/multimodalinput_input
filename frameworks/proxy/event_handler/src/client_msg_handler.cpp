@@ -20,16 +20,18 @@
 #include <sstream>
 
 #include "bytrace_adapter.h"
+#include "define_interceptor_manager.h"
 #include "input_device_impl.h"
 #include "input_event_data_transformation.h"
-#include "input_event_monitor_manager.h"
 #include "input_handler_manager.h"
 #include "input_manager_impl.h"
+#ifdef OHOS_BUILD_ENABLE_MONITOR
 #include "input_monitor_manager.h"
-#include "interceptor_manager.h"
+#endif // OHOS_BUILD_ENABLE_MONITOR
 #include "mmi_client.h"
 #include "mmi_func_callback.h"
 #include "multimodal_event_handler.h"
+#include "multimodal_input_connect_manager.h"
 #include "proto.h"
 #include "time_cost_chk.h"
 #include "util.h"
@@ -53,21 +55,25 @@ ClientMsgHandler::~ClientMsgHandler()
 void ClientMsgHandler::Init()
 {
     MsgCallback funs[] = {
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
         {MmiMessageId::ON_KEYEVENT, MsgCallbackBind2(&ClientMsgHandler::OnKeyEvent, this)},
         {MmiMessageId::ON_SUBSCRIBE_KEY, std::bind(&ClientMsgHandler::OnSubscribeKeyEventCallback,
                                                    this, std::placeholders::_1, std::placeholders::_2)},
-        {MmiMessageId::ON_KEYMONITOR, MsgCallbackBind2(&ClientMsgHandler::OnKeyMonitor, this)},
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
         {MmiMessageId::ON_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::OnPointerEvent, this)},
-        {MmiMessageId::ON_TOUCHPAD_MONITOR, MsgCallbackBind2(&ClientMsgHandler::OnTouchPadMonitor, this)},
-        {MmiMessageId::GET_MMI_INFO_ACK, MsgCallbackBind2(&ClientMsgHandler::GetMultimodeInputInfo, this)},
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
         {MmiMessageId::INPUT_DEVICE, MsgCallbackBind2(&ClientMsgHandler::OnInputDevice, this)},
         {MmiMessageId::INPUT_DEVICE_IDS, MsgCallbackBind2(&ClientMsgHandler::OnInputDeviceIds, this)},
-        {MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY, MsgCallbackBind2(&ClientMsgHandler::OnKeyList, this)},
+        {MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY, MsgCallbackBind2(&ClientMsgHandler::OnSupportKeys, this)},
+        {MmiMessageId::INPUT_DEVICE_KEYBOARD_TYPE, MsgCallbackBind2(&ClientMsgHandler::OnInputKeyboardType, this)},
         {MmiMessageId::ADD_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ClientMsgHandler::OnDevMonitor, this)},
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
         {MmiMessageId::REPORT_KEY_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportKeyEvent, this)},
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
         {MmiMessageId::REPORT_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportPointerEvent, this)},
-        {MmiMessageId::TOUCHPAD_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::TouchpadEventInterceptor, this)},
-        {MmiMessageId::KEYBOARD_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::KeyEventInterceptor, this)},
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     };
     for (auto& it : funs) {
         if (!RegistrationEvent(it)) {
@@ -93,24 +99,7 @@ void ClientMsgHandler::OnMsgHandler(const UDSClient& client, NetPacket& pkt)
     }
 }
 
-int32_t ClientMsgHandler::OnKeyMonitor(const UDSClient& client, NetPacket& pkt)
-{
-    auto key = KeyEvent::Create();
-    CHKPR(key, ERROR_NULL_POINTER);
-    int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(pkt, key);
-    if (ret != RET_OK) {
-        MMI_HILOGE("read netPacket failed");
-        return RET_ERR;
-    }
-    int32_t pid;
-    pkt >> pid;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read pid failed");
-        return PACKET_READ_FAIL;
-    }
-    MMI_HILOGD("Client receive the msg from server, keyCode:%{public}d,pid:%{public}d", key->GetKeyCode(), pid);
-    return InputMonitorMgr.OnMonitorInputEvent(key);
-}
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 
 int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
 {
@@ -127,23 +116,20 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
         MMI_HILOGE("Packet read fd failed");
         return PACKET_READ_FAIL;
     }
-    MMI_HILOGD("key event dispatcher of client, KeyCode:%{public}d,"
-               "ActionTime:%{public}" PRId64 ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ","
-               "EventType:%{public}d,Flag:%{public}u,"
-               "KeyAction:%{public}d,eventNumber:%{public}d,Fd:%{public}d,",
-               key->GetKeyCode(), key->GetActionTime(), key->GetAction(),
-               key->GetActionStartTime(), key->GetEventType(),
-               key->GetFlag(), key->GetKeyAction(), key->GetId(), fd);
+    MMI_HILOGD("key event dispatcher of client, Fd:%{public}d", fd);
+    PrintEventData(key);
     BytraceAdapter::StartBytrace(key, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_DISPATCH_EVENT);
     key->SetProcessedCallback(eventProcessedCallback_);
     InputMgrImpl->OnKeyEvent(key);
     key->MarkProcessed();
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     auto pointerEvent = PointerEvent::Create();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (InputEventDataTransformation::Unmarshalling(pkt, pointerEvent) != ERR_OK) {
@@ -151,12 +137,7 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
         return RET_ERR;
     }
     MMI_HILOGD("Pointer event dispatcher of client:");
-    std::stringstream sStream;
-    sStream << *pointerEvent;
-    std::string sLine;
-    while (std::getline(sStream, sLine)) {
-        MMI_HILOGD("%{public}s", sLine.c_str());
-    }
+    PrintEventData(pointerEvent);
     if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
         MMI_HILOGD("Operation canceled.");
     }
@@ -165,7 +146,9 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     InputMgrImpl->OnPointerEvent(pointerEvent);
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, NetPacket &pkt)
 {
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
@@ -191,147 +174,113 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
     return KeyEventInputSubscribeMgr.OnSubscribeKeyEventCallback(keyEvent, subscribeId);
 }
-
-int32_t ClientMsgHandler::OnTouchPadMonitor(const UDSClient& client, NetPacket& pkt)
-{
-    auto pointer = PointerEvent::Create();
-    CHKPR(pointer, ERROR_NULL_POINTER);
-    int32_t ret = InputEventDataTransformation::Unmarshalling(pkt, pointer);
-    if (ret != RET_OK) {
-        MMI_HILOGE("read netPacket failed");
-        return RET_ERR;
-    }
-    int32_t pid = 0;
-    pkt >> pid;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read pid failed");
-        return PACKET_READ_FAIL;
-    }
-    MMI_HILOGD("client receive the msg from server: EventType:%{public}d,pid:%{public}d",
-        pointer->GetEventType(), pid);
-    return InputMonitorMgr.OnTouchpadMonitorInputEvent(pointer);
-}
-
-int32_t ClientMsgHandler::GetMultimodeInputInfo(const UDSClient& client, NetPacket& pkt)
-{
-    TagPackHead tagPackHeadAck;
-    pkt >> tagPackHeadAck;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read tagPackHeadAck failed");
-        return PACKET_READ_FAIL;
-    }
-    std::cout << "GetMultimodeInputInfo: The client fd is " << tagPackHeadAck.sizeEvent[0] << std::endl;
-    return RET_OK;
-}
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 int32_t ClientMsgHandler::OnInputDeviceIds(const UDSClient& client, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t userData;
-    int32_t size;
     std::vector<int32_t> inputDeviceIds;
-    if (!pkt.Read(userData)) {
-        MMI_HILOGE("Packet read userData failed");
+    pkt >> userData >> inputDeviceIds;
+    if (inputDeviceIds.size() > MAX_INPUT_DEVICE) {
+        MMI_HILOGE("Device exceeds the max range");
         return RET_ERR;
     }
-    if (!pkt.Read(size)) {
-        MMI_HILOGE("Packet read size failed");
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read device Data failed");
         return RET_ERR;
     }
-    for (int32_t i = 0; i < size; i++) {
-        int32_t deviceId = 0;
-        if (!pkt.Read(deviceId)) {
-            MMI_HILOGE("Packet read device failed");
-            return RET_ERR;
-        }
-        inputDeviceIds.push_back(deviceId);
-    }
-    InputDevImp.OnInputDeviceIds(userData, inputDeviceIds);
+    InputDevImpl.OnInputDeviceIds(userData, inputDeviceIds);
     return RET_OK;
 }
 
 int32_t ClientMsgHandler::OnInputDevice(const UDSClient& client, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t userData;
-    int32_t id;
-    std::string name;
-    int32_t deviceType;
-    if (!pkt.Read(userData)) {
-        MMI_HILOGE("Packet read userData failed");
-        return RET_ERR;
+    size_t size;
+    auto devData = std::make_shared<InputDeviceImpl::InputDeviceInfo>();
+    pkt >> userData >> devData->id >> devData->name >> devData->deviceType >> devData->busType >> devData->product
+        >> devData->vendor >> devData->version >> devData->phys >> devData->uniq >> size;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read basic data failed");
+        return PACKET_READ_FAIL;
     }
-    if (!pkt.Read(id)) {
-        MMI_HILOGE("Packet read data failed");
-        return RET_ERR;
+    std::vector<InputDeviceImpl::AxisInfo> axisInfo;
+    InputDeviceImpl::AxisInfo axis;
+    for (size_t i = 0; i < size; ++i) {
+        pkt >> axis.axisType >> axis.min >> axis.max >> axis.fuzz >> axis.flat >> axis.resolution;
+        if (pkt.ChkRWError()) {
+            MMI_HILOGE("Packet read axis data failed");
+            return PACKET_READ_FAIL;
+        }
+        axisInfo.push_back(axis);
     }
-    if (!pkt.Read(name)) {
-        MMI_HILOGE("Packet read name failed");
-        return RET_ERR;
-    }
-    if (!pkt.Read(deviceType)) {
-        MMI_HILOGE("Packet read deviceType failed");
-        return RET_ERR;
-    }
-
-    InputDevImp.OnInputDevice(userData, id, name, deviceType);
+    devData->axis = axisInfo;
+    CHKPR(devData, RET_ERR);
+    InputDevImpl.OnInputDevice(userData, devData);
     return RET_OK;
 }
 
-int32_t ClientMsgHandler::OnKeyList(const UDSClient& client, NetPacket& pkt)
+int32_t ClientMsgHandler::OnSupportKeys(const UDSClient& client, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t userData;
-    if (!pkt.Read(userData)) {
-        MMI_HILOGE("Packet read userData failed");
-        return RET_ERR;
-    }
     size_t size;
-    if (!pkt.Read(size)) {
-        MMI_HILOGE("Packet read userData failed");
+    pkt >> userData >> size;
+    if (size > MAX_SUPPORT_KEY) {
+        MMI_HILOGE("Keys exceeds the max range");
         return RET_ERR;
     }
-    int32_t keyCode;
-    int32_t isSupport;
-    std::map<int32_t, bool> abilityRet;
-    for (size_t i = 0; i < size;) {
-        if (!pkt.Read(keyCode)) {
-            MMI_HILOGE("Packet read keyCode failed");
-            return RET_ERR;
-        }
-        if (!pkt.Read(isSupport)) {
-            MMI_HILOGE("Packet read isSupport failed");
-            return RET_ERR;
-        }
-        abilityRet[keyCode] = isSupport == 1 ? true : false;
-        i += 2;
+    std::vector<bool> abilityRet;
+    bool ret;
+    for (size_t i = 0; i < size; ++i) {
+        pkt >> ret;
+        abilityRet.push_back(ret);
     }
-    InputDeviceImpl::GetInstance().OnKeystrokeAbility(userData, abilityRet);
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read key Data failed");
+        return RET_ERR;
+    }
+    InputDevImpl.OnSupportKeys(userData, abilityRet);
+    return RET_OK;
+}
+
+int32_t ClientMsgHandler::OnInputKeyboardType(const UDSClient& client, NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    int32_t userData;
+    int32_t KeyboardType;
+    pkt >> userData >> KeyboardType;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read failed");
+        return PACKET_WRITE_FAIL;
+    }
+    InputDevImpl.OnKeyboardType(userData, KeyboardType);
     return RET_OK;
 }
 
 int32_t ClientMsgHandler::OnDevMonitor(const UDSClient& client, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::string type;
-    if (!pkt.Read(type)) {
-        MMI_HILOGE("Packet read userData failed");
-        return RET_ERR;
-    }
     int32_t deviceId;
-    if (!pkt.Read(deviceId)) {
-        MMI_HILOGE("Packet read userData failed");
+    pkt >> type >> deviceId;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read type failed");
         return RET_ERR;
     }
     InputDeviceImpl::GetInstance().OnDevMonitor(type, deviceId);
     return RET_OK;
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t handlerId;
-    if (!pkt.Read(handlerId)) {
+    pkt >> handlerId;
+    if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read handler failed");
         return RET_ERR;
     }
@@ -341,21 +290,21 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
         MMI_HILOGE("Failed to deserialize key event.");
         return RET_ERR;
     }
-    InputHandlerManager::GetInstance().OnInputEvent(handlerId, keyEvent);
+    BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_INTERCEPT_EVENT);
+    InputHandlerMgr.OnInputEvent(handlerId, keyEvent);
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t handlerId;
     InputHandlerType handlerType;
-    if (!pkt.Read(handlerId)) {
-        MMI_HILOGE("Packet read handler failed");
-        return RET_ERR;
-    }
-    if (!pkt.Read(handlerType)) {
-        MMI_HILOGE("Packet read handlerType failed");
+    pkt >> handlerId >> handlerType;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read Pointer data failed");
         return RET_ERR;
     }
     MMI_HILOGD("Client handlerId:%{public}d,handlerType:%{public}d", handlerId, handlerType);
@@ -366,60 +315,15 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
         return RET_ERR;
     }
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_INTERCEPT_EVENT);
-    InputHandlerManager::GetInstance().OnInputEvent(handlerId, pointerEvent);
+    InputHandlerMgr.OnInputEvent(handlerId, pointerEvent);
     return RET_OK;
 }
-
-int32_t ClientMsgHandler::TouchpadEventInterceptor(const UDSClient& client, NetPacket& pkt)
-{
-    auto pointerEvent = PointerEvent::Create();
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    int32_t ret = InputEventDataTransformation::Unmarshalling(pkt, pointerEvent);
-    if (ret != RET_OK) {
-        MMI_HILOGE("read netPacket failed");
-        return RET_ERR;
-    }
-    int32_t pid = 0;
-    int32_t id = 0;
-    pkt >> pid >> id;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read pid failed");
-        return PACKET_READ_FAIL;
-    }
-    MMI_HILOGD("client receive the msg from server: pointId:%{public}d,pid:%{public}d",
-               pointerEvent->GetPointerId(), pid);
-    return InterceptorMgr.OnPointerEvent(pointerEvent, id);
-}
-
-int32_t ClientMsgHandler::KeyEventInterceptor(const UDSClient& client, NetPacket& pkt)
-{
-    auto keyEvent = KeyEvent::Create();
-    CHKPR(keyEvent, ERROR_NULL_POINTER);
-    int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(pkt, keyEvent);
-    if (ret != RET_OK) {
-        MMI_HILOGE("read netPacket failed");
-        return RET_ERR;
-    }
-    int32_t pid = 0;
-    pkt >> pid;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read pid failed");
-        return PACKET_READ_FAIL;
-    }
-    BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_INTERCEPT_EVENT);
-    MMI_HILOGD("client receive the msg from server: keyCode:%{public}d,pid:%{public}d",
-        keyEvent->GetKeyCode(), pid);
-    return InterceptorMgr.OnKeyEvent(keyEvent);
-}
-
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 void ClientMsgHandler::OnEventProcessed(int32_t eventId)
 {
-    MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    CHKPV(client);
-    NetPacket pkt(MmiMessageId::MARK_PROCESS);
-    pkt << eventId;
-    if (!client->SendMessage(pkt)) {
-        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+    int32_t ret = MultimodalInputConnMgr->MarkEventProcessed(eventId);
+    if (ret != 0) {
+        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
         return;
     }
 }

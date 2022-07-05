@@ -49,7 +49,7 @@ std::shared_ptr<MultimodalInputConnectManager> MultimodalInputConnectManager::Ge
 
 int32_t MultimodalInputConnectManager::AllocSocketPair(const int32_t moduleType)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ == nullptr) {
         MMI_HILOGE("client has not connect server");
@@ -69,7 +69,7 @@ int32_t MultimodalInputConnectManager::AllocSocketPair(const int32_t moduleType)
 
 int32_t MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair() const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     return socketFd_;
 }
 
@@ -83,9 +83,76 @@ int32_t MultimodalInputConnectManager::AddInputEventFilter(sptr<IEventFilter> fi
     return multimodalInputConnectService_->AddInputEventFilter(filter);
 }
 
+int32_t MultimodalInputConnectManager::SetPointerVisible(bool visible)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetPointerVisible(visible);
+}
+
+int32_t MultimodalInputConnectManager::IsPointerVisible(bool &visible)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->IsPointerVisible(visible);
+}
+
+int32_t MultimodalInputConnectManager::MarkEventProcessed(int32_t eventId)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->MarkEventProcessed(eventId);
+}
+
+int32_t MultimodalInputConnectManager::AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
+    HandleEventType eventType)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->AddInputHandler(handlerId, handlerType, eventType);
+}
+
+int32_t MultimodalInputConnectManager::RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->RemoveInputHandler(handlerId, handlerType);
+}
+
+int32_t MultimodalInputConnectManager::MarkEventConsumed(int32_t monitorId, int32_t eventId)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->MarkEventConsumed(monitorId, eventId);
+}
+
+int32_t MultimodalInputConnectManager::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SubscribeKeyEvent(subscribeId, option);
+}
+
+int32_t MultimodalInputConnectManager::UnsubscribeKeyEvent(int32_t subscribeId)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->UnsubscribeKeyEvent(subscribeId);
+}
+
+int32_t MultimodalInputConnectManager::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->MoveMouseEvent(offsetX, offsetY);
+}
+
+int32_t MultimodalInputConnectManager::InjectKeyEvent(const std::shared_ptr<KeyEvent> event)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->InjectKeyEvent(event);
+}
+
+int32_t MultimodalInputConnectManager::InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->InjectPointerEvent(pointerEvent);
+}
+
 bool MultimodalInputConnectManager::ConnectMultimodalInputService()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ != nullptr) {
         return true;
@@ -123,14 +190,14 @@ bool MultimodalInputConnectManager::ConnectMultimodalInputService()
 
 void MultimodalInputConnectManager::OnDeath()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     Clean();
     NotifyDeath();
 }
 
 void MultimodalInputConnectManager::Clean()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ != nullptr) {
         multimodalInputConnectService_.clear();
@@ -145,7 +212,7 @@ void MultimodalInputConnectManager::Clean()
 
 void MultimodalInputConnectManager::NotifyDeath()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
 
     int32_t retryCount = 50;
     do {

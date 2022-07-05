@@ -31,11 +31,9 @@ public:
 private:
     int32_t SendEvent(const InputEventArray& inputEventArray);
     int32_t SendEventToHdi(const InputEventArray& inputEventArray);
-    int32_t SendEventToDeviveNode(const InputEventArray& inputEventArray);
+    int32_t SendEventToDeviceNode(const InputEventArray& inputEventArray);
 private:
     GetDeviceNode getDeviceNodeObject_;
-private:
-    static constexpr int64_t INJECT_SLEEP_TIMES = 10;
 };
 } // namespace MMI
 } // namespace OHOS

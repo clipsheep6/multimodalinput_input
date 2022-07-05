@@ -18,6 +18,7 @@
 
 #include "if_mmi_client.h"
 
+#include "circle_stream_buffer.h"
 #include "client_msg_handler.h"
 #include "mmi_event_handler.h"
 
@@ -41,7 +42,6 @@ public:
     bool Start() override;
     void RegisterConnectedFunction(ConnectCallback fun) override;
     void RegisterDisconnectedFunction(ConnectCallback fun) override;
-    void VirtualKeyIn(RawInputEvent virtualKeyEvent);
 
 protected:
     virtual void OnConnected() override;
@@ -52,12 +52,14 @@ protected:
     void OnRecvThread();
     bool AddFdListener(int32_t fd);
     bool DelFdListener(int32_t fd);
+    void OnPacket(NetPacket& pkt);
 
 protected:
     ClientMsgHandler msgHandler_;
     ConnectCallback funConnected_;
     ConnectCallback funDisconnected_;
 
+    CircleStreamBuffer circBuf_;
     std::condition_variable cv_;
     std::thread recvThread_;
     std::shared_ptr<MMIEventHandler> recvEventHandler_ = nullptr;

@@ -43,8 +43,8 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputData, TestSize
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformPenJsonDataToInputData.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start touchpad & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start touchpad & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_TransformPenJsonDataToInputData.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start touchpad &";
@@ -55,22 +55,13 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputData, TestSize
         ASSERT_TRUE(false) << "start device failed";
     }
     pclose(startDevice);
-    FILE* fp = fopen(path.c_str(), "r");
-    if (fp == nullptr) {
-        ASSERT_TRUE(false) << "can not open " << path;
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::string jsonBuf = ReadJsonFile(path);
+    if (jsonBuf.empty()) {
+        ASSERT_TRUE(false) << "read file failed" << path;
     }
-    char buf[256] = {};
-    std::string jsonBuf;
-    while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf += buf;
-    }
-    if (fclose(fp) < 0) {
-        ASSERT_TRUE(false) << "fclose file error " << path;
-    }
-    InputParse InputParse;
-    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
     FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
     if (!closeDevice) {
         ASSERT_TRUE(false) << "close device failed";
@@ -90,8 +81,8 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataNotfindEve
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformPenJsonDataToInputDataNotfindEvents.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start touchpad & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start touchpad & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_TransformPenJsonDataToInputDataNotfindEvents.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start touchpad &";
@@ -102,22 +93,12 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataNotfindEve
         ASSERT_TRUE(false) << "start device failed";
     }
     pclose(startDevice);
-    FILE* fp = fopen(path.c_str(), "r");
-    if (fp == nullptr) {
-        ASSERT_TRUE(false) << "can not open " << path;
+    std::string jsonBuf = ReadJsonFile(path);
+    if (jsonBuf.empty()) {
+        ASSERT_TRUE(false) << "read file failed" << path;
     }
-    char buf[256] = {};
-    std::string jsonBuf;
-    while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf += buf;
-    }
-    if (fclose(fp) < 0) {
-        ASSERT_TRUE(false) << "fclose file error " << path;
-    }
-    InputParse InputParse;
-    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
     FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
     if (!closeDevice) {
         ASSERT_TRUE(false) << "close device failed";
@@ -137,8 +118,8 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataEventsIsEm
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformPenJsonDataToInputDataEventsIsEmpty.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start touchpad & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start touchpad & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_TransformPenJsonDataToInputDataEventsIsEmpty.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start touchpad &";
@@ -149,22 +130,12 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataEventsIsEm
         ASSERT_TRUE(false) << "start device failed";
     }
     pclose(startDevice);
-    FILE* fp = fopen(path.c_str(), "r");
-    if (fp == nullptr) {
-        ASSERT_TRUE(false) << "can not open " << path;
+    std::string jsonBuf = ReadJsonFile(path);
+    if (jsonBuf.empty()) {
+        ASSERT_TRUE(false) << "read file failed" << path;
     }
-    char buf[256] = {};
-    std::string jsonBuf;
-    while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf += buf;
-    }
-    if (fclose(fp) < 0) {
-        ASSERT_TRUE(false) << "fclose file error " << path;
-    }
-    InputParse InputParse;
-    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
     FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
     if (!closeDevice) {
         ASSERT_TRUE(false) << "close device failed";
@@ -175,19 +146,19 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataEventsIsEm
 }
 
 /**
- * @tc.name:Test_TransformPenJsonDataToInputDataApprochEventError
+ * @tc.name:Test_TransformPenJsonDataToInputDataApproachEventError
  * @tc.desc:Verify ManageInjectDevice function TransformJsonData
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataApprochEventError, TestSize.Level1)
+HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataApproachEventError, TestSize.Level1)
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformPenJsonDataToInputDataApprochEventError.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start touchpad & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start touchpad & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
-    const std::string path = "temp/Test_TransformPenJsonDataToInputDataApprochEventError.json";
+    const std::string path = "temp/Test_TransformPenJsonDataToInputDataApproachEventError.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start touchpad &";
     std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
@@ -196,22 +167,12 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataApprochEve
         ASSERT_TRUE(false) << "start device failed";
     }
     pclose(startDevice);
-    FILE* fp = fopen(path.c_str(), "r");
-    if (fp == nullptr) {
-        ASSERT_TRUE(false) << "can not open " << path;
+    std::string jsonBuf = ReadJsonFile(path);
+    if (jsonBuf.empty()) {
+        ASSERT_TRUE(false) << "read file failed" << path;
     }
-    char buf[256] = {};
-    std::string jsonBuf;
-    while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf += buf;
-    }
-    if (fclose(fp) < 0) {
-        ASSERT_TRUE(false) << "fclose file error " << path;
-    }
-    InputParse InputParse;
-    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
     FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
     if (!closeDevice) {
         ASSERT_TRUE(false) << "close device failed";
@@ -231,8 +192,8 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataSlideEvent
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformPenJsonDataToInputDataSlideEventError.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start touchpad & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start touchpad & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_TransformPenJsonDataToInputDataSlideEventError.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start touchpad &";
@@ -243,22 +204,12 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataSlideEvent
         ASSERT_TRUE(false) << "start device failed";
     }
     pclose(startDevice);
-    FILE* fp = fopen(path.c_str(), "r");
-    if (fp == nullptr) {
-        ASSERT_TRUE(false) << "can not open " << path;
+    std::string jsonBuf = ReadJsonFile(path);
+    if (jsonBuf.empty()) {
+        ASSERT_TRUE(false) << "read file failed" << path;
     }
-    char buf[256] = {};
-    std::string jsonBuf;
-    while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf += buf;
-    }
-    if (fclose(fp) < 0) {
-        ASSERT_TRUE(false) << "fclose file error " << path;
-    }
-    InputParse InputParse;
-    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
     FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
     if (!closeDevice) {
         ASSERT_TRUE(false) << "close device failed";
@@ -278,8 +229,8 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataLeaveEvent
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformPenJsonDataToInputDataLeaveEventError.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start touchpad & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start touchpad & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_TransformPenJsonDataToInputDataLeaveEventError.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start touchpad &";
@@ -290,22 +241,12 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataLeaveEvent
         ASSERT_TRUE(false) << "start device failed";
     }
     pclose(startDevice);
-    FILE* fp = fopen(path.c_str(), "r");
-    if (fp == nullptr) {
-        ASSERT_TRUE(false) << "can not open " << path;
+    std::string jsonBuf = ReadJsonFile(path);
+    if (jsonBuf.empty()) {
+        ASSERT_TRUE(false) << "read file failed" << path;
     }
-    char buf[256] = {};
-    std::string jsonBuf;
-    while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf += buf;
-    }
-    if (fclose(fp) < 0) {
-        ASSERT_TRUE(false) << "fclose file error " << path;
-    }
-    InputParse InputParse;
-    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
     FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
     if (!closeDevice) {
         ASSERT_TRUE(false) << "close device failed";
@@ -316,19 +257,19 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataLeaveEvent
 }
 
 /**
- * @tc.name:Test_TransformPenJsonDataToInputDataApprochEventEventTypeError
+ * @tc.name:Test_TransformPenJsonDataToInputDataApproachEventEventTypeError
  * @tc.desc:Verify ManageInjectDevice function TransformJsonData
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataApprochEventEventTypeError, TestSize.Level1)
+HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataApproachEventEventTypeError, TestSize.Level1)
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformPenJsonDataToInputDataApprochEventEventTypeError.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start touchpad & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start touchpad & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
-    const std::string path = "temp/Test_TransformPenJsonDataToInputDataApprochEventEventTypeError.json";
+    const std::string path = "temp/Test_TransformPenJsonDataToInputDataApproachEventEventTypeError.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start touchpad &";
     std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
@@ -337,22 +278,12 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataApprochEve
         ASSERT_TRUE(false) << "start device failed";
     }
     pclose(startDevice);
-    FILE* fp = fopen(path.c_str(), "r");
-    if (fp == nullptr) {
-        ASSERT_TRUE(false) << "can not open " << path;
+    std::string jsonBuf = ReadJsonFile(path);
+    if (jsonBuf.empty()) {
+        ASSERT_TRUE(false) << "read file failed" << path;
     }
-    char buf[256] = {};
-    std::string jsonBuf;
-    while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf += buf;
-    }
-    if (fclose(fp) < 0) {
-        ASSERT_TRUE(false) << "fclose file error " << path;
-    }
-    InputParse InputParse;
-    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
     FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
     if (!closeDevice) {
         ASSERT_TRUE(false) << "close device failed";
@@ -372,8 +303,8 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataLeaveEvent
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformPenJsonDataToInputDataLeaveEventEventTypeError.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start touchpad & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start touchpad & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_TransformPenJsonDataToInputDataLeaveEventEventTypeError.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start touchpad &";
@@ -384,22 +315,12 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataLeaveEvent
         ASSERT_TRUE(false) << "start device failed";
     }
     pclose(startDevice);
-    FILE* fp = fopen(path.c_str(), "r");
-    if (fp == nullptr) {
-        ASSERT_TRUE(false) << "can not open " << path;
+    std::string jsonBuf = ReadJsonFile(path);
+    if (jsonBuf.empty()) {
+        ASSERT_TRUE(false) << "read file failed" << path;
     }
-    char buf[256] = {};
-    std::string jsonBuf;
-    while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf += buf;
-    }
-    if (fclose(fp) < 0) {
-        ASSERT_TRUE(false) << "fclose file error " << path;
-    }
-    InputParse InputParse;
-    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
     FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
     if (!closeDevice) {
         ASSERT_TRUE(false) << "close device failed";

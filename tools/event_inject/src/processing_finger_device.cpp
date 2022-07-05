@@ -19,15 +19,16 @@ using namespace OHOS::MMI;
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingFingerDevice" };
+constexpr int64_t FINGER_BLOCK_TIME = 6;
 } // namespace
 
 int32_t ProcessingFingerDevice::TransformJsonDataToInputData(const DeviceItem& fingerEventArrays,
     InputEventArray& inputEventArray)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::vector<DeviceEvent> inputData = fingerEventArrays.events;
     if (inputData.empty()) {
-        MMI_HILOGE("manage finger array faild, inputData is empty.");
+        MMI_HILOGE("manage finger array failed, inputData is empty.");
         return RET_ERR;
     }
     TouchPadInputEvents touchPadInputEvents = {};
@@ -48,12 +49,13 @@ void ProcessingFingerDevice::AnalysisTouchPadFingerDate(const std::vector<Device
 {
     TouchPadCoordinates touchPadCoordinates = {};
     TouchPadInputEvent touchPadInputEvent = {};
-    for (size_t i = 0; i < inputData.size(); i++) {
-        for (size_t j = 0; j < inputData[i].posXY.size(); j++) {
-            touchPadCoordinates.xPos = inputData[i].posXY[j].xPos;
-            touchPadCoordinates.yPos = inputData[i].posXY[j].yPos;
+    for (const auto &item : inputData) {
+        touchPadInputEvent.groupNumber = 0;
+        for (auto &posXYItem : item.posXY) {
+            touchPadCoordinates.xPos = posXYItem.xPos;
+            touchPadCoordinates.yPos = posXYItem.yPos;
             touchPadInputEvent.events.push_back(touchPadCoordinates);
-            touchPadInputEvent.groupNumber = j + 1;
+            ++touchPadInputEvent.groupNumber;
         }
         touchPadInputEvents.eventNumber = inputData.size();
         touchPadInputEvents.eventArray.push_back(touchPadInputEvent);

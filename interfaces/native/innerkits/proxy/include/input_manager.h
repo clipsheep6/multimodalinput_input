@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,6 +20,7 @@
 #include <memory>
 #include <list>
 
+#include "event_handler.h"
 #include "nocopyable.h"
 
 #include "display_info.h"
@@ -41,13 +42,11 @@ public:
 
     /**
      * @brief Updates the screen and window information.
-     * @param physicalDisplays Indicates the physical screen information.
-     * @param logicalDisplays Indicates the logical screen information, which includes the window information.
+     * @param displayGroupInfo Indicates the logical screen information.
      * @since 9
      */
-    void UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
-        const std::vector<LogicalDisplayInfo> &logicalDisplays);
-        
+    void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
+
     /**
      * @brief Sets a globally unique input event filter.
      * @param filter Indicates the input event filter to set. When an input event occurs, this filter is
@@ -69,13 +68,22 @@ public:
     void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer);
 
     /**
+     * @brief Sets a window input event consumer that runs on the specified thread.
+     * @param inputEventConsumer Indicates the consumer to set.
+     * @param eventHandler Indicates the thread running the consumer.
+     * @since 9
+     */
+    void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
+        std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
+
+    /**
      * @brief Subscribes to the key input event that meets a specific condition. When such an event occurs,
      * the <b>callback</b> specified is invoked to process the event.
      * @param keyOption Indicates the condition of the key input event.
      * @param callback Indicates the callback.
      * @return Returns the subscription ID, which uniquely identifies a subscription in the process.
-	 * If the value is greater than or equal to <b>0</b>,
-	 * the subscription is successful. Otherwise, the subscription fails.
+     * If the value is greater than or equal to <b>0</b>,
+     * the subscription is successful. Otherwise, the subscription fails.
      * @since 9
      */
     int32_t SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
@@ -95,7 +103,7 @@ public:
      * @param monitor Indicates the input event monitor. After an input event is generated,
      * the functions of the monitor object will be called.
      * @return Returns the monitor ID, which uniquely identifies a monitor in the process.
-	 * If the value is greater than or equal to <b>0</b>, the monitor is successfully added. Otherwise,
+     * If the value is greater than or equal to <b>0</b>, the monitor is successfully added. Otherwise,
      * the monitor fails to be added.
      * @since 9
      */
@@ -144,17 +152,25 @@ public:
     void MarkConsumed(int32_t monitorId, int32_t eventId);
 
     /**
+     * @brief Moves the cursor to the specified position.
+     * @param offsetX Indicates the offset on the X axis.
+     * @param offsetY Indicates the offset on the Y axis.
+     * @return void
+     * @since 9
+     */
+    void MoveMouse(int32_t offsetX, int32_t offsetY);
+
+    /**
      * @brief Adds an input event interceptor. After such an interceptor is added,
      * an input event will be distributed to the interceptor instead of the original target and monitor.
      * @param interceptor Indicates the input event interceptor. After an input event is generated,
-	 * the functions of the interceptor object will be called.
+     * the functions of the interceptor object will be called.
      * @return Returns the interceptor ID, which uniquely identifies an interceptor in the process.
      * If the value is greater than or equal to <b>0</b>,the interceptor is successfully added. Otherwise,
      * the interceptor fails to be added.
      * @since 9
      */
     int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor);
-    int32_t AddInterceptor(int32_t sourceType, std::function<void(std::shared_ptr<PointerEvent>)> interceptor);
     int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor);
 
     /**
@@ -167,7 +183,7 @@ public:
 
     /**
      * @brief Simulates a key input event. This event will be distributed and
-	 * processed in the same way as the event reported by the input device.
+     * processed in the same way as the event reported by the input device.
      * @param keyEvent Indicates the key input event to simulate.
      * @return void
      * @since 9
@@ -191,8 +207,32 @@ public:
      * @return Returns a result indicating whether the specified key codes are supported.
      * @since 9
      */
-    void GetKeystrokeAbility(int32_t deviceId, std::vector<int32_t> keyCodes,
-        std::function<void(std::map<int32_t, bool>)> callback);
+    void SupportKeys(int32_t deviceId, std::vector<int32_t> keyCodes,
+        std::function<void(std::vector<bool>&)> callback);
+
+    /**
+     * @brief Sets whether the pointer icon is visible.
+     * @param visible Whether the pointer icon is visible. The value <b>true</b> indicates that
+     * the pointer icon is visible, and the value <b>false</b> indicates the opposite.
+     * @return void
+     * @since 9
+     */
+    int32_t SetPointerVisible(bool visible);
+
+    /**
+     * @brief Checks whether the pointer icon is visible.
+     * @return Returns <b>true</b> if the pointer icon is visible; returns <b>false</b> otherwise.
+     * @since 9
+     */
+    bool IsPointerVisible();
+
+    /**
+     * @brief Queries the keyboard type.
+     * @param deviceId Indicates the keyboard device ID.
+     * @return Returns the keyboard type.
+     * @since 9
+     */
+    void GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback);
 
 private:
     InputManager() = default;

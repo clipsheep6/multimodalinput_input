@@ -20,12 +20,10 @@
 #include "msg_handler.h"
 #include "uds_client.h"
 
-#include "key_event_input_subscribe_manager.h"
-
 namespace OHOS {
 namespace MMI {
 typedef std::function<int32_t(const UDSClient&, NetPacket&)> ClientMsgFun;
-class ClientMsgHandler : public MsgHandler<ClientMsgFun> {
+class ClientMsgHandler : public MsgHandler<MmiMessageId, ClientMsgFun> {
 public:
     ClientMsgHandler();
     virtual ~ClientMsgHandler();
@@ -35,20 +33,27 @@ public:
     void OnMsgHandler(const UDSClient& client, NetPacket& pkt);
 
 protected:
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t OnKeyEvent(const UDSClient& client, NetPacket& pkt);
     int32_t OnKeyMonitor(const UDSClient& client, NetPacket& pkt);
-    int32_t OnTouchPadMonitor(const UDSClient& client, NetPacket& pkt);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t OnPointerEvent(const UDSClient& client, NetPacket& pkt);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t OnSubscribeKeyEventCallback(const UDSClient& client, NetPacket& pkt);
-    int32_t GetMultimodeInputInfo(const UDSClient& client, NetPacket& pkt);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t ReportKeyEvent(const UDSClient& client, NetPacket& pkt);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t ReportPointerEvent(const UDSClient& client, NetPacket& pkt);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     int32_t OnInputDevice(const UDSClient& client, NetPacket& pkt);
     int32_t OnInputDeviceIds(const UDSClient& client, NetPacket& pkt);
-    int32_t OnKeyList(const UDSClient& client, NetPacket& pkt);
+    int32_t OnSupportKeys(const UDSClient& client, NetPacket& pkt);
+    int32_t OnInputKeyboardType(const UDSClient& client, NetPacket& pkt);
     int32_t OnDevMonitor(const UDSClient& client, NetPacket& pkt);
-    int32_t TouchpadEventInterceptor(const UDSClient& client, NetPacket& pkt);
-    int32_t KeyEventInterceptor(const UDSClient& client, NetPacket& pkt);
 
 private:
     static void OnEventProcessed(int32_t eventId);

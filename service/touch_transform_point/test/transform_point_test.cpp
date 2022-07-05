@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 #include <thread>
 #include "mmi_log.h"
-#include "virtual_stylus.h"
+#include "virtual_pen.h"
 
 namespace OHOS {
 namespace MMI {
@@ -75,7 +75,6 @@ public:
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
     static std::string GetDeviceNodeName();
-    static struct input_event* CountFrames(struct input_event* events, size_t nevents, size_t nframes);
     bool SendEvent(const Context& ctx, struct input_event* event);
     bool SendEvents(const Context& ctx, struct input_event* events, size_t nevents);
     static int Execute(const std::string& command, std::vector<std::string>& results);
@@ -84,11 +83,11 @@ public:
     static bool IsVirtualStylusOn();
 
 private:
-    static VirtualStylus virtualStylus_;
+    static VirtualPen virtualPen_;
     static std::string  devNode_;
 };
 
-VirtualStylus TransformPointTest::virtualStylus_;
+VirtualPen TransformPointTest::virtualPen_;
 std::string TransformPointTest::devNode_;
 
 void TransformPointTest::SetUpTestCase(void)
@@ -99,7 +98,7 @@ void TransformPointTest::SetUpTestCase(void)
 void TransformPointTest::TearDownTestCase(void)
 {
     if (!devNode_.empty()) {
-        virtualStylus_.Close();
+        virtualPen_.Close();
         devNode_.clear();
     }
 }
@@ -109,22 +108,9 @@ std::string TransformPointTest::GetDeviceNodeName()
     return devNode_;
 }
 
-struct input_event* TransformPointTest::CountFrames(struct input_event* events, size_t nevents, size_t nframes)
-{
-    struct input_event* sp = events;
-    struct input_event* tp = sp + nevents;
-    size_t cnt = 0;
-
-    for (; (sp < tp) && (cnt < nframes); ++sp) {
-        if (sp->type == EV_SYN) {
-            ++cnt;
-        }
-    }
-    return (cnt >= nframes ? sp : nullptr);
-}
-
 bool TransformPointTest::SendEvent(const Context& ctx, struct input_event* event)
 {
+    CALL_INFO_TRACE;
     MMI_HILOGD("send input event.");
     struct timeval tv;
     if (gettimeofday(&tv, nullptr)) {
@@ -141,6 +127,7 @@ bool TransformPointTest::SendEvent(const Context& ctx, struct input_event* event
 
 bool TransformPointTest::SendEvents(const Context& ctx, struct input_event* events, size_t nevents)
 {
+    CALL_INFO_TRACE;
     if (!ctx.IsReady()) {
         MMI_HILOGE("Device is not ready.");
         return false;
@@ -160,6 +147,7 @@ bool TransformPointTest::SendEvents(const Context& ctx, struct input_event* even
 
 int TransformPointTest::Execute(const std::string& command, std::vector<std::string>& results)
 {
+    CALL_INFO_TRACE;
     MMI_HILOGD("execute command: %{public}s.", command.c_str());
     char buffer[DEFAULT_BUF_SIZE] {};
     FILE* pin = popen(command.c_str(), "r");
@@ -178,6 +166,7 @@ int TransformPointTest::Execute(const std::string& command, std::vector<std::str
 
 void TransformPointTest::GetInputDeviceNodes(std::map<std::string, std::string>& nodes)
 {
+    CALL_INFO_TRACE;
     std::string command { "cat /proc/bus/input/devices" };
     std::vector<std::string> results;
     Execute(command, results);
@@ -219,8 +208,9 @@ void TransformPointTest::GetInputDeviceNodes(std::map<std::string, std::string>&
 
 bool TransformPointTest::SetupVirtualStylus()
 {
+    CALL_INFO_TRACE;
     MMI_HILOGD("setup virtual stylus.");
-    if (!virtualStylus_.SetUp()) {
+    if (!virtualPen_.SetUp()) {
         MMI_HILOGE("Failed to setup virtual stylus.");
         return false;
     }
@@ -230,7 +220,7 @@ bool TransformPointTest::SetupVirtualStylus()
     GetInputDeviceNodes(nodes);
     MMI_HILOGD("There are %{public}zu device nodes.", nodes.size());
 
-    const std::string dev { "Virtual Stylus" };
+    const std::string dev { "V-Pencil" };
     std::map<std::string, std::string>::const_iterator cItr = nodes.find(dev);
     if (cItr == nodes.cend()) {
         MMI_HILOGE("No virtual stylus is found.");
@@ -249,34 +239,34 @@ bool TransformPointTest::IsVirtualStylusOn()
 }
 
 static struct input_event inputEvents1[] {
-    { 0, 0, EV_ABS, ABS_X,               7950   },
-    { 0, 0, EV_ABS, ABS_Y,               6400   },
-    { 0, 0, EV_ABS, ABS_TILT_X,          10     },
-    { 0, 0, EV_ABS, ABS_TILT_Y,          -10    },
-    { 0, 0, EV_ABS, ABS_PRESSURE,        30     },
-    { 0, 0, EV_SYN, SYN_REPORT,          0      },
-    { 0, 0, EV_ABS, ABS_X,               8000   },
-    { 0, 0, EV_ABS, ABS_PRESSURE,        30     },
-    { 0, 0, EV_SYN, SYN_REPORT,          0      },
-    { 0, 0, EV_ABS, ABS_X,               8050   },
-    { 0, 0, EV_ABS, ABS_Y,               6450   },
-    { 0, 0, EV_ABS, ABS_PRESSURE,        35     },
-    { 0, 0, EV_SYN, SYN_REPORT,          0      },
-    { 0, 0, EV_ABS, ABS_X,               8100   },
-    { 0, 0, EV_ABS, ABS_Y,               6500   },
-    { 0, 0, EV_ABS, ABS_PRESSURE,        1510   },
-    { 0, 0, EV_SYN, SYN_REPORT,          0      },
-    { 0, 0, EV_ABS, ABS_X,               8150   },
-    { 0, 0, EV_ABS, ABS_PRESSURE,        1520   },
-    { 0, 0, EV_SYN, SYN_REPORT,          0      },
-    { 0, 0, EV_ABS, ABS_X,               8200   },
-    { 0, 0, EV_ABS, ABS_Y,               6550   },
-    { 0, 0, EV_ABS, ABS_PRESSURE,        1530   },
-    { 0, 0, EV_SYN, SYN_REPORT,          0      },
-    { 0, 0, EV_ABS, ABS_X,               8200   },
-    { 0, 0, EV_ABS, ABS_Y,               6550   },
-    { 0, 0, EV_ABS, ABS_PRESSURE,        0      },
-    { 0, 0, EV_SYN, SYN_REPORT,          0      },
+    { { 0, 0 }, EV_ABS, ABS_X,               7950   },
+    { { 0, 0 }, EV_ABS, ABS_Y,               6400   },
+    { { 0, 0 }, EV_ABS, ABS_TILT_X,          10     },
+    { { 0, 0 }, EV_ABS, ABS_TILT_Y,          -10    },
+    { { 0, 0 }, EV_ABS, ABS_PRESSURE,        30     },
+    { { 0, 0 }, EV_SYN, SYN_REPORT,          0      },
+    { { 0, 0 }, EV_ABS, ABS_X,               8000   },
+    { { 0, 0 }, EV_ABS, ABS_PRESSURE,        30     },
+    { { 0, 0 }, EV_SYN, SYN_REPORT,          0      },
+    { { 0, 0 }, EV_ABS, ABS_X,               8050   },
+    { { 0, 0 }, EV_ABS, ABS_Y,               6450   },
+    { { 0, 0 }, EV_ABS, ABS_PRESSURE,        35     },
+    { { 0, 0 }, EV_SYN, SYN_REPORT,          0      },
+    { { 0, 0 }, EV_ABS, ABS_X,               8100   },
+    { { 0, 0 }, EV_ABS, ABS_Y,               6500   },
+    { { 0, 0 }, EV_ABS, ABS_PRESSURE,        1510   },
+    { { 0, 0 }, EV_SYN, SYN_REPORT,          0      },
+    { { 0, 0 }, EV_ABS, ABS_X,               8150   },
+    { { 0, 0 }, EV_ABS, ABS_PRESSURE,        1520   },
+    { { 0, 0 }, EV_SYN, SYN_REPORT,          0      },
+    { { 0, 0 }, EV_ABS, ABS_X,               8200   },
+    { { 0, 0 }, EV_ABS, ABS_Y,               6550   },
+    { { 0, 0 }, EV_ABS, ABS_PRESSURE,        1530   },
+    { { 0, 0 }, EV_SYN, SYN_REPORT,          0      },
+    { { 0, 0 }, EV_ABS, ABS_X,               8200   },
+    { { 0, 0 }, EV_ABS, ABS_Y,               6550   },
+    { { 0, 0 }, EV_ABS, ABS_PRESSURE,        0      },
+    { { 0, 0 }, EV_SYN, SYN_REPORT,          0      },
 };
 
 /**
@@ -287,45 +277,47 @@ static struct input_event inputEvents1[] {
  */
 HWTEST_F(TransformPointTest, TabletTransformPointProcesser1, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     ASSERT_TRUE(IsVirtualStylusOn());
     Context ctx { GetDeviceNodeName() };
     ASSERT_TRUE(SendEvents(ctx, inputEvents1, ARRAY_LENGTH(inputEvents1)));
 }
 
 static struct input_event inputEvents2[] {
-    { 0, 0, EV_ABS, ABS_X,               10752  },
-    { 0, 0, EV_ABS, ABS_Y,               22176  },
-    { 0, 0, EV_ABS, ABS_TILT_X,          90     },
-    { 0, 0, EV_ABS, ABS_TILT_Y,          90     },
-    { 0, 0, EV_ABS, ABS_PRESSURE,        0      },
-    { 0, 0, EV_SYN, SYN_REPORT,          0      },
-    { 0, 0, EV_ABS, ABS_X,               10753  },
-    { 0, 0, EV_ABS, ABS_TILT_X,          -90    },
-    { 0, 0, EV_SYN, SYN_REPORT,          0      },
-    { 0, 0, EV_ABS, ABS_Y,               22177  },
-    { 0, 0, EV_ABS, ABS_TILT_Y,          -90    },
-    { 0, 0, EV_ABS, ABS_PRESSURE,        50     },
-    { 0, 0, EV_SYN, SYN_REPORT,          0      },
-    { 0, 0, EV_ABS, ABS_TILT_X,          90     },
-    { 0, 0, EV_ABS, ABS_PRESSURE,        1510   },
-    { 0, 0, EV_SYN, SYN_REPORT,          0      },
-    { 0, 0, EV_ABS, ABS_X,               40000  },
-    { 0, 0, EV_ABS, ABS_TILT_X,          180    },
-    { 0, 0, EV_ABS, ABS_PRESSURE,        4096   },
-    { 0, 0, EV_SYN, SYN_REPORT,          0      },
-    { 0, 0, EV_ABS, ABS_X,               50000  },
-    { 0, 0, EV_ABS, ABS_TILT_X,          270    },
-    { 0, 0, EV_ABS, ABS_PRESSURE,        100000 },
-    { 0, 0, EV_SYN, SYN_REPORT,          0      },
-    { 0, 0, EV_ABS, ABS_X,               60000  },
-    { 0, 0, EV_ABS, ABS_Y,               6550   },
-    { 0, 0, EV_ABS, ABS_TILT_X,          360    },
-    { 0, 0, EV_ABS, ABS_PRESSURE,        0      },
-    { 0, 0, EV_SYN, SYN_REPORT,          0      },
+    { { 0, 0 }, EV_ABS, ABS_X,               10752  },
+    { { 0, 0 }, EV_ABS, ABS_Y,               22176  },
+    { { 0, 0 }, EV_ABS, ABS_TILT_X,          90     },
+    { { 0, 0 }, EV_ABS, ABS_TILT_Y,          90     },
+    { { 0, 0 }, EV_ABS, ABS_PRESSURE,        0      },
+    { { 0, 0 }, EV_SYN, SYN_REPORT,          0      },
+    { { 0, 0 }, EV_ABS, ABS_X,               10753  },
+    { { 0, 0 }, EV_ABS, ABS_TILT_X,          -90    },
+    { { 0, 0 }, EV_SYN, SYN_REPORT,          0      },
+    { { 0, 0 }, EV_ABS, ABS_Y,               22177  },
+    { { 0, 0 }, EV_ABS, ABS_TILT_Y,          -90    },
+    { { 0, 0 }, EV_ABS, ABS_PRESSURE,        50     },
+    { { 0, 0 }, EV_SYN, SYN_REPORT,          0      },
+    { { 0, 0 }, EV_ABS, ABS_TILT_X,          90     },
+    { { 0, 0 }, EV_ABS, ABS_PRESSURE,        1510   },
+    { { 0, 0 }, EV_SYN, SYN_REPORT,          0      },
+    { { 0, 0 }, EV_ABS, ABS_X,               40000  },
+    { { 0, 0 }, EV_ABS, ABS_TILT_X,          180    },
+    { { 0, 0 }, EV_ABS, ABS_PRESSURE,        4096   },
+    { { 0, 0 }, EV_SYN, SYN_REPORT,          0      },
+    { { 0, 0 }, EV_ABS, ABS_X,               50000  },
+    { { 0, 0 }, EV_ABS, ABS_TILT_X,          270    },
+    { { 0, 0 }, EV_ABS, ABS_PRESSURE,        100000 },
+    { { 0, 0 }, EV_SYN, SYN_REPORT,          0      },
+    { { 0, 0 }, EV_ABS, ABS_X,               60000  },
+    { { 0, 0 }, EV_ABS, ABS_Y,               6550   },
+    { { 0, 0 }, EV_ABS, ABS_TILT_X,          360    },
+    { { 0, 0 }, EV_ABS, ABS_PRESSURE,        0      },
+    { { 0, 0 }, EV_SYN, SYN_REPORT,          0      },
 };
 
 HWTEST_F(TransformPointTest, TabletTransformPointProcesser2, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     ASSERT_TRUE(IsVirtualStylusOn());
     Context ctx { GetDeviceNodeName() };
     ASSERT_TRUE(SendEvents(ctx, inputEvents2, ARRAY_LENGTH(inputEvents2)));

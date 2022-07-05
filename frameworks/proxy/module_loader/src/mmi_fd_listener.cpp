@@ -30,11 +30,11 @@ constexpr HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIFdListen
 using namespace AppExecFwk;
 MMIFdListener::MMIFdListener(MMIClientPtr client) : mmiClient_(client)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
 }
 MMIFdListener::~MMIFdListener()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
 }
 
 void MMIFdListener::OnReadable(int32_t fd)
@@ -44,31 +44,20 @@ void MMIFdListener::OnReadable(int32_t fd)
         return;
     }
     CHKPV(mmiClient_);
-
-    StreamBuffer buf;
-    bool isoverflow = false;
     char szBuf[MAX_PACKET_BUF_SIZE] = {};
-    constexpr int32_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
-    if (maxCount <= 0) {
-        MMI_HILOGE("Invalid max count");
-        return;
-    }
-    for (int32_t i = 0; i < maxCount; i++) {
-        auto size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
+    for (int32_t i = 0; i < MAX_RECV_LIMIT; i++) {
+        ssize_t size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (size > 0) {
-            if (!buf.Write(szBuf, size)) {
-                MMI_HILOGE("write error or buffer overflow,count:%{}d size:%{}zu", i, size);
-                isoverflow = true;
-                break;
-            }
+            mmiClient_->OnRecvMsg(szBuf, size);
         } else if (size < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
-                MMI_HILOGD("continue for errno EAGAIN|EINTR|EWOULDBLOCK");
+                MMI_HILOGD("continue for errno EAGAIN|EINTR|EWOULDBLOCK size:%{public}zu errno:%{public}d",
+                    size, errno);
                 continue;
             }
             MMI_HILOGE("recv return %{public}zu errno:%{public}d", size, errno);
             break;
-        } else if (size == 0) {
+        } else {
             MMI_HILOGD("[Do nothing here]The service side disconnect with the client. size:0 count:%{public}d "
                 "errno:%{public}d", i, errno);
             break;
@@ -77,14 +66,11 @@ void MMIFdListener::OnReadable(int32_t fd)
             break;
         }
     }
-    if (!isoverflow && buf.Size() > 0) {
-        mmiClient_->OnRecvMsg(buf.Data(), buf.Size());
-    }
 }
 
 void MMIFdListener::OnShutdown(int32_t fd)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     if (fd < 0) {
         MMI_HILOGE("Invalid fd:%{public}d", fd);
     }
@@ -94,7 +80,7 @@ void MMIFdListener::OnShutdown(int32_t fd)
 
 void MMIFdListener::OnException(int32_t fd)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     if (fd < 0) {
         MMI_HILOGE("Invalid fd:%{public}d", fd);
     }

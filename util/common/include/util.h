@@ -17,6 +17,7 @@
 
 #include <ctime>
 #include <map>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -25,6 +26,12 @@
 
 namespace OHOS {
 namespace MMI {
+struct DeviceConfig {
+    int32_t autoSwitch { 1 };
+    int32_t delayTime { 300 };
+    int32_t intervalTime { 100 };
+    int32_t keyboardType { 0 };
+};
 const char *GetMmiErrorTypeDesc(int32_t errorCodeEnum);
 std::string UuIdGenerate();
 int64_t GetMicrotime();
@@ -51,11 +58,52 @@ const std::string& GetThreadName();
 void AddId(std::vector<int32_t> &list, int32_t id);
 size_t CalculateDifference(const std::vector<int32_t> &list1, std::vector<int32_t> &list2,
     std::vector<int32_t> &difList);
+void ReadProFile(const std::string &filePath, int32_t deviceId,
+    std::map<int32_t, std::map<int32_t, int32_t>> &configMap);
+void ReadProConfigFile(const std::string &realPath, int32_t deviceId,
+    std::map<int32_t, std::map<int32_t, int32_t>> &configKey);
 std::string StringFmt(const char* str, ...);
-bool IsFileExists(const std::string& fileName);
-int32_t VerifyFile(const std::string& fileName);
-std::string GetFileExtendName(const std::string& fileName);
-int32_t GetFileSize(const std::string& fileName);
+std::string ReadJsonFile(const std::string &filePath);
+std::string ReadUinputToolFile(const std::string &filePath);
+int32_t ReadTomlFile(const std::string &filePath, DeviceConfig& devConf);
+int32_t ReadConfigFile(const std::string &realPath, DeviceConfig& devConf);
+int32_t ConfigItemSwitch(const std::string &configItem, const std::string &value, DeviceConfig& devConf);
+inline bool IsNum(const std::string &str)
+{
+    std::istringstream sin(str);
+    double num;
+    return (sin >> num) && sin.eof();
+}
+inline void RemoveSpace(std::string &str)
+{
+    str.erase(remove_if(str.begin(), str.end(), [](unsigned char c) { return std::isspace(c);}), str.end());
+}
+template <typename T>
+bool AddInt(T op1, T op2, T minVal, T maxVal, T &res);
+inline bool AddInt32(int32_t op1, int32_t op2, int32_t &res)
+{
+    return AddInt(op1, op2, INT32_MIN, INT32_MAX, res);
+}
+inline bool AddInt64(int64_t op1, int64_t op2, int64_t &res)
+{
+    return AddInt(op1, op2, INT64_MIN, INT64_MAX, res);
+}
+template<typename T>
+bool AddInt(T op1, T op2, T minVal, T maxVal, T &res)
+{
+    if (op1 >= 0) {
+        if (op2 > maxVal - op1) {
+            return false;
+        }
+    }
+    else {
+        if (op2 < minVal - op1) {
+            return false;
+        }
+    }
+    res = op1 + op2;
+    return true;
+}
 } // namespace MMI
 } // namespace OHOS
 #endif // UTIL_H

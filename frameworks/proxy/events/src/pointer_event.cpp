@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -146,6 +146,66 @@ void PointerEvent::PointerItem::SetTiltY(double tiltY)
     tiltY_ = tiltY;
 }
 
+int32_t PointerEvent::PointerItem::GetToolGlobalX() const
+{
+    return toolGlobalX_;
+}
+
+void PointerEvent::PointerItem::SetToolGlobalX(int32_t x)
+{
+    toolGlobalX_ = x;
+}
+
+int32_t PointerEvent::PointerItem::GetToolGlobalY() const
+{
+    return toolGlobalY_;
+}
+
+void PointerEvent::PointerItem::SetToolGlobalY(int32_t y)
+{
+    toolGlobalY_ = y;
+}
+
+int32_t PointerEvent::PointerItem::GetToolLocalX() const
+{
+    return toolLocalX_;
+}
+
+void PointerEvent::PointerItem::SetToolLocalX(int32_t x)
+{
+    toolLocalX_ = x;
+}
+
+int32_t PointerEvent::PointerItem::GetToolLocalY() const
+{
+    return toolLocalY_;
+}
+
+void PointerEvent::PointerItem::SetToolLocalY(int32_t y)
+{
+    toolLocalY_ = y;
+}
+
+int32_t PointerEvent::PointerItem::GetToolWidth() const
+{
+    return toolWidth_;
+}
+
+void PointerEvent::PointerItem::SetToolWidth(int32_t width)
+{
+    toolWidth_ = width;
+}
+
+int32_t PointerEvent::PointerItem::GetToolHeight() const
+{
+    return toolHeight_;
+}
+
+void PointerEvent::PointerItem::SetToolHeight(int32_t height)
+{
+    toolHeight_ = height;
+}
+
 double PointerEvent::PointerItem::GetPressure() const
 {
     return pressure_;
@@ -154,6 +214,26 @@ double PointerEvent::PointerItem::GetPressure() const
 void PointerEvent::PointerItem::SetPressure(double pressure)
 {
     pressure_ = pressure >= MAX_PRESSURE ? MAX_PRESSURE : pressure;
+}
+
+int32_t PointerEvent::PointerItem::GetLongAxis() const
+{
+    return longAxis_;
+}
+
+void PointerEvent::PointerItem::SetLongAxis(int32_t longAxis)
+{
+    longAxis_ = longAxis;
+}
+
+int32_t PointerEvent::PointerItem::GetShortAxis() const
+{
+    return shortAxis_;
+}
+
+void PointerEvent::PointerItem::SetShortAxis(int32_t shortAxis)
+{
+    shortAxis_ = shortAxis;
 }
 
 int32_t PointerEvent::PointerItem::GetDeviceId() const
@@ -166,92 +246,70 @@ void PointerEvent::PointerItem::SetDeviceId(int32_t deviceId)
     deviceId_ = deviceId;
 }
 
+int32_t PointerEvent::PointerItem::GetToolType() const
+{
+    return toolType_;
+}
+
+void PointerEvent::PointerItem::SetToolType(int32_t toolType)
+{
+    toolType_ = toolType;
+}
+
 bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
 {
-    if (!out.WriteInt32(pointerId_)) {
-        return false;
-    }
-    if (!out.WriteInt64(downTime_)) {
-        return false;
-    }
-    if (!out.WriteBool(pressed_)) {
-        return false;
-    }
-    if (!out.WriteInt32(globalX_)) {
-        return false;
-    }
-    if (!out.WriteInt32(globalY_)) {
-        return false;
-    }
-    if (!out.WriteInt32(localX_)) {
-        return false;
-    }
-    if (!out.WriteInt32(localY_)) {
-        return false;
-    }
-    if (!out.WriteInt32(width_)) {
-        return false;
-    }
-    if (!out.WriteInt32(height_)) {
-        return false;
-    }
-    if (!out.WriteDouble(tiltX_)) {
-        return false;
-    }
-    if (!out.WriteDouble(tiltY_)) {
-        return false;
-    }
-    if (!out.WriteDouble(pressure_)) {
-        return false;
-    }
-    if (!out.WriteInt32(deviceId_)) {
-        return false;
-    }
-    return true;
+    return (
+        out.WriteInt32(pointerId_) &&
+        out.WriteInt64(downTime_) &&
+        out.WriteBool(pressed_) &&
+        out.WriteInt32(globalX_) &&
+        out.WriteInt32(globalY_) &&
+        out.WriteInt32(localX_) &&
+        out.WriteInt32(localY_) &&
+        out.WriteInt32(width_) &&
+        out.WriteInt32(height_) &&
+        out.WriteInt32(toolGlobalX_) &&
+        out.WriteInt32(toolGlobalY_) &&
+        out.WriteInt32(toolLocalX_) &&
+        out.WriteInt32(toolLocalY_) &&
+        out.WriteInt32(toolWidth_) &&
+        out.WriteInt32(toolHeight_) &&
+        out.WriteDouble(tiltX_) &&
+        out.WriteDouble(tiltY_) &&
+        out.WriteDouble(pressure_) &&
+        out.WriteInt32(longAxis_) &&
+        out.WriteInt32(shortAxis_) &&
+        out.WriteInt32(toolType_) &&
+        out.WriteInt32(deviceId_)
+    );
 }
 
 bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
 {
-    if (!in.ReadInt32(pointerId_)) {
-        return false;
-    }
-    if (!in.ReadInt64(downTime_)) {
-        return false;
-    }
-    if (!in.ReadBool(pressed_)) {
-        return false;
-    }
-    if (!in.ReadInt32(globalX_)) {
-        return false;
-    }
-    if (!in.ReadInt32(globalY_)) {
-        return false;
-    }
-    if (!in.ReadInt32(localX_)) {
-        return false;
-    }
-    if (!in.ReadInt32(localY_)) {
-        return false;
-    }
-    if (!in.ReadInt32(width_)) {
-        return false;
-    }
-    if (!in.ReadInt32(height_)) {
-        return false;
-    }
-    if (!in.ReadDouble(tiltX_)) {
-        return false;
-    }
-    if (!in.ReadDouble(tiltY_)) {
-        return false;
-    }
-    if (!in.ReadDouble(pressure_)) {
-        return false;
-    }
-    if (!in.ReadInt32(deviceId_)) {
-        return false;
-    }
-    return true;
+    return (
+        in.ReadInt32(pointerId_) &&
+        in.ReadInt64(downTime_) &&
+        in.ReadBool(pressed_) &&
+        in.ReadInt32(globalX_) &&
+        in.ReadInt32(globalY_) &&
+        in.ReadInt32(localX_) &&
+        in.ReadInt32(localY_) &&
+        in.ReadInt32(width_) &&
+        in.ReadInt32(height_) &&
+        in.ReadInt32(toolGlobalX_) &&
+        in.ReadInt32(toolGlobalY_) &&
+        in.ReadInt32(toolLocalX_) &&
+        in.ReadInt32(toolLocalY_) &&
+        in.ReadInt32(toolWidth_) &&
+        in.ReadInt32(toolHeight_) &&
+        in.ReadDouble(tiltX_) &&
+        in.ReadDouble(tiltY_) &&
+        in.ReadDouble(pressure_) &&
+        in.ReadInt32(longAxis_) &&
+        in.ReadInt32(shortAxis_) &&
+        in.ReadInt32(toolType_) &&
+        in.ReadInt32(deviceId_)
+    );
 }
 
 PointerEvent::PointerEvent(int32_t eventType) : InputEvent(eventType) {}
@@ -299,26 +357,36 @@ void PointerEvent::SetPointerAction(int32_t pointerAction)
 const char* PointerEvent::DumpPointerAction() const
 {
     switch (pointerAction_) {
-        case PointerEvent::POINTER_ACTION_CANCEL:
+        case PointerEvent::POINTER_ACTION_CANCEL: {
             return "cancel";
-        case PointerEvent::POINTER_ACTION_DOWN:
+        }
+        case PointerEvent::POINTER_ACTION_DOWN: {
             return "down";
-        case PointerEvent::POINTER_ACTION_MOVE:
+        }
+        case PointerEvent::POINTER_ACTION_MOVE: {
             return "move";
-        case PointerEvent::POINTER_ACTION_UP:
+        }
+        case PointerEvent::POINTER_ACTION_UP: {
             return "up";
-        case PointerEvent::POINTER_ACTION_AXIS_BEGIN:
+        }
+        case PointerEvent::POINTER_ACTION_AXIS_BEGIN: {
             return "axis-begin";
-        case PointerEvent::POINTER_ACTION_AXIS_UPDATE:
+        }
+        case PointerEvent::POINTER_ACTION_AXIS_UPDATE: {
             return "axis-update";
-        case PointerEvent::POINTER_ACTION_AXIS_END:
+        }
+        case PointerEvent::POINTER_ACTION_AXIS_END: {
             return "axis-end";
-        case PointerEvent::POINTER_ACTION_BUTTON_DOWN:
+        }
+        case PointerEvent::POINTER_ACTION_BUTTON_DOWN: {
             return "button-down";
-        case PointerEvent::POINTER_ACTION_BUTTON_UP:
+        }
+        case PointerEvent::POINTER_ACTION_BUTTON_UP: {
             return "button-up";
-        default:
+        }
+        default: {
             break;
+        }
     }
     return "unknown";
 }
@@ -422,14 +490,18 @@ void PointerEvent::SetSourceType(int32_t sourceType)
 const char* PointerEvent::DumpSourceType() const
 {
     switch (sourceType_) {
-        case PointerEvent::SOURCE_TYPE_MOUSE:
+        case PointerEvent::SOURCE_TYPE_MOUSE: {
             return "mouse";
-        case PointerEvent::SOURCE_TYPE_TOUCHSCREEN:
+        }
+        case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
             return "touch-screen";
-        case PointerEvent::SOURCE_TYPE_TOUCHPAD:
+        }
+        case PointerEvent::SOURCE_TYPE_TOUCHPAD: {
             return "touch-pad";
-        default:
+        }
+        default: {
             break;
+        }
     }
     return "unknown";
 }
@@ -446,7 +518,7 @@ void PointerEvent::SetButtonId(int32_t buttonId)
 
 double PointerEvent::GetAxisValue(AxisType axis) const
 {
-    double axisValue {  };
+    double axisValue {};
     if ((axis >= AXIS_TYPE_UNKNOWN) && (axis < AXIS_TYPE_MAX)) {
         axisValue = axisValues_[axis];
     }
@@ -492,17 +564,13 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
         return false;
     }
 
-    if (!out.WriteInt32(pointerId_)) {
-        return false;
-    }
+    WRITEINT32(out, pointerId_);
 
     if (pointers_.size() > INT_MAX) {
         return false;
     }
 
-    if (!out.WriteInt32(static_cast<int32_t>(pointers_.size()))) {
-        return false;
-    }
+    WRITEINT32(out, static_cast<int32_t>(pointers_.size()));
 
     for (const auto &item : pointers_) {
         if (!item.WriteToParcel(out)) {
@@ -514,31 +582,19 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
         return false;
     }
 
-    if (!out.WriteInt32(static_cast<int32_t>(pressedButtons_.size()))) {
-        return false;
-    }
+    WRITEINT32(out, static_cast<int32_t>(pressedButtons_.size()));
 
     for (const auto &item : pressedButtons_) {
-        if (!out.WriteInt32(item)) {
-            return false;
-        }
+        WRITEINT32(out, item);
     }
 
-    if (!out.WriteInt32(sourceType_)) {
-        return false;
-    }
+    WRITEINT32(out, sourceType_);
 
-    if (!out.WriteInt32(pointerAction_)) {
-        return false;
-    }
+    WRITEINT32(out, pointerAction_);
 
-    if (!out.WriteInt32(buttonId_)) {
-        return false;
-    }
+    WRITEINT32(out, buttonId_);
 
-    if (!out.WriteUint32(axes_)) {
-        return false;
-    }
+    WRITEUINT32(out, axes_);
 
     const size_t axisValuesSize = axisValues_.size();
     if (axisValuesSize > INT_MAX) {
@@ -549,14 +605,10 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
         return false;
     }
 
-    if (!out.WriteInt32(static_cast<int32_t>(axisValuesSize))) {
-        return false;
-    }
+    WRITEINT32(out, static_cast<int32_t>(axisValuesSize));
 
     for (const auto &item : axisValues_) {
-        if (!out.WriteDouble(item)) {
-            return false;
-        }
+        WRITEDOUBLE(out, item);
     }
 
     return true;
@@ -568,9 +620,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
         return false;
     }
 
-    if (!in.ReadInt32(pointerId_)) {
-        return false;
-    }
+    READINT32(in, pointerId_);
 
     const int32_t pointersSize = in.ReadInt32();
     if (pointersSize < 0) {
@@ -592,30 +642,20 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
 
     for (int32_t i = 0; i < pressedButtonsSize; i++) {
         int32_t val = 0;
-        if (!in.ReadInt32(val)) {
-            return false;
-        }
+        READINT32(in, val);
         auto iter = pressedButtons_.insert(val);
         if (!iter.second) {
             MMI_HILOGE("Insert value failed, button:%{public}d", val);
         }
     }
 
-    if (!in.ReadInt32(sourceType_)) {
-        return false;
-    }
+    READINT32(in, sourceType_);
 
-    if (!in.ReadInt32(pointerAction_)) {
-        return false;
-    }
+    READINT32(in, pointerAction_);
 
-    if (!in.ReadInt32(buttonId_)) {
-        return false;
-    }
+    READINT32(in, buttonId_);
 
-    if (!in.ReadUint32(axes_)) {
-        return false;
-    }
+    READUINT32(in, axes_);
 
     const int32_t axisValueSize = in.ReadInt32();
     if (axisValueSize < 0) {
@@ -627,10 +667,8 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
     }
 
     for (int32_t i = 0; i < axisValueSize; i++) {
-        double val = {};
-        if (!in.ReadDouble(val)) {
-            return false;
-        }
+        double val {};
+        READDOUBLE(in, val);
         axisValues_[i] = val;
     }
 
@@ -639,7 +677,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
 
 bool PointerEvent::IsValidCheckMouseFunc() const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (pointers_.size() != 1) {
         MMI_HILOGE("Pointers_ is invalid");
         return false;
@@ -684,7 +722,7 @@ bool PointerEvent::IsValidCheckMouseFunc() const
 
 bool PointerEvent::IsValidCheckMouse() const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t mousePointID = GetPointerId();
     if (mousePointID < 0) {
         MMI_HILOGE("MousePointID is invalid");
@@ -722,7 +760,7 @@ bool PointerEvent::IsValidCheckMouse() const
 
 bool PointerEvent::IsValidCheckTouchFunc() const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t touchPointID = GetPointerId();
     if (touchPointID < 0) {
         MMI_HILOGE("TouchPointID is invalid");
@@ -750,7 +788,7 @@ bool PointerEvent::IsValidCheckTouchFunc() const
 
 bool PointerEvent::IsValidCheckTouch() const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (!IsValidCheckTouchFunc()) {
         MMI_HILOGE("IsValidCheckTouchFunc is invalid");
         return false;
@@ -795,7 +833,7 @@ bool PointerEvent::IsValidCheckTouch() const
 
 bool PointerEvent::IsValid() const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t sourceType = GetSourceType();
     if (sourceType != SOURCE_TYPE_MOUSE && sourceType != SOURCE_TYPE_TOUCHSCREEN &&
         sourceType != SOURCE_TYPE_TOUCHPAD) {
@@ -830,13 +868,14 @@ std::ostream& operator<<(std::ostream& ostream, PointerEvent& pointerEvent)
 {
     const int precision = 2;
     std::vector<int32_t> pointerIds { pointerEvent.GetPointersIdList() };
-    ostream << "EventType:" << pointerEvent.GetEventType()
+    ostream << "EventType:" << InputEvent::EventTypeToString(pointerEvent.GetEventType())
          << ",ActionTime:" << pointerEvent.GetActionTime()
          << ",Action:" << pointerEvent.GetAction()
          << ",ActionStartTime:" << pointerEvent.GetActionStartTime()
          << ",Flag:" << pointerEvent.GetFlag()
          << ",PointerAction:" << pointerEvent.DumpPointerAction()
          << ",SourceType:" << pointerEvent.DumpSourceType()
+         << ",ButtonId:" << pointerEvent.GetButtonId()
          << ",VerticalAxisValue:" << std::fixed << std::setprecision(precision)
          << pointerEvent.GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)
          << ",HorizontalAxisValue:" << std::fixed << std::setprecision(precision)
@@ -846,7 +885,6 @@ std::ostream& operator<<(std::ostream& ostream, PointerEvent& pointerEvent)
          << ",PointerCount:" << pointerIds.size()
          << ",EventNumber:" << pointerEvent.GetId() << std::endl;
 
-    const int pressurePrecision = 6;
     for (const auto& pointerId : pointerIds) {
         PointerEvent::PointerItem item;
         if (!pointerEvent.GetPointerItem(pointerId, item)) {
@@ -859,14 +897,19 @@ std::ostream& operator<<(std::ostream& ostream, PointerEvent& pointerEvent)
             << ",LocalX:" << item.GetLocalX() << ",LocalY:" << item.GetLocalY()
             << ",Width:" << item.GetWidth() << ",Height:" << item.GetHeight()
             << ",TiltX:" << item.GetTiltX() << ",TiltY:" << item.GetTiltY()
-            << ",Pressure:" << std::fixed << std::setprecision(pressurePrecision)
-            << item.GetPressure() << std::endl;
+            << ",ToolGlobalX:" << item.GetToolGlobalX() << ",ToolGlobalY:" << item.GetToolGlobalY()
+            << ",ToolLocalX:" << item.GetToolLocalX() << ",ToolLocalY:" << item.GetToolLocalY()
+            << ",ToolWidth:" << item.GetToolWidth() << ",ToolHeight:" << item.GetToolHeight()
+            << ",Pressure:" << item.GetPressure() << ",ToolType:" << item.GetToolType()
+            << ",LongAxis:" << item.GetLongAxis() << ",ShortAxis:" << item.GetShortAxis()
+            << std::endl;
     }
     std::vector<int32_t> pressedKeys = pointerEvent.GetPressedKeys();
-    if (!pressedKeys.empty()) {
-        ostream << "Pressed keyCode: [";
-        for (const auto& keyCode : pressedKeys) {
-            ostream << keyCode << ",";
+    std::vector<int32_t>::const_iterator cItr = pressedKeys.cbegin();
+    if (cItr != pressedKeys.cend()) {
+        ostream << "Pressed keyCode: [" << *cItr++;
+        for (; cItr != pressedKeys.cend(); ++cItr) {
+            ostream << "," << *cItr;
         }
         ostream << "]" << std::endl;
     }

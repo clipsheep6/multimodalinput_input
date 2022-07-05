@@ -31,11 +31,13 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "LibinputAdapter" };
-constexpr int32_t WAIT_TIME_FOR_INPUT { 100 };
+constexpr int32_t WAIT_TIME_FOR_INPUT { 500 };
+constexpr int32_t MAX_RETRY_COUNT = 60;
 } // namespace
 
 static void HiLogFunc(struct libinput* input, libinput_log_priority priority, const char* fmt, va_list args)
 {
+    CHKPV(input);
     char buffer[256];
     if (vsnprintf_s(buffer, sizeof(buffer), sizeof(buffer) - 1, fmt, args) == -1) {
         MMI_HILOGE("call vsnprintf_s fail");
@@ -61,21 +63,31 @@ void LibinputAdapter::LoginfoPackagingTool(struct libinput_event *event)
 {
     CHKPV(event);
     auto context = libinput_event_get_context(event);
+    CHKPV(context);
     InitHiLogFunc(context);
 }
 
 constexpr static libinput_interface LIBINPUT_INTERFACE = {
     .open_restricted = [](const char *path, int32_t flags, void *user_data)->int32_t {
-        CHKPR(path, errno);
+        if (path == nullptr) {
+            MMI_HILOGWK("input device path is nullptr");
+            return RET_ERR;
+        }
         char realPath[PATH_MAX] = {};
-        if (realpath(path, realPath) == nullptr) {
-            MMI_HILOGE("path is error, path:%{public}s", path);
+        int32_t count = 0;
+        while ((realpath(path, realPath) == nullptr) && (count < MAX_RETRY_COUNT)) {
+            MMI_HILOGWK("path is error, count: %{public}d, path:%{public}s", count, path);
             std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_FOR_INPUT));
+            ++count;
+        }
+        if (count >= MAX_RETRY_COUNT) {
+            MMI_HILOGWK("retry %{public}d times realpath failed", count);
             return RET_ERR;
         }
         int32_t fd = open(realPath, flags);
-        MMI_HILOGD("libinput .open_restricted path:%{public}s,fd:%{public}d", path, fd);
-        return fd < 0 ? -errno : fd;
+        int32_t errNo = errno;
+        MMI_HILOGWK("libinput .open_restricted path:%{public}s,fd:%{public}d,errno:%{public}d", path, fd, errNo);
+        return fd < 0 ? RET_ERR : fd;
     },
     .close_restricted = [](int32_t fd, void *user_data)
     {
@@ -90,7 +102,7 @@ LibinputAdapter::~LibinputAdapter() {}
 
 bool LibinputAdapter::Init(FunInputEvent funInputEvent, const std::string& seat_id)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPF(funInputEvent);
     funInputEvent_ = funInputEvent;
     seat_id_ = seat_id;
@@ -101,7 +113,7 @@ bool LibinputAdapter::Init(FunInputEvent funInputEvent, const std::string& seat_
     CHKPF(udev_);
     input_ = libinput_udev_create_context(&LIBINPUT_INTERFACE, nullptr, udev_);
     CHKPF(input_);
-    auto rt = libinput_udev_assign_seat(input_, seat_id_.c_str());
+    int32_t rt = libinput_udev_assign_seat(input_, seat_id_.c_str());
     if (rt != 0) {
         libinput_unref(input_);
         udev_unref(udev_);
@@ -121,7 +133,7 @@ bool LibinputAdapter::Init(FunInputEvent funInputEvent, const std::string& seat_
 
 void LibinputAdapter::EventDispatch(struct epoll_event& ev)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(ev.data.ptr);
     auto fd = *static_cast<int*>(ev.data.ptr);
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
@@ -140,7 +152,7 @@ void LibinputAdapter::EventDispatch(struct epoll_event& ev)
 
 void LibinputAdapter::Stop()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (fd_ >= 0) {
         close(fd_);
         fd_ = -1;
@@ -149,15 +161,28 @@ void LibinputAdapter::Stop()
     udev_unref(udev_);
 }
 
+void LibinputAdapter::ProcessPendingEvents()
+{
+    OnEventHandler();
+}
+
 void LibinputAdapter::OnEventHandler()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(funInputEvent_);
     libinput_event *event = nullptr;
     while ((event = libinput_get_event(input_))) {
         funInputEvent_(event);
         libinput_event_destroy(event);
     }
+}
+
+void LibinputAdapter::ReloadDevice()
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(input_);
+    libinput_suspend(input_);
+    libinput_resume(input_);
 }
 } // namespace MMI
 } // namespace OHOS

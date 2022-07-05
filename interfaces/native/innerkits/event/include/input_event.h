@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -123,11 +123,11 @@ public:
      */
     static const char* EventTypeToString(int32_t eventType);
 
-   /**
-    * @brief Resets an input event to the initial state.
-    * @return void
-    * @since 9
-    */
+    /**
+     * @brief Resets an input event to the initial state.
+     * @return void
+     * @since 9
+     */
     virtual void Reset();
 
     /**
@@ -319,7 +319,7 @@ public:
 
 public:
     /**
-     * @brief Writes data to a <b>Parcel</b> obejct.
+     * @brief Writes data to a <b>Parcel</b> object.
      * @param out Indicates the object into which data will be written.
      * @return Returns <b>true</b> if the data is successfully written; returns <b>false</b> otherwise.
      * @since 9
@@ -327,7 +327,7 @@ public:
     bool WriteToParcel(Parcel &out) const;
 
     /**
-     * @brief Reads data from a <b>Parcel</b> obejct.
+     * @brief Reads data from a <b>Parcel</b> object.
      * @param in Indicates the object from which data will be read.
      * @return Returns <b>true</b> if the data is successfully read; returns <b>false</b> otherwise.
      * @since 9
@@ -355,6 +355,8 @@ private:
     uint32_t bitwise_;
     std::function<void(int32_t)> processedCallback_;
 };
+
+std::ostream& operator<<(std::ostream&, InputEvent&);
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_EVENT_H

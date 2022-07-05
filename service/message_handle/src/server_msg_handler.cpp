@@ -20,13 +20,13 @@
 #include "event_dump.h"
 #include "event_package.h"
 #include "hos_key_event.h"
+#include "interceptor_handler_global.h"
 #include "input_device_manager.h"
 #include "input_event.h"
 #include "input_event_data_transformation.h"
-#include "input_event_monitor_manager.h"
+#include "input_event_handler.h"
 #include "input_handler_manager_global.h"
 #include "input_windows_manager.h"
-#include "interceptor_manager_global.h"
 #include "key_event_subscriber.h"
 #include "mmi_func_callback.h"
 #include "time_cost_chk.h"
@@ -55,35 +55,16 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
     }
 #endif
     MsgCallback funs[] = {
-        {MmiMessageId::ON_VIRTUAL_KEY, MsgCallbackBind2(&ServerMsgHandler::OnVirtualKeyEvent, this)},
-        {MmiMessageId::MARK_PROCESS,
-            MsgCallbackBind2(&ServerMsgHandler::MarkProcessed, this)},
-        {MmiMessageId::ON_DUMP, MsgCallbackBind2(&ServerMsgHandler::OnDump, this)},
-        {MmiMessageId::GET_MMI_INFO_REQ, MsgCallbackBind2(&ServerMsgHandler::GetMultimodeInputInfo, this)},
-        {MmiMessageId::INJECT_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnInjectKeyEvent, this) },
-        {MmiMessageId::INJECT_POINTER_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnInjectPointerEvent, this) },
         {MmiMessageId::INPUT_DEVICE, MsgCallbackBind2(&ServerMsgHandler::OnInputDevice, this)},
         {MmiMessageId::INPUT_DEVICE_IDS, MsgCallbackBind2(&ServerMsgHandler::OnInputDeviceIds, this)},
-        {MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY, MsgCallbackBind2(&ServerMsgHandler::GetKeystrokeAbility, this)},
-        {MmiMessageId::ADD_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnAddInputDeviceMontior, this)},
-        {MmiMessageId::REMOVE_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputDeviceMontior, this)},
+        {MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY, MsgCallbackBind2(&ServerMsgHandler::OnSupportKeys, this)},
+        {MmiMessageId::INPUT_DEVICE_KEYBOARD_TYPE, MsgCallbackBind2(&ServerMsgHandler::OnInputKeyboardType, this)},
+        {MmiMessageId::ADD_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnAddInputDeviceMonitor, this)},
+        {MmiMessageId::REMOVE_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputDeviceMonitor, this)},
         {MmiMessageId::DISPLAY_INFO, MsgCallbackBind2(&ServerMsgHandler::OnDisplayInfo, this)},
-        {MmiMessageId::ADD_INPUT_EVENT_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnAddInputEventMontior, this)},
-        {MmiMessageId::REMOVE_INPUT_EVENT_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputEventMontior, this)},
-        {MmiMessageId::ADD_INPUT_EVENT_TOUCHPAD_MONITOR,
-            MsgCallbackBind2(&ServerMsgHandler::OnAddInputEventTouchpadMontior, this)},
-        {MmiMessageId::REMOVE_INPUT_EVENT_TOUCHPAD_MONITOR,
-            MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputEventTouchpadMontior, this)},
-        {MmiMessageId::ADD_INPUT_HANDLER, MsgCallbackBind2(&ServerMsgHandler::OnAddInputHandler, this)},
-        {MmiMessageId::REMOVE_INPUT_HANDLER, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputHandler, this)},
-        {MmiMessageId::MARK_CONSUMED, MsgCallbackBind2(&ServerMsgHandler::OnMarkConsumed, this)},
-        {MmiMessageId::MOVE_MOUSE_BY_OFFSET, MsgCallbackBind2(&ServerMsgHandler::OnMoveMouse, this)},
-        {MmiMessageId::SUBSCRIBE_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnSubscribeKeyEvent, this)},
-        {MmiMessageId::UNSUBSCRIBE_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnUnSubscribeKeyEvent, this)},
-        {MmiMessageId::ADD_EVENT_INTERCEPTOR,
-            MsgCallbackBind2(&ServerMsgHandler::OnAddTouchpadEventFilter, this)},
-        {MmiMessageId::REMOVE_EVENT_INTERCEPTOR,
-            MsgCallbackBind2(&ServerMsgHandler::OnRemoveTouchpadEventFilter, this)},
+#ifdef OHOS_BUILD_MMI_DEBUG
+        {MmiMessageId::BIGPACKET_TEST, MsgCallbackBind2(&ServerMsgHandler::OnBigPacketTest, this)},
+#endif // OHOS_BUILD_MMI_DEBUG
 #ifdef OHOS_BUILD_HDF
         {MmiMessageId::HDI_INJECT, MsgCallbackBind2(&ServerMsgHandler::OnHdiInject, this)},
 #endif // OHOS_BUILD_HDF
@@ -121,308 +102,234 @@ int32_t ServerMsgHandler::OnHdiInject(SessionPtr sess, NetPacket& pkt)
     const int32_t processingCode = MMIHdiInject->ManageHdfInject(sess, pkt);
     NetPacket pkt(MmiMessageId::HDI_INJECT);
     pkt << processingCode;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write reply message failed");
+        return RET_ERR;
+    }
     if (!sess->SendMsg(pkt)) {
-        MMI_HILOGE("OnHdiInject reply messaage error");
+        MMI_HILOGE("OnHdiInject reply message error");
         return RET_ERR;
     }
     return RET_OK;
 }
-#endif
+#endif // OHOS_BUILD_HDF
 
-int32_t ServerMsgHandler::OnVirtualKeyEvent(SessionPtr sess, NetPacket& pkt)
+int32_t ServerMsgHandler::MarkEventProcessed(SessionPtr sess, int32_t eventId)
 {
-    VirtualKey virtualKeyEvent;
-    pkt >> virtualKeyEvent;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read virtualKeyEvent failed");
-        return PACKET_READ_FAIL;
-    }
-    if (virtualKeyEvent.keyCode == HOS_KEY_HOME) {
-        MMI_HILOGD(" home press");
-    } else if (virtualKeyEvent.keyCode == HOS_KEY_BACK) {
-        MMI_HILOGD(" back press");
-    } else if (virtualKeyEvent.keyCode == HOS_KEY_VIRTUAL_MULTITASK) {
-        MMI_HILOGD(" multitask press");
-    }
-    return RET_OK;
-}
-
-int32_t ServerMsgHandler::OnDump(SessionPtr sess, NetPacket& pkt)
-{
-    CHKPR(udsServer_, ERROR_NULL_POINTER);
-    int32_t fd = -1;
-    pkt >> fd;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read fd failed");
-        return PACKET_READ_FAIL;
-    }
-    MMIEventDump->Dump(fd);
-    return RET_OK;
-}
-
-int32_t ServerMsgHandler::MarkProcessed(SessionPtr sess, NetPacket& pkt)
-{
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t eventId = 0;
-    pkt >> eventId;
-    MMI_HILOGD("event is: %{public}d", eventId);
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read data failed");
-        return PACKET_READ_FAIL;
-    }
     sess->DelEvents(eventId);
     return RET_OK;
 }
 
-int32_t ServerMsgHandler::GetMultimodeInputInfo(SessionPtr sess, NetPacket& pkt)
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
-    CHKPR(sess, ERROR_NULL_POINTER);
-    CHKPR(udsServer_, ERROR_NULL_POINTER);
-    TagPackHead tagPackHead;
-    pkt >> tagPackHead;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read tagPackHead failed");
-        return PACKET_READ_FAIL;
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
+    CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
+    inputEventNormalizeHandler->HandleKeyEvent(keyEvent);
+    MMI_HILOGD("Inject keyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    pointerEvent->UpdateId();
+    int32_t action = pointerEvent->GetPointerAction();
+    if ((action == PointerEvent::POINTER_ACTION_MOVE || action == PointerEvent::POINTER_ACTION_UP)
+        && targetWindowId_ > 0) {
+        pointerEvent->SetTargetWindowId(targetWindowId_);
     }
-    int32_t fd = sess->GetFd();
-    if (tagPackHead.idMsg != MmiMessageId::INVALID) {
-        TagPackHead tagPackHeadAck = { MmiMessageId::INVALID, {fd}};
-        NetPacket pkt(MmiMessageId::GET_MMI_INFO_ACK);
-        pkt << tagPackHeadAck;
-        if (!udsServer_->SendMsg(fd, pkt)) {
-            MMI_HILOGE("Sending message failed");
-            return MSG_SEND_FAIL;
+    auto source = pointerEvent->GetSourceType();
+    switch (source) {
+        case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
+            auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
+            CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
+            inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
+            break;
+        }
+        case PointerEvent::SOURCE_TYPE_MOUSE:
+        case PointerEvent::SOURCE_TYPE_TOUCHPAD : {
+            auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
+            CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
+            inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
+            break;
+        }
+        default: {
+            MMI_HILOGW("Source type is unknown, source:%{public}d", source);
+            break;
         }
     }
-    return RET_OK;
-}
-
-int32_t ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket& pkt)
-{
-    CHKPR(sess, ERROR_NULL_POINTER);
-    auto creKey = KeyEvent::Create();
-    CHKPR(creKey, ERROR_NULL_POINTER);
-    int32_t errCode = InputEventDataTransformation::NetPacketToKeyEvent(pkt, creKey);
-    if (errCode != RET_OK) {
-        MMI_HILOGE("Deserialization is Failed, errCode:%{public}u", errCode);
-        return RET_ERR;
-    }
-    auto result = eventDispatch_.DispatchKeyEventPid(*udsServer_, creKey);
-    if (result != RET_OK) {
-        MMI_HILOGE("Key event dispatch failed. ret:%{public}d,errCode:%{public}d", result, KEY_EVENT_DISP_FAIL);
-    }
-    MMI_HILOGD("Inject keyCode:%{public}d, action:%{public}d", creKey->GetKeyCode(), creKey->GetKeyAction());
-    return RET_OK;
-}
-
-int32_t ServerMsgHandler::OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt)
-{
-    CALL_LOG_ENTER;
-    auto pointerEvent = PointerEvent::Create();
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    if (InputEventDataTransformation::Unmarshalling(pkt, pointerEvent) != RET_OK) {
-        MMI_HILOGE("Unmarshalling failed");
-        return RET_ERR;
-    }
-    pointerEvent->UpdateId();
-    if (eventDispatch_.HandlePointerEvent(pointerEvent) != RET_OK) {
-        MMI_HILOGE("HandlePointerEvent failed");
-        return RET_ERR;
+    if (action == PointerEvent::POINTER_ACTION_DOWN) {
+        targetWindowId_ = pointerEvent->GetTargetWindowId();
     }
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
-
-    std::vector<PhysicalDisplayInfo> physicalDisplays;
-    int32_t num = 0;
-    pkt.Read(num);
-    for (int32_t i = 0; i < num; i++) {
-        PhysicalDisplayInfo info;
-        pkt.Read(info.id);
-        pkt.Read(info.leftDisplayId);
-        pkt.Read(info.upDisplayId);
-        pkt.Read(info.topLeftX);
-        pkt.Read(info.topLeftY);
-        pkt.Read(info.width);
-        pkt.Read(info.height);
-        pkt.Read(info.name);
-        pkt.Read(info.seatId);
-        pkt.Read(info.seatName);
-        pkt.Read(info.logicWidth);
-        pkt.Read(info.logicHeight);
-        pkt.Read(info.direction);
-        physicalDisplays.push_back(info);
+    DisplayGroupInfo displayGroupInfo;
+    pkt >> displayGroupInfo.width >> displayGroupInfo.height >> displayGroupInfo.focusWindowId;
+    uint32_t num = 0;
+    pkt >> num;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read display info failed");
+        return RET_ERR;
     }
-
-    std::vector<LogicalDisplayInfo> logicalDisplays;
-    pkt.Read(num);
-    for (int32_t i = 0; i < num; i++) {
-        LogicalDisplayInfo info;
-        pkt.Read(info.id);
-        pkt.Read(info.topLeftX);
-        pkt.Read(info.topLeftY);
-        pkt.Read(info.width);
-        pkt.Read(info.height);
-        pkt.Read(info.name);
-        pkt.Read(info.seatId);
-        pkt.Read(info.seatName);
-        pkt.Read(info.focusWindowId);
-
-        std::vector<WindowInfo> windowInfos;
-        int32_t numWindow = 0;
-        pkt.Read(numWindow);
-        for (int32_t j = 0; j < numWindow; j++) {
-            WindowInfo info;
-            pkt.Read(info);
-            windowInfos.push_back(info);
-        }
-        info.windowsInfo = windowInfos;
-        logicalDisplays.push_back(info);
+    for (uint32_t i = 0; i < num; i++) {
+        WindowInfo info;
+        pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
+            >> info.pointerHotAreas >> info.agentWindowId >> info.flags;
+        displayGroupInfo.windowsInfo.push_back(info);
+        if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read display info failed");
+        return RET_ERR;
     }
-
-    InputWindowsManager::GetInstance()->UpdateDisplayInfo(physicalDisplays, logicalDisplays);
+    }
+    pkt >> num;
+    for (uint32_t i = 0; i < num; i++) {
+        DisplayInfo info;
+        pkt >> info.id >> info.x >> info.y >> info.width >> info.height
+            >> info.name >> info.uniq >> info.direction;
+        displayGroupInfo.displaysInfo.push_back(info);
+        if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read display info failed");
+        return RET_ERR;
+    }
+    }
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read display info failed");
+        return RET_ERR;
+    }
+    InputWindowsManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo);
     return RET_OK;
 }
 
-int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, NetPacket& pkt)
+#if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
+int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType,
+    HandleEventType eventType)
 {
-    int32_t handlerId;
-    InputHandlerType handlerType;
-    if (!pkt.Read(handlerId)) {
-        MMI_HILOGE("Packet read handler failed");
-        return RET_ERR;
+    CHKPR(sess, ERROR_NULL_POINTER);
+    MMI_HILOGD("handler:%{public}d, handlerType:%{public}d", handlerId, handlerType);
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+    if (handlerType == InputHandlerType::INTERCEPTOR) {
+        auto interceptorHandler = InputHandler->GetInterceptorHandler();
+        CHKPR(interceptorHandler, ERROR_NULL_POINTER);
+        return interceptorHandler->AddInputHandler(handlerId, handlerType, eventType, sess);
     }
-    if (!pkt.Read(handlerType)) {
-        MMI_HILOGE("Packet read handlerType failed");
-        return RET_ERR;
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    if (handlerType == InputHandlerType::MONITOR) {
+        auto monitorHandler = InputHandler->GetMonitorHandler();
+        CHKPR(monitorHandler, ERROR_NULL_POINTER);
+        return monitorHandler->AddInputHandler(handlerId, handlerType, sess);
     }
-    MMI_HILOGD("OnAddInputHandler handler:%{public}d,handlerType:%{public}d", handlerId, handlerType);
-    return InputHandlerManagerGlobal::GetInstance().AddInputHandler(handlerId, handlerType, sess);
+#endif // OHOS_BUILD_ENABLE_MONITOR
+    return RET_OK;
 }
 
-int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, NetPacket& pkt)
+int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType)
 {
-    int32_t handlerId;
-    InputHandlerType handlerType;
-    if (!pkt.Read(handlerId)) {
-        MMI_HILOGE("Packet read handler failed");
-        return RET_ERR;
-    }
-    if (!pkt.Read(handlerType)) {
-        MMI_HILOGE("Packet read handlerType failed");
-        return RET_ERR;
-    }
+    CHKPR(sess, ERROR_NULL_POINTER);
     MMI_HILOGD("OnRemoveInputHandler handler:%{public}d,handlerType:%{public}d", handlerId, handlerType);
-    InputHandlerManagerGlobal::GetInstance().RemoveInputHandler(handlerId, handlerType, sess);
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+    if (handlerType == InputHandlerType::INTERCEPTOR) {
+        auto interceptorHandler = InputHandler->GetInterceptorHandler();
+        CHKPR(interceptorHandler, ERROR_NULL_POINTER);
+        interceptorHandler->RemoveInputHandler(handlerId, handlerType, sess);
+    }
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    if (handlerType == InputHandlerType::MONITOR) {
+        auto monitorHandler = InputHandler->GetMonitorHandler();
+        CHKPR(monitorHandler, ERROR_NULL_POINTER);
+        monitorHandler->RemoveInputHandler(handlerId, handlerType, sess);
+    }
+#endif // OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 
-int32_t ServerMsgHandler::OnMarkConsumed(SessionPtr sess, NetPacket& pkt)
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+int32_t ServerMsgHandler::OnMarkConsumed(SessionPtr sess, int32_t monitorId, int32_t eventId)
 {
-    int32_t monitorId, eventId;
-    if (!pkt.Read(monitorId)) {
-        MMI_HILOGE("Packet read monitor failed");
-        return RET_ERR;
-    }
-    if (!pkt.Read(eventId)) {
-        MMI_HILOGE("Packet read event failed");
-        return RET_ERR;
-    }
-    InputHandlerManagerGlobal::GetInstance().MarkConsumed(monitorId, eventId, sess);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    auto monitorHandler = InputHandler->GetMonitorHandler();
+    CHKPR(monitorHandler, ERROR_NULL_POINTER);
+    monitorHandler->MarkConsumed(monitorId, eventId, sess);
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_MONITOR
 
-int32_t ServerMsgHandler::OnMoveMouse(SessionPtr sess, NetPacket& pkt)
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+int32_t ServerMsgHandler::OnMoveMouse(int32_t offsetX, int32_t offsetY)
 {
-    CALL_LOG_ENTER;
-    int32_t offsetX = 0;
-    int32_t offsetY = 0;
-    if (!pkt.Read(offsetX)) {
-        MMI_HILOGE("Packet read offsetX failed");
-        return RET_ERR;
-    }
-    if (!pkt.Read(offsetY)) {
-        MMI_HILOGE("Packet read offsetY failed");
-        return RET_ERR;
-    }
-
+    CALL_DEBUG_ENTER;
     if (MouseEventHdr->NormalizeMoveMouse(offsetX, offsetY)) {
         auto pointerEvent = MouseEventHdr->GetPointerEvent();
-        eventDispatch_.HandlePointerEvent(pointerEvent);
+        CHKPR(pointerEvent, ERROR_NULL_POINTER);
+        auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
+        CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
+        inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
+        MMI_HILOGD("Mouse movement message processed successfully");
     }
     return RET_OK;
 }
-int32_t ServerMsgHandler::OnSubscribeKeyEvent(SessionPtr sess, NetPacket &pkt)
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+int32_t ServerMsgHandler::OnSubscribeKeyEvent(IUdsServer *server, int32_t pid,
+    int32_t subscribeId, const std::shared_ptr<KeyOption> option)
 {
-    int32_t subscribeId = -1;
-    uint32_t preKeySize = 0;
-    int32_t finalKey = -1;
-    bool isFinalKeyDown = true;
-    int32_t finalKeyDownDuration = 0;
-    pkt >> subscribeId >> finalKey >> isFinalKeyDown >> finalKeyDownDuration >> preKeySize;
-    std::set<int32_t> preKeys;
-    for (uint32_t i = 0; i < preKeySize; ++i) {
-        int32_t tmpKey = -1;
-        pkt >> tmpKey;
-        if (!(preKeys.insert(tmpKey).second)) {
-            MMI_HILOGE("Insert value failed, tmpKey:%{public}d", tmpKey);
-        }
-    }
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read subscribe failed");
-        return PACKET_READ_FAIL;
-    }
-    auto keyOption = std::make_shared<KeyOption>();
-    keyOption->SetPreKeys(preKeys);
-    keyOption->SetFinalKey(finalKey);
-    keyOption->SetFinalKeyDown(isFinalKeyDown);
-    keyOption->SetFinalKeyDownDuration(finalKeyDownDuration);
-    int32_t ret = KeyEventSubscriber_.SubscribeKeyEvent(sess, subscribeId, keyOption);
-    return ret;
+    CALL_DEBUG_ENTER;
+    CHKPR(server, ERROR_NULL_POINTER);
+    auto sess = server->GetSessionByPid(pid);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    auto subscriberHandler = InputHandler->GetSubscriberHandler();
+    CHKPR(subscriberHandler, ERROR_NULL_POINTER);
+    return subscriberHandler->SubscribeKeyEvent(sess, subscribeId, option);
 }
 
-int32_t ServerMsgHandler::OnUnSubscribeKeyEvent(SessionPtr sess, NetPacket &pkt)
+int32_t ServerMsgHandler::OnUnsubscribeKeyEvent(IUdsServer *server, int32_t pid, int32_t subscribeId)
 {
-    int32_t subscribeId = -1;
-    pkt >> subscribeId;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read subscribe failed");
-        return PACKET_READ_FAIL;
-    }
-    int32_t ret = KeyEventSubscriber_.UnSubscribeKeyEvent(sess, subscribeId);
-    return ret;
+    CALL_DEBUG_ENTER;
+    CHKPR(server, ERROR_NULL_POINTER);
+    auto sess = server->GetSessionByPid(pid);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    auto subscriberHandler = InputHandler->GetSubscriberHandler();
+    CHKPR(subscriberHandler, ERROR_NULL_POINTER);    
+    return subscriberHandler->UnsubscribeKeyEvent(sess, subscribeId);
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 int32_t ServerMsgHandler::OnInputDeviceIds(SessionPtr sess, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
     int32_t userData = 0;
-    if (!pkt.Read(userData)) {
+    pkt >> userData;
+    if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read userData failed");
         return RET_ERR;
     }
     std::vector<int32_t> ids = InputDevMgr->GetInputDeviceIds();
-    int32_t size = static_cast<int32_t>(ids.size());
+    if (ids.size() > MAX_INPUT_DEVICE) {
+        MMI_HILOGE("Device exceeds the max range");
+        return RET_ERR;
+    }
     NetPacket pkt2(MmiMessageId::INPUT_DEVICE_IDS);
-    if (!pkt2.Write(userData)) {
-        MMI_HILOGE("Packet write userData failed");
+    pkt2 << userData << ids;
+    if (pkt2.ChkRWError()) {
+        MMI_HILOGE("Packet write deviceIds failed");
         return RET_ERR;
-    }
-    if (!pkt2.Write(size)) {
-        MMI_HILOGE("Packet write size failed");
-        return RET_ERR;
-    }
-    for (const auto& item : ids) {
-        if (!pkt2.Write(item)) {
-            MMI_HILOGE("Packet write item failed");
-            return RET_ERR;
-        }
     }
     if (!sess->SendMsg(pkt2)) {
         MMI_HILOGE("Sending failed");
@@ -433,18 +340,16 @@ int32_t ServerMsgHandler::OnInputDeviceIds(SessionPtr sess, NetPacket& pkt)
 
 int32_t ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
     int32_t userData = 0;
-    if (!pkt.Read(userData)) {
-        MMI_HILOGE("Packet read userData failed");
-        return RET_ERR;
-    }
     int32_t deviceId = 0;
-    if (!pkt.Read(deviceId)) {
-        MMI_HILOGE("Packet read device failed");
-        return RET_ERR;
+    pkt >> userData >> deviceId;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read data failed");
+        return PACKET_READ_FAIL;
     }
+
     std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetInputDevice(deviceId);
     NetPacket pkt2(MmiMessageId::INPUT_DEVICE);
     if (inputDevice == nullptr) {
@@ -452,20 +357,16 @@ int32_t ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& pkt)
         int32_t id = -1;
         std::string name = "null";
         int32_t deviceType = -1;
-        if (!pkt2.Write(userData)) {
-            MMI_HILOGE("Packet write userData failed");
-            return RET_ERR;
-        }
-        if (!pkt2.Write(id)) {
-            MMI_HILOGE("Packet write data failed");
-            return RET_ERR;
-        }
-        if (!pkt2.Write(name)) {
-            MMI_HILOGE("Packet write name failed");
-            return RET_ERR;
-        }
-        if (!pkt2.Write(deviceType)) {
-            MMI_HILOGE("Packet write deviceType failed");
+        int32_t busType = -1;
+        int32_t product = -1;
+        int32_t vendor = -1;
+        int32_t version = -1;
+        std::string phys = "null";
+        std::string uniq = "null";
+        size_t size = 0;
+        pkt2 << userData << id << name << deviceType << busType << product << vendor << version << phys << uniq << size;
+        if (pkt2.ChkRWError()) {
+            MMI_HILOGE("packet write data failed");
             return RET_ERR;
         }
         if (!sess->SendMsg(pkt2)) {
@@ -474,24 +375,22 @@ int32_t ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& pkt)
         }
         return RET_OK;
     }
-    int32_t id = inputDevice->GetId();
-    std::string name = inputDevice->GetName();
-    int32_t deviceType = inputDevice->GetType();
-    if (!pkt2.Write(userData)) {
-        MMI_HILOGE("Packet write userData failed");
+
+    pkt2 << userData << inputDevice->GetId() << inputDevice->GetName() << inputDevice->GetType()
+        << inputDevice->GetBusType() << inputDevice->GetProduct() << inputDevice->GetVendor()
+        << inputDevice->GetVersion() << inputDevice->GetPhys() << inputDevice->GetUniq()
+        << inputDevice->GetAxisInfo().size();
+    if (pkt2.ChkRWError()) {
+        MMI_HILOGE("packet write basic data failed");
         return RET_ERR;
     }
-    if (!pkt2.Write(id)) {
-        MMI_HILOGE("Packet write data failed");
-        return RET_ERR;
-    }
-    if (!pkt2.Write(name)) {
-        MMI_HILOGE("Packet write name failed");
-        return RET_ERR;
-    }
-    if (!pkt2.Write(deviceType)) {
-        MMI_HILOGE("Packet write deviceType failed");
-        return RET_ERR;
+    for (const auto &item : inputDevice->GetAxisInfo()) {
+        pkt2 << item.GetAxisType() << item.GetMinimum() << item.GetMaximum() << item.GetFuzz() << item.GetFlat()
+            << item.GetResolution();
+        if (pkt2.ChkRWError()) {
+            MMI_HILOGE("packet write axis data failed");
+            return RET_ERR;
+        }
     }
     if (!sess->SendMsg(pkt2)) {
         MMI_HILOGE("Sending failed");
@@ -500,57 +399,31 @@ int32_t ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& pkt)
     return RET_OK;
 }
 
-int32_t ServerMsgHandler::GetKeystrokeAbility(SessionPtr sess, NetPacket& pkt)
+int32_t ServerMsgHandler::OnSupportKeys(SessionPtr sess, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
     int32_t userData;
-    if (!pkt.Read(userData)) {
-        MMI_HILOGE("Packet read userData failed");
-        return RET_ERR;
-    }
     int32_t deviceId;
-    if (!pkt.Read(deviceId)) {
-        MMI_HILOGE("Packet read device failed");
-        return RET_ERR;
-    }
-    size_t size;
-    if (!pkt.Read(size)) {
-        MMI_HILOGE("Packet read size failed");
-        return RET_ERR;
-    }
-    int32_t sysKeyValue;
     std::vector<int32_t> keyCode;
-    for (size_t i = 0 ; i < size; ++i) {
-        if (!pkt.Read(sysKeyValue)) {
-            MMI_HILOGE("Packet read nativeKeyValue failed");
-            return RET_ERR;
-        }
-        keyCode.push_back(sysKeyValue);
+    pkt >> userData >> deviceId >> keyCode;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read key info failed");
+        return RET_ERR;
     }
-
-    std::map<int32_t, bool> abilityRet = InputDevMgr->GetKeystrokeAbility(deviceId, keyCode);
-    std::vector<int32_t> keystroke;
-    for (const auto &item : abilityRet) {
-        keystroke.push_back(item.first);
-        keystroke.push_back(item.second ? 1 : 0);
+    std::vector<bool> keystroke = InputDevMgr->SupportKeys(deviceId, keyCode);
+    if (keystroke.size() > MAX_SUPPORT_KEY) {
+        MMI_HILOGE("Keys exceeds the max range");
+        return RET_ERR;
     }
-
     NetPacket pkt2(MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY);
-    if (!pkt2.Write(userData)) {
-        MMI_HILOGE("Packet write userData failed");
-        return RET_ERR;
+    pkt2 << userData << keystroke.size();
+    for (const bool &item : keystroke) {
+        pkt2 << item;
     }
-    size = keystroke.size();
-    if (!pkt2.Write(size)) {
-        MMI_HILOGE("Packet write size failed");
+    if (pkt2.ChkRWError()) {
+        MMI_HILOGE("Packet write support keys failed");
         return RET_ERR;
-    }
-    for (const auto &item : keystroke) {
-        if (!pkt2.Write(item)) {
-            MMI_HILOGE("Packet write keystroke failed");
-            return RET_ERR;
-        }
     }
     if (!sess->SendMsg(pkt2)) {
         MMI_HILOGE("Sending failed");
@@ -559,19 +432,42 @@ int32_t ServerMsgHandler::GetKeystrokeAbility(SessionPtr sess, NetPacket& pkt)
     return RET_OK;
 }
 
-int32_t ServerMsgHandler::OnAddInputDeviceMontior(SessionPtr sess, NetPacket& pkt)
+int32_t ServerMsgHandler::OnInputKeyboardType(SessionPtr sess, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
+    CHKPR(sess, ERROR_NULL_POINTER);
+    int32_t userData;
+    int32_t deviceId;
+    pkt >> userData >> deviceId;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read key info failed");
+        return RET_ERR;
+    }
+    int32_t keyboardType = InputDevMgr->GetKeyboardType(deviceId);
+    MMI_HILOGD("Gets the keyboard type result:%{public}d", keyboardType);
+    NetPacket pkt2(MmiMessageId::INPUT_DEVICE_KEYBOARD_TYPE);
+    pkt2 << userData << keyboardType;
+    if (pkt2.ChkRWError()) {
+        MMI_HILOGE("Packet write keyboard type failed");
+        return RET_ERR;
+    }
+    if (!sess->SendMsg(pkt2)) {
+        MMI_HILOGE("Failed to send the keyboard package");
+        return MSG_SEND_FAIL;
+    }
+    return RET_OK;
+}
+
+int32_t ServerMsgHandler::OnAddInputDeviceMonitor(SessionPtr sess, NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
     InputDevMgr->AddDevMonitor(sess, [sess](std::string type, int32_t deviceId) {
-        CALL_LOG_ENTER;
+        CALL_DEBUG_ENTER;
         CHKPV(sess);
         NetPacket pkt2(MmiMessageId::ADD_INPUT_DEVICE_MONITOR);
-        if (!pkt2.Write(type)) {
-            MMI_HILOGE("Packet write type failed");
-            return;
-        }
-        if (!pkt2.Write(deviceId)) {
+        pkt2 << type << deviceId;
+        if (pkt2.ChkRWError()) {
             MMI_HILOGE("Packet write deviceId failed");
             return;
         }
@@ -583,107 +479,63 @@ int32_t ServerMsgHandler::OnAddInputDeviceMontior(SessionPtr sess, NetPacket& pk
     return RET_OK;
 }
 
-int32_t ServerMsgHandler::OnRemoveInputDeviceMontior(SessionPtr sess, NetPacket& pkt)
+int32_t ServerMsgHandler::OnRemoveInputDeviceMonitor(SessionPtr sess, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
     InputDevMgr->RemoveDevMonitor(sess);
     return RET_OK;
 }
 
-int32_t ServerMsgHandler::OnAddInputEventMontior(SessionPtr sess, NetPacket& pkt)
+#ifdef OHOS_BUILD_MMI_DEBUG
+int32_t ServerMsgHandler::OnBigPacketTest(SessionPtr sess, NetPacket& pkt)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t eventType = 0;
-    pkt >> eventType;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read eventType failed");
-        return PACKET_READ_FAIL;
+    int32_t width = 0;
+    int32_t height = 0;
+    int32_t focusWindowId = 0;
+    pkt >> width >> height >> focusWindowId;
+    MMI_HILOGD("logicalInfo,width:%{public}d,height:%{public}d,focusWindowId:%{public}d",
+        width, height, focusWindowId);
+    uint32_t num = 0;
+    pkt >> num;
+    for (uint32_t i = 0; i < num; i++) {
+        WindowInfo info;
+        pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
+            >> info.pointerHotAreas >> info.agentWindowId >> info.flags;
+        MMI_HILOGD("windowsInfos,id:%{public}d,pid:%{public}d,uid:%{public}d,"
+            "area.x:%{public}d,area.y:%{public}d,area.width:%{public}d,area.height:%{public}d,"
+            "defaultHotAreas:size:%{public}zu,pointerHotAreas:size:%{public}zu,"
+            "agentWindowId:%{public}d,flags:%{public}d",
+            info.id, info.pid, info.uid, info.area.x, info.area.y, info.area.width,
+            info.area.height, info.defaultHotAreas.size(), info.pointerHotAreas.size(),
+            info.agentWindowId, info.flags);
+        for (const auto &win : info.defaultHotAreas) {
+            MMI_HILOGD("defaultHotAreas,x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
+                win.x, win.y, win.width, win.height);
+        }
+        for (const auto &pointer : info.pointerHotAreas) {
+            MMI_HILOGD("pointerHotAreas,x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
+                pointer.x, pointer.y, pointer.width, pointer.height);
+        }
     }
-    if (eventType != InputEvent::EVENT_TYPE_KEY) {
-        MMI_HILOGE("Wrong event type, eventType:%{public}d", eventType);
-        return RET_ERR;
+    pkt >> num;
+    for (uint32_t i = 0; i < num; i++) {
+        DisplayInfo info;
+        pkt >> info.id >> info.x >> info.y >> info.width >> info.height
+            >> info.name >> info.uniq >> info.direction;
+        MMI_HILOGD("displaysInfos,id:%{public}d,x:%{public}d,y:%{public}d,"
+            "width:%{public}d,height:%{public}d,name:%{public}s,"
+            "uniq:%{public}s,direction:%{public}d",
+            info.id, info.x, info.y, info.width, info.height, info.name.c_str(),
+            info.uniq.c_str(), info.direction);
     }
-    InputMonitorServiceMgr.AddInputEventMontior(sess, eventType);
-    return RET_OK;
-}
-
-int32_t ServerMsgHandler::OnAddInputEventTouchpadMontior(SessionPtr sess, NetPacket& pkt)
-{
-    CALL_LOG_ENTER;
-    CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t eventType = 0;
-    pkt >> eventType;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read eventType failed");
-        return PACKET_READ_FAIL;
-    }
-    if (eventType != InputEvent::EVENT_TYPE_POINTER) {
-        MMI_HILOGE("Wrong event type, eventType:%{public}d", eventType);
-        return RET_ERR;
-    }
-    InputMonitorServiceMgr.AddInputEventTouchpadMontior(eventType, sess);
-    return RET_OK;
-}
-
-int32_t ServerMsgHandler::OnRemoveInputEventMontior(SessionPtr sess, NetPacket& pkt)
-{
-    CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t eventType = 0;
-    pkt >> eventType;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read eventType failed");
-        return PACKET_READ_FAIL;
-    }
-    if (eventType != InputEvent::EVENT_TYPE_KEY) {
-        MMI_HILOGE("Wrong event type, eventType:%{public}d", eventType);
-        return RET_ERR;
-    }
-    InputMonitorServiceMgr.RemoveInputEventMontior(sess, eventType);
-    return RET_OK;
-}
-
-int32_t ServerMsgHandler::OnRemoveInputEventTouchpadMontior(SessionPtr sess, NetPacket& pkt)
-{
-    CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t eventType = 0;
-    pkt >> eventType;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read eventType failed");
-        return PACKET_READ_FAIL;
-    }
-    if (eventType != InputEvent::EVENT_TYPE_POINTER) {
-        MMI_HILOGE("Wrong event type, eventType:%{public}d", eventType);
-        return RET_ERR;
-    }
-    InputMonitorServiceMgr.RemoveInputEventMontior(sess, eventType);
-    return RET_OK;
-}
-int32_t ServerMsgHandler::OnAddTouchpadEventFilter(SessionPtr sess, NetPacket& pkt)
-{
-    CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t sourceType = 0;
-    int32_t id = 0;
-    pkt >> sourceType >> id;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read sourceType failed");
-        return PACKET_READ_FAIL;
-    }
-    InterceptorMgrGbl.OnAddInterceptor(sourceType, id, sess);
-    return RET_OK;
-}
-
-int32_t ServerMsgHandler::OnRemoveTouchpadEventFilter(SessionPtr sess, NetPacket& pkt)
-{
-    CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t id = 0;
-    pkt  >> id;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read data failed");
         return PACKET_READ_FAIL;
     }
-    InterceptorMgrGbl.OnRemoveInterceptor(id);
     return RET_OK;
 }
+#endif // OHOS_BUILD_MMI_DEBUG
 } // namespace MMI
 } // namespace OHOS

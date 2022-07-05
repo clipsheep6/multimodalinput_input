@@ -35,13 +35,12 @@ RunShellUtil::~RunShellUtil() {}
 
 int32_t RunShellUtil::RunShellCommand(const std::string &command, std::vector<std::string> &vLog)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     vLog.clear();
     const std::string command_ = HILOG_GREP + "'" + command + "'";
 
     if ((fp_ = popen(command_.c_str(), "r")) == nullptr) {
         MMI_HILOGE("open fail");
-        pclose(fp_);
         fp_ = nullptr;
         return RET_ERR;
     }
@@ -58,6 +57,10 @@ int32_t RunShellUtil::RunShellCommand(const std::string &command, std::vector<st
         }
         retLog.append(std::string(buf));
         i++;
+    }
+    if (fp_ != nullptr) {
+        pclose(fp_);
+        fp_ = nullptr;
     }
     if (retLog.length() == 0) {
         MMI_HILOGD("retLog is empty");

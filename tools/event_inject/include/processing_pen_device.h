@@ -24,14 +24,14 @@ namespace MMI {
 class ProcessingPenDevice : public DeviceBase {
     struct PenEvent {
         std::string eventType;
-        int32_t xPos;
-        int32_t yPos;
-        int32_t tiltX;
-        int32_t tiltY;
-        int32_t pressure;
-        int32_t distance;
-        int32_t keyValue;
-        int32_t keyStatus;
+        int32_t xPos { 0 };
+        int32_t yPos { 0 };
+        int32_t tiltX { 0 };
+        int32_t tiltY { 0 };
+        int32_t pressure { 0 };
+        int32_t distance { 0 };
+        int32_t keyValue { 0 };
+        int32_t keyStatus { 0 };
     };
 public:
     ProcessingPenDevice() = default;
@@ -47,9 +47,6 @@ private:
     int32_t AnalysisPenApproachPadEvent(const DeviceEvent& event, std::vector<PenEvent>& penEventArray);
     int32_t AnalysisPenSlidePadEvent(const DeviceEvent& event, std::vector<PenEvent>& penEventArray);
     int32_t AnalysisPenLeavePadEvent(const DeviceEvent& event, std::vector<PenEvent>& penEventArray);
-private:
-    static constexpr int32_t EV_ABS_Z_DEFAULT_VALUE = 450;
-    static constexpr int32_t EV_ABS_MISC_DEFAULT_VALUE = 2114;
 };
 } // namespace MMI
 } // namespace OHOS

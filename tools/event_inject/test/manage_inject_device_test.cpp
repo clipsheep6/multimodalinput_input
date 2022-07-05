@@ -58,8 +58,8 @@ HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataCheckFileNotEmpty, TestSi
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformJsonDataCheckFileNotEmpty.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start all & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start all & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_TransformJsonDataCheckFileNotEmpty.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start all &";
@@ -70,22 +70,12 @@ HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataCheckFileNotEmpty, TestSi
         ASSERT_TRUE(false) << "start device failed";
     }
     pclose(startDevice);
-    FILE* fp = fopen(path.c_str(), "r");
-    if (fp == nullptr) {
-        ASSERT_TRUE(false) << "can not open " << path;
+    std::string jsonBuf = ReadJsonFile(path);
+    if (jsonBuf.empty()) {
+        ASSERT_TRUE(false) << "read file failed" << path;
     }
-    char buf[256] = {};
-    std::string jsonBuf;
-    while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf += buf;
-    }
-    if (fclose(fp) < 0) {
-        ASSERT_TRUE(false) << "fclose file error " << path;
-    }
-    InputParse InputParse;
-    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
     FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
     if (!closeDevice) {
         ASSERT_TRUE(false) << "close device failed";
@@ -105,8 +95,8 @@ HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataGetDeviceNodeError, TestS
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformJsonDataGetDeviceNodeError.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start all & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start all & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_TransformJsonDataGetDeviceNodeError.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start all &";
@@ -117,22 +107,12 @@ HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataGetDeviceNodeError, TestS
         ASSERT_TRUE(false) << "start device failed";
     }
     pclose(startDevice);
-    FILE* fp = fopen(path.c_str(), "r");
-    if (fp == nullptr) {
-        ASSERT_TRUE(false) << "can not open " << path;
+    std::string jsonBuf = ReadJsonFile(path);
+    if (jsonBuf.empty()) {
+        ASSERT_TRUE(false) << "read file failed" << path;
     }
-    char buf[256] = {};
-    std::string jsonBuf;
-    while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf += buf;
-    }
-    if (fclose(fp) < 0) {
-        ASSERT_TRUE(false) << "fclose file error " << path;
-    }
-    InputParse InputParse;
-    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
     FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
     if (!closeDevice) {
         ASSERT_TRUE(false) << "close device failed";
@@ -143,17 +123,17 @@ HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataGetDeviceNodeError, TestS
 }
 
 /**
- * @tc.name:Test_SendEventToDeviveNodeError
- * @tc.desc:Verify ManageInjectDevice function SendEventToDeviveNode
+ * @tc.name:Test_SendEventToDeviceNodeError
+ * @tc.desc:Verify ManageInjectDevice function SendEventToDeviceNode
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(ManageInjectDeviceTest, Test_SendEventToDeviveNodeError, TestSize.Level1)
+HWTEST_F(ManageInjectDeviceTest, Test_SendEventToDeviceNodeError, TestSize.Level1)
 {
     ManageInjectDevice manageInjectDevice;
     InputEventArray inputEventArray = {};
     inputEventArray.target = "";
-    auto ret = manageInjectDevice.SendEventToDeviveNode(inputEventArray);
+    auto ret = manageInjectDevice.SendEventToDeviceNode(inputEventArray);
     EXPECT_EQ(ret, RET_ERR);
 }
 } // namespace MMI

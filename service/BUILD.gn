@@ -19,12 +19,14 @@ config("libmmi_server_config") {
   include_dirs = [
     "device_manager/include",
     "device_scalability/include",
+    "delegate_task/include",
     "event_dispatch/include",
     "event_package/include",
     "event_handler/include",
     "event_dump/include",
     "monitor/include",
     "interceptor/include",
+    "dfx/include",
     "libinput_adapter/include",
     "message_handle/include",
     "module_loader/include",
@@ -33,6 +35,7 @@ config("libmmi_server_config") {
     "key_command/include",
     "subscriber/include",
     "timer_manager/include",
+    "permission_helper/include",
     "${mmi_service_path}/connect_manager/include",
     "${mmi_service_path}/filter/include",
     "${mmi_service_path}/module_loader/include",
@@ -40,8 +43,8 @@ config("libmmi_server_config") {
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "mouse_event_handler/include",
     "//foundation/multimodalinput/interfaces/native/innerkits/event/include",
-    "//foundation/graphic/standard/rosen/modules/2d_graphics/include",
-    "//foundation/graphic/standard/rosen/modules/2d_graphics/src",
+    "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/include",
+    "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/src",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/util/socket/include",
@@ -74,6 +77,40 @@ config("libmmi_server_config") {
   if (is_mmi_have_hdf) {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
+
+  if (mmi_enable_combinationkey) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_COMBINATION_KEY" ]
+  }
+
+  if (mmi_enable_pointer_drawing) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER_DRAWING" ]
+  }
+
+  if (mmi_enable_interceptor) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_INTERCEPTOR" ]
+  }
+
+  if (resource_schedule_service_enabled) {
+    cflags += [ "-DOHOS_RSS_CLIENT" ]
+  }
+
+  if (mmi_enable_pointer_drawing) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER_DRAWING" ]
+  }
+  if (mmi_enable_keyboard) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_KEYBOARD" ]
+  }
+
+  if (mmi_enable_mouse) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER" ]
+  }
+
+  if (mmi_enable_tp) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_TOUCH" ]
+  }
+  if (mmi_enable_monitor) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_MONITOR" ]
+  }
 }
 
 ohos_prebuilt_etc("multimodalinput_config_ability.json") {
@@ -93,29 +130,23 @@ ohos_prebuilt_etc("drawing_pointer_image") {
 ohos_shared_library("libmmi-server") {
   sources = [
     "//foundation/multimodalinput/input/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
+    "delegate_task/src/delegate_tasks.cpp",
     "device_manager/src/input_device.cpp",
     "device_manager/src/input_device_manager.cpp",
+    "dfx/src/dfx_hisysevent.cpp",
     "event_dispatch/src/event_dispatch.cpp",
     "event_dump/src/event_dump.cpp",
     "event_handler/src/input_event_handler.cpp",
+    "event_handler/src/input_event_normalize_handler.cpp",
+    "event_handler/src/key_auto_repeat.cpp",
     "event_handler/src/key_event_value_transformation.cpp",
-    "event_package/src/event_package.cpp",
-    "interceptor/src/interceptor_manager_global.cpp",
+    "event_handler/src/key_map_manager.cpp",
     "libinput_adapter/src/libinput_adapter.cpp",
     "message_handle/src/server_msg_handler.cpp",
+    "module_loader/src/mmi_service.cpp",
     "module_loader/src/uds_server.cpp",
-    "monitor/src/input_event_monitor_manager.cpp",
-    "monitor/src/input_handler_manager_global.cpp",
-    "mouse_event_handler/src/mouse_device_state.cpp",
-    "mouse_event_handler/src/mouse_event_handler.cpp",
-    "subscriber/src/key_event_subscriber.cpp",
-    "subscriber/src/key_option.cpp",
+    "permission_helper/src/permission_helper.cpp",
     "timer_manager/src/timer_manager.cpp",
-    "touch_transform_point/src/gesture_transform_point_processor.cpp",
-    "touch_transform_point/src/tablet_tool_processor.cpp",
-    "touch_transform_point/src/touch_transform_point_manager.cpp",
-    "touch_transform_point/src/touch_transform_point_processor.cpp",
-    "touch_transform_point/src/touchpad_transform_point_processor.cpp",
     "window_manager/src/input_windows_manager.cpp",
   ]
 
@@ -126,19 +157,44 @@ ohos_shared_library("libmmi-server") {
     ]
   }
 
-  if (mmi_enable_combinationkey) {
-    sources += [ "key_command/src/key_command_manager.cpp" ]
-  } else {
-    sources += [ "key_command/src/i_key_command_manager.cpp" ]
+  if (mmi_enable_keyboard) {
+    sources += [
+      "event_package/src/event_package.cpp",
+      "subscriber/src/key_event_subscriber.cpp",
+    ]
+    if (mmi_enable_combinationkey) {
+      sources += [ "key_command/src/key_command_manager.cpp" ]
+    }
   }
 
-  if (mmi_enable_pointer_drawing) {
-    sources += [ "window_manager/src/pointer_drawing_manager.cpp" ]
-  } else {
-    sources += [ "window_manager/src/i_pointer_drawing_manager.cpp" ]
+  if (mmi_enable_mouse || mmi_enable_tp) {
+    sources += [ "touch_transform_point/src/touch_transform_point_manager.cpp" ]
+    if (mmi_enable_mouse) {
+      sources += [
+        "mouse_event_handler/src/mouse_device_state.cpp",
+        "mouse_event_handler/src/mouse_event_handler.cpp",
+        "touch_transform_point/src/gesture_transform_point_processor.cpp",
+        "touch_transform_point/src/touchpad_transform_point_processor.cpp",
+      ]
+      if (mmi_enable_pointer_drawing) {
+        sources += [ "window_manager/src/pointer_drawing_manager.cpp" ]
+      } else {
+        sources += [ "window_manager/src/i_pointer_drawing_manager.cpp" ]
+      }
+    }
+    if (mmi_enable_tp) {
+      sources += [
+        "touch_transform_point/src/tablet_tool_processor.cpp",
+        "touch_transform_point/src/touch_transform_point_processor.cpp",
+      ]
+    }
   }
-
-  sources += [ "module_loader/src/mmi_service.cpp" ]
+  if (mmi_enable_monitor) {
+    sources += [ "monitor/src/input_handler_manager_global.cpp" ]
+  }
+  if (mmi_enable_interceptor) {
+    sources += [ "interceptor/src/interceptor_handler_global.cpp" ]
+  }
 
   configs = [ ":libmmi_server_config" ]
 
@@ -146,35 +202,37 @@ ohos_shared_library("libmmi-server") {
     ":drawing_pointer_image",
     ":mmi_device_config.ini",
     ":multimodalinput_config_ability.json",
-    "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
-    "//foundation/aafwk/standard/frameworks/kits/appkit:appkit_native",
-    "//foundation/aafwk/standard/interfaces/innerkits/ability_manager:ability_manager",
-    "//foundation/aafwk/standard/interfaces/innerkits/base:base",
-    "//foundation/aafwk/standard/interfaces/innerkits/want:want",
-    "//foundation/aafwk/standard/services/abilitymgr:abilityms",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler:libeventhandler",
-    "//foundation/graphic/standard/rosen/modules/2d_graphics:2d_graphics",
-    "//foundation/graphic/standard/rosen/modules/render_service_client:librender_service_client",
-    "//foundation/multimedia/image_standard/interfaces/innerkits:image_native",
+    "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
+    "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics:2d_graphics",
+    "//foundation/graphic/graphic_2d/rosen/modules/render_service_client:librender_service_client",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_service",
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_proxy",
     "//foundation/multimodalinput/input/util:libmmi-util",
     "//third_party/cJSON:cjson_static",
+    "//third_party/json:nlohmann_json_static",
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
 
+  if (resource_schedule_service_enabled) {
+    deps += [ "//foundation/resourceschedule/resource_schedule_service/ressched/interfaces/innerkits/ressched_client:ressched_client" ]
+  }
+
   external_deps = [
+    "ability_base:base",
+    "ability_base:want",
     "ability_runtime:ability_manager",
     "access_token:libaccesstoken_sdk",
-    "bytrace_standard:bytrace_core",
+    "drivers_interface_input:hdi_input",
     "hisysevent_native:libhisysevent",
+    "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
-    "input_device_driver:hdi_input",
+    "init:libbegetutil",
     "ipc:ipc_core",
+    "multimedia_image_standard:image_native",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]
@@ -195,7 +253,6 @@ ohos_prebuilt_etc("mmi_device_config.ini") {
 
 import("//build/test.gni")
 module_output_path = "multimodalinput/unit_out"
-HDF_FWKS = "//drivers/framework"
 
 ohos_unittest("ut-mmi-service-out") {
   module_out_path = module_output_path
@@ -231,7 +288,6 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/uinput",
-    "$HDF_FWKS/inclue",
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
@@ -260,14 +316,28 @@ ohos_unittest("ut-mmi-service-out") {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
+  if (mmi_enable_pointer_drawing) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER_DRAWING" ]
+  }
+  if (mmi_enable_keyboard) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_KEYBOARD" ]
+  }
+  if (mmi_enable_mouse) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER" ]
+  }
+  if (mmi_enable_tp) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_TOUCH" ]
+  }
+  if (mmi_enable_monitor) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_MONITOR" ]
+  }
+
   configs = [ ":libmmi_server_config" ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
-    "//foundation/aafwk/standard/frameworks/kits/appkit:appkit_native",
-    "//foundation/aafwk/standard/interfaces/innerkits/ability_manager:ability_manager",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -277,8 +347,8 @@ ohos_unittest("ut-mmi-service-out") {
   }
 
   external_deps = [
+    "drivers_interface_input:hdi_input",
     "hiviewdfx_hilog_native:libhilog",
-    "input_device_driver:hdi_input",
     "utils_base:utils",
   ]
 }
@@ -288,7 +358,7 @@ ohos_unittest("TransformPointTest") {
   include_dirs = [
     "${mmi_path}/interfaces/native/innerkits/common/include",
     "${mmi_path}/util/common/include",
-    "${mmi_path}/tools/virtual_device_manager/include",
+    "${mmi_path}/tools/vuinput/include",
   ]
 
   sources = [ "touch_transform_point/test/transform_point_test.cpp" ]
@@ -300,7 +370,7 @@ ohos_unittest("TransformPointTest") {
   }
 
   deps = [
-    "${mmi_path}/tools/virtual_device_manager:libmmi-virtual-device",
+    "${mmi_path}/tools/vuinput:libmmi-virtual-device",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -309,9 +379,4 @@ ohos_unittest("TransformPointTest") {
     "hiviewdfx_hilog_native:libhilog",
     "utils_base:utils",
   ]
-}
-
-group("ut-mmi-service") {
-  testonly = true
-  deps = [ ":ut-mmi-service-out" ]
 }

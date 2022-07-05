@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,19 +15,58 @@
 
 #include "input_handler_manager_global.h"
 
+#include "bytrace_adapter.h"
 #include "define_multimodal.h"
-#include "event_dispatch.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "mmi_log.h"
 #include "net_packet.h"
 #include "proto.h"
+#include "util_ex.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputHandlerManagerGlobal" };
 } // namespace
+
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+void InputHandlerManagerGlobal::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CHKPV(keyEvent);
+    HandleEvent(keyEvent);
+    CHKPV(nextHandler_);
+    nextHandler_->HandleKeyEvent(keyEvent);
+}
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+#ifdef OHOS_BUILD_ENABLE_POINTER
+void InputHandlerManagerGlobal::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPV(pointerEvent);
+    if (HandleEvent(pointerEvent)) {
+        BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP);
+        MMI_HILOGD("Monitor is succeeded");
+        return;
+    }
+    CHKPV(nextHandler_);
+    nextHandler_->HandlePointerEvent(pointerEvent);
+}
+#endif // OHOS_BUILD_ENABLE_POINTER
+
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+void InputHandlerManagerGlobal::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPV(pointerEvent);
+    if (HandleEvent(pointerEvent)) {
+        BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP);
+        MMI_HILOGD("Monitor is succeeded");
+        return;
+    }
+    CHKPV(nextHandler_);
+    nextHandler_->HandleTouchEvent(pointerEvent);
+}
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
 int32_t InputHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
@@ -47,11 +86,6 @@ int32_t InputHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
         SessionHandler mon { handlerId, handlerType, session };
         return monitors_.AddMonitor(mon);
     }
-    if (handlerType == InputHandlerType::INTERCEPTOR) {
-        MMI_HILOGD("Register interceptor:%{public}d", handlerId);
-        SessionHandler interceptor { handlerId, handlerType, session };
-        return interceptors_.AddInterceptor(interceptor);
-    }
     MMI_HILOGW("Invalid handler type:%{public}d", handlerType);
     return RET_ERR;
 }
@@ -67,10 +101,6 @@ void InputHandlerManagerGlobal::RemoveInputHandler(int32_t handlerId,
         MMI_HILOGD("Unregister monitor:%{public}d", handlerId);
         SessionHandler monitor { handlerId, handlerType, session };
         monitors_.RemoveMonitor(monitor);
-    } else if (handlerType == InputHandlerType::INTERCEPTOR) {
-        MMI_HILOGD("Unregister interceptor:%{public}d", handlerId);
-        SessionHandler interceptor { handlerId, handlerType, session };
-        interceptors_.RemoveInterceptor(interceptor);
     }
 }
 
@@ -80,18 +110,11 @@ void InputHandlerManagerGlobal::MarkConsumed(int32_t handlerId, int32_t eventId,
     monitors_.MarkConsumed(handlerId, eventId, session);
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_HILOGD("Handle KeyEvent");
     CHKPF(keyEvent);
-    if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
-        MMI_HILOGD("This event has been tagged as not to be intercepted");
-    } else {
-        if (interceptors_.HandleEvent(keyEvent)) {
-            MMI_HILOGD("Key event was intercepted");
-            return true;
-        }
-    }
     if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_NO_MONITOR)) {
         MMI_HILOGD("This event has been tagged as not to be monitored");
     } else {
@@ -102,18 +125,12 @@ bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
     }
     return false;
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
-    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
-        MMI_HILOGD("This event has been tagged as not to be intercepted");
-    } else {
-        if (interceptors_.HandleEvent(pointerEvent)) {
-            MMI_HILOGD("Pointer event was intercepted");
-            return true;
-        }
-    }
     if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_NO_MONITOR)) {
         MMI_HILOGD("This event has been tagged as not to be monitored");
     } else {
@@ -125,6 +142,7 @@ bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointe
     MMI_HILOGD("Interception and monitor failed");
     return false;
 }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 void InputHandlerManagerGlobal::InitSessionLostCallback()
 {
@@ -142,15 +160,15 @@ void InputHandlerManagerGlobal::InitSessionLostCallback()
 void InputHandlerManagerGlobal::OnSessionLost(SessionPtr session)
 {
     monitors_.OnSessionLost(session);
-    interceptors_.OnSessionLost(session);
 }
 
 void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<KeyEvent> keyEvent) const
 {
     CHKPV(keyEvent);
     NetPacket pkt(MmiMessageId::REPORT_KEY_EVENT);
-    if (!pkt.Write(id_)) {
-        MMI_HILOGE("Write to stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+    pkt << id_;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write key event failed");
         return;
     }
     if (InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt) != RET_OK) {
@@ -168,8 +186,9 @@ void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<Poi
     CHKPV(pointerEvent);
     NetPacket pkt(MmiMessageId::REPORT_POINTER_EVENT);
     MMI_HILOGD("Service SendToClient id:%{public}d,InputHandlerType:%{public}d", id_, handlerType_);
-    if (!pkt.Write(id_) || !pkt.Write(handlerType_)) {
-        MMI_HILOGE("Write id_ to stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+    pkt << id_ << handlerType_;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write pointer event failed");
         return;
     }
     if (InputEventDataTransformation::Marshalling(pointerEvent, pkt) != RET_OK) {
@@ -231,15 +250,14 @@ void InputHandlerManagerGlobal::MonitorCollection::MarkConsumed(int32_t monitorI
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
     pointerEvent->SetActionTime(GetSysClockTime());
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT | InputEvent::EVENT_FLAG_NO_MONITOR);
-    EventDispatch eDispatch;
-    eDispatch.HandlePointerEvent(pointerEvent);
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
+    CHKPV(inputEventNormalizeHandler);
+    inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
+#endif // OHOS_BUILD_ENABLE_TOUCH
 }
 
-int32_t InputHandlerManagerGlobal::MonitorCollection::GetPriority() const
-{
-    return IInputEventHandler::DEFAULT_MONITOR;
-}
-
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 bool InputHandlerManagerGlobal::MonitorCollection::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPF(keyEvent);
@@ -249,14 +267,23 @@ bool InputHandlerManagerGlobal::MonitorCollection::HandleEvent(std::shared_ptr<K
     }
     return false;
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 bool InputHandlerManagerGlobal::MonitorCollection::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
+#ifdef OHOS_BUILD_ENABLE_TOUCH
     UpdateConsumptionState(pointerEvent);
+#endif // OHOS_BUILD_ENABLE_TOUCH
     Monitor(pointerEvent);
-    return isMonitorConsumed_;
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        return isMonitorConsumed_;
+    }
+    MMI_HILOGI("This is not a touch-screen event");
+    return false;
 }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 bool InputHandlerManagerGlobal::MonitorCollection::HasMonitor(int32_t monitorId, SessionPtr session)
 {
@@ -264,11 +291,11 @@ bool InputHandlerManagerGlobal::MonitorCollection::HasMonitor(int32_t monitorId,
     return (monitors_.find(monitor) != monitors_.end());
 }
 
+#ifdef OHOS_BUILD_ENABLE_TOUCH
 void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        MMI_HILOGE("This is not a touch-screen event");
         return;
     }
     lastPointerEvent_ = pointerEvent;
@@ -287,7 +314,9 @@ void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::s
         lastPointerEvent_.reset();
     }
 }
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 void InputHandlerManagerGlobal::MonitorCollection::Monitor(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
@@ -296,6 +325,7 @@ void InputHandlerManagerGlobal::MonitorCollection::Monitor(std::shared_ptr<Point
         monitor.SendToClient(pointerEvent);
     }
 }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 void InputHandlerManagerGlobal::MonitorCollection::OnSessionLost(SessionPtr session)
 {
@@ -308,76 +338,26 @@ void InputHandlerManagerGlobal::MonitorCollection::OnSessionLost(SessionPtr sess
         }
     }
 }
-
-int32_t InputHandlerManagerGlobal::InterceptorCollection::GetPriority() const
+void InputHandlerManagerGlobal::Dump(int32_t fd, const std::vector<std::string> &args)
 {
-    return IInputEventHandler::DEFAULT_INTERCEPTOR;
+    return monitors_.Dump(fd, args);
 }
 
-bool InputHandlerManagerGlobal::InterceptorCollection::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
+void InputHandlerManagerGlobal::MonitorCollection::Dump(int32_t fd, const std::vector<std::string> &args)
 {
-    CHKPF(keyEvent);
-    std::lock_guard<std::mutex> guard(lockInterceptors_);
-    if (interceptors_.empty()) {
-        return false;
-    }
-    MMI_HILOGD("There are currently:%{public}zu interceptors", interceptors_.size());
-    for (const auto &interceptor : interceptors_) {
-        interceptor.SendToClient(keyEvent);
-    }
-    return true;
-}
-
-bool InputHandlerManagerGlobal::InterceptorCollection::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
-{
-    CHKPF(pointerEvent);
-    std::lock_guard<std::mutex> guard(lockInterceptors_);
-    if (interceptors_.empty()) {
-        return false;
-    }
-    MMI_HILOGD("There are currently:%{public}zu interceptors", interceptors_.size());
-    for (const auto &interceptor : interceptors_) {
-        interceptor.SendToClient(pointerEvent);
-    }
-    return true;
-}
-
-int32_t InputHandlerManagerGlobal::InterceptorCollection::AddInterceptor(const SessionHandler& interceptor)
-{
-    std::lock_guard<std::mutex> guard(lockInterceptors_);
-    if (interceptors_.size() >= MAX_N_INPUT_INTERCEPTORS) {
-        MMI_HILOGE("The number of interceptors exceeds limit");
-        return RET_ERR;
-    }
-    auto ret = interceptors_.insert(interceptor);
-    if (ret.second) {
-        MMI_HILOGD("Register interceptor successfully");
-    } else {
-        MMI_HILOGW("Duplicate interceptors");
-    }
-    return RET_OK;
-}
-
-void InputHandlerManagerGlobal::InterceptorCollection::RemoveInterceptor(const SessionHandler& interceptor)
-{
-    std::lock_guard<std::mutex> guard(lockInterceptors_);
-    std::set<SessionHandler>::const_iterator tItr = interceptors_.find(interceptor);
-    if (tItr != interceptors_.cend()) {
-        interceptors_.erase(tItr);
-        MMI_HILOGD("Unregister interceptor successfully");
-    }
-}
-
-void InputHandlerManagerGlobal::InterceptorCollection::OnSessionLost(SessionPtr session)
-{
-    std::lock_guard<std::mutex> guard(lockInterceptors_);
-    std::set<SessionHandler>::const_iterator cItr = interceptors_.cbegin();
-    while (cItr != interceptors_.cend()) {
-        if (cItr->session_ != session) {
-            ++cItr;
-        } else {
-            cItr = interceptors_.erase(cItr);
-        }
+    CALL_DEBUG_ENTER;
+    mprintf(fd, "Monitor information:\t");
+    mprintf(fd, "monitors: count=%d", monitors_.size());
+    for (const auto &item : monitors_) {
+        SessionPtr session = item.session_;
+        CHKPV(session);
+        mprintf(fd,
+                "monitor id:%d | handlerType:%d | Pid:%d | Uid:%d | Fd:%d "
+                "| HasPermission:%s | EarliestEventTime:%" PRId64 " | Descript:%s \t",
+                item.id_, item.handlerType_, session->GetPid(),
+                session->GetUid(), session->GetFd(),
+                session->HasPermission() ? "true" : "false",
+                session->GetEarliestEventTime(), session->GetDescript().c_str());
     }
 }
 } // namespace MMI

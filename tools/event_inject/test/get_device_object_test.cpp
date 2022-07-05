@@ -44,8 +44,8 @@ HWTEST_F(GetDeviceObjectTest, Test_GetDeviceObjectTest, TestSize.Level1)
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_GetDeviceObjectTest.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start all & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start all & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_GetDeviceObjectTest.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start all &";
@@ -56,22 +56,13 @@ HWTEST_F(GetDeviceObjectTest, Test_GetDeviceObjectTest, TestSize.Level1)
         ASSERT_TRUE(false) << "can not failed";
     }
     pclose(startDevice);
-    FILE* fp = fopen(path.c_str(), "r");
-    if (fp == nullptr) {
-        ASSERT_TRUE(false) << "can not open " << path;
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::string jsonBuf = ReadJsonFile(path);
+    if (jsonBuf.empty()) {
+        ASSERT_TRUE(false) << "read file failed" << path;
     }
-    char buf[256] = {};
-    std::string jsonBuf;
-    while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        jsonBuf += buf;
-    }
-    if (fclose(fp) < 0) {
-        ASSERT_TRUE(false) << "fclose file error " << path;
-    }
-    InputParse InputParse;
-    DeviceItems inputEventArrays = InputParse.DataInit(jsonBuf, false);
     ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(inputEventArrays);
+    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
     FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
     if (!closeDevice) {
         ASSERT_TRUE(false) << "close device failed";

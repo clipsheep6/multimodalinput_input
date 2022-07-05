@@ -22,7 +22,7 @@
 
 #include "accesstoken_kit.h"
 #include "ipc_skeleton.h"
-
+#include "dfx_hisysevent.h"
 #include "i_multimodal_input_connect.h"
 #include "mmi_log.h"
 #include "util.h"
@@ -33,19 +33,16 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "UDSServer"};
 } // namespace
-
 UDSServer::UDSServer() {}
 
 UDSServer::~UDSServer()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     UdsStop();
 }
 
 void UDSServer::UdsStop()
 {
-    std::lock_guard<std::mutex> lock(mux_);
-    isRunning_ = false;
     if (epollFd_ != -1) {
         close(epollFd_);
         epollFd_ = -1;
@@ -57,25 +54,19 @@ void UDSServer::UdsStop()
     sessionsMap_.clear();
 }
 
-int32_t UDSServer::GetClientFd(int32_t pid)
+int32_t UDSServer::GetClientFd(int32_t pid) const
 {
-    std::lock_guard<std::mutex> lock(mux_);
     auto it = idxPidMap_.find(pid);
     if (it == idxPidMap_.end()) {
-        MMI_HILOGE("find fd error, Invalid input parameter pid:%{public}d,errCode:%{public}d",
-            pid, SESSION_NOT_FOUND);
         return RET_ERR;
     }
     return it->second;
 }
 
-int32_t UDSServer::GetClientPid(int32_t fd)
+int32_t UDSServer::GetClientPid(int32_t fd) const
 {
-    std::lock_guard<std::mutex> lock(mux_);
     auto it = sessionsMap_.find(fd);
     if (it == sessionsMap_.end()) {
-        MMI_HILOGE("find pid error, Invalid input parameter fd:%{public}d,errCode:%{public}d",
-            fd, SESSION_NOT_FOUND);
         return RET_ERR;
     }
     return it->second->GetPid();
@@ -83,7 +74,6 @@ int32_t UDSServer::GetClientPid(int32_t fd)
 
 bool UDSServer::SendMsg(int32_t fd, NetPacket& pkt)
 {
-    std::lock_guard<std::mutex> lock(mux_);
     if (fd < 0) {
         MMI_HILOGE("fd is less than 0");
         return false;
@@ -108,8 +98,7 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     const int32_t moduleType, const int32_t uid, const int32_t pid,
     int32_t& serverFd, int32_t& toReturnClientFd)
 {
-    CALL_LOG_ENTER;
-    std::lock_guard<std::mutex> lock(mux_);
+    CALL_DEBUG_ENTER;
     int32_t sockFds[2] = {};
 
     if (socketpair(AF_UNIX, SOCK_STREAM, 0, sockFds) != 0) {
@@ -124,12 +113,11 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
         return RET_ERR;
     }
 
-    constexpr size_t bufferSize = 32 * 1024;
+    static constexpr size_t bufferSize = 32 * 1024;
     setsockopt(sockFds[0], SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));
     setsockopt(sockFds[0], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
     setsockopt(sockFds[1], SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));
     setsockopt(sockFds[1], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
-
     MMI_HILOGD("alloc socketpair, serverFd:%{public}d,clientFd:%{public}d(%{public}d)",
                serverFd, toReturnClientFd, sockFds[1]);
     auto closeSocketFdWhenError = [&serverFd, &toReturnClientFd] {
@@ -194,22 +182,20 @@ void UDSServer::AddPermission(SessionPtr sess)
     }
 }
 
-void UDSServer::Dump(int32_t fd)
+void UDSServer::Dump(int32_t fd, const std::vector<std::string> &args)
 {
-    std::lock_guard<std::mutex> lock(mux_);
-    mprintf(fd, "Sessions: count=%d", sessionsMap_.size());
-    std::string strTmp = "fds:[";
-    if (sessionsMap_.empty()) {
-        strTmp = "fds:[]";
-        mprintf(fd, "\t%s", strTmp.c_str());
-        return;
+    CALL_DEBUG_ENTER;
+    mprintf(fd, "Uds_server information:\t");
+    mprintf(fd, "uds_server: count=%d", sessionsMap_.size());
+    for (const auto &item : sessionsMap_) {
+        std::shared_ptr<UDSSession> udsSession = item.second;
+        CHKPV(udsSession);
+        mprintf(fd,
+                "Uid:%d | Pid:%d | Fd:%d | HasPermission:%s | Descript:%s\t",
+                udsSession->GetUid(), udsSession->GetPid(), udsSession->GetFd(),
+                udsSession->HasPermission() ? "true" : "false",
+                udsSession->GetDescript().c_str());
     }
-    for (const auto& item : sessionsMap_) {
-        strTmp += std::to_string(item.second->GetFd()) + ",";
-    }
-    strTmp.resize(strTmp.size() - 1);
-    strTmp += "]";
-    mprintf(fd, "\t%s", strTmp.c_str());
 }
 
 void UDSServer::OnConnected(SessionPtr s)
@@ -233,113 +219,74 @@ void UDSServer::SetRecvFun(MsgServerFunCallback fun)
     recvFun_ = fun;
 }
 
-void UDSServer::OnRecv(int32_t fd, const char *buf, size_t size)
-{
-    CHKPV(buf);
-    if (fd < 0) {
-        MMI_HILOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
-        return;
-    }
-    auto sess = GetSession(fd);
-    CHKPV(sess);
-    int32_t readIdx = 0;
-    int32_t packSize = 0;
-    int32_t bufSize = static_cast<int32_t>(size);
-    const int32_t headSize = static_cast<int32_t>(sizeof(PackHead));
-    if (bufSize < headSize) {
-        MMI_HILOGE("The in parameter size less than headSize, errCode%{public}d", VAL_NOT_EXP);
-        return;
-    }
-    while (bufSize > 0 && recvFun_) {
-        if (bufSize < headSize) {
-            MMI_HILOGE("The size less than headSize, errCode%{public}d", VAL_NOT_EXP);
-            return;
-        }
-        auto head = (PackHead*)&buf[readIdx];
-        if (head->size >= bufSize) {
-            MMI_HILOGE("The head->size more or equal than size, errCode:%{public}d", VAL_NOT_EXP);
-            return;
-        }
-        packSize = headSize + head->size;
-        if (bufSize < packSize) {
-            MMI_HILOGE("The size less than packSize, errCode:%{public}d", VAL_NOT_EXP);
-            return;
-        }
-        
-        NetPacket pkt(head->idMsg);
-        if (head->size > 0) {
-            if (!pkt.Write(&buf[readIdx + headSize], static_cast<size_t>(head->size))) {
-                MMI_HILOGE("Write to the stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
-                return;
-            }
-        }
-        recvFun_(sess, pkt);
-        bufSize -= packSize;
-        readIdx += packSize;
-    }
-}
-
-void UDSServer::ReleaseSession(int32_t fd, struct epoll_event& ev)
+void UDSServer::ReleaseSession(int32_t fd, epoll_event& ev)
 {
     auto secPtr = GetSession(fd);
     if (secPtr != nullptr) {
         OnDisconnected(secPtr);
         DelSession(fd);
+    } else {
+        DfxHisysevent::OnClientDisconnect(secPtr, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
     }
     if (ev.data.ptr) {
         free(ev.data.ptr);
         ev.data.ptr = nullptr;
     }
-    close(fd);
+    if (auto it = circleBufMap_.find(fd); it != circleBufMap_.end()) {
+        circleBufMap_.erase(it);
+    }
+    if (close(fd) == RET_OK) {
+        DfxHisysevent::OnClientDisconnect(secPtr, fd, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
+    } else {
+        DfxHisysevent::OnClientDisconnect(secPtr, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+    }
 }
 
-void UDSServer::OnEpollRecv(int32_t fd, std::map<int32_t, StreamBufData>& bufMap, struct epoll_event& ev)
+void UDSServer::OnPacket(int32_t fd, NetPacket& pkt)
+{
+    auto sess = GetSession(fd);
+    CHKPV(sess);
+    recvFun_(sess, pkt);
+}
+
+void UDSServer::OnEpollRecv(int32_t fd, epoll_event& ev)
 {
     if (fd < 0) {
         MMI_HILOGE("Invalid input param fd:%{public}d", fd);
         return;
     }
-    constexpr size_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
-    if (maxCount <= 0) {
-        MMI_HILOGE("The maxCount value is error, errCode:%{public}d", VAL_NOT_EXP);
-        return;
-    }
-    auto bufData = &bufMap[fd];
-    if (bufData->isOverflow) {
-        MMI_HILOGE("StreamBuffer full or write error, Data discarded errCode:%{public}d",
-            STREAMBUFF_OVER_FLOW);
-        return;
-    }
+    auto& buf = circleBufMap_[fd];
     char szBuf[MAX_PACKET_BUF_SIZE] = {};
-    for (size_t i = 0; i < maxCount; i++) {
+    for (int32_t i = 0; i < MAX_RECV_LIMIT; i++) {
         auto size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
-        if (size < 0) {
+        if (size > 0) {
+#ifdef OHOS_BUILD_HAVE_DUMP_DATA
+            DumpData(szBuf, size, LINEINFO, "in %s, read message from fd: %d.", __func__, fd);
+#endif
+            if (!buf.Write(szBuf, size)) {
+                MMI_HILOGW("Write data failed. size:%{public}zu", size);
+            }
+            OnReadPackets(buf, std::bind(&UDSServer::OnPacket, this, fd, std::placeholders::_1));
+        } else if (size < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
-                MMI_HILOGD("continue for errno EAGAIN|EINTR|EWOULDBLOCK");
+                MMI_HILOGD("continue for errno EAGAIN|EINTR|EWOULDBLOCK size:%{public}zu errno:%{public}d",
+                    size, errno);
                 continue;
             }
             MMI_HILOGE("recv return %{public}zu errno:%{public}d", size, errno);
             break;
-        } else if (size == 0) {
+        } else {
             MMI_HILOGE("The client side disconnect with the server. size:0 errno:%{public}d", errno);
             ReleaseSession(fd, ev);
             break;
-        } else {
-#ifdef OHOS_BUILD_HAVE_DUMP_DATA
-            DumpData(szBuf, size, LINEINFO, "in %s, read message from fd: %d.", __func__, fd);
-#endif
-            if (!bufData->sBuf.Write(szBuf, size)) {
-                bufData->isOverflow = true;
-                break;
-            }
-            if (size < MAX_PACKET_BUF_SIZE) {
-                break;
-            }
+        }
+        if (size < MAX_PACKET_BUF_SIZE) {
+            break;
         }
     }
 }
 
-void UDSServer::OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap, struct epoll_event& ev)
+void UDSServer::OnEpollEvent(epoll_event& ev)
 {
     CHKPV(ev.data.ptr);
     auto fd = *static_cast<int32_t*>(ev.data.ptr);
@@ -351,7 +298,7 @@ void UDSServer::OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap, struct ep
         MMI_HILOGD("EPOLLERR or EPOLLHUP fd:%{public}d,ev.events:0x%{public}x", fd, ev.events);
         ReleaseSession(fd, ev);
     } else if (ev.events & EPOLLIN) {
-        OnEpollRecv(fd, bufMap, ev);
+        OnEpollRecv(fd, ev);
     }
 }
 
@@ -370,10 +317,21 @@ SessionPtr UDSServer::GetSession(int32_t fd) const
 {
     auto it = sessionsMap_.find(fd);
     if (it == sessionsMap_.end()) {
+        MMI_HILOGE("Session not found.fd:%{public}d", fd);
         return nullptr;
     }
     CHKPP(it->second);
     return it->second->GetSharedPtr();
+}
+
+SessionPtr UDSServer::GetSessionByPid(int32_t pid) const
+{
+    int32_t fd = GetClientFd(pid);
+    if (fd <= 0) {
+        MMI_HILOGE("Session not found.pid:%{public}d", pid);
+        return nullptr;
+    }
+    return GetSession(fd);
 }
 
 bool UDSServer::AddSession(SessionPtr ses)
@@ -387,7 +345,7 @@ bool UDSServer::AddSession(SessionPtr ses)
     }
     auto pid = ses->GetPid();
     if (pid <= 0) {
-        MMI_HILOGE("Get process faild");
+        MMI_HILOGE("Get process failed");
         return false;
     }
     idxPidMap_[pid] = fd;
@@ -403,7 +361,7 @@ bool UDSServer::AddSession(SessionPtr ses)
 
 void UDSServer::DelSession(int32_t fd)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     MMI_HILOGD("fd:%{public}d", fd);
     if (fd < 0) {
         MMI_HILOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
@@ -423,13 +381,13 @@ void UDSServer::DelSession(int32_t fd)
 
 void UDSServer::AddSessionDeletedCallback(std::function<void(SessionPtr)> callback)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     callbacks_.push_back(callback);
 }
 
 void UDSServer::NotifySessionDeleted(SessionPtr ses)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     for (const auto& callback : callbacks_) {
         callback(ses);
     }

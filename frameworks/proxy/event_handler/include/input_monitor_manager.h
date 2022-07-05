@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,12 +30,11 @@ class InputMonitorManager {
 public:
     InputMonitorManager() = default;
     DISALLOW_COPY_AND_MOVE(InputMonitorManager);
-
+    ~InputMonitorManager() = default;
 public:
     int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor);
     void RemoveMonitor(int32_t monitorId);
     void MarkConsumed(int32_t monitorId, int32_t eventId);
-    void MoveMouse(int32_t offsetX, int32_t offsetY);
 
 public:
     static bool IsValidMonitorId(int32_t monitorId);

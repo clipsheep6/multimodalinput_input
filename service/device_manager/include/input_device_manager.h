@@ -23,6 +23,8 @@
 #include "event_dispatch.h"
 #include "event_package.h"
 #include "input_device.h"
+#include "key_auto_repeat.h"
+#include "key_map_manager.h"
 #include "msg_handler.h"
 #include "nocopyable.h"
 #include "singleton.h"
@@ -34,23 +36,31 @@ class InputDeviceManager : public DelayedSingleton<InputDeviceManager>, public I
 public:
     InputDeviceManager() = default;
     DISALLOW_COPY_AND_MOVE(InputDeviceManager);
-    void OnInputDeviceAdded(struct libinput_device* inputDevice);
-    void OnInputDeviceRemoved(struct libinput_device* inputDevice);
+    void OnInputDeviceAdded(struct libinput_device *inputDevice);
+    void OnInputDeviceRemoved(struct libinput_device *inputDevice);
     std::vector<int32_t> GetInputDeviceIds() const;
     std::shared_ptr<InputDevice> GetInputDevice(int32_t id) const;
-    std::map<int32_t, bool> GetKeystrokeAbility(int32_t deviceId, std::vector<int32_t> &keyCodes);
+    std::vector<bool> SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes);
     int32_t FindInputDeviceId(struct libinput_device* inputDevice);
+    int32_t GetKeyboardBusMode(int32_t deviceId);
+    bool GetDeviceConfig(int32_t deviceId, int32_t &KeyboardType);
+    int32_t GetDeviceSupportKey(int32_t deviceId);
+    int32_t GetKeyboardType(int32_t deviceId);
     void Attach(std::shared_ptr<IDeviceObserver> observer);
     void Detach(std::shared_ptr<IDeviceObserver> observer);
     void NotifyPointerDevice(bool hasPointerDevice);
     void AddDevMonitor(SessionPtr sess, std::function<void(std::string, int32_t)> callback);
     void RemoveDevMonitor(SessionPtr sess);
+    void Dump(int32_t fd, const std::vector<std::string> &args);
+    void DumpDeviceList(int32_t fd, const std::vector<std::string> &args);
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool HasPointerDevice();
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 private:
     bool IsPointerDevice(struct libinput_device* device);
     void ScanPointerDevice();
-    std::map<int32_t, struct libinput_device*> inputDevice_;
+    std::map<int32_t, struct libinput_device *> inputDevice_;
     int32_t nextId_ {0};
     std::list<std::shared_ptr<IDeviceObserver>> observers_;
     std::map<SessionPtr, std::function<void(std::string, int32_t)>> devMonitor_;

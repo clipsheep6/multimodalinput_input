@@ -38,7 +38,7 @@ int32_t UDSSocket::EpollCreat(int32_t size)
 {
     epollFd_ = epoll_create(size);
     if (epollFd_ < 0) {
-        MMI_HILOGE("epoll_create retrun %{public}d", epollFd_);
+        MMI_HILOGE("epoll_create return %{public}d", epollFd_);
     } else {
         MMI_HILOGI("epoll_create, epollFd_:%{public}d", epollFd_);
     }
@@ -58,9 +58,14 @@ int32_t UDSSocket::EpollCtl(int32_t fd, int32_t op, struct epoll_event& event, i
         MMI_HILOGE("Invalid param epollFd");
         return RET_ERR;
     }
-    auto ret = epoll_ctl(epollFd, op, fd, &event);
+    int32_t ret;
+    if (op == EPOLL_CTL_DEL) {
+        ret = epoll_ctl(epollFd, op, fd, NULL);
+    } else {
+        ret = epoll_ctl(epollFd, op, fd, &event);
+    }
     if (ret < 0) {
-        MMI_HILOGE("epoll_ctl retrun %{public}d,epollFd_:%{public}d,"
+        MMI_HILOGE("epoll_ctl return %{public}d,epollFd_:%{public}d,"
                    "op:%{public}d,fd:%{public}d,errno:%{public}d",
                    ret, epollFd, op, fd, errno);
     }
@@ -109,6 +114,48 @@ int32_t UDSSocket::SetNonBlockMode(int32_t fd, bool isNonBlock)
     }
     MMI_HILOGD("F_SETFL fd:%{public}d,flags:%{public}d", fd, flags);
     return flags;
+}
+
+void UDSSocket::OnReadPackets(CircleStreamBuffer& circBuf, UDSSocket::PacketCallBackFun callbackFun)
+{
+    constexpr int32_t headSize = static_cast<int32_t>(sizeof(PackHead));
+    for (int32_t i = 0; i < ONCE_PROCESS_NETPACKET_LIMIT; i++) {
+        const int32_t unreadSize = circBuf.UnreadSize();
+        if (unreadSize < headSize) {
+            break;
+        }
+        int32_t dataSize = unreadSize - headSize;
+        char *buf = const_cast<char *>(circBuf.ReadBuf());
+        CHKPB(buf);
+        PackHead *head = reinterpret_cast<PackHead *>(buf);
+        CHKPB(head);
+        if (head->size < 0 || head->size > MAX_PACKET_BUF_SIZE) {
+            MMI_HILOGF("Packet header parsing error, and this error cannot be recovered. The buffer will be reset."
+                " head->size:%{public}d, unreadSize:%{public}d", head->size, unreadSize);
+            circBuf.Reset();
+            break;
+        }
+        if (head->size > dataSize) {
+            break;
+        }
+        NetPacket pkt(head->idMsg);
+        if ((head->size > 0) && (!pkt.Write(&buf[headSize], head->size))) {
+            MMI_HILOGW("Error writing data in the NetPacket. It will be retried next time. messageid: %{public}d,"
+                "size:%{public}d", head->idMsg, head->size);
+            break;
+        }
+        if (!circBuf.SeekReadPos(pkt.GetPacketLength())) {
+            MMI_HILOGW("Set read position error, and this error cannot be recovered, and the buffer will be reset."
+                " packetSize:%{public}d unreadSize:%{public}d", pkt.GetPacketLength(), unreadSize);
+            circBuf.Reset();
+            break;
+        }
+        callbackFun(pkt);
+        if (circBuf.IsEmpty()) {
+            circBuf.Reset();
+            break;
+        }
+    }
 }
 
 void UDSSocket::EpollClose()

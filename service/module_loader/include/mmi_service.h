@@ -16,6 +16,7 @@
 #ifndef MMI_SERVICE_H
 #define MMI_SERVICE_H
 
+#include <atomic>
 #include <mutex>
 #include <thread>
 
@@ -24,6 +25,7 @@
 #include "singleton.h"
 #include "system_ability.h"
 
+#include "delegate_tasks.h"
 #include "input_event_handler.h"
 #include "multimodal_input_connect_stub.h"
 #include "libinput_adapter.h"
@@ -37,7 +39,7 @@
 namespace OHOS {
 namespace MMI {
 
-enum class ServiceRunningState { STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
+enum class ServiceRunningState {STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
 class MMIService : public UDSServer, public SystemAbility, public MultimodalInputConnectStub {
     DECLARE_DELAYED_SINGLETON(MMIService);
     DECLEAR_SYSTEM_ABILITY(MMIService);
@@ -46,34 +48,73 @@ class MMIService : public UDSServer, public SystemAbility, public MultimodalInpu
 public:
     virtual void OnStart() override;
     virtual void OnStop() override;
-    virtual void OnDump() override;
-    virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &socketFd) override;
+    int32_t Dump(int32_t fd, const std::vector<std::u16string> &args) override;
+    virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
+        int32_t &toReturnClientFd) override;
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
+    virtual int32_t SetPointerVisible(bool visible) override;
+    virtual int32_t IsPointerVisible(bool &visible) override;
+    virtual int32_t MarkEventProcessed(int32_t eventId) override;
+    virtual int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
+        HandleEventType eventType) override;
+    virtual int32_t RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType) override;
+    virtual int32_t MarkEventConsumed(int32_t monitorId, int32_t eventId) override;
+    virtual int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY) override;
+    virtual int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
+    virtual int32_t SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option) override;
+    virtual int32_t UnsubscribeKeyEvent(int32_t subscribeId) override;
+    virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
+
+#ifdef OHOS_RSS_CLIENT
+    virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+#endif
 
 protected:
     virtual void OnConnected(SessionPtr s) override;
     virtual void OnDisconnected(SessionPtr s) override;
-    virtual int32_t StubHandleAllocSocketFd(MessageParcel &data, MessageParcel &reply) override;
-
     virtual int32_t AddEpoll(EpollEventType type, int32_t fd) override;
-
+    int32_t DelEpoll(EpollEventType type, int32_t fd);
+    virtual bool IsRunning() const override;
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    int32_t CheckPointerVisible(bool &visible);
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+    int32_t CheckEventProcessed(int32_t pid, int32_t eventId);
+#if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
+    int32_t CheckAddInput(int32_t pid, int32_t handlerId, InputHandlerType handlerType,
+        HandleEventType eventType);
+    int32_t CheckRemoveInput(int32_t pid, int32_t handlerId, InputHandlerType handlerType);
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
+    int32_t CheckMarkConsumed(int32_t pid, int32_t monitorId, int32_t eventId);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    int32_t CheckInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    int32_t CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     bool InitLibinputService();
     bool InitService();
     bool InitSignalHandler();
+    bool InitDelegateTasks();
     int32_t Init();
 
-    void OnTimer();
     void OnThread();
     void OnSignalEvent(int32_t signalFd);
+    void OnDelegateTask(epoll_event& ev);
+
+    void AddReloadDeviceTimer();
 
 private:
-    ServiceRunningState state_ = ServiceRunningState::STATE_NOT_START;
+    std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t mmiFd_ = -1;
     std::mutex mu_;
     std::thread t_;
+#ifdef OHOS_RSS_CLIENT
+    std::atomic<uint64_t> tid_ = 0;
+#endif
 
     LibinputAdapter libinputAdapter_;
     ServerMsgHandler sMsgHandler_;
+    DelegateTasks delegateTasks_;
 };
 } // namespace MMI
 } // namespace OHOS

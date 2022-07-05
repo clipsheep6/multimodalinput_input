@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -32,17 +32,23 @@ public:
     MouseEventHandler();
     ~MouseEventHandler() = default;
     DISALLOW_COPY_AND_MOVE(MouseEventHandler);
-
     std::shared_ptr<PointerEvent> GetPointerEvent() const;
-    void Normalize(struct libinput_event *event);
+    int32_t Normalize(struct libinput_event *event);
+    void Dump(int32_t fd, const std::vector<std::string> &args);
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool NormalizeMoveMouse(int32_t offsetX, int32_t offsetY);
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+
 private:
-    void HandleMotionInner(libinput_event_pointer* data);
-    void HandleButonInner(libinput_event_pointer* data);
-    void HandleAxisInner(libinput_event_pointer* data);
+    int32_t HandleMotionInner(libinput_event_pointer* data);
+    int32_t HandleButtonInner(libinput_event_pointer* data);
+    int32_t HandleAxisInner(libinput_event_pointer* data);
     void HandlePostInner(libinput_event_pointer* data, int32_t deviceId, PointerEvent::PointerItem& pointerItem);
+ #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     void HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY);
     void HandlePostMoveMouse(PointerEvent::PointerItem& pointerItem);
+ #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+    int32_t HandleButtonValueInner(libinput_event_pointer* data);
     void DumpInner();
     void InitAbsolution();
 
@@ -51,8 +57,9 @@ private:
     int32_t timerId_ = -1;
     double absolutionX_ = -1;
     double absolutionY_ = -1;
-    int32_t buttionId_ = -1;
+    int32_t buttonId_ = -1;
     bool isPressed_ = false;
+    int32_t currentDisplayId_ = -1;
 };
 
 #define MouseEventHdr MouseEventHandler::GetInstance()

@@ -35,10 +35,10 @@ GestureTransformPointProcessor::~GestureTransformPointProcessor() {}
 
 void GestureTransformPointProcessor::OnEventTouchPadPinchBegin(libinput_event_gesture *data)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(data);
-    auto time = static_cast<int64_t>(libinput_event_gesture_get_time(data));
-    auto scale = libinput_event_gesture_get_scale(data);
+    int64_t time = static_cast<int64_t>(libinput_event_gesture_get_time(data));
+    double scale = libinput_event_gesture_get_scale(data);
     pointerEvent_->SetActionTime(GetSysClockTime());
     pointerEvent_->SetActionStartTime(time);
 
@@ -70,8 +70,8 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchUpdate(libinput_event_g
 {
     MMI_HILOGD("Touchpad update event");
     CHKPV(data);
-    auto time = static_cast<int64_t>(libinput_event_gesture_get_time(data));
-    auto scale = libinput_event_gesture_get_scale(data);
+    int64_t time = static_cast<int64_t>(libinput_event_gesture_get_time(data));
+    double scale = libinput_event_gesture_get_scale(data);
     pointerEvent_->SetActionTime(GetSysClockTime());
     pointerEvent_->SetActionStartTime(time);
 
@@ -95,8 +95,8 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchEnd(libinput_event_gest
 {
     MMI_HILOGD("Touchpad end event");
     CHKPV(data);
-    auto time = static_cast<int64_t>(libinput_event_gesture_get_time(data));
-    auto scale = libinput_event_gesture_get_scale(data);
+    int64_t time = static_cast<int64_t>(libinput_event_gesture_get_time(data));
+    double scale = libinput_event_gesture_get_scale(data);
     pointerEvent_->SetActionTime(GetSysClockTime());
     pointerEvent_->SetActionStartTime(time);
 
@@ -116,10 +116,10 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchEnd(libinput_event_gest
     pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scale);
 }
 
-std::shared_ptr<PointerEvent> GestureTransformPointProcessor::OnTouchPadGestrueEvent(
+std::shared_ptr<PointerEvent> GestureTransformPointProcessor::OnTouchPadGestureEvent(
     struct libinput_event *event)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPP(event);
     auto data = libinput_event_get_gesture_event(event);
     CHKPP(data);
