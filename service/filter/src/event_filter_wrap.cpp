@@ -83,6 +83,7 @@ bool EventFilterWrap::HandlePointerEventFilter(std::shared_ptr<PointerEvent> poi
     CHKPF(point);
     std::lock_guard<std::mutex> guard(lockFilter_);
     if (filter_ == nullptr) {
+        MMI_HILOGI("filter_ is nullptr");
         return false;
     }
     if (filter_->HandlePointerEvent(point)) {
