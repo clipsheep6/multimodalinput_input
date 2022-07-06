@@ -14,9 +14,6 @@
  */
 
 #include "js_input_monitor.h"
-
-#include <cinttypes>
-
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "input_manager.h"
