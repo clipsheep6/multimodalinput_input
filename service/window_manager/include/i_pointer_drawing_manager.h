@@ -33,7 +33,11 @@ public:
         return true;
     }
     virtual void DeletePointerVisible(int32_t pid) {}
-    virtual void SetPointerVisible(int32_t pid, bool visible) {}
+    virtual int32_t SetPointerVisible(int32_t pid, bool visible)
+    {
+        return 0;
+    }
+    virtual void SetPointerLocation(int32_t pid, int32_t x, int32_t y) {}
     virtual bool IsPointerVisible()
     {
         return false;

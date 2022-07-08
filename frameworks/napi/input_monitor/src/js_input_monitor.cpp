@@ -29,6 +29,7 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitor" };
 constexpr int32_t NAPI_ERR = 3;
+constexpr int32_t MOUSE_FLOW = 10;
 } // namespace
 
 bool InputMonitor::Start()
@@ -68,6 +69,16 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
     if (JsInputMonMgr.GetMonitor(id_) == nullptr) {
         MMI_HILOGE("failed to process pointer event, id:%{public}d", id_);
         return;
+    }
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE
+        && pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE) {
+        static int32_t count = MOUSE_FLOW;
+        std::lock_guard<std::mutex> guard(filterMutex_);
+        if (++count < MOUSE_FLOW) {
+            return;
+        } else {
+            count = 0;
+        }
     }
     std::function<void(std::shared_ptr<PointerEvent>)> callback;
     {
@@ -376,6 +387,14 @@ int32_t JsInputMonitor::GetMousePointerItem(const std::shared_ptr<PointerEvent> 
                 MMI_HILOGE("Set axisVerticalValue property failed");
                 return RET_ERR;
             }
+            if (SetNameProperty(jsEnv_, result, "rawDeltaX", item.GetRawData().GetDx()) != napi_ok) {
+                MMI_HILOGE("Set dx property failed");
+                return RET_ERR;
+            }
+            if (SetNameProperty(jsEnv_, result, "rawDeltaY", item.GetRawData().GetDy()) != napi_ok) {
+                MMI_HILOGE("Set dy property failed");
+                return RET_ERR;
+            }
         }
     }
     return RET_OK;
@@ -488,11 +507,17 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
     }
     CHKPV(monitor_);
     CHKPV(pointerEvent);
+    {
+        std::lock_guard<std::mutex> guard(evQueueMutex_);
+        std::queue<std::shared_ptr<PointerEvent>> empty;
+        std::swap(evQueue_, empty);
+        evQueue_.push(pointerEvent);
+    }
     int32_t num = 0;
     {
-        std::lock_guard<std::mutex> guard(mutex_);
-        evQueue_.push(pointerEvent);
+        std::lock_guard<std::mutex> guard(mutex_); 
         num = jsTaskNum_;
+        jsTaskNum_ = 1;
     }
     if (num < 1) {
         int32_t *id = &monitorId_;
@@ -503,11 +528,14 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
         auto status = napi_get_uv_event_loop(jsEnv_, &loop);
         if (status != napi_ok) {
             MMI_HILOGE("napi_get_uv_event_loop is failed");
+            {
+                std::lock_guard<std::mutex> guard(mutex_);
+                jsTaskNum_ = 0;
+            }
             return;
         }
         uv_queue_work(loop, work, [](uv_work_t *work){}, &JsInputMonitor::JsCallback);
         std::lock_guard<std::mutex> guard(mutex_);
-        ++jsTaskNum_;
     }
 }
 
@@ -527,6 +555,7 @@ void JsInputMonitor::JsCallback(uv_work_t *work, int32_t status)
 void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
 {
     CALL_LOG_ENTER;
+    jsTaskNum_ = 0;
     if (!isMonitoring_) {
         MMI_HILOGE("js monitor stop");
         return;
@@ -583,7 +612,6 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
         status = napi_get_value_bool(jsEnv_, result, &retValue);
         if (status != napi_ok) {
             napi_close_handle_scope(jsEnv_, scope);
-            --jsTaskNum_;
             return;
         }
         if (retValue) {
@@ -592,7 +620,6 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
         }
         napi_close_handle_scope(jsEnv_, scope);
     }
-    --jsTaskNum_;
 }
 } // namespace MMI
 } // namespace OHOS

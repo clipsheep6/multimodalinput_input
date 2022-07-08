@@ -72,6 +72,7 @@ public:
     static std::shared_ptr<PointerEvent> SetupPointerEvent011();
     static std::shared_ptr<PointerEvent> SetupPointerEvent012();
     static std::shared_ptr<PointerEvent> SetupPointerEvent013();
+    static std::shared_ptr<PointerEvent> SetupPointerEvent(int32_t displayId);
     static void TestSimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
     static void TestSimulateInputEvent_2(std::shared_ptr<PointerEvent> pointerEvent);
     static std::string DumpPointerItem2(const PointerEvent::PointerItem &item);
@@ -1029,6 +1030,34 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent013()
     item.SetTiltY(15.33);
     item.SetPressure(0.45);
     item.SetDeviceId(1);
+    pointerEvent->AddPointerItem(item);
+    return pointerEvent;
+}
+
+std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent(int32_t displayId)
+{
+    auto pointerEvent = PointerEvent::Create();
+    int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
+    pointerEvent->SetTargetDisplayId(displayId);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetDownTime(downTime);
+    item.SetPressed(true);
+
+    item.SetGlobalX(200);
+    item.SetGlobalY(200);
+    item.SetLocalX(300);
+    item.SetLocalY(300);
+
+    item.SetWidth(0);
+    item.SetHeight(0);
+    item.SetPressure(0);
+    item.SetDeviceId(0);
     pointerEvent->AddPointerItem(item);
     return pointerEvent;
 }
@@ -2724,5 +2753,375 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_004, TestSize.Level1
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 }
+HWTEST_F(InputManagerTest, InputManagerTest_SimulateInputEvent_001, TestSize.Level1)
+{
+    MMI_HILOGD("InputManagerTest_SimulateInputEvent_001");
+    std::string command {
+        "PointerDrawingManager: in DrawPointer, leave, display:0,globalX:200,globalY:200"
+    };
+
+    std::vector<std::string> sLogs { SearchLog(command, true) };
+    auto pointerEvent = SetupPointerEvent(0);
+    EXPECT_TRUE(pointerEvent != nullptr);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+    EXPECT_TRUE(!tLogs.empty());
+}
+
+HWTEST_F(InputManagerTest, InputManagerTest_SimulateInputEvent_002, TestSize.Level1)
+{
+    MMI_HILOGD("InputManagerTest_SimulateInputEvent_002");
+    std::string command {
+        "PointerDrawingManager: in DrawPointer, leave, display:0,globalX:200,globalY:200"
+    };
+
+    std::vector<std::string> sLogs { SearchLog(command, true) };
+    auto pointerEvent = SetupPointerEvent(-1);
+    EXPECT_TRUE(pointerEvent != nullptr);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+    EXPECT_TRUE(!tLogs.empty());
+}
+
+HWTEST_F(InputManagerTest, InputManagerTest_SimulateInputEvent_003, TestSize.Level1)
+{
+    MMI_HILOGD("InputManagerTest_SimulateInputEvent_003");
+    std::string command {
+        "InputWindowsManager: in UpdateMouseTarget, This display:2 is not exist"
+    };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
+    auto pointerEvent = SetupPointerEvent(2);
+    EXPECT_TRUE(pointerEvent != nullptr);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+    EXPECT_TRUE(!tLogs.empty());
+}
+
+HWTEST_F(InputManagerTest, InputManagerTest_SetPointerVisible_001, TestSize.Level1)
+{
+    MMI_HILOGD("InputManagerTest_SetPointerVisible_001");
+    bool expect = true;
+    InputManager::GetInstance()->SetPointerVisible(expect);
+    bool acture = InputManager::GetInstance()->IsPointerVisible();
+    EXPECT_EQ(expect, acture);
+}
+
+HWTEST_F(InputManagerTest, InputManagerTest_SetPointerVisible_002, TestSize.Level1)
+{
+    MMI_HILOGD("InputManagerTest_SetPointerVisible_002");
+    bool expect = true;
+    int32_t ret = InputManager::GetInstance()->SetPointerVisible(expect);
+    EXPECT_EQ(RET_OK, ret); 
+
+}
+
+HWTEST_F(InputManagerTest, InputManagerTest_SetPointerVisible_003, TestSize.Level1)
+{
+    MMI_HILOGD("InputManagerTest_SetPointerVisible_003");
+    bool expect = false;
+    InputManager::GetInstance()->SetPointerVisible(expect);
+    bool acture = InputManager::GetInstance()->IsPointerVisible();
+    EXPECT_EQ(expect, acture);
+
+}
+
+HWTEST_F(InputManagerTest, InputManagerTest_SetPointerVisible_004, TestSize.Level1)
+{
+    MMI_HILOGD("InputManagerTest_SetPointerVisible_004");
+    bool isVisable = false;
+    int32_t ret = InputManager::GetInstance()->SetPointerVisible(isVisable);
+    EXPECT_EQ(RET_OK, ret);
+
+}
+
+HWTEST_F(InputManagerTest, InputManagerTest_SetPointerLocation_001, TestSize.Level1)
+{
+    MMI_HILOGD("InputManagerTest_SetPointerLocation_001");
+    int32_t x = 100;
+    int32_t y = 200;
+    std::string command {
+        "MouseEventHandler: in SetAbsolutionLocation, "
+        "MouseEventHandler cross screen location : x:100.000000, y:200.000000"
+    };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
+    int32_t ret = InputManager::GetInstance()->SetPointerLocation(x, y);
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+    EXPECT_TRUE(!tLogs.empty());
+    EXPECT_EQ(RET_OK, ret);
+}
+
+
+HWTEST_F(InputManagerTest, InputManagerTest_SetPointerLocation_002, TestSize.Level1)
+{
+    MMI_HILOGD("InputManagerTest_SetPointerLocation_002");
+    int32_t x =0;
+    int32_t y = 0;
+    std::string command {
+        "MouseEventHandler: in SetAbsolutionLocation, "
+        "MouseEventHandler cross screen location : x:0.000000, y:0.000000"
+    };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
+    int32_t ret = InputManager::GetInstance()->SetPointerLocation(x, y);
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+    EXPECT_TRUE(!tLogs.empty());
+    EXPECT_EQ(RET_OK, ret);
+}
+
+HWTEST_F(InputManagerTest, InputManagerTest_SetPointerLocation_003, TestSize.Level1)
+{
+    MMI_HILOGD("InputManagerTest_SetPointerLocation_003");
+    int32_t x =2;
+    int32_t y = 2;
+    std::string command {
+        "MouseEventHandler: in SetAbsolutionLocation, "
+        "MouseEventHandler cross screen location : x:2.000000, y:2.000000"
+    };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
+    int32_t ret = InputManager::GetInstance()->SetPointerLocation(x, y);
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+    EXPECT_TRUE(!tLogs.empty());
+    EXPECT_EQ(RET_OK, ret);
+}
+
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+HWTEST_F(InputManagerTest, InputManagerTest_PrepareRemoteInput001, TestSize.Level1)
+{
+    MMI_HILOGD("InputManagerTest_PrepareRemoteInput001");
+    std::string deviceId = "001";
+    std::string command {
+        "DInputManager: in PrepareRemoteInput, leave"
+    };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
+    int32_t ret = InputManager::GetInstance()->PrepareRemoteInput(deviceId,
+        [](int32_t status)
+    {
+        MMI_HILOGD("Prepare remote input result=%{public}d", status);
+        EXPECT_EQ(-60000, status);
+    });
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+    EXPECT_TRUE(!tLogs.empty());
+    EXPECT_EQ(-1, ret);
+}
+
+HWTEST_F(InputManagerTest, InputManagerTest_PrepareRemoteInput002, TestSize.Level1)
+{
+    MMI_HILOGD("InputManagerTest_PrepareRemoteInput002");
+    std::string deviceId = "002";
+    std::function<void(int32_t)> callback;
+    std::string command {
+        "DInputManager: in PrepareRemoteInput, leave"
+    };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
+    int32_t ret = InputManager::GetInstance()->PrepareRemoteInput(deviceId, callback);
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+    EXPECT_TRUE(!tLogs.empty());
+    EXPECT_EQ(-1, ret);
+}
+
+HWTEST_F(InputManagerTest, InputManagerTest_PrepareRemoteInput003, TestSize.Level1)
+{
+    MMI_HILOGD("InputManagerTest_PrepareRemoteInput003");
+    std::string deviceId = "";
+    std::string command {
+        "DInputManager: in PrepareRemoteInput, leave"
+    };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
+    int32_t ret = InputManager::GetInstance()->PrepareRemoteInput(deviceId,[](int32_t status)
+    {
+        MMI_HILOGD("Prepare remote input result=%{public}d",status);
+        EXPECT_EQ(-60000, status);
+    });
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+    EXPECT_TRUE(!tLogs.empty());
+    EXPECT_EQ(-1, ret);
+}
+
+HWTEST_F(InputManagerTest, InputManagerTest_UnprepareRemoteInput001, TestSize.Level1)
+{
+    MMI_HILOGD("InputManagerTest_UnprepareRemoteInput001");
+    std::string deviceId = "001";
+    std::string command {
+        "DInputManager: in UnprepareRemoteInput, leave"
+    };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
+    int32_t ret = InputManager::GetInstance()->UnprepareRemoteInput(deviceId,
+        [](int32_t status)
+    {
+        MMI_HILOGD("Unprepare remote input result=%{public}d", status);
+        EXPECT_EQ(-60000, status);
+    });
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+    EXPECT_TRUE(!tLogs.empty());
+    EXPECT_EQ(-1, ret);
+}
+
+HWTEST_F(InputManagerTest, InputManagerTest_UnprepareRemoteInput002, TestSize.Level1)
+{
+    MMI_HILOGD("InputManagerTest_UnprepareRemoteInput002"); 
+    std::string deviceId = "002";
+    std::function<void(int32_t)> callback;
+    std::string command {
+        "DInputManager: in UnprepareRemoteInput, leave"
+    };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
+    int32_t ret = InputManager::GetInstance()->UnprepareRemoteInput(deviceId, callback);
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+    EXPECT_TRUE(!tLogs.empty());
+    EXPECT_EQ(-1, ret);
+}
+
+HWTEST_F(InputManagerTest, InputManagerTest_UnprepareRemoteInput003, TestSize.Level1)
+{
+    MMI_HILOGD("InputManagerTest_UnprepareRemoteInput003");
+    std::string deviceId = "";
+    std::string command {
+        "DInputManager: in UnprepareRemoteInput, leave"
+    };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
+    int32_t ret = InputManager::GetInstance()->UnprepareRemoteInput(deviceId,
+        [](int32_t status)
+    {
+        MMI_HILOGD("Unprepare remote input result=%{public}d", status);
+        EXPECT_EQ(-60000, status);
+    });
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+    EXPECT_TRUE(!tLogs.empty());
+    EXPECT_EQ(-1, ret);
+}
+
+HWTEST_F(InputManagerTest, InputManagerTest_StartRemoteInput_001, TestSize.Level1)
+{
+    MMI_HILOGD("InputManagerTest_StartRemoteInput_001");
+    std::string deviceId = "001";
+    std::string command {
+        "DInputManager: in StartRemoteInput, leave"
+    };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
+    int32_t ret = InputManager::GetInstance()->StartRemoteInput(deviceId, 1, [](int32_t status) {
+        MMI_HILOGD("Start remote input result=%{public}d", status);
+        EXPECT_EQ(-60000, status);
+    });
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+    EXPECT_TRUE(!tLogs.empty());
+    EXPECT_EQ(-1, ret);
+}
+
+HWTEST_F(InputManagerTest, InputManagerTest_StartRemoteInput_002, TestSize.Level1)
+{
+    MMI_HILOGD("InputManagerTest_StartRemoteInput_002");
+    std::string deviceId = "002";
+    std::function<void(int32_t)> callback;
+    std::string command {
+        "DInputManager: in StartRemoteInput, leave"
+    };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
+    int32_t ret = InputManager::GetInstance()->StartRemoteInput(deviceId, 1, callback);
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+    EXPECT_TRUE(!tLogs.empty());
+    EXPECT_EQ(-1, ret);
+}
+
+HWTEST_F(InputManagerTest, InputManagerTest_StartRemoteInput_003, TestSize.Level1)
+{
+    MMI_HILOGD("InputManagerTest_StartRemoteInput_003");
+    std::string deviceId = "";
+    std::string command {
+        "DInputManager: in StartRemoteInput, leave"
+    };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
+    int32_t ret = InputManager::GetInstance()->StartRemoteInput(deviceId, 1, [](int32_t status) {
+        MMI_HILOGD("Start remote input result=%{public}d", status);
+        EXPECT_EQ(-60000, status);
+    });
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+    EXPECT_TRUE(!tLogs.empty());
+    EXPECT_EQ(-1, ret);
+}
+
+HWTEST_F(InputManagerTest, InputManagerTest_StopRemoteInput_001, TestSize.Level1)
+{
+    MMI_HILOGD("InputManagerTest_StopRemoteInput_001");
+    std::string deviceId = "001";
+    std::string command {
+        "DInputManager: in StopRemoteInput, leave"
+    };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
+    int32_t ret = InputManager::GetInstance()->StopRemoteInput(deviceId, 1, [](int32_t status) {
+        MMI_HILOGD("Stop remote input result=%{public}d", status);
+        EXPECT_EQ(-60000, status);
+    });
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+    EXPECT_TRUE(!tLogs.empty());
+    EXPECT_EQ(-1, ret);
+}
+
+HWTEST_F(InputManagerTest, InputManagerTest_StopRemoteInput_002, TestSize.Level1)
+{
+    MMI_HILOGD("InputManagerTest_StopRemoteInput_002");
+    std::string deviceId = "002";
+    std::function<void(int32_t)> callback;
+    std::string command {
+        "DInputManager: in StopRemoteInput, leave"
+    };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
+    int32_t ret = InputManager::GetInstance()->StopRemoteInput(deviceId, 1, callback);
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+    EXPECT_TRUE(!tLogs.empty());
+    EXPECT_EQ(-1, ret);
+}
+
+HWTEST_F(InputManagerTest, InputManagerTest_StopRemoteInput_003, TestSize.Level1)
+{
+    MMI_HILOGD("InputManagerTest_StopRemoteInput_003");
+    std::string deviceId = "";
+    std::string command {
+        "DInputManager: in StopRemoteInput, leave"
+    };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
+    int32_t ret = InputManager::GetInstance()->StopRemoteInput(deviceId,
+        1, [](int32_t status)
+    {
+        MMI_HILOGD("Stop remote input result=%{public}d", status);
+        EXPECT_EQ(-60000, status);
+    });
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+    EXPECT_TRUE(!tLogs.empty());
+    EXPECT_EQ(-1, ret);
+}
+
+HWTEST_F(InputManagerTest, InputManagerTest_GetRemoteInputAbility_001, TestSize.Level1)
+{
+    MMI_HILOGD("InputManagerTest_GetRemoteInputAbility_001");
+    int32_t ret = InputManager::GetInstance()->GetRemoteInputAbility("001", [](std::set<int32_t> result){
+        EXPECT_EQ(0, result.size());
+    });
+    EXPECT_EQ(RET_OK, ret);
+}
+
+HWTEST_F(InputManagerTest, InputManagerTest_GetRemoteInputAbility_002, TestSize.Level1)
+{
+    MMI_HILOGD("InputManagerTest_GetRemoteInputAbility_002");
+    int32_t ret = InputManager::GetInstance()->GetRemoteInputAbility("002", [](std::set<int32_t>){});
+    EXPECT_EQ(RET_OK, ret); 
+
+}
+
+HWTEST_F(InputManagerTest, InputManagerTest_GetRemoteInputAbility_003, TestSize.Level1)
+{
+    MMI_HILOGD("InputManagerTest_GetRemoteInputAbility_003");
+    std::function<void(std::set<int32_t>)> fun = nullptr;
+    std::string command {
+        "CallDinputService: in HandleRemoteInputAbility"
+    };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
+    int32_t ret = InputManager::GetInstance()->GetRemoteInputAbility("003", fun);
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+    EXPECT_TRUE(!tLogs.empty());
+    EXPECT_EQ(RET_ERR, ret); 
+}
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
 } // namespace MMI
 } // namespace OHOS
