@@ -51,6 +51,16 @@ void BytraceAdapter::StartBytrace(std::shared_ptr<PointerEvent> pointerEvent, Tr
         } else {
             StartAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, onTouchEvent, eventId);
             HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "service report touchId:" + std::to_string(eventId));
+            std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
+            for (const auto& pointerId : pointerIds) {
+                PointerEvent::PointerItem item;
+                if (!pointerEvent->GetPointerItem(pointerId, item)) {
+                    return;
+                }
+                HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "service report touchXY: " +
+                    std::to_string(item.GetGlobalX()) + "," + std::to_string(item.GetGlobalY()) + " " +
+                    std::to_string(item.GetLocalX()) + "," + std::to_string(item.GetLocalY()));
+            }
         }
     } else {
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
