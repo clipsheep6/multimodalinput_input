@@ -17,10 +17,16 @@ ability_runtime_path = "//foundation/ability/ability_runtime"
 ability_runtime_kits_path = "${ability_runtime_path}/frameworks/kits"
 declare_args() {
   resource_schedule_service_enabled = false
+  suspend_manager_service_enabled = false
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
     resource_schedule_service_enabled = true
+  }
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.resourceschedule_suspend_manager)) {
+    suspend_manager_service_enabled = true
   }
 }
 

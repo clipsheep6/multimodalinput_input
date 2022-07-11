@@ -94,6 +94,10 @@ config("libmmi_server_config") {
     cflags += [ "-DOHOS_RSS_CLIENT" ]
   }
 
+  if (suspend_manager_service_enabled) {
+    cflags += [ "-DOHOS_SUSPEND_MANAGER_ENABLED" ]
+  }
+
   if (mmi_enable_pointer_drawing) {
     cflags += [ "-DOHOS_BUILD_ENABLE_POINTER_DRAWING" ]
   }
@@ -239,6 +243,10 @@ ohos_shared_library("libmmi-server") {
 
   if (mmi_enable_pointer_drawing) {
     external_deps += [ "window_manager:libwm" ]
+  }
+
+  if (suspend_manager_service_enabled) {
+    external_deps += [ "suspend_manager:suspend_manager_client" ]
   }
 
   part_name = "input"
