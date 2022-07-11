@@ -685,9 +685,13 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
         }
         auto ret = RET_ERR;
         if (typeName == "touch") {
-            ret = TransformPointerEvent(pointerEvent, napiPointer);
+            if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+                ret = TransformPointerEvent(pointerEvent, napiPointer);
+            }
         } else {
-            ret = TransformMousePointerEvent(pointerEvent, napiPointer);
+            if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
+                ret = TransformMousePointerEvent(pointerEvent, napiPointer);
+            }
         }
         if (ret != RET_OK || napiPointer == nullptr) {
             break;
