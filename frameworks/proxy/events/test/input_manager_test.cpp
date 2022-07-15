@@ -17,6 +17,7 @@
 #include "input_handler_type.h"
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"
+#include "system_info.h"
 #include "util.h"
 
 namespace OHOS {
@@ -162,10 +163,10 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent005()
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
     pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
-    pointerEvent->SetPointerId(1);
+    pointerEvent->SetPointerId(0);
     pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
     PointerEvent::PointerItem item;
-    item.SetPointerId(1);
+    item.SetPointerId(0);
     item.SetDownTime(downTime);
     item.SetPressed(true);
 
@@ -188,9 +189,9 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent006()
     CHKPP(pointerEvent);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    pointerEvent->SetPointerId(1);
+    pointerEvent->SetPointerId(0);
     PointerEvent::PointerItem item;
-    item.SetPointerId(1);
+    item.SetPointerId(0);
     item.SetDownTime(0);
     item.SetPressed(false);
 
@@ -215,10 +216,10 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent007()
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
     pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
-    pointerEvent->SetPointerId(1);
+    pointerEvent->SetPointerId(0);
     pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
     PointerEvent::PointerItem item;
-    item.SetPointerId(1);
+    item.SetPointerId(0);
     item.SetDownTime(downTime);
     item.SetPressed(false);
 
@@ -2189,6 +2190,16 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetKeyboardType, TestSize.Level1)
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     MMI_HILOGD("Stop InputManagerTest_GetKeyboardType");
+}
+
+HWTEST_F(InputManagerTest, InputManagerTest_GetProcCpuUsage, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    SYSTEM_INFO::CpuInfo cpuInfo;
+    const std::string process_name = "multimodalinput";
+    auto usage = cpuInfo.GetProcCpuUsage(process_name);
+    MMI_HILOGD("The CPU usage of the %{public}s process is %{public}.2f", process_name.c_str(), usage);
+    ASSERT_TRUE(usage < SYSTEM_INFO::CPU_USAGE_LOAD && usage != SYSTEM_INFO::CPU_USAGE_UNKONW);
 }
 } // namespace MMI
 } // namespace OHOS
