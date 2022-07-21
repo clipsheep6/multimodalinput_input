@@ -555,7 +555,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         } else if (IsInHotArea(logicalX, logicalY, item.defaultHotAreas)) {
             touchWindow = &item;
 #ifdef OHOS_SUSPEND_MANAGER_ENABLED
-            SuspendManager::SuspendManagerImpl::GetInstance().ThawOneApplication(
+            SuspendManager::SuspendManagerClient::GetInstance().ThawOneApplication(
                 -1, "", "THAW_BY_TOUCH_EVNET", touchWindow->pid);
 #endif // OHOS_SUSPEND_MANAGER_ENABLED
             break;
