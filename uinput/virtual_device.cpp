@@ -15,10 +15,6 @@
 
 #include "virtual_device.h"
 
-#include <cerrno>
-#include <cinttypes>
-#include <cstring>
-
 #include <fcntl.h>
 #include <securec.h>
 #include <unistd.h>
@@ -36,7 +32,7 @@ bool DoIoctl(int32_t fd, int32_t request, const uint32_t value)
 {
     int32_t rc = ioctl(fd, request, value);
     if (rc < 0) {
-        MMI_HILOGE("ioctl failed");
+        MMI_HILOGE("Failed to ioctl");
         return false;
     }
     return true;
@@ -99,7 +95,7 @@ bool VirtualDevice::SetUp()
 
     errno_t ret = strncpy_s(dev_.name, MAX_NAME_LENGTH, deviceName_, sizeof(dev_.name));
     if (ret != EOK) {
-        MMI_HILOGE("failed to copy deviceName");
+        MMI_HILOGE("Failed to copy deviceName");
         return false;
     }
     dev_.id.bustype = busType_;

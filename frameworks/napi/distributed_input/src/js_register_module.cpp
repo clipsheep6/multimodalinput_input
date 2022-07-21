@@ -12,22 +12,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef DEFINE_INTERCEPTOR_MANAGER_H
-#define DEFINE_INTERCEPTOR_MANAGER_H
 
-#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
-    #include "input_interceptor_manager.h"
-#else
-    #include "i_input_interceptor_manager.h"
-#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+#include <cinttypes>
+
+#include "js_input_dinput_context.h"
 
 namespace OHOS {
 namespace MMI {
-#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
-    #define InputInterMgr InputInterceptorManager::GetInstance()
-#else
-    #define InputInterMgr IInputInterceptorManager::GetInstance()
-#endif
-} // namespace MMI
-} // namespace OHOS
-#endif // DEFINE_INTERCEPTOR_MANAGER_H
+static napi_module mmiInputDInputModule = {
+    .nm_version = 1,
+    .nm_flags = 0,
+    .nm_filename = nullptr,
+    .nm_register_func = JsInputDinputContext::Export,
+    .nm_modname = "multimodalInput.distributedInput",
+    .nm_priv = ((void*)0),
+    .reserved = { 0 },
+};
+
+extern "C" __attribute__((constructor)) void RegisterModule(void)
+{
+    napi_module_register(&mmiInputDInputModule);
+}
+}
+}

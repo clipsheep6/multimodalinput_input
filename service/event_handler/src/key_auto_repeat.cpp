@@ -65,7 +65,6 @@ void KeyAutoRepeat::SelectAutoRepeat(std::shared_ptr<KeyEvent>& keyEvent)
     if (devConf.autoSwitch != OPEN_AUTO_REPEAT) {
         return;
     }
-    udsServer_ = InputHandler->GetUDSServer();
     keyEvent_ = keyEvent;
     if (keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
         if (TimerMgr->IsExist(timerId_)) {
@@ -87,7 +86,7 @@ void KeyAutoRepeat::SelectAutoRepeat(std::shared_ptr<KeyEvent>& keyEvent)
             if (pressedKeyItem != nullptr) {
                 keyEvent_->RemoveReleasedKeyItems(*pressedKeyItem);
             } else {
-                MMI_HILOGW("pressedKeyItem is nullptr");
+                MMI_HILOGW("The pressedKeyItem is nullptr");
             }
             keyEvent_->SetKeyCode(repeatKeyCode_);
             keyEvent_->SetAction(KeyEvent::KEY_ACTION_DOWN);

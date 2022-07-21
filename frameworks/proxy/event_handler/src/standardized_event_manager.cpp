@@ -61,16 +61,16 @@ int32_t StandardizedEventManager::UnsubscribeKeyEvent(int32_t subscribeId)
 
 int32_t StandardizedEventManager::InjectEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     CHKPR(keyEvent, RET_ERR);
     keyEvent->UpdateId();
     if (keyEvent->GetKeyCode() < 0) {
-        MMI_HILOGE("keyCode is invalid:%{public}u", keyEvent->GetKeyCode());
+        MMI_HILOGE("KeyCode is invalid:%{public}u", keyEvent->GetKeyCode());
         return RET_ERR;
     }
     int32_t ret = MultimodalInputConnMgr->InjectKeyEvent(keyEvent);
     if (ret != 0) {
-        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -80,7 +80,7 @@ int32_t StandardizedEventManager::InjectEvent(const std::shared_ptr<KeyEvent> ke
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t StandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     MMI_HILOGD("Inject pointer event:");
     std::stringstream sStream;
@@ -91,7 +91,7 @@ int32_t StandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEven
     }
     int32_t ret = MultimodalInputConnMgr->InjectPointerEvent(pointerEvent);
     if (ret != 0) {
-        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -104,68 +104,12 @@ int32_t StandardizedEventManager::MoveMouseEvent(int32_t offsetX, int32_t offset
     CALL_DEBUG_ENTER;
     int32_t ret = MultimodalInputConnMgr->MoveMouseEvent(offsetX, offsetY);
     if (ret != 0) {
-        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
-
-int32_t StandardizedEventManager::GetDeviceIds(int32_t userData)
-{
-    NetPacket pkt(MmiMessageId::INPUT_DEVICE_IDS);
-    pkt << userData;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write userData failed");
-        return RET_ERR;
-    }
-    return SendMsg(pkt);
-}
-
-int32_t StandardizedEventManager::GetDevice(int32_t userData, int32_t deviceId)
-{
-    NetPacket pkt(MmiMessageId::INPUT_DEVICE);
-    pkt << userData << deviceId;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write userData failed");
-        return RET_ERR;
-    }
-    return SendMsg(pkt);
-}
-
-int32_t StandardizedEventManager::SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> keyCodes)
-{
-    NetPacket pkt(MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY);
-    pkt << userData << deviceId << keyCodes;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write keyCodes failed");
-        return RET_ERR;
-    }
-    return SendMsg(pkt);
-}
-
-int32_t StandardizedEventManager::GetKeyboardType(int32_t userData, int32_t deviceId) const
-{
-    NetPacket pkt(MmiMessageId::INPUT_DEVICE_KEYBOARD_TYPE);
-    pkt << userData << deviceId;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write userData failed");
-        return PACKET_WRITE_FAIL;
-    }
-    return SendMsg(pkt);
-}
-
-int32_t StandardizedEventManager::RegisterInputDeviceMonitor()
-{
-    NetPacket pkt(MmiMessageId::ADD_INPUT_DEVICE_MONITOR);
-    return SendMsg(pkt);
-}
-
-int32_t StandardizedEventManager::UnRegisterInputDeviceMonitor()
-{
-    NetPacket pkt(MmiMessageId::REMOVE_INPUT_DEVICE_MONITOR);
-    return SendMsg(pkt);
-}
 
 bool StandardizedEventManager::SendMsg(NetPacket& pkt) const
 {

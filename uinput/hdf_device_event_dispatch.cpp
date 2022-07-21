@@ -15,11 +15,10 @@
 
 #include "hdf_device_event_dispatch.h"
 
-#include <cstdio>
-#include <cstring>
-#include <functional>
+#include <memory>
 
 #include "mmi_log.h"
+#include "virtual_touch_screen.h"
 
 using namespace OHOS::HiviewDFX;
 namespace OHOS {
@@ -42,7 +41,7 @@ void HdfDeviceEventDispatch::GetEventCallbackDispatch(
     const InputEventPackage **pkgs, uint32_t count, uint32_t devIndex)
 {
     if (pkgs == nullptr) {
-        MMI_HILOGE("pkgs is nullptr");
+        MMI_HILOGE("The pkgs is nullptr");
         return;
     }
     for (uint32_t i = 0; i < count; i++) {

@@ -71,7 +71,7 @@ void EventFilterWrap::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEven
 
 int32_t EventFilterWrap::AddInputEventFilter(sptr<IEventFilter> filter)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(lockFilter_);
     filter_ = filter;
     return RET_OK;
@@ -84,7 +84,7 @@ bool EventFilterWrap::HandlePointerEventFilter(std::shared_ptr<PointerEvent> poi
     std::lock_guard<std::mutex> guard(lockFilter_);
     CHKPF(filter_);
     if (filter_->HandlePointerEvent(point)) {
-        MMI_HILOGD("call HandlePointerEvent return true");
+        MMI_HILOGD("Call HandlePointerEvent return true");
         return true;
     }
     return false;

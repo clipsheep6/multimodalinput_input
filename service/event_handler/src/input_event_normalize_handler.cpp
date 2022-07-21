@@ -121,12 +121,13 @@ void InputEventNormalizeHandler::HandlePointerEvent(std::shared_ptr<PointerEvent
             return;
         }
         MMI_HILOGI("MouseEvent Item Normalization Results, DownTime:%{public}" PRId64 ",IsPressed:%{public}d,"
-            "DisplayX:%{public}d,DisplayY:%{public}d,LocalX:%{public}d,LocalY:%{public}d,"
+            "DisplayX:%{public}d,DisplayY:%{public}d,WindowX:%{public}d,WindowY:%{public}d,"
             "Width:%{public}d,Height:%{public}d,Pressure:%{public}f,Device:%{public}d",
             item.GetDownTime(), static_cast<int32_t>(item.IsPressed()), item.GetDisplayX(), item.GetDisplayY(),
             item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
             item.GetDeviceId());
     }
+    WinMgr->UpdateTargetPointer(pointerEvent);
     nextHandler_->HandlePointerEvent(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
@@ -139,6 +140,7 @@ void InputEventNormalizeHandler::HandleTouchEvent(std::shared_ptr<PointerEvent> 
     }
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     CHKPV(pointerEvent);
+    WinMgr->UpdateTargetPointer(pointerEvent);
     nextHandler_->HandleTouchEvent(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 }
@@ -222,7 +224,7 @@ int32_t InputEventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     if (type == LIBINPUT_EVENT_TOUCHPAD_UP) {
         pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
         MMI_HILOGD("This touch pad event is up remove this finger");
-        if (pointerEvent->GetPointersIdList().empty()) {
+        if (pointerEvent->GetPointerIds().empty()) {
             MMI_HILOGD("This touch pad event is final finger up remove this finger");
             pointerEvent->Reset();
         }
@@ -253,7 +255,7 @@ int32_t InputEventNormalizeHandler::HandleGestureEvent(libinput_event* event)
     PointerEvent::PointerItem item;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item);
     MMI_HILOGD("Item:DownTime:%{public}" PRId64 ",IsPressed:%{public}s,"
-               "DisplayX:%{public}d,DisplayY:%{public}d,LocalX:%{public}d,LocalY:%{public}d,"
+               "DisplayX:%{public}d,DisplayY:%{public}d,WindowX:%{public}d,WindowY:%{public}d,"
                "Width:%{public}d,Height:%{public}d",
                item.GetDownTime(), (item.IsPressed() ? "true" : "false"),
                item.GetDisplayX(), item.GetDisplayY(), item.GetWindowX(), item.GetWindowY(),
@@ -285,7 +287,7 @@ int32_t InputEventNormalizeHandler::HandleTouchEvent(libinput_event* event)
     if (type == LIBINPUT_EVENT_TOUCH_UP) {
         pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
         MMI_HILOGD("This touch event is up remove this finger");
-        if (pointerEvent->GetPointersIdList().empty()) {
+        if (pointerEvent->GetPointerIds().empty()) {
             MMI_HILOGD("This touch event is final finger up remove this finger");
             pointerEvent->Reset();
         }

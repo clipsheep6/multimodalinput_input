@@ -12,24 +12,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef I_INPUT_INTERCEPTOR_MANAGER_H
-#define I_INPUT_INTERCEPTOR_MANAGER_H
+
+#ifndef ANR_MANAGER_H
+#define ANR_MANAGER_H
 
 #include "nocopyable.h"
 #include "singleton.h"
 
-#include "i_input_event_consumer.h"
+#include "uds_server.h"
+#include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
-class IInputInterceptorManager : public DelayedSingleton<IInputInterceptorManager> {
+class ANRManager : public DelayedSingleton<ANRManager> {
 public:
-    IInputInterceptorManager() = default;
-    ~IInputInterceptorManager() = default;
-    DISALLOW_COPY_AND_MOVE(IInputInterceptorManager);
-    int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor);
-    void RemoveInterceptor(int32_t interceptorId);
+    ANRManager() = default;
+    DISALLOW_COPY_AND_MOVE(ANRManager);
+    ~ANRManager() = default;
+    void Init(UDSServer& udsServer);
+    bool TriggerANR(int64_t time, SessionPtr sess);
+    int32_t SetANRNoticedPid(int32_t anrPid);
+    void OnSessionLost(SessionPtr session);
+
+private:
+    int32_t anrNoticedPid_ { -1 };
+    UDSServer *udsServer_ = nullptr;;
 };
-} // namespace MMI
+} // namespace MMI 
 } // namespace OHOS
-#endif // I_INPUT_INTERCEPTOR_MANAGER_H
+#define ANRMgr OHOS::MMI::ANRManager::GetInstance()
+#endif // ANR_MANAGER_H

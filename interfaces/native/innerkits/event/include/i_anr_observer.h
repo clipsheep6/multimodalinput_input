@@ -13,26 +13,19 @@
  * limitations under the License.
  */
 
-#include "i_input_interceptor_manager.h"
-#include "error_multimodal.h"
-#include "mmi_log.h"
+#ifndef I_ANR_OBSERVER_H
+#define I_ANR_OBSERVER_H
 
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IInputInterceptorManager" };
-} // namespace
-
-int32_t IInputInterceptorManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
-{
-    MMI_HILOGW("Interceptor function does not support");
-    return ERROR_UNSUPPORT;
-}
-
-void IInputInterceptorManager::RemoveInterceptor(int32_t interceptorId)
-{
-    MMI_HILOGW("Interceptor function does not support");
-    return;
-}
+class IAnrObserver {
+public:
+    IAnrObserver() = default;
+    virtual ~IAnrObserver() = default;
+    virtual void OnAnr(int32_t pid) const;
+};
 } // namespace MMI
 } // namespace OHOS
+
+
+#endif // I_ANR_OBSERVER_H

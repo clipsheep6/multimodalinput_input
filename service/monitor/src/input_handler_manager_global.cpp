@@ -71,6 +71,7 @@ void InputHandlerManagerGlobal::HandleTouchEvent(std::shared_ptr<PointerEvent> p
 int32_t InputHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
 {
+    CALL_INFO_TRACE;
     InitSessionLostCallback();
     if (!IsValidHandlerId(handlerId)) {
         MMI_HILOGE("Invalid handler");
@@ -78,10 +79,6 @@ int32_t InputHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
     }
     CHKPR(session, RET_ERR);
     if (handlerType == InputHandlerType::MONITOR) {
-        if (!session->HasPermission()) {
-            MMI_HILOGE("no permission, can not add monitor");
-            return RET_ERR;
-        }
         MMI_HILOGD("Register monitor:%{public}d", handlerId);
         SessionHandler mon { handlerId, handlerType, session };
         return monitors_.AddMonitor(mon);
@@ -93,11 +90,8 @@ int32_t InputHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
 void InputHandlerManagerGlobal::RemoveInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
 {
+    CALL_INFO_TRACE;
     if (handlerType == InputHandlerType::MONITOR) {
-        if (!session->HasPermission()) {
-            MMI_HILOGE("no permission, can not remove monitor");
-            return;
-        }
         MMI_HILOGD("Unregister monitor:%{public}d", handlerId);
         SessionHandler monitor { handlerId, handlerType, session };
         monitors_.RemoveMonitor(monitor);
@@ -106,6 +100,7 @@ void InputHandlerManagerGlobal::RemoveInputHandler(int32_t handlerId,
 
 void InputHandlerManagerGlobal::MarkConsumed(int32_t handlerId, int32_t eventId, SessionPtr session)
 {
+    CALL_INFO_TRACE;
     MMI_HILOGD("Mark consumed state, monitor:%{public}d", handlerId);
     monitors_.MarkConsumed(handlerId, eventId, session);
 }
@@ -300,7 +295,7 @@ void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::s
     }
     lastPointerEvent_ = pointerEvent;
 
-    if (pointerEvent->GetPointersIdList().size() != 1) {
+    if (pointerEvent->GetPointerIds().size() != 1) {
         MMI_HILOGD("First press down and last press up intermediate process");
         return;
     }
@@ -329,6 +324,7 @@ void InputHandlerManagerGlobal::MonitorCollection::Monitor(std::shared_ptr<Point
 
 void InputHandlerManagerGlobal::MonitorCollection::OnSessionLost(SessionPtr session)
 {
+    CALL_INFO_TRACE;
     std::set<SessionHandler>::const_iterator cItr = monitors_.cbegin();
     while (cItr != monitors_.cend()) {
         if (cItr->session_ != session) {
@@ -353,10 +349,9 @@ void InputHandlerManagerGlobal::MonitorCollection::Dump(int32_t fd, const std::v
         CHKPV(session);
         mprintf(fd,
                 "monitor id:%d | handlerType:%d | Pid:%d | Uid:%d | Fd:%d "
-                "| HasPermission:%s | EarliestEventTime:%" PRId64 " | Descript:%s \t",
+                "| EarliestEventTime:%" PRId64 " | Descript:%s \t",
                 item.id_, item.handlerType_, session->GetPid(),
                 session->GetUid(), session->GetFd(),
-                session->HasPermission() ? "true" : "false",
                 session->GetEarliestEventTime(), session->GetDescript().c_str());
     }
 }
