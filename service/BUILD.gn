@@ -70,8 +70,8 @@ config("libmmi_server_config") {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
 
-  if (suspend_manager_service_enabled) {
-    defines += [ "OHOS_SUSPEND_MANAGER_ENABLED" ]
+  if (efficiency_manager_service_enabled) {
+    defines += [ "OHOS_EFFICIENCY_MANAGER_ENABLED" ]
   }
 
   if (input_feature_libinput) {
@@ -225,8 +225,8 @@ ohos_shared_library("libmmi-server") {
     deps += [ "//foundation/resourceschedule/resource_schedule_service/ressched/interfaces/innerkits/ressched_client:ressched_client" ]
   }
 
-  if (suspend_manager_service_enabled) {
-    deps += [ "//foundation/resourceschedule/efficiency_manager/suspend_manager/interfaces/innerkits:suspend_manager_client" ]
+  if (efficiency_manager_service_enabled) {
+    deps += [ "//foundation/resourceschedule/efficiency_manager/interfaces/innerkits/suspend_manager:suspend_manager_client" ]
   }
 
   external_deps = [
