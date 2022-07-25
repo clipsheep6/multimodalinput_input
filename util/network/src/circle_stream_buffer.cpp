@@ -14,6 +14,8 @@
  */
 #include "circle_stream_buffer.h"
 
+#include <cstdint>
+
 namespace OHOS {
 namespace MMI {
 void CircleStreamBuffer::CopyDataToBegin()

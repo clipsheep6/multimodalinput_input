@@ -14,6 +14,9 @@
  */
 
 #include "key_option.h"
+
+#include <memory>
+
 #include "config_multimodal.h"
 #include "mmi_log.h"
 
