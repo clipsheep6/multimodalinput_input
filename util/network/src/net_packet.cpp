@@ -15,6 +15,7 @@
 
 #include "net_packet.h"
 
+#include "error_multimodal.h"
 #include "mmi_log.h"
 
 namespace OHOS {

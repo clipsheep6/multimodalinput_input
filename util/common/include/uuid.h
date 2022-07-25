@@ -18,8 +18,6 @@
 
 #include <array>
 #include <cstdint>
-#include <cstring>
-#include <string>
 
 /**
  * @brief The OHOS subsystem.

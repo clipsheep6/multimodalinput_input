@@ -18,6 +18,7 @@
 #include <fcntl.h>
 #include <securec.h>
 #include <unistd.h>
+#include <vector>
 
 #include "mmi_log.h"
 

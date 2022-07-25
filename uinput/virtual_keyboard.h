@@ -17,6 +17,7 @@
 #define VIRTUAL_KEYBOARD_H
 
 #include <cstdint>
+#include <vector>
 #include "nocopyable.h"
 
 #include "virtual_device.h"

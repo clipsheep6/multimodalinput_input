@@ -17,10 +17,12 @@
 
 #include <algorithm>
 #include <climits>
+#include <cstring>
 #include <iomanip>
 #include <iostream>
 
 #include <sys/time.h>
+#include <string>
 
 namespace OHOS {
 namespace MMI {
