@@ -27,6 +27,7 @@
 #include "parcel.h"
 
 #include "input_event.h"
+#include "raw_data.h"
 
 namespace OHOS {
 namespace MMI {
@@ -111,7 +112,7 @@ public:
     static constexpr int32_t POINTER_ACTION_ENTER_WINDOW = 10;
 
     /**
-     * Indicates that the pointer leaves the window.
+     * * Indicates that the pointer leaves the window.
      *
      * @since 9
      */
@@ -673,6 +674,8 @@ public:
          */
         void SetTargetWindowId(int32_t windowId);
 
+        RawData GetRawData() const;
+        void SetRawData(const RawData& rawData);
         /**
          * @brief Writes data to a <b>Parcel</b> object.
          * @param out Indicates the object into which data will be written.
@@ -713,6 +716,7 @@ public:
         int64_t downTime_ {};
         int32_t toolType_ {};
         int32_t targetWindowId_ { -1 };
+        RawData rawData_;
     };
 
 public:
