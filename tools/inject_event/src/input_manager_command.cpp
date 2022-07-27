@@ -667,7 +667,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                     static constexpr int64_t minTotalTimeMs = 1;
                     static constexpr int64_t maxTotalTimeMs = 15000;
                     if ((minTotalTimeMs > totalTimeMs) || (maxTotalTimeMs < totalTimeMs)) {
-                        std::cout << "total time is out of range:" << minTotalTimeMs << " ms" << " <" 
+                        std::cout << "total time is out of range:" << minTotalTimeMs << " ms" << " <"
                             << totalTimeMs << " ms" << " <" << maxTotalTimeMs << " ms" << std::endl;
                         return RET_ERR;
                     }
@@ -792,7 +792,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                     static constexpr int64_t minIntervalTimeMs = 1;
                     static constexpr int64_t maxIntervalTimeMs = 450;
                     if ((minIntervalTimeMs > intervalTimeMs) || (maxIntervalTimeMs < intervalTimeMs)) {
-                        std::cout << "interval time is out of range:" << minIntervalTimeMs << " ms" << " <" 
+                        std::cout << "interval time is out of range:" << minIntervalTimeMs << " ms" << " <"
                             << totalTimeMs << " ms" << " <" << maxIntervalTimeMs << " ms"  << std::endl;
                         return RET_ERR;
                     }
