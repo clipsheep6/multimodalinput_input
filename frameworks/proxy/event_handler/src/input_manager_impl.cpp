@@ -394,7 +394,7 @@ int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consum
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return IMonitorMgr->AddMonitor(consumer);
+    return monitorManager_.AddMonitor(consumer);
 #else
     MMI_HILOGI("Monitor function does not support");
     return ERROR_UNSUPPORT;
@@ -410,7 +410,7 @@ void InputManagerImpl::RemoveMonitor(int32_t monitorId)
         MMI_HILOGE("Client init failed");
         return;
     }
-    IMonitorMgr->RemoveMonitor(monitorId);
+    monitorManager_.RemoveMonitor(monitorId);
 #else
     MMI_HILOGI("Monitor function does not support");
 #endif // OHOS_BUILD_ENABLE_MONITOR
@@ -425,7 +425,7 @@ void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
         MMI_HILOGE("Client init failed");
         return;
     }
-    IMonitorMgr->MarkConsumed(monitorId, eventId);
+    monitorManager_.MarkConsumed(monitorId, eventId);
 #else
     MMI_HILOGI("Monitor function does not support");
 #endif // OHOS_BUILD_ENABLE_MONITOR
@@ -453,8 +453,8 @@ int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> in
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return InputInterMgr->AddInterceptor(interceptor, HANDLE_EVENT_TYPE_ALL);
-#else
+    return interceptorManager_.AddInterceptor(interceptor, HandleEventType::ALL);
+#else 
     MMI_HILOGW("Interceptor function does not support");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
@@ -472,7 +472,7 @@ int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyE
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return InputInterMgr->AddInterceptor(consumer, HANDLE_EVENT_TYPE_KEY);
+    return interceptorManager_.AddInterceptor(consumer, HandleEventType::KEY);
 #else
     MMI_HILOGW("Keyboard device or interceptor function does not support");
     return ERROR_UNSUPPORT;
@@ -488,7 +488,7 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
         MMI_HILOGE("Client init failed");
         return;
     }
-    InputInterMgr->RemoveInterceptor(interceptorId);
+    interceptorManager_.RemoveInterceptor(interceptorId);
 #else
     MMI_HILOGW("Interceptor function does not support");
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
@@ -706,6 +706,162 @@ void InputManagerImpl::OnAnrTask(std::vector<std::shared_ptr<IAnrObserver>> obse
         CHKPV(observer);
         observer->OnAnr(pid);
     }
+}
+
+int32_t InputManagerImpl::SetPointerLocation(int32_t x, int32_t y)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnectManager::GetInstance()->SetPointerLocation(x, y);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SetPointerLocation has send to server fail, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    MMI_HILOGI("SetPointerLocation has send to server success");
+    return RET_OK;
+#else
+    MMI_HILOGW("SetPointerLocation dose not support");
+    return RET_OK;
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
+}
+
+int32_t InputManagerImpl::SetInputDeviceSeatName(const std::string& seatName, DeviceUniqId& deviceUniqId)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnectManager::GetInstance()->SetInputDeviceSeatName(seatName, deviceUniqId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SetInputDeviceSeatName has send to server fail, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    MMI_HILOGI("SetInputDeviceSeatName has send to server success");
+    return RET_OK;
+#else
+    MMI_HILOGW("SetInputDeviceSeatName dose not support");
+    return RET_OK;
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
+}
+
+int32_t InputManagerImpl::GetRemoteInputAbility(std::string deviceId,
+    std::function<void(std::set<int32_t>)> remoteTypes)
+{
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (callDinputService_ == nullptr) {
+        callDinputService_ = new CallDinputService();
+    }
+    CHKPR(callDinputService_, RET_ERR);
+    callDinputService_->SetRemoteAbilityCallback(remoteTypes);
+    int32_t ret = MultimodalInputConnectManager::GetInstance()->GetRemoteInputAbility(deviceId, callDinputService_);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send to server fail, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    MMI_HILOGD("Send to server success");
+    return RET_OK;
+#else
+    MMI_HILOGW("GetRemoteInputAbility dose not support");
+    return RET_OK;
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
+}
+
+int32_t InputManagerImpl::PrepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback)
+{
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (callDinputService_ == nullptr) {
+        callDinputService_ = new CallDinputService();
+    }
+    CHKPR(callDinputService_, RET_ERR);
+    callDinputService_->SetPrepareCallback(callback);
+    int32_t ret = MultimodalInputConnectManager::GetInstance()->PrepareRemoteInput(deviceId, callDinputService_);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send to server fail, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    MMI_HILOGD("Send to server success");
+    return RET_OK;
+#else
+    MMI_HILOGW("PrepareRemoteInput dose not support");
+    return RET_OK;
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
+}
+
+int32_t InputManagerImpl::UnprepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback)
+{
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (callDinputService_ == nullptr) {
+        callDinputService_ = new CallDinputService();
+    }
+    CHKPR(callDinputService_, RET_ERR);
+    callDinputService_->SetUnprepareCallback(callback);
+    int32_t ret = MultimodalInputConnectManager::GetInstance()->UnprepareRemoteInput(deviceId, callDinputService_);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send to server fail, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    MMI_HILOGD("Send to server success");
+    return RET_OK;
+#else
+    MMI_HILOGW("UnprepareRemoteInput dose not support");
+    return RET_OK;
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
+}
+
+int32_t InputManagerImpl::StartRemoteInput(const std::string& deviceId,
+    uint32_t inputAbility, std::function<void(int32_t)> callback)
+{
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (callDinputService_ == nullptr) {
+        callDinputService_ = new CallDinputService();
+    }
+    CHKPR(callDinputService_, RET_ERR);
+    callDinputService_->SetStartCallback(callback);
+    int32_t ret = MultimodalInputConnectManager::GetInstance()->StartRemoteInput(deviceId,
+        inputAbility, callDinputService_);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send to server fail, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    MMI_HILOGD("Send to server success");
+    return RET_OK;
+#else
+    MMI_HILOGW("StartRemoteInput dose not support");
+    return RET_OK;
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
+}
+
+int32_t InputManagerImpl::StopRemoteInput(const std::string& deviceId,
+    uint32_t inputAbility, std::function<void(int32_t)> callback)
+{
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (callDinputService_ == nullptr) {
+        callDinputService_ = new CallDinputService();
+    }
+    CHKPR(callDinputService_, RET_ERR);
+    callDinputService_->SetStopCallback(callback);
+    int32_t ret = MultimodalInputConnectManager::GetInstance()->StopRemoteInput(deviceId,
+        inputAbility, callDinputService_);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send to server fail, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    MMI_HILOGD("Send to server success");
+    return RET_OK;
+#else
+    MMI_HILOGW("StopRemoteInput dose not support");
+    return RET_OK;
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
 }
 } // namespace MMI
 } // namespace OHOS

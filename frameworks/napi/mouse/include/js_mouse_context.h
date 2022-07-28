@@ -27,6 +27,7 @@ public:
     static napi_value Export(napi_env env, napi_value exports);
     static napi_value SetPointerVisible(napi_env env, napi_callback_info info);
     static napi_value IsPointerVisible(napi_env env, napi_callback_info info);
+    static napi_value SetPointerLocation(napi_env env, napi_callback_info info);
     std::shared_ptr<JsMouseManager> GetJsMouseMgr() const;
 
 private:
