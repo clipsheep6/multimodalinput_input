@@ -266,6 +266,16 @@ void PointerEvent::PointerItem::SetTargetWindowId(int32_t windowId)
     targetWindowId_ = windowId;
 }
 
+RawData PointerEvent::PointerItem::GetRawData() const
+{
+    return rawData_;
+}
+
+void PointerEvent::PointerItem::SetRawData(const RawData& rawData)
+{
+    rawData_ = rawData;
+}
+
 bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
 {
     return (
