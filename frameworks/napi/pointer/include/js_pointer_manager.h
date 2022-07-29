@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef JS_MOUSE_MANAGER_H
-#define JS_MOUSE_MANAGER_H
+#ifndef JS_POINTER_MANAGER_H
+#define JS_POINTER_MANAGER_H
 
 #include <memory>
 
@@ -76,11 +76,11 @@ struct AsyncContext : RefBase {
     ~AsyncContext();
 };
 
-class JsMouseManager {
+class JsPointerManager {
 public:
-    JsMouseManager() = default;
-    ~JsMouseManager() = default;
-    DISALLOW_COPY_AND_MOVE(JsMouseManager);
+    JsPointerManager() = default;
+    ~JsPointerManager() = default;
+    DISALLOW_COPY_AND_MOVE(JsPointerManager);
 
     void ResetEnv();
     napi_value SetPointerVisible(napi_env env, bool visible, napi_value handle = nullptr);
@@ -90,4 +90,4 @@ public:
 } // namespace MMI
 } // namespace OHOS
 
-#endif // JS_MOUSE_MANAGER_H
+#endif // JS_POINTER_MANAGER_H

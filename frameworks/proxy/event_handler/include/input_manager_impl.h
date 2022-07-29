@@ -54,7 +54,7 @@ public:
     bool InitEventHandler();
     MMIEventHandlerPtr GetEventHandler() const;
     EventHandlerPtr GetCurrentEventHandler() const;
-    
+
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
     int32_t SubscribeKeyEvent(
         std::shared_ptr<KeyOption> keyOption,
@@ -101,6 +101,9 @@ public:
     int32_t SetPointerVisible(bool visible);
     bool IsPointerVisible();
 
+    int32_t SetPointerSpeed(int32_t speed);
+    int32_t GetPointerSpeed();
+
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
     void OnAnr(int32_t pid);
 	
@@ -137,13 +140,6 @@ private:
     std::vector<std::shared_ptr<IAnrObserver>> anrObservers_;
 
     DisplayGroupInfo displayGroupInfo_;
-#ifdef OHOS_BUILD_ENABLE_MONITOR
-    InputMonitorManager monitorManager_;
-#endif // OHOS_BUILD_ENABLE_MONITOR
-#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
-    InputInterceptorManager interceptorManager_;
-#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
-
     std::mutex mtx_;
     std::mutex handleMtx_;
     std::condition_variable cv_;

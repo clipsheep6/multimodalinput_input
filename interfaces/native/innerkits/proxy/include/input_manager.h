@@ -207,7 +207,7 @@ public:
      * @brief Starts listening for an input device event.
      * @param type Type of the input device event, which is **change**.
      * @param listener Listener for the input device event.
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @return Returns **0** if success; returns a non-0 value otherwise.
      * @since 9
      */
     int32_t RegisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener);
@@ -216,7 +216,7 @@ public:
      * @brief Stops listening for an input device event.
      * @param type Type of the input device event, which is **change**.
      * @param listener Listener for the input device event.
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @return Returns **0** if success; returns a non-0 value otherwise.
      * @since 9
      */
     int32_t UnregisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener = nullptr);
@@ -224,7 +224,7 @@ public:
     /**
      * @brief Obtain the information about an input device.
      * @param callback Callback function, receive reported data.
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @return Returns **0** if success; returns a non-0 value otherwise.
      * @since 9
      */
     int32_t GetDeviceIds(std::function<void(std::vector<int32_t>&)> callback);
@@ -233,7 +233,7 @@ public:
      * @brief Obtain the information about an input device.
      * @param deviceId ID of the input device whose information is to be obtained.
      * @param callback Callback function, receive reported data.
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @return Returns **0** if success; returns a non-0 value otherwise.
      * @since 9
      */
     int32_t GetDevice(int32_t deviceId, std::function<void(std::shared_ptr<InputDevice>)> callback);
@@ -243,7 +243,7 @@ public:
      * @param deviceId ID of the input device.
      * @param keyCodes Key codes of the input device.
      * @param callback Callback function, receive reported data.
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @return Returns **0** if success; returns a non-0 value otherwise.
      * @since 9
      */
     int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> keyCodes,
@@ -253,7 +253,7 @@ public:
      * @brief Sets whether the pointer icon is visible.
      * @param visible Whether the pointer icon is visible. The value <b>true</b> indicates that
      * the pointer icon is visible, and the value <b>false</b> indicates the opposite.
-     * @return void
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 9
      */
     int32_t SetPointerVisible(bool visible);
@@ -264,7 +264,7 @@ public:
      * @since 9
      */
     bool IsPointerVisible();
-	
+
     /**
      * @brief 设置鼠标光标的位置.
      * @param x x 坐标
@@ -331,11 +331,12 @@ public:
     /**
      * @brief Queries the keyboard type.
      * @param deviceId Indicates the keyboard device ID.
-     * @return Returns the keyboard type.
+     * @param callback Callback used to return the keyboard type.
+     * @return Returns **0** if success; returns a non-0 value otherwise.
      * @since 9
      */
     int32_t GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback);
-    
+
     /**
      * @brief 设定输入设备的席位名称.
      * @param seatName 席位名称
@@ -345,8 +346,7 @@ public:
      */
     using DeviceUniqId = std::tuple<int32_t, int32_t, int32_t, int32_t, int32_t, std::string>;
     int32_t SetInputDeviceSeatName(const std::string& seatName, DeviceUniqId& deviceUniqId);
-	
-	void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
+    void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
 
 private:
     InputManager() = default;

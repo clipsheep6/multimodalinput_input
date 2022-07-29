@@ -112,7 +112,7 @@ public:
     static constexpr int32_t POINTER_ACTION_ENTER_WINDOW = 10;
 
     /**
-     * * Indicates that the pointer leaves the window.
+     * Indicates that the pointer leaves the window.
      *
      * @since 9
      */
@@ -673,9 +673,22 @@ public:
          * @since 9
          */
         void SetTargetWindowId(int32_t windowId);
-
+		
+        /**
+         * @brief Obtains the RawData of the active window.
+         * @return Returns the RawData.
+         * @since 9
+         */
         RawData GetRawData() const;
+		
+        /**
+         * @brief Sets the RawData for the active window.
+         * @param rawData Indicates the rawData to set.
+         * @return void
+         * @since 9
+         */
         void SetRawData(const RawData& rawData);
+		
         /**
          * @brief Writes data to a <b>Parcel</b> object.
          * @param out Indicates the object into which data will be written.

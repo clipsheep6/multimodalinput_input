@@ -53,7 +53,6 @@ public:
 private:
     int32_t id_ {-1};
     mutable std::mutex mutex_;
-    mutable std::mutex filterMutex_;
     int32_t monitorId_ {-1};
     std::function<void(std::shared_ptr<PointerEvent>)> callback_;
     mutable bool consumed_ {false};
@@ -100,7 +99,6 @@ private:
     bool isMonitoring_ = false;
     std::queue<std::shared_ptr<PointerEvent>> evQueue_;
     std::mutex mutex_;
-    std::mutex evQueueMutex_;
     int32_t jsTaskNum_ = 0;
 };
 } // namespace MMI

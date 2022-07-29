@@ -149,12 +149,6 @@ ohos_shared_library("libmmi-client") {
     "//foundation/multimodalinput/input/util:libmmi-util",
   ]
 
-  if (input_feature_distributed) {
-    deps += [
-      "//foundation/multimodalinput/input/service/dinput:mmi_dinput_service",
-    ]
-  }
-
   part_name = "input"
   external_deps = [
     "drivers_interface_input:hdi_input",
@@ -186,9 +180,6 @@ ohos_unittest("ut-mmi-proxy-out") {
 
   if (input_feature_hdf) {
     defines += [ "OHOS_BUILD_HDF" ]
-  if (input_feature_distributed) {
-    defines += [ "OHOS_DISTRIBUTED_INPUT_MODEL" ]
-    }
   }
 
   sources = [ "module_loader/test/mmi_client_test.cpp" ]
@@ -228,9 +219,6 @@ ohos_unittest("KeyEventTest") {
 
   if (input_feature_hdf) {
     defines += [ "OHOS_BUILD_HDF" ]
-  if (input_feature_distributed) {
-    defines += [ "OHOS_DISTRIBUTED_INPUT_MODEL" ]
-    }
   }
 
   sources = [ "events/test/key_event_test.cpp" ]

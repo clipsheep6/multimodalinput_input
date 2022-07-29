@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
-#include "js_mouse_manager.h"
+#include "js_pointer_manager.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsMouseManager" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsPointerManager" };
 
 enum class ReturnType {
     VOID,
@@ -121,7 +121,7 @@ void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
     }
 }
 
-napi_value JsMouseManager::SetPointerVisible(napi_env env, bool visible, napi_value handle)
+napi_value JsPointerManager::SetPointerVisible(napi_env env, bool visible, napi_value handle)
 {
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
@@ -144,7 +144,7 @@ napi_value JsMouseManager::SetPointerVisible(napi_env env, bool visible, napi_va
     return promise;
 }
 
-napi_value JsMouseManager::IsPointerVisible(napi_env env, napi_value handle)
+napi_value JsPointerManager::IsPointerVisible(napi_env env, napi_value handle)
 {
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
@@ -168,7 +168,7 @@ napi_value JsMouseManager::IsPointerVisible(napi_env env, napi_value handle)
     return promise;
 }
 
-napi_value JsMouseManager::SetPointerLocation(napi_env env, napi_value handle, int32_t x, int32_t y)
+napi_value JsPointerManager::SetPointerLocation(napi_env env, napi_value handle, int32_t x, int32_t y)
 {
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
