@@ -51,8 +51,6 @@ int32_t RunShellUtil::RunShellCommand(const std::string &command, std::vector<st
         if (fgets(buf, sizeof(buf), fp_) == nullptr) {
             MMI_HILOGE("read fp end");
             retLog.append(std::string(buf));
-            pclose(fp_);
-            fp_ = nullptr;
             break;
         }
         retLog.append(std::string(buf));
