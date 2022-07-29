@@ -46,8 +46,7 @@ InputEventHandler::~InputEventHandler() {}
 void InputEventHandler::Init(UDSServer& udsServer)
 {
     udsServer_ = &udsServer;
-    BuildInputHandlerChain();   
-    return;
+    BuildInputHandlerChain();
 }
 
 void InputEventHandler::OnEvent(void *event)
