@@ -24,10 +24,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "hitrace_meter.h"
 #include "libinput.h"
 
-#include "bytrace_adapter.h"
 #include "key_command_manager.h"
 #include "timer_manager.h"
 #include "util.h"
