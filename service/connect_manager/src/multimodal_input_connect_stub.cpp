@@ -50,6 +50,8 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         {IMultimodalInputConnect::ALLOC_SOCKET_FD, &MultimodalInputConnectStub::StubHandleAllocSocketFd},
         {IMultimodalInputConnect::ADD_INPUT_EVENT_FILTER, &MultimodalInputConnectStub::StubAddInputEventFilter},
         {IMultimodalInputConnect::SET_POINTER_VISIBLE, &MultimodalInputConnectStub::StubSetPointerVisible},
+        {IMultimodalInputConnect::SET_POINTER_STYLE, &MultimodalInputConnectStub::StubSetPointerStyle},
+        {IMultimodalInputConnect::GET_POINTER_STYLE, &MultimodalInputConnectStub::StubGetPointerStyle},
         {IMultimodalInputConnect::IS_POINTER_VISIBLE, &MultimodalInputConnectStub::StubIsPointerVisible},
         {IMultimodalInputConnect::REGISTER_DEV_MONITOR, &MultimodalInputConnectStub::StubRegisterInputDeviceMonitor},
         {IMultimodalInputConnect::UNREGISTER_DEV_MONITOR,
@@ -140,6 +142,49 @@ int32_t MultimodalInputConnectStub::StubSetPointerVisible(MessageParcel& data, M
         return ret;
     }
     MMI_HILOGD("Success visible:%{public}d,pid:%{public}d", visible, GetCallingPid());
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetPointerStyle(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("permission check fail");
+        return CHECK_PERMISSION_FAIL;
+    }
+
+    int32_t windowId;
+    READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t iconId;
+    READINT32(data, iconId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetPointerStyle(windowId, iconId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("call SetPointerStyle failed ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("success window:%{public}d, icon:%{public}d, pid:%{public}d", windowId, iconId, GetCallingPid());
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetPointerStyle(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("permission check fail");
+        return CHECK_PERMISSION_FAIL;
+    }
+
+    int32_t windowId;
+    READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t iconId;
+    READINT32(data, iconId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = GetPointerStyle(windowId, iconId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("call GetPointerStyle failed ret:%{public}d", ret);
+        return ret;
+    }
+    WRITEINT32(reply, iconId, IPC_STUB_WRITE_PARCEL_ERR);
+    MMI_HILOGD("success window:%{public}d, icon:%{public}d, pid:%{public}d", windowId, iconId, GetCallingPid());
     return RET_OK;
 }
 

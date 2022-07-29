@@ -72,6 +72,11 @@ public:
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
     const DisplayGroupInfo& GetDisplayGroupInfo();
+    void OnSessionLost(SessionPtr session);
+    int32_t SetPointerStyle(int32_t pid, int32_t windowId, int32_t iconId);
+    int32_t GetPointerStyle(int32_t pid, int32_t windowId, int32_t &iconId) const;
+    void UpdatePointerStyle();
+    bool isNeedRefreshLayer(int32_t windowId);
 #endif // OHOS_BUILD_ENABLE_POINTER
     void Dump(int32_t fd, const std::vector<std::string> &args);
     int32_t GetWindowPid(int32_t windowId, const DisplayGroupInfo& displayGroupInfo) const;
@@ -108,6 +113,7 @@ private:
 #ifdef OHOS_BUILD_ENABLE_POINTER
     std::optional<WindowInfo> SelectWindowInfo(int32_t logicalX, int32_t logicalY,
         const std::shared_ptr<PointerEvent>& pointerEvent);
+    std::optional<WindowInfo> GetWindowInfo(int32_t logicalX, int32_t logicalY);
 #endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void GetPhysicalDisplayCoord(struct libinput_event_touch* touch,
@@ -128,6 +134,7 @@ private:
     int32_t lastLogicY_ = -1;
     WindowInfo lastWindowInfo_;
     std::shared_ptr<PointerEvent> lastPointerEvent_ = nullptr;
+    std::map<int32_t, std::map<int32_t, int32_t>> mapPointerStyle_ = {};
 #endif // OHOS_BUILD_ENABLE_POINTER
     DisplayGroupInfo displayGroupInfo_;
     MouseLocation mouseLocation_ = {-1, -1}; // physical coord

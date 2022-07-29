@@ -389,6 +389,32 @@ int32_t MMIService::SetPointerVisible(bool visible)
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     return RET_OK;
 }
+
+int32_t MMIService::SetPointerStyle(int32_t windowId, int32_t iconId)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetPointerStyle,
+        IPointerDrawingManager::GetInstance(), GetCallingPid(), windowId, iconId));
+    if (ret != RET_OK) {
+        MMI_HILOGE("set pointer visible failed,return %{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::GetPointerStyle(int32_t windowId, int32_t &iconId)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::GetPointerStyle,
+        IPointerDrawingManager::GetInstance(), GetCallingPid(), windowId, std::ref(iconId)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("set pointer visible failed,return %{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("MMIService::GetPointerStyle, iconId:%{public}d", iconId);
+    return RET_OK;
+}
+
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 int32_t MMIService::CheckPointerVisible(bool &visible)
 {

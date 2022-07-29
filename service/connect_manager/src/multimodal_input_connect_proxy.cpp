@@ -119,6 +119,56 @@ int32_t MultimodalInputConnectProxy::SetPointerVisible(bool visible)
     return RET_OK;
 }
 
+int32_t MultimodalInputConnectProxy::SetPointerStyle(int32_t windowId, int32_t iconId)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, windowId, ERR_INVALID_VALUE);
+    WRITEINT32(data, iconId, ERR_INVALID_VALUE);
+
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(SET_POINTER_STYLE, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::GetPointerStyle(int32_t windowId, int32_t &iconId)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MMI_HILOGD("MultimodalInputConnectProxy::GetPointerStyle, windowId:%{public}d, iconId:%{public}d", windowId, iconId);
+
+    WRITEINT32(data, windowId, ERR_INVALID_VALUE);
+    WRITEINT32(data, iconId, ERR_INVALID_VALUE);
+
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(GET_POINTER_STYLE, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        return ret;
+    }
+    iconId = reply.ReadInt32();
+    MMI_HILOGD("MultimodalInputConnectProxy::GetPointerStyle, iconId:%{public}d", iconId);
+    return RET_OK;
+}
+
 int32_t MultimodalInputConnectProxy::IsPointerVisible(bool &visible)
 {
     CALL_DEBUG_ENTER;

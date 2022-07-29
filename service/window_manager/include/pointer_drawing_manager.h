@@ -36,16 +36,19 @@ class PointerDrawingManager : public IPointerDrawingManager,
                               public IDeviceObserver,
                               public std::enable_shared_from_this<PointerDrawingManager> {
 public:
-    PointerDrawingManager() = default;
-    virtual ~PointerDrawingManager() = default;
+    PointerDrawingManager();
+    ~PointerDrawingManager();
     DISALLOW_COPY_AND_MOVE(PointerDrawingManager);
-    void DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY);
-    void OnDisplayInfo(int32_t displayId, int32_t width, int32_t height, Direction direction);
+    void DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY, const MOUSE_ICON mouseStyle = MOUSE_ICON::ANGLE);
+    void OnDisplayInfo(int32_t displayId, int32_t pid, int32_t focusWindowId, int32_t width, int32_t height, Direction direction);
     void UpdatePointerDevice(bool hasPointerDevice);
     bool Init();
     void DeletePointerVisible(int32_t pid);
     int32_t SetPointerVisible(int32_t pid, bool visible);
+    int32_t SetPointerStyle(int32_t pid, int32_t windowId, int32_t iconId);
+    int32_t GetPointerStyle(int32_t pid, int32_t windowId, int32_t &iconId);
     bool IsPointerVisible();
+    int32_t InitLayer(const MOUSE_ICON mouseStyle);
 
 public:
     static const int32_t IMAGE_WIDTH = 64;
@@ -55,8 +58,8 @@ private:
     void CreatePointerWindow(int32_t displayId, int32_t physicalX, int32_t physicalY);
     sptr<OHOS::Surface> GetLayer();
     sptr<OHOS::SurfaceBuffer> GetSurfaceBuffer(sptr<OHOS::Surface> layer) const;
-    void DoDraw(uint8_t *addr, uint32_t width, uint32_t height);
-    void DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas);
+    void DoDraw(uint8_t *addr, uint32_t width, uint32_t height, const MOUSE_ICON mouseStyle = MOUSE_ICON::ANGLE);
+    void DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas, const std::string& iconPath);
     void DrawManager();
     void FixCursorPosition(int32_t &physicalX, int32_t &physicalY);
     std::unique_ptr<OHOS::Media::PixelMap> DecodeImageToPixelMap(const std::string &imagePath);
@@ -70,10 +73,15 @@ private:
     int32_t displayId_ = -1;
     int32_t displayWidth_ = 0;
     int32_t displayHeight_ = 0;
+    int32_t pid_ = 0;
+    int32_t focusWindowId_ = 0;
     bool hasPointerDevice_ = false;
     int32_t lastPhysicalX_ = -1;
     int32_t lastPhysicalY_ = -1;
     Direction direction_ = Direction0;
+    int32_t preMouseStyle_ = 0;
+    std::map<MOUSE_ICON, std::string> mouseIcons_;
+
     struct PidInfo {
         int32_t pid { 0 };
         bool visible { false };

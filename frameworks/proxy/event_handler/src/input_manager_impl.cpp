@@ -550,6 +550,27 @@ int32_t InputManagerImpl::SetPointerVisible(bool visible)
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
+int32_t InputManagerImpl::SetPointerStyle(int32_t windowId, int32_t iconId)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = MultimodalInputConnMgr->SetPointerStyle(windowId, iconId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t InputManagerImpl::GetPointerStyle(int32_t windowId, int32_t &iconId)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = MultimodalInputConnMgr->GetPointerStyle(windowId, iconId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
+    }
+    MMI_HILOGD("InputManagerImpl::GetPointerStyle, iconId:%{public}d, ret:%{public}d", iconId, ret);
+    return iconId;
+}
+
 bool InputManagerImpl::IsPointerVisible()
 {
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)

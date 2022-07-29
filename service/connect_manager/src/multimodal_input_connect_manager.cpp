@@ -89,6 +89,20 @@ int32_t MultimodalInputConnectManager::SetPointerVisible(bool visible)
     return multimodalInputConnectService_->SetPointerVisible(visible);
 }
 
+int32_t MultimodalInputConnectManager::SetPointerStyle(int32_t windowId, int32_t iconId)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetPointerStyle(windowId, iconId);
+}
+
+int32_t MultimodalInputConnectManager::GetPointerStyle(int32_t windowId, int32_t &iconId)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    int32_t ret = multimodalInputConnectService_->GetPointerStyle(windowId, iconId);
+    MMI_HILOGD("MultimodalInputConnectManager::GetPointerStyle, ret:%{public}d", ret);
+    return ret;
+}
+
 int32_t MultimodalInputConnectManager::IsPointerVisible(bool &visible)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);

@@ -156,6 +156,18 @@ bool InputManager::IsPointerVisible()
     return InputMgrImpl->IsPointerVisible();
 }
 
+int32_t InputManager::SetPointerStyle(int32_t windowId, int32_t iconId)
+{
+    return InputMgrImpl->SetPointerStyle(windowId, iconId);
+}
+
+int32_t InputManager::GetPointerStyle(int32_t windowId)
+{
+    int32_t iconId;
+    iconId = InputMgrImpl->GetPointerStyle(windowId, iconId);
+    return iconId;
+}
+
 int32_t InputManager::GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback)
 {
     return InputMgrImpl->GetKeyboardType(deviceId, callback);

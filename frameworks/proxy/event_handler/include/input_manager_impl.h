@@ -96,6 +96,8 @@ public:
     int32_t GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback);
 
     int32_t SetPointerVisible(bool visible);
+    int32_t SetPointerStyle(int32_t windowId, int32_t iconId);
+    int32_t GetPointerStyle(int32_t windowId, int32_t &iconId);
     bool IsPointerVisible();
 
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
