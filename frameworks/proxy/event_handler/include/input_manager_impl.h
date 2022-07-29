@@ -100,6 +100,9 @@ public:
     int32_t GetPointerStyle(int32_t windowId, int32_t &iconId);
     bool IsPointerVisible();
 
+    int32_t SetPointerSpeed(int32_t speed);
+    int32_t GetPointerSpeed();
+
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
     void OnAnr(int32_t pid);
 

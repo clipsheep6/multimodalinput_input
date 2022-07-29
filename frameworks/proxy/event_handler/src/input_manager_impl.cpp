@@ -587,6 +587,29 @@ bool InputManagerImpl::IsPointerVisible()
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
+int32_t InputManagerImpl::SetPointerSpeed(int32_t speed)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = MultimodalInputConnMgr->SetPointerSpeed(speed);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to set pointer speed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t InputManagerImpl::GetPointerSpeed()
+{
+    CALL_DEBUG_ENTER;
+    int32_t speed;
+    int32_t ret = MultimodalInputConnMgr->GetPointerSpeed(speed);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get pointer speed failed");
+        return RET_ERR;
+    }
+    return speed;
+}
+
 void InputManagerImpl::OnConnected()
 {
     CALL_DEBUG_ENTER;
@@ -596,6 +619,13 @@ void InputManagerImpl::OnConnected()
     }
     SendDisplayInfo();
     PrintDisplayInfo();
+    if (anrObservers_.empty()) {
+        return;
+    }
+    int32_t ret = MultimodalInputConnMgr->SetAnrObserver();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
+    }
 }
 
 void InputManagerImpl::SendDisplayInfo()

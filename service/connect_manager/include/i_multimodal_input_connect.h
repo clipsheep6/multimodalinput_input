@@ -38,6 +38,8 @@ public:
     virtual int32_t SetPointerStyle(int32_t windowId, int32_t iconId) = 0;
     virtual int32_t GetPointerStyle(int32_t windowId, int32_t &iconId) = 0;
     virtual int32_t IsPointerVisible(bool &visible) = 0;
+    virtual int32_t SetPointerSpeed(int32_t speed) = 0;
+    virtual int32_t GetPointerSpeed(int32_t &speed) = 0;
     virtual int32_t SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> &keys) = 0;
     virtual int32_t GetDeviceIds(int32_t userData) = 0;
     virtual int32_t GetDevice(int32_t userData, int32_t id) = 0;
@@ -74,7 +76,9 @@ public:
         UNREGISTER_DEV_MONITOR = 19,
         GET_KEYBOARD_TYPE = 20,
         SET_POINTER_STYLE = 21,
-        GET_POINTER_STYLE = 22
+        GET_POINTER_STYLE = 22,
+        SET_POINTER_SPEED = 23,
+        GET_POINTER_SPEED = 24
     };
 
     enum {
