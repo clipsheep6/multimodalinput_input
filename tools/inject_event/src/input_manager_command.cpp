@@ -114,6 +114,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
     struct option keyboardSensorOptions[] = {
         {"down", required_argument, NULL, 'd'},
         {"up", required_argument, NULL, 'u'},
+        {"long_press", required_argument, NULL, 'l'},
         {"interval", required_argument, NULL, 'i'},
         {NULL, 0, NULL, 0}
     };
@@ -417,11 +418,14 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 std::vector<int32_t> downKey;
                 int32_t keyCode = 0;
                 int32_t isCombinationKey = 0;
-                while ((c = getopt_long(argc, argv, "d:u:i:", keyboardSensorOptions, &optionIndex)) != -1) {
+                static constexpr int32_t minKeyCode = 0;
+                static constexpr int32_t maxKeyCode = 5000;
+                while ((c = getopt_long(argc, argv, "d:u:l:i:", keyboardSensorOptions, &optionIndex)) != -1) {
                     switch (c) {
                         case 'd': {
                             if (!StrToInt(optarg, keyCode)) {
                                 std::cout << "invalid command to down key" << std::endl;
+                                return RET_ERR;
                             }
                             if (optind == isCombinationKey + TWO_MORE_COMMAND) {
                                 downKey.push_back(keyCode);
@@ -430,7 +434,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 CHKPR(KeyEvent, ERROR_NULL_POINTER);
                                 if (downKey.size() > MAX_PRESSED_COUNT) {
                                     std::cout << "pressed button count should less than 30" << std::endl;
-                                    return EVENT_REG_FAIL;
+                                    return RET_ERR;
                                 }
                                 KeyEvent::KeyItem item[downKey.size()];
                                 for (size_t i = 0; i < downKey.size(); i++) {
@@ -459,7 +463,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                         case 'u': {
                             if (!StrToInt(optarg, keyCode)) {
                                 std::cout << "invalid button press command" << std::endl;
-                                return EVENT_REG_FAIL;
+                                return RET_ERR;
                             }
                             std::vector<int32_t>::iterator iter = std::find(downKey.begin(), downKey.end(), keyCode);
                             if (iter != downKey.end()) {
@@ -479,6 +483,67 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 std::cout << "please press the " << keyCode << " key first "<< std::endl;
                                 return EVENT_REG_FAIL;
                             }
+                        }
+                        case 'l': {
+                            if (argc < 4) {
+                                std::cout << "argc:" << argc << std::endl;
+                                std::cout << "wrong number of parameters" << std::endl;
+                                return RET_ERR;
+                            }
+                            int32_t pressTimeMs = 5000;
+                            if (argc == 4) {
+                                if (!StrToInt(optarg, keyCode)) {
+                                    std::cout << "invalid key code value" << std::endl;
+                                    return RET_ERR;
+                                }
+                            }
+                            if (argc == 5) {
+                                if ((!StrToInt(optarg, keyCode)) ||
+                                    (!StrToInt(argv[optind], pressTimeMs))) {
+                                    std::cout << "invalid key code value or press times" << std::endl;
+                                    return RET_ERR;
+                                }
+                            }
+                            if ((keyCode < minKeyCode) || (keyCode > maxKeyCode)) {
+                                std::cout << "key code is out of range:" << minKeyCode << " <= "
+                                    << "key codes" << " <= " << maxKeyCode << std::endl;
+                                return RET_ERR;
+                            }
+                            static constexpr int32_t minPressTimeMs = 2000;
+                            static constexpr int32_t maxPressTimeMs = 15000;
+                            if ((pressTimeMs < minPressTimeMs) || (pressTimeMs > maxPressTimeMs)) {
+                                std::cout << "press time is out of range:" << minPressTimeMs << " ms" << " <= "
+                                    << "press times" << " <= " << maxPressTimeMs << " ms" << std::endl;
+                                return RET_ERR;
+                            }
+                            std::vector<int32_t>::iterator iter = std::find(downKey.begin(), downKey.end(), keyCode);
+                            if (iter != downKey.end()) {
+                                std::cout << "this key: " << keyCode << "already prees" << std::endl;
+                                return RET_ERR;
+                            }
+                            std::cout << "       key code: " << keyCode     << std::endl;
+                            std::cout << "long press time: " << pressTimeMs << " ms" << std::endl;
+                            downKey.push_back(keyCode);
+                            auto KeyEvent = KeyEvent::Create();
+                            CHKPR(KeyEvent, ERROR_NULL_POINTER);
+                            KeyEvent->SetKeyCode(keyCode);
+                            KeyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+                            KeyEvent::KeyItem item1;
+                            item1.SetKeyCode(keyCode);
+                            item1.SetPressed(true);
+                            KeyEvent->AddKeyItem(item1);
+                            InputMgr->SimulateInputEvent(KeyEvent);
+                            std::this_thread::sleep_for(std::chrono::milliseconds(pressTimeMs));
+
+                            KeyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+                            item1.SetPressed(true);
+                            KeyEvent->AddKeyItem(item1);
+                            InputMgr->SimulateInputEvent(KeyEvent);
+                            iter = std::find(downKey.begin(), downKey.end(), keyCode);
+                            if (iter != downKey.end()) {
+                                iter = downKey.erase(iter);
+                            }
+                            break;
                         }
                         case 'i': {
                             int32_t taktTime = 0;
@@ -505,8 +570,9 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                     }
                     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEPTIME));
                 }
-                for (size_t i = 0; i < downKey.size(); i++) {
-                    std::cout << "you have a key " << downKey[i] << " not release" << std::endl;
+                std::vector<int32_t>::iterator isPressKey = std::find(downKey.begin(), downKey.end(), keyCode);
+                if (isPressKey != downKey.end()) {
+                    std::cout << "you have a key:" << keyCode << " is press" << std::endl;
                 }
                 break;
             }
@@ -838,56 +904,57 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
 
 void InputManagerCommand::ShowUsage()
 {
-    std::cout << "Usage: uinput <option> <command> <arg>..." << std::endl;
-    std::cout << "The option are:                                " << std::endl;
-    std::cout << "-M  --mouse                                    " << std::endl;
-    std::cout << "commands for mouse:                            " << std::endl;
-    std::cout << "-m <dx> <dy>              --move   <dx> <dy>  -move to relative position (dx,dy) "    << std::endl;
-    std::cout << "-d <key>                  --down   key        -press down a button, "                 << std::endl;
-    std::cout << "                                               0 is the left button, 1 is the right," << std::endl;
-    std::cout << "                                               2 is the middle"   << std::endl;
-    std::cout << "-u <key>                  --up     <key>      -release a button " << std::endl;
-    std::cout << "-c <key>                  --click  <key>      -press the left button down,then raise" << std::endl;
-    std::cout << "-b <dx1> <dy1> <id> [press time] [click interval time]                --double click" << std::endl;
-    std::cout << "  [press time] the time range is more than 1ms but less than 300ms, "       << std::endl;
-    std::cout << "  [click interval time] the time range is more than 1ms but less than 450ms, " << std::endl;
-    std::cout << "  Otherwise the operation result may produce error or invalid operation"       << std::endl;
-    std::cout << " -press the left button down,then raise" << std::endl;
-    std::cout << "   key value:0 - button left"     << std::endl;
-    std::cout << "   key value:1 - button right"    << std::endl;
-    std::cout << "   key value:2 - button middle"   << std::endl;
-    std::cout << "   key value:3 - button side"     << std::endl;
-    std::cout << "   key value:4 - button extra"    << std::endl;
-    std::cout << "   key value:5 - button forward"  << std::endl;
-    std::cout << "   key value:6 - button back"     << std::endl;
-    std::cout << "   key value:7 - button task"     << std::endl;
-    std::cout << "-s <key>                  --scroll <key>      -positive values are sliding backwards" << std::endl;
-    std::cout << "-i <time>                 --interval <time>   -the program interval for the (time) milliseconds";
-    std::cout << std::endl;
-    std::cout << std::endl;
-    std::cout << "                                               negative values are sliding forwards"  << std::endl;
-    std::cout << "-K  --keyboard                                                " << std::endl;
-    std::cout << "commands for keyboard:                                        " << std::endl;
-    std::cout << "-d <key>                   --down   <key>     -press down a key" << std::endl;
-    std::cout << "-u <key>                   --up     <key>     -release a key   " << std::endl;
-    std::cout << "-i <time>                  --interval <time>  -the program interval for the (time) milliseconds";
-    std::cout << std::endl;
-    std::cout << std::endl;
-    std::cout << "-T  --touch                                                   " << std::endl;
-    std::cout << "commands for touch:                                           " << std::endl;
-    std::cout << "-d <dx1> <dy1>             --down   <dx1> <dy1> -press down a position  dx1 dy1, " << std::endl;
-    std::cout << "-u <dx1> <dy1>             --up     <dx1> <dy1> -release a position dx1 dy1, "     << std::endl;
-    std::cout << "-m <dx1> <dy1> <dx2> <dy2> [smooth time]      --smooth movement"   << std::endl;
-    std::cout << "   <dx1> <dy1> <dx2> <dy2> [smooth time]      -smooth movement, "  << std::endl;
-    std::cout << "                                              dx1 dy1 to dx2 dy2 smooth movement"  << std::endl;
-    std::cout << "-c <dx1> <dy1> [click interval]               -touch screen click dx1 dy1"         << std::endl;
-    std::cout << "-i <time>                  --interval <time>  -the program interval for the (time) milliseconds";
-    std::cout << std::endl;
-    std::cout << "-g <dx1> <dy1> <dx2> <dy2> [press time] [total time]     -drag, "                       << std::endl;
-    std::cout << "  [Press time] not less than 500ms and [total time] - [Press time] not less than 500ms" << std::endl;
-    std::cout << "  Otherwise the operation result may produce error or invalid operation"                << std::endl;
-    std::cout << "                                                              " << std::endl;
-    std::cout << "-?  --help                                                    " << std::endl;
+    std::cout << "Usage: uinput <option> <command> <arg>..."                                          << std::endl;
+    std::cout << "commands for mouse:"                                                                << std::endl;
+    std::cout << "-M  --mousee"                                                                       << std::endl;
+    std::cout << "  -m <dx> <dy>      --move       <dx> <dy>  -move to relative position (dx, dy)."   << std::endl;
+    std::cout << "  -d <button>       --down       <button>   -press down a button, "                 << std::endl;
+    std::cout << "      0 is the left button, 1 is the right, 2 is the middle."                       << std::endl;
+    std::cout << "  -u <button>       --up         <button>   -release a button."                     << std::endl;
+    std::cout << "  -c <button>       --click      <button>   -press the left button down, then raise."<< std::endl;
+    std::cout << "  -b <dx> <dy> <key> [press time] [click interval time]"                            << std::endl;
+    std::cout << "      --double_click <dx> <dy> <key> [press time] [click interval time], "          << std::endl;
+    std::cout << "      -double click the mouse button. "                                             << std::endl;
+    std::cout << "  -s <button>       --scroll     <button>   -positive values are sliding backwards."<< std::endl;
+    std::cout << "  -i <time>         --interval   <time>     -the program interval for the (time) milliseconds." ;
+    std::cout                                                                                         << std::endl;
+    std::cout << "  press the left button down,then raise: "                                          << std::endl;
+    std::cout << "      key value:0 - button left"                                                    << std::endl;
+    std::cout << "      key value:1 - button right"                                                   << std::endl;
+    std::cout << "      key value:2 - button middle"                                                  << std::endl;
+    std::cout << "      key value:3 - button side"                                                    << std::endl;
+    std::cout << "      key value:4 - button extra"                                                   << std::endl;
+    std::cout << "      key value:5 - button forward"                                                 << std::endl;
+    std::cout << "      key value:6 - button back"                                                    << std::endl;
+    std::cout << "      key value:7 - button task"                                                    << std::endl;
+    std::cout                                                                                         << std::endl;
+    std::cout << "commands for keyboard:"                                                             << std::endl;
+    std::cout << "-K  --keyboard"                                                                     << std::endl;
+    std::cout << "  -d <key>          --down       <key>   -press a key."                             << std::endl;
+    std::cout << "  -u <key>          --up         <key>   -release a key."                           << std::endl;
+    std::cout << "  -l <key> [long press time]"                                                       << std::endl;
+    std::cout << "      --long_press <key> [long press time], "                                       << std::endl;
+    std::cout << "      -press and hold the key."                                                     << std::endl;
+    std::cout << "  -i <time>         --interval   <time>  -the program interval for the (time) milliseconds.";
+    std::cout                                                                                         << std::endl;
+    std::cout                                                                                         << std::endl;
+    std::cout << "commands for touch:"                                                                << std::endl;
+    std::cout << "-T  --touch"                                                                        << std::endl;
+    std::cout << "  -m <dx1> <dy1> <dx2> <dy2> [smooth time], "                                       << std::endl;
+    std::cout << "      --move <dx1> <dy1> <dx2> <dy2> [smooth time], "                               << std::endl;
+    std::cout << "      -dx1 dy1 to dx2 dy2 smooth movement."                                         << std::endl;
+    std::cout << "  -d <dx> <dy>      --down       <dx> <dy>  -press a position dx1 dy1."             << std::endl;
+    std::cout << "  -u <dx> <dy>      --up         <dx> <dy>  -release a position dx1 dy1."           << std::endl;
+    std::cout << "  -c <dx> <dy> [click interval]"                                                    << std::endl;
+    std::cout << "      --click <dx> <dy> [click interval], "                                         << std::endl;
+    std::cout << "      -touch screen click dx1 dy1."                                                 << std::endl;
+    std::cout << "  -g <dx1> <dy1> <dx2> <dy2> [press time] [total time], "                           << std::endl;
+    std::cout << "      --drag <dx1> <dy1> <dx2> <dy2> [press time] [total time], "                   << std::endl;
+    std::cout << "      -dx1 dy1 drag to dx2 dy2."                                                    << std::endl;
+    std::cout << "  -i <time>         --interval   <time>   -the program interval for the (time) milliseconds.";
+    std::cout                                                                                         << std::endl;
+    std::cout                                                                                         << std::endl;
+    std::cout << "-?  --help"                                                                         << std::endl;
 }
 } // namespace MMI
 } // namespace OHOS
