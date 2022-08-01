@@ -22,7 +22,9 @@
 #include "input_event_handler.h"
 #include "key_auto_repeat.h"
 #include "key_event_value_transformation.h"
+#include "libinput_adapter.h"
 #include "mmi_log.h"
+#include "time_cost_chk.h"
 #include "timer_manager.h"
 #include "touch_transform_point_manager.h"
 
@@ -37,11 +39,20 @@ void InputEventNormalizeHandler::HandleLibinputEvent(libinput_event* event)
     CALL_DEBUG_ENTER;
     CHKPV(event);
     auto type = libinput_event_get_type(event);
+    TimeCostChk chk("HandleLibinputEvent", "overtime 1000(us)", MAX_INPUT_EVENT_TIME, type);
     if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
         MMI_HILOGD("This touch event is canceled type:%{public}d", type);
         return;
     }
     switch (type) {
+        case LIBINPUT_EVENT_DEVICE_ADDED: {
+            OnEventDeviceAdded(event);
+            break;
+        }
+        case LIBINPUT_EVENT_DEVICE_REMOVED: {
+            OnEventDeviceRemoved(event);
+            break;
+        }
         case LIBINPUT_EVENT_KEYBOARD_KEY: {
             HandleKeyboardEvent(event);
             break;
@@ -85,6 +96,28 @@ void InputEventNormalizeHandler::HandleLibinputEvent(libinput_event* event)
             break;
         }
     }
+}
+
+int32_t InputEventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
+{
+    CHKPR(event, ERROR_NULL_POINTER);
+    auto device = libinput_event_get_device(event);
+    CHKPR(device, ERROR_NULL_POINTER);
+    InputDevMgr->OnInputDeviceAdded(device);
+    KeyMapMgr->ParseDeviceConfigFile(device);
+    KeyRepeat->AddDeviceConfig(device);
+    return RET_OK;
+}
+
+int32_t InputEventNormalizeHandler::OnEventDeviceRemoved(libinput_event *event)
+{
+    CHKPR(event, ERROR_NULL_POINTER);
+    auto device = libinput_event_get_device(event);
+    CHKPR(device, ERROR_NULL_POINTER);
+    KeyMapMgr->RemoveKeyValue(device);
+    KeyRepeat->RemoveDeviceConfig(device);
+    InputDevMgr->OnInputDeviceRemoved(device);
+    return RET_OK;
 }
 
 void InputEventNormalizeHandler::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
@@ -153,6 +186,9 @@ int32_t InputEventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     }
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     auto keyEvent = InputHandler->GetKeyEvent();
+    if (keyEvent == nullptr) {
+        keyEvent = KeyEvent::Create();
+    }
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     CHKPR(event, ERROR_NULL_POINTER);
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
@@ -189,11 +225,14 @@ int32_t InputEventNormalizeHandler::HandleMouseEvent(libinput_event* event)
         return ERROR_UNSUPPORT;
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
+    auto keyEvent = InputHandler->GetKeyEvent();
+    if (keyEvent == nullptr) {
+        keyEvent = KeyEvent::Create();
+    }
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
     MouseEventHdr->Normalize(event);
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    auto keyEvent = InputHandler->GetKeyEvent();
-    CHKPR(keyEvent, ERROR_NULL_POINTER);
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
     for (const int32_t& keyCode : pressedKeys) {
         MMI_HILOGI("Pressed keyCode:%{public}d", keyCode);
@@ -269,6 +308,7 @@ int32_t InputEventNormalizeHandler::HandleGestureEvent(libinput_event* event)
 
 int32_t InputEventNormalizeHandler::HandleTouchEvent(libinput_event* event)
 {
+    LibinputAdapter::LoginfoPackagingTool(event);
     if (nextHandler_ == nullptr) {
         MMI_HILOGW("Touchscreen device does not support");
         return ERROR_UNSUPPORT;
