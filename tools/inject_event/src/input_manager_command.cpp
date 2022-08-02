@@ -517,7 +517,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             std::cout << " key code: " << keyCode << std::endl
                                 << "long press time: " << pressTimeMs << " ms" << std::endl;
                             auto keyEvent = KeyEvent::Create();
-                            if(keyEvent == nullptr) {
+                            if (keyEvent == nullptr) {
                                 std::cout << "failed to create input event object" << std::endl;
                                 return RET_ERR;
                             }
@@ -527,7 +527,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             item.SetKeyCode(keyCode);
                             item.SetPressed(true);
                             auto keyEventTemp = KeyEvent::Clone(keyEvent);
-                            if(keyEventTemp == nullptr) {
+                            if (keyEventTemp == nullptr) {
                                 std::cout << "failed to clone key event object" << std::endl;
                                 return RET_ERR;
                             }
