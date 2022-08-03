@@ -113,13 +113,6 @@ config("libinput-third_config") {
     "-Wno-unused-function",
     "-Wno-string-conversion",
   ]
-
-  if (input_feature_libinput) {
-    cflags += [
-      "-DHAVE_LIBINPUT_LOG_CONSOLE_ENABLE",
-      "-DHAVE_LIBINPUT_LOG_ENABLE",
-    ]
-  }
 }
 
 config("libinput-third_public_config") {
