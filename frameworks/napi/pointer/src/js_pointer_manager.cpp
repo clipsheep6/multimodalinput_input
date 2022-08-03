@@ -49,17 +49,18 @@ AsyncContext::~AsyncContext()
     }
 }
 
-void getResult(sptr<AsyncContext> asyncContext, napi_value * results)
+void getResult(sptr<AsyncContext> asyncContext, size_t* argc, napi_value* argv)
 {
     CALL_DEBUG_ENTER;
     napi_env env = asyncContext->env;
+    *argc = 2;
     if (asyncContext->errorCode == RET_OK) {
-        CHKRV(env, napi_get_undefined(env, &results[0]), GET_UNDEFINED);
+        napi_get_undefined(env, &argv[0]);
     } else {
-        CHKRV(env, napi_create_object(env, &results[0]), CREATE_OBJECT);
-        napi_value errCode = nullptr;
-        CHKRV(env, napi_create_int32(env, asyncContext->errorCode, &errCode), CREATE_INT32);
-        CHKRV(env, napi_set_named_property(env, results[0], "code", errCode), SET_NAMED_PROPERTY);
+        napi_value returnResult;
+        CHKRV(env, napi_create_int32(env, asyncContext->errorCode, &returnResult), CREATE_INT32);
+        CHKRV(env, napi_create_object(env, &argv[0]), CREATE_OBJECT);
+        CHKRV(env, napi_set_named_property(env, argv[0], "code", returnResult), SET_NAMED_PROPERTY);
     }
 
     ReturnType resultType;
@@ -67,13 +68,13 @@ void getResult(sptr<AsyncContext> asyncContext, napi_value * results)
     if (resultType == ReturnType::BOOL) {
         bool temp;
         asyncContext->reserve >> temp;
-        CHKRV(env, napi_get_boolean(env, temp, &results[1]), CREATE_BOOL);
+        CHKRV(env, napi_get_boolean(env, temp, &argv[1]), CREATE_BOOL);
     } else if (resultType == ReturnType::NUMBER) {
         int32_t temp;
         asyncContext->reserve >> temp;
-        CHKRV(env, napi_create_int32(env, temp, &results[1]), CREATE_INT32);
+        CHKRV(env, napi_create_int32(env, temp, &argv[1]), CREATE_INT32);
     } else {
-        CHKRV(env, napi_get_undefined(env, &results[1]), GET_UNDEFINED);
+        *argc = 1;
     }
 }
 
@@ -97,19 +98,20 @@ void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
              * count of the smart pointer is guaranteed to be 1.
              */
             asyncContext->DecStrongRef(nullptr);
-            napi_value results[2] = { 0 };
-            getResult(asyncContext, results);
+            size_t argc = 2;
+            napi_value argv[2];
+            getResult(asyncContext, &argc, argv);
             if (asyncContext->deferred) {
                 if (asyncContext->errorCode == RET_OK) {
-                    CHKRV(env, napi_resolve_deferred(env, asyncContext->deferred, results[1]), RESOLVE_DEFERRED);
+                    CHKRV(env, napi_resolve_deferred(env, asyncContext->deferred, argv[argc - 1]), RESOLVE_DEFERRED);
                 } else {
-                    CHKRV(env, napi_reject_deferred(env, asyncContext->deferred, results[0]), REJECT_DEFERRED);
+                    CHKRV(env, napi_reject_deferred(env, asyncContext->deferred, argv[argc - 1]), REJECT_DEFERRED);
                 }
             } else {
                 napi_value callback = nullptr;
                 CHKRV(env, napi_get_reference_value(env, asyncContext->callback, &callback), GET_REFERENCE);
                 napi_value callResult = nullptr;
-                CHKRV(env, napi_call_function(env, nullptr, callback, 2, results, &callResult), CALL_FUNCTION);
+                CHKRV(env, napi_call_function(env, nullptr, callback, argc, argv, &callResult), CALL_FUNCTION);
             }
         },
         asyncContext.GetRefPtr(), &asyncContext->work);
@@ -155,6 +157,27 @@ napi_value JsPointerManager::IsPointerVisible(napi_env env, napi_value handle)
     asyncContext->errorCode = ERR_OK;
     asyncContext->reserve << ReturnType::BOOL << visible;
 
+    napi_value promise = nullptr;
+    if (handle != nullptr) {
+        CHKRP(env, napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
+        CHKRP(env, napi_get_undefined(env, &promise), GET_UNDEFINED);
+    } else {
+        CHKRP(env, napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+    }
+    AsyncCallbackWork(asyncContext);
+    return promise;
+}
+
+napi_value JsPointerManager::SetPointerLocation(napi_env env, napi_value handle, int32_t x, int32_t y)
+{
+    CALL_DEBUG_ENTER;
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    if (asyncContext == nullptr) {
+        THROWERR(env, "create AsyncContext failed");
+        return nullptr;
+    }
+    asyncContext->errorCode = InputManager::GetInstance()->SetPointerLocation(x, y);
+    asyncContext->reserve << ReturnType::VOID;
     napi_value promise = nullptr;
     if (handle != nullptr) {
         CHKRP(env, napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
