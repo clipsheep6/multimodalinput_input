@@ -739,12 +739,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_005, TestSize.Level
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 /**
- * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_001
+ * @tc.name: MultimodalEventHandler_SimulatePointerEvent_001
  * @tc.desc: Verify simulate screen down event
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, InputManagerTest_SimulatePoniterEvent_001, TestSize.Level1)
+HWTEST_F(InputManagerTest, InputManagerTest_SimulatePointerEvent_001, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent001() };
@@ -753,12 +753,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulatePoniterEvent_001, TestSize.L
 }
 
 /**
- * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_002
+ * @tc.name: MultimodalEventHandler_SimulatePointerEvent_002
  * @tc.desc: Verify simulate screen move event
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, InputManagerTest_SimulatePoniterEvent_002, TestSize.Level1)
+HWTEST_F(InputManagerTest, InputManagerTest_SimulatePointerEvent_002, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent002() };
@@ -767,12 +767,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulatePoniterEvent_002, TestSize.L
 }
 
 /**
- * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_003
+ * @tc.name: MultimodalEventHandler_SimulatePointerEvent_003
  * @tc.desc: Verify simulate screen up event
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_003, TestSize.Level1)
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_003, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent003() };
@@ -781,12 +781,12 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_003, Test
 }
 
 /**
- * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_004
+ * @tc.name: MultimodalEventHandler_SimulatePointerEvent_004
  * @tc.desc: Verify simulate screen exception event
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_004, TestSize.Level1)
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_004, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     auto pointerEvent = PointerEvent::Create();
@@ -800,12 +800,12 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_004, Test
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
 /**
- * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_005
+ * @tc.name: MultimodalEventHandler_SimulatePointerEvent_005
  * @tc.desc: Verify simulate mouse down event
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_005, TestSize.Level1)
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_005, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent005() };
@@ -814,12 +814,12 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_005, Test
 }
 
 /**
- * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_006
+ * @tc.name: MultimodalEventHandler_SimulatePointerEvent_006
  * @tc.desc: Verify simulate mouse move event
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_006, TestSize.Level1)
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_006, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent006() };
@@ -828,12 +828,12 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_006, Test
 }
 
 /**
- * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_007
+ * @tc.name: MultimodalEventHandler_SimulatePointerEvent_007
  * @tc.desc: Verify simulate mouse up event
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_007, TestSize.Level1)
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_007, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent007() };
@@ -842,12 +842,12 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_007, Test
 }
 
 /**
- * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_008
+ * @tc.name: MultimodalEventHandler_SimulatePointerEvent_008
  * @tc.desc: Verify simulate mouse exception event
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_008, TestSize.Level1)
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_008, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     auto pointerEvent = PointerEvent::Create();
@@ -859,12 +859,12 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_008, Test
 }
 
 /**
- * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_009
+ * @tc.name: MultimodalEventHandler_SimulatePointerEvent_009
  * @tc.desc: Verify simulate mouse VERTICAL axis event
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_009, TestSize.Level1)
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_009, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent009() };
@@ -873,12 +873,12 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_009, Test
 }
 
 /**
- * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_010
+ * @tc.name: MultimodalEventHandler_SimulatePointerEvent_010
  * @tc.desc: Verify simulate mouse VERTICAL HORIZONTAL axis event
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_010, TestSize.Level1)
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_010, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent010() };
@@ -887,12 +887,12 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_010, Test
 }
 
 /**
- * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_011
+ * @tc.name: MultimodalEventHandler_SimulatePointerEvent_011
  * @tc.desc: Verify simulate mouse AXIS_BEGIN event
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_011, TestSize.Level1)
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_011, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     auto pointerEvent = PointerEvent::Create();
@@ -921,12 +921,12 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_011, Test
 }
 
 /**
- * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_012
+ * @tc.name: MultimodalEventHandler_SimulatePointerEvent_012
  * @tc.desc: Verify simulate mouse AXIS_UPDATE event
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_012, TestSize.Level1)
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_012, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     auto pointerEvent = PointerEvent::Create();
@@ -955,12 +955,12 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_012, Test
 }
 
 /**
- * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_013
+ * @tc.name: MultimodalEventHandler_SimulatePointerEvent_013
  * @tc.desc: Verify simulate mouse AXIS_END event
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_013, TestSize.Level1)
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_013, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     auto pointerEvent = PointerEvent::Create();
@@ -1630,7 +1630,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_001, TestSize.L
     pointerEvent->SetPointerId(0);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
 
-    int32_t monitorId { };
+    int32_t monitorId {};
     auto callBackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callBackPtr != nullptr);
     monitorId = TestAddMonitor(callBackPtr);
@@ -1668,7 +1668,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_002, TestSize.L
     pointerEvent->SetPointerId(0);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
 
-    int32_t monitorId { };
+    int32_t monitorId {};
     auto callBackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callBackPtr != nullptr);
     monitorId = TestAddMonitor(callBackPtr);
@@ -1706,7 +1706,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_003, TestSize.L
     pointerEvent->SetPointerId(0);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
 
-    int32_t monitorId { };
+    int32_t monitorId {};
     auto callBackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callBackPtr != nullptr);
     monitorId = TestAddMonitor(callBackPtr);
@@ -1790,7 +1790,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_005, TestSize.L
     pointerEvent->SetPointerId(0);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
 
-    int32_t monitorId { };
+    int32_t monitorId {};
     auto callBackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callBackPtr != nullptr);
     monitorId = TestAddMonitor(callBackPtr);
@@ -1823,7 +1823,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_001, TestSize
     int64_t actionTime = GetSysClockTime();
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
-    PointerEvent::PointerItem item { };
+    PointerEvent::PointerItem item {};
     item.SetPointerId(DEFAULT_POINTER_ID);
     item.SetDownTime(actionTime);
     item.SetPressed(true);
@@ -1862,7 +1862,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_002, TestSize
     int64_t actionTime = GetSysClockTime();
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
-    PointerEvent::PointerItem item { };
+    PointerEvent::PointerItem item {};
     item.SetPointerId(DEFAULT_POINTER_ID);
     item.SetDownTime(actionTime);
     item.SetPressed(true);
@@ -1901,7 +1901,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_003, TestSize
     int64_t actionTime = GetSysClockTime();
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
-    PointerEvent::PointerItem item { };
+    PointerEvent::PointerItem item {};
     item.SetPointerId(DEFAULT_POINTER_ID);
     item.SetDownTime(actionTime);
     item.SetPressed(false);
@@ -1940,7 +1940,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_004, TestSize
     int64_t actionTime = GetSysClockTime();
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
-    PointerEvent::PointerItem item { };
+    PointerEvent::PointerItem item {};
     item.SetPointerId(DEFAULT_POINTER_ID);
     item.SetDownTime(actionTime);
     item.SetPressed(true);
@@ -2260,6 +2260,217 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetProcCpuUsage, TestSize.Level1)
     auto usage = cpuInfo.GetProcCpuUsage(process_name);
     MMI_HILOGD("The CPU usage of the %{public}s process is %{public}.2f", process_name.c_str(), usage);
     ASSERT_TRUE(usage < SYSTEM_INFO::CPU_USAGE_LOAD && usage != SYSTEM_INFO::CPU_USAGE_UNKONW);
+}
+
+#ifdef OHOS_BUILD_ENABLE_POINTER
+/**
+ * @tc.name: InputManagerTest_SetWindowInputEventConsumer_001
+ * @tc.desc: Verify pointerEvent report eventHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetWindowInputEventConsumer_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto runner = AppExecFwk::EventRunner::Create(true);
+    ASSERT_TRUE(runner != nullptr);
+    auto eventHandler = std::make_shared<AppExecFwk::EventHandler>(runner);
+    ASSERT_TRUE(eventHandler != nullptr);
+    uint64_t runnerThreadId = 0;
+
+    auto fun = [&]() {
+        runnerThreadId = GetThisThreadId();
+        MMI_HILOGD("Create eventHandler is threadId:%{public}" PRIu64, runnerThreadId);
+        ASSERT_TRUE(runnerThreadId != 0);
+    };
+    eventHandler->PostSyncTask(fun, AppExecFwk::EventHandler::Priority::HIGH);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    auto consumer = GetPtr<WindowEventConsumer>();
+    ASSERT_TRUE(consumer != nullptr);
+    MMI::InputManager::GetInstance()->SetWindowInputEventConsumer(consumer, eventHandler);
+    auto pointerEvent = SetupPointerEvent005();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    uint64_t consumerThreadId = consumer->GetConsumerThreadId();
+    EXPECT_EQ(runnerThreadId, consumerThreadId);
+}
+#endif // OHOS_BUILD_ENABLE_POINTER
+
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+/**
+ * @tc.name: InputManagerTest_SetWindowInputEventConsumer_002
+ * @tc.desc: Verify keyEvent report eventHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetWindowInputEventConsumer_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    const std::string threadTest = "threadNameTest";
+    auto runner = AppExecFwk::EventRunner::Create(threadTest);
+    ASSERT_TRUE(runner != nullptr);
+    auto eventHandler = std::make_shared<AppExecFwk::EventHandler>(runner);
+    ASSERT_TRUE(eventHandler != nullptr);
+    uint64_t runnerThreadId = 0;
+
+    auto fun = [&]() {
+        runnerThreadId = GetThisThreadId();
+        MMI_HILOGD("Create eventHandler is threadId:%{public}" PRIu64, runnerThreadId);
+        ASSERT_TRUE(runnerThreadId != 0);
+    };
+    eventHandler->PostSyncTask(fun, AppExecFwk::EventHandler::Priority::HIGH);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    auto consumer = GetPtr<WindowEventConsumer>();
+    ASSERT_TRUE(consumer != nullptr);
+    MMI::InputManager::GetInstance()->SetWindowInputEventConsumer(consumer, eventHandler);
+    auto keyEvent = SetupKeyEvent001();
+    ASSERT_TRUE(keyEvent != nullptr);
+    InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    uint64_t consumerThreadId = consumer->GetConsumerThreadId();
+    EXPECT_EQ(runnerThreadId, consumerThreadId);
+}
+<<<<<<< Updated upstream
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+/**
+ * @tc.name: InputManagerTest_SetPointSpeed_001
+ * @tc.desc: Abnormal speed value processing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    const int32_t speed = -1;
+    InputManager::GetInstance()->SetPointerSpeed(speed);
+    int32_t speed1 = InputManager::GetInstance()->GetPointerSpeed();
+    ASSERT_EQ(speed1, 1);
+    InputManager::GetInstance()->MoveMouse(50, 50);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    InputManager::GetInstance()->MoveMouse(100, 150);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    InputManager::GetInstance()->MoveMouse(300, 350);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    InputManager::GetInstance()->MoveMouse(400, 450);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    InputManager::GetInstance()->MoveMouse(500, 550);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    InputManager::GetInstance()->MoveMouse(700, 1000);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+}
+
+/**
+ * @tc.name: InputManagerTest_SetPointSpeed_002
+ * @tc.desc: Normal speed value processing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    const int32_t speed = 1;
+    InputManager::GetInstance()->SetPointerSpeed(speed);
+    int32_t speed1 = InputManager::GetInstance()->GetPointerSpeed();
+    ASSERT_EQ(speed1, speed);
+    InputManager::GetInstance()->MoveMouse(-2000, -2000);
+    InputManager::GetInstance()->MoveMouse(50, 50);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    InputManager::GetInstance()->MoveMouse(100, 150);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    InputManager::GetInstance()->MoveMouse(300, 350);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    InputManager::GetInstance()->MoveMouse(400, 450);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    InputManager::GetInstance()->MoveMouse(500, 550);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    InputManager::GetInstance()->MoveMouse(700, 1000);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+}
+
+/**
+ * @tc.name: InputManagerTest_SetPointSpeed_003
+ * @tc.desc: Normal speed value processing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_003, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    const int32_t speed = 10;
+    InputManager::GetInstance()->SetPointerSpeed(speed);
+    int32_t speed1 = InputManager::GetInstance()->GetPointerSpeed();
+    ASSERT_EQ(speed1, speed);
+    InputManager::GetInstance()->MoveMouse(-2000, -2000);
+    InputManager::GetInstance()->MoveMouse(50, 50);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    InputManager::GetInstance()->MoveMouse(100, 150);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    InputManager::GetInstance()->MoveMouse(300, 350);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    InputManager::GetInstance()->MoveMouse(400, 450);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    InputManager::GetInstance()->MoveMouse(500, 550);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    InputManager::GetInstance()->MoveMouse(700, 1000);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+}
+
+/**
+ * @tc.name: InputManagerTest_SetPointSpeed_004
+ * @tc.desc: Normal speed value processing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_004, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    const int32_t speed = 20;
+    InputManager::GetInstance()->SetPointerSpeed(speed);
+    int32_t speed1 = InputManager::GetInstance()->GetPointerSpeed();
+    ASSERT_EQ(speed1, speed);
+    InputManager::GetInstance()->MoveMouse(-2000, -2000);
+    InputManager::GetInstance()->MoveMouse(50, 50);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    InputManager::GetInstance()->MoveMouse(100, 150);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    InputManager::GetInstance()->MoveMouse(300, 350);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    InputManager::GetInstance()->MoveMouse(400, 450);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    InputManager::GetInstance()->MoveMouse(500, 550);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    InputManager::GetInstance()->MoveMouse(700, 1000);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+}
+
+/**
+ * @tc.name: InputManagerTest_SetPointSpeed_005
+ * @tc.desc: Abnormal speed value processing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_005, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    const int32_t speed = 30;
+    InputManager::GetInstance()->SetPointerSpeed(speed);
+    int32_t speed1 = InputManager::GetInstance()->GetPointerSpeed();
+    ASSERT_EQ(speed1, 20);
+    InputManager::GetInstance()->MoveMouse(-2000, -2000);
+    InputManager::GetInstance()->MoveMouse(50, 50);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    InputManager::GetInstance()->MoveMouse(100, 150);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    InputManager::GetInstance()->MoveMouse(300, 350);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    InputManager::GetInstance()->MoveMouse(400, 450);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    InputManager::GetInstance()->MoveMouse(500, 550);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    InputManager::GetInstance()->MoveMouse(700, 1000);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 }
 } // namespace MMI
 } // namespace OHOS

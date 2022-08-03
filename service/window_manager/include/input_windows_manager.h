@@ -73,8 +73,8 @@ public:
 #ifdef OHOS_BUILD_ENABLE_POINTER
     const DisplayGroupInfo& GetDisplayGroupInfo();
     void OnSessionLost(SessionPtr session);
-    int32_t SetPointerStyle(int32_t pid, int32_t windowId, int32_t iconId);
-    int32_t GetPointerStyle(int32_t pid, int32_t windowId, int32_t &iconId) const;
+    int32_t SetPointerStyle(int32_t pid, int32_t windowId, int32_t pointerStyle);
+    int32_t GetPointerStyle(int32_t pid, int32_t windowId, int32_t &pointerStyle) const;
     void UpdatePointerStyle();
     bool isNeedRefreshLayer(int32_t windowId);
 #endif // OHOS_BUILD_ENABLE_POINTER

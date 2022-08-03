@@ -31,8 +31,8 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerDrawingManager" };
-const std::string IMAGE_POINTER_JPEG_PATH = "/system/etc/multimodalinput/mouse_icon/angle.png";
-constexpr int32_t MAX_POINTER_STYLE = 16;
+const std::string IMAGE_POINTER_JPEG_PATH = "/system/etc/multimodalinput/mouse_icon/Default.png";
+constexpr int32_t MAX_POINTER_STYLE = 38;
 } // namespace
 } // namespace MMI
 } // namespace OHOS
@@ -41,23 +41,45 @@ namespace OHOS {
 namespace MMI {
 PointerDrawingManager::PointerDrawingManager()
 {
-    mouseIcons_[MOUSE_ICON::ANGLE] = "/system/etc/multimodalinput/mouse_icon/angle.png";
-    mouseIcons_[MOUSE_ICON::HAND] = "/system/etc/multimodalinput/mouse_icon/hand.png";
-    mouseIcons_[MOUSE_ICON::BACkGROUNDER] = "/system/etc/multimodalinput/mouse_icon/backgrounder.png";
-    mouseIcons_[MOUSE_ICON::BUSY] = "/system/etc/multimodalinput/mouse_icon/busy.png";
-    mouseIcons_[MOUSE_ICON::CANDIDATE] = "/system/etc/multimodalinput/mouse_icon/candidate.png";
-    mouseIcons_[MOUSE_ICON::DIAGONALADJUSTMENT1] = "/system/etc/multimodalinput/mouse_icon/diagonalAdjustment1.png";
-    mouseIcons_[MOUSE_ICON::DIAGONALADJUSTMENT2] = "/system/etc/multimodalinput/mouse_icon/diagonalAdjustment2.png";
-    mouseIcons_[MOUSE_ICON::HORIZONTALTRIM] = "/system/etc/multimodalinput/mouse_icon/horizontalTrim.png";
-    mouseIcons_[MOUSE_ICON::VERTICALADJUSTMENT] = "/system/etc/multimodalinput/mouse_icon/verticalAdjustment.png";
-    mouseIcons_[MOUSE_ICON::DISABLE] = "/system/etc/multimodalinput/mouse_icon/disable.png";
-    mouseIcons_[MOUSE_ICON::HANDWRITTEN] = "/system/etc/multimodalinput/mouse_icon/handwritten.png";
-    mouseIcons_[MOUSE_ICON::HELPCHOOSE] = "/system/etc/multimodalinput/mouse_icon/helpChoose.png";
-    mouseIcons_[MOUSE_ICON::MOVESTYLE] = "/system/etc/multimodalinput/mouse_icon/move.png";
-    mouseIcons_[MOUSE_ICON::PERSONALSELECTION] = "/system/etc/multimodalinput/mouse_icon/personalSelection.png";
-    mouseIcons_[MOUSE_ICON::PRECISIONSELECT] = "/system/etc/multimodalinput/mouse_icon/precisionSelect.png";
-    mouseIcons_[MOUSE_ICON::SITESELECTION] = "/system/etc/multimodalinput/mouse_icon/siteSelection.png";
-    mouseIcons_[MOUSE_ICON::TEXTSELECTION] = "/system/etc/multimodalinput/mouse_icon/textSelection.png";
+    mouseIcons_[MOUSE_ICON::DEFAULT] = "/system/etc/multimodalinput/mouse_icon/Default.png";
+    mouseIcons_[MOUSE_ICON::EAST] = "/system/etc/multimodalinput/mouse_icon/East.png";
+    mouseIcons_[MOUSE_ICON::WEST] = "/system/etc/multimodalinput/mouse_icon/West.png";
+    mouseIcons_[MOUSE_ICON::SOUTH] = "/system/etc/multimodalinput/mouse_icon/South.png";
+    mouseIcons_[MOUSE_ICON::NORTH] = "/system/etc/multimodalinput/mouse_icon/North.png";
+    mouseIcons_[MOUSE_ICON::WEST_EAST] = "/system/etc/multimodalinput/mouse_icon/westEast.png";
+    mouseIcons_[MOUSE_ICON::NORTH_SOUTH] = "/system/etc/multimodalinput/mouse_icon/northSouth.png";
+    mouseIcons_[MOUSE_ICON::NORTH_EAST] = "/system/etc/multimodalinput/mouse_icon/northEast.png";
+    mouseIcons_[MOUSE_ICON::NORTH_WEST] = "/system/etc/multimodalinput/mouse_icon/northWest.png";
+    mouseIcons_[MOUSE_ICON::SOUTH_EAST] = "/system/etc/multimodalinput/mouse_icon/southEast.png";
+    mouseIcons_[MOUSE_ICON::SOUTH_WEST] = "/system/etc/multimodalinput/mouse_icon/southWest.png";
+    mouseIcons_[MOUSE_ICON::NORTH_EAST_SOUTH_WEST] = "/system/etc/multimodalinput/mouse_icon/northEastSouthWest.png";
+    mouseIcons_[MOUSE_ICON::NORTH_WEST_SOUTH_EAST] = "/system/etc/multimodalinput/mouse_icon/northWestSouthEast.png";
+    mouseIcons_[MOUSE_ICON::CROSS] = "/system/etc/multimodalinput/mouse_icon/Cross.png";
+    mouseIcons_[MOUSE_ICON::CURSOR_COPY] = "/system/etc/multimodalinput/mouse_icon/cursorCopy.png";
+    mouseIcons_[MOUSE_ICON::CURSOR_FORBID] = "/system/etc/multimodalinput/mouse_icon/cursorForbid.png";
+    mouseIcons_[MOUSE_ICON::COLOR_SUCKER] = "/system/etc/multimodalinput/mouse_icon/colorsucker.png";
+    mouseIcons_[MOUSE_ICON::HAND_GRABBING] = "/system/etc/multimodalinput/mouse_icon/handGrabbing.png";
+    mouseIcons_[MOUSE_ICON::HAND_OPEN] = "/system/etc/multimodalinput/mouse_icon/handOpen.png";
+    mouseIcons_[MOUSE_ICON::HAND_POINTING] = "/system/etc/multimodalinput/mouse_icon/handPointing.png";
+    mouseIcons_[MOUSE_ICON::HELP] = "/system/etc/multimodalinput/mouse_icon/Help.png";
+    mouseIcons_[MOUSE_ICON::CURSOR_MOVE] = "/system/etc/multimodalinput/mouse_icon/Move.png";
+    mouseIcons_[MOUSE_ICON::RESIZE_LEFT_RIGHT] = "/system/etc/multimodalinput/mouse_icon/resizeLeftRight.png";
+    mouseIcons_[MOUSE_ICON::RESIZE_UP_DOWN] = "/system/etc/multimodalinput/mouse_icon/resizeUpDown.png";
+    mouseIcons_[MOUSE_ICON::SCREENSHOT_CHOOSE] = "/system/etc/multimodalinput/mouse_icon/screenshotChoose.png";
+    mouseIcons_[MOUSE_ICON::SCREENSHOT_CURSOR] = "/system/etc/multimodalinput/mouse_icon/screenshotCursor.png";
+    mouseIcons_[MOUSE_ICON::TEXT_CURSOR] = "/system/etc/multimodalinput/mouse_icon/textCursor.png";
+    mouseIcons_[MOUSE_ICON::ZOOM_IN] = "/system/etc/multimodalinput/mouse_icon/zoomIn.png";
+    mouseIcons_[MOUSE_ICON::ZOOM_OUT] = "/system/etc/multimodalinput/mouse_icon/zoomOut.png";
+    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_EAST] = "/system/etc/multimodalinput/mouse_icon/middleBinEast.png";
+    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_WEST] = "/system/etc/multimodalinput/mouse_icon/middleBinWest.png";
+    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_SOUTH] = "/system/etc/multimodalinput/mouse_icon/middleBinSouth.png";
+    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_NORTH] = "/system/etc/multimodalinput/mouse_icon/middleBinNorth.png";
+    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_NORTH_SOUTH] = "/system/etc/multimodalinput/mouse_icon/middleBinNorthSouth.png";
+    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_NORTH_EAST] = "/system/etc/multimodalinput/mouse_icon/middleBinNorthEast.png";
+    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_NORTH_WEST] = "/system/etc/multimodalinput/mouse_icon/middleBinNorthWest.png";
+    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_SOUTH_EAST] = "/system/etc/multimodalinput/mouse_icon/middleBinSouthEast.png";
+    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_SOUTH_WEST] = "/system/etc/multimodalinput/mouse_icon/middleBinSouthWest.png";
+    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_NORTH_SOUTH_WEST_EAST] = "/system/etc/multimodalinput/mouse_icon/middleBinNorthSouthWestEast.png";
 }
 
 PointerDrawingManager::~PointerDrawingManager() {}
@@ -398,43 +420,43 @@ int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
     return RET_OK;
 }
 
-int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, int32_t iconId)
+int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, int32_t pointerStyle)
 {
     CALL_DEBUG_ENTER;
-    if (iconId > MAX_POINTER_STYLE) {
-        MMI_HILOGE("Pointer icon type invalid");
+    if (pointerStyle > MAX_POINTER_STYLE) {
+        MMI_HILOGE("The param pointerStyle is invalid");
         return RET_ERR;
     }
 
-    if (WinMgr->SetPointerStyle(pid, windowId, iconId)) {
+    if (WinMgr->SetPointerStyle(pid, windowId, pointerStyle)) {
         MMI_HILOGE("Set pointer style failed");
         return RET_ERR;
     }
 
     if (!WinMgr->isNeedRefreshLayer(windowId)) {
-        MMI_HILOGD("Not need refresh layer, window type:%{public}d, icon type:%{public}d", windowId, iconId);
+        MMI_HILOGD("Not need refresh layer, window type:%{public}d, pointer style:%{public}d", windowId, pointerStyle);
         return RET_OK;
     }
 
-    int32_t ret = InitLayer(MOUSE_ICON(iconId));
+    int32_t ret = InitLayer(MOUSE_ICON(pointerStyle));
     if (ret != RET_OK) {
         MMI_HILOGE("Init layer failed");
         return RET_ERR;
     }
-    MMI_HILOGD("Window type:%{public}d set pointer style:%{public}d success", windowId, iconId);
+    MMI_HILOGD("Window type:%{public}d set pointer style:%{public}d success", windowId, pointerStyle);
     return RET_OK;
 }
 
-int32_t PointerDrawingManager::GetPointerStyle(int32_t pid, int32_t windowId, int32_t &iconId)
+int32_t PointerDrawingManager::GetPointerStyle(int32_t pid, int32_t windowId, int32_t &pointerStyle)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = WinMgr->GetPointerStyle(pid, windowId, iconId);
+    int32_t ret = WinMgr->GetPointerStyle(pid, windowId, pointerStyle);
     if (ret != RET_OK) {
         MMI_HILOGE("Get pointer style failed, pointer style return default style");
         return RET_ERR;
     }
 
-    MMI_HILOGD("Window type:%{public}d get pointer style:%{public}d success", windowId, iconId); 
+    MMI_HILOGD("Window type:%{public}d get pointer style:%{public}d success", windowId, pointerStyle); 
     return RET_OK;
 }
 } // namespace MMI

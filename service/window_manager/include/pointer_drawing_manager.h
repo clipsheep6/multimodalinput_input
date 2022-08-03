@@ -39,14 +39,14 @@ public:
     PointerDrawingManager();
     ~PointerDrawingManager();
     DISALLOW_COPY_AND_MOVE(PointerDrawingManager);
-    void DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY, const MOUSE_ICON mouseStyle = MOUSE_ICON::ANGLE);
+    void DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY, const MOUSE_ICON mouseStyle = MOUSE_ICON::DEFAULT);
     void OnDisplayInfo(int32_t displayId, int32_t pid, int32_t focusWindowId, int32_t width, int32_t height, Direction direction);
     void UpdatePointerDevice(bool hasPointerDevice);
     bool Init();
     void DeletePointerVisible(int32_t pid);
     int32_t SetPointerVisible(int32_t pid, bool visible);
-    int32_t SetPointerStyle(int32_t pid, int32_t windowId, int32_t iconId);
-    int32_t GetPointerStyle(int32_t pid, int32_t windowId, int32_t &iconId);
+    int32_t SetPointerStyle(int32_t pid, int32_t windowId, int32_t pointerStyle);
+    int32_t GetPointerStyle(int32_t pid, int32_t windowId, int32_t &pointerStyle);
     bool IsPointerVisible();
     int32_t InitLayer(const MOUSE_ICON mouseStyle);
 
@@ -58,7 +58,7 @@ private:
     void CreatePointerWindow(int32_t displayId, int32_t physicalX, int32_t physicalY);
     sptr<OHOS::Surface> GetLayer();
     sptr<OHOS::SurfaceBuffer> GetSurfaceBuffer(sptr<OHOS::Surface> layer) const;
-    void DoDraw(uint8_t *addr, uint32_t width, uint32_t height, const MOUSE_ICON mouseStyle = MOUSE_ICON::ANGLE);
+    void DoDraw(uint8_t *addr, uint32_t width, uint32_t height, const MOUSE_ICON mouseStyle = MOUSE_ICON::DEFAULT);
     void DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas, const std::string& iconPath);
     void DrawManager();
     void FixCursorPosition(int32_t &physicalX, int32_t &physicalY);

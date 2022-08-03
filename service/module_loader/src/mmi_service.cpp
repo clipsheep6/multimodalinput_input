@@ -308,7 +308,6 @@ void MMIService::OnStop()
 {
     CHK_PID_AND_TID();
     UdsStop();
-    InputHandler->Clear();
     libinputAdapter_.Stop();
     state_ = ServiceRunningState::STATE_NOT_START;
 #ifdef OHOS_RSS_CLIENT
@@ -317,7 +316,7 @@ void MMIService::OnStop()
 }
 
 int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType,
-    int32_t &toReturnClientFd)
+    int32_t &toReturnClientFd, int32_t &tokenType)
 {
     MMI_HILOGI("Enter, programName:%{public}s,moduleType:%{public}d", programName.c_str(), moduleType);
 
@@ -325,7 +324,6 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
     int32_t serverFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
     int32_t pid = GetCallingPid();
     int32_t uid = GetCallingUid();
-    int32_t tokenType = PerHelper->GetTokenType();
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&UDSServer::AddSocketPairInfo, this,
         programName, moduleType, uid, pid, serverFd, std::ref(toReturnClientFd), tokenType));
     DfxHisysevent::ClientConnectData data = {
@@ -390,31 +388,6 @@ int32_t MMIService::SetPointerVisible(bool visible)
     return RET_OK;
 }
 
-int32_t MMIService::SetPointerStyle(int32_t windowId, int32_t iconId)
-{
-    CALL_DEBUG_ENTER;
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetPointerStyle,
-        IPointerDrawingManager::GetInstance(), GetCallingPid(), windowId, iconId));
-    if (ret != RET_OK) {
-        MMI_HILOGE("set pointer visible failed,return %{public}d", ret);
-        return ret;
-    }
-    return RET_OK;
-}
-
-int32_t MMIService::GetPointerStyle(int32_t windowId, int32_t &iconId)
-{
-    CALL_DEBUG_ENTER;
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::GetPointerStyle,
-        IPointerDrawingManager::GetInstance(), GetCallingPid(), windowId, std::ref(iconId)));
-    if (ret != RET_OK) {
-        MMI_HILOGE("set pointer visible failed,return %{public}d", ret);
-        return ret;
-    }
-    MMI_HILOGD("MMIService::GetPointerStyle, iconId:%{public}d", iconId);
-    return RET_OK;
-}
-
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 int32_t MMIService::CheckPointerVisible(bool &visible)
 {
@@ -439,27 +412,57 @@ int32_t MMIService::IsPointerVisible(bool &visible)
 int32_t MMIService::SetPointerSpeed(int32_t speed)
 {
     CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MouseEventHandler::SetPointerSpeed,
         MouseEventHdr, speed));
     if (ret != RET_OK) {
         MMI_HILOGE("Set pointer speed failed,return %{public}d", ret);
         return RET_ERR;
     }
+#endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
 }
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
 int32_t MMIService::ReadPointerSpeed(int32_t &speed)
 {
     speed = MouseEventHandler::GetInstance()->GetPointerSpeed();
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_POINTER
 
 int32_t MMIService::GetPointerSpeed(int32_t &speed)
 {
     CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadPointerSpeed, this, std::ref(speed)));
     if (ret != RET_OK) {
         MMI_HILOGE("Get pointer speed failed,return %{public}d", ret);
+        return RET_ERR;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
+int32_t MMIService::SetPointerStyle(int32_t windowId, int32_t pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetPointerStyle,
+        IPointerDrawingManager::GetInstance(), GetCallingPid(), windowId, pointerStyle));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set pointer style failed,return %{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::GetPointerStyle(int32_t windowId, int32_t &pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::GetPointerStyle,
+        IPointerDrawingManager::GetInstance(), GetCallingPid(), windowId, std::ref(pointerStyle)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get pointer style failed,return %{public}d", pointerStyle);
         return RET_ERR;
     }
     return RET_OK;

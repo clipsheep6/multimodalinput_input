@@ -92,7 +92,8 @@ int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data,
     MMI_HILOGD("clientName:%{public}s,moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
 
     int32_t clientFd = INVALID_SOCKET_FD;
-    int32_t ret = AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd);
+    int32_t tokenType = PerHelper->GetTokenType();
+    int32_t ret = AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd, tokenType);
     if (ret != RET_OK) {
         MMI_HILOGE("AllocSocketFd failed pid:%{public}d, go switch default", pid);
         if (clientFd >= 0) {
@@ -101,7 +102,8 @@ int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data,
         return ret;
     }
     reply.WriteFileDescriptor(clientFd);
-    MMI_HILOGI("Send clientFd to client, clientFd = %{public}d", clientFd);
+    WRITEINT32(reply, tokenType, IPC_STUB_WRITE_PARCEL_ERR);
+    MMI_HILOGI("send clientFd to client, clientFd:%{public}d, tokenType:%{public}d", clientFd, tokenType);
     close(clientFd);
     return RET_OK;
 }
@@ -144,49 +146,6 @@ int32_t MultimodalInputConnectStub::StubSetPointerVisible(MessageParcel& data, M
         return ret;
     }
     MMI_HILOGD("Success visible:%{public}d,pid:%{public}d", visible, GetCallingPid());
-    return RET_OK;
-}
-
-int32_t MultimodalInputConnectStub::StubSetPointerStyle(MessageParcel& data, MessageParcel& reply)
-{
-    CALL_DEBUG_ENTER;
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("permission check fail");
-        return CHECK_PERMISSION_FAIL;
-    }
-
-    int32_t windowId;
-    READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t iconId;
-    READINT32(data, iconId, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = SetPointerStyle(windowId, iconId);
-    if (ret != RET_OK) {
-        MMI_HILOGE("call SetPointerStyle failed ret:%{public}d", ret);
-        return ret;
-    }
-    MMI_HILOGD("success window:%{public}d, icon:%{public}d, pid:%{public}d", windowId, iconId, GetCallingPid());
-    return RET_OK;
-}
-
-int32_t MultimodalInputConnectStub::StubGetPointerStyle(MessageParcel& data, MessageParcel& reply)
-{
-    CALL_DEBUG_ENTER;
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("permission check fail");
-        return CHECK_PERMISSION_FAIL;
-    }
-
-    int32_t windowId;
-    READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t iconId;
-    READINT32(data, iconId, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = GetPointerStyle(windowId, iconId);
-    if (ret != RET_OK) {
-        MMI_HILOGE("call GetPointerStyle failed ret:%{public}d", ret);
-        return ret;
-    }
-    WRITEINT32(reply, iconId, IPC_STUB_WRITE_PARCEL_ERR);
-    MMI_HILOGD("success window:%{public}d, icon:%{public}d, pid:%{public}d", windowId, iconId, GetCallingPid());
     return RET_OK;
 }
 
@@ -241,6 +200,48 @@ int32_t MultimodalInputConnectStub::StubGetPointerSpeed(MessageParcel& data, Mes
     }
     WRITEINT32(reply, speed, IPC_STUB_WRITE_PARCEL_ERR);
     MMI_HILOGD("Pointer speed:%{public}d,ret:%{public}d", speed, ret);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetPointerStyle(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_CORE)) {
+        MMI_HILOGE("permission check fail");
+        return RET_ERR;
+    }
+
+    int32_t windowId;
+    READINT32(data, windowId, RET_ERR);
+    int32_t pointerStyle;
+    READINT32(data, pointerStyle, RET_ERR);
+    int32_t ret = SetPointerStyle(windowId, pointerStyle);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetPointerStyle failed ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    MMI_HILOGD("Successfully set window:%{public}d, icon:%{public}d", windowId, pointerStyle);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetPointerStyle(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_CORE)) {
+        MMI_HILOGE("permission check fail");
+        return RET_ERR;
+    }
+
+    int32_t windowId;
+    READINT32(data, windowId, RET_ERR);
+    int32_t pointerStyle;
+    int32_t ret = GetPointerStyle(windowId, pointerStyle);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetPointerStyle failed ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    WRITEINT32(reply, pointerStyle, RET_ERR);
+    MMI_HILOGD("Successfully get window:%{public}d, icon:%{public}d", windowId, pointerStyle);
     return RET_OK;
 }
 
@@ -318,7 +319,7 @@ int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, Mes
     int32_t handlerType;
     READINT32(data, handlerType, IPC_PROXY_DEAD_OBJECT_ERR);
     if ((handlerType == InputHandlerType::INTERCEPTOR) &&
-        (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_CORE))) {
+        (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE))) {
         MMI_HILOGE("Interceptor permission check failed");
         return CHECK_PERMISSION_FAIL;
     }
@@ -346,7 +347,7 @@ int32_t MultimodalInputConnectStub::StubRemoveInputHandler(MessageParcel& data, 
     int32_t handlerType;
     READINT32(data, handlerType, IPC_PROXY_DEAD_OBJECT_ERR);
     if ((handlerType == InputHandlerType::INTERCEPTOR) &&
-        (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_CORE))) {
+        (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE))) {
         MMI_HILOGE("Interceptor permission check failed");
         return CHECK_PERMISSION_FAIL;
     }
@@ -518,7 +519,7 @@ int32_t MultimodalInputConnectStub::StubInjectPointerEvent(MessageParcel& data, 
 int32_t MultimodalInputConnectStub::StubSetAnrListener(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_CORE)) {
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
         MMI_HILOGE("Permission check failed");
         return CHECK_PERMISSION_FAIL;
     }

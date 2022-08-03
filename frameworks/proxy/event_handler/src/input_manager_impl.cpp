@@ -34,14 +34,10 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 
 struct MonitorEventConsumer : public IInputEventConsumer {
     explicit MonitorEventConsumer(const std::function<void(std::shared_ptr<PointerEvent>)>& monitor)
-        : monitor_ (monitor)
-    {
-    }
+        : monitor_ (monitor) {}
 
     explicit MonitorEventConsumer(const std::function<void(std::shared_ptr<KeyEvent>)>& monitor)
-        : keyMonitor_ (monitor)
-    {
-    }
+        : keyMonitor_ (monitor) {}
 
     void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
     {
@@ -550,27 +546,6 @@ int32_t InputManagerImpl::SetPointerVisible(bool visible)
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
-int32_t InputManagerImpl::SetPointerStyle(int32_t windowId, int32_t iconId)
-{
-    CALL_DEBUG_ENTER;
-    int32_t ret = MultimodalInputConnMgr->SetPointerStyle(windowId, iconId);
-    if (ret != RET_OK) {
-        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
-    }
-    return ret;
-}
-
-int32_t InputManagerImpl::GetPointerStyle(int32_t windowId, int32_t &iconId)
-{
-    CALL_DEBUG_ENTER;
-    int32_t ret = MultimodalInputConnMgr->GetPointerStyle(windowId, iconId);
-    if (ret != RET_OK) {
-        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
-    }
-    MMI_HILOGD("InputManagerImpl::GetPointerStyle, iconId:%{public}d, ret:%{public}d", iconId, ret);
-    return iconId;
-}
-
 bool InputManagerImpl::IsPointerVisible()
 {
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
@@ -590,17 +565,23 @@ bool InputManagerImpl::IsPointerVisible()
 int32_t InputManagerImpl::SetPointerSpeed(int32_t speed)
 {
     CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = MultimodalInputConnMgr->SetPointerSpeed(speed);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to set pointer speed");
         return RET_ERR;
     }
     return RET_OK;
+#else
+    MMI_HILOGW("Pointer device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
 }
 
 int32_t InputManagerImpl::GetPointerSpeed()
 {
     CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t speed;
     int32_t ret = MultimodalInputConnMgr->GetPointerSpeed(speed);
     if (ret != RET_OK) {
@@ -608,6 +589,33 @@ int32_t InputManagerImpl::GetPointerSpeed()
         return RET_ERR;
     }
     return speed;
+#else
+    return ERROR_UNSUPPORT;
+    MMI_HILOGW("Pointer device does not support");
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+int32_t InputManagerImpl::SetPointerStyle(int32_t windowId, int32_t pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = MultimodalInputConnMgr->SetPointerStyle(windowId, pointerStyle);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to send to server, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t InputManagerImpl::GetPointerStyle(int32_t windowId)
+{
+    CALL_DEBUG_ENTER;
+    int32_t pointerStyle = -1;
+    int32_t ret = MultimodalInputConnMgr->GetPointerStyle(windowId, pointerStyle);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to send to server, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return pointerStyle;
 }
 
 void InputManagerImpl::OnConnected()

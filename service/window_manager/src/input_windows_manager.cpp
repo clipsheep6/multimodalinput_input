@@ -502,7 +502,7 @@ void InputWindowsManager::OnSessionLost(SessionPtr session)
     }
 }
 
-int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, int32_t iconId)
+int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, int32_t pointerStyle)
 {
     CALL_DEBUG_ENTER;
     auto it = mapPointerStyle_.find(pid);
@@ -517,20 +517,15 @@ int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, int3
         return RET_ERR;
     }
     
-    it->second.erase(subit);
-    auto ret = it->second.insert(std::make_pair(windowId, iconId));
-    if (!ret.second) {
-        MMI_HILOGE("Map insert failed, ret.second:%{public}d", ret.second);
-        return RET_ERR;
-    }
-    MMI_HILOGD("Window type:%{public}d set pointer style:%{public}d success", windowId, iconId);
+    subit->second = pointerStyle;
+    MMI_HILOGD("Window type:%{public}d set pointer style:%{public}d success", windowId, pointerStyle);
     return RET_OK;
 }
 
-int32_t InputWindowsManager::GetPointerStyle(int32_t pid, int32_t windowId, int32_t &iconId) const
+int32_t InputWindowsManager::GetPointerStyle(int32_t pid, int32_t windowId, int32_t &pointerStyle) const
 {
     CALL_DEBUG_ENTER;
-    iconId = DEFAULT_POINTER_STYLE;
+    pointerStyle = DEFAULT_POINTER_STYLE;
 
     auto it = mapPointerStyle_.find(pid);
     if (it == mapPointerStyle_.end()) {
@@ -544,8 +539,8 @@ int32_t InputWindowsManager::GetPointerStyle(int32_t pid, int32_t windowId, int3
         return RET_ERR;
     }
     
-    iconId = subit->second;
-    MMI_HILOGD("Window type:%{public}d get pointer style:%{public}d success", windowId, iconId);
+    pointerStyle = subit->second;
+    MMI_HILOGD("Window type:%{public}d get pointer style:%{public}d success", windowId, pointerStyle);
     return RET_OK;
 }
 
@@ -968,19 +963,21 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     if (displayId == lastDisplayId) {
         if (integerX < 0) {
             integerX = 0;
+            x = static_cast<double>(integerX);
         }
         if (integerX >= width) {
             integerX = width - 1;
+            x = static_cast<double>(integerX);
         }
         if (integerY < 0) {
             integerY = 0;
+            y = static_cast<double>(integerY);
         }
         if (integerY >= height) {
             integerY = height - 1;
+            y = static_cast<double>(integerY);
         }
     }
-    x = static_cast<double>(integerX);
-    y = static_cast<double>(integerY);
     mouseLocation_.physicalX = integerX;
     mouseLocation_.physicalY = integerY;
     MMI_HILOGD("Mouse Data: physicalX:%{public}d,physicalY:%{public}d, displayId:%{public}d",

@@ -18,19 +18,19 @@
 #include <cinttypes>
 
 #include "event_dump.h"
-#include "event_package.h"
+#include "event_interceptor_handler.h"
+#include "event_monitor_handler.h"
 #include "hos_key_event.h"
-#include "interceptor_handler_global.h"
 #include "input_device_manager.h"
-#include "input_event.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
-#include "input_handler_manager_global.h"
+#include "input_event.h"
 #include "input_windows_manager.h"
+#include "key_event_handler.h"
 #include "key_event_subscriber.h"
 #include "mmi_func_callback.h"
-#include "time_cost_chk.h"
 #include "mouse_event_handler.h"
+#include "time_cost_chk.h"
 #ifdef OHOS_BUILD_HDF
 #include "hdi_inject.h"
 #endif
@@ -114,13 +114,14 @@ int32_t ServerMsgHandler::MarkProcessed(SessionPtr sess, NetPacket& pkt)
     CALL_DEBUG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
     int32_t eventId = 0;
-    pkt >> eventId;
+    int32_t eventType = 0;
+    pkt >> eventId >> eventType;
     MMI_HILOGD("event is: %{public}d", eventId);
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read data failed");
         return PACKET_READ_FAIL;
     }
-    sess->DelEvents(eventId);
+    sess->DelEvents(eventType, eventId);
     return RET_OK;
 }
 
@@ -149,6 +150,10 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
         pointerEvent->SetTargetWindowId(targetWindowId_);
         PointerEvent::PointerItem pointerItem;
         auto pointerIds = pointerEvent->GetPointerIds();
+        if (pointerIds.empty()) {
+            MMI_HILOGE("GetPointerIds is empty");
+            return RET_ERR;
+        }
         auto id = pointerIds.front();
         if (!pointerEvent->GetPointerItem(id, pointerItem)) {
             MMI_HILOGE("Can't find pointer item");

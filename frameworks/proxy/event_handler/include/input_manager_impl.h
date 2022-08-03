@@ -96,9 +96,9 @@ public:
     int32_t GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback);
 
     int32_t SetPointerVisible(bool visible);
-    int32_t SetPointerStyle(int32_t windowId, int32_t iconId);
-    int32_t GetPointerStyle(int32_t windowId, int32_t &iconId);
     bool IsPointerVisible();
+    int32_t SetPointerStyle(int32_t windowId, int32_t pointerStyle);
+    int32_t GetPointerStyle(int32_t windowId);
 
     int32_t SetPointerSpeed(int32_t speed);
     int32_t GetPointerSpeed();

@@ -27,9 +27,9 @@
 
 #include "input_device_manager.h"
 #include "input_event_handler.h"
-#include "input_handler_manager_global.h"
+#include "event_monitor_handler.h"
 #include "input_windows_manager.h"
-#include "interceptor_handler_global.h"
+#include "event_interceptor_handler.h"
 #include "key_event_subscriber.h"
 #include "mouse_event_handler.h"
 #include "securec.h"
@@ -40,6 +40,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDump" };
+constexpr int32_t MAX_COMMAND_COUNT = 32;
 } // namespace
 
 void ChkConfig(int32_t fd)
@@ -66,6 +67,10 @@ void ChkConfig(int32_t fd)
 void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
+    if (args.size() > MAX_COMMAND_COUNT) {
+        MMI_HILOGE("More than 32 commands");
+        return;
+    }
     int32_t optionIndex = 0;
     struct option dumpOptions[] = {
         {"help", no_argument, 0, 'h'},
@@ -79,13 +84,22 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
         {"mouse", no_argument, 0, 'm'},
         {NULL, 0, 0, 0}
     };
-    char **argv = new char *[args.size()];
+    char **argv = new (std::nothrow) char *[args.size()];
+    CHKPV(argv);
+    if (memset_s(argv, args.size() * sizeof(char*), 0, args.size() * sizeof(char*)) != EOK) {
+        MMI_HILOGE("Call memset_s failed");
+        delete[] argv;
+        return;
+    }
     for (size_t i = 0; i < args.size(); ++i) {
-        argv[i] = new char[args[i].size() + 1];
+        argv[i] = new (std::nothrow) char[args[i].size() + 1];
+        if (argv[i] == nullptr) {
+            MMI_HILOGE("Failed to allocate memory");
+            goto RELEASE_RES;
+        }
         if (strcpy_s(argv[i], args[i].size() + 1, args[i].c_str()) != EOK) {
             MMI_HILOGE("strcpy_s error");
             goto RELEASE_RES;
-            return;
         }
     }
     optind = 1;

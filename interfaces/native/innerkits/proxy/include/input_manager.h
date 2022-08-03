@@ -257,8 +257,6 @@ public:
      * @since 9
      */
     int32_t SetPointerVisible(bool visible);
-    int32_t SetPointerStyle(int32_t windowId, int32_t iconId);
-    int32_t GetPointerStyle(int32_t windowId);
 
     /**
      * @brief Checks whether the pointer icon is visible.
@@ -266,6 +264,9 @@ public:
      * @since 9
      */
     bool IsPointerVisible();
+
+    int32_t SetPointerStyle(int32_t windowId, int32_t pointerStyle);
+    int32_t GetPointerStyle(int32_t windowId);
 
     /**
      * @brief 设置鼠标移动速度(取值范围1到20)。

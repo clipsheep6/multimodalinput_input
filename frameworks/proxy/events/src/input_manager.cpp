@@ -157,18 +157,6 @@ bool InputManager::IsPointerVisible()
     return InputMgrImpl->IsPointerVisible();
 }
 
-int32_t InputManager::SetPointerStyle(int32_t windowId, int32_t iconId)
-{
-    return InputMgrImpl->SetPointerStyle(windowId, iconId);
-}
-
-int32_t InputManager::GetPointerStyle(int32_t windowId)
-{
-    int32_t iconId;
-    iconId = InputMgrImpl->GetPointerStyle(windowId, iconId);
-    return iconId;
-}
-
 int32_t InputManager::SetPointerSpeed(int32_t speed)
 {
     return InputMgrImpl->SetPointerSpeed(speed);
@@ -187,6 +175,26 @@ int32_t InputManager::GetKeyboardType(int32_t deviceId, std::function<void(int32
 void InputManager::SetAnrObserver(std::shared_ptr<IAnrObserver> observer)
 {
     InputMgrImpl->SetAnrObserver(observer);
+}
+
+int32_t InputManager::SetPointerStyle(int32_t windowId, int32_t pointerStyle)
+{
+    if(windowId < 0 || pointerStyle <0)
+    {
+        MMI_HILOGW("Parameter passing error");
+        return RET_ERR;
+    }
+    return InputMgrImpl->SetPointerStyle(windowId, pointerStyle);
+}
+
+int32_t InputManager::GetPointerStyle(int32_t windowId)
+{
+    if(windowId < 0)
+    {
+        MMI_HILOGW("Parameter passing error");
+        return RET_ERR;
+    }
+    return InputMgrImpl->GetPointerStyle(windowId);
 }
 } // namespace MMI
 } // namespace OHOS
