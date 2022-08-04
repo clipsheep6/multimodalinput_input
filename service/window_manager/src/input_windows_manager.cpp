@@ -476,8 +476,7 @@ bool InputWindowsManager::isNeedRefreshLayer(int32_t windowId)
         MMI_HILOGE("TouchWindow is nullptr");
         return false;
     }
-    if (touchWindow->id == windowId)
-    {
+    if (touchWindow->id == windowId) {
         MMI_HILOGD("Need refresh pointer style, focusWindow type:%{public}d, window type:%{public}d",
             touchWindow->id, windowId);
         return true;
@@ -761,7 +760,8 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     if (ret != RET_OK) {
         MMI_HILOGE("Get pointer style failed, mouse style return default style");
     }
-    IPointerDrawingManager::GetInstance()->DrawPointer(displayId, pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), MOUSE_ICON(mouseStyle));
+    IPointerDrawingManager::GetInstance()->DrawPointer(displayId, pointerItem.GetDisplayX(),
+        pointerItem.GetDisplayY(), MOUSE_ICON(mouseStyle));
 
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);

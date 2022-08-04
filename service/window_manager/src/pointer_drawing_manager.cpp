@@ -31,7 +31,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerDrawingManager" };
-const std::string IMAGE_POINTER_JPEG_PATH = "/system/etc/multimodalinput/mouse_icon/Default.png";
+const std::string IMAGE_POINTER_JPEG_PATH = "/system/etc/multimodalinput/mouse_icon/";
 constexpr int32_t MAX_POINTER_STYLE = 38;
 } // namespace
 } // namespace MMI
@@ -41,50 +41,51 @@ namespace OHOS {
 namespace MMI {
 PointerDrawingManager::PointerDrawingManager()
 {
-    mouseIcons_[MOUSE_ICON::DEFAULT] = "/system/etc/multimodalinput/mouse_icon/Default.png";
-    mouseIcons_[MOUSE_ICON::EAST] = "/system/etc/multimodalinput/mouse_icon/East.png";
-    mouseIcons_[MOUSE_ICON::WEST] = "/system/etc/multimodalinput/mouse_icon/West.png";
-    mouseIcons_[MOUSE_ICON::SOUTH] = "/system/etc/multimodalinput/mouse_icon/South.png";
-    mouseIcons_[MOUSE_ICON::NORTH] = "/system/etc/multimodalinput/mouse_icon/North.png";
-    mouseIcons_[MOUSE_ICON::WEST_EAST] = "/system/etc/multimodalinput/mouse_icon/westEast.png";
-    mouseIcons_[MOUSE_ICON::NORTH_SOUTH] = "/system/etc/multimodalinput/mouse_icon/northSouth.png";
-    mouseIcons_[MOUSE_ICON::NORTH_EAST] = "/system/etc/multimodalinput/mouse_icon/northEast.png";
-    mouseIcons_[MOUSE_ICON::NORTH_WEST] = "/system/etc/multimodalinput/mouse_icon/northWest.png";
-    mouseIcons_[MOUSE_ICON::SOUTH_EAST] = "/system/etc/multimodalinput/mouse_icon/southEast.png";
-    mouseIcons_[MOUSE_ICON::SOUTH_WEST] = "/system/etc/multimodalinput/mouse_icon/southWest.png";
-    mouseIcons_[MOUSE_ICON::NORTH_EAST_SOUTH_WEST] = "/system/etc/multimodalinput/mouse_icon/northEastSouthWest.png";
-    mouseIcons_[MOUSE_ICON::NORTH_WEST_SOUTH_EAST] = "/system/etc/multimodalinput/mouse_icon/northWestSouthEast.png";
-    mouseIcons_[MOUSE_ICON::CROSS] = "/system/etc/multimodalinput/mouse_icon/Cross.png";
-    mouseIcons_[MOUSE_ICON::CURSOR_COPY] = "/system/etc/multimodalinput/mouse_icon/cursorCopy.png";
-    mouseIcons_[MOUSE_ICON::CURSOR_FORBID] = "/system/etc/multimodalinput/mouse_icon/cursorForbid.png";
-    mouseIcons_[MOUSE_ICON::COLOR_SUCKER] = "/system/etc/multimodalinput/mouse_icon/colorsucker.png";
-    mouseIcons_[MOUSE_ICON::HAND_GRABBING] = "/system/etc/multimodalinput/mouse_icon/handGrabbing.png";
-    mouseIcons_[MOUSE_ICON::HAND_OPEN] = "/system/etc/multimodalinput/mouse_icon/handOpen.png";
-    mouseIcons_[MOUSE_ICON::HAND_POINTING] = "/system/etc/multimodalinput/mouse_icon/handPointing.png";
-    mouseIcons_[MOUSE_ICON::HELP] = "/system/etc/multimodalinput/mouse_icon/Help.png";
-    mouseIcons_[MOUSE_ICON::CURSOR_MOVE] = "/system/etc/multimodalinput/mouse_icon/Move.png";
-    mouseIcons_[MOUSE_ICON::RESIZE_LEFT_RIGHT] = "/system/etc/multimodalinput/mouse_icon/resizeLeftRight.png";
-    mouseIcons_[MOUSE_ICON::RESIZE_UP_DOWN] = "/system/etc/multimodalinput/mouse_icon/resizeUpDown.png";
-    mouseIcons_[MOUSE_ICON::SCREENSHOT_CHOOSE] = "/system/etc/multimodalinput/mouse_icon/screenshotChoose.png";
-    mouseIcons_[MOUSE_ICON::SCREENSHOT_CURSOR] = "/system/etc/multimodalinput/mouse_icon/screenshotCursor.png";
-    mouseIcons_[MOUSE_ICON::TEXT_CURSOR] = "/system/etc/multimodalinput/mouse_icon/textCursor.png";
-    mouseIcons_[MOUSE_ICON::ZOOM_IN] = "/system/etc/multimodalinput/mouse_icon/zoomIn.png";
-    mouseIcons_[MOUSE_ICON::ZOOM_OUT] = "/system/etc/multimodalinput/mouse_icon/zoomOut.png";
-    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_EAST] = "/system/etc/multimodalinput/mouse_icon/middleBinEast.png";
-    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_WEST] = "/system/etc/multimodalinput/mouse_icon/middleBinWest.png";
-    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_SOUTH] = "/system/etc/multimodalinput/mouse_icon/middleBinSouth.png";
-    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_NORTH] = "/system/etc/multimodalinput/mouse_icon/middleBinNorth.png";
-    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_NORTH_SOUTH] = "/system/etc/multimodalinput/mouse_icon/middleBinNorthSouth.png";
-    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_NORTH_EAST] = "/system/etc/multimodalinput/mouse_icon/middleBinNorthEast.png";
-    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_NORTH_WEST] = "/system/etc/multimodalinput/mouse_icon/middleBinNorthWest.png";
-    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_SOUTH_EAST] = "/system/etc/multimodalinput/mouse_icon/middleBinSouthEast.png";
-    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_SOUTH_WEST] = "/system/etc/multimodalinput/mouse_icon/middleBinSouthWest.png";
-    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_NORTH_SOUTH_WEST_EAST] = "/system/etc/multimodalinput/mouse_icon/middleBinNorthSouthWestEast.png";
+    mouseIcons_[MOUSE_ICON::DEFAULT] = IMAGE_POINTER_JPEG_PATH + "Default.png";
+    mouseIcons_[MOUSE_ICON::EAST] = IMAGE_POINTER_JPEG_PATH + "East.png";
+    mouseIcons_[MOUSE_ICON::WEST] = IMAGE_POINTER_JPEG_PATH + "West.png";
+    mouseIcons_[MOUSE_ICON::SOUTH] = IMAGE_POINTER_JPEG_PATH + "South.png";
+    mouseIcons_[MOUSE_ICON::NORTH] = IMAGE_POINTER_JPEG_PATH + "North.png";
+    mouseIcons_[MOUSE_ICON::WEST_EAST] = IMAGE_POINTER_JPEG_PATH + "westEast.png";
+    mouseIcons_[MOUSE_ICON::NORTH_SOUTH] = IMAGE_POINTER_JPEG_PATH + "northSouth.png";
+    mouseIcons_[MOUSE_ICON::NORTH_EAST] = IMAGE_POINTER_JPEG_PATH + "northEast.png";
+    mouseIcons_[MOUSE_ICON::NORTH_WEST] = IMAGE_POINTER_JPEG_PATH + "northWest.png";
+    mouseIcons_[MOUSE_ICON::SOUTH_EAST] = IMAGE_POINTER_JPEG_PATH + "southEast.png";
+    mouseIcons_[MOUSE_ICON::SOUTH_WEST] = IMAGE_POINTER_JPEG_PATH + "southWest.png";
+    mouseIcons_[MOUSE_ICON::NORTH_EAST_SOUTH_WEST] = IMAGE_POINTER_JPEG_PATH + "northEastSouthWest.png";
+    mouseIcons_[MOUSE_ICON::NORTH_WEST_SOUTH_EAST] = IMAGE_POINTER_JPEG_PATH + "northWestSouthEast.png";
+    mouseIcons_[MOUSE_ICON::CROSS] = IMAGE_POINTER_JPEG_PATH + "Cross.png";
+    mouseIcons_[MOUSE_ICON::CURSOR_COPY] = IMAGE_POINTER_JPEG_PATH + "cursorCopy.png";
+    mouseIcons_[MOUSE_ICON::CURSOR_FORBID] = IMAGE_POINTER_JPEG_PATH + "cursorForbid.png";
+    mouseIcons_[MOUSE_ICON::COLOR_SUCKER] = IMAGE_POINTER_JPEG_PATH + "colorsucker.png";
+    mouseIcons_[MOUSE_ICON::HAND_GRABBING] = IMAGE_POINTER_JPEG_PATH + "handGrabbing.png";
+    mouseIcons_[MOUSE_ICON::HAND_OPEN] = IMAGE_POINTER_JPEG_PATH + "handOpen.png";
+    mouseIcons_[MOUSE_ICON::HAND_POINTING] = IMAGE_POINTER_JPEG_PATH + "handPointing.png";
+    mouseIcons_[MOUSE_ICON::HELP] = IMAGE_POINTER_JPEG_PATH + "Help.png";
+    mouseIcons_[MOUSE_ICON::CURSOR_MOVE] = IMAGE_POINTER_JPEG_PATH + "Move.png";
+    mouseIcons_[MOUSE_ICON::RESIZE_LEFT_RIGHT] = IMAGE_POINTER_JPEG_PATH + "resizeLeftRight.png";
+    mouseIcons_[MOUSE_ICON::RESIZE_UP_DOWN] = IMAGE_POINTER_JPEG_PATH + "resizeUpDown.png";
+    mouseIcons_[MOUSE_ICON::SCREENSHOT_CHOOSE] = IMAGE_POINTER_JPEG_PATH + "screenshotChoose.png";
+    mouseIcons_[MOUSE_ICON::SCREENSHOT_CURSOR] = IMAGE_POINTER_JPEG_PATH + "screenshotCursor.png";
+    mouseIcons_[MOUSE_ICON::TEXT_CURSOR] = IMAGE_POINTER_JPEG_PATH + "textCursor.png";
+    mouseIcons_[MOUSE_ICON::ZOOM_IN] = IMAGE_POINTER_JPEG_PATH + "zoomIn.png";
+    mouseIcons_[MOUSE_ICON::ZOOM_OUT] = IMAGE_POINTER_JPEG_PATH + "zoomOut.png";
+    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_EAST] = IMAGE_POINTER_JPEG_PATH + "middleBinEast.png";
+    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_WEST] = IMAGE_POINTER_JPEG_PATH + "middleBinWest.png";
+    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_SOUTH] = IMAGE_POINTER_JPEG_PATH + "middleBinSouth.png";
+    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_NORTH] = IMAGE_POINTER_JPEG_PATH + "middleBinNorth.png";
+    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_NORTH_SOUTH] = IMAGE_POINTER_JPEG_PATH + "middleBinNorthSouth.png";
+    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_NORTH_EAST] = IMAGE_POINTER_JPEG_PATH + "middleBinNorthEast.png";
+    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_NORTH_WEST] = IMAGE_POINTER_JPEG_PATH + "middleBinNorthWest.png";
+    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_SOUTH_EAST] = IMAGE_POINTER_JPEG_PATH + "middleBinSouthEast.png";
+    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_SOUTH_WEST] = IMAGE_POINTER_JPEG_PATH + "middleBinSouthWest.png";
+    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_NORTH_SOUTH_WEST_EAST] = IMAGE_POINTER_JPEG_PATH + "middleBinNorthSouthWestEast.png";
 }
 
 PointerDrawingManager::~PointerDrawingManager() {}
 
-void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY, const MOUSE_ICON mouseStyle)
+void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
+    const MOUSE_ICON mouseStyle)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("display:%{public}d,physicalX:%{public}d,physicalY:%{public}d,mouseStyle:%{public}d", displayId, physicalX, physicalY, mouseStyle);
@@ -293,7 +294,7 @@ std::unique_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixel
 }
 
 void PointerDrawingManager::OnDisplayInfo(int32_t displayId, int32_t pid, int32_t focusWindowId,
-                                          int32_t width, int32_t height, Direction direction) 
+    int32_t width, int32_t height, Direction direction) 
 {
     CALL_DEBUG_ENTER;
     hasDisplay_ = true;
@@ -456,7 +457,7 @@ int32_t PointerDrawingManager::GetPointerStyle(int32_t pid, int32_t windowId, in
         return RET_ERR;
     }
 
-    MMI_HILOGD("Window type:%{public}d get pointer style:%{public}d success", windowId, pointerStyle); 
+    MMI_HILOGD("Window type:%{public}d get pointer style:%{public}d success", windowId, pointerStyle);
     return RET_OK;
 }
 } // namespace MMI
