@@ -176,5 +176,35 @@ void InputManager::SetAnrObserver(std::shared_ptr<IAnrObserver> observer)
 {
     InputMgrImpl->SetAnrObserver(observer);
 }
+
+int32_t InputManager::RegisterCooperateListener(std::function<void(std::string, CooperateMessages)> listener)
+{
+    return InputMgrImpl->RegisterCooperateListener(listener);
+}
+
+int32_t InputManager::UnregisterCooperateListener()
+{
+    return InputMgrImpl->UnregisterCooperateListener();
+}
+
+int32_t InputManager::EnableInputDeviceCooperate(bool enabled)
+{
+    return InputMgrImpl->EnableInputDeviceCooperate(enabled);
+}
+
+int32_t InputManager::StartInputDeviceCooperate(const std::string &sinkDeviceId, int32_t srcInputDeviceId)
+{
+    return InputMgrImpl->StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId);
+}
+
+int32_t InputManager::StopDeviceCooperate()
+{
+    return InputMgrImpl->StopDeviceCooperate();
+}
+
+int32_t InputManager::GetInputDeviceCooperateState(const std::string &deviceId, std::function<void(bool)> callback)
+{
+    return InputMgrImpl->GetInputDeviceCooperateState(deviceId, callback);
+}
 } // namespace MMI
 } // namespace OHOS
