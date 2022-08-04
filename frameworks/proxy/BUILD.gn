@@ -67,7 +67,7 @@ ohos_source_set("libmmi-common") {
     "events/src/pointer_event.cpp",
   ]
 
-  defines = [ "OHOS_BUILD" ]
+  defines = []
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
@@ -99,7 +99,7 @@ ohos_shared_library("libmmi-client") {
     "module_loader/src/mmi_fd_listener.cpp",
   ]
 
-  defines = [ "OHOS_BUILD" ]
+  defines = []
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
@@ -182,7 +182,7 @@ ohos_unittest("ut-mmi-proxy-out") {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
-  defines = [ "OHOS_BUILD" ]
+  defines = []
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
@@ -221,7 +221,7 @@ ohos_unittest("KeyEventTest") {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
-  defines = [ "OHOS_BUILD" ]
+  defines = []
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
@@ -257,7 +257,7 @@ ohos_unittest("InputManagerTest") {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
-  defines = [ "OHOS_BUILD" ]
+  defines = []
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
@@ -328,7 +328,7 @@ ohos_unittest("InputManagerManualTest") {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
-  defines = [ "OHOS_BUILD" ]
+  defines = []
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
@@ -371,7 +371,7 @@ ohos_unittest("PointerEventTest") {
     include_dirs = [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
-  defines = [ "OHOS_BUILD" ]
+  defines = []
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
