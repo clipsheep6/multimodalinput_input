@@ -35,10 +35,6 @@ public:
 protected:
     int32_t StubOnCooperateMessage(MessageParcel& data, MessageParcel& reply);
     int32_t StubOnCooperateState(MessageParcel& data, MessageParcel& reply);
-<<<<<<< HEAD
-=======
-
->>>>>>> f26c9f2efc4faf3e0332466054f3b12ae8a09ed3
 };
 } // namespace MMI
 } // namespace OHOS
