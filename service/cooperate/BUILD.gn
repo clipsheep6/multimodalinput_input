@@ -44,8 +44,8 @@ ohos_source_set("mmi_event_cooperate_service") {
 ohos_source_set("mmi_event_cooperate_proxy") {
   part_name = "input"
   sources = [
-    "${event_cooperate_path}/src/event_cooperate_proxy.cpp",
     "${event_cooperate_path}/src/event_cooperate_manager.cpp",
+    "${event_cooperate_path}/src/event_cooperate_proxy.cpp",
   ]
 
   configs = [ ":mmi_event_cooperate_config" ]
