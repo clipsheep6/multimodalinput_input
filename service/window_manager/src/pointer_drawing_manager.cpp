@@ -79,7 +79,8 @@ PointerDrawingManager::PointerDrawingManager()
     mouseIcons_[MOUSE_ICON::MIDDLE_BTN_NORTH_WEST] = IMAGE_POINTER_JPEG_PATH + "middleBinNorthWest.png";
     mouseIcons_[MOUSE_ICON::MIDDLE_BTN_SOUTH_EAST] = IMAGE_POINTER_JPEG_PATH + "middleBinSouthEast.png";
     mouseIcons_[MOUSE_ICON::MIDDLE_BTN_SOUTH_WEST] = IMAGE_POINTER_JPEG_PATH + "middleBinSouthWest.png";
-    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_NORTH_SOUTH_WEST_EAST] = IMAGE_POINTER_JPEG_PATH + "middleBinNorthSouthWestEast.png";
+    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_NORTH_SOUTH_WEST_EAST] = IMAGE_POINTER_JPEG_PATH +
+        "middleBinNorthSouthWestEast.png";
 }
 
 PointerDrawingManager::~PointerDrawingManager() {}
@@ -88,7 +89,8 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     const MOUSE_ICON mouseStyle)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("display:%{public}d,physicalX:%{public}d,physicalY:%{public}d,mouseStyle:%{public}d", displayId, physicalX, physicalY, mouseStyle);
+    MMI_HILOGD("display:%{public}d,physicalX:%{public}d,physicalY:%{public}d,mouseStyle:%{public}d",
+        displayId, physicalX, physicalY, mouseStyle);
     FixCursorPosition(physicalX, physicalY);
     lastPhysicalX_ = physicalX;
     lastPhysicalY_ = physicalY;
@@ -294,7 +296,7 @@ std::unique_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixel
 }
 
 void PointerDrawingManager::OnDisplayInfo(int32_t displayId, int32_t pid, int32_t focusWindowId,
-    int32_t width, int32_t height, Direction direction) 
+    int32_t width, int32_t height, Direction direction)
 {
     CALL_DEBUG_ENTER;
     hasDisplay_ = true;
