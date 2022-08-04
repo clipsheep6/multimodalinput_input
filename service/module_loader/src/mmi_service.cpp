@@ -25,7 +25,6 @@
 #endif
 
 #include "anr_manager.h"
-#include "define_multimodal.h"
 #include "event_dump.h"
 #include "input_device_manager.h"
 #include "input_windows_manager.h"
@@ -1057,7 +1056,7 @@ int32_t MMIService::StartCooperateOtherRes(const std::string& srcNetworkId)
         return ret;
     }
 #else
-    UNUSED_PARAM(isSucess);
+    UNUSED_PARAM(srcNetworkId);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     return RET_OK;
 }
