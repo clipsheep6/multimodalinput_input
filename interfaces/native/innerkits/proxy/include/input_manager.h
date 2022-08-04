@@ -30,6 +30,7 @@
 #include "i_input_event_consumer.h"
 #include "input_device.h"
 #include "key_option.h"
+#include "cooperate_messages.h"
 
 namespace OHOS {
 namespace MMI {
@@ -296,6 +297,55 @@ public:
      * @since 9
      */
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
+
+    /**
+     * @brief Register input device cooperate event listening.
+     * @param listener Listener for the input device cooperate event.
+     * @return Returns **0** if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t RegisterCooperateListener(std::function<void(std::string, CooperateMessages)> listener);
+
+    /**
+     * @brief Unregister input device cooperate event listening.
+     * @param listener Listener for the input device cooperate event.
+     * @return Returns **0** if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t UnregisterCooperateListener();
+
+    /**
+     * @brief Enable or disable input device cooperate.
+     * @param enabled The input device cooperate enable or disable.
+     * @return Returns **0** if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t EnableInputDeviceCooperate(bool enabled);
+
+    /**
+     * @brief Start input device cooperate.
+     * @param sinkDeviceId Keyboard and mouse through the target device id.
+     * @param srcInputDeviceId Keyboard and mouse through to enter peripheral identifier.
+     * @return Returns **0** if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t StartInputDeviceCooperate(const std::string &sinkDeviceId, int32_t srcInputDeviceId);
+
+    /**
+     * @brief Stop input device cooperate.
+     * @return Returns **0** if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t StopDeviceCooperate();
+
+    /**
+     * @brief Get the crossing status of the specified device.
+     * @param deviceId The specified device id.
+     * @param callback The specified device status callback.
+     * @return Returns **0** if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t GetInputDeviceCooperateState(const std::string &deviceId, std::function<void(bool)> callback);
 
 private:
     InputManager() = default;

@@ -68,7 +68,17 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         {IMultimodalInputConnect::MOVE_MOUSE, &MultimodalInputConnectStub::StubMoveMouseEvent},
         {IMultimodalInputConnect::INJECT_KEY_EVENT, &MultimodalInputConnectStub::StubInjectKeyEvent},
         {IMultimodalInputConnect::INJECT_POINTER_EVENT, &MultimodalInputConnectStub::StubInjectPointerEvent},
-        {IMultimodalInputConnect::SET_ANR_OBSERVER, &MultimodalInputConnectStub::StubSetAnrListener}
+        {IMultimodalInputConnect::SET_ANR_OBSERVER, &MultimodalInputConnectStub::StubSetAnrListener},
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+        {IMultimodalInputConnect::REGISTER_COOPERATE_EVENT, &MultimodalInputConnectStub::StubRegisterCooperateEvent},
+        {IMultimodalInputConnect::ENABLE_INPUT_DEVICE_COOPERATE,
+            &MultimodalInputConnectStub::StubEnableInputDeviceCooperate},
+        {IMultimodalInputConnect::START_INPUT_DEVICE_COOPERATE,
+            &MultimodalInputConnectStub::StubStartInputDeviceCooperate},
+        {IMultimodalInputConnect::STOP_DEVICE_COOPERATE, &MultimodalInputConnectStub::StubStopDeviceCooperate},
+        {IMultimodalInputConnect::GET_INPUT_DEVICE_COOPERATE_STATE,
+            &MultimodalInputConnectStub::StubGetInputDeviceCooperateState},
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -486,6 +496,91 @@ int32_t MultimodalInputConnectStub::StubSetAnrListener(MessageParcel& data, Mess
     int32_t ret = SetAnrObserver();
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetAnrObserver failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubRegisterCooperateEvent(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    sptr<IRemoteObject> client = data.ReadRemoteObject();
+    sptr<IEventCooperate> event = iface_cast<IEventCooperate>(client);
+    int32_t ret = RegisterCooperateEvent(event);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call RegisterCooperateEvent failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubEnableInputDeviceCooperate(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    bool isSuccess;
+    READBOOL(data, isSuccess, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = EnableInputDeviceCooperate(isSuccess);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call EnableInputDeviceCooperate failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubStartInputDeviceCooperate(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    std::string sinkDeviceId;
+    READSTRING(data, sinkDeviceId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t srcInputDeviceId;
+    READINT32(data, srcInputDeviceId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call StartInputDeviceCooperate failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubStopDeviceCooperate(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t ret = StopDeviceCooperate();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call StopDeviceCooperate failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetInputDeviceCooperateState(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    std::string deviceId;
+    READSTRING(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = GetInputDeviceCooperateState(deviceId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetInputDeviceCooperateState failed ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;

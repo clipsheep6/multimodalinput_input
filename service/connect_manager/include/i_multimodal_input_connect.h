@@ -23,6 +23,7 @@
 #include "key_event.h"
 #include "key_option.h"
 #include "pointer_event.h"
+#include "i_event_cooperate.h"
 
 namespace OHOS {
 namespace MMI {
@@ -54,6 +55,11 @@ public:
     virtual int32_t UnsubscribeKeyEvent(int32_t subscribeId) = 0;
     virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual int32_t SetAnrObserver() = 0;
+    virtual int32_t EnableInputDeviceCooperate(bool enabled) = 0;
+    virtual int32_t StartInputDeviceCooperate(const std::string &sinkDeviceId, int32_t srcInputDeviceId) = 0;
+    virtual int32_t StopDeviceCooperate() = 0;
+    virtual int32_t RegisterCooperateEvent(sptr<IEventCooperate> event) = 0;
+    virtual int32_t GetInputDeviceCooperateState(const std::string &deviceId) = 0;
     enum {
         ALLOC_SOCKET_FD = 0,
         ADD_INPUT_EVENT_FILTER = 1,
@@ -75,7 +81,12 @@ public:
         UNREGISTER_DEV_MONITOR = 19,
         GET_KEYBOARD_TYPE = 20,
         SET_POINTER_SPEED = 21,
-        GET_POINTER_SPEED = 22
+        GET_POINTER_SPEED = 22,
+        REGISTER_COOPERATE_EVENT = 30,
+        ENABLE_INPUT_DEVICE_COOPERATE = 31,
+        START_INPUT_DEVICE_COOPERATE = 32,
+        STOP_DEVICE_COOPERATE = 33,
+        GET_INPUT_DEVICE_COOPERATE_STATE = 34,
     };
 
     enum {

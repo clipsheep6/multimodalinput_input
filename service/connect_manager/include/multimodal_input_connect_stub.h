@@ -58,6 +58,11 @@ protected:
     int32_t StubSetAnrListener(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPointerSpeed(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetPointerSpeed(MessageParcel& data, MessageParcel& reply);
+    int32_t StubRegisterCooperateEvent(MessageParcel& data, MessageParcel& reply);
+    int32_t StubEnableInputDeviceCooperate(MessageParcel& data, MessageParcel& reply);
+    int32_t StubStartInputDeviceCooperate(MessageParcel& data, MessageParcel& reply);
+    int32_t StubStopDeviceCooperate(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetInputDeviceCooperateState(MessageParcel& data, MessageParcel& reply);
 };
 } // namespace MMI
 } // namespace OHOS
