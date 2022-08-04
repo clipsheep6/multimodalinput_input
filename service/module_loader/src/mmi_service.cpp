@@ -1011,6 +1011,23 @@ int32_t MMIService::EnableInputDeviceCooperate(bool enabled)
     return RET_OK;
 }
 
+int32_t MMIService::StartInputDeviceCooperate(const std::string &sinkDeviceId, int32_t srcInputDeviceId)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    int32_t ret = delegateTasks_.PostAsyncTask(std::bind(&InputDeviceCooperateSM::StartInputDeviceCooperate,
+        InputDevCooSM, sinkDeviceId, srcInputDeviceId));
+    if (ret != RET_OK) {
+        MMI_HILOGE("start input devicve cooperate failed,return %{public}d", ret);
+        return ret;
+    }
+#else
+    UNUSED_PARAM(sinkDeviceId);
+    UNUSED_PARAM(srcInputDeviceId);
+#endif //OHOS_BUILD_ENABLE_COOPERATE
+    return RET_OK;
+}
+
 int32_t MMIService::StopDeviceCooperate()
 {
     CALL_DEBUG_ENTER;
