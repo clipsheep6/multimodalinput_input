@@ -57,6 +57,12 @@ public:
     int32_t UnsubscribeKeyEvent(int32_t subscribeId);
     int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
     int32_t SetAnrObserver();
+    int32_t RegisterCooperateEvent(sptr<IEventCooperate> event);
+    int32_t EnableInputDeviceCooperate(bool enabled);
+    int32_t StartInputDeviceCooperate(const std::string &sinkDeviceId, int32_t srcInputDeviceId);
+    int32_t StopDeviceCooperate();
+    int32_t GetInputDeviceCooperateState(const std::string &deviceId);
+
 private:
     MultimodalInputConnectManager() = default;
     DISALLOW_COPY_AND_MOVE(MultimodalInputConnectManager);

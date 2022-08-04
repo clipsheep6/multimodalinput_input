@@ -197,6 +197,37 @@ int32_t MultimodalInputConnectManager::SetAnrObserver()
     return multimodalInputConnectService_->SetAnrObserver();
 }
 
+int32_t MultimodalInputConnectManager::RegisterCooperateEvent(sptr<IEventCooperate> event)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->RegisterCooperateEvent(event);
+}
+
+int32_t MultimodalInputConnectManager::EnableInputDeviceCooperate(bool enabled)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->EnableInputDeviceCooperate(enabled);
+}
+
+int32_t MultimodalInputConnectManager::StartInputDeviceCooperate(const std::string &sinkDeviceId,
+    int32_t srcInputDeviceId)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId);
+}
+
+int32_t MultimodalInputConnectManager::StopDeviceCooperate()
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->StopDeviceCooperate();
+}
+
+int32_t MultimodalInputConnectManager::GetInputDeviceCooperateState(const std::string &deviceId)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetInputDeviceCooperateState(deviceId);
+}
+
 bool MultimodalInputConnectManager::ConnectMultimodalInputService()
 {
     CALL_DEBUG_ENTER;

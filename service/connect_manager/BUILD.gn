@@ -28,6 +28,7 @@ config("mmi_connect_manager_config") {
     "//foundation/multimodalinput/input/service/permission_helper/include",
     "//foundation/multimodalinput/input/frameworks/proxy/event_handler/include",
     "${mmi_connect_manager_path}/include",
+    "//foundation/multimodalinput/input/service/cooperate/include",
   ]
 }
 
@@ -39,6 +40,11 @@ ohos_source_set("mmi_connect_manager_service") {
   ]
 
   configs = [ ":mmi_connect_manager_config" ]
+
+  defines = [ "OHOS_BUILD" ]
+    if (input_feature_input_cooperate) {
+    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
+  }
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
@@ -59,6 +65,11 @@ ohos_source_set("mmi_connect_manager_proxy") {
   ]
 
   configs = [ ":mmi_connect_manager_config" ]
+
+  defines = [ "OHOS_BUILD" ]
+  if (input_feature_input_cooperate) {
+    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
+  }
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
