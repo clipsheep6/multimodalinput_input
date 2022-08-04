@@ -52,7 +52,8 @@ int32_t MultimodalInputConnectRemoter::StartRemoteCooperate(const std::string& l
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectRemoter::StartRemoteCooperateRes(const std::string &deviceId, bool isSucess, int32_t xPercent, int32_t yPercent)
+int32_t MultimodalInputConnectRemoter::StartRemoteCooperateRes(const std::string &deviceId, bool isSucess,
+    int32_t xPercent, int32_t yPercent)
 {
     CALL_DEBUG_ENTER;
     sptr<IMultimodalInputConnect> proxy = GetProxyById(deviceId);
@@ -76,7 +77,8 @@ int32_t MultimodalInputConnectRemoter::StopRemoteCooperateRes(const std::string 
     return proxy->StopRemoteCooperateRes(isSucess);
 }
 
-int32_t MultimodalInputConnectRemoter::StartCooperateOtherRes(const std::string &deviceId, const std::string& srcNetworkId)
+int32_t MultimodalInputConnectRemoter::StartCooperateOtherRes(const std::string &deviceId,
+    const std::string& srcNetworkId)
 {
     CALL_DEBUG_ENTER;
     sptr<IMultimodalInputConnect> proxy = GetProxyById(deviceId);
@@ -103,7 +105,8 @@ sptr<IMultimodalInputConnect> MultimodalInputConnectRemoter::GetProxyById(const 
             sharedPtr->OnRemoteDeath(deviceId);
         }
     };
-    sptr<IRemoteObject::DeathRecipient> remoteRecipient = new (std::nothrow) MultimodalInputConnectDeathRecipient(deathCallback);
+    sptr<IRemoteObject::DeathRecipient> remoteRecipient =
+        new (std::nothrow) MultimodalInputConnectDeathRecipient(deathCallback);
     CHKPP(remoteRecipient);
     sa->AddDeathRecipient(remoteRecipient);
     mmiRemoteRecipients_.insert(std::make_pair(deviceId, remoteRecipient));
