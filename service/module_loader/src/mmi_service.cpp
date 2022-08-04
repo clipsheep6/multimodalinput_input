@@ -996,7 +996,7 @@ int32_t MMIService::StartRemoteCooperateRes(bool isSucess, int32_t xPercent, int
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    MMI_HILOGI("StartRemoteCooperateRes=[%{public}d]",isSucess);
+    MMI_HILOGI("StartRemoteCooperateRes=[%{public}d]", isSucess);
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputDeviceCooperateSM::StartRemoteCooperateRes,
         InputDevCooSM, isSucess, xPercent, yPercent));
     if (ret != RET_OK) {
@@ -1029,7 +1029,7 @@ int32_t MMIService::StopRemoteCooperateRes(bool isSucess)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    MMI_HILOGI("Enter MMI StopRemoteCooperateRes [%{public}d]",isSucess);
+    MMI_HILOGI("Enter MMI StopRemoteCooperateRes [%{public}d]", isSucess);
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputDeviceCooperateSM::StopRemoteCooperateRes,
         InputDevCooSM, isSucess));
     if (ret != RET_OK) {
