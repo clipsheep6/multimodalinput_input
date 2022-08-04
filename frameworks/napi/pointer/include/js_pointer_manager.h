@@ -46,6 +46,7 @@ const std::string CREATE_REFERENCE = "napi_create_reference";
 const std::string REFERENCE_REF = "napi_create_reference";
 const std::string GET_CB_INFO = "napi_get_cb_info";
 const std::string HAS_NAMED_PROPERTY = "napi_has_named_property";
+const std::string GET_INT32 = "napi_get_value_int32";
 const std::string DEFINE_PROPERTIES = "napi_define_properties";
 const std::string CREATE_PROMISE = "napi_create_promise";
 const std::string CREATE_STRING_UTF8 = "napi_create_string_utf8";
@@ -84,6 +85,7 @@ public:
     void ResetEnv();
     napi_value SetPointerVisible(napi_env env, bool visible, napi_value handle = nullptr);
     napi_value IsPointerVisible(napi_env env, napi_value handle = nullptr);
+    napi_value SetPointerLocation(napi_env env, napi_value handle, int32_t x, int32_t y);
 };
 } // namespace MMI
 } // namespace OHOS
