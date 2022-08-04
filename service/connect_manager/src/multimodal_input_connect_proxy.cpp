@@ -540,10 +540,9 @@ int32_t MultimodalInputConnectProxy::StartRemoteCooperate(const std::string& loc
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(REMOTE_COOPERATE_START, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, ret:%{public}d", ret);
-        return ret;
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t MultimodalInputConnectProxy::StartRemoteCooperateRes(bool isSucess, int32_t xPercent, int32_t yPercent)
@@ -563,10 +562,9 @@ int32_t MultimodalInputConnectProxy::StartRemoteCooperateRes(bool isSucess, int3
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(REMOTE_COOPERATE_START_RES, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, ret:%{public}d", ret);
-        return ret;
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t MultimodalInputConnectProxy::StopRemoteCooperate()
@@ -583,10 +581,9 @@ int32_t MultimodalInputConnectProxy::StopRemoteCooperate()
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(REMOTE_COOPERATE_STOP, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, ret:%{public}d", ret);
-        return ret;
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t MultimodalInputConnectProxy::StopRemoteCooperateRes(bool isSucess)
@@ -604,10 +601,9 @@ int32_t MultimodalInputConnectProxy::StopRemoteCooperateRes(bool isSucess)
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(REMOTE_COOPERATE_STOP_RES, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, ret:%{public}d", ret);
-        return ret;
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t MultimodalInputConnectProxy::StartCooperateOtherRes(const std::string& srcNetworkId)
@@ -625,10 +621,9 @@ int32_t MultimodalInputConnectProxy::StartCooperateOtherRes(const std::string& s
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(REMOTE_COOPERATE_STOP_OTHER_RES, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, ret:%{public}d", ret);
-        return ret;
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
     }
-    return RET_OK;
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS

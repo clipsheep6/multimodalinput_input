@@ -39,17 +39,15 @@ std::shared_ptr<MultimodalInputConnectRemoter> MultimodalInputConnectRemoter::Ge
     std::call_once(flag, [&]() {
         g_instance.reset(new (std::nothrow) MultimodalInputConnectRemoter());
     });
-    CHKPP(g_instance);
     return g_instance;
 }
 
-int32_t MultimodalInputConnectRemoter::StartRemoteCooperate(const std::string& localDeviceId, const std::string &remote)
+int32_t MultimodalInputConnectRemoter::StartRemoteCooperate(const std::string &localDeviceId, const std::string &remoteDeviceId)
 {
     CALL_DEBUG_ENTER;
-    sptr<IMultimodalInputConnect> proxy = GetProxyById(remote);
+    sptr<IMultimodalInputConnect> proxy = GetProxyById(remoteDeviceId);
     CHKPR(proxy, RET_ERR);
     return proxy->StartRemoteCooperate(localDeviceId);
-    return RET_OK;
 }
 
 int32_t MultimodalInputConnectRemoter::StartRemoteCooperateRes(const std::string &deviceId, bool isSucess,
@@ -78,7 +76,7 @@ int32_t MultimodalInputConnectRemoter::StopRemoteCooperateRes(const std::string 
 }
 
 int32_t MultimodalInputConnectRemoter::StartCooperateOtherRes(const std::string &deviceId,
-    const std::string& srcNetworkId)
+    const std::string &srcNetworkId)
 {
     CALL_DEBUG_ENTER;
     sptr<IMultimodalInputConnect> proxy = GetProxyById(deviceId);
@@ -90,9 +88,9 @@ sptr<IMultimodalInputConnect> MultimodalInputConnectRemoter::GetProxyById(const 
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
-    auto fitService = mmiRemoteServices_.find(deviceId);
-    if (fitService != mmiRemoteServices_.end()) {
-        return fitService->second;
+    auto iterService = mmiRemoteServices_.find(deviceId);
+    if (iterService != mmiRemoteServices_.end()) {
+        return iterService->second;
     }
     auto sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     CHKPP(sm);
@@ -105,28 +103,30 @@ sptr<IMultimodalInputConnect> MultimodalInputConnectRemoter::GetProxyById(const 
             sharedPtr->OnRemoteDeath(deviceId);
         }
     };
-    sptr<IRemoteObject::DeathRecipient> remoteRecipient =
+    sptr<IRemoteObject::DeathRecipient> deathRecipient =
         new (std::nothrow) MultimodalInputConnectDeathRecipient(deathCallback);
-    CHKPP(remoteRecipient);
-    sa->AddDeathRecipient(remoteRecipient);
-    mmiRemoteRecipients_.insert(std::make_pair(deviceId, remoteRecipient));
-
+    CHKPP(deathRecipient);
+    sa->AddDeathRecipient(deathRecipient);
+    mmiDeathRecipients_.emplace(deviceId, deathRecipient);
     sptr<IMultimodalInputConnect> remoteService = iface_cast<IMultimodalInputConnect>(sa);
-    CHKPP(remoteService);
-    mmiRemoteServices_.insert(std::make_pair(deviceId, remoteService));
+    if (remoteService == nullptr) {
+        OnRemoteDeath(deviceId);
+        return nullptr;
+    }
+    mmiRemoteServices_.emplace(deviceId, remoteService);
     return remoteService;
 }
 
 void MultimodalInputConnectRemoter::OnRemoteDeath(const std::string &deviceId)
 {
     CALL_DEBUG_ENTER;
-    auto fitService = mmiRemoteServices_.find(deviceId);
-    if (fitService != mmiRemoteServices_.end()) {
-        mmiRemoteServices_.erase(fitService);
+    auto iterService = mmiRemoteServices_.find(deviceId);
+    if (iterService != mmiRemoteServices_.end()) {
+        mmiRemoteServices_.erase(iterService);
     }
-    auto fitRecipient = mmiRemoteRecipients_.find(deviceId);
-    if (fitRecipient != mmiRemoteRecipients_.end()) {
-        mmiRemoteRecipients_.erase(fitRecipient);
+    auto iterRecipient = mmiDeathRecipients_.find(deviceId);
+    if (iterRecipient != mmiDeathRecipients_.end()) {
+        mmiDeathRecipients_.erase(iterRecipient);
     }
 }
 } // namespace MMI

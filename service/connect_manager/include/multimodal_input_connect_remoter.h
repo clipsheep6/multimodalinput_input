@@ -31,11 +31,11 @@ class MultimodalInputConnectRemoter : public std::enable_shared_from_this<Multim
 public:
     virtual ~MultimodalInputConnectRemoter() = default;
     static std::shared_ptr<MultimodalInputConnectRemoter> GetInstance();
-    int32_t StartRemoteCooperate(const std::string& localDeviceId, const std::string &remoteDeviceId);
+    int32_t StartRemoteCooperate(const std::string &localDeviceId, const std::string &remoteDeviceId);
     int32_t StartRemoteCooperateRes(const std::string &deviceId, bool isSucess, int32_t xPercent, int32_t yPercent);
     int32_t StopRemoteCooperate(const std::string &deviceId);
     int32_t StopRemoteCooperateRes(const std::string &deviceId, bool isSucess);
-    int32_t StartCooperateOtherRes(const std::string &deviceId, const std::string& srcNetworkId);
+    int32_t StartCooperateOtherRes(const std::string &deviceId, const std::string &srcNetworkId);
 
 private:
     MultimodalInputConnectRemoter() = default;
@@ -45,7 +45,8 @@ private:
     void OnRemoteDeath(const std::string &deviceId);
     std::mutex lock_;
     std::map<std::string, sptr<IMultimodalInputConnect>> mmiRemoteServices_;
-    std::map<std::string, sptr<IRemoteObject::DeathRecipient>> mmiRemoteRecipients_;
+    std::map<std::string, sptr<IRemoteObject::DeathRecipient>> mmiDeathRecipients_;
+    std::map<std::string, struct RemoterInfo> connectRemoters_;
 };
 } // namespace MMI
 } // namespace OHOS
