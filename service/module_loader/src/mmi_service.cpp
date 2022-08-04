@@ -1006,6 +1006,8 @@ int32_t MMIService::EnableInputDeviceCooperate(bool enabled)
         return ret;
     }
 #else
+    UNUSED_PARAM(enabled);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     return RET_OK;
 }
 
