@@ -2331,7 +2331,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetWindowInputEventConsumer_002, Tes
     uint64_t consumerThreadId = consumer->GetConsumerThreadId();
     EXPECT_EQ(runnerThreadId, consumerThreadId);
 }
-<<<<<<< Updated upstream
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 /**
