@@ -736,5 +736,90 @@ void InputManagerImpl::OnAnrTask(std::vector<std::shared_ptr<IAnrObserver>> obse
         observer->OnAnr(pid);
     }
 }
+
+int32_t InputManagerImpl::RegisterCooperateListener(std::function<void(std::string, CooperateMessages)> listener)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (eventCooperateService_ != nullptr) {
+        return eventCooperateService_->SetCooperateMessageListener(listener);
+    }
+    eventCooperateService_ = new (std::nothrow) EventCooperateService();
+    CHKPR(eventCooperateService_, RET_ERR);
+    eventCooperateService_->SetCooperateMessageListener(listener);
+    return MultimodalInputConnMgr->RegisterCooperateEvent(eventCooperateService_);
+#else
+    UNUSED_PARAM(listener);
+    return ERROR_UNSUPPORT;
+#endif //OHOS_BUILD_ENABLE_COOPERATE
+}
+
+int32_t InputManagerImpl::UnregisterCooperateListener()
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    std::lock_guard<std::mutex> guard(mtx_);
+    CHKPR(eventCooperateService_, RET_ERR);
+    return eventCooperateService_->SetCooperateMessageListener(nullptr);
+#else
+    return ERROR_UNSUPPORT;
+#endif //OHOS_BUILD_ENABLE_COOPERATE
+}
+
+int32_t InputManagerImpl::EnableInputDeviceCooperate(bool enabled)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    std::lock_guard<std::mutex> guard(mtx_);
+    return MultimodalInputConnMgr->EnableInputDeviceCooperate(enabled);
+#else
+    UNUSED_PARAM(enabled);
+    return ERROR_UNSUPPORT;
+#endif //OHOS_BUILD_ENABLE_COOPERATE
+}
+
+int32_t InputManagerImpl::StartInputDeviceCooperate(const std::string &sinkDeviceId, int32_t srcInputDeviceId)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    std::lock_guard<std::mutex> guard(mtx_);
+    return MultimodalInputConnMgr->StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId);
+#else
+    UNUSED_PARAM(sinkDeviceId);
+    UNUSED_PARAM(srcInputDeviceId);
+    return ERROR_UNSUPPORT;
+#endif //OHOS_BUILD_ENABLE_COOPERATE
+}
+
+int32_t InputManagerImpl::StopDeviceCooperate()
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    std::lock_guard<std::mutex> guard(mtx_);
+    return MultimodalInputConnMgr->StopDeviceCooperate();
+#else
+    return ERROR_UNSUPPORT;
+#endif //OHOS_BUILD_ENABLE_COOPERATE
+}
+
+int32_t InputManagerImpl::GetInputDeviceCooperateState(const std::string &deviceId, std::function<void(bool)> callback)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (eventCooperateService_ == nullptr) {
+        eventCooperateService_ = new (std::nothrow) EventCooperateService();
+        CHKPR(eventCooperateService_, RET_ERR);
+        MultimodalInputConnMgr->RegisterCooperateEvent(eventCooperateService_);
+    }
+    eventCooperateService_->SetCooperateStateCallback(callback);
+    return MultimodalInputConnMgr->GetInputDeviceCooperateState(deviceId);
+#else
+    UNUSED_PARAM(deviceId);
+    UNUSED_PARAM(callback);
+    return ERROR_UNSUPPORT;
+#endif //OHOS_BUILD_ENABLE_COOPERATE
+}
 } // namespace MMI
 } // namespace OHOS

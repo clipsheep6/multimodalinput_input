@@ -43,6 +43,7 @@
 #include "timer_manager.h"
 #include "input_device_manager.h"
 #include "util.h"
+#include "event_cooperate_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -978,6 +979,82 @@ int32_t MMIService::Dump(int32_t fd, const std::vector<std::u16string> &args)
         return Str16ToStr8(arg);
     });
     MMIEventDump->ParseCommand(fd, argList);
+    return RET_OK;
+}
+
+int32_t MMIService::RegisterCooperateEvent(sptr<IEventCooperate> event)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    MMI_HILOGE("Enter MMI RegisterCooperateEvent");
+    EventCooperateMgr->AddCooperateEvent(event);
+#else
+    UNUSED_PARAM(event);
+#endif //OHOS_BUILD_ENABLE_COOPERATE
+    return RET_OK;
+}
+
+int32_t MMIService::EnableInputDeviceCooperate(bool enabled)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputDeviceCooperateSM::EnableInputDeviceCooperate,
+        InputDevCooSM, enabled));
+    if (ret != RET_OK) {
+        MMI_HILOGE("enalbe input devicve cooperate failed,return %{public}d", ret);
+        return ret;
+    }
+#else
+    UNUSED_PARAM(enabled);
+#endif //OHOS_BUILD_ENABLE_COOPERATE
+    return RET_OK;
+}
+
+int32_t MMIService::StartInputDeviceCooperate(const std::string &sinkDeviceId, int32_t srcInputDeviceId)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    int32_t ret = delegateTasks_.PostAsyncTask(std::bind(&InputDeviceCooperateSM::StartInputDeviceCooperate,
+        InputDevCooSM, sinkDeviceId, srcInputDeviceId));
+    if (ret != RET_OK) {
+        MMI_HILOGE("start input devicve cooperate failed,return %{public}d", ret);
+        return ret;
+    }
+#else
+    UNUSED_PARAM(sinkDeviceId);
+    UNUSED_PARAM(srcInputDeviceId);
+#endif //OHOS_BUILD_ENABLE_COOPERATE
+    return RET_OK;
+}
+
+int32_t MMIService::StopDeviceCooperate()
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    int32_t ret = delegateTasks_.PostAsyncTask(std::bind(&InputDeviceCooperateSM::StopInputDeviceCooperate,
+        InputDevCooSM));
+    if (ret != RET_OK) {
+        MMI_HILOGE("stop devicve cooperate failed,return %{public}d", ret);
+        return ret;
+    }
+#endif //OHOS_BUILD_ENABLE_COOPERATE
+    return RET_OK;
+}
+
+int32_t MMIService::GetInputDeviceCooperateState(const std::string &deviceId)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    MMI_HILOGI("Enter MMI GetInputDeviceCooperateState deviceId=[%{public}s]",deviceId.c_str());
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputDeviceCooperateSM::GetCooperateState,
+        InputDevCooSM, deviceId));
+    if (ret != RET_OK) {
+        MMI_HILOGE("get devicve cooperate state failed,return %{public}d", ret);
+        return ret;
+    }
+#else
+    UNUSED_PARAM(deviceId);
+#endif //OHOS_BUILD_ENABLE_COOPERATE
     return RET_OK;
 }
 } // namespace MMI
