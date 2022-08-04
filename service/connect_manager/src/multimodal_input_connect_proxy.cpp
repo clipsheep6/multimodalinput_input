@@ -543,7 +543,7 @@ int32_t MultimodalInputConnectProxy::RegisterCooperateEvent(sptr<IEventCooperate
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(REGISTER_COOPERATE_EVENT, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -564,7 +564,7 @@ int32_t MultimodalInputConnectProxy::EnableInputDeviceCooperate(bool enabled)
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(ENABLE_INPUT_DEVICE_COOPERATE, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -587,7 +587,7 @@ int32_t MultimodalInputConnectProxy::StartInputDeviceCooperate(const std::string
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(START_INPUT_DEVICE_COOPERATE, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -607,7 +607,7 @@ int32_t MultimodalInputConnectProxy::StopDeviceCooperate()
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(STOP_DEVICE_COOPERATE, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -628,7 +628,7 @@ int32_t MultimodalInputConnectProxy::GetInputDeviceCooperateState(const std::str
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(GET_INPUT_DEVICE_COOPERATE_STATE, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;

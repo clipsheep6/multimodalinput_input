@@ -41,30 +41,28 @@ int32_t EventCooperateManager::AddCooperateEvent(sptr<IEventCooperate> event)
     return RET_OK;
 }
 
-bool EventCooperateManager::OnCooperateMessage(const CooperateMessages &msg, const std::string &deviceId)
+void EventCooperateManager::OnCooperateMessage(const CooperateMessages &msg, const std::string &deviceId)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lockCooperate_);
     MMI_HILOGI("cooperateEvents_ size:%{public}zu", cooperateEvents_.size());
-    for (auto &event : cooperateEvents_) {
+    for (const auto &event : cooperateEvents_) {
         if (event != nullptr) {
             event->OnCooperateMessage(deviceId, msg);
         }
     }
-    return true;
 }
 
-bool EventCooperateManager::OnCooperateState(bool state)
+void EventCooperateManager::OnCooperateState(bool state)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lockCooperate_);
     MMI_HILOGI("cooperateEvents_ size:%{public}zu", cooperateEvents_.size());
-    for (auto &event : cooperateEvents_) {
+    for (const auto &event : cooperateEvents_) {
         if (event != nullptr) {
             event->OnCooperateState(state);
         }
     }
-    return true;
 }
 } // namespace MMI
 } // namespace OHOS

@@ -69,7 +69,6 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         {IMultimodalInputConnect::INJECT_KEY_EVENT, &MultimodalInputConnectStub::StubInjectKeyEvent},
         {IMultimodalInputConnect::INJECT_POINTER_EVENT, &MultimodalInputConnectStub::StubInjectPointerEvent},
         {IMultimodalInputConnect::SET_ANR_OBSERVER, &MultimodalInputConnectStub::StubSetAnrListener},
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
         {IMultimodalInputConnect::REGISTER_COOPERATE_EVENT, &MultimodalInputConnectStub::StubRegisterCooperateEvent},
         {IMultimodalInputConnect::ENABLE_INPUT_DEVICE_COOPERATE,
             &MultimodalInputConnectStub::StubEnableInputDeviceCooperate},
@@ -78,7 +77,6 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         {IMultimodalInputConnect::STOP_DEVICE_COOPERATE, &MultimodalInputConnectStub::StubStopDeviceCooperate},
         {IMultimodalInputConnect::GET_INPUT_DEVICE_COOPERATE_STATE,
             &MultimodalInputConnectStub::StubGetInputDeviceCooperateState},
-#endif // OHOS_BUILD_ENABLE_COOPERATE
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {

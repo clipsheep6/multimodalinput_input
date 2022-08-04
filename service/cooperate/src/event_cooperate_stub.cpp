@@ -33,12 +33,6 @@ int32_t EventCooperateStub::OnRemoteRequest(
     uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
     CALL_DEBUG_ENTER;
-
-    int32_t pid = GetCallingPid();
-    TimeCostChk chk("IPC-OnRemoteRequest", "overtime 300(us)", MAX_OVER_TIME, pid,
-        static_cast<int64_t>(code));
-    MMI_HILOGD("RemoteRequest code:%{public}d tid:%{public}" PRIu64 " pid:%{public}d", code, GetThisThreadId(), pid);
-
     std::u16string descriptor = data.ReadInterfaceToken();
     if (descriptor != IEventCooperate::GetDescriptor()) {
         MMI_HILOGE("Get unexpect descriptor:%{public}s", Str16ToStr8(descriptor).c_str());
@@ -48,12 +42,10 @@ int32_t EventCooperateStub::OnRemoteRequest(
         {IEventCooperate::ON_COOPERATE_MESSAGE_EVENT, &EventCooperateStub::StubOnCooperateMessage},
         {IEventCooperate::ON_COOPERATE_STATE_EVENT, &EventCooperateStub::StubOnCooperateState},
     };
-
     auto it = mapCooperateFunc.find(code);
     if (it != mapCooperateFunc.end()) {
         return (this->*it->second)(data, reply);
     }
-    MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 

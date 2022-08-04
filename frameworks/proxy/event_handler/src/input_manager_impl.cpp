@@ -750,6 +750,7 @@ int32_t InputManagerImpl::RegisterCooperateListener(std::function<void(std::stri
     eventCooperateService_->SetCooperateMessageListener(listener);
     return MultimodalInputConnMgr->RegisterCooperateEvent(eventCooperateService_);
 #else
+    MMI_HILOGW("Cooperate does not support");
     UNUSED_PARAM(listener);
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
@@ -763,6 +764,7 @@ int32_t InputManagerImpl::UnregisterCooperateListener()
     CHKPR(eventCooperateService_, RET_ERR);
     return eventCooperateService_->SetCooperateMessageListener(nullptr);
 #else
+    MMI_HILOGW("Cooperate does not support");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 }
@@ -774,6 +776,7 @@ int32_t InputManagerImpl::EnableInputDeviceCooperate(bool enabled)
     std::lock_guard<std::mutex> guard(mtx_);
     return MultimodalInputConnMgr->EnableInputDeviceCooperate(enabled);
 #else
+    MMI_HILOGW("Cooperate does not support");
     UNUSED_PARAM(enabled);
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
@@ -786,6 +789,7 @@ int32_t InputManagerImpl::StartInputDeviceCooperate(const std::string &sinkDevic
     std::lock_guard<std::mutex> guard(mtx_);
     return MultimodalInputConnMgr->StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId);
 #else
+    MMI_HILOGW("Cooperate does not support");
     UNUSED_PARAM(sinkDeviceId);
     UNUSED_PARAM(srcInputDeviceId);
     return ERROR_UNSUPPORT;
@@ -799,6 +803,7 @@ int32_t InputManagerImpl::StopDeviceCooperate()
     std::lock_guard<std::mutex> guard(mtx_);
     return MultimodalInputConnMgr->StopDeviceCooperate();
 #else
+    MMI_HILOGW("Cooperate does not support");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 }
@@ -816,6 +821,7 @@ int32_t InputManagerImpl::GetInputDeviceCooperateState(const std::string &device
     eventCooperateService_->SetCooperateStateCallback(callback);
     return MultimodalInputConnMgr->GetInputDeviceCooperateState(deviceId);
 #else
+    MMI_HILOGW("Cooperate does not support");
     UNUSED_PARAM(deviceId);
     UNUSED_PARAM(callback);
     return ERROR_UNSUPPORT;

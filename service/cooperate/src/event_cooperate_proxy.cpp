@@ -28,12 +28,10 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Event
 
 EventCooperateProxy::EventCooperateProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IEventCooperate>(impl)
 {
-    MMI_HILOGI("EventCooperateProxy()");
 }
 
 EventCooperateProxy::~EventCooperateProxy()
 {
-    MMI_HILOGI("~EventCooperateProxy()");
 }
 
 bool EventCooperateProxy::OnCooperateMessage(const std::string &deviceId, const CooperateMessages &msg)

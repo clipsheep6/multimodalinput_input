@@ -27,7 +27,6 @@ public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.multimodalinput.IEventCooperate");
     virtual bool OnCooperateMessage(const std::string &deviceId, const CooperateMessages &msg) = 0;
     virtual bool OnCooperateState(bool state) = 0;
-
     enum {
         ON_COOPERATE_MESSAGE_EVENT = 0,
         ON_COOPERATE_STATE_EVENT = 1,

@@ -24,8 +24,8 @@
 #include "net_packet.h"
 
 #include "display_info.h"
-#include "event_filter_service.h"
 #include "event_cooperate_service.h"
+#include "event_filter_service.h"
 
 #include "if_mmi_client.h"
 #include "input_device_impl.h"
@@ -130,9 +130,9 @@ private:
     void OnThread();
 
 private:
-    sptr<EventFilterService> eventFilterService_ {nullptr};
+    sptr<EventFilterService> eventFilterService_ { nullptr };
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    sptr<EventCooperateService> eventCooperateService_ {nullptr};
+    sptr<EventCooperateService> eventCooperateService_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     std::shared_ptr<IInputEventConsumer> consumer_ = nullptr;
     std::vector<std::shared_ptr<IAnrObserver>> anrObservers_;

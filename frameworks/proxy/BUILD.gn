@@ -38,7 +38,7 @@ config("libmmi_public_client_config") {
     "//foundation/multimodalinput/input/util/common/include",
   ]
 
-  if (input_feature_input_cooperate) {
+  if (input_feature_input_cooperation) {
     include_dirs +=
         [ "//foundation/multimodalinput/input/service/cooperate/include" ]
   }
@@ -136,7 +136,7 @@ ohos_shared_library("libmmi-client") {
     sources += [ "event_handler/src/key_event_input_subscribe_manager.cpp" ]
   }
 
-  if (input_feature_input_cooperate) {
+  if (input_feature_input_cooperation) {
     defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
   }
 
@@ -147,7 +147,7 @@ ohos_shared_library("libmmi-client") {
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_config",
   ]
 
-  if (input_feature_input_cooperate) {
+  if (input_feature_input_cooperation) {
     configs += [ "//foundation/multimodalinput/input/service/cooperate:mmi_event_cooperate_config" ]
   }
 
@@ -160,7 +160,7 @@ ohos_shared_library("libmmi-client") {
     "//foundation/multimodalinput/input/util:libmmi-util",
   ]
 
-  if (input_feature_input_cooperate) {
+  if (input_feature_input_cooperation) {
     deps += [ "//foundation/multimodalinput/input/service/cooperate:mmi_event_cooperate_service" ]
   }
 
@@ -291,7 +291,7 @@ ohos_unittest("InputManagerTest") {
   if (input_feature_monitor) {
     defines += [ "OHOS_BUILD_ENABLE_MONITOR" ]
   }
-  if (input_feature_input_cooperate) {
+  if (input_feature_input_cooperation) {
     defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
   }
   sources = [

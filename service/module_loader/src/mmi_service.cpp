@@ -984,7 +984,6 @@ int32_t MMIService::RegisterCooperateEvent(sptr<IEventCooperate> event)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    MMI_HILOGE("Enter MMI RegisterCooperateEvent");
     EventCooperateMgr->AddCooperateEvent(event);
 #else
     UNUSED_PARAM(event);

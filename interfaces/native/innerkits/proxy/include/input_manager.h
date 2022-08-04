@@ -299,50 +299,50 @@ public:
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
 
     /**
-     * @brief Register input device cooperate event listening.
-     * @param listener Listener for the input device cooperate event.
-     * @return Returns **0** if success; returns a non-0 value otherwise.
+     * @brief 注册键鼠穿越管理事件监听。
+     * @param listener 穿越管理事件监听回调。
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 9
      */
     int32_t RegisterCooperateListener(std::function<void(std::string, CooperateMessages)> listener);
 
     /**
-     * @brief Unregister input device cooperate event listening.
-     * @param listener Listener for the input device cooperate event.
-     * @return Returns **0** if success; returns a non-0 value otherwise.
+     * @brief 注销键鼠穿越管理事件监听。
+     * @param listener 事件监听回调.
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 9
      */
     int32_t UnregisterCooperateListener();
 
     /**
-     * @brief Enable or disable input device cooperate.
-     * @param enabled The input device cooperate enable or disable.
-     * @return Returns **0** if success; returns a non-0 value otherwise.
+     * @brief 开启/关闭键鼠穿越管理接口。
+     * @param enabled 开启/关闭。
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 9
      */
     int32_t EnableInputDeviceCooperate(bool enabled);
 
     /**
-     * @brief Start input device cooperate.
-     * @param sinkDeviceId Keyboard and mouse through the target device id.
-     * @param srcInputDeviceId Keyboard and mouse through to enter peripheral identifier.
-     * @return Returns **0** if success; returns a non-0 value otherwise.
+     * @brief 启动跨设备键鼠穿越。
+     * @param sinkDeviceId 键鼠穿越目标设备描述符（networkID）
+     * @param srcInputDeviceId 键鼠穿越待穿越输入外设标识符（设备ID句柄）
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 9
      */
     int32_t StartInputDeviceCooperate(const std::string &sinkDeviceId, int32_t srcInputDeviceId);
 
     /**
-     * @brief Stop input device cooperate.
-     * @return Returns **0** if success; returns a non-0 value otherwise.
+     * @brief 停止跨设备键鼠穿越。
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 9
      */
     int32_t StopDeviceCooperate();
 
     /**
-     * @brief Get the crossing status of the specified device.
-     * @param deviceId The specified device id.
-     * @param callback The specified device status callback.
-     * @return Returns **0** if success; returns a non-0 value otherwise.
+     * @brief 获取指定设备键鼠穿越状态。
+     * @param deviceId 指定设备描述符。
+     * @param callback 穿越管理设备状态回调。
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 9
      */
     int32_t GetInputDeviceCooperateState(const std::string &deviceId, std::function<void(bool)> callback);

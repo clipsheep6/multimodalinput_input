@@ -16,14 +16,14 @@
 #ifndef EVENT_COOPERATE_WRAP_H
 #define EVENT_COOPERATE_WRAP_H
 
-#include <mutex>
 #include <list>
+#include <mutex>
 
 #include "nocopyable.h"
 #include "singleton.h"
 
-#include "i_event_cooperate.h"
 #include "cooperate_messages.h"
+#include "i_event_cooperate.h"
 
 namespace OHOS {
 namespace MMI {
@@ -34,8 +34,8 @@ public:
     ~EventCooperateManager();
 
     int32_t AddCooperateEvent(sptr<IEventCooperate> event);
-    bool OnCooperateMessage(const CooperateMessages &msg, const std::string &deviceId = "");
-    bool OnCooperateState(bool state);
+    void OnCooperateMessage(const CooperateMessages &msg, const std::string &deviceId = "");
+    void OnCooperateState(bool state);
 
 private:
     std::mutex lockCooperate_;

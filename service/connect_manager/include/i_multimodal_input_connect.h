@@ -18,12 +18,12 @@
 
 #include "iremote_broker.h"
 
+#include "i_event_cooperate.h"
 #include "i_event_filter.h"
 #include "input_handler_type.h"
 #include "key_event.h"
 #include "key_option.h"
 #include "pointer_event.h"
-#include "i_event_cooperate.h"
 
 namespace OHOS {
 namespace MMI {
