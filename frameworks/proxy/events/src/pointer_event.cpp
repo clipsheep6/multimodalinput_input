@@ -266,6 +266,17 @@ void PointerEvent::PointerItem::SetTargetWindowId(int32_t windowId)
     targetWindowId_ = windowId;
 }
 
+RawData PointerEvent::PointerItem::GetRawData() const
+{
+    return rawData_;
+}
+
+void PointerEvent::PointerItem::SetRawData(const RawData& rawData)
+{
+    rawData_ = rawData;
+}
+
+
 bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
 {
     return (
@@ -290,7 +301,8 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         out.WriteInt32(longAxis_) &&
         out.WriteInt32(shortAxis_) &&
         out.WriteInt32(toolType_) &&
-        out.WriteInt32(deviceId_)
+        out.WriteInt32(deviceId_)&&
+        rawData_.WriteToParcel(out)
     );
 }
 
@@ -318,7 +330,8 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         in.ReadInt32(longAxis_) &&
         in.ReadInt32(shortAxis_) &&
         in.ReadInt32(toolType_) &&
-        in.ReadInt32(deviceId_)
+        in.ReadInt32(deviceId_)&& 
+        rawData_.ReadFromParcel(in)
     );
 }
 
@@ -326,10 +339,10 @@ PointerEvent::PointerEvent(int32_t eventType) : InputEvent(eventType) {}
 
 PointerEvent::PointerEvent(const PointerEvent& other)
     : InputEvent(other), pointerId_(other.pointerId_), pointers_(other.pointers_),
-      pressedButtons_(other.pressedButtons_), sourceType_(other.sourceType_),
-      pointerAction_(other.pointerAction_), buttonId_(other.buttonId_),
-      axes_(other.axes_), axisValues_(other.axisValues_),
-      pressedKeys_(other.pressedKeys_) {}
+    pressedButtons_(other.pressedButtons_), sourceType_(other.sourceType_),
+    pointerAction_(other.pointerAction_), buttonId_(other.buttonId_),
+    axes_(other.axes_), axisValues_(other.axisValues_),
+    pressedKeys_(other.pressedKeys_) {}
 
 PointerEvent::~PointerEvent() {}
 

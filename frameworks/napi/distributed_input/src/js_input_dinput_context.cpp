@@ -82,20 +82,14 @@ napi_value JsInputDinputContext::JsConstructor(napi_env env, napi_callback_info 
     napi_value thisVar = nullptr;
     void *data = nullptr;
     CHKRP(env, napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data), GET_CB_INFO);
+    CHKPP(data);
     JsInputDinputContext *jsContext = new (std::nothrow) JsInputDinputContext();
     CHKPP(jsContext);
-    CHKPP(data);
     napi_status status = napi_wrap(env, thisVar, jsContext, [](napi_env env, void* data, void* hin) {
         MMI_HILOGI("jsvm ends");
-        CHKPL(data);
         auto context = static_cast<JsInputDinputContext*>(data);
         delete context;
     }, nullptr, nullptr);
-    if (status != napi_ok) {
-        delete jsContext;
-        THROWERR(env, "Failed to wrap native instance");
-        return nullptr;
-    }
     return thisVar;
 }
 
