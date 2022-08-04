@@ -38,8 +38,9 @@ config("libmmi_public_client_config") {
     "//foundation/multimodalinput/input/util/common/include",
   ]
 
-  if(input_feature_input_cooperate) {
-    include_dirs += [ "//foundation/multimodalinput/input/service/cooperate/include" ]
+  if (input_feature_input_cooperate) {
+    include_dirs +=
+        [ "//foundation/multimodalinput/input/service/cooperate/include" ]
   }
 }
 
@@ -67,7 +68,7 @@ ohos_source_set("libmmi-common") {
     "events/src/pointer_event.cpp",
   ]
 
-  defines = [ "OHOS_BUILD" ]
+  defines = []
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
@@ -99,7 +100,7 @@ ohos_shared_library("libmmi-client") {
     "module_loader/src/mmi_fd_listener.cpp",
   ]
 
-  defines = [ "OHOS_BUILD" ]
+  defines = []
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
@@ -135,7 +136,7 @@ ohos_shared_library("libmmi-client") {
     sources += [ "event_handler/src/key_event_input_subscribe_manager.cpp" ]
   }
 
-  if(input_feature_input_cooperate) {
+  if (input_feature_input_cooperate) {
     defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
   }
 
@@ -146,7 +147,7 @@ ohos_shared_library("libmmi-client") {
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_config",
   ]
 
-  if(input_feature_input_cooperate) {
+  if (input_feature_input_cooperate) {
     configs += [ "//foundation/multimodalinput/input/service/cooperate:mmi_event_cooperate_config" ]
   }
 
@@ -159,7 +160,7 @@ ohos_shared_library("libmmi-client") {
     "//foundation/multimodalinput/input/util:libmmi-util",
   ]
 
-  if(input_feature_input_cooperate) {
+  if (input_feature_input_cooperate) {
     deps += [ "//foundation/multimodalinput/input/service/cooperate:mmi_event_cooperate_service" ]
   }
 
@@ -182,7 +183,7 @@ ohos_unittest("ut-mmi-proxy-out") {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
-  defines = [ "OHOS_BUILD" ]
+  defines = []
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
@@ -221,7 +222,7 @@ ohos_unittest("KeyEventTest") {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
-  defines = [ "OHOS_BUILD" ]
+  defines = []
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
@@ -257,7 +258,7 @@ ohos_unittest("InputManagerTest") {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
-  defines = [ "OHOS_BUILD" ]
+  defines = []
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
@@ -328,7 +329,7 @@ ohos_unittest("InputManagerManualTest") {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
-  defines = [ "OHOS_BUILD" ]
+  defines = []
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
@@ -371,7 +372,7 @@ ohos_unittest("PointerEventTest") {
     include_dirs = [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
-  defines = [ "OHOS_BUILD" ]
+  defines = []
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
