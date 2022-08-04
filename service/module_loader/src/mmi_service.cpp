@@ -980,5 +980,39 @@ int32_t MMIService::Dump(int32_t fd, const std::vector<std::u16string> &args)
     MMIEventDump->ParseCommand(fd, argList);
     return RET_OK;
 }
+
+int32_t MMIService::StartRemoteCooperate(const std::string& remoteDeviceId)
+{
+    CALL_DEBUG_ENTER;
+    return RET_OK;
+}
+
+int32_t MMIService::StartRemoteCooperateRes(bool isSucess, int32_t xPercent, int32_t yPercent)
+{
+    CALL_DEBUG_ENTER;
+    UNUSED_PARAM(isSucess);
+    UNUSED_PARAM(xPercent);
+    UNUSED_PARAM(yPercent);
+    return RET_OK;
+}
+
+int32_t MMIService::StopRemoteCooperate()
+{
+    CALL_DEBUG_ENTER;
+    return RET_OK;
+}
+
+int32_t MMIService::StopRemoteCooperateRes(bool isSucess)
+{
+    CALL_DEBUG_ENTER;
+    UNUSED_PARAM(isSucess);
+    return RET_OK;
+}
+int32_t MMIService::StartCooperateOtherRes(const std::string& srcNetworkId)
+{
+    CALL_DEBUG_ENTER;
+    UNUSED_PARAM(isSucess);
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

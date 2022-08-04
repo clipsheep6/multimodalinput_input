@@ -68,7 +68,14 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         {IMultimodalInputConnect::MOVE_MOUSE, &MultimodalInputConnectStub::StubMoveMouseEvent},
         {IMultimodalInputConnect::INJECT_KEY_EVENT, &MultimodalInputConnectStub::StubInjectKeyEvent},
         {IMultimodalInputConnect::INJECT_POINTER_EVENT, &MultimodalInputConnectStub::StubInjectPointerEvent},
-        {IMultimodalInputConnect::SET_ANR_OBSERVER, &MultimodalInputConnectStub::StubSetAnrListener}
+        {IMultimodalInputConnect::SET_ANR_OBSERVER, &MultimodalInputConnectStub::StubSetAnrListener},
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+        {IMultimodalInputConnect::REMOTE_COOPERATE_START, &MultimodalInputConnectStub::StubStartRemoteCooperate},
+        {IMultimodalInputConnect::REMOTE_COOPERATE_START_RES, &MultimodalInputConnectStub::StubStartRemoteCooperateRes},
+        {IMultimodalInputConnect::REMOTE_COOPERATE_STOP, &MultimodalInputConnectStub::StubStopRemoteCooperate},
+        {IMultimodalInputConnect::REMOTE_COOPERATE_STOP_RES, &MultimodalInputConnectStub::StubStopRemoteCooperateRes}
+        {IMultimodalInputConnect::REMOTE_COOPERATE_STOP_OTHER_RES, &MultimodalInputConnectStub::StubStartCooperateOtherRes}
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -486,6 +493,93 @@ int32_t MultimodalInputConnectStub::StubSetAnrListener(MessageParcel& data, Mess
     int32_t ret = SetAnrObserver();
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetAnrObserver failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubStartRemoteCooperate(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    std::string remoteDeviceId;
+    READSTRING(data, remoteDeviceId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = StartRemoteCooperate(remoteDeviceId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call StartRemoteCooperate failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubStartRemoteCooperateRes(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    bool isSucess;
+    READBOOL(data, isSucess, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t xPercent;
+    READINT32(data, xPercent, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t yPercent;
+    READINT32(data, yPercent, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = StartRemoteCooperateRes(isSucess, xPercent, yPercent);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call StartRemoteCooperateRes failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubStopRemoteCooperate(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t ret = StopRemoteCooperate();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call StopRemoteCooperate failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubStopRemoteCooperateRes(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    bool isSucess;
+    READBOOL(data, isSucess, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = StopRemoteCooperateRes(isSucess);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call StopRemoteCooperateRes failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubStartCooperateOtherRes(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    std::string otherNetworkId;
+    READSTRING(data, otherNetworkId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = StartCooperateOtherRes(otherNetworkId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call StopRemoteCooperateRes failed ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
