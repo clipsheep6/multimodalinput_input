@@ -1021,7 +1021,7 @@ int32_t MMIService::StartInputDeviceCooperate(const std::string &sinkDeviceId, i
 #else
     UNUSED_PARAM(sinkDeviceId);
     UNUSED_PARAM(srcInputDeviceId);
-#endif //OHOS_BUILD_ENABLE_COOPERATE
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     return RET_OK;
 }
 
