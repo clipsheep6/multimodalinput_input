@@ -931,7 +931,7 @@ void InputManagerCommand::ShowUsage()
     std::cout << "commands for keyboard:                                        " << std::endl;
     std::cout << "-d <key>                   --down   <key>     -press down a key" << std::endl;
     std::cout << "-u <key>                   --up     <key>     -release a key   " << std::endl;
-    std::cout << "-l <key> [long press time] --long_press <key> [long press time] -press and hold the key"; 
+    std::cout << "-l <key> [long press time] --long_press <key> [long press time] -press and hold the key";
     std::cout << std::endl;
     std::cout << "-i <time>                  --interval <time>  -the program interval for the (time) milliseconds";
     std::cout << std::endl;
