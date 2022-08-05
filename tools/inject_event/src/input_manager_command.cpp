@@ -936,7 +936,7 @@ void InputManagerCommand::ShowUsage()
     std::cout << "-i <time>                  --interval <time>  -the program interval for the (time) milliseconds";
     std::cout << std::endl;
     std::cout << std::endl;
-    std::cout << "-T  --touch                                                    " << std::endl;
+    std::cout << "-T  --touch                                                   " << std::endl;
     std::cout << "commands for touch:                                           " << std::endl;
     std::cout << "-d <dx1> <dy1>             --down   <dx1> <dy1> -press down a position  dx1 dy1, " << std::endl;
     std::cout << "-u <dx1> <dy1>             --up     <dx1> <dy1> -release a position dx1 dy1, "     << std::endl;
