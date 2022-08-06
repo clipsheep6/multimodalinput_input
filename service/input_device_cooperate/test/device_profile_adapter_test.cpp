@@ -26,20 +26,20 @@ namespace OHOS {
 namespace MMI {
 using namespace testing::ext;
 
-class DPAdapterTest : public testing::Test {
+class DeviceProfileAdapterTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
 };
 
-HWTEST_F(DPAdapterTest, UpdateCrossingSwitchState001, TestSize.Level1)
+HWTEST_F(DeviceProfileAdapterTest, UpdateCrossingSwitchState001, TestSize.Level1)
 {
     int32_t rest = DProfileAdapter->UpdateCrossingSwitchState(true);
     std::cout << "rest: " << rest << std::endl;
     EXPECT_EQ(rest, 0);
 }
 
-HWTEST_F(DPAdapterTest, GetCrossingSwitchState001, TestSize.Level1)
+HWTEST_F(DeviceProfileAdapterTest, GetCrossingSwitchState001, TestSize.Level1)
 {
     std::string deviceId = "";
     bool state = false;
@@ -48,7 +48,7 @@ HWTEST_F(DPAdapterTest, GetCrossingSwitchState001, TestSize.Level1)
     EXPECT_EQ(state, true);
 }
 
-HWTEST_F(DPAdapterTest, RegisterCrossingStateListener001, TestSize.Level1)
+HWTEST_F(DeviceProfileAdapterTest, RegisterCrossingStateListener001, TestSize.Level1)
 {
     NodeBasicInfo *info = NULL;
     int32_t infoNum = 0;
