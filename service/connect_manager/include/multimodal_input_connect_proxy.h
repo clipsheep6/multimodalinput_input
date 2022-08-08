@@ -53,6 +53,13 @@ public:
     virtual int32_t UnsubscribeKeyEvent(int32_t subscribeId) override;
     virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
     virtual int32_t SetAnrObserver() override;
+    virtual int32_t SendDisplayInfo(const std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo) override;
+
+private:
+    int32_t WritewindowsVecToParcel(const std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo, MessageParcel& data);
+    int32_t WriteDisplayVecToParcel(const std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo, MessageParcel& data);
+    int32_t WriteDisplayInfoToParcel(const std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo, MessageParcel& data);
+
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;
 };

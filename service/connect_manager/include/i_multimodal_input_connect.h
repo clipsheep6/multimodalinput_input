@@ -23,6 +23,7 @@
 #include "key_event.h"
 #include "key_option.h"
 #include "pointer_event.h"
+#include "display_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -54,6 +55,7 @@ public:
     virtual int32_t UnsubscribeKeyEvent(int32_t subscribeId) = 0;
     virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual int32_t SetAnrObserver() = 0;
+    virtual int32_t SendDisplayInfo(const std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo) = 0;
     enum {
         ALLOC_SOCKET_FD = 0,
         ADD_INPUT_EVENT_FILTER = 1,
@@ -75,7 +77,8 @@ public:
         UNREGISTER_DEV_MONITOR = 19,
         GET_KEYBOARD_TYPE = 20,
         SET_POINTER_SPEED = 21,
-        GET_POINTER_SPEED = 22
+        GET_POINTER_SPEED = 22,
+        DISPLAY_INFO = 23
     };
 
     enum {

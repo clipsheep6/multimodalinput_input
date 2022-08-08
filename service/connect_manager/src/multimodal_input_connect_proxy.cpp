@@ -524,5 +524,86 @@ int32_t MultimodalInputConnectProxy::SetAnrObserver()
     }
     return RET_OK;
 }
+
+int32_t MultimodalInputConnectProxy::WritewindowsVecToParcel(const std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo, MessageParcel& data)
+{
+    int32_t windows_num = static_cast<int32_t>(pDisplayGroupInfo->windowsInfo.size());
+    WRITEINT32(data, windows_num, ERR_INVALID_VALUE);
+    for (const auto& item : pDisplayGroupInfo->windowsInfo) {
+        WRITEINT32(data, item.id, ERR_INVALID_VALUE);
+        WRITEINT32(data, item.pid, ERR_INVALID_VALUE);
+        WRITEINT32(data, item.uid, ERR_INVALID_VALUE);
+        WRITEINT32(data, item.area.x, ERR_INVALID_VALUE);
+        WRITEINT32(data, item.area.y, ERR_INVALID_VALUE);
+        WRITEINT32(data, item.area.width, ERR_INVALID_VALUE);
+        WRITEINT32(data, item.area.height, ERR_INVALID_VALUE);
+        WRITEINT32(data, static_cast<int32_t>(item.defaultHotAreas.size()));
+        for (const auto& item_d : item.defaultHotAreas) {
+            WRITEINT32(data, item_d.x, ERR_INVALID_VALUE);
+            WRITEINT32(data, item_d.y, ERR_INVALID_VALUE);
+            WRITEINT32(data, item_d.width, ERR_INVALID_VALUE);
+            WRITEINT32(data, item_d.height, ERR_INVALID_VALUE);
+        }
+        WRITEINT32(data, static_cast<int32_t>(item.pointerHotAreas.size()));
+        for (const auto& item_p : item.pointerHotAreas) {
+            WRITEINT32(data, item_p.x, ERR_INVALID_VALUE);
+            WRITEINT32(data, item_p.y, ERR_INVALID_VALUE);
+            WRITEINT32(data, item_p.width, ERR_INVALID_VALUE);
+            WRITEINT32(data, item_p.height, ERR_INVALID_VALUE);
+        }
+        WRITEINT32(data, item.agentWindowId, ERR_INVALID_VALUE);
+        WRITEUINT32(data, item.flags, ERR_INVALID_VALUE);
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::WriteDisplayVecToParcel(const std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo, MessageParcel& data)
+{
+    int32_t display_num = static_cast<int32_t>(pDisplayGroupInfo->displaysInfo.size());
+    WRITEINT32(data, display_num, ERR_INVALID_VALUE);
+    for (const auto& item : pDisplayGroupInfo->displaysInfo) {
+        WRITEINT32(data, item.id, ERR_INVALID_VALUE);
+        WRITEINT32(data, item.x, ERR_INVALID_VALUE);
+        WRITEINT32(data, item.y, ERR_INVALID_VALUE);
+        WRITEINT32(data, item.width, ERR_INVALID_VALUE);
+        WRITEINT32(data, item.height, ERR_INVALID_VALUE);
+        WRITESTRING(data, item.name, ERR_INVALID_VALUE);
+        WRITESTRING(data, item.uniq, ERR_INVALID_VALUE);
+        WRITEINT32(data, static_cast<uint32_t>(item.direction), ERR_INVALID_VALUE);
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::WriteDisplayInfoToParcel(const std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo, MessageParcel& data)
+{
+    WRITEINT32(data, pDisplayGroupInfo->width, ERR_INVALID_VALUE);
+    WRITEINT32(data, pDisplayGroupInfo->height, ERR_INVALID_VALUE);
+    WRITEINT32(data, pDisplayGroupInfo->focusWindowId, ERR_INVALID_VALUE);
+    (void)WritewindowsVecToParcel(pDisplayGroupInfo, data);
+    (void)WriteDisplayVecToParcel(pDisplayGroupInfo, data);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::SendDisplayInfo(const std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    (void)WriteDisplayInfoToParcel(pDisplayGroupInfo, data);
+
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(DISPLAY_INFO, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

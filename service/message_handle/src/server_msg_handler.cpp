@@ -56,7 +56,6 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
 #endif
     MsgCallback funs[] = {
         {MmiMessageId::MARK_PROCESS, MsgCallbackBind2(&ServerMsgHandler::MarkProcessed, this)},
-        {MmiMessageId::DISPLAY_INFO, MsgCallbackBind2(&ServerMsgHandler::OnDisplayInfo, this)},
 #ifdef OHOS_BUILD_MMI_DEBUG
         {MmiMessageId::BIGPACKET_TEST, MsgCallbackBind2(&ServerMsgHandler::OnBigPacketTest, this)},
 #endif // OHOS_BUILD_MMI_DEBUG
@@ -189,44 +188,11 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
-int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
+int32_t ServerMsgHandler::OnDisplayInfo(const std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(sess, ERROR_NULL_POINTER);
-    DisplayGroupInfo displayGroupInfo;
-    pkt >> displayGroupInfo.width >> displayGroupInfo.height >> displayGroupInfo.focusWindowId;
-    uint32_t num = 0;
-    pkt >> num;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read display info failed");
-        return RET_ERR;
-    }
-    for (uint32_t i = 0; i < num; i++) {
-        WindowInfo info;
-        pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
-            >> info.pointerHotAreas >> info.agentWindowId >> info.flags;
-        displayGroupInfo.windowsInfo.push_back(info);
-        if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read display info failed");
-        return RET_ERR;
-    }
-    }
-    pkt >> num;
-    for (uint32_t i = 0; i < num; i++) {
-        DisplayInfo info;
-        pkt >> info.id >> info.x >> info.y >> info.width >> info.height
-            >> info.name >> info.uniq >> info.direction;
-        displayGroupInfo.displaysInfo.push_back(info);
-        if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read display info failed");
-        return RET_ERR;
-    }
-    }
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read display info failed");
-        return RET_ERR;
-    }
-    InputWindowsManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo);
+    CHKPR(pDisplayGroupInfo, ERROR_NULL_POINTER);
+    InputWindowsManager::GetInstance()->UpdateDisplayInfo(*pDisplayGroupInfo);
     return RET_OK;
 }
 

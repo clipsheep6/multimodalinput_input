@@ -71,6 +71,7 @@ public:
     virtual int32_t UnsubscribeKeyEvent(int32_t subscribeId) override;
     virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
     virtual int32_t SetAnrObserver() override;
+    virtual int32_t SendDisplayInfo(const std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo) override;
 
 #ifdef OHOS_RSS_CLIENT
     virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
@@ -106,6 +107,7 @@ protected:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+    int32_t CheckSendDisplayInfo(const std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo);
     bool InitLibinputService();
     bool InitService();
     bool InitSignalHandler();

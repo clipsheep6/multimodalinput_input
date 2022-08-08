@@ -18,6 +18,7 @@
 
 #include "nocopyable.h"
 
+#include "display_info.h"
 #include "event_dispatch.h"
 #include "input_handler_type.h"
 #include "key_option.h"
@@ -55,13 +56,13 @@ public:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t OnInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+    int32_t OnDisplayInfo(const std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo);
 protected:
     int32_t MarkProcessed(SessionPtr sess, NetPacket& pkt);
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
 #ifdef OHOS_BUILD_HDF
     int32_t OnHdiInject(SessionPtr sess, NetPacket& pkt);
 #endif
-    int32_t OnDisplayInfo(SessionPtr sess, NetPacket& pkt);
 #ifdef OHOS_BUILD_MMI_DEBUG
     int32_t OnBigPacketTest(SessionPtr sess, NetPacket& pkt);
 #endif // OHOS_BUILD_MMI_DEBUG

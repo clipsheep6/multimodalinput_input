@@ -58,6 +58,12 @@ protected:
     int32_t StubSetAnrListener(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPointerSpeed(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetPointerSpeed(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSendDisplayInfo(MessageParcel& data, MessageParcel& reply);
+
+private:
+    int32_t ReadwindowsVecToParcel(MessageParcel& data, DisplayGroupInfo& displayGroupInfo);
+    int32_t ReadDisplayVecToParcel(MessageParcel& data, DisplayGroupInfo& displayGroupInfo);
+    int32_t ReadDisplayInfoToParcel(MessageParcel& data, DisplayGroupInfo& displayGroupInfo);
 };
 } // namespace MMI
 } // namespace OHOS

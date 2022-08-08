@@ -816,6 +816,24 @@ int32_t MMIService::UnsubscribeKeyEvent(int32_t subscribeId)
     return RET_OK;
 }
 
+int32_t MMIService::CheckSendDisplayInfo(const std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo)
+{
+    CHKPR(pDisplayGroupInfo, ERROR_NULL_POINTER);
+    return sMsgHandler_.OnDisplayInfo(pDisplayGroupInfo);
+}
+
+int32_t MMIService::SendDisplayInfo(const std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&MMIService::CheckSendDisplayInfo, this, pDisplayGroupInfo));
+    if (ret != RET_OK) {
+        MMI_HILOGE("CheckSendDisplayInfo failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 int32_t MMIService::SetAnrObserver()
 {
     CALL_DEBUG_ENTER;
