@@ -40,7 +40,6 @@ namespace OHOS {
 namespace MMI {
 PointerDrawingManager::PointerDrawingManager()
 {
-
     mouseIcons_[MOUSE_ICON::DEFAULT] = IMAGE_POINTER_DEFAULT_PATH + "Default.png";
     mouseIcons_[MOUSE_ICON::EAST] = IMAGE_POINTER_DEFAULT_PATH + "East.png";
     mouseIcons_[MOUSE_ICON::WEST] = IMAGE_POINTER_DEFAULT_PATH + "West.png";
