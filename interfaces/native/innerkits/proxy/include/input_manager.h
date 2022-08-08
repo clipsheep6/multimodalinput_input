@@ -265,6 +265,9 @@ public:
      */
     bool IsPointerVisible();
 
+    int32_t SetPointerStyle(int32_t windowId, int32_t pointerStyle);
+    int32_t GetPointerStyle(int32_t windowId, int32_t &pointerStyle);
+
     /**
      * @brief 设置鼠标移动速度(取值范围1到20)。
      * @param speed 客户端设置的鼠标移动速度.

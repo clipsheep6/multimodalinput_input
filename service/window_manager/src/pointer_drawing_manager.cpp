@@ -31,47 +31,124 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerDrawingManager" };
-const std::string IMAGE_POINTER_JPEG_PATH = "/system/etc/multimodalinput/mouse_icon/angle.png";
+const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
 } // namespace
 } // namespace MMI
 } // namespace OHOS
 
 namespace OHOS {
 namespace MMI {
-void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY)
+PointerDrawingManager::PointerDrawingManager()
+{
+
+    mouseIcons_[MOUSE_ICON::DEFAULT] = IMAGE_POINTER_DEFAULT_PATH + "Default.png";
+    mouseIcons_[MOUSE_ICON::EAST] = IMAGE_POINTER_DEFAULT_PATH + "East.png";
+    mouseIcons_[MOUSE_ICON::WEST] = IMAGE_POINTER_DEFAULT_PATH + "West.png";
+    mouseIcons_[MOUSE_ICON::SOUTH] = IMAGE_POINTER_DEFAULT_PATH + "South.png";
+    mouseIcons_[MOUSE_ICON::NORTH] = IMAGE_POINTER_DEFAULT_PATH + "North.png";
+    mouseIcons_[MOUSE_ICON::WEST_EAST] = IMAGE_POINTER_DEFAULT_PATH + "westEast.png";
+    mouseIcons_[MOUSE_ICON::NORTH_SOUTH] = IMAGE_POINTER_DEFAULT_PATH + "northSouth.png";
+    mouseIcons_[MOUSE_ICON::NORTH_EAST] = IMAGE_POINTER_DEFAULT_PATH + "northEast.png";
+    mouseIcons_[MOUSE_ICON::NORTH_WEST] = IMAGE_POINTER_DEFAULT_PATH + "northWest.png";
+    mouseIcons_[MOUSE_ICON::SOUTH_EAST] = IMAGE_POINTER_DEFAULT_PATH + "southEast.png";
+    mouseIcons_[MOUSE_ICON::SOUTH_WEST] = IMAGE_POINTER_DEFAULT_PATH + "southWest.png";
+    mouseIcons_[MOUSE_ICON::NORTH_EAST_SOUTH_WEST] = IMAGE_POINTER_DEFAULT_PATH + "northEastSouthWest.png";
+    mouseIcons_[MOUSE_ICON::NORTH_WEST_SOUTH_EAST] = IMAGE_POINTER_DEFAULT_PATH + "northWestSouthEast.png";
+    mouseIcons_[MOUSE_ICON::CROSS] = IMAGE_POINTER_DEFAULT_PATH + "Cross.png";
+    mouseIcons_[MOUSE_ICON::CURSOR_COPY] = IMAGE_POINTER_DEFAULT_PATH + "cursorCopy.png";
+    mouseIcons_[MOUSE_ICON::CURSOR_FORBID] = IMAGE_POINTER_DEFAULT_PATH + "cursorForbid.png";
+    mouseIcons_[MOUSE_ICON::COLOR_SUCKER] = IMAGE_POINTER_DEFAULT_PATH + "colorSucker.png";
+    mouseIcons_[MOUSE_ICON::HAND_GRABBING] = IMAGE_POINTER_DEFAULT_PATH + "handGrabbing.png";
+    mouseIcons_[MOUSE_ICON::HAND_OPEN] = IMAGE_POINTER_DEFAULT_PATH + "handOpen.png";
+    mouseIcons_[MOUSE_ICON::HAND_POINTING] = IMAGE_POINTER_DEFAULT_PATH + "handPointing.png";
+    mouseIcons_[MOUSE_ICON::HELP] = IMAGE_POINTER_DEFAULT_PATH + "Help.png";
+    mouseIcons_[MOUSE_ICON::CURSOR_MOVE] = IMAGE_POINTER_DEFAULT_PATH + "Move.png";
+    mouseIcons_[MOUSE_ICON::RESIZE_LEFT_RIGHT] = IMAGE_POINTER_DEFAULT_PATH + "resizeLeftRight.png";
+    mouseIcons_[MOUSE_ICON::RESIZE_UP_DOWN] = IMAGE_POINTER_DEFAULT_PATH + "resizeUpDown.png";
+    mouseIcons_[MOUSE_ICON::SCREENSHOT_CHOOSE] = IMAGE_POINTER_DEFAULT_PATH + "screenshotChoose.png";
+    mouseIcons_[MOUSE_ICON::SCREENSHOT_CURSOR] = IMAGE_POINTER_DEFAULT_PATH + "screenshotCursor.png";
+    mouseIcons_[MOUSE_ICON::TEXT_CURSOR] = IMAGE_POINTER_DEFAULT_PATH + "textCursor.png";
+    mouseIcons_[MOUSE_ICON::ZOOM_IN] = IMAGE_POINTER_DEFAULT_PATH + "zoomIn.png";
+    mouseIcons_[MOUSE_ICON::ZOOM_OUT] = IMAGE_POINTER_DEFAULT_PATH + "zoomOut.png";
+    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_EAST] = IMAGE_POINTER_DEFAULT_PATH + "middleBinEast.png";
+    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_WEST] = IMAGE_POINTER_DEFAULT_PATH + "middleBinWest.png";
+    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_SOUTH] = IMAGE_POINTER_DEFAULT_PATH + "middleBinSouth.png";
+    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_NORTH] = IMAGE_POINTER_DEFAULT_PATH + "middleBinNorth.png";
+    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_NORTH_SOUTH] = IMAGE_POINTER_DEFAULT_PATH + "middleBinNorthSouth.png";
+    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_NORTH_EAST] = IMAGE_POINTER_DEFAULT_PATH + "middleBinNorthEast.png";
+    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_NORTH_WEST] = IMAGE_POINTER_DEFAULT_PATH + "middleBinNorthWest.png";
+    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_SOUTH_EAST] = IMAGE_POINTER_DEFAULT_PATH + "middleBinSouthEast.png";
+    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_SOUTH_WEST] = IMAGE_POINTER_DEFAULT_PATH + "middleBinSouthWest.png";
+    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_NORTH_SOUTH_WEST_EAST] = IMAGE_POINTER_DEFAULT_PATH +
+        "middleBinNorthSouthWestEast.png";
+}
+
+PointerDrawingManager::~PointerDrawingManager() {}
+
+void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
+    const MOUSE_ICON mouseStyle)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("display:%{public}d,physicalX:%{public}d,physicalY:%{public}d", displayId, physicalX, physicalY);
+    MMI_HILOGD("display:%{public}d,physicalX:%{public}d,physicalY:%{public}d,mouseStyle:%{public}d",
+        displayId, physicalX, physicalY, mouseStyle);
     FixCursorPosition(physicalX, physicalY);
     lastPhysicalX_ = physicalX;
     lastPhysicalY_ = physicalY;
     if (pointerWindow_ != nullptr) {
         pointerWindow_->MoveTo(physicalX, physicalY);
+
+        if (preMouseStyle_ == mouseStyle) {
+            MMI_HILOGD("The preMouseStyle is equal with mouseStyle");
+            MMI_HILOGD("Leave, display:%{public}d,physicalX:%{public}d,physicalY:%{public}d",
+                displayId, physicalX, physicalY);
+            return;
+        }
+        preMouseStyle_ = mouseStyle;
+        int32_t ret = InitLayer(mouseStyle);
+        if (ret != RET_OK) {
+            MMI_HILOGE("Init layer failed");
+            return;
+        }
+
         MMI_HILOGD("Leave, display:%{public}d,physicalX:%{public}d,physicalY:%{public}d",
             displayId, physicalX, physicalY);
         return;
     }
-
+    
     CreatePointerWindow(displayId, physicalX, physicalY);
-    CHKPV(pointerWindow_);
+    int32_t ret = InitLayer(mouseStyle);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Init layer failed");
+        return;
+    }
+
+    MMI_HILOGD("Leave, display:%{public}d,physicalX:%{public}d,physicalY:%{public}d",
+        displayId, physicalX, physicalY);
+    return;
+}
+
+int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(pointerWindow_, RET_ERR);
     sptr<OHOS::Surface> layer = GetLayer();
     if (layer == nullptr) {
-        MMI_HILOGE("Draw pointer is failed, get layer is nullptr");
+        MMI_HILOGE("Init layer is failed, get layer is nullptr");
         pointerWindow_->Destroy();
         pointerWindow_ = nullptr;
-        return;
+        return RET_ERR;
     }
 
     sptr<OHOS::SurfaceBuffer> buffer = GetSurfaceBuffer(layer);
     if (buffer == nullptr || buffer->GetVirAddr() == nullptr) {
-        MMI_HILOGE("Draw pointer is failed, buffer or virAddr is nullptr");
+        MMI_HILOGE("Init layer is failed, buffer or virAddr is nullptr");
         pointerWindow_->Destroy();
         pointerWindow_ = nullptr;
-        return;
+        return RET_ERR;
     }
 
     auto addr = static_cast<uint8_t *>(buffer->GetVirAddr());
-    DoDraw(addr, buffer->GetWidth(), buffer->GetHeight());
+    DoDraw(addr, buffer->GetWidth(), buffer->GetHeight(), mouseStyle);
     OHOS::BufferFlushConfig flushConfig = {
         .damage = {
             .w = buffer->GetWidth(),
@@ -79,11 +156,9 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
         },
     };
     OHOS::SurfaceError ret = layer->FlushBuffer(buffer, -1, flushConfig);
-    MMI_HILOGD("Draw pointer FlushBuffer ret:%{public}s", SurfaceErrorStr(ret).c_str());
-    if (IsPointerVisible()) {
-        pointerWindow_->Show();
-    }
-    MMI_HILOGD("displayId:%{public}d,physicalX:%{public}d,physicalY:%{public}d", displayId, physicalX, physicalY);
+    MMI_HILOGD("Init layer FlushBuffer ret:%{public}s", SurfaceErrorStr(ret).c_str());
+    UpdatePointerVisible();
+    return RET_OK;
 }
 
 void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physicalY)
@@ -165,7 +240,7 @@ sptr<OHOS::SurfaceBuffer> PointerDrawingManager::GetSurfaceBuffer(sptr<OHOS::Sur
     return buffer;
 }
 
-void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t height)
+void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t height, const MOUSE_ICON mouseStyle)
 {
     CALL_DEBUG_ENTER;
     OHOS::Rosen::Drawing::Bitmap bitmap;
@@ -175,7 +250,7 @@ void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t heigh
     OHOS::Rosen::Drawing::Canvas canvas;
     canvas.Bind(bitmap);
     canvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
-    DrawPixelmap(canvas);
+    DrawPixelmap(canvas, mouseIcons_[mouseStyle]);
     static constexpr uint32_t stride = 4;
     uint32_t addrSize = width * height * stride;
     errno_t ret = memcpy_s(addr, addrSize, bitmap.GetPixels(), addrSize);
@@ -185,10 +260,10 @@ void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t heigh
     }
 }
 
-void PointerDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas)
+void PointerDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas, const std::string& iconPath)
 {
     CALL_DEBUG_ENTER;
-    std::unique_ptr<OHOS::Media::PixelMap> pixelmap = DecodeImageToPixelMap(IMAGE_POINTER_JPEG_PATH);
+    std::unique_ptr<OHOS::Media::PixelMap> pixelmap = DecodeImageToPixelMap(iconPath);
     CHKPV(pixelmap);
     OHOS::Rosen::Drawing::Pen pen;
     pen.SetAntiAlias(true);
@@ -218,7 +293,8 @@ std::unique_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixel
     return pixelMap;
 }
 
-void PointerDrawingManager::OnDisplayInfo(int32_t displayId, int32_t width, int32_t height, Direction direction)
+void PointerDrawingManager::OnDisplayInfo(int32_t displayId, WinInfo info, int32_t width,
+    int32_t height, Direction direction)
 {
     CALL_DEBUG_ENTER;
     hasDisplay_ = true;
@@ -226,6 +302,8 @@ void PointerDrawingManager::OnDisplayInfo(int32_t displayId, int32_t width, int3
     displayWidth_ = width;
     displayHeight_ = height;
     direction_ = direction;
+    windowId_ = info.windowId;
+    pid_ = info.windowPid;
     DrawManager();
 }
 
@@ -238,13 +316,22 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice)
 
 void PointerDrawingManager::DrawManager()
 {
-    if (hasDisplay_ && hasPointerDevice_ && pointerWindow_ == nullptr) {
+    if (hasDisplay_ && hasPointerDevice_) {
         MMI_HILOGD("Draw pointer begin");
+        int32_t mouseStyle = 0;
+        int32_t ret = WinMgr->GetPointerStyle(pid_, windowId_, mouseStyle);
+        if (ret != RET_OK) {
+            MMI_HILOGE("Get pointer style failed, mouse style return default style");
+        }
+
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
-            DrawPointer(displayId_, displayWidth_/2, displayHeight_/2);
+            DrawPointer(displayId_, displayWidth_/2, displayHeight_/2, MOUSE_ICON(mouseStyle));
+            MMI_HILOGD("Draw manager, mouseStyle:%{public}d", mouseStyle);
             return;
         }
-        DrawPointer(displayId_, lastPhysicalX_, lastPhysicalY_);
+       
+        DrawPointer(displayId_, lastPhysicalX_, lastPhysicalY_, MOUSE_ICON(mouseStyle));
+        MMI_HILOGD("Draw manager, mouseStyle:%{public}d", mouseStyle);
         return;
     }
 
@@ -330,6 +417,52 @@ int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
     CALL_DEBUG_ENTER;
     UpdatePidInfo(pid, visible);
     UpdatePointerVisible();
+    return RET_OK;
+}
+
+int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, int32_t pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+    if (WinMgr->GetWindowPid(windowId) != pid) {
+        MMI_HILOGE("The param window type is invalid");
+        return RET_ERR;
+    }
+
+    auto it = mouseIcons_.find(MOUSE_ICON(pointerStyle));
+    if (it == mouseIcons_.end()) {
+        MMI_HILOGE("The param pointerStyle is invalid");
+        return RET_ERR;
+    }
+
+    if (WinMgr->SetPointerStyle(pid, windowId, pointerStyle)) {
+        MMI_HILOGE("Set pointer style failed");
+        return RET_ERR;
+    }
+
+    if (!WinMgr->IsNeedRefreshLayer(windowId)) {
+        MMI_HILOGD("Not need refresh layer, window type:%{public}d, pointer style:%{public}d", windowId, pointerStyle);
+        return RET_OK;
+    }
+
+    int32_t ret = InitLayer(MOUSE_ICON(pointerStyle));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Init layer failed");
+        return RET_ERR;
+    }
+    MMI_HILOGD("Window type:%{public}d set pointer style:%{public}d success", windowId, pointerStyle);
+    return RET_OK;
+}
+
+int32_t PointerDrawingManager::GetPointerStyle(int32_t pid, int32_t windowId, int32_t &pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = WinMgr->GetPointerStyle(pid, windowId, pointerStyle);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get pointer style failed, pointer style return default style");
+        return RET_ERR;
+    }
+
+    MMI_HILOGD("Window type:%{public}d get pointer style:%{public}d success", windowId, pointerStyle);
     return RET_OK;
 }
 } // namespace MMI

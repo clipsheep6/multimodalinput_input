@@ -595,6 +595,28 @@ int32_t InputManagerImpl::GetPointerSpeed()
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
+int32_t InputManagerImpl::SetPointerStyle(int32_t windowId, int32_t pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = MultimodalInputConnMgr->SetPointerStyle(windowId, pointerStyle);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to send to server, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t InputManagerImpl::GetPointerStyle(int32_t windowId, int32_t &pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = MultimodalInputConnMgr->GetPointerStyle(windowId, pointerStyle);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to send to server, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 void InputManagerImpl::OnConnected()
 {
     CALL_DEBUG_ENTER;

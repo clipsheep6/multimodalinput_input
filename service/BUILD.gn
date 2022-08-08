@@ -120,8 +120,285 @@ ohos_prebuilt_etc("multimodalinput_config_ability.json") {
   relative_install_dir = "multimodalinput"
 }
 
-ohos_prebuilt_etc("drawing_pointer_image") {
-  source = "//foundation/multimodalinput/input/util/source_icon/angle.png"
+ohos_prebuilt_etc("drawing_pointer_image_Default") {
+  source = "//foundation/multimodalinput/input/util/source_icon/Default.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_East") {
+  source = "//foundation/multimodalinput/input/util/source_icon/East.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_West") {
+  source = "//foundation/multimodalinput/input/util/source_icon/West.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_South") {
+  source = "//foundation/multimodalinput/input/util/source_icon/South.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_North") {
+  source = "//foundation/multimodalinput/input/util/source_icon/North.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_westEast") {
+  source = "//foundation/multimodalinput/input/util/source_icon/westEast.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_northSouth") {
+  source = "//foundation/multimodalinput/input/util/source_icon/northSouth.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_northEast") {
+  source = "//foundation/multimodalinput/input/util/source_icon/northEast.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_northWest") {
+  source = "//foundation/multimodalinput/input/util/source_icon/northWest.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_southEast") {
+  source = "//foundation/multimodalinput/input/util/source_icon/southEast.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_southWest") {
+  source = "//foundation/multimodalinput/input/util/source_icon/southWest.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_northEastSouthWest") {
+  source = "//foundation/multimodalinput/input/util/source_icon/northEastSouthWest.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_northWestSouthEast") {
+  source = "//foundation/multimodalinput/input/util/source_icon/northWestSouthEast.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_Cross") {
+  source = "//foundation/multimodalinput/input/util/source_icon/Cross.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_cursorCopy") {
+  source = "//foundation/multimodalinput/input/util/source_icon/cursorCopy.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_cursorForbid") {
+  source =
+      "//foundation/multimodalinput/input/util/source_icon/cursorForbid.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_colorSucker") {
+  source = "//foundation/multimodalinput/input/util/source_icon/colorSucker.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_handGrabbing") {
+  source =
+      "//foundation/multimodalinput/input/util/source_icon/handGrabbing.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_handOpen") {
+  source = "//foundation/multimodalinput/input/util/source_icon/handOpen.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_handPointing") {
+  source =
+      "//foundation/multimodalinput/input/util/source_icon/handPointing.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_Help") {
+  source = "//foundation/multimodalinput/input/util/source_icon/Help.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_Move") {
+  source = "//foundation/multimodalinput/input/util/source_icon/Move.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_resizeLeftRight") {
+  source =
+      "//foundation/multimodalinput/input/util/source_icon/resizeLeftRight.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_resizeUpDown") {
+  source =
+      "//foundation/multimodalinput/input/util/source_icon/resizeUpDown.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_screenshotChoose") {
+  source =
+      "//foundation/multimodalinput/input/util/source_icon/screenshotChoose.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_screenshotCursor") {
+  source =
+      "//foundation/multimodalinput/input/util/source_icon/screenshotCursor.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_textCursor") {
+  source = "//foundation/multimodalinput/input/util/source_icon/textCursor.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_zoomIn") {
+  source = "//foundation/multimodalinput/input/util/source_icon/zoomIn.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_zoomOut") {
+  source = "//foundation/multimodalinput/input/util/source_icon/zoomOut.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_middleBinEast") {
+  source =
+      "//foundation/multimodalinput/input/util/source_icon/middleBinEast.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_middleBinWest") {
+  source =
+      "//foundation/multimodalinput/input/util/source_icon/middleBinWest.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_middleBinSouth") {
+  source =
+      "//foundation/multimodalinput/input/util/source_icon/middleBinSouth.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_middleBinNorth") {
+  source =
+      "//foundation/multimodalinput/input/util/source_icon/middleBinNorth.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_middleBinNorthSouth") {
+  source = "//foundation/multimodalinput/input/util/source_icon/middleBinNorthSouth.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_middleBinNorthEast") {
+  source = "//foundation/multimodalinput/input/util/source_icon/middleBinNorthEast.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_middleBinNorthWest") {
+  source = "//foundation/multimodalinput/input/util/source_icon/middleBinNorthWest.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_middleBinSouthEast") {
+  source = "//foundation/multimodalinput/input/util/source_icon/middleBinSouthEast.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_middleBinSouthWest") {
+  source = "//foundation/multimodalinput/input/util/source_icon/middleBinSouthWest.png"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_middleBinNorthSouthWestEast") {
+  source = "//foundation/multimodalinput/input/util/source_icon/middleBinNorthSouthWestEast.png"
   part_name = "input"
   subsystem_name = "multimodalinput"
   relative_install_dir = "multimodalinput/mouse_icon"
@@ -199,7 +476,45 @@ ohos_shared_library("libmmi-server") {
   configs = [ ":libmmi_server_config" ]
 
   deps = [
-    ":drawing_pointer_image",
+    ":drawing_pointer_image_Cross",
+    ":drawing_pointer_image_Default",
+    ":drawing_pointer_image_East",
+    ":drawing_pointer_image_Help",
+    ":drawing_pointer_image_Move",
+    ":drawing_pointer_image_North",
+    ":drawing_pointer_image_South",
+    ":drawing_pointer_image_West",
+    ":drawing_pointer_image_colorSucker",
+    ":drawing_pointer_image_cursorCopy",
+    ":drawing_pointer_image_cursorForbid",
+    ":drawing_pointer_image_handGrabbing",
+    ":drawing_pointer_image_handOpen",
+    ":drawing_pointer_image_handPointing",
+    ":drawing_pointer_image_middleBinEast",
+    ":drawing_pointer_image_middleBinNorth",
+    ":drawing_pointer_image_middleBinNorthEast",
+    ":drawing_pointer_image_middleBinNorthSouth",
+    ":drawing_pointer_image_middleBinNorthSouthWestEast",
+    ":drawing_pointer_image_middleBinNorthWest",
+    ":drawing_pointer_image_middleBinSouth",
+    ":drawing_pointer_image_middleBinSouthEast",
+    ":drawing_pointer_image_middleBinSouthWest",
+    ":drawing_pointer_image_middleBinWest",
+    ":drawing_pointer_image_northEast",
+    ":drawing_pointer_image_northEastSouthWest",
+    ":drawing_pointer_image_northSouth",
+    ":drawing_pointer_image_northWest",
+    ":drawing_pointer_image_northWestSouthEast",
+    ":drawing_pointer_image_resizeLeftRight",
+    ":drawing_pointer_image_resizeUpDown",
+    ":drawing_pointer_image_screenshotChoose",
+    ":drawing_pointer_image_screenshotCursor",
+    ":drawing_pointer_image_southEast",
+    ":drawing_pointer_image_southWest",
+    ":drawing_pointer_image_textCursor",
+    ":drawing_pointer_image_westEast",
+    ":drawing_pointer_image_zoomIn",
+    ":drawing_pointer_image_zoomOut",
     ":mmi_device_config.ini",
     ":multimodalinput_config_ability.json",
     "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
