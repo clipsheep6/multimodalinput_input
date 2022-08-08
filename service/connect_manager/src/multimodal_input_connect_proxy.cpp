@@ -525,7 +525,8 @@ int32_t MultimodalInputConnectProxy::SetAnrObserver()
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::WritewindowsVecToParcel(const std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo, MessageParcel& data)
+int32_t MultimodalInputConnectProxy::WritewindowsVecToParcel(const std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo,
+                                                             MessageParcel& data)
 {
     int32_t windows_num = static_cast<int32_t>(pDisplayGroupInfo->windowsInfo.size());
     WRITEINT32(data, windows_num, ERR_INVALID_VALUE);
@@ -557,7 +558,8 @@ int32_t MultimodalInputConnectProxy::WritewindowsVecToParcel(const std::shared_p
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::WriteDisplayVecToParcel(const std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo, MessageParcel& data)
+int32_t MultimodalInputConnectProxy::WriteDisplayVecToParcel(const std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo,
+                                                             MessageParcel& data)
 {
     int32_t display_num = static_cast<int32_t>(pDisplayGroupInfo->displaysInfo.size());
     WRITEINT32(data, display_num, ERR_INVALID_VALUE);
@@ -574,7 +576,8 @@ int32_t MultimodalInputConnectProxy::WriteDisplayVecToParcel(const std::shared_p
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::WriteDisplayInfoToParcel(const std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo, MessageParcel& data)
+int32_t MultimodalInputConnectProxy::WriteDisplayInfoToParcel(const std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo,
+                                                              MessageParcel& data)
 {
     WRITEINT32(data, pDisplayGroupInfo->width, ERR_INVALID_VALUE);
     WRITEINT32(data, pDisplayGroupInfo->height, ERR_INVALID_VALUE);
