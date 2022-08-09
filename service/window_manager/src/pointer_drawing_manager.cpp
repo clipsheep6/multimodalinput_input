@@ -229,10 +229,11 @@ void PointerDrawingManager::OnDisplayInfo(int32_t displayId, int32_t width, int3
     DrawManager();
 }
 
-void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice)
+void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible)
 {
     CALL_DEBUG_ENTER;
     hasPointerDevice_ = hasPointerDevice;
+    UpdatePidInfo(getpid(), isPointerVisible);
     DrawManager();
 }
 
@@ -331,6 +332,18 @@ int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
     UpdatePidInfo(pid, visible);
     UpdatePointerVisible();
     return RET_OK;
+}
+
+void PointerDrawingManager::SetPointerLocation(int32_t pid, int32_t x, int32_t y)
+{
+    CALL_DEBUG_ENTER;
+    FixCursorPosition(x, y);
+    lastPhysicalX_ = x;
+    lastPhysicalY_ = y;
+    if (pointerWindow_ != nullptr) {
+        pointerWindow_->MoveTo(x, y);
+        SetPointerVisible(pid, true);
+    }
 }
 } // namespace MMI
 } // namespace OHOS
