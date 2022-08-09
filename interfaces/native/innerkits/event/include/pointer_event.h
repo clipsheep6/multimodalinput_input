@@ -27,6 +27,7 @@
 #include "parcel.h"
 
 #include "input_event.h"
+#include "raw_data.h"
 
 namespace OHOS {
 namespace MMI {
@@ -664,7 +665,7 @@ public:
          * @since 9
          */
         int32_t GetTargetWindowId() const;
-
+        
         /**
          * @brief Sets the ID of the window corresponding to the finger touch position.
          * @param windowId Indicates the ID of the target window.
@@ -672,6 +673,21 @@ public:
          * @since 9
          */
         void SetTargetWindowId(int32_t windowId);
+        
+        /**
+         * @brief Obtains the RawData of the active window.
+         * @return Returns the RawData.
+         * @since 9
+         */
+        RawData GetRawData() const;
+		
+        /**
+         * @brief Sets the RawData for the active window.
+         * @param rawData Indicates the rawData to set.
+         * @return void
+         * @since 9
+         */
+        void SetRawData(const RawData& rawData);
 
         /**
          * @brief Writes data to a <b>Parcel</b> object.
@@ -713,6 +729,7 @@ public:
         int64_t downTime_ {};
         int32_t toolType_ {};
         int32_t targetWindowId_ { -1 };
+        RawData rawData_ {};
     };
 
 public:
