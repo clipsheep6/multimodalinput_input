@@ -542,9 +542,6 @@ void InputDeviceCooperateSM::MmiDeviceStateCallback::OnDeviceOnline(
 void InputDeviceCooperateSM::MmiDeviceStateCallback::OnDeviceOffline(
     const DistributedHardware::DmDeviceInfo &deviceInfo)
 {
-    CALL_DEBUG_ENTER;
-    InputDevCooSM->OnDeviceOffline(deviceInfo.deviceId);
-}
 
 void InputDeviceCooperateSM::MmiDeviceStateCallback::OnDeviceChanged(
     const DistributedHardware::DmDeviceInfo &deviceInfo)
