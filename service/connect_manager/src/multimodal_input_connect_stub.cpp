@@ -572,10 +572,6 @@ int32_t MultimodalInputConnectStub::ReadDisplayInfoToParcel(MessageParcel& data,
 int32_t MultimodalInputConnectStub::StubSendDisplayInfo(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check failed");
-        return CHECK_PERMISSION_FAIL;
-    }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
