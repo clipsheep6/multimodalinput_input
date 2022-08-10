@@ -250,7 +250,7 @@ void InputDeviceCooperateSM::StartFinish(bool isSucess, const std::string &netwo
             RemoteMgr->StartCooperateOtherRes(sink, networkId);
         }
         InputDevCooSM->UpdateState(CooperateState::STATE_FREE);
-    }  
+    }
     isStarting_ = false;
     isStopping_ = false;
 }
@@ -520,10 +520,10 @@ void InputDeviceCooperateSM::Dump(int32_t fd, const std::vector<std::string> &ar
 {
     CALL_DEBUG_ENTER;
     mprintf(fd, "Keyboard and mouse crossing information:");
-    mprintf(fd, "State machine status: %d\t",cooperateState_);
+    mprintf(fd, "State machine status: %d\t", cooperateState_);
     mprintf(fd, "Peripheral keyboard and mouse information: startDhid_  srcNetworkId_:\t");
-    mprintf(fd, "%s",startDhid_.c_str());
-    mprintf(fd, "%s",srcNetworkId_.c_str());
+    mprintf(fd, "%s", startDhid_.c_str());
+    mprintf(fd, "%s", srcNetworkId_.c_str());
     mprintf(fd, "Run successfully");
 }
 
@@ -542,6 +542,9 @@ void InputDeviceCooperateSM::MmiDeviceStateCallback::OnDeviceOnline(
 void InputDeviceCooperateSM::MmiDeviceStateCallback::OnDeviceOffline(
     const DistributedHardware::DmDeviceInfo &deviceInfo)
 {
+    CALL_DEBUG_ENTER;
+    InputDevCooSM->OnDeviceOffline(deviceInfo.deviceId);
+}
 
 void InputDeviceCooperateSM::MmiDeviceStateCallback::OnDeviceChanged(
     const DistributedHardware::DmDeviceInfo &deviceInfo)
