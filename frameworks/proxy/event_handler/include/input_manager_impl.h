@@ -49,7 +49,7 @@ public:
     InputManagerImpl() = default;
 
     bool InitEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventHandler, bool isNeedNewThread = false);
-    MMIEventHandlerPtr GetEventHandler() const;
+    EventHandlerPtr GetEventHandler() const;
     EventHandlerPtr GetCurrentEventHandler() const;
 
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);

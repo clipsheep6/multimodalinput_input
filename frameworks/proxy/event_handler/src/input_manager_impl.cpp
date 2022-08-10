@@ -98,7 +98,7 @@ void InputManagerImpl::Stop()
     eventHandler_->RemoveAllFileDescriptorListeners();
 }
 
-MMIEventHandlerPtr InputManagerImpl::GetEventHandler() const
+EventHandlerPtr InputManagerImpl::GetEventHandler() const
 {
     return eventHandler_;
 }
