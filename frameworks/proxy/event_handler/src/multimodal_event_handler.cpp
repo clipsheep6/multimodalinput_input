@@ -59,8 +59,31 @@ bool MultimodalEventHandler::InitClient()
     if (client_ != nullptr) {
         return true;
     }
+    bool newThread = false;
+    auto eventHandler = AppExecFwk::EventHandler::Current();
+    if (eventHandler == nullptr) {
+        auto runner = AppExecFwk::EventRunner::Current();
+        if (runner == nullptr) {
+            runner = AppExecFwk::EventRunner::Create(false);
+            newThread = true;
+        }
+        CHKPF(runner);
+        eventHandler = std::make_shared<AppExecFwk::EventHandler>(runner);
+        CHKPF(eventHandler);
+    }
+    return InitClient(eventHandler, newThread);
+}
+
+bool MultimodalEventHandler::InitClient(std::shared_ptr<AppExecFwk::EventHandler> eventHandler, bool newThread)
+{
+    CALL_DEBUG_ENTER;
+    if (client_ != nullptr) {
+        return true;
+    }
+    CHKPF(eventHandler);
     client_ = std::make_shared<MMIClient>();
     CHKPF(client_);
+    client_->SetEventHandler(eventHandler, newThread);
     client_->RegisterConnectedFunction(&OnConnected);
     if (!(client_->Start())) {
         MMI_HILOGE("The client fails to start");

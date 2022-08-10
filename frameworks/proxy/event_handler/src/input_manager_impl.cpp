@@ -66,29 +66,41 @@ private:
     std::function<void(std::shared_ptr<AxisEvent>)> axisMonitor_;
 };
 
-bool InputManagerImpl::InitEventHandler()
+bool InputManagerImpl::InitEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventHandler, bool isNeedNewThread)
 {
     CALL_DEBUG_ENTER;
-    if (mmiEventHandler_ != nullptr) {
-        MMI_HILOGE("Repeated initialization operations");
-        return false;
-    }
+    CHKPF(eventHandler);
+    eventHandler_ = eventHandler;
 
-    static constexpr int32_t timeout = 3;
-    std::unique_lock<std::mutex> lck(handleMtx_);
-    ehThread_ = std::thread(std::bind(&InputManagerImpl::OnThread, this));
-    ehThread_.detach();
-    if (cv_.wait_for(lck, std::chrono::seconds(timeout)) == std::cv_status::timeout) {
-        MMI_HILOGE("EventHandler thread start timeout");
-        return false;
+    if (isNeedNewThread) {
+        static constexpr int32_t timeout = 3;
+        std::unique_lock<std::mutex> lck(handleMtx_);
+        ehThread_ = std::thread(std::bind(&InputManagerImpl::OnThread, this));
+        ehThread_.detach();
+        if (cv_.wait_for(lck, std::chrono::seconds(timeout)) == std::cv_status::timeout) {
+            MMI_HILOGE("EventHandler thread start timeout");
+            return false;
+        }
     }
     return true;
 }
 
+void InputManagerImpl::Stop()
+{
+    if (!isNeedNewThread) {
+        return;
+    }
+    CHKPV(eventHandler_);
+    auto runner = eventHandler_->GetEventRunner();
+    CHKPV(runner);
+    runner->Stop();
+    eventHandler_->RemoveAllEvents();
+    eventHandler_->RemoveAllFileDescriptorListeners();
+}
+
 MMIEventHandlerPtr InputManagerImpl::GetEventHandler() const
 {
-    CHKPP(mmiEventHandler_);
-    return mmiEventHandler_->GetSharedPtr();
+    return eventHandler_;
 }
 
 EventHandlerPtr InputManagerImpl::GetCurrentEventHandler() const
@@ -104,17 +116,16 @@ void InputManagerImpl::OnThread()
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
+    SetThreadName("mmi_input_manager_impl_thread");
+
+    CHKPV(eventHandler_);
     std::shared_ptr<AppExecFwk::EventRunner> eventRunner = nullptr;
     {
         std::lock_guard<std::mutex> lck(handleMtx_);
-        SetThreadName("mmi_client_EventHdr");
-        mmiEventHandler_ = std::make_shared<MMIEventHandler>();
-        CHKPV(mmiEventHandler_);
-        eventRunner = mmiEventHandler_->GetEventRunner();
+        eventRunner = eventHandler_->GetEventRunner();
         CHKPV(eventRunner);
         cv_.notify_one();
     }
-    CHKPV(eventRunner);
     eventRunner->Run();
 }
 
@@ -175,21 +186,41 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 
+// void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
+//     std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
+// {
+//     CALL_INFO_TRACE;
+//     CHKPV(inputEventConsumer);
+//     std::lock_guard<std::mutex> guard(mtx_);
+//     if (!MMIEventHdl.InitClient()) {
+//         MMI_HILOGE("Client init failed");
+//         return;
+//     }
+//     consumer_ = inputEventConsumer;
+//     eventHandler_ = eventHandler;
+//     if (eventHandler_ == nullptr) {
+//         eventHandler_ = InputMgrImpl->GetCurrentEventHandler();
+//     }
+// }
+
 void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
 {
     CALL_INFO_TRACE;
     CHKPV(inputEventConsumer);
     std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.InitClient()) {
+    if (!MMIEventHdl.InitClient(eventHandler)) {
         MMI_HILOGE("Client init failed");
         return;
     }
-    consumer_ = inputEventConsumer;
-    eventHandler_ = eventHandler;
     if (eventHandler_ == nullptr) {
-        eventHandler_ = InputMgrImpl->GetCurrentEventHandler();
+        MMI_HILOGE("invalid eventhandler, init client failed.");
     }
+    consumer_ = inputEventConsumer;
+    // eventHandler_ = eventHandler;
+    // if (eventHandler_ == nullptr) {
+    //     eventHandler_ = InputMgrImpl->GetCurrentEventHandler();
+    // }
 }
 
 int32_t InputManagerImpl::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,

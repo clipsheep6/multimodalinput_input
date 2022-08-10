@@ -37,6 +37,7 @@ public:
 
     MMIClientPtr GetMMIClient();
     bool InitClient();
+    bool InitClient(std::shared_ptr<AppExecFwk::EventHandler> eventHandler, bool newThread = false);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t InjectEvent(const std::shared_ptr<KeyEvent> keyEventPtr);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD

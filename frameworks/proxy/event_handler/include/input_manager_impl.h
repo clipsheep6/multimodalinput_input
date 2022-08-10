@@ -48,7 +48,7 @@ public:
     DISALLOW_COPY_AND_MOVE(InputManagerImpl);
     InputManagerImpl() = default;
 
-    bool InitEventHandler();
+    bool InitEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventHandler, bool isNeedNewThread = false);
     MMIEventHandlerPtr GetEventHandler() const;
     EventHandlerPtr GetCurrentEventHandler() const;
 
@@ -103,6 +103,7 @@ public:
 
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
     void OnAnr(int32_t pid);
+    void Stop();
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
@@ -132,7 +133,6 @@ private:
     std::condition_variable cv_;
     std::thread ehThread_;
     EventHandlerPtr eventHandler_  = nullptr;
-    MMIEventHandlerPtr mmiEventHandler_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS
