@@ -27,22 +27,26 @@ class InputEventNormalizeHandler : public IInputEventHandler {
 public:
     InputEventNormalizeHandler() = default;
     ~InputEventNormalizeHandler() = default;
-    void HandleEvent(libinput_event* event) override;
+    void HandleEvent(libinput_event *event) override;
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
     void HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
     void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
     int32_t AddHandleTimer(int32_t timeout = 300);
+    bool CheckKeyboardWhiteList(const std::shared_ptr<KeyEvent> keyEvent);
 
 private:
     int32_t OnEventDeviceAdded(libinput_event *event);
     int32_t OnEventDeviceRemoved(libinput_event *event);
-    int32_t HandleKeyboardEvent(libinput_event* event);
+    int32_t HandleKeyboardEvent(libinput_event *event);
     void Repeat(const std::shared_ptr<KeyEvent> keyEvent);
-    int32_t HandleTouchPadEvent(libinput_event* event);
-    int32_t HandleGestureEvent(libinput_event* event);
-    int32_t HandleMouseEvent(libinput_event* event);
-    int32_t HandleTouchEvent(libinput_event* event);
-    int32_t HandleTableToolEvent(libinput_event* event);
+    int32_t HandleTouchPadEvent(libinput_event *event);
+    int32_t HandleGestureEvent(libinput_event *event);
+    int32_t HandleMouseEvent(libinput_event *event);
+    int32_t HandleTouchEvent(libinput_event *event);
+    int32_t HandleTableToolEvent(libinput_event *event);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    bool IsNeedFilterOut(const std::string &deviceId, const std::shared_ptr<KeyEvent> keyEvent);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 
 private:
     int32_t timerId_ = -1;
