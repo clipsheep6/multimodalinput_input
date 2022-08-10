@@ -22,14 +22,14 @@
 #include "singleton.h"
 
 #include "event_dispatch.h"
-#include "i_event_filter.h"
-#include "i_input_event_handler.h"
+#include "event_filter_wrap.h"
 #include "event_interceptor_handler.h"
 #include "event_monitor_handler.h"
+#include "i_event_filter.h"
+#include "i_input_event_handler.h"
+#include "input_event_normalize_handler.h"
 #include "key_event_subscriber.h"
 #include "mouse_event_handler.h"
-#include "event_filter_wrap.h"
-#include "input_event_normalize_handler.h"
 
 namespace OHOS {
 namespace MMI {
@@ -40,7 +40,7 @@ public:
     InputEventHandler();
     DISALLOW_COPY_AND_MOVE(InputEventHandler);
     virtual ~InputEventHandler() override;
-    void Init(UDSServer& udsServer);
+    void Init(UDSServer &udsServer);
     void OnEvent(void *event);
     UDSServer *GetUDSServer() const;
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
@@ -49,6 +49,10 @@ public:
     std::shared_ptr<EventInterceptorHandler> GetInterceptorHandler() const;
     std::shared_ptr<KeyEventSubscriber> GetSubscriberHandler() const;
     std::shared_ptr<EventMonitorHandler> GetMonitorHandler() const;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    void SetJumpInterceptState(bool isJump);
+    bool GetJumpInterceptState() const;
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 
 private:
     int32_t BuildInputHandlerChain();
@@ -61,6 +65,9 @@ private:
     std::shared_ptr<EventMonitorHandler> monitorHandler_ = nullptr;
 
     uint64_t idSeed_ = 0;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    bool isJumpIntercept_ = false;
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 };
 #define InputHandler InputEventHandler::GetInstance()
 } // namespace MMI
