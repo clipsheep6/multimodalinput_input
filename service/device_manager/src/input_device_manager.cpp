@@ -16,7 +16,9 @@
 #include "input_device_manager.h"
 
 #include <parameters.h>
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include <openssl/sha.h>
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 #include <unordered_map>
 
 #include "dfx_hisysevent.h"
@@ -277,18 +279,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
 #endif // OHOS_BUILD_ENABLE_POINTER
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-    struct InputDeviceObj obj;
-    obj.inputDeviceOrgin_ = inputDevice;
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-    obj.isRemote_ = IsRemote(inputDevice);
-    if (obj.isRemote_) {
-        obj.networkIdOrgin_ = MakeNetworkId(libinput_device_get_phys(inputDevice));
-    }
-    obj.fd_ = libinput_device_get_fd(inputDevice);
-    MMI_HILOGE("networkIdOrgin: %{public}s, fd:%{public}d", obj.networkIdOrgin_.c_str(), obj.fd_);
-    obj.dhid_ = GenerateDescriptor(inputDevice, obj.isRemote_);
-#endif // OHOS_BUILD_ENABLE_COOPERATE
-    inputDevice_[nextId_] = obj;
+    inputDevice_[nextId_] = MakeInputDeviceObj(inputDevice);
     for (const auto &item : devListener_) {
         CHKPC(item.first);
         item.second(nextId_, "add");
@@ -306,6 +297,22 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
         MMI_HILOGI("Set para input.pointer.device true");
     }
     DfxHisysevent::OnDeviceConnect(nextId_ - 1, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
+}
+
+struct InputDeviceObj InputDeviceManager::MakeInputDeviceObj(struct libinput_device *inputDevice)
+{
+    struct InputDeviceObj obj;
+    obj.inputDeviceOrgin_ = inputDevice;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    obj.isRemote_ = IsRemote(inputDevice);
+    if (obj.isRemote_) {
+        obj.networkIdOrgin_ = MakeNetworkId(libinput_device_get_phys(inputDevice));
+    }
+    obj.fd_ = libinput_device_get_fd(inputDevice);
+    MMI_HILOGE("networkIdOrgin: %{public}s, fd:%{public}d", obj.networkIdOrgin_.c_str(), obj.fd_);
+    obj.dhid_ = GenerateDescriptor(inputDevice, obj.isRemote_);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+    return obj;
 }
 
 void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevice)

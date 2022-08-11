@@ -40,7 +40,6 @@ constexpr int32_t INTERVAL_MS = 2000;
 constexpr int32_t MOUSE_ABS_LOCATION_CONST = 100;
 constexpr int32_t MOUSE_ABS_LOCATION_X = 50;
 constexpr int32_t MOUSE_ABS_LOCATION_Y = 50;
-
 } // namespace
 
 void InputDeviceCooperateSM::Init()

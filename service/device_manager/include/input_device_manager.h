@@ -77,6 +77,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 private:
+    struct InputDeviceObj MakeInputDeviceObj(struct libinput_device *inputDevice);
     bool IsPointerDevice(struct libinput_device* device) const;
     void ScanPointerDevice();
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
