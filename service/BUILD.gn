@@ -17,7 +17,6 @@ mmi_service_path = "${mmi_path}/service"
 
 config("libmmi_server_config") {
   include_dirs = [
-    "input_device_cooperate/include",
     "device_manager/include",
     "device_scalability/include",
     "delegate_task/include",
@@ -53,6 +52,14 @@ config("libmmi_server_config") {
     "//foundation/multimodalinput/input/frameworks/proxy/event_handler/include",
     "//third_party/cJSON",
   ]
+
+  if (input_feature_input_cooperate) {
+    include_dirs += [
+      "input_device_cooperate/include",
+      "//foundation/deviceprofile/device_profile_core/interfaces/innerkits/core/include",
+      "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include"
+    ]
+  }
 
   if (input_feature_hdf) {
     include_dirs += [
@@ -263,7 +270,7 @@ ohos_shared_library("libmmi-server") {
   ]
 
   if (input_feature_input_cooperate) {
-    external_deps += [ 
+    external_deps += [
       "dsoftbus:softbus_client",
       "device_manager:devicemanagersdk",
     ]
