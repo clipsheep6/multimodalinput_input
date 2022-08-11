@@ -18,7 +18,9 @@
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_cooperate_sm.h"
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_manager.h"
 #include "input_event_handler.h"
 #include "key_auto_repeat.h"
