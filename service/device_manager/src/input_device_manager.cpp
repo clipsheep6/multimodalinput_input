@@ -22,10 +22,14 @@
 #include <unordered_map>
 
 #include "dfx_hisysevent.h"
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_cooperate_sm.h"
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "input_windows_manager.h"
 #include "key_event_value_transformation.h"
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include "softbus_bus_center.h"
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "util_ex.h"
 
 namespace OHOS {
