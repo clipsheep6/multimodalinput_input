@@ -736,5 +736,23 @@ void InputManagerImpl::OnAnrTask(std::vector<std::shared_ptr<IAnrObserver>> obse
         observer->OnAnr(pid);
     }
 }
+
+int32_t InputManagerImpl::SetInputDeviceToScreen(int32_t deviceFd, const std::string& screenId)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->SetInputDeviceToScreen(deviceFd, screenId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
+    }
+    return ret;
+#else
+    (void)(deviceFd);
+    (void)(screenId);
+    MMI_HILOGW("Enable input device cooperate does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+}
 } // namespace MMI
 } // namespace OHOS

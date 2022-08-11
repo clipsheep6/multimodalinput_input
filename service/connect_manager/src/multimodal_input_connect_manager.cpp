@@ -197,6 +197,12 @@ int32_t MultimodalInputConnectManager::SetAnrObserver()
     return multimodalInputConnectService_->SetAnrObserver();
 }
 
+int32_t MultimodalInputConnectManager::SetInputDeviceToScreen(int32_t deviceFd, const std::string& screenId)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->SetInputDeviceToScreen(deviceFd, screenId);
+}
+
 bool MultimodalInputConnectManager::ConnectMultimodalInputService()
 {
     CALL_DEBUG_ENTER;

@@ -26,6 +26,11 @@
 namespace OHOS {
 namespace MMI {
 class EventDispatch : public IInputEventHandler {
+    struct MouseState {
+        uint32_t type;
+        uint32_t code;
+        int32_t value;
+    };
 public:
     EventDispatch();
     DISALLOW_COPY_AND_MOVE(EventDispatch);
@@ -42,6 +47,16 @@ public:
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    void OnMouseStateChange(uint32_t type, uint32_t code, int32_t value);
+    bool CheckPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+
+private:
+    void OnHandlePointerEvent(const std::shared_ptr<PointerEvent> point, int32_t dispacthType);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    std::vector<MouseState> mouseState_;
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 };
 } // namespace MMI
 } // namespace OHOS

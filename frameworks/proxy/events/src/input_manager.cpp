@@ -176,5 +176,10 @@ void InputManager::SetAnrObserver(std::shared_ptr<IAnrObserver> observer)
 {
     InputMgrImpl->SetAnrObserver(observer);
 }
+
+int32_t InputManager::SetInputDeviceToScreen(int32_t deviceFd, const std::string& screenId)
+{
+    return InputMgrImpl->SetInputDeviceToScreen(deviceFd, screenId);
+}
 } // namespace MMI
 } // namespace OHOS

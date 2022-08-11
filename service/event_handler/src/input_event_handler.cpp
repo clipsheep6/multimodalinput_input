@@ -145,6 +145,16 @@ std::shared_ptr<EventMonitorHandler> InputEventHandler::GetMonitorHandler() cons
     return monitorHandler_;
 }
 
+void InputEventHandler::SetJumpInterceptState(bool isJump)
+{
+    isJumpIntercept_ = isJump;
+}
+
+bool InputEventHandler::GetJumpInterceptState() const
+{
+    return isJumpIntercept_;
+}
+
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t InputEventHandler::AddInputEventFilter(sptr<IEventFilter> filter)
 {

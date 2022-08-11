@@ -111,6 +111,10 @@ config("libmmi_server_config") {
   if (input_feature_monitor) {
     defines += [ "OHOS_BUILD_ENABLE_MONITOR" ]
   }
+
+  if (input_feature_input_cooperate) {
+    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
+  }
 }
 
 ohos_prebuilt_etc("multimodalinput_config_ability.json") {

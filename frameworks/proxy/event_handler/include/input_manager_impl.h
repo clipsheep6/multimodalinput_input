@@ -104,6 +104,8 @@ public:
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
     void OnAnr(int32_t pid);
 
+    int32_t SetInputDeviceToScreen(int32_t deviceFd, const std::string& screenId);
+
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
     int32_t PackDisplayInfo(NetPacket &pkt);

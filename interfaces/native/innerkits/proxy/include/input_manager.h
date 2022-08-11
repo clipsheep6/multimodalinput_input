@@ -297,6 +297,15 @@ public:
      */
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
 
+    /**
+     * @brief Set screen ID corresponding to input device fd.
+     * @param deviceFd Indicates the input device fd
+     * @param screenId Indicates the input device's screen ID
+     * @return Returns **0** if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t SetInputDeviceToScreen(int32_t deviceFd, const std::string& screenId);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

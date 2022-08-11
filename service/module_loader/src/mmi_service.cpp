@@ -977,5 +977,22 @@ int32_t MMIService::Dump(int32_t fd, const std::vector<std::u16string> &args)
     MMIEventDump->ParseCommand(fd, argList);
     return RET_OK;
 }
+
+int32_t MMIService::SetInputDeviceToScreen(int32_t deviceFd, const std::string& screenId)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputDeviceManager::SetInputDeviceToScreen,
+        InputDevMgr, deviceFd, screenId));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set input device to screen failed,return %{public}d", ret);
+        return ret;
+    }
+#else
+    (void)(deviceFd);
+    (void)(screenId);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

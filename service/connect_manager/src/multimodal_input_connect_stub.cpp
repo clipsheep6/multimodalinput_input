@@ -68,7 +68,10 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         {IMultimodalInputConnect::MOVE_MOUSE, &MultimodalInputConnectStub::StubMoveMouseEvent},
         {IMultimodalInputConnect::INJECT_KEY_EVENT, &MultimodalInputConnectStub::StubInjectKeyEvent},
         {IMultimodalInputConnect::INJECT_POINTER_EVENT, &MultimodalInputConnectStub::StubInjectPointerEvent},
-        {IMultimodalInputConnect::SET_ANR_OBSERVER, &MultimodalInputConnectStub::StubSetAnrListener}
+        {IMultimodalInputConnect::SET_ANR_OBSERVER, &MultimodalInputConnectStub::StubSetAnrListener},
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+        {IMultimodalInputConnect::SET_INPUT_DEVICE_TO_SCREEN, &MultimodalInputConnectStub::StubSetInputDeviceToScreen}
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -486,6 +489,29 @@ int32_t MultimodalInputConnectStub::StubSetAnrListener(MessageParcel& data, Mess
     int32_t ret = SetAnrObserver();
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetAnrObserver failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetInputDeviceToScreen(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t deviceFd = -1;
+    READINT32(data, deviceFd, IPC_PROXY_DEAD_OBJECT_ERR);
+    std::string screenId;
+    READSTRING(data, screenId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetInputDeviceToScreen(deviceFd, screenId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetInputDeviceToScreen failed ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;

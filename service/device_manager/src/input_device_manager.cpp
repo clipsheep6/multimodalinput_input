@@ -28,6 +28,9 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceManager"};
 constexpr int32_t INVALID_DEVICE_ID = -1;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+constexpr int32_t INVALID_DEVICE_FD = -1;
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 constexpr int32_t SUPPORT_KEY = 1;
 
 constexpr int32_t ABS_MT_TOUCH_MAJOR = 0x30;
@@ -40,6 +43,8 @@ constexpr int32_t ABS_MT_WIDTH_MAJOR = 0x32;
 constexpr int32_t ABS_MT_WIDTH_MINOR = 0x33;
 
 constexpr int32_t BUS_BLUETOOTH = 0X5;
+
+const std::string UNKNOWN_SCREEN_ID = "";
 
 std::unordered_map<int32_t, std::string> axisType = {
     {ABS_MT_TOUCH_MAJOR, "TOUCH_MAJOR"},
@@ -411,6 +416,40 @@ void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::strin
                 deviceId, inputDevice->GetName().c_str(), inputDevice->GetType(), inputDevice->GetBus(),
                 inputDevice->GetVersion(), inputDevice->GetProduct(), inputDevice->GetVendor());
     }
+}
+
+int32_t InputDeviceManager::SetInputDeviceToScreen(int32_t deviceFd, const std::string& screenId)
+{
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    CALL_DEBUG_ENTER;
+    MMI_HILOGI("SetInputDeviceToScreen: %{public}d, fd:%{public}s", deviceFd, screenId.c_str());
+    if (deviceFd == INVALID_DEVICE_FD) {
+        MMI_HILOGE("Invalid input device fd");
+        return RET_ERR;
+    }
+    if (screenId.empty()) {
+        MMI_HILOGE("Input device screen id is empty");
+        return RET_ERR;
+    }
+    inputDeviceScreen_[deviceFd] = screenId;
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+    return RET_OK;
+}
+
+const std::string& InputDeviceManager::GetScreenIdFromDeviceId(int32_t deviceId) const
+{
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    CALL_DEBUG_ENTER;
+    auto item = inputDevice_.find(deviceId);
+    if (item != inputDevice_.end()) {
+        auto iter = inputDeviceScreen_.find(item->second.fd_);
+        if (iter != inputDeviceScreen_.end()) {
+            return iter->second;
+        }
+    }
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+    MMI_HILOGE("Find input device screen id failed");
+    return UNKNOWN_SCREEN_ID;
 }
 } // namespace MMI
 } // namespace OHOS
