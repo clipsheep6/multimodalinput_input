@@ -582,7 +582,7 @@ int32_t MultimodalInputConnectProxy::WriteDisplayInfoToParcel(const std::shared_
     WRITEINT32(data, pDisplayGroupInfo->width, ERR_INVALID_VALUE);
     WRITEINT32(data, pDisplayGroupInfo->height, ERR_INVALID_VALUE);
     WRITEINT32(data, pDisplayGroupInfo->focusWindowId, ERR_INVALID_VALUE);
-    (void)WritewindowsVecToParcel(pDisplayGroupInfo, data);
+    (void)WriteWindowsVecToParcel(pDisplayGroupInfo, data);
     (void)WriteDisplayVecToParcel(pDisplayGroupInfo, data);
     return RET_OK;
 }

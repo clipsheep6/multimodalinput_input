@@ -497,7 +497,7 @@ int32_t MultimodalInputConnectStub::ReadWindowsVecToParcel(MessageParcel& data, 
     int32_t num = 0;
     WindowInfo windowData = {};
     READINT32(data, num, IPC_PROXY_DEAD_OBJECT_ERR);
-    for (uint32_t i = 0; i < num; i++) {
+    for (int32_t i = 0; i < num; i++) {
         windowData = {};
         READINT32(data, windowData.id, IPC_PROXY_DEAD_OBJECT_ERR);
         READINT32(data, windowData.pid, IPC_PROXY_DEAD_OBJECT_ERR);
@@ -510,7 +510,7 @@ int32_t MultimodalInputConnectStub::ReadWindowsVecToParcel(MessageParcel& data, 
         int32_t numD = 0;
         READINT32(data, numD, IPC_PROXY_DEAD_OBJECT_ERR);
         Rect defaultHotArea = {};
-        for (uint32_t i = 0; i < numD; i++) {
+        for (int32_t i = 0; i < numD; i++) {
             defaultHotArea = {};
             READINT32(data, defaultHotArea.x, IPC_PROXY_DEAD_OBJECT_ERR);
             READINT32(data, defaultHotArea.y, IPC_PROXY_DEAD_OBJECT_ERR);
@@ -522,7 +522,7 @@ int32_t MultimodalInputConnectStub::ReadWindowsVecToParcel(MessageParcel& data, 
         int32_t numP = 0;
         READINT32(data, numP, IPC_PROXY_DEAD_OBJECT_ERR);
         Rect pointerHotArea = {};
-        for (uint32_t i = 0; i < numP; i++) {
+        for (int32_t i = 0; i < numP; i++) {
             pointerHotArea = {};
             READINT32(data, pointerHotArea.x, IPC_PROXY_DEAD_OBJECT_ERR);
             READINT32(data, pointerHotArea.y, IPC_PROXY_DEAD_OBJECT_ERR);
@@ -542,7 +542,7 @@ int32_t MultimodalInputConnectStub::ReadDisplayVecToParcel(MessageParcel& data, 
     int32_t num = 0;
     DisplayInfo displaysData = {};
     READINT32(data, num, IPC_PROXY_DEAD_OBJECT_ERR);
-    for (uint32_t i = 0; i < num; i++) {
+    for (int32_t i = 0; i < num; i++) {
         displaysData = {};
         READINT32(data, displaysData.id, IPC_PROXY_DEAD_OBJECT_ERR);
         READINT32(data, displaysData.x, IPC_PROXY_DEAD_OBJECT_ERR);
@@ -564,7 +564,7 @@ int32_t MultimodalInputConnectStub::ReadDisplayInfoToParcel(MessageParcel& data,
     READINT32(data, displayGroupInfo.width, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, displayGroupInfo.height, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, displayGroupInfo.focusWindowId, IPC_PROXY_DEAD_OBJECT_ERR);
-    (void)ReadwindowsVecToParcel(data, displayGroupInfo);
+    (void)ReadWindowsVecToParcel(data, displayGroupInfo);
     (void)ReadDisplayVecToParcel(data, displayGroupInfo);
     return RET_OK;
 }
