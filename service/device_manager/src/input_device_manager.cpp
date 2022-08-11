@@ -456,11 +456,7 @@ std::vector<int32_t> InputDeviceManager::GetPointerKeyboardFds(int32_t pointerId
     std::vector<int32_t> fds;
     auto iter = inputDevice_.find(pointerId);
     if (iter == inputDevice_.end()) {
-<<<<<<< HEAD
         return fds;
-=======
-       return fds;
->>>>>>> 6e099be19f95389046790ee8b65f1e23c73e7e42
     }
     if (!IsPointerDevice(iter->second.inputDeviceOrgin_)) {
         MMI_HILOGI("input pointerId not pointer!!!");
@@ -547,11 +543,7 @@ std::vector<std::string> InputDeviceManager::GetPointerKeyboardUnqs(int32_t poin
     std::vector<std::string> unqs;
     auto iter = inputDevice_.find(pointerId);
     if (iter == inputDevice_.end()) {
-<<<<<<< HEAD
         return unqs;
-=======
-       return unqs;
->>>>>>> 6e099be19f95389046790ee8b65f1e23c73e7e42
     }
     if (!IsPointerDevice(iter->second.inputDeviceOrgin_)) {
         return unqs;

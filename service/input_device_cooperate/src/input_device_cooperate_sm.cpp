@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <stdio.h>
+#include <cstdio>
 #include "cooperate_messages.h"
 #include "device_manager.h"
 #include "define_multimodal.h"
@@ -36,13 +36,18 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceCooperateStateManager"};
 const std::string BUNDLE_NAME = "ohos.multimodalinput.input";
+constexpr int32_t INTERVAL_MS = 2000;
+constexpr int32_t MOUSE_ABS_LOCATION_CONST = 100;
+constexpr int32_t MOUSE_ABS_LOCATION_X = 50;
+constexpr int32_t MOUSE_ABS_LOCATION_Y = 50;
+
 } // namespace
 
 void InputDeviceCooperateSM::Init()
 {
     preparedNetworkId_ = std::make_pair("", "");
     Reset();
-    TimerMgr->AddTimer(2000, 1, [this]() {
+    TimerMgr->AddTimer(INTERVAL_MS, 1, [this]() {
         InputDevCooSM->InitDeviceManager();
     });
 }
@@ -86,7 +91,7 @@ void InputDeviceCooperateSM::OnCloseCooperation(const std::string &networkId, bo
     if (isLocal || networkId.compare(srcNetworkId_) == 0) {
         auto hasPointer = InputDevMgr->HasLocalPointerDevice();
         if (hasPointer) {
-            MouseEventHdr->SetAbsolutionLocation(50, 50);
+            MouseEventHdr->SetAbsolutionLocation(MOUSE_ABS_LOCATION_X, MOUSE_ABS_LOCATION_Y);
         }
         Reset();
         return;
@@ -180,10 +185,10 @@ int32_t InputDeviceCooperateSM::StartRemoteCooperateRes(bool isSucess, const std
         EventCooperateMgr->OnCooperateMessage(msg);
 
     if (cooperateState_ == CooperateState::STATE_FREE && isSucess) {
-        MouseEventHdr->SetAbsolutionLocation(100 - xPercent, yPercent);
+        MouseEventHdr->SetAbsolutionLocation(MOUSE_ABS_LOCATION_CONST - xPercent, yPercent);
         InputDevCooSM->UpdateState(CooperateState::STATE_IN);
     } else if (cooperateState_ == CooperateState::STATE_OUT && isSucess) {
-        MouseEventHdr->SetAbsolutionLocation(100 - xPercent, yPercent);
+        MouseEventHdr->SetAbsolutionLocation(MOUSE_ABS_LOCATION_CONST - xPercent, yPercent);
         InputDevCooSM->UpdateState(CooperateState::STATE_FREE);
     }
     isStarting_ = false;
@@ -212,7 +217,7 @@ int32_t InputDeviceCooperateSM::StopRemoteCooperateRes(bool isSucess)
     if (isSucess) {
         auto hasPointer = InputDevMgr->HasLocalPointerDevice();
         if (hasPointer) {
-            MouseEventHdr->SetAbsolutionLocation(50, 50);
+            MouseEventHdr->SetAbsolutionLocation(MOUSE_ABS_LOCATION_X, MOUSE_ABS_LOCATION_Y);
         }
         InputDevCooSM->UpdateState(CooperateState::STATE_FREE);
     }
@@ -262,7 +267,7 @@ void InputDeviceCooperateSM::StopFinish(bool isSucess, const std::string &networ
     if (isSucess) {
         auto hasPointer = InputDevMgr->HasLocalPointerDevice();
         if (hasPointer) {
-            MouseEventHdr->SetAbsolutionLocation(50, 50);
+            MouseEventHdr->SetAbsolutionLocation(MOUSE_ABS_LOCATION_X, MOUSE_ABS_LOCATION_Y);
         }
     }
     
@@ -312,8 +317,8 @@ bool InputDeviceCooperateSM::UpdateMouseLocation()
     auto displayWidth = physicalDisplayInfo->width;
     auto displayHeight = physicalDisplayInfo->height;
     auto mouseInfo = WinMgr->GetMouseInfo();
-    int32_t xPercent = mouseInfo.physicalX * 100 / displayWidth;
-    int32_t yPercent = mouseInfo.physicalY * 100 / displayHeight;
+    int32_t xPercent = mouseInfo.physicalX * MOUSE_ABS_LOCATION_CONST / displayWidth;
+    int32_t yPercent = mouseInfo.physicalY * MOUSE_ABS_LOCATION_CONST / displayHeight;
     MMI_HILOGI("displayWidth: %{public}d, displayHeight: %{public}d, physicalX: %{public}d, physicalY: %{public}d,",
         displayWidth, displayHeight, mouseInfo.physicalX, mouseInfo.physicalY);
     mouseLocation_ = std::make_pair(xPercent, yPercent);
@@ -503,7 +508,7 @@ void InputDeviceCooperateSM::OnDeviceOffline(const std::string& networkId)
         UpdatePreparedDevices("", "");
         auto hasPointer = InputDevMgr->HasLocalPointerDevice();
         if (hasPointer) {
-            MouseEventHdr->SetAbsolutionLocation(50, 50);
+            MouseEventHdr->SetAbsolutionLocation(MOUSE_ABS_LOCATION_X, MOUSE_ABS_LOCATION_Y);
         }
         Reset();
     }
