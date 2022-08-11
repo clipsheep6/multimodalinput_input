@@ -17,6 +17,7 @@ mmi_service_path = "${mmi_path}/service"
 
 config("libmmi_server_config") {
   include_dirs = [
+    "input_device_cooperate/include",
     "device_manager/include",
     "device_scalability/include",
     "delegate_task/include",
@@ -111,6 +112,10 @@ config("libmmi_server_config") {
   if (input_feature_monitor) {
     defines += [ "OHOS_BUILD_ENABLE_MONITOR" ]
   }
+
+  if (input_feature_input_cooperate) {
+    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
+  }
 }
 
 ohos_prebuilt_etc("multimodalinput_config_ability.json") {
@@ -149,6 +154,10 @@ ohos_shared_library("libmmi-server") {
     "timer_manager/src/timer_manager.cpp",
     "window_manager/src/input_windows_manager.cpp",
   ]
+
+  if (input_feature_input_cooperate) {
+    sources += [ "input_device_cooperate/src/distributed_input_adapter.cpp" ]
+  }
 
   if (input_feature_hdf) {
     sources += [
@@ -212,6 +221,10 @@ ohos_shared_library("libmmi-server") {
     "//third_party/cJSON:cjson_static",
     "//third_party/json:nlohmann_json_static",
   ]
+
+  if (input_feature_input_cooperate) {
+    deps += [ "//foundation/distributedhardware/distributed_input/interfaces/inner_kits:libdinput_sdk" ]
+  }
 
   if (input_feature_libinput || input_feature_hdf) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
