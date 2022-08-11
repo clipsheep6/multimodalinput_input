@@ -53,6 +53,12 @@ config("libmmi_server_config") {
     "//third_party/cJSON",
   ]
 
+  if (input_feature_input_cooperate) {
+    include_dirs += [
+      "input_device_cooperate/include",
+    ]
+  }
+
   if (input_feature_hdf) {
     include_dirs += [
       "hdf_adapter/include",
@@ -111,6 +117,10 @@ config("libmmi_server_config") {
   if (input_feature_monitor) {
     defines += [ "OHOS_BUILD_ENABLE_MONITOR" ]
   }
+
+  if (input_feature_input_cooperate) {
+    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
+  }
 }
 
 ohos_prebuilt_etc("multimodalinput_config_ability.json") {
@@ -149,6 +159,15 @@ ohos_shared_library("libmmi-server") {
     "timer_manager/src/timer_manager.cpp",
     "window_manager/src/input_windows_manager.cpp",
   ]
+
+  if (input_feature_input_cooperate) {
+    sources += [
+      "input_device_cooperate/src/i_input_device_cooperate_state.cpp",
+      "input_device_cooperate/src/input_device_cooperate_state_free.cpp",
+      "input_device_cooperate/src/input_device_cooperate_state_in.cpp",
+      "input_device_cooperate/src/input_device_cooperate_state_out.cpp",
+    ]
+  }
 
   if (input_feature_hdf) {
     sources += [
