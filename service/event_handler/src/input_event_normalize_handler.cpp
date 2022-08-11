@@ -215,7 +215,7 @@ int32_t InputEventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
 
     BytraceAdapter::StartBytrace(keyEvent_);
     PrintEventData(keyEvent_);
-    if (!CheckKeyboardWhiteList(keyEvent)) {
+    if (!CheckKeyboardWhiteList(keyEvent_)) {
         MMI_HILOGI("check white list return false, keyboard event dropped");
         return RET_OK;
     }

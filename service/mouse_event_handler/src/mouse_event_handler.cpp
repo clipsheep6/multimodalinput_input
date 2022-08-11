@@ -39,7 +39,9 @@ const std::array<double, 6> SPEED_DIFF_NUMS { 0.0, -2.0, -5.0, -19.0, -28.6, -57
 constexpr double DOUBLE_ZERO = 1e-6;
 constexpr int32_t MIN_SPEED = 1;
 constexpr int32_t MAX_SPEED = 20;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
 constexpr int32_t PERCENT_CONST = 100;
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 } // namespace
 MouseEventHandler::MouseEventHandler()
 {
