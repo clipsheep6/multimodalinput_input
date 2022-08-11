@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include "i_input_device_cooperate_state.h"
+
 #include "define_multimodal.h"
 #include "distributed_input_adapter.h"
 #include "event_cooperate_manager.h"
@@ -20,8 +22,6 @@
 #include "input_device_manager.h"
 #include "mouse_event_handler.h"
 #include "multimodal_input_connect_remoter.h"
-
-#include "i_input_device_cooperate_state.h"
 
 namespace OHOS {
 namespace MMI {
@@ -35,9 +35,7 @@ IInputDeviceCooperateState::IInputDeviceCooperateState()
     if (runner_ == nullptr) {
         return;
     }
-
     eventHandler_ = std::make_shared<CooperateEventHandler>(runner_);
-    MMI_HILOGI("init success");
 }
 
 int32_t IInputDeviceCooperateState::StartInputDeviceCooperate(const std::string &networkId, int32_t startInputDeviceId)
@@ -51,11 +49,10 @@ int32_t IInputDeviceCooperateState::StartInputDeviceCooperate(const std::string 
 
 int32_t IInputDeviceCooperateState::PrepareAndStart(const std::string &srcNetworkId, int32_t startInputDeviceId)
 {
-    MMI_HILOGD("srcNetworkId: %{public}s, startInputDeviceId: %{public}d", srcNetworkId.c_str(), startInputDeviceId);
-    auto sinkNetworkId = InputDevMgr->GetOrginNetworkId(startInputDeviceId);
-    if (srcNetworkId.empty() || sinkNetworkId.empty() || srcNetworkId.compare(sinkNetworkId) == 0) {
-        MMI_HILOGE("parameter error! srcNetworkId: %{public}s, sinkNetworkId: %{public}s", srcNetworkId.c_str(),
-            sinkNetworkId.c_str());
+    CALL_DEBUG_ENTER;
+    auto sinkNetworkId = InputDevMgr->GetOriginNetworkId(startInputDeviceId);
+    if (srcNetworkId.empty() || sinkNetworkId.empty() || srcNetworkId == sinkNetworkId) {
+        MMI_HILOGE("Parameter error");
         return RET_ERR;
     }
     RemoteMgr->StartRemoteCooperate(sinkNetworkId, srcNetworkId);
@@ -67,13 +64,14 @@ int32_t IInputDeviceCooperateState::PrepareAndStart(const std::string &srcNetwor
                 this->OnPrepareDistributedInput(isSucess, srcNetworkId, startInputDeviceId);
             });
         if (ret != RET_OK) {
+            MMI_HILOGE("Prepare remote input fail");
             InputDevCooSM->UpdatePreparedDevices("", "");
         }
     } else {
-        RemoteMgr->StartRemoteCooperate(sinkNetworkId, srcNetworkId);
         ret = StartDistributedInput(startInputDeviceId);
     }
     if (ret != RET_OK) {
+        MMI_HILOGE("Start remote input fail");
         InputDevCooSM->StartFinish(false, srcNetworkId, startInputDeviceId);
         return RET_ERR;
     }
@@ -83,7 +81,6 @@ int32_t IInputDeviceCooperateState::PrepareAndStart(const std::string &srcNetwor
 void IInputDeviceCooperateState::OnPrepareDistributedInput(
     bool isSucess, const std::string &networkId, int32_t startInputDeviceId)
 {
-    CALL_DEBUG_ENTER;
     MMI_HILOGI("isSucess: %{public}s", isSucess ? "true" : "false");
     if (!isSucess) {
         InputDevCooSM->UpdatePreparedDevices("", "");
@@ -93,6 +90,7 @@ void IInputDeviceCooperateState::OnPrepareDistributedInput(
         std::string taskName = "start_dinput_task";
         std::function<void()> handleStartDinputFunc =
             std::bind(&IInputDeviceCooperateState::StartDistributedInput, this, startInputDeviceId);
+        CHKPV(eventHandler_);
         eventHandler_->PostTask(handleStartDinputFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
     }
 }
@@ -101,12 +99,12 @@ int32_t IInputDeviceCooperateState::StartDistributedInput(int32_t startInputDevi
 {
     CALL_DEBUG_ENTER;
     auto networkIds = InputDevCooSM->GetPreparedDevices();
-    auto uniqs = InputDevMgr->GetPointerKeyboardUnqs(startInputDeviceId);
-    if (uniqs.empty()) {
+    auto dhids = InputDevMgr->GetPointerKeyboardDhids(startInputDeviceId);
+    if (dhids.empty()) {
         InputDevCooSM->StartFinish(false, networkIds.first, startInputDeviceId);
     }
     return DistributedAdapter->StartRemoteInput(
-        networkIds.first, networkIds.second, uniqs, [this, src = networkIds.first, startInputDeviceId](bool isSucess) {
+        networkIds.first, networkIds.second, dhids, [this, src = networkIds.first, startInputDeviceId](bool isSucess) {
             this->OnStartDistributedInput(isSucess, src, startInputDeviceId);
         });
 }
@@ -118,19 +116,18 @@ void IInputDeviceCooperateState::OnStartDistributedInput(
     std::string taskName = "start_finish_task";
     std::function<void()> handleStartFinishFunc =
         std::bind(&InputDeviceCooperateSM::StartFinish, InputDevCooSM, isSucess, srcNetworkId, startInputDeviceId);
+    CHKPV(eventHandler_);
     eventHandler_->PostTask(handleStartFinishFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
 }
 
-void IInputDeviceCooperateState::OnStopDistributedInput(bool isSucess, const std::string &srcNetworkId) {}
+void IInputDeviceCooperateState::OnStopDistributedInput(bool isSucess, const std::string &srcNetworkId, int32_t startInputDeviceId) {}
 
 bool IInputDeviceCooperateState::NeedPrepare(const std::string &srcNetworkId, const std::string &sinkNetworkId)
 {
     CALL_DEBUG_ENTER;
     auto prepared = InputDevCooSM->GetPreparedDevices();
-    MMI_HILOGD("preSrcId: %{public}s, preSinkId: %{public}s, srcId: %{public}s, sinkId: %{public}s",
-        prepared.first.c_str(), prepared.second.c_str(), srcNetworkId.c_str(), sinkNetworkId.c_str());
-    bool isNeed = !(srcNetworkId.compare(prepared.first) == 0 && sinkNetworkId.compare(prepared.second) == 0);
-    MMI_HILOGD("NeedPrepare?: %{public}s", isNeed ? "true" : "false");
+    bool isNeed =  !(srcNetworkId == prepared.first && sinkNetworkId == prepared.second);
+    MMI_HILOGI("NeedPrepare?: %{public}s", isNeed ? "true" : "false");
     return isNeed;
 }
 

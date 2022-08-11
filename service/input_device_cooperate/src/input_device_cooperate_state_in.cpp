@@ -41,6 +41,7 @@ int32_t InputDeviceCooperateStateIn::StartInputDeviceCooperate(const std::string
     std::string taskName = "process_start_task";
     std::function<void()> handleProcessStartFunc =
         std::bind(&InputDeviceCooperateStateIn::ProcessStart, this, remote, startInputDeviceId);
+    CHKPR(eventHandler_, RET_ERR);
     eventHandler_->PostTask(handleProcessStartFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
     return RET_OK;
 }
@@ -48,9 +49,8 @@ int32_t InputDeviceCooperateStateIn::StartInputDeviceCooperate(const std::string
 int32_t InputDeviceCooperateStateIn::ProcessStart(const std::string &remote, int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
-    auto orginNetworkId = InputDevMgr->GetOrginNetworkId(startInputDeviceId);
-    // 归属networkId 和 开始的一致，是穿越返回.不一致是 接力穿越或接力返回
-    if (remote.compare(orginNetworkId) == 0) {
+    auto originNetworkId = InputDevMgr->GetOriginNetworkId(startInputDeviceId);
+    if (remote.compare(originNetworkId) == 0) {
         ComeBack(remote, startInputDeviceId);
         return RET_OK;
     } else {
@@ -61,13 +61,15 @@ int32_t InputDeviceCooperateStateIn::ProcessStart(const std::string &remote, int
 int32_t InputDeviceCooperateStateIn::StopInputDeviceCooperate()
 {
     CALL_DEBUG_ENTER;
-    auto sink = InputDevMgr->GetOrginNetworkId(startDhid_);
+    auto sink = InputDevMgr->GetOriginNetworkId(startDhid_);
     int32_t ret = IInputDeviceCooperateState::StopInputDeviceCooperate(sink);
     if (ret != RET_OK) {
+        MMI_HILOGE("Stop input device cooperate fail");
         return ret;
     }
     std::string taskName = "process_stop_task";
     std::function<void()> handleProcessStopFunc = std::bind(&InputDeviceCooperateStateIn::ProcessStop, this);
+    CHKPR(eventHandler_, RET_ERR);
     eventHandler_->PostTask(handleProcessStopFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
     return ret;
 }
@@ -75,10 +77,10 @@ int32_t InputDeviceCooperateStateIn::StopInputDeviceCooperate()
 int32_t InputDeviceCooperateStateIn::ProcessStop()
 {
     CALL_DEBUG_ENTER;
-    auto unqs = InputDevMgr->GetPointerKeyboardUnqs(startDhid_);
-    auto sink = InputDevMgr->GetOrginNetworkId(startDhid_);
+    auto dhids = InputDevMgr->GetPointerKeyboardDhids(startDhid_);
+    auto sink = InputDevMgr->GetOriginNetworkId(startDhid_);
     int32_t ret = DistributedAdapter->StopRemoteInput(
-        sink, unqs, [this, sink](bool isSucess) { this->OnStopDistributedInput(isSucess, sink); });
+        sink, dhids, [this, sink](bool isSucess) { this->OnStopDistributedInput(isSucess, sink, -1); });
     if (ret != RET_OK) {
         InputDevCooSM->StopFinish(false, sink);
     }
@@ -93,37 +95,43 @@ void InputDeviceCooperateStateIn::OnStartDistributedInput(
         IInputDeviceCooperateState::OnStartDistributedInput(isSucess, srcNetworkId, startInputDeviceId);
         return;
     }
-    auto sinkNetworkId = InputDevMgr->GetOrginNetworkId(startInputDeviceId);
-    auto unq = InputDevMgr->GetPointerKeyboardUnqs(startInputDeviceId);
+    auto sinkNetworkId = InputDevMgr->GetOriginNetworkId(startInputDeviceId);
+    auto dhid = InputDevMgr->GetPointerKeyboardDhids(startInputDeviceId);
 
     std::string taskName = "relay_stop_task";
     std::function<void()> handleRelayStopFunc =
-        std::bind(&InputDeviceCooperateStateIn::StopRemoteInput, this, sinkNetworkId, srcNetworkId, unq);
+        std::bind(&InputDeviceCooperateStateIn::StopRemoteInput, this, sinkNetworkId, srcNetworkId, dhid, startInputDeviceId);
+    CHKPV(eventHandler_);
     eventHandler_->PostTask(handleRelayStopFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
 }
 
-void InputDeviceCooperateStateIn::StopRemoteInput(
-    const std::string &sinkNetworkId, const std::string &srcNetworkId, const std::vector<std::string> &unq)
+void InputDeviceCooperateStateIn::StopRemoteInput(const std::string &sinkNetworkId,
+    const std::string &srcNetworkId, const std::vector<std::string> &dhid, int32_t startInputDeviceId)
 {
-    int32_t ret = DistributedAdapter->StopRemoteInput(sinkNetworkId, unq,
-        [this, srcNetworkId](bool isSucess) { this->OnStopDistributedInput(isSucess, srcNetworkId); });
+    int32_t ret = DistributedAdapter->StopRemoteInput(sinkNetworkId, dhid,
+        [this, srcNetworkId, startInputDeviceId](bool isSucess) {
+            this->OnStopDistributedInput(isSucess, srcNetworkId, startInputDeviceId);
+    });
     if (ret != RET_OK) {
-        InputDevCooSM->StartFinish(false, sinkNetworkId, -1);
+        InputDevCooSM->StartFinish(false, sinkNetworkId, startInputDeviceId);
     }
 }
 
-void InputDeviceCooperateStateIn::OnStopDistributedInput(bool isSucess, const std::string &remote)
+void InputDeviceCooperateStateIn::OnStopDistributedInput(bool isSucess, const std::string &remote,
+    int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
     if (InputDevCooSM->IsStarting()) {
         std::string taskName = "start_finish_task";
         std::function<void()> handleStartFinishFunc =
-            std::bind(&InputDeviceCooperateSM::StartFinish, InputDevCooSM, isSucess, remote, -1);
+            std::bind(&InputDeviceCooperateSM::StartFinish, InputDevCooSM, isSucess, remote, startInputDeviceId);
+        CHKPV(eventHandler_);
         eventHandler_->PostTask(handleStartFinishFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
-    } else if (InputDevCooSM->IsStopping()) {
+    } else if (InputDevCooSM->IsStopping()){
         std::string taskName = "stop_finish_task";
         std::function<void()> handleStopFinishFunc =
             std::bind(&InputDeviceCooperateSM::StopFinish, InputDevCooSM, isSucess, remote);
+        CHKPV(eventHandler_);
         eventHandler_->PostTask(handleStopFinishFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
     }
 }
@@ -134,11 +142,13 @@ void InputDeviceCooperateStateIn::ComeBack(const std::string &sinkNetworkId, int
     std::string localNetworkId;
     InputDevMgr->GetLocalDeviceId(localNetworkId);
     RemoteMgr->StartRemoteCooperate(localNetworkId, sinkNetworkId);
-    auto unqs = InputDevMgr->GetPointerKeyboardUnqs(startInputDeviceId);
-    int32_t ret = DistributedAdapter->StopRemoteInput(sinkNetworkId, unqs,
-        [this, sinkNetworkId](bool isSucess) { this->OnStopDistributedInput(isSucess, sinkNetworkId); });
+    auto dhids = InputDevMgr->GetPointerKeyboardDhids(startInputDeviceId);
+    int32_t ret = DistributedAdapter->StopRemoteInput(sinkNetworkId, dhids,
+        [this, sinkNetworkId, startInputDeviceId](bool isSucess) {
+            this->OnStopDistributedInput(isSucess, sinkNetworkId, startInputDeviceId);
+            });
     if (ret != RET_OK) {
-        InputDevCooSM->StartFinish(false, sinkNetworkId, -1);
+        InputDevCooSM->StartFinish(false, sinkNetworkId, startInputDeviceId);
     }
 }
 

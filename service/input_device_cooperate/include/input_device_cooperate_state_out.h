@@ -26,7 +26,7 @@ public:
     explicit InputDeviceCooperateStateOut(const std::string &startDhid);
     virtual int32_t StartInputDeviceCooperate(const std::string &networkId, int32_t sharedInputDevice) override;
     virtual int32_t StopInputDeviceCooperate() override;
-    virtual void OnKeyboardOnline(const std::string &unq) override;
+    virtual void OnKeyboardOnline(const std::string &dhid) override;
 
 protected:
     void OnStopRemoteInput(bool isSucess, const std::string &srcNetworkId);

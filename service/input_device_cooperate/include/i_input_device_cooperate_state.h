@@ -34,7 +34,7 @@ public:
     virtual int32_t StartInputDeviceCooperate(const std::string &networkId, int32_t startInputDeviceId);
     virtual int32_t StopInputDeviceCooperate();
 
-    virtual void OnKeyboardOnline(const std::string &unq) {}
+    virtual void OnKeyboardOnline(const std::string &dhid) {}
     virtual void UpdateSinkDeviceInfo(const std::map<std::string, std::set<std::string>> &sinkDeviceInfo) {}
 
 protected:
@@ -44,11 +44,11 @@ protected:
     int32_t StartDistributedInput(int32_t startInputDeviceId);
     int32_t StopInputDeviceCooperate(const std::string &networkId);
     virtual void OnStartDistributedInput(bool isSucess, const std::string &srcNetworkId, int32_t startInputDeviceId);
-    virtual void OnStopDistributedInput(bool isSucess, const std::string &srcNetworkId);
+    virtual void OnStopDistributedInput(bool isSucess, const std::string &srcNetworkId, int32_t startInputDeviceId);
 
 protected:
-    std::shared_ptr<AppExecFwk::EventRunner> runner_;
-    std::shared_ptr<CooperateEventHandler> eventHandler_;
+    std::shared_ptr<AppExecFwk::EventRunner> runner_ {nullptr};
+    std::shared_ptr<CooperateEventHandler> eventHandler_ {nullptr};
 };
 } // namespace MMI
 } // namespace OHOS

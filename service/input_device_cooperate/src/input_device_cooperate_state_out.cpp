@@ -56,6 +56,7 @@ int32_t InputDeviceCooperateStateOut::StopInputDeviceCooperate()
     std::string taskName = "process_stop_task";
     std::function<void()> handleProcessStopFunc =
         std::bind(&InputDeviceCooperateStateOut::ProcessStop, this, src);
+    CHKPR(eventHandler_, RET_ERR);
     eventHandler_->PostTask(handleProcessStopFunc, taskName, 0,
         AppExecFwk::EventQueue::Priority::HIGH);
     return ret;
@@ -64,14 +65,13 @@ int32_t InputDeviceCooperateStateOut::StopInputDeviceCooperate()
 int32_t InputDeviceCooperateStateOut::ProcessStop(const std::string& src)
 {
     CALL_DEBUG_ENTER;
-    auto sink = InputDevMgr->GetOrginNetworkId(startDhid_);
-    auto unqs = InputDevMgr->GetPointerKeyboardUnqs(startDhid_);
-    MMI_HILOGI("src: %{public}s, sink: %{public}s", src.c_str(), sink.c_str());
-    int32_t ret = DistributedAdapter->StopRemoteInput(src, sink, unqs, [this, src](bool isSucess) {
+    auto sink = InputDevMgr->GetOriginNetworkId(startDhid_);
+    auto dhids = InputDevMgr->GetPointerKeyboardDhids(startDhid_);
+    int32_t ret = DistributedAdapter->StopRemoteInput(src, sink, dhids, [this, src](bool isSucess) {
         this->OnStopRemoteInput(isSucess, src);
         });
     if (ret != RET_OK) {
-        InputDevCooSM->StopFinish(false, src);
+       InputDevCooSM->StopFinish(false, src);
     }
     return ret;
 }
@@ -82,16 +82,17 @@ void InputDeviceCooperateStateOut::OnStopRemoteInput(bool isSucess, const std::s
     std::string taskName = "stop_finish_task";
     std::function<void()> handleStopFinishFunc =
     std::bind(&InputDeviceCooperateSM::StopFinish, InputDevCooSM, isSucess, srcNetworkId);
+    CHKPV(eventHandler_);
     eventHandler_->PostTask(handleStopFinishFunc, taskName, 0,
         AppExecFwk::EventQueue::Priority::HIGH);
 }
 
-void InputDeviceCooperateStateOut::OnKeyboardOnline(const std::string &unq)
+void InputDeviceCooperateStateOut::OnKeyboardOnline(const std::string &dhid)
 {
     auto networkIds = InputDevCooSM->GetPreparedDevices();
-    std::vector<std::string> unqs;
-    unqs.push_back(unq);
-    DistributedAdapter->StartRemoteInput(networkIds.first, networkIds.second, unqs, [](bool isSucess) {});
+    std::vector<std::string> dhids;
+    dhids.push_back(dhid);
+    DistributedAdapter->StartRemoteInput(networkIds.first, networkIds.second, dhids, [](bool isSucess) {});
 }
 } // namespace MMI
 } // namespace OHOS

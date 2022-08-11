@@ -33,11 +33,13 @@ int32_t InputDeviceCooperateStateFree::StartInputDeviceCooperate(
     CALL_DEBUG_ENTER;
     int32_t ret = IInputDeviceCooperateState::StartInputDeviceCooperate(networkId, startInputDeviceId);
     if (ret != RET_OK) {
+        MMI_HILOGE("Start input device cooperate fail");
         return ret;
     }
     std::string taskName = "process_start_task";
     std::function<void()> handleProcessStartFunc =
         std::bind(&InputDeviceCooperateStateFree::ProcessStart, this, networkId, startInputDeviceId);
+    CHKPR(eventHandler_, RET_ERR);
     eventHandler_->PostTask(handleProcessStartFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
     return RET_OK;
 }
