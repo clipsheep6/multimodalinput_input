@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <stdio.h>
 #include "cooperate_messages.h"
-
 #include "device_manager.h"
 #include "define_multimodal.h"
 #include "device_profile_adapter.h"
@@ -24,14 +24,13 @@
 #include "input_device_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "timer_manager.h"
-#include "input_device_cooperate_sm.h"
 #include "mouse_event_handler.h"
 #include "multimodal_input_connect_remoter.h"
 #include "bytrace_adapter.h"
 #include "util_ex.h"
-#include <stdio.h>
 #include "hitrace_meter.h"
 
+#include "input_device_cooperate_sm.h"
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -74,7 +73,7 @@ void InputDeviceCooperateSM::OnCloseCooperation(const std::string &networkId, bo
     CALL_DEBUG_ENTER;
     EventCooperateMgr->OnCooperateMessage(CooperateMessages::MSG_COOPERATE_STATE_OFF, networkId);
     if (!preparedNetworkId_.first.empty() && !preparedNetworkId_.second.empty()) {
-        if (networkId.compare(preparedNetworkId_.first) == 0 || networkId.compare(preparedNetworkId_.second) == 0) {   
+        if (networkId.compare(preparedNetworkId_.first) == 0 || networkId.compare(preparedNetworkId_.second) == 0) {
             DistributedAdapter->UnPrepareRemoteInput(preparedNetworkId_.first, preparedNetworkId_.second,
                 [this](bool isSucess) {
                     if (isSucess) {
@@ -113,7 +112,7 @@ int32_t InputDeviceCooperateSM::EnableInputDeviceCooperate(bool enabled)
     if (enabled) {
         BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_START, BytraceAdapter::START_EVENT);
         EventCooperateMgr->OnCooperateMessage(CooperateMessages::MSG_COOPERATE_OPEN_SUCCESS);
-        BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_STOP, BytraceAdapter::START_EVENT); 
+        BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_STOP, BytraceAdapter::START_EVENT);
     } else {
         std::string localNetworkId;
         InputDevMgr->GetLocalDeviceId(localNetworkId);
@@ -151,7 +150,7 @@ int32_t InputDeviceCooperateSM::StopInputDeviceCooperate()
         return RET_ERR;
     }
     CHKPR(currentStateSM_, ERROR_NULL_POINTER);
-    BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_START, BytraceAdapter::STOP_EVENT); 
+    BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_START, BytraceAdapter::STOP_EVENT);
     isStopping_ = true;
     int32_t ret = currentStateSM_->StopInputDeviceCooperate();
     if (ret != RET_OK) {
@@ -258,7 +257,7 @@ void InputDeviceCooperateSM::StartFinish(bool isSucess, const std::string &netwo
 void InputDeviceCooperateSM::StopFinish(bool isSucess, const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
-    BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_STOP, BytraceAdapter::STOP_EVENT); 
+    BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_STOP, BytraceAdapter::STOP_EVENT);
     NotifyRemoteStopFinish(isSucess, networkId);
     if (isSucess) {
         auto hasPointer = InputDevMgr->HasLocalPointerDevice();

@@ -33,7 +33,7 @@ protected:
     int32_t ProcessStop(const std::string &src);
 
 private:
-    std::string startDhid_{ "" };
+    std::string startDhid_ { "" };
 };
 } // namespace MMI
 } // namespace OHOS

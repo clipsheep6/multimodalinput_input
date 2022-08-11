@@ -104,18 +104,18 @@ private:
     void NotifyRemoteStopFinish(bool isSucess, const std::string &networkId);
     bool UpdateMouseLocation();
 
-    std::shared_ptr<IInputDeviceCooperateState> currentStateSM_{ nullptr };
-    std::pair<std::string, std::string> preparedNetworkId_{ "", "" };
-    std::string startDhid_{ "" };
-    std::string srcNetworkId_{ "" };
-    CooperateState cooperateState_{ CooperateState::STATE_FREE };
+    std::shared_ptr<IInputDeviceCooperateState> currentStateSM_ { nullptr };
+    std::pair<std::string, std::string> preparedNetworkId_ { "", "" };
+    std::string startDhid_ { "" };
+    std::string srcNetworkId_ { "" };
+    CooperateState cooperateState_ { CooperateState::STATE_FREE };
     std::shared_ptr<DistributedHardware::DmInitCallback> initCallback_;
     std::shared_ptr<DistributedHardware::DeviceStateCallback> stateCallback_;
     std::vector<std::string> onLineDevice_;
     mutable std::mutex mutex_;
-    std::atomic<bool> isStarting_{ false };
-    std::atomic<bool> isStopping_{ false };
-    std::pair<int32_t, int32_t> mouseLocation_{ std::make_pair(0, 0) };
+    std::atomic<bool> isStarting_ { false };
+    std::atomic<bool> isStopping_ { false };
+    std::pair<int32_t, int32_t> mouseLocation_ { std::make_pair(0, 0) };
 };
 #define InputDevCooSM InputDeviceCooperateSM::GetInstance()
 } // namespace MMI
