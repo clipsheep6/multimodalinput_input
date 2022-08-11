@@ -73,6 +73,8 @@ napi_value JsPointerContext::CreateJsObject(napi_env env, napi_callback_info inf
     if (status != napi_ok) {
         delete jsContext;
         THROWERR(env, "Failed to wrap native instance");
+        auto infoTemp = std::string(__FUNCTION__)+ ": " + std::string(WRAP) + " failed";
+        napi_throw_error(env, nullptr, infoTemp.c_str());
         return nullptr;
     }
     return thisVar;
@@ -107,7 +109,7 @@ JsPointerContext* JsPointerContext::GetInstance(napi_env env)
     return instance;
 }
 
-std::shared_ptr<JsPointerManager> JsPointerContext::GetJsPointerMgr() const
+std::shared_ptr<JsPointerManager> JsPointerContext::GetJsMouseMgr() const
 {
     return mgr_;
 }
@@ -130,15 +132,15 @@ napi_value JsPointerContext::SetPointerVisible(napi_env env, napi_callback_info 
     CHKRP(env, napi_get_value_bool(env, argv[0], &visible), GET_BOOL);
 
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
-    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    auto jsMouseMgr = jsPointer->GetJsMouseMgr();
     if (argc == 1) {
-        return jsPointerMgr->SetPointerVisible(env, visible);
+        return jsMouseMgr->SetPointerVisible(env, visible);
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
         THROWERR(env, "The second parameter type is wrong");
         return nullptr;
     }
-    return jsPointerMgr->SetPointerVisible(env, visible, argv[1]);
+    return jsMouseMgr->SetPointerVisible(env, visible, argv[1]);
 }
 
 napi_value JsPointerContext::IsPointerVisible(napi_env env, napi_callback_info info)
@@ -153,16 +155,50 @@ napi_value JsPointerContext::IsPointerVisible(napi_env env, napi_callback_info i
     }
 
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
-    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    auto jsMouseMgr = jsPointer->GetJsMouseMgr();
     if (argc == 0) {
-        return jsPointerMgr->IsPointerVisible(env);
+        return jsMouseMgr->IsPointerVisible(env);
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
         THROWERR(env, "The first parameter type is wrong");
         return nullptr;
     }
 
-    return jsPointerMgr->IsPointerVisible(env, argv[0]);
+    return jsMouseMgr->IsPointerVisible(env, argv[0]);
+}
+
+napi_value JsPointerContext::SetPointerLocation(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 3;
+    napi_value argv[3];
+    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc > 3 || argc < 2) {
+        THROWERR(env, "the number of parameters is not as expected");
+        return nullptr;
+    }
+    if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
+        THROWERR(env, "The first parameter type is wrong");
+        return nullptr;
+    }
+    if (!JsCommon::TypeOf(env, argv[1], napi_number)) {
+        THROWERR(env, "The second parameter type is wrong");
+        return nullptr;
+    }
+    int32_t x = 0;
+    int32_t y = 0;
+    CHKRP(env, napi_get_value_int32(env, argv[0], &x), GET_INT32);
+    CHKRP(env, napi_get_value_int32(env, argv[1], &y), GET_INT32);
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    auto jsMouseMgr = jsPointer->GetJsMouseMgr();
+    if (argc == 2) {
+        return jsMouseMgr->SetPointerLocation(env, nullptr, x, y);
+    }
+    if (!JsCommon::TypeOf(env, argv[2], napi_function)) {
+        THROWERR(env, "The third parameter type is wrong");
+        return nullptr;
+    }
+    return jsMouseMgr->SetPointerLocation(env, argv[2], x, y);
 }
 
 napi_value JsPointerContext::SetPointerSpeed(napi_env env, napi_callback_info info)
@@ -232,8 +268,7 @@ napi_value JsPointerContext::Export(napi_env env, napi_value exports)
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_FUNCTION("setPointerVisible", SetPointerVisible),
         DECLARE_NAPI_STATIC_FUNCTION("isPointerVisible", IsPointerVisible),
-        DECLARE_NAPI_STATIC_FUNCTION("setPointerSpeed", SetPointerSpeed),
-        DECLARE_NAPI_STATIC_FUNCTION("getPointerSpeed", GetPointerSpeed),
+        DECLARE_NAPI_STATIC_FUNCTION("setPointerLocation", SetPointerLocation),
     };
     CHKRP(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     return exports;
