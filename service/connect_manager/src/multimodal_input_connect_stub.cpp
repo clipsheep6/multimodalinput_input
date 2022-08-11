@@ -580,8 +580,8 @@ int32_t MultimodalInputConnectStub::StubSendDisplayInfo(MessageParcel& data, Mes
         MMI_HILOGE("Failed to read display info");
         return ret;
     }
-    std::shared_ptr<DisplayGroupInfo> displayGroupInfo = std::make_shared<DisplayGroupInfo>(displayGroupInfo);
-    ret = SendDisplayInfo(displayGroupInfo);
+    std::shared_ptr<DisplayGroupInfo> displayGroupInfoPtr = std::make_shared<DisplayGroupInfo>(displayGroupInfo);
+    ret = SendDisplayInfo(displayGroupInfoPtr);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SendDisplayInfo failed ret:%{public}d", ret);
         return ret;
