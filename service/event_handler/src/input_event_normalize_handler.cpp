@@ -18,6 +18,9 @@
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+#include "input_device_cooperate_sm.h"
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_manager.h"
 #include "input_event_handler.h"
 #include "key_auto_repeat.h"
@@ -129,6 +132,10 @@ void InputEventNormalizeHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPV(keyEvent);
     PrintEventData(keyEvent);
+    if (!CheckKeyboardWhiteList(keyEvent)) {
+        MMI_HILOGI("check white list return false, keyboard event dropped");
+        return;
+    }
     nextHandler_->HandleKeyEvent(keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
@@ -208,6 +215,10 @@ int32_t InputEventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
 
     BytraceAdapter::StartBytrace(keyEvent_);
     PrintEventData(keyEvent_);
+    if (!CheckKeyboardWhiteList(keyEvent_)) {
+        MMI_HILOGI("check white list return false, keyboard event dropped");
+        return RET_OK;
+    }
     nextHandler_->HandleKeyEvent(keyEvent_);
     KeyRepeat->SelectAutoRepeat(keyEvent_);
     MMI_HILOGD("keyCode:%{public}d, action:%{public}d", keyEvent_->GetKeyCode(), keyEvent_->GetKeyAction());
@@ -216,6 +227,61 @@ int32_t InputEventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
 }
+
+bool InputEventNormalizeHandler::CheckKeyboardWhiteList(const std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    int32_t deviceId = keyEvent->GetDeviceId();
+    auto su = InputDevMgr->GetDeviceSupportKey(deviceId);
+    MMI_HILOGI("GetDeviceSupportKey: su : %{public}d", su);
+    if (KEYBOARD_TYPE_ALPHABETICKEYBOARD != su) {
+        return true;
+    }
+    InputHandler->SetJumpInterceptState(false);
+    CooperateState state = InputDevCooSM->GetCurrentCooperateState();
+    if (CooperateState::STATE_IN == state) {
+        CHKPF(keyEvent);
+        if (InputDevMgr->IsRemote(deviceId)) {
+            auto networkId = InputDevMgr->GetOrginNetworkId(deviceId);
+            return !IsNeedFilterOut(networkId, keyEvent);
+        }
+    } else if (CooperateState::STATE_OUT == state) {
+        std::string networkId;
+        InputDevMgr->GetLocalDeviceId(networkId);
+        if (!IsNeedFilterOut(networkId, keyEvent)) {
+            return false;
+        }
+        InputHandler->SetJumpInterceptState(true);
+    }
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+    return true;
+}
+
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+bool InputEventNormalizeHandler::IsNeedFilterOut(const std::string& deviceId, const std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    std::vector<OHOS::MMI::KeyEvent::KeyItem> pressedKeys = keyEvent->GetKeyItems();
+    MMI_HILOGI("pressedKeys size :%{public}lu", pressedKeys.size());
+    std::vector<int32_t> pressedKeysForDInput;
+    pressedKeysForDInput.reserve(pressedKeys.size());
+    for (auto& item : pressedKeys) {
+        pressedKeysForDInput.push_back(item.GetKeyCode());
+    }
+    using namespace OHOS::DistributedHardware::DistributedInput;
+    BusinessEvent businessEvent;
+    businessEvent.keyCode = keyEvent->GetKeyCode();
+    businessEvent.keyAction = keyEvent->GetKeyAction();
+    businessEvent.pressedKeys = pressedKeysForDInput;
+    MMI_HILOGI("businessEvent.keyCode :%{public}d", businessEvent.keyCode);
+    MMI_HILOGI("keyAction :%{public}d", businessEvent.keyAction);
+    for (const auto &item : businessEvent.pressedKeys) {
+        MMI_HILOGI("pressedKeys :%{public}d", item);
+    }
+    return DistributedAdapter->IsNeedFilterOut(deviceId, businessEvent);
+}
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 
 int32_t InputEventNormalizeHandler::HandleMouseEvent(libinput_event* event)
 {

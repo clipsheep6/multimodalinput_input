@@ -46,7 +46,9 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     lastPhysicalX_ = physicalX;
     lastPhysicalY_ = physicalY;
     if (pointerWindow_ != nullptr) {
-        pointerWindow_->MoveTo(physicalX, physicalY);
+        if (IsPointerVisible()) {
+            pointerWindow_->MoveTo(physicalX, physicalY);
+        }
         MMI_HILOGD("Leave, display:%{public}d,physicalX:%{public}d,physicalY:%{public}d",
             displayId, physicalX, physicalY);
         return;
@@ -229,11 +231,15 @@ void PointerDrawingManager::OnDisplayInfo(int32_t displayId, int32_t width, int3
     DrawManager();
 }
 
-void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice)
+void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible)
 {
     CALL_DEBUG_ENTER;
     hasPointerDevice_ = hasPointerDevice;
+    UpdatePidInfo(getpid(), isPointerVisible);
     DrawManager();
+    if (isPointerVisible) {
+        UpdatePointerVisible();
+    }
 }
 
 void PointerDrawingManager::DrawManager()
@@ -331,6 +337,19 @@ int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
     UpdatePidInfo(pid, visible);
     UpdatePointerVisible();
     return RET_OK;
+}
+
+void PointerDrawingManager::SetPointerLocation(int32_t pid, int32_t x, int32_t y)
+{
+    CALL_DEBUG_ENTER;
+    FixCursorPosition(x, y);
+    lastPhysicalX_ = x;
+    lastPhysicalY_ = y;
+    if (pointerWindow_ != nullptr) {
+        pointerWindow_->MoveTo(x, y);
+        UpdatePidInfo(pid, true);
+        SetPointerVisible(pid, true);
+    }
 }
 } // namespace MMI
 } // namespace OHOS
