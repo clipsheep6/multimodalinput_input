@@ -615,12 +615,11 @@ void InputManagerImpl::OnConnected()
 
 void InputManagerImpl::SendDisplayInfo()
 {
-    std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo = std::make_shared<DisplayGroupInfo>(displayGroupInfo_);
-    int32_t ret = MultimodalInputConnMgr->SendDisplayInfo(pDisplayGroupInfo);
+    std::shared_ptr<DisplayGroupInfo> displayGroupInfo = std::make_shared<DisplayGroupInfo>(displayGroupInfo_);
+    int32_t ret = MultimodalInputConnMgr->SendDisplayInfo(displayGroupInfo);
     if (ret != 0) {
         MMI_HILOGE("send to server fail, ret:%{public}d", ret);
     }
-    return;
 }
 
 int32_t InputManagerImpl::RegisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener)

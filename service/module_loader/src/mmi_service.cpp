@@ -283,11 +283,11 @@ int32_t MMIService::Init()
 
 void MMIService::OnStart()
 {
-    int sleepSeconds = 3;
+    int32_t sleepSeconds = 3;
     sleep(sleepSeconds);
     CHK_PID_AND_TID();
     int32_t ret = Init();
-    if (RET_OK != ret) {
+    if (ret != RET_OK) {
         MMI_HILOGE("Init mmi_service failed");
         return;
     }
@@ -816,17 +816,11 @@ int32_t MMIService::UnsubscribeKeyEvent(int32_t subscribeId)
     return RET_OK;
 }
 
-int32_t MMIService::CheckSendDisplayInfo(const std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo)
-{
-    CHKPR(pDisplayGroupInfo, ERROR_NULL_POINTER);
-    return sMsgHandler_.OnDisplayInfo(pDisplayGroupInfo);
-}
-
-int32_t MMIService::SendDisplayInfo(const std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo)
+int32_t MMIService::SendDisplayInfo(const std::shared_ptr<DisplayGroupInfo> displayGroupInfo)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&MMIService::CheckSendDisplayInfo, this, pDisplayGroupInfo));
+        std::bind(&ServerMsgHandler::OnDisplayInfo, this, displayGroupInfo));
     if (ret != RET_OK) {
         MMI_HILOGE("CheckSendDisplayInfo failed, ret:%{public}d", ret);
         return RET_ERR;

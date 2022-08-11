@@ -56,7 +56,7 @@ public:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t OnInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-    int32_t OnDisplayInfo(const std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo);
+    int32_t OnDisplayInfo(const std::shared_ptr<DisplayGroupInfo> displayGroupInfo);
 protected:
     int32_t MarkProcessed(SessionPtr sess, NetPacket& pkt);
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);

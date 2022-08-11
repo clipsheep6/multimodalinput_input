@@ -69,7 +69,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         {IMultimodalInputConnect::INJECT_KEY_EVENT, &MultimodalInputConnectStub::StubInjectKeyEvent},
         {IMultimodalInputConnect::INJECT_POINTER_EVENT, &MultimodalInputConnectStub::StubInjectPointerEvent},
         {IMultimodalInputConnect::SET_ANR_OBSERVER, &MultimodalInputConnectStub::StubSetAnrListener},
-        {IMultimodalInputConnect::DISPLAY_INFO, &MultimodalInputConnectStub::StubSendDisplayInfo}
+        {IMultimodalInputConnect::SEND_DISPLAY_INFO, &MultimodalInputConnectStub::StubSendDisplayInfo}
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -495,10 +495,9 @@ int32_t MultimodalInputConnectStub::StubSetAnrListener(MessageParcel& data, Mess
 int32_t MultimodalInputConnectStub::ReadWindowsVecToParcel(MessageParcel& data, DisplayGroupInfo& displayGroupInfo)
 {
     int32_t num = 0;
-    WindowInfo windowData = {};
     READINT32(data, num, IPC_PROXY_DEAD_OBJECT_ERR);
     for (int32_t i = 0; i < num; i++) {
-        windowData = {};
+        WindowInfo windowData = {};
         READINT32(data, windowData.id, IPC_PROXY_DEAD_OBJECT_ERR);
         READINT32(data, windowData.pid, IPC_PROXY_DEAD_OBJECT_ERR);
         READINT32(data, windowData.uid, IPC_PROXY_DEAD_OBJECT_ERR);
@@ -509,9 +508,8 @@ int32_t MultimodalInputConnectStub::ReadWindowsVecToParcel(MessageParcel& data, 
 
         int32_t numD = 0;
         READINT32(data, numD, IPC_PROXY_DEAD_OBJECT_ERR);
-        Rect defaultHotArea = {};
         for (int32_t i = 0; i < numD; i++) {
-            defaultHotArea = {};
+            Rect defaultHotArea = {};
             READINT32(data, defaultHotArea.x, IPC_PROXY_DEAD_OBJECT_ERR);
             READINT32(data, defaultHotArea.y, IPC_PROXY_DEAD_OBJECT_ERR);
             READINT32(data, defaultHotArea.width, IPC_PROXY_DEAD_OBJECT_ERR);
@@ -521,9 +519,8 @@ int32_t MultimodalInputConnectStub::ReadWindowsVecToParcel(MessageParcel& data, 
 
         int32_t numP = 0;
         READINT32(data, numP, IPC_PROXY_DEAD_OBJECT_ERR);
-        Rect pointerHotArea = {};
         for (int32_t i = 0; i < numP; i++) {
-            pointerHotArea = {};
+            Rect pointerHotArea = {};
             READINT32(data, pointerHotArea.x, IPC_PROXY_DEAD_OBJECT_ERR);
             READINT32(data, pointerHotArea.y, IPC_PROXY_DEAD_OBJECT_ERR);
             READINT32(data, pointerHotArea.width, IPC_PROXY_DEAD_OBJECT_ERR);
@@ -564,9 +561,9 @@ int32_t MultimodalInputConnectStub::ReadDisplayInfoToParcel(MessageParcel& data,
     READINT32(data, displayGroupInfo.width, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, displayGroupInfo.height, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, displayGroupInfo.focusWindowId, IPC_PROXY_DEAD_OBJECT_ERR);
-    (void)ReadWindowsVecToParcel(data, displayGroupInfo);
-    (void)ReadDisplayVecToParcel(data, displayGroupInfo);
-    return RET_OK;
+    int32_t ret = ReadWindowsVecToParcel(data, displayGroupInfo);
+    ret |= ReadDisplayVecToParcel(data, displayGroupInfo);
+    return ret;
 }
 
 int32_t MultimodalInputConnectStub::StubSendDisplayInfo(MessageParcel& data, MessageParcel& reply)
@@ -578,9 +575,13 @@ int32_t MultimodalInputConnectStub::StubSendDisplayInfo(MessageParcel& data, Mes
     }
 
     DisplayGroupInfo displayGroupInfo = {};
-    (void)ReadDisplayInfoToParcel(data, displayGroupInfo);
-    std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo = std::make_shared<DisplayGroupInfo>(displayGroupInfo);
-    int32_t ret = SendDisplayInfo(pDisplayGroupInfo);
+    int32_t ret = ReadDisplayInfoToParcel(data, displayGroupInfo);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to read display info");
+        return ret;
+    }
+    std::shared_ptr<DisplayGroupInfo> displayGroupInfo = std::make_shared<DisplayGroupInfo>(displayGroupInfo);
+    ret = SendDisplayInfo(displayGroupInfo);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SendDisplayInfo failed ret:%{public}d", ret);
         return ret;

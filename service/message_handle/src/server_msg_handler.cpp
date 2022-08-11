@@ -188,11 +188,11 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
-int32_t ServerMsgHandler::OnDisplayInfo(const std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo)
+int32_t ServerMsgHandler::OnDisplayInfo(const std::shared_ptr<DisplayGroupInfo> displayGroupInfo)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(pDisplayGroupInfo, ERROR_NULL_POINTER);
-    InputWindowsManager::GetInstance()->UpdateDisplayInfo(*pDisplayGroupInfo);
+    CHKPR(displayGroupInfo, ERROR_NULL_POINTER);
+    InputWindowsManager::GetInstance()->UpdateDisplayInfo(*displayGroupInfo);
     return RET_OK;
 }
 
