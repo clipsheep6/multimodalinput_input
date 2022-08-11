@@ -61,7 +61,7 @@ protected:
     int32_t StubSendDisplayInfo(MessageParcel& data, MessageParcel& reply);
 
 private:
-    int32_t ReadwindowsVecToParcel(MessageParcel& data, DisplayGroupInfo& displayGroupInfo);
+    int32_t ReadWindowsVecToParcel(MessageParcel& data, DisplayGroupInfo& displayGroupInfo);
     int32_t ReadDisplayVecToParcel(MessageParcel& data, DisplayGroupInfo& displayGroupInfo);
     int32_t ReadDisplayInfoToParcel(MessageParcel& data, DisplayGroupInfo& displayGroupInfo);
 };

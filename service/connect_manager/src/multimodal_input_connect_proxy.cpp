@@ -525,11 +525,11 @@ int32_t MultimodalInputConnectProxy::SetAnrObserver()
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::WritewindowsVecToParcel(const std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo,
+int32_t MultimodalInputConnectProxy::WriteWindowsVecToParcel(const std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo,
                                                              MessageParcel& data)
 {
-    int32_t windows_num = static_cast<int32_t>(pDisplayGroupInfo->windowsInfo.size());
-    WRITEINT32(data, windows_num, ERR_INVALID_VALUE);
+    int32_t windowsNum = static_cast<int32_t>(pDisplayGroupInfo->windowsInfo.size());
+    WRITEINT32(data, windowsNum, ERR_INVALID_VALUE);
     for (const auto& item : pDisplayGroupInfo->windowsInfo) {
         WRITEINT32(data, item.id, ERR_INVALID_VALUE);
         WRITEINT32(data, item.pid, ERR_INVALID_VALUE);
@@ -539,18 +539,18 @@ int32_t MultimodalInputConnectProxy::WritewindowsVecToParcel(const std::shared_p
         WRITEINT32(data, item.area.width, ERR_INVALID_VALUE);
         WRITEINT32(data, item.area.height, ERR_INVALID_VALUE);
         WRITEINT32(data, static_cast<int32_t>(item.defaultHotAreas.size()));
-        for (const auto& item_d : item.defaultHotAreas) {
-            WRITEINT32(data, item_d.x, ERR_INVALID_VALUE);
-            WRITEINT32(data, item_d.y, ERR_INVALID_VALUE);
-            WRITEINT32(data, item_d.width, ERR_INVALID_VALUE);
-            WRITEINT32(data, item_d.height, ERR_INVALID_VALUE);
+        for (const auto& itemD : item.defaultHotAreas) {
+            WRITEINT32(data, itemD.x, ERR_INVALID_VALUE);
+            WRITEINT32(data, itemD.y, ERR_INVALID_VALUE);
+            WRITEINT32(data, itemD.width, ERR_INVALID_VALUE);
+            WRITEINT32(data, itemD.height, ERR_INVALID_VALUE);
         }
         WRITEINT32(data, static_cast<int32_t>(item.pointerHotAreas.size()));
-        for (const auto& item_p : item.pointerHotAreas) {
-            WRITEINT32(data, item_p.x, ERR_INVALID_VALUE);
-            WRITEINT32(data, item_p.y, ERR_INVALID_VALUE);
-            WRITEINT32(data, item_p.width, ERR_INVALID_VALUE);
-            WRITEINT32(data, item_p.height, ERR_INVALID_VALUE);
+        for (const auto& itemP : item.pointerHotAreas) {
+            WRITEINT32(data, itemP.x, ERR_INVALID_VALUE);
+            WRITEINT32(data, itemP.y, ERR_INVALID_VALUE);
+            WRITEINT32(data, itemP.width, ERR_INVALID_VALUE);
+            WRITEINT32(data, itemP.height, ERR_INVALID_VALUE);
         }
         WRITEINT32(data, item.agentWindowId, ERR_INVALID_VALUE);
         WRITEUINT32(data, item.flags, ERR_INVALID_VALUE);
@@ -561,8 +561,8 @@ int32_t MultimodalInputConnectProxy::WritewindowsVecToParcel(const std::shared_p
 int32_t MultimodalInputConnectProxy::WriteDisplayVecToParcel(const std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo,
                                                              MessageParcel& data)
 {
-    int32_t display_num = static_cast<int32_t>(pDisplayGroupInfo->displaysInfo.size());
-    WRITEINT32(data, display_num, ERR_INVALID_VALUE);
+    int32_t displayNum = static_cast<int32_t>(pDisplayGroupInfo->displaysInfo.size());
+    WRITEINT32(data, displayNum, ERR_INVALID_VALUE);
     for (const auto& item : pDisplayGroupInfo->displaysInfo) {
         WRITEINT32(data, item.id, ERR_INVALID_VALUE);
         WRITEINT32(data, item.x, ERR_INVALID_VALUE);

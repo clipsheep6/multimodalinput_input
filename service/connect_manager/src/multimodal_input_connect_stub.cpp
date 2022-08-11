@@ -492,7 +492,7 @@ int32_t MultimodalInputConnectStub::StubSetAnrListener(MessageParcel& data, Mess
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectStub::ReadwindowsVecToParcel(MessageParcel& data, DisplayGroupInfo& displayGroupInfo)
+int32_t MultimodalInputConnectStub::ReadWindowsVecToParcel(MessageParcel& data, DisplayGroupInfo& displayGroupInfo)
 {
     int32_t num = 0;
     WindowInfo windowData = {};
@@ -507,10 +507,10 @@ int32_t MultimodalInputConnectStub::ReadwindowsVecToParcel(MessageParcel& data, 
         READINT32(data, windowData.area.width, IPC_PROXY_DEAD_OBJECT_ERR);
         READINT32(data, windowData.area.height, IPC_PROXY_DEAD_OBJECT_ERR);
 
-        int32_t num_d = 0;
-        READINT32(data, num_d, IPC_PROXY_DEAD_OBJECT_ERR);
+        int32_t numD = 0;
+        READINT32(data, numD, IPC_PROXY_DEAD_OBJECT_ERR);
         Rect defaultHotArea = {};
-        for (uint32_t i = 0; i < num_d; i++) {
+        for (uint32_t i = 0; i < numD; i++) {
             defaultHotArea = {};
             READINT32(data, defaultHotArea.x, IPC_PROXY_DEAD_OBJECT_ERR);
             READINT32(data, defaultHotArea.y, IPC_PROXY_DEAD_OBJECT_ERR);
@@ -519,10 +519,10 @@ int32_t MultimodalInputConnectStub::ReadwindowsVecToParcel(MessageParcel& data, 
             windowData.defaultHotAreas.push_back(defaultHotArea);
         }
 
-        int32_t num_p = 0;
-        READINT32(data, num_p, IPC_PROXY_DEAD_OBJECT_ERR);
+        int32_t numP = 0;
+        READINT32(data, numP, IPC_PROXY_DEAD_OBJECT_ERR);
         Rect pointerHotArea = {};
-        for (uint32_t i = 0; i < num_p; i++) {
+        for (uint32_t i = 0; i < numP; i++) {
             pointerHotArea = {};
             READINT32(data, pointerHotArea.x, IPC_PROXY_DEAD_OBJECT_ERR);
             READINT32(data, pointerHotArea.y, IPC_PROXY_DEAD_OBJECT_ERR);

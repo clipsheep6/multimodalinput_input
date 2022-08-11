@@ -56,7 +56,7 @@ public:
     virtual int32_t SendDisplayInfo(const std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo) override;
 
 private:
-    int32_t WritewindowsVecToParcel(const std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo, MessageParcel& data);
+    int32_t WriteWindowsVecToParcel(const std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo, MessageParcel& data);
     int32_t WriteDisplayVecToParcel(const std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo, MessageParcel& data);
     int32_t WriteDisplayInfoToParcel(const std::shared_ptr<DisplayGroupInfo> pDisplayGroupInfo, MessageParcel& data);
 

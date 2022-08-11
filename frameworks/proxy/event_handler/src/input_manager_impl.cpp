@@ -619,7 +619,6 @@ void InputManagerImpl::SendDisplayInfo()
     int32_t ret = MultimodalInputConnMgr->SendDisplayInfo(pDisplayGroupInfo);
     if (ret != 0) {
         MMI_HILOGE("send to server fail, ret:%{public}d", ret);
-        return;
     }
     return;
 }
