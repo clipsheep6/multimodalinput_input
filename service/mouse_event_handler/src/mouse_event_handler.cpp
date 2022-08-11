@@ -438,6 +438,6 @@ void MouseEventHandler::SetAbsolutionLocation(int32_t xPercent, int32_t yPercent
     int32_t physicalY = WinMgr->GetMouseInfo().physicalY;
     IPointerDrawingManager::GetInstance()->SetPointerLocation(getpid(), physicalX, physicalY);
 }
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 } // namespace MMI
 } // namespace OHOS

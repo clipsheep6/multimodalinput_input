@@ -27,6 +27,9 @@
 #include "parcel.h"
 
 #include "input_event.h"
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+#include "raw_data.h"
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 
 namespace OHOS {
 namespace MMI {
@@ -688,7 +691,21 @@ public:
          * @since 9
          */
         bool ReadFromParcel(Parcel &in);
-
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+        /**
+         * @brief Obtains the RawData of the active window.
+         * @return Returns the RawData.
+         * @since 9
+         */
+        RawData GetRawData() const;
+        /**
+         * @brief Sets the RawData for the active window.
+         * @param rawData Indicates the rawData to set.
+         * @return void
+         * @since 9
+         */
+        void SetRawData(const RawData& rawData);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     private:
         int32_t pointerId_ {};
         bool pressed_ { false };
@@ -713,6 +730,9 @@ public:
         int64_t downTime_ {};
         int32_t toolType_ {};
         int32_t targetWindowId_ { -1 };
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+        RawData rawData_;
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     };
 
 public:
