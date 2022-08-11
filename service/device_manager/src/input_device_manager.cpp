@@ -283,7 +283,9 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
 #endif // OHOS_BUILD_ENABLE_POINTER
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-    inputDevice_[nextId_] = MakeInputDeviceObj(inputDevice);
+    struct InputDeviceObj obj;
+    MakeInputDeviceObj(obj, inputDevice);
+    inputDevice_[nextId_] = obj;
     for (const auto &item : devListener_) {
         CHKPC(item.first);
         item.second(nextId_, "add");
@@ -303,9 +305,8 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     DfxHisysevent::OnDeviceConnect(nextId_ - 1, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
 }
 
-struct InputDeviceObj InputDeviceManager::MakeInputDeviceObj(struct libinput_device *inputDevice)
+void InputDeviceManager::MakeInputDeviceObj(struct InputDeviceObj &obj, struct libinput_device *inputDevice)
 {
-    struct InputDeviceObj obj;
     obj.inputDeviceOrgin_ = inputDevice;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     obj.isRemote_ = IsRemote(inputDevice);
@@ -316,7 +317,6 @@ struct InputDeviceObj InputDeviceManager::MakeInputDeviceObj(struct libinput_dev
     MMI_HILOGE("networkIdOrgin: %{public}s, fd:%{public}d", obj.networkIdOrgin_.c_str(), obj.fd_);
     obj.dhid_ = GenerateDescriptor(inputDevice, obj.isRemote_);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
-    return obj;
 }
 
 void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevice)
