@@ -17,6 +17,7 @@ mmi_service_path = "${mmi_path}/service"
 
 config("libmmi_server_config") {
   include_dirs = [
+    "input_device_cooperate/include",
     "device_manager/include",
     "device_scalability/include",
     "delegate_task/include",
@@ -51,6 +52,7 @@ config("libmmi_server_config") {
     "//foundation/multimodalinput/input/util/network/include",
     "//foundation/multimodalinput/input/frameworks/proxy/event_handler/include",
     "//third_party/cJSON",
+    "//foundation/deviceprofile/device_info_manager/interfaces/innerkits/core/include",
   ]
 
   if (input_feature_hdf) {
@@ -111,6 +113,10 @@ config("libmmi_server_config") {
   if (input_feature_monitor) {
     defines += [ "OHOS_BUILD_ENABLE_MONITOR" ]
   }
+
+  if (input_feature_input_cooperate) {
+    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
+  }
 }
 
 ohos_prebuilt_etc("multimodalinput_config_ability.json") {
@@ -149,6 +155,10 @@ ohos_shared_library("libmmi-server") {
     "timer_manager/src/timer_manager.cpp",
     "window_manager/src/input_windows_manager.cpp",
   ]
+
+  if (input_feature_input_cooperate) {
+    sources += [ "input_device_cooperate/src/device_profile_adapter.cpp" ]
+  }
 
   if (input_feature_hdf) {
     sources += [
@@ -203,6 +213,7 @@ ohos_shared_library("libmmi-server") {
     ":mmi_device_config.ini",
     ":multimodalinput_config_ability.json",
     "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
+    "//foundation/deviceprofile/device_info_manager/interfaces/innerkits/core:distributed_device_profile_client",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics:2d_graphics",
     "//foundation/graphic/graphic_2d/rosen/modules/render_service_client:librender_service_client",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
@@ -228,6 +239,7 @@ ohos_shared_library("libmmi-server") {
     "access_token:libaccesstoken_sdk",
     "config_policy:configpolicy_util",
     "drivers_interface_input:hdi_input",
+    "dsoftbus:softbus_client",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
