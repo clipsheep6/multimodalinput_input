@@ -252,7 +252,7 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
     pointerItem.SetDeviceId(deviceId);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     SetDxDyForDInput(pointerItem, data);
-#endif //OHOS_BUILD_ENABLE_COOPERATE
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     pointerEvent_->UpdateId();
     pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
@@ -417,7 +417,8 @@ void MouseEventHandler::SetDxDyForDInput(PointerEvent::PointerItem& pointerItem,
 
 void MouseEventHandler::SetAbsolutionLocation(int32_t xPercent, int32_t yPercent)
 {
-    MMI_HILOGI("MouseEventHandler cross screen location : xPercent:%{public}d, yPercent:%{public}d", xPercent, yPercent);
+    MMI_HILOGI("MouseEventHandler cross screen location : xPercent:%{public}d, yPercent:%{public}d",
+        xPercent, yPercent);
     if (currentDisplayId_ == -1) {
         auto dispalyGroupInfo = WinMgr->GetDisplayGroupInfo();
         if (dispalyGroupInfo.displaysInfo.empty()) {
