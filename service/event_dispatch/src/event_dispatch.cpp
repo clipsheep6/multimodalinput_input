@@ -175,7 +175,7 @@ bool EventDispatch::CheckPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
 {
     if (mouseState_.size() > 0) {
         CHKPF(pointerEvent);
-        if(pointerEvent->GetSourceType() == mouseState_[0].type &&
+        if (pointerEvent->GetSourceType() == mouseState_[0].type &&
             pointerEvent->GetButtonId() == mouseState_[0].code &&
             pointerEvent->GetPointerAction() == mouseState_[0].value) {
             mouseState_.clear();
