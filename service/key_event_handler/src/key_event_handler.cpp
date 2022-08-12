@@ -80,7 +80,8 @@ int32_t KeyEventHandler::Normalize(struct libinput_event *event, std::shared_ptr
     return RET_OK;
 }
 
-void KeyEventHandler::CheckUpKeyItems(std::shared_ptr<KeyEvent> keyEvent) {
+void KeyEventHandler::CheckUpKeyItems(std::shared_ptr<KeyEvent> keyEvent)
+{
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     auto preAction = keyEvent->GetAction();
     if (preAction == KeyEvent::KEY_ACTION_UP) {
