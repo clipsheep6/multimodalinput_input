@@ -31,6 +31,7 @@ public:
     virtual ~MMIClient() override;
 
     int32_t Socket() override;
+    void SetEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventHandler, bool newThread = false);
     virtual void Stop() override;
     virtual bool SendMessage(const NetPacket& pkt) const override;
     virtual bool GetCurrentConnectedStatus() const override;
@@ -47,8 +48,9 @@ protected:
     virtual void OnConnected() override;
     virtual void OnDisconnected() override;
 
-    bool StartEventRunner();
-    void OnRecvThread();
+    // bool StartEventRunner();
+    // void OnRecvThread();
+    void OnReconnect();
     bool AddFdListener(int32_t fd);
     bool DelFdListener(int32_t fd);
     void OnPacket(NetPacket& pkt);
@@ -62,7 +64,9 @@ protected:
     std::mutex mtx_;
     std::condition_variable cv_;
     std::thread recvThread_;
-    std::shared_ptr<MMIEventHandler> recvEventHandler_ = nullptr;
+
+    bool isNeedNewThread_ = false;
+    std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS
