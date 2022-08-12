@@ -82,7 +82,7 @@ int32_t KeyEventHandler::Normalize(struct libinput_event *event, std::shared_ptr
 
 void KeyEventHandler::CheckUpKeyItems(std::shared_ptr<KeyEvent> keyEvent)
 {
-    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    CHKPV(keyEvent);
     auto preAction = keyEvent->GetAction();
     if (preAction == KeyEvent::KEY_ACTION_UP) {
         auto preUpKeyItem = keyEvent->GetKeyItem();
@@ -93,6 +93,5 @@ void KeyEventHandler::CheckUpKeyItems(std::shared_ptr<KeyEvent> keyEvent)
         }
     }
 }
-
 } // namespace MMI
 } // namespace OHOS
