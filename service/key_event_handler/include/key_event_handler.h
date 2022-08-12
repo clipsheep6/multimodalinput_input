@@ -20,8 +20,6 @@
 
 #include "input_windows_manager.h"
 #include "key_event.h"
-// #include "pointer_event.h"
-// #include "uds_server.h"
 #include "util.h"
 
 namespace OHOS {
