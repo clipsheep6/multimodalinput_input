@@ -46,15 +46,7 @@ int32_t KeyEventHandler::Normalize(struct libinput_event *event, std::shared_ptr
     keyCode = KeyMapMgr->TransferDeviceKeyValue(device, keyCode);
     int32_t keyAction = (libinput_event_keyboard_get_key_state(data) == 0) ?
         (KeyEvent::KEY_ACTION_UP) : (KeyEvent::KEY_ACTION_DOWN);
-    auto preAction = keyEvent->GetAction();
-    if (preAction == KeyEvent::KEY_ACTION_UP) {
-        auto preUpKeyItem = keyEvent->GetKeyItem();
-        if (preUpKeyItem != nullptr) {
-            keyEvent->RemoveReleasedKeyItems(*preUpKeyItem);
-        } else {
-            MMI_HILOGE("The preUpKeyItem is null");
-        }
-    }
+    CheckUpKeyItems(keyEvent);
     int64_t time = GetSysClockTime();
     keyEvent->SetActionTime(time);
     keyEvent->SetAction(keyAction);
@@ -87,5 +79,19 @@ int32_t KeyEventHandler::Normalize(struct libinput_event *event, std::shared_ptr
     }
     return RET_OK;
 }
+
+void KeyEventHandler::CheckUpKeyItems(std::shared_ptr<KeyEvent> keyEvent) {
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    auto preAction = keyEvent->GetAction();
+    if (preAction == KeyEvent::KEY_ACTION_UP) {
+        auto preUpKeyItem = keyEvent->GetKeyItem();
+        if (preUpKeyItem != nullptr) {
+            keyEvent->RemoveReleasedKeyItems(*preUpKeyItem);
+        } else {
+            MMI_HILOGE("The preUpKeyItem is null");
+        }
+    }
+}
+
 } // namespace MMI
 } // namespace OHOS
