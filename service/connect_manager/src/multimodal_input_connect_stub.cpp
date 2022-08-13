@@ -68,7 +68,16 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         {IMultimodalInputConnect::MOVE_MOUSE, &MultimodalInputConnectStub::StubMoveMouseEvent},
         {IMultimodalInputConnect::INJECT_KEY_EVENT, &MultimodalInputConnectStub::StubInjectKeyEvent},
         {IMultimodalInputConnect::INJECT_POINTER_EVENT, &MultimodalInputConnectStub::StubInjectPointerEvent},
-        {IMultimodalInputConnect::SET_ANR_OBSERVER, &MultimodalInputConnectStub::StubSetAnrListener}
+        {IMultimodalInputConnect::SET_ANR_OBSERVER, &MultimodalInputConnectStub::StubSetAnrListener},
+        {IMultimodalInputConnect::SIMULATE_CROSS_LOCATION, &MultimodalInputConnectStub::StubSetPointerLocation},
+        {IMultimodalInputConnect::SET_INPUT_DEVICE_SEAT_NAME, &MultimodalInputConnectStub::StubSetInputDeviceSeatName},
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+        {IMultimodalInputConnect::GET_REMOTE_ABILITY, &MultimodalInputConnectStub::StubGetRemoteAbility},
+        {IMultimodalInputConnect::PREPARE_DINPUT, &MultimodalInputConnectStub::StubPrepareRemoteInput},
+        {IMultimodalInputConnect::UNPREPARE_DINPUT, &MultimodalInputConnectStub::StubUnprepareRemoteInput},
+        {IMultimodalInputConnect::START_DINPUT, &MultimodalInputConnectStub::StubStartRemoteInput},
+        {IMultimodalInputConnect::STOP_DINPUT, &MultimodalInputConnectStub::StubStopRemoteInput},
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -490,5 +499,161 @@ int32_t MultimodalInputConnectStub::StubSetAnrListener(MessageParcel& data, Mess
     }
     return RET_OK;
 }
+
+int32_t MultimodalInputConnectStub::StubSetPointerLocation(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_INFO_TRACE;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check fail");
+        return CHECK_PERMISSION_FAIL;
+    }
+    int32_t x;
+    READINT32(data, x, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t y;
+    READINT32(data, y, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetPointerLocation(x, y);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetPointerLocation failed ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("Success pid:%{public}d", GetCallingPid());
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetInputDeviceSeatName(MessageParcel& data, MessageParcel& reply)
+{
+    std::string seatName;
+    READSTRING(data, seatName, IPC_PROXY_DEAD_OBJECT_ERR);
+    DeviceUniqId deviceUniqId;
+    int32_t ret = SetInputDeviceSeatName(seatName, deviceUniqId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetInputDeviceSeatName failed ret:%{public}d", ret);
+        return ret;
+    }
+    if (!reply.WriteInt32(std::get<0>(deviceUniqId)) || !reply.WriteInt32(std::get<1>(deviceUniqId))
+        || !reply.WriteInt32(std::get<2>(deviceUniqId)) || !reply.WriteInt32(std::get<3>(deviceUniqId))
+        || !reply.WriteInt32(std::get<4>(deviceUniqId)) || !reply.WriteString(std::get<5>(deviceUniqId))) {
+        MMI_HILOGE("Write DeviceUniqId :%{public}d fail", ret);
+        return IPC_STUB_WRITE_PARCEL_ERR;
+    }
+    MMI_HILOGD("Success pid:%{public}d", GetCallingPid());
+    return RET_OK;
+}
+
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+int32_t MultimodalInputConnectStub::StubGetRemoteAbility(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_INFO_TRACE;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check fail");
+        return CHECK_PERMISSION_FAIL;
+    }
+    std::string networkId;
+    READSTRING(data, networkId, IPC_PROXY_DEAD_OBJECT_ERR);
+    sptr<IRemoteObject> client = data.ReadRemoteObject();
+    CHKPR(client, ERR_INVALID_VALUE);
+    sptr<ICallDinput> remoteAbility = iface_cast<ICallDinput>(client);
+    CHKPR(remoteAbility, ERROR_NULL_POINTER);
+    int32_t ret = GetRemoteInputAbility(networkId, remoteAbility);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetRemoteAbility failed ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("Success pid:%{public}d", GetCallingPid());
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubPrepareRemoteInput(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_INFO_TRACE;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check fail");
+        return CHECK_PERMISSION_FAIL;
+    }
+    std::string networkId;
+    READSTRING(data, networkId, IPC_PROXY_DEAD_OBJECT_ERR);
+    sptr<IRemoteObject> client = data.ReadRemoteObject();
+    CHKPR(client, ERR_INVALID_VALUE);
+    sptr<ICallDinput> prepareDinput = iface_cast<ICallDinput>(client);
+    CHKPR(prepareDinput, ERROR_NULL_POINTER);
+    int32_t ret = PrepareRemoteInput(networkId, prepareDinput);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call PrepareRemoteInput failed ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("Success pid:%{public}d", GetCallingPid());
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubUnprepareRemoteInput(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_INFO_TRACE;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check fail");
+        return CHECK_PERMISSION_FAIL;
+    }
+    std::string networkId;
+    READSTRING(data, networkId, IPC_PROXY_DEAD_OBJECT_ERR);
+    sptr<IRemoteObject> client = data.ReadRemoteObject();
+    CHKPR(client, ERR_INVALID_VALUE);
+    sptr<ICallDinput> unprepareDinput = iface_cast<ICallDinput>(client);
+    CHKPR(unprepareDinput, ERROR_NULL_POINTER);
+    int32_t ret = UnprepareRemoteInput(networkId, unprepareDinput);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call UnprepareRemoteInput failed ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("Success pid:%{public}d", GetCallingPid());
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubStartRemoteInput(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_INFO_TRACE;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check fail");
+        return CHECK_PERMISSION_FAIL;
+    }
+    std::string networkId;
+    READSTRING(data, networkId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t inputAbility;
+    READINT32(data, inputAbility, IPC_PROXY_DEAD_OBJECT_ERR);
+    sptr<IRemoteObject> client = data.ReadRemoteObject();
+    CHKPR(client, ERR_INVALID_VALUE);
+    sptr<ICallDinput> startDinput = iface_cast<ICallDinput>(client);
+    CHKPR(startDinput, ERROR_NULL_POINTER);
+    int32_t ret = StartRemoteInput(networkId, inputAbility, startDinput);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call StartRemoteInput failed ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("Success pid:%{public}d", GetCallingPid());
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubStopRemoteInput(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_INFO_TRACE;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check fail");
+        return CHECK_PERMISSION_FAIL;
+    }
+    std::string networkId;
+    READSTRING(data, networkId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t inputAbility;
+    READINT32(data, inputAbility, IPC_PROXY_DEAD_OBJECT_ERR);
+    sptr<IRemoteObject> client = data.ReadRemoteObject();
+    CHKPR(client, ERR_INVALID_VALUE);
+    sptr<ICallDinput> stopDinput = iface_cast<ICallDinput>(client);
+    CHKPR(stopDinput, ERROR_NULL_POINTER);
+    int32_t ret = StopRemoteInput(networkId, inputAbility, stopDinput);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call StopRemoteInput failed ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("Success pid:%{public}d", GetCallingPid());
+    return RET_OK;
+}
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
 } // namespace MMI
 } // namespace OHOS
