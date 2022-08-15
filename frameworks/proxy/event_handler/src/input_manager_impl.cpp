@@ -752,6 +752,7 @@ int32_t InputManagerImpl::SetInputDeviceToScreen(int32_t deviceFd, const std::st
     MMI_HILOGW("Enable input device cooperate does not support");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
+}
 
 int32_t InputManagerImpl::SetPointerLocation(int32_t x, int32_t y)
 {
