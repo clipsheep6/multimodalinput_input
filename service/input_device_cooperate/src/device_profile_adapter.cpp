@@ -105,7 +105,7 @@ int32_t DeviceProfileAdapter::RegisterCrossingStateListener(const std::string &d
     }
     auto callbackIter = callbacks_.find(deviceId);
     if ((callbackIter != callbacks_.end()) && (&callbackIter->second == &callback)) {
-        MMI_HILOGI("callback has exist!!!");
+        MMI_HILOGI("callback has already exist");
         return RET_OK;
     }
     callbacks_[deviceId] = callback;
