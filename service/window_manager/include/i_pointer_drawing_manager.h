@@ -17,7 +17,6 @@
 #define I_POINTER_DRAWING_MANAGER_H
 
 #include <memory>
-#include "struct_multimodal.h"
 
 #include "display_info.h"
 #include "struct_multimodal.h"
