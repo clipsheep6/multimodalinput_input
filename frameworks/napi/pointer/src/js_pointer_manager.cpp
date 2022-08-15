@@ -244,7 +244,6 @@ napi_value JsPointerManager::SetPointerStyle(napi_env env, int windowid, int poi
         THROWERR(env, "create AsyncContext failed");
         return nullptr;
     }
-    MMI_HILOGE("SetPointerStyle windowid:%{public}d, pointerStyle:%{public}d", windowid, pointerStyle);
     asyncContext->errorCode = InputManager::GetInstance()->SetPointerStyle(windowid, pointerStyle);
     asyncContext->reserve << ReturnType::VOID;
 
@@ -267,7 +266,6 @@ napi_value JsPointerManager::GetPointerStyle(napi_env env, int windowid, napi_va
         THROWERR(env, "create AsyncContext failed");
         return nullptr;
     }
-    MMI_HILOGE("GetPointerStyle windowid:%{public}d", windowid);
     int pointerStyle = 0;
     asyncContext->errorCode = InputManager::GetInstance()->GetPointerStyle(windowid, pointerStyle);
     asyncContext->reserve << ReturnType::NUMBER << pointerStyle;
