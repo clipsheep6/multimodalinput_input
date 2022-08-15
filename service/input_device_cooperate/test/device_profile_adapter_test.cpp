@@ -17,9 +17,7 @@
 #include <memory>
 
 #include <gtest/gtest.h>
-
 #include "device_profile_adapter.h"
-
 #include "softbus_bus_center.h"
 
 namespace OHOS {
@@ -34,9 +32,9 @@ public:
 
 HWTEST_F(DeviceProfileAdapterTest, UpdateCrossingSwitchState001, TestSize.Level1)
 {
-    int32_t rest = DProfileAdapter->UpdateCrossingSwitchState(true);
-    std::cout << "rest: " << rest << std::endl;
-    EXPECT_EQ(rest, 0);
+    int32_t ret = DProfileAdapter->UpdateCrossingSwitchState(true);
+    std::cout << "ret: " << ret << std::endl;
+    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(DeviceProfileAdapterTest, GetCrossingSwitchState001, TestSize.Level1)
@@ -50,21 +48,21 @@ HWTEST_F(DeviceProfileAdapterTest, GetCrossingSwitchState001, TestSize.Level1)
 
 HWTEST_F(DeviceProfileAdapterTest, RegisterCrossingStateListener001, TestSize.Level1)
 {
-    NodeBasicInfo *info = NULL;
+    NodeBasicInfo *info = nullptr;
     int32_t infoNum = 0;
     GetAllNodeDeviceInfo("ohos.multimodalinput.input", &info, &infoNum);
-    std::cout << "DeviceInfo::" << std::endl;
+    std::cout << "DeviceInfo: " << std::endl;
     for (int32_t i = 0; i < infoNum; i++) {
-        std::cout << "other dev networkId::" << std::endl;
+        std::cout << "other dev networkId: " << std::endl;
         std::cout << info->networkId << std::endl;
-        std::cout << "other dev deviceName::" << std::endl;
+        std::cout << "other dev deviceName: " << std::endl;
         std::cout << info->deviceName << std::endl;
         std::cout << std::endl;
         info++;
     }
     std::string networkId;
     std::vector<std::string> ids;
-    std::cout << "NetworkId::enter q to stop";
+    std::cout << "NetworkId:enter q to stop";
     while (networkId != "q") {
         std::cin >> networkId;
         ids.emplace_back(networkId);

@@ -15,6 +15,8 @@
 
 #include "device_profile_adapter.h"
 
+#include <algorithm>
+
 #include "distributed_device_profile_client.h"
 #include "nlohmann/json.hpp"
 #include "service_characteristic_profile.h"
@@ -30,7 +32,7 @@ constexpr const char *SERVICE_ID = "InputDeviceCooperation";
 constexpr const char *SERVICE_TYPE = "InputDeviceCooperation";
 constexpr const char *CHARACTERISTICS_NAME = "currentState";
 } // namespace
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "DeviceProfileAdapter"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "DeviceProfileAdapter" };
 
 DeviceProfileAdapter::DeviceProfileAdapter()
 {
@@ -39,7 +41,7 @@ DeviceProfileAdapter::DeviceProfileAdapter()
 
 DeviceProfileAdapter::~DeviceProfileAdapter()
 {
-    UnInit();
+    Release();
 }
 
 int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, std::vector<std::string> &deviceIds)
@@ -59,7 +61,7 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, std::vector<
                   [&, this](std::string &deviceId) { syncOptions.AddDevice(deviceId); });
     int32_t syncRet =
         DistributedDeviceProfileClient::GetInstance().SyncDeviceProfile(syncOptions, profileEventCallback_);
-    if (syncRet) {
+    if (syncRet != 0) {
         MMI_HILOGW("Sync Device Profile failed code:%{public}d", syncRet);
     }
     return putRet;
@@ -102,7 +104,7 @@ int32_t DeviceProfileAdapter::RegisterCrossingStateListener(const std::string &d
         return RET_ERR;
     }
     auto callbackIter = callbacks_.find(deviceId);
-    if (callbackIter != callbacks_.end() && (&callbackIter->second == &callback)) {
+    if ((callbackIter != callbacks_.end()) && (&callbackIter->second == &callback)) {
         MMI_HILOGI("callback has exist!!!");
         return RET_OK;
     }
@@ -146,11 +148,9 @@ int32_t DeviceProfileAdapter::RegisterProfileListener(const std::string &deviceI
     changeEventInfo.profileEvent = ProfileEvent::EVENT_PROFILE_CHANGED;
     changeEventInfo.extraInfo = std::move(extraInfo);
     subscribeInfos.emplace_back(changeEventInfo);
-
     SubscribeInfo syncEventInfo;
     syncEventInfo.profileEvent = ProfileEvent::EVENT_SYNC_COMPLETED;
     subscribeInfos.emplace_back(syncEventInfo);
-
     std::list<ProfileEvent> failedEvents;
     int32_t ret = DistributedDeviceProfileClient::GetInstance().SubscribeProfileEvents(
         subscribeInfos, profileEventCallback_, failedEvents);
@@ -163,7 +163,7 @@ void DeviceProfileAdapter::Init()
     profileEventCallback_ = std::make_shared<ProfileEventCallbackImpl>();
 }
 
-void DeviceProfileAdapter::UnInit()
+void DeviceProfileAdapter::Release()
 {
     DistributedDeviceProfileClient::GetInstance().UnsubscribeProfileEvent(ProfileEvent::EVENT_PROFILE_CHANGED,
                                                                           profileEventCallback_);
@@ -174,8 +174,8 @@ void DeviceProfileAdapter::UnInit()
 void DeviceProfileAdapter::ProfileEventCallbackImpl::OnProfileChanged(
     const ProfileChangeNotification &changeNotification)
 {
-    MMI_HILOGD("OnProfile Changed!!!!");
     std::string deviceId = changeNotification.GetDeviceId();
+    MMI_HILOGD("The profile has changed deviceId is %{public}s", deviceId.c_str());
     auto callbackIter = DProfileAdapter->callbacks_.find(deviceId);
     if (callbackIter == DProfileAdapter->callbacks_.end()) {
         MMI_HILOGD("The device has no callback");
@@ -191,7 +191,11 @@ void DeviceProfileAdapter::ProfileEventCallbackImpl::OnProfileChanged(
 
 void DeviceProfileAdapter::ProfileEventCallbackImpl::OnSyncCompleted(const DeviceProfile::SyncResult &syncResults)
 {
-    MMI_HILOGI("OnSyncCompleted!!!!");
+    std::for_each(syncResults.begin(), syncResults.end(),
+                  [](SyncResult::reference &syncResult) {
+                      MMI_HILOGD("Sync Result : deviceId:%{public}s, result:%{public}d",
+                                 syncResult.first.c_str(), syncResult.second);
+                  });
 }
 } // namespace MMI
 } // namespace OHOS

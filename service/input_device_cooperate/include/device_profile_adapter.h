@@ -16,14 +16,14 @@
 #ifndef DEVICE_PROFILE_ADAPTER_H
 #define DEVICE_PROFILE_ADAPTER_H
 
+#include <functional>
 #include <memory>
 #include <vector>
-#include <functional>
 
-#include "nocopyable.h"
-#include "singleton.h"
 #include "define_multimodal.h"
 #include "iprofile_event_callback.h"
+#include "nocopyable.h"
+#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
@@ -85,7 +85,7 @@ private:
         void OnProfileChanged(const DeviceProfile::ProfileChangeNotification &changeNotification) override;
     };
     void Init();
-    void UnInit();
+    void Release();
     int32_t RegisterProfileListener(const std::string &deviceId);
     std::map<std::string, ProfileEventCallback> callbacks_;
     std::shared_ptr<DeviceProfile::IProfileEventCallback> profileEventCallback_;
