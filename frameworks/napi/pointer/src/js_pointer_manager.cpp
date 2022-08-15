@@ -241,7 +241,7 @@ napi_value JsPointerManager::SetPointerStyle(napi_env env, int windowid, int poi
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
     if (asyncContext == nullptr) {
-        THROWERR(env, "create AsyncContext failed");
+        THROWERR(env, "Create AsyncContext failed");
         return nullptr;
     }
     asyncContext->errorCode = InputManager::GetInstance()->SetPointerStyle(windowid, pointerStyle);
@@ -263,7 +263,7 @@ napi_value JsPointerManager::GetPointerStyle(napi_env env, int windowid, napi_va
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
     if (asyncContext == nullptr) {
-        THROWERR(env, "create AsyncContext failed");
+        THROWERR(env, "Create AsyncContext failed");
         return nullptr;
     }
     int pointerStyle = 0;
