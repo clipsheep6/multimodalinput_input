@@ -191,11 +191,10 @@ void DeviceProfileAdapter::ProfileEventCallbackImpl::OnProfileChanged(
 
 void DeviceProfileAdapter::ProfileEventCallbackImpl::OnSyncCompleted(const DeviceProfile::SyncResult &syncResults)
 {
-    std::for_each(syncResults.begin(), syncResults.end(),
-                  [](SyncResult::reference &syncResult) {
-                      MMI_HILOGD("Sync Result : deviceId:%{public}s, result:%{public}d",
-                                 syncResult.first.c_str(), syncResult.second);
-                  });
+    std::for_each(syncResults.begin(), syncResults.end(), [](const auto &syncResult) {
+        MMI_HILOGD("Sync Result : deviceId: %{public}s, result:%{public}d", syncResult.first.c_str(),
+                   syncResult.second);
+    });
 }
 } // namespace MMI
 } // namespace OHOS
