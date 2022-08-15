@@ -85,6 +85,11 @@ private:
         UnPrepareStopDInputCallbackSink,
     };
 
+    struct TimerInfo {
+        int32_t times = 0;
+        int32_t timerId = 0;
+    };
+
     class StartDInputCallback : public DistributedHardware::DistributedInput::StartDInputCallbackStub {
     public:
         void OnResult(const std::string &devId, const uint32_t &inputTypes, const int32_t &status) override;
@@ -146,7 +151,10 @@ private:
 
     void Init();
     void Release();
-    void SaveCallbackFunc(CallbackType type, DICallback callback);
+    int32_t SaveCallbackFunc(CallbackType type, DICallback callback);
+    int32_t AddWatch(const CallbackType &type);
+    int32_t RemoveWatch(const CallbackType &type);
+    std::map<CallbackType, TimerInfo> watchingMap_;
     std::map<CallbackType, DICallback> callbackMap_;
     MouseStateChangeCallback mouseStateChangeCallback_ = nullptr;
     sptr<DistributedHardware::DistributedInput::SimulationEventListener> mouseListener_ = nullptr;
