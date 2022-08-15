@@ -26,6 +26,7 @@
 #include "define_multimodal.h"
 #include "input_device_manager.h"
 #include "mmi_log.h"
+#include "util.h"
 
 namespace OHOS {
 namespace MMI {
@@ -40,46 +41,7 @@ namespace OHOS {
 namespace MMI {
 PointerDrawingManager::PointerDrawingManager()
 {
-    mouseIcons_[MOUSE_ICON::DEFAULT] = IMAGE_POINTER_DEFAULT_PATH + "Default.png";
-    mouseIcons_[MOUSE_ICON::EAST] = IMAGE_POINTER_DEFAULT_PATH + "East.png";
-    mouseIcons_[MOUSE_ICON::WEST] = IMAGE_POINTER_DEFAULT_PATH + "West.png";
-    mouseIcons_[MOUSE_ICON::SOUTH] = IMAGE_POINTER_DEFAULT_PATH + "South.png";
-    mouseIcons_[MOUSE_ICON::NORTH] = IMAGE_POINTER_DEFAULT_PATH + "North.png";
-    mouseIcons_[MOUSE_ICON::WEST_EAST] = IMAGE_POINTER_DEFAULT_PATH + "westEast.png";
-    mouseIcons_[MOUSE_ICON::NORTH_SOUTH] = IMAGE_POINTER_DEFAULT_PATH + "northSouth.png";
-    mouseIcons_[MOUSE_ICON::NORTH_EAST] = IMAGE_POINTER_DEFAULT_PATH + "northEast.png";
-    mouseIcons_[MOUSE_ICON::NORTH_WEST] = IMAGE_POINTER_DEFAULT_PATH + "northWest.png";
-    mouseIcons_[MOUSE_ICON::SOUTH_EAST] = IMAGE_POINTER_DEFAULT_PATH + "southEast.png";
-    mouseIcons_[MOUSE_ICON::SOUTH_WEST] = IMAGE_POINTER_DEFAULT_PATH + "southWest.png";
-    mouseIcons_[MOUSE_ICON::NORTH_EAST_SOUTH_WEST] = IMAGE_POINTER_DEFAULT_PATH + "northEastSouthWest.png";
-    mouseIcons_[MOUSE_ICON::NORTH_WEST_SOUTH_EAST] = IMAGE_POINTER_DEFAULT_PATH + "northWestSouthEast.png";
-    mouseIcons_[MOUSE_ICON::CROSS] = IMAGE_POINTER_DEFAULT_PATH + "Cross.png";
-    mouseIcons_[MOUSE_ICON::CURSOR_COPY] = IMAGE_POINTER_DEFAULT_PATH + "cursorCopy.png";
-    mouseIcons_[MOUSE_ICON::CURSOR_FORBID] = IMAGE_POINTER_DEFAULT_PATH + "cursorForbid.png";
-    mouseIcons_[MOUSE_ICON::COLOR_SUCKER] = IMAGE_POINTER_DEFAULT_PATH + "colorSucker.png";
-    mouseIcons_[MOUSE_ICON::HAND_GRABBING] = IMAGE_POINTER_DEFAULT_PATH + "handGrabbing.png";
-    mouseIcons_[MOUSE_ICON::HAND_OPEN] = IMAGE_POINTER_DEFAULT_PATH + "handOpen.png";
-    mouseIcons_[MOUSE_ICON::HAND_POINTING] = IMAGE_POINTER_DEFAULT_PATH + "handPointing.png";
-    mouseIcons_[MOUSE_ICON::HELP] = IMAGE_POINTER_DEFAULT_PATH + "Help.png";
-    mouseIcons_[MOUSE_ICON::CURSOR_MOVE] = IMAGE_POINTER_DEFAULT_PATH + "Move.png";
-    mouseIcons_[MOUSE_ICON::RESIZE_LEFT_RIGHT] = IMAGE_POINTER_DEFAULT_PATH + "resizeLeftRight.png";
-    mouseIcons_[MOUSE_ICON::RESIZE_UP_DOWN] = IMAGE_POINTER_DEFAULT_PATH + "resizeUpDown.png";
-    mouseIcons_[MOUSE_ICON::SCREENSHOT_CHOOSE] = IMAGE_POINTER_DEFAULT_PATH + "screenshotChoose.png";
-    mouseIcons_[MOUSE_ICON::SCREENSHOT_CURSOR] = IMAGE_POINTER_DEFAULT_PATH + "screenshotCursor.png";
-    mouseIcons_[MOUSE_ICON::TEXT_CURSOR] = IMAGE_POINTER_DEFAULT_PATH + "textCursor.png";
-    mouseIcons_[MOUSE_ICON::ZOOM_IN] = IMAGE_POINTER_DEFAULT_PATH + "zoomIn.png";
-    mouseIcons_[MOUSE_ICON::ZOOM_OUT] = IMAGE_POINTER_DEFAULT_PATH + "zoomOut.png";
-    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_EAST] = IMAGE_POINTER_DEFAULT_PATH + "middleBinEast.png";
-    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_WEST] = IMAGE_POINTER_DEFAULT_PATH + "middleBinWest.png";
-    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_SOUTH] = IMAGE_POINTER_DEFAULT_PATH + "middleBinSouth.png";
-    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_NORTH] = IMAGE_POINTER_DEFAULT_PATH + "middleBinNorth.png";
-    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_NORTH_SOUTH] = IMAGE_POINTER_DEFAULT_PATH + "middleBinNorthSouth.png";
-    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_NORTH_EAST] = IMAGE_POINTER_DEFAULT_PATH + "middleBinNorthEast.png";
-    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_NORTH_WEST] = IMAGE_POINTER_DEFAULT_PATH + "middleBinNorthWest.png";
-    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_SOUTH_EAST] = IMAGE_POINTER_DEFAULT_PATH + "middleBinSouthEast.png";
-    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_SOUTH_WEST] = IMAGE_POINTER_DEFAULT_PATH + "middleBinSouthWest.png";
-    mouseIcons_[MOUSE_ICON::MIDDLE_BTN_NORTH_SOUTH_WEST_EAST] = IMAGE_POINTER_DEFAULT_PATH +
-        "middleBinNorthSouthWestEast.png";
+    InitStyle();
 }
 
 PointerDrawingManager::~PointerDrawingManager() {}
@@ -93,6 +55,8 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     FixCursorPosition(physicalX, physicalY);
     lastPhysicalX_ = physicalX;
     lastPhysicalY_ = physicalY;
+    
+    AdjustMouseFocus(ICON_TYPE(mouseIcons_[mouseStyle].alignmentWay), physicalX, physicalY);
     if (pointerWindow_ != nullptr) {
         pointerWindow_->MoveTo(physicalX, physicalY);
 
@@ -115,6 +79,7 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     }
     
     CreatePointerWindow(displayId, physicalX, physicalY);
+    CHKPV(pointerWindow_);
     int32_t ret = InitLayer(mouseStyle);
     if (ret != RET_OK) {
         MMI_HILOGE("Init layer failed");
@@ -129,20 +94,23 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
 int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(pointerWindow_, RET_ERR);
     sptr<OHOS::Surface> layer = GetLayer();
     if (layer == nullptr) {
+        if (pointerWindow_ != nullptr) {
+            pointerWindow_->Destroy();
+            pointerWindow_ = nullptr;
+        }
         MMI_HILOGE("Init layer is failed, get layer is nullptr");
-        pointerWindow_->Destroy();
-        pointerWindow_ = nullptr;
         return RET_ERR;
     }
 
     sptr<OHOS::SurfaceBuffer> buffer = GetSurfaceBuffer(layer);
     if (buffer == nullptr || buffer->GetVirAddr() == nullptr) {
+        if (pointerWindow_ != nullptr) {
+            pointerWindow_->Destroy();
+            pointerWindow_ = nullptr;
+        }
         MMI_HILOGE("Init layer is failed, buffer or virAddr is nullptr");
-        pointerWindow_->Destroy();
-        pointerWindow_ = nullptr;
         return RET_ERR;
     }
 
@@ -158,6 +126,30 @@ int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
     MMI_HILOGD("Init layer FlushBuffer ret:%{public}s", SurfaceErrorStr(ret).c_str());
     UpdatePointerVisible();
     return RET_OK;
+}
+
+void PointerDrawingManager::AdjustMouseFocus(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY)
+{
+    CALL_DEBUG_ENTER;
+    int32_t realImageWidth = 40;
+    int32_t realImageHeight = 40;
+
+    switch (iconType) {
+        case ANGLE_SW: {
+            physicalY -= realImageHeight;
+            break;
+        }
+        case ANGLE_CENTER: {
+            physicalX -= realImageWidth / 2;
+            physicalY -= realImageHeight / 2;
+            break;
+        }
+        case ANGLE_NW:
+        default: {
+            MMI_HILOGD("No need adjust mouse focus");
+            break;
+        }
+    }
 }
 
 void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physicalY)
@@ -249,7 +241,7 @@ void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t heigh
     OHOS::Rosen::Drawing::Canvas canvas;
     canvas.Bind(bitmap);
     canvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
-    DrawPixelmap(canvas, mouseIcons_[mouseStyle]);
+    DrawPixelmap(canvas, mouseIcons_[mouseStyle].iconPath);
     static constexpr uint32_t stride = 4;
     uint32_t addrSize = width * height * stride;
     errno_t ret = memcpy_s(addr, addrSize, bitmap.GetPixels(), addrSize);
@@ -463,6 +455,59 @@ int32_t PointerDrawingManager::GetPointerStyle(int32_t pid, int32_t windowId, in
 
     MMI_HILOGD("Window type:%{public}d get pointer style:%{public}d success", windowId, pointerStyle);
     return RET_OK;
+}
+
+void PointerDrawingManager::InitStyle()
+{
+    CALL_DEBUG_ENTER;
+    mouseIcons_ = {
+        {DEFAULT, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Default_NW.png"}},
+        {EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "East_Center.png"}},
+        {WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "West_Center.png"}},
+        {SOUTH, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "South_Center.png"}},
+        {NORTH, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "North_Center.png"}},
+        {WEST_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "WestEast_Center.png"}},
+        {NORTH_SOUTH, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "NorthSouth_Center.png"}},
+        {NORTH_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "NorthEast_Center.png"}},
+        {NORTH_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "NorthWest_Center.png"}},
+        {SOUTH_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "SouthEast_Center.png"}},
+        {SOUTH_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "SouthWest_Center.png"}},
+        {NORTH_EAST_SOUTH_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "NESW_Center.png"}},
+        {NORTH_WEST_SOUTH_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "NWSE_Center.png"}},
+        {CROSS, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Cross_Center.png"}},
+        {CURSOR_COPY, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Copy_NW.png"}},
+        {CURSOR_FORBID, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Forbid_NW.png"}},
+        {COLOR_SUCKER, {ANGLE_SW, IMAGE_POINTER_DEFAULT_PATH + "Colorsucker_SW.png"}},
+        {HAND_GRABBING, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "HandGrabbing_Center.png"}},
+        {HAND_OPEN, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "HandOpen_Center.png"}},
+        {HAND_POINTING, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "HandPointing_NW.png"}},
+        {HELP, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Help_NW.png"}},
+        {CURSOR_MOVE, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Move_Center.png"}},
+        {RESIZE_LEFT_RIGHT, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "ResizeLeftRight_Center.png"}},
+        {RESIZE_UP_DOWN, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "ResizeUpDown_Center.png"}},
+        {SCREENSHOT_CHOOSE, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "ScreenshotCross_Center.png"}},
+        {SCREENSHOT_CURSOR, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "ScreenshotCursor_Center.png"}},
+        {TEXT_CURSOR, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "TextCursor_Center.png"}},
+        {ZOOM_IN, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "ZoomIn_Center.png"}},
+        {ZOOM_OUT, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "ZoomOut_Center.png"}},
+        {MIDDLE_BTN_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBin_East_Center.png"}},
+        {MIDDLE_BTN_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBin_West_Center.png"}},
+        {MIDDLE_BTN_SOUTH, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBin_South_Center.png"}},
+        {MIDDLE_BTN_NORTH, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBin_North_Center.png"}},
+        {MIDDLE_BTN_NORTH_SOUTH, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBin_NS_Center.png"}},
+        {MIDDLE_BTN_NORTH_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBin_NE_Center.png"}},
+        {MIDDLE_BTN_NORTH_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBin_NW_Center.png"}},
+        {MIDDLE_BTN_SOUTH_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBin_SE_Center.png"}},
+        {MIDDLE_BTN_SOUTH_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBin_SW_Center.png"}},
+        {MIDDLE_BTN_NORTH_SOUTH_WEST_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBin_NSWE_Center.png"}},
+    };
+    for (auto iter = mouseIcons_.begin(); iter != mouseIcons_.end(); ) {
+        if((ReadCursorStyleFile(iter->second.iconPath)) != RET_OK) {
+            iter = mouseIcons_.erase(iter);
+            continue;
+        }
+        ++iter;
+    }
 }
 } // namespace MMI
 } // namespace OHOS

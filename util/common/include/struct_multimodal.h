@@ -150,6 +150,23 @@ enum MOUSE_ICON {
     MIDDLE_BTN_NORTH_SOUTH_WEST_EAST = 38,
 };
 
+enum ICON_TYPE {
+    ANGLE_E = 0,
+    ANGLE_S = 1,
+    ANGLE_W = 2,
+    ANGLE_N = 3,
+    ANGLE_SE = 4,
+    ANGLE_NE = 5,
+    ANGLE_SW = 6,
+    ANGLE_NW = 7,
+    ANGLE_CENTER = 8,
+};
+
+struct IconStyle {
+    int32_t alignmentWay {0};
+    std::string iconPath;
+};
+
 #pragma pack(1)
 struct TagPackHead {
     MmiMessageId idMsg;

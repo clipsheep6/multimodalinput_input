@@ -31,6 +31,7 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputWindowsManager"};
 constexpr int32_t DEFAULT_POINTER_STYLE = 0;
+constexpr int32_t MAX_WINDOW_COUNT = 20;
 } // namespace
 
 InputWindowsManager::InputWindowsManager() {}
@@ -563,6 +564,10 @@ void InputWindowsManager::UpdatePointerStyle()
 
         auto subit = it->second.find(windowItem.id);
         if (subit == it->second.end()) {
+            if (it->second.size() == MAX_WINDOW_COUNT) {
+                MMI_HILOGD("The window count:%{public}zu exceeds limit in same pd", it->second.size());
+                it->second.erase(it->second.begin());
+            }
             auto iter = it->second.insert(std::pair<int32_t, int32_t>(windowItem.id, DEFAULT_POINTER_STYLE));
             if (!iter.second) {
                 MMI_HILOGE("The window type is duplicated");
@@ -760,6 +765,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     int32_t ret = GetPointerStyle(touchWindow->pid, touchWindow->id, mouseStyle);
     if (ret != RET_OK) {
         MMI_HILOGE("Get pointer style failed, mouse style return default style");
+        return RET_ERR;
     }
     IPointerDrawingManager::GetInstance()->DrawPointer(displayId, pointerItem.GetDisplayX(),
         pointerItem.GetDisplayY(), MOUSE_ICON(mouseStyle));

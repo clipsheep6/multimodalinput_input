@@ -459,7 +459,7 @@ int32_t MMIService::GetPointerStyle(int32_t windowId, int32_t &pointerStyle)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::GetPointerStyle,
         IPointerDrawingManager::GetInstance(), GetCallingPid(), windowId, std::ref(pointerStyle)));
     if (ret != RET_OK) {
-        MMI_HILOGE("Get pointer style failed,return %{public}d", pointerStyle);
+        MMI_HILOGE("Get pointer style failed,return %{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;

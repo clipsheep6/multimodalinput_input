@@ -50,10 +50,11 @@ public:
     int32_t GetPointerStyle(int32_t pid, int32_t windowId, int32_t &pointerStyle);
     bool IsPointerVisible();
     int32_t InitLayer(const MOUSE_ICON mouseStyle);
+    void AdjustMouseFocus(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
 
 public:
-    static const int32_t IMAGE_WIDTH = 64;
-    static const int32_t IMAGE_HEIGHT = 64;
+    static const int32_t IMAGE_WIDTH = 48;
+    static const int32_t IMAGE_HEIGHT = 48;
 
 private:
     void CreatePointerWindow(int32_t displayId, int32_t physicalX, int32_t physicalY);
@@ -67,6 +68,7 @@ private:
     void DeletePidInfo(int32_t pid);
     void UpdatePointerVisible();
     void UpdatePidInfo(int32_t pid, bool visible);
+    void InitStyle();
 
 private:
     sptr<OHOS::Rosen::Window> pointerWindow_ = nullptr;
@@ -81,8 +83,7 @@ private:
     int32_t lastPhysicalY_ = -1;
     Direction direction_ = Direction0;
     int32_t preMouseStyle_ = 0;
-    std::map<MOUSE_ICON, std::string> mouseIcons_;
-
+    std::map<MOUSE_ICON, IconStyle> mouseIcons_;
     struct PidInfo {
         int32_t pid { 0 };
         bool visible { false };

@@ -190,7 +190,7 @@ int32_t MultimodalInputConnectProxy::SetPointerStyle(int32_t windowId, int32_t p
     MessageParcel data;
     if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
         MMI_HILOGE("Failed to write descriptor");
-        return ERR_INVALID_VALUE;
+        return RET_ERR;
     }
 
     WRITEINT32(data, windowId, RET_ERR);
