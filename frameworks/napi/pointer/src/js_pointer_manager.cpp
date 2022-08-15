@@ -279,6 +279,5 @@ napi_value JsPointerManager::GetPointerStyle(napi_env env, int windowid, napi_va
     AsyncCallbackWork(asyncContext);
     return promise;
 }
-
 } // namespace MMI
 } // namespace OHOS

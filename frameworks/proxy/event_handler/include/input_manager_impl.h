@@ -66,7 +66,6 @@ public:
     void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
         std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
 
-
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD

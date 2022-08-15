@@ -368,7 +368,8 @@ napi_value JsPointerContext::CreatePointerStyle(napi_env env, napi_value exports
     napi_value middle_btn_south_west = nullptr;
     CHKRP(env, napi_create_int32(env, MOUSE_ICON::MIDDLE_BTN_SOUTH_WEST, &middle_btn_south_west), CREATE_INT32);
     napi_value middle_btn_north_south_west_east = nullptr;
-    CHKRP(env, napi_create_int32(env, MOUSE_ICON::MIDDLE_BTN_NORTH_SOUTH_WEST_EAST, &middle_btn_north_south_west_east), CREATE_INT32);
+    CHKRP(env, napi_create_int32(env, MOUSE_ICON::MIDDLE_BTN_NORTH_SOUTH_WEST_EAST,
+        &middle_btn_north_south_west_east), CREATE_INT32);
 
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_PROPERTY("DEFAULT", defaults),
@@ -442,11 +443,11 @@ napi_value JsPointerContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("isPointerVisible", IsPointerVisible),
         DECLARE_NAPI_STATIC_FUNCTION("setPointerSpeed", SetPointerSpeed),
         DECLARE_NAPI_STATIC_FUNCTION("getPointerSpeed", GetPointerSpeed),
-		DECLARE_NAPI_STATIC_FUNCTION("setPointerStyle", SetPointerStyle),
+        DECLARE_NAPI_STATIC_FUNCTION("setPointerStyle", SetPointerStyle),
         DECLARE_NAPI_STATIC_FUNCTION("getPointerStyle", GetPointerStyle),
     };
     CHKRP(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
-    if(CreatePointerStyle(env, exports) == nullptr) {
+    if (CreatePointerStyle(env, exports) == nullptr) {
         THROWERR(env, "Failed to create pointer style");
         return nullptr;
     }

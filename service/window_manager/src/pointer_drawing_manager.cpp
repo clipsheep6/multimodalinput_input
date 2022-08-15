@@ -501,8 +501,8 @@ void PointerDrawingManager::InitStyle()
         {MIDDLE_BTN_SOUTH_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBin_SW_Center.png"}},
         {MIDDLE_BTN_NORTH_SOUTH_WEST_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBin_NSWE_Center.png"}},
     };
-    for (auto iter = mouseIcons_.begin(); iter != mouseIcons_.end(); ) {
-        if((ReadCursorStyleFile(iter->second.iconPath)) != RET_OK) {
+    for (auto iter = mouseIcons_.begin(); iter != mouseIcons_.end();) {
+        if ((ReadCursorStyleFile(iter->second.iconPath)) != RET_OK) {
             iter = mouseIcons_.erase(iter);
             continue;
         }
