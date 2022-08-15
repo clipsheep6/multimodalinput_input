@@ -30,8 +30,6 @@ public:
     DISALLOW_COPY_AND_MOVE(KeyEventHandler);
     virtual ~KeyEventHandler();
     int32_t Normalize(libinput_event *event, std::shared_ptr<KeyEvent> keyEvent);
-private:
-    void CheckUpKeyItems(std::shared_ptr<KeyEvent> keyEvent);
 };
 } // namespace MMI
 } // namespace OHOS
