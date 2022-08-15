@@ -15,6 +15,7 @@
 
 #include "input_event_normalize_handler.h"
 
+#include "dfx_hisysevent.h"
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
@@ -41,6 +42,7 @@ void InputEventNormalizeHandler::HandleEvent(libinput_event* event)
 {
     CALL_DEBUG_ENTER;
     CHKPV(event);
+    DfxHisysevent::GetDispStartTime();
     auto type = libinput_event_get_type(event);
     TimeCostChk chk("HandleLibinputEvent", "overtime 1000(us)", MAX_INPUT_EVENT_TIME, type);
     if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
@@ -58,6 +60,7 @@ void InputEventNormalizeHandler::HandleEvent(libinput_event* event)
         }
         case LIBINPUT_EVENT_KEYBOARD_KEY: {
             HandleKeyboardEvent(event);
+            DfxHisysevent::CalcKeyDispTimes();
             break;
         }
         case LIBINPUT_EVENT_POINTER_MOTION:
@@ -65,12 +68,14 @@ void InputEventNormalizeHandler::HandleEvent(libinput_event* event)
         case LIBINPUT_EVENT_POINTER_BUTTON:
         case LIBINPUT_EVENT_POINTER_AXIS: {
             HandleMouseEvent(event);
+            DfxHisysevent::CalcPointerDispTimes();
             break;
         }
         case LIBINPUT_EVENT_TOUCHPAD_DOWN:
         case LIBINPUT_EVENT_TOUCHPAD_UP:
         case LIBINPUT_EVENT_TOUCHPAD_MOTION: {
             HandleTouchPadEvent(event);
+            DfxHisysevent::CalcPointerDispTimes();
             break;
         }
         case LIBINPUT_EVENT_GESTURE_SWIPE_BEGIN:
@@ -80,12 +85,14 @@ void InputEventNormalizeHandler::HandleEvent(libinput_event* event)
         case LIBINPUT_EVENT_GESTURE_PINCH_UPDATE:
         case LIBINPUT_EVENT_GESTURE_PINCH_END: {
             HandleGestureEvent(event);
+            DfxHisysevent::CalcPointerDispTimes();
             break;
         }
         case LIBINPUT_EVENT_TOUCH_DOWN:
         case LIBINPUT_EVENT_TOUCH_UP:
         case LIBINPUT_EVENT_TOUCH_MOTION: {
             HandleTouchEvent(event);
+            DfxHisysevent::CalcPointerDispTimes();
             break;
         }
         case LIBINPUT_EVENT_TABLET_TOOL_AXIS:
@@ -99,6 +106,7 @@ void InputEventNormalizeHandler::HandleEvent(libinput_event* event)
             break;
         }
     }
+    DfxHisysevent::ReportDispTimes();
 }
 
 int32_t InputEventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
