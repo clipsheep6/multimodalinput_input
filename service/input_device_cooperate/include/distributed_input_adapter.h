@@ -39,15 +39,7 @@ namespace OHOS {
 namespace MMI {
 class DistributedInputAdapter : public DelayedSingleton<DistributedInputAdapter> {
 public:
-    struct StartStopResultData {
-        std::string srcId;
-        std::string sinkId;
-        std::map<int32_t, std::string> deviceDataMap;
-        bool isStart;
-    };
-
     using DICallback = std::function<void(bool)>;
-    using StartStopResultCallback = std::function<void(StartStopResultData)>;
     using MouseStateChangeCallback = std::function<void(uint32_t type, uint32_t code, int32_t value)>;
 
     DistributedInputAdapter();
@@ -78,7 +70,6 @@ public:
 
     int32_t RegisterEventCallback(MouseStateChangeCallback callback);
     int32_t UnregisterEventCallback(MouseStateChangeCallback callback);
-    int32_t RegisterStartStopCallback(StartStopResultCallback callback);
 
 private:
     enum class CallbackType {
@@ -148,24 +139,15 @@ private:
         void OnResult(const std::string &devId, const int32_t &status) override;
     };
 
-    class StartStopResCallback : public DistributedHardware::DistributedInput::StartStopResultCallbackStub {
-    public:
-        void OnStart(const std::string &srcId, const std::string &sinkId,
-                     std::vector<DistributedHardware::DistributedInput::FdDhidDeviceData> &devData) override;
-        void OnStop(const std::string &srcId, const std::string &sinkId,
-                    std::vector<DistributedHardware::DistributedInput::FdDhidDeviceData> &devData) override;
-    };
-
     class MouseStateChangeCallbackImpl : public DistributedHardware::DistributedInput::SimulationEventListenerStub {
     public:
         int32_t OnMouseDownEvent(uint32_t type, uint32_t code, int32_t value) override;
     };
 
     void Init();
-    void UnInit();
+    void Release();
     void SaveCallbackFunc(CallbackType type, DICallback callback);
     std::map<CallbackType, DICallback> callbackMap_;
-    StartStopResultCallback startStopCallback_ = nullptr;
     MouseStateChangeCallback mouseStateChangeCallback_ = nullptr;
     sptr<DistributedHardware::DistributedInput::SimulationEventListener> mouseListener_ = nullptr;
 };
