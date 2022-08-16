@@ -24,7 +24,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "StopDeviceCooperateFuzzTest" };
 } // namespace
 
-void StopDeviceCooperateFuzzTest(const uint8_t* data, size_t  size )
+void StopDeviceCooperateFuzzTest(const uint8_t* data, size_t  size)
 {
     if (data == nullptr) {
         return;

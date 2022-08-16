@@ -28,7 +28,8 @@ class IAnrObserverTest : public IAnrObserver {
 public:
     IAnrObserverTest () : IAnrObserver() {}
     virtual ~IAnrObserverTest() {}
-    virtual void OnAnr(int32_t pid) const override {
+    virtual void OnAnr(int32_t pid) const override
+    {
         MMI_HILOGD("Set anr success");
     };
 };

@@ -31,7 +31,6 @@ void GetDeviceIdsFuzzTest(const uint8_t* data, size_t /* size */)
     };
     InputManager::GetInstance()->GetDeviceIds(fun);
 }
-
 } // MMI
 } // OHOS
 

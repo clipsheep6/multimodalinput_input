@@ -23,7 +23,8 @@
 namespace OHOS {
     namespace MMI {
         namespace {
-            constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "RegisterCooperateListenerFuzzTest" };
+            constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN,
+                                                            "RegisterCooperateListenerFuzzTest" };
         } // namespace
 
         template<class T>
