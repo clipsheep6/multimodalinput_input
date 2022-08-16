@@ -520,6 +520,7 @@ int32_t MultimodalInputConnectProxy::SetAnrObserver()
     int32_t ret = remote->SendRequest(SET_ANR_OBSERVER, data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return ret;
     }
     return RET_OK;
 }
