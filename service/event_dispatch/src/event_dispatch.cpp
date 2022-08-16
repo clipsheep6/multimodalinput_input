@@ -26,6 +26,7 @@
 #include "hitrace_meter.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
+#include "input_windows_manager.h"
 #include "input-event-codes.h"
 #include "proto.h"
 #include "util.h"
@@ -61,22 +62,24 @@ void EventDispatch::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
+void EventDispatch::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPV(pointerEvent);
+    HandlePointerEventInner(pointerEvent, EVENT_DISPATCH_TYPE_POINTER);
+}
+#endif // OHOS_BUILD_ENABLE_POINTER
+
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 void EventDispatch::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
-    OnHandlePointerEvent(pointerEvent, EVENT_DISPATCH_TYPE_TOUCH);
+    HandlePointerEventInner(pointerEvent, EVENT_DISPATCH_TYPE_TOUCH);
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-void EventDispatch::HandlePointerEvent(const std::shared_ptr<PointerEvent> point)
-{
-    CHKPV(point);
-    OnHandlePointerEvent(point, EVENT_DISPATCH_TYPE_POINTER);
-}
-
-void EventDispatch::OnHandlePointerEvent(const std::shared_ptr<PointerEvent> point, int32_t dispacthType)
+void EventDispatch::HandlePointerEventInner(const std::shared_ptr<PointerEvent> point, int32_t dispacthType)
 {
     CALL_DEBUG_ENTER;
     CHKPV(point);
@@ -88,7 +91,7 @@ void EventDispatch::OnHandlePointerEvent(const std::shared_ptr<PointerEvent> poi
     }
     DfxHisysevent::OnUpdateTargetPointer(point, fd, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    if (handleType == EVENT_DISPATCH_TYPE_POINTER) {
+    if (dispacthType == EVENT_DISPATCH_TYPE_POINTER) {
         if (CheckPointerEvent(point)) {
             return;
         }
