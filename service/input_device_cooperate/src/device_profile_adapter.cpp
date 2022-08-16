@@ -16,6 +16,7 @@
 #include "device_profile_adapter.h"
 
 #include <algorithm>
+#include <mutex>
 
 #include "distributed_device_profile_client.h"
 #include "nlohmann/json.hpp"
@@ -31,6 +32,7 @@ namespace {
 constexpr const char *SERVICE_ID = "InputDeviceCooperation";
 constexpr const char *SERVICE_TYPE = "InputDeviceCooperation";
 constexpr const char *CHARACTERISTICS_NAME = "CurrentState";
+std::mutex adapterLock;
 } // namespace
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "DeviceProfileAdapter" };
 
@@ -98,6 +100,7 @@ bool DeviceProfileAdapter::GetCrossingSwitchState(const std::string &deviceId)
 
 int32_t DeviceProfileAdapter::RegisterCrossingStateListener(const std::string &deviceId, ProfileEventCallback callback)
 {
+    std::lock_guard<std::mutex> lock(adapterLock);
     CHKPR(callback, RET_ERR);
     if (deviceId.empty()) {
         MMI_HILOGE("DeviceId is nullptr");
