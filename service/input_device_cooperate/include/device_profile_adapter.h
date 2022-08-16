@@ -35,46 +35,46 @@ public:
     DISALLOW_COPY_AND_MOVE(DeviceProfileAdapter);
 
     /**
-     * Abandoned: it will cause this change can not notify other device
+     * 更新开关状态，但不会通知到设备
      *
-     * @param state The new Switch state
-     * @return int32_t 0 : OK , Other: FAIL
+     * @param state 开关状态
+     * @return 0表示成功，其他表示失败
      */
     int32_t UpdateCrossingSwitchState(bool state);
 
     /**
-     * UpdateCrossingSwtichState
+     * 更新开关状态，并通知到设备
      *
-     * @param state The new Switch state
-     * @param deviceIds Which device you want notify this change
-     * @return int32_t 0 : OK , Other: FAIL
+     * @param state 开关状态
+     * @param deviceIds 设备id列表
+     * @return 0表示成功，其他表示失败
      */
     int32_t UpdateCrossingSwitchState(bool state, std::vector<std::string> &deviceIds);
 
     /**
-     * @brief Get the Crossing Switch State object
+     * 注册事件回调函数
      *
-     * @param deviceId The device you want to get
-     * @return true SwitchState
-     * @return false SwitchState
+     * @param deviceId 设备id
+     * @return true 开关状态
+     * @return false 开关状态
      */
     bool GetCrossingSwitchState(const std::string &deviceId);
 
     /**
-     * Regist a listener to listen for one device switch change
+     * 注册事件回调函数
      *
-     * @param deviceId The device you want to listen
-     * @param callback The function for call you
-     * @return int32_t 0 : OK , Other: FAIL
+     * @param deviceId 设备id
+     * @param callback 事件回调函数
+     * @return 0表示成功，其他表示失败
      */
     int32_t RegisterCrossingStateListener(const std::string &deviceId, ProfileEventCallback callback);
 
     /**
-     * Unregist the listener to listen for one device switch change
+     * 取消注册事件回调函数
      *
-     * @param deviceId The device you want to Unregist
-     * @param callback The which you set listen
-     * @return int32_t 0 : OK , Other: FAIL
+     * @param deviceId 设备id
+     * @param callback 事件回调函数
+     * @return 0表示成功，其他表示失败
      */
     int32_t UnregisterCrossingStateListener(const std::string &deviceId);
 

@@ -53,9 +53,9 @@ HWTEST_F(DeviceProfileAdapterTest, RegisterCrossingStateListener001, TestSize.Le
     GetAllNodeDeviceInfo("ohos.multimodalinput.input", &info, &infoNum);
     std::cout << "DeviceInfo: " << std::endl;
     for (int32_t i = 0; i < infoNum; i++) {
-        std::cout << "other dev networkId: " << std::endl;
+        std::cout << "other device networkId: " << std::endl;
         std::cout << info->networkId << std::endl;
-        std::cout << "other dev deviceName: " << std::endl;
+        std::cout << "other device deviceName: " << std::endl;
         std::cout << info->deviceName << std::endl;
         std::cout << std::endl;
         info++;
@@ -73,11 +73,11 @@ HWTEST_F(DeviceProfileAdapterTest, RegisterCrossingStateListener001, TestSize.Le
         });
     EXPECT_EQ(regisRet, 0);
     DProfileAdapter->UpdateCrossingSwitchState(false, ids);
-    std::cout << "Make Sure that Get the State Change 0 and press any key to be continue" << std::endl;
+    std::cout << "Make sure that get the state change 0 and press any key to be continue" << std::endl;
     std::string wait;
     std::cin >> wait;
     DProfileAdapter->UpdateCrossingSwitchState(true, ids);
-    std::cout << "Make Sure that Get the State Change 1 and press any key to be continue" << std::endl;
+    std::cout << "Make sure that get the state change 1 and press any key to be continue" << std::endl;
     std::cin >> wait;
     (void)wait;
 }
