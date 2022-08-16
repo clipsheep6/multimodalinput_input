@@ -420,8 +420,8 @@ void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::strin
 
 int32_t InputDeviceManager::SetInputDeviceToScreen(int32_t deviceFd, const std::string& screenId)
 {
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
     CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
     MMI_HILOGI("SetInputDeviceToScreen: %{public}d, fd:%{public}s", deviceFd, screenId.c_str());
     if (deviceFd == INVALID_DEVICE_FD) {
         MMI_HILOGE("Invalid input device fd");
@@ -431,19 +431,19 @@ int32_t InputDeviceManager::SetInputDeviceToScreen(int32_t deviceFd, const std::
         MMI_HILOGE("Input device screen id is empty");
         return RET_ERR;
     }
-    inputDeviceScreen_[deviceFd] = screenId;
+    inputDeviceScreens_[deviceFd] = screenId;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     return RET_OK;
 }
 
 const std::string& InputDeviceManager::GetScreenIdFromDeviceId(int32_t deviceId) const
 {
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
     CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
     auto item = inputDevice_.find(deviceId);
     if (item != inputDevice_.end()) {
-        auto iter = inputDeviceScreen_.find(item->second.fd_);
-        if (iter != inputDeviceScreen_.end()) {
+        auto iter = inputDeviceScreens_.find(item->second.fd_);
+        if (iter != inputDeviceScreens_.end()) {
             return iter->second;
         }
     }

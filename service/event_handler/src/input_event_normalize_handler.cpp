@@ -140,10 +140,12 @@ void InputEventNormalizeHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPV(keyEvent);
     PrintEventData(keyEvent);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
     if (!CheckKeyboardWhiteList(keyEvent)) {
-        MMI_HILOGI("check white list return false, keyboard event dropped");
+        MMI_HILOGI("Check white list return false, keyboard event dropped");
         return;
     }
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     nextHandler_->HandleKeyEvent(keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
@@ -223,10 +225,12 @@ int32_t InputEventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
 
     BytraceAdapter::StartBytrace(keyEvent_);
     PrintEventData(keyEvent_);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
     if (!CheckKeyboardWhiteList(keyEvent_)) {
-        MMI_HILOGI("check white list return false, keyboard event dropped");
+        MMI_HILOGI("Check white list return false, keyboard event dropped");
         return RET_OK;
     }
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     nextHandler_->HandleKeyEvent(keyEvent_);
     KeyRepeat->SelectAutoRepeat(keyEvent_);
     MMI_HILOGD("keyCode:%{public}d, action:%{public}d", keyEvent_->GetKeyCode(), keyEvent_->GetKeyAction());
@@ -236,21 +240,21 @@ int32_t InputEventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     return RET_OK;
 }
 
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
 bool InputEventNormalizeHandler::CheckKeyboardWhiteList(std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-   InputHandler->SetJumpInterceptState(false);
+    CHKPF(keyEvent);
+    InputHandler->SetJumpInterceptState(false);
     CooperateState state = InputDevCooSM->GetCurrentCooperateState();
     MMI_HILOGI("InputDevCooSM->GetCurrentCooperateState(): %{public}d", state);
-    CHKPF(keyEvent);
-    if (CooperateState::STATE_IN == state) {
+    if (state == CooperateState::STATE_IN) {
         int32_t deviceId = keyEvent->GetDeviceId();
         if (InputDevMgr->IsRemote(deviceId)) {
             auto networkId = InputDevMgr->GetOrginNetworkId(deviceId);
             return !IsNeedFilterOut(networkId, keyEvent);
         }
-    } else if (CooperateState::STATE_OUT == state) {
+    } else if (state == CooperateState::STATE_OUT) {
         std::string networkId;
         InputDevMgr->GetLocalDeviceId(networkId);
         if (!IsNeedFilterOut(networkId, keyEvent)) {
@@ -260,29 +264,29 @@ bool InputEventNormalizeHandler::CheckKeyboardWhiteList(std::shared_ptr<KeyEvent
             return false;
         }
         InputHandler->SetJumpInterceptState(true);
+    } else {
+        MMI_HILOGI("Get current cooperate state: STATE_FREE");`
     }
-#endif
     return true;
 }
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 bool InputEventNormalizeHandler::IsNeedFilterOut(const std::string& deviceId, const std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
-    std::vector<OHOS::MMI::KeyEvent::KeyItem> pressedKeys = keyEvent->GetKeyItems();
-    MMI_HILOGI("pressedKeys size :%{public}lu", pressedKeys.size());
-    std::vector<int32_t> pressedKeysForDInput;
-    pressedKeysForDInput.reserve(pressedKeys.size());
-    for (auto& item : pressedKeys) {
-        pressedKeysForDInput.push_back(item.GetKeyCode());
+    std::vector<OHOS::MMI::KeyEvent::KeyItem> KeyItems = keyEvent->GetKeyItems();
+    MMI_HILOGI("KeyItems size :%{public}lu", KeyItems.size());
+    std::vector<int32_t> KeyItemsForDInput;
+    KeyItemsForDInput.reserve(KeyItems.size());
+    for (auto& item : KeyItems) {
+        KeyItemsForDInput.push_back(item.GetKeyCode());
     }
-    using namespace OHOS::DistributedHardware::DistributedInput;
-    BusinessEvent businessEvent;
+    OHOS::DistributedHardware::DistributedInput::BusinessEvent businessEvent;
     businessEvent.keyCode = keyEvent->GetKeyCode();
     businessEvent.keyAction = keyEvent->GetKeyAction();
-    businessEvent.pressedKeys = pressedKeysForDInput;
-    MMI_HILOGI("businessEvent.keyCode :%{public}d", businessEvent.keyCode);
-    MMI_HILOGI("keyAction :%{public}d", businessEvent.keyAction);
+    businessEvent.pressedKeys = KeyItemsForDInput;
+    MMI_HILOGI("businessEvent.keyCode :%{public}d, keyAction :%{public}d", businessEvent.keyCode, businessEvent.keyAction);
     for (const auto &item : businessEvent.pressedKeys) {
         MMI_HILOGI("pressedKeys :%{public}d", item);
     }

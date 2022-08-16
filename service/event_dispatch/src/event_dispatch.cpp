@@ -37,8 +37,6 @@ namespace {
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) || defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatch" };
 constexpr int32_t ANR_DISPATCH = 0;
-constexpr int32_t EVENT_DISPATCH_TYPE_TOUCH = 0;
-constexpr int32_t EVENT_DISPATCH_TYPE_POINTER = 1;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD ||  OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace
 
@@ -66,7 +64,7 @@ void EventDispatch::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 void EventDispatch::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
-    HandlePointerEventInner(pointerEvent, EVENT_DISPATCH_TYPE_POINTER);
+    HandlePointerEventInner(pointerEvent);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
@@ -74,12 +72,12 @@ void EventDispatch::HandlePointerEvent(const std::shared_ptr<PointerEvent> point
 void EventDispatch::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
-    HandlePointerEventInner(pointerEvent, EVENT_DISPATCH_TYPE_TOUCH);
+    HandlePointerEventInner(pointerEvent);
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-void EventDispatch::HandlePointerEventInner(const std::shared_ptr<PointerEvent> point, int32_t dispacthType)
+void EventDispatch::HandlePointerEventInner(const std::shared_ptr<PointerEvent> point)
 {
     CALL_DEBUG_ENTER;
     CHKPV(point);
@@ -91,7 +89,7 @@ void EventDispatch::HandlePointerEventInner(const std::shared_ptr<PointerEvent> 
     }
     DfxHisysevent::OnUpdateTargetPointer(point, fd, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    if (dispacthType == EVENT_DISPATCH_TYPE_POINTER) {
+    if(point->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
         if (CheckPointerEvent(point)) {
             return;
         }
@@ -176,7 +174,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 bool EventDispatch::CheckPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    if (mouseState_.size() > 0) {
+    if (!mouseState_.empty()) {
         CHKPF(pointerEvent);
         if (pointerEvent->GetSourceType() == mouseState_[0].type &&
             pointerEvent->GetButtonId() == mouseState_[0].code &&

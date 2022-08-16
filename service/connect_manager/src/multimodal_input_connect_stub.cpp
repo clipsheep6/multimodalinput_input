@@ -69,9 +69,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         {IMultimodalInputConnect::INJECT_KEY_EVENT, &MultimodalInputConnectStub::StubInjectKeyEvent},
         {IMultimodalInputConnect::INJECT_POINTER_EVENT, &MultimodalInputConnectStub::StubInjectPointerEvent},
         {IMultimodalInputConnect::SET_ANR_OBSERVER, &MultimodalInputConnectStub::StubSetAnrListener},
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
         {IMultimodalInputConnect::SET_INPUT_DEVICE_TO_SCREEN, &MultimodalInputConnectStub::StubSetInputDeviceToScreen}
-#endif // OHOS_BUILD_ENABLE_COOPERATE
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {

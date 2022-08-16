@@ -48,7 +48,7 @@ public:
     int32_t DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    void HandlePointerEventInner(const std::shared_ptr<PointerEvent> pointer, int32_t dispacthType);
+    void HandlePointerEventInner(const std::shared_ptr<PointerEvent> point);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     void OnMouseStateChange(uint32_t type, uint32_t code, int32_t value);

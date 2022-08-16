@@ -543,7 +543,7 @@ int32_t MultimodalInputConnectProxy::SetInputDeviceToScreen(int32_t deviceFd, co
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(SET_INPUT_DEVICE_TO_SCREEN, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, result:%{public}d", ret);
+        MMI_HILOGE("Send request fail, result:%{public}d", ret);
         return ret;
     }
     return RET_OK;

@@ -37,7 +37,7 @@ class InputDeviceManager : public DelayedSingleton<InputDeviceManager>, public I
         struct libinput_device *inputDeviceOrgin_ { nullptr };
         std::string networkIdOrgin_ { "" };
         bool isRemote_ { false };
-        int32_t fd_;
+        int32_t fd_ {-1};
         std::string dhid_ { "" };
     };
 public:
@@ -70,7 +70,7 @@ private:
     bool IsPointerDevice(struct libinput_device* device);
     void ScanPointerDevice();
     std::map<int32_t, struct libinput_device *> inputDevice_;
-    std::map<int32_t, std::string> inputDeviceScreen_;
+    std::map<int32_t, std::string> inputDeviceScreens_;
     int32_t nextId_ {0};
     std::list<std::shared_ptr<IDeviceObserver>> observers_;
     std::map<SessionPtr, std::function<void(int32_t, const std::string&)>> devListener_;
