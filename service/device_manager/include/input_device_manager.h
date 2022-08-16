@@ -33,13 +33,6 @@
 namespace OHOS {
 namespace MMI {
 class InputDeviceManager : public DelayedSingleton<InputDeviceManager>, public IDeviceObject {
-    struct InputDeviceObj {
-        struct libinput_device *inputDeviceOrgin_ { nullptr };
-        std::string networkIdOrgin_ { "" };
-        bool isRemote_ { false };
-        int32_t fd_ {-1};
-        std::string dhid_ { "" };
-    };
 public:
     InputDeviceManager() = default;
     DISALLOW_COPY_AND_MOVE(InputDeviceManager);
