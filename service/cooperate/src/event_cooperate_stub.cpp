@@ -15,11 +15,10 @@
 
 #include "event_cooperate_stub.h"
 
-#include <map>
-#include "string_ex.h"
-
 #include "ipc_skeleton.h"
+#include "string_ex.h"
 #include "time_cost_chk.h"
+
 #include "mmi_log.h"
 
 namespace OHOS {
