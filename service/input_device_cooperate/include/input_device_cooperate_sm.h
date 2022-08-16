@@ -71,7 +71,7 @@ public:
     int32_t StartRemoteCooperate(const std::string &localDeviceId);
     int32_t StartRemoteCooperateResult(bool isSucess, const std::string &startDhid, int32_t xPercent, int32_t yPercent);
     int32_t StopRemoteCooperate();
-    int32_t StopRemoteCooperateRes(bool isSucess);
+    int32_t StopRemoteCooperateResult(bool isSucess);
 
     int32_t StartCooperateOtherRes(const std::string &otherNetworkId);
     void HandleLibinputEvent(struct libinput_event *event) override;
@@ -83,10 +83,10 @@ public:
     const std::string &GetSrcNetworkId() const;
     void OnCooperateChanged(const std::string &networkId, bool isOpen);
     void OnKeyboardOnline(const std::string &dhid);
-    void OnPointerOffline(const std::string &dhid, const std::string sinkNetworkId,
+    void OnPointerOffline(const std::string &dhid, const std::string &sinkNetworkId,
         const std::vector<std::string> &keyboards);
     bool InitDeviceManager();
-    void OnDeviceOnLine(const std::string &networkId);
+    void OnDeviceOnline(const std::string &networkId);
     void OnDeviceOffline(const std::string &networkId);
     void StartFinish(bool isSucess, const std::string &networkId, int32_t startInputDeviceId);
     void StopFinish(bool isSucess, const std::string &networkId);
@@ -96,7 +96,6 @@ public:
 
 private:
     void Reset();
-    void GetLocalDeviceId(std::string &networkId);
     void CheckPointerEvent(struct libinput_event *event);
     void OnCloseCooperation(const std::string &networkId, bool isLocal);
     void NotifyRemoteStartFail(const std::string &networkId);
@@ -105,13 +104,13 @@ private:
     bool UpdateMouseLocation();
 
     std::shared_ptr<IInputDeviceCooperateState> currentStateSM_ { nullptr };
-    std::pair<std::string, std::string> preparedNetworkId_ { "", "" };
-    std::string startDhid_ { "" };
-    std::string srcNetworkId_ { "" };
+    std::pair<std::string, std::string> preparedNetworkId_;
+    std::string startDhid_ ;
+    std::string srcNetworkId_;
     CooperateState cooperateState_ { CooperateState::STATE_FREE };
     std::shared_ptr<DistributedHardware::DmInitCallback> initCallback_ { nullptr };
     std::shared_ptr<DistributedHardware::DeviceStateCallback> stateCallback_ { nullptr };
-    std::vector<std::string> onLineDevice_;
+    std::vector<std::string> onlineDevice_;
     mutable std::mutex mutex_;
     std::atomic<bool> isStarting_ { false };
     std::atomic<bool> isStopping_ { false };

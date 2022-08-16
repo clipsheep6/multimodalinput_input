@@ -27,11 +27,8 @@ class CooperateEventHandler : public AppExecFwk::EventHandler {
 public:
     CooperateEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
     virtual ~CooperateEventHandler();
-
     bool ProxyPostTask(const Callback &callback, int64_t delayTime);
-
     bool ProxyPostTask(const Callback &callback, const std::string &name = std::string(), int64_t delayTime = 0);
-
     void ProxyRemoveTask(const std::string &name);
 };
 } // namespace MMI

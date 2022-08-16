@@ -17,7 +17,6 @@
 
 namespace OHOS {
 namespace MMI {
-
 CooperateEventHandler::CooperateEventHandler(
     const std::shared_ptr<AppExecFwk::EventRunner> &runner)
     : AppExecFwk::EventHandler(runner)
@@ -31,7 +30,7 @@ bool CooperateEventHandler::ProxyPostTask(const Callback &callback, int64_t dela
 }
 
 bool CooperateEventHandler::ProxyPostTask(const Callback &callback, const std::string &name,
-                                                     int64_t delayTime)
+    int64_t delayTime)
 {
     return AppExecFwk::EventHandler::PostTask(callback, name, delayTime);
 }
