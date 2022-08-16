@@ -53,8 +53,8 @@ public:
     void AdjustMouseFocus(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
 
 public:
-    static const int32_t IMAGE_WIDTH = 48;
-    static const int32_t IMAGE_HEIGHT = 48;
+    static const int32_t IMAGE_WIDTH = 64;
+    static const int32_t IMAGE_HEIGHT = 64;
 
 private:
     void CreatePointerWindow(int32_t displayId, int32_t physicalX, int32_t physicalY);
