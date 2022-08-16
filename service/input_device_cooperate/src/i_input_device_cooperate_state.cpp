@@ -120,7 +120,8 @@ void IInputDeviceCooperateState::OnStartDistributedInput(
     eventHandler_->PostTask(handleStartFinishFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
 }
 
-void IInputDeviceCooperateState::OnStopDistributedInput(bool isSucess, const std::string &srcNetworkId, int32_t startInputDeviceId) {}
+void IInputDeviceCooperateState::OnStopDistributedInput(bool isSucess,
+    const std::string &srcNetworkId, int32_t startInputDeviceId) {}
 
 bool IInputDeviceCooperateState::NeedPrepare(const std::string &srcNetworkId, const std::string &sinkNetworkId)
 {

@@ -99,8 +99,8 @@ void InputDeviceCooperateStateIn::OnStartDistributedInput(
     auto dhid = InputDevMgr->GetPointerKeyboardDhids(startInputDeviceId);
 
     std::string taskName = "relay_stop_task";
-    std::function<void()> handleRelayStopFunc =
-        std::bind(&InputDeviceCooperateStateIn::StopRemoteInput, this, sinkNetworkId, srcNetworkId, dhid, startInputDeviceId);
+    std::function<void()> handleRelayStopFunc = std::bind(&InputDeviceCooperateStateIn::StopRemoteInput,
+        this, sinkNetworkId, srcNetworkId, dhid, startInputDeviceId);
     CHKPV(eventHandler_);
     eventHandler_->PostTask(handleRelayStopFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
 }
@@ -127,7 +127,7 @@ void InputDeviceCooperateStateIn::OnStopDistributedInput(bool isSucess, const st
             std::bind(&InputDeviceCooperateSM::StartFinish, InputDevCooSM, isSucess, remote, startInputDeviceId);
         CHKPV(eventHandler_);
         eventHandler_->PostTask(handleStartFinishFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
-    } else if (InputDevCooSM->IsStopping()){
+    } else if (InputDevCooSM->IsStopping()) {
         std::string taskName = "stop_finish_task";
         std::function<void()> handleStopFinishFunc =
             std::bind(&InputDeviceCooperateSM::StopFinish, InputDevCooSM, isSucess, remote);

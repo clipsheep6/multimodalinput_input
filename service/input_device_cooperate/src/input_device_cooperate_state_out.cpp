@@ -71,7 +71,7 @@ int32_t InputDeviceCooperateStateOut::ProcessStop(const std::string& src)
         this->OnStopRemoteInput(isSucess, src);
         });
     if (ret != RET_OK) {
-       InputDevCooSM->StopFinish(false, src);
+        InputDevCooSM->StopFinish(false, src);
     }
     return ret;
 }
