@@ -545,7 +545,7 @@ int32_t MultimodalInputConnectProxy::StartRemoteCooperate(const std::string& loc
     return ret;
 }
 
-int32_t MultimodalInputConnectProxy::StartRemoteCooperateRes(bool isSucess, int32_t xPercent, int32_t yPercent)
+int32_t MultimodalInputConnectProxy::StartRemoteCooperateResult(bool isSucess, int32_t xPercent, int32_t yPercent)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -586,7 +586,7 @@ int32_t MultimodalInputConnectProxy::StopRemoteCooperate()
     return ret;
 }
 
-int32_t MultimodalInputConnectProxy::StopRemoteCooperateRes(bool isSucess)
+int32_t MultimodalInputConnectProxy::StopRemoteCooperateResult(bool isSucess)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -606,7 +606,7 @@ int32_t MultimodalInputConnectProxy::StopRemoteCooperateRes(bool isSucess)
     return ret;
 }
 
-int32_t MultimodalInputConnectProxy::StartCooperateOtherRes(const std::string& srcNetworkId)
+int32_t MultimodalInputConnectProxy::StartCooperateOtherResult(const std::string& srcNetworkId)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;

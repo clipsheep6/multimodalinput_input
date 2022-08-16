@@ -491,7 +491,7 @@ int32_t MultimodalInputConnectStub::StubSetAnrListener(MessageParcel& data, Mess
     }
     int32_t ret = SetAnrObserver();
     if (ret != RET_OK) {
-        MMI_HILOGE("Call SetAnrObserver failed，ret:%{public}d", ret);
+        MMI_HILOGE("Call SetAnrObserver failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -512,7 +512,7 @@ int32_t MultimodalInputConnectStub::StubStartRemoteCooperate(MessageParcel& data
     READSTRING(data, remoteDeviceId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = StartRemoteCooperate(remoteDeviceId);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call StartRemoteCooperate failed，ret:%{public}d", ret);
+        MMI_HILOGE("Call StartRemoteCooperate failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -535,9 +535,9 @@ int32_t MultimodalInputConnectStub::StubStartRemoteCooperateRes(MessageParcel& d
     READINT32(data, xPercent, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t yPercent;
     READINT32(data, yPercent, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = StartRemoteCooperateRes(isSucess, xPercent, yPercent);
+    int32_t ret = StartRemoteCooperateResult(isSucess, xPercent, yPercent);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call StartRemoteCooperateRes failed，ret:%{public}d", ret);
+        MMI_HILOGE("Call StartRemoteCooperateResult failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -555,7 +555,7 @@ int32_t MultimodalInputConnectStub::StubStopRemoteCooperate(MessageParcel& data,
     }
     int32_t ret = StopRemoteCooperate();
     if (ret != RET_OK) {
-        MMI_HILOGE("Call StopRemoteCooperate failed，ret:%{public}d", ret);
+        MMI_HILOGE("Call StopRemoteCooperate failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -573,9 +573,9 @@ int32_t MultimodalInputConnectStub::StubStopRemoteCooperateRes(MessageParcel& da
     }
     bool isSucess;
     READBOOL(data, isSucess, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = StopRemoteCooperateRes(isSucess);
+    int32_t ret = StopRemoteCooperateResult(isSucess);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call StopRemoteCooperateRes failed，ret:%{public}d", ret);
+        MMI_HILOGE("Call StopRemoteCooperateResult failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -593,9 +593,9 @@ int32_t MultimodalInputConnectStub::StubStartCooperateOtherRes(MessageParcel& da
     }
     std::string peerNetworkId;
     READSTRING(data, peerNetworkId, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = StartCooperateOtherRes(peerNetworkId);
+    int32_t ret = StartCooperateOtherResult(peerNetworkId);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call StopRemoteCooperateRes failed，ret:%{public}d", ret);
+        MMI_HILOGE("Call StopRemoteCooperateResult failed, ret:%{public}d", ret);
     }
     return ret;
 }

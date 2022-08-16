@@ -40,7 +40,6 @@ ohos_source_set("mmi_connect_manager_service") {
 
   configs = [ ":mmi_connect_manager_config" ]
 
-  defines = [ "OHOS_BUILD" ]
   if (input_feature_input_cooperation) {
     defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
   }
@@ -71,7 +70,6 @@ ohos_source_set("mmi_connect_manager_proxy") {
 
   configs = [ ":mmi_connect_manager_config" ]
 
-  defines = [ "OHOS_BUILD" ]
   if (input_feature_input_cooperation) {
     defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
   }

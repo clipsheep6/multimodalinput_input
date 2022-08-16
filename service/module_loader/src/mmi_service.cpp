@@ -992,12 +992,12 @@ int32_t MMIService::StartRemoteCooperate(const std::string& remoteDeviceId)
     return RET_OK;
 }
 
-int32_t MMIService::StartRemoteCooperateRes(bool isSucess, int32_t xPercent, int32_t yPercent)
+int32_t MMIService::StartRemoteCooperateResult(bool isSucess, int32_t xPercent, int32_t yPercent)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    MMI_HILOGI("StartRemoteCooperateRes:[%{public}d]", isSucess);
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputDeviceCooperateSM::StartRemoteCooperateRes,
+    MMI_HILOGI("StartRemoteCooperateResult:[%{public}d]", isSucess);
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputDeviceCooperateSM::StartRemoteCooperateResult,
         InputDevCooSM, isSucess, xPercent, yPercent));
     if (ret != RET_OK) {
         MMI_HILOGE("Start remote cooperate res failed,return %{public}d", ret);
@@ -1025,12 +1025,12 @@ int32_t MMIService::StopRemoteCooperate()
     return RET_OK;
 }
 
-int32_t MMIService::StopRemoteCooperateRes(bool isSucess)
+int32_t MMIService::StopRemoteCooperateResult(bool isSucess)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    MMI_HILOGI("Enter MMI StopRemoteCooperateRes [%{public}d]", isSucess);
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputDeviceCooperateSM::StopRemoteCooperateRes,
+    MMI_HILOGI("Enter MMI StopRemoteCooperateResult [%{public}d]", isSucess);
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputDeviceCooperateSM::StopRemoteCooperateResult,
         InputDevCooSM, isSucess));
     if (ret != RET_OK) {
         MMI_HILOGE("Stop remote cooperate res failed,return %{public}d", ret);
@@ -1041,12 +1041,12 @@ int32_t MMIService::StopRemoteCooperateRes(bool isSucess)
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     return RET_OK;
 }
-int32_t MMIService::StartCooperateOtherRes(const std::string& srcNetworkId)
+int32_t MMIService::StartCooperateOtherResult(const std::string& srcNetworkId)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    MMI_HILOGI("Enter MMI StartCooperateOtherRes [%{public}s]", srcNetworkId.c_str());
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputDeviceCooperateSM::StartCooperateOtherRes,
+    MMI_HILOGI("Enter MMI StartCooperateOtherResult [%{public}s]", srcNetworkId.c_str());
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputDeviceCooperateSM::StartCooperateOtherResult,
         InputDevCooSM, srcNetworkId));
     if (ret != RET_OK) {
         MMI_HILOGE("Start remote other res failed,return %{public}d", ret);
