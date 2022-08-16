@@ -17,6 +17,7 @@
 
 #include "input_manager.h"
 #include "mmi_log.h"
+#include "event_handler.h"
 
 namespace OHOS {
 namespace MMI {
@@ -37,7 +38,9 @@ public:
 void SetWindowInputEventConsumerFuzzTest(const uint8_t* data, size_t /* size */)
 {
     std::shared_ptr<InputEventConsumerTest> consumer = std::make_shared<InputEventConsumerTest>();
+    std::shared_ptr<AppExecFwk::EventHandler> eventhandler = nullptr;
     InputManager::GetInstance()->SetWindowInputEventConsumer(consumer);
+    InputManager::GetInstance()->SetWindowInputEventConsumer(consumer, eventhandler);
 }
 } // MMI
 } // OHOS
