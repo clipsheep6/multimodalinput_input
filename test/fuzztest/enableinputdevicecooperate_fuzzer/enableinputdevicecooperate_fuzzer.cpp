@@ -45,7 +45,7 @@ void EnableInputDeviceCooperateFuzzTest(const uint8_t* data, size_t size)
     startPos += GetObject<int32_t>(data + startPos, size - startPos, random);
     bool enabled = (random % 2) ? false : true;
     if (InputManager::GetInstance()->EnableInputDeviceCooperate(enabled) == RET_ERR) {
-        MMI_HILOGD("Set pointer enabled failed")
+        MMI_HILOGD("Set pointer enabled failed");
     }
 }
 } // namespace MMI
