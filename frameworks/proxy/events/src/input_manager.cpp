@@ -179,19 +179,11 @@ void InputManager::SetAnrObserver(std::shared_ptr<IAnrObserver> observer)
 
 int32_t InputManager::SetPointerStyle(int32_t windowId, int32_t pointerStyle)
 {
-    if (windowId < 0 || pointerStyle < 0) {
-        MMI_HILOGE("Parameter passing error");
-        return RET_ERR;
-    }
     return InputMgrImpl->SetPointerStyle(windowId, pointerStyle);
 }
 
 int32_t InputManager::GetPointerStyle(int32_t windowId, int32_t &pointerStyle)
 {
-    if (windowId < 0) {
-        MMI_HILOGE("Parameter passing error");
-        return RET_ERR;
-    }
     return InputMgrImpl->GetPointerStyle(windowId, pointerStyle);
 }
 

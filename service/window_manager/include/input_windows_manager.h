@@ -37,7 +37,7 @@ struct MouseLocation {
 class InputWindowsManager : public DelayedSingleton<InputWindowsManager> {
 public:
     InputWindowsManager();
-    virtual ~InputWindowsManager();
+    virtual ~InputWindowsManager() = default;
     DISALLOW_COPY_AND_MOVE(InputWindowsManager);
 
     void Init(UDSServer& udsServer);
@@ -129,12 +129,12 @@ private:
 private:
     UDSServer* udsServer_ = nullptr;
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    int32_t firstBtnDownWindowId_ = -1;
-    int32_t lastLogicX_ = -1;
-    int32_t lastLogicY_ = -1;
+    int32_t firstBtnDownWindowId_ { -1 };
+    int32_t lastLogicX_ { -1 };
+    int32_t lastLogicY_ { -1 };
     WindowInfo lastWindowInfo_;
-    std::shared_ptr<PointerEvent> lastPointerEvent_ = nullptr;
-    std::map<int32_t, std::map<int32_t, int32_t>> mapPointerStyle_ = {};
+    std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
+    std::map<int32_t, std::map<int32_t, int32_t>> pointerStyle_;
 #endif // OHOS_BUILD_ENABLE_POINTER
     DisplayGroupInfo displayGroupInfo_;
     MouseLocation mouseLocation_ = {-1, -1}; // physical coord

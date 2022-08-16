@@ -37,7 +37,7 @@ class PointerDrawingManager : public IPointerDrawingManager,
                               public std::enable_shared_from_this<PointerDrawingManager> {
 public:
     PointerDrawingManager();
-    ~PointerDrawingManager();
+    ~PointerDrawingManager() = default;
     DISALLOW_COPY_AND_MOVE(PointerDrawingManager);
     void DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
         const MOUSE_ICON mouseStyle = MOUSE_ICON::DEFAULT);
@@ -71,18 +71,18 @@ private:
     void InitStyle();
 
 private:
-    sptr<OHOS::Rosen::Window> pointerWindow_ = nullptr;
-    bool hasDisplay_ = false;
-    int32_t displayId_ = -1;
-    int32_t displayWidth_ = 0;
-    int32_t displayHeight_ = 0;
-    int32_t pid_ = 0;
-    int32_t windowId_ = 0;
-    bool hasPointerDevice_ = false;
-    int32_t lastPhysicalX_ = -1;
-    int32_t lastPhysicalY_ = -1;
-    Direction direction_ = Direction0;
-    int32_t preMouseStyle_ = 0;
+    sptr<OHOS::Rosen::Window> pointerWindow_ { nullptr };
+    bool hasDisplay_ { false };
+    int32_t displayId_ { -1 };
+    int32_t displayWidth_ { 0 };
+    int32_t displayHeight_ { 0 };
+    int32_t pid_ { 0 };
+    int32_t windowId_ { 0 };
+    bool hasPointerDevice_ { false };
+    int32_t lastPhysicalX_ { -1 };
+    int32_t lastPhysicalY_ { -1 };
+    Direction direction_ { Direction0 };
+    int32_t lastMouseStyle_ { 0 };
     std::map<MOUSE_ICON, IconStyle> mouseIcons_;
     struct PidInfo {
         int32_t pid { 0 };

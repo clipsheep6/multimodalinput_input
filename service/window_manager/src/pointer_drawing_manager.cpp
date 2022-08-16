@@ -33,6 +33,8 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerDrawingManager" };
 const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
+constexpr int32_t realImageWidth = 40;
+constexpr int32_t realImageHeight = 40;
 } // namespace
 } // namespace MMI
 } // namespace OHOS
@@ -44,13 +46,11 @@ PointerDrawingManager::PointerDrawingManager()
     InitStyle();
 }
 
-PointerDrawingManager::~PointerDrawingManager() {}
-
 void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
     const MOUSE_ICON mouseStyle)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("display:%{public}d,physicalX:%{public}d,physicalY:%{public}d,mouseStyle:%{public}d",
+    MMI_HILOGD("Display:%{public}d,physicalX:%{public}d,physicalY:%{public}d,mouseStyle:%{public}d",
         displayId, physicalX, physicalY, mouseStyle);
     FixCursorPosition(physicalX, physicalY);
     lastPhysicalX_ = physicalX;
@@ -60,13 +60,11 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     if (pointerWindow_ != nullptr) {
         pointerWindow_->MoveTo(physicalX, physicalY);
 
-        if (preMouseStyle_ == mouseStyle) {
-            MMI_HILOGD("The preMouseStyle is equal with mouseStyle");
-            MMI_HILOGD("Leave, display:%{public}d,physicalX:%{public}d,physicalY:%{public}d",
-                displayId, physicalX, physicalY);
+        if (lastMouseStyle_ == mouseStyle) {
+            MMI_HILOGD("The lastMouseStyle is equal with mouseStyle");
             return;
         }
-        preMouseStyle_ = mouseStyle;
+        lastMouseStyle_ = mouseStyle;
         int32_t ret = InitLayer(mouseStyle);
         if (ret != RET_OK) {
             MMI_HILOGE("Init layer failed");
@@ -131,9 +129,6 @@ int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
 void PointerDrawingManager::AdjustMouseFocus(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY)
 {
     CALL_DEBUG_ENTER;
-    int32_t realImageWidth = 40;
-    int32_t realImageHeight = 40;
-
     switch (iconType) {
         case ANGLE_SW: {
             physicalY -= realImageHeight;

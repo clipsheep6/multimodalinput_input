@@ -31,12 +31,10 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputWindowsManager"};
 constexpr int32_t DEFAULT_POINTER_STYLE = 0;
-constexpr int32_t MAX_WINDOW_COUNT = 20;
+constexpr size_t MAX_WINDOW_COUNT = 20;
 } // namespace
 
 InputWindowsManager::InputWindowsManager() {}
-
-InputWindowsManager::~InputWindowsManager() {}
 
 void InputWindowsManager::Init(UDSServer& udsServer)
 {
@@ -495,9 +493,9 @@ void InputWindowsManager::OnSessionLost(SessionPtr session)
     CHKPV(session);
     int32_t pid = session->GetPid();
 
-    auto it = mapPointerStyle_.find(pid);
-    if (it != mapPointerStyle_.end()) {
-        mapPointerStyle_.erase(it);
+    auto it = pointerStyle_.find(pid);
+    if (it != pointerStyle_.end()) {
+        pointerStyle_.erase(it);
         MMI_HILOGD("Clear the pointer style map, pd:%{public}d", pid);
         return;
     }
@@ -506,8 +504,8 @@ void InputWindowsManager::OnSessionLost(SessionPtr session)
 int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, int32_t pointerStyle)
 {
     CALL_DEBUG_ENTER;
-    auto it = mapPointerStyle_.find(pid);
-    if (it == mapPointerStyle_.end()) {
+    auto it = pointerStyle_.find(pid);
+    if (it == pointerStyle_.end()) {
         MMI_HILOGE("The pointer style map is not include param pd:%{public}d", pid);
         return RET_ERR;
     }
@@ -528,8 +526,8 @@ int32_t InputWindowsManager::GetPointerStyle(int32_t pid, int32_t windowId, int3
     CALL_DEBUG_ENTER;
     pointerStyle = DEFAULT_POINTER_STYLE;
 
-    auto it = mapPointerStyle_.find(pid);
-    if (it == mapPointerStyle_.end()) {
+    auto it = pointerStyle_.find(pid);
+    if (it == pointerStyle_.end()) {
         MMI_HILOGE("The pointer style map is not include param pd, %{public}d", pid);
         return RET_ERR;
     }
@@ -550,11 +548,11 @@ void InputWindowsManager::UpdatePointerStyle()
     CALL_DEBUG_ENTER;
     for (const auto& windowItem : displayGroupInfo_.windowsInfo) {
         int32_t pid = windowItem.pid;
-        auto it = mapPointerStyle_.find(pid);
-        if (it == mapPointerStyle_.end()) {
+        auto it = pointerStyle_.find(pid);
+        if (it == pointerStyle_.end()) {
             std::map<int32_t, int32_t> tmpPointerStyle;
             tmpPointerStyle.insert(std::pair<int32_t, int32_t>(windowItem.id, DEFAULT_POINTER_STYLE));
-            auto iter = mapPointerStyle_.insert(std::make_pair(pid, tmpPointerStyle));
+            auto iter = pointerStyle_.insert(std::make_pair(pid, tmpPointerStyle));
             if (!iter.second) {
                 MMI_HILOGE("The pd is duplicated");
                 return;
@@ -562,13 +560,13 @@ void InputWindowsManager::UpdatePointerStyle()
             continue;
         }
 
-        auto subit = it->second.find(windowItem.id);
-        if (subit == it->second.end()) {
+        auto subIter = it->second.find(windowItem.id);
+        if (subIter == it->second.end()) {
             if (it->second.size() == MAX_WINDOW_COUNT) {
                 MMI_HILOGD("The window count:%{public}zu exceeds limit in same pd", it->second.size());
                 it->second.erase(it->second.begin());
             }
-            auto iter = it->second.insert(std::pair<int32_t, int32_t>(windowItem.id, DEFAULT_POINTER_STYLE));
+            auto iter = it->second.insert(std::make_pair(windowItem.id, DEFAULT_POINTER_STYLE));
             if (!iter.second) {
                 MMI_HILOGE("The window type is duplicated");
                 return;
@@ -576,7 +574,7 @@ void InputWindowsManager::UpdatePointerStyle()
         }
     }
 
-    MMI_HILOGD("Number of pointer style:%{public}zu", mapPointerStyle_.size());
+    MMI_HILOGD("Number of pointer style:%{public}zu", pointerStyle_.size());
 }
 
 #endif // OHOS_BUILD_ENABLE_POINTER
