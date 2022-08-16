@@ -69,13 +69,13 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         {IMultimodalInputConnect::INJECT_KEY_EVENT, &MultimodalInputConnectStub::StubInjectKeyEvent},
         {IMultimodalInputConnect::INJECT_POINTER_EVENT, &MultimodalInputConnectStub::StubInjectPointerEvent},
         {IMultimodalInputConnect::SET_ANR_OBSERVER, &MultimodalInputConnectStub::StubSetAnrListener},
-        {IMultimodalInputConnect::REGISTER_COOPERATE_EVENT, &MultimodalInputConnectStub::StubRegisterCooperateEvent},
-        {IMultimodalInputConnect::ENABLE_INPUT_DEVICE_COOPERATE,
+        {IMultimodalInputConnect::REGISTER_COOPERATION_DEVICE, &MultimodalInputConnectStub::StubRegisterCooperateEvent},
+        {IMultimodalInputConnect::ENABLE_COOPERATION_DEVICE,
             &MultimodalInputConnectStub::StubEnableInputDeviceCooperate},
-        {IMultimodalInputConnect::START_INPUT_DEVICE_COOPERATE,
+        {IMultimodalInputConnect::START_COOPERATION_DEVICE,
             &MultimodalInputConnectStub::StubStartInputDeviceCooperate},
-        {IMultimodalInputConnect::STOP_DEVICE_COOPERATE, &MultimodalInputConnectStub::StubStopDeviceCooperate},
-        {IMultimodalInputConnect::GET_INPUT_DEVICE_COOPERATE_STATE,
+        {IMultimodalInputConnect::STOP_COOPERATION_DEVICE, &MultimodalInputConnectStub::StubStopDeviceCooperate},
+        {IMultimodalInputConnect::GET_STATE_COOPERATION_DEVICE,
             &MultimodalInputConnectStub::StubGetInputDeviceCooperateState},
     };
     auto it = mapConnFunc.find(code);

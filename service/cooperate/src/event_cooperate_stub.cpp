@@ -56,7 +56,7 @@ int32_t EventCooperateStub::StubOnCooperateMessage(MessageParcel& data, MessageP
     READSTRING(data, deviceId, ERR_INVALID_VALUE);
     int32_t nType;
     READINT32(data, nType, ERR_INVALID_VALUE);
-    CooperateMessages msg = CooperateMessages(nType);
+    CooperationState msg = CooperationState(nType);
     bool ret = OnCooperateMessage(deviceId, msg);
     WRITEBOOL(reply, ret, RET_ERR);
     return RET_OK;

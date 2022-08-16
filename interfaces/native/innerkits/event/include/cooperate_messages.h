@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
-#ifndef COOPERATE_MESSAGES_H
-#define COOPERATE_MESSAGES_H
+#ifndef COOPERATION_STATE_H
+#define COOPERATION_STATE_H
 
 namespace OHOS {
 namespace MMI {
-enum class CooperateMessages {
+enum class CooperationState {
     OPEN_SUCCESS = 100,
     OPEN_FAIL = 101,
     INFO_START = 200,
@@ -33,4 +33,4 @@ enum class CooperateMessages {
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // COOPERATE_MESSAGES_H
+#endif // COOPERATION_STATE_H

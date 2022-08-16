@@ -29,7 +29,7 @@ public:
     explicit EventCooperateProxy(const sptr<IRemoteObject> &impl);
     DISALLOW_COPY_AND_MOVE(EventCooperateProxy);
     virtual ~EventCooperateProxy() override;
-    virtual bool OnCooperateMessage(const std::string &deviceId, const CooperateMessages &msg) override;
+    virtual bool OnCooperateMessage(const std::string &deviceId, const CooperationState &msg) override;
     virtual bool OnCooperateState(bool state) override;
 
 private:

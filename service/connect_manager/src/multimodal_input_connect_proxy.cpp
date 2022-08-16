@@ -520,7 +520,6 @@ int32_t MultimodalInputConnectProxy::SetAnrObserver()
     int32_t ret = remote->SendRequest(SET_ANR_OBSERVER, data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
-        return ret;
     }
     return RET_OK;
 }
@@ -541,12 +540,11 @@ int32_t MultimodalInputConnectProxy::RegisterCooperateEvent(sptr<IEventCooperate
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(REGISTER_COOPERATE_EVENT, data, reply, option);
+    int32_t ret = remote->SendRequest(REGISTER_COOPERATION_DEVICE, data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request fail, ret:%{public}d", ret);
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t MultimodalInputConnectProxy::EnableInputDeviceCooperate(bool enabled)
@@ -562,12 +560,11 @@ int32_t MultimodalInputConnectProxy::EnableInputDeviceCooperate(bool enabled)
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(ENABLE_INPUT_DEVICE_COOPERATE, data, reply, option);
+    int32_t ret = remote->SendRequest(ENABLE_COOPERATION_DEVICE, data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request fail, ret:%{public}d", ret);
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t MultimodalInputConnectProxy::StartInputDeviceCooperate(const std::string &sinkDeviceId,
@@ -585,12 +582,11 @@ int32_t MultimodalInputConnectProxy::StartInputDeviceCooperate(const std::string
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(START_INPUT_DEVICE_COOPERATE, data, reply, option);
+    int32_t ret = remote->SendRequest(START_COOPERATION_DEVICE, data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request fail, ret:%{public}d", ret);
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t MultimodalInputConnectProxy::StopDeviceCooperate()
@@ -605,12 +601,11 @@ int32_t MultimodalInputConnectProxy::StopDeviceCooperate()
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(STOP_DEVICE_COOPERATE, data, reply, option);
+    int32_t ret = remote->SendRequest(STOP_COOPERATION_DEVICE, data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request fail, ret:%{public}d", ret);
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t MultimodalInputConnectProxy::GetInputDeviceCooperateState(const std::string &deviceId)
@@ -626,12 +621,11 @@ int32_t MultimodalInputConnectProxy::GetInputDeviceCooperateState(const std::str
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(GET_INPUT_DEVICE_COOPERATE_STATE, data, reply, option);
+    int32_t ret = remote->SendRequest(GET_STATE_COOPERATION_DEVICE, data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request fail, ret:%{public}d", ret);
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS

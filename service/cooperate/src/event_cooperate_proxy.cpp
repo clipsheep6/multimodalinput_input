@@ -34,7 +34,7 @@ EventCooperateProxy::~EventCooperateProxy()
 {
 }
 
-bool EventCooperateProxy::OnCooperateMessage(const std::string &deviceId, const CooperateMessages &msg)
+bool EventCooperateProxy::OnCooperateMessage(const std::string &deviceId, const CooperationState &msg)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;

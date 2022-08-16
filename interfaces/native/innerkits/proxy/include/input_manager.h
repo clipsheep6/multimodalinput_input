@@ -30,7 +30,7 @@
 #include "i_input_event_consumer.h"
 #include "input_device.h"
 #include "key_option.h"
-#include "cooperate_messages.h"
+#include "cooperation_state.h"
 
 namespace OHOS {
 namespace MMI {
@@ -304,7 +304,7 @@ public:
      * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 9
      */
-    int32_t RegisterCooperateListener(std::function<void(std::string, CooperateMessages)> listener);
+    int32_t RegisterCooperateListener(std::function<void(std::string, CooperationState)> listener);
 
     /**
      * @brief 注销键鼠穿越管理事件监听。

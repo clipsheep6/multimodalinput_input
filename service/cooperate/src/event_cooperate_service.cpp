@@ -40,7 +40,7 @@ EventCooperateService::~EventCooperateService()
     CALL_DEBUG_ENTER;
 }
 
-int32_t EventCooperateService::SetCooperateMessageListener(std::function<void(std::string, CooperateMessages)> listener)
+int32_t EventCooperateService::SetCooperateMessageListener(std::function<void(std::string, CooperationState)> listener)
 {
     CALL_DEBUG_ENTER;
     msgCooperateListener_ = listener;
@@ -55,7 +55,7 @@ int32_t EventCooperateService::SetCooperateStateCallback(std::function<void(bool
     return RET_OK;
 }
 
-bool EventCooperateService::OnCooperateMessage(const std::string &deviceId, const CooperateMessages &msg)
+bool EventCooperateService::OnCooperateMessage(const std::string &deviceId, const CooperationState &msg)
 {
     CALL_DEBUG_ENTER;
     CHKPR(msgCooperateListener_, false);

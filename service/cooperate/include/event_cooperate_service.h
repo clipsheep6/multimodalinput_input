@@ -19,7 +19,7 @@
 #include "nocopyable.h"
 
 #include "event_cooperate_stub.h"
-#include "cooperate_messages.h"
+#include "cooperation_state.h"
 
 namespace OHOS {
 namespace MMI {
@@ -29,13 +29,13 @@ public:
     DISALLOW_COPY_AND_MOVE(EventCooperateService);
     ~EventCooperateService();
 
-    virtual bool OnCooperateMessage(const std::string &deviceId, const CooperateMessages &msg) override;
+    virtual bool OnCooperateMessage(const std::string &deviceId, const CooperationState &msg) override;
     virtual bool OnCooperateState(bool state) override;
-    int32_t SetCooperateMessageListener(std::function<void(std::string, CooperateMessages)> listener);
+    int32_t SetCooperateMessageListener(std::function<void(std::string, CooperationState)> listener);
     int32_t SetCooperateStateCallback(std::function<void(bool)> callback);
 
 private:
-    std::function<void(std::string, CooperateMessages)> msgCooperateListener_ { nullptr };
+    std::function<void(std::string, CooperationState)> msgCooperateListener_ { nullptr };
     std::function<void(bool)> stateCooperateCallback_ { nullptr };
 };
 } // namespace MMI

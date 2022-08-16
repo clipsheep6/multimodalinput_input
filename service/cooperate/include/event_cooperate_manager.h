@@ -22,19 +22,19 @@
 #include "nocopyable.h"
 #include "singleton.h"
 
-#include "cooperate_messages.h"
+#include "cooperation_state.h"
 #include "i_event_cooperate.h"
 
 namespace OHOS {
 namespace MMI {
 class EventCooperateManager : public DelayedSingleton<EventCooperateManager> {
 public:
-    EventCooperateManager();
+    EventCooperateManager() = default;
     DISALLOW_COPY_AND_MOVE(EventCooperateManager);
-    ~EventCooperateManager();
+    ~EventCooperateManager() = default;
 
-    int32_t AddCooperateEvent(sptr<IEventCooperate> event);
-    void OnCooperateMessage(const CooperateMessages &msg, const std::string &deviceId = "");
+    void AddCooperateEvent(sptr<IEventCooperate> event);
+    void OnCooperateMessage(const CooperationState &msg, const std::string &deviceId = "");
     void OnCooperateState(bool state);
 
 private:

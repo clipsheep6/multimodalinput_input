@@ -737,7 +737,7 @@ void InputManagerImpl::OnAnrTask(std::vector<std::shared_ptr<IAnrObserver>> obse
     }
 }
 
-int32_t InputManagerImpl::RegisterCooperateListener(std::function<void(std::string, CooperateMessages)> listener)
+int32_t InputManagerImpl::RegisterCooperateListener(std::function<void(std::string, CooperationState)> listener)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE

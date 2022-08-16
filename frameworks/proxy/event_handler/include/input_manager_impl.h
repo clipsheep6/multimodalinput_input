@@ -105,7 +105,7 @@ public:
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
     void OnAnr(int32_t pid);
 
-    int32_t RegisterCooperateListener(std::function<void(std::string, CooperateMessages)> listener);
+    int32_t RegisterCooperateListener(std::function<void(std::string, CooperationState)> listener);
     int32_t UnregisterCooperateListener();
     int32_t EnableInputDeviceCooperate(bool enabled);
     int32_t StartInputDeviceCooperate(const std::string &sinkDeviceId, int32_t srcInputDeviceId);

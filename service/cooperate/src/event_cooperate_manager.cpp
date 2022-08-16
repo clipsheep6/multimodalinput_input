@@ -23,17 +23,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventCooperateManager" };
 } // namespace
 
-EventCooperateManager::EventCooperateManager()
-{
-    CALL_DEBUG_ENTER;
-}
-
-EventCooperateManager::~EventCooperateManager()
-{
-    CALL_DEBUG_ENTER;
-}
-
-int32_t EventCooperateManager::AddCooperateEvent(sptr<IEventCooperate> event)
+void EventCooperateManager::AddCooperateEvent(sptr<IEventCooperate> event)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lockCooperate_);
@@ -41,7 +31,7 @@ int32_t EventCooperateManager::AddCooperateEvent(sptr<IEventCooperate> event)
     return RET_OK;
 }
 
-void EventCooperateManager::OnCooperateMessage(const CooperateMessages &msg, const std::string &deviceId)
+void EventCooperateManager::OnCooperateMessage(const CooperationState &msg, const std::string &deviceId)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lockCooperate_);

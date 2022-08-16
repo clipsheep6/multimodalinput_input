@@ -177,7 +177,7 @@ void InputManager::SetAnrObserver(std::shared_ptr<IAnrObserver> observer)
     InputMgrImpl->SetAnrObserver(observer);
 }
 
-int32_t InputManager::RegisterCooperateListener(std::function<void(std::string, CooperateMessages)> listener)
+int32_t InputManager::RegisterCooperateListener(std::function<void(std::string, CooperationState)> listener)
 {
     return InputMgrImpl->RegisterCooperateListener(listener);
 }
