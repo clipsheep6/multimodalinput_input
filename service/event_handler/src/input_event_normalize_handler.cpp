@@ -35,7 +35,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventNormalizeHandler" };
 }
 
-void InputEventNormalizeHandler::HandleEvent(libinput_event* event)
+void InputEventNormalizeHandler::HandleEvent(struct libinput_event* event)
 {
     CALL_DEBUG_ENTER;
     CHKPV(event);
@@ -106,7 +106,7 @@ void InputEventNormalizeHandler::HandleEvent(libinput_event* event)
     DfxHisysevent::ReportDispTimes();
 }
 
-int32_t InputEventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
+int32_t InputEventNormalizeHandler::OnEventDeviceAdded(struct libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
@@ -117,7 +117,7 @@ int32_t InputEventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
     return RET_OK;
 }
 
-int32_t InputEventNormalizeHandler::OnEventDeviceRemoved(libinput_event *event)
+int32_t InputEventNormalizeHandler::OnEventDeviceRemoved(struct libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
@@ -186,7 +186,7 @@ void InputEventNormalizeHandler::HandleTouchEvent(const std::shared_ptr<PointerE
 #endif // OHOS_BUILD_ENABLE_TOUCH
 }
 
-int32_t InputEventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
+int32_t InputEventNormalizeHandler::HandleKeyboardEvent(struct libinput_event* event)
 {
     if (nextHandler_ == nullptr) {
         MMI_HILOGW("Keyboard device does not support");
@@ -225,7 +225,7 @@ int32_t InputEventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     return RET_OK;
 }
 
-int32_t InputEventNormalizeHandler::HandleMouseEvent(libinput_event* event)
+int32_t InputEventNormalizeHandler::HandleMouseEvent(struct libinput_event* event)
 {
     if (nextHandler_ == nullptr) {
         MMI_HILOGW("Pointer device does not support");
@@ -252,7 +252,7 @@ int32_t InputEventNormalizeHandler::HandleMouseEvent(libinput_event* event)
     return RET_OK;
 }
 
-int32_t InputEventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
+int32_t InputEventNormalizeHandler::HandleTouchPadEvent(struct libinput_event* event)
 {
     if (nextHandler_ == nullptr) {
         MMI_HILOGW("Pointer device does not support");
@@ -278,7 +278,7 @@ int32_t InputEventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     return RET_OK;
 }
 
-int32_t InputEventNormalizeHandler::HandleGestureEvent(libinput_event* event)
+int32_t InputEventNormalizeHandler::HandleGestureEvent(struct libinput_event* event)
 {
     if (nextHandler_ == nullptr) {
         MMI_HILOGW("Pointer device does not support");
@@ -312,7 +312,7 @@ int32_t InputEventNormalizeHandler::HandleGestureEvent(libinput_event* event)
     return RET_OK;
 }
 
-int32_t InputEventNormalizeHandler::HandleTouchEvent(libinput_event* event)
+int32_t InputEventNormalizeHandler::HandleTouchEvent(struct libinput_event* event)
 {
     LibinputAdapter::LoginfoPackagingTool(event);
     if (nextHandler_ == nullptr) {
@@ -340,7 +340,7 @@ int32_t InputEventNormalizeHandler::HandleTouchEvent(libinput_event* event)
     return RET_OK;
 }
 
-int32_t InputEventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
+int32_t InputEventNormalizeHandler::HandleTableToolEvent(struct libinput_event* event)
 {
     if (nextHandler_ == nullptr) {
         MMI_HILOGW("Touchscreen device does not support");

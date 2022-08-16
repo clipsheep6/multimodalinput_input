@@ -53,17 +53,10 @@ public:
     };
     static void OnDeviceConnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::EventType type);
     static void OnDeviceDisconnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::EventType type);
-    static void OnClientConnect(const ClientConnectData &data, OHOS::HiviewDFX::HiSysEvent::EventType type);
-    static void OnClientDisconnect(const SessionPtr& secPtr, int32_t fd,
-        OHOS::HiviewDFX::HiSysEvent::EventType type);
     static void OnUpdateTargetPointer(std::shared_ptr<PointerEvent> pointer, int32_t fd,
         OHOS::HiviewDFX::HiSysEvent::EventType type);
     static void OnUpdateTargetKey(std::shared_ptr<KeyEvent> key, int32_t fd,
         OHOS::HiviewDFX::HiSysEvent::EventType type);
-    static void OnFocusWindowChanged(int32_t oldFocusWindowId, int32_t newFocusWindowId,
-        int32_t oldFocusWindowPid, int32_t newFocusWindowPid);
-    static void OnZorderWindowChanged(int32_t oldZorderFirstWindowId, int32_t newZorderFirstWindowId,
-        int32_t oldZorderFirstWindowPid, int32_t newZorderFirstWindowPid);
     static void ApplicationBlockInput(const SessionPtr& sess);
     static void CalcKeyDispTimes();
     static void CalcPointerDispTimes();
