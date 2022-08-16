@@ -15,6 +15,7 @@
 
 #include "input_device_manager.h"
 
+#include <mutex>
 #include <parameters.h>
 #include <unordered_map>
 
@@ -56,6 +57,8 @@ std::unordered_map<int32_t, std::string> axisType = {
     {ABS_MT_WIDTH_MAJOR, "WIDTH_MAJOR"},
     {ABS_MT_WIDTH_MINOR, "WIDTH_MINOR"}
 };
+
+std::mutex lock_;
 } // namespace
 
 std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) const
@@ -422,7 +425,7 @@ int32_t InputDeviceManager::SetInputDeviceToScreen(int32_t deviceFd, const std::
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    MMI_HILOGI("SetInputDeviceToScreen: %{public}d, fd:%{public}s", deviceFd, screenId.c_str());
+    MMI_HILOGI("Set input device fd:%{public}d to screen id:%{public}s", deviceFd, screenId.c_str());
     if (deviceFd == INVALID_DEVICE_FD) {
         MMI_HILOGE("Invalid input device fd");
         return RET_ERR;
@@ -440,6 +443,7 @@ const std::string& InputDeviceManager::GetScreenIdFromDeviceId(int32_t deviceId)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
+    std::lock_guard<std::mutex> guard(lock_);
     auto item = inputDevice_.find(deviceId);
     if (item != inputDevice_.end()) {
         auto iter = inputDeviceScreens_.find(item->second.fd_);

@@ -91,6 +91,7 @@ void EventDispatch::HandlePointerEventInner(const std::shared_ptr<PointerEvent> 
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     if (point->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
         if (CheckPointerEvent(point)) {
+            MMI_HILOGE("Check pointer event return true,filter out this pointer event.");
             return;
         }
     }

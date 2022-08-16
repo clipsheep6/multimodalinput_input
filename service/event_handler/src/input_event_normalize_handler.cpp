@@ -247,7 +247,7 @@ bool InputEventNormalizeHandler::CheckKeyboardWhiteList(std::shared_ptr<KeyEvent
     CHKPF(keyEvent);
     InputHandler->SetJumpInterceptState(false);
     CooperateState state = InputDevCooSM->GetCurrentCooperateState();
-    MMI_HILOGI("Get current cooperate state: %{public}d", state);
+    MMI_HILOGI("Get current cooperate state:%{public}d", state);
     if (state == CooperateState::STATE_IN) {
         int32_t deviceId = keyEvent->GetDeviceId();
         if (InputDevMgr->IsRemote(deviceId)) {
@@ -265,7 +265,7 @@ bool InputEventNormalizeHandler::CheckKeyboardWhiteList(std::shared_ptr<KeyEvent
         }
         InputHandler->SetJumpInterceptState(true);
     } else {
-        MMI_HILOGI("Get current cooperate state: STATE_FREE");`
+        MMI_HILOGW("Get current cooperate state:STATE_FREE(%{public}d)", state);
     }
     return true;
 }

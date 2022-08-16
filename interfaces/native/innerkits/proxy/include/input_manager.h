@@ -371,11 +371,11 @@ public:
     int32_t SetInputDeviceSeatName(const std::string& seatName, DeviceUniqId& deviceUniqId);
 
     /**
-     * @brief 设置多模输入设备对应的显示窗口ID
-     * @param deviceFd 输入设备FD
-     * @param screenId 输入设备对应的显示窗口ID
-     * @return 如果成功设置多模输入设备对应的显示窗口ID，则返回大于或等于 <b>0</b> 的值
-     * 否则返回小于 <b>0</b> 的值
+     * @brief 设置指定输入设备对应的屏幕ID
+     * @param deviceFd 输入设备句柄
+     * @param screenId 输入设备对应的屏幕ID
+     * @return 如果设置成功则返回值大于等于 0值
+     * 否则返回值小于 0
      */
     int32_t SetInputDeviceToScreen(int32_t deviceFd, const std::string& screenId);
 

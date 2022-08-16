@@ -27,9 +27,9 @@ namespace OHOS {
 namespace MMI {
 class EventDispatch : public IInputEventHandler {
     struct MouseState {
-        uint32_t type;
-        uint32_t code;
-        int32_t value;
+        uint32_t type { PointerEvent::SOURCE_TYPE_UNKNOWN };
+        uint32_t code { PointerEvent::BUTTON_NONE };
+        int32_t value { PointerEvent::POINTER_ACTION_UNKNOWN };
     };
 public:
     EventDispatch();

@@ -736,7 +736,7 @@ void InputManagerImpl::OnAnrTask(std::vector<std::shared_ptr<IAnrObserver>> obse
     }
 }
 
-int32_t InputManagerImpl::SetInputDeviceToScreen(int32_t deviceFd, const std::string& screenId)
+int32_t InputManagerImpl::SetInputDevice(int32_t deviceFd, const std::string& screenId)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE

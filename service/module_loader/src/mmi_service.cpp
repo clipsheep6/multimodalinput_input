@@ -991,6 +991,7 @@ int32_t MMIService::SetInputDeviceToScreen(int32_t deviceFd, const std::string& 
 #else
     (void)(deviceFd);
     (void)(screenId);
+    MMI_HILOGW("Enable input device cooperate does not support");
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     return RET_OK;
 }
