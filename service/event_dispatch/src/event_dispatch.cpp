@@ -88,14 +88,10 @@ void EventDispatch::HandlePointerEventInner(const std::shared_ptr<PointerEvent> 
         return;
     }
     DfxHisysevent::OnUpdateTargetPointer(point, fd, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-    if (point->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
-        if (CheckPointerEvent(point)) {
-            MMI_HILOGE("Check pointer event return true,filter out this pointer event.");
-            return;
-        }
+    if (CheckPointerEvent(point)) {
+        MMI_HILOGE("Check pointer event return true,filter out this pointer event.");
+        return;
     }
-#endif // OHOS_BUILD_ENABLE_COOPERATE
     auto udsServer = InputHandler->GetUDSServer();
     CHKPV(udsServer);
     auto session = udsServer->GetSession(fd);
@@ -172,21 +168,25 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
 bool EventDispatch::CheckPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
-    if (!mouseState_.empty()) {
-        if (pointerEvent->GetSourceType() == mouseState_[0].type &&
-            pointerEvent->GetButtonId() == mouseState_[0].code &&
-            pointerEvent->GetPointerAction() == mouseState_[0].value) {
-            mouseState_.clear();
-            return true;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
+        if (!mouseState_.empty()) {
+            if (pointerEvent->GetSourceType() == mouseState_[0].type &&
+                pointerEvent->GetButtonId() == mouseState_[0].code &&
+                pointerEvent->GetPointerAction() == mouseState_[0].value) {
+                mouseState_.clear();
+                return true;
+            }
         }
     }
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     return false;
 }
 
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
 void EventDispatch::OnMouseStateChange(uint32_t type, uint32_t code, int32_t value)
 {
     mouseState_.clear();

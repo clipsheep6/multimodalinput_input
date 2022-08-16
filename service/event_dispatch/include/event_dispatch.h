@@ -52,8 +52,8 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     void OnMouseStateChange(uint32_t type, uint32_t code, int32_t value);
-    bool CheckPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
+    bool CheckPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
 
 private:
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
