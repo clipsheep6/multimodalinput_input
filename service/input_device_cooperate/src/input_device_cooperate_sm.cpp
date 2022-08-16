@@ -77,7 +77,7 @@ void InputDeviceCooperateSM::OnCooperateChanged(const std::string &networkId, bo
 // DP 监听到 开关关闭
 void InputDeviceCooperateSM::OnCloseCooperation(const std::string &networkId, bool isLocal)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_ENTER;
     EventCooperateMgr->OnCooperateMessage(CooperateMessages::MSG_COOPERATE_STATE_OFF, networkId);
     if (!preparedNetworkId_.first.empty() && !preparedNetworkId_.second.empty()) {
         if (networkId ==preparedNetworkId_.first || networkId == preparedNetworkId_.second) {
@@ -488,7 +488,7 @@ bool InputDeviceCooperateSM::InitDeviceManager()
 
 void InputDeviceCooperateSM::OnDeviceOnLine(const std::string& networkId)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     onLineDevice_.push_back(networkId);
     DProfileAdapter->RegisterCrossingStateListener(networkId,
@@ -498,7 +498,7 @@ void InputDeviceCooperateSM::OnDeviceOnLine(const std::string& networkId)
 
 void InputDeviceCooperateSM::OnDeviceOffline(const std::string& networkId)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     bool needReset = true;
     if (cooperateState_ == CooperateState::STATE_OUT) {
