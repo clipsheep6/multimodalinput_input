@@ -72,11 +72,10 @@ ohos_source_set("libmmi-common") {
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
-
+  
   if(input_feature_input_cooperate) {
     defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
   }
-  
   public_configs = [ ":libmmi_client_config" ]
 
   external_deps = [

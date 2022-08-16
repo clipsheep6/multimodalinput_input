@@ -81,7 +81,7 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
     std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
     CHKPP(inputDevice);
     inputDevice->SetId(iter->first);
-    struct libinput_device * inputDeviceOrigni = iter->second.inputDeviceOrigin_;
+    struct libinput_device *inputDeviceOrigni = iter->second.inputDeviceOrigin_;
     inputDevice->SetType(static_cast<int32_t>(libinput_device_get_tags(inputDeviceOrigni)));
     const char* name = libinput_device_get_name(inputDeviceOrigni);
     inputDevice->SetName((name == nullptr) ? ("null") : (name));
@@ -496,7 +496,7 @@ std::vector<std::string> InputDeviceManager::GetPointerKeyboardDhids(int32_t poi
         if (networkId != pointerNetworkId) {
             continue;
         }
-        if (KEYBOARD_TYPE_ALPHABETICKEYBOARD == GetDeviceSupportKey(item.first)) {
+        if (GetDeviceSupportKey(item.first) == KEYBOARD_TYPE_ALPHABETICKEYBOARD) {
             dhids.push_back(item.second.dhid_);
             MMI_HILOGI("unq: %{public}s, type:%{public}s", dhids.back().c_str(), "supportkey");
         }
@@ -536,11 +536,12 @@ std::string InputDeviceManager::GetOriginNetworkId(const std::string& dhid)
     }
 
     std::string networkId = "";
-    for (auto iter : inputDevice_) {
+    for (const auto &iter : inputDevice_) {
         if (iter.second.dhid_ == dhid) {
             networkId = iter.second.networkIdOrigin_;
             if (networkId.empty()) {
                 GetLocalDeviceId(networkId);
+                break;
             }
         }
     }
@@ -684,15 +685,12 @@ std::string InputDeviceManager::GenerateDescriptor(struct libinput_device *input
     rawDescriptor += StringPrintf(":%04x:%04x:", vendor, product);
     // add handling for USB devices to not uniqueify kbs that show up twice
     if (uniqueId != nullptr && uniqueId[0] != '\0') {
-        rawDescriptor += "uniqueId:";
-        rawDescriptor += uniqueId;
+        rawDescriptor += "uniqueId:" + uniqueId;
     } else if (location != nullptr) {
-        rawDescriptor += "location:";
-        rawDescriptor += location;
+        rawDescriptor += "location:" + location;
     }
     if (name != nullptr && name[0] != '\0') {
-        rawDescriptor += "name:";
-        rawDescriptor += regex_replace(name, std::regex(" "), "");;
+        rawDescriptor += "name:" + regex_replace(name, std::regex(" "), "");
     }
     descriptor = DH_ID_PREFIX + Sha256(rawDescriptor);
     MMI_HILOGI("Created descriptor raw: %{public}s", rawDescriptor.c_str());

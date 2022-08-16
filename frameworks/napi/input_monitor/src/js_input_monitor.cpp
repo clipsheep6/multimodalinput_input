@@ -756,7 +756,6 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
     }
     CHKPV(jsEnv_);
     CHKPV(receiver_);
-    std::lock_guard<std::mutex> guard(mutex_);
     while (!evQueue_.empty()) {
         if (!isMonitoring_) {
             MMI_HILOGE("Js monitor stop handle callback");
