@@ -42,7 +42,8 @@ std::shared_ptr<MultimodalInputConnectRemoter> MultimodalInputConnectRemoter::Ge
     return g_instance;
 }
 
-int32_t MultimodalInputConnectRemoter::StartRemoteCooperate(const std::string &localDeviceId, const std::string &remoteDeviceId)
+int32_t MultimodalInputConnectRemoter::StartRemoteCooperate(const std::string &localDeviceId,
+    const std::string &remoteDeviceId)
 {
     CALL_DEBUG_ENTER;
     sptr<IMultimodalInputConnect> proxy = GetProxyById(remoteDeviceId);
@@ -110,6 +111,7 @@ sptr<IMultimodalInputConnect> MultimodalInputConnectRemoter::GetProxyById(const 
     mmiDeathRecipients_.emplace(deviceId, deathRecipient);
     sptr<IMultimodalInputConnect> remoteService = iface_cast<IMultimodalInputConnect>(sa);
     if (remoteService == nullptr) {
+        MMI_HILOGE("Get remote service is null!");
         OnRemoteDeath(deviceId);
         return nullptr;
     }
