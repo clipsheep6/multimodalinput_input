@@ -174,8 +174,8 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 bool EventDispatch::CheckPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CHKPF(pointerEvent);
     if (!mouseState_.empty()) {
-        CHKPF(pointerEvent);
         if (pointerEvent->GetSourceType() == mouseState_[0].type &&
             pointerEvent->GetButtonId() == mouseState_[0].code &&
             pointerEvent->GetPointerAction() == mouseState_[0].value) {

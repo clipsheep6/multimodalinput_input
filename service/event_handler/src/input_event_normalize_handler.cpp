@@ -279,7 +279,7 @@ bool InputEventNormalizeHandler::IsNeedFilterOut(const std::string& deviceId, co
     MMI_HILOGI("KeyItems size :%{public}lu", KeyItems.size());
     std::vector<int32_t> KeyItemsForDInput;
     KeyItemsForDInput.reserve(KeyItems.size());
-    for (auto& item : KeyItems) {
+    for (const auto& item : KeyItems) {
         KeyItemsForDInput.push_back(item.GetKeyCode());
     }
     OHOS::DistributedHardware::DistributedInput::BusinessEvent businessEvent;

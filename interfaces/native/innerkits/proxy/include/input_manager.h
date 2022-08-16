@@ -296,7 +296,7 @@ public:
      * @since 9
      */
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
-    
+
     /**
      * @brief 设置鼠标光标的位置.
      * @param x x 坐标
@@ -359,7 +359,7 @@ public:
      * 否则返回小于 <b>0</b> 的值
      */
     int32_t StopRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback);
-	
+
     /**
      * @brief 设定输入设备的席位名称.
      * @param seatName 席位名称
@@ -371,11 +371,11 @@ public:
     int32_t SetInputDeviceSeatName(const std::string& seatName, DeviceUniqId& deviceUniqId);
 
     /**
-     * @brief Set screen ID corresponding to input device fd.
-     * @param deviceFd Indicates the input device fd
-     * @param screenId Indicates the input device's screen ID
-     * @return Returns **0** if success; returns a non-0 value otherwise.
-     * @since 9
+     * @brief 设置多模输入设备对应的显示窗口ID
+     * @param deviceFd 输入设备FD
+     * @param screenId 输入设备对应的显示窗口ID
+     * @return 如果成功设置多模输入设备对应的显示窗口ID，则返回大于或等于 <b>0</b> 的值
+     * 否则返回小于 <b>0</b> 的值
      */
     int32_t SetInputDeviceToScreen(int32_t deviceFd, const std::string& screenId);
 
