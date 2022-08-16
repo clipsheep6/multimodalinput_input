@@ -286,7 +286,8 @@ bool InputEventNormalizeHandler::IsNeedFilterOut(const std::string& deviceId, co
     businessEvent.keyCode = keyEvent->GetKeyCode();
     businessEvent.keyAction = keyEvent->GetKeyAction();
     businessEvent.pressedKeys = KeyItemsForDInput;
-    MMI_HILOGI("businessEvent.keyCode :%{public}d, keyAction :%{public}d", businessEvent.keyCode, businessEvent.keyAction);
+    MMI_HILOGI("businessEvent.keyCode :%{public}d, keyAction :%{public}d",
+        businessEvent.keyCode, businessEvent.keyAction);
     for (const auto &item : businessEvent.pressedKeys) {
         MMI_HILOGI("pressedKeys :%{public}d", item);
     }

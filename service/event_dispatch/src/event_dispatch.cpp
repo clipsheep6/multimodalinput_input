@@ -89,7 +89,7 @@ void EventDispatch::HandlePointerEventInner(const std::shared_ptr<PointerEvent> 
     }
     DfxHisysevent::OnUpdateTargetPointer(point, fd, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    if(point->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
+    if (point->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
         if (CheckPointerEvent(point)) {
             return;
         }
