@@ -18,22 +18,23 @@
 
 #include <functional>
 #include <map>
-#include <memory>
+
 #include <string>
 #include <vector>
 
-#include "define_multimodal.h"
 #include "distributed_input_kit.h"
-#include "i_start_stop_d_input_vector_call_back.h"
+#include "i_start_stop_d_inputs_call_back.h"
 #include "nocopyable.h"
 #include "prepare_d_input_call_back_stub.h"
 #include "simulation_event_listener_stub.h"
 #include "singleton.h"
 #include "start_d_input_call_back_stub.h"
-#include "start_stop_d_input_vector_call_back_stub.h"
+#include "start_stop_d_inputs_call_back_stub.h"
 #include "start_stop_result_call_back_stub.h"
 #include "stop_d_input_call_back_stub.h"
 #include "unprepare_d_input_call_back_stub.h"
+
+#include "define_multimodal.h"
 
 namespace OHOS {
 namespace MMI {
@@ -100,25 +101,25 @@ private:
         void OnResult(const std::string &devId, const uint32_t &inputTypes, const int32_t &status) override;
     };
 
-    class StartDInputCallbackDHIds : public DistributedHardware::DistributedInput::StartStopDInputVectorCallbackStub {
+    class StartDInputCallbackDHIds : public DistributedHardware::DistributedInput::StartStopDInputsCallbackStub {
     public:
         void OnResultFds(const std::string &srcId, const std::string &sinkId, const int32_t &status) override;
         void OnResultDhids(const std::string &devId, const int32_t &status) override;
     };
 
-    class StopDInputCallbackDHIds : public DistributedHardware::DistributedInput::StartStopDInputVectorCallbackStub {
+    class StopDInputCallbackDHIds : public DistributedHardware::DistributedInput::StartStopDInputsCallbackStub {
     public:
         void OnResultFds(const std::string &srcId, const std::string &sinkId, const int32_t &status) override;
         void OnResultDhids(const std::string &devId, const int32_t &status) override;
     };
 
-    class StartDInputCallbackFds : public DistributedHardware::DistributedInput::StartStopDInputVectorCallbackStub {
+    class StartDInputCallbackFds : public DistributedHardware::DistributedInput::StartStopDInputsCallbackStub {
     public:
         void OnResultFds(const std::string &srcId, const std::string &sinkId, const int32_t &status) override;
         void OnResultDhids(const std::string &devId, const int32_t &status) override;
     };
 
-    class StopDInputCallbackFds : public DistributedHardware::DistributedInput::StartStopDInputVectorCallbackStub {
+    class StopDInputCallbackFds : public DistributedHardware::DistributedInput::StartStopDInputsCallbackStub {
     public:
         void OnResultFds(const std::string &srcId, const std::string &sinkId, const int32_t &status) override;
         void OnResultDhids(const std::string &devId, const int32_t &status) override;
@@ -151,13 +152,14 @@ private:
 
     void Init();
     void Release();
-    int32_t SaveCallbackFunc(CallbackType type, DICallback callback);
-    int32_t AddWatch(const CallbackType &type);
+    int32_t SaveCallback(CallbackType type, DICallback callback);
+    int32_t AddTimer(const CallbackType &type);
     int32_t RemoveWatch(const CallbackType &type);
     std::map<CallbackType, TimerInfo> watchingMap_;
     std::map<CallbackType, DICallback> callbackMap_;
-    MouseStateChangeCallback mouseStateChangeCallback_ = nullptr;
-    sptr<DistributedHardware::DistributedInput::SimulationEventListener> mouseListener_ = nullptr;
+    MouseStateChangeCallback mouseStateChangeCallback_ = { nullptr };
+    sptr<DistributedHardware::DistributedInput::SimulationEventListener> mouseListener_ { nullptr };
+    std::mutex adapterLock_;
 };
 
 #define DistributedAdapter DistributedInputAdapter::GetInstance()

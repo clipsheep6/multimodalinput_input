@@ -113,7 +113,7 @@ config("libmmi_server_config") {
     defines += [ "OHOS_BUILD_ENABLE_MONITOR" ]
   }
 
-  if (input_feature_input_cooperate) {
+  if (input_feature_input_cooperation) {
     defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
   }
 }
@@ -155,7 +155,7 @@ ohos_shared_library("libmmi-server") {
     "window_manager/src/input_windows_manager.cpp",
   ]
 
-  if (input_feature_input_cooperate) {
+  if (input_feature_input_cooperation) {
     sources += [ "input_device_cooperate/src/distributed_input_adapter.cpp" ]
   }
 
@@ -222,7 +222,7 @@ ohos_shared_library("libmmi-server") {
     "//third_party/json:nlohmann_json_static",
   ]
 
-  if (input_feature_input_cooperate) {
+  if (input_feature_input_cooperation) {
     deps += [ "//foundation/distributedhardware/distributed_input/interfaces/inner_kits:libdinput_sdk" ]
   }
 
