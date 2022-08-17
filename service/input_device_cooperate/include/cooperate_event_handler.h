@@ -25,7 +25,7 @@ namespace OHOS {
 namespace MMI {
 class CooperateEventHandler : public AppExecFwk::EventHandler {
 public:
-    CooperateEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
+    explicit CooperateEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
     virtual ~CooperateEventHandler();
     bool ProxyPostTask(const Callback &callback, int64_t delayTime);
     bool ProxyPostTask(const Callback &callback, const std::string &name = std::string(), int64_t delayTime = 0);
@@ -33,4 +33,4 @@ public:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // DISRIBUTED_INPUT_SINK_EVENT_HANDLER_H
+#endif // COOPERATE_EVENT_HANDLER_H

@@ -219,11 +219,10 @@ int32_t InputDeviceCooperateSM::StopRemoteCooperateResult(bool isSucess)
     return RET_OK;
 }
 
-int32_t InputDeviceCooperateSM::StartCooperateOtherRes(const std::string& srcNetworkId)
+void InputDeviceCooperateSM::StartCooperateOtherResult(const std::string& remoteNetworkId)
 {
     CALL_DEBUG_ENTER;
-    srcNetworkId_ = srcNetworkId;
-    return RET_OK;
+    srcNetworkId_ = remoteNetworkId;
 }
 
 void InputDeviceCooperateSM::StartFinish(bool isSucess, const std::string &networkId, int32_t startInputDeviceId)
@@ -243,7 +242,7 @@ void InputDeviceCooperateSM::StartFinish(bool isSucess, const std::string &netwo
     } else if (cooperateState_ == CooperateState::STATE_IN && isSucess) {
         auto sink = InputDevMgr->GetOriginNetworkId(startInputDeviceId);
         if (!sink.empty() && networkId != sink) {
-            RemoteMgr->StartCooperateOtherRes(sink, networkId);
+            RemoteMgr->StartCooperateOtherResult(sink, networkId);
         }
         InputDevCooSM->UpdateState(CooperateState::STATE_FREE);
     } else {
@@ -536,7 +535,7 @@ void InputDeviceCooperateSM::Dump(int32_t fd, const std::vector<std::string> &ar
 
 void InputDeviceCooperateSM::DeviceInitCallBack::OnRemoteDied()
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_ENTER;
 }
 
 void InputDeviceCooperateSM::MmiDeviceStateCallback::OnDeviceOnline(
@@ -556,13 +555,13 @@ void InputDeviceCooperateSM::MmiDeviceStateCallback::OnDeviceOffline(
 void InputDeviceCooperateSM::MmiDeviceStateCallback::OnDeviceChanged(
     const DistributedHardware::DmDeviceInfo &deviceInfo)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_ENTER;
 }
 
 void InputDeviceCooperateSM::MmiDeviceStateCallback::OnDeviceReady(
     const DistributedHardware::DmDeviceInfo &deviceInfo)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_ENTER;
 }
 } // namespace MMI
 } // namespace OHOS

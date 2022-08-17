@@ -73,7 +73,7 @@ public:
     int32_t StopRemoteCooperate();
     int32_t StopRemoteCooperateResult(bool isSucess);
 
-    int32_t StartCooperateOtherRes(const std::string &otherNetworkId);
+    void StartCooperateOtherResult(const std::string &remoteNetworkId);
     void HandleLibinputEvent(struct libinput_event *event) override;
     void UpdateState(CooperateState state);
     void UpdatePreparedDevices(const std::string &srcNetworkId, const std::string &sinkNetworkId);
