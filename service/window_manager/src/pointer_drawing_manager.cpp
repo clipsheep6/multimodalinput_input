@@ -92,22 +92,19 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
 int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
 {
     CALL_DEBUG_ENTER;
+    CHKPR(pointerWindow_, RET_ERR);
     sptr<OHOS::Surface> layer = GetLayer();
     if (layer == nullptr) {
-        if (pointerWindow_ != nullptr) {
-            pointerWindow_->Destroy();
-            pointerWindow_ = nullptr;
-        }
+        pointerWindow_->Destroy();
+        pointerWindow_ = nullptr;
         MMI_HILOGE("Init layer is failed, get layer is nullptr");
         return RET_ERR;
     }
 
     sptr<OHOS::SurfaceBuffer> buffer = GetSurfaceBuffer(layer);
     if (buffer == nullptr || buffer->GetVirAddr() == nullptr) {
-        if (pointerWindow_ != nullptr) {
-            pointerWindow_->Destroy();
-            pointerWindow_ = nullptr;
-        }
+        pointerWindow_->Destroy();
+        pointerWindow_ = nullptr;
         MMI_HILOGE("Init layer is failed, buffer or virAddr is nullptr");
         return RET_ERR;
     }
@@ -423,6 +420,11 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, in
     if (WinMgr->SetPointerStyle(pid, windowId, pointerStyle)) {
         MMI_HILOGE("Set pointer style failed");
         return RET_ERR;
+    }
+
+    if (!InputDevMgr->HasPointerDevice()) {
+        MMI_HILOGD("The pointer device is not exist");
+        return RET_OK;
     }
 
     if (!WinMgr->IsNeedRefreshLayer(windowId)) {
