@@ -587,7 +587,7 @@ int32_t MultimodalInputConnectProxy::WriteDisplayInfoToParcel(const std::shared_
     return ret;
 }
 
-int32_t MultimodalInputConnectProxy::SendDisplayInfo(const std::shared_ptr<DisplayGroupInfo> displayGroupInfo)
+int32_t MultimodalInputConnectProxy::UpdateDisplayInfo(const std::shared_ptr<DisplayGroupInfo> displayGroupInfo)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -604,12 +604,11 @@ int32_t MultimodalInputConnectProxy::SendDisplayInfo(const std::shared_ptr<Displ
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    ret = remote->SendRequest(SEND_DISPLAY_INFO, data, reply, option);
+    ret = remote->SendRequest(UPDATE_DISPLAY_INFO, data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS

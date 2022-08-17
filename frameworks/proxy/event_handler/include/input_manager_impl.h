@@ -108,7 +108,7 @@ private:
     int32_t PackWindowInfo(NetPacket &pkt);
     int32_t PackDisplayInfo(NetPacket &pkt);
     void PrintDisplayInfo();
-    void SendDisplayInfo();
+    void UpdateDisplayInfo();
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consumer,

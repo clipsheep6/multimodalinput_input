@@ -822,7 +822,7 @@ int32_t MMIService::CheckSendDisplayInfo(const std::shared_ptr<DisplayGroupInfo>
     return sMsgHandler_.OnDisplayInfo(displayGroupInfo);
 }
 
-int32_t MMIService::SendDisplayInfo(const std::shared_ptr<DisplayGroupInfo> displayGroupInfo)
+int32_t MMIService::UpdateDisplayInfo(const std::shared_ptr<DisplayGroupInfo> displayGroupInfo)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask(

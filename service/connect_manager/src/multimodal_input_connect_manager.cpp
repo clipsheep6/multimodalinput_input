@@ -197,10 +197,10 @@ int32_t MultimodalInputConnectManager::SetAnrObserver()
     return multimodalInputConnectService_->SetAnrObserver();
 }
 
-int32_t MultimodalInputConnectManager::SendDisplayInfo(const std::shared_ptr<DisplayGroupInfo> displayGroupInfo)
+int32_t MultimodalInputConnectManager::UpdateDisplayInfo(const std::shared_ptr<DisplayGroupInfo> displayGroupInfo)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->SendDisplayInfo(displayGroupInfo);
+    return multimodalInputConnectService_->UpdateDisplayInfo(displayGroupInfo);
 }
 
 bool MultimodalInputConnectManager::ConnectMultimodalInputService()

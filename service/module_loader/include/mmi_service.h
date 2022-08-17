@@ -71,7 +71,7 @@ public:
     virtual int32_t UnsubscribeKeyEvent(int32_t subscribeId) override;
     virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
     virtual int32_t SetAnrObserver() override;
-    virtual int32_t SendDisplayInfo(const std::shared_ptr<DisplayGroupInfo> displayGroupInfo) override;
+    virtual int32_t UpdateDisplayInfo(const std::shared_ptr<DisplayGroupInfo> displayGroupInfo) override;
 
 #ifdef OHOS_RSS_CLIENT
     virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;

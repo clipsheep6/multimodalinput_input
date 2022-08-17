@@ -69,7 +69,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         {IMultimodalInputConnect::INJECT_KEY_EVENT, &MultimodalInputConnectStub::StubInjectKeyEvent},
         {IMultimodalInputConnect::INJECT_POINTER_EVENT, &MultimodalInputConnectStub::StubInjectPointerEvent},
         {IMultimodalInputConnect::SET_ANR_OBSERVER, &MultimodalInputConnectStub::StubSetAnrListener},
-        {IMultimodalInputConnect::SEND_DISPLAY_INFO, &MultimodalInputConnectStub::StubSendDisplayInfo}
+        {IMultimodalInputConnect::UPDATE_DISPLAY_INFO, &MultimodalInputConnectStub::StubSendDisplayInfo}
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -506,9 +506,9 @@ int32_t MultimodalInputConnectStub::ReadWindowsVecToParcel(MessageParcel& data, 
         READINT32(data, windowData.area.width, IPC_PROXY_DEAD_OBJECT_ERR);
         READINT32(data, windowData.area.height, IPC_PROXY_DEAD_OBJECT_ERR);
 
-        int32_t numD = 0;
-        READINT32(data, numD, IPC_PROXY_DEAD_OBJECT_ERR);
-        for (int32_t i = 0; i < numD; i++) {
+        int32_t DefaultHotAreaNum = 0;
+        READINT32(data, DefaultHotAreaNum, IPC_PROXY_DEAD_OBJECT_ERR);
+        for (int32_t i = 0; i < DefaultHotAreaNum; i++) {
             Rect defaultHotArea = {};
             READINT32(data, defaultHotArea.x, IPC_PROXY_DEAD_OBJECT_ERR);
             READINT32(data, defaultHotArea.y, IPC_PROXY_DEAD_OBJECT_ERR);
@@ -517,9 +517,9 @@ int32_t MultimodalInputConnectStub::ReadWindowsVecToParcel(MessageParcel& data, 
             windowData.defaultHotAreas.push_back(defaultHotArea);
         }
 
-        int32_t numP = 0;
-        READINT32(data, numP, IPC_PROXY_DEAD_OBJECT_ERR);
-        for (int32_t i = 0; i < numP; i++) {
+        int32_t pointerHotAreaNum = 0;
+        READINT32(data, pointerHotAreaNum, IPC_PROXY_DEAD_OBJECT_ERR);
+        for (int32_t i = 0; i < pointerHotAreaNum; i++) {
             Rect pointerHotArea = {};
             READINT32(data, pointerHotArea.x, IPC_PROXY_DEAD_OBJECT_ERR);
             READINT32(data, pointerHotArea.y, IPC_PROXY_DEAD_OBJECT_ERR);
@@ -581,12 +581,11 @@ int32_t MultimodalInputConnectStub::StubSendDisplayInfo(MessageParcel& data, Mes
         return ret;
     }
     std::shared_ptr<DisplayGroupInfo> displayGroupInfoPtr = std::make_shared<DisplayGroupInfo>(displayGroupInfo);
-    ret = SendDisplayInfo(displayGroupInfoPtr);
+    ret = UpdateDisplayInfo(displayGroupInfoPtr);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call SendDisplayInfo failed ret:%{public}d", ret);
-        return ret;
+        MMI_HILOGE("Call UpdateDisplayInfo failed ret:%{public}d", ret);
     }
-    return RET_OK;
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS

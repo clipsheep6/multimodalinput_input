@@ -53,7 +53,7 @@ public:
     virtual int32_t UnsubscribeKeyEvent(int32_t subscribeId) override;
     virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
     virtual int32_t SetAnrObserver() override;
-    virtual int32_t SendDisplayInfo(const std::shared_ptr<DisplayGroupInfo> displayGroupInfo) override;
+    virtual int32_t UpdateDisplayInfo(const std::shared_ptr<DisplayGroupInfo> displayGroupInfo) override;
 
 private:
     int32_t WriteWindowsVecToParcel(const std::shared_ptr<DisplayGroupInfo> displayGroupInfo, MessageParcel& data);
