@@ -49,6 +49,7 @@ public:
     std::shared_ptr<EventInterceptorHandler> GetInterceptorHandler() const;
     std::shared_ptr<KeyEventSubscriber> GetSubscriberHandler() const;
     std::shared_ptr<EventMonitorHandler> GetMonitorHandler() const;
+    std::shared_ptr<EventFilterWrap> GetFilterHandler() const;
 
 private:
     int32_t BuildInputHandlerChain();
