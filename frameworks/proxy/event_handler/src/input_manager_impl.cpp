@@ -141,7 +141,7 @@ void InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInf
         }
     }
     displayGroupInfo_ = displayGroupInfo;
-    UpdateDisplayInfo();
+    SendDisplayInfo();
     PrintDisplayInfo();
 }
 
@@ -602,7 +602,7 @@ void InputManagerImpl::OnConnected()
         MMI_HILOGE("The windows info or display info is empty");
         return;
     }
-    UpdateDisplayInfo();
+    SendDisplayInfo();
     PrintDisplayInfo();
     if (anrObservers_.empty()) {
         return;
@@ -613,7 +613,7 @@ void InputManagerImpl::OnConnected()
     }
 }
 
-void InputManagerImpl::UpdateDisplayInfo()
+void InputManagerImpl::SendDisplayInfo()
 {
     std::shared_ptr<DisplayGroupInfo> displayGroupInfo = std::make_shared<DisplayGroupInfo>(displayGroupInfo_);
     int32_t ret = MultimodalInputConnMgr->UpdateDisplayInfo(displayGroupInfo);
