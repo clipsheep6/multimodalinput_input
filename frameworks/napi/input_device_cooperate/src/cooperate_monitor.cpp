@@ -36,6 +36,8 @@ namespace CooperateMonitor {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "cooperate_monitor" };
 constexpr std::string_view COOPERATE = "cooperate";
+constexpr size_t ARGC_SIZE_MIN = 1;
+constexpr size_t ARGC_SIZE_MAX = 2;
 
 sptr<Context> context = nullptr;
 std::set<std::string> types;
@@ -49,7 +51,7 @@ static sptr<Context> Parseparams(napi_env env, napi_callback_info info)
     napi_value argv[] = { nullptr, nullptr };
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
-    if (argc < 1 || argc > 2) {
+    if (argc < ARGC_SIZE_MIN || argc > ARGC_SIZE_MAX) {
         THROWERR(env, "Cooperate monitor: parameter is not one or two");
         return nullptr;
     }
@@ -63,7 +65,7 @@ static sptr<Context> Parseparams(napi_env env, napi_callback_info info)
         context = new Context();
     }
 
-    if (argc == 2) {
+    if (argc == ARGC_SIZE_MAX) {
         if (!TypeOf(env, argv[1], napi_function)) {
             THROWERR(env, "Cooperate monitor: the second parameter is not function");
             if (types.empty()) {
