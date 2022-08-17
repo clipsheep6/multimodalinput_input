@@ -79,6 +79,7 @@ group("input_jsapi_group") {
   deps = []
   if (support_jsapi) {
     deps += [
+      "frameworks/napi/input_device:inputdevice",
       "frameworks/napi/key_code:keycode",
       "frameworks/napi/key_event:keyevent",
       "frameworks/napi/mouse_event:mouseevent",
@@ -101,6 +102,9 @@ group("input_jsapi_group") {
     }
     if (input_feature_input_device) {
       deps += [ "frameworks/napi/input_device:inputdevice" ]
+    }
+    if (input_feature_input_cooperate) {
+      deps += [ "frameworks/napi/input_device_cooperate:inputdevicecooperate" ]
     }
   }
 }
