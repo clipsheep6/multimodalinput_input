@@ -24,7 +24,6 @@
 #include "hilog/log.h"
 
 #include "util.h"
-#include "klog.h"
 
 namespace OHOS {
 namespace MMI {
