@@ -12,11 +12,6 @@
 # limitations under the License.
 
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
-declare_args() {
-  input_feature_input_cooperate = false
-}
-
-print("input_feature_input_cooperate = ${input_feature_input_cooperate}")
 
 group("test") {
   testonly = true
