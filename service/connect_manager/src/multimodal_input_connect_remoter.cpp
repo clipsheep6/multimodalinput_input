@@ -51,91 +51,91 @@ int32_t MultimodalInputConnectRemoter::StartRemoteCooperate(const std::string &l
     return proxy->StartRemoteCooperate(localDeviceId);
 }
 
-int32_t MultimodalInputConnectRemoter::StartRemoteCooperateResult(const std::string &deviceId, bool isSucess,
+int32_t MultimodalInputConnectRemoter::StartRemoteCooperateResult(const std::string &remoteDeviceId, bool isSucess,
     int32_t xPercent, int32_t yPercent)
 {
     CALL_DEBUG_ENTER;
-    auto proxy = GetProxyById(deviceId);
+    auto proxy = GetProxyById(remoteDeviceId);
     CHKPR(proxy, RET_ERR);
     return proxy->StartRemoteCooperateResult(isSucess, xPercent, yPercent);
 }
 
-int32_t MultimodalInputConnectRemoter::StopRemoteCooperate(const std::string &deviceId)
+int32_t MultimodalInputConnectRemoter::StopRemoteCooperate(const std::string &remoteDeviceId)
 {
     CALL_DEBUG_ENTER;
-    auto proxy = GetProxyById(deviceId);
+    auto proxy = GetProxyById(remoteDeviceId);
     CHKPR(proxy, RET_ERR);
     return proxy->StopRemoteCooperate();
 }
 
-int32_t MultimodalInputConnectRemoter::StopRemoteCooperateResult(const std::string &deviceId, bool isSucess)
+int32_t MultimodalInputConnectRemoter::StopRemoteCooperateResult(const std::string &remoteDeviceId, bool isSucess)
 {
     CALL_DEBUG_ENTER;
-    auto proxy = GetProxyById(deviceId);
+    auto proxy = GetProxyById(remoteDeviceId);
     CHKPR(proxy, RET_ERR);
     return proxy->StopRemoteCooperateResult(isSucess);
 }
 
-int32_t MultimodalInputConnectRemoter::StartCooperateOtherResult(const std::string &deviceId,
+int32_t MultimodalInputConnectRemoter::StartCooperateOtherResult(const std::string &remoteDeviceId,
     const std::string &srcNetworkId)
 {
     CALL_DEBUG_ENTER;
-    auto proxy = GetProxyById(deviceId);
+    auto proxy = GetProxyById(remoteDeviceId);
     CHKPR(proxy, RET_ERR);
     return proxy->StartCooperateOtherResult(srcNetworkId);
 }
 
-sptr<IMultimodalInputConnect> MultimodalInputConnectRemoter::GetProxyById(const std::string &deviceId)
+sptr<IMultimodalInputConnect> MultimodalInputConnectRemoter::GetProxyById(const std::string &remoteDeviceId)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
-    auto iterService = mmiRemoteServices_.find(deviceId);
+    auto iterService = mmiRemoteServices_.find(remoteDeviceId);
     if (iterService != mmiRemoteServices_.end()) {
         return iterService->second;
     }
     auto sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     CHKPP(sm);
-    auto sa = sm->GetSystemAbility(IMultimodalInputConnect::MULTIMODAL_INPUT_CONNECT_SERVICE_ID, deviceId);
+    auto sa = sm->GetSystemAbility(IMultimodalInputConnect::MULTIMODAL_INPUT_CONNECT_SERVICE_ID, remoteDeviceId);
     CHKPP(sa);
     std::weak_ptr<MultimodalInputConnectRemoter> weakPtr = shared_from_this();
-    auto deathCallback = [deviceId, weakPtr](const wptr<IRemoteObject> &object) {
+    auto deathCallback = [remoteDeviceId, weakPtr](const wptr<IRemoteObject> &object) {
         auto sharedPtr = weakPtr.lock();
         if (sharedPtr != nullptr) {
-            sharedPtr->OnRemoteDeath(deviceId);
+            sharedPtr->OnRemoteDeath(remoteDeviceId);
         }
     };
     sptr<IRemoteObject::DeathRecipient> deathRecipient =
         new (std::nothrow) MultimodalInputConnectDeathRecipient(deathCallback);
     CHKPP(deathRecipient);
     sa->AddDeathRecipient(deathRecipient);
-    auto retDeath = mmiDeathRecipients_.emplace(deviceId, deathRecipient);
+    auto retDeath = mmiDeathRecipients_.emplace(remoteDeviceId, deathRecipient);
     if (!retDeath.second) {
-        MMI_HILOGE("Get proxy faild, death recipient not set!");
+        MMI_HILOGE("Get proxy faild, death recipient not set");
         return nullptr;
     }
     sptr<IMultimodalInputConnect> remoteService = iface_cast<IMultimodalInputConnect>(sa);
     if (remoteService == nullptr) {
         MMI_HILOGE("Get proxy faild, get remote service is null!");
-        OnRemoteDeath(deviceId);
+        OnRemoteDeath(remoteDeviceId);
         return nullptr;
     }
-    auto retService = mmiRemoteServices_.emplace(deviceId, remoteService);
+    auto retService = mmiRemoteServices_.emplace(remoteDeviceId, remoteService);
     if (!retService.second) {
         MMI_HILOGE("Get proxy faild, remote service not set!");
-        OnRemoteDeath(deviceId);
+        OnRemoteDeath(remoteDeviceId);
         return nullptr;
     }
     return remoteService;
 }
 
-void MultimodalInputConnectRemoter::OnRemoteDeath(const std::string &deviceId)
+void MultimodalInputConnectRemoter::OnRemoteDeath(const std::string &remoteDeviceId)
 {
     CALL_DEBUG_ENTER;
-    auto iterService = mmiRemoteServices_.find(deviceId);
+    auto iterService = mmiRemoteServices_.find(remoteDeviceId);
     if (iterService != mmiRemoteServices_.end()) {
         mmiRemoteServices_.erase(iterService);
     }
-    auto iterRecipient = mmiDeathRecipients_.find(deviceId);
+    auto iterRecipient = mmiDeathRecipients_.find(remoteDeviceId);
     if (iterRecipient != mmiDeathRecipients_.end()) {
         mmiDeathRecipients_.erase(iterRecipient);
     }

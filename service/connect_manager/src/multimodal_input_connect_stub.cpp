@@ -492,9 +492,8 @@ int32_t MultimodalInputConnectStub::StubSetAnrListener(MessageParcel& data, Mess
     int32_t ret = SetAnrObserver();
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetAnrObserver failed, ret:%{public}d", ret);
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t MultimodalInputConnectStub::StubStartRemoteCooperate(MessageParcel& data, MessageParcel& reply)
@@ -513,9 +512,8 @@ int32_t MultimodalInputConnectStub::StubStartRemoteCooperate(MessageParcel& data
     int32_t ret = StartRemoteCooperate(remoteDeviceId);
     if (ret != RET_OK) {
         MMI_HILOGE("Call StartRemoteCooperate failed, ret:%{public}d", ret);
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t MultimodalInputConnectStub::StubStartRemoteCooperateRes(MessageParcel& data, MessageParcel& reply)
@@ -595,7 +593,7 @@ int32_t MultimodalInputConnectStub::StubStartCooperateOtherRes(MessageParcel& da
     READSTRING(data, peerNetworkId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = StartCooperateOtherResult(peerNetworkId);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call StopRemoteCooperateResult failed, ret:%{public}d", ret);
+        MMI_HILOGE("Call StartCooperateOtherRes failed, ret:%{public}d", ret);
     }
     return ret;
 }

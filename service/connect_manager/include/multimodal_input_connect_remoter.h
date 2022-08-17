@@ -31,17 +31,17 @@ public:
     virtual ~MultimodalInputConnectRemoter() = default;
     static std::shared_ptr<MultimodalInputConnectRemoter> GetInstance();
     int32_t StartRemoteCooperate(const std::string &localDeviceId, const std::string &remoteDeviceId);
-    int32_t StartRemoteCooperateResult(const std::string &deviceId, bool isSucess, int32_t xPercent, int32_t yPercent);
-    int32_t StopRemoteCooperate(const std::string &deviceId);
-    int32_t StopRemoteCooperateResult(const std::string &deviceId, bool isSucess);
-    int32_t StartCooperateOtherResult(const std::string &deviceId, const std::string &srcNetworkId);
+    int32_t StartRemoteCooperateResult(const std::string &remoteDeviceId, bool isSucess, int32_t xPercent, int32_t yPercent);
+    int32_t StopRemoteCooperate(const std::string &remoteDeviceId);
+    int32_t StopRemoteCooperateResult(const std::string &remoteDeviceId, bool isSucess);
+    int32_t StartCooperateOtherResult(const std::string &remoteDeviceId, const std::string &srcNetworkId);
 
 private:
     MultimodalInputConnectRemoter() = default;
     DISALLOW_COPY_AND_MOVE(MultimodalInputConnectRemoter);
 
-    sptr<IMultimodalInputConnect> GetProxyById(const std::string &deviceId);
-    void OnRemoteDeath(const std::string &deviceId);
+    sptr<IMultimodalInputConnect> GetProxyById(const std::string &remoteDeviceId);
+    void OnRemoteDeath(const std::string &remoteDeviceId);
     std::mutex lock_;
     std::map<std::string, sptr<IMultimodalInputConnect>> mmiRemoteServices_;
     std::map<std::string, sptr<IRemoteObject::DeathRecipient>> mmiDeathRecipients_;
