@@ -23,6 +23,7 @@
 #include "hitrace_meter.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
+#include "input_windows_manager.h"
 #include "input-event-codes.h"
 #include "proto.h"
 #include "util.h"
@@ -41,7 +42,7 @@ EventDispatch::EventDispatch() {}
 EventDispatch::~EventDispatch() {}
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-void EventDispatch::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+void EventDispatch::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
     auto udsServer = InputHandler->GetUDSServer();
@@ -50,16 +51,24 @@ void EventDispatch::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
-#ifdef OHOS_BUILD_ENABLE_TOUCH
-void EventDispatch::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
+#ifdef OHOS_BUILD_ENABLE_POINTER
+void EventDispatch::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
-    HandlePointerEvent(pointerEvent);
+    HandlePointerEventInner(pointerEvent);
+}
+#endif // OHOS_BUILD_ENABLE_POINTER
+
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+void EventDispatch::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPV(pointerEvent);
+    HandlePointerEventInner(pointerEvent);
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-void EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
+void EventDispatch::HandlePointerEventInner(const std::shared_ptr<PointerEvent> point)
 {
     CALL_DEBUG_ENTER;
     CHKPV(point);
