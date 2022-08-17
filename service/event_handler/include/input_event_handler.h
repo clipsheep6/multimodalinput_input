@@ -43,7 +43,6 @@ public:
     void Init(UDSServer& udsServer);
     void OnEvent(void *event);
     UDSServer *GetUDSServer() const;
-    int32_t AddInputEventFilter(sptr<IEventFilter> filter);
 
     std::shared_ptr<InputEventNormalizeHandler> GetInputEventNormalizeHandler() const;
     std::shared_ptr<EventInterceptorHandler> GetInterceptorHandler() const;
