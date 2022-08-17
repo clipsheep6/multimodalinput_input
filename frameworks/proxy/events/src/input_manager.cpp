@@ -205,6 +205,8 @@ int32_t InputManager::StopDeviceCooperate()
 int32_t InputManager::GetInputDeviceCooperateState(const std::string &deviceId, std::function<void(bool)> callback)
 {
     return InputMgrImpl->GetInputDeviceCooperateState(deviceId, callback);
+}
+
 int32_t InputManager::SetPointerLocation(int32_t x, int32_t y)
 {
     return InputManagerImpl::GetInstance()->SetPointerLocation(x, y);
