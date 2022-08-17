@@ -54,7 +54,7 @@ public:
     virtual int32_t UnsubscribeKeyEvent(int32_t subscribeId) = 0;
     virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual int32_t SetAnrObserver() = 0;
-    virtual int32_t SetInputDeviceToScreen(int32_t deviceFd, const std::string& screenId) = 0;
+    virtual int32_t SetInputDeviceToScreen(const std::string& dhid, const std::string& screenId) = 0;
     enum {
         ALLOC_SOCKET_FD = 0,
         ADD_INPUT_EVENT_FILTER = 1,

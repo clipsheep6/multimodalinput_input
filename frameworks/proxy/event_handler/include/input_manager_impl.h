@@ -117,7 +117,7 @@ public:
     int32_t StartRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback);
     int32_t StopRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback);
 
-    int32_t SetInputDevice(int32_t deviceFd, const std::string& screenId);
+    int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);

@@ -503,11 +503,11 @@ int32_t MultimodalInputConnectStub::StubSetInputDeviceToScreen(MessageParcel& da
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    int32_t deviceFd = -1;
-    READINT32(data, deviceFd, IPC_PROXY_DEAD_OBJECT_ERR);
+    std::string dhid;
+    READSTRING(data, dhid, IPC_PROXY_DEAD_OBJECT_ERR);
     std::string screenId;
     READSTRING(data, screenId, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = SetInputDeviceToScreen(deviceFd, screenId);
+    int32_t ret = SetInputDeviceToScreen(dhid, screenId);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetInputDeviceToScreen failed ret:%{public}d", ret);
         return ret;

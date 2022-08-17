@@ -525,7 +525,7 @@ int32_t MultimodalInputConnectProxy::SetAnrObserver()
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::SetInputDeviceToScreen(int32_t deviceFd, const std::string& screenId)
+int32_t MultimodalInputConnectProxy::SetInputDeviceToScreen(const std::string& dhid, const std::string& screenId)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -534,7 +534,7 @@ int32_t MultimodalInputConnectProxy::SetInputDeviceToScreen(int32_t deviceFd, co
         return ERR_INVALID_VALUE;
     }
 
-    WRITEINT32(data, deviceFd, ERR_INVALID_VALUE);
+    WRITESTRING(data, dhid, ERR_INVALID_VALUE);
     WRITESTRING(data, screenId, ERR_INVALID_VALUE);
 
     MessageParcel reply;

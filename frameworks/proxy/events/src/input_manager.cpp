@@ -177,9 +177,9 @@ void InputManager::SetAnrObserver(std::shared_ptr<IAnrObserver> observer)
     InputMgrImpl->SetAnrObserver(observer);
 }
 
-int32_t InputManager::SetInputDeviceToScreen(int32_t deviceFd, const std::string& screenId)
+int32_t InputManager::SetInputDeviceToScreen(const std::string& dhid, const std::string& screenId)
 {
-    return InputMgrImpl->SetInputDevice(deviceFd, screenId);
+    return InputMgrImpl->SetInputDevice(dhid, screenId);
 }
 
 int32_t InputManager::SetPointerLocation(int32_t x, int32_t y)

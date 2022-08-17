@@ -372,12 +372,12 @@ public:
 
     /**
      * @brief 设置指定输入设备对应的屏幕ID
-     * @param deviceFd 输入设备句柄
+     * @param dhid 输入设备唯一ID
      * @param screenId 输入设备对应的屏幕ID
      * @return 如果设置成功则返回值大于等于 0值
      * 否则返回值小于 0
      */
-    int32_t SetInputDeviceToScreen(int32_t deviceFd, const std::string& screenId);
+    int32_t SetInputDeviceToScreen(const std::string& dhid, const std::string& screenId);
 
 private:
     InputManager() = default;

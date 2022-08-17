@@ -53,7 +53,7 @@ public:
     virtual int32_t UnsubscribeKeyEvent(int32_t subscribeId) override;
     virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
     virtual int32_t SetAnrObserver() override;
-    virtual int32_t SetInputDeviceToScreen(int32_t deviceFd, const std::string& screenId) override;
+    virtual int32_t SetInputDeviceToScreen(const std::string& dhid, const std::string& screenId) override;
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;
 };

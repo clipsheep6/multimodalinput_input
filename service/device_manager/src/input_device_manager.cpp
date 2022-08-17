@@ -421,12 +421,12 @@ void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::strin
     }
 }
 
-int32_t InputDeviceManager::SetInputDeviceToScreen(int32_t deviceFd, const std::string& screenId)
+int32_t InputDeviceManager::SetInputDeviceToScreen(const std::string& dhid, const std::string& screenId)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    MMI_HILOGI("Set input device fd:%{public}d to screen id:%{public}s", deviceFd, screenId.c_str());
-    if (deviceFd == INVALID_DEVICE_FD) {
+    MMI_HILOGI("Set input device dhid:%{public}s to screen id:%{public}s", dhid.c_cstr(), screenId.c_str());
+    if (dhid.empty()) {
         MMI_HILOGE("Invalid input device fd");
         return RET_ERR;
     }
@@ -434,7 +434,7 @@ int32_t InputDeviceManager::SetInputDeviceToScreen(int32_t deviceFd, const std::
         MMI_HILOGE("Input device screen id is empty");
         return RET_ERR;
     }
-    inputDeviceScreens_[deviceFd] = screenId;
+    inputDeviceScreens_[dhid] = screenId;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     return RET_OK;
 }
@@ -446,7 +446,7 @@ const std::string& InputDeviceManager::GetScreenIdFromDeviceId(int32_t deviceId)
     std::lock_guard<std::mutex> guard(lock_);
     auto item = inputDevice_.find(deviceId);
     if (item != inputDevice_.end()) {
-        auto iter = inputDeviceScreens_.find(item->second.fd_);
+        auto iter = inputDeviceScreens_.find(item->second.dhid_);
         if (iter != inputDeviceScreens_.end()) {
             return iter->second;
         }
