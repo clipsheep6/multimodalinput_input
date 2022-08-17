@@ -597,6 +597,11 @@ int32_t InputManagerImpl::GetPointerSpeed()
 int32_t InputManagerImpl::SetPointerStyle(int32_t windowId, int32_t pointerStyle)
 {
     CALL_DEBUG_ENTER;
+    if(windowId < 0 || pointerStyle < 0)
+    {
+        MMI_HILOGE("The param is invalid");
+        return RET_ERR;
+    }
     int32_t ret = MultimodalInputConnMgr->SetPointerStyle(windowId, pointerStyle);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to send to server, ret:%{public}d", ret);
@@ -608,6 +613,11 @@ int32_t InputManagerImpl::SetPointerStyle(int32_t windowId, int32_t pointerStyle
 int32_t InputManagerImpl::GetPointerStyle(int32_t windowId, int32_t &pointerStyle)
 {
     CALL_DEBUG_ENTER;
+    if(windowId < 0)
+    {
+        MMI_HILOGE("The param is invalid");
+        return RET_ERR;
+    }
     int32_t ret = MultimodalInputConnMgr->GetPointerStyle(windowId, pointerStyle);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to send to server, ret:%{public}d", ret);
