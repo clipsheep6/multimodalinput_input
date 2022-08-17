@@ -236,6 +236,12 @@ int32_t InputEventNormalizeHandler::HandleMouseEvent(libinput_event* event)
         keyEvent_ = KeyEvent::Create();
     }
     CHKPR(keyEvent_, ERROR_NULL_POINTER);
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    if (!DInputMgr->IsControllerSide(DInputManager::MOUSE_ABILITY)) {
+        MMI_HILOGD("OnEventPointer::dinput controlled point event droped");
+        return RET_OK;
+    }
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
     MouseEventHdr->Normalize(event);
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);

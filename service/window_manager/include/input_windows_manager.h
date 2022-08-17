@@ -64,7 +64,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     bool TouchPointToDisplayPoint(struct libinput_event_touch* touch,
-        EventTouch& touchInfo, int32_t& targetDisplayId);
+        const std::string& seatName, EventTouch& touchInfo, int32_t& targetDisplayId);
     void RotateTouchScreen(DisplayInfo info, LogicalCoordinate& coord) const;
     bool TransformTipPoint(struct libinput_event_tablet_tool* tip, LogicalCoordinate& coord, int32_t& displayId) const;
     bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
@@ -80,6 +80,10 @@ public:
     void DispatchPointer(int32_t pointerAction);
     void SendPointerEvent(int32_t pointerAction);
 #endif // OHOS_BUILD_ENABLE_POINTER
+
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    void UpdateDMouseLocation(int32_t displayId);
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
 
 private:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)

@@ -26,6 +26,9 @@
 
 #include "libinput.h"
 
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+#include "dinput_manager.h"
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
 #include "key_command_manager.h"
 #include "timer_manager.h"
 #include "util.h"
@@ -153,5 +156,10 @@ int32_t InputEventHandler::AddInputEventFilter(sptr<IEventFilter> filter)
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+int32_t InputEventHandler::SetAbsolutionLocation(int32_t pid, double absX, double absY)
+{
+    MouseEventHdr->SetAbsolutionLocation(pid, absX, absY);
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

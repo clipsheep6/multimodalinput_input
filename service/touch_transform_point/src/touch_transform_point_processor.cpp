@@ -15,6 +15,7 @@
 
 #include "touch_transform_point_processor.h"
 
+#include "input_device_manager.h"
 #include "mmi_log.h"
 
 namespace OHOS {
@@ -54,7 +55,12 @@ bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event
     CHKPF(device);
     EventTouch touchInfo;
     int32_t logicalDisplayId = -1;
-    if (!WinMgr->TouchPointToDisplayPoint(data, touchInfo, logicalDisplayId)) {
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    auto seatName = InputDevMgr->FindInputDeviceName(deviceId_);
+#else
+    std::string seatName = "";
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
+    if (!WinMgr->TouchPointToDisplayPoint(data, seatName, touchInfo, logicalDisplayId)) {
         MMI_HILOGE("TouchDownPointToDisplayPoint failed");
         return false;
     }
@@ -105,7 +111,12 @@ bool TouchTransformPointProcessor::OnEventTouchMotion(struct libinput_event *eve
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     EventTouch touchInfo;
     int32_t logicalDisplayId = pointerEvent_->GetTargetDisplayId();
-    if (!WinMgr->TouchPointToDisplayPoint(data, touchInfo, logicalDisplayId)) {
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    auto seatName = InputDevMgr->FindInputDeviceName(deviceId_);
+#else
+    std::string seatName = "";
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
+    if (!WinMgr->TouchPointToDisplayPoint(data, seatName, touchInfo, logicalDisplayId)) {
         MMI_HILOGE("Get TouchMotionPointToDisplayPoint failed");
         return false;
     }

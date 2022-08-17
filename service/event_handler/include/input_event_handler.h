@@ -49,6 +49,7 @@ public:
     std::shared_ptr<EventInterceptorHandler> GetInterceptorHandler() const;
     std::shared_ptr<KeyEventSubscriber> GetSubscriberHandler() const;
     std::shared_ptr<EventMonitorHandler> GetMonitorHandler() const;
+    int32_t SetAbsolutionLocation(int32_t pid, double absX, double absY);
 
 private:
     int32_t BuildInputHandlerChain();
