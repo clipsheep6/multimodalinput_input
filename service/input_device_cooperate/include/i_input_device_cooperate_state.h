@@ -47,8 +47,8 @@ protected:
     virtual void OnStopDistributedInput(bool isSucess, const std::string &srcNetworkId, int32_t startInputDeviceId);
 
 protected:
-    std::shared_ptr<AppExecFwk::EventRunner> runner_ {nullptr};
-    std::shared_ptr<CooperateEventHandler> eventHandler_ {nullptr};
+    std::shared_ptr<AppExecFwk::EventRunner> runner_ { nullptr };
+    std::shared_ptr<CooperateEventHandler> eventHandler_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS

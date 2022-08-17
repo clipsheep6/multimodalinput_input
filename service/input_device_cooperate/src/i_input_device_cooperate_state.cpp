@@ -33,6 +33,7 @@ IInputDeviceCooperateState::IInputDeviceCooperateState()
 {
     runner_ = AppExecFwk::EventRunner::Create(true);
     if (runner_ == nullptr) {
+        MMI_HILOGE("Create event runner fail");
         return;
     }
     eventHandler_ = std::make_shared<CooperateEventHandler>(runner_);

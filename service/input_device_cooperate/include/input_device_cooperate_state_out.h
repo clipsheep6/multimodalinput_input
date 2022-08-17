@@ -17,7 +17,6 @@
 #define INPUT_DEVICE_COOPERATE_STATE_OUT_H
 
 #include "i_input_device_cooperate_state.h"
-#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
@@ -33,7 +32,7 @@ protected:
     int32_t ProcessStop(const std::string &src);
 
 private:
-    std::string startDhid_ { "" };
+    std::string startDhid_;
 };
 } // namespace MMI
 } // namespace OHOS
