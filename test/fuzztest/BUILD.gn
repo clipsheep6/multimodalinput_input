@@ -29,7 +29,7 @@ group("test") {
     "supportkeys_fuzzer:fuzztest",
     "updatedisplayinfo_fuzzer:fuzztest",
   ]
-  if (input_feature_input_cooperate) {
+  if (input_feature_input_cooperation) {
     deps += [
       "enableinputdevicecooperate_fuzzer:fuzztest",
       "getdeviceIds_fuzzer:fuzztest",
