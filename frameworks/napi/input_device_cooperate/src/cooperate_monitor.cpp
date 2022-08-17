@@ -126,9 +126,8 @@ static void Callback(std::string deviceId, CooperateMessages cooperateMessages)
     context->eventMsg_ = cooperateMessages;
 
     work->data = static_cast<void*>(context);
-    int32_t result;
-    result = uv_queue_work(loop, work, [](uv_work_t *work) {}, AsyncCallback);
-    if(result != 0) {
+    int32_t result = uv_queue_work(loop, work, [](uv_work_t *work) {}, AsyncCallback);
+    if (result != 0) {
         MMI_HILOGE("Cooperate monitor uv_queue_work failed");
         delete work;
         work = nullptr;

@@ -30,6 +30,8 @@ namespace MMI {
 namespace CooperateGetState {
 namespace {
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "cooperate_get_state" };
+constexpr size_t ARGC_SIZE_MIN = 1;
+constexpr size_t ARGC_SIZE_MAX = 2;
 } // namespace
 
 static sptr<Context> ParseParams(napi_env env, napi_callback_info info)
@@ -40,7 +42,7 @@ static sptr<Context> ParseParams(napi_env env, napi_callback_info info)
     napi_value argv[] = { nullptr, nullptr };
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
-    if (argc < 1 || argc > 2) {
+    if (argc < ARGC_SIZE_MIN || argc > ARGC_SIZE_MAX) {
         THROWERR(env, "Cooperate getState: parameter is not one or two");
         return nullptr;
     }
@@ -51,7 +53,7 @@ static sptr<Context> ParseParams(napi_env env, napi_callback_info info)
     }
 
     sptr<Context> context = new Context();
-    if (argc == 2) {
+    if (argc == ARGC_SIZE_MAX) {
         if (!TypeOf(env, argv[1], napi_function)) {
             THROWERR(env, "Cooperate getState: the second paramter is not function");
             delete context;
