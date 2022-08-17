@@ -71,6 +71,10 @@ static void Execute(sptr<Context> context)
     if (result != RET_OK) {
         MMI_HILOGE("Cooperate start execute error");
     }
+<<<<<<< HEAD
+=======
+
+>>>>>>> bd6697fa0b77718b443ac279fd0bd8d36af5ef9f
 }
 
 napi_value Start(napi_env env, napi_callback_info info)
