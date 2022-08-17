@@ -192,6 +192,9 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
         IPointerDrawingManager::GetInstance()->OnDisplayInfo(displayGroupInfo.displaysInfo[0].id,
             info, displayGroupInfo.displaysInfo[0].width, displayGroupInfo.displaysInfo[0].height,
             displayGroupInfo.displaysInfo[0].direction);
+        if (InputDevMgr->HasPointerDevice()) {
+            IPointerDrawingManager::GetInstance()->DrawPointerStyle();
+        }
 #endif // OHOS_BUILD_ENABLE_POINTER
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -762,9 +765,13 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     int32_t mouseStyle = 0;
     int32_t ret = GetPointerStyle(touchWindow->pid, touchWindow->id, mouseStyle);
     if (ret != RET_OK) {
-        MMI_HILOGE("Get pointer style failed, mouse style return default style");
+        MMI_HILOGE("Get pointer style failed");
         return RET_ERR;
     }
+
+    WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
+    IPointerDrawingManager::GetInstance()->OnDisplayInfo(physicalDisplayInfo->id, info,
+        physicalDisplayInfo->width, physicalDisplayInfo->height, physicalDisplayInfo->direction);
     IPointerDrawingManager::GetInstance()->DrawPointer(displayId, pointerItem.GetDisplayX(),
         pointerItem.GetDisplayY(), MOUSE_ICON(mouseStyle));
 

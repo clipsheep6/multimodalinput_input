@@ -72,10 +72,8 @@ public:
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
     const DisplayGroupInfo& GetDisplayGroupInfo();
-    void OnSessionLost(SessionPtr session);
     int32_t SetPointerStyle(int32_t pid, int32_t windowId, int32_t pointerStyle);
     int32_t GetPointerStyle(int32_t pid, int32_t windowId, int32_t &pointerStyle) const;
-    void UpdatePointerStyle();
     bool IsNeedRefreshLayer(int32_t windowId);
 #endif // OHOS_BUILD_ENABLE_POINTER
     void Dump(int32_t fd, const std::vector<std::string> &args);
@@ -96,6 +94,8 @@ private:
     void UpdatePointerEvent(int32_t logicalX, int32_t logicalY,
         const std::shared_ptr<PointerEvent>& pointerEvent, const WindowInfo& touchWindow);
     void NotifyPointerToWindow();
+    void OnSessionLost(SessionPtr session);
+    void UpdatePointerStyle();
 #endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     int32_t UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent);

@@ -49,13 +49,10 @@ public:
     {
         return 0;
     }
+    virtual void DrawPointerStyle() {}
     virtual bool IsPointerVisible()
     {
         return false;
-    }
-    virtual int32_t InitLayer(const MOUSE_ICON mouseStyle)
-    {
-        return 0;
     }
 
 public:

@@ -299,12 +299,13 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice)
 
 void PointerDrawingManager::DrawManager()
 {
-    if (hasDisplay_ && hasPointerDevice_) {
+    if (hasDisplay_ && hasPointerDevice_ && pointerWindow_ == nullptr) {
         MMI_HILOGD("Draw pointer begin");
         int32_t mouseStyle = 0;
         int32_t ret = WinMgr->GetPointerStyle(pid_, windowId_, mouseStyle);
         if (ret != RET_OK) {
-            MMI_HILOGE("Get pointer style failed, mouse style return default style");
+            MMI_HILOGE("Get pointer style failed");
+            return;
         }
 
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
@@ -406,11 +407,6 @@ int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
 int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, int32_t pointerStyle)
 {
     CALL_DEBUG_ENTER;
-    if (WinMgr->GetWindowPid(windowId) != pid) {
-        MMI_HILOGE("The param window type is invalid");
-        return RET_ERR;
-    }
-
     auto it = mouseIcons_.find(MOUSE_ICON(pointerStyle));
     if (it == mouseIcons_.end()) {
         MMI_HILOGE("The param pointerStyle is invalid");
@@ -452,6 +448,29 @@ int32_t PointerDrawingManager::GetPointerStyle(int32_t pid, int32_t windowId, in
 
     MMI_HILOGD("Window type:%{public}d get pointer style:%{public}d success", windowId, pointerStyle);
     return RET_OK;
+}
+
+void PointerDrawingManager::DrawPointerStyle()
+{
+    CALL_DEBUG_ENTER;
+    if (hasDisplay_ && hasPointerDevice_ && pointerWindow_ != nullptr) {
+        int32_t mouseStyle = 0;
+        int32_t ret = WinMgr->GetPointerStyle(pid_, windowId_, mouseStyle);
+        if (ret != RET_OK) {
+            MMI_HILOGE("Get pointer style failed");
+            return;
+        }
+
+        if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
+            DrawPointer(displayId_, displayWidth_/2, displayHeight_/2, MOUSE_ICON(mouseStyle));
+            MMI_HILOGD("Draw pointer style, mouseStyle:%{public}d", mouseStyle);
+            return;
+        }
+
+        DrawPointer(displayId_, lastPhysicalX_, lastPhysicalY_, MOUSE_ICON(mouseStyle));
+        MMI_HILOGD("Draw pointer style, mouseStyle:%{public}d", mouseStyle);
+        return;
+    }
 }
 
 void PointerDrawingManager::InitStyle()

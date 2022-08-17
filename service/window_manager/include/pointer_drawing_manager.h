@@ -48,8 +48,8 @@ public:
     int32_t SetPointerVisible(int32_t pid, bool visible);
     int32_t SetPointerStyle(int32_t pid, int32_t windowId, int32_t pointerStyle);
     int32_t GetPointerStyle(int32_t pid, int32_t windowId, int32_t &pointerStyle);
+    void DrawPointerStyle();
     bool IsPointerVisible();
-    int32_t InitLayer(const MOUSE_ICON mouseStyle);
     void AdjustMouseFocus(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
 
 public:
@@ -69,6 +69,7 @@ private:
     void UpdatePointerVisible();
     void UpdatePidInfo(int32_t pid, bool visible);
     void InitStyle();
+    int32_t InitLayer(const MOUSE_ICON mouseStyle);
 
 private:
     sptr<OHOS::Rosen::Window> pointerWindow_ { nullptr };
