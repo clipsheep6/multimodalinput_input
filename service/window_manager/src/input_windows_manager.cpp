@@ -19,6 +19,9 @@
 #include <cstdio>
 
 #include "dfx_hisysevent.h"
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+#include "dinput_manager.h"
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
 #include "input_device_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "mouse_event_handler.h"
@@ -398,10 +401,10 @@ void InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* t
 }
 
 bool InputWindowsManager::TouchPointToDisplayPoint(struct libinput_event_touch* touch,
-    EventTouch& touchInfo, int32_t& physicalDisplayId)
+    const std::string& seatName, EventTouch& touchInfo, int32_t& physicalDisplayId)
 {
     CHKPF(touch);
-    auto info = FindPhysicalDisplayInfo("default0");
+    auto info = FindPhysicalDisplayInfo(seatName);
     CHKPF(info);
     physicalDisplayId = info->id;
     if ((info->width <= 0) || (info->height <= 0)) {
@@ -832,6 +835,9 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     }
     mouseLocation_.physicalX = integerX;
     mouseLocation_.physicalY = integerY;
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    UpdateDMouseLocation(displayId);
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
     MMI_HILOGD("Mouse Data: physicalX:%{public}d,physicalY:%{public}d, displayId:%{public}d",
         mouseLocation_.physicalX, mouseLocation_.physicalY, displayId);
 }
@@ -882,5 +888,22 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
                 item.uniq.c_str(), item.direction);
     }
 }
+
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+void OHOS::MMI::InputWindowsManager::UpdateDMouseLocation(int32_t displayId)
+{
+    CALL_LOG_ENTER;
+    DInputMgr->GetMouseLocation().globalX = mouseLocation_.globalX;
+    DInputMgr->GetMouseLocation().globalY = mouseLocation_.globalY;
+    if (displayGroupInfo_.displaysInfo.empty()) {
+        MMI_HILOGW("logicalDisplays_is empty");
+        return;
+    }
+    if (displayId < 0) {
+        displayId = displayGroupInfo_.displaysInfo[0].id;
+    }
+    DInputMgr->GetMouseLocation().displayId = displayId;
+}
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
 } // namespace MMI
 } // namespace OHOS

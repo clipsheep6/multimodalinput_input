@@ -17,6 +17,9 @@
 #include <cinttypes>
 
 #include "anr_manager.h"
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+#include "dinput_manager.h"
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
 #include "bytrace_adapter.h"
 #include "dfx_hisysevent.h"
 #include "error_multimodal.h"
@@ -112,6 +115,12 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
 {
     CALL_DEBUG_ENTER;
     CHKPR(key, PARAM_INPUT_INVALID);
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    bool jumpIntercept = false;
+    if (DInputMgr->CheckWhiteList(key, jumpIntercept)) {
+        return RET_OK;
+    }
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
     auto fd = WinMgr->UpdateTarget(key);
     if (fd < 0) {
         MMI_HILOGE("Invalid fd, fd: %{public}d", fd);
