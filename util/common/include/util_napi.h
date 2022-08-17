@@ -15,9 +15,12 @@
 #ifndef UTIL_NAPI_H
 #define UTIL_NAPI_H
 
-#include "napi/native_api.h"
-#include "napi/native_node_api.h"
-#include "utils/log.h"
+#include <cstdint>
+#include <string>
+
+#include <napi/native_api.h>
+
+#include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {
@@ -57,7 +60,28 @@ namespace MMI {
         auto infoTemp = std::string(__FUNCTION__)+ ": " + #desc; \
         napi_throw_error(env, nullptr, infoTemp.c_str()); \
     } while (0)
+
+namespace UtilNapi {
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UtilNapi" };
+} // namespace
+
+bool TypeOf(napi_env env, napi_value value, napi_valuetype type);
+napi_value CreateErrorMessage(napi_env env, int32_t errorCode, const std::string &errorMessage);
+
+template <typename Context>
+void CallFunction(napi_env env, Context *context, size_t argc, const napi_value *argv)
+{
+    CHKPV(context);
+    if (context->callbackRef_ == nullptr) {
+        return;
+    }
+    napi_value callback = nullptr;
+    CHKRV(env, napi_get_reference_value(env, context->callbackRef_, &callback), "napi_get_reference_value");
+    napi_value result = nullptr;
+    CHKRV(env, napi_call_function(env, nullptr, callback, argc, argv, &result), "napi_call_function");
+}
+} // namespace UtilNapi
 } // namespace MMI
 } // namespace OHOS
-
 #endif // UTIL_NAPI_H
