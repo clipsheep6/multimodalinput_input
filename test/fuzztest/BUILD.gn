@@ -12,6 +12,12 @@
 # limitations under the License.
 
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+declare_args() {
+  input_feature_input_cooperate = false
+}
+
+print("input_feature_input_cooperate = ${input_feature_input_cooperate}")
+
 group("test") {
   testonly = true
 
@@ -28,22 +34,22 @@ group("test") {
     "supportkeys_fuzzer:fuzztest",
     "updatedisplayinfo_fuzzer:fuzztest",
   ]
-  if(input_feature_input_cooperate) {
+  if (input_feature_input_cooperate) {
     deps += [
-      "removeinterceptor_fuzzer:fuzztest",
-      "registerdevListener_fuzzer:fuzztest",
-      "startinputdevicecooperate_fuzzer:fuzztest",
-      "setinputdevicetoscreen_fuzzer:fuzztest",
-      "getinputdevicecooperatestate_fuzzer:fuzztest",
-      "stopdevicecooperate_fuzzer:fuzztest",
-      "unregisterdevListener_fuzzer:fuzztest",
+      "enableinputdevicecooperate_fuzzer:fuzztest",
       "getdeviceIds_fuzzer:fuzztest",
       "getdevice_fuzzer:fuzztest",
-      "unregistercooperatelistener_fuzzer:fuzztest",
-      "setanrobserver_fuzzer:fuzztest",
+      "getinputdevicecooperatestate_fuzzer:fuzztest",
       "registercooperatelistener_fuzzer:fuzztest",
-      "enableinputdevicecooperate_fuzzer:fuzztest",
+      "registerdevListener_fuzzer:fuzztest",
+      "removeinterceptor_fuzzer:fuzztest",
+      "setanrobserver_fuzzer:fuzztest",
+      "setinputdevicetoscreen_fuzzer:fuzztest",
       "setwindowinputeventconsumer_fuzzer:fuzztest",
+      "startinputdevicecooperate_fuzzer:fuzztest",
+      "stopdevicecooperate_fuzzer:fuzztest",
+      "unregistercooperatelistener_fuzzer:fuzztest",
+      "unregisterdevListener_fuzzer:fuzztest",
     ]
   }
 }
