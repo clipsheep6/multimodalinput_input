@@ -41,7 +41,7 @@ constexpr int32_t MIN_SPEED = 1;
 constexpr int32_t MAX_SPEED = 20;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 constexpr int32_t PERCENT_CONST = 100;
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 } // namespace
 MouseEventHandler::MouseEventHandler()
 {

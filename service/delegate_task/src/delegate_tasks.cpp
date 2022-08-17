@@ -85,7 +85,7 @@ int32_t DelegateTasks::PostSyncTask(DTaskCallback callback)
         return ETASKS_POST_SYNCTASK_FAIL;
     }
 
-    static constexpr int32_t timeout = 6000;
+    static constexpr int32_t timeout = 3000;
     std::chrono::milliseconds span(timeout);
     auto res = future.wait_for(span);
     task->SetWaited();

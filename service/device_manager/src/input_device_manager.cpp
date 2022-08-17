@@ -510,6 +510,7 @@ std::vector<std::string> InputDeviceManager::GetPointerKeyboardDhids(const std::
     for (const auto &iter : inputDevice_) {
         if (iter.second.dhid_ == dhid) {
             pointerId = iter.first;
+            break;
         }
     }
     return GetPointerKeyboardDhids(pointerId);
