@@ -114,7 +114,7 @@ config("libmmi_server_config") {
     defines += [ "OHOS_BUILD_ENABLE_MONITOR" ]
   }
 
-  if (input_feature_input_cooperate) {
+  if (input_feature_input_cooperation) {
     defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
   }
 }
@@ -156,7 +156,7 @@ ohos_shared_library("libmmi-server") {
     "window_manager/src/input_windows_manager.cpp",
   ]
 
-  if (input_feature_input_cooperate) {
+  if (input_feature_input_cooperation) {
     sources += [ "input_device_cooperate/src/device_profile_adapter.cpp" ]
   }
 
@@ -213,7 +213,6 @@ ohos_shared_library("libmmi-server") {
     ":mmi_device_config.ini",
     ":multimodalinput_config_ability.json",
     "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
-    "//foundation/deviceprofile/device_info_manager/interfaces/innerkits/core:distributed_device_profile_client",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics:2d_graphics",
     "//foundation/graphic/graphic_2d/rosen/modules/render_service_client:librender_service_client",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
@@ -238,6 +237,7 @@ ohos_shared_library("libmmi-server") {
     "ability_runtime:ability_manager",
     "access_token:libaccesstoken_sdk",
     "config_policy:configpolicy_util",
+    "device_info_manager:distributed_device_profile_client",
     "drivers_interface_input:hdi_input",
     "dsoftbus:softbus_client",
     "hisysevent_native:libhisysevent",

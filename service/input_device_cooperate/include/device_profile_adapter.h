@@ -34,61 +34,15 @@ public:
     ~DeviceProfileAdapter();
     DISALLOW_COPY_AND_MOVE(DeviceProfileAdapter);
 
-    /**
-     * 更新开关状态，但不会通知到设备
-     *
-     * @param state 开关状态
-     * @return 0表示成功，其他表示失败
-     */
     int32_t UpdateCrossingSwitchState(bool state);
-
-    /**
-     * 更新开关状态，并通知到设备
-     *
-     * @param state 开关状态
-     * @param deviceIds 设备id列表
-     * @return 0表示成功，其他表示失败
-     */
-    int32_t UpdateCrossingSwitchState(bool state, std::vector<std::string> &deviceIds);
-
-    /**
-     * 注册事件回调函数
-     *
-     * @param deviceId 设备id
-     * @return true 开关状态
-     * @return false 开关状态
-     */
+    int32_t UpdateCrossingSwitchState(bool state, const std::vector<std::string> &deviceIds);
     bool GetCrossingSwitchState(const std::string &deviceId);
-
-    /**
-     * 注册事件回调函数
-     *
-     * @param deviceId 设备id
-     * @param callback 事件回调函数
-     * @return 0表示成功，其他表示失败
-     */
     int32_t RegisterCrossingStateListener(const std::string &deviceId, ProfileEventCallback callback);
-
-    /**
-     * 取消注册事件回调函数
-     *
-     * @param deviceId 设备id
-     * @param callback 事件回调函数
-     * @return 0表示成功，其他表示失败
-     */
     int32_t UnregisterCrossingStateListener(const std::string &deviceId);
 
 private:
-    class ProfileEventCallbackImpl : public DeviceProfile::IProfileEventCallback {
-    public:
-        void OnSyncCompleted(const DeviceProfile::SyncResult &syncResults) override;
-        void OnProfileChanged(const DeviceProfile::ProfileChangeNotification &changeNotification) override;
-    };
-    void Init();
-    void Release();
     int32_t RegisterProfileListener(const std::string &deviceId);
-    std::map<std::string, ProfileEventCallback> callbacks_;
-    std::shared_ptr<DeviceProfile::IProfileEventCallback> profileEventCallback_;
+    std::shared_ptr<DeviceProfile::IProfileEventCallback> profileEventCallback_ { nullptr };
 };
 
 #define DProfileAdapter DeviceProfileAdapter::GetInstance()
