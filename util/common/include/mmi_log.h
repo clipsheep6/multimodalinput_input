@@ -68,31 +68,6 @@ constexpr uint32_t MMI_LOG_DOMAIN = 0xD002800;
     ::OHOS::HiviewDFX::HiLog::Fatal(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 
-#define MMI_HILOGDK(fmt, ...) do { \
-    KMSG_LOGD(fmt, ##__VA_ARGS__); \
-    MMI_HILOGD(fmt, ##__VA_ARGS__); \
-} while (0)
-
-#define MMI_HILOGIK(fmt, ...) do { \
-    KMSG_LOGI(fmt, ##__VA_ARGS__); \
-    MMI_HILOGI(fmt, ##__VA_ARGS__); \
-} while (0)
-
-#define MMI_HILOGWK(fmt, ...) do { \
-    KMSG_LOGW(fmt, ##__VA_ARGS__); \
-    MMI_HILOGW(fmt, ##__VA_ARGS__); \
-} while (0)
-
-#define MMI_HILOGEK(fmt, ...) do { \
-    KMSG_LOGE(fmt, ##__VA_ARGS__); \
-    MMI_HILOGE(fmt, ##__VA_ARGS__); \
-} while (0)
-
-#define MMI_HILOGFK(fmt, ...) do { \
-    KMSG_LOGF(fmt, ##__VA_ARGS__); \
-    MMI_HILOGF(fmt, ##__VA_ARGS__); \
-} while (0)
-
 namespace OHOS {
 namespace MMI {
 namespace {

@@ -291,45 +291,44 @@ const char* GetProgramName()
 
     char buf[BUF_CMD_SIZE] = { 0 };
     if (sprintf_s(buf, BUF_CMD_SIZE, "/proc/%d/cmdline", static_cast<int32_t>(getpid())) == -1) {
-        KMSG_LOGE("GetProcessInfo sprintf_s /proc/.../cmdline error");
+        MMI_HILOGE("GetProcessInfo sprintf_s /proc/.../cmdline error");
         return "";
     }
     FILE *fp = fopen(buf, "rb");
     if (fp == nullptr) {
-        KMSG_LOGE("fp is nullptr, filename = %s.", buf);
+        MMI_HILOGE("fp is nullptr, filename = %{public}s.", buf);
         return "";
     }
     static constexpr size_t bufLineSize = 512;
     char bufLine[bufLineSize] = { 0 };
     if ((fgets(bufLine, bufLineSize, fp) == nullptr)) {
-        KMSG_LOGE("fgets fail.");
+        MMI_HILOGE("fgets fail.");
         if (fclose(fp) != 0) {
-            KMSG_LOGW("close file: %s failed", buf);
+            MMI_HILOGE("close file: %{public}s failed", buf);
         }
         fp = nullptr;
         return "";
     }
     if (fclose(fp) != 0) {
-        KMSG_LOGW("close file: %s failed", buf);
+        MMI_HILOGE("close file: %{public}s failed", buf);
     }
     fp = nullptr;
 
     std::string tempName(bufLine);
     tempName = GetFileName(tempName);
     if (tempName.empty()) {
-        KMSG_LOGE("tempName is empty.");
+        MMI_HILOGE("tempName is empty.");
         return "";
     }
     const size_t copySize = std::min(tempName.size(), PROGRAM_NAME_SIZE - 1);
     if (copySize == 0) {
-        KMSG_LOGE("copySize is 0.");
+        MMI_HILOGE("copySize is 0.");
         return "";
     }
     errno_t ret = memcpy_s(programName, PROGRAM_NAME_SIZE, tempName.c_str(), copySize);
     if (ret != EOK) {
         return "";
     }
-    KMSG_LOGI("GetProgramName success. programName = %s", programName);
 
     return programName;
 }
