@@ -80,6 +80,9 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
         {"monitor", no_argument, 0, 'o'},
         {"interceptor", no_argument, 0, 'i'},
         {"mouse", no_argument, 0, 'm'},
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+        {"inputdevcoosm", no_argument, 0, 'k'},
+#endif // OHOS_BUILD_ENABLE_COOPERATE
         {NULL, 0, 0, 0}
     };
     char **argv = new (std::nothrow) char *[args.size()];
@@ -102,7 +105,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
     }
     optind = 1;
     int32_t c;
-    while ((c = getopt_long (args.size(), argv, "hdlwusoim", dumpOptions, &optionIndex)) != -1) {
+    while ((c = getopt_long (args.size(), argv, "hdlwusoimk", dumpOptions, &optionIndex)) != -1) {
         switch (c) {
             case 'h': {
                 DumpEventHelp(fd, args);
@@ -126,10 +129,12 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
                 udsServer->Dump(fd, args);
                 break;
             }
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
             case 'k': {
                 InputDevCooSM->Dump(fd, args);
                 break;
             }
+#endif // OHOS_BUILD_ENABLE_COOPERATE
             case 's': {
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
                 auto subscriberHandler = InputHandler->GetSubscriberHandler();

@@ -76,7 +76,7 @@ void InputDeviceCooperateSM::OnCooperateChanged(const std::string &networkId, bo
 
 void InputDeviceCooperateSM::OnCloseCooperation(const std::string &networkId, bool isLocal)
 {
-    CALL_INFO_ENTER;
+    CALL_INFO_TRACE;
     EventCooperateMgr->OnCooperateMessage(CooperateMessages::MSG_COOPERATE_STATE_OFF, networkId);
     if (!preparedNetworkId_.first.empty() && !preparedNetworkId_.second.empty()) {
         if (networkId == preparedNetworkId_.first || networkId == preparedNetworkId_.second) {
@@ -480,7 +480,7 @@ bool InputDeviceCooperateSM::InitDeviceManager()
 
 void InputDeviceCooperateSM::OnDeviceOnline(const std::string& networkId)
 {
-    CALL_INFO_ENTER;
+    CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
     onlineDevice_.push_back(networkId);
     DProfileAdapter->RegisterCrossingStateListener(networkId,
@@ -490,7 +490,7 @@ void InputDeviceCooperateSM::OnDeviceOnline(const std::string& networkId)
 
 void InputDeviceCooperateSM::OnDeviceOffline(const std::string& networkId)
 {
-    CALL_INFO_ENTER;
+    CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
     bool needReset = true;
     if (cooperateState_ == CooperateState::STATE_OUT) {
@@ -535,7 +535,7 @@ void InputDeviceCooperateSM::Dump(int32_t fd, const std::vector<std::string> &ar
 
 void InputDeviceCooperateSM::DeviceInitCallBack::OnRemoteDied()
 {
-    CALL_INFO_ENTER;
+    CALL_INFO_TRACE;
 }
 
 void InputDeviceCooperateSM::MmiDeviceStateCallback::OnDeviceOnline(
@@ -555,13 +555,13 @@ void InputDeviceCooperateSM::MmiDeviceStateCallback::OnDeviceOffline(
 void InputDeviceCooperateSM::MmiDeviceStateCallback::OnDeviceChanged(
     const DistributedHardware::DmDeviceInfo &deviceInfo)
 {
-    CALL_INFO_ENTER;
+    CALL_INFO_TRACE;
 }
 
 void InputDeviceCooperateSM::MmiDeviceStateCallback::OnDeviceReady(
     const DistributedHardware::DmDeviceInfo &deviceInfo)
 {
-    CALL_INFO_ENTER;
+    CALL_INFO_TRACE;
 }
 } // namespace MMI
 } // namespace OHOS
