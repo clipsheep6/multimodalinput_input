@@ -37,8 +37,6 @@ namespace MMI {
     #define WL_EXPORT
 #endif
 
-#endif
-
 #ifdef DEBUG_CODE_TEST
 #define CHKPL(cond, ...) \
     do { \
