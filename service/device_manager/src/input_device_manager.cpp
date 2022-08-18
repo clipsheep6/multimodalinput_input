@@ -324,7 +324,7 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
     CHKPV(inputDevice);
     int32_t deviceId = INVALID_DEVICE_ID;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    OnInputDeviceRemovedForDinput(inputDevice);
+    OnDInputDeviceRemove(inputDevice);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
         if (it->second.inputDeviceOrigin_ == inputDevice) {
@@ -352,7 +352,7 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
 }
 
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-void InputDeviceManager::OnInputDeviceRemovedForDinput(struct libinput_device *inputDevice)
+void InputDeviceManager::OnDInputDeviceRemove(struct libinput_device *inputDevice)
 {
     if (!IsPointerDevice(inputDevice)) {
         return;

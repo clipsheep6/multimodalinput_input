@@ -81,7 +81,7 @@ private:
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     std::string MakeNetworkId(const char* phys) const;
     bool IsKeyboard(struct libinput_device* device) const;
-    void OnInputDeviceRemovedForDinput(struct libinput_device *inputDevice);
+    void OnDInputDeviceRemove(struct libinput_device *inputDevice);
     std::string StringPrintf(const char *format, ...) const;
     std::string Sha256(const std::string &in) const;
     std::string GenerateDescriptor(struct libinput_device *inputDevice, bool isRemote) const;
