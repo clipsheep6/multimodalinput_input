@@ -35,9 +35,9 @@ namespace MMI {
 class InputDeviceManager : public DelayedSingleton<InputDeviceManager>, public IDeviceObject {
     struct InputDeviceInfo {
         struct libinput_device *inputDeviceOrigin_ { nullptr };
-        std::string networkIdOrigin_ { "" };
+        std::string networkIdOrigin_;
         bool isRemote_ { false };
-        std::string dhid_ { "" };
+        std::string dhid_;
     };
 public:
     InputDeviceManager() = default;

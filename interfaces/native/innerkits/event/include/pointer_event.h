@@ -693,14 +693,14 @@ public:
         bool ReadFromParcel(Parcel &in);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
         /**
-         * @brief Obtains the RawData of the active window.
-         * @return Returns the RawData.
+         * @brief 取得原始的坐标数据，包括x坐标和y坐标.
+         * @return RawData 返回原始的坐标数据.
          * @since 9
          */
         RawData GetRawData() const;
         /**
-         * @brief Sets the RawData for the active window.
-         * @param rawData Indicates the rawData to set.
+         * @brief 设定原始的坐标数据,包括x坐标和y坐标.
+         * @param rawData 待设定的原始坐标数据.
          * @return void
          * @since 9
          */

@@ -27,11 +27,32 @@ public:
     virtual ~RawData();
 public:
     // Get or set the dx when the Pointer is move
+    /**
+     * @brief 取得x方向位移.
+     * @return 返回x方向的位移
+     * @since 9
+     */
     int32_t GetDx() const;
+    /**
+     * @brief 设置x方向位移.
+     * @param dx x方向的位移.
+     * @return void
+     * @since 9
+     */
     void SetDx(int32_t dx);
 
-    // Get or set the dy when the Pointer is move
+    /**
+     * @brief 取得y方向位移.
+     * @return 返回y方向的位移
+     * @since 9
+     */
     int32_t GetDy() const;
+    /**
+     * @brief 设置y方向位移.
+     * @param dy y方向的位移.
+     * @return void
+     * @since 9
+     */
     void SetDy(int32_t dy);
 
 public:

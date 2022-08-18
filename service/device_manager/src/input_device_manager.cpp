@@ -81,22 +81,22 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
     std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
     CHKPP(inputDevice);
     inputDevice->SetId(iter->first);
-    struct libinput_device *inputDeviceOrigni = iter->second.inputDeviceOrigin_;
-    inputDevice->SetType(static_cast<int32_t>(libinput_device_get_tags(inputDeviceOrigni)));
-    const char* name = libinput_device_get_name(inputDeviceOrigni);
+    struct libinput_device *inputDeviceOrigin = iter->second.inputDeviceOrigin_;
+    inputDevice->SetType(static_cast<int32_t>(libinput_device_get_tags(inputDeviceOrigin)));
+    const char* name = libinput_device_get_name(inputDeviceOrigin);
     inputDevice->SetName((name == nullptr) ? ("null") : (name));
-    inputDevice->SetBus(libinput_device_get_id_bustype(inputDeviceOrigni));
-    inputDevice->SetVersion(libinput_device_get_id_version(inputDeviceOrigni));
-    inputDevice->SetProduct(libinput_device_get_id_product(inputDeviceOrigni));
-    inputDevice->SetVendor(libinput_device_get_id_vendor(inputDeviceOrigni));
-    const char* phys = libinput_device_get_phys(inputDeviceOrigni);
+    inputDevice->SetBus(libinput_device_get_id_bustype(inputDeviceOrigin));
+    inputDevice->SetVersion(libinput_device_get_id_version(inputDeviceOrigin));
+    inputDevice->SetProduct(libinput_device_get_id_product(inputDeviceOrigin));
+    inputDevice->SetVendor(libinput_device_get_id_vendor(inputDeviceOrigin));
+    const char* phys = libinput_device_get_phys(inputDeviceOrigin);
     inputDevice->SetPhys((phys == nullptr) ? ("null") : (phys));
-    const char* uniq = libinput_device_get_uniq(inputDeviceOrigni);
+    const char* uniq = libinput_device_get_uniq(inputDeviceOrigin);
     inputDevice->SetUniq((uniq == nullptr) ? ("null") : (uniq));
 
     InputDevice::AxisInfo axis;
     for (const auto &item : axisType) {
-        int32_t min = libinput_device_get_axis_min(inputDeviceOrigni, item.first);
+        int32_t min = libinput_device_get_axis_min(inputDeviceOrigin, item.first);
         if (min == -1) {
             MMI_HILOGD("The device does not support this axis");
             continue;
@@ -106,12 +106,12 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
             axis.SetMaximum(1);
         } else {
             axis.SetMinimum(min);
-            axis.SetMaximum(libinput_device_get_axis_max(inputDeviceOrigni, item.first));
+            axis.SetMaximum(libinput_device_get_axis_max(inputDeviceOrigin, item.first));
         }
         axis.SetAxisType(item.first);
-        axis.SetFuzz(libinput_device_get_axis_fuzz(inputDeviceOrigni, item.first));
-        axis.SetFlat(libinput_device_get_axis_flat(inputDeviceOrigni, item.first));
-        axis.SetResolution(libinput_device_get_axis_resolution(inputDeviceOrigni, item.first));
+        axis.SetFuzz(libinput_device_get_axis_fuzz(inputDeviceOrigin, item.first));
+        axis.SetFlat(libinput_device_get_axis_flat(inputDeviceOrigin, item.first));
+        axis.SetResolution(libinput_device_get_axis_resolution(inputDeviceOrigin, item.first));
         inputDevice->AddAxisInfo(axis);
     }
     return inputDevice;
@@ -284,7 +284,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
 #endif // OHOS_BUILD_ENABLE_POINTER
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-    struct InputDeviceInfo info;
+    InputDeviceInfo info;
     MakeDeviceInfo(inputDevice, info);
     inputDevice_[nextId_] = info;
     for (const auto &item : devListener_) {
@@ -488,7 +488,7 @@ std::vector<std::string> InputDeviceManager::GetPointerKeyboardDhids(int32_t poi
     dhids.push_back(iter->second.dhid_);
     MMI_HILOGI("unq: %{public}s, type:%{public}s", dhids.back().c_str(), "pointer");
     auto pointerNetworkId = iter->second.networkIdOrigin_;
-    std::string localNetworkId = "";
+    std::string localNetworkId;
     GetLocalDeviceId(localNetworkId);
     pointerNetworkId = iter->second.isRemote_ ? iter->second.networkIdOrigin_ : localNetworkId;
     for (const auto &item : inputDevice_) {
@@ -536,7 +536,7 @@ std::string InputDeviceManager::GetOriginNetworkId(const std::string& dhid)
         return "";
     }
 
-    std::string networkId = "";
+    std::string networkId;
     for (const auto &iter : inputDevice_) {
         if (iter.second.dhid_ == dhid) {
             networkId = iter.second.networkIdOrigin_;
@@ -610,7 +610,7 @@ bool InputDeviceManager::IsRemote(int32_t id) const
 
 std::string InputDeviceManager::MakeNetworkId(const char* phys) const
 {
-    std::string networkId = "";
+    std::string networkId;
     if (phys == nullptr || phys[0] == '\0') {
         return networkId;
     }
@@ -667,7 +667,7 @@ std::string InputDeviceManager::Sha256(const std::string &in) const
 std::string InputDeviceManager::GenerateDescriptor(struct libinput_device *inputDevice, bool isRemote) const
 {
     const char* location = libinput_device_get_phys(inputDevice);
-    std::string descriptor = "";
+    std::string descriptor;
     if (isRemote && location != nullptr) {
         MMI_HILOGI("location:%{public}s", location);
         std::vector<std::string> strList;

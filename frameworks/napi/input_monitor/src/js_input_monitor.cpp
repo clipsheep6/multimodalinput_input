@@ -701,8 +701,8 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
     CHKPV(pointerEvent);
     {
         std::lock_guard<std::mutex> guard(evQueueMutex_);
-        std::queue<std::shared_ptr<PointerEvent>> empty;
-        std::swap(evQueue_, empty);
+        std::queue<std::shared_ptr<PointerEvent>> tmp;
+        std::swap(evQueue_, tmp);
         evQueue_.push(pointerEvent);
     }
     int32_t num = 0;
