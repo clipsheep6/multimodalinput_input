@@ -152,6 +152,11 @@ std::shared_ptr<EventMonitorHandler> InputEventHandler::GetMonitorHandler() cons
     return monitorHandler_;
 }
 
+std::shared_ptr<EventFilterWrap> InputEventHandler::GetFilterHandler() const
+{
+    return eventfilterHandler_;
+}
+
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 void InputEventHandler::SetJumpInterceptState(bool isJump)
 {
@@ -163,14 +168,5 @@ bool InputEventHandler::GetJumpInterceptState() const
     return isJumpIntercept_;
 }
 #endif // OHOS_BUILD_ENABLE_COOPERATE
-
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-int32_t InputEventHandler::AddInputEventFilter(sptr<IEventFilter> filter)
-{
-    CHKPR(eventfilterHandler_, ERROR_NULL_POINTER);
-    eventfilterHandler_->AddInputEventFilter(filter);
-    return RET_OK;
-}
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace MMI
 } // namespace OHOS
