@@ -37,8 +37,6 @@ namespace MMI {
     #define WL_EXPORT
 #endif
 
-#ifndef UNUSED_PARAM
-#define UNUSED_PARAM(x) (void)(x)
 #endif
 
 #ifdef DEBUG_CODE_TEST

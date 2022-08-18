@@ -1004,9 +1004,9 @@ int32_t MMIService::StartRemoteCooperateResult(bool isSucess, int32_t xPercent, 
         return ret;
     }
 #else
-    UNUSED_PARAM(isSucess);
-    UNUSED_PARAM(xPercent);
-    UNUSED_PARAM(yPercent);
+    (void)(isSucess);
+    (void)(xPercent);
+    (void)(yPercent);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     return RET_OK;
 }
@@ -1037,7 +1037,7 @@ int32_t MMIService::StopRemoteCooperateResult(bool isSucess)
         return ret;
     }
 #else
-    UNUSED_PARAM(isSucess);
+    (void)(isSucess);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     return RET_OK;
 }
@@ -1053,7 +1053,7 @@ int32_t MMIService::StartCooperateOtherResult(const std::string& srcNetworkId)
         return ret;
     }
 #else
-    UNUSED_PARAM(srcNetworkId);
+    (void)(srcNetworkId);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     return RET_OK;
 }

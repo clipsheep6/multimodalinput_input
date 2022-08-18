@@ -527,7 +527,7 @@ int32_t MultimodalInputConnectProxy::SetAnrObserver()
 
 int32_t MultimodalInputConnectProxy::StartRemoteCooperate(const std::string& localDeviceId)
 {
-    CALL_INFO_ENTER;
+    CALL_INFO_TRACE;
     MessageParcel data;
     if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
         MMI_HILOGE("Failed to write descriptor");
@@ -547,7 +547,7 @@ int32_t MultimodalInputConnectProxy::StartRemoteCooperate(const std::string& loc
 
 int32_t MultimodalInputConnectProxy::StartRemoteCooperateResult(bool isSucess, int32_t xPercent, int32_t yPercent)
 {
-    CALL_INFO_ENTER;
+    CALL_INFO_TRACE;
     MessageParcel data;
     if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
         MMI_HILOGE("Failed to write descriptor");
@@ -569,7 +569,7 @@ int32_t MultimodalInputConnectProxy::StartRemoteCooperateResult(bool isSucess, i
 
 int32_t MultimodalInputConnectProxy::StopRemoteCooperate()
 {
-    CALL_INFO_ENTER;
+    CALL_INFO_TRACE;
     MessageParcel data;
     if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
         MMI_HILOGE("Failed to write descriptor");
@@ -588,7 +588,7 @@ int32_t MultimodalInputConnectProxy::StopRemoteCooperate()
 
 int32_t MultimodalInputConnectProxy::StopRemoteCooperateResult(bool isSucess)
 {
-    CALL_INFO_ENTER;
+    CALL_INFO_TRACE;
     MessageParcel data;
     if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
         MMI_HILOGE("Failed to write descriptor");
@@ -608,7 +608,7 @@ int32_t MultimodalInputConnectProxy::StopRemoteCooperateResult(bool isSucess)
 
 int32_t MultimodalInputConnectProxy::StartCooperateOtherResult(const std::string& srcNetworkId)
 {
-    CALL_INFO_ENTER;
+    CALL_INFO_TRACE;
     MessageParcel data;
     if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
         MMI_HILOGE("Failed to write descriptor");
