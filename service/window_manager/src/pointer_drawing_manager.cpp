@@ -428,10 +428,17 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, in
         return RET_OK;
     }
 
-    int32_t ret = InitLayer(MOUSE_ICON(pointerStyle));
-    if (ret != RET_OK) {
-        MMI_HILOGE("Init layer failed");
-        return RET_ERR;
+    if (pointerWindow_ != nullptr) {
+        int32_t physicalX = lastPhysicalX_;
+        int32_t physicalY = lastPhysicalY_;
+        AdjustMouseFocus(ICON_TYPE(mouseIcons_[MOUSE_ICON(pointerStyle)].alignmentWay), physicalX, physicalY);
+        pointerWindow_->MoveTo(physicalX, physicalY);
+
+        int32_t ret = InitLayer(MOUSE_ICON(pointerStyle));
+        if (ret != RET_OK) {
+            MMI_HILOGE("Init layer failed");
+            return RET_ERR;
+        }
     }
     MMI_HILOGD("Window type:%{public}d set pointer style:%{public}d success", windowId, pointerStyle);
     return RET_OK;
