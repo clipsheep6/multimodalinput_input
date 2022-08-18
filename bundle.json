@@ -21,7 +21,7 @@
       "input_feature_mouse",
       "input_feature_touchscreen",
       "input_feature_input_device",
-      "input_feature_input_cooperate"
+      "input_feature_input_cooperation"
     ],
     "adapted_system_type": [
       "standard"
