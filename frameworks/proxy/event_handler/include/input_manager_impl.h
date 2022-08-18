@@ -24,6 +24,7 @@
 #include "net_packet.h"
 
 #include "display_info.h"
+#include "event_cooperate_service.h"
 #include "event_filter_service.h"
 
 #include "if_mmi_client.h"
@@ -117,6 +118,13 @@ public:
     int32_t StartRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback);
     int32_t StopRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback);
 
+    int32_t RegisterCooperateListener(std::function<void(std::string, CooperationState)> listener);
+    int32_t UnregisterCooperateListener();
+    int32_t EnableInputDeviceCooperate(bool enabled);
+    int32_t StartInputDeviceCooperate(const std::string &sinkDeviceId, int32_t srcInputDeviceId);
+    int32_t StopDeviceCooperate();
+    int32_t GetInputDeviceCooperateState(const std::string &deviceId, std::function<void(bool)> callback);
+
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
     int32_t PackDisplayInfo(NetPacket &pkt);
@@ -135,7 +143,10 @@ private:
     void OnThread();
 
 private:
-    sptr<EventFilterService> eventFilterService_ {nullptr};
+    sptr<EventFilterService> eventFilterService_ { nullptr };
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    sptr<EventCooperateService> eventCooperateService_ { nullptr };
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     std::shared_ptr<IInputEventConsumer> consumer_ = nullptr;
     std::vector<std::shared_ptr<IAnrObserver>> anrObservers_;
 

@@ -71,6 +71,11 @@ public:
     virtual int32_t UnsubscribeKeyEvent(int32_t subscribeId) override;
     virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
     virtual int32_t SetAnrObserver() override;
+    virtual int32_t RegisterCooperateEvent(sptr<IEventCooperate> event) override;
+    virtual int32_t EnableInputDeviceCooperate(bool enabled) override;
+    virtual int32_t StartInputDeviceCooperate(const std::string &sinkDeviceId, int32_t srcInputDeviceId) override;
+    virtual int32_t StopDeviceCooperate() override;
+    virtual int32_t GetInputDeviceCooperateState(const std::string &deviceId) override;
 
 #ifdef OHOS_RSS_CLIENT
     virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;

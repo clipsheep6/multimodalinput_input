@@ -28,6 +28,7 @@ config("mmi_connect_manager_config") {
     "//foundation/multimodalinput/input/service/permission_helper/include",
     "//foundation/multimodalinput/input/frameworks/proxy/event_handler/include",
     "${mmi_connect_manager_path}/include",
+    "//foundation/multimodalinput/input/service/cooperate/include",
   ]
 }
 

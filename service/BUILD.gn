@@ -38,6 +38,7 @@ config("libmmi_server_config") {
     "permission_helper/include",
     "${mmi_service_path}/connect_manager/include",
     "${mmi_service_path}/filter/include",
+    "${mmi_service_path}/cooperate/include",
     "${mmi_service_path}/module_loader/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
@@ -110,6 +111,10 @@ config("libmmi_server_config") {
   }
   if (input_feature_monitor) {
     defines += [ "OHOS_BUILD_ENABLE_MONITOR" ]
+  }
+
+  if (input_feature_input_cooperation) {
+    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
   }
 }
 
@@ -219,6 +224,10 @@ ohos_shared_library("libmmi-server") {
 
   if (resource_schedule_service_enabled) {
     deps += [ "//foundation/resourceschedule/resource_schedule_service/ressched/interfaces/innerkits/ressched_client:ressched_client" ]
+  }
+
+  if (input_feature_input_cooperation) {
+    deps += [ "//foundation/multimodalinput/input/service/cooperate:mmi_event_cooperate_proxy" ]
   }
 
   external_deps = [

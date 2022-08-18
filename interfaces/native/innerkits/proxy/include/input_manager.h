@@ -30,6 +30,7 @@
 #include "i_input_event_consumer.h"
 #include "input_device.h"
 #include "key_option.h"
+#include "cooperation_state.h"
 
 namespace OHOS {
 namespace MMI {
@@ -370,6 +371,55 @@ public:
      */
     using DeviceUniqId = std::tuple<int32_t, int32_t, int32_t, int32_t, int32_t, std::string>;
     int32_t SetInputDeviceSeatName(const std::string& seatName, DeviceUniqId& deviceUniqId);
+
+    /**
+     * @brief 注册键鼠穿越管理事件监听。
+     * @param listener 穿越管理事件监听回调。
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @since 9
+     */
+    int32_t RegisterCooperateListener(std::function<void(std::string, CooperationState)> listener);
+
+    /**
+     * @brief 注销键鼠穿越管理事件监听。
+     * @param listener 事件监听回调.
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @since 9
+     */
+    int32_t UnregisterCooperateListener();
+
+    /**
+     * @brief 开启/关闭键鼠穿越管理接口。
+     * @param enabled 开启/关闭。
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @since 9
+     */
+    int32_t EnableInputDeviceCooperate(bool enabled);
+
+    /**
+     * @brief 启动跨设备键鼠穿越。
+     * @param sinkDeviceId 键鼠穿越目标设备描述符（networkID）
+     * @param srcInputDeviceId 键鼠穿越待穿越输入外设标识符（设备ID句柄）
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @since 9
+     */
+    int32_t StartInputDeviceCooperate(const std::string &sinkDeviceId, int32_t srcInputDeviceId);
+
+    /**
+     * @brief 停止跨设备键鼠穿越。
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @since 9
+     */
+    int32_t StopDeviceCooperate();
+
+    /**
+     * @brief 获取指定设备键鼠穿越状态。
+     * @param deviceId 指定设备描述符。
+     * @param callback 穿越管理设备状态回调。
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @since 9
+     */
+    int32_t GetInputDeviceCooperateState(const std::string &deviceId, std::function<void(bool)> callback);
 
 private:
     InputManager() = default;
