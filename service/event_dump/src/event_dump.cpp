@@ -127,7 +127,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
                 break;
             }
             case 'k': {
-                InputDevCooSM->Dump(fd,args);
+                InputDevCooSM->Dump(fd, args);
                 break;
             }
             case 's': {
