@@ -35,7 +35,9 @@
 #include "securec.h"
 #include "util.h"
 #include "util_ex.h"
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_cooperate_sm.h"
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 
 namespace OHOS {
 namespace MMI {
@@ -105,7 +107,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
     }
     optind = 1;
     int32_t c;
-    while ((c = getopt_long (args.size(), argv, "hdlwusoimk", dumpOptions, &optionIndex)) != -1) {
+    while ((c = getopt_long (args.size(), argv, "hdlwusoimc", dumpOptions, &optionIndex)) != -1) {
         switch (c) {
             case 'h': {
                 DumpEventHelp(fd, args);
@@ -129,12 +131,14 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
                 udsServer->Dump(fd, args);
                 break;
             }
+            case 'c': {
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-            case 'k': {
                 InputDevCooSM->Dump(fd, args);
+#else
+                mprintf(fd, "Input device cooperate does not support");
+#endif // OHOS_BUILD_ENABLE_COOPERATE
                 break;
             }
-#endif // OHOS_BUILD_ENABLE_COOPERATE
             case 's': {
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
                 auto subscriberHandler = InputHandler->GetSubscriberHandler();
@@ -204,7 +208,7 @@ void EventDump::DumpHelp(int32_t fd)
     mprintf(fd, "      -s, --subscriber: dump the subscriber information\t");
     mprintf(fd, "      -i, --interceptor: dump the interceptor information\t");
     mprintf(fd, "      -m, --mouse: dump the mouse information\t");
-    mprintf(fd, "      -k, --dump Keyboard and mouse crossing information\t");
+    mprintf(fd, "      -c, --dump Keyboard and mouse crossing information\t");
 }
 } // namespace MMI
 } // namespace OHOS
