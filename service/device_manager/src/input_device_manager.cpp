@@ -286,7 +286,10 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     InputDeviceInfo info;
     MakeDeviceInfo(inputDevice, info);
-    inputDevice_[nextId_] = info;
+    {
+        std::lock_guard<std::mutex> guard(mutex_);
+        inputDevice_[nextId_] = info;
+    }
     for (const auto &item : devListener_) {
         CHKPC(item.first);
         item.second(nextId_, "add");
@@ -563,6 +566,7 @@ void InputDeviceManager::GetLocalDeviceId(std::string& networkId)
 
 std::string InputDeviceManager::GetDhid(int32_t deviceId) const
 {
+    std::lock_guard<std::mutex> guard(mutex_);
     auto dev = inputDevice_.find(deviceId);
     if (dev != inputDevice_.end()) {
         return dev->second.dhid_;
@@ -600,6 +604,7 @@ bool InputDeviceManager::IsRemote(struct libinput_device* inputDevice) const
 bool InputDeviceManager::IsRemote(int32_t id) const
 {
     bool isRemote = false;
+    std::lock_guard<std::mutex> guard(mutex_);
     auto device = inputDevice_.find(id);
     if (device != inputDevice_.end()) {
         isRemote = device->second.isRemote_;

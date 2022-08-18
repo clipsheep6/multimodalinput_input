@@ -90,6 +90,7 @@ private:
     int32_t nextId_ {0};
     std::list<std::shared_ptr<IDeviceObserver>> observers_;
     std::map<SessionPtr, std::function<void(int32_t, const std::string&)>> devListener_;
+    mutable std::mutex mutex_;
 };
 
 #define InputDevMgr InputDeviceManager::GetInstance()
