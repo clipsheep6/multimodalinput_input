@@ -30,8 +30,8 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "IInput
 } // namespace
 
 IInputDeviceCooperateState::IInputDeviceCooperateState()
+    :runner_(AppExecFwk::EventRunner::Create(true))
 {
-    runner_ = AppExecFwk::EventRunner::Create(true);
     if (runner_ == nullptr) {
         MMI_HILOGE("Create event runner fail");
         return;
