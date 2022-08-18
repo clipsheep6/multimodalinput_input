@@ -76,6 +76,18 @@ public:
     virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
 #endif
 
+    virtual int32_t SetPointerLocation(int32_t x, int32_t y) override;
+    virtual int32_t SetInputDeviceSeatName(const std::string& seatName, DeviceUniqId& deviceUniqId) override;
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    virtual int32_t GetRemoteInputAbility(std::string deviceId, sptr<ICallDinput> ablitity) override;
+    virtual int32_t PrepareRemoteInput(const std::string& deviceId, sptr<ICallDinput> prepareDinput) override;
+    virtual int32_t UnprepareRemoteInput(const std::string& deviceId, sptr<ICallDinput> prepareDinput) override;
+    virtual int32_t StartRemoteInput(const std::string& deviceId, uint32_t inputAbility,
+        sptr<ICallDinput> prepareDinput) override;
+    virtual int32_t StopRemoteInput(const std::string& deviceId, uint32_t inputAbility,
+        sptr<ICallDinput> prepareDinput) override;
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
+
 protected:
     virtual void OnConnected(SessionPtr s) override;
     virtual void OnDisconnected(SessionPtr s) override;
@@ -117,6 +129,11 @@ protected:
     void OnDelegateTask(epoll_event& ev);
 
     void AddReloadDeviceTimer();
+
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    void PublishSA();
+    void InitDeviceManager();
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
 
 private:
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;

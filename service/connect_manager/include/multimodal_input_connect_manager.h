@@ -57,6 +57,16 @@ public:
     int32_t UnsubscribeKeyEvent(int32_t subscribeId);
     int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
     int32_t SetAnrObserver();
+	
+    int32_t SetPointerLocation(int32_t x, int32_t y);
+    int32_t SetInputDeviceSeatName(const std::string& seatName, DeviceUniqId& deviceUniqId);
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    int32_t GetRemoteInputAbility(const std::string& deviceId, sptr<ICallDinput> ablitity);
+    int32_t PrepareRemoteInput(const std::string& deviceId, sptr<ICallDinput> prepareDinput);
+    int32_t UnprepareRemoteInput(const std::string& deviceId, sptr<ICallDinput> prepareDinput);
+    int32_t StartRemoteInput(const std::string& deviceId, uint32_t inputAbility, sptr<ICallDinput> prepareDinput);
+    int32_t StopRemoteInput(const std::string& deviceId, uint32_t inputAbility, sptr<ICallDinput> prepareDinput);
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
 private:
     MultimodalInputConnectManager() = default;
     DISALLOW_COPY_AND_MOVE(MultimodalInputConnectManager);

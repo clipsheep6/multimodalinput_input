@@ -53,6 +53,18 @@ public:
     virtual int32_t UnsubscribeKeyEvent(int32_t subscribeId) override;
     virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
     virtual int32_t SetAnrObserver() override;
+	
+    virtual int32_t SetPointerLocation(int32_t x, int32_t y) override;
+    virtual int32_t SetInputDeviceSeatName(const std::string& seatName, DeviceUniqId& deviceUniqId) override;
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    virtual int32_t GetRemoteInputAbility(std::string deviceId, sptr<ICallDinput> ablitity) override;
+    virtual int32_t PrepareRemoteInput(const std::string& deviceId, sptr<ICallDinput> prepareDinput) override;
+    virtual int32_t UnprepareRemoteInput(const std::string& deviceId, sptr<ICallDinput> prepareDinput) override;
+    virtual int32_t StartRemoteInput(const std::string& deviceId, uint32_t inputAbility,
+        sptr<ICallDinput> prepareDinput) override;
+    virtual int32_t StopRemoteInput(const std::string& deviceId, uint32_t inputAbility,
+        sptr<ICallDinput> prepareDinput) override;
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;
 };

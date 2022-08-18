@@ -58,6 +58,16 @@ protected:
     int32_t StubSetAnrListener(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPointerSpeed(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetPointerSpeed(MessageParcel& data, MessageParcel& reply);
+	
+    int32_t StubSetPointerLocation(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetInputDeviceSeatName(MessageParcel& data, MessageParcel& reply);
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    int32_t StubGetRemoteAbility(MessageParcel& data, MessageParcel& reply);
+    int32_t StubPrepareRemoteInput(MessageParcel& data, MessageParcel& reply);
+    int32_t StubUnprepareRemoteInput(MessageParcel& data, MessageParcel& reply);
+    int32_t StubStartRemoteInput(MessageParcel& data, MessageParcel& reply);
+    int32_t StubStopRemoteInput(MessageParcel& data, MessageParcel& reply);
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
 };
 } // namespace MMI
 } // namespace OHOS
