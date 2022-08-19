@@ -20,10 +20,11 @@
 #include <memory>
 #include <vector>
 
-#include "define_multimodal.h"
 #include "iprofile_event_callback.h"
 #include "nocopyable.h"
 #include "singleton.h"
+
+#include "define_multimodal.h"
 
 namespace OHOS {
 namespace MMI {
