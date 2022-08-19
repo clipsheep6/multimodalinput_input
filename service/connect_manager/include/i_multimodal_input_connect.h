@@ -55,6 +55,11 @@ public:
     virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual int32_t SetAnrObserver() = 0;
     virtual int32_t SetInputDeviceToScreen(const std::string& dhid, const std::string& screenId) = 0;
+    virtual int32_t StartRemoteCooperate(const std::string& localDeviceId) = 0;
+    virtual int32_t StartRemoteCooperateResult(bool isSucess, int32_t xPercent, int32_t yPercent) = 0;
+    virtual int32_t StopRemoteCooperate() = 0;
+    virtual int32_t StopRemoteCooperateResult(bool isSucess) = 0;
+    virtual int32_t StartCooperateOtherResult(const std::string &srcNetworkId) = 0;
     enum {
         ALLOC_SOCKET_FD = 0,
         ADD_INPUT_EVENT_FILTER = 1,
@@ -77,7 +82,12 @@ public:
         GET_KEYBOARD_TYPE = 20,
         SET_POINTER_SPEED = 21,
         GET_POINTER_SPEED = 22,
-	SET_INPUT_DEVICE_TO_SCREEN = 23
+	    SET_INPUT_DEVICE_TO_SCREEN = 30,
+        REMOTE_COOPERATE_START = 35,
+        REMOTE_COOPERATE_START_RES = 36,
+        REMOTE_COOPERATE_STOP = 37,
+        REMOTE_COOPERATE_STOP_RES = 38,
+        REMOTE_COOPERATE_STOP_OTHER_RES = 39,
     };
 
     enum {
