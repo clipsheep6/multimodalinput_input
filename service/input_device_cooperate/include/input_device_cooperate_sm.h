@@ -63,16 +63,14 @@ public:
     InputDeviceCooperateSM() = default;
     DISALLOW_COPY_AND_MOVE(InputDeviceCooperateSM);
     void Init();
-    int32_t EnableInputDeviceCooperate(bool enabled);
-    int32_t StartInputDeviceCooperate(const std::string &networkId, int32_t startInputDeviceId);
+    void EnableInputDeviceCooperate(bool enabled);
+    int32_t StartInputDeviceCooperate(const std::string &remote, int32_t startInputDeviceId);
     int32_t StopInputDeviceCooperate();
-    int32_t GetCooperateState(const std::string &deviceId);
-
-    int32_t StartRemoteCooperate(const std::string &localDeviceId);
-    int32_t StartRemoteCooperateResult(bool isSucess, const std::string &startDhid, int32_t xPercent, int32_t yPercent);
-    int32_t StopRemoteCooperate();
-    int32_t StopRemoteCooperateResult(bool isSucess);
-
+    void GetCooperateState(const std::string &deviceId);
+    void StartRemoteCooperate(const std::string &remote);
+    void StartRemoteCooperateResult(bool isSucess, const std::string &startDhid, int32_t xPercent, int32_t yPercent);
+    void StopRemoteCooperate();
+    void StopRemoteCooperateResult(bool isSucess);
     void StartCooperateOtherResult(const std::string &remoteNetworkId);
     void HandleLibinputEvent(struct libinput_event *event) override;
     void UpdateState(CooperateState state);
@@ -88,8 +86,8 @@ public:
     bool InitDeviceManager();
     void OnDeviceOnline(const std::string &networkId);
     void OnDeviceOffline(const std::string &networkId);
-    void StartFinish(bool isSucess, const std::string &networkId, int32_t startInputDeviceId);
-    void StopFinish(bool isSucess, const std::string &networkId);
+    void StartFinish(bool isSucess, const std::string &remote, int32_t startInputDeviceId);
+    void StopFinish(bool isSucess, const std::string &remote);
     bool IsStarting() const;
     bool IsStopping() const;
     void Dump(int32_t fd, const std::vector<std::string> &args);
@@ -98,9 +96,9 @@ private:
     void Reset();
     void CheckPointerEvent(struct libinput_event *event);
     void OnCloseCooperation(const std::string &networkId, bool isLocal);
-    void NotifyRemoteStartFail(const std::string &networkId);
-    void NotifyRemoteStartSucess(const std::string &networkId, const std::string &startDhid);
-    void NotifyRemoteStopFinish(bool isSucess, const std::string &networkId);
+    void NotifyRemoteStartFail(const std::string &remote);
+    void NotifyRemoteStartSucess(const std::string &remote, const std::string &startDhid);
+    void NotifyRemoteStopFinish(bool isSucess, const std::string &remote);
     bool UpdateMouseLocation();
 
     std::shared_ptr<IInputDeviceCooperateState> currentStateSM_ { nullptr };
