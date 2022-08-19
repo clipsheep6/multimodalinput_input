@@ -54,12 +54,16 @@ public:
     virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
     virtual int32_t SetAnrObserver() override;
     virtual int32_t UpdateDisplayInfo(const std::shared_ptr<DisplayGroupInfo> displayGroupInfo) override;
-
+    virtual int32_t StartRemoteCooperate(const std::string &localDeviceId) override;
+    virtual int32_t StartRemoteCooperateResult(bool isSucess, int32_t xPercent, int32_t yPercent) override;
+    virtual int32_t StopRemoteCooperate() override;
+    virtual int32_t StopRemoteCooperateResult(bool isSucess) override;
+    virtual int32_t StartCooperateOtherResult(const std::string &srcNetworkId) override;
 private:
     int32_t WriteWindowsVecToParcel(const std::shared_ptr<DisplayGroupInfo> displayGroupInfo, MessageParcel& data);
     int32_t WriteDisplayVecToParcel(const std::shared_ptr<DisplayGroupInfo> displayGroupInfo, MessageParcel& data);
     int32_t WriteDisplayInfoToParcel(const std::shared_ptr<DisplayGroupInfo> displayGroupInfo, MessageParcel& data);
-
+    
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;
 };
