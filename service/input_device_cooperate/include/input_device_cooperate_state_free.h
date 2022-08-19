@@ -23,12 +23,12 @@ namespace OHOS {
 namespace MMI {
 class InputDeviceCooperateStateFree : public IInputDeviceCooperateState {
 public:
-    virtual int32_t StartInputDeviceCooperate(const std::string &networkId, int32_t startInputDeviceId) override;
+    virtual int32_t StartInputDeviceCooperate(const std::string &remote, int32_t startInputDeviceId) override;
     virtual int32_t StopInputDeviceCooperate() override;
 
 private:
     void OnStartDistributedInput(bool isSucess, const std::string &srcNetworkId, int32_t startInputDeviceId) override;
-    int32_t ProcessStart(const std::string &networkId, int32_t startInputDeviceId);
+    int32_t ProcessStart(const std::string &remote, int32_t startInputDeviceId);
 };
 } // namespace MMI
 } // namespace OHOS

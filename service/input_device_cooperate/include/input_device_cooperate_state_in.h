@@ -35,9 +35,7 @@ private:
     void OnStopDistributedInput(bool isSucess, const std::string &srcNetworkId, int32_t startInputDeviceId) override;
     int32_t ProcessStart(const std::string &remote, int32_t startInputDeviceId);
     int32_t ProcessStop();
-
-private:
-    std::string startDhid_;
+    std::string startDhid_ { "" };
 };
 } // namespace MMI
 } // namespace OHOS

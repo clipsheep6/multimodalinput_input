@@ -16,7 +16,6 @@
 #include "input_device_cooperate_state_free.h"
 
 #include "define_multimodal.h"
-#include "event_cooperate_manager.h"
 #include "input_device_cooperate_sm.h"
 #include "input_device_manager.h"
 #include "mouse_event_handler.h"
@@ -28,32 +27,31 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputD
 } // namespace
 
 int32_t InputDeviceCooperateStateFree::StartInputDeviceCooperate(
-    const std::string &networkId, int32_t startInputDeviceId)
+    const std::string &remote, int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = IInputDeviceCooperateState::StartInputDeviceCooperate(networkId, startInputDeviceId);
+    int32_t ret = IInputDeviceCooperateState::StartInputDeviceCooperate(remote, startInputDeviceId);
     if (ret != RET_OK) {
         MMI_HILOGE("Start input device cooperate fail");
         return ret;
     }
     std::string taskName = "process_start_task";
     std::function<void()> handleProcessStartFunc =
-        std::bind(&InputDeviceCooperateStateFree::ProcessStart, this, networkId, startInputDeviceId);
+        std::bind(&InputDeviceCooperateStateFree::ProcessStart, this, remote, startInputDeviceId);
     CHKPR(eventHandler_, RET_ERR);
     eventHandler_->PostTask(handleProcessStartFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
     return RET_OK;
 }
 
-int32_t InputDeviceCooperateStateFree::ProcessStart(const std::string &networkId, int32_t startInputDeviceId)
+int32_t InputDeviceCooperateStateFree::ProcessStart(const std::string &remote, int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
-    return PrepareAndStart(networkId, startInputDeviceId);
+    return PrepareAndStart(remote, startInputDeviceId);
 }
 
 int32_t InputDeviceCooperateStateFree::StopInputDeviceCooperate()
 {
-    CALL_DEBUG_ENTER;
-    EventCooperateMgr->OnCooperateMessage(CooperateMessages::MSG_COOPERATE_STOP_FAIL);
+    MMI_HILOGI("Current state is free, can not stop");
     return RET_ERR;
 }
 
