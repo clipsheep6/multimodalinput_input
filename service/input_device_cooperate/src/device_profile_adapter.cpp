@@ -18,8 +18,9 @@
 #include <algorithm>
 #include <mutex>
 
-#include "distributed_device_profile_client.h"
 #include "nlohmann/json.hpp"
+
+#include "distributed_device_profile_client.h"
 #include "service_characteristic_profile.h"
 #include "softbus_bus_center.h"
 #include "softbus_common.h"
