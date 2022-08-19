@@ -35,37 +35,22 @@ public:
     void OnProfileChanged(const DeviceProfile::ProfileChangeNotification &changeNotification) override;
 };
 
-<<<<<<< HEAD
 const std::string SERVICE_ID = "InputDeviceCooperation";
 const std::string SERVICE_TYPE = "InputDeviceCooperation";
 const std::string CHARACTERISTICS_NAME = "CurrentState";
-=======
-constexpr const char *SERVICE_ID = "InputDeviceCooperation";
-constexpr const char *SERVICE_TYPE = "InputDeviceCooperation";
-constexpr const char *CHARACTERISTICS_NAME = "CurrentState";
->>>>>>> fa89dd2766489cef708167ea09a38545a3ddee2a
 std::mutex adapterLock;
 std::map<std::string, DeviceProfileAdapter::ProfileEventCallback> callbacks_;
 } // namespace
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "DeviceProfileAdapter" };
 
 DeviceProfileAdapter::DeviceProfileAdapter()
-<<<<<<< HEAD
     :profileEventCallback_(std::make_shared<ProfileEventCallbackImpl>()) {}
-=======
-{
-    profileEventCallback_ = std::make_shared<ProfileEventCallbackImpl>();
-}
->>>>>>> fa89dd2766489cef708167ea09a38545a3ddee2a
 
 DeviceProfileAdapter::~DeviceProfileAdapter()
 {
     DistributedDeviceProfileClient::GetInstance().UnsubscribeProfileEvent(ProfileEvent::EVENT_PROFILE_CHANGED,
                                                                           profileEventCallback_);
-<<<<<<< HEAD
     std::lock_guard<std::mutex> guard(adapterLock);
-=======
->>>>>>> fa89dd2766489cef708167ea09a38545a3ddee2a
     profileEventCallback_ = nullptr;
     callbacks_.clear();
 }
@@ -120,7 +105,6 @@ bool DeviceProfileAdapter::GetCrossingSwitchState(const std::string &deviceId)
 int32_t DeviceProfileAdapter::RegisterCrossingStateListener(const std::string &deviceId, ProfileEventCallback callback)
 {
     CHKPR(callback, RET_ERR);
-    std::lock_guard<std::mutex> lock(adapterLock);
     if (deviceId.empty()) {
         MMI_HILOGE("DeviceId is nullptr");
         return RET_ERR;
@@ -183,10 +167,6 @@ int32_t DeviceProfileAdapter::RegisterProfileListener(const std::string &deviceI
     std::list<ProfileEvent> failedEvents;
     return DistributedDeviceProfileClient::GetInstance().SubscribeProfileEvents(
         subscribeInfos, profileEventCallback_, failedEvents);
-<<<<<<< HEAD
-=======
-    return ret;
->>>>>>> fa89dd2766489cef708167ea09a38545a3ddee2a
 }
 
 void ProfileEventCallbackImpl::OnProfileChanged(
@@ -194,10 +174,7 @@ void ProfileEventCallbackImpl::OnProfileChanged(
 {
     std::string deviceId = changeNotification.GetDeviceId();
     MMI_HILOGD("The profile has changed deviceId is %{public}s", deviceId.c_str());
-<<<<<<< HEAD
     std::lock_guard<std::mutex> guard(adapterLock);
-=======
->>>>>>> fa89dd2766489cef708167ea09a38545a3ddee2a
     auto it = callbacks_.find(deviceId);
     if (it == callbacks_.end()) {
         MMI_HILOGW("The device has no callback");
