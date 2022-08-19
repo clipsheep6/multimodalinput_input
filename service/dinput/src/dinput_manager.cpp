@@ -92,7 +92,7 @@ bool DInputManager::CheckTouchEvent(struct libinput_event* event)
         CHKPF(touchEvent);
         int32_t absX = static_cast<int32_t>(libinput_event_touch_get_x(touchEvent));
         int32_t absY = static_cast<int32_t>(libinput_event_touch_get_y(touchEvent));
-        MMI_HILOGI("check touch event absX:%{public}d, absY:%{public}d", absX, absY);
+        MMI_HILOGI("Check touch event absX:%{public}d, absY:%{public}d", absX, absY);
         return DistributedInputKit::IsTouchEventNeedFilterOut(absX, absY);
     }
     MMI_HILOGI("Get dinput server type:%{public}d does not need to be filtered", type);
