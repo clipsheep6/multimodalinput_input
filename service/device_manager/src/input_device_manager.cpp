@@ -425,9 +425,8 @@ int32_t InputDeviceManager::SetInputDeviceToScreen(const std::string& dhid, cons
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    MMI_HILOGI("Set input device dhid:%{public}s to screen id:%{public}s", dhid.c_cstr(), screenId.c_str());
     if (dhid.empty()) {
-        MMI_HILOGE("Invalid input device fd");
+        MMI_HILOGE("Invalid input device dhid");
         return RET_ERR;
     }
     if (screenId.empty()) {

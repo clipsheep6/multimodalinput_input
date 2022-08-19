@@ -131,7 +131,7 @@ ohos_shared_library("libmmi-client") {
     sources += [ "event_handler/src/key_event_input_subscribe_manager.cpp" ]
   }
 
-  if (input_feature_input_cooperate) {
+  if (input_feature_input_cooperation) {
     defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
   }
 

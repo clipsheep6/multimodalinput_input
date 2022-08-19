@@ -89,7 +89,7 @@ void EventDispatch::HandlePointerEventInner(const std::shared_ptr<PointerEvent> 
     }
     DfxHisysevent::OnUpdateTargetPointer(point, fd, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     if (CheckPointerEvent(point)) {
-        MMI_HILOGE("Check pointer event return true,filter out this pointer event.");
+        MMI_HILOGE("Check pointer event return true,filter out this pointer event");
         return;
     }
     auto udsServer = InputHandler->GetUDSServer();
@@ -189,6 +189,7 @@ bool EventDispatch::CheckPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 void EventDispatch::OnMouseStateChange(uint32_t type, uint32_t code, int32_t value)
 {
+    std::lock_guard<std::mutex> guard(lock_);
     mouseState_.clear();
     struct MouseState state = {type, code, value};
     mouseState_.push_back(state);

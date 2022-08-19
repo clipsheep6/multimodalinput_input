@@ -15,6 +15,8 @@
 #ifndef EVENT_DISPATCH_H
 #define EVENT_DISPATCH_H
 
+#include <mutex>
+
 #include "nocopyable.h"
 
 #include "i_input_event_handler.h"
@@ -57,6 +59,7 @@ public:
 
 private:
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
+    std::mutex lock_;
     std::vector<MouseState> mouseState_;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 };

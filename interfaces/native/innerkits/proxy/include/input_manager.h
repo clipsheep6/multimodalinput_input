@@ -375,7 +375,7 @@ public:
      * @brief 设置指定输入设备对应的屏幕ID
      * @param dhid 输入设备唯一ID
      * @param screenId 输入设备对应的屏幕ID
-     * @return 如果设置成功则返回值大于等于 0值
+     * @return 如果设置成功则返回值大于等于 0
      * 否则返回值小于 0
      */
     int32_t SetInputDeviceToScreen(const std::string& dhid, const std::string& screenId);

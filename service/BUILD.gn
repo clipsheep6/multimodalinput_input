@@ -112,7 +112,7 @@ config("libmmi_server_config") {
     defines += [ "OHOS_BUILD_ENABLE_MONITOR" ]
   }
 
-  if (input_feature_input_cooperate) {
+  if (input_feature_input_cooperation) {
     defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
   }
 }
