@@ -154,7 +154,7 @@ private:
     void Release();
     int32_t SaveCallback(CallbackType type, DICallback callback);
     int32_t AddTimer(const CallbackType &type);
-    int32_t RemoveWatch(const CallbackType &type);
+    int32_t RemoveTimer(const CallbackType &type);
     std::map<CallbackType, TimerInfo> watchingMap_;
     std::map<CallbackType, DICallback> callbackMap_;
     MouseStateChangeCallback mouseStateChangeCallback_ = { nullptr };

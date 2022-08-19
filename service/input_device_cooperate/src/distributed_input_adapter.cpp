@@ -197,9 +197,9 @@ int32_t DistributedInputAdapter::AddTimer(const CallbackType &type)
     return RET_OK;
 }
 
-int32_t DistributedInputAdapter::RemoveWatch(const CallbackType &type)
+int32_t DistributedInputAdapter::RemoveTimer(const CallbackType &type)
 {
-    MMI_HILOGD("RemoveWatch type:%{public}d", type);
+    MMI_HILOGD("RemoveTimer type:%{public}d", type);
     if ((callbackMap_.find(type) == callbackMap_.end()) || (watchingMap_.find(type) == watchingMap_.end())) {
         MMI_HILOGE("callback or watching do not exist");
         return RET_ERR;
@@ -212,7 +212,7 @@ int32_t DistributedInputAdapter::RemoveWatch(const CallbackType &type)
 void DistributedInputAdapter::StartDInputCallback::OnResult(const std::string &devId, const uint32_t &inputTypes,
                                                             const int32_t &status)
 {
-    DistributedAdapter->RemoveWatch(CallbackType::StartDInputCallback);
+    DistributedAdapter->RemoveTimer(CallbackType::StartDInputCallback);
     if (DistributedAdapter->callbackMap_.find(CallbackType::StartDInputCallback) ==
         DistributedAdapter->callbackMap_.end()) {
         MMI_HILOGI("No Callback for StartDInput");
@@ -225,7 +225,7 @@ void DistributedInputAdapter::StartDInputCallback::OnResult(const std::string &d
 void DistributedInputAdapter::StopDInputCallback::OnResult(const std::string &devId, const uint32_t &inputTypes,
                                                            const int32_t &status)
 {
-    DistributedAdapter->RemoveWatch(CallbackType::StopDInputCallback);
+    DistributedAdapter->RemoveTimer(CallbackType::StopDInputCallback);
     if (DistributedAdapter->callbackMap_.find(CallbackType::StopDInputCallback) ==
         DistributedAdapter->callbackMap_.end()) {
         MMI_HILOGI("No Callback StopDInput");
@@ -240,13 +240,13 @@ void DistributedInputAdapter::StartDInputCallbackDHIds::OnResultFds(const std::s
 {
     MMI_HILOGI("Fds Result srcId:%{public}s, sinkId:%{public}s, status:%{public}d", srcId.c_str(), sinkId.c_str(),
                status);
-    DistributedAdapter->RemoveWatch(CallbackType::StartDInputCallbackDHIds);
+    DistributedAdapter->RemoveTimer(CallbackType::StartDInputCallbackDHIds);
 }
 
 void DistributedInputAdapter::StartDInputCallbackDHIds::OnResultDhids(const std::string &devId, const int32_t &status)
 {
     MMI_HILOGI("Start Distributed Input Callback Results status : %{public}d", status);
-    DistributedAdapter->RemoveWatch(CallbackType::StartDInputCallbackDHIds);
+    DistributedAdapter->RemoveTimer(CallbackType::StartDInputCallbackDHIds);
     if (DistributedAdapter->callbackMap_.find(CallbackType::StartDInputCallbackDHIds) ==
         DistributedAdapter->callbackMap_.end()) {
         MMI_HILOGI("No Start Distributed Input Callback for DHIds");
@@ -261,13 +261,13 @@ void DistributedInputAdapter::StopDInputCallbackDHIds::OnResultFds(const std::st
 {
     MMI_HILOGI("Fds Result srcId:%{public}s, sinkId:%{public}s, status:%{public}d", srcId.c_str(), sinkId.c_str(),
                status);
-    DistributedAdapter->RemoveWatch(CallbackType::StopDInputCallbackDHIds);
+    DistributedAdapter->RemoveTimer(CallbackType::StopDInputCallbackDHIds);
 }
 
 void DistributedInputAdapter::StopDInputCallbackDHIds::OnResultDhids(const std::string &devId, const int32_t &status)
 {
     MMI_HILOGI("Stop Distributed Input Callback for DHIds status : %{public}d", status);
-    DistributedAdapter->RemoveWatch(CallbackType::StopDInputCallbackDHIds);
+    DistributedAdapter->RemoveTimer(CallbackType::StopDInputCallbackDHIds);
     if (DistributedAdapter->callbackMap_.find(CallbackType::StopDInputCallbackDHIds) ==
         DistributedAdapter->callbackMap_.end()) {
         MMI_HILOGI("No Stop Distributed Input Callback for DHIds");
@@ -282,13 +282,13 @@ void DistributedInputAdapter::StartDInputCallbackFds::OnResultFds(const std::str
 {
     MMI_HILOGI("On result for fds srcId:%{public}s, sinkId:%{public}s, status:%{public}d", srcId.c_str(),
                sinkId.c_str(), status);
-    DistributedAdapter->RemoveWatch(CallbackType::StartDInputCallbackFds);
+    DistributedAdapter->RemoveTimer(CallbackType::StartDInputCallbackFds);
 }
 
 void DistributedInputAdapter::StartDInputCallbackFds::OnResultDhids(const std::string &devId, const int32_t &status)
 {
     MMI_HILOGI("Start Distributed InputCallback for Dhids status : %{public}d", status);
-    DistributedAdapter->RemoveWatch(CallbackType::StartDInputCallbackFds);
+    DistributedAdapter->RemoveTimer(CallbackType::StartDInputCallbackFds);
     if (DistributedAdapter->callbackMap_.find(CallbackType::StartDInputCallbackFds) ==
         DistributedAdapter->callbackMap_.end()) {
         MMI_HILOGI("No StartDInputCallbackFds");
@@ -303,12 +303,12 @@ void DistributedInputAdapter::StopDInputCallbackFds::OnResultFds(const std::stri
 {
     MMI_HILOGI("Stop dinput callback for fds srcId:%{public}s, sinkId:%{public}s, status:%{public}d", srcId.c_str(),
                sinkId.c_str(), status);
-    DistributedAdapter->RemoveWatch(CallbackType::StopDInputCallbackFds);
+    DistributedAdapter->RemoveTimer(CallbackType::StopDInputCallbackFds);
 }
 
 void DistributedInputAdapter::StopDInputCallbackFds::OnResultDhids(const std::string &devId, const int32_t &status)
 {
-    DistributedAdapter->RemoveWatch(CallbackType::StopDInputCallbackFds);
+    DistributedAdapter->RemoveTimer(CallbackType::StopDInputCallbackFds);
     if (DistributedAdapter->callbackMap_.find(CallbackType::StopDInputCallbackFds) ==
         DistributedAdapter->callbackMap_.end()) {
         MMI_HILOGI("No Stop DInput Callback for Fds");
@@ -320,7 +320,7 @@ void DistributedInputAdapter::StopDInputCallbackFds::OnResultDhids(const std::st
 
 void DistributedInputAdapter::PrepareStartDInputCallback::OnResult(const std::string &devId, const int32_t &status)
 {
-    DistributedAdapter->RemoveWatch(CallbackType::PrepareStartDInputCallback);
+    DistributedAdapter->RemoveTimer(CallbackType::PrepareStartDInputCallback);
     if (DistributedAdapter->callbackMap_.find(CallbackType::PrepareStartDInputCallback) ==
         DistributedAdapter->callbackMap_.end()) {
         MMI_HILOGI("No Prepare Start DInput Callback");
@@ -332,7 +332,7 @@ void DistributedInputAdapter::PrepareStartDInputCallback::OnResult(const std::st
 
 void DistributedInputAdapter::UnPrepareStopDInputCallback::OnResult(const std::string &devId, const int32_t &status)
 {
-    DistributedAdapter->RemoveWatch(CallbackType::UnPrepareStopDInputCallback);
+    DistributedAdapter->RemoveTimer(CallbackType::UnPrepareStopDInputCallback);
     if (DistributedAdapter->callbackMap_.find(CallbackType::UnPrepareStopDInputCallback) ==
         DistributedAdapter->callbackMap_.end()) {
         MMI_HILOGI("No UnPrepare Stop DInput Callback");
@@ -344,7 +344,7 @@ void DistributedInputAdapter::UnPrepareStopDInputCallback::OnResult(const std::s
 
 void DistributedInputAdapter::PrepareStartDInputCallbackSink::OnResult(const std::string &devId, const int32_t &status)
 {
-    DistributedAdapter->RemoveWatch(CallbackType::PrepareStartDInputCallbackSink);
+    DistributedAdapter->RemoveTimer(CallbackType::PrepareStartDInputCallbackSink);
     if (DistributedAdapter->callbackMap_.find(CallbackType::PrepareStartDInputCallbackSink) ==
         DistributedAdapter->callbackMap_.end()) {
         MMI_HILOGI("No Prepare Start DInput Callback Sink");
@@ -356,7 +356,7 @@ void DistributedInputAdapter::PrepareStartDInputCallbackSink::OnResult(const std
 
 void DistributedInputAdapter::UnPrepareStopDInputCallbackSink::OnResult(const std::string &devId, const int32_t &status)
 {
-    DistributedAdapter->RemoveWatch(CallbackType::UnPrepareStopDInputCallbackSink);
+    DistributedAdapter->RemoveTimer(CallbackType::UnPrepareStopDInputCallbackSink);
     if (DistributedAdapter->callbackMap_.find(CallbackType::UnPrepareStopDInputCallbackSink) ==
         DistributedAdapter->callbackMap_.end()) {
         MMI_HILOGI("No UnPrepare Stop DInputCallback Sink");
