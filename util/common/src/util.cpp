@@ -54,6 +54,7 @@ const std::string CONFIG_ITEM_REPEAT = "Key.autorepeat";
 const std::string CONFIG_ITEM_DELAY = "Key.autorepeat.delaytime";
 const std::string CONFIG_ITEM_INTERVAL = "Key.autorepeat.intervaltime";
 const std::string CONFIG_ITEM_TYPE = "Key.keyboard.type";
+const std::string CURSORSTYLE_PATH = "/system/etc/multimodalinput/mouse_icon/";
 const std::string DATA_PATH = "/data";
 const std::string INPUT_PATH = "/system/etc/multimodalinput/";
 const std::string KEY_PATH = "/vendor/etc/keymap/";
@@ -486,6 +487,11 @@ static bool IsValidTomlPath(const std::string &filePath)
     return IsValidPath(KEY_PATH, filePath);
 }
 
+static bool IsValidCursorStylePath(const std::string &filePath)
+{
+    return IsValidPath(CURSORSTYLE_PATH, filePath);
+}
+
 void ReadProFile(const std::string &filePath, int32_t deviceId,
     std::map<int32_t, std::map<int32_t, int32_t>> &configMap)
 {
@@ -692,6 +698,29 @@ int32_t ConfigItemSwitch(const std::string &configItem, const std::string &value
         }
     } else if (configItem == CONFIG_ITEM_TYPE) {
         devConf.keyboardType = stoi(value);
+    }
+    return RET_OK;
+}
+
+int32_t ReadCursorStyleFile(const std::string &filePath)
+{
+    CALL_DEBUG_ENTER;
+    if (filePath.empty()) {
+        MMI_HILOGE("FilePath is empty");
+        return RET_ERR;
+    }
+    char realPath[PATH_MAX] = {};
+    if (realpath(filePath.c_str(), realPath) == nullptr) {
+        MMI_HILOGE("Path is error");
+        return RET_ERR;
+    }
+    if (!IsValidCursorStylePath(realPath)) {
+        MMI_HILOGE("File path is error");
+        return RET_ERR;
+    }
+    if (!IsFileExists(realPath)) {
+        MMI_HILOGE("File is not existent");
+        return RET_ERR;
     }
     return RET_OK;
 }
