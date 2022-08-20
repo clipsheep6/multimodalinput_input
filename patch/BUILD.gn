@@ -30,10 +30,15 @@ group("patch_packages") {
   if (input_feature_libinput) {
     deps += [
       "prebuild_libinput:prebuild_libinput",
-      "//third_party/eudev:libudev",
       "//third_party/eudev:udev_conf",
       "//third_party/eudev:udevd",
       "//third_party/eudev:udevd.rc",
     ]
+
+    if (input_feature_uevent) {
+      deps += [ "//foundation/multimodalinput/input/uevent:libuevent" ]
+    } else {
+      deps += [ "//third_party/eudev:libudev" ]
+    }
   }
 }

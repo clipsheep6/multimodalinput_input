@@ -20,6 +20,7 @@ input_feature_libinput = true
 input_feature_hdf = false
 input_feature_debug = false
 input_feature_distributed = false
+input_feature_uevent = false
 
 declare_args() {
   resource_schedule_service_enabled = false
@@ -52,3 +53,4 @@ print("input_feature_mouse = ${input_feature_mouse}")
 print("input_feature_touchscreen = ${input_feature_touchscreen}")
 print("input_feature_input_device = ${input_feature_input_device}")
 print("input_feature_input_cooperation = ${input_feature_input_cooperation}")
+print("input_feature_uevent = ${input_feature_uevent}")

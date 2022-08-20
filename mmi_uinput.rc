@@ -17,5 +17,7 @@ service mmi_uinput_service /system/bin/uinput_inject
     group system shell uhid
     seclabel u:r:uinput_inject:s0
 
-on property:init.svc.udevd_service=running
+# on property:init.svc.udevd_service=running
+#    start mmi_uinput_service
+on post-fs
     start mmi_uinput_service

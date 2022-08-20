@@ -120,6 +120,10 @@ config("libinput-third_config") {
       "-DHAVE_LIBINPUT_LOG_ENABLE",
     ]
   }
+
+  if (input_feature_uevent) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_UEVENT" ]
+  }
 }
 
 config("libinput-third_public_config") {
@@ -181,8 +185,13 @@ ohos_source_set("patch_gen_libinput-third-mmi") {
   public_configs = [ ":libinput-third_public_config" ]
 
   deps = [ ":apply_patch" ]
+  public_deps = []
 
-  public_deps = [ "//third_party/eudev:libudev" ]
+  if (input_feature_uevent) {
+    public_deps += [ "//foundation/multimodalinput/input/uevent:libuevent" ]
+  } else {
+    public_deps += [ "//third_party/eudev:libudev" ]
+  }
 
   if (input_feature_libinput) {
     public_deps += [
@@ -207,8 +216,13 @@ ohos_shared_library("libinput-third-mmi") {
   public_configs = [ ":libinput-third_public_config" ]
 
   deps = [ ":patch_gen_libinput-third-mmi" ]
+  public_deps = []
 
-  public_deps = [ "//third_party/eudev:libudev" ]
+  if (input_feature_uevent) {
+    public_deps += [ "//foundation/multimodalinput/input/uevent:libuevent" ]
+  } else {
+    public_deps += [ "//third_party/eudev:libudev" ]
+  }
 
   if (input_feature_libinput) {
     public_deps += [
@@ -243,10 +257,15 @@ if (input_feature_libinput) {
     deps = [ ":apply_patch" ]
 
     public_deps = [
-      "//third_party/eudev:libudev",
       "//third_party/libevdev:libevdev",
       "//third_party/mtdev:libmtdev",
     ]
+
+    if (input_feature_uevent) {
+      public_deps += [ "//foundation/multimodalinput/input/uevent:libuevent" ]
+    } else {
+      public_deps += [ "//third_party/eudev:libudev" ]
+    }
   }
 
   ohos_executable("libinput-debug-mmi") {
@@ -264,10 +283,15 @@ if (input_feature_libinput) {
     ]
 
     public_deps = [
-      "//third_party/eudev:libudev",
       "//third_party/libevdev:libevdev",
       "//third_party/mtdev:libmtdev",
     ]
+
+    if (input_feature_uevent) {
+      public_deps += [ "//foundation/multimodalinput/input/uevent:libuevent" ]
+    } else {
+      public_deps += [ "//third_party/eudev:libudev" ]
+    }
 
     part_name = "input"
   }
@@ -287,10 +311,15 @@ if (input_feature_libinput) {
     deps = [ ":apply_patch" ]
 
     public_deps = [
-      "//third_party/eudev:libudev",
       "//third_party/libevdev:libevdev",
       "//third_party/mtdev:libmtdev",
     ]
+
+    if (input_feature_uevent) {
+      public_deps += [ "//foundation/multimodalinput/input/uevent:libuevent" ]
+    } else {
+      public_deps += [ "//third_party/eudev:libudev" ]
+    }
   }
 
   ohos_executable("libinput-list-mmi") {
@@ -308,10 +337,15 @@ if (input_feature_libinput) {
     ]
 
     public_deps = [
-      "//third_party/eudev:libudev",
       "//third_party/libevdev:libevdev",
       "//third_party/mtdev:libmtdev",
     ]
+
+    if (input_feature_uevent) {
+      public_deps += [ "//foundation/multimodalinput/input/uevent:libuevent" ]
+    } else {
+      public_deps += [ "//third_party/eudev:libudev" ]
+    }
 
     part_name = "input"
   }
@@ -331,10 +365,15 @@ if (input_feature_libinput) {
     deps = [ ":apply_patch" ]
 
     public_deps = [
-      "//third_party/eudev:libudev",
       "//third_party/libevdev:libevdev",
       "//third_party/mtdev:libmtdev",
     ]
+
+    if (input_feature_uevent) {
+      public_deps += [ "//foundation/multimodalinput/input/uevent:libuevent" ]
+    } else {
+      public_deps += [ "//third_party/eudev:libudev" ]
+    }
   }
 
   ohos_executable("libinput-tablet-mmi") {
@@ -352,10 +391,15 @@ if (input_feature_libinput) {
     ]
 
     public_deps = [
-      "//third_party/eudev:libudev",
       "//third_party/libevdev:libevdev",
       "//third_party/mtdev:libmtdev",
     ]
+
+    if (input_feature_uevent) {
+      public_deps += [ "//foundation/multimodalinput/input/uevent:libuevent" ]
+    } else {
+      public_deps += [ "//third_party/eudev:libudev" ]
+    }
 
     part_name = "input"
   }
@@ -376,10 +420,15 @@ if (input_feature_libinput) {
     deps = [ ":apply_patch" ]
 
     public_deps = [
-      "//third_party/eudev:libudev",
       "//third_party/libevdev:libevdev",
       "//third_party/mtdev:libmtdev",
     ]
+
+    if (input_feature_uevent) {
+      public_deps += [ "//foundation/multimodalinput/input/uevent:libuevent" ]
+    } else {
+      public_deps += [ "//third_party/eudev:libudev" ]
+    }
   }
 
   ohos_executable("libinput-record-mmi") {
@@ -397,10 +446,15 @@ if (input_feature_libinput) {
     ]
 
     public_deps = [
-      "//third_party/eudev:libudev",
       "//third_party/libevdev:libevdev",
       "//third_party/mtdev:libmtdev",
     ]
+
+    if (input_feature_uevent) {
+      public_deps += [ "//foundation/multimodalinput/input/uevent:libuevent" ]
+    } else {
+      public_deps += [ "//third_party/eudev:libudev" ]
+    }
 
     part_name = "input"
   }
@@ -420,10 +474,15 @@ if (input_feature_libinput) {
     deps = [ ":apply_patch" ]
 
     public_deps = [
-      "//third_party/eudev:libudev",
       "//third_party/libevdev:libevdev",
       "//third_party/mtdev:libmtdev",
     ]
+
+    if (input_feature_uevent) {
+      public_deps += [ "//foundation/multimodalinput/input/uevent:libuevent" ]
+    } else {
+      public_deps += [ "//third_party/eudev:libudev" ]
+    }
   }
 
   ohos_executable("libinput-analyze-mmi") {
@@ -441,10 +500,15 @@ if (input_feature_libinput) {
     ]
 
     public_deps = [
-      "//third_party/eudev:libudev",
       "//third_party/libevdev:libevdev",
       "//third_party/mtdev:libmtdev",
     ]
+
+    if (input_feature_uevent) {
+      public_deps += [ "//foundation/multimodalinput/input/uevent:libuevent" ]
+    } else {
+      public_deps += [ "//third_party/eudev:libudev" ]
+    }
 
     part_name = "input"
   }
@@ -464,10 +528,15 @@ if (input_feature_libinput) {
     deps = [ ":apply_patch" ]
 
     public_deps = [
-      "//third_party/eudev:libudev",
       "//third_party/libevdev:libevdev",
       "//third_party/mtdev:libmtdev",
     ]
+
+    if (input_feature_uevent) {
+      public_deps += [ "//foundation/multimodalinput/input/uevent:libuevent" ]
+    } else {
+      public_deps += [ "//third_party/eudev:libudev" ]
+    }
   }
 
   ohos_executable("libinput-measure-mmi") {
@@ -485,10 +554,15 @@ if (input_feature_libinput) {
     ]
 
     public_deps = [
-      "//third_party/eudev:libudev",
       "//third_party/libevdev:libevdev",
       "//third_party/mtdev:libmtdev",
     ]
+
+    if (input_feature_uevent) {
+      public_deps += [ "//foundation/multimodalinput/input/uevent:libuevent" ]
+    } else {
+      public_deps += [ "//third_party/eudev:libudev" ]
+    }
 
     part_name = "input"
   }
@@ -508,10 +582,15 @@ if (input_feature_libinput) {
     deps = [ ":apply_patch" ]
 
     public_deps = [
-      "//third_party/eudev:libudev",
       "//third_party/libevdev:libevdev",
       "//third_party/mtdev:libmtdev",
     ]
+
+    if (input_feature_uevent) {
+      public_deps += [ "//foundation/multimodalinput/input/uevent:libuevent" ]
+    } else {
+      public_deps += [ "//third_party/eudev:libudev" ]
+    }
   }
 
   ohos_executable("libinput-quirks-mmi") {
@@ -529,10 +608,15 @@ if (input_feature_libinput) {
     ]
 
     public_deps = [
-      "//third_party/eudev:libudev",
       "//third_party/libevdev:libevdev",
       "//third_party/mtdev:libmtdev",
     ]
+
+    if (input_feature_uevent) {
+      public_deps += [ "//foundation/multimodalinput/input/uevent:libuevent" ]
+    } else {
+      public_deps += [ "//third_party/eudev:libudev" ]
+    }
 
     part_name = "input"
   }
