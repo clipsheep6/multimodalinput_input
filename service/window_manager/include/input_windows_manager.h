@@ -73,7 +73,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_POINTER
     const DisplayGroupInfo& GetDisplayGroupInfo();
     int32_t SetPointerStyle(int32_t pid, int32_t windowId, int32_t pointerStyle);
-    int32_t GetPointerStyle(int32_t pid, int32_t windowId, int32_t &pointerStyle) const;
+    std::optional<int> GetPointerStyle(int32_t pid, int32_t windowId) const;
     bool IsNeedRefreshLayer(int32_t windowId);
 #endif // OHOS_BUILD_ENABLE_POINTER
     void Dump(int32_t fd, const std::vector<std::string> &args);

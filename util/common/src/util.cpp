@@ -487,11 +487,6 @@ static bool IsValidTomlPath(const std::string &filePath)
     return IsValidPath(KEY_PATH, filePath);
 }
 
-static bool IsValidCursorStylePath(const std::string &filePath)
-{
-    return IsValidPath(CURSORSTYLE_PATH, filePath);
-}
-
 void ReadProFile(const std::string &filePath, int32_t deviceId,
     std::map<int32_t, std::map<int32_t, int32_t>> &configMap)
 {
@@ -709,17 +704,13 @@ int32_t ReadCursorStyleFile(const std::string &filePath)
         MMI_HILOGE("FilePath is empty");
         return RET_ERR;
     }
-    char realPath[PATH_MAX] = {};
-    if (realpath(filePath.c_str(), realPath) == nullptr) {
-        MMI_HILOGE("Path is error");
-        return RET_ERR;
-    }
-    if (!IsValidCursorStylePath(realPath)) {
-        MMI_HILOGE("File path is error");
-        return RET_ERR;
-    }
-    if (!IsFileExists(realPath)) {
+    if (!IsFileExists(filePath)) {
         MMI_HILOGE("File is not existent");
+        return RET_ERR;
+    }
+    int32_t fileSize = GetFileSize(filePath);
+    if ((fileSize <= 0) || (fileSize > FILE_SIZE_MAX)) {
+        MMI_HILOGE("File size out of read range");
         return RET_ERR;
     }
     return RET_OK;

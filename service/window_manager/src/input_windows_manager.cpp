@@ -182,7 +182,7 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
         const MouseLocation &mouseLocation = GetMouseInfo();
         int32_t logicX = mouseLocation.physicalX;
         int32_t logicY = mouseLocation.physicalY;
-        auto windowInfo = GetWindowInfo(logicX, logicY);
+        std::optional<WindowInfo> windowInfo = GetWindowInfo(logicX, logicY);
         if (!windowInfo) {
             MMI_HILOGE("The windowInfo is nullptr");
             return;
@@ -474,7 +474,7 @@ bool InputWindowsManager::IsNeedRefreshLayer(int32_t windowId)
     const MouseLocation &mouseLocation = GetMouseInfo();
     int32_t logicX = mouseLocation.physicalX;
     int32_t logicY = mouseLocation.physicalY;
-    auto touchWindow = GetWindowInfo(logicX, logicY);
+    std::optional<WindowInfo> touchWindow = GetWindowInfo(logicX, logicY);
     if (!touchWindow) {
         MMI_HILOGE("TouchWindow is nullptr");
         return false;
@@ -513,37 +513,34 @@ int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, int3
         return RET_ERR;
     }
     
-    auto subit = it->second.find(windowId);
-    if (subit == it->second.end()) {
+    auto iter = it->second.find(windowId);
+    if (iter == it->second.end()) {
         MMI_HILOGE("The window type is invalid");
         return RET_ERR;
     }
     
-    subit->second = pointerStyle;
+    iter->second = pointerStyle;
     MMI_HILOGD("Window type:%{public}d set pointer style:%{public}d success", windowId, pointerStyle);
     return RET_OK;
 }
 
-int32_t InputWindowsManager::GetPointerStyle(int32_t pid, int32_t windowId, int32_t &pointerStyle) const
+std::optional<int> InputWindowsManager::GetPointerStyle(int32_t pid, int32_t windowId) const
 {
     CALL_DEBUG_ENTER;
-    pointerStyle = DEFAULT_POINTER_STYLE;
-
     auto it = pointerStyle_.find(pid);
     if (it == pointerStyle_.end()) {
         MMI_HILOGE("The pointer style map is not include param pd, %{public}d", pid);
-        return RET_ERR;
+        return std::nullopt;
     }
     
-    auto subit = it->second.find(windowId);
-    if (subit == it->second.end()) {
+    auto iter = it->second.find(windowId);
+    if (iter == it->second.end()) {
         MMI_HILOGE("The window type is Invalid");
-        return RET_ERR;
+        return std::nullopt;
     }
     
-    pointerStyle = subit->second;
-    MMI_HILOGD("Window type:%{public}d get pointer style:%{public}d success", windowId, pointerStyle);
-    return RET_OK;
+    MMI_HILOGD("Window type:%{public}d get pointer style:%{public}d success", windowId, iter->second);
+    return iter->second;
 }
 
 void InputWindowsManager::UpdatePointerStyle()
@@ -553,8 +550,7 @@ void InputWindowsManager::UpdatePointerStyle()
         int32_t pid = windowItem.pid;
         auto it = pointerStyle_.find(pid);
         if (it == pointerStyle_.end()) {
-            std::map<int32_t, int32_t> tmpPointerStyle;
-            tmpPointerStyle.insert(std::pair<int32_t, int32_t>(windowItem.id, DEFAULT_POINTER_STYLE));
+            std::map<int32_t, int32_t> tmpPointerStyle = {{windowItem.id, DEFAULT_POINTER_STYLE}};
             auto iter = pointerStyle_.insert(std::make_pair(pid, tmpPointerStyle));
             if (!iter.second) {
                 MMI_HILOGE("The pd is duplicated");
@@ -762,13 +758,12 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         return RET_ERR;
     }
 
-    int32_t mouseStyle = 0;
-    int32_t ret = GetPointerStyle(touchWindow->pid, touchWindow->id, mouseStyle);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Get pointer style failed");
+    std::optional<int32_t> pointerStyleInfo = GetPointerStyle(touchWindow->pid, touchWindow->id);
+    if (!pointerStyleInfo) {
+        MMI_HILOGE("Get pointer style failed, pointerStyleInfo is nullptr");
         return RET_ERR;
     }
-
+    int32_t mouseStyle = pointerStyleInfo.value();
     WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
     IPointerDrawingManager::GetInstance()->OnDisplayInfo(physicalDisplayInfo->id, info,
         physicalDisplayInfo->width, physicalDisplayInfo->height, physicalDisplayInfo->direction);

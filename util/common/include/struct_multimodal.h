@@ -163,7 +163,7 @@ enum ICON_TYPE {
 };
 
 struct IconStyle {
-    int32_t alignmentWay {0};
+    int32_t alignmentWay { 0 };
     std::string iconPath;
 };
 
