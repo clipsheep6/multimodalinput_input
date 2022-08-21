@@ -17,6 +17,7 @@ mmi_service_path = "${mmi_path}/service"
 
 config("libmmi_server_config") {
   include_dirs = [
+    "input_device_cooperate/include",
     "device_manager/include",
     "device_scalability/include",
     "delegate_task/include",
@@ -110,6 +111,10 @@ config("libmmi_server_config") {
   }
   if (input_feature_monitor) {
     defines += [ "OHOS_BUILD_ENABLE_MONITOR" ]
+  }
+
+  if (input_feature_input_cooperation) {
+    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
   }
 }
 
@@ -428,6 +433,10 @@ ohos_shared_library("libmmi-server") {
     "timer_manager/src/timer_manager.cpp",
     "window_manager/src/input_windows_manager.cpp",
   ]
+
+  if (input_feature_input_cooperation) {
+    sources += [ "input_device_cooperate/src/cooperate_event_manager.cpp" ]
+  }
 
   if (input_feature_hdf) {
     sources += [
