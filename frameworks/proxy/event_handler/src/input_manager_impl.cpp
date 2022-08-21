@@ -930,7 +930,6 @@ int32_t InputManagerImpl::RegisterCooperateListener(std::shared_ptr<IInputDevice
     (void)(listener);
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
-
 }
 
 int32_t InputManagerImpl::UnregisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener)
@@ -950,7 +949,8 @@ int32_t InputManagerImpl::UnregisterCooperateListener(std::shared_ptr<IInputDevi
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 }
 
-int32_t InputManagerImpl::EnableInputDeviceCooperate(bool enabled, std::function<void(std::string, CooperationMessage)> callback)
+int32_t InputManagerImpl::EnableInputDeviceCooperate(bool enabled,
+    std::function<void(std::string, CooperationMessage)> callback)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE

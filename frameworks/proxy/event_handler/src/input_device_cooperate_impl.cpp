@@ -147,7 +147,7 @@ void InputDeviceCooperateImpl::OnDevCooperateListener(const std::string deviceId
     CALL_DEBUG_ENTER;
     for (const auto &item : devCooperateListener_) {
         if (!MMIEventHandler::PostTask(item.first,
-                std::bind(&InputDeviceCooperateImpl::OnDevCooperateListenerTask, this, item, deviceId, msg))) {
+            std::bind(&InputDeviceCooperateImpl::OnDevCooperateListenerTask, this, item, deviceId, msg))) {
             MMI_HILOGE("Post task failed");
         }
     }
