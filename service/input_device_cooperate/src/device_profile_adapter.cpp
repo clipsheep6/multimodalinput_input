@@ -59,7 +59,7 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::v
 
     int32_t putRet = DistributedDeviceProfileClient::GetInstance().PutDeviceProfile(profile);
     if (putRet != 0) {
-       MMI_HILOGW("Put device profile failed");
+        MMI_HILOGW("Put device profile failed");
     }
     SyncOptions syncOptions;
     std::for_each(deviceIds.begin(), deviceIds.end(),
