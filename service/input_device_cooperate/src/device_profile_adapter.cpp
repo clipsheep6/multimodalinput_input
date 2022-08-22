@@ -112,11 +112,8 @@ int32_t DeviceProfileAdapter::RegisterCrossingStateListener(const std::string &d
     }
     callbacks_[deviceId] = callback;
     MMI_HILOGI("Register crossing state listener success");
-    if (profileEventCallback_ == nullptr) {
-        profileEventCallback_ = std::make_shared<DeviceProfileAdapter::ProfileEventCallbackImpl>();
-    }
     if (RegisterProfileListener(deviceId) != RET_OK) {
-        MMI_HILOGE("Register profile listener failed error");
+        MMI_HILOGE("Register profile listener failed");
         return RET_ERR;
     }
     return RET_OK;
@@ -134,6 +131,11 @@ int32_t DeviceProfileAdapter::UnregisterCrossingStateListener(const std::string 
         MMI_HILOGW("This device has no callback");
         return RET_OK;
     }
+    std::list<ProfileEvent> profileEvents;
+    profileEvents.emplace_back(ProfileEvent::EVENT_PROFILE_CHANGED);
+    std::list<ProfileEvent> failedEvents;
+    DistributedDeviceProfileClient::GetInstance().UnsubscribeProfileEvents(profileEvents,
+    callbackIter.second, failedEvents);
     callbacks_.erase(callbackIter);
     return RET_OK;
 }
@@ -154,6 +156,9 @@ int32_t DeviceProfileAdapter::RegisterProfileListener(const std::string &deviceI
     syncEventInfo.profileEvent = ProfileEvent::EVENT_SYNC_COMPLETED;
     subscribeInfos.emplace_back(syncEventInfo);
     std::list<ProfileEvent> failedEvents;
+    if (profileEventCallback_ == nullptr) {
+        profileEventCallback_ = std::make_shared<DeviceProfileAdapter::ProfileEventCallbackImpl>();
+    }
     return DistributedDeviceProfileClient::GetInstance().SubscribeProfileEvents(
         subscribeInfos, profileEventCallback_, failedEvents);
 }
