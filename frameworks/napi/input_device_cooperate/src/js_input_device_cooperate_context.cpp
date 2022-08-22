@@ -29,7 +29,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInp
 constexpr size_t ARGC_SIZE_ONE = 1;
 constexpr size_t ARGC_SIZE_TWO = 2;
 constexpr size_t ARGC_SIZE_THREE = 3;
-
 } // namespace
 
 JsInputDeviceCooperateContext::JsInputDeviceCooperateContext()
