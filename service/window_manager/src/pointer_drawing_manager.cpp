@@ -350,7 +350,8 @@ void PointerDrawingManager::SetPointerLocation(int32_t pid, int32_t x, int32_t y
         UpdatePidInfo(pid, true);
         SetPointerVisible(pid, true);
     }
-    
+}
+
 int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, int32_t pointerStyle)
 {
     CALL_DEBUG_ENTER;

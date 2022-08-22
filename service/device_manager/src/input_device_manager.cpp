@@ -507,7 +507,7 @@ std::vector<std::string> InputDeviceManager::GetPointerKeyboardDhids(int32_t poi
     return dhids;
 }
 
-std::vector<std::string> InputDeviceManager::GetPointerKeyboardDhids(const std::string& dhid)
+std::vector<std::string> InputDeviceManager::GetPointerKeyboardDhids(const std::string &dhid)
 {
     int32_t pointerId = -1;
     for (const auto &iter : inputDevice_) {
@@ -533,7 +533,7 @@ std::string InputDeviceManager::GetOriginNetworkId(int32_t id)
     return networkId;
 }
 
-std::string InputDeviceManager::GetOriginNetworkId(const std::string& dhid)
+std::string InputDeviceManager::GetOriginNetworkId(const std::string &dhid)
 {
     if (dhid.empty()) {
         return "";
@@ -552,16 +552,16 @@ std::string InputDeviceManager::GetOriginNetworkId(const std::string& dhid)
     return networkId;
 }
 
-void InputDeviceManager::GetLocalDeviceId(std::string& networkId)
+void InputDeviceManager::GetLocalDeviceId(std::string &local)
 {
     auto localNode = std::make_unique<NodeBasicInfo>();
     CHKPV(localNode);
     int32_t errCode = GetLocalNodeDeviceInfo(BUNDLE_NAME.c_str(), localNode.get());
     if (errCode != RET_OK) {
         MMI_HILOGE("GetLocalNodeDeviceInfo errCode: %{public}d", errCode);
-        networkId = "";
+        local = "";
     }
-    networkId = localNode->networkId;
+    local = localNode->networkId;
 }
 
 std::string InputDeviceManager::GetDhid(int32_t deviceId) const
@@ -584,7 +584,7 @@ bool InputDeviceManager::HasLocalPointerDevice() const
     return false;
 }
 
-bool InputDeviceManager::IsRemote(struct libinput_device* inputDevice) const
+bool InputDeviceManager::IsRemote(struct libinput_device *inputDevice) const
 {
     CHKPR(inputDevice, false);
     bool isRemote = false;
@@ -613,7 +613,7 @@ bool InputDeviceManager::IsRemote(int32_t id) const
     return isRemote;
 }
 
-std::string InputDeviceManager::MakeNetworkId(const char* phys) const
+std::string InputDeviceManager::MakeNetworkId(const char *phys) const
 {
     std::string networkId;
     if (phys == nullptr || phys[0] == '\0') {
@@ -628,7 +628,7 @@ std::string InputDeviceManager::MakeNetworkId(const char* phys) const
     return networkId;
 }
 
-bool InputDeviceManager::IsKeyboard(struct libinput_device* device) const
+bool InputDeviceManager::IsKeyboard(struct libinput_device *device) const
 {
     CHKPF(device);
     enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);

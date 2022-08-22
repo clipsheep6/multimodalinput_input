@@ -61,13 +61,13 @@ public:
     void DumpDeviceList(int32_t fd, const std::vector<std::string> &args);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     std::string GetOriginNetworkId(int32_t id);
-    std::string GetOriginNetworkId(const std::string& dhid);
-    void GetLocalDeviceId(std::string& networkId);
+    std::string GetOriginNetworkId(const std::string &dhid);
+    void GetLocalDeviceId(std::string &local);
     std::string GetDhid(int32_t deviceId) const;
     std::vector<std::string> GetPointerKeyboardDhids(int32_t pointerId);
-    std::vector<std::string> GetPointerKeyboardDhids(const std::string& dhid);
+    std::vector<std::string> GetPointerKeyboardDhids(const std::string &dhid);
     bool HasLocalPointerDevice() const;
-    bool IsRemote(struct libinput_device* inputDevice) const;
+    bool IsRemote(struct libinput_device *inputDevice) const;
     bool IsRemote(int32_t id) const;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -79,8 +79,8 @@ private:
     bool IsPointerDevice(struct libinput_device* device) const;
     void ScanPointerDevice();
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    std::string MakeNetworkId(const char* phys) const;
-    bool IsKeyboard(struct libinput_device* device) const;
+    std::string MakeNetworkId(const char *phys) const;
+    bool IsKeyboard(struct libinput_device *device) const;
     void OnDInputDeviceRemove(struct libinput_device *inputDevice);
     std::string StringPrintf(const char *format, ...) const;
     std::string Sha256(const std::string &in) const;
