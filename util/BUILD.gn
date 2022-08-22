@@ -63,8 +63,8 @@ ohos_shared_library("libmmi-util") {
 
   public_deps = [
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-    "//foundation/arkui/napi:ace_napi",
     "//commonlibrary/c_utils/base:utils",
+    "//foundation/arkui/napi:ace_napi",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
   ]
 
