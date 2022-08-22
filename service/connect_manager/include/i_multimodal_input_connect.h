@@ -40,6 +40,8 @@ public:
     virtual int32_t IsPointerVisible(bool &visible) = 0;
     virtual int32_t SetPointerSpeed(int32_t speed) = 0;
     virtual int32_t GetPointerSpeed(int32_t &speed) = 0;
+    virtual int32_t SetPointerStyle(int32_t windowId, int32_t pointerStyle) = 0;
+    virtual int32_t GetPointerStyle(int32_t windowId, int32_t &pointerStyle) = 0;
     virtual int32_t SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> &keys) = 0;
     virtual int32_t GetDeviceIds(int32_t userData) = 0;
     virtual int32_t GetDevice(int32_t userData, int32_t id) = 0;
@@ -83,7 +85,9 @@ public:
         GET_KEYBOARD_TYPE = 20,
         SET_POINTER_SPEED = 21,
         GET_POINTER_SPEED = 22,
-        UPDATE_DISPLAY_INFO = 23,
+        SET_POINTER_STYLE = 23,
+        GET_POINTER_STYLE = 24,
+        UPDATE_DISPLAY_INFO = 25,
         REMOTE_COOPERATE_START = 35,
         REMOTE_COOPERATE_START_RES = 36,
         REMOTE_COOPERATE_STOP = 37,
