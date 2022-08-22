@@ -36,7 +36,7 @@ constexpr std::string_view COOPERATION = "cooperation";
 
 JsEventTarget::JsEventTarget()
 {
-    auto result = cooperateListener_.insert({ COOPERATION, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>() });
+    auto result = cooperateListener_.insert( { COOPERATION, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>() } );
     CK(result.second, VAL_NOT_EXP);
 }
 
