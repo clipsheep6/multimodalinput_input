@@ -219,8 +219,6 @@ struct DisplayInfo {
      * @since 9
      */
     Direction direction;
-
-    double size;
 };
 
 /**
