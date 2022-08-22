@@ -31,30 +31,31 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputD
 
 InputDeviceCooperateStateIn::InputDeviceCooperateStateIn(const std::string &startDhid) : startDhid_(startDhid) {}
 
-int32_t InputDeviceCooperateStateIn::StartInputDeviceCooperate(const std::string &remote, int32_t startInputDeviceId)
+int32_t InputDeviceCooperateStateIn::StartInputDeviceCooperate(const std::string &remoteNetworkId,
+    int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = IInputDeviceCooperateState::StartInputDeviceCooperate(remote, startInputDeviceId);
+    int32_t ret = IInputDeviceCooperateState::StartInputDeviceCooperate(remoteNetworkId, startInputDeviceId);
     if (ret != RET_OK) {
         return ret;
     }
     std::string taskName = "process_start_task";
     std::function<void()> handleProcessStartFunc =
-        std::bind(&InputDeviceCooperateStateIn::ProcessStart, this, remote, startInputDeviceId);
+        std::bind(&InputDeviceCooperateStateIn::ProcessStart, this, remoteNetworkId, startInputDeviceId);
     CHKPR(eventHandler_, RET_ERR);
     eventHandler_->PostTask(handleProcessStartFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
     return RET_OK;
 }
 
-int32_t InputDeviceCooperateStateIn::ProcessStart(const std::string &remote, int32_t startInputDeviceId)
+int32_t InputDeviceCooperateStateIn::ProcessStart(const std::string &remoteNetworkId, int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
     std::string originNetworkId = InputDevMgr->GetOriginNetworkId(startInputDeviceId);
-    if (remote.compare(originNetworkId) == 0) {
-        ComeBack(remote, startInputDeviceId);
+    if (remoteNetworkId == originNetworkId) {
+        ComeBack(remoteNetworkId, startInputDeviceId);
         return RET_OK;
     } else {
-        return RelayOrRelayComeBack(remote, startInputDeviceId);
+        return RelayOrRelayComeBack(remoteNetworkId, startInputDeviceId);
     }
 }
 
@@ -117,20 +118,20 @@ void InputDeviceCooperateStateIn::StopRemoteInput(const std::string &sinkNetwork
     }
 }
 
-void InputDeviceCooperateStateIn::OnStopDistributedInput(bool isSucess, const std::string &remote,
-    int32_t startInputDeviceId)
+void InputDeviceCooperateStateIn::OnStopDistributedInput(bool isSucess,
+    const std::string &remoteNetworkId, int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
     if (InputDevCooSM->IsStarting()) {
         std::string taskName = "start_finish_task";
-        std::function<void()> handleStartFinishFunc =
-            std::bind(&InputDeviceCooperateSM::StartFinish, InputDevCooSM, isSucess, remote, startInputDeviceId);
+        std::function<void()> handleStartFinishFunc = std::bind(&InputDeviceCooperateSM::StartFinish,
+            InputDevCooSM, isSucess, remoteNetworkId, startInputDeviceId);
         CHKPV(eventHandler_);
         eventHandler_->PostTask(handleStartFinishFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
     } else if (InputDevCooSM->IsStopping()) {
         std::string taskName = "stop_finish_task";
         std::function<void()> handleStopFinishFunc =
-            std::bind(&InputDeviceCooperateSM::StopFinish, InputDevCooSM, isSucess, remote);
+            std::bind(&InputDeviceCooperateSM::StopFinish, InputDevCooSM, isSucess, remoteNetworkId);
         CHKPV(eventHandler_);
         eventHandler_->PostTask(handleStopFinishFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
     }
