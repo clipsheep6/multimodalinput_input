@@ -708,7 +708,11 @@ int32_t ReadCursorStyleFile(const std::string &filePath)
         MMI_HILOGE("File is not existent");
         return RET_ERR;
     }
-    int32_t fileSize = GetFileSize(filePath);
+    if (realpath(filePath.c_str(), realPath) == nullptr) {
+        MMI_HILOGE("Path is error");
+        return RET_ERR;
+    }
+    int32_t fileSize = GetFileSize(realPath);
     if ((fileSize <= 0) || (fileSize > FILE_SIZE_MAX)) {
         MMI_HILOGE("File size out of read range");
         return RET_ERR;
