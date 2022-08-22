@@ -43,6 +43,7 @@ public:
 
 private:
     int32_t RegisterProfileListener(const std::string &deviceId);
+    void OnProfileChanged(const std::string &deviceId);
     std::shared_ptr<DeviceProfile::IProfileEventCallback> profileEventCallback_ { nullptr };
     std::mutex adapterLock_;
     std::map<std::string, DeviceProfileAdapter::ProfileEventCallback> callbacks_;
