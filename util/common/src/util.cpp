@@ -708,6 +708,7 @@ int32_t ReadCursorStyleFile(const std::string &filePath)
         MMI_HILOGE("File is not existent");
         return RET_ERR;
     }
+    char realPath[PATH_MAX] = {};
     if (realpath(filePath.c_str(), realPath) == nullptr) {
         MMI_HILOGE("Path is error");
         return RET_ERR;
