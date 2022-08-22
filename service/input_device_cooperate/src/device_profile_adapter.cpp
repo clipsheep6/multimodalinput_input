@@ -57,19 +57,20 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::v
     data[CHARACTERISTICS_NAME] = state;
     profile.SetCharacteristicProfileJson(data.dump());
 
-    int32_t putRet = DistributedDeviceProfileClient::GetInstance().PutDeviceProfile(profile);
-    if (putRet != 0) {
-        MMI_HILOGW("Put device profile failed");
+    int32_t ret = DistributedDeviceProfileClient::GetInstance().PutDeviceProfile(profile);
+    if (ret != 0) {
+       MMI_HILOGE("Put device profile failed");
+       return ret;
     }
     SyncOptions syncOptions;
     std::for_each(deviceIds.begin(), deviceIds.end(),
                   [&syncOptions](auto &deviceId) { syncOptions.AddDevice(deviceId); });
-    int32_t syncRet =
+    ret =
         DistributedDeviceProfileClient::GetInstance().SyncDeviceProfile(syncOptions, profileEventCallback_);
-    if (syncRet != 0) {
-        MMI_HILOGW("Sync device profile failed");
+    if (ret != 0) {
+        MMI_HILOGE("Sync device profile failed");
     }
-    return putRet;
+    return ret;
 }
 
 int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state)
@@ -126,16 +127,20 @@ int32_t DeviceProfileAdapter::UnregisterCrossingStateListener(const std::string 
         return RET_ERR;
     }
     std::lock_guard<std::mutex> guard(adapterLock);
+    auto it = profileEventCallbacks_.find(deviceId);
+    if (it != profileEventCallbacks_.end()) {
+        std::list<ProfileEvent> profileEvents;
+        profileEvents.emplace_back(ProfileEvent::EVENT_PROFILE_CHANGED);
+        std::list<ProfileEvent> failedEvents;
+        DistributedDeviceProfileClient::GetInstance().UnsubscribeProfileEvents(profileEvents,
+        it.second, failedEvents);
+
+    }
     auto callbackIter = callbacks_.find(deviceId);
     if (callbackIter == callbacks_.end()) {
         MMI_HILOGW("This device has no callback");
         return RET_OK;
     }
-    std::list<ProfileEvent> profileEvents;
-    profileEvents.emplace_back(ProfileEvent::EVENT_PROFILE_CHANGED);
-    std::list<ProfileEvent> failedEvents;
-    DistributedDeviceProfileClient::GetInstance().UnsubscribeProfileEvents(profileEvents,
-    callbackIter.second, failedEvents);
     callbacks_.erase(callbackIter);
     return RET_OK;
 }
@@ -156,11 +161,12 @@ int32_t DeviceProfileAdapter::RegisterProfileListener(const std::string &deviceI
     syncEventInfo.profileEvent = ProfileEvent::EVENT_SYNC_COMPLETED;
     subscribeInfos.emplace_back(syncEventInfo);
     std::list<ProfileEvent> failedEvents;
-    if (profileEventCallback_ == nullptr) {
-        profileEventCallback_ = std::make_shared<DeviceProfileAdapter::ProfileEventCallbackImpl>();
+    auto it = profileEventCallbacks_.find(deviceId);
+    if (it == profileEventCallbacks_.end() || it.second == nullptr) {
+        profileEventCallbacks_[deviceId] = std::make_shared<DeviceProfileAdapter::ProfileEventCallbackImpl>();
     }
     return DistributedDeviceProfileClient::GetInstance().SubscribeProfileEvents(
-        subscribeInfos, profileEventCallback_, failedEvents);
+        subscribeInfos, profileEventCallbacks_[deviceId], failedEvents);
 }
 
 void DeviceProfileAdapter::OnProfileChanged(const std::string &deviceId)
