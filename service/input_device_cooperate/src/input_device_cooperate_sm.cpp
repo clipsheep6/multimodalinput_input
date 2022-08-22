@@ -499,6 +499,7 @@ void InputDeviceCooperateSM::OnDeviceOffline(const std::string& networkId)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
+    DProfileAdapter->UnregisterCrossingStateListener(networkId);
     bool needReset = true;
     if (cooperateState_ == CooperateState::STATE_OUT) {
         if (networkId != srcNetworkId_) {
