@@ -392,39 +392,29 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             int32_t py1 = 0;
                             int32_t px2 = 0;
                             int32_t py2 = 0;
-                            int32_t buttonId = 0;
                             int32_t totalTimeMs = 1000;
-                            if (argc < 8) {
+                            if (argc < 7) {
                                 std::cout << "argc:" << argc << std::endl;
                                 std::cout << "wrong number of parameters" << std::endl;
                                 return RET_ERR;
                             }
-                            if (argv[optind + 4] == nullptr || argv[optind + 4][0] == '-') {
-                                if ((!StrToInt(optarg, buttonId)) ||
-                                    (!StrToInt(argv[optind], px1)) ||
-                                    (!StrToInt(argv[optind + 1], px2)) ||
-                                    (!StrToInt(argv[optind + 2], py1)) ||
-                                    (!StrToInt(argv[optind + 3], py2))) {
+                            if (argv[optind + 3] == nullptr || argv[optind + 3][0] == '-') {
+                                if ((!StrToInt(optarg, px1)) ||
+                                    (!StrToInt(argv[optind], px2)) ||
+                                    (!StrToInt(argv[optind + 1], py1)) ||
+                                    (!StrToInt(argv[optind + 2], py2))) {
                                         std::cout << "invalid coordinate value" << std::endl;
                                         return RET_ERR;
                                 }
                             } else {
-                                if ((!StrToInt(optarg, buttonId)) ||
-                                    (!StrToInt(argv[optind], px1)) ||
-                                    (!StrToInt(argv[optind + 1], py1)) ||
-                                    (!StrToInt(argv[optind + 2], px2)) ||
-                                    (!StrToInt(argv[optind + 3], py2)) ||
-                                    (!StrToInt(argv[optind + 4], totalTimeMs))) {
+                                if ((!StrToInt(optarg, px1)) ||
+                                    (!StrToInt(argv[optind], py1)) ||
+                                    (!StrToInt(argv[optind + 1], px2)) ||
+                                    (!StrToInt(argv[optind + 2], py2)) ||
+                                    (!StrToInt(argv[optind + 3], totalTimeMs))) {
                                         std::cout << "invalid coordinate value or total times" << std::endl;
                                         return RET_ERR;
                                 }
-                            }
-                            static constexpr int32_t minButtonId = 0;
-                            static constexpr int32_t maxButtonId = 7;
-                            if ((buttonId < minButtonId) || (buttonId > maxButtonId)) {
-                                std::cout << "button is out of range:" << minButtonId << " <= " << buttonId << " <= "
-                                    << maxButtonId << std::endl;
-                                return RET_ERR;
                             }
                             const int64_t minTotalTimeMs = 1;
                             const int64_t maxTotalTimeMs = 15000;
@@ -434,7 +424,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     << std::endl;
                                 return RET_ERR;
                             }
-                            std::cout << "             key: (" << buttonId     << ")"        << std::endl;
                             std::cout << "start coordinate: (" << px1 << ", "  << py1 << ")" << std::endl;
                             std::cout << "  end coordinate: (" << px2 << ", "  << py2 << ")" << std::endl;
                             std::cout << "     total times: "  << totalTimeMs  << " ms"      << std::endl;
@@ -444,16 +433,14 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             item.SetPointerId(0);
                             item.SetDisplayX(px1);
                             item.SetDisplayY(py1);
-                            item.SetPressed(true);
                             pointerEvent->SetPointerId(0);
                             pointerEvent->AddPointerItem(item);
-                            pointerEvent->SetButtonId(buttonId);
-                            pointerEvent->SetButtonPressed(buttonId);
+                            pointerEvent->SetButtonPressed(-1);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
-                            int64_t startTimeUs = pointerEvent->GetActionStartTime();
+                            int64_t startTimeUs = GetSysClockTime();
                             int64_t startTimeMs = startTimeUs / 1000;
                             int64_t endTimeMs = 0;
                             if (!AddInt64(startTimeMs, totalTimeMs, endTimeMs)) {
@@ -470,13 +457,19 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                                 sleepTimeMs = (currentTimeMs + BLOCK_TIME_MS) - ((GetSysClockTime()) / 1000);
+                                std::cout << "curtime+blcktime: " << (currentTimeMs + BLOCK_TIME_MS) << " systime: "
+                                << ((GetSysClockTime()) / 1000) << " sleepTimeMs: " << sleepTimeMs << std::endl;
+                                if (sleepTimeMs < 0) {
+                                    std::cout << "system jam" << std::endl;
+                                    currentTimeMs += BLOCK_TIME_MS;
+                                    continue;
+                                }
                                 std::this_thread::sleep_for(std::chrono::milliseconds(sleepTimeMs));
                                 currentTimeMs += BLOCK_TIME_MS;
                             }
 
                             item.SetDisplayX(px2);
                             item.SetDisplayY(py2);
-                            item.SetPressed(false);
                             pointerEvent->SetActionTime(endTimeMs);
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
@@ -959,8 +952,8 @@ void InputManagerCommand::ShowUsage()
     std::cout << "   key value:6 - button back"     << std::endl;
     std::cout << "   key value:7 - button task"     << std::endl;
     std::cout << "-s <key>                  --scroll <key>      -positive values are sliding backwards" << std::endl;
-    std::cout << "-v <key> <px1> <py1> <py2> <py2> [soomth time]" << std::endl;
-    std::cout << "  --movement <key> <px1> <py1> <py2> <py2> [soomth time] -dx1 dy1 to dx2 dy2 smooth movement";
+    std::cout << "-v <px1> <py1> <py2> <py2> [soomth time]"  << std::endl;
+    std::cout << "  --movement <px1> <py1> <py2> <py2> [soomth time] -dx1 dy1 to dx2 dy2 smooth movement";
     std::cout << std::endl;
     std::cout << "-i <time>                 --interval <time>   -the program interval for the (time) milliseconds";
     std::cout << std::endl;
