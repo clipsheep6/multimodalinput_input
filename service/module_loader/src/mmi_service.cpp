@@ -1002,14 +1002,14 @@ int32_t MMIService::Dump(int32_t fd, const std::vector<std::u16string> &args)
     return RET_OK;
 }
 
-int32_t MMIService::SetInputDeviceToScreen(const std::string& dhid, const std::string& screenId)
+int32_t MMIService::SetInputDevice(const std::string& dhid, const std::string& screenId)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputDeviceManager::SetInputDeviceToScreen,
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputDeviceManager::SetInputDevice,
         InputDevMgr, dhid, screenId));
     if (ret != RET_OK) {
-        MMI_HILOGE("Set input device to screen failed,return %{public}d", ret);
+        MMI_HILOGE("Set input device screen id failed,return %{public}d", ret);
         return ret;
     }
 #else

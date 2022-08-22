@@ -56,8 +56,8 @@ public:
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool HasPointerDevice();
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-    int32_t SetInputDeviceToScreen(const std::string& dhid, const std::string& screenId);
-    const std::string& GetScreenIdFromDeviceId(int32_t deviceId) const;
+    int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
+    const std::string& GetScreenId(int32_t deviceId) const;
 
 private:
     bool IsPointerDevice(struct libinput_device* device);

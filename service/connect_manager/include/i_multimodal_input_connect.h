@@ -56,7 +56,7 @@ public:
     virtual int32_t UnsubscribeKeyEvent(int32_t subscribeId) = 0;
     virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual int32_t SetAnrObserver() = 0;
-    virtual int32_t SetInputDeviceToScreen(const std::string& dhid, const std::string& screenId) = 0;
+    virtual int32_t SetInputDevice(const std::string& dhid, const std::string& screenId) = 0;
     virtual int32_t StartRemoteCooperate(const std::string& localDeviceId) = 0;
     virtual int32_t StartRemoteCooperateResult(bool isSucess, int32_t xPercent, int32_t yPercent) = 0;
     virtual int32_t StopRemoteCooperate() = 0;

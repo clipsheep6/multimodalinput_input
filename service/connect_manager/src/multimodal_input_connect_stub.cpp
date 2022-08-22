@@ -71,7 +71,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         {IMultimodalInputConnect::INJECT_KEY_EVENT, &MultimodalInputConnectStub::StubInjectKeyEvent},
         {IMultimodalInputConnect::INJECT_POINTER_EVENT, &MultimodalInputConnectStub::StubInjectPointerEvent},
         {IMultimodalInputConnect::SET_ANR_OBSERVER, &MultimodalInputConnectStub::StubSetAnrListener},
-        {IMultimodalInputConnect::SET_INPUT_DEVICE_TO_SCREEN, &MultimodalInputConnectStub::StubSetInputDeviceToScreen},
+        {IMultimodalInputConnect::SET_INPUT_DEVICE_TO_SCREEN, &MultimodalInputConnectStub::StubSetInputDevice},
         {IMultimodalInputConnect::REMOTE_COOPERATE_START, &MultimodalInputConnectStub::StubStartRemoteCooperate},
         {IMultimodalInputConnect::REMOTE_COOPERATE_START_RES, &MultimodalInputConnectStub::StubStartRemoteCooperateRes},
         {IMultimodalInputConnect::REMOTE_COOPERATE_STOP, &MultimodalInputConnectStub::StubStopRemoteCooperate},
@@ -643,7 +643,7 @@ int32_t MultimodalInputConnectStub::StubStartCooperateOtherRes(MessageParcel& da
     return ret;
 }
 
-int32_t MultimodalInputConnectStub::StubSetInputDeviceToScreen(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubSetInputDevice(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
@@ -658,9 +658,9 @@ int32_t MultimodalInputConnectStub::StubSetInputDeviceToScreen(MessageParcel& da
     READSTRING(data, dhid, IPC_PROXY_DEAD_OBJECT_ERR);
     std::string screenId;
     READSTRING(data, screenId, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = SetInputDeviceToScreen(dhid, screenId);
+    int32_t ret = SetInputDevice(dhid, screenId);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call SetInputDeviceToScreen failed ret:%{public}d", ret);
+        MMI_HILOGE("Call SetInputDevice failed ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;

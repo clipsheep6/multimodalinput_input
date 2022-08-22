@@ -770,7 +770,7 @@ int32_t InputManagerImpl::SetInputDevice(const std::string& dhid, const std::str
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     std::lock_guard<std::mutex> guard(mtx_);
-    int32_t ret = MultimodalInputConnMgr->SetInputDeviceToScreen(dhid, screenId);
+    int32_t ret = MultimodalInputConnMgr->SetInputDevice(dhid, screenId);
     if (ret != RET_OK) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }

@@ -421,16 +421,16 @@ void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::strin
     }
 }
 
-int32_t InputDeviceManager::SetInputDeviceToScreen(const std::string& dhid, const std::string& screenId)
+int32_t InputDeviceManager::SetInputDevice(const std::string& dhid, const std::string& screenId)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     if (dhid.empty()) {
-        MMI_HILOGE("Invalid input device dhid");
+        MMI_HILOGE("hdid is empty");
         return RET_ERR;
     }
     if (screenId.empty()) {
-        MMI_HILOGE("Input device screen id is empty");
+        MMI_HILOGE("screenId is empty");
         return RET_ERR;
     }
     inputDeviceScreens_[dhid] = screenId;
@@ -438,7 +438,7 @@ int32_t InputDeviceManager::SetInputDeviceToScreen(const std::string& dhid, cons
     return RET_OK;
 }
 
-const std::string& InputDeviceManager::GetScreenIdFromDeviceId(int32_t deviceId) const
+const std::string& InputDeviceManager::GetScreenId(int32_t deviceId) const
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE

@@ -571,7 +571,7 @@ int32_t MultimodalInputConnectProxy::SetAnrObserver()
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::SetInputDeviceToScreen(const std::string& dhid, const std::string& screenId)
+int32_t MultimodalInputConnectProxy::SetInputDevice(const std::string& dhid, const std::string& screenId)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;

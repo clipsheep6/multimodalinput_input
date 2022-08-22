@@ -187,7 +187,7 @@ int32_t InputManager::GetPointerStyle(int32_t windowId, int32_t &pointerStyle)
     return InputMgrImpl->GetPointerStyle(windowId, pointerStyle);
 }
 
-int32_t InputManager::SetInputDeviceToScreen(const std::string& dhid, const std::string& screenId)
+int32_t InputManager::SetInputDevice(const std::string& dhid, const std::string& screenId)
 {
     return InputMgrImpl->SetInputDevice(dhid, screenId);
 }

@@ -365,11 +365,11 @@ public:
     int32_t StopRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback);
 
     /**
-     * @brief 设定输入设备的席位名称.
+     * @brief 设置输入设备的席位名称.
      * @param seatName 席位名称
      * @param deviceUniqId 返回输入设备的唯一ID
-     * @return 如果设定输入设备的席位名称成功调用，则返回大于或等于 <b>0</b> 的值
-     * 否则返回小于 <b>0</b> 的值
+     * @return 如果设置成功则返回值等于 0
+     * 否则返回不等于 0的值
      */
     using DeviceUniqId = std::tuple<int32_t, int32_t, int32_t, int32_t, int32_t, std::string>;
     int32_t SetInputDeviceSeatName(const std::string& seatName, DeviceUniqId& deviceUniqId);
@@ -379,9 +379,9 @@ public:
      * @param dhid 输入设备唯一ID
      * @param screenId 输入设备对应的屏幕ID
      * @return 如果设置成功则返回值大于等于 0
-     * 否则返回值小于 0
+     * 否则返回不等于 0的值
      */
-    int32_t SetInputDeviceToScreen(const std::string& dhid, const std::string& screenId);
+    int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
 
 private:
     InputManager() = default;
