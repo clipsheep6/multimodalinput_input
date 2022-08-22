@@ -188,7 +188,7 @@ void ProfileEventCallbackImpl::OnProfileChanged(
 void ProfileEventCallbackImpl::OnSyncCompleted(const DeviceProfile::SyncResult &syncResults)
 {
     std::for_each(syncResults.begin(), syncResults.end(), [](const auto &syncResult) {
-        MMI_HILOGD("Sync result :%{public}d", syncResult.second);
+        MMI_HILOGD("Sync result:%{public}d", syncResult.second);
     });
 }
 } // namespace MMI
