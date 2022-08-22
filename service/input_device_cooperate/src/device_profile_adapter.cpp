@@ -111,10 +111,6 @@ int32_t DeviceProfileAdapter::RegisterCrossingStateListener(const std::string &d
     std::lock_guard<std::mutex> guard(adapterLock);
     auto callbackIter = callbacks_.find(deviceId);
     if (callbackIter != callbacks_.end()) {
-        if (&callbackIter->second == &callback) {
-            MMI_HILOGW("Callback is already registered");
-            return RET_OK;
-        }
         callbackIter->second = callback;
         MMI_HILOGW("Callback is updated");
         return RET_OK;
