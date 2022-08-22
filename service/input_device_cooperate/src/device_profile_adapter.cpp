@@ -94,13 +94,11 @@ bool DeviceProfileAdapter::GetCrossingSwitchState(const std::string &deviceId)
     DistributedDeviceProfileClient::GetInstance().GetDeviceProfile(deviceId, SERVICE_ID, profile);
     std::string jsonData = profile.GetCharacteristicProfileJson();
     nlohmann::json jsonObject = nlohmann::json::parse(jsonData, nullptr, false);
-    bool result = false;
     if (jsonObject.is_discarded()) {
         MMI_HILOGE("JsonData is discarded");
-        return result;
+        return false;
     }
-    result = jsonObject[CHARACTERISTICS_NAME].get<bool>();
-    return result;
+    return jsonObject[CHARACTERISTICS_NAME].get<bool>();
 }
 
 int32_t DeviceProfileAdapter::RegisterCrossingStateListener(const std::string &deviceId, ProfileEventCallback callback)
