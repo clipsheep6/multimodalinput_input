@@ -40,6 +40,8 @@ protected:
     int32_t StubHandleAllocSocketFd(MessageParcel &data, MessageParcel &reply);
     int32_t StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPointerVisible(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetPointerStyle(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetPointerStyle(MessageParcel& data, MessageParcel& reply);
     int32_t StubIsPointerVisible(MessageParcel& data, MessageParcel& reply);
     int32_t StubSupportKeys(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetDeviceIds(MessageParcel& data, MessageParcel& reply);
@@ -59,7 +61,11 @@ protected:
     int32_t StubSetPointerSpeed(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetPointerSpeed(MessageParcel& data, MessageParcel& reply);
     int32_t StubSendDisplayInfo(MessageParcel& data, MessageParcel& reply);
-
+    int32_t StubStartRemoteCooperate(MessageParcel& data, MessageParcel& reply);
+    int32_t StubStartRemoteCooperateRes(MessageParcel& data, MessageParcel& reply);
+    int32_t StubStopRemoteCooperate(MessageParcel& data, MessageParcel& reply);
+    int32_t StubStopRemoteCooperateRes(MessageParcel& data, MessageParcel& reply);
+    int32_t StubStartCooperateOtherRes(MessageParcel& data, MessageParcel& reply);
 private:
     int32_t ReadWindowsVecToParcel(MessageParcel& data, DisplayGroupInfo& displayGroupInfo);
     int32_t ReadDisplayVecToParcel(MessageParcel& data, DisplayGroupInfo& displayGroupInfo);
