@@ -398,23 +398,16 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 std::cout << "wrong number of parameters" << std::endl;
                                 return RET_ERR;
                             }
-                            if (argv[optind + 3] == nullptr || argv[optind + 3][0] == '-') {
-                                if ((!StrToInt(optarg, px1)) ||
-                                    (!StrToInt(argv[optind], px2)) ||
-                                    (!StrToInt(argv[optind + 1], py1)) ||
-                                    (!StrToInt(argv[optind + 2], py2))) {
-                                        std::cout << "invalid coordinate value" << std::endl;
-                                        return RET_ERR;
-                                }
-                            } else {
-                                if ((!StrToInt(optarg, px1)) ||
-                                    (!StrToInt(argv[optind], py1)) ||
-                                    (!StrToInt(argv[optind + 1], px2)) ||
-                                    (!StrToInt(argv[optind + 2], py2)) ||
-                                    (!StrToInt(argv[optind + 3], totalTimeMs))) {
-                                        std::cout << "invalid coordinate value or total times" << std::endl;
-                                        return RET_ERR;
-                                }
+                            if ((!StrToInt(optarg, px1)) ||
+                                (!StrToInt(argv[optind], py1)) ||
+                                (!StrToInt(argv[optind + 1], px2)) ||
+                                (!StrToInt(argv[optind + 2], py2))) {
+                                    std::cout << "invalid coordinate value" << std::endl;
+                                    return RET_ERR;
+                            }
+                            if ((argc >= 8) && !StrToInt(argv[optind + 3], totalTimeMs)) {
+                                std::cout << "invalid total times" << std::endl;
+                                return RET_ERR;
                             }
                             const int64_t minTotalTimeMs = 1;
                             const int64_t maxTotalTimeMs = 15000;
@@ -457,8 +450,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                                 sleepTimeMs = (currentTimeMs + BLOCK_TIME_MS) - ((GetSysClockTime()) / 1000);
-                                std::cout << "curtime+blcktime: " << (currentTimeMs + BLOCK_TIME_MS) << " systime: "
-                                << ((GetSysClockTime()) / 1000) << " sleepTimeMs: " << sleepTimeMs << std::endl;
                                 if (sleepTimeMs < 0) {
                                     std::cout << "system jam" << std::endl;
                                     currentTimeMs += BLOCK_TIME_MS;

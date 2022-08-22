@@ -154,14 +154,13 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectMouse_007, TestSize.Level1)
     char command1[] = {"uinput"};
     char command2[] = {"-M"};
     char command3[] = {"-v"};
-    char command4[] = {"0"};
-    char command5[] = {"100"};
+    char command4[] = {"200"};
+    char command5[] = {"200"};
     char command6[] = {"200"};
-    char command7[] = {"600"};
-    char command8[] = {"200"};
-    char command9[] = {"3000"};
-    char *argv[] = {command1, command2, command3, command4, command5, command6, command7, command8, command9};
-    int32_t result = inputManagerCommand->ParseCommand(9, argv);
+    char command7[] = {"700"};
+    char command8[] = {"3000"};
+    char *argv[] = {command1, command2, command3, command4, command5, command6, command7, command8};
+    int32_t result = inputManagerCommand->ParseCommand(8, argv);
     EXPECT_EQ(OHOS::ERR_OK, result);
 }
 
