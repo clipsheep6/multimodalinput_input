@@ -59,8 +59,8 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::v
 
     int32_t ret = DistributedDeviceProfileClient::GetInstance().PutDeviceProfile(profile);
     if (ret != 0) {
-       MMI_HILOGE("Put device profile failed");
-       return ret;
+        MMI_HILOGE("Put device profile failed");
+        return ret;
     }
     SyncOptions syncOptions;
     std::for_each(deviceIds.begin(), deviceIds.end(),
@@ -133,8 +133,7 @@ int32_t DeviceProfileAdapter::UnregisterCrossingStateListener(const std::string 
         profileEvents.emplace_back(ProfileEvent::EVENT_PROFILE_CHANGED);
         std::list<ProfileEvent> failedEvents;
         DistributedDeviceProfileClient::GetInstance().UnsubscribeProfileEvents(profileEvents,
-        it.second, failedEvents);
-
+            it.second, failedEvents);
     }
     auto callbackIter = callbacks_.find(deviceId);
     if (callbackIter == callbacks_.end()) {
