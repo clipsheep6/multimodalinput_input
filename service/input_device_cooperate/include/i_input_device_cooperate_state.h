@@ -31,7 +31,7 @@ class IInputDeviceCooperateState {
 public:
     IInputDeviceCooperateState();
     virtual ~IInputDeviceCooperateState() = default;
-    virtual int32_t StartInputDeviceCooperate(const std::string &remote, int32_t startInputDeviceId);
+    virtual int32_t StartInputDeviceCooperate(const std::string &remoteNetworkId, int32_t startInputDeviceId);
     virtual int32_t StopInputDeviceCooperate();
 
     virtual void OnKeyboardOnline(const std::string &dhid) {}
@@ -42,7 +42,7 @@ protected:
     bool NeedPrepare(const std::string &srcNetworkId, const std::string &sinkNetworkId);
     void OnPrepareDistributedInput(bool isSucess, const std::string &srcNetworkId, int32_t startInputDeviceId);
     int32_t StartDistributedInput(int32_t startInputDeviceId);
-    int32_t StopInputDeviceCooperate(const std::string &remote);
+    int32_t StopInputDeviceCooperate(const std::string &remoteNetworkId);
     virtual void OnStartDistributedInput(bool isSucess, const std::string &srcNetworkId, int32_t startInputDeviceId);
     virtual void OnStopDistributedInput(bool isSucess, const std::string &srcNetworkId, int32_t startInputDeviceId);
 
