@@ -27,26 +27,26 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputD
 } // namespace
 
 int32_t InputDeviceCooperateStateFree::StartInputDeviceCooperate(
-    const std::string &remote, int32_t startInputDeviceId)
+    const std::string &remoteNetworkId, int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = IInputDeviceCooperateState::StartInputDeviceCooperate(remote, startInputDeviceId);
+    int32_t ret = IInputDeviceCooperateState::StartInputDeviceCooperate(remoteNetworkId, startInputDeviceId);
     if (ret != RET_OK) {
         MMI_HILOGE("Start input device cooperate fail");
         return ret;
     }
     std::string taskName = "process_start_task";
     std::function<void()> handleProcessStartFunc =
-        std::bind(&InputDeviceCooperateStateFree::ProcessStart, this, remote, startInputDeviceId);
+        std::bind(&InputDeviceCooperateStateFree::ProcessStart, this, remoteNetworkId, startInputDeviceId);
     CHKPR(eventHandler_, RET_ERR);
     eventHandler_->PostTask(handleProcessStartFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
     return RET_OK;
 }
 
-int32_t InputDeviceCooperateStateFree::ProcessStart(const std::string &remote, int32_t startInputDeviceId)
+int32_t InputDeviceCooperateStateFree::ProcessStart(const std::string &remoteNetworkId, int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
-    return PrepareAndStart(remote, startInputDeviceId);
+    return PrepareAndStart(remoteNetworkId, startInputDeviceId);
 }
 
 int32_t InputDeviceCooperateStateFree::StopInputDeviceCooperate()
