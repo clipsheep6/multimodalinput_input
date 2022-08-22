@@ -30,12 +30,6 @@ namespace OHOS {
 namespace MMI {
 using namespace OHOS::DeviceProfile;
 namespace {
-class ProfileEventCallbackImpl : public DeviceProfile::IProfileEventCallback {
-public:
-    void OnSyncCompleted(const DeviceProfile::SyncResult &syncResults) override;
-    void OnProfileChanged(const DeviceProfile::ProfileChangeNotification &changeNotification) override;
-};
-
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "DeviceProfileAdapter" };
 const std::string SERVICE_ID = "InputDeviceCooperation";
 const std::string SERVICE_TYPE = "InputDeviceCooperation";
@@ -43,7 +37,7 @@ const std::string CHARACTERISTICS_NAME = "CurrentState";
 } // namespace
 
 DeviceProfileAdapter::DeviceProfileAdapter()
-    :profileEventCallback_(std::make_shared<ProfileEventCallbackImpl>()) {}
+    :profileEventCallback_(std::make_shared<DeviceProfileAdapter::ProfileEventCallbackImpl>()) {}
 
 DeviceProfileAdapter::~DeviceProfileAdapter()
 {
@@ -116,7 +110,7 @@ int32_t DeviceProfileAdapter::RegisterCrossingStateListener(const std::string &d
     callbacks_[deviceId] = callback;
     MMI_HILOGI("Register crossing state listener success");
     if (profileEventCallback_ == nullptr) {
-        profileEventCallback_ = std::make_shared<ProfileEventCallbackImpl>();
+        profileEventCallback_ = std::make_shared<DeviceProfileAdapter::ProfileEventCallbackImpl>();
     }
     if (RegisterProfileListener(deviceId) != RET_OK) {
         MMI_HILOGE("Register profile listener failed error");
@@ -177,7 +171,7 @@ void DeviceProfileAdapter::OnProfileChanged(const std::string &deviceId)
     }
 }
 
-void ProfileEventCallbackImpl::OnProfileChanged(
+void DeviceProfileAdapter::ProfileEventCallbackImpl::OnProfileChanged(
     const ProfileChangeNotification &changeNotification)
 {
     CALL_INFO_TRACE
@@ -185,7 +179,7 @@ void ProfileEventCallbackImpl::OnProfileChanged(
     DProfileAdapter->OnProfileChanged(deviceId);
 }
 
-void ProfileEventCallbackImpl::OnSyncCompleted(const DeviceProfile::SyncResult &syncResults)
+void DeviceProfileAdapter::ProfileEventCallbackImpl::OnSyncCompleted(const DeviceProfile::SyncResult &syncResults)
 {
     std::for_each(syncResults.begin(), syncResults.end(), [](const auto &syncResult) {
         MMI_HILOGD("Sync result:%{public}d", syncResult.second);
