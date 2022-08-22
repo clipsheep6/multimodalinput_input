@@ -58,13 +58,16 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::v
     profile.SetCharacteristicProfileJson(data.dump());
 
     int32_t putRet = DistributedDeviceProfileClient::GetInstance().PutDeviceProfile(profile);
+    if (putRet != 0) {
+       MMI_HILOGW("Put device profile failed");
+    }
     SyncOptions syncOptions;
     std::for_each(deviceIds.begin(), deviceIds.end(),
                   [&syncOptions](auto &deviceId) { syncOptions.AddDevice(deviceId); });
     int32_t syncRet =
         DistributedDeviceProfileClient::GetInstance().SyncDeviceProfile(syncOptions, profileEventCallback_);
     if (syncRet != 0) {
-        MMI_HILOGW("Sync device profile failed code:%{public}d", syncRet);
+        MMI_HILOGW("Sync device profile failed");
     }
     return putRet;
 }
