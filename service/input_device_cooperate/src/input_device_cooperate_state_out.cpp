@@ -33,7 +33,8 @@ InputDeviceCooperateStateOut::InputDeviceCooperateStateOut(const std::string& st
 {
 }
 
-int32_t InputDeviceCooperateStateOut::StartInputDeviceCooperate(const std::string &remote, int32_t sharedInputDevice)
+int32_t InputDeviceCooperateStateOut::StartInputDeviceCooperate(const std::string &remoteNetworkId,
+    int32_t sharedInputDevice)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGI("Current state is out, can not start");
