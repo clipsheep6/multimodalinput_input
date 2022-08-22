@@ -23,7 +23,7 @@ namespace MMI {
 class InputDeviceCooperateStateOut : public IInputDeviceCooperateState {
 public:
     explicit InputDeviceCooperateStateOut(const std::string &startDhid);
-    virtual int32_t StartInputDeviceCooperate(const std::string &remote, int32_t sharedInputDevice) override;
+    virtual int32_t StartInputDeviceCooperate(const std::string &remoteNetworkId, int32_t sharedInputDevice) override;
     virtual int32_t StopInputDeviceCooperate() override;
     virtual void OnKeyboardOnline(const std::string &dhid) override;
 
