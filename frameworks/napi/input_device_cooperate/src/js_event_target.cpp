@@ -36,7 +36,7 @@ constexpr std::string_view COOPERATION = "cooperation";
 
 JsEventTarget::JsEventTarget()
 {
-    auto result = cooperateListener_.insert({ COOPERATION, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>() });
+    auto result = cooperateListener_.insert( {COOPERATION, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>()} );
     CK(result.second, VAL_NOT_EXP);
 }
 
@@ -484,7 +484,8 @@ void JsEventTarget::EmitCooperateMessageEvent(uv_work_t *work, int32_t status)
         CHKRV(item->env, napi_create_int32(item->env, static_cast<int32_t>(item->data.msg), &evemtMsg), CREATE_INT32);
         napi_value object = nullptr;
         CHKRV(item->env, napi_create_object(item->env, &object), CREATE_OBJECT);
-        CHKRV(item->env, napi_set_named_property(item->env, object, "deviceDescriptor", deviceDescriptor), SET_NAMED_PROPERTY);
+        CHKRV(item->env, napi_set_named_property(item->env, object, "deviceDescriptor", deviceDescriptor),
+            SET_NAMED_PROPERTY);
         CHKRV(item->env, napi_set_named_property(item->env, object, "evemtMsg", evemtMsg), SET_NAMED_PROPERTY);
 
         napi_value handler = nullptr;
