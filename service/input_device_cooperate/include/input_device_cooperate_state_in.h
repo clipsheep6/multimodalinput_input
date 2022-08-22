@@ -23,7 +23,7 @@ namespace MMI {
 class InputDeviceCooperateStateIn : public IInputDeviceCooperateState {
 public:
     explicit InputDeviceCooperateStateIn(const std::string &startDhid);
-    virtual int32_t StartInputDeviceCooperate(const std::string &networkId, int32_t startInputDeviceId) override;
+    virtual int32_t StartInputDeviceCooperate(const std::string &remoteNetworkId, int32_t startInputDeviceId) override;
     virtual int32_t StopInputDeviceCooperate() override;
 
 private:
@@ -33,7 +33,7 @@ private:
     void StopRemoteInput(const std::string &sinkNetworkId, const std::string &srcNetworkId,
         const std::vector<std::string> &dhid, int32_t startInputDeviceId);
     void OnStopDistributedInput(bool isSucess, const std::string &srcNetworkId, int32_t startInputDeviceId) override;
-    int32_t ProcessStart(const std::string &remote, int32_t startInputDeviceId);
+    int32_t ProcessStart(const std::string &remoteNetworkId, int32_t startInputDeviceId);
     int32_t ProcessStop();
     std::string startDhid_ { "" };
 };
