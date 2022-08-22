@@ -40,7 +40,7 @@ namespace OHOS {
 namespace MMI {
 class DistributedInputAdapter : public DelayedSingleton<DistributedInputAdapter> {
 public:
-    using DICallback = std::function<void(bool)>;
+    using DInputCallback = std::function<void(bool)>;
     using MouseStateChangeCallback = std::function<void(uint32_t type, uint32_t code, int32_t value)>;
 
     DistributedInputAdapter();
@@ -51,23 +51,23 @@ public:
                          const DistributedHardware::DistributedInput::BusinessEvent &event);
 
     int32_t StartRemoteInput(const std::string &srcId, const std::string &sinkId, const uint32_t &inputTypes,
-                             DICallback callback);
+                             DInputCallback callback);
     int32_t StopRemoteInput(const std::string &srcId, const std::string &sinkId, const uint32_t &inputTypes,
-                            DICallback callback);
+                            DInputCallback callback);
 
     int32_t StartRemoteInput(const std::string &srcId, const std::string &sinkId, const std::vector<std::string> &dhIds,
-                             DICallback callback);
+                             DInputCallback callback);
     int32_t StopRemoteInput(const std::string &srcId, const std::string &sinkId, const std::vector<std::string> &dhIds,
-                            DICallback callback);
+                            DInputCallback callback);
 
-    int32_t StartRemoteInput(const std::string &deviceId, const std::vector<std::string> &dhIds, DICallback callback);
-    int32_t StopRemoteInput(const std::string &deviceId, const std::vector<std::string> &dhIds, DICallback callback);
+    int32_t StartRemoteInput(const std::string &deviceId, const std::vector<std::string> &dhIds, DInputCallback callback);
+    int32_t StopRemoteInput(const std::string &deviceId, const std::vector<std::string> &dhIds, DInputCallback callback);
 
-    int32_t PrepareRemoteInput(const std::string &srcId, const std::string &sinkId, DICallback callback);
-    int32_t UnPrepareRemoteInput(const std::string &srcId, const std::string &sinkId, DICallback callback);
+    int32_t PrepareRemoteInput(const std::string &srcId, const std::string &sinkId, DInputCallback callback);
+    int32_t UnPrepareRemoteInput(const std::string &srcId, const std::string &sinkId, DInputCallback callback);
 
-    int32_t PrepareRemoteInput(const std::string &deviceId, DICallback callback);
-    int32_t UnPrepareRemoteInput(const std::string &deviceId, DICallback callback);
+    int32_t PrepareRemoteInput(const std::string &deviceId, DInputCallback callback);
+    int32_t UnPrepareRemoteInput(const std::string &deviceId, DInputCallback callback);
 
     int32_t RegisterEventCallback(MouseStateChangeCallback callback);
     int32_t UnregisterEventCallback(MouseStateChangeCallback callback);
@@ -152,14 +152,13 @@ private:
 
     void Init();
     void Release();
-    int32_t SaveCallback(CallbackType type, DICallback callback);
+    int32_t SaveCallback(CallbackType type, DInputCallback callback);
     int32_t AddTimer(const CallbackType &type);
     int32_t RemoveTimer(const CallbackType &type);
     std::map<CallbackType, TimerInfo> watchingMap_;
-    std::map<CallbackType, DICallback> callbackMap_;
+    std::map<CallbackType, DInputCallback> callbackMap_;
     MouseStateChangeCallback mouseStateChangeCallback_ = { nullptr };
     sptr<DistributedHardware::DistributedInput::SimulationEventListener> mouseListener_ { nullptr };
-    std::mutex adapterLock_;
 };
 
 #define DistributedAdapter DistributedInputAdapter::GetInstance()
