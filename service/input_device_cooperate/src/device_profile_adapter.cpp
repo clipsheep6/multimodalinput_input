@@ -163,7 +163,7 @@ void DeviceProfileAdapter::OnProfileChanged(const std::string &deviceId)
         MMI_HILOGW("The device has no callback");
         return;
     }
-    if (it->second) {
+    if (it->second != nullptr) {
         auto state = GetCrossingSwitchState(deviceId);
         it->second(deviceId, state);
     } else {
