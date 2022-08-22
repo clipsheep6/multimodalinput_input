@@ -562,7 +562,10 @@ int32_t MultimodalInputConnectStub::ReadDisplayInfoToParcel(MessageParcel& data,
     READINT32(data, displayGroupInfo.height, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, displayGroupInfo.focusWindowId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = ReadWindowsVecToParcel(data, displayGroupInfo);
-    ret |= ReadDisplayVecToParcel(data, displayGroupInfo);
+    ret += ReadDisplayVecToParcel(data, displayGroupInfo);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to read display info to parcel!");
+    }
     return ret;
 }
 

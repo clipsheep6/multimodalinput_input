@@ -583,7 +583,10 @@ int32_t MultimodalInputConnectProxy::WriteDisplayInfoToParcel(const std::shared_
     WRITEINT32(data, displayGroupInfo->height, ERR_INVALID_VALUE);
     WRITEINT32(data, displayGroupInfo->focusWindowId, ERR_INVALID_VALUE);
     int32_t ret = WriteWindowsVecToParcel(displayGroupInfo, data);
-    ret |= WriteDisplayVecToParcel(displayGroupInfo, data);
+    ret += WriteDisplayVecToParcel(displayGroupInfo, data);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to write display info to parcel!");
+    }
     return ret;
 }
 
