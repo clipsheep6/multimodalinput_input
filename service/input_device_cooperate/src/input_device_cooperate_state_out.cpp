@@ -70,7 +70,7 @@ int32_t InputDeviceCooperateStateOut::ProcessStop(const std::string& srcNetworkI
         this->OnStopRemoteInput(isSucess, srcNetworkId);
         });
     if (ret != RET_OK) {
-       InputDevCooSM->StopFinish(false, srcNetworkId);
+        InputDevCooSM->StopFinish(false, srcNetworkId);
     }
     return RET_OK;
 }
