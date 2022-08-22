@@ -29,6 +29,11 @@
 namespace OHOS {
 namespace MMI {
 class DeviceProfileAdapter : public DelayedSingleton<DeviceProfileAdapter> {
+    class ProfileEventCallbackImpl : public DeviceProfile::IProfileEventCallback {
+    public:
+        void OnSyncCompleted(const DeviceProfile::SyncResult &syncResults) override;
+        void OnProfileChanged(const DeviceProfile::ProfileChangeNotification &changeNotification) override;
+    };
 public:
     using ProfileEventCallback = std::function<void(const std::string &, bool)>;
     DeviceProfileAdapter();
