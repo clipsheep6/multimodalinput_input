@@ -60,8 +60,10 @@ public:
     int32_t StopRemoteInput(const std::string &srcId, const std::string &sinkId, const std::vector<std::string> &dhIds,
                             DInputCallback callback);
 
-    int32_t StartRemoteInput(const std::string &deviceId, const std::vector<std::string> &dhIds, DInputCallback callback);
-    int32_t StopRemoteInput(const std::string &deviceId, const std::vector<std::string> &dhIds, DInputCallback callback);
+    int32_t StartRemoteInput(const std::string &deviceId,
+                             const std::vector<std::string> &dhIds, DInputCallback callback);
+    int32_t StopRemoteInput(const std::string &deviceId,
+                            const std::vector<std::string> &dhIds, DInputCallback callback);
 
     int32_t PrepareRemoteInput(const std::string &srcId, const std::string &sinkId, DInputCallback callback);
     int32_t UnPrepareRemoteInput(const std::string &srcId, const std::string &sinkId, DInputCallback callback);
