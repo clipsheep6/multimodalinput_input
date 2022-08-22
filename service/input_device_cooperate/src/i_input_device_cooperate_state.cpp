@@ -39,20 +39,21 @@ IInputDeviceCooperateState::IInputDeviceCooperateState()
     eventHandler_ = std::make_shared<CooperateEventHandler>(runner_);
 }
 
-int32_t IInputDeviceCooperateState::StartInputDeviceCooperate(const std::string &remote, int32_t startInputDeviceId)
+int32_t IInputDeviceCooperateState::StartInputDeviceCooperate(const std::string &remoteNetworkId,
+    int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
-    if (remote.empty()) {
+    if (remoteNetworkId.empty()) {
         MMI_HILOGE("Parameter error");
         return RET_ERR;
     }
     std::string localNetworkId;
     InputDevMgr->GetLocalDeviceId(localNetworkId);
-    if (remote.empty() || localNetworkId.empty() || remote == localNetworkId) {
+    if (remoteNetworkId.empty() || localNetworkId.empty() || remoteNetworkId == localNetworkId) {
         MMI_HILOGE("Parameter error");
         return RET_ERR;
     }
-    return RemoteMgr->StartRemoteCooperate(localNetworkId, remote);
+    return RemoteMgr->StartRemoteCooperate(localNetworkId, remoteNetworkId);
 }
 
 int32_t IInputDeviceCooperateState::PrepareAndStart(const std::string &srcNetworkId, int32_t startInputDeviceId)
@@ -67,14 +68,14 @@ int32_t IInputDeviceCooperateState::PrepareAndStart(const std::string &srcNetwor
                 this->OnPrepareDistributedInput(isSucess, srcNetworkId, startInputDeviceId);
             });
         if (ret != RET_OK) {
-            MMI_HILOGE("Prepare remote input fail");
+            MMI_HILOGE("Prepare remoteNetworkId input fail");
             InputDevCooSM->StartFinish(false, sinkNetworkId, startInputDeviceId);
             InputDevCooSM->UpdatePreparedDevices("", "");
         }
     } else {
         ret = StartDistributedInput(startInputDeviceId);
         if (ret != RET_OK) {
-            MMI_HILOGE("Start remote input fail");
+            MMI_HILOGE("Start remoteNetworkId input fail");
             InputDevCooSM->StartFinish(false, sinkNetworkId, startInputDeviceId);
         }
     }
@@ -141,10 +142,10 @@ int32_t IInputDeviceCooperateState::StopInputDeviceCooperate()
     return RET_ERR;
 }
 
-int32_t IInputDeviceCooperateState::StopInputDeviceCooperate(const std::string &remote)
+int32_t IInputDeviceCooperateState::StopInputDeviceCooperate(const std::string &remoteNetworkId)
 {
     CALL_DEBUG_ENTER;
-    return RemoteMgr->StopRemoteCooperate(remote);
+    return RemoteMgr->StopRemoteCooperate(remoteNetworkId);
 }
 } // namespace MMI
 } // namespace OHOS
