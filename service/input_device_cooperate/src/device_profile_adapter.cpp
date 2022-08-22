@@ -118,9 +118,8 @@ int32_t DeviceProfileAdapter::RegisterCrossingStateListener(const std::string &d
     if (profileEventCallback_ == nullptr) {
         profileEventCallback_ = std::make_shared<ProfileEventCallbackImpl>();
     }
-    int32_t registerRet = RegisterProfileListener(deviceId);
-    if (registerRet != RET_OK) {
-        MMI_HILOGE("Register profile listener failed error :%{public}d", registerRet);
+    if (RegisterProfileListener(deviceId) != RET_OK) {
+        MMI_HILOGE("Register profile listener failed error");
         return RET_ERR;
     }
     return RET_OK;
