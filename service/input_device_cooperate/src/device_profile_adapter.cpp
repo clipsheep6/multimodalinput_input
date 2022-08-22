@@ -36,13 +36,11 @@ public:
     void OnProfileChanged(const DeviceProfile::ProfileChangeNotification &changeNotification) override;
 };
 
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "DeviceProfileAdapter" };
 const std::string SERVICE_ID = "InputDeviceCooperation";
 const std::string SERVICE_TYPE = "InputDeviceCooperation";
 const std::string CHARACTERISTICS_NAME = "CurrentState";
-std::mutex adapterLock;
-std::map<std::string, DeviceProfileAdapter::ProfileEventCallback> callbacks_;
 } // namespace
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "DeviceProfileAdapter" };
 
 DeviceProfileAdapter::DeviceProfileAdapter()
     :profileEventCallback_(std::make_shared<ProfileEventCallbackImpl>()) {}
@@ -164,23 +162,28 @@ int32_t DeviceProfileAdapter::RegisterProfileListener(const std::string &deviceI
         subscribeInfos, profileEventCallback_, failedEvents);
 }
 
-void ProfileEventCallbackImpl::OnProfileChanged(
-    const ProfileChangeNotification &changeNotification)
+void DeviceProfileAdapter::OnProfileChanged(const std::string &deviceId)
 {
-    std::string deviceId = changeNotification.GetDeviceId();
-    MMI_HILOGD("The profile has changed deviceId is %{public}s", deviceId.c_str());
-    std::lock_guard<std::mutex> guard(adapterLock);
+    std::lock_guard<std::mutex> guard(adapterLock_);
     auto it = callbacks_.find(deviceId);
     if (it == callbacks_.end()) {
         MMI_HILOGW("The device has no callback");
         return;
     }
     if (it->second) {
-        auto state = DProfileAdapter->GetCrossingSwitchState(deviceId);
+        auto state = GetCrossingSwitchState(deviceId);
         it->second(deviceId, state);
     } else {
         callbacks_.erase(it);
     }
+}
+
+void ProfileEventCallbackImpl::OnProfileChanged(
+    const ProfileChangeNotification &changeNotification)
+{
+    CALL_INFO_TRACE
+    std::string deviceId = changeNotification.GetDeviceId();
+    DProfileAdapter->OnProfileChanged(deviceId);
 }
 
 void ProfileEventCallbackImpl::OnSyncCompleted(const DeviceProfile::SyncResult &syncResults)
