@@ -15,14 +15,14 @@
 
 #include "key_command_manager.h"
 
-
+#include "dfx_hisysevent.h"
 #include "ability_manager_client.h"
 #include "cJSON.h"
+#include "config_policy_utils.h"
 #include "file_ex.h"
 #include "bytrace_adapter.h"
 #include "error_multimodal.h"
 #include "mmi_log.h"
-#include "string_wrapper.h"
 #include "timer_manager.h"
 
 namespace OHOS {
@@ -313,9 +313,17 @@ std::string KeyCommandManager::GenerateKey(const ShortcutKey& key)
 
 bool KeyCommandManager::ParseConfig()
 {
-    std::string vendorConfig = "/vendor/etc/ability_launch_config.json";
+    const char *testPathSuffix = "/etc/multimodalinput/ability_launch_config.json";
+    char buf[MAX_PATH_LEN] = { 0 };
+    char *filePath = GetOneCfgFile(testPathSuffix, buf, MAX_PATH_LEN);
     std::string defaultConfig = "/system/etc/multimodalinput/ability_launch_config.json";
-    return ParseJson(vendorConfig) || ParseJson(defaultConfig);
+    if (!filePath || strlen(filePath) == 0 || strlen(filePath) > MAX_PATH_LEN) {
+        MMI_HILOGD("can not get customization config file");
+        return ParseJson(defaultConfig);
+    }
+    std::string customConfig = filePath;
+    MMI_HILOGD("The configuration file path is :%{public}s", customConfig.c_str());
+    return ParseJson(customConfig) || ParseJson(defaultConfig);
 }
 
 bool KeyCommandManager::ParseJson(const std::string configFile)
@@ -379,6 +387,7 @@ bool KeyCommandManager::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
         MMI_HILOGE("The same key is waiting timeout, skip");
         return true;
     }
+    DfxHisysevent::GetComboStartTime();
     if (lastMatchedKey_.timerId >= 0) {
         MMI_HILOGE("Remove timer:%{public}d", lastMatchedKey_.timerId);
         TimerMgr->RemoveTimer(lastMatchedKey_.timerId);
@@ -503,11 +512,11 @@ void KeyCommandManager::LaunchAbility(ShortcutKey key)
     for (const auto &entity : key.ability.entities) {
         want.AddEntity(entity);
     }
-    AAFwk::WantParams wParams;
     for (const auto &item : key.ability.params) {
-        wParams.SetParam(item.first, AAFwk::String::Box(item.second));
+        want.SetParam(item.first, item.second);
     }
-    want.SetParams(wParams);
+    DfxHisysevent::CalcComboStartTimes(lastMatchedKey_.keyDownDuration);
+    DfxHisysevent::ReportComboStartTimes();
     MMI_HILOGD("Start launch ability, bundleName:%{public}s", key.ability.bundleName.c_str());
     ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
     if (err != ERR_OK) {
