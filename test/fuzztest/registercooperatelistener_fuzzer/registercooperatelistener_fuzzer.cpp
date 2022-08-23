@@ -26,7 +26,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "RegisterCooperateListenerFuzzTest" };
 } // namespace
 
-class InputDeviceCooperateListenerTest: public IInputDeviceCooperateListener {
+class InputDeviceCooperateListenerTest : public IInputDeviceCooperateListener {
 public:
     virtual void OnCooperateMessage(const std::string &deviceId, CooperateMessages &msg)  override
     {

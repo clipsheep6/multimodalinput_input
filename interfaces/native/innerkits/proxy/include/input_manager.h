@@ -369,8 +369,6 @@ public:
      */
     using DeviceUniqId = std::tuple<int32_t, int32_t, int32_t, int32_t, int32_t, std::string>;
     int32_t SetInputDeviceSeatName(const std::string& seatName, DeviceUniqId& deviceUniqId);
-
-
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);
