@@ -30,13 +30,11 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "IInput
 } // namespace
 
 IInputDeviceCooperateState::IInputDeviceCooperateState()
-    :runner_(AppExecFwk::EventRunner::Create(true))
 {
-    if (runner_ == nullptr) {
-        MMI_HILOGE("Create event runner fail");
-        return;
-    }
+    runner_ = AppExecFwk::EventRunner::Create(true);
+    CHKPL(runner_);
     eventHandler_ = std::make_shared<CooperateEventHandler>(runner_);
+    CHKPL(eventHandler_);
 }
 
 int32_t IInputDeviceCooperateState::StartInputDeviceCooperate(const std::string &remoteNetworkId,
@@ -64,8 +62,8 @@ int32_t IInputDeviceCooperateState::PrepareAndStart(const std::string &srcNetwor
     if (NeedPrepare(srcNetworkId, sinkNetworkId)) {
         InputDevCooSM->UpdatePreparedDevices(srcNetworkId, sinkNetworkId);
         ret = DistributedAdapter->PrepareRemoteInput(
-            srcNetworkId, sinkNetworkId, [this, srcNetworkId, startInputDeviceId](bool isSucess) {
-                this->OnPrepareDistributedInput(isSucess, srcNetworkId, startInputDeviceId);
+            srcNetworkId, sinkNetworkId, [this, srcNetworkId, startInputDeviceId](bool isSuccess) {
+                this->OnPrepareDistributedInput(isSuccess, srcNetworkId, startInputDeviceId);
             });
         if (ret != RET_OK) {
             MMI_HILOGE("Prepare remoteNetworkId input fail");
@@ -83,10 +81,10 @@ int32_t IInputDeviceCooperateState::PrepareAndStart(const std::string &srcNetwor
 }
 
 void IInputDeviceCooperateState::OnPrepareDistributedInput(
-    bool isSucess, const std::string &srcNetworkId, int32_t startInputDeviceId)
+    bool isSuccess, const std::string &srcNetworkId, int32_t startInputDeviceId)
 {
-    MMI_HILOGI("isSucess: %{public}s", isSucess ? "true" : "false");
-    if (!isSucess) {
+    MMI_HILOGI("isSuccess: %{public}s", isSuccess ? "true" : "false");
+    if (!isSuccess) {
         InputDevCooSM->UpdatePreparedDevices("", "");
         InputDevCooSM->StartFinish(false, srcNetworkId, startInputDeviceId);
         return;
@@ -109,23 +107,23 @@ int32_t IInputDeviceCooperateState::StartDistributedInput(int32_t startInputDevi
         return RET_OK;
     }
     return DistributedAdapter->StartRemoteInput(
-        networkIds.first, networkIds.second, dhids, [this, src = networkIds.first, startInputDeviceId](bool isSucess) {
-            this->OnStartDistributedInput(isSucess, src, startInputDeviceId);
+        networkIds.first, networkIds.second, dhids, [this, src = networkIds.first, startInputDeviceId](bool isSuccess) {
+            this->OnStartDistributedInput(isSuccess, src, startInputDeviceId);
         });
 }
 
 void IInputDeviceCooperateState::OnStartDistributedInput(
-    bool isSucess, const std::string &srcNetworkId, int32_t startInputDeviceId)
+    bool isSuccess, const std::string &srcNetworkId, int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
     std::string taskName = "start_finish_task";
     std::function<void()> handleStartFinishFunc =
-        std::bind(&InputDeviceCooperateSM::StartFinish, InputDevCooSM, isSucess, srcNetworkId, startInputDeviceId);
+        std::bind(&InputDeviceCooperateSM::StartFinish, InputDevCooSM, isSuccess, srcNetworkId, startInputDeviceId);
     CHKPV(eventHandler_);
     eventHandler_->PostTask(handleStartFinishFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
 }
 
-void IInputDeviceCooperateState::OnStopDistributedInput(bool isSucess,
+void IInputDeviceCooperateState::OnStopDistributedInput(bool isSuccess,
     const std::string &srcNetworkId, int32_t startInputDeviceId) {}
 
 bool IInputDeviceCooperateState::NeedPrepare(const std::string &srcNetworkId, const std::string &sinkNetworkId)
@@ -135,11 +133,6 @@ bool IInputDeviceCooperateState::NeedPrepare(const std::string &srcNetworkId, co
     bool isNeed =  !(srcNetworkId == prepared.first && sinkNetworkId == prepared.second);
     MMI_HILOGI("NeedPrepare?: %{public}s", isNeed ? "true" : "false");
     return isNeed;
-}
-
-int32_t IInputDeviceCooperateState::StopInputDeviceCooperate()
-{
-    return RET_ERR;
 }
 
 int32_t IInputDeviceCooperateState::StopInputDeviceCooperate(const std::string &remoteNetworkId)

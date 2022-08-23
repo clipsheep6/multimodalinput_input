@@ -67,8 +67,8 @@ int32_t InputDeviceCooperateStateOut::ProcessStop(const std::string& srcNetworkI
     CALL_DEBUG_ENTER;
     std::string sink = InputDevMgr->GetOriginNetworkId(startDhid_);
     std::vector<std::string>  dhids = InputDevMgr->GetPointerKeyboardDhids(startDhid_);
-    int32_t ret = DistributedAdapter->StopRemoteInput(srcNetworkId, sink, dhids, [this, srcNetworkId](bool isSucess) {
-        this->OnStopRemoteInput(isSucess, srcNetworkId);
+    int32_t ret = DistributedAdapter->StopRemoteInput(srcNetworkId, sink, dhids, [this, srcNetworkId](bool isSuccess) {
+        this->OnStopRemoteInput(isSuccess, srcNetworkId);
         });
     if (ret != RET_OK) {
         InputDevCooSM->StopFinish(false, srcNetworkId);
@@ -76,12 +76,12 @@ int32_t InputDeviceCooperateStateOut::ProcessStop(const std::string& srcNetworkI
     return RET_OK;
 }
 
-void InputDeviceCooperateStateOut::OnStopRemoteInput(bool isSucess, const std::string &srcNetworkId)
+void InputDeviceCooperateStateOut::OnStopRemoteInput(bool isSuccess, const std::string &srcNetworkId)
 {
     CALL_DEBUG_ENTER;
     std::string taskName = "stop_finish_task";
     std::function<void()> handleStopFinishFunc =
-        std::bind(&InputDeviceCooperateSM::StopFinish, InputDevCooSM, isSucess, srcNetworkId);
+        std::bind(&InputDeviceCooperateSM::StopFinish, InputDevCooSM, isSuccess, srcNetworkId);
     CHKPV(eventHandler_);
     eventHandler_->PostTask(handleStopFinishFunc, taskName, 0,
         AppExecFwk::EventQueue::Priority::HIGH);
@@ -92,7 +92,7 @@ void InputDeviceCooperateStateOut::OnKeyboardOnline(const std::string &dhid)
     std::pair<std::string, std::string> networkIds = InputDevCooSM->GetPreparedDevices();
     std::vector<std::string> dhids;
     dhids.push_back(dhid);
-    DistributedAdapter->StartRemoteInput(networkIds.first, networkIds.second, dhids, [](bool isSucess) {});
+    DistributedAdapter->StartRemoteInput(networkIds.first, networkIds.second, dhids, [](bool isSuccess) {});
 }
 } // namespace MMI
 } // namespace OHOS

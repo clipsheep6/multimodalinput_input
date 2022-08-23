@@ -49,17 +49,11 @@ int32_t InputDeviceCooperateStateFree::ProcessStart(const std::string &remoteNet
     return PrepareAndStart(remoteNetworkId, startInputDeviceId);
 }
 
-int32_t InputDeviceCooperateStateFree::StopInputDeviceCooperate()
-{
-    MMI_HILOGI("Current state is free, can not stop");
-    return RET_ERR;
-}
-
 void InputDeviceCooperateStateFree::OnStartDistributedInput(
-    bool isSucess, const std::string &srcNetworkId, int32_t startInputDeviceId)
+    bool isSuccess, const std::string &srcNetworkId, int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
-    IInputDeviceCooperateState::OnStartDistributedInput(isSucess, srcNetworkId, startInputDeviceId);
+    IInputDeviceCooperateState::OnStartDistributedInput(isSuccess, srcNetworkId, startInputDeviceId);
 }
 } // namespace MMI
 } // namespace OHOS

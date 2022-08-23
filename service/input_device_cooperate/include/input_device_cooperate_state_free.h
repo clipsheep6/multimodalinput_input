@@ -24,10 +24,9 @@ namespace MMI {
 class InputDeviceCooperateStateFree : public IInputDeviceCooperateState {
 public:
     virtual int32_t StartInputDeviceCooperate(const std::string &remoteNetworkId, int32_t startInputDeviceId) override;
-    virtual int32_t StopInputDeviceCooperate() override;
 
 private:
-    void OnStartDistributedInput(bool isSucess, const std::string &srcNetworkId, int32_t startInputDeviceId) override;
+    void OnStartDistributedInput(bool isSuccess, const std::string &srcNetworkId, int32_t startInputDeviceId) override;
     int32_t ProcessStart(const std::string &remoteNetworkId, int32_t startInputDeviceId);
 };
 } // namespace MMI

@@ -28,7 +28,7 @@ public:
     virtual void OnKeyboardOnline(const std::string &dhid) override;
 
 protected:
-    void OnStopRemoteInput(bool isSucess, const std::string &srcNetworkId);
+    void OnStopRemoteInput(bool isSuccess, const std::string &srcNetworkId);
     int32_t ProcessStop(const std::string &srcNetworkId);
 
 private:
