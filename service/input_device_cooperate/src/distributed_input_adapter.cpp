@@ -25,15 +25,15 @@
 namespace OHOS {
 namespace MMI {
 using namespace DistributedHardware::DistributedInput;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "DistributedInputAdapter"};
 namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "DistributedInputAdapter"};
 constexpr int32_t DEFAULT_DELAY_TIME = 4000;
 constexpr int32_t RETRY_TIME = 2;
 } // namespace
 DistributedInputAdapter::DistributedInputAdapter()
 {
     mouseListener_ = new (std::nothrow) MouseStateChangeCallbackImpl();
-    CHKPV(mouseListener_);
+    CHKPL(mouseListener_);
     DistributedInputKit::RegisterEventListener(mouseListener_);
 }
 
@@ -107,9 +107,9 @@ int32_t DistributedInputAdapter::StopRemoteInput(const std::string &srcId, const
 int32_t DistributedInputAdapter::PrepareRemoteInput(const std::string &srcId, const std::string &sinkId,
                                                     DInputCallback callback)
 {
-    SaveCallback(CallbackType::PrepareStartDInputCallbackSink, callback);
     sptr<IPrepareDInputCallback> cb = new (std::nothrow) PrepareStartDInputCallbackSink();
     CHKPR(cb, ERROR_NULL_POINTER);
+    SaveCallback(CallbackType::PrepareStartDInputCallbackSink, callback);
     return DistributedInputKit::PrepareRemoteInput(srcId, sinkId, cb);
 }
 
@@ -166,7 +166,7 @@ void DistributedInputAdapter::AddTimer(const CallbackType &type)
     MMI_HILOGD("AddTimer type:%{public}d", type);
     int32_t timerId = TimerMgr->AddTimer(DEFAULT_DELAY_TIME, RETRY_TIME, [this, type]() {
         if ((callbackMap_.find(type) == callbackMap_.end()) || (watchingMap_.find(type) == watchingMap_.end())) {
-            MMI_HILOGE("callback or watching is not exist");
+            MMI_HILOGE("Callback or watching is not exist");
             return;
         }
         if (watchingMap_[type].times == 0) {
@@ -190,7 +190,7 @@ int32_t DistributedInputAdapter::RemoveTimer(const CallbackType &type)
 {
     MMI_HILOGD("RemoveTimer type:%{public}d", type);
     if ((callbackMap_.find(type) == callbackMap_.end()) || (watchingMap_.find(type) == watchingMap_.end())) {
-        MMI_HILOGE("callback or watching do not exist");
+        MMI_HILOGE("Callback or watching do not exist");
         return RET_ERR;
     }
     TimerMgr->RemoveTimer(watchingMap_[type].timerId);
@@ -198,14 +198,14 @@ int32_t DistributedInputAdapter::RemoveTimer(const CallbackType &type)
     return RET_OK;
 }
 
-void DistributedInputAdapter::ProcessCallbackFromDinput(CallbackType type, int32_t status)
+void DistributedInputAdapter::ProcessDInputCallback(CallbackType type, int32_t status)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(adapterLock_);
     RemoveTimer(type);
     auto it = callbackMap_.find(type);
     if (it == callbackMap_.end()) {
-        MMI_HILOGI("dinput callback not exist");
+        MMI_HILOGI("Dinput callback not exist");
         return;
     }
     it->second(status == RET_OK);
@@ -215,86 +215,77 @@ void DistributedInputAdapter::ProcessCallbackFromDinput(CallbackType type, int32
 void DistributedInputAdapter::StartDInputCallback::OnResult(const std::string &devId, const uint32_t &inputTypes,
                                                             const int32_t &status)
 {
-    DistributedAdapter->ProcessCallbackFromDinput(CallbackType::StartDInputCallback, status);
+    DistributedAdapter->ProcessDInputCallback(CallbackType::StartDInputCallback, status);
 }
 
 void DistributedInputAdapter::StopDInputCallback::OnResult(const std::string &devId, const uint32_t &inputTypes,
                                                            const int32_t &status)
 {
-    DistributedAdapter->ProcessCallbackFromDinput(CallbackType::StopDInputCallback, status);
+    DistributedAdapter->ProcessDInputCallback(CallbackType::StopDInputCallback, status);
 }
 
 void DistributedInputAdapter::StartDInputCallbackDHIds::OnResultFds(const std::string &srcId,
     const std::string &sinkId, const int32_t &status)
 {
-    MMI_HILOGI("Fds result status:%{public}d", status);
-    std::lock_guard<std::mutex> guard(adapterLock_);
-    DistributedAdapter->RemoveTimer(CallbackType::StartDInputCallbackDHIds);
+    CALL_DEBUG_ENTER;
 }
 
 void DistributedInputAdapter::StartDInputCallbackDHIds::OnResultDhids(const std::string &devId, const int32_t &status)
 {
-    DistributedAdapter->ProcessCallbackFromDinput(CallbackType::StartDInputCallbackDHIds, status);
+    DistributedAdapter->ProcessDInputCallback(CallbackType::StartDInputCallbackDHIds, status);
 }
 
 void DistributedInputAdapter::StopDInputCallbackDHIds::OnResultFds(const std::string &srcId, const std::string &sinkId,
                                                                    const int32_t &status)
 {
-    MMI_HILOGI("Fds Result srcId:%{public}s, sinkId:%{public}s, status:%{public}d", srcId.c_str(), sinkId.c_str(),
-               status);
-    std::lock_guard<std::mutex> guard(adapterLock_);
-    DistributedAdapter->RemoveTimer(CallbackType::StopDInputCallbackDHIds);
+    CALL_DEBUG_ENTER;
 }
 
 void DistributedInputAdapter::StopDInputCallbackDHIds::OnResultDhids(const std::string &devId, const int32_t &status)
 {
-    DistributedAdapter->ProcessCallbackFromDinput(CallbackType::StopDInputCallbackDHIds, status);
+    DistributedAdapter->ProcessDInputCallback(CallbackType::StopDInputCallbackDHIds, status);
 }
 
 void DistributedInputAdapter::StartDInputCallbackFds::OnResultFds(const std::string &srcId, const std::string &sinkId,
                                                                   const int32_t &status)
 {
-    MMI_HILOGI("On result for fds status:%{public}d", status);
-    std::lock_guard<std::mutex> guard(adapterLock_);
-    DistributedAdapter->RemoveTimer(CallbackType::StartDInputCallbackFds);
+    CALL_DEBUG_ENTER;
 }
 
 void DistributedInputAdapter::StartDInputCallbackFds::OnResultDhids(const std::string &devId, const int32_t &status)
 {
-    DistributedAdapter->ProcessCallbackFromDinput(CallbackType::StartDInputCallbackFds, status);
+    DistributedAdapter->ProcessDInputCallback(CallbackType::StartDInputCallbackFds, status);
 }
 
 void DistributedInputAdapter::StopDInputCallbackFds::OnResultFds(const std::string &srcId, const std::string &sinkId,
                                                                  const int32_t &status)
 {
-    MMI_HILOGI("Stop dinput callback for fds status:%{public}d", status);
-    std::lock_guard<std::mutex> guard(adapterLock_);
-    DistributedAdapter->RemoveTimer(CallbackType::StopDInputCallbackFds);
+    CALL_DEBUG_ENTER;
 }
 
 void DistributedInputAdapter::StopDInputCallbackFds::OnResultDhids(const std::string &devId, const int32_t &status)
 {
-    DistributedAdapter->ProcessCallbackFromDinput(CallbackType::StopDInputCallbackFds, status);
+    DistributedAdapter->ProcessDInputCallback(CallbackType::StopDInputCallbackFds, status);
 }
 
 void DistributedInputAdapter::PrepareStartDInputCallback::OnResult(const std::string &devId, const int32_t &status)
 {
-    DistributedAdapter->ProcessCallbackFromDinput(CallbackType::PrepareStartDInputCallback, status);
+    DistributedAdapter->ProcessDInputCallback(CallbackType::PrepareStartDInputCallback, status);
 }
 
 void DistributedInputAdapter::UnPrepareStopDInputCallback::OnResult(const std::string &devId, const int32_t &status)
 {
-    DistributedAdapter->ProcessCallbackFromDinput(CallbackType::UnPrepareStopDInputCallback, status);
+    DistributedAdapter->ProcessDInputCallback(CallbackType::UnPrepareStopDInputCallback, status);
 }
 
 void DistributedInputAdapter::PrepareStartDInputCallbackSink::OnResult(const std::string &devId, const int32_t &status)
 {
-    DistributedAdapter->ProcessCallbackFromDinput(CallbackType::PrepareStartDInputCallbackSink, status);
+    DistributedAdapter->ProcessDInputCallback(CallbackType::PrepareStartDInputCallbackSink, status);
 }
 
 void DistributedInputAdapter::UnPrepareStopDInputCallbackSink::OnResult(const std::string &devId, const int32_t &status)
 {
-    DistributedAdapter->ProcessCallbackFromDinput(CallbackType::UnPrepareStopDInputCallbackSink, status);
+    DistributedAdapter->ProcessDInputCallback(CallbackType::UnPrepareStopDInputCallbackSink, status);
 }
 
 int32_t DistributedInputAdapter::MouseStateChangeCallbackImpl::OnMouseDownEvent(uint32_t type, uint32_t code,
