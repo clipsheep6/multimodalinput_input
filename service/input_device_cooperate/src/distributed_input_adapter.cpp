@@ -32,12 +32,17 @@ constexpr int32_t RETRY_TIME = 2;
 } // namespace
 DistributedInputAdapter::DistributedInputAdapter()
 {
-    Init();
+    mouseListener_ = new (std::nothrow) MouseStateChangeCallbackImpl();
+    CHKPV(mouseListener_);
+    DistributedInputKit::RegisterEventListener(mouseListener_);
 }
 
 DistributedInputAdapter::~DistributedInputAdapter()
 {
-    Release();
+    std::lock_guard<std::mutex> guard(adapterLock_);
+    DistributedInputKit::UnregisterEventListener(mouseListener_);
+    mouseListener_ = nullptr;
+    callbackMap_.clear();
 }
 
 bool DistributedInputAdapter::IsNeedFilterOut(const std::string &deviceId, const BusinessEvent &event)
@@ -135,39 +140,28 @@ int32_t DistributedInputAdapter::UnPrepareRemoteInput(const std::string &deviceI
 
 int32_t DistributedInputAdapter::RegisterEventCallback(MouseStateChangeCallback callback)
 {
+    std::lock_guard<std::mutex> guard(adapterLock_);
     CHKPR(callback, RET_ERR);
     mouseStateChangeCallback_ = callback;
     return RET_OK;
 }
 int32_t DistributedInputAdapter::UnregisterEventCallback(MouseStateChangeCallback callback)
 {
+    std::lock_guard<std::mutex> guard(adapterLock_);
     CHKPR(callback, RET_ERR);
     mouseStateChangeCallback_ = nullptr;
     return RET_OK;
 }
 
-void DistributedInputAdapter::Init()
+void DistributedInputAdapter::SaveCallback(CallbackType type, DInputCallback callback)
 {
-    mouseListener_ = new (std::nothrow) MouseStateChangeCallbackImpl();
-    CHKPV(mouseListener_);
-    DistributedInputKit::RegisterEventListener(mouseListener_);
-}
-
-void DistributedInputAdapter::Release()
-{
-    DistributedInputKit::UnregisterEventListener(mouseListener_);
-    mouseListener_ = nullptr;
-    callbackMap_.clear();
-}
-
-int32_t DistributedInputAdapter::SaveCallback(CallbackType type, DInputCallback callback)
-{
+    std::lock_guard<std::mutex> guard(adapterLock_);
     CHKPR(callback, RET_ERR);
     callbackMap_[type] = callback;
-    return AddTimer(type);
+    AddTimer(type);
 }
 
-int32_t DistributedInputAdapter::AddTimer(const CallbackType &type)
+void DistributedInputAdapter::AddTimer(const CallbackType &type)
 {
     MMI_HILOGD("AddTimer type:%{public}d", type);
     int32_t timerId = TimerMgr->AddTimer(DEFAULT_DELAY_TIME, RETRY_TIME, [this, type]() {
@@ -185,11 +179,11 @@ int32_t DistributedInputAdapter::AddTimer(const CallbackType &type)
     });
     if (timerId < 0) {
         MMI_HILOGE("Add timer failed timeId:%{public}d", timerId);
-        return RET_ERR;
+        return;
     }
     watchingMap_[type].timerId = timerId;
     watchingMap_[type].times = 0;
-    return RET_OK;
+    return;
 }
 
 int32_t DistributedInputAdapter::RemoveTimer(const CallbackType &type)
@@ -207,6 +201,7 @@ int32_t DistributedInputAdapter::RemoveTimer(const CallbackType &type)
 void DistributedInputAdapter::StartDInputCallback::OnResult(const std::string &devId, const uint32_t &inputTypes,
                                                             const int32_t &status)
 {
+    std::lock_guard<std::mutex> guard(adapterLock_);
     DistributedAdapter->RemoveTimer(CallbackType::StartDInputCallback);
     if (DistributedAdapter->callbackMap_.find(CallbackType::StartDInputCallback) ==
         DistributedAdapter->callbackMap_.end()) {
@@ -220,6 +215,7 @@ void DistributedInputAdapter::StartDInputCallback::OnResult(const std::string &d
 void DistributedInputAdapter::StopDInputCallback::OnResult(const std::string &devId, const uint32_t &inputTypes,
                                                            const int32_t &status)
 {
+    std::lock_guard<std::mutex> guard(adapterLock_);
     DistributedAdapter->RemoveTimer(CallbackType::StopDInputCallback);
     if (DistributedAdapter->callbackMap_.find(CallbackType::StopDInputCallback) ==
         DistributedAdapter->callbackMap_.end()) {
@@ -235,12 +231,14 @@ void DistributedInputAdapter::StartDInputCallbackDHIds::OnResultFds(const std::s
 {
     MMI_HILOGI("Fds result srcId:%{public}s, sinkId:%{public}s, status:%{public}d", srcId.c_str(), sinkId.c_str(),
                status);
+    std::lock_guard<std::mutex> guard(adapterLock_);
     DistributedAdapter->RemoveTimer(CallbackType::StartDInputCallbackDHIds);
 }
 
 void DistributedInputAdapter::StartDInputCallbackDHIds::OnResultDhids(const std::string &devId, const int32_t &status)
 {
     MMI_HILOGI("Start distributed input callback results status : %{public}d", status);
+    std::lock_guard<std::mutex> guard(adapterLock_);
     DistributedAdapter->RemoveTimer(CallbackType::StartDInputCallbackDHIds);
     if (DistributedAdapter->callbackMap_.find(CallbackType::StartDInputCallbackDHIds) ==
         DistributedAdapter->callbackMap_.end()) {
@@ -256,12 +254,14 @@ void DistributedInputAdapter::StopDInputCallbackDHIds::OnResultFds(const std::st
 {
     MMI_HILOGI("Fds Result srcId:%{public}s, sinkId:%{public}s, status:%{public}d", srcId.c_str(), sinkId.c_str(),
                status);
+    std::lock_guard<std::mutex> guard(adapterLock_);
     DistributedAdapter->RemoveTimer(CallbackType::StopDInputCallbackDHIds);
 }
 
 void DistributedInputAdapter::StopDInputCallbackDHIds::OnResultDhids(const std::string &devId, const int32_t &status)
 {
     MMI_HILOGI("Stop Distributed Input Callback for DHIds status : %{public}d", status);
+    std::lock_guard<std::mutex> guard(adapterLock_);
     DistributedAdapter->RemoveTimer(CallbackType::StopDInputCallbackDHIds);
     if (DistributedAdapter->callbackMap_.find(CallbackType::StopDInputCallbackDHIds) ==
         DistributedAdapter->callbackMap_.end()) {
@@ -277,12 +277,14 @@ void DistributedInputAdapter::StartDInputCallbackFds::OnResultFds(const std::str
 {
     MMI_HILOGI("On result for fds srcId:%{public}s, sinkId:%{public}s, status:%{public}d", srcId.c_str(),
                sinkId.c_str(), status);
+    std::lock_guard<std::mutex> guard(adapterLock_);
     DistributedAdapter->RemoveTimer(CallbackType::StartDInputCallbackFds);
 }
 
 void DistributedInputAdapter::StartDInputCallbackFds::OnResultDhids(const std::string &devId, const int32_t &status)
 {
     MMI_HILOGI("Start Distributed InputCallback for Dhids status : %{public}d", status);
+    std::lock_guard<std::mutex> guard(adapterLock_);
     DistributedAdapter->RemoveTimer(CallbackType::StartDInputCallbackFds);
     if (DistributedAdapter->callbackMap_.find(CallbackType::StartDInputCallbackFds) ==
         DistributedAdapter->callbackMap_.end()) {
@@ -298,11 +300,13 @@ void DistributedInputAdapter::StopDInputCallbackFds::OnResultFds(const std::stri
 {
     MMI_HILOGI("Stop dinput callback for fds srcId:%{public}s, sinkId:%{public}s, status:%{public}d", srcId.c_str(),
                sinkId.c_str(), status);
+    std::lock_guard<std::mutex> guard(adapterLock_);
     DistributedAdapter->RemoveTimer(CallbackType::StopDInputCallbackFds);
 }
 
 void DistributedInputAdapter::StopDInputCallbackFds::OnResultDhids(const std::string &devId, const int32_t &status)
 {
+    std::lock_guard<std::mutex> guard(adapterLock_);
     DistributedAdapter->RemoveTimer(CallbackType::StopDInputCallbackFds);
     if (DistributedAdapter->callbackMap_.find(CallbackType::StopDInputCallbackFds) ==
         DistributedAdapter->callbackMap_.end()) {
@@ -315,6 +319,7 @@ void DistributedInputAdapter::StopDInputCallbackFds::OnResultDhids(const std::st
 
 void DistributedInputAdapter::PrepareStartDInputCallback::OnResult(const std::string &devId, const int32_t &status)
 {
+    std::lock_guard<std::mutex> guard(adapterLock_);
     DistributedAdapter->RemoveTimer(CallbackType::PrepareStartDInputCallback);
     if (DistributedAdapter->callbackMap_.find(CallbackType::PrepareStartDInputCallback) ==
         DistributedAdapter->callbackMap_.end()) {
@@ -327,6 +332,7 @@ void DistributedInputAdapter::PrepareStartDInputCallback::OnResult(const std::st
 
 void DistributedInputAdapter::UnPrepareStopDInputCallback::OnResult(const std::string &devId, const int32_t &status)
 {
+    std::lock_guard<std::mutex> guard(adapterLock_);
     DistributedAdapter->RemoveTimer(CallbackType::UnPrepareStopDInputCallback);
     if (DistributedAdapter->callbackMap_.find(CallbackType::UnPrepareStopDInputCallback) ==
         DistributedAdapter->callbackMap_.end()) {
@@ -339,6 +345,7 @@ void DistributedInputAdapter::UnPrepareStopDInputCallback::OnResult(const std::s
 
 void DistributedInputAdapter::PrepareStartDInputCallbackSink::OnResult(const std::string &devId, const int32_t &status)
 {
+    std::lock_guard<std::mutex> guard(adapterLock_);
     DistributedAdapter->RemoveTimer(CallbackType::PrepareStartDInputCallbackSink);
     if (DistributedAdapter->callbackMap_.find(CallbackType::PrepareStartDInputCallbackSink) ==
         DistributedAdapter->callbackMap_.end()) {
@@ -351,6 +358,7 @@ void DistributedInputAdapter::PrepareStartDInputCallbackSink::OnResult(const std
 
 void DistributedInputAdapter::UnPrepareStopDInputCallbackSink::OnResult(const std::string &devId, const int32_t &status)
 {
+    std::lock_guard<std::mutex> guard(adapterLock_);
     DistributedAdapter->RemoveTimer(CallbackType::UnPrepareStopDInputCallbackSink);
     if (DistributedAdapter->callbackMap_.find(CallbackType::UnPrepareStopDInputCallbackSink) ==
         DistributedAdapter->callbackMap_.end()) {
@@ -364,6 +372,7 @@ void DistributedInputAdapter::UnPrepareStopDInputCallbackSink::OnResult(const st
 int32_t DistributedInputAdapter::MouseStateChangeCallbackImpl::OnMouseDownEvent(uint32_t type, uint32_t code,
                                                                                 int32_t value)
 {
+    std::lock_guard<std::mutex> guard(adapterLock_);
     CHKPR(DistributedAdapter->mouseStateChangeCallback_, RET_ERR);
     DistributedAdapter->mouseStateChangeCallback_(type, code, value);
     return RET_OK;
