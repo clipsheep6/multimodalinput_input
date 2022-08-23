@@ -36,15 +36,10 @@ const std::string SERVICE_TYPE = "InputDeviceCooperation";
 const std::string CHARACTERISTICS_NAME = "CurrentState";
 } // namespace
 
-DeviceProfileAdapter::DeviceProfileAdapter()
-    :profileEventCallback_(std::make_shared<DeviceProfileAdapter::ProfileEventCallbackImpl>()) {}
-
 DeviceProfileAdapter::~DeviceProfileAdapter()
 {
-    DistributedDeviceProfileClient::GetInstance().UnsubscribeProfileEvent(ProfileEvent::EVENT_PROFILE_CHANGED,
-                                                                          profileEventCallback_);
     std::lock_guard<std::mutex> guard(adapterLock);
-    profileEventCallback_ = nullptr;
+    profileEventCallbacks_.clear();
     callbacks_.clear();
 }
 
@@ -65,8 +60,9 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::v
     SyncOptions syncOptions;
     std::for_each(deviceIds.begin(), deviceIds.end(),
                   [&syncOptions](auto &deviceId) { syncOptions.AddDevice(deviceId); });
+    auto sycnCallback = std::make_shared<DeviceProfileAdapter::ProfileEventCallbackImpl>();
     ret =
-        DistributedDeviceProfileClient::GetInstance().SyncDeviceProfile(syncOptions, profileEventCallback_);
+        DistributedDeviceProfileClient::GetInstance().SyncDeviceProfile(syncOptions, sycnCallback);
     if (ret != 0) {
         MMI_HILOGE("Sync device profile failed");
     }
@@ -134,6 +130,7 @@ int32_t DeviceProfileAdapter::UnregisterCrossingStateListener(const std::string 
         std::list<ProfileEvent> failedEvents;
         DistributedDeviceProfileClient::GetInstance().UnsubscribeProfileEvents(profileEvents,
             it.second, failedEvents);
+        profileEventCallbacks_.erase(it);
     }
     auto callbackIter = callbacks_.find(deviceId);
     if (callbackIter == callbacks_.end()) {
