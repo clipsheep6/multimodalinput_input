@@ -43,8 +43,8 @@ group("test") {
       "setwindowinputeventconsumer_fuzzer:fuzztest",
       "startinputdevicecooperate_fuzzer:fuzztest",
       "stopdevicecooperate_fuzzer:fuzztest",
-      "unregistercooperatelistener_fuzzer:fuzztest",
       "unregisterdevListener_fuzzer:fuzztest",
+      "setinputdevicetoscreen_fuzzer:fuzztest",
     ]
   }
 }
