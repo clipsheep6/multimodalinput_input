@@ -110,8 +110,6 @@ public:
     void OnAnr(int32_t pid);
 
     int32_t SetPointerLocation(int32_t x, int32_t y);
-    using DeviceUniqId = std::tuple<int32_t, int32_t, int32_t, int32_t, int32_t, std::string>;
-    int32_t SetInputDeviceSeatName(const std::string& seatName, DeviceUniqId& deviceUniqId);
 
     int32_t GetRemoteInputAbility(std::string deviceId, std::function<void(std::set<int32_t>)> remoteTypes);
     int32_t PrepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
