@@ -40,11 +40,12 @@ group("test") {
       "removeinterceptor_fuzzer:fuzztest",
       "setanrobserver_fuzzer:fuzztest",
       "setinputdevicetoscreen_fuzzer:fuzztest",
+      "setinputdevicetoscreen_fuzzer:fuzztest",
       "setwindowinputeventconsumer_fuzzer:fuzztest",
       "startinputdevicecooperate_fuzzer:fuzztest",
       "stopdevicecooperate_fuzzer:fuzztest",
       "unregisterdevListener_fuzzer:fuzztest",
-      "setinputdevicetoscreen_fuzzer:fuzztest",
     ]
   }
 }
+
