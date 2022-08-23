@@ -27,7 +27,6 @@
 #include "display_info.h"
 #include "error_multimodal.h"
 #include "i_input_device_listener.h"
-#include "i_input_device_cooperate_listener.h"
 #include "i_input_event_consumer.h"
 #include "input_device.h"
 #include "key_option.h"
