@@ -29,11 +29,12 @@ void StartInputDeviceCooperateFuzzTest(const uint8_t* data, size_t  size)
     if (data == nullptr) {
         return;
     }
-    MMI_HILOGD("StartInputDeviceCooperateFuzzTest");
-
     const std::string sinkDeviceId(reinterpret_cast<const char*>(data), size);
     const int32_t srcInputDeviceId = *(reinterpret_cast<const int32_t*>(data));
-    InputManager::GetInstance()->StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId);
+    auto fun = [](std::string listener, CooperateMessages cooperateMessages) {
+        MMI_HILOGD("StartInputDeviceCooperateFuzzTest");
+    };
+    InputManager::GetInstance()->StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId,fun);
 }
 } // MMI
 } // OHOS

@@ -29,8 +29,10 @@ void StopDeviceCooperateFuzzTest(const uint8_t* data, size_t  size)
     if (data == nullptr) {
         return;
     }
-    MMI_HILOGD("StopDeviceCooperateFuzzTest");
-    InputManager::GetInstance()->StopDeviceCooperate();
+    auto fun = [](std::string listener, CooperateMessages cooperateMessages) {
+        MMI_HILOGD("StopDeviceCooperateFuzzTest");
+    };
+    InputManager::GetInstance()->StopDeviceCooperate(fun);
 }
 } // MMI
 } // OHOS

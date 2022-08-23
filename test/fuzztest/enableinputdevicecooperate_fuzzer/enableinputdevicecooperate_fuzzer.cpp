@@ -24,7 +24,7 @@ namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EnableInputDeviceCooperateFuzzTest" };
 } // namespace
 
-template<class T>
+/*template<class T>
 size_t GetObject(const uint8_t* data, size_t size, T& object)
 {
     size_t objectSize = sizeof(object);
@@ -36,16 +36,19 @@ size_t GetObject(const uint8_t* data, size_t size, T& object)
         return 0;
     }
         return objectSize;
-}
+}*/
 
 void EnableInputDeviceCooperateFuzzTest(const uint8_t* data, size_t size)
 {
     int32_t random = 0;
-    size_t startPos = 0;
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, random);
+    //size_t startPos = 0;
+    //startPos += GetObject<int32_t>(data + startPos, size - startPos, random);
     bool enabled = (random % 2) ? false : true;
-    if (InputManager::GetInstance()->EnableInputDeviceCooperate(enabled) == RET_ERR) {
-        MMI_HILOGD("Set pointer enabled failed");
+    auto fun = [](std::string listener, CooperateMessages cooperateMessages) {
+                MMI_HILOGD("EnableInputDeviceCooperateFuzzTest");
+    };
+    if (InputManager::GetInstance()->EnableInputDeviceCooperate(enabled,fun)) {
+
     }
 }
 } // namespace MMI

@@ -27,9 +27,11 @@
 #include "display_info.h"
 #include "error_multimodal.h"
 #include "i_input_device_listener.h"
+#include "i_input_device_cooperate_listener.h"
 #include "i_input_event_consumer.h"
 #include "input_device.h"
 #include "key_option.h"
+#include "cooperate_messages.h"
 
 namespace OHOS {
 namespace MMI {
@@ -369,6 +371,15 @@ public:
      */
     using DeviceUniqId = std::tuple<int32_t, int32_t, int32_t, int32_t, int32_t, std::string>;
     int32_t SetInputDeviceSeatName(const std::string& seatName, DeviceUniqId& deviceUniqId);
+
+    int32_t SetInputDeviceToScreen(const std::string& dhid, const std::string& screenId);
+    int32_t RegisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener);
+    int32_t UnregisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener = nullptr);
+    int32_t EnableInputDeviceCooperate(bool enabled, std::function<void(std::string, CooperateMessages)> callback);
+    int32_t StartInputDeviceCooperate(const std::string &sinkDeviceId, int32_t srcInputDeviceId,
+        std::function<void(std::string, CooperateMessages)> callback);
+    int32_t StopDeviceCooperate(std::function<void(std::string, CooperateMessages)> callback);
+    int32_t GetInputDeviceCooperateState(const std::string &deviceId, std::function<void(bool)> callback);
 
 private:
     InputManager() = default;

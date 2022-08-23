@@ -30,9 +30,9 @@ void SetInputDeviceToScreenFuzzTest(const uint8_t* data, size_t  size)
         return;
     }
     MMI_HILOGD("SetInputDeviceToScreenFuzzTest");
-    const int32_t deviceFd = *(reinterpret_cast<const int32_t*>(data));
+    const std::string dhid(reinterpret_cast<const char*>(data), size);
     const std::string screenId(reinterpret_cast<const char*>(data), size);
-    InputManager::GetInstance()->SetInputDeviceToScreen(deviceFd, screenId);
+    InputManager::GetInstance()->SetInputDeviceToScreen(dhid, screenId);
 }
 } // MMI
 } // OHOS

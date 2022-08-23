@@ -21,34 +21,26 @@
 #include "mmi_log.h"
 
 namespace OHOS {
-    namespace MMI {
-        namespace {
-            constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN,
-                                                            "RegisterCooperateListenerFuzzTest" };
-        } // namespace
+namespace MMI {
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN,
+                                                    "RegisterCooperateListenerFuzzTest" };
+} // namespace
 
-        template<class T>
-        size_t GetObject(const uint8_t* data, size_t size, T& object)
-        {
-            size_t objectSize = sizeof(object);
-            if (objectSize > size) {
-                return 0;
-            }
-            errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-            if (ret != EOK) {
-                return 0;
-            }
-            return objectSize;
-        }
+class InputDeviceCooperateListenerTest: public IInputDeviceCooperateListener {
+public:
+    virtual void OnCooperateMessage(const std::string &deviceId, CooperateMessages &msg)  override {
+        MMI_HILOGD("RegisterCooperateListenerFuzzTest");
+    };
+};
 
-        void RegisterCooperateListenerFuzzTest(const uint8_t* data, size_t size)
-        {
-            auto fun = [](std::string listener, CooperateMessages cooperateMessages) {
-                MMI_HILOGD("RegisterCooperateListenerFuzzTest");
-            };
-            InputManager::GetInstance()->RegisterCooperateListener(fun);
-        }
-    } // namespace MMI
+void RegisterCooperateListenerFuzzTest(const uint8_t* data, size_t size)
+{
+    std::shared_ptr<InputDeviceCooperateListenerTest> consumer = std::make_shared<InputDeviceCooperateListenerTest>();
+    InputManager::GetInstance()->RegisterCooperateListener(consumer);
+    InputManager::GetInstance()->UnregisterCooperateListener(consumer);
+}
+} // namespace MMI
 } // namespace OHOS
 
 /* Fuzzer entry point */
