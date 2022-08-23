@@ -15,6 +15,7 @@
 
 #include "input_event_normalize_handler.h"
 
+#include "dfx_hisysevent.h"
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
@@ -38,6 +39,7 @@ void InputEventNormalizeHandler::HandleEvent(libinput_event* event)
 {
     CALL_DEBUG_ENTER;
     CHKPV(event);
+    DfxHisysevent::GetDispStartTime();
     auto type = libinput_event_get_type(event);
     TimeCostChk chk("HandleLibinputEvent", "overtime 1000(us)", MAX_INPUT_EVENT_TIME, type);
     if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
@@ -55,6 +57,7 @@ void InputEventNormalizeHandler::HandleEvent(libinput_event* event)
         }
         case LIBINPUT_EVENT_KEYBOARD_KEY: {
             HandleKeyboardEvent(event);
+            DfxHisysevent::CalcKeyDispTimes();
             break;
         }
         case LIBINPUT_EVENT_POINTER_MOTION:
@@ -62,12 +65,14 @@ void InputEventNormalizeHandler::HandleEvent(libinput_event* event)
         case LIBINPUT_EVENT_POINTER_BUTTON:
         case LIBINPUT_EVENT_POINTER_AXIS: {
             HandleMouseEvent(event);
+            DfxHisysevent::CalcPointerDispTimes();
             break;
         }
         case LIBINPUT_EVENT_TOUCHPAD_DOWN:
         case LIBINPUT_EVENT_TOUCHPAD_UP:
         case LIBINPUT_EVENT_TOUCHPAD_MOTION: {
             HandleTouchPadEvent(event);
+            DfxHisysevent::CalcPointerDispTimes();
             break;
         }
         case LIBINPUT_EVENT_GESTURE_SWIPE_BEGIN:
@@ -77,12 +82,14 @@ void InputEventNormalizeHandler::HandleEvent(libinput_event* event)
         case LIBINPUT_EVENT_GESTURE_PINCH_UPDATE:
         case LIBINPUT_EVENT_GESTURE_PINCH_END: {
             HandleGestureEvent(event);
+            DfxHisysevent::CalcPointerDispTimes();
             break;
         }
         case LIBINPUT_EVENT_TOUCH_DOWN:
         case LIBINPUT_EVENT_TOUCH_UP:
         case LIBINPUT_EVENT_TOUCH_MOTION: {
             HandleTouchEvent(event);
+            DfxHisysevent::CalcPointerDispTimes();
             break;
         }
         case LIBINPUT_EVENT_TABLET_TOOL_AXIS:
@@ -96,6 +103,7 @@ void InputEventNormalizeHandler::HandleEvent(libinput_event* event)
             break;
         }
     }
+    DfxHisysevent::ReportDispTimes();
 }
 
 int32_t InputEventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
@@ -196,7 +204,7 @@ int32_t InputEventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
         lastPressedKey = pressedKeys.back();
         MMI_HILOGD("The last repeat button, keyCode:%{public}d", lastPressedKey);
     }
-    auto packageResult = keyEventHandler_.PackageKeyEvent(event, keyEvent_);
+    auto packageResult = keyEventHandler_.Normalize(event, keyEvent_);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
         MMI_HILOGD("The same event reported by multi_device should be discarded");
         return RET_OK;
@@ -212,7 +220,7 @@ int32_t InputEventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     KeyRepeat->SelectAutoRepeat(keyEvent_);
     MMI_HILOGD("keyCode:%{public}d, action:%{public}d", keyEvent_->GetKeyCode(), keyEvent_->GetKeyAction());
 #else
-        MMI_HILOGW("Keyboard device does not support");
+    MMI_HILOGW("Keyboard device does not support");
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
 }
@@ -239,7 +247,7 @@ int32_t InputEventNormalizeHandler::HandleMouseEvent(libinput_event* event)
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandlePointerEvent(pointerEvent);
 #else
-        MMI_HILOGW("Pointer device does not support");
+    MMI_HILOGW("Pointer device does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
 }
@@ -321,7 +329,7 @@ int32_t InputEventNormalizeHandler::HandleTouchEvent(libinput_event* event)
         ResetTouchUpEvent(pointerEvent, event);
         return RET_OK;
     }
-#endif
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandleTouchEvent(pointerEvent);
     ResetTouchUpEvent(pointerEvent, event);
@@ -331,7 +339,8 @@ int32_t InputEventNormalizeHandler::HandleTouchEvent(libinput_event* event)
     return RET_OK;
 }
 
-void InputEventNormalizeHandler::ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent, libinput_event *event)
+void InputEventNormalizeHandler::ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent,
+    struct libinput_event *event)
 {
     CHKPV(pointerEvent);
     CHKPV(event);

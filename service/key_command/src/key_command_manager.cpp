@@ -15,7 +15,7 @@
 
 #include "key_command_manager.h"
 
-
+#include "dfx_hisysevent.h"
 #include "ability_manager_client.h"
 #include "cJSON.h"
 #include "config_policy_utils.h"
@@ -23,7 +23,6 @@
 #include "bytrace_adapter.h"
 #include "error_multimodal.h"
 #include "mmi_log.h"
-#include "string_wrapper.h"
 #include "timer_manager.h"
 
 namespace OHOS {
@@ -388,6 +387,7 @@ bool KeyCommandManager::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
         MMI_HILOGE("The same key is waiting timeout, skip");
         return true;
     }
+    DfxHisysevent::GetComboStartTime();
     if (lastMatchedKey_.timerId >= 0) {
         MMI_HILOGE("Remove timer:%{public}d", lastMatchedKey_.timerId);
         TimerMgr->RemoveTimer(lastMatchedKey_.timerId);
@@ -512,11 +512,11 @@ void KeyCommandManager::LaunchAbility(ShortcutKey key)
     for (const auto &entity : key.ability.entities) {
         want.AddEntity(entity);
     }
-    AAFwk::WantParams wParams;
     for (const auto &item : key.ability.params) {
-        wParams.SetParam(item.first, AAFwk::String::Box(item.second));
+        want.SetParam(item.first, item.second);
     }
-    want.SetParams(wParams);
+    DfxHisysevent::CalcComboStartTimes(lastMatchedKey_.keyDownDuration);
+    DfxHisysevent::ReportComboStartTimes();
     MMI_HILOGD("Start launch ability, bundleName:%{public}s", key.ability.bundleName.c_str());
     ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
     if (err != ERR_OK) {
