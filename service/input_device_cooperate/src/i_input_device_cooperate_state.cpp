@@ -67,14 +67,14 @@ int32_t IInputDeviceCooperateState::PrepareAndStart(const std::string &srcNetwor
             });
         if (ret != RET_OK) {
             MMI_HILOGE("Prepare remoteNetworkId input fail");
-            InputDevCooSM->StartFinish(false, sinkNetworkId, startInputDeviceId);
+            InputDevCooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
             InputDevCooSM->UpdatePreparedDevices("", "");
         }
     } else {
         ret = StartDistributedInput(startInputDeviceId);
         if (ret != RET_OK) {
             MMI_HILOGE("Start remoteNetworkId input fail");
-            InputDevCooSM->StartFinish(false, sinkNetworkId, startInputDeviceId);
+            InputDevCooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
         }
     }
     return ret;
@@ -86,8 +86,7 @@ void IInputDeviceCooperateState::OnPrepareDistributedInput(
     MMI_HILOGI("isSuccess: %{public}s", isSuccess ? "true" : "false");
     if (!isSuccess) {
         InputDevCooSM->UpdatePreparedDevices("", "");
-        InputDevCooSM->StartFinish(false, srcNetworkId, startInputDeviceId);
-        return;
+        InputDevCooSM->OnStartFinish(false, srcNetworkId, startInputDeviceId);
     } else {
         std::string taskName = "start_dinput_task";
         std::function<void()> handleStartDinputFunc =
@@ -103,7 +102,7 @@ int32_t IInputDeviceCooperateState::StartDistributedInput(int32_t startInputDevi
     std::pair<std::string, std::string> networkIds = InputDevCooSM->GetPreparedDevices();
     std::vector<std::string> dhids = InputDevMgr->GetPointerKeyboardDhids(startInputDeviceId);
     if (dhids.empty()) {
-        InputDevCooSM->StartFinish(false, networkIds.first, startInputDeviceId);
+        InputDevCooSM->OnStartFinish(false, networkIds.first, startInputDeviceId);
         return RET_OK;
     }
     return DistributedAdapter->StartRemoteInput(

@@ -30,7 +30,17 @@ int32_t InputDeviceCooperateStateFree::StartInputDeviceCooperate(
     const std::string &remoteNetworkId, int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = IInputDeviceCooperateState::StartInputDeviceCooperate(remoteNetworkId, startInputDeviceId);
+    if (remoteNetworkId.empty()) {
+        MMI_HILOGE("RemoteNetworkId is empty");
+        return RET_ERR;
+    }
+    std::string localNetworkId;
+    InputDevMgr->GetLocalDeviceId(localNetworkId);
+    if (localNetworkId.empty() || remoteNetworkId == localNetworkId) {
+        MMI_HILOGE("Input Parameters error");
+        return RET_ERR;
+    }
+    int32_t ret = RemoteMgr->StartRemoteCooperate(localNetworkId, remoteNetworkId);
     if (ret != RET_OK) {
         MMI_HILOGE("Start input device cooperate fail");
         return ret;

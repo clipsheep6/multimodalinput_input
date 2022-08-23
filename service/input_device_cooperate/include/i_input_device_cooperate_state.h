@@ -31,7 +31,10 @@ class IInputDeviceCooperateState {
 public:
     IInputDeviceCooperateState();
     virtual ~IInputDeviceCooperateState() = default;
-    virtual int32_t StartInputDeviceCooperate(const std::string &remoteNetworkId, int32_t startInputDeviceId);
+    virtual int32_t StartInputDeviceCooperate(const std::string &remoteNetworkId, int32_t startInputDeviceId)
+    {
+        return RET_ERR;
+    }
     virtual int32_t StopInputDeviceCooperate()
     {
         return RET_ERR;

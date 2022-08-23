@@ -35,8 +35,19 @@ int32_t InputDeviceCooperateStateIn::StartInputDeviceCooperate(const std::string
     int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = IInputDeviceCooperateState::StartInputDeviceCooperate(remoteNetworkId, startInputDeviceId);
+    if (remoteNetworkId.empty()) {
+        MMI_HILOGE("RemoteNetworkId is empty");
+        return RET_ERR;
+    }
+    std::string localNetworkId;
+    InputDevMgr->GetLocalDeviceId(localNetworkId);
+    if (localNetworkId.empty() || remoteNetworkId == localNetworkId) {
+        MMI_HILOGE("Input Parameters error");
+        return RET_ERR;
+    }
+    int32_t ret = RemoteMgr->StartRemoteCooperate(localNetworkId, remoteNetworkId);
     if (ret != RET_OK) {
+        MMI_HILOGE("Start input device cooperate fail");
         return ret;
     }
     std::string taskName = "process_start_task";
@@ -83,7 +94,7 @@ int32_t InputDeviceCooperateStateIn::ProcessStop()
     int32_t ret = DistributedAdapter->StopRemoteInput(
         sink, dhids, [this, sink](bool isSuccess) { this->OnStopDistributedInput(isSuccess, sink, -1); });
     if (ret != RET_OK) {
-        InputDevCooSM->StopFinish(false, sink);
+        InputDevCooSM->OnStopFinish(false, sink);
     }
     return RET_OK;
 }
@@ -114,7 +125,7 @@ void InputDeviceCooperateStateIn::StopRemoteInput(const std::string &sinkNetwork
             this->OnStopDistributedInput(isSuccess, srcNetworkId, startInputDeviceId);
     });
     if (ret != RET_OK) {
-        InputDevCooSM->StartFinish(false, sinkNetworkId, startInputDeviceId);
+        InputDevCooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
     }
 }
 
@@ -146,7 +157,7 @@ void InputDeviceCooperateStateIn::ComeBack(const std::string &sinkNetworkId, int
             this->OnStopDistributedInput(isSuccess, sinkNetworkId, startInputDeviceId);
             });
     if (ret != RET_OK) {
-        InputDevCooSM->StartFinish(false, sinkNetworkId, startInputDeviceId);
+        InputDevCooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
     }
 }
 

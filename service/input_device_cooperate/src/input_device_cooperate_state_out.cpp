@@ -33,14 +33,6 @@ InputDeviceCooperateStateOut::InputDeviceCooperateStateOut(const std::string& st
 {
 }
 
-int32_t InputDeviceCooperateStateOut::StartInputDeviceCooperate(const std::string &remoteNetworkId,
-    int32_t sharedInputDevice)
-{
-    CALL_DEBUG_ENTER;
-    MMI_HILOGI("Current state is out, can not start");
-    return RET_ERR;
-}
-
 int32_t InputDeviceCooperateStateOut::StopInputDeviceCooperate()
 {
     CALL_DEBUG_ENTER;
@@ -51,6 +43,7 @@ int32_t InputDeviceCooperateStateOut::StopInputDeviceCooperate()
     }
     int32_t ret = IInputDeviceCooperateState::StopInputDeviceCooperate(srcNetworkId);
     if (ret != RET_OK) {
+        MMI_HILOGE("Stop input device cooperate fail");
         return ret;
     }
     std::string taskName = "process_stop_task";
@@ -62,7 +55,7 @@ int32_t InputDeviceCooperateStateOut::StopInputDeviceCooperate()
     return RET_OK;
 }
 
-int32_t InputDeviceCooperateStateOut::ProcessStop(const std::string& srcNetworkId)
+void InputDeviceCooperateStateOut::ProcessStop(const std::string& srcNetworkId)
 {
     CALL_DEBUG_ENTER;
     std::string sink = InputDevMgr->GetOriginNetworkId(startDhid_);
@@ -71,9 +64,8 @@ int32_t InputDeviceCooperateStateOut::ProcessStop(const std::string& srcNetworkI
         this->OnStopRemoteInput(isSuccess, srcNetworkId);
         });
     if (ret != RET_OK) {
-        InputDevCooSM->StopFinish(false, srcNetworkId);
+        InputDevCooSM->OnStopFinish(false, srcNetworkId);
     }
-    return RET_OK;
 }
 
 void InputDeviceCooperateStateOut::OnStopRemoteInput(bool isSuccess, const std::string &srcNetworkId)
