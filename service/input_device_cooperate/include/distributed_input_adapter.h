@@ -151,16 +151,15 @@ private:
     public:
         int32_t OnMouseDownEvent(uint32_t type, uint32_t code, int32_t value) override;
     };
-
-    void Init();
-    void Release();
-    int32_t SaveCallback(CallbackType type, DInputCallback callback);
-    int32_t AddTimer(const CallbackType &type);
+    
+    void SaveCallback(CallbackType type, DInputCallback callback);
+    void AddTimer(const CallbackType &type);
     int32_t RemoveTimer(const CallbackType &type);
     std::map<CallbackType, TimerInfo> watchingMap_;
     std::map<CallbackType, DInputCallback> callbackMap_;
     MouseStateChangeCallback mouseStateChangeCallback_ = { nullptr };
     sptr<DistributedHardware::DistributedInput::SimulationEventListener> mouseListener_ { nullptr };
+    std::mutex adapterLock_;
 };
 
 #define DistributedAdapter DistributedInputAdapter::GetInstance()
