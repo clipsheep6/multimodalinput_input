@@ -23,6 +23,7 @@
 #include "hitrace_meter.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
+#include "input_windows_manager.h"
 #include "input-event-codes.h"
 #include "proto.h"
 #include "util.h"
@@ -50,16 +51,24 @@ void EventDispatch::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
+void EventDispatch::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPV(pointerEvent);
+    HandlePointerEventInner(pointerEvent);
+}
+#endif // OHOS_BUILD_ENABLE_POINTER
+
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 void EventDispatch::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
-    HandlePointerEvent(pointerEvent);
+    HandlePointerEventInner(pointerEvent);
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-void EventDispatch::HandlePointerEvent(const std::shared_ptr<PointerEvent> point)
+void EventDispatch::HandlePointerEventInner(const std::shared_ptr<PointerEvent> point)
 {
     CALL_DEBUG_ENTER;
     CHKPV(point);
@@ -103,7 +112,7 @@ void EventDispatch::HandlePointerEvent(const std::shared_ptr<PointerEvent> point
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return;
     }
-    session->SaveANREvent(ANR_DISPATCH, point->GetId(), currentTime);
+    ANRMgr->AddTimer(ANR_DISPATCH, point->GetId(), currentTime, session);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_POINTER
 
@@ -141,7 +150,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
         MMI_HILOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
-    session->SaveANREvent(ANR_DISPATCH, key->GetId(), currentTime);
+    ANRMgr->AddTimer(ANR_DISPATCH, key->GetId(), currentTime, session);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
