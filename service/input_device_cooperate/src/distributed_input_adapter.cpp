@@ -290,7 +290,6 @@ void DistributedInputAdapter::UnPrepareStopDInputCallback::OnResult(const std::s
 void DistributedInputAdapter::PrepareStartDInputCallbackSink::OnResult(const std::string &devId, const int32_t &status)
 {
     DistributedAdapter->ProcessCallbackFromDinput(CallbackType::PrepareStartDInputCallbackSink, status);
-
 }
 
 void DistributedInputAdapter::UnPrepareStopDInputCallbackSink::OnResult(const std::string &devId, const int32_t &status)
