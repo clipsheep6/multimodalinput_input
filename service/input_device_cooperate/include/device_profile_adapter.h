@@ -37,7 +37,7 @@ class DeviceProfileAdapter : public DelayedSingleton<DeviceProfileAdapter> {
 public:
     using ProfileEventCallback = std::shared_ptr<DeviceProfile::IProfileEventCallback>;
     using DPCallback = std::function<void(const std::string &, bool)>;
-    DeviceProfileAdapter();
+    DeviceProfileAdapter() = default;
     ~DeviceProfileAdapter();
     DISALLOW_COPY_AND_MOVE(DeviceProfileAdapter);
 
@@ -52,7 +52,7 @@ private:
     void OnProfileChanged(const std::string &deviceId);
     std::map<std::string, DeviceProfileAdapter::ProfileEventCallback> profileEventCallbacks_;
     std::mutex adapterLock_;
-    std::map<std::string, DPCallback> callbacks_;
+    std::map<std::string, DeviceProfileAdapter::DPCallback> callbacks_;
 };
 
 #define DProfileAdapter DeviceProfileAdapter::GetInstance()
