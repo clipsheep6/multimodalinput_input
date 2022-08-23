@@ -800,23 +800,6 @@ int32_t InputManagerImpl::SetPointerLocation(int32_t x, int32_t y)
 #endif // OHOS_DISTRIBUTED_INPUT_MODEL
 }
 
-int32_t InputManagerImpl::SetInputDeviceSeatName(const std::string& seatName, DeviceUniqId& deviceUniqId)
-{
-    CALL_INFO_TRACE;
-#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
-    std::lock_guard<std::mutex> guard(mtx_);
-    int32_t ret = MultimodalInputConnectManager::GetInstance()->SetInputDeviceSeatName(seatName, deviceUniqId);
-    if (ret != RET_OK) {
-        MMI_HILOGE("SetInputDeviceSeatName has send to server fail, ret:%{public}d", ret);
-        return RET_ERR;
-    }
-    return RET_OK;
-#else
-    MMI_HILOGW("Set input device seat name dose not support");
-    return RET_OK;
-#endif // OHOS_DISTRIBUTED_INPUT_MODEL
-}
-
 int32_t InputManagerImpl::GetRemoteInputAbility(std::string deviceId,
     std::function<void(std::set<int32_t>)> remoteTypes)
 {
