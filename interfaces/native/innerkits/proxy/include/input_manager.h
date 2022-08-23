@@ -30,7 +30,6 @@
 #include "i_input_event_consumer.h"
 #include "input_device.h"
 #include "key_option.h"
-#include "cooperate_messages.h"
 
 namespace OHOS {
 namespace MMI {
