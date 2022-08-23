@@ -24,6 +24,7 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SetAnrObserverFuzzTest" };
 } // namespace
+
 class IAnrObserverTest : public IAnrObserver {
 public:
     IAnrObserverTest () : IAnrObserver() {}

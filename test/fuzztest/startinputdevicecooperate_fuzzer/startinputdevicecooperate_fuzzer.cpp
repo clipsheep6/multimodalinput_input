@@ -34,7 +34,7 @@ void StartInputDeviceCooperateFuzzTest(const uint8_t* data, size_t  size)
     auto fun = [](std::string listener, CooperateMessages cooperateMessages) {
         MMI_HILOGD("StartInputDeviceCooperateFuzzTest");
     };
-    InputManager::GetInstance()->StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId,fun);
+    InputManager::GetInstance()->StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId, fun);
 }
 } // MMI
 } // OHOS

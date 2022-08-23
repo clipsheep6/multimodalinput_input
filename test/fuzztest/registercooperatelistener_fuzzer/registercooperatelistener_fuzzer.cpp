@@ -23,13 +23,13 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN,
-                                                    "RegisterCooperateListenerFuzzTest" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "RegisterCooperateListenerFuzzTest" };
 } // namespace
 
 class InputDeviceCooperateListenerTest: public IInputDeviceCooperateListener {
 public:
-    virtual void OnCooperateMessage(const std::string &deviceId, CooperateMessages &msg)  override {
+    virtual void OnCooperateMessage(const std::string &deviceId, CooperateMessages &msg)  override
+    {
         MMI_HILOGD("RegisterCooperateListenerFuzzTest");
     };
 };

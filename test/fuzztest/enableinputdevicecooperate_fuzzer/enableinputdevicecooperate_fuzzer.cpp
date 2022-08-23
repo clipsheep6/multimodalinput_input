@@ -24,31 +24,14 @@ namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EnableInputDeviceCooperateFuzzTest" };
 } // namespace
 
-/*template<class T>
-size_t GetObject(const uint8_t* data, size_t size, T& object)
-{
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-        return objectSize;
-}*/
-
 void EnableInputDeviceCooperateFuzzTest(const uint8_t* data, size_t size)
 {
     int32_t random = 0;
-    //size_t startPos = 0;
-    //startPos += GetObject<int32_t>(data + startPos, size - startPos, random);
     bool enabled = (random % 2) ? false : true;
     auto fun = [](std::string listener, CooperateMessages cooperateMessages) {
-                MMI_HILOGD("EnableInputDeviceCooperateFuzzTest");
+        MMI_HILOGD("EnableInputDeviceCooperateFuzzTest");
     };
-    if (InputManager::GetInstance()->EnableInputDeviceCooperate(enabled,fun)) {
-
+    if (InputManager::GetInstance()->EnableInputDeviceCooperate(enabled, fun)) {
     }
 }
 } // namespace MMI
