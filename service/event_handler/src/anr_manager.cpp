@@ -44,7 +44,7 @@ void ANRManager::Init(UDSServer& udsServer)
 void ANRManager::MarkProcessed(int32_t eventType, int32_t eventId, SessionPtr sess)
 {
     CHKPV(sess);
-    MMI_HILOGE("lisong: MarkProcessed, type:%{public}d, eventId: %{public}d, recieveTime: %{public}ld", eventType, eventId, GetSysClockTime());
+    MMI_HILOGE("lisong: MarkProcessed, type:%{public}d, eventId: %{public}d, recieveTime: %{public}lld", eventType, eventId, GetSysClockTime());
     std::list<int32_t> timerIds = sess->DelEvents(eventType, eventId);
     for (int32_t item : timerIds) {
         if (item != -1) {
@@ -80,7 +80,7 @@ void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, Session
     int32_t timerId = TimerMgr->AddTimer(INPUT_UI_TIMEOUT_TIME, 1, [this, type, sess, id, currentTime]() {
         CHKPV(sess);
         sess->SetAnrStatus(type, true);
-        MMI_HILOGE("lisong: ANR, type:%{public}d, eventId: %{public}d, eventCreate: %{public}ld", type, id, currentTime);
+        MMI_HILOGE("lisong: ANR, type:%{public}d, eventId: %{public}d, eventCreate: %{public}lld", type, id, currentTime);
         DfxHisysevent::ApplicationBlockInput(sess);
         if (anrNoticedPid_ < 0) {
             MMI_HILOGE("anrNoticedPid_ is invalid");
