@@ -134,6 +134,7 @@ bool UDSSession::SendMsg(NetPacket& pkt) const
 void UDSSession::SaveANREvent(int32_t type, int32_t id, int64_t time, int32_t timerId)
 {
     CALL_DEBUG_ENTER;
+    MMI_HILOGE("lisong: SaveANREvent, type:%{public}d, eventId: %{public}d, eventCreate: %{public}ld, timerId:%{public}d", type, id, time, timerId);
     EventTime eventTime = { id, time, timerId };
     auto iter = events_.find(type);
     if (iter != events_.end()) {
