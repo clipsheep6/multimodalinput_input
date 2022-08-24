@@ -26,11 +26,9 @@ public:
     virtual int32_t StopInputDeviceCooperate() override;
     virtual void OnKeyboardOnline(const std::string &dhid) override;
 
-protected:
-    void OnStopRemoteInput(bool isSuccess, const std::string &srcNetworkId);
-    int32_t ProcessStop(const std::string &srcNetworkId);
-
 private:
+    void OnStopRemoteInput(bool isSuccess, const std::string &srcNetworkId);
+    void ProcessStop(const std::string &srcNetworkId);
     std::string startDhid_;
 };
 } // namespace MMI

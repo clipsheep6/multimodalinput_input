@@ -73,7 +73,7 @@ void InputDeviceCooperateStateOut::OnStopRemoteInput(bool isSuccess, const std::
     CALL_DEBUG_ENTER;
     std::string taskName = "stop_finish_task";
     std::function<void()> handleStopFinishFunc =
-        std::bind(&InputDeviceCooperateSM::StopFinish, InputDevCooSM, isSuccess, srcNetworkId);
+        std::bind(&InputDeviceCooperateSM::OnStopFinish, InputDevCooSM, isSuccess, srcNetworkId);
     CHKPV(eventHandler_);
     eventHandler_->PostTask(handleStopFinishFunc, taskName, 0,
         AppExecFwk::EventQueue::Priority::HIGH);

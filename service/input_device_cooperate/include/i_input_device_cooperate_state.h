@@ -48,8 +48,7 @@ protected:
     void OnPrepareDistributedInput(bool isSuccess, const std::string &srcNetworkId, int32_t startInputDeviceId);
     int32_t StartDistributedInput(int32_t startInputDeviceId);
     int32_t StopInputDeviceCooperate(const std::string &remoteNetworkId);
-    virtual void OnStartDistributedInput(bool isSuccess, const std::string &srcNetworkId, int32_t startInputDeviceId);
-    virtual void OnStopDistributedInput(bool isSuccess, const std::string &srcNetworkId, int32_t startInputDeviceId);
+    virtual void OnStartRemoteInput(bool isSuccess, const std::string &srcNetworkId, int32_t startInputDeviceId);
 
 protected:
     std::shared_ptr<AppExecFwk::EventRunner> runner_ { nullptr };

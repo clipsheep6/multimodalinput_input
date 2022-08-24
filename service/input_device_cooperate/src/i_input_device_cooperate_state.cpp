@@ -37,23 +37,6 @@ IInputDeviceCooperateState::IInputDeviceCooperateState()
     CHKPL(eventHandler_);
 }
 
-int32_t IInputDeviceCooperateState::StartInputDeviceCooperate(const std::string &remoteNetworkId,
-    int32_t startInputDeviceId)
-{
-    CALL_DEBUG_ENTER;
-    if (remoteNetworkId.empty()) {
-        MMI_HILOGE("Parameter error");
-        return RET_ERR;
-    }
-    std::string localNetworkId;
-    InputDevMgr->GetLocalDeviceId(localNetworkId);
-    if (remoteNetworkId.empty() || localNetworkId.empty() || remoteNetworkId == localNetworkId) {
-        MMI_HILOGE("Parameter error");
-        return RET_ERR;
-    }
-    return RemoteMgr->StartRemoteCooperate(localNetworkId, remoteNetworkId);
-}
-
 int32_t IInputDeviceCooperateState::PrepareAndStart(const std::string &srcNetworkId, int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
@@ -107,23 +90,20 @@ int32_t IInputDeviceCooperateState::StartDistributedInput(int32_t startInputDevi
     }
     return DistributedAdapter->StartRemoteInput(
         networkIds.first, networkIds.second, dhids, [this, src = networkIds.first, startInputDeviceId](bool isSuccess) {
-            this->OnStartDistributedInput(isSuccess, src, startInputDeviceId);
+            this->OnStartRemoteInput(isSuccess, src, startInputDeviceId);
         });
 }
 
-void IInputDeviceCooperateState::OnStartDistributedInput(
+void IInputDeviceCooperateState::OnStartRemoteInput(
     bool isSuccess, const std::string &srcNetworkId, int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
     std::string taskName = "start_finish_task";
     std::function<void()> handleStartFinishFunc =
-        std::bind(&InputDeviceCooperateSM::StartFinish, InputDevCooSM, isSuccess, srcNetworkId, startInputDeviceId);
+        std::bind(&InputDeviceCooperateSM::OnStartFinish, InputDevCooSM, isSuccess, srcNetworkId, startInputDeviceId);
     CHKPV(eventHandler_);
     eventHandler_->PostTask(handleStartFinishFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
 }
-
-void IInputDeviceCooperateState::OnStopDistributedInput(bool isSuccess,
-    const std::string &srcNetworkId, int32_t startInputDeviceId) {}
 
 bool IInputDeviceCooperateState::NeedPrepare(const std::string &srcNetworkId, const std::string &sinkNetworkId)
 {

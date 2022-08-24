@@ -26,7 +26,6 @@ public:
     virtual int32_t StartInputDeviceCooperate(const std::string &remoteNetworkId, int32_t startInputDeviceId) override;
 
 private:
-    void OnStartDistributedInput(bool isSuccess, const std::string &srcNetworkId, int32_t startInputDeviceId) override;
     int32_t ProcessStart(const std::string &remoteNetworkId, int32_t startInputDeviceId);
 };
 } // namespace MMI

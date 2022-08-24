@@ -66,7 +66,7 @@ int32_t InputDeviceCooperateStateIn::ProcessStart(const std::string &remoteNetwo
         ComeBack(remoteNetworkId, startInputDeviceId);
         return RET_OK;
     } else {
-        return RelayOrRelayComeBack(remoteNetworkId, startInputDeviceId);
+        return RelayComeBack(remoteNetworkId, startInputDeviceId);
     }
 }
 
@@ -92,19 +92,19 @@ int32_t InputDeviceCooperateStateIn::ProcessStop()
     std::vector<std::string> dhids = InputDevMgr->GetPointerKeyboardDhids(startDhid_);
     std::string sink = InputDevMgr->GetOriginNetworkId(startDhid_);
     int32_t ret = DistributedAdapter->StopRemoteInput(
-        sink, dhids, [this, sink](bool isSuccess) { this->OnStopDistributedInput(isSuccess, sink, -1); });
+        sink, dhids, [this, sink](bool isSuccess) { this->OnStopRemoteInput(isSuccess, sink, -1); });
     if (ret != RET_OK) {
         InputDevCooSM->OnStopFinish(false, sink);
     }
     return RET_OK;
 }
 
-void InputDeviceCooperateStateIn::OnStartDistributedInput(
+void InputDeviceCooperateStateIn::OnStartRemoteInput(
     bool isSuccess, const std::string &srcNetworkId, int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
     if (!isSuccess) {
-        IInputDeviceCooperateState::OnStartDistributedInput(isSuccess, srcNetworkId, startInputDeviceId);
+        IInputDeviceCooperateState::OnStartRemoteInput(isSuccess, srcNetworkId, startInputDeviceId);
         return;
     }
     std::string sinkNetworkId = InputDevMgr->GetOriginNetworkId(startInputDeviceId);
@@ -122,27 +122,27 @@ void InputDeviceCooperateStateIn::StopRemoteInput(const std::string &sinkNetwork
 {
     int32_t ret = DistributedAdapter->StopRemoteInput(sinkNetworkId, dhid,
         [this, srcNetworkId, startInputDeviceId](bool isSuccess) {
-            this->OnStopDistributedInput(isSuccess, srcNetworkId, startInputDeviceId);
+            this->OnStopRemoteInput(isSuccess, srcNetworkId, startInputDeviceId);
     });
     if (ret != RET_OK) {
         InputDevCooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
     }
 }
 
-void InputDeviceCooperateStateIn::OnStopDistributedInput(bool isSuccess,
+void InputDeviceCooperateStateIn::OnStopRemoteInput(bool isSuccess,
     const std::string &remoteNetworkId, int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
     if (InputDevCooSM->IsStarting()) {
         std::string taskName = "start_finish_task";
-        std::function<void()> handleStartFinishFunc = std::bind(&InputDeviceCooperateSM::StartFinish,
+        std::function<void()> handleStartFinishFunc = std::bind(&InputDeviceCooperateSM::OnStartFinish,
             InputDevCooSM, isSuccess, remoteNetworkId, startInputDeviceId);
         CHKPV(eventHandler_);
         eventHandler_->PostTask(handleStartFinishFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
     } else if (InputDevCooSM->IsStopping()) {
         std::string taskName = "stop_finish_task";
         std::function<void()> handleStopFinishFunc =
-            std::bind(&InputDeviceCooperateSM::StopFinish, InputDevCooSM, isSuccess, remoteNetworkId);
+            std::bind(&InputDeviceCooperateSM::OnStopFinish, InputDevCooSM, isSuccess, remoteNetworkId);
         CHKPV(eventHandler_);
         eventHandler_->PostTask(handleStopFinishFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
     }
@@ -154,14 +154,14 @@ void InputDeviceCooperateStateIn::ComeBack(const std::string &sinkNetworkId, int
     std::vector<std::string> dhids = InputDevMgr->GetPointerKeyboardDhids(startInputDeviceId);
     int32_t ret = DistributedAdapter->StopRemoteInput(sinkNetworkId, dhids,
         [this, sinkNetworkId, startInputDeviceId](bool isSuccess) {
-            this->OnStopDistributedInput(isSuccess, sinkNetworkId, startInputDeviceId);
+            this->OnStopRemoteInput(isSuccess, sinkNetworkId, startInputDeviceId);
             });
     if (ret != RET_OK) {
         InputDevCooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
     }
 }
 
-int32_t InputDeviceCooperateStateIn::RelayOrRelayComeBack(const std::string &srcNetworkId, int32_t startInputDeviceId)
+int32_t InputDeviceCooperateStateIn::RelayComeBack(const std::string &srcNetworkId, int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
     return PrepareAndStart(srcNetworkId, startInputDeviceId);

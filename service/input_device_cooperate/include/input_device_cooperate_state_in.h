@@ -28,11 +28,11 @@ public:
 
 private:
     void ComeBack(const std::string &sinkNetworkId, int32_t startInputDeviceId);
-    int32_t RelayOrRelayComeBack(const std::string &srcNetworkId, int32_t startInputDeviceId);
-    void OnStartDistributedInput(bool isSuccess, const std::string &srcNetworkId, int32_t startInputDeviceId) override;
+    int32_t RelayComeBack(const std::string &srcNetworkId, int32_t startInputDeviceId);
+    void OnStartRemoteInput(bool isSuccess, const std::string &srcNetworkId, int32_t startInputDeviceId) override;
     void StopRemoteInput(const std::string &sinkNetworkId, const std::string &srcNetworkId,
         const std::vector<std::string> &dhid, int32_t startInputDeviceId);
-    void OnStopDistributedInput(bool isSuccess, const std::string &srcNetworkId, int32_t startInputDeviceId) override;
+    void OnStopRemoteInput(bool isSuccess, const std::string &srcNetworkId, int32_t startInputDeviceId);
     int32_t ProcessStart(const std::string &remoteNetworkId, int32_t startInputDeviceId);
     int32_t ProcessStop();
     std::string startDhid_;

@@ -19,6 +19,7 @@
 #include "input_device_cooperate_sm.h"
 #include "input_device_manager.h"
 #include "mouse_event_handler.h"
+#include "multimodal_input_connect_remoter.h"
 
 namespace OHOS {
 namespace MMI {
@@ -57,13 +58,6 @@ int32_t InputDeviceCooperateStateFree::ProcessStart(const std::string &remoteNet
 {
     CALL_DEBUG_ENTER;
     return PrepareAndStart(remoteNetworkId, startInputDeviceId);
-}
-
-void InputDeviceCooperateStateFree::OnStartDistributedInput(
-    bool isSuccess, const std::string &srcNetworkId, int32_t startInputDeviceId)
-{
-    CALL_DEBUG_ENTER;
-    IInputDeviceCooperateState::OnStartDistributedInput(isSuccess, srcNetworkId, startInputDeviceId);
 }
 } // namespace MMI
 } // namespace OHOS
