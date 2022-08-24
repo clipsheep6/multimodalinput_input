@@ -154,7 +154,7 @@ private:
     
     void SaveCallback(CallbackType type, DInputCallback callback);
     void AddTimer(const CallbackType &type);
-    int32_t RemoveTimer(const CallbackType &type);
+    void RemoveTimer(const CallbackType &type);
     void ProcessDInputCallback(CallbackType type, int32_t status);
     std::map<CallbackType, TimerInfo> watchingMap_;
     std::map<CallbackType, DInputCallback> callbackMap_;
