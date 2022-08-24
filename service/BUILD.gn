@@ -446,8 +446,8 @@ ohos_shared_library("libmmi-server") {
   if (input_feature_input_cooperation) {
     sources += [
       "input_device_cooperate/src/cooperate_event_handler.cpp",
-      "input_device_cooperate/src/input_device_cooperate_sm.cpp",
       "input_device_cooperate/src/device_profile_adapter.cpp",
+      "input_device_cooperate/src/input_device_cooperate_sm.cpp",
     ]
   }
 
