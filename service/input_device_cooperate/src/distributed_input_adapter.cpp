@@ -183,19 +183,15 @@ void DistributedInputAdapter::AddTimer(const CallbackType &type)
     }
     watchingMap_[type].timerId = timerId;
     watchingMap_[type].times = 0;
-    return;
 }
 
-int32_t DistributedInputAdapter::RemoveTimer(const CallbackType &type)
+void DistributedInputAdapter::RemoveTimer(const CallbackType &type)
 {
     MMI_HILOGD("RemoveTimer type:%{public}d", type);
-    if ((callbackMap_.find(type) == callbackMap_.end()) || (watchingMap_.find(type) == watchingMap_.end())) {
-        MMI_HILOGE("Callback or watching do not exist");
-        return RET_ERR;
+    if (watchingMap_.find(type) != watchingMap_.end()) {
+        TimerMgr->RemoveTimer(watchingMap_[type].timerId);
+        watchingMap_.erase(type);
     }
-    TimerMgr->RemoveTimer(watchingMap_[type].timerId);
-    watchingMap_.erase(type);
-    return RET_OK;
 }
 
 void DistributedInputAdapter::ProcessDInputCallback(CallbackType type, int32_t status)
@@ -209,7 +205,7 @@ void DistributedInputAdapter::ProcessDInputCallback(CallbackType type, int32_t s
         return;
     }
     it->second(status == RET_OK);
-    callbackMap_.erase(CallbackType::type);
+    callbackMap_.erase(type);
 }
 
 void DistributedInputAdapter::StartDInputCallback::OnResult(const std::string &devId, const uint32_t &inputTypes,
