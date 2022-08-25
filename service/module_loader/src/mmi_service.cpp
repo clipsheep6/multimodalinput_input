@@ -1108,7 +1108,8 @@ int32_t MMIService::OnRegisterCooperateListener(int32_t pid)
     CALL_DEBUG_ENTER;
     auto sess = GetSession(GetClientFd(pid));
     CHKPR(sess, RET_ERR);
-    sptr<CooperateEventManager::EventInfo> event = new CooperateEventManager::EventInfo();
+    sptr<CooperateEventManager::EventInfo> event = new (std::nothrow) CooperateEventManager::EventInfo();
+    CHKPR(event, RET_ERR);
     event->type = CooperateEventManager::EventType::LISTENER;
     event->sess = sess;
     event->msgId = MmiMessageId::COOPERATION_ADD_LISTENER;
@@ -1120,7 +1121,8 @@ int32_t MMIService::OnUnregisterCooperateListener(int32_t pid)
 {
     CALL_DEBUG_ENTER;
     auto sess = GetSession(GetClientFd(pid));
-    sptr<CooperateEventManager::EventInfo> event = new CooperateEventManager::EventInfo();
+    sptr<CooperateEventManager::EventInfo> event = new (std::nothrow) CooperateEventManager::EventInfo();
+    CHKPR(event, RET_ERR);
     event->type = CooperateEventManager::EventType::LISTENER;
     event->sess = sess;
     CooperateEventMgr->RemoveCooperationListenerEvent(event);
@@ -1132,7 +1134,8 @@ int32_t MMIService::OnEnableInputDeviceCooperate(int32_t pid, int32_t userData, 
     CALL_DEBUG_ENTER;
     auto sess = GetSession(GetClientFd(pid));
     CHKPR(sess, RET_ERR);
-    sptr<CooperateEventManager::EventInfo> event = new CooperateEventManager::EventInfo();
+    sptr<CooperateEventManager::EventInfo> event = new (std::nothrow) CooperateEventManager::EventInfo();
+    CHKPR(event, RET_ERR);
     event->type = CooperateEventManager::EventType::ENABLE;
     event->sess = sess;
     event->msgId = MmiMessageId::COOPERATION_MESSAGE;
@@ -1161,7 +1164,8 @@ int32_t MMIService::OnStartInputDeviceCooperate(int32_t pid, int32_t userData, c
     CALL_DEBUG_ENTER;
     auto sess = GetSession(GetClientFd(pid));
     CHKPR(sess, RET_ERR);
-    sptr<CooperateEventManager::EventInfo> event = new CooperateEventManager::EventInfo();
+    sptr<CooperateEventManager::EventInfo> event = new (std::nothrow) CooperateEventManager::EventInfo();
+    CHKPR(event, RET_ERR);
     event->type = CooperateEventManager::EventType::START;
     event->sess = sess;
     event->msgId = MmiMessageId::COOPERATION_MESSAGE;
@@ -1181,7 +1185,8 @@ int32_t MMIService::OnStopDeviceCooperate(int32_t pid, int32_t userData)
     CALL_DEBUG_ENTER;
     auto sess = GetSession(GetClientFd(pid));
     CHKPR(sess, RET_ERR);
-    sptr<CooperateEventManager::EventInfo> event = new CooperateEventManager::EventInfo();
+    sptr<CooperateEventManager::EventInfo> event = new (std::nothrow) CooperateEventManager::EventInfo();
+    CHKPR(event, RET_ERR);
     event->type = CooperateEventManager::EventType::STOP;
     event->sess = sess;
     event->msgId = MmiMessageId::COOPERATION_MESSAGE;
@@ -1201,7 +1206,8 @@ int32_t MMIService::OnGetInputDeviceCooperateState(int32_t pid, int32_t userData
     CALL_DEBUG_ENTER;
     auto sess = GetSession(GetClientFd(pid));
     CHKPR(sess, RET_ERR);
-    sptr<CooperateEventManager::EventInfo> event = new CooperateEventManager::EventInfo();
+    sptr<CooperateEventManager::EventInfo> event = new (std::nothrow) CooperateEventManager::EventInfo();
+    CHKPR(event, RET_ERR);
     event->type = CooperateEventManager::EventType::STATE;
     event->sess = sess;
     event->msgId = MmiMessageId::COOPERATION_GET_STATE;
