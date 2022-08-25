@@ -42,7 +42,7 @@ void CooperateEventManager::RemoveCooperationListenerEvent(sptr<EventInfo> event
         MMI_HILOGE("Remove listener failed.");
         return;
     }
-    for (auto it = cooperateListenerList_.begin(); it != cooperateListenerList_.end(); it++) {
+    for (auto it = cooperateListenerList_.begin(); it != cooperateListenerList_.end(); ++it) {
         if ((*it)->sess == event->sess) {
             cooperateListenerList_.erase(it);
             break;
@@ -53,12 +53,11 @@ void CooperateEventManager::RemoveCooperationListenerEvent(sptr<EventInfo> event
 void CooperateEventManager::OnCooperateMessage(CooperationMessage msg, const std::string &deviceId)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(lock_);
     if (cooperateListenerList_.size() == 0) {
         MMI_HILOGE("No listener, send cooperate message failed.");
         return;
     }
-    for (auto it = cooperateListenerList_.begin(); it != cooperateListenerList_.end(); it++) {
+    for (auto it = cooperateListenerList_.begin(); it != cooperateListenerList_.end(); ++it) {
         sptr<EventInfo> info = (*it);
         CHKPC(info);
         NotifyCooperateMessage(info->sess, info->msgId, info->userData, deviceId, msg);
