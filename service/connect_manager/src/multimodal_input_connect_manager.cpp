@@ -244,6 +244,8 @@ int32_t MultimodalInputConnectManager::GetInputDeviceCooperateState(int32_t user
 {
     CHKPR(multimodalInputConnectService_, RET_ERR);
     return multimodalInputConnectService_->GetInputDeviceCooperateState(userData, deviceId);
+}
+
 int32_t MultimodalInputConnectManager::SetInputDevice(const std::string& dhid, const std::string& screenId)
 {
     CHKPR(multimodalInputConnectService_, RET_ERR);
