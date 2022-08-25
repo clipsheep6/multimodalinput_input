@@ -442,6 +442,7 @@ ohos_shared_library("libmmi-server") {
   if (input_feature_input_cooperation) {
     sources += [
       "input_device_cooperate/src/device_profile_adapter.cpp",
+      "input_device_cooperate/src/distributed_input_adapter.cpp",
       "input_device_cooperate/src/i_input_device_cooperate_state.cpp",
       "input_device_cooperate/src/input_device_cooperate_state_free.cpp",
       "input_device_cooperate/src/input_device_cooperate_state_in.cpp",
@@ -549,6 +550,10 @@ ohos_shared_library("libmmi-server") {
     "//third_party/cJSON:cjson_static",
     "//third_party/json:nlohmann_json_static",
   ]
+
+  if (input_feature_input_cooperation) {
+    deps += [ "//foundation/distributedhardware/distributed_input/interfaces/inner_kits:libdinput_sdk" ]
+  }
 
   if (input_feature_libinput || input_feature_hdf) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
