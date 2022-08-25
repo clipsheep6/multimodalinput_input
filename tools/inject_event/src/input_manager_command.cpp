@@ -108,7 +108,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
         {"down", required_argument, NULL, 'd'},
         {"up", required_argument, NULL, 'u'},
         {"scroll", required_argument, NULL, 's'},
-        {"movement", required_argument, NULL, 'v'},
         {"interval", required_argument, NULL, 'i'},
         {NULL, 0, NULL, 0}
     };
@@ -137,30 +136,104 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 int32_t py = 0;
                 int32_t buttonId;
                 int32_t scrollValue;
-                while ((c = getopt_long(argc, argv, "m:d:u:c:b:s:v:i:", mouseSensorOptions, &optionIndex)) != -1) {
+                while ((c = getopt_long(argc, argv, "m:d:u:c:b:s:i:", mouseSensorOptions, &optionIndex)) != -1) {
                     switch (c) {
                         case 'm': {
-                            if (optind >= argc) {
+                            if (argc < 5) {
                                 std::cout << "too few arguments to function" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
-                            if (!StrToInt(optarg, px) || !StrToInt(argv[optind], py)) {
-                                std::cout << "invalid parameter to move mouse" << std::endl;
-                                return EVENT_REG_FAIL;
+                            if (argc == 5) {
+                                if (!StrToInt(optarg, px) || !StrToInt(argv[optind], py)) {
+                                    std::cout << "invalid parameter to move mouse" << std::endl;
+                                    return EVENT_REG_FAIL;
+                                }
+                                std::cout << "move to " << px << " " << py << std::endl;
+                                auto pointerEvent = PointerEvent::Create();
+                                CHKPR(pointerEvent, ERROR_NULL_POINTER);
+                                PointerEvent::PointerItem item;
+                                item.SetPointerId(0);
+                                item.SetDisplayX(px);
+                                item.SetDisplayY(py);
+                                pointerEvent->AddPointerItem(item);
+                                pointerEvent->SetPointerId(0);
+                                pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+                                pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+                                InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             }
-                            std::cout << "move to " << px << " " << py << std::endl;
-                            auto pointerEvent = PointerEvent::Create();
-                            CHKPR(pointerEvent, ERROR_NULL_POINTER);
-                            PointerEvent::PointerItem item;
-                            item.SetPointerId(0);
-                            item.SetDisplayX(px);
-                            item.SetDisplayY(py);
-                            pointerEvent->AddPointerItem(item);
-                            pointerEvent->SetPointerId(0);
-                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-                            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-                            optind++;
+                            if (argc >= 7) {
+                                int32_t px1 = 0;
+                                int32_t py1 = 0;
+                                int32_t px2 = 0;
+                                int32_t py2 = 0;
+                                int32_t totalTimeMs = 1000;
+                                if ((!StrToInt(optarg, px1)) ||
+                                    (!StrToInt(argv[optind], py1)) ||
+                                    (!StrToInt(argv[optind + 1], px2)) ||
+                                    (!StrToInt(argv[optind + 2], py2))) {
+                                        std::cout << "invalid coordinate value" << std::endl;
+                                        return RET_ERR;
+                                }
+                                if (!StrToInt(argv[optind + 3], totalTimeMs)) {
+                                    std::cout << "invalid total times" << std::endl;
+                                    return RET_ERR;
+                                }
+                                const int64_t minTotalTimeMs = 1;
+                                const int64_t maxTotalTimeMs = 15000;
+                                if ((totalTimeMs < minTotalTimeMs) || (totalTimeMs > maxTotalTimeMs)) {
+                                    std::cout << "total time is out of range:"
+                                        << minTotalTimeMs << " <= " << totalTimeMs << " <= " << maxTotalTimeMs
+                                        << std::endl;
+                                    return RET_ERR;
+                                }
+                                std::cout << "start coordinate: (" << px1 << ", "  << py1 << ")" << std::endl;
+                                std::cout << "  end coordinate: (" << px2 << ", "  << py2 << ")" << std::endl;
+                                std::cout << "     total times: "  << totalTimeMs  << " ms"      << std::endl;
+                                auto pointerEvent = PointerEvent::Create();
+                                CHKPR(pointerEvent, ERROR_NULL_POINTER);
+                                PointerEvent::PointerItem item;
+                                item.SetPointerId(0);
+                                item.SetDisplayX(px1);
+                                item.SetDisplayY(py1);
+                                pointerEvent->SetPointerId(0);
+                                pointerEvent->AddPointerItem(item);
+                                pointerEvent->SetButtonPressed(-1);
+                                pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+                                pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+                                InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+
+                                int64_t startTimeUs = GetSysClockTime();
+                                int64_t startTimeMs = startTimeUs / 1000;
+                                int64_t endTimeMs = 0;
+                                if (!AddInt64(startTimeMs, totalTimeMs, endTimeMs)) {
+                                    std::cout << "system time error" << std::endl;
+                                    return RET_ERR;
+                                }
+                                int64_t currentTimeMs = startTimeMs;
+                                int64_t sleepTimeMs = 0;
+                                int64_t nowStartSysTimeMs = 0;
+                                int64_t nowEndSysTimeMs = 0;
+                                while (currentTimeMs < endTimeMs) {
+                                    nowStartSysTimeMs = GetSysClockTime() / 1000;
+                                    item.SetDisplayX(NextPos(startTimeMs, currentTimeMs, totalTimeMs, px1, px2));
+                                    item.SetDisplayY(NextPos(startTimeMs, currentTimeMs, totalTimeMs, py1, py2));
+                                    pointerEvent->SetActionTime(currentTimeMs);
+                                    pointerEvent->UpdatePointerItem(0, item);
+                                    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+                                    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                                    nowEndSysTimeMs = GetSysClockTime() / 1000;
+                                    sleepTimeMs = BLOCK_TIME_MS - (nowEndSysTimeMs - nowStartSysTimeMs) % BLOCK_TIME_MS;
+                                    std::this_thread::sleep_for(std::chrono::milliseconds(sleepTimeMs));
+                                    currentTimeMs = nowEndSysTimeMs + sleepTimeMs;
+                                }
+
+                                item.SetDisplayX(px2);
+                                item.SetDisplayY(py2);
+                                pointerEvent->SetActionTime(endTimeMs);
+                                pointerEvent->UpdatePointerItem(0, item);
+                                pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+                                InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            }
                             break;
                         }
                         case 'd': {
@@ -385,86 +458,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
                             InputMgr->SimulateInputEvent(pointerEvent);
-                            break;
-                        }
-                        case 'v': {
-                            int32_t px1 = 0;
-                            int32_t py1 = 0;
-                            int32_t px2 = 0;
-                            int32_t py2 = 0;
-                            int32_t totalTimeMs = 1000;
-                            if (argc < 7) {
-                                std::cout << "argc:" << argc << std::endl;
-                                std::cout << "wrong number of parameters" << std::endl;
-                                return RET_ERR;
-                            }
-                            if ((!StrToInt(optarg, px1)) ||
-                                (!StrToInt(argv[optind], py1)) ||
-                                (!StrToInt(argv[optind + 1], px2)) ||
-                                (!StrToInt(argv[optind + 2], py2))) {
-                                    std::cout << "invalid coordinate value" << std::endl;
-                                    return RET_ERR;
-                            }
-                            if ((argc >= 8) && !StrToInt(argv[optind + 3], totalTimeMs)) {
-                                std::cout << "invalid total times" << std::endl;
-                                return RET_ERR;
-                            }
-                            const int64_t minTotalTimeMs = 1;
-                            const int64_t maxTotalTimeMs = 15000;
-                            if ((totalTimeMs < minTotalTimeMs) || (totalTimeMs > maxTotalTimeMs)) {
-                                std::cout << "total time is out of range:"
-                                    << minTotalTimeMs << " <= " << totalTimeMs << " <= " << maxTotalTimeMs
-                                    << std::endl;
-                                return RET_ERR;
-                            }
-                            std::cout << "start coordinate: (" << px1 << ", "  << py1 << ")" << std::endl;
-                            std::cout << "  end coordinate: (" << px2 << ", "  << py2 << ")" << std::endl;
-                            std::cout << "     total times: "  << totalTimeMs  << " ms"      << std::endl;
-                            auto pointerEvent = PointerEvent::Create();
-                            CHKPR(pointerEvent, ERROR_NULL_POINTER);
-                            PointerEvent::PointerItem item;
-                            item.SetPointerId(0);
-                            item.SetDisplayX(px1);
-                            item.SetDisplayY(py1);
-                            pointerEvent->SetPointerId(0);
-                            pointerEvent->AddPointerItem(item);
-                            pointerEvent->SetButtonPressed(-1);
-                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-                            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-
-                            int64_t startTimeUs = GetSysClockTime();
-                            int64_t startTimeMs = startTimeUs / 1000;
-                            int64_t endTimeMs = 0;
-                            if (!AddInt64(startTimeMs, totalTimeMs, endTimeMs)) {
-                                std::cout << "system time error" << std::endl;
-                                return RET_ERR;
-                            }
-                            int64_t currentTimeMs = startTimeMs;
-                            int64_t sleepTimeMs = 0;
-                            while (currentTimeMs < endTimeMs) {
-                                item.SetDisplayX(NextPos(startTimeMs, currentTimeMs, totalTimeMs, px1, px2));
-                                item.SetDisplayY(NextPos(startTimeMs, currentTimeMs, totalTimeMs, py1, py2));
-                                pointerEvent->SetActionTime(currentTimeMs);
-                                pointerEvent->UpdatePointerItem(0, item);
-                                pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-                                InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-                                sleepTimeMs = (currentTimeMs + BLOCK_TIME_MS) - ((GetSysClockTime()) / 1000);
-                                if (sleepTimeMs < 0) {
-                                    std::cout << "system jam" << std::endl;
-                                    currentTimeMs += BLOCK_TIME_MS;
-                                    continue;
-                                }
-                                std::this_thread::sleep_for(std::chrono::milliseconds(sleepTimeMs));
-                                currentTimeMs += BLOCK_TIME_MS;
-                            }
-
-                            item.SetDisplayX(px2);
-                            item.SetDisplayY(py2);
-                            pointerEvent->SetActionTime(endTimeMs);
-                            pointerEvent->UpdatePointerItem(0, item);
-                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             break;
                         }
                         case 'i': {
