@@ -94,7 +94,7 @@ int32_t MouseEventHandler::HandleMotionInner(struct libinput_event_pointer* data
     if (currentDisplayId_ == -1) {
         absolutionX_ = -1;
         absolutionY_ = -1;
-        MMI_HILOGI("The currentDisplayId_ is -1");
+        MMI_HILOGE("The currentDisplayId_ is -1");
         return RET_ERR;
     }
 
