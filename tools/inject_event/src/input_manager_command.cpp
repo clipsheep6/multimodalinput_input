@@ -60,6 +60,13 @@ constexpr int32_t ACTION_TIME = 3000;
 constexpr int32_t BLOCK_TIME_MS = 16;
 } // namespace
 
+int64_t InputManagerCommand::SleepTimes(int64_t currentTimeMs)
+{
+    int64_t nowEndSysTimeMs = GetSysClockTime() / 1000;
+    int64_t sleepTimeMs = BLOCK_TIME_MS - (nowEndSysTimeMs - currentTimeMs) % BLOCK_TIME_MS;
+    std::this_thread::sleep_for(std::chrono::milliseconds(sleepTimeMs));
+    return nowEndSysTimeMs + sleepTimeMs;
+}
 int32_t InputManagerCommand::NextPos(int64_t begTimeMs, int64_t curtTimeMs, int32_t totalTimeMs,
     int32_t begPos, int32_t endPos)
 {
@@ -141,12 +148,12 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                         case 'm': {
                             if (argc < 5) {
                                 std::cout << "too few arguments to function" << std::endl;
-                                return EVENT_REG_FAIL;
+                                return RET_ERR;
                             }
                             if (argc == 5) {
                                 if (!StrToInt(optarg, px) || !StrToInt(argv[optind], py)) {
                                     std::cout << "invalid parameter to move mouse" << std::endl;
-                                    return EVENT_REG_FAIL;
+                                    return RET_ERR;
                                 }
                                 std::cout << "move to " << px << " " << py << std::endl;
                                 auto pointerEvent = PointerEvent::Create();
@@ -160,6 +167,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                                 pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                                optind++;
                             }
                             if (argc >= 7) {
                                 int32_t px1 = 0;
@@ -210,21 +218,14 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     return RET_ERR;
                                 }
                                 int64_t currentTimeMs = startTimeMs;
-                                int64_t sleepTimeMs = 0;
-                                int64_t nowStartSysTimeMs = 0;
-                                int64_t nowEndSysTimeMs = 0;
                                 while (currentTimeMs < endTimeMs) {
-                                    nowStartSysTimeMs = GetSysClockTime() / 1000;
                                     item.SetDisplayX(NextPos(startTimeMs, currentTimeMs, totalTimeMs, px1, px2));
                                     item.SetDisplayY(NextPos(startTimeMs, currentTimeMs, totalTimeMs, py1, py2));
                                     pointerEvent->SetActionTime(currentTimeMs);
                                     pointerEvent->UpdatePointerItem(0, item);
                                     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                                     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-                                    nowEndSysTimeMs = GetSysClockTime() / 1000;
-                                    sleepTimeMs = BLOCK_TIME_MS - (nowEndSysTimeMs - nowStartSysTimeMs) % BLOCK_TIME_MS;
-                                    std::this_thread::sleep_for(std::chrono::milliseconds(sleepTimeMs));
-                                    currentTimeMs = nowEndSysTimeMs + sleepTimeMs;
+                                    currentTimeMs = SleepTimes(currentTimeMs);
                                 }
 
                                 item.SetDisplayX(px2);
