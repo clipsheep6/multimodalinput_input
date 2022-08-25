@@ -112,6 +112,12 @@ void ClientMsgHandler::OnMsgHandler(const UDSClient& client, NetPacket& pkt)
     }
 }
 
+void ClientMsgHandler::SetInputConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer)
+{
+    CHKPV(inputEventConsumer);
+    inputEventConsumer_ = inputEventConsumer;
+}
+
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
 {
@@ -132,7 +138,9 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
     PrintEventData(key);
     BytraceAdapter::StartBytrace(key, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_DISPATCH_EVENT);
     key->SetProcessedCallback(dispatchCallback_);
-    InputMgrImpl->OnKeyEvent(key);
+    BytraceAdapter::StartBytrace(key, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_DISPATCH_EVENT);
+    inputEventConsumer_->OnInputEvent(key);
+    MMI_HILOGD("Key event callback keyCode:%{public}d", key->GetKeyCode());
     key->MarkProcessed();
     return RET_OK;
 }
@@ -153,9 +161,11 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
         MMI_HILOGI("Operation canceled.");
     }
-    pointerEvent->SetProcessedCallback(dispatchCallback_);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_DISPATCH_EVENT);
-    InputMgrImpl->OnPointerEvent(pointerEvent);
+    pointerEvent->SetProcessedCallback(dispatchCallback_);
+    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_DISPATCH_EVENT);
+    inputEventConsumer_->OnInputEvent(pointerEvent);
+    MMI_HILOGD("Pointer event callback pointerId:%{public}d", pointerEvent->GetPointerId());
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH

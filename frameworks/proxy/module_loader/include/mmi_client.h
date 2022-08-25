@@ -20,7 +20,6 @@
 
 #include "circle_stream_buffer.h"
 #include "client_msg_handler.h"
-#include "mmi_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
@@ -42,16 +41,21 @@ public:
     bool Start() override;
     void RegisterConnectedFunction(ConnectCallback fun) override;
     void RegisterDisconnectedFunction(ConnectCallback fun) override;
+    void SwitchEventHandler(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
+        std::shared_ptr<AppExecFwk::EventHandler> eventHandler) override;
 
 protected:
     virtual void OnConnected() override;
     virtual void OnDisconnected() override;
 
     bool StartEventRunner();
-    void OnRecvThread();
+    void OnReconnect();
+    void StopOldEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
+    void StartNewEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
     bool AddFdListener(int32_t fd);
     bool DelFdListener(int32_t fd);
     void OnPacket(NetPacket& pkt);
+    const std::string& GetErrorStr(ErrCode code) const;
 
 protected:
     ClientMsgHandler msgHandler_;
@@ -62,7 +66,7 @@ protected:
     std::mutex mtx_;
     std::condition_variable cv_;
     std::thread recvThread_;
-    std::shared_ptr<MMIEventHandler> recvEventHandler_ = nullptr;
+    std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS

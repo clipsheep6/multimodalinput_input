@@ -37,9 +37,8 @@ int32_t KeyEventInputSubscribeManager::subscribeIdManager_ = 0;
 
 KeyEventInputSubscribeManager::SubscribeKeyEventInfo::SubscribeKeyEventInfo(
     std::shared_ptr<KeyOption> keyOption,
-    std::function<void(std::shared_ptr<KeyEvent>)> callback,
-    EventHandlerPtr eventHandler)
-    : keyOption_(keyOption), callback_(callback), eventHandler_(eventHandler)
+    std::function<void(std::shared_ptr<KeyEvent>)> callback)
+    : keyOption_(keyOption), callback_(callback)
 {
     if (KeyEventInputSubscribeManager::subscribeIdManager_ >= INT_MAX) {
         subscribeId_ = -1;
@@ -62,7 +61,6 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
         return INVALID_SUBSCRIBE_ID;
     }
 
-    std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
         return INVALID_SUBSCRIBE_ID;
@@ -70,9 +68,7 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
     for (const auto &preKey : preKeys) {
         MMI_HILOGD("prekey:%{public}d", preKey);
     }
-    auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
-    CHKPR(eventHandler, INVALID_SUBSCRIBE_ID);
-    SubscribeKeyEventInfo subscribeInfo(keyOption, callback, eventHandler);
+    SubscribeKeyEventInfo subscribeInfo(keyOption, callback);
     MMI_HILOGD("subscribeId:%{public}d,keyOption->finalKey:%{public}d,"
         "keyOption->isFinalKeyDown:%{public}s,keyOption->finalKeyDownDuration:%{public}d",
         subscribeInfo.GetSubscribeId(), keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
@@ -93,7 +89,6 @@ int32_t KeyEventInputSubscribeManager::UnsubscribeKeyEvent(int32_t subscribeId)
         return RET_ERR;
     }
 
-    std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
         return INVALID_SUBSCRIBE_ID;
@@ -116,25 +111,6 @@ int32_t KeyEventInputSubscribeManager::UnsubscribeKeyEvent(int32_t subscribeId)
     return RET_ERR;
 }
 
-bool KeyEventInputSubscribeManager::PostTask(int32_t subscribeId, const AppExecFwk::EventHandler::Callback &callback)
-{
-    auto obj = GetSubscribeKeyEvent(subscribeId);
-    CHKPF(obj);
-    auto eventHandler = obj->GetEventHandler();
-    CHKPF(eventHandler);
-    return MMIEventHandler::PostTask(eventHandler, callback);
-}
-
-void KeyEventInputSubscribeManager::OnSubscribeKeyEventCallbackTask(
-    KeyEventInputSubscribeManager::SubscribeKeyEventInfo info, std::shared_ptr<KeyEvent> event,
-    int32_t subscribeId)
-{
-    CHK_PID_AND_TID();
-    CHKPV(event);
-    info.GetCallback()(event);
-    MMI_HILOGD("Key event callback id:%{public}d keyCode:%{public}d", subscribeId, event->GetKeyCode());
-}
-
 int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_ptr<KeyEvent> event,
     int32_t subscribeId)
 {
@@ -149,11 +125,7 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
     BytraceAdapter::StartBytrace(event, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
     auto info = GetSubscribeKeyEvent(subscribeId);
     CHKPR(info, ERROR_NULL_POINTER);
-    if (!PostTask(subscribeId, std::bind(&KeyEventInputSubscribeManager::OnSubscribeKeyEventCallbackTask,
-        this, *info, event, subscribeId))) {
-        MMI_HILOGE("Post task failed");
-        return RET_ERR;
-    }
+    info->GetCallback()(event);
     MMI_HILOGD("Key event id:%{public}d keyCode:%{public}d", subscribeId, event->GetKeyCode());
     return RET_OK;
 }

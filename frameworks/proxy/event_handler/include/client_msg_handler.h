@@ -17,6 +17,7 @@
 
 #include "nocopyable.h"
 
+#include "i_input_event_consumer.h"
 #include "msg_handler.h"
 #include "uds_client.h"
 
@@ -32,6 +33,7 @@ public:
     void Init();
     void InitProcessedCallback();
     void OnMsgHandler(const UDSClient& client, NetPacket& pkt);
+    void SetInputConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer);
 
 protected:
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -65,6 +67,7 @@ private:
 
 private:
     std::function<void(int32_t)> dispatchCallback_ { nullptr };
+    std::shared_ptr<IInputEventConsumer> inputEventConsumer_;
 };
 } // namespace MMI
 } // namespace OHOS
