@@ -66,6 +66,7 @@ protected:
     int32_t StubStartInputDeviceCooperate(MessageParcel& data, MessageParcel& reply);
     int32_t StubStopDeviceCooperate(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetInputDeviceCooperateState(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetInputDevice(MessageParcel& data, MessageParcel& reply);
     int32_t StubStartRemoteCooperate(MessageParcel& data, MessageParcel& reply);
     int32_t StubStartRemoteCooperateRes(MessageParcel& data, MessageParcel& reply);
     int32_t StubStopRemoteCooperate(MessageParcel& data, MessageParcel& reply);
