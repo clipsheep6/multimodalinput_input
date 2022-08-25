@@ -45,7 +45,7 @@ config("libmmi_server_config") {
     "mouse_event_handler/include",
     "//foundation/multimodalinput/interfaces/native/innerkits/event/include",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/include",
-    "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/src",
+    "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/src/drawing",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/util/socket/include",
