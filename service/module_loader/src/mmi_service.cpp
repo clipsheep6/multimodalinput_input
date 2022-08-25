@@ -1098,6 +1098,10 @@ int32_t MMIService::GetInputDeviceCooperateState(int32_t userData, const std::st
 #else
     (void)(userData);
     (void)(deviceId);
+    MMI_HILOGW("Get input device cooperate state does not support");
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+    return RET_OK;
+}
 int32_t MMIService::SetInputDevice(const std::string& dhid, const std::string& screenId)
 {
     CALL_DEBUG_ENTER;
