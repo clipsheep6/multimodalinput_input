@@ -415,11 +415,15 @@ void InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* t
         libinput_event_touch_get_tool_height_transformed(touch, info.height));
 }
 
-bool InputWindowsManager::TouchPointToDisplayPoint(struct libinput_event_touch* touch,
+bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, struct libinput_event_touch* touch,
     EventTouch& touchInfo, int32_t& physicalDisplayId)
 {
     CHKPF(touch);
-    auto info = FindPhysicalDisplayInfo("default0");
+    std::string screenId = InputDevMgr->GetScreenId(deviceId);
+    if (screenId.empty()) {
+        screenId = "default0";
+    }
+    auto info = FindPhysicalDisplayInfo(screenId);
     CHKPF(info);
     physicalDisplayId = info->id;
     if ((info->width <= 0) || (info->height <= 0)) {
@@ -500,7 +504,6 @@ void InputWindowsManager::OnSessionLost(SessionPtr session)
     if (it != pointerStyle_.end()) {
         pointerStyle_.erase(it);
         MMI_HILOGD("Clear the pointer style map, pd:%{public}d", pid);
-        return;
     }
 }
 
@@ -515,12 +518,12 @@ int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, int3
     
     auto iter = it->second.find(windowId);
     if (iter == it->second.end()) {
-        MMI_HILOGE("The window type is invalid");
+        MMI_HILOGE("The window id is invalid");
         return RET_ERR;
     }
     
     iter->second = pointerStyle;
-    MMI_HILOGD("Window type:%{public}d set pointer style:%{public}d success", windowId, pointerStyle);
+    MMI_HILOGD("Window id:%{public}d set pointer style:%{public}d success", windowId, pointerStyle);
     return RET_OK;
 }
 
@@ -535,7 +538,7 @@ std::optional<int> InputWindowsManager::GetPointerStyle(int32_t pid, int32_t win
     
     auto iter = it->second.find(windowId);
     if (iter == it->second.end()) {
-        MMI_HILOGE("The window type is Invalid");
+        MMI_HILOGE("The window id is Invalid");
         return std::nullopt;
     }
     
@@ -553,8 +556,7 @@ void InputWindowsManager::UpdatePointerStyle()
             std::map<int32_t, int32_t> tmpPointerStyle = {{windowItem.id, DEFAULT_POINTER_STYLE}};
             auto iter = pointerStyle_.insert(std::make_pair(pid, tmpPointerStyle));
             if (!iter.second) {
-                MMI_HILOGE("The pd is duplicated");
-                return;
+                MMI_HILOGW("The pd is duplicated");
             }
             continue;
         }
@@ -567,8 +569,7 @@ void InputWindowsManager::UpdatePointerStyle()
             }
             auto iter = it->second.insert(std::make_pair(windowItem.id, DEFAULT_POINTER_STYLE));
             if (!iter.second) {
-                MMI_HILOGE("The window type is duplicated");
-                return;
+                MMI_HILOGW("The window type is duplicated");
             }
         }
     }

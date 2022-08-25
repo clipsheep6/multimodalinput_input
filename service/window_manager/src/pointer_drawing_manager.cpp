@@ -456,7 +456,7 @@ int32_t PointerDrawingManager::GetPointerStyle(int32_t pid, int32_t windowId, in
     }
 
     pointerStyle = pointerStyleInfo.value();
-    MMI_HILOGD("Window type:%{public}d get pointer style:%{public}d success", windowId, pointerStyle);
+    MMI_HILOGD("Window id:%{public}d get pointer style:%{public}d success", windowId, pointerStyle);
     return RET_OK;
 }
 
@@ -484,7 +484,6 @@ void PointerDrawingManager::DrawPointerStyle()
 
         DrawPointer(displayId_, lastPhysicalX_, lastPhysicalY_, MOUSE_ICON(mouseStyle));
         MMI_HILOGD("Draw pointer style, mouseStyle:%{public}d", mouseStyle);
-        return;
     }
 }
 

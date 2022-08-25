@@ -71,6 +71,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         {IMultimodalInputConnect::INJECT_KEY_EVENT, &MultimodalInputConnectStub::StubInjectKeyEvent},
         {IMultimodalInputConnect::INJECT_POINTER_EVENT, &MultimodalInputConnectStub::StubInjectPointerEvent},
         {IMultimodalInputConnect::SET_ANR_OBSERVER, &MultimodalInputConnectStub::StubSetAnrListener},
+        {IMultimodalInputConnect::SET_INPUT_DEVICE_TO_SCREEN, &MultimodalInputConnectStub::StubSetInputDevice},
         {IMultimodalInputConnect::REMOTE_COOPERATE_START, &MultimodalInputConnectStub::StubStartRemoteCooperate},
         {IMultimodalInputConnect::REMOTE_COOPERATE_START_RES, &MultimodalInputConnectStub::StubStartRemoteCooperateRes},
         {IMultimodalInputConnect::REMOTE_COOPERATE_STOP, &MultimodalInputConnectStub::StubStopRemoteCooperate},
@@ -571,13 +572,13 @@ int32_t MultimodalInputConnectStub::StubStartRemoteCooperateRes(MessageParcel& d
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    bool isSucess;
-    READBOOL(data, isSucess, IPC_PROXY_DEAD_OBJECT_ERR);
+    bool isSuccess;
+    READBOOL(data, isSuccess, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t xPercent;
     READINT32(data, xPercent, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t yPercent;
     READINT32(data, yPercent, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = StartRemoteCooperateResult(isSucess, xPercent, yPercent);
+    int32_t ret = StartRemoteCooperateResult(isSuccess, xPercent, yPercent);
     if (ret != RET_OK) {
         MMI_HILOGE("Call StartRemoteCooperateResult failed, ret:%{public}d", ret);
     }
@@ -613,9 +614,9 @@ int32_t MultimodalInputConnectStub::StubStopRemoteCooperateRes(MessageParcel& da
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    bool isSucess;
-    READBOOL(data, isSucess, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = StopRemoteCooperateResult(isSucess);
+    bool isSuccess;
+    READBOOL(data, isSuccess, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = StopRemoteCooperateResult(isSuccess);
     if (ret != RET_OK) {
         MMI_HILOGE("Call StopRemoteCooperateResult failed, ret:%{public}d", ret);
     }
@@ -640,6 +641,29 @@ int32_t MultimodalInputConnectStub::StubStartCooperateOtherRes(MessageParcel& da
         MMI_HILOGE("Call StartCooperateOtherRes failed, ret:%{public}d", ret);
     }
     return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubSetInputDevice(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    std::string dhid;
+    READSTRING(data, dhid, IPC_PROXY_DEAD_OBJECT_ERR);
+    std::string screenId;
+    READSTRING(data, screenId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetInputDevice(dhid, screenId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetInputDevice failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS
