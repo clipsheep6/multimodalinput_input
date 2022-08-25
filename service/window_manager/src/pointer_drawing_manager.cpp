@@ -121,7 +121,7 @@ int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
         MMI_HILOGE("Init layer failed, FlushBuffer return ret:%{public}s", SurfaceErrorStr(ret).c_str());
         return RET_ERR;
     }
-    MMI_HILOGD("Init layer is success");
+    MMI_HILOGD("Init layer success");
     UpdatePointerVisible();
     return RET_OK;
 }
