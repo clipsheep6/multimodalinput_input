@@ -109,11 +109,9 @@ public:
 
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
     void OnAnr(int32_t pid);
-	
+
     int32_t SetPointerLocation(int32_t x, int32_t y);
-    using DeviceUniqId = std::tuple<int32_t, int32_t, int32_t, int32_t, int32_t, std::string>;
-    int32_t SetInputDeviceSeatName(const std::string& seatName, DeviceUniqId& deviceUniqId);
-    
+
     int32_t GetRemoteInputAbility(std::string deviceId, std::function<void(std::set<int32_t>)> remoteTypes);
     int32_t PrepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
     int32_t UnprepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
@@ -127,6 +125,7 @@ public:
         std::function<void(std::string, CooperationMessage)> callback);
     int32_t StopDeviceCooperate(std::function<void(std::string, CooperationMessage)> callback);
     int32_t GetInputDeviceCooperateState(const std::string &deviceId, std::function<void(bool)> callback);
+    int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
