@@ -18,9 +18,11 @@
 #include "proto.h"
 
 #include "input_event.h"
+#include "input_event_data_transformation.h"
 #include "input_manager_impl.h"
 #include "input_handler_manager.h"
 #include "mmi_client.h"
+#include "multimodal_input_connect_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -46,10 +48,34 @@ void OnConnected(const IfMMIClient& client)
 MultimodalEventHandler::MultimodalEventHandler() {}
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyEventPtr)
+int32_t MultimodalEventHandler::SubscribeKeyEvent(
+    const KeyEventInputSubscribeManager::SubscribeKeyEventInfo &subscribeInfo)
 {
-    CHKPR(keyEventPtr, ERROR_NULL_POINTER);
-    return EventManager.InjectEvent(keyEventPtr);
+    CALL_DEBUG_ENTER;
+    return MultimodalInputConnMgr->SubscribeKeyEvent(subscribeInfo.GetSubscribeId(), subscribeInfo.GetKeyOption());
+}
+
+int32_t MultimodalEventHandler::UnsubscribeKeyEvent(int32_t subscribeId)
+{
+    CALL_DEBUG_ENTER;
+    return MultimodalInputConnMgr->UnsubscribeKeyEvent(subscribeId);
+}
+
+int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    keyEvent->UpdateId();
+    if (keyEvent->GetKeyCode() < 0) {
+        MMI_HILOGE("KeyCode is invalid:%{public}u", keyEvent->GetKeyCode());
+        return RET_ERR;
+    }
+    int32_t ret = MultimodalInputConnMgr->InjectKeyEvent(keyEvent);
+    if (ret != 0) {
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
@@ -78,15 +104,34 @@ MMIClientPtr MultimodalEventHandler::GetMMIClient()
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    return EventManager.InjectPointerEvent(pointerEvent);
+    MMI_HILOGD("Inject pointer event:");
+    std::stringstream sStream;
+    sStream << *pointerEvent;
+    std::string sLine;
+    while (std::getline(sStream, sLine)) {
+        MMI_HILOGD("%{public}s", sLine.c_str());
+    }
+    int32_t ret = MultimodalInputConnMgr->InjectPointerEvent(pointerEvent);
+    if (ret != 0) {
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 int32_t MultimodalEventHandler::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
 {
-    return EventManager.MoveMouseEvent(offsetX, offsetY);
+    CALL_DEBUG_ENTER;
+    int32_t ret = MultimodalInputConnMgr->MoveMouseEvent(offsetX, offsetY);
+    if (ret != 0) {
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 } // namespace MMI

@@ -22,9 +22,7 @@
 
 #include "bytrace_adapter.h"
 #include "input_manager_impl.h"
-#include "mmi_event_handler.h"
 #include "multimodal_event_handler.h"
-#include "standardized_event_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -75,7 +73,7 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
         subscribeInfo.GetSubscribeId(), keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
         keyOption->GetFinalKeyDownDuration());
     subscribeInfos_.push_back(subscribeInfo);
-    if (EventManager.SubscribeKeyEvent(subscribeInfo) != RET_OK) {
+    if (MMIEventHdl.SubscribeKeyEvent(subscribeInfo) != RET_OK) {
         MMI_HILOGE("Leave, subscribe key event failed");
         return INVALID_SUBSCRIBE_ID;
     }
@@ -102,7 +100,7 @@ int32_t KeyEventInputSubscribeManager::UnsubscribeKeyEvent(int32_t subscribeId)
 
     for (auto it = subscribeInfos_.begin(); it != subscribeInfos_.end(); ++it) {
         if (it->GetSubscribeId() == subscribeId) {
-            if (EventManager.UnsubscribeKeyEvent(subscribeId) != RET_OK) {
+            if (MMIEventHdl.UnsubscribeKeyEvent(subscribeId) != RET_OK) {
                 MMI_HILOGE("Leave, unsubscribe key event failed");
                 return RET_ERR;
             }
@@ -140,7 +138,7 @@ void KeyEventInputSubscribeManager::OnConnected()
         return;
     }
     for (const auto& subscriberInfo : subscribeInfos_) {
-        if (EventManager.SubscribeKeyEvent(subscriberInfo) != RET_OK) {
+        if (MMIEventHdl.SubscribeKeyEvent(subscriberInfo) != RET_OK) {
             MMI_HILOGE("Subscribe key event failed");
         }
     }

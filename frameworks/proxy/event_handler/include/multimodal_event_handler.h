@@ -19,9 +19,9 @@
 #include "singleton.h"
 
 #include "if_mmi_client.h"
-#include "proto.h"
+#include "key_event_input_subscribe_manager.h"
 #include "pointer_event.h"
-#include "standardized_event_manager.h"
+#include "proto.h"
 
 namespace OHOS {
 namespace MMI {
@@ -39,7 +39,9 @@ public:
     MMIClientPtr GetMMIClient();
     bool InitClient();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    int32_t InjectEvent(const std::shared_ptr<KeyEvent> keyEventPtr);
+    int32_t SubscribeKeyEvent(const KeyEventInputSubscribeManager::SubscribeKeyEventInfo& subscribeInfo);
+    int32_t UnsubscribeKeyEvent(int32_t subscribeId);
+    int32_t InjectEvent(const std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);

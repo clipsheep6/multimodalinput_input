@@ -84,10 +84,9 @@ bool MMIClient::StartEventRunner()
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
-    auto runner = AppExecFwk::EventRunner::Create(true);
+    auto runner = AppExecFwk::EventRunner::Create("mmi_EventHdr");
     eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
     CHKPF(eventHandler_);
-
     if (isConnected_ && fd_ >= 0) {
         if (!AddFdListener(fd_)) {
             MMI_HILOGE("Add fd listener failed");
@@ -138,7 +137,6 @@ void MMIClient::StartNewEventHandler(std::shared_ptr<AppExecFwk::EventHandler> e
             return;
         }
     }
-
     MMI_HILOGI("Switch eventHandler successfully");
 }
 
@@ -153,10 +151,10 @@ void MMIClient::SwitchEventHandler(std::shared_ptr<IInputEventConsumer> inputEve
     if (eventHandler_ != nullptr) {
         auto currentRunner = eventHandler_->GetEventRunner();
         CHKPV(currentRunner);
-        MMI_HILOGI("Current runner:%{public}" PRIu64, GetThisThreadId());
+        MMI_HILOGI("Current thread name:%{public}s", currentRunner->GetRunnerThreadName().c_str());
         auto newRunner = eventHandler->GetEventRunner();
         CHKPV(newRunner);
-        MMI_HILOGI("New runner:%{public}" PRIu64, GetThisThreadId());
+        MMI_HILOGI("New thread name:%{public}s", newRunner->GetRunnerThreadName().c_str());
         if (currentRunner->GetThreadId() == newRunner->GetThreadId()) {
             MMI_HILOGI("The eventRunners are the same");
             return;
