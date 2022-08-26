@@ -249,10 +249,12 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 std::cout << "      trace mode: " << std::boolalpha << foundTraceOption << std::endl;
                                 auto pointerEvent = PointerEvent::Create();
                                 CHKPR(pointerEvent, ERROR_NULL_POINTER);
+                                px = px1;
+                                py = py1;
                                 PointerEvent::PointerItem item;
                                 item.SetPointerId(0);
-                                item.SetDisplayX(px1);
-                                item.SetDisplayY(py1);
+                                item.SetDisplayX(px);
+                                item.SetDisplayY(py);
                                 pointerEvent->SetPointerId(0);
                                 pointerEvent->AddPointerItem(item);
                                 pointerEvent->SetButtonPressed(-1);
@@ -278,8 +280,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     SleepAndUpdateTime(currentTimeMs);
                                 }
 
-                                item.SetDisplayX(px2);
-                                item.SetDisplayY(py2);
+                                px = px2;
+                                py = py2;
+                                item.SetDisplayX(px);
+                                item.SetDisplayY(py);
                                 pointerEvent->SetActionTime(endTimeMs);
                                 pointerEvent->UpdatePointerItem(0, item);
                                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
