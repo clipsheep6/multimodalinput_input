@@ -73,6 +73,9 @@ group("multimodalinput_mmi_service") {
     "service:libmmi-server",
     "tools/inject_event:uinput",
   ]
+  if (input_feature_uevent) {
+    deps += [ "uevent:libuevent" ]
+  }
 }
 
 group("input_jsapi_group") {
