@@ -17,7 +17,6 @@ mmi_service_path = "${mmi_path}/service"
 
 config("libmmi_server_config") {
   include_dirs = [
-    "input_device_cooperate/include",
     "device_manager/include",
     "device_scalability/include",
     "delegate_task/include",
