@@ -153,12 +153,14 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectMouse_007, TestSize.Level1)
     std::unique_ptr<InputManagerCommand> inputManagerCommand = std::make_unique<InputManagerCommand>();
     char command1[] = {"uinput"};
     char command2[] = {"-M"};
-    char command3[] = {"-v"};
+    char command3[] = {"-m"};
     char command4[] = {"200"};
     char command5[] = {"200"};
     char command6[] = {"200"};
     char command7[] = {"700"};
     char command8[] = {"3000"};
+    char command8[] = {"--trace"};
+
     char *argv[] = {command1, command2, command3, command4, command5, command6, command7, command8};
     int32_t result = inputManagerCommand->ParseCommand(8, argv);
     EXPECT_EQ(OHOS::ERR_OK, result);
