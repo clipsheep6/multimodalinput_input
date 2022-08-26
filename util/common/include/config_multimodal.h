@@ -51,7 +51,7 @@ namespace MMI {
 #ifndef OHOS_BUILD_ENABLE_COOPERATE
     #define SEND_RETRY_LIMIT 32
 #else
-    #define SEND_RETRY_LIMIT 1
+    #define SEND_RETRY_LIMIT 2
 #endif
 #define SEND_RETRY_SLEEP_TIME 10000
 #define ONCE_PROCESS_NETPACKET_LIMIT 100
