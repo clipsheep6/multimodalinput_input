@@ -71,8 +71,8 @@ private:
 
 private:
     InputDeviceCooperateImpl() = default;
-    std::list<DevCooperateListener> devCooperateListener_ = { };
-    std::map<int32_t, CooperateEvent> devCooperateEvent_ = { };
+    std::list<DevCooperateListener> devCooperateListener_;
+    std::map<int32_t, CooperateEvent> devCooperateEvent_;
     std::mutex mtx_;
     int32_t userData_ { 0 };
     bool isListeningProcess_ { false };
