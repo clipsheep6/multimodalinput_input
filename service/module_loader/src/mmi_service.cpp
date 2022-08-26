@@ -1309,7 +1309,7 @@ int32_t MMIService::StartCooperateOtherResult(const std::string& srcNetworkId)
         return ret;
     }
 #else
-    (void)(isSuccess);
+    (void)(srcNetworkId);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     return RET_OK;
 }
