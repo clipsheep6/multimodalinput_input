@@ -76,9 +76,8 @@ public:
     void UpdateState(CooperateState state);
     void UpdatePreparedDevices(const std::string &srcNetworkId, const std::string &sinkNetworkId);
     std::pair<std::string, std::string> GetPreparedDevices() const;
-    std::shared_ptr<IInputDeviceCooperateState> GetCurrentState() const;
     CooperateState GetCurrentCooperateState() const;
-    const std::string &GetSrcNetworkId() const;
+    std::string GetSrcNetworkId() const;
     void OnCooperateChanged(const std::string &networkId, bool isOpen);
     void OnKeyboardOnline(const std::string &dhid);
     void OnPointerOffline(const std::string &dhid, const std::string &sinkNetworkId,
@@ -88,6 +87,8 @@ public:
     void OnDeviceOffline(const std::string &networkId);
     void OnStartFinish(bool isSuccess, const std::string &remoteNetworkId, int32_t startInputDeviceId);
     void OnStopFinish(bool isSuccess, const std::string &remoteNetworkId);
+    bool IsStarting() const;
+    bool IsStopping() const;
     void Dump(int32_t fd, const std::vector<std::string> &args);
 
 private:
@@ -98,6 +99,7 @@ private:
     void NotifyRemoteStartSucess(const std::string &remoteNetworkId, const std::string &startDhid);
     void NotifyRemoteStopFinish(bool isSuccess, const std::string &remoteNetworkId);
     bool UpdateMouseLocation();
+    bool IsRemote(struct libinput_device *inputDevice) const;
 
     std::shared_ptr<IInputDeviceCooperateState> currentStateSM_ { nullptr };
     std::pair<std::string, std::string> preparedNetworkId_;
