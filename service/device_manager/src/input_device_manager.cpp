@@ -38,9 +38,6 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceManager"};
 constexpr int32_t INVALID_DEVICE_ID = -1;
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-constexpr int32_t INVALID_DEVICE_FD = -1;
-#endif // OHOS_BUILD_ENABLE_COOPERATE
 constexpr int32_t SUPPORT_KEY = 1;
 
 constexpr int32_t ABS_MT_TOUCH_MAJOR = 0x30;
@@ -59,8 +56,6 @@ const std::string BUNDLE_NAME = "DBinderBus_" + std::to_string(getpid());
 const std::string UNKNOWN_SCREEN_ID = "";
 const std::string DH_ID_PREFIX = "Input_";
 #endif // OHOS_BUILD_ENABLE_COOPERATE
-
-const std::string UNKNOWN_SCREEN_ID = "";
 
 std::unordered_map<int32_t, std::string> axisType = {
     {ABS_MT_TOUCH_MAJOR, "TOUCH_MAJOR"},
@@ -289,7 +284,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
 #endif // OHOS_BUILD_ENABLE_POINTER
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-    InputDeviceInfo info;
+    struct InputDeviceInfo info;
     MakeDeviceInfo(inputDevice, info);
     {
         std::lock_guard<std::mutex> guard(mutex_);
@@ -338,7 +333,10 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
         if (it->second.inputDeviceOrigin_ == inputDevice) {
             deviceId = it->first;
             DfxHisysevent::OnDeviceDisconnect(deviceId, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
-            inputDevice_.erase(it);
+            {
+                std::lock_guard<std::mutex> guard(mutex_);
+                inputDevice_.erase(it);
+            }
             break;
         }
     }
@@ -484,6 +482,7 @@ void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::strin
 std::vector<std::string> InputDeviceManager::GetPointerKeyboardDhids(int32_t pointerId)
 {
     std::vector<std::string> dhids;
+    std::lock_guard<std::mutex> guard(mutex_);
     auto iter = inputDevice_.find(pointerId);
     if (iter == inputDevice_.end()) {
         MMI_HILOGI("Find pointer id failed");
@@ -515,10 +514,13 @@ std::vector<std::string> InputDeviceManager::GetPointerKeyboardDhids(int32_t poi
 std::vector<std::string> InputDeviceManager::GetPointerKeyboardDhids(const std::string &dhid)
 {
     int32_t pointerId = -1;
-    for (const auto &iter : inputDevice_) {
-        if (iter.second.dhid_ == dhid) {
-            pointerId = iter.first;
-            break;
+    {
+        std::lock_guard<std::mutex> guard(mutex_);
+        for (const auto &iter : inputDevice_) {
+            if (iter.second.dhid_ == dhid) {
+                pointerId = iter.first;
+                break;
+            }
         }
     }
     return GetPointerKeyboardDhids(pointerId);
@@ -526,6 +528,7 @@ std::vector<std::string> InputDeviceManager::GetPointerKeyboardDhids(const std::
 
 std::string InputDeviceManager::GetOriginNetworkId(int32_t id)
 {
+    std::lock_guard<std::mutex> guard(mutex_);
     auto iter = inputDevice_.find(id);
     if (iter == inputDevice_.end()) {
         MMI_HILOGE("Failed to search for the device: id %{public}d", id);
@@ -543,7 +546,7 @@ std::string InputDeviceManager::GetOriginNetworkId(const std::string &dhid)
     if (dhid.empty()) {
         return "";
     }
-
+    std::lock_guard<std::mutex> guard(mutex_);
     std::string networkId;
     for (const auto &iter : inputDevice_) {
         if (iter.second.dhid_ == dhid) {
@@ -581,6 +584,7 @@ std::string InputDeviceManager::GetDhid(int32_t deviceId) const
 
 bool InputDeviceManager::HasLocalPointerDevice() const
 {
+    std::lock_guard<std::mutex> guard(mutex_);
     for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
         if (!it->second.isRemote_ && IsPointerDevice(it->second.inputDeviceOrigin_)) {
             return true;
@@ -609,7 +613,6 @@ bool InputDeviceManager::IsRemote(struct libinput_device *inputDevice) const
 bool InputDeviceManager::IsRemote(int32_t id) const
 {
     bool isRemote = false;
-    std::lock_guard<std::mutex> guard(mutex_);
     auto device = inputDevice_.find(id);
     if (device != inputDevice_.end()) {
         isRemote = device->second.isRemote_;
@@ -696,9 +699,9 @@ std::string InputDeviceManager::GenerateDescriptor(struct libinput_device *input
     rawDescriptor += StringPrintf(":%04x:%04x:", vendor, product);
     // add handling for USB devices to not uniqueify kbs that show up twice
     if (uniqueId != nullptr && uniqueId[0] != '\0') {
-        rawDescriptor += "uniqueId:" + uniqueId;
+        rawDescriptor += "uniqueId:" + std::string(uniqueId);
     } else if (location != nullptr) {
-        rawDescriptor += "location:" + location;
+        rawDescriptor += "location:" + std::string(location);
     }
     if (name != nullptr && name[0] != '\0') {
         rawDescriptor += "name:" + regex_replace(name, std::regex(" "), "");
