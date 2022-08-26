@@ -266,7 +266,7 @@ int32_t MMIService::Init()
     }
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     InputDevCooSM->Init();
-#endif //OHOS_BUILD_ENABLE_COOPERATE
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     MMI_HILOGD("Input msg handler init");
     InputHandler->Init(*this);
     if (!InitLibinputService()) {
@@ -1251,7 +1251,7 @@ int32_t MMIService::StartRemoteCooperateResult(bool isSuccess,
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    MMI_HILOGI("StartRemoteCooperateResult=[%{public}d]",isSuccess);
+    MMI_HILOGI("StartRemoteCooperateResult=[%{public}d]", isSuccess);
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnStartRemoteCooperateResult,
         this, isSuccess, startDhid, xPercent, yPercent));
     if (ret != RET_OK) {
@@ -1283,7 +1283,7 @@ int32_t MMIService::StopRemoteCooperateResult(bool isSuccess)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    MMI_HILOGI("Enter MMI StopRemoteCooperateResult [%{public}d]",isSuccess);
+    MMI_HILOGI("Enter MMI StopRemoteCooperateResult [%{public}d]", isSuccess);
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnStopRemoteCooperateResult,
         this, isSuccess));
     if (ret != RET_OK) {
@@ -1292,7 +1292,7 @@ int32_t MMIService::StopRemoteCooperateResult(bool isSuccess)
     }
 #else
     (void)(isSuccess);
-#endif //OHOS_BUILD_ENABLE_COOPERATE
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     return RET_OK;
 }
 
@@ -1309,7 +1309,7 @@ int32_t MMIService::StartCooperateOtherResult(const std::string& srcNetworkId)
     }
 #else
     (void)(isSuccess);
-#endif //OHOS_BUILD_ENABLE_COOPERATE
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     return RET_OK;
 }
 
@@ -1344,6 +1344,6 @@ int32_t MMIService::OnStartCooperateOtherResult(const std::string& srcNetworkId)
     InputDevCooSM->StartCooperateOtherResult(srcNetworkId);
     return RET_OK;
 }
-#endif //OHOS_BUILD_ENABLE_COOPERATE
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 } // namespace MMI
 } // namespace OHOS
