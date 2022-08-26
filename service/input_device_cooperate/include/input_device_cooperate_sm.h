@@ -19,7 +19,6 @@
 #include "bytrace_adapter.h"
 #include "singleton.h"
 
-#include "device_manager_callback.h"
 #include "distributed_input_adapter.h"
 #include "dm_device_info.h"
 #include "event_package.h"
