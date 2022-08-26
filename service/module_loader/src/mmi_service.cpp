@@ -67,7 +67,7 @@ void CheckDefineOutput(const char* fmt, Ts... args)
     char buf[MAX_PACKET_BUF_SIZE] = {};
     int32_t ret = snprintf_s(buf, MAX_PACKET_BUF_SIZE, MAX_PACKET_BUF_SIZE - 1, fmt, args...);
     if (ret == -1) {
-        KMSG_LOGI("call snprintf_s fail.ret = %d", ret);
+        KMSG_LOGE("call snprintf_s fail.ret = %d", ret);
         return;
     }
     KMSG_LOGI("%s", buf);
