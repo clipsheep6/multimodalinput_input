@@ -25,7 +25,6 @@
 #endif
 
 #include "anr_manager.h"
-#include "event_cooperate_manager.h"
 #include "event_dump.h"
 #include "input_device_cooperate_sm.h"
 #include "input_device_manager.h"
