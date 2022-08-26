@@ -93,19 +93,20 @@ bool MMIClient::StartEventRunner()
         if (!AddFdListener(fd_)) {
             MMI_HILOGE("Add fd listener failed");
             return false;
-        } else {
-            if (!eventHandler_->PostTask(std::bind(&MMIClient::OnReconnect, this), CLIENT_RECONNECT_COOLING_TIME)) {
-                MMI_HILOGE("Send reconnect event failed");
-                return false;
-            }
+        }
+    } else {
+        if (!eventHandler_->PostTask(std::bind(&MMIClient::OnReconnect, this), CLIENT_RECONNECT_COOLING_TIME)) {
+            MMI_HILOGE("Send reconnect event failed");
+            return false;
         }
     }
     return true;
 }
 
-void MMIClient::StopOldEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
-{
+void MMIClient::StartNewEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
+{    
     CALL_DEBUG_ENTER;
+    CHK_PID_AND_TID();
     CHKPV(eventHandler);
     CHKPV(eventHandler_);
     if (fd_ >= 0) {
@@ -115,16 +116,8 @@ void MMIClient::StopOldEventHandler(std::shared_ptr<AppExecFwk::EventHandler> ev
     auto runner = eventHandler_->GetEventRunner();
     CHKPV(runner);
     runner->Stop();
+    eventHandler_.reset();
 
-    if (!eventHandler->PostTask(std::bind(&MMIClient::StartNewEventHandler, this, eventHandler))) {
-        MMI_HILOGE("Post new eventHandler task failed");
-        return;
-    }
-}
-
-void MMIClient::StartNewEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
-{    
-    CALL_DEBUG_ENTER;
     eventHandler_ = eventHandler;
     if (isConnected_ && fd_ >= 0) {
         if (!AddFdListener(fd_)) {
@@ -133,7 +126,7 @@ void MMIClient::StartNewEventHandler(std::shared_ptr<AppExecFwk::EventHandler> e
         }
     } else {
         if (!eventHandler_->PostTask(std::bind(&MMIClient::OnReconnect, this), CLIENT_RECONNECT_COOLING_TIME)) {
-            MMI_HILOGE("Send reconnect event failed");
+            MMI_HILOGE("Send new reconnect event failed");
             return;
         }
     }
@@ -152,15 +145,19 @@ void MMIClient::SwitchEventHandler(std::shared_ptr<IInputEventConsumer> inputEve
     if (eventHandler_ != nullptr) {
         auto currentRunner = eventHandler_->GetEventRunner();
         CHKPV(currentRunner);
+        uint64_t currentRunnerId = currentRunner->GetThreadId();
+        MMI_HILOGI("Current runner:%{public}" PRIu64, currentRunnerId);
         auto newRunner = eventHandler->GetEventRunner();
         CHKPV(newRunner);
-        if (currentRunner->GetThreadId() == newRunner->GetThreadId()) {
+        uint64_t newRunnerId = newRunner->GetThreadId();
+        MMI_HILOGI("New runner:%{public}" PRIu64, newRunnerId);
+        if (currentRunnerId == newRunnerId) {
             MMI_HILOGI("The eventRunners are the same");
             return;
         }
 
-        if (!eventHandler_->PostTask(std::bind(&MMIClient::StopOldEventHandler, this, eventHandler))) {
-            MMI_HILOGE("Post stop old eventHandler task failed");
+        if (!eventHandler_->PostTask(std::bind(&MMIClient::StartNewEventHandler, this, eventHandler))) {
+            MMI_HILOGE("Send stop old eventHandler task failed");
             return;
         }
     }
@@ -232,7 +229,7 @@ void MMIClient::OnReconnect()
     }
     CHKPV(eventHandler_);
     if (eventHandler_->PostTask(std::bind(&MMIClient::OnReconnect, this), CLIENT_RECONNECT_COOLING_TIME)) {
-        MMI_HILOGF("Post reconnect event failed");
+        MMI_HILOGE("Post reconnect event failed");
     }
 }
 
@@ -265,7 +262,7 @@ void MMIClient::OnDisconnected()
     Close();
     if (!isExit && eventHandler_ != nullptr) {
         if (!eventHandler_->PostTask(std::bind(&MMIClient::OnReconnect, this), CLIENT_RECONNECT_COOLING_TIME)) {
-            MMI_HILOGE("Send reconnect event return false");
+            MMI_HILOGE("Send reconnect event task failed");
         }
     }
 }
@@ -306,7 +303,14 @@ void MMIClient::Stop()
 {
     CALL_DEBUG_ENTER;
     UDSClient::Stop();
-    eventHandler_.reset();
+    if (eventHandler_ != nullptr) {
+        auto runner = eventHandler_->GetEventRunner();
+        if (runner != nullptr) {
+            runner->Stop();
+        }
+        eventHandler_->RemoveAllEvents();
+        eventHandler_->RemoveAllFileDescriptorListeners();
+    }
 }
 
 const std::string& MMIClient::GetErrorStr(ErrCode code) const

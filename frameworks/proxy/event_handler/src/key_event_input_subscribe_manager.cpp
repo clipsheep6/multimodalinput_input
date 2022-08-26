@@ -61,6 +61,7 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
         return INVALID_SUBSCRIBE_ID;
     }
 
+    std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
         return INVALID_SUBSCRIBE_ID;
@@ -89,6 +90,7 @@ int32_t KeyEventInputSubscribeManager::UnsubscribeKeyEvent(int32_t subscribeId)
         return RET_ERR;
     }
 
+    std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
         return INVALID_SUBSCRIBE_ID;

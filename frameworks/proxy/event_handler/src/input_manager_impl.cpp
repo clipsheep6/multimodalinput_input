@@ -126,6 +126,7 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventCo
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
 {
     CALL_INFO_TRACE;
+    CHK_PID_AND_TID();
     CHKPV(inputEventConsumer);
     CHKPV(eventHandler);
     std::lock_guard<std::mutex> guard(mtx_);
