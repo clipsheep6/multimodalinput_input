@@ -21,7 +21,6 @@
 #include "nocopyable.h"
 #include "singleton.h"
 
-#include "if_mmi_client.h"
 #include "key_event_input_subscribe_manager.h"
 #include "pointer_event.h"
 
@@ -34,8 +33,6 @@ public:
     ~StandardizedEventManager();
     DISALLOW_COPY_AND_MOVE(StandardizedEventManager);
 
-    void SetClientHandle(MMIClientPtr client);
-    const std::set<std::string> *GetRegisterEvent();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t InjectEvent(const std::shared_ptr<KeyEvent> keyEventPtr);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -49,12 +46,6 @@ public:
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWIN
-
-protected:
-    bool SendMsg(NetPacket& pkt) const;
-
-protected:
-    MMIClientPtr client_ = nullptr;
 };
 
 #define EventManager OHOS::Singleton<StandardizedEventManager>::GetInstance()

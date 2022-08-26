@@ -39,12 +39,6 @@ StandardizedEventManager::StandardizedEventManager() {}
 
 StandardizedEventManager::~StandardizedEventManager() {}
 
-void StandardizedEventManager::SetClientHandle(MMIClientPtr client)
-{
-    CALL_DEBUG_ENTER;
-    client_ = client;
-}
-
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t StandardizedEventManager::SubscribeKeyEvent(
     const KeyEventInputSubscribeManager::SubscribeKeyEventInfo &subscribeInfo)
@@ -110,11 +104,5 @@ int32_t StandardizedEventManager::MoveMouseEvent(int32_t offsetX, int32_t offset
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
-
-bool StandardizedEventManager::SendMsg(NetPacket& pkt) const
-{
-    CHKPF(client_);
-    return client_->SendMessage(pkt);
-}
 } // namespace MMI
 } // namespace OHOS

@@ -63,7 +63,6 @@ bool MMIClient::Start()
 {
     CALL_DEBUG_ENTER;
     msgHandler_.Init();
-    EventManager.SetClientHandle(GetSharedPtr());
     auto callback = std::bind(&ClientMsgHandler::OnMsgHandler, &msgHandler_,
         std::placeholders::_1, std::placeholders::_2);
     if (!StartClient(callback)) {
@@ -103,8 +102,8 @@ bool MMIClient::StartEventRunner()
     return true;
 }
 
-void MMIClient::StartNewEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
-{    
+void MMIClient::StopOldEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
+{
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     CHKPV(eventHandler);
@@ -116,8 +115,17 @@ void MMIClient::StartNewEventHandler(std::shared_ptr<AppExecFwk::EventHandler> e
     auto runner = eventHandler_->GetEventRunner();
     CHKPV(runner);
     runner->Stop();
-    eventHandler_.reset();
 
+    if (!eventHandler->PostTask(std::bind(&MMIClient::StartNewEventHandler, this, eventHandler))) {
+        MMI_HILOGE("Send new eventHandler task failed");
+        return;
+    }
+}
+
+void MMIClient::StartNewEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
+{    
+    CALL_DEBUG_ENTER;
+    CHK_PID_AND_TID();
     eventHandler_ = eventHandler;
     if (isConnected_ && fd_ >= 0) {
         if (!AddFdListener(fd_)) {
@@ -145,18 +153,16 @@ void MMIClient::SwitchEventHandler(std::shared_ptr<IInputEventConsumer> inputEve
     if (eventHandler_ != nullptr) {
         auto currentRunner = eventHandler_->GetEventRunner();
         CHKPV(currentRunner);
-        uint64_t currentRunnerId = currentRunner->GetThreadId();
-        MMI_HILOGI("Current runner:%{public}" PRIu64, currentRunnerId);
+        MMI_HILOGI("Current runner:%{public}" PRIu64, GetThisThreadId());
         auto newRunner = eventHandler->GetEventRunner();
         CHKPV(newRunner);
-        uint64_t newRunnerId = newRunner->GetThreadId();
-        MMI_HILOGI("New runner:%{public}" PRIu64, newRunnerId);
-        if (currentRunnerId == newRunnerId) {
+        MMI_HILOGI("New runner:%{public}" PRIu64, GetThisThreadId());
+        if (currentRunner->GetThreadId() == newRunner->GetThreadId()) {
             MMI_HILOGI("The eventRunners are the same");
             return;
         }
 
-        if (!eventHandler_->PostTask(std::bind(&MMIClient::StartNewEventHandler, this, eventHandler))) {
+        if (!eventHandler_->PostTask(std::bind(&MMIClient::StopOldEventHandler, this, eventHandler))) {
             MMI_HILOGE("Send stop old eventHandler task failed");
             return;
         }

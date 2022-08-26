@@ -18,6 +18,7 @@
 #include "nocopyable.h"
 #include "singleton.h"
 
+#include "if_mmi_client.h"
 #include "proto.h"
 #include "pointer_event.h"
 #include "standardized_event_manager.h"

@@ -50,6 +50,7 @@ protected:
 
     bool StartEventRunner();
     void OnReconnect();
+    void StopOldEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
     void StartNewEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
     bool AddFdListener(int32_t fd);
     bool DelFdListener(int32_t fd);
