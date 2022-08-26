@@ -142,6 +142,7 @@ ohos_shared_library("libmmi-client") {
   if (input_feature_input_cooperation) {
     defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
   }
+
   configs = [
     ":libmmi_client_config",
     "//foundation/multimodalinput/input/util:libmmi_util_public_config",
