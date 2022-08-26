@@ -48,12 +48,11 @@ constexpr int32_t ABS_MT_POSITION_Y = 0x36;
 constexpr int32_t ABS_MT_PRESSURE = 0x3a;
 constexpr int32_t ABS_MT_WIDTH_MAJOR = 0x32;
 constexpr int32_t ABS_MT_WIDTH_MINOR = 0x33;
-
 constexpr int32_t BUS_BLUETOOTH = 0X5;
+const std::string UNKNOWN_SCREEN_ID = "";
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 const char *SPLIT_SYMBOL = "|";
 const std::string BUNDLE_NAME = "DBinderBus_" + std::to_string(getpid());
-const std::string UNKNOWN_SCREEN_ID = "";
 const std::string DH_ID_PREFIX = "Input_";
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 
