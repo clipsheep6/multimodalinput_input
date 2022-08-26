@@ -60,13 +60,14 @@ constexpr int32_t ACTION_TIME = 3000;
 constexpr int32_t BLOCK_TIME_MS = 16;
 } // namespace
 
-int64_t InputManagerCommand::SleepTimes(int64_t currentTimeMs)
+void InputManagerCommand::SleepAndUpdateTime(int64_t &currentTimeMs)
 {
     int64_t nowEndSysTimeMs = GetSysClockTime() / 1000;
     int64_t sleepTimeMs = BLOCK_TIME_MS - (nowEndSysTimeMs - currentTimeMs) % BLOCK_TIME_MS;
     std::this_thread::sleep_for(std::chrono::milliseconds(sleepTimeMs));
-    return nowEndSysTimeMs + sleepTimeMs;
+    currentTimeMs = nowEndSysTimeMs + sleepTimeMs;
 }
+
 int32_t InputManagerCommand::NextPos(int64_t begTimeMs, int64_t curtTimeMs, int32_t totalTimeMs,
     int32_t begPos, int32_t endPos)
 {
@@ -146,11 +147,31 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 while ((c = getopt_long(argc, argv, "m:d:u:c:b:s:i:", mouseSensorOptions, &optionIndex)) != -1) {
                     switch (c) {
                         case 'm': {
-                            if (argc < 5) {
+                            if (argc - optind < 1) {
                                 std::cout << "too few arguments to function" << std::endl;
                                 return RET_ERR;
                             }
-                            if (argc == 5) {
+                            auto isTraceOption = [](const std::string &opt1) {
+                                return opt1 == std::string("--trace");
+                            };
+                            auto traceMode = [isTraceOption](int32_t argCount, char *argvOffset[]) -> bool {
+                                if (argCount <= 3) {
+                                    return false;
+                                }
+                                std::string arg3 = argvOffset[2];
+                                if (arg3.at(0) == '-') {
+                                    return false;
+                                }
+                                if ((argCount >= 5) && isTraceOption(std::string(argvOffset[4]))) {
+                                    return true;
+                                }
+                                if ((argCount >= 6) && isTraceOption(std::string(argvOffset[5]))) {
+                                    return true;
+                                }
+                                return false;
+                            }(argc - optind + 1, &argv[optind - 1]);
+
+                            if (!traceMode) {
                                 if (!StrToInt(optarg, px) || !StrToInt(argv[optind], py)) {
                                     std::cout << "invalid parameter to move mouse" << std::endl;
                                     return RET_ERR;
@@ -168,23 +189,50 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                                 optind++;
-                            }
-                            if (argc >= 7) {
+                            } else {
                                 int32_t px1 = 0;
                                 int32_t py1 = 0;
                                 int32_t px2 = 0;
                                 int32_t py2 = 0;
                                 int32_t totalTimeMs = 1000;
-                                if ((!StrToInt(optarg, px1)) ||
-                                    (!StrToInt(argv[optind], py1)) ||
-                                    (!StrToInt(argv[optind + 1], px2)) ||
-                                    (!StrToInt(argv[optind + 2], py2))) {
-                                        std::cout << "invalid coordinate value" << std::endl;
-                                        return RET_ERR;
+                                bool foundTraceOption = false;
+                                if (argc - optind >= 3) {
+                                    if ((!StrToInt(optarg, px1)) ||
+                                        (!StrToInt(argv[optind], py1)) ||
+                                        (!StrToInt(argv[optind + 1], px2)) ||
+                                        (!StrToInt(argv[optind + 2], py2))) {
+                                            std::cout << "invalid coordinate value" << std::endl;
+                                            return RET_ERR;
+                                    }
+                                    optind += 3;
                                 }
-                                if (!StrToInt(argv[optind + 3], totalTimeMs)) {
-                                    std::cout << "invalid total times" << std::endl;
-                                    return RET_ERR;
+                                if (argc - optind >= 1) {
+                                    std::string arg5 = argv[optind];
+                                    if (arg5.at(0) == '-') {
+                                        if (isTraceOption(arg5)) {
+                                            foundTraceOption = true;
+                                        } else {
+                                            std::cout << "invalid option, the 5th position parameter must be --trace" << std::endl;
+                                            return RET_ERR;
+                                        }
+                                    } else if (!StrToInt(arg5, totalTimeMs)) {
+                                        std::cout << "invalid total times" << std::endl;
+                                        return RET_ERR;
+                                    }
+                                    optind++;
+                                }
+                                if (!foundTraceOption) {
+                                    if (argc - optind < 1) {
+                                        std::cout << "missing 6th position parameter --trace" << std::endl;
+                                        return RET_ERR;
+                                    }
+                                    std::string arg6 = argv[optind];
+                                    if (!isTraceOption(arg6)) {
+                                        std::cout << "invalid option, the 6th position parameter must be --trace" << std::endl;
+                                        return RET_ERR;
+                                    }
+                                    optind++;
+                                    foundTraceOption = true;
                                 }
                                 const int64_t minTotalTimeMs = 1;
                                 const int64_t maxTotalTimeMs = 15000;
@@ -197,6 +245,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 std::cout << "start coordinate: (" << px1 << ", "  << py1 << ")" << std::endl;
                                 std::cout << "  end coordinate: (" << px2 << ", "  << py2 << ")" << std::endl;
                                 std::cout << "     total times: "  << totalTimeMs  << " ms"      << std::endl;
+                                std::cout << "      trace mode: " << std::boolalpha << foundTraceOption << std::endl;
                                 auto pointerEvent = PointerEvent::Create();
                                 CHKPR(pointerEvent, ERROR_NULL_POINTER);
                                 PointerEvent::PointerItem item;
@@ -225,7 +274,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     pointerEvent->UpdatePointerItem(0, item);
                                     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                                     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-                                    currentTimeMs = SleepTimes(currentTimeMs);
+                                    SleepAndUpdateTime(currentTimeMs);
                                 }
 
                                 item.SetDisplayX(px2);
