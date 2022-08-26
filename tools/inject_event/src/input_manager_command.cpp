@@ -170,7 +170,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 }
                                 return false;
                             }(argc - optind + 1, &argv[optind - 1]);
-
                             if (!traceMode) {
                                 if (!StrToInt(optarg, px) || !StrToInt(argv[optind], py)) {
                                     std::cout << "invalid parameter to move mouse" << std::endl;
@@ -212,7 +211,8 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                         if (isTraceOption(arg5)) {
                                             foundTraceOption = true;
                                         } else {
-                                            std::cout << "invalid option, the 5th position parameter must be --trace" << std::endl;
+                                            std::cout << "invalid option, the 5th position parameter must be --trace"
+                                                << std::endl;
                                             return RET_ERR;
                                         }
                                     } else if (!StrToInt(arg5, totalTimeMs)) {
@@ -228,7 +228,8 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     }
                                     std::string arg6 = argv[optind];
                                     if (!isTraceOption(arg6)) {
-                                        std::cout << "invalid option, the 6th position parameter must be --trace" << std::endl;
+                                        std::cout << "invalid option, the 6th position parameter must be --trace"
+                                            << std::endl;
                                         return RET_ERR;
                                     }
                                     optind++;
