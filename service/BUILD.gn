@@ -76,6 +76,10 @@ config("libmmi_server_config") {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
 
+  if (efficiency_manager_service_enabled) {
+    defines += [ "OHOS_EFFICIENCY_MANAGER_ENABLED" ]
+  }
+
   if (input_feature_libinput) {
     defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
@@ -582,6 +586,10 @@ ohos_shared_library("libmmi-server") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
+
+  if (efficiency_manager_service_enabled) {
+    external_deps += [ "efficiency_manager:suspend_manager_client" ]
+  }
 
   if (input_feature_pointer_drawing) {
     external_deps += [ "window_manager:libwm" ]

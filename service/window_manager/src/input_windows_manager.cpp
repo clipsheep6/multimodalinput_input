@@ -25,6 +25,9 @@
 #include "pointer_drawing_manager.h"
 #include "util.h"
 #include "util_ex.h"
+#ifdef OHOS_EFFICIENCY_MANAGER_ENABLED
+#include "suspend_manager_client.h"
+#endif // OHOS_EFFICIENCY_MANAGER_ENABLED
 
 namespace OHOS {
 namespace MMI {
@@ -839,6 +842,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             }
         } else if (IsInHotArea(logicalX, logicalY, item.defaultHotAreas)) {
             touchWindow = &item;
+#ifdef OHOS_EFFICIENCY_MANAGER_ENABLED
+            SuspendManager::SuspendManagerClient::GetInstance().ThawOneApplication(
+                -1, "", "THAW_BY_TOUCH_EVNET", touchWindow->pid);
+#endif // OHOS_EFFICIENCY_MANAGER_ENABLED
             break;
         }
     }

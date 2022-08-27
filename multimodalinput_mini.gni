@@ -23,6 +23,7 @@ input_feature_distributed = false
 
 declare_args() {
   resource_schedule_service_enabled = false
+  efficiency_manager_service_enabled = false
   input_feature_combination_key = true
   input_feature_pointer_drawing = true
   input_feature_interceptor = true
@@ -36,6 +37,11 @@ declare_args() {
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
     resource_schedule_service_enabled = true
+  }
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.resourceschedule_efficiency_manager)) {
+    efficiency_manager_service_enabled = true
   }
 }
 
