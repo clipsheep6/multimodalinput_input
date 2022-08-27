@@ -41,7 +41,7 @@ int32_t IInputDeviceCooperateState::PrepareAndStart(const std::string &srcNetwor
 {
     CALL_DEBUG_ENTER;
     std::string sinkNetworkId = InputDevMgr->GetOriginNetworkId(startInputDeviceId);
-    int32_t ret;
+    int32_t ret = RET_ERR;
     if (NeedPrepare(srcNetworkId, sinkNetworkId)) {
         InputDevCooSM->UpdatePreparedDevices(srcNetworkId, sinkNetworkId);
         ret = DistributedAdapter->PrepareRemoteInput(
