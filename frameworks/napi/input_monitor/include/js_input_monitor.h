@@ -53,6 +53,7 @@ public:
 private:
     int32_t id_ {-1};
     mutable std::mutex mutex_;
+    mutable std::mutex filterMutex_;
     int32_t monitorId_ {-1};
     std::function<void(std::shared_ptr<PointerEvent>)> callback_;
     mutable bool consumed_ {false};
@@ -90,7 +91,7 @@ private:
     bool GetPressedButtons(const std::set<int32_t>& pressedButtons, napi_value result);
     bool HasKeyCode(const std::vector<int32_t>& pressedKeys, int32_t keyCode);
     bool GetPressedKey(const std::vector<int32_t>& pressedKeys, napi_value result);
-    MapFun GetFuns(const std::shared_ptr<PointerEvent> pointerEvent, const PointerEvent::PointerItem& item);
+    MapFun GetFuns(const PointerEvent::PointerItem& item);
 private:
     std::shared_ptr<InputMonitor> monitor_ {nullptr};
     napi_ref receiver_ {nullptr};
@@ -100,6 +101,7 @@ private:
     bool isMonitoring_ = false;
     std::queue<std::shared_ptr<PointerEvent>> evQueue_;
     std::mutex mutex_;
+    std::mutex evQueueMutex_;
     int32_t jsTaskNum_ = 0;
 };
 } // namespace MMI

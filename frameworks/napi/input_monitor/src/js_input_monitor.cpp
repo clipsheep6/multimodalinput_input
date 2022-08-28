@@ -40,6 +40,7 @@ constexpr int32_t AXIS_UPDATE = 5;
 constexpr int32_t AXIS_END = 6;
 constexpr int32_t MIDDLE = 1;
 constexpr int32_t RIGHT = 2;
+constexpr int32_t MOUSE_FLOW = 15;
 } // namespace
 
 bool InputMonitor::Start()
@@ -80,6 +81,16 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
         MMI_HILOGE("Failed to process pointer event, id:%{public}d", id_);
         return;
     }
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE
+        && pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE) {
+        static int32_t count = MOUSE_FLOW;
+        std::lock_guard<std::mutex> guard(filterMutex_);
+        if (++count < MOUSE_FLOW) {
+            return;
+        } else {
+            count = 0;
+        }
+    }
     std::function<void(std::shared_ptr<PointerEvent>)> callback;
     {
         std::lock_guard<std::mutex> guard(mutex_);
@@ -110,7 +121,8 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
     callback(pointerEvent);
 }
 
-void InputMonitor::SetId(int32_t id) {
+void InputMonitor::SetId(int32_t id)
+{
     id_ = id;
 }
 
@@ -331,17 +343,17 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
     return RET_OK;
 }
 
-MapFun JsInputMonitor::GetFuns(const std::shared_ptr<PointerEvent> pointerEvent, const PointerEvent::PointerItem& item)
+MapFun JsInputMonitor::GetFuns(const PointerEvent::PointerItem& item)
 {
     MapFun mapFun;
-    mapFun["actionTime"] = std::bind(&PointerEvent::GetActionTime, pointerEvent);
-    mapFun["screenId"] = std::bind(&PointerEvent::GetTargetDisplayId, pointerEvent);
-    mapFun["windowId"] = std::bind(&PointerEvent::GetTargetWindowId, pointerEvent);
-    mapFun["deviceId"] = std::bind(&PointerEvent::PointerItem::GetDeviceId, item);
     mapFun["windowX"] = std::bind(&PointerEvent::PointerItem::GetDisplayX, item);
     mapFun["windowY"] = std::bind(&PointerEvent::PointerItem::GetDisplayY, item);
     mapFun["screenX"] = std::bind(&PointerEvent::PointerItem::GetWindowX, item);
     mapFun["screenY"] = std::bind(&PointerEvent::PointerItem::GetWindowY, item);
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    mapFun["rawDeltaX"] = std::bind(&RawData::GetDx, item.GetRawData());
+    mapFun["rawDeltaY"] = std::bind(&RawData::GetDy, item.GetRawData());
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
     return mapFun;
 }
 
@@ -359,7 +371,7 @@ bool JsInputMonitor::SetMouseProperty(const std::shared_ptr<PointerEvent> pointe
         return false;
     }
 
-    auto mapFun = GetFuns(pointerEvent, item);
+    auto mapFun = GetFuns(item);
     for (const auto& it : mapFun) {
         if (SetNameProperty(jsEnv_, result, it.first, it.second()) != napi_ok) {
             THROWERR(jsEnv_, "Set property failed");
@@ -417,10 +429,6 @@ int32_t JsInputMonitor::GetMousePointerItem(const std::shared_ptr<PointerEvent> 
             if (!pointerEvent->GetPointerItem(pointerId, item)) {
                 MMI_HILOGE("Invalid pointer: %{public}d", pointerId);
                 return RET_ERR;
-            }
-            if (SetNameProperty(jsEnv_, result, "id", currentPointerId) != napi_ok) {
-                THROWERR(jsEnv_, "Set property of id failed");
-                return false;
             }
             if (!SetMouseProperty(pointerEvent, item, result)) {
                 MMI_HILOGE("Set property of mouse failed");
@@ -684,6 +692,12 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
     }
     CHKPV(monitor_);
     CHKPV(pointerEvent);
+    {
+        std::lock_guard<std::mutex> guard(evQueueMutex_);
+        std::queue<std::shared_ptr<PointerEvent>> myEmpty;
+        std::swap(evQueue_, myEmpty);
+        evQueue_.push(pointerEvent);
+    }
     int32_t num = 0;
     {
         std::lock_guard<std::mutex> guard(mutex_);
@@ -700,11 +714,12 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
         if (status != napi_ok) {
             THROWERR(jsEnv_, "napi_get_uv_event_loop is failed");
             delete work;
+            std::lock_guard<std::mutex> guard(mutex_);
+            jsTaskNum_ = 0;
             return;
         }
         uv_queue_work(loop, work, [](uv_work_t *work){}, &JsInputMonitor::JsCallback);
         std::lock_guard<std::mutex> guard(mutex_);
-        ++jsTaskNum_;
     }
 }
 
