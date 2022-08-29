@@ -93,11 +93,11 @@ const std::map<int32_t, KeyUnicode> KEY_UNICODE_TRANSFORMATION = {
     { HOS_KEY_NUMPAD_MULTIPLY,  { 0x0038, 0x0000 } },
     { HOS_KEY_NUMPAD_SUBTRACT,  { 0x002D, 0x0000 } },
     { HOS_KEY_NUMPAD_ADD,       { 0x002B, 0x0000 } },
-    { HOS_KEY_NUMPAD_DOT,       { 0x002E, 0x0000 } },
+    { HOS_KEY_NUMPAD_DOT,       { 0x002E, 0x0000 } }
 };
 } // namespace
 
-bool IsShiftPressed(const std::shared_ptr<KeyEvent>& keyEvent)
+bool IsShiftPressed(const std::shared_ptr<KeyEvent> &keyEvent)
 {
     auto pressedKeys = keyEvent->GetPressedKeys();
     for (auto iter = pressedKeys.cbegin(); iter != pressedKeys.cend(); ++iter) {
@@ -108,14 +108,14 @@ bool IsShiftPressed(const std::shared_ptr<KeyEvent>& keyEvent)
     return false;
 }
 
-uint32_t KeyCodeToUnicode(int32_t keyCode, const std::shared_ptr<KeyEvent>& keyEvent)
+uint32_t KeyCodeToUnicode(int32_t keyCode, const std::shared_ptr<KeyEvent> &keyEvent)
 {
     CHKPR(keyEvent, DEFAULT_UNICODE);
     auto iter = KEY_UNICODE_TRANSFORMATION.find(keyCode);
     if (iter == KEY_UNICODE_TRANSFORMATION.end()) {
         return DEFAULT_UNICODE;
     }
-    const KeyUnicode& keyUnicode = iter->second;
+    const KeyUnicode &keyUnicode = iter->second;
     bool isCapsEnable = keyEvent->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY);
     bool isShiftPress = IsShiftPressed(keyEvent);
     if (keyCode >= HOS_KEY_A && keyCode <= HOS_KEY_Z) {

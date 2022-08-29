@@ -20,7 +20,7 @@
 
 namespace OHOS {
 namespace MMI {
-uint32_t KeyCodeToUnicode(int32_t keyCode, const std::shared_ptr<KeyEvent>& keyEvent);
+uint32_t KeyCodeToUnicode(int32_t keyCode, const std::shared_ptr<KeyEvent> &keyEvent);
 } // namespace MMI
 } // namespace OHOS
 #endif // KEY_UNICODE_TRANSFORMATION_H
