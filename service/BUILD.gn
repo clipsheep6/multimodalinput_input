@@ -51,6 +51,7 @@ config("libmmi_server_config") {
     "//foundation/multimodalinput/input/util/socket/include",
     "//foundation/multimodalinput/input/util/network/include",
     "//foundation/multimodalinput/input/frameworks/proxy/event_handler/include",
+    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
     "//third_party/cJSON",
     "//foundation/deviceprofile/device_info_manager/interfaces/innerkits/core/include",
   ]
