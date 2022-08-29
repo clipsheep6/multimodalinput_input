@@ -41,8 +41,7 @@ ohos_shared_library("keyevent") {
 
   configs = [ ":keyEvent_config" ]
 
-  deps = [
-  ]
+  deps = []
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
