@@ -15,6 +15,8 @@
 #ifndef EVENT_DISPATCH_H
 #define EVENT_DISPATCH_H
 
+#include <mutex>
+
 #include "nocopyable.h"
 
 #include "i_input_event_handler.h"
@@ -26,6 +28,11 @@
 namespace OHOS {
 namespace MMI {
 class EventDispatch : public IInputEventHandler {
+    struct MouseState {
+        uint32_t type { PointerEvent::SOURCE_TYPE_UNKNOWN };
+        uint32_t code { PointerEvent::BUTTON_NONE };
+        int32_t value { PointerEvent::POINTER_ACTION_UNKNOWN };
+    };
 public:
     EventDispatch();
     DISALLOW_COPY_AND_MOVE(EventDispatch);
@@ -33,15 +40,28 @@ public:
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+#ifdef OHOS_BUILD_ENABLE_POINTER
     void HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    void HandlePointerEventInner(const std::shared_ptr<PointerEvent> point);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    void OnMouseStateChange(uint32_t type, uint32_t code, int32_t value);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+    bool CheckPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
+
+private:
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    std::mutex lock_;
+    std::vector<MouseState> mouseState_;
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 };
 } // namespace MMI
 } // namespace OHOS

@@ -35,6 +35,9 @@
 #include "securec.h"
 #include "util.h"
 #include "util_ex.h"
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+#include "input_device_cooperate_sm.h"
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 
 namespace OHOS {
 namespace MMI {
@@ -64,8 +67,20 @@ void ChkConfig(int32_t fd)
 void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
-    if (args.size() > MAX_COMMAND_COUNT) {
-        MMI_HILOGE("More than 32 commands");
+    int32_t count = 0;
+    for (const auto &str : args) {
+        if (str.find("--") == 0) {
+            ++count;
+            continue;
+        }
+        if (str.find("-") == 0) {
+            count += str.size() - 1;
+            continue;
+        }
+    }
+    if (count > MAX_COMMAND_COUNT) {
+        MMI_HILOGE("cmd param number not more than 32");
+        mprintf(fd, "cmd param number not more than 32\n");
         return;
     }
     int32_t optionIndex = 0;
@@ -79,6 +94,9 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
         {"monitor", no_argument, 0, 'o'},
         {"interceptor", no_argument, 0, 'i'},
         {"mouse", no_argument, 0, 'm'},
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+        {"inputdevcoosm", no_argument, 0, 'k'},
+#endif // OHOS_BUILD_ENABLE_COOPERATE
         {NULL, 0, 0, 0}
     };
     char **argv = new (std::nothrow) char *[args.size()];
@@ -101,7 +119,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
     }
     optind = 1;
     int32_t c;
-    while ((c = getopt_long (args.size(), argv, "hdlwusoim", dumpOptions, &optionIndex)) != -1) {
+    while ((c = getopt_long (args.size(), argv, "hdlwusoimc", dumpOptions, &optionIndex)) != -1) {
         switch (c) {
             case 'h': {
                 DumpEventHelp(fd, args);
@@ -123,6 +141,14 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
                 auto udsServer = InputHandler->GetUDSServer();
                 CHKPV(udsServer);
                 udsServer->Dump(fd, args);
+                break;
+            }
+            case 'c': {
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+                InputDevCooSM->Dump(fd, args);
+#else
+                mprintf(fd, "Input device cooperate does not support");
+#endif // OHOS_BUILD_ENABLE_COOPERATE
                 break;
             }
             case 's': {
@@ -188,12 +214,13 @@ void EventDump::DumpHelp(int32_t fd)
     mprintf(fd, "      -h, --help: dump help\t");
     mprintf(fd, "      -d, --device: dump the device information\t");
     mprintf(fd, "      -l, --devicelist: dump the device list information\t");
-    mprintf(fd, "      -w, --windows,: dump the windows information\t");
+    mprintf(fd, "      -w, --windows: dump the windows information\t");
     mprintf(fd, "      -u, --udsserver: dump the uds_server information\t");
     mprintf(fd, "      -o, --monitor: dump the monitor information\t");
     mprintf(fd, "      -s, --subscriber: dump the subscriber information\t");
     mprintf(fd, "      -i, --interceptor: dump the interceptor information\t");
     mprintf(fd, "      -m, --mouse: dump the mouse information\t");
+    mprintf(fd, "      -c, --dump Keyboard and mouse crossing information\t");
 }
 } // namespace MMI
 } // namespace OHOS

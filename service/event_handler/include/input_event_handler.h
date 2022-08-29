@@ -43,12 +43,19 @@ public:
     void Init(UDSServer& udsServer);
     void OnEvent(void *event);
     UDSServer *GetUDSServer() const;
-    int32_t AddInputEventFilter(sptr<IEventFilter> filter);
 
     std::shared_ptr<InputEventNormalizeHandler> GetInputEventNormalizeHandler() const;
     std::shared_ptr<EventInterceptorHandler> GetInterceptorHandler() const;
     std::shared_ptr<KeyEventSubscriber> GetSubscriberHandler() const;
     std::shared_ptr<EventMonitorHandler> GetMonitorHandler() const;
+    std::shared_ptr<EventFilterWrap> GetFilterHandler() const;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    void SetJumpInterceptState(bool isJump);
+    bool GetJumpInterceptState() const;
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+
+    void SetJumpInterceptState(bool isJump);
+    bool GetJumpInterceptState() const;
 
 private:
     int32_t BuildInputHandlerChain();
@@ -61,6 +68,7 @@ private:
     std::shared_ptr<EventMonitorHandler> monitorHandler_ = nullptr;
 
     uint64_t idSeed_ = 0;
+    bool isJumpIntercept_ = false;
 };
 #define InputHandler InputEventHandler::GetInstance()
 } // namespace MMI

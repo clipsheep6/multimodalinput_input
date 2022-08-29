@@ -122,6 +122,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
     struct option keyboardSensorOptions[] = {
         {"down", required_argument, NULL, 'd'},
         {"up", required_argument, NULL, 'u'},
+        {"long_press", required_argument, NULL, 'l'},
         {"interval", required_argument, NULL, 'i'},
         {NULL, 0, NULL, 0}
     };
@@ -546,7 +547,8 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 std::vector<int32_t> downKey;
                 int32_t keyCode = 0;
                 int32_t isCombinationKey = 0;
-                while ((c = getopt_long(argc, argv, "d:u:i:", keyboardSensorOptions, &optionIndex)) != -1) {
+                int64_t time = GetSysClockTime();
+                while ((c = getopt_long(argc, argv, "d:u:l:i:", keyboardSensorOptions, &optionIndex)) != -1) {
                     switch (c) {
                         case 'd': {
                             if (!StrToInt(optarg, keyCode)) {
@@ -564,8 +566,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 KeyEvent::KeyItem item[downKey.size()];
                                 for (size_t i = 0; i < downKey.size(); i++) {
                                     KeyEvent->SetKeyCode(keyCode);
+                                    KeyEvent->SetActionTime(time);
                                     KeyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
                                     item[i].SetKeyCode(downKey[i]);
+                                    item[i].SetDownTime(time);
                                     item[i].SetPressed(true);
                                     KeyEvent->AddKeyItem(item[i]);
                                 }
@@ -576,9 +580,11 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             auto KeyEvent = KeyEvent::Create();
                             CHKPR(KeyEvent, ERROR_NULL_POINTER);
                             KeyEvent->SetKeyCode(keyCode);
+                            KeyEvent->SetActionTime(time);
                             KeyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
                             KeyEvent::KeyItem item1;
                             item1.SetKeyCode(keyCode);
+                            item1.SetDownTime(time);
                             item1.SetPressed(true);
                             KeyEvent->AddKeyItem(item1);
                             InputManager::GetInstance()->SimulateInputEvent(KeyEvent);
@@ -596,10 +602,12 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 auto KeyEvent = KeyEvent::Create();
                                 CHKPR(KeyEvent, ERROR_NULL_POINTER);
                                 KeyEvent->SetKeyCode(keyCode);
+                                KeyEvent->SetActionTime(time);
                                 KeyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
                                 KeyEvent::KeyItem item1;
                                 item1.SetKeyCode(keyCode);
-                                item1.SetPressed(true);
+                                item1.SetDownTime(time);
+                                item1.SetPressed(false);
                                 KeyEvent->AddKeyItem(item1);
                                 InputManager::GetInstance()->SimulateInputEvent(KeyEvent);
                                 iter = downKey.erase(iter);
@@ -608,6 +616,66 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 std::cout << "please press the " << keyCode << " key first "<< std::endl;
                                 return EVENT_REG_FAIL;
                             }
+                        }
+                        case 'l': {
+                            if (argc < 4) {
+                                std::cout << "argc:" << argc << std::endl;
+                                std::cout << "wrong number of parameters" << std::endl;
+                                return RET_ERR;
+                            }
+                            if (argc >= 4) {
+                                if (!StrToInt(optarg, keyCode)) {
+                                    std::cout << "invalid key code value" << std::endl;
+                                    return RET_ERR;
+                                }
+                            }
+                            int32_t pressTimeMs = 3000;
+                            if (argc >= 5) {
+                                if (!StrToInt(argv[optind], pressTimeMs)) {
+                                    std::cout << "invalid key code value or press time" << std::endl;
+                                    return RET_ERR;
+                                }
+                            }
+                            static constexpr int32_t minKeyCode = 0;
+                            static constexpr int32_t maxKeyCode = 5000;
+                            if ((keyCode < minKeyCode) || (keyCode > maxKeyCode)) {
+                                std::cout << "key code is out of range:" << minKeyCode << " <= "
+                                    << keyCode << " <= " << maxKeyCode << std::endl;
+                                return RET_ERR;
+                            }
+                            static constexpr int32_t minPressTimeMs = 3000;
+                            static constexpr int32_t maxPressTimeMs = 15000;
+                            if ((pressTimeMs < minPressTimeMs) || (pressTimeMs > maxPressTimeMs)) {
+                                std::cout << "press time is out of range:" << minPressTimeMs << " ms" << " <= "
+                                    << pressTimeMs << " <= " << maxPressTimeMs << " ms" << std::endl;
+                                return RET_ERR;
+                            }
+                            std::cout << " key code: " << keyCode << std::endl
+                                << "long press time: " << pressTimeMs << " ms" << std::endl;
+                            auto keyEvent = KeyEvent::Create();
+                            if (keyEvent == nullptr) {
+                                std::cout << "failed to create input event object" << std::endl;
+                                return RET_ERR;
+                            }
+                            keyEvent->SetKeyCode(keyCode);
+                            keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+                            KeyEvent::KeyItem item;
+                            item.SetKeyCode(keyCode);
+                            item.SetPressed(true);
+                            auto keyEventTemp = KeyEvent::Clone(keyEvent);
+                            if (keyEventTemp == nullptr) {
+                                std::cout << "failed to clone key event object" << std::endl;
+                                return RET_ERR;
+                            }
+                            keyEventTemp->AddKeyItem(item);
+                            InputMgr->SimulateInputEvent(keyEventTemp);
+                            std::this_thread::sleep_for(std::chrono::milliseconds(pressTimeMs));
+
+                            keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+                            item.SetPressed(false);
+                            keyEvent->AddKeyItem(item);
+                            InputMgr->SimulateInputEvent(keyEvent);
+                            break;
                         }
                         case 'i': {
                             int32_t taktTime = 0;
@@ -724,6 +792,14 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             item.SetDisplayX(px2);
                             item.SetDisplayY(py2);
                             pointerEvent->SetActionTime(endTimeMs);
+                            pointerEvent->UpdatePointerItem(0, item);
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            std::this_thread::sleep_for(std::chrono::milliseconds(BLOCK_TIME_MS));
+
+                            item.SetDisplayX(px2);
+                            item.SetDisplayY(py2);
+                            pointerEvent->SetActionTime(endTimeMs + BLOCK_TIME_MS);
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -1002,6 +1078,8 @@ void InputManagerCommand::ShowUsage()
     std::cout << "commands for keyboard:                                        " << std::endl;
     std::cout << "-d <key>                   --down   <key>     -press down a key" << std::endl;
     std::cout << "-u <key>                   --up     <key>     -release a key   " << std::endl;
+    std::cout << "-l <key> [long press time] --long_press <key> [long press time] -press and hold the key";
+    std::cout << std::endl;
     std::cout << "-i <time>                  --interval <time>  -the program interval for the (time) milliseconds";
     std::cout << std::endl;
     std::cout << std::endl;
