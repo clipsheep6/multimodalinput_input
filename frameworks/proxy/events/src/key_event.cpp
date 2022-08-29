@@ -1140,8 +1140,25 @@ bool KeyEvent::ReadFromParcel(Parcel &in)
 
 std::ostream& operator<<(std::ostream& ostream, KeyEvent& keyEvent)
 {
-    ostream << "KeyCode:" << keyEvent.GetKeyCode()
-        << ",KeyAction:" << KeyEvent::ActionToString(keyEvent.GetKeyAction()) << std::endl;
+    std::vector<KeyEvent::KeyItem> keyItems { keyEvent.GetKeyItems() };
+    MMI_HILOGD("KeyCode:%{public}d,ActionTime:%{public}ld,ActionStartTime:%{public}ld,EventType:%{public}s,Flag:%{public}d,KeyAction:%{public}s,EventNumber:%{public}d,keyItemsCount:%{public}zu",
+        keyEvent.GetKeyCode(), keyEvent.GetActionTime(), keyEvent.GetActionStartTime(),
+        InputEvent::EventTypeToString(keyEvent.GetEventType()), keyEvent.GetFlag(),
+        KeyEvent::ActionToString(keyEvent.GetKeyAction()), keyEvent.GetId(), keyItems.size());
+    for (const auto &item : keyItems) {
+        MMI_HILOGD("DeviceNumber:%{public}d,KeyCode:%{public}d,DownTime:%{public}ld,IsPressed:%{public}d",
+        item.GetDeviceId(), item.GetKeyCode(), item.GetDownTime(),item.IsPressed());
+    }
+    std::vector<int32_t> pressedKeys = keyEvent.GetPressedKeys();
+    std::vector<int32_t>::const_iterator cItr = pressedKeys.cbegin();
+    if (cItr != pressedKeys.cend()) {
+        std::string tmpStr = "Pressed keyCode: [" + std::to_string(*cItr++);
+        for (; cItr != pressedKeys.cend(); ++cItr) {
+            tmpStr += ("," + std::to_string(*cItr));
+        }
+        MMI_HILOGD("%{public}s]", tmpStr.data());
+    }
+    ostream << std::endl;
     return ostream;
 }
 } // namespace MMI
