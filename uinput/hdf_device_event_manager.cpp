@@ -25,6 +25,8 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "HdfDeviceEventManager"};
+constexpr int32_t SLEEP_TIME = 50000;
+constexpr uint32_t CALL_NUMBER = 70;
 } // namespace
 
 HdfDeviceEventManager::HdfDeviceEventManager() {}
@@ -33,16 +35,25 @@ HdfDeviceEventManager::~HdfDeviceEventManager() {}
 
 void HdfDeviceEventManager::ConnectHDFInit()
 {
-    inputInterface_ = IInputInterfaces::Get();
-    thread_ = std::thread(&InjectThread::InjectFunc, injectThread_);
-    int32_t ret = inputInterface_->OpenInputDevice(TOUCH_DEV_ID);
-    if ((ret == HDF_SUCCESS) && (inputInterface_ != nullptr)) {
-        ret = inputInterface_->GetInputDevice(TOUCH_DEV_ID, iDevInfo_);
-        if (ret != HDF_SUCCESS) {
-            MMI_HILOGE("GetInputDevice error");
+    uint32_t cnt = 0;
+    do {
+        inputInterface_ = IInputInterfaces::Get();
+        usleep(SLEEP_TIME);
+        if (++cnt > CALL_NUMBER) {
+            MMI_HILOGE("The inputInterface_ is nullptr");
             return;
         }
-        callback_ = new HdfDeviceEventDispatch(\
+    } while (inputInterface_ == nullptr);
+
+    thread_ = std::thread(&InjectThread::InjectFunc, injectThread_);
+    int32_t ret = inputInterface_->OpenInputDevice(TOUCH_DEV_ID);
+    if (ret == HDF_SUCCESS) {
+        ret = inputInterface_->GetInputDevice(TOUCH_DEV_ID, iDevInfo_);
+        if (ret != HDF_SUCCESS) {
+            MMI_HILOGE("Get input device failed");
+            return;
+        }
+        callback_ = new (std::nothrow) HdfDeviceEventDispatch(\
             iDevInfo_.attrSet.axisInfo[ABS_MT_POSITION_X].max, iDevInfo_.attrSet.axisInfo[ABS_MT_POSITION_Y].max);
         if (callback_ == nullptr) {
             MMI_HILOGE("The callback_ is nullptr");
