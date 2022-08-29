@@ -33,33 +33,22 @@ HdfDeviceEventManager::~HdfDeviceEventManager() {}
 
 void HdfDeviceEventManager::ConnectHDFInit()
 {
-    int32_t ret = GetInputInterface(&inputInterface_);
-    if (ret != 0) {
-        MMI_HILOGE("Initialize fail");
-        return;
-    }
-
-    if (inputInterface_ == nullptr || inputInterface_->iInputManager == nullptr) {
-        MMI_HILOGE("The inputInterface_ or iInputManager is nullptr");
-        return;
-    }
-
+    inputInterface_ = IInputInterfaces::Get();
     thread_ = std::thread(&InjectThread::InjectFunc, injectThread_);
-    ret = inputInterface_->iInputManager->OpenInputDevice(TOUCH_DEV_ID);
-    if ((ret == INPUT_SUCCESS) && (inputInterface_->iInputReporter != nullptr)) {
-        ret = inputInterface_->iInputManager->GetInputDevice(TOUCH_DEV_ID, &iDevInfo_);
-        if (ret != INPUT_SUCCESS) {
+    int32_t ret = inputInterface_->OpenInputDevice(TOUCH_DEV_ID);
+    if ((ret == HDF_SUCCESS) && (inputInterface_ != nullptr)) {
+        ret = inputInterface_->GetInputDevice(TOUCH_DEV_ID, iDevInfo_);
+        if (ret != HDF_SUCCESS) {
             MMI_HILOGE("GetInputDevice error");
             return;
         }
-        std::unique_ptr<HdfDeviceEventDispatch> hdf = std::make_unique<HdfDeviceEventDispatch>(\
-            iDevInfo_->attrSet.axisInfo[ABS_MT_POSITION_X].max, iDevInfo_->attrSet.axisInfo[ABS_MT_POSITION_Y].max);
-        if (hdf == nullptr) {
-            MMI_HILOGE("The hdf is nullptr");
+        callback_ = new HdfDeviceEventDispatch(\
+            iDevInfo_.attrSet.axisInfo[ABS_MT_POSITION_X].max, iDevInfo_.attrSet.axisInfo[ABS_MT_POSITION_Y].max);
+        if (callback_ == nullptr) {
+            MMI_HILOGE("The callback_ is nullptr");
             return;
         }
-        callback_.EventPkgCallback = hdf->GetEventCallbackDispatch;
-        ret = inputInterface_->iInputReporter->RegisterReportCallback(TOUCH_DEV_ID, &callback_);
+        ret = inputInterface_->RegisterReportCallback(TOUCH_DEV_ID, callback_);
         MMI_HILOGD("RegisterReportCallback ret:%{public}d", ret);
     }
 }
