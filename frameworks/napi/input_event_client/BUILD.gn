@@ -42,9 +42,7 @@ ohos_shared_library("inputeventclient") {
 
   configs = [ ":inputeventclient_config" ]
 
-  deps = [
-    "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
-  ]
+  deps = [ "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client" ]
 
   external_deps = [
     "c_utils:utils",
