@@ -49,7 +49,7 @@ void DfxHisysevent::OnDeviceConnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::Eve
             type,
             "MSG", "The input_device connection failed because the nextId_ exceeded the upper limit");
         if (ret != 0) {
-            MMI_HILOGE("HiviewDFX Write failed, ret: %{public}d", ret);
+            MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
         }
     } else {
         int32_t ret = OHOS::HiviewDFX::HiSysEvent::Write(
@@ -62,7 +62,7 @@ void DfxHisysevent::OnDeviceConnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::Eve
             "DEVICE_TYPE", dev->GetType(),
             "MSG", message);
         if (ret != 0) {
-            MMI_HILOGE("HiviewDFX Write failed, ret: %{public}d", ret);
+            MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
         }
     }
 }
@@ -76,7 +76,7 @@ void DfxHisysevent::OnDeviceDisconnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::
             type,
             "MSG", "The input device failed to disconnect to server");
         if (ret != 0) {
-            MMI_HILOGE("HiviewDFX Write failed, ret: %{public}d", ret);
+            MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
         }
     } else {
         std::shared_ptr dev = InputDevMgr->GetInputDevice(id);
@@ -91,7 +91,7 @@ void DfxHisysevent::OnDeviceDisconnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::
             "DEVICE_TYPE", dev->GetType(),
             "MSG", "The input device successfully disconnect to server");
         if (ret != 0) {
-            MMI_HILOGE("HiviewDFX Write failed, ret: %{public}d", ret);
+            MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
         }
     }
 }
@@ -111,7 +111,7 @@ void DfxHisysevent::OnUpdateTargetPointer(std::shared_ptr<PointerEvent> pointer,
             "FD", fd,
             "MSG", "The window manager successfully update target pointer");
         if (ret != 0) {
-            MMI_HILOGE("HiviewDFX Write failed, ret: %{public}d", ret);
+            MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
         }
     } else {
         int32_t ret = OHOS::HiviewDFX::HiSysEvent::Write(
@@ -121,7 +121,7 @@ void DfxHisysevent::OnUpdateTargetPointer(std::shared_ptr<PointerEvent> pointer,
             "EVENTTYPE", pointer->GetEventType(),
             "MSG", "The window manager failed to update target pointer");
         if (ret != 0) {
-            MMI_HILOGE("HiviewDFX Write failed, ret: %{public}d", ret);
+            MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
         }
     }
 }
@@ -147,7 +147,7 @@ void DfxHisysevent::OnUpdateTargetKey(std::shared_ptr<KeyEvent> key, int32_t fd,
             "PID", WinMgr->GetWindowPid(key->GetTargetWindowId()),
             "MSG", "The window manager successfully update target key");
         if (ret != 0) {
-            MMI_HILOGE("HiviewDFX Write failed, ret: %{public}d", ret);
+            MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
         }
     } else {
         int32_t ret = OHOS::HiviewDFX::HiSysEvent::Write(
@@ -163,7 +163,7 @@ void DfxHisysevent::OnUpdateTargetKey(std::shared_ptr<KeyEvent> key, int32_t fd,
             "KEYACTION", key->GetKeyAction(),
             "MSG", "The window manager failed to update target key");
         if (ret != 0) {
-            MMI_HILOGE("HiviewDFX Write failed, ret: %{public}d", ret);
+            MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
         }
     }
 }
@@ -180,7 +180,7 @@ void DfxHisysevent::ApplicationBlockInput(const SessionPtr& sess)
         "PROCESS_NAME", sess->GetProgramName(),
         "MSG", "User input does not respond");
     if (ret != 0) {
-        MMI_HILOGE("HiviewDFX Write failed, ret: %{public}d", ret);
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
     }
 }
 
@@ -233,7 +233,7 @@ void DfxHisysevent::ReportDispTimes()
             "ABOVE50MS", dispCastTime_.above50msTimes,
             "MSG", "The costing time to dispatch event");
         if (ret != 0) {
-            MMI_HILOGE("HiviewDFX Write failed, ret: %{public}d", ret);
+            MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
         } else {
             dispCastTime_.sampleCount = 0;
             dispCastTime_.totalTimes = 0;
@@ -274,7 +274,7 @@ void DfxHisysevent::ReportComboStartTimes()
             "ABOVE50MS", comboStartCastTime_.above50msTimes,
             "MSG", "The costing time to launch application of combination");
         if (ret != 0) {
-            MMI_HILOGE("HiviewDFX Write failed, ret: %{public}d", ret);
+            MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
         } else {
             comboStartCastTime_.totalTimes = 0;
             comboStartCastTime_.below10msTimes = 0;

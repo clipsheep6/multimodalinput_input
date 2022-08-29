@@ -19,6 +19,9 @@
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+#include "input_device_cooperate_sm.h"
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_manager.h"
 #include "input_event_handler.h"
 #include "key_auto_repeat.h"
@@ -137,6 +140,12 @@ void InputEventNormalizeHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPV(keyEvent);
     PrintEventData(keyEvent);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    if (!CheckKeyboardWhiteList(keyEvent)) {
+        MMI_HILOGI("Check white list return false, keyboard event dropped");
+        return;
+    }
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     nextHandler_->HandleKeyEvent(keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
@@ -216,14 +225,75 @@ int32_t InputEventNormalizeHandler::HandleKeyboardEvent(struct libinput_event* e
 
     BytraceAdapter::StartBytrace(keyEvent_);
     PrintEventData(keyEvent_);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    if (!CheckKeyboardWhiteList(keyEvent_)) {
+        MMI_HILOGI("Check white list return false, keyboard event dropped");
+        return RET_OK;
+    }
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     nextHandler_->HandleKeyEvent(keyEvent_);
     KeyRepeat->SelectAutoRepeat(keyEvent_);
     MMI_HILOGD("keyCode:%{public}d, action:%{public}d", keyEvent_->GetKeyCode(), keyEvent_->GetKeyAction());
 #else
-        MMI_HILOGW("Keyboard device does not support");
+    MMI_HILOGW("Keyboard device does not support");
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
 }
+
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+bool InputEventNormalizeHandler::CheckKeyboardWhiteList(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(keyEvent);
+    InputHandler->SetJumpInterceptState(false);
+    CooperateState state = InputDevCooSM->GetCurrentCooperateState();
+    MMI_HILOGI("Get current cooperate state:%{public}d", state);
+    if (state == CooperateState::STATE_IN) {
+        int32_t deviceId = keyEvent->GetDeviceId();
+        if (InputDevMgr->IsRemote(deviceId)) {
+            auto networkId = InputDevMgr->GetOrginNetworkId(deviceId);
+            return !IsNeedFilterOut(networkId, keyEvent);
+        }
+    } else if (state == CooperateState::STATE_OUT) {
+        std::string networkId;
+        InputDevMgr->GetLocalDeviceId(networkId);
+        if (!IsNeedFilterOut(networkId, keyEvent)) {
+            if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
+                KeyRepeat->SelectAutoRepeat(keyEvent);
+            }
+            return false;
+        }
+        InputHandler->SetJumpInterceptState(true);
+    } else {
+        MMI_HILOGW("Get current cooperate state:STATE_FREE(%{public}d)", state);
+    }
+    return true;
+}
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+bool InputEventNormalizeHandler::IsNeedFilterOut(const std::string& deviceId, const std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    std::vector<OHOS::MMI::KeyEvent::KeyItem> KeyItems = keyEvent->GetKeyItems();
+    MMI_HILOGI("KeyItems size :%{public}lu", KeyItems.size());
+    std::vector<int32_t> KeyItemsForDInput;
+    KeyItemsForDInput.reserve(KeyItems.size());
+    for (const auto& item : KeyItems) {
+        KeyItemsForDInput.push_back(item.GetKeyCode());
+    }
+    OHOS::DistributedHardware::DistributedInput::BusinessEvent businessEvent;
+    businessEvent.keyCode = keyEvent->GetKeyCode();
+    businessEvent.keyAction = keyEvent->GetKeyAction();
+    businessEvent.pressedKeys = KeyItemsForDInput;
+    MMI_HILOGI("businessEvent.keyCode :%{public}d, keyAction :%{public}d",
+        businessEvent.keyCode, businessEvent.keyAction);
+    for (const auto &item : businessEvent.pressedKeys) {
+        MMI_HILOGI("pressedKeys :%{public}d", item);
+    }
+    return DistributedAdapter->IsNeedFilterOut(deviceId, businessEvent);
+}
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 
 int32_t InputEventNormalizeHandler::HandleMouseEvent(struct libinput_event* event)
 {
@@ -247,7 +317,7 @@ int32_t InputEventNormalizeHandler::HandleMouseEvent(struct libinput_event* even
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandlePointerEvent(pointerEvent);
 #else
-        MMI_HILOGW("Pointer device does not support");
+    MMI_HILOGW("Pointer device does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
 }
@@ -323,8 +393,27 @@ int32_t InputEventNormalizeHandler::HandleTouchEvent(struct libinput_event* even
     CHKPR(event, ERROR_NULL_POINTER);
     auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    if (DInputMgr->CheckTouchEvent(event)) {
+        MMI_HILOGW("Touch event filter out");
+        ResetTouchUpEvent(pointerEvent, event);
+        return RET_OK;
+    }
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandleTouchEvent(pointerEvent);
+    ResetTouchUpEvent(pointerEvent, event);
+#else
+    MMI_HILOGW("Touchscreen device does not support");
+#endif // OHOS_BUILD_ENABLE_TOUCH
+    return RET_OK;
+}
+
+void InputEventNormalizeHandler::ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent,
+    struct libinput_event *event)
+{
+    CHKPV(pointerEvent);
+    CHKPV(event);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_UP) {
         pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
@@ -334,10 +423,6 @@ int32_t InputEventNormalizeHandler::HandleTouchEvent(struct libinput_event* even
             pointerEvent->Reset();
         }
     }
-#else
-    MMI_HILOGW("Touchscreen device does not support");
-#endif // OHOS_BUILD_ENABLE_TOUCH
-    return RET_OK;
 }
 
 int32_t InputEventNormalizeHandler::HandleTableToolEvent(struct libinput_event* event)
