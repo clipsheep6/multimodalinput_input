@@ -35,11 +35,11 @@ HdfDeviceEventManager::~HdfDeviceEventManager() {}
 
 void HdfDeviceEventManager::ConnectHDFInit()
 {
-    uint32_t cnt = 0;
+    uint32_t count = 0;
     do {
         inputInterface_ = IInputInterfaces::Get();
         usleep(SLEEP_TIME);
-        if (++cnt > CALL_NUMBER) {
+        if (++count > CALL_NUMBER) {
             MMI_HILOGE("The inputInterface_ is nullptr");
             return;
         }
@@ -53,8 +53,8 @@ void HdfDeviceEventManager::ConnectHDFInit()
             MMI_HILOGE("Get input device failed");
             return;
         }
-        callback_ = new (std::nothrow) HdfDeviceEventDispatch(\
-            iDevInfo_.attrSet.axisInfo[ABS_MT_POSITION_X].max, iDevInfo_.attrSet.axisInfo[ABS_MT_POSITION_Y].max);
+        callback_ = new (std::nothrow) HdfDeviceEventDispatch(iDevInfo_.attrSet.axisInfo[ABS_MT_POSITION_X].max,
+            iDevInfo_.attrSet.axisInfo[ABS_MT_POSITION_Y].max);
         if (callback_ == nullptr) {
             MMI_HILOGE("The callback_ is nullptr");
             return;
