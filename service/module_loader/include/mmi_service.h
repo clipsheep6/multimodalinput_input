@@ -122,7 +122,6 @@ protected:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-    int32_t CheckSendDisplayInfo(const std::shared_ptr<DisplayGroupInfo> displayGroupInfo);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     int32_t OnRegisterCooperateListener(int32_t pid);
     int32_t OnUnregisterCooperateListener(int32_t pid);
