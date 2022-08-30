@@ -25,7 +25,7 @@
 
 namespace OHOS {
 namespace MMI {
-class KeyEvent : public InputEvent {  //pass
+class KeyEvent : public InputEvent {
 public:
     /**
      * 未知的功能按键
