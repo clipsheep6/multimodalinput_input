@@ -162,9 +162,9 @@ int32_t InputManager::SetPointerSpeed(int32_t speed)
     return InputMgrImpl->SetPointerSpeed(speed);
 }
 
-int32_t InputManager::GetPointerSpeed()
+int32_t InputManager::GetPointerSpeed(int32_t &speed)
 {
-    return InputMgrImpl->GetPointerSpeed();
+    return InputMgrImpl->GetPointerSpeed(speed);
 }
 
 int32_t InputManager::GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback)
@@ -177,14 +177,24 @@ void InputManager::SetAnrObserver(std::shared_ptr<IAnrObserver> observer)
     InputMgrImpl->SetAnrObserver(observer);
 }
 
+int32_t InputManager::SetPointerStyle(int32_t windowId, int32_t pointerStyle)
+{
+    return InputMgrImpl->SetPointerStyle(windowId, pointerStyle);
+}
+
+int32_t InputManager::GetPointerStyle(int32_t windowId, int32_t &pointerStyle)
+{
+    return InputMgrImpl->GetPointerStyle(windowId, pointerStyle);
+}
+
+int32_t InputManager::SetInputDevice(const std::string& dhid, const std::string& screenId)
+{
+    return InputMgrImpl->SetInputDevice(dhid, screenId);
+}
+
 int32_t InputManager::SetPointerLocation(int32_t x, int32_t y)
 {
     return InputManagerImpl::GetInstance()->SetPointerLocation(x, y);
-}
-
-int32_t InputManager::SetInputDeviceSeatName(const std::string& seatName, DeviceUniqId& deviceUniqId)
-{
-    return InputManagerImpl::GetInstance()->SetInputDeviceSeatName(seatName, deviceUniqId);
 }
 
 int32_t InputManager::GetRemoteInputAbility(std::string deviceId,
@@ -192,6 +202,7 @@ int32_t InputManager::GetRemoteInputAbility(std::string deviceId,
 {
     return InputManagerImpl::GetInstance()->GetRemoteInputAbility(deviceId, remoteTypes);
 }
+
 int32_t InputManager::PrepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback)
 {
     return InputManagerImpl::GetInstance()->PrepareRemoteInput(deviceId, callback);
@@ -212,6 +223,38 @@ int32_t InputManager::StopRemoteInput(const std::string& deviceId, uint32_t inpu
     std::function<void(int32_t)> callback)
 {
     return InputManagerImpl::GetInstance()->StopRemoteInput(deviceId, inputAbility, callback);
+}
+
+int32_t InputManager::RegisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener)
+{
+    return InputMgrImpl->RegisterCooperateListener(listener);
+}
+
+int32_t InputManager::UnregisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener)
+{
+    return InputMgrImpl->UnregisterCooperateListener(listener);
+}
+
+int32_t InputManager::EnableInputDeviceCooperate(bool enabled,
+    std::function<void(std::string, CooperationMessage)> callback)
+{
+    return InputMgrImpl->EnableInputDeviceCooperate(enabled, callback);
+}
+
+int32_t InputManager::StartInputDeviceCooperate(const std::string &sinkDeviceId, int32_t srcInputDeviceId,
+    std::function<void(std::string, CooperationMessage)> callback)
+{
+    return InputMgrImpl->StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId, callback);
+}
+
+int32_t InputManager::StopDeviceCooperate(std::function<void(std::string, CooperationMessage)> callback)
+{
+    return InputMgrImpl->StopDeviceCooperate(callback);
+}
+
+int32_t InputManager::GetInputDeviceCooperateState(const std::string &deviceId, std::function<void(bool)> callback)
+{
+    return InputMgrImpl->GetInputDeviceCooperateState(deviceId, callback);
 }
 } // namespace MMI
 } // namespace OHOS

@@ -25,7 +25,9 @@
 #include <unistd.h>
 
 #include "libinput.h"
-
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+#include "input_device_cooperate_sm.h"
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "key_command_manager.h"
 #include "timer_manager.h"
 #include "util.h"
@@ -66,7 +68,11 @@ void InputEventHandler::OnEvent(void *event)
     MMI_HILOGD("Event reporting. id:%{public}" PRId64 ",tid:%{public}" PRId64 ",eventType:%{public}d,"
                "beginTime:%{public}" PRId64, idSeed_, GetThisThreadId(), eventType, beginTime);
     CHKPV(inputEventNormalizeHandler_);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    InputDevCooSM->HandleEvent(lpEvent);
+#else
     inputEventNormalizeHandler_->HandleEvent(lpEvent);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     int64_t endTime = GetSysClockTime();
     int64_t lostTime = endTime - beginTime;
     MMI_HILOGD("Event handling completed. id:%{public}" PRId64 ",endTime:%{public}" PRId64
@@ -77,6 +83,9 @@ int32_t InputEventHandler::BuildInputHandlerChain()
 {
     inputEventNormalizeHandler_ = std::make_shared<InputEventNormalizeHandler>();
     CHKPR(inputEventNormalizeHandler_, ERROR_NULL_POINTER);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    InputDevCooSM->SetNext(inputEventNormalizeHandler_);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 #if !defined(OHOS_BUILD_ENABLE_KEYBOARD) && !defined(OHOS_BUILD_ENABLE_POINTER) && !defined(OHOS_BUILD_ENABLE_TOUCH)
     return RET_OK;
 #endif // !OHOS_BUILD_ENABLE_KEYBOARD && !OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_TOUCH
@@ -145,13 +154,21 @@ std::shared_ptr<EventMonitorHandler> InputEventHandler::GetMonitorHandler() cons
     return monitorHandler_;
 }
 
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-int32_t InputEventHandler::AddInputEventFilter(sptr<IEventFilter> filter)
+std::shared_ptr<EventFilterWrap> InputEventHandler::GetFilterHandler() const
 {
-    CHKPR(eventfilterHandler_, ERROR_NULL_POINTER);
-    eventfilterHandler_->AddInputEventFilter(filter);
-    return RET_OK;
+    return eventfilterHandler_;
 }
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+void InputEventHandler::SetJumpInterceptState(bool isJump)
+{
+    isJumpIntercept_ = isJump;
+}
+
+bool InputEventHandler::GetJumpInterceptState() const
+{
+    return isJumpIntercept_;
+}
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 } // namespace MMI
 } // namespace OHOS
