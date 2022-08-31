@@ -27,9 +27,9 @@ void EventLogHelper::Print(const std::shared_ptr<KeyEvent> event)
     MMI_HILOGD("KeyCode:%{public}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64 ",EventType:%{public}s,Flag:%{public}d,KeyAction:%{public}s,NumLock:%{public}d,CapsLock:%{public}d,ScrollLock:%{public}d,EventNumber:%{public}d,keyItemsCount:%{public}zu",
         event->GetKeyCode(), event->GetActionTime(), event->GetActionStartTime(),
         InputEvent::EventTypeToString(event->GetEventType()), event->GetFlag(),
-        KeyEvent::ActionToString(event->GetKeyAction()), keyEvent.GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY),
-        keyEvent.GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY),
-        keyEvent.GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY),
+        KeyEvent::ActionToString(event->GetKeyAction()), event->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY),
+        event->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY),
+        event->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY),
         event->GetId(), eventItems.size());
     for (const auto &item : eventItems) {
         MMI_HILOGD("DeviceNumber:%{public}d,KeyCode:%{public}d,DownTime:%{public}" PRId64 ",IsPressed:%{public}d",
