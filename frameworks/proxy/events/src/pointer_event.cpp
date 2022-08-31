@@ -903,41 +903,5 @@ bool PointerEvent::IsValid() const
     }
     return true;
 }
-
-std::ostream& operator<<(std::ostream& ostream, PointerEvent& pointerEvent)
-{
-    std::vector<int32_t> pointerIds { pointerEvent.GetPointerIds() };
-    MMI_HILOGD("EventType:%{public}s,ActionTime:%{public}ld,Action:%{public}d,ActionStartTime:%{public}ld,Flag:%{public}d,PointerAction:%{public}s,SourceType:%{public}s,ButtonId:%{public}d,VerticalAxisValue:%{public}.2f,HorizontalAxisValue:%{public}.2f,PinchAxisValue:%{public}.2f,PointerCount:%{public}zu ,EventNumber:%{public}d",
-    InputEvent::EventTypeToString(pointerEvent.GetEventType()), pointerEvent.GetActionTime(),
-    pointerEvent.GetAction(), pointerEvent.GetActionStartTime(), pointerEvent.GetFlag(),
-    pointerEvent.DumpPointerAction(), pointerEvent.DumpSourceType(), pointerEvent.GetButtonId(),
-    pointerEvent.GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
-    pointerEvent.GetAxisValue(PointerEvent::AXIS_TYPE_PINCH),
-    pointerEvent.GetAxisValue(PointerEvent::AXIS_TYPE_PINCH), pointerIds.size(),pointerEvent.GetId());
-
-    for (const auto& pointerId : pointerIds) {
-        PointerEvent::PointerItem item;
-        if (!pointerEvent.GetPointerItem(pointerId, item)) {
-            MMI_HILOGE("Invalid pointer: %{public}d.", pointerId);
-            return ostream;
-        }
-        MMI_HILOGD("DownTime:%{public}ld,IsPressed:%{public}d,DisplayX:%{public}d,DisplayY:%{public}d,WindowX:%{public}d,WindowY:%{public}d,Width:%{public}d,Height:%{public}d,TiltX:%{public}.2f,TiltY:%{public}.2f,ToolDisplayX:%{public}d,ToolDisplayY:%{public}d,ToolWindowX:%{public}d,ToolWindowY:%{public}d,ToolWidth:%{public}d,ToolHeight:%{public}d,Pressure:%{public}.2f,ToolType:%{public}d,LongAxis:%{public}d,ShortAxis:%{public}d",
-            item.GetDownTime(), item.IsPressed(), item.GetDisplayX(),
-            item.GetDisplayY(), item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(),
-            item.GetTiltX(), item.GetTiltY(), item.GetToolDisplayX(), item.GetToolDisplayY(), item.GetToolWindowX(),
-            item.GetToolWindowY(), item.GetToolWidth(), item.GetToolHeight(), item.GetPressure(), item.GetToolType(),
-            item.GetLongAxis(), item.GetShortAxis());
-    }
-    std::vector<int32_t> pressedKeys = pointerEvent.GetPressedKeys();
-    std::vector<int32_t>::const_iterator cItr = pressedKeys.cbegin();
-    if (cItr != pressedKeys.cend()) {
-        std::string tmpStr = "Pressed keyCode: [" + std::to_string(*cItr++);
-        for (; cItr != pressedKeys.cend(); ++cItr) {
-            tmpStr += ("," + std::to_string(*cItr));
-        }
-        MMI_HILOGD("%{public}s]", tmpStr.data());
-    }
-    return ostream;
-}
 } // namespace MMI
 } // namespace OHOS

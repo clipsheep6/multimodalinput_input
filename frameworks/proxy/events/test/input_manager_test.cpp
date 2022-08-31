@@ -14,6 +14,7 @@
  */
 
 #include "event_util_test.h"
+#include "event_log_helper.h"
 #include "input_handler_type.h"
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"
@@ -1165,7 +1166,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_02, TestSize.Level
     int32_t subscribeId1 = -1;
     subscribeId1 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
         [](std::shared_ptr<KeyEvent> keyEvent) {
-        PrintEventData(keyEvent);
+        EventLogHelper::PrintEventData(keyEvent);
         MMI_HILOGD("Subscribe key event KEYCODE_POWER down trigger callback");
     });
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -1183,7 +1184,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_02, TestSize.Level
     int32_t subscribeId2 = -1;
     subscribeId2 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption2,
         [](std::shared_ptr<KeyEvent> keyEvent) {
-        PrintEventData(keyEvent);
+        EventLogHelper::PrintEventData(keyEvent);
         MMI_HILOGD("Subscribe key event KEYCODE_POWER up trigger callback");
     });
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
