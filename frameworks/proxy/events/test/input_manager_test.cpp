@@ -1723,9 +1723,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_001, TestSize.Lev
     auto pointerEvent = SetupPointerEvent001();
     ASSERT_TRUE(pointerEvent != nullptr);
 
-    auto callBackPtr = GetPtr<InputEventCallback>();
-    ASSERT_TRUE(callBackPtr != nullptr);
-    int32_t monitorId = TestAddMonitor(callBackPtr);
+    auto callbackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callbackPtr != nullptr);
+    int32_t monitorId = TestAddMonitor(callbackPtr);
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     EXPECT_TRUE(IsValidHandlerId(monitorId));
 #else
@@ -1799,9 +1799,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_003, TestSize.Lev
     auto pointerEvent = SetupPointerEvent003();
     ASSERT_TRUE(pointerEvent != nullptr);
 
-    auto callBackPtr = GetPtr<InputEventCallback>();
-    ASSERT_TRUE(callBackPtr != nullptr);
-    int32_t monitorId = TestAddMonitor(callBackPtr);
+    auto callbackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callbackPtr != nullptr);
+    int32_t monitorId = TestAddMonitor(callbackPtr);
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     EXPECT_TRUE(IsValidHandlerId(monitorId));
 #else
@@ -1828,9 +1828,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_003, TestSize.Lev
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_004, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    auto callBackPtr = GetPtr<InputEventCallback>();
-    ASSERT_TRUE(callBackPtr != nullptr);
-    int32_t monitorId = TestAddMonitor(callBackPtr);
+    auto callbackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callbackPtr != nullptr);
+    int32_t monitorId = TestAddMonitor(callbackPtr);
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     EXPECT_TRUE(IsValidHandlerId(monitorId));
 #else
@@ -1841,7 +1841,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_004, TestSize.Lev
     TestMarkConsumedStep1();
     auto pointerEvent = TestMarkConsumedStep2();
 
-    TestMarkConsumedStep3(monitorId, pointerEvent->GetId());
+    TestMarkConsumedStep3(monitorId, callbackPtr->GetLastEventId());
 
     TestMarkConsumedStep4();
     TestMarkConsumedStep5();
@@ -1861,9 +1861,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_004, TestSize.Lev
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_005, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    auto callBackPtr = GetPtr<InputEventCallback>();
-    ASSERT_TRUE(callBackPtr != nullptr);
-    int32_t monitorId = TestAddMonitor(callBackPtr);
+    auto callbackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callbackPtr != nullptr);
+    int32_t monitorId = TestAddMonitor(callbackPtr);
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     EXPECT_TRUE(IsValidHandlerId(monitorId));
 #else
@@ -1873,7 +1873,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_005, TestSize.Lev
 
     auto pointerEvent = TestMarkConsumedStep1();
 
-    TestMarkConsumedStep3(monitorId, pointerEvent->GetId());
+    TestMarkConsumedStep3(monitorId, callbackPtr->GetLastEventId());
 
     TestMarkConsumedStep4();
     TestMarkConsumedStep6();
@@ -1907,9 +1907,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_001, TestSize.L
     pointerEvent->SetPointerId(0);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
 
-    auto callBackPtr = GetPtr<InputEventCallback>();
-    ASSERT_TRUE(callBackPtr != nullptr);
-    int32_t monitorId = TestAddMonitor(callBackPtr);
+    auto callbackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callbackPtr != nullptr);
+    int32_t monitorId = TestAddMonitor(callbackPtr);
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     EXPECT_TRUE(IsValidHandlerId(monitorId));
 #else
@@ -1950,9 +1950,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_002, TestSize.L
     pointerEvent->SetPointerId(0);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
 
-    auto callBackPtr = GetPtr<InputEventCallback>();
-    ASSERT_TRUE(callBackPtr != nullptr);
-    int32_t monitorId = TestAddMonitor(callBackPtr);
+    auto callbackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callbackPtr != nullptr);
+    int32_t monitorId = TestAddMonitor(callbackPtr);
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     EXPECT_TRUE(IsValidHandlerId(monitorId));
 #else
@@ -1993,9 +1993,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_003, TestSize.L
     pointerEvent->SetPointerId(0);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
 
-    auto callBackPtr = GetPtr<InputEventCallback>();
-    ASSERT_TRUE(callBackPtr != nullptr);
-    int32_t monitorId = TestAddMonitor(callBackPtr);
+    auto callbackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callbackPtr != nullptr);
+    int32_t monitorId = TestAddMonitor(callbackPtr);
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     EXPECT_TRUE(IsValidHandlerId(monitorId));
 #else
@@ -2039,10 +2039,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.L
 
     const std::vector<int32_t>::size_type N_TEST_CASES { 3 };
     std::vector<int32_t> ids(N_TEST_CASES);
-    auto callBackPtr = GetPtr<InputEventCallback>();
-    ASSERT_TRUE(callBackPtr != nullptr);
+    auto callbackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callbackPtr != nullptr);
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
-        ids[i] = TestAddMonitor(callBackPtr);
+        ids[i] = TestAddMonitor(callbackPtr);
 #ifdef OHOS_BUILD_ENABLE_MONITOR
         EXPECT_TRUE(IsValidHandlerId(ids[i]));
 #else
@@ -2091,9 +2091,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_005, TestSize.L
     pointerEvent->SetPointerId(0);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
 
-    auto callBackPtr = GetPtr<InputEventCallback>();
-    ASSERT_TRUE(callBackPtr != nullptr);
-    int32_t monitorId = TestAddMonitor(callBackPtr);
+    auto callbackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callbackPtr != nullptr);
+    int32_t monitorId = TestAddMonitor(callbackPtr);
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     EXPECT_TRUE(IsValidHandlerId(monitorId));
 #else
@@ -2120,9 +2120,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_005, TestSize.L
 HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_001, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    auto callBackPtr = GetPtr<InputEventCallback>();
-    ASSERT_TRUE(callBackPtr != nullptr);
-    int32_t monitorId { TestAddMonitor(callBackPtr) };
+    auto callbackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callbackPtr != nullptr);
+    int32_t monitorId { TestAddMonitor(callbackPtr) };
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     EXPECT_TRUE(monitorId >= MIN_HANDLER_ID);
 #else
@@ -2165,9 +2165,9 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_001, TestSize
 HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_002, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    auto callBackPtr = GetPtr<InputEventCallback>();
-    ASSERT_TRUE(callBackPtr != nullptr);
-    int32_t monitorId { TestAddMonitor(callBackPtr) };
+    auto callbackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callbackPtr != nullptr);
+    int32_t monitorId { TestAddMonitor(callbackPtr) };
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     EXPECT_TRUE(monitorId >= MIN_HANDLER_ID);
 #else
@@ -2210,9 +2210,9 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_002, TestSize
 HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_003, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    auto callBackPtr = GetPtr<InputEventCallback>();
-    ASSERT_TRUE(callBackPtr != nullptr);
-    int32_t monitorId { TestAddMonitor(callBackPtr) };
+    auto callbackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callbackPtr != nullptr);
+    int32_t monitorId { TestAddMonitor(callbackPtr) };
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     EXPECT_TRUE(monitorId >= MIN_HANDLER_ID);
 #else
@@ -2255,9 +2255,9 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_003, TestSize
 HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_004, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    auto callBackPtr = GetPtr<InputEventCallback>();
-    ASSERT_TRUE(callBackPtr != nullptr);
-    int32_t monitorId { TestAddMonitor(callBackPtr) };
+    auto callbackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callbackPtr != nullptr);
+    int32_t monitorId { TestAddMonitor(callbackPtr) };
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     EXPECT_TRUE(monitorId >= MIN_HANDLER_ID);
 #else
@@ -2314,9 +2314,9 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_004, TestSize
 HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_001, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    auto callBackPtr = GetPtr<InputEventCallback>();
-    ASSERT_TRUE(callBackPtr != nullptr);
-    int32_t monitorId = TestAddMonitor(callBackPtr);
+    auto callbackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callbackPtr != nullptr);
+    int32_t monitorId = TestAddMonitor(callbackPtr);
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     EXPECT_TRUE(IsValidHandlerId(monitorId));
 #else
@@ -2344,9 +2344,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_001, TestSize.Level1
 HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_002, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    auto callBackPtr = GetPtr<InputEventCallback>();
-    ASSERT_TRUE(callBackPtr != nullptr);
-    int32_t monitorId = TestAddMonitor(callBackPtr);
+    auto callbackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callbackPtr != nullptr);
+    int32_t monitorId = TestAddMonitor(callbackPtr);
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     EXPECT_TRUE(IsValidHandlerId(monitorId));
 #else
@@ -2378,9 +2378,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_002, TestSize.Level1
 HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_003, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    auto callBackPtr = GetPtr<InputEventCallback>();
-    ASSERT_TRUE(callBackPtr != nullptr);
-    int32_t monitorId = TestAddMonitor(callBackPtr);
+    auto callbackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callbackPtr != nullptr);
+    int32_t monitorId = TestAddMonitor(callbackPtr);
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     EXPECT_TRUE(IsValidHandlerId(monitorId));
 #else
@@ -2415,9 +2415,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_004, TestSize.Level1
     int32_t maxMonitor = 0;
 
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
-        auto callBackPtr = GetPtr<InputEventCallback>();
-        ASSERT_TRUE(callBackPtr != nullptr);
-        maxMonitor = TestAddMonitor(callBackPtr);
+        auto callbackPtr = GetPtr<InputEventCallback>();
+        ASSERT_TRUE(callbackPtr != nullptr);
+        maxMonitor = TestAddMonitor(callbackPtr);
         if (IsValidHandlerId(maxMonitor)) {
             ids.push_back(maxMonitor);
             std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -2456,10 +2456,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddKeyboardMonitor_001, TestSize.L
     TestUtil->SetRecvFlag(RECV_FLAG::RECV_MONITOR);
     const std::vector<int32_t>::size_type N_TEST_CASES { 3 };
     std::vector<int32_t> ids;
-    auto callBackPtr = GetPtr<InputEventCallback>();
-    ASSERT_TRUE(callBackPtr != nullptr);
+    auto callbackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callbackPtr != nullptr);
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
-        int32_t id = TestAddMonitor(callBackPtr);
+        int32_t id = TestAddMonitor(callbackPtr);
         if (IsValidHandlerId(id)) {
             ids.push_back(id);
             std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -2496,10 +2496,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddKeyboardMonitor_002, TestSize.L
     CALL_DEBUG_ENTER;
     const std::vector<int32_t>::size_type N_TEST_CASES { 3 };
     std::vector<int32_t> ids;
-    auto callBackPtr = GetPtr<InputEventCallback>();
-    ASSERT_TRUE(callBackPtr != nullptr);
+    auto callbackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callbackPtr != nullptr);
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
-        int32_t id = TestAddMonitor(callBackPtr);
+        int32_t id = TestAddMonitor(callbackPtr);
         if (IsValidHandlerId(id)) {
             ids.push_back(id);
             std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));

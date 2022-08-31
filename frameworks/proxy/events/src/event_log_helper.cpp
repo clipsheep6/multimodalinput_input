@@ -24,10 +24,13 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Event
 void EventLogHelper::Print(const std::shared_ptr<KeyEvent> event)
 {
     std::vector<KeyEvent::KeyItem> eventItems { event->GetKeyItems() };
-    MMI_HILOGD("KeyCode:%{public}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64 ",EventType:%{public}s,Flag:%{public}d,KeyAction:%{public}s,EventNumber:%{public}d,keyItemsCount:%{public}zu",
+    MMI_HILOGD("KeyCode:%{public}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64 ",EventType:%{public}s,Flag:%{public}d,KeyAction:%{public}s,NumLock:%{public}d,CapsLock:%{public}d,ScrollLock:%{public}d,EventNumber:%{public}d,keyItemsCount:%{public}zu",
         event->GetKeyCode(), event->GetActionTime(), event->GetActionStartTime(),
         InputEvent::EventTypeToString(event->GetEventType()), event->GetFlag(),
-        KeyEvent::ActionToString(event->GetKeyAction()), event->GetId(), eventItems.size());
+        KeyEvent::ActionToString(event->GetKeyAction()), keyEvent.GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY),
+        keyEvent.GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY),
+        keyEvent.GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY),
+        event->GetId(), eventItems.size());
     for (const auto &item : eventItems) {
         MMI_HILOGD("DeviceNumber:%{public}d,KeyCode:%{public}d,DownTime:%{public}" PRId64 ",IsPressed:%{public}d",
         item.GetDeviceId(), item.GetKeyCode(), item.GetDownTime(),item.IsPressed());
