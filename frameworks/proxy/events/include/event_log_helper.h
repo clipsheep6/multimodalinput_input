@@ -36,7 +36,6 @@ void PrintEventData(std::shared_ptr<Event> event);
 template <class Event>
 void EventLogHelper::PrintEventData(std::shared_ptr<Event> event, int32_t actionType, int32_t itemNum)
 {
-    #if 1
     constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "EventLogHelper"};
     if (HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)) {
         static int64_t nowTimeUSec = 0;
@@ -55,7 +54,6 @@ void EventLogHelper::PrintEventData(std::shared_ptr<Event> event, int32_t action
 
         EventLogHelper::Print(event);
     }
-    #endif
 }
 
 template<class Event>
