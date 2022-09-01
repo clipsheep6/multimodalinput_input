@@ -96,7 +96,12 @@ void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, Session
             return;
         }
         MMI_HILOGI("ANR remove all timers");
-        RemoveTimers(sess);
+        std::vector<int32_t> TimerIds = sess->GetTimerIds(type);
+        for (int32_t item : TimerIds) {
+            if (item != -1) {
+                TimerMgr->RemoveTimer(item);
+            }
+        }
     });
     sess->SaveANREvent(type, id, currentTime, timerId);
 }
@@ -112,7 +117,7 @@ bool ANRManager::TriggerANR(int32_t type, int64_t time, SessionPtr sess)
         return false;
     }
     if (sess->CheckAnrStatus(type)) {
-        MMI_HILOGW("application not responding");
+        MMI_HILOGW("Application not responding");
         return true;
     }
     MMI_HILOGI("AAFwk send ANR process id succeeded");
