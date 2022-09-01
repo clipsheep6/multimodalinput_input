@@ -54,8 +54,8 @@ void EventLogHelper::Print(const std::shared_ptr<PointerEvent> event)
     event->GetAction(), event->GetActionStartTime(), event->GetFlag(),
     event->DumpPointerAction(), event->DumpSourceType(), event->GetButtonId(),
     event->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
-    event->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH),
-    event->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH), pointerIds.size(),event->GetId());
+    event->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
+    event->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH), pointerIds.size(), event->GetId());
 
     for (const auto& pointerId : pointerIds) {
         PointerEvent::PointerItem item;
