@@ -28,14 +28,6 @@ ohos_prebuilt_etc("multimodalinput.rc") {
   subsystem_name = "multimodalinput"
 }
 
-ohos_prebuilt_etc("multimodalinput.para.dac") {
-  source = "${mmi_path}/etc/multimodalinput.para.dac"
-  relative_install_dir = "init"
-  part_name = "input"
-  subsystem_name = "multimodalinput"
-  module_install_dir = "etc/param"
-}
-
 ohos_executable("uinput_inject") {
   install_enable = true
 
@@ -78,7 +70,6 @@ group("multimodalinput_mmi_frameworks") {
 
 group("multimodalinput_mmi_service") {
   deps = [
-    "multimodalinput.para.dac",
     "service:libmmi-server",
     "tools/inject_event:uinput",
   ]
