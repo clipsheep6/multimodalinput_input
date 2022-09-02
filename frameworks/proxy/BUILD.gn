@@ -62,7 +62,6 @@ ohos_source_set("libmmi-common") {
     "events/src/key_event.cpp",
     "events/src/key_option.cpp",
     "events/src/pointer_event.cpp",
-    "events/src/event_log_helper.cpp",
   ]
 
   defines = []

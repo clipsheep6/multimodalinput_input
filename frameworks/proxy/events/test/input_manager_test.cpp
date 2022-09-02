@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include "event_util_test.h"
 #include "event_log_helper.h"
+#include "event_util_test.h"
 #include "input_handler_type.h"
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"
