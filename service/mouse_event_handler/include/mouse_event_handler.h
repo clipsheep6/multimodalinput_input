@@ -19,7 +19,6 @@
 #include <memory>
 
 #include "libinput.h"
-#include "nocopyable.h"
 #include "singleton.h"
 
 #include "pointer_event.h"
@@ -36,35 +35,40 @@ struct AccelerateCurve {
     std::vector<double> diffNums;
 };
 
-class MouseEventHandler : public DelayedSingleton<MouseEventHandler>,
-    public std::enable_shared_from_this<MouseEventHandler> {
+class MouseEventHandler final : public std::enable_shared_from_this<MouseEventHandler> {
+    DECLARE_DELAYED_SINGLETON(MouseEventHandler);
 public:
-    MouseEventHandler();
-    ~MouseEventHandler() = default;
     DISALLOW_COPY_AND_MOVE(MouseEventHandler);
     std::shared_ptr<PointerEvent> GetPointerEvent() const;
     int32_t Normalize(struct libinput_event *event);
     void Dump(int32_t fd, const std::vector<std::string> &args);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    void SetAbsolutionLocation(int32_t xPercent, int32_t yPercent);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool NormalizeMoveMouse(int32_t offsetX, int32_t offsetY);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t SetPointerSpeed(int32_t speed);
     int32_t GetPointerSpeed() const;
+    void OnDisplayLost(int32_t displayId);
 
 private:
     int32_t HandleMotionInner(struct libinput_event_pointer* data);
     int32_t HandleButtonInner(struct libinput_event_pointer* data);
     int32_t HandleAxisInner(struct libinput_event_pointer* data);
-    void HandlePostInner(struct libinput_event_pointer* data, int32_t deviceId, PointerEvent::PointerItem& pointerItem);
+    void HandlePostInner(struct libinput_event_pointer* data, int32_t deviceId, PointerEvent::PointerItem &pointerItem);
  #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     void HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY);
-    void HandlePostMoveMouse(PointerEvent::PointerItem& pointerItem);
+    void HandlePostMoveMouse(PointerEvent::PointerItem &pointerItem);
  #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t HandleButtonValueInner(struct libinput_event_pointer* data);
     int32_t HandleMotionAccelerate(struct libinput_event_pointer* data);
-    bool GetSpeedGain(double vin, double& gain) const;
+    bool GetSpeedGain(double vin, double &gain) const;
     void DumpInner();
     void InitAbsolution();
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    void SetDxDyForDInput(PointerEvent::PointerItem& pointerItem, libinput_event_pointer* data);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 
 private:
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
@@ -77,7 +81,7 @@ private:
     int32_t speed_ { DEFAULT_SPEED };
 };
 
-#define MouseEventHdr MouseEventHandler::GetInstance()
+#define MouseEventHdr ::OHOS::DelayedSingleton<MouseEventHandler>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // MOUSE_EVENT_HANDLER_H

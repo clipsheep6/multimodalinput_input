@@ -27,11 +27,8 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputD
 const std::string CHANGED_TYPE = "change";
 } // namespace
 
-InputDeviceImpl& InputDeviceImpl::GetInstance()
-{
-    static InputDeviceImpl instance;
-    return instance;
-}
+InputDeviceImpl::InputDeviceImpl() {}
+InputDeviceImpl::~InputDeviceImpl() {}
 
 int32_t InputDeviceImpl::RegisterDevListener(const std::string &type, InputDevListenerPtr listener)
 {

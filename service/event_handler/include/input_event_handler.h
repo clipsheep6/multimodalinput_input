@@ -18,7 +18,6 @@
 
 #include <memory>
 
-#include "nocopyable.h"
 #include "singleton.h"
 
 #include "event_dispatch.h"
@@ -35,11 +34,10 @@ namespace OHOS {
 namespace MMI {
 using EventFun = std::function<int32_t(libinput_event *event)>;
 using NotifyDeviceChange = std::function<void(int32_t, int32_t, char *)>;
-class InputEventHandler : public DelayedSingleton<InputEventHandler> {
+class InputEventHandler final {
+    DECLARE_DELAYED_SINGLETON(InputEventHandler);
 public:
-    InputEventHandler();
     DISALLOW_COPY_AND_MOVE(InputEventHandler);
-    virtual ~InputEventHandler() override;
     void Init(UDSServer& udsServer);
     void OnEvent(void *event);
     UDSServer *GetUDSServer() const;
@@ -49,9 +47,10 @@ public:
     std::shared_ptr<KeyEventSubscriber> GetSubscriberHandler() const;
     std::shared_ptr<EventMonitorHandler> GetMonitorHandler() const;
     std::shared_ptr<EventFilterWrap> GetFilterHandler() const;
-
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
     void SetJumpInterceptState(bool isJump);
     bool GetJumpInterceptState() const;
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 
 private:
     int32_t BuildInputHandlerChain();
@@ -64,9 +63,11 @@ private:
     std::shared_ptr<EventMonitorHandler> monitorHandler_ = nullptr;
 
     uint64_t idSeed_ = 0;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
     bool isJumpIntercept_ = false;
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 };
-#define InputHandler InputEventHandler::GetInstance()
+#define InputHandler ::OHOS::DelayedSingleton<InputEventHandler>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_EVENT_HANDLER_H

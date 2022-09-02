@@ -18,7 +18,6 @@
 #include <iomanip>
 
 #include "mmi_log.h"
-#include "window_utils_test.h"
 
 namespace OHOS {
 namespace MMI {
@@ -57,6 +56,7 @@ void InputEventCallback::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent
         TestUtil->SetRecvFlag(RECV_FLAG::RECV_MONITOR);
         ASSERT_TRUE(pointerEvent != nullptr);
         TestUtil->AddEventDump(TestUtil->DumpInputEvent(pointerEvent));
+        lastPointerEventId_ = pointerEvent->GetId();
     }
 }
 
@@ -86,6 +86,9 @@ uint64_t WindowEventConsumer::GetConsumerThreadId()
 {
     return threadId_;
 }
+
+EventUtilTest::EventUtilTest() {}
+EventUtilTest::~EventUtilTest() {}
 
 void EventUtilTest::AddEventDump(std::string eventDump)
 {
@@ -150,7 +153,7 @@ std::string EventUtilTest::DumpInputEvent(const std::shared_ptr<PointerEvent>& p
          << pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)
          << ",HorizontalAxisValue:" << std::fixed << std::setprecision(precision)
          << pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL);
-    for (const auto& pointerId : pointerIds) {
+    for (const auto &pointerId : pointerIds) {
         PointerEvent::PointerItem item;
         if (!pointerEvent->GetPointerItem(pointerId, item)) {
             MMI_HILOGE("Invalid pointer:%{public}d.", pointerId);

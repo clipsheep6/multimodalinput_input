@@ -38,6 +38,10 @@ config("libmmi_util_public_config") {
   if (input_feature_hdf) {
     defines += [ "OHOS_BUILD_HDF" ]
   }
+
+  if (input_feature_input_cooperation) {
+    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
+  }
 }
 
 ohos_shared_library("libmmi-util") {
@@ -46,6 +50,7 @@ ohos_shared_library("libmmi-util") {
     "common/src/klog.cpp",
     "common/src/run_shell_util.cpp",
     "common/src/util.cpp",
+    "common/src/util_napi.cpp",
     "common/src/uuid.cpp",
     "network/src/circle_stream_buffer.cpp",
     "network/src/net_packet.cpp",
@@ -63,6 +68,7 @@ ohos_shared_library("libmmi-util") {
   public_deps = [
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//commonlibrary/c_utils/base:utils",
+    "//foundation/arkui/napi:ace_napi",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
   ]
 
@@ -110,6 +116,10 @@ ohos_unittest("ut-mmi-util-out") {
 
   if (input_feature_hdf) {
     defines += [ "OHOS_BUILD_HDF" ]
+  }
+
+  if (input_feature_input_cooperation) {
+    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
   }
 
   sources = [
@@ -172,6 +182,10 @@ ohos_unittest("RunShellUtilTest") {
 
   if (input_feature_hdf) {
     defines += [ "OHOS_BUILD_HDF" ]
+  }
+
+  if (input_feature_input_cooperation) {
+    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
   }
 
   sources = [ "common/test/run_shell_util_test.cpp" ]
