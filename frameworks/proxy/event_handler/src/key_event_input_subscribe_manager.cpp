@@ -21,7 +21,6 @@
 #include "error_multimodal.h"
 
 #include "bytrace_adapter.h"
-#include "input_manager_impl.h"
 #include "multimodal_event_handler.h"
 
 namespace OHOS {

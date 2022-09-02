@@ -22,7 +22,6 @@
 
 #include "bytrace_adapter.h"
 #include "input_handler_type.h"
-#include "input_manager_impl.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
 

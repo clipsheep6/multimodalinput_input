@@ -24,7 +24,6 @@
 
 #include "cooperation_message.h"
 #include "i_input_device_cooperate_listener.h"
-#include "mmi_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
@@ -37,11 +36,11 @@ public:
     using FuncCooperationMessage = std::function<void(std::string, CooperationMessage)>;
     using FuncCooperateionState = std::function<void(bool)>;
 
-    using DevCooperationMsg = std::pair<EventHandlerPtr, FuncCooperationMessage>;
-    using DevCooperateionState = std::pair<EventHandlerPtr, FuncCooperateionState>;
+    using DevCooperationMsg = FuncCooperationMessage;
+    using DevCooperateionState = FuncCooperateionState;
 
     using InputDevCooperateListenerPtr = std::shared_ptr<IInputDeviceCooperateListener>;
-    using DevCooperateListener = std::pair<EventHandlerPtr, InputDevCooperateListenerPtr>;
+    using DevCooperateListener = InputDevCooperateListenerPtr;
 
     struct CooperateEvent {
         DevCooperationMsg msg;
@@ -63,11 +62,6 @@ public:
 private:
     const DevCooperationMsg *GetCooprateMessageEvent(int32_t userData) const;
     const DevCooperateionState *GetCooprateStateEvent(int32_t userData) const;
-    void OnDevCooperateListenerTask(const DevCooperateListener &devCooperateMonitor,
-        const std::string &deviceId, CooperationMessage msg);
-    void OnCooperateMessageTask(const DevCooperationMsg &msgCooperation, int32_t userData,
-        const std::string &deviceId, CooperationMessage msg);
-    void OnCooperateStateTask(const DevCooperateionState &stateCooperation, int32_t userData, bool state);
 
 private:
     InputDeviceCooperateImpl() = default;
