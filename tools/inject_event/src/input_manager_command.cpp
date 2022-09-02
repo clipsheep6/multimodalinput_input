@@ -176,6 +176,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     std::cout << "invalid parameter to move mouse" << std::endl;
                                     return RET_ERR;
                                 }
+                                if (px < 0 || py < 0) {
+                                    std::cout << "coordinate value must be greater than 0" << std::endl;
+                                    return RET_ERR;
+                                }
                                 std::cout << "move to " << px << " " << py << std::endl;
                                 auto pointerEvent = PointerEvent::Create();
                                 CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -205,6 +209,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                             return RET_ERR;
                                     }
                                     optind += 3;
+                                }
+                                if (px1 < 0 || py1 < 0 || px2 < 0 || py2 < 0) {
+                                    std::cout << "coordinate value must be greater than 0" << std::endl;
+                                    return RET_ERR;
                                 }
                                 if (argc - optind >= 1) {
                                     std::string arg5 = argv[optind];
@@ -239,14 +247,14 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 static const int64_t minTotalTimeMs = 1;
                                 static const int64_t maxTotalTimeMs = 15000;
                                 if ((totalTimeMs < minTotalTimeMs) || (totalTimeMs > maxTotalTimeMs)) {
-                                    std::cout << "total time is out of range:"
-                                        << minTotalTimeMs << " <= " << totalTimeMs << " <= " << maxTotalTimeMs
-                                        << std::endl;
+                                    std::cout << "total time is out of range: "
+                                        << minTotalTimeMs << "ms" << " <= " << totalTimeMs << "ms" << " <= "
+                                        << maxTotalTimeMs << "ms" << std::endl;
                                     return RET_ERR;
                                 }
                                 std::cout << "start coordinate: (" << px1 << ", "  << py1 << ")" << std::endl;
                                 std::cout << "  end coordinate: (" << px2 << ", "  << py2 << ")" << std::endl;
-                                std::cout << "     total times: "  << totalTimeMs  << " ms"      << std::endl;
+                                std::cout << "     total times: "  << totalTimeMs  << "ms"       << std::endl;
                                 std::cout << "      trace mode: " << std::boolalpha << foundTraceOption << std::endl;
                                 auto pointerEvent = PointerEvent::Create();
                                 CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -447,6 +455,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 std::cout << "invalid coordinate value" << std::endl;
                                 return RET_ERR;
                             }
+                            if (px < 0 || py < 0) {
+                                std::cout << "coordinate value must be greater than 0" << std::endl;
+                                return RET_ERR;
+                            }
                             if (!StrToInt(argv[optind + 1], buttonId)) {
                                 std::cout << "invalid key" << std::endl;
                                 return RET_ERR;
@@ -464,26 +476,26 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 }
                             }
                             if ((buttonId < minButtonId) || (buttonId > maxButtonId)) {
-                                std::cout << "button is out of range:" << minButtonId << " < " << buttonId << " < "
+                                std::cout << "button is out of range: " << minButtonId << " <= " << buttonId << " <= "
                                     << maxButtonId << std::endl;
                                 return RET_ERR;
                             }
                             if ((pressTimeMs < minPressTimeMs) || (pressTimeMs > maxPressTimeMs)) {
-                                std::cout << "press time is out of range:" << minPressTimeMs << " ms" << " < "
-                                    << pressTimeMs << " < " << maxPressTimeMs << " ms" << std::endl;
+                                std::cout << "press time is out of range: " << minPressTimeMs << "ms" << " <= "
+                                    << pressTimeMs << "ms" << " <= " << maxPressTimeMs << "ms" << std::endl;
                                 return RET_ERR;
                             }
                             if ((clickIntervalTimeMs < minClickIntervalTimeMs) ||
                                 (clickIntervalTimeMs > maxClickIntervalTimeMs)) {
-                                std::cout << "click interval time is out of range:" << minClickIntervalTimeMs << " ms"
-                                    " < " << clickIntervalTimeMs << " < " << maxClickIntervalTimeMs << " ms"
-                                    << std::endl;
+                                std::cout << "click interval time is out of range: " << minClickIntervalTimeMs
+                                    << "ms" << " <= " << clickIntervalTimeMs << "ms" << " <= "
+                                    << maxClickIntervalTimeMs << "ms" << std::endl;
                                 return RET_ERR;
                             }
                             std::cout << "   coordinate: ("<< px << ", "  << py << ")" << std::endl;
                             std::cout << "    button id: " << buttonId    << std::endl;
-                            std::cout << "   press time: " << pressTimeMs << " ms" << std::endl;
-                            std::cout << "interval time: " << clickIntervalTimeMs  << " ms" << std::endl;
+                            std::cout << "   press time: " << pressTimeMs << "ms" << std::endl;
+                            std::cout << "interval time: " << clickIntervalTimeMs  << "ms" << std::endl;
                             auto pointerEvent = PointerEvent::Create();
                             CHKPR(pointerEvent, ERROR_NULL_POINTER);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
@@ -639,19 +651,19 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             static constexpr int32_t minKeyCode = 0;
                             static constexpr int32_t maxKeyCode = 5000;
                             if ((keyCode < minKeyCode) || (keyCode > maxKeyCode)) {
-                                std::cout << "key code is out of range:" << minKeyCode << " <= "
+                                std::cout << "key code is out of range: " << minKeyCode << " <= "
                                     << keyCode << " <= " << maxKeyCode << std::endl;
                                 return RET_ERR;
                             }
                             static constexpr int32_t minPressTimeMs = 3000;
                             static constexpr int32_t maxPressTimeMs = 15000;
                             if ((pressTimeMs < minPressTimeMs) || (pressTimeMs > maxPressTimeMs)) {
-                                std::cout << "press time is out of range:" << minPressTimeMs << " ms" << " <= "
-                                    << pressTimeMs << " <= " << maxPressTimeMs << " ms" << std::endl;
+                                std::cout << "press time is out of range: " << minPressTimeMs << "ms" << " <= "
+                                    << pressTimeMs << "ms" << " <= " << maxPressTimeMs << "ms" << std::endl;
                                 return RET_ERR;
                             }
                             std::cout << " key code: " << keyCode << std::endl
-                                << "long press time: " << pressTimeMs << " ms" << std::endl;
+                                << "long press time: " << pressTimeMs << "ms" << std::endl;
                             auto keyEvent = KeyEvent::Create();
                             if (keyEvent == nullptr) {
                                 std::cout << "failed to create input event object" << std::endl;
@@ -741,17 +753,20 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                         return EVENT_REG_FAIL;
                                 }
                             }
+                            if (px1 < 0 || py1 < 0 || px2 < 0 || py2 < 0) {
+                                std::cout << "coordinate value must be greater than 0" << std::endl;
+                                return RET_ERR;
+                            }
                             const int64_t minTotalTimeMs = 1;
                             const int64_t maxTotalTimeMs = 15000;
                             if ((totalTimeMs < minTotalTimeMs) || (totalTimeMs > maxTotalTimeMs)) {
-                                std::cout << "total time is out of range:" << std::endl;
-                                std::cout << minTotalTimeMs << " <= " << "total times" << " <= " << maxTotalTimeMs;
-                                std::cout << std::endl;
+                                std::cout << "total time is out of range: " << minTotalTimeMs << "ms" << " <= "
+                                    << totalTimeMs << "ms" << " <= " << maxTotalTimeMs << "ms" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
                             std::cout << "start coordinate: ("<< px1 << ", "  << py1 << ")" << std::endl;
                             std::cout << "  end coordinate: ("<< px2 << ", "  << py2 << ")" << std::endl;
-                            std::cout << "     total times: " << totalTimeMs << " ms" << std::endl;
+                            std::cout << "     total times: " << totalTimeMs << "ms" << std::endl;
                             auto pointerEvent = PointerEvent::Create();
                             CHKPR(pointerEvent, ERROR_NULL_POINTER);
                             PointerEvent::PointerItem item;
@@ -815,6 +830,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 std::cout << "invalid coordinate value" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
+                            if (px1 < 0 || py1 < 0) {
+                                std::cout << "coordinate value must be greater than 0" << std::endl;
+                                return RET_ERR;
+                            }
                             std::cout << "touch down " << px1 << " " << py1 << std::endl;
                             auto pointerEvent = PointerEvent::Create();
                             CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -838,6 +857,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             if (!StrToInt(optarg, px1) || !StrToInt(argv[optind], py1)) {
                                 std::cout << "invalid coordinate value" << std::endl;
                                 return EVENT_REG_FAIL;
+                            }
+                            if (px1 < 0 || py1 < 0) {
+                                std::cout << "coordinate value must be greater than 0" << std::endl;
+                                return RET_ERR;
                             }
                             std::cout << "touch up " << px1 << " " << py1 << std::endl;
                             auto pointerEvent = PointerEvent::Create();
@@ -873,12 +896,17 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 const int64_t minIntervalTimeMs = 1;
                                 const int64_t maxIntervalTimeMs = 450;
                                 if ((minIntervalTimeMs > intervalTimeMs) || (maxIntervalTimeMs < intervalTimeMs)) {
-                                    std::cout << "interval time is out of range: " << minIntervalTimeMs << "ms";
-                                    std::cout << " < interval time < " << maxIntervalTimeMs << "ms" << std::endl;
+                                    std::cout << "interval time is out of range: " << minIntervalTimeMs << "ms"
+                                        << " <= " << intervalTimeMs << "ms" << " <= " << maxIntervalTimeMs
+                                        << "ms" << std::endl;
                                     return RET_ERR;
                                 }
                             } else {
                                 std::cout << "parameter error, unable to run" << std::endl;
+                                return RET_ERR;
+                            }
+                            if (px1 < 0 || py1 < 0) {
+                                std::cout << "coordinate value must be greater than 0" << std::endl;
                                 return RET_ERR;
                             }
                             std::cout << "   click coordinate: ("<< px1 << ", "  << py1 << ")" << std::endl;
@@ -950,6 +978,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                         std::cout << "invalid input coordinate or time" << std::endl;
                                         return RET_ERR;
                                 }
+                            }
+                            if (px1 < 0 || py1 < 0 || px2 < 0 || py2 < 0) {
+                                std::cout << "coordinate value must be greater than 0" << std::endl;
+                                return RET_ERR;
                             }
                             const int32_t minTotalTimeMs = 1000;
                             const int32_t maxTotalTimeMs = 15000;
