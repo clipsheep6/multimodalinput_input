@@ -227,7 +227,7 @@ int32_t InputEventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     BytraceAdapter::StartBytrace(keyEvent);
     EventLogHelper::PrintEventData(keyEvent);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    if (!CheckKeyboardWhiteList(keyEvent)) {
+    if (!CheckKeyboardWhiteList(keyEvent_)) {
         MMI_HILOGI("Check white list return false, keyboard event dropped");
         return RET_OK;
     }

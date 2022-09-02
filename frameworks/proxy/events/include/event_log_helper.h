@@ -30,7 +30,7 @@ constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Even
 private:
 static void Print(const std::shared_ptr<KeyEvent> event)
 {
-    CHKPR(event);
+    CHKPV(event);
     std::vector<KeyEvent::KeyItem> eventItems { event->GetKeyItems() };
     MMI_HILOGD("KeyCode:%{public}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64
         ",EventType:%{public}s,Flag:%{public}d,KeyAction:%{public}s,NumLock:%{public}d,"
@@ -58,7 +58,7 @@ static void Print(const std::shared_ptr<KeyEvent> event)
 
 static void Print(const std::shared_ptr<PointerEvent> event)
 {
-    CHKPR(event);
+    CHKPV(event);
     std::vector<int32_t> pointerIds { event->GetPointerIds() };
     MMI_HILOGD("EventType:%{public}s,ActionTime:%{public}" PRId64 ",Action:%{public}d,"
         "ActionStartTime:%{public}" PRId64 ",Flag:%{public}d,PointerAction:%{public}s,"
@@ -109,7 +109,7 @@ static void PrintEventData(std::shared_ptr<T> event);
 template <class T>
 static void EventLogHelper::PrintEventData(std::shared_ptr<T> event, int32_t actionType, int32_t itemNum)
 {
-    CHKPR(event);
+    CHKPV(event);
     if (HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)) {
         static int64_t nowTimeUSec = 0;
         static int32_t dropped = 0;
@@ -131,7 +131,7 @@ static void EventLogHelper::PrintEventData(std::shared_ptr<T> event, int32_t act
 
 static void EventLogHelper::PrintEventData(std::shared_ptr<T> event)
 {
-     CHKPR(event);
+    CHKPV(event);
     if (HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)) {
         EventLogHelper::Print(event);
     }
