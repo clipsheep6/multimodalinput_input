@@ -23,6 +23,9 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "CooperateEventManager"};
 } // namespace
 
+CooperateEventManager::CooperateEventManager() {}
+CooperateEventManager::~CooperateEventManager() {}
+
 void CooperateEventManager::AddCooperationEvent(sptr<EventInfo> event)
 {
     CALL_DEBUG_ENTER;
@@ -118,7 +121,7 @@ void CooperateEventManager::NotifyCooperateMessage(
     CALL_DEBUG_ENTER;
     CHKPV(sess);
     NetPacket pkt(msgId);
-    pkt << userData << deviceId << msg;
+    pkt << userData << deviceId << static_cast<int32_t>(msg);
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write data failed");
         return;

@@ -431,7 +431,7 @@ int32_t MMIService::SetPointerSpeed(int32_t speed)
 #ifdef OHOS_BUILD_ENABLE_POINTER
 int32_t MMIService::ReadPointerSpeed(int32_t &speed)
 {
-    speed = MouseEventHandler::GetInstance()->GetPointerSpeed();
+    speed = MouseEventHdr->GetPointerSpeed();
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -861,6 +861,38 @@ int32_t MMIService::SetAnrObserver()
     return RET_OK;
 }
 
+int32_t MMIService::GetFunctionKeyState(int32_t funcKey, bool &state)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&ServerMsgHandler::OnGetFunctionKeyState, &sMsgHandler_, funcKey, std::ref(state)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to get the keyboard status, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+#else
+    MMI_HILOGD("Function not supported");
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+    return RET_OK;
+}
+
+int32_t MMIService::SetFunctionKeyState(int32_t funcKey, bool enable)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&ServerMsgHandler::OnSetFunctionKeyState, &sMsgHandler_, funcKey, enable));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to update the keyboard status, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+#else
+    MMI_HILOGD("Function not supported");
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+    return RET_OK;
+}
+
 void MMIService::OnDelegateTask(epoll_event& ev)
 {
     if ((ev.events & EPOLLIN) == 0) {
@@ -1164,7 +1196,7 @@ int32_t MMIService::OnEnableInputDeviceCooperate(int32_t pid, int32_t userData, 
     CooperationMessage msg =
         enabled ? CooperationMessage::OPEN_SUCCESS : CooperationMessage::CLOSE_SUCCESS;
     NetPacket pkt(MmiMessageId::COOPERATION_MESSAGE);
-    pkt << userData << deviceId << msg;
+    pkt << userData << deviceId << static_cast<int32_t>(msg);
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write data failed");
         return RET_ERR;

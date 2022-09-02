@@ -21,7 +21,6 @@
 #include <thread>
 
 #include "iremote_object.h"
-#include "nocopyable.h"
 #include "singleton.h"
 #include "system_ability.h"
 
@@ -40,7 +39,7 @@ namespace OHOS {
 namespace MMI {
 
 enum class ServiceRunningState {STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
-class MMIService : public UDSServer, public SystemAbility, public MultimodalInputConnectStub {
+class MMIService final : public UDSServer, public SystemAbility, public MultimodalInputConnectStub {
     DECLARE_DELAYED_SINGLETON(MMIService);
     DECLEAR_SYSTEM_ABILITY(MMIService);
     DISALLOW_COPY_AND_MOVE(MMIService);
@@ -87,6 +86,8 @@ public:
     virtual int32_t StopRemoteCooperate() override;
     virtual int32_t StopRemoteCooperateResult(bool isSuccess) override;
     virtual int32_t StartCooperateOtherResult(const std::string& srcNetworkId) override;
+    virtual int32_t GetFunctionKeyState(int32_t funcKey, bool &state) override;
+    virtual int32_t SetFunctionKeyState(int32_t funcKey, bool enable) override;
 
 #ifdef OHOS_RSS_CLIENT
     virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;

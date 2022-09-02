@@ -37,7 +37,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
 } // namespace
 
 StandardizedEventManager::StandardizedEventManager() {}
-
 StandardizedEventManager::~StandardizedEventManager() {}
 
 void StandardizedEventManager::SetClientHandle(MMIClientPtr client)

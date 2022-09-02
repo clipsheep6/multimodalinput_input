@@ -19,7 +19,6 @@
 #include "iremote_object.h"
 #include "iremote_proxy.h"
 #include "nocopyable.h"
-#include "singleton.h"
 #include "system_ability.h"
 
 #include "i_multimodal_input_connect.h"
@@ -69,6 +68,9 @@ public:
     virtual int32_t StopRemoteCooperate() override;
     virtual int32_t StopRemoteCooperateResult(bool isSuccess) override;
     virtual int32_t StartCooperateOtherResult(const std::string &srcNetworkId) override;
+    virtual int32_t GetFunctionKeyState(int32_t funcKey, bool &state) override;
+    virtual int32_t SetFunctionKeyState(int32_t funcKey, bool enable) override;
+
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;
 };
