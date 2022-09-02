@@ -67,10 +67,13 @@ public:
     virtual int32_t GetInputDeviceCooperateState(int32_t userData, const std::string &deviceId) = 0;
     virtual int32_t SetInputDevice(const std::string& dhid, const std::string& screenId) = 0;
     virtual int32_t StartRemoteCooperate(const std::string& localDeviceId) = 0;
-    virtual int32_t StartRemoteCooperateResult(bool isSuccess, int32_t xPercent, int32_t yPercent) = 0;
+    virtual int32_t StartRemoteCooperateResult(bool isSuccess, const std::string& startDhid,
+        int32_t xPercent, int32_t yPercent) = 0;
     virtual int32_t StopRemoteCooperate() = 0;
     virtual int32_t StopRemoteCooperateResult(bool isSuccess) = 0;
     virtual int32_t StartCooperateOtherResult(const std::string &srcNetworkId) = 0;
+    virtual int32_t GetFunctionKeyState(int32_t funckey, bool &state) = 0;
+    virtual int32_t SetFunctionKeyState(int32_t funcKey, bool enable) = 0;
     enum {
         ALLOC_SOCKET_FD = 0,
         ADD_INPUT_EVENT_FILTER = 1,
@@ -95,7 +98,9 @@ public:
         GET_POINTER_SPEED = 22,
         SET_POINTER_STYLE = 23,
         GET_POINTER_STYLE = 24,
-        UPDATE_DISPLAY_INFO = 25,
+        SET_FUNCTION_KEY_STATE = 25,
+        GET_FUNCTION_KEY_STATE = 26,
+        UPDATE_DISPLAY_INFO = 27,
         REGISTER_COOPERATE_MONITOR = 30,
         UNREGISTER_COOPERATE_MONITOR = 31,
         ENABLE_INPUT_DEVICE_COOPERATE = 32,

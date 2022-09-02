@@ -17,11 +17,10 @@
 #define KEY_EVENT_INPUT_SUBSCRIBE_MANAGER_H
 
 #include <functional>
-#include <list>
 #include <memory>
+#include <set>
 
-#include "nocopyable.h"
-#include "singleton.h"
+#include <singleton.h>
 
 #include "key_event.h"
 #include "key_option.h"
@@ -29,7 +28,11 @@
 
 namespace OHOS {
 namespace MMI {
-class KeyEventInputSubscribeManager : public Singleton<KeyEventInputSubscribeManager> {
+bool operator<(const KeyOption &first, const KeyOption &second);
+
+class KeyEventInputSubscribeManager final {
+    DECLARE_SINGLETON(KeyEventInputSubscribeManager);
+
 public:
     class SubscribeKeyEventInfo {
     public:
@@ -58,6 +61,8 @@ public:
             return callback_;
         }
 
+        bool operator<(const SubscribeKeyEventInfo &other) const;
+
     private:
         int32_t subscribeId_ { -1 };
         std::shared_ptr<KeyOption> keyOption_ { nullptr };
@@ -66,9 +71,7 @@ public:
     };
 
 public:
-    KeyEventInputSubscribeManager() = default;
-    ~KeyEventInputSubscribeManager() = default;
-    DISALLOW_COPY_AND_MOVE(KeyEventInputSubscribeManager);
+    DISALLOW_MOVE(KeyEventInputSubscribeManager);
 
     int32_t SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
         std::function<void(std::shared_ptr<KeyEvent>)> callback);
@@ -84,12 +87,12 @@ private:
         std::shared_ptr<KeyEvent> event, int32_t subscribeId);
 
 private:
-    std::list<SubscribeKeyEventInfo> subscribeInfos_;
+    std::set<SubscribeKeyEventInfo> subscribeInfos_;
     static int32_t subscribeIdManager_;
     std::mutex mtx_;
 };
 
-#define KeyEventInputSubscribeMgr KeyEventInputSubscribeManager::GetInstance()
+#define KeyEventInputSubscribeMgr ::OHOS::Singleton<KeyEventInputSubscribeManager>::GetInstance()
 }  // namespace MMI
 }  // namespace OHOS
 #endif  // KEY_EVENT_INPUT_SUBSCRIBE_MANAGER_H

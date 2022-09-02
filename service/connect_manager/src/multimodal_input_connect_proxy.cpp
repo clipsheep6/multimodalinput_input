@@ -157,7 +157,7 @@ int32_t MultimodalInputConnectProxy::SetPointerSpeed(int32_t speed)
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(SET_POINTER_SPEED, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -177,7 +177,7 @@ int32_t MultimodalInputConnectProxy::GetPointerSpeed(int32_t &speed)
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(GET_POINTER_SPEED, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     speed = reply.ReadInt32();
@@ -244,7 +244,7 @@ int32_t MultimodalInputConnectProxy::RegisterDevListener()
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(REGISTER_DEV_MONITOR, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -264,7 +264,7 @@ int32_t MultimodalInputConnectProxy::UnregisterDevListener()
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(UNREGISTER_DEV_MONITOR, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -291,7 +291,7 @@ int32_t MultimodalInputConnectProxy::SupportKeys(int32_t userData, int32_t devic
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(SUPPORT_KEYS, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -312,7 +312,7 @@ int32_t MultimodalInputConnectProxy::GetDeviceIds(int32_t userData)
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(GET_DEVICE_IDS, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -334,7 +334,7 @@ int32_t MultimodalInputConnectProxy::GetDevice(int32_t userData, int32_t deviceI
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(GET_DEVICE, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -356,7 +356,7 @@ int32_t MultimodalInputConnectProxy::GetKeyboardType(int32_t userData, int32_t d
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(GET_KEYBOARD_TYPE, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -738,7 +738,8 @@ int32_t MultimodalInputConnectProxy::StartRemoteCooperate(const std::string& loc
     return ret;
 }
 
-int32_t MultimodalInputConnectProxy::StartRemoteCooperateResult(bool isSuccess, int32_t xPercent, int32_t yPercent)
+int32_t MultimodalInputConnectProxy::StartRemoteCooperateResult(bool isSuccess,
+    const std::string& startDhid, int32_t xPercent, int32_t yPercent)
 {
     CALL_INFO_TRACE;
     MessageParcel data;
@@ -747,6 +748,7 @@ int32_t MultimodalInputConnectProxy::StartRemoteCooperateResult(bool isSuccess, 
         return ERR_INVALID_VALUE;
     }
     WRITEBOOL(data, isSuccess, ERR_INVALID_VALUE);
+    WRITESTRING(data, startDhid, ERR_INVALID_VALUE);
     WRITEINT32(data, xPercent, ERR_INVALID_VALUE);
     WRITEINT32(data, yPercent, ERR_INVALID_VALUE);
     MessageParcel reply;
@@ -819,6 +821,48 @@ int32_t MultimodalInputConnectProxy::StartCooperateOtherResult(const std::string
     return ret;
 }
 
+int32_t MultimodalInputConnectProxy::GetFunctionKeyState(int32_t funcKey, bool &state)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    WRITEINT32(data, funcKey, ERR_INVALID_VALUE);
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(GET_FUNCTION_KEY_STATE, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return ret;
+    }
+    READBOOL(reply, state, ERR_INVALID_VALUE);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::SetFunctionKeyState(int32_t funcKey, bool enable)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    WRITEINT32(data, funcKey, ERR_INVALID_VALUE);
+    WRITEBOOL(data, enable, ERR_INVALID_VALUE);
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(SET_FUNCTION_KEY_STATE, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
 int32_t MultimodalInputConnectProxy::WriteWindowsVecToParcel(const std::shared_ptr<DisplayGroupInfo> displayGroupInfo,
                                                              MessageParcel& data)
 {

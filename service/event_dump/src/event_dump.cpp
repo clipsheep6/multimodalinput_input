@@ -35,6 +35,9 @@
 #include "securec.h"
 #include "util.h"
 #include "util_ex.h"
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+#include "input_device_cooperate_sm.h"
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 
 namespace OHOS {
 namespace MMI {
@@ -42,6 +45,9 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDump" };
 constexpr int32_t MAX_COMMAND_COUNT = 32;
 } // namespace
+
+EventDump::EventDump() {}
+EventDump::~EventDump() {}
 
 void ChkConfig(int32_t fd)
 {
@@ -91,6 +97,9 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
         {"monitor", no_argument, 0, 'o'},
         {"interceptor", no_argument, 0, 'i'},
         {"mouse", no_argument, 0, 'm'},
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+        {"inputdevcoosm", no_argument, 0, 'k'},
+#endif // OHOS_BUILD_ENABLE_COOPERATE
         {NULL, 0, 0, 0}
     };
     char **argv = new (std::nothrow) char *[args.size()];
@@ -113,7 +122,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
     }
     optind = 1;
     int32_t c;
-    while ((c = getopt_long (args.size(), argv, "hdlwusoim", dumpOptions, &optionIndex)) != -1) {
+    while ((c = getopt_long (args.size(), argv, "hdlwusoimc", dumpOptions, &optionIndex)) != -1) {
         switch (c) {
             case 'h': {
                 DumpEventHelp(fd, args);
@@ -135,6 +144,14 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
                 auto udsServer = InputHandler->GetUDSServer();
                 CHKPV(udsServer);
                 udsServer->Dump(fd, args);
+                break;
+            }
+            case 'c': {
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+                InputDevCooSM->Dump(fd, args);
+#else
+                mprintf(fd, "Input device cooperate does not support");
+#endif // OHOS_BUILD_ENABLE_COOPERATE
                 break;
             }
             case 's': {
@@ -206,6 +223,7 @@ void EventDump::DumpHelp(int32_t fd)
     mprintf(fd, "      -s, --subscriber: dump the subscriber information\t");
     mprintf(fd, "      -i, --interceptor: dump the interceptor information\t");
     mprintf(fd, "      -m, --mouse: dump the mouse information\t");
+    mprintf(fd, "      -c, --dump Keyboard and mouse crossing information\t");
 }
 } // namespace MMI
 } // namespace OHOS

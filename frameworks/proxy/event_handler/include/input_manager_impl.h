@@ -18,7 +18,6 @@
 
 #include <vector>
 
-#include "nocopyable.h"
 #include "singleton.h"
 
 #include "net_packet.h"
@@ -28,6 +27,7 @@
 
 #include "if_mmi_client.h"
 #include "input_device_impl.h"
+#include "input_device_cooperate_impl.h"
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
 #include "input_interceptor_manager.h"
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
@@ -45,11 +45,11 @@
 
 namespace OHOS {
 namespace MMI {
-class InputManagerImpl : public DelayedSingleton<InputManagerImpl> {
+class InputManagerImpl final {
+    DECLARE_SINGLETON(InputManagerImpl);
+
 public:
-    virtual ~InputManagerImpl() = default;
-    DISALLOW_COPY_AND_MOVE(InputManagerImpl);
-    InputManagerImpl() = default;
+    DISALLOW_MOVE(InputManagerImpl);
 
     bool InitEventHandler();
     MMIEventHandlerPtr GetEventHandler() const;
@@ -117,7 +117,16 @@ public:
     int32_t StartRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback);
     int32_t StopRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback);
 
+    int32_t RegisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener);
+    int32_t UnregisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener = nullptr);
+    int32_t EnableInputDeviceCooperate(bool enabled, std::function<void(std::string, CooperationMessage)> callback);
+    int32_t StartInputDeviceCooperate(const std::string &sinkDeviceId, int32_t srcInputDeviceId,
+        std::function<void(std::string, CooperationMessage)> callback);
+    int32_t StopDeviceCooperate(std::function<void(std::string, CooperationMessage)> callback);
+    int32_t GetInputDeviceCooperateState(const std::string &deviceId, std::function<void(bool)> callback);
     int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
+    bool GetFunctionKeyState(int32_t funcKey);
+    int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
@@ -152,7 +161,8 @@ private:
     sptr<CallDinputService> callDinputService_ = nullptr;
 #endif // OHOS_DISTRIBUTED_INPUT_MODEL
 };
+
+#define InputMgrImpl ::OHOS::Singleton<InputManagerImpl>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#define InputMgrImpl OHOS::MMI::InputManagerImpl::GetInstance()
 #endif // INPUT_MANAGER_IMPL_H

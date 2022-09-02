@@ -73,6 +73,8 @@ protected:
     int32_t StubStopRemoteCooperate(MessageParcel& data, MessageParcel& reply);
     int32_t StubStopRemoteCooperateRes(MessageParcel& data, MessageParcel& reply);
     int32_t StubStartCooperateOtherRes(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetFunctionKeyState(MessageParcel &data, MessageParcel &reply);
+    int32_t StubSetFunctionKeyState(MessageParcel &data, MessageParcel &reply);
 private:
     int32_t ReadWindowsVecToParcel(MessageParcel& data, DisplayGroupInfo& displayGroupInfo);
     int32_t ReadDisplayVecToParcel(MessageParcel& data, DisplayGroupInfo& displayGroupInfo);

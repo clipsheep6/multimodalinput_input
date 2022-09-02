@@ -24,6 +24,9 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TouchTransformPointManager" };
 } // namespace
 
+TouchTransformPointManager::TouchTransformPointManager() {}
+TouchTransformPointManager::~TouchTransformPointManager() {}
+
 std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibInput(
     struct libinput_event *event, INPUT_DEVICE_TYPE deviceType)
 {
@@ -96,7 +99,7 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTabletToolEv
         CHKPP(processor);
         auto ret = processors_.emplace(deviceId, processor);
         if (!ret.second) {
-            MMI_HILOGE("Duplicate device record: %{public}d", deviceId);
+            MMI_HILOGE("Duplicate device record:%{public}d", deviceId);
         }
     }
     return processor->OnEvent(event);

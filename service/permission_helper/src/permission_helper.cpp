@@ -24,6 +24,9 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "PermissionHelper"};
 } // namespace
 
+PermissionHelper::PermissionHelper() {}
+PermissionHelper::~PermissionHelper() {}
+
 bool PermissionHelper::CheckPermission(uint32_t required)
 {
     CALL_DEBUG_ENTER;
@@ -34,7 +37,7 @@ bool PermissionHelper::CheckPermission(uint32_t required)
     } else if (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE) {
         return CheckNativePermission(tokenId, required);
     } else if (tokenType == OHOS::Security::AccessToken::TOKEN_SHELL) {
-        MMI_HILOGI("token type is shell");
+        MMI_HILOGI("Token type is shell");
         return true;
     } else {
         MMI_HILOGE("Unsupported token type:%{public}d", tokenType);
@@ -51,7 +54,7 @@ bool PermissionHelper::CheckMonitor()
         (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE)) {
         return CheckMonitorPermission(tokenId);
     } else if (tokenType == OHOS::Security::AccessToken::TOKEN_SHELL) {
-        MMI_HILOGI("token type is shell");
+        MMI_HILOGI("Token type is shell");
         return true;
     } else {
         MMI_HILOGE("Unsupported token type:%{public}d", tokenType);

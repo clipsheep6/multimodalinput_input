@@ -71,7 +71,6 @@ bool MMIClient::Start()
         Stop();
         return false;
     }
-    msgHandler_.InitProcessedCallback();
     if (!StartEventRunner()) {
         MMI_HILOGE("Start runner failed");
         Stop();
@@ -85,7 +84,7 @@ bool MMIClient::StartEventRunner()
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
-    if (!InputMgrImpl->InitEventHandler()) {
+    if (!InputMgrImpl.InitEventHandler()) {
         MMI_HILOGE("Init event handler failed");
         Stop();
         return false;
@@ -228,6 +227,7 @@ void MMIClient::OnConnected()
     CALL_DEBUG_ENTER;
     MMI_HILOGI("Connection to server succeeded, fd:%{public}d", GetFd());
     isConnected_ = true;
+    msgHandler_.InitProcessedCallback();
     if (funConnected_) {
         funConnected_(*this);
     }
@@ -262,7 +262,7 @@ void MMIClient::Stop()
     if (recvEventHandler_ != nullptr) {
         recvEventHandler_->SendSyncEvent(MMI_EVENT_HANDLER_ID_STOP, 0, EventHandler::Priority::IMMEDIATE);
     }
-    auto eventHandler = InputMgrImpl->GetEventHandler();
+    auto eventHandler = InputMgrImpl.GetEventHandler();
     CHKPV(eventHandler);
     eventHandler->SendSyncEvent(MMI_EVENT_HANDLER_ID_STOP, 0, EventHandler::Priority::IMMEDIATE);
 }
