@@ -774,7 +774,6 @@ ohos_unittest("device_profile_adapter_test") {
   external_deps = [
     "drivers_interface_input:hdi_input",
     "hiviewdfx_hilog_native:libhilog",
-    "utils_base:utils",
   ]
 
   if (is_standard_system) {
@@ -834,7 +833,6 @@ ohos_unittest("input_device_cooperate_sm_test") {
   external_deps = [
     "drivers_interface_input:hdi_input",
     "hiviewdfx_hilog_native:libhilog",
-    "utils_base:utils",
   ]
 
   if (is_standard_system) {
