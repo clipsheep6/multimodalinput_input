@@ -682,10 +682,6 @@ int32_t MultimodalInputConnectStub::StubGetInputDeviceCooperateState(MessageParc
 int32_t MultimodalInputConnectStub::StubStartRemoteCooperate(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check failed");
-        return CHECK_PERMISSION_FAIL;
-    }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -702,10 +698,6 @@ int32_t MultimodalInputConnectStub::StubStartRemoteCooperate(MessageParcel& data
 int32_t MultimodalInputConnectStub::StubStartRemoteCooperateRes(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check failed");
-        return CHECK_PERMISSION_FAIL;
-    }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -728,10 +720,6 @@ int32_t MultimodalInputConnectStub::StubStartRemoteCooperateRes(MessageParcel& d
 int32_t MultimodalInputConnectStub::StubStopRemoteCooperate(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check failed");
-        return CHECK_PERMISSION_FAIL;
-    }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -746,10 +734,6 @@ int32_t MultimodalInputConnectStub::StubStopRemoteCooperate(MessageParcel& data,
 int32_t MultimodalInputConnectStub::StubStopRemoteCooperateRes(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check failed");
-        return CHECK_PERMISSION_FAIL;
-    }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -766,10 +750,6 @@ int32_t MultimodalInputConnectStub::StubStopRemoteCooperateRes(MessageParcel& da
 int32_t MultimodalInputConnectStub::StubStartCooperateOtherRes(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check failed");
-        return CHECK_PERMISSION_FAIL;
-    }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;

@@ -106,7 +106,6 @@ protected:
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ReadPointerSpeed(int32_t &speed);
 #endif // OHOS_BUILD_ENABLE_POINTER
-    int32_t CheckEventProcessed(int32_t pid, int32_t eventId);
     int32_t OnRegisterDevListener(int32_t pid);
     int32_t OnUnregisterDevListener(int32_t pid);
     int32_t OnGetDeviceIds(int32_t pid, int32_t userData);
@@ -153,7 +152,7 @@ protected:
 
 private:
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
-    int32_t mmiFd_ = -1;
+    int32_t mmiFd_ { -1 };
     std::mutex mu_;
     std::thread t_;
 #ifdef OHOS_RSS_CLIENT
