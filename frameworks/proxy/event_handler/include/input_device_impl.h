@@ -73,9 +73,9 @@ private:
 private:
     std::map<int32_t, InputDeviceData> inputDevices_;
     std::map<std::string, std::list<InputDevListenerPtr>> devListener_ = { { "change", {} } };
+    int32_t userData_ { 0 };
+    bool isListeningProcess_ { false };
     std::mutex mtx_;
-    int32_t userData_ {0};
-    bool isListeningProcess_ {false};
 };
 
 #define InputDevImpl ::OHOS::Singleton<InputDeviceImpl>::GetInstance()

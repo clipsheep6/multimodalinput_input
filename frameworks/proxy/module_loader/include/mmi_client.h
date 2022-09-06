@@ -30,6 +30,9 @@ public:
     virtual ~MMIClient() override;
 
     int32_t Socket() override;
+    bool Start() override;
+    void RegisterConnectedFunction(ConnectCallback fun) override;
+    void RegisterDisconnectedFunction(ConnectCallback fun) override;
     virtual void Stop() override;
     virtual bool SendMessage(const NetPacket& pkt) const override;
     virtual bool GetCurrentConnectedStatus() const override;
@@ -45,9 +48,6 @@ public:
         std::shared_ptr<AppExecFwk::EventHandler> eventHandler) override;
 
 protected:
-    virtual void OnConnected() override;
-    virtual void OnDisconnected() override;
-
     bool StartEventRunner();
     void OnReconnect();
     void StopOldEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
@@ -56,12 +56,13 @@ protected:
     bool DelFdListener(int32_t fd);
     void OnPacket(NetPacket& pkt);
     const std::string& GetErrorStr(ErrCode code) const;
+    virtual void OnConnected() override;
+    virtual void OnDisconnected() override;
 
 protected:
     ClientMsgHandler msgHandler_;
     ConnectCallback funConnected_;
     ConnectCallback funDisconnected_;
-
     CircleStreamBuffer circBuf_;
     std::mutex mtx_;
     std::condition_variable cv_;

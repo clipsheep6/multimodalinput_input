@@ -34,6 +34,13 @@ constexpr std::string_view COOPERATION = "cooperation";
 std::mutex mutex_;
 } // namespace
 
+JsEventTarget::JsEventTarget()
+{
+    CALL_DEBUG_ENTER;
+    auto ret = cooperateListener_.insert({ COOPERATION, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>() });
+    CK(ret.second, VAL_NOT_EXP);
+}
+
 void JsEventTarget::EmitJsEnable(int32_t userData, std::string deviceId, CooperationMessage msg)
 {
     CALL_INFO_TRACE;
@@ -49,7 +56,8 @@ void JsEventTarget::EmitJsEnable(int32_t userData, std::string deviceId, Coopera
         MMI_HILOGE("The env is nullptr");
         return;
     }
-    iter->second->data.enableResult = (msg == CooperationMessage::OPEN_SUCCESS ? true : false);
+    iter->second->data.enableResult =
+        (msg == CooperationMessage::OPEN_SUCCESS || msg == CooperationMessage::CLOSE_SUCCESS) ? true : false;
     uv_loop_s *loop = nullptr;
     CHKRV(iter->second->env, napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_LOOP);
     uv_work_s *work = new (std::nothrow) uv_work_t;
@@ -484,7 +492,7 @@ void JsEventTarget::CallGetStatePromiseWork(uv_work_t *work, int32_t status)
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(cb->env, &scope);
 
-    napi_value object = JsUtil::GetGetStateInfo(cb);
+    napi_value object = JsUtil::GetStateInfo(cb);
     if (object == nullptr) {
         MMI_HILOGE("object is nullptr");
         napi_close_handle_scope(cb->env, scope);
@@ -507,7 +515,7 @@ void JsEventTarget::CallGetStateAsyncWork(uv_work_t *work, int32_t status)
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(cb->env, &scope);
 
-    napi_value object = JsUtil::GetGetStateInfo(cb);
+    napi_value object = JsUtil::GetStateInfo(cb);
     if (object == nullptr) {
         MMI_HILOGE("object is nullptr");
         napi_close_handle_scope(cb->env, scope);
@@ -549,14 +557,14 @@ void JsEventTarget::EmitCooperateMessageEvent(uv_work_t *work, int32_t status)
         napi_value deviceDescriptor = nullptr;
         CHKRV_SCOPE(item->env, napi_create_string_utf8(item->env, item->data.deviceDescriptor.c_str(),
             NAPI_AUTO_LENGTH, &deviceDescriptor), CREATE_STRING, scope);
-        napi_value evemtMsg = nullptr;
-        CHKRV_SCOPE(item->env, napi_create_int32(item->env, static_cast<int32_t>(item->data.msg), &evemtMsg),
+        napi_value eventMsg = nullptr;
+        CHKRV_SCOPE(item->env, napi_create_int32(item->env, static_cast<int32_t>(item->data.msg), &eventMsg),
             CREATE_INT32, scope);
         napi_value object = nullptr;
         CHKRV_SCOPE(item->env, napi_create_object(item->env, &object), CREATE_OBJECT, scope);
         CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "deviceDescriptor", deviceDescriptor),
             SET_NAMED_PROPERTY, scope);
-        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "evemtMsg", evemtMsg),
+        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "eventMsg", eventMsg),
             SET_NAMED_PROPERTY, scope);
 
         napi_value handler = nullptr;

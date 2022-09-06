@@ -27,8 +27,8 @@ typedef std::function<int32_t(const UDSClient&, NetPacket&)> ClientMsgFun;
 class ClientMsgHandler : public MsgHandler<MmiMessageId, ClientMsgFun> {
 public:
     ClientMsgHandler() = default;
-    virtual ~ClientMsgHandler();
     DISALLOW_COPY_AND_MOVE(ClientMsgHandler);
+    virtual ~ClientMsgHandler();
 
     void Init();
     void InitProcessedCallback();
@@ -67,7 +67,6 @@ protected:
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 
 private:
-    static void OnEventProcessed(int32_t eventId, int32_t eventType);
     static void OnDispatchEventProcessed(int32_t eventId);
 
 private:

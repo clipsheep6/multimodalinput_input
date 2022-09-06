@@ -124,8 +124,8 @@ private:
     void SendDisplayInfo();
 
 private:
-    sptr<EventFilterService> eventFilterService_ {nullptr};
-    std::shared_ptr<IInputEventConsumer> consumer_ = nullptr;
+    sptr<EventFilterService> eventFilterService_ { nullptr };
+    std::shared_ptr<IInputEventConsumer> consumer_ { nullptr };
     std::vector<std::shared_ptr<IAnrObserver>> anrObservers_;
 
     DisplayGroupInfo displayGroupInfo_;
@@ -134,7 +134,7 @@ private:
     std::condition_variable cv_;
     std::thread ehThread_;
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
-    sptr<CallDinputService> callDinputService_ = nullptr;
+    sptr<CallDinputService> callDinputService_ { nullptr };
 #endif // OHOS_DISTRIBUTED_INPUT_MODEL
 };
 

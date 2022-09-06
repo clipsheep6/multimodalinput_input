@@ -249,6 +249,10 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
     lastWindowInfo_ = *touchWindow;
 
     auto fd = udsServer_->GetClientFd(touchWindow->pid);
+    if (fd == RET_ERR) {
+        auto windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
+        fd = udsServer_->GetClientFd(windowInfo->pid);
+    }
     auto sess = udsServer_->GetSession(fd);
     CHKPV(sess);
 
@@ -298,6 +302,10 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction)
     pointerEvent->SetDeviceId(lastPointerEvent_->GetDeviceId());
 
     auto fd = udsServer_->GetClientFd(lastWindowInfo_.pid);
+    if (fd == RET_ERR) {
+        auto windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
+        fd = udsServer_->GetClientFd(windowInfo->pid);
+    }
     auto sess = udsServer_->GetSession(fd);
     CHKPV(sess);
 
@@ -319,8 +327,9 @@ void InputWindowsManager::NotifyPointerToWindow()
         }
     }
     for (const auto &item : displayGroupInfo_.windowsInfo) {
-        if ((IsInHotArea(lastLogicX_, lastLogicX_, item.pointerHotAreas)) && (lastWindowInfo_.id != item.id)) {
+        if ((IsInHotArea(lastLogicX_, lastLogicY_, item.pointerHotAreas)) && (lastWindowInfo_.id != item.id)) {
             lastWindowInfo_ = item;
+            MMI_HILOGI("Pointer select new window:%{public}d", item.id);
             break;
         }
     }
@@ -801,9 +810,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     auto fd = udsServer_->GetClientFd(touchWindow->pid);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-    if (InputDevMgr->HasPointerDevice()) {
-        UpdatePointerEvent(logicalX, logicalY, pointerEvent, *touchWindow);
-    }
+    UpdatePointerEvent(logicalX, logicalY, pointerEvent, *touchWindow);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
     MMI_HILOGD("fd:%{public}d,pid:%{public}d,id:%{public}d,agentWindowId:%{public}d,"

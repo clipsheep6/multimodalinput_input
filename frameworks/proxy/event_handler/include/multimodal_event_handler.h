@@ -51,7 +51,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 private:
-    MMIClientPtr client_ = nullptr;
+    MMIClientPtr client_ { nullptr };
 };
 
 #define MMIEventHdl ::OHOS::Singleton<MultimodalEventHandler>::GetInstance()
