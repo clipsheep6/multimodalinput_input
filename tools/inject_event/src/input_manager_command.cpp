@@ -176,7 +176,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     std::cout << "invalid parameter to move mouse" << std::endl;
                                     return RET_ERR;
                                 }
-                                if (px < 0 || py < 0) {
+                                if ((px < 0) || (py < 0)) {
                                     std::cout << "coordinate value must be greater than 0" << std::endl;
                                     return RET_ERR;
                                 }
@@ -210,7 +210,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     }
                                     optind += 3;
                                 }
-                                if (px1 < 0 || py1 < 0 || px2 < 0 || py2 < 0) {
+                                if ((px1 < 0) || (py1 < 0) || (px2 < 0) || (py2 < 0)) {
                                     std::cout << "coordinate value must be greater than 0" << std::endl;
                                     return RET_ERR;
                                 }
@@ -455,7 +455,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 std::cout << "invalid coordinate value" << std::endl;
                                 return RET_ERR;
                             }
-                            if (px < 0 || py < 0) {
+                            if ((px < 0) || (py < 0)) {
                                 std::cout << "coordinate value must be greater than 0" << std::endl;
                                 return RET_ERR;
                             }
@@ -753,7 +753,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                         return EVENT_REG_FAIL;
                                 }
                             }
-                            if (px1 < 0 || py1 < 0 || px2 < 0 || py2 < 0) {
+                            if ((px1 < 0) || (py1 < 0) || (px2 < 0) || (py2 < 0)) {
                                 std::cout << "coordinate value must be greater than 0" << std::endl;
                                 return RET_ERR;
                             }
@@ -830,7 +830,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 std::cout << "invalid coordinate value" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
-                            if (px1 < 0 || py1 < 0) {
+                            if ((px1 < 0) || (py1 < 0)) {
                                 std::cout << "coordinate value must be greater than 0" << std::endl;
                                 return RET_ERR;
                             }
@@ -858,7 +858,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 std::cout << "invalid coordinate value" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
-                            if (px1 < 0 || py1 < 0) {
+                            if ((px1 < 0) || (py1 < 0)) {
                                 std::cout << "coordinate value must be greater than 0" << std::endl;
                                 return RET_ERR;
                             }
@@ -905,7 +905,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 std::cout << "parameter error, unable to run" << std::endl;
                                 return RET_ERR;
                             }
-                            if (px1 < 0 || py1 < 0) {
+                            if ((px1 < 0) || (py1 < 0)) {
                                 std::cout << "coordinate value must be greater than 0" << std::endl;
                                 return RET_ERR;
                             }
@@ -979,7 +979,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                         return RET_ERR;
                                 }
                             }
-                            if (px1 < 0 || py1 < 0 || px2 < 0 || py2 < 0) {
+                            if ((px1 < 0) || (py1 < 0) || (px2 < 0) || (py2 < 0)) {
                                 std::cout << "coordinate value must be greater than 0" << std::endl;
                                 return RET_ERR;
                             }
