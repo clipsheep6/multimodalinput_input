@@ -49,7 +49,7 @@ KeyEventInputSubscribeManager::SubscribeKeyEventInfo::SubscribeKeyEventInfo(
     ++KeyEventInputSubscribeManager::subscribeIdManager_;
 }
 
-bool operator<(const KeyOption &first, const KeyOption &second)
+static bool operator<(const KeyOption &first, const KeyOption &second)
 {
     if (first.GetFinalKey() != second.GetFinalKey()) {
         return (first.GetFinalKey() < second.GetFinalKey());
@@ -66,8 +66,14 @@ bool operator<(const KeyOption &first, const KeyOption &second)
     if (sIter != sPrekeys.cend() || tIter != tPrekeys.cend()) {
         return (tIter != tPrekeys.cend());
     }
-    if (first.IsFinalKeyDown() ^ second.IsFinalKeyDown()) {
-        return second.IsFinalKeyDown();
+    if (first.IsFinalKeyDown()) {
+        if (!second.IsFinalKeyDown()) {
+            return false;
+        }
+    } else {
+        if (second.IsFinalKeyDown()) {
+            return true;
+        }
     }
     return (first.GetFinalKeyDownDuration() < second.GetFinalKeyDownDuration());
 }

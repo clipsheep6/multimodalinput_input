@@ -30,6 +30,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIClient" };
+const std::string THREAD_NAME = "mmi_EventHdr";
 } // namespace
 
 using namespace AppExecFwk;
@@ -83,7 +84,7 @@ bool MMIClient::StartEventRunner()
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
-    auto runner = AppExecFwk::EventRunner::Create("mmi_EventHdr");
+    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
     CHKPF(eventHandler_);
     if (isConnected_ && fd_ >= 0) {
@@ -110,11 +111,13 @@ void MMIClient::StopOldEventHandler(std::shared_ptr<AppExecFwk::EventHandler> ev
         eventHandler_->RemoveFileDescriptorListener(fd_);
     }
 
-    auto runner = eventHandler_->GetEventRunner();
-    CHKPV(runner);
-    runner->Stop();
+    auto currentRunner = eventHandler_->GetEventRunner();
+    CHKPV(currentRunner);
+    if (currentRunner->GetRunnerThreadName() == THREAD_NAME) {
+        currentRunner->Stop();
+    }
 
-    if (!eventHandler->PostTask(std::bind(&MMIClient::StartNewEventHandler, this, eventHandler))) {
+    if (!eventHandler->PostImmediateTask(std::bind(&MMIClient::StartNewEventHandler, this, eventHandler))) {
         MMI_HILOGE("Send new eventHandler task failed");
         return;
     }
@@ -159,7 +162,8 @@ void MMIClient::SwitchEventHandler(std::shared_ptr<IInputEventConsumer> inputEve
             return;
         }
 
-        if (!eventHandler_->PostTask(std::bind(&MMIClient::StopOldEventHandler, this, eventHandler))) {
+        if (!eventHandler_->PostTask(std::bind(&MMIClient::StopOldEventHandler, this, eventHandler),
+            AppExecFwk::EventHandler::Priority::IMMEDIATE)) {
             MMI_HILOGE("Send stop old eventHandler task failed");
             return;
         }

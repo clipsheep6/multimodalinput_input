@@ -27,8 +27,6 @@
 
 namespace OHOS {
 namespace MMI {
-bool operator<(const KeyOption &first, const KeyOption &second);
-
 class KeyEventInputSubscribeManager final {
     DECLARE_SINGLETON(KeyEventInputSubscribeManager);
 
