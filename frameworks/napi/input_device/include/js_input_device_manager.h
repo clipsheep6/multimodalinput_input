@@ -17,10 +17,25 @@
 #define JS_INPUT_DEVICE_MANAGER_H
 
 #include <memory>
+
+#include "refbase.h"
+#include "stream_buffer.h"
+
 #include "js_event_target.h"
 
 namespace OHOS {
 namespace MMI {
+struct AsyncContext : RefBase {
+    napi_env env { nullptr };
+    napi_async_work work { nullptr };
+    napi_deferred deferred { nullptr };
+    napi_ref callback { nullptr };
+    int32_t errorCode { -1 };
+    StreamBuffer reserve;
+    AsyncContext(napi_env env) : env(env) {}
+    ~AsyncContext();
+};
+
 class JsInputDeviceManager : public JsEventTarget {
 public:
     JsInputDeviceManager() = default;
@@ -33,6 +48,8 @@ public:
     napi_value SupportKeys(napi_env env, int32_t id, std::vector<int32_t> &keyCodes,
                                    napi_value handle = nullptr);
     napi_value GetKeyboardType(napi_env env, int32_t id, napi_value handle = nullptr);
+    napi_value GetFunctionKeyState(napi_env env, int32_t key, napi_value handle = nullptr);
+    napi_value SetFunctionKeyState(napi_env env, int32_t key, bool state, napi_value handle = nullptr);
     void RegisterDevListener(napi_env env, const std::string &type, napi_value handle);
     void UnregisterDevListener(napi_env env, const std::string &type, napi_value handle = nullptr);
 };

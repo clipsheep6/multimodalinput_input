@@ -341,6 +341,72 @@ napi_value JsInputDeviceContext::GetKeyboardType(napi_env env, napi_callback_inf
     return jsInputDeviceMgr->GetKeyboardType(env, id, argv[1]);
 }
 
+napi_value JsInputDeviceContext::GetFunctionKeyState(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 0;
+    napi_value argv[2];
+    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc < 1 || argc > 2) {
+        THROWERR(env, "The number of parameters is not as expected");
+        return nullptr;
+    }
+
+    if (!JsUtil::TypeOf(env, argv[0], napi_number)) {
+        THROWERR(env, "The first parameter type is wrong");
+        return nullptr;
+    }
+    int32_t keyCode = 0;
+    CHKRP(env, napi_get_value_int32(env, argv[0], &keyCode), GET_INT32);
+
+    JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
+    auto jsInputDeviceMgr = jsDev->GetJsInputDeviceMgr();
+    if (argc == 1) {
+        return jsInputDeviceMgr->GetFunctionKeyState(env, keyCode);
+    }
+    if (!JsUtil::TypeOf(env, argv[1], napi_function)) {
+        THROWERR(env, "The second parameter type is wrong");
+        return nullptr;
+    }
+    return jsInputDeviceMgr->GetFunctionKeyState(env, keyCode, argv[1]);
+}
+
+napi_value JsInputDeviceContext::SetFunctionKeyState(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 0;
+    napi_value argv[3];
+    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc < 2 || argc > 3) {
+        THROWERR(env, "The number of parameters is not as expected");
+        return nullptr;
+    }
+
+    if (!JsUtil::TypeOf(env, argv[0], napi_number)) {
+        THROWERR(env, "The first parameter type is wrong");
+        return nullptr;
+    }
+    if (!JsUtil::TypeOf(env, argv[1], napi_boolean)) {
+        THROWERR(env, "The first parameter type is wrong");
+        return nullptr;
+    }
+    int32_t keyCode = 0;
+    CHKRP(env, napi_get_value_int32(env, argv[0], &keyCode), GET_INT32);
+    bool state;
+    CHKRP(env, napi_get_value_bool(env, argv[1], &state), CREATE_BOOL);
+
+    JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
+    auto jsInputDeviceMgr = jsDev->GetJsInputDeviceMgr();
+    if (argc == 2) {
+        return jsInputDeviceMgr->SetFunctionKeyState(env, keyCode, state);
+    }
+    if (!JsUtil::TypeOf(env, argv[2], napi_function)) {
+        THROWERR(env, "The second parameter type is wrong");
+        return nullptr;
+    }
+    return jsInputDeviceMgr->SetFunctionKeyState(env, keyCode, state, argv[2]);
+}
+
 napi_value JsInputDeviceContext::EnumClassConstructor(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
@@ -397,6 +463,8 @@ napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getDeviceIds", GetDeviceIds),
         DECLARE_NAPI_STATIC_FUNCTION("supportKeys", SupportKeys),
         DECLARE_NAPI_STATIC_FUNCTION("getKeyboardType", GetKeyboardType),
+        DECLARE_NAPI_STATIC_FUNCTION("GetFunctionKeyState", GetFunctionKeyState),
+        DECLARE_NAPI_STATIC_FUNCTION("SetFunctionKeyState", SetFunctionKeyState),
     };
     CHKRP(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     if (CreateEnumKeyboardType(env, exports) == nullptr) {
