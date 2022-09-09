@@ -79,6 +79,12 @@ void InputEventHandler::OnEvent(void *event)
                ",lostTime:%{public}" PRId64, idSeed_, endTime, lostTime);
 }
 
+void InputEventHandler::OnEvent(const MmiHdfEvent &event)
+{
+    CHKPV(inputEventNormalizeHandler_);
+    inputEventNormalizeHandler_->HandleEvent(event);    
+}
+
 int32_t InputEventHandler::BuildInputHandlerChain()
 {
     inputEventNormalizeHandler_ = std::make_shared<InputEventNormalizeHandler>();

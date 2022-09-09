@@ -40,6 +40,7 @@ public:
     DISALLOW_COPY_AND_MOVE(InputEventHandler);
     void Init(UDSServer& udsServer);
     void OnEvent(void *event);
+    void OnEvent(const MmiHdfEvent &event);
     UDSServer *GetUDSServer() const;
 
     std::shared_ptr<InputEventNormalizeHandler> GetInputEventNormalizeHandler() const;

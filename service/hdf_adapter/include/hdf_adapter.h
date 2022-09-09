@@ -5,7 +5,10 @@
 #include <unistd.h>
 
 struct MmiHdfEvent {
-
+    int32_t type;
+    int32_t code;
+    int32_t value;
+    int64_t time;
 };
 
 class HdfAdapter {

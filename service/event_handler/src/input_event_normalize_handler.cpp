@@ -40,7 +40,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventNormalizeHandler" };
 }
 
-void InputEventNormalizeHandler::HandleLibinputEvent(libinput_event* event)
+void InputEventNormalizeHandler::HandleEvent(libinput_event* event)
 {
     CALL_DEBUG_ENTER;
     CHKPV(event);
@@ -111,30 +111,30 @@ void InputEventNormalizeHandler::HandleLibinputEvent(libinput_event* event)
     DfxHisysevent::ReportDispTimes();
 }
 
-void InputEventNormalizeHandler::HandleHdfEvent(const NetPacket &pkt)
+void InputEventNormalizeHandler::HandleEvent(const MmiHdfEvent &event)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(event);
     DfxHisysevent::GetDispStartTime();
-    auto type = libinput_event_get_type(event);
-    TimeCostChk chk("HandleLibinputEvent", "overtime 1000(us)", MAX_INPUT_EVENT_TIME, type);
-    if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
-        MMI_HILOGD("This touch event is canceled type:%{public}d", type);
-        return;
-    }
-    switch (type) {
-        case LIBINPUT_EVENT_DEVICE_ADDED: {
-            OnEventDeviceAdded(event);
+    TimeCostChk chk("HandleLibinputEvent", "overtime 1000(us)", MAX_INPUT_EVENT_TIME, event.type);
+    MMI_HILOGW("type: %{public}d, code: %{public}d, value: %{public}d, time: %{public}ld",
+        event.type, event.code, event.value, event.time);
+    hdfHelper_.HandleEvent(event);
+    switch (event.type) {
+        case MmiHdfEventType::DEVICE_ADDED: {
+            auto ev = hdfHelper_.OnDeviceEvent(event);
+            OnEventDeviceAdded(ev);
             break;
         }
-        case LIBINPUT_EVENT_DEVICE_REMOVED: {
-            OnEventDeviceRemoved(event);
+        case MmiHdfEventType::DEVICE_REMOVED: {
+            auto ev = hdfHelper_.OnDeviceEvent(event);
+            OnEventDeviceRemoved(ev);
             break;
         }
-        case LIBINPUT_EVENT_TOUCH_DOWN:
-        case LIBINPUT_EVENT_TOUCH_UP:
-        case LIBINPUT_EVENT_TOUCH_MOTION: {
-            HandleTouchEvent(event);
+        case MmiHdfEventType::TOUCH_DOWN:
+        case MmiHdfEventType::TOUCH_UP:
+        case MmiHdfEventType::TOUCH_MOTION: {
+            auto ev = hdfHelper_.OnTouchEvent(event);
+            HandleTouchEvent(ev);
             DfxHisysevent::CalcPointerDispTimes();
             break;
         }
