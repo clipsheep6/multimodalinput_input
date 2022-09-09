@@ -40,7 +40,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventNormalizeHandler" };
 }
 
-void InputEventNormalizeHandler::HandleEvent(libinput_event* event)
+void InputEventNormalizeHandler::HandleLibinputEvent(libinput_event* event)
 {
     CALL_DEBUG_ENTER;
     CHKPV(event);
@@ -109,6 +109,41 @@ void InputEventNormalizeHandler::HandleEvent(libinput_event* event)
         }
     }
     DfxHisysevent::ReportDispTimes();
+}
+
+void InputEventNormalizeHandler::HandleHdfEvent(const NetPacket &pkt)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(event);
+    DfxHisysevent::GetDispStartTime();
+    auto type = libinput_event_get_type(event);
+    TimeCostChk chk("HandleLibinputEvent", "overtime 1000(us)", MAX_INPUT_EVENT_TIME, type);
+    if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
+        MMI_HILOGD("This touch event is canceled type:%{public}d", type);
+        return;
+    }
+    switch (type) {
+        case LIBINPUT_EVENT_DEVICE_ADDED: {
+            OnEventDeviceAdded(event);
+            break;
+        }
+        case LIBINPUT_EVENT_DEVICE_REMOVED: {
+            OnEventDeviceRemoved(event);
+            break;
+        }
+        case LIBINPUT_EVENT_TOUCH_DOWN:
+        case LIBINPUT_EVENT_TOUCH_UP:
+        case LIBINPUT_EVENT_TOUCH_MOTION: {
+            HandleTouchEvent(event);
+            DfxHisysevent::CalcPointerDispTimes();
+            break;
+        }
+        default: {
+            MMI_HILOGW("This device does not support, type: %{public}d", type);
+            break;
+        }
+    }
+    DfxHisysevent::ReportDispTimes();    
 }
 
 int32_t InputEventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)

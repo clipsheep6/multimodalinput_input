@@ -31,7 +31,8 @@ public:
     IInputEventHandler() = default;
     DISALLOW_COPY_AND_MOVE(IInputEventHandler);
     virtual ~IInputEventHandler() = default;
-    virtual void HandleEvent(libinput_event* event) {};
+    virtual void HandleLibinputEvent(libinput_event* event) {};
+    virtual void HandleHdfEvent(const NetPacket &pkt) {};
     virtual void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) {};
     virtual void HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) {};
     virtual void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) {};

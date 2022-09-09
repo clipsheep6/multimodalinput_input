@@ -182,17 +182,31 @@ bool MMIService::IsRunning() const
 
 bool MMIService::InitLibinputService()
 {
-#ifdef OHOS_BUILD_HDF
-    MMI_HILOGD("HDF Init");
-    hdfEventManager.SetupCallback();
-#endif
-    if (!(libinputAdapter_.Init(std::bind(&InputEventHandler::OnEvent, InputHandler, std::placeholders::_1),
+    if (!(libinputAdapter_.Init(std::bind(&InputEventHandler::OnLibinputEvent, InputHandler, std::placeholders::_1),
         DEF_INPUT_SEAT))) {
         MMI_HILOGE("Libinput init, bind failed");
         return false;
     }
     auto inputFd = libinputAdapter_.GetInputFd();
     auto ret = AddEpoll(EPOLL_EVENT_INPUT, inputFd);
+    if (ret <  0) {
+        MMI_HILOGE("AddEpoll error ret:%{public}d", ret);
+        EpollClose();
+        return false;
+    }
+    MMI_HILOGI("AddEpoll, epollfd:%{public}d, fd:%{public}d", mmiFd_, inputFd);
+    return true;
+}
+
+bool MMIService::InitHdfService()
+{
+    if (!(hdfAdapter_.Init(std::bind(&InputEventHandler::OnHdfEvent, InputHandler, std::placeholders::_1),
+        DEF_INPUT_SEAT))) {
+        MMI_HILOGE("Libinput init, bind failed");
+        return false;
+    }
+    auto inputFd = hdfAdapter_.GetInputFd();
+    auto ret = AddEpoll(EPOLL_EVENT_HDF, inputFd);
     if (ret <  0) {
         MMI_HILOGE("AddEpoll error ret:%{public}d", ret);
         EpollClose();
@@ -930,6 +944,8 @@ void MMIService::OnThread()
             CHKPC(mmiEd);
             if (mmiEd->event_type == EPOLL_EVENT_INPUT) {
                 libinputAdapter_.EventDispatch(ev[i]);
+            } else if (mmiEd->event_type == EPOLL_EVENT_HDF) {
+                hdfAdapter_.EventDispatch(ev[i]);
             } else if (mmiEd->event_type == EPOLL_EVENT_SOCKET) {
                 OnEpollEvent(ev[i]);
             } else if (mmiEd->event_type == EPOLL_EVENT_SIGNAL) {
@@ -1028,10 +1044,8 @@ int32_t MMIService::Dump(int32_t fd, const std::vector<std::u16string> &args)
         return DUMP_PARAM_ERR;
     }
     if (args.empty()) {
-        MMI_HILOGE("The args cannot be empty");
-        mprintf(fd, "args cannot be empty\n");
         MMIEventDump->DumpHelp(fd);
-        return DUMP_PARAM_ERR;
+        return RET_OK;
     }
     std::vector<std::string> argList = { "" };
     std::transform(args.begin(), args.end(), std::back_inserter(argList),

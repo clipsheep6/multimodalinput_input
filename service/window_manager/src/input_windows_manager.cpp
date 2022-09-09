@@ -1045,7 +1045,7 @@ MouseLocation InputWindowsManager::GetMouseInfo()
 void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
-    mprintf(fd, "Windows information:\t");
+    mprintf(fd, "Windows information:");
     mprintf(fd, "windowsInfos,num:%zu", displayGroupInfo_.windowsInfo.size());
     for (const auto &item : displayGroupInfo_.windowsInfo) {
         mprintf(fd,

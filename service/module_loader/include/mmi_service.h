@@ -159,6 +159,7 @@ private:
 #endif
 
     LibinputAdapter libinputAdapter_;
+    HdfAdapter      hdfAdapter_;
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;
 };

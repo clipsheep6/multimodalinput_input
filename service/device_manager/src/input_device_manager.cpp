@@ -466,14 +466,14 @@ void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
     for (const auto &item : inputDevice_) {
         std::shared_ptr<InputDevice> inputDevice = GetInputDevice(item.first);
         CHKPV(inputDevice);
+        std::vector<InputDevice::AxisInfo> axisinfo = inputDevice->GetAxisInfo();
         mprintf(fd,
-                "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d "
-                "| product:%d | vendor:%d | phys:%s\t",
+                "deviceId:%-4d | deviceName:%-20s | deviceType:%-2d | bus:%-2d | version:%-4d "
+                "| product:%-4d | vendor:%-4d | phys:%-12s\t",
                 inputDevice->GetId(), inputDevice->GetName().c_str(), inputDevice->GetType(),
                 inputDevice->GetBus(), inputDevice->GetVersion(), inputDevice->GetProduct(),
                 inputDevice->GetVendor(), inputDevice->GetPhys().c_str());
-        std::vector<InputDevice::AxisInfo> axisinfo = inputDevice->GetAxisInfo();
-        mprintf(fd, "axis: count=%d", axisinfo.size());
+        mprintf(fd, "    axis: count=%d", axisinfo.size());
         for (const auto &axis : axisinfo) {
             auto iter = axisType.find(axis.GetAxisType());
             if (iter == axisType.end()) {
@@ -481,7 +481,7 @@ void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
                 return;
             }
             mprintf(fd,
-                    "\t axisType:%s | minimum:%d | maximum:%d | fuzz:%d | flat:%d | resolution:%d\t",
+                    "    axisType:%-12s | minimum:%-4d | maximum:%-4d | fuzz:%d | flat:%-4d | resolution:%-4d\t",
                     iter->second.c_str(), axis.GetMinimum(), axis.GetMaximum(), axis.GetFuzz(),
                     axis.GetFlat(), axis.GetResolution());
         }
@@ -498,7 +498,7 @@ void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::strin
         CHKPV(inputDevice);
         int32_t deviceId = inputDevice->GetId();
         mprintf(fd,
-                "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d | product:%d | vendor:%d\t",
+                "deviceId:%-4d | deviceName:%-20s | deviceType:%-4d | bus:%-4d | version:%-4d | product:%-4d | vendor:%-4d\t",
                 deviceId, inputDevice->GetName().c_str(), inputDevice->GetType(), inputDevice->GetBus(),
                 inputDevice->GetVersion(), inputDevice->GetProduct(), inputDevice->GetVendor());
     }

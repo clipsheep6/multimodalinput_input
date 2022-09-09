@@ -213,17 +213,20 @@ void EventDump::DumpEventHelp(int32_t fd, const std::vector<std::string> &args)
 
 void EventDump::DumpHelp(int32_t fd)
 {
-    mprintf(fd, "Usage:\t");
-    mprintf(fd, "      -h, --help: dump help\t");
-    mprintf(fd, "      -d, --device: dump the device information\t");
-    mprintf(fd, "      -l, --devicelist: dump the device list information\t");
-    mprintf(fd, "      -w, --windows: dump the windows information\t");
-    mprintf(fd, "      -u, --udsserver: dump the uds_server information\t");
-    mprintf(fd, "      -o, --monitor: dump the monitor information\t");
-    mprintf(fd, "      -s, --subscriber: dump the subscriber information\t");
-    mprintf(fd, "      -i, --interceptor: dump the interceptor information\t");
-    mprintf(fd, "      -m, --mouse: dump the mouse information\t");
-    mprintf(fd, "      -c, --dump Keyboard and mouse crossing information\t");
+    mprintf(fd, "Usage:");
+	mprintf(fd, "      hidumper -s 3101 -a [Option]");
+	mprintf(fd, "      hidumper -s MultimodalInput -a [Option]");
+	mprintf(fd, "Options:");
+    mprintf(fd, "      -h, --help: dump help");
+    mprintf(fd, "      -d, --device: dump the device information");
+    mprintf(fd, "      -l, --devicelist: dump the device list information");
+    mprintf(fd, "      -w, --windows: dump the windows information");
+    mprintf(fd, "      -u, --udsserver: dump the uds_server information");
+    mprintf(fd, "      -o, --monitor: dump the monitor information");
+    mprintf(fd, "      -s, --subscriber: dump the subscriber information");
+    mprintf(fd, "      -i, --interceptor: dump the interceptor information");
+    mprintf(fd, "      -m, --mouse: dump the mouse information");
+    mprintf(fd, "      -c, --dump Keyboard and mouse crossing information");
 }
 } // namespace MMI
 } // namespace OHOS

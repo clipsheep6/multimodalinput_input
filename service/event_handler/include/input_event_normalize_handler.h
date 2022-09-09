@@ -26,7 +26,8 @@ class InputEventNormalizeHandler : public IInputEventHandler {
 public:
     InputEventNormalizeHandler() = default;
     ~InputEventNormalizeHandler() = default;
-    void HandleEvent(libinput_event* event) override;
+    void HandleLibinputEvent(libinput_event* event) override;
+    void HandleHdfEvent(const NetPacket &pkt) override;
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
     void HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
     void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
@@ -52,6 +53,7 @@ private:
     int32_t timerId_ = -1;
     void ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent, struct libinput_event *event);
 };
+
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_EVENT_NORMALIZE_H
