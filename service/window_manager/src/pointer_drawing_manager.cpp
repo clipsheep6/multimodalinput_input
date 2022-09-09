@@ -574,7 +574,8 @@ void PointerDrawingManager::InitStyle()
         {MIDDLE_BTN_NORTH_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MID_Btn_North_West.png"}},
         {MIDDLE_BTN_SOUTH_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MID_Btn_South_East.png"}},
         {MIDDLE_BTN_SOUTH_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MID_Btn_South_West.png"}},
-        {MIDDLE_BTN_NORTH_SOUTH_WEST_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MID_Btn_North_South_West_East.png"}},
+        {MIDDLE_BTN_NORTH_SOUTH_WEST_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH +
+            "MID_Btn_North_South_West_East.png"}},
     };
     for (auto iter = mouseIcons_.begin(); iter != mouseIcons_.end();) {
         if ((ReadCursorStyleFile(iter->second.iconPath)) != RET_OK) {
