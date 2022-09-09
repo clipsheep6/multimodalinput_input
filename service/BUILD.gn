@@ -169,8 +169,7 @@ ohos_prebuilt_etc("drawing_pointer_image_North") {
 }
 
 ohos_prebuilt_etc("drawing_pointer_image_West_East") {
-  source =
-      "//foundation/multimodalinput/input/util/source_icon/West_East.png"
+  source = "//foundation/multimodalinput/input/util/source_icon/West_East.png"
   part_name = "input"
   subsystem_name = "multimodalinput"
   relative_install_dir = "multimodalinput/mouse_icon"
