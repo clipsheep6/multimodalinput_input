@@ -71,7 +71,9 @@ ohos_shared_library("libmmi-util") {
     "//foundation/arkui/napi:ace_napi",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
   ]
-
+  if (input_feature_input_cooperation) {
+    external_deps = [ "dsoftbus:softbus_client", ]
+  }
   part_name = "input"
 }
 

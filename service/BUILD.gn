@@ -460,6 +460,7 @@ ohos_shared_library("libmmi-server") {
       "input_device_cooperate/src/input_device_cooperate_state_free.cpp",
       "input_device_cooperate/src/input_device_cooperate_state_in.cpp",
       "input_device_cooperate/src/input_device_cooperate_state_out.cpp",
+      "input_device_cooperate/src/multimodal_input_softbus.cpp",
     ]
   }
 
@@ -563,7 +564,6 @@ ohos_shared_library("libmmi-server") {
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_proxy",
     "//foundation/multimodalinput/input/util:libmmi-util",
     "//third_party/cJSON:cjson_static",
-    "//third_party/json:nlohmann_json_static",
   ]
 
   if (input_feature_libinput || input_feature_hdf) {
@@ -580,6 +580,8 @@ ohos_shared_library("libmmi-server") {
       "//foundation/deviceprofile/device_info_manager/interfaces/innerkits/core:distributed_device_profile_client",
       "//foundation/distributedhardware/distributed_input/interfaces/inner_kits:libdinput_sdk",
       "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_proxy",
+      "//third_party/json:nlohmann_json_static",
+      "//foundation/communication/dsoftbus/sdk:softbus_client",
     ]
   }
 
@@ -600,7 +602,6 @@ ohos_shared_library("libmmi-server") {
   if (input_feature_input_cooperation) {
     external_deps += [
       "device_manager:devicemanagersdk",
-      "dsoftbus:softbus_client",
     ]
   }
 

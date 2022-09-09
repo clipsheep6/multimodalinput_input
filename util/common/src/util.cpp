@@ -36,6 +36,9 @@
 #include "mmi_log.h"
 #include "securec.h"
 #include "uuid.h"
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+#include "softbus_bus_center.h"
+#endif
 
 namespace OHOS {
 namespace MMI {
@@ -736,6 +739,19 @@ std::string StringPrintf(const char *format, ...)
     } 
     va_end(ap);
     return result;
+}
+
+void GetLocalDeviceId(std::string &local)
+{
+    local = "";
+    auto localNode = std::make_unique<NodeBasicInfo>();
+    CHKPV(localNode);
+    int32_t errCode = GetLocalNodeDeviceInfo(MMI_PKG_NAME, localNode.get());
+    if (errCode != RET_OK) {
+        MMI_HILOGE("GetLocalNodeDeviceInfo errCode: %{public}d", errCode);
+        return;
+    }
+    local = localNode->networkId;
 }
 } // namespace MMI
 } // namespace OHOS
