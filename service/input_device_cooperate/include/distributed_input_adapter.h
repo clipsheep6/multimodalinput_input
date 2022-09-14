@@ -42,7 +42,7 @@ class DistributedInputAdapter final {
     DECLARE_DELAYED_SINGLETON(DistributedInputAdapter);
 public:
     using DInputCallback = std::function<void(bool)>;
-    using MouseStateChangeCallback = std::function<void(uint32_t type, uint32_t code, int32_t value)>;
+    using SimulationEventCallback = std::function<void(uint32_t type, uint32_t code, int32_t value)>;
     DISALLOW_COPY_AND_MOVE(DistributedInputAdapter);
 
     bool IsNeedFilterOut(const std::string &deviceId,
@@ -69,19 +69,17 @@ public:
     int32_t PrepareRemoteInput(const std::string &deviceId, DInputCallback callback);
     int32_t UnPrepareRemoteInput(const std::string &deviceId, DInputCallback callback);
 
-    int32_t RegisterEventCallback(MouseStateChangeCallback callback);
-    int32_t UnregisterEventCallback(MouseStateChangeCallback callback);
-
-    bool IsTouchEventNeedFilterOut(uint32_t absX, uint32_t absY);
+    int32_t RegisterEventCallback(SimulationEventCallback callback);
+    int32_t UnregisterEventCallback(SimulationEventCallback callback);
 
 private:
     enum class CallbackType {
         StartDInputCallback,
         StartDInputCallbackDHIds,
-        StartDInputCallbackFds,
+        StartDInputCallbackSink,
         StopDInputCallback,
         StopDInputCallbackDHIds,
-        StopDInputCallbackFds,
+        StopDInputCallbackSink,
         PrepareStartDInputCallback,
         UnPrepareStopDInputCallback,
         PrepareStartDInputCallbackSink,
@@ -113,12 +111,12 @@ private:
         void OnResultDhids(const std::string &devId, const int32_t &status) override;
     };
 
-    class StartDInputCallbackFds : public DistributedHardware::DistributedInput::StartStopDInputsCallbackStub {
+    class StartDInputCallbackSink : public DistributedHardware::DistributedInput::StartStopDInputsCallbackStub {
     public:
         void OnResultDhids(const std::string &devId, const int32_t &status) override;
     };
 
-    class StopDInputCallbackFds : public DistributedHardware::DistributedInput::StartStopDInputsCallbackStub {
+    class StopDInputCallbackSink : public DistributedHardware::DistributedInput::StartStopDInputsCallbackStub {
     public:
         void OnResultDhids(const std::string &devId, const int32_t &status) override;
     };
@@ -143,7 +141,7 @@ private:
         void OnResult(const std::string &devId, const int32_t &status) override;
     };
 
-    class MouseStateChangeCallbackImpl : public DistributedHardware::DistributedInput::SimulationEventListenerStub {
+    class SimulationEventCallbackImpl : public DistributedHardware::DistributedInput::SimulationEventListenerStub {
     public:
         int32_t OnSimulationEvent(uint32_t type, uint32_t code, int32_t value) override;
     };
@@ -155,8 +153,8 @@ private:
     void OnSimulationEvent(uint32_t type, uint32_t code, int32_t value);
     std::map<CallbackType, TimerInfo> watchingMap_;
     std::map<CallbackType, DInputCallback> callbackMap_;
-    MouseStateChangeCallback mouseStateChangeCallback_ = { nullptr };
-    sptr<MouseStateChangeCallbackImpl> mouseListener_ { nullptr };
+    SimulationEventCallback simulationEventCallback_ = { nullptr };
+    sptr<SimulationEventCallbackImpl> simulationEventListener_ { nullptr };
     std::mutex adapterLock_;
 };
 

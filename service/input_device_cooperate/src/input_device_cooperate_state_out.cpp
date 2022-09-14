@@ -19,8 +19,7 @@
 #include "distributed_input_adapter.h"
 #include "input_device_cooperate_sm.h"
 #include "input_device_manager.h"
-#include "mouse_event_handler.h"
-#include "multimodal_input_connect_remoter.h"
+#include "multimodal_input_softbus.h"
 
 namespace OHOS {
 namespace MMI {
@@ -41,7 +40,7 @@ int32_t InputDeviceCooperateStateOut::StopInputDeviceCooperate(const std::string
         std::pair<std::string, std::string> prepared = InputDevCooSM->GetPreparedDevices();
         srcNetworkId = prepared.first;
     }
-    int32_t ret = RemoteMgr->StopRemoteCooperate(networkId);
+    int32_t ret = SoftbusMgr->StopRemoteCooperate(networkId);
     if (ret != RET_OK) {
         MMI_HILOGE("Stop input device cooperate fail");
         return ret;

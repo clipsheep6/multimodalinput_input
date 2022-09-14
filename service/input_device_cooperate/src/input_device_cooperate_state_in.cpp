@@ -20,7 +20,7 @@
 #include "input_device_cooperate_sm.h"
 #include "input_device_manager.h"
 #include "mouse_event_handler.h"
-#include "multimodal_input_connect_remoter.h"
+#include "multimodal_input_softbus.h"
 
 namespace OHOS {
 namespace MMI {
@@ -39,12 +39,12 @@ int32_t InputDeviceCooperateStateIn::StartInputDeviceCooperate(const std::string
         return RET_ERR;
     }
     std::string localNetworkId;
-    InputDevMgr->GetLocalDeviceId(localNetworkId);
+    GetLocalDeviceId(localNetworkId);
     if (localNetworkId.empty() || remoteNetworkId == localNetworkId) {
         MMI_HILOGE("Input Parameters error");
         return RET_ERR;
     }
-    int32_t ret = RemoteMgr->StartRemoteCooperate(localNetworkId, remoteNetworkId);
+    int32_t ret = SoftbusMgr->StartRemoteCooperate(localNetworkId, remoteNetworkId);
     if (ret != RET_OK) {
         MMI_HILOGE("Start input device cooperate fail");
         return ret;
@@ -72,7 +72,7 @@ int32_t InputDeviceCooperateStateIn::ProcessStart(const std::string &remoteNetwo
 int32_t InputDeviceCooperateStateIn::StopInputDeviceCooperate(const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = RemoteMgr->StopRemoteCooperate(networkId);
+    int32_t ret = SoftbusMgr->StopRemoteCooperate(networkId);
     if (ret != RET_OK) {
         MMI_HILOGE("Stop input device cooperate fail");
         return ret;

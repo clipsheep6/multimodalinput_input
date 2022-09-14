@@ -30,7 +30,6 @@
 #include "input_windows_manager.h"
 #include "key_event_value_transformation.h"
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-#include "softbus_bus_center.h"
 #include "util.h"
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "util_ex.h"
@@ -45,7 +44,6 @@ constexpr int32_t SUPPORT_KEY = 1;
 const std::string UNKNOWN_SCREEN_ID = "";
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 const char *SPLIT_SYMBOL = "|";
-const std::string BUNDLE_NAME = "DBinderBus_" + std::to_string(getpid());
 const std::string DH_ID_PREFIX = "Input_";
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 
@@ -571,19 +569,6 @@ std::string InputDeviceManager::GetOriginNetworkId(const std::string &dhid)
         }
     }
     return networkId;
-}
-
-void InputDeviceManager::GetLocalDeviceId(std::string &local)
-{
-    local = "";
-    auto localNode = std::make_unique<NodeBasicInfo>();
-    CHKPV(localNode);
-    int32_t errCode = GetLocalNodeDeviceInfo(BUNDLE_NAME.c_str(), localNode.get());
-    if (errCode != RET_OK) {
-        MMI_HILOGE("GetLocalNodeDeviceInfo errCode: %{public}d", errCode);
-        return;
-    }
-    local = localNode->networkId;
 }
 
 std::string InputDeviceManager::GetDhid(int32_t deviceId) const
