@@ -53,9 +53,9 @@ public:
     void HandlePointerEventInner(const std::shared_ptr<PointerEvent> point);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    void OnDinputSimulationEventChange(uint32_t type, uint32_t code, int32_t value);
-#endif // OHOS_BUILD_ENABLE_COOPERATE
+    void OnDinputSimulationEvent(uint32_t type, uint32_t code, int32_t value);
     bool CheckPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 
 private:
 #ifdef OHOS_BUILD_ENABLE_COOPERATE

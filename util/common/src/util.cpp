@@ -741,6 +741,7 @@ std::string StringPrintf(const char *format, ...)
     return result;
 }
 
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
 void GetLocalDeviceId(std::string &local)
 {
     local = "";
@@ -753,5 +754,6 @@ void GetLocalDeviceId(std::string &local)
     }
     local = localNode->networkId;
 }
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 } // namespace MMI
 } // namespace OHOS
