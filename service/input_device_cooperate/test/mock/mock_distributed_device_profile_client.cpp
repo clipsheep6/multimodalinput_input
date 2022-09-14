@@ -45,25 +45,23 @@ IMPLEMENT_SINGLE_INSTANCE(DistributedDeviceProfileClient);
 int32_t DistributedDeviceProfileClient::PutDeviceProfile(const ServiceCharacteristicProfile& profile)
 {
     if (DistributedDeviceProfileClient::CheckProfileInvalidity(profile)) {
-        HILOGE("[jy] CheckProfileInvalidity success");
         return DP_INVALID_PARAMS;
     }
-    HILOGE("[jy] GetDeviceProfileService success");
+    HILOGE("Getting device profile service succeeded");
     return DP_GET_SERVICE_SUCCESS;
 }
 
 int32_t DistributedDeviceProfileClient::GetDeviceProfile(const std::string& udid, const std::string& serviceId,
     ServiceCharacteristicProfile& profile)
 {
-    HILOGE("[jy] GetDeviceProfile");
     if (udid.empty() || serviceId.empty()) {
-        HILOGE("[jy]GetDeviceProfile failed");
+        HILOGE("Failed to get device profile");
         return RET_ERR;
     } 
     nlohmann::json data;
     data[CHARACTERISTICS_NAME] = state_;
     profile.SetCharacteristicProfileJson(data.dump());
-    HILOGE("[jy]GetDeviceProfile successfully");
+    HILOGE("Get device profile successfully");
     return RET_OK;
 }
 
@@ -119,20 +117,18 @@ int32_t DistributedDeviceProfileClient::SyncDeviceProfile(const SyncOptions& syn
 {
     auto dps = GetDeviceProfileService();
     if (dps == nullptr) {
-        HILOGE("[jy GetDeviceProfileService]dpProxy_  is nullptr");   
         return DP_GET_SERVICE_FAILED;
     }
-    HILOGE("[jy GetDeviceProfileService]dpProxy_  is  ok");   
+    HILOGE("Successfully synchronized device profile");
     return DP_GET_SERVICE_SUCCESS;
 }
 
 sptr<IDistributedDeviceProfile> DistributedDeviceProfileClient::GetDeviceProfileService()
 {
     if (dpProxy_ != nullptr) {
-        HILOGE("[jy GetDeviceProfileService]dpProxy_  !=  nullptr");   
         return dpProxy_;
     }
-    HILOGE("[jy GetDeviceProfileService]dpProxy_  ==  nullptr");   
+    HILOGE("Get device profile service succeeded");
     return dpProxy_;
 }
 
@@ -140,7 +136,7 @@ bool DistributedDeviceProfileClient::CheckProfileInvalidity(const ServiceCharact
 {
     bool state = profile.GetServiceId().empty() || profile.GetServiceType().empty() ||
                  profile.GetCharacteristicProfileJson().empty();
-    HILOGE("[jy]CheckProfileInvalidity] state is :%{public}d", state);
+    HILOGE("The status of the invalid profile is :%{public}d", state);
     return state;
 }
 } // namespace DeviceProfile
