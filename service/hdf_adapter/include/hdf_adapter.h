@@ -1,9 +1,25 @@
-#ifndef C5102E32_B38C_4E71_8063_A57DBA96B8A1
-#define C5102E32_B38C_4E71_8063_A57DBA96B8A1
+/*
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
+#ifndef HDF_ADAPTER_H
+#define HDF_ADAPTER_H
 
 #include <unistd.h>
 
+namespace OHOS {
+namespace MMI {
 struct MmiHdfEvent {
     int32_t type;
     int32_t code;
@@ -12,59 +28,18 @@ struct MmiHdfEvent {
 };
 
 class HdfAdapter {
-    typedef std::function<void(void *event)> HdfEventCallback;
+    using HdfEventCallback = std::function<void(void *event)>;
 public:
     int32_t Init();
     int32_t DeInit();
     int32_t GetInputFd() const;
     void EventDispatch(struct epoll_event& ev);
-    void OnEventHandler();
+    void OnEventHandler(const MmiHdfEvent &data);
     void OnEventCallBack(void *data);
 private:
-    int32_t fd_ { -1 };
+    int32_t pipes_[2] = { -1, -1 };
     HdfEventCallback callback_ = nullptr;
 };
-
-void HdfAdapter::EventDispatch(struct epoll_event& ev)
-{
-    CALL_DEBUG_ENTER;
-    CHKPV(ev.data.ptr);
-    if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_HILOGF("Epoll unrecoverable error,"
-            "The service must be restarted. fd:%{public}d", fd);
-        free(ev.data.ptr);
-        ev.data.ptr = nullptr;
-        return;
-    }
-    auto data = static_cast<const MmiHdfEvent *>(ev.data.ptr);
-    CHKPV(data);
-    OnEventHandler(*data);
-}
-
-void HdfAdapter::OnEventHandler(const MmiHdfEvent &data)
-{
-    CALL_DEBUG_ENTER;
-    CHKPV(callback_);
-    callback_(data);   
-}
-
-int32_t HdfAdapter::Init()
-{
-   int fds[2] = {};
-   int32_t ret = pipe(fds);
-   close(fds[1]);
-   fd_ = fds[0];
-}
-
-void HdfAdapter::OnEventCallBack(void *data)
-{
-    if (callback_ == nullptr) {
-        return;
-    }
-
-    callback_(data);
-}
-
-
-
-#endif /* C5102E32_B38C_4E71_8063_A57DBA96B8A1 */
+} // namespace MMI
+} // namespace OHOS
+#endif // HDF_ADAPTER_H
