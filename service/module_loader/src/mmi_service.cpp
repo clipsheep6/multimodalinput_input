@@ -1044,8 +1044,10 @@ int32_t MMIService::Dump(int32_t fd, const std::vector<std::u16string> &args)
         return DUMP_PARAM_ERR;
     }
     if (args.empty()) {
+        MMI_HILOGE("The args cannot be empty");
+        mprintf(fd, "args cannot be empty\n");
         MMIEventDump->DumpHelp(fd);
-        return RET_OK;
+        return DUMP_PARAM_ERR;
     }
     std::vector<std::string> argList = { "" };
     std::transform(args.begin(), args.end(), std::back_inserter(argList),
