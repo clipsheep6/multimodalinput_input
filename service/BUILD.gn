@@ -764,6 +764,7 @@ if (input_feature_input_cooperation) {
       "input_device_cooperate/test/input_device_cooperate_test.cpp",
       "input_device_cooperate/test/mock/mock_distributed_device_profile_client.cpp",
       "input_device_cooperate/test/mock/mock_distributed_input_kit.cpp",
+      "input_device_cooperate/test/mock/softbus_bus_center.cpp",
     ]
 
     include_dirs = [

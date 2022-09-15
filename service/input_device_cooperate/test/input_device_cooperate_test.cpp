@@ -152,28 +152,28 @@ HWTEST_F(IDCooperateTest, UnregisterCrossingStateListener002, TestSize.Level1)
 /**
  * @tc.number: StartInputDeviceCooperate001
  * @tc.name: StartInputDeviceCooperate
- * @tc.desc: Verify that the input device is started for collaboration.
+ * @tc.desc: Verify that the input device is started for cooperation.
  */
 HWTEST_F(IDCooperateTest, StartInputDeviceCooperate001, TestSize.Level1)
 {
     std::string remote = "";
-    std::string startDhid = "123";
     int32_t startInputDeviceId = 10;
     InputDevCooSM->Reset();
     int32_t state = InputDevCooSM->StartInputDeviceCooperate(remote, startInputDeviceId);
     MMI_HILOGI("Start inputdevice cooperate state :%{public}d", state);
     EXPECT_EQ(state, RET_ERR);
+    sleep(300);
+    EXPECT_EQ(CooperateState::STATE_FREE, InputDevCooSM->cooperateState_);
 }
 
 /**
  * @tc.number: StartInputDeviceCooperate002
  * @tc.name: StartInputDeviceCooperate
- * @tc.desc: Verify that the input device is started for collaboration.
+ * @tc.desc: Verify that the input device is started for cooperation.
  */
 HWTEST_F(IDCooperateTest, StartInputDeviceCooperate002, TestSize.Level1)
 {
     std::string remote = "123";
-    std::string startDhid = "456";
     int32_t startInputDeviceId = 10;
     InputDevCooSM->isStopping_ = false;
     InputDevCooSM->isStarting_ = false;
@@ -186,7 +186,7 @@ HWTEST_F(IDCooperateTest, StartInputDeviceCooperate002, TestSize.Level1)
 /**
  * @tc.number: StopInputDeviceCooperate001
  * @tc.name: StopInputDeviceCooperate
- * @tc.desc: Verify that input device collaboration is stopped.
+ * @tc.desc: Verify that input device cooperation is stopped.
  */
 HWTEST_F(IDCooperateTest, StopInputDeviceCooperate001, TestSize.Level1)
 {
@@ -201,7 +201,7 @@ HWTEST_F(IDCooperateTest, StopInputDeviceCooperate001, TestSize.Level1)
 /**
  * @tc.number: StopInputDeviceCooperate002
  * @tc.name: StopInputDeviceCooperate
- * @tc.desc: Verify that input device collaboration is stopped.
+ * @tc.desc: Verify that input device cooperation is stopped.
  */
 HWTEST_F(IDCooperateTest, StopInputDeviceCooperate002, TestSize.Level1)
 {
@@ -218,7 +218,7 @@ HWTEST_F(IDCooperateTest, StopInputDeviceCooperate002, TestSize.Level1)
 /**
  * @tc.number: StopInputDeviceCooperate003
  * @tc.name: StopInputDeviceCooperate
- * @tc.desc: Verify that input device collaboration is stopped.
+ * @tc.desc: Verify that input device cooperation is stopped.
  */
 HWTEST_F(IDCooperateTest, StopInputDeviceCooperate003, TestSize.Level1)
 {
@@ -236,7 +236,7 @@ HWTEST_F(IDCooperateTest, StopInputDeviceCooperate003, TestSize.Level1)
 /**
  * @tc.number: StartRemoteCooperateResult001
  * @tc.name: StartRemoteCooperateResult
- * @tc.desc: Verify Remote Collaboration results are started.
+ * @tc.desc: Verify remote cooperation results are started.
  */
 HWTEST_F(IDCooperateTest, StartRemoteCooperateResult001, TestSize.Level1)
 {
@@ -251,7 +251,7 @@ HWTEST_F(IDCooperateTest, StartRemoteCooperateResult001, TestSize.Level1)
 /**
  * @tc.number: StartRemoteCooperateResult002
  * @tc.name: StartRemoteCooperateResult
- * @tc.desc: Verify Remote Collaboration results are started.
+ * @tc.desc: Verify remote cooperation results are started.
  */
 HWTEST_F(IDCooperateTest, StartRemoteCooperateResult002, TestSize.Level1)
 {
@@ -266,7 +266,7 @@ HWTEST_F(IDCooperateTest, StartRemoteCooperateResult002, TestSize.Level1)
 /**
  * @tc.number: StopRemoteCooperate
  * @tc.name: StopRemoteCooperate
- * @tc.desc: Verify Stop Remote Collaboration.
+ * @tc.desc: Verify Stop Remote cooperation.
  */
 HWTEST_F(IDCooperateTest, StopRemoteCooperate, TestSize.Level1)
 {
@@ -277,7 +277,7 @@ HWTEST_F(IDCooperateTest, StopRemoteCooperate, TestSize.Level1)
 /**
  * @tc.number: StopRemoteCooperateResult001
  * @tc.name: StopRemoteCooperateResult
- * @tc.desc: Verify whether to stop remote collaboration results.
+ * @tc.desc: Verify whether to stop remote cooperation results.
  */
 HWTEST_F(IDCooperateTest, StopRemoteCooperateResult001, TestSize.Level1)
 {
@@ -288,7 +288,7 @@ HWTEST_F(IDCooperateTest, StopRemoteCooperateResult001, TestSize.Level1)
 /**
  * @tc.number: StopRemoteCooperateResult002
  * @tc.name: StopRemoteCooperateResult
- * @tc.desc: Verify whether to stop remote collaboration results.
+ * @tc.desc: Verify whether to stop remote cooperation results.
  */
 HWTEST_F(IDCooperateTest, StopRemoteCooperateResult002, TestSize.Level1) 
 {
