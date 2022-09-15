@@ -19,12 +19,12 @@
 #include <cstdio>
 
 #include "dfx_hisysevent.h"
-#include "input_device_manager.h"
 #include "i_pointer_drawing_manager.h"
-#include "mouse_event_handler.h"
+#include "input_device_manager.h"
+#include "mouse_event_normalize.h"
 #include "pointer_drawing_manager.h"
-#include "util.h"
 #include "util_ex.h"
+#include "util.h"
 
 namespace OHOS {
 namespace MMI {
@@ -733,6 +733,7 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
             }
         }
     }
+    MMI_HILOGD("firstBtnDownWindowId_:%{public}d", firstBtnDownWindowId_);
     for (const auto &item : displayGroupInfo_.windowsInfo) {
         if (item.id == firstBtnDownWindowId_) {
             return std::make_optional(item);
