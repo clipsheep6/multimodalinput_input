@@ -33,9 +33,6 @@
 #include "mmi_func_callback.h"
 #include "mouse_event_handler.h"
 #include "time_cost_chk.h"
-#ifdef OHOS_BUILD_HDF
-#include "hdi_inject.h"
-#endif
 
 namespace OHOS {
 namespace MMI {
