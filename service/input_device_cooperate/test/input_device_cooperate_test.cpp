@@ -116,8 +116,7 @@ HWTEST_F(IDCooperateTest, RegisterCrossingStateListener002, TestSize.Level1)
 {
     using ProfileEventCallback = std::function<void(const std::string &, bool)>;
     ProfileEventCallback callback;
-    callback = [](const std::string &, bool)
-    {
+    callback = [](const std::string &, bool){
         MMI_HILOGI("callback is ok");
     };
     std::string deviceId = "123";
