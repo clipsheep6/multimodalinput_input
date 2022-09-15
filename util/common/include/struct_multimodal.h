@@ -24,11 +24,6 @@ inline constexpr int32_t MAX_UUIDSIZE = 64;
 inline constexpr int32_t SYSTEMUID = 1000;
 inline constexpr int32_t MAX_SOLTED_COORDS_NUMS = 10;
 
-enum SENIOR_DEVICE_TYPE {
-    INPUT_DEVICE_AISENSOR = 31,
-    INPUT_DEVICE_KNUCKLE = 41
-};
-
 enum DEVICE_TYPE {
     DEVICE_TYPE_UNKNOWN = -1,
     DEVICE_TYPE_TOUCH_PANEL = 0,
@@ -171,11 +166,6 @@ struct TagPackHead {
     int32_t sizeEvent[1];
 };
 #pragma pack()
-
-struct SeniorDeviceInfo {
-    char physical[MAX_DEVICENAME];
-    enum SENIOR_DEVICE_TYPE seniorDeviceType;
-};
 
 struct EventJoyStickAxisAbsInfo {
     int32_t code;
