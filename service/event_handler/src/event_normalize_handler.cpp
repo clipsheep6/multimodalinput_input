@@ -111,42 +111,6 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event)
     DfxHisysevent::ReportDispTimes();
 }
 
-void InputEventNormalizeHandler::HandleEvent(const MmiHdfEvent &event)
-{
-    CALL_DEBUG_ENTER;
-    DfxHisysevent::GetDispStartTime();
-    TimeCostChk chk("HandleLibinputEvent", "overtime 1000(us)", MAX_INPUT_EVENT_TIME, event.type);
-    MMI_HILOGW("type: %{public}d, code: %{public}d, value: %{public}d, time: %{public}ld",
-        event.type, event.code, event.value, event.time);
-    hdfHelper_.HandleEvent(event);
-    switch (event.type) {
-        case MmiHdfEventType::DEVICE_ADDED: {
-            auto ev = hdfHelper_.OnDeviceEvent(event);
-            OnEventDeviceAdded(ev);
-            break;
-        }
-        case MmiHdfEventType::DEVICE_REMOVED: {
-            auto ev = hdfHelper_.OnDeviceEvent(event);
-            OnEventDeviceRemoved(ev);
-            break;
-        }
-        case MmiHdfEventType::TOUCH_DOWN:
-        case MmiHdfEventType::TOUCH_UP:
-        case MmiHdfEventType::TOUCH_MOTION: {
-            auto ev = hdfHelper_.OnTouchEvent(event);
-            HandleTouchEvent(ev);
-            DfxHisysevent::CalcPointerDispTimes();
-            break;
-        }
-        default: {
-            MMI_HILOGW("This device does not support, type: %{public}d", type);
-            break;
-        }
-    }
-    DfxHisysevent::ReportDispTimes();    
-}
-
-int32_t InputEventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
 int32_t EventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);

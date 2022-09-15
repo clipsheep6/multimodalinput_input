@@ -226,7 +226,7 @@ int32_t MouseEventHandler::HandleAxisInner(struct libinput_event_pointer* data)
             auto pointerEvent = sharedPtr->GetPointerEvent();
             CHKPV(pointerEvent);
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
-            auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
+            auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
             CHKPV(inputEventNormalizeHandler);
             inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
         });
@@ -339,6 +339,11 @@ void MouseEventHandler::OnDisplayLost(int32_t displayId)
         InitAbsolution();
         WinMgr->UpdateAndAdjustMouseLocation(currentDisplayId_, absolutionX_, absolutionY_);
     }
+}
+
+int32_t MouseEventHandler::GetDisplayId() const
+{
+    return currentDisplayId_;
 }
 
 void MouseEventHandler::HandlePostMoveMouse(PointerEvent::PointerItem& pointerItem)
