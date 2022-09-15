@@ -491,7 +491,7 @@ void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::strin
         CHKPV(inputDevice);
         int32_t deviceId = inputDevice->GetId();
         mprintf(fd,
-                "deviceId:%-4d | deviceName:%-20s | deviceType:%-4d | bus:%-4d | version:%-4d | product:%-4d | vendor:%-4d\t",
+                "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d | product:%d | vendor:%d\t",
                 deviceId, inputDevice->GetName().c_str(), inputDevice->GetType(), inputDevice->GetBus(),
                 inputDevice->GetVersion(), inputDevice->GetProduct(), inputDevice->GetVendor());
     }
