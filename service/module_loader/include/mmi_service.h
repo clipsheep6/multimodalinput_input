@@ -138,6 +138,9 @@ protected:
     int32_t OnStartCooperateOtherResult(const std::string& srcNetworkId);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     bool InitLibinputService();
+#ifdef OHOS_BUILD_HDF
+    bool InitHDFService();
+#endif // OHOS_BUILD_HDF
     bool InitService();
     bool InitSignalHandler();
     bool InitDelegateTasks();
@@ -148,6 +151,7 @@ protected:
     void OnDelegateTask(epoll_event& ev);
 
     void AddReloadDeviceTimer();
+    int32_t PostInitTask();
 
 private:
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;

@@ -27,18 +27,54 @@ struct MmiHdfEvent {
     int64_t time;
 };
 
+enum class MmiHdfEventPacketType : int32_t {
+    HDF_NONE = 0,
+    HDF_EVENT,
+    HDF_ADD_DEVICE,
+    HDF_RMV_DEVICE,
+};
+
+struct MmiHdfPacket {
+    int32_t size { 0 };
+    MmiHdfEventPacketType type { HDF_NONE };
+};
+
+struct MmiHdfDevDescPacket {
+    MmiHdfPacket head;
+    DevDesc descs[MAX_INPUT_DEVICE_COUNT];
+};
+
+struct MmiHdfEventPacket {
+    constexpr int32_t MAX_EVENT_PKG_NUM = 256;
+    MmiHdfPacket head;
+    input_event events[MAX_EVENT_PKG_NUM];;
+};
+
 class HdfAdapter {
-    using HdfEventCallback = std::function<void(void *event)>;
+    using HdfEventCallback = std::function<void(const MmiHdfEvent &event)>;
+public:    
+    static void OnHDFHotPlugCallback(const HotPlugEvent *event);
+    static void OnHDFEventCallback(const KeyEventHandler **pkgs, uint32_t count, uint32_t devIndex);
 public:
-    int32_t Init();
-    int32_t DeInit();
+    bool Init(HdfEventCallback callback, const std::string& seat_id = "seat0");
+    void DeInit();
     int32_t GetInputFd() const;
+    int32_t ScanInputDevice();
     void EventDispatch(struct epoll_event& ev);
-    void OnEventHandler(const MmiHdfEvent &data);
-    void OnEventCallBack(void *data);
+    void OnEventHandler(const MmiHdfEvent &event);
+    void OnEventCallback(const MmiHdfPacket &pkt);
 private:
-    int32_t pipes_[2] = { -1, -1 };
+    int32_t ConnectHDFInit();
+    int32_t DisconnectHDFInit();
+    void HandleDeviceAdd(int32_t devIndex, int32_t devType);
+    void HandleDeviceRmv(int32_t devIndex, int32_t devType);
+    void HandleDeviceEvent(int32_t devIndex, int32_t type, int32_t code, int32_t value, int64_t timestamp);
+private:
+    IInputInterface *inputInterface_ { nullptr };
+    int32_t hdfAdapterWriteFd_ { -1 };
+    int32_t mmiServiceReadFd_ { -1 };
     HdfEventCallback callback_ = nullptr;
+    std::string seat_id_;
 };
 } // namespace MMI
 } // namespace OHOS

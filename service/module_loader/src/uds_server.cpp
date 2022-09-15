@@ -302,21 +302,6 @@ void UDSServer::OnEpollRecv(int32_t fd, epoll_event& ev)
     }
 }
 
-void UDSServer::OnHdfRecv(int32_t fd, epoll_event& ev)
-{
-    if (fd < 0) {
-        MMI_HILOGE("Invalid input param fd:%{public}d", fd);
-        return;
-    }
-    char szBuf[MAX_PACKET_BUF_SIZE] = {};
-    auto size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
-    if (size > 0) {
-#ifdef OHOS_BUILD_HAVE_DUMP_DATA
-            DumpData(szBuf, size, LINEINFO, "in %s, read message from fd: %d.", __func__, fd);
-#endif
-    hdfAdapter_.OnEventCallBack(buf);
-}
-
 void UDSServer::OnEpollEvent(epoll_event& ev)
 {
     CHKPV(ev.data.ptr);
@@ -330,22 +315,6 @@ void UDSServer::OnEpollEvent(epoll_event& ev)
         ReleaseSession(fd, ev);
     } else if (ev.events & EPOLLIN) {
         OnEpollRecv(fd, ev);
-    }
-}
-
-void UDSServer::OnHdfEvent(epoll_event& ev)
-{
-    CHKPV(ev.data.ptr);
-    auto fd = *static_cast<int32_t*>(ev.data.ptr);
-    if (fd < 0) {
-        MMI_HILOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
-        return;
-    }
-    if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_HILOGI("EPOLLERR or EPOLLHUP fd:%{public}d,ev.events:0x%{public}x", fd, ev.events);
-        HdfReInit(fd, ev);
-    } else if (ev.events & EPOLLIN) {
-        OnHdfRecv(fd, ev);
     }
 }
 
