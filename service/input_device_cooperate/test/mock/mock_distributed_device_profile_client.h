@@ -24,7 +24,6 @@ class MockDistributedDeviceProfileClient {
 public:
     static void SetDPState(bool state);
 };
-//#define MDDeviceProfileClient MockDistributedDeviceProfileClient::GetInstance()
 } // namespace DeviceProfile
 } // namespace OHOS
 #endif // MOCK_DISTRIBUTED_DEVICE_PROFILE_CLIENT

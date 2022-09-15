@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-//#include "distributed_device_profile_client.h"
-
 #include <chrono>
 #include <thread>
 #include <unistd.h>
@@ -23,13 +21,11 @@
 #include "bluetooth_log.h"
 #include "mock_distributed_device_profile_client.h"
 #include "mock_idistributed_device_profile.h"
-//#include "device_profile_errors.h"
 
 namespace OHOS {
 namespace DeviceProfile {
 using namespace std::chrono_literals;
 static bool state_ = true;
-//constexpr const char *CHARACTERISTICS_NAME = "CurrentState";
 const std::string CHARACTERISTICS_NAME = "CurrentState";
 constexpr const int32_t DP_GET_SERVICE_FAILED = 98566147;
 constexpr const int32_t DP_GET_SERVICE_SUCCESS = 98566148;

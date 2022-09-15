@@ -15,8 +15,6 @@
 
 #include "distributed_input_kit.h"
 #include "define_multimodal.h"
-//#include "distributed_hardware_log.h"
-//#include "dh_log.h"
 
 namespace OHOS {
 namespace DistributedHardware {
