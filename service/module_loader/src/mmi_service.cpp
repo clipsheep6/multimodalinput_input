@@ -322,11 +322,6 @@ void MMIService::OnStart()
     state_ = ServiceRunningState::STATE_RUNNING;
     MMI_HILOGD("Started successfully");
     AddReloadDeviceTimer();
-    ret = PostInitTask();
-    if (ret != RET_OK) {
-        MMI_HILOGE("Init PostInitTask failed, ret:%{public}d", ret);
-        return;
-    }
     t_ = std::thread(std::bind(&MMIService::OnThread, this));
 #ifdef OHOS_RSS_CLIENT
     AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
@@ -946,7 +941,7 @@ void MMIService::OnThread()
 #endif
     libinputAdapter_.RetriggerHotplugEvents();
     libinputAdapter_.ProcessPendingEvents();
-    hdfAdapter_.ScanInputDevice();
+    hdfAdapter_.ScanInputDevice(); //TODO: 是否应该委托到eventRunner中执行
     while (state_ == ServiceRunningState::STATE_RUNNING) {
         epoll_event ev[MAX_EVENT_SIZE] = {};
         int32_t timeout = TimerMgr->CalcNextDelay();
@@ -1047,17 +1042,6 @@ void MMIService::AddReloadDeviceTimer()
             libinputAdapter_.ReloadDevice();
         }
     });
-}
-
-int32_t MMIService::PostInitTask()
-{
-    CALL_DEBUG_ENTER;
-    int32_t ret = delegateTasks_.PostTask(std::bind(&HdfAdapter::ScanInputDevice, hdfAdapter_));
-    if (ret != RET_OK) {
-        MMI_HILOGE("Post task HdfAdapter ScanInputDevice failed,return %{public}d", ret);
-        return RET_ERR;
-    }
-    return RET_OK;
 }
 
 int32_t MMIService::Dump(int32_t fd, const std::vector<std::u16string> &args)

@@ -151,7 +151,6 @@ protected:
     void OnDelegateTask(epoll_event& ev);
 
     void AddReloadDeviceTimer();
-    int32_t PostInitTask();
 
 private:
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
