@@ -14,33 +14,49 @@
  */
 
 #include "hdf_adapter.h"
+#include "config_multimodal.h"
 
-void OHOS::MMI::HdfAdapter::OnHDFHotPlugCallback(const HotPlugEvent *event)
+namespace OHOS {
+namespace MMI {
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "HdfAdapter" };
+const std::string DEF_INPUT_SEAT = "seat0";
+int32_t g_hdfAdapterWriteFd { -1 };
+int32_t g_mmiServiceReadFd { -1 };
+IInputInterface *g_inputInterface { nullptr };
+InputEventCb g_eventCb;
+InputHostCb g_hostCb;
+// sptr<IInputCallback> g_inputEventCallback = nullptr;
+// sptr<IInputCallback> g_hotplugEventCallback = nullptr;
+std::mutex g_mutex;
+} // namespace
+
+static void HotPlugCallback(const InputHotPlugEvent *event)
 {
     CHKPV(event);
     MMI_HILOGD("status:%{public}u,index:%{public}u,type:%{public}u", event->status, event->devIndex, event->devType);
-    if (hdfAdapterWriteFd_ == -1) {
-        MMI_HILOGE("hdfAdapterWriteFd_ is invalid.");
+    if (g_hdfAdapterWriteFd == -1) {
+        MMI_HILOGE("g_hdfAdapterWriteFd is invalid.");
         return;
     }
 
     MmiHdfDevDescPacket pkt;
-    pkt.head.size = sizeof(pkt.desc[0]);
+    pkt.head.size = sizeof(pkt.descs[0]);
     pkt.head.type = (event->status ? HDF_RMV_DEVICE : HDF_ADD_DEVICE);
     pkt.descs[0].devIndex = event->devIndex;
     pkt.descs[0].devType = event->devType;
-    auto ret = write(hdfAdapterWriteFd_, &pkt, sizeof(pkt.head) + pkt.head.size);
+    auto ret = write(g_hdfAdapterWriteFd, &pkt, sizeof(pkt.head) + pkt.head.size);
     if (ret == -1) {
         int saveErrno = errno;
         MMI_HILOGE("Write pipe fail, errno:%{public}d, %{public}s", saveErrno, strerror(saveErrno));
     }
 }
 
-void OHOS::MMI::HdfAdapter::OnHDFEventCallback(const KeyEventHandler **pkgs, uint32_t count, uint32_t devIndex)
+static void EventPkgCallback(const InputEventPackage **pkgs, uint32_t count, uint32_t devIndex)
 {
     static constexpr uint16_t byteSize = 8;
     CHKPV(pkgs);    
-    uint32_t fixedCount = std::min(count, MmiHdfEventPacket::MAX_EVENT_PKG_NUM);
+    uint32_t fixedCount = std::min(count, static_cast<uint32_t>(MmiHdfEventPacket::MAX_EVENT_PKG_NUM));
     MmiHdfEventPacket pkt;
     pkt.head.size = sizeof(MmiHdfEventPacket::events[0]) * fixedCount;
     pkt.head.type = HDF_EVENT;
@@ -48,25 +64,30 @@ void OHOS::MMI::HdfAdapter::OnHDFEventCallback(const KeyEventHandler **pkgs, uin
         pkt.events[i].code = pkgs[i]->code;
         pkt.events[i].type = (pkgs[i]->type) | static_cast<uint16_t>(devIndex << byteSize);
         pkt.events[i].value = pkgs[i]->value;
-        pkt.events[i].input_event_sec = (pkgs[i]->timestamp) / (USEC_PER_SEC);
-        pkt.events[i].input_event_usec = (pkgs[i]->timestamp) % (USEC_PER_SEC);
+        pkt.events[i].time = pkgs[i]->timestamp;
     }
-    auto ret = write(hdfAdapterWriteFd_, &pkt, sizeof(pkt.head) + pkt.head.size);
+    auto ret = write(g_hdfAdapterWriteFd, &pkt, sizeof(pkt.head) + pkt.head.size);
     if (ret == -1) {
         int saveErrno = errno;
         MMI_HILOGE("Write pipe fail, errno:%{public}d, %{public}s", saveErrno, strerror(saveErrno));
     } 
 }
 
-int32_t OHOS::MMI::HdfAdapter::ScanInputDevice()
+HdfAdapter::HdfAdapter()
+{
+    g_eventCb.EventPkgCallback = EventPkgCallback;
+    g_hostCb.HotPlugCallback = HotPlugCallback;
+}
+
+int32_t HdfAdapter::ScanInputDevice()
 {
     CALL_DEBUG_ENTER;
-    CHKPR(inputInterface_, RET_ERR);
-    CHKPR(inputInterface_->iInputManager, RET_ERR);
-    CHKPR(inputInterface_->iInputReporter, RET_ERR);
+    CHKPR(g_inputInterface, RET_ERR);
+    CHKPR(g_inputInterface->iInputManager, RET_ERR);
+    CHKPR(g_inputInterface->iInputReporter, RET_ERR);
 
-    InputDevDesc mountDevIndex[TOTAL_INPUT_DEVICE_COUNT] = {};
-    int32_t ret = inputInterface_->iInputManager->ScanInputDevice(mountDevIndex, MmiHdfDevDescPacket::MAX_INPUT_DEVICE_COUNT);
+    InputDevDesc mountDevIndex[MmiHdfDevDescPacket::MAX_INPUT_DEVICE_COUNT] = {};
+    int32_t ret = g_inputInterface->iInputManager->ScanInputDevice(mountDevIndex, MmiHdfDevDescPacket::MAX_INPUT_DEVICE_COUNT);
     if (ret != INPUT_SUCCESS) {
         MMI_HILOGE("call ScanInputDevice failed, ret:%{public}d", ret);
         return RET_ERR;
@@ -81,8 +102,8 @@ int32_t OHOS::MMI::HdfAdapter::ScanInputDevice()
         }
     }
     pkt.head.size = devCount * sizeof(InputDevDesc);
-    ptk.head.type = MmiHdfEventPacketType::HDF_ADD_DEVICE;
-    auto ret = write(hdfAdapterWriteFd_, &pkt, sizeof(pkt.head) + pkt.head.size);
+    pkt.head.type = MmiHdfEventPacketType::HDF_ADD_DEVICE;
+    ret = write(g_hdfAdapterWriteFd, &pkt, sizeof(pkt.head) + pkt.head.size);
     if (ret == -1) {
         int saveErrno = errno;
         MMI_HILOGE("Write pipe fail, errno:%{public}d, %{public}s", saveErrno, strerror(saveErrno));
@@ -91,7 +112,7 @@ int32_t OHOS::MMI::HdfAdapter::ScanInputDevice()
     return RET_OK;
 }
 
-int32_t OHOS::MMI::HdfAdapter::Init(HdfEventCallback callback, const std::string &seat_id = "seat0")
+bool HdfAdapter::Init(HdfEventCallback callback, const std::string &seat_id)
 {
     CALL_DEBUG_ENTER;
     CHKPF(callback);
@@ -103,12 +124,6 @@ int32_t OHOS::MMI::HdfAdapter::Init(HdfEventCallback callback, const std::string
 
     int ret;
     do {
-        ret = ConnectHDFInit();
-        if (ret != RET_OK) {
-            MMI_HILOGE("connect hdf init failed, ret:%{public}d", ret);
-            break;
-        }
-
         int32_t fds[2] = {-1, -1};
         int32_t ret = pipe(fds);
         if (ret != 0) {
@@ -116,33 +131,39 @@ int32_t OHOS::MMI::HdfAdapter::Init(HdfEventCallback callback, const std::string
             MMI_HILOGE("create pipe error, errno: %{public}d, %{public}s", saveErrno, strerror(saveErrno));       
             break;
         }
-        hdfAdapterWriteFd_ = fds[0];
-        mmiServiceReadFd_ = fds[1];
-        return RET_OK;
+        g_hdfAdapterWriteFd = fds[0];
+        g_mmiServiceReadFd = fds[1];
+
+        ret = ConnectHDFInit();
+        if (ret != RET_OK) {
+            MMI_HILOGE("connect hdf init failed, ret:%{public}d", ret);
+            break;
+        }
+        return true;
     } while (0);
     
     ret = DisconnectHDFInit();
     if (ret != RET_OK) {
         MMI_HILOGE("disconnect hdf init failed, ret:%{public}d", ret);
     }
-    if (hdfAdapterWriteFd_ != -1) {
-        ret = close(hdfAdapterWriteFd_);
+    if (g_hdfAdapterWriteFd != -1) {
+        ret = close(g_hdfAdapterWriteFd);
         if (ret != RET_OK) {
             MMI_HILOGE("disconnect hdf init failed, ret:%{public}d", ret);
         }
-        hdfAdapterWriteFd_ = -1;
+        g_hdfAdapterWriteFd = -1;
     }
-    if (mmiServiceReadFd_ != -1) {
-        ret = close(mmiServiceReadFd_);
+    if (g_mmiServiceReadFd != -1) {
+        ret = close(g_mmiServiceReadFd);
         if (ret != RET_OK) {
             MMI_HILOGE("disconnect hdf init failed, ret:%{public}d", ret);
         }
-        mmiServiceReadFd_ = -1;
+        g_mmiServiceReadFd = -1;
     }
-    return RET_ERR;
+    return false;
 }
 
-void OHOS::MMI::HdfAdapter::DeInit()
+void HdfAdapter::DeInit()
 {
     CALL_DEBUG_ENTER;
     auto ret = DisconnectHDFInit();    
@@ -153,14 +174,12 @@ void OHOS::MMI::HdfAdapter::DeInit()
     MMI_HILOGI("disconnect hdf init success");
 }
 
-void OHOS::MMI::HdfAdapter::EventDispatch(struct epoll_event &ev)
+void HdfAdapter::EventDispatch(struct epoll_event &ev)
 {
     CALL_DEBUG_ENTER;
     CHKPV(ev.data.ptr);
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_HILOGF("Epoll unrecoverable error,"
-                   "The service must be restarted. fd:%{public}d",
-                   fd);
+        MMI_HILOGF("Epoll unrecoverable error");
         free(ev.data.ptr);
         ev.data.ptr = nullptr;
         return;
@@ -170,8 +189,9 @@ void OHOS::MMI::HdfAdapter::EventDispatch(struct epoll_event &ev)
     OnEventCallback(*data);
 }
 
-void OHOS::MMI::HdfAdapter::OnEventCallback(const MmiHdfPacket &pkt)
+void HdfAdapter::OnEventCallback(const MmiHdfPacket &pkt)
 {
+    #if 0
     auto pktType = pkt.type;
     switch(pktType) {
         case HDF_ADD_DEVICE:
@@ -204,25 +224,26 @@ void OHOS::MMI::HdfAdapter::OnEventCallback(const MmiHdfPacket &pkt)
         }
         break;
     }
+    #endif
 }
 
-int32_t OHOS::MMI::HdfAdapter::ConnectHDFInit()
+int32_t HdfAdapter::ConnectHDFInit()
 {
-    CALL_DEBUG_ENTER();
-    if (inputInterface_ != nullptr) {
+    CALL_DEBUG_ENTER;
+    if (g_inputInterface != nullptr) {
         MMI_HILOGE("HDF has alread connected.");
         return RET_OK;
     }
-    int32_t ret = GetInputInterface(&inputInterface_);
+    int32_t ret = GetInputInterface(&g_inputInterface);
     if (ret != INPUT_SUCCESS) {
         MMI_HILOGE("Initialize failed, ret:%{public}d", ret);
         return RET_ERR;
     }
-    CHKPR(inputInterface_, RET_ERR);
-    CHKPR(inputInterface_->iInputManager, RET_ERR);
-    CHKPR(inputInterface_->iInputReporter, RET_ERR);
+    CHKPR(g_inputInterface, RET_ERR);
+    CHKPR(g_inputInterface->iInputManager, RET_ERR);
+    CHKPR(g_inputInterface->iInputReporter, RET_ERR);
 
-    auto ret = inputInterface_->iInputReporter->RegisterHotPlugCallback(&HdfAdapter::OnHDFHotPlugCallback);
+    ret = g_inputInterface->iInputReporter->RegisterHotPlugCallback(&g_hostCb);
     if (ret != INPUT_SUCCESS) {
         MMI_HILOGE("call RegisterHotPlugCallback fail, ret:%{public}d", ret);
         return RET_ERR;
@@ -231,31 +252,27 @@ int32_t OHOS::MMI::HdfAdapter::ConnectHDFInit()
     return RET_OK;
 }
 
-int32_t OHOS::MMI::HdfAdapter::DisconnectHDFInit()
+int32_t HdfAdapter::DisconnectHDFInit()
 {
     CALL_DEBUG_ENTER;
-    if (inputInterface_ == nullptr) {
+    if (g_inputInterface == nullptr) {
         MMI_HILOGE("HDF has alread disconnected.");
         return RET_OK;
     }
-    int32_t ret = ReleaseInputInterface(inputInterface_);
-    if (ret != 0) {
-        MMI_HILOGE("Initialize failed, ret:%{public}d", ret);
-        return RET_ERR;
-    }
-    inputInterface_ = nullptr;
+    ReleaseInputInterface(g_inputInterface);
+    g_inputInterface = nullptr;
     return RET_OK;
 }
 
-void OHOS::MMI::HdfAdapter::HandleDeviceAdd(int32_t devIndex, int32_t devType)
+void HdfAdapter::HandleDeviceAdd(int32_t devIndex, int32_t devType)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(inputInterface_, RET_ERR);
-    CHKPR(inputInterface_->iInputManager, RET_ERR);
-    CHKPR(inputInterface_->iInputReporter, RET_ERR);
+    CHKPV(g_inputInterface);
+    CHKPV(g_inputInterface->iInputManager);
+    CHKPV(g_inputInterface->iInputReporter);
 
     int32_t ret;
-    ret = inputInterface_->iInputManager->OpenInputDevice(devIndex);
+    ret = g_inputInterface->iInputManager->OpenInputDevice(devIndex);
     if (ret != RET_OK) {
         MMI_HILOGE("OpenInputDevice failed, devIndex:%{public}d, ret:%{public}d", devIndex, ret);
         return;
@@ -264,7 +281,7 @@ void OHOS::MMI::HdfAdapter::HandleDeviceAdd(int32_t devIndex, int32_t devType)
     }
 
     do {
-        ret = inputInterface_->iInputReporter->RegisterReportCallback(devIndex, &HdfAdapter::OnHDFEventCallback);
+        ret = g_inputInterface->iInputReporter->RegisterReportCallback(devIndex, &g_eventCb);
         if (ret != RET_OK) {
             MMI_HILOGE("RegisterReportCallback fail,devindex:%{public}d, devType:%{public}d, ret:%{public}d", devIndex, devType, ret);
             return;
@@ -276,40 +293,43 @@ void OHOS::MMI::HdfAdapter::HandleDeviceAdd(int32_t devIndex, int32_t devType)
         return;
     } while (0);
 
-    ret = inputInterface_->iInputManager->CloseInputDevice(devIndex);
+    ret = g_inputInterface->iInputManager->CloseInputDevice(devIndex);
     if (ret != RET_OK) {
         MMI_HILOGE("CloseInputDevice failed, devIndex:%{public}d, ret:%{public}d", devIndex, ret);
-        return RET_ERR;
+        return;
     } else {
         MMI_HILOGD("CloseInputDevice success, devIndex:%{public}d", devIndex);
     }
 }
 
-void OHOS::MMI::HdfAdapter::HandleDeviceRmv(int32_t devIndex, int32_t devType)
+void HdfAdapter::HandleDeviceRmv(int32_t devIndex, int32_t devType)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(inputInterface_, RET_ERR);
-    CHKPR(inputInterface_->iInputManager, RET_ERR);
-    CHKPR(inputInterface_->iInputReporter, RET_ERR);
+    CHKPV(g_inputInterface);
+    CHKPV(g_inputInterface->iInputManager);
+    CHKPV(g_inputInterface->iInputReporter);
 
     int32_t ret;
-    ret = inputInterface_->iInputManager->CloseInputDevice(devIndex);
+    ret = g_inputInterface->iInputManager->CloseInputDevice(devIndex);
     if (ret != RET_OK) {
         MMI_HILOGE("CloseInputDevice failed, devIndex:%{public}d, ret:%{public}d", devIndex, ret);
-        return RET_ERR;
+        return;
     } else {
         MMI_HILOGD("CloseInputDevice success, devIndex:%{public}d", devIndex);
     }    
 }
 
-void OHOS::MMI::HdfAdapter::HandleDeviceEvent(int32_t devIndex, int32_t type, int32_t code, int32_t value, int64_t timestamp)
+void HdfAdapter::HandleDeviceEvent(int32_t devIndex, int32_t type, int32_t code, int32_t value, int64_t timestamp)
 {
     
 }
 
-void OHOS::MMI::OnEventHandler(const MmiHdfEvent &data)
+void HdfAdapter::OnEventHandler(const MmiHdfEvent &data)
 {
     CALL_DEBUG_ENTER;
     CHKPV(callback_);
     callback_(data);
 }
+
+} // namespace MMI
+} // namespace OHOS

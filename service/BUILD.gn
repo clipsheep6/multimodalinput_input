@@ -62,12 +62,6 @@ config("libmmi_server_config") {
     ]
   }
 
-  if (input_feature_hdf) {
-    include_dirs += [
-      "hdf_adapter/include",
-    ]
-  }
-
   defines = []
 
   if (input_feature_debug) {
@@ -453,12 +447,6 @@ ohos_shared_library("libmmi-server") {
     ]
   }
 
-  if (input_feature_hdf) {
-    sources += [
-      "hdf_adapter/src/hdf_adapter.cpp",
-    ]
-  }
-
   if (input_feature_keyboard) {
     sources += [
       "key_event_normalize/src/key_event_normalize.cpp",
@@ -542,6 +530,7 @@ ohos_shared_library("libmmi-server") {
     ":drawing_pointer_image_Zoom_In",
     ":drawing_pointer_image_Zoom_Out",
     ":mmi_device_config.ini",
+    "hdf_adapter:mmi_service_hdf_adapter",
     ":multimodalinput.para.dac",
     ":multimodalinput_config_ability.json",
     "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
