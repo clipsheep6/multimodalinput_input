@@ -17,6 +17,7 @@
 #define HDF_ADAPTER_H
 
 #include <unistd.h>
+#include "input_type.h"
 
 namespace OHOS {
 namespace MMI {
@@ -27,7 +28,7 @@ struct MmiHdfEvent {
     int64_t time;
 };
 
-enum class MmiHdfEventPacketType : int32_t {
+enum MmiHdfEventPacketType {
     HDF_NONE = 0,
     HDF_EVENT,
     HDF_ADD_DEVICE,
@@ -36,16 +37,17 @@ enum class MmiHdfEventPacketType : int32_t {
 
 struct MmiHdfPacket {
     int32_t size { 0 };
-    MmiHdfEventPacketType type { HDF_NONE };
+    int32_t type { HDF_NONE };
 };
 
 struct MmiHdfDevDescPacket {
+    static constexpr int32_t MAX_INPUT_DEVICE_COUNT = 256;
     MmiHdfPacket head;
-    DevDesc descs[MAX_INPUT_DEVICE_COUNT];
+    InputDevDesc descs[MAX_INPUT_DEVICE_COUNT];
 };
 
 struct MmiHdfEventPacket {
-    constexpr int32_t MAX_EVENT_PKG_NUM = 256;
+    static constexpr int32_t MAX_EVENT_PKG_NUM = 256;
     MmiHdfPacket head;
     input_event events[MAX_EVENT_PKG_NUM];;
 };

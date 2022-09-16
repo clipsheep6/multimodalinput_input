@@ -19,6 +19,9 @@
 #include <memory>
 
 #include "i_input_event_handler.h"
+#ifdef OHOS_BUILD_HDF
+#include "hdf_adapter.h"
+#endif // OHOS_BUILD_HDF
 
 namespace OHOS {
 namespace MMI {
@@ -27,7 +30,9 @@ public:
     EventNormalizeHandler() = default;
     ~EventNormalizeHandler() = default;
     void HandleEvent(libinput_event* event);
-    void HandleEvent(const MmiHdfEvent &event) override;
+#ifdef OHOS_BUILD_HDF
+    void HandleEvent(const MmiHdfEvent &event);
+#endif // OHOS_BUILD_HDF
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
     void HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
     void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
@@ -52,7 +57,7 @@ private:
 private:
     int32_t timerId_ = -1;
     void ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent, struct libinput_event *event);
-    HdfEventNormalizeHelper hdfHelper_;
+    //HdfEventNormalizeHelper hdfHelper_;
 };
 
 } // namespace MMI

@@ -65,11 +65,6 @@ config("libmmi_server_config") {
   if (input_feature_hdf) {
     include_dirs += [
       "hdf_adapter/include",
-      "hdi_inject/include",
-      "$root_out_dir/diff_libinput_mmi/export_include",
-      "//third_party/eudev/export_include/",
-      "$root_out_dir/diff_libevdev_hdf/export_include",
-      "$root_out_dir/diff_libinput_mmi/include/linux",
     ]
   }
 
@@ -460,8 +455,7 @@ ohos_shared_library("libmmi-server") {
 
   if (input_feature_hdf) {
     sources += [
-      "hdf_adapter/src/hdf_event_manager.cpp",
-      "hdi_inject/src/hdi_inject.cpp",
+      "hdf_adapter/src/hdf_adapter.cpp",
     ]
   }
 
@@ -561,7 +555,7 @@ ohos_shared_library("libmmi-server") {
     "//third_party/json:nlohmann_json_static",
   ]
 
-  if (input_feature_libinput || input_feature_hdf) {
+  if (input_feature_libinput) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
 
@@ -601,6 +595,10 @@ ohos_shared_library("libmmi-server") {
 
   if (input_feature_pointer_drawing) {
     external_deps += [ "window_manager:libwm" ]
+  }
+
+  if (input_feature_hdf) {
+    external_deps += [ "drivers_interface_input:hdi_input" ]
   }
 
   part_name = "input"
@@ -643,7 +641,6 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/service/event_dispatch/include",
     "${mmi_path}/service/key_event_normalize/include",
     "${mmi_path}/service/event_handler/include",
-    "${mmi_path}/service/hdi_inject/include",
     "${mmi_path}/service/event_dump/include",
     "${mmi_path}/service/hdf_adapter/include",
     "${mmi_path}/service/libinput_adapter/include",
@@ -653,13 +650,12 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/uinput",
   ]
 
-  if (input_feature_libinput || input_feature_hdf) {
+  if (input_feature_libinput) {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
   sources = [
     "event_dispatch/test/event_dispatch_test.cpp",
-    "hdi_inject/test/hdi_inject_test.cpp",
     "message_handle/test/server_msg_handler_test.cpp",
     "module_loader/test/uds_server_test.cpp",
     "window_manager/test/input_windows_manager_test.cpp",
@@ -705,7 +701,7 @@ ohos_unittest("ut-mmi-service-out") {
     "//third_party/googletest:gtest_main",
   ]
 
-  if (input_feature_libinput || input_feature_hdf) {
+  if (input_feature_libinput) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
 

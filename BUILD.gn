@@ -14,6 +14,24 @@
 import("//build/ohos.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
+group("third_party_group") {
+  deps = []
+  if (input_feature_libinput) {
+    deps += [
+      "//foundation/multimodalinput/input/patch:patch_packages",
+      "//third_party/eudev:libudev",
+      "//third_party/eudev:udevd",
+      "//third_party/eudev:udevadm",
+      "//third_party/eudev:udevd.rc",
+      "//third_party/eudev:udev_conf",
+      "//third_party/eudev:udev_touchscreen_rule",
+      "//third_party/eudev:udev_vk_rule",
+      "//third_party/mtdev:libmtdev",
+      "//third_party/libevdev:libevdev"
+    ]
+  }
+}
+
 ohos_prebuilt_etc("multimodalinput.rc") {
   source = "multimodalinput.cfg"
   relative_install_dir = "init"

@@ -65,8 +65,8 @@ int32_t OHOS::MMI::HdfAdapter::ScanInputDevice()
     CHKPR(inputInterface_->iInputManager, RET_ERR);
     CHKPR(inputInterface_->iInputReporter, RET_ERR);
 
-    DevDesc mountDevIndex[TOTAL_INPUT_DEVICE_COUNT] = {};
-    int32_t ret = inputInterface_->iInputManager->ScanInputDevice(MAX_INPUT_DEVICE_COUNT, mountDevIndex);
+    InputDevDesc mountDevIndex[TOTAL_INPUT_DEVICE_COUNT] = {};
+    int32_t ret = inputInterface_->iInputManager->ScanInputDevice(mountDevIndex, MmiHdfDevDescPacket::MAX_INPUT_DEVICE_COUNT);
     if (ret != INPUT_SUCCESS) {
         MMI_HILOGE("call ScanInputDevice failed, ret:%{public}d", ret);
         return RET_ERR;
@@ -74,13 +74,13 @@ int32_t OHOS::MMI::HdfAdapter::ScanInputDevice()
 
     MmiHdfDevDescPacket pkt = {};
     int32_t devCount = 0;
-    for (int32_t i = 0; i < MAX_INPUT_DEVICE_COUNT; i++) {
+    for (int32_t i = 0; i < MmiHdfDevDescPacket::MAX_INPUT_DEVICE_COUNT; i++) {
         if (mountDevIndex[i].devIndex != 0) {
             pkt.descs[devCount] = mountDevIndex[i];
             ++devCount;
         }
     }
-    pkt.head.size = devCount * sizeof(DevDesc);
+    pkt.head.size = devCount * sizeof(InputDevDesc);
     ptk.head.type = MmiHdfEventPacketType::HDF_ADD_DEVICE;
     auto ret = write(hdfAdapterWriteFd_, &pkt, sizeof(pkt.head) + pkt.head.size);
     if (ret == -1) {
