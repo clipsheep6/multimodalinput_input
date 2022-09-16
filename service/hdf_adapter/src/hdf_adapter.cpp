@@ -174,6 +174,11 @@ void HdfAdapter::DeInit()
     MMI_HILOGI("disconnect hdf init success");
 }
 
+int32_t HdfAdapter::GetInputFd() const
+{
+    return g_mmiServiceReadFd;
+}
+
 void HdfAdapter::EventDispatch(struct epoll_event &ev)
 {
     CALL_DEBUG_ENTER;
