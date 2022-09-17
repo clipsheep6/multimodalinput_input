@@ -45,10 +45,15 @@ struct MmiHdfPacket {
     int32_t type { HDF_NONE };
 };
 
+typedef struct {
+    uint32_t devIndex;      /**< Device index */
+    uint32_t devType;       /**< Device type */
+} MmiDevDesc;
+
 struct MmiHdfDevDescPacket {
     static constexpr int32_t MAX_INPUT_DEVICE_COUNT = 256;
     MmiHdfPacket head;
-    InputDevDesc descs[MAX_INPUT_DEVICE_COUNT];
+    MmiDevDesc descs[MAX_INPUT_DEVICE_COUNT];
 };
 
 struct MmiHdfEventPacket {

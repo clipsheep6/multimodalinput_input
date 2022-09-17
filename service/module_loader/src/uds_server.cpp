@@ -229,42 +229,6 @@ void UDSServer::OnPacket(int32_t fd, NetPacket& pkt)
     recvFun_(sess, pkt);
 }
 
-void UDSServer::OnHdfDeviceEvent(NetPacket& pkt)
-{
-    HdfTouchScreenEventHandler touchScreenEventHandler;
-    int32_t deviceType = pkt.ReadInt32();
-    switch (deviceType) {
-        case TOUCH_SCREEN:
-        {
-            touchScreenEventHandler->OnTouchScreenProcess(pkt);
-        }
-        break;
-        default:
-        {
-            MMI_HILOGE("unsupport deviceType: %{public}d", deviceType);            
-        }
-        break;
-    }
-}
-
-void UDSServer::OnHdfPacket(NetPacket& pkt)
-{
-    int32_t msgType = pkt.ReadInt32();
-    switch(msgType) {
-        case DEVICE_ADD:
-        {}
-        break;
-        case DEVICE_RMV:
-        {}
-        break;
-        case DEVICE_EVENT:
-        {
-            OnHdfDeviceEvent(pkt);
-        }
-        break;
-    }
-}
-
 void UDSServer::OnEpollRecv(int32_t fd, epoll_event& ev)
 {
     if (fd < 0) {

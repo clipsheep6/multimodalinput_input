@@ -39,8 +39,8 @@ class InputEventHandler final {
 public:
     DISALLOW_COPY_AND_MOVE(InputEventHandler);
     void Init(UDSServer& udsServer);
-    void OnEvent(void *event);
-    void OnEvent(const MmiHdfEvent &event);
+    void OnLibinputEvent(void *event);
+    void OnHDFEvent(const MmiHdfEvent &event);
     UDSServer *GetUDSServer() const;
 
     std::shared_ptr<EventNormalizeHandler> GetEventNormalizeHandler() const;

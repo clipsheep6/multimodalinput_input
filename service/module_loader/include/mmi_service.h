@@ -32,7 +32,7 @@
 #include "uds_server.h"
 
 #ifdef OHOS_BUILD_HDF
-    #include "hdf_event_manager.h"
+#include "hdf_adapter.h"
 #endif
 
 namespace OHOS {

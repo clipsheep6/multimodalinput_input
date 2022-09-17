@@ -97,7 +97,8 @@ int32_t HdfAdapter::ScanInputDevice()
     int32_t devCount = 0;
     for (int32_t i = 0; i < MmiHdfDevDescPacket::MAX_INPUT_DEVICE_COUNT; i++) {
         if (mountDevIndex[i].devIndex != 0) {
-            pkt.descs[devCount] = mountDevIndex[i];
+            pkt.descs[devCount].devIndex = mountDevIndex[i].devIndex;
+            pkt.descs[devCount].devType = mountDevIndex[i].devType;
             ++devCount;
         }
     }

@@ -54,6 +54,7 @@ enum {
     ERROR_NULL_POINTER,                         // 空指针
     WINDOWS_MSG_INIT_FAIL,                      // 窗口管理器初始化失败
     LIBINPUT_INIT_FAIL,                         // libinput初始化失败
+    HDF_INIT_FAIL,                              // HDF初始化失败
     PARAM_INPUT_INVALID,                        // 无效的输入参数
     KEY_EVENT_DISP_FAIL,                        // 键盘事件派发失败
     MEMCPY_SEC_FUN_FAIL,                        // memcpy安全函数错误

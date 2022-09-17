@@ -51,7 +51,7 @@ void InputEventHandler::Init(UDSServer& udsServer)
     BuildInputHandlerChain();
 }
 
-void InputEventHandler::OnEvent(void *event)
+void InputEventHandler::OnLibinputEvent(void *event)
 {
     CHKPV(event);
     idSeed_ += 1;
@@ -79,10 +79,10 @@ void InputEventHandler::OnEvent(void *event)
                ",lostTime:%{public}" PRId64, idSeed_, endTime, lostTime);
 }
 
-void InputEventHandler::OnEvent(const MmiHdfEvent &event)
+void InputEventHandler::OnHDFEvent(const MmiHdfEvent &event)
 {
-    CHKPV(inputEventNormalizeHandler_);
-    inputEventNormalizeHandler_->HandleEvent(event);    
+    CHKPV(eventNormalizeHandler_);
+    eventNormalizeHandler_->HandleEvent(event);    
 }
 
 int32_t InputEventHandler::BuildInputHandlerChain()
