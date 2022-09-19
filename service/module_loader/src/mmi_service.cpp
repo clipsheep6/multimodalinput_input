@@ -47,7 +47,6 @@
 #endif
 #include "permission_helper.h"
 #include "timer_manager.h"
-#include "input_device_manager.h"
 #include "util.h"
 
 namespace OHOS {
