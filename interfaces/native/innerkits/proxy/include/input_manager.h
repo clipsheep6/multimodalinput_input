@@ -304,142 +304,142 @@ public:
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
 
     /**
-     * @brief 设置鼠标光标的位置.
-     * @param x x 坐标
-     * @param y y 坐标
-     * @return 0表示返回成功，否则表示返回失败
+     * @brief Sets the position of the mouse pointer.
+     * @param x X coordinate.
+     * @param y Y coordinate.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      */
     int32_t SetPointerLocation(int32_t x, int32_t y);
 
     /**
-     * @brief 获取远端输入能力.
-     * @param deviceId 远端的deviceId
-     * @param remoteTypes 返回远端输入能力
-     * @return 0表示返回成功，否则表示返回失败
+     * @brief Obtains the capability of the remote input device.
+     * @param deviceId ID of the remote input device.
+     * @param remoteTypes Capability of the remote input device.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
     int32_t GetRemoteInputAbility(std::string deviceId, std::function<void(std::set<int32_t>)> remoteTypes);
 
     /**
-     * @brief 准备分布式.
-     * @param deviceId 准备分布式的那台设备的ID
-     * @param callback 准备分布式的回调，如果准备分布式执行完了，此回调被调用
-     * 如果准备分布式成功，则返回大于或等于 <b>0</b> 的值
-     * 否则返回小于 <b>0</b> 的值.
-     * @return 0表示返回成功，否则表示返回失败
+     * @brief Prepares the remote input device for distributed implementation.
+     * @param deviceId ID of the remote input device.
+     * @param callback Callback of the preparation result. This callback is invoked when the preparation is complete.
+     * A value greater than or equal to <b>0</b> indicates that the preparation is successful;
+     * a value less than <b>0</b> indicates that the preparation has failed.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      */
     int32_t PrepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
 
     /**
-     * @brief 取消准备分布式.
-     * @param deviceId 取消准备分布式的那台设备的ID
-     * @param callback 取消准备分布式的回调，如果取消准备分布式执行完了，此回调被调用
-     * 如果取消准备分布式成功，则返回大于或等于 <b>0</b> 的值
-     * 否则返回小于 <b>0</b> 的值.
-     * @return 0表示返回成功，否则表示返回失败
+     * @brief Cancels the preparation of the remote input device for distributed implementation.
+     * @param deviceId ID of the remote input device.
+     * @param callback Callback of the cancellation result. This callback is invoked when the cancellation is complete.
+     * A value greater than or equal to <b>0</b> indicates that the cancellation is successful;
+     * a value less than <b>0</b> indicates that the cancellation has failed.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      */
     int32_t UnprepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
 
     /**
-     * @brief 开始分布式.
-     * @param deviceId 开始分布式的那台设备的ID
-     * @param callback 开始分布式的回调，如果开始分布式执行完了，此回调被调用
-     * 如果开始分布式成功，则返回大于或等于 <b>0</b> 的值
-     * 否则返回小于 <b>0</b> 的值.
-     * @return 0表示返回成功，否则表示返回失败
+     * @brief Starts the remote input device for distributed implementation.
+     * @param deviceId ID of the remote input device.
+     * @param callback Callback of the device starting result. This callback is invoked when the device starting is complete.
+     * A value greater than or equal to <b>0</b> indicates that device starting is successful;
+     * a value less than <b>0</b> indicates that device starting has failed.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      */
     int32_t StartRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback);
 
     /**
-     * @brief 取消分布式.
-     * @param deviceId 取消分布式的那台设备的ID
-     * @param callback 取消分布式的回调，如果取消分布式执行完了，此回调被调用
-     * 如果取消分布式成功，则返回大于或等于 <b>0</b> 的值
-     * 否则返回小于 <b>0</b> 的值.
-     * @return 0表示返回成功，否则表示返回失败
+     * @brief Stops the remote input device from distributed implementation.
+     * @param deviceId ID of the remote input device.
+     * @param callback Callback of the device stopping result. This callback is invoked when the device stopping is complete.
+     * A value greater than or equal to <b>0</b> indicates that device stopping is successful;
+     * a value less than <b>0</b> indicates that device stopping has failed.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      */
     int32_t StopRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback);
 
     /**
-     * @brief 设置指定输入设备对应的屏幕ID
-     * @param dhid 输入设备唯一ID
-     * @param screenId 输入设备对应的屏幕ID
-     * @return 0表示返回成功，否则表示返回失败
+     * @brief Sets the screen ID corresponding to the specified input device.
+     * @param dhid ID of the input device.
+     * @param screenId Screen ID corresponding to the input device.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      */
     int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
 
     /**
-     * @brief 注册键鼠穿越管理事件监听。
-     * @param listener 穿越管理事件监听回调。
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @brief Registers a listener for screen hop events of the mouse pointer.
+     * @param listener Listener for screen hop events of the mouse pointer.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
     int32_t RegisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener);
 
     /**
-     * @brief 注销键鼠穿越管理事件监听。
-     * @param listener 事件监听回调.
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @brief Unregisters the listener for screen hop events of the mouse pointer.
+     * @param listener Listener for screen hop events of the mouse pointer.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
     int32_t UnregisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener = nullptr);
 
     /**
-     * @brief 开启/关闭键鼠穿越管理接口。
-     * @param enabled 开启/关闭。
-     * @param callback 开启/关闭键鼠穿越，此回调被调用
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @brief Enables screen hop for the mouse pointer.
+     * @param enabled Whether to enable screen hop for the mouse pointer.
+     * @param callback Callback of the result for enabling screen hop.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
     int32_t EnableInputDeviceCooperate(bool enabled, std::function<void(std::string, CooperationMessage)> callback);
 
     /**
-     * @brief 启动跨设备键鼠穿越。
-     * @param sinkDeviceId 键鼠穿越目标设备描述符（networkID）
-     * @param srcInputDeviceId 键鼠穿越待穿越输入外设标识符（设备ID句柄）
-     * @param callback 启动跨设备键鼠穿越，此回调被调用
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @brief Starts screen hop for the mouse pointer.
+     * @param sinkDeviceId Descriptor of the target input device (network ID) for screen hop.
+     * @param srcInputDeviceId ID of the source input device (device ID handle) for screen hop.
+     * @param callback Callback of the result for starting screen hop.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
     int32_t StartInputDeviceCooperate(const std::string &sinkDeviceId, int32_t srcInputDeviceId,
         std::function<void(std::string, CooperationMessage)> callback);
 
     /**
-     * @brief 停止跨设备键鼠穿越。
-     * @param callback 停止跨设备键鼠穿越，此回调被调用
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @brief Stops screen hop for the mouse pointer.
+     * @param callback Callback of the result for stopping screen hop.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
     int32_t StopDeviceCooperate(std::function<void(std::string, CooperationMessage)> callback);
 
     /**
-     * @brief 获取指定设备键鼠穿越状态。
-     * @param deviceId 指定设备描述符。
-     * @param callback 获取穿越管理设备状态，此回调被调用
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @brief Obtains the screen hop status of a mouse pointer.
+     * @param deviceId Descriptor of the input device.
+     * @param callback Callback of the screen hop status.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
     int32_t GetInputDeviceCooperateState(const std::string &deviceId, std::function<void(bool)> callback);
 
     /**
-     * @brief 获取键盘设备指定功能按键的使能状态。
-     * @param funcKey 指定的功能按键，当前支持的功能按键有：
+     * @brief Obtains the enable status of the specified function key on the keyboard.
+     * @param funcKey Function key. Currently, the following function keys are supported:
      * NUM_LOCK_FUNCTION_KEY
      * CAPS_LOCK_FUNCTION_KEY
-     * SCROLL_LOCK_FUNCTION_KEY。
-     * @return 返回功能按键的使能状态，true表示功能按键使能，
-     * false表示功能按键未使能。
+     * SCROLL_LOCK_FUNCTION_KEY
+     * @param state Enable state of the function key.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      */
-    bool GetFunctionKeyState(int32_t funcKey);
+    int32_t GetFunctionKeyState(int32_t funcKey, bool &state);
 
     /**
-     * @brief 设置键盘设备指定功能按键的使能状态。
-     * @param funcKey 指定的功能按键，当前支持的功能按键有：
+     * @brief Sets the enable status of the specified function key on the keyboard.
+     * @param funcKey Function key. Currently, the following function keys are supported:
      * NUM_LOCK_FUNCTION_KEY
      * CAPS_LOCK_FUNCTION_KEY
-     * SCROLL_LOCK_FUNCTION_KEY。
-     * @param isEnable 待设置的使能状态。
-     * @return 0 表示设置成功，其他值表示设置失败。
+     * SCROLL_LOCK_FUNCTION_KEY
+     * @param isEnable Enable status to set.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      */
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
 
