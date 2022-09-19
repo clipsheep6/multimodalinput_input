@@ -32,6 +32,16 @@ group("third_party_group") {
   }
 }
 
+ohos_prebuilt_executable("gdb") {
+  install_enable = true
+  source = "//gdb/gdb-7.10.1-arm6v"
+  symlink_target_name = [ "gdb" ]
+  module_install_dir = "bin"
+  install_images = [ "system" ]
+  part_name = "input"
+  subsystem_name = "multimodalinput"  
+}
+
 ohos_prebuilt_etc("multimodalinput.rc") {
   source = "multimodalinput.cfg"
   relative_install_dir = "init"
