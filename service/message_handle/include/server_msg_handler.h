@@ -19,7 +19,6 @@
 #include "nocopyable.h"
 
 #include "display_info.h"
-#include "event_dispatch.h"
 #include "event_dispatch_handler.h"
 #include "i_event_filter.h"
 #include "input_handler_type.h"
