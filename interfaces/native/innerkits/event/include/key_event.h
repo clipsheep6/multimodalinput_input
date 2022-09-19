@@ -3153,15 +3153,13 @@ private:
     bool IsValidKeyItem() const;
 
 private:
-    int32_t keyCode_ = -1;
+    int32_t keyCode_ { -1 };
     std::vector<KeyItem> keys_;
-    int32_t keyAction_ = 0;
+    int32_t keyAction_ { 0 };
     bool numLock_ { false };
     bool capsLock_ { false };
     bool scrollLock_ { false };
 };
-
-std::ostream& operator<<(std::ostream&, KeyEvent&);
 } // namespace MMI
 } // namespace OHOS
 #endif // KEY_EVENT_H
