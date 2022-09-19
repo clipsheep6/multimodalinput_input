@@ -230,7 +230,7 @@ int32_t ServerMsgHandler::OnDisplayInfo(const std::shared_ptr<DisplayGroupInfo> 
 {
     CALL_DEBUG_ENTER;
     CHKPR(displayGroupInfo, ERROR_NULL_POINTER);
-    InputWindowsManager::GetInstance()->UpdateDisplayInfo(*displayGroupInfo);
+    WinMgr->UpdateDisplayInfo(*displayGroupInfo);
     return RET_OK;
 }
 
