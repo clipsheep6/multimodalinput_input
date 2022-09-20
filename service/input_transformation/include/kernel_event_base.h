@@ -20,7 +20,7 @@
 #include <ostream>
 #include <memory>
 
-#include "StreamUtils.h"
+#include "stream_util.h"
 
 struct input_event;
 namespace OHOS {
