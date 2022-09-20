@@ -137,11 +137,11 @@ napi_value JsInputDeviceCooperateContext::Start(napi_env env, napi_callback_info
 napi_value JsInputDeviceCooperateContext::Stop(napi_env env, napi_callback_info info)
 {
     CALL_INFO_TRACE;
-    size_t argc = 1;
-    napi_value argv[1] = {};
+    size_t argc = 2;
+    napi_value argv[2] = {};
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
-    if (argc != 0 && argc != 1) {
+    if (argc > 2) {
         THROWERR(env, "Wrong number of parameters");
         MMI_HILOGE("Wrong number of parameters");
         return nullptr;
@@ -152,12 +152,23 @@ napi_value JsInputDeviceCooperateContext::Stop(napi_env env, napi_callback_info 
     if (argc == 0) {
         return jsInputDeviceMgr->Stop(env);
     }
-    if (!UtilNapi::TypeOf(env, argv[0], napi_function)) {
-        THROWERR(env, "The first paramter is not function");
-        MMI_HILOGE("The first parameter is not function");
-        return nullptr;
+    if (argc == 1) {
+        if (UtilNapi::TypeOf(env, argv[0], napi_function)) {
+            return jsInputDeviceMgr->Stop(env, -1, argv[0]);
+        } else if (UtilNapi::TypeOf(env, argv[0], napi_number)) {
+            int32_t stopInputDeviceId;
+            CHKRP(env, napi_get_value_int32(env, argv[0], &stopInputDeviceId), GET_INT32);
+            return jsInputDeviceMgr->Stop(env, stopInputDeviceId);
+        }
     }
-    return jsInputDeviceMgr->Stop(env, argv[0]);
+    if (argc == 2 && UtilNapi::TypeOf(env, argv[0], napi_number) && UtilNapi::TypeOf(env, argv[1], napi_function)) {
+        int32_t stopInputDeviceId;
+        CHKRP(env, napi_get_value_int32(env, argv[0], &stopInputDeviceId), GET_INT32);
+        return jsInputDeviceMgr->Stop(env, stopInputDeviceId, argv[1]);
+    }
+    THROWERR(env, "The first paramter is not function");
+    MMI_HILOGE("The first parameter is not function");
+    return nullptr;
 }
 
 napi_value JsInputDeviceCooperateContext::GetState(napi_env env, napi_callback_info info)

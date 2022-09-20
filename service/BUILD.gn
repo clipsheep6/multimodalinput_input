@@ -451,6 +451,7 @@ ohos_shared_library("libmmi-server") {
       "input_device_cooperate/src/device_profile_adapter.cpp",
       "input_device_cooperate/src/distributed_input_adapter.cpp",
       "input_device_cooperate/src/i_input_device_cooperate_state.cpp",
+      "input_device_cooperate/src/input_device_cooperate_manager.cpp",
       "input_device_cooperate/src/input_device_cooperate_sm.cpp",
       "input_device_cooperate/src/input_device_cooperate_state_free.cpp",
       "input_device_cooperate/src/input_device_cooperate_state_in.cpp",

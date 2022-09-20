@@ -25,6 +25,7 @@
 #include "device_manager.h"
 #include "device_profile_adapter.h"
 #include "i_pointer_drawing_manager.h"
+#include "input_device_cooperate_manager.h"
 #include "input_device_cooperate_state_free.h"
 #include "input_device_cooperate_state_in.h"
 #include "input_device_cooperate_state_out.h"
@@ -77,6 +78,8 @@ void InputDeviceCooperateSM::Reset(bool adjustAbsolutionLocation)
 void InputDeviceCooperateSM::OnCooperateChanged(const std::string &networkId, bool isOpen)
 {
     CALL_DEBUG_ENTER;
+    CooperationMessage msg = isOpen ? CooperationMessage::STATE_ON : CooperationMessage::STATE_OFF;
+    CooperateEventMgr->OnCooperateMessage(msg, networkId);
     if (!isOpen) {
         OnCloseCooperation(networkId, false);
     }
@@ -233,9 +236,6 @@ void InputDeviceCooperateSM::StopRemoteCooperateResult(bool isSuccess)
         MMI_HILOGI("Not in stopping");
         return;
     }
-    CooperationMessage msg =
-        isSuccess ? CooperationMessage::STOP_SUCCESS : CooperationMessage::STOP_FAIL;
-    CooperateEventMgr->OnCooperateMessage(msg);
     if (isSuccess) {
         Reset(true);
     }
@@ -512,21 +512,6 @@ void InputDeviceCooperateSM::CheckPointerEvent(struct libinput_event *event)
     inputEventNormalizeHandler->HandleEvent(event);
 }
 
-bool InputDeviceCooperateSM::CheckTouchEvent(struct libinput_event* event)
-{
-    CALL_INFO_TRACE;
-    CHKPF(event);
-    auto device = libinput_event_get_device(event);
-    int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
-    std::string dhid = InputDevMgr->GetDhid(deviceId);
-    auto touchEvent = libinput_event_get_touch_event(event);
-    CHKPF(touchEvent);
-    uint32_t absX = static_cast<uint32_t>(libinput_event_touch_get_x(touchEvent));
-    uint32_t absY = static_cast<uint32_t>(libinput_event_touch_get_y(touchEvent));
-    MMI_HILOGI("Check touch event absX:%{public}d, absY:%{public}d", absX, absY);
-    return DistributedAdapter->IsTouchEventNeedFilterOut(absX, absY);
-}
-
 bool InputDeviceCooperateSM::InitDeviceManager()
 {
     CALL_DEBUG_ENTER;
@@ -555,7 +540,7 @@ void InputDeviceCooperateSM::OnDeviceOnline(const std::string& networkId)
     onlineDevice_.push_back(networkId);
     DProfileAdapter->RegisterCrossingStateListener(networkId,
         std::bind(&InputDeviceCooperateSM::OnCooperateChanged,
-        InputDevCooSM, std::placeholders::_1, std::placeholders::_2));
+        this, std::placeholders::_1, std::placeholders::_2));
 }
 
 void InputDeviceCooperateSM::OnDeviceOffline(const std::string& networkId)
@@ -611,14 +596,14 @@ void InputDeviceCooperateSM::MmiDeviceStateCallback::OnDeviceOnline(
     const DistributedHardware::DmDeviceInfo &deviceInfo)
 {
     CALL_DEBUG_ENTER;
-    InputDevCooSM->OnDeviceOnline(deviceInfo.deviceId);
+    InputDevCooManager->OnDeviceOnline(deviceInfo.deviceId);
 }
 
 void InputDeviceCooperateSM::MmiDeviceStateCallback::OnDeviceOffline(
     const DistributedHardware::DmDeviceInfo &deviceInfo)
 {
     CALL_DEBUG_ENTER;
-    InputDevCooSM->OnDeviceOffline(deviceInfo.deviceId);
+    InputDevCooManager->OnDeviceOffline(deviceInfo.deviceId);
 }
 
 void InputDeviceCooperateSM::MmiDeviceStateCallback::OnDeviceChanged(

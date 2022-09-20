@@ -992,7 +992,8 @@ int32_t InputManagerImpl::StartInputDeviceCooperate(const std::string &sinkDevic
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 }
 
-int32_t InputManagerImpl::StopDeviceCooperate(std::function<void(std::string, CooperationMessage)> callback)
+int32_t InputManagerImpl::StopDeviceCooperate(int32_t stopInputDeviceId,
+    std::function<void(std::string, CooperationMessage)> callback)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
@@ -1001,7 +1002,7 @@ int32_t InputManagerImpl::StopDeviceCooperate(std::function<void(std::string, Co
         MMI_HILOGE("client init failed");
         return RET_ERR;
     }
-    return InputDevCooperateImpl.StopDeviceCooperate(callback);
+    return InputDevCooperateImpl.StopDeviceCooperate(stopInputDeviceId, callback);
 #else
     MMI_HILOGW("Cooperate does not support");
     (void)(callback);

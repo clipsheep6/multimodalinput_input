@@ -17,7 +17,7 @@
 
 #include "cooperation_message.h"
 #include "distributed_input_adapter.h"
-#include "input_device_cooperate_sm.h"
+#include "input_device_cooperate_manager.h"
 #include "input_device_manager.h"
 #include "mouse_event_normalize.h"
 #include "multimodal_input_connect_remoter.h"
@@ -38,7 +38,7 @@ int32_t InputDeviceCooperateStateOut::StopInputDeviceCooperate(const std::string
     CALL_DEBUG_ENTER;
     std::string srcNetworkId = networkId;
     if (srcNetworkId.empty()) {
-        std::pair<std::string, std::string> prepared = InputDevCooSM->GetPreparedDevices();
+        std::pair<std::string, std::string> prepared = InputDevCooManager->GetPreparedDevices();
         srcNetworkId = prepared.first;
     }
     int32_t ret = RemoteMgr->StopRemoteCooperate(networkId);
@@ -58,13 +58,14 @@ int32_t InputDeviceCooperateStateOut::StopInputDeviceCooperate(const std::string
 void InputDeviceCooperateStateOut::ProcessStop(const std::string& srcNetworkId)
 {
     CALL_DEBUG_ENTER;
-    std::string sink = InputDevMgr->GetOriginNetworkId(startDhid_);
+    std::string sink;
+    GetLocalDeviceId(sink);
     std::vector<std::string>  dhids = InputDevMgr->GetCooperateDhids(startDhid_);
     int32_t ret = DistributedAdapter->StopRemoteInput(srcNetworkId, sink, dhids, [this, srcNetworkId](bool isSuccess) {
         this->OnStopRemoteInput(isSuccess, srcNetworkId);
         });
     if (ret != RET_OK) {
-        InputDevCooSM->OnStopFinish(false, srcNetworkId);
+        InputDevCooManager->OnStopFinish(false, srcNetworkId);
     }
 }
 
@@ -73,7 +74,7 @@ void InputDeviceCooperateStateOut::OnStopRemoteInput(bool isSuccess, const std::
     CALL_DEBUG_ENTER;
     std::string taskName = "stop_finish_task";
     std::function<void()> handleStopFinishFunc =
-        std::bind(&InputDeviceCooperateSM::OnStopFinish, InputDevCooSM, isSuccess, srcNetworkId);
+        std::bind(&InputDeviceCooperateSM::OnStopFinish, InputDevCooManager, isSuccess, srcNetworkId);
     CHKPV(eventHandler_);
     eventHandler_->PostTask(handleStopFinishFunc, taskName, 0,
         AppExecFwk::EventQueue::Priority::HIGH);
@@ -81,7 +82,7 @@ void InputDeviceCooperateStateOut::OnStopRemoteInput(bool isSuccess, const std::
 
 void InputDeviceCooperateStateOut::OnKeyboardOnline(const std::string &dhid)
 {
-    std::pair<std::string, std::string> networkIds = InputDevCooSM->GetPreparedDevices();
+    std::pair<std::string, std::string> networkIds = InputDevCooManager->GetPreparedDevices();
     std::vector<std::string> dhids;
     dhids.push_back(dhid);
     DistributedAdapter->StartRemoteInput(networkIds.first, networkIds.second, dhids, [](bool isSuccess) {});

@@ -36,7 +36,7 @@ public:
     napi_value Enable(napi_env env, bool enable, napi_value handle = nullptr);
     napi_value Start(napi_env env, const std::string &sinkDeviceDescriptor, int32_t srcInputDeviceId,
         napi_value handle = nullptr);
-    napi_value Stop(napi_env env, napi_value handle = nullptr);
+    napi_value Stop(napi_env env, int32_t srcInputDeviceId = -1, napi_value handle = nullptr);
     napi_value GetState(napi_env env, const std::string &deviceDescriptor, napi_value handle = nullptr);
     void RegisterListener(napi_env env, const std::string &type, napi_value handle);
     void UnregisterListener(napi_env env, const std::string &type, napi_value handle = nullptr);

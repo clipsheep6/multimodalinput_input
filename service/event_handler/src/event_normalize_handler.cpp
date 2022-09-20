@@ -21,7 +21,7 @@
 #include "error_multimodal.h"
 #include "event_log_helper.h"
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-#include "input_device_cooperate_sm.h"
+#include "input_device_cooperate_manager.h"
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_manager.h"
 #include "input_event_handler.h"
@@ -252,7 +252,7 @@ bool EventNormalizeHandler::CheckKeyboardWhiteList(std::shared_ptr<KeyEvent> key
         || keyCode == KeyEvent::KEYCODE_VOLUME_DOWN || keyCode == KeyEvent::KEYCODE_POWER) {
         return true;
     }
-    CooperateState state = InputDevCooSM->GetCurrentCooperateState();
+    CooperateState state = InputDevCooManager->GetCurrentCooperateState();
     MMI_HILOGI("Get current cooperate state:%{public}d", state);
     if (state == CooperateState::STATE_IN) {
         int32_t deviceId = keyEvent->GetDeviceId();
@@ -396,13 +396,6 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event)
     CHKPR(event, ERROR_NULL_POINTER);
     auto pointerEvent = TouchEventHdr->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
-    if (InputDevCooSM->CheckTouchEvent(event)) {
-        MMI_HILOGW("Touch event filter out");
-        ResetTouchUpEvent(pointerEvent, event);
-        return RET_OK;
-    }
-#endif // OHOS_DISTRIBUTED_INPUT_MODEL
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandleTouchEvent(pointerEvent);
     ResetTouchUpEvent(pointerEvent, event);

@@ -53,14 +53,14 @@ napi_value JsInputDeviceCooperateManager::Start(napi_env env, const std::string 
     return result;
 }
 
-napi_value JsInputDeviceCooperateManager::Stop(napi_env env, napi_value handle)
+napi_value JsInputDeviceCooperateManager::Stop(napi_env env, int32_t stopInputDeviceId, napi_value handle)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
     int32_t userData = InputDevCooperateImpl.GetUserData();
     napi_value result = CreateCallbackInfo(env, handle, userData);
     auto callback = std::bind(EmitJsStop, userData, std::placeholders::_1, std::placeholders::_2);
-    InputMgr->StopDeviceCooperate(callback);
+    InputMgr->StopDeviceCooperate(stopInputDeviceId, callback);
     return result;
 }
 

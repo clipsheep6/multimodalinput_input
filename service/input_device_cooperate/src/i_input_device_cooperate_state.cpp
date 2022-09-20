@@ -17,7 +17,7 @@
 
 #include "cooperate_event_manager.h"
 #include "distributed_input_adapter.h"
-#include "input_device_cooperate_sm.h"
+#include "input_device_cooperate_manager.h"
 #include "input_device_manager.h"
 #include "mouse_event_normalize.h"
 
@@ -41,21 +41,21 @@ int32_t IInputDeviceCooperateState::PrepareAndStart(const std::string &srcNetwor
     std::string sinkNetworkId = InputDevMgr->GetOriginNetworkId(startInputDeviceId);
     int32_t ret = RET_ERR;
     if (NeedPrepare(srcNetworkId, sinkNetworkId)) {
-        InputDevCooSM->UpdatePreparedDevices(srcNetworkId, sinkNetworkId);
+        InputDevCooManager->UpdatePreparedDevices(srcNetworkId, sinkNetworkId);
         ret = DistributedAdapter->PrepareRemoteInput(
             srcNetworkId, sinkNetworkId, [this, srcNetworkId, startInputDeviceId](bool isSuccess) {
                 this->OnPrepareDistributedInput(isSuccess, srcNetworkId, startInputDeviceId);
             });
         if (ret != RET_OK) {
             MMI_HILOGE("Prepare remoteNetworkId input fail");
-            InputDevCooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
-            InputDevCooSM->UpdatePreparedDevices("", "");
+            InputDevCooManager->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
+            InputDevCooManager->UpdatePreparedDevices("", "");
         }
     } else {
         ret = StartRemoteInput(startInputDeviceId);
         if (ret != RET_OK) {
             MMI_HILOGE("Start remoteNetworkId input fail");
-            InputDevCooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
+            InputDevCooManager->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
         }
     }
     return ret;
@@ -66,8 +66,8 @@ void IInputDeviceCooperateState::OnPrepareDistributedInput(
 {
     MMI_HILOGI("isSuccess: %{public}s", isSuccess ? "true" : "false");
     if (!isSuccess) {
-        InputDevCooSM->UpdatePreparedDevices("", "");
-        InputDevCooSM->OnStartFinish(false, srcNetworkId, startInputDeviceId);
+        InputDevCooManager->UpdatePreparedDevices("", "");
+        InputDevCooManager->OnStartFinish(false, srcNetworkId, startInputDeviceId);
     } else {
         std::string taskName = "start_dinput_task";
         std::function<void()> handleStartDinputFunc =
@@ -80,10 +80,10 @@ void IInputDeviceCooperateState::OnPrepareDistributedInput(
 int32_t IInputDeviceCooperateState::StartRemoteInput(int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
-    std::pair<std::string, std::string> networkIds = InputDevCooSM->GetPreparedDevices();
+    std::pair<std::string, std::string> networkIds = InputDevCooManager->GetPreparedDevices();
     std::vector<std::string> dhids = InputDevMgr->GetCooperateDhids(startInputDeviceId);
     if (dhids.empty()) {
-        InputDevCooSM->OnStartFinish(false, networkIds.first, startInputDeviceId);
+        InputDevCooManager->OnStartFinish(false, networkIds.first, startInputDeviceId);
         return RET_OK;
     }
     return DistributedAdapter->StartRemoteInput(
@@ -98,7 +98,7 @@ void IInputDeviceCooperateState::OnStartRemoteInput(
     CALL_DEBUG_ENTER;
     std::string taskName = "start_finish_task";
     std::function<void()> handleStartFinishFunc =
-        std::bind(&InputDeviceCooperateSM::OnStartFinish, InputDevCooSM, isSuccess, srcNetworkId, startInputDeviceId);
+        std::bind(&InputDeviceCooperateSM::OnStartFinish, InputDevCooManager, isSuccess, srcNetworkId, startInputDeviceId);
     CHKPV(eventHandler_);
     eventHandler_->PostTask(handleStartFinishFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
 }
@@ -106,7 +106,7 @@ void IInputDeviceCooperateState::OnStartRemoteInput(
 bool IInputDeviceCooperateState::NeedPrepare(const std::string &srcNetworkId, const std::string &sinkNetworkId)
 {
     CALL_DEBUG_ENTER;
-    std::pair<std::string, std::string> prepared = InputDevCooSM->GetPreparedDevices();
+    std::pair<std::string, std::string> prepared = InputDevCooManager->GetPreparedDevices();
     bool isNeed =  !(srcNetworkId == prepared.first && sinkNetworkId == prepared.second);
     MMI_HILOGI("NeedPrepare?: %{public}s", isNeed ? "true" : "false");
     return isNeed;

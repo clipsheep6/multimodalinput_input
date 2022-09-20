@@ -15,7 +15,7 @@
 
 #include "input_device_cooperate_state_free.h"
 
-#include "input_device_cooperate_sm.h"
+#include "input_device_cooperate_manager.h"
 #include "input_device_manager.h"
 #include "mouse_event_normalize.h"
 #include "multimodal_input_connect_remoter.h"

@@ -77,7 +77,7 @@ public:
     virtual int32_t EnableInputDeviceCooperate(int32_t userData, bool enabled) override;
     virtual int32_t StartInputDeviceCooperate(int32_t userData, const std::string &sinkDeviceId,
         int32_t srcInputDeviceId) override;
-    virtual int32_t StopDeviceCooperate(int32_t userData) override;
+    virtual int32_t StopDeviceCooperate(int32_t userData, int32_t stopInputDeviceId) override;
     virtual int32_t GetInputDeviceCooperateState(int32_t userData, const std::string &deviceId) override;
     virtual int32_t SetInputDevice(const std::string& dhid, const std::string& screenId) override;
     virtual int32_t StartRemoteCooperate(const std::string& localDeviceId) override;
@@ -128,7 +128,7 @@ protected:
     int32_t OnEnableInputDeviceCooperate(int32_t pid, int32_t userData, bool enabled);
     int32_t OnStartInputDeviceCooperate(int32_t pid, int32_t userData, const std::string &sinkDeviceId,
         int32_t srcInputDeviceId);
-    int32_t OnStopDeviceCooperate(int32_t pid, int32_t userData);
+    int32_t OnStopDeviceCooperate(int32_t pid, int32_t userData, int32_t stopInputDeviceId);
     int32_t OnGetInputDeviceCooperateState(int32_t pid, int32_t userData, const std::string &deviceId);
     int32_t OnStartRemoteCooperate(const std::string& remoteDeviceId);
     int32_t OnStartRemoteCooperateResult(bool isSuccess,

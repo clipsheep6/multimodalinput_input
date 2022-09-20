@@ -122,7 +122,8 @@ public:
     int32_t EnableInputDeviceCooperate(bool enabled, std::function<void(std::string, CooperationMessage)> callback);
     int32_t StartInputDeviceCooperate(const std::string &sinkDeviceId, int32_t srcInputDeviceId,
         std::function<void(std::string, CooperationMessage)> callback);
-    int32_t StopDeviceCooperate(std::function<void(std::string, CooperationMessage)> callback);
+    int32_t StopDeviceCooperate(int32_t stopInputDeviceId,
+        std::function<void(std::string, CooperationMessage)> callback);
     int32_t GetInputDeviceCooperateState(const std::string &deviceId, std::function<void(bool)> callback);
     int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
     bool GetFunctionKeyState(int32_t funcKey);

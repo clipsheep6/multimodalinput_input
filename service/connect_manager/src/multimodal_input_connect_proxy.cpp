@@ -677,7 +677,7 @@ int32_t MultimodalInputConnectProxy::StartInputDeviceCooperate(int32_t userData,
     return ret;
 }
 
-int32_t MultimodalInputConnectProxy::StopDeviceCooperate(int32_t userData)
+int32_t MultimodalInputConnectProxy::StopDeviceCooperate(int32_t userData, int32_t stopInputDeviceId)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -686,6 +686,12 @@ int32_t MultimodalInputConnectProxy::StopDeviceCooperate(int32_t userData)
         return ERR_INVALID_VALUE;
     }
     WRITEINT32(data, userData, ERR_INVALID_VALUE);
+    WRITEINT32(data, stopInputDeviceId, ERR_INVALID_VALUE);
+
+    int32_t userData1;
+    int32_t stopDeviceId1;
+    READINT32(data, userData1, IPC_PROXY_DEAD_OBJECT_ERR);
+    READINT32(data, stopDeviceId1, IPC_PROXY_DEAD_OBJECT_ERR);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();

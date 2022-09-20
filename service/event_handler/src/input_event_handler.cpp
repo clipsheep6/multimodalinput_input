@@ -26,7 +26,7 @@
 
 #include "libinput.h"
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-#include "input_device_cooperate_sm.h"
+#include "input_device_cooperate_manager.h"
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "key_command_handler.h"
 #include "timer_manager.h"
@@ -69,7 +69,7 @@ void InputEventHandler::OnEvent(void *event)
                "beginTime:%{public}" PRId64, idSeed_, GetThisThreadId(), eventType, beginTime);
     CHKPV(eventNormalizeHandler_);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    InputDevCooSM->HandleEvent(lpEvent);
+    InputDevCooManager->HandleEvent(lpEvent);
 #else
     eventNormalizeHandler_->HandleEvent(lpEvent);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
