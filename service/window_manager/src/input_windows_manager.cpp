@@ -708,11 +708,19 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
     const std::shared_ptr<PointerEvent>& pointerEvent)
 {
     CALL_DEBUG_ENTER;
-    int32_t action = pointerEvent->GetPointerAction();
+    int32_t action = pointerEvent->GetPointerAction(); // action = 3 POINTER_ACTION_BUTTON_MOVE
+    MMI_HILOGD("action:%{public}d", action);
+    auto pressedButtonsSize = pointerEvent->GetPressedButtons().size();
+    MMI_HILOGD("pressedButtonsSize:%{public}d", pressedButtonsSize);
+    auto pressedButtonsDebug = pointerEvent->GetPressedButtons();
+    for (auto& pressedButtonElem : pressButtonsDebug) {
+        MMI_HILOGD("pressedButtonElem:%{public}d", pressedButtonElem);
+    }
     if ((firstBtnDownWindowId_ == -1) ||
         ((action == PointerEvent::POINTER_ACTION_BUTTON_DOWN) && (pointerEvent->GetPressedButtons().size() == 1)) ||
-        ((action == PointerEvent::POINTER_ACTION_MOVE) && (pointerEvent->GetPressedButtons().empty()))) {
+        ((action == PointerEvent::POINTER_ACTION_MOVE) && (pointerEvent->GetPressedButtons().empty()))) { // 问题出在  pointerEvent->GetPressedButtons().empty(),这个不空
         int32_t targetWindowId = pointerEvent->GetTargetWindowId();
+        MMI_HILOGD("targetWindowId:%{public}d", targetWindowId);
         for (const auto &item : displayGroupInfo_.windowsInfo) {
             if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE) {
                 MMI_HILOGD("Skip the untouchable window to continue searching, "
