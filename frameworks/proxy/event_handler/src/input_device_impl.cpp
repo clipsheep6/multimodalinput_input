@@ -27,9 +27,11 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceImpl"};
 } // namespace
 
-InputDeviceImpl::InputDeviceImpl() {}
-InputDeviceImpl::~InputDeviceImpl() {}
-
+InputDeviceImpl& InputDeviceImpl::GetInstance()
+{
+    static InputDeviceImpl instance;
+    return instance;
+}
 int32_t InputDeviceImpl::RegisterDevListener(const std::string &type, InputDevListenerPtr listener)
 {
     CALL_DEBUG_ENTER;
@@ -124,7 +126,7 @@ int32_t InputDeviceImpl::GetInputDeviceIdsAsync(FunInputDevIds callback)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
-    auto eventHandler = InputMgrImpl.GetCurrentEventHandler();
+    auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
     CHKPR(eventHandler, RET_ERR);
     InputDeviceData data;
     data.ids = std::make_pair(eventHandler, callback);
@@ -140,7 +142,7 @@ int32_t InputDeviceImpl::GetInputDeviceAsync(int32_t deviceId, FunInputDevInfo c
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
-    auto eventHandler = InputMgrImpl.GetCurrentEventHandler();
+    auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
     CHKPR(eventHandler, RET_ERR);
     InputDeviceData data;
     data.inputDevice = std::make_pair(eventHandler, callback);
@@ -160,7 +162,7 @@ int32_t InputDeviceImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> keyC
         MMI_HILOGE("Keys exceeds the max range");
         return RET_ERR;
     }
-    auto eventHandler = InputMgrImpl.GetCurrentEventHandler();
+    auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
     CHKPR(eventHandler, RET_ERR);
     InputDeviceData data;
     data.keys = std::make_pair(eventHandler, callback);
@@ -176,7 +178,7 @@ int32_t InputDeviceImpl::GetKeyboardType(int32_t deviceId, FunKeyboardTypes call
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
-    auto eventHandler = InputMgrImpl.GetCurrentEventHandler();
+    auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
     CHKPR(eventHandler, RET_ERR);
     InputDeviceData data;
     data.kbTypes = std::make_pair(eventHandler, callback);
