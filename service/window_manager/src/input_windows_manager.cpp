@@ -686,10 +686,12 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
 {
     CALL_DEBUG_ENTER;
     int32_t action = pointerEvent->GetPointerAction();
+    MMI_HILOGD("action:%{public}d", action);
     if ((firstBtnDownWindowId_ == -1) ||
         ((action == PointerEvent::POINTER_ACTION_BUTTON_DOWN) && (pointerEvent->GetPressedButtons().size() == 1)) ||
         ((action == PointerEvent::POINTER_ACTION_MOVE) && (pointerEvent->GetPressedButtons().empty()))) {
         int32_t targetWindowId = pointerEvent->GetTargetWindowId();
+        MMI_HILOGD("targetWindowId:%{public}d", targetWindowId);
         for (const auto &item : displayGroupInfo_.windowsInfo) {
             if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE) {
                 MMI_HILOGD("Skip the untouchable window to continue searching, "
@@ -710,6 +712,7 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
             }
         }
     }
+    MMI_HILOGD("firstBtnDownWindowId_:%{public}d", firstBtnDownWindowId_);
     for (const auto &item : displayGroupInfo_.windowsInfo) {
         if (item.id == firstBtnDownWindowId_) {
             return std::make_optional(item);
