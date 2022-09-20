@@ -24,7 +24,7 @@ input_feature_distributed = false
 declare_args() {
   resource_schedule_service_enabled = false
   input_feature_combination_key = true
-  input_feature_pointer_drawing = true
+  input_feature_pointer_drawing = false
   input_feature_interceptor = true
   input_feature_monitor = true
   input_feature_keyboard = true
