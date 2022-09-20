@@ -1,0 +1,229 @@
+/*
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include <gtest/gtest.h>
+
+#include "define_multimodal.h"
+#include "mmi_log.h"
+#define private public
+#include "multimodal_event_handler.h"
+#include "input_manager.h"
+#include "multimodal_input_connect_manager.h"
+#include "input_device_cooperate_impl.h"
+#include "mock_multimodal_input_connect_proxy.h"
+
+namespace OHOS {
+namespace MMI {
+namespace {
+using namespace testing::ext;
+using namespace OHOS::MMI;
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputCooperateTest" };
+} // namespace
+#define InputMG ::OHOS::DelayedSingleton<InputManager>::GetInstance()
+class InputCooperateTest : public testing::Test {
+public:
+    static void SetUpTestCase(void) {}
+    static void TearDownTestCase(void) {}
+};
+class InputDeviceCooperateListenerTest : public IInputDeviceCooperateListener {
+public:
+    virtual void OnCooperateMessage(const std::string &deviceId, CooperationMessage msg)  override
+    {
+        MMI_HILOGD("InputDeviceCooperateListenerTest");
+    };
+};
+
+/**
+ * @tc.name: InputCooperateTest_RegisterCooperateListener_001
+ * @tc.desc: Verify whether the cooperation listener is registered
+ * @tc.type: FUNC
+ * @tc.require: I5P6WL
+ */
+HWTEST_F(InputCooperateTest, InputCooperateTest_RegisterCooperateListener_001, TestSize.Level1)
+{
+    MMI_HILOGI("[RegisterCooperateListener001]");
+    std::shared_ptr<InputDeviceCooperateListenerTest> listener = nullptr;
+    int state = InputMG->RegisterCooperateListener(listener);
+    EXPECT_EQ(state, RET_ERR);
+}
+/**
+ * @tc.name: InputCooperateTest_RegisterCooperateListener_002
+ * @tc.desc: Verify whether the cooperation listener is registered
+ * @tc.type: FUNC
+ * @tc.require: I5P6WL
+ */
+HWTEST_F(InputCooperateTest, InputCooperateTest_RegisterCooperateListener_002, TestSize.Level1)
+{
+    MMI_HILOGI("RegisterCooperateListener002");
+    std::shared_ptr<InputDeviceCooperateListenerTest> listener = std::make_shared<InputDeviceCooperateListenerTest>();
+    int state = InputMG->RegisterCooperateListener(listener);
+    EXPECT_EQ(state, RET_OK);
+}
+
+/**
+ * @tc.name: InputCooperateTest_UnregisterCooperateListener001
+ * @tc.desc: Verify that the cooperation listener is unregistered
+ * @tc.type: FUNC
+ * @tc.require: I5P6ZR
+ */
+HWTEST_F(InputCooperateTest, InputCooperateTest_UnregisterCooperateListener001, TestSize.Level1)
+{
+    MMI_HILOGI("UnregisterCooperateListener001");
+    std::shared_ptr<InputDeviceCooperateListenerTest> listener = nullptr;
+    int state = InputMG->UnregisterCooperateListener(listener);
+    EXPECT_EQ(state, RET_OK);
+}
+
+/**
+ * @tc.name: InputCooperateTest_UnregisterCooperateListener002
+ * @tc.desc: Verify that the cooperation listener is unregistered
+ * @tc.type: FUNC
+ * @tc.require: I5P6ZR
+ */
+HWTEST_F(InputCooperateTest, InputCooperateTest_UnregisterCooperateListener002, TestSize.Level1)
+{
+    MMI_HILOGI("UnregisterCooperateListener002");
+    std::shared_ptr<InputDeviceCooperateListenerTest> listener = std::make_shared<InputDeviceCooperateListenerTest>();
+    int state = InputMG->UnregisterCooperateListener(listener);
+    EXPECT_EQ(state, RET_OK);
+}
+
+/**
+ * @tc.name: InputCooperateTest_EnableInputDeviceCooperate_001
+ * @tc.desc: Verify whether enable input device cooperation
+ * @tc.type: FUNC
+ * @tc.require: I5P6VG
+ */
+HWTEST_F(InputCooperateTest, InputCooperateTest_EnableInputDeviceCooperate_001, TestSize.Level1)
+{
+    bool enabled = true;
+    MMI_HILOGI("EnableInputDeviceCooperate001");
+    using CooperationCallback = std::function<void(std::string, CooperationMessage)>;
+    CooperationCallback callback;
+    callback = [](const std::string &, CooperationMessage){
+        MMI_HILOGI("callback is ok");
+    };
+    InputDevCooperateImpl.userData_ = 2147483647;
+    int state = InputMG->EnableInputDeviceCooperate(enabled, callback);
+    EXPECT_EQ(state, RET_ERR);
+}
+
+/**
+ * @tc.name: InputCooperateTest_EnableInputDeviceCooperate_002
+ * @tc.desc: Verify whether enable input device cooperation
+ * @tc.type: FUNC
+ * @tc.require: I5P6VG
+ */
+HWTEST_F(InputCooperateTest, InputCooperateTest_EnableInputDeviceCooperate_002, TestSize.Level1)
+{
+    bool enabled = true;
+    InputDevCooperateImpl.userData_ = 0;
+    MMI_HILOGI("EnableInputDeviceCooperate002");
+    using CooperationCallback = std::function<void(std::string, CooperationMessage)>;
+    CooperationCallback callback;
+    callback = [](const std::string &, CooperationMessage){
+        MMI_HILOGI("callback is ok");
+    };
+    int state = InputMG->EnableInputDeviceCooperate(enabled, callback);
+    EXPECT_EQ(state, RET_OK);
+}
+
+/**
+ * @tc.name: InputCooperateTest_StartInputDeviceCooperate_001
+ * @tc.desc: Verify that the input device is started for cooperation
+ * @tc.type: FUNC
+ * @tc.require: I5P6WL I5P772 I5P76M
+ */
+
+HWTEST_F(InputCooperateTest, InputCooperateTest_StartInputDeviceCooperate_001, TestSize.Level1)
+{
+    MMI_HILOGI("StartInputDeviceCooperate001");
+    std::string sinkDeviceId = "";
+    int32_t srcInputDeviceId = 10;
+    InputDevCooperateImpl.userData_ = 0;
+    using CooperationCallback = std::function<void(std::string, CooperationMessage)>;
+    CooperationCallback callback;
+    callback = [](const std::string &, CooperationMessage){
+        MMI_HILOGI("callback is ok");
+    };
+    int state = InputMG->StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId, callback);
+    EXPECT_EQ(state, RET_ERR);
+}
+
+/**
+ * @tc.name: InputCooperateTest_StartInputDeviceCooperate_002
+ * @tc.desc: Verify that the input device is started for cooperation
+ * @tc.type: FUNC
+ * @tc.require: I5P6WL I5P772 I5P76M
+ */
+
+HWTEST_F(InputCooperateTest, InputCooperateTest_StartInputDeviceCooperate_002, TestSize.Level1)
+{
+    MMI_HILOGI("StartInputDeviceCooperate002");
+    std::string sinkDeviceId = "123";
+    int32_t srcInputDeviceId = 10;
+    InputDevCooperateImpl.userData_ = 0;
+    using CooperationCallback = std::function<void(std::string, CooperationMessage)>;
+    CooperationCallback callback;
+    callback = [](const std::string &, CooperationMessage){
+        MMI_HILOGI("callback is ok");
+    };
+    int state = InputMG->StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId, callback);
+    EXPECT_EQ(state, RET_OK);
+}
+
+/**
+ * @tc.name: InputCooperateTest_StopDeviceCooperate
+ * @tc.desc: Verify whether device cooperation is stopped
+ * @tc.type: FUNC
+ * @tc.require: I5P6ZR
+ */
+HWTEST_F(InputCooperateTest, InputCooperateTest_StopDeviceCooperate_001, TestSize.Level1)
+{
+    MMI_HILOGI("StopDeviceCooperate");
+    InputDevCooperateImpl.userData_ = 0;
+    using CooperationCallback = std::function<void(std::string, CooperationMessage)>;
+    CooperationCallback callback;
+    callback = [](const std::string &, CooperationMessage){
+        MMI_HILOGI("callback is ok");
+    };
+    bool state = false;
+    MultimodalInputConnectProxy::SetMIState(state);
+    int ret = InputMG->StopDeviceCooperate(callback);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: InputCooperateTest_StopDeviceCooperate
+ * @tc.desc: Verify whether device cooperation is stopped
+ * @tc.type: FUNC
+ * @tc.require: I5P6ZR
+ */
+HWTEST_F(InputCooperateTest, InputCooperateTest_StopDeviceCooperate_002, TestSize.Level1)
+{
+    MMI_HILOGI("StopDeviceCooperate");
+    InputDevCooperateImpl.userData_ = 0;
+    using CooperationCallback = std::function<void(std::string, CooperationMessage)>;
+    CooperationCallback callback;
+    callback = [](const std::string &, CooperationMessage){
+        MMI_HILOGI("callback is ok");
+    };
+    bool state = true;
+    MultimodalInputConnectProxy::SetMIState(state);
+    int ret = InputMG->StopDeviceCooperate(callback);
+    EXPECT_EQ(ret, RET_OK);
+}
+} // namespace MMI
+} // namespace OHOS
