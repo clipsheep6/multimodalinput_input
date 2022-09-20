@@ -44,6 +44,7 @@ public:
  * @tc.number: UpdateCrossingSwitchState001
  * @tc.name: UpdateCrossingSwitchState
  * @tc.desc: Verify that the status of the crossing switch is updated.
+ * @tc.require: I5P6WL I5P6ZR
  */
 HWTEST_F(IDCooperateTest, UpdateCrossingSwitchState001, TestSize.Level1)
 {
@@ -56,6 +57,7 @@ HWTEST_F(IDCooperateTest, UpdateCrossingSwitchState001, TestSize.Level1)
  * @tc.number: UpdateCrossingSwitchState002
  * @tc.name: UpdateCrossingSwitchState
  * @tc.desc: Verify that the status of the crossing switch is updated.
+ * @tc.require: I5P6WL I5P6ZR
  */
 HWTEST_F(IDCooperateTest, UpdateCrossingSwitchState002, TestSize.Level1)
 {
@@ -69,6 +71,7 @@ HWTEST_F(IDCooperateTest, UpdateCrossingSwitchState002, TestSize.Level1)
  * @tc.number: GetCrossingSwitchState001
  * @tc.name: GetCrossingSwitchState
  * @tc.desc: Verify that the cross switch status is obtained.
+ * @tc.require: I5P6WL I5P6ZR
  */
 HWTEST_F(IDCooperateTest, GetCrossingSwitchState001, TestSize.Level1)
 {
@@ -83,6 +86,7 @@ HWTEST_F(IDCooperateTest, GetCrossingSwitchState001, TestSize.Level1)
  * @tc.number: GetCrossingSwitchState002
  * @tc.name: GetCrossingSwitchState
  * @tc.desc: Verify that the cross switch status is obtained.
+ * @tc.require: I5P6WL I5P6ZR
  */
 HWTEST_F(IDCooperateTest, GetCrossingSwitchState002, TestSize.Level1)
 {
@@ -97,6 +101,7 @@ HWTEST_F(IDCooperateTest, GetCrossingSwitchState002, TestSize.Level1)
  * @tc.number: RegisterCrossingStateListener001
  * @tc.name: RegisterCrossingStateListener
  * @tc.desc: Verify register cross state listener.
+ * @tc.require: I5P6WL I5P6ZR
  */
 HWTEST_F(IDCooperateTest, RegisterCrossingStateListener001, TestSize.Level1)
 {
@@ -111,6 +116,7 @@ HWTEST_F(IDCooperateTest, RegisterCrossingStateListener001, TestSize.Level1)
  * @tc.number: RegisterCrossingStateListener002
  * @tc.name: RegisterCrossingStateListener
  * @tc.desc: Verify register cross state listener.
+ * @tc.require: I5P6WL I5P6ZR
  */
 HWTEST_F(IDCooperateTest, RegisterCrossingStateListener002, TestSize.Level1)
 {
@@ -128,6 +134,7 @@ HWTEST_F(IDCooperateTest, RegisterCrossingStateListener002, TestSize.Level1)
  * @tc.number: UnregisterCrossingStateListener001
  * @tc.name: UnregisterCrossingStateListener
  * @tc.desc: Verify that cross state listeners are unregistered.
+ * @tc.require: I5P6WL I5P6ZR
  */
 HWTEST_F(IDCooperateTest, UnregisterCrossingStateListener001, TestSize.Level1)
 {
@@ -140,6 +147,7 @@ HWTEST_F(IDCooperateTest, UnregisterCrossingStateListener001, TestSize.Level1)
  * @tc.number: UnregisterCrossingStateListener002
  * @tc.name: UnregisterCrossingStateListener
  * @tc.desc: Verify that cross state listeners are unregistered.
+ * @tc.require: I5P6WL I5P6ZR
  */
 HWTEST_F(IDCooperateTest, UnregisterCrossingStateListener002, TestSize.Level1)
 {
@@ -152,6 +160,7 @@ HWTEST_F(IDCooperateTest, UnregisterCrossingStateListener002, TestSize.Level1)
  * @tc.number: StartInputDeviceCooperate001
  * @tc.name: StartInputDeviceCooperate
  * @tc.desc: Verify that the input device is started for cooperation.
+ * @tc.require: I5P6WL I5P772 I5P76M
  */
 HWTEST_F(IDCooperateTest, StartInputDeviceCooperate001, TestSize.Level1)
 {
@@ -169,9 +178,31 @@ HWTEST_F(IDCooperateTest, StartInputDeviceCooperate001, TestSize.Level1)
  * @tc.number: StartInputDeviceCooperate002
  * @tc.name: StartInputDeviceCooperate
  * @tc.desc: Verify that the input device is started for cooperation.
+ * @tc.require: I5P6WL I5P772 I5P76M
  */
 HWTEST_F(IDCooperateTest, StartInputDeviceCooperate002, TestSize.Level1)
 {
+    MMI_HILOGI("startinputdevicejy002");
+    std::string remote = "123";
+    int32_t startInputDeviceId = 10;
+    InputDevCooSM->currentStateSM_ = std::make_shared<InputDeviceCooperateStateIn>(remote);
+    InputDevCooSM->cooperateState_ = CooperateState::STATE_IN;
+    int32_t state = InputDevCooSM->StartInputDeviceCooperate(remote, startInputDeviceId);
+    MMI_HILOGI("Start inputdevice cooperate state :%{public}d", state);
+    EXPECT_EQ(state, RET_ERR);
+    sleep(300);
+    EXPECT_EQ(CooperateState::STATE_IN, InputDevCooSM->cooperateState_);
+}
+
+/**
+ * @tc.number: StartInputDeviceCooperate002
+ * @tc.name: StartInputDeviceCooperate
+ * @tc.desc: Verify that the input device is started for cooperation.
+ * @tc.require: I5P6WL I5P772 I5P76M
+ */
+HWTEST_F(IDCooperateTest, StartInputDeviceCooperate003, TestSize.Level1)//a
+{
+    MMI_HILOGI("startinputdevicejy003");
     std::string remote = "123";
     int32_t startInputDeviceId = 10;
     InputDevCooSM->isStopping_ = false;
@@ -180,12 +211,15 @@ HWTEST_F(IDCooperateTest, StartInputDeviceCooperate002, TestSize.Level1)
     int32_t state = InputDevCooSM->StartInputDeviceCooperate(remote, startInputDeviceId);
     MMI_HILOGI("Start inputdevice cooperate state :%{public}d", state);
     EXPECT_EQ(state, RET_ERR);
+    sleep(300);
+    EXPECT_EQ(CooperateState::STATE_FREE, InputDevCooSM->cooperateState_);
 }
 
 /**
  * @tc.number: StopInputDeviceCooperate001
  * @tc.name: StopInputDeviceCooperate
  * @tc.desc: Verify that input device cooperation is stopped.
+ * @tc.require: I5P705
  */
 HWTEST_F(IDCooperateTest, StopInputDeviceCooperate001, TestSize.Level1)
 {
@@ -195,12 +229,16 @@ HWTEST_F(IDCooperateTest, StopInputDeviceCooperate001, TestSize.Level1)
     int32_t state = InputDevCooSM->StopInputDeviceCooperate();
     MMI_HILOGI("Stop inputdevice cooperate state :%{public}d", state);
     EXPECT_EQ(state, RET_ERR);
+    sleep(300);
+    EXPECT_EQ(CooperateState::STATE_FREE, InputDevCooSM->cooperateState_);
+
 }
 
 /**
  * @tc.number: StopInputDeviceCooperate002
  * @tc.name: StopInputDeviceCooperate
  * @tc.desc: Verify that input device cooperation is stopped.
+ * @tc.require: I5P705
  */
 HWTEST_F(IDCooperateTest, StopInputDeviceCooperate002, TestSize.Level1)
 {
@@ -218,6 +256,7 @@ HWTEST_F(IDCooperateTest, StopInputDeviceCooperate002, TestSize.Level1)
  * @tc.number: StopInputDeviceCooperate003
  * @tc.name: StopInputDeviceCooperate
  * @tc.desc: Verify that input device cooperation is stopped.
+ * @tc.require: I5P705
  */
 HWTEST_F(IDCooperateTest, StopInputDeviceCooperate003, TestSize.Level1)
 {
@@ -230,12 +269,15 @@ HWTEST_F(IDCooperateTest, StopInputDeviceCooperate003, TestSize.Level1)
     int32_t state = InputDevCooSM->StopInputDeviceCooperate();
     MMI_HILOGI("Stop inputdevice cooperate state :%{public}d", state);
     EXPECT_EQ(state, RET_ERR);
+    sleep(100);
+    EXPECT_EQ(CooperateState::STATE_OUT, InputDevCooSM->cooperateState_);
 }
 
 /**
  * @tc.number: StartRemoteCooperateResult001
  * @tc.name: StartRemoteCooperateResult
  * @tc.desc: Verify remote cooperation results are started.
+ * @tc.require: I5P6WL
  */
 HWTEST_F(IDCooperateTest, StartRemoteCooperateResult001, TestSize.Level1)
 {
@@ -251,6 +293,7 @@ HWTEST_F(IDCooperateTest, StartRemoteCooperateResult001, TestSize.Level1)
  * @tc.number: StartRemoteCooperateResult002
  * @tc.name: StartRemoteCooperateResult
  * @tc.desc: Verify remote cooperation results are started.
+ * @tc.require: I5P6WL
  */
 HWTEST_F(IDCooperateTest, StartRemoteCooperateResult002, TestSize.Level1)
 {
@@ -266,6 +309,7 @@ HWTEST_F(IDCooperateTest, StartRemoteCooperateResult002, TestSize.Level1)
  * @tc.number: StopRemoteCooperate
  * @tc.name: StopRemoteCooperate
  * @tc.desc: Verify Stop Remote cooperation.
+ * @tc.require: I5P705
  */
 HWTEST_F(IDCooperateTest, StopRemoteCooperate, TestSize.Level1)
 {
@@ -277,6 +321,7 @@ HWTEST_F(IDCooperateTest, StopRemoteCooperate, TestSize.Level1)
  * @tc.number: StopRemoteCooperateResult001
  * @tc.name: StopRemoteCooperateResult
  * @tc.desc: Verify whether to stop remote cooperation results.
+ * @tc.require: I5P705
  */
 HWTEST_F(IDCooperateTest, StopRemoteCooperateResult001, TestSize.Level1)
 {
@@ -288,6 +333,7 @@ HWTEST_F(IDCooperateTest, StopRemoteCooperateResult001, TestSize.Level1)
  * @tc.number: StopRemoteCooperateResult002
  * @tc.name: StopRemoteCooperateResult
  * @tc.desc: Verify whether to stop remote cooperation results.
+ * @tc.require: I5P705
  */
 HWTEST_F(IDCooperateTest, StopRemoteCooperateResult002, TestSize.Level1) 
 {
@@ -301,6 +347,7 @@ HWTEST_F(IDCooperateTest, StopRemoteCooperateResult002, TestSize.Level1)
  * @tc.number: StartCooperateOtherResult
  * @tc.name: StartCooperateOtherResult
  * @tc.desc: Verify start working with other results.
+ * @tc.require: I5P6WL
  */
 HWTEST_F(IDCooperateTest, StartCooperateOtherResult, TestSize.Level1)
 {
@@ -313,6 +360,7 @@ HWTEST_F(IDCooperateTest, StartCooperateOtherResult, TestSize.Level1)
  * @tc.number: UpdateState001
  * @tc.name: UpdateState
  * @tc.desc: Verify whether the status is updated.
+ * @tc.require: I5P6UW I5P6TG
  */
 HWTEST_F(IDCooperateTest, UpdateState001, TestSize.Level1)
 {
@@ -324,6 +372,7 @@ HWTEST_F(IDCooperateTest, UpdateState001, TestSize.Level1)
  * @tc.number: UpdateState002
  * @tc.name: UpdateState
  * @tc.desc: Verify whether the status is updated.
+ * @tc.require: I5P6UW I5P6TG
  */
 HWTEST_F(IDCooperateTest, UpdateState002, TestSize.Level1)
 {
@@ -336,6 +385,7 @@ HWTEST_F(IDCooperateTest, UpdateState002, TestSize.Level1)
  * @tc.number: UpdateState003
  * @tc.name: UpdateState
  * @tc.desc: Verify whether the status is updated.
+ * @tc.require: I5P6UW I5P6TG
  */
 HWTEST_F(IDCooperateTest, UpdateState003, TestSize.Level1)
 {
@@ -347,6 +397,7 @@ HWTEST_F(IDCooperateTest, UpdateState003, TestSize.Level1)
  * @tc.number: UpdatePreparedDevices
  * @tc.name: UpdatePreparedDevices
  * @tc.desc: Verify that the prepared device is updated.
+ * @tc.require: I5P6WL
  */
 HWTEST_F(IDCooperateTest, UpdatePreparedDevices, TestSize.Level1)
 {
@@ -360,6 +411,7 @@ HWTEST_F(IDCooperateTest, UpdatePreparedDevices, TestSize.Level1)
  * @tc.number: GetPreparedDevices
  * @tc.name: GetPreparedDevices
  * @tc.desc: Verify to obtain the prepared networkId.
+ * @tc.require: I5P6WL
  */
 HWTEST_F(IDCooperateTest, GetPreparedDevices, TestSize.Level1)
 {
@@ -372,6 +424,7 @@ HWTEST_F(IDCooperateTest, GetPreparedDevices, TestSize.Level1)
  * @tc.number: GetCurrentCooperateState
  * @tc.name: GetCurrentCooperateState
  * @tc.desc: Verify whether the current cooperation status is obtained.
+ * @tc.require: I5P6WL
  */
 HWTEST_F(IDCooperateTest, GetCurrentCooperateState, TestSize.Level1)
 {
@@ -385,6 +438,7 @@ HWTEST_F(IDCooperateTest, GetCurrentCooperateState, TestSize.Level1)
  * @tc.number: InitDeviceManager
  * @tc.name: InitDeviceManager
  * @tc.desc: Verify that Device Manager is initialized.
+ * @tc.require: I5P6WL
  */
 HWTEST_F(IDCooperateTest, InitDeviceManager, TestSize.Level1)
 {
@@ -398,6 +452,7 @@ HWTEST_F(IDCooperateTest, InitDeviceManager, TestSize.Level1)
  * @tc.number: OnDeviceOnline
  * @tc.name: OnDeviceOnline
  * @tc.desc: Verify online devices.
+ * @tc.require: I5P6UW
  */
 HWTEST_F(IDCooperateTest, OnDeviceOnline, TestSize.Level1) 
 {
@@ -413,6 +468,7 @@ HWTEST_F(IDCooperateTest, OnDeviceOnline, TestSize.Level1)
  * @tc.number: OnDeviceOffline001
  * @tc.name: OnDeviceOffline
  * @tc.desc: Verify that the device is offline.
+ * @tc.require: I5P6UW
  */
 HWTEST_F(IDCooperateTest, OnDeviceOffline001, TestSize.Level1)
 {
@@ -433,6 +489,7 @@ HWTEST_F(IDCooperateTest, OnDeviceOffline001, TestSize.Level1)
  * @tc.number: GetCrossingSwitchState002
  * @tc.name: UpdateCrossingSwitchState
  * @tc.desc: Verify that the device is offline.
+ * @tc.require: I5P6UW
  */
 HWTEST_F(IDCooperateTest, OnDeviceOffline002, TestSize.Level1)
 {
@@ -453,6 +510,7 @@ HWTEST_F(IDCooperateTest, OnDeviceOffline002, TestSize.Level1)
  * @tc.number: IsStarting001
  * @tc.name: IsStarting
  * @tc.desc: Verify whether to start.
+ * @tc.require: I5P6WL
  */
 HWTEST_F(IDCooperateTest, IsStarting001, TestSize.Level1)
 {
@@ -467,6 +525,7 @@ HWTEST_F(IDCooperateTest, IsStarting001, TestSize.Level1)
  * @tc.number: IsStarting002
  * @tc.name: IsStarting
  * @tc.desc: Verify whether to start.
+ * @tc.require: I5P6WL
  */
 HWTEST_F(IDCooperateTest, IsStarting002, TestSize.Level1)
 {
@@ -481,6 +540,7 @@ HWTEST_F(IDCooperateTest, IsStarting002, TestSize.Level1)
  * @tc.number: IsStopping001
  * @tc.name: IsStopping
  * @tc.desc: Verify whether to stop.
+ * @tc.require: I5P705
  */
 HWTEST_F(IDCooperateTest, IsStopping001, TestSize.Level1)
 {
@@ -495,6 +555,7 @@ HWTEST_F(IDCooperateTest, IsStopping001, TestSize.Level1)
  * @tc.number: IsStopping002
  * @tc.name: IsStopping
  * @tc.desc: Verify whether to stop.
+ * @tc.require: I5P705
  */
 HWTEST_F(IDCooperateTest, IsStopping002, TestSize.Level1)
 {
@@ -509,6 +570,7 @@ HWTEST_F(IDCooperateTest, IsStopping002, TestSize.Level1)
  * @tc.number: IsNeedFilterOut001
  * @tc.name: IsNeedFilterOut
  * @tc.desc: Verify whether filtering is required.
+ * @tc.require:
  */
 HWTEST_F(IDCooperateTest, IsNeedFilterOut001, TestSize.Level1)
 {
@@ -523,6 +585,7 @@ HWTEST_F(IDCooperateTest, IsNeedFilterOut001, TestSize.Level1)
  * @tc.number: IsNeedFilterOut002
  * @tc.name: IsNeedFilterOut
  * @tc.desc: Verify whether filtering is required.
+ * @tc.require:
  */
 HWTEST_F(IDCooperateTest, IsNeedFilterOut002, TestSize.Level1)
 {
@@ -537,6 +600,7 @@ HWTEST_F(IDCooperateTest, IsNeedFilterOut002, TestSize.Level1)
  * @tc.number: StartRemoteInput001
  * @tc.name: StartRemoteInput
  * @tc.desc: Verify start remote input.
+ * @tc.require: I5P6WL
  */
 HWTEST_F(IDCooperateTest, StartRemoteInput001, TestSize.Level1)
 {
@@ -553,6 +617,7 @@ HWTEST_F(IDCooperateTest, StartRemoteInput001, TestSize.Level1)
  * @tc.number: StartRemoteInput002
  * @tc.name: StartRemoteInput
  * @tc.desc: Verify start remote input.
+ * @tc.require: I5P6WL
  */
 HWTEST_F(IDCooperateTest, StartRemoteInput002, TestSize.Level1)
 {
@@ -571,6 +636,7 @@ HWTEST_F(IDCooperateTest, StartRemoteInput002, TestSize.Level1)
  * @tc.number: StopRemoteInput001
  * @tc.name: StopRemoteInput
  * @tc.desc: Verify stop remote input.
+ * @tc.require: I5P705
  */
 HWTEST_F(IDCooperateTest, StopRemoteInput001, TestSize.Level1)
 {
@@ -589,6 +655,7 @@ HWTEST_F(IDCooperateTest, StopRemoteInput001, TestSize.Level1)
  * @tc.number: StopRemoteInput002
  * @tc.name: StopRemoteInput
  * @tc.desc: Verify stop remote input.
+ * @tc.require: I5P705
  */
 HWTEST_F(IDCooperateTest, StopRemoteInput002, TestSize.Level1)
 {
@@ -607,6 +674,7 @@ HWTEST_F(IDCooperateTest, StopRemoteInput002, TestSize.Level1)
  * @tc.number: StartRemoteInput003
  * @tc.name: StartRemoteInput
  * @tc.desc: Verify start remote input.
+ * @tc.require: I5P6WL
  */
 HWTEST_F(IDCooperateTest, StartRemoteInput003, TestSize.Level1)
 {
@@ -625,6 +693,7 @@ HWTEST_F(IDCooperateTest, StartRemoteInput003, TestSize.Level1)
  * @tc.number: StartRemoteInput004
  * @tc.name: StartRemoteInput
  * @tc.desc: Verify start remote input.
+ * @tc.require: I5P6WL
  */
 HWTEST_F(IDCooperateTest, StartRemoteInput004, TestSize.Level1)
 {
@@ -643,6 +712,7 @@ HWTEST_F(IDCooperateTest, StartRemoteInput004, TestSize.Level1)
  * @tc.number: StopRemoteInput003
  * @tc.name: StopRemoteInput
  * @tc.desc: Verify stop remote input.
+ * @tc.require: I5P705
  */
 HWTEST_F(IDCooperateTest, StopRemoteInput003, TestSize.Level1)
 {
@@ -661,6 +731,7 @@ HWTEST_F(IDCooperateTest, StopRemoteInput003, TestSize.Level1)
  * @tc.number: StopRemoteInput004
  * @tc.name: StopRemoteInput
  * @tc.desc: Verify stop remote input.
+ * @tc.require: I5P705
  */
 HWTEST_F(IDCooperateTest, StopRemoteInput004, TestSize.Level1)
 {
@@ -679,6 +750,7 @@ HWTEST_F(IDCooperateTest, StopRemoteInput004, TestSize.Level1)
  * @tc.number: StartRemoteInput005
  * @tc.name: StartRemoteInput
  * @tc.desc: Verify start remote input.
+ * @tc.require: I5P6WL
  */
 HWTEST_F(IDCooperateTest, StartRemoteInput005, TestSize.Level1)
 {
@@ -696,6 +768,7 @@ HWTEST_F(IDCooperateTest, StartRemoteInput005, TestSize.Level1)
  * @tc.number: StartRemoteInput006
  * @tc.name: StartRemoteInput
  * @tc.desc: Verify start remote input.
+ * @tc.require: I5P6WL
  */
 HWTEST_F(IDCooperateTest, StartRemoteInput006, TestSize.Level1)
 {
@@ -713,6 +786,7 @@ HWTEST_F(IDCooperateTest, StartRemoteInput006, TestSize.Level1)
  * @tc.number: StopRemoteInput005
  * @tc.name: StopRemoteInput
  * @tc.desc: Verify stop remote input.
+ * @tc.require: I5P705
  */
 HWTEST_F(IDCooperateTest, StopRemoteInput005, TestSize.Level1)
 {
@@ -730,6 +804,7 @@ HWTEST_F(IDCooperateTest, StopRemoteInput005, TestSize.Level1)
  * @tc.number: StopRemoteInput006
  * @tc.name: StopRemoteInput
  * @tc.desc: Verify stop remote input.
+ * @tc.require: I5P705
  */
 HWTEST_F(IDCooperateTest, StopRemoteInput006, TestSize.Level1)
 {
@@ -747,6 +822,7 @@ HWTEST_F(IDCooperateTest, StopRemoteInput006, TestSize.Level1)
  * @tc.number: PrepareRemoteInput001
  * @tc.name: PrepareRemoteInput
  * @tc.desc: Verify prepare remote input.
+ * @tc.require:
  */
 HWTEST_F(IDCooperateTest, PrepareRemoteInput001, TestSize.Level1)
 {
@@ -764,6 +840,7 @@ HWTEST_F(IDCooperateTest, PrepareRemoteInput001, TestSize.Level1)
  * @tc.number: PrepareRemoteInput002
  * @tc.name: PrepareRemoteInput
  * @tc.desc: Verify prepare remote input.
+ * @tc.require:
  */
 HWTEST_F(IDCooperateTest, PrepareRemoteInput002, TestSize.Level1)
 {
@@ -781,6 +858,7 @@ HWTEST_F(IDCooperateTest, PrepareRemoteInput002, TestSize.Level1)
  * @tc.number: UnPrepareRemoteInput001
  * @tc.name: UnPrepareRemoteInput
  * @tc.desc: Verify that remote input is not prepared.
+ * @tc.require:
  */
 HWTEST_F(IDCooperateTest, UnPrepareRemoteInput001, TestSize.Level1)
 {
@@ -798,6 +876,7 @@ HWTEST_F(IDCooperateTest, UnPrepareRemoteInput001, TestSize.Level1)
  * @tc.number: UnPrepareRemoteInput002
  * @tc.name: UnPrepareRemoteInput
  * @tc.desc: Verify that remote input is not prepared.
+ * @tc.require:
  */
 HWTEST_F(IDCooperateTest, UnPrepareRemoteInput002, TestSize.Level1)
 {
@@ -814,7 +893,8 @@ HWTEST_F(IDCooperateTest, UnPrepareRemoteInput002, TestSize.Level1)
 /**
  * @tc.number: PrepareRemoteInput003
  * @tc.name: PrepareRemoteInput
- * @tc.desc: Verify that remote input is not prepared.
+ * @tc.desc: Verify that remote input is prepared.
+ * @tc.require:
  */
 HWTEST_F(IDCooperateTest, PrepareRemoteInput003, TestSize.Level1)
 {
@@ -830,7 +910,8 @@ HWTEST_F(IDCooperateTest, PrepareRemoteInput003, TestSize.Level1)
 /**
  * @tc.number: PrepareRemoteInput004
  * @tc.name: PrepareRemoteInput
- * @tc.desc: Verify that remote input is not prepared.
+ * @tc.desc: Verify that remote input is prepared.
+ * @tc.require:
  */
 HWTEST_F(IDCooperateTest, PrepareRemoteInput004, TestSize.Level1)
 {
@@ -847,6 +928,7 @@ HWTEST_F(IDCooperateTest, PrepareRemoteInput004, TestSize.Level1)
  * @tc.number: UnPrepareRemoteInput003
  * @tc.name: UnPrepareRemoteInput
  * @tc.desc: Verify that remote input is not prepared.
+ * @tc.require:
  */
 HWTEST_F(IDCooperateTest, UnPrepareRemoteInput003, TestSize.Level1)
 {
@@ -863,6 +945,7 @@ HWTEST_F(IDCooperateTest, UnPrepareRemoteInput003, TestSize.Level1)
  * @tc.number: UnPrepareRemoteInput004
  * @tc.name: UnPrepareRemoteInput
  * @tc.desc: Verify that remote input is not prepared.
+ * @tc.require:
  */
 HWTEST_F(IDCooperateTest, UnPrepareRemoteInput004, TestSize.Level1)
 {
@@ -879,6 +962,7 @@ HWTEST_F(IDCooperateTest, UnPrepareRemoteInput004, TestSize.Level1)
  * @tc.number: RegisterEventCallback001
  * @tc.name: RegisterEventCallback
  * @tc.desc: Verify registration event callback.
+ * @tc.require: I5P6UW
  */
 HWTEST_F(IDCooperateTest, RegisterEventCallback001, TestSize.Level1)
 {
@@ -892,6 +976,7 @@ HWTEST_F(IDCooperateTest, RegisterEventCallback001, TestSize.Level1)
  * @tc.number: RegisterEventCallback002
  * @tc.name: RegisterEventCallback
  * @tc.desc: Verify registration event callback.
+ * @tc.require: I5P6UW
  */
 HWTEST_F(IDCooperateTest, RegisterEventCallback002, TestSize.Level1)
 {
@@ -907,6 +992,7 @@ HWTEST_F(IDCooperateTest, RegisterEventCallback002, TestSize.Level1)
  * @tc.number: UnregisterEventCallback001
  * @tc.name: UnregisterEventCallback
  * @tc.desc: Verify unregister event callback.
+ * @tc.require: I5P6UW
  */
 HWTEST_F(IDCooperateTest, UnregisterEventCallback001, TestSize.Level1)
 {
@@ -920,6 +1006,7 @@ HWTEST_F(IDCooperateTest, UnregisterEventCallback001, TestSize.Level1)
  * @tc.number: UnregisterEventCallback002
  * @tc.name: UnregisterEventCallback
  * @tc.desc: Verify unregister event callback.
+ * @tc.require: I5P6UW
  */
 HWTEST_F(IDCooperateTest, UnregisterEventCallback002, TestSize.Level1)
 {
