@@ -25,7 +25,7 @@ namespace OHOS {
 namespace MMI {
     class Seat : public NonCopyable, public ISeat {
         public:
-            static std::unique_ptr<Seat> CreateInstance(const IInputContext* context, const std::string& seatId);
+            static std::unique_ptr<Seat> CreateInstance(const std::string& seatId);
 
         public:
             virtual ~Seat();
@@ -36,10 +36,10 @@ namespace MMI {
             virtual void OnInputEvent(const std::shared_ptr<const KernelKeyEvent>& event) override;
             virtual void OnInputEvent(const std::shared_ptr<const AbsEvent>& event) override;
 
-            virtual int32_t AddDisplay(const std::shared_ptr<LogicalDisplayState>& display) override;
-            virtual int32_t RemoveDisplay(const std::shared_ptr<LogicalDisplayState>& display) override;
-            virtual int32_t UpdateDisplay(const std::shared_ptr<LogicalDisplayState>& display) override;
-            virtual std::list<std::shared_ptr<LogicalDisplayState>> GetDisplays() const override;
+            // virtual int32_t AddDisplay(const std::shared_ptr<LogicalDisplayState>& display) override;
+            // virtual int32_t RemoveDisplay(const std::shared_ptr<LogicalDisplayState>& display) override;
+            // virtual int32_t UpdateDisplay(const std::shared_ptr<LogicalDisplayState>& display) override;
+            // virtual std::list<std::shared_ptr<LogicalDisplayState>> GetDisplays() const override;
 
             virtual int32_t AddInputDevice(const std::shared_ptr<IInputDevice>& inputDevice) override;
             virtual int32_t RemoveInputDevice(const std::shared_ptr<IInputDevice>& inputDevice) override;
@@ -48,7 +48,7 @@ namespace MMI {
             virtual bool IsEmpty() const override;
 
         protected:
-            Seat(const IInputContext* context, const std::string& seatId);
+            Seat(const std::string& seatId);
 
             class NewEventListener : public NonCopyable, public IEventTransformer::INewEventListener {
                 public:
@@ -72,10 +72,10 @@ namespace MMI {
             bool TryTransform(const std::shared_ptr<const PointerEvent>& event);
 
         private:
-            const IInputContext* const context_;
+            // const IInputContext* const context_;
             const std::string seatId_;
             std::list<std::shared_ptr<IInputDevice>> inputDevices_;
-            std::list<std::shared_ptr<LogicalDisplayState>> displays_;
+            // std::list<std::shared_ptr<LogicalDisplayState>> displays_;
             RelEventHandler relEventHandler_;
             KernelKeyEventHandler kernelKeyEventHandler_;
             AbsEventHandler absEventHandler_;
@@ -83,7 +83,6 @@ namespace MMI {
             std::shared_ptr<NewEventListener> newEventListener_;
             std::list<std::shared_ptr<IEventTransformer>> transformers_;
     };
-
 } // namespace MMI
 } // namespace OHOS
 #endif // SEAT_H

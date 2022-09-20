@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef I_KERNEL_EVENT_HANDLER
-#define I_KERNEL_EVENT_HANDLER
+#ifndef I_KERNEL_EVENT_HANDLER_H
+#define I_KERNEL_EVENT_HANDLER_H
 
 #include <string>
 #include <memory>
@@ -36,4 +36,4 @@ namespace MMI {
     };
 } // namespace MMI
 } // namespace OHOS
-#endif // I_KERNEL_EVENT_HANDLER
+#endif // I_KERNEL_EVENT_HANDLER_H

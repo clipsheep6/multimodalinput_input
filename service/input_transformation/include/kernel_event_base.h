@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef I_KERNEL_EVENT_BASE
-#define I_KERNEL_EVENT_BASE
+#ifndef I_KERNEL_EVENT_BASE_H
+#define I_KERNEL_EVENT_BASE_H
 
 #include <cstdint>
 #include <ostream>
@@ -25,7 +25,6 @@
 struct input_event;
 namespace OHOS {
 namespace MMI {
-
     class KernelEventBase {
         public:
             virtual ~KernelEventBase() = default;
@@ -54,6 +53,6 @@ namespace MMI {
 
 } // namespace MMI
 } // namespace OHOS
-#endif // I_KERNEL_EVENT_BASE
+#endif // I_KERNEL_EVENT_BASE_H
 
 

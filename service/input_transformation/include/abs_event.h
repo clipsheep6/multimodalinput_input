@@ -24,8 +24,7 @@
 
 namespace OHOS {
 namespace MMI {
-
-    class AbsEvent : public KernelEventBase{
+    class AbsEvent : public KernelEventBase {
         public:
             static constexpr int32_t ACTION_NONE = 0;
             static constexpr int32_t ACTION_DOWN = 1;
