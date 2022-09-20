@@ -19,6 +19,9 @@
 #include <memory>
 #include <list>
 
+#include "i_input_device.h"
+#include "abs_event.h"
+
 namespace OHOS {
 namespace MMI {
     class ISeat {

@@ -19,7 +19,7 @@
 #include <set>
 #include <memory>
 
-#include "ISeat.h"
+#include "i_seat.h"
 
 namespace OHOS {
 namespace MMI {
