@@ -368,6 +368,7 @@ std::shared_ptr<PointerEvent> PointerEvent::Create()
 
 void PointerEvent::Reset()
 {
+    CALL_DEBUG_ENTER;
     InputEvent::Reset();
     pointerId_ = -1;
     pointers_.clear();
@@ -496,6 +497,7 @@ bool PointerEvent::IsButtonPressed(int32_t buttonId) const
 
 void PointerEvent::SetButtonPressed(int32_t buttonId)
 {
+    CALL_DEBUG_ENTER;
     if (pressedButtons_.size() >= MAX_N_PRESSED_BUTTONS) {
         MMI_HILOGE("Exceed maximum allowed number of pressed buttons");
         return;
@@ -508,6 +510,7 @@ void PointerEvent::SetButtonPressed(int32_t buttonId)
 
 void PointerEvent::DeleteReleaseButton(int32_t buttonId)
 {
+    CALL_DEBUG_ENTER;
     if (pressedButtons_.find(buttonId) != pressedButtons_.end()) {
         pressedButtons_.erase(buttonId);
     }
@@ -515,6 +518,7 @@ void PointerEvent::DeleteReleaseButton(int32_t buttonId)
 
 void PointerEvent::ClearButtonPressed()
 {
+    CALL_DEBUG_ENTER;
     pressedButtons_.clear();
 }
 
@@ -600,6 +604,7 @@ bool PointerEvent::HasAxis(uint32_t axes, AxisType axis)
 
 void PointerEvent::SetPressedKeys(const std::vector<int32_t> pressedKeys)
 {
+    CALL_DEBUG_ENTER;
     pressedKeys_ = pressedKeys;
 }
 
