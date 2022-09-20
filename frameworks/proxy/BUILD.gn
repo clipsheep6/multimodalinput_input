@@ -447,10 +447,10 @@ if (input_feature_input_cooperation) {
       defines += [ "OHOS_BUILD_ENABLE_POINTER" ]
     }
     sources = [
-      "events/test/input_cooperate_test.cpp",
-      "events/src/input_manager.cpp",
-      "event_handler/src/input_manager_impl.cpp",
       "event_handler/src/input_device_cooperate_impl.cpp",
+      "event_handler/src/input_manager_impl.cpp",
+      "events/src/input_manager.cpp",
+      "events/test/input_cooperate_test.cpp",
       "events/test/mock/mock_multimodal_input_connect_proxy.cpp",
     ]
 
@@ -511,9 +511,9 @@ if (input_feature_input_cooperation) {
       defines += [ "OHOS_BUILD_ENABLE_POINTER" ]
     }
     sources = [
-      "events/src/input_manager.cpp",
-      "event_handler/src/input_manager_impl.cpp",
       "event_handler/src/input_device_cooperate_impl.cpp",
+      "event_handler/src/input_manager_impl.cpp",
+      "events/src/input_manager.cpp",
       "events/test/anomalous_input_cooperate_test.cpp",
     ]
 
