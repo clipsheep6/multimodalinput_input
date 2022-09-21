@@ -18,23 +18,23 @@
 namespace OHOS {
 namespace MMI {
 
-    class DefaultHandler : public IKernelEventHandler {
-        // virtual void OnInputEvent(const std::shared_ptr<const RelEvent>& event) override
-        // {
-        // }
+class DefaultHandler : public IKernelEventHandler {
+    // virtual void OnInputEvent(const std::shared_ptr<const RelEvent>& event) override
+    // {
+    // }
 
-        // virtual void OnInputEvent(const std::shared_ptr<const KernelKeyEvent>& event) override
-        // {
-        // }
+    // virtual void OnInputEvent(const std::shared_ptr<const KernelKeyEvent>& event) override
+    // {
+    // }
 
-        virtual void OnInputEvent(const std::shared_ptr<const AbsEvent>& event) override
-        {
-        }
-    };
-
-    const std::shared_ptr<IKernelEventHandler>& IKernelEventHandler::GetDefault() {
-        static std::shared_ptr<IKernelEventHandler> defaultHandler(new DefaultHandler());
-        return defaultHandler;
+    virtual void OnInputEvent(const std::shared_ptr<const AbsEvent>& event) override
+    {
     }
+};
+
+const std::shared_ptr<IKernelEventHandler>& IKernelEventHandler::GetDefault() {
+    static std::shared_ptr<IKernelEventHandler> defaultHandler(new DefaultHandler());
+    return defaultHandler;
+}
 } // namespace MMI
 } // namespace OHOS

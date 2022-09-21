@@ -92,8 +92,8 @@ void InputDevice::Uninit()
     CloseDevice();
 }
 
-InputDevice::InputDevice(int32_t id, const std::string& deviceFile, const IInputContext* context)
-    : id_(id), deviceFile_(deviceFile), context_(context),
+InputDevice::InputDevice(int32_t id, const std::string& deviceFile)
+    : id_(id), deviceFile_(deviceFile),
     relEventCollector_(id), keyEventCollector_(id), absEventCollector_(id, AbsEvent::SOURCE_TYPE_NONE),
     eventHandler_(IKernelEventHandler::GetDefault())
 {
@@ -565,15 +565,15 @@ void InputDevice::OnEventCollected(const std::shared_ptr<const RelEvent>& event)
     MMI_HILOGD("Leave");
 }
 
-void InputDevice::OnEventCollected(const std::shared_ptr<const KernelKeyEvent>& event) {
-    if (!event) {
-        return;
-    }
+// void InputDevice::OnEventCollected(const std::shared_ptr<const KernelKeyEvent>& event) {
+//     if (!event) {
+//         return;
+//     }
 
-    MMI_HILOGD("Enter KernelKeyEvent");
-    eventHandler_->OnInputEvent(event);
-    MMI_HILOGD("Leave KernelKeyEvent");
-}
+//     MMI_HILOGD("Enter KernelKeyEvent");
+//     eventHandler_->OnInputEvent(event);
+//     MMI_HILOGD("Leave KernelKeyEvent");
+// }
 
 void InputDevice::OnEventCollected(const std::shared_ptr<const AbsEvent>& event) {
     if (!event) {

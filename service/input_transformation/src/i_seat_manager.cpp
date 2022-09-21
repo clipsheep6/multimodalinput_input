@@ -18,6 +18,6 @@
 namespace OHOS {
 namespace MMI {
 
-    const std::unique_ptr<ISeatManager> ISeatManager::NULL_VALUE;
+const std::unique_ptr<ISeatManager> ISeatManager::NULL_VALUE;
 } // namespace MMI
 } // namespace OHOS

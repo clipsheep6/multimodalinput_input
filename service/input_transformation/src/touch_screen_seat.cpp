@@ -107,48 +107,48 @@ void TouchScreenSeat::OnInputEvent(const std::shared_ptr<const AbsEvent>& event)
 {
     MMI_HILOGD("Enter absEvent:$s", event);
 
-    std::shared_ptr<const LogicalDisplayState> targetDisplay;
+    // std::shared_ptr<const LogicalDisplayState> targetDisplay;
     int32_t pointerAction = PointerEvent::POINTER_ACTION_NONE;
     int64_t actionTime = 0;
-    auto pointer = ConvertPointer(event, pointerAction, actionTime, targetDisplay);
+    auto pointer = ConvertPointer(event, pointerAction, actionTime);
     if (!pointer) {
         MMI_HILOGE("Leave ConvertPointer Failed");
         return;
     }
 
-    auto retCode = DispatchTo(targetDisplay, pointerAction, actionTime,  pointer);
-    if (retCode < 0) {
-        MMI_HILOGE("Leave, Dispatch Failed");
-        return;
-    }
+    // auto retCode = DispatchTo(pointerAction, actionTime,  pointer);
+    // if (retCode < 0) {
+    //     MMI_HILOGE("Leave, Dispatch Failed");
+    //     return;
+    // }
 
-    MMI_HILOGD("Leave, targetDisplayId:$s, pointerAction:$s, pointer:$s", targetDisplay->GetId(), 
+    MMI_HILOGD("Leave,  pointerAction:$s, pointer:$s", 
             PointerEvent::ActionToString(pointerAction), pointer);
 }
 
-int32_t TouchScreenSeat::BindDisplay(const std::shared_ptr<PhysicalDisplayState>& display)
-{
-    MMI_HILOGD("Enter");
+// int32_t TouchScreenSeat::BindDisplay(const std::shared_ptr<PhysicalDisplayState>& display)
+// {
+//     MMI_HILOGD("Enter");
 
-    if (!display) {
-        MMI_HILOGE("Leave, null display");
-        return -1;
-    }
+//     if (!display) {
+//         MMI_HILOGE("Leave, null display");
+//         return -1;
+//     }
 
-    if (display_) {
-        MMI_HILOGE("Leave, nonnull display_");
-        return -1;
-    }
+//     if (display_) {
+//         MMI_HILOGE("Leave, nonnull display_");
+//         return -1;
+//     }
 
-    if (display->GetSeatId() != seatId_ || display->GetSeatName() != seatName_) {
-        MMI_HILOGE("Leave, seatId,seatName Mismatch");
-        return -1;
-    }
+//     if (display->GetSeatId() != seatId_ || display->GetSeatName() != seatName_) {
+//         MMI_HILOGE("Leave, seatId,seatName Mismatch");
+//         return -1;
+//     }
 
-    display_ = display;
-    MMI_HILOGD("Leave");
-    return 0;
-}
+//     display_ = display;
+//     MMI_HILOGD("Leave");
+//     return 0;
+// }
 
 // int32_t TouchScreenSeat::UnbindDisplay(const std::shared_ptr<PhysicalDisplayState>& display)
 // {
