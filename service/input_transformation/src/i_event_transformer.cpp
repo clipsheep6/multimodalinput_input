@@ -21,7 +21,9 @@
 
 namespace OHOS {
 namespace MMI {
-
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IEventTransformer" };
+};
 std::list<std::shared_ptr<IEventTransformer>> IEventTransformer::CreateTransformers(const std::shared_ptr<INewEventListener>& listener)
 {
     std::list<std::shared_ptr<IEventTransformer>> result;

@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "input_device.h"
+#include "input_event_device.h"
 
 #include <iostream>
 #include <cstring>
@@ -41,7 +41,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputDevice" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventDevice" };
 };
 // std::shared_ptr<InputDevice> InputDevice::Open(const std::string& deviceFile)
 // {
@@ -56,7 +56,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 // }
 
 
-int32_t InputDevice::Init() {
+int32_t InputEventDevice::Init() {
     MMI_HILOGD("Enter");
 
     // const auto& looper = context_->GetLooper();
@@ -90,37 +90,37 @@ int32_t InputDevice::Init() {
     return 0;
 }
 
-void InputDevice::Uninit() 
+void InputEventDevice::Uninit() 
 {
     CloseDevice();
 }
 
-InputDevice::InputDevice(int32_t id, const std::string& deviceFile)
+InputEventDevice::InputEventDevice(int32_t id, const std::string& deviceFile)
     : id_(id), absEventCollector_(id, AbsEvent::SOURCE_TYPE_NONE),
     eventHandler_(IKernelEventHandler::GetDefault())
 {
 }
 
-InputDevice::~InputDevice()
+InputEventDevice::~InputEventDevice()
 {
     Uninit();
 }
 
-int32_t InputDevice::GetId() const
+int32_t InputEventDevice::GetId() const
 {
     return id_;
 }
 
-const std::string& InputDevice::GetName() const
+const std::string& InputEventDevice::GetName() const
 {
     return name_;
 }
 
-const std::string& InputDevice::GetSeatId() const {
+const std::string& InputEventDevice::GetSeatId() const {
     return seatId_;
 }
 
-const std::string& InputDevice::GetSeatName() const {
+const std::string& InputEventDevice::GetSeatName() const {
     return seatName_;
 }
 
@@ -129,7 +129,7 @@ const std::string& InputDevice::GetSeatName() const {
 //     return deviceFile_;
 // }
 
-std::shared_ptr<IInputDevice::AxisInfo> InputDevice::GetAxisInfo(int32_t axis) const
+std::shared_ptr<IInputDevice::AxisInfo> InputEventDevice::GetAxisInfo(int32_t axis) const
 {
     MMI_HILOGD("Enter device:%{public}s axis:%{public}s", GetName().c_str(), IInputDevice::AxisToString(axis));
     auto it = axises_.find(axis);
@@ -178,7 +178,7 @@ std::shared_ptr<IInputDevice::AxisInfo> InputDevice::GetAxisInfo(int32_t axis) c
     return axisInfo;
 }
 
-void InputDevice::OnFdEvent(int fd, int event)
+void InputEventDevice::OnFdEvent(int fd, int event)
 {
     // MMI_HILOGD("Enter fd:%{public}s event:%{public}s", fd, IEventLooper::EventToString(event));
     // if (fd != fd_) {
@@ -202,7 +202,7 @@ void InputDevice::OnFdEvent(int fd, int event)
     // MMI_HILOGE("Leave fd:%{public}s event:%{public}s, Unknown event", fd, IEventLooper::EventToString(event));
 }
 
-void InputDevice::ReadEvents() {
+void InputEventDevice::ReadEvents() {
     // MMI_HILOGD("Enter deviceFile:%{public}s", deviceFile_);
     // constexpr size_t MAX_COUNT_ONCE = 8;
     // struct input_event inputEvent[MAX_COUNT_ONCE];
@@ -243,7 +243,7 @@ void InputDevice::ReadEvents() {
     // MMI_HILOGD("Leave deviceFile:%{public}s", deviceFile_);
 }
 
-int32_t InputDevice::CloseDevice() {
+int32_t InputEventDevice::CloseDevice() {
     // MMI_HILOGD("Enter deviceFile:%{public}s", deviceFile_);
     // if (fd_ < 0) {
     //     MMI_HILOGD("Leave deviceFile:$s, fd < 0", deviceFile_);
@@ -266,7 +266,7 @@ int32_t InputDevice::CloseDevice() {
     return 0;
 }
 
-void InputDevice::ProcessEventItem(struct input_event* eventItem) {
+void InputEventDevice::ProcessEventItem(struct input_event* eventItem) {
     auto type = eventItem->type;
     auto code = eventItem->code;
     auto value = eventItem->value;
@@ -320,7 +320,7 @@ void InputDevice::ProcessEventItem(struct input_event* eventItem) {
     }
 }
 
-int32_t InputDevice::UpdateCapablility() {
+int32_t InputEventDevice::UpdateCapablility() {
     auto retCode = UpdateInputProperty();
     if (retCode < 0) {
         return -1;
@@ -364,7 +364,7 @@ int32_t InputDevice::UpdateCapablility() {
     return 0;
 }
 
-int32_t InputDevice::UpdateInputProperty() {
+int32_t InputEventDevice::UpdateInputProperty() {
     auto ret = ioctl(fd_, EVIOCGPROP(sizeof(inputProperty)), &inputProperty[0]);
     if (ret < 0) {
         return -1;
@@ -379,7 +379,7 @@ int32_t InputDevice::UpdateInputProperty() {
     return 0;
 }
 
-int32_t InputDevice::UpdateBitStat(int32_t evType, int32_t maxValue, unsigned long* resultValue, size_t len) {
+int32_t InputEventDevice::UpdateBitStat(int32_t evType, int32_t maxValue, unsigned long* resultValue, size_t len) {
     auto ret = ioctl(fd_, EVIOCGBIT(evType, maxValue), resultValue);
     if (ret < 0) {
         MMI_HILOGE("Leave, Failed for %{public}s", EnumUtils::InputEventTypeToString(evType));
@@ -411,7 +411,7 @@ int32_t InputDevice::UpdateBitStat(int32_t evType, int32_t maxValue, unsigned lo
     return 0;
 }
 
-bool InputDevice::TestBit(int32_t bitIndex, const unsigned long* bitMap, size_t count) const {
+bool InputEventDevice::TestBit(int32_t bitIndex, const unsigned long* bitMap, size_t count) const {
     if (bitIndex < 0) {
         return false;
     }
@@ -426,18 +426,18 @@ bool InputDevice::TestBit(int32_t bitIndex, const unsigned long* bitMap, size_t 
     return (bitMap[idx] & (bitOne << offset)) != 0;
 }
 
-bool InputDevice::HasInputProperty(int32_t property) {
+bool InputEventDevice::HasInputProperty(int32_t property) {
     return TestBit(property, &inputProperty[0], sizeof(inputProperty) / sizeof(inputProperty[0]));
 }
 
-bool InputDevice::HasMouseCapability() {
+bool InputEventDevice::HasMouseCapability() {
     if (HasEventCode(EV_REL, REL_X) && HasEventCode(EV_REL, REL_Y)) {
         return true;
     }
     return false;
 }
 
-bool InputDevice::HasKeyboardCapability() {
+bool InputEventDevice::HasKeyboardCapability() {
     if (!HasEventType(EV_KEY)) {
         return false;
     }
@@ -445,7 +445,7 @@ bool InputDevice::HasKeyboardCapability() {
     return true;
 }
 
-bool InputDevice::HasTouchscreenCapability() {
+bool InputEventDevice::HasTouchscreenCapability() {
     if (!HasEventType(EV_ABS)) {
         return false;
     }
@@ -457,7 +457,7 @@ bool InputDevice::HasTouchscreenCapability() {
     return true;
 }
 
-bool InputDevice::HasTouchpadCapability() {
+bool InputEventDevice::HasTouchpadCapability() {
     if (!HasEventType(EV_ABS)) {
         return false;
     }
@@ -469,11 +469,11 @@ bool InputDevice::HasTouchpadCapability() {
     return true;
 }
 
-bool InputDevice::HasEventType(int32_t evType) const {
+bool InputEventDevice::HasEventType(int32_t evType) const {
     return TestBit(evType, &evBit[0], LENTH_OF_ARRAY(evBit));
 }
 
-bool InputDevice::HasEventCode(int32_t evType, int32_t evCode) const {
+bool InputEventDevice::HasEventCode(int32_t evType, int32_t evCode) const {
     if (!HasEventType(evType)) {
         return false;
     }
@@ -489,7 +489,7 @@ bool InputDevice::HasEventCode(int32_t evType, int32_t evCode) const {
     }
 }
 
-void InputDevice::ProcessSyncEvent(int32_t code, int32_t value) {
+void InputEventDevice::ProcessSyncEvent(int32_t code, int32_t value) {
     // {
     //     auto event = relEventCollector_.HandleSyncEvent(code, value);
     //     if (event) {
@@ -524,7 +524,7 @@ void InputDevice::ProcessSyncEvent(int32_t code, int32_t value) {
 //     MMI_HILOGD("Leave code:%{public}d value:%{public}d", EnumUtils::InputEventRelCodeToString(code), value);
 // }
 
-void InputDevice::ProcessAbsEvent(int32_t code, int32_t value) {
+void InputEventDevice::ProcessAbsEvent(int32_t code, int32_t value) {
     const auto& event = absEventCollector_.HandleAbsEvent(code, value);
     if (event) {
         OnEventCollected(event);
@@ -576,7 +576,7 @@ void InputDevice::ProcessAbsEvent(int32_t code, int32_t value) {
 //     MMI_HILOGD("Leave KernelKeyEvent");
 // }
 
-void InputDevice::OnEventCollected(const std::shared_ptr<const AbsEvent>& event) {
+void InputEventDevice::OnEventCollected(const std::shared_ptr<const AbsEvent>& event) {
     if (!event) {
         return;
     }
@@ -587,12 +587,12 @@ void InputDevice::OnEventCollected(const std::shared_ptr<const AbsEvent>& event)
     return;
 }
 
-bool InputDevice::HasCapability(int32_t capability) const
+bool InputEventDevice::HasCapability(int32_t capability) const
 {
     return (capabilities_ & capability) != 0;
 }
 
-int32_t InputDevice::StartReceiveEvents(const std::shared_ptr<IKernelEventHandler>& eventHandler)
+int32_t InputEventDevice::StartReceiveEvents(const std::shared_ptr<IKernelEventHandler>& eventHandler)
 {
     MMI_HILOGD("Enter");
     if (!eventHandler) {
@@ -623,7 +623,7 @@ int32_t InputDevice::StartReceiveEvents(const std::shared_ptr<IKernelEventHandle
     return 0;
 }
 
-int32_t InputDevice::StopReceiveEvents()
+int32_t InputEventDevice::StopReceiveEvents()
 {
     eventHandler_ = IKernelEventHandler::GetDefault();
 

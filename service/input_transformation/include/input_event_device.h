@@ -42,12 +42,12 @@ namespace MMI {
 
 class IKernelEventHandler;
 // class IEventLooper;
-class InputDevice : public NonCopyable, public IInputDevice {
+class InputEventDevice : public NonCopyable, public IInputDevice {
     // public:
         // static std::shared_ptr<InputDevice> Open(const std::string& deviceFile, const IInputContext* context);
 
 public:
-    virtual ~InputDevice();
+    virtual ~InputEventDevice();
     virtual int32_t GetId() const override;
     virtual const std::string& GetName() const override;
     virtual const std::string& GetSeatId() const override;
@@ -63,7 +63,7 @@ protected:
     void Uninit();
 
 private:
-    InputDevice(int32_t id, const std::string& deviceFile);
+    InputEventDevice(int32_t id, const std::string& deviceFile);
 
 private:
     void OnFdEvent(int fd, int event);
