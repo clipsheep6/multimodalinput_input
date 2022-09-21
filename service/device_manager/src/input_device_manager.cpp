@@ -695,7 +695,7 @@ std::string InputDeviceManager::GenerateDescriptor(struct libinput_device *input
         rawDescriptor += "uniqueId:" + std::string(uniqueId);
     }
     if (physicalPath != nullptr) {
-        rawDescriptor += "physicalPath:" + std::string(physicalPath);
+        rawDescriptor += "location:" + std::string(physicalPath);
     }
     if (name != nullptr && name[0] != '\0') {
         rawDescriptor += "name:" + regex_replace(name, std::regex(" "), "");
