@@ -14,16 +14,17 @@
  */
 
 #include "input_handler_manager.h"
-#include <cinttypes>
 
-#include "mmi_log.h"
-#include "net_packet.h"
-#include "proto.h"
+#include <cinttypes>
 
 #include "bytrace_adapter.h"
 #include "input_handler_type.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
+#include "mmi_log.h"
+#include "napi_constants.h"
+#include "net_packet.h"
+#include "proto.h"
 
 namespace OHOS {
 namespace MMI {
@@ -189,10 +190,14 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEven
         CHKPV(consumer);
         auto tempEvent = std::make_shared<PointerEvent>(*pointerEvent);
         CHKPV(tempEvent);
-        consumer->OnInputEvent(tempEvent);
-        consumerCount++;
         tempEvent->SetProcessedCallback(monitorCallback_);
+		consumer->OnInputEvent(tempEvent);
+        consumerCount++;
         MMI_HILOGD("Pointer event id:%{public}d pointerId:%{public}d", handlerId, pointerEvent->GetPointerId());
+    }
+    if (consumerCount == 0) {
+        MMI_HILOGE("All task post failed");
+        return;
     }
     int32_t tokenType = MultimodalInputConnMgr->GetTokenType();
     if (tokenType == TokenType::TOKEN_HAP &&

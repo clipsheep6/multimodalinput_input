@@ -37,7 +37,8 @@ public:
     DISALLOW_MOVE(MultimodalEventHandler);
 
     MMIClientPtr GetMMIClient();
-    bool InitClient();
+    bool InitClient(std::shared_ptr<IInputEventConsumer> inputEventConsumer = nullptr,
+        std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t SubscribeKeyEvent(const KeyEventInputSubscribeManager::SubscribeKeyEventInfo& subscribeInfo);
     int32_t UnsubscribeKeyEvent(int32_t subscribeId);

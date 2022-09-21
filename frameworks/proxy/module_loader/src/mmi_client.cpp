@@ -45,6 +45,16 @@ MMIClient::~MMIClient()
     Stop();
 }
 
+void MMIClient::SetEventHandler(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
+    std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
+{
+    CHKPV(inputEventConsumer);
+    CHKPV(eventHandler);
+    std::lock_guard<std::mutex> guard(mtx_);
+    inputEventConsumer_ = inputEventConsumer;
+    eventHandler_ = eventHandler;
+}
+
 bool MMIClient::SendMessage(const NetPacket &pkt) const
 {
     return SendMsg(pkt);
@@ -84,14 +94,23 @@ bool MMIClient::StartEventRunner()
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
-    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
-    eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
-    CHKPF(eventHandler_);
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (eventHandler_ == nullptr) {
+        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
+        eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
+        CHKPF(eventHandler_);
+    }
+
     if (isConnected_ && fd_ >= 0) {
+        if (isListening_) {
+            MMI_HILOGI("File fd is in listening");
+            return true;
+        }
         if (!AddFdListener(fd_)) {
             MMI_HILOGE("Add fd listener failed");
             return false;
         }
+        msgHandler_.SetInputConsumer(inputEventConsumer_);
     } else {
         if (!eventHandler_->PostTask(std::bind(&MMIClient::OnReconnect, this), CLIENT_RECONNECT_COOLING_TIME)) {
             MMI_HILOGE("Send reconnect event failed");
@@ -101,30 +120,41 @@ bool MMIClient::StartEventRunner()
     return true;
 }
 
-void MMIClient::StopOldEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
+void MMIClient::StopOldEventHandler(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
+    std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     CHKPV(eventHandler);
     CHKPV(eventHandler_);
+    auto currentRunner = eventHandler_->GetEventRunner();
+    CHKPV(currentRunner);
+    MMI_HILOGI("Current thread name:%{public}s", currentRunner->GetRunnerThreadName().c_str());
+    auto newRunner = eventHandler->GetEventRunner();
+    CHKPV(newRunner);
+    MMI_HILOGI("New thread name:%{public}s", newRunner->GetRunnerThreadName().c_str());
+    if (currentRunner->GetThreadId() == newRunner->GetThreadId()) {
+        MMI_HILOGI("The eventRunners are the same");
+        return;
+    }
+
     if (fd_ >= 0) {
         eventHandler_->RemoveFileDescriptorListener(fd_);
     }
 
-    auto currentRunner = eventHandler_->GetEventRunner();
-    CHKPV(currentRunner);
     if (currentRunner->GetRunnerThreadName() == THREAD_NAME) {
         currentRunner->Stop();
     }
 
-    if (!eventHandler->PostImmediateTask(std::bind(&MMIClient::StartNewEventHandler, this, eventHandler))) {
+    if (!eventHandler->PostImmediateTask(std::bind(&MMIClient::StartNewEventHandler, this, inputEventConsumer, eventHandler))) {
         MMI_HILOGE("Send new eventHandler task failed");
         return;
     }
 }
 
-void MMIClient::StartNewEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
-{    
+void MMIClient::StartNewEventHandler(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
+    std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
+{
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     eventHandler_ = eventHandler;
@@ -133,6 +163,7 @@ void MMIClient::StartNewEventHandler(std::shared_ptr<AppExecFwk::EventHandler> e
             MMI_HILOGE("Add new fd listener failed");
             return;
         }
+        msgHandler_.SetInputConsumer(inputEventConsumer);
     } else {
         if (!eventHandler_->PostTask(std::bind(&MMIClient::OnReconnect, this), CLIENT_RECONNECT_COOLING_TIME)) {
             MMI_HILOGE("Send new reconnect event failed");
@@ -149,21 +180,9 @@ void MMIClient::SwitchEventHandler(std::shared_ptr<IInputEventConsumer> inputEve
     CHK_PID_AND_TID();
     CHKPV(inputEventConsumer);
     CHKPV(eventHandler);
-    msgHandler_.SetInputConsumer(inputEventConsumer);
+    std::lock_guard<std::mutex> guard(mtx_);
     if (eventHandler_ != nullptr) {
-        auto currentRunner = eventHandler_->GetEventRunner();
-        CHKPV(currentRunner);
-        MMI_HILOGI("Current thread name:%{public}s", currentRunner->GetRunnerThreadName().c_str());
-        auto newRunner = eventHandler->GetEventRunner();
-        CHKPV(newRunner);
-        MMI_HILOGI("New thread name:%{public}s", newRunner->GetRunnerThreadName().c_str());
-        if (currentRunner->GetThreadId() == newRunner->GetThreadId()) {
-            MMI_HILOGI("The eventRunners are the same");
-            return;
-        }
-
-        if (!eventHandler_->PostTask(std::bind(&MMIClient::StopOldEventHandler, this, eventHandler),
-            AppExecFwk::EventHandler::Priority::IMMEDIATE)) {
+        if (!eventHandler_->PostImmediateTask(std::bind(&MMIClient::StopOldEventHandler, this, inputEventConsumer, eventHandler))) {
             MMI_HILOGE("Send stop old eventHandler task failed");
             return;
         }
@@ -200,8 +219,12 @@ bool MMIClient::DelFdListener(int32_t fd)
         return false;
     }
     CHKPF(eventHandler_);
-    eventHandler_->RemoveAllEvents();
-    eventHandler_->RemoveFileDescriptorListener(fd);
+    auto runner = eventHandler_->GetEventRunner();
+    CHKPF(runner);
+    if (runner->GetRunnerThreadName() == THREAD_NAME) {
+        eventHandler_->RemoveAllEvents();
+        eventHandler_->RemoveFileDescriptorListener(fd);
+    }
     isRunning_ = false;
     return true;
 }
@@ -235,7 +258,7 @@ void MMIClient::OnReconnect()
         return;
     }
     CHKPV(eventHandler_);
-    if (eventHandler_->PostTask(std::bind(&MMIClient::OnReconnect, this), CLIENT_RECONNECT_COOLING_TIME)) {
+    if (!eventHandler_->PostTask(std::bind(&MMIClient::OnReconnect, this), CLIENT_RECONNECT_COOLING_TIME)) {
         MMI_HILOGE("Post reconnect event failed");
     }
 }
@@ -287,6 +310,8 @@ void MMIClient::OnConnected()
         if (!AddFdListener(fd_)) {
             MMI_HILOGE("Add fd listener failed");
         }
+        msgHandler_.SetInputConsumer(inputEventConsumer_);
+        isListening_ = true;
     }
 }
 
@@ -313,11 +338,12 @@ void MMIClient::Stop()
     UDSClient::Stop();
     if (eventHandler_ != nullptr) {
         auto runner = eventHandler_->GetEventRunner();
-        if (runner != nullptr) {
+        CHKPV(runner);
+        if (runner->GetRunnerThreadName() == THREAD_NAME) {
             runner->Stop();
+            eventHandler_->RemoveAllEvents();
+            eventHandler_->RemoveAllFileDescriptorListeners();
         }
-        eventHandler_->RemoveAllEvents();
-        eventHandler_->RemoveAllFileDescriptorListeners();
     }
 }
 

@@ -30,9 +30,8 @@ public:
     virtual ~MMIClient() override;
 
     int32_t Socket() override;
-    bool Start() override;
-    void RegisterConnectedFunction(ConnectCallback fun) override;
-    void RegisterDisconnectedFunction(ConnectCallback fun) override;
+    void SetEventHandler(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
+        std::shared_ptr<AppExecFwk::EventHandler> eventHandler) override;
     virtual void Stop() override;
     virtual bool SendMessage(const NetPacket& pkt) const override;
     virtual bool GetCurrentConnectedStatus() const override;
@@ -50,8 +49,10 @@ public:
 protected:
     bool StartEventRunner();
     void OnReconnect();
-    void StopOldEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
-    void StartNewEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
+    void StopOldEventHandler(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
+        std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
+    void StartNewEventHandler(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
+        std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
     bool AddFdListener(int32_t fd);
     bool DelFdListener(int32_t fd);
     void OnPacket(NetPacket& pkt);
@@ -67,7 +68,9 @@ protected:
     std::mutex mtx_;
     std::condition_variable cv_;
     std::thread recvThread_;
+    std::shared_ptr<IInputEventConsumer> inputEventConsumer_ = nullptr;
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ = nullptr;
+    bool isListening_ = false;
 };
 } // namespace MMI
 } // namespace OHOS

@@ -134,13 +134,13 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventCo
     CHKPV(inputEventConsumer);
     CHKPV(eventHandler);
     std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.InitClient()) {
-        MMI_HILOGE("Client init failed");
-        return;
-    }
-
-    MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    CHKPV(client);
+	MMIClientPtr client = MMIEventHdl.GetMMIClient();
+	if (client == nullptr) {
+		if (!MMIEventHdl.InitClient(inputEventConsumer, eventHandler)) {
+			MMI_HILOGE("Client init failed");
+		}
+		return;
+	}
     client->SwitchEventHandler(inputEventConsumer, eventHandler);
 }
 

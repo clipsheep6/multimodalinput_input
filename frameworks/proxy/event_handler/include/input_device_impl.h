@@ -21,7 +21,7 @@
 #include <mutex>
 #include <vector>
 
-#include "singleton.h"
+#include "nocopyable.h"
 
 #include "i_input_device_listener.h"
 #include "input_device.h"
@@ -29,11 +29,12 @@
 namespace OHOS {
 namespace MMI {
 class NetPacket;
-class InputDeviceImpl final {
-    DECLARE_SINGLETON(InputDeviceImpl);
+class InputDeviceImpl {
 
 public:
-    DISALLOW_MOVE(InputDeviceImpl);
+    static InputDeviceImpl& GetInstance();
+    DISALLOW_COPY_AND_MOVE(InputDeviceImpl);
+    ~InputDeviceImpl() = default;
 
     using FunInputDevInfo = std::function<void(std::shared_ptr<InputDevice>)>;
     using FunInputDevIds = std::function<void(std::vector<int32_t>&)>;
@@ -71,14 +72,14 @@ private:
     const DevKeys* GetDeviceKeys(int32_t) const;
     const DevKeyboardTypes* GetKeyboardTypes(int32_t) const;
 private:
+    InputDeviceImpl() = default;
     std::map<int32_t, InputDeviceData> inputDevices_;
     std::map<std::string, std::list<InputDevListenerPtr>> devListener_ = { { "change", {} } };
     int32_t userData_ { 0 };
     bool isListeningProcess_ { false };
     std::mutex mtx_;
 };
-
-#define InputDevImpl ::OHOS::Singleton<InputDeviceImpl>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
+#define InputDevImpl OHOS::MMI::InputDeviceImpl::GetInstance()
 #endif // OHOS_INPUT_DEVICE_EVENT_H

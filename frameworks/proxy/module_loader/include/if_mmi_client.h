@@ -37,6 +37,8 @@ public:
     virtual void OnRecvMsg(const char *buf, size_t size) = 0;
     virtual int32_t Reconnect() = 0;
     virtual void OnDisconnect() = 0;
+    virtual void SetEventHandler(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
+        std::shared_ptr<AppExecFwk::EventHandler> eventHandler) = 0;
     virtual void SwitchEventHandler(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
         std::shared_ptr<AppExecFwk::EventHandler> eventHandler) = 0;
 };

@@ -18,17 +18,19 @@
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
+#include "napi_constants.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceImpl"};
-const std::string CHANGED_TYPE = "change";
 } // namespace
 
-InputDeviceImpl::InputDeviceImpl() {}
-InputDeviceImpl::~InputDeviceImpl() {}
-
+InputDeviceImpl& InputDeviceImpl::GetInstance()
+{
+    static InputDeviceImpl instance;
+    return instance;
+}
 int32_t InputDeviceImpl::RegisterDevListener(const std::string &type, InputDevListenerPtr listener)
 {
     CALL_DEBUG_ENTER;

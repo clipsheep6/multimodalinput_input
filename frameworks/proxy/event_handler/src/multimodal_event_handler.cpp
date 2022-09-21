@@ -80,7 +80,8 @@ int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyE
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
-bool MultimodalEventHandler::InitClient()
+bool MultimodalEventHandler::InitClient(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
+    std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
 {
     CALL_DEBUG_ENTER;
     if (client_ != nullptr) {
@@ -88,6 +89,7 @@ bool MultimodalEventHandler::InitClient()
     }
     client_ = std::make_shared<MMIClient>();
     CHKPF(client_);
+    client_->SetEventHandler(inputEventConsumer, eventHandler);
     client_->RegisterConnectedFunction(&OnConnected);
     if (!(client_->Start())) {
         MMI_HILOGE("The client fails to start");
