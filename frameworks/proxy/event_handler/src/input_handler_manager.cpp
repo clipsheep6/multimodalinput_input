@@ -19,7 +19,6 @@
 
 #include "bytrace_adapter.h"
 #include "input_handler_type.h"
-#include "input_manager_impl.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
 #include "mmi_log.h"
@@ -181,7 +180,6 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEven
     CHKPV(pointerEvent);
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_INTERCEPT_EVENT);
-    int32_t consumerCount = 0;
     for (const auto &iter : inputHandlers_) {
         if ((iter.second.eventType_ & HANDLE_EVENT_TYPE_POINTER) != HANDLE_EVENT_TYPE_POINTER) {
             continue;
@@ -191,10 +189,8 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEven
         CHKPV(consumer);
         auto tempEvent = std::make_shared<PointerEvent>(*pointerEvent);
         CHKPV(tempEvent);
-		tempEvent->SetProcessedCallback(monitorCallback_);
+        tempEvent->SetProcessedCallback(monitorCallback_);
         consumer->OnInputEvent(tempEvent);
-        consumerCount++;
-        
         MMI_HILOGD("Pointer event id:%{public}d pointerId:%{public}d", handlerId, pointerEvent->GetPointerId());
     }
     int32_t tokenType = MultimodalInputConnMgr->GetTokenType();

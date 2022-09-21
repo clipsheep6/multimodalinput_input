@@ -15,7 +15,6 @@
 
 #include "input_device_cooperate_impl.h"
 
-#include "input_manager_impl.h"
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
