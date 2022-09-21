@@ -517,7 +517,7 @@ ohos_shared_library("libmmi-server") {
       "input_transformation/src/i_kernel_event_handler.cpp",
       "input_transformation/src/i_seat_manager.cpp",
       "input_transformation/src/i_touch_screen_seat.cpp",
-      "input_transformation/src/input_device.cpp",
+      "input_transformation/src/input_event_device.cpp",
       "input_transformation/src/kernel_event_base.cpp",
       "input_transformation/src/kernel_event_handler_bridge.cpp",
       "input_transformation/src/seat_manager.cpp",
