@@ -19,11 +19,15 @@
 #include <memory>
 #include <list>
 
-#include "i_input_device.h"
-#include "abs_event.h"
+#include "i_kernel_event_handler.h"
+// #include "LogicalDisplayState.h"
 
 namespace OHOS {
 namespace MMI {
+    
+    // class IInputContext;
+    class IInputDevice;
+
     class ISeat {
         public:
             static std::unique_ptr<ISeat> CreateInstance(const std::string& seatId);

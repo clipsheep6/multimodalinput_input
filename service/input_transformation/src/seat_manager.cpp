@@ -12,10 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+ 
+#include "seat_manager.h"
 
 #include <algorithm>
 
-#include "seat_manager.h"
 // #include "IInputContext.h"
 #include "i_input_device.h"
 #include "i_seat.h"

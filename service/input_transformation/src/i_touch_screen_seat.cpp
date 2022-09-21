@@ -14,6 +14,7 @@
  */
 
 #include "i_touch_screen_seat.h"
+
 // #include "Log.h"
 #include "mmi_log.h"
 

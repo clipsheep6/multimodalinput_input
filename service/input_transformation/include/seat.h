@@ -19,11 +19,13 @@
 #include <set>
 #include <memory>
 
-#include "abs_event_handler.h"
-#include "i_event_transformer.h"
-#include "i_input_define.h"
 #include "i_seat.h"
-#include "pointer_event.h"
+#include "i_input_define.h"
+// #include "RelEventHandler.h"
+// #include "KernelKeyEventHandler.h"
+#include "abs_event_handler.h"
+// #include "LogicalDisplayState.h"
+#include "i_event_transformer.h"
 
 namespace OHOS {
 namespace MMI {

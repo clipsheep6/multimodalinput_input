@@ -23,6 +23,7 @@
 
 namespace OHOS {
 namespace MMI {
+    // class IInputContext;
     // class PhysicalDisplayState;
     // class LogicalDisplayState;
 

@@ -13,9 +13,10 @@
  * limitations under the License.
  */
 
+#include "abs_event_collector.h"
+
 #include <linux/input.h>
 
-#include "abs_event_collector.h"
 #include "abs_event.h"
 #include "enum_utils.h"
 #include "time_utils.h"

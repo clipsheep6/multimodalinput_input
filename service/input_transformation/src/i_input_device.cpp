@@ -13,9 +13,10 @@
  * limitations under the License.
  */
 
+#include "i_input_device.h"
+
 #include <linux/input-event-codes.h>
 
-#include "i_input_device.h"
 #include "i_input_define.h"
 
 namespace OHOS {

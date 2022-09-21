@@ -14,6 +14,7 @@
  */
 
 #include "kernel_event_handler_bridge.h"
+
 // #include "Log.h"
 #include "mmi_log.h"
 

@@ -13,21 +13,22 @@
  * limitations under the License.
  */
 
-#include "time_utils.h"
+#ifndef I_EVENT_COLLECTOR_H
+#define I_EVENT_COLLECTOR_H
 
-#include <chrono>
+#include <memory>
+
+struct input_event;
 
 namespace OHOS {
 namespace MMI {
 
-int64_t TimeUtils::GetTimeStampMs() {
-    auto time = std::chrono::system_clock::now().time_since_epoch();
-    return std::chrono::duration_cast<std::chrono::milliseconds>(time).count();
-}
-
-int64_t TimeUtils::GetMonotonicTimeMs() {
-    auto time = std::chrono::steady_clock::now().time_since_epoch();
-    return std::chrono::duration_cast<std::chrono::milliseconds>(time).count();
-}
+    class IEventCollector {
+        public:
+            virtual ~IEventCollector() = default;
+            virtual bool HandleEvent(struct input_event* inputEvent) = 0;
+            virtual void TryReportEvent() = 0;
+    };
 } // namespace MMI
 } // namespace OHOS
+#endif // I_EVENT_COLLECTOR_H

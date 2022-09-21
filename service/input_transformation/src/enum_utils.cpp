@@ -13,12 +13,13 @@
  * limitations under the License.
  */
 
+#include "enum_utils.h"
+
 #include <string>
 
 #include <linux/input.h>
 #include <linux/input-event-codes.h>
 
-#include "enum_utils.h"
 #include "i_input_define.h"
 
 namespace OHOS {

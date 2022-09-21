@@ -12,16 +12,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "abs_event.h"
 
 #include <algorithm>
 
 #include <linux/input.h>
 
-#include "abs_event.h"
 #include "i_input_define.h"
 // #include "Log.h"
 #include "mmi_log.h"
-#include "stream_util.h"
+#include "stream_utils.h"
 
 namespace OHOS {
 namespace MMI {

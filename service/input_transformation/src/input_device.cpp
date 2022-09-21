@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "input_device.h"
 
 #include <iostream>
 #include <cstring>
@@ -29,14 +30,13 @@
 
 // #include "IEventLooper.h"
 // #include "Log.h"
-// #include "MMI_HILOGE.h"
-// #include "RelEvent.h"
-// #include "ResourceGuard.h"
-#include "enum_utils.h"
-#include "enum_utils.h"
-#include "input_device.h"
-#include "IoctlUtils.h"
 #include "mmi_log.h"
+#include "enum_utils.h"
+// #include "IoctlUtils.h"
+#include "time_utils.h"
+// #include "ResourceGuard.h"
+// #include "RelEvent.h"
+// #include "IdGenerator.h"
 
 namespace OHOS {
 namespace MMI {

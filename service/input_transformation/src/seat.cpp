@@ -13,13 +13,15 @@
  * limitations under the License.
  */
 
+#include "seat.h"
+
 #include <algorithm>
 
-#include "seat.h"
+// #include "IInputContext.h"
 #include "i_seat_manager.h"
 #include "i_input_device.h"
 // #include "IEventDispatcher.h"
-#include "i_input_device.h"
+// #include "IInputDevice.h"
 // #include "Log.h"
 #include "mmi_log.h"
 

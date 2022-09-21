@@ -13,14 +13,15 @@
  * limitations under the License.
  */
 
-// #include "IEventDispatcher.h"
+#include "touch_screen_seat.h"
+
 // #include "IInputContext.h"
 // #include "IWindowStateManager.h"
-// #include "Log.h"
-// #include "MMI_HILOGE.h"
+// #include "IEventDispatcher.h"
 // #include "PhysicalDisplayState.h"
+// #include "Utils.h"
+// #include "Log.h"
 #include "mmi_log.h"
-#include "touch_screen_seat.h"
 
 namespace OHOS {
 namespace MMI {

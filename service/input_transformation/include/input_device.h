@@ -22,9 +22,11 @@
 #include <linux/input-event-codes.h>
 #include <linux/input.h>
 
+
 #include "i_input_define.h"
 #include "i_input_device.h"
-// #include "IEventCollector.h"
+// #include "IInputContext.h"
+#include "i_event_collector.h"
 #include "i_seat.h"
 #include "i_touch_screen_seat.h"
 // #include "RelEventCollector.h"
@@ -39,6 +41,7 @@ namespace OHOS {
 namespace MMI {
 
 class IKernelEventHandler;
+// class IEventLooper;
 class InputDevice : public NonCopyable, public IInputDevice
 {
     // public:
