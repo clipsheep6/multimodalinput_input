@@ -50,8 +50,8 @@ public:
     void RemoveCooperationEvent(sptr<EventInfo> event);
     void OnCooperateMessage(CooperationMessage msg, const std::string &deviceId = "");
     void OnEnable(CooperationMessage msg, const std::string &deviceId = "");
-    void OnStart(CooperationMessage msg, const std::string &deviceId = "");
-    void OnStop(CooperationMessage msg, const std::string &deviceId = "");
+    int32_t OnStart(CooperationMessage msg, const std::string &deviceId = "");
+    int32_t OnStop(CooperationMessage msg, const std::string &deviceId = "");
     void OnGetState(bool state);
     void OnErrorMessage(EventType type, CooperationMessage msg);
 
@@ -61,7 +61,6 @@ private:
     void NotifyCooperateState(SessionPtr sess, MmiMessageId msgId, int32_t userData, bool state);
 
 private:
-    std::mutex lock_;
     std::list<sptr<EventInfo>> remoteCooperateCallbacks_;
     std::map<EventType, sptr<EventInfo>> cooperateCallbacks_ {
         {EventType::ENABLE, nullptr},

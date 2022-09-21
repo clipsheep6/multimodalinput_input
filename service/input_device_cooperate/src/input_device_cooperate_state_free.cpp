@@ -17,7 +17,6 @@
 
 #include "input_device_cooperate_sm.h"
 #include "input_device_manager.h"
-#include "mouse_event_normalize.h"
 #include "multimodal_input_connect_remoter.h"
 
 namespace OHOS {
@@ -45,17 +44,6 @@ int32_t InputDeviceCooperateStateFree::StartInputDeviceCooperate(
         MMI_HILOGE("Start input device cooperate fail");
         return ret;
     }
-    std::string taskName = "process_start_task";
-    std::function<void()> handleProcessStartFunc =
-        std::bind(&InputDeviceCooperateStateFree::ProcessStart, this, remoteNetworkId, startInputDeviceId);
-    CHKPR(eventHandler_, RET_ERR);
-    eventHandler_->PostTask(handleProcessStartFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
-    return RET_OK;
-}
-
-int32_t InputDeviceCooperateStateFree::ProcessStart(const std::string &remoteNetworkId, int32_t startInputDeviceId)
-{
-    CALL_DEBUG_ENTER;
     return PrepareAndStart(remoteNetworkId, startInputDeviceId);
 }
 } // namespace MMI

@@ -41,10 +41,12 @@ namespace MMI {
 class DistributedInputAdapter final {
     DECLARE_DELAYED_SINGLETON(DistributedInputAdapter);
 public:
+    using DelegateTasksCallback = std::function<int32_t(std::function<int32_t()>)>;
     using DInputCallback = std::function<void(bool)>;
     using MouseStateChangeCallback = std::function<void(uint32_t type, uint32_t code, int32_t value)>;
     DISALLOW_COPY_AND_MOVE(DistributedInputAdapter);
 
+    void Init(DelegateTasksCallback delegateTasksCallback);
     bool IsNeedFilterOut(const std::string &deviceId,
                          const DistributedHardware::DistributedInput::BusinessEvent &event);
 
@@ -71,8 +73,6 @@ public:
 
     int32_t RegisterEventCallback(MouseStateChangeCallback callback);
     int32_t UnregisterEventCallback(MouseStateChangeCallback callback);
-
-    bool IsTouchEventNeedFilterOut(uint32_t absX, uint32_t absY);
 
 private:
     enum class CallbackType {
@@ -152,12 +152,14 @@ private:
     void AddTimer(const CallbackType &type);
     void RemoveTimer(const CallbackType &type);
     void ProcessDInputCallback(CallbackType type, int32_t status);
-    void OnSimulationEvent(uint32_t type, uint32_t code, int32_t value);
+    int32_t OnDInputCallback(CallbackType type, int32_t status);
+    void ProcessSimulationEvent(uint32_t type, uint32_t code, int32_t value);
+    int32_t OnSimulationEvent(uint32_t type, uint32_t code, int32_t value);
     std::map<CallbackType, TimerInfo> watchingMap_;
     std::map<CallbackType, DInputCallback> callbackMap_;
     MouseStateChangeCallback mouseStateChangeCallback_ = { nullptr };
     sptr<MouseStateChangeCallbackImpl> mouseListener_ { nullptr };
-    std::mutex adapterLock_;
+    DelegateTasksCallback delegateTasksCallback_ { nullptr };
 };
 
 #define DistributedAdapter ::OHOS::DelayedSingleton<DistributedInputAdapter>::GetInstance()

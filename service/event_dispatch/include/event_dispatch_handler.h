@@ -59,7 +59,6 @@ public:
 
 private:
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    std::mutex lock_;
     std::vector<MouseState> mouseState_;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 };

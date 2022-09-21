@@ -46,16 +46,10 @@ int32_t InputDeviceCooperateStateOut::StopInputDeviceCooperate(const std::string
         MMI_HILOGE("Stop input device cooperate fail");
         return ret;
     }
-    std::string taskName = "process_stop_task";
-    std::function<void()> handleProcessStopFunc =
-        std::bind(&InputDeviceCooperateStateOut::ProcessStop, this, srcNetworkId);
-    CHKPR(eventHandler_, RET_ERR);
-    eventHandler_->PostTask(handleProcessStopFunc, taskName, 0,
-        AppExecFwk::EventQueue::Priority::HIGH);
-    return RET_OK;
+    return ProcessStop(srcNetworkId);
 }
 
-void InputDeviceCooperateStateOut::ProcessStop(const std::string& srcNetworkId)
+int32_t InputDeviceCooperateStateOut::ProcessStop(const std::string& srcNetworkId)
 {
     CALL_DEBUG_ENTER;
     std::string sink = InputDevMgr->GetOriginNetworkId(startDhid_);
@@ -66,17 +60,13 @@ void InputDeviceCooperateStateOut::ProcessStop(const std::string& srcNetworkId)
     if (ret != RET_OK) {
         InputDevCooSM->OnStopFinish(false, srcNetworkId);
     }
+    return ret;
 }
 
 void InputDeviceCooperateStateOut::OnStopRemoteInput(bool isSuccess, const std::string &srcNetworkId)
 {
     CALL_DEBUG_ENTER;
-    std::string taskName = "stop_finish_task";
-    std::function<void()> handleStopFinishFunc =
-        std::bind(&InputDeviceCooperateSM::OnStopFinish, InputDevCooSM, isSuccess, srcNetworkId);
-    CHKPV(eventHandler_);
-    eventHandler_->PostTask(handleStopFinishFunc, taskName, 0,
-        AppExecFwk::EventQueue::Priority::HIGH);
+    InputDevCooSM->OnStopFinish(isSuccess, srcNetworkId);
 }
 
 void InputDeviceCooperateStateOut::OnKeyboardOnline(const std::string &dhid)

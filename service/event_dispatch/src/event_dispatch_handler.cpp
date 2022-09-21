@@ -173,7 +173,6 @@ bool EventDispatchHandler::CheckPointerEvent(std::shared_ptr<PointerEvent> point
     CHKPF(pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
-        std::lock_guard<std::mutex> guard(lock_);
         if (!mouseState_.empty()) {
             if (pointerEvent->GetSourceType() == mouseState_[0].type &&
                 pointerEvent->GetButtonId() == mouseState_[0].code &&
@@ -190,7 +189,6 @@ bool EventDispatchHandler::CheckPointerEvent(std::shared_ptr<PointerEvent> point
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 void EventDispatchHandler::OnMouseStateChange(uint32_t type, uint32_t code, int32_t value)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     mouseState_.clear();
     MouseState state = {type, code, value};
     mouseState_.push_back(state);

@@ -32,7 +32,6 @@ void CooperateEventManager::AddCooperationEvent(sptr<EventInfo> event)
     if (event->type == EventType::LISTENER) {
         remoteCooperateCallbacks_.emplace_back(event);
     } else {
-        std::lock_guard<std::mutex> guard(lock_);
         cooperateCallbacks_[event->type] = event;
     }
 }
@@ -69,37 +68,35 @@ void CooperateEventManager::OnCooperateMessage(CooperationMessage msg, const std
 void CooperateEventManager::OnEnable(CooperationMessage msg, const std::string &deviceId)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(lock_);
     sptr<EventInfo> info = cooperateCallbacks_[EventType::ENABLE];
     CHKPV(info);
     NotifyCooperateMessage(info->sess, info->msgId, info->userData, deviceId, msg);
     cooperateCallbacks_[EventType::ENABLE] =  nullptr;
 }
 
-void CooperateEventManager::OnStart(CooperationMessage msg, const std::string &deviceId)
+int32_t CooperateEventManager::OnStart(CooperationMessage msg, const std::string &deviceId)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(lock_);
     sptr<EventInfo> info = cooperateCallbacks_[EventType::START];
-    CHKPV(info);
+    CHKPR(info, RET_ERR);
     NotifyCooperateMessage(info->sess, info->msgId, info->userData, deviceId, msg);
     cooperateCallbacks_[EventType::START] =  nullptr;
+    return RET_OK;
 }
 
-void CooperateEventManager::OnStop(CooperationMessage msg, const std::string &deviceId)
+int32_t CooperateEventManager::OnStop(CooperationMessage msg, const std::string &deviceId)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(lock_);
     sptr<EventInfo> info = cooperateCallbacks_[EventType::STOP];
-    CHKPV(info);
+    CHKPR(info, RET_ERR);
     NotifyCooperateMessage(info->sess, info->msgId, info->userData, deviceId, msg);
     cooperateCallbacks_[EventType::STOP] =  nullptr;
+    return RET_OK;
 }
 
 void CooperateEventManager::OnGetState(bool state)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(lock_);
     sptr<EventInfo> info = cooperateCallbacks_[EventType::STATE];
     CHKPV(info);
     NotifyCooperateState(info->sess, info->msgId, info->userData, state);
@@ -108,7 +105,6 @@ void CooperateEventManager::OnGetState(bool state)
 
 void CooperateEventManager::OnErrorMessage(EventType type, CooperationMessage msg)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     sptr<EventInfo> info = cooperateCallbacks_[type];
     CHKPV(info);
     NotifyCooperateMessage(info->sess, info->msgId, info->userData, "", msg);
