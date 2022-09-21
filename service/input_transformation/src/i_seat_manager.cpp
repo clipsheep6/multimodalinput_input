@@ -13,22 +13,11 @@
  * limitations under the License.
  */
 
-#include "i_event_handler.h"
-// #include "TouchPadEventTransformer.h"
-// #include "Log.h"
-#include "mmi_log.h"
+#include "i_seat_manager.h"
 
 namespace OHOS {
 namespace MMI {
 
-std::list<std::shared_ptr<IEventHandler>> IEventHandler::PrepareHandlers()
-{
-    std::list<std::shared_ptr<IEventHandler>> result;
-    // if (context == nullptr) {
-    //     return result;
-    // }
-
-    return result;
-}
+    const std::unique_ptr<ISeatManager> ISeatManager::NULL_VALUE;
 } // namespace MMI
 } // namespace OHOS

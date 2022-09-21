@@ -13,22 +13,28 @@
  * limitations under the License.
  */
 
-#include "i_event_handler.h"
-// #include "TouchPadEventTransformer.h"
-// #include "Log.h"
-#include "mmi_log.h"
+#include "i_kernel_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
 
-std::list<std::shared_ptr<IEventHandler>> IEventHandler::PrepareHandlers()
-{
-    std::list<std::shared_ptr<IEventHandler>> result;
-    // if (context == nullptr) {
-    //     return result;
-    // }
+    class DefaultHandler : public IKernelEventHandler {
+        // virtual void OnInputEvent(const std::shared_ptr<const RelEvent>& event) override
+        // {
+        // }
 
-    return result;
-}
+        // virtual void OnInputEvent(const std::shared_ptr<const KernelKeyEvent>& event) override
+        // {
+        // }
+
+        virtual void OnInputEvent(const std::shared_ptr<const AbsEvent>& event) override
+        {
+        }
+    };
+
+    const std::shared_ptr<IKernelEventHandler>& IKernelEventHandler::GetDefault() {
+        static std::shared_ptr<IKernelEventHandler> defaultHandler(new DefaultHandler());
+        return defaultHandler;
+    }
 } // namespace MMI
 } // namespace OHOS

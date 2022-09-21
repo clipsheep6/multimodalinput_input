@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,22 +13,21 @@
  * limitations under the License.
  */
 
-#include "i_event_handler.h"
-// #include "TouchPadEventTransformer.h"
-// #include "Log.h"
-#include "mmi_log.h"
+#include <chrono>
+
+#include "time_utils.h"
 
 namespace OHOS {
 namespace MMI {
 
-std::list<std::shared_ptr<IEventHandler>> IEventHandler::PrepareHandlers()
-{
-    std::list<std::shared_ptr<IEventHandler>> result;
-    // if (context == nullptr) {
-    //     return result;
-    // }
+    int64_t TimeUtils::GetTimeStampMs() {
+        auto time = std::chrono::system_clock::now().time_since_epoch();
+        return std::chrono::duration_cast<std::chrono::milliseconds>(time).count();
+    }
 
-    return result;
-}
+    int64_t TimeUtils::GetMonotonicTimeMs() {
+        auto time = std::chrono::steady_clock::now().time_since_epoch();
+        return std::chrono::duration_cast<std::chrono::milliseconds>(time).count();
+    }
 } // namespace MMI
 } // namespace OHOS
