@@ -70,58 +70,6 @@ private:
 InputManagerImpl::InputManagerImpl() {}
 InputManagerImpl::~InputManagerImpl() {}
 
-bool InputManagerImpl::InitEventHandler()
-{
-    CALL_DEBUG_ENTER;
-    if (mmiEventHandler_ != nullptr) {
-        MMI_HILOGE("Repeated initialization operations");
-        return false;
-    }
-
-    static constexpr int32_t timeout = 3;
-    std::unique_lock<std::mutex> lck(handleMtx_);
-    ehThread_ = std::thread(std::bind(&InputManagerImpl::OnThread, this));
-    ehThread_.detach();
-    if (cv_.wait_for(lck, std::chrono::seconds(timeout)) == std::cv_status::timeout) {
-        MMI_HILOGE("EventHandler thread start timeout");
-        return false;
-    }
-    return true;
-}
-
-MMIEventHandlerPtr InputManagerImpl::GetEventHandler() const
-{
-    CHKPP(mmiEventHandler_);
-    return mmiEventHandler_->GetSharedPtr();
-}
-
-EventHandlerPtr InputManagerImpl::GetCurrentEventHandler() const
-{
-    auto eventHandler = AppExecFwk::EventHandler::Current();
-    if (eventHandler == nullptr) {
-        eventHandler = GetEventHandler();
-    }
-    return eventHandler;
-}
-
-void InputManagerImpl::OnThread()
-{
-    CALL_DEBUG_ENTER;
-    CHK_PID_AND_TID();
-    std::shared_ptr<AppExecFwk::EventRunner> eventRunner = nullptr;
-    {
-        std::lock_guard<std::mutex> lck(handleMtx_);
-        SetThreadName("mmi_client_EventHdr");
-        mmiEventHandler_ = std::make_shared<MMIEventHandler>();
-        CHKPV(mmiEventHandler_);
-        eventRunner = mmiEventHandler_->GetEventRunner();
-        CHKPV(eventRunner);
-        cv_.notify_one();
-    }
-    CHKPV(eventRunner);
-    eventRunner->Run();
-}
-
 void InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
 {
     CALL_DEBUG_ENTER;
@@ -182,17 +130,18 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventCo
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
 {
     CALL_INFO_TRACE;
+    CHK_PID_AND_TID();
     CHKPV(inputEventConsumer);
+    CHKPV(eventHandler);
     std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.InitClient()) {
-        MMI_HILOGE("Client init failed");
-        return;
-    }
-    consumer_ = inputEventConsumer;
-    eventHandler_ = eventHandler;
-    if (eventHandler_ == nullptr) {
-        eventHandler_ = InputMgrImpl.GetCurrentEventHandler();
-    }
+	MMIClientPtr client = MMIEventHdl.GetMMIClient();
+	if (client == nullptr) {
+		if (!MMIEventHdl.InitClient(inputEventConsumer, eventHandler)) {
+			MMI_HILOGE("Client init failed");
+		}
+		return;
+	}
+    client->SwitchEventHandler(inputEventConsumer, eventHandler);
 }
 
 int32_t InputManagerImpl::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
@@ -222,60 +171,6 @@ void InputManagerImpl::UnsubscribeKeyEvent(int32_t subscriberId)
     MMI_HILOGW("Keyboard device does not support");
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
-
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-void InputManagerImpl::OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consumer,
-    std::shared_ptr<KeyEvent> keyEvent)
-{
-    CHK_PID_AND_TID();
-    CHKPV(consumer);
-    consumer->OnInputEvent(keyEvent);
-    MMI_HILOGD("Key event callback keyCode:%{public}d", keyEvent->GetKeyCode());
-}
-
-void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
-{
-    CHK_PID_AND_TID();
-    CHKPV(keyEvent);
-    CHKPV(eventHandler_);
-    CHKPV(consumer_);
-    std::lock_guard<std::mutex> guard(mtx_);
-    BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_DISPATCH_EVENT);
-    if (!MMIEventHandler::PostTask(eventHandler_,
-        std::bind(&InputManagerImpl::OnKeyEventTask, this, consumer_, keyEvent))) {
-        MMI_HILOGE("Post task failed");
-    }
-    MMI_HILOGD("Key event keyCode:%{public}d", keyEvent->GetKeyCode());
-}
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-void InputManagerImpl::OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer,
-    std::shared_ptr<PointerEvent> pointerEvent)
-{
-    CHK_PID_AND_TID();
-    CHKPV(consumer);
-    CHKPV(pointerEvent);
-    consumer->OnInputEvent(pointerEvent);
-    MMI_HILOGD("Pointer event callback pointerId:%{public}d", pointerEvent->GetPointerId());
-}
-
-void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
-{
-    CALL_DEBUG_ENTER;
-    CHK_PID_AND_TID();
-    CHKPV(pointerEvent);
-    CHKPV(eventHandler_);
-    CHKPV(consumer_);
-    std::lock_guard<std::mutex> guard(mtx_);
-    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_DISPATCH_EVENT);
-    if (!MMIEventHandler::PostTask(eventHandler_,
-        std::bind(&InputManagerImpl::OnPointerEventTask, this, consumer_, pointerEvent))) {
-        MMI_HILOGE("Post task failed");
-    }
-    MMI_HILOGD("Pointer event pointerId:%{public}d", pointerEvent->GetPointerId());
-}
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt)
 {
@@ -755,24 +650,12 @@ void InputManagerImpl::OnAnr(int32_t pid)
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
-    auto eventHandler = GetCurrentEventHandler();
-    CHKPV(eventHandler);
     std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHandler::PostTask(eventHandler,
-        std::bind(&InputManagerImpl::OnAnrTask, this, anrObservers_, pid))) {
-        MMI_HILOGE("Post task failed");
-    }
-    MMI_HILOGI("ANR noticed pid:%{public}d", pid);
-}
-
-void InputManagerImpl::OnAnrTask(std::vector<std::shared_ptr<IAnrObserver>> observers, int32_t pid)
-{
-    CALL_DEBUG_ENTER;
-    CHK_PID_AND_TID();
-    for (const auto &observer : observers) {
+    for (auto &observer : anrObservers_) {
         CHKPV(observer);
         observer->OnAnr(pid);
     }
+    MMI_HILOGI("ANR noticed pid:%{public}d", pid);
 }
 
 int32_t InputManagerImpl::SetInputDevice(const std::string &dhid, const std::string &screenId)

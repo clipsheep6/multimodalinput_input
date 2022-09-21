@@ -102,8 +102,9 @@ sptr<Rosen::Window> WindowUtilsTest::CreateWindow(const TestWindowInfo& info)
     option->SetTurnScreenOn(true);
     option->SetDisplayId(0);
     option->SetRequestedOrientation(info.orientation_);
-    if (info.parentId != Rosen::INVALID_WINDOW_ID) {
-        option->SetParentId(info.parentId);
+    option->SetMainHandlerAvailable(false);
+    if (info.parentName != "") {
+        option->SetParentName(info.parentName);
     }
     if (info.needAvoid) {
         option->AddWindowFlag(Rosen::WindowFlag::WINDOW_FLAG_NEED_AVOID);

@@ -17,6 +17,9 @@
 
 #include <functional>
 
+#include "event_handler.h"
+#include "i_input_event_consumer.h"
+
 namespace OHOS {
 namespace MMI {
 class NetPacket;
@@ -34,6 +37,10 @@ public:
     virtual void OnRecvMsg(const char *buf, size_t size) = 0;
     virtual int32_t Reconnect() = 0;
     virtual void OnDisconnect() = 0;
+    virtual void SetEventHandler(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
+        std::shared_ptr<AppExecFwk::EventHandler> eventHandler) = 0;
+    virtual void SwitchEventHandler(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
+        std::shared_ptr<AppExecFwk::EventHandler> eventHandler) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

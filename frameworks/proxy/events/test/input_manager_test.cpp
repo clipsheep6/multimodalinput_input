@@ -2939,7 +2939,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetWindowInputEventConsumer_001, Tes
         MMI_HILOGD("Create eventHandler is threadId:%{public}" PRIu64, runnerThreadId);
         ASSERT_TRUE(runnerThreadId != 0);
     };
-    eventHandler->PostSyncTask(fun, AppExecFwk::EventHandler::Priority::HIGH);
+    eventHandler->PostSyncTask(fun, AppExecFwk::EventHandler::Priority::IMMEDIATE);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     auto consumer = GetPtr<WindowEventConsumer>();
     ASSERT_TRUE(consumer != nullptr);
@@ -2965,7 +2965,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetWindowInputEventConsumer_001, Tes
 HWTEST_F(InputManagerTest, InputManagerTest_SetWindowInputEventConsumer_002, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    TestUtil->Init();
     const std::string threadTest = "threadNameTest";
     auto runner = AppExecFwk::EventRunner::Create(threadTest);
     ASSERT_TRUE(runner != nullptr);
@@ -2978,7 +2977,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetWindowInputEventConsumer_002, Tes
         MMI_HILOGD("Create eventHandler is threadId:%{public}" PRIu64, runnerThreadId);
         ASSERT_TRUE(runnerThreadId != 0);
     };
-    eventHandler->PostSyncTask(fun, AppExecFwk::EventHandler::Priority::HIGH);
+    eventHandler->PostSyncTask(fun, AppExecFwk::EventHandler::Priority::IMMEDIATE);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     auto consumer = GetPtr<WindowEventConsumer>();
     ASSERT_TRUE(consumer != nullptr);
