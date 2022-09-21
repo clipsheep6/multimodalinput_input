@@ -23,12 +23,12 @@ struct input_event;
 namespace OHOS {
 namespace MMI {
 
-    class IEventCollector {
-        public:
-            virtual ~IEventCollector() = default;
-            virtual bool HandleEvent(struct input_event* inputEvent) = 0;
-            virtual void TryReportEvent() = 0;
-    };
+class IEventCollector {
+public:
+    virtual ~IEventCollector() = default;
+    virtual bool HandleEvent(struct input_event* inputEvent) = 0;
+    virtual void TryReportEvent() = 0;
+};
 } // namespace MMI
 } // namespace OHOS
 #endif // I_EVENT_COLLECTOR_H

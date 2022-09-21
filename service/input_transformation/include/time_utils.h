@@ -19,11 +19,11 @@
 namespace OHOS {
 namespace MMI {
 
-    namespace TimeUtils
-    {
-        int64_t GetTimeStampMs();
-        int64_t GetMonotonicTimeMs();
-    };
+namespace TimeUtils
+{
+    int64_t GetTimeStampMs();
+    int64_t GetMonotonicTimeMs();
+};
 
 } // namespace MMI
 } // namespace OHOS

@@ -26,44 +26,44 @@
 namespace OHOS {
 namespace MMI {
 
-    // class IInputContext;
-    class SeatManager : public NonCopyable, public ISeatManager {
-        public:
-            static std::unique_ptr<SeatManager> CreateInstance();
-        public:
-            virtual ~SeatManager() = default;
+// class IInputContext;
+class SeatManager : public NonCopyable, public ISeatManager {
+public:
+    static std::unique_ptr<SeatManager> CreateInstance();
+public:
+    virtual ~SeatManager() = default;
 
-            virtual void OnInputDeviceAdded(const std::shared_ptr<IInputDevice>& inputDevice) override;
-            virtual void OnInputDeviceRemoved(const std::shared_ptr<IInputDevice>& inputDevice) override;
+    virtual void OnInputDeviceAdded(const std::shared_ptr<IInputDevice>& inputDevice) override;
+    virtual void OnInputDeviceRemoved(const std::shared_ptr<IInputDevice>& inputDevice) override;
 
-            // virtual void OnDisplayAdded(const std::shared_ptr<PhysicalDisplayState>& display) override;
-            // virtual void OnDisplayRemoved(const std::shared_ptr<PhysicalDisplayState>& display) override;
-            // virtual void OnDisplayChanged(const std::shared_ptr<PhysicalDisplayState>& display) override;
+    // virtual void OnDisplayAdded(const std::shared_ptr<PhysicalDisplayState>& display) override;
+    // virtual void OnDisplayRemoved(const std::shared_ptr<PhysicalDisplayState>& display) override;
+    // virtual void OnDisplayChanged(const std::shared_ptr<PhysicalDisplayState>& display) override;
 
-            // virtual void OnDisplayAdded(const std::shared_ptr<LogicalDisplayState>& display) override;
-            // virtual void OnDisplayRemoved(const std::shared_ptr<LogicalDisplayState>& display) override;
-            // virtual void OnDisplayChanged(const std::shared_ptr<LogicalDisplayState>& display) override;
+    // virtual void OnDisplayAdded(const std::shared_ptr<LogicalDisplayState>& display) override;
+    // virtual void OnDisplayRemoved(const std::shared_ptr<LogicalDisplayState>& display) override;
+    // virtual void OnDisplayChanged(const std::shared_ptr<LogicalDisplayState>& display) override;
 
-        private:
-            SeatManager();
+private:
+    SeatManager();
 
-            // std::shared_ptr<ITouchScreenSeat> FindTouchScreenSeat(const std::shared_ptr<PhysicalDisplayState>& display,
-            //         bool createIfNotExist);
-            std::shared_ptr<ITouchScreenSeat> FindTouchScreenSeat(const std::string& seatId, 
-                    const std::string& seatName, bool createIfNotExist);
+    // std::shared_ptr<ITouchScreenSeat> FindTouchScreenSeat(const std::shared_ptr<PhysicalDisplayState>& display,
+    //         bool createIfNotExist);
+    std::shared_ptr<ITouchScreenSeat> FindTouchScreenSeat(const std::string& seatId, 
+            const std::string& seatName, bool createIfNotExist);
 
-            std::shared_ptr<ISeat> FindSeat(std::string seatId, bool createIfNotExist);
+    std::shared_ptr<ISeat> FindSeat(std::string seatId, bool createIfNotExist);
 
-            void OnTouchScreenRemoved(const std::shared_ptr<IInputDevice>& inputDevice);
+    void OnTouchScreenRemoved(const std::shared_ptr<IInputDevice>& inputDevice);
 
-            void RemoveSeat(const std::shared_ptr<ISeat>& seat);
-            void RemoveSeat(const std::shared_ptr<ITouchScreenSeat>& seat);
+    void RemoveSeat(const std::shared_ptr<ISeat>& seat);
+    void RemoveSeat(const std::shared_ptr<ITouchScreenSeat>& seat);
 
-        private:
-            // const IInputContext* const context_;
-            std::list<std::shared_ptr<ISeat>> seats_;
-            std::list<std::shared_ptr<ITouchScreenSeat>> touchScreenSeats_;
-    };
+private:
+    // const IInputContext* const context_;
+    std::list<std::shared_ptr<ISeat>> seats_;
+    std::list<std::shared_ptr<ITouchScreenSeat>> touchScreenSeats_;
+};
 } // namespace MMI
 } // namespace OHOS
 #endif // SEAT_MANAGER_H

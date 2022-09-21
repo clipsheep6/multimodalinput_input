@@ -27,122 +27,122 @@
 namespace OHOS {
 namespace MMI {
 
-    template <typename T>
-    std::ostream& operator<<(std::ostream& outStream, const std::shared_ptr<T>& item) {
-        if (item) {
-            return item->operator<<(outStream);
+template <typename T>
+std::ostream& operator<<(std::ostream& outStream, const std::shared_ptr<T>& item) {
+    if (item) {
+        return item->operator<<(outStream);
+    }
+
+    return outStream << "(null)";
+}
+
+template <typename T>
+std::ostream& operator<<(std::ostream& outStream, const std::unique_ptr<T>& item) {
+    if (item) {
+        return item->operator<<(outStream);
+    }
+    return outStream << "(null)";
+}
+
+template <typename T1, typename T2>
+std::ostream& operator<<(std::ostream& outStream, const std::pair<T1, T2>& item) {
+    return outStream << item.first << ':' << item.second;
+}
+
+template <typename T1, typename T2>
+std::ostream& operator<<(std::ostream& outStream, const std::map<T1, T2>& items) {
+    outStream << '{';
+
+    bool isFirst = true;
+    for (const auto& item : items) {
+        if (isFirst) {
+            isFirst = false;
+        } else {
+            outStream << ',';
         }
-
-        return outStream << "(null)";
+        outStream << item;
     }
 
-    template <typename T>
-    std::ostream& operator<<(std::ostream& outStream, const std::unique_ptr<T>& item) {
-        if (item) {
-            return item->operator<<(outStream);
+    outStream << '}';
+    return outStream;
+}
+
+
+template <typename T>
+std::ostream& operator<<(std::ostream& outStream, const std::list<T>& items) {
+    outStream << '[';
+
+    bool isFirst = true;
+    for (const auto& item : items) {
+        if (isFirst) {
+            isFirst = false;
+        } else {
+            outStream << ',';
         }
-        return outStream << "(null)";
+        outStream << item;
     }
 
-    template <typename T1, typename T2>
-    std::ostream& operator<<(std::ostream& outStream, const std::pair<T1, T2>& item) {
-        return outStream << item.first << ':' << item.second;
-    }
+    outStream << ']';
 
-    template <typename T1, typename T2>
-    std::ostream& operator<<(std::ostream& outStream, const std::map<T1, T2>& items) {
-        outStream << '{';
+    return outStream;
+}
 
-        bool isFirst = true;
-        for (const auto& item : items) {
-            if (isFirst) {
-                isFirst = false;
-            } else {
-                outStream << ',';
-            }
-            outStream << item;
+template <typename T>
+std::ostream& operator<<(std::ostream& outStream, const std::vector<T>& items) {
+    outStream << '[';
+
+    bool isFirst = true;
+    for (const auto& item : items) {
+        if (isFirst) {
+            isFirst = false;
+        } else {
+            outStream << ',';
         }
-
-        outStream << '}';
-        return outStream;
+        outStream << item;
     }
 
+    outStream << ']';
 
-    template <typename T>
-    std::ostream& operator<<(std::ostream& outStream, const std::list<T>& items) {
-        outStream << '[';
+    return outStream;
+}
 
-        bool isFirst = true;
-        for (const auto& item : items) {
-            if (isFirst) {
-                isFirst = false;
-            } else {
-                outStream << ',';
-            }
-            outStream << item;
+template <typename T>
+std::ostream& operator<<(std::ostream& outStream, const std::deque<T>& items) {
+    outStream << '[';
+
+    bool isFirst = true;
+    for (const auto& item : items) {
+        if (isFirst) {
+            isFirst = false;
+        } else {
+            outStream << ',';
         }
-
-        outStream << ']';
-
-        return outStream;
+        outStream << item;
     }
 
-    template <typename T>
-    std::ostream& operator<<(std::ostream& outStream, const std::vector<T>& items) {
-        outStream << '[';
+    outStream << ']';
 
-        bool isFirst = true;
-        for (const auto& item : items) {
-            if (isFirst) {
-                isFirst = false;
-            } else {
-                outStream << ',';
-            }
-            outStream << item;
+    return outStream;
+}
+
+template <typename T>
+std::ostream& operator<<(std::ostream& outStream, const std::set<T>& items) {
+    outStream << '[';
+
+    bool isFirst = true;
+    for (const auto& item : items) {
+        if (isFirst) {
+            isFirst = false;
+        } else {
+            outStream << ',';
         }
-
-        outStream << ']';
-
-        return outStream;
+        outStream << item;
     }
 
-    template <typename T>
-    std::ostream& operator<<(std::ostream& outStream, const std::deque<T>& items) {
-        outStream << '[';
+    outStream << ']';
 
-        bool isFirst = true;
-        for (const auto& item : items) {
-            if (isFirst) {
-                isFirst = false;
-            } else {
-                outStream << ',';
-            }
-            outStream << item;
-        }
-
-        outStream << ']';
-
-        return outStream;
-    }
-
-    template <typename T>
-    std::ostream& operator<<(std::ostream& outStream, const std::set<T>& items) {
-        outStream << '[';
-
-        bool isFirst = true;
-        for (const auto& item : items) {
-            if (isFirst) {
-                isFirst = false;
-            } else {
-                outStream << ',';
-            }
-            outStream << item;
-        }
-
-        outStream << ']';
-
-        return outStream;
-    }
+    return outStream;
+}
 } // namespace MMI
 } // namespace OHOS
 #endif // STREAM_UTIL_H
