@@ -39,32 +39,32 @@ std::shared_ptr<const PointerEvent> AbsEventHandler::HandleEvent(const std::shar
     auto deviceId = absEvent->GetDeviceId();
     auto sourceType = ConvertSourceType(absEvent->GetSourceType());
     if (sourceType == PointerEvent::SOURCE_TYPE_NONE) {
-        LOG_E("Leave, ConvertSourceType Failed");
+        MMI_HILOGE("Leave, ConvertSourceType Failed");
         return PointerEvent::NULL_VALUE;
     }
 
     auto action = ConvertAction(absEvent->GetAction());
     if (action == PointerEvent::POINTER_ACTION_NONE) {
-        LOG_E("Leave, ConvertAction Failed");
+        MMI_HILOGE("Leave, ConvertAction Failed");
         return PointerEvent::NULL_VALUE;
     }
 
     auto pointerEvent = PointerEvent::CreateInstance(sourceType);
     if (!pointerEvent) {
-        LOG_E("Leave, null pointerEvent");
+        MMI_HILOGE("Leave, null pointerEvent");
         return PointerEvent::NULL_VALUE;
     }
 
     for (const auto& absEventPointer : absEvent->GetPointerList()) {
         auto pointer = ConvertPointer(absEventPointer);
         if (!pointer) {
-            LOG_E("Leave, ConvertPointer Failed");
+            MMI_HILOGE("Leave, ConvertPointer Failed");
             return PointerEvent::NULL_VALUE;
         }
         pointer->SetDeviceId(deviceId);
         auto retCode = pointerEvent->AddPointer(pointer);
         if (retCode < 0) {
-            LOG_E("Leave, AddPointer Failed");
+            MMI_HILOGE("Leave, AddPointer Failed");
             return PointerEvent::NULL_VALUE;
         }
     }
@@ -99,7 +99,7 @@ int32_t AbsEventHandler::ConvertSourceType(int32_t absEventSourceType) const
         return PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
     }
 
-    LOG_E("Leave, Invalid AbsEvent SourceType:$s", AbsEvent::SourceToString(absEventSourceType));
+    MMI_HILOGE("Leave, Invalid AbsEvent SourceType:$s", AbsEvent::SourceToString(absEventSourceType));
     return PointerEvent::POINTER_ACTION_NONE;
 }
 
@@ -124,7 +124,7 @@ std::shared_ptr<PointerEvent::PointerItem> AbsEventHandler::ConvertPointer(const
 {
     std::shared_ptr<PointerEvent::PointerItem> pointer;
     if (!absEventPointer) {
-        LOG_E("Leave, null absEventPointer");
+        MMI_HILOGE("Leave, null absEventPointer");
         return pointer;
     }
 

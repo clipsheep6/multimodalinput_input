@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include "seat_manager.h"
 
 #include <algorithm>
@@ -44,7 +44,7 @@ SeatManager::SeatManager() {
 }
 
 std::shared_ptr<ISeat> SeatManager::FindSeat(std::string seatId, bool createIfNotExist) {
-    LOG_D("Enter seatId:$s createIfNotExist:$s", seatId, createIfNotExist);
+    MMI_HILOGD("Enter seatId:$s createIfNotExist:$s", seatId, createIfNotExist);
 
     for (auto& seat : seats_) {
         if (seat->GetSeatId() == seatId) {
@@ -54,18 +54,18 @@ std::shared_ptr<ISeat> SeatManager::FindSeat(std::string seatId, bool createIfNo
 
     std::shared_ptr<ISeat> result;
     if (!createIfNotExist) {
-        LOG_D("Leave seatId:$s createIfNotExist:$s, Not Exist", seatId, createIfNotExist);
+        MMI_HILOGD("Leave seatId:$s createIfNotExist:$s, Not Exist", seatId, createIfNotExist);
         return result;
     }
 
     result = ISeat::CreateInstance(seatId);
     if (!result) {
-        LOG_E("Leave seatId:$s createIfNotExist:$s, Create Failed", seatId, createIfNotExist);
+        MMI_HILOGE("Leave seatId:$s createIfNotExist:$s, Create Failed", seatId, createIfNotExist);
         return result;
     }
 
     seats_.push_back(result);
-    LOG_D("Leave seatId:$s createIfNotExist:$s", seatId, createIfNotExist);
+    MMI_HILOGD("Leave seatId:$s createIfNotExist:$s", seatId, createIfNotExist);
     return result;
 }
 
@@ -73,7 +73,7 @@ std::shared_ptr<ISeat> SeatManager::FindSeat(std::string seatId, bool createIfNo
 //         bool createIfNotExist)
 // {
 //     if (!display) {
-//         LOG_E("Leave, null display");
+//         MMI_HILOGE("Leave, null display");
 //         return nullptr;
 //     }
 
@@ -83,7 +83,7 @@ std::shared_ptr<ISeat> SeatManager::FindSeat(std::string seatId, bool createIfNo
 std::shared_ptr<ITouchScreenSeat> SeatManager::FindTouchScreenSeat(const std::string& seatId, 
         const std::string& seatName, bool createIfNotExist)
 {
-    LOG_D("Enter seatId:$s seatName:$s createIfNotExist:$s", seatId, seatName, createIfNotExist);
+    MMI_HILOGD("Enter seatId:$s seatName:$s createIfNotExist:$s", seatId, seatName, createIfNotExist);
 
     for (auto& seat : touchScreenSeats_) {
         if (seat->GetSeatId() == seatId && seat->GetSeatName() == seatName) {
@@ -93,26 +93,26 @@ std::shared_ptr<ITouchScreenSeat> SeatManager::FindTouchScreenSeat(const std::st
 
     std::shared_ptr<ITouchScreenSeat> result;
     if (!createIfNotExist) {
-        LOG_D("Leave seatId:$s seatName:$s createIfNotExist:$s", seatId, seatName, createIfNotExist);
+        MMI_HILOGD("Leave seatId:$s seatName:$s createIfNotExist:$s", seatId, seatName, createIfNotExist);
         return result;
     }
 
     result = ITouchScreenSeat::CreateInstance(context_, seatId, seatName);
     if (!result) {
-        LOG_E("Leave seatId:$s seatName:$s createIfNotExist:$s, Create Failed", seatId, seatName, createIfNotExist);
+        MMI_HILOGE("Leave seatId:$s seatName:$s createIfNotExist:$s, Create Failed", seatId, seatName, createIfNotExist);
         return result;
     }
 
     touchScreenSeats_.push_back(result);
-    LOG_D("Leave seatId:$s seatName:$s createIfNotExist:$s", seatId, seatName, createIfNotExist);
+    MMI_HILOGD("Leave seatId:$s seatName:$s createIfNotExist:$s", seatId, seatName, createIfNotExist);
     return result;
 }
 
 void SeatManager::OnInputDeviceAdded(const std::shared_ptr<IInputDevice>& inputDevice)
 {
-    LOG_D("Enter");
+    MMI_HILOGD("Enter");
     if (!inputDevice) {
-        LOG_E("Leave, null inputDevice");
+        MMI_HILOGE("Leave, null inputDevice");
         return;
     }
 
@@ -123,14 +123,14 @@ void SeatManager::OnInputDeviceAdded(const std::shared_ptr<IInputDevice>& inputD
     if (inputDevice->HasCapability(IInputDevice::CAPABILITY_TOUCHSCREEN)) {
         touchScreenSeat = FindTouchScreenSeat(seatId, seatName, true);
         if (!touchScreenSeat) {
-            LOG_E("Leave, null touchScreenSeat");
+            MMI_HILOGE("Leave, null touchScreenSeat");
             return;
         }
 
         auto retCode = touchScreenSeat->BindInputDevice(inputDevice);
         if (retCode < 0) {
             RemoveSeat(touchScreenSeat);
-            LOG_E("Leave, BindInputDevice Failed");
+            MMI_HILOGE("Leave, BindInputDevice Failed");
             return;
         }
     }
@@ -141,7 +141,7 @@ void SeatManager::OnInputDeviceAdded(const std::shared_ptr<IInputDevice>& inputD
             touchScreenSeat->UnbindInputDevice(inputDevice);
             RemoveSeat(touchScreenSeat);
         }
-        LOG_E("Leave, null seat");
+        MMI_HILOGE("Leave, null seat");
         return;
     }
 
@@ -151,7 +151,7 @@ void SeatManager::OnInputDeviceAdded(const std::shared_ptr<IInputDevice>& inputD
             touchScreenSeat->UnbindInputDevice(inputDevice);
             RemoveSeat(touchScreenSeat);
         }
-        LOG_E("Leave, seat AddInputDevice Failed");
+        MMI_HILOGE("Leave, seat AddInputDevice Failed");
         return;
     }
 
@@ -164,103 +164,103 @@ void SeatManager::OnInputDeviceAdded(const std::shared_ptr<IInputDevice>& inputD
 
         seat->RemoveInputDevice(inputDevice);
         RemoveSeat(seat);
-        LOG_E("Leave, null bridge handler");
+        MMI_HILOGE("Leave, null bridge handler");
         return;
     }
 
     inputDevice->StartReceiveEvents(handler);
 
-    LOG_D("Leave");
+    MMI_HILOGD("Leave");
 }
 
 void SeatManager::OnInputDeviceRemoved(const std::shared_ptr<IInputDevice>& inputDevice)
 {
-    LOG_D("Enter");
+    MMI_HILOGD("Enter");
     if (!inputDevice) {
-        LOG_E("Leave");
+        MMI_HILOGE("Leave");
         return;
     }
 
     auto seat = FindSeat(inputDevice->GetSeatId(), false);
     if (!seat) {
-        LOG_W("Leave, null seat");
+        MMI_HILOGW("Leave, null seat");
     } else {
         auto retCode = seat->RemoveInputDevice(inputDevice);
         if (retCode < 0) {
-            LOG_W("Leave, seat RemoveInputDevice Failed");
+            MMI_HILOGW("Leave, seat RemoveInputDevice Failed");
         }
         RemoveSeat(seat);
     }
 
     auto retCode = inputDevice->StopReceiveEvents();
     if (retCode < 0) {
-        LOG_W("Leave, inputDevice StopReceiveEvents Failed");
+        MMI_HILOGW("Leave, inputDevice StopReceiveEvents Failed");
     }
 
-    LOG_D("Leave");
+    MMI_HILOGD("Leave");
 }
 
 // void SeatManager::OnDisplayAdded(const std::shared_ptr<PhysicalDisplayState>& display)
 // {
-//     LOG_D("Enter display:$s", display);
+//     MMI_HILOGD("Enter display:$s", display);
 //     auto seat = FindTouchScreenSeat(display, true);
 //     if (!seat) {
-//         LOG_E("Leave, null seat");
+//         MMI_HILOGE("Leave, null seat");
 //         return;
 //     }
 //     auto retCode = seat->BindDisplay(display);
 //     if (retCode < 0) {
 //         RemoveSeat(seat);
-//         LOG_E("Leave, BindDisplay Failed");
+//         MMI_HILOGE("Leave, BindDisplay Failed");
 //         return;
 //     }
 
-//     LOG_D("Leave");
+//     MMI_HILOGD("Leave");
 // }
 
 // void SeatManager::OnDisplayRemoved(const std::shared_ptr<PhysicalDisplayState>& display)
 // {
-//     LOG_D("Enter display:$s", display);
+//     MMI_HILOGD("Enter display:$s", display);
 //     auto seat = FindTouchScreenSeat(display, false);
 //     if (!seat) {
-//         LOG_E("Leave, null seat");
+//         MMI_HILOGE("Leave, null seat");
 //         return;
 //     }
 
 //     auto retCode = seat->UnbindDisplay(display);
 //     if (retCode < 0) {
-//         LOG_E("Leave, BindDisplay Failed");
+//         MMI_HILOGE("Leave, BindDisplay Failed");
 //         return;
 //     }
 
 //     RemoveSeat(seat);
 
-//     LOG_D("Leave");
+//     MMI_HILOGD("Leave");
 // }
 
 // void SeatManager::OnDisplayChanged(const std::shared_ptr<PhysicalDisplayState>& display)
 // {
-//     LOG_D("Enter display:$s", display);
+//     MMI_HILOGD("Enter display:$s", display);
 //     auto seat = FindTouchScreenSeat(display, false);
 //     if (!seat) {
-//         LOG_E("Leave, null seat");
+//         MMI_HILOGE("Leave, null seat");
 //         return;
 //     }
 
 //     auto retCode = seat->UpdateDisplay(display);
 //     if (retCode < 0) {
-//         LOG_E("Leave, UpdateDisplay Failed");
+//         MMI_HILOGE("Leave, UpdateDisplay Failed");
 //         return;
 //     }
 
-//     LOG_D("Leave");
+//     MMI_HILOGD("Leave");
 // }
 
 // void SeatManager::OnDisplayAdded(const std::shared_ptr<LogicalDisplayState>& display)
 // {
-//     LOG_D("Enter display:$s", display);
+//     MMI_HILOGD("Enter display:$s", display);
 //     if (!display) {
-//         LOG_E("Leave, null display");
+//         MMI_HILOGE("Leave, null display");
 //         return;
 //     }
 
@@ -270,25 +270,25 @@ void SeatManager::OnInputDeviceRemoved(const std::shared_ptr<IInputDevice>& inpu
 
 //     auto seat = FindSeat(display->GetSeatId(), true);
 //     if (!seat) {
-//         LOG_E("Leave, null seat");
+//         MMI_HILOGE("Leave, null seat");
 //         return;
 //     }
 
 //     auto retCode = seat->AddDisplay(display);
 //     if (retCode < 0) {
 //         RemoveSeat(seat);
-//         LOG_E("Leave, seat AddDisplay Failed");
+//         MMI_HILOGE("Leave, seat AddDisplay Failed");
 //         return;
 //     }
 
-//     LOG_D("Leave");
+//     MMI_HILOGD("Leave");
 // }
 
 // void SeatManager::OnDisplayRemoved(const std::shared_ptr<LogicalDisplayState>& display)
 // {
-//     LOG_D("Enter display:$s", display);
+//     MMI_HILOGD("Enter display:$s", display);
 //     if (!display) {
-//         LOG_E("Leave, null display");
+//         MMI_HILOGE("Leave, null display");
 //         return;
 //     }
 
@@ -298,24 +298,24 @@ void SeatManager::OnInputDeviceRemoved(const std::shared_ptr<IInputDevice>& inpu
 
 //     auto seat = FindSeat(display->GetSeatId(), false);
 //     if (!seat) {
-//         LOG_E("Leave, null seat");
+//         MMI_HILOGE("Leave, null seat");
 //         return;
 //     }
 
 //     auto retCode = seat->RemoveDisplay(display);
 //     if (retCode < 0) {
-//         LOG_E("Leave, seat RemoveDisplay Failed");
+//         MMI_HILOGE("Leave, seat RemoveDisplay Failed");
 //         return;
 //     }
 
-//     LOG_D("Leave");
+//     MMI_HILOGD("Leave");
 // }
 
 // void SeatManager::OnDisplayChanged(const std::shared_ptr<LogicalDisplayState>& display)
 // {
-//     LOG_D("Enter display:$s", display);
+//     MMI_HILOGD("Enter display:$s", display);
 //     if (!display) {
-//         LOG_E("Leave, null display");
+//         MMI_HILOGE("Leave, null display");
 //         return;
 //     }
 
@@ -325,24 +325,24 @@ void SeatManager::OnInputDeviceRemoved(const std::shared_ptr<IInputDevice>& inpu
 
 //     auto seat = FindSeat(display->GetSeatId(), false);
 //     if (!seat) {
-//         LOG_E("Leave, null seat");
+//         MMI_HILOGE("Leave, null seat");
 //         return;
 //     }
 
 //     auto retCode = seat->UpdateDisplay(display);
 //     if (retCode < 0) {
-//         LOG_E("Leave, seat AddDisplay Failed");
+//         MMI_HILOGE("Leave, seat AddDisplay Failed");
 //         return;
 //     }
 
-//     LOG_D("Leave");
+//     MMI_HILOGD("Leave");
 // }
 
 void SeatManager::OnTouchScreenRemoved(const std::shared_ptr<IInputDevice>& inputDevice)
 {
-    LOG_D("Enter");
+    MMI_HILOGD("Enter");
     if (!inputDevice) {
-        LOG_E("Leave, null inputDevice");
+        MMI_HILOGE("Leave, null inputDevice");
         return;
     }
 
@@ -351,17 +351,17 @@ void SeatManager::OnTouchScreenRemoved(const std::shared_ptr<IInputDevice>& inpu
 
     auto seat = FindTouchScreenSeat(seatId, seatName, false);
     if (!seat) {
-        LOG_E("Leave, no seat");
+        MMI_HILOGE("Leave, no seat");
         return;
     }
 
     auto retCode = seat->UnbindInputDevice(inputDevice);
     if (retCode < 0) {
-        LOG_E("Leave, BindInputDevice Failed");
+        MMI_HILOGE("Leave, BindInputDevice Failed");
         return;
     }
 
-    LOG_D("Leave");
+    MMI_HILOGD("Leave");
 }
 
 void SeatManager::RemoveSeat(const std::shared_ptr<ISeat>& seat)

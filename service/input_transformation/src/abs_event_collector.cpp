@@ -33,7 +33,7 @@ AbsEventCollector::AbsEventCollector(int32_t deviceId, int32_t sourceType)
 }
 
 const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleAbsEvent(int32_t code, int32_t value) {
-    LOG_D("Enter code:$s value:$s", EnumUtils::InputEventAbsCodeToString(code), value);
+    MMI_HILOGD("Enter code:$s value:$s", EnumUtils::InputEventAbsCodeToString(code), value);
 
     RemoveReleasedPointer();
 
@@ -65,14 +65,14 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleAbsEvent(int32_t code,
             break;
     }
 
-    LOG_D("Leave code:$s value:$s", EnumUtils::InputEventAbsCodeToString(code), value);
+    MMI_HILOGD("Leave code:$s value:$s", EnumUtils::InputEventAbsCodeToString(code), value);
     return AbsEvent::NULL_VALUE;
 }
 
 const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleSyncEvent(int32_t code, int32_t value) {
-    LOG_D("Enter code:$s value:$s", EnumUtils::InputEventSynCodeToString(code), value);
+    MMI_HILOGD("Enter code:$s value:$s", EnumUtils::InputEventSynCodeToString(code), value);
     const auto& absEvent = FinishPointer();
-    LOG_D("Leave code:$s value:$s absEvent:$s", EnumUtils::InputEventSynCodeToString(code), value, absEvent);
+    MMI_HILOGD("Leave code:$s value:$s absEvent:$s", EnumUtils::InputEventSynCodeToString(code), value, absEvent);
     return absEvent;
 }
 
@@ -81,7 +81,7 @@ void AbsEventCollector::AfterProcessed() {
 }
 
 int32_t AbsEventCollector::SetSourceType(int32_t sourceType) {
-    LOG_D("Enter, sourceType_:$s, sourceType:$s", 
+    MMI_HILOGD("Enter, sourceType_:$s, sourceType:$s", 
             AbsEvent::SourceToString(sourceType_),
             AbsEvent::SourceToString(sourceType));
 
@@ -95,7 +95,7 @@ int32_t AbsEventCollector::SetSourceType(int32_t sourceType) {
     sourceType_ = sourceType;
     absEvent_->SetSourceType(sourceType_);
 
-    LOG_D("Leave, sourceType_:$0, sourceType:$1", 
+    MMI_HILOGD("Leave, sourceType_:$0, sourceType:$1", 
             AbsEvent::SourceToString(sourceType_),
             AbsEvent::SourceToString(sourceType));
     return 0;
@@ -103,7 +103,7 @@ int32_t AbsEventCollector::SetSourceType(int32_t sourceType) {
 
 std::shared_ptr<AbsEvent::Pointer> AbsEventCollector::GetCurrentPointer(bool createIfNotExist) {
     if (curSlot_ < 0) {
-        LOG_E("Leave, curSlot_ < 0");
+        MMI_HILOGE("Leave, curSlot_ < 0");
         return nullptr;
     }
 
@@ -118,7 +118,7 @@ std::shared_ptr<AbsEvent::Pointer> AbsEventCollector::GetCurrentPointer(bool cre
     }
 
     if (!createIfNotExist) {
-        LOG_E("Leave, null pointer and !createIfNotExist");
+        MMI_HILOGE("Leave, null pointer and !createIfNotExist");
         return nullptr;
     }
 
@@ -128,9 +128,9 @@ std::shared_ptr<AbsEvent::Pointer> AbsEventCollector::GetCurrentPointer(bool cre
 }
 
 const std::shared_ptr<AbsEvent>& AbsEventCollector::FinishPointer() {
-    LOG_D("Enter");
+    MMI_HILOGD("Enter");
     if (!curPointer_) {
-        LOG_D("Leave");
+        MMI_HILOGD("Leave");
         return AbsEvent::NULL_VALUE;
     }
 
@@ -142,7 +142,7 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::FinishPointer() {
             curPointer_->SetId(nextId_++);
             auto retCode = absEvent_->AddPointer(curPointer_);
             if (retCode < 0) {
-                LOG_E("Leave, absAction:$s AddPointer Failed", AbsEvent::ActionToString(action));
+                MMI_HILOGE("Leave, absAction:$s AddPointer Failed", AbsEvent::ActionToString(action));
                 return AbsEvent::NULL_VALUE;
             }
             curPointer_->SetDownTime(nowTime);
@@ -150,7 +150,7 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::FinishPointer() {
         }
     } else if (action == AbsEvent::ACTION_UP) {
         if (curPointer_->GetId() < 0) {
-            LOG_E("Leave, absAction:$s id < 0 on up", AbsEvent::ActionToString(action));
+            MMI_HILOGE("Leave, absAction:$s id < 0 on up", AbsEvent::ActionToString(action));
             return AbsEvent::NULL_VALUE;
         }
 
@@ -165,7 +165,7 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::FinishPointer() {
     absEvent_->SetAction(action);
     absEvent_->SetActionTime(nowTime);
 
-    LOG_D("Leave, absAction:$s", AbsEvent::ActionToString(action));
+    MMI_HILOGD("Leave, absAction:$s", AbsEvent::ActionToString(action));
     return absEvent_;
 }
 
@@ -179,7 +179,7 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleMtSlot(int32_t value)
     curSlot_ = value;
     curPointer_ = AbsEvent::Pointer::NULL_VALUE;
     absEventAction_ = AbsEvent::ACTION_NONE;
-    LOG_D("Reset curPointer_");
+    MMI_HILOGD("Reset curPointer_");
     return absEvent;
 }
 
@@ -187,7 +187,7 @@ void AbsEventCollector::HandleMtPositionX(int32_t value)
 {
     auto pointer = GetCurrentPointer(true);
     if (!pointer) {
-        LOG_E("Leave, null pointer");
+        MMI_HILOGE("Leave, null pointer");
         return;
     }
 
@@ -199,7 +199,7 @@ void AbsEventCollector::HandleMtPositionY(int32_t value)
 {
     auto pointer = GetCurrentPointer(true);
     if (!pointer) {
-        LOG_E("Leave, null pointer");
+        MMI_HILOGE("Leave, null pointer");
         return;
     }
 
@@ -210,7 +210,7 @@ void AbsEventCollector::HandleMtPositionY(int32_t value)
 const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleMtTrackingId(int32_t value)
 {
     if (value < 0) {
-        LOG_F("MT_TRACKING_ID -1");
+        MMI_HILOGF("MT_TRACKING_ID -1");
         absEventAction_ = AbsEvent::ACTION_UP;
         return FinishPointer();
     }
@@ -226,13 +226,13 @@ void AbsEventCollector::RemoveReleasedPointer()
     absEvent_->SetAction(AbsEvent::ACTION_NONE);
     const auto& pointer = absEvent_->GetPointer();
     if (!pointer) {
-        LOG_E("Leave, null pointer");
+        MMI_HILOGE("Leave, null pointer");
         return;
     }
 
     auto retCode = absEvent_->RemovePointer(pointer);
     if (retCode < 0) {
-        LOG_E("Leave, null pointer failed");
+        MMI_HILOGE("Leave, null pointer failed");
         return;
     }
 

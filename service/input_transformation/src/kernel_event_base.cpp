@@ -39,7 +39,7 @@ int64_t KernelEventBase::GetActionTime() const {
 }
 
 void KernelEventBase::SetAction(int32_t action) {
-    LOG_D("action:$s, action_:$s", ActionToStr(action),
+    MMI_HILOGD("action:$s, action_:$s", ActionToStr(action),
             ActionToStr(action_));
     action_ = action;
 }

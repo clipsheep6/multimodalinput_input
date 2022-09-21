@@ -42,37 +42,37 @@ TouchScreenSeat::TouchScreenSeat(const std::string& seatId,
 
 int32_t TouchScreenSeat::BindInputDevice(const std::shared_ptr<IInputDevice>& inputDevice)
 {
-    LOG_D("Enter");
+    MMI_HILOGD("Enter");
     if (!inputDevice) {
-        LOG_E("Leave, null InputDevice");
+        MMI_HILOGE("Leave, null InputDevice");
         return -1;
     }
 
     auto inputDeviceId = inputDevice->GetId();
     if (inputDeviceId < 0) {
-        LOG_E("Leave, inputDeviceId < 0");
+        MMI_HILOGE("Leave, inputDeviceId < 0");
         return -1;
     }
 
     std::shared_ptr<IInputDevice::AxisInfo> xInfo = inputDevice->GetAxisInfo(IInputDevice::AXIS_MT_X);
     if (!xInfo) {
-        LOG_E("Leave, null AxisInfo Of AXIS_MT_X");
+        MMI_HILOGE("Leave, null AxisInfo Of AXIS_MT_X");
         return -1;
     }
 
     if (xInfo->GetMinimum() >= xInfo->GetMaximum()) {
-        LOG_E("Leave, xInfo->GetMinimum():$s >= xInfo->GetMaximum():$s", xInfo->GetMinimum(), xInfo->GetMaximum());
+        MMI_HILOGE("Leave, xInfo->GetMinimum():$s >= xInfo->GetMaximum():$s", xInfo->GetMinimum(), xInfo->GetMaximum());
         return -1;
     }
 
     std::shared_ptr<IInputDevice::AxisInfo> yInfo = inputDevice->GetAxisInfo(IInputDevice::AXIS_MT_Y);
     if (!yInfo) {
-        LOG_E("Leave, null AxisInfo Of AXIS_MT_Y");
+        MMI_HILOGE("Leave, null AxisInfo Of AXIS_MT_Y");
         return -1;
     }
 
     if (yInfo->GetMinimum() >= yInfo->GetMaximum()) {
-        LOG_E("Leave, yInfo->GetMinimum():$s >= yInfo->GetMaximum():$s", yInfo->GetMinimum(), yInfo->GetMaximum());
+        MMI_HILOGE("Leave, yInfo->GetMinimum():$s >= yInfo->GetMaximum():$s", yInfo->GetMinimum(), yInfo->GetMaximum());
         return -1;
     }
 
@@ -80,21 +80,21 @@ int32_t TouchScreenSeat::BindInputDevice(const std::shared_ptr<IInputDevice>& in
     xInfo_ = xInfo;
     yInfo_ = yInfo;
     
-    LOG_D("Leave, inputDeviceId:$s xInfo:$s, yInfo:$s", inputDeviceId, xInfo, yInfo);
+    MMI_HILOGD("Leave, inputDeviceId:$s xInfo:$s, yInfo:$s", inputDeviceId, xInfo, yInfo);
     return 0;
 }
 
 int32_t TouchScreenSeat::UnbindInputDevice(const std::shared_ptr<IInputDevice>& inputDevice)
 {
-    LOG_D("Enter");
+    MMI_HILOGD("Enter");
     if (inputDevice != inputDevice_) {
-        LOG_E("Leave, inputDevice != inputDevice_");
+        MMI_HILOGE("Leave, inputDevice != inputDevice_");
         return -1;
     }
 
     inputDevice_.reset();
     targetDisplays_.clear();
-    LOG_D("Leave");
+    MMI_HILOGD("Leave");
     return 0;
 }
 
@@ -105,57 +105,57 @@ std::shared_ptr<IInputDevice> TouchScreenSeat::GetInputDevice() const
 
 void TouchScreenSeat::OnInputEvent(const std::shared_ptr<const AbsEvent>& event)
 {
-    LOG_D("Enter absEvent:$s", event);
+    MMI_HILOGD("Enter absEvent:$s", event);
 
     std::shared_ptr<const LogicalDisplayState> targetDisplay;
     int32_t pointerAction = PointerEvent::POINTER_ACTION_NONE;
     int64_t actionTime = 0;
     auto pointer = ConvertPointer(event, pointerAction, actionTime, targetDisplay);
     if (!pointer) {
-        LOG_E("Leave ConvertPointer Failed");
+        MMI_HILOGE("Leave ConvertPointer Failed");
         return;
     }
 
     auto retCode = DispatchTo(targetDisplay, pointerAction, actionTime,  pointer);
     if (retCode < 0) {
-        LOG_E("Leave, Dispatch Failed");
+        MMI_HILOGE("Leave, Dispatch Failed");
         return;
     }
 
-    LOG_D("Leave, targetDisplayId:$s, pointerAction:$s, pointer:$s", targetDisplay->GetId(), 
+    MMI_HILOGD("Leave, targetDisplayId:$s, pointerAction:$s, pointer:$s", targetDisplay->GetId(), 
             PointerEvent::ActionToString(pointerAction), pointer);
 }
 
 int32_t TouchScreenSeat::BindDisplay(const std::shared_ptr<PhysicalDisplayState>& display)
 {
-    LOG_D("Enter");
+    MMI_HILOGD("Enter");
 
     if (!display) {
-        LOG_E("Leave, null display");
+        MMI_HILOGE("Leave, null display");
         return -1;
     }
 
     if (display_) {
-        LOG_E("Leave, nonnull display_");
+        MMI_HILOGE("Leave, nonnull display_");
         return -1;
     }
 
     if (display->GetSeatId() != seatId_ || display->GetSeatName() != seatName_) {
-        LOG_E("Leave, seatId,seatName Mismatch");
+        MMI_HILOGE("Leave, seatId,seatName Mismatch");
         return -1;
     }
 
     display_ = display;
-    LOG_D("Leave");
+    MMI_HILOGD("Leave");
     return 0;
 }
 
 // int32_t TouchScreenSeat::UnbindDisplay(const std::shared_ptr<PhysicalDisplayState>& display)
 // {
-//     LOG_D("Enter");
+//     MMI_HILOGD("Enter");
 
 //     if (!display) {
-//         LOG_E("Leave, null display");
+//         MMI_HILOGE("Leave, null display");
 //         return -1;
 //     }
 
@@ -164,16 +164,16 @@ int32_t TouchScreenSeat::BindDisplay(const std::shared_ptr<PhysicalDisplayState>
 //     }
 
 //     display_.reset();
-//     LOG_D("Leave");
+//     MMI_HILOGD("Leave");
 //     return 0;
 // }
 
 // int32_t TouchScreenSeat::UpdateDisplay(const std::shared_ptr<PhysicalDisplayState>& display)
 // {
-//     LOG_D("Enter");
+//     MMI_HILOGD("Enter");
 
 //     if (!display) {
-//         LOG_E("Leave, null display");
+//         MMI_HILOGE("Leave, null display");
 //         return -1;
 //     }
 
@@ -185,7 +185,7 @@ int32_t TouchScreenSeat::BindDisplay(const std::shared_ptr<PhysicalDisplayState>
 //         targetDisplays_.clear();
 //     }
 
-//     LOG_D("Leave");
+//     MMI_HILOGD("Leave");
 //     return 0;
 // }
 
@@ -207,17 +207,17 @@ const std::string& TouchScreenSeat::GetSeatName() const
 int32_t TouchScreenSeat::TransformToPhysicalDisplayCoordinate(int32_t tpX, int32_t tpY, int32_t& displayX, int32_t& displayY) const
 {
     if (!xInfo_) {
-        LOG_E("Leave, null xInfo_");
+        MMI_HILOGE("Leave, null xInfo_");
         return -1;
     }
 
     if (!yInfo_) {
-        LOG_E("Leave, null yInfo_");
+        MMI_HILOGE("Leave, null yInfo_");
         return -1;
     }
 
     if (!display_) {
-        LOG_E("Leave, null display_");
+        MMI_HILOGE("Leave, null display_");
         return -1;
     }
 
@@ -229,7 +229,7 @@ int32_t TouchScreenSeat::TransformToPhysicalDisplayCoordinate(int32_t tpX, int32
     int32_t height = yInfo_->GetMaximum() - yInfo_->GetMinimum() + 1;
     displayY = display_->TransformY(deltaY, height);
 
-    LOG_D("Leave");
+    MMI_HILOGD("Leave");
     return 0;
 }
 
@@ -242,24 +242,24 @@ bool TouchScreenSeat::IsEmpty() const
 //                 int32_t pointerAction, int64_t actionTime, std::shared_ptr<PointerEvent::PointerItem>& pointer)
 // {
 //     if (!targetDisplay) {
-//         LOG_E("Leave, null targetDisplay");
+//         MMI_HILOGE("Leave, null targetDisplay");
 //         return -1;
 //     }
 
 //     auto pointerEvent = targetDisplay->HandleEvent(pointerAction, actionTime, pointer);
 //     if (!pointerEvent) {
-//         LOG_E("Leave, null pointerEvent");
+//         MMI_HILOGE("Leave, null pointerEvent");
 //         return -1;
 //     }
 
 //     if (context_ == nullptr) {
-//         LOG_E("Leave, null context_");
+//         MMI_HILOGE("Leave, null context_");
 //         return -1;
 //     }
 
 //     const auto& dispatcher = context_->GetEventDispatcher();
 //     if (!dispatcher) {
-//         LOG_E("Leave, null dispatcher");
+//         MMI_HILOGE("Leave, null dispatcher");
 //         return -1;
 //     }
 
@@ -274,7 +274,7 @@ bool TouchScreenSeat::IsEmpty() const
 // void TouchScreenSeat::OnDisplayRemoved(const std::shared_ptr<LogicalDisplayState>& display)
 // {
 //     if (!display) {
-//         LOG_E("Leave, null display");
+//         MMI_HILOGE("Leave, null display");
 //         return;
 //     }
 
@@ -290,7 +290,7 @@ bool TouchScreenSeat::IsEmpty() const
 // void TouchScreenSeat::OnDisplayChanged(const std::shared_ptr<LogicalDisplayState>& display)
 // {
 //     if (!display) {
-//         LOG_E("Leave, null display");
+//         MMI_HILOGE("Leave, null display");
 //         return;
 //     }
 
@@ -313,34 +313,34 @@ std::shared_ptr<PointerEvent::PointerItem> TouchScreenSeat::ConvertPointer(const
 {
     std::shared_ptr<PointerEvent::PointerItem> pointer;
     if (!absEvent) {
-        LOG_E("Leave, null absEvent");
+        MMI_HILOGE("Leave, null absEvent");
         return pointer;
     }
     const auto& absEventPointer = absEvent->GetPointer();
     if (!absEventPointer) {
-        LOG_E("Leave, null absEventPointer");
+        MMI_HILOGE("Leave, null absEventPointer");
         return pointer;
     }
 
     if (!display_) {
-        LOG_E("Leave, null display_");
+        MMI_HILOGE("Leave, null display_");
         return pointer;
     }
 
     if (context_ == nullptr) {
-        LOG_E("Leave, null context_");
+        MMI_HILOGE("Leave, null context_");
         return pointer;
     }
 
     const auto& windowStateManager = context_->GetWindowStateManager();
     if (!windowStateManager) {
-        LOG_E("Leave, null windowStateManager");
+        MMI_HILOGE("Leave, null windowStateManager");
         return pointer;
     }
 
     auto action = ConvertAction(absEvent->GetAction());
     if (action == PointerEvent::POINTER_ACTION_NONE) {
-        LOG_E("Leave, ConvertAction Failed");
+        MMI_HILOGE("Leave, ConvertAction Failed");
         return pointer;
     }
 
@@ -361,7 +361,7 @@ std::shared_ptr<PointerEvent::PointerItem> TouchScreenSeat::ConvertPointer(const
     //     auto retCode = TransformToPhysicalDisplayCoordinate(absEventPointer->GetX(), absEventPointer->GetY(), 
     //             physicalDisplayX, physicalDisplayY);
     //     if (retCode < 0) {
-    //         LOG_E("Leave, TransformToPhysicalDisplayCoordinate Failed");
+    //         MMI_HILOGE("Leave, TransformToPhysicalDisplayCoordinate Failed");
     //         return pointer;
     //     }
 
@@ -372,20 +372,20 @@ std::shared_ptr<PointerEvent::PointerItem> TouchScreenSeat::ConvertPointer(const
     //             globalX, globalY);
 
     //     if (retCode < 0) {
-    //         LOG_E("Leave, TransformPhysicalDisplayCooridateToLogicalDisplayCooridate Failed");
+    //         MMI_HILOGE("Leave, TransformPhysicalDisplayCooridateToLogicalDisplayCooridate Failed");
     //         return pointer;
     //     }
 
     //     targetDisplay = windowStateManager->TransformPhysicalGlobalCoordinateToLogicalDisplayCoordinate(globalX, globalY,
     //             logicalDisplayX, logicalDisplayY);
     //     if (!targetDisplay) {
-    //         LOG_E("Leave, TransformPhysicalGlobalCoordinateToLogicalDisplayCoordinate Failed");
+    //         MMI_HILOGE("Leave, TransformPhysicalGlobalCoordinateToLogicalDisplayCoordinate Failed");
     //         return pointer;
     //     }
     //     targetDisplays_[pointerKey] = targetDisplay;
     // } else if (action == PointerEvent::POINTER_ACTION_MOVE || action == PointerEvent::POINTER_ACTION_UP) {
     //     if (it == targetDisplays_.end()) {
-    //         LOG_E("Leave, No Target When MOVE OR UP");
+    //         MMI_HILOGE("Leave, No Target When MOVE OR UP");
     //         return pointer;
     //     }
     //     targetDisplay = it->second;
@@ -398,19 +398,19 @@ std::shared_ptr<PointerEvent::PointerItem> TouchScreenSeat::ConvertPointer(const
     //     auto retCode = TransformToPhysicalDisplayCoordinate(absEventPointer->GetX(), absEventPointer->GetY(), 
     //             physicalDisplayX, physicalDisplayY);
     //     if (retCode < 0) {
-    //         LOG_E("Leave, TransformToPhysicalDisplayCoordinate Failed");
+    //         MMI_HILOGE("Leave, TransformToPhysicalDisplayCoordinate Failed");
     //         return pointer;
     //     }
 
     //     retCode = targetDisplay->Transform(physicalDisplayX, physicalDisplayY, 
     //             true, logicalDisplayX, logicalDisplayY);
     //     if (retCode < 0) {
-    //         LOG_E("Leave, TransformTo Target Display Coordinate Failed");
+    //         MMI_HILOGE("Leave, TransformTo Target Display Coordinate Failed");
     //         return pointer;
     //     }
 
     // } else {
-    //     LOG_E("Leve, unknown absEvent Action:$s", PointerEvent::ActionToString(action));
+    //     MMI_HILOGE("Leve, unknown absEvent Action:$s", PointerEvent::ActionToString(action));
     //     return pointer;
     // }
 
@@ -424,7 +424,7 @@ std::shared_ptr<PointerEvent::PointerItem> TouchScreenSeat::ConvertPointer(const
     pointer->SetGlobalX(logicalDisplayX);
     pointer->SetGlobalY(logicalDisplayY);
     pointer->SetDeviceId(absEvent->GetDeviceId());
-    LOG_D("Leave");
+    MMI_HILOGD("Leave");
     return pointer;
 }
 

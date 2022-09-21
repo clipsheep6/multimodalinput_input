@@ -44,8 +44,8 @@ namespace MMI {
 
         virtual void OnInputEvent(const std::shared_ptr<const AbsEvent>& event) override
         {
-            LOG_D("Enter");
-            LOG_D("Leave");
+            MMI_HILOGD("Enter");
+            MMI_HILOGD("Leave");
         }
 
         // virtual int32_t BindDisplay(const std::shared_ptr<PhysicalDisplayState>& display)  override
