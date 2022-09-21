@@ -16,6 +16,8 @@
 #ifndef ENUM_UTILS_H
 #define ENUM_UTILS_H
 
+#include <cstdint>
+
 namespace OHOS {
 namespace MMI {
 namespace EnumUtils {

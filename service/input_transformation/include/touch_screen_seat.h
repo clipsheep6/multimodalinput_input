@@ -22,6 +22,7 @@
 #include "i_input_define.h"
 #include "i_input_device.h"
 #include "abs_event.h"
+#include "pointer_event.h"
 // #include "LogicalDisplayState.h"
 
 namespace OHOS {
@@ -58,7 +59,7 @@ protected:
 
     // std::shared_ptr<PhysicalDisplayState> GetTargetDisplay() const;
 
-    int32_t TransformToPhysicalDisplayCoordinate(int32_t tpX, int32_t tpY, int32_t& displayX, int32_t& displayY) const;
+    // int32_t TransformToPhysicalDisplayCoordinate(int32_t tpX, int32_t tpY, int32_t& displayX, int32_t& displayY) const;
 
     // int32_t DispatchTo(const std::shared_ptr<const LogicalDisplayState>& targetDisplay, 
     //         int32_t pointerAction, int64_t actionTime, std::shared_ptr<PointerEvent::PointerItem>& pointer);
@@ -72,7 +73,7 @@ private:
     const std::string seatId_;
     const std::string seatName_;
 
-    int32_t displayId_ {-1};
+    // int32_t displayId_ {-1};
     std::shared_ptr<IInputDevice> inputDevice_;
     // std::shared_ptr<PhysicalDisplayState> display_;
     std::shared_ptr<IInputDevice::AxisInfo> xInfo_;

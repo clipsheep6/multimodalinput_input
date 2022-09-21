@@ -31,7 +31,9 @@
 
 namespace OHOS {
 namespace MMI {
-
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SeatManager" };
+};
 std::unique_ptr<SeatManager> SeatManager::CreateInstance() {
     // if (context == nullptr) {
     //     return nullptr;
@@ -44,7 +46,7 @@ SeatManager::SeatManager() {
 }
 
 std::shared_ptr<ISeat> SeatManager::FindSeat(std::string seatId, bool createIfNotExist) {
-    MMI_HILOGD("Enter seatId:$s createIfNotExist:$s", seatId, createIfNotExist);
+    MMI_HILOGD("Enter seatId:%{public}s createIfNotExist:%{public}d", seatId.c_str(), createIfNotExist);
 
     for (auto& seat : seats_) {
         if (seat->GetSeatId() == seatId) {
@@ -54,18 +56,18 @@ std::shared_ptr<ISeat> SeatManager::FindSeat(std::string seatId, bool createIfNo
 
     std::shared_ptr<ISeat> result;
     if (!createIfNotExist) {
-        MMI_HILOGD("Leave seatId:$s createIfNotExist:$s, Not Exist", seatId, createIfNotExist);
+        MMI_HILOGD("Leave seatId:%{public}s createIfNotExist:%{public}d, Not Exist", seatId.c_str(), createIfNotExist);
         return result;
     }
 
     result = ISeat::CreateInstance(seatId);
     if (!result) {
-        MMI_HILOGE("Leave seatId:$s createIfNotExist:$s, Create Failed", seatId, createIfNotExist);
+        MMI_HILOGE("Leave seatId:$%{public}s createIfNotExist:%{public}d, Create Failed", seatId.c_str(), createIfNotExist);
         return result;
     }
 
     seats_.push_back(result);
-    MMI_HILOGD("Leave seatId:$s createIfNotExist:$s", seatId, createIfNotExist);
+    MMI_HILOGD("Leave seatId:%{public}s createIfNotExist:%{public}d", seatId.c_str(), createIfNotExist);
     return result;
 }
 
@@ -83,7 +85,7 @@ std::shared_ptr<ISeat> SeatManager::FindSeat(std::string seatId, bool createIfNo
 std::shared_ptr<ITouchScreenSeat> SeatManager::FindTouchScreenSeat(const std::string& seatId, 
         const std::string& seatName, bool createIfNotExist)
 {
-    MMI_HILOGD("Enter seatId:$s seatName:$s createIfNotExist:$s", seatId, seatName, createIfNotExist);
+    MMI_HILOGD("Enter seatId:%{public}s seatName:%{public}s createIfNotExist:%{public}d", seatId.c_str(), seatName.c_str(), createIfNotExist);
 
     for (auto& seat : touchScreenSeats_) {
         if (seat->GetSeatId() == seatId && seat->GetSeatName() == seatName) {
@@ -93,18 +95,18 @@ std::shared_ptr<ITouchScreenSeat> SeatManager::FindTouchScreenSeat(const std::st
 
     std::shared_ptr<ITouchScreenSeat> result;
     if (!createIfNotExist) {
-        MMI_HILOGD("Leave seatId:$s seatName:$s createIfNotExist:$s", seatId, seatName, createIfNotExist);
+        MMI_HILOGD("Leave seatId:%{public}s seatName:%{public}s createIfNotExist:%{public}d", seatId.c_str(), seatName.c_str(), createIfNotExist);
         return result;
     }
 
-    result = ITouchScreenSeat::CreateInstance(context_, seatId, seatName);
+    result = ITouchScreenSeat::CreateInstance(seatId, seatName);
     if (!result) {
-        MMI_HILOGE("Leave seatId:$s seatName:$s createIfNotExist:$s, Create Failed", seatId, seatName, createIfNotExist);
+        MMI_HILOGE("Leave seatId:%{public}s seatName:%{public}s createIfNotExist:%{public}d, Create Failed", seatId.c_str(), seatName.c_str(), createIfNotExist);
         return result;
     }
 
     touchScreenSeats_.push_back(result);
-    MMI_HILOGD("Leave seatId:$s seatName:$s createIfNotExist:$s", seatId, seatName, createIfNotExist);
+    MMI_HILOGD("Leave seatId:%{public}s seatName:%{public}s createIfNotExist:%{public}d", seatId.c_str(), seatName.c_str(), createIfNotExist);
     return result;
 }
 

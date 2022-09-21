@@ -21,10 +21,13 @@
 #include "pointer_event.h"
 // #include "Log.h"
 #include "mmi_log.h"
+#include <cstddef>
 
 namespace OHOS {
 namespace MMI {
-
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AbsEventHandler" };
+};
 AbsEventHandler::AbsEventHandler(const std::string& seatId)
     : seatId_(seatId)
 {
@@ -33,40 +36,41 @@ AbsEventHandler::AbsEventHandler(const std::string& seatId)
 std::shared_ptr<const PointerEvent> AbsEventHandler::HandleEvent(const std::shared_ptr<const AbsEvent>& absEvent)
 {
     if (!absEvent) {
-        return PointerEvent::NULL_VALUE;
+        return nullptr;
     }
 
     auto deviceId = absEvent->GetDeviceId();
     auto sourceType = ConvertSourceType(absEvent->GetSourceType());
-    if (sourceType == PointerEvent::SOURCE_TYPE_NONE) {
+    if (sourceType == PointerEvent::SOURCE_TYPE_UNKNOWN) {
         MMI_HILOGE("Leave, ConvertSourceType Failed");
-        return PointerEvent::NULL_VALUE;
+        return nullptr;
     }
 
     auto action = ConvertAction(absEvent->GetAction());
-    if (action == PointerEvent::POINTER_ACTION_NONE) {
+    if (action == PointerEvent::POINTER_ACTION_UNKNOWN) {
         MMI_HILOGE("Leave, ConvertAction Failed");
-        return PointerEvent::NULL_VALUE;
+        return nullptr;
     }
 
-    auto pointerEvent = PointerEvent::CreateInstance(sourceType);
+    // auto pointerEvent = PointerEvent::CreateInstance(sourceType);
+    auto pointerEvent = PointerEvent::Create();
     if (!pointerEvent) {
         MMI_HILOGE("Leave, null pointerEvent");
-        return PointerEvent::NULL_VALUE;
+        return nullptr;
     }
 
     for (const auto& absEventPointer : absEvent->GetPointerList()) {
         auto pointer = ConvertPointer(absEventPointer);
         if (!pointer) {
             MMI_HILOGE("Leave, ConvertPointer Failed");
-            return PointerEvent::NULL_VALUE;
+            return nullptr;
         }
         pointer->SetDeviceId(deviceId);
-        auto retCode = pointerEvent->AddPointer(pointer);
-        if (retCode < 0) {
-            MMI_HILOGE("Leave, AddPointer Failed");
-            return PointerEvent::NULL_VALUE;
-        }
+        // auto retCode = pointerEvent->AddPointer(pointer);
+        // if (retCode < 0) {
+        //     MMI_HILOGE("Leave, AddPointer Failed");
+        //     return nullptr;
+        // }
     }
 
     pointerEvent->SetDeviceId(deviceId);
@@ -99,8 +103,8 @@ int32_t AbsEventHandler::ConvertSourceType(int32_t absEventSourceType) const
         return PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
     }
 
-    MMI_HILOGE("Leave, Invalid AbsEvent SourceType:$s", AbsEvent::SourceToString(absEventSourceType));
-    return PointerEvent::POINTER_ACTION_NONE;
+    MMI_HILOGE("Leave, Invalid AbsEvent SourceType:%{public}s", AbsEvent::SourceToString(absEventSourceType));
+    return PointerEvent::SOURCE_TYPE_UNKNOWN;
 }
 
 int32_t AbsEventHandler::ConvertAction(int32_t absEventAction) const
@@ -117,7 +121,7 @@ int32_t AbsEventHandler::ConvertAction(int32_t absEventAction) const
         return PointerEvent::POINTER_ACTION_MOVE;
     }
 
-    return PointerEvent::POINTER_ACTION_NONE;
+    return PointerEvent::POINTER_ACTION_UNKNOWN;
 }
 
 std::shared_ptr<PointerEvent::PointerItem> AbsEventHandler::ConvertPointer(const std::shared_ptr<const AbsEvent::Pointer>& absEventPointer) const
@@ -129,10 +133,10 @@ std::shared_ptr<PointerEvent::PointerItem> AbsEventHandler::ConvertPointer(const
     }
 
     pointer = std::make_shared<PointerEvent::PointerItem>();
-    pointer->SetId(absEventPointer->GetId());
+    // pointer->SetId(absEventPointer->GetId());
     pointer->SetDownTime(absEventPointer->GetDownTime());
-    pointer->SetGlobalX(absEventPointer->GetX());
-    pointer->SetGlobalY(absEventPointer->GetY());
+    // pointer->SetGlobalX(absEventPointer->GetX());
+    // pointer->SetGlobalY(absEventPointer->GetY());
 
     return pointer;
 }

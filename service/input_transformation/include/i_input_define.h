@@ -22,7 +22,7 @@
 namespace OHOS {
 namespace MMI {
 
-constexpr int INVALID_FD = -1;
+// constexpr int INVALID_FD = -1;
 
 struct NonCopyable {
     NonCopyable() = default;

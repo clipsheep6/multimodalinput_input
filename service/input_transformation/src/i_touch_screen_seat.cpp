@@ -20,7 +20,9 @@
 
 namespace OHOS {
 namespace MMI {
-
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ITouchScreenSeat" };
+};
 class DefaultSeat : public ITouchScreenSeat {
     virtual int32_t BindInputDevice(const std::shared_ptr<IInputDevice>& inputDevice) override
     {

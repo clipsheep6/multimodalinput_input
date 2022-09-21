@@ -16,6 +16,8 @@
 #ifndef TIME_UTILS_H
 #define TIME_UTILS_H
 
+#include <cstdint>
+
 namespace OHOS {
 namespace MMI {
 

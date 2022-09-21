@@ -25,7 +25,9 @@
 
 namespace OHOS {
 namespace MMI {
-
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AbsEvent" };
+};
 const std::shared_ptr<AbsEvent> AbsEvent::NULL_VALUE;
 const std::shared_ptr<AbsEvent::Pointer> AbsEvent::Pointer::NULL_VALUE;
 
@@ -156,12 +158,12 @@ int32_t AbsEvent::SetSourceType(int32_t sourceType)
 {
     if (sourceType <= SOURCE_TYPE_NONE || sourceType >= SOURCE_TYPE_END)
     {
-        MMI_HILOGE("Leave, Invalid sourceType:$s", SourceToString(sourceType));
+        MMI_HILOGE("Leave, Invalid sourceType:%{public}s", SourceToString(sourceType));
         return -1;
     }
 
     if (sourceType_ > SOURCE_TYPE_NONE && sourceType_ < SOURCE_TYPE_END) {
-        MMI_HILOGE("Leave, Valid sourceType_:$s", SourceToString(sourceType_));
+        MMI_HILOGE("Leave, Valid sourceType_:%{public}s", SourceToString(sourceType_));
         return -1;
     }
 
@@ -172,7 +174,7 @@ int32_t AbsEvent::SetSourceType(int32_t sourceType)
 int32_t AbsEvent::SetPointerId(int32_t pointerId)
 {
     if (!GetPointer(pointerId)) {
-        MMI_HILOGE("Leave, not exist pointer:$s", pointerId_);
+        MMI_HILOGE("Leave, not exist pointer:%{public}d", pointerId_);
         return -1;
     }
 

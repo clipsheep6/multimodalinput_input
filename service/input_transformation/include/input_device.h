@@ -19,7 +19,7 @@
 #include <memory>
 #include <map>
 
-#include <linux/input-event-codes.h>
+//#include <linux/input-event-codes.h>
 #include <linux/input.h>
 
 
@@ -52,7 +52,7 @@ public:
     virtual const std::string& GetName() const override;
     virtual const std::string& GetSeatId() const override;
     virtual const std::string& GetSeatName() const override;
-    virtual const std::string& GetDeviceFile() const override;
+    // virtual const std::string& GetDeviceFile() const override;
     virtual std::shared_ptr<AxisInfo> GetAxisInfo(int32_t axis) const override;
     virtual bool HasCapability(int32_t capability) const override;
     virtual int32_t StartReceiveEvents(const std::shared_ptr<IKernelEventHandler>& eventHandler) override;
@@ -102,7 +102,7 @@ private:
 
 private:
     const int32_t id_;
-    const std::string deviceFile_;
+    // const std::string deviceFile_;
     // const IInputContext* const context_;
     int32_t fd_;
     std::string seatId_;

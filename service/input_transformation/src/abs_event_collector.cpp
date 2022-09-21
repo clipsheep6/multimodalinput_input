@@ -25,7 +25,9 @@
 
 namespace OHOS {
 namespace MMI {
-
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AbsEventCollector" };
+};
 AbsEventCollector::AbsEventCollector(int32_t deviceId, int32_t sourceType) 
     : deviceId_(deviceId), sourceType_(sourceType), curSlot_(0), nextId_(0), 
     absEvent_(new AbsEvent(deviceId, sourceType))
@@ -33,7 +35,7 @@ AbsEventCollector::AbsEventCollector(int32_t deviceId, int32_t sourceType)
 }
 
 const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleAbsEvent(int32_t code, int32_t value) {
-    MMI_HILOGD("Enter code:$s value:$s", EnumUtils::InputEventAbsCodeToString(code), value);
+    MMI_HILOGD("Enter code:%{public}s value:%{public}d", EnumUtils::InputEventAbsCodeToString(code), value);
 
     RemoveReleasedPointer();
 
@@ -65,14 +67,14 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleAbsEvent(int32_t code,
             break;
     }
 
-    MMI_HILOGD("Leave code:$s value:$s", EnumUtils::InputEventAbsCodeToString(code), value);
+    MMI_HILOGD("Leave code:%{public}s value:%{public}d", EnumUtils::InputEventAbsCodeToString(code), value);
     return AbsEvent::NULL_VALUE;
 }
 
 const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleSyncEvent(int32_t code, int32_t value) {
-    MMI_HILOGD("Enter code:$s value:$s", EnumUtils::InputEventSynCodeToString(code), value);
+    MMI_HILOGD("Enter code:%{public}s value:%{public}d", EnumUtils::InputEventSynCodeToString(code), value);
     const auto& absEvent = FinishPointer();
-    MMI_HILOGD("Leave code:$s value:$s absEvent:$s", EnumUtils::InputEventSynCodeToString(code), value, absEvent);
+    MMI_HILOGD("Leave code:%{public}s value:%{public}d absEvent:%{public}p", EnumUtils::InputEventSynCodeToString(code), value, absEvent.get());
     return absEvent;
 }
 
@@ -81,7 +83,7 @@ void AbsEventCollector::AfterProcessed() {
 }
 
 int32_t AbsEventCollector::SetSourceType(int32_t sourceType) {
-    MMI_HILOGD("Enter, sourceType_:$s, sourceType:$s", 
+    MMI_HILOGD("Enter, sourceType_:%{public}s, sourceType:%{public}s", 
             AbsEvent::SourceToString(sourceType_),
             AbsEvent::SourceToString(sourceType));
 
@@ -95,7 +97,7 @@ int32_t AbsEventCollector::SetSourceType(int32_t sourceType) {
     sourceType_ = sourceType;
     absEvent_->SetSourceType(sourceType_);
 
-    MMI_HILOGD("Leave, sourceType_:$0, sourceType:$1", 
+    MMI_HILOGD("Leave, sourceType_:%{public}s, sourceType:%{public}s", 
             AbsEvent::SourceToString(sourceType_),
             AbsEvent::SourceToString(sourceType));
     return 0;
@@ -142,7 +144,7 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::FinishPointer() {
             curPointer_->SetId(nextId_++);
             auto retCode = absEvent_->AddPointer(curPointer_);
             if (retCode < 0) {
-                MMI_HILOGE("Leave, absAction:$s AddPointer Failed", AbsEvent::ActionToString(action));
+                MMI_HILOGE("Leave, absAction:%{public}s AddPointer Failed", AbsEvent::ActionToString(action));
                 return AbsEvent::NULL_VALUE;
             }
             curPointer_->SetDownTime(nowTime);
@@ -150,7 +152,7 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::FinishPointer() {
         }
     } else if (action == AbsEvent::ACTION_UP) {
         if (curPointer_->GetId() < 0) {
-            MMI_HILOGE("Leave, absAction:$s id < 0 on up", AbsEvent::ActionToString(action));
+            MMI_HILOGE("Leave, absAction:%{public}s id < 0 on up", AbsEvent::ActionToString(action));
             return AbsEvent::NULL_VALUE;
         }
 
@@ -165,7 +167,7 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::FinishPointer() {
     absEvent_->SetAction(action);
     absEvent_->SetActionTime(nowTime);
 
-    MMI_HILOGD("Leave, absAction:$s", AbsEvent::ActionToString(action));
+    MMI_HILOGD("Leave, absAction:%{public}s", AbsEvent::ActionToString(action));
     return absEvent_;
 }
 

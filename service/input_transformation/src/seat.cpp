@@ -27,7 +27,9 @@
 
 namespace OHOS {
 namespace MMI {
-
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Seat" };
+};
 Seat::NewEventListener::NewEventListener(Seat* seat)
     : seat_(seat) 
 {
@@ -50,7 +52,7 @@ void Seat::NewEventListener::OnEvent(const std::shared_ptr<const PointerEvent>& 
         return;
     }
 
-    seat_->DispatchEvent(event);
+    // seat_->DispatchEvent(event);
 }
 
 // void Seat::NewEventListener::OnEvent(const std::shared_ptr<const RelEvent>& event)
@@ -90,7 +92,7 @@ std::unique_ptr<Seat> Seat::CreateInstance( const std::string& seatId) {
 }
 
 Seat::Seat(const std::string& seatId)
-    seatId_(seatId), 
+    : seatId_(seatId), 
     absEventHandler_(seatId) ,
     newEventListener_(std::shared_ptr<NewEventListener>(new NewEventListener(this))), 
     transformers_(IEventTransformer::CreateTransformers(newEventListener_))
@@ -134,11 +136,11 @@ Seat::~Seat()
 // }
 
 void Seat::OnInputEvent(const std::shared_ptr<const AbsEvent>& event) {
-    MMI_HILOGD("Enter AbsEvent:$s", event);
+    MMI_HILOGD("Enter AbsEvent:%{public}p", event.get());
 
     auto pointerEvent = absEventHandler_.HandleEvent(event);
     if (pointerEvent) {
-        DispatchEvent(pointerEvent);
+        //DispatchEvent(pointerEvent);
     }
 
     MMI_HILOGD("Leave AbsEvent");
@@ -278,79 +280,79 @@ std::list<std::shared_ptr<IInputDevice>> Seat::GetInputDevices() const
 
 bool Seat::IsEmpty() const
 {
-    return displays_.empty() && inputDevices_.empty();
+    return inputDevices_.empty();
 }
 
-void Seat::DispatchEvent(const std::shared_ptr<const KeyEvent>& event) {
-    MMI_HILOGD("Enter");
-    if (!event) {
-        MMI_HILOGE("Leave, null event");
-        return;
-    }
+// void Seat::DispatchEvent(const std::shared_ptr<const KeyEvent>& event) {
+//     MMI_HILOGD("Enter");
+//     if (!event) {
+//         MMI_HILOGE("Leave, null event");
+//         return;
+//     }
 
-    if (TryTransform(event)) {
-        MMI_HILOGD("Leave, consumed by Transformer");
-        return;
-    }
+//     if (TryTransform(event)) {
+//         MMI_HILOGD("Leave, consumed by Transformer");
+//         return;
+//     }
 
-    const auto& eventDispatcher = context_->GetEventDispatcher();
-    if (!eventDispatcher) {
-        MMI_HILOGE("Leave, null eventDispatcher");
-        return;
-    }
+//     const auto& eventDispatcher = context_->GetEventDispatcher();
+//     if (!eventDispatcher) {
+//         MMI_HILOGE("Leave, null eventDispatcher");
+//         return;
+//     }
 
-    eventDispatcher->DispatchEvent(event);
-    MMI_HILOGD("Leave");
-}
+//     eventDispatcher->DispatchEvent(event);
+//     MMI_HILOGD("Leave");
+// }
 
-void Seat::DispatchEvent(const std::shared_ptr<const PointerEvent>& event) {
-    MMI_HILOGD("Enter PointerEvent:$s", PointerEvent::SourceTypeToString(event->GetSourceType()));
-    if (!event) {
-        MMI_HILOGE("Leave PointerEvent, null event");
-        return;
-    }
+// void Seat::DispatchEvent(const std::shared_ptr<const PointerEvent>& event) {
+//     MMI_HILOGD("Enter PointerEvent:%{public}s", PointerEvent::SourceTypeToString(event->GetSourceType()));
+//     if (!event) {
+//         MMI_HILOGE("Leave PointerEvent, null event");
+//         return;
+//     }
 
-    if (TryTransform(event)) {
-        MMI_HILOGD("Leave PointerEvent, consumed by Transformer");
-        return;
-    }
+//     // if (TryTransform(event)) {
+//     //     MMI_HILOGD("Leave PointerEvent, consumed by Transformer");
+//     //     return;
+//     // }
 
-    const auto& eventDispatcher = context_->GetEventDispatcher();
-    if (!eventDispatcher) {
-        MMI_HILOGE("Leave PointerEvent, null eventDispatcher");
-        return;
-    }
+//     const auto& eventDispatcher = context_->GetEventDispatcher();
+//     if (!eventDispatcher) {
+//         MMI_HILOGE("Leave PointerEvent, null eventDispatcher");
+//         return;
+//     }
 
-    eventDispatcher->DispatchEvent(event);
-    MMI_HILOGD("Leave PointerEvent");
-}
+//     eventDispatcher->DispatchEvent(event);
+//     MMI_HILOGD("Leave PointerEvent");
+// }
 
 const std::string& Seat::GetSeatId() const {
     return seatId_;
 }
 
-bool Seat::TryTransform(const std::shared_ptr<const KeyEvent>& event)
-{
-    bool consumed = false;
-    for (const auto& transformer : transformers_)  {
-        MMI_HILOGD("Enter Transformer:$s", transformer->GetName());
-        if (transformer->HandleEvent(event)) {
-            consumed = true;
-            MMI_HILOGD("KeyEvent $s Handled by $s", event, transformer->GetName());
-            break;
-        }
-    }
-    return consumed;
-}
+// bool Seat::TryTransform(const std::shared_ptr<const KeyEvent>& event)
+// {
+//     bool consumed = false;
+//     for (const auto& transformer : transformers_)  {
+//         MMI_HILOGD("Enter Transformer:%{public}s", transformer->GetName());
+//         if (transformer->HandleEvent(event)) {
+//             consumed = true;
+//             MMI_HILOGD("KeyEvent %{public}p Handled by %{public}s", event.get(), transformer->GetName());
+//             break;
+//         }
+//     }
+//     return consumed;
+// }
 
 bool Seat::TryTransform(const std::shared_ptr<const PointerEvent>& event)
 {
     bool consumed = false;
     for (const auto& transformer : transformers_)  {
-        MMI_HILOGD("Enter Transformer:$s", transformer->GetName());
+        MMI_HILOGD("Enter Transformer:%{public}s", transformer->GetName().c_str());
         if (transformer->HandleEvent(event)) {
             consumed = true;
-            MMI_HILOGD("KeyEvent $s Handled by $s", event, transformer->GetName());
+            MMI_HILOGD("KeyEvent %{public}p Handled by %{public}s", event.get(), transformer->GetName().c_str());
             break;
         }
     }
