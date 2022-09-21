@@ -13,33 +13,18 @@
  * limitations under the License.
  */
 
-#ifndef I_INPUT_DEFINE_H
-#define I_INPUT_DEFINE_H
-
-#include <cstdint>
-#include <cstddef>
+#ifndef TIME_UTILS_H
+#define TIME_UTILS_H
 
 namespace OHOS {
 namespace MMI {
 
-constexpr int INVALID_FD = -1;
+    namespace TimeUtils
+    {
+        int64_t GetTimeStampMs();
+        int64_t GetMonotonicTimeMs();
+    };
 
-struct NonCopyable {
-    NonCopyable() = default;
-    virtual ~NonCopyable() = default;;
-
-    NonCopyable(const NonCopyable&) = delete;
-    NonCopyable(NonCopyable&&) = delete;
-};
-
-#define CASE_STR(item) case item: do {return #item;} while(0)
-
-inline constexpr size_t LongsOfBits(int32_t bitsCount)  {
-    return (bitsCount / (sizeof(long) * 8)) + !!(bitsCount % (sizeof(long) * 8));
-}
-
-
-#define LENTH_OF_ARRAY(arr) (sizeof(arr) / sizeof(arr[0]))
 } // namespace MMI
 } // namespace OHOS
-#endif // I_INPUT_DEFINE_H
+#endif // TIME_UTILS_H

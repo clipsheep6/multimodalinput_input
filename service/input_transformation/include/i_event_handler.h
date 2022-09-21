@@ -13,33 +13,26 @@
  * limitations under the License.
  */
 
-#ifndef I_INPUT_DEFINE_H
-#define I_INPUT_DEFINE_H
+#ifndef I_EVENT_HANDLER_H
+#define I_EVENT_HANDLER_H
 
-#include <cstdint>
-#include <cstddef>
+#include <memory>
+#include <list>
 
 namespace OHOS {
 namespace MMI {
+    // class KeyEvent;
+    class PointerEvent;
+    // class IInputContext;
+    class IEventHandler {
+        public:
+            static std::list<std::shared_ptr<IEventHandler>> PrepareHandlers();
 
-constexpr int INVALID_FD = -1;
-
-struct NonCopyable {
-    NonCopyable() = default;
-    virtual ~NonCopyable() = default;;
-
-    NonCopyable(const NonCopyable&) = delete;
-    NonCopyable(NonCopyable&&) = delete;
-};
-
-#define CASE_STR(item) case item: do {return #item;} while(0)
-
-inline constexpr size_t LongsOfBits(int32_t bitsCount)  {
-    return (bitsCount / (sizeof(long) * 8)) + !!(bitsCount % (sizeof(long) * 8));
-}
-
-
-#define LENTH_OF_ARRAY(arr) (sizeof(arr) / sizeof(arr[0]))
+            virtual ~IEventHandler() = default;
+            // virtual bool HandleEvent(const std::shared_ptr<const KeyEvent>& event) = 0;
+            virtual bool HandleEvent(const std::shared_ptr<const PointerEvent>& event) = 0;
+            virtual const std::string& GetName() const = 0;
+    };
 } // namespace MMI
 } // namespace OHOS
-#endif // I_INPUT_DEFINE_H
+#endif // I_EVENT_HANDLER_H
