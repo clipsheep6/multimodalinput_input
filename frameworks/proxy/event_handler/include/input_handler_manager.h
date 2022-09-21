@@ -22,7 +22,6 @@
 
 #include "input_handler_type.h"
 #include "i_input_event_consumer.h"
-#include "mmi_event_handler.h"
 #include "pointer_event.h"
 
 namespace OHOS {
@@ -58,7 +57,6 @@ private:
         InputHandlerType handlerType_ { NONE };
         HandleEventType eventType_ { HANDLE_EVENT_TYPE_ALL };
         std::shared_ptr<IInputEventConsumer> consumer_ { nullptr };
-        EventHandlerPtr eventHandler_ { nullptr };
     };
 
 private:
@@ -70,16 +68,6 @@ private:
     void RemoveFromServer(InputHandlerType handlerType, HandleEventType eventType);
 
     std::shared_ptr<IInputEventConsumer> FindHandler(int32_t handlerId);
-    EventHandlerPtr GetEventHandler(int32_t handlerId);
-    bool PostTask(int32_t handlerId, const AppExecFwk::EventHandler::Callback &callback);
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    void OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consumer, int32_t handlerId,
-        std::shared_ptr<KeyEvent> keyEvent);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    void OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer, int32_t handlerId,
-        std::shared_ptr<PointerEvent> pointerEvent);
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     void OnDispatchEventProcessed(int32_t eventId);
 
 private:
