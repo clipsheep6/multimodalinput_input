@@ -250,6 +250,10 @@ bool EventNormalizeHandler::CheckKeyboardWhiteList(std::shared_ptr<KeyEvent> key
     int32_t keyCode = keyEvent->GetKeyCode();
     if(keyCode == KeyEvent::KEYCODE_BACK || keyCode == KeyEvent::KEYCODE_VOLUME_UP
         || keyCode == KeyEvent::KEYCODE_VOLUME_DOWN || keyCode == KeyEvent::KEYCODE_POWER) {
+        int32_t deviceId = keyEvent->GetDeviceId();
+        if (InputDevMgr->IsRemote(deviceId)) {
+           return false; 
+        }
         return true;
     }
     CooperateState state = InputDevCooSM->GetCurrentCooperateState();
