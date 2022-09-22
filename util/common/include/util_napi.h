@@ -62,6 +62,7 @@ namespace MMI {
     do { \
         MMI_HILOGE("%{public}s", (#desc)); \
         auto infoTemp = std::string(__FUNCTION__)+ ": " + #desc; \
+        napi_throw_error(env, nullptr, infoTemp.c_str()); \
     } while (0)
 
 namespace UtilNapi {
