@@ -100,7 +100,7 @@ bool MMIClient::Start()
         Stop();
         return false;
     }
-    MMI_HILOGI("Client started successfully");
+    MMI_HILOGD("Client started successfully");
     return true;
 }
 
@@ -232,6 +232,7 @@ void MMIClient::OnDisconnected()
     CALL_DEBUG_ENTER;
     MMI_HILOGI("Disconnected from server, fd:%{public}d", fd_);
     isConnected_ = false;
+    isListening_ = false;
     if (funDisconnected_) {
         funDisconnected_(*this);
     }
@@ -276,7 +277,7 @@ int32_t MMIClient::Socket()
     if (fd_ == IMultimodalInputConnect::INVALID_SOCKET_FD) {
         MMI_HILOGE("Call GetClientSocketFdOfAllocedSocketPair return invalid fd");
     } else {
-        MMI_HILOGI("Call GetClientSocketFdOfAllocedSocketPair return fd:%{public}d", fd_);
+        MMI_HILOGD("Call GetClientSocketFdOfAllocedSocketPair return fd:%{public}d", fd_);
     }
     return fd_;
 }

@@ -197,7 +197,7 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
         }
     } else {
         consumer_->OnInputEvent(keyEvent);
-        MMI_HILOGD("Key event callback keyCode:%{public}d", keyEvent->GetKeyCode());
+        MMI_HILOGD("Key event report keyCode:%{public}d", keyEvent->GetKeyCode());
     }
     MMI_HILOGD("Key event keyCode:%{public}d", keyEvent->GetKeyCode());
 }
@@ -232,7 +232,7 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
         }
     } else {
         consumer_->OnInputEvent(pointerEvent);
-        MMI_HILOGD("Pointer event callback pointerId:%{public}d", pointerEvent->GetPointerId());
+        MMI_HILOGD("Pointer event report pointerId:%{public}d", pointerEvent->GetPointerId());
     }
     MMI_HILOGD("Pointer event pointerId:%{public}d", pointerEvent->GetPointerId());
 }
@@ -475,17 +475,23 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
     CHKPV(pointerEvent);
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE ||
         pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
-    #ifndef OHOS_BUILD_ENABLE_POINTER
+#ifndef OHOS_BUILD_ENABLE_POINTER
         MMI_HILOGW("Pointer device does not support");
         return;
-    #endif
+#endif
     }
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-    #ifndef OHOS_BUILD_ENABLE_TOUCH
+#ifndef OHOS_BUILD_ENABLE_TOUCH
         MMI_HILOGW("Touchscreen device does not support");
         return;
-    #endif
-   }
+#endif
+    }
+#ifndef OHOS_BUILD_ENABLE_JOYSTICK
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_JOYSTICK) {
+        MMI_HILOGW("Joystick device does not support");
+        return;
+    }
+#endif
     std::lock_guard<std::mutex> guard(mtx_);
     if (MMIEventHdl.InjectPointerEvent(pointerEvent) != RET_OK) {
         MMI_HILOGE("Failed to inject pointer event");
@@ -711,7 +717,7 @@ void InputManagerImpl::OnAnr(int32_t pid)
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     std::lock_guard<std::mutex> guard(mtx_);
-    for (auto &observer : anrObservers_) {
+    for (const auto &observer : anrObservers_) {
         CHKPV(observer);
         observer->OnAnr(pid);
     }
