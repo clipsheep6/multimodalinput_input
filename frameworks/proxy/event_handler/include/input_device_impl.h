@@ -16,6 +16,7 @@
 #define OHOS_INPUT_DEVICE_EVENT_H
 
 #include <functional>
+#include <list>
 #include <map>
 #include <mutex>
 #include <vector>
@@ -27,8 +28,8 @@
 
 namespace OHOS {
 namespace MMI {
+class NetPacket;
 class InputDeviceImpl {
-
 public:
     static InputDeviceImpl& GetInstance();
     DISALLOW_COPY_AND_MOVE(InputDeviceImpl);

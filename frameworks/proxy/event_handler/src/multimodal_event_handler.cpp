@@ -17,6 +17,7 @@
 
 #include "proto.h"
 
+#include "event_log_helper.h"
 #include "input_event.h"
 #include "input_event_data_transformation.h"
 #include "input_manager_impl.h"

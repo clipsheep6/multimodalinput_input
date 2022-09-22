@@ -180,6 +180,7 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEven
     CHKPV(pointerEvent);
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_INTERCEPT_EVENT);
+    int32_t consumerCount = 0;
     for (const auto &iter : inputHandlers_) {
         if ((iter.second.eventType_ & HANDLE_EVENT_TYPE_POINTER) != HANDLE_EVENT_TYPE_POINTER) {
             continue;
@@ -191,7 +192,12 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEven
         CHKPV(tempEvent);
         tempEvent->SetProcessedCallback(monitorCallback_);
         consumer->OnInputEvent(tempEvent);
+        consumerCount++;
         MMI_HILOGD("Pointer event id:%{public}d pointerId:%{public}d", handlerId, pointerEvent->GetPointerId());
+    }
+    if (consumerCount == 0) {
+        MMI_HILOGE("All task post failed");
+        return;
     }
     int32_t tokenType = MultimodalInputConnMgr->GetTokenType();
     if (tokenType == TokenType::TOKEN_HAP &&

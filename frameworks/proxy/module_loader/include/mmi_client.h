@@ -32,6 +32,9 @@ public:
     int32_t Socket() override;
     virtual void SetEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventHandler) override;
     virtual void CompareEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventHandler) override;
+    bool Start() override;
+    void RegisterConnectedFunction(ConnectCallback fun) override;
+    void RegisterDisconnectedFunction(ConnectCallback fun) override;
     virtual void Stop() override;
     virtual bool SendMessage(const NetPacket& pkt) const override;
     virtual bool GetCurrentConnectedStatus() const override;
@@ -39,10 +42,6 @@ public:
     virtual int32_t Reconnect() override;
     virtual void OnDisconnect() override;
     virtual MMIClientPtr GetSharedPtr() override;
-
-    bool Start() override;
-    void RegisterConnectedFunction(ConnectCallback fun) override;
-    void RegisterDisconnectedFunction(ConnectCallback fun) override;
     bool IsNewHandler() override;
 
 protected:
@@ -61,8 +60,6 @@ protected:
     ConnectCallback funDisconnected_;
     CircleStreamBuffer circBuf_;
     std::mutex mtx_;
-    std::condition_variable cv_;
-    std::thread recvThread_;
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ = nullptr;
     bool isListening_ = false;
     bool isNewHandler_ = false;

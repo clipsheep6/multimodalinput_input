@@ -19,6 +19,7 @@
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
 #include "napi_constants.h"
+#include "net_packet.h"
 
 namespace OHOS {
 namespace MMI {
@@ -31,6 +32,7 @@ InputDeviceImpl& InputDeviceImpl::GetInstance()
     static InputDeviceImpl instance;
     return instance;
 }
+
 int32_t InputDeviceImpl::RegisterDevListener(const std::string &type, InputDevListenerPtr listener)
 {
     CALL_DEBUG_ENTER;
