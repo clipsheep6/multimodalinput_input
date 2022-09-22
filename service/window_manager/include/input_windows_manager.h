@@ -34,12 +34,10 @@ struct MouseLocation {
     int32_t physicalY { 0 };
 };
 
-class InputWindowsManager : public DelayedSingleton<InputWindowsManager> {
+class InputWindowsManager final {
+    DECLARE_DELAYED_SINGLETON(InputWindowsManager);
 public:
-    InputWindowsManager();
-    virtual ~InputWindowsManager() = default;
     DISALLOW_COPY_AND_MOVE(InputWindowsManager);
-
     void Init(UDSServer& udsServer);
     int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent) const;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -97,6 +95,9 @@ private:
     void OnSessionLost(SessionPtr session);
     void UpdatePointerStyle();
 #endif // OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_JOYSTICK
+    int32_t UpdateJoystickTarget(std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     int32_t UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
@@ -127,7 +128,7 @@ private:
     void CheckFocusWindowChange(const DisplayGroupInfo &displayGroupInfo);
     void CheckZorderWindowChange(const DisplayGroupInfo &displayGroupInfo);
 private:
-    UDSServer* udsServer_ = nullptr;
+    UDSServer* udsServer_ { nullptr };
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t firstBtnDownWindowId_ { -1 };
     int32_t lastLogicX_ { -1 };
@@ -137,9 +138,10 @@ private:
     std::map<int32_t, std::map<int32_t, int32_t>> pointerStyle_;
 #endif // OHOS_BUILD_ENABLE_POINTER
     DisplayGroupInfo displayGroupInfo_;
-    MouseLocation mouseLocation_ = {-1, -1}; // physical coord
+    MouseLocation mouseLocation_ = { -1, -1 }; // physical coord
 };
+
+#define WinMgr ::OHOS::DelayedSingleton<InputWindowsManager>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#define WinMgr InputWindowsManager::GetInstance()
 #endif // INPUT_WINDOWS_MANAGER_H

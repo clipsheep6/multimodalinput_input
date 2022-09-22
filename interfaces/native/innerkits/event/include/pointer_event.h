@@ -27,9 +27,6 @@
 #include "parcel.h"
 
 #include "input_event.h"
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-#include "raw_data.h"
-#endif // OHOS_BUILD_ENABLE_COOPERATE
 
 namespace OHOS {
 namespace MMI {
@@ -187,6 +184,13 @@ public:
      * @since 9
      */
     static constexpr int32_t SOURCE_TYPE_TOUCHPAD = 3;
+
+    /**
+     * 表明输入源产生类似于操纵杆的事件，包含按钮按下、按钮抬起、滚轮滚动。
+     *
+     * @since 9
+     */
+    static constexpr int32_t SOURCE_TYPE_JOYSTICK = 4;
 
     /**
      * Indicates an invalid button ID.
@@ -692,7 +696,6 @@ public:
          */
         bool ReadFromParcel(Parcel &in);
 		
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
         /**
          * @brief 获取原始X坐标数值.
          * @return  返回原始X坐标值.
@@ -721,7 +724,6 @@ public:
          * @since 9
          */
         void SetRawDy(int32_t rawDy);
-#endif // OHOS_BUILD_ENABLE_COOPERATE
     private:
         int32_t pointerId_ {};
         bool pressed_ { false };
@@ -746,10 +748,8 @@ public:
         int64_t downTime_ {};
         int32_t toolType_ {};
         int32_t targetWindowId_ { -1 };
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-        int32_t rawDx_;
-        int32_t rawDy_;
-#endif // OHOS_BUILD_ENABLE_COOPERATE
+        int32_t rawDx_ {};
+        int32_t rawDy_ {};
     };
 
 public:
@@ -1053,8 +1053,6 @@ inline uint32_t PointerEvent::GetAxes() const
 {
     return axes_;
 }
-
-std::ostream& operator<<(std::ostream&, PointerEvent&);
 } // namespace MMI
 } // namespace OHOS
 #endif // POINTER_EVENT_H

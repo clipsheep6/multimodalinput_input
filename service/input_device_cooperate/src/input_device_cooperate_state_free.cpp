@@ -15,10 +15,9 @@
 
 #include "input_device_cooperate_state_free.h"
 
-#include "define_multimodal.h"
 #include "input_device_cooperate_sm.h"
 #include "input_device_manager.h"
-#include "mouse_event_handler.h"
+#include "mouse_event_normalize.h"
 #include "multimodal_input_connect_remoter.h"
 
 namespace OHOS {
@@ -30,7 +29,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputD
 int32_t InputDeviceCooperateStateFree::StartInputDeviceCooperate(
     const std::string &remoteNetworkId, int32_t startInputDeviceId)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     if (remoteNetworkId.empty()) {
         MMI_HILOGE("RemoteNetworkId is empty");
         return RET_ERR;

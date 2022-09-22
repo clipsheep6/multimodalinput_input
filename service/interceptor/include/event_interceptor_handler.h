@@ -22,7 +22,6 @@
 #include "i_input_event_collection_handler.h"
 #include "input_handler_type.h"
 #include "nocopyable.h"
-#include "singleton.h"
 #include "uds_session.h"
 
 namespace OHOS {
@@ -67,7 +66,7 @@ private:
         }
         InputHandlerType handlerType_;
         HandleEventType eventType_;
-        SessionPtr session_ = nullptr;
+        SessionPtr session_ { nullptr };
     };
 
     class InterceptorCollection : public IInputEventCollectionHandler, protected NoCopyable {

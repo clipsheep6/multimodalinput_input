@@ -29,6 +29,7 @@
 namespace OHOS {
 namespace MMI {
 class InputDeviceImpl {
+
 public:
     static InputDeviceImpl& GetInstance();
     DISALLOW_COPY_AND_MOVE(InputDeviceImpl);
@@ -79,9 +80,9 @@ private:
     InputDeviceImpl() = default;
     std::map<int32_t, InputDeviceData> inputDevices_;
     std::map<std::string, std::list<DevListener>> devListener_ = { { "change", {} } };
+    int32_t userData_ { 0 };
+    bool isListeningProcess_ { false };
     std::mutex mtx_;
-    int32_t userData_ {0};
-    bool isListeningProcess_ {false};
 };
 } // namespace MMI
 } // namespace OHOS
