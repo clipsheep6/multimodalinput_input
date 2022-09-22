@@ -456,7 +456,7 @@ HWTEST_F(IDCooperateTest, OnDeviceOnline, TestSize.Level1)
 {
     std::string networkId = "123";
     InputDevCooSM->OnDeviceOnline(networkId);
-    std::for_each(InputDevCooSM->onlineDevice_.begin(), InputDevCooSM->onlineDevice_.end(),[&, this](std::string &deviceId)
+    std::for_each(InputDevCooSM->onlineDevice_.begin(), InputDevCooSM->onlineDevice_.end(), [&, this](std::string &deviceId)
     {
         EXPECT_EQ(deviceId, networkId);
     });
@@ -476,7 +476,7 @@ HWTEST_F(IDCooperateTest, OnDeviceOffline001, TestSize.Level1)
     InputDevCooSM->OnDeviceOffline(networkId);
     if (!InputDevCooSM->onlineDevice_.empty()) {
         MMI_HILOGD("onlineDevice is not nullptr");
-        std::for_each(InputDevCooSM->onlineDevice_.begin(), InputDevCooSM->onlineDevice_.end(),[&, this](std::string &deviceId)
+        std::for_each(InputDevCooSM->onlineDevice_.begin(), InputDevCooSM->onlineDevice_.end(), [&, this](std::string &deviceId)
         {
             EXPECT_NE(deviceId, networkId);
         });
@@ -497,7 +497,7 @@ HWTEST_F(IDCooperateTest, OnDeviceOffline002, TestSize.Level1)
     InputDevCooSM->OnDeviceOffline(networkId);
     if (!InputDevCooSM->onlineDevice_.empty()) {
         MMI_HILOGD("InputDevCooSM onlineDevice is not nullptr");
-        std::for_each(InputDevCooSM->onlineDevice_.begin(), InputDevCooSM->onlineDevice_.end(),[&, this](std::string &deviceId)
+        std::for_each(InputDevCooSM->onlineDevice_.begin(), InputDevCooSM->onlineDevice_.end(), [&, this](std::string &deviceId)
         {
             EXPECT_NE(deviceId, networkId);
         });

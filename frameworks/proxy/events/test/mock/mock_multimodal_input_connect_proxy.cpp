@@ -61,7 +61,7 @@ int32_t MultimodalInputConnectProxy::EnableInputDeviceCooperate(int32_t userData
     if (ret == false) {
         return RET_ERR;
     }
-    MMI_HILOGI("EnableInputDeviceCooperate");
+    MMI_HILOGD("EnableInputDeviceCooperate");
     return RET_OK;
 }
 
