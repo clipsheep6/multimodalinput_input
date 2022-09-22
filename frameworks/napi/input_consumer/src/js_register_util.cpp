@@ -331,12 +331,17 @@ void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
 {
     CALL_DEBUG_ENTER;
     CHKPV(work);
-    CHKPV(work->data);
-    (void)status;
-    KeyEventMonitorInfoWorker *dataWorker = static_cast<KeyEventMonitorInfoWorker *>(work->data);
-    if (dataWorker == nullptr) {
+    if (work->data == nullptr) {
+        MMI_HILOGE("Check data is null");
         delete work;
         work = nullptr;
+        return;
+    }
+    (void)status;
+    KeyEventMonitorInfoWorker *dataWorker = static_cast<KeyEventMonitorInfoWorker *>(work->data);
+    delete work;
+    work = nullptr;
+    if (dataWorker == nullptr) {
         MMI_HILOGE("Data worker is empty");
         napi_throw_error(dataWorker->env, nullptr, "Data worker is empty");
         return;

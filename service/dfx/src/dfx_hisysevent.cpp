@@ -131,6 +131,7 @@ void DfxHisysevent::OnClientConnect(const ClientConnectData &data, OHOS::HiviewD
 void DfxHisysevent::OnClientDisconnect(const SessionPtr& secPtr, int32_t fd,
     OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
+    CHKPV(secPtr);
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
         int32_t ret = OHOS::HiviewDFX::HiSysEvent::Write(
             OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,

@@ -317,6 +317,7 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction)
     auto fd = udsServer_->GetClientFd(lastWindowInfo_.pid);
     if (fd == RET_ERR) {
         auto windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
+        CHKPV(windowInfo);
         fd = udsServer_->GetClientFd(windowInfo->pid);
     }
     auto sess = udsServer_->GetSession(fd);
