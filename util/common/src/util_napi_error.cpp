@@ -23,14 +23,15 @@ namespace UtilNapiError {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UtilNapiError" };
 } // namespace
-const NapiError* GetApiError(int32_t code)
+bool GetApiError(int32_t code, NapiError& codeMsg)
 {
     auto iter = NAPI_ERRORS.find(code);
     if (iter == NAPI_ERRORS.end()) {
         MMI_HILOGE("Error code %{public}d not found", code);
-        return nullptr;
+        return false;
     }
-    return &(iter->second);
+    codeMsg = iter->second;
+    return true;
 }
 } // namespace OHOS::MMI::UtilNapiError
 } // namespace MMI

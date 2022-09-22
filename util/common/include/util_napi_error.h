@@ -63,17 +63,16 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
 #define THROWERR_API9(env, code, ...) \
     do { \
         MMI_HILOGE("%{public}s", (#code)); \
-        auto res = UtilNapiError::GetApiError(code); \
-        if (res != nullptr) { \
-            char buf[100]; \
-            if (sprintf_s(buf, sizeof(buf), res->msg.c_str(), ##__VA_ARGS__) > 0) { \
-                napi_throw_error(env, res->ErrorCode.c_str(), buf); \
+        NapiError codeMsg; \
+        if(UtilNapiError::GetApiError(code, codeMsg)) { \
+           char buf[100]; \
+           if (sprintf_s(buf, sizeof(buf), codeMsg.msg.c_str(), ##__VA_ARGS__) > 0) { \
+               napi_throw_error(env, codeMsg.ErrorCode.c_str(), buf); \
             } \
         } \
     } while (0)
-
 namespace UtilNapiError {
-const NapiError* GetApiError(int32_t code);
+bool GetApiError(int32_t code, NapiError& codeMsg);
 } // namespace UtilNapiError
 } // namespace MMI
 } // namespace OHOS
