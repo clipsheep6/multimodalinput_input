@@ -156,6 +156,85 @@ public:
         AXIS_TYPE_MAX
     };
 
+    enum AbsoluteType {
+        /**
+         * 表示未知的操纵杆类型。它通常用作初始值。
+         *
+         * @since 9
+         */
+        ABSOLUTE_TYPE_UNKNOWN,
+
+        /**
+         * 表示操纵杆类型的X事件。
+         *
+         * @since 9
+         */
+        ABSOLUTE_TYPE_X,
+
+        /**
+         * 表示操纵杆类型的Y事件。
+         *
+         * @since 9
+         */
+        ABSOLUTE_TYPE_Y,
+
+        /**
+         * 表示操纵杆类型的Z事件。
+         *
+         * @since 9
+         */
+        ABSOLUTE_TYPE_Z,
+
+        /**
+         * 表示操纵杆类型的RZ事件。
+         *
+         * @since 9
+         */
+        ABSOLUTE_TYPE_RZ,
+
+        /**
+         * 表示操纵杆类型的GAS事件。
+         *
+         * @since 9
+         */
+        ABSOLUTE_TYPE_GAS,
+
+        /**
+         * 表示操纵杆类型的BRAKE事件。
+         *
+         * @since 9
+         */
+        ABSOLUTE_TYPE_BRAKE,
+
+        /**
+         * 表示操纵杆类型的HAT0X事件。
+         *
+         * @since 9
+         */
+        ABSOLUTE_TYPE_HAT0X,
+
+        /**
+         * 表示操纵杆类型的HAT0Y事件。
+         *
+         * @since 9
+         */
+        ABSOLUTE_TYPE_HAT0Y,
+
+        /**
+         * 表示操纵杆类型的THROTTLE事件。
+         *
+         * @since 9
+         */
+        ABSOLUTE_TYPE_THROTTLE,
+
+        /**
+         * 表示已定义的操纵杆类型的最大数目。
+         *
+         * @since 9
+         */
+        ABSOLUTE_TYPE_MAX
+    };
+
     /**
      * Indicates an unknown input source type. It is usually used as the initial value.
      *
@@ -310,6 +389,188 @@ public:
      * @since 9
      */
     static constexpr int32_t TOOL_TYPE_LENS = 7;
+
+    /**
+     * 表示手柄的TL2按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_TL2 = 0;
+
+    /**
+     * 表示手柄的TR2按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_TR2 = 1;
+
+    /**
+     * 表示手柄的TL按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_TL = 2;
+
+    /**
+     * 表示手柄的TR按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_TR = 3;
+
+    /**
+     * 表示手柄的WEST按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_WEST = 4;
+
+    /**
+     * 表示手柄的SOUTH按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_SOUTH = 5;
+
+    /**
+     * 表示手柄的NORTH按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_NORTH = 6;
+
+    /**
+     * 表示手柄的EAST按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_EAST = 7;
+
+    /**
+     * 表示手柄的START按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_START = 8;
+
+    /**
+     * 表示手柄的SELECT按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_SELECT = 9;
+
+    /**
+     * 表示手柄的HOMEPAGE按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_HOMEPAGE = 10;
+
+    /**
+     * 表示手柄的THUMBL按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_THUMBL = 11;
+
+    /**
+     * 表示手柄的THUMBR按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_THUMBR = 12;
+
+    /**
+     * 表示操纵杆的TRIGGER按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_TRIGGER = 13;
+
+    /**
+     * 表示操纵杆的THUMB按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_THUMB = 14;
+
+    /**
+     * 表示操纵杆的THUMB2按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_THUMB2 = 15;
+
+    /**
+     * 表示操纵杆的TOP按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_TOP = 16;
+
+    /**
+     * 表示操纵杆的TOP2按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_TOP2 = 17;
+
+    /**
+     * 表示操纵杆的PINKIE按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_PINKIE = 18;
+
+    /**
+     * 表示操纵杆的BASE按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_BASE = 19;
+
+    /**
+     * 表示操纵杆的BASE2按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_BASE2 = 20;
+
+    /**
+     * 表示操纵杆的BASE3按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_BASE3 = 21;
+
+    /**
+     * 表示操纵杆的BASE4按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_BASE4 = 22;
+
+    /**
+     * 表示操纵杆的BASE5按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_BASE5 = 23;
+
+    /**
+     * 表示操纵杆的BASE6按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_BASE6 = 24;
+
+    /**
+     * 表示操纵杆的DEAD按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_DEAD = 25;
 
 public:
     static std::shared_ptr<PointerEvent> from(std::shared_ptr<InputEvent> inputEvent);
@@ -971,6 +1232,21 @@ public:
     uint32_t GetAxes() const;
 
     /**
+     * @brief 检查此事件是否包含指定的操纵杆类型。
+     * @param abs 指示操纵杆类型。
+     * @return 如果事件包含指定的操纵杆类型，返回true;否则返回false。
+     * @since 9
+     */
+    bool Hasjoystick(AbsoluteType abs) const;
+
+    /**
+     * @brief 获取此事件的所有操纵杆。
+     * @return 返回所有的操纵杆，每一位表示一个操纵杆。
+     * @since 9
+     */
+    uint32_t GetAbs() const;
+
+    /**
      * @brief Set the front keys in the key combination.
      * @param pressedKeys Indicates the front keys to set.
      * @return void.
@@ -991,6 +1267,24 @@ public:
      * @since 9
      */
     bool IsValid() const;
+
+    /**
+     * @brief 获取abs值。
+     * @param abs 表示是abs类型
+     * @return 返回abs值
+     * @since 9
+     */
+    double GetAbsValue(AbsoluteType abs) const;
+
+    /**
+     * @brief 设置abs值。
+     * @param abs 表示是abs类型。
+     * @param absValue 表示需要设置的abs值。
+     * @return 返回abs值。
+     * @since 9
+     */
+    void SetAbsValue(AbsoluteType abs, double absValue);
+
 public:
     /**
      * @brief Checks whether the axes set represented by <b>axes</b> contains a specified type of axis.
@@ -1000,6 +1294,15 @@ public:
      * @since 9
      */
     static bool HasAxis(uint32_t axes, AxisType axis);
+
+    /**
+     * @brief 检查操纵杆的集合是否包含指定类型的操纵杆。
+     * @param joystick 表示操纵杆的集合。每一位表示一个操纵杆。
+     * @param abs 指示要检查的操纵杆的类型。
+     * @return 如果操纵杆集合包含指定的操纵杆类型，返回true;否则false。
+     * @since 9
+     */
+    static bool Hasjoystick(uint32_t joystick, AbsoluteType abs);
 
 public:
     /**
@@ -1040,7 +1343,9 @@ private:
     int32_t pointerAction_ { POINTER_ACTION_UNKNOWN };
     int32_t buttonId_ { -1 };
     uint32_t axes_ { 0U };
+    uint32_t abs_ { 0U };
     std::array<double, AXIS_TYPE_MAX>   axisValues_ {};
+    std::array<double, ABSOLUTE_TYPE_MAX> absValues_ {};
     std::vector<int32_t> pressedKeys_;
 };
 
@@ -1052,6 +1357,16 @@ inline bool PointerEvent::HasAxis(AxisType axis) const
 inline uint32_t PointerEvent::GetAxes() const
 {
     return axes_;
+}
+
+inline bool PointerEvent::Hasjoystick(AbsoluteType abs) const
+{
+    return Hasjoystick(abs_, abs);
+}
+
+inline uint32_t PointerEvent::GetAbs() const
+{
+    return abs_;
 }
 } // namespace MMI
 } // namespace OHOS
