@@ -69,7 +69,7 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
             if (sprintf_s(buf, sizeof(buf), res->msg.c_str(), ##__VA_ARGS__) > 0) { \
                 napi_throw_error(env, res->ErrorCode.c_str(), buf); \
             } \
-        }\
+        } \
     } while (0)
 
 namespace UtilNapiError {
