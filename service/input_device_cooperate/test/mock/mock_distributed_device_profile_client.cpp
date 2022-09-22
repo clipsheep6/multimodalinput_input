@@ -43,7 +43,7 @@ int32_t DistributedDeviceProfileClient::PutDeviceProfile(const ServiceCharacteri
     if (DistributedDeviceProfileClient::CheckProfileInvalidity(profile)) {
         return DP_INVALID_PARAMS;
     }
-    HILOGE("Getting device profile service succeeded");
+    HILOGD("Getting device profile service succeeded");
     return DP_GET_SERVICE_SUCCESS;
 }
 
@@ -51,13 +51,13 @@ int32_t DistributedDeviceProfileClient::GetDeviceProfile(const std::string& udid
     ServiceCharacteristicProfile& profile)
 {
     if (udid.empty() || serviceId.empty()) {
-        HILOGE("Failed to get device profile");
+        HILOGD("Failed to get device profile");
         return RET_ERR;
     } 
     nlohmann::json data;
     data[CHARACTERISTICS_NAME] = state_;
     profile.SetCharacteristicProfileJson(data.dump());
-    HILOGE("Get device profile successfully");
+    HILOGD("Get device profile successfully");
     return RET_OK;
 }
 
@@ -115,7 +115,7 @@ int32_t DistributedDeviceProfileClient::SyncDeviceProfile(const SyncOptions& syn
     if (dps == nullptr) {
         return DP_GET_SERVICE_FAILED;
     }
-    HILOGE("Successfully synchronized device profile");
+    HILOGD("Successfully synchronized device profile");
     return DP_GET_SERVICE_SUCCESS;
 }
 
@@ -124,7 +124,7 @@ sptr<IDistributedDeviceProfile> DistributedDeviceProfileClient::GetDeviceProfile
     if (dpProxy_ != nullptr) {
         return dpProxy_;
     }
-    HILOGE("Get device profile service succeeded");
+    HILOGD("Get device profile service succeeded");
     return dpProxy_;
 }
 
@@ -132,7 +132,7 @@ bool DistributedDeviceProfileClient::CheckProfileInvalidity(const ServiceCharact
 {
     bool state = profile.GetServiceId().empty() || profile.GetServiceType().empty() ||
                  profile.GetCharacteristicProfileJson().empty();
-    HILOGE("The status of the invalid profile is :%{public}d", state);
+    HILOGD("The status of the invalid profile is :%{public}d", state);
     return state;
 }
 } // namespace DeviceProfile
