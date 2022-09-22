@@ -113,7 +113,6 @@ bool MMIClient::StartEventRunner()
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
         CHKPF(eventHandler_);
-        MMI_HILOGI("Create new EventRunner success");
     }
 
     if (isConnected_ && fd_ >= 0) {
