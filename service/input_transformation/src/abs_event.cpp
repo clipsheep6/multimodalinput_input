@@ -15,11 +15,9 @@
 #include "abs_event.h"
 
 #include <algorithm>
-
 #include <linux/input.h>
 
 #include "i_input_define.h"
-// #include "Log.h"
 #include "mmi_log.h"
 #include "stream_utils.h"
 
