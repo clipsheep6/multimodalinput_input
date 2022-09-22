@@ -26,10 +26,10 @@
 
 namespace OHOS {
 namespace MMI {
-// class IInputContext;
+    class IInputContext;
 class AbsEventHandler : public NonCopyable {
 public:
-    AbsEventHandler(const std::string& seatId);
+    AbsEventHandler(const IInputContext* context, const std::string& seatId);
     virtual ~AbsEventHandler() = default;
 
     std::shared_ptr<const PointerEvent> HandleEvent(const std::shared_ptr<const AbsEvent>& absEvent);
@@ -44,7 +44,7 @@ private:
     std::shared_ptr<PointerEvent::PointerItem> ConvertPointer(const std::shared_ptr<const AbsEvent::Pointer>& absEventPointer) const;
 
 private:
-    // [[maybe_unused]] const IInputContext* const context_;
+    [[maybe_unused]] const IInputContext* const context_;
     const std::string seatId_;
 };
 } // namespace MMI

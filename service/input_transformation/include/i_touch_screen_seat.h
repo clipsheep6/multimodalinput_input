@@ -23,13 +23,14 @@
 
 namespace OHOS {
 namespace MMI {
-// class IInputContext;
+class IInputContext;
 // class PhysicalDisplayState;
 // class LogicalDisplayState;
 
 class ITouchScreenSeat {
 public:
-    static std::unique_ptr<ITouchScreenSeat> CreateInstance(const std::string& seatId, const std::string& seatName);
+    static std::unique_ptr<ITouchScreenSeat> CreateInstance(const IInputContext* contex, 
+                    const std::string& seatId, const std::string& seatName);
 
     static std::shared_ptr<ITouchScreenSeat> GetDefault();
 

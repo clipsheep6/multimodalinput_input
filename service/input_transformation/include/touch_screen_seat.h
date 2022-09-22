@@ -30,7 +30,8 @@ namespace MMI {
 
 class TouchScreenSeat : public NonCopyable, public ITouchScreenSeat {
 public:
-    static std::unique_ptr<TouchScreenSeat> CreateInstance(const std::string& seatId, const std::string& seatName);
+    static std::unique_ptr<TouchScreenSeat> CreateInstance(const IInputContext* context, 
+                    const std::string& seatId, const std::string& seatName);
 
 public:
     virtual ~TouchScreenSeat() = default;
@@ -55,7 +56,7 @@ public:
     virtual void OnInputEvent(const std::shared_ptr<const AbsEvent>& event) override;
 
 protected:
-    TouchScreenSeat(const std::string& seatId, const std::string& seatName);
+    TouchScreenSeat(const IInputContext* context, const std::string& seatId, const std::string& seatName);
 
     // std::shared_ptr<PhysicalDisplayState> GetTargetDisplay() const;
 
@@ -69,7 +70,7 @@ protected:
     int32_t ConvertAction(int32_t absEventAction) const;
 
 private:
-    // const IInputContext* const context_;
+    const IInputContext* const context_;
     const std::string seatId_;
     const std::string seatName_;
 

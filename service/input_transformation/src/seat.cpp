@@ -17,7 +17,7 @@
 
 #include <algorithm>
 
-// #include "IInputContext.h"
+#include "i_input_context.h"
 #include "i_seat_manager.h"
 #include "i_input_device.h"
 // #include "IEventDispatcher.h"
@@ -82,20 +82,21 @@ void Seat::NewEventListener::Reset()
     seat_ = nullptr;    
 }
 
-std::unique_ptr<Seat> Seat::CreateInstance(const std::string& seatId) {
-    // if (!context) {
-    //     errno = EINVAL;
-    //     return nullptr;
-    // }
+std::unique_ptr<Seat> Seat::CreateInstance(const IInputContext* context, const std::string& seatId) {
+    if (!context) {
+        //errno = EINVAL;
+       return nullptr;
+    }
 
-    return std::unique_ptr<Seat>(new Seat(seatId));
+    return std::unique_ptr<Seat>(new Seat(context, seatId));
 }
 
-Seat::Seat(const std::string& seatId)
-    : seatId_(seatId), 
-    absEventHandler_(seatId) ,
+Seat::Seat(const IInputContext* context, const std::string& seatId)
+    : context_(context), 
+    seatId_(seatId), 
+    absEventHandler_(context_, seatId) ,
     newEventListener_(std::shared_ptr<NewEventListener>(new NewEventListener(this))), 
-    transformers_(IEventTransformer::CreateTransformers(newEventListener_))
+    transformers_(IEventTransformer::CreateTransformers(context, newEventListener_))
 {
 }
 

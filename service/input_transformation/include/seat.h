@@ -31,7 +31,7 @@ namespace OHOS {
 namespace MMI {
 class Seat : public NonCopyable, public ISeat {
 public:
-    static std::unique_ptr<Seat> CreateInstance(const std::string& seatId);
+    static std::unique_ptr<Seat> CreateInstance(const IInputContext* context, const std::string& seatId);
 
 public:
     virtual ~Seat();
@@ -54,7 +54,7 @@ public:
     virtual bool IsEmpty() const override;
 
 protected:
-    Seat(const std::string& seatId);
+    Seat(const IInputContext* context, const std::string& seatId);
 
     class NewEventListener : public NonCopyable, public IEventTransformer::INewEventListener {
         public:
@@ -78,7 +78,7 @@ private:
     bool TryTransform(const std::shared_ptr<const PointerEvent>& event);
 
 private:
-    // const IInputContext* const context_;
+    const IInputContext* const context_;
     const std::string seatId_;
     std::list<std::shared_ptr<IInputDevice>> inputDevices_;
     // std::list<std::shared_ptr<LogicalDisplayState>> displays_;

@@ -13,26 +13,29 @@
  * limitations under the License.
  */
 
-#ifndef I_EVENT_HANDLER_H
-#define I_EVENT_HANDLER_H
+#ifndef I_DEVICE_MANAGER_H
+#define I_DEVICE_MANAGER_H
 
 #include <memory>
 #include <list>
 
+#include "i_input_device.h"
+
 namespace OHOS {
 namespace MMI {
-// class KeyEvent;
-class PointerEvent;
 class IInputContext;
-class IEventHandler {
+class IDeviceManager {
 public:
-    static std::list<std::shared_ptr<IEventHandler>> PrepareHandlers(const IInputContext* context);
+    static std::unique_ptr<IDeviceManager> CreateInstance(IInputContext* context);
 
-    virtual ~IEventHandler() = default;
-    // virtual bool HandleEvent(const std::shared_ptr<const KeyEvent>& event) = 0;
-    virtual bool HandleEvent(const std::shared_ptr<const PointerEvent>& event) = 0;
-    virtual const std::string& GetName() const = 0;
+    virtual ~IDeviceManager() = default;
+    virtual std::shared_ptr<IInputDevice> GetDevice(int32_t id) const = 0;
+    virtual std::list<int32_t> GetDeviceIdList() const = 0;
+
+    virtual bool AddDevice(const std::shared_ptr<IInputDevice>& device) = 0;
+    virtual std::shared_ptr<IInputDevice> RemoveDevice(int32_t id) = 0;
+    // virtual std::shared_ptr<IInputDevice> RemoveDevice(const std::string& deviceFile) = 0;
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // I_EVENT_HANDLER_H
+#endif // I_DEVICE_MANAGER_H

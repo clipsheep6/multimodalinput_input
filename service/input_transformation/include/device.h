@@ -25,7 +25,7 @@
 
 #include "i_input_define.h"
 #include "i_input_device.h"
-// #include "IInputContext.h"
+#include "i_input_context.h"
 #include "i_event_collector.h"
 #include "i_seat.h"
 #include "i_touch_screen_seat.h"
@@ -42,12 +42,12 @@ namespace MMI {
 
 class IKernelEventHandler;
 // class IEventLooper;
-class InputEventDevice : public NonCopyable, public IInputDevice {
-    // public:
-        // static std::shared_ptr<InputDevice> Open(const std::string& deviceFile, const IInputContext* context);
+class Device : public NonCopyable, public IInputDevice {
+public:
+    static std::shared_ptr<Device> Open(const std::string& deviceFile, const IInputContext* context);
 
 public:
-    virtual ~InputEventDevice();
+    virtual ~Device();
     virtual int32_t GetId() const override;
     virtual const std::string& GetName() const override;
     virtual const std::string& GetSeatId() const override;
@@ -63,7 +63,7 @@ protected:
     void Uninit();
 
 private:
-    InputEventDevice(int32_t id, const std::string& deviceFile);
+    Device(int32_t id, const std::string& deviceFile, const IInputContext* context);
 
 private:
     void OnFdEvent(int fd, int event);
@@ -103,7 +103,7 @@ private:
 private:
     const int32_t id_;
     // const std::string deviceFile_;
-    // const IInputContext* const context_;
+    const IInputContext* const context_;
     int32_t fd_;
     std::string seatId_;
     std::string seatName_;

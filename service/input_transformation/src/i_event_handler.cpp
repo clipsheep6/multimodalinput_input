@@ -22,12 +22,12 @@
 namespace OHOS {
 namespace MMI {
 
-std::list<std::shared_ptr<IEventHandler>> IEventHandler::PrepareHandlers()
+std::list<std::shared_ptr<IEventHandler>> IEventHandler::PrepareHandlers(const IInputContext* context)
 {
     std::list<std::shared_ptr<IEventHandler>> result;
-    // if (context == nullptr) {
-    //     return result;
-    // }
+    if (context == nullptr) {
+        return result;
+    }
 
     return result;
 }

@@ -17,7 +17,7 @@
 
 #include <algorithm>
 
-// #include "IInputContext.h"
+#include "i_input_context.h"
 #include "i_input_device.h"
 #include "i_seat.h"
 #include "i_touch_screen_seat.h"
@@ -34,16 +34,17 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SeatManager" };
 };
-std::unique_ptr<SeatManager> SeatManager::CreateInstance() {
-    // if (context == nullptr) {
-    //     return nullptr;
-    // }
+std::unique_ptr<SeatManager> SeatManager::CreateInstance(const IInputContext* context) {
+    if (context == nullptr) {
+        return nullptr;
+    }
 
-    return std::unique_ptr<SeatManager>(new SeatManager());
+    return std::unique_ptr<SeatManager>(new SeatManager(context));
 }
 
-SeatManager::SeatManager() {
-}
+    SeatManager::SeatManager(const IInputContext* context) 
+        : context_(context) {
+    }
 
 std::shared_ptr<ISeat> SeatManager::FindSeat(std::string seatId, bool createIfNotExist) {
     MMI_HILOGD("Enter seatId:%{public}s createIfNotExist:%{public}d", seatId.c_str(), createIfNotExist);
@@ -60,7 +61,7 @@ std::shared_ptr<ISeat> SeatManager::FindSeat(std::string seatId, bool createIfNo
         return result;
     }
 
-    result = ISeat::CreateInstance(seatId);
+    result = ISeat::CreateInstance(context_, seatId);
     if (!result) {
         MMI_HILOGE("Leave seatId:$%{public}s createIfNotExist:%{public}d, Create Failed", seatId.c_str(), createIfNotExist);
         return result;
@@ -99,7 +100,7 @@ std::shared_ptr<ITouchScreenSeat> SeatManager::FindTouchScreenSeat(const std::st
         return result;
     }
 
-    result = ITouchScreenSeat::CreateInstance(seatId, seatName);
+    ITouchScreenSeat::CreateInstance(context_, seatId, seatName);
     if (!result) {
         MMI_HILOGE("Leave seatId:%{public}s seatName:%{public}s createIfNotExist:%{public}d, Create Failed", seatId.c_str(), seatName.c_str(), createIfNotExist);
         return result;

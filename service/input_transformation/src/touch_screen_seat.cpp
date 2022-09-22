@@ -15,7 +15,7 @@
 
 #include "touch_screen_seat.h"
 
-// #include "IInputContext.h"
+#include "i_input_context.h"
 // #include "IWindowStateManager.h"
 // #include "IEventDispatcher.h"
 // #include "PhysicalDisplayState.h"
@@ -28,17 +28,18 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TouchScreenSeat" };
 };
-std::unique_ptr<TouchScreenSeat> TouchScreenSeat::CreateInstance(const std::string& seatId, const std::string& seatName) 
+std::unique_ptr<TouchScreenSeat> TouchScreenSeat::CreateInstance(const IInputContext* context,
+            const std::string& seatId, const std::string& seatName) 
 {
-    // if (context == nullptr) {
-    //     return nullptr;
-    // }
-    return std::unique_ptr<TouchScreenSeat>(new TouchScreenSeat(seatId, seatName));
+    if (context == nullptr) {
+         return nullptr;
+     }
+    return std::unique_ptr<TouchScreenSeat>(new TouchScreenSeat(context, seatId, seatName));
 }
 
-TouchScreenSeat::TouchScreenSeat(const std::string& seatId, 
-        const std::string& seatName) 
-    : seatId_(seatId), seatName_(seatName)
+TouchScreenSeat::TouchScreenSeat(const IInputContext* context, const std::string& seatId, 
+     const std::string& seatName) 
+        : context_(context), seatId_(seatId), seatName_(seatName)
 {
 }
 
@@ -329,10 +330,10 @@ std::shared_ptr<PointerEvent::PointerItem> TouchScreenSeat::ConvertPointer(const
     //     return pointer;
     // }
 
-    // if (context_ == nullptr) {
-    //     MMI_HILOGE("Leave, null context_");
-    //     return pointer;
-    // }
+    if (context_ == nullptr) {
+        MMI_HILOGE("Leave, null context_");
+        return pointer;
+    }
 
     // const auto& windowStateManager = context_->GetWindowStateManager();
     // if (!windowStateManager) {

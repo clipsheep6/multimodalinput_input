@@ -23,6 +23,7 @@
 
 namespace OHOS {
 namespace MMI {
+class IInputContext;
 // class RelEvent;
 // class KernelKeyEvent;
 class IEventTransformer : public IEventHandler {
@@ -36,7 +37,8 @@ public:
             // virtual void OnEvent(const std::shared_ptr<const KernelKeyEvent>& event) = 0;
     };
 
-    static std::list<std::shared_ptr<IEventTransformer>> CreateTransformers(const std::shared_ptr<INewEventListener>& listener);
+    static std::list<std::shared_ptr<IEventTransformer>> CreateTransformers(const IInputContext* context, 
+                    const std::shared_ptr<INewEventListener>& listener);
 };
 } // namespace MMI
 } // namespace OHOS

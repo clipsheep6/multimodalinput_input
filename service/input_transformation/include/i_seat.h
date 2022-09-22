@@ -25,12 +25,12 @@
 namespace OHOS {
 namespace MMI {
     
-// class IInputContext;
+class IInputContext;
 class IInputDevice;
 
 class ISeat {
 public:
-    static std::unique_ptr<ISeat> CreateInstance(const std::string& seatId);
+    static std::unique_ptr<ISeat> CreateInstance(const IInputContext* inputContext, const std::string& seatId);
 
     virtual ~ISeat() = default;
 

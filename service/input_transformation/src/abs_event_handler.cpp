@@ -16,7 +16,7 @@
 #include "abs_event_handler.h"
 
 #include "abs_event.h"
-// #include "IInputContext.h"
+#include "i_input_context.h"
 // #include "IInputDeviceManager.h"
 #include "pointer_event.h"
 // #include "Log.h"
@@ -28,8 +28,8 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AbsEventHandler" };
 };
-AbsEventHandler::AbsEventHandler(const std::string& seatId)
-    : seatId_(seatId)
+AbsEventHandler::AbsEventHandler(const IInputContext* context, const std::string& seatId)
+        : context_(context), seatId_(seatId)
 {
 }
 

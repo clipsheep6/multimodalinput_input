@@ -22,7 +22,7 @@
 namespace OHOS {
 namespace MMI {
 
-// class IInputContext;
+class IInputContext;
 class ISeat;
 class ITouchScreenSeat;
 class IInputDevice;
@@ -31,7 +31,7 @@ class IInputDevice;
 
 class ISeatManager {
 public:
-    static std::unique_ptr<ISeatManager> CreateInstance();
+    static std::unique_ptr<ISeatManager> CreateInstance(const IInputContext* context);
     static const std::unique_ptr<ISeatManager> NULL_VALUE;
 
     virtual ~ISeatManager() = default;

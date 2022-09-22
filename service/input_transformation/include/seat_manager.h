@@ -26,10 +26,10 @@
 namespace OHOS {
 namespace MMI {
 
-// class IInputContext;
+class IInputContext;
 class SeatManager : public NonCopyable, public ISeatManager {
 public:
-    static std::unique_ptr<SeatManager> CreateInstance();
+    static std::unique_ptr<SeatManager> CreateInstance(const IInputContext* context);
 public:
     virtual ~SeatManager() = default;
 
@@ -45,7 +45,7 @@ public:
     // virtual void OnDisplayChanged(const std::shared_ptr<LogicalDisplayState>& display) override;
 
 private:
-    SeatManager();
+    SeatManager(const IInputContext* context);
 
     // std::shared_ptr<ITouchScreenSeat> FindTouchScreenSeat(const std::shared_ptr<PhysicalDisplayState>& display,
     //         bool createIfNotExist);
@@ -60,7 +60,7 @@ private:
     void RemoveSeat(const std::shared_ptr<ITouchScreenSeat>& seat);
 
 private:
-    // const IInputContext* const context_;
+    const IInputContext* const context_;
     std::list<std::shared_ptr<ISeat>> seats_;
     std::list<std::shared_ptr<ITouchScreenSeat>> touchScreenSeats_;
 };
