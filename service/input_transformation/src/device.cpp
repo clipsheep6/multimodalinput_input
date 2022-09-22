@@ -19,7 +19,6 @@
 #include <cstring>
 #include <functional>
 #include <iomanip>
-
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
@@ -27,67 +26,20 @@
 #include <unistd.h>
 
 #include <linux/input.h>
-//#include <linux/input-event-codes.h>
-
-// #include "IEventLooper.h"
-// #include "Log.h"
 #include "mmi_log.h"
 #include "enum_utils.h"
-// #include "IoctlUtils.h"
 #include "time_utils.h"
-// #include "ResourceGuard.h"
-// #include "RelEvent.h"
-// #include "IdGenerator.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Device" };
 };
-// std::shared_ptr<InputDevice> InputDevice::Open(const std::string& deviceFile)
-// {
-//     int32_t id = MMI_HILOGE::TakeNextInputDeviceId();
-//     auto inputDevice = std::shared_ptr<InputDevice>(new InputDevice(id, deviceFile, context));
-//     auto retCode = inputDevice->Init();
-//     if (retCode != 0) {
-//         return nullptr;
-//     }
-
-//     return inputDevice;
-// }
-
 
 int32_t Device::Init() {
     MMI_HILOGD("Enter");
-
-    // const auto& looper = context_->GetLooper();
-    // if (!looper) {
-    //     MMI_HILOGE("Leave, null looper");
-    //     return -1;
-    // }
-
-    // fd_ = ::open(deviceFile_.c_str(), O_CLOEXEC | O_RDWR | O_NONBLOCK);
-    // if (fd_ < 0) {
-    //     MMI_HILOGE("Leave deviceFile:$s, open Failed:$s", deviceFile_, strerror(errno));
-    //     return -1;
-    // }
-
-    // auto retCode = IoctlUtils::GetInputDeviceName(fd_, name_);
-    // if (retCode == -1) {
-    //     MMI_HILOGE("Leave deviceFile:$s, null deviceName", deviceFile_);
-    //     return -1;
-    // }
-
-    // retCode = UpdateCapablility();
-    // if (retCode < 0) {
-    //     MMI_HILOGE("Leave deviceFile:$s, UpdateCapablility Failed", deviceFile_);
-    //     return -1;
-    // }
-
     seatId_ = "seat0";
     seatName_ = "default0";
-
-    // MMI_HILOGD("Leave deviceFile:$s", deviceFile_);
     return 0;
 }
 
@@ -125,11 +77,6 @@ const std::string& Device::GetSeatId() const {
 const std::string& Device::GetSeatName() const {
     return seatName_;
 }
-
-// const std::string& InputDevice::GetDeviceFile() const
-// {
-//     return deviceFile_;
-// }
 
 std::shared_ptr<IInputDevice::AxisInfo> Device::GetAxisInfo(int32_t axis) const
 {
@@ -182,89 +129,12 @@ std::shared_ptr<IInputDevice::AxisInfo> Device::GetAxisInfo(int32_t axis) const
 
 void Device::OnFdEvent(int fd, int event)
 {
-    // MMI_HILOGD("Enter fd:%{public}s event:%{public}s", fd, IEventLooper::EventToString(event));
-    // if (fd != fd_) {
-    //     context_->GetLooper()->RemoveFd(fd);
-    //     MMI_HILOGE("Leave fd:$s event:$s, fd_:$s mismatch", fd, IEventLooper::EventToString(event), fd_);
-    //     return;
-    // }
-
-    // if (event == IEventLooper::EVENT_IN) {
-    //     ReadEvents();
-    //     MMI_HILOGD("Leave fd:$s event:$s", fd, IEventLooper::EventToString(event));
-    //     return;
-    // }
-
-    // if (event == IEventLooper::EVENT_HUP) {
-    //     context_->GetLooper()->RemoveFd(fd);
-    //     MMI_HILOGD("Leave fd:$s event:$s", fd, IEventLooper::EventToString(event));
-    //     return;
-    // }
-
-    // MMI_HILOGE("Leave fd:%{public}s event:%{public}s, Unknown event", fd, IEventLooper::EventToString(event));
 }
 
 void Device::ReadEvents() {
-    // MMI_HILOGD("Enter deviceFile:%{public}s", deviceFile_);
-    // constexpr size_t MAX_COUNT_ONCE = 8;
-    // struct input_event inputEvent[MAX_COUNT_ONCE];
-
-    // while (true) {
-    //     auto ret = ::read(fd_, &inputEvent[0], sizeof(inputEvent));
-    //     if (ret < 0) {
-    //         auto err = errno;
-    //         if (err == EINTR) {
-    //             continue;
-    //         }
-
-    //         if (err == EAGAIN || err == EWOULDBLOCK) {
-    //             break;
-    //         }
-
-    //         MMI_HILOGE("Error:$s", strerror(err));
-    //         CloseDevice();
-    //         MMI_HILOGE("Leave deviceFile:$s, ReadError:$s", deviceFile_, strerror(err));
-    //         return;
-    //     }
-
-    //     if (ret == 0) {
-    //         break;
-    //     }
-
-    //     if ((ret % ((int)sizeof(inputEvent[0]))) != 0) {
-    //         CloseDevice();
-    //         MMI_HILOGE("Leave deviceFile:$s, Wrong DataSize", deviceFile_);
-    //         break;
-    //     }
-
-    //     for (int i = 0; i < (ret / ((int)sizeof(inputEvent[0]))); ++i) {
-    //         ProcessEventItem(&inputEvent[i]);
-    //     }
-    // }
-
-    // MMI_HILOGD("Leave deviceFile:%{public}s", deviceFile_);
 }
 
-int32_t Device::CloseDevice() {
-    // MMI_HILOGD("Enter deviceFile:%{public}s", deviceFile_);
-    // if (fd_ < 0) {
-    //     MMI_HILOGD("Leave deviceFile:$s, fd < 0", deviceFile_);
-    //     return 0;
-    // }
-
-    // auto fd = fd_;
-    // fd_ = -1;
-
-    // if (context_ != nullptr) {
-    //     const auto& looper = context_->GetLooper();
-    //     if (!looper) {
-    //         looper->RemoveFd(fd);
-    //     }
-    // }
-
-    // ::close(fd);
-
-    // MMI_HILOGD("Leave deviceFile:%{public}s", deviceFile_);
+int32_t Device::CloseDevice() {;
     return 0;
 }
 
@@ -492,13 +362,6 @@ bool Device::HasEventCode(int32_t evType, int32_t evCode) const {
 }
 
 void Device::ProcessSyncEvent(int32_t code, int32_t value) {
-    // {
-    //     auto event = relEventCollector_.HandleSyncEvent(code, value);
-    //     if (event) {
-    //         OnEventCollected(event);
-    //         relEventCollector_.AfterProcessed();
-    //     }
-    // }
     {
         const auto& event = absEventCollector_.HandleSyncEvent(code, value);
         if (event) {
@@ -508,24 +371,6 @@ void Device::ProcessSyncEvent(int32_t code, int32_t value) {
     }
 }
 
-// void InputDevice::ProcessKeyEvent(int32_t code, int32_t value) {
-//     MMI_HILOGD("Enter code:%{public}d value:%{public}d", EnumUtils::InputEventKeyCodeToString(code), value);
-//     auto event = keyEventCollector_.HandleKeyEvent(code, value);
-//     if (event) {
-//         OnEventCollected(event);
-//         keyEventCollector_.AfterProcessed();
-//         MMI_HILOGD("Leave code:%{public}d value:%{public}d KeyEvent", EnumUtils::InputEventKeyCodeToString(code), value);
-//         return;
-//     }
-//     MMI_HILOGD("Leave code:%{public}d value:%{public}d", EnumUtils::InputEventKeyCodeToString(code), value);
-// }
-
-// void InputDevice::ProcessRelEvent(int32_t code, int32_t value) {
-//     MMI_HILOGD("Enter code:%{public}d value:%{public}d", EnumUtils::InputEventRelCodeToString(code), value);
-//     relEventCollector_.HandleRelEvent(code, value);
-//     MMI_HILOGD("Leave code:%{public}d value:%{public}d", EnumUtils::InputEventRelCodeToString(code), value);
-// }
-
 void Device::ProcessAbsEvent(int32_t code, int32_t value) {
     const auto& event = absEventCollector_.HandleAbsEvent(code, value);
     if (event) {
@@ -533,50 +378,6 @@ void Device::ProcessAbsEvent(int32_t code, int32_t value) {
         absEventCollector_.AfterProcessed();
     }
 }
-
-// void InputDevice::ProcessMscEvent(int32_t code, int32_t value) {
-// }
-
-// void InputDevice::ProcessSwEvent(int32_t code, int32_t value) {
-// }
-
-// void InputDevice::ProcessLedEvent(int32_t code, int32_t value) {
-// }
-
-// void InputDevice::ProcessSndEvent(int32_t code, int32_t value) {
-// }
-
-// void InputDevice::ProcessRepEvent(int32_t code, int32_t value) {
-// }
-
-// void InputDevice::ProcessFfEvent(int32_t code, int32_t value) {
-// }
-
-// void InputDevice::ProcessPwrEvent(int32_t code, int32_t value) {
-// }
-
-// void InputDevice::ProcessFfStatusEvent(int32_t code, int32_t value) {
-// }
-
-// void InputDevice::OnEventCollected(const std::shared_ptr<const RelEvent>& event) {
-//     if (!event) {
-//         return;
-//     }
-
-//     MMI_HILOGD("Enter");
-//     eventHandler_->OnInputEvent(event);
-//     MMI_HILOGD("Leave");
-// }
-
-// void InputDevice::OnEventCollected(const std::shared_ptr<const KernelKeyEvent>& event) {
-//     if (!event) {
-//         return;
-//     }
-
-//     MMI_HILOGD("Enter KernelKeyEvent");
-//     eventHandler_->OnInputEvent(event);
-//     MMI_HILOGD("Leave KernelKeyEvent");
-// }
 
 void Device::OnEventCollected(const std::shared_ptr<const AbsEvent>& event) {
     if (!event) {
@@ -602,23 +403,10 @@ int32_t Device::StartReceiveEvents(const std::shared_ptr<IKernelEventHandler>& e
         return -1;
     }
 
-    // if (context_ == nullptr) {
-    //     MMI_HILOGE("Leave, null context_");
-    //     return -1;
-    // }
-
-    // const auto& looper = context_->GetLooper();
-    // if (!looper) {
-    //     MMI_HILOGE("Leave, null looper");
-    //     return -1;
-    // }
-
-    // auto retCode = looper->AddFd(fd_, IEventLooper::EVENT_IN, 
-    //         std::bind(&InputDevice::OnFdEvent, this, std::placeholders::_1, std::placeholders::_2));
-    // if (retCode == -1) {
-    //     MMI_HILOGE("Leave deviceFile:$s, AddFd Failed", deviceFile_);
-    //     return -1;
-    // }
+    if (context_ == nullptr) {
+        MMI_HILOGE("Leave, null context_");
+        return -1;
+    }
 
     eventHandler_ = eventHandler;
     MMI_HILOGD("Leave");
@@ -629,23 +417,10 @@ int32_t Device::StopReceiveEvents()
 {
     eventHandler_ = IKernelEventHandler::GetDefault();
 
-    // if (context_ == nullptr) {
-    //     MMI_HILOGE("Leave, null context_");
-    //     return -1;
-    // }
-
-    // const auto& looper = context_->GetLooper();
-    // if (!looper) {
-    //     MMI_HILOGE("Leave, null looper");
-    //     return -1;
-    // }
-
-    // auto retCode = looper->RemoveFd(fd_);
-    // if (retCode == -1) {
-    //     MMI_HILOGE("Leave deviceFile:$s, RemoveFd Failed", deviceFile_);
-    //     return -1;
-    // }
-
+    if (context_ == nullptr) {
+        MMI_HILOGE("Leave, null context_");
+        return -1;
+    }
     return 0;
 }
 } // namespace MMI

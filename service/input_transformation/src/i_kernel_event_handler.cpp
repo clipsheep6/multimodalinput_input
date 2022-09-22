@@ -19,14 +19,6 @@ namespace OHOS {
 namespace MMI {
 
 class DefaultHandler : public IKernelEventHandler {
-    // virtual void OnInputEvent(const std::shared_ptr<const RelEvent>& event) override
-    // {
-    // }
-
-    // virtual void OnInputEvent(const std::shared_ptr<const KernelKeyEvent>& event) override
-    // {
-    // }
-
     virtual void OnInputEvent(const std::shared_ptr<const AbsEvent>& event) override
     {
     }

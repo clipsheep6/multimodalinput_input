@@ -19,7 +19,6 @@
 #include <memory>
 #include <map>
 
-//#include <linux/input-event-codes.h>
 #include <linux/input.h>
 
 
@@ -29,10 +28,7 @@
 #include "i_event_collector.h"
 #include "i_seat.h"
 #include "i_touch_screen_seat.h"
-// #include "RelEventCollector.h"
-// #include "KeyEventCollector.h"
 #include "abs_event_collector.h"
-// #include "KernelKeyEvent.h"
 #include "abs_event.h"
 
 struct input_event;
@@ -41,7 +37,6 @@ namespace OHOS {
 namespace MMI {
 
 class IKernelEventHandler;
-// class IEventLooper;
 class Device : public NonCopyable, public IInputDevice {
 public:
     static std::shared_ptr<Device> Open(const std::string& deviceFile, const IInputContext* context);
@@ -52,7 +47,6 @@ public:
     virtual const std::string& GetName() const override;
     virtual const std::string& GetSeatId() const override;
     virtual const std::string& GetSeatName() const override;
-    // virtual const std::string& GetDeviceFile() const override;
     virtual std::shared_ptr<AxisInfo> GetAxisInfo(int32_t axis) const override;
     virtual bool HasCapability(int32_t capability) const override;
     virtual int32_t StartReceiveEvents(const std::shared_ptr<IKernelEventHandler>& eventHandler) override;
@@ -84,25 +78,12 @@ private:
     bool HasEventCode(int32_t evType, int32_t evCode) const;
 
     void ProcessSyncEvent(int32_t code, int32_t value);
-    // void ProcessKeyEvent(int32_t code, int32_t value);
-    // void ProcessRelEvent(int32_t code, int32_t value);
     void ProcessAbsEvent(int32_t code, int32_t value);
     void ProcessMscEvent(int32_t code, int32_t value);
-    // void ProcessSwEvent(int32_t code, int32_t value);
-    // void ProcessLedEvent(int32_t code, int32_t value);
-    // void ProcessSndEvent(int32_t code, int32_t value);
-    // void ProcessRepEvent(int32_t code, int32_t value);
-    // void ProcessFfEvent(int32_t code, int32_t value);
-    // void ProcessPwrEvent(int32_t code, int32_t value);
-    // void ProcessFfStatusEvent(int32_t code, int32_t value);
-
-    // void OnEventCollected(const std::shared_ptr<const RelEvent>& event);
-    // void OnEventCollected(const std::shared_ptr<const KernelKeyEvent>& event);
     void OnEventCollected(const std::shared_ptr<const AbsEvent>& event);
 
 private:
     const int32_t id_;
-    // const std::string deviceFile_;
     const IInputContext* const context_;
     int32_t fd_;
     std::string seatId_;
@@ -114,9 +95,6 @@ private:
     unsigned long evBit[LongsOfBits(EV_MAX)];
     unsigned long relBit[LongsOfBits(REL_MAX)];
     unsigned long absBit[LongsOfBits(ABS_MAX)];
-
-    // RelEventCollector relEventCollector_;
-    // KeyEventCollector keyEventCollector_;
     AbsEventCollector absEventCollector_;
 
     mutable std::map<int32_t, std::shared_ptr<IInputDevice::AxisInfo>> axises_;

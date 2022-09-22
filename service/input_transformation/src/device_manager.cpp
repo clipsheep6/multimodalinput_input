@@ -12,18 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
-#include <cstring>
 
+ #include "device_manager.h"
+
+#include <cstring>
 #include <dirent.h>
 
-#include "device_manager.h"
-// #include "IoUtils.h"
-// #include "Log.h"
 #include "mmi_log.h"
 #include "device.h"
 #include "i_seat_manager.h"
-// #include "InputErrorCode.h"
 
 namespace OHOS {
 namespace MMI {
@@ -33,7 +30,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Devic
 std::unique_ptr<DeviceManager> DeviceManager::CreateInstance(IInputContext* context) 
 {
     if (context == nullptr) {
-        // errno = EINVAL;
         return nullptr;
     }
     return std::unique_ptr<DeviceManager>(new DeviceManager(context));
@@ -109,31 +105,6 @@ std::shared_ptr<IInputDevice> DeviceManager::RemoveDevice(int32_t id)
     MMI_HILOGD("Leave id:%{public}d", id);
     return device;
 }
-
-// std::shared_ptr<IInputDevice> DeviceManager::RemoveDevice(const std::string& deviceFile)
-// {
-//     MMI_HILOGD("Enter deviceFile:%{public}s", deviceFile.c_str());
-//     for (auto it = inputDevices_.begin(); it != inputDevices_.end(); ) {
-//         std::shared_ptr<IInputDevice> inputDevice = it->second;
-//         if (!inputDevice) {
-//             MMI_HILOGW("null inputDevice, remove it");
-//             it = inputDevices_.erase(it);
-//             continue;
-//         }
-
-//         if (inputDevice->GetDeviceFile() == deviceFile) {
-//             inputDevices_.erase(it);
-//             NotifyDeviceRemoved(inputDevice);
-//             MMI_HILOGD("Leave");
-//             return inputDevice;
-//         }
-
-//         ++it;
-//     }
-    
-//     MMI_HILOGE("Leave deviceFile:%{public}s", deviceFile.c_str());
-//     return nullptr;
-// }
 
 const std::unique_ptr<ISeatManager>& DeviceManager::GetSeatManager() const
 {

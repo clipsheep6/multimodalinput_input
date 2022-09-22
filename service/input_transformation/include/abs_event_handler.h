@@ -22,7 +22,6 @@
 #include "i_input_define.h"
 #include "pointer_event.h"
 #include "abs_event.h"
-// #include "LogicalDisplayState.h"
 
 namespace OHOS {
 namespace MMI {
@@ -33,10 +32,6 @@ public:
     virtual ~AbsEventHandler() = default;
 
     std::shared_ptr<const PointerEvent> HandleEvent(const std::shared_ptr<const AbsEvent>& absEvent);
-
-    // void OnDisplayAdded(const std::shared_ptr<const LogicalDisplayState>& display);
-    // void OnDisplayRemoved(const std::shared_ptr<const LogicalDisplayState>& display);
-    // void OnDisplayChanged(const std::shared_ptr<const LogicalDisplayState>& display);
 
 private:
     int32_t ConvertSourceType(int32_t absEventSourceType) const;

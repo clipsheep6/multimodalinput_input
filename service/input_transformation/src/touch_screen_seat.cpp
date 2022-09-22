@@ -16,11 +16,6 @@
 #include "touch_screen_seat.h"
 
 #include "i_input_context.h"
-// #include "IWindowStateManager.h"
-// #include "IEventDispatcher.h"
-// #include "PhysicalDisplayState.h"
-// #include "Utils.h"
-// #include "Log.h"
 #include "mmi_log.h"
 
 namespace OHOS {
@@ -96,7 +91,6 @@ int32_t TouchScreenSeat::UnbindInputDevice(const std::shared_ptr<IInputDevice>& 
     }
 
     inputDevice_.reset();
-    // targetDisplays_.clear();
     MMI_HILOGD("Leave");
     return 0;
 }
@@ -109,8 +103,6 @@ std::shared_ptr<IInputDevice> TouchScreenSeat::GetInputDevice() const
 void TouchScreenSeat::OnInputEvent(const std::shared_ptr<const AbsEvent>& event)
 {
     MMI_HILOGD("Enter absEvent:%{public}p", event.get());
-
-    // std::shared_ptr<const LogicalDisplayState> targetDisplay;
     int32_t pointerAction = PointerEvent::POINTER_ACTION_UNKNOWN;
     int64_t actionTime = 0;
     auto pointer = ConvertPointer(event, pointerAction, actionTime);
@@ -207,35 +199,6 @@ const std::string& TouchScreenSeat::GetSeatName() const
     return seatName_;
 }
 
-// int32_t TouchScreenSeat::TransformToPhysicalDisplayCoordinate(int32_t tpX, int32_t tpY, int32_t& displayX, int32_t& displayY) const
-// {
-//     if (!xInfo_) {
-//         MMI_HILOGE("Leave, null xInfo_");
-//         return -1;
-//     }
-
-//     if (!yInfo_) {
-//         MMI_HILOGE("Leave, null yInfo_");
-//         return -1;
-//     }
-
-//     if (!display_) {
-//         MMI_HILOGE("Leave, null display_");
-//         return -1;
-//     }
-
-//     int32_t deltaX = tpX  - xInfo_->GetMinimum();
-//     int32_t width = xInfo_->GetMaximum() - xInfo_->GetMinimum() + 1;
-//     displayX = display_->TransformX(deltaX, width);
-
-//     int32_t deltaY = tpY - yInfo_->GetMinimum();
-//     int32_t height = yInfo_->GetMaximum() - yInfo_->GetMinimum() + 1;
-//     displayY = display_->TransformY(deltaY, height);
-
-//     MMI_HILOGD("Leave");
-//     return 0;
-// }
-
 bool TouchScreenSeat::IsEmpty() const
 {
     return !inputDevice_;
@@ -270,47 +233,6 @@ bool TouchScreenSeat::IsEmpty() const
 //     return 0;
 // }
 
-// void TouchScreenSeat::OnDisplayAdded(const std::shared_ptr<LogicalDisplayState>& display)
-// {
-// }
-
-// void TouchScreenSeat::OnDisplayRemoved(const std::shared_ptr<LogicalDisplayState>& display)
-// {
-//     if (!display) {
-//         MMI_HILOGE("Leave, null display");
-//         return;
-//     }
-
-//     for (auto it = targetDisplays_.begin(); it != targetDisplays_.end();) {
-//         if (it->second == display) {
-//             it = targetDisplays_.erase(it);
-//         } else {
-//             ++it;
-//         }
-//     }
-// }
-
-// void TouchScreenSeat::OnDisplayChanged(const std::shared_ptr<LogicalDisplayState>& display)
-// {
-//     if (!display) {
-//         MMI_HILOGE("Leave, null display");
-//         return;
-//     }
-
-//     auto changed = display->GetChanged();
-//     if (changed == LogicalDisplayState::CHANGED_NONE) {
-//         return;
-//     }
-
-//     for (auto it = targetDisplays_.begin(); it != targetDisplays_.end();) {
-//         if (it->second == display) {
-//             it = targetDisplays_.erase(it);
-//         } else {
-//             ++it;
-//         }
-//     }
-// }
-
 std::shared_ptr<PointerEvent::PointerItem> TouchScreenSeat::ConvertPointer(const std::shared_ptr<const AbsEvent>& absEvent,
         int32_t& pointerAction, int64_t& actionTime)
 {
@@ -325,21 +247,10 @@ std::shared_ptr<PointerEvent::PointerItem> TouchScreenSeat::ConvertPointer(const
         return pointer;
     }
 
-    // if (!display_) {
-    //     MMI_HILOGE("Leave, null display_");
-    //     return pointer;
-    // }
-
     if (context_ == nullptr) {
         MMI_HILOGE("Leave, null context_");
         return pointer;
     }
-
-    // const auto& windowStateManager = context_->GetWindowStateManager();
-    // if (!windowStateManager) {
-    //     MMI_HILOGE("Leave, null windowStateManager");
-    //     return pointer;
-    // }
 
     auto action = ConvertAction(absEvent->GetAction());
     if (action == PointerEvent::POINTER_ACTION_UNKNOWN) {

@@ -15,7 +15,6 @@
 
 #include "kernel_event_handler_bridge.h"
 
-// #include "Log.h"
 #include "mmi_log.h"
 
 namespace OHOS {
@@ -35,16 +34,6 @@ std::shared_ptr<IKernelEventHandler> KernelEventHandlerBridge::CreateInstance(co
     return std::shared_ptr<IKernelEventHandler>(new KernelEventHandlerBridge(seat, 
                 touchScreenSeat));
 }
-
-// void KernelEventHandlerBridge::OnInputEvent(const std::shared_ptr<const RelEvent>& event)
-// {
-//     seat_->OnInputEvent(event);
-// }
-
-// void KernelEventHandlerBridge::OnInputEvent(const std::shared_ptr<const KernelKeyEvent>& event)
-// {
-//     seat_->OnInputEvent(event);
-// }
 
 void KernelEventHandlerBridge::OnInputEvent(const std::shared_ptr<const AbsEvent>& event)
 {

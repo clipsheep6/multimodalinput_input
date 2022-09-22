@@ -35,20 +35,9 @@ public:
 
     virtual void OnInputDeviceAdded(const std::shared_ptr<IInputDevice>& inputDevice) override;
     virtual void OnInputDeviceRemoved(const std::shared_ptr<IInputDevice>& inputDevice) override;
-
-    // virtual void OnDisplayAdded(const std::shared_ptr<PhysicalDisplayState>& display) override;
-    // virtual void OnDisplayRemoved(const std::shared_ptr<PhysicalDisplayState>& display) override;
-    // virtual void OnDisplayChanged(const std::shared_ptr<PhysicalDisplayState>& display) override;
-
-    // virtual void OnDisplayAdded(const std::shared_ptr<LogicalDisplayState>& display) override;
-    // virtual void OnDisplayRemoved(const std::shared_ptr<LogicalDisplayState>& display) override;
-    // virtual void OnDisplayChanged(const std::shared_ptr<LogicalDisplayState>& display) override;
-
 private:
     SeatManager(const IInputContext* context);
 
-    // std::shared_ptr<ITouchScreenSeat> FindTouchScreenSeat(const std::shared_ptr<PhysicalDisplayState>& display,
-    //         bool createIfNotExist);
     std::shared_ptr<ITouchScreenSeat> FindTouchScreenSeat(const std::string& seatId, 
             const std::string& seatName, bool createIfNotExist);
 

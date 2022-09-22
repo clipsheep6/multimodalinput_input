@@ -22,14 +22,8 @@
 #include <list>
 
 #include "i_input_define.h"
-// #include "IEventLooper.h"
 #include "i_device_manager.h"
 #include "i_seat_manager.h"
-// #include "IWindowStateManager.h"
-// #include "IEventDispatcher.h"
-// #include "IInputDeviceDiscoverer.h"
-
-// #include "Robot.h"
 
 namespace OHOS {
 namespace MMI {
@@ -43,30 +37,17 @@ class InputContext : public NonCopyable, public IInputContext {
     public:
         virtual ~InputContext() = default;
 
-        // virtual const std::unique_ptr<IEventLooper>& GetLooper() const override; 
         virtual const std::unique_ptr<ISeatManager>& GetSeatManager() const override; 
         virtual const std::unique_ptr<IDeviceManager>& GetInputDeviceManager() const override; 
-        // virtual const std::unique_ptr<IWindowStateManager>& GetWindowStateManager() const override; 
-        // virtual const std::unique_ptr<IEventDispatcher>& GetEventDispatcher() const override; 
-
-        // void Run();
 
     protected:
         InputContext() = default;
-        // int32_t SetLooper(std::unique_ptr<IEventLooper>& looper);
         int32_t SetDeviceManager(std::unique_ptr<IDeviceManager>& inputDeviceManager);
         int32_t SetSeatManager(std::unique_ptr<ISeatManager>& seatManager);
-        // int32_t SetWindowStateManager(std::unique_ptr<IWindowStateManager>& windowStateManager);
-        // int32_t SetEventDispatcher(std::unique_ptr<IEventDispatcher>& eventDispatcher);
 
     private:
-        // std::unique_ptr<IEventLooper> looper_;
         std::unique_ptr<IDeviceManager> inputDeviceManager_;
         std::unique_ptr<ISeatManager> seatManager_;
-        // std::unique_ptr<IWindowStateManager> windowStateManager_;
-        // std::unique_ptr<IEventDispatcher> eventDispatcher_;
-        // std::list<std::shared_ptr<IInputDeviceDiscoverer>> inputDeviceDiscoverers_;
-        // std::unique_ptr<Robot> robot_;
 };
 } // namespace MMI
 } // namespace OHOS

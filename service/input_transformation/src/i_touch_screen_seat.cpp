@@ -50,26 +50,6 @@ class DefaultSeat : public ITouchScreenSeat {
         MMI_HILOGD("Leave");
     }
 
-    // virtual int32_t BindDisplay(const std::shared_ptr<PhysicalDisplayState>& display)  override
-    // {
-    //     return -1;
-    // }
-
-    // virtual int32_t UnbindDisplay(const std::shared_ptr<PhysicalDisplayState>& display) override
-    // {
-    //     return -1;
-    // }
-
-    // virtual int32_t UpdateDisplay(const std::shared_ptr<PhysicalDisplayState>& display) override
-    // {
-    //     return -1;
-    // }
-
-    // virtual std::shared_ptr<PhysicalDisplayState> GetDisplay() const override
-    // {
-    //     return nullptr;
-    // }
-
     virtual const std::string& GetSeatId() const override
     {
         return seatId_;
@@ -80,19 +60,7 @@ class DefaultSeat : public ITouchScreenSeat {
         return seatName_;
     }
 
-    // virtual void OnDisplayAdded(const std::shared_ptr<LogicalDisplayState>& display) override
-    // {
-    // }
-
-    // virtual void OnDisplayRemoved(const std::shared_ptr<LogicalDisplayState>& display) override
-    // {
-    // }
-
-    // virtual void OnDisplayChanged(const std::shared_ptr<LogicalDisplayState>& display) override
-    // {
-    // }
-
-    private:
+private:
     const std::string seatId_{"seat0"};
     const std::string seatName_{"default0"};
 };

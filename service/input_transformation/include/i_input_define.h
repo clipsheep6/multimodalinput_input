@@ -21,9 +21,6 @@
 
 namespace OHOS {
 namespace MMI {
-
-// constexpr int INVALID_FD = -1;
-
 struct NonCopyable {
     NonCopyable() = default;
     virtual ~NonCopyable() = default;;

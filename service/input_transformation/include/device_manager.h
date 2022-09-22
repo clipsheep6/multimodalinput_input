@@ -37,7 +37,6 @@ public:
 
     virtual bool AddDevice(const std::shared_ptr<IInputDevice>& device) override;
     virtual std::shared_ptr<IInputDevice> RemoveDevice(int32_t id) override;
-    // virtual std::shared_ptr<IInputDevice> RemoveDevice(const std::string& deviceFile) override;
 
 protected:
     DeviceManager(IInputContext* context);

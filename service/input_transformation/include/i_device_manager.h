@@ -34,7 +34,6 @@ public:
 
     virtual bool AddDevice(const std::shared_ptr<IInputDevice>& device) = 0;
     virtual std::shared_ptr<IInputDevice> RemoveDevice(int32_t id) = 0;
-    // virtual std::shared_ptr<IInputDevice> RemoveDevice(const std::string& deviceFile) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

@@ -20,7 +20,6 @@
 #include "abs_event.h"
 #include "enum_utils.h"
 #include "time_utils.h"
-// #include "Log.h"
 #include "mmi_log.h"
 
 namespace OHOS {
@@ -237,7 +236,6 @@ void AbsEventCollector::RemoveReleasedPointer()
         MMI_HILOGE("Leave, null pointer failed");
         return;
     }
-
     pointer->SetId(-1);
 }
 } // namespace MMI

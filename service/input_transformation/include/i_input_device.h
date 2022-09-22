@@ -25,8 +25,6 @@ namespace MMI {
 
 class IInputContext;
 class IKernelEventHandler;
-// class IKernelTouchScreenEventHandler;
-
 class IInputDevice {
 public:
     static const int32_t CAPABILITY_UNKNOWN = 0b0;

@@ -20,9 +20,6 @@
 #include "i_input_context.h"
 #include "i_seat_manager.h"
 #include "i_input_device.h"
-// #include "IEventDispatcher.h"
-// #include "IInputDevice.h"
-// #include "Log.h"
 #include "mmi_log.h"
 
 namespace OHOS {
@@ -35,16 +32,6 @@ Seat::NewEventListener::NewEventListener(Seat* seat)
 {
 }
 
-// void Seat::NewEventListener::OnEvent(const std::shared_ptr<const KeyEvent>& event)
-// {
-//     if (seat_ == nullptr) {
-//         MMI_HILOGE("Leave, null seat_");
-//         return;
-//     }
-
-//     seat_->DispatchEvent(event);
-// }
-
 void Seat::NewEventListener::OnEvent(const std::shared_ptr<const PointerEvent>& event)
 {
     if (seat_ == nullptr) {
@@ -55,28 +42,6 @@ void Seat::NewEventListener::OnEvent(const std::shared_ptr<const PointerEvent>& 
     // seat_->DispatchEvent(event);
 }
 
-// void Seat::NewEventListener::OnEvent(const std::shared_ptr<const RelEvent>& event)
-// {
-//     if (seat_ == nullptr) {
-//         MMI_HILOGE("Leave, null seat_");
-//         return;
-//     }
-
-//     MMI_HILOGD("RelEvent");
-//     seat_->OnInputEvent(event);
-// }
-
-// void Seat::NewEventListener::OnEvent(const std::shared_ptr<const KernelKeyEvent>& event)
-// {
-//     if (seat_ == nullptr) {
-//         MMI_HILOGE("Leave, null seat_");
-//         return;
-//     }
-
-//     MMI_HILOGD("KernelKeyEvent");
-//     seat_->OnInputEvent(event);
-// }
-
 void Seat::NewEventListener::Reset()
 {
     seat_ = nullptr;    
@@ -84,7 +49,6 @@ void Seat::NewEventListener::Reset()
 
 std::unique_ptr<Seat> Seat::CreateInstance(const IInputContext* context, const std::string& seatId) {
     if (!context) {
-        //errno = EINVAL;
        return nullptr;
     }
 
@@ -107,35 +71,6 @@ Seat::~Seat()
     }
 }
 
-// void Seat::OnInputEvent(const std::shared_ptr<const RelEvent>& event) {
-//     MMI_HILOGD("Enter RelEvent");
-//     auto pointerEvent = relEventHandler_.HandleEvent(event);
-//     if (pointerEvent) {
-//         DispatchEvent(pointerEvent);
-//     }
-//     MMI_HILOGD("Leave RelEvent");
-// }
-
-// void Seat::OnInputEvent(const std::shared_ptr<const KernelKeyEvent>& event) {
-//     MMI_HILOGD("Enter KernelKeyEvent");
-//     bool consumed = false;
-//     auto pointerEvent = relEventHandler_.HandleEvent(event, consumed);
-//     if (pointerEvent) {
-//         DispatchEvent(pointerEvent);
-//     }
-//     if (consumed) {
-//         MMI_HILOGD("Leave KernelKeyEvent, Consumed By RelEventHandler");
-//         return;
-//     }
-
-//     auto keyEvent = kernelKeyEventHandler_.HandleEvent(event);
-//     if (keyEvent) {
-//         DispatchEvent(keyEvent);
-//     }
-
-//     MMI_HILOGD("Leave KernelKeyEvent");
-// }
-
 void Seat::OnInputEvent(const std::shared_ptr<const AbsEvent>& event) {
     MMI_HILOGD("Enter AbsEvent:%{public}p", event.get());
 
@@ -146,92 +81,6 @@ void Seat::OnInputEvent(const std::shared_ptr<const AbsEvent>& event) {
 
     MMI_HILOGD("Leave AbsEvent");
 }
-
-// int32_t Seat::AddDisplay(const std::shared_ptr<LogicalDisplayState>& display)
-// {
-//     MMI_HILOGD("Enter display:$s", display);
-//     if (!display) {
-//         MMI_HILOGE("Leave, null display");
-//         return -1;
-//     }
-
-//     for (const auto& item : displays_) {
-//         if (item == display) {
-//             MMI_HILOGE("Leave, Already Added");
-//             return -1;
-//         }
-//     }
-
-//     if (seatId_ != display->GetSeatId()) {
-//         MMI_HILOGE("Leave, seatId Mismatch");
-//         return -1;
-//     }
-
-//     displays_.push_back(display);
-
-//     auto displayId = display->GetId();
-//     kernelKeyEventHandler_.OnDisplayAdded(display);
-//     relEventHandler_.OnDisplayAdded(display);
-//     absEventHandler_.OnDisplayAdded(display);
-
-//     MMI_HILOGD("Leave displayId:$s", displayId);
-//     return 0;
-// }
-
-// int32_t Seat::RemoveDisplay(const std::shared_ptr<LogicalDisplayState>& display) {
-//     MMI_HILOGD("Enter display:$s", display);
-
-//     if (!display) {
-//         MMI_HILOGE("Leave, null display", display);
-//         return -1;
-//     }
-
-//     auto it = std::find(displays_.begin(), displays_.end(), display);
-//     if (it == displays_.end()) {
-//         MMI_HILOGE("Leave, display not it seat");
-//         return -1;
-//     }
-
-//     displays_.erase(it);
-
-//     auto displayId = display->GetId();
-//     absEventHandler_.OnDisplayRemoved(display);
-//     relEventHandler_.OnDisplayRemoved(display);
-//     kernelKeyEventHandler_.OnDisplayRemoved(display);
-
-//     MMI_HILOGD("Leave displayId:$s", displayId);
-//     return 0;
-// }
-
-// int32_t Seat::UpdateDisplay(const std::shared_ptr<LogicalDisplayState>& display)
-// {
-//     MMI_HILOGD("Enter display:$s", display);
-
-//     if (!display) {
-//         MMI_HILOGE("Leave, null display", display);
-//         return -1;
-//     }
-
-//     auto it = std::find(displays_.begin(), displays_.end(), display);
-//     if (it == displays_.end()) {
-//         MMI_HILOGE("Leave, display not it seat");
-//         return -1;
-//     }
-
-//     displays_.erase(it);
-
-//     auto displayId = display->GetId();
-//     kernelKeyEventHandler_.OnDisplayChanged(display);
-//     relEventHandler_.OnDisplayChanged(display);
-//     absEventHandler_.OnDisplayChanged(display);
-
-//     MMI_HILOGD("Leave displayId:$s", displayId);
-//     return 0;
-// }
-
-// std::list<std::shared_ptr<LogicalDisplayState>> Seat::GetDisplays() const {
-//     return displays_;
-// }
 
 int32_t Seat::AddInputDevice(const std::shared_ptr<IInputDevice>& inputDevice)
 {
@@ -284,67 +133,9 @@ bool Seat::IsEmpty() const
     return inputDevices_.empty();
 }
 
-// void Seat::DispatchEvent(const std::shared_ptr<const KeyEvent>& event) {
-//     MMI_HILOGD("Enter");
-//     if (!event) {
-//         MMI_HILOGE("Leave, null event");
-//         return;
-//     }
-
-//     if (TryTransform(event)) {
-//         MMI_HILOGD("Leave, consumed by Transformer");
-//         return;
-//     }
-
-//     const auto& eventDispatcher = context_->GetEventDispatcher();
-//     if (!eventDispatcher) {
-//         MMI_HILOGE("Leave, null eventDispatcher");
-//         return;
-//     }
-
-//     eventDispatcher->DispatchEvent(event);
-//     MMI_HILOGD("Leave");
-// }
-
-// void Seat::DispatchEvent(const std::shared_ptr<const PointerEvent>& event) {
-//     MMI_HILOGD("Enter PointerEvent:%{public}s", PointerEvent::SourceTypeToString(event->GetSourceType()));
-//     if (!event) {
-//         MMI_HILOGE("Leave PointerEvent, null event");
-//         return;
-//     }
-
-//     // if (TryTransform(event)) {
-//     //     MMI_HILOGD("Leave PointerEvent, consumed by Transformer");
-//     //     return;
-//     // }
-
-//     const auto& eventDispatcher = context_->GetEventDispatcher();
-//     if (!eventDispatcher) {
-//         MMI_HILOGE("Leave PointerEvent, null eventDispatcher");
-//         return;
-//     }
-
-//     eventDispatcher->DispatchEvent(event);
-//     MMI_HILOGD("Leave PointerEvent");
-// }
-
 const std::string& Seat::GetSeatId() const {
     return seatId_;
 }
-
-// bool Seat::TryTransform(const std::shared_ptr<const KeyEvent>& event)
-// {
-//     bool consumed = false;
-//     for (const auto& transformer : transformers_)  {
-//         MMI_HILOGD("Enter Transformer:%{public}s", transformer->GetName());
-//         if (transformer->HandleEvent(event)) {
-//             consumed = true;
-//             MMI_HILOGD("KeyEvent %{public}p Handled by %{public}s", event.get(), transformer->GetName());
-//             break;
-//         }
-//     }
-//     return consumed;
-// }
 
 bool Seat::TryTransform(const std::shared_ptr<const PointerEvent>& event)
 {

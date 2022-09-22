@@ -19,7 +19,6 @@
 
 namespace OHOS {
 namespace MMI {
-
 int64_t TimeUtils::GetTimeStampMs() {
     auto time = std::chrono::system_clock::now().time_since_epoch();
     return std::chrono::duration_cast<std::chrono::milliseconds>(time).count();

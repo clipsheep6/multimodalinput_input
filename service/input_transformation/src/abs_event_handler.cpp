@@ -17,9 +17,7 @@
 
 #include "abs_event.h"
 #include "i_input_context.h"
-// #include "IInputDeviceManager.h"
 #include "pointer_event.h"
-// #include "Log.h"
 #include "mmi_log.h"
 #include <cstddef>
 
@@ -80,18 +78,6 @@ std::shared_ptr<const PointerEvent> AbsEventHandler::HandleEvent(const std::shar
 
     return pointerEvent;
 }
-
-// void AbsEventHandler::OnDisplayAdded([[maybe_unused]] const std::shared_ptr<const LogicalDisplayState>& display)
-// {
-// }
-
-// void AbsEventHandler::OnDisplayRemoved([[maybe_unused]] const std::shared_ptr<const LogicalDisplayState>& display)
-// {
-// }
-
-// void AbsEventHandler::OnDisplayChanged([[maybe_unused]] const std::shared_ptr<const LogicalDisplayState>& display)
-// {
-// }
 
 int32_t AbsEventHandler::ConvertSourceType(int32_t absEventSourceType) const
 {

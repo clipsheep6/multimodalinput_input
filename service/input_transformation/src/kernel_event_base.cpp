@@ -15,7 +15,6 @@
 
 #include "kernel_event_base.h"
 
-// #include "Log.h"
 #include "mmi_log.h"
 
 namespace OHOS {

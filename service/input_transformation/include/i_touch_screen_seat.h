@@ -24,9 +24,6 @@
 namespace OHOS {
 namespace MMI {
 class IInputContext;
-// class PhysicalDisplayState;
-// class LogicalDisplayState;
-
 class ITouchScreenSeat {
 public:
     static std::unique_ptr<ITouchScreenSeat> CreateInstance(const IInputContext* contex, 
@@ -43,16 +40,6 @@ public:
     virtual int32_t BindInputDevice(const std::shared_ptr<IInputDevice>& inputDevice) = 0;
     virtual int32_t UnbindInputDevice(const std::shared_ptr<IInputDevice>& inputDevice) = 0;
     virtual std::shared_ptr<IInputDevice> GetInputDevice() const = 0;
-
-    // virtual int32_t BindDisplay(const std::shared_ptr<PhysicalDisplayState>& display) = 0;
-    // virtual int32_t UnbindDisplay(const std::shared_ptr<PhysicalDisplayState>& display) = 0;
-    // virtual int32_t UpdateDisplay(const std::shared_ptr<PhysicalDisplayState>& display) = 0;
-    // virtual std::shared_ptr<PhysicalDisplayState> GetDisplay() const = 0;
-
-    // virtual void OnDisplayAdded(const std::shared_ptr<LogicalDisplayState>& display) = 0;
-    // virtual void OnDisplayRemoved(const std::shared_ptr<LogicalDisplayState>& display) = 0;
-    // virtual void OnDisplayChanged(const std::shared_ptr<LogicalDisplayState>& display) = 0;
-
     virtual void OnInputEvent(const std::shared_ptr<const AbsEvent>& event) = 0;
 };
 } // namespace MMI

@@ -15,8 +15,6 @@
 
 #include "i_event_transformer.h"
 
-// #include "TouchPadEventTransformer.h"
-// #include "Log.h"
 #include "mmi_log.h"
 
 namespace OHOS {
@@ -24,7 +22,7 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IEventTransformer" };
 };
-std::list<std::shared_ptr<IEventTransformer>> IEventTransformer::CreateTransformers(const IInputContext* context, 
+std::list<std::shared_ptr<IEventTransformer>> IEventTransformer::CreateTransformers(const IInputContext* context,
             const std::shared_ptr<INewEventListener>& listener)
 {
     std::list<std::shared_ptr<IEventTransformer>> result;
@@ -38,13 +36,6 @@ std::list<std::shared_ptr<IEventTransformer>> IEventTransformer::CreateTransform
         MMI_HILOGE("Leave, null listener");
         return result;
     }
-
-    // std::shared_ptr<IEventTransformer> transformer = TouchPadEventTransformer::Create(context, listener);
-    // if (!transformer) {
-    //     MMI_HILOGW("TouchPadEventTransformer Create Failed");
-    // } else {
-    //     result.push_back(transformer);
-    // }
 
     return result;
 }
