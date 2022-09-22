@@ -131,7 +131,6 @@ bool JsUtil::GetDeviceAxisInfo(const std::unique_ptr<CallbackInfo> &cb, napi_val
         CHKRF(cb->env, napi_create_object(cb->env, &axisRange), CREATE_OBJECT);
         CHKRF(cb->env, napi_set_named_property(cb->env, axisRange, "source", sourceType), SET_NAMED_PROPERTY);
         napi_value axisType = nullptr;
-        CHKPF(iter->second);
         CHKRF(cb->env, napi_create_string_utf8(cb->env, iter->second.c_str(),
             NAPI_AUTO_LENGTH, &axisType), CREATE_STRING_UTF8);
         CHKRF(cb->env, napi_set_named_property(cb->env, axisRange, "axis", axisType), SET_NAMED_PROPERTY);
