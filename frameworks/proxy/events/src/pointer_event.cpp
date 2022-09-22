@@ -609,6 +609,7 @@ bool PointerEvent::Hasjoystick(uint32_t joystick, AbsoluteType abs)
     if ((abs >= ABSOLUTE_TYPE_UNKNOWN) && (abs < ABSOLUTE_TYPE_MAX)) {
        return static_cast<bool>(joystick & (1 << joystick));
     }
+    return false;
 }
 
 void PointerEvent::SetPressedKeys(const std::vector<int32_t> pressedKeys)
