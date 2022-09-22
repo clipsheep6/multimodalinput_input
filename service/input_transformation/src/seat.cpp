@@ -82,7 +82,7 @@ void Seat::NewEventListener::Reset()
     seat_ = nullptr;    
 }
 
-std::unique_ptr<Seat> Seat::CreateInstance( const std::string& seatId) {
+std::unique_ptr<Seat> Seat::CreateInstance(const std::string& seatId) {
     // if (!context) {
     //     errno = EINVAL;
     //     return nullptr;

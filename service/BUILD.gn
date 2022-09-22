@@ -524,6 +524,7 @@ ohos_shared_library("libmmi-server") {
       "input_transformation/src/seat.cpp",
       "input_transformation/src/time_utils.cpp",
       "input_transformation/src/touch_screen_seat.cpp",
+      "input_transformation/src/instance_creator.cpp",
     ]
   configs = [ ":libmmi_server_config" ]
 
