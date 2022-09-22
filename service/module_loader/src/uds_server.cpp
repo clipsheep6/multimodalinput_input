@@ -180,11 +180,13 @@ void UDSServer::Dump(int32_t fd, const std::vector<std::string> &args)
 
 void UDSServer::OnConnected(SessionPtr s)
 {
+    CHKPV(s);
     MMI_HILOGI("Session desc:%{public}s", s->GetDescript().c_str());
 }
 
 void UDSServer::OnDisconnected(SessionPtr s)
 {
+    CHKPV(s);
     MMI_HILOGI("Session desc:%{public}s", s->GetDescript().c_str());
 }
 
