@@ -606,11 +606,9 @@ bool PointerEvent::HasAxis(uint32_t axes, AxisType axis)
 
 bool PointerEvent::Hasjoystick(uint32_t joystick, AbsoluteType abs)
 {
-    bool ret { false };
     if ((abs >= ABSOLUTE_TYPE_UNKNOWN) && (abs < ABSOLUTE_TYPE_MAX)) {
-        ret = static_cast<bool>(joystick & (1 << joystick));
+       return static_cast<bool>(joystick & (1 << joystick));
     }
-    return ret;
 }
 
 void PointerEvent::SetPressedKeys(const std::vector<int32_t> pressedKeys)
@@ -661,7 +659,7 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
         }
     }
 
-    const uint32_t joystick { GetAbs() };
+    uint32_t joystick { GetAbs() };
     WRITEUINT32(out, joystick);
     for (int32_t i = ABSOLUTE_TYPE_UNKNOWN; i < ABSOLUTE_TYPE_MAX; ++i) {
         const AbsoluteType abs { static_cast<AbsoluteType>(i) };
