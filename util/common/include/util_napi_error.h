@@ -73,7 +73,7 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
     } while (0)
 
 namespace UtilNapiError {
-NapiError* GetApiError(int32_t code);
+const NapiError* GetApiError(int32_t code);
 } // namespace UtilNapiError
 } // namespace MMI
 } // namespace OHOS
