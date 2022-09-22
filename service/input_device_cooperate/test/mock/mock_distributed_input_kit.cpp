@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,10 +21,10 @@ namespace DistributedHardware {
 namespace DistributedInput {
 int32_t DistributedInputKit::PrepareRemoteInput(const std::string &deviceId, sptr<IPrepareDInputCallback> callback)
 {
-    if(deviceId == "" || callback == nullptr){
+    if (deviceId == "" || callback == nullptr) {
         return RET_ERR;
     }
-    std::thread t = std::thread([deviceId, callback]{
+    std::thread t = std::thread([deviceId, callback] {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         callback->OnResult(deviceId, 0);
     });
@@ -34,10 +34,10 @@ int32_t DistributedInputKit::PrepareRemoteInput(const std::string &deviceId, spt
 
 int32_t DistributedInputKit::UnprepareRemoteInput(const std::string &deviceId, sptr<IUnprepareDInputCallback> callback)
 {
-    if(deviceId == "" || callback == nullptr){
+    if (deviceId == "" || callback == nullptr) {
         return RET_ERR;
     }
-    std::thread t = std::thread([deviceId, callback]{
+    std::thread t = std::thread([deviceId, callback] {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         callback->OnResult(deviceId, 0);
     });
@@ -48,10 +48,10 @@ int32_t DistributedInputKit::UnprepareRemoteInput(const std::string &deviceId, s
 int32_t DistributedInputKit::StartRemoteInput(const std::string &srcId, const std::string &sinkId,
                                               const uint32_t &inputTypes, sptr<IStartDInputCallback> callback)
 {
-    if(srcId == "" || sinkId == "" || callback == nullptr){
+    if (srcId == "" || sinkId == "" || callback == nullptr) {
         return RET_ERR;
     }
-    std::thread t = std::thread([srcId, callback]{
+    std::thread t = std::thread([srcId, callback] {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         callback->OnResult(srcId, 0, 0);
     });
@@ -62,10 +62,10 @@ int32_t DistributedInputKit::StartRemoteInput(const std::string &srcId, const st
 int32_t DistributedInputKit::StopRemoteInput(const std::string &srcId, const std::string &sinkId,
                                              const uint32_t &inputTypes, sptr<IStopDInputCallback> callback)
 {
-    if(srcId == "" || sinkId == "" || callback == nullptr){
+    if (srcId == "" || sinkId == "" || callback == nullptr) {
         return RET_ERR;
     }
-    std::thread t = std::thread([srcId, callback]{
+    std::thread t = std::thread([srcId, callback] {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         callback->OnResult(srcId, 0, 0);
     });
@@ -75,7 +75,7 @@ int32_t DistributedInputKit::StopRemoteInput(const std::string &srcId, const std
 
 bool DistributedInputKit::IsNeedFilterOut(const std::string &deviceId, const BusinessEvent &event)
 {
-    if(deviceId == ""){
+    if (deviceId == "") {
         return false;
     }
     return true;
@@ -89,10 +89,10 @@ DInputServerType DistributedInputKit::IsStartDistributedInput(const uint32_t &in
 int32_t DistributedInputKit::PrepareRemoteInput(const std::string &srcId, const std::string &sinkId,
                                                 sptr<IPrepareDInputCallback> callback)
 {
-    if(srcId == "" || sinkId == "" || callback == nullptr) {
+    if (srcId == "" || sinkId == "" || callback == nullptr) {
         return RET_ERR;
     }
-    std::thread t = std::thread([srcId, callback]{
+    std::thread t = std::thread([srcId, callback] {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         callback->OnResult(srcId, 0);
     });
@@ -103,26 +103,25 @@ int32_t DistributedInputKit::PrepareRemoteInput(const std::string &srcId, const 
 int32_t DistributedInputKit::UnprepareRemoteInput(const std::string &srcId, const std::string &sinkId,
                                                   sptr<IUnprepareDInputCallback> callback)
 {
-    if(srcId == "" || sinkId == "" || callback == nullptr) {
+    if (srcId == "" || sinkId == "" || callback == nullptr) {
         return RET_ERR;
     }
-    std::thread t = std::thread([srcId, callback]{
+    std::thread t = std::thread([srcId, callback] {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         callback->OnResult(srcId, 0);
     });
     t.join();
-
     return RET_OK;
 }
 
 int32_t DistributedInputKit::StartRemoteInput(const std::string &sinkId, const std::vector<std::string> &dhIds,
                                               sptr<IStartStopDInputsCallback> callback)
 {
-    if(sinkId == "" || callback == nullptr){
+    if (sinkId == "" || callback == nullptr) {
         return RET_ERR;
     }
     std::string srcId = "123";
-    std::thread t = std::thread([sinkId, srcId, callback]{
+    std::thread t = std::thread([sinkId, srcId, callback] {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         callback->OnResultFds(sinkId, srcId, 0);
         callback->OnResultDhids(sinkId, 0);
@@ -134,11 +133,11 @@ int32_t DistributedInputKit::StartRemoteInput(const std::string &sinkId, const s
 int32_t DistributedInputKit::StopRemoteInput(const std::string &sinkId, const std::vector<std::string> &dhIds,
                                              sptr<IStartStopDInputsCallback> callback)
 {
-    if(sinkId == "" || callback == nullptr){
+    if (sinkId == "" || callback == nullptr) {
         return RET_ERR;
     }
     const std::string devId = "123";
-    std::thread t = std::thread([sinkId, devId, callback]{
+    std::thread t = std::thread([sinkId, devId, callback] {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         callback->OnResultFds(sinkId, devId, 0);
         callback->OnResultDhids(sinkId, 0);
@@ -151,10 +150,10 @@ int32_t DistributedInputKit::StartRemoteInput(const std::string &srcId, const st
                                               const std::vector<std::string> &dhIds,
                                               sptr<IStartStopDInputsCallback> callback)
 {
-    if(srcId == "" || sinkId == "" || callback == nullptr){
+    if (srcId == "" || sinkId == "" || callback == nullptr) {
         return RET_ERR;
     }
-    std::thread t = std::thread([srcId, sinkId, callback]{
+    std::thread t = std::thread([srcId, sinkId, callback] {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         callback->OnResultFds(srcId, sinkId, 0);
         callback->OnResultDhids(srcId, 0);
@@ -167,10 +166,10 @@ int32_t DistributedInputKit::StopRemoteInput(const std::string &srcId, const std
                                              const std::vector<std::string> &dhIds,
                                              sptr<IStartStopDInputsCallback> callback)
 {
-    if(srcId == "" || sinkId == "" || callback == nullptr){
+    if (srcId == "" || sinkId == "" || callback == nullptr) {
         return RET_ERR;
     }
-    std::thread t = std::thread([srcId, sinkId, callback]{
+    std::thread t = std::thread([srcId, sinkId, callback] {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         callback->OnResultFds(srcId, sinkId, 0);
         callback->OnResultDhids(srcId, 0);
@@ -182,7 +181,7 @@ int32_t DistributedInputKit::StopRemoteInput(const std::string &srcId, const std
 int32_t DistributedInputKit::StartRemoteInput(const std::string &srcId, const std::string &sinkId,
                                               std::vector<int32_t> &fds, sptr<IStartStopDInputsCallback> callback)
 {
-    std::thread t = std::thread([srcId, sinkId, callback]{
+    std::thread t = std::thread([srcId, sinkId, callback] {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         callback->OnResultFds(srcId, sinkId, 0);
         callback->OnResultDhids(srcId, 0);
@@ -194,10 +193,10 @@ int32_t DistributedInputKit::StartRemoteInput(const std::string &srcId, const st
 int32_t DistributedInputKit::StopRemoteInput(const std::string &srcId, const std::string &sinkId,
                                              std::vector<int32_t> &fds, sptr<IStartStopDInputsCallback> callback)
 {
-    if(srcId == "" || sinkId == "" || callback == nullptr){
+    if (srcId == "" || sinkId == "" || callback == nullptr) {
         return RET_ERR;
     }
-    std::thread t = std::thread([srcId, sinkId, callback]{
+    std::thread t = std::thread([srcId, sinkId, callback] {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         callback->OnResultFds(srcId, sinkId, 0);
         callback->OnResultDhids(srcId, 0);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,12 +23,12 @@ namespace MMI {
 class MultimodalInputConnectProxy {
 public:
     static void SetMIState(bool state);
-    int32_t RegisterCooperateListener() ;
-    int32_t UnregisterCooperateListener() ;
-    int32_t EnableInputDeviceCooperate(int32_t userData, bool enabled) ;
+    int32_t RegisterCooperateListener();
+    int32_t UnregisterCooperateListener();
+    int32_t EnableInputDeviceCooperate(int32_t userData, bool enabled);
     int32_t StartInputDeviceCooperate(int32_t userData, const std::string &sinkDeviceId,
-        int32_t srcInputDeviceId) ;
-    int32_t StopDeviceCooperate(int32_t userData) ;
+        int32_t srcInputDeviceId);
+    int32_t StopDeviceCooperate(int32_t userData);
 };
 } // namespace MMI
 } // namespace OHOS

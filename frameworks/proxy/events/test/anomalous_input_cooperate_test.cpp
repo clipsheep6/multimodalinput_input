@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -52,7 +52,7 @@ public:
  */
 HWTEST_F(InputCooperateTest, InputCooperateTest_RegisterCooperateListener_001, TestSize.Level1)
 {
-    MMI_HILOGI("[RegisterCooperateListener001]");
+    MMI_HILOGD("RegisterCooperateListener001");
     std::shared_ptr<InputDeviceCooperateListenerTest> listener = nullptr;
     int state = InputMG->RegisterCooperateListener(listener);
     EXPECT_EQ(state, RET_ERR);
@@ -66,7 +66,7 @@ HWTEST_F(InputCooperateTest, InputCooperateTest_RegisterCooperateListener_001, T
  */
 HWTEST_F(InputCooperateTest, InputCooperateTest_RegisterCooperateListener_002, TestSize.Level1)
 {
-    MMI_HILOGI("RegisterCooperateListener002");
+    MMI_HILOGD("RegisterCooperateListener002");
     std::shared_ptr<InputDeviceCooperateListenerTest> listener = std::make_shared<InputDeviceCooperateListenerTest>();
     int state = InputMG->RegisterCooperateListener(listener);
     EXPECT_EQ(state, RET_OK);
@@ -80,7 +80,7 @@ HWTEST_F(InputCooperateTest, InputCooperateTest_RegisterCooperateListener_002, T
  */
 HWTEST_F(InputCooperateTest, InputCooperateTest_UnregisterCooperateListener001, TestSize.Level1)
 {
-    MMI_HILOGI("UnregisterCooperateListener001");
+    MMI_HILOGD("UnregisterCooperateListener001");
     std::shared_ptr<InputDeviceCooperateListenerTest> listener = nullptr;
     int state = InputMG->UnregisterCooperateListener(listener);
     EXPECT_EQ(state, RET_OK);
@@ -94,7 +94,7 @@ HWTEST_F(InputCooperateTest, InputCooperateTest_UnregisterCooperateListener001, 
  */
 HWTEST_F(InputCooperateTest, InputCooperateTest_UnregisterCooperateListener002, TestSize.Level1)
 {
-    MMI_HILOGI("UnregisterCooperateListener002");
+    MMI_HILOGD("UnregisterCooperateListener002");
     std::shared_ptr<InputDeviceCooperateListenerTest> listener = std::make_shared<InputDeviceCooperateListenerTest>();
     int state = InputMG->UnregisterCooperateListener(listener);
     EXPECT_EQ(state, RET_OK);
@@ -109,11 +109,11 @@ HWTEST_F(InputCooperateTest, InputCooperateTest_UnregisterCooperateListener002, 
 HWTEST_F(InputCooperateTest, InputCooperateTest_EnableInputDeviceCooperate_001, TestSize.Level1)
 {
     bool enabled = true;
-    MMI_HILOGI("EnableInputDeviceCooperate001");
+    MMI_HILOGD("EnableInputDeviceCooperate001");
     using CooperationCallback = std::function<void(std::string, CooperationMessage)>;
     CooperationCallback callback;
-    callback = [](const std::string &, CooperationMessage){
-        MMI_HILOGI("callback is ok");
+    callback = [](const std::string &, CooperationMessage) {
+        MMI_HILOGD("callback is ok");
     };
     InputDevCooperateImpl.userData_ = 2147483647;
     int state = InputMG->EnableInputDeviceCooperate(enabled, callback);
@@ -130,11 +130,11 @@ HWTEST_F(InputCooperateTest, InputCooperateTest_EnableInputDeviceCooperate_002, 
 {
     bool enabled = true;
     InputDevCooperateImpl.userData_ = 0;
-    MMI_HILOGI("EnableInputDeviceCooperate002");
+    MMI_HILOGD("EnableInputDeviceCooperate002");
     using CooperationCallback = std::function<void(std::string, CooperationMessage)>;
     CooperationCallback callback;
-    callback = [](const std::string &, CooperationMessage){
-        MMI_HILOGI("callback is ok");
+    callback = [](const std::string &, CooperationMessage) {
+        MMI_HILOGD("callback is ok");
     };
     int state = InputMG->EnableInputDeviceCooperate(enabled, callback);
     EXPECT_EQ(state, RET_OK);
@@ -149,14 +149,14 @@ HWTEST_F(InputCooperateTest, InputCooperateTest_EnableInputDeviceCooperate_002, 
 
 HWTEST_F(InputCooperateTest, Anomalous_InputCooperateTest_StartInputDeviceCooperate, TestSize.Level1)
 {
-    MMI_HILOGI("StartInputDeviceCooperate");
+    MMI_HILOGD("StartInputDeviceCooperate");
     std::string sinkDeviceId = "123";
     int32_t srcInputDeviceId = 10;
     InputDevCooperateImpl.userData_ = 0;
     using CooperationCallback = std::function<void(std::string, CooperationMessage)>;
     CooperationCallback callback;
-    callback = [](const std::string &, CooperationMessage){
-        MMI_HILOGI("callback is ok");
+    callback = [](const std::string &, CooperationMessage) {
+        MMI_HILOGD("callback is ok");
     };
     int state = InputMG->StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId, callback);
     EXPECT_EQ(state, RET_ERR);
@@ -170,12 +170,12 @@ HWTEST_F(InputCooperateTest, Anomalous_InputCooperateTest_StartInputDeviceCooper
  */
 HWTEST_F(InputCooperateTest, Anomalous_IInputCooperateTest_StopDeviceCooperate, TestSize.Level1)
 {
-    MMI_HILOGI("StopDeviceCooperate");
+    MMI_HILOGD("StopDeviceCooperate");
     InputDevCooperateImpl.userData_ = 0;
     using CooperationCallback = std::function<void(std::string, CooperationMessage)>;
     CooperationCallback callback;
-    callback = [](const std::string &, CooperationMessage){
-        MMI_HILOGI("callback is ok");
+    callback = [](const std::string &, CooperationMessage) {
+        MMI_HILOGD("callback is ok");
     };
     int state = InputMG->StopDeviceCooperate(callback);
     EXPECT_EQ(state, RET_ERR);

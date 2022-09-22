@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,30 +35,30 @@ void MultimodalInputConnectProxy::SetMIState(bool state)
     state_ = state;
 }
 
-int32_t MultimodalInputConnectProxy::RegisterCooperateListener()//a
+int32_t MultimodalInputConnectProxy::RegisterCooperateListener()
 {
     bool ret = state_;
-    if(ret == false){
+    if (ret == false) {
         return RET_ERR;
     }
     return RET_OK;
 }
 
 
-int32_t MultimodalInputConnectProxy::UnregisterCooperateListener()//a
+int32_t MultimodalInputConnectProxy::UnregisterCooperateListener()
 {
     bool ret = state_;
-    if(ret == false){
+    if (ret == false) {
         return RET_ERR;
     }
     return RET_OK;
 }
 
 
-int32_t MultimodalInputConnectProxy::EnableInputDeviceCooperate(int32_t userData, bool enabled)//a
+int32_t MultimodalInputConnectProxy::EnableInputDeviceCooperate(int32_t userData, bool enabled)
 {
     bool ret = state_;
-    if(ret == false){
+    if (ret == false) {
         return RET_ERR;
     }
     MMI_HILOGI("EnableInputDeviceCooperate");
@@ -69,7 +69,7 @@ int32_t MultimodalInputConnectProxy::StartInputDeviceCooperate(int32_t userData,
     int32_t srcInputDeviceId)
 {
     bool ret = state_;
-    if(sinkDeviceId == "" || ret == false){
+    if (sinkDeviceId == "" || ret == false) {
         return RET_ERR;
     }
     return RET_OK;
@@ -78,7 +78,7 @@ int32_t MultimodalInputConnectProxy::StartInputDeviceCooperate(int32_t userData,
 int32_t MultimodalInputConnectProxy::StopDeviceCooperate(int32_t userData)
 {
     bool ret = state_;
-    if(ret == false){
+    if (ret == false) {
         return RET_ERR;
     }
     return RET_OK;
