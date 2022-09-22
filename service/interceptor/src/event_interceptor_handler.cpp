@@ -31,10 +31,10 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventInterceptorHandler" };
 } // namespace
 
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void EventInterceptorHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     if (!InputHandler->GetJumpInterceptState() && OnHandleEvent(keyEvent)) {
         MMI_HILOGD("KeyEvent filter find a keyEvent from Original event keyCode:%{puiblic}d",
@@ -52,13 +52,13 @@ void EventInterceptorHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> key
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     CHKPV(nextHandler_);
     nextHandler_->HandleKeyEvent(keyEvent);
-}
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+}
 
-#ifdef OHOS_BUILD_ENABLE_POINTER
 void EventInterceptorHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
+#ifdef OHOS_BUILD_ENABLE_POINTER
     if (OnHandleEvent(pointerEvent)) {
         BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP);
         MMI_HILOGD("Interception is succeeded");
@@ -66,13 +66,13 @@ void EventInterceptorHandler::HandlePointerEvent(const std::shared_ptr<PointerEv
     }
     CHKPV(nextHandler_);
     nextHandler_->HandlePointerEvent(pointerEvent);
-}
 #endif // OHOS_BUILD_ENABLE_POINTER
+}
 
-#ifdef OHOS_BUILD_ENABLE_TOUCH
 void EventInterceptorHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
+#ifdef OHOS_BUILD_ENABLE_TOUCH
     if (OnHandleEvent(pointerEvent)) {
         BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP);
         MMI_HILOGD("Interception is succeeded");
@@ -80,8 +80,8 @@ void EventInterceptorHandler::HandleTouchEvent(const std::shared_ptr<PointerEven
     }
     CHKPV(nextHandler_);
     nextHandler_->HandleTouchEvent(pointerEvent);
-}
 #endif // OHOS_BUILD_ENABLE_TOUCH
+}
 
 int32_t EventInterceptorHandler::AddInputHandler(InputHandlerType handlerType,
     HandleEventType eventType, SessionPtr session)

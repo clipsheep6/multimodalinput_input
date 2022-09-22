@@ -119,7 +119,9 @@ int32_t EventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
     InputDevMgr->OnInputDeviceAdded(device);
     KeyMapMgr->ParseDeviceConfigFile(device);
     KeyRepeat->AddDeviceConfig(device);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     KeyEventHdr->ResetKeyEvent(device);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
 }
 
@@ -449,18 +451,5 @@ int32_t EventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
     return RET_OK;
 }
 
-int32_t EventNormalizeHandler::AddHandleTimer(int32_t timeout)
-{
-    CALL_DEBUG_ENTER;
-    timerId_ = TimerMgr->AddTimer(timeout, 1, [this]() {
-        auto keyEvent = KeyEventHdr->GetKeyEvent();
-        CHKPV(keyEvent);
-        CHKPV(nextHandler_);
-        nextHandler_->HandleKeyEvent(keyEvent);
-        int32_t triggerTime = KeyRepeat->GetIntervalTime(keyEvent->GetDeviceId());
-        this->AddHandleTimer(triggerTime);
-    });
-    return timerId_;
-}
 } // namespace MMI
 } // namespace OHOS

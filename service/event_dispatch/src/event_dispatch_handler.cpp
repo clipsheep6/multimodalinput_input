@@ -52,31 +52,31 @@ EventDispatchHandler::EventDispatchHandler()
 
 EventDispatchHandler::~EventDispatchHandler() {}
 
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void EventDispatchHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     auto udsServer = InputHandler->GetUDSServer();
     CHKPV(udsServer);
     DispatchKeyEventPid(*udsServer, keyEvent);
-}
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+}
 
-#ifdef OHOS_BUILD_ENABLE_POINTER
 void EventDispatchHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
+#ifdef OHOS_BUILD_ENABLE_POINTER
     HandlePointerEventInner(pointerEvent);
-}
 #endif // OHOS_BUILD_ENABLE_POINTER
+}
 
-#ifdef OHOS_BUILD_ENABLE_TOUCH
 void EventDispatchHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
+#ifdef OHOS_BUILD_ENABLE_TOUCH
     HandlePointerEventInner(pointerEvent);
-}
 #endif // OHOS_BUILD_ENABLE_TOUCH
+}
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<PointerEvent> point)

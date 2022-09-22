@@ -30,7 +30,6 @@ public:
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
     void HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
     void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
-    int32_t AddHandleTimer(int32_t timeout = 300);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     bool CheckKeyboardWhiteList(std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
