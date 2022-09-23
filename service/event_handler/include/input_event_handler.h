@@ -29,6 +29,7 @@
 #include "i_input_event_handler.h"
 #include "key_subscriber_handler.h"
 #include "mouse_event_normalize.h"
+#include "event_plugins_handler.h"
 
 namespace OHOS {
 namespace MMI {
@@ -57,6 +58,7 @@ private:
 
     UDSServer *udsServer_ = nullptr;
     std::shared_ptr<EventNormalizeHandler> eventNormalizeHandler_ = nullptr;
+    std::shared_ptr<EventPluginsHandler> eventPluginsHandler_ = nullptr;
     std::shared_ptr<EventFilterHandler> eventFilterHandler_ = nullptr;
     std::shared_ptr<EventInterceptorHandler> eventInterceptorHandler_ = nullptr;
     std::shared_ptr<KeySubscriberHandler> eventSubscriberHandler_ = nullptr;

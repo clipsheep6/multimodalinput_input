@@ -23,6 +23,7 @@ config("libmmi_server_config") {
     "delegate_task/include",
     "event_dispatch/include",
     "key_event_normalize/include",
+    "event_plugin/include",
     "event_handler/include",
     "event_dump/include",
     "monitor/include",
@@ -117,6 +118,11 @@ config("libmmi_server_config") {
   if (input_feature_touchscreen) {
     defines += [ "OHOS_BUILD_ENABLE_TOUCH" ]
   }
+
+  if (input_feature_mmi_plugin) {
+    defines += [ "OHOS_BUILD_ENABLE_EVENT_PLUGIN" ]
+  }
+
   if (input_feature_monitor) {
     defines += [ "OHOS_BUILD_ENABLE_MONITOR" ]
   }
@@ -435,6 +441,7 @@ ohos_shared_library("libmmi-server") {
     "event_handler/src/key_auto_repeat.cpp",
     "event_handler/src/key_event_value_transformation.cpp",
     "event_handler/src/key_map_manager.cpp",
+    "event_plugin/src/event_plugins_handler.cpp",
     "libinput_adapter/src/libinput_adapter.cpp",
     "message_handle/src/server_msg_handler.cpp",
     "module_loader/src/mmi_service.cpp",
@@ -643,6 +650,7 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/service/event_dispatch/include",
     "${mmi_path}/service/key_event_normalize/include",
     "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/service/event_pligin/include",
     "${mmi_path}/service/hdi_inject/include",
     "${mmi_path}/service/event_dump/include",
     "${mmi_path}/service/hdf_adapter/include",

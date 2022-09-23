@@ -51,6 +51,7 @@ private:
 private:
     int32_t timerId_ = -1;
     void ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent, struct libinput_event *event);
+    //std::list<IInputEventHandler> extendHandlers_;
 };
 } // namespace MMI
 } // namespace OHOS

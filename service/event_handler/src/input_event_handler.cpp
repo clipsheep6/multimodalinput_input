@@ -91,6 +91,13 @@ int32_t InputEventHandler::BuildInputHandlerChain()
 #endif // !OHOS_BUILD_ENABLE_KEYBOARD && !OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_TOUCH
 
     std::shared_ptr<IInputEventHandler> handler = eventNormalizeHandler_;
+#ifdef OHOS_BUILD_ENABLE_EVENT_PLUGIN
+     eventPluginsHandler_ = std::make_shared<EventPluginsHandler>();
+     CHKPR(eventPluginsHandler_, ERROR_NULL_POINTER);
+     handler->SetNext(eventPluginsHandler_);
+     handler = eventPluginsHandler_;
+     MMI_HILOGE("11111111111111111111111111111111111111111");
+#endif // OHOS_BUILD_ENABLE_EVENT_PLUGIN
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     eventFilterHandler_ = std::make_shared<EventFilterHandler>();
     CHKPR(eventFilterHandler_, ERROR_NULL_POINTER);
