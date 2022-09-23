@@ -85,7 +85,6 @@ bool MultimodalEventHandler::InitClient(std::shared_ptr<AppExecFwk::EventHandler
 {
     CALL_DEBUG_ENTER;
     if (client_ != nullptr) {
-        client_->CompareEventHandler(eventHandler);
         return true;
     }
     client_ = std::make_shared<MMIClient>();

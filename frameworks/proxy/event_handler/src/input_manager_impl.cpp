@@ -196,14 +196,14 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_DISPATCH_EVENT);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
-    if (client->IsNewHandler()) {
+    if (client->CompareEventHandler(eventHandler)) {
+        inputConsumer->OnInputEvent(keyEvent);
+        MMI_HILOGD("Key event report keyCode:%{public}d", keyEvent->GetKeyCode());
+    } else {
         if (!eventHandler->PostHighPriorityTask(std::bind(&InputManagerImpl::OnKeyEventTask, this, inputConsumer, keyEvent))) {
             MMI_HILOGE("Post task failed");
             return;
         }
-    } else {
-        inputConsumer->OnInputEvent(keyEvent);
-        MMI_HILOGD("Key event report keyCode:%{public}d", keyEvent->GetKeyCode());
     }
     MMI_HILOGD("Key event keyCode:%{public}d", keyEvent->GetKeyCode());
 }
@@ -237,14 +237,14 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_DISPATCH_EVENT);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
-    if (client->IsNewHandler()) {
+    if (client->CompareEventHandler(eventHandler)) {
+        inputConsumer->OnInputEvent(pointerEvent);
+        MMI_HILOGD("Pointer event report pointerId:%{public}d", pointerEvent->GetPointerId());
+    } else {
         if (!eventHandler->PostHighPriorityTask(std::bind(&InputManagerImpl::OnPointerEventTask, this, inputConsumer, pointerEvent))) {
             MMI_HILOGE("Post task failed");
             return;
         }
-    } else {
-        inputConsumer->OnInputEvent(pointerEvent);
-        MMI_HILOGD("Pointer event report pointerId:%{public}d", pointerEvent->GetPointerId());
     }
     MMI_HILOGD("Pointer event pointerId:%{public}d", pointerEvent->GetPointerId());
 }

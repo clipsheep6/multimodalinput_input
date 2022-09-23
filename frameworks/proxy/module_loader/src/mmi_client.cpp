@@ -51,20 +51,20 @@ void MMIClient::SetEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventH
     eventHandler_ = eventHandler;
 }
 
-void MMIClient::CompareEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
+bool MMIClient::CompareEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
 {
     CHKPV(eventHandler);
     CHKPV(eventHandler_);
     auto currentRunner = eventHandler_->GetEventRunner();
     CHKPV(currentRunner);
-    MMI_HILOGI("Current thread name:%{public}s", currentRunner->GetRunnerThreadName().c_str());
     auto newRunner = eventHandler->GetEventRunner();
     CHKPV(newRunner);
-    MMI_HILOGI("New thread name:%{public}s", newRunner->GetRunnerThreadName().c_str());
-    isNewHandler_ = false;
+    bool isSameHandler = true;
     if (currentRunner->GetThreadId() != newRunner->GetThreadId()) {
-        isNewHandler_ = true;
+        isSameHandler = false;
+        MMI_HILOGD("EventHandlers are the same");
     }
+    return isSameHandler;
 }
 
 bool MMIClient::SendMessage(const NetPacket &pkt) const
@@ -128,11 +128,6 @@ bool MMIClient::StartEventRunner()
         }
     }
     return true;
-}
-
-bool MMIClient::IsNewHandler()
-{
-    return isNewHandler_;
 }
 
 bool MMIClient::AddFdListener(int32_t fd)
