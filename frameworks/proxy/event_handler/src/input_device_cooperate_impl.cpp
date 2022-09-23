@@ -137,8 +137,8 @@ void InputDeviceCooperateImpl::OnDevCooperateListener(const std::string deviceId
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
     for (const auto &item : devCooperateListener_) {
-		MMI_HILOGI("Task listener device id is %{public}s", deviceId.c_str());
-		item.OnCooperateMessage(deviceId, msg);
+        MMI_HILOGI("Task listener device id is %{public}s", deviceId.c_str());
+        item.OnCooperateMessage(deviceId, msg);
     }
 }
 

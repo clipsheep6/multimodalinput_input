@@ -147,7 +147,7 @@ private:
     std::mutex handleMtx_;
     std::condition_variable cv_;
     std::thread ehThread_;
-    std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ = nullptr;
+    std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ { nullptr };
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
     sptr<CallDinputService> callDinputService_ { nullptr };
 #endif // OHOS_DISTRIBUTED_INPUT_MODEL

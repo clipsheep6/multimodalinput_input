@@ -48,7 +48,6 @@ MMIClient::~MMIClient()
 void MMIClient::SetEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
 {
     CHKPV(eventHandler);
-    std::lock_guard<std::mutex> guard(mtx_);
     eventHandler_ = eventHandler;
 }
 
@@ -56,7 +55,6 @@ void MMIClient::CompareEventHandler(std::shared_ptr<AppExecFwk::EventHandler> ev
 {
     CHKPV(eventHandler);
     CHKPV(eventHandler_);
-    std::lock_guard<std::mutex> guard(mtx_);
     auto currentRunner = eventHandler_->GetEventRunner();
     CHKPV(currentRunner);
     MMI_HILOGI("Current thread name:%{public}s", currentRunner->GetRunnerThreadName().c_str());
@@ -108,7 +106,6 @@ bool MMIClient::StartEventRunner()
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
-    std::lock_guard<std::mutex> guard(mtx_);
     if (eventHandler_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);

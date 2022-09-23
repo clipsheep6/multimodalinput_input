@@ -39,15 +39,11 @@ public:
     using FunInputDevIds = std::function<void(std::vector<int32_t>&)>;
     using FunInputDevKeys = std::function<void(std::vector<bool>&)>;
     using FunKeyboardTypes = std::function<void(int32_t)>;
-    using DevInfo = FunInputDevInfo;
-    using DevIds = FunInputDevIds;
-    using DevKeys = FunInputDevKeys;
-    using DevKeyboardTypes = FunKeyboardTypes;
     struct InputDeviceData {
-        DevInfo inputDevice;
-        DevIds ids;
-        DevKeys keys;
-        DevKeyboardTypes kbTypes;
+        FunInputDevInfo inputDevice;
+        FunInputDevIds ids;
+        FunInputDevKeys keys;
+        FunKeyboardTypes kbTypes;
     };
     using InputDevListenerPtr = std::shared_ptr<IInputDeviceListener>;
 
@@ -66,10 +62,10 @@ public:
     std::shared_ptr<InputDevice> DevDataUnmarshalling(NetPacket &pkt);
 
 private:
-    const DevInfo* GetDeviceInfo(int32_t) const;
-    const DevIds* GetDeviceIds(int32_t) const;
-    const DevKeys* GetDeviceKeys(int32_t) const;
-    const DevKeyboardTypes* GetKeyboardTypes(int32_t) const;
+    const FunInputDevInfo* GetDeviceInfo(int32_t) const;
+    const FunInputDevIds* GetDeviceIds(int32_t) const;
+    const FunInputDevKeys* GetDeviceKeys(int32_t) const;
+    const FunKeyboardTypes* GetKeyboardTypes(int32_t) const;
 private:
     InputDeviceImpl() = default;
     std::map<int32_t, InputDeviceData> inputDevices_;

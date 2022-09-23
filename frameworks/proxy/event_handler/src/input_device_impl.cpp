@@ -235,7 +235,7 @@ void InputDeviceImpl::OnKeyboardType(int32_t userData, int32_t keyboardType)
         userData, keyboardType);
 }
 
-const InputDeviceImpl::DevInfo* InputDeviceImpl::GetDeviceInfo(int32_t userData) const
+const InputDeviceImpl::FunInputDevInfo* InputDeviceImpl::GetDeviceInfo(int32_t userData) const
 {
     auto iter = inputDevices_.find(userData);
     if (iter == inputDevices_.end()) {
@@ -244,7 +244,7 @@ const InputDeviceImpl::DevInfo* InputDeviceImpl::GetDeviceInfo(int32_t userData)
     return &iter->second.inputDevice;
 }
 
-const InputDeviceImpl::DevIds* InputDeviceImpl::GetDeviceIds(int32_t userData) const
+const InputDeviceImpl::FunInputDevIds* InputDeviceImpl::GetDeviceIds(int32_t userData) const
 {
     auto iter = inputDevices_.find(userData);
     if (iter == inputDevices_.end()) {
@@ -253,7 +253,7 @@ const InputDeviceImpl::DevIds* InputDeviceImpl::GetDeviceIds(int32_t userData) c
     return &iter->second.ids;
 }
 
-const InputDeviceImpl::DevKeys* InputDeviceImpl::GetDeviceKeys(int32_t userData) const
+const InputDeviceImpl::FunInputDevKeys* InputDeviceImpl::GetDeviceKeys(int32_t userData) const
 {
     auto iter = inputDevices_.find(userData);
     if (iter == inputDevices_.end()) {
@@ -262,7 +262,7 @@ const InputDeviceImpl::DevKeys* InputDeviceImpl::GetDeviceKeys(int32_t userData)
     return &iter->second.keys;
 }
 
-const InputDeviceImpl::DevKeyboardTypes* InputDeviceImpl::GetKeyboardTypes(int32_t userData) const
+const InputDeviceImpl::FunKeyboardTypes* InputDeviceImpl::GetKeyboardTypes(int32_t userData) const
 {
     auto iter = inputDevices_.find(userData);
     return iter == inputDevices_.end()? nullptr : &iter->second.kbTypes;

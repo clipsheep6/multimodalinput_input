@@ -186,17 +186,23 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     CHKPV(keyEvent);
     CHKPV(eventHandler_);
     CHKPV(consumer_);
-    std::lock_guard<std::mutex> guard(mtx_);
+    std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
+    std::shared_ptr<IInputEventConsumer> inputConsumer = nullptr;
+    {
+        std::lock_guard<std::mutex> guard(mtx_);
+        eventHandler = eventHandler_;
+        inputConsumer = consumer_;
+    }
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_DISPATCH_EVENT);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     if (client->IsNewHandler()) {
-        if (!eventHandler_->PostHighPriorityTask(std::bind(&InputManagerImpl::OnKeyEventTask, this, consumer_, keyEvent))) {
+        if (!eventHandler->PostHighPriorityTask(std::bind(&InputManagerImpl::OnKeyEventTask, this, inputConsumer, keyEvent))) {
             MMI_HILOGE("Post task failed");
             return;
         }
     } else {
-        consumer_->OnInputEvent(keyEvent);
+        inputConsumer->OnInputEvent(keyEvent);
         MMI_HILOGD("Key event report keyCode:%{public}d", keyEvent->GetKeyCode());
     }
     MMI_HILOGD("Key event keyCode:%{public}d", keyEvent->GetKeyCode());
@@ -221,17 +227,23 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     CHKPV(pointerEvent);
     CHKPV(eventHandler_);
     CHKPV(consumer_);
-    std::lock_guard<std::mutex> guard(mtx_);
+    std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
+    std::shared_ptr<IInputEventConsumer> inputConsumer = nullptr;
+    {
+        std::lock_guard<std::mutex> guard(mtx_);
+        eventHandler = eventHandler_;
+        inputConsumer = consumer_;
+    }
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_DISPATCH_EVENT);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     if (client->IsNewHandler()) {
-        if (!eventHandler_->PostHighPriorityTask(std::bind(&InputManagerImpl::OnPointerEventTask, this, consumer_, pointerEvent))) {
+        if (!eventHandler->PostHighPriorityTask(std::bind(&InputManagerImpl::OnPointerEventTask, this, inputConsumer, pointerEvent))) {
             MMI_HILOGE("Post task failed");
             return;
         }
     } else {
-        consumer_->OnInputEvent(pointerEvent);
+        inputConsumer->OnInputEvent(pointerEvent);
         MMI_HILOGD("Pointer event report pointerId:%{public}d", pointerEvent->GetPointerId());
     }
     MMI_HILOGD("Pointer event pointerId:%{public}d", pointerEvent->GetPointerId());
