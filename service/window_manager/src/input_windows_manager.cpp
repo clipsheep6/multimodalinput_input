@@ -184,7 +184,7 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
 #endif // OHOS_BUILD_ENABLE_POINTER
 
     if (!displayGroupInfo.displaysInfo.empty()) {
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
         IPointerDrawingManager::GetInstance()->OnDisplayInfo(displayGroupInfo);
         if (InputDevMgr->HasPointerDevice()) {
             MouseLocation mouseLocation = GetMouseInfo();
@@ -206,7 +206,7 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
             IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
             IPointerDrawingManager::GetInstance()->DrawPointerStyle();
         }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (InputDevMgr->HasPointerDevice()) {
@@ -525,6 +525,7 @@ const DisplayGroupInfo& InputWindowsManager::GetDisplayGroupInfo()
     return displayGroupInfo_;
 }
 
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 bool InputWindowsManager::IsNeedRefreshLayer(int32_t windowId)
 {
     CALL_DEBUG_ENTER;
@@ -552,6 +553,7 @@ bool InputWindowsManager::IsNeedRefreshLayer(int32_t windowId)
         touchWindow->id, windowId);
     return false;
 }
+#endif
 
 void InputWindowsManager::OnSessionLost(SessionPtr session)
 {
