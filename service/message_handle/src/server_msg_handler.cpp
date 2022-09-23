@@ -226,14 +226,6 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
-int32_t ServerMsgHandler::OnDisplayInfo(const std::shared_ptr<DisplayGroupInfo> displayGroupInfo)
-{
-    CALL_DEBUG_ENTER;
-    CHKPR(displayGroupInfo, ERROR_NULL_POINTER);
-    WinMgr->UpdateDisplayInfo(*displayGroupInfo);
-    return RET_OK;
-}
-
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
 int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, InputHandlerType handlerType,
     HandleEventType eventType)

@@ -851,13 +851,19 @@ int32_t MMIService::UnsubscribeKeyEvent(int32_t subscribeId)
 int32_t MMIService::UpdateDisplayInfo(const std::shared_ptr<DisplayGroupInfo> displayInfo)
 {
     CALL_DEBUG_ENTER;
+    // load display into cache.
+    auto result = WinMgr->UpdateDisplayInfoCache(displayInfo);
+    if (result == InputWindowsManager::DispInfoCacheUpdateResult::UPDATE) {
+        return RET_OK;
+    }
+    // start post async task.
     int32_t ret = delegateTasks_.PostAsyncTask(
-        std::bind(&ServerMsgHandler::OnDisplayInfo, &sMsgHandler_, displayInfo));
+        std::bind(&InputWindowsManager::UpdateDisplayInfo, WinMgr));
     if (ret != RET_OK) {
-        MMI_HILOGE("Post async task OnDisplayInfo failed, ret:%{public}d", ret);
+        MMI_HILOGE("Post async task UpdateDisplayInfo failed, ret:%{public}d", ret);
         return RET_ERR;
     }
-    
+
     return RET_OK;
 }
 
