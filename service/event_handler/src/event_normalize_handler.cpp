@@ -156,6 +156,7 @@ void EventNormalizeHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEv
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
 void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (nextHandler_ == nullptr) {
@@ -190,7 +191,9 @@ void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEven
     DfxHisysevent::ReportDispTimes();
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
+#endif // OHOS_BUILD_ENABLE_POINTER
 
+#ifdef OHOS_BUILD_ENABLE_TOUCH
 void EventNormalizeHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (nextHandler_ == nullptr) {
@@ -206,6 +209,7 @@ void EventNormalizeHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent>
     DfxHisysevent::ReportDispTimes();
 #endif // OHOS_BUILD_ENABLE_TOUCH
 }
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
 int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
 {
