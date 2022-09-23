@@ -49,7 +49,6 @@ private:
 private:
     IInputContext* const context_;
     std::map<int32_t, std::shared_ptr<IInputDevice>> inputDevices_;
-    static const int32_t MAX_INPUT_DEVICE {1024};
 };
 } // namespace MMI
 } // namespace OHOS
