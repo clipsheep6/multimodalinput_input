@@ -158,7 +158,6 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHK_PID_AND_TID();
     CHKPV(keyEvent);
-    std::lock_guard<std::mutex> guard(mtxHandlers_);
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_INTERCEPT_EVENT);
     for (const auto &handler : inputHandlers_) {
         if ((handler.second.eventType_ & HANDLE_EVENT_TYPE_KEY) != HANDLE_EVENT_TYPE_KEY) {
@@ -178,7 +177,6 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEven
 {
     CHK_PID_AND_TID();
     CHKPV(pointerEvent);
-    std::lock_guard<std::mutex> guard(mtxHandlers_);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_INTERCEPT_EVENT);
     int32_t consumerCount = 0;
     for (const auto &iter : inputHandlers_) {

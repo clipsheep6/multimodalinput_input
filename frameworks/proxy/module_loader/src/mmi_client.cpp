@@ -53,12 +53,12 @@ void MMIClient::SetEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventH
 
 bool MMIClient::CompareEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
 {
-    CHKPV(eventHandler);
-    CHKPV(eventHandler_);
+    CHKPF(eventHandler);
+    CHKPF(eventHandler_);
     auto currentRunner = eventHandler_->GetEventRunner();
-    CHKPV(currentRunner);
+    CHKPF(currentRunner);
     auto newRunner = eventHandler->GetEventRunner();
-    CHKPV(newRunner);
+    CHKPF(newRunner);
     bool isSameHandler = true;
     if (currentRunner->GetThreadId() != newRunner->GetThreadId()) {
         isSameHandler = false;

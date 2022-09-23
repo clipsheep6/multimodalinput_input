@@ -728,10 +728,12 @@ void InputManagerImpl::OnAnr(int32_t pid)
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
-    std::lock_guard<std::mutex> guard(mtx_);
-    for (const auto &observer : anrObservers_) {
-        CHKPV(observer);
-        observer->OnAnr(pid);
+    {
+        std::lock_guard<std::mutex> guard(mtx_);
+        for (const auto &observer : anrObservers_) {
+            CHKPV(observer);
+            observer->OnAnr(pid);
+        }
     }
     MMI_HILOGI("ANR noticed pid:%{public}d", pid);
 }

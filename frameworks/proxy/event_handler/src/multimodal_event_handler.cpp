@@ -92,6 +92,8 @@ bool MultimodalEventHandler::InitClient(std::shared_ptr<AppExecFwk::EventHandler
     client_->SetEventHandler(eventHandler);
     client_->RegisterConnectedFunction(&OnConnected);
     if (!(client_->Start())) {
+        client_.reset();
+        client_ = nullptr;
         MMI_HILOGE("The client fails to start");
         return false;
     }
