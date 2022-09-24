@@ -47,10 +47,10 @@ void JsEventTarget::EmitJsEnable(int32_t userData, std::string deviceId, Coopera
     std::lock_guard<std::mutex> guard(mutex_);
     auto iter = callback_.find(userData);
     if (iter == callback_.end()) {
-        CHKPV(iter->second);
         THROWERR(iter->second->env, "failed to search for userData");
         return;
     }
+    CHKPV(iter->second);
     if (iter->second->env == nullptr) {
         callback_.erase(iter);
         MMI_HILOGE("The env is nullptr");
