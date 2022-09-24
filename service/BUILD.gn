@@ -470,9 +470,7 @@ ohos_shared_library("libmmi-server") {
   }
 
   if (input_feature_keyboard) {
-    sources += [
-      "subscriber/src/key_subscriber_handler.cpp",
-    ]
+    sources += [ "subscriber/src/key_subscriber_handler.cpp" ]
     if (input_feature_combination_key) {
       sources += [ "key_command/src/key_command_handler.cpp" ]
     }
