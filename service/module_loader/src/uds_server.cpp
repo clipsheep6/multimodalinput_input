@@ -178,16 +178,16 @@ void UDSServer::Dump(int32_t fd, const std::vector<std::string> &args)
     }
 }
 
-void UDSServer::OnConnected(SessionPtr s)
+void UDSServer::OnConnected(SessionPtr sess)
 {
-    CHKPV(s);
-    MMI_HILOGI("Session desc:%{public}s", s->GetDescript().c_str());
+    CHKPV(sess);
+    MMI_HILOGI("Session desc:%{public}s", sess->GetDescript().c_str());
 }
 
-void UDSServer::OnDisconnected(SessionPtr s)
+void UDSServer::OnDisconnected(SessionPtr sess)
 {
-    CHKPV(s);
-    MMI_HILOGI("Session desc:%{public}s", s->GetDescript().c_str());
+    CHKPV(sess);
+    MMI_HILOGI("Session desc:%{public}s", sess->GetDescript().c_str());
 }
 
 int32_t UDSServer::AddEpoll(EpollEventType type, int32_t fd)
