@@ -53,7 +53,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputManagerCommand"};
 constexpr int32_t SLEEPTIME = 20;
 constexpr int32_t MOUSE_ID = 7;
-constexpr int32_t JOYSTICK_BTN_ID = 25;
+constexpr int32_t JOYSTICK_BUTTON_ID = 25;
 constexpr int32_t TWO_MORE_COMMAND = 2;
 constexpr int32_t THREE_MORE_COMMAND = 3;
 constexpr int32_t MAX_PRESSED_COUNT = 30;
@@ -1125,7 +1125,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 std::cout << "Invalid button press command" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
-                            if (joyInfo.buttonId > JOYSTICK_BTN_ID) {
+                            if (joyInfo.buttonId > JOYSTICK_BUTTON_ID) {
                                 std::cout << "Invalid button press command" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
@@ -1137,7 +1137,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 std::cout << "Invalid raise button command" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
-                            if (joyInfo.buttonId > JOYSTICK_BTN_ID) {
+                            if (joyInfo.buttonId > JOYSTICK_BUTTON_ID) {
                                 std::cout << "Invalid raise button command" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
@@ -1149,7 +1149,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 std::cout << "Invalid click button command" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
-                            if (joyInfo.buttonId > JOYSTICK_BTN_ID) {
+                            if (joyInfo.buttonId > JOYSTICK_BUTTON_ID) {
                                 std::cout << "Invalid button press command" << std::endl;
                                 return EVENT_REG_FAIL;
                             }

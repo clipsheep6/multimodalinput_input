@@ -660,7 +660,7 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
         }
     }
 
-    uint32_t joystick { GetAbs() };
+    uint32_t joystick = GetAbs();
     WRITEUINT32(out, joystick);
     for (int32_t i = ABSOLUTE_TYPE_UNKNOWN; i < ABSOLUTE_TYPE_MAX; ++i) {
         const AbsoluteType abs { static_cast<AbsoluteType>(i) };
@@ -727,7 +727,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
     uint32_t joystick;
     READUINT32(in, joystick);
     for (int32_t i = ABSOLUTE_TYPE_UNKNOWN; i < ABSOLUTE_TYPE_MAX; ++i) {
-        const AbsoluteType abs { static_cast<AbsoluteType>(i) };
+        AbsoluteType abs = static_cast<AbsoluteType>(i);
         if (Hasjoystick(joystick, abs)) {
             double value;
             READDOUBLE(in, value);
@@ -937,6 +937,16 @@ bool PointerEvent::IsValid() const
         }
     }
     return true;
+}
+
+bool PointerEvent::Hasjoystick(AbsoluteType abs) const
+{
+    return Hasjoystick(abs_, abs);
+}
+
+uint32_t PointerEvent::GetAbs() const
+{
+    return abs_;
 }
 } // namespace MMI
 } // namespace OHOS
