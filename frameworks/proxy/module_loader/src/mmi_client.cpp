@@ -60,9 +60,10 @@ bool MMIClient::CompareEventHandler(std::shared_ptr<AppExecFwk::EventHandler> ev
     auto newRunner = eventHandler->GetEventRunner();
     CHKPF(newRunner);
     bool isSameHandler = true;
-    if (currentRunner->GetThreadId() != newRunner->GetThreadId()) {
+    MMI_HILOGD("Current handler name:%{public}s", currentRunner->GetRunnerThreadName().c_str());
+    if (currentRunner->GetRunnerThreadName() != newRunner->GetRunnerThreadName()) {
         isSameHandler = false;
-        MMI_HILOGD("EventHandlers are not the same");
+        MMI_HILOGD("New handler name:%{public}s", newRunner->GetRunnerThreadName().c_str());
     }
     return isSameHandler;
 }
