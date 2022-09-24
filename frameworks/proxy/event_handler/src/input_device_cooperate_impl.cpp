@@ -161,7 +161,7 @@ void InputDeviceCooperateImpl::OnCooperationState(int32_t userData, bool state)
     std::lock_guard<std::mutex> guard(mtx_);
     auto event = GetCooprateStateEvent(userData);
     CHKPV(event);
-	(*event)(state);
+    (*event)(state);
     MMI_HILOGD("Cooperatinon state event callback userData:%{public}d state:(%{public}d)", userData, state);
 }
 
