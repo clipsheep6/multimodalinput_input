@@ -12,23 +12,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef UTIL_NAPI_ERROR_H
 #define UTIL_NAPI_ERROR_H
 
-#include<map>
-#include<string>
+#include <map>
+#include <string>
 
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
-#include "securec.h"
 
 #include "utils/log.h"
 
 namespace OHOS {
 namespace MMI {
-
 struct NapiError {
-    std::string ErrorCode;
+    std::string errorCode;
     std::string msg;
 };
 
@@ -38,6 +37,7 @@ enum NapiErrorCode : int32_t {
     DEVICE_ID_ERROR = 3900001,
     POINTER_WINDOW_ID_ERROR = 4000001,
     POINTER_NO_PERMISSION = 4000002,
+    POINTER_STYLE_NOT_EXIST = 4000003,
     MONITOR_REGISTER_EXCEED_MAX = 4100001,
     CONSUMER_PARAMETER_ERROR = 4200401,
     SIMULATOR_PARAMETER_ERROR = 4300401,
@@ -52,6 +52,7 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
     {DEVICE_ID_ERROR, {"3900001", "Invalid input device ID"}},
     {POINTER_WINDOW_ID_ERROR, {"4000001", "Invalid window ID"}},
     {POINTER_NO_PERMISSION, {"4000002", "No permission to set the current window style"}},
+    {POINTER_STYLE_NOT_EXIST, {"401", "Pointer style not exist"}},
     {MONITOR_REGISTER_EXCEED_MAX, {"4100001", "Maximum number of listeners exceeded for a single process"}},
     {CONSUMER_PARAMETER_ERROR, {"401", "Incorrect keyoptions in the event subscription or unsubscription API"}},
     {SIMULATOR_PARAMETER_ERROR, {"401", "Invalid KeyEvent orchestration settings for input event injection"}},
