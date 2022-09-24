@@ -31,7 +31,7 @@ public:
 
     int32_t Socket() override;
     virtual void SetEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventHandler) override;
-    virtual bool CompareEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventHandler) override;
+    virtual void CheckIsEventHandlerChanged(std::shared_ptr<AppExecFwk::EventHandler> eventHandler) override;
     bool Start() override;
     void RegisterConnectedFunction(ConnectCallback fun) override;
     void RegisterDisconnectedFunction(ConnectCallback fun) override;
@@ -42,6 +42,7 @@ public:
     virtual int32_t Reconnect() override;
     virtual void OnDisconnect() override;
     virtual MMIClientPtr GetSharedPtr() override;
+    bool IsEventHandlerChanged() override { return isEventHandlerChanged_; }
 
 protected:
     bool StartEventRunner();
@@ -60,6 +61,7 @@ protected:
     CircleStreamBuffer circBuf_;
     std::mutex mtx_;
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ { nullptr };
+    bool isEventHandlerChanged_ = false;
     bool isListening_ = false;
 };
 } // namespace MMI

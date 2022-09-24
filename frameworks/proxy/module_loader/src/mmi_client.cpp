@@ -51,21 +51,20 @@ void MMIClient::SetEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventH
     eventHandler_ = eventHandler;
 }
 
-bool MMIClient::CompareEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
+void MMIClient::CheckIsEventHandlerChanged(std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
 {
-    CHKPF(eventHandler);
-    CHKPF(eventHandler_);
+    CHKPV(eventHandler);
+    CHKPV(eventHandler_);
     auto currentRunner = eventHandler_->GetEventRunner();
-    CHKPF(currentRunner);
+    CHKPV(currentRunner);
     auto newRunner = eventHandler->GetEventRunner();
-    CHKPF(newRunner);
-    bool isSameHandler = true;
+    CHKPV(newRunner);
     MMI_HILOGD("Current handler name:%{public}s", currentRunner->GetRunnerThreadName().c_str());
+    isEventHandlerChanged_ = false;
     if (currentRunner->GetRunnerThreadName() != newRunner->GetRunnerThreadName()) {
-        isSameHandler = false;
+        isEventHandlerChanged_ = true;
         MMI_HILOGD("New handler name:%{public}s", newRunner->GetRunnerThreadName().c_str());
     }
-    return isSameHandler;
 }
 
 bool MMIClient::SendMessage(const NetPacket &pkt) const

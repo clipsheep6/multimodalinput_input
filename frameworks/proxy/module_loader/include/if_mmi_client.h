@@ -37,7 +37,8 @@ public:
     virtual int32_t Reconnect() = 0;
     virtual void OnDisconnect() = 0;
     virtual void SetEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventHandler) = 0;
-    virtual bool CompareEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventHandler) = 0;
+    virtual void CheckIsEventHandlerChanged(std::shared_ptr<AppExecFwk::EventHandler> eventHandler) = 0;
+    virtual bool IsEventHandlerChanged() = 0;
 };
 } // namespace MMI
 } // namespace OHOS
