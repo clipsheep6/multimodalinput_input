@@ -198,9 +198,9 @@ bool MMIService::InitLibinputService()
     return true;
 }
 
-bool MMIService::InitHdfService()
+bool MMIService::InitHDFService()
 {
-    if (!(hdfAdapter_.Init(std::bind(&InputEventHandler::OnHdfEvent, InputHandler, std::placeholders::_1),
+    if (!(hdfAdapter_.Init(std::bind(&InputEventHandler::OnHDFEvent, InputHandler, std::placeholders::_1),
         DEF_INPUT_SEAT))) {
         MMI_HILOGE("Libinput init, bind failed");
         return false;
@@ -941,11 +941,13 @@ void MMIService::OnThread()
 #endif
     libinputAdapter_.RetriggerHotplugEvents();
     libinputAdapter_.ProcessPendingEvents();
+    MMI_HILOGE("zpc:before ScanInputDevice");
     hdfAdapter_.ScanInputDevice(); //TODO: 是否应该委托到eventRunner中执行
+    MMI_HILOGE("zpc:before ScanInputDevice");
     while (state_ == ServiceRunningState::STATE_RUNNING) {
         epoll_event ev[MAX_EVENT_SIZE] = {};
         int32_t timeout = TimerMgr->CalcNextDelay();
-        MMI_HILOGD("timeout:%{public}d", timeout);
+        MMI_HILOGE("zpc:timeout:%{public}d", timeout);
         int32_t count = EpollWait(ev[0], MAX_EVENT_SIZE, timeout, mmiFd_);
         for (int32_t i = 0; i < count && state_ == ServiceRunningState::STATE_RUNNING; i++) {
             auto mmiEd = reinterpret_cast<mmi_epoll_event*>(ev[i].data.ptr);
@@ -953,6 +955,7 @@ void MMIService::OnThread()
             if (mmiEd->event_type == EPOLL_EVENT_INPUT) {
                 libinputAdapter_.EventDispatch(ev[i]);
             } else if (mmiEd->event_type == EPOLL_EVENT_HDF) {
+                MMI_HILOGE("zpc:hdfAdapter_.EventDispatch:%{public}d", i);
                 hdfAdapter_.EventDispatch(ev[i]);
             } else if (mmiEd->event_type == EPOLL_EVENT_SOCKET) {
                 OnEpollEvent(ev[i]);

@@ -111,6 +111,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event)
     DfxHisysevent::ReportDispTimes();
 }
 
+#ifdef OHOS_BUILD_HDF
 void InputEventNormalizeHandler::HandleEvent(const MmiHdfEvent &event)
 {
     CALL_DEBUG_ENTER;
@@ -118,6 +119,7 @@ void InputEventNormalizeHandler::HandleEvent(const MmiHdfEvent &event)
     TimeCostChk chk("HandleLibinputEvent", "overtime 1000(us)", MAX_INPUT_EVENT_TIME, event.type);
     MMI_HILOGW("type: %{public}d, code: %{public}d, value: %{public}d, time: %{public}ld",
         event.type, event.code, event.value, event.time);
+#if 0
     hdfHelper_.HandleEvent(event);
     switch (event.type) {
         case MmiHdfEventType::DEVICE_ADDED: {
@@ -143,8 +145,10 @@ void InputEventNormalizeHandler::HandleEvent(const MmiHdfEvent &event)
             break;
         }
     }
+#endif
     DfxHisysevent::ReportDispTimes();    
 }
+#endif // OHOS_BUILD_HDF
 
 int32_t InputEventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
 int32_t EventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)

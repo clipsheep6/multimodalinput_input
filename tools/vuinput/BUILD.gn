@@ -142,7 +142,7 @@ ohos_unittest("ut-virtual-device-out") {
     "${mmi_path}/util/socket/include",
   ]
 
-  if (input_feature_libinput || input_feature_hdf) {
+  if (input_feature_libinput) {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
@@ -171,7 +171,7 @@ ohos_unittest("ut-virtual-device-out") {
     "//third_party/googletest:gtest_main",
   ]
 
-  if (input_feature_libinput || input_feature_hdf) {
+  if (input_feature_libinput) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
   external_deps = [

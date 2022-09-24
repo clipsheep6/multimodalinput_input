@@ -111,6 +111,14 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event)
     DfxHisysevent::ReportDispTimes();
 }
 
+#ifdef OHOS_BUILD_HDF
+void EventNormalizeHandler::HandleEvent(const MmiHdfEvent &event)
+{
+    MMI_HILOGI("hdfEvent: type:%{public}d, code:%{public}d, value:%{public}d, time:%{public}lld",
+        event.type, event.code, event.value, event.time);
+}
+#endif // OHOS_BUILD_HDF
+
 int32_t EventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
