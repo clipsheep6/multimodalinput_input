@@ -62,7 +62,7 @@ bool MMIClient::CompareEventHandler(std::shared_ptr<AppExecFwk::EventHandler> ev
     bool isSameHandler = true;
     if (currentRunner->GetThreadId() != newRunner->GetThreadId()) {
         isSameHandler = false;
-        MMI_HILOGD("EventHandlers are the same");
+        MMI_HILOGD("EventHandlers are not the same");
     }
     return isSameHandler;
 }
@@ -155,16 +155,16 @@ bool MMIClient::AddFdListener(int32_t fd)
 bool MMIClient::DelFdListener(int32_t fd)
 {
     CALL_DEBUG_ENTER;
-    if (fd < 0) {
-        MMI_HILOGE("Invalid fd:%{public}d", fd);
-        return false;
-    }
     CHKPF(eventHandler_);
+    if (fd >= 0) {
+        eventHandler_->RemoveFileDescriptorListener(fd);
+    } else {
+        MMI_HILOGE("Invalid fd:%{public}d", fd);
+    }
     auto runner = eventHandler_->GetEventRunner();
     CHKPF(runner);
     if (runner->GetRunnerThreadName() == THREAD_NAME) {
         eventHandler_->RemoveAllEvents();
-        eventHandler_->RemoveFileDescriptorListener(fd);
     }
     isRunning_ = false;
     return true;
