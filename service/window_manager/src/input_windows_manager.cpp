@@ -178,7 +178,7 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
     UpdatePointerStyle();
 
     if (!displayGroupInfo.displaysInfo.empty()) {
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
         IPointerDrawingManager::GetInstance()->OnDisplayInfo(displayGroupInfo);
         if (InputDevMgr->HasPointerDevice()) {
             MouseLocation mouseLocation = GetMouseInfo();
@@ -200,7 +200,7 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
             IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
             IPointerDrawingManager::GetInstance()->DrawPointerStyle();
         }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (InputDevMgr->HasPointerDevice()) {
@@ -519,6 +519,7 @@ const DisplayGroupInfo& InputWindowsManager::GetDisplayGroupInfo()
     return displayGroupInfo_;
 }
 
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 bool InputWindowsManager::IsNeedRefreshLayer(int32_t windowId)
 {
     CALL_DEBUG_ENTER;
@@ -546,6 +547,7 @@ bool InputWindowsManager::IsNeedRefreshLayer(int32_t windowId)
         touchWindow->id, windowId);
     return false;
 }
+#endif
 
 void InputWindowsManager::OnSessionLost(SessionPtr session)
 {
@@ -932,6 +934,28 @@ int32_t InputWindowsManager::UpdateTouchPadTarget(std::shared_ptr<PointerEvent> 
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
+#ifdef OHOS_BUILD_ENABLE_JOYSTICK
+int32_t InputWindowsManager::UpdateJoystickTarget(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    int32_t focusWindowId = displayGroupInfo_.focusWindowId;
+    const WindowInfo* windowInfo = nullptr;
+    for (const auto &item : displayGroupInfo_.windowsInfo) {
+        if (item.id == focusWindowId) {
+            windowInfo = &item;
+            break;
+        }
+    }
+    CHKPR(windowInfo, ERROR_NULL_POINTER);
+    pointerEvent->SetTargetWindowId(windowInfo->id);
+    pointerEvent->SetAgentWindowId(windowInfo->agentWindowId);
+    MMI_HILOGD("focusWindow:%{public}d, pid:%{public}d", focusWindowId, windowInfo->pid);
+
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
+
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent)
 {
@@ -952,6 +976,11 @@ int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> p
             return UpdateTouchPadTarget(pointerEvent);
         }
 #endif // OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_JOYSTICK
+        case PointerEvent::SOURCE_TYPE_JOYSTICK: {
+            return UpdateJoystickTarget(pointerEvent);
+        }
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
         default: {
             MMI_HILOGE("Source type is unknown, source:%{public}d", source);
             break;
@@ -1036,8 +1065,8 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     if (integerY >= height) {
         integerY = height - 1;
     }
-    x = static_cast<double>(integerX);
-    y = static_cast<double>(integerY);
+    x = static_cast<double>(integerX) + (x - floor(x));
+    y = static_cast<double>(integerY) + (y - floor(y));
     mouseLocation_.physicalX = integerX;
     mouseLocation_.physicalY = integerY;
     MMI_HILOGD("Mouse Data: physicalX:%{public}d,physicalY:%{public}d, displayId:%{public}d",
