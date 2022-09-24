@@ -19,7 +19,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "HdfAdapter" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "zpcHdfAdapter" };
 const std::string DEF_INPUT_SEAT = "seat0";
 int32_t g_hdfAdapterWriteFd { -1 };
 int32_t g_mmiServiceReadFd { -1 };
@@ -33,6 +33,7 @@ std::mutex g_mutex;
 
 static void HotPlugCallback(const InputHotPlugEvent *event)
 {
+    CALL_DEBUG_ENTER;
     CHKPV(event);
     MMI_HILOGD("status:%{public}u,index:%{public}u,type:%{public}u", event->status, event->devIndex, event->devType);
     if (g_hdfAdapterWriteFd == -1) {
@@ -54,6 +55,7 @@ static void HotPlugCallback(const InputHotPlugEvent *event)
 
 static void EventPkgCallback(const InputEventPackage **pkgs, uint32_t count, uint32_t devIndex)
 {
+    CALL_DEBUG_ENTER;
     static constexpr uint16_t byteSize = 8;
     CHKPV(pkgs);    
     uint32_t fixedCount = std::min(count, static_cast<uint32_t>(MmiHdfEventPacket::MAX_EVENT_PKG_NUM));
@@ -104,6 +106,7 @@ int32_t HdfAdapter::ScanInputDevice()
     }
     pkt.head.size = devCount * sizeof(InputDevDesc);
     pkt.head.type = MmiHdfEventPacketType::HDF_ADD_DEVICE;
+    MMI_HILOGE("Write pipe g_hdfAdapterWriteFd:%{public}d", g_hdfAdapterWriteFd);
     ret = write(g_hdfAdapterWriteFd, &pkt, sizeof(pkt.head) + pkt.head.size);
     if (ret == -1) {
         int saveErrno = errno;
@@ -129,11 +132,14 @@ bool HdfAdapter::Init(HdfEventCallback callback, const std::string &seat_id)
         int32_t ret = pipe(fds);
         if (ret != 0) {
             int saveErrno = errno;
-            MMI_HILOGE("create pipe error, errno: %{public}d, %{public}s", saveErrno, strerror(saveErrno));       
+            MMI_HILOGE("create pipe error, errno: %{public}d, %{public}s", saveErrno, strerror(saveErrno));
             break;
         }
         g_hdfAdapterWriteFd = fds[0];
         g_mmiServiceReadFd = fds[1];
+        MMI_HILOGD("connect hdf init, fds:(%{public}d, (%{public}d)", fds[0], fds[1]);
+        MMI_HILOGE("connect hdf init, fds:(%{public}d, (%{public}d), g_hdfAdapterWriteFd:%{public}d, g_mmiServiceReadFd:%{public}d", 
+            fds[0], fds[1], g_hdfAdapterWriteFd, g_mmiServiceReadFd);
 
         ret = ConnectHDFInit();
         if (ret != RET_OK) {
@@ -197,6 +203,7 @@ void HdfAdapter::EventDispatch(struct epoll_event &ev)
 
 void HdfAdapter::OnEventCallback(const MmiHdfPacket &pkt)
 {
+    CALL_DEBUG_ENTER;
     #if 0
     auto pktType = pkt.type;
     switch(pktType) {
@@ -327,7 +334,7 @@ void HdfAdapter::HandleDeviceRmv(int32_t devIndex, int32_t devType)
 
 void HdfAdapter::HandleDeviceEvent(int32_t devIndex, int32_t type, int32_t code, int32_t value, int64_t timestamp)
 {
-    
+    CALL_DEBUG_ENTER;    
 }
 
 void HdfAdapter::OnEventHandler(const MmiHdfEvent &data)
