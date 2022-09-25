@@ -36,18 +36,18 @@ int32_t InputDeviceCooperateStateIn::StartInputDeviceCooperate(const std::string
     CALL_INFO_TRACE;
     if (remoteNetworkId.empty()) {
         MMI_HILOGE("RemoteNetworkId is empty");
-        return CooperationMessage::COOPERATION_DEVICE_ERROR;
+        return static_cast<int32_t>(CooperationMessage::COOPERATION_DEVICE_ERROR);
     }
     std::string localNetworkId;
     InputDevMgr->GetLocalDeviceId(localNetworkId);
     if (localNetworkId.empty() || remoteNetworkId == localNetworkId) {
         MMI_HILOGE("Input Parameters error");
-        return CooperationMessage::COOPERATION_DEVICE_ERROR;
+        return static_cast<int32_t>(CooperationMessage::COOPERATION_DEVICE_ERROR);
     }
     int32_t ret = RemoteMgr->StartRemoteCooperate(localNetworkId, remoteNetworkId);
     if (ret != RET_OK) {
         MMI_HILOGE("Start input device cooperate fail");
-        return CooperationMessage::COOPERATE_FAIL;
+        return static_cast<int32_t>(CooperationMessage::COOPERATE_FAIL);
     }
     std::string taskName = "process_start_task";
     std::function<void()> handleProcessStartFunc =
@@ -150,7 +150,7 @@ void InputDeviceCooperateStateIn::ComeBack(const std::string &sinkNetworkId, int
 {
     CALL_DEBUG_ENTER;
     std::vector<std::string> dhids = InputDevMgr->GetCooperateDhids(startInputDeviceId);
-    if (dhis.empty()) {
+    if (dhids.empty()) {
        InputDevCooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
     }
     

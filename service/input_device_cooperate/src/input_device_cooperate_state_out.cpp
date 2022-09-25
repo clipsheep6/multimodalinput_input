@@ -44,7 +44,7 @@ int32_t InputDeviceCooperateStateOut::StopInputDeviceCooperate(const std::string
     int32_t ret = RemoteMgr->StopRemoteCooperate(networkId);
     if (ret != RET_OK) {
         MMI_HILOGE("Stop input device cooperate fail");
-        return CooperationMessage::COOPERATE_FAIL;
+        return static_cast<int32_t>(CooperationMessage::COOPERATE_FAIL);
     }
     std::string taskName = "process_stop_task";
     std::function<void()> handleProcessStopFunc =

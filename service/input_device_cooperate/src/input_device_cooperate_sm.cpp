@@ -135,7 +135,7 @@ int32_t InputDeviceCooperateSM::StartInputDeviceCooperate(
     std::lock_guard<std::mutex> guard(mutex_);
     if (isStarting_) {
         MMI_HILOGE("In transition state, not process");
-        return CooperationMessage::COOPERATE_FAIL;
+        return static_cast<int32_t>(CooperationMessage::COOPERATE_FAIL);
     }
     CHKPR(currentStateSM_, ERROR_NULL_POINTER);
     BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_START, BytraceAdapter::LAUNCH_EVENT);
