@@ -33,11 +33,11 @@ public:
     virtual ~IInputDeviceCooperateState() = default;
     virtual int32_t StartInputDeviceCooperate(const std::string &remoteNetworkId, int32_t startInputDeviceId)
     {
-        return RET_ERR;
+        return CooperationMessage::COOPERATE_FAIL;
     }
     virtual int32_t StopInputDeviceCooperate(const std::string &networkId)
     {
-        return RET_ERR;
+        return CooperationMessage::COOPERATE_FAIL;
     }
     virtual void OnKeyboardOnline(const std::string &dhid) {}
     virtual void UpdateSinkDeviceInfo(const std::map<std::string, std::set<std::string>> &sinkDeviceInfo) {}
