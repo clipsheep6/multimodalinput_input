@@ -19,7 +19,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "zpcHdfAdapter" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "HdfAdapter" };
 const std::string DEF_INPUT_SEAT = "seat0";
 int32_t g_hdfAdapterWriteFd { -1 };
 int32_t g_mmiServiceReadFd { -1 };
@@ -135,11 +135,11 @@ bool HdfAdapter::Init(HdfEventCallback callback, const std::string &seat_id)
             MMI_HILOGE("create pipe error, errno: %{public}d, %{public}s", saveErrno, strerror(saveErrno));
             break;
         }
-        g_hdfAdapterWriteFd = fds[0];
-        g_mmiServiceReadFd = fds[1];
+        g_mmiServiceReadFd = fds[0];
+        g_hdfAdapterWriteFd = fds[1];
         MMI_HILOGD("connect hdf init, fds:(%{public}d, (%{public}d)", fds[0], fds[1]);
-        MMI_HILOGE("connect hdf init, fds:(%{public}d, (%{public}d), g_hdfAdapterWriteFd:%{public}d, g_mmiServiceReadFd:%{public}d", 
-            fds[0], fds[1], g_hdfAdapterWriteFd, g_mmiServiceReadFd);
+        MMI_HILOGE("connect hdf init, fds:(%{public}d, (%{public}d), g_mmiServiceReadFd:%{public}d, g_hdfAdapterWriteFd:%{public}d", 
+            fds[0], fds[1], g_mmiServiceReadFd, g_hdfAdapterWriteFd);
 
         ret = ConnectHDFInit();
         if (ret != RET_OK) {
