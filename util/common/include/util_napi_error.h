@@ -36,7 +36,9 @@ enum NapiErrorCode : int32_t {
     COMMON_PARAMETER_ERROR = 401,
     MONITOR_REGISTER_EXCEED_MAX = 4100001,
     COOPERATOR_TARGET_DEV_DESCRIPTOR_ERROR = 4400001,
+    COOPERATOR_DEVICE_ID_ERROE = 4400002,
     COOPERATOR_FAIL = 4400003,
+    OTHER_ERROR = -1,
 };
 
 const std::map<int32_t, NapiError> NAPI_ERRORS = {
@@ -44,7 +46,8 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
     {COMMON_PARAMETER_ERROR,  {"401", "Parameter error. The type of %s must be %s."}},
     {MONITOR_REGISTER_EXCEED_MAX, {"4100001", "Maximum number of listeners exceeded for a single process"}},
     {COOPERATOR_TARGET_DEV_DESCRIPTOR_ERROR, {"4400001", "Incorrect descriptor for the target device"}},
-    {COOPERATOR_FAIL, {"4400001", "Screen hop failed"}},
+    {COOPERATOR_DEVICE_ID_ERROE, {"4400002", " Incorrect ID of the input device for screen hop"}},
+    {COOPERATOR_FAIL, {"4400003", "Screen hop failed"}},
 };
 
 #define THROWERR_API9(env, code, ...) \
@@ -62,7 +65,7 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
 
 #define THROWERR_CUSTOM(env, code, msg) \
     do { \
-        napi_throw_error(env, std::to_string(code).c_str(), msg.c_str()); \
+        napi_throw_error(env, std::to_string(code).c_str(), msg); \
     } while (0)
 namespace UtilNapiError {
 bool GetApiError(int32_t code, NapiError& codeMsg);
