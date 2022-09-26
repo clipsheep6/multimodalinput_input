@@ -623,7 +623,7 @@ int32_t ReadTomlFile(const std::string &filePath, DeviceConfig &devConf)
     }
     int32_t fileSize = GetFileSize(realPath);
     if ((fileSize <= 0) || (fileSize > FILE_SIZE_MAX)) {
-        MMI_HILOGE("File size out of read range");
+        MMI_HILOGE("File size out of range");
         return RET_ERR;
     }
     if (ReadConfigFile(realPath, devConf) == RET_ERR) {

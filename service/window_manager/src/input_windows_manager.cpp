@@ -318,7 +318,7 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction)
     if (fd == RET_ERR) {
         auto windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
         if (!windowInfo) {
-            MMI_HILOGE("The windowInfo is nullptr");
+            MMI_HILOGE("windowInfo is nullptr");
             return;
         }
         fd = udsServer_->GetClientFd(windowInfo->pid);
