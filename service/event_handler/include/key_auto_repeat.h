@@ -37,10 +37,12 @@ public:
     void AddHandleTimer(int32_t timeout);
     void RemoveDeviceConfig(struct libinput_device *device);
     int32_t GetIntervalTime(int32_t deviceId) const;
-    std::map<int32_t, DeviceConfig> GetDeviceConfig() const;
+    bool GetKeyboardType(int32_t deviceId, int32_t &keyboardType) const;
+
 private:
     std::string GetTomlFilePath(const std::string &fileName) const;
-    DeviceConfig GetAutoSwitch(int32_t deviceId);
+    DeviceConfig GetAutoSwitch(int32_t deviceId) const;
+
 private:
     std::map<int32_t, DeviceConfig> deviceConfig_;
     int32_t timerId_ { -1 };

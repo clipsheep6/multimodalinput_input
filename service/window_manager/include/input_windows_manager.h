@@ -69,7 +69,7 @@ public:
         int32_t& targetDisplayId, LogicalCoordinate& coord) const;
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    const DisplayGroupInfo& GetDisplayGroupInfo();
+    std::optional<DisplayInfo> GetDefaultDisplayInfo();
     int32_t SetPointerStyle(int32_t pid, int32_t windowId, int32_t pointerStyle);
     std::optional<int> GetPointerStyle(int32_t pid, int32_t windowId) const;
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -107,10 +107,10 @@ private:
     int32_t UpdateTouchPadTarget(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    const DisplayInfo* GetPhysicalDisplay(int32_t id) const;
+    std::optional<DisplayInfo> GetPhysicalDisplay(int32_t id) const;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    const DisplayInfo* FindPhysicalDisplayInfo(const std::string& uniq) const;
+    std::optional<DisplayInfo> FindPhysicalDisplayInfo(const std::string& uniq) const;
 #endif // OHOS_BUILD_ENABLE_TOUCH
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
 #ifdef OHOS_BUILD_ENABLE_POINTER

@@ -31,7 +31,7 @@ public:
 public:
     bool DrawTestWindow();
     void ClearTestWindow();
-    sptr<Rosen::Window>& GetWindow();
+    sptr<Rosen::Window> GetWindow();
     uint32_t GetWindowId();
 
 private:

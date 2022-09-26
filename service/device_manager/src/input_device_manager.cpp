@@ -134,7 +134,10 @@ std::vector<bool> InputDeviceManager::SupportKeys(int32_t deviceId, std::vector<
     for (const auto &item : keyCodes) {
         bool ret = false;
         for (const auto &it : KeyMapMgr->InputTransferKeyValue(deviceId, item)) {
-            ret |= libinput_device_has_key(iter->second.inputDeviceOrigin_, it) == SUPPORT_KEY;
+            if (libinput_device_has_key(iter->second.inputDeviceOrigin_, it) == SUPPORT_KEY) {
+                ret = true;
+                break;
+            }
         }
         keystrokeAbility.push_back(ret);
     }
@@ -159,13 +162,10 @@ bool InputDeviceManager::GetDeviceConfig(int32_t deviceId, int32_t &keyboardType
         MMI_HILOGE("Failed to search for the deviceID");
         return false;
     }
-    auto deviceConfig = KeyRepeat->GetDeviceConfig();
-    auto it = deviceConfig.find(deviceId);
-    if (it == deviceConfig.end()) {
-        MMI_HILOGE("Failed to obtain the keyboard type of the configuration file");
+    if (!KeyRepeat->GetKeyboardType(deviceId, keyboardType)) {
+        MMI_HILOGE("Get keyboard type failed");
         return false;
     }
-    keyboardType = it->second.keyboardType;
     MMI_HILOGD("Get keyboard type results from the configuration file:%{public}d", keyboardType);
     return true;
 }
@@ -722,7 +722,7 @@ int32_t InputDeviceManager::SetInputDevice(const std::string& dhid, const std::s
     return RET_OK;
 }
 
-const std::string& InputDeviceManager::GetScreenId(int32_t deviceId) const
+std::string InputDeviceManager::GetScreenId(int32_t deviceId) const
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE

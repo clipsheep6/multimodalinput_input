@@ -187,12 +187,15 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
                 displayId = displayGroupInfo_.displaysInfo[0].id;
             }
             auto displayInfo = GetPhysicalDisplay(displayId);
-            CHKPV(displayInfo);
+            if (!displayInfo) {
+                MMI_HILOGE("Get physical display info failed");
+                return;
+            }
             int32_t logicX = mouseLocation.physicalX + displayInfo->x;
             int32_t logicY = mouseLocation.physicalY + displayInfo->y;
             std::optional<WindowInfo> windowInfo = GetWindowInfo(logicX, logicY);
             if (!windowInfo) {
-                MMI_HILOGE("The windowInfo is nullptr");
+                MMI_HILOGE("Get window info failed");
                 return;
             }
             int32_t windowPid = GetWindowPid(windowInfo->id);
@@ -388,28 +391,28 @@ void InputWindowsManager::PrintDisplayInfo()
 }
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-const DisplayInfo* InputWindowsManager::GetPhysicalDisplay(int32_t id) const
+std::optional<DisplayInfo> InputWindowsManager::GetPhysicalDisplay(int32_t id) const
 {
     for (auto &it : displayGroupInfo_.displaysInfo) {
         if (it.id == id) {
-            return &it;
+            return std::make_optional(it);
         }
     }
     MMI_HILOGW("Failed to obtain physical(%{public}d) display", id);
-    return nullptr;
+    return std::nullopt;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-const DisplayInfo* InputWindowsManager::FindPhysicalDisplayInfo(const std::string& uniq) const
+std::optional<DisplayInfo> InputWindowsManager::FindPhysicalDisplayInfo(const std::string& uniq) const
 {
     for (auto &it : displayGroupInfo_.displaysInfo) {
         if (it.uniq == uniq) {
-            return &it;
+            return std::make_optional(it);
         }
     }
     MMI_HILOGE("Failed to search for Physical,uniq:%{public}s", uniq.c_str());
-    return nullptr;
+    return std::nullopt;
 }
 
 void InputWindowsManager::RotateTouchScreen(DisplayInfo info, LogicalCoordinate& coord) const
@@ -470,8 +473,11 @@ bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, struct libi
     if (screenId.empty()) {
         screenId = "default0";
     }
-    auto info = FindPhysicalDisplayInfo(screenId);
-    CHKPF(info);
+    std::optional<DisplayInfo> info = FindPhysicalDisplayInfo(screenId);
+    if (!info) {
+        MMI_HILOGE("Find physical display info failed");
+        return false;
+    }
     physicalDisplayId = info->id;
     if ((info->width <= 0) || (info->height <= 0)) {
         MMI_HILOGE("Get DisplayInfo is error");
@@ -485,8 +491,11 @@ bool InputWindowsManager::TransformTipPoint(struct libinput_event_tablet_tool* t
     LogicalCoordinate& coord, int32_t& displayId) const
 {
     CHKPF(tip);
-    auto displayInfo = FindPhysicalDisplayInfo("default0");
-    CHKPF(displayInfo);
+    std::optional<DisplayInfo> displayInfo = FindPhysicalDisplayInfo("default0");
+    if (!displayInfo) {
+        MMI_HILOGE("Find physical display info failed");
+        return false;
+    }
     MMI_HILOGD("PhysicalDisplay.width:%{public}d, PhysicalDisplay.height:%{public}d, "
                "PhysicalDisplay.topLeftX:%{public}d, PhysicalDisplay.topLeftY:%{public}d",
                displayInfo->width, displayInfo->height, displayInfo->x, displayInfo->y);
@@ -514,9 +523,14 @@ bool InputWindowsManager::CalculateTipPoint(struct libinput_event_tablet_tool* t
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-const DisplayGroupInfo& InputWindowsManager::GetDisplayGroupInfo()
+
+std::optional<DisplayInfo> InputWindowsManager::GetDefaultDisplayInfo()
 {
-    return displayGroupInfo_;
+    if (displayGroupInfo_.displaysInfo.empty()) {
+        MMI_HILOGE("Display group info is empty");
+        return std::nullopt;
+    }
+    return std::make_optional(displayGroupInfo_.displaysInfo[0]);
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -529,7 +543,10 @@ bool InputWindowsManager::IsNeedRefreshLayer(int32_t windowId)
         displayId = displayGroupInfo_.displaysInfo[0].id;
     }
     auto displayInfo = GetPhysicalDisplay(displayId);
-    CHKPR(displayInfo, false);
+    if (!displayInfo) {
+        MMI_HILOGE("Get physical display info failed");
+        return false;
+    }
     int32_t logicX = mouseLocation.physicalX + displayInfo->x;
     int32_t logicY = mouseLocation.physicalY + displayInfo->y;
     std::optional<WindowInfo> touchWindow = GetWindowInfo(logicX, logicY);
@@ -797,8 +814,11 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
         return RET_ERR;
     }
-    auto physicalDisplayInfo = GetPhysicalDisplay(displayId);
-    CHKPR(physicalDisplayInfo, ERROR_NULL_POINTER);
+    std::optional<DisplayInfo> physicalDisplayInfo = GetPhysicalDisplay(displayId);
+    if (!physicalDisplayInfo) {
+        MMI_HILOGE("Get physical display info failed");
+        return RET_ERR;
+    }
     int32_t logicalX = 0;
     int32_t logicalY = 0;
     if (!AddInt32(pointerItem.GetDisplayX(), physicalDisplayInfo->x, logicalX)) {
@@ -867,8 +887,11 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         return RET_ERR;
     }
     MMI_HILOGD("display:%{public}d", displayId);
-    auto physicDisplayInfo = GetPhysicalDisplay(displayId);
-    CHKPR(physicDisplayInfo, ERROR_NULL_POINTER);
+    std::optional<DisplayInfo> physicDisplayInfo = GetPhysicalDisplay(displayId);
+    if (!physicDisplayInfo) {
+        MMI_HILOGE("Get physical display info failed");
+        return RET_ERR;
+    }
     int32_t physicalX = pointerItem.GetDisplayX();
     int32_t physicalY = pointerItem.GetDisplayY();
     AdjustDisplayCoordinate(*physicDisplayInfo, physicalX, physicalY);
@@ -1032,8 +1055,11 @@ void InputWindowsManager::FindPhysicalDisplay(const DisplayInfo& displayInfo, in
 }
 void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, double& x, double& y)
 {
-    auto displayInfo = GetPhysicalDisplay(displayId);
-    CHKPV(displayInfo);
+    std::optional<DisplayInfo> displayInfo = GetPhysicalDisplay(displayId);
+    if (!displayInfo) {
+        MMI_HILOGE("Get physical display failed");
+        return;
+    }
     int32_t integerX = static_cast<int32_t>(x);
     int32_t integerY = static_cast<int32_t>(y);
     int32_t lastDisplayId = displayId;
@@ -1042,7 +1068,10 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     }
     if (displayId != lastDisplayId) {
         displayInfo = GetPhysicalDisplay(displayId);
-        CHKPV(displayInfo);
+        if (!displayInfo) {
+        MMI_HILOGE("Get physical display failed");
+        return;
+    }
     }
     int32_t width = 0;
     int32_t height = 0;

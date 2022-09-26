@@ -144,14 +144,14 @@ void MouseEventNormalize::InitAbsolution()
         return;
     }
     MMI_HILOGD("Init absolution");
-    auto dispalyGroupInfo = WinMgr->GetDisplayGroupInfo();
-    if (dispalyGroupInfo.displaysInfo.empty()) {
-        MMI_HILOGI("The displayInfo is empty");
+    auto displayInfo = WinMgr->GetDefaultDisplayInfo();
+    if (!displayInfo) {
+        MMI_HILOGE("Get default display Info failed");
         return;
     }
-    currentDisplayId_ = dispalyGroupInfo.displaysInfo[0].id;
-    absolutionX_ = dispalyGroupInfo.displaysInfo[0].width * 1.0 / 2;
-    absolutionY_ = dispalyGroupInfo.displaysInfo[0].height * 1.0 / 2;
+    currentDisplayId_ = displayInfo->id;
+    absolutionX_ = displayInfo->width * 1.0 / 2;
+    absolutionY_ = displayInfo->height * 1.0 / 2;
 }
 
 int32_t MouseEventNormalize::HandleButtonInner(struct libinput_event_pointer* data)
@@ -452,23 +452,19 @@ void MouseEventNormalize::SetAbsolutionLocation(double xPercent, double yPercent
 {
     MMI_HILOGI("MouseEventNormalize cross screen location : xPercent:%{public}lf, yPercent:%{public}lf",
         xPercent, yPercent);
-    auto displayGroupInfo = WinMgr->GetDisplayGroupInfo();
+    std::optional<DisplayInfo> display {};
     if (currentDisplayId_ == -1) {
-        if (displayGroupInfo.displaysInfo.empty()) {
-            MMI_HILOGI("The displayInfo is empty");
-            return;
-        }
-        currentDisplayId_ = displayGroupInfo.displaysInfo[0].id;
+        display = WinMgr->GetDefaultDisplayInfo();
+    } else {
+        display = WinMgr->GetPhysicalDisplay(currentDisplayId_);
     }
-    struct DisplayInfo display;
-    for (auto &it : displayGroupInfo.displaysInfo) {
-        if (it.id == currentDisplayId_) {
-            display = it;
-            break;
-        }
+    if (!display) {
+        MMI_HILOGE("Get display Info failed");
+        return;
     }
-    absolutionX_ = display.width * xPercent / PERCENT_CONST;
-    absolutionY_ = display.height * yPercent / PERCENT_CONST;
+    currentDisplayId_ = display->id;
+    absolutionX_ = display->width * xPercent / PERCENT_CONST;
+    absolutionY_ = display->height * yPercent / PERCENT_CONST;
     WinMgr->UpdateAndAdjustMouseLocation(currentDisplayId_, absolutionX_, absolutionY_);
     int32_t physicalX = WinMgr->GetMouseInfo().physicalX;
     int32_t physicalY = WinMgr->GetMouseInfo().physicalY;

@@ -335,17 +335,13 @@ bool InputDeviceCooperateSM::UpdateMouseLocation()
     CALL_DEBUG_ENTER;
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
     CHKPR(pointerEvent, false);
-    int32_t displayId = pointerEvent->GetTargetDisplayId();
-    auto displayGroupInfo =  WinMgr->GetDisplayGroupInfo();
-    struct DisplayInfo physicalDisplayInfo;
-    for (auto &it : displayGroupInfo.displaysInfo) {
-        if (it.id == displayId) {
-            physicalDisplayInfo = it;
-            break;
-        }
+    auto physicalDisplayInfo = GetPhysicalDisplay(pointerEvent->GetTargetDisplayId());
+    if (!physicalDisplayInfo) {
+        MMI_HILOGE("Get physical display failed");
+        return false;
     }
-    int32_t displayWidth = physicalDisplayInfo.width;
-    int32_t displayHeight = physicalDisplayInfo.height;
+    int32_t displayWidth = physicalDisplayInfo->width;
+    int32_t displayHeight = physicalDisplayInfo->height;
     if (displayWidth == 0 || displayHeight == 0) {
         MMI_HILOGE("diaplay width or height is 0");
         return false;
