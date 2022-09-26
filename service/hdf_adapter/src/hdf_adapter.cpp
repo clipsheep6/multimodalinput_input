@@ -40,7 +40,8 @@ void InputEventSetTime(struct input_event &e, int64_t time)
 static void HotPlugCallback(const InputHotPlugEvent *event)
 {
     CHKPV(event);
-    HdfDeviceStatusChanged(event->devIndex, event->devType, (event->status ? HDF_RMV_DEVICE : HDF_ADD_DEVICE));
+    auto plugType = (event->status ? HDFDevicePlugType::HDF_RMV_DEVICE : HDFDevicePlugType::HDF_ADD_DEVICE);
+    HdfDeviceStatusChanged(event->devIndex, event->devType, plugType);
 }
 
 static void EventPkgCallback(const InputEventPackage **pkgs, uint32_t count, uint32_t devIndex)
@@ -102,7 +103,7 @@ int32_t HdfAdapter::ScanInputDevice()
     for (const auto &i : devDescs) {
         if (i.devIndex != 0) {
             ++devCount;
-            HdfDeviceStatusChanged(i.devIndex, i.devType, HDF_ADD_DEVICE);
+            HdfDeviceStatusChanged(i.devIndex, i.devType, HDFDevicePlugType::HDF_ADD_DEVICE);
         }
     }
     MMI_HILOGI("Found %{public}d devices.", devCount);    
@@ -212,7 +213,7 @@ void HdfAdapter::OnEventCallback(const MmiHdfPacket &pkt)
     #if 0
     auto pktType = pkt.type;
     switch(pktType) {
-        case HDF_ADD_DEVICE:
+        case HDFDevicePlugType::HDF_ADD_DEVICE:
         {
             const MmiHdfDevDescPacket &descPkt = static_cast<const MmiHdfDevDescPacket>(pkt);
             for (auto &i : descPkt.descs) {
@@ -220,7 +221,7 @@ void HdfAdapter::OnEventCallback(const MmiHdfPacket &pkt)
             }
         }        
         break;
-        case HDF_RMV_DEVICE:
+        case HDFDevicePlugType::HDF_RMV_DEVICE:
         {
             const MmiHdfDevDescPacket &descPkt = static_cast<const MmiHdfDevDescPacket>(pkt);
             for (auto &i : pkt.descs) {
@@ -306,8 +307,9 @@ void HdfAdapter::HandleDeviceAdd(int32_t devIndex, int32_t devType)
         } else {
             MMI_HILOGE("RegisterReportCallback success,devindex:%{public}d, devType:%{public}d", devIndex, devType);
         }
-        input_event event {.type = HDF_ADD_DEVICE, .code = devIndex, .value = devType, .time = 0};
-        callback_(event);
+        HdfDeviceStatusChanged(i.devIndex, i.devType, HDFDevicePlugType::HDF_ADD_DEVICE);
+        // input_event event {.type = HDF_ADD_DEVICE, .code = devIndex, .value = devType, .time = 0};
+        // callback_(event);
         return;
     } while (0);
 

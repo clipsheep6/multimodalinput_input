@@ -24,15 +24,13 @@
 #include "input_manager.h"
 #include "mmi_log.h"
 
+struct input_event;
+
 namespace OHOS {
 namespace MMI {
 class HdfAdapter {
     using HdfEventCallback = std::function<void(const input_event &event)>;
 public:
-    enum {
-        HDF_ADD_DEVICE = 1,
-        HDF_RMV_DEVICE = 2,
-    };
     HdfAdapter();
     bool Init(HdfEventCallback callback, const std::string& seat_id = "seat0");
     void DeInit();
