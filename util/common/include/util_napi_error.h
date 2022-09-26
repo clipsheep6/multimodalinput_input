@@ -23,7 +23,6 @@
 #include "napi/native_node_api.h"
 
 #include "utils/log.h"
-#include "securec.h"
 
 namespace OHOS {
 namespace MMI {
