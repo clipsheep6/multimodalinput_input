@@ -342,7 +342,7 @@ void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
     delete work;
     work = nullptr;
     KeyEventMonitorInfo *event = dataWorker->reportEvent;
-
+    CHKPV(event);
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(dataWorker->env, &scope);
     if (scope == nullptr) {
