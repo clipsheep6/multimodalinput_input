@@ -30,6 +30,8 @@
 #include "key_subscriber_handler.h"
 #include "mouse_event_normalize.h"
 
+struct input_event;
+
 namespace OHOS {
 namespace MMI {
 using EventFun = std::function<int32_t(libinput_event *event)>;
@@ -40,7 +42,7 @@ public:
     DISALLOW_COPY_AND_MOVE(InputEventHandler);
     void Init(UDSServer& udsServer);
     void OnLibinputEvent(void *event);
-    void OnHDFEvent(const MmiHdfEvent &event);
+    void OnHDFEvent(const input_event &event);
     UDSServer *GetUDSServer() const;
 
     std::shared_ptr<EventNormalizeHandler> GetEventNormalizeHandler() const;

@@ -26,62 +26,34 @@
 
 namespace OHOS {
 namespace MMI {
-struct MmiHdfEvent {
-    int32_t type;
-    int32_t code;
-    int32_t value;
-    int64_t time;
-};
-
-enum MmiHdfEventPacketType {
-    HDF_NONE = 0,
-    HDF_EVENT,
-    HDF_ADD_DEVICE,
-    HDF_RMV_DEVICE,
-};
-
-struct MmiHdfPacket {
-    int32_t size { 0 };
-    int32_t type { HDF_NONE };
-};
-
-typedef struct {
-    uint32_t devIndex;      /**< Device index */
-    uint32_t devType;       /**< Device type */
-} MmiDevDesc;
-
-struct MmiHdfDevDescPacket {
-    static constexpr int32_t MAX_INPUT_DEVICE_COUNT = 256;
-    MmiHdfPacket head;
-    MmiDevDesc descs[MAX_INPUT_DEVICE_COUNT];
-};
-
-struct MmiHdfEventPacket {
-    static constexpr int32_t MAX_EVENT_PKG_NUM = 256;
-    MmiHdfPacket head;
-    MmiHdfEvent events[MAX_EVENT_PKG_NUM];;
-};
-
 class HdfAdapter {
-    using HdfEventCallback = std::function<void(const MmiHdfEvent &event)>;
+    using HdfEventCallback = std::function<void(const input_event &event)>;
 public:
+    enum {
+        HDF_ADD_DEVICE = 1,
+        HDF_RMV_DEVICE = 2,
+    };
     HdfAdapter();
     bool Init(HdfEventCallback callback, const std::string& seat_id = "seat0");
     void DeInit();
+    void Dump(int32_t fd, const std::vector<std::string> &args);
     int32_t GetInputFd() const;
     int32_t ScanInputDevice();
     void EventDispatch(struct epoll_event& ev);
-    void OnEventHandler(const MmiHdfEvent &event);
-    void OnEventCallback(const MmiHdfPacket &pkt);
+    void OnEventHandler(const input_event &event);
+    void OnEventCallback(const input_event &event);
 private:
     int32_t ConnectHDFInit();
     int32_t DisconnectHDFInit();
+    void HdfDeviceStatusChanged(int32_t devIndex, int32_t devType, int32_t statusType);
     void HandleDeviceAdd(int32_t devIndex, int32_t devType);
     void HandleDeviceRmv(int32_t devIndex, int32_t devType);
     void HandleDeviceEvent(int32_t devIndex, int32_t type, int32_t code, int32_t value, int64_t timestamp);
 private:
     HdfEventCallback callback_ = nullptr;
     std::string seat_id_;
+    size_t eventDispatchCallTimes_ {};
+    std::vector<std::string> eventRecords_;
 };
 } // namespace MMI
 } // namespace OHOS

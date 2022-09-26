@@ -112,7 +112,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event)
 }
 
 #ifdef OHOS_BUILD_HDF
-void EventNormalizeHandler::HandleEvent(const MmiHdfEvent &event)
+void EventNormalizeHandler::HandleEvent(const input_event &event)
 {
     MMI_HILOGI("hdfEvent: type:%{public}d, code:%{public}d, value:%{public}d, time:%{public}lld",
         event.type, event.code, event.value, event.time);
