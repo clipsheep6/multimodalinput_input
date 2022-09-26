@@ -62,7 +62,7 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
 
 #define THROWERR_CUSTOM(env, code, msg) \
     do { \
-        napi_throw_error(env, std::to_string(code).c_str(), msg); \
+        napi_throw_error(env, std::to_string(code).c_str(), msg.c_str()); \
     } while (0)
 namespace UtilNapiError {
 bool GetApiError(int32_t code, NapiError& codeMsg);
