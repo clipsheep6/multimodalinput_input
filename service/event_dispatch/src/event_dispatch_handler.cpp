@@ -89,7 +89,6 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         DfxHisysevent::OnUpdateTargetPointer(point, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         return;
     }
-    DfxHisysevent::OnUpdateTargetPointer(point, fd, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     if (CheckPointerEvent(point)) {
         MMI_HILOGE("Check pointer event return true,filter out this pointer event");
         return;
@@ -142,7 +141,6 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
         DfxHisysevent::OnUpdateTargetKey(key, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         return RET_ERR;
     }
-    DfxHisysevent::OnUpdateTargetKey(key, fd, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     MMI_HILOGD("Event dispatcher of server:KeyEvent:KeyCode:%{public}d,Action:%{public}d,EventType:%{public}d,"
         "Fd:%{public}d", key->GetKeyCode(), key->GetAction(), key->GetEventType(), fd);
     auto session = udsServer.GetSession(fd);
@@ -177,8 +175,8 @@ bool EventDispatchHandler::CheckPointerEvent(std::shared_ptr<PointerEvent> point
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
         std::lock_guard<std::mutex> guard(lock_);
         if (!mouseState_.empty()) {
-            if (pointerEvent->GetSourceType() == mouseState_[0].type &&
-                pointerEvent->GetButtonId() == mouseState_[0].code &&
+            if (pointerEvent->GetSourceType() == static_cast<int32_t>(mouseState_[0].type) &&
+                pointerEvent->GetButtonId() == static_cast<int32_t>(mouseState_[0].code) &&
                 pointerEvent->GetPointerAction() == mouseState_[0].value) {
                 mouseState_.clear();
                 return true;
