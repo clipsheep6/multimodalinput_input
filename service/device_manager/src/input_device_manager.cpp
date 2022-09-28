@@ -521,9 +521,9 @@ std::vector<std::string> InputDeviceManager::GetCooperateDhids(int32_t deviceId)
         if (networkId != pointerNetworkId) {
             continue;
         }
-        if (GetDeviceSupportKey(item.first) == KEYBOARD_TYPE_ALPHABETICKEYBOARD) {
+        if (IsKeyboardDevice(item.second.inputDeviceOrigin_)) {
             dhids.push_back(item.second.dhid_);
-            MMI_HILOGI("unq: %{public}s, type:%{public}s", dhids.back().c_str(), "supportkey");
+            MMI_HILOGI("unq: %{public}s, type:%{public}s", dhids.back().c_str(), "keyboard");
         }
     }
     return dhids;
