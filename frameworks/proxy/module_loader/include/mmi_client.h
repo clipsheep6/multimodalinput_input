@@ -30,8 +30,8 @@ public:
     virtual ~MMIClient() override;
 
     int32_t Socket() override;
-    virtual void SetEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventHandler) override;
-    virtual void CheckIsEventHandlerChanged(std::shared_ptr<AppExecFwk::EventHandler> eventHandler) override;
+    virtual void SetEventHandler(EventHandlerPtr eventHandler) override;
+    virtual void CheckIsEventHandlerChanged(EventHandlerPtr eventHandler) override;
     bool Start() override;
     void RegisterConnectedFunction(ConnectCallback fun) override;
     void RegisterDisconnectedFunction(ConnectCallback fun) override;
@@ -60,7 +60,7 @@ protected:
     ConnectCallback funDisconnected_;
     CircleStreamBuffer circBuf_;
     std::mutex mtx_;
-    std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ { nullptr };
+    EventHandlerPtr eventHandler_ { nullptr };
     bool isEventHandlerChanged_ = false;
     bool isListening_ = false;
 };

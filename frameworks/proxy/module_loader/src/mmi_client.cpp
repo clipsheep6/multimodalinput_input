@@ -45,13 +45,13 @@ MMIClient::~MMIClient()
     Stop();
 }
 
-void MMIClient::SetEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
+void MMIClient::SetEventHandler(EventHandlerPtr eventHandler)
 {
     CHKPV(eventHandler);
     eventHandler_ = eventHandler;
 }
 
-void MMIClient::CheckIsEventHandlerChanged(std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
+void MMIClient::CheckIsEventHandlerChanged(EventHandlerPtr eventHandler)
 {
     CHKPV(eventHandler);
     CHKPV(eventHandler_);

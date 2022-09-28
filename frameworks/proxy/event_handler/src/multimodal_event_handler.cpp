@@ -81,7 +81,7 @@ int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyE
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
-bool MultimodalEventHandler::InitClient(std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
+bool MultimodalEventHandler::InitClient(EventHandlerPtr eventHandler)
 {
     CALL_DEBUG_ENTER;
     if (client_ != nullptr) {

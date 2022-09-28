@@ -181,6 +181,7 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEven
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_INTERCEPT_EVENT);
     int32_t consumerCount = 0;
+    std::map<int32_t, std::shared_ptr<IInputEventConsumer>> eventConsumer;
     for (const auto &iter : inputHandlers_) {
         if ((iter.second.eventType_ & HANDLE_EVENT_TYPE_POINTER) != HANDLE_EVENT_TYPE_POINTER) {
             continue;
@@ -188,12 +189,8 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEven
         int32_t handlerId = iter.first;
         auto consumer = iter.second.consumer_;
         CHKPV(consumer);
-        auto tempEvent = std::make_shared<PointerEvent>(*pointerEvent);
-        CHKPV(tempEvent);
-        tempEvent->SetProcessedCallback(monitorCallback_);
-        consumer->OnInputEvent(tempEvent);
+        eventConsumer.emplace(handlerId, consumer);
         consumerCount++;
-        MMI_HILOGD("Pointer event id:%{public}d pointerId:%{public}d", handlerId, pointerEvent->GetPointerId());
     }
     if (consumerCount == 0) {
         MMI_HILOGE("All task post failed");
@@ -203,6 +200,15 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEven
     if (tokenType == TokenType::TOKEN_HAP &&
         pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         processedEvents_.emplace(pointerEvent->GetId(), consumerCount);
+    }
+    for (const auto &iter : eventConsumer) {
+        int32_t handlerId = iter.first;
+        auto consumer = iter.second;
+        auto tempEvent = std::make_shared<PointerEvent>(*pointerEvent);
+        CHKPV(tempEvent);
+        tempEvent->SetProcessedCallback(monitorCallback_);
+        consumer->OnInputEvent(tempEvent);
+        MMI_HILOGD("Pointer event id:%{public}d pointerId:%{public}d", handlerId, pointerEvent->GetPointerId());
     }
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
@@ -241,7 +247,6 @@ HandleEventType InputHandlerManager::GetEventType() const
 void InputHandlerManager::OnDispatchEventProcessed(int32_t eventId)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mtxHandlers_);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     auto iter = processedEvents_.find(eventId);

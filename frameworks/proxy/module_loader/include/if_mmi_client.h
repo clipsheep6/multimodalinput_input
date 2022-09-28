@@ -24,6 +24,7 @@ namespace MMI {
 class NetPacket;
 class IfMMIClient;
 using MMIClientPtr = std::shared_ptr<IfMMIClient>;
+using EventHandlerPtr = std::shared_ptr<AppExecFwk::EventHandler>;
 typedef std::function<void(const IfMMIClient&)> ConnectCallback;
 class IfMMIClient {
 public:
@@ -36,8 +37,8 @@ public:
     virtual void OnRecvMsg(const char *buf, size_t size) = 0;
     virtual int32_t Reconnect() = 0;
     virtual void OnDisconnect() = 0;
-    virtual void SetEventHandler(std::shared_ptr<AppExecFwk::EventHandler> eventHandler) = 0;
-    virtual void CheckIsEventHandlerChanged(std::shared_ptr<AppExecFwk::EventHandler> eventHandler) = 0;
+    virtual void SetEventHandler(EventHandlerPtr eventHandler) = 0;
+    virtual void CheckIsEventHandlerChanged(EventHandlerPtr eventHandler) = 0;
     virtual bool IsEventHandlerChanged() = 0;
 };
 } // namespace MMI
