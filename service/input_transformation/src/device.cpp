@@ -29,6 +29,7 @@
 #include "mmi_log.h"
 #include "enum_utils.h"
 #include "time_utils.h"
+#include "i_kernel_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
@@ -38,8 +39,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Devic
 
 int32_t Device::Init() {
     MMI_HILOGD("Enter");
-    seatId_ = "seat0";
-    seatName_ = "default0";
     return 0;
 }
 
@@ -68,14 +67,6 @@ int32_t Device::GetId() const
 const std::string& Device::GetName() const
 {
     return name_;
-}
-
-const std::string& Device::GetSeatId() const {
-    return seatId_;
-}
-
-const std::string& Device::GetSeatName() const {
-    return seatName_;
 }
 
 std::shared_ptr<IInputDevice::AxisInfo> Device::GetAxisInfo(int32_t axis) const
@@ -362,13 +353,13 @@ bool Device::HasEventCode(int32_t evType, int32_t evCode) const {
 }
 
 void Device::ProcessSyncEvent(int32_t code, int32_t value) {
-    {
-        const auto& event = absEventCollector_.HandleSyncEvent(code, value);
-        if (event) {
-            OnEventCollected(event);
-            absEventCollector_.AfterProcessed();
-        }
+
+    const auto& event = absEventCollector_.HandleSyncEvent(code, value);
+    if (event) {
+        OnEventCollected(event);
+        absEventCollector_.AfterProcessed();
     }
+
 }
 
 void Device::ProcessAbsEvent(int32_t code, int32_t value) {

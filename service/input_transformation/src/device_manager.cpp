@@ -18,18 +18,20 @@
 #include <cstring>
 #include <dirent.h>
 
+#include "i_touch_screen_handler.h"
 #include "mmi_log.h"
 #include "device.h"
-#include "i_seat_manager.h"
-
+#include "kernel_event_handler_bridge.h"
 namespace OHOS {
 namespace MMI {
+
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "DeviceManager" };
 };
 std::unique_ptr<DeviceManager> DeviceManager::CreateInstance(IInputContext* context) 
 {
     if (context == nullptr) {
+        errno = EINVAL;
         return nullptr;
     }
     return std::unique_ptr<DeviceManager>(new DeviceManager(context));
@@ -106,24 +108,6 @@ std::shared_ptr<IInputDevice> DeviceManager::RemoveDevice(int32_t id)
     return device;
 }
 
-const std::unique_ptr<ISeatManager>& DeviceManager::GetSeatManager() const
-{
-    MMI_HILOGD("Enter");
-    if (context_ == nullptr) {
-        MMI_HILOGE("Leave, null context_");
-        return ISeatManager::NULL_VALUE;
-    }
-
-    const auto& seatManager = context_->GetSeatManager();
-    if (!seatManager) {
-        MMI_HILOGE("Leave, null seatManager");
-        return seatManager;
-    }
-
-    MMI_HILOGD("Leave");
-    return seatManager;
-}
-
 void DeviceManager::NotifyDeviceAdded(const std::shared_ptr<IInputDevice>& device)
 {
     MMI_HILOGD("Enter");
@@ -132,13 +116,17 @@ void DeviceManager::NotifyDeviceAdded(const std::shared_ptr<IInputDevice>& devic
         return;
     }
 
-    const auto& seatManager = context_->GetSeatManager();
-    if (!seatManager) {
-        MMI_HILOGE("Leave, null seatManager");
+    std::shared_ptr<ITouchScreenHandler> result = ITouchScreenHandler::CreateInstance(context_);
+    if (!result) {
+        // LOG_E("Leave seatId:$s seatName:$s createIfNotExist:$s, Create Failed", seatId, seatName, createIfNotExist);
         return;
     }
-
-    seatManager->OnInputDeviceAdded(device);
+    auto handler = KernelEventHandlerBridge::CreateInstance(result);
+    if (!handler) {
+        MMI_HILOGE("Leave, null bridge handler");
+        return;
+    }
+    device->StartReceiveEvents(handler);
 }
 
 void DeviceManager::NotifyDeviceRemoved(const std::shared_ptr<IInputDevice>& device)
@@ -148,14 +136,11 @@ void DeviceManager::NotifyDeviceRemoved(const std::shared_ptr<IInputDevice>& dev
         MMI_HILOGE("Leave, null device");
         return;
     }
-
-    const auto& seatManager = context_->GetSeatManager();
-    if (!seatManager) {
-        MMI_HILOGE("Leave, null seatManager");
-        return;
+    auto retCode = device->StopReceiveEvents();
+    if (retCode < 0) {
+        MMI_HILOGW("Leave, inputDevice StopReceiveEvents Failed");
     }
-
-    seatManager->OnInputDeviceRemoved(device);
+    MMI_HILOGD("Leave");
 }
 } // namespace MMI
 } // namespace OHOS

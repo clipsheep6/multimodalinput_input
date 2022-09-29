@@ -26,8 +26,8 @@
 #include "i_input_device.h"
 #include "i_input_context.h"
 #include "i_event_collector.h"
-#include "i_seat.h"
-#include "i_touch_screen_seat.h"
+// #include "i_seat.h"
+// #include "i_touch_screen_handler.h"
 #include "abs_event_collector.h"
 #include "abs_event.h"
 
@@ -45,8 +45,8 @@ public:
     virtual ~Device();
     virtual int32_t GetId() const override;
     virtual const std::string& GetName() const override;
-    virtual const std::string& GetSeatId() const override;
-    virtual const std::string& GetSeatName() const override;
+    // virtual const std::string& GetSeatId() const override;
+    // virtual const std::string& GetSeatName() const override;
     virtual std::shared_ptr<AxisInfo> GetAxisInfo(int32_t axis) const override;
     virtual bool HasCapability(int32_t capability) const override;
     virtual int32_t StartReceiveEvents(const std::shared_ptr<IKernelEventHandler>& eventHandler) override;
@@ -86,8 +86,8 @@ private:
     const int32_t id_;
     const IInputContext* const context_;
     int32_t fd_;
-    std::string seatId_;
-    std::string seatName_;
+    // std::string seatId_;
+    // std::string seatName_;
     std::string name_;
 
     int32_t capabilities_ {IInputDevice::CAPABILITY_UNKNOWN};

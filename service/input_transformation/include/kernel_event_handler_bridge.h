@@ -17,23 +17,21 @@
 #define KERNEL_EVENT_HANDLER_BRIDGE_H
 
 #include "i_kernel_event_handler.h"
-#include "i_seat.h"
-#include "i_touch_screen_seat.h"
+// #include "i_seat.h"
+#include "i_touch_screen_handler.h"
 
 namespace OHOS {
 namespace MMI {
 class KernelEventHandlerBridge : public IKernelEventHandler {
 public:
-    static std::shared_ptr<IKernelEventHandler> CreateInstance(const std::shared_ptr<ISeat>& seat, 
-            const std::shared_ptr<ITouchScreenSeat>& touchScreenSeat);
+    static std::shared_ptr<IKernelEventHandler> CreateInstance(const std::shared_ptr<ITouchScreenHandler>& touchScreenSeat);
     public:
     virtual void OnInputEvent(const std::shared_ptr<const AbsEvent>& event) override;
 private:
-    KernelEventHandlerBridge(const std::shared_ptr<ISeat>& seat, 
-            const std::shared_ptr<ITouchScreenSeat>& touchScreenSeat);
+    KernelEventHandlerBridge(const std::shared_ptr<ITouchScreenHandler>& touchScreenSeat);
 private:
-    std::shared_ptr<ISeat> seat_;
-    std::shared_ptr<ITouchScreenSeat> touchScreenSeat_;
+    // std::shared_ptr<ISeat> seat_;
+    std::shared_ptr<ITouchScreenHandler> touchScreenSeat_;
 };
 } // namespace MMI
 } // namespace OHOS

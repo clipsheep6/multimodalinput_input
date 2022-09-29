@@ -23,7 +23,6 @@
 
 #include "i_input_define.h"
 #include "i_device_manager.h"
-#include "i_seat_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -37,17 +36,14 @@ class InputContext : public NonCopyable, public IInputContext {
     public:
         virtual ~InputContext() = default;
 
-        virtual const std::unique_ptr<ISeatManager>& GetSeatManager() const override; 
         virtual const std::unique_ptr<IDeviceManager>& GetInputDeviceManager() const override; 
 
     protected:
         InputContext() = default;
         int32_t SetDeviceManager(std::unique_ptr<IDeviceManager>& inputDeviceManager);
-        int32_t SetSeatManager(std::unique_ptr<ISeatManager>& seatManager);
 
     private:
         std::unique_ptr<IDeviceManager> inputDeviceManager_;
-        std::unique_ptr<ISeatManager> seatManager_;
 };
 } // namespace MMI
 } // namespace OHOS

@@ -41,15 +41,8 @@ std::unique_ptr<InputContext> InputContext::CreateInstance()
 
 int32_t InputContext::InitInstance(InputContext* inputContext) {
     MMI_HILOGD("Enter");
-    auto seatManager = ISeatManager::CreateInstance(inputContext);
-    auto retCode = inputContext->SetSeatManager(seatManager);
-    if (retCode == -1) {
-        MMI_HILOGE("Leave, SetSeatManager Failed");
-        return -1;
-    }
-
     auto deviceManager = IDeviceManager::CreateInstance(inputContext);
-    retCode = inputContext->SetDeviceManager(deviceManager);
+    auto retCode = inputContext->SetDeviceManager(deviceManager);
     if (retCode == -1) {
         MMI_HILOGE("Leave, SetDeviceManager Failed");
         return -1;
@@ -62,25 +55,12 @@ const std::unique_ptr<IDeviceManager>& InputContext::GetInputDeviceManager() con
     return inputDeviceManager_;
 }
 
-const std::unique_ptr<ISeatManager>& InputContext::GetSeatManager() const {
-    return seatManager_;
-}
-
 int32_t InputContext::SetDeviceManager(std::unique_ptr<IDeviceManager>& inputDeviceManager) {
     if (!inputDeviceManager) {
         return -1;
     }
 
     inputDeviceManager_ = std::move(inputDeviceManager);
-    return 0;
-}
-
-int32_t InputContext::SetSeatManager(std::unique_ptr<ISeatManager>& seatManager) {
-    if (!seatManager) {
-        return -1;
-    }
-
-    seatManager_ = std::move(seatManager);
     return 0;
 }
 } // namespace MMI

@@ -18,7 +18,7 @@
 #include <memory>
 #include <map>
 
-#include "i_touch_screen_seat.h"
+#include "i_touch_screen_handler.h"
 #include "i_input_define.h"
 #include "i_input_device.h"
 #include "abs_event.h"
@@ -27,34 +27,23 @@
 namespace OHOS {
 namespace MMI {
 
-class TouchScreenSeat : public NonCopyable, public ITouchScreenSeat {
+class TouchScreenHandler : public NonCopyable, public ITouchScreenHandler {
 public:
-    static std::unique_ptr<TouchScreenSeat> CreateInstance(const IInputContext* context, 
-                    const std::string& seatId, const std::string& seatName);
+    static std::unique_ptr<TouchScreenHandler> CreateInstance(const IInputContext* context);
 
 public:
-    virtual ~TouchScreenSeat() = default;
-
-    virtual const std::string& GetSeatId() const override;
-    virtual const std::string& GetSeatName() const override;
-    virtual bool IsEmpty() const override;
-
-    virtual int32_t BindInputDevice(const std::shared_ptr<IInputDevice>& inputDevice) override;
-    virtual int32_t UnbindInputDevice(const std::shared_ptr<IInputDevice>& inputDevice) override;
-    virtual std::shared_ptr<IInputDevice> GetInputDevice() const override;
+    virtual ~TouchScreenHandler() = default;
     virtual void OnInputEvent(const std::shared_ptr<const AbsEvent>& event) override;
 
 protected:
-    TouchScreenSeat(const IInputContext* context, const std::string& seatId, const std::string& seatName);
+    TouchScreenHandler(const IInputContext* context);    
     std::shared_ptr<PointerEvent::PointerItem> ConvertPointer(const std::shared_ptr<const AbsEvent>& absEvent, 
             int32_t& pointerAction, int64_t& actionTime);
+    int32_t DispatchTo(int32_t pointerAction, int64_t actionTime, std::shared_ptr<PointerEvent::PointerItem>& pointer);
     int32_t ConvertAction(int32_t absEventAction) const;
 
 private:
     const IInputContext* const context_;
-    const std::string seatId_;
-    const std::string seatName_;
-    std::shared_ptr<IInputDevice> inputDevice_;
     std::shared_ptr<IInputDevice::AxisInfo> xInfo_;
     std::shared_ptr<IInputDevice::AxisInfo> yInfo_;
 };

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "touch_screen_seat.h"
+#include "touch_screen_handler.h"
 
 #include "i_input_context.h"
 #include "mmi_log.h"
@@ -21,86 +21,22 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TouchScreenSeat" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TouchScreenHandler" };
 };
-std::unique_ptr<TouchScreenSeat> TouchScreenSeat::CreateInstance(const IInputContext* context,
-            const std::string& seatId, const std::string& seatName) 
+std::unique_ptr<TouchScreenHandler> TouchScreenHandler::CreateInstance(const IInputContext* context) 
 {
     if (context == nullptr) {
          return nullptr;
      }
-    return std::unique_ptr<TouchScreenSeat>(new TouchScreenSeat(context, seatId, seatName));
+    return std::unique_ptr<TouchScreenHandler>(new TouchScreenHandler(context));
 }
 
-TouchScreenSeat::TouchScreenSeat(const IInputContext* context, const std::string& seatId, 
-     const std::string& seatName) 
-        : context_(context), seatId_(seatId), seatName_(seatName)
+TouchScreenHandler::TouchScreenHandler(const IInputContext* context) 
+        : context_(context)
 {
 }
 
-int32_t TouchScreenSeat::BindInputDevice(const std::shared_ptr<IInputDevice>& inputDevice)
-{
-    MMI_HILOGD("Enter");
-    if (!inputDevice) {
-        MMI_HILOGE("Leave, null InputDevice");
-        return -1;
-    }
-
-    auto inputDeviceId = inputDevice->GetId();
-    if (inputDeviceId < 0) {
-        MMI_HILOGE("Leave, inputDeviceId < 0");
-        return -1;
-    }
-
-    std::shared_ptr<IInputDevice::AxisInfo> xInfo = inputDevice->GetAxisInfo(IInputDevice::AXIS_MT_X);
-    if (!xInfo) {
-        MMI_HILOGE("Leave, null AxisInfo Of AXIS_MT_X");
-        return -1;
-    }
-
-    if (xInfo->GetMinimum() >= xInfo->GetMaximum()) {
-        MMI_HILOGE("Leave, xInfo->GetMinimum():%{public}d >= xInfo->GetMaximum():%{public}d", xInfo->GetMinimum(), xInfo->GetMaximum());
-        return -1;
-    }
-
-    std::shared_ptr<IInputDevice::AxisInfo> yInfo = inputDevice->GetAxisInfo(IInputDevice::AXIS_MT_Y);
-    if (!yInfo) {
-        MMI_HILOGE("Leave, null AxisInfo Of AXIS_MT_Y");
-        return -1;
-    }
-
-    if (yInfo->GetMinimum() >= yInfo->GetMaximum()) {
-        MMI_HILOGE("Leave, yInfo->GetMinimum():%{public}d >= yInfo->GetMaximum():%{public}d", yInfo->GetMinimum(), yInfo->GetMaximum());
-        return -1;
-    }
-
-    inputDevice_ = inputDevice;
-    xInfo_ = xInfo;
-    yInfo_ = yInfo;
-    
-    MMI_HILOGD("Leave, inputDeviceId:%{public}d xInfo:%{public}p, yInfo:%{public}p", inputDeviceId, xInfo.get(), yInfo.get());
-    return 0;
-}
-
-int32_t TouchScreenSeat::UnbindInputDevice(const std::shared_ptr<IInputDevice>& inputDevice)
-{
-    MMI_HILOGD("Enter");
-    if (inputDevice != inputDevice_) {
-        MMI_HILOGE("Leave, inputDevice != inputDevice_");
-        return -1;
-    }
-
-    inputDevice_.reset();
-    MMI_HILOGD("Leave");
-    return 0;
-}
-
-std::shared_ptr<IInputDevice> TouchScreenSeat::GetInputDevice() const
-{
-    return inputDevice_;
-}
-
-void TouchScreenSeat::OnInputEvent(const std::shared_ptr<const AbsEvent>& event)
+void TouchScreenHandler::OnInputEvent(const std::shared_ptr<const AbsEvent>& event)
 {
     MMI_HILOGD("Enter absEvent:%{public}p", event.get());
     int32_t pointerAction = PointerEvent::POINTER_ACTION_UNKNOWN;
@@ -111,129 +47,37 @@ void TouchScreenSeat::OnInputEvent(const std::shared_ptr<const AbsEvent>& event)
         return;
     }
 
-    // auto retCode = DispatchTo(pointerAction, actionTime,  pointer);
-    // if (retCode < 0) {
-    //     MMI_HILOGE("Leave, Dispatch Failed");
-    //     return;
-    // }
+    auto retCode = DispatchTo(pointerAction, actionTime,  pointer);
+    if (retCode < 0) {
+        MMI_HILOGE("Leave, Dispatch Failed");
+        return;
+    }
 
     MMI_HILOGD("Leave,  pointerAction:%{public}d, pointer:%{public}p", 
             pointerAction, pointer.get());
 }
 
-// int32_t TouchScreenSeat::BindDisplay(const std::shared_ptr<PhysicalDisplayState>& display)
-// {
-//     MMI_HILOGD("Enter");
-
-//     if (!display) {
-//         MMI_HILOGE("Leave, null display");
-//         return -1;
-//     }
-
-//     if (display_) {
-//         MMI_HILOGE("Leave, nonnull display_");
-//         return -1;
-//     }
-
-//     if (display->GetSeatId() != seatId_ || display->GetSeatName() != seatName_) {
-//         MMI_HILOGE("Leave, seatId,seatName Mismatch");
-//         return -1;
-//     }
-
-//     display_ = display;
-//     MMI_HILOGD("Leave");
-//     return 0;
-// }
-
-// int32_t TouchScreenSeat::UnbindDisplay(const std::shared_ptr<PhysicalDisplayState>& display)
-// {
-//     MMI_HILOGD("Enter");
-
-//     if (!display) {
-//         MMI_HILOGE("Leave, null display");
-//         return -1;
-//     }
-
-//     if (display != display_) {
-//         return -1;
-//     }
-
-//     display_.reset();
-//     MMI_HILOGD("Leave");
-//     return 0;
-// }
-
-// int32_t TouchScreenSeat::UpdateDisplay(const std::shared_ptr<PhysicalDisplayState>& display)
-// {
-//     MMI_HILOGD("Enter");
-
-//     if (!display) {
-//         MMI_HILOGE("Leave, null display");
-//         return -1;
-//     }
-
-//     if (display != display_) {
-//         return -1;
-//     }
-
-//     if (display->GetChanged() != PhysicalDisplayState::CHANGED_NONE) {
-//         targetDisplays_.clear();
-//     }
-
-//     MMI_HILOGD("Leave");
-//     return 0;
-// }
-
-// std::shared_ptr<PhysicalDisplayState> TouchScreenSeat::GetDisplay() const
-// {
-//     return display_; 
-// }
-
-const std::string& TouchScreenSeat::GetSeatId() const
+int32_t TouchScreenHandler::DispatchTo(int32_t pointerAction, int64_t actionTime, std::shared_ptr<PointerEvent::PointerItem>& pointer)
 {
-    return seatId_; 
+
+    // auto pointerEvent = targetDisplay->HandleEvent(pointerAction, actionTime, pointer);
+    // if (!pointerEvent) {
+    //     MMI_HILOGE("Leave, null pointerEvent");
+    //     return -1;
+    // }
+    
+
+    if (context_ == nullptr) {
+        MMI_HILOGE("Leave, null context_");
+        return -1;
+    }
+    // auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+    // CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
+    // inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
+    return 0;
 }
 
-const std::string& TouchScreenSeat::GetSeatName() const
-{
-    return seatName_;
-}
-
-bool TouchScreenSeat::IsEmpty() const
-{
-    return !inputDevice_;
-}
-
-// int32_t TouchScreenSeat::DispatchTo(const std::shared_ptr<const LogicalDisplayState>& targetDisplay, 
-//                 int32_t pointerAction, int64_t actionTime, std::shared_ptr<PointerEvent::PointerItem>& pointer)
-// {
-//     if (!targetDisplay) {
-//         MMI_HILOGE("Leave, null targetDisplay");
-//         return -1;
-//     }
-
-//     auto pointerEvent = targetDisplay->HandleEvent(pointerAction, actionTime, pointer);
-//     if (!pointerEvent) {
-//         MMI_HILOGE("Leave, null pointerEvent");
-//         return -1;
-//     }
-
-//     if (context_ == nullptr) {
-//         MMI_HILOGE("Leave, null context_");
-//         return -1;
-//     }
-
-//     const auto& dispatcher = context_->GetEventDispatcher();
-//     if (!dispatcher) {
-//         MMI_HILOGE("Leave, null dispatcher");
-//         return -1;
-//     }
-
-//     dispatcher->DispatchEvent(pointerEvent);
-//     return 0;
-// }
-
-std::shared_ptr<PointerEvent::PointerItem> TouchScreenSeat::ConvertPointer(const std::shared_ptr<const AbsEvent>& absEvent,
+std::shared_ptr<PointerEvent::PointerItem> TouchScreenHandler::ConvertPointer(const std::shared_ptr<const AbsEvent>& absEvent,
         int32_t& pointerAction, int64_t& actionTime)
 {
     std::shared_ptr<PointerEvent::PointerItem> pointer;
@@ -342,7 +186,7 @@ std::shared_ptr<PointerEvent::PointerItem> TouchScreenSeat::ConvertPointer(const
     return pointer;
 }
 
-int32_t TouchScreenSeat::ConvertAction(int32_t absEventAction) const
+int32_t TouchScreenHandler::ConvertAction(int32_t absEventAction) const
 {
     if (absEventAction == AbsEvent::ACTION_DOWN) {
         return PointerEvent::POINTER_ACTION_DOWN;

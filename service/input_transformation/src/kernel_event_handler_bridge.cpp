@@ -19,34 +19,17 @@
 
 namespace OHOS {
 namespace MMI {
-std::shared_ptr<IKernelEventHandler> KernelEventHandlerBridge::CreateInstance(const std::shared_ptr<ISeat>& seat, 
-        const std::shared_ptr<ITouchScreenSeat>& touchScreenSeat)
+std::shared_ptr<IKernelEventHandler> KernelEventHandlerBridge::CreateInstance(const std::shared_ptr<ITouchScreenHandler>& touchScreenSeat)
 {
-    if (!seat) {
-        return nullptr;
-    }
-
-    if (!touchScreenSeat) {
-        return std::shared_ptr<IKernelEventHandler>(
-                new KernelEventHandlerBridge(seat, ITouchScreenSeat::GetDefault()));
-    }
-
-    return std::shared_ptr<IKernelEventHandler>(new KernelEventHandlerBridge(seat, 
-                touchScreenSeat));
+    return std::shared_ptr<IKernelEventHandler>(new KernelEventHandlerBridge(touchScreenSeat));
 }
 
 void KernelEventHandlerBridge::OnInputEvent(const std::shared_ptr<const AbsEvent>& event)
 {
-    if (event->GetSourceType() == AbsEvent::SOURCE_TYPE_TOUCHPAD) {
-        seat_->OnInputEvent(event);
-        return;
-    }
-
     touchScreenSeat_->OnInputEvent(event);
 }
-KernelEventHandlerBridge::KernelEventHandlerBridge(const std::shared_ptr<ISeat>& seat, 
-        const std::shared_ptr<ITouchScreenSeat>& touchScreenSeat)
-    : seat_(seat), touchScreenSeat_(touchScreenSeat)
+KernelEventHandlerBridge::KernelEventHandlerBridge(const std::shared_ptr<ITouchScreenHandler>& touchScreenSeat)
+    : touchScreenSeat_(touchScreenSeat)
 {
 }
 } // namespace MMI

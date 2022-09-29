@@ -76,7 +76,7 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleSyncEvent(int32_t code
     MMI_HILOGD("Leave code:%{public}s value:%{public}d absEvent:%{public}p", EnumUtils::InputEventSynCodeToString(code), value, absEvent.get());
     return absEvent;
 }
-
+ 
 void AbsEventCollector::AfterProcessed() {
     RemoveReleasedPointer();
 }

@@ -15,9 +15,7 @@
 
 #include "device_manager.h"
 #include "input_context.h"
-#include "seat_manager.h"
-#include "seat.h"
-#include "touch_screen_seat.h"
+#include "touch_screen_handler.h"
 
 namespace OHOS {
 namespace MMI {
@@ -31,18 +29,8 @@ std::unique_ptr<IInputContext> IInputContext::CreateInstance()
     return InputContext::CreateInstance();
 }
 
-std::unique_ptr<ISeatManager> ISeatManager::CreateInstance(const IInputContext* context) 
-{
-    return SeatManager::CreateInstance(context);
-}
-
-std::unique_ptr<ISeat> ISeat::CreateInstance(const IInputContext* context, const std::string& seatId)
-{
-    return Seat::CreateInstance(context, seatId);
-}
-
-std::unique_ptr<ITouchScreenSeat> ITouchScreenSeat::CreateInstance(const IInputContext* context, const std::string& seatId, const std::string& seatName) {
-    return TouchScreenSeat::CreateInstance(context, seatId, seatName);
+std::unique_ptr<ITouchScreenHandler> ITouchScreenHandler::CreateInstance(const IInputContext* context) {
+    return TouchScreenHandler::CreateInstance(context);
 }
 } // namespace MMI
 } // namespace OHOS

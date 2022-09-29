@@ -13,32 +13,23 @@
  * limitations under the License.
  */
 
-#ifndef I_SEAT_H
-#define I_SEAT_H
+#ifndef I_TOUCH_SCREEN_H
+#define I_TOUCH_SCREEN_H
 
 #include <memory>
-#include <list>
 
-#include "i_kernel_event_handler.h"
+#include "abs_event.h"
+#include "i_input_device.h"
 
 namespace OHOS {
-namespace MMI {    
+namespace MMI {
 class IInputContext;
-class IInputDevice;
-class ISeat {
+class ITouchScreenHandler {
 public:
-    static std::unique_ptr<ISeat> CreateInstance(const IInputContext* inputContext, const std::string& seatId);
-
-    virtual ~ISeat() = default;
-
-    virtual const std::string& GetSeatId() const = 0;
-    virtual int32_t AddInputDevice(const std::shared_ptr<IInputDevice>& inputDevice) = 0;
-    virtual int32_t RemoveInputDevice(const std::shared_ptr<IInputDevice>& inputDevice) = 0;
-    virtual std::list<std::shared_ptr<IInputDevice>> GetInputDevices() const = 0;
-
-    virtual bool IsEmpty() const = 0;
+    static std::unique_ptr<ITouchScreenHandler> CreateInstance(const IInputContext* contex);
+    virtual ~ITouchScreenHandler() = default;
     virtual void OnInputEvent(const std::shared_ptr<const AbsEvent>& event) = 0;
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // SEAT_H
+#endif // I_TOUCH_SCREEN_H

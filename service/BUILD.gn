@@ -465,10 +465,9 @@ ohos_shared_library("libmmi-server") {
       "hdi_inject/src/hdi_inject.cpp",
     ]
   }
-  if (input_feature_hdf) {
+  if (true) {
     sources += [
         "input_transformation/src/abs_event_collector.cpp",
-        "input_transformation/src/abs_event_handler.cpp",
         "input_transformation/src/abs_event.cpp",
         "input_transformation/src/device_manager.cpp",
         "input_transformation/src/device.cpp",
@@ -477,16 +476,12 @@ ohos_shared_library("libmmi-server") {
         "input_transformation/src/i_event_transformer.cpp",
         "input_transformation/src/i_input_device.cpp",
         "input_transformation/src/i_kernel_event_handler.cpp",
-        "input_transformation/src/i_seat_manager.cpp",
-        "input_transformation/src/i_touch_screen_seat.cpp",
         "input_transformation/src/input_context.cpp",
         "input_transformation/src/instance_creator.cpp",
         "input_transformation/src/kernel_event_base.cpp",
         "input_transformation/src/kernel_event_handler_bridge.cpp",
-        "input_transformation/src/seat_manager.cpp",
-        "input_transformation/src/seat.cpp",
         "input_transformation/src/time_utils.cpp",
-        "input_transformation/src/touch_screen_seat.cpp",
+        "input_transformation/src/touch_screen_handler.cpp",
       ]
   }
   if (input_feature_keyboard) {

@@ -25,7 +25,6 @@
 namespace OHOS {
 namespace MMI {
 class IInputContext;
-class ISeatManager;
 class DeviceManager : public NonCopyable, public IDeviceManager {
 public:
     static std::unique_ptr<DeviceManager> CreateInstance(IInputContext* context);
@@ -42,7 +41,6 @@ protected:
     DeviceManager(IInputContext* context);
 
 private:
-    const std::unique_ptr<ISeatManager>& GetSeatManager() const;
     void NotifyDeviceAdded(const std::shared_ptr<IInputDevice>& device);
     void NotifyDeviceRemoved(const std::shared_ptr<IInputDevice>& device);
 
