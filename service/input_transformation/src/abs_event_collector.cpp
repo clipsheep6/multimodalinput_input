@@ -27,15 +27,15 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AbsEventCollector" };
 };
-AbsEventCollector::AbsEventCollector(int32_t deviceId, int32_t sourceType) 
+AbsEventCollector::AbsEventCollector(int32_t deviceId, int32_t sourceType)
     : deviceId_(deviceId), sourceType_(sourceType), curSlot_(0), nextId_(0), 
     absEvent_(new AbsEvent(deviceId, sourceType))
 {
 }
 
-const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleAbsEvent(int32_t code, int32_t value) {
+const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleAbsEvent(int32_t code, int32_t value)
+{
     MMI_HILOGD("Enter code:%{public}s value:%{public}d", EnumUtils::InputEventAbsCodeToString(code), value);
-
     RemoveReleasedPointer();
 
     switch (code) {
@@ -70,18 +70,21 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleAbsEvent(int32_t code,
     return AbsEvent::NULL_VALUE;
 }
 
-const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleSyncEvent(int32_t code, int32_t value) {
+const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleSyncEvent(int32_t code, int32_t value)
+{
     MMI_HILOGD("Enter code:%{public}s value:%{public}d", EnumUtils::InputEventSynCodeToString(code), value);
     const auto& absEvent = FinishPointer();
     MMI_HILOGD("Leave code:%{public}s value:%{public}d absEvent:%{public}p", EnumUtils::InputEventSynCodeToString(code), value, absEvent.get());
     return absEvent;
 }
  
-void AbsEventCollector::AfterProcessed() {
+void AbsEventCollector::AfterProcessed()
+{
     RemoveReleasedPointer();
 }
 
-int32_t AbsEventCollector::SetSourceType(int32_t sourceType) {
+int32_t AbsEventCollector::SetSourceType(int32_t sourceType)
+{
     MMI_HILOGD("Enter, sourceType_:%{public}s, sourceType:%{public}s", 
             AbsEvent::SourceToString(sourceType_),
             AbsEvent::SourceToString(sourceType));
@@ -102,7 +105,8 @@ int32_t AbsEventCollector::SetSourceType(int32_t sourceType) {
     return 0;
 }
 
-std::shared_ptr<AbsEvent::Pointer> AbsEventCollector::GetCurrentPointer(bool createIfNotExist) {
+std::shared_ptr<AbsEvent::Pointer> AbsEventCollector::GetCurrentPointer(bool createIfNotExist)
+{
     if (curSlot_ < 0) {
         MMI_HILOGE("Leave, curSlot_ < 0");
         return nullptr;
@@ -128,7 +132,8 @@ std::shared_ptr<AbsEvent::Pointer> AbsEventCollector::GetCurrentPointer(bool cre
     return curPointer_;
 }
 
-const std::shared_ptr<AbsEvent>& AbsEventCollector::FinishPointer() {
+const std::shared_ptr<AbsEvent>& AbsEventCollector::FinishPointer()
+{
     MMI_HILOGD("Enter");
     if (!curPointer_) {
         MMI_HILOGD("Leave");

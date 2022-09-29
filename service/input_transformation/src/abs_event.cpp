@@ -29,7 +29,8 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AbsEv
 const std::shared_ptr<AbsEvent> AbsEvent::NULL_VALUE;
 const std::shared_ptr<AbsEvent::Pointer> AbsEvent::Pointer::NULL_VALUE;
 
-const char* AbsEvent::SourceToString(int32_t sourceType) {
+const char* AbsEvent::SourceToString(int32_t sourceType)
+{
     switch (sourceType) {
         CASE_STR(SOURCE_TYPE_NONE);
         CASE_STR(SOURCE_TYPE_TOUCHSCREEN);
@@ -40,7 +41,8 @@ const char* AbsEvent::SourceToString(int32_t sourceType) {
     }
 }
 
-const char* AbsEvent::ActionToString(int32_t action) {
+const char* AbsEvent::ActionToString(int32_t action)
+{
     switch(action) {
         CASE_STR(ACTION_NONE);
         CASE_STR(ACTION_DOWN);
