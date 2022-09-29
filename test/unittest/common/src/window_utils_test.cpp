@@ -61,7 +61,7 @@ bool WindowUtilsTest::DrawTestWindow()
     return testWindow_->Show() == Rosen::WMError::WM_OK;
 }
 
-sptr<Rosen::Window>& WindowUtilsTest::GetWindow()
+sptr<Rosen::Window> WindowUtilsTest::GetWindow()
 {
     return testWindow_;
 }

@@ -35,9 +35,15 @@ constexpr int32_t OPEN_AUTO_REPEAT = 1;
 KeyAutoRepeat::KeyAutoRepeat() {}
 KeyAutoRepeat::~KeyAutoRepeat() {}
 
-std::map<int32_t, DeviceConfig> KeyAutoRepeat::GetDeviceConfig() const
+bool KeyAutoRepeat::GetKeyboardType(int32_t deviceId, int32_t &keyboardType) const
 {
-    return deviceConfig_;
+    auto it = deviceConfig_.find(deviceId);
+    if (it == deviceConfig_.end()) {
+        MMI_HILOGE("Failed to obtain the keyboard type of the configuration file");
+        return false;
+    }
+    keyboardType = it->second.keyboardType;
+    return true;
 }
 
 int32_t KeyAutoRepeat::AddDeviceConfig(struct libinput_device *device)
@@ -129,7 +135,7 @@ int32_t KeyAutoRepeat::GetIntervalTime(int32_t deviceId) const
     return triggertime;
 }
 
-DeviceConfig KeyAutoRepeat::GetAutoSwitch(int32_t deviceId)
+DeviceConfig KeyAutoRepeat::GetAutoSwitch(int32_t deviceId) const
 {
     auto iter = deviceConfig_.find(deviceId);
     if (iter == deviceConfig_.end()) {

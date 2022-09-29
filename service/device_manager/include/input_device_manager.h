@@ -78,7 +78,7 @@ public:
     bool HasPointerDevice();
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
-    const std::string& GetScreenId(int32_t deviceId) const;
+    std::string GetScreenId(int32_t deviceId) const;
 
 private:
     void MakeDeviceInfo(struct libinput_device *inputDevice, struct InputDeviceInfo& info);
