@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef I_TOUCH_SCREEN_H
-#define I_TOUCH_SCREEN_H
+#ifndef I_TOUCH_SCREEN_HANDLE_H
+#define I_TOUCH_SCREEN_HANDLE_H
 
 #include <memory>
 
@@ -32,4 +32,4 @@ public:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // I_TOUCH_SCREEN_H
+#endif // I_TOUCH_SCREEN_HANDLE_H
