@@ -24,7 +24,8 @@ class DefaultHandler : public IKernelEventHandler {
     }
 };
 
-const std::shared_ptr<IKernelEventHandler>& IKernelEventHandler::GetDefault() {
+const std::shared_ptr<IKernelEventHandler>& IKernelEventHandler::GetDefault()
+{
     static std::shared_ptr<IKernelEventHandler> defaultHandler(new DefaultHandler());
     return defaultHandler;
 }

@@ -39,7 +39,8 @@ std::unique_ptr<InputContext> InputContext::CreateInstance()
     return inputContext;
 }
 
-int32_t InputContext::InitInstance(InputContext* inputContext) {
+int32_t InputContext::InitInstance(InputContext* inputContext)
+{
     MMI_HILOGD("Enter");
     auto deviceManager = IDeviceManager::CreateInstance(inputContext);
     auto retCode = inputContext->SetDeviceManager(deviceManager);
@@ -51,11 +52,13 @@ int32_t InputContext::InitInstance(InputContext* inputContext) {
     return 0;
 }
 
-const std::unique_ptr<IDeviceManager>& InputContext::GetInputDeviceManager() const {
+const std::unique_ptr<IDeviceManager>& InputContext::GetInputDeviceManager() const
+{
     return inputDeviceManager_;
 }
 
-int32_t InputContext::SetDeviceManager(std::unique_ptr<IDeviceManager>& inputDeviceManager) {
+int32_t InputContext::SetDeviceManager(std::unique_ptr<IDeviceManager>& inputDeviceManager)
+{
     if (!inputDeviceManager) {
         return -1;
     }

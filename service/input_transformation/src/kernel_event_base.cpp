@@ -27,25 +27,30 @@ KernelEventBase::KernelEventBase(int32_t deviceId, int32_t action)
 {
 }
 
-int32_t KernelEventBase::GetDeviceId() const {
+int32_t KernelEventBase::GetDeviceId() const
+{
     return deviceId_;
 }
 
-int32_t KernelEventBase::GetAction() const {
+int32_t KernelEventBase::GetAction() const
+{
     return action_;
 }
 
-int64_t KernelEventBase::GetActionTime() const {
+int64_t KernelEventBase::GetActionTime() const
+{
     return actionTime_;
 }
 
-void KernelEventBase::SetAction(int32_t action) {
+void KernelEventBase::SetAction(int32_t action)
+{
     MMI_HILOGD("action:%{public}s, action_:%{public}s", ActionToStr(action),
             ActionToStr(action_));
     action_ = action;
 }
 
-void KernelEventBase::SetActionTime(int64_t actionTime) {
+void KernelEventBase::SetActionTime(int64_t actionTime)
+{
     actionTime_ = actionTime;
 }
 

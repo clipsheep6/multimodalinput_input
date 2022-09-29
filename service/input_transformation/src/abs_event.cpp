@@ -107,11 +107,13 @@ AbsEvent::AbsEvent(int32_t deviceId, int32_t sourceType)
 {
 }
 
-int32_t AbsEvent::GetSourceType() const {
+int32_t AbsEvent::GetSourceType() const
+{
     return sourceType_;
 }
 
-int32_t AbsEvent::GetPointerId() const {
+int32_t AbsEvent::GetPointerId() const
+{
     return pointerId_;
 }
 
@@ -228,7 +230,8 @@ int32_t AbsEvent::RemovePointer(const std::shared_ptr<Pointer>& pointer)
     return -1;
 }
 
-const char* AbsEvent::ActionToStr(int32_t action) const {
+const char* AbsEvent::ActionToStr(int32_t action) const
+{
     return ActionToString(action);
 }
 

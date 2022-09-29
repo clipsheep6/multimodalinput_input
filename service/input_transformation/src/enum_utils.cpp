@@ -25,13 +25,15 @@
 namespace OHOS {
 namespace MMI {
 
-static const char* IntValueToCStr(int32_t eventCode) {
+static const char* IntValueToCStr(int32_t eventCode)
+{
     static std::string codeStr;
     codeStr = std::to_string(eventCode);
     return codeStr.c_str();
 }
 
-const char* EnumUtils::InputEventTypeToString(int32_t eventType) {
+const char* EnumUtils::InputEventTypeToString(int32_t eventType)
+{
     switch(eventType) {
         CASE_STR(EV_SYN);
         CASE_STR(EV_KEY);
@@ -50,7 +52,8 @@ const char* EnumUtils::InputEventTypeToString(int32_t eventType) {
     }
 }
 
-const char* EnumUtils::InputEventCodeToString(int32_t eventType, int32_t eventCode) {
+const char* EnumUtils::InputEventCodeToString(int32_t eventType, int32_t eventCode)
+{
     switch(eventType) {
         case EV_SYN:
             return InputEventSynCodeToString(eventCode);
@@ -81,7 +84,8 @@ const char* EnumUtils::InputEventCodeToString(int32_t eventType, int32_t eventCo
     }
 }
 
-const char* EnumUtils::InputEventSynCodeToString(int32_t eventCode) {
+const char* EnumUtils::InputEventSynCodeToString(int32_t eventCode)
+{
     switch(eventCode) {
         CASE_STR(SYN_REPORT);
         CASE_STR(SYN_CONFIG);
@@ -92,7 +96,8 @@ const char* EnumUtils::InputEventSynCodeToString(int32_t eventCode) {
     }
 }
 
-const char* EnumUtils::InputEventKeyCodeToString(int32_t eventCode) {
+const char* EnumUtils::InputEventKeyCodeToString(int32_t eventCode)
+{
     switch(eventCode) {
         CASE_STR(KEY_RESERVED);
         CASE_STR(KEY_ESC);
@@ -749,7 +754,8 @@ const char* EnumUtils::InputEventKeyCodeToString(int32_t eventCode) {
     }
 }
 
-const char* EnumUtils::InputEventRelCodeToString(int32_t eventCode) {
+const char* EnumUtils::InputEventRelCodeToString(int32_t eventCode)
+{
     switch(eventCode) {
         CASE_STR(REL_X);
         CASE_STR(REL_Y);
@@ -771,7 +777,8 @@ const char* EnumUtils::InputEventRelCodeToString(int32_t eventCode) {
     }
 }
 
-const char* EnumUtils::InputEventAbsCodeToString(int32_t eventCode) {
+const char* EnumUtils::InputEventAbsCodeToString(int32_t eventCode)
+{
     switch(eventCode) {
         CASE_STR(ABS_X);
         CASE_STR(ABS_Y);
@@ -822,7 +829,8 @@ const char* EnumUtils::InputEventAbsCodeToString(int32_t eventCode) {
     }
 }
 
-const char* EnumUtils::InputEventMscCodeToString(int32_t eventCode) {
+const char* EnumUtils::InputEventMscCodeToString(int32_t eventCode)
+{
     switch(eventCode) {
         CASE_STR(MSC_SERIAL);
         CASE_STR(MSC_PULSELED);
@@ -837,7 +845,8 @@ const char* EnumUtils::InputEventMscCodeToString(int32_t eventCode) {
     }
 }
 
-const char* EnumUtils::InputEventSwCodeToString(int32_t eventCode) {
+const char* EnumUtils::InputEventSwCodeToString(int32_t eventCode)
+{
     switch(eventCode) {
         CASE_STR(MSC_SERIAL);
         CASE_STR(MSC_PULSELED);
@@ -852,7 +861,8 @@ const char* EnumUtils::InputEventSwCodeToString(int32_t eventCode) {
     }
 }
 
-const char* EnumUtils::InputEventLedCodeToString(int32_t eventCode) {
+const char* EnumUtils::InputEventLedCodeToString(int32_t eventCode)
+{
     switch(eventCode) {
         CASE_STR(LED_NUML);
         CASE_STR(LED_CAPSL);
@@ -873,7 +883,8 @@ const char* EnumUtils::InputEventLedCodeToString(int32_t eventCode) {
 
 }
 
-const char* EnumUtils::InputEventSndCodeToString(int32_t eventCode) {
+const char* EnumUtils::InputEventSndCodeToString(int32_t eventCode)
+{
     switch(eventCode) {
         CASE_STR(SND_CLICK);
         CASE_STR(SND_BELL);
@@ -885,7 +896,8 @@ const char* EnumUtils::InputEventSndCodeToString(int32_t eventCode) {
     }
 }
 
-const char* EnumUtils::InputEventRepCodeToString(int32_t eventCode) {
+const char* EnumUtils::InputEventRepCodeToString(int32_t eventCode)
+{
     switch(eventCode) {
         CASE_STR(REP_DELAY);
         //CASE_STR(REP_PERIOD);
@@ -896,18 +908,23 @@ const char* EnumUtils::InputEventRepCodeToString(int32_t eventCode) {
     }
 }
 
-const char* EnumUtils::InputEventFfCodeToString(int32_t eventCode) {
+const char* EnumUtils::InputEventFfCodeToString(int32_t eventCode)
+{
     return IntValueToCStr(eventCode);
 }
 
-const char* EnumUtils::InputEventPwrCodeToString(int32_t eventCode) {
-    return IntValueToCStr(eventCode);
-}
-const char* EnumUtils::InputEventFfstatusCodeToString(int32_t eventCode) {
+const char* EnumUtils::InputEventPwrCodeToString(int32_t eventCode)
+{
     return IntValueToCStr(eventCode);
 }
 
-const char* EnumUtils::InputPropertyToString(int32_t property) {
+const char* EnumUtils::InputEventFfstatusCodeToString(int32_t eventCode)
+{
+    return IntValueToCStr(eventCode);
+}
+
+const char* EnumUtils::InputPropertyToString(int32_t property)
+{
     switch(property) {
         CASE_STR(INPUT_PROP_POINTER);
         CASE_STR(INPUT_PROP_DIRECT);

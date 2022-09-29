@@ -29,7 +29,8 @@ std::unique_ptr<IInputContext> IInputContext::CreateInstance()
     return InputContext::CreateInstance();
 }
 
-std::unique_ptr<ITouchScreenHandler> ITouchScreenHandler::CreateInstance(const IInputContext* context) {
+std::unique_ptr<ITouchScreenHandler> ITouchScreenHandler::CreateInstance(const IInputContext* context)
+{
     return TouchScreenHandler::CreateInstance(context);
 }
 } // namespace MMI

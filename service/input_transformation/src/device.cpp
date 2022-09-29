@@ -37,7 +37,8 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Device" };
 };
 
-int32_t Device::Init() {
+int32_t Device::Init()
+{
     MMI_HILOGD("Enter");
     return 0;
 }
@@ -122,14 +123,17 @@ void Device::OnFdEvent(int fd, int event)
 {
 }
 
-void Device::ReadEvents() {
+void Device::ReadEvents()
+{
 }
 
-int32_t Device::CloseDevice() {;
+int32_t Device::CloseDevice()
+{
     return 0;
 }
 
-void Device::ProcessEventItem(struct input_event* eventItem) {
+void Device::ProcessEventItem(struct input_event* eventItem)
+{
     auto type = eventItem->type;
     auto code = eventItem->code;
     auto value = eventItem->value;
@@ -183,7 +187,8 @@ void Device::ProcessEventItem(struct input_event* eventItem) {
     }
 }
 
-int32_t Device::UpdateCapablility() {
+int32_t Device::UpdateCapablility()
+{
     auto retCode = UpdateInputProperty();
     if (retCode < 0) {
         return -1;
@@ -227,7 +232,8 @@ int32_t Device::UpdateCapablility() {
     return 0;
 }
 
-int32_t Device::UpdateInputProperty() {
+int32_t Device::UpdateInputProperty()
+{
     auto ret = ioctl(fd_, EVIOCGPROP(sizeof(inputProperty)), &inputProperty[0]);
     if (ret < 0) {
         return -1;
@@ -242,7 +248,8 @@ int32_t Device::UpdateInputProperty() {
     return 0;
 }
 
-int32_t Device::UpdateBitStat(int32_t evType, int32_t maxValue, unsigned long* resultValue, size_t len) {
+int32_t Device::UpdateBitStat(int32_t evType, int32_t maxValue, unsigned long* resultValue, size_t len)
+{
     auto ret = ioctl(fd_, EVIOCGBIT(evType, maxValue), resultValue);
     if (ret < 0) {
         MMI_HILOGE("Leave, Failed for %{public}s", EnumUtils::InputEventTypeToString(evType));
@@ -274,7 +281,8 @@ int32_t Device::UpdateBitStat(int32_t evType, int32_t maxValue, unsigned long* r
     return 0;
 }
 
-bool Device::TestBit(int32_t bitIndex, const unsigned long* bitMap, size_t count) const {
+bool Device::TestBit(int32_t bitIndex, const unsigned long* bitMap, size_t count) const
+{
     if (bitIndex < 0) {
         return false;
     }
@@ -289,18 +297,21 @@ bool Device::TestBit(int32_t bitIndex, const unsigned long* bitMap, size_t count
     return (bitMap[idx] & (bitOne << offset)) != 0;
 }
 
-bool Device::HasInputProperty(int32_t property) {
+bool Device::HasInputProperty(int32_t property)
+{
     return TestBit(property, &inputProperty[0], sizeof(inputProperty) / sizeof(inputProperty[0]));
 }
 
-bool Device::HasMouseCapability() {
+bool Device::HasMouseCapability()
+{
     if (HasEventCode(EV_REL, REL_X) && HasEventCode(EV_REL, REL_Y)) {
         return true;
     }
     return false;
 }
 
-bool Device::HasKeyboardCapability() {
+bool Device::HasKeyboardCapability()
+{
     if (!HasEventType(EV_KEY)) {
         return false;
     }
@@ -308,7 +319,8 @@ bool Device::HasKeyboardCapability() {
     return true;
 }
 
-bool Device::HasTouchscreenCapability() {
+bool Device::HasTouchscreenCapability()
+{
     if (!HasEventType(EV_ABS)) {
         return false;
     }
@@ -320,7 +332,8 @@ bool Device::HasTouchscreenCapability() {
     return true;
 }
 
-bool Device::HasTouchpadCapability() {
+bool Device::HasTouchpadCapability()
+{
     if (!HasEventType(EV_ABS)) {
         return false;
     }
@@ -332,11 +345,13 @@ bool Device::HasTouchpadCapability() {
     return true;
 }
 
-bool Device::HasEventType(int32_t evType) const {
+bool Device::HasEventType(int32_t evType) const
+{
     return TestBit(evType, &evBit[0], LENTH_OF_ARRAY(evBit));
 }
 
-bool Device::HasEventCode(int32_t evType, int32_t evCode) const {
+bool Device::HasEventCode(int32_t evType, int32_t evCode) const
+{
     if (!HasEventType(evType)) {
         return false;
     }
@@ -352,7 +367,8 @@ bool Device::HasEventCode(int32_t evType, int32_t evCode) const {
     }
 }
 
-void Device::ProcessSyncEvent(int32_t code, int32_t value) {
+void Device::ProcessSyncEvent(int32_t code, int32_t value)
+{
 
     const auto& event = absEventCollector_.HandleSyncEvent(code, value);
     if (event) {
@@ -362,7 +378,8 @@ void Device::ProcessSyncEvent(int32_t code, int32_t value) {
 
 }
 
-void Device::ProcessAbsEvent(int32_t code, int32_t value) {
+void Device::ProcessAbsEvent(int32_t code, int32_t value)
+{
     const auto& event = absEventCollector_.HandleAbsEvent(code, value);
     if (event) {
         OnEventCollected(event);
@@ -370,7 +387,8 @@ void Device::ProcessAbsEvent(int32_t code, int32_t value) {
     }
 }
 
-void Device::OnEventCollected(const std::shared_ptr<const AbsEvent>& event) {
+void Device::OnEventCollected(const std::shared_ptr<const AbsEvent>& event)
+{
     if (!event) {
         return;
     }
