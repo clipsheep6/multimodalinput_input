@@ -178,28 +178,30 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEven
 {
     CHK_PID_AND_TID();
     CHKPV(pointerEvent);
-    std::lock_guard<std::mutex> guard(mtxHandlers_);
-    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_INTERCEPT_EVENT);
-    int32_t consumerCount = 0;
     std::map<int32_t, std::shared_ptr<IInputEventConsumer>> eventConsumers;
-    for (const auto &iter : inputHandlers_) {
-        if ((iter.second.eventType_ & HANDLE_EVENT_TYPE_POINTER) != HANDLE_EVENT_TYPE_POINTER) {
-            continue;
+    {
+        std::lock_guard<std::mutex> guard(mtxHandlers_);
+        BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_INTERCEPT_EVENT);
+        int32_t consumerCount = 0;
+        for (const auto &iter : inputHandlers_) {
+            if ((iter.second.eventType_ & HANDLE_EVENT_TYPE_POINTER) != HANDLE_EVENT_TYPE_POINTER) {
+                continue;
+            }
+            int32_t handlerId = iter.first;
+            auto consumer = iter.second.consumer_;
+            CHKPV(consumer);
+            eventConsumers.emplace(handlerId, consumer);
+            consumerCount++;
         }
-        int32_t handlerId = iter.first;
-        auto consumer = iter.second.consumer_;
-        CHKPV(consumer);
-        eventConsumers.emplace(handlerId, consumer);
-        consumerCount++;
-    }
-    if (consumerCount == 0) {
-        MMI_HILOGE("All task post failed");
-        return;
-    }
-    int32_t tokenType = MultimodalInputConnMgr->GetTokenType();
-    if (tokenType == TokenType::TOKEN_HAP &&
-        pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        processedEvents_.emplace(pointerEvent->GetId(), consumerCount);
+        if (consumerCount == 0) {
+            MMI_HILOGE("All task post failed");
+            return;
+        }
+        int32_t tokenType = MultimodalInputConnMgr->GetTokenType();
+        if (tokenType == TokenType::TOKEN_HAP &&
+            pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+            processedEvents_.emplace(pointerEvent->GetId(), consumerCount);
+        }
     }
     for (const auto &iter : eventConsumers) {
         auto tempEvent = std::make_shared<PointerEvent>(*pointerEvent);
@@ -247,6 +249,7 @@ HandleEventType InputHandlerManager::GetEventType() const
 void InputHandlerManager::OnDispatchEventProcessed(int32_t eventId)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtxHandlers_);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     auto iter = processedEvents_.find(eventId);
