@@ -181,7 +181,7 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEven
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_INTERCEPT_EVENT);
     int32_t consumerCount = 0;
-    std::map<int32_t, std::shared_ptr<IInputEventConsumer>> eventConsumer;
+    std::map<int32_t, std::shared_ptr<IInputEventConsumer>> eventConsumers;
     for (const auto &iter : inputHandlers_) {
         if ((iter.second.eventType_ & HANDLE_EVENT_TYPE_POINTER) != HANDLE_EVENT_TYPE_POINTER) {
             continue;
@@ -189,7 +189,7 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEven
         int32_t handlerId = iter.first;
         auto consumer = iter.second.consumer_;
         CHKPV(consumer);
-        eventConsumer.emplace(handlerId, consumer);
+        eventConsumers.emplace(handlerId, consumer);
         consumerCount++;
     }
     if (consumerCount == 0) {
@@ -201,14 +201,14 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEven
         pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         processedEvents_.emplace(pointerEvent->GetId(), consumerCount);
     }
-    for (const auto &iter : eventConsumer) {
-        int32_t handlerId = iter.first;
-        auto consumer = iter.second;
+    for (const auto &iter : eventConsumers) {
         auto tempEvent = std::make_shared<PointerEvent>(*pointerEvent);
         CHKPV(tempEvent);
         tempEvent->SetProcessedCallback(monitorCallback_);
+        auto consumer = iter.second;
+        CHKPV(consumer);
         consumer->OnInputEvent(tempEvent);
-        MMI_HILOGD("Pointer event id:%{public}d pointerId:%{public}d", handlerId, pointerEvent->GetPointerId());
+        MMI_HILOGD("Pointer event id:%{public}d pointerId:%{public}d", iter.first, pointerEvent->GetPointerId());
     }
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
