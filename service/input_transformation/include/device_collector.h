@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DEVICE_MANAGER_H
-#define DEVICE_MANAGER_H
+#ifndef DEVICE_COLLECTOR_H
+#define DEVICE_COLLECTOR_H
 
 #include <memory>
 #include <map>
@@ -50,4 +50,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // DEVICE_MANAGER_H
+#endif // DEVICE_COLLECTOR_H

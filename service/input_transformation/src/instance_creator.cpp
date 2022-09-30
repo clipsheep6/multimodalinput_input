@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "device_manager.h"
+#include "device_collector.h"
 #include "input_context.h"
 #include "touch_screen_handler.h"
 
