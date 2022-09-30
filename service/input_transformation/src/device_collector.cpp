@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
- #include "device_manager.h"
+ #include "device_collector.h"
 
 #include <cstring>
 #include <dirent.h>
@@ -26,27 +26,27 @@ namespace OHOS {
 namespace MMI {
 
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "DeviceManager" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "DeviceCollector" };
 };
-std::unique_ptr<DeviceManager> DeviceManager::CreateInstance(IInputContext* context) 
+std::unique_ptr<DeviceCollector> DeviceCollector::CreateInstance(IInputContext* context) 
 {
     if (context == nullptr) {
         errno = EINVAL;
         return nullptr;
     }
-    return std::unique_ptr<DeviceManager>(new DeviceManager(context));
+    return std::unique_ptr<DeviceCollector>(new DeviceCollector(context));
 }
 
-DeviceManager::DeviceManager(IInputContext* context)
+DeviceCollector::DeviceCollector(IInputContext* context)
     : context_(context)
 {
 }
 
-DeviceManager::~DeviceManager() 
+DeviceCollector::~DeviceCollector() 
 {
 }
 
-std::shared_ptr<IInputDevice> DeviceManager::GetDevice(int32_t id) const
+std::shared_ptr<IInputDevice> DeviceCollector::GetDevice(int32_t id) const
 {
     auto it = inputDevices_.find(id);
     if (it == inputDevices_.end()) {
@@ -55,7 +55,7 @@ std::shared_ptr<IInputDevice> DeviceManager::GetDevice(int32_t id) const
     return it->second;
 }
 
-std::list<int32_t> DeviceManager::GetDeviceIdList() const
+std::list<int32_t> DeviceCollector::GetDeviceIdList() const
 {
     std::list<int32_t> result;
     for (auto it = inputDevices_.begin(); it != inputDevices_.end(); ++it) {
@@ -64,7 +64,7 @@ std::list<int32_t> DeviceManager::GetDeviceIdList() const
     return result;
 }
 
-bool DeviceManager::AddDevice(const std::shared_ptr<IInputDevice>& device)
+bool DeviceCollector::AddDevice(const std::shared_ptr<IInputDevice>& device)
 {
     MMI_HILOGD("Enter");
     if (!device) {
@@ -90,7 +90,7 @@ bool DeviceManager::AddDevice(const std::shared_ptr<IInputDevice>& device)
     return true;
 }
 
-std::shared_ptr<IInputDevice> DeviceManager::RemoveDevice(int32_t id)
+std::shared_ptr<IInputDevice> DeviceCollector::RemoveDevice(int32_t id)
 {
     MMI_HILOGD("Enter id:%{public}d", id);
     auto it = inputDevices_.find(id);
@@ -108,7 +108,7 @@ std::shared_ptr<IInputDevice> DeviceManager::RemoveDevice(int32_t id)
     return device;
 }
 
-void DeviceManager::NotifyDeviceAdded(const std::shared_ptr<IInputDevice>& device)
+void DeviceCollector::NotifyDeviceAdded(const std::shared_ptr<IInputDevice>& device)
 {
     MMI_HILOGD("Enter");
     if (!device) {
@@ -129,7 +129,7 @@ void DeviceManager::NotifyDeviceAdded(const std::shared_ptr<IInputDevice>& devic
     device->StartReceiveEvents(handler);
 }
 
-void DeviceManager::NotifyDeviceRemoved(const std::shared_ptr<IInputDevice>& device)
+void DeviceCollector::NotifyDeviceRemoved(const std::shared_ptr<IInputDevice>& device)
 {
     MMI_HILOGD("Enter");
     if (!device) {

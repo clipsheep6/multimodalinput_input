@@ -42,28 +42,28 @@ std::unique_ptr<InputContext> InputContext::CreateInstance()
 int32_t InputContext::InitInstance(InputContext* inputContext)
 {
     MMI_HILOGD("Enter");
-    auto deviceManager = IDeviceManager::CreateInstance(inputContext);
-    auto retCode = inputContext->SetDeviceManager(deviceManager);
+    auto deviceCollector = IDeviceCollector::CreateInstance(inputContext);
+    auto retCode = inputContext->SetDeviceCollector(deviceCollector);
     if (retCode == -1) {
-        MMI_HILOGE("Leave, SetDeviceManager Failed");
+        MMI_HILOGE("Leave, SetDeviceCollector Failed");
         return -1;
     }
     MMI_HILOGD("Leave");
     return 0;
 }
 
-const std::unique_ptr<IDeviceManager>& InputContext::GetInputDeviceManager() const
+const std::unique_ptr<IDeviceCollector>& InputContext::GetInputDeviceCollector() const
 {
-    return inputDeviceManager_;
+    return inputDeviceCollector_;
 }
 
-int32_t InputContext::SetDeviceManager(std::unique_ptr<IDeviceManager>& inputDeviceManager)
+int32_t InputContext::SetDeviceCollector(std::unique_ptr<IDeviceCollector>& inputDeviceCollector)
 {
-    if (!inputDeviceManager) {
+    if (!inputDeviceCollector) {
         return -1;
     }
 
-    inputDeviceManager_ = std::move(inputDeviceManager);
+    inputDeviceCollector_ = std::move(inputDeviceCollector);
     return 0;
 }
 } // namespace MMI

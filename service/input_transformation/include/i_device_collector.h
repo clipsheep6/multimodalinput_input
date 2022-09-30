@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef I_DEVICE_MANAGER_H
-#define I_DEVICE_MANAGER_H
+#ifndef I_DEVICE_COLLECTOR_H
+#define I_DEVICE_COLLECTOR_H
 
 #include <memory>
 #include <list>
@@ -24,11 +24,11 @@
 namespace OHOS {
 namespace MMI {
 class IInputContext;
-class IDeviceManager {
+class IDeviceCollector {
 public:
-    static std::unique_ptr<IDeviceManager> CreateInstance(IInputContext* context);
+    static std::unique_ptr<IDeviceCollector> CreateInstance(IInputContext* context);
 
-    virtual ~IDeviceManager() = default;
+    virtual ~IDeviceCollector() = default;
     virtual std::shared_ptr<IInputDevice> GetDevice(int32_t id) const = 0;
     virtual std::list<int32_t> GetDeviceIdList() const = 0;
 
@@ -37,4 +37,4 @@ public:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // I_DEVICE_MANAGER_H
+#endif // I_DEVICE_COLLECTOR_H

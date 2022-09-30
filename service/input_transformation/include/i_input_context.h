@@ -20,13 +20,13 @@
 
 namespace OHOS {
 namespace MMI {
-class IDeviceManager;
+class IDeviceCollector;
 class IInputContext {
     public:
         static std::unique_ptr<IInputContext> CreateInstance();
 
         virtual ~IInputContext() = default;
-        virtual const std::unique_ptr<IDeviceManager>& GetInputDeviceManager() const = 0; 
+        virtual const std::unique_ptr<IDeviceCollector>& GetInputDeviceCollector() const = 0; 
 };
 } // namespace MMI
 } // namespace OHOS

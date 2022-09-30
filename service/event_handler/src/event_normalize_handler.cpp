@@ -180,7 +180,7 @@ int32_t EventNormalizeHandler::OnHDFEvent(MmiHdfEvent* event)
     CHKPR(inputDeviceManager, ERROR_NULL_POINTER);
     const auto& device = inputDeviceManager->GetDevice(event->value);
     CHKPR(device, ERROR_NULL_POINTER);
-    //device->ProcessEventItem();
+    device->ProcessEventItem();
     return RET_OK;
 }
 #endif // OHOS_BUILD_HDF

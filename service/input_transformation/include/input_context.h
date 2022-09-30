@@ -22,7 +22,7 @@
 #include <list>
 
 #include "i_input_define.h"
-#include "i_device_manager.h"
+#include "i_device_collector.h"
 
 namespace OHOS {
 namespace MMI {
@@ -36,14 +36,14 @@ class InputContext : public NonCopyable, public IInputContext {
     public:
         virtual ~InputContext() = default;
 
-        virtual const std::unique_ptr<IDeviceManager>& GetInputDeviceManager() const override; 
+        virtual const std::unique_ptr<IDeviceCollector>& GetInputDeviceCollector() const override; 
 
     protected:
         InputContext() = default;
-        int32_t SetDeviceManager(std::unique_ptr<IDeviceManager>& inputDeviceManager);
+        int32_t SetDeviceCollector(std::unique_ptr<IDeviceCollector>& inputDeviceCollector);
 
     private:
-        std::unique_ptr<IDeviceManager> inputDeviceManager_;
+        std::unique_ptr<IDeviceCollector> inputDeviceCollector_;
 };
 } // namespace MMI
 } // namespace OHOS

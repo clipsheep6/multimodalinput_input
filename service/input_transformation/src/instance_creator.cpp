@@ -19,9 +19,9 @@
 
 namespace OHOS {
 namespace MMI {
-std::unique_ptr<IDeviceManager> IDeviceManager::CreateInstance(IInputContext* context) 
+std::unique_ptr<IDeviceCollector> IDeviceCollector::CreateInstance(IInputContext* context) 
 {
-    return DeviceManager::CreateInstance(context);
+    return DeviceCollector::CreateInstance(context);
 }
 
 std::unique_ptr<IInputContext> IInputContext::CreateInstance() 

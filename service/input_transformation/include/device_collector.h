@@ -20,17 +20,17 @@
 #include <map>
 
 #include "i_input_define.h"
-#include "i_device_manager.h"
+#include "i_device_collector.h"
 
 namespace OHOS {
 namespace MMI {
 class IInputContext;
-class DeviceManager : public NonCopyable, public IDeviceManager {
+class DeviceCollector : public NonCopyable, public IDeviceCollector {
 public:
-    static std::unique_ptr<DeviceManager> CreateInstance(IInputContext* context);
+    static std::unique_ptr<DeviceCollector> CreateInstance(IInputContext* context);
 
 public:
-    virtual ~DeviceManager();
+    virtual ~DeviceCollector();
     virtual std::shared_ptr<IInputDevice> GetDevice(int32_t id) const override;
     virtual std::list<int32_t> GetDeviceIdList() const override;
 
@@ -38,7 +38,7 @@ public:
     virtual std::shared_ptr<IInputDevice> RemoveDevice(int32_t id) override;
 
 protected:
-    DeviceManager(IInputContext* context);
+    DeviceCollector(IInputContext* context);
 
 private:
     void NotifyDeviceAdded(const std::shared_ptr<IInputDevice>& device);
