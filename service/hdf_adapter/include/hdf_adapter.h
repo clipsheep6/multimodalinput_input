@@ -32,25 +32,27 @@ class HdfAdapter {
     using HdfEventCallback = std::function<void(const input_event &event)>;
 public:
     HdfAdapter();
+    ~HdfAdapter() = default;
     bool Init(HdfEventCallback callback, const std::string& seat_id = "seat0");
     void DeInit();
     void Dump(int32_t fd, const std::vector<std::string> &args);
     int32_t GetInputFd() const;
     int32_t ScanInputDevice();
-    void EventDispatch(struct epoll_event& ev);
+    void EventDispatch(epoll_event& ev);
     void OnEventHandler(const input_event &event);
     void OnEventCallback(const input_event &event);
 private:
     int32_t ConnectHDFInit();
     int32_t DisconnectHDFInit();
-    void HdfDeviceStatusChanged(int32_t devIndex, int32_t devType, int32_t statusType);
+private:
+    void HandleDeviceStatusChanged(int32_t devIndex, int32_t devType, int32_t status);
+    void HandleEvent(int32_t devIndex, int32_t evType, int32_t code, int32_t value, int64_t time);
     void HandleDeviceAdd(int32_t devIndex, int32_t devType);
     void HandleDeviceRmv(int32_t devIndex, int32_t devType);
     void HandleDeviceEvent(int32_t devIndex, int32_t type, int32_t code, int32_t value, int64_t timestamp);
 private:
     HdfEventCallback callback_ = nullptr;
     std::string seat_id_;
-    size_t eventDispatchCallTimes_ {};
     std::vector<std::string> eventRecords_;
 };
 } // namespace MMI

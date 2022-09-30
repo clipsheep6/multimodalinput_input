@@ -326,7 +326,10 @@ void MMIService::OnStart()
 #ifdef OHOS_RSS_CLIENT
     AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
 #endif
-    t_.join();
+    t_.detach();
+    MMI_HILOGI("MMIService thread has detatched");
+    hdfAdapter_.ScanInputDevice(); //TODO: 是否应该委托到eventRunner中执行
+    MMI_HILOGI("MMIService OnStart has finished");
 }
 
 void MMIService::OnStop()
@@ -941,7 +944,6 @@ void MMIService::OnThread()
 #endif
     libinputAdapter_.RetriggerHotplugEvents();
     libinputAdapter_.ProcessPendingEvents();
-    hdfAdapter_.ScanInputDevice(); //TODO: 是否应该委托到eventRunner中执行
     while (state_ == ServiceRunningState::STATE_RUNNING) {
         epoll_event ev[MAX_EVENT_SIZE] = {};
         int32_t timeout = TimerMgr->CalcNextDelay();

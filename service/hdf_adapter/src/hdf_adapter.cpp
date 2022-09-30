@@ -14,13 +14,17 @@
  */
 
 #include "hdf_adapter.h"
+#include <array>
 #include <linux/input.h>
 #include "config_multimodal.h"
+#include "util_ex.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "HdfAdapter" };
+inline constexpr uint32_t MMI_MAX_EVENT_PKG_NUM = 100;
+inline constexpr uint32_t MMI_MAX_INPUT_DEVICE_COUNT = 32;
 const std::string DEF_INPUT_SEAT = "seat0";
 int32_t g_hdfAdapterWriteFd { -1 };
 int32_t g_mmiServiceReadFd { -1 };
@@ -35,7 +39,26 @@ void InputEventSetTime(struct input_event &e, int64_t time)
     e.input_event_sec = time / 1000000;
 	e.input_event_usec = time % 1000000;
 }
+
+uint64_t GetTime(const struct input_event &event)
+{
+    return event.input_event_sec * 1000000 + event.input_event_usec;
+}
 } // namespace
+
+void HdfDeviceStatusChanged(int32_t devIndex, int32_t devType, HDFDevicePlugType statusType)
+{
+    input_event event;
+    event.code = -1;
+    event.type = (static_cast<int32_t>(statusType) << 16) | (devIndex << 8);
+    event.value = devType;
+    InputEventSetTime(event, GetSysClockTime());
+    auto ret = write(g_hdfAdapterWriteFd, &event, sizeof(event));
+    if (ret == -1) {
+        int saveErrno = errno;
+        MMI_HILOGE("Write pipe fail, errno:%{public}d, %{public}s", saveErrno, strerror(saveErrno));
+    }
+}
 
 static void HotPlugCallback(const InputHotPlugEvent *event)
 {
@@ -49,9 +72,9 @@ static void EventPkgCallback(const InputEventPackage **pkgs, uint32_t count, uin
     static constexpr uint16_t byteSize = 8;
     CHKPV(pkgs);
     uint32_t fixedCount = count;
-    if (count > MmiHdfEventPacket::MAX_EVENT_PKG_NUM) {
-        fixedCount = MmiHdfEventPacket::MAX_EVENT_PKG_NUM;
-        MMI_HILOGE("Too big hdf event, count:%{public}d is beyond %{public}d", count, MmiHdfEventPacket::MAX_EVENT_PKG_NUM);
+    if (count > MMI_MAX_EVENT_PKG_NUM) {
+        fixedCount = MMI_MAX_EVENT_PKG_NUM;
+        MMI_HILOGE("Too big hdf event, count:%{public}d is beyond %{public}d", count, MMI_MAX_EVENT_PKG_NUM);
     }
     for (uint32_t i = 0; i < fixedCount; ++i) {
         input_event event;
@@ -59,7 +82,7 @@ static void EventPkgCallback(const InputEventPackage **pkgs, uint32_t count, uin
         event.type = (pkgs[i]->type) | static_cast<uint16_t>(devIndex << byteSize);
         event.value = pkgs[i]->value;
         InputEventSetTime(event, pkgs[i]->timestamp);
-        auto ret = write(g_hdfAdapterWriteFd, &event, sizeof(input_event);
+        auto ret = write(g_hdfAdapterWriteFd, &event, sizeof(input_event));
         if (ret == -1) {
             int saveErrno = errno;
             MMI_HILOGE("Write pipe fail, errno:%{public}d, %{public}s", saveErrno, strerror(saveErrno));
@@ -73,28 +96,14 @@ HdfAdapter::HdfAdapter()
     g_hostCb.HotPlugCallback = HotPlugCallback;
 }
 
-void HdfAdapter::HdfDeviceStatusChanged(int32_t devIndex, int32_t devType, int32_t statusType)
-{
-    input_event event;
-    event.code = -1;
-    event.type = (statusType << 16) | (devIndex << 8);
-    event.value = devType;
-    InputEventSetTime(event, GetSysClockTime());
-    auto ret = write(g_hdfAdapterWriteFd, &event, sizeof(event));
-    if (ret == -1) {
-        int saveErrno = errno;
-        MMI_HILOGE("Write pipe fail, errno:%{public}d, %{public}s", saveErrno, strerror(saveErrno));
-    }
-}
-
 int32_t HdfAdapter::ScanInputDevice()
 {
     CALL_DEBUG_ENTER;
     CHKPR(g_inputInterface, RET_ERR);
     CHKPR(g_inputInterface->iInputManager, RET_ERR);
     CHKPR(g_inputInterface->iInputReporter, RET_ERR);
-    std::array<InputDevDesc, MmiHdfDevDescPacket::MAX_INPUT_DEVICE_COUNT> devDescs;
-    int32_t ret = g_inputInterface->iInputManager->ScanInputDevice(devDescs.data(), devDescs.size);
+    std::array<InputDevDesc, MMI_MAX_INPUT_DEVICE_COUNT> devDescs;
+    int32_t ret = g_inputInterface->iInputManager->ScanInputDevice(devDescs.data(), devDescs.size());
     if (ret != INPUT_SUCCESS) {
         MMI_HILOGE("call ScanInputDevice failed, ret:%{public}d", ret);
         return RET_ERR;
@@ -178,7 +187,7 @@ void HdfAdapter::DeInit()
 void HdfAdapter::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     mprintf(fd, "HDF adapter information:");
-    mprintf(fd, "uds_server: count=%d", sessionsMap_.size());    
+    // TODO:
 }
 
 int32_t HdfAdapter::GetInputFd() const
@@ -186,7 +195,7 @@ int32_t HdfAdapter::GetInputFd() const
     return g_mmiServiceReadFd;
 }
 
-void HdfAdapter::EventDispatch(struct epoll_event &ev)
+void HdfAdapter::EventDispatch(epoll_event &ev)
 {
     CALL_DEBUG_ENTER;
     CHKPV(ev.data.ptr);
@@ -196,54 +205,48 @@ void HdfAdapter::EventDispatch(struct epoll_event &ev)
         ev.data.ptr = nullptr;
         return;
     }
-    auto data = static_cast<const MmiHdfPacket *>(ev.data.ptr);
+    auto data = static_cast<const input_event *>(ev.data.ptr);
     CHKPV(data);
     OnEventCallback(*data);
 }
 
-void HdfAdapter::OnEventCallback(const MmiHdfPacket &pkt)
+void HdfAdapter::HandleDeviceStatusChanged(int32_t devIndex, int32_t devType, int32_t status)
+{
+    MMI_HILOGE("devIndex:%{public}d, devType:%{public}d, status:%{public}d", devIndex, devType, status);
+    if (status == 1) { // dev add
+        HandleDeviceAdd(devIndex, devType);
+    } else if (status == 2) { // dev remove
+        HandleDeviceRmv(devIndex, devType);
+    } else {
+        MMI_HILOGE("Invalid status, devIndex:%{public}d, devType:%{public}d, status:%{public}d", devIndex, devType, status);
+    }
+}
+
+void HdfAdapter::HandleEvent(int32_t devIndex, int32_t evType, int32_t code, int32_t value, int64_t time)
+{
+    MMI_HILOGE("devIndex:%{public}d, evType:%{public}d, code:%{public}d, value:%{public}d, time:%{public}lld",
+        devIndex, evType, code, value, time);
+}
+
+void HdfAdapter::OnEventCallback(const input_event &event)
 {
     std::ostringstream oss;
-    oss << std::dec << "pkt.size: " << pkt.size
-        << "(" << pkt.size << ","
-        << pkt.type << ",";
-    
+    oss << std::dec << event.code << ", " << event.type << ", "
+        << event.value << ", " << GetTime(event);   
     eventRecords_.push_back(oss.str());
-    //CALL_DEBUG_ENTER;
-    #if 0
-    auto pktType = pkt.type;
-    switch(pktType) {
-        case HDFDevicePlugType::HDF_ADD_DEVICE:
-        {
-            const MmiHdfDevDescPacket &descPkt = static_cast<const MmiHdfDevDescPacket>(pkt);
-            for (auto &i : descPkt.descs) {
-                HandleDeviceAdd(i.devIndex, i.devType);
-            }
-        }        
-        break;
-        case HDFDevicePlugType::HDF_RMV_DEVICE:
-        {
-            const MmiHdfDevDescPacket &descPkt = static_cast<const MmiHdfDevDescPacket>(pkt);
-            for (auto &i : pkt.descs) {
-                HandleDeviceRmv(i.devIndex, i.devType);
-            }
-        }        
-        break;
-        case HDF_EVENT:
-        {
-            const MmiHdfEventPacket &eventPkt = static_cast<const MmiHdfEventPacket>(pkt);
-            for (auto &i : eventPkt.events) {
-                HandleDeviceEvent(i.devIndex, i.devType);
-            }
-        }        
-        break;
-        default:
-        {
-            MMI_HILOGE("unknown type:%{public}d", pktType);
-        }
-        break;
+    /*
+        31 - 24 | 23 - 16    | 15 - 8   | 7 - 0      |
+        保留    | 热插拨     | devIndex | ev_xx type |
+        rev     | plugStatus | devIndex | evType     |
+     */
+    int32_t devStatus = ((event.type | 0xff0000) >> 16);
+    int32_t devIndex = ((event.type | 0xff00) >> 8);
+    int32_t evType = (event.type | 0xff);
+    if (devStatus != 0) { // 0 表示有插拨事件
+        HandleDeviceStatusChanged(devIndex, evType, devStatus);
+        return;
     }
-    #endif
+    HandleEvent(devIndex, evType, event.code, event.value, GetTime(event));
 }
 
 int32_t HdfAdapter::ConnectHDFInit()
@@ -307,7 +310,7 @@ void HdfAdapter::HandleDeviceAdd(int32_t devIndex, int32_t devType)
         } else {
             MMI_HILOGE("RegisterReportCallback success,devindex:%{public}d, devType:%{public}d", devIndex, devType);
         }
-        HdfDeviceStatusChanged(i.devIndex, i.devType, HDFDevicePlugType::HDF_ADD_DEVICE);
+        HdfDeviceStatusChanged(devIndex, devType, HDFDevicePlugType::HDF_ADD_DEVICE);
         // input_event event {.type = HDF_ADD_DEVICE, .code = devIndex, .value = devType, .time = 0};
         // callback_(event);
         return;
