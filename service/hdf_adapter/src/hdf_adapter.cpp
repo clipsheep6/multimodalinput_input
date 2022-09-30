@@ -267,9 +267,6 @@ int32_t HdfAdapter::HandleDeviceAdd(int32_t devIndex, int32_t devType)
         } else {
             MMI_HILOGE("RegisterReportCallback success,devindex:%{public}d, devType:%{public}d", devIndex, devType);
         }
-        HdfDeviceStatusChanged(devIndex, devType, HDFDevicePlugType::HDF_ADD_DEVICE);
-        // input_event event {.type = HDF_ADD_DEVICE, .code = devIndex, .value = devType, .time = 0};
-        // callback_(event);
         return RET_OK;
     } while (0);
 
