@@ -200,8 +200,7 @@ bool MMIService::InitLibinputService()
 
 bool MMIService::InitHDFService()
 {
-    if (!(hdfAdapter_.Init(std::bind(&InputEventHandler::OnHDFEvent, InputHandler, std::placeholders::_1),
-        DEF_INPUT_SEAT))) {
+    if (!(hdfAdapter_.Init(std::bind(&InputEventHandler::OnHDFEvent, InputHandler, std::placeholders::_1)))) {
         MMI_HILOGE("Libinput init, bind failed");
         return false;
     }

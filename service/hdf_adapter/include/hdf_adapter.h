@@ -33,26 +33,20 @@ class HdfAdapter {
 public:
     HdfAdapter();
     ~HdfAdapter() = default;
-    bool Init(HdfEventCallback callback, const std::string& seat_id = "seat0");
+    bool Init(HdfEventCallback callback);
     void DeInit();
     void Dump(int32_t fd, const std::vector<std::string> &args);
     int32_t GetInputFd() const;
     int32_t ScanInputDevice();
     void EventDispatch(epoll_event& ev);
     void OnEventHandler(const input_event &event);
-    void OnEventCallback(const input_event &event);
 private:
     int32_t ConnectHDFInit();
     int32_t DisconnectHDFInit();
-private:
-    void HandleDeviceStatusChanged(int32_t devIndex, int32_t devType, int32_t status);
-    void HandleEvent(int32_t devIndex, int32_t evType, int32_t code, int32_t value, int64_t time);
-    void HandleDeviceAdd(int32_t devIndex, int32_t devType);
-    void HandleDeviceRmv(int32_t devIndex, int32_t devType);
-    void HandleDeviceEvent(int32_t devIndex, int32_t type, int32_t code, int32_t value, int64_t timestamp);
+    int32_t HandleDeviceAdd(int32_t devIndex, int32_t devType);
+    int32_t HandleDeviceRmv(int32_t devIndex, int32_t devType);
 private:
     HdfEventCallback callback_ = nullptr;
-    std::string seat_id_;
     std::vector<std::string> eventRecords_;
 };
 } // namespace MMI

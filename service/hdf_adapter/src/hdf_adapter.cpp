@@ -207,46 +207,7 @@ void HdfAdapter::EventDispatch(epoll_event &ev)
     }
     auto data = static_cast<const input_event *>(ev.data.ptr);
     CHKPV(data);
-    OnEventCallback(*data);
-}
-
-void HdfAdapter::HandleDeviceStatusChanged(int32_t devIndex, int32_t devType, int32_t status)
-{
-    MMI_HILOGE("devIndex:%{public}d, devType:%{public}d, status:%{public}d", devIndex, devType, status);
-    if (status == 1) { // dev add
-        HandleDeviceAdd(devIndex, devType);
-    } else if (status == 2) { // dev remove
-        HandleDeviceRmv(devIndex, devType);
-    } else {
-        MMI_HILOGE("Invalid status, devIndex:%{public}d, devType:%{public}d, status:%{public}d", devIndex, devType, status);
-    }
-}
-
-void HdfAdapter::HandleEvent(int32_t devIndex, int32_t evType, int32_t code, int32_t value, int64_t time)
-{
-    MMI_HILOGE("devIndex:%{public}d, evType:%{public}d, code:%{public}d, value:%{public}d, time:%{public}lld",
-        devIndex, evType, code, value, time);
-}
-
-void HdfAdapter::OnEventCallback(const input_event &event)
-{
-    std::ostringstream oss;
-    oss << std::dec << event.code << ", " << event.type << ", "
-        << event.value << ", " << GetTime(event);   
-    eventRecords_.push_back(oss.str());
-    /*
-        31 - 24 | 23 - 16    | 15 - 8   | 7 - 0      |
-        保留    | 热插拨     | devIndex | ev_xx type |
-        rev     | plugStatus | devIndex | evType     |
-     */
-    int32_t devStatus = ((event.type | 0xff0000) >> 16);
-    int32_t devIndex = ((event.type | 0xff00) >> 8);
-    int32_t evType = (event.type | 0xff);
-    if (devStatus != 0) { // 0 表示有插拨事件
-        HandleDeviceStatusChanged(devIndex, evType, devStatus);
-        return;
-    }
-    HandleEvent(devIndex, evType, event.code, event.value, GetTime(event));
+    OnEventHandler(*data);
 }
 
 int32_t HdfAdapter::ConnectHDFInit()
@@ -286,18 +247,18 @@ int32_t HdfAdapter::DisconnectHDFInit()
     return RET_OK;
 }
 
-void HdfAdapter::HandleDeviceAdd(int32_t devIndex, int32_t devType)
+int32_t HdfAdapter::HandleDeviceAdd(int32_t devIndex, int32_t devType)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(g_inputInterface);
-    CHKPV(g_inputInterface->iInputManager);
-    CHKPV(g_inputInterface->iInputReporter);
+    CHKPR(g_inputInterface, ERROR_NULL_POINTER);
+    CHKPR(g_inputInterface->iInputManager, ERROR_NULL_POINTER);
+    CHKPR(g_inputInterface->iInputReporter, ERROR_NULL_POINTER);
 
     int32_t ret;
     ret = g_inputInterface->iInputManager->OpenInputDevice(devIndex);
     if (ret != RET_OK) {
         MMI_HILOGE("OpenInputDevice failed, devIndex:%{public}d, ret:%{public}d", devIndex, ret);
-        return;
+        return RET_ERR;
     } else {
         MMI_HILOGD("OpenInputDevice success, devIndex:%{public}d", devIndex);
     }
@@ -306,51 +267,70 @@ void HdfAdapter::HandleDeviceAdd(int32_t devIndex, int32_t devType)
         ret = g_inputInterface->iInputReporter->RegisterReportCallback(devIndex, &g_eventCb);
         if (ret != RET_OK) {
             MMI_HILOGE("RegisterReportCallback fail,devindex:%{public}d, devType:%{public}d, ret:%{public}d", devIndex, devType, ret);
-            return;
+            break;;
         } else {
             MMI_HILOGE("RegisterReportCallback success,devindex:%{public}d, devType:%{public}d", devIndex, devType);
         }
         HdfDeviceStatusChanged(devIndex, devType, HDFDevicePlugType::HDF_ADD_DEVICE);
         // input_event event {.type = HDF_ADD_DEVICE, .code = devIndex, .value = devType, .time = 0};
         // callback_(event);
-        return;
+        return RET_OK;
     } while (0);
 
     ret = g_inputInterface->iInputManager->CloseInputDevice(devIndex);
     if (ret != RET_OK) {
         MMI_HILOGE("CloseInputDevice failed, devIndex:%{public}d, ret:%{public}d", devIndex, ret);
-        return;
     } else {
         MMI_HILOGD("CloseInputDevice success, devIndex:%{public}d", devIndex);
     }
+    return RET_ERR;
 }
 
-void HdfAdapter::HandleDeviceRmv(int32_t devIndex, int32_t devType)
+int32_t HdfAdapter::HandleDeviceRmv(int32_t devIndex, int32_t devType)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(g_inputInterface);
-    CHKPV(g_inputInterface->iInputManager);
-    CHKPV(g_inputInterface->iInputReporter);
+    CHKPR(g_inputInterface, ERROR_NULL_POINTER);
+    CHKPR(g_inputInterface->iInputManager, ERROR_NULL_POINTER);
+    CHKPR(g_inputInterface->iInputReporter, ERROR_NULL_POINTER);
 
     int32_t ret;
     ret = g_inputInterface->iInputManager->CloseInputDevice(devIndex);
     if (ret != RET_OK) {
         MMI_HILOGE("CloseInputDevice failed, devIndex:%{public}d, ret:%{public}d", devIndex, ret);
-        return;
+        return RET_ERR;
     } else {
         MMI_HILOGD("CloseInputDevice success, devIndex:%{public}d", devIndex);
-    }    
-}
-
-void HdfAdapter::HandleDeviceEvent(int32_t devIndex, int32_t type, int32_t code, int32_t value, int64_t timestamp)
-{
-    CALL_DEBUG_ENTER;    
+    }
+    return RET_OK;
 }
 
 void HdfAdapter::OnEventHandler(const input_event &event)
 {
     CALL_DEBUG_ENTER;
     CHKPV(callback_);
+    /*
+        31 - 24 | 23 - 16    | 15 - 8   | 7 - 0      |
+        保留    | 热插拨     | devIndex | ev_xx type |
+        rev     | plugStatus | devIndex | evType     |
+     */
+    int32_t devStatus = ((event.type | 0xff0000) >> 16);
+    int32_t devIndex = ((event.type | 0xff00) >> 8);
+    int32_t evType = (event.type | 0xff);
+    if (status == 1) { // dev add
+        auto ret = HandleDeviceAdd(devIndex, devType);
+        if (ret != RET_OK) {
+            MMI_HILOGE("call HandleDeviceAdd fail, ret:%{public}d, type:%{public}d, code:%{public}d, value:%{public}d, time:%{public}lld",
+                ret, event.type, event.code, event.value, GetTime(event));
+            return;
+        }
+    } else if (status == 2) { // dev remove
+        auto ret = HandleDeviceRmv(devIndex, devType);
+        if (ret != RET_OK) {
+            MMI_HILOGE("call HandleDeviceRmv fail, ret:%{public}d, type:%{public}d, code:%{public}d, value:%{public}d, time:%{public}lld",
+                ret, event.type, event.code, event.value, GetTime(event));
+            return;
+        }
+    }
     callback_(event);
 }
 
