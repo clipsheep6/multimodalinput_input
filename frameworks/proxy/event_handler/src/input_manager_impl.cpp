@@ -731,7 +731,7 @@ void InputManagerImpl::OnAnr(int32_t pid)
     {
         std::lock_guard<std::mutex> guard(mtx_);
         for (const auto &observer : anrObservers_) {
-            CHKPV(observer);
+            CHKPC(observer);
             observer->OnAnr(pid);
         }
     }
