@@ -174,36 +174,40 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+void InputHandlerManager::GetConsumerInfos(std::shared_ptr<PointerEvent> pointerEvent,
+    std::map<int32_t, std::shared_ptr<IInputEventConsumer>> &consumerInfos)
+{
+    std::lock_guard<std::mutex> guard(mtxHandlers_);
+    int32_t consumerCount = 0;
+    for (const auto &iter : inputHandlers_) {
+        if ((iter.second.eventType_ & HANDLE_EVENT_TYPE_POINTER) != HANDLE_EVENT_TYPE_POINTER) {
+            continue;
+        }
+        int32_t handlerId = iter.first;
+        auto consumer = iter.second.consumer_;
+        CHKPV(consumer);
+        consumerInfos.emplace(handlerId, consumer);
+        consumerCount++;
+    }
+    if (consumerCount == 0) {
+        MMI_HILOGE("All task post failed");
+        return;
+    }
+    int32_t tokenType = MultimodalInputConnMgr->GetTokenType();
+    if (tokenType == TokenType::TOKEN_HAP &&
+        pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        processedEvents_.emplace(pointerEvent->GetId(), consumerCount);
+    }
+}
+
 void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHK_PID_AND_TID();
     CHKPV(pointerEvent);
-    std::map<int32_t, std::shared_ptr<IInputEventConsumer>> eventConsumers;
-    {
-        std::lock_guard<std::mutex> guard(mtxHandlers_);
-        BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_INTERCEPT_EVENT);
-        int32_t consumerCount = 0;
-        for (const auto &iter : inputHandlers_) {
-            if ((iter.second.eventType_ & HANDLE_EVENT_TYPE_POINTER) != HANDLE_EVENT_TYPE_POINTER) {
-                continue;
-            }
-            int32_t handlerId = iter.first;
-            auto consumer = iter.second.consumer_;
-            CHKPV(consumer);
-            eventConsumers.emplace(handlerId, consumer);
-            consumerCount++;
-        }
-        if (consumerCount == 0) {
-            MMI_HILOGE("All task post failed");
-            return;
-        }
-        int32_t tokenType = MultimodalInputConnMgr->GetTokenType();
-        if (tokenType == TokenType::TOKEN_HAP &&
-            pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-            processedEvents_.emplace(pointerEvent->GetId(), consumerCount);
-        }
-    }
-    for (const auto &iter : eventConsumers) {
+    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_INTERCEPT_EVENT);
+    std::map<int32_t, std::shared_ptr<IInputEventConsumer>> consumerInfos;
+    GetConsumerInfos(pointerEvent, consumerInfos);
+    for (const auto &iter : consumerInfos) {
         auto tempEvent = std::make_shared<PointerEvent>(*pointerEvent);
         CHKPV(tempEvent);
         tempEvent->SetProcessedCallback(monitorCallback_);

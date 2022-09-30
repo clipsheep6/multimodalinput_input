@@ -38,7 +38,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
-#endif
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     void OnConnected();
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
@@ -69,6 +69,10 @@ private:
 
     std::shared_ptr<IInputEventConsumer> FindHandler(int32_t handlerId);
     void OnDispatchEventProcessed(int32_t eventId);
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    void GetConsumerInfos(std::shared_ptr<PointerEvent> pointerEvent,
+        std::map<int32_t, std::shared_ptr<IInputEventConsumer>> &consumerInfos);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 private:
     std::map<int32_t, Handler> inputHandlers_;
