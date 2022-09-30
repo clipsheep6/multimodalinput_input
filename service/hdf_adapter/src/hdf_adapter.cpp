@@ -17,6 +17,7 @@
 #include <array>
 #include <linux/input.h>
 #include "config_multimodal.h"
+#include "error_multimodal.h"
 #include "util_ex.h"
 
 namespace OHOS {
@@ -39,8 +40,7 @@ void InputEventSetTime(struct input_event &e, int64_t time)
     e.input_event_sec = time / 1000000;
 	e.input_event_usec = time % 1000000;
 }
-
-uint64_t GetTime(const struct input_event &event)
+inline uint64_t GetTime(const struct input_event &event)
 {
     return event.input_event_sec * 1000000 + event.input_event_usec;
 }
@@ -119,15 +119,11 @@ int32_t HdfAdapter::ScanInputDevice()
     return RET_OK;
 }
 
-bool HdfAdapter::Init(HdfEventCallback callback, const std::string &seat_id)
+bool HdfAdapter::Init(HdfEventCallback callback)
 {
     CALL_DEBUG_ENTER;
     CHKPF(callback);
     callback_ = callback;
-    seat_id_ = seat_id;
-    if (seat_id_.empty()) {
-        seat_id_ = DEF_SEAT_ID;
-    }
 
     int ret;
     do {
@@ -315,15 +311,15 @@ void HdfAdapter::OnEventHandler(const input_event &event)
      */
     int32_t devStatus = ((event.type | 0xff0000) >> 16);
     int32_t devIndex = ((event.type | 0xff00) >> 8);
-    int32_t evType = (event.type | 0xff);
-    if (status == 1) { // dev add
+    int32_t devType = (event.type | 0xff);
+    if (devStatus == 1) { // dev add
         auto ret = HandleDeviceAdd(devIndex, devType);
         if (ret != RET_OK) {
             MMI_HILOGE("call HandleDeviceAdd fail, ret:%{public}d, type:%{public}d, code:%{public}d, value:%{public}d, time:%{public}lld",
                 ret, event.type, event.code, event.value, GetTime(event));
             return;
         }
-    } else if (status == 2) { // dev remove
+    } else if (devStatus == 2) { // dev remove
         auto ret = HandleDeviceRmv(devIndex, devType);
         if (ret != RET_OK) {
             MMI_HILOGE("call HandleDeviceRmv fail, ret:%{public}d, type:%{public}d, code:%{public}d, value:%{public}d, time:%{public}lld",

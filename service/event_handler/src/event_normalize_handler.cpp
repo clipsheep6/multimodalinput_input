@@ -14,6 +14,9 @@
  */
 
 #include "event_normalize_handler.h"
+#ifdef OHOS_BUILD_HDF
+#include <linux/input.h>
+#endif // OHOS_BUILD_HDF
 
 #include "dfx_hisysevent.h"
 #include "bytrace_adapter.h"
@@ -38,6 +41,10 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventNormalizeHandler" };
+inline uint64_t GetTime(const struct input_event &event)
+{
+    return event.input_event_sec * 1000000 + event.input_event_usec;
+}
 }
 
 void EventNormalizeHandler::HandleEvent(libinput_event* event)
@@ -115,15 +122,15 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event)
 void EventNormalizeHandler::HandleEvent(const input_event &event)
 {
     MMI_HILOGI("hdfEvent: type:%{public}d, code:%{public}d, value:%{public}d, time:%{public}lld",
-        event.type, event.code, event.value, event.time);
+        event.type, event.code, event.value, GetTime(event));
     /*
         31 - 24 | 23 - 16    | 15 - 8   | 7 - 0      |
         保留    | 热插拨     | devIndex | ev_xx type |
         rev     | plugStatus | devIndex | evType     |
      */
-    int32_t devStatus = ((event.type | 0xff0000) >> 16);
-    int32_t devIndex = ((event.type | 0xff00) >> 8);
-    int32_t evType = (event.type | 0xff);
+    // int32_t devStatus = ((event.type | 0xff0000) >> 16);
+    // int32_t devIndex = ((event.type | 0xff00) >> 8);
+    // int32_t evType = (event.type | 0xff);
     // 0 普通事件
     // 1 dev add
     // 2 dev rmv
