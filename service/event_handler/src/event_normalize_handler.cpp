@@ -33,7 +33,7 @@
 #include "time_cost_chk.h"
 #include "timer_manager.h"
 #include "touch_event_normalize.h"
-#include "device_manager.h"
+#include "device_collector.h"
 
 namespace OHOS {
 namespace MMI {
