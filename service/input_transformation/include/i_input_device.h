@@ -72,11 +72,10 @@ public:
 
     virtual int32_t GetId() const = 0;
     virtual const std::string& GetName() const = 0;
-    // virtual const std::string& GetSeatId() const = 0;
-    // virtual const std::string& GetSeatName() const = 0;
-    virtual const std::string& GetDeviceFile() const = 0;
+
     virtual std::shared_ptr<AxisInfo> GetAxisInfo(int32_t axis) const = 0;
     virtual bool HasCapability(int32_t capability) const = 0;
+    virtual void ProcessEventItem(const struct input_event* eventItem) = 0;
     virtual int32_t StartReceiveEvents(const std::shared_ptr<IKernelEventHandler>& eventHandler) = 0;
     virtual int32_t StopReceiveEvents() = 0;
 };

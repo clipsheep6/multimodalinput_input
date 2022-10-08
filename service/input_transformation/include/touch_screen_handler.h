@@ -34,18 +34,21 @@ public:
 public:
     virtual ~TouchScreenHandler() = default;
     virtual void OnInputEvent(const std::shared_ptr<const AbsEvent>& event) override;
+    std::shared_ptr<PointerEvent> GetPointerEvent();
 
 protected:
     TouchScreenHandler(const IInputContext* context);    
-    std::shared_ptr<PointerEvent::PointerItem> ConvertPointer(const std::shared_ptr<const AbsEvent>& absEvent, 
+    bool ConvertPointer(const std::shared_ptr<const AbsEvent>& absEvent, 
             int32_t& pointerAction, int64_t& actionTime);
     int32_t DispatchTo(int32_t pointerAction, int64_t actionTime, std::shared_ptr<PointerEvent::PointerItem>& pointer);
     int32_t ConvertAction(int32_t absEventAction) const;
+    bool OnEventTouchDown(std::shared_ptr<const AbsEvent>& absEvent);
 
 private:
     const IInputContext* const context_;
     std::shared_ptr<IInputDevice::AxisInfo> xInfo_;
     std::shared_ptr<IInputDevice::AxisInfo> yInfo_;
+    std::shared_ptr<PointerEvent> pointerEvent_;
 };
 } // namespace MMI
 } // namespace OHOS

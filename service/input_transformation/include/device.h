@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef INPUT_DEVICE_H
-#define INPUT_DEVICE_H
+#ifndef DEVICE_H
+#define DEVICE_H
 
 #include <memory>
 #include <map>
@@ -38,32 +38,26 @@ namespace MMI {
 
 class IKernelEventHandler;
 class Device : public NonCopyable, public IInputDevice {
-public:
-    static std::shared_ptr<Device> Open(const std::string& deviceFile, const IInputContext* context);
 
 public:
+    Device(int32_t id, const IInputContext* context);
     virtual ~Device();
     virtual int32_t GetId() const override;
     virtual const std::string& GetName() const override;
-    // virtual const std::string& GetSeatId() const override;
-    // virtual const std::string& GetSeatName() const override;
     virtual std::shared_ptr<AxisInfo> GetAxisInfo(int32_t axis) const override;
     virtual bool HasCapability(int32_t capability) const override;
     virtual int32_t StartReceiveEvents(const std::shared_ptr<IKernelEventHandler>& eventHandler) override;
     virtual int32_t StopReceiveEvents() override;
+    virtual void ProcessEventItem(const struct input_event* eventItem) override;
 
 protected:
     int32_t Init();
     void Uninit();
 
 private:
-    Device(int32_t id, const std::string& deviceFile, const IInputContext* context);
-
-private:
     void OnFdEvent(int fd, int event);
     void ReadEvents();
     int32_t CloseDevice();
-    void ProcessEventItem(struct input_event* eventItem);
     int32_t UpdateCapablility();
     int32_t UpdateInputProperty();
     int32_t UpdateBitStat(int32_t evType, int32_t maxValue, unsigned long* resultValue, size_t len);
@@ -103,4 +97,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // INPUT_DEVICE_H
+#endif // DEVICE_H

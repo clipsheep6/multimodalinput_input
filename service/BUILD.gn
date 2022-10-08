@@ -88,6 +88,10 @@ config("libmmi_server_config") {
     defines += [ "OHOS_BUILD_HDF" ]
   }
 
+  if (!input_feature_hdf) {
+    defines += [ "OHOS_BUILD_HDF_TEMP" ]
+  }
+
   if (input_feature_combination_key) {
     defines += [ "OHOS_BUILD_ENABLE_COMBINATION_KEY" ]
   }
@@ -469,7 +473,7 @@ ohos_shared_library("libmmi-server") {
       "hdi_inject/src/hdi_inject.cpp",
     ]
   }
-  if (true) {
+  if (!input_feature_hdf) {
     sources += [
         "input_transformation/src/abs_event_collector.cpp",
         "input_transformation/src/abs_event.cpp",

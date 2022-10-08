@@ -48,7 +48,7 @@ void Device::Uninit()
     CloseDevice();
 }
 
-Device::Device(int32_t id, const std::string& deviceFile, const IInputContext* context)
+Device::Device(int32_t id, const IInputContext* context)
    : id_(id), context_(context), absEventCollector_(id, AbsEvent::SOURCE_TYPE_NONE),
    eventHandler_(IKernelEventHandler::GetDefault())
 
@@ -132,7 +132,7 @@ int32_t Device::CloseDevice()
     return 0;
 }
 
-void Device::ProcessEventItem(struct input_event* eventItem)
+void Device::ProcessEventItem(const struct input_event* eventItem)
 {
     auto type = eventItem->type;
     auto code = eventItem->code;

@@ -20,31 +20,21 @@
 
 #include "i_input_event_handler.h"
 
+struct input_event;
+
 namespace OHOS {
 namespace MMI {
 class EventNormalizeHandler : public IInputEventHandler {
-struct MmiHdfEvent {
-    int32_t type;
-    int32_t code;
-    int32_t value;
-    int64_t time;
-};
-enum MmiHdfEventPacketType {
-    HDF_NONE = 0,
-    HDF_EVENT,
-    HDF_ADD_DEVICE,
-    HDF_RMV_DEVICE,
-};
 public:
     EventNormalizeHandler() = default;
     ~EventNormalizeHandler() = default;
     void HandleEvent(libinput_event* event);
+#ifdef OHOS_BUILD_HDF_TEMP
+    void HandleEvent(const input_event &event);
+#endif // OHOS_BUILD_HDF_TEMP
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-#ifdef OHOS_BUILD_HDF
-    void HandleEvent(MmiHdfEvent* event);
-#endif // OHOS_BUILD_HDF
 #ifdef OHOS_BUILD_ENABLE_POINTER
     void HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -58,11 +48,11 @@ public:
 private:
     int32_t OnEventDeviceAdded(libinput_event *event);
     int32_t OnEventDeviceRemoved(libinput_event *event);
-#ifdef OHOS_BUILD_HDF
-    int32_t OnHDFDeviceAdded(MmiHdfEvent* event);
-    int32_t OnHDFDeviceRemoved(MmiHdfEvent* event);
-    int32_t OnHDFEvent(MmiHdfEvent* event);
-#endif // OHOS_BUILD_HDF
+#ifdef OHOS_BUILD_HDF_TEMP
+    int32_t OnHDFDeviceAdded(int32_t devIndex);
+    int32_t OnHDFDeviceRemoved(int32_t devIndex);
+    int32_t OnHDFEvent(int32_t devIndex, const input_event &event);
+#endif // OHOS_BUILD_HDF_TEMP
     int32_t HandleKeyboardEvent(libinput_event* event);
     void Repeat(const std::shared_ptr<KeyEvent> keyEvent);
     int32_t HandleTouchPadEvent(libinput_event* event);

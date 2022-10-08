@@ -116,11 +116,17 @@ void DeviceCollector::NotifyDeviceAdded(const std::shared_ptr<IInputDevice>& dev
         return;
     }
 
-    std::shared_ptr<ITouchScreenHandler> result = ITouchScreenHandler::CreateInstance(context_);
-    if (!result) {
-        // LOG_E("Leave seatId:$s seatName:$s createIfNotExist:$s, Create Failed", seatId, seatName, createIfNotExist);
+    if (!device->HasCapability(IInputDevice::CAPABILITY_TOUCHSCREEN)) {
+        MMI_HILOGE("Leave, invalid device");
         return;
     }
+
+    std::shared_ptr<ITouchScreenHandler> result = ITouchScreenHandler::CreateInstance(context_);
+    if (!result) {
+        MMI_HILOGE("Leave , Create Failed");
+        return;
+    }
+
     auto handler = KernelEventHandlerBridge::CreateInstance(result);
     if (!handler) {
         MMI_HILOGE("Leave, null bridge handler");

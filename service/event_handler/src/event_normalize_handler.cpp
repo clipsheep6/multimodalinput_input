@@ -15,6 +15,11 @@
 
 #include "event_normalize_handler.h"
 
+#ifdef OHOS_BUILD_HDF_TEMP
+#include <linux/input.h>
+#include <memory>
+#endif // OHOS_BUILD_HDF_TEMP
+
 #include "dfx_hisysevent.h"
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
@@ -33,12 +38,21 @@
 #include "time_cost_chk.h"
 #include "timer_manager.h"
 #include "touch_event_normalize.h"
+#ifdef OHOS_BUILD_HDF_TEMP
 #include "device_collector.h"
+#include "device.h"
+#endif // OHOS_BUILD_HDF_TEMP
 
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventNormalizeHandler" };
+#ifdef OHOS_BUILD_HDF_TEMP
+inline uint64_t GetTime(const struct input_event &event)
+{
+    return event.input_event_sec * 1000000 + event.input_event_usec;
+}
+#endif // OHOS_BUILD_HDF_TEMP
 }
 
 void EventNormalizeHandler::HandleEvent(libinput_event* event)
@@ -112,78 +126,69 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event)
     DfxHisysevent::ReportDispTimes();
 }
 
-#ifdef OHOS_BUILD_HDF
-void EventNormalizeHandler::HandleEvent(MmiHdfEvent* event)
+#ifdef OHOS_BUILD_HDF_TEMP
+void EventNormalizeHandler::HandleEvent(const input_event &event)
 {
-    CALL_DEBUG_ENTER;
-    CHKPV(event);
-    switch (event.type) {
-        case MmiHdfEventType::DEVICE_ADDED: {
-            OnHDFDeviceAdded(event);
-            // OnEventDeviceRemoved(event);
-            break;
-        }
-        case MmiHdfEventType::DEVICE_REMOVED: {
-            OnHDFDeviceRemoved(event);
-            // OnEventDeviceRemoved(event);
-            break;
-        }
-        case MmiHdfEventType::TOUCH_DOWN:
-        case MmiHdfEventType::TOUCH_UP:
-        case MmiHdfEventType::TOUCH_MOTION: {
-            OnHDFEvent(event);
-            DfxHisysevent::CalcPointerDispTimes();
-            break;
-        }
-        default: {
-            MMI_HILOGW("This device does not support, type: %{public}d", type);
-            break;
+    MMI_HILOGI("hdfEvent: type:%{public}d, code:%{public}d, value:%{public}d, time:%{public}lld",
+        event.type, event.code, event.value, GetTime(event));
+    int32_t devStatus = ((event.type | 0xff0000) >> 16);
+    if ((devStatus == 1) || (devStatus == 2)) {
+        int32_t devIndex = ((event.type | 0xff00) >> 8);
+        // int32_t devType = (event.type | 0xff);
+        if (devStatus == 1) {
+            OnHDFDeviceAdded(devIndex);
+            return;
+        } else {
+            OnHDFDeviceRemoved(devIndex);
+            return;
         }
     }
+    if (devStatus != 0) {
+        MMI_HILOGW("Invalid status:%{public}d", devStatus);
+        return;
+    }
+    int32_t devIndex = ((event.type | 0xff00) >> 8);
+    // int32_t evType = (event.type | 0xff);
+    OnHDFEvent(devIndex, event);
 }
-#endif // OHOS_BUILD_HDF
 
-#ifdef OHOS_BUILD_HDF
-int32_t EventNormalizeHandler::OnHDFDeviceAdded(MmiHdfEvent* event)
+int32_t EventNormalizeHandler::OnHDFDeviceAdded(int32_t devIndex)
 {
-    CHKPR(event, ERROR_NULL_POINTER);
     auto context = InputHandler->GetContext();
     CHKPR(context, ERROR_NULL_POINTER);
-    auto inputDevice = std::shared_ptr<Device>(new Device(event->value, context));
-    auto retCode = inputDevice->Init();
-    if (retCode != 0) {
-        return ERROR_NULL_POINTER;
-    }
-    const auto& inputDeviceManager = context->GetInputDeviceManager();
-    CHKPR(inputDeviceManager, ERROR_NULL_POINTER);
-    inputDeviceManager->AddDevice(device);
+    auto inputDevice = std::make_shared<Device>(devIndex, context);
+    CHKPR(inputDevice, ERROR_NULL_POINTER);
+    const auto& deviceCollector = context->GetInputDeviceCollector();
+    CHKPR(deviceCollector, ERROR_NULL_POINTER);
+    deviceCollector->AddDevice(inputDevice);
+    InputDevMgr->OnInputDeviceAdded(inputDevice);
     return RET_OK;
 }
 
-int32_t EventNormalizeHandler::OnHDFDeviceRemoved(MmiHdfEvent* event)
+int32_t EventNormalizeHandler::OnHDFDeviceRemoved(int32_t devIndex)
 {
-    CHKPR(event, ERROR_NULL_POINTER);
     auto context = InputHandler->GetContext();
     CHKPR(context, ERROR_NULL_POINTER);
-    const auto& inputDeviceManager = context->GetInputDeviceManager();
-    CHKPR(inputDeviceManager, ERROR_NULL_POINTER);
-    inputDeviceManager->RemoveDevice(1);
+    const auto& deviceCollector = context->GetInputDeviceCollector();
+    CHKPR(deviceCollector, ERROR_NULL_POINTER);
+    auto inputDevice = deviceCollector->GetDevice(devIndex);
+    InputDevMgr->OnInputDeviceRemoved(inputDevice);
+    deviceCollector->RemoveDevice(devIndex);
     return RET_OK;
 }
 
-int32_t EventNormalizeHandler::OnHDFEvent(MmiHdfEvent* event)
+int32_t EventNormalizeHandler::OnHDFEvent(int32_t devIndex, const input_event &event)
 {
-    CHKPR(event, ERROR_NULL_POINTER);
     auto context = InputHandler->GetContext();
     CHKPR(context, ERROR_NULL_POINTER); 
-    const auto& inputDeviceManager = context->GetInputDeviceManager();
-    CHKPR(inputDeviceManager, ERROR_NULL_POINTER);
-    const auto& device = inputDeviceManager->GetDevice(event->value);
+    const auto& deviceCollector = context->GetInputDeviceCollector();
+    CHKPR(deviceCollector, ERROR_NULL_POINTER);
+    const auto& device = deviceCollector->GetDevice(event.value);
     CHKPR(device, ERROR_NULL_POINTER);
-    device->ProcessEventItem();
+    device->ProcessEventItem(&event);
     return RET_OK;
 }
-#endif // OHOS_BUILD_HDF
+#endif // OHOS_BUILD_HDF_TEMP
 
 int32_t EventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
 {
