@@ -145,7 +145,9 @@ int32_t EventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
     InputDevMgr->OnInputDeviceAdded(device);
     KeyMapMgr->ParseDeviceConfigFile(device);
     KeyRepeat->AddDeviceConfig(device);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     KeyEventHdr->ResetKeyEvent(device);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
 }
 
@@ -160,6 +162,7 @@ int32_t EventNormalizeHandler::OnEventDeviceRemoved(libinput_event *event)
     return RET_OK;
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void EventNormalizeHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     if (nextHandler_ == nullptr) {
@@ -167,7 +170,6 @@ void EventNormalizeHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEv
         return;
     }
     DfxHisysevent::GetDispStartTime();
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPV(keyEvent);
     EventLogHelper::PrintEventData(keyEvent);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
@@ -179,9 +181,10 @@ void EventNormalizeHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEv
     nextHandler_->HandleKeyEvent(keyEvent);
     DfxHisysevent::CalcKeyDispTimes();
     DfxHisysevent::ReportDispTimes();
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
 void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (nextHandler_ == nullptr) {
@@ -189,7 +192,6 @@ void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEven
         return;
     }
     DfxHisysevent::GetDispStartTime();
-#ifdef OHOS_BUILD_ENABLE_POINTER
     CHKPV(pointerEvent);
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_END) {
         MMI_HILOGI("MouseEvent Normalization Results, PointerAction:%{public}d,PointerId:%{public}d,"
@@ -214,9 +216,10 @@ void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEven
     nextHandler_->HandlePointerEvent(pointerEvent);
     DfxHisysevent::CalcPointerDispTimes();
     DfxHisysevent::ReportDispTimes();
-#endif // OHOS_BUILD_ENABLE_POINTER
 }
+#endif // OHOS_BUILD_ENABLE_POINTER
 
+#ifdef OHOS_BUILD_ENABLE_TOUCH
 void EventNormalizeHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (nextHandler_ == nullptr) {
@@ -224,14 +227,13 @@ void EventNormalizeHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent>
         return;
     }
     DfxHisysevent::GetDispStartTime();
-#ifdef OHOS_BUILD_ENABLE_TOUCH
     CHKPV(pointerEvent);
     WinMgr->UpdateTargetPointer(pointerEvent);
     nextHandler_->HandleTouchEvent(pointerEvent);
     DfxHisysevent::CalcPointerDispTimes();
     DfxHisysevent::ReportDispTimes();
-#endif // OHOS_BUILD_ENABLE_TOUCH
 }
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
 int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
 {
@@ -285,6 +287,10 @@ bool EventNormalizeHandler::CheckKeyboardWhiteList(std::shared_ptr<KeyEvent> key
     int32_t keyCode = keyEvent->GetKeyCode();
     if(keyCode == KeyEvent::KEYCODE_BACK || keyCode == KeyEvent::KEYCODE_VOLUME_UP
         || keyCode == KeyEvent::KEYCODE_VOLUME_DOWN || keyCode == KeyEvent::KEYCODE_POWER) {
+        int32_t deviceId = keyEvent->GetDeviceId();
+        if (InputDevMgr->IsRemote(deviceId)) {
+           return false; 
+        }
         return true;
     }
     CooperateState state = InputDevCooSM->GetCurrentCooperateState();
@@ -316,15 +322,16 @@ bool EventNormalizeHandler::CheckKeyboardWhiteList(std::shared_ptr<KeyEvent> key
 bool EventNormalizeHandler::IsNeedFilterOut(const std::string& deviceId, const std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
-    std::vector<OHOS::MMI::KeyEvent::KeyItem> KeyItems = keyEvent->GetKeyItems();
-    std::vector<int32_t> KeyItemsForDInput;
-    KeyItemsForDInput.reserve(KeyItems.size());
-    for (const auto& item : KeyItems) {
-        KeyItemsForDInput.push_back(item.GetKeyCode());
-    }
     OHOS::DistributedHardware::DistributedInput::BusinessEvent businessEvent;
     businessEvent.keyCode = keyEvent->GetKeyCode();
     businessEvent.keyAction = keyEvent->GetKeyAction();
+    std::vector<OHOS::MMI::KeyEvent::KeyItem> KeyItems = keyEvent->GetKeyItems();
+    std::vector<int32_t> KeyItemsForDInput;
+    for (const auto& item : KeyItems) {
+        if (item.GetKeyCode() != businessEvent.keyCode) {
+            KeyItemsForDInput.push_back(item.GetKeyCode());
+        }
+    }
     businessEvent.pressedKeys = KeyItemsForDInput;
     MMI_HILOGI("businessEvent.keyCode :%{public}d, keyAction :%{public}d",
         businessEvent.keyCode, businessEvent.keyAction);
@@ -342,16 +349,20 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
         return ERROR_UNSUPPORT;
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     const auto &keyEvent = KeyEventHdr->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     MouseEventHdr->Normalize(event);
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
     for (const int32_t& keyCode : pressedKeys) {
         MMI_HILOGI("Pressed keyCode:%{public}d", keyCode);
     }
     pointerEvent->SetPressedKeys(pressedKeys);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandlePointerEvent(pointerEvent);
 #else
@@ -488,12 +499,14 @@ int32_t EventNormalizeHandler::AddHandleTimer(int32_t timeout)
 {
     CALL_DEBUG_ENTER;
     timerId_ = TimerMgr->AddTimer(timeout, 1, [this]() {
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
         auto keyEvent = KeyEventHdr->GetKeyEvent();
         CHKPV(keyEvent);
         CHKPV(nextHandler_);
         nextHandler_->HandleKeyEvent(keyEvent);
         int32_t triggerTime = KeyRepeat->GetIntervalTime(keyEvent->GetDeviceId());
         this->AddHandleTimer(triggerTime);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     });
     return timerId_;
 }
