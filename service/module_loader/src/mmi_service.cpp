@@ -272,7 +272,7 @@ int32_t MMIService::Init()
         return SASERVICE_INIT_FAIL;
     }
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    InputDevCooSM->Init();
+    InputDevCooSM->Init(std::bind(&DelegateTasks::PostSyncTask, &delegateTasks_, std::placeholders::_1));
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     MMI_HILOGD("Input msg handler init");
     InputHandler->Init(*this);

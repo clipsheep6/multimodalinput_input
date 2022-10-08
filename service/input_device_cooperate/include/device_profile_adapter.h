@@ -36,22 +36,24 @@ class DeviceProfileAdapter final {
         void OnProfileChanged(const DeviceProfile::ProfileChangeNotification &changeNotification) override;
     };
 public:
+    using DelegateTasksCallback = std::function<int32_t(std::function<int32_t()>)>;
     using ProfileEventCallback = std::shared_ptr<DeviceProfile::IProfileEventCallback>;
     using DPCallback = std::function<void(const std::string &, bool)>;
     DISALLOW_COPY_AND_MOVE(DeviceProfileAdapter);
 
+    void Init(DelegateTasksCallback delegateTasksCallback);
     int32_t UpdateCrossingSwitchState(bool state);
     int32_t UpdateCrossingSwitchState(bool state, const std::vector<std::string> &deviceIds);
     bool GetCrossingSwitchState(const std::string &deviceId);
     int32_t RegisterCrossingStateListener(const std::string &deviceId, DPCallback callback);
     int32_t UnregisterCrossingStateListener(const std::string &deviceId);
-
 private:
     int32_t RegisterProfileListener(const std::string &deviceId);
-    void OnProfileChanged(const std::string &deviceId);
+    void ProfileChanged(const std::string &deviceId);
+    int32_t OnProfileChanged(const std::string &deviceId);
     std::map<std::string, DeviceProfileAdapter::ProfileEventCallback> profileEventCallbacks_;
-    std::mutex adapterLock_;
     std::map<std::string, DeviceProfileAdapter::DPCallback> callbacks_;
+    DelegateTasksCallback delegateTasksCallback_ { nullptr };
 };
 
 #define DProfileAdapter ::OHOS::DelayedSingleton<DeviceProfileAdapter>::GetInstance()

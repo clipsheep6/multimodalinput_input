@@ -49,6 +49,7 @@ enum class CooperateMsg {
 };
 
 class InputDeviceCooperateSM final {
+    using DelegateTasksCallback = std::function<int32_t(std::function<int32_t()>)>;
     DECLARE_DELAYED_SINGLETON(InputDeviceCooperateSM);
     class DeviceInitCallBack : public DistributedHardware::DmInitCallback {
         void OnRemoteDied() override;
@@ -62,16 +63,16 @@ class InputDeviceCooperateSM final {
     };
 public:
     DISALLOW_COPY_AND_MOVE(InputDeviceCooperateSM);
-    void Init();
+    void Init(DelegateTasksCallback delegateTasksCallback);
     void EnableInputDeviceCooperate(bool enabled);
     int32_t StartInputDeviceCooperate(const std::string &remoteNetworkId, int32_t startInputDeviceId);
     int32_t StopInputDeviceCooperate();
     void GetCooperateState(const std::string &deviceId);
-    void StartRemoteCooperate(const std::string &remoteNetworkId);
-    void StartRemoteCooperateResult(bool isSuccess, const std::string &startDhid, int32_t xPercent, int32_t yPercent);
-    void StopRemoteCooperate();
-    void StopRemoteCooperateResult(bool isSuccess);
-    void StartCooperateOtherResult(const std::string &srcNetworkId);
+    int32_t StartRemoteCooperate(const std::string &remoteNetworkId);
+    int32_t StartRemoteCooperateResult(bool isSuccess, const std::string &startDhid, int32_t xPercent, int32_t yPercent);
+    int32_t StopRemoteCooperate();
+    int32_t StopRemoteCooperateResult(bool isSuccess);
+    int32_t StartCooperateOtherResult(const std::string &srcNetworkId);
     void HandleEvent(struct libinput_event *event);
     void UpdateState(CooperateState state);
     void UpdatePreparedDevices(const std::string &srcNetworkId, const std::string &sinkNetworkId);
@@ -82,10 +83,8 @@ public:
     void OnPointerOffline(const std::string &dhid, const std::string &sinkNetworkId,
         const std::vector<std::string> &keyboards);
     bool InitDeviceManager();
-    void OnDeviceOnline(const std::string &networkId);
-    void OnDeviceOffline(const std::string &networkId);
-    void OnStartFinish(bool isSuccess, const std::string &remoteNetworkId, int32_t startInputDeviceId);
-    void OnStopFinish(bool isSuccess, const std::string &remoteNetworkId);
+    int32_t OnStartFinish(bool isSuccess, const std::string &remoteNetworkId, int32_t startInputDeviceId);
+    int32_t OnStopFinish(bool isSuccess, const std::string &remoteNetworkId);
     bool IsStarting() const;
     bool IsStopping() const;
     void Dump(int32_t fd, const std::vector<std::string> &args);
@@ -93,12 +92,15 @@ public:
 private:
     void Reset(bool adjustAbsolutionLocation = false);
     void CheckPointerEvent(struct libinput_event *event);
-    bool CheckTouchEvent(struct libinput_event* event);
     void OnCloseCooperation(const std::string &networkId, bool isLocal);
     void NotifyRemoteStartFail(const std::string &remoteNetworkId);
     void NotifyRemoteStartSucess(const std::string &remoteNetworkId, const std::string &startDhid);
     void NotifyRemoteStopFinish(bool isSuccess, const std::string &remoteNetworkId);
     bool UpdateMouseLocation();
+    void DeviceOnline(const std::string &networkId);
+    void DeviceOffline(const std::string &networkId);
+    int32_t OnDeviceOnline(const std::string &networkId);
+    int32_t OnDeviceOffline(const std::string &networkId);
     std::shared_ptr<IInputDeviceCooperateState> currentStateSM_ { nullptr };
     std::pair<std::string, std::string> preparedNetworkId_;
     std::string startDhid_ ;
@@ -107,10 +109,10 @@ private:
     std::shared_ptr<DistributedHardware::DmInitCallback> initCallback_ { nullptr };
     std::shared_ptr<DistributedHardware::DeviceStateCallback> stateCallback_ { nullptr };
     std::vector<std::string> onlineDevice_;
-    mutable std::mutex mutex_;
     std::atomic<bool> isStarting_ { false };
     std::atomic<bool> isStopping_ { false };
     std::pair<int32_t, int32_t> mouseLocation_ { std::make_pair(0, 0) };
+    DelegateTasksCallback delegateTasksCallback_ { nullptr };
 };
 
 #define InputDevCooSM ::OHOS::DelayedSingleton<InputDeviceCooperateSM>::GetInstance()

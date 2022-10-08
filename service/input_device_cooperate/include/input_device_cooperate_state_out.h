@@ -28,7 +28,7 @@ public:
 
 private:
     void OnStopRemoteInput(bool isSuccess, const std::string &srcNetworkId);
-    void ProcessStop(const std::string &srcNetworkId);
+    int32_t ProcessStop(const std::string &srcNetworkId);
     std::string startDhid_;
 };
 } // namespace MMI

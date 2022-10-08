@@ -22,8 +22,6 @@
 
 #include "distributed_device_profile_client.h"
 #include "service_characteristic_profile.h"
-#include "softbus_bus_center.h"
-#include "softbus_common.h"
 #include "sync_options.h"
 
 namespace OHOS {
@@ -40,9 +38,13 @@ DeviceProfileAdapter::DeviceProfileAdapter() {}
 
 DeviceProfileAdapter::~DeviceProfileAdapter()
 {
-    std::lock_guard<std::mutex> guard(adapterLock_);
     profileEventCallbacks_.clear();
     callbacks_.clear();
+}
+
+void DeviceProfileAdapter::Init(DelegateTasksCallback delegateTasksCallback)
+{
+    delegateTasksCallback_ = delegateTasksCallback;
 }
 
 int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::vector<std::string> &deviceIds)
@@ -56,7 +58,7 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::v
 
     int32_t ret = DistributedDeviceProfileClient::GetInstance().PutDeviceProfile(profile);
     if (ret != 0) {
-        MMI_HILOGE("Put device profile failed");
+        MMI_HILOGE("Put device profile failed, ret:%{public}d", ret);
         return ret;
     }
     SyncOptions syncOptions;
@@ -102,7 +104,6 @@ int32_t DeviceProfileAdapter::RegisterCrossingStateListener(const std::string &d
         MMI_HILOGE("DeviceId is nullptr");
         return RET_ERR;
     }
-    std::lock_guard<std::mutex> guard(adapterLock_);
     auto callbackIter = callbacks_.find(deviceId);
     if (callbackIter != callbacks_.end()) {
         callbackIter->second = callback;
@@ -124,7 +125,6 @@ int32_t DeviceProfileAdapter::UnregisterCrossingStateListener(const std::string 
         MMI_HILOGE("DeviceId is empty");
         return RET_ERR;
     }
-    std::lock_guard<std::mutex> guard(adapterLock_);
     auto it = profileEventCallbacks_.find(deviceId);
     if (it != profileEventCallbacks_.end()) {
         std::list<ProfileEvent> profileEvents;
@@ -167,13 +167,18 @@ int32_t DeviceProfileAdapter::RegisterProfileListener(const std::string &deviceI
         subscribeInfos, profileEventCallbacks_[deviceId], failedEvents);
 }
 
-void DeviceProfileAdapter::OnProfileChanged(const std::string &deviceId)
+void DeviceProfileAdapter::ProfileChanged(const std::string &deviceId)
 {
-    std::lock_guard<std::mutex> guard(adapterLock_);
+    CHKPV(delegateTasksCallback_);
+    delegateTasksCallback_(std::bind(&DeviceProfileAdapter::OnProfileChanged, this, deviceId));
+}
+
+int32_t DeviceProfileAdapter::OnProfileChanged(const std::string &deviceId)
+{
     auto it = callbacks_.find(deviceId);
     if (it == callbacks_.end()) {
         MMI_HILOGW("The device has no callback");
-        return;
+        return RET_ERR;
     }
     if (it->second != nullptr) {
         auto state = GetCrossingSwitchState(deviceId);
@@ -181,6 +186,7 @@ void DeviceProfileAdapter::OnProfileChanged(const std::string &deviceId)
     } else {
         callbacks_.erase(it);
     }
+    return RET_OK;
 }
 
 void DeviceProfileAdapter::ProfileEventCallbackImpl::OnProfileChanged(
@@ -188,7 +194,7 @@ void DeviceProfileAdapter::ProfileEventCallbackImpl::OnProfileChanged(
 {
     CALL_INFO_TRACE;
     std::string deviceId = changeNotification.GetDeviceId();
-    DProfileAdapter->OnProfileChanged(deviceId);
+    DProfileAdapter->ProfileChanged(deviceId);
 }
 
 void DeviceProfileAdapter::ProfileEventCallbackImpl::OnSyncCompleted(const DeviceProfile::SyncResult &syncResults)
