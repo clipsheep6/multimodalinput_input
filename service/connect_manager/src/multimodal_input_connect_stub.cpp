@@ -656,8 +656,10 @@ int32_t MultimodalInputConnectStub::StubStopDeviceCooperate(MessageParcel& data,
         return MMISERVICE_NOT_RUNNING;
     }
     int32_t userData;
+    int32_t stopDeviceId;
     READINT32(data, userData, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = StopDeviceCooperate(userData);
+    READINT32(data, stopDeviceId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = StopDeviceCooperate(userData, stopDeviceId);
     if (ret != RET_OK) {
         MMI_HILOGE("Call RegisterCooperateEvent failed ret:%{public}d", ret);
     }

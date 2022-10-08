@@ -104,7 +104,7 @@ public:
     virtual int32_t EnableInputDeviceCooperate(int32_t userData, bool enabled) = 0;
     virtual int32_t StartInputDeviceCooperate(int32_t userData, const std::string &sinkDeviceId,
         int32_t srcInputDeviceId) = 0;
-    virtual int32_t StopDeviceCooperate(int32_t userData) = 0;
+    virtual int32_t StopDeviceCooperate(int32_t userData, int32_t stopInputDeviceId) = 0;
     virtual int32_t GetInputDeviceCooperateState(int32_t userData, const std::string &deviceId) = 0;
     virtual int32_t SetInputDevice(const std::string& dhid, const std::string& screenId) = 0;
     virtual int32_t StartRemoteCooperate(const std::string& localDeviceId) = 0;

@@ -25,7 +25,7 @@
 
 #include "dfx_hisysevent.h"
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-#include "input_device_cooperate_sm.h"
+#include "input_device_cooperate_manager.h"
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "input_windows_manager.h"
 #include "key_event_value_transformation.h"
@@ -301,7 +301,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     ++nextId_;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     if (IsKeyboardDevice(inputDevice)) {
-        InputDevCooSM->OnKeyboardOnline(info.dhid_);
+        InputDevCooManager->OnKeyboardOnline(info.dhid_);
     }
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     if (IsPointerDevice(inputDevice)) {
@@ -360,7 +360,7 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
     ScanPointerDevice();
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     if (IsPointerDevice(inputDevice)) {
-        InputDevCooSM->OnPointerOffline(removedInfo.dhid_, removedInfo.networkIdOrigin_, dhids);
+        InputDevCooManager->OnPointerOffline(removedInfo.dhid_, removedInfo.networkIdOrigin_, dhids);
     }
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     if (deviceId == INVALID_DEVICE_ID) {
@@ -499,14 +499,24 @@ void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::strin
 }
 
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
+bool InputDeviceManager::IsPointerDevice(int32_t deviceId) const
+{
+    auto it = inputDevice_.find(deviceId);
+    if (it == inputDevice_.end()) {
+        return false;
+    }
+    return IsPointerDevice(it->second.inputDeviceOrigin_);
+}
+
 std::vector<std::string> InputDeviceManager::GetCooperateDhids(int32_t deviceId)
 {
     std::vector<std::string> dhids;
     auto iter = inputDevice_.find(deviceId);
     if (iter == inputDevice_.end()) {
-        MMI_HILOGI("Find pointer id failed");
+        MMI_HILOGI("Find input device id failed");
         return dhids;
     }
+    dhids.emplace_back(iter->second.dhid_);
     if (!IsPointerDevice(iter->second.inputDeviceOrigin_)) {
         MMI_HILOGI("Not pointer device");
         return dhids;
@@ -563,12 +573,9 @@ std::string InputDeviceManager::GetOriginNetworkId(const std::string &dhid)
     }
     std::string networkId;
     for (const auto &iter : inputDevice_) {
-        if (iter.second.dhid_ == dhid) {
+        if (iter.second.isRemote_ && iter.second.dhid_ == dhid) {
             networkId = iter.second.networkIdOrigin_;
-            if (networkId.empty()) {
-                GetLocalDeviceId(networkId);
-                break;
-            }
+            break;
         }
     }
     return networkId;

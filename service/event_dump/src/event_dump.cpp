@@ -28,7 +28,7 @@
 #include "event_interceptor_handler.h"
 #include "event_monitor_handler.h"
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-#include "input_device_cooperate_sm.h"
+#include "input_device_cooperate_manager.h"
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_manager.h"
 #include "input_event_handler.h"
@@ -148,7 +148,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
             }
             case 'c': {
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-                InputDevCooSM->Dump(fd, args);
+                InputDevCooManager->Dump(fd, args);
 #else
                 mprintf(fd, "Input device cooperate does not support");
 #endif // OHOS_BUILD_ENABLE_COOPERATE

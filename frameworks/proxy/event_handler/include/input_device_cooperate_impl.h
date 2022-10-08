@@ -53,7 +53,7 @@ public:
     int32_t EnableInputDeviceCooperate(bool enabled, FuncCooperationMessage callback);
     int32_t StartInputDeviceCooperate(const std::string &sinkDeviceId, int32_t srcInputDeviceId,
         FuncCooperationMessage callback);
-    int32_t StopDeviceCooperate(FuncCooperationMessage callback);
+    int32_t StopDeviceCooperate(int32_t stopInputDeviceId, FuncCooperationMessage callback);
     int32_t GetInputDeviceCooperateState(const std::string &deviceId, FuncCooperateionState callback);
     void OnDevCooperateListener(const std::string deviceId, CooperationMessage msg);
     void OnCooprationMessage(int32_t userData, const std::string deviceId, CooperationMessage msg);

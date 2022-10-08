@@ -111,7 +111,7 @@ int32_t InputDeviceCooperateImpl::StartInputDeviceCooperate(const std::string &s
     return MultimodalInputConnMgr->StartInputDeviceCooperate(userData_++, sinkDeviceId, srcInputDeviceId);
 }
 
-int32_t InputDeviceCooperateImpl::StopDeviceCooperate(FuncCooperationMessage callback)
+int32_t InputDeviceCooperateImpl::StopDeviceCooperate(int32_t stopInputDeviceId, FuncCooperationMessage callback)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -124,7 +124,7 @@ int32_t InputDeviceCooperateImpl::StopDeviceCooperate(FuncCooperationMessage cal
         return RET_ERR;
     }
     devCooperateEvent_[userData_] = event;
-    return MultimodalInputConnMgr->StopDeviceCooperate(userData_++);
+    return MultimodalInputConnMgr->StopDeviceCooperate(userData_++, stopInputDeviceId);
 }
 
 int32_t InputDeviceCooperateImpl::GetInputDeviceCooperateState(

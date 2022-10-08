@@ -17,7 +17,7 @@
 
 #include "cooperation_message.h"
 #include "distributed_input_adapter.h"
-#include "input_device_cooperate_sm.h"
+#include "input_device_cooperate_manager.h"
 #include "input_device_manager.h"
 #include "mouse_event_normalize.h"
 #include "multimodal_input_connect_remoter.h"
@@ -92,7 +92,7 @@ int32_t InputDeviceCooperateStateIn::ProcessStop()
     int32_t ret = DistributedAdapter->StopRemoteInput(
         sink, dhids, [this, sink](bool isSuccess) { this->OnStopRemoteInput(isSuccess, sink, -1); });
     if (ret != RET_OK) {
-        InputDevCooSM->OnStopFinish(false, sink);
+        InputDevCooManager->OnStopFinish(false, sink);
     }
     return RET_OK;
 }
@@ -123,7 +123,7 @@ void InputDeviceCooperateStateIn::StopRemoteInput(const std::string &sinkNetwork
             this->OnStopRemoteInput(isSuccess, srcNetworkId, startInputDeviceId);
     });
     if (ret != RET_OK) {
-        InputDevCooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
+        InputDevCooManager->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
     }
 }
 
@@ -131,16 +131,16 @@ void InputDeviceCooperateStateIn::OnStopRemoteInput(bool isSuccess,
     const std::string &remoteNetworkId, int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
-    if (InputDevCooSM->IsStarting()) {
+    if (InputDevCooManager->IsStarting()) {
         std::string taskName = "start_finish_task";
         std::function<void()> handleStartFinishFunc = std::bind(&InputDeviceCooperateSM::OnStartFinish,
-            InputDevCooSM, isSuccess, remoteNetworkId, startInputDeviceId);
+            InputDevCooManager, isSuccess, remoteNetworkId, startInputDeviceId);
         CHKPV(eventHandler_);
         eventHandler_->PostTask(handleStartFinishFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
-    } else if (InputDevCooSM->IsStopping()) {
+    } else if (InputDevCooManager->IsStopping()) {
         std::string taskName = "stop_finish_task";
         std::function<void()> handleStopFinishFunc =
-            std::bind(&InputDeviceCooperateSM::OnStopFinish, InputDevCooSM, isSuccess, remoteNetworkId);
+            std::bind(&InputDeviceCooperateSM::OnStopFinish, InputDevCooManager, isSuccess, remoteNetworkId);
         CHKPV(eventHandler_);
         eventHandler_->PostTask(handleStopFinishFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
     }
@@ -155,7 +155,7 @@ void InputDeviceCooperateStateIn::ComeBack(const std::string &sinkNetworkId, int
             this->OnStopRemoteInput(isSuccess, sinkNetworkId, startInputDeviceId);
             });
     if (ret != RET_OK) {
-        InputDevCooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
+        InputDevCooManager->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
     }
 }
 

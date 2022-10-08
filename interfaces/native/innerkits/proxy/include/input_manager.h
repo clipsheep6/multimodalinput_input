@@ -384,7 +384,7 @@ public:
     int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
 
     /**
-     * @brief 注册键鼠穿越管理事件监听。
+     * @brief 注册穿越管理事件监听。
      * @param listener 穿越管理事件监听回调。
      * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 9
@@ -392,7 +392,7 @@ public:
     int32_t RegisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener);
 
     /**
-     * @brief 注销键鼠穿越管理事件监听。
+     * @brief 注销穿越管理事件监听。
      * @param listener 事件监听回调.
      * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 9
@@ -400,19 +400,19 @@ public:
     int32_t UnregisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener = nullptr);
 
     /**
-     * @brief 开启/关闭键鼠穿越管理接口。
+     * @brief 开启/关闭穿越管理接口。
      * @param enabled 开启/关闭。
-     * @param callback 开启/关闭键鼠穿越，此回调被调用
+     * @param callback 开启/关闭穿越，此回调被调用
      * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 9
      */
     int32_t EnableInputDeviceCooperate(bool enabled, std::function<void(std::string, CooperationMessage)> callback);
 
     /**
-     * @brief 启动跨设备键鼠穿越。
-     * @param sinkDeviceId 键鼠穿越目标设备描述符（networkID）
-     * @param srcInputDeviceId 键鼠穿越待穿越输入外设标识符（设备ID句柄）
-     * @param callback 启动跨设备键鼠穿越，此回调被调用
+     * @brief 启动跨设备穿越。
+     * @param sinkDeviceId 穿越目标设备描述符（networkID）
+     * @param srcInputDeviceId 穿越待穿越输入外设标识符（设备ID句柄）
+     * @param callback 启动跨设备穿越，此回调被调用
      * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 9
      */
@@ -420,15 +420,16 @@ public:
         std::function<void(std::string, CooperationMessage)> callback);
 
     /**
-     * @brief 停止跨设备键鼠穿越。
-     * @param callback 停止跨设备键鼠穿越，此回调被调用
+     * @brief 停止跨设备穿越。
+     * @param stopInputDeviceId 穿越带停止外设标识符（设备ID句柄）
+     * @param callback 停止跨设备穿越，此回调被调用
      * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 9
      */
-    int32_t StopDeviceCooperate(std::function<void(std::string, CooperationMessage)> callback);
-
+    int32_t StopDeviceCooperate(int32_t stopInputDeviceId,
+        std::function<void(std::string, CooperationMessage)> callback);
     /**
-     * @brief 获取指定设备键鼠穿越状态。
+     * @brief 获取指定设备穿越状态。
      * @param deviceId 指定设备描述符。
      * @param callback 获取穿越管理设备状态，此回调被调用
      * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。

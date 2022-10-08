@@ -234,10 +234,10 @@ int32_t MultimodalInputConnectManager::StartInputDeviceCooperate(int32_t userDat
     return multimodalInputConnectService_->StartInputDeviceCooperate(userData, sinkDeviceId, srcInputDeviceId);
 }
 
-int32_t MultimodalInputConnectManager::StopDeviceCooperate(int32_t userData)
+int32_t MultimodalInputConnectManager::StopDeviceCooperate(int32_t userData, int32_t stopInputDeviceId)
 {
     CHKPR(multimodalInputConnectService_, RET_ERR);
-    return multimodalInputConnectService_->StopDeviceCooperate(userData);
+    return multimodalInputConnectService_->StopDeviceCooperate(userData, stopInputDeviceId);
 }
 
 int32_t MultimodalInputConnectManager::GetInputDeviceCooperateState(int32_t userData, const std::string &deviceId)

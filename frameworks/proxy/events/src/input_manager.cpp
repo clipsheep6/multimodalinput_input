@@ -247,9 +247,10 @@ int32_t InputManager::StartInputDeviceCooperate(const std::string &sinkDeviceId,
     return InputMgrImpl.StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId, callback);
 }
 
-int32_t InputManager::StopDeviceCooperate(std::function<void(std::string, CooperationMessage)> callback)
+int32_t InputManager::StopDeviceCooperate(int32_t stopInputDeviceId,
+    std::function<void(std::string, CooperationMessage)> callback)
 {
-    return InputMgrImpl.StopDeviceCooperate(callback);
+    return InputMgrImpl.StopDeviceCooperate(stopInputDeviceId, callback);
 }
 
 int32_t InputManager::GetInputDeviceCooperateState(const std::string &deviceId, std::function<void(bool)> callback)
