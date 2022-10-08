@@ -752,19 +752,22 @@ if (input_feature_input_cooperation) {
   ohos_unittest("input_device_cooperate_test") {
     module_out_path = "multimodalinput/unit_out"
     sources = [
-      "input_device_cooperate/src/cooperate_event_handler.cpp",
       "input_device_cooperate/src/cooperate_event_manager.cpp",
+      "input_device_cooperate/src/device_cooperate_softbus_adapter.cpp",
       "input_device_cooperate/src/device_profile_adapter.cpp",
       "input_device_cooperate/src/distributed_input_adapter.cpp",
       "input_device_cooperate/src/i_input_device_cooperate_state.cpp",
+      "input_device_cooperate/src/input_device_cooperate_manager.cpp",
       "input_device_cooperate/src/input_device_cooperate_sm.cpp",
       "input_device_cooperate/src/input_device_cooperate_state_free.cpp",
       "input_device_cooperate/src/input_device_cooperate_state_in.cpp",
       "input_device_cooperate/src/input_device_cooperate_state_out.cpp",
+      "input_device_cooperate/src/input_device_cooperate_util.cpp",
       "input_device_cooperate/test/input_device_cooperate_test.cpp",
       "input_device_cooperate/test/mock/mock_distributed_device_profile_client.cpp",
       "input_device_cooperate/test/mock/mock_distributed_input_kit.cpp",
       "input_device_cooperate/test/mock/softbus_bus_center.cpp",
+      "input_device_cooperate/test/mock/mock_client_trans_session_service.c",
     ]
 
     include_dirs = [
@@ -802,6 +805,14 @@ if (input_feature_input_cooperation) {
       "//foundation/deviceprofile/device_info_manager/interfaces/innerkits/core/include",
       "//foundation/multimodalinput/input/service/key_event_handler/include",
       "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
+      "//foundation/multimodalinput/input/service/interceptor/include",
+      "//foundation/multimodalinput/input/service/monitor/include",
+      "//foundation/multimodalinput/input/service/subscriber/include",
+      "//foundation/multimodalinput/input/service/mouse_event_normalize/include",
+      "//third_party/cJSON",
+      "//foundation/multimodalinput/input/service/key_event_normalize/include",
+      "//foundation/communication/dsoftbus/sdk/transmission/session/include",
+      "//foundation/communication/dsoftbus/core/common/include",
     ]
 
     if (input_feature_libinput || input_feature_hdf) {
@@ -828,6 +839,7 @@ if (input_feature_input_cooperation) {
       "device_manager:devicemanagersdk",
       "drivers_interface_input:hdi_input",
       "hiviewdfx_hilog_native:libhilog",
+      "dsoftbus:softbus_client",
     ]
 
     defines = [ "OHOS_BUILD" ]
