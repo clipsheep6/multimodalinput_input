@@ -193,6 +193,7 @@ HWTEST_F(InputCooperateTest, InputCooperateTest_StartInputDeviceCooperate_002, T
 HWTEST_F(InputCooperateTest, InputCooperateTest_StopDeviceCooperate_001, TestSize.Level1)
 {
     MMI_HILOGD("StopDeviceCooperate");
+    int listen = 1;
     InputDevCooperateImpl.userData_ = 0;
     using CooperationCallback = std::function<void(std::string, CooperationMessage)>;
     CooperationCallback callback;
@@ -201,7 +202,7 @@ HWTEST_F(InputCooperateTest, InputCooperateTest_StopDeviceCooperate_001, TestSiz
     };
     bool state = false;
     MultimodalInputConnectProxy::SetMIState(state);
-    int ret = InputMG->StopDeviceCooperate(callback);
+    int ret = InputMG->StopDeviceCooperate(listen, callback);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -214,6 +215,7 @@ HWTEST_F(InputCooperateTest, InputCooperateTest_StopDeviceCooperate_001, TestSiz
 HWTEST_F(InputCooperateTest, InputCooperateTest_StopDeviceCooperate_002, TestSize.Level1)
 {
     MMI_HILOGD("StopDeviceCooperate");
+    int32_t listen = 1;
     InputDevCooperateImpl.userData_ = 0;
     using CooperationCallback = std::function<void(std::string, CooperationMessage)>;
     CooperationCallback callback;
@@ -222,7 +224,7 @@ HWTEST_F(InputCooperateTest, InputCooperateTest_StopDeviceCooperate_002, TestSiz
     };
     bool state = true;
     MultimodalInputConnectProxy::SetMIState(state);
-    int ret = InputMG->StopDeviceCooperate(callback);
+    int ret = InputMG->StopDeviceCooperate(listen, callback);
     EXPECT_EQ(ret, RET_OK);
 }
 } // namespace MMI

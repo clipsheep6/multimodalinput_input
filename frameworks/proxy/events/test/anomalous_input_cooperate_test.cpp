@@ -171,13 +171,14 @@ HWTEST_F(InputCooperateTest, Anomalous_InputCooperateTest_StartInputDeviceCooper
 HWTEST_F(InputCooperateTest, Anomalous_IInputCooperateTest_StopDeviceCooperate, TestSize.Level1)
 {
     MMI_HILOGD("StopDeviceCooperate");
+    int32_t listen = 1;
     InputDevCooperateImpl.userData_ = 0;
     using CooperationCallback = std::function<void(std::string, CooperationMessage)>;
     CooperationCallback callback;
     callback = [](const std::string &, CooperationMessage) {
         MMI_HILOGD("callback is ok");
     };
-    int state = InputMG->StopDeviceCooperate(callback);
+    int state = InputMG->StopDeviceCooperate(listen, callback);
     EXPECT_EQ(state, RET_ERR);
 }
 } // namespace MMI
