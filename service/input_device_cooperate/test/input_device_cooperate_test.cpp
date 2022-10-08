@@ -22,6 +22,7 @@
 #include "input_device_cooperate_state_free.h"
 #include "input_device_cooperate_state_in.h"
 #define private public
+#define protected public
 #include "input_device_cooperate_sm.h"
 #include "device_profile_adapter.h"
 #include "define_multimodal.h"
@@ -33,6 +34,7 @@ using namespace testing::ext;
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceCooperateStateTest" };
 constexpr const int32_t DP_GET_SERVICE_SUCCESS = 98566148;
+#define InputDevCooSM ::OHOS::DelayedSingleton<InputDeviceCooperateSM>::GetInstance()
 } // namespace
 class IDCooperateTest : public testing::Test {
 public:
@@ -48,6 +50,7 @@ public:
  */
 HWTEST_F(IDCooperateTest, UpdateCrossingSwitchState001, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     int32_t rest = DProfileAdapter->UpdateCrossingSwitchState(true);
     MMI_HILOGD("Update crossing switch state :%{public}d", rest);
     EXPECT_EQ(rest, DP_GET_SERVICE_SUCCESS);
@@ -61,6 +64,8 @@ HWTEST_F(IDCooperateTest, UpdateCrossingSwitchState001, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, UpdateCrossingSwitchState002, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
+    MMI_HILOGD("UpdateCrossingSwitchState002");
     std::vector<std::string> deviceIds = {"123"};
     int32_t rest = DProfileAdapter->UpdateCrossingSwitchState(true, deviceIds);
     MMI_HILOGD("Update crossing switch state :%{public}d", rest);
@@ -75,6 +80,8 @@ HWTEST_F(IDCooperateTest, UpdateCrossingSwitchState002, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, GetCrossingSwitchState001, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
+    MMI_HILOGD("GetCrossingSwitchState001");
     std::string deviceId = "123";
     DeviceProfile::MockDistributedDeviceProfileClient::SetDPState(true);
     bool state  = DProfileAdapter->GetCrossingSwitchState(deviceId);
@@ -90,6 +97,8 @@ HWTEST_F(IDCooperateTest, GetCrossingSwitchState001, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, GetCrossingSwitchState002, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
+    MMI_HILOGD("GetCrossingSwitchState002");
     std::string deviceId = "123";
     DeviceProfile::MockDistributedDeviceProfileClient::SetDPState(false);
     bool state  = DProfileAdapter->GetCrossingSwitchState(deviceId);
@@ -105,6 +114,8 @@ HWTEST_F(IDCooperateTest, GetCrossingSwitchState002, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, RegisterCrossingStateListener001, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
+    MMI_HILOGD("RegisterCrossingStateListener001");
     using ProfileEventCallback = std::function<void(const std::string &, bool)>;
     ProfileEventCallback callback ;
     std::string deviceId = "";
@@ -120,6 +131,7 @@ HWTEST_F(IDCooperateTest, RegisterCrossingStateListener001, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, RegisterCrossingStateListener002, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     using ProfileEventCallback = std::function<void(const std::string &, bool)>;
     ProfileEventCallback callback;
     callback = [](const std::string &, bool) {
@@ -138,6 +150,7 @@ HWTEST_F(IDCooperateTest, RegisterCrossingStateListener002, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, UnregisterCrossingStateListener001, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string deviceId = "";
     int32_t regisRet = DProfileAdapter->UnregisterCrossingStateListener(deviceId);
     EXPECT_EQ(regisRet, RET_ERR);
@@ -151,6 +164,7 @@ HWTEST_F(IDCooperateTest, UnregisterCrossingStateListener001, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, UnregisterCrossingStateListener002, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string deviceId = "123";
     int32_t regisRet = DProfileAdapter->UnregisterCrossingStateListener(deviceId);
     EXPECT_EQ(regisRet, RET_OK);
@@ -164,13 +178,14 @@ HWTEST_F(IDCooperateTest, UnregisterCrossingStateListener002, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, StartInputDeviceCooperate001, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string remote = "";
     int32_t startInputDeviceId = 10;
     InputDevCooSM->Reset();
     int32_t state = InputDevCooSM->StartInputDeviceCooperate(remote, startInputDeviceId);
     MMI_HILOGD("Start inputdevice cooperate state :%{public}d", state);
     EXPECT_EQ(state, RET_ERR);
-    sleep(300);
+    usleep(300000);
     EXPECT_EQ(CooperateState::STATE_FREE, InputDevCooSM->cooperateState_);
 }
 
@@ -182,6 +197,7 @@ HWTEST_F(IDCooperateTest, StartInputDeviceCooperate001, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, StartInputDeviceCooperate002, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string remote = "123";
     int32_t startInputDeviceId = 10;
     InputDevCooSM->currentStateSM_ = std::make_shared<InputDeviceCooperateStateIn>(remote);
@@ -189,7 +205,7 @@ HWTEST_F(IDCooperateTest, StartInputDeviceCooperate002, TestSize.Level1)
     int32_t state = InputDevCooSM->StartInputDeviceCooperate(remote, startInputDeviceId);
     MMI_HILOGD("Start inputdevice cooperate state :%{public}d", state);
     EXPECT_EQ(state, RET_ERR);
-    sleep(300);
+    usleep(300000);
     EXPECT_EQ(CooperateState::STATE_IN, InputDevCooSM->cooperateState_);
 }
 
@@ -199,8 +215,9 @@ HWTEST_F(IDCooperateTest, StartInputDeviceCooperate002, TestSize.Level1)
  * @tc.desc: Verify that the input device is started for cooperation.
  * @tc.require: I5P6WL I5P772 I5P76M
  */
-HWTEST_F(IDCooperateTest, StartInputDeviceCooperate003, TestSize.Level1)//a
+HWTEST_F(IDCooperateTest, StartInputDeviceCooperate003, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string remote = "123";
     int32_t startInputDeviceId = 10;
     InputDevCooSM->isStopping_ = false;
@@ -209,7 +226,7 @@ HWTEST_F(IDCooperateTest, StartInputDeviceCooperate003, TestSize.Level1)//a
     int32_t state = InputDevCooSM->StartInputDeviceCooperate(remote, startInputDeviceId);
     MMI_HILOGD("Start inputdevice cooperate state :%{public}d", state);
     EXPECT_EQ(state, RET_ERR);
-    sleep(300);
+    usleep(300000);
     EXPECT_EQ(CooperateState::STATE_FREE, InputDevCooSM->cooperateState_);
 }
 
@@ -221,13 +238,14 @@ HWTEST_F(IDCooperateTest, StartInputDeviceCooperate003, TestSize.Level1)//a
  */
 HWTEST_F(IDCooperateTest, StopInputDeviceCooperate001, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string startDhid = "123";
     InputDevCooSM->currentStateSM_ = std::make_shared<InputDeviceCooperateStateFree>();
     InputDevCooSM->cooperateState_ = CooperateState::STATE_FREE;
     int32_t state = InputDevCooSM->StopInputDeviceCooperate();
     MMI_HILOGD("Stop inputdevice cooperate state :%{public}d", state);
     EXPECT_EQ(state, RET_ERR);
-    sleep(300);
+    usleep(100000);
     EXPECT_EQ(CooperateState::STATE_FREE, InputDevCooSM->cooperateState_);
 
 }
@@ -240,6 +258,7 @@ HWTEST_F(IDCooperateTest, StopInputDeviceCooperate001, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, StopInputDeviceCooperate002, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string startDhid = "123";
     InputDevCooSM->isStopping_ = false;
     InputDevCooSM->isStarting_ = false;
@@ -247,7 +266,7 @@ HWTEST_F(IDCooperateTest, StopInputDeviceCooperate002, TestSize.Level1)
     InputDevCooSM->cooperateState_ = CooperateState::STATE_IN;
     int32_t state = InputDevCooSM->StopInputDeviceCooperate();
     MMI_HILOGD("Stop inputdevice cooperate state :%{public}d", state);
-    EXPECT_EQ(state, RET_OK);
+    EXPECT_EQ(state, RET_ERR);
 }
 
 /**
@@ -258,6 +277,7 @@ HWTEST_F(IDCooperateTest, StopInputDeviceCooperate002, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, StopInputDeviceCooperate003, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string startDhid = "123";
     InputDevCooSM->isStopping_ = false;
     InputDevCooSM->isStarting_ = false;
@@ -267,7 +287,7 @@ HWTEST_F(IDCooperateTest, StopInputDeviceCooperate003, TestSize.Level1)
     int32_t state = InputDevCooSM->StopInputDeviceCooperate();
     MMI_HILOGD("Stop inputdevice cooperate state :%{public}d", state);
     EXPECT_EQ(state, RET_ERR);
-    sleep(100);
+    usleep(100000);
     EXPECT_EQ(CooperateState::STATE_OUT, InputDevCooSM->cooperateState_);
 }
 
@@ -279,6 +299,7 @@ HWTEST_F(IDCooperateTest, StopInputDeviceCooperate003, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, StartRemoteCooperateResult001, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string startDhid = "123";
     int32_t xPercent = 10;
     int32_t yPercent = 20; 
@@ -295,6 +316,7 @@ HWTEST_F(IDCooperateTest, StartRemoteCooperateResult001, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, StartRemoteCooperateResult002, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string startDhid = "123";
     int32_t xPercent = 10;
     int32_t yPercent = 20; 
@@ -311,6 +333,7 @@ HWTEST_F(IDCooperateTest, StartRemoteCooperateResult002, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, StopRemoteCooperate, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     InputDevCooSM->StopRemoteCooperate();
     EXPECT_EQ(InputDevCooSM->isStopping_, true);
 }
@@ -323,6 +346,7 @@ HWTEST_F(IDCooperateTest, StopRemoteCooperate, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, StopRemoteCooperateResult001, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     InputDevCooSM->StopRemoteCooperateResult(true);
     EXPECT_EQ(InputDevCooSM->cooperateState_, CooperateState::STATE_FREE);
 }
@@ -335,6 +359,7 @@ HWTEST_F(IDCooperateTest, StopRemoteCooperateResult001, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, StopRemoteCooperateResult002, TestSize.Level1) 
 {
+    CALL_INFO_TRACE;
     InputDevCooSM->cooperateState_ = CooperateState::STATE_IN;
     InputDevCooSM->StopRemoteCooperateResult(false);
     MMI_HILOGD("Stop inputdevice cooperate state :%{public}d", InputDevCooSM->cooperateState_);
@@ -349,6 +374,7 @@ HWTEST_F(IDCooperateTest, StopRemoteCooperateResult002, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, StartCooperateOtherResult, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string srcNetworkId = "123";
     InputDevCooSM->StartCooperateOtherResult(srcNetworkId);
     EXPECT_EQ(InputDevCooSM->srcNetworkId_, srcNetworkId);
@@ -362,6 +388,7 @@ HWTEST_F(IDCooperateTest, StartCooperateOtherResult, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, UpdateState001, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     InputDevCooSM->UpdateState(CooperateState::STATE_FREE);
     EXPECT_EQ(InputDevCooSM->cooperateState_, CooperateState::STATE_FREE);
 }
@@ -374,6 +401,7 @@ HWTEST_F(IDCooperateTest, UpdateState001, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, UpdateState002, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     InputDevCooSM->UpdateState(CooperateState::STATE_IN);
     auto state = InputDevCooSM->GetCurrentCooperateState();
     EXPECT_EQ(state, CooperateState::STATE_IN);
@@ -387,6 +415,7 @@ HWTEST_F(IDCooperateTest, UpdateState002, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, UpdateState003, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     InputDevCooSM->UpdateState(CooperateState::STATE_OUT);
     EXPECT_EQ(InputDevCooSM->cooperateState_, CooperateState::STATE_OUT);
 }
@@ -399,6 +428,7 @@ HWTEST_F(IDCooperateTest, UpdateState003, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, UpdatePreparedDevices, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string srcNetworkId = "123";
     std::string sinkNetworkId = "456";
     InputDevCooSM->UpdatePreparedDevices(srcNetworkId, sinkNetworkId);
@@ -413,6 +443,7 @@ HWTEST_F(IDCooperateTest, UpdatePreparedDevices, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, GetPreparedDevices, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::pair<std::string, std::string> pair {"123", "456"};
     std::pair<std::string, std::string> state = InputDevCooSM->GetPreparedDevices();
     EXPECT_EQ(state, pair);
@@ -426,6 +457,7 @@ HWTEST_F(IDCooperateTest, GetPreparedDevices, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, GetCurrentCooperateState, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     InputDevCooSM->Reset();
     CooperateState  cooperateState = InputDevCooSM->GetCurrentCooperateState();
     MMI_HILOGD("Get current cooperatestate :%{public}d", cooperateState);
@@ -440,6 +472,7 @@ HWTEST_F(IDCooperateTest, GetCurrentCooperateState, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, InitDeviceManager, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     bool state = false;
     state = InputDevCooSM->InitDeviceManager();
     MMI_HILOGD("Get src networkId :%{public}d", state);
@@ -454,6 +487,7 @@ HWTEST_F(IDCooperateTest, InitDeviceManager, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, OnDeviceOnline, TestSize.Level1) 
 {
+    CALL_INFO_TRACE;
     std::string networkId = "123";
     InputDevCooSM->OnDeviceOnline(networkId);
     std::for_each(InputDevCooSM->onlineDevice_.begin(), InputDevCooSM->onlineDevice_.end(), [&, this](std::string &deviceId)
@@ -470,6 +504,7 @@ HWTEST_F(IDCooperateTest, OnDeviceOnline, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, OnDeviceOffline001, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string networkId = "123";
     InputDevCooSM->cooperateState_ = CooperateState::STATE_OUT;
     InputDevCooSM->srcNetworkId_ = "456";
@@ -491,12 +526,13 @@ HWTEST_F(IDCooperateTest, OnDeviceOffline001, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, OnDeviceOffline002, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string networkId = "123";
     InputDevCooSM->cooperateState_ = CooperateState::STATE_IN;
     InputDevCooSM->srcNetworkId_ = "456";
     InputDevCooSM->OnDeviceOffline(networkId);
     if (!InputDevCooSM->onlineDevice_.empty()) {
-        MMI_HILOGD("InputDevCooSM onlineDevice is not nullptr");
+        MMI_HILOGD("InputDevCooManager onlineDevice is not nullptr");
         std::for_each(InputDevCooSM->onlineDevice_.begin(), InputDevCooSM->onlineDevice_.end(), [&, this](std::string &deviceId)
         {
             EXPECT_NE(deviceId, networkId);
@@ -512,6 +548,7 @@ HWTEST_F(IDCooperateTest, OnDeviceOffline002, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, IsStarting001, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     bool isSuccess = false;
     InputDevCooSM->isStarting_ = true;
     isSuccess = InputDevCooSM->IsStarting();
@@ -527,6 +564,7 @@ HWTEST_F(IDCooperateTest, IsStarting001, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, IsStarting002, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     bool isSuccess = true;
     InputDevCooSM->isStarting_ = false;
     isSuccess = InputDevCooSM->IsStarting();
@@ -542,6 +580,7 @@ HWTEST_F(IDCooperateTest, IsStarting002, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, IsStopping001, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     bool isSuccess = false;
     InputDevCooSM->isStopping_= true;
     isSuccess = InputDevCooSM->IsStopping();
@@ -557,6 +596,7 @@ HWTEST_F(IDCooperateTest, IsStopping001, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, IsStopping002, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     bool isSuccess = true;
     InputDevCooSM->isStopping_= false;
     isSuccess = InputDevCooSM->IsStopping();
@@ -572,6 +612,7 @@ HWTEST_F(IDCooperateTest, IsStopping002, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, IsNeedFilterOut001, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string deviceId = "";
     DistributedHardware::DistributedInput::BusinessEvent event;
     bool state = true;
@@ -587,6 +628,7 @@ HWTEST_F(IDCooperateTest, IsNeedFilterOut001, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, IsNeedFilterOut002, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string deviceId = "123";
     DistributedHardware::DistributedInput::BusinessEvent event;
     bool state = false;
@@ -602,6 +644,7 @@ HWTEST_F(IDCooperateTest, IsNeedFilterOut002, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, StartRemoteInput001, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string srcId = "";
     std::string sinkId = "";
     uint32_t  inputTypes = 1;
@@ -619,6 +662,7 @@ HWTEST_F(IDCooperateTest, StartRemoteInput001, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, StartRemoteInput002, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string srcId = "123";
     std::string sinkId = "456";
     uint32_t  inputTypes = 1;
@@ -638,6 +682,7 @@ HWTEST_F(IDCooperateTest, StartRemoteInput002, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, StopRemoteInput001, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string srcId = "";
     std::string sinkId = "";
     uint32_t  inputTypes = 1;
@@ -657,6 +702,7 @@ HWTEST_F(IDCooperateTest, StopRemoteInput001, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, StopRemoteInput002, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string srcId = "123";
     std::string sinkId = "456";
     uint32_t  inputTypes = 1;
@@ -676,6 +722,7 @@ HWTEST_F(IDCooperateTest, StopRemoteInput002, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, StartRemoteInput003, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string srcId = "";
     std::string sinkId = "";
     std::vector<std::string> dhIds{"123"};
@@ -695,6 +742,7 @@ HWTEST_F(IDCooperateTest, StartRemoteInput003, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, StartRemoteInput004, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string srcId = "123";
     std::string sinkId = "456";
     std::vector<std::string> dhIds{"123"};
@@ -714,6 +762,7 @@ HWTEST_F(IDCooperateTest, StartRemoteInput004, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, StopRemoteInput003, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string srcId = "";
     std::string sinkId = "123";
     std::vector<std::string> dhIds{"123"};
@@ -733,6 +782,7 @@ HWTEST_F(IDCooperateTest, StopRemoteInput003, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, StopRemoteInput004, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string srcId = "123";
     std::string sinkId = "456";
     std::vector<std::string> dhIds{"123"};
@@ -752,6 +802,7 @@ HWTEST_F(IDCooperateTest, StopRemoteInput004, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, StartRemoteInput005, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string deviceId = "";
     std::vector<std::string> dhIds{"123"};
     using DICallback = std::function<void(bool)>;
@@ -770,6 +821,7 @@ HWTEST_F(IDCooperateTest, StartRemoteInput005, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, StartRemoteInput006, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string deviceId = "123";
     std::vector<std::string> dhIds{"123"};
     using DICallback = std::function<void(bool)>;
@@ -788,6 +840,7 @@ HWTEST_F(IDCooperateTest, StartRemoteInput006, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, StopRemoteInput005, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string deviceId = "";
     std::vector<std::string> dhIds{"123"};
     using DICallback = std::function<void(bool)>;
@@ -806,6 +859,7 @@ HWTEST_F(IDCooperateTest, StopRemoteInput005, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, StopRemoteInput006, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string deviceId = "123";
     std::vector<std::string> dhIds{"123"};
     using DICallback = std::function<void(bool)>;
@@ -824,6 +878,7 @@ HWTEST_F(IDCooperateTest, StopRemoteInput006, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, PrepareRemoteInput001, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string srcId = "";
     std::string sinkId = "";
     using DICallback = std::function<void(bool)>;
@@ -842,6 +897,7 @@ HWTEST_F(IDCooperateTest, PrepareRemoteInput001, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, PrepareRemoteInput002, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string srcId = "123";
     std::string sinkId = "456";
     using DICallback = std::function<void(bool)>;
@@ -860,6 +916,7 @@ HWTEST_F(IDCooperateTest, PrepareRemoteInput002, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, UnPrepareRemoteInput001, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string srcId = "";
     std::string sinkId = "";
     using DICallback = std::function<void(bool)>;
@@ -878,6 +935,7 @@ HWTEST_F(IDCooperateTest, UnPrepareRemoteInput001, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, UnPrepareRemoteInput002, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string srcId = "123";
     std::string sinkId = "456";
     using DICallback = std::function<void(bool)>;
@@ -896,6 +954,7 @@ HWTEST_F(IDCooperateTest, UnPrepareRemoteInput002, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, PrepareRemoteInput003, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string deviceId = "";
     using DICallback = std::function<void(bool)>;
     DICallback callback = [](bool state) {
@@ -913,6 +972,7 @@ HWTEST_F(IDCooperateTest, PrepareRemoteInput003, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, PrepareRemoteInput004, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string deviceId = "123";
     using DICallback = std::function<void(bool)>;
     DICallback callback = [](bool state) {
@@ -930,6 +990,7 @@ HWTEST_F(IDCooperateTest, PrepareRemoteInput004, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, UnPrepareRemoteInput003, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string deviceId = "";
     using DICallback = std::function<void(bool)>;
     DICallback callback = [](bool state) {
@@ -947,6 +1008,7 @@ HWTEST_F(IDCooperateTest, UnPrepareRemoteInput003, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, UnPrepareRemoteInput004, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     std::string deviceId = "123";
     using DICallback = std::function<void(bool)>;
     DICallback callback = [](bool state) {
@@ -964,6 +1026,7 @@ HWTEST_F(IDCooperateTest, UnPrepareRemoteInput004, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, RegisterEventCallback001, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     using MouseStateChangeCallback = std::function<void(uint32_t type, uint32_t code, int32_t value)>;
     MouseStateChangeCallback callback{nullptr};
     int32_t state = DistributedAdapter->RegisterEventCallback(callback);
@@ -978,6 +1041,7 @@ HWTEST_F(IDCooperateTest, RegisterEventCallback001, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, RegisterEventCallback002, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     using MouseStateChangeCallback = std::function<void(uint32_t type, uint32_t code, int32_t value)>;
     MouseStateChangeCallback callback = [](uint32_t type, uint32_t code, int32_t value) {
         MMI_HILOGD("Callback succeeded");
@@ -994,6 +1058,7 @@ HWTEST_F(IDCooperateTest, RegisterEventCallback002, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, UnregisterEventCallback001, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     using MouseStateChangeCallback = std::function<void(uint32_t type, uint32_t code, int32_t value)>;
     MouseStateChangeCallback callback{nullptr};
     int32_t state = DistributedAdapter->UnregisterEventCallback(callback);
@@ -1008,6 +1073,7 @@ HWTEST_F(IDCooperateTest, UnregisterEventCallback001, TestSize.Level1)
  */
 HWTEST_F(IDCooperateTest, UnregisterEventCallback002, TestSize.Level1)
 {
+    CALL_INFO_TRACE;
     using MouseStateChangeCallback = std::function<void(uint32_t type, uint32_t code, int32_t value)>;
     MouseStateChangeCallback callback = [](uint32_t type, uint32_t code, int32_t value) {
         MMI_HILOGD("Callback succeeded");
