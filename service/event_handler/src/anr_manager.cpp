@@ -53,6 +53,7 @@ bool AnrManager::TriggerAnr(int64_t time, SessionPtr sess)
         MMI_HILOGD("the event reports normally");
         return false;
     }
+    
     DfxHisysevent::ApplicationBlockInput(sess);
     int32_t ret = OHOS::AAFwk::AbilityManagerClient::GetInstance()->SendANRProcessID(sess->GetPid());
     if (ret != 0) {
