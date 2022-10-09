@@ -15,8 +15,6 @@
 
 #include "pointer_drawing_manager.h"
 
-#include <display_type.h>
-
 #include "image/bitmap.h"
 #include "image_source.h"
 #include "image_type.h"
@@ -219,7 +217,7 @@ sptr<OHOS::SurfaceBuffer> PointerDrawingManager::GetSurfaceBuffer(sptr<OHOS::Sur
         .height = IMAGE_HEIGHT,
         .strideAlignment = 0x8,
         .format = PIXEL_FMT_RGBA_8888,
-        .usage = HBM_USE_CPU_READ | HBM_USE_CPU_WRITE | HBM_USE_MEM_DMA,
+        .usage = BUFFER_USAGE_CPU_READ | BUFFER_USAGE_CPU_WRITE | BUFFER_USAGE_MEM_DMA,
     };
 
     OHOS::SurfaceError ret = layer->RequestBuffer(buffer, releaseFence, config);
@@ -520,11 +518,6 @@ void PointerDrawingManager::DrawPointerStyle()
 {
     CALL_DEBUG_ENTER;
     if (hasDisplay_ && hasPointerDevice_) {
-        if (pointerWindow_ == nullptr) {
-            MMI_HILOGE("Draw pointer style failed, pointerWindow_ is null");
-            return;
-        }
-
         std::optional<int32_t> pointerStyleInfo = WinMgr->GetPointerStyle(pid_, windowId_);
         if (!pointerStyleInfo) {
             MMI_HILOGE("Draw pointer style failed, pointerStyleInfo is nullptr");

@@ -27,9 +27,15 @@ public:
     EventNormalizeHandler() = default;
     ~EventNormalizeHandler() = default;
     void HandleEvent(libinput_event* event);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_POINTER
     void HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
+#endif // OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCH
     void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
+#endif // OHOS_BUILD_ENABLE_TOUCH
     int32_t AddHandleTimer(int32_t timeout = 300);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     bool CheckKeyboardWhiteList(std::shared_ptr<KeyEvent> keyEvent);
@@ -49,7 +55,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 
 private:
-    int32_t timerId_ = -1;
+    int32_t timerId_ { -1 };
     void ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent, struct libinput_event *event);
     //std::list<IInputEventHandler> extendHandlers_;
 };
