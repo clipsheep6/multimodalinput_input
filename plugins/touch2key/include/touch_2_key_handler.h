@@ -21,6 +21,7 @@
 namespace OHOS {
 namespace MMI {
 class Touch2KeyHandler : public IInputEventConvertHandler {
+
 public:
     Touch2KeyHandler() = default;
     DISALLOW_COPY_AND_MOVE(Touch2KeyHandler);
@@ -32,16 +33,18 @@ public:
     virtual PluginDispatchEventType GetDispatchEventType();
     virtual const std::shared_ptr<KeyEvent> GetKeyEvent();
     virtual const std::shared_ptr<PointerEvent> GetPointEvent();
+    virtual int32_t GetPluginInfo(PluginInfo *&pluginInfo);
 private:
+
 };
 
-// the class factories
-// extern "C" IInputEventConvertHandler* create() {
-//     return new Touch2KeyHandler;
-// }
-// extern "C" void destroy(IInputEventConvertHandler* p) {
-//     delete p;
-// }
+//the class factories
+extern "C" IInputEventConvertHandler* create() {
+    return new Touch2KeyHandler;
+}
+extern "C" void destroy(IInputEventConvertHandler* p) {
+    delete p;
+}
 } // namespace MMI
 } // namespace OHOS
 #endif // TOUCH_2_KEY_HANDLER_H

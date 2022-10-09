@@ -42,11 +42,16 @@ ohos_shared_library("input_touch_2_key_handler") {
   deps = [
      "//foundation/multimodalinput/input/util:libmmi-util",
   ]
-
+    external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    #"ipc:ipc_core",
+    #"safwk:system_ability_fwk",
+    #"samgr:samgr_proxy",
+  ]
   #external_deps = []
 
   #install_enable = true
-  relative_install_dir = "module/input/plugins"
+  relative_install_dir = "module/multimodalinput/plugins"
   subsystem_name = "multimodalinput"
   part_name = "input"
 }

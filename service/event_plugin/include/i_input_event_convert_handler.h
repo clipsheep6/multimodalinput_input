@@ -22,16 +22,23 @@ namespace MMI {
 
 class IInputEventConvertHandler : public IInputEventHandler {
 public:
-    enum class PluginDispatchCmd {
-        GOTO_NEXT,
-        REDIRECT,
-        DISCARD
-    };
+enum class PluginDispatchCmd {
+    GOTO_NEXT,
+    REDIRECT,
+    DISCARD
+};
+typedef struct {
+    std::string name;
+    std::string version;
+    int32_t priority;
+    std::shared_ptr<IInputEventConvertHandler> handler;
+} PluginInfo;
 public:
     virtual PluginDispatchCmd GetDispatchCmd() = 0;
     virtual PluginDispatchEventType GetDispatchEventType() = 0;
     virtual const std::shared_ptr<KeyEvent> GetKeyEvent() = 0;
     virtual const std::shared_ptr<PointerEvent> GetPointEvent() = 0;
+    virtual int32_t GetPluginInfo(PluginInfo *&pluginInfo) = 0;
     template<typename T1, typename T2>
     const std::shared_ptr<T1> GetEvent();
 };
@@ -53,6 +60,10 @@ inline const std::shared_ptr<PointerEvent> IInputEventConvertHandler::GetEvent<P
 {
     return GetPointEvent();
 }
+
+typedef IInputEventConvertHandler* create_t();
+typedef void destroy_t(IInputEventConvertHandler*);
+
 } // namespace MMI
 } // namespace OHOS
 #endif // I_INPUT_EVENT_CONVERT_HANDLER_H
