@@ -18,11 +18,11 @@
 constexpr int32_t DH_SUCCESS = 0;
 int32_t GetLocalNodeDeviceInfo(const char *pkgName, NodeBasicInfo *info)
 {
-    NodeBasicInfo nodeBasicInfo_ = {
+    NodeBasicInfo nodeBasicInfo = {
         .networkId = "networkidc08647073e02e7a78f09473aa122ff57fc81c00",
         .deviceName = "f6d4c08647073e02e7a78f09473aa122ff57fc81c00981fcf5be989e7d112591",
         .deviceTypeId = 1};
     (void)pkgName;
-    *info = nodeBasicInfo_;
+    *info = nodeBasicInfo;
     return DH_SUCCESS;
 }

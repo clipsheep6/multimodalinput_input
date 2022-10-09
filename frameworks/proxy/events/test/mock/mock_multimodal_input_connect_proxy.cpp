@@ -28,16 +28,16 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MockMultimodalInputConnectProxy" };
-static bool state_ = true;
+static bool g_cooperateState = true;
 } // namespace
 void MultimodalInputConnectProxy::SetMIState(bool state)
 {
-    state_ = state;
+    g_cooperateState = state;
 }
 
 int32_t MultimodalInputConnectProxy::RegisterCooperateListener()
 {
-    bool ret = state_;
+    bool ret = g_cooperateState;
     if (ret == false) {
         return RET_ERR;
     }
@@ -47,7 +47,7 @@ int32_t MultimodalInputConnectProxy::RegisterCooperateListener()
 
 int32_t MultimodalInputConnectProxy::UnregisterCooperateListener()
 {
-    bool ret = state_;
+    bool ret = g_cooperateState;
     if (ret == false) {
         return RET_ERR;
     }
@@ -57,7 +57,7 @@ int32_t MultimodalInputConnectProxy::UnregisterCooperateListener()
 
 int32_t MultimodalInputConnectProxy::EnableInputDeviceCooperate(int32_t userData, bool enabled)
 {
-    bool ret = state_;
+    bool ret = g_cooperateState;
     if (ret == false) {
         return RET_ERR;
     }
@@ -68,7 +68,7 @@ int32_t MultimodalInputConnectProxy::EnableInputDeviceCooperate(int32_t userData
 int32_t MultimodalInputConnectProxy::StartInputDeviceCooperate(int32_t userData, const std::string &sinkDeviceId,
     int32_t srcInputDeviceId)
 {
-    bool ret = state_;
+    bool ret = g_cooperateState;
     if (sinkDeviceId == "" || ret == false) {
         return RET_ERR;
     }
@@ -77,7 +77,7 @@ int32_t MultimodalInputConnectProxy::StartInputDeviceCooperate(int32_t userData,
 
 int32_t MultimodalInputConnectProxy::StopDeviceCooperate(int32_t userData, int32_t stopInputDeviceId)
 {
-    bool ret = state_;
+    bool ret = g_cooperateState;
     if (ret == false) {
         return RET_ERR;
     }

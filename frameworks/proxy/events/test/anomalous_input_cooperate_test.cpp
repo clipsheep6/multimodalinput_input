@@ -38,7 +38,7 @@ public:
 };
 class InputDeviceCooperateListenerTest : public IInputDeviceCooperateListener {
 public:
-    virtual void OnCooperateMessage(const std::string &deviceId, CooperationMessage msg)  override
+    void OnCooperateMessage(const std::string &deviceId, CooperationMessage msg)  override
     {
         MMI_HILOGD("InputDeviceCooperateListenerTest");
     };

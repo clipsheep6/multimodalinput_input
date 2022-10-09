@@ -247,7 +247,6 @@ HWTEST_F(IDCooperateTest, StopInputDeviceCooperate001, TestSize.Level1)
     EXPECT_EQ(state, RET_ERR);
     usleep(100000);
     EXPECT_EQ(CooperateState::STATE_FREE, InputDevCooSM->cooperateState_);
-
 }
 
 /**
@@ -302,7 +301,7 @@ HWTEST_F(IDCooperateTest, StartRemoteCooperateResult001, TestSize.Level1)
     CALL_INFO_TRACE;
     std::string startDhid = "123";
     int32_t xPercent = 10;
-    int32_t yPercent = 20; 
+    int32_t yPercent = 20;
     InputDevCooSM->cooperateState_ = CooperateState::STATE_OUT;
     InputDevCooSM->StartRemoteCooperateResult(false, startDhid, xPercent, yPercent);
     EXPECT_EQ(InputDevCooSM->cooperateState_, CooperateState::STATE_OUT);
@@ -319,7 +318,7 @@ HWTEST_F(IDCooperateTest, StartRemoteCooperateResult002, TestSize.Level1)
     CALL_INFO_TRACE;
     std::string startDhid = "123";
     int32_t xPercent = 10;
-    int32_t yPercent = 20; 
+    int32_t yPercent = 20;
     InputDevCooSM->cooperateState_ = CooperateState::STATE_FREE;
     InputDevCooSM->StartRemoteCooperateResult(true, startDhid, xPercent, yPercent);
     EXPECT_EQ(InputDevCooSM->cooperateState_, CooperateState::STATE_FREE);
@@ -357,7 +356,7 @@ HWTEST_F(IDCooperateTest, StopRemoteCooperateResult001, TestSize.Level1)
  * @tc.desc: Verify whether to stop remote cooperation results.
  * @tc.require: I5P705
  */
-HWTEST_F(IDCooperateTest, StopRemoteCooperateResult002, TestSize.Level1) 
+HWTEST_F(IDCooperateTest, StopRemoteCooperateResult002, TestSize.Level1)
 {
     CALL_INFO_TRACE;
     InputDevCooSM->cooperateState_ = CooperateState::STATE_IN;
@@ -485,12 +484,13 @@ HWTEST_F(IDCooperateTest, InitDeviceManager, TestSize.Level1)
  * @tc.desc: Verify online devices.
  * @tc.require: I5P6UW
  */
-HWTEST_F(IDCooperateTest, OnDeviceOnline, TestSize.Level1) 
+HWTEST_F(IDCooperateTest, OnDeviceOnline, TestSize.Level1)
 {
     CALL_INFO_TRACE;
     std::string networkId = "123";
     InputDevCooSM->OnDeviceOnline(networkId);
-    std::for_each(InputDevCooSM->onlineDevice_.begin(), InputDevCooSM->onlineDevice_.end(), [&, this](std::string &deviceId)
+    std::for_each(InputDevCooSM->onlineDevice_.begin(), InputDevCooSM->onlineDevice_.end(),
+        [&, this](std::string &deviceId)
     {
         EXPECT_EQ(deviceId, networkId);
     });
@@ -511,7 +511,8 @@ HWTEST_F(IDCooperateTest, OnDeviceOffline001, TestSize.Level1)
     InputDevCooSM->OnDeviceOffline(networkId);
     if (!InputDevCooSM->onlineDevice_.empty()) {
         MMI_HILOGD("onlineDevice is not nullptr");
-        std::for_each(InputDevCooSM->onlineDevice_.begin(), InputDevCooSM->onlineDevice_.end(), [&, this](std::string &deviceId)
+        std::for_each(InputDevCooSM->onlineDevice_.begin(), InputDevCooSM->onlineDevice_.end(),
+            [&, this](std::string &deviceId)
         {
             EXPECT_NE(deviceId, networkId);
         });
@@ -533,7 +534,8 @@ HWTEST_F(IDCooperateTest, OnDeviceOffline002, TestSize.Level1)
     InputDevCooSM->OnDeviceOffline(networkId);
     if (!InputDevCooSM->onlineDevice_.empty()) {
         MMI_HILOGD("InputDevCooManager onlineDevice is not nullptr");
-        std::for_each(InputDevCooSM->onlineDevice_.begin(), InputDevCooSM->onlineDevice_.end(), [&, this](std::string &deviceId)
+        std::for_each(InputDevCooSM->onlineDevice_.begin(), InputDevCooSM->onlineDevice_.end(),
+            [&, this](std::string &deviceId)
         {
             EXPECT_NE(deviceId, networkId);
         });
@@ -666,7 +668,7 @@ HWTEST_F(IDCooperateTest, StartRemoteInput002, TestSize.Level1)
     std::string srcId = "123";
     std::string sinkId = "456";
     uint32_t  inputTypes = 1;
-    using DICallback = std::function<void(bool)>; 
+    using DICallback = std::function<void(bool)>;
     DICallback callback = [](bool state) {
         MMI_HILOGD("Callback succeeded");
     };

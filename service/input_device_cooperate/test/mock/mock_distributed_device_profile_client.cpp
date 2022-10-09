@@ -25,7 +25,7 @@
 namespace OHOS {
 namespace DeviceProfile {
 using namespace std::chrono_literals;
-static bool state_ = true;
+static bool g_cooperateState = true;
 const std::string CHARACTERISTICS_NAME = "CurrentState";
 constexpr const int32_t DP_GET_SERVICE_FAILED = 98566147;
 constexpr const int32_t DP_GET_SERVICE_SUCCESS = 98566148;
@@ -33,7 +33,7 @@ constexpr const int32_t DP_INVALID_PARAMS = 98566144;
 
 void MockDistributedDeviceProfileClient::SetDPState(bool state)
 {
-    state_ = state;
+    g_cooperateState = state;
 }
 
 IMPLEMENT_SINGLE_INSTANCE(DistributedDeviceProfileClient);
@@ -53,9 +53,9 @@ int32_t DistributedDeviceProfileClient::GetDeviceProfile(const std::string& udid
     if (udid.empty() || serviceId.empty()) {
         HILOGD("Failed to get device profile");
         return RET_ERR;
-    } 
+    }
     nlohmann::json data;
-    data[CHARACTERISTICS_NAME] = state_;
+    data[CHARACTERISTICS_NAME] = g_cooperateState;
     profile.SetCharacteristicProfileJson(data.dump());
     HILOGD("Get device profile successfully");
     return RET_OK;
