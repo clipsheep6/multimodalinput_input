@@ -49,6 +49,8 @@ public:
     virtual int32_t StartReceiveEvents(const std::shared_ptr<IKernelEventHandler>& eventHandler) override;
     virtual int32_t StopReceiveEvents() override;
     virtual void ProcessEventItem(const struct input_event* eventItem) override;
+    virtual void SetDeviceId(int32_t deviceId) override;
+    virtual int32_t GetDeviceId() override;
 
 protected:
     int32_t Init();
@@ -78,6 +80,7 @@ private:
 
 private:
     const int32_t id_;
+    const int32_t deviceId_;
     const IInputContext* const context_;
     int32_t fd_;
     // std::string seatId_;

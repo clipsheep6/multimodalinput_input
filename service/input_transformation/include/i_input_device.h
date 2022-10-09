@@ -78,6 +78,8 @@ public:
     virtual void ProcessEventItem(const struct input_event* eventItem) = 0;
     virtual int32_t StartReceiveEvents(const std::shared_ptr<IKernelEventHandler>& eventHandler) = 0;
     virtual int32_t StopReceiveEvents() = 0;
+    virtual void SetDeviceId(int32_t deviceId) = 0;
+    virtual int32_t GetDeviceId() const = 0;
 };
 
 std::ostream& operator<<(std::ostream& outStream, const IInputDevice::AxisInfo& axisInfo);

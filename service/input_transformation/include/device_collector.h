@@ -46,6 +46,7 @@ private:
 
 private:
     IInputContext* const context_;
+    std::shared_ptr<ITouchScreenHandler> touchScreenHandler_;
     std::map<int32_t, std::shared_ptr<IInputDevice>> inputDevices_;
 };
 } // namespace MMI

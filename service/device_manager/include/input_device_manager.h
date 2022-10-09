@@ -53,6 +53,7 @@ public:
     std::shared_ptr<InputDevice> GetInputDevice(int32_t id) const;
     std::vector<bool> SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes);
     int32_t FindInputDeviceId(struct libinput_device* inputDevice);
+    int32_t FindInputDeviceId(std::shared_ptr<IInputDevice> inputDevice);
     int32_t GetKeyboardBusMode(int32_t deviceId);
     bool GetDeviceConfig(int32_t deviceId, int32_t &KeyboardType);
     int32_t GetDeviceSupportKey(int32_t deviceId);

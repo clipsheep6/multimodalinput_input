@@ -789,6 +789,7 @@ void InputDeviceManager::OnInputDeviceAdded(std::shared_ptr<IInputDevice> inputD
     struct InputDeviceInfo info;
     MakeDeviceInfo(inputDevice, info);
     inputDevice_[nextId_] = info;
+    inputDevice->SetDeviceId(nextId_);
     for (const auto &item : devListener_) {
         CHKPC(item.first);
         item.second(nextId_, "add");

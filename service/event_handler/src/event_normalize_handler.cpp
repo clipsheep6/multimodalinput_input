@@ -160,8 +160,8 @@ int32_t EventNormalizeHandler::OnHDFDeviceAdded(int32_t devIndex)
     CHKPR(inputDevice, ERROR_NULL_POINTER);
     const auto& deviceCollector = context->GetInputDeviceCollector();
     CHKPR(deviceCollector, ERROR_NULL_POINTER);
-    deviceCollector->AddDevice(inputDevice);
     InputDevMgr->OnInputDeviceAdded(inputDevice);
+    deviceCollector->AddDevice(inputDevice);
     return RET_OK;
 }
 

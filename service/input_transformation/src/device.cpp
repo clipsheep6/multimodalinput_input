@@ -70,6 +70,16 @@ const std::string& Device::GetName() const
     return name_;
 }
 
+void SetDeviceId(int32_t deviceId)
+{
+    deviceId_ = deviceId;
+}
+
+int32_t GetDeviceId() const
+{
+    return deviceId_;
+}
+
 std::shared_ptr<IInputDevice::AxisInfo> Device::GetAxisInfo(int32_t axis) const
 {
     MMI_HILOGD("Enter device:%{public}s axis:%{public}s", GetName().c_str(), IInputDevice::AxisToString(axis));

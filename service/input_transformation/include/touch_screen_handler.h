@@ -35,6 +35,8 @@ public:
     virtual ~TouchScreenHandler() = default;
     virtual void OnInputEvent(const std::shared_ptr<const AbsEvent>& event) override;
     std::shared_ptr<PointerEvent> GetPointerEvent();
+    virtual int32_t BindInputDevice(const std::shared_ptr<IInputDevice>& inputDevice) override;
+    virtual int32_t UnbindInputDevice(const std::shared_ptr<IInputDevice>& inputDevice) override;
 
 protected:
     TouchScreenHandler(const IInputContext* context);    
@@ -43,9 +45,12 @@ protected:
     int32_t DispatchTo(int32_t pointerAction, int64_t actionTime, std::shared_ptr<PointerEvent::PointerItem>& pointer);
     int32_t ConvertAction(int32_t absEventAction) const;
     bool OnEventTouchDown(std::shared_ptr<const AbsEvent>& absEvent);
+    bool OnEventTouchUp(std::shared_ptr<const AbsEvent>& absEvent);
+    bool OnEventTouchMotion(std::shared_ptr<const AbsEvent>& absEvent);
 
 private:
     const IInputContext* const context_;
+    std::shared_ptr<IInputDevice> inputDevice_;
     std::shared_ptr<IInputDevice::AxisInfo> xInfo_;
     std::shared_ptr<IInputDevice::AxisInfo> yInfo_;
     std::shared_ptr<PointerEvent> pointerEvent_;

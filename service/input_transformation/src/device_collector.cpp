@@ -121,13 +121,19 @@ void DeviceCollector::NotifyDeviceAdded(const std::shared_ptr<IInputDevice>& dev
         return;
     }
 
-    std::shared_ptr<ITouchScreenHandler> result = ITouchScreenHandler::CreateInstance(context_);
-    if (!result) {
+    touchScreenHandler_ = ITouchScreenHandler::CreateInstance(context_);
+    if (!touchScreenHandler_) {
         MMI_HILOGE("Leave , Create Failed");
         return;
     }
 
-    auto handler = KernelEventHandlerBridge::CreateInstance(result);
+    auto retCode = touchScreenHandler_->BindInputDevice(device);
+    if (retCode < 0) {
+        MMI_HILOGE("Leave, BindInputDevice Failed");
+        return;
+    }
+
+    auto handler = KernelEventHandlerBridge::CreateInstance(touchScreenHandler_);
     if (!handler) {
         MMI_HILOGE("Leave, null bridge handler");
         return;
@@ -145,6 +151,14 @@ void DeviceCollector::NotifyDeviceRemoved(const std::shared_ptr<IInputDevice>& d
     auto retCode = device->StopReceiveEvents();
     if (retCode < 0) {
         MMI_HILOGW("Leave, inputDevice StopReceiveEvents Failed");
+    }
+
+    if (touchScreenHandler_ != nullptr) {
+        retCode = touchScreenHandler_->UnbindInputDevice(device);
+        if (retCode < 0) {
+            MMI_HILOGE("Leave, BindInputDevice Failed");
+            return;
+        }
     }
     MMI_HILOGD("Leave");
 }
