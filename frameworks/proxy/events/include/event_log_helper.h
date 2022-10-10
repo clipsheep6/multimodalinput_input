@@ -63,6 +63,16 @@ private:
         }
     }
 
+    static uint64_t GetSysClockTime1()
+    {
+        struct timespec ts = { 0, 0 };
+        if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
+            MMI_HILOGD("clock_gettime failed:%{public}d", errno);
+            return 0;
+        }
+        return (ts.tv_sec * 1000 * 1000) + (ts.tv_nsec / 1000);
+    }
+
     static void Print(const std::shared_ptr<PointerEvent> event)
     {
         std::vector<int32_t> pointerIds { event->GetPointerIds() };
@@ -79,6 +89,8 @@ private:
             event->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH),
             event->GetPointerId(), pointerIds.size(), event->GetId());
 
+        uint64_t nowTime = GetSysClockTime1();
+
         for (const auto& pointerId : pointerIds) {
             PointerEvent::PointerItem item;
             if (!event->GetPointerItem(pointerId, item)) {
@@ -89,12 +101,12 @@ private:
                 "DisplayY:%{public}d,WindowX:%{public}d,WindowY:%{public}d,Width:%{public}d,Height:%{public}d,"
                 "TiltX:%{public}.2f,TiltY:%{public}.2f,ToolDisplayX:%{public}d,ToolDisplayY:%{public}d,"
                 "ToolWindowX:%{public}d,ToolWindowY:%{public}d,ToolWidth:%{public}d,ToolHeight:%{public}d,"
-                "Pressure:%{public}.2f,ToolType:%{public}d,LongAxis:%{public}d,ShortAxis:%{public}d",
+                "Pressure:%{public}.2f,ToolType:%{public}d,LongAxis:%{public}d,ShortAxis:%{public}d, EventTime:%{public}llu, NowTime:%{public}llu, CostTime:%{public}llu",
                 pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(),
                 item.GetDisplayY(), item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(),
                 item.GetTiltX(), item.GetTiltY(), item.GetToolDisplayX(), item.GetToolDisplayY(), item.GetToolWindowX(),
                 item.GetToolWindowY(), item.GetToolWidth(), item.GetToolHeight(), item.GetPressure(), item.GetToolType(),
-                item.GetLongAxis(), item.GetShortAxis());
+                item.GetLongAxis(), item.GetShortAxis(), item.GetEventTime(), nowTime, nowTime - item.GetEventTime());
         }
         std::vector<int32_t> pressedKeys = event->GetPressedKeys();
         std::vector<int32_t>::const_iterator cItr = pressedKeys.cbegin();

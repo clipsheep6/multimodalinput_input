@@ -19,6 +19,7 @@
 
 #include "define_multimodal.h"
 #include "error_multimodal.h"
+#include "event_log_helper.h"
 
 #include "bytrace_adapter.h"
 #include "event_filter_service.h"
@@ -218,6 +219,7 @@ void InputManagerImpl::OnPointerEventTask(std::shared_ptr<IInputEventConsumer> c
     CHKPV(consumer);
     CHKPV(pointerEvent);
     consumer->OnInputEvent(pointerEvent);
+    EventLogHelper::PrintEventData(pointerEvent);
     MMI_HILOGD("Pointer event callback pointerId:%{public}d", pointerEvent->GetPointerId());
 }
 

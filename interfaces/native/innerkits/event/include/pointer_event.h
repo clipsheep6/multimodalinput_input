@@ -351,6 +351,9 @@ public:
          */
         void SetDownTime(int64_t downTime);
 
+        uint64_t GetEventTime() const;
+        void SetEventTime(uint64_t eventTime);
+
         /**
          * @brief Checks whether the pointer is pressed.
          * @return Returns <b>true</b> if the pointer is pressed; returns <b>false</b> otherwise.
@@ -750,6 +753,7 @@ public:
         int32_t targetWindowId_ { -1 };
         int32_t rawDx_ {};
         int32_t rawDy_ {};
+        uint64_t eventTime_{};
     };
 
 public:

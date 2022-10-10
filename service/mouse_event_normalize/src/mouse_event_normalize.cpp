@@ -20,7 +20,7 @@
 #include "input-event-codes.h"
 
 #include "define_multimodal.h"
-#include "event_log_helper.h"
+//#include "event_log_helper.h"
 #include "i_pointer_drawing_manager.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
@@ -312,8 +312,10 @@ int32_t MouseEventNormalize::Normalize(struct libinput_event *event)
             return RET_ERR;
         }
     }
+    uint64_t eventTime = libinput_event_pointer_get_time_usec(data);
     int32_t deviceId = InputDevMgr->FindInputDeviceId(libinput_event_get_device(event));
     PointerEvent::PointerItem pointerItem;
+    pointerItem.SetEventTime(eventTime);
     HandlePostInner(data, deviceId, pointerItem);
     WinMgr->UpdateTargetPointer(pointerEvent_);
     DumpInner();
@@ -398,7 +400,7 @@ bool MouseEventNormalize::NormalizeMoveMouse(int32_t offsetX, int32_t offsetY)
 
 void MouseEventNormalize::DumpInner()
 {
-    EventLogHelper::PrintEventData(pointerEvent_);
+    //EventLogHelper::PrintEventData(pointerEvent_);
 }
 
 void MouseEventNormalize::Dump(int32_t fd, const std::vector<std::string> &args)

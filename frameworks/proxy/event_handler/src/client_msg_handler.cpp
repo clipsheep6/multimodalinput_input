@@ -158,7 +158,7 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
         return RET_ERR;
     }
     MMI_HILOGD("Pointer event dispatcher of client:");
-    EventLogHelper::PrintEventData(pointerEvent);
+    //EventLogHelper::PrintEventData(pointerEvent);
     if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
         MMI_HILOGI("Operation canceled.");
     }

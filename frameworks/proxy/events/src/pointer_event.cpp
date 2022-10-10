@@ -58,6 +58,16 @@ void PointerEvent::PointerItem::SetDownTime(int64_t downTime)
     downTime_ = downTime;
 }
 
+uint64_t PointerEvent::PointerItem::GetEventTime() const 
+{
+    return eventTime_;
+}
+
+void PointerEvent::PointerItem::SetEventTime(uint64_t eventTime)
+{
+    eventTime_ = eventTime;
+}
+
 bool PointerEvent::PointerItem::IsPressed() const
 {
     return pressed_;
