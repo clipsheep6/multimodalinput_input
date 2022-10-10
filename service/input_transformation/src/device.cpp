@@ -159,39 +159,20 @@ void Device::ProcessEventItem(const struct input_event* eventItem)
         case EV_SYN:
             ProcessSyncEvent(code, value);
             break;
-        // case EV_KEY:
-        //     ProcessKeyEvent(code, value);
-        //     break;
-        // case EV_REL:
-        //     ProcessRelEvent(code, value);
-        //     break;
         case EV_ABS:
             ProcessAbsEvent(code, value);
             break;
-        // case EV_MSC:
-        //     ProcessMscEvent(code, value);
-        //     break;
-        // case EV_SW:
-        //     ProcessSwEvent(code, value);
-        //     break;
-        // case EV_LED:
-        //     ProcessLedEvent(code, value);
-        //     break;
-        // case EV_SND:
-        //     ProcessSndEvent(code, value);
-        //     break;
-        // case EV_REP:
-        //     ProcessRepEvent(code, value);
-        //     break;
-        // case EV_FF:
-        //     ProcessFfEvent(code, value);
-        //     break;
-        // case EV_PWR:
-        //     ProcessPwrEvent(code, value);
-        //     break;
-        // case EV_FF_STATUS:
-        //     ProcessFfStatusEvent(code, value);
-        //     break;
+        case EV_KEY:
+        case EV_REL:
+        case EV_MSC:
+        case EV_SW:
+        case EV_LED:
+        case EV_SND:
+        case EV_REP:
+        case EV_FF:
+        case EV_PWR:
+        case EV_FF_STATUS:
+            break;
         default:
             break;
     }

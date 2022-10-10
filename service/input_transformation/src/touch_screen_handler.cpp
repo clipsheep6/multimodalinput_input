@@ -18,6 +18,7 @@
 #include "event_log_helper.h"
 #include "i_input_context.h"
 #include "input_device_manager.h"
+#include "input_event_handler.h"
 #include "input_windows_manager.h"
 #include "mmi_log.h"
 
@@ -46,7 +47,7 @@ std::shared_ptr<PointerEvent> TouchScreenHandler::GetPointerEvent()
 
 int32_t TouchScreenHandler::BindInputDevice(const std::shared_ptr<IInputDevice>& inputDevice)
 {
-    MMI_HILOGD("Enter");
+    CALL_DEBUG_ENTER;
     if (!inputDevice) {
         MMI_HILOGE("Leave, null InputDevice");
         return -1;
@@ -79,26 +80,24 @@ int32_t TouchScreenHandler::BindInputDevice(const std::shared_ptr<IInputDevice>&
     inputDevice_ = inputDevice;
     xInfo_ = xInfo;
     yInfo_ = yInfo;
-    MMI_HILOGD("Leave");
     return 0;
 }
 
 int32_t TouchScreenHandler::UnbindInputDevice(const std::shared_ptr<IInputDevice>& inputDevice)
 {
-    MMI_HILOGD("Enter");
+    CALL_DEBUG_ENTER;
     if (inputDevice != inputDevice_) {
         MMI_HILOGE("Leave, inputDevice != inputDevice_");
         return -1;
     }
 
     inputDevice_.reset();
-    MMI_HILOGD("Leave");
     return 0;
 }
 
 void TouchScreenHandler::OnInputEvent(const std::shared_ptr<const AbsEvent>& event)
 {
-    MMI_HILOGD("Enter absEvent:%{public}p", event.get());
+    CALL_DEBUG_ENTER;
     int32_t pointerAction = PointerEvent::POINTER_ACTION_UNKNOWN;
     int64_t actionTime = 0;
     auto ret = ConvertPointer(event, pointerAction, actionTime);
@@ -106,38 +105,16 @@ void TouchScreenHandler::OnInputEvent(const std::shared_ptr<const AbsEvent>& eve
         MMI_HILOGE("Leave ConvertPointer Failed");
         return;
     }
-
-    /*auto retCode = DispatchTo(pointerAction, actionTime,  pointer);
-    if (retCode < 0) {
-        MMI_HILOGE("Leave, Dispatch Failed");
-        return;
-    }*/
-
-    MMI_HILOGD("Leave,  pointerAction:%{public}d", pointerAction);
-}
-
-int32_t TouchScreenHandler::DispatchTo(int32_t pointerAction, int64_t actionTime, std::shared_ptr<PointerEvent::PointerItem>& pointer)
-{
-
-    // auto pointerEvent = targetDisplay->HandleEvent(pointerAction, actionTime, pointer);
-    // if (!pointerEvent) {
-    //     MMI_HILOGE("Leave, null pointerEvent");
-    //     return -1;
-    // }
-
-    if (context_ == nullptr) {
-        MMI_HILOGE("Leave, null context_");
-        return -1;
-    }
-    // auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
-    // CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
-    // inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
-    return 0;
+    auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPV(inputEventNormalizeHandler);
+    CHKPV(pointerEvent_);
+    inputEventNormalizeHandler->HandleTouchEvent(pointerEvent_);
 }
 
 bool TouchScreenHandler::ConvertPointer(const std::shared_ptr<const AbsEvent>& absEvent,
         int32_t& pointerAction, int64_t& actionTime)
 {
+    CALL_DEBUG_ENTER;
     std::shared_ptr<PointerEvent::PointerItem> pointer;
     if (!absEvent) {
         MMI_HILOGE("Leave, null absEvent");
@@ -196,7 +173,6 @@ bool TouchScreenHandler::ConvertPointer(const std::shared_ptr<const AbsEvent>& a
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent_->UpdateId();
     WinMgr->UpdateTargetPointer(pointerEvent_);
-
     MMI_HILOGD("Leave");
     return true;
 }
@@ -247,6 +223,7 @@ int32_t TouchScreenHandler::TransformY(int32_t yPos, int32_t height, int32_t log
 int32_t TouchScreenHandler::TransformToPhysicalDisplayCoordinate(const DisplayInfo& info,
         int32_t tpX, int32_t tpY, int32_t& displayX, int32_t& displayY) const
 {
+    CALL_DEBUG_ENTER;
     if (!xInfo_) {
         MMI_HILOGE("Leave, null xInfo_");
         return -1;
@@ -264,8 +241,6 @@ int32_t TouchScreenHandler::TransformToPhysicalDisplayCoordinate(const DisplayIn
     int32_t deltaY = tpY - yInfo_->GetMinimum();
     int32_t height = yInfo_->GetMaximum() - yInfo_->GetMinimum() + 1;
     displayY = TransformY(deltaY, height, info.height);
-
-    MMI_HILOGD("Leave");
     return 0;
 }
 

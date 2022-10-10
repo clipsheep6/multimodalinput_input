@@ -44,7 +44,6 @@ protected:
     TouchScreenHandler(const IInputContext* context);    
     bool ConvertPointer(const std::shared_ptr<const AbsEvent>& absEvent, 
             int32_t& pointerAction, int64_t& actionTime);
-    int32_t DispatchTo(int32_t pointerAction, int64_t actionTime, std::shared_ptr<PointerEvent::PointerItem>& pointer);
     int32_t ConvertAction(int32_t absEventAction) const;
     bool OnEventTouchDown(const std::shared_ptr<const AbsEvent>& absEvent);
     bool OnEventTouchUp(const std::shared_ptr<const AbsEvent>& absEvent);
