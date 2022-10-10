@@ -18,7 +18,6 @@
 #include <cstring>
 #include <dirent.h>
 
-#include "i_touch_screen_handler.h"
 #include "mmi_log.h"
 #include "device.h"
 #include "kernel_event_handler_bridge.h"

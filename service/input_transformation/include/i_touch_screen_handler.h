@@ -26,7 +26,7 @@ namespace MMI {
 class IInputContext;
 class ITouchScreenHandler {
 public:
-    static std::unique_ptr<ITouchScreenHandler> CreateInstance(const IInputContext* context, );
+    static std::unique_ptr<ITouchScreenHandler> CreateInstance(const IInputContext* context);
     virtual ~ITouchScreenHandler() = default;
     virtual void OnInputEvent(const std::shared_ptr<const AbsEvent>& event) = 0;
     virtual int32_t BindInputDevice(const std::shared_ptr<IInputDevice>& inputDevice) = 0;

@@ -70,12 +70,12 @@ const std::string& Device::GetName() const
     return name_;
 }
 
-void SetDeviceId(int32_t deviceId)
+void Device::SetDeviceId(int32_t deviceId)
 {
     deviceId_ = deviceId;
 }
 
-int32_t GetDeviceId() const
+int32_t Device::GetDeviceId() const
 {
     return deviceId_;
 }

@@ -50,7 +50,7 @@ public:
     virtual int32_t StopReceiveEvents() override;
     virtual void ProcessEventItem(const struct input_event* eventItem) override;
     virtual void SetDeviceId(int32_t deviceId) override;
-    virtual int32_t GetDeviceId() override;
+    virtual int32_t GetDeviceId() const override;
 
 protected:
     int32_t Init();
@@ -80,12 +80,10 @@ private:
 
 private:
     const int32_t id_;
-    const int32_t deviceId_;
     const IInputContext* const context_;
     int32_t fd_;
-    // std::string seatId_;
-    // std::string seatName_;
     std::string name_;
+    int32_t deviceId_;
 
     int32_t capabilities_ {IInputDevice::CAPABILITY_UNKNOWN};
     unsigned long inputProperty[LongsOfBits(INPUT_PROP_MAX)];
