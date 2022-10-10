@@ -59,6 +59,7 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
     int32_t retryCount = 0;
     const int32_t bufSize = static_cast<int32_t>(size);
     int32_t remSize = bufSize;
+    MMI_HILOGD("Send size:%{public}d, fd:%{public}d", bufSize, fd_);
     while (remSize > 0 && retryCount < SEND_RETRY_LIMIT) {
         retryCount += 1;
         auto count = send(fd_, &buf[idx], remSize, MSG_DONTWAIT | MSG_NOSIGNAL);
