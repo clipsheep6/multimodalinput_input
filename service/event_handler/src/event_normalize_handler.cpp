@@ -38,7 +38,7 @@
 #include "mmi_log.h"
 #include "time_cost_chk.h"
 #include "timer_manager.h"
-#include "touch_event_handler.h"
+#include "touch_screen_handler.h"
 #include "touch_event_normalize.h"
 #ifdef OHOS_BUILD_HDF_TEMP
 #include "device_collector.h"
