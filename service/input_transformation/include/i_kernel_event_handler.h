@@ -22,6 +22,7 @@
 namespace OHOS {
 namespace MMI {
 class AbsEvent;
+class ITouchScreenHandler;
 class IKernelEventHandler {
 public:
     static const std::shared_ptr<IKernelEventHandler>& GetDefault();
