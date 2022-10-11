@@ -119,10 +119,10 @@ void EventNormalizeHandler::HandleEvent(const HdfInputEvent &event)
 {
     if (event.IsDevNodeAddRmvEvent()) {
         MMI_HILOGI("hdfEvent:addrmv: eventType:%{public}u, devIndex:%{public}u, devType:%{public}u, devStatus:%{public}u, time:%{public}llu",
-            event.eventType, event.devIndex, event.devType, event.devStatus, event.time));
+            event.eventType, event.devIndex, event.devType, event.devStatus, event.time);
     } else {
         MMI_HILOGI("hdfEvent:event: eventType:%{public}u, devIndex:%{public}u, type:%{public}u, code:%{public}u, value:%{public}u, time:%{public}llu",
-        event.eventType, event.devIndex, event.type, event.code, event.value, event.time));
+        event.eventType, event.devIndex, event.type, event.code, event.value, event.time);
     }
     
     /*

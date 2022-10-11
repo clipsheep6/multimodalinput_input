@@ -48,12 +48,11 @@ void HdfDeviceStatusChanged(int32_t devIndex, int32_t devType, HdfInputEventDevS
         rev     | plugStatus | devIndex | 00         |
         rev     | statusType |          |            |
      */
-    auto t = ((static_cast<int32_t>(devStatus)) << 16) | (devIndex << 8) | 0x00;
     HdfInputEvent event;
-    event.eventType = HdfInputEventType::DEV_NODE_ADD_RMV;
+    event.eventType = static_cast<uint32_t>(HdfInputEventType::DEV_NODE_ADD_RMV);
     event.devIndex = devIndex;
     event.devType = devType;
-    event.devStatus = devStatus;
+    event.devStatus = static_cast<uint32_t>(devStatus);
     event.time = GetSysClockTime();
     MMI_HILOGE("zpc:write:plugin:eventType:%{public}u, devIndex:%{public}u, devType:%{public}u, devStatus:%{public}u,time:%{public}llu",
         event.eventType, event.devIndex, event.devType, event.devStatus, event.time);
@@ -89,7 +88,7 @@ static void EventPkgCallback(const InputEventPackage **pkgs, uint32_t count, uin
              rev     | plugStatus | devIndex | evType     |
          */
         HdfInputEvent event;
-        event.eventType = HdfInputEventType::DEV_NODE_EVENT;
+        event.eventType = static_cast<uint32_t>(HdfInputEventType::DEV_NODE_EVENT);
         event.devIndex = devIndex;
         event.code = pkgs[i]->code;
         event.type = pkgs[i]->type;

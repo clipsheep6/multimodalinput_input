@@ -28,7 +28,7 @@ namespace OHOS {
 namespace MMI {
 enum class HdfInputEventType : uint32_t {
     DEV_NODE_EVENT = 0,
-    DEV_NODE_ADD_RMV = 1,}
+    DEV_NODE_ADD_RMV = 1,
 };
 
 enum class HdfInputEventDevStatus : int32_t {
@@ -38,8 +38,8 @@ enum class HdfInputEventDevStatus : int32_t {
 
 #pragma pack(1)
 struct HdfInputEvent {
-    bool IsDevNodeAddRmvEvent() { return eventType == (static_cast<uint32_t>(HdfInputEventType::DEV_NODE_ADD_RMV)); }
-    bool IsDevAdd() { return (devStatus == (static_cast<uint32_t>(HdfInputEventDevStatus::HDF_ADD_DEVICE)))}
+    bool IsDevNodeAddRmvEvent() const { return (eventType == (static_cast<uint32_t>(HdfInputEventType::DEV_NODE_ADD_RMV))); }
+    bool IsDevAdd() const { return (devStatus == (static_cast<uint32_t>(HdfInputEventDevStatus::HDF_ADD_DEVICE))); }
     uint32_t eventType; // 0 设备节点事件, 1 设备添加删除事件
     uint32_t devIndex;
     union {
