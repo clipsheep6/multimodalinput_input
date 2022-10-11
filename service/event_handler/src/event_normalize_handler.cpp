@@ -30,7 +30,6 @@
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_manager.h"
 #include "input_event_handler.h"
-#include "kernel_event_handler_bridge.h"
 #include "key_auto_repeat.h"
 #include "key_event_normalize.h"
 #include "key_event_value_transformation.h"
@@ -38,7 +37,6 @@
 #include "mmi_log.h"
 #include "time_cost_chk.h"
 #include "timer_manager.h"
-#include "touch_screen_handler.h"
 #include "touch_event_normalize.h"
 #ifdef OHOS_BUILD_HDF_TEMP
 #include "device_collector.h"
@@ -194,9 +192,9 @@ int32_t EventNormalizeHandler::OnHDFEvent(int32_t devIndex, const input_event &e
     device->ProcessEventItem(&event);
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
-    std::shared_ptr<KernelEventHandlerBridge> kernelEventHandler = device->GetKernelEventHandler();
+    std::shared_ptr<IKernelEventHandler> kernelEventHandler = device->GetKernelEventHandler();
     CHKPR(kernelEventHandler, ERROR_NULL_POINTER);
-    std::shared_ptr<TouchScreenHandler> touchEventHandler = kernelEventHandler->GetTouchEventHandler();
+    std::shared_ptr<ITouchScreenHandler> touchEventHandler = kernelEventHandler->GetTouchEventHandler();
     CHKPR(touchEventHandler, ERROR_NULL_POINTER);
     auto pointerEvent = touchEventHandler->GetPointerEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
