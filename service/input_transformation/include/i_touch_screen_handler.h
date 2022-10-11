@@ -24,6 +24,7 @@
 namespace OHOS {
 namespace MMI {
 class IInputContext;
+class PointerEvent;
 class ITouchScreenHandler {
 public:
     static std::unique_ptr<ITouchScreenHandler> CreateInstance(const IInputContext* context);
