@@ -18,9 +18,9 @@
 #include <cstring>
 #include <dirent.h>
 
-#include "mmi_log.h"
 #include "device.h"
 #include "kernel_event_handler_bridge.h"
+#include "mmi_log.h"
 namespace OHOS {
 namespace MMI {
 

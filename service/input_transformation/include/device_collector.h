@@ -19,8 +19,8 @@
 #include <memory>
 #include <map>
 
-#include "i_input_define.h"
 #include "i_device_collector.h"
+#include "i_input_define.h"
 #include "i_touch_screen_handler.h"
 
 namespace OHOS {

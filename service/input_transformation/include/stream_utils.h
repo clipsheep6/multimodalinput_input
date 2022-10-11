@@ -16,13 +16,13 @@
 #ifndef STREAM_UTIL_H
 #define STREAM_UTIL_H
 
-#include <utility>
-#include <list>
-#include <vector>
 #include <deque>
-#include <set>
+#include <list>
 #include <map>
+#include <set>
 #include <sstream>
+#include <utility>
+#include <vector>
 
 namespace OHOS {
 namespace MMI {

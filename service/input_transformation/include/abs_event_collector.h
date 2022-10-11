@@ -20,8 +20,8 @@
 #include <map>
 #include <list>
 
-#include "i_input_define.h"
 #include "abs_event.h"
+#include "i_input_define.h"
 
 namespace OHOS {
 namespace MMI {

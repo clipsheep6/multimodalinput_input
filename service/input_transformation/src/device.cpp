@@ -15,21 +15,21 @@
  
 #include "device.h"
 
-#include <iostream>
 #include <cstring>
+#include <fcntl.h>
 #include <functional>
 #include <iomanip>
-#include <sys/types.h>
-#include <sys/stat.h>
+#include <iostream>
+#include <linux/input.h>
 #include <sys/ioctl.h>
-#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
 
-#include <linux/input.h>
-#include "mmi_log.h"
 #include "enum_utils.h"
-#include "time_utils.h"
 #include "i_kernel_event_handler.h"
+#include "mmi_log.h"
+#include "time_utils.h"
 
 namespace OHOS {
 namespace MMI {
@@ -78,6 +78,11 @@ void Device::SetDeviceId(int32_t deviceId)
 int32_t Device::GetDeviceId() const
 {
     return deviceId_;
+}
+
+std::shared_ptr<IKernelEventHandler> Device::GetKernelEventHandler()
+{
+    return eventHandler_;
 }
 
 std::shared_ptr<IInputDevice::AxisInfo> Device::GetAxisInfo(int32_t axis) const

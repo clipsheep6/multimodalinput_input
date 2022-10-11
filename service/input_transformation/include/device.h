@@ -21,15 +21,12 @@
 
 #include <linux/input.h>
 
-
-#include "i_input_define.h"
-#include "i_input_device.h"
-#include "i_input_context.h"
-#include "i_event_collector.h"
-// #include "i_seat.h"
-// #include "i_touch_screen_handler.h"
 #include "abs_event_collector.h"
 #include "abs_event.h"
+#include "i_event_collector.h"
+#include "i_input_context.h"
+#include "i_input_define.h"
+#include "i_input_device.h"
 
 struct input_event;
 
@@ -51,7 +48,8 @@ public:
     virtual void ProcessEventItem(const struct input_event* eventItem) override;
     virtual void SetDeviceId(int32_t deviceId) override;
     virtual int32_t GetDeviceId() const override;
-
+    std::shared_ptr<IKernelEventHandler> GetKernelEventHandler();
+    
 protected:
     int32_t Init();
     void Uninit();

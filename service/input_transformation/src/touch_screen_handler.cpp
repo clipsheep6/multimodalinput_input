@@ -103,12 +103,7 @@ void TouchScreenHandler::OnInputEvent(const std::shared_ptr<const AbsEvent>& eve
     auto ret = ConvertPointer(event, pointerAction, actionTime);
     if (!ret) {
         MMI_HILOGE("Leave ConvertPointer Failed");
-        return;
     }
-    auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
-    CHKPV(inputEventNormalizeHandler);
-    CHKPV(pointerEvent_);
-    inputEventNormalizeHandler->HandleTouchEvent(pointerEvent_);
 }
 
 bool TouchScreenHandler::ConvertPointer(const std::shared_ptr<const AbsEvent>& absEvent,

@@ -18,11 +18,11 @@
 #include <memory>
 #include <map>
 
-#include "i_touch_screen_handler.h"
-#include "i_input_define.h"
-#include "i_input_device.h"
 #include "abs_event.h"
 #include "display_info.h"
+#include "i_input_define.h"
+#include "i_input_device.h"
+#include "i_touch_screen_handler.h"
 #include "pointer_event.h"
 #include "struct_multimodal.h"
 

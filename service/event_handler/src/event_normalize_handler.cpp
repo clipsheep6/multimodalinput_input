@@ -129,6 +129,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event)
 #ifdef OHOS_BUILD_HDF_TEMP
 void EventNormalizeHandler::HandleEvent(const input_event &event)
 {
+    CALL_DEBUG_ENTER;
     MMI_HILOGI("hdfEvent: type:%{public}d, code:%{public}d, value:%{public}d, time:%{public}lld",
         event.type, event.code, event.value, GetTime(event));
     int32_t devStatus = ((event.type | 0xff0000) >> 16);
@@ -154,6 +155,7 @@ void EventNormalizeHandler::HandleEvent(const input_event &event)
 
 int32_t EventNormalizeHandler::OnHDFDeviceAdded(int32_t devIndex)
 {
+    CALL_DEBUG_ENTER;
     auto context = InputHandler->GetContext();
     CHKPR(context, ERROR_NULL_POINTER);
     auto inputDevice = std::make_shared<Device>(devIndex, context);
@@ -167,6 +169,7 @@ int32_t EventNormalizeHandler::OnHDFDeviceAdded(int32_t devIndex)
 
 int32_t EventNormalizeHandler::OnHDFDeviceRemoved(int32_t devIndex)
 {
+    CALL_DEBUG_ENTER;
     auto context = InputHandler->GetContext();
     CHKPR(context, ERROR_NULL_POINTER);
     const auto& deviceCollector = context->GetInputDeviceCollector();
@@ -179,13 +182,23 @@ int32_t EventNormalizeHandler::OnHDFDeviceRemoved(int32_t devIndex)
 
 int32_t EventNormalizeHandler::OnHDFEvent(int32_t devIndex, const input_event &event)
 {
+    CALL_DEBUG_ENTER;
     auto context = InputHandler->GetContext();
     CHKPR(context, ERROR_NULL_POINTER); 
     const auto& deviceCollector = context->GetInputDeviceCollector();
     CHKPR(deviceCollector, ERROR_NULL_POINTER);
-    const auto& device = deviceCollector->GetDevice(event.value);
+    const auto& device = deviceCollector->GetDevice(devIndex);
     CHKPR(device, ERROR_NULL_POINTER);
     device->ProcessEventItem(&event);
+    auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPV(inputEventNormalizeHandler);
+    std::shared_ptr<KernelEventHandlerBridge> kernelEventHandler = device->GetKernelEventHandler();
+    CHKPV(kernelEventHandler);
+    std::shared_ptr<TouchScreenHandler> touchEventHandler = kernelEventHandler->GetTouchEventHandler();
+    CHKPV(touchEventHandler);
+    auto pointerEvent = touchEventHandler->GetPointerEvent();
+    CHKPV(pointerEvent);
+    inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
     return RET_OK;
 }
 #endif // OHOS_BUILD_HDF_TEMP
