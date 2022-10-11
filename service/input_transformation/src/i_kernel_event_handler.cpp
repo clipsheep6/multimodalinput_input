@@ -22,6 +22,10 @@ class DefaultHandler : public IKernelEventHandler {
     virtual void OnInputEvent(const std::shared_ptr<const AbsEvent>& event) override
     {
     }
+    virtual std::shared_ptr<ITouchScreenHandler> GetTouchEventHandler() override
+    {
+        return nullptr;
+    }
 };
 
 const std::shared_ptr<IKernelEventHandler>& IKernelEventHandler::GetDefault()
