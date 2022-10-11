@@ -48,6 +48,7 @@ config("libmmi_server_config") {
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/src",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/util/common/include",
+    "//foundation/multimodalinput/input/util/stack_dumper/include",
     "//foundation/multimodalinput/input/util/socket/include",
     "//foundation/multimodalinput/input/util/network/include",
     "//foundation/multimodalinput/input/frameworks/proxy/event_handler/include",

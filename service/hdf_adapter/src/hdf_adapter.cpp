@@ -16,8 +16,10 @@
 #include "hdf_adapter.h"
 #include <array>
 #include <linux/input.h>
+#include "circle_stream_buffer.h"
 #include "config_multimodal.h"
 #include "error_multimodal.h"
+#include "stack_dumper_helper.h"
 #include "util_ex.h"
 
 namespace OHOS {
@@ -29,6 +31,7 @@ inline constexpr uint32_t MMI_MAX_INPUT_DEVICE_COUNT = 32;
 const std::string DEF_INPUT_SEAT = "seat0";
 int32_t g_hdfAdapterWriteFd { -1 };
 int32_t g_mmiServiceReadFd { -1 };
+CircleStreamBuffer g_circBuf;
 IInputInterface *g_inputInterface { nullptr };
 InputEventCb g_eventCb;
 InputHostCb g_hostCb;
@@ -46,22 +49,39 @@ inline uint64_t GetTime(const struct input_event &event)
 }
 } // namespace
 
-void HdfDeviceStatusChanged(int32_t devIndex, int32_t devType, HDFDevicePlugType statusType)
+void HdfDeviceStatusChanged(int32_t devIndex, int32_t devType, HDFDevicePlugType plugType)
 {
+    CHK_PID_AND_TID();
+    /*
+     * 设备管理信息, type写pipe
+        31 - 24 | 23 - 16    | 15 - 8   | 7 - 0      |
+        保留    | 热插拨     | devIndex | ev_xx type |
+        rev     | plugStatus | devIndex | 00         |
+        rev     | statusType |          |            |
+     */
+    auto t = ((static_cast<int32_t>(plugType)) << 16) | (devIndex << 8) | 0x00;
     input_event event;
-    event.code = -1;
-    event.type = (static_cast<int32_t>(statusType) << 16) | (devIndex << 8);
+    event.code = 0;
+    event.type = ((static_cast<int32_t>(plugType)) << 16) | (devIndex << 8) | 0x00;
     event.value = devType;
     InputEventSetTime(event, GetSysClockTime());
+    MMI_HILOGE("zpc:write:plugin:devIndex:%{public}d, devType:%{public}d, statusType:%{public}d, "
+        "- code:%{public}d, t:%{public}x, type:%{public}x, value:%{public}d, time:%{public}lld",
+        devIndex, devType, plugType,
+        event.code, t, event.type, event.value, GetTime(event)
+        );
     auto ret = write(g_hdfAdapterWriteFd, &event, sizeof(event));
     if (ret == -1) {
         int saveErrno = errno;
         MMI_HILOGE("Write pipe fail, errno:%{public}d, %{public}s", saveErrno, strerror(saveErrno));
     }
+    // auto [isOk, msg] = StackDumperHelper::Dump();
+    // MMI_HILOGE("zpc: stack: %{public}d, %{public}s", isOk, msg.c_str());
 }
 
 static void HotPlugCallback(const InputHotPlugEvent *event)
 {
+    CHK_PID_AND_TID();
     CHKPV(event);
     auto plugType = (event->status ? HDFDevicePlugType::HDF_RMV_DEVICE : HDFDevicePlugType::HDF_ADD_DEVICE);
     HdfDeviceStatusChanged(event->devIndex, event->devType, plugType);
@@ -69,6 +89,7 @@ static void HotPlugCallback(const InputHotPlugEvent *event)
 
 static void EventPkgCallback(const InputEventPackage **pkgs, uint32_t count, uint32_t devIndex)
 {
+    CHK_PID_AND_TID();
     static constexpr uint16_t byteSize = 8;
     CHKPV(pkgs);
     uint32_t fixedCount = count;
@@ -77,27 +98,44 @@ static void EventPkgCallback(const InputEventPackage **pkgs, uint32_t count, uin
         MMI_HILOGE("Too big hdf event, count:%{public}d is beyond %{public}d", count, MMI_MAX_EVENT_PKG_NUM);
     }
     for (uint32_t i = 0; i < fixedCount; ++i) {
+        /*
+         * 设备事件消息, type写pipe
+             31 - 24 | 23 - 16    | 15 - 8   | 7 - 0      |
+             保留    | 热插拨     | devIndex | ev_xx type |
+             rev     | plugStatus | devIndex | evType     |
+         */
         input_event event;
         event.code = pkgs[i]->code;
         event.type = (pkgs[i]->type) | static_cast<uint16_t>(devIndex << byteSize);
         event.value = pkgs[i]->value;
         InputEventSetTime(event, pkgs[i]->timestamp);
+
+        MMI_HILOGE("zpc:write:event:devIndex:%{public}d, count:%{public}d, fixedCount:%{public}d, "
+            "- code:%{public}d, type:%{public}d, value:%{public}d, time:%{public}lld",
+            devIndex, count, fixedCount,
+            event.code, event.type, event.value, GetTime(event)
+            );
+
         auto ret = write(g_hdfAdapterWriteFd, &event, sizeof(input_event));
         if (ret == -1) {
             int saveErrno = errno;
             MMI_HILOGE("Write pipe fail, errno:%{public}d, %{public}s", saveErrno, strerror(saveErrno));
         }
+        // auto [isOk, msg] = StackDumperHelper::Dump();
+        // MMI_HILOGE("zpc: stack: %{public}d, %{public}s", isOk, msg.c_str());
     }     
 }
 
 HdfAdapter::HdfAdapter()
 {
+    CHK_PID_AND_TID();
     g_eventCb.EventPkgCallback = EventPkgCallback;
     g_hostCb.HotPlugCallback = HotPlugCallback;
 }
 
 int32_t HdfAdapter::ScanInputDevice()
 {
+    CHK_PID_AND_TID();
     CALL_DEBUG_ENTER;
     CHKPR(g_inputInterface, RET_ERR);
     CHKPR(g_inputInterface->iInputManager, RET_ERR);
@@ -201,9 +239,49 @@ void HdfAdapter::EventDispatch(epoll_event &ev)
         ev.data.ptr = nullptr;
         return;
     }
-    auto data = static_cast<const input_event *>(ev.data.ptr);
-    CHKPV(data);
-    OnEventHandler(*data);
+    int32_t fd = *static_cast<int32_t *>(ev.data.ptr);
+    if (fd < 0) {
+        MMI_HILOGE("fd(%{public}d) is invalid.", fd);
+        return;
+    }
+    constexpr int32_t szBufSize = 1024;
+    char szBuf[szBufSize] = {};
+    auto retSize = read(fd, szBuf, szBufSize);
+    if (retSize < 0) {
+        errno_t errnoSaved = errno;
+        MMI_HILOGE("read pipe failed, errno:%{public}d, %{public}s", errnoSaved, strerror(errnoSaved));
+        return;
+    } else if (retSize == 0) {
+        MMI_HILOGD("pipe no data");
+        return;
+    }
+    if (!g_circBuf.Write(szBuf, retSize)) {
+        MMI_HILOGW("Write data failed. size:%{public}zu", retSize);
+    }
+
+    constexpr int32_t onceProcessLimit = 100;
+    constexpr int32_t hdfEventSize = sizeof(struct input_event);
+    for (int32_t i = 0; i < onceProcessLimit; i++) {
+        const int32_t unreadSize = g_circBuf.UnreadSize();
+        if (unreadSize < hdfEventSize) {
+            break;
+        }
+        char *buf = const_cast<char *>(g_circBuf.ReadBuf());
+        CHKPB(buf);
+        struct input_event *event = reinterpret_cast<struct input_event *>(buf);
+        CHKPB(event);
+        if (!g_circBuf.SeekReadPos(hdfEventSize)) {
+            MMI_HILOGW("Set read position error, and this error cannot be recovered, and the buffer will be reset."
+                " hdfEventSize:%{public}d unreadSize:%{public}d", hdfEventSize, unreadSize);
+            g_circBuf.Reset();
+            break;
+        }        
+        OnEventHandler(*event);
+        if (g_circBuf.IsEmpty()) {
+            g_circBuf.Reset();
+            break;
+        }
+    }
 }
 
 int32_t HdfAdapter::ConnectHDFInit()
@@ -306,9 +384,13 @@ void HdfAdapter::OnEventHandler(const input_event &event)
         保留    | 热插拨     | devIndex | ev_xx type |
         rev     | plugStatus | devIndex | evType     |
      */
-    int32_t devStatus = ((event.type | 0xff0000) >> 16);
-    int32_t devIndex = ((event.type | 0xff00) >> 8);
-    int32_t devType = (event.type | 0xff);
+    int32_t devStatus = ((event.type & 0xff0000) >> 16);
+    int32_t devIndex = ((event.type & 0xff00) >> 8);
+    int32_t devType = (event.type & 0xff);
+    MMI_HILOGE("zpc:type:%{public}d, code:%{public}d, value:%{public}d, time:%{public}lld, devStatus:%{public}d, devIndex:%{public}d, devType:%{public}d",
+                event.type, event.code, event.value, GetTime(event), devStatus, devIndex, devType);
+    // auto [isOk, msg] = StackDumperHelper::Dump();
+    // MMI_HILOGE("zpc: stack: %{public}d, %{public}s", isOk, msg.c_str());
     if (devStatus == 1) { // dev add
         auto ret = HandleDeviceAdd(devIndex, devType);
         if (ret != RET_OK) {
