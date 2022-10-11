@@ -36,7 +36,7 @@ public:
 public:
     virtual ~TouchScreenHandler() = default;
     virtual void OnInputEvent(const std::shared_ptr<const AbsEvent>& event) override;
-    std::shared_ptr<PointerEvent> GetPointerEvent();
+    virtual std::shared_ptr<PointerEvent> GetPointerEvent() override;
     virtual int32_t BindInputDevice(const std::shared_ptr<IInputDevice>& inputDevice) override;
     virtual int32_t UnbindInputDevice(const std::shared_ptr<IInputDevice>& inputDevice) override;
 
