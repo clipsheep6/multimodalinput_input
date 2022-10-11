@@ -80,7 +80,7 @@ int32_t Device::GetDeviceId() const
     return deviceId_;
 }
 
-std::shared_ptr<IKernelEventHandler> Device::GetKernelEventHandler()
+std::shared_ptr<IKernelEventHandler> Device::GetKernelEventHandler() const
 {
     return eventHandler_;
 }
