@@ -26,7 +26,7 @@ public:
     static std::shared_ptr<IKernelEventHandler> CreateInstance(const std::shared_ptr<ITouchScreenHandler>& touchScreenHandle);
 public:
     virtual void OnInputEvent(const std::shared_ptr<const AbsEvent>& event) override;
-    std::shared_ptr<ITouchScreenHandler> GetTouchEventHandler();
+    std::shared_ptr<ITouchScreenHandler> GetTouchEventHandler() override;
 private:
     KernelEventHandlerBridge(const std::shared_ptr<ITouchScreenHandler>& touchScreenHandle);
 private:
