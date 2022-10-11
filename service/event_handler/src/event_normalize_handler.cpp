@@ -30,6 +30,7 @@
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_manager.h"
 #include "input_event_handler.h"
+#include "kernel_event_handler_bridge.h"
 #include "key_auto_repeat.h"
 #include "key_event_normalize.h"
 #include "key_event_value_transformation.h"
@@ -37,6 +38,7 @@
 #include "mmi_log.h"
 #include "time_cost_chk.h"
 #include "timer_manager.h"
+#include "touch_screen_handler.h"
 #include "touch_event_normalize.h"
 #ifdef OHOS_BUILD_HDF_TEMP
 #include "device_collector.h"
