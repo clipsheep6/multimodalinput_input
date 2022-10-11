@@ -1,0 +1,9 @@
+import("//build/ohos.gni")
+
+ohos_executable("udev_demo") {
+  sources = [ "udev_demo.cpp" ]
+  # include_dirs = []
+  deps = [ "//third_party/eudev:libudev" ]
+  subsystem_name = "multimodalinput"
+  part_name = "input"
+}
