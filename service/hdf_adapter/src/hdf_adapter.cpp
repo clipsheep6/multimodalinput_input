@@ -35,21 +35,10 @@ CircleStreamBuffer g_circBuf;
 IInputInterface *g_inputInterface { nullptr };
 InputEventCb g_eventCb;
 InputHostCb g_hostCb;
-// sptr<IInputCallback> g_inputEventCallback = nullptr;
-// sptr<IInputCallback> g_hotplugEventCallback = nullptr;
 std::mutex g_mutex;
-void InputEventSetTime(struct input_event &e, int64_t time)
-{
-    e.input_event_sec = time / 1000000;
-	e.input_event_usec = time % 1000000;
-}
-inline uint64_t GetTime(const struct input_event &event)
-{
-    return event.input_event_sec * 1000000 + event.input_event_usec;
-}
 } // namespace
 
-void HdfDeviceStatusChanged(int32_t devIndex, int32_t devType, HDFDevicePlugType plugType)
+void HdfDeviceStatusChanged(int32_t devIndex, int32_t devType, HdfInputEventDevStatus devStatus)
 {
     CHK_PID_AND_TID();
     /*
@@ -59,38 +48,33 @@ void HdfDeviceStatusChanged(int32_t devIndex, int32_t devType, HDFDevicePlugType
         rev     | plugStatus | devIndex | 00         |
         rev     | statusType |          |            |
      */
-    auto t = ((static_cast<int32_t>(plugType)) << 16) | (devIndex << 8) | 0x00;
-    input_event event;
-    event.code = 0;
-    event.type = ((static_cast<int32_t>(plugType)) << 16) | (devIndex << 8) | 0x00;
-    event.value = devType;
-    InputEventSetTime(event, GetSysClockTime());
-    MMI_HILOGE("zpc:write:plugin:devIndex:%{public}d, devType:%{public}d, statusType:%{public}d, "
-        "- code:%{public}d, t:%{public}x, type:%{public}x, value:%{public}d, time:%{public}lld",
-        devIndex, devType, plugType,
-        event.code, t, event.type, event.value, GetTime(event)
-        );
+    auto t = ((static_cast<int32_t>(devStatus)) << 16) | (devIndex << 8) | 0x00;
+    HdfInputEvent event;
+    event.eventType = HdfInputEventType::DEV_NODE_ADD_RMV;
+    event.devIndex = devIndex;
+    event.devType = devType;
+    event.devStatus = devStatus;
+    event.time = GetSysClockTime();
+    MMI_HILOGE("zpc:write:plugin:eventType:%{public}u, devIndex:%{public}u, devType:%{public}u, devStatus:%{public}u,time:%{public}llu",
+        event.eventType, event.devIndex, event.devType, event.devStatus, event.time);
     auto ret = write(g_hdfAdapterWriteFd, &event, sizeof(event));
     if (ret == -1) {
         int saveErrno = errno;
         MMI_HILOGE("Write pipe fail, errno:%{public}d, %{public}s", saveErrno, strerror(saveErrno));
     }
-    // auto [isOk, msg] = StackDumperHelper::Dump();
-    // MMI_HILOGE("zpc: stack: %{public}d, %{public}s", isOk, msg.c_str());
 }
 
 static void HotPlugCallback(const InputHotPlugEvent *event)
 {
     CHK_PID_AND_TID();
     CHKPV(event);
-    auto plugType = (event->status ? HDFDevicePlugType::HDF_RMV_DEVICE : HDFDevicePlugType::HDF_ADD_DEVICE);
-    HdfDeviceStatusChanged(event->devIndex, event->devType, plugType);
+    auto devStatus = (event->status ? HdfInputEventDevStatus::HDF_RMV_DEVICE : HdfInputEventDevStatus::HDF_ADD_DEVICE);
+    HdfDeviceStatusChanged(event->devIndex, event->devType, devStatus);
 }
 
 static void EventPkgCallback(const InputEventPackage **pkgs, uint32_t count, uint32_t devIndex)
 {
     CHK_PID_AND_TID();
-    static constexpr uint16_t byteSize = 8;
     CHKPV(pkgs);
     uint32_t fixedCount = count;
     if (count > MMI_MAX_EVENT_PKG_NUM) {
@@ -104,26 +88,25 @@ static void EventPkgCallback(const InputEventPackage **pkgs, uint32_t count, uin
              保留    | 热插拨     | devIndex | ev_xx type |
              rev     | plugStatus | devIndex | evType     |
          */
-        input_event event;
+        HdfInputEvent event;
+        event.eventType = HdfInputEventType::DEV_NODE_EVENT;
+        event.devIndex = devIndex;
         event.code = pkgs[i]->code;
-        event.type = (pkgs[i]->type) | static_cast<uint16_t>(devIndex << byteSize);
+        event.type = pkgs[i]->type;
         event.value = pkgs[i]->value;
-        InputEventSetTime(event, pkgs[i]->timestamp);
+        event.time = pkgs[i]->timestamp;
 
-        MMI_HILOGE("zpc:write:event:devIndex:%{public}d, count:%{public}d, fixedCount:%{public}d, "
-            "- code:%{public}d, type:%{public}d, value:%{public}d, time:%{public}lld",
-            devIndex, count, fixedCount,
-            event.code, event.type, event.value, GetTime(event)
-            );
+        MMI_HILOGE("zpc:write:event:eventType:%{public}u,devIndex:%{public}u,"
+            "code:%{public}u,type:%{public}u,value:%{public}u,time:%{public}llu,"
+            "count:%{public}u,fixedCount:%{public}d",
+            event.eventType, event.devIndex, event.code, event.type, event.value, event.time, count, fixedCount);
 
-        auto ret = write(g_hdfAdapterWriteFd, &event, sizeof(input_event));
+        auto ret = write(g_hdfAdapterWriteFd, &event, sizeof(HdfInputEvent));
         if (ret == -1) {
             int saveErrno = errno;
             MMI_HILOGE("Write pipe fail, errno:%{public}d, %{public}s", saveErrno, strerror(saveErrno));
         }
-        // auto [isOk, msg] = StackDumperHelper::Dump();
-        // MMI_HILOGE("zpc: stack: %{public}d, %{public}s", isOk, msg.c_str());
-    }     
+    }
 }
 
 HdfAdapter::HdfAdapter()
@@ -150,7 +133,7 @@ int32_t HdfAdapter::ScanInputDevice()
     for (const auto &i : devDescs) {
         if (i.devIndex != 0) {
             ++devCount;
-            HdfDeviceStatusChanged(i.devIndex, i.devType, HDFDevicePlugType::HDF_ADD_DEVICE);
+            HdfDeviceStatusChanged(i.devIndex, i.devType, HdfInputEventDevStatus::HDF_ADD_DEVICE);
         }
     }
     MMI_HILOGI("Found %{public}d devices.", devCount);    
@@ -260,7 +243,7 @@ void HdfAdapter::EventDispatch(epoll_event &ev)
     }
 
     constexpr int32_t onceProcessLimit = 100;
-    constexpr int32_t hdfEventSize = sizeof(struct input_event);
+    constexpr int32_t hdfEventSize = sizeof(HdfInputEvent);
     for (int32_t i = 0; i < onceProcessLimit; i++) {
         const int32_t unreadSize = g_circBuf.UnreadSize();
         if (unreadSize < hdfEventSize) {
@@ -268,7 +251,7 @@ void HdfAdapter::EventDispatch(epoll_event &ev)
         }
         char *buf = const_cast<char *>(g_circBuf.ReadBuf());
         CHKPB(buf);
-        struct input_event *event = reinterpret_cast<struct input_event *>(buf);
+        struct HdfInputEvent *event = reinterpret_cast<struct HdfInputEvent *>(buf);
         CHKPB(event);
         if (!g_circBuf.SeekReadPos(hdfEventSize)) {
             MMI_HILOGW("Set read position error, and this error cannot be recovered, and the buffer will be reset."
@@ -375,7 +358,7 @@ int32_t HdfAdapter::HandleDeviceRmv(int32_t devIndex, int32_t devType)
     return RET_OK;
 }
 
-void HdfAdapter::OnEventHandler(const input_event &event)
+void HdfAdapter::OnEventHandler(const HdfInputEvent &event)
 {
     CALL_DEBUG_ENTER;
     CHKPV(callback_);
@@ -384,28 +367,24 @@ void HdfAdapter::OnEventHandler(const input_event &event)
         保留    | 热插拨     | devIndex | ev_xx type |
         rev     | plugStatus | devIndex | evType     |
      */
-    int32_t devStatus = ((event.type & 0xff0000) >> 16);
-    int32_t devIndex = ((event.type & 0xff00) >> 8);
-    int32_t devType = (event.type & 0xff);
-    MMI_HILOGE("zpc:type:%{public}d, code:%{public}d, value:%{public}d, time:%{public}lld, devStatus:%{public}d, devIndex:%{public}d, devType:%{public}d",
-                event.type, event.code, event.value, GetTime(event), devStatus, devIndex, devType);
-    // auto [isOk, msg] = StackDumperHelper::Dump();
-    // MMI_HILOGE("zpc: stack: %{public}d, %{public}s", isOk, msg.c_str());
-    if (devStatus == 1) { // dev add
-        auto ret = HandleDeviceAdd(devIndex, devType);
-        if (ret != RET_OK) {
-            MMI_HILOGE("call HandleDeviceAdd fail, ret:%{public}d, type:%{public}d, code:%{public}d, value:%{public}d, time:%{public}lld",
-                ret, event.type, event.code, event.value, GetTime(event));
-            return;
-        }
-    } else if (devStatus == 2) { // dev remove
-        auto ret = HandleDeviceRmv(devIndex, devType);
-        if (ret != RET_OK) {
-            MMI_HILOGE("call HandleDeviceRmv fail, ret:%{public}d, type:%{public}d, code:%{public}d, value:%{public}d, time:%{public}lld",
-                ret, event.type, event.code, event.value, GetTime(event));
-            return;
+    if (event.IsDevNodeAddRmvEvent()) {
+        MMI_HILOGE("zpc:type:addrmv:eventType:%{public}u,devIndex:%{public}u,devType:%{public}u,devStatus:%{public}u, time:%{public}llu",
+                    event.eventType, event.devIndex, event.devType, event.devStatus, event.time);
+        if (event.IsDevAdd()) { // dev add
+            auto ret = HandleDeviceAdd(event.devIndex, event.devType);
+            if (ret != RET_OK) {
+                MMI_HILOGE("call HandleDeviceAdd fail, ret:%{public}d", ret);
+                return;
+            }
+        } else { // dev remove
+            auto ret = HandleDeviceRmv(event.devIndex, event.devType);
+            if (ret != RET_OK) {
+                MMI_HILOGE("call HandleDeviceRmv fail, ret:%{public}d", ret);
+                return;
+            }
         }
     }
+    
     callback_(event);
 }
 

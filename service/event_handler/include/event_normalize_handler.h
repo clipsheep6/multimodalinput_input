@@ -23,8 +23,6 @@
 #include "hdf_adapter.h"
 #endif // OHOS_BUILD_HDF
 
-struct input_event;
-
 namespace OHOS {
 namespace MMI {
 class EventNormalizeHandler : public IInputEventHandler {
@@ -33,7 +31,7 @@ public:
     ~EventNormalizeHandler() = default;
     void HandleEvent(libinput_event* event);
 #ifdef OHOS_BUILD_HDF
-    void HandleEvent(const input_event &event);
+    void HandleEvent(const HdfInputEvent &event);
 #endif // OHOS_BUILD_HDF
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;

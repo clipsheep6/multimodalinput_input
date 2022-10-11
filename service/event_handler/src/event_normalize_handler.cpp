@@ -41,10 +41,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventNormalizeHandler" };
-inline uint64_t GetTime(const struct input_event &event)
-{
-    return event.input_event_sec * 1000000 + event.input_event_usec;
-}
 }
 
 void EventNormalizeHandler::HandleEvent(libinput_event* event)
@@ -119,10 +115,16 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event)
 }
 
 #ifdef OHOS_BUILD_HDF
-void EventNormalizeHandler::HandleEvent(const input_event &event)
+void EventNormalizeHandler::HandleEvent(const HdfInputEvent &event)
 {
-    MMI_HILOGI("hdfEvent: type:%{public}d, code:%{public}d, value:%{public}d, time:%{public}lld",
-        event.type, event.code, event.value, GetTime(event));
+    if (event.IsDevNodeAddRmvEvent()) {
+        MMI_HILOGI("hdfEvent:addrmv: eventType:%{public}u, devIndex:%{public}u, devType:%{public}u, devStatus:%{public}u, time:%{public}llu",
+            event.eventType, event.devIndex, event.devType, event.devStatus, event.time));
+    } else {
+        MMI_HILOGI("hdfEvent:event: eventType:%{public}u, devIndex:%{public}u, type:%{public}u, code:%{public}u, value:%{public}u, time:%{public}llu",
+        event.eventType, event.devIndex, event.type, event.code, event.value, event.time));
+    }
+    
     /*
         31 - 24 | 23 - 16    | 15 - 8   | 7 - 0      |
         保留    | 热插拨     | devIndex | ev_xx type |

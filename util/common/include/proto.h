@@ -142,11 +142,6 @@ enum class MmiMessageId : int32_t {
     END,
 };
 
-enum class HDFDevicePlugType : int32_t {
-    HDF_ADD_DEVICE = 1,
-    HDF_RMV_DEVICE = 2,
-};
-
 enum INPUT_DEVICE_TYPE {
     INPUT_DEVICE_CAP_KEYBOARD = 0,
     INPUT_DEVICE_CAP_POINTER = 1,

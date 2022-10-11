@@ -79,7 +79,7 @@ void InputEventHandler::OnLibinputEvent(void *event)
                ",lostTime:%{public}" PRId64, idSeed_, endTime, lostTime);
 }
 
-void InputEventHandler::OnHDFEvent(const input_event &event)
+void InputEventHandler::OnHDFEvent(const HdfInputEvent &event)
 {
     CHKPV(eventNormalizeHandler_);
     eventNormalizeHandler_->HandleEvent(event);    
