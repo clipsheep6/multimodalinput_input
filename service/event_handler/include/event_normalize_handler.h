@@ -23,6 +23,8 @@
 #include "hdf_adapter.h"
 #endif // OHOS_BUILD_HDF
 
+struct input_event;
+
 namespace OHOS {
 namespace MMI {
 class EventNormalizeHandler : public IInputEventHandler {
@@ -49,6 +51,11 @@ public:
 private:
     int32_t OnEventDeviceAdded(libinput_event *event);
     int32_t OnEventDeviceRemoved(libinput_event *event);
+#ifdef OHOS_BUILD_HDF
+    int32_t OnHDFDeviceAdded(int32_t devIndex);
+    int32_t OnHDFDeviceRemoved(int32_t devIndex);
+    int32_t OnHDFEvent(int32_t devIndex, const input_event &event);
+#endif // OHOS_BUILD_HDF
     int32_t HandleKeyboardEvent(libinput_event* event);
     void Repeat(const std::shared_ptr<KeyEvent> keyEvent);
     int32_t HandleTouchPadEvent(libinput_event* event);

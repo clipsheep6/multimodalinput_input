@@ -51,6 +51,11 @@ void InputEventHandler::Init(UDSServer& udsServer)
     BuildInputHandlerChain();
 }
 
+void InputEventHandler::SetContext(IInputContext* context)
+{
+    context_ = context;
+}
+
 void InputEventHandler::OnLibinputEvent(void *event)
 {
     CHKPV(event);
@@ -135,6 +140,11 @@ int32_t InputEventHandler::BuildInputHandlerChain()
 UDSServer* InputEventHandler::GetUDSServer() const
 {
     return udsServer_;
+}
+
+IInputContext* InputEventHandler::GetContext() const
+{
+    return context_;
 }
 
 std::shared_ptr<EventNormalizeHandler> InputEventHandler::GetEventNormalizeHandler() const

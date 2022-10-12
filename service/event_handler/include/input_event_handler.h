@@ -29,6 +29,7 @@
 #include "i_input_event_handler.h"
 #include "key_subscriber_handler.h"
 #include "mouse_event_normalize.h"
+#include "i_input_context.h"
 
 namespace OHOS {
 namespace MMI {
@@ -41,7 +42,9 @@ public:
     void Init(UDSServer& udsServer);
     void OnLibinputEvent(void *event);
     void OnHDFEvent(const HdfInputEvent &event);
+    void SetContext(IInputContext* context);
     UDSServer *GetUDSServer() const;
+    IInputContext *GetContext() const;
 
     std::shared_ptr<EventNormalizeHandler> GetEventNormalizeHandler() const;
     std::shared_ptr<EventInterceptorHandler> GetInterceptorHandler() const;
@@ -57,6 +60,7 @@ private:
     int32_t BuildInputHandlerChain();
 
     UDSServer *udsServer_ { nullptr };
+    IInputContext* context_ {nullptr};
     std::shared_ptr<EventNormalizeHandler> eventNormalizeHandler_ { nullptr };
     std::shared_ptr<EventFilterHandler> eventFilterHandler_ { nullptr };
     std::shared_ptr<EventInterceptorHandler> eventInterceptorHandler_ { nullptr };
