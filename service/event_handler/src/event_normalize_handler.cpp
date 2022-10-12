@@ -132,33 +132,16 @@ void EventNormalizeHandler::HandleEvent(const HdfInputEvent &event)
     if (event.IsDevNodeAddRmvEvent()) {
         MMI_HILOGI("hdfEvent:addrmv: eventType:%{public}u, devIndex:%{public}u, devType:%{public}u, devStatus:%{public}u, time:%{public}llu",
             event.eventType, event.devIndex, event.devType, event.devStatus, event.time);
+        if (event.devStatus == 1) {
+            OnHDFDeviceAdded(event.devIndex);
+        } else {
+            OnHDFDeviceRemoved(event.devIndex);
+        }
     } else {
         MMI_HILOGI("hdfEvent:event: eventType:%{public}u, devIndex:%{public}u, type:%{public}u, code:%{public}u, value:%{public}u, time:%{public}llu",
         event.eventType, event.devIndex, event.type, event.code, event.value, event.time);
-    }
-#if 0
-    MMI_HILOGI("hdfEvent: type:%{public}d, code:%{public}d, value:%{public}d, time:%{public}lld",
-        event.type, event.code, event.value, GetTime(event));
-    int32_t devStatus = ((event.type | 0xff0000) >> 16);
-    if ((devStatus == 1) || (devStatus == 2)) {
-        int32_t devIndex = ((event.type | 0xff00) >> 8);
-        // int32_t devType = (event.type | 0xff);
-        if (devStatus == 1) {
-            OnHDFDeviceAdded(devIndex);
-            return;
-        } else {
-            OnHDFDeviceRemoved(devIndex);
-            return;
-        }
-    }
-    if (devStatus != 0) {
-        MMI_HILOGW("Invalid status:%{public}d", devStatus);
-        return;
-    }
-    int32_t devIndex = ((event.type | 0xff00) >> 8);
-    // int32_t evType = (event.type | 0xff);
-    OnHDFEvent(devIndex, event);
-#endif
+        OnHDFEvent(event.devIndex, event);
+    }    
 }
 
 int32_t EventNormalizeHandler::OnHDFDeviceAdded(int32_t devIndex)
@@ -188,7 +171,7 @@ int32_t EventNormalizeHandler::OnHDFDeviceRemoved(int32_t devIndex)
     return RET_OK;
 }
 
-int32_t EventNormalizeHandler::OnHDFEvent(int32_t devIndex, const input_event &event)
+int32_t EventNormalizeHandler::OnHDFEvent(int32_t devIndex, const HdfInputEvent &event1)
 {
     CALL_DEBUG_ENTER;
     auto context = InputHandler->GetContext();
@@ -197,6 +180,13 @@ int32_t EventNormalizeHandler::OnHDFEvent(int32_t devIndex, const input_event &e
     CHKPR(deviceCollector, ERROR_NULL_POINTER);
     const auto& device = deviceCollector->GetDevice(devIndex);
     CHKPR(device, ERROR_NULL_POINTER);
+    const input_event event {
+        .input_event_sec = event1.time / 1000000,
+        .input_event_usec = event1.time % 1000000,
+        .type = event1.type,
+        .code = event1.code,
+        .value = event1.value
+    };
     device->ProcessEventItem(&event);
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);

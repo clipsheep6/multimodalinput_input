@@ -41,7 +41,8 @@ struct HdfInputEvent {
     bool IsDevNodeAddRmvEvent() const { return (eventType == (static_cast<uint32_t>(HdfInputEventType::DEV_NODE_ADD_RMV))); }
     bool IsDevAdd() const { return (devStatus == (static_cast<uint32_t>(HdfInputEventDevStatus::HDF_ADD_DEVICE))); }
     uint32_t eventType; // 0 设备节点事件, 1 设备添加删除事件
-    uint32_t devIndex;
+    uint32_t devIndex;    
+    uint64_t time; 
     union {
         union {
             uint16_t type;
@@ -52,8 +53,7 @@ struct HdfInputEvent {
     union {
         uint32_t value;
         uint32_t devStatus;
-    };
-    uint64_t time;   
+    };  
 };
 #pragma pack()
 class HdfAdapter {

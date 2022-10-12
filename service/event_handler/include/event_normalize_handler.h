@@ -54,7 +54,7 @@ private:
 #ifdef OHOS_BUILD_HDF
     int32_t OnHDFDeviceAdded(int32_t devIndex);
     int32_t OnHDFDeviceRemoved(int32_t devIndex);
-    int32_t OnHDFEvent(int32_t devIndex, const input_event &event);
+    int32_t OnHDFEvent(int32_t devIndex, const HdfInputEvent &event);
 #endif // OHOS_BUILD_HDF
     int32_t HandleKeyboardEvent(libinput_event* event);
     void Repeat(const std::shared_ptr<KeyEvent> keyEvent);
