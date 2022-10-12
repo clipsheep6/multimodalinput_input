@@ -39,6 +39,20 @@ ohos_shared_library("input_touch_2_key_handler") {
     "touch2key/src/touch_2_key_handler.cpp"
   ]
 
+  defines = []
+
+  if (input_feature_keyboard) {
+    defines += [ "OHOS_BUILD_ENABLE_KEYBOARD" ]
+  }
+
+  if (input_feature_mouse) {
+    defines += [ "OHOS_BUILD_ENABLE_POINTER" ]
+  }
+
+  if (input_feature_touchscreen) {
+    defines += [ "OHOS_BUILD_ENABLE_TOUCH" ]
+  }
+
   deps = [
      "//foundation/multimodalinput/input/util:libmmi-util",
   ]

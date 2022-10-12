@@ -62,24 +62,30 @@ public:
 protected:
     std::shared_ptr<IInputEventHandler> nextHandler_ { nullptr };
 };
+
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 template<>
 inline void IInputEventHandler::HandleEvent<KeyEvent, PluginDispatchKeyEvent>(const std::shared_ptr<KeyEvent> event)
 {
     HandleKeyEvent(event);
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
 template<>
 inline void IInputEventHandler::HandleEvent<PointerEvent, PluginDispatchPointEvent>(const std::shared_ptr<PointerEvent> event)
 {
     HandlePointerEvent(event);
 }
+#endif // OHOS_BUILD_ENABLE_POINTER
 
+#ifdef OHOS_BUILD_ENABLE_TOUCH
 template<>
 inline void IInputEventHandler::HandleEvent<PointerEvent, PluginDispatchTouchEvent>(const std::shared_ptr<PointerEvent> event)
 {
     HandleTouchEvent(event);
 }
-
+#endif // OHOS_BUILD_ENABLE_TOUCHd
 } // namespace MMI
 } // namespace OHOS
 #endif // I_INPUT_EVENT_HANDLER_H
