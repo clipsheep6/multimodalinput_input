@@ -37,7 +37,7 @@ class IKernelEventHandler;
 class Device : public NonCopyable, public IInputDevice {
 
 public:
-    Device(int32_t id, const IInputContext* context);
+    Device(int32_t id, const std::shared_ptr<IInputContext> context);
     virtual ~Device();
     virtual int32_t GetId() const override;
     virtual const std::string& GetName() const override;
@@ -78,7 +78,7 @@ private:
 
 private:
     const int32_t id_;
-    const IInputContext* const context_;
+    const std::shared_ptr<IInputContext> context_;
     int32_t fd_;
     std::string name_;
     int32_t deviceId_;

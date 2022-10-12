@@ -48,12 +48,9 @@ void Device::Uninit()
     CloseDevice();
 }
 
-Device::Device(int32_t id, const IInputContext* context)
+Device::Device(int32_t id, const std::shared_ptr<IInputContext> context)
    : id_(id), context_(context), absEventCollector_(id, AbsEvent::SOURCE_TYPE_NONE),
-   eventHandler_(IKernelEventHandler::GetDefault())
-
-{
-}
+   eventHandler_(IKernelEventHandler::GetDefault()) {}
 
 Device::~Device()
 {

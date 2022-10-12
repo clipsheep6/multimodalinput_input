@@ -33,6 +33,7 @@
 
 namespace OHOS {
 namespace MMI {
+class InputContext;
 using EventFun = std::function<int32_t(libinput_event *event)>;
 using NotifyDeviceChange = std::function<void(int32_t, int32_t, char *)>;
 class InputEventHandler final {
@@ -42,9 +43,9 @@ public:
     void Init(UDSServer& udsServer);
     void OnLibinputEvent(void *event);
     void OnHDFEvent(const HdfInputEvent &event);
-    void SetContext(IInputContext* context);
+    void SetContext(std::shared_ptr<IInputContext> context);
     UDSServer *GetUDSServer() const;
-    IInputContext *GetContext() const;
+    std::shared_ptr<IInputContext> GetContext() const;
 
     std::shared_ptr<EventNormalizeHandler> GetEventNormalizeHandler() const;
     std::shared_ptr<EventInterceptorHandler> GetInterceptorHandler() const;
@@ -60,7 +61,7 @@ private:
     int32_t BuildInputHandlerChain();
 
     UDSServer *udsServer_ { nullptr };
-    IInputContext* context_ {nullptr};
+    std::shared_ptr<IInputContext> context_ {nullptr};
     std::shared_ptr<EventNormalizeHandler> eventNormalizeHandler_ { nullptr };
     std::shared_ptr<EventFilterHandler> eventFilterHandler_ { nullptr };
     std::shared_ptr<EventInterceptorHandler> eventInterceptorHandler_ { nullptr };

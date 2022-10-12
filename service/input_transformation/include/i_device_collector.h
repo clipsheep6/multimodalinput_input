@@ -26,7 +26,7 @@ namespace MMI {
 class IInputContext;
 class IDeviceCollector {
 public:
-    static std::unique_ptr<IDeviceCollector> CreateInstance(IInputContext* context);
+    static std::shared_ptr<IDeviceCollector> CreateInstance(IInputContext* context);
 
     virtual ~IDeviceCollector() = default;
     virtual std::shared_ptr<IInputDevice> GetDevice(int32_t id) const = 0;

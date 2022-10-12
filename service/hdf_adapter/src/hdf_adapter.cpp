@@ -41,13 +41,6 @@ std::mutex g_mutex;
 void HdfDeviceStatusChanged(int32_t devIndex, int32_t devType, HdfInputEventDevStatus devStatus)
 {
     CHK_PID_AND_TID();
-    /*
-     * 设备管理信息, type写pipe
-        31 - 24 | 23 - 16    | 15 - 8   | 7 - 0      |
-        保留    | 热插拨     | devIndex | ev_xx type |
-        rev     | plugStatus | devIndex | 00         |
-        rev     | statusType |          |            |
-     */
     HdfInputEvent event;
     event.eventType = static_cast<uint32_t>(HdfInputEventType::DEV_NODE_ADD_RMV);
     event.devIndex = devIndex;
@@ -81,12 +74,6 @@ static void EventPkgCallback(const InputEventPackage **pkgs, uint32_t count, uin
         MMI_HILOGE("Too big hdf event, count:%{public}d is beyond %{public}d", count, MMI_MAX_EVENT_PKG_NUM);
     }
     for (uint32_t i = 0; i < fixedCount; ++i) {
-        /*
-         * 设备事件消息, type写pipe
-             31 - 24 | 23 - 16    | 15 - 8   | 7 - 0      |
-             保留    | 热插拨     | devIndex | ev_xx type |
-             rev     | plugStatus | devIndex | evType     |
-         */
         HdfInputEvent event;
         event.eventType = static_cast<uint32_t>(HdfInputEventType::DEV_NODE_EVENT);
         event.devIndex = devIndex;
@@ -361,11 +348,6 @@ void HdfAdapter::OnEventHandler(const HdfInputEvent &event)
 {
     CALL_DEBUG_ENTER;
     CHKPV(callback_);
-    /*
-        31 - 24 | 23 - 16    | 15 - 8   | 7 - 0      |
-        保留    | 热插拨     | devIndex | ev_xx type |
-        rev     | plugStatus | devIndex | evType     |
-     */
     if (event.IsDevNodeAddRmvEvent()) {
         MMI_HILOGE("zpc:type:addrmv:eventType:%{public}u,devIndex:%{public}u,devType:%{public}u,devStatus:%{public}u, time:%{public}llu",
                     event.eventType, event.devIndex, event.devType, event.devStatus, event.time);

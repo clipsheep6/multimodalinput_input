@@ -28,22 +28,22 @@ namespace OHOS {
 namespace MMI {
 class InputContext : public NonCopyable, public IInputContext {
     public:
-        static std::unique_ptr<InputContext> CreateInstance();
+        static std::shared_ptr<IInputContext> CreateInstance();
 
     protected:
         static int32_t InitInstance(InputContext* context);
 
     public:
+        InputContext() = default;
         virtual ~InputContext() = default;
 
-        virtual const std::unique_ptr<IDeviceCollector>& GetInputDeviceCollector() const override; 
+        virtual const std::shared_ptr<IDeviceCollector>& GetInputDeviceCollector() const override; 
 
     protected:
-        InputContext() = default;
-        int32_t SetDeviceCollector(std::unique_ptr<IDeviceCollector>& inputDeviceCollector);
+        int32_t SetDeviceCollector(std::shared_ptr<IDeviceCollector>& inputDeviceCollector);
 
     private:
-        std::unique_ptr<IDeviceCollector> inputDeviceCollector_;
+        std::shared_ptr<IDeviceCollector> inputDeviceCollector_;
 };
 } // namespace MMI
 } // namespace OHOS

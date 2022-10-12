@@ -31,6 +31,7 @@
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_cooperate_sm.h"
 #endif // OHOS_BUILD_ENABLE_COOPERATE
+#include "input_context.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
 #include "kernel_event_handler_bridge.h"
@@ -52,12 +53,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventNormalizeHandler" };
-#ifdef OHOS_BUILD_HDF
-inline uint64_t GetTime(const struct input_event &event)
-{
-    return event.input_event_sec * 1000000 + event.input_event_usec;
-}
-#endif // OHOS_BUILD_HDF
 }
 
 void EventNormalizeHandler::HandleEvent(libinput_event* event)
@@ -141,18 +136,7 @@ void EventNormalizeHandler::HandleEvent(const HdfInputEvent &event)
         MMI_HILOGI("hdfEvent:event: eventType:%{public}u, devIndex:%{public}u, type:%{public}u, code:%{public}u, value:%{public}u, time:%{public}llu",
         event.eventType, event.devIndex, event.type, event.code, event.value, event.time);
     }
-    
-    /*
-        31 - 24 | 23 - 16    | 15 - 8   | 7 - 0      |
-        保留    | 热插拨     | devIndex | ev_xx type |
-        rev     | plugStatus | devIndex | evType     |
-     */
-    // int32_t devStatus = ((event.type | 0xff0000) >> 16);
-    // int32_t devIndex = ((event.type | 0xff00) >> 8);
-    // int32_t evType = (event.type | 0xff);
-    // 0 普通事件
-    // 1 dev add
-    // 2 dev rmv
+#if 0
     MMI_HILOGI("hdfEvent: type:%{public}d, code:%{public}d, value:%{public}d, time:%{public}lld",
         event.type, event.code, event.value, GetTime(event));
     int32_t devStatus = ((event.type | 0xff0000) >> 16);
@@ -174,6 +158,7 @@ void EventNormalizeHandler::HandleEvent(const HdfInputEvent &event)
     int32_t devIndex = ((event.type | 0xff00) >> 8);
     // int32_t evType = (event.type | 0xff);
     OnHDFEvent(devIndex, event);
+#endif
 }
 
 int32_t EventNormalizeHandler::OnHDFDeviceAdded(int32_t devIndex)
@@ -183,7 +168,7 @@ int32_t EventNormalizeHandler::OnHDFDeviceAdded(int32_t devIndex)
     CHKPR(context, ERROR_NULL_POINTER);
     auto inputDevice = std::make_shared<Device>(devIndex, context);
     CHKPR(inputDevice, ERROR_NULL_POINTER);
-    const auto& deviceCollector = context->GetInputDeviceCollector();
+    const auto deviceCollector = context->GetInputDeviceCollector();
     CHKPR(deviceCollector, ERROR_NULL_POINTER);
     InputDevMgr->OnInputDeviceAdded(inputDevice);
     deviceCollector->AddDevice(inputDevice);

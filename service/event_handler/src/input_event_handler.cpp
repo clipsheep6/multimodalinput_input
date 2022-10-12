@@ -51,7 +51,7 @@ void InputEventHandler::Init(UDSServer& udsServer)
     BuildInputHandlerChain();
 }
 
-void InputEventHandler::SetContext(IInputContext* context)
+void InputEventHandler::SetContext(std::shared_ptr<IInputContext> context)
 {
     context_ = context;
 }
@@ -142,7 +142,7 @@ UDSServer* InputEventHandler::GetUDSServer() const
     return udsServer_;
 }
 
-IInputContext* InputEventHandler::GetContext() const
+std::shared_ptr<IInputContext> InputEventHandler::GetContext() const
 {
     return context_;
 }

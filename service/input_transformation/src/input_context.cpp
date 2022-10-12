@@ -25,11 +25,11 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputContext" };
 };
-std::unique_ptr<InputContext> InputContext::CreateInstance()
+std::shared_ptr<IInputContext> InputContext::CreateInstance()
 {
     MMI_HILOGD("Enter");
 
-    auto inputContext = std::unique_ptr<InputContext>(new InputContext());
+    auto inputContext = std::make_shared<InputContext>();
     auto retCode = InitInstance(inputContext.get());
     if (retCode != 0) {
         MMI_HILOGE("Leave");
@@ -52,12 +52,12 @@ int32_t InputContext::InitInstance(InputContext* inputContext)
     return 0;
 }
 
-const std::unique_ptr<IDeviceCollector>& InputContext::GetInputDeviceCollector() const
+const std::shared_ptr<IDeviceCollector>& InputContext::GetInputDeviceCollector() const
 {
     return inputDeviceCollector_;
 }
 
-int32_t InputContext::SetDeviceCollector(std::unique_ptr<IDeviceCollector>& inputDeviceCollector)
+int32_t InputContext::SetDeviceCollector(std::shared_ptr<IDeviceCollector>& inputDeviceCollector)
 {
     if (!inputDeviceCollector) {
         return -1;

@@ -17,6 +17,7 @@
 
 #include <cinttypes>
 #include <csignal>
+#include <memory>
 #include <parameters.h>
 #include <sys/signalfd.h>
 #include "dfx_hisysevent.h"

@@ -23,10 +23,10 @@ namespace MMI {
 class IDeviceCollector;
 class IInputContext {
     public:
-        static std::unique_ptr<IInputContext> CreateInstance();
+        static std::shared_ptr<IInputContext> CreateInstance();
 
         virtual ~IInputContext() = default;
-        virtual const std::unique_ptr<IDeviceCollector>& GetInputDeviceCollector() const = 0; 
+        virtual const std::shared_ptr<IDeviceCollector>& GetInputDeviceCollector() const = 0; 
 };
 } // namespace MMI
 } // namespace OHOS
