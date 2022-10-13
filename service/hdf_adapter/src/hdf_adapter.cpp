@@ -126,11 +126,13 @@ int32_t HdfAdapter::ScanInputDevice()
     return RET_OK;
 }
 
-bool HdfAdapter::Init(HdfEventCallback callback)
+bool HdfAdapter::Init(HDFDeviceStatusEventCallback statusCallback, HDFDeviceInputEventCallback inputCallback)
 {
     CALL_DEBUG_ENTER;
-    CHKPF(callback);
-    callback_ = callback;
+    CHKPF(statusCallback);
+    CHKPF(inputCallback);
+    statusCallback_ = statusCallback;
+    inputCallback_ = inputCallback;
 
     int ret;
     do {
@@ -290,13 +292,16 @@ int32_t HdfAdapter::DisconnectHDFInit()
     return RET_OK;
 }
 
-int32_t HdfAdapter::HandleDeviceAdd(int32_t devIndex, int32_t devType)
+int32_t HdfAdapter::HandleDeviceAdd(HDFDeviceStatusEvent &event)
 {
     CALL_DEBUG_ENTER;
     CHKPR(g_inputInterface, ERROR_NULL_POINTER);
     CHKPR(g_inputInterface->iInputManager, ERROR_NULL_POINTER);
+    CHKPR(g_inputInterface->iInputController, ERROR_NULL_POINTER);
     CHKPR(g_inputInterface->iInputReporter, ERROR_NULL_POINTER);
 
+    const int32_t devIndex = event.devIndex;
+    const int32_t devType = event.devType;
     int32_t ret;
     ret = g_inputInterface->iInputManager->OpenInputDevice(devIndex);
     if (ret != RET_OK) {
@@ -307,6 +312,17 @@ int32_t HdfAdapter::HandleDeviceAdd(int32_t devIndex, int32_t devType)
     }
 
     do {
+        InputDeviceInfo *iDevInfo_ { nullptr };
+        ret = g_inputInterface->iInputManager->GetInputDevice(devIndex, &iDevInfo_);
+        if (ret != INPUT_SUCCESS) {
+            MMI_HILOGE("GetInputDevice error, devIndex:%{public}d", devIndex);
+            break;
+        }
+        if (iDevInfo_ == nullptr) {
+            MMI_HILOGE("iDevInfo_ is nullptr, devIndex:%{public}d", devIndex);
+            break;
+        }
+        event.devInfo = *iDevInfo_;
         ret = g_inputInterface->iInputReporter->RegisterReportCallback(devIndex, &g_eventCb);
         if (ret != RET_OK) {
             MMI_HILOGE("RegisterReportCallback fail,devindex:%{public}d, devType:%{public}d, ret:%{public}d", devIndex, devType, ret);
@@ -347,12 +363,16 @@ int32_t HdfAdapter::HandleDeviceRmv(int32_t devIndex, int32_t devType)
 void HdfAdapter::OnEventHandler(const HdfInputEvent &event)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(callback_);
     if (event.IsDevNodeAddRmvEvent()) {
         MMI_HILOGE("zpc:type:addrmv:eventType:%{public}u,devIndex:%{public}u,devType:%{public}u,devStatus:%{public}u, time:%{public}llu",
                     event.eventType, event.devIndex, event.devType, event.devStatus, event.time);
+        HDFDeviceStatusEvent retEvent;
+        retEvent.devIndex = event.devIndex;
+        retEvent.time = event.time;
+        retEvent.devType = event.devType;
+        retEvent.devStatus = event.devStatus;
         if (event.IsDevAdd()) { // dev add
-            auto ret = HandleDeviceAdd(event.devIndex, event.devType);
+            auto ret = HandleDeviceAdd(retEvent);
             if (ret != RET_OK) {
                 MMI_HILOGE("call HandleDeviceAdd fail, ret:%{public}d", ret);
                 return;
@@ -364,9 +384,13 @@ void HdfAdapter::OnEventHandler(const HdfInputEvent &event)
                 return;
             }
         }
+        CHKPV(statusCallback_);
+        statusCallback_(retEvent);
+        return;
     }
     
-    callback_(event);
+    CHKPV(inputCallback_);
+    inputCallback_(event);
 }
 
 } // namespace MMI

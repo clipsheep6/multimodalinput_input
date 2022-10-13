@@ -42,7 +42,10 @@ public:
     DISALLOW_COPY_AND_MOVE(InputEventHandler);
     void Init(UDSServer& udsServer);
     void OnLibinputEvent(void *event);
-    void OnHDFEvent(const HdfInputEvent &event);
+#ifdef OHOS_BUILD_HDF
+    void HandleHDFDeviceStatusEvent(const HDFDeviceStatusEvent &event);
+    void HandleHDFDeviceInputEvent(const HDFDeviceInputEvent &event);
+#endif // OHOS_BUILD_HDF
     void SetContext(std::shared_ptr<IInputContext> context);
     UDSServer *GetUDSServer() const;
     std::shared_ptr<IInputContext> GetContext() const;

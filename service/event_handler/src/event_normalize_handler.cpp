@@ -127,21 +127,22 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event)
 }
 
 #ifdef OHOS_BUILD_HDF
-void EventNormalizeHandler::HandleEvent(const HdfInputEvent &event)
+void EventNormalizeHandler::HandleHDFDeviceStatusEvent(const HDFDeviceStatusEvent &event)
 {
-    if (event.IsDevNodeAddRmvEvent()) {
-        MMI_HILOGI("hdfEvent:addrmv: eventType:%{public}u, devIndex:%{public}u, devType:%{public}u, devStatus:%{public}u, time:%{public}llu",
-            event.eventType, event.devIndex, event.devType, event.devStatus, event.time);
-        if (event.devStatus == 1) {
-            OnHDFDeviceAdded(event.devIndex);
-        } else {
-            OnHDFDeviceRemoved(event.devIndex);
-        }
+    MMI_HILOGI("hdfEvent:addrmv:devIndex:%{public}u,devType:%{public}u,devStatus:%{public}u,time:%{public}llu",
+        event.devIndex, event.devType, event.devStatus, event.time);
+    if (event.devStatus == 1) {
+        OnHDFDeviceAdded(event.devIndex);
     } else {
-        MMI_HILOGI("hdfEvent:event: eventType:%{public}u, devIndex:%{public}u, type:%{public}u, code:%{public}u, value:%{public}u, time:%{public}llu",
-        event.eventType, event.devIndex, event.type, event.code, event.value, event.time);
-        OnHDFEvent(event.devIndex, event);
-    }    
+        OnHDFDeviceRemoved(event.devIndex);
+    } 
+}
+
+void EventNormalizeHandler::HandleHDFDeviceInputEvent(const HDFDeviceInputEvent &event)
+{
+    MMI_HILOGI("hdfEvent:event:devIndex:%{public}u,type:%{public}u,code:%{public}u,value:%{public}u,time:%{public}llu",
+        event.devIndex, event.type, event.code, event.value, event.time);
+    OnHDFEvent(event.devIndex, event); 
 }
 
 int32_t EventNormalizeHandler::OnHDFDeviceAdded(int32_t devIndex)

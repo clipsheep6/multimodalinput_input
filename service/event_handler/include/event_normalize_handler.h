@@ -33,7 +33,8 @@ public:
     ~EventNormalizeHandler() = default;
     void HandleEvent(libinput_event* event);
 #ifdef OHOS_BUILD_HDF
-    void HandleEvent(const HdfInputEvent &event);
+    void HandleHDFDeviceStatusEvent(const HDFDeviceStatusEvent &event);
+    void HandleHDFDeviceInputEvent(const HDFDeviceInputEvent &event);
 #endif // OHOS_BUILD_HDF
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;

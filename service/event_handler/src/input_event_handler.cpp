@@ -51,6 +51,18 @@ void InputEventHandler::Init(UDSServer& udsServer)
     BuildInputHandlerChain();
 }
 
+void InputEventHandler::HandleHDFDeviceStatusEvent(const HDFDeviceStatusEvent &event)
+{
+    CHKPV(eventNormalizeHandler_);
+    eventNormalizeHandler_->HandleHDFDeviceStatusEvent(event); 
+}
+
+void InputEventHandler::HandleHDFDeviceInputEvent(const HDFDeviceInputEvent &event)
+{
+    CHKPV(eventNormalizeHandler_);
+    eventNormalizeHandler_->HandleHDFDeviceInputEvent(event);
+}
+
 void InputEventHandler::SetContext(std::shared_ptr<IInputContext> context)
 {
     context_ = context;
@@ -84,7 +96,7 @@ void InputEventHandler::OnLibinputEvent(void *event)
                ",lostTime:%{public}" PRId64, idSeed_, endTime, lostTime);
 }
 
-void InputEventHandler::OnHDFEvent(const HdfInputEvent &event)
+void InputEventHandler::OnHDFDeviceStatus(const HdfInputEvent &event)
 {
     CHKPV(eventNormalizeHandler_);
     eventNormalizeHandler_->HandleEvent(event);    

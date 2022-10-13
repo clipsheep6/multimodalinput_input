@@ -20,6 +20,7 @@
 #include <functional>
 #include <string>
 #include <sys/epoll.h>
+#include "input_type.h"
 #include "define_multimodal.h"
 #include "input_manager.h"
 #include "mmi_log.h"
@@ -55,13 +56,24 @@ struct HdfInputEvent {
         uint32_t devStatus;
     };  
 };
+
+struct HDFDeviceStatusEvent {
+    uint32_t devIndex;
+    uint64_t time;
+    uint32_t devType;
+    uint32_t devStatus;
+    InputDeviceInfo devInfo;
+};
+
+using HDFDeviceInputEvent = HdfInputEvent;
 #pragma pack()
 class HdfAdapter {
-    using HdfEventCallback = std::function<void(const HdfInputEvent &event)>;
+    using HDFDeviceStatusEventCallback = std::function<void(const HDFDeviceStatusEvent &event)>;
+    using HDFDeviceInputEventCallback = std::function<void(const HDFDeviceInputEvent &event)>;
 public:
     HdfAdapter();
     ~HdfAdapter() = default;
-    bool Init(HdfEventCallback callback);
+    bool Init(HDFDeviceStatusEventCallback statusCallback, HDFDeviceInputEventCallback inputCallback);
     void DeInit();
     void Dump(int32_t fd, const std::vector<std::string> &args);
     int32_t GetInputFd() const;
@@ -71,10 +83,11 @@ public:
 private:
     int32_t ConnectHDFInit();
     int32_t DisconnectHDFInit();
-    int32_t HandleDeviceAdd(int32_t devIndex, int32_t devType);
+    int32_t HandleDeviceAdd(HDFDeviceStatusEvent &retEvent);
     int32_t HandleDeviceRmv(int32_t devIndex, int32_t devType);
 private:
-    HdfEventCallback callback_ = nullptr;
+    HDFDeviceStatusEventCallback statusCallback_;
+    HDFDeviceInputEventCallback inputCallback_;
     std::vector<std::string> eventRecords_;
 };
 } // namespace MMI

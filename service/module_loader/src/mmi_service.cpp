@@ -209,7 +209,9 @@ bool MMIService::InitHDFService()
     auto context = OHOS::MMI::InputContext::CreateInstance();
     InputHandler->SetContext(context);
 
-    if (!(hdfAdapter_.Init(std::bind(&InputEventHandler::OnHDFEvent, InputHandler, std::placeholders::_1)))) {
+    if (!(hdfAdapter_.Init(std::bind(&InputEventHandler::HandleHDFDeviceStatusEvent, InputHandler, std::placeholders::_1),
+        std::bind(&InputEventHandler::HandleHDFDeviceInputEvent, InputHandler, std::placeholders::_1)
+        ))) {
         MMI_HILOGE("Libinput init, bind failed");
         return false;
     }
