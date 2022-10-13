@@ -45,7 +45,7 @@ struct HdfInputEvent {
     uint32_t devIndex;    
     uint64_t time; 
     union {
-        union {
+        struct {
             uint16_t type;
             uint16_t code;
         };
