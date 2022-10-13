@@ -96,12 +96,6 @@ void InputEventHandler::OnLibinputEvent(void *event)
                ",lostTime:%{public}" PRId64, idSeed_, endTime, lostTime);
 }
 
-void InputEventHandler::OnHDFDeviceStatus(const HdfInputEvent &event)
-{
-    CHKPV(eventNormalizeHandler_);
-    eventNormalizeHandler_->HandleEvent(event);    
-}
-
 int32_t InputEventHandler::BuildInputHandlerChain()
 {
     eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
