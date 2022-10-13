@@ -122,6 +122,7 @@ bool TouchScreenHandler::ConvertPointer(const std::shared_ptr<const AbsEvent>& a
         MMI_HILOGE("Leave, null absEvent");
         return false;
     }
+
     const auto& absEventPointer = absEvent->GetPointer();
     if (!absEventPointer) {
         MMI_HILOGE("Leave, null absEventPointer");
@@ -175,6 +176,7 @@ bool TouchScreenHandler::ConvertPointer(const std::shared_ptr<const AbsEvent>& a
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent_->UpdateId();
     WinMgr->UpdateTargetPointer(pointerEvent_);
+    EventLogHelper::PrintEventData(pointerEvent_);
     MMI_HILOGD("Leave");
     return true;
 }
