@@ -19,6 +19,7 @@
 #include "i_input_context.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
+#include "input_event_handler.h"
 #include "input_windows_manager.h"
 #include "mmi_log.h"
 
@@ -53,33 +54,33 @@ int32_t TouchScreenHandler::BindInputDevice(const std::shared_ptr<IInputDevice>&
         return -1;
     }
 
-    std::shared_ptr<IInputDevice::AxisInfo> xInfo = inputDevice->GetAxisInfo(IInputDevice::AXIS_MT_X);
-    if (!xInfo) {
-        MMI_HILOGE("Leave, null AxisInfo Of AXIS_MT_X");
-        return -1;
-    }
+    // std::shared_ptr<IInputDevice::AxisInfo> xInfo = inputDevice->GetAxisInfo(IInputDevice::AXIS_MT_X);
+    // if (!xInfo) {
+    //     MMI_HILOGE("Leave, null AxisInfo Of AXIS_MT_X");
+    //     return -1;
+    // }
 
-    if (xInfo->GetMinimum() >= xInfo->GetMaximum()) {
-        MMI_HILOGE("Leave, xInfo->GetMinimum():%{public}d >= xInfo->GetMaximum():%{public}d",
-                    xInfo->GetMinimum(), xInfo->GetMaximum());
-        return -1;
-    }
+    // if (xInfo->GetMinimum() >= xInfo->GetMaximum()) {
+    //     MMI_HILOGE("Leave, xInfo->GetMinimum():%{public}d >= xInfo->GetMaximum():%{public}d",
+    //                 xInfo->GetMinimum(), xInfo->GetMaximum());
+    //     return -1;
+    // }
 
-    std::shared_ptr<IInputDevice::AxisInfo> yInfo = inputDevice->GetAxisInfo(IInputDevice::AXIS_MT_Y);
-    if (!yInfo) {
-        MMI_HILOGE("Leave, null AxisInfo Of AXIS_MT_Y");
-        return -1;
-    }
+    // std::shared_ptr<IInputDevice::AxisInfo> yInfo = inputDevice->GetAxisInfo(IInputDevice::AXIS_MT_Y);
+    // if (!yInfo) {
+    //     MMI_HILOGE("Leave, null AxisInfo Of AXIS_MT_Y");
+    //     return -1;
+    // }
 
-    if (yInfo->GetMinimum() >= yInfo->GetMaximum()) {
-        MMI_HILOGE("Leave, yInfo->GetMinimum():%{public}d >= yInfo->GetMaximum():%{public}d",
-                    yInfo->GetMinimum(), yInfo->GetMaximum());
-        return -1;
-    }
+    // if (yInfo->GetMinimum() >= yInfo->GetMaximum()) {
+    //     MMI_HILOGE("Leave, yInfo->GetMinimum():%{public}d >= yInfo->GetMaximum():%{public}d",
+    //                 yInfo->GetMinimum(), yInfo->GetMaximum());
+    //     return -1;
+    // }
 
     inputDevice_ = inputDevice;
-    xInfo_ = xInfo;
-    yInfo_ = yInfo;
+    // xInfo_ = xInfo;
+    // yInfo_ = yInfo;
     return 0;
 }
 
@@ -98,12 +99,18 @@ int32_t TouchScreenHandler::UnbindInputDevice(const std::shared_ptr<IInputDevice
 void TouchScreenHandler::OnInputEvent(const std::shared_ptr<const AbsEvent>& event)
 {
     CALL_DEBUG_ENTER;
+    MMI_HILOGE("OnInputEvent enter");
     int32_t pointerAction = PointerEvent::POINTER_ACTION_UNKNOWN;
     int64_t actionTime = 0;
     auto ret = ConvertPointer(event, pointerAction, actionTime);
     if (!ret) {
         MMI_HILOGE("Leave ConvertPointer Failed");
     }
+    auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPV(inputEventNormalizeHandler);   
+    CHKPV(pointerEvent_);
+    inputEventNormalizeHandler->HandleTouchEvent(pointerEvent_);
+
 }
 
 bool TouchScreenHandler::ConvertPointer(const std::shared_ptr<const AbsEvent>& absEvent,

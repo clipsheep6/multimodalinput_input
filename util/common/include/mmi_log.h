@@ -50,7 +50,7 @@ inline constexpr uint32_t MMI_LOG_DOMAIN = 0xD002800;
 
 #define MMI_HILOGD(fmt, ...) do { \
     if (HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)) { \
-        ::OHOS::HiviewDFX::HiLog::Debug(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
+        ::OHOS::HiviewDFX::HiLog::Warn(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
     } \
 } while (0)
 #define MMI_HILOGI(fmt, ...) do { \

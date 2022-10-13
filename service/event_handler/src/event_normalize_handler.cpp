@@ -150,6 +150,7 @@ int32_t EventNormalizeHandler::OnHDFDeviceAdded(int32_t devIndex)
     auto context = InputHandler->GetContext();
     CHKPR(context, ERROR_NULL_POINTER);
     auto inputDevice = std::make_shared<Device>(devIndex, context);
+    inputDevice->Init();
     CHKPR(inputDevice, ERROR_NULL_POINTER);
     const auto deviceCollector = context->GetInputDeviceCollector();
     CHKPR(deviceCollector, ERROR_NULL_POINTER);
@@ -187,16 +188,7 @@ int32_t EventNormalizeHandler::OnHDFEvent(int32_t devIndex, const HdfInputEvent 
         .code = event1.code,
         .value = event1.value
     };
-    device->ProcessEventItem(&event);
-    auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
-    CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
-    std::shared_ptr<IKernelEventHandler> kernelEventHandler = device->GetKernelEventHandler();
-    CHKPR(kernelEventHandler, ERROR_NULL_POINTER);
-    std::shared_ptr<ITouchScreenHandler> touchEventHandler = kernelEventHandler->GetTouchEventHandler();
-    CHKPR(touchEventHandler, ERROR_NULL_POINTER);
-    auto pointerEvent = touchEventHandler->GetPointerEvent();
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
+    device->ProcessEventItem(&event);  
     return RET_OK;
 }
 #endif // OHOS_BUILD_HDF

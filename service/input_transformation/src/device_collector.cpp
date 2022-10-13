@@ -15,6 +15,7 @@
 
  #include "device_collector.h"
 
+#include <cstddef>
 #include <cstring>
 #include <dirent.h>
 
@@ -83,7 +84,7 @@ bool DeviceCollector::AddDevice(const std::shared_ptr<IInputDevice>& device)
     }
 
     inputDevices_[id] = device;
-
+    MMI_HILOGE("inputDevice %{public}d size", inputDevices_.size());
     NotifyDeviceAdded(device);
     MMI_HILOGD("Leave");
     return true;
@@ -116,7 +117,7 @@ void DeviceCollector::NotifyDeviceAdded(const std::shared_ptr<IInputDevice>& dev
     }
 
     if (!device->HasCapability(IInputDevice::CAPABILITY_TOUCHSCREEN)) {
-        MMI_HILOGE("Leave, invalid device");
+        MMI_HILOGE("Leave, invalid device!");
         return;
     }
 

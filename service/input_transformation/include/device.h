@@ -27,6 +27,7 @@
 #include "i_input_context.h"
 #include "i_input_define.h"
 #include "i_input_device.h"
+#include "key_event_collector.h"
 
 struct input_event;
 
@@ -39,6 +40,7 @@ class Device : public NonCopyable, public IInputDevice {
 public:
     Device(int32_t id, const std::shared_ptr<IInputContext> context);
     virtual ~Device();
+    int32_t Init();
     virtual int32_t GetId() const override;
     virtual const std::string& GetName() const override;
     virtual std::shared_ptr<AxisInfo> GetAxisInfo(int32_t axis) const override;
@@ -51,7 +53,6 @@ public:
     virtual std::shared_ptr<IKernelEventHandler> GetKernelEventHandler() const override;
 
 protected:
-    int32_t Init();
     void Uninit();
 
 private:
@@ -59,7 +60,7 @@ private:
     void ReadEvents();
     int32_t CloseDevice();
     int32_t UpdateCapablility();
-    int32_t UpdateInputProperty();
+    // int32_t UpdateInputProperty();
     int32_t UpdateBitStat(int32_t evType, int32_t maxValue, unsigned long* resultValue, size_t len);
     bool TestBit(int32_t bitIndex, const unsigned long* bitMap, size_t count) const;
     bool HasInputProperty(int32_t property);
@@ -72,6 +73,7 @@ private:
     bool HasEventCode(int32_t evType, int32_t evCode) const;
 
     void ProcessSyncEvent(int32_t code, int32_t value);
+    void ProcessKeyEvent(int32_t code, int32_t value);
     void ProcessAbsEvent(int32_t code, int32_t value);
     void ProcessMscEvent(int32_t code, int32_t value);
     void OnEventCollected(const std::shared_ptr<const AbsEvent>& event);
@@ -79,7 +81,7 @@ private:
 private:
     const int32_t id_;
     const std::shared_ptr<IInputContext> context_;
-    int32_t fd_;
+    // int32_t fd_;
     std::string name_;
     int32_t deviceId_;
 
@@ -88,6 +90,7 @@ private:
     unsigned long evBit[LongsOfBits(EV_MAX)];
     unsigned long relBit[LongsOfBits(REL_MAX)];
     unsigned long absBit[LongsOfBits(ABS_MAX)];
+    KeyEventCollector keyEventCollector_;
     AbsEventCollector absEventCollector_;
 
     mutable std::map<int32_t, std::shared_ptr<IInputDevice::AxisInfo>> axises_;

@@ -39,7 +39,12 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Devic
 
 int32_t Device::Init()
 {
-    MMI_HILOGD("Enter");
+    CALL_DEBUG_ENTER;
+    auto retCode = UpdateCapablility();
+    if (retCode < 0) {
+        MMI_HILOGE("Leave device Init, UpdateCapablility Failed");
+        return -1;
+    }
     return 0;
 }
 
@@ -49,7 +54,7 @@ void Device::Uninit()
 }
 
 Device::Device(int32_t id, const std::shared_ptr<IInputContext> context)
-   : id_(id), context_(context), absEventCollector_(id, AbsEvent::SOURCE_TYPE_NONE),
+   : id_(id), context_(context), keyEventCollector_(id), absEventCollector_(id, AbsEvent::SOURCE_TYPE_NONE),
    eventHandler_(IKernelEventHandler::GetDefault()) {}
 
 Device::~Device()
@@ -104,19 +109,19 @@ std::shared_ptr<IInputDevice::AxisInfo> Device::GetAxisInfo(int32_t axis) const
             return nullptr;
     }
 
-    if (!HasEventCode(EV_ABS, absCode)) {
-        MMI_HILOGE("Leave device:%{public}s axis:%{public}s, absCode:%{public}s, InputDevice Not support axis", GetName().c_str(), IInputDevice::AxisToString(axis),
-                EnumUtils::InputEventAbsCodeToString(absCode));
-        return nullptr;
-    }
+    // if (!HasEventCode(EV_ABS, absCode)) {
+    //     MMI_HILOGE("Leave device:%{public}s axis:%{public}s, absCode:%{public}s, InputDevice Not support axis", GetName().c_str(), IInputDevice::AxisToString(axis),
+    //             EnumUtils::InputEventAbsCodeToString(absCode));
+    //     return nullptr;
+    // }
 
-    struct input_absinfo abs;
-    auto retCode = ::ioctl(fd_, EVIOCGABS(absCode), &abs);
-    if (retCode < 0) {
-        MMI_HILOGE("Leave device:%{public}s axis:%{public}s, absCode:%{public}s ::ioctl Failed:%{public}s", GetName().c_str(), IInputDevice::AxisToString(axis),
-                EnumUtils::InputEventAbsCodeToString(absCode), strerror(errno));
-        return nullptr;
-    }
+    struct input_absinfo abs = {};
+    // auto retCode = ::ioctl(fd_, EVIOCGABS(absCode), &abs);
+    // if (retCode < 0) {
+    //     MMI_HILOGE("Leave device:%{public}s axis:%{public}s, absCode:%{public}s ::ioctl Failed:%{public}s", GetName().c_str(), IInputDevice::AxisToString(axis),
+    //             EnumUtils::InputEventAbsCodeToString(absCode), strerror(errno));
+    //     return nullptr;
+    // }
 
     auto axisInfo = std::make_shared<IInputDevice::AxisInfo>();
     axisInfo->SetAxis(axis);
@@ -146,11 +151,12 @@ int32_t Device::CloseDevice()
 
 void Device::ProcessEventItem(const struct input_event* eventItem)
 {
+    MMI_HILOGE("ProcessEventItem enter");
     auto type = eventItem->type;
     auto code = eventItem->code;
     auto value = eventItem->value;
 
-    if (code == EV_ABS || code == EV_SYN) {
+    if (type == EV_ABS || type == EV_SYN) {
         MMI_HILOGD("Type:%{public}s, Code:%{public}s, Value:%{public}d", 
                 EnumUtils::InputEventTypeToString(type), 
                 EnumUtils::InputEventCodeToString(type, code), 
@@ -159,12 +165,18 @@ void Device::ProcessEventItem(const struct input_event* eventItem)
 
     switch (type) {
         case EV_SYN:
+            MMI_HILOGE("ProcessEventItem EV_SYN");
             ProcessSyncEvent(code, value);
-            break;
-        case EV_ABS:
-            ProcessAbsEvent(code, value);
+            MMI_HILOGE("xcbai ProcessEventItem EV_SYN end");
             break;
         case EV_KEY:
+                ProcessKeyEvent(code, value);
+                break;
+        case EV_ABS:
+            MMI_HILOGE("ProcessEventItem EV_ABS");
+            ProcessAbsEvent(code, value);
+            MMI_HILOGE("xcbai ProcessEventItem EV_SYN end");
+            break;
         case EV_REL:
         case EV_MSC:
         case EV_SW:
@@ -182,25 +194,29 @@ void Device::ProcessEventItem(const struct input_event* eventItem)
 
 int32_t Device::UpdateCapablility()
 {
-    auto retCode = UpdateInputProperty();
-    if (retCode < 0) {
-        return -1;
-    }
+    CALL_DEBUG_ENTER;
+    // auto retCode = UpdateInputProperty();
+    // if (retCode < 0) {
+    //     return -1;
+    // }
 
-    retCode = UpdateBitStat(0, EV_MAX, &evBit[0], LENTH_OF_ARRAY(evBit));
-    if (retCode < 0) {
-        return -1;
-    }
+    // auto retCode = UpdateBitStat(0, EV_MAX, &evBit[0], LENTH_OF_ARRAY(evBit));
+    // if (retCode < 0) {
+    //     MMI_HILOGD("UpdateBitStat 0");
+    //     return -1;
+    // }
 
-    retCode = UpdateBitStat(EV_REL, REL_MAX, &relBit[0], LENTH_OF_ARRAY(relBit));
-    if (retCode < 0) {
-        return -1;
-    }
+    // retCode = UpdateBitStat(EV_REL, REL_MAX, &relBit[0], LENTH_OF_ARRAY(relBit));
+    // if (retCode < 0) {
+    //     MMI_HILOGD("UpdateBitStat EV_REL");
+    //     return -1;
+    // }
 
-    retCode = UpdateBitStat(EV_ABS, ABS_MAX, &absBit[0], LENTH_OF_ARRAY(absBit));
-    if (retCode < 0) {
-        return -1;
-    }
+    // retCode = UpdateBitStat(EV_ABS, ABS_MAX, &absBit[0], LENTH_OF_ARRAY(absBit));
+    // if (retCode < 0) {
+    //     MMI_HILOGD("UpdateBitStat EV_ABS");
+    //     return -1;
+    // }
 
     if (HasMouseCapability()) {
         capabilities_ |= IInputDevice::CAPABILITY_MOUSE;
@@ -211,43 +227,46 @@ int32_t Device::UpdateCapablility()
     }
 
     if (HasTouchscreenCapability()) {
+        MMI_HILOGD("HasTouchscreenCapability");
         capabilities_ |= IInputDevice::CAPABILITY_TOUCHSCREEN;
         absEventCollector_.SetSourceType(AbsEvent::SOURCE_TYPE_TOUCHSCREEN);
+    } else {
+        MMI_HILOGD("!HasTouchscreenCapability");
     }
 
-    if (HasTouchpadCapability()) {
-        capabilities_ |= IInputDevice::CAPABILITY_TOUCHPAD;
-        absEventCollector_.SetSourceType(AbsEvent::SOURCE_TYPE_TOUCHPAD);
-        // capabilities_ |= IInputDevice::CAPABILITY_TOUCHSCREEN;
-        // absEventCollector_.SetSourceType(AbsEvent::SOURCE_TYPE_TOUCHSCREEN);
-    }
+    // if (HasTouchpadCapability()) {
+    //     capabilities_ |= IInputDevice::CAPABILITY_TOUCHPAD;
+    //     absEventCollector_.SetSourceType(AbsEvent::SOURCE_TYPE_TOUCHPAD);
+    //     // capabilities_ |= IInputDevice::CAPABILITY_TOUCHSCREEN;
+    //     // absEventCollector_.SetSourceType(AbsEvent::SOURCE_TYPE_TOUCHSCREEN);
+    // }
 
     return 0;
 }
 
-int32_t Device::UpdateInputProperty()
-{
-    auto ret = ioctl(fd_, EVIOCGPROP(sizeof(inputProperty)), &inputProperty[0]);
-    if (ret < 0) {
-        return -1;
-    }
+// int32_t Device::UpdateInputProperty()
+// {
+//     auto ret = ioctl(fd_, EVIOCGPROP(sizeof(inputProperty)), &inputProperty[0]);
+//     if (ret < 0) {
+//         return -1;
+//     }
 
-    for (int32_t property = 0; property <= INPUT_PROP_MAX; ++property) {
-        bool has = HasInputProperty(property);
-        MMI_HILOGD("InputDevice(Name:%{public}s) %{public}s Property:%{public}s",  GetName().c_str(),
-                has ? "has" : "hasn't", 
-                EnumUtils::InputPropertyToString(property));
-    }
-    return 0;
-}
+//     for (int32_t property = 0; property <= INPUT_PROP_MAX; ++property) {
+//         bool has = HasInputProperty(property);
+//         MMI_HILOGD("InputDevice(Name:%{public}s) %{public}s Property:%{public}s",  GetName().c_str(),
+//                 has ? "has" : "hasn't", 
+//                 EnumUtils::InputPropertyToString(property));
+//     }
+//     return 0;
+// }
 
 int32_t Device::UpdateBitStat(int32_t evType, int32_t maxValue, unsigned long* resultValue, size_t len)
 {
-    auto ret = ioctl(fd_, EVIOCGBIT(evType, maxValue), resultValue);
-    if (ret < 0) {
-        MMI_HILOGE("Leave, Failed for %{public}s", EnumUtils::InputEventTypeToString(evType));
-        return -1;
-    }
+    // auto ret = ioctl(fd_, EVIOCGBIT(evType, maxValue), resultValue);
+    // if (ret < 0) {
+    //     MMI_HILOGE("Leave, Failed for %{public}s", EnumUtils::InputEventTypeToString(evType));
+    //     return -1;
+    // }
 
     /*
         std::stringstream debugStr;
@@ -314,13 +333,13 @@ bool Device::HasKeyboardCapability()
 
 bool Device::HasTouchscreenCapability()
 {
-    if (!HasEventType(EV_ABS)) {
-        return false;
-    }
+    // if (!HasEventType(EV_ABS)) {
+    //     return false;
+    // }
 
-    if (HasInputProperty(INPUT_PROP_POINTER)) {
-        return false;
-    }
+    // if (HasInputProperty(INPUT_PROP_POINTER)) {
+    //     return false;
+    // }
 
     return true;
 }
@@ -331,9 +350,9 @@ bool Device::HasTouchpadCapability()
         return false;
     }
 
-    if (!HasInputProperty(INPUT_PROP_POINTER)) {
-        return false;
-    }
+    // if (!HasInputProperty(INPUT_PROP_POINTER)) {
+    //     return false;
+    // }
 
     return true;
 }
@@ -362,33 +381,56 @@ bool Device::HasEventCode(int32_t evType, int32_t evCode) const
 
 void Device::ProcessSyncEvent(int32_t code, int32_t value)
 {
-
+    MMI_HILOGE("ProcessSyncEvent Enter");
     const auto& event = absEventCollector_.HandleSyncEvent(code, value);
+    MMI_HILOGE("ProcessSyncEvent Enter 1");
+    if (event) {
+        MMI_HILOGE("ProcessSyncEvent Enter 2");
+        OnEventCollected(event);
+        MMI_HILOGE("ProcessSyncEvent Enter 3");
+        absEventCollector_.AfterProcessed();
+        MMI_HILOGE("ProcessSyncEvent Enter 4");
+    }
+    MMI_HILOGE("ProcessSyncEvent Enter 5");
+}
+
+void Device::ProcessKeyEvent(int32_t code, int32_t value) {
+    MMI_HILOGE("Enter code:%{public}s value:%{public}d", EnumUtils::InputEventKeyCodeToString(code), value);
+    const auto& event = keyEventCollector_.HandleKeyEvent(code, value);
     if (event) {
         OnEventCollected(event);
-        absEventCollector_.AfterProcessed();
+        keyEventCollector_.AfterProcessed();
+        MMI_HILOGE("Leave code:%{public}s value:%{public}d KeyEvent", EnumUtils::InputEventKeyCodeToString(code), value);
+        return;
     }
-
+    MMI_HILOGE("Leave code:%{public}s value:%{public}d", EnumUtils::InputEventKeyCodeToString(code), value);
 }
 
 void Device::ProcessAbsEvent(int32_t code, int32_t value)
 {
+    MMI_HILOGE("ProcessAbsEvent Enter");
     const auto& event = absEventCollector_.HandleAbsEvent(code, value);
+    MMI_HILOGE("ProcessAbsEvent Enter 1");
     if (event) {
+        MMI_HILOGE("ProcessAbsEvent Enter 2");
         OnEventCollected(event);
+        MMI_HILOGE("ProcessAbsEvent Enter 3");
         absEventCollector_.AfterProcessed();
+        MMI_HILOGE("ProcessAbsEvent Enter 4");
     }
+    MMI_HILOGE("ProcessAbsEvent Enter 5");
 }
 
 void Device::OnEventCollected(const std::shared_ptr<const AbsEvent>& event)
 {
     if (!event) {
+        MMI_HILOGE("OnEventCollected event is null");
         return;
     }
 
-    MMI_HILOGD("Enter");
+    MMI_HILOGE("Enter");
     eventHandler_->OnInputEvent(event);
-    MMI_HILOGD("Leave");
+    MMI_HILOGE("Leave");
     return;
 }
 
