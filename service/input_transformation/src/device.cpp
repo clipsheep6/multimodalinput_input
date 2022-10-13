@@ -54,7 +54,7 @@ void Device::Uninit()
 }
 
 Device::Device(int32_t id, const std::shared_ptr<IInputContext> context)
-   : id_(id), context_(context), keyEventCollector_(id), absEventCollector_(id, AbsEvent::SOURCE_TYPE_NONE),
+   : id_(id), context_(context), absEventCollector_(id, AbsEvent::SOURCE_TYPE_NONE),
    eventHandler_(IKernelEventHandler::GetDefault()) {}
 
 Device::~Device()
@@ -170,7 +170,6 @@ void Device::ProcessEventItem(const struct input_event* eventItem)
             MMI_HILOGE("xcbai ProcessEventItem EV_SYN end");
             break;
         case EV_KEY:
-                ProcessKeyEvent(code, value);
                 break;
         case EV_ABS:
             MMI_HILOGE("ProcessEventItem EV_ABS");
@@ -394,18 +393,6 @@ void Device::ProcessSyncEvent(int32_t code, int32_t value)
     MMI_HILOGE("ProcessSyncEvent Enter 5");
 }
 
-void Device::ProcessKeyEvent(int32_t code, int32_t value) {
-    MMI_HILOGE("Enter code:%{public}s value:%{public}d", EnumUtils::InputEventKeyCodeToString(code), value);
-    const auto& event = keyEventCollector_.HandleKeyEvent(code, value);
-    if (event) {
-        OnEventCollected(event);
-        keyEventCollector_.AfterProcessed();
-        MMI_HILOGE("Leave code:%{public}s value:%{public}d KeyEvent", EnumUtils::InputEventKeyCodeToString(code), value);
-        return;
-    }
-    MMI_HILOGE("Leave code:%{public}s value:%{public}d", EnumUtils::InputEventKeyCodeToString(code), value);
-}
-
 void Device::ProcessAbsEvent(int32_t code, int32_t value)
 {
     MMI_HILOGE("ProcessAbsEvent Enter");
@@ -420,6 +407,7 @@ void Device::ProcessAbsEvent(int32_t code, int32_t value)
     }
     MMI_HILOGE("ProcessAbsEvent Enter 5");
 }
+
 
 void Device::OnEventCollected(const std::shared_ptr<const AbsEvent>& event)
 {

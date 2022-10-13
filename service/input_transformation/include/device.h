@@ -27,7 +27,6 @@
 #include "i_input_context.h"
 #include "i_input_define.h"
 #include "i_input_device.h"
-#include "key_event_collector.h"
 
 struct input_event;
 
@@ -90,7 +89,6 @@ private:
     unsigned long evBit[LongsOfBits(EV_MAX)];
     unsigned long relBit[LongsOfBits(REL_MAX)];
     unsigned long absBit[LongsOfBits(ABS_MAX)];
-    KeyEventCollector keyEventCollector_;
     AbsEventCollector absEventCollector_;
 
     mutable std::map<int32_t, std::shared_ptr<IInputDevice::AxisInfo>> axises_;
