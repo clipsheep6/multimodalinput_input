@@ -265,6 +265,12 @@ void TouchScreenHandler::GetPhysicalDisplayCoord(const std::shared_ptr<const Abs
         MMI_HILOGE("Leave, TransformToPhysicalDisplayCoordinate Failed");
         return;
     }
+    touchInfo.point.x = physicalDisplayX;
+    touchInfo.point.y = physicalDisplayY;
+    touchInfo.toolRect.point.x = 0;   //static_cast<int32_t>(libinput_event_touch_get_tool_x_transformed(touch, info.width));
+    touchInfo.toolRect.point.y = 0;   //static_cast<int32_t>(libinput_event_touch_get_tool_y_transformed(touch, info.height));
+    touchInfo.toolRect.width = 0; //static_cast<int32_t>(libinput_event_touch_get_tool_width_transformed(touch, info.width));
+    touchInfo.toolRect.height = 0;  //static_cast<int32_t>(libinput_event_touch_get_tool_height_transformed(touch, info.height));
 }
 
 bool TouchScreenHandler::TouchPointToDisplayPoint(int32_t deviceId, const std::shared_ptr<const AbsEvent>& absEvent,
