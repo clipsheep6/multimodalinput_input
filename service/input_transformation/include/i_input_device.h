@@ -80,7 +80,6 @@ public:
     virtual int32_t StopReceiveEvents() = 0;
     virtual void SetDeviceId(int32_t deviceId) = 0;
     virtual int32_t GetDeviceId() const = 0;
-    virtual std::shared_ptr<IKernelEventHandler> GetKernelEventHandler() const = 0;
 };
 
 std::ostream& operator<<(std::ostream& outStream, const IInputDevice::AxisInfo& axisInfo);

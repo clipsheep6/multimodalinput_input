@@ -29,7 +29,6 @@ public:
 
     virtual ~IKernelEventHandler() = default;
     virtual void OnInputEvent(const std::shared_ptr<const AbsEvent>& event) = 0;
-    virtual std::shared_ptr<ITouchScreenHandler> GetTouchEventHandler() = 0;
 };
 } // namespace MMI
 } // namespace OHOS

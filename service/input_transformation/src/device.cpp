@@ -82,11 +82,6 @@ int32_t Device::GetDeviceId() const
     return deviceId_;
 }
 
-std::shared_ptr<IKernelEventHandler> Device::GetKernelEventHandler() const
-{
-    return eventHandler_;
-}
-
 std::shared_ptr<IInputDevice::AxisInfo> Device::GetAxisInfo(int32_t axis) const
 {
     MMI_HILOGD("Enter device:%{public}s axis:%{public}s", GetName().c_str(), IInputDevice::AxisToString(axis));

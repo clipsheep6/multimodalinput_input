@@ -49,7 +49,6 @@ public:
     virtual void ProcessEventItem(const struct input_event* eventItem) override;
     virtual void SetDeviceId(int32_t deviceId) override;
     virtual int32_t GetDeviceId() const override;
-    virtual std::shared_ptr<IKernelEventHandler> GetKernelEventHandler() const override;
 
 protected:
     void Uninit();

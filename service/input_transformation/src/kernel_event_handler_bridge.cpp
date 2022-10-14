@@ -31,10 +31,5 @@ void KernelEventHandlerBridge::OnInputEvent(const std::shared_ptr<const AbsEvent
 {
     touchScreenHandle_->OnInputEvent(event);
 }
-
-std::shared_ptr<ITouchScreenHandler> KernelEventHandlerBridge::GetTouchEventHandler()
-{
-    return touchScreenHandle_;
-}
 } // namespace MMI
 } // namespace OHOS
