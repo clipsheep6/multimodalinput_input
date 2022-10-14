@@ -173,7 +173,7 @@ int32_t EventNormalizeHandler::OnHDFDeviceRemoved(int32_t devIndex)
     return RET_OK;
 }
 
-int32_t EventNormalizeHandler::OnHDFEvent(int32_t devIndex, const HdfInputEvent &event1)
+int32_t EventNormalizeHandler::OnHDFEvent(int32_t devIndex, const HdfInputEvent &hdfEevent)
 {
     CALL_DEBUG_ENTER;
     auto context = InputHandler->GetContext();
@@ -183,11 +183,11 @@ int32_t EventNormalizeHandler::OnHDFEvent(int32_t devIndex, const HdfInputEvent 
     const auto& device = deviceCollector->GetDevice(devIndex);
     CHKPR(device, ERROR_NULL_POINTER);
     const input_event event {
-        .input_event_sec = event1.time / 1000000,
-        .input_event_usec = event1.time % 1000000,
-        .type = event1.type,
-        .code = event1.code,
-        .value = event1.value
+        .input_event_sec = hdfEevent.time / 1000000,
+        .input_event_usec = hdfEevent.time % 1000000,
+        .type = hdfEevent.type,
+        .code = hdfEevent.code,
+        .value = hdfEevent.value
     };
     device->ProcessEventItem(&event);  
     return RET_OK;
