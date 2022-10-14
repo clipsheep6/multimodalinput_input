@@ -146,13 +146,13 @@ int32_t Device::CloseDevice()
 
 void Device::ProcessEventItem(const struct input_event* eventItem)
 {
-    MMI_HILOGE("ProcessEventItem enter");
+    CALL_DEBUG_ENTER;
     auto type = eventItem->type;
     auto code = eventItem->code;
     auto value = eventItem->value;
 
     if (type == EV_ABS || type == EV_SYN) {
-        MMI_HILOGD("Type:%{public}s, Code:%{public}s, Value:%{public}d", 
+        MMI_HILOGD("songliy Type:%{public}s, Code:%{public}s, Value:%{public}d", 
                 EnumUtils::InputEventTypeToString(type), 
                 EnumUtils::InputEventCodeToString(type, code), 
                 value);
@@ -160,16 +160,12 @@ void Device::ProcessEventItem(const struct input_event* eventItem)
 
     switch (type) {
         case EV_SYN:
-            MMI_HILOGE("ProcessEventItem EV_SYN");
             ProcessSyncEvent(code, value);
-            MMI_HILOGE("xcbai ProcessEventItem EV_SYN end");
             break;
         case EV_KEY:
                 break;
         case EV_ABS:
-            MMI_HILOGE("ProcessEventItem EV_ABS");
             ProcessAbsEvent(code, value);
-            MMI_HILOGE("xcbai ProcessEventItem EV_SYN end");
             break;
         case EV_REL:
         case EV_MSC:
@@ -375,32 +371,30 @@ bool Device::HasEventCode(int32_t evType, int32_t evCode) const
 
 void Device::ProcessSyncEvent(int32_t code, int32_t value)
 {
-    MMI_HILOGE("ProcessSyncEvent Enter");
+    MMI_HILOGE("songliy ProcessSyncEvent Enter");
     const auto& event = absEventCollector_.HandleSyncEvent(code, value);
-    MMI_HILOGE("ProcessSyncEvent Enter 1");
     if (event) {
-        MMI_HILOGE("ProcessSyncEvent Enter 2");
+        MMI_HILOGE("songliy ProcessSyncEvent Enter 1");
         OnEventCollected(event);
-        MMI_HILOGE("ProcessSyncEvent Enter 3");
+        MMI_HILOGE("songliy ProcessSyncEvent Enter 2");
         absEventCollector_.AfterProcessed();
-        MMI_HILOGE("ProcessSyncEvent Enter 4");
+        MMI_HILOGE("songliy ProcessSyncEvent Enter 3");
     }
-    MMI_HILOGE("ProcessSyncEvent Enter 5");
+    MMI_HILOGE("songliy ProcessSyncEvent Leave");
 }
 
 void Device::ProcessAbsEvent(int32_t code, int32_t value)
 {
-    MMI_HILOGE("ProcessAbsEvent Enter");
+    MMI_HILOGE("songliy ProcessAbsEvent Enter");
     const auto& event = absEventCollector_.HandleAbsEvent(code, value);
-    MMI_HILOGE("ProcessAbsEvent Enter 1");
     if (event) {
-        MMI_HILOGE("ProcessAbsEvent Enter 2");
+        MMI_HILOGE("songliy ProcessAbsEvent Enter 1");
         OnEventCollected(event);
-        MMI_HILOGE("ProcessAbsEvent Enter 3");
+        MMI_HILOGE("songliy ProcessAbsEvent Enter 2");
         absEventCollector_.AfterProcessed();
-        MMI_HILOGE("ProcessAbsEvent Enter 4");
+        MMI_HILOGE("songliy ProcessAbsEvent Enter 3");
     }
-    MMI_HILOGE("ProcessAbsEvent Enter 5");
+    MMI_HILOGE("songliy ProcessAbsEvent Leave");
 }
 
 
@@ -411,9 +405,9 @@ void Device::OnEventCollected(const std::shared_ptr<const AbsEvent>& event)
         return;
     }
 
-    MMI_HILOGE("Enter");
+    MMI_HILOGE("songliy Enter");
     eventHandler_->OnInputEvent(event);
-    MMI_HILOGE("Leave");
+    MMI_HILOGE("songliy Leave");
     return;
 }
 
@@ -424,7 +418,7 @@ bool Device::HasCapability(int32_t capability) const
 
 int32_t Device::StartReceiveEvents(const std::shared_ptr<IKernelEventHandler>& eventHandler)
 {
-    MMI_HILOGD("Enter");
+    CALL_DEBUG_ENTER;
     if (!eventHandler) {
         MMI_HILOGE("Leave, null eventHandler");
         return -1;
