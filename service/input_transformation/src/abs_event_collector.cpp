@@ -35,12 +35,12 @@ AbsEventCollector::AbsEventCollector(int32_t deviceId, int32_t sourceType)
 
 const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleAbsEvent(int32_t code, int32_t value)
 {
-    MMI_HILOGE("Enter code:%{public}s value:%{public}d", EnumUtils::InputEventAbsCodeToString(code), value);
+    MMI_HILOGD("Enter code:%{public}s value:%{public}d", EnumUtils::InputEventAbsCodeToString(code), value);
     RemoveReleasedPointer();
 
     switch (code) {
         case ABS_MT_SLOT:
-        MMI_HILOGE("ABS_MT_SLOT value:%{public}d", value);
+        MMI_HILOGD("ABS_MT_SLOT value:%{public}d", value);
             return HandleMtSlot(value);
         case ABS_MT_TOUCH_MAJOR:
         case ABS_MT_TOUCH_MINOR:
@@ -49,18 +49,18 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleAbsEvent(int32_t code,
         case ABS_MT_ORIENTATION:
             break;
         case ABS_MT_POSITION_X:
-            MMI_HILOGE("ABS_MT_POSITION_X value:%{public}d", value);
+            MMI_HILOGD("ABS_MT_POSITION_X value:%{public}d", value);
             HandleMtPositionX(value);
             break;
         case ABS_MT_POSITION_Y:
-            MMI_HILOGE("ABS_MT_POSITION_Y value:%{public}d", value);
+            MMI_HILOGD("ABS_MT_POSITION_Y value:%{public}d", value);
             HandleMtPositionY(value);
             break;
         case ABS_MT_TOOL_TYPE:
         case ABS_MT_BLOB_ID:
             break;
         case ABS_MT_TRACKING_ID:
-            MMI_HILOGE("ABS_MT_TRACKING_ID value:%{public}d", value);
+            MMI_HILOGD("ABS_MT_TRACKING_ID value:%{public}d", value);
             return HandleMtTrackingId(value);
         case ABS_MT_PRESSURE:
         case ABS_MT_DISTANCE:
@@ -70,15 +70,15 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleAbsEvent(int32_t code,
             break;
     }
 
-    MMI_HILOGE("Leave code:%{public}s value:%{public}d", EnumUtils::InputEventAbsCodeToString(code), value);
+    MMI_HILOGD("Leave code:%{public}s value:%{public}d", EnumUtils::InputEventAbsCodeToString(code), value);
     return AbsEvent::NULL_VALUE;
 }
 
 const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleSyncEvent(int32_t code, int32_t value)
 {
-    MMI_HILOGE("Enter code:%{public}s value:%{public}d", EnumUtils::InputEventSynCodeToString(code), value);
+    MMI_HILOGD("Enter code:%{public}s value:%{public}d", EnumUtils::InputEventSynCodeToString(code), value);
     const auto& absEvent = FinishPointer();
-    MMI_HILOGE("Leave code:%{public}s value:%{public}d absEvent:%{public}p", EnumUtils::InputEventSynCodeToString(code), value, absEvent.get());
+    MMI_HILOGD("Leave code:%{public}s value:%{public}d absEvent:%{public}p", EnumUtils::InputEventSynCodeToString(code), value, absEvent.get());
     return absEvent;
 }
  
@@ -138,7 +138,7 @@ std::shared_ptr<AbsEvent::Pointer> AbsEventCollector::GetCurrentPointer(bool cre
 
 const std::shared_ptr<AbsEvent>& AbsEventCollector::FinishPointer()
 {
-    MMI_HILOGE("Enter");
+    MMI_HILOGD("Enter");
     if (!curPointer_) {
         MMI_HILOGE("Leave");
         return AbsEvent::NULL_VALUE;
@@ -175,7 +175,7 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::FinishPointer()
     absEvent_->SetAction(action);
     absEvent_->SetActionTime(nowTime);
 
-    MMI_HILOGE("Leave, absAction:%{public}s", AbsEvent::ActionToString(action));
+    MMI_HILOGD("Leave, absAction:%{public}s", AbsEvent::ActionToString(action));
     return absEvent_;
 }
 

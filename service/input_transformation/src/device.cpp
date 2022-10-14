@@ -371,30 +371,30 @@ bool Device::HasEventCode(int32_t evType, int32_t evCode) const
 
 void Device::ProcessSyncEvent(int32_t code, int32_t value)
 {
-    MMI_HILOGE("songliy ProcessSyncEvent Enter");
+    MMI_HILOGD("songliy ProcessSyncEvent Enter");
     const auto& event = absEventCollector_.HandleSyncEvent(code, value);
     if (event) {
-        MMI_HILOGE("songliy ProcessSyncEvent Enter 1");
+        MMI_HILOGD("songliy ProcessSyncEvent Enter 1");
         OnEventCollected(event);
-        MMI_HILOGE("songliy ProcessSyncEvent Enter 2");
+        MMI_HILOGD("songliy ProcessSyncEvent Enter 2");
         absEventCollector_.AfterProcessed();
-        MMI_HILOGE("songliy ProcessSyncEvent Enter 3");
+        MMI_HILOGD("songliy ProcessSyncEvent Enter 3");
     }
-    MMI_HILOGE("songliy ProcessSyncEvent Leave");
+    MMI_HILOGD("songliy ProcessSyncEvent Leave");
 }
 
 void Device::ProcessAbsEvent(int32_t code, int32_t value)
 {
-    MMI_HILOGE("songliy ProcessAbsEvent Enter");
+    MMI_HILOGD("songliy ProcessAbsEvent Enter");
     const auto& event = absEventCollector_.HandleAbsEvent(code, value);
+
+    // never will be true.
     if (event) {
-        MMI_HILOGE("songliy ProcessAbsEvent Enter 1");
+        MMI_HILOGD("songliy ProcessAbsEvent event is true.");
         OnEventCollected(event);
-        MMI_HILOGE("songliy ProcessAbsEvent Enter 2");
         absEventCollector_.AfterProcessed();
-        MMI_HILOGE("songliy ProcessAbsEvent Enter 3");
     }
-    MMI_HILOGE("songliy ProcessAbsEvent Leave");
+    MMI_HILOGD("songliy ProcessAbsEvent Leave");
 }
 
 
@@ -405,9 +405,9 @@ void Device::OnEventCollected(const std::shared_ptr<const AbsEvent>& event)
         return;
     }
 
-    MMI_HILOGE("songliy Enter");
+    MMI_HILOGD("songliy Enter");
     eventHandler_->OnInputEvent(event);
-    MMI_HILOGE("songliy Leave");
+    MMI_HILOGD("songliy Leave");
     return;
 }
 

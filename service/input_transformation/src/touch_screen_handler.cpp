@@ -214,29 +214,29 @@ int32_t TouchScreenHandler::TransformY(int32_t yPos, int32_t height, int32_t log
     return result;
 }
 
-int32_t TouchScreenHandler::TransformToPhysicalDisplayCoordinate(const DisplayInfo& info,
-        int32_t tpX, int32_t tpY, int32_t& displayX, int32_t& displayY) const
-{
-    CALL_DEBUG_ENTER;
-    if (!xInfo_) {
-        MMI_HILOGE("Leave, null xInfo_");
-        return -1;
-    }
+// int32_t TouchScreenHandler::TransformToPhysicalDisplayCoordinate(const DisplayInfo& info,
+//         int32_t tpX, int32_t tpY, int32_t& displayX, int32_t& displayY) const
+// {
+//     CALL_DEBUG_ENTER;
+//     if (!xInfo_) {
+//         MMI_HILOGE("Leave, null xInfo_");
+//         return -1;
+//     }
 
-    if (!yInfo_) {
-        MMI_HILOGE("Leave, null yInfo_");
-        return -1;
-    }
+//     if (!yInfo_) {
+//         MMI_HILOGE("Leave, null yInfo_");
+//         return -1;
+//     }
 
-    int32_t deltaX = tpX  - xInfo_->GetMinimum();
-    int32_t width = xInfo_->GetMaximum() - xInfo_->GetMinimum() + 1;
-    displayX = TransformX(deltaX, width, info.width);
+//     int32_t deltaX = tpX  - xInfo_->GetMinimum();
+//     int32_t width = xInfo_->GetMaximum() - xInfo_->GetMinimum() + 1;
+//     displayX = TransformX(deltaX, width, info.width);
 
-    int32_t deltaY = tpY - yInfo_->GetMinimum();
-    int32_t height = yInfo_->GetMaximum() - yInfo_->GetMinimum() + 1;
-    displayY = TransformY(deltaY, height, info.height);
-    return 0;
-}
+//     int32_t deltaY = tpY - yInfo_->GetMinimum();
+//     int32_t height = yInfo_->GetMaximum() - yInfo_->GetMinimum() + 1;
+//     displayY = TransformY(deltaY, height, info.height);
+//     return 0;
+// }
 
 void TouchScreenHandler::GetPhysicalDisplayCoord(const std::shared_ptr<const AbsEvent>& absEvent,
     const DisplayInfo& info, EventTouch& touchInfo)
@@ -247,17 +247,17 @@ void TouchScreenHandler::GetPhysicalDisplayCoord(const std::shared_ptr<const Abs
         return;
     }
 
-    int32_t physicalDisplayX = -1;
-    int32_t physicalDisplayY = -1;
-    auto retCode = TransformToPhysicalDisplayCoordinate(info, absEventPointer->GetX(), absEventPointer->GetY(),
-            physicalDisplayX, physicalDisplayY);
-    if (retCode < 0) {
-        MMI_HILOGE("Leave, TransformToPhysicalDisplayCoordinate Failed");
-        return;
-    }
-    MMI_HILOGE("songliy physicalDisplayX = %{public}d, physicalDisplayY = %{public}d", physicalDisplayX, physicalDisplayY);
-    touchInfo.point.x = physicalDisplayX;
-    touchInfo.point.y = physicalDisplayY;
+    // int32_t physicalDisplayX = -1;
+    // int32_t physicalDisplayY = -1;
+    // auto retCode = TransformToPhysicalDisplayCoordinate(info, absEventPointer->GetX(), absEventPointer->GetY(),
+    //         physicalDisplayX, physicalDisplayY);
+    // if (retCode < 0) {
+    //     MMI_HILOGE("Leave, TransformToPhysicalDisplayCoordinate Failed");
+    //     return;
+    // }
+    MMI_HILOGD("songliy physicalDisplayX = %{public}d, physicalDisplayY = %{public}d", absEventPointer->GetX(), absEventPointer->GetY());
+    touchInfo.point.x = absEventPointer->GetX();
+    touchInfo.point.y = absEventPointer->GetY();
     touchInfo.toolRect.point.x = 0;   //static_cast<int32_t>(libinput_event_touch_get_tool_x_transformed(touch, info.width));
     touchInfo.toolRect.point.y = 0;   //static_cast<int32_t>(libinput_event_touch_get_tool_y_transformed(touch, info.height));
     touchInfo.toolRect.width = 0; //static_cast<int32_t>(libinput_event_touch_get_tool_width_transformed(touch, info.width));
@@ -279,8 +279,8 @@ bool TouchScreenHandler::TouchPointToDisplayPoint(int32_t deviceId, const std::s
         MMI_HILOGE("Get DisplayInfo is error");
         return false;
     }
-    MMI_HILOGE("songliy screenId = %{public}s, physicalDisplayId = %{public}d", screenId.c_str(), physicalDisplayId);
-    MMI_HILOGE("songliy width = %{public}d, height = %{public}d", info->width, info->height);
+    MMI_HILOGD("songliy screenId = %{public}s, physicalDisplayId = %{public}d", screenId.c_str(), physicalDisplayId);
+    MMI_HILOGD("songliy width = %{public}d, height = %{public}d", info->width, info->height);
     GetPhysicalDisplayCoord(absEvent, *info, touchInfo);
     return true;
 }
@@ -296,7 +296,7 @@ bool TouchScreenHandler::OnEventTouchDown(const std::shared_ptr<const AbsEvent>&
         MMI_HILOGE("TouchDownPointToDisplayPoint failed");
         return false;
     }
-    MMI_HILOGE("songliy deviceId = %{public}d", deviceId);
+    MMI_HILOGD("songliy deviceId = %{public}d", deviceId);
     auto pointIds = pointerEvent_->GetPointerIds();
     int64_t time = GetSysClockTime();
     if (pointIds.empty()) {
