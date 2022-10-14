@@ -54,11 +54,11 @@ int32_t TouchScreenHandler::BindInputDevice(const std::shared_ptr<IInputDevice>&
         return -1;
     }
 
-    // std::shared_ptr<IInputDevice::AxisInfo> xInfo = inputDevice->GetAxisInfo(IInputDevice::AXIS_MT_X);
-    // if (!xInfo) {
-    //     MMI_HILOGE("Leave, null AxisInfo Of AXIS_MT_X");
-    //     return -1;
-    // }
+    std::shared_ptr<IInputDevice::AxisInfo> xInfo = inputDevice->GetAxisInfo(IInputDevice::AXIS_MT_X);
+    if (!xInfo) {
+        MMI_HILOGE("Leave, null AxisInfo Of AXIS_MT_X");
+        return -1;
+    }
 
     // if (xInfo->GetMinimum() >= xInfo->GetMaximum()) {
     //     MMI_HILOGE("Leave, xInfo->GetMinimum():%{public}d >= xInfo->GetMaximum():%{public}d",
@@ -66,11 +66,11 @@ int32_t TouchScreenHandler::BindInputDevice(const std::shared_ptr<IInputDevice>&
     //     return -1;
     // }
 
-    // std::shared_ptr<IInputDevice::AxisInfo> yInfo = inputDevice->GetAxisInfo(IInputDevice::AXIS_MT_Y);
-    // if (!yInfo) {
-    //     MMI_HILOGE("Leave, null AxisInfo Of AXIS_MT_Y");
-    //     return -1;
-    // }
+    std::shared_ptr<IInputDevice::AxisInfo> yInfo = inputDevice->GetAxisInfo(IInputDevice::AXIS_MT_Y);
+    if (!yInfo) {
+        MMI_HILOGE("Leave, null AxisInfo Of AXIS_MT_Y");
+        return -1;
+    }
 
     // if (yInfo->GetMinimum() >= yInfo->GetMaximum()) {
     //     MMI_HILOGE("Leave, yInfo->GetMinimum():%{public}d >= yInfo->GetMaximum():%{public}d",
@@ -79,8 +79,8 @@ int32_t TouchScreenHandler::BindInputDevice(const std::shared_ptr<IInputDevice>&
     // }
 
     inputDevice_ = inputDevice;
-    // xInfo_ = xInfo;
-    // yInfo_ = yInfo;
+    xInfo_ = xInfo;
+    yInfo_ = yInfo;
     return 0;
 }
 
@@ -117,26 +117,16 @@ bool TouchScreenHandler::ConvertPointer(const std::shared_ptr<const AbsEvent>& a
         int32_t& pointerAction, int64_t& actionTime)
 {
     CALL_DEBUG_ENTER;
-    std::shared_ptr<PointerEvent::PointerItem> pointer;
-    if (!absEvent) {
-        MMI_HILOGE("Leave, null absEvent");
-        return false;
-    }
+    CHKPF(absEvent);
 
-    const auto& absEventPointer = absEvent->GetPointer();
-    if (!absEventPointer) {
-        MMI_HILOGE("Leave, null absEventPointer");
-        return false;
+    if (pointerEvent_ == nullptr) {
+        pointerEvent_ = PointerEvent::Create();
+        CHKPF(pointerEvent_);
     }
 
     if (context_ == nullptr) {
         MMI_HILOGE("Leave, null context_");
         return false;
-    }
-
-    if (pointerEvent_ == nullptr) {
-        pointerEvent_ = PointerEvent::Create();
-        CHKPF(pointerEvent_);
     }
 
     auto action = ConvertAction(absEvent->GetAction());
@@ -147,7 +137,7 @@ bool TouchScreenHandler::ConvertPointer(const std::shared_ptr<const AbsEvent>& a
 
     switch (action) {
         case PointerEvent::POINTER_ACTION_DOWN: {
-           if (!OnEventTouchDown(absEvent)) {
+            if (!OnEventTouchDown(absEvent)) {
                 MMI_HILOGE("Get OnEventTouchDown failed");
                 return false;
             }
@@ -265,6 +255,7 @@ void TouchScreenHandler::GetPhysicalDisplayCoord(const std::shared_ptr<const Abs
         MMI_HILOGE("Leave, TransformToPhysicalDisplayCoordinate Failed");
         return;
     }
+    MMI_HILOGE("songliy physicalDisplayX = %{public}d, physicalDisplayY = %{public}d", physicalDisplayX, physicalDisplayY);
     touchInfo.point.x = physicalDisplayX;
     touchInfo.point.y = physicalDisplayY;
     touchInfo.toolRect.point.x = 0;   //static_cast<int32_t>(libinput_event_touch_get_tool_x_transformed(touch, info.width));
@@ -288,6 +279,8 @@ bool TouchScreenHandler::TouchPointToDisplayPoint(int32_t deviceId, const std::s
         MMI_HILOGE("Get DisplayInfo is error");
         return false;
     }
+    MMI_HILOGE("songliy screenId = %{public}s, physicalDisplayId = %{public}d", screenId.c_str(), physicalDisplayId);
+    MMI_HILOGE("songliy width = %{public}d, height = %{public}d", info->width, info->height);
     GetPhysicalDisplayCoord(absEvent, *info, touchInfo);
     return true;
 }
@@ -303,7 +296,7 @@ bool TouchScreenHandler::OnEventTouchDown(const std::shared_ptr<const AbsEvent>&
         MMI_HILOGE("TouchDownPointToDisplayPoint failed");
         return false;
     }
-
+    MMI_HILOGE("songliy deviceId = %{public}d", deviceId);
     auto pointIds = pointerEvent_->GetPointerIds();
     int64_t time = GetSysClockTime();
     if (pointIds.empty()) {
