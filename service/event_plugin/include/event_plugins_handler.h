@@ -18,7 +18,6 @@
 
 #include "i_input_event_handler.h"
 #include "i_input_event_convert_handler.h"
-#include "event_plugin_define.h"
 namespace OHOS {
 namespace MMI {
 enum class EventHandlerType
@@ -37,7 +36,7 @@ public:
     virtual void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent);
     virtual void SetNext(std::shared_ptr<IInputEventHandler> nextHandler);
 private:
-    std::list<PluginInfo *> pluginInfos_;
+    std::list<IInputEventConvertHandler::PluginInfo *> pluginInfos_;
 private:
     int32_t ScanPlugins();
     int32_t UnloadPlugins();

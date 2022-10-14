@@ -60,12 +60,24 @@ int32_t EventPluginsHandler::ScanPlugins()
         if (ret != 0) {
             MMI_HILOGE("closedir failed, dirname:%{public}s, errno:%{public}d", INPUT_EVENT_HANDLER_PLUGIN_HOME.data(), errno);
         }
+
+        for (auto cur = pluginInfos_.begin(); cur != pluginInfos_.end(); cur++) {
+                SetNext((*cur)->handler);
+                MMI_HILOGE("1010101010101010101010101");
+        }
         // auto cur = pluginInfos_.begin();
+
+        // MMI_HILOGE("66666666666666666666666666");
         // while (cur != pluginInfos_.end()) {
+        //     MMI_HILOGE("777777777777777777777777777777777");
         //     auto next = cur++;
+        //     MMI_HILOGE("88888888888888888888888888888888888");
         //     if (next != pluginInfos_.end()) {
-        //         (cur)->handler->SetNext((next)->handler);
+        //         MMI_HILOGE("9999999999999999999999999999999");
+        //         SetNext((*next)->handler);
+        //         MMI_HILOGE("1010101010101010101010101");
         //     }
+        //     MMI_HILOGE("12121212121212121212221222112121212");
         //     cur = next;
         // }
 
@@ -114,19 +126,19 @@ int32_t EventPluginsHandler::LoadPlugin(void *handle)
         MMI_HILOGE("load plugin failed, error msg:%{public}s", retError);
         return RET_ERR;
     }
-
-    PluginInfo *info = new PluginInfo;
-    info->handler.reset(create_plu());
-    info->name = "name";
-    info->version = "1.0";
-    info->priority = 0;
+    IInputEventConvertHandler::PluginInfo *info = new IInputEventConvertHandler::PluginInfo;
+    info->handler = create_plu()->GetPluginInfo().handler;
+    info->name = create_plu()->GetPluginInfo().name;
+    info->version = create_plu()->GetPluginInfo().version;
+    info->priority = create_plu()->GetPluginInfo().priority;
+    MMI_HILOGE("8888888888888888888888888888info->priority is %{public}d ", info->priority);
     pluginInfos_.push_front(info);
-    // for (auto it = pluginInfos_.begin(); it != pluginInfos_.end(); ++it) {
-    //     if ((*it)->priority > info->priority) {
-    //         (void)pluginInfos_.insert(it, info);
-    //         break;
-    //     }
-    // }
+    for (auto it = pluginInfos_.begin(); it != pluginInfos_.end(); ++it) {
+        if ((*it)->priority > info->priority) {
+            (void)pluginInfos_.insert(it, info);
+            break;
+        }
+    }
     return RET_OK;
 }
 
