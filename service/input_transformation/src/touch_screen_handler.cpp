@@ -128,7 +128,7 @@ bool TouchScreenHandler::ConvertPointer(const std::shared_ptr<const AbsEvent>& a
         MMI_HILOGE("Leave, null context_");
         return false;
     }
-
+     MMI_HILOGE("songliy action %{public}d", absEvent->GetAction());
     auto action = ConvertAction(absEvent->GetAction());
     if (action == PointerEvent::POINTER_ACTION_UNKNOWN) {
         MMI_HILOGE("Leave, ConvertAction Failed");
