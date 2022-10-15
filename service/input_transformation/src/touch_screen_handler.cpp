@@ -143,20 +143,20 @@ bool TouchScreenHandler::ConvertPointer(const std::shared_ptr<const AbsEvent>& a
             }
             break;
         }
-        // case PointerEvent::POINTER_ACTION_UP: {
-        //     if (!OnEventTouchUp(absEvent)) {
-        //         MMI_HILOGE("Get OnEventTouchUp failed");
-        //         return false;
-        //     }
-        //     break;
-        // }
-        // case PointerEvent::POINTER_ACTION_MOVE: {
-        //     if (!OnEventTouchMotion(absEvent)) {
-        //         MMI_HILOGE("Get OnEventTouchMotion failed");
-        //         return false;
-        //     }
-        //     break;
-        // }
+        case PointerEvent::POINTER_ACTION_UP: {
+            if (!OnEventTouchUp(absEvent)) {
+                MMI_HILOGE("Get OnEventTouchUp failed");
+                return false;
+            }
+            break;
+        }
+        case PointerEvent::POINTER_ACTION_MOVE: {
+            if (!OnEventTouchMotion(absEvent)) {
+                MMI_HILOGE("Get OnEventTouchMotion failed");
+                return false;
+            }
+            break;
+        }
         default: {
             MMI_HILOGE("Leave, unknown absEvent Action:%{public}s", AbsEvent::ActionToString(action));
             return false;
