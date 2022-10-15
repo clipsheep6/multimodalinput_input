@@ -13,25 +13,26 @@
  * limitations under the License.
  */
 
-#ifndef I_KERNEL_EVENT_HANDLER_H
-#define I_KERNEL_EVENT_HANDLER_H
-
-#include <string>
-#include <memory>
+#ifndef KEY_EVENT_COLLECTOR_H
+#define KEY_EVENT_COLLECTOR_H
+#include "i_input_define.h"
+#include "kernel_key_event.h"
 
 namespace OHOS {
 namespace MMI {
-class KernelKeyEvent;
-class AbsEvent;
-class ITouchScreenHandler;
-class IKernelEventHandler {
-public:
-    static const std::shared_ptr<IKernelEventHandler>& GetDefault();
+    class KeyEventCollector : public NonCopyable {
+        public:
+            KeyEventCollector(int32_t deviceId);
+            virtual ~KeyEventCollector() = default;
 
-    virtual ~IKernelEventHandler() = default;
-    virtual void OnInputEvent(const std::shared_ptr<const KernelKeyEvent>& event) = 0;
-    virtual void OnInputEvent(const std::shared_ptr<const AbsEvent>& event) = 0;
-};
+            std::shared_ptr<const KernelKeyEvent> HandleKeyEvent(int32_t eventCode, int32_t eventValue);
+
+            void AfterProcessed();
+
+        private:
+            [[maybe_unused]] int32_t deviceId_;
+            std::shared_ptr<KernelKeyEvent> keyEvent_;
+    };
 } // namespace MMI
 } // namespace OHOS
-#endif // I_KERNEL_EVENT_HANDLER_H
+#endif // KEY_EVENT_COLLECTOR_H

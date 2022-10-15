@@ -13,25 +13,24 @@
  * limitations under the License.
  */
 
-#ifndef I_KERNEL_EVENT_HANDLER_H
-#define I_KERNEL_EVENT_HANDLER_H
-
-#include <string>
-#include <memory>
+#include "key_event_collector.h"
+#include "time_utils.h"
 
 namespace OHOS {
 namespace MMI {
-class KernelKeyEvent;
-class AbsEvent;
-class ITouchScreenHandler;
-class IKernelEventHandler {
-public:
-    static const std::shared_ptr<IKernelEventHandler>& GetDefault();
+KeyEventCollector::KeyEventCollector(int32_t deviceId) 
+: deviceId_(deviceId), keyEvent_(std::make_shared<KernelKeyEvent>(deviceId)) {
+}
 
-    virtual ~IKernelEventHandler() = default;
-    virtual void OnInputEvent(const std::shared_ptr<const KernelKeyEvent>& event) = 0;
-    virtual void OnInputEvent(const std::shared_ptr<const AbsEvent>& event) = 0;
-};
+std::shared_ptr<const KernelKeyEvent> KeyEventCollector::HandleKeyEvent(int32_t code, int32_t value) {
+    keyEvent_->SetKeyCode(code);
+    keyEvent_->SetAction(value > 0 ? KernelKeyEvent::ACTION_DOWN : KernelKeyEvent::ACTION_UP);
+    keyEvent_->SetActionTime(TimeUtils::GetTimeStampMs());
+    return keyEvent_;
+}
+
+void KeyEventCollector::AfterProcessed() {
+    keyEvent_->SetAction(KernelKeyEvent::ACTION_NONE);
+}
 } // namespace MMI
 } // namespace OHOS
-#endif // I_KERNEL_EVENT_HANDLER_H

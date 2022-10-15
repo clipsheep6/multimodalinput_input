@@ -134,7 +134,7 @@ bool TouchScreenHandler::ConvertPointer(const std::shared_ptr<const AbsEvent>& a
         MMI_HILOGE("Leave, ConvertAction Failed");
         return false;
     }
-
+    MMI_HILOGE("songliy action %{public}d", action);
     switch (action) {
         case PointerEvent::POINTER_ACTION_DOWN: {
             if (!OnEventTouchDown(absEvent)) {
@@ -143,20 +143,20 @@ bool TouchScreenHandler::ConvertPointer(const std::shared_ptr<const AbsEvent>& a
             }
             break;
         }
-        case PointerEvent::POINTER_ACTION_UP: {
-            if (!OnEventTouchUp(absEvent)) {
-                MMI_HILOGE("Get OnEventTouchUp failed");
-                return false;
-            }
-            break;
-        }
-        case PointerEvent::POINTER_ACTION_MOVE: {
-            if (!OnEventTouchMotion(absEvent)) {
-                MMI_HILOGE("Get OnEventTouchMotion failed");
-                return false;
-            }
-            break;
-        }
+        // case PointerEvent::POINTER_ACTION_UP: {
+        //     if (!OnEventTouchUp(absEvent)) {
+        //         MMI_HILOGE("Get OnEventTouchUp failed");
+        //         return false;
+        //     }
+        //     break;
+        // }
+        // case PointerEvent::POINTER_ACTION_MOVE: {
+        //     if (!OnEventTouchMotion(absEvent)) {
+        //         MMI_HILOGE("Get OnEventTouchMotion failed");
+        //         return false;
+        //     }
+        //     break;
+        // }
         default: {
             MMI_HILOGE("Leave, unknown absEvent Action:%{public}s", AbsEvent::ActionToString(action));
             return false;
@@ -292,11 +292,12 @@ bool TouchScreenHandler::OnEventTouchDown(const std::shared_ptr<const AbsEvent>&
     EventTouch touchInfo;
     int32_t logicalDisplayId = -1;
     int32_t deviceId = inputDevice_->GetDeviceId();
+    MMI_HILOGD("songliy deviceId = %{public}d", deviceId);
     if (!TouchPointToDisplayPoint(deviceId, absEvent, touchInfo, logicalDisplayId)) {
         MMI_HILOGE("TouchDownPointToDisplayPoint failed");
         return false;
     }
-    MMI_HILOGD("songliy deviceId = %{public}d", deviceId);
+
     auto pointIds = pointerEvent_->GetPointerIds();
     int64_t time = GetSysClockTime();
     if (pointIds.empty()) {

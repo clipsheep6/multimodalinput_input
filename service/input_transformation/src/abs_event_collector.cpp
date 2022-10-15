@@ -143,7 +143,7 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::FinishPointer()
         MMI_HILOGE("Leave");
         return AbsEvent::NULL_VALUE;
     }
-
+    MMI_HILOGD("curPointer_:%{public}p, GetId()%{public}d", curPointer_.get(), curPointer_->GetId());
     auto action = absEventAction_;
     absEventAction_ = AbsEvent::ACTION_NONE;
     auto nowTime = TimeUtils::GetTimeStampMs();
