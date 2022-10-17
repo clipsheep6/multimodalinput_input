@@ -386,6 +386,7 @@ void Device::ProcessSyncEvent(int32_t code, int32_t value)
 
 void Device::ProcessKeyEvent(int32_t code, int32_t value) {
     MMI_HILOGD("Enter code:%{public}s value:%{public}d", EnumUtils::InputEventKeyCodeToString(code), value);
+    absEventCollector_.SetAction((value > 0 ? AbsEvent::ACTION_DOWN : AbsEvent::ACTION_UP));
     auto event = keyEventCollector_.HandleKeyEvent(code, value);
     if (event) {
         OnEventCollected(event);

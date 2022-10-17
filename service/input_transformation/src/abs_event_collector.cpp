@@ -109,6 +109,10 @@ int32_t AbsEventCollector::SetSourceType(int32_t sourceType)
     return 0;
 }
 
+void AbsEventCollector::SetAction(int32_t action) {
+    absEventAction_ = action;
+}
+
 std::shared_ptr<AbsEvent::Pointer> AbsEventCollector::GetCurrentPointer(bool createIfNotExist)
 {
     if (curSlot_ < 0) {
