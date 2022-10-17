@@ -163,7 +163,7 @@ void Device::ProcessEventItem(const struct input_event* eventItem)
             ProcessSyncEvent(code, value);
             break;
         case EV_KEY:
-            ProcessSyncEvent(code, value);
+            ProcessKeyEvent(code, value);
             break;
         case EV_ABS:
             ProcessAbsEvent(code, value);
