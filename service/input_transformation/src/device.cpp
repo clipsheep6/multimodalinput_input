@@ -88,7 +88,7 @@ std::shared_ptr<IInputDevice::AxisInfo> Device::GetAxisInfo(int32_t axis) const
     MMI_HILOGD("Enter device:%{public}s axis:%{public}s", GetName().c_str(), IInputDevice::AxisToString(axis));
     auto it = axises_.find(axis);
     if (it != axises_.end()) {
-        MMI_HILOGD("Leave deivce:%{public}s axis:%{public}s, result:%{public}s", GetName().c_str(), IInputDevice::AxisToString(axis), it->second);
+        MMI_HILOGD("Leave deivce:%{public}s axis:%{public}s", GetName().c_str(), IInputDevice::AxisToString(axis));
         return it->second;
     }
 
@@ -104,12 +104,12 @@ std::shared_ptr<IInputDevice::AxisInfo> Device::GetAxisInfo(int32_t axis) const
             dimensionInfo = dimensionInfoY_;
             break;
         default:
-            LOG_E("Leave device:%{public}s axis:%{public}s, Unknown axis", GetName(), IInputDevice::AxisToString(axis));
+            MMI_HILOGE("Leave device:%{public}s axis:%{public}s, Unknown axis", GetName().c_str(), IInputDevice::AxisToString(axis));
             return nullptr;
     }
 
     if (!HasEventCode(EV_ABS, absCode)) {
-        MMI_HILOGE("Leave device:%{public}s axis:%{public}s, absCode:%{public}s, InputDevice Not support axis", GetName(), IInputDevice::AxisToString(axis),
+        MMI_HILOGE("Leave device:%{public}s axis:%{public}s, absCode:%{public}s, InputDevice Not support axis", GetName().c_str(), IInputDevice::AxisToString(axis),
                 EnumUtils::InputEventAbsCodeToString(absCode));
         return nullptr;
     }
@@ -123,8 +123,7 @@ std::shared_ptr<IInputDevice::AxisInfo> Device::GetAxisInfo(int32_t axis) const
     // axisInfo->SetResolution();
 
     axises_[axis] = axisInfo;
-    MMI_HILOGD("Leave device:%{public}s axis:%{public}s, axisInfo:%{public}s", GetName(), IInputDevice::AxisToString(axis), axisInfo);
-
+    MMI_HILOGD("Leave device:%{public}s axis:%{public}s", GetName().c_str(), IInputDevice::AxisToString(axis));
     return axisInfo;
 }
 
