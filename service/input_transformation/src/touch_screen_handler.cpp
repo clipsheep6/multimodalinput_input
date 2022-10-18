@@ -60,11 +60,11 @@ int32_t TouchScreenHandler::BindInputDevice(const std::shared_ptr<IInputDevice>&
         return -1;
     }
 
-    // if (xInfo->GetMinimum() >= xInfo->GetMaximum()) {
-    //     MMI_HILOGE("Leave, xInfo->GetMinimum():%{public}d >= xInfo->GetMaximum():%{public}d",
-    //                 xInfo->GetMinimum(), xInfo->GetMaximum());
-    //     return -1;
-    // }
+    if (xInfo->GetMinimum() >= xInfo->GetMaximum()) {
+        MMI_HILOGE("Leave, xInfo->GetMinimum():%{public}d >= xInfo->GetMaximum():%{public}d",
+                    xInfo->GetMinimum(), xInfo->GetMaximum());
+        return -1;
+    }
 
     std::shared_ptr<IInputDevice::AxisInfo> yInfo = inputDevice->GetAxisInfo(IInputDevice::AXIS_MT_Y);
     if (!yInfo) {
@@ -72,11 +72,11 @@ int32_t TouchScreenHandler::BindInputDevice(const std::shared_ptr<IInputDevice>&
         return -1;
     }
 
-    // if (yInfo->GetMinimum() >= yInfo->GetMaximum()) {
-    //     MMI_HILOGE("Leave, yInfo->GetMinimum():%{public}d >= yInfo->GetMaximum():%{public}d",
-    //                 yInfo->GetMinimum(), yInfo->GetMaximum());
-    //     return -1;
-    // }
+    if (yInfo->GetMinimum() >= yInfo->GetMaximum()) {
+        MMI_HILOGE("Leave, yInfo->GetMinimum():%{public}d >= yInfo->GetMaximum():%{public}d",
+                    yInfo->GetMinimum(), yInfo->GetMaximum());
+        return -1;
+    }
 
     inputDevice_ = inputDevice;
     xInfo_ = xInfo;
@@ -102,6 +102,11 @@ void TouchScreenHandler::OnInputEvent(const std::shared_ptr<const AbsEvent>& eve
     MMI_HILOGE("OnInputEvent enter");
     int32_t pointerAction = PointerEvent::POINTER_ACTION_UNKNOWN;
     int64_t actionTime = 0;
+
+    if (pointerEvent_ == nullptr) {
+        pointerEvent_ = PointerEvent::Create();
+        CHKPV(pointerEvent_);
+    }
     auto ret = ConvertPointer(event, pointerAction, actionTime);
     if (!ret) {
         MMI_HILOGE("Leave ConvertPointer Failed");
@@ -110,7 +115,9 @@ void TouchScreenHandler::OnInputEvent(const std::shared_ptr<const AbsEvent>& eve
     CHKPV(inputEventNormalizeHandler);   
     CHKPV(pointerEvent_);
     inputEventNormalizeHandler->HandleTouchEvent(pointerEvent_);
-
+    MMI_HILOGD("songliy EventLogHelper pointerEvent start!");
+    EventLogHelper::PrintEventData(pointerEvent_);
+    MMI_HILOGD("songliy EventLogHelper pointerEvent end!");
 }
 
 bool TouchScreenHandler::ConvertPointer(const std::shared_ptr<const AbsEvent>& absEvent,
@@ -118,23 +125,14 @@ bool TouchScreenHandler::ConvertPointer(const std::shared_ptr<const AbsEvent>& a
 {
     CALL_DEBUG_ENTER;
     CHKPF(absEvent);
+    // CHKPF(context_);
 
-    if (pointerEvent_ == nullptr) {
-        pointerEvent_ = PointerEvent::Create();
-        CHKPF(pointerEvent_);
-    }
-
-    if (context_ == nullptr) {
-        MMI_HILOGE("Leave, null context_");
-        return false;
-    }
-     MMI_HILOGE("songliy action %{public}d", absEvent->GetAction());
     auto action = ConvertAction(absEvent->GetAction());
     if (action == PointerEvent::POINTER_ACTION_UNKNOWN) {
         MMI_HILOGE("Leave, ConvertAction Failed");
         return false;
     }
-    MMI_HILOGE("songliy action after %{public}d", action);
+
     switch (action) {
         case PointerEvent::POINTER_ACTION_DOWN: {
             if (!OnEventTouchDown(absEvent)) {
@@ -166,7 +164,6 @@ bool TouchScreenHandler::ConvertPointer(const std::shared_ptr<const AbsEvent>& a
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent_->UpdateId();
     WinMgr->UpdateTargetPointer(pointerEvent_);
-    EventLogHelper::PrintEventData(pointerEvent_);
     MMI_HILOGD("Leave");
     return true;
 }
@@ -255,7 +252,8 @@ void TouchScreenHandler::GetPhysicalDisplayCoord(const std::shared_ptr<const Abs
     //     MMI_HILOGE("Leave, TransformToPhysicalDisplayCoordinate Failed");
     //     return;
     // }
-    MMI_HILOGD("songliy physicalDisplayX = %{public}d, physicalDisplayY = %{public}d", absEventPointer->GetX(), absEventPointer->GetY());
+    MMI_HILOGD("songliy physicalDisplayX = %{public}d, physicalDisplayY = %{public}d, width = %{public}d, height = %{public}d",
+    absEventPointer->GetX(), absEventPointer->GetY(), info.width, info.height);
     touchInfo.point.x = absEventPointer->GetX();
     touchInfo.point.y = absEventPointer->GetY();
     touchInfo.toolRect.point.x = 0;   //static_cast<int32_t>(libinput_event_touch_get_tool_x_transformed(touch, info.width));
@@ -279,8 +277,8 @@ bool TouchScreenHandler::TouchPointToDisplayPoint(int32_t deviceId, const std::s
         MMI_HILOGE("Get DisplayInfo is error");
         return false;
     }
-    MMI_HILOGD("songliy screenId = %{public}s, physicalDisplayId = %{public}d", screenId.c_str(), physicalDisplayId);
-    MMI_HILOGD("songliy width = %{public}d, height = %{public}d", info->width, info->height);
+    // MMI_HILOGD("songliy screenId = %{public}s, physicalDisplayId = %{public}d", screenId.c_str(), physicalDisplayId);
+    // MMI_HILOGD("songliy width = %{public}d, height = %{public}d", info->width, info->height);
     GetPhysicalDisplayCoord(absEvent, *info, touchInfo);
     return true;
 }
@@ -291,6 +289,7 @@ bool TouchScreenHandler::OnEventTouchDown(const std::shared_ptr<const AbsEvent>&
     CHKPF(absEvent);
     EventTouch touchInfo;
     int32_t logicalDisplayId = -1;
+    CHKPF(inputDevice_);
     int32_t deviceId = inputDevice_->GetDeviceId();
     MMI_HILOGD("songliy deviceId = %{public}d", deviceId);
     if (!TouchPointToDisplayPoint(deviceId, absEvent, touchInfo, logicalDisplayId)) {
@@ -330,8 +329,6 @@ bool TouchScreenHandler::OnEventTouchDown(const std::shared_ptr<const AbsEvent>&
     pointerEvent_->SetDeviceId(deviceId);
     pointerEvent_->AddPointerItem(item);
     pointerEvent_->SetPointerId(seatSlot);
-    EventLogHelper::PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(),
-        pointerEvent_->GetPointerIds().size());
     return true;
 }
 
@@ -393,8 +390,6 @@ bool TouchScreenHandler::OnEventTouchMotion(const std::shared_ptr<const AbsEvent
     item.SetToolHeight(touchInfo.toolRect.height);
     pointerEvent_->UpdatePointerItem(seatSlot, item);
     pointerEvent_->SetPointerId(seatSlot);
-    EventLogHelper::PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(),
-        pointerEvent_->GetPointerIds().size());
     return true;
 }
 } // namespace MMI

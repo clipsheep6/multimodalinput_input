@@ -132,9 +132,9 @@ void EventNormalizeHandler::HandleHDFDeviceStatusEvent(const HDFDeviceStatusEven
     MMI_HILOGI("hdfEvent:addrmv:devIndex:%{public}u,devType:%{public}u,devStatus:%{public}u,time:%{public}llu",
         event.devIndex, event.devType, event.devStatus, event.time);
     if (event.devStatus == 1) {
-        OnHDFDeviceAdded(event.devIndex);
+        OnHDFDeviceAdded(event.devInfo);
     } else {
-        OnHDFDeviceRemoved(event.devIndex);
+        OnHDFDeviceRemoved(event.devInfo);
     } 
 }
 
@@ -145,12 +145,12 @@ void EventNormalizeHandler::HandleHDFDeviceInputEvent(const HDFDeviceInputEvent 
     OnHDFEvent(event.devIndex, event); 
 }
 
-int32_t EventNormalizeHandler::OnHDFDeviceAdded(int32_t devIndex)
+int32_t EventNormalizeHandler::OnHDFDeviceAdded(InputDeviceInfo devInfo)
 {
     CALL_DEBUG_ENTER;
     auto context = InputHandler->GetContext();
     CHKPR(context, ERROR_NULL_POINTER);
-    auto inputDevice = std::make_shared<Device>(devIndex, context);
+    auto inputDevice = std::make_shared<Device>(devInfo.devId, context, devInfo.attrSet.axisInfo[0]);
     inputDevice->Init();
     CHKPR(inputDevice, ERROR_NULL_POINTER);
     const auto deviceCollector = context->GetInputDeviceCollector();
@@ -160,16 +160,16 @@ int32_t EventNormalizeHandler::OnHDFDeviceAdded(int32_t devIndex)
     return RET_OK;
 }
 
-int32_t EventNormalizeHandler::OnHDFDeviceRemoved(int32_t devIndex)
+int32_t EventNormalizeHandler::OnHDFDeviceRemoved(InputDeviceInfo devInfo)
 {
     CALL_DEBUG_ENTER;
     auto context = InputHandler->GetContext();
     CHKPR(context, ERROR_NULL_POINTER);
     const auto& deviceCollector = context->GetInputDeviceCollector();
     CHKPR(deviceCollector, ERROR_NULL_POINTER);
-    auto inputDevice = deviceCollector->GetDevice(devIndex);
+    auto inputDevice = deviceCollector->GetDevice(devInfo.devId);
     InputDevMgr->OnInputDeviceRemoved(inputDevice);
-    deviceCollector->RemoveDevice(devIndex);
+    deviceCollector->RemoveDevice(devInfo.devId);
     return RET_OK;
 }
 
@@ -228,7 +228,7 @@ void EventNormalizeHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEv
     }
     DfxHisysevent::GetDispStartTime();
     CHKPV(keyEvent);
-    EventLogHelper::PrintEventData(keyEvent);
+    //EventLogHelper::PrintEventData(keyEvent);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     if (!CheckKeyboardWhiteList(keyEvent)) {
         MMI_HILOGI("Check white list return false, keyboard event dropped");
@@ -319,7 +319,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     }
 
     BytraceAdapter::StartBytrace(keyEvent);
-    EventLogHelper::PrintEventData(keyEvent);
+    //EventLogHelper::PrintEventData(keyEvent);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     if (!CheckKeyboardWhiteList(keyEvent)) {
         MMI_HILOGI("Check white list return false, keyboard event dropped");

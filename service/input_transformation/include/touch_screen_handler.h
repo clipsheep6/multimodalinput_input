@@ -58,7 +58,7 @@ protected:
             EventTouch& touchInfo, int32_t& physicalDisplayId);
 
 private:
-    const IInputContext* const context_;
+    // const IInputContext* const context_;
     std::shared_ptr<IInputDevice> inputDevice_;
     std::shared_ptr<IInputDevice::AxisInfo> xInfo_;
     std::shared_ptr<IInputDevice::AxisInfo> yInfo_;

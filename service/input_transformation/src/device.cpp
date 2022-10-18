@@ -53,9 +53,9 @@ void Device::Uninit()
     CloseDevice();
 }
 
-Device::Device(int32_t id, const std::shared_ptr<IInputContext> context)
-   : id_(id), context_(context), keyEventCollector_(id), absEventCollector_(id, AbsEvent::SOURCE_TYPE_NONE),
-   eventHandler_(IKernelEventHandler::GetDefault()) {}
+Device::Device(int32_t id, const std::shared_ptr<IInputContext> context, DimensionInfo dimensionInfo)
+   : id_(id), context_(context), dimensionInfo_(dimensionInfo), keyEventCollector_(id), 
+   absEventCollector_(id, AbsEvent::SOURCE_TYPE_NONE), eventHandler_(IKernelEventHandler::GetDefault()) {}
 
 Device::~Device()
 {
@@ -84,10 +84,10 @@ int32_t Device::GetDeviceId() const
 
 std::shared_ptr<IInputDevice::AxisInfo> Device::GetAxisInfo(int32_t axis) const
 {
-    MMI_HILOGD("Enter device:%{public}s axis:%{public}s", GetName().c_str(), IInputDevice::AxisToString(axis));
+    MMI_HILOGD("Enter device:%{public}s axis:%{public}s", GetName(), IInputDevice::AxisToString(axis));
     auto it = axises_.find(axis);
     if (it != axises_.end()) {
-        MMI_HILOGD("Leave deivce:%{public}s axis:%{public}s, result:%{public}p", GetName().c_str(), IInputDevice::AxisToString(axis), it->second.get());
+        MMI_HILOGD("Leave deivce:%{public}s axis:%{public}s, result:%{public}s", GetName(), IInputDevice::AxisToString(axis), it->second);
         return it->second;
     }
 
@@ -100,34 +100,26 @@ std::shared_ptr<IInputDevice::AxisInfo> Device::GetAxisInfo(int32_t axis) const
             absCode = ABS_MT_POSITION_Y;
             break;
         default:
-            MMI_HILOGE("Leave device:%{public}s axis:%{public}s, Unknown axis", GetName().c_str(), IInputDevice::AxisToString(axis));
+            LOG_E("Leave device:%{public}s axis:%{public}s, Unknown axis", GetName(), IInputDevice::AxisToString(axis));
             return nullptr;
     }
 
-    // if (!HasEventCode(EV_ABS, absCode)) {
-    //     MMI_HILOGE("Leave device:%{public}s axis:%{public}s, absCode:%{public}s, InputDevice Not support axis", GetName().c_str(), IInputDevice::AxisToString(axis),
-    //             EnumUtils::InputEventAbsCodeToString(absCode));
-    //     return nullptr;
-    // }
-
-    struct input_absinfo abs = {};
-    // auto retCode = ::ioctl(fd_, EVIOCGABS(absCode), &abs);
-    // if (retCode < 0) {
-    //     MMI_HILOGE("Leave device:%{public}s axis:%{public}s, absCode:%{public}s ::ioctl Failed:%{public}s", GetName().c_str(), IInputDevice::AxisToString(axis),
-    //             EnumUtils::InputEventAbsCodeToString(absCode), strerror(errno));
-    //     return nullptr;
-    // }
+    if (!HasEventCode(EV_ABS, absCode)) {
+        MMI_HILOGE("Leave device:%{public}s axis:%{public}s, absCode:%{public}s, InputDevice Not support axis", GetName(), IInputDevice::AxisToString(axis),
+                EnumUtils::InputEventAbsCodeToString(absCode));
+        return nullptr;
+    }
 
     auto axisInfo = std::make_shared<IInputDevice::AxisInfo>();
     axisInfo->SetAxis(axis);
-    axisInfo->SetMinimum(abs.minimum);
-    axisInfo->SetMaximum(abs.maximum);
-    axisInfo->SetFlat(abs.flat);
-    axisInfo->SetFuzz(abs.fuzz);
-    axisInfo->SetResolution(abs.resolution);
+    axisInfo->SetMinimum(dimensionInfo_.min);
+    axisInfo->SetMaximum(dimensionInfo_.max);
+    axisInfo->SetFlat(dimensionInfo_.flat);
+    axisInfo->SetFuzz(dimensionInfo_.fuzz);
+    // axisInfo->SetResolution();
 
     axises_[axis] = axisInfo;
-    MMI_HILOGD("Leave device:%{public}s axis:%{public}s, axisInfo:%{public}p", GetName().c_str(), IInputDevice::AxisToString(axis), axisInfo.get());
+    MMI_HILOGD("Leave device:%{public}s axis:%{public}s, axisInfo:%{public}s", GetName(), IInputDevice::AxisToString(axis), axisInfo);
     return axisInfo;
 }
 
@@ -266,7 +258,7 @@ int32_t Device::UpdateBitStat(int32_t evType, int32_t maxValue, unsigned long* r
         debugStr << std::hex << std::setw(16) << std::setfill('0') << resultValue[i-1];
         }
         debugStr << "[END]";
-        MMI_HILOGD("Device:$s BITSTAT:$s", GetName(), debugStr.str());
+        MMI_HILOGD("Device:%{public}s BITSTAT:%{public}s", GetName(), debugStr.str());
         */
 
     const char* typeStr = "";

@@ -34,11 +34,12 @@ struct input_event;
 namespace OHOS {
 namespace MMI {
 
+struct DimensionInfo;
 class IKernelEventHandler;
 class Device : public NonCopyable, public IInputDevice {
 
 public:
-    Device(int32_t id, const std::shared_ptr<IInputContext> context);
+    Device(int32_t id, const std::shared_ptr<IInputContext> context, DimensionInfo dimensionInfo_);
     virtual ~Device();
     int32_t Init();
     virtual int32_t GetId() const override;
@@ -84,6 +85,7 @@ private:
     // int32_t fd_;
     std::string name_;
     int32_t deviceId_;
+    DimensionInfo dimensionInfo_;
 
     int32_t capabilities_ {IInputDevice::CAPABILITY_UNKNOWN};
     unsigned long inputProperty[LongsOfBits(INPUT_PROP_MAX)];

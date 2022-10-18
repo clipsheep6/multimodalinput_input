@@ -53,8 +53,8 @@ private:
     int32_t OnEventDeviceAdded(libinput_event *event);
     int32_t OnEventDeviceRemoved(libinput_event *event);
 #ifdef OHOS_BUILD_HDF
-    int32_t OnHDFDeviceAdded(int32_t devIndex);
-    int32_t OnHDFDeviceRemoved(int32_t devIndex);
+    int32_t OnHDFDeviceAdded(InputDeviceInfo devInfo);
+    int32_t OnHDFDeviceRemoved(InputDeviceInfo devInfo);
     int32_t OnHDFEvent(int32_t devIndex, const HdfInputEvent &event);
 #endif // OHOS_BUILD_HDF
     int32_t HandleKeyboardEvent(libinput_event* event);
