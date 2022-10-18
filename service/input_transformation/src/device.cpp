@@ -53,8 +53,9 @@ void Device::Uninit()
     CloseDevice();
 }
 
-Device::Device(int32_t id, const std::shared_ptr<IInputContext> context, DimensionInfo dimensionInfo)
-   : id_(id), context_(context), dimensionInfo_(dimensionInfo), keyEventCollector_(id), 
+Device::Device(int32_t id, const std::shared_ptr<IInputContext> context, DimensionInfo dimensionInfoX,
+               DimensionInfo dimensionInfoY)
+   : id_(id), context_(context), dimensionInfoX_(dimensionInfoX), dimensionInfoY_(dimensionInfoY), keyEventCollector_(id), 
    absEventCollector_(id, AbsEvent::SOURCE_TYPE_NONE), eventHandler_(IKernelEventHandler::GetDefault()) {}
 
 Device::~Device()

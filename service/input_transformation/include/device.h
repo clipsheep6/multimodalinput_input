@@ -85,7 +85,8 @@ private:
     // int32_t fd_;
     std::string name_;
     int32_t deviceId_;
-    DimensionInfo dimensionInfo_;
+    DimensionInfo dimensionInfoX_;
+    DimensionInfo dimensionInfoY_;
 
     int32_t capabilities_ {IInputDevice::CAPABILITY_UNKNOWN};
     unsigned long inputProperty[LongsOfBits(INPUT_PROP_MAX)];
