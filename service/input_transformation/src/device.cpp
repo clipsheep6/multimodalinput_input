@@ -160,12 +160,15 @@ void Device::ProcessEventItem(const struct input_event* eventItem)
 
     switch (type) {
         case EV_SYN:
+            MMI_HILOGD("xcbai EV_SYN:%{public}d", value);
             ProcessSyncEvent(code, value);
             break;
         case EV_KEY:
+            MMI_HILOGD("xcbai EV_KEY:%{public}d", value);
             ProcessKeyEvent(code, value);
             break;
         case EV_ABS:
+            MMI_HILOGD("xcbai EV_ABS:%{public}d", value);
             ProcessAbsEvent(code, value);
             break;
         case EV_REL:
