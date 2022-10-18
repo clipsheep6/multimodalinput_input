@@ -23,6 +23,7 @@
 
 #include "abs_event_collector.h"
 #include "abs_event.h"
+#include "hdf_adapter.h"
 #include "i_event_collector.h"
 #include "i_input_context.h"
 #include "i_input_define.h"
@@ -34,12 +35,21 @@ struct input_event;
 namespace OHOS {
 namespace MMI {
 
-struct DimensionInfo;
+typedef struct {
+    int32_t axis;
+    int32_t min;
+    int32_t max;
+    int32_t fuzz;
+    int32_t flat;
+    int32_t range;
+} HDFDimensionInfo;
+
 class IKernelEventHandler;
 class Device : public NonCopyable, public IInputDevice {
 
 public:
-    Device(int32_t id, const std::shared_ptr<IInputContext> context, DimensionInfo dimensionInfo_);
+    Device(int32_t id, const std::shared_ptr<IInputContext> context, const HDFDimensionInfo &dimensionInfoX,
+               const HDFDimensionInfo &dimensionInfoY);
     virtual ~Device();
     int32_t Init();
     virtual int32_t GetId() const override;
@@ -85,8 +95,8 @@ private:
     // int32_t fd_;
     std::string name_;
     int32_t deviceId_;
-    DimensionInfo dimensionInfoX_;
-    DimensionInfo dimensionInfoY_;
+    HDFDimensionInfo dimensionInfoX_;
+    HDFDimensionInfo dimensionInfoY_;
 
     int32_t capabilities_ {IInputDevice::CAPABILITY_UNKNOWN};
     unsigned long inputProperty[LongsOfBits(INPUT_PROP_MAX)];

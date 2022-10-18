@@ -145,19 +145,34 @@ void EventNormalizeHandler::HandleHDFDeviceInputEvent(const HDFDeviceInputEvent 
     OnHDFEvent(event.devIndex, event); 
 }
 
+const HDFDimensionInfo Convert(const DimensionInfo &r)
+{
+    return HDFDimensionInfo {
+        .axis = r.axis, 
+        .axis = r.axis, 
+        .axis = r.axis, 
+        .axis = r.axis, 
+        .axis = r.axis, 
+        .axis = r.axis, 
+    };
+}
+
 int32_t EventNormalizeHandler::OnHDFDeviceAdded(InputDeviceInfo devInfo)
 {
     CALL_DEBUG_ENTER;
     auto context = InputHandler->GetContext();
     CHKPR(context, ERROR_NULL_POINTER);
-    auto inputDevice = std::make_shared<Device>(devInfo.devId, context, devInfo.attrSet.axisInfo[ABS_MT_POSITION_X],
-                                                                        devInfo.attrSet.axisInfo[ABS_MT_POSITION_Y]);
+    #if 0
+    HDFDimensionInfo axisInfoX = Convert(devInfo.attrSet.axisInfo[ABS_MT_POSITION_X]);
+    HDFDimensionInfo axisInfoY = Convert(devInfo.attrSet.axisInfo[ABS_MT_POSITION_Y]);
+    auto inputDevice = std::make_shared<Device>(devInfo.devId, context, axisInfoX, axisInfoY);
     inputDevice->Init();
     CHKPR(inputDevice, ERROR_NULL_POINTER);
     const auto deviceCollector = context->GetInputDeviceCollector();
     CHKPR(deviceCollector, ERROR_NULL_POINTER);
     InputDevMgr->OnInputDeviceAdded(inputDevice);
     deviceCollector->AddDevice(inputDevice);
+    #endif
     return RET_OK;
 }
 

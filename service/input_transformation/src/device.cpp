@@ -53,8 +53,8 @@ void Device::Uninit()
     CloseDevice();
 }
 
-Device::Device(int32_t id, const std::shared_ptr<IInputContext> context, DimensionInfo dimensionInfoX,
-               DimensionInfo dimensionInfoY)
+Device::Device(int32_t id, const std::shared_ptr<IInputContext> context, const HDFDimensionInfo &dimensionInfoX,
+               const HDFDimensionInfo &dimensionInfoY)
    : id_(id), context_(context), dimensionInfoX_(dimensionInfoX), dimensionInfoY_(dimensionInfoY), keyEventCollector_(id), 
    absEventCollector_(id, AbsEvent::SOURCE_TYPE_NONE), eventHandler_(IKernelEventHandler::GetDefault()) {}
 
@@ -93,12 +93,15 @@ std::shared_ptr<IInputDevice::AxisInfo> Device::GetAxisInfo(int32_t axis) const
     }
 
     int32_t absCode = -1;
+    HDFDimensionInfo dimensionInfo = {};
     switch (axis) {
         case IInputDevice::AXIS_MT_X:
             absCode = ABS_MT_POSITION_X;
+            dimensionInfo = dimensionInfoX_;
             break;
         case IInputDevice::AXIS_MT_Y:
             absCode = ABS_MT_POSITION_Y;
+            dimensionInfo = dimensionInfoY_;
             break;
         default:
             LOG_E("Leave device:%{public}s axis:%{public}s, Unknown axis", GetName(), IInputDevice::AxisToString(axis));
@@ -113,10 +116,10 @@ std::shared_ptr<IInputDevice::AxisInfo> Device::GetAxisInfo(int32_t axis) const
 
     auto axisInfo = std::make_shared<IInputDevice::AxisInfo>();
     axisInfo->SetAxis(axis);
-    axisInfo->SetMinimum(dimensionInfo_.min);
-    axisInfo->SetMaximum(dimensionInfo_.max);
-    axisInfo->SetFlat(dimensionInfo_.flat);
-    axisInfo->SetFuzz(dimensionInfo_.fuzz);
+    axisInfo->SetMinimum(dimensionInfo.min);
+    axisInfo->SetMaximum(dimensionInfo.max);
+    axisInfo->SetFlat(dimensionInfo.flat);
+    axisInfo->SetFuzz(dimensionInfo.fuzz);
     // axisInfo->SetResolution();
 
     axises_[axis] = axisInfo;
