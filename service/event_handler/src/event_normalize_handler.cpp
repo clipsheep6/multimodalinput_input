@@ -47,6 +47,7 @@
 #ifdef OHOS_BUILD_HDF
 #include "device_collector.h"
 #include "device.h"
+#include "hdf_adapter.h"
 #endif // OHOS_BUILD_HDF
 
 namespace OHOS {
@@ -145,34 +146,20 @@ void EventNormalizeHandler::HandleHDFDeviceInputEvent(const HDFDeviceInputEvent 
     OnHDFEvent(event.devIndex, event); 
 }
 
-const HDFDimensionInfo Convert(const DimensionInfo &r)
-{
-    return HDFDimensionInfo {
-        .axis = r.axis, 
-        .axis = r.axis, 
-        .axis = r.axis, 
-        .axis = r.axis, 
-        .axis = r.axis, 
-        .axis = r.axis, 
-    };
-}
 
 int32_t EventNormalizeHandler::OnHDFDeviceAdded(InputDeviceInfo devInfo)
 {
     CALL_DEBUG_ENTER;
     auto context = InputHandler->GetContext();
     CHKPR(context, ERROR_NULL_POINTER);
-    #if 0
-    HDFDimensionInfo axisInfoX = Convert(devInfo.attrSet.axisInfo[ABS_MT_POSITION_X]);
-    HDFDimensionInfo axisInfoY = Convert(devInfo.attrSet.axisInfo[ABS_MT_POSITION_Y]);
-    auto inputDevice = std::make_shared<Device>(devInfo.devId, context, axisInfoX, axisInfoY);
+    auto inputDevice = std::make_shared<Device>(devInfo.devIndex, context, devInfo.attrSet.axisInfo[ABS_MT_POSITION_X],
+        devInfo.attrSet.axisInfo[ABS_MT_POSITION_Y]);
     inputDevice->Init();
     CHKPR(inputDevice, ERROR_NULL_POINTER);
     const auto deviceCollector = context->GetInputDeviceCollector();
     CHKPR(deviceCollector, ERROR_NULL_POINTER);
     InputDevMgr->OnInputDeviceAdded(inputDevice);
     deviceCollector->AddDevice(inputDevice);
-    #endif
     return RET_OK;
 }
 
@@ -183,9 +170,9 @@ int32_t EventNormalizeHandler::OnHDFDeviceRemoved(InputDeviceInfo devInfo)
     CHKPR(context, ERROR_NULL_POINTER);
     const auto& deviceCollector = context->GetInputDeviceCollector();
     CHKPR(deviceCollector, ERROR_NULL_POINTER);
-    auto inputDevice = deviceCollector->GetDevice(devInfo.devId);
+    auto inputDevice = deviceCollector->GetDevice(devInfo.devIndex);
     InputDevMgr->OnInputDeviceRemoved(inputDevice);
-    deviceCollector->RemoveDevice(devInfo.devId);
+    deviceCollector->RemoveDevice(devInfo.devIndex);
     return RET_OK;
 }
 

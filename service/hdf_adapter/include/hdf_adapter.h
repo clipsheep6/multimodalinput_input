@@ -62,7 +62,7 @@ struct HDFDeviceStatusEvent {
     uint64_t time;
     uint32_t devType;
     uint32_t devStatus;
-    HDFInputDeviceInfo devInfo;
+    InputDeviceInfo devInfo;
 };
 
 using HDFDeviceInputEvent = HdfInputEvent;

@@ -19,7 +19,7 @@
 #include <map>
 
 #include "abs_event.h"
-#include "display_info.h"
+#include "input_display_info.h"
 #include "i_input_define.h"
 #include "i_input_device.h"
 #include "i_touch_screen_handler.h"

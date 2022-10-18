@@ -53,8 +53,8 @@ void Device::Uninit()
     CloseDevice();
 }
 
-Device::Device(int32_t id, const std::shared_ptr<IInputContext> context, const HDFDimensionInfo &dimensionInfoX,
-               const HDFDimensionInfo &dimensionInfoY)
+Device::Device(int32_t id, const std::shared_ptr<IInputContext> context, const InputDimensionInfo &dimensionInfoX,
+               const InputDimensionInfo &dimensionInfoY)
    : id_(id), context_(context), dimensionInfoX_(dimensionInfoX), dimensionInfoY_(dimensionInfoY), keyEventCollector_(id), 
    absEventCollector_(id, AbsEvent::SOURCE_TYPE_NONE), eventHandler_(IKernelEventHandler::GetDefault()) {}
 
@@ -85,15 +85,15 @@ int32_t Device::GetDeviceId() const
 
 std::shared_ptr<IInputDevice::AxisInfo> Device::GetAxisInfo(int32_t axis) const
 {
-    MMI_HILOGD("Enter device:%{public}s axis:%{public}s", GetName(), IInputDevice::AxisToString(axis));
+    MMI_HILOGD("Enter device:%{public}s axis:%{public}s", GetName().c_str(), IInputDevice::AxisToString(axis));
     auto it = axises_.find(axis);
     if (it != axises_.end()) {
-        MMI_HILOGD("Leave deivce:%{public}s axis:%{public}s, result:%{public}s", GetName(), IInputDevice::AxisToString(axis), it->second);
+        MMI_HILOGD("Leave deivce:%{public}s axis:%{public}s, result:%{public}s", GetName().c_str(), IInputDevice::AxisToString(axis), it->second);
         return it->second;
     }
 
     int32_t absCode = -1;
-    HDFDimensionInfo dimensionInfo = {};
+    InputDimensionInfo dimensionInfo = {};
     switch (axis) {
         case IInputDevice::AXIS_MT_X:
             absCode = ABS_MT_POSITION_X;
@@ -124,6 +124,7 @@ std::shared_ptr<IInputDevice::AxisInfo> Device::GetAxisInfo(int32_t axis) const
 
     axises_[axis] = axisInfo;
     MMI_HILOGD("Leave device:%{public}s axis:%{public}s, axisInfo:%{public}s", GetName(), IInputDevice::AxisToString(axis), axisInfo);
+
     return axisInfo;
 }
 

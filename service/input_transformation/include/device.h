@@ -34,22 +34,12 @@ struct input_event;
 
 namespace OHOS {
 namespace MMI {
-
-typedef struct {
-    int32_t axis;
-    int32_t min;
-    int32_t max;
-    int32_t fuzz;
-    int32_t flat;
-    int32_t range;
-} HDFDimensionInfo;
-
 class IKernelEventHandler;
 class Device : public NonCopyable, public IInputDevice {
 
 public:
-    Device(int32_t id, const std::shared_ptr<IInputContext> context, const HDFDimensionInfo &dimensionInfoX,
-               const HDFDimensionInfo &dimensionInfoY);
+    Device(int32_t id, const std::shared_ptr<IInputContext> context, const InputDimensionInfo &dimensionInfoX,
+               const InputDimensionInfo &dimensionInfoY);
     virtual ~Device();
     int32_t Init();
     virtual int32_t GetId() const override;
@@ -95,8 +85,8 @@ private:
     // int32_t fd_;
     std::string name_;
     int32_t deviceId_;
-    HDFDimensionInfo dimensionInfoX_;
-    HDFDimensionInfo dimensionInfoY_;
+    InputDimensionInfo dimensionInfoX_;
+    InputDimensionInfo dimensionInfoY_;
 
     int32_t capabilities_ {IInputDevice::CAPABILITY_UNKNOWN};
     unsigned long inputProperty[LongsOfBits(INPUT_PROP_MAX)];
