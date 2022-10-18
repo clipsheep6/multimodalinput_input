@@ -108,11 +108,11 @@ std::shared_ptr<IInputDevice::AxisInfo> Device::GetAxisInfo(int32_t axis) const
             return nullptr;
     }
 
-    if (!HasEventCode(EV_ABS, absCode)) {
-        MMI_HILOGE("Leave device:%{public}s axis:%{public}s, absCode:%{public}s, InputDevice Not support axis", GetName().c_str(), IInputDevice::AxisToString(axis),
-                EnumUtils::InputEventAbsCodeToString(absCode));
-        return nullptr;
-    }
+    // if (!HasEventCode(EV_ABS, absCode)) {
+    //     MMI_HILOGE("Leave device:%{public}s axis:%{public}s, absCode:%{public}s, InputDevice Not support axis", GetName().c_str(), IInputDevice::AxisToString(axis),
+    //             EnumUtils::InputEventAbsCodeToString(absCode));
+    //     return nullptr;
+    // }
 
     auto axisInfo = std::make_shared<IInputDevice::AxisInfo>();
     axisInfo->SetAxis(axis);
