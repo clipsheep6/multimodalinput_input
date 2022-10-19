@@ -282,6 +282,7 @@ void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEven
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 void EventNormalizeHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CALL_DEBUG_ENTER;
     if (nextHandler_ == nullptr) {
         MMI_HILOGW("Touchscreen device does not support");
         return;

@@ -115,9 +115,6 @@ void TouchScreenHandler::OnInputEvent(const std::shared_ptr<const AbsEvent>& eve
     CHKPV(inputEventNormalizeHandler);   
     CHKPV(pointerEvent_);
     inputEventNormalizeHandler->HandleTouchEvent(pointerEvent_);
-    MMI_HILOGD("songliy EventLogHelper pointerEvent start!");
-    EventLogHelper::PrintEventData(pointerEvent_);
-    MMI_HILOGD("songliy EventLogHelper pointerEvent end!");
 }
 
 bool TouchScreenHandler::ConvertPointer(const std::shared_ptr<const AbsEvent>& absEvent,
@@ -163,7 +160,7 @@ bool TouchScreenHandler::ConvertPointer(const std::shared_ptr<const AbsEvent>& a
 
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent_->UpdateId();
-    WinMgr->UpdateTargetPointer(pointerEvent_);
+    // WinMgr->UpdateTargetPointer(pointerEvent_);
     MMI_HILOGD("Leave");
     return true;
 }
@@ -277,8 +274,6 @@ bool TouchScreenHandler::TouchPointToDisplayPoint(int32_t deviceId, const std::s
         MMI_HILOGE("Get DisplayInfo is error");
         return false;
     }
-    // MMI_HILOGD("songliy screenId = %{public}s, physicalDisplayId = %{public}d", screenId.c_str(), physicalDisplayId);
-    // MMI_HILOGD("songliy width = %{public}d, height = %{public}d", info->width, info->height);
     GetPhysicalDisplayCoord(absEvent, *info, touchInfo);
     return true;
 }

@@ -148,7 +148,7 @@ void Device::ProcessEventItem(const struct input_event* eventItem)
     auto value = eventItem->value;
 
     if (type == EV_ABS || type == EV_SYN) {
-        MMI_HILOGD("songliy Type:%{public}s, Code:%{public}s, Value:%{public}d", 
+        MMI_HILOGD("Type:%{public}s, Code:%{public}s, Value:%{public}d", 
                 EnumUtils::InputEventTypeToString(type), 
                 EnumUtils::InputEventCodeToString(type, code), 
                 value);
@@ -368,16 +368,11 @@ bool Device::HasEventCode(int32_t evType, int32_t evCode) const
 
 void Device::ProcessSyncEvent(int32_t code, int32_t value)
 {
-    MMI_HILOGD("songliy ProcessSyncEvent Enter");
     const auto& event = absEventCollector_.HandleSyncEvent(code, value);
     if (event) {
-        MMI_HILOGD("songliy ProcessSyncEvent Enter 1");
         OnEventCollected(event);
-        MMI_HILOGD("songliy ProcessSyncEvent Enter 2");
         absEventCollector_.AfterProcessed();
-        MMI_HILOGD("songliy ProcessSyncEvent Enter 3");
     }
-    MMI_HILOGD("songliy ProcessSyncEvent Leave");
 }
 
 void Device::ProcessKeyEvent(int32_t code, int32_t value) {
@@ -395,16 +390,11 @@ void Device::ProcessKeyEvent(int32_t code, int32_t value) {
 
 void Device::ProcessAbsEvent(int32_t code, int32_t value)
 {
-    MMI_HILOGD("songliy ProcessAbsEvent Enter");
     const auto& event = absEventCollector_.HandleAbsEvent(code, value);
-
-    // never will be true.
     if (event) {
-        MMI_HILOGD("songliy ProcessAbsEvent event is true.");
-        OnEventCollected(event);
+        // OnEventCollected(event);
         absEventCollector_.AfterProcessed();
     }
-    MMI_HILOGD("songliy ProcessAbsEvent Leave");
 }
 
 void Device::OnEventCollected(const std::shared_ptr<const KernelKeyEvent>& event) {
@@ -423,10 +413,7 @@ void Device::OnEventCollected(const std::shared_ptr<const AbsEvent>& event)
         MMI_HILOGE("OnEventCollected event is null");
         return;
     }
-
-    MMI_HILOGD("songliy Enter");
     eventHandler_->OnInputEvent(event);
-    MMI_HILOGD("songliy Leave");
     return;
 }
 
