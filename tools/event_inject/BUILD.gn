@@ -64,7 +64,6 @@ ohos_source_set("event-injection") {
     "src/processing_pad_device.cpp",
     "src/processing_pen_device.cpp",
     "src/processing_touch_screen_device.cpp",
-    "src/send_message.cpp",
   ]
 
   configs = [
@@ -143,7 +142,6 @@ ohos_unittest("ut-event-injection-out") {
     "test/processing_pad_device_test.cpp",
     "test/processing_pen_device_test.cpp",
     "test/processing_touch_screen_device_test.cpp",
-    "test/send_message_test.cpp",
   ]
 
   defines = []
