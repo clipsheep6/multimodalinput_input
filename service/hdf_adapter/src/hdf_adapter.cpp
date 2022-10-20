@@ -64,6 +64,19 @@ static void HotPlugCallback(const InputHotPlugEvent *event)
     HdfDeviceStatusChanged(event->devIndex, event->devType, devStatus);
 }
 
+static void HDFWrite(const HdfInputEvent &event)
+{
+    MMI_HILOGE("zpc:write:event:eventType:%{public}u,devIndex:%{public}u,"
+        "code:%{public}u,type:%{public}u,value:%{public}u,time:%{public}llu,",
+        event.eventType, event.devIndex, event.code, event.type, event.value, event.time);
+
+    auto ret = write(g_hdfAdapterWriteFd, &event, sizeof(HdfInputEvent));
+    if (ret == -1) {
+        int saveErrno = errno;
+        MMI_HILOGE("Write pipe fail, errno:%{public}d, %{public}s", saveErrno, strerror(saveErrno));
+    }
+}
+
 static void EventPkgCallback(const InputEventPackage **pkgs, uint32_t count, uint32_t devIndex)
 {
     CHK_PID_AND_TID();
@@ -74,24 +87,18 @@ static void EventPkgCallback(const InputEventPackage **pkgs, uint32_t count, uin
         MMI_HILOGE("Too big hdf event, count:%{public}d is beyond %{public}d", count, MMI_MAX_EVENT_PKG_NUM);
     }
     for (uint32_t i = 0; i < fixedCount; ++i) {
-        HdfInputEvent event;
+        HdfInputEvent event {};
         event.eventType = static_cast<uint32_t>(HdfInputEventType::DEV_NODE_EVENT);
         event.devIndex = devIndex;
-        event.code = pkgs[i]->code;
-        event.type = pkgs[i]->type;
-        event.value = pkgs[i]->value;
-        event.time = pkgs[i]->timestamp;
-
-        MMI_HILOGE("zpc:write:event:eventType:%{public}u,devIndex:%{public}u,"
-            "code:%{public}u,type:%{public}u,value:%{public}u,time:%{public}llu,"
-            "count:%{public}u,fixedCount:%{public}d",
-            event.eventType, event.devIndex, event.code, event.type, event.value, event.time, count, fixedCount);
-
-        auto ret = write(g_hdfAdapterWriteFd, &event, sizeof(HdfInputEvent));
-        if (ret == -1) {
-            int saveErrno = errno;
-            MMI_HILOGE("Write pipe fail, errno:%{public}d, %{public}s", saveErrno, strerror(saveErrno));
+        const InputEventPackage &r = *pkgs[i];
+        if (r.code == 0 && r.type == 0 && r.value == 0) {
+            HDFWrite(event);
         }
+        event.code = r.code;
+        event.type = r.type;
+        event.value = r.value;
+        event.time = r.timestamp;
+        HDFWrite(event);        
     }
 }
 

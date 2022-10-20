@@ -249,8 +249,6 @@ void TouchScreenHandler::GetPhysicalDisplayCoord(const std::shared_ptr<const Abs
         MMI_HILOGE("Leave, TransformToPhysicalDisplayCoordinate Failed");
         return;
     }
-    MMI_HILOGD("songliy physicalDisplayX = %{public}d, physicalDisplayY = %{public}d, width = %{public}d, height = %{public}d",
-    absEventPointer->GetX(), absEventPointer->GetY(), info.width, info.height);
     touchInfo.point.x = physicalDisplayX;
     touchInfo.point.y = physicalDisplayY;
     touchInfo.toolRect.point.x = 0;   //static_cast<int32_t>(libinput_event_touch_get_tool_x_transformed(touch, info.width));
@@ -286,7 +284,6 @@ bool TouchScreenHandler::OnEventTouchDown(const std::shared_ptr<const AbsEvent>&
     int32_t logicalDisplayId = -1;
     CHKPF(inputDevice_);
     int32_t deviceId = inputDevice_->GetDeviceId();
-    MMI_HILOGD("songliy deviceId = %{public}d", deviceId);
     if (!TouchPointToDisplayPoint(deviceId, absEvent, touchInfo, logicalDisplayId)) {
         MMI_HILOGE("TouchDownPointToDisplayPoint failed");
         return false;

@@ -34,6 +34,40 @@ struct input_event;
 
 namespace OHOS {
 namespace MMI {
+static const int ev_max[EV_MAX + 1] = {
+    SYN_MAX,
+    KEY_MAX,
+    REL_MAX,
+    ABS_MAX,
+    MSC_MAX,
+    SW_MAX,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    LED_MAX,
+    SND_MAX,
+    -1,
+    REP_MAX,
+    FF_MAX,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+};
 class IKernelEventHandler;
 class Device : public NonCopyable, public IInputDevice {
 
@@ -78,6 +112,9 @@ private:
     void ProcessMscEvent(int32_t code, int32_t value);
     void OnEventCollected(const std::shared_ptr<const KernelKeyEvent>& event);
     void OnEventCollected(const std::shared_ptr<const AbsEvent>& event);
+    int libevdev_event_is_type(const struct input_event *ev, unsigned int type);
+    int libevdev_event_type_get_max(unsigned int type);
+    int libevdev_event_is_code(const struct input_event *ev, unsigned int type, unsigned int code);
 
 private:
     const int32_t id_;

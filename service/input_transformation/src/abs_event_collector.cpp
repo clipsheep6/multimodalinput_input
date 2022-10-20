@@ -39,8 +39,8 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleAbsEvent(int32_t code,
     RemoveReleasedPointer();
 
     switch (code) {
-        case ABS_MT_SLOT:
-        MMI_HILOGD("ABS_MT_SLOT value:%{public}d", value);
+        case ABS_MT_SLOT: 
+        MMI_HILOGD("songliy e->code == ABS_MT_SLOT");
             return HandleMtSlot(value);
         case ABS_MT_TOUCH_MAJOR:
         case ABS_MT_TOUCH_MINOR:
@@ -49,18 +49,18 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleAbsEvent(int32_t code,
         case ABS_MT_ORIENTATION:
             break;
         case ABS_MT_POSITION_X:
-            MMI_HILOGD("ABS_MT_POSITION_X value:%{public}d", value);
+            MMI_HILOGD("songliy ABS_MT_POSITION_X");
             HandleMtPositionX(value);
             break;
         case ABS_MT_POSITION_Y:
-            MMI_HILOGD("ABS_MT_POSITION_Y value:%{public}d", value);
+            MMI_HILOGD("songliy ABS_MT_POSITION_Y");
             HandleMtPositionY(value);
             break;
         case ABS_MT_TOOL_TYPE:
         case ABS_MT_BLOB_ID:
             break;
         case ABS_MT_TRACKING_ID:
-            MMI_HILOGD("ABS_MT_TRACKING_ID value:%{public}d", value);
+            MMI_HILOGD("songliy ABS_MT_TRACKING_ID");
             return HandleMtTrackingId(value);
         case ABS_MT_PRESSURE:
         case ABS_MT_DISTANCE:

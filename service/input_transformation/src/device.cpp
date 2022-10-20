@@ -147,21 +147,22 @@ void Device::ProcessEventItem(const struct input_event* eventItem)
     auto code = eventItem->code;
     auto value = eventItem->value;
 
-    if (type == EV_ABS || type == EV_SYN) {
-        MMI_HILOGD("Type:%{public}s, Code:%{public}s, Value:%{public}d", 
-                EnumUtils::InputEventTypeToString(type), 
-                EnumUtils::InputEventCodeToString(type, code), 
-                value);
+    if (!libevdev_event_is_code(eventItem, EV_SYN, SYN_REPORT)) {
+        MMI_HILOGD("songliy libevdev_event_is_code.");
+        return;
     }
 
     switch (type) {
         case EV_SYN:
+            MMI_HILOGD("songliy EV_SYN, value = %{public}d", value);
             ProcessSyncEvent(code, value);
             break;
         case EV_KEY:
+            MMI_HILOGD("songliy EV_KEY, value = %{public}d", value);
             ProcessKeyEvent(code, value);
             break;
         case EV_ABS:
+            MMI_HILOGD("songliy EV_ABS, value = %{public}d", value);
             ProcessAbsEvent(code, value);
             break;
         case EV_REL:
@@ -377,6 +378,7 @@ void Device::ProcessSyncEvent(int32_t code, int32_t value)
 
 void Device::ProcessKeyEvent(int32_t code, int32_t value) {
     MMI_HILOGD("Enter code:%{public}s value:%{public}d", EnumUtils::InputEventKeyCodeToString(code), value);
+     MMI_HILOGD("songliy e->code == BTN_TOUCH");
     absEventCollector_.SetAction((value > 0 ? AbsEvent::ACTION_DOWN : AbsEvent::ACTION_UP));
     auto event = keyEventCollector_.HandleKeyEvent(code, value);
     if (event) {
@@ -390,6 +392,7 @@ void Device::ProcessKeyEvent(int32_t code, int32_t value) {
 
 void Device::ProcessAbsEvent(int32_t code, int32_t value)
 {
+    MMI_HILOGD("songliy fallback_process_touch");
     const auto& event = absEventCollector_.HandleAbsEvent(code, value);
     if (event) {
         // OnEventCollected(event);
@@ -450,5 +453,30 @@ int32_t Device::StopReceiveEvents()
     }
     return 0;
 }
+
+int Device::libevdev_event_is_type(const struct input_event *ev, unsigned int type)
+{
+	return type < EV_CNT && ev->type == type;
+}
+
+int Device::libevdev_event_type_get_max(unsigned int type)
+{
+	if (type > EV_MAX)
+		return -1;
+
+	return ev_max[type];
+}
+
+int Device::libevdev_event_is_code(const struct input_event *ev, unsigned int type, unsigned int code)
+{
+	int max;
+
+	if (!libevdev_event_is_type(ev, type))
+		return 0;
+
+	max = libevdev_event_type_get_max(type);
+	return (max > -1 && code <= (unsigned int)max && ev->code == code);
+}
+
 } // namespace MMI
 } // namespace OHOS
