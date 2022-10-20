@@ -19,10 +19,12 @@
 #include <list>
 #include <string>
 
+#include "device.h"
 #include "device_observer.h"
 #include "event_dispatch_handler.h"
 #include "key_event_normalize.h"
 #include "input_device.h"
+#include "input_type.h"
 #include "key_auto_repeat.h"
 #include "key_map_manager.h"
 #include "msg_handler.h"
@@ -35,8 +37,9 @@ namespace MMI {
 class InputDeviceManager final : public IDeviceObject {
     DECLARE_DELAYED_SINGLETON(InputDeviceManager);
 
-    struct InputDeviceInfo {
+    struct InputDeviceInformation{
         struct libinput_device *inputDeviceOrigin_ { nullptr };
+        InputDeviceInfo *deviceOrigin_ { nullptr };
         std::string networkIdOrigin_;
         bool isRemote_ { false };
         std::string dhid_;
@@ -44,11 +47,14 @@ class InputDeviceManager final : public IDeviceObject {
 public:
     DISALLOW_COPY_AND_MOVE(InputDeviceManager);
     void OnInputDeviceAdded(struct libinput_device *inputDevice);
+    void OnInputDeviceAdded(const InputDeviceInfo *hdfDevInfo);
     void OnInputDeviceRemoved(struct libinput_device *inputDevice);
+    void OnInputDeviceRemoved(std::shared_ptr<IInputDevice> inputDevice);
     std::vector<int32_t> GetInputDeviceIds() const;
     std::shared_ptr<InputDevice> GetInputDevice(int32_t id) const;
     int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes, std::vector<bool> &keystroke);
     int32_t FindInputDeviceId(struct libinput_device* inputDevice);
+    int32_t FindInputDeviceId(std::shared_ptr<IInputDevice> inputDevice);
     int32_t GetKeyboardBusMode(int32_t deviceId);
     bool GetDeviceConfig(int32_t deviceId, int32_t &KeyboardType);
     int32_t GetDeviceSupportKey(int32_t deviceId, int32_t &keyboardType);
@@ -73,6 +79,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     bool IsKeyboardDevice(struct libinput_device* device) const;
     bool IsPointerDevice(struct libinput_device* device) const;
+    bool IsPointerDevice(std::shared_ptr<IInputDevice> device) const;
     struct libinput_device* GetKeyboardDevice() const;
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool HasPointerDevice();
@@ -81,15 +88,18 @@ public:
     const std::string& GetScreenId(int32_t deviceId) const;
 
 private:
-    void MakeDeviceInfo(struct libinput_device *inputDevice, struct InputDeviceInfo& info);
+    void MakeDeviceInfo(struct libinput_device *inputDevice, struct InputDeviceInformation& info);
+    void MakeDeviceInfo(const InputDeviceInfo *hdfDevInfo, struct InputDeviceInformation& info);
     bool IsMatchKeys(struct libinput_device* device, const std::vector<int32_t> &keyCodes) const;
     void ScanPointerDevice();
+    void SetInputDevInfo(struct libinput_device *inputDeviceOrigin, std::shared_ptr<InputDevice> inputDevice) const;
+    void SetInputDevInfo(InputDeviceInfo *devOrigin, std::shared_ptr<InputDevice> inputDevice) const;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     std::string MakeNetworkId(const char *phys) const;
     std::string Sha256(const std::string &in) const;
     std::string GenerateDescriptor(struct libinput_device *inputDevice, bool isRemote) const;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
-    std::map<int32_t, struct InputDeviceInfo> inputDevice_;
+    std::map<int32_t, struct InputDeviceInformation> inputDevice_;
     std::map<std::string, std::string> inputDeviceScreens_;
     int32_t nextId_ { 0 };
     std::list<std::shared_ptr<IDeviceObserver>> observers_;

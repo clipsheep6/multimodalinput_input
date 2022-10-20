@@ -21,7 +21,7 @@
 #include <chrono>
 #include <cinttypes>
 #include <random>
-#include "display_info.h"
+#include "input_display_info.h"
 #include "multimodal_event_handler.h"
 #include "util.h"
 #endif // OHOS_BUILD_MMI_DEBUG

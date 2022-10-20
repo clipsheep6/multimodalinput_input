@@ -22,7 +22,7 @@
 #include "cooperate_event_manager.h"
 #include "cooperation_message.h"
 #include "define_multimodal.h"
-#include "device_manager.h"
+#include "device_collector.h"
 #include "device_profile_adapter.h"
 #include "i_pointer_drawing_manager.h"
 #include "input_device_cooperate_state_free.h"

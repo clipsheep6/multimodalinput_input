@@ -665,7 +665,10 @@ bool InputWindowsManager::IsInHotArea(int32_t x, int32_t y, const std::vector<Re
             (y >= item.y) && (y < displayMaxY)) {
             return true;
         }
+        // MMI_HILOGD("songliy IsInHotArea x = %{public}d,  item.x = %{public}d, displayMaxX = %{public}d", x, item.x, displayMaxX);
+        // MMI_HILOGD("songliy IsInHotArea y = %{public}d,  item.y = %{public}d, displayMaxY = %{public}d", y, item.y, displayMaxY);
     }
+    // MMI_HILOGD("songliy IsInHotArea return last false");
     return false;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
@@ -894,8 +897,12 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         MMI_HILOGE("The addition of logicalY overflows");
         return RET_ERR;
     }
+    // MMI_HILOGD("songliy physicalX = %{public}d, physicalY = %{public}d, logicalX = %{public}d, logicalY = %{public}d",
+    //             physicalX, physicalY, logicalX, logicalY);
+
     WindowInfo *touchWindow = nullptr;
     auto targetWindowId = pointerItem.GetTargetWindowId();
+    // MMI_HILOGD("songliy targetWindowId = %{public}d", targetWindowId);
     for (auto &item : displayGroupInfo_.windowsInfo) {
         if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE) {
             MMI_HILOGD("Skip the untouchable window to continue searching, "
@@ -903,6 +910,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             continue;
         }
         if (targetWindowId >= 0) {
+            // MMI_HILOGD("songliy targetWindowId item.id = %{public}d", item.id);
             if (item.id == targetWindowId) {
                 touchWindow = &item;
                 break;
