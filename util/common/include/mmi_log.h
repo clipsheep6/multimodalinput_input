@@ -33,11 +33,11 @@ inline constexpr uint32_t MMI_LOG_DOMAIN = 0xD002800;
 } // namespace OHOS
 
 #ifndef MMI_FUNC_FMT
-#define MMI_FUNC_FMT "in %{public}s, "
+#define MMI_FUNC_FMT "in %{public}s, #%{public}d "
 #endif
 
 #ifndef MMI_FUNC_INFO
-#define MMI_FUNC_INFO __FUNCTION__
+#define MMI_FUNC_INFO __FUNCTION__, __LINE__
 #endif
 
 #ifndef MMI_FILE_NAME
@@ -50,7 +50,7 @@ inline constexpr uint32_t MMI_LOG_DOMAIN = 0xD002800;
 
 #define MMI_HILOGD(fmt, ...) do { \
     if (HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)) { \
-        ::OHOS::HiviewDFX::HiLog::Debug(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
+        ::OHOS::HiviewDFX::HiLog::Warn(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
     } \
 } while (0)
 #define MMI_HILOGI(fmt, ...) do { \
@@ -130,7 +130,7 @@ private:
 } // namespace OHOS
 
 #define CALL_DEBUG_ENTER        ::OHOS::MMI::InnerFunctionTracer ___innerFuncTracer_Debug___    \
-    { std::bind(&::OHOS::HiviewDFX::HiLog::Debug, LABEL, std::placeholders::_1, __FUNCTION__), LABEL.tag, LOG_DEBUG }
+    { std::bind(&::OHOS::HiviewDFX::HiLog::Info, LABEL, std::placeholders::_1, __FUNCTION__), LABEL.tag, LOG_DEBUG }
 
 #define CALL_INFO_TRACE         ::OHOS::MMI::InnerFunctionTracer ___innerFuncTracer_Info___     \
     { std::bind(&::OHOS::HiviewDFX::HiLog::Info, LABEL, std::placeholders::_1, __FUNCTION__), LABEL.tag, LOG_INFO }
