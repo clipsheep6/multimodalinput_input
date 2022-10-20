@@ -234,10 +234,6 @@ bool MMIService::InitService()
         MMI_HILOGE("Service running status is not enabled");
         return false;
     }
-    if (!(Publish(this))) {
-        MMI_HILOGE("Service initialization failed");
-        return false;
-    }
     if (EpollCreat(MAX_EVENT_SIZE) < 0) {
         MMI_HILOGE("Create epoll failed");
         return false;
@@ -246,6 +242,10 @@ bool MMIService::InitService()
     if (ret <  0) {
         MMI_HILOGE("AddEpoll error ret:%{public}d", ret);
         EpollClose();
+        return false;
+    }
+    if (!(Publish(this))) {
+        MMI_HILOGE("Service initialization failed");
         return false;
     }
     MMI_HILOGI("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, epollFd_);
@@ -288,10 +288,6 @@ int32_t MMIService::Init()
         MMI_HILOGE("Create epoll failed");
         return EPOLL_CREATE_FAIL;
     }
-    if (!InitService()) {
-        MMI_HILOGE("Saservice init failed");
-        return SASERVICE_INIT_FAIL;
-    }
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     InputDevCooSM->Init();
 #endif // OHOS_BUILD_ENABLE_COOPERATE
@@ -315,6 +311,10 @@ int32_t MMIService::Init()
         std::placeholders::_2));
     KeyMapMgr->GetConfigKeyValue("default_keymap", KeyMapMgr->GetDefaultKeyId());
     OHOS::system::SetParameter(INPUT_POINTER_DEVICE, "false");
+    if (!InitService()) {
+        MMI_HILOGE("Saservice init failed");
+        return SASERVICE_INIT_FAIL;
+    }
     MMI_HILOGI("Set para input.pointer.device false");
     return RET_OK;
 }
