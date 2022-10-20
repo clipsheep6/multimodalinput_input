@@ -22,23 +22,24 @@ namespace MMI {
 
 class IInputEventConvertHandler : public IInputEventHandler {
 public:
-enum class PluginDispatchCmd {
-    GOTO_NEXT,
-    REDIRECT,
-    DISCARD
-};
 typedef struct {
     std::string name;
     std::string version;
     int32_t priority;
     std::shared_ptr<IInputEventConvertHandler> handler;
 } PluginInfo;
+
+enum class PluginDispatchCmd {
+    GOTO_NEXT,
+    REDIRECT,
+    DISCARD
+};
 public:
     virtual PluginDispatchCmd GetDispatchCmd() = 0;
     virtual PluginDispatchEventType GetDispatchEventType() = 0;
     virtual const std::shared_ptr<KeyEvent> GetKeyEvent() = 0;
     virtual const std::shared_ptr<PointerEvent> GetPointEvent() = 0;
-    virtual int32_t GetPluginInfo(PluginInfo *&pluginInfo) = 0;
+    virtual PluginInfo GetPluginInfo() = 0;
     template<typename T1, typename T2>
     const std::shared_ptr<T1> GetEvent();
 };

@@ -111,14 +111,14 @@ const std::shared_ptr<PointerEvent> Touch2KeyHandler::GetPointEvent()
     return pointevent_;
 }
 
-int32_t Touch2KeyHandler::GetPluginInfo(PluginInfo *&pluginInfo)
+IInputEventConvertHandler::PluginInfo Touch2KeyHandler::GetPluginInfo()
 {
-
-    pluginInfo->name = "name";
-    pluginInfo->version = "1.0";
-    pluginInfo->priority = 0;
-    pluginInfo->handler.reset(create());
-    return 0;
+    PluginInfo pluginInfo;
+    pluginInfo.name = "name";
+    pluginInfo.version = "1.0";
+    pluginInfo.priority = 0;
+    pluginInfo.handler.reset(create());
+    return pluginInfo;
 }
 } // namespace MMI
 } // namespace OHOS

@@ -64,7 +64,6 @@ private:
     std::shared_ptr<KeySubscriberHandler> eventSubscriberHandler_ { nullptr };
     std::shared_ptr<EventMonitorHandler> eventMonitorHandler_ { nullptr };
 
-
     uint64_t idSeed_ { 0 };
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     bool isJumpIntercept_ { false };

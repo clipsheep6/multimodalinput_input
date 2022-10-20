@@ -33,7 +33,7 @@ public:
     virtual PluginDispatchEventType GetDispatchEventType();
     virtual const std::shared_ptr<KeyEvent> GetKeyEvent();
     virtual const std::shared_ptr<PointerEvent> GetPointEvent();
-    virtual int32_t GetPluginInfo(PluginInfo *&pluginInfo);
+    virtual IInputEventConvertHandler::PluginInfo GetPluginInfo();
 private:
 
 };
