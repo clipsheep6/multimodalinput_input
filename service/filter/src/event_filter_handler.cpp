@@ -33,41 +33,42 @@ EventFilterHandler::~EventFilterHandler()
 {
     CALL_DEBUG_ENTER;
 }
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+
 void EventFilterHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPV(nextHandler_);
     nextHandler_->HandleKeyEvent(keyEvent);
-}
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+}
 
-#ifdef OHOS_BUILD_ENABLE_POINTER
 void EventFilterHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
+#ifdef OHOS_BUILD_ENABLE_POINTER
     if (HandlePointerEventFilter(pointerEvent)) {
         MMI_HILOGI("Pointer event Filter succeeded");
         return;
     }
     CHKPV(nextHandler_);
     nextHandler_->HandlePointerEvent(pointerEvent);
-}
 #endif // OHOS_BUILD_ENABLE_POINTER
+}
 
-#ifdef OHOS_BUILD_ENABLE_TOUCH
 void EventFilterHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
+#ifdef OHOS_BUILD_ENABLE_TOUCH
     if (HandlePointerEventFilter(pointerEvent)) {
         MMI_HILOGI("Pointer event Filter succeeded");
         return;
     }
     CHKPV(nextHandler_);
     nextHandler_->HandleTouchEvent(pointerEvent);
-}
 #endif // OHOS_BUILD_ENABLE_TOUCH
+}
 
 int32_t EventFilterHandler::AddInputEventFilter(sptr<IEventFilter> filter)
 {

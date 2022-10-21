@@ -32,10 +32,10 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "KeySub
 constexpr uint32_t MAX_PRE_KEY_COUNT = 4;
 } // namespace
 
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void KeySubscriberHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     if (SubscribeKeyEvent(keyEvent)) {
         MMI_HILOGD("Subscribe keyEvent filter success. keyCode:%{public}d", keyEvent->GetKeyCode());
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
@@ -43,26 +43,26 @@ void KeySubscriberHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEve
     }
     CHKPV(nextHandler_);
     nextHandler_->HandleKeyEvent(keyEvent);
-}
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+}
 
-#ifdef OHOS_BUILD_ENABLE_POINTER
 void KeySubscriberHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
+#ifdef OHOS_BUILD_ENABLE_POINTER
     CHKPV(nextHandler_);
     nextHandler_->HandlePointerEvent(pointerEvent);
-}
 #endif // OHOS_BUILD_ENABLE_POINTER
+}
 
-#ifdef OHOS_BUILD_ENABLE_TOUCH
 void KeySubscriberHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
+#ifdef OHOS_BUILD_ENABLE_TOUCH
     CHKPV(nextHandler_);
     nextHandler_->HandleTouchEvent(pointerEvent);
-}
 #endif // OHOS_BUILD_ENABLE_TOUCH
+}
 
 int32_t KeySubscriberHandler::SubscribeKeyEvent(
     SessionPtr sess, int32_t subscribeId, std::shared_ptr<KeyOption> keyOption)

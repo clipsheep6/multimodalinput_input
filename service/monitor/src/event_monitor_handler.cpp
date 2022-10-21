@@ -32,20 +32,20 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventMonitorHandler" };
 } // namespace
 
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void EventMonitorHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     OnHandleEvent(keyEvent);
     CHKPV(nextHandler_);
     nextHandler_->HandleKeyEvent(keyEvent);
-}
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+}
 
-#ifdef OHOS_BUILD_ENABLE_POINTER
 void EventMonitorHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
+#ifdef OHOS_BUILD_ENABLE_POINTER
     if (OnHandleEvent(pointerEvent)) {
         BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP);
         MMI_HILOGD("Monitor is succeeded");
@@ -53,13 +53,13 @@ void EventMonitorHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent>
     }
     CHKPV(nextHandler_);
     nextHandler_->HandlePointerEvent(pointerEvent);
-}
 #endif // OHOS_BUILD_ENABLE_POINTER
+}
 
-#ifdef OHOS_BUILD_ENABLE_TOUCH
 void EventMonitorHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
+#ifdef OHOS_BUILD_ENABLE_TOUCH
     if (OnHandleEvent(pointerEvent)) {
         BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP);
         MMI_HILOGD("Monitor is succeeded");
@@ -67,8 +67,8 @@ void EventMonitorHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> p
     }
     CHKPV(nextHandler_);
     nextHandler_->HandleTouchEvent(pointerEvent);
-}
 #endif // OHOS_BUILD_ENABLE_TOUCH
+}
 
 int32_t EventMonitorHandler::AddInputHandler(InputHandlerType handlerType,
     HandleEventType eventType, SessionPtr session)
