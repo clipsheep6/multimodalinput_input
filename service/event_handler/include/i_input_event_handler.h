@@ -26,6 +26,7 @@ struct libinput_event;
 
 namespace OHOS {
 namespace MMI {
+
     struct PluginDispatchKeyEvent {};
     struct PluginDispatchPointEvent {};
     struct PluginDispatchTouchEvent {};
@@ -52,16 +53,19 @@ public:
     {
         nextHandler_ = nextHandler;
     };
+    
     virtual std::shared_ptr<IInputEventHandler> GetNextHandler()
     {
         return nextHandler_;
     }
     template<typename T1, typename T2>
     void HandleEvent(const std::shared_ptr<T1> event);
-
+    virtual bool GetisPlugin() { return isPlugin; }
 protected:
     std::shared_ptr<IInputEventHandler> nextHandler_ { nullptr };
+    bool isPlugin { false };
 };
+
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 template<>
@@ -70,7 +74,6 @@ inline void IInputEventHandler::HandleEvent<KeyEvent, PluginDispatchKeyEvent>(co
     HandleKeyEvent(event);
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-
 #ifdef OHOS_BUILD_ENABLE_POINTER
 template<>
 inline void IInputEventHandler::HandleEvent<PointerEvent, PluginDispatchPointEvent>(const std::shared_ptr<PointerEvent> event)
@@ -78,14 +81,13 @@ inline void IInputEventHandler::HandleEvent<PointerEvent, PluginDispatchPointEve
     HandlePointerEvent(event);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
-
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 template<>
 inline void IInputEventHandler::HandleEvent<PointerEvent, PluginDispatchTouchEvent>(const std::shared_ptr<PointerEvent> event)
 {
     HandleTouchEvent(event);
 }
-#endif // OHOS_BUILD_ENABLE_TOUCHd
+#endif // OHOS_BUILD_ENABLE_TOUCH
 } // namespace MMI
 } // namespace OHOS
 #endif // I_INPUT_EVENT_HANDLER_H

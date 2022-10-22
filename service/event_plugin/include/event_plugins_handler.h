@@ -43,7 +43,7 @@ private:
     int32_t LoadPlugin(void *handle);
     void Dump(int32_t fd) {};
     template<typename T1, typename T2>
-    void HandlePluginEventEx(std::shared_ptr<IInputEventConvertHandler> handler, const std::shared_ptr<T1> event);
+    void HandlePluginEventEx(std::shared_ptr<IInputEventConvertHandler> handler, const std::shared_ptr<T1> event, bool isfast);
     template<typename T1, typename T2>
     void HandlePluginEvent(const std::shared_ptr<T1> event);
 };

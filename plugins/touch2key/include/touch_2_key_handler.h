@@ -34,7 +34,9 @@ public:
     virtual const std::shared_ptr<KeyEvent> GetKeyEvent();
     virtual const std::shared_ptr<PointerEvent> GetPointEvent();
     virtual IInputEventConvertHandler::PluginInfo GetPluginInfo();
+    virtual bool GetisPlugin() { return isPlugin; };
 private:
+    bool isPlugin { true };
 
 };
 

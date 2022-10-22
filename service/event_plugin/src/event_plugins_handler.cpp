@@ -60,10 +60,11 @@ int32_t EventPluginsHandler::ScanPlugins()
         if (ret != 0) {
             MMI_HILOGE("closedir failed, dirname:%{public}s, errno:%{public}d", INPUT_EVENT_HANDLER_PLUGIN_HOME.data(), errno);
         }
-
+        auto cur1 = pluginInfos_.begin();
         for (auto cur = pluginInfos_.begin(); cur != pluginInfos_.end(); cur++) {
-                SetNext((*cur)->handler);
+                (*cur1)->handler->SetNext((*cur)->handler);
                 MMI_HILOGE("1010101010101010101010101");
+                cur1 = cur;
         }
         // auto cur = pluginInfos_.begin();
 
@@ -132,13 +133,17 @@ int32_t EventPluginsHandler::LoadPlugin(void *handle)
     info->version = create_plu()->GetPluginInfo().version;
     info->priority = create_plu()->GetPluginInfo().priority;
     MMI_HILOGE("8888888888888888888888888888info->priority is %{public}d ", info->priority);
-    pluginInfos_.push_front(info);
-    for (auto it = pluginInfos_.begin(); it != pluginInfos_.end(); ++it) {
-        if ((*it)->priority > info->priority) {
-            (void)pluginInfos_.insert(it, info);
-            break;
+    if (pluginInfos_.empty()) {
+        pluginInfos_.push_front(info);
+    } else {
+        for (auto it = pluginInfos_.begin(); it != pluginInfos_.end(); ++it) {
+            if ((*it)->priority > info->priority) {
+                (void)pluginInfos_.insert(it, info);
+                break;
+            }
         }
     }
+    
     return RET_OK;
 }
 
@@ -148,22 +153,29 @@ void EventPluginsHandler::SetNext(std::shared_ptr<IInputEventHandler> nextHandle
     if (pluginInfos_.empty()) {
         return;
     }
-
+    MMI_HILOGE("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
     pluginInfos_.back()->handler->SetNext(nextHandler);
 }
 
 template<typename T1, typename T2>
-void EventPluginsHandler::HandlePluginEventEx(std::shared_ptr<IInputEventConvertHandler> handler, const std::shared_ptr<T1> event)
+void EventPluginsHandler::HandlePluginEventEx(std::shared_ptr<IInputEventConvertHandler> handler, const std::shared_ptr<T1> event, bool isfast)
 {
-    handler->HandleEvent<T1, T2>(event);
+    if (isfast) {
+        handler->HandleEvent<T1, T2>(event);
+    }
 
     IInputEventConvertHandler::PluginDispatchCmd cmd = handler->GetDispatchCmd();
     MMI_HILOGE("44444444444444444444444444444444444444444444444 cmd====%{public}d" ,int32_t(cmd));
     switch(cmd) {
         case IInputEventConvertHandler::PluginDispatchCmd::GOTO_NEXT: {
-            auto nextHandler = handler->GetNextHandler();
+            auto nextHandler = std::static_pointer_cast<IInputEventConvertHandler>(handler->GetNextHandler());
+            MMI_HILOGE("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:::::::%{public}d", nextHandler->GetisPlugin());
             auto newEvent = handler->GetEvent<T1, T2>();
             nextHandler->HandleEvent<T1, T2>(newEvent);
+            if (nextHandler->GetisPlugin()) {
+                MMI_HILOGE("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+                HandlePluginEventEx<T1, T2>(nextHandler, newEvent, false);
+            } 
             break;
         }
         case IInputEventConvertHandler::PluginDispatchCmd::REDIRECT: {
@@ -199,7 +211,7 @@ void EventPluginsHandler::HandlePluginEvent(const std::shared_ptr<T1> event)
     }
 
     auto handler = (*pluginInfos_.begin())->handler;
-    HandlePluginEventEx<T1, T2>(handler, event);
+    HandlePluginEventEx<T1, T2>(handler, event, true);
 }
 
 EventPluginsHandler::EventPluginsHandler()

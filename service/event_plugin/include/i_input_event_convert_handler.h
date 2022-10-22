@@ -42,6 +42,7 @@ public:
     virtual PluginInfo GetPluginInfo() = 0;
     template<typename T1, typename T2>
     const std::shared_ptr<T1> GetEvent();
+    virtual bool GetisPlugin() = 0;
 };
 
 template<>
