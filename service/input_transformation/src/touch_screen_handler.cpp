@@ -111,6 +111,7 @@ void TouchScreenHandler::OnInputEvent(const std::shared_ptr<const AbsEvent>& eve
     if (!ret) {
         MMI_HILOGE("Leave ConvertPointer Failed");
     }
+    MMI_HILOGE("lisong, HandleTouchEvent, ");
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPV(inputEventNormalizeHandler);   
     CHKPV(pointerEvent_);
@@ -125,11 +126,12 @@ bool TouchScreenHandler::ConvertPointer(const std::shared_ptr<const AbsEvent>& a
     // CHKPF(context_);
 
     auto action = ConvertAction(absEvent->GetAction());
+
     if (action == PointerEvent::POINTER_ACTION_UNKNOWN) {
         MMI_HILOGE("Leave, ConvertAction Failed");
         return false;
     }
-
+    MMI_HILOGD("lisong, ConvertPointer, %{public}d", action);
     switch (action) {
         case PointerEvent::POINTER_ACTION_DOWN: {
             if (!OnEventTouchDown(absEvent)) {

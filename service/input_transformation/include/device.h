@@ -20,6 +20,8 @@
 #include <map>
 
 #include <linux/input.h>
+#include "mtdev.h"
+#include <mtdev-plumbing.h>
 
 #include "abs_event_collector.h"
 #include "abs_event.h"
@@ -68,6 +70,9 @@ static const int ev_max[EV_MAX + 1] = {
     -1,
     -1,
 };
+
+typedef unsigned int bitmask_t;
+
 class IKernelEventHandler;
 class Device : public NonCopyable, public IInputDevice {
 
@@ -112,9 +117,11 @@ private:
     void ProcessMscEvent(int32_t code, int32_t value);
     void OnEventCollected(const std::shared_ptr<const KernelKeyEvent>& event);
     void OnEventCollected(const std::shared_ptr<const AbsEvent>& event);
-    int libevdev_event_is_type(const struct input_event *ev, unsigned int type);
-    int libevdev_event_type_get_max(unsigned int type);
-    int libevdev_event_is_code(const struct input_event *ev, unsigned int type, unsigned int code);
+    void mmi_evdev_process_event(const struct input_event* eventItem);
+
+    int mmi_libevdev_event_is_type(const struct input_event *ev, unsigned int type);
+    int mmi_libevdev_event_type_get_max(unsigned int type);
+    int mmi_libevdev_event_is_code(const struct input_event *ev, unsigned int type, unsigned int code);
 
 private:
     const int32_t id_;
@@ -132,6 +139,7 @@ private:
     unsigned long absBit[LongsOfBits(ABS_MAX)];
     KeyEventCollector keyEventCollector_;
     AbsEventCollector absEventCollector_;
+    mtdev* mtdev_;
 
     mutable std::map<int32_t, std::shared_ptr<IInputDevice::AxisInfo>> axises_;
 

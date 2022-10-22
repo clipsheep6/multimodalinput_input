@@ -76,7 +76,7 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleAbsEvent(int32_t code,
 
 const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleSyncEvent(int32_t code, int32_t value)
 {
-    MMI_HILOGD("Enter code:%{public}s value:%{public}d", EnumUtils::InputEventSynCodeToString(code), value);
+    MMI_HILOGD("Enter HandleSyncEvent FinishPointer code:%{public}s value:%{public}d", EnumUtils::InputEventSynCodeToString(code), value);
     const auto& absEvent = FinishPointer();
     MMI_HILOGD("Leave code:%{public}s value:%{public}d absEvent:%{public}p", EnumUtils::InputEventSynCodeToString(code), value, absEvent.get());
     return absEvent;
@@ -110,7 +110,7 @@ int32_t AbsEventCollector::SetSourceType(int32_t sourceType)
 }
 
 void AbsEventCollector::SetAction(int32_t action) {
-    absEventAction_ = action;
+    // absEventAction_ = action;
 }
 
 std::shared_ptr<AbsEvent::Pointer> AbsEventCollector::GetCurrentPointer(bool createIfNotExist)
@@ -142,7 +142,6 @@ std::shared_ptr<AbsEvent::Pointer> AbsEventCollector::GetCurrentPointer(bool cre
 
 const std::shared_ptr<AbsEvent>& AbsEventCollector::FinishPointer()
 {
-    MMI_HILOGD("Enter");
     if (!curPointer_) {
         MMI_HILOGE("Leave");
         return AbsEvent::NULL_VALUE;
@@ -179,7 +178,6 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::FinishPointer()
     absEvent_->SetAction(action);
     absEvent_->SetActionTime(nowTime);
 
-    MMI_HILOGD("Leave, absAction:%{public}s", AbsEvent::ActionToString(action));
     return absEvent_;
 }
 
@@ -188,7 +186,7 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleMtSlot(int32_t value)
     if (curSlot_ == value) {
         return AbsEvent::NULL_VALUE;
     }
-
+    MMI_HILOGD("Enter HandleMtSlot FinishPointer");
     const auto& absEvent = FinishPointer();
     curSlot_ = value;
     curPointer_ = AbsEvent::Pointer::NULL_VALUE;
@@ -226,6 +224,7 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleMtTrackingId(int32_t v
     if (value < 0) {
         MMI_HILOGF("MT_TRACKING_ID -1");
         absEventAction_ = AbsEvent::ACTION_UP;
+        MMI_HILOGE("HandleMtTrackingId, FinishPointer");
         return FinishPointer();
     }
 

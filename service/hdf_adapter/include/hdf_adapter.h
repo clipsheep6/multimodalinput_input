@@ -89,6 +89,7 @@ private:
     HDFDeviceStatusEventCallback statusCallback_;
     HDFDeviceInputEventCallback inputCallback_;
     std::vector<std::string> eventRecords_;
+    
 };
 } // namespace MMI
 } // namespace OHOS

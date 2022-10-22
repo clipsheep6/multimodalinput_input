@@ -25,7 +25,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-
+#include "error_multimodal.h"
 #include "enum_utils.h"
 #include "i_kernel_event_handler.h"
 #include "mmi_log.h"
@@ -45,6 +45,8 @@ int32_t Device::Init()
         MMI_HILOGE("Leave device Init, UpdateCapablility Failed");
         return -1;
     }
+
+    mtdev_ = mmi_mtdev_new_open();
     return 0;
 }
 
@@ -137,21 +139,34 @@ void Device::ReadEvents()
 
 int32_t Device::CloseDevice()
 {
+    CHKPR(mtdev_, ERROR_NULL_POINTER); 
+    mtdev_delete(mtdev_);
+    mtdev_ = nullptr;
     return 0;
 }
 
 void Device::ProcessEventItem(const struct input_event* eventItem)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(mtdev_);
+    MMI_HILOGE("xcbai before mtdev_put_event, type = %{public}d, value = %{public}d", eventItem->type, eventItem->value);
+    mtdev_put_event(mtdev_, eventItem);
+    if (mmi_libevdev_event_is_code(eventItem, EV_SYN, SYN_REPORT)) {
+        while (!mtdev_empty(mtdev_)) {
+            struct input_event e;
+            mtdev_get_event(mtdev_, &e);
+			MMI_HILOGE("xcbai mtdev_get_event, type = %{public}d", e.type);
+            mmi_evdev_process_event(&e);
+        }
+    }    
+}
+
+void Device::mmi_evdev_process_event(const struct input_event* eventItem)
+{
+    CALL_DEBUG_ENTER;
     auto type = eventItem->type;
     auto code = eventItem->code;
     auto value = eventItem->value;
-
-    if (!libevdev_event_is_code(eventItem, EV_SYN, SYN_REPORT)) {
-        MMI_HILOGD("songliy libevdev_event_is_code.");
-        return;
-    }
-
     switch (type) {
         case EV_SYN:
             MMI_HILOGD("songliy EV_SYN, value = %{public}d", value);
@@ -454,12 +469,12 @@ int32_t Device::StopReceiveEvents()
     return 0;
 }
 
-int Device::libevdev_event_is_type(const struct input_event *ev, unsigned int type)
+int Device::mmi_libevdev_event_is_type(const struct input_event *ev, unsigned int type)
 {
 	return type < EV_CNT && ev->type == type;
 }
 
-int Device::libevdev_event_type_get_max(unsigned int type)
+int Device::mmi_libevdev_event_type_get_max(unsigned int type)
 {
 	if (type > EV_MAX)
 		return -1;
@@ -467,16 +482,15 @@ int Device::libevdev_event_type_get_max(unsigned int type)
 	return ev_max[type];
 }
 
-int Device::libevdev_event_is_code(const struct input_event *ev, unsigned int type, unsigned int code)
+int Device::mmi_libevdev_event_is_code(const struct input_event *ev, unsigned int type, unsigned int code)
 {
 	int max;
 
-	if (!libevdev_event_is_type(ev, type))
+	if (!mmi_libevdev_event_is_type(ev, type))
 		return 0;
 
-	max = libevdev_event_type_get_max(type);
+	max = mmi_libevdev_event_type_get_max(type);
 	return (max > -1 && code <= (unsigned int)max && ev->code == code);
 }
-
 } // namespace MMI
 } // namespace OHOS
