@@ -138,8 +138,13 @@ int32_t EventPluginsHandler::LoadPlugin(void *handle)
     } else {
         for (auto it = pluginInfos_.begin(); it != pluginInfos_.end(); ++it) {
             if ((*it)->priority > info->priority) {
-                (void)pluginInfos_.insert(it, info);
+                pluginInfos_.insert(it, info);
                 break;
+            } else  {
+                if ((*it)->priority == pluginInfos_.back()->priority) {
+                    pluginInfos_.push_back(info);
+                    break;
+                }
             }
         }
     }
@@ -166,14 +171,18 @@ void EventPluginsHandler::HandlePluginEventEx(std::shared_ptr<IInputEventConvert
 
     IInputEventConvertHandler::PluginDispatchCmd cmd = handler->GetDispatchCmd();
     MMI_HILOGE("44444444444444444444444444444444444444444444444 cmd====%{public}d" ,int32_t(cmd));
+    auto nextHandler = std::static_pointer_cast<IInputEventConvertHandler>(handler->GetNextHandler());
     switch(cmd) {
         case IInputEventConvertHandler::PluginDispatchCmd::GOTO_NEXT: {
-            auto nextHandler = std::static_pointer_cast<IInputEventConvertHandler>(handler->GetNextHandler());
+            
             MMI_HILOGE("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:::::::%{public}d", nextHandler->GetisPlugin());
             auto newEvent = handler->GetEvent<T1, T2>();
             nextHandler->HandleEvent<T1, T2>(newEvent);
             if (nextHandler->GetisPlugin()) {
                 MMI_HILOGE("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+                if (int32_t(nextHandler->GetDispatchEventType()) != int32_t(IInputEventConvertHandler::PluginDispatchCmd::GOTO_NEXT))  {
+                    HandlePluginEventEx<T1, T2>(nextHandler, newEvent, true);
+                }
                 HandlePluginEventEx<T1, T2>(nextHandler, newEvent, false);
             } 
             break;
@@ -183,13 +192,31 @@ void EventPluginsHandler::HandlePluginEventEx(std::shared_ptr<IInputEventConvert
             MMI_HILOGE("999999999999999999999999999999999unsupport eventType: %{public}d", int32_t(eventType));
             if (eventType == IInputEventConvertHandler::PluginDispatchEventType::KEY_EVENT) {
                 auto keyEvent = handler->GetKeyEvent();
-                InputHandler->GetEventNormalizeHandler()->HandleKeyEvent(keyEvent);
+                if (nextHandler->GetisPlugin()) {
+                    MMI_HILOGE("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+                    HandlePluginEventEx<KeyEvent, PluginDispatchKeyEvent>(nextHandler, keyEvent, true);
+                } else {
+                    nextHandler->HandleEvent<KeyEvent, PluginDispatchKeyEvent>(keyEvent);
+                }
+                //InputHandler->GetEventNormalizeHandler()->HandleKeyEvent(keyEvent);
             } else if (eventType == IInputEventConvertHandler::PluginDispatchEventType::POINT_EVENT) {
                 auto pointEvent = handler->GetPointEvent();
-                InputHandler->GetEventNormalizeHandler()->HandlePointerEvent(pointEvent);
+                if (nextHandler->GetisPlugin()) {
+                    MMI_HILOGE("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+                    HandlePluginEventEx<PointerEvent, PluginDispatchPointEvent>(nextHandler, pointEvent, true);
+                }  else {
+                    nextHandler->HandleEvent<PointerEvent, PluginDispatchPointEvent>(pointEvent);
+                }
+                //InputHandler->GetEventNormalizeHandler()->HandlePointerEvent(pointEvent);
             } else if (eventType == IInputEventConvertHandler::PluginDispatchEventType::TOUCH_EVENT) {
                 auto pointEvent = handler->GetPointEvent();
-                InputHandler->GetEventNormalizeHandler()->HandleTouchEvent(pointEvent);
+                if (nextHandler->GetisPlugin()) {
+                    MMI_HILOGE("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+                    HandlePluginEventEx<PointerEvent, PluginDispatchTouchEvent>(nextHandler, pointEvent, true);
+                }  else {
+                    nextHandler->HandleEvent<PointerEvent, PluginDispatchTouchEvent>(pointEvent);
+                }
+                // InputHandler->GetEventNormalizeHandler()->HandleTouchEvent(pointEvent);
             } else {
                 MMI_HILOGE("unsupport eventType: %{public}d", int32_t(eventType));
             }
