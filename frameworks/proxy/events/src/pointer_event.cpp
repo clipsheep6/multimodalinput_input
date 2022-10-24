@@ -354,7 +354,8 @@ PointerEvent::PointerEvent(const PointerEvent& other)
     : InputEvent(other), pointerId_(other.pointerId_), pointers_(other.pointers_),
       pressedButtons_(other.pressedButtons_), sourceType_(other.sourceType_),
       pointerAction_(other.pointerAction_), buttonId_(other.buttonId_),
-      axes_(other.axes_), axisValues_(other.axisValues_),
+      axes_(other.axes_), abs_(other.abs_),
+      axisValues_(other.axisValues_), absValues_(other.absValues_),
       pressedKeys_(other.pressedKeys_) {}
 
 PointerEvent::~PointerEvent() {}
@@ -376,6 +377,8 @@ void PointerEvent::Reset()
     pointerAction_ = POINTER_ACTION_UNKNOWN;
     buttonId_ = -1;
     axes_ = 0U;
+    abs_ = 0U;
+    absValues_.fill(0.0);
     axisValues_.fill(0.0);
     pressedKeys_.clear();
 }
@@ -601,6 +604,14 @@ bool PointerEvent::HasAxis(uint32_t axes, AxisType axis)
     return ret;
 }
 
+bool PointerEvent::Hasjoystick(uint32_t joystick, AbsoluteType abs)
+{
+    if ((abs >= ABSOLUTE_TYPE_UNKNOWN) && (abs < ABSOLUTE_TYPE_MAX)) {
+       return static_cast<bool>(joystick & (1 << joystick));
+    }
+    return false;
+}
+
 void PointerEvent::SetPressedKeys(const std::vector<int32_t> pressedKeys)
 {
     pressedKeys_ = pressedKeys;
@@ -646,6 +657,15 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
         const AxisType axis { static_cast<AxisType>(i) };
         if (HasAxis(axes, axis)) {
             WRITEDOUBLE(out, GetAxisValue(axis));
+        }
+    }
+
+    uint32_t joystick = GetAbs();
+    WRITEUINT32(out, joystick);
+    for (int32_t i = ABSOLUTE_TYPE_UNKNOWN; i < ABSOLUTE_TYPE_MAX; ++i) {
+        const AbsoluteType abs { static_cast<AbsoluteType>(i) };
+        if (Hasjoystick(joystick, abs)) {
+            WRITEDOUBLE(out, GetAbsValue(abs));
         }
     }
 
@@ -704,7 +724,35 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
         }
     }
 
+    uint32_t joystick;
+    READUINT32(in, joystick);
+    for (int32_t i = ABSOLUTE_TYPE_UNKNOWN; i < ABSOLUTE_TYPE_MAX; ++i) {
+        AbsoluteType abs = static_cast<AbsoluteType>(i);
+        if (Hasjoystick(joystick, abs)) {
+            double value;
+            READDOUBLE(in, value);
+            SetAbsValue(abs, value);
+        }
+    }
+
     return true;
+}
+
+double PointerEvent::GetAbsValue(AbsoluteType abs) const
+{
+    double absValue {};
+    if ((abs >= ABSOLUTE_TYPE_UNKNOWN) && (abs < ABSOLUTE_TYPE_MAX)) {
+        absValue = absValues_[abs];
+    }
+    return absValue;
+}
+
+void PointerEvent::SetAbsValue(AbsoluteType abs, double absValue)
+{
+    if ((abs >= ABSOLUTE_TYPE_UNKNOWN) && (abs < ABSOLUTE_TYPE_MAX)) {
+        absValues_[abs] = absValue;
+        abs_ = (abs_ | (1 << abs));
+    }
 }
 
 bool PointerEvent::IsValidCheckMouseFunc() const
@@ -866,13 +914,7 @@ bool PointerEvent::IsValidCheckTouch() const
 bool PointerEvent::IsValid() const
 {
     CALL_DEBUG_ENTER;
-    int32_t sourceType = GetSourceType();
-    if (sourceType != SOURCE_TYPE_MOUSE && sourceType != SOURCE_TYPE_TOUCHSCREEN &&
-        sourceType != SOURCE_TYPE_TOUCHPAD) {
-        MMI_HILOGE("SourceType is invalid");
-        return false;
-    }
-    switch (sourceType) {
+    switch (GetSourceType()) {
         case SOURCE_TYPE_MOUSE: {
             if (!IsValidCheckMouse()) {
                 MMI_HILOGE("IsValidCheckMouse is invalid");
@@ -888,12 +930,23 @@ bool PointerEvent::IsValid() const
             }
             break;
         }
+        case SOURCE_TYPE_JOYSTICK:
         default: {
             MMI_HILOGE("SourceType is invalid");
             return false;
         }
     }
     return true;
+}
+
+bool PointerEvent::Hasjoystick(AbsoluteType abs) const
+{
+    return Hasjoystick(abs_, abs);
+}
+
+uint32_t PointerEvent::GetAbs() const
+{
+    return abs_;
 }
 } // namespace MMI
 } // namespace OHOS
