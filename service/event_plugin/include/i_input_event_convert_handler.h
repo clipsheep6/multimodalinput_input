@@ -34,11 +34,17 @@ enum class PluginDispatchCmd {
     REDIRECT,
     DISCARD
 };
+
+enum class PluginfunctionId {
+    PHALANGEAL_JOINT
+};
+
 public:
     virtual PluginDispatchCmd GetDispatchCmd() = 0;
     virtual PluginDispatchEventType GetDispatchEventType() = 0;
     virtual const std::shared_ptr<KeyEvent> GetKeyEvent() = 0;
     virtual const std::shared_ptr<PointerEvent> GetPointEvent() = 0;
+    virtual void SetPluginfunctionStatus(std::map<PluginfunctionId, bool> FunctionStatus) = 0;
     virtual PluginInfo GetPluginInfo() = 0;
     template<typename T1, typename T2>
     const std::shared_ptr<T1> GetEvent();

@@ -20,6 +20,9 @@ bool CheckFileExtendName(const std::string &filePath, const std::string &checkEx
     }
     return (filePath.substr(pos + 1, filePath.npos) == checkExtension);
 }
+std::map<IInputEventConvertHandler::PluginfunctionId, bool> PluginFunctionStatus = {
+    {IInputEventConvertHandler::PluginfunctionId::PHALANGEAL_JOINT, true}
+};
 } // namespace
 
 int32_t EventPluginsHandler::ScanPlugins()
@@ -166,6 +169,7 @@ template<typename T1, typename T2>
 void EventPluginsHandler::HandlePluginEventEx(std::shared_ptr<IInputEventConvertHandler> handler, const std::shared_ptr<T1> event, bool isfast)
 {
     if (isfast) {
+        handler->SetPluginfunctionStatus(PluginFunctionStatus);
         handler->HandleEvent<T1, T2>(event);
     }
 
@@ -174,9 +178,11 @@ void EventPluginsHandler::HandlePluginEventEx(std::shared_ptr<IInputEventConvert
     auto nextHandler = std::static_pointer_cast<IInputEventConvertHandler>(handler->GetNextHandler());
     switch(cmd) {
         case IInputEventConvertHandler::PluginDispatchCmd::GOTO_NEXT: {
-            
             MMI_HILOGE("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:::::::%{public}d", nextHandler->GetisPlugin());
             auto newEvent = handler->GetEvent<T1, T2>();
+            if (!isfast) {
+                nextHandler->SetPluginfunctionStatus(PluginFunctionStatus);
+            }
             nextHandler->HandleEvent<T1, T2>(newEvent);
             if (nextHandler->GetisPlugin()) {
                 MMI_HILOGE("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
@@ -196,6 +202,7 @@ void EventPluginsHandler::HandlePluginEventEx(std::shared_ptr<IInputEventConvert
                     MMI_HILOGE("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
                     HandlePluginEventEx<KeyEvent, PluginDispatchKeyEvent>(nextHandler, keyEvent, true);
                 } else {
+                    nextHandler->SetPluginfunctionStatus(PluginFunctionStatus);
                     nextHandler->HandleEvent<KeyEvent, PluginDispatchKeyEvent>(keyEvent);
                 }
                 //InputHandler->GetEventNormalizeHandler()->HandleKeyEvent(keyEvent);
@@ -205,6 +212,7 @@ void EventPluginsHandler::HandlePluginEventEx(std::shared_ptr<IInputEventConvert
                     MMI_HILOGE("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
                     HandlePluginEventEx<PointerEvent, PluginDispatchPointEvent>(nextHandler, pointEvent, true);
                 }  else {
+                    nextHandler->SetPluginfunctionStatus(PluginFunctionStatus);
                     nextHandler->HandleEvent<PointerEvent, PluginDispatchPointEvent>(pointEvent);
                 }
                 //InputHandler->GetEventNormalizeHandler()->HandlePointerEvent(pointEvent);
@@ -214,6 +222,7 @@ void EventPluginsHandler::HandlePluginEventEx(std::shared_ptr<IInputEventConvert
                     MMI_HILOGE("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
                     HandlePluginEventEx<PointerEvent, PluginDispatchTouchEvent>(nextHandler, pointEvent, true);
                 }  else {
+                    nextHandler->SetPluginfunctionStatus(PluginFunctionStatus);
                     nextHandler->HandleEvent<PointerEvent, PluginDispatchTouchEvent>(pointEvent);
                 }
                 // InputHandler->GetEventNormalizeHandler()->HandleTouchEvent(pointEvent);

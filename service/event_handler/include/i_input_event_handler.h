@@ -57,10 +57,10 @@ public:
     virtual std::shared_ptr<IInputEventHandler> GetNextHandler()
     {
         return nextHandler_;
-    }
+    };
     template<typename T1, typename T2>
     void HandleEvent(const std::shared_ptr<T1> event);
-    virtual bool GetisPlugin() { return isPlugin; }
+    virtual bool GetisPlugin() { return isPlugin; };
 protected:
     std::shared_ptr<IInputEventHandler> nextHandler_ { nullptr };
     bool isPlugin { false };
