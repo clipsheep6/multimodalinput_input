@@ -75,7 +75,7 @@ int32_t MultimodalInputConnectProxy::StartInputDeviceCooperate(int32_t userData,
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::StopDeviceCooperate(int32_t userData, int32_t stopInputDeviceId)
+int32_t MultimodalInputConnectProxy::StopDeviceCooperate(int32_t userData)
 {
     bool ret = g_cooperateState;
     if (ret == false) {

@@ -195,11 +195,6 @@ int32_t DistributedInputKit::StopRemoteInput(
     return RET_OK;
 }
 
-int32_t DistributedInputKit::RegisterStartStopResultCallback(const sptr<IStartStopResultCallback> callback)
-{
-    return RET_OK;
-}
-
 int32_t DistributedInputKit::RegisterInputNodeListener(sptr<InputNodeListener> listener)
 {
     return RET_OK;

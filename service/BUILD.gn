@@ -749,22 +749,24 @@ if (input_feature_input_cooperation) {
   ohos_unittest("input_device_cooperate_test") {
     module_out_path = "multimodalinput/unit_out"
     sources = [
+      "input_device_cooperate/src/cooperate_event_handler.cpp",
       "input_device_cooperate/src/cooperate_event_manager.cpp",
       "input_device_cooperate/src/device_cooperate_softbus_adapter.cpp",
       "input_device_cooperate/src/device_profile_adapter.cpp",
       "input_device_cooperate/src/distributed_input_adapter.cpp",
       "input_device_cooperate/src/i_input_device_cooperate_state.cpp",
-      "input_device_cooperate/src/input_device_cooperate_manager.cpp",
       "input_device_cooperate/src/input_device_cooperate_sm.cpp",
       "input_device_cooperate/src/input_device_cooperate_state_free.cpp",
       "input_device_cooperate/src/input_device_cooperate_state_in.cpp",
       "input_device_cooperate/src/input_device_cooperate_state_out.cpp",
       "input_device_cooperate/src/input_device_cooperate_util.cpp",
       "input_device_cooperate/test/input_device_cooperate_test.cpp",
-      "input_device_cooperate/test/mock/mock_client_trans_session_service.c",
+      "input_device_cooperate/test/mock/mock_client_trans_session_service.cpp",
       "input_device_cooperate/test/mock/mock_distributed_device_profile_client.cpp",
       "input_device_cooperate/test/mock/mock_distributed_input_kit.cpp",
-      "input_device_cooperate/test/mock/softbus_bus_center.cpp",
+      "input_device_cooperate/test/mock/mock_input_device_manager.cpp",
+      "input_device_cooperate/test/mock/mock_softbus_bus_center.cpp",
+      "input_device_cooperate/test/mock/mock_input_device_manager.cpp",
     ]
 
     include_dirs = [
@@ -779,7 +781,6 @@ if (input_feature_input_cooperation) {
       "//foundation/distributedhardware/distributed_input/frameworks/include",
       "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include",
       "//foundation/distributedhardware/distributed_input/common/include",
-      "//foundation/multimodalinput/input/service/device_manager/include",
       "//base/hiviewdfx/hitrace/interfaces/native/innerkits/include/hitrace_meter",
       "//foundation/distributedschedule/safwk/services/safwk/include",
       "//foundation/multimodalinput/input/service/event_dispatch/include",
@@ -810,6 +811,12 @@ if (input_feature_input_cooperation) {
       "//foundation/multimodalinput/input/service/key_event_normalize/include",
       "//foundation/communication/dsoftbus/sdk/transmission/session/include",
       "//foundation/communication/dsoftbus/core/common/include",
+      "//foundation/distributeddatamgr/kv_store/kvstoremock/interfaces/mock/base",
+      "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
+      "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+      "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
+      "//foundation/multimodalinput/input/service/delegate_task/include",
+      "//foundation/multimodalinput/input/service/dfx/include",
     ]
 
     if (input_feature_libinput || input_feature_hdf) {
@@ -833,10 +840,14 @@ if (input_feature_input_cooperation) {
     }
 
     external_deps = [
+      "c_utils:utils",
       "device_manager:devicemanagersdk",
       "drivers_interface_input:hdi_input",
       "dsoftbus:softbus_client",
       "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_core",
+      "safwk:system_ability_fwk",
+      "samgr:samgr_proxy",
     ]
 
     defines = [ "OHOS_BUILD" ]

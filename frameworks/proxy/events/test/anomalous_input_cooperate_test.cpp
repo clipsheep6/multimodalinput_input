@@ -22,6 +22,7 @@
 #include "input_manager.h"
 #include "multimodal_input_connect_manager.h"
 #include "input_device_cooperate_impl.h"
+#include "input_device_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -29,6 +30,8 @@ namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AnomalousInputCooperateTest" };
+constexpr const int32_t COOPERATION_DEVICE_ERROR = 4400003;
+constexpr const int32_t COOPERATE_FAIL = 4400002;
 } // namespace
 #define InputMG ::OHOS::DelayedSingleton<InputManager>::GetInstance()
 class InputCooperateTest : public testing::Test {
@@ -151,7 +154,7 @@ HWTEST_F(InputCooperateTest, Anomalous_InputCooperateTest_StartInputDeviceCooper
 {
     MMI_HILOGD("StartInputDeviceCooperate");
     std::string sinkDeviceId = "123";
-    int32_t srcInputDeviceId = 10;
+    int32_t srcInputDeviceId = 1;
     InputDevCooperateImpl.userData_ = 0;
     using CooperationCallback = std::function<void(std::string, CooperationMessage)>;
     CooperationCallback callback;
@@ -159,7 +162,7 @@ HWTEST_F(InputCooperateTest, Anomalous_InputCooperateTest_StartInputDeviceCooper
         MMI_HILOGD("callback is ok");
     };
     int state = InputMG->StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId, callback);
-    EXPECT_EQ(state, RET_ERR);
+    EXPECT_EQ(state, COOPERATION_DEVICE_ERROR);
 }
 
 /**
@@ -171,15 +174,14 @@ HWTEST_F(InputCooperateTest, Anomalous_InputCooperateTest_StartInputDeviceCooper
 HWTEST_F(InputCooperateTest, Anomalous_IInputCooperateTest_StopDeviceCooperate, TestSize.Level1)
 {
     MMI_HILOGD("StopDeviceCooperate");
-    int32_t listen = 1;
     InputDevCooperateImpl.userData_ = 0;
     using CooperationCallback = std::function<void(std::string, CooperationMessage)>;
     CooperationCallback callback;
     callback = [](const std::string &, CooperationMessage) {
         MMI_HILOGD("callback is ok");
     };
-    int state = InputMG->StopDeviceCooperate(listen, callback);
-    EXPECT_EQ(state, RET_ERR);
+    int state = InputMG->StopDeviceCooperate(callback);
+    EXPECT_EQ(state, 4400002);
 }
 } // namespace MMI
 } // namespace OHOS

@@ -407,7 +407,6 @@ ohos_unittest("PointerEventTest") {
     "window_manager:libwm",
   ]
 }
-
 if (input_feature_input_cooperation) {
   ohos_unittest("InputCooperateTest") {
     module_out_path = module_output_path
@@ -486,6 +485,53 @@ if (input_feature_input_cooperation) {
         "${mmi_path}/service/connect_manager/include",
         "${mmi_path}/frameworks/proxy/event_handler/include",
         "//foundation/systemabilitymgr/safwk/services/safwk/include",
+
+        "//foundation/multimodalinput/input/service/event_handler/include",
+        "//foundation/multimodalinput/input/service/libinput_adapter/include",
+        "//third_party/libinput/src",
+        "//third_party/eudev/src/libudev",
+        "//third_party/json/include",
+        "//foundation/multimodalinput/input/util/network/include",
+        "//foundation/multimodalinput/input/service/module_loader/include",
+        "//foundation/multimodalinput/input/service/connect_manager/include",
+        "//foundation/distributedhardware/distributed_input/frameworks/include",
+        "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include",
+        "//foundation/distributedhardware/distributed_input/common/include",
+        "//foundation/multimodalinput/input/service/device_manager/include",
+        "//base/hiviewdfx/hitrace/interfaces/native/innerkits/include/hitrace_meter",
+        "//foundation/distributedschedule/safwk/services/safwk/include",
+        "//foundation/multimodalinput/input/service/event_dispatch/include",
+        "//foundation/multimodalinput/input/service/mouse_event_handler/include",
+        "//foundation/multimodalinput/input/service/timer_manager/include",
+        "//foundation/multimodalinput/input/service/filter/include",
+        "//foundation/multimodalinput/input/service/input_device_cooperate/include",
+        "//foundation/multimodalinput/input/service/input_device_cooperate/test/mock",
+        "//foundation/distributedhardware/distributed_input/interfaces/inner_kits/include",
+        "//foundation/distributedhardware/distributed_hardware_fwk/common/log/include",
+        "//foundation/multimodalinput/input/service/event_package/include",
+        "//foundation/multimodalinput/input/util/socket/include",
+        "//foundation/multimodalinput/input/service/window_manager/include",
+        "//foundation/distributedhardware/distributed_hardware_fwk/utils/include/log",
+        "//foundation/communication/dsoftbus/interfaces/kits/common",
+        "//foundation/distributedhardware/distributed_input/interfaces/ipc/include",
+        "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
+        "//foundation/distributedhardware/distributed_hardware_fwk/common/utils/include",
+        "//foundation/communication/bluetooth/frameworks/inner/common",
+        "//foundation/deviceprofile/device_info_manager/interfaces/innerkits/core/include",
+        "//foundation/multimodalinput/input/service/key_event_handler/include",
+        "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
+        "//foundation/multimodalinput/input/service/interceptor/include",
+        "//foundation/multimodalinput/input/service/monitor/include",
+        "//foundation/multimodalinput/input/service/subscriber/include",
+        "//foundation/multimodalinput/input/service/mouse_event_normalize/include",
+        "//third_party/cJSON",
+        "//foundation/multimodalinput/input/service/key_event_normalize/include",
+        "//foundation/communication/dsoftbus/sdk/transmission/session/include",
+        "//foundation/communication/dsoftbus/core/common/include",
+        "//foundation/distributeddatamgr/kv_store/kvstoremock/interfaces/mock/base",
+        "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
+        "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+        "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
       ]
     }
 

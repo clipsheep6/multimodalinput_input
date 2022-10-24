@@ -16,17 +16,25 @@
 #include <memory>
 
 #include <gtest/gtest.h>
+#define private public
+#define protected public
+#include "cooperation_message.h"
 #include "cooperate_event_manager.h"
-#include "multimodal_input_connect_def_parcel.h"
+#include "device_profile_adapter.h"
+#include "define_multimodal.h"
+#include "device_cooperate_softbus_adapter.h"
+#include "input_device_cooperate_sm.h"
 #include "input_device_cooperate_state_out.h"
 #include "input_device_cooperate_state_free.h"
 #include "input_device_cooperate_state_in.h"
-#define private public
-#define protected public
-#include "input_device_cooperate_sm.h"
-#include "device_profile_adapter.h"
-#include "define_multimodal.h"
+#include "input_manager.h"
+#include "input_device_manager.h"
+#include "multimodal_input_connect_manager.h"
+#include "multimodal_input_connect_def_parcel.h"
 #include "mock_distributed_device_profile_client.h"
+#include "delegate_tasks.h"
+#include "util_ex.h"
+#include "util_napi_error.h"
 
 namespace OHOS {
 namespace MMI {
@@ -34,6 +42,7 @@ using namespace testing::ext;
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceCooperateStateTest" };
 constexpr const int32_t DP_GET_SERVICE_SUCCESS = 98566148;
+constexpr const int32_t COOPERATION_DEVICE_ERROR = 4400003;
 #define InputDevCooSM ::OHOS::DelayedSingleton<InputDeviceCooperateSM>::GetInstance()
 } // namespace
 class IDCooperateTest : public testing::Test {
@@ -179,14 +188,16 @@ HWTEST_F(IDCooperateTest, UnregisterCrossingStateListener002, TestSize.Level1)
 HWTEST_F(IDCooperateTest, StartInputDeviceCooperate001, TestSize.Level1)
 {
     CALL_INFO_TRACE;
-    std::string remote = "";
-    int32_t startInputDeviceId = 10;
     InputDevCooSM->Reset();
+    std::string remote = "";
+    int32_t startInputDeviceId = 1;
+    InputDevCooSM->currentStateSM_ = std::make_shared<InputDeviceCooperateStateIn>(remote);
+    InputDevCooSM->cooperateState_ = CooperateState::STATE_IN;
     int32_t state = InputDevCooSM->StartInputDeviceCooperate(remote, startInputDeviceId);
     MMI_HILOGD("Start inputdevice cooperate state :%{public}d", state);
-    EXPECT_EQ(state, RET_ERR);
+    EXPECT_EQ(state, COOPERATION_DEVICE_ERROR);
     usleep(300000);
-    EXPECT_EQ(CooperateState::STATE_FREE, InputDevCooSM->cooperateState_);
+    EXPECT_EQ(CooperateState::STATE_IN, InputDevCooSM->cooperateState_);
 }
 
 /**
@@ -198,15 +209,15 @@ HWTEST_F(IDCooperateTest, StartInputDeviceCooperate001, TestSize.Level1)
 HWTEST_F(IDCooperateTest, StartInputDeviceCooperate002, TestSize.Level1)
 {
     CALL_INFO_TRACE;
-    std::string remote = "123";
-    int32_t startInputDeviceId = 10;
+    std::string remote = "networkId";
+    int32_t startInputDeviceId = 1;
     InputDevCooSM->currentStateSM_ = std::make_shared<InputDeviceCooperateStateIn>(remote);
     InputDevCooSM->cooperateState_ = CooperateState::STATE_IN;
     int32_t state = InputDevCooSM->StartInputDeviceCooperate(remote, startInputDeviceId);
     MMI_HILOGD("Start inputdevice cooperate state :%{public}d", state);
-    EXPECT_EQ(state, RET_ERR);
+    EXPECT_EQ(state, RET_OK);
     usleep(300000);
-    EXPECT_EQ(CooperateState::STATE_IN, InputDevCooSM->cooperateState_);
+    EXPECT_EQ(CooperateState::STATE_FREE, InputDevCooSM->cooperateState_);
 }
 
 /**
@@ -218,16 +229,14 @@ HWTEST_F(IDCooperateTest, StartInputDeviceCooperate002, TestSize.Level1)
 HWTEST_F(IDCooperateTest, StartInputDeviceCooperate003, TestSize.Level1)
 {
     CALL_INFO_TRACE;
-    std::string remote = "123";
-    int32_t startInputDeviceId = 10;
-    InputDevCooSM->isStopping_ = false;
-    InputDevCooSM->isStarting_ = false;
     InputDevCooSM->Reset();
+    std::string remote = "networkId";
+    int32_t startInputDeviceId = 1;
     int32_t state = InputDevCooSM->StartInputDeviceCooperate(remote, startInputDeviceId);
     MMI_HILOGD("Start inputdevice cooperate state :%{public}d", state);
-    EXPECT_EQ(state, RET_ERR);
+    EXPECT_EQ(state, RET_OK);
     usleep(300000);
-    EXPECT_EQ(CooperateState::STATE_FREE, InputDevCooSM->cooperateState_);
+    EXPECT_EQ(CooperateState::STATE_OUT, InputDevCooSM->cooperateState_);
 }
 
 /**
@@ -239,14 +248,17 @@ HWTEST_F(IDCooperateTest, StartInputDeviceCooperate003, TestSize.Level1)
 HWTEST_F(IDCooperateTest, StopInputDeviceCooperate001, TestSize.Level1)
 {
     CALL_INFO_TRACE;
-    std::string startDhid = "123";
-    InputDevCooSM->currentStateSM_ = std::make_shared<InputDeviceCooperateStateFree>();
-    InputDevCooSM->cooperateState_ = CooperateState::STATE_FREE;
+    InputDevCooSM->isStopping_ = true;
+    std::string startDhid = "1";
+    InputDevCooSM->startDhid_ = "1";
+    InputDevCooSM->currentStateSM_ = std::make_shared<InputDeviceCooperateStateIn>(startDhid);
+    InputDevCooSM->cooperateState_ = CooperateState::STATE_IN;
+    DevCooperateSoftbusAdapter->sessionDevMap_[startDhid] = 1;
     int32_t state = InputDevCooSM->StopInputDeviceCooperate();
-    MMI_HILOGD("Stop inputdevice cooperate state :%{public}d", state);
+    MMI_HILOGE("Stop inputdevice cooperate state :%{public}d", state);
     EXPECT_EQ(state, RET_ERR);
-    usleep(100000);
-    EXPECT_EQ(CooperateState::STATE_FREE, InputDevCooSM->cooperateState_);
+    usleep(300000);
+    EXPECT_EQ(CooperateState::STATE_IN, InputDevCooSM->cooperateState_);
 }
 
 /**
@@ -258,14 +270,17 @@ HWTEST_F(IDCooperateTest, StopInputDeviceCooperate001, TestSize.Level1)
 HWTEST_F(IDCooperateTest, StopInputDeviceCooperate002, TestSize.Level1)
 {
     CALL_INFO_TRACE;
-    std::string startDhid = "123";
-    InputDevCooSM->isStopping_ = false;
-    InputDevCooSM->isStarting_ = false;
+    InputDevCooSM->Reset();
+    std::string startDhid = "1";
+    InputDevCooSM->startDhid_ = "1";
     InputDevCooSM->currentStateSM_ = std::make_shared<InputDeviceCooperateStateIn>(startDhid);
     InputDevCooSM->cooperateState_ = CooperateState::STATE_IN;
+    DevCooperateSoftbusAdapter->sessionDevMap_[startDhid] = 1;
     int32_t state = InputDevCooSM->StopInputDeviceCooperate();
-    MMI_HILOGD("Stop inputdevice cooperate state :%{public}d", state);
-    EXPECT_EQ(state, RET_ERR);
+    MMI_HILOGE("Stop inputdevice cooperate state :%{public}d", state);
+    EXPECT_EQ(state, RET_OK);
+    usleep(300000);
+    EXPECT_EQ(CooperateState::STATE_FREE, InputDevCooSM->cooperateState_);
 }
 
 /**
@@ -277,17 +292,17 @@ HWTEST_F(IDCooperateTest, StopInputDeviceCooperate002, TestSize.Level1)
 HWTEST_F(IDCooperateTest, StopInputDeviceCooperate003, TestSize.Level1)
 {
     CALL_INFO_TRACE;
-    std::string startDhid = "123";
-    InputDevCooSM->isStopping_ = false;
-    InputDevCooSM->isStarting_ = false;
-    InputDevCooSM->srcNetworkId_ = "123";
+    InputDevCooSM->Reset();
+    std::string startDhid = "1";
+    InputDevCooSM->srcNetworkId_ = "1";
     InputDevCooSM->currentStateSM_ = std::make_shared<InputDeviceCooperateStateOut>(startDhid);
     InputDevCooSM->cooperateState_ = CooperateState::STATE_OUT;
+    DevCooperateSoftbusAdapter->sessionDevMap_[startDhid] = 1;
     int32_t state = InputDevCooSM->StopInputDeviceCooperate();
-    MMI_HILOGD("Stop inputdevice cooperate state :%{public}d", state);
-    EXPECT_EQ(state, RET_ERR);
-    usleep(100000);
-    EXPECT_EQ(CooperateState::STATE_OUT, InputDevCooSM->cooperateState_);
+    MMI_HILOGE("Stop inputdevice cooperate state :%{public}d", state);
+    EXPECT_EQ(state, RET_OK);
+    usleep(300000);
+    EXPECT_EQ(CooperateState::STATE_FREE, InputDevCooSM->cooperateState_);
 }
 
 /**
@@ -299,12 +314,20 @@ HWTEST_F(IDCooperateTest, StopInputDeviceCooperate003, TestSize.Level1)
 HWTEST_F(IDCooperateTest, StartRemoteCooperateResult001, TestSize.Level1)
 {
     CALL_INFO_TRACE;
+    InputDevCooSM->Reset();
     std::string startDhid = "123";
     int32_t xPercent = 10;
     int32_t yPercent = 20;
+    DelegateTasks delegateTasks;
+    delegateTasks.Init();
+    uint64_t tid = GetThisThreadId();
+    delegateTasks.SetWorkerThreadId(tid);
+    InputDevCooSM->Init(std::bind(&DelegateTasks::PostSyncTask, &delegateTasks, std::placeholders::_1));
     InputDevCooSM->cooperateState_ = CooperateState::STATE_OUT;
-    InputDevCooSM->StartRemoteCooperateResult(false, startDhid, xPercent, yPercent);
-    EXPECT_EQ(InputDevCooSM->cooperateState_, CooperateState::STATE_OUT);
+    InputDevCooSM->StartRemoteCooperate(startDhid);
+    delegateTasks.ProcessTasks();
+    InputDevCooSM->StartRemoteCooperateResult(true, startDhid, xPercent, yPercent);
+    EXPECT_EQ(InputDevCooSM->cooperateState_, CooperateState::STATE_FREE);
 }
 
 /**
@@ -316,12 +339,19 @@ HWTEST_F(IDCooperateTest, StartRemoteCooperateResult001, TestSize.Level1)
 HWTEST_F(IDCooperateTest, StartRemoteCooperateResult002, TestSize.Level1)
 {
     CALL_INFO_TRACE;
+    InputDevCooSM->Reset();
     std::string startDhid = "123";
     int32_t xPercent = 10;
     int32_t yPercent = 20;
+    DelegateTasks delegateTasks;
+    delegateTasks.Init();
+    uint64_t tid = GetThisThreadId();
+    delegateTasks.SetWorkerThreadId(tid);
+    InputDevCooSM->Init(std::bind(&DelegateTasks::PostSyncTask, &delegateTasks, std::placeholders::_1));
     InputDevCooSM->cooperateState_ = CooperateState::STATE_FREE;
+    InputDevCooSM->StartRemoteCooperate(startDhid);
     InputDevCooSM->StartRemoteCooperateResult(true, startDhid, xPercent, yPercent);
-    EXPECT_EQ(InputDevCooSM->cooperateState_, CooperateState::STATE_FREE);
+    EXPECT_EQ(InputDevCooSM->cooperateState_, CooperateState::STATE_IN);
 }
 
 /**
