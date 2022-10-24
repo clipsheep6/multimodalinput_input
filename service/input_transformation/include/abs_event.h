@@ -80,6 +80,8 @@ public:
     std::shared_ptr<Pointer> GetPointer(int32_t id) const;
     std::list<int32_t> GetPointerIdList() const;
     std::list<std::shared_ptr<const Pointer>> GetPointerList() const;
+    void SetCurSlot(int32_t curSlot);
+    int32_t GetCurSlot() const;
 
     virtual std::ostream& operator<<(std::ostream& outStream) const override;
 
@@ -95,6 +97,7 @@ protected:
 private:
     int32_t pointerId_;
     int32_t sourceType_;
+    int32_t curSlot_;
     pointer_list pointers_;
 };
 

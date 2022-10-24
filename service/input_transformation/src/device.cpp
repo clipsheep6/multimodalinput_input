@@ -392,17 +392,20 @@ void Device::ProcessSyncEvent(int32_t code, int32_t value)
 }
 
 void Device::ProcessKeyEvent(int32_t code, int32_t value) {
-    MMI_HILOGD("Enter code:%{public}s value:%{public}d", EnumUtils::InputEventKeyCodeToString(code), value);
-     MMI_HILOGD("songliy e->code == BTN_TOUCH");
-    absEventCollector_.SetAction((value > 0 ? AbsEvent::ACTION_DOWN : AbsEvent::ACTION_UP));
+    CALL_DEBUG_ENTER;
+	if (value == 2) {
+        return;
+    }
+    if (code == BTN_TOUCH) {
+        return;
+    }
     auto event = keyEventCollector_.HandleKeyEvent(code, value);
     if (event) {
         OnEventCollected(event);
         keyEventCollector_.AfterProcessed();
-        MMI_HILOGD("Leave code:%{public}s value::%{public}d KeyEvent", EnumUtils::InputEventKeyCodeToString(code), value);
+        MMI_HILOGD("HandleKeyEvent code:%{public}s value::%{public}d KeyEvent", EnumUtils::InputEventKeyCodeToString(code), value);
         return;
     }
-    MMI_HILOGD("Leave code:%{public}s value:%{public}d", EnumUtils::InputEventKeyCodeToString(code), value);
 }
 
 void Device::ProcessAbsEvent(int32_t code, int32_t value)

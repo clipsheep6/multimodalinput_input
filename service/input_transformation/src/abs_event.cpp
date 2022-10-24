@@ -142,6 +142,16 @@ std::list<std::shared_ptr<const AbsEvent::Pointer>> AbsEvent::GetPointerList() c
     return result;
 }
 
+void AbsEvent::SetCurSlot(int32_t curSlot)
+{
+    curSlot_ = curSlot;
+}
+
+int32_t AbsEvent::GetCurSlot() const
+{
+    return curSlot_;
+}
+
 std::list<int32_t> AbsEvent::GetPointerIdList() const
 {
     std::list<int32_t> result;
