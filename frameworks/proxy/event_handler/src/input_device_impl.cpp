@@ -285,7 +285,7 @@ std::shared_ptr<InputDevice> InputDeviceImpl::DevDataUnmarshalling(NetPacket &pk
     int32_t vendor;
     int32_t version;
     std::string phys;
-    std::string uniq;    
+    std::string uniq;
     pkt >> deviceId >> name >> deviceType >> bus >> product >> vendor >> version >> phys >> uniq;
     devData->SetId(deviceId);
     devData->SetName(name);
