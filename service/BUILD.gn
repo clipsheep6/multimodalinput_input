@@ -466,8 +466,6 @@ ohos_shared_library("libmmi-server") {
         "input_transformation/src/instance_creator.cpp",
         "input_transformation/src/kernel_event_base.cpp",
         "input_transformation/src/kernel_event_handler_bridge.cpp",
-        "input_transformation/src/kernel_key_event.cpp",
-        "input_transformation/src/key_event_collector.cpp",
         "input_transformation/src/time_utils.cpp",
         "input_transformation/src/touch_screen_handler.cpp",
       ]

@@ -57,7 +57,7 @@ void Device::Uninit()
 
 Device::Device(int32_t id, const std::shared_ptr<IInputContext> context, const InputDimensionInfo &dimensionInfoX,
                const InputDimensionInfo &dimensionInfoY)
-   : id_(id), context_(context), dimensionInfoX_(dimensionInfoX), dimensionInfoY_(dimensionInfoY), keyEventCollector_(id), 
+   : id_(id), context_(context), dimensionInfoX_(dimensionInfoX), dimensionInfoY_(dimensionInfoY),
    absEventCollector_(id, AbsEvent::SOURCE_TYPE_NONE), eventHandler_(IKernelEventHandler::GetDefault()) {}
 
 Device::~Device()
@@ -148,16 +148,16 @@ void Device::ProcessEventItem(const struct input_event* eventItem)
     CALL_DEBUG_ENTER;
     CHKPV(mtdev_);
     mtdev_put_event(mtdev_, eventItem);
-    if (mmi_libevdev_event_is_code(eventItem, EV_SYN, SYN_REPORT)) {
+    if (EventIsCode(eventItem, EV_SYN, SYN_REPORT)) {
         while (!mtdev_empty(mtdev_)) {
             struct input_event e;
             mtdev_get_event(mtdev_, &e);
-            mmi_evdev_process_event(&e);
+            ProcessEvent(&e);
         }
     }    
 }
 
-void Device::mmi_evdev_process_event(const struct input_event* eventItem)
+void Device::ProcessEvent(const struct input_event* eventItem)
 {
     CALL_DEBUG_ENTER;
     auto type = eventItem->type;
@@ -167,12 +167,10 @@ void Device::mmi_evdev_process_event(const struct input_event* eventItem)
         case EV_SYN:
             ProcessSyncEvent(code, value);
             break;
-        case EV_KEY:
-            ProcessKeyEvent(code, value);
-            break;
         case EV_ABS:
             ProcessAbsEvent(code, value);
             break;
+        case EV_KEY:
         case EV_REL:
         case EV_MSC:
         case EV_SW:
@@ -279,10 +277,10 @@ int32_t Device::UpdateBitStat(int32_t evType, int32_t maxValue, unsigned long* r
         typeStr = EnumUtils::InputEventTypeToString(evType);
     }
 
-    for (int32_t item = 0; item <= maxValue; ++item) {
-        const char* has = TestBit(item, resultValue, len) ? "has" : "hasn't";
-        const char* valueStr = (evType == 0 ? EnumUtils::InputEventTypeToString(item) : EnumUtils::InputEventCodeToString(evType, item));
-    }
+    // for (int32_t item = 0; item <= maxValue; ++item) {
+    //     const char* has = TestBit(item, resultValue, len) ? "has" : "hasn't";
+    //     const char* valueStr = (evType == 0 ? EnumUtils::InputEventTypeToString(item) : EnumUtils::InputEventCodeToString(evType, item));
+    // }
 
     return 0;
 }
@@ -382,23 +380,6 @@ void Device::ProcessSyncEvent(int32_t code, int32_t value)
     }
 }
 
-void Device::ProcessKeyEvent(int32_t code, int32_t value) {
-    CALL_DEBUG_ENTER;
-	if (value == 2) {
-        return;
-    }
-    if (code == BTN_TOUCH) {
-        return;
-    }
-    auto event = keyEventCollector_.HandleKeyEvent(code, value);
-    if (event) {
-        OnEventCollected(event);
-        keyEventCollector_.AfterProcessed();
-        MMI_HILOGD("HandleKeyEvent code:%{public}s value::%{public}d KeyEvent", EnumUtils::InputEventKeyCodeToString(code), value);
-        return;
-    }
-}
-
 void Device::ProcessAbsEvent(int32_t code, int32_t value)
 {
     const auto& event = absEventCollector_.HandleAbsEvent(code, value);
@@ -406,13 +387,6 @@ void Device::ProcessAbsEvent(int32_t code, int32_t value)
         // OnEventCollected(event);
         absEventCollector_.AfterProcessed();
     }
-}
-
-void Device::OnEventCollected(const std::shared_ptr<const KernelKeyEvent>& event) {
-    if (!event) {
-        return;
-    }
-    //eventHandler_->OnInputEvent(event);
 }
 
 void Device::OnEventCollected(const std::shared_ptr<const AbsEvent>& event)
@@ -458,12 +432,12 @@ int32_t Device::StopReceiveEvents()
     return 0;
 }
 
-int Device::mmi_libevdev_event_is_type(const struct input_event *ev, unsigned int type)
+int Device::EventIsType(const struct input_event *ev, unsigned int type)
 {
 	return type < EV_CNT && ev->type == type;
 }
 
-int Device::mmi_libevdev_event_type_get_max(unsigned int type)
+int Device::EventtTypeGetMax(unsigned int type)
 {
 	if (type > EV_MAX)
 		return -1;
@@ -471,14 +445,14 @@ int Device::mmi_libevdev_event_type_get_max(unsigned int type)
 	return ev_max[type];
 }
 
-int Device::mmi_libevdev_event_is_code(const struct input_event *ev, unsigned int type, unsigned int code)
+int Device::EventIsCode(const struct input_event *ev, unsigned int type, unsigned int code)
 {
 	int max;
 
-	if (!mmi_libevdev_event_is_type(ev, type))
+	if (!EventIsType(ev, type))
 		return 0;
 
-	max = mmi_libevdev_event_type_get_max(type);
+	max = EventtTypeGetMax(type);
 	return (max > -1 && code <= (unsigned int)max && ev->code == code);
 }
 } // namespace MMI

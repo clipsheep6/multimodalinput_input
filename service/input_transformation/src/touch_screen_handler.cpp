@@ -110,7 +110,6 @@ void TouchScreenHandler::ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointer
 void TouchScreenHandler::OnInputEvent(const std::shared_ptr<const AbsEvent>& event)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGE("OnInputEvent enter");
     int32_t pointerAction = PointerEvent::POINTER_ACTION_UNKNOWN;
     int64_t actionTime = 0;
 
@@ -126,7 +125,7 @@ void TouchScreenHandler::OnInputEvent(const std::shared_ptr<const AbsEvent>& eve
     auto curSlot = event->GetCurSlot();
     auto action = event->GetAction();
     auto absEventPointer = event->GetPointer();
-    MMI_HILOGE("lisong, OnInputEvent, CurSlot = %{public}d, Action = %{public}d, x = %{public}d, y = %{public}d",
+    MMI_HILOGE("OnInputEvent, CurSlot = %{public}d, Action = %{public}d, x = %{public}d, y = %{public}d",
     curSlot, action, absEventPointer->GetX(), absEventPointer->GetY());
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPV(inputEventNormalizeHandler);   

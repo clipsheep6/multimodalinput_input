@@ -19,9 +19,6 @@
 
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KernelEventBase" };
-};
 KernelEventBase::KernelEventBase(int32_t deviceId, int32_t action) 
     : deviceId_(deviceId), action_(action), actionTime_(-1)
 {

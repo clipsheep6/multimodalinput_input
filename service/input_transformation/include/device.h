@@ -30,7 +30,6 @@
 #include "i_input_context.h"
 #include "i_input_define.h"
 #include "i_input_device.h"
-#include "key_event_collector.h"
 
 struct input_event;
 
@@ -112,16 +111,14 @@ private:
     bool HasEventCode(int32_t evType, int32_t evCode) const;
 
     void ProcessSyncEvent(int32_t code, int32_t value);
-    void ProcessKeyEvent(int32_t code, int32_t value);
     void ProcessAbsEvent(int32_t code, int32_t value);
     void ProcessMscEvent(int32_t code, int32_t value);
-    void OnEventCollected(const std::shared_ptr<const KernelKeyEvent>& event);
     void OnEventCollected(const std::shared_ptr<const AbsEvent>& event);
-    void mmi_evdev_process_event(const struct input_event* eventItem);
+    void ProcessEvent(const struct input_event* eventItem);
 
-    int mmi_libevdev_event_is_type(const struct input_event *ev, unsigned int type);
-    int mmi_libevdev_event_type_get_max(unsigned int type);
-    int mmi_libevdev_event_is_code(const struct input_event *ev, unsigned int type, unsigned int code);
+    int EventIsType(const struct input_event *ev, unsigned int type);
+    int EventtTypeGetMax(unsigned int type);
+    int EventIsCode(const struct input_event *ev, unsigned int type, unsigned int code);
 
 private:
     const int32_t id_;
@@ -137,7 +134,6 @@ private:
     unsigned long evBit[LongsOfBits(EV_MAX)];
     unsigned long relBit[LongsOfBits(REL_MAX)];
     unsigned long absBit[LongsOfBits(ABS_MAX)];
-    KeyEventCollector keyEventCollector_;
     AbsEventCollector absEventCollector_;
     mtdev* mtdev_;
 
