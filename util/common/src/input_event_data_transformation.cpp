@@ -214,15 +214,7 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
     event->SetSourceType(tField);
     pkt >> tField;
     event->SetButtonId(tField);
-    uint32_t tAxes;
-    pkt >> tAxes;
-    double axisValue;
-    for (int32_t i = PointerEvent::AXIS_TYPE_UNKNOWN; i < PointerEvent::AXIS_TYPE_MAX; ++i) {
-        if (PointerEvent::HasAxis(tAxes, static_cast<PointerEvent::AxisType>(i))) {
-            pkt >> axisValue;
-            event->SetAxisValue(static_cast<PointerEvent::AxisType>(i), axisValue);
-        }
-    }
+    SetAxisInfo(pkt, event);
 
     std::set<int32_t>::size_type nPressed;
     pkt >> nPressed;
@@ -262,17 +254,11 @@ void InputEventDataTransformation::SetAxisInfo(NetPacket &pkt, std::shared_ptr<P
     uint32_t tAxes;
     pkt >> tAxes;
     double axisValue;
-    if (PointerEvent::HasAxis(tAxes, PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)) {
-        pkt >> axisValue;
-        event->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, axisValue);
-    }
-    if (PointerEvent::HasAxis(tAxes, PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL)) {
-        pkt >> axisValue;
-        event->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, axisValue);
-    }
-    if (PointerEvent::HasAxis(tAxes, PointerEvent::AXIS_TYPE_PINCH)) {
-        pkt >> axisValue;
-        event->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, axisValue);
+    for (int32_t i = PointerEvent::AXIS_TYPE_UNKNOWN; i < PointerEvent::AXIS_TYPE_MAX; ++i) {
+        if (PointerEvent::HasAxis(tAxes, static_cast<PointerEvent::AxisType>(i))) {
+            pkt >> axisValue;
+            event->SetAxisValue(static_cast<PointerEvent::AxisType>(i), axisValue);
+        }
     }
 }
 
