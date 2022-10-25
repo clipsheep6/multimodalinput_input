@@ -29,9 +29,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "UDSServer"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSServer" };
 } // namespace
-UDSServer::UDSServer() {}
 
 UDSServer::~UDSServer()
 {
@@ -156,9 +155,6 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
         return RET_ERR;
     }
     sess->SetTokenType(tokenType);
-#ifdef OHOS_BUILD_MMI_DEBUG
-    sess->SetClientFd(toReturnClientFd);
-#endif // OHOS__BUILD_MMI_DEBUG
 
     if (!AddSession(sess)) {
         cleanTaskWhenError();

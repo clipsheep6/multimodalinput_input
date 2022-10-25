@@ -50,8 +50,6 @@ EventDispatchHandler::EventDispatchHandler()
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 }
 
-EventDispatchHandler::~EventDispatchHandler() {}
-
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void EventDispatchHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
@@ -151,7 +149,7 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
         return RET_OK;
     }
 
-    NetPacket pkt(MmiMessageId::ON_KEYEVENT);
+    NetPacket pkt(MmiMessageId::ON_KEY_EVENT);
     InputEventDataTransformation::KeyEventToNetPacket(key, pkt);
     BytraceAdapter::StartBytrace(key, BytraceAdapter::KEY_DISPATCH_EVENT);
     pkt << fd;

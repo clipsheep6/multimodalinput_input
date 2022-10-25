@@ -25,13 +25,12 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceCooperateStateOut"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceCooperateStateOut" };
 } // namespace
 
 InputDeviceCooperateStateOut::InputDeviceCooperateStateOut(const std::string& startDhid)
     : startDhid_(startDhid)
-{
-}
+{}
 
 int32_t InputDeviceCooperateStateOut::StopInputDeviceCooperate(const std::string &networkId)
 {

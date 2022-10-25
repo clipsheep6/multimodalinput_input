@@ -37,7 +37,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceCooperateSM"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceCooperateSM" };
 const std::string BUNDLE_NAME = "ohos.multimodalinput.input";
 constexpr int32_t INTERVAL_MS = 2000;
 constexpr int32_t MOUSE_ABS_LOCATION = 100;
@@ -334,7 +334,7 @@ bool InputDeviceCooperateSM::UpdateMouseLocation()
 {
     CALL_DEBUG_ENTER;
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
-    CHKPR(pointerEvent, false);
+    CHKPF(pointerEvent);
     int32_t displayId = pointerEvent->GetTargetDisplayId();
     auto displayGroupInfo =  WinMgr->GetDisplayGroupInfo();
     struct DisplayInfo physicalDisplayInfo;
