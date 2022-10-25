@@ -36,6 +36,7 @@ IInputInterface *g_inputInterface { nullptr };
 InputEventCb g_eventCb;
 InputHostCb g_hostCb;
 std::mutex g_mutex;
+std::map<uint32_t, int32_t> lastDevInfo;
 } // namespace
 
 void HdfDeviceStatusChanged(int32_t devIndex, int32_t devType, HdfInputEventDevStatus devStatus)
@@ -64,46 +65,6 @@ static void HotPlugCallback(const InputHotPlugEvent *event)
     HdfDeviceStatusChanged(event->devIndex, event->devType, devStatus);
 }
 
-#if 0
-static void HDFWrite(const HdfInputEvent &event)
-{
-    MMI_HILOGE("zpc:write:event:eventType:%{public}u,devIndex:%{public}u,"
-        "code:%{public}u,type:%{public}u,value:%{public}u,time:%{public}llu,",
-        event.eventType, event.devIndex, event.code, event.type, event.value, event.time);
-
-    auto ret = write(g_hdfAdapterWriteFd, &event, sizeof(HdfInputEvent));
-    if (ret == -1) {
-        int saveErrno = errno;
-        MMI_HILOGE("Write pipe fail, errno:%{public}d, %{public}s", saveErrno, strerror(saveErrno));
-    }
-}
-
-static void EventPkgCallback(const InputEventPackage **pkgs, uint32_t count, uint32_t devIndex)
-{
-    CHK_PID_AND_TID();
-    CHKPV(pkgs);
-    uint32_t fixedCount = count;
-    if (count > MMI_MAX_EVENT_PKG_NUM) {
-        fixedCount = MMI_MAX_EVENT_PKG_NUM;
-        MMI_HILOGE("Too big hdf event, count:%{public}d is beyond %{public}d", count, MMI_MAX_EVENT_PKG_NUM);
-    }
-    for (uint32_t i = 0; i < fixedCount; ++i) {
-        HdfInputEvent event {};
-        event.eventType = static_cast<uint32_t>(HdfInputEventType::DEV_NODE_EVENT);
-        event.devIndex = devIndex;
-        const InputEventPackage &r = *pkgs[i];
-        if (r.code == 0 && r.type == 0 && r.value == 0) {
-            HDFWrite(event);
-        }
-        event.code = r.code;
-        event.type = r.type;
-        event.value = r.value;
-        event.time = r.timestamp;
-        HDFWrite(event);        
-    }
-}
-#else
-int32_t lastBtnTouchValue = -1;
 static void EventPkgCallback(const InputEventPackage **pkgs, uint32_t count, uint32_t devIndex)
 {
     CHK_PID_AND_TID();
@@ -117,28 +78,27 @@ static void EventPkgCallback(const InputEventPackage **pkgs, uint32_t count, uin
         if (pkgs[i] == nullptr) {
             continue;
         }
-    if ((pkgs[i]->type == 0) && (pkgs[i]->code == 0) && (pkgs[i]->value == 0)) {
-    			HdfInputEvent event;
-    			event.eventType = static_cast<uint32_t>(HdfInputEventType::DEV_NODE_EVENT);
-    			event.devIndex = devIndex;
-    			event.code = SYN_MT_REPORT;
-    			event.type = 0;
-    			event.value = 0;
-    			event.time = pkgs[i]->timestamp;
-    			auto ret = write(g_hdfAdapterWriteFd, &event, sizeof(HdfInputEvent));
-    			if (ret == -1) {
-    				int saveErrno = errno;
-    				MMI_HILOGE("Write pipe fail, errno:%{public}d, %{public}s", saveErrno, strerror(saveErrno));
-    			}
+        if ((pkgs[i]->type == 0) && (pkgs[i]->code == 0) && (pkgs[i]->value == 0)) {
+            HdfInputEvent event;
+            event.eventType = static_cast<uint32_t>(HdfInputEventType::DEV_NODE_EVENT);
+            event.devIndex = devIndex;
+            event.code = SYN_MT_REPORT;
+            event.type = 0;
+            event.value = 0;
+            event.time = pkgs[i]->timestamp;
+            auto ret = write(g_hdfAdapterWriteFd, &event, sizeof(HdfInputEvent));
+            if (ret == -1) {
+                int saveErrno = errno;
+                MMI_HILOGE("Write pipe fail, errno:%{public}d, %{public}s", saveErrno, strerror(saveErrno));
+            }
         }
         if (pkgs[i]->type == EV_KEY && pkgs[i]->code == BTN_TOUCH) {
-          if (lastBtnTouchValue == pkgs[i]->value) {
-              MMI_HILOGE("lastBtnTouchValue == pkgs[i]->value");
-              continue;
-          } else {
-              MMI_HILOGE("lastBtnTouchValue != pkgs[i]->value");
-              lastBtnTouchValue = pkgs[i]->value;
-          }
+            auto iter = lastDevInfo.find(devIndex);
+            if (iter != lastDevInfo.end() && iter->second == pkgs[i]->value) {
+                continue;
+            } else {
+                lastDevInfo.emplace(devIndex, pkgs[i]->value);
+            }
         }
         HdfInputEvent event;
         event.eventType = static_cast<uint32_t>(HdfInputEventType::DEV_NODE_EVENT);
@@ -160,7 +120,7 @@ static void EventPkgCallback(const InputEventPackage **pkgs, uint32_t count, uin
         }
     }
 }
-#endif
+
 HdfAdapter::HdfAdapter()
 {
     CHK_PID_AND_TID();
