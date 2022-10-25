@@ -791,7 +791,7 @@ void InputDeviceManager::OnInputDeviceAdded(std::shared_ptr<IInputDevice> inputD
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (IsPointerDevice(inputDevice) && !HasPointerDevice()) {
 #ifdef OHOS_BUILD_ENABLE_POINTER
-        WinMgr->DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
+        // WinMgr->DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
 #endif // OHOS_BUILD_ENABLE_POINTER
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -842,7 +842,7 @@ void InputDeviceManager::OnInputDeviceRemoved(std::shared_ptr<IInputDevice> inpu
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (IsPointerDevice(inputDevice) && !HasPointerDevice()) {
 #ifdef OHOS_BUILD_ENABLE_POINTER
-        WinMgr->DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
+        // WinMgr->DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
 #endif // OHOS_BUILD_ENABLE_POINTER
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING

@@ -151,6 +151,7 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::FinishPointer()
     absEventAction_ = AbsEvent::ACTION_NONE;
     auto nowTime = TimeUtils::GetTimeStampMs();
     if (action == AbsEvent::ACTION_DOWN) {
+        MMI_HILOGE("lisong, FinishPointer slot = %{public}d, absAction:%{public}s on down", curSlot_, AbsEvent::ActionToString(action));
         if (curPointer_->GetId() < 0) {
             curPointer_->SetId(nextId_++);
             auto retCode = absEvent_->AddPointer(curPointer_);
@@ -172,11 +173,12 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::FinishPointer()
         //     // action = AbsEvent::ACTION_DOWN;
         // }
     } else if (action == AbsEvent::ACTION_UP) {
+        MMI_HILOGE("lisong, FinishPointer slot = %{public}d, absAction:%{public}s on up", curSlot_, AbsEvent::ActionToString(action));
         if (curPointer_->GetId() < 0) {
-            MMI_HILOGE("lisong, FinishPointer absAction:%{public}s id < 0 on up", AbsEvent::ActionToString(action));
+            MMI_HILOGE("lisong, FinishPointer slot = %{public}d, absAction:%{public}s id < 0 on up", curSlot_, AbsEvent::ActionToString(action));
             return AbsEvent::NULL_VALUE;
         }
-        MMI_HILOGE("lisong, FinishPointer absAction:%{public}s id", AbsEvent::ActionToString(action));
+        MMI_HILOGE("lisong, FinishPointer slot = %{public}d, absAction:%{public}s id", curSlot_, AbsEvent::ActionToString(action));
         if (absEvent_->GetPointerIdList().empty()) {
             MMI_HILOGE("lisong, FinishPointer absEvent_->GetPointerIdList().empty()");
             nextId_ = 0;

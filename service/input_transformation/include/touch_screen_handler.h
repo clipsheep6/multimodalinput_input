@@ -56,6 +56,7 @@ protected:
             int32_t tpX, int32_t tpY, int32_t& displayX, int32_t& displayY) const;
     bool TouchPointToDisplayPoint(int32_t deviceId, const std::shared_ptr<const AbsEvent>& absEvent,
             EventTouch& touchInfo, int32_t& physicalDisplayId);
+    void ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent);
 
 private:
     [[maybe_unused]]const IInputContext* const context_;

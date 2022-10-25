@@ -96,6 +96,17 @@ int32_t TouchScreenHandler::UnbindInputDevice(const std::shared_ptr<IInputDevice
     return 0;
 }
 
+void TouchScreenHandler::ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPV(pointerEvent);
+    pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
+    MMI_HILOGD("This touch event is up remove this finger");
+    if (pointerEvent->GetPointerIds().empty()) {
+        MMI_HILOGD("This touch event is final finger up remove this finger");
+        pointerEvent->Reset();
+    }
+}
+
 void TouchScreenHandler::OnInputEvent(const std::shared_ptr<const AbsEvent>& event)
 {
     CALL_DEBUG_ENTER;
@@ -121,6 +132,9 @@ void TouchScreenHandler::OnInputEvent(const std::shared_ptr<const AbsEvent>& eve
     CHKPV(inputEventNormalizeHandler);   
     CHKPV(pointerEvent_);
     inputEventNormalizeHandler->HandleTouchEvent(pointerEvent_);
+    if (pointerAction == PointerEvent::POINTER_ACTION_UP) {
+        ResetTouchUpEvent(pointerEvent_);
+    }
 }
 
 bool TouchScreenHandler::ConvertPointer(const std::shared_ptr<const AbsEvent>& absEvent,
@@ -131,7 +145,7 @@ bool TouchScreenHandler::ConvertPointer(const std::shared_ptr<const AbsEvent>& a
     // CHKPF(context_);
 
     auto action = ConvertAction(absEvent->GetAction());
-
+    pointerAction = action;
     if (action == PointerEvent::POINTER_ACTION_UNKNOWN) {
         MMI_HILOGE("Leave, ConvertAction Failed");
         return false;
@@ -168,7 +182,6 @@ bool TouchScreenHandler::ConvertPointer(const std::shared_ptr<const AbsEvent>& a
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent_->UpdateId();
     // WinMgr->UpdateTargetPointer(pointerEvent_);
-    MMI_HILOGD("Leave");
     return true;
 }
 
@@ -335,8 +348,6 @@ bool TouchScreenHandler::OnEventTouchUp(const std::shared_ptr<const AbsEvent>& a
 {
     CALL_DEBUG_ENTER;
     CHKPF(absEvent);
-    // auto touch = libinput_event_get_touch_event(event);
-    // CHKPF(touch);
     int64_t time = GetSysClockTime();
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
@@ -357,8 +368,6 @@ bool TouchScreenHandler::OnEventTouchMotion(const std::shared_ptr<const AbsEvent
 {
     CALL_DEBUG_ENTER;
     CHKPF(absEvent);
-    // auto touch = libinput_event_get_touch_event(event);
-    // CHKPF(touch);
     int64_t time = GetSysClockTime();
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
