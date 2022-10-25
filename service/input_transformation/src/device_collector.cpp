@@ -66,73 +66,60 @@ std::list<int32_t> DeviceCollector::GetDeviceIdList() const
 
 bool DeviceCollector::AddDevice(const std::shared_ptr<IInputDevice>& device)
 {
-    MMI_HILOGD("Enter");
+    CALL_DEBUG_ENTER;
     if (!device) {
         MMI_HILOGE("Leave, null device");
         return false;
     }
-
     auto id = device->GetId();
     if (id < 0) {
         MMI_HILOGE("Leave, id < 0");
         return false;
     }
-
     if (GetDevice(id)) {
         MMI_HILOGE("Leave, repeat id");
         return false;
     }
-
     inputDevices_[id] = device;
-    MMI_HILOGE("inputDevice %{public}d size", inputDevices_.size());
     NotifyDeviceAdded(device);
-    MMI_HILOGD("Leave");
     return true;
 }
 
 std::shared_ptr<IInputDevice> DeviceCollector::RemoveDevice(int32_t id)
 {
-    MMI_HILOGD("Enter id:%{public}d", id);
+    CALL_DEBUG_ENTER;
     auto it = inputDevices_.find(id);
     if (it == inputDevices_.end()) {
         MMI_HILOGE("Leave id:%{public}d not exist device", id);
         return nullptr;
     }
-
     std::shared_ptr<IInputDevice> device = it->second;
     inputDevices_.erase(it);
-
     NotifyDeviceRemoved(device);
-
-    MMI_HILOGD("Leave id:%{public}d", id);
     return device;
 }
 
 void DeviceCollector::NotifyDeviceAdded(const std::shared_ptr<IInputDevice>& device)
 {
-    MMI_HILOGD("Enter");
+    CALL_DEBUG_ENTER;
     if (!device) {
         MMI_HILOGE("Leave, null device");
         return;
     }
-
     if (!device->HasCapability(IInputDevice::CAPABILITY_TOUCHSCREEN)) {
         MMI_HILOGE("Leave, invalid device!");
         return;
     }
-
     touchScreenHandler_ = ITouchScreenHandler::CreateInstance(context_);
     if (!touchScreenHandler_) {
         MMI_HILOGE("Leave , Create Failed");
         return;
     }
-
     auto retCode = touchScreenHandler_->BindInputDevice(device);
     if (retCode < 0) {
         MMI_HILOGE("Leave, BindInputDevice Failed");
         return;
     }
-
     auto handler = KernelEventHandlerBridge::CreateInstance(touchScreenHandler_);
     if (!handler) {
         MMI_HILOGE("Leave, null bridge handler");
@@ -143,7 +130,7 @@ void DeviceCollector::NotifyDeviceAdded(const std::shared_ptr<IInputDevice>& dev
 
 void DeviceCollector::NotifyDeviceRemoved(const std::shared_ptr<IInputDevice>& device)
 {
-    MMI_HILOGD("Enter");
+    CALL_DEBUG_ENTER;
     if (!device) {
         MMI_HILOGE("Leave, null device");
         return;

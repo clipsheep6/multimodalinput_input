@@ -35,12 +35,11 @@ AbsEventCollector::AbsEventCollector(int32_t deviceId, int32_t sourceType)
 
 const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleAbsEvent(int32_t code, int32_t value)
 {
-    MMI_HILOGD("Enter code:%{public}s value:%{public}d", EnumUtils::InputEventAbsCodeToString(code), value);
+    CALL_DEBUG_ENTER;
     RemoveReleasedPointer();
 
     switch (code) {
         case ABS_MT_SLOT: 
-        MMI_HILOGD("songliy e->code == ABS_MT_SLOT");
             return HandleMtSlot(value);
         case ABS_MT_TOUCH_MAJOR:
         case ABS_MT_TOUCH_MINOR:
@@ -49,18 +48,15 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleAbsEvent(int32_t code,
         case ABS_MT_ORIENTATION:
             break;
         case ABS_MT_POSITION_X:
-            MMI_HILOGD("songliy ABS_MT_POSITION_X");
             HandleMtPositionX(value);
             break;
         case ABS_MT_POSITION_Y:
-            MMI_HILOGD("songliy ABS_MT_POSITION_Y");
             HandleMtPositionY(value);
             break;
         case ABS_MT_TOOL_TYPE:
         case ABS_MT_BLOB_ID:
             break;
         case ABS_MT_TRACKING_ID:
-            MMI_HILOGD("songliy ABS_MT_TRACKING_ID");
             return HandleMtTrackingId(value);
         case ABS_MT_PRESSURE:
         case ABS_MT_DISTANCE:
@@ -70,15 +66,12 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleAbsEvent(int32_t code,
             break;
     }
 
-    MMI_HILOGD("Leave code:%{public}s value:%{public}d", EnumUtils::InputEventAbsCodeToString(code), value);
     return AbsEvent::NULL_VALUE;
 }
 
 const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleSyncEvent(int32_t code, int32_t value)
 {
-    MMI_HILOGD("Enter HandleSyncEvent FinishPointer code:%{public}s value:%{public}d", EnumUtils::InputEventSynCodeToString(code), value);
     const auto& absEvent = FinishPointer();
-    MMI_HILOGD("Leave code:%{public}s value:%{public}d absEvent:%{public}p", EnumUtils::InputEventSynCodeToString(code), value, absEvent.get());
     return absEvent;
 }
  
@@ -89,10 +82,7 @@ void AbsEventCollector::AfterProcessed()
 
 int32_t AbsEventCollector::SetSourceType(int32_t sourceType)
 {
-    MMI_HILOGD("Enter, sourceType_:%{public}s, sourceType:%{public}s", 
-            AbsEvent::SourceToString(sourceType_),
-            AbsEvent::SourceToString(sourceType));
-
+    CALL_DEBUG_ENTER;
     if (sourceType <= AbsEvent::SOURCE_TYPE_NONE || sourceType >= AbsEvent::SOURCE_TYPE_END) {
         return -1;
     }
@@ -103,9 +93,6 @@ int32_t AbsEventCollector::SetSourceType(int32_t sourceType)
     sourceType_ = sourceType;
     absEvent_->SetSourceType(sourceType_);
 
-    MMI_HILOGD("Leave, sourceType_:%{public}s, sourceType:%{public}s", 
-            AbsEvent::SourceToString(sourceType_),
-            AbsEvent::SourceToString(sourceType));
     return 0;
 }
 
@@ -142,16 +129,15 @@ std::shared_ptr<AbsEvent::Pointer> AbsEventCollector::GetCurrentPointer(bool cre
 
 const std::shared_ptr<AbsEvent>& AbsEventCollector::FinishPointer()
 {
+    CALL_DEBUG_ENTER;
     if (!curPointer_) {
         MMI_HILOGE("Leave");
         return AbsEvent::NULL_VALUE;
     }
-    MMI_HILOGD("curPointer_:%{public}p, GetId()%{public}d", curPointer_.get(), curPointer_->GetId());
     auto action = absEventAction_;
     absEventAction_ = AbsEvent::ACTION_NONE;
     auto nowTime = TimeUtils::GetTimeStampMs();
     if (action == AbsEvent::ACTION_DOWN) {
-        MMI_HILOGE("lisong, FinishPointer slot = %{public}d, absAction:%{public}s on down", curSlot_, AbsEvent::ActionToString(action));
         if (curPointer_->GetId() < 0) {
             curPointer_->SetId(nextId_++);
             auto retCode = absEvent_->AddPointer(curPointer_);
@@ -173,14 +159,10 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::FinishPointer()
         //     // action = AbsEvent::ACTION_DOWN;
         // }
     } else if (action == AbsEvent::ACTION_UP) {
-        MMI_HILOGE("lisong, FinishPointer slot = %{public}d, absAction:%{public}s on up", curSlot_, AbsEvent::ActionToString(action));
         if (curPointer_->GetId() < 0) {
-            MMI_HILOGE("lisong, FinishPointer slot = %{public}d, absAction:%{public}s id < 0 on up", curSlot_, AbsEvent::ActionToString(action));
             return AbsEvent::NULL_VALUE;
         }
-        MMI_HILOGE("lisong, FinishPointer slot = %{public}d, absAction:%{public}s id", curSlot_, AbsEvent::ActionToString(action));
         if (absEvent_->GetPointerIdList().empty()) {
-            MMI_HILOGE("lisong, FinishPointer absEvent_->GetPointerIdList().empty()");
             nextId_ = 0;
         }
     } else {
@@ -200,12 +182,10 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleMtSlot(int32_t value)
     if (curSlot_ == value) {
         return AbsEvent::NULL_VALUE;
     }
-    MMI_HILOGD("Enter HandleMtSlot FinishPointer");
     // const auto& absEvent = FinishPointer();
     curSlot_ = value;
     curPointer_ = AbsEvent::Pointer::NULL_VALUE;
     absEventAction_ = AbsEvent::ACTION_NONE;
-    MMI_HILOGE("Reset curPointer_");
     return AbsEvent::NULL_VALUE;
 }
 
@@ -238,11 +218,9 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleMtTrackingId(int32_t v
     if (value < 0) {
         MMI_HILOGF("MT_TRACKING_ID -1");
         absEventAction_ = AbsEvent::ACTION_UP;
-        MMI_HILOGD("action up, FinishPointer");
         // return FinishPointer();
     } else {
         absEventAction_ = AbsEvent::ACTION_DOWN;
-        MMI_HILOGD("action down, FinishPointer");
         // return FinishPointer();
     }
 

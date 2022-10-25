@@ -44,8 +44,6 @@ int64_t KernelEventBase::GetActionTime() const
 
 void KernelEventBase::SetAction(int32_t action)
 {
-    MMI_HILOGD("action:%{public}s, action_:%{public}s", ActionToStr(action),
-            ActionToStr(action_));
     action_ = action;
 }
 

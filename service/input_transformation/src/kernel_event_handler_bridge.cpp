@@ -29,7 +29,6 @@ KernelEventHandlerBridge::KernelEventHandlerBridge(const std::shared_ptr<ITouchS
 
 void KernelEventHandlerBridge::OnInputEvent(const std::shared_ptr<const KernelKeyEvent>& event)
 {
-    //seat_->OnInputEvent(event);
 }
 
 void KernelEventHandlerBridge::OnInputEvent(const std::shared_ptr<const AbsEvent>& event)

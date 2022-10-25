@@ -87,7 +87,6 @@ int32_t Device::GetDeviceId() const
 
 std::shared_ptr<IInputDevice::AxisInfo> Device::GetAxisInfo(int32_t axis) const
 {
-    MMI_HILOGD("Enter device:%{public}s axis:%{public}s", GetName().c_str(), IInputDevice::AxisToString(axis));
     auto it = axises_.find(axis);
     if (it != axises_.end()) {
         MMI_HILOGD("Leave deivce:%{public}s axis:%{public}s", GetName().c_str(), IInputDevice::AxisToString(axis));
@@ -125,7 +124,6 @@ std::shared_ptr<IInputDevice::AxisInfo> Device::GetAxisInfo(int32_t axis) const
     // axisInfo->SetResolution();
 
     axises_[axis] = axisInfo;
-    MMI_HILOGD("Leave device:%{public}s axis:%{public}s", GetName().c_str(), IInputDevice::AxisToString(axis));
     return axisInfo;
 }
 
@@ -149,13 +147,11 @@ void Device::ProcessEventItem(const struct input_event* eventItem)
 {
     CALL_DEBUG_ENTER;
     CHKPV(mtdev_);
-    MMI_HILOGE("xcbai before mtdev_put_event, type = %{public}d, value = %{public}d", eventItem->type, eventItem->value);
     mtdev_put_event(mtdev_, eventItem);
     if (mmi_libevdev_event_is_code(eventItem, EV_SYN, SYN_REPORT)) {
         while (!mtdev_empty(mtdev_)) {
             struct input_event e;
             mtdev_get_event(mtdev_, &e);
-			MMI_HILOGE("xcbai mtdev_get_event, type = %{public}d", e.type);
             mmi_evdev_process_event(&e);
         }
     }    
@@ -169,15 +165,12 @@ void Device::mmi_evdev_process_event(const struct input_event* eventItem)
     auto value = eventItem->value;
     switch (type) {
         case EV_SYN:
-            MMI_HILOGD("songliy EV_SYN, value = %{public}d", value);
             ProcessSyncEvent(code, value);
             break;
         case EV_KEY:
-            MMI_HILOGD("songliy EV_KEY, value = %{public}d", value);
             ProcessKeyEvent(code, value);
             break;
         case EV_ABS:
-            MMI_HILOGD("songliy EV_ABS, value = %{public}d", value);
             ProcessAbsEvent(code, value);
             break;
         case EV_REL:
@@ -289,8 +282,6 @@ int32_t Device::UpdateBitStat(int32_t evType, int32_t maxValue, unsigned long* r
     for (int32_t item = 0; item <= maxValue; ++item) {
         const char* has = TestBit(item, resultValue, len) ? "has" : "hasn't";
         const char* valueStr = (evType == 0 ? EnumUtils::InputEventTypeToString(item) : EnumUtils::InputEventCodeToString(evType, item));
-        MMI_HILOGD("InputDeviceBit(Name:%{public}s) %{public}s %{public}s:%{public}s(%{public}d)",  GetName().c_str(),
-                has, typeStr, valueStr, item);
     }
 
     return 0;
@@ -410,7 +401,6 @@ void Device::ProcessKeyEvent(int32_t code, int32_t value) {
 
 void Device::ProcessAbsEvent(int32_t code, int32_t value)
 {
-    MMI_HILOGD("songliy fallback_process_touch");
     const auto& event = absEventCollector_.HandleAbsEvent(code, value);
     if (event) {
         // OnEventCollected(event);
@@ -422,10 +412,7 @@ void Device::OnEventCollected(const std::shared_ptr<const KernelKeyEvent>& event
     if (!event) {
         return;
     }
-
-    MMI_HILOGD("Enter KernelKeyEvent");
     //eventHandler_->OnInputEvent(event);
-    MMI_HILOGD("Leave KernelKeyEvent");
 }
 
 void Device::OnEventCollected(const std::shared_ptr<const AbsEvent>& event)
@@ -457,7 +444,6 @@ int32_t Device::StartReceiveEvents(const std::shared_ptr<IKernelEventHandler>& e
     }
 
     eventHandler_ = eventHandler;
-    MMI_HILOGD("Leave");
     return 0;
 }
 

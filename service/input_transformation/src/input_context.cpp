@@ -27,28 +27,23 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 };
 std::shared_ptr<IInputContext> InputContext::CreateInstance()
 {
-    MMI_HILOGD("Enter");
-
     auto inputContext = std::make_shared<InputContext>();
     auto retCode = InitInstance(inputContext.get());
     if (retCode != 0) {
         MMI_HILOGE("Leave");
         return nullptr;
     }
-    MMI_HILOGD("Leave");
     return inputContext;
 }
 
 int32_t InputContext::InitInstance(InputContext* inputContext)
 {
-    MMI_HILOGD("Enter");
     auto deviceCollector = IDeviceCollector::CreateInstance(inputContext);
     auto retCode = inputContext->SetDeviceCollector(deviceCollector);
     if (retCode == -1) {
         MMI_HILOGE("Leave, SetDeviceCollector Failed");
         return -1;
     }
-    MMI_HILOGD("Leave");
     return 0;
 }
 

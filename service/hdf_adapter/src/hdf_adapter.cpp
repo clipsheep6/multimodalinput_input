@@ -113,12 +113,10 @@ static void EventPkgCallback(const InputEventPackage **pkgs, uint32_t count, uin
         fixedCount = MMI_MAX_EVENT_PKG_NUM;
         MMI_HILOGE("Too big hdf event, count:%{public}d is beyond %{public}d", count, MMI_MAX_EVENT_PKG_NUM);
     }
-    MMI_HILOGE("xcbai, count:%{public}d", count);
     for (uint32_t i = 0; i < fixedCount; ++i) {
         if (pkgs[i] == nullptr) {
             continue;
         }
-        MMI_HILOGE("songliy EventPkgCallback type = %{public}d, code = %{public}d, value = %{public}d", pkgs[i]->type, pkgs[i]->code, pkgs[i]->value);
     if ((pkgs[i]->type == 0) && (pkgs[i]->code == 0) && (pkgs[i]->value == 0)) {
     			HdfInputEvent event;
     			event.eventType = static_cast<uint32_t>(HdfInputEventType::DEV_NODE_EVENT);
