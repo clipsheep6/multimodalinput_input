@@ -124,6 +124,10 @@ config("libmmi_server_config") {
   if (input_feature_input_cooperation) {
     defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
   }
+
+  if (input_feature_joystick) {
+    defines += [ "OHOS_BUILD_ENABLE_JOYSTICK" ]
+  }
 }
 
 ohos_prebuilt_etc("multimodalinput_config_ability.json") {
@@ -446,12 +450,12 @@ ohos_shared_library("libmmi-server") {
 
   if (input_feature_input_cooperation) {
     sources += [
+      "input_device_cooperate/src/cooperate_event_handler.cpp",
       "input_device_cooperate/src/cooperate_event_manager.cpp",
       "input_device_cooperate/src/device_cooperate_softbus_adapter.cpp",
       "input_device_cooperate/src/device_profile_adapter.cpp",
       "input_device_cooperate/src/distributed_input_adapter.cpp",
       "input_device_cooperate/src/i_input_device_cooperate_state.cpp",
-      "input_device_cooperate/src/input_device_cooperate_manager.cpp",
       "input_device_cooperate/src/input_device_cooperate_sm.cpp",
       "input_device_cooperate/src/input_device_cooperate_state_free.cpp",
       "input_device_cooperate/src/input_device_cooperate_state_in.cpp",
@@ -589,7 +593,7 @@ ohos_shared_library("libmmi-server") {
     "hiviewdfx_hilog_native:libhilog",
     "init:libbegetutil",
     "ipc:ipc_core",
-    "multimedia_image_standard:image_native",
+    "multimedia_image_framework:image_native",
     "safwk:system_ability_fwk",
   ]
 
@@ -765,8 +769,8 @@ if (input_feature_input_cooperation) {
       "input_device_cooperate/test/mock/mock_distributed_device_profile_client.cpp",
       "input_device_cooperate/test/mock/mock_distributed_input_kit.cpp",
       "input_device_cooperate/test/mock/mock_input_device_manager.cpp",
-      "input_device_cooperate/test/mock/mock_softbus_bus_center.cpp",
       "input_device_cooperate/test/mock/mock_input_device_manager.cpp",
+      "input_device_cooperate/test/mock/mock_softbus_bus_center.cpp",
     ]
 
     include_dirs = [
