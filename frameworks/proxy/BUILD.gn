@@ -171,11 +171,10 @@ ohos_shared_library("libmmi-client") {
 
 ohos_unittest("ut-mmi-proxy-out") {
   module_out_path = module_output_path
-  include_dirs = [ "//commonlibrary/c_utils/base/include" ]
-
-  if (input_feature_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
-  }
+  include_dirs = [
+    "//commonlibrary/c_utils/base/include",
+    "$root_out_dir/diff_libinput_mmi/export_include",
+  ]
 
   sources = [ "module_loader/test/mmi_client_test.cpp" ]
 
@@ -196,11 +195,10 @@ ohos_unittest("ut-mmi-proxy-out") {
 
 ohos_unittest("KeyEventTest") {
   module_out_path = module_output_path
-  include_dirs = [ "//commonlibrary/c_utils/base/include" ]
-
-  if (input_feature_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
-  }
+  include_dirs = [
+    "//commonlibrary/c_utils/base/include",
+    "$root_out_dir/diff_libinput_mmi/export_include",
+  ]
 
   sources = [ "events/test/key_event_test.cpp" ]
 
@@ -218,11 +216,10 @@ ohos_unittest("KeyEventTest") {
 
 ohos_unittest("InputManagerTest") {
   module_out_path = module_output_path
-  include_dirs = [ "${mmi_path}/frameworks/proxy/events/test" ]
-
-  if (input_feature_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
-  }
+  include_dirs = [
+    "${mmi_path}/frameworks/proxy/events/test",
+    "$root_out_dir/diff_libinput_mmi/export_include",
+  ]
 
   defines = []
 
@@ -274,11 +271,10 @@ ohos_unittest("InputManagerTest") {
 
 ohos_unittest("InputManagerManualTest") {
   module_out_path = module_output_path
-  include_dirs = [ "//commonlibrary/c_utils/base/include" ]
-
-  if (input_feature_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
-  }
+  include_dirs = [
+    "//commonlibrary/c_utils/base/include",
+    "$root_out_dir/diff_libinput_mmi/export_include",
+  ]
 
   defines = []
 
@@ -310,9 +306,7 @@ ohos_unittest("InputManagerManualTest") {
 ohos_unittest("PointerEventTest") {
   module_out_path = module_output_path
 
-  if (input_feature_libinput) {
-    include_dirs = [ "$root_out_dir/diff_libinput_mmi/export_include" ]
-  }
+  include_dirs = [ "$root_out_dir/diff_libinput_mmi/export_include" ]
 
   defines = []
 
