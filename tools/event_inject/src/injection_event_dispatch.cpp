@@ -141,20 +141,6 @@ int32_t InjectionEventDispatch::OnHelp()
     return RET_OK;
 }
 
-int32_t InjectionEventDispatch::GetDeviceIndex(const std::string& deviceNameText)
-{
-    if (deviceNameText.empty()) {
-        MMI_LOGE("Get device index failed");
-        return RET_ERR;
-    }
-    for (const auto &item : allDevices_) {
-        if (deviceNameText == item.chipName) {
-            return item.devIndex;
-        }
-    }
-    return RET_ERR;
-}
-
 int32_t InjectionEventDispatch::OnSendEvent()
 {
     if (injectArgvs_.size() != SEND_EVENT_ARGV_COUNTS) {
@@ -191,24 +177,4 @@ int32_t InjectionEventDispatch::OnSendEvent()
         close(fd);
     }
     return RET_OK;
-}
-
-int32_t InjectionEventDispatch::GetDevTypeIndex(int32_t devIndex)
-{
-    for (const auto &item : allDevices_) {
-        if (devIndex == item.devIndex) {
-            return item.devType;
-        }
-    }
-    return RET_ERR;
-}
-
-int32_t InjectionEventDispatch::GetDevIndexType(int32_t devType)
-{
-    for (const auto &item : allDevices_) {
-        if (item.devType == devType) {
-            return item.devIndex;
-        }
-    }
-    return RET_ERR;
 }
