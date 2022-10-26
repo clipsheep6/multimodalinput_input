@@ -472,7 +472,7 @@ int32_t EventNormalizeHandler::HandleJoystickEvent(libinput_event* event)
     }
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
     CHKPR(event, ERROR_NULL_POINTER);
-    auto pointerEvent = TouchEventHdr->OnLibInput(event, INPUT_DEVICE_CAP_JOYSTICK);
+    auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::JOYSTICK);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandlePointerEvent(pointerEvent);
