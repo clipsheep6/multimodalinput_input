@@ -103,11 +103,9 @@ ohos_executable("vuinput") {
 
   deps = [
     "//foundation/multimodalinput/input/tools/vuinput:libmmi-virtual-device",
+    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
   ]
 
-  if (input_feature_libinput) {
-    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
-  }
   defines = []
 
   if (input_feature_debug) {
@@ -167,11 +165,9 @@ ohos_unittest("ut-virtual-device-out") {
     "${mmi_path}/util:libmmi-util",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
+    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
   ]
 
-  if (input_feature_libinput || input_feature_hdf) {
-    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
-  }
   external_deps = [
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
