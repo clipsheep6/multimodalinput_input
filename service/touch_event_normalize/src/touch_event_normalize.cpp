@@ -77,7 +77,7 @@ std::shared_ptr<TransformProcessor> TouchEventNormalize::MakeTransformProcessor(
         }
 #endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
-        case INPUT_DEVICE_CAP_JOYSTICK : {
+	case DeviceType::JOYSTICK: {
             processor = std::make_shared<JoystickTransformProcessor>(deviceId);
             break;
         }
