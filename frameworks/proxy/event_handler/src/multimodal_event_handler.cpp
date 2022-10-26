@@ -114,7 +114,7 @@ int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent>
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    EventLogHelper::PrintEventData(pointerEvent);
+    //EventLogHelper::PrintEventData(pointerEvent);
     int32_t ret = MultimodalInputConnMgr->InjectPointerEvent(pointerEvent);
     if (ret != 0) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);

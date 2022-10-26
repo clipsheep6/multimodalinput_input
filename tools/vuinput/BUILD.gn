@@ -96,8 +96,11 @@ ohos_unittest("ut-virtual-device-out") {
     "${mmi_path}/util/network/include",
     "${mmi_path}/util/socket",
     "${mmi_path}/util/socket/include",
-    "$root_out_dir/diff_libinput_mmi/export_include",
   ]
+
+  if (input_feature_libinput) {
+    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
+  }
 
   sources = [ "test/virtual_device_test.cpp" ]
 
@@ -106,11 +109,13 @@ ohos_unittest("ut-virtual-device-out") {
   deps = [
     "${mmi_path}/tools/vuinput:libmmi-virtual-device",
     "${mmi_path}/util:libmmi-util",
-    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
 
+  if (input_feature_libinput) {
+    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
+  }
   external_deps = [
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",

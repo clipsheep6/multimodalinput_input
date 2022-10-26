@@ -19,6 +19,11 @@
 #include <memory>
 
 #include "i_input_event_handler.h"
+#ifdef OHOS_BUILD_HDF
+#include "hdf_adapter.h"
+#endif // OHOS_BUILD_HDF
+
+struct input_event;
 
 namespace OHOS {
 namespace MMI {
@@ -27,6 +32,10 @@ public:
     EventNormalizeHandler() = default;
     ~EventNormalizeHandler() = default;
     void HandleEvent(libinput_event* event);
+#ifdef OHOS_BUILD_HDF
+    void HandleHDFDeviceStatusEvent(const HDFDeviceStatusEvent &event);
+    void HandleHDFDeviceInputEvent(const HDFDeviceInputEvent &event);
+#endif // OHOS_BUILD_HDF
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -43,6 +52,11 @@ public:
 private:
     int32_t OnEventDeviceAdded(libinput_event *event);
     int32_t OnEventDeviceRemoved(libinput_event *event);
+#ifdef OHOS_BUILD_HDF
+    int32_t OnHDFDeviceAdded(InputDeviceInfo devInfo);
+    int32_t OnHDFDeviceRemoved(InputDeviceInfo devInfo);
+    int32_t OnHDFEvent(int32_t devIndex, const HdfInputEvent &event);
+#endif // OHOS_BUILD_HDF
     int32_t HandleKeyboardEvent(libinput_event* event);
     void Repeat(const std::shared_ptr<KeyEvent> keyEvent);
     int32_t HandleTouchPadEvent(libinput_event* event);
@@ -57,7 +71,9 @@ private:
 private:
     int32_t timerId_ { -1 };
     void ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent, struct libinput_event *event);
+    //HdfEventNormalizeHelper hdfHelper_;
 };
+
 } // namespace MMI
 } // namespace OHOS
 #endif // EVENT_NORMALIZE_HANDLER_H

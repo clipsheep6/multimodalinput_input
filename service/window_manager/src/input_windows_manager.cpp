@@ -654,11 +654,9 @@ bool InputWindowsManager::IsInHotArea(int32_t x, int32_t y, const std::vector<Re
         int32_t displayMaxX = 0;
         int32_t displayMaxY = 0;
         if (!AddInt32(item.x, item.width, displayMaxX)) {
-            MMI_HILOGE("The addition of displayMaxX overflows");
             return false;
         }
         if (!AddInt32(item.y, item.height, displayMaxY)) {
-            MMI_HILOGE("The addition of displayMaxY overflows");
             return false;
         }
         if (((x >= item.x) && (x < displayMaxX)) &&
@@ -894,12 +892,11 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         MMI_HILOGE("The addition of logicalY overflows");
         return RET_ERR;
     }
+
     WindowInfo *touchWindow = nullptr;
     auto targetWindowId = pointerItem.GetTargetWindowId();
     for (auto &item : displayGroupInfo_.windowsInfo) {
         if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE) {
-            MMI_HILOGD("Skip the untouchable window to continue searching, "
-                       "window:%{public}d, flags:%{public}d", item.id, item.flags);
             continue;
         }
         if (targetWindowId >= 0) {
@@ -913,8 +910,6 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         }
     }
     if (touchWindow == nullptr) {
-        MMI_HILOGE("The touchWindow is nullptr, logicalX:%{public}d, logicalY:%{public}d",
-            logicalX, logicalY);
         return RET_ERR;
     }
     auto windowX = logicalX - touchWindow->area.x;

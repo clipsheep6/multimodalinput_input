@@ -56,6 +56,8 @@ enum {
     ERROR_NULL_POINTER,
     // libinput初始化失败
     LIBINPUT_INIT_FAIL,
+    // HDF初始化失败
+    HDF_INIT_FAIL,
     // 无效的输入参数
     PARAM_INPUT_INVALID,
     // memcpy安全函数错误
