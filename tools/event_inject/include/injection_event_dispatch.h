@@ -41,9 +41,6 @@ public:
     int32_t OnJson();
     int32_t OnHelp();
     int32_t ExecuteFunction(std::string funId);
-    int32_t GetDevTypeIndex(int32_t devIndex);
-    int32_t GetDevIndexType(int32_t devType);
-    int32_t GetDeviceIndex(const std::string& deviceNameText);
     std::string GetFunId();
     bool VirifyArgvs(const int32_t& argc, const std::vector<std::string>& argv);
     bool RegistInjectEvent(InjectFunctionMap& msg)
@@ -70,8 +67,6 @@ private:
     ManageInjectDevice manageInjectDevice_;
     std::vector<std::string> injectArgvs_;
     std::map<std::string, InjectFunction> injectFuns_;
-    std::map<std::string, int32_t> sendEventType_;
-    std::vector<DeviceInformation> allDevices_ = {};
 private:
     static constexpr uint32_t SEND_EVENT_ARGV_COUNTS = 5;
     static constexpr uint32_t SEND_EVENT_DEV_NODE_INDEX = 1;
