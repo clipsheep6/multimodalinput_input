@@ -66,10 +66,6 @@ ohos_source_set("libmmi-common") {
 
   defines = []
 
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
-
   if (input_feature_input_cooperation) {
     defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
   }
@@ -103,10 +99,6 @@ ohos_shared_library("libmmi-client") {
   }
 
   defines = []
-
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
 
   if (input_feature_pointer_drawing) {
     defines += [ "OHOS_BUILD_ENABLE_POINTER_DRAWING" ]

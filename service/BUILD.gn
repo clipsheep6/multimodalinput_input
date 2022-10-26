@@ -681,10 +681,6 @@ ohos_unittest("TransformPointTest") {
 
   defines = []
 
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
-
   deps = [
     "${mmi_path}/tools/vuinput:libmmi-virtual-device",
     "//third_party/googletest:gmock_main",
