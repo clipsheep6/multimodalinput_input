@@ -28,7 +28,6 @@
       "input_feature_touchscreen",
       "input_feature_input_device",
       "input_feature_input_cooperation",
-      "input_feature_libinput",
       "input_feature_hdf"
     ],
     "adapted_system_type": [

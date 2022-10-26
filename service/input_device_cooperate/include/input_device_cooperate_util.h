@@ -12,26 +12,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef INPUT_DEVICE_COOPERATE_UTIL_H
+#define INPUT_DEVICE_COOPERATE_UTIL_H
 
-#include <cinttypes>
+#include <string>
 
-#include "js_input_dinput_context.h"
+#include "cJSON.h"
 
 namespace OHOS {
 namespace MMI {
-static napi_module mmiInputDInputModule = {
-    .nm_version = 1,
-    .nm_flags = 0,
-    .nm_filename = nullptr,
-    .nm_register_func = JsInputDinputContext::Export,
-    .nm_modname = "multimodalInput.distributedInput",
-    .nm_priv = ((void*)0),
-    .reserved = { 0 },
+struct JsonParser {
+    JsonParser() = default;
+    ~JsonParser()
+    {
+        if (json_ != nullptr) {
+            cJSON_Delete(json_);
+            json_ = nullptr;
+        }
+    }
+    operator cJSON *()
+    {
+        return json_;
+    }
+    cJSON *json_ { nullptr };
 };
-
-extern "C" __attribute__((constructor)) void RegisterModule(void)
-{
-    napi_module_register(&mmiInputDInputModule);
-}
-}
-}
+std::string GetLocalDeviceId();
+} // namespace MMI
+} // namespace OHOS
+#endif // INPUT_DEVICE_COOPERATE_UTIL_H

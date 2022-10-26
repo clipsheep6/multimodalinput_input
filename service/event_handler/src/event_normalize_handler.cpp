@@ -30,6 +30,7 @@
 #include "event_log_helper.h"
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_cooperate_sm.h"
+#include "input_device_cooperate_util.h"
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "input_context.h"
 #include "input_device_manager.h"
@@ -359,8 +360,7 @@ bool EventNormalizeHandler::CheckKeyboardWhiteList(std::shared_ptr<KeyEvent> key
             return !IsNeedFilterOut(networkId, keyEvent);
         }
     } else if (state == CooperateState::STATE_OUT) {
-        std::string networkId;
-        InputDevMgr->GetLocalDeviceId(networkId);
+        std::string networkId = GetLocalDeviceId();
         if (!IsNeedFilterOut(networkId, keyEvent)) {
             if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
                 KeyRepeat->SelectAutoRepeat(keyEvent);
@@ -435,7 +435,7 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
     CHKPR(event, ERROR_NULL_POINTER);
-    auto pointerEvent = TouchEventHdr->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH_PAD);
+    auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH_PAD);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     nextHandler_->HandlePointerEvent(pointerEvent);
     auto type = libinput_event_get_type(event);
@@ -461,7 +461,7 @@ int32_t EventNormalizeHandler::HandleGestureEvent(libinput_event* event)
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
     CHKPR(event, ERROR_NULL_POINTER);
-    auto pointerEvent = TouchEventHdr->OnLibInput(event, INPUT_DEVICE_CAP_GESTURE);
+    auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::GESTURE);
     CHKPR(pointerEvent, GESTURE_EVENT_PKG_FAIL);
     MMI_HILOGD("GestureEvent package, eventType:%{public}d,actionTime:%{public}" PRId64 ","
                "action:%{public}d,actionStartTime:%{public}" PRId64 ","
@@ -496,15 +496,8 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event)
     }
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     CHKPR(event, ERROR_NULL_POINTER);
-    auto pointerEvent = TouchEventHdr->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH);
+    auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
-    if (InputDevCooSM->CheckTouchEvent(event)) {
-        MMI_HILOGW("Touch event filter out");
-        ResetTouchUpEvent(pointerEvent, event);
-        return RET_OK;
-    }
-#endif // OHOS_DISTRIBUTED_INPUT_MODEL
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandleTouchEvent(pointerEvent);
     ResetTouchUpEvent(pointerEvent, event);
@@ -538,7 +531,7 @@ int32_t EventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
     }
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     CHKPR(event, ERROR_NULL_POINTER);
-    auto pointerEvent = TouchEventHdr->OnLibInput(event, INPUT_DEVICE_CAP_TABLET_TOOL);
+    auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TABLET_TOOL);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandleTouchEvent(pointerEvent);

@@ -13,23 +13,27 @@
  * limitations under the License.
  */
 
-#include "call_dinput_death_recipient.h"
+#include "input_device_cooperate_util.h"
 
-#include "mmi_log.h"
+#include "softbus_bus_center.h"
 
+#include "config_multimodal.h"
+#include "define_multimodal.h"
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "CallDinputDeathRecipient" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceCooperateUtil" };
 } // namespace
-CALLDinputDeathRecipient::CALLDinputDeathRecipient(
-    const std::function<void(const wptr<IRemoteObject> &object)> &deathCallback)
-    : deathCallback_(deathCallback) {}
-
-void CALLDinputDeathRecipient::OnRemoteDied(const OHOS::wptr<OHOS::IRemoteObject> &object)
+std::string GetLocalDeviceId()
 {
-    CHKPV(deathCallback_);
-    deathCallback_(object);
+    auto localNode = std::make_unique<NodeBasicInfo>();
+    CHKPS(localNode);
+    int32_t ret = GetLocalNodeDeviceInfo(MMI_DINPUT_PKG_NAME, localNode.get());
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetLocalNodeDeviceInfo ret:%{public}d", ret);
+        return {};
+    }
+    return localNode->networkId;
 }
 } // namespace MMI
 } // namespace OHOS

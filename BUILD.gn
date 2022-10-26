@@ -16,7 +16,6 @@ import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
 group("third_party_group") {
   deps = []
-  if (input_feature_libinput) {
     deps += [
       "//foundation/multimodalinput/input/patch:patch_packages",
       "//third_party/eudev:libudev",
@@ -29,7 +28,6 @@ group("third_party_group") {
       "//third_party/mtdev:libmtdev",
       "//third_party/libevdev:libevdev"
     ]
-  }
 }
 
 ohos_prebuilt_executable("gdb") {
@@ -78,9 +76,6 @@ group("input_jsapi_group") {
       "frameworks/napi/mouse_event:mouseevent",
       "frameworks/napi/touch_event:touchevent",
     ]
-    if (input_feature_distributed) {
-      deps += [ "frameworks/napi/distributed_input:distributedinput" ]
-    }
     if (input_feature_monitor) {
       deps += [ "frameworks/napi/input_monitor:inputmonitor" ]
     }
