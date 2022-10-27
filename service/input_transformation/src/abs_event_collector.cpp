@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -218,10 +218,8 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleMtTrackingId(int32_t v
     if (value < 0) {
         MMI_HILOGF("MT_TRACKING_ID -1");
         absEventAction_ = AbsEvent::ACTION_UP;
-        // return FinishPointer();
     } else {
         absEventAction_ = AbsEvent::ACTION_DOWN;
-        // return FinishPointer();
     }
 
     return AbsEvent::NULL_VALUE;
