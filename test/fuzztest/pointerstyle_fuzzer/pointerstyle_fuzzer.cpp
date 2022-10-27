@@ -101,21 +101,21 @@ void UpdateDisplayInfo(const uint8_t* data, size_t size, int32_t windowId)
     startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.x);
     startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.y);
     startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.width);
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.height);
+    GetObject<int32_t>(data + startPos, size - startPos, displayInfo.height);
 
     size_t objectSize = 0;
     std::string name = "";
     size_t ret = 0;
     ret = GetString(objectSize, data, size, name);
     if (ret == 0) {
-        MMI_HILOGD("%{public}s:%{public}d The return value is 0", __func__, __LINE__);
+        MMI_HILOGD("%{public}s:%{public}d GetString return 0", __func__, __LINE__);
         return;
     }
     displayInfo.name = name;
     std::string uniq = "";
     ret = GetString(objectSize, data, size, uniq);
     if (ret == 0) {
-        MMI_HILOGD("%{public}s:%{public}d The return value is 0", __func__, __LINE__);
+        MMI_HILOGD("%{public}s:%{public}d GetString return 0", __func__, __LINE__);
         return;
     }
     displayInfo.uniq = uniq;
@@ -132,7 +132,7 @@ void PointerStyleFuzzTest(const uint8_t* data, size_t size)
     startPos += GetObject<int32_t>(data + startPos, size - startPos, windowId);
     UpdateDisplayInfo(data, size, windowId);
     int32_t pointerStyle;
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, pointerStyle);
+    GetObject<int32_t>(data + startPos, size - startPos, pointerStyle);
     InputManager::GetInstance()->SetPointerStyle(windowId, pointerStyle);
     InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle);
 }

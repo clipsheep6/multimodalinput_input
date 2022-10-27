@@ -42,7 +42,7 @@ void FunctionkeyStateFuzzTest(const uint8_t* data, size_t size)
     size_t startPos = 0;
     startPos += GetObject<int32_t>(funcKey, data + startPos, size - startPos);
     int32_t random;
-    startPos += GetObject<int32_t>(random, data + startPos, size - startPos);
+    GetObject<int32_t>(random, data + startPos, size - startPos);
     bool enable = (random % 2) ? false : true;
     InputManager::GetInstance()->SetFunctionKeyState(funcKey, enable);
 
