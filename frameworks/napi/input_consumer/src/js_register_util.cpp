@@ -322,7 +322,7 @@ void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
             anrTask.erase(it);
         }
     }
-    MMI_HILOGD("mxh444444444, taskid is : %{public}d, times is %{public}d", taskId);
+    MMI_HILOGD("mxh444444444, taskid is : %{public}d", taskId);
 }
 
 void EmitAsyncCallbackWork(std::list<KeyEventMonitorInfo *>& reportEvents, std::shared_ptr<KeyEvent> keyEvent)
@@ -335,9 +335,9 @@ void EmitAsyncCallbackWork(std::list<KeyEventMonitorInfo *>& reportEvents, std::
     }
     {
         std::lock_guard<std::mutex> guard(mutex);
-        anrTask.emplace_back(taskId, reportEvents.size());
+        anrTask.emplace(taskId, reportEvents.size());
         taskId++;
-        MMI_HILOGD("mxh11111111111111111111, taskid is : %{public}d, times is %{public}d", taskId, reportEvents.size());
+        MMI_HILOGD("mxh11111111111111111111, taskid is : %{public}d, times is %{public}d,  map size is %{public}d", taskId, reportEvents.size(), anrTask.size());
     }
     for (auto item : reportEvents) {
         CHKPV(item);
