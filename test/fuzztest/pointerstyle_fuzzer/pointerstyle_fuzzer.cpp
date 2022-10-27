@@ -57,8 +57,7 @@ void UpdateHotAreas(const uint8_t* data, size_t size, WindowInfo &windowInfo)
     size_t startPos = 0;
     std::vector<Rect> defaultHotAreasInfo;
     std::vector<Rect> pointerHotAreasInfo;
-    for (size_t j = 0; j < WindowInfo::MAX_HOTAREA_COUNT; ++j)
-    {
+    for (size_t j = 0; j < WindowInfo::MAX_HOTAREA_COUNT; ++j) {
         Rect defaultRect;
         startPos += GetObject<int32_t>(data + startPos, size - startPos, defaultRect.height);
         startPos += GetObject<int32_t>(data + startPos, size - startPos, defaultRect.width);
