@@ -55,7 +55,7 @@ struct KeyEventMonitorInfo {
     std::shared_ptr<KeyOption> keyOption { nullptr };
 };
 
-typedef std::map<std::string, std::list<KeyEventMonitorInfo *>> Callbacks;
+typedef std::map<std::shared_ptr<KeyOption>, std::list<KeyEventMonitorInfo *>> Callbacks;
 } // namespace MMI
 } // namespace OHOS
 #endif // JS_REGISTER_MODULE_H
