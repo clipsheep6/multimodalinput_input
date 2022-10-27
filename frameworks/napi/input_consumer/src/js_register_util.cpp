@@ -314,7 +314,9 @@ void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
     auto it = anrTask.find(taskId);
     if (it != anrTask.end()) {
         it->second--;
+        MMI_HILOGD("mxh222222222222, taskid is : %{public}d, times is %{public}d", it->first, it->second);
         if (it->second == 0) {
+            MMI_HILOGD("mxh33333333", it->first);
             auto keyEvent = event->keyEvent;
             keyEvent->MarkProcessed();
             anrTask.erase(it);
@@ -334,6 +336,7 @@ void EmitAsyncCallbackWork(std::list<KeyEventMonitorInfo *>& reportEvents, std::
         std::lock_guard<std::mutex> guard(mutex);
         anrTask.emplace(taskId, reportEvents.size());
         taskId++;
+        MMI_HILOGD("mxh11111111111111111111, taskid is : %{public}d, times is %{public}d", taskId, reportEvents.size());
     }
     for (auto item : reportEvents) {
         CHKPV(item);
