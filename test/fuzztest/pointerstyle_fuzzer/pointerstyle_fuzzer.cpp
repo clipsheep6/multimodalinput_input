@@ -82,8 +82,8 @@ void UpdateDisplayInfo(const uint8_t* data, size_t size, int32_t windowId)
     startPos += GetObject<int32_t>(data + startPos, size - startPos, displayGroupInfo.width);
     startPos += GetObject<int32_t>(data + startPos, size - startPos, displayGroupInfo.height);
     startPos += GetObject<int32_t>(data + startPos, size - startPos, displayGroupInfo.focusWindowId);
-    std::vector<WindowInfo> windowsInfos;
-    std::vector<DisplayInfo> displaysInfos;
+    std::vector<WindowInfo> windowsInfo;
+    std::vector<DisplayInfo> displaysInfo;
     WindowInfo windowInfo;
     windowInfo.id = windowId;
     windowInfo.pid = IPCSkeleton::GetCallingPid();
@@ -93,7 +93,7 @@ void UpdateDisplayInfo(const uint8_t* data, size_t size, int32_t windowId)
     startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.area.width);
     startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.area.height);
     UpdateHotAreas(data, size, windowInfo);
-    windowsInfos.push_back(windowInfo);
+    windowsInfo.push_back(windowInfo);
 
     DisplayInfo displayInfo;
     startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.id);
@@ -104,8 +104,7 @@ void UpdateDisplayInfo(const uint8_t* data, size_t size, int32_t windowId)
 
     size_t objectSize = 0;
     std::string name = "";
-    size_t ret = 0;
-    ret = GetString(objectSize, data, size, name);
+    size_t ret = GetString(objectSize, data, size, name);
     if (ret == 0) {
         MMI_HILOGD("%{public}s:%{public}d GetString return 0", __func__, __LINE__);
         return;
@@ -118,9 +117,9 @@ void UpdateDisplayInfo(const uint8_t* data, size_t size, int32_t windowId)
         return;
     }
     displayInfo.uniq = uniq;
-    displaysInfos.push_back(displayInfo);
-    displayGroupInfo.windowsInfo = windowsInfos;
-    displayGroupInfo.displaysInfo = displaysInfos;
+    displaysInfo.push_back(displayInfo);
+    displayGroupInfo.windowsInfo = windowsInfo;
+    displayGroupInfo.displaysInfo = displaysInfo;
     InputManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo);
 }
 

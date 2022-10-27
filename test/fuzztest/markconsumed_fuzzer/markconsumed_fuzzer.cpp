@@ -55,9 +55,7 @@ void MarkConsumedFuzzTest(const uint8_t* data, size_t size)
 {
     CALL_DEBUG_ENTER;
     int32_t eventId;
-    size_t startPos = 0;
-    GetObject<int32_t>(data + startPos, size - startPos, eventId);
-
+    GetObject<int32_t>(data, size, eventId);
     auto consumer = std::make_shared<InputEventConsumerTest>();
     int32_t monitorId = InputManager::GetInstance()->AddMonitor(consumer);
     InputManager::GetInstance()->MarkConsumed(monitorId, eventId);
