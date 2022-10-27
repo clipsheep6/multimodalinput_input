@@ -398,7 +398,7 @@ bool MouseEventNormalize::NormalizeMoveMouse(int32_t offsetX, int32_t offsetY)
 
 void MouseEventNormalize::DumpInner()
 {
-    //EventLogHelper::PrintEventData(pointerEvent_);
+    EventLogHelper::PrintEventData(pointerEvent_);
 }
 
 void MouseEventNormalize::Dump(int32_t fd, const std::vector<std::string> &args)

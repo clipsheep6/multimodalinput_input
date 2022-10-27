@@ -232,7 +232,7 @@ void EventNormalizeHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEv
     }
     DfxHisysevent::GetDispStartTime();
     CHKPV(keyEvent);
-    //EventLogHelper::PrintEventData(keyEvent);
+    EventLogHelper::PrintEventData(keyEvent);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     if (!CheckKeyboardWhiteList(keyEvent)) {
         MMI_HILOGI("Check white list return false, keyboard event dropped");
@@ -324,7 +324,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     }
 
     BytraceAdapter::StartBytrace(keyEvent);
-    //EventLogHelper::PrintEventData(keyEvent);
+    EventLogHelper::PrintEventData(keyEvent);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     if (!CheckKeyboardWhiteList(keyEvent)) {
         MMI_HILOGI("Check white list return false, keyboard event dropped");
