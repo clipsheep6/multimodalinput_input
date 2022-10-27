@@ -160,7 +160,7 @@ int32_t KeyEventInputSubscribeManager::UnsubscribeKeyEvent(int32_t subscribeId)
     return RET_ERR;
 }
 
-static void OnDispatchEventProcessed(int32_t eventId)
+static void OnSubscribeKeyEventProcessed(int32_t eventId)
 {
     CALL_DEBUG_ENTER;
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
@@ -189,7 +189,7 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
     int32_t tokenType = MultimodalInputConnMgr->GetTokenType();
     if (tokenType == TokenType::TOKEN_HAP) {
         MMI_HILOGI("Current session is hap");
-        event->SetProcessedCallback(OnDispatchEventProcessed);
+        event->SetProcessedCallback(OnSubscribeKeyEventProcessed);
     }
     std::lock_guard<std::mutex> guard(mtx_);
     BytraceAdapter::StartBytrace(event, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
