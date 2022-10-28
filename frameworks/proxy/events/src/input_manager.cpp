@@ -224,9 +224,9 @@ int32_t InputManager::GetInputDeviceCooperateState(const std::string &deviceId, 
     return InputMgrImpl.GetInputDeviceCooperateState(deviceId, callback);
 }
 
-bool InputManager::GetFunctionKeyState(int32_t funcKey)
+int32_t InputManager::GetFunctionKeyState(int32_t funcKey, bool &state)
 {
-    return InputMgrImpl.GetFunctionKeyState(funcKey);
+    return InputMgrImpl.GetFunctionKeyState(funcKey, state);
 }
 
 int32_t InputManager::SetFunctionKeyState(int32_t funcKey, bool enable)

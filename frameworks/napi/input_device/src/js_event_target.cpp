@@ -451,7 +451,7 @@ void JsEventTarget::CallKeystrokeAbilityPromise(uv_work_t *work, int32_t status)
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
-        callResult = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
+        callResult = CreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         CHKRV_SCOPE(cb->env, napi_reject_deferred(cb->env, cb->deferred, callResult), REJECT_DEFERRED, scope);
     } else {
         CHKRV_SCOPE(cb->env, napi_create_array(cb->env, &callResult), CREATE_ARRAY, scope);
@@ -499,7 +499,7 @@ void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
-        callResult[0] = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
+        callResult[0] = CreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &callResult[1]), GET_UNDEFINED, scope);
     } else {
         CHKRV_SCOPE(cb->env, napi_create_array(cb->env, &callResult[1]), CREATE_ARRAY, scope);
@@ -632,7 +632,7 @@ void JsEventTarget::CallKeyboardTypeAsync(uv_work_t *work, int32_t status)
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
-        callResult[0] = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
+        callResult[0] = CreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &callResult[1]), GET_UNDEFINED, scope);
     } else {
         CHKRV_SCOPE(cb->env, napi_create_int32(cb->env, cb->data.keyboardType, &callResult[1]), CREATE_INT32, scope);
@@ -677,7 +677,7 @@ void JsEventTarget::CallKeyboardTypePromise(uv_work_t *work, int32_t status)
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
-        callResult = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
+        callResult = CreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         CHKRV_SCOPE(cb->env, napi_reject_deferred(cb->env, cb->deferred, callResult), REJECT_DEFERRED, scope);
     } else {
         CHKRV_SCOPE(cb->env, napi_create_int32(cb->env, cb->data.keyboardType, &callResult), CREATE_INT32, scope);
@@ -716,7 +716,7 @@ void JsEventTarget::CallDevListAsyncWork(uv_work_t *work, int32_t status)
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
-        callResult[0] = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
+        callResult[0] = CreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &callResult[1]), GET_UNDEFINED, scope);
     } else {
         CHKRV_SCOPE(cb->env, napi_create_array(cb->env, &callResult[1]), CREATE_ARRAY, scope);
@@ -766,7 +766,7 @@ void JsEventTarget::CallDevListPromiseWork(uv_work_t *work, int32_t status)
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
-        callResult = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
+        callResult = CreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         CHKRV_SCOPE(cb->env, napi_reject_deferred(cb->env, cb->deferred, callResult), REJECT_DEFERRED, scope);
     } else {
         CHKRV_SCOPE(cb->env, napi_create_array(cb->env, &callResult), CREATE_ARRAY, scope);
@@ -811,7 +811,7 @@ void JsEventTarget::CallDevInfoPromiseWork(uv_work_t *work, int32_t status)
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
-        callResult = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
+        callResult = CreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         CHKRV_SCOPE(cb->env, napi_reject_deferred(cb->env, cb->deferred, callResult), REJECT_DEFERRED, scope);
     } else {
         callResult = JsUtil::GetDeviceInfo(cb);
@@ -854,7 +854,7 @@ void JsEventTarget::CallDevInfoAsyncWork(uv_work_t *work, int32_t status)
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
-        callResult[0] = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
+        callResult[0] = CreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &callResult[1]), GET_UNDEFINED, scope);
     } else {
         callResult[1] = JsUtil::GetDeviceInfo(cb);
@@ -865,6 +865,172 @@ void JsEventTarget::CallDevInfoAsyncWork(uv_work_t *work, int32_t status)
     napi_value result = nullptr;
     CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 2, callResult, &result), CALL_FUNCTION,
         scope);
+    napi_close_handle_scope(cb->env, scope);
+    JsUtil::DeleteCallbackInfo(std::move(cb));
+}
+
+void JsEventTarget::EmitJsGetFunctionKeyState(int32_t userData, int32_t errCode, bool state)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    auto iter = callback_.find(userData);
+    if (iter == callback_.end()) {
+        MMI_HILOGE("Failed to search for userData");
+        return;
+    }
+    CHKPV(iter->second);
+    if (iter->second->env == nullptr) {
+        callback_.erase(iter);
+        MMI_HILOGE("The env is nullptr");
+        return;
+    }
+    iter->second->data.funcKeyState = state;
+    iter->second->errCode = errCode;
+
+    uv_loop_s *loop = nullptr;
+    CHKRV(iter->second->env, napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_LOOP);
+
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    CHKPV(work);
+    int32_t *uData = new (std::nothrow) int32_t(userData);
+    if (uData == nullptr) {
+        MMI_HILOGE("uData is nullptr");
+        JsUtil::DeletePtr<uv_work_t*>(work);
+        return;
+    }
+    work->data = static_cast<void*>(uData);
+    int32_t ret = 0;
+    ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallGetFunctionKeyState);
+    if (ret != 0) {
+        MMI_HILOGE("uv_queue_work failed");
+        JsUtil::DeletePtr<uv_work_t*>(work);
+        JsUtil::DeletePtr<int32_t*>(uData);
+    }
+}
+
+void JsEventTarget::CallGetFunctionKeyState(uv_work_t *work, int32_t status)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(work);
+    if (work->data == nullptr) {
+        JsUtil::DeletePtr<uv_work_t*>(work);
+        MMI_HILOGE("Check data is null");
+        return;
+    }
+    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
+    CHKPV(cb);
+    CHKPV(cb->env);
+
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(cb->env, &scope);
+    CHKPV(scope);
+
+    napi_value results[2] = { 0 };
+    if (cb->errCode == RET_OK) {
+        CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &results[0]), GET_UNDEFINED, scope);
+        CHKRV_SCOPE(cb->env, napi_get_boolean(cb->env, cb->data.funcKeyState, &results[1]), CREATE_INT32, scope);
+    } else {
+        CHKRV_SCOPE(cb->env, napi_create_object(cb->env, &results[0]), CREATE_OBJECT, scope);
+        napi_value errCode = nullptr;
+        CHKRV_SCOPE(cb->env, napi_create_int32(cb->env, cb->errCode, &errCode), CREATE_INT32, scope);
+        CHKRV_SCOPE(cb->env, napi_set_named_property(cb->env, results[0], "code", errCode),
+            SET_NAMED_PROPERTY, scope);
+        CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &results[1]), GET_UNDEFINED, scope);
+    }
+    if (cb->deferred) {
+        if (cb->errCode == RET_OK) {
+            CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, results[1]), RESOLVE_DEFERRED, scope);
+        } else {
+            CHKRV_SCOPE(cb->env, napi_reject_deferred(cb->env, cb->deferred, results[0]), REJECT_DEFERRED, scope);
+        }
+    } else {
+        napi_value handler = nullptr;
+        CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE, scope);
+        napi_value result = nullptr;
+        CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 2, results, &result),
+            CALL_FUNCTION, scope);
+    }
+    napi_close_handle_scope(cb->env, scope);
+    JsUtil::DeleteCallbackInfo(std::move(cb));
+}
+
+void JsEventTarget::EmitJsSetFunctionKeyState(int32_t userData, int32_t errCode)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    auto iter = callback_.find(userData);
+    if (iter == callback_.end()) {
+        MMI_HILOGE("Failed to search for userData");
+        return;
+    }
+    CHKPV(iter->second);
+    if (iter->second->env == nullptr) {
+        callback_.erase(iter);
+        MMI_HILOGE("The env is nullptr");
+        return;
+    }
+    iter->second->errCode = errCode;
+
+    uv_loop_s *loop = nullptr;
+    CHKRV(iter->second->env, napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_LOOP);
+
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    CHKPV(work);
+    int32_t *uData = new (std::nothrow) int32_t(userData);
+    if (uData == nullptr) {
+        MMI_HILOGE("uData is nullptr");
+        JsUtil::DeletePtr<uv_work_t*>(work);
+        return;
+    }
+    work->data = static_cast<void*>(uData);
+    int32_t ret = 0;
+    ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallSetFunctionKeyState);
+    if (ret != 0) {
+        MMI_HILOGE("uv_queue_work failed");
+        JsUtil::DeletePtr<uv_work_t*>(work);
+        JsUtil::DeletePtr<int32_t*>(uData);
+    }
+}
+
+void JsEventTarget::CallSetFunctionKeyState(uv_work_t *work, int32_t status)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(work);
+    if (work->data == nullptr) {
+        JsUtil::DeletePtr<uv_work_t*>(work);
+        MMI_HILOGE("Check data is null");
+        return;
+    }
+    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
+    CHKPV(cb);
+    CHKPV(cb->env);
+
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(cb->env, &scope);
+    CHKPV(scope);
+
+    napi_value result;
+    if (cb->errCode == RET_OK) {
+        CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &result), GET_UNDEFINED, scope);
+    } else {
+        CHKRV_SCOPE(cb->env, napi_create_object(cb->env, &result), CREATE_OBJECT, scope);
+        napi_value errCode = nullptr;
+        CHKRV_SCOPE(cb->env, napi_create_int32(cb->env, cb->errCode, &errCode), CREATE_INT32, scope);
+        CHKRV_SCOPE(cb->env, napi_set_named_property(cb->env, result, "code", errCode), SET_NAMED_PROPERTY, scope);
+    }
+    if (cb->deferred) {
+        if (cb->errCode == RET_OK) {
+            CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, result), RESOLVE_DEFERRED, scope);
+        } else {
+            CHKRV_SCOPE(cb->env, napi_reject_deferred(cb->env, cb->deferred, result), REJECT_DEFERRED, scope);
+        }
+    } else {
+        napi_value handler = nullptr;
+        CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE, scope);
+        napi_value callResult = nullptr;
+        CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &result, &callResult),
+            CALL_FUNCTION, scope);
+    }
     napi_close_handle_scope(cb->env, scope);
     JsUtil::DeleteCallbackInfo(std::move(cb));
 }
@@ -952,7 +1118,7 @@ napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, co
     return promise;
 }
 
-napi_value JsEventTarget::GreateBusinessError(napi_env env, int32_t errCode, std::string errMessage)
+napi_value JsEventTarget::CreateBusinessError(napi_env env, int32_t errCode, std::string errMessage)
 {
     CALL_DEBUG_ENTER;
     napi_value result = nullptr;

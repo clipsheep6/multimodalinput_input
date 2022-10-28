@@ -39,6 +39,7 @@ size_t GetObject(T &object, const uint8_t *data, size_t size)
 void FunctionkeyStateFuzzTest(const uint8_t* data, size_t size)
 {
     int32_t funcKey;
+    bool state = false;
     size_t startPos = 0;
     startPos += GetObject<int32_t>(funcKey, data + startPos, size - startPos);
     int32_t random;
@@ -46,7 +47,7 @@ void FunctionkeyStateFuzzTest(const uint8_t* data, size_t size)
     bool enable = (random % 2) ? false : true;
     InputManager::GetInstance()->SetFunctionKeyState(funcKey, enable);
 
-    InputManager::GetInstance()->GetFunctionKeyState(funcKey);
+    InputManager::GetInstance()->GetFunctionKeyState(funcKey, state);
 }
 } // MMI
 } // OHOS
