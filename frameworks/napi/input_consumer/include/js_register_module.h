@@ -54,6 +54,7 @@ struct KeyEventMonitorInfo {
     int32_t subscribeId { 0 };
     std::shared_ptr<KeyOption> keyOption { nullptr };
 };
+bool operator<(std::shared_ptr<KeyOption> &first, std::shared_ptr<KeyOption> &second);
 
 typedef std::map<std::shared_ptr<KeyOption>, std::list<KeyEventMonitorInfo *>> Callbacks;
 } // namespace MMI

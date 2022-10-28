@@ -34,6 +34,37 @@ constexpr size_t PRE_KEYS_SIZE = 4;
 
 static Callbacks callbacks = {};
 
+
+bool operator<(std::shared_ptr<KeyOption> &first, std::shared_ptr<KeyOption> &second)
+{
+    CALL_DEBUG_ENTER;
+    if (first->GetFinalKey() != second->GetFinalKey()) {
+        return (first->GetFinalKey() < second->GetFinalKey());
+    }
+    const std::set<int32_t> sPrekeys { first->GetPreKeys() };
+    const std::set<int32_t> tPrekeys { second->GetPreKeys() };
+    std::set<int32_t>::const_iterator sIter = sPrekeys.cbegin();
+    std::set<int32_t>::const_iterator tIter = tPrekeys.cbegin();
+    for (; sIter != sPrekeys.cend() && tIter != tPrekeys.cend(); ++sIter, ++tIter) {
+        if (*sIter != *tIter) {
+            return (*sIter < *tIter);
+        }
+    }
+    if (sIter != sPrekeys.cend() || tIter != tPrekeys.cend()) {
+        return (tIter != tPrekeys.cend());
+    }
+    if (first->IsFinalKeyDown()) {
+        if (!second->IsFinalKeyDown()) {
+            return false;
+        }
+    } else {
+        if (second->IsFinalKeyDown()) {
+            return true;
+        }
+    }
+    return (first->GetFinalKeyDownDuration() < second->GetFinalKeyDownDuration());
+}
+
 napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonitorInfo* event,
     std::shared_ptr<KeyOption> keyOption)
 {
