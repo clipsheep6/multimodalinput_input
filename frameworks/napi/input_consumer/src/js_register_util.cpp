@@ -168,6 +168,7 @@ int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks, KeyEventMoni
         }
     }
     it->second.push_back(event);
+    MMI_HILOGD("size is %{puiblic}d", it->second.size());
     return JS_CALLBACK_EVENT_SUCCESS;
 }
 
