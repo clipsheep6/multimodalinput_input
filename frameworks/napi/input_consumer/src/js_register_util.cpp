@@ -336,7 +336,6 @@ void EmitAsyncCallbackWork(std::list<KeyEventMonitorInfo *>& reportEvents, std::
     {
         std::lock_guard<std::mutex> guard(mutex);
         anrTask.emplace(taskId, reportEvents.size());
-        taskId++;
         MMI_HILOGD("mxh11111111111111111111, taskid is : %{public}d, times is %{public}d,  map size is %{public}d", taskId, reportEvents.size(), anrTask.size());
     }
     for (auto item : reportEvents) {
@@ -360,7 +359,7 @@ void EmitAsyncCallbackWork(std::list<KeyEventMonitorInfo *>& reportEvents, std::
             delete work;
         }
     }
-    
+    taskId++;
 }
 } // namespace MMI
 } // namespace OHOS
