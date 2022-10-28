@@ -29,7 +29,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSReg
 } // namespace
 int32_t GetNamedPropertyBool(const napi_env& env, const napi_value& object, const std::string& name, bool& ret)
 {
-    napi_value napiValue = {};
+    napi_value napiValue = nullptr;
     CHKRF(env, napi_get_named_property(env, object, name.c_str(), &napiValue), GET_NAMED_PROPERTY);
     if (napiValue == nullptr) {
         MMI_HILOGE("The value is null");
@@ -49,7 +49,7 @@ int32_t GetNamedPropertyBool(const napi_env& env, const napi_value& object, cons
 
 int32_t GetNamedPropertyInt32(const napi_env& env, const napi_value& object, const std::string& name, int32_t& ret)
 {
-    napi_value napiValue = {};
+    napi_value napiValue = nullptr;
     if (napi_get_named_property(env, object, name.c_str(), &napiValue) != napi_ok) {
         MMI_HILOGE("Call napi_get_named_property failed");
         return RET_ERR;
