@@ -62,6 +62,7 @@ bool operator<(std::shared_ptr<KeyOption> &first, std::shared_ptr<KeyOption> &se
             return true;
         }
     }
+    MMI_HILOGD("11111111111111111");
     return (first->GetFinalKeyDownDuration() < second->GetFinalKeyDownDuration());
 }
 

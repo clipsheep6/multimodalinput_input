@@ -33,6 +33,37 @@ static std::map<int32_t, int32_t> anrTask = {};
 std::mutex mutex;
 } // namespace
 
+bool operator<(std::shared_ptr<KeyOption> &first, std::shared_ptr<KeyOption> &second)
+{
+    CALL_DEBUG_ENTER;
+    if (first->GetFinalKey() != second->GetFinalKey()) {
+        return (first->GetFinalKey() < second->GetFinalKey());
+    }
+    const std::set<int32_t> sPrekeys { first->GetPreKeys() };
+    const std::set<int32_t> tPrekeys { second->GetPreKeys() };
+    std::set<int32_t>::const_iterator sIter = sPrekeys.cbegin();
+    std::set<int32_t>::const_iterator tIter = tPrekeys.cbegin();
+    for (; sIter != sPrekeys.cend() && tIter != tPrekeys.cend(); ++sIter, ++tIter) {
+        if (*sIter != *tIter) {
+            return (*sIter < *tIter);
+        }
+    }
+    if (sIter != sPrekeys.cend() || tIter != tPrekeys.cend()) {
+        return (tIter != tPrekeys.cend());
+    }
+    if (first->IsFinalKeyDown()) {
+        if (!second->IsFinalKeyDown()) {
+            return false;
+        }
+    } else {
+        if (second->IsFinalKeyDown()) {
+            return true;
+        }
+    }
+    MMI_HILOGD("11111111111111111");
+    return (first->GetFinalKeyDownDuration() < second->GetFinalKeyDownDuration());
+}
+
 void SetNamedProperty(const napi_env &env, napi_value &object, const std::string &name, int32_t value)
 {
     MMI_HILOGD("%{public}s=%{public}d", name.c_str(), value);
@@ -168,7 +199,7 @@ int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks, KeyEventMoni
         }
     }
     it->second.push_back(event);
-    MMI_HILOGD("size is %{puiblic}d", it->second.size());
+    MMI_HILOGD("size is %{public}d", it->second.size());
     return JS_CALLBACK_EVENT_SUCCESS;
 }
 

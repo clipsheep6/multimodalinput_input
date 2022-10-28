@@ -36,6 +36,7 @@ int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks,
 int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks,
     KeyEventMonitorInfo *event, int32_t &subscribeId);
 void EmitAsyncCallbackWork(std::list<KeyEventMonitorInfo *>& reportEvents, std::shared_ptr<KeyEvent> keyEvent);
+bool operator<(std::shared_ptr<KeyOption> &first, std::shared_ptr<KeyOption> &second);
 } // namespace MMI
 } // namespace OHOS
 #endif // JS_REGISTER_UTIL_H
