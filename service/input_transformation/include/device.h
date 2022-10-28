@@ -98,14 +98,11 @@ private:
     void ReadEvents();
     int32_t CloseDevice();
     int32_t UpdateCapablility();
-    // int32_t UpdateInputProperty();
-    int32_t UpdateBitStat(int32_t evType, int32_t maxValue, unsigned long* resultValue, size_t len);
     bool TestBit(int32_t bitIndex, const unsigned long* bitMap, size_t count) const;
     bool HasInputProperty(int32_t property);
     bool HasMouseCapability();
     bool HasKeyboardCapability();
     bool HasTouchscreenCapability();
-    bool HasTouchpadCapability();
 
     bool HasEventType(int32_t evType) const;
     bool HasEventCode(int32_t evType, int32_t evCode) const;
@@ -123,7 +120,6 @@ private:
 private:
     const int32_t id_;
     const std::shared_ptr<IInputContext> context_;
-    // int32_t fd_;
     std::string name_;
     int32_t deviceId_;
     InputDimensionInfo dimensionInfoX_;
@@ -135,7 +131,7 @@ private:
     unsigned long relBit[LongsOfBits(REL_MAX)];
     unsigned long absBit[LongsOfBits(ABS_MAX)];
     AbsEventCollector absEventCollector_;
-    mtdev* mtdev_;
+    mtdev* mtdev_ {nullptr};
 
     mutable std::map<int32_t, std::shared_ptr<IInputDevice::AxisInfo>> axises_;
 

@@ -45,8 +45,10 @@ int32_t Device::Init()
         MMI_HILOGE("Leave device Init, UpdateCapablility Failed");
         return -1;
     }
+    if (HasCapability(IInputDevice::CAPABILITY_TOUCHSCREEN)) {
+        mtdev_ = mmi_mtdev_new_open();
+    }
 
-    mtdev_ = mmi_mtdev_new_open();
     return 0;
 }
 
@@ -109,19 +111,13 @@ std::shared_ptr<IInputDevice::AxisInfo> Device::GetAxisInfo(int32_t axis) const
             return nullptr;
     }
 
-    // if (!HasEventCode(EV_ABS, absCode)) {
-    //     MMI_HILOGE("Leave device:%{public}s axis:%{public}s, absCode:%{public}s, InputDevice Not support axis", GetName().c_str(), IInputDevice::AxisToString(axis),
-    //             EnumUtils::InputEventAbsCodeToString(absCode));
-    //     return nullptr;
-    // }
-
     auto axisInfo = std::make_shared<IInputDevice::AxisInfo>();
     axisInfo->SetAxis(axis);
     axisInfo->SetMinimum(dimensionInfo.min);
     axisInfo->SetMaximum(dimensionInfo.max);
     axisInfo->SetFlat(dimensionInfo.flat);
     axisInfo->SetFuzz(dimensionInfo.fuzz);
-    // axisInfo->SetResolution();
+    // axisInfo->SetResolution();  //TO DO:...
 
     axises_[axis] = axisInfo;
     return axisInfo;
@@ -146,15 +142,18 @@ int32_t Device::CloseDevice()
 void Device::ProcessEventItem(const struct input_event* eventItem)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(mtdev_);
-    mtdev_put_event(mtdev_, eventItem);
-    if (EventIsCode(eventItem, EV_SYN, SYN_REPORT)) {
-        while (!mtdev_empty(mtdev_)) {
-            struct input_event e;
-            mtdev_get_event(mtdev_, &e);
-            ProcessEvent(&e);
+    if (mtdev_ == nullptr) {
+        ProcessEvent(eventItem);
+    } else {
+        mtdev_put_event(mtdev_, eventItem);
+        if (EventIsCode(eventItem, EV_SYN, SYN_REPORT)) {
+            while (!mtdev_empty(mtdev_)) {
+               struct input_event e;
+               mtdev_get_event(mtdev_, &e);
+               ProcessEvent(&e);
+            }
         }
-    }    
+    }
 }
 
 void Device::ProcessEvent(const struct input_event* eventItem)
@@ -189,99 +188,16 @@ void Device::ProcessEvent(const struct input_event* eventItem)
 int32_t Device::UpdateCapablility()
 {
     CALL_DEBUG_ENTER;
-    // auto retCode = UpdateInputProperty();
-    // if (retCode < 0) {
-    //     return -1;
-    // }
-
-    // auto retCode = UpdateBitStat(0, EV_MAX, &evBit[0], LENTH_OF_ARRAY(evBit));
-    // if (retCode < 0) {
-    //     MMI_HILOGD("UpdateBitStat 0");
-    //     return -1;
-    // }
-
-    // retCode = UpdateBitStat(EV_REL, REL_MAX, &relBit[0], LENTH_OF_ARRAY(relBit));
-    // if (retCode < 0) {
-    //     MMI_HILOGD("UpdateBitStat EV_REL");
-    //     return -1;
-    // }
-
-    // retCode = UpdateBitStat(EV_ABS, ABS_MAX, &absBit[0], LENTH_OF_ARRAY(absBit));
-    // if (retCode < 0) {
-    //     MMI_HILOGD("UpdateBitStat EV_ABS");
-    //     return -1;
-    // }
-
     if (HasMouseCapability()) {
         capabilities_ |= IInputDevice::CAPABILITY_MOUSE;
     }
-
     if (HasKeyboardCapability()) {
         capabilities_ |= IInputDevice::CAPABILITY_KEYBOARD;
     }
-
     if (HasTouchscreenCapability()) {
-        MMI_HILOGD("HasTouchscreenCapability");
         capabilities_ |= IInputDevice::CAPABILITY_TOUCHSCREEN;
         absEventCollector_.SetSourceType(AbsEvent::SOURCE_TYPE_TOUCHSCREEN);
-    } else {
-        MMI_HILOGD("!HasTouchscreenCapability");
     }
-
-    // if (HasTouchpadCapability()) {
-    //     capabilities_ |= IInputDevice::CAPABILITY_TOUCHPAD;
-    //     absEventCollector_.SetSourceType(AbsEvent::SOURCE_TYPE_TOUCHPAD);
-    //     // capabilities_ |= IInputDevice::CAPABILITY_TOUCHSCREEN;
-    //     // absEventCollector_.SetSourceType(AbsEvent::SOURCE_TYPE_TOUCHSCREEN);
-    // }
-
-    return 0;
-}
-
-// int32_t Device::UpdateInputProperty()
-// {
-//     auto ret = ioctl(fd_, EVIOCGPROP(sizeof(inputProperty)), &inputProperty[0]);
-//     if (ret < 0) {
-//         return -1;
-//     }
-
-//     for (int32_t property = 0; property <= INPUT_PROP_MAX; ++property) {
-//         bool has = HasInputProperty(property);
-//         MMI_HILOGD("InputDevice(Name:%{public}s) %{public}s Property:%{public}s",  GetName().c_str(),
-//                 has ? "has" : "hasn't", 
-//                 EnumUtils::InputPropertyToString(property));
-//     }
-//     return 0;
-// }
-
-int32_t Device::UpdateBitStat(int32_t evType, int32_t maxValue, unsigned long* resultValue, size_t len)
-{
-    // auto ret = ioctl(fd_, EVIOCGBIT(evType, maxValue), resultValue);
-    // if (ret < 0) {
-    //     MMI_HILOGE("Leave, Failed for %{public}s", EnumUtils::InputEventTypeToString(evType));
-    //     return -1;
-    // }
-
-    /*
-        std::stringstream debugStr;
-        debugStr << EnumUtils::InputEventTypeToString(evType) << " : ";
-        for (auto i = len; i > 0; --i) {
-        debugStr << std::hex << std::setw(16) << std::setfill('0') << resultValue[i-1];
-        }
-        debugStr << "[END]";
-        MMI_HILOGD("Device:%{public}s BITSTAT:%{public}s", GetName(), debugStr.str());
-        */
-
-    const char* typeStr = "";
-    if (evType != 0) {
-        typeStr = EnumUtils::InputEventTypeToString(evType);
-    }
-
-    // for (int32_t item = 0; item <= maxValue; ++item) {
-    //     const char* has = TestBit(item, resultValue, len) ? "has" : "hasn't";
-    //     const char* valueStr = (evType == 0 ? EnumUtils::InputEventTypeToString(item) : EnumUtils::InputEventCodeToString(evType, item));
-    // }
-
     return 0;
 }
 
@@ -336,19 +252,6 @@ bool Device::HasTouchscreenCapability()
     return true;
 }
 
-bool Device::HasTouchpadCapability()
-{
-    if (!HasEventType(EV_ABS)) {
-        return false;
-    }
-
-    // if (!HasInputProperty(INPUT_PROP_POINTER)) {
-    //     return false;
-    // }
-
-    return true;
-}
-
 bool Device::HasEventType(int32_t evType) const
 {
     return TestBit(evType, &evBit[0], LENTH_OF_ARRAY(evBit));
@@ -384,7 +287,6 @@ void Device::ProcessAbsEvent(int32_t code, int32_t value)
 {
     const auto& event = absEventCollector_.HandleAbsEvent(code, value);
     if (event) {
-        // OnEventCollected(event);
         absEventCollector_.AfterProcessed();
     }
 }

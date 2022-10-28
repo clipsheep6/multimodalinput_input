@@ -36,7 +36,6 @@ public:
     void AfterProcessed();
 
     int32_t SetSourceType(int32_t sourceType);
-    void SetAction(int32_t action);
 
 protected:
     const std::shared_ptr<AbsEvent>& HandleMtSlot(int32_t value);

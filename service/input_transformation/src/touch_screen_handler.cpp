@@ -125,7 +125,7 @@ void TouchScreenHandler::OnInputEvent(const std::shared_ptr<const AbsEvent>& eve
     auto curSlot = event->GetCurSlot();
     auto action = event->GetAction();
     auto absEventPointer = event->GetPointer();
-    MMI_HILOGE("OnInputEvent, CurSlot = %{public}d, Action = %{public}d, x = %{public}d, y = %{public}d",
+    MMI_HILOGD("OnInputEvent, CurSlot = %{public}d, Action = %{public}d, x = %{public}d, y = %{public}d",
     curSlot, action, absEventPointer->GetX(), absEventPointer->GetY());
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPV(inputEventNormalizeHandler);   
@@ -267,10 +267,10 @@ void TouchScreenHandler::GetPhysicalDisplayCoord(const std::shared_ptr<const Abs
     }
     touchInfo.point.x = physicalDisplayX;
     touchInfo.point.y = physicalDisplayY;
-    touchInfo.toolRect.point.x = 0;   //static_cast<int32_t>(libinput_event_touch_get_tool_x_transformed(touch, info.width));
-    touchInfo.toolRect.point.y = 0;   //static_cast<int32_t>(libinput_event_touch_get_tool_y_transformed(touch, info.height));
-    touchInfo.toolRect.width = 0; //static_cast<int32_t>(libinput_event_touch_get_tool_width_transformed(touch, info.width));
-    touchInfo.toolRect.height = 0;  //static_cast<int32_t>(libinput_event_touch_get_tool_height_transformed(touch, info.height));
+    touchInfo.toolRect.point.x = 0;   //TO DO...
+    touchInfo.toolRect.point.y = 0;   //TO DO...
+    touchInfo.toolRect.width = 0;     //TO DO...
+    touchInfo.toolRect.height = 0;    //TO DO...
 }
 
 bool TouchScreenHandler::TouchPointToDisplayPoint(int32_t deviceId, const std::shared_ptr<const AbsEvent>& absEvent,
@@ -315,14 +315,14 @@ bool TouchScreenHandler::OnEventTouchDown(const std::shared_ptr<const AbsEvent>&
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
 
     PointerEvent::PointerItem item;
-    double pressure = 0;//TO DO ...
+    double pressure = 0;    //TO DO ...
     int32_t seatSlot = absEvent->GetCurSlot();
-    int32_t longAxis = 0;//TO DO ...
-    int32_t shortAxis = 0;//TO DO ...
+    int32_t longAxis = 0;   //TO DO ...
+    int32_t shortAxis = 0;  //TO DO ...
     item.SetPressure(pressure);
     item.SetLongAxis(longAxis);
     item.SetShortAxis(shortAxis);
-    int32_t toolType = 0;  //TO DO ... GetTouchToolType(touch, device);
+    int32_t toolType = 0;   //TO DO ...
     item.SetToolType(toolType);
     item.SetPointerId(seatSlot);
     item.SetDownTime(time);
@@ -380,9 +380,9 @@ bool TouchScreenHandler::OnEventTouchMotion(const std::shared_ptr<const AbsEvent
         MMI_HILOGE("Get pointer parameter failed");
         return false;
     }
-    double pressure = 0;    //TO DO... libinput_event_touch_get_pressure(touch);
-    int32_t longAxis = 0;    //TO DO... libinput_event_get_touch_contact_long_axis(touch);
-    int32_t shortAxis = 0;   //TO DO... libinput_event_get_touch_contact_short_axis(touch);
+    double pressure = 0;     //TO DO...
+    int32_t longAxis = 0;    //TO DO...
+    int32_t shortAxis = 0;   //TO DO...
     item.SetPressure(pressure);
     item.SetLongAxis(longAxis);
     item.SetShortAxis(shortAxis);

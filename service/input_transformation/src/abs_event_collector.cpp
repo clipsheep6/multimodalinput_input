@@ -96,10 +96,6 @@ int32_t AbsEventCollector::SetSourceType(int32_t sourceType)
     return 0;
 }
 
-void AbsEventCollector::SetAction(int32_t action) {
-    // absEventAction_ = action;
-}
-
 std::shared_ptr<AbsEvent::Pointer> AbsEventCollector::GetCurrentPointer(bool createIfNotExist)
 {
     if (curSlot_ < 0) {
@@ -155,8 +151,6 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::FinishPointer()
         //         MMI_HILOGE("Leave, absAction:%{public}s AddPointer Failed", AbsEvent::ActionToString(action));
         //         return AbsEvent::NULL_VALUE;
         //     }
-        //     curPointer_->SetDownTime(nowTime);
-        //     // action = AbsEvent::ACTION_DOWN;
         // }
     } else if (action == AbsEvent::ACTION_UP) {
         if (curPointer_->GetId() < 0) {
@@ -182,7 +176,6 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleMtSlot(int32_t value)
     if (curSlot_ == value) {
         return AbsEvent::NULL_VALUE;
     }
-    // const auto& absEvent = FinishPointer();
     curSlot_ = value;
     curPointer_ = AbsEvent::Pointer::NULL_VALUE;
     absEventAction_ = AbsEvent::ACTION_NONE;
