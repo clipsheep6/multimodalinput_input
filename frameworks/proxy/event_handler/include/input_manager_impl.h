@@ -109,7 +109,7 @@ public:
     int32_t StopDeviceCooperate(std::function<void(std::string, CooperationMessage)> callback);
     int32_t GetInputDeviceCooperateState(const std::string &deviceId, std::function<void(bool)> callback);
     int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
-    bool GetFunctionKeyState(int32_t funcKey);
+    int32_t GetFunctionKeyState(int32_t funcKey, bool &state);
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
 
 private:

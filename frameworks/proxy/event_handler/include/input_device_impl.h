@@ -53,6 +53,8 @@ public:
     int32_t GetInputDeviceAsync(int32_t deviceId, FunInputDevInfo callback);
     int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> keyCodes, FunInputDevKeys callback);
     int32_t GetKeyboardType(int32_t deviceId, FunKeyboardTypes callback);
+    int32_t GetFunctionKeyState(int32_t funcKey, bool &state);
+    int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
     void OnInputDevice(int32_t userData, std::shared_ptr<InputDevice> devData);
     void OnInputDeviceIds(int32_t userData, std::vector<int32_t> &ids);
     void OnSupportKeys(int32_t userData, std::vector<bool> &keystrokeAbility);

@@ -385,10 +385,10 @@ public:
      * NUM_LOCK_FUNCTION_KEY
      * CAPS_LOCK_FUNCTION_KEY
      * SCROLL_LOCK_FUNCTION_KEY。
-     * @return 返回功能按键的使能状态，true表示功能按键使能，
-     * false表示功能按键未使能。
+     * @param state 需要获取的功能按键的使能状态
+     * @return 0 表示获取成功，其他值表示获取失败。
      */
-    bool GetFunctionKeyState(int32_t funcKey);
+    int32_t GetFunctionKeyState(int32_t funcKey, bool &state);
 
     /**
      * @brief 设置键盘设备指定功能按键的使能状态。

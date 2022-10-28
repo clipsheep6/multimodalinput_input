@@ -103,6 +103,12 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
 int32_t ServerMsgHandler::OnGetFunctionKeyState(int32_t funcKey, bool &state)
 {
     CALL_INFO_TRACE;
+    if (funcKey != KeyEvent::NUM_LOCK_FUNCTION_KEY &&
+        funcKey != KeyEvent::CAPS_LOCK_FUNCTION_KEY &&
+        funcKey != KeyEvent::SCROLL_LOCK_FUNCTION_KEY) {
+        MMI_HILOGW("This feature button is not currently supported");
+        return ERROR_UNSUPPORT;
+    }
     const auto &keyEvent = KeyEventHdr->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     state = keyEvent->GetFunctionKey(funcKey);
@@ -113,6 +119,12 @@ int32_t ServerMsgHandler::OnGetFunctionKeyState(int32_t funcKey, bool &state)
 int32_t ServerMsgHandler::OnSetFunctionKeyState(int32_t funcKey, bool enable)
 {
     CALL_INFO_TRACE;
+    if (funcKey != KeyEvent::NUM_LOCK_FUNCTION_KEY &&
+        funcKey != KeyEvent::CAPS_LOCK_FUNCTION_KEY &&
+        funcKey != KeyEvent::SCROLL_LOCK_FUNCTION_KEY) {
+        MMI_HILOGW("This feature button is not currently supported");
+        return ERROR_UNSUPPORT;
+    }
     auto device = InputDevMgr->GetKeyboardDevice();
     CHKPR(device, ERROR_NULL_POINTER);
     if (LibinputAdapter::DeviceLedUpdate(device, funcKey, enable) != RET_OK) {

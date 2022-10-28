@@ -108,6 +108,7 @@ int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_p
 
 void KeyEventNormalize::ResetKeyEvent(struct libinput_device* device)
 {
+    CHKPV(device);
     if (InputDevMgr->IsKeyboardDevice(device) || InputDevMgr->IsPointerDevice(device)) {
         if (keyEvent_ == nullptr) {
             keyEvent_ = KeyEvent::Create();

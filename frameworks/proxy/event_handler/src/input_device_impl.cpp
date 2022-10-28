@@ -172,6 +172,42 @@ int32_t InputDeviceImpl::GetKeyboardType(int32_t deviceId, FunKeyboardTypes call
     return MultimodalInputConnMgr->GetKeyboardType(userData_++, deviceId);
 }
 
+int32_t InputDeviceImpl::GetFunctionKeyState(int32_t funcKey, bool &state)
+{
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->GetFunctionKeyState(funcKey, state);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
+    } else {
+        userData_++;
+    }
+    return ret;
+#else
+    MMI_HILOGW("Keyboard device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+}
+
+int32_t InputDeviceImpl::SetFunctionKeyState(int32_t funcKey, bool enable)
+{
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->SetFunctionKeyState(funcKey, enable);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
+    } else {
+        userData_++;
+    }
+    return ret;
+#else
+    MMI_HILOGW("Keyboard device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+}
+
 void InputDeviceImpl::OnInputDevice(int32_t userData, std::shared_ptr<InputDevice> devData)
 {
     CALL_DEBUG_ENTER;

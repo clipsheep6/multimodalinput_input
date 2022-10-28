@@ -124,6 +124,29 @@ napi_value JsInputDeviceManager::GetDeviceInfo(napi_env env, int32_t id, napi_va
     return ret;
 }
 
+napi_value JsInputDeviceManager::GetFunctionKeyState(napi_env env, int32_t funcKey, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    int32_t userData = InputDevImpl.GetUserData();
+    napi_value ret = CreateCallbackInfo(env, handle, userData);
+    bool state { false };
+    int32_t errCode = InputManager::GetInstance()->GetFunctionKeyState(funcKey, state);
+    EmitJsGetFunctionKeyState(userData, errCode, state);
+    return ret;
+}
+
+napi_value JsInputDeviceManager::SetFunctionKeyState(napi_env env, int32_t funcKey, bool state, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    int32_t userData = InputDevImpl.GetUserData();
+    napi_value ret = CreateCallbackInfo(env, handle, userData);
+    int32_t errCode = InputManager::GetInstance()->SetFunctionKeyState(funcKey, state);
+    EmitJsSetFunctionKeyState(userData, errCode);
+    return ret;
+}
+
 void JsInputDeviceManager::ResetEnv()
 {
     CALL_DEBUG_ENTER;

@@ -38,6 +38,7 @@ public:
         std::vector<bool> keystrokeAbility;
         int32_t deviceId { 0 };
         int32_t keyboardType { 0 };
+        bool funcKeyState { false };
     };
     struct CallbackInfo {
         napi_env env { nullptr };

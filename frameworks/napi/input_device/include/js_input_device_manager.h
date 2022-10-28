@@ -33,6 +33,8 @@ public:
     napi_value SupportKeys(napi_env env, int32_t id, std::vector<int32_t> &keyCodes,
                                    napi_value handle = nullptr);
     napi_value GetKeyboardType(napi_env env, int32_t id, napi_value handle = nullptr);
+    napi_value GetFunctionKeyState(napi_env env, int32_t funcKey, napi_value handle = nullptr);
+    napi_value SetFunctionKeyState(napi_env env, int32_t funcKey, bool state, napi_value handle = nullptr);
     void RegisterDevListener(napi_env env, const std::string &type, napi_value handle);
     void UnregisterDevListener(napi_env env, const std::string &type, napi_value handle = nullptr);
     napi_value GetDeviceList(napi_env env, napi_value handle = nullptr);
