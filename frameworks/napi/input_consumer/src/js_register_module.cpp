@@ -201,7 +201,7 @@ static void SubKeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
                 return;
             }
             EmitAsyncCallbackWork(item.second, keyEvent);
-            MMI_HILOGD("size is %{public}d", item.second);
+            MMI_HILOGD("size is %{public}d", item.second.size());
             break;
         }
     }
