@@ -34,7 +34,7 @@ UDSSocket::~UDSSocket()
     EpollClose();
 }
 
-int32_t UDSSocket::EpollCreat(int32_t size)
+int32_t UDSSocket::EpollCreate(int32_t size)
 {
     epollFd_ = epoll_create(size);
     if (epollFd_ < 0) {
@@ -110,6 +110,7 @@ int32_t UDSSocket::SetNonBlockMode(int32_t fd, bool isNonBlock)
     if (flags < 0) {
         MMI_HILOGE("fcntl F_SETFL fail. fd:%{public}d,flags:%{public}d,errno:%{public}d,errCode:%{public}d",
             fd, flags, errno, FCNTL_FAIL);
+        close(fd);
         return flags;
     }
     MMI_HILOGI("F_SETFL fd:%{public}d,flags:%{public}d", fd, flags);

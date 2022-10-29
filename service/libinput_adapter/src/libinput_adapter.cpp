@@ -97,7 +97,9 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
     .close_restricted = [](int32_t fd, void *user_data)
     {
         MMI_HILOGI("Libinput .close_restricted fd:%{public}d", fd);
-        close(fd);
+        if (fd >= 0) {
+            close(fd);
+        }
     },
 };
 
@@ -194,7 +196,8 @@ void LibinputAdapter::RetriggerHotplugEvents()
         MMI_HILOGE("Failed to open directory: \'/sys/class/input\'");
         return;
     }
-    for (struct dirent *pdirent = readdir(pdir); pdirent != nullptr; pdirent = readdir(pdir)) {
+    struct dirent *pdirent = nullptr;
+    while ((pdirent = readdir(pdir)) != nullptr) {
         char path[PATH_MAX];
         if (sprintf_s(path, sizeof(path), "/sys/class/input/%s/uevent", pdirent->d_name) < 0) {
             continue;
