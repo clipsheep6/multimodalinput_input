@@ -30,24 +30,23 @@ bool Phalangeal_Joint_ { false } ;
 void Touch2KeyHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     keyEvent_ = keyEvent;
-    cmd = PluginDispatchCmd::GOTO_NEXT;
+    cmd = PluginDispatchCmd::REDIRECT;
     EventType = PluginDispatchEventType::KEY_EVENT;
 }
 
 void Touch2KeyHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     pointevent_ = pointerEvent;
-    cmd = PluginDispatchCmd::GOTO_NEXT;
+    cmd = PluginDispatchCmd::REDIRECT;
     EventType = PluginDispatchEventType::POINT_EVENT;
 }
 
 void Touch2KeyHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     pointevent_ = pointerEvent;
-    cmd = PluginDispatchCmd::GOTO_NEXT;
+    cmd = PluginDispatchCmd::REDIRECT;
     EventType = PluginDispatchEventType::TOUCH_EVENT;
     if (Phalangeal_Joint_) {
-
         std::vector<int32_t> pointerIds { pointevent_->GetPointerIds() };
         for (const auto& pointerId : pointerIds) {
             PointerEvent::PointerItem item;
@@ -55,12 +54,54 @@ void Touch2KeyHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> poin
                 MMI_HILOGE("Invalid pointer: %{public}d.", pointerId);
                 return;
             }
+            std::string type = pointevent_->DumpPointerAction();
             if (item.GetDisplayY() < 300 &&  item.GetDisplayY() > 200) {
-                item.SetDisplayY(1280 - item.GetDisplayY());
-                item.SetWindowY(1280 - item.GetWindowY());
-                pointevent_->UpdatePointerItem(pointerId, item);
+                if (type == "down") {
+                    keyEvent_ = KeyEvent::Create();
+                    KeyEvent::KeyItem item;
+                    keyEvent_->SetKeyCode(2017);
+                    keyEvent_->SetActionTime(pointerEvent->GetActionTime());
+                    keyEvent_->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+                    item.SetKeyCode(2017);
+                    item.SetDownTime(pointerEvent->GetActionStartTime());
+                    item.SetPressed(true);
+                    keyEvent_->AddKeyItem(item);
+                    MMI_HILOGE("1111111111111111111111111111111111111KEY_ACTION_DOWN");
+                    EventType = PluginDispatchEventType::KEY_EVENT;
+                } else if (type == "up") {
+                    keyEvent_ = KeyEvent::Create();
+                    KeyEvent::KeyItem item;
+                    keyEvent_->SetKeyCode(2017);
+                    keyEvent_->SetActionTime(pointerEvent->GetActionTime());
+                    keyEvent_->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+                    item.SetKeyCode(2017);
+                    item.SetDownTime(pointerEvent->GetActionStartTime());
+                    item.SetPressed(true);
+                    keyEvent_->AddKeyItem(item);
+                    MMI_HILOGE("1111111111111111111111111111111111111KEY_ACTION_UP");
+                    EventType = PluginDispatchEventType::KEY_EVENT;
+                } else {
+                    MMI_HILOGE("1111111111111111111111111111111111111111111111111PointerAction:%{public}d", pointerEvent->GetAction());
+                     
+                }
             }
         }
+        
+        
+
+        // std::vector<int32_t> pointerIds { pointevent_->GetPointerIds() };
+        // for (const auto& pointerId : pointerIds) {
+        //     PointerEvent::PointerItem item;
+        //     if (!pointevent_->GetPointerItem(pointerId, item)) {
+        //         MMI_HILOGE("Invalid pointer: %{public}d.", pointerId);
+        //         return;
+        //     }
+        //     if (item.GetDisplayY() < 300 &&  item.GetDisplayY() > 200) {
+        //         item.SetDisplayY(1280 - item.GetDisplayY());
+        //         item.SetWindowY(1280 - item.GetWindowY());
+        //         pointevent_->UpdatePointerItem(pointerId, item);
+        //     }
+        // }
         MMI_HILOGE("EventType:%{public}s,ActionTime:%{public}" PRId64 ",Action:%{public}d,"
                 "ActionStartTime:%{public}" PRId64 ",Flag:%{public}d,PointerAction:%{public}s,"
                 "SourceType:%{public}s,ButtonId:%{public}d,VerticalAxisValue:%{public}.2f,"

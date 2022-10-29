@@ -30,7 +30,7 @@ typedef struct {
 } PluginInfo;
 
 enum class PluginDispatchCmd {
-    GOTO_NEXT,
+    // GOTO_NEXT,
     REDIRECT,
     DISCARD
 };

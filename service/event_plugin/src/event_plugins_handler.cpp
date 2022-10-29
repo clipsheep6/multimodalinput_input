@@ -58,6 +58,7 @@ int32_t EventPluginsHandler::ScanPlugins()
                 MMI_HILOGE("load plugin failed, soname:%{public}s, ret:%{public}d. retClose:%{public}d", p->d_name, ret, retClose);
                 continue;
             }
+            openPlugins_.push_back(handle);
         }
         auto ret = closedir(dir);
         if (ret != 0) {
@@ -66,61 +67,24 @@ int32_t EventPluginsHandler::ScanPlugins()
         auto cur1 = pluginInfos_.begin();
         for (auto cur = pluginInfos_.begin(); cur != pluginInfos_.end(); cur++) {
                 (*cur1)->handler->SetNext((*cur)->handler);
-                MMI_HILOGE("1010101010101010101010101");
                 cur1 = cur;
         }
-        // auto cur = pluginInfos_.begin();
-
-        // MMI_HILOGE("66666666666666666666666666");
-        // while (cur != pluginInfos_.end()) {
-        //     MMI_HILOGE("777777777777777777777777777777777");
-        //     auto next = cur++;
-        //     MMI_HILOGE("88888888888888888888888888888888888");
-        //     if (next != pluginInfos_.end()) {
-        //         MMI_HILOGE("9999999999999999999999999999999");
-        //         SetNext((*next)->handler);
-        //         MMI_HILOGE("1010101010101010101010101");
-        //     }
-        //     MMI_HILOGE("12121212121212121212221222112121212");
-        //     cur = next;
-        // }
-
         return RET_OK;
 }
 
 int32_t EventPluginsHandler::UnloadPlugins()
 {
-    for (auto iter = pluginInfos_.begin(); iter != pluginInfos_.end(); ++iter){
-        //UnloadPlugin(iter->second);
-        //dlclose(iter->second);
+    if (openPlugins_.empty()) {
+        return RET_OK;
+    }
+    for (auto iter = openPlugins_.begin(); iter != openPlugins_.end(); ++iter){
+        dlclose(*iter);
     }
     pluginInfos_.clear();
+    openPlugins_.clear();
     return RET_OK;
 }
 
-#if 0
-int32_t EventPluginsHandler::UnloadPlugin(void *handle)
-{
-    UnloadPluginFunc* unloadFunc = (LoadPluginFunc*)dlsym(handle, "UnloadPlugin");
-    const char* retError = dlerror();
-    if (retError != nullptr) {
-        MMI_HILOGE("unload plugin failed, error msg:%{public}s", retError);
-        return RET_ERR;
-    }
-    int32_t ret = (*unloadFunc)(*info);
-    if (ret != RET_OK) {
-        MMI_HILOGE("call unload plugin func failed. ret:%{public}d", ret);
-        return RET_ERR;
-    }
-    for (auto it = pluginInfos_.begin(); it != pluginInfos_.end(); ++it) {
-        if ((*it)->priority > info->priority) {
-            (void)pluginInfos_.insert(it, info);
-            break;
-        }
-    }
-    return RET_OK;
-}
-#endif
 
 int32_t EventPluginsHandler::LoadPlugin(void *handle)
 {
@@ -135,7 +99,6 @@ int32_t EventPluginsHandler::LoadPlugin(void *handle)
     info->name = create_plu()->GetPluginInfo().name;
     info->version = create_plu()->GetPluginInfo().version;
     info->priority = create_plu()->GetPluginInfo().priority;
-    MMI_HILOGE("8888888888888888888888888888info->priority is %{public}d ", info->priority);
     if (pluginInfos_.empty()) {
         pluginInfos_.push_front(info);
     } else {
@@ -161,22 +124,18 @@ void EventPluginsHandler::SetNext(std::shared_ptr<IInputEventHandler> nextHandle
     if (pluginInfos_.empty()) {
         return;
     }
-    MMI_HILOGE("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
     pluginInfos_.back()->handler->SetNext(nextHandler);
 }
 
 template<typename T1, typename T2>
-void EventPluginsHandler::HandlePluginEventEx(std::shared_ptr<IInputEventConvertHandler> handler, const std::shared_ptr<T1> event, bool isfast)
+void EventPluginsHandler::HandlePluginEventEx(std::shared_ptr<IInputEventConvertHandler> handler, const std::shared_ptr<T1> event)
 {
-    if (isfast) {
-        handler->SetPluginfunctionStatus(PluginFunctionStatus);
-        handler->HandleEvent<T1, T2>(event);
-    }
-
+    handler->SetPluginfunctionStatus(PluginFunctionStatus);
+    handler->HandleEvent<T1, T2>(event);
     IInputEventConvertHandler::PluginDispatchCmd cmd = handler->GetDispatchCmd();
-    MMI_HILOGE("44444444444444444444444444444444444444444444444 cmd====%{public}d" ,int32_t(cmd));
     auto nextHandler = std::static_pointer_cast<IInputEventConvertHandler>(handler->GetNextHandler());
     switch(cmd) {
+/*
         case IInputEventConvertHandler::PluginDispatchCmd::GOTO_NEXT: {
             MMI_HILOGE("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:::::::%{public}d", nextHandler->GetisPlugin());
             auto newEvent = handler->GetEvent<T1, T2>();
@@ -193,36 +152,28 @@ void EventPluginsHandler::HandlePluginEventEx(std::shared_ptr<IInputEventConvert
             } 
             break;
         }
+*/
         case IInputEventConvertHandler::PluginDispatchCmd::REDIRECT: {
             IInputEventConvertHandler::PluginDispatchEventType eventType = handler->GetDispatchEventType();
-            MMI_HILOGE("999999999999999999999999999999999unsupport eventType: %{public}d", int32_t(eventType));
             if (eventType == IInputEventConvertHandler::PluginDispatchEventType::KEY_EVENT) {
                 auto keyEvent = handler->GetKeyEvent();
                 if (nextHandler->GetisPlugin()) {
-                    MMI_HILOGE("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-                    HandlePluginEventEx<KeyEvent, PluginDispatchKeyEvent>(nextHandler, keyEvent, true);
+                    HandlePluginEventEx<KeyEvent, PluginDispatchKeyEvent>(nextHandler, keyEvent);
                 } else {
-                    nextHandler->SetPluginfunctionStatus(PluginFunctionStatus);
                     nextHandler->HandleEvent<KeyEvent, PluginDispatchKeyEvent>(keyEvent);
                 }
-                //InputHandler->GetEventNormalizeHandler()->HandleKeyEvent(keyEvent);
             } else if (eventType == IInputEventConvertHandler::PluginDispatchEventType::POINT_EVENT) {
                 auto pointEvent = handler->GetPointEvent();
                 if (nextHandler->GetisPlugin()) {
-                    MMI_HILOGE("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-                    HandlePluginEventEx<PointerEvent, PluginDispatchPointEvent>(nextHandler, pointEvent, true);
+                    HandlePluginEventEx<PointerEvent, PluginDispatchPointEvent>(nextHandler, pointEvent);
                 }  else {
-                    nextHandler->SetPluginfunctionStatus(PluginFunctionStatus);
                     nextHandler->HandleEvent<PointerEvent, PluginDispatchPointEvent>(pointEvent);
                 }
-                //InputHandler->GetEventNormalizeHandler()->HandlePointerEvent(pointEvent);
             } else if (eventType == IInputEventConvertHandler::PluginDispatchEventType::TOUCH_EVENT) {
                 auto pointEvent = handler->GetPointEvent();
                 if (nextHandler->GetisPlugin()) {
-                    MMI_HILOGE("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-                    HandlePluginEventEx<PointerEvent, PluginDispatchTouchEvent>(nextHandler, pointEvent, true);
+                    HandlePluginEventEx<PointerEvent, PluginDispatchTouchEvent>(nextHandler, pointEvent);
                 }  else {
-                    nextHandler->SetPluginfunctionStatus(PluginFunctionStatus);
                     nextHandler->HandleEvent<PointerEvent, PluginDispatchTouchEvent>(pointEvent);
                 }
                 // InputHandler->GetEventNormalizeHandler()->HandleTouchEvent(pointEvent);
@@ -245,9 +196,7 @@ void EventPluginsHandler::HandlePluginEvent(const std::shared_ptr<T1> event)
         GetNextHandler()->HandleEvent<T1, T2>(event);
         return;
     }
-
-    auto handler = (*pluginInfos_.begin())->handler;
-    HandlePluginEventEx<T1, T2>(handler, event, true);
+    HandlePluginEventEx<T1, T2>((*pluginInfos_.begin())->handler, event);
 }
 
 EventPluginsHandler::EventPluginsHandler()
@@ -256,7 +205,6 @@ EventPluginsHandler::EventPluginsHandler()
     if (ret != RET_OK) {
         MMI_HILOGE("ScanPlugins failed, ret:%{public}d", ret);
     }
-
 }
 
 void EventPluginsHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> event)
@@ -276,6 +224,17 @@ void EventPluginsHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent>
 void EventPluginsHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> event)
 {
     HandlePluginEvent<PointerEvent, PluginDispatchTouchEvent>(event);
+}
+
+int32_t EventPluginsHandler::SetPhalangealJointStatue(bool joint)
+{
+    PluginFunctionStatus[IInputEventConvertHandler::PluginfunctionId::PHALANGEAL_JOINT] = joint;
+    return RET_OK;
+} 
+
+bool EventPluginsHandler::GetPhalangealJointStatue()
+{
+    return PluginFunctionStatus[IInputEventConvertHandler::PluginfunctionId::PHALANGEAL_JOINT];
 }
 
 } // namespace MMI

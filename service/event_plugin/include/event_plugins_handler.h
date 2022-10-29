@@ -35,15 +35,18 @@ public:
     virtual void HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
     virtual void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent);
     virtual void SetNext(std::shared_ptr<IInputEventHandler> nextHandler);
+    int32_t SetPhalangealJointStatue(bool joint);
+    bool GetPhalangealJointStatue();
 private:
     std::list<IInputEventConvertHandler::PluginInfo *> pluginInfos_;
+    std::list<void *> openPlugins_;
 private:
     int32_t ScanPlugins();
     int32_t UnloadPlugins();
     int32_t LoadPlugin(void *handle);
     void Dump(int32_t fd) {};
     template<typename T1, typename T2>
-    void HandlePluginEventEx(std::shared_ptr<IInputEventConvertHandler> handler, const std::shared_ptr<T1> event, bool isfast);
+    void HandlePluginEventEx(std::shared_ptr<IInputEventConvertHandler> handler, const std::shared_ptr<T1> event);
     template<typename T1, typename T2>
     void HandlePluginEvent(const std::shared_ptr<T1> event);
 };
