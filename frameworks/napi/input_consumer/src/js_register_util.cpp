@@ -16,6 +16,7 @@
 #include "js_register_util.h"
 
 #include <cinttypes>
+#include <map>
 
 #include <uv.h>
 
@@ -28,7 +29,40 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterUtil" };
+static std::map<int32_t, int32_t> anrTask = {};
+std::mutex mutex;
 } // namespace
+
+bool operator<(std::shared_ptr<KeyOption> &first, std::shared_ptr<KeyOption> &second)
+{
+    CALL_DEBUG_ENTER;
+    if (first->GetFinalKey() != second->GetFinalKey()) {
+        return (first->GetFinalKey() < second->GetFinalKey());
+    }
+    const std::set<int32_t> sPrekeys { first->GetPreKeys() };
+    const std::set<int32_t> tPrekeys { second->GetPreKeys() };
+    std::set<int32_t>::const_iterator sIter = sPrekeys.cbegin();
+    std::set<int32_t>::const_iterator tIter = tPrekeys.cbegin();
+    for (; sIter != sPrekeys.cend() && tIter != tPrekeys.cend(); ++sIter, ++tIter) {
+        if (*sIter != *tIter) {
+            return (*sIter < *tIter);
+        }
+    }
+    if (sIter != sPrekeys.cend() || tIter != tPrekeys.cend()) {
+        return (tIter != tPrekeys.cend());
+    }
+    if (first->IsFinalKeyDown()) {
+        if (!second->IsFinalKeyDown()) {
+            return false;
+        }
+    } else {
+        if (second->IsFinalKeyDown()) {
+            return true;
+        }
+    }
+    MMI_HILOGD("11111111111111111");
+    return (first->GetFinalKeyDownDuration() < second->GetFinalKeyDownDuration());
+}
 
 void SetNamedProperty(const napi_env &env, napi_value &object, const std::string &name, int32_t value)
 {
@@ -122,7 +156,7 @@ napi_value GetPreKeys(const napi_env &env, const napi_value &value, std::set<int
 int32_t GetPreSubscribeId(Callbacks &callbacks, KeyEventMonitorInfo *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
-    auto it = callbacks.find(event->eventType);
+    auto it = callbacks.find(event->keyOption);
     if (it == callbacks.end() || it->second.empty()) {
         MMI_HILOGE("The callbacks is empty");
         return JS_CALLBACK_EVENT_FAILED;
@@ -135,9 +169,9 @@ int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks, KeyEventMoni
 {
     CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
-    if (callbacks.find(event->eventType) == callbacks.end()) {
+    if (callbacks.find(event->keyOption) == callbacks.end()) {
         MMI_HILOGD("No callback in %{public}s", event->eventType.c_str());
-        callbacks[event->eventType] = {};
+        callbacks[event->keyOption] = {};
     }
     napi_value handler1 = nullptr;
     napi_status status = napi_get_reference_value(env, event->callback[0], &handler1);
@@ -145,7 +179,7 @@ int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks, KeyEventMoni
         MMI_HILOGE("Handler1 get reference value failed");
         return JS_CALLBACK_EVENT_FAILED;
     }
-    auto it = callbacks.find(event->eventType);
+    auto it = callbacks.find(event->keyOption);
     for (const auto &iter : it->second) {
         napi_value handler2 = nullptr;
         status = napi_get_reference_value(env, (*iter).callback[0], &handler2);
@@ -165,6 +199,7 @@ int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks, KeyEventMoni
         }
     }
     it->second.push_back(event);
+    MMI_HILOGD("size is %{public}d", it->second.size());
     return JS_CALLBACK_EVENT_SUCCESS;
 }
 
@@ -173,11 +208,11 @@ int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks,
 {
     CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
-    if (callbacks.count(event->eventType) <= 0) {
+    if (callbacks.count(event->keyOption) <= 0) {
         MMI_HILOGE("Callback doesn't exists");
         return JS_CALLBACK_EVENT_FAILED;
     }
-    auto &info = callbacks[event->eventType];
+    auto &info = callbacks[event->keyOption];
     MMI_HILOGD("EventType:%{public}s, keyEventMonitorInfos:%{public}zu",
         event->eventType.c_str(), info.size());
     napi_value handler1 = nullptr;
@@ -271,6 +306,7 @@ static void AsyncWorkFn(const napi_env &env, KeyEventMonitorInfo *event, napi_va
 struct KeyEventMonitorInfoWorker {
     napi_env env { nullptr };
     KeyEventMonitorInfo *reportEvent { nullptr };
+    int32_t taskId { 0 };
 };
 
 void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
@@ -289,6 +325,7 @@ void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
     work = nullptr;
     KeyEventMonitorInfo *event = dataWorker->reportEvent;
     napi_env env = dataWorker->env;
+    int32_t taskId = dataWorker->taskId;
     delete dataWorker;
     dataWorker = nullptr;
     CHKPV(event);
@@ -305,28 +342,56 @@ void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
     napi_value callResult = nullptr;
     CHKRV_SCOPE(env, napi_call_function(env, nullptr, callback, 1, &result, &callResult), CALL_FUNCTION, scope);
     napi_close_handle_scope(env, scope);
+    std::lock_guard<std::mutex> guard(mutex);
+    auto it = anrTask.find(taskId);
+    if (it != anrTask.end()) {
+        it->second--;
+        MMI_HILOGD("mxh222222222222, taskid is : %{public}d, times is %{public}d", it->first, it->second);
+        if (it->second == 0) {
+            MMI_HILOGD("mxh33333333, taskid is %{public}d", it->first);
+            auto keyEvent = event->keyEvent;
+            keyEvent->MarkProcessed();
+            anrTask.erase(it);
+        }
+    }
+    MMI_HILOGD("mxh444444444, taskid is : %{public}d", taskId);
 }
 
-void EmitAsyncCallbackWork(KeyEventMonitorInfo *reportEvent)
+void EmitAsyncCallbackWork(std::list<KeyEventMonitorInfo *>& reportEvents, std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(reportEvent);
-    uv_loop_s *loop = nullptr;
-    CHKRV(reportEvent->env, napi_get_uv_event_loop(reportEvent->env, &loop), GET_UV_LOOP);
-    uv_work_t *work = new (std::nothrow) uv_work_t;
-    CHKPV(work);
-    KeyEventMonitorInfoWorker *dataWorker = new (std::nothrow) KeyEventMonitorInfoWorker();
-    CHKPV(dataWorker);
-
-    dataWorker->env = reportEvent->env;
-    dataWorker->reportEvent = reportEvent;
-    work->data = static_cast<void *>(dataWorker);
-
-    int32_t ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, UvQueueWorkAsyncCallback);
-    if (ret != 0) {
-        delete dataWorker;
-        delete work;
+    static int32_t taskId = 0;
+    if (reportEvents.empty()) {
+        MMI_HILOGE("reportEvents is empty");
+        return;
     }
+    {
+        std::lock_guard<std::mutex> guard(mutex);
+        anrTask.emplace(taskId, reportEvents.size());
+        MMI_HILOGD("mxh11111111111111111111, taskid is : %{public}d, times is %{public}d,  map size is %{public}d", taskId, reportEvents.size(), anrTask.size());
+    }
+    for (auto item : reportEvents) {
+        CHKPV(item);
+        item->keyEvent = keyEvent;
+        uv_loop_s *loop = nullptr;
+        CHKRV(item->env, napi_get_uv_event_loop(item->env, &loop), GET_UV_LOOP);
+        uv_work_t *work = new (std::nothrow) uv_work_t;
+        CHKPV(work);
+        KeyEventMonitorInfoWorker *dataWorker = new (std::nothrow) KeyEventMonitorInfoWorker();
+        CHKPV(dataWorker);
+
+        dataWorker->env = item->env;
+        dataWorker->reportEvent = item;
+        dataWorker->taskId = taskId;
+        work->data = static_cast<void *>(dataWorker);
+
+        int32_t ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, UvQueueWorkAsyncCallback);
+        if (ret != 0) {
+            delete dataWorker;
+            delete work;
+        }
+    }
+    taskId++;
 }
 } // namespace MMI
 } // namespace OHOS

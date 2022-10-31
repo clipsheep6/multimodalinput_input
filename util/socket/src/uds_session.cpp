@@ -45,8 +45,10 @@ UDSSession::UDSSession(const std::string &programName, const int32_t moduleType,
     UpdateDescript();
     events_[ANR_DISPATCH] = {};
     events_[ANR_MONITOR] = {};
+    events_[ANR_SUBSCRIBE] = {};
     isAnrProcess_[ANR_DISPATCH] = false;
     isAnrProcess_[ANR_MONITOR] = false;
+    isAnrProcess_[ANR_SUBSCRIBE] = false;
 }
 
 bool UDSSession::SendMsg(const char *buf, size_t size) const
