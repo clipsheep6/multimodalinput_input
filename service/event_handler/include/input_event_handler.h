@@ -29,9 +29,11 @@
 #include "i_input_event_handler.h"
 #include "key_subscriber_handler.h"
 #include "mouse_event_normalize.h"
+#include "i_input_context.h"
 
 namespace OHOS {
 namespace MMI {
+class InputContext;
 using EventFun = std::function<int32_t(libinput_event *event)>;
 using NotifyDeviceChange = std::function<void(int32_t, int32_t, char *)>;
 class InputEventHandler final {
@@ -39,8 +41,14 @@ class InputEventHandler final {
 public:
     DISALLOW_COPY_AND_MOVE(InputEventHandler);
     void Init(UDSServer& udsServer);
-    void OnEvent(void *event);
+    void OnLibinputEvent(void *event);
+#ifdef OHOS_BUILD_HDF
+    void HandleHDFDeviceStatusEvent(const HDFDeviceStatusEvent &event);
+    void HandleHDFDeviceInputEvent(const HDFDeviceInputEvent &event);
+#endif // OHOS_BUILD_HDF
+    void SetContext(std::shared_ptr<IInputContext> context);
     UDSServer *GetUDSServer() const;
+    std::shared_ptr<IInputContext> GetContext() const;
 
     std::shared_ptr<EventNormalizeHandler> GetEventNormalizeHandler() const;
     std::shared_ptr<EventInterceptorHandler> GetInterceptorHandler() const;
@@ -56,6 +64,7 @@ private:
     int32_t BuildInputHandlerChain();
 
     UDSServer *udsServer_ { nullptr };
+    std::shared_ptr<IInputContext> context_ {nullptr};
     std::shared_ptr<EventNormalizeHandler> eventNormalizeHandler_ { nullptr };
     std::shared_ptr<EventFilterHandler> eventFilterHandler_ { nullptr };
     std::shared_ptr<EventInterceptorHandler> eventInterceptorHandler_ { nullptr };

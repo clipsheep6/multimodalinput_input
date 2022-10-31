@@ -31,6 +31,10 @@
 #include "server_msg_handler.h"
 #include "uds_server.h"
 
+#ifdef OHOS_BUILD_HDF
+#include "hdf_adapter.h"
+#endif
+
 namespace OHOS {
 namespace MMI {
 
@@ -122,6 +126,9 @@ protected:
     int32_t OnGetInputDeviceCooperateState(int32_t pid, int32_t userData, const std::string &deviceId);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     bool InitLibinputService();
+#ifdef OHOS_BUILD_HDF
+    bool InitHDFService();
+#endif // OHOS_BUILD_HDF
     bool InitService();
     bool InitSignalHandler();
     bool InitDelegateTasks();
@@ -143,6 +150,7 @@ private:
 #endif
 
     LibinputAdapter libinputAdapter_;
+    HdfAdapter      hdfAdapter_;
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;
 
