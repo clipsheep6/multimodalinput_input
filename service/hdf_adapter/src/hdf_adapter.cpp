@@ -48,8 +48,8 @@ void HdfDeviceStatusChanged(int32_t devIndex, int32_t devType, HdfInputEventDevS
     event.devType = devType;
     event.devStatus = static_cast<uint32_t>(devStatus);
     event.time = GetSysClockTime();
-    MMI_HILOGE("zpc:write:plugin:eventType:%{public}u, devIndex:%{public}u, devType:%{public}u, devStatus:%{public}u,time:%{public}llu",
-        event.eventType, event.devIndex, event.devType, event.devStatus, event.time);
+    MMI_HILOGE("devIndex:%{public}u, devType:%{public}u, devStatus:%{public}u,time:%{public}llu",
+        devIndex, event.devType, event.devStatus, event.time);
     auto ret = write(g_hdfAdapterWriteFd, &event, sizeof(event));
     if (ret == -1) {
         int saveErrno = errno;
@@ -65,6 +65,44 @@ static void HotPlugCallback(const InputHotPlugEvent *event)
     HdfDeviceStatusChanged(event->devIndex, event->devType, devStatus);
 }
 
+static inline bool IsDupTouchBtnKey(const InputEventPackage &r, uint32_t devIndex)
+{
+    if (r.type == EV_KEY && r.code == BTN_TOUCH) {
+        auto it = lastDevInfo.find(devIndex);
+        if (it != lastDevInfo.end() && it->second == r.value) {
+            return true;
+        } else {
+            lastDevInfo.emplace(devIndex, r.value);
+        }
+    }
+    return false;
+}
+
+static inline void WriteToPipe(const InputEventPackage &r, uint32_t devIndex)
+{
+    HdfInputEvent event;
+    event.eventType = static_cast<uint32_t>(HdfInputEventType::DEV_NODE_EVENT);
+    event.devIndex = devIndex;
+    event.type = r.type;
+    event.value = r.value;
+    event.time = r.timestamp;
+    auto f = [&]() {
+        auto ret = write(g_hdfAdapterWriteFd, &event, sizeof(HdfInputEvent));
+        if (ret == -1) {
+            int saveErrno = errno;
+            MMI_HILOGE("Write pipe fail, errno:%{public}d, %{public}s", saveErrno, strerror(saveErrno));
+        }
+    };
+    if ((r.type == 0) && (r.code == 0) && (r.value == 0)) {
+        event.code = SYN_MT_REPORT;
+        f();
+    }
+    event.code = r.code;
+    f();
+    MMI_HILOGD("devIndex:%{public}u,code:%{public}u,type:%{public}u,value:%{public}u,time:%{public}llu,",
+        devIndex, r.code, r.type, r.value, r.timestamp);
+}
+
 static void EventPkgCallback(const InputEventPackage **pkgs, uint32_t count, uint32_t devIndex)
 {
     CHK_PID_AND_TID();
@@ -78,46 +116,11 @@ static void EventPkgCallback(const InputEventPackage **pkgs, uint32_t count, uin
         if (pkgs[i] == nullptr) {
             continue;
         }
-        if ((pkgs[i]->type == 0) && (pkgs[i]->code == 0) && (pkgs[i]->value == 0)) {
-            HdfInputEvent event;
-            event.eventType = static_cast<uint32_t>(HdfInputEventType::DEV_NODE_EVENT);
-            event.devIndex = devIndex;
-            event.code = SYN_MT_REPORT;
-            event.type = 0;
-            event.value = 0;
-            event.time = pkgs[i]->timestamp;
-            auto ret = write(g_hdfAdapterWriteFd, &event, sizeof(HdfInputEvent));
-            if (ret == -1) {
-                int saveErrno = errno;
-                MMI_HILOGE("Write pipe fail, errno:%{public}d, %{public}s", saveErrno, strerror(saveErrno));
-            }
+        const InputEventPackage &r = *pkgs[i];
+        if (IsDupTouchBtnKey(r, devIndex)) {
+            continue;
         }
-        if (pkgs[i]->type == EV_KEY && pkgs[i]->code == BTN_TOUCH) {
-            auto iter = lastDevInfo.find(devIndex);
-            if (iter != lastDevInfo.end() && iter->second == pkgs[i]->value) {
-                continue;
-            } else {
-                lastDevInfo.emplace(devIndex, pkgs[i]->value);
-            }
-        }
-        HdfInputEvent event;
-        event.eventType = static_cast<uint32_t>(HdfInputEventType::DEV_NODE_EVENT);
-        event.devIndex = devIndex;
-        event.code = pkgs[i]->code;
-        event.type = pkgs[i]->type;
-        event.value = pkgs[i]->value;
-        event.time = pkgs[i]->timestamp;
-
-        MMI_HILOGE("zpc:write:event:eventType:%{public}u,devIndex:%{public}u,"
-            "code:%{public}u,type:%{public}u,value:%{public}u,time:%{public}llu,"
-            "count:%{public}u,fixedCount:%{public}d",
-            event.eventType, event.devIndex, event.code, event.type, event.value, event.time, count, fixedCount);
-
-        auto ret = write(g_hdfAdapterWriteFd, &event, sizeof(HdfInputEvent));
-        if (ret == -1) {
-            int saveErrno = errno;
-            MMI_HILOGE("Write pipe fail, errno:%{public}d, %{public}s", saveErrno, strerror(saveErrno));
-        }
+        WriteToPipe(r, devIndex);
     }
 }
 
