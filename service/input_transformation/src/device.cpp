@@ -56,12 +56,13 @@ void Device::Uninit()
     CloseDevice();
 }
 
-Device::Device(int32_t id, const std::shared_ptr<IInputContext> context, const InputDimensionInfo &dimensionInfoX,
-               const InputDimensionInfo &dimensionInfoY, const InputDevAbility &devAbility)
-   : id_(id), context_(context), dimensionInfoX_(dimensionInfoX), dimensionInfoY_(dimensionInfoY),
-   devAbility_(devAbility), absEventCollector_(id, AbsEvent::SOURCE_TYPE_NONE),
-   eventHandler_(IKernelEventHandler::GetDefault()) {}
-
+Device::Device(int32_t id, const std::shared_ptr<IInputContext> context, const InputDeviceInfo &devInfo) : id_(id),
+   context_(context), absEventCollector_(id, AbsEvent::SOURCE_TYPE_NONE),
+   eventHandler_(IKernelEventHandler::GetDefault()) {
+       dimensionInfoX_ = devInfo.attrSet.axisInfo[ABS_MT_POSITION_X];
+       dimensionInfoY_ = devInfo.attrSet.axisInfo[ABS_MT_POSITION_Y];
+       devAbility_ = devInfo.abilitySet;
+   }
 Device::~Device()
 {
     Uninit();
@@ -219,7 +220,13 @@ bool Device::TestBit(int32_t bitIndex, const unsigned long* bitMap, size_t count
 
 bool Device::HasInputProperty(int32_t property)
 {
-    return TestBit(property, &inputProperty[0], sizeof(inputProperty) / sizeof(inputProperty[0]));
+    //return TestBit(property, &inputProperty[0], sizeof(inputProperty) / sizeof(inputProperty[0]));
+    for (int i = 0; i < BITS_TO_UINT64(INPUT_PROP_CNT); i++) {
+        if (devAbility_.devProp[i] == static_cast<unsigned long>(property)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool Device::HasMouseCapability()
@@ -245,9 +252,9 @@ bool Device::HasTouchscreenCapability()
         return false;
     }
 
-    // if (HasInputProperty(INPUT_PROP_POINTER)) {
-    //     return false;
-    // }
+    if (HasInputProperty(INPUT_PROP_POINTER)) {
+        return false;
+    }
 
     return true;
 }

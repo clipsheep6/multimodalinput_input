@@ -76,8 +76,7 @@ class IKernelEventHandler;
 class Device : public NonCopyable, public IInputDevice {
 
 public:
-    Device(int32_t id, const std::shared_ptr<IInputContext> context, const InputDimensionInfo &dimensionInfoX,
-               const InputDimensionInfo &dimensionInfoY, const InputDevAbility &devAbility);
+    Device(int32_t id, const std::shared_ptr<IInputContext> context, const InputDeviceInfo &devInfo);
     virtual ~Device();
     int32_t Init();
     virtual int32_t GetId() const override;
@@ -125,7 +124,7 @@ private:
     InputDimensionInfo dimensionInfoX_;
     InputDimensionInfo dimensionInfoY_;
     InputDevAbility devAbility_;
-
+    
     int32_t capabilities_ {IInputDevice::CAPABILITY_UNKNOWN};
     unsigned long inputProperty[LongsOfBits(INPUT_PROP_MAX)];
     unsigned long evBit[LongsOfBits(EV_MAX)];

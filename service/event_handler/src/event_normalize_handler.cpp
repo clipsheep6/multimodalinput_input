@@ -153,8 +153,7 @@ int32_t EventNormalizeHandler::OnHDFDeviceAdded(InputDeviceInfo devInfo)
     CALL_DEBUG_ENTER;
     auto context = InputHandler->GetContext();
     CHKPR(context, ERROR_NULL_POINTER);
-    auto inputDevice = std::make_shared<Device>(devInfo.devIndex, context, devInfo.attrSet.axisInfo[ABS_MT_POSITION_X],
-        devInfo.attrSet.axisInfo[ABS_MT_POSITION_Y], devInfo.abilitySet);
+    auto inputDevice = std::make_shared<Device>(devInfo.devIndex, context, devInfo);
     inputDevice->Init();
     CHKPR(inputDevice, ERROR_NULL_POINTER);
     const auto deviceCollector = context->GetInputDeviceCollector();
