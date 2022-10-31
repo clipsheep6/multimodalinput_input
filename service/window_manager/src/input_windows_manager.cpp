@@ -30,7 +30,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputWindowsManager"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputWindowsManager" };
 #ifdef OHOS_BUILD_ENABLE_POINTER
 constexpr int32_t DEFAULT_POINTER_STYLE = 0;
 constexpr size_t MAX_WINDOW_COUNT = 20;
@@ -541,7 +541,7 @@ bool InputWindowsManager::IsNeedRefreshLayer(int32_t windowId)
         displayId = displayGroupInfo_.displaysInfo[0].id;
     }
     auto displayInfo = GetPhysicalDisplay(displayId);
-    CHKPR(displayInfo, false);
+    CHKPF(displayInfo);
     int32_t logicX = mouseLocation.physicalX + displayInfo->x;
     int32_t logicY = mouseLocation.physicalY + displayInfo->y;
     std::optional<WindowInfo> touchWindow = GetWindowInfo(logicX, logicY);
