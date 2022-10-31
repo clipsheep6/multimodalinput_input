@@ -77,7 +77,7 @@ class Device : public NonCopyable, public IInputDevice {
 
 public:
     Device(int32_t id, const std::shared_ptr<IInputContext> context, const InputDimensionInfo &dimensionInfoX,
-               const InputDimensionInfo &dimensionInfoY);
+               const InputDimensionInfo &dimensionInfoY, const InputDevAbility &devAbility);
     virtual ~Device();
     int32_t Init();
     virtual int32_t GetId() const override;
@@ -124,6 +124,7 @@ private:
     int32_t deviceId_;
     InputDimensionInfo dimensionInfoX_;
     InputDimensionInfo dimensionInfoY_;
+    InputDevAbility devAbility_;
 
     int32_t capabilities_ {IInputDevice::CAPABILITY_UNKNOWN};
     unsigned long inputProperty[LongsOfBits(INPUT_PROP_MAX)];

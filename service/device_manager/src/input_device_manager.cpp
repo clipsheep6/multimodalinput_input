@@ -490,7 +490,8 @@ bool InputDeviceManager::IsPointerDevice(struct libinput_device* device) const
 bool InputDeviceManager::IsPointerDevice(std::shared_ptr<IInputDevice> device) const
 {
     CHKPF(device);
-    return device->HasCapability(IInputDevice::CAPABILITY_TOUCHSCREEN);
+    return (device->HasCapability( IInputDevice::CAPABILITY_MOUSE) || 
+        device->HasCapability(IInputDevice::CAPABILITY_TOUCHPAD));
 }
 
 bool InputDeviceManager::IsKeyboardDevice(struct libinput_device* device) const

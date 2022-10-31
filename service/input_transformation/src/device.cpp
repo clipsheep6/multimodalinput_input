@@ -57,9 +57,10 @@ void Device::Uninit()
 }
 
 Device::Device(int32_t id, const std::shared_ptr<IInputContext> context, const InputDimensionInfo &dimensionInfoX,
-               const InputDimensionInfo &dimensionInfoY)
+               const InputDimensionInfo &dimensionInfoY, const InputDevAbility &devAbility)
    : id_(id), context_(context), dimensionInfoX_(dimensionInfoX), dimensionInfoY_(dimensionInfoY),
-   absEventCollector_(id, AbsEvent::SOURCE_TYPE_NONE), eventHandler_(IKernelEventHandler::GetDefault()) {}
+   devAbility_(devAbility), absEventCollector_(id, AbsEvent::SOURCE_TYPE_NONE),
+   eventHandler_(IKernelEventHandler::GetDefault()) {}
 
 Device::~Device()
 {
@@ -240,9 +241,9 @@ bool Device::HasKeyboardCapability()
 
 bool Device::HasTouchscreenCapability()
 {
-    // if (!HasEventType(EV_ABS)) {
-    //     return false;
-    // }
+    if (!HasEventType(EV_ABS)) {
+        return false;
+    }
 
     // if (HasInputProperty(INPUT_PROP_POINTER)) {
     //     return false;
@@ -253,7 +254,13 @@ bool Device::HasTouchscreenCapability()
 
 bool Device::HasEventType(int32_t evType) const
 {
-    return TestBit(evType, &evBit[0], LENTH_OF_ARRAY(evBit));
+    for (int i = 0; i < BITS_TO_UINT64(ABS_CNT); i++) {
+        if (devAbility_.absCode[i] == static_cast<unsigned long>(evType)) {
+            return true;
+        }
+    }
+    
+    return false;
 }
 
 bool Device::HasEventCode(int32_t evType, int32_t evCode) const
