@@ -116,7 +116,7 @@ int32_t CpuInfo::GetTaskPidCmd(const std::string &process_name, int32_t flag, st
         return DEFAULT_PID;
     }
     ::pclose(fp);
-    return ::stoi(buf);
+    return std::stoi(buf);
 }
 
 int32_t CpuInfo::GetProcOccupy(int32_t pid)
