@@ -292,10 +292,6 @@ void Device::ProcessSyncEvent(int32_t code, int32_t value)
 void Device::ProcessAbsEvent(int32_t code, int32_t value)
 {
     absEventCollector_.HandleAbsEvent(code, value);
-    // const auto& event = absEventCollector_.HandleAbsEvent(code, value);
-    // if (event) {
-    //     absEventCollector_.AfterProcessed();
-    // }
 }
 
 void Device::OnEventCollected(const std::shared_ptr<const AbsEvent>& event)

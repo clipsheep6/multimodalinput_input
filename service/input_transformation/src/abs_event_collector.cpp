@@ -38,7 +38,8 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleAbsEvent(int32_t code,
     CALL_DEBUG_ENTER;
 
     switch (code) {
-        case ABS_MT_SLOT: 
+        case ABS_MT_SLOT:
+            MMI_HILOGE("lisong EV_ABS: ABS_MT_SLOT = %{public}d", value);
             return HandleMtSlot(value);
         case ABS_MT_TOUCH_MAJOR:
         case ABS_MT_TOUCH_MINOR:
@@ -47,15 +48,18 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleAbsEvent(int32_t code,
         case ABS_MT_ORIENTATION:
             break;
         case ABS_MT_POSITION_X:
+            MMI_HILOGE("lisong EV_ABS: ABS_MT_POSITION_X = %{public}d", value);
             HandleMtPositionX(value);
             break;
         case ABS_MT_POSITION_Y:
+            MMI_HILOGE("lisong EV_ABS: ABS_MT_POSITION_Y = %{public}d", value);
             HandleMtPositionY(value);
             break;
         case ABS_MT_TOOL_TYPE:
         case ABS_MT_BLOB_ID:
             break;
         case ABS_MT_TRACKING_ID:
+            MMI_HILOGE("lisong EV_ABS: ABS_MT_TRACKING_ID = %{public}d", value);
             return HandleMtTrackingId(value);
         case ABS_MT_PRESSURE:
         case ABS_MT_DISTANCE:
@@ -70,6 +74,7 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleAbsEvent(int32_t code,
 
 const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleSyncEvent(int32_t code, int32_t value)
 {
+    MMI_HILOGE("lisong EV_SYN: HandleSyncEvent = %{public}d", value);
     const auto& absEvent = FinishPointer();
     return absEvent;
 }
@@ -102,9 +107,9 @@ std::shared_ptr<AbsEvent::Pointer> AbsEventCollector::GetCurrentPointer(bool cre
         return nullptr;
     }
 
-    if (curPointer_) {
-        return curPointer_;
-    }
+    // if (curPointer_) {
+    //     return curPointer_;
+    // }
 
     auto it = pointers_.find(curSlot_);
     if (it != pointers_.end()) {
@@ -134,6 +139,7 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::FinishPointer()
     auto nowTime = TimeUtils::GetTimeStampMs();
     if (action == AbsEvent::ACTION_DOWN) {
         if (curPointer_->GetId() < 0) {
+            MMI_HILOGE("ACTION_DOWN is coming, nextId_ = %{public}d", nextId_);
             curPointer_->SetId(nextId_++);
             auto retCode = absEvent_->AddPointer(curPointer_);
             if (retCode < 0) {
@@ -156,6 +162,7 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::FinishPointer()
             return AbsEvent::NULL_VALUE;
         }
         if (absEvent_->GetPointerIdList().empty()) {
+            MMI_HILOGE("ACTION_UP is all over, nextId_ = %{public}d", nextId_);
             nextId_ = 0;
         }
     } else {
@@ -176,6 +183,11 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleMtSlot(int32_t value)
     }
     curSlot_ = value;
     curPointer_ = AbsEvent::Pointer::NULL_VALUE;
+    curPointer_ = GetCurrentPointer(true);
+    if (!curPointer_) {
+        MMI_HILOGE("Leave, null pointer");
+        return AbsEvent::NULL_VALUE;
+    }
     absEventAction_ = AbsEvent::ACTION_NONE;
     return AbsEvent::NULL_VALUE;
 }
