@@ -48,7 +48,6 @@ int32_t Device::Init()
     if (HasCapability(IInputDevice::CAPABILITY_TOUCHSCREEN)) {
         mtdev_ = mmi_mtdev_new_open();
     }
-
     return 0;
 }
 
@@ -285,10 +284,11 @@ void Device::ProcessSyncEvent(int32_t code, int32_t value)
 
 void Device::ProcessAbsEvent(int32_t code, int32_t value)
 {
-    const auto& event = absEventCollector_.HandleAbsEvent(code, value);
-    if (event) {
-        absEventCollector_.AfterProcessed();
-    }
+    absEventCollector_.HandleAbsEvent(code, value);
+    // const auto& event = absEventCollector_.HandleAbsEvent(code, value);
+    // if (event) {
+    //     absEventCollector_.AfterProcessed();
+    // }
 }
 
 void Device::OnEventCollected(const std::shared_ptr<const AbsEvent>& event)

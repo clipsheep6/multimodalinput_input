@@ -36,7 +36,6 @@ AbsEventCollector::AbsEventCollector(int32_t deviceId, int32_t sourceType)
 const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleAbsEvent(int32_t code, int32_t value)
 {
     CALL_DEBUG_ENTER;
-    RemoveReleasedPointer();
 
     switch (code) {
         case ABS_MT_SLOT: 
@@ -127,7 +126,7 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::FinishPointer()
 {
     CALL_DEBUG_ENTER;
     if (!curPointer_) {
-        MMI_HILOGE("Leave");
+        MMI_HILOGE("curPointer is null. Leave.");
         return AbsEvent::NULL_VALUE;
     }
     auto action = absEventAction_;
@@ -167,7 +166,6 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::FinishPointer()
     absEvent_->SetAction(action);
     absEvent_->SetCurSlot(curSlot_);
     absEvent_->SetActionTime(nowTime);
-
     return absEvent_;
 }
 

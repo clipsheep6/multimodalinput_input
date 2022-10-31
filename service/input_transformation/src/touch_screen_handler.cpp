@@ -100,9 +100,9 @@ void TouchScreenHandler::ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointer
 {
     CHKPV(pointerEvent);
     pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
-    MMI_HILOGD("This touch event is up remove this finger");
+    MMI_HILOGE("This touch event is up remove this finger, idx = %{public}d", pointerEvent->GetPointerId());
     if (pointerEvent->GetPointerIds().empty()) {
-        MMI_HILOGD("This touch event is final finger up remove this finger");
+        MMI_HILOGE("This touch event is final finger up remove this finger");
         pointerEvent->Reset();
     }
 }
@@ -117,21 +117,23 @@ void TouchScreenHandler::OnInputEvent(const std::shared_ptr<const AbsEvent>& eve
         pointerEvent_ = PointerEvent::Create();
         CHKPV(pointerEvent_);
     }
-    auto ret = ConvertPointer(event, pointerAction, actionTime);
-    if (!ret) {
-        MMI_HILOGE("Leave ConvertPointer Failed");
-    }
 
     auto curSlot = event->GetCurSlot();
     auto action = event->GetAction();
     auto absEventPointer = event->GetPointer();
-    MMI_HILOGD("OnInputEvent, CurSlot = %{public}d, Action = %{public}d, x = %{public}d, y = %{public}d",
+    MMI_HILOGE("lisong OnInputEvent, before ConvertPointer. CurSlot = %{public}d, Action = %{public}d, x = %{public}d, y = %{public}d",
     curSlot, action, absEventPointer->GetX(), absEventPointer->GetY());
+
+    auto ret = ConvertPointer(event, pointerAction, actionTime);
+    if (!ret) {
+        MMI_HILOGE("Leave ConvertPointer Failed");
+    }
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPV(inputEventNormalizeHandler);   
     CHKPV(pointerEvent_);
     inputEventNormalizeHandler->HandleTouchEvent(pointerEvent_);
     if (pointerAction == PointerEvent::POINTER_ACTION_UP) {
+        MMI_HILOGE("lisong POINTER_ACTION_UP idx = %{public}d", pointerEvent_->GetPointerId());
         ResetTouchUpEvent(pointerEvent_);
     }
 }

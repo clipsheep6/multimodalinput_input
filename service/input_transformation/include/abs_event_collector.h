@@ -50,12 +50,12 @@ protected:
 
 private:
     [[maybe_unused]] const int32_t deviceId_;
-    int32_t sourceType_;
-    int32_t curSlot_;
-    int32_t nextId_;
-    std::shared_ptr<AbsEvent::Pointer> curPointer_;
+    int32_t sourceType_ {-1};
+    int32_t curSlot_ {-1};
+    int32_t nextId_ {-1};
+    std::shared_ptr<AbsEvent::Pointer> curPointer_ {nullptr};
     int32_t absEventAction_ {AbsEvent::ACTION_NONE};
-    std::shared_ptr<AbsEvent> absEvent_;
+    std::shared_ptr<AbsEvent> absEvent_ {nullptr};
     std::map<int32_t, std::shared_ptr<AbsEvent::Pointer>> pointers_;
 
 };
