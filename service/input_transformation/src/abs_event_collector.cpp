@@ -232,6 +232,10 @@ void AbsEventCollector::RemoveReleasedPointer()
         return;
     }
     pointer->SetId(-1);
+    if (absEvent_->GetPointerIdList().empty()) {
+        MMI_HILOGE("ACTION_UP is all over, nextId_ = %{public}d", nextId_);
+        nextId_ = 0;
+    }
 }
 } // namespace MMI
 } // namespace OHOS
