@@ -77,10 +77,6 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleSyncEvent(int32_t code
 void AbsEventCollector::AfterProcessed()
 {
     RemoveReleasedPointer();
-    if (absEvent_->GetPointerIdList().empty()) {
-        MMI_HILOGE("ACTION_UP is all over, nextId_ = %{public}d", nextId_);
-        nextId_ = 0;
-    }
 }
 
 int32_t AbsEventCollector::SetSourceType(int32_t sourceType)
@@ -150,6 +146,10 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::FinishPointer()
     } else if (action == AbsEvent::ACTION_UP) {
         if (curPointer_->GetId() < 0) {
             return AbsEvent::NULL_VALUE;
+        }
+        if (absEvent_->GetPointerIdList().empty()) {
+            MMI_HILOGE("ACTION_UP is all over, nextId_ = %{public}d", nextId_);
+            nextId_ = 0;
         }
     } else if (action != AbsEvent::ACTION_MOVE) {
         return AbsEvent::NULL_VALUE;
