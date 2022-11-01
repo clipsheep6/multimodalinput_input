@@ -23,7 +23,7 @@
 #include "nocopyable.h"
 #include "session.h"
 
-#include "i_multimodal_input_connect.h"
+#include "i_input_connect.h"
 
 namespace OHOS {
 namespace MMI {

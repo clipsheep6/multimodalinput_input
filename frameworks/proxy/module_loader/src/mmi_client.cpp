@@ -23,8 +23,7 @@
 
 #include "input_manager_impl.h"
 #include "mmi_fd_listener.h"
-#include "multimodal_event_handler.h"
-#include "multimodal_input_connect_manager.h"
+#include "input_connect_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -258,13 +257,13 @@ void MMIClient::OnConnected()
 int32_t MMIClient::Socket()
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = MultimodalInputConnMgr->AllocSocketPair(IMultimodalInputConnect::CONNECT_MODULE_TYPE_MMI_CLIENT);
+    int32_t ret = MultimodalInputConnMgr->AllocSocketPair(IInputConnect::CONNECT_MODULE_TYPE_MMI_CLIENT);
     if (ret != RET_OK) {
         MMI_HILOGE("Call AllocSocketPair return %{public}d", ret);
         return RET_ERR;
     }
     fd_ = MultimodalInputConnMgr->GetClientSocketFdOfAllocedSocketPair();
-    if (fd_ == IMultimodalInputConnect::INVALID_SOCKET_FD) {
+    if (fd_ == IInputConnect::INVALID_SOCKET_FD) {
         MMI_HILOGE("Call GetClientSocketFdOfAllocedSocketPair return invalid fd");
     } else {
         MMI_HILOGD("Call GetClientSocketFdOfAllocedSocketPair return fd:%{public}d", fd_);

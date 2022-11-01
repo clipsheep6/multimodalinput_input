@@ -15,9 +15,8 @@
 
 #include "input_device_impl.h"
 
+#include "input_connect_manager.h"
 #include "mmi_log.h"
-#include "multimodal_event_handler.h"
-#include "multimodal_input_connect_manager.h"
 #include "napi_constants.h"
 #include "net_packet.h"
 
@@ -26,12 +25,6 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceImpl" };
 } // namespace
-
-InputDeviceImpl& InputDeviceImpl::GetInstance()
-{
-    static InputDeviceImpl instance;
-    return instance;
-}
 
 int32_t InputDeviceImpl::RegisterDevListener(const std::string &type, InputDevListenerPtr listener)
 {
@@ -278,41 +271,68 @@ std::shared_ptr<InputDevice> InputDeviceImpl::DevDataUnmarshalling(NetPacket &pk
     auto devData = std::make_shared<InputDevice>();
     CHKPP(devData);
     int32_t deviceId;
-    std::string name;
-    int32_t deviceType;
-    int32_t bus;
-    int32_t product;
-    int32_t vendor;
-    int32_t version;
-    std::string phys;
-    std::string uniq;
-    pkt >> deviceId >> name >> deviceType >> bus >> product >> vendor >> version >> phys >> uniq;
+    pkt >> deviceId;
     devData->SetId(deviceId);
+
+    std::string name;
+    pkt >> name;
     devData->SetName(name);
+
+    int32_t deviceType;
+    pkt >> deviceType;
     devData->SetType(deviceType);
+
+    int32_t bus;
+    pkt >> bus;
     devData->SetBus(bus);
+
+    int32_t product;
+    pkt >> product;
     devData->SetProduct(product);
+
+    int32_t vendor;
+    pkt >> vendor;
     devData->SetVendor(vendor);
+
+    int32_t version;
+    pkt >> version;
     devData->SetVersion(version);
+
+    std::string phys;
+    pkt >> phys;
     devData->SetPhys(phys);
+
+    std::string uniq;
+    pkt >> uniq;
     devData->SetUniq(uniq);
 
     size_t size;
     pkt >> size;
+    std::vector<InputDevice::AxisInfo> axisInfo;
     for (size_t i = 0; i < size; ++i) {
         InputDevice::AxisInfo axis;
         int32_t type;
-        int32_t min;
-        int32_t max;
-        int32_t fuzz;
-        int32_t flat;
-        int32_t resolution;
-        pkt >> type >> min >> max >> fuzz >> flat >> resolution;
+        pkt >> type;
         axis.SetAxisType(type);
+
+        int32_t min;
+        pkt >> min;
         axis.SetMinimum(min);
+
+        int32_t max;
+        pkt >> max;
         axis.SetMaximum(max);
+
+        int32_t fuzz;
+        pkt >> fuzz;
         axis.SetFuzz(fuzz);
+
+        int32_t flat;
+        pkt >> flat;
         axis.SetFlat(flat);
+
+        int32_t resolution;
+        pkt >> resolution;
         axis.SetResolution(resolution);
         devData->AddAxisInfo(axis);
     }

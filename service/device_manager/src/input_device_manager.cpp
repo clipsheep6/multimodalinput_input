@@ -258,7 +258,7 @@ void InputDeviceManager::RemoveDevListener(SessionPtr sess)
 bool InputDeviceManager::HasPointerDevice()
 {
     for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
-        if (it->second.isPointerDevice_) {
+        if (IsPointerDevice(it->second.inputDeviceOrigin_)) {
             return true;
         }
     }
@@ -277,7 +277,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
             DfxHisysevent::OnDeviceConnect(item.first, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
             return;
         }
-        if (!item.second.isRemote_ && item.second.isPointerDevice_) {
+        if (!item.second.isRemote_ && IsPointerDevice(item.second.inputDeviceOrigin_)) {
             hasLocalPointer = true;
         }
     }
@@ -306,7 +306,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
         InputDevCooSM->OnKeyboardOnline(info.dhid_);
     }
 #endif // OHOS_BUILD_ENABLE_COOPERATE
-    if (info.isPointerDevice_) {
+    if (IsPointerDevice(inputDevice)) {
         bool visible = !info.isRemote_ || hasLocalPointer;
         NotifyPointerDevice(true, visible);
         OHOS::system::SetParameter(INPUT_POINTER_DEVICE, "true");
@@ -319,7 +319,6 @@ void InputDeviceManager::MakeDeviceInfo(struct libinput_device *inputDevice, str
 {
     info.inputDeviceOrigin_ = inputDevice;
     info.isRemote_ = IsRemote(inputDevice);
-    info.isPointerDevice_ = IsPointerDevice(inputDevice);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     if (info.isRemote_) {
         info.networkIdOrigin_ = MakeNetworkId(libinput_device_get_phys(inputDevice));
@@ -375,7 +374,7 @@ void InputDeviceManager::ScanPointerDevice()
 {
     bool hasPointerDevice = false;
     for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
-        if (it->second.isPointerDevice_) {
+        if (IsPointerDevice(it->second.inputDeviceOrigin_)) {
             hasPointerDevice = true;
             break;
         }
@@ -539,7 +538,7 @@ std::vector<std::string> InputDeviceManager::GetCooperateDhids(int32_t deviceId)
         MMI_HILOGI("Find pointer id failed");
         return dhids;
     }
-    if (!iter->second.isPointerDevice_) {
+    if (!IsPointerDevice(iter->second.inputDeviceOrigin_)) {
         MMI_HILOGI("Not pointer device");
         return dhids;
     }
@@ -619,7 +618,7 @@ std::string InputDeviceManager::GetDhid(int32_t deviceId) const
 bool InputDeviceManager::HasLocalPointerDevice() const
 {
     for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
-        if (!it->second.isRemote_ && it->second.isPointerDevice_) {
+        if (!it->second.isRemote_ && IsPointerDevice(it->second.inputDeviceOrigin_)) {
             return true;
         }
     }

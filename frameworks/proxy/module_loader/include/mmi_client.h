@@ -16,14 +16,14 @@
 #define MMI_CLIENT_H
 #include "nocopyable.h"
 
-#include "if_mmi_client.h"
+#include "i_mmi_client.h"
 
 #include "circle_stream_buffer.h"
 #include "client_msg_handler.h"
 
 namespace OHOS {
 namespace MMI {
-class MMIClient final : public UDSClient, public IfMMIClient, public std::enable_shared_from_this<IfMMIClient> {
+class MMIClient final : public UDSClient, public IMMIClient, public std::enable_shared_from_this<IMMIClient> {
 public:
     MMIClient() = default;
     DISALLOW_COPY_AND_MOVE(MMIClient);

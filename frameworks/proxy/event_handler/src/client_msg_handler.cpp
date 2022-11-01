@@ -21,21 +21,19 @@
 
 #include "bytrace_adapter.h"
 #include "event_log_helper.h"
+#include "input_connect_manager.h"
 #include "input_device.h"
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_cooperate_impl.h"
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_impl.h"
 #include "input_event_data_transformation.h"
-#include "input_handler_manager.h"
 #include "input_manager_impl.h"
 #ifdef OHOS_BUILD_ENABLE_MONITOR
-#include "input_monitor_manager.h"
+#include "input_monitor.h"
 #endif // OHOS_BUILD_ENABLE_MONITOR
 #include "mmi_client.h"
 #include "mmi_func_callback.h"
-#include "multimodal_event_handler.h"
-#include "multimodal_input_connect_manager.h"
 #include "napi_constants.h"
 #include "proto.h"
 #include "time_cost_chk.h"
@@ -64,13 +62,19 @@ void ClientMsgHandler::Init()
         {MmiMessageId::INPUT_DEVICE_KEYBOARD_TYPE, MsgCallbackBind2(&ClientMsgHandler::OnInputKeyboardType, this)},
         {MmiMessageId::ADD_INPUT_DEVICE_LISTENER, MsgCallbackBind2(&ClientMsgHandler::OnDevListener, this)},
         {MmiMessageId::NOTICE_ANR, MsgCallbackBind2(&ClientMsgHandler::OnAnr, this)},
-#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || \
-    defined(OHOS_BUILD_ENABLE_MONITOR))
-        {MmiMessageId::REPORT_KEY_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportKeyEvent, this)},
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
+        {MmiMessageId::REPORT_INTERCEPTOR_KEY, MsgCallbackBind2(&ClientMsgHandler::ReportInterceptorKey, this)},
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && \
-    (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR))
-        {MmiMessageId::REPORT_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportPointerEvent, this)},
+    defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
+        {MmiMessageId::REPORT_INTERCEPTOR_POINTER, MsgCallbackBind2(&ClientMsgHandler::ReportInterceptorPointer, this)},
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_MONITOR)
+        {MmiMessageId::REPORT_MONITOR_KEY, MsgCallbackBind2(&ClientMsgHandler::ReportMonitorKey, this)},
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && \
+    defined(OHOS_BUILD_ENABLE_MONITOR)
+        {MmiMessageId::REPORT_MONITOR_POINTER, MsgCallbackBind2(&ClientMsgHandler::ReportMonitorPointer, this)},
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
         {MmiMessageId::COOPERATION_ADD_LISTENER, MsgCallbackBind2(&ClientMsgHandler::OnCooperationListiner, this)},
@@ -191,7 +195,7 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
         keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
         keyEvent->GetEventType(), keyEvent->GetFlag());
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
-    return KeyEventInputSubscribeMgr.OnSubscribeKeyEventCallback(keyEvent, subscribeId);
+    return InputMgrImpl.GetKeySubscriber().OnSubscribeKeyEventCallback(keyEvent, subscribeId);
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
@@ -209,7 +213,7 @@ int32_t ClientMsgHandler::OnInputDeviceIds(const UDSClient& client, NetPacket& p
         MMI_HILOGE("Packet read cooperate msg failed");
         return RET_ERR;
     }
-    InputDevImpl.OnInputDeviceIds(userData, inputDeviceIds);
+    InputMgrImpl.GetInputDeviceImpl().OnInputDeviceIds(userData, inputDeviceIds);
     return RET_OK;
 }
 
@@ -218,13 +222,13 @@ int32_t ClientMsgHandler::OnInputDevice(const UDSClient& client, NetPacket& pkt)
     CALL_DEBUG_ENTER;
     int32_t userData;
     pkt >> userData;
-    std::shared_ptr<InputDevice> devData = InputDevImpl.DevDataUnmarshalling(pkt);
+    std::shared_ptr<InputDevice> devData = InputMgrImpl.GetInputDeviceImpl().DevDataUnmarshalling(pkt);
     CHKPR(devData, RET_ERR);
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read cooperate msg failed");
         return RET_ERR;
     }
-    InputDevImpl.OnInputDevice(userData, devData);
+    InputMgrImpl.GetInputDeviceImpl().OnInputDevice(userData, devData);
     return RET_OK;
 }
 
@@ -248,7 +252,7 @@ int32_t ClientMsgHandler::OnSupportKeys(const UDSClient& client, NetPacket& pkt)
         MMI_HILOGE("Packet read key Data failed");
         return RET_ERR;
     }
-    InputDevImpl.OnSupportKeys(userData, abilityRet);
+    InputMgrImpl.GetInputDeviceImpl().OnSupportKeys(userData, abilityRet);
     return RET_OK;
 }
 
@@ -262,7 +266,7 @@ int32_t ClientMsgHandler::OnInputKeyboardType(const UDSClient& client, NetPacket
         MMI_HILOGE("Packet read failed");
         return PACKET_WRITE_FAIL;
     }
-    InputDevImpl.OnKeyboardType(userData, KeyboardType);
+    InputMgrImpl.GetInputDeviceImpl().OnKeyboardType(userData, KeyboardType);
     return RET_OK;
 }
 
@@ -276,21 +280,14 @@ int32_t ClientMsgHandler::OnDevListener(const UDSClient& client, NetPacket& pkt)
         MMI_HILOGE("Packet read type failed");
         return RET_ERR;
     }
-    InputDevImpl.OnDevListener(deviceId, type);
+    InputMgrImpl.GetInputDeviceImpl().OnDevListener(deviceId, type);
     return RET_OK;
 }
 
-#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || \
-    defined(OHOS_BUILD_ENABLE_MONITOR))
-int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt)
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
+int32_t ClientMsgHandler::ReportInterceptorKey(const UDSClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
-    InputHandlerType handlerType;
-    pkt >> handlerType;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read handler failed");
-        return RET_ERR;
-    }
     auto keyEvent = KeyEvent::Create();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     if (InputEventDataTransformation::NetPacketToKeyEvent(pkt, keyEvent) != ERR_OK) {
@@ -298,40 +295,18 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
         return RET_ERR;
     }
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_INTERCEPT_EVENT);
-    switch (handlerType) {
-        case INTERCEPTOR: {
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
-            InputInterMgr->OnInputEvent(keyEvent);
+    InputMgrImpl.GetInputInterceptor().OnInputEvent(keyEvent);
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
-            break;
-        }
-        case MONITOR: {
-#ifdef OHOS_BUILD_ENABLE_MONITOR
-            IMonitorMgr->OnInputEvent(keyEvent);
-#endif // OHOS_BUILD_ENABLE_MONITOR
-            break;
-        }
-        default: {
-            MMI_HILOGW("Failed to intercept or monitor on the event");
-            break;
-        }
-    }
     return RET_OK;
 }
-#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR
 
 #if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && \
-    (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR))
-int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket& pkt)
+    defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
+int32_t ClientMsgHandler::ReportInterceptorPointer(const UDSClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
-    InputHandlerType handlerType;
-    pkt >> handlerType;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read Pointer data failed");
-        return RET_ERR;
-    }
-    MMI_HILOGD("Client handlerType:%{public}d", handlerType);
     auto pointerEvent = PointerEvent::Create();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (InputEventDataTransformation::Unmarshalling(pkt, pointerEvent) != ERR_OK) {
@@ -339,24 +314,46 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
         return RET_ERR;
     }
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_INTERCEPT_EVENT);
-    switch (handlerType) {
-        case INTERCEPTOR: {
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
-            InputInterMgr->OnInputEvent(pointerEvent);
+    InputMgrImpl.GetInputInterceptor().OnInputEvent(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
-            break;
-        }
-        case MONITOR: {
-#ifdef OHOS_BUILD_ENABLE_MONITOR
-            IMonitorMgr->OnInputEvent(pointerEvent);
-#endif // OHOS_BUILD_ENABLE_MONITOR
-            break;
-        }
-        default: {
-            MMI_HILOGW("Failed to intercept or monitor on the event");
-            break;
-        }
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_MONITOR)
+int32_t ClientMsgHandler::ReportMonitorKey(const UDSClient& client, NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    auto keyEvent = KeyEvent::Create();
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    if (InputEventDataTransformation::NetPacketToKeyEvent(pkt, keyEvent) != ERR_OK) {
+        MMI_HILOGE("Failed to deserialize key event.");
+        return RET_ERR;
     }
+    BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_INTERCEPT_EVENT);
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    InputMgrImpl.GetInputMonitor().OnInputEvent(keyEvent);
+#endif // OHOS_BUILD_ENABLE_MONITOR
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_MONITOR
+
+#if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && \
+    defined(OHOS_BUILD_ENABLE_MONITOR)
+int32_t ClientMsgHandler::ReportMonitorPointer(const UDSClient& client, NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    auto pointerEvent = PointerEvent::Create();
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    if (InputEventDataTransformation::Unmarshalling(pkt, pointerEvent) != ERR_OK) {
+        MMI_HILOGE("Failed to deserialize pointer event");
+        return RET_ERR;
+    }
+    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_INTERCEPT_EVENT);
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    InputMgrImpl.GetInputMonitor().OnInputEvent(pointerEvent);
+#endif // OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
@@ -364,7 +361,7 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
 void ClientMsgHandler::OnDispatchEventProcessed(int32_t eventId)
 {
     CALL_DEBUG_ENTER;
-    MMIClientPtr client = MMIEventHdl.GetMMIClient();
+    MMIClientPtr client = InputMgrImpl.GetMMIClient();
     CHKPV(client);
     NetPacket pkt(MmiMessageId::MARK_PROCESS);
     pkt << eventId << ANR_DISPATCH;
@@ -404,7 +401,7 @@ int32_t ClientMsgHandler::OnCooperationListiner(const UDSClient& client, NetPack
         MMI_HILOGE("Packet read type failed");
         return RET_ERR;
     }
-    InputDevCooperateImpl.OnDevCooperateListener(deviceId, CooperationMessage(nType));
+    InputMgrImpl.GetInputDeviceCooImpl().OnDevCooperateListener(deviceId, CooperationMessage(nType));
     return RET_OK;
 }
 
@@ -419,7 +416,7 @@ int32_t ClientMsgHandler::OnCooperationMessage(const UDSClient& client, NetPacke
         MMI_HILOGE("Packet read cooperate msg failed");
         return RET_ERR;
     }
-    InputDevCooperateImpl.OnCooprationMessage(userData, deviceId, CooperationMessage(nType));
+    InputMgrImpl.GetInputDeviceCooImpl().OnCooprationMessage(userData, deviceId, CooperationMessage(nType));
     return RET_OK;
 }
 
@@ -433,7 +430,7 @@ int32_t ClientMsgHandler::OnCooperationState(const UDSClient& client, NetPacket&
         MMI_HILOGE("Packet read cooperate msg failed");
         return RET_ERR;
     }
-    InputDevCooperateImpl.OnCooperationState(userData, state);
+    InputMgrImpl.GetInputDeviceCooImpl().OnCooperationState(userData, state);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_COOPERATE

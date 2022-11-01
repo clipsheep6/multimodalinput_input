@@ -235,51 +235,55 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     return RET_OK;
 }
 
-#if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
-int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, InputHandlerType handlerType,
-    HandleEventType eventType)
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+int32_t ServerMsgHandler::OnAddInterceptorHandler(SessionPtr sess, HandleEventType eventType)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
-    MMI_HILOGD("handlerType:%{public}d", handlerType);
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
-    if (handlerType == InputHandlerType::INTERCEPTOR) {
-        auto interceptorHandler = InputHandler->GetInterceptorHandler();
-        CHKPR(interceptorHandler, ERROR_NULL_POINTER);
-        return interceptorHandler->AddInputHandler(handlerType, eventType, sess);
-    }
+    auto interceptorHandler = InputHandler->GetInterceptorHandler();
+    CHKPR(interceptorHandler, ERROR_NULL_POINTER);
+    return interceptorHandler->AddInterceptorHandler(eventType, sess);
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+    return RET_OK;
+}
+
+int32_t ServerMsgHandler::OnRemoveInterceptorHandler(SessionPtr sess, HandleEventType eventType)
+{
+    CHKPR(sess, ERROR_NULL_POINTER);
+    MMI_HILOGD("OnRemoveInputHandler eventType:%{public}u", eventType);
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+    auto interceptorHandler = InputHandler->GetInterceptorHandler();
+    CHKPR(interceptorHandler, ERROR_NULL_POINTER);
+    interceptorHandler->RemoveInterceptorHandler(eventType, sess);
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+
 #ifdef OHOS_BUILD_ENABLE_MONITOR
-    if (handlerType == InputHandlerType::MONITOR) {
-        auto monitorHandler = InputHandler->GetMonitorHandler();
-        CHKPR(monitorHandler, ERROR_NULL_POINTER);
-        return monitorHandler->AddInputHandler(handlerType, eventType, sess);
-    }
+int32_t ServerMsgHandler::OnAddMonitorHandler(SessionPtr sess, HandleEventType eventType)
+{
+    CHKPR(sess, ERROR_NULL_POINTER);
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    auto monitorHandler = InputHandler->GetMonitorHandler();
+    CHKPR(monitorHandler, ERROR_NULL_POINTER);
+    return monitorHandler->AddMonitorHandler(eventType, sess);
 #endif // OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
 }
 
-int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, InputHandlerType handlerType,
-                                               HandleEventType eventType)
+int32_t ServerMsgHandler::OnRemoveMonitorHandler(SessionPtr sess, HandleEventType eventType)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
-    MMI_HILOGD("OnRemoveInputHandler handlerType:%{public}d eventType:%{public}u", handlerType, eventType);
-#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
-    if (handlerType == InputHandlerType::INTERCEPTOR) {
-        auto interceptorHandler = InputHandler->GetInterceptorHandler();
-        CHKPR(interceptorHandler, ERROR_NULL_POINTER);
-        interceptorHandler->RemoveInputHandler(handlerType, eventType, sess);
-    }
-#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+    MMI_HILOGD("OnRemoveInputHandler eventType:%{public}u", eventType);
 #ifdef OHOS_BUILD_ENABLE_MONITOR
-    if (handlerType == InputHandlerType::MONITOR) {
-        auto monitorHandler = InputHandler->GetMonitorHandler();
-        CHKPR(monitorHandler, ERROR_NULL_POINTER);
-        monitorHandler->RemoveInputHandler(handlerType, eventType, sess);
-    }
+    auto monitorHandler = InputHandler->GetMonitorHandler();
+    CHKPR(monitorHandler, ERROR_NULL_POINTER);
+    monitorHandler->RemoveMonitorHandler(eventType, sess);
 #endif // OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
 }
-#endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_MONITOR
 
 #ifdef OHOS_BUILD_ENABLE_MONITOR
 int32_t ServerMsgHandler::OnMarkConsumed(SessionPtr sess, int32_t eventId)

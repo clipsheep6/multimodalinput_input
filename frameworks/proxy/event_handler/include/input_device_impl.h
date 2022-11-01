@@ -31,7 +31,7 @@ namespace MMI {
 class NetPacket;
 class InputDeviceImpl final {
 public:
-    static InputDeviceImpl& GetInstance();
+    InputDeviceImpl() = default;
     DISALLOW_COPY_AND_MOVE(InputDeviceImpl);
     ~InputDeviceImpl() = default;
 
@@ -67,7 +67,6 @@ private:
     const FunInputDevKeys* GetDeviceKeys(int32_t) const;
     const FunKeyboardTypes* GetKeyboardTypes(int32_t) const;
 private:
-    InputDeviceImpl() = default;
     std::map<int32_t, InputDeviceData> inputDevices_;
     std::map<std::string, std::list<InputDevListenerPtr>> devListener_ = { { "change", {} } };
     int32_t userData_ { 0 };
@@ -76,5 +75,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#define InputDevImpl OHOS::MMI::InputDeviceImpl::GetInstance()
 #endif // OHOS_INPUT_DEVICE_EVENT_H

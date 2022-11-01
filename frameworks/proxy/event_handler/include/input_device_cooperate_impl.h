@@ -29,7 +29,7 @@ namespace OHOS {
 namespace MMI {
 class InputDeviceCooperateImpl final {
 public:
-    static InputDeviceCooperateImpl &GetInstance();
+    InputDeviceCooperateImpl() = default;
     DISALLOW_COPY_AND_MOVE(InputDeviceCooperateImpl);
     ~InputDeviceCooperateImpl() = default;
 
@@ -57,13 +57,13 @@ public:
     void OnCooprationMessage(int32_t userData, const std::string deviceId, CooperationMessage msg);
     void OnCooperationState(int32_t userData, bool state);
     int32_t GetUserData();
+    int32_t SetInputDevice(const std::string &dhid, const std::string &screenId);
 
 private:
     const DevCooperationMsg *GetCooprateMessageEvent(int32_t userData) const;
     const DevCooperateionState *GetCooprateStateEvent(int32_t userData) const;
 
 private:
-    InputDeviceCooperateImpl() = default;
     std::list<InputDevCooperateListenerPtr> devCooperateListener_;
     std::map<int32_t, CooperateEvent> devCooperateEvent_;
     std::mutex mtx_;
@@ -72,5 +72,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#define InputDevCooperateImpl OHOS::MMI::InputDeviceCooperateImpl::GetInstance()
 #endif // INPUT_DEVICE_COOPERATE_IMPL_H

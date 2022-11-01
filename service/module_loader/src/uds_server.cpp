@@ -21,7 +21,7 @@
 #include <sys/socket.h>
 
 #include "dfx_hisysevent.h"
-#include "i_multimodal_input_connect.h"
+#include "i_input_connect.h"
 #include "mmi_log.h"
 #include "util.h"
 #include "util_ex.h"
@@ -126,8 +126,8 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     auto closeSocketFdWhenError = [&serverFd, &toReturnClientFd] {
         close(serverFd);
         close(toReturnClientFd);
-        serverFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
-        toReturnClientFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
+        serverFd = IInputConnect::INVALID_SOCKET_FD;
+        toReturnClientFd = IInputConnect::INVALID_SOCKET_FD;
     };
 
     std::list<std::function<void()> > cleanTaskList;
@@ -244,6 +244,9 @@ void UDSServer::OnEpollRecv(int32_t fd, epoll_event& ev)
     for (int32_t i = 0; i < MAX_RECV_LIMIT; i++) {
         auto size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (size > 0) {
+#ifdef OHOS_BUILD_HAVE_DUMP_DATA
+            DumpData(szBuf, size, LINEINFO, "in %s, read message from fd: %d.", __func__, fd);
+#endif
             if (!buf.Write(szBuf, size)) {
                 MMI_HILOGW("Write data failed. size:%{public}zu", size);
             }
