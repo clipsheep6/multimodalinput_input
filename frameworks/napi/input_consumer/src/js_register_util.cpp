@@ -33,7 +33,7 @@ static std::map<int32_t, int32_t> anrTask = {};
 std::mutex mutex;
 } // namespace
 
-bool operator<(std::shared_ptr<KeyOption> &first, std::shared_ptr<KeyOption> &second)
+bool operator<(const std::shared_ptr<KeyOption> &first, const std::shared_ptr<KeyOption> &second)
 {
     CALL_DEBUG_ENTER;
     if (first->GetFinalKey() != second->GetFinalKey()) {
