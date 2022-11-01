@@ -147,10 +147,10 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::FinishPointer()
         if (curPointer_->GetId() < 0) {
             return AbsEvent::NULL_VALUE;
         }
-        if (absEvent_->GetPointerIdList().empty()) {
-            MMI_HILOGE("ACTION_UP is all over, nextId_ = %{public}d", nextId_);
-            nextId_ = 0;
-        }
+        // if (absEvent_->GetPointerIdList().empty()) {
+        //     MMI_HILOGE("ACTION_UP is all over, nextId_ = %{public}d", nextId_);
+        //     nextId_ = 0;
+        // }
     } else if (action != AbsEvent::ACTION_MOVE) {
         return AbsEvent::NULL_VALUE;
     }
