@@ -15,23 +15,16 @@
 
 #include "input_device_impl.h"
 
+#include "input_connect_manager.h"
 #include "mmi_log.h"
-#include "multimodal_event_handler.h"
-#include "multimodal_input_connect_manager.h"
 #include "napi_constants.h"
 #include "net_packet.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceImpl"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceImpl" };
 } // namespace
-
-InputDeviceImpl& InputDeviceImpl::GetInstance()
-{
-    static InputDeviceImpl instance;
-    return instance;
-}
 
 int32_t InputDeviceImpl::RegisterDevListener(const std::string &type, InputDevListenerPtr listener)
 {

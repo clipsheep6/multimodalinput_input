@@ -18,7 +18,6 @@
 #include "error_multimodal.h"
 #include "input_manager_impl.h"
 #include "define_multimodal.h"
-#include "multimodal_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
@@ -190,39 +189,6 @@ int32_t InputManager::GetPointerStyle(int32_t windowId, int32_t &pointerStyle)
 int32_t InputManager::SetInputDevice(const std::string& dhid, const std::string& screenId)
 {
     return InputMgrImpl.SetInputDevice(dhid, screenId);
-}
-
-int32_t InputManager::SetPointerLocation(int32_t x, int32_t y)
-{
-    return InputMgrImpl.SetPointerLocation(x, y);
-}
-
-int32_t InputManager::GetRemoteInputAbility(std::string deviceId,
-    std::function<void(std::set<int32_t>)> remoteTypes)
-{
-    return InputMgrImpl.GetRemoteInputAbility(deviceId, remoteTypes);
-}
-
-int32_t InputManager::PrepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback)
-{
-    return InputMgrImpl.PrepareRemoteInput(deviceId, callback);
-}
-
-int32_t InputManager::UnprepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback)
-{
-    return InputMgrImpl.UnprepareRemoteInput(deviceId, callback);
-}
-
-int32_t InputManager::StartRemoteInput(const std::string& deviceId,
-    uint32_t inputAbility, std::function<void(int32_t)> callback)
-{
-    return InputMgrImpl.StartRemoteInput(deviceId, inputAbility, callback);
-}
-
-int32_t InputManager::StopRemoteInput(const std::string& deviceId, uint32_t inputAbility,
-    std::function<void(int32_t)> callback)
-{
-    return InputMgrImpl.StopRemoteInput(deviceId, inputAbility, callback);
 }
 
 int32_t InputManager::RegisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener)

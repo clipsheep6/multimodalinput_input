@@ -83,8 +83,7 @@ void EventInterceptorHandler::HandleTouchEvent(const std::shared_ptr<PointerEven
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
-int32_t EventInterceptorHandler::AddInputHandler(InputHandlerType handlerType,
-    HandleEventType eventType, SessionPtr session)
+int32_t EventInterceptorHandler::AddInterceptorHandler(HandleEventType eventType, SessionPtr session)
 {
     CALL_INFO_TRACE;
     CHKPR(session, RET_ERR);
@@ -93,19 +92,16 @@ int32_t EventInterceptorHandler::AddInputHandler(InputHandlerType handlerType,
         return RET_ERR;
     }
     InitSessionLostCallback();
-    SessionHandler interceptor { handlerType, eventType, session };
+    SessionHandler interceptor { eventType, session };
     return interceptors_.AddInterceptor(interceptor);
 }
 
-void EventInterceptorHandler::RemoveInputHandler(InputHandlerType handlerType,
-    HandleEventType eventType, SessionPtr session)
+void EventInterceptorHandler::RemoveInterceptorHandler(HandleEventType eventType, SessionPtr session)
 {
     CALL_INFO_TRACE;
     CHKPV(session);
-    if (handlerType == InputHandlerType::INTERCEPTOR) {
-        SessionHandler interceptor { handlerType, eventType, session };
-        interceptors_.RemoveInterceptor(interceptor);
-    }
+    SessionHandler interceptor { eventType, session };
+    interceptors_.RemoveInterceptor(interceptor);
 }
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 bool EventInterceptorHandler::OnHandleEvent(std::shared_ptr<KeyEvent> keyEvent)
@@ -154,12 +150,7 @@ void EventInterceptorHandler::OnSessionLost(SessionPtr session)
 void EventInterceptorHandler::SessionHandler::SendToClient(std::shared_ptr<KeyEvent> keyEvent) const
 {
     CHKPV(keyEvent);
-    NetPacket pkt(MmiMessageId::REPORT_KEY_EVENT);
-    pkt << handlerType_;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write key event failed");
-        return;
-    }
+    NetPacket pkt(MmiMessageId::REPORT_INTERCEPTOR_KEY);
     if (InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt) != RET_OK) {
         MMI_HILOGE("Packet key event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
         return;
@@ -173,13 +164,7 @@ void EventInterceptorHandler::SessionHandler::SendToClient(std::shared_ptr<KeyEv
 void EventInterceptorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const
 {
     CHKPV(pointerEvent);
-    NetPacket pkt(MmiMessageId::REPORT_POINTER_EVENT);
-    MMI_HILOGD("Service send to client InputHandlerType:%{public}d", handlerType_);
-    pkt << handlerType_;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write pointer event failed");
-        return;
-    }
+    NetPacket pkt(MmiMessageId::REPORT_INTERCEPTOR_POINTER);
     if (InputEventDataTransformation::Marshalling(pointerEvent, pkt) != RET_OK) {
         MMI_HILOGE("Marshalling pointer event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
         return;
@@ -315,10 +300,9 @@ void EventInterceptorHandler::InterceptorCollection::Dump(int32_t fd, const std:
         SessionPtr session = item.session_;
         CHKPV(session);
         mprintf(fd,
-                "handlerType:%d | eventType:%d | Pid:%d | Uid:%d | Fd:%d "
+                "eventType:%d | Pid:%d | Uid:%d | Fd:%d "
                 "| EarliestEventTime:%" PRId64 " | Descript:%s \t",
-                item.handlerType_, item.eventType_,
-                session->GetPid(), session->GetUid(),
+                item.eventType_, session->GetPid(), session->GetUid(),
                 session->GetFd(),
                 session->GetEarliestEventTime(), session->GetDescript().c_str());
     }

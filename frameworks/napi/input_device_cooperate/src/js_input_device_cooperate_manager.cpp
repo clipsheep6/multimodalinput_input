@@ -18,7 +18,6 @@
 #include <functional>
 
 #include "define_multimodal.h"
-#include "input_device_cooperate_impl.h"
 #include "input_manager.h"
 #include "mmi_log.h"
 #include "napi_constants.h"
@@ -34,10 +33,14 @@ napi_value JsInputDeviceCooperateManager::Enable(napi_env env, bool enable, napi
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
-    int32_t userData = InputDevCooperateImpl.GetUserData();
+    int32_t userData = 0;
     napi_value result = CreateCallbackInfo(env, handle, userData);
     auto callback = std::bind(EmitJsEnable, userData, std::placeholders::_1, std::placeholders::_2);
-    InputMgr->EnableInputDeviceCooperate(enable, callback);
+    int32_t errCode = InputMgr->EnableInputDeviceCooperate(enable, callback);
+    HandleExecuteResult(env, errCode);
+    if (errCode != RET_OK) {
+        RemoveCallbackInfo(userData);
+    }
     return result;
 }
 
@@ -46,10 +49,14 @@ napi_value JsInputDeviceCooperateManager::Start(napi_env env, const std::string 
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
-    int32_t userData = InputDevCooperateImpl.GetUserData();
+    int32_t userData = 0;
     napi_value result = CreateCallbackInfo(env, handle, userData);
     auto callback = std::bind(EmitJsStart, userData, std::placeholders::_1, std::placeholders::_2);
-    InputMgr->StartInputDeviceCooperate(sinkDeviceDescriptor, srcInputDeviceId, callback);
+    int32_t errCode = InputMgr->StartInputDeviceCooperate(sinkDeviceDescriptor, srcInputDeviceId, callback);
+    HandleExecuteResult(env, errCode);
+    if (errCode != RET_OK) {
+        RemoveCallbackInfo(userData);
+    }
     return result;
 }
 
@@ -57,10 +64,14 @@ napi_value JsInputDeviceCooperateManager::Stop(napi_env env, napi_value handle)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
-    int32_t userData = InputDevCooperateImpl.GetUserData();
+    int32_t userData = 0;
     napi_value result = CreateCallbackInfo(env, handle, userData);
     auto callback = std::bind(EmitJsStop, userData, std::placeholders::_1, std::placeholders::_2);
-    InputMgr->StopDeviceCooperate(callback);
+    int32_t errCode = InputMgr->StopDeviceCooperate(callback);
+    HandleExecuteResult(env, errCode);
+    if (errCode != RET_OK) {
+        RemoveCallbackInfo(userData);
+    }
     return result;
 }
 
@@ -68,10 +79,14 @@ napi_value JsInputDeviceCooperateManager::GetState(napi_env env, const std::stri
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
-    int32_t userData = InputDevCooperateImpl.GetUserData();
+    int32_t userData = 0;
     napi_value result = CreateCallbackInfo(env, handle, userData);
     auto callback = std::bind(EmitJsGetState, userData, std::placeholders::_1);
-    InputMgr->GetInputDeviceCooperateState(deviceDescriptor, callback);
+    int32_t errCode = InputMgr->GetInputDeviceCooperateState(deviceDescriptor, callback);
+    HandleExecuteResult(env, errCode);
+    if (errCode != RET_OK) {
+        RemoveCallbackInfo(userData);
+    }
     return result;
 }
 

@@ -20,25 +20,29 @@
 
 #include "event_dispatch_handler.h"
 #include "i_event_filter.h"
-#include "input_handler_type.h"
+#include "input_proxy_def.h"
 #include "key_option.h"
 #include "msg_handler.h"
 
 namespace OHOS {
 namespace MMI {
 typedef std::function<int32_t(SessionPtr sess, NetPacket& pkt)> ServerMsgFun;
-class ServerMsgHandler : public MsgHandler<MmiMessageId, ServerMsgFun> {
+class ServerMsgHandler final : public MsgHandler<MmiMessageId, ServerMsgFun> {
 public:
-    ServerMsgHandler();
+    ServerMsgHandler() = default;
     DISALLOW_COPY_AND_MOVE(ServerMsgHandler);
-    virtual ~ServerMsgHandler() override;
+    ~ServerMsgHandler() override = default;
 
     void Init(UDSServer& udsServer);
     void OnMsgHandler(SessionPtr sess, NetPacket& pkt);
-#if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
-    int32_t OnAddInputHandler(SessionPtr sess, InputHandlerType handlerType, HandleEventType eventType);
-    int32_t OnRemoveInputHandler(SessionPtr sess, InputHandlerType handlerType, HandleEventType eventType);
-#endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+    int32_t OnAddInterceptorHandler(SessionPtr sess, HandleEventType eventType);
+    int32_t OnRemoveInterceptorHandler(SessionPtr sess, HandleEventType eventType);
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    int32_t OnAddMonitorHandler(SessionPtr sess, HandleEventType eventType);
+    int32_t OnRemoveMonitorHandler(SessionPtr sess, HandleEventType eventType);
+#endif // OHOS_BUILD_ENABLE_MONITOR
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     int32_t OnMarkConsumed(SessionPtr sess, int32_t eventId);
 #endif // OHOS_BUILD_ENABLE_MONITOR
@@ -64,13 +68,7 @@ public:
 protected:
     int32_t MarkProcessed(SessionPtr sess, NetPacket& pkt);
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
-#ifdef OHOS_BUILD_HDF
-    int32_t OnHdiInject(SessionPtr sess, NetPacket& pkt);
-#endif
     int32_t OnDisplayInfo(SessionPtr sess, NetPacket& pkt);
-#ifdef OHOS_BUILD_MMI_DEBUG
-    int32_t OnBigPacketTest(SessionPtr sess, NetPacket& pkt);
-#endif // OHOS_BUILD_MMI_DEBUG
 private:
     UDSServer *udsServer_ { nullptr };
     int32_t targetWindowId_ { -1 };

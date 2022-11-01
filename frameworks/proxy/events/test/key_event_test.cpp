@@ -22,7 +22,6 @@
 #include "proto.h"
 #include "run_shell_util.h"
 
-
 namespace OHOS {
 namespace MMI {
 namespace {

@@ -15,21 +15,14 @@
 
 #include "input_device_cooperate_impl.h"
 
+#include "input_connect_manager.h"
 #include "mmi_log.h"
-#include "multimodal_event_handler.h"
-#include "multimodal_input_connect_manager.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceCooperateImpl"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceCooperateImpl" };
 } // namespace
-
-InputDeviceCooperateImpl &InputDeviceCooperateImpl::GetInstance()
-{
-    static InputDeviceCooperateImpl instance;
-    return instance;
-}
 
 int32_t InputDeviceCooperateImpl::RegisterCooperateListener(InputDevCooperateListenerPtr listener)
 {
@@ -137,7 +130,6 @@ void InputDeviceCooperateImpl::OnDevCooperateListener(const std::string deviceId
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
     for (const auto &item : devCooperateListener_) {
-        MMI_HILOGI("Task listener device id is %{public}s", deviceId.c_str());
         item->OnCooperateMessage(deviceId, msg);
     }
 }
@@ -150,8 +142,6 @@ void InputDeviceCooperateImpl::OnCooprationMessage(int32_t userData, const std::
     auto event = GetCooprateMessageEvent(userData);
     CHKPV(event);
     (*event)(deviceId, msg);
-    MMI_HILOGD("Cooperatinon message event callback userData:%{public}d deviceId:(%{public}s) msg:(%{public}d)",
-        userData, deviceId.c_str(), msg);
 }
 
 void InputDeviceCooperateImpl::OnCooperationState(int32_t userData, bool state)
@@ -183,6 +173,17 @@ const InputDeviceCooperateImpl::DevCooperateionState *InputDeviceCooperateImpl::
 {
     auto iter = devCooperateEvent_.find(userData);
     return iter == devCooperateEvent_.end() ? nullptr : &iter->second.state;
+}
+
+int32_t InputDeviceCooperateImpl::SetInputDevice(const std::string &dhid, const std::string &screenId)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->SetInputDevice(dhid, screenId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
+    }
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS

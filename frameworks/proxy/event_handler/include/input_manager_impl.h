@@ -16,31 +16,24 @@
 #ifndef INPUT_MANAGER_IMPL_H
 #define INPUT_MANAGER_IMPL_H
 
-#include <vector>
-
 #include "singleton.h"
 
-#include "net_packet.h"
-
-#include "display_info.h"
-#include "event_filter_service.h"
+#include "anr_collecter.h"
 #include "event_handler.h"
-#include "if_mmi_client.h"
+#include "i_mmi_client.h"
 #include "input_device_impl.h"
 #include "input_device_cooperate_impl.h"
+#include "input_filter.h"
+#include "input_injector.h"
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
-#include "input_interceptor_manager.h"
+#include "input_interceptor.h"
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+#include "input_key_subscriber.h"
 #ifdef OHOS_BUILD_ENABLE_MONITOR
-#include "input_monitor_manager.h"
+#include "input_monitor.h"
 #endif // OHOS_BUILD_ENABLE_MONITOR
-#include "i_anr_observer.h"
-#include "i_input_event_consumer.h"
-#include "key_option.h"
-#include "pointer_event.h"
-#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
-#include "call_dinput_service.h"
-#endif // OHOS_DISTRIBUTED_INPUT_MODEL
+#include "input_mouse_helper.h"
+#include "input_window_transfer.h"
 
 namespace OHOS {
 namespace MMI {
@@ -50,6 +43,7 @@ class InputManagerImpl final {
 public:
     DISALLOW_MOVE(InputManagerImpl);
 
+    bool InitClient(EventHandlerPtr eventHandler = nullptr);
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
     int32_t SubscribeKeyEvent(
         std::shared_ptr<KeyOption> keyOption,
@@ -67,7 +61,6 @@ public:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-    int32_t PackDisplayData(NetPacket &pkt);
 
     int32_t AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor);
     int32_t AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor);
@@ -104,14 +97,6 @@ public:
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
     void OnAnr(int32_t pid);
 
-    int32_t SetPointerLocation(int32_t x, int32_t y);
-
-    int32_t GetRemoteInputAbility(std::string deviceId, std::function<void(std::set<int32_t>)> remoteTypes);
-    int32_t PrepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
-    int32_t UnprepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
-    int32_t StartRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback);
-    int32_t StopRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback);
-
     int32_t RegisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener);
     int32_t UnregisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener = nullptr);
     int32_t EnableInputDeviceCooperate(bool enabled, std::function<void(std::string, CooperationMessage)> callback);
@@ -122,13 +107,13 @@ public:
     int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
     bool GetFunctionKeyState(int32_t funcKey);
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
-
+    MMIClientPtr GetMMIClient();
+    InputDeviceCooperateImpl& GetInputDeviceCooImpl();
+    InputDeviceImpl& GetInputDeviceImpl();
+    InputMonitor& GetInputMonitor();
+    InputInterceptor& GetInputInterceptor();
+    InputKeySubscriber& GetKeySubscriber();
 private:
-    int32_t PackWindowInfo(NetPacket &pkt);
-    int32_t PackDisplayInfo(NetPacket &pkt);
-    void PrintDisplayInfo();
-    void SendDisplayInfo();
-
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consumer,
         std::shared_ptr<KeyEvent> keyEvent);
@@ -138,19 +123,20 @@ private:
         std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 private:
-    sptr<EventFilterService> eventFilterService_ { nullptr };
+    MMIClientPtr client_ { nullptr };
     std::shared_ptr<IInputEventConsumer> consumer_ { nullptr };
-    std::vector<std::shared_ptr<IAnrObserver>> anrObservers_;
-
-    DisplayGroupInfo displayGroupInfo_ {};
     std::mutex mtx_;
-    std::mutex handleMtx_;
-    std::condition_variable cv_;
-    std::thread ehThread_;
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ { nullptr };
-#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
-    sptr<CallDinputService> callDinputService_ { nullptr };
-#endif // OHOS_DISTRIBUTED_INPUT_MODEL
+    AnrCollecter anrCollecter_;
+    InputInjector inputInjector_;
+    InputDeviceCooperateImpl inputDeviceCooImpl_;
+    InputDeviceImpl inputDeviceImpl_;
+    InputFilter inputFilter_;
+    InputInterceptor inputInterceptor_;
+    InputMonitor inputMonitor_;
+    InputKeySubscriber keySubscriber_;
+    InputMouseHelper mouseHelper_;
+    InputWindowTransfer windowTransfer_;
 };
 
 #define InputMgrImpl ::OHOS::Singleton<InputManagerImpl>::GetInstance()

@@ -23,11 +23,11 @@
 namespace OHOS {
 namespace MMI {
 typedef std::function<int32_t(const UDSClient&, NetPacket&)> ClientMsgFun;
-class ClientMsgHandler : public MsgHandler<MmiMessageId, ClientMsgFun> {
+class ClientMsgHandler final : public MsgHandler<MmiMessageId, ClientMsgFun> {
 public:
     ClientMsgHandler() = default;
     DISALLOW_COPY_AND_MOVE(ClientMsgHandler);
-    virtual ~ClientMsgHandler();
+    ~ClientMsgHandler() override = default;
 
     void Init();
     void InitProcessedCallback();
@@ -44,13 +44,19 @@ protected:
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t OnSubscribeKeyEventCallback(const UDSClient& client, NetPacket& pkt);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || \
-    defined(OHOS_BUILD_ENABLE_MONITOR))
-    int32_t ReportKeyEvent(const UDSClient& client, NetPacket& pkt);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
+    int32_t ReportInterceptorKey(const UDSClient& client, NetPacket& pkt);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR
 #if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && \
-    (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR))
-    int32_t ReportPointerEvent(const UDSClient& client, NetPacket& pkt);
+    defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
+    int32_t ReportInterceptorPointer(const UDSClient& client, NetPacket& pkt);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_MONITOR)
+    int32_t ReportMonitorKey(const UDSClient& client, NetPacket& pkt);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_MONITOR
+#if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && \
+    defined(OHOS_BUILD_ENABLE_MONITOR)
+    int32_t ReportMonitorPointer(const UDSClient& client, NetPacket& pkt);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     int32_t OnInputDevice(const UDSClient& client, NetPacket& pkt);
     int32_t OnInputDeviceIds(const UDSClient& client, NetPacket& pkt);

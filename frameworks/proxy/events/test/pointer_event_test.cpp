@@ -22,7 +22,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 #ifdef OHOS_BUILD_ENABLE_POINTER
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "PointerEventTest"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerEventTest" };
 #endif // OHOS_BUILD_ENABLE_POINTER
 using namespace testing::ext;
 } // namespace
@@ -142,6 +142,18 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_001, TestSize.L
     item2.SetPointerId(0);
     pointerEvent->AddPointerItem(item2);
     ASSERT_TRUE(!pointerEvent->IsValid());
+    PointerEvent::PointerItem item3;
+    item3.SetPointerId(0);
+    pointerEvent->AddPointerItem(item3);
+    PointerEvent::PointerItem item4;
+    item4.SetPointerId(0);
+    pointerEvent->AddPointerItem(item4);
+    PointerEvent::PointerItem item5;
+    item5.SetPointerId(0);
+    pointerEvent->AddPointerItem(item5);
+    PointerEvent::PointerItem item6;
+    item6.SetPointerId(0);
+    pointerEvent->AddPointerItem(item6);
 
     auto pointerEvent1 = PointerEvent::Create();
     ASSERT_NE(pointerEvent1, nullptr);
@@ -487,7 +499,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_006, TestSize.L
     item.SetTargetWindowId(0);
     pointerEvent->AddPointerItem(item);
     ASSERT_TRUE(pointerEvent->IsValid());
-    DumpWindowData(pointerEvent); 
+    DumpWindowData(pointerEvent);
     pointerEvent->RemovePointerItem(0);
     pointerEvent->IsButtonPressed(0);
     pointerEvent->ClearButtonPressed();

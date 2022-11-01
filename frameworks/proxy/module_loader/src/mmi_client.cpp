@@ -23,8 +23,7 @@
 
 #include "input_manager_impl.h"
 #include "mmi_fd_listener.h"
-#include "multimodal_event_handler.h"
-#include "multimodal_input_connect_manager.h"
+#include "input_connect_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -34,11 +33,6 @@ const std::string THREAD_NAME = "mmi_EventHdr";
 } // namespace
 
 using namespace AppExecFwk;
-MMIClient::MMIClient()
-{
-    CALL_DEBUG_ENTER;
-}
-
 MMIClient::~MMIClient()
 {
     CALL_DEBUG_ENTER;
@@ -51,7 +45,7 @@ void MMIClient::SetEventHandler(EventHandlerPtr eventHandler)
     eventHandler_ = eventHandler;
 }
 
-void MMIClient::CheckIsEventHandlerChanged(EventHandlerPtr eventHandler)
+void MMIClient::MarkIsEventHandlerChanged(EventHandlerPtr eventHandler)
 {
     CHKPV(eventHandler);
     CHKPV(eventHandler_);
@@ -59,12 +53,13 @@ void MMIClient::CheckIsEventHandlerChanged(EventHandlerPtr eventHandler)
     CHKPV(currentRunner);
     auto newRunner = eventHandler->GetEventRunner();
     CHKPV(newRunner);
-    MMI_HILOGD("Current handler name:%{public}s", currentRunner->GetRunnerThreadName().c_str());
     isEventHandlerChanged_ = false;
     if (currentRunner->GetRunnerThreadName() != newRunner->GetRunnerThreadName()) {
         isEventHandlerChanged_ = true;
-        MMI_HILOGD("New handler name:%{public}s", newRunner->GetRunnerThreadName().c_str());
+        MMI_HILOGD("Event handler changed");
     }
+    MMI_HILOGD("Current handler name:%{public}s, New handler name:%{public}s",
+        currentRunner->GetRunnerThreadName().c_str(), newRunner->GetRunnerThreadName().c_str());
 }
 
 bool MMIClient::SendMessage(const NetPacket &pkt) const
@@ -110,6 +105,7 @@ bool MMIClient::StartEventRunner()
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
         CHKPF(eventHandler_);
+        MMI_HILOGI("Create event handler, thread name:%{public}s", runner->GetRunnerThreadName().c_str());
     }
 
     if (isConnected_ && fd_ >= 0) {
@@ -196,6 +192,7 @@ int32_t MMIClient::Reconnect()
 void MMIClient::OnReconnect()
 {
     if (Reconnect() == RET_OK) {
+        MMI_HILOGI("Reconnect ok");
         return;
     }
     CHKPV(eventHandler_);
@@ -260,13 +257,13 @@ void MMIClient::OnConnected()
 int32_t MMIClient::Socket()
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = MultimodalInputConnMgr->AllocSocketPair(IMultimodalInputConnect::CONNECT_MODULE_TYPE_MMI_CLIENT);
+    int32_t ret = MultimodalInputConnMgr->AllocSocketPair(IInputConnect::CONNECT_MODULE_TYPE_MMI_CLIENT);
     if (ret != RET_OK) {
         MMI_HILOGE("Call AllocSocketPair return %{public}d", ret);
         return RET_ERR;
     }
     fd_ = MultimodalInputConnMgr->GetClientSocketFdOfAllocedSocketPair();
-    if (fd_ == IMultimodalInputConnect::INVALID_SOCKET_FD) {
+    if (fd_ == IInputConnect::INVALID_SOCKET_FD) {
         MMI_HILOGE("Call GetClientSocketFdOfAllocedSocketPair return invalid fd");
     } else {
         MMI_HILOGD("Call GetClientSocketFdOfAllocedSocketPair return fd:%{public}d", fd_);
