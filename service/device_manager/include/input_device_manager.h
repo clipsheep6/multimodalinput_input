@@ -42,6 +42,7 @@ class InputDeviceManager final : public IDeviceObject {
         InputDeviceInfo *deviceOrigin_ { nullptr };
         std::string networkIdOrigin_;
         bool isRemote_ { false };
+        bool isPointerDevice_ { false };
         std::string dhid_;
     };
 public:
