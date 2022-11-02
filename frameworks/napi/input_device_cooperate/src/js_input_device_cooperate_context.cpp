@@ -62,7 +62,7 @@ napi_value JsInputDeviceCooperateContext::Enable(napi_env env, napi_callback_inf
 {
     CALL_INFO_TRACE;
     size_t argc = 2;
-    napi_value argv[2] = {};
+    napi_value argv[2] = { 0 };
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     if (argc == 0) {
@@ -96,7 +96,7 @@ napi_value JsInputDeviceCooperateContext::Start(napi_env env, napi_callback_info
 {
     CALL_INFO_TRACE;
     size_t argc = 3;
-    napi_value argv[3] = {};
+    napi_value argv[3] = { 0 };
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     if (argc < 2) {
@@ -140,7 +140,7 @@ napi_value JsInputDeviceCooperateContext::Stop(napi_env env, napi_callback_info 
 {
     CALL_INFO_TRACE;
     size_t argc = 1;
-    napi_value argv[1] = {};
+    napi_value argv[1] = { 0 };
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     JsInputDeviceCooperateContext *jsDev = JsInputDeviceCooperateContext::GetInstance(env);
@@ -161,7 +161,7 @@ napi_value JsInputDeviceCooperateContext::GetState(napi_env env, napi_callback_i
 {
     CALL_INFO_TRACE;
     size_t argc = 2;
-    napi_value argv[2] = {};
+    napi_value argv[2] = { 0 };
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     if (argc == 0) {
@@ -198,7 +198,7 @@ napi_value JsInputDeviceCooperateContext::On(napi_env env, napi_callback_info in
 {
     CALL_INFO_TRACE;
     size_t argc = 2;
-    napi_value argv[2] = {};
+    napi_value argv[2] = { 0 };
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     if (argc == 0) {
@@ -235,7 +235,7 @@ napi_value JsInputDeviceCooperateContext::Off(napi_env env, napi_callback_info i
 {
     CALL_INFO_TRACE;
     size_t argc = 2;
-    napi_value argv[2] = {};
+    napi_value argv[2] = { 0 };
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     if (argc == 0) {
@@ -413,7 +413,7 @@ void JsInputDeviceCooperateContext::DeclareDeviceCooperateData(napi_env env, nap
 napi_value JsInputDeviceCooperateContext::EnumClassConstructor(napi_env env, napi_callback_info info)
 {
     size_t argc = 0;
-    napi_value args[1] = {};
+    napi_value args[1] = { 0 };
     napi_value result = nullptr;
     void *data = nullptr;
     CHKRP(env, napi_get_cb_info(env, info, &argc, args, &result, &data), GET_CB_INFO);

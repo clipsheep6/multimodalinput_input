@@ -93,7 +93,10 @@ napi_value JsInputDeviceContext::JsConstructor(napi_env env, napi_callback_info 
     napi_status status = napi_wrap(env, thisVar, jsContext, [](napi_env env, void* data, void* hin) {
         MMI_HILOGI("jsvm ends");
         JsInputDeviceContext *context = static_cast<JsInputDeviceContext*>(data);
-        delete context;
+        if (context != nullptr) {
+            delete context;
+            context = nullptr;
+        }
     }, nullptr, nullptr);
     if (status != napi_ok) {
         delete jsContext;
@@ -141,7 +144,7 @@ napi_value JsInputDeviceContext::On(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     size_t argc = 2;
-    napi_value argv[2];
+    napi_value argv[2] = { 0 };
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc == 0) {
         MMI_HILOGE("Require two parameters");
@@ -180,7 +183,7 @@ napi_value JsInputDeviceContext::Off(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     size_t argc = 2;
-    napi_value argv[2];
+    napi_value argv[2] = { 0 };
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc == 0) {
         MMI_HILOGE("Require two parameters");
@@ -223,7 +226,7 @@ napi_value JsInputDeviceContext::GetDeviceIds(napi_env env, napi_callback_info i
 {
     CALL_DEBUG_ENTER;
     size_t argc = 1;
-    napi_value argv[1];
+    napi_value argv[1] = { 0 };
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc > 1) {
         THROWERR(env, "too many parameters");
@@ -247,7 +250,7 @@ napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info
 {
     CALL_DEBUG_ENTER;
     size_t argc = 2;
-    napi_value argv[2];
+    napi_value argv[2] = { 0 };
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 1 || argc > 2) {
         THROWERR(env, "the number of parameters is not as expected");
@@ -276,7 +279,7 @@ napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info in
 {
     CALL_DEBUG_ENTER;
     size_t argc = 3;
-    napi_value argv[3];
+    napi_value argv[3] = { 0 };
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 2) {
         MMI_HILOGE("Require three parameters");
@@ -336,7 +339,7 @@ napi_value JsInputDeviceContext::GetKeyboardType(napi_env env, napi_callback_inf
 {
     CALL_DEBUG_ENTER;
     size_t argc = 2;
-    napi_value argv[2];
+    napi_value argv[2] = { 0 };
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc == 0) {
         MMI_HILOGE("Require two parameters");
@@ -371,7 +374,7 @@ napi_value JsInputDeviceContext::GetDeviceList(napi_env env, napi_callback_info 
 {
     CALL_DEBUG_ENTER;
     size_t argc = 1;
-    napi_value argv[1];
+    napi_value argv[1] = { 0 };
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     JsInputDeviceContext *jsIds = JsInputDeviceContext::GetInstance(env);
@@ -392,7 +395,7 @@ napi_value JsInputDeviceContext::GetDeviceInfo(napi_env env, napi_callback_info 
 {
     CALL_DEBUG_ENTER;
     size_t argc = 2;
-    napi_value argv[2];
+    napi_value argv[2] = { 0 };
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc == 0) {
         MMI_HILOGE("Require two parameters");
@@ -425,7 +428,7 @@ napi_value JsInputDeviceContext::EnumClassConstructor(napi_env env, napi_callbac
 {
     CALL_DEBUG_ENTER;
     size_t argc = 0;
-    napi_value args[1] = {0};
+    napi_value args[1] = { 0 };
     napi_value ret = nullptr;
     void *data = nullptr;
     CHKRP(env, napi_get_cb_info(env, info, &argc, args, &ret, &data), GET_CB_INFO);

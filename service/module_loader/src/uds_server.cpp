@@ -109,47 +109,55 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
         MMI_HILOGE("Call fcntl failed, errno:%{public}d", errno);
         return RET_ERR;
     }
-
     static constexpr size_t bufferSize = 32 * 1024;
-    setsockopt(sockFds[0], SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));
-    setsockopt(sockFds[0], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
+
+    int32_t optRet = 0;
+    auto closeFdWhenErr = [&optRet] (int32_t& fd) {
+        if (optRet == -1) {
+            MMI_HILOGE("Cant't set opt to sockFd：%{public}d", fd);
+            close(fd);
+            fd = IMultimodalInputConnect::INVALID_SOCKET_FD;
+        }
+        return RET_ERR;
+    };
+
+    optRet = setsockopt(serverFd, SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));
+    closeFdWhenErr(serverFd);
+    optRet = setsockopt(serverFd, SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
+    closeFdWhenErr(serverFd);
     if (tokenType == TokenType::TOKEN_NATIVE) {
         static constexpr size_t nativeBufferSize = 64 * 1024;
-        setsockopt(sockFds[1], SOL_SOCKET, SO_SNDBUF, &nativeBufferSize, sizeof(nativeBufferSize));
-        setsockopt(sockFds[1], SOL_SOCKET, SO_RCVBUF, &nativeBufferSize, sizeof(nativeBufferSize));
+        optRet = setsockopt(toReturnClientFd, SOL_SOCKET, SO_SNDBUF, &nativeBufferSize, sizeof(nativeBufferSize));
+        closeFdWhenErr(toReturnClientFd);
+        optRet = setsockopt(toReturnClientFd, SOL_SOCKET, SO_RCVBUF, &nativeBufferSize, sizeof(nativeBufferSize));
+        closeFdWhenErr(toReturnClientFd);
     } else {
-        setsockopt(sockFds[1], SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));
-        setsockopt(sockFds[1], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
+        optRet = setsockopt(toReturnClientFd, SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));
+        closeFdWhenErr(toReturnClientFd);
+        optRet = setsockopt(toReturnClientFd, SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
+        closeFdWhenErr(toReturnClientFd);
     }
     MMI_HILOGD("Alloc socketpair, serverFd:%{public}d,clientFd:%{public}d(%{public}d)",
                serverFd, toReturnClientFd, sockFds[1]);
-    auto closeSocketFdWhenError = [&serverFd, &toReturnClientFd] {
+
+    auto closeSocketPairWhenError = [&serverFd, &toReturnClientFd] {
         close(serverFd);
         close(toReturnClientFd);
         serverFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
         toReturnClientFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
     };
 
-    std::list<std::function<void()> > cleanTaskList;
-    auto cleanTaskWhenError = [cleanTaskList] {
-        for (const auto &item : cleanTaskList) {
-            item();
-        }
-    };
-
-    cleanTaskList.push_back(closeSocketFdWhenError);
-
     int32_t ret = RET_OK;
     ret = AddEpoll(EPOLL_EVENT_SOCKET, serverFd);
     if (ret != RET_OK) {
-        cleanTaskWhenError();
+        closeSocketPairWhenError();
         MMI_HILOGE("epoll_ctl EPOLL_CTL_ADD return %{public}d,errCode:%{public}d", ret, EPOLL_MODIFY_FAIL);
         return ret;
     }
 
     SessionPtr sess = std::make_shared<UDSSession>(programName, moduleType, serverFd, uid, pid);
     if (sess == nullptr) {
-        cleanTaskWhenError();
+        closeSocketPairWhenError();
         MMI_HILOGE("make_shared fail. progName:%{public}s,pid:%{public}d,errCode:%{public}d",
             programName.c_str(), pid, MAKE_SHARED_FAIL);
         return RET_ERR;
@@ -157,7 +165,7 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     sess->SetTokenType(tokenType);
 
     if (!AddSession(sess)) {
-        cleanTaskWhenError();
+        closeSocketPairWhenError();
         MMI_HILOGE("AddSession fail errCode:%{public}d", ADD_SESSION_FAIL);
         return RET_ERR;
     }

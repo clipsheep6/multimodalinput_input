@@ -138,7 +138,7 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
 
 bool GetNamePropertyBool(const napi_env& env, const napi_value& object, const std::string& name)
 {
-    napi_value napiValue = {};
+    napi_value napiValue = { 0 };
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
@@ -158,7 +158,7 @@ bool GetNamePropertyBool(const napi_env& env, const napi_value& object, const st
 std::string GetNamePropertyString(const napi_env& env, const napi_value& object, const std::string& name)
 {
     std::string value = "";
-    napi_value napiValue = {};
+    napi_value napiValue = { 0 };
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
@@ -180,7 +180,7 @@ std::string GetNamePropertyString(const napi_env& env, const napi_value& object,
 int32_t GetNamePropertyInt32(const napi_env& env, const napi_value& object, const std::string& name)
 {
     int32_t value = 0;
-    napi_value napiValue = {};
+    napi_value napiValue = { 0 };
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
@@ -198,7 +198,7 @@ int32_t GetNamePropertyInt32(const napi_env& env, const napi_value& object, cons
 int64_t GetNamePropertyInt64(const napi_env& env, const napi_value& object, const std::string& name)
 {
     int64_t value = 0;
-    napi_value napiValue = {};
+    napi_value napiValue = { 0 };
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
@@ -216,7 +216,7 @@ int64_t GetNamePropertyInt64(const napi_env& env, const napi_value& object, cons
 uint32_t GetNamePropertyUint32(const napi_env& env, const napi_value& object, const std::string& name)
 {
     uint32_t value = 0;
-    napi_value napiValue = {};
+    napi_value napiValue = { 0 };
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {

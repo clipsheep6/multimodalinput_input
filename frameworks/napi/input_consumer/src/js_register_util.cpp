@@ -48,7 +48,7 @@ void SetNamedProperty(const napi_env &env, napi_value &object, const std::string
 
 bool GetNamedPropertyBool(const napi_env &env, const napi_value &object, const std::string &name, bool &ret)
 {
-    napi_value napiValue = {};
+    napi_value napiValue = { 0 };
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
 
@@ -65,7 +65,7 @@ bool GetNamedPropertyBool(const napi_env &env, const napi_value &object, const s
 
 std::optional<int32_t> GetNamedPropertyInt32(const napi_env &env, const napi_value &object, const std::string &name)
 {
-    napi_value napiValue = {};
+    napi_value napiValue = { 0 };
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
@@ -287,6 +287,10 @@ void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
     KeyEventMonitorInfoWorker *dataWorker = static_cast<KeyEventMonitorInfoWorker *>(work->data);
     delete work;
     work = nullptr;
+    if (dataWorker == nullptr) {
+        MMI_HILOGE("dataWorker is null");
+        return;
+    }
     KeyEventMonitorInfo *event = dataWorker->reportEvent;
     napi_env env = dataWorker->env;
     delete dataWorker;
@@ -316,7 +320,11 @@ void EmitAsyncCallbackWork(KeyEventMonitorInfo *reportEvent)
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
     KeyEventMonitorInfoWorker *dataWorker = new (std::nothrow) KeyEventMonitorInfoWorker();
-    CHKPV(dataWorker);
+    if (dataWorker == nullptr) {
+        MMI_HILOGE("dataWorker is nullptr");
+        delete work;
+        return;
+    }
 
     dataWorker->env = reportEvent->env;
     dataWorker->reportEvent = reportEvent;

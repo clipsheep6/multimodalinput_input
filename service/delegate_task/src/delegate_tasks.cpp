@@ -27,6 +27,16 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "DelegateTasks" };
 } // namespace
 
+DelegateTasks::~DelegateTasks()
+{
+    if (fds_[0] >= 0) {
+        close(fds_[0]);
+    }
+    if (fds_[1] >= 0) {
+        close(fds_[1]);
+    }
+}
+
 void DelegateTasks::Task::ProcessTask()
 {
     CALL_DEBUG_ENTER;
@@ -52,10 +62,16 @@ bool DelegateTasks::Init()
     }
     if (fcntl(fds_[0], F_SETFL, O_NONBLOCK) == -1) {
         MMI_HILOGE("The fcntl read failed,errno:%{public}d", errno);
+        if (fds_[0] >= 0) {
+            close(fds_[0]);
+        }
         return false;
     }
     if (fcntl(fds_[1], F_SETFL, O_NONBLOCK) == -1) {
         MMI_HILOGE("The fcntl write failed,errno:%{public}d", errno);
+        if (fds_[1] >= 0) {
+            close(fds_[1]);
+        }
         return false;
     }
     return true;

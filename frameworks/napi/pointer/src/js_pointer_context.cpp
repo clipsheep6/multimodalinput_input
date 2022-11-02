@@ -116,7 +116,7 @@ napi_value JsPointerContext::SetPointerVisible(napi_env env, napi_callback_info 
 {
     CALL_DEBUG_ENTER;
     size_t argc = 2;
-    napi_value argv[2];
+    napi_value argv[2] = { 0 };
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc == 0) {
         MMI_HILOGE("At least one parameter is required");
@@ -148,7 +148,7 @@ napi_value JsPointerContext::IsPointerVisible(napi_env env, napi_callback_info i
 {
     CALL_DEBUG_ENTER;
     size_t argc = 1;
-    napi_value argv[1];
+    napi_value argv[1] = { 0 };
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
@@ -169,7 +169,7 @@ napi_value JsPointerContext::SetPointerSpeed(napi_env env, napi_callback_info in
 {
     CALL_DEBUG_ENTER;
     size_t argc = 2;
-    napi_value argv[2];
+    napi_value argv[2] = { 0 };
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc == 0) {
         MMI_HILOGE("At least 1 parameter is required");
@@ -205,7 +205,7 @@ napi_value JsPointerContext::GetPointerSpeed(napi_env env, napi_callback_info in
 {
     CALL_DEBUG_ENTER;
     size_t argc = 1;
-    napi_value argv[1];
+    napi_value argv[1] = { 0 };
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
@@ -225,7 +225,7 @@ napi_value JsPointerContext::SetPointerStyle(napi_env env, napi_callback_info in
 {
     CALL_DEBUG_ENTER;
     size_t argc = 3;
-    napi_value argv[3];
+    napi_value argv[3] = { 0 };
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 2) {
         MMI_HILOGE("At least 2 parameter is required");
@@ -273,7 +273,7 @@ napi_value JsPointerContext::GetPointerStyle(napi_env env, napi_callback_info in
 {
     CALL_DEBUG_ENTER;
     size_t argc = 2;
-    napi_value argv[2];
+    napi_value argv[2] = { 0 };
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc == 0) {
         MMI_HILOGE("At least 1 parameter is required");
