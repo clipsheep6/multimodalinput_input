@@ -48,7 +48,7 @@ public:
         public:
             static const std::shared_ptr<Pointer> NULL_VALUE;
         public:
-            int32_t GetId() const;
+            // int32_t GetId() const;
             int32_t GetX() const;
             int32_t GetY() const;
             int64_t GetDownTime() const;
@@ -74,21 +74,21 @@ public:
     AbsEvent(int32_t deviceId, int32_t sourceType);
     virtual ~AbsEvent() = default;
     int32_t GetSourceType() const;
-    int32_t GetPointerId() const;
+    // int32_t GetPointerId() const;
 
     std::shared_ptr<Pointer> GetPointer() const;
-    std::shared_ptr<Pointer> GetPointer(int32_t id) const;
-    std::list<int32_t> GetPointerIdList() const;
-    std::list<std::shared_ptr<const Pointer>> GetPointerList() const;
+    // std::shared_ptr<Pointer> GetPointer(int32_t id) const;
+    // std::list<int32_t> GetPointerIdList() const;
+    // std::list<std::shared_ptr<const Pointer>> GetPointerList() const;
     void SetCurSlot(int32_t curSlot);
     int32_t GetCurSlot() const;
 
     virtual std::ostream& operator<<(std::ostream& outStream) const override;
 
     int32_t SetSourceType(int32_t sourceType);
-    int32_t SetPointerId(int32_t pointerId);
+    // int32_t SetPointerId(int32_t pointerId);
     int32_t AddPointer(const std::shared_ptr<Pointer>& pointer);
-    int32_t RemovePointer(const std::shared_ptr<Pointer>& pointer);
+    // int32_t RemovePointer(const std::shared_ptr<Pointer>& pointer);
 
 protected:
     virtual const char* ActionToStr(int32_t action) const override;
@@ -99,6 +99,7 @@ private:
     int32_t sourceType_;
     int32_t curSlot_;
     pointer_list pointers_;
+    std::shared_ptr<AbsEvent::Pointer> curPointer_ {nullptr};
 };
 
 std::ostream& operator<<(std::ostream& outStream, const AbsEvent& absEvent);

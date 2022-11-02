@@ -37,6 +37,7 @@ InputEventCb g_eventCb;
 InputHostCb g_hostCb;
 std::mutex g_mutex;
 std::map<uint32_t, int32_t> lastDevInfo;
+static std::map<uint32_t, uint16_t> latestHdfEventTypes;
 } // namespace
 
 void HdfDeviceStatusChanged(int32_t devIndex, int32_t devType, HdfInputEventDevStatus devStatus)
@@ -55,6 +56,14 @@ void HdfDeviceStatusChanged(int32_t devIndex, int32_t devType, HdfInputEventDevS
         int saveErrno = errno;
         MMI_HILOGE("Write pipe fail, errno:%{public}d, %{public}s", saveErrno, strerror(saveErrno));
     }
+
+    if (devStatus != HdfInputEventDevStatus::HDF_RMV_DEVICE) {
+        return;
+    }
+    auto it = latestHdfEventTypes.find(devIndex);
+    if (it != latestHdfEventTypes.end()) {
+        latestHdfEventTypes.erase(it);
+    }
 }
 
 static void HotPlugCallback(const InputHotPlugEvent *event)
@@ -63,6 +72,21 @@ static void HotPlugCallback(const InputHotPlugEvent *event)
     CHKPV(event);
     auto devStatus = (event->status ? HdfInputEventDevStatus::HDF_RMV_DEVICE : HdfInputEventDevStatus::HDF_ADD_DEVICE);
     HdfDeviceStatusChanged(event->devIndex, event->devType, devStatus);
+}
+
+static inline bool IsDupEvSync(const InputEventPackage &r, uint32_t devIndex)
+{
+    auto it = latestHdfEventTypes.find(devIndex);
+    if (it == latestHdfEventTypes.end()) {
+        latestHdfEventTypes.insert(std::make_pair(devIndex, r.type));
+        return false;
+    }
+
+    if (it->second == EV_SYN) {
+        return true;
+    }
+    latestHdfEventTypes.emplace(devIndex, r.type);
+    return false;
 }
 
 static inline bool IsDupTouchBtnKey(const InputEventPackage &r, uint32_t devIndex)
@@ -118,6 +142,9 @@ static void EventPkgCallback(const InputEventPackage **pkgs, uint32_t count, uin
         }
         const InputEventPackage &r = *pkgs[i];
         if (IsDupTouchBtnKey(r, devIndex)) {
+            continue;
+        }
+        if (IsDupEvSync(r, devIndex)) {
             continue;
         }
         WriteToPipe(r, devIndex);
