@@ -213,7 +213,7 @@ void JsEventTarget::CallIdsAsyncWork(uv_work_t *work, int32_t status)
         MMI_HILOGE("scope is nullptr");
         return;
     }
-    napi_value arr[2];
+    napi_value arr[2] = { 0 };
     CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &arr[0]), GET_UNDEFINED, scope);
     CHKRV_SCOPE(cb->env, napi_create_array(cb->env, &arr[1]), CREATE_ARRAY, scope);
     uint32_t index = 0;
@@ -333,7 +333,7 @@ void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
         MMI_HILOGE("scope is nullptr");
         return;
     }
-    napi_value object[2];
+    napi_value object[2] = { 0 };
     CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &object[0]), GET_UNDEFINED, scope);
     object[1] = JsUtil::GetDeviceInfo(cb);
     napi_value handler = nullptr;
