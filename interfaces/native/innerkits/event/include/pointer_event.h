@@ -615,8 +615,8 @@ public:
          * @return void
          * @since 9
          */
-        void SetDownTime(int64_t downTime);
 
+        void SetDownTime(int64_t downTime);        
         /**
          * @brief Checks whether the pointer is pressed.
          * @return Returns <b>true</b> if the pointer is pressed; returns <b>false</b> otherwise.

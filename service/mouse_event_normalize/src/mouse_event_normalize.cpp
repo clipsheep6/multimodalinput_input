@@ -252,6 +252,7 @@ void MouseEventNormalize::HandlePostInner(struct libinput_event_pointer* data, i
 {
     CALL_DEBUG_ENTER;
     CHKPV(data);
+    uint64_t eventTime = libinput_event_pointer_get_time_usec(data);
     auto mouseInfo = WinMgr->GetMouseInfo();
     MouseState->SetMouseCoords(mouseInfo.physicalX, mouseInfo.physicalY);
     pointerItem.SetDisplayX(mouseInfo.physicalX);
@@ -271,6 +272,7 @@ void MouseEventNormalize::HandlePostInner(struct libinput_event_pointer* data, i
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     SetDxDyForDInput(pointerItem, data);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
+    pointerEvent_->SetEventTime(eventTime);
     pointerEvent_->UpdateId();
     pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);

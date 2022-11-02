@@ -115,6 +115,16 @@ void InputEvent::SetActionTime(int64_t actionTime)
     actionTime_ = actionTime;
 }
 
+uint64_t InputEvent::GetEventTime() const 
+{
+    return eventTime_;
+}
+
+void InputEvent::SetEventTime(uint64_t eventTime)
+{
+    eventTime_ = eventTime;
+}
+
 int32_t InputEvent::GetAction() const
 {
     return action_;

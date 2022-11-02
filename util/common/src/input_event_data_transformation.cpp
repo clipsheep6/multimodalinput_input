@@ -45,6 +45,7 @@ int32_t InputEventDataTransformation::KeyEventToNetPacket(
     pkt << key->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY)
         << key->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY)
         << key->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY);
+
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write key event failed");
         return RET_ERR;
@@ -110,7 +111,7 @@ int32_t InputEventDataTransformation::SerializeInputEvent(std::shared_ptr<InputE
     pkt << event->GetEventType() << event->GetId() << event->GetActionTime()
         << event->GetAction() << event->GetActionStartTime() << event->GetDeviceId()
         << event->GetTargetDisplayId() << event->GetTargetWindowId()
-        << event->GetAgentWindowId() << event->GetFlag();
+        << event->GetAgentWindowId() << event->GetFlag() << event->GetEventTime();
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Serialize packet is failed");
         return RET_ERR;
@@ -142,6 +143,9 @@ int32_t InputEventDataTransformation::DeserializeInputEvent(NetPacket &pkt, std:
     event->SetAgentWindowId(tField);
     uint32_t tFlag = InputEvent::EVENT_FLAG_NONE;
     pkt >> tFlag;
+    uint64_t eventTime = 0;
+    pkt >> eventTime;
+    event->SetEventTime(eventTime);
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Deserialize packet is failed");
         return RET_ERR;
