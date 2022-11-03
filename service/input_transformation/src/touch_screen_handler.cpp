@@ -31,7 +31,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Touch
 std::unique_ptr<TouchScreenHandler> TouchScreenHandler::CreateInstance(const IInputContext* context)
 {
     if (context == nullptr) {
-         return nullptr;
+        return nullptr;
     }
     return std::unique_ptr<TouchScreenHandler>(new TouchScreenHandler(context));
 }
@@ -126,9 +126,6 @@ void TouchScreenHandler::OnInputEvent(const std::shared_ptr<const AbsEvent>& eve
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPV(inputEventNormalizeHandler);   
     CHKPV(pointerEvent_);
-    if (pointerEvent_->GetPointerId() == -1) {
-        return;
-    }
     MMI_HILOGE("lisong POINTER OnInputEvent idx = %{public}d, pointerEvent = %{public}p", pointerEvent_->GetPointerId(), pointerEvent_.get());
     inputEventNormalizeHandler->HandleTouchEvent(pointerEvent_);
     if (pointerAction == PointerEvent::POINTER_ACTION_UP) {

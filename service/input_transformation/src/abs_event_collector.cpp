@@ -75,7 +75,7 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleSyncEvent(int32_t code
  
 void AbsEventCollector::AfterProcessed()
 {
-    //RemoveReleasedPointer();
+    RemoveReleasedPointer();
 }
 
 int32_t AbsEventCollector::SetSourceType(int32_t sourceType)
@@ -108,7 +108,7 @@ std::shared_ptr<AbsEvent::Pointer> AbsEventCollector::GetCurrentPointer(bool cre
     }
 
     if (!createIfNotExist) {
-        MMI_HILOGE("Leave, null pointer and !createIfNotExist");
+        MMI_HILOGD("Leave, null pointer and !createIfNotExist");
         return nullptr;
     }
 
@@ -161,7 +161,7 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::FinishPointer()
 
 
     CALL_DEBUG_ENTER;
-    auto pointer = GetCurrentPointer(true);
+    auto pointer = GetCurrentPointer(false);
     if (!pointer) {
         MMI_HILOGE("pointer is null. Leave.");
         return AbsEvent::NULL_VALUE;
@@ -246,28 +246,33 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleMtTrackingId(int32_t v
     return AbsEvent::NULL_VALUE;
 }
 
-// void AbsEventCollector::RemoveReleasedPointer()
-// {
-//     if (absEvent_->GetAction() != AbsEvent::ACTION_UP) {
-//         return;
-//     }
-//     absEvent_->SetAction(AbsEvent::ACTION_NONE);
-//     const auto& pointer = absEvent_->GetPointer();
-//     if (!pointer) {
-//         MMI_HILOGE("Leave, null pointer");
-//         return;
-//     }
+void AbsEventCollector::RemoveReleasedPointer()
+{
+    if (absEvent_->GetAction() != AbsEvent::ACTION_UP) {
+        return;
+    }
 
-//     auto retCode = absEvent_->RemovePointer(pointer);
-//     if (retCode < 0) {
-//         MMI_HILOGE("Leave, null pointer failed");
-//         return;
-//     }
-//     pointer->SetId(-1);
-//     // if (absEvent_->GetPointerIdList().empty()) {
-//     //     MMI_HILOGE("ACTION_UP is all over, nextId_ = %{public}d", nextId_);
-//     //     nextId_ = 0;
-//     // }
-// }
+    if (pointers_.find(curSlot_) != pointers_.end()) {
+        pointers_.erase(curSlot_);
+    }
+
+    // absEvent_->SetAction(AbsEvent::ACTION_NONE);
+    // const auto& pointer = absEvent_->GetPointer();
+    // if (!pointer) {
+    //     MMI_HILOGE("Leave, null pointer");
+    //     return;
+    // }
+
+    // auto retCode = absEvent_->RemovePointer(pointer);
+    // if (retCode < 0) {
+    //     MMI_HILOGE("Leave, null pointer failed");
+    //     return;
+    // }
+    // pointer->SetId(-1);
+    // if (absEvent_->GetPointerIdList().empty()) {
+    //     MMI_HILOGE("ACTION_UP is all over, nextId_ = %{public}d", nextId_);
+    //     nextId_ = 0;
+    // }
+}
 } // namespace MMI
 } // namespace OHOS
