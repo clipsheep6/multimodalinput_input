@@ -52,10 +52,6 @@ const char* AbsEvent::ActionToString(int32_t action)
         return "ACTION_UNKOWN";
     }
 }
-// int32_t AbsEvent::Pointer::GetId() const
-// {
-//     return id_;
-// }
 
 int32_t AbsEvent::Pointer::GetX() const
 {
@@ -112,36 +108,10 @@ int32_t AbsEvent::GetSourceType() const
     return sourceType_;
 }
 
-// int32_t AbsEvent::GetPointerId() const
-// {
-//     return pointerId_;
-// }
-
 std::shared_ptr<AbsEvent::Pointer> AbsEvent::GetPointer() const
 {
-    // return GetPointer(pointerId_);
     return curPointer_;
 }
-
-// std::shared_ptr<AbsEvent::Pointer> AbsEvent::GetPointer(int32_t id) const
-// {
-//     for (const auto& pointer : pointers_) {
-//         if (pointer->GetId() == id) {
-//             return pointer;
-//         }
-//     }
-
-//     return nullptr;
-// }
-
-// std::list<std::shared_ptr<const AbsEvent::Pointer>> AbsEvent::GetPointerList() const
-// {
-//     std::list<std::shared_ptr<const AbsEvent::Pointer>> result;
-//     for (const auto& pointer : pointers_) {
-//         result.push_back(pointer);
-//     }
-//     return result;
-// }
 
 void AbsEvent::SetCurSlot(int32_t curSlot)
 {
@@ -152,15 +122,6 @@ int32_t AbsEvent::GetCurSlot() const
 {
     return curSlot_;
 }
-
-// std::list<int32_t> AbsEvent::GetPointerIdList() const
-// {
-//     std::list<int32_t> result;
-//     for (const auto& pointer: pointers_) {
-//         result.push_back(pointer->GetId());
-//     }
-//     return result;
-// }
 
 std::ostream& AbsEvent::operator<<(std::ostream& outStream) const
 {
@@ -184,63 +145,15 @@ int32_t AbsEvent::SetSourceType(int32_t sourceType)
     return 0;
 }
 
-// int32_t AbsEvent::SetPointerId(int32_t pointerId)
-// {
-//     // if (!GetPointer(pointerId)) {
-//     //     MMI_HILOGE("Leave, not exist pointer:%{public}d", pointerId_);
-//     //     return -1;
-//     // }
-
-//     pointerId_ = pointerId;
-//     return 0;
-// }
-
 int32_t AbsEvent::AddPointer(const std::shared_ptr<Pointer>& pointer)
 {
     if (!pointer) {
         MMI_HILOGE("Leave, null pointer");
         return -1;
     }
-
-    // if (pointer->GetId() < 0) {
-    //     MMI_HILOGE("Leave, null pointer");
-    //     return -1;
-    // }
-
-    // for (const auto& item : pointers_) {
-    //     if (item == pointer) {
-    //         MMI_HILOGE("Leave, Repeat Added Pointer");
-    //         return -1;
-    //     }
-
-    //     if (item->GetId() == pointer->GetId()) {
-    //         MMI_HILOGE("Leave, Repeat Added Pointer");
-    //         return -1;
-    //     }
-    // }
-
-    // pointers_.push_back(pointer);
     curPointer_ = pointer;
     return 0;
 }
-
-// int32_t AbsEvent::RemovePointer(const std::shared_ptr<Pointer>& pointer)
-// {
-//     if (!pointer) {
-//         MMI_HILOGE("Leave, null pointer");
-//         return -1;
-//     }
-
-//     for (auto it = pointers_.begin(); it != pointers_.end(); ++it) {
-//         if (*it == pointer) {
-//             pointers_.erase(it);
-//             return 0;
-//         }
-//     }
-
-//     MMI_HILOGE("Leave, not exist pointer");
-//     return -1;
-// }
 
 const char* AbsEvent::ActionToStr(int32_t action) const
 {

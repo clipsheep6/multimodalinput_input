@@ -100,7 +100,6 @@ void TouchScreenHandler::ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointer
 {
     CHKPV(pointerEvent);
     pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
-    MMI_HILOGE("This touch event is up remove this finger, idx = %{public}d", pointerEvent->GetPointerId());
     if (pointerEvent->GetPointerIds().empty()) {
         MMI_HILOGE("This touch event is final finger up remove this finger");
         pointerEvent->Reset();
@@ -114,7 +113,6 @@ void TouchScreenHandler::OnInputEvent(const std::shared_ptr<const AbsEvent>& eve
     int64_t actionTime = 0;
 
     if (pointerEvent_ == nullptr) {
-        MMI_HILOGE("lisong pointerEvent_ = PointerEvent::Create(), pointerEvent = %{public}p", pointerEvent_.get());
         pointerEvent_ = PointerEvent::Create();
         CHKPV(pointerEvent_);
     }
@@ -126,10 +124,8 @@ void TouchScreenHandler::OnInputEvent(const std::shared_ptr<const AbsEvent>& eve
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPV(inputEventNormalizeHandler);   
     CHKPV(pointerEvent_);
-    MMI_HILOGE("lisong POINTER OnInputEvent idx = %{public}d, pointerEvent = %{public}p", pointerEvent_->GetPointerId(), pointerEvent_.get());
     inputEventNormalizeHandler->HandleTouchEvent(pointerEvent_);
     if (pointerAction == PointerEvent::POINTER_ACTION_UP) {
-        MMI_HILOGE("lisong POINTER_ACTION_UP idx = %{public}d, pointerEvent = %{public}p", pointerEvent_->GetPointerId(), pointerEvent_.get());
         ResetTouchUpEvent(pointerEvent_);
     }
 }
@@ -315,7 +311,6 @@ bool TouchScreenHandler::OnEventTouchDown(const std::shared_ptr<const AbsEvent>&
     PointerEvent::PointerItem item;
     double pressure = 0;    //TO DO ...
     int32_t seatSlot = absEvent->GetCurSlot();
-    MMI_HILOGE("lisong OnEventTouchDown seatSlot = %{public}d", seatSlot);
     int32_t longAxis = 0;   //TO DO ...
     int32_t shortAxis = 0;  //TO DO ...
     item.SetPressure(pressure);
@@ -349,7 +344,6 @@ bool TouchScreenHandler::OnEventTouchUp(const std::shared_ptr<const AbsEvent>& a
 
     PointerEvent::PointerItem item;
     int32_t seatSlot = absEvent->GetCurSlot();
-    MMI_HILOGE("lisong OnEventTouchUp seatSlot = %{public}d", seatSlot);
     if (!(pointerEvent_->GetPointerItem(seatSlot, item))) {
         MMI_HILOGE("Get pointer parameter failed");
         return false;
@@ -376,7 +370,6 @@ bool TouchScreenHandler::OnEventTouchMotion(const std::shared_ptr<const AbsEvent
     }
     PointerEvent::PointerItem item;
     int32_t seatSlot = absEvent->GetCurSlot();
-    MMI_HILOGE("lisong OnEventTouchMotion seatSlot = %{public}d", seatSlot);
     if (!(pointerEvent_->GetPointerItem(seatSlot, item))) {
         MMI_HILOGE("Get pointer parameter failed");
         return false;

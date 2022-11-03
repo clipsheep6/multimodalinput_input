@@ -103,7 +103,6 @@ std::shared_ptr<AbsEvent::Pointer> AbsEventCollector::GetCurrentPointer(bool cre
 
     auto it = pointers_.find(curSlot_);
     if (it != pointers_.end()) {
-        // curPointer_ = it->second;
         return it->second;
     }
 
@@ -119,55 +118,12 @@ std::shared_ptr<AbsEvent::Pointer> AbsEventCollector::GetCurrentPointer(bool cre
 
 const std::shared_ptr<AbsEvent>& AbsEventCollector::FinishPointer()
 {
-    // CALL_DEBUG_ENTER;
-    // if (!curPointer_) {
-    //     MMI_HILOGE("curPointer is null. Leave.");
-    //     return AbsEvent::NULL_VALUE;
-    // }
-    // auto action = absEventAction_;
-    // absEventAction_ = AbsEvent::ACTION_NONE;
-    // auto nowTime = TimeUtils::GetTimeStampMs();
-    // if (action == AbsEvent::ACTION_DOWN) {
-    //     if (curPointer_->GetId() < 0) {
-    //         MMI_HILOGE("ACTION_DOWN is coming, nextId_ = %{public}d", nextId_);
-    //         curPointer_->SetId(nextId_++);
-    //         auto retCode = absEvent_->AddPointer(curPointer_);
-    //         if (retCode < 0) {
-    //             MMI_HILOGE("Leave, absAction:%{public}s AddPointer Failed", AbsEvent::ActionToString(action));
-    //             return AbsEvent::NULL_VALUE;
-    //         }
-    //         curPointer_->SetDownTime(nowTime);
-    //     }
-    // } else if (action == AbsEvent::ACTION_UP) {
-    //     if (curPointer_->GetId() < 0) {
-    //         return AbsEvent::NULL_VALUE;
-    //     }
-    //     if (absEvent_->GetPointerIdList().empty()) {
-    //         MMI_HILOGE("ACTION_UP is all over, nextId_ = %{public}d", nextId_);
-    //         nextId_ = 0;
-    //     }
-    // } else if (action != AbsEvent::ACTION_MOVE) {
-    //     return AbsEvent::NULL_VALUE;
-    // }
-
-    // absEvent_->SetPointerId(curPointer_->GetId());
-    // absEvent_->SetAction(action);
-    // absEvent_->SetCurSlot(curSlot_);
-    // absEvent_->SetActionTime(nowTime);
-    // return absEvent_;
-
-
-
-
-
     CALL_DEBUG_ENTER;
     auto pointer = GetCurrentPointer(false);
     if (!pointer) {
         MMI_HILOGE("pointer is null. Leave.");
         return AbsEvent::NULL_VALUE;
     }
-    // auto action = absEventAction_;
-    // absEventAction_ = AbsEvent::ACTION_NONE;
     auto nowTime = TimeUtils::GetTimeStampMs();
     if (absEventAction_ == AbsEvent::ACTION_DOWN) {
            auto retCode = absEvent_->AddPointer(pointer);
@@ -180,33 +136,17 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::FinishPointer()
     absEvent_->SetAction(absEventAction_);
     absEvent_->SetCurSlot(curSlot_);
     absEvent_->SetActionTime(nowTime);
-    MMI_HILOGE("lisong FinishPointer seatSlot = %{public}d", curSlot_);
     return absEvent_;
 }
 
 const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleMtSlot(int32_t value)
 {
-    // if (curSlot_ == value) {
-    //     return AbsEvent::NULL_VALUE;
-    // }
-    // curSlot_ = value;
-    // curPointer_ = AbsEvent::Pointer::NULL_VALUE;
-    // curPointer_ = GetCurrentPointer(true);
-    // if (!curPointer_) {
-    //     MMI_HILOGE("Leave, null pointer");
-    //     return AbsEvent::NULL_VALUE;
-    // }
-    // absEventAction_ = AbsEvent::ACTION_NONE;
-    // return AbsEvent::NULL_VALUE;
-
-    
     if (value >= slotNum_) {
-        MMI_HILOGE("HandleMtSlot, exceeded slot count (%{public}d of max %{public}d)", value, slotNum_);
+        MMI_HILOGE("exceeded slot count (%{public}d of max %{public}d)", value, slotNum_);
         curSlot_ = slotNum_ - 1;
         return AbsEvent::NULL_VALUE;
     }
     curSlot_ = value;
-    MMI_HILOGE("HandleMtSlot, value = %{public}d, slotNum = %{public}d, curSlot = %{public}d", value, slotNum_, curSlot_);
     return AbsEvent::NULL_VALUE;
 }
 
@@ -237,7 +177,6 @@ void AbsEventCollector::HandleMtPositionY(int32_t value)
 const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleMtTrackingId(int32_t value)
 {
     if (value < 0) {
-        MMI_HILOGF("MT_TRACKING_ID -1");
         absEventAction_ = AbsEvent::ACTION_UP;
     } else {
         absEventAction_ = AbsEvent::ACTION_DOWN;
@@ -251,28 +190,9 @@ void AbsEventCollector::RemoveReleasedPointer()
     if (absEvent_->GetAction() != AbsEvent::ACTION_UP) {
         return;
     }
-
     if (pointers_.find(curSlot_) != pointers_.end()) {
         pointers_.erase(curSlot_);
     }
-
-    // absEvent_->SetAction(AbsEvent::ACTION_NONE);
-    // const auto& pointer = absEvent_->GetPointer();
-    // if (!pointer) {
-    //     MMI_HILOGE("Leave, null pointer");
-    //     return;
-    // }
-
-    // auto retCode = absEvent_->RemovePointer(pointer);
-    // if (retCode < 0) {
-    //     MMI_HILOGE("Leave, null pointer failed");
-    //     return;
-    // }
-    // pointer->SetId(-1);
-    // if (absEvent_->GetPointerIdList().empty()) {
-    //     MMI_HILOGE("ACTION_UP is all over, nextId_ = %{public}d", nextId_);
-    //     nextId_ = 0;
-    // }
 }
 } // namespace MMI
 } // namespace OHOS
