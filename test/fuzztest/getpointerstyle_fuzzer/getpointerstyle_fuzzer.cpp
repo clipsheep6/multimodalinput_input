@@ -13,21 +13,19 @@
  * limitations under the License.
  */
 
-#include "pointerspeed_fuzzer.h"
+#include "getpointerstyle_fuzzer.h"
 
 #include "securec.h"
 
 #include "input_manager.h"
+#include "define_multimodal.h"
 #include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerSpeedFuzzTest" };
-} // namespace
 
 template<class T>
-size_t GetObject(const uint8_t *data, size_t size, T &object)
+size_t GetObject(T &object, const uint8_t *data, size_t size)
 {
     size_t objectSize = sizeof(object);
     if (objectSize > size) {
@@ -40,28 +38,27 @@ size_t GetObject(const uint8_t *data, size_t size, T &object)
     return objectSize;
 }
 
-void PointerSpeedFuzzTest(const uint8_t* data, size_t size)
+void GetPointerStyleFuzzTest(const uint8_t* data, size_t  size)
 {
-    int32_t speed;
+    int32_t windowId;
     size_t startPos = 0;
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, speed);
-    InputManager::GetInstance()->SetPointerSpeed(speed);
-    if (InputManager::GetInstance()->SetPointerSpeed(speed) == RET_OK) {
-        MMI_HILOGD("Set pointer speed success");
-    }
+    startPos += GetObject<int32_t>(windowId, data + startPos, size - startPos);
+    int32_t pointerStyle;
+    startPos += GetObject<int32_t>(pointerStyle, data + startPos, size - startPos);
+    InputManager::GetInstance()->SetPointerStyle(windowId, pointerStyle);
 
-    GetObject<int32_t>(data + startPos, size - startPos, speed);
-    if (InputManager::GetInstance()->GetPointerSpeed(speed) == RET_OK) {
-        MMI_HILOGD("Get pointer speed success");
-    }
+    startPos += GetObject<int32_t>(windowId, data + startPos, size - startPos);
+    startPos += GetObject<int32_t>(pointerStyle, data + startPos, size - startPos);
+    InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle);
 }
-} // namespace MMI
-} // namespace OHOS
+} // MMI
+} // OHOS
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::MMI::PointerSpeedFuzzTest(data, size);
+    OHOS::MMI::GetPointerStyleFuzzTest(data, size);
     return 0;
 }
+

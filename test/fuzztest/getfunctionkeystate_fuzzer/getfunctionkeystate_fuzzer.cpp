@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "pointerspeed_fuzzer.h"
+#include "getfunctionkeystate_fuzzer.h"
 
 #include "securec.h"
 
@@ -22,12 +22,8 @@
 
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerSpeedFuzzTest" };
-} // namespace
-
 template<class T>
-size_t GetObject(const uint8_t *data, size_t size, T &object)
+size_t GetObject(T &object, const uint8_t *data, size_t size)
 {
     size_t objectSize = sizeof(object);
     if (objectSize > size) {
@@ -40,28 +36,27 @@ size_t GetObject(const uint8_t *data, size_t size, T &object)
     return objectSize;
 }
 
-void PointerSpeedFuzzTest(const uint8_t* data, size_t size)
+void GetFunctionkeyStateFuzzTest(const uint8_t* data, size_t  size)
 {
-    int32_t speed;
+    int32_t funcKey;
     size_t startPos = 0;
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, speed);
-    InputManager::GetInstance()->SetPointerSpeed(speed);
-    if (InputManager::GetInstance()->SetPointerSpeed(speed) == RET_OK) {
-        MMI_HILOGD("Set pointer speed success");
-    }
+    startPos += GetObject<int32_t>(funcKey, data + startPos, size - startPos);
+    InputManager::GetInstance()->GetFunctionKeyState(funcKey);
 
-    GetObject<int32_t>(data + startPos, size - startPos, speed);
-    if (InputManager::GetInstance()->GetPointerSpeed(speed) == RET_OK) {
-        MMI_HILOGD("Get pointer speed success");
-    }
+    int32_t random = 0;
+    startPos += GetObject<int32_t>(funcKey, data + startPos, size - startPos);
+    startPos += GetObject<int32_t>(random, data + startPos, size - startPos);
+    bool enable = (random % 2) ? false : true;
+    InputManager::GetInstance()->SetFunctionKeyState(funcKey, enable);
 }
-} // namespace MMI
-} // namespace OHOS
+} // MMI
+} // OHOS
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::MMI::PointerSpeedFuzzTest(data, size);
+    OHOS::MMI::GetFunctionkeyStateFuzzTest(data, size);
     return 0;
 }
+

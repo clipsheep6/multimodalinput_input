@@ -22,6 +22,7 @@ group("test") {
     "addmonitor_fuzzer:fuzztest",
     "functionkeystate_fuzzer:fuzztest",
     "getkeyboardtype_fuzzer:fuzztest",
+    "getpointerstyle_fuzzer:fuzztest",
     "markconsumed_fuzzer:fuzztest",
     "movemouse_fuzzer:fuzztest",
     "pointerspeed_fuzzer:fuzztest",
