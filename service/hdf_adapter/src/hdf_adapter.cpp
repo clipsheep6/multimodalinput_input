@@ -74,21 +74,6 @@ static void HotPlugCallback(const InputHotPlugEvent *event)
     HdfDeviceStatusChanged(event->devIndex, event->devType, devStatus);
 }
 
-static inline bool IsDupEvSync(const InputEventPackage &r, uint32_t devIndex)
-{
-    auto it = latestHdfEventTypes.find(devIndex);
-    if (it == latestHdfEventTypes.end()) {
-        latestHdfEventTypes.insert(std::make_pair(devIndex, r.type));
-        return false;
-    }
-
-    if (it->second == EV_SYN) {
-        return true;
-    }
-    latestHdfEventTypes.emplace(devIndex, r.type);
-    return false;
-}
-
 static inline bool IsDupTouchBtnKey(const InputEventPackage &r, uint32_t devIndex)
 {
     if (r.type == EV_KEY && r.code == BTN_TOUCH) {
@@ -142,9 +127,6 @@ static void EventPkgCallback(const InputEventPackage **pkgs, uint32_t count, uin
         }
         const InputEventPackage &r = *pkgs[i];
         if (IsDupTouchBtnKey(r, devIndex)) {
-            continue;
-        }
-        if (IsDupEvSync(r, devIndex)) {
             continue;
         }
         WriteToPipe(r, devIndex);
