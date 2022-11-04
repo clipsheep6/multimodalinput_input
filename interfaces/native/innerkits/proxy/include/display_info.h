@@ -205,6 +205,7 @@ struct DisplayInfo {
      * @since 10
      */
     int32_t dpi;
+    
     /**
      * Name of the physical display, which is used for debugging
      *

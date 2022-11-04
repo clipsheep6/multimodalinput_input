@@ -19,7 +19,6 @@
 #include "securec.h"
 
 #include "input_manager.h"
-#include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {
