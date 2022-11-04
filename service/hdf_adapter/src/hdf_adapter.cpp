@@ -61,7 +61,7 @@ static void HotPlugCallback(const InputHotPlugEvent *event)
 {
     CHK_PID_AND_TID();
     CHKPV(event);
-    auto devStatus = (event->status ? HdfInputEventDevStatus::HDF_ADD_DEVICE : HdfInputEventDevStatus::HDF_RMV_DEVICE);
+    auto devStatus = ((event->status == 0) ? HdfInputEventDevStatus::HDF_ADD_DEVICE : HdfInputEventDevStatus::HDF_RMV_DEVICE);
     HdfDeviceStatusChanged(event->devIndex, event->devType, devStatus);
 }
 
@@ -151,7 +151,7 @@ int32_t HdfAdapter::ScanInputDevice()
             HdfDeviceStatusChanged(i.devIndex, i.devType, HdfInputEventDevStatus::HDF_ADD_DEVICE);
         }
     }
-    MMI_HILOGI("Found %{public}d devices.", devCount);    
+    MMI_HILOGI("Found %{public}d devices.", devCount);
     return RET_OK;
 }
 
@@ -175,7 +175,7 @@ bool HdfAdapter::Init(HDFDeviceStatusEventCallback statusCallback, HDFDeviceInpu
         g_mmiServiceReadFd = fds[0];
         g_hdfAdapterWriteFd = fds[1];
         MMI_HILOGD("connect hdf init, fds:(%{public}d, (%{public}d)", fds[0], fds[1]);
-        MMI_HILOGE("connect hdf init, fds:(%{public}d, (%{public}d), g_mmiServiceReadFd:%{public}d, g_hdfAdapterWriteFd:%{public}d", 
+        MMI_HILOGE("connect hdf init, fds:(%{public}d, (%{public}d), g_mmiServiceReadFd:%{public}d, g_hdfAdapterWriteFd:%{public}d",
             fds[0], fds[1], g_mmiServiceReadFd, g_hdfAdapterWriteFd);
 
         ret = ConnectHDFInit();
@@ -185,7 +185,7 @@ bool HdfAdapter::Init(HDFDeviceStatusEventCallback statusCallback, HDFDeviceInpu
         }
         return true;
     } while (0);
-    
+
     ret = DisconnectHDFInit();
     if (ret != RET_OK) {
         MMI_HILOGE("disconnect hdf init failed, ret:%{public}d", ret);
@@ -210,7 +210,7 @@ bool HdfAdapter::Init(HDFDeviceStatusEventCallback statusCallback, HDFDeviceInpu
 void HdfAdapter::DeInit()
 {
     CALL_DEBUG_ENTER;
-    auto ret = DisconnectHDFInit();    
+    auto ret = DisconnectHDFInit();
     if (ret != RET_OK) {
         MMI_HILOGE("disconnect hdf init failed, ret:%{public}d", ret);
         return;
@@ -275,7 +275,7 @@ void HdfAdapter::EventDispatch(epoll_event &ev)
                 " hdfEventSize:%{public}d unreadSize:%{public}d", hdfEventSize, unreadSize);
             g_circBuf.Reset();
             break;
-        }        
+        }
         OnEventHandler(*event);
         if (g_circBuf.IsEmpty()) {
             g_circBuf.Reset();
@@ -417,7 +417,7 @@ void HdfAdapter::OnEventHandler(const HdfInputEvent &event)
         statusCallback_(retEvent);
         return;
     }
-    
+
     CHKPV(inputCallback_);
     inputCallback_(event);
 }

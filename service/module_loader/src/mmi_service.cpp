@@ -198,6 +198,7 @@ bool MMIService::InitLibinputService()
     return true;
 }
 
+#ifdef OHOS_BUILD_HDF
 bool MMIService::InitHDFService()
 {
     auto context = OHOS::MMI::InputContext::CreateInstance();
@@ -219,6 +220,7 @@ bool MMIService::InitHDFService()
     MMI_HILOGI("AddEpoll, epollfd:%{public}d, fd:%{public}d", mmiFd_, inputFd);
     return true;
 }
+#endif // OHOS_BUILD_HDF
 
 bool MMIService::InitService()
 {
@@ -347,7 +349,9 @@ void MMIService::OnStart()
         WATCHDOG_INTERVAL_TIME, WATCHDOG_DELAY_TIME);
     t_.detach();
     MMI_HILOGI("MMIService thread has detatched");
+#ifdef OHOS_BUILD_HDF
     hdfAdapter_.ScanInputDevice(); //TODO: 是否应该委托到eventRunner中执行
+#endif // OHOS_BUILD_HDF
     MMI_HILOGI("MMIService OnStart has finished");
 }
 
@@ -356,7 +360,9 @@ void MMIService::OnStop()
     CHK_PID_AND_TID();
     UdsStop();
     libinputAdapter_.Stop();
+#ifdef OHOS_BUILD_HDF
     hdfAdapter_.DeInit();
+#endif // OHOS_BUILD_HDF
     state_ = ServiceRunningState::STATE_NOT_START;
 #ifdef OHOS_RSS_CLIENT
     RemoveSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
@@ -987,7 +993,9 @@ void MMIService::OnThread()
             if (mmiEd->event_type == EPOLL_EVENT_INPUT) {
                 libinputAdapter_.EventDispatch(ev[i]);
             } else if (mmiEd->event_type == EPOLL_EVENT_HDF) {
+#ifdef OHOS_BUILD_HDF
                 hdfAdapter_.EventDispatch(ev[i]);
+#endif // OHOS_BUILD_HDF
             } else if (mmiEd->event_type == EPOLL_EVENT_SOCKET) {
                 OnEpollEvent(ev[i]);
             } else if (mmiEd->event_type == EPOLL_EVENT_SIGNAL) {

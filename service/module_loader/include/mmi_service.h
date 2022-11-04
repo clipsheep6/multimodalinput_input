@@ -150,7 +150,9 @@ private:
 #endif
 
     LibinputAdapter libinputAdapter_;
-    HdfAdapter      hdfAdapter_;
+#ifdef OHOS_BUILD_HDF
+    HdfAdapter hdfAdapter_;
+#endif // OHOS_BUILD_HDF
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;
 

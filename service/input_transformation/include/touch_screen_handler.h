@@ -41,8 +41,8 @@ public:
     virtual int32_t UnbindInputDevice(const std::shared_ptr<IInputDevice>& inputDevice) override;
 
 protected:
-    TouchScreenHandler(const IInputContext* context);    
-    bool ConvertPointer(const std::shared_ptr<const AbsEvent>& absEvent, 
+    TouchScreenHandler(const IInputContext* context);
+    bool ConvertPointer(const std::shared_ptr<const AbsEvent>& absEvent,
             int32_t& pointerAction, int64_t& actionTime);
     int32_t ConvertAction(int32_t absEventAction) const;
     bool OnEventTouchDown(const std::shared_ptr<const AbsEvent>& absEvent);

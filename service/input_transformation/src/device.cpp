@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include "device.h"
 
 #include <cstring>
@@ -51,7 +51,7 @@ int32_t Device::Init()
     return 0;
 }
 
-void Device::Uninit() 
+void Device::Uninit()
 {
     CloseDevice();
 }
@@ -134,7 +134,7 @@ void Device::ReadEvents()
 
 int32_t Device::CloseDevice()
 {
-    CHKPR(mtdev_, ERROR_NULL_POINTER); 
+    CHKPR(mtdev_, ERROR_NULL_POINTER);
     mtdev_delete(mtdev_);
     mtdev_ = nullptr;
     return 0;

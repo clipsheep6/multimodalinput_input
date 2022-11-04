@@ -51,6 +51,7 @@ void InputEventHandler::Init(UDSServer& udsServer)
     BuildInputHandlerChain();
 }
 
+#ifdef OHOS_BUILD_HDF
 void InputEventHandler::HandleHDFDeviceStatusEvent(const HDFDeviceStatusEvent &event)
 {
     CHKPV(eventNormalizeHandler_);
@@ -62,6 +63,7 @@ void InputEventHandler::HandleHDFDeviceInputEvent(const HDFDeviceInputEvent &eve
     CHKPV(eventNormalizeHandler_);
     eventNormalizeHandler_->HandleHDFDeviceInputEvent(event);
 }
+#endif // OHOS_BUILD_HDF
 
 void InputEventHandler::SetContext(std::shared_ptr<IInputContext> context)
 {

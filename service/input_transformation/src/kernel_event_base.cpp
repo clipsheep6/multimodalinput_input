@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace MMI {
-KernelEventBase::KernelEventBase(int32_t deviceId, int32_t action) 
+KernelEventBase::KernelEventBase(int32_t deviceId, int32_t action)
     : deviceId_(deviceId), action_(action), actionTime_(-1)
 {
 }
@@ -49,7 +49,7 @@ void KernelEventBase::SetActionTime(int64_t actionTime)
     actionTime_ = actionTime;
 }
 
-std::ostream& KernelEventBase::operator<<(std::ostream& outStream) const 
+std::ostream& KernelEventBase::operator<<(std::ostream& outStream) const
 {
     return PrintInternal(outStream);
 }

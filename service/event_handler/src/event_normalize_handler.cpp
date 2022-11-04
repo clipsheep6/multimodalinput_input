@@ -143,20 +143,24 @@ void EventNormalizeHandler::HandleHDFDeviceStatusEvent(const HDFDeviceStatusEven
         OnHDFDeviceAdded(event.devInfo);
     } else {
         OnHDFDeviceRemoved(event.devInfo);
-    } 
+    }
 }
 
 void EventNormalizeHandler::HandleHDFDeviceInputEvent(const HDFDeviceInputEvent &event)
 {
     MMI_HILOGI("hdfEvent:event:devIndex:%{public}u,type:%{public}u,code:%{public}u,value:%{public}u,time:%{public}llu",
         event.devIndex, event.type, event.code, event.value, event.time);
-    OnHDFEvent(event.devIndex, event); 
+    OnHDFEvent(event.devIndex, event);
 }
 
 
 int32_t EventNormalizeHandler::OnHDFDeviceAdded(InputDeviceInfo devInfo)
 {
     CALL_DEBUG_ENTER;
+    if (devInfo.devType != INDEV_TYPE_TOUCH) {
+        MMI_HILOGI("Hdf doesn't support device type:%{public}d", devInfo.devType);
+        return RET_ERR;
+    }
     auto context = InputHandler->GetContext();
     CHKPR(context, ERROR_NULL_POINTER);
     auto inputDevice = std::make_shared<Device>(devInfo.devIndex, context, devInfo);
@@ -164,20 +168,19 @@ int32_t EventNormalizeHandler::OnHDFDeviceAdded(InputDeviceInfo devInfo)
     CHKPR(inputDevice, ERROR_NULL_POINTER);
     const auto deviceCollector = context->GetInputDeviceCollector();
     CHKPR(deviceCollector, ERROR_NULL_POINTER);
-    InputDevMgr->OnInputDeviceAdded(&devInfo);
     deviceCollector->AddDevice(inputDevice);
+    InputDevMgr->OnInputDeviceAdded(devInfo, inputDevice);
     return RET_OK;
 }
 
 int32_t EventNormalizeHandler::OnHDFDeviceRemoved(InputDeviceInfo devInfo)
 {
     CALL_DEBUG_ENTER;
+    InputDevMgr->OnInputDeviceRemoved(devInfo);
     auto context = InputHandler->GetContext();
     CHKPR(context, ERROR_NULL_POINTER);
     const auto& deviceCollector = context->GetInputDeviceCollector();
     CHKPR(deviceCollector, ERROR_NULL_POINTER);
-    auto inputDevice = deviceCollector->GetDevice(devInfo.devIndex);
-    InputDevMgr->OnInputDeviceRemoved(inputDevice);
     deviceCollector->RemoveDevice(devInfo.devIndex);
     return RET_OK;
 }
@@ -186,7 +189,7 @@ int32_t EventNormalizeHandler::OnHDFEvent(int32_t devIndex, const HdfInputEvent 
 {
     CALL_DEBUG_ENTER;
     auto context = InputHandler->GetContext();
-    CHKPR(context, ERROR_NULL_POINTER); 
+    CHKPR(context, ERROR_NULL_POINTER);
     const auto& deviceCollector = context->GetInputDeviceCollector();
     CHKPR(deviceCollector, ERROR_NULL_POINTER);
     const auto& device = deviceCollector->GetDevice(devIndex);
@@ -198,7 +201,7 @@ int32_t EventNormalizeHandler::OnHDFEvent(int32_t devIndex, const HdfInputEvent 
         .code = hdfEevent.code,
         .value = hdfEevent.value
     };
-    device->ProcessEventItem(&event);  
+    device->ProcessEventItem(&event);
     return RET_OK;
 }
 #endif // OHOS_BUILD_HDF

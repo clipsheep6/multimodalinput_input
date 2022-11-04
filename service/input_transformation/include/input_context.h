@@ -37,7 +37,7 @@ class InputContext : public NonCopyable, public IInputContext {
         InputContext() = default;
         virtual ~InputContext() = default;
 
-        virtual const std::shared_ptr<IDeviceCollector>& GetInputDeviceCollector() const override; 
+        virtual const std::shared_ptr<IDeviceCollector>& GetInputDeviceCollector() const override;
 
     protected:
         int32_t SetDeviceCollector(std::shared_ptr<IDeviceCollector>& inputDeviceCollector);

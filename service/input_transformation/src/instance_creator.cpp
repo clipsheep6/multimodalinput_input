@@ -19,12 +19,12 @@
 
 namespace OHOS {
 namespace MMI {
-std::shared_ptr<IDeviceCollector> IDeviceCollector::CreateInstance(IInputContext* context) 
+std::shared_ptr<IDeviceCollector> IDeviceCollector::CreateInstance(IInputContext* context)
 {
     return DeviceCollector::CreateInstance(context);
 }
 
-std::shared_ptr<IInputContext> IInputContext::CreateInstance() 
+std::shared_ptr<IInputContext> IInputContext::CreateInstance()
 {
     return InputContext::CreateInstance();
 }

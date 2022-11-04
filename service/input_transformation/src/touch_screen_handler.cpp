@@ -36,7 +36,7 @@ std::unique_ptr<TouchScreenHandler> TouchScreenHandler::CreateInstance(const IIn
     return std::unique_ptr<TouchScreenHandler>(new TouchScreenHandler(context));
 }
 
-TouchScreenHandler::TouchScreenHandler(const IInputContext* context) 
+TouchScreenHandler::TouchScreenHandler(const IInputContext* context)
         : context_(context)
 {
 }
@@ -122,7 +122,7 @@ void TouchScreenHandler::OnInputEvent(const std::shared_ptr<const AbsEvent>& eve
         MMI_HILOGE("Leave ConvertPointer Failed");
     }
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
-    CHKPV(inputEventNormalizeHandler);   
+    CHKPV(inputEventNormalizeHandler);
     CHKPV(pointerEvent_);
     inputEventNormalizeHandler->HandleTouchEvent(pointerEvent_);
     if (pointerAction == PointerEvent::POINTER_ACTION_UP) {

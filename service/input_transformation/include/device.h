@@ -129,7 +129,7 @@ private:
     InputDimensionInfo dimensionInfoX_;
     InputDimensionInfo dimensionInfoY_;
     InputDevAbility devAbility_;
-    
+
     int32_t capabilities_ {IInputDevice::CAPABILITY_UNKNOWN};
     unsigned long inputProperty[LongsOfBits(INPUT_PROP_MAX)];
     unsigned long evBit[LongsOfBits(EV_MAX)];

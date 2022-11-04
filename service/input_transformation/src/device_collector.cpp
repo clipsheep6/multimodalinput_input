@@ -28,7 +28,7 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "DeviceCollector" };
 };
-std::unique_ptr<DeviceCollector> DeviceCollector::CreateInstance(IInputContext* context) 
+std::unique_ptr<DeviceCollector> DeviceCollector::CreateInstance(IInputContext* context)
 {
     if (context == nullptr) {
         errno = EINVAL;
@@ -42,7 +42,7 @@ DeviceCollector::DeviceCollector(IInputContext* context)
 {
 }
 
-DeviceCollector::~DeviceCollector() 
+DeviceCollector::~DeviceCollector()
 {
 }
 

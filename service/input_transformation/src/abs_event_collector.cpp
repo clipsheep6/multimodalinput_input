@@ -72,7 +72,7 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleSyncEvent(int32_t code
     const auto& absEvent = FinishPointer();
     return absEvent;
 }
- 
+
 void AbsEventCollector::AfterProcessed()
 {
     RemoveReleasedPointer();

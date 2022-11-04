@@ -70,10 +70,10 @@ int64_t AbsEvent::Pointer::GetDownTime() const
 
 std::ostream& AbsEvent::Pointer::operator<<(std::ostream& outStream) const
 {
-    outStream << '{' 
+    outStream << '{'
         << "id:" << id_ << ','
         << "x:" << x_ << ','
-        << "y:" << y_ 
+        << "y:" << y_
         << '}';
     return outStream;
 }

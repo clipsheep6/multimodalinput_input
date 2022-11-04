@@ -51,7 +51,7 @@ const char* IInputDevice::AxisToString(int32_t axis)
 
 int32_t IInputDevice::AxisInfo::GetAxis() const
 {
-    return axis_; 
+    return axis_;
 }
 
 int32_t IInputDevice::AxisInfo::GetMinimum() const
@@ -66,12 +66,12 @@ int32_t IInputDevice::AxisInfo::GetMaximum() const
 
 int32_t IInputDevice::AxisInfo::GetFuzz() const
 {
-    return fuzz_;    
+    return fuzz_;
 }
 
 int32_t IInputDevice::AxisInfo::GetFlat() const
 {
-    return flat_;    
+    return flat_;
 }
 
 int32_t IInputDevice::AxisInfo::GetResolution() const
@@ -96,17 +96,17 @@ void IInputDevice::AxisInfo::SetMaximum(int32_t maximum)
 
 void IInputDevice::AxisInfo::SetFuzz(int32_t fuzz)
 {
-    fuzz_ = fuzz; 
+    fuzz_ = fuzz;
 }
 
 void IInputDevice::AxisInfo::SetFlat(int32_t flat)
 {
-    flat_ = flat; 
+    flat_ = flat;
 }
 
 void IInputDevice::AxisInfo::SetResolution(int32_t resolution)
 {
-    resolution_ = resolution; 
+    resolution_ = resolution;
 }
 
 std::ostream& operator<<(std::ostream& outStream, const IInputDevice::AxisInfo& axisInfo)

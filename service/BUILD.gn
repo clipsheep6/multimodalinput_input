@@ -554,7 +554,6 @@ ohos_shared_library("libmmi-server") {
     ":drawing_pointer_image_Zoom_In",
     ":drawing_pointer_image_Zoom_Out",
     ":mmi_device_config.ini",
-    "hdf_adapter:mmi_service_hdf_adapter",
     ":multimodalinput.para.dac",
     ":multimodalinput_config_ability.json",
     "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
@@ -567,6 +566,9 @@ ohos_shared_library("libmmi-server") {
     "//foundation/multimodalinput/input/util:libmmi-util",
     "//third_party/cJSON:cjson_static",
   ]
+  if (input_feature_hdf) {
+    deps += [ "hdf_adapter:mmi_service_hdf_adapter" ]
+  }
 
   if (resource_schedule_service_enabled) {
     deps += [ "//foundation/resourceschedule/resource_schedule_service/ressched/interfaces/innerkits/ressched_client:ressched_client" ]

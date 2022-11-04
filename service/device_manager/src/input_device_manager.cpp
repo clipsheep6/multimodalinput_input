@@ -79,15 +79,12 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
     CHKPP(inputDevice);
     inputDevice->SetId(iter->first);
     struct libinput_device *inputDeviceOrigin = iter->second.inputDeviceOrigin_;
-    InputDeviceInfo *devOrigin = iter->second.deviceOrigin_;
-    if (inputDeviceOrigin == nullptr && devOrigin == nullptr) {
-        MMI_HILOGE("Input device origin is empty!");
-        return nullptr;
-    }
     if (inputDeviceOrigin != nullptr) {
         SetInputDevInfo(inputDeviceOrigin, inputDevice);
     } else {
-        SetInputDevInfo(devOrigin, inputDevice);
+#ifdef OHOS_BUILD_HDF
+        SetInputDevInfo(iter->second.deviceOrigin_, inputDevice);
+#endif // OHOS_BUILD_HDF
     }
     return inputDevice;
 }
@@ -131,23 +128,24 @@ void InputDeviceManager::SetInputDevInfo(struct libinput_device *inputDeviceOrig
     }
 }
 
-void InputDeviceManager::SetInputDevInfo(InputDeviceInfo *devOrigin, std::shared_ptr<InputDevice> inputDevice) const
+#ifdef OHOS_BUILD_HDF
+void InputDeviceManager::SetInputDevInfo(const InputDeviceInfo &devOrigin,
+                                         std::shared_ptr<InputDevice> inputDevice) const
 {
-    CHKPV(devOrigin);
     CHKPV(inputDevice);
-    inputDevice->SetType(devOrigin->devType);
-    std::string name = devOrigin->attrSet.devName;
+    inputDevice->SetType(devOrigin.devType);
+    std::string name = devOrigin.attrSet.devName;
     inputDevice->SetName((name == "") ? ("null") : (name));
-    inputDevice->SetBus(devOrigin->attrSet.id.busType);
-    inputDevice->SetVersion(devOrigin->attrSet.id.version);
-    inputDevice->SetProduct(devOrigin->attrSet.id.product);
-    inputDevice->SetVendor(devOrigin->attrSet.id.vendor);
-    inputDevice->SetPhys("");
-    inputDevice->SetUniq("");
+    inputDevice->SetBus(devOrigin.attrSet.id.busType);
+    inputDevice->SetVersion(devOrigin.attrSet.id.version);
+    inputDevice->SetProduct(devOrigin.attrSet.id.product);
+    inputDevice->SetVendor(devOrigin.attrSet.id.vendor);
+    inputDevice->SetPhys("null");
+    inputDevice->SetUniq("null");
 
     InputDevice::AxisInfo axis;
     for (const auto &item : axisType) {
-        int32_t min = devOrigin->attrSet.axisInfo[item.first].min;
+        int32_t min = devOrigin.attrSet.axisInfo[item.first].min;
         if (min == -1) {
             MMI_HILOGD("The device does not support this axis");
             continue;
@@ -157,16 +155,17 @@ void InputDeviceManager::SetInputDevInfo(InputDeviceInfo *devOrigin, std::shared
             axis.SetMaximum(1);
         } else {
             axis.SetMinimum(min);
-            int32_t max = devOrigin->attrSet.axisInfo[item.first].max;
+            int32_t max = devOrigin.attrSet.axisInfo[item.first].max;
             axis.SetMaximum(max);
         }
         axis.SetAxisType(item.first);
-        axis.SetFuzz(devOrigin->attrSet.axisInfo[item.first].fuzz);
-        axis.SetFlat(devOrigin->attrSet.axisInfo[item.first].flat);
-        axis.SetResolution(devOrigin->attrSet.axisInfo[item.first].range);
+        axis.SetFuzz(devOrigin.attrSet.axisInfo[item.first].fuzz);
+        axis.SetFlat(devOrigin.attrSet.axisInfo[item.first].flat);
+        axis.SetResolution(devOrigin.attrSet.axisInfo[item.first].range);
         inputDevice->AddAxisInfo(axis);
     }
 }
+#endif // OHOS_BUILD_HDF
 
 std::vector<int32_t> InputDeviceManager::GetInputDeviceIds() const
 {
@@ -314,23 +313,9 @@ void InputDeviceManager::RemoveDevListener(SessionPtr sess)
 bool InputDeviceManager::HasPointerDevice()
 {
     for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
-        if (it->second.inputDeviceOrigin_ == nullptr && it->second.deviceOrigin_ == nullptr) {
-            continue;
+        if (it->second.isPointerDevice_) {
+            return true;
         }
-        
-        if (it->second.inputDeviceOrigin_ != nullptr) {
-            if (it->second.isPointerDevice_) {
-                return true;
-            }
-        } else {
-            auto context = InputHandler->GetContext();
-            CHKPR(context, ERROR_NULL_POINTER);
-            const auto& deviceCollector = context->GetInputDeviceCollector();
-            CHKPR(deviceCollector, ERROR_NULL_POINTER);
-            auto hdfDev = deviceCollector->GetDevice(it->second.deviceOrigin_->devIndex);
-            return IsPointerDevice(hdfDev);
-        }
-        
     }
     return false;
 }
@@ -385,6 +370,58 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     DfxHisysevent::OnDeviceConnect(nextId_ - 1, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
 }
 
+#ifdef OHOS_BUILD_HDF
+void InputDeviceManager::OnInputDeviceAdded(const InputDeviceInfo &hdfDevInfo, std::shared_ptr<IInputDevice> hdfDev)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(hdfDev);
+    bool hasLocalPointer = false;
+    for (const auto &item : inputDevice_) {
+        if (item.second.deviceOrigin_.devIndex == hdfDevInfo.devIndex){
+            MMI_HILOGI("The device is already existent");
+            DfxHisysevent::OnDeviceConnect(item.first, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+            return;
+        }
+        if (!item.second.isRemote_ && item.second.isPointerDevice_) {
+            hasLocalPointer = true;
+        }
+    }
+    if (nextId_ == INT32_MAX) {
+        MMI_HILOGE("The nextId_ exceeded the upper limit");
+        DfxHisysevent::OnDeviceConnect(INT32_MAX, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+        return;
+    }
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+    if (IsPointerDevice(hdfDevInfo) && !HasPointerDevice()) {
+#ifdef OHOS_BUILD_ENABLE_POINTER
+        WinMgr->DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
+#endif // OHOS_BUILD_ENABLE_POINTER
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+    struct InputDeviceInformation info;
+    MakeDeviceInfo(hdfDevInfo, info);
+    inputDevice_[nextId_] = info;
+	hdfDev->SetDeviceId(nextId_);
+    for (const auto &item : devListener_) {
+        CHKPC(item.first);
+        item.second(nextId_, "add");
+    }
+    ++nextId_;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+     if (IsKeyboardDevice(hdfDevInfo)) {
+         InputDevCooSM->OnKeyboardOnline(info.dhid_);
+     }
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+    if (info.isPointerDevice_) {
+        bool visible = !info.isRemote_ || hasLocalPointer;
+        NotifyPointerDevice(true, visible);
+        OHOS::system::SetParameter(INPUT_POINTER_DEVICE, "true");
+        MMI_HILOGI("Set para input.pointer.device true");
+    }
+    DfxHisysevent::OnDeviceConnect(nextId_ - 1, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
+}
+#endif // OHOS_BUILD_HDF
+
 void InputDeviceManager::MakeDeviceInfo(struct libinput_device *inputDevice, struct InputDeviceInformation& info)
 {
     info.inputDeviceOrigin_ = inputDevice;
@@ -398,18 +435,26 @@ void InputDeviceManager::MakeDeviceInfo(struct libinput_device *inputDevice, str
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 }
 
-void InputDeviceManager::MakeDeviceInfo(const InputDeviceInfo *hdfDevInfo, struct InputDeviceInformation &info)
+#ifdef OHOS_BUILD_HDF
+void InputDeviceManager::MakeDeviceInfo(const InputDeviceInfo &hdfDevInfo, struct InputDeviceInformation &info)
 {
-    CHKPV(hdfDevInfo);
-    info.deviceOrigin_ = const_cast<InputDeviceInfo*>(hdfDevInfo);
+    info.deviceOrigin_ = hdfDevInfo;
+    info.isRemote_ = IsRemote(hdfDevInfo);
+    auto context = InputHandler->GetContext();
+    CHKPV(context);
+    const auto& deviceCollector = context->GetInputDeviceCollector();
+    CHKPV(deviceCollector);
+    auto inputDevice = deviceCollector->GetDevice(hdfDevInfo.devIndex);
+    CHKPV(inputDevice);
+    info.isPointerDevice_ = IsPointerDevice(hdfDevInfo);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    // info.isRemote_ = IsRemote(inputDevice);
-    // if (info.isRemote_) {
-    //     info.networkIdOrigin_ = MakeNetworkId(libinput_device_get_phys(inputDevice));
-    // }
-    // info.dhid_ = GenerateDescriptor(inputDevice, info.isRemote_);
+    if (info.isRemote_) {
+       info.networkIdOrigin_ = "";
+    }
+    info.dhid_ = "";
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 }
+#endif // OHOS_BUILD_HDF
 
 void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevice)
 {
@@ -454,29 +499,57 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
     }
 }
 
+#ifdef OHOS_BUILD_HDF
+void InputDeviceManager::OnInputDeviceRemoved(const InputDeviceInfo &hdfDevInfo)
+{
+    CALL_DEBUG_ENTER;
+    int32_t deviceId = INVALID_DEVICE_ID;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    struct InputDeviceInformation removedInfo;
+    std::vector<std::string> dhids;
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+    for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
+        if (it->second.deviceOrigin_.devIndex == hdfDevInfo.devIndex) {
+            deviceId = it->first;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+             removedInfo = it->second;
+             dhids = GetCooperateDhids(deviceId);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+            DfxHisysevent::OnDeviceDisconnect(deviceId, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
+            inputDevice_.erase(it);
+            break;
+        }
+    }
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+    if (IsPointerDevice(hdfDevInfo) && !HasPointerDevice()) {
+#ifdef OHOS_BUILD_ENABLE_POINTER
+        WinMgr->DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
+#endif // OHOS_BUILD_ENABLE_POINTER
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+    for (const auto &item : devListener_) {
+        CHKPC(item.first);
+        item.second(deviceId, "remove");
+    }
+    ScanPointerDevice();
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    if (IsPointerDevice(hdfDevInfo)) {
+        InputDevCooSM->OnPointerOffline(removedInfo.dhid_, removedInfo.networkIdOrigin_, dhids);
+    }
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+    if (deviceId == INVALID_DEVICE_ID) {
+        DfxHisysevent::OnDeviceDisconnect(INVALID_DEVICE_ID, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+    }
+}
+#endif // OHOS_BUILD_HDF
+
 void InputDeviceManager::ScanPointerDevice()
 {
     bool hasPointerDevice = false;
     for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
-        if (it->second.inputDeviceOrigin_ == nullptr && it->second.deviceOrigin_ == nullptr) {
-            continue;
-        }
-        
-        if (it->second.inputDeviceOrigin_ != nullptr){
-            if (it->second.isPointerDevice_) {
-                hasPointerDevice = true;
-                break;
-            }
-        } else {
-            auto context = InputHandler->GetContext();
-            CHKPV(context);
-            const auto& deviceCollector = context->GetInputDeviceCollector();
-            CHKPV(deviceCollector);
-            auto hdfDev = deviceCollector->GetDevice(it->second.deviceOrigin_->devIndex);
-            if (IsPointerDevice(hdfDev)) {
-                hasPointerDevice = true;
-                break;
-            }
+       if (it->second.isPointerDevice_) {
+            hasPointerDevice = true;
+            break;
         }
     }
     if (!hasPointerDevice) {
@@ -495,18 +568,19 @@ bool InputDeviceManager::IsPointerDevice(struct libinput_device* device) const
     EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD)) != 0;
 }
 
-bool InputDeviceManager::IsPointerDevice(std::shared_ptr<IInputDevice> device) const
+#ifdef OHOS_BUILD_HDF
+bool InputDeviceManager::IsPointerDevice(const InputDeviceInfo &hdfDevInfo) const
 {
+    auto context = InputHandler->GetContext();
+    CHKPF(context);
+    const auto& deviceCollector = context->GetInputDeviceCollector();
+    CHKPF(deviceCollector);
+    auto device = deviceCollector->GetDevice(hdfDevInfo.devIndex);
     CHKPF(device);
-    return (device->HasCapability( IInputDevice::CAPABILITY_MOUSE) || 
+    return (device->HasCapability(IInputDevice::CAPABILITY_MOUSE) ||
         device->HasCapability(IInputDevice::CAPABILITY_TOUCHPAD));
 }
-
-bool InputDeviceManager::IsKeyboardDevice(std::shared_ptr<IInputDevice> device) const
-{
-    CHKPF(device);
-    return device->HasCapability(IInputDevice::CAPABILITY_KEYBOARD);
-}
+#endif // OHOS_BUILD_HDF
 
 bool InputDeviceManager::IsKeyboardDevice(struct libinput_device* device) const
 {
@@ -515,6 +589,19 @@ bool InputDeviceManager::IsKeyboardDevice(struct libinput_device* device) const
     MMI_HILOGD("The current device udev tag:%{public}d", static_cast<int32_t>(udevTags));
     return udevTags & EVDEV_UDEV_TAG_KEYBOARD;
 }
+
+#ifdef OHOS_BUILD_HDF
+bool InputDeviceManager::IsKeyboardDevice(const InputDeviceInfo &hdfDevInfo) const
+{
+    auto context = InputHandler->GetContext();
+    CHKPF(context);
+    const auto& deviceCollector = context->GetInputDeviceCollector();
+    CHKPF(deviceCollector);
+    auto device = deviceCollector->GetDevice(hdfDevInfo.devIndex);
+    CHKPF(device);
+    return device->HasCapability(IInputDevice::CAPABILITY_KEYBOARD);
+}
+#endif // OHOS_BUILD_HDF
 
 void InputDeviceManager::Attach(std::shared_ptr<IDeviceObserver> observer)
 {
@@ -630,6 +717,25 @@ bool InputDeviceManager::IsRemote(struct libinput_device *inputDevice) const
     MMI_HILOGD("isRemote:%{public}s", isRemote ? "true" : "false");
     return isRemote;
 }
+
+#ifdef OHOS_BUILD_HDF
+bool InputDeviceManager::IsRemote(const InputDeviceInfo &hdfDevInfo) const
+{
+    bool isRemote = false;
+    std::string name = hdfDevInfo.attrSet.devName;
+    if (name == "" || name[0] == '\0') {
+        MMI_HILOGD("Device name is empty");
+        return false;
+    }
+    std::string strName = name;
+    std::string::size_type pos = strName.find(INPUT_VIRTUAL_DEVICE_NAME);
+    if (pos != std::string::npos) {
+        isRemote = true;
+    }
+    MMI_HILOGD("isRemote:%{public}s", isRemote ? "true" : "false");
+    return isRemote;
+}
+#endif // OHOS_BUILD_HDF
 
 bool InputDeviceManager::IsRemote(int32_t id) const
 {
@@ -810,6 +916,7 @@ std::string InputDeviceManager::GenerateDescriptor(struct libinput_device *input
     return descriptor;
 }
 #endif // OHOS_BUILD_ENABLE_COOPERATE
+
 int32_t InputDeviceManager::SetInputDevice(const std::string& dhid, const std::string& screenId)
 {
     CALL_DEBUG_ENTER;
@@ -841,119 +948,6 @@ const std::string& InputDeviceManager::GetScreenId(int32_t deviceId) const
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     MMI_HILOGE("Find input device screen id failed");
     return UNKNOWN_SCREEN_ID;
-}
-
-void InputDeviceManager::OnInputDeviceAdded(const InputDeviceInfo *hdfDevInfo)
-{
-    CALL_DEBUG_ENTER;
-    CHKPV(hdfDevInfo);
-    bool hasLocalPointer = false;
-    auto context = InputHandler->GetContext();
-    CHKPV(context);
-    const auto& deviceCollector = context->GetInputDeviceCollector();
-    CHKPV(deviceCollector);
-    auto hdfDev = deviceCollector->GetDevice(hdfDevInfo->devIndex);
-    CHKPV(hdfDev);
-    for (const auto &item : inputDevice_) {
-        if (item.second.deviceOrigin_ == nullptr) {
-            continue;
-        }
-        auto itemDev = deviceCollector->GetDevice(item.second.deviceOrigin_->devIndex);
-        CHKPV(itemDev);
-        if (itemDev == hdfDev){
-            MMI_HILOGI("The device is already existent");
-            DfxHisysevent::OnDeviceConnect(item.first, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
-            return;
-        }
-        if (!item.second.isRemote_ && IsPointerDevice(itemDev)) {
-            hasLocalPointer = true;
-        }
-    }
-    if (nextId_ == INT32_MAX) {
-        MMI_HILOGE("The nextId_ exceeded the upper limit");
-        DfxHisysevent::OnDeviceConnect(INT32_MAX, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
-        return;
-    }
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-    if (IsPointerDevice(hdfDev) && !HasPointerDevice()) {
-#ifdef OHOS_BUILD_ENABLE_POINTER
-        WinMgr->DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
-#endif // OHOS_BUILD_ENABLE_POINTER
-    }
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-    struct InputDeviceInformation info;
-    MakeDeviceInfo(hdfDevInfo, info);
-    inputDevice_[nextId_] = info;
-    hdfDev->SetDeviceId(nextId_);
-    for (const auto &item : devListener_) {
-        CHKPC(item.first);
-        item.second(nextId_, "add");
-    }
-    ++nextId_;
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-    // if (IsKeyboardDevice(inputDevice)) {
-    //     InputDevCooSM->OnKeyboardOnline(info.dhid_);
-    // }
-#endif // OHOS_BUILD_ENABLE_COOPERATE
-    if (IsPointerDevice(hdfDev)) {
-        bool visible = !info.isRemote_ || hasLocalPointer;
-        NotifyPointerDevice(true, visible);
-        OHOS::system::SetParameter(INPUT_POINTER_DEVICE, "true");
-        MMI_HILOGI("Set para input.pointer.device true");
-    }
-    DfxHisysevent::OnDeviceConnect(nextId_ - 1, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
-}
-
-void InputDeviceManager::OnInputDeviceRemoved(std::shared_ptr<IInputDevice> inputDevice)
-{
-    CALL_DEBUG_ENTER;
-    CHKPV(inputDevice);
-    int32_t deviceId = INVALID_DEVICE_ID;
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-    //struct InputDeviceInfo removedInfo;
-    //std::vector<std::string> dhids;
-#endif // OHOS_BUILD_ENABLE_COOPERATE
-    auto context = InputHandler->GetContext();
-    CHKPV(context);
-    const auto& deviceCollector = context->GetInputDeviceCollector();
-    CHKPV(deviceCollector);
-    for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
-        if (it->second.deviceOrigin_ == nullptr) {
-            continue;
-        }
-        auto inputDev = deviceCollector->GetDevice(it->second.deviceOrigin_->devIndex);
-        CHKPV(inputDev);
-        if (inputDev == inputDevice) {
-            deviceId = it->first;
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-            // removedInfo = it->second;
-            // dhids = GetCooperateDhids(deviceId);
-#endif // OHOS_BUILD_ENABLE_COOPERATE
-            DfxHisysevent::OnDeviceDisconnect(deviceId, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
-            inputDevice_.erase(it);
-            break;
-        }
-    }
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-    if (IsPointerDevice(inputDevice) && !HasPointerDevice()) {
-#ifdef OHOS_BUILD_ENABLE_POINTER
-        WinMgr->DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
-#endif // OHOS_BUILD_ENABLE_POINTER
-    }
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-    for (const auto &item : devListener_) {
-        CHKPC(item.first);
-        item.second(deviceId, "remove");
-    }
-    ScanPointerDevice();
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-    // if (IsPointerDevice(inputDevice)) {
-    //     InputDevCooSM->OnPointerOffline(removedInfo.dhid_, removedInfo.networkIdOrigin_, dhids);
-    // }
-#endif // OHOS_BUILD_ENABLE_COOPERATE
-    if (deviceId == INVALID_DEVICE_ID) {
-        DfxHisysevent::OnDeviceDisconnect(INVALID_DEVICE_ID, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
-    }
 }
 } // namespace MMI
 } // namespace OHOS

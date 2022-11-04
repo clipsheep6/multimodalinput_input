@@ -34,5 +34,5 @@ ohos_source_set("mmi_stack_dumper_helper") {
   ]
 
   part_name = "input"
-  subsystem_name = "multimodalinput" 
+  subsystem_name = "multimodalinput"
 }
