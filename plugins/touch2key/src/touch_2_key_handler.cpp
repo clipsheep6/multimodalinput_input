@@ -29,9 +29,11 @@ bool Phalangeal_Joint_ { false } ;
 
 void Touch2KeyHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
-    keyEvent_ = keyEvent;
-    cmd = PluginDispatchCmd::REDIRECT;
-    EventType = PluginDispatchEventType::KEY_EVENT;
+    pluginContext_->next->HandlePointerEvent();
+    // keyEvent_ = keyEvent;
+    // cmd = PluginDispatchCmd::REDIRECT;
+    // EventType = PluginDispatchEventType::KEY_EVENT;
+    // MMI_HILOGE("1111111111111111111111111111111DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
 }
 
 void Touch2KeyHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
@@ -66,7 +68,6 @@ void Touch2KeyHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> poin
                     item.SetDownTime(pointerEvent->GetActionStartTime());
                     item.SetPressed(true);
                     keyEvent_->AddKeyItem(item);
-                    MMI_HILOGE("1111111111111111111111111111111111111KEY_ACTION_DOWN");
                     EventType = PluginDispatchEventType::KEY_EVENT;
                 } else if (type == "up") {
                     keyEvent_ = KeyEvent::Create();
@@ -78,30 +79,12 @@ void Touch2KeyHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> poin
                     item.SetDownTime(pointerEvent->GetActionStartTime());
                     item.SetPressed(true);
                     keyEvent_->AddKeyItem(item);
-                    MMI_HILOGE("1111111111111111111111111111111111111KEY_ACTION_UP");
                     EventType = PluginDispatchEventType::KEY_EVENT;
                 } else {
-                    MMI_HILOGE("1111111111111111111111111111111111111111111111111PointerAction:%{public}d", pointerEvent->GetAction());
-                     
+                    MMI_HILOGE("", pointerEvent->GetAction());
                 }
             }
         }
-        
-        
-
-        // std::vector<int32_t> pointerIds { pointevent_->GetPointerIds() };
-        // for (const auto& pointerId : pointerIds) {
-        //     PointerEvent::PointerItem item;
-        //     if (!pointevent_->GetPointerItem(pointerId, item)) {
-        //         MMI_HILOGE("Invalid pointer: %{public}d.", pointerId);
-        //         return;
-        //     }
-        //     if (item.GetDisplayY() < 300 &&  item.GetDisplayY() > 200) {
-        //         item.SetDisplayY(1280 - item.GetDisplayY());
-        //         item.SetWindowY(1280 - item.GetWindowY());
-        //         pointevent_->UpdatePointerItem(pointerId, item);
-        //     }
-        // }
         MMI_HILOGE("EventType:%{public}s,ActionTime:%{public}" PRId64 ",Action:%{public}d,"
                 "ActionStartTime:%{public}" PRId64 ",Flag:%{public}d,PointerAction:%{public}s,"
                 "SourceType:%{public}s,ButtonId:%{public}d,VerticalAxisValue:%{public}.2f,"

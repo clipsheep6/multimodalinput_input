@@ -88,24 +88,19 @@ int32_t InputEventHandler::BuildInputHandlerChain()
 #endif // !OHOS_BUILD_ENABLE_KEYBOARD && !OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_TOUCH
 
     std::shared_ptr<IInputEventHandler> handler = eventNormalizeHandler_;
-#ifdef OHOS_BUILD_ENABLE_EVENT_PLUGIN
-    eventPluginsHandler_ = std::make_shared<EventPluginsHandler>();
-    CHKPR(eventPluginsHandler_, ERROR_NULL_POINTER);
-    handler->SetNext(eventPluginsHandler_);
-    handler = eventPluginsHandler_;
-#endif // OHOS_BUILD_ENABLE_EVENT_PLUGIN
+    handler = pluginMgr_.ScanPlugin(eventPluginsHandler_, IPluginContext::LoadPeriod::ON_EVENT_NORMALLIZE)
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     eventFilterHandler_ = std::make_shared<EventFilterHandler>();
     CHKPR(eventFilterHandler_, ERROR_NULL_POINTER);
     handler->SetNext(eventFilterHandler_);
-    handler = eventFilterHandler_;
+    handler = pluginMgr_.ScanPlugin(eventFilterHandler_, IPluginContext::LoadPeriod::ON_EVENT_FILTER)
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     eventInterceptorHandler_  = std::make_shared<EventInterceptorHandler>();
     CHKPR(eventInterceptorHandler_, ERROR_NULL_POINTER);
     handler->SetNext(eventInterceptorHandler_);
-    handler = eventInterceptorHandler_;
+    handler = pluginMgr_.ScanPlugin(eventInterceptorHandler_, IPluginContext::LoadPeriod::ON_EVENT_INTERCEPTOR)
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -113,18 +108,19 @@ int32_t InputEventHandler::BuildInputHandlerChain()
     auto keyCommandHandler = std::make_shared<KeyCommandHandler>();
     CHKPR(keyCommandHandler, ERROR_NULL_POINTER);
     handler->SetNext(keyCommandHandler);
-    handler = keyCommandHandler;
+    handler = pluginMgr_.ScanPlugin(keyCommandHandler, IPluginContext::LoadPeriod::ON_EVENT_KEY_COMMAND)
 #endif // OHOS_BUILD_ENABLE_COMBINATION_KEY
     eventSubscriberHandler_ = std::make_shared<KeySubscriberHandler>();
     CHKPR(eventSubscriberHandler_, ERROR_NULL_POINTER);
     handler->SetNext(eventSubscriberHandler_);
-    handler = eventSubscriberHandler_;
+    handler = pluginMgr_.ScanPlugin(eventSubscriberHandler_, IPluginContext::LoadPeriod::ON_EVENT_SUBSCRIBER)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     eventMonitorHandler_ = std::make_shared<EventMonitorHandler>();
     CHKPR(eventMonitorHandler_, ERROR_NULL_POINTER);
     handler->SetNext(eventMonitorHandler_);
-    handler = eventMonitorHandler_;
+    handler = pluginMgr_.ScanPlugin(eventMonitorHandler_, IPluginContext::LoadPeriod::ON_EVENT_MONITOR)
 #endif // OHOS_BUILD_ENABLE_MONITOR
     auto dispatchHandler = std::make_shared<EventDispatchHandler>();
     CHKPR(dispatchHandler, ERROR_NULL_POINTER);

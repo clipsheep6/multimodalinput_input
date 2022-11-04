@@ -10,6 +10,11 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "EventPluginsHandler"};
+/*
+两个目录：
+1，系统目录
+2，定制目录（同名定制与系统目录，优先加载定制目录）
+*/
 const std::string INPUT_EVENT_HANDLER_PLUGIN_HOME = "/system/lib/module/multimodalinput/plugins/";
 bool CheckFileExtendName(const std::string &filePath, const std::string &checkExtension)
 {
@@ -27,49 +32,49 @@ std::map<IInputEventConvertHandler::PluginfunctionId, bool> PluginFunctionStatus
 
 int32_t EventPluginsHandler::ScanPlugins()
 {
-        DIR* dir = opendir(INPUT_EVENT_HANDLER_PLUGIN_HOME.c_str());
-        if (dir == nullptr) {
-            MMI_HILOGE("open plugin home(%{public}s) failed. errno: %{public}d",INPUT_EVENT_HANDLER_PLUGIN_HOME.data(), errno);
-            return RET_ERR;
+    DIR* dir = opendir(INPUT_EVENT_HANDLER_PLUGIN_HOME.c_str());
+    if (dir == nullptr) {
+        MMI_HILOGE("open plugin home(%{public}s) failed. errno: %{public}d",INPUT_EVENT_HANDLER_PLUGIN_HOME.data(), errno);
+        return RET_ERR;
+    }
+    dirent* p = nullptr;
+    while ((p = readdir(dir)) != nullptr) {
+        if (p->d_type != DT_REG) {
+            continue;
         }
-        dirent* p = nullptr;
-        while ((p = readdir(dir)) != nullptr) {
-            if (p->d_type != DT_REG) {
-                continue;
-            }
 
-            char realPath[PATH_MAX] = {};
+        char realPath[PATH_MAX] = {};
 
-            if (realpath((INPUT_EVENT_HANDLER_PLUGIN_HOME + p->d_name).data(), realPath) == nullptr) {
-                MMI_HILOGE("Path is error, path:%{public}s", p->d_name);
-                continue;
-            }
-            if (!CheckFileExtendName(realPath, "so")) {
-                continue;
-            }
-            void *handle = dlopen(realPath, RTLD_NOW);
-            if(handle == nullptr){
-                MMI_HILOGE("open plugin failed, soname:%{public}s, msg:%{public}s", p->d_name, dlerror());
-                continue;
-            }
-            int32_t ret = LoadPlugin(handle);
-            if(ret != RET_OK){
-                auto retClose = dlclose(handle);
-                MMI_HILOGE("load plugin failed, soname:%{public}s, ret:%{public}d. retClose:%{public}d", p->d_name, ret, retClose);
-                continue;
-            }
-            openPlugins_.push_back(handle);
+        if (realpath((INPUT_EVENT_HANDLER_PLUGIN_HOME + p->d_name).data(), realPath) == nullptr) {
+            MMI_HILOGE("Path is error, path:%{public}s", p->d_name);
+            continue;
         }
-        auto ret = closedir(dir);
-        if (ret != 0) {
-            MMI_HILOGE("closedir failed, dirname:%{public}s, errno:%{public}d", INPUT_EVENT_HANDLER_PLUGIN_HOME.data(), errno);
+        if (!CheckFileExtendName(realPath, "so")) {
+            continue;
         }
-        auto cur1 = pluginInfos_.begin();
-        for (auto cur = pluginInfos_.begin(); cur != pluginInfos_.end(); cur++) {
-                (*cur1)->handler->SetNext((*cur)->handler);
-                cur1 = cur;
+        void *handle = dlopen(realPath, RTLD_NOW);
+        if(handle == nullptr){
+            MMI_HILOGE("open plugin failed, soname:%{public}s, msg:%{public}s", p->d_name, dlerror());
+            continue;
         }
-        return RET_OK;
+        int32_t ret = LoadPlugin(handle);
+        if(ret != RET_OK){
+            auto retClose = dlclose(handle);
+            MMI_HILOGE("load plugin failed, soname:%{public}s, ret:%{public}d. retClose:%{public}d", p->d_name, ret, retClose);
+            continue;
+        }
+        openPlugins_.push_back(handle);
+    }
+    auto ret = closedir(dir);
+    if (ret != 0) {
+        MMI_HILOGE("closedir failed, dirname:%{public}s, errno:%{public}d", INPUT_EVENT_HANDLER_PLUGIN_HOME.data(), errno);
+    }
+    auto cur1 = pluginInfos_.begin();
+    for (auto cur = pluginInfos_.begin(); cur != pluginInfos_.end(); cur++) {
+        (*cur1)->handler->SetNext((*cur)->handler);
+        cur1 = cur;
+    }
+    return RET_OK;
 }
 
 int32_t EventPluginsHandler::UnloadPlugins()
@@ -85,8 +90,12 @@ int32_t EventPluginsHandler::UnloadPlugins()
     return RET_OK;
 }
 
+class PluginContext
+{
 
-int32_t EventPluginsHandler::LoadPlugin(void *handle)
+};
+
+int32_t EventPluginsHandler::LoadPlugin(void *handle, std::shared_ptr<PluginContext> pluginContext)
 {
     create_t* create_plu = (create_t*) dlsym(handle, "create");
     const char* retError = dlerror();
@@ -95,7 +104,9 @@ int32_t EventPluginsHandler::LoadPlugin(void *handle)
         return RET_ERR;
     }
     IInputEventConvertHandler::PluginInfo *info = new IInputEventConvertHandler::PluginInfo;
-    info->handler = create_plu()->GetPluginInfo().handler;
+    auto plugin = create_plu(pluginContext);
+    info->handler = plugin->CreateHandler();
+    info->handler = create_plu(pluginContext)->GetPluginInfo().handler;
     info->name = create_plu()->GetPluginInfo().name;
     info->version = create_plu()->GetPluginInfo().version;
     info->priority = create_plu()->GetPluginInfo().priority;
@@ -114,7 +125,6 @@ int32_t EventPluginsHandler::LoadPlugin(void *handle)
             }
         }
     }
-    
     return RET_OK;
 }
 
@@ -135,24 +145,6 @@ void EventPluginsHandler::HandlePluginEventEx(std::shared_ptr<IInputEventConvert
     IInputEventConvertHandler::PluginDispatchCmd cmd = handler->GetDispatchCmd();
     auto nextHandler = std::static_pointer_cast<IInputEventConvertHandler>(handler->GetNextHandler());
     switch(cmd) {
-/*
-        case IInputEventConvertHandler::PluginDispatchCmd::GOTO_NEXT: {
-            MMI_HILOGE("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:::::::%{public}d", nextHandler->GetisPlugin());
-            auto newEvent = handler->GetEvent<T1, T2>();
-            if (!isfast) {
-                nextHandler->SetPluginfunctionStatus(PluginFunctionStatus);
-            }
-            nextHandler->HandleEvent<T1, T2>(newEvent);
-            if (nextHandler->GetisPlugin()) {
-                MMI_HILOGE("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-                if (int32_t(nextHandler->GetDispatchEventType()) != int32_t(IInputEventConvertHandler::PluginDispatchCmd::GOTO_NEXT))  {
-                    HandlePluginEventEx<T1, T2>(nextHandler, newEvent, true);
-                }
-                HandlePluginEventEx<T1, T2>(nextHandler, newEvent, false);
-            } 
-            break;
-        }
-*/
         case IInputEventConvertHandler::PluginDispatchCmd::REDIRECT: {
             IInputEventConvertHandler::PluginDispatchEventType eventType = handler->GetDispatchEventType();
             if (eventType == IInputEventConvertHandler::PluginDispatchEventType::KEY_EVENT) {
@@ -230,7 +222,7 @@ int32_t EventPluginsHandler::SetPhalangealJointStatue(bool joint)
 {
     PluginFunctionStatus[IInputEventConvertHandler::PluginfunctionId::PHALANGEAL_JOINT] = joint;
     return RET_OK;
-} 
+}
 
 bool EventPluginsHandler::GetPhalangealJointStatue()
 {

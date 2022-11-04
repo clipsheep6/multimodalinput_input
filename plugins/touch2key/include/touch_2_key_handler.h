@@ -38,12 +38,12 @@ public:
     virtual bool GetisPlugin() { return isPlugin; };
 private:
     bool isPlugin { true };
-
+    std::shared_ptr<PluginContext> pluginContext_ = nullptr;
 };
 
 //the class factories
-extern "C" IInputEventConvertHandler* create() {
-    return new Touch2KeyHandler;
+extern "C" IInputEventConvertHandler* create(std::shared_ptr<PluginContext> pluginContext) {
+    return new Touch2KeyHandler(pluginContext);
 }
 extern "C" void destroy(IInputEventConvertHandler* p) {
     delete p;

@@ -29,45 +29,9 @@ typedef struct {
     std::shared_ptr<IInputEventConvertHandler> handler;
 } PluginInfo;
 
-enum class PluginDispatchCmd {
-    // GOTO_NEXT,
-    REDIRECT,
-    DISCARD
-};
-
-enum class PluginfunctionId {
-    PHALANGEAL_JOINT
-};
-
 public:
-    virtual PluginDispatchCmd GetDispatchCmd() = 0;
-    virtual PluginDispatchEventType GetDispatchEventType() = 0;
-    virtual const std::shared_ptr<KeyEvent> GetKeyEvent() = 0;
-    virtual const std::shared_ptr<PointerEvent> GetPointEvent() = 0;
-    virtual void SetPluginfunctionStatus(std::map<PluginfunctionId, bool> FunctionStatus) = 0;
-    virtual PluginInfo GetPluginInfo() = 0;
-    template<typename T1, typename T2>
-    const std::shared_ptr<T1> GetEvent();
-    virtual bool GetisPlugin() = 0;
+    virtual SetEventHandler() = 0;
 };
-
-template<>
-inline const std::shared_ptr<KeyEvent> IInputEventConvertHandler::GetEvent<KeyEvent, PluginDispatchKeyEvent>()
-{
-    return GetKeyEvent();
-}
-
-template<>
-inline const std::shared_ptr<PointerEvent> IInputEventConvertHandler::GetEvent<PointerEvent, PluginDispatchPointEvent>()
-{
-    return GetPointEvent();
-}
-
-template<>
-inline const std::shared_ptr<PointerEvent> IInputEventConvertHandler::GetEvent<PointerEvent, PluginDispatchTouchEvent>()
-{
-    return GetPointEvent();
-}
 
 typedef IInputEventConvertHandler* create_t();
 typedef void destroy_t(IInputEventConvertHandler*);

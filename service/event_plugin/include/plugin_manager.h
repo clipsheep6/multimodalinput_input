@@ -17,39 +17,24 @@
 #define EVENT_PLUGINS_HANDLER_H
 
 #include "i_input_event_handler.h"
-#include "i_input_event_convert_handler.h"
 
 namespace OHOS {
 namespace MMI {
-enum class EventHandlerType {
-    KEY_EVENT,
-    POINT_EVENT,
-    TOUCH_EVENT,
-};
+
 class EventPluginsHandler : public IInputEventHandler {
 public:
-    EventPluginsHandler();
+    EventPluginsHandler() = default;
     virtual ~EventPluginsHandler() = default;
     DISALLOW_COPY_AND_MOVE(EventPluginsHandler);
-    virtual void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
-    virtual void HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
-    virtual void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent);
-    virtual void SetNext(std::shared_ptr<IInputEventHandler> nextHandler);
-    int32_t SetPhalangealJointStatue(bool joint);
-    bool GetPhalangealJointStatue();
 private:
     std::list<IInputEventConvertHandler::PluginInfo *> pluginInfos_;
-    std::list<void *> openPlugins_;
 private:
-    int32_t ScanPlugins();
+    void Addplugin(const std::string pluginPath);
+    int32_t ScanPlugins(std::shared_ptr<IInputEventHandler> handler,);
     int32_t UnloadPlugins();
     int32_t LoadPlugin(void *handle);
-    void Dump(int32_t fd) {};
-    template<typename T1, typename T2>
-    void HandlePluginEventEx(std::shared_ptr<IInputEventConvertHandler> handler, const std::shared_ptr<T1> event);
-    template<typename T1, typename T2>
-    void HandlePluginEvent(const std::shared_ptr<T1> event);
 };
 } // namespace MMI
 } // namespace OHOS
+#define pluginMgr_ ::OHOS::DelayedSingleton<EventPluginsHandler>::GetInstance()
 #endif // EVENT_PLUGINS_HANDLER_H
