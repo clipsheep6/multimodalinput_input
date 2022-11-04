@@ -37,7 +37,6 @@ InputEventCb g_eventCb;
 InputHostCb g_hostCb;
 std::mutex g_mutex;
 std::map<uint32_t, int32_t> lastDevInfo;
-static std::map<uint32_t, uint16_t> latestHdfEventTypes;
 } // namespace
 
 void HdfDeviceStatusChanged(int32_t devIndex, int32_t devType, HdfInputEventDevStatus devStatus)
@@ -56,21 +55,13 @@ void HdfDeviceStatusChanged(int32_t devIndex, int32_t devType, HdfInputEventDevS
         int saveErrno = errno;
         MMI_HILOGE("Write pipe fail, errno:%{public}d, %{public}s", saveErrno, strerror(saveErrno));
     }
-
-    if (devStatus != HdfInputEventDevStatus::HDF_RMV_DEVICE) {
-        return;
-    }
-    auto it = latestHdfEventTypes.find(devIndex);
-    if (it != latestHdfEventTypes.end()) {
-        latestHdfEventTypes.erase(it);
-    }
 }
 
 static void HotPlugCallback(const InputHotPlugEvent *event)
 {
     CHK_PID_AND_TID();
     CHKPV(event);
-    auto devStatus = (event->status ? HdfInputEventDevStatus::HDF_RMV_DEVICE : HdfInputEventDevStatus::HDF_ADD_DEVICE);
+    auto devStatus = (event->status ? HdfInputEventDevStatus::HDF_ADD_DEVICE : HdfInputEventDevStatus::HDF_RMV_DEVICE);
     HdfDeviceStatusChanged(event->devIndex, event->devType, devStatus);
 }
 

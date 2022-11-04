@@ -96,8 +96,7 @@ private:
     void OnFdEvent(int fd, int event);
     void ReadEvents();
     int32_t CloseDevice();
-    int32_t UpdateCapablility();
-    bool TestBit(int32_t bitIndex, const unsigned long* bitMap, size_t count) const;
+    int32_t UpdateCapability();
     bool HasInputProperty(int32_t property);
     bool HasMouseCapability();
     bool HasKeyboardCapability();
@@ -115,6 +114,12 @@ private:
     int EventIsType(const struct input_event *ev, unsigned int type);
     int EventtTypeGetMax(unsigned int type);
     int EventIsCode(const struct input_event *ev, unsigned int type, unsigned int code);
+
+    static unsigned long GetBitLoc(unsigned long offset)
+    {
+        int BITS_PER_LONG = sizeof(unsigned long) * 8;
+        return (1UL << ((offset) % BITS_PER_LONG));
+    }
 
 private:
     const int32_t id_;

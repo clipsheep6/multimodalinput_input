@@ -78,6 +78,7 @@ public:
     bool HasLocalPointerDevice() const;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     bool IsKeyboardDevice(struct libinput_device* device) const;
+    bool IsKeyboardDevice(std::shared_ptr<IInputDevice> device) const;
     bool IsPointerDevice(struct libinput_device* device) const;
     bool IsPointerDevice(std::shared_ptr<IInputDevice> device) const;
     struct libinput_device* GetKeyboardDevice() const;

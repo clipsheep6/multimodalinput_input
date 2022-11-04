@@ -40,9 +40,9 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Devic
 int32_t Device::Init()
 {
     CALL_DEBUG_ENTER;
-    auto retCode = UpdateCapablility();
+    auto retCode = UpdateCapability();
     if (retCode < 0) {
-        MMI_HILOGE("Leave device Init, UpdateCapablility Failed");
+        MMI_HILOGE("Leave device Init, UpdateCapability Failed");
         return -1;
     }
     if (HasCapability(IInputDevice::CAPABILITY_TOUCHSCREEN)) {
@@ -186,7 +186,7 @@ void Device::ProcessEvent(const struct input_event* eventItem)
     }
 }
 
-int32_t Device::UpdateCapablility()
+int32_t Device::UpdateCapability()
 {
     CALL_DEBUG_ENTER;
     if (HasMouseCapability()) {
@@ -202,28 +202,68 @@ int32_t Device::UpdateCapablility()
     return 0;
 }
 
-bool Device::TestBit(int32_t bitIndex, const unsigned long* bitMap, size_t count) const
-{
-    if (bitIndex < 0) {
-        return false;
-    }
-
-    size_t idx = bitIndex / (sizeof(unsigned long) * 8);
-    if (idx >= count) {
-        return false;
-    }
-
-    size_t offset = bitIndex % (sizeof(unsigned long) * 8);
-    unsigned long bitOne = 1UL;
-    return (bitMap[idx] & (bitOne << offset)) != 0;
-}
-
 bool Device::HasInputProperty(int32_t property)
 {
-    //return TestBit(property, &inputProperty[0], sizeof(inputProperty) / sizeof(inputProperty[0]));
-    for (int i = 0; i < BITS_TO_UINT64(INPUT_PROP_CNT); i++) {
-        if (devAbility_.devProp[i] == static_cast<unsigned long>(property)) {
+    CALL_DEBUG_ENTER;
+    unsigned long proBitLoc = GetBitLoc(property);
+
+    for (unsigned int i = 0; i < BITS_TO_UINT64(INPUT_PROP_CNT); i++) {
+        if (devAbility_.devProp[i] & proBitLoc) {
             return true;
+        }
+    }
+    return false;
+}
+
+bool Device::HasEventType(int32_t evType) const
+{
+    CALL_DEBUG_ENTER;
+    unsigned long evBitLoc = GetBitLoc(evType);
+
+    for (int i = 0; i < BITS_TO_UINT64(EV_CNT); i++) {
+        if (devAbility_.eventType[i] & evBitLoc) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Device::HasEventCode(int32_t evType, int32_t evCode) const
+{
+    CALL_DEBUG_ENTER;
+    unsigned long evBitLoc = GetBitLoc(evCode);
+
+    switch (evType) {
+        case EV_KEY: {
+            for (int i = 0; i < BITS_TO_UINT64(KEY_CNT); i++) {
+                if (devAbility_.keyCode[i] & evBitLoc) {
+                    MMI_HILOGI("devAbility_.keyCode[i] & evBitLoc is True");
+                    return true;
+                }
+            }
+            break;
+        }
+        case EV_ABS: {
+            for (int i = 0; i < BITS_TO_UINT64(ABS_CNT); i++) {
+                if (devAbility_.absCode[i] & evBitLoc) {
+                    MMI_HILOGI("devAbility_.absCode[i] & evBitLoc is True");
+                    return true;
+                }
+            }
+            break;
+        }
+        case EV_REL: {
+            for (int i = 0; i < BITS_TO_UINT64(REL_CNT); i++) {
+                if (devAbility_.relCode[i] & evBitLoc) {
+                    MMI_HILOGI("devAbility_.relCode[i] & evBitLoc is True");
+                    return true;
+                }
+            }
+            break;
+        }
+        default: {
+            MMI_HILOGE("The current evType:%{public}d is unknow", evType);
+            return false;
         }
     }
     return false;
@@ -231,60 +271,28 @@ bool Device::HasInputProperty(int32_t property)
 
 bool Device::HasMouseCapability()
 {
-    if (HasEventCode(EV_REL, REL_X) && HasEventCode(EV_REL, REL_Y)) {
-        return true;
-    }
-    return false;
+    CALL_DEBUG_ENTER;
+    return (HasEventType(EV_REL) &&
+            HasEventCode(EV_REL, REL_X) &&
+            HasEventCode(EV_REL, REL_Y) &&
+            HasInputProperty(INPUT_PROP_POINTER));
 }
 
 bool Device::HasKeyboardCapability()
 {
-    if (!HasEventType(EV_KEY)) {
-        return false;
-    }
-
-    return true;
+    CALL_DEBUG_ENTER;
+    return (HasEventType(EV_KEY) &&
+            !HasEventType(EV_ABS) &&
+            !HasEventType(EV_REL));
 }
 
 bool Device::HasTouchscreenCapability()
 {
-    if (!HasEventType(EV_ABS)) {
-        return false;
-    }
-
-    if (HasInputProperty(INPUT_PROP_POINTER)) {
-        return false;
-    }
-
-    return true;
-}
-
-bool Device::HasEventType(int32_t evType) const
-{
-    for (int i = 0; i < BITS_TO_UINT64(ABS_CNT); i++) {
-        if (devAbility_.absCode[i] == static_cast<unsigned long>(evType)) {
-            return true;
-        }
-    }
-    
-    return false;
-}
-
-bool Device::HasEventCode(int32_t evType, int32_t evCode) const
-{
-    if (!HasEventType(evType)) {
-        return false;
-    }
-
-    switch(evType) {
-        case EV_REL:
-            return TestBit(evCode, &relBit[0], LENTH_OF_ARRAY(relBit));
-        case EV_ABS:
-            return TestBit(evCode, &absBit[0], LENTH_OF_ARRAY(absBit));
-        default:
-            MMI_HILOGE("NOT IMPLEMENTATION");
-            return false;
-    }
+    CALL_DEBUG_ENTER;
+    return (HasInputProperty(INPUT_PROP_DIRECT) &&
+            HasEventType(EV_ABS) &&
+            ((HasEventCode(EV_ABS, ABS_X) && HasEventCode(EV_ABS, ABS_Y)) ||
+            (HasEventCode(EV_ABS, ABS_MT_POSITION_X) && HasEventCode(EV_ABS, ABS_MT_POSITION_Y))));
 }
 
 void Device::ProcessSyncEvent(int32_t code, int32_t value)
