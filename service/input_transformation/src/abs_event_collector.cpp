@@ -35,7 +35,6 @@ AbsEventCollector::AbsEventCollector(int32_t deviceId, int32_t sourceType)
 const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleAbsEvent(int32_t code, int32_t value)
 {
     CALL_DEBUG_ENTER;
-
     switch (code) {
         case ABS_MT_SLOT:
             return HandleMtSlot(value);
@@ -63,7 +62,6 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleAbsEvent(int32_t code,
         default:
             break;
     }
-
     return AbsEvent::NULL_VALUE;
 }
 

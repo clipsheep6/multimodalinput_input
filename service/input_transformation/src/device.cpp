@@ -205,68 +205,58 @@ int32_t Device::UpdateCapability()
 bool Device::HasInputProperty(int32_t property)
 {
     CALL_DEBUG_ENTER;
-    unsigned long proBitLoc = GetBitLoc(property);
-
-    for (unsigned int i = 0; i < BITS_TO_UINT64(INPUT_PROP_CNT); i++) {
-        if (devAbility_.devProp[i] & proBitLoc) {
-            return true;
-        }
+    auto [index, offset] = GetBitLoc(property);
+    if (offset > BITS_PER_LONG || index >= BITS_TO_UINT64(INPUT_PROP_CNT)) {
+        MMI_HILOGE("Error");
     }
-    return false;
+    auto curBit = (1UL) << offset;
+    return devAbility_.devProp[index] & curBit;
 }
 
 bool Device::HasEventType(int32_t evType) const
 {
     CALL_DEBUG_ENTER;
-    unsigned long evBitLoc = GetBitLoc(evType);
-
-    for (int i = 0; i < BITS_TO_UINT64(EV_CNT); i++) {
-        if (devAbility_.eventType[i] & evBitLoc) {
-            return true;
-        }
+    auto [index, offset] = GetBitLoc(evType);
+    if (offset > BITS_PER_LONG || index >= BITS_TO_UINT64(EV_CNT)) {
+        MMI_HILOGE("Error");
     }
-    return false;
+    auto curBit = (1UL) << offset;
+    return devAbility_.eventType[index] & curBit;
 }
 
 bool Device::HasEventCode(int32_t evType, int32_t evCode) const
 {
     CALL_DEBUG_ENTER;
-    unsigned long evBitLoc = GetBitLoc(evCode);
+    auto [index, offset] = GetBitLoc(evCode);
+    if (offset > BITS_PER_LONG) {
+        MMI_HILOGE("Error");
+    }
+    auto curBit = (1UL) << offset;
 
     switch (evType) {
         case EV_KEY: {
-            for (int i = 0; i < BITS_TO_UINT64(KEY_CNT); i++) {
-                if (devAbility_.keyCode[i] & evBitLoc) {
-                    MMI_HILOGI("devAbility_.keyCode[i] & evBitLoc is True");
-                    return true;
-                }
+            if (index >= BITS_TO_UINT64(KEY_CNT)) {
+                MMI_HILOGE("Error");
             }
-            break;
+            return devAbility_.keyCode[index] & curBit;
         }
         case EV_ABS: {
-            for (int i = 0; i < BITS_TO_UINT64(ABS_CNT); i++) {
-                if (devAbility_.absCode[i] & evBitLoc) {
-                    MMI_HILOGI("devAbility_.absCode[i] & evBitLoc is True");
-                    return true;
-                }
+            if (index >= BITS_TO_UINT64(ABS_CNT)) {
+                MMI_HILOGE("Error");
             }
-            break;
+            return devAbility_.absCode[index] & curBit;
         }
         case EV_REL: {
-            for (int i = 0; i < BITS_TO_UINT64(REL_CNT); i++) {
-                if (devAbility_.relCode[i] & evBitLoc) {
-                    MMI_HILOGI("devAbility_.relCode[i] & evBitLoc is True");
-                    return true;
-                }
+            if (index >= BITS_TO_UINT64(REL_CNT)) {
+                MMI_HILOGE("Error");
             }
-            break;
+            return devAbility_.relCode[index] & curBit;
         }
         default: {
-            MMI_HILOGE("The current evType:%{public}d is unknow", evType);
+            MMI_HILOGE("The current evType:%{public}d is not supported", evType);
             return false;
         }
     }
-    return false;
 }
 
 bool Device::HasMouseCapability()

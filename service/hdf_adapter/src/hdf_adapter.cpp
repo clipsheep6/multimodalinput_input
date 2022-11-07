@@ -48,7 +48,7 @@ void HdfDeviceStatusChanged(int32_t devIndex, int32_t devType, HdfInputEventDevS
     event.devType = devType;
     event.devStatus = static_cast<uint32_t>(devStatus);
     event.time = GetSysClockTime();
-    MMI_HILOGE("devIndex:%{public}u, devType:%{public}u, devStatus:%{public}u,time:%{public}llu",
+    MMI_HILOGE("devIndex:%{public}u, devType:%{public}u, devStatus:%{public}u,time:%{public}" PRId64,
         devIndex, event.devType, event.devStatus, event.time);
     auto ret = write(g_hdfAdapterWriteFd, &event, sizeof(event));
     if (ret == -1) {
@@ -99,7 +99,7 @@ static inline void WriteToPipe(const InputEventPackage &r, uint32_t devIndex)
     }
     event.code = r.code;
     f();
-    MMI_HILOGD("devIndex:%{public}u,code:%{public}u,type:%{public}u,value:%{public}u,time:%{public}llu,",
+    MMI_HILOGD("devIndex:%{public}u,code:%{public}u,type:%{public}u,value:%{public}u,time:%{public}" PRId64 ",",
         devIndex, r.code, r.type, r.value, r.timestamp);
 }
 
@@ -393,7 +393,7 @@ void HdfAdapter::OnEventHandler(const HdfInputEvent &event)
 {
     CALL_DEBUG_ENTER;
     if (event.IsDevNodeAddRmvEvent()) {
-        MMI_HILOGE("zpc:type:addrmv:eventType:%{public}u,devIndex:%{public}u,devType:%{public}u,devStatus:%{public}u, time:%{public}llu",
+        MMI_HILOGE("zpc:type:addrmv:eventType:%{public}u,devIndex:%{public}u,devType:%{public}u,devStatus:%{public}u, time:%{public}" PRId64,
                     event.eventType, event.devIndex, event.devType, event.devStatus, event.time);
         HDFDeviceStatusEvent retEvent;
         retEvent.devIndex = event.devIndex;

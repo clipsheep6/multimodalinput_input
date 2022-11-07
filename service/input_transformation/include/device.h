@@ -71,7 +71,8 @@ static const int ev_max[EV_MAX + 1] = {
 };
 
 typedef unsigned int bitmask_t;
-
+constexpr unsigned long BITS_PER_BYTE = 8;
+constexpr unsigned long BITS_PER_LONG = sizeof(unsigned long) * BITS_PER_BYTE;
 class IKernelEventHandler;
 class Device : public NonCopyable, public IInputDevice {
 
@@ -115,10 +116,11 @@ private:
     int EventtTypeGetMax(unsigned int type);
     int EventIsCode(const struct input_event *ev, unsigned int type, unsigned int code);
 
-    static unsigned long GetBitLoc(unsigned long offset)
+    static std::tuple<unsigned int, unsigned int> GetBitLoc(unsigned long evMacro)
     {
-        int BITS_PER_LONG = sizeof(unsigned long) * 8;
-        return (1UL << ((offset) % BITS_PER_LONG));
+        unsigned long index = evMacro / BITS_PER_LONG;
+        unsigned long offset = evMacro % BITS_PER_LONG;
+        return {index, offset};
     }
 
 private:
