@@ -26,7 +26,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include "error_multimodal.h"
-#include "enum_utils.h"
 #include "i_kernel_event_handler.h"
 #include "mmi_log.h"
 #include "time_utils.h"

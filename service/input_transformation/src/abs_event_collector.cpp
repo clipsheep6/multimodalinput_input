@@ -18,7 +18,6 @@
 #include <linux/input.h>
 
 #include "abs_event.h"
-#include "enum_utils.h"
 #include "time_utils.h"
 #include "mmi_log.h"
 
