@@ -63,12 +63,17 @@ void InputEventHandler::HandleHDFDeviceInputEvent(const HDFDeviceInputEvent &eve
     CHKPV(eventNormalizeHandler_);
     eventNormalizeHandler_->HandleHDFDeviceInputEvent(event);
 }
-#endif // OHOS_BUILD_HDF
 
 void InputEventHandler::SetContext(std::shared_ptr<IInputContext> context)
 {
     context_ = context;
 }
+
+std::shared_ptr<IDeviceCollector> InputEventHandler::GetInputDeviceCollector() {
+    CHKPP(context_);
+    return context_->GetInputDeviceCollector();
+}
+#endif // OHOS_BUILD_HDF
 
 void InputEventHandler::OnLibinputEvent(void *event)
 {
@@ -148,11 +153,6 @@ int32_t InputEventHandler::BuildInputHandlerChain()
 UDSServer* InputEventHandler::GetUDSServer() const
 {
     return udsServer_;
-}
-
-std::shared_ptr<IInputContext> InputEventHandler::GetContext() const
-{
-    return context_;
 }
 
 std::shared_ptr<EventNormalizeHandler> InputEventHandler::GetEventNormalizeHandler() const

@@ -55,9 +55,8 @@ void Device::Uninit()
     CloseDevice();
 }
 
-Device::Device(int32_t id, const std::shared_ptr<IInputContext> context, const InputDeviceInfo &devInfo) : id_(id),
-   context_(context), absEventCollector_(id, AbsEvent::SOURCE_TYPE_NONE),
-   eventHandler_(IKernelEventHandler::GetDefault()) {
+Device::Device(int32_t id, const InputDeviceInfo &devInfo) : id_(id),
+    absEventCollector_(id, AbsEvent::SOURCE_TYPE_NONE), eventHandler_(IKernelEventHandler::GetDefault()) {
        dimensionInfoX_ = devInfo.attrSet.axisInfo[ABS_MT_POSITION_X];
        dimensionInfoY_ = devInfo.attrSet.axisInfo[ABS_MT_POSITION_Y];
        devAbility_ = devInfo.abilitySet;
@@ -321,11 +320,6 @@ int32_t Device::StartReceiveEvents(const std::shared_ptr<IKernelEventHandler>& e
         return -1;
     }
 
-    if (context_ == nullptr) {
-        MMI_HILOGE("Leave, null context_");
-        return -1;
-    }
-
     eventHandler_ = eventHandler;
     return 0;
 }
@@ -333,11 +327,6 @@ int32_t Device::StartReceiveEvents(const std::shared_ptr<IKernelEventHandler>& e
 int32_t Device::StopReceiveEvents()
 {
     eventHandler_ = IKernelEventHandler::GetDefault();
-
-    if (context_ == nullptr) {
-        MMI_HILOGE("Leave, null context_");
-        return -1;
-    }
     return 0;
 }
 

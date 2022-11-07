@@ -27,7 +27,6 @@
 #include "abs_event.h"
 #include "hdf_adapter.h"
 #include "i_event_collector.h"
-#include "i_input_context.h"
 #include "i_input_define.h"
 #include "i_input_device.h"
 
@@ -77,7 +76,7 @@ class IKernelEventHandler;
 class Device : public NonCopyable, public IInputDevice {
 
 public:
-    Device(int32_t id, const std::shared_ptr<IInputContext> context, const InputDeviceInfo &devInfo);
+    Device(int32_t id, const InputDeviceInfo &devInfo);
     virtual ~Device();
     int32_t Init();
     virtual int32_t GetId() const override;
@@ -125,7 +124,6 @@ private:
 
 private:
     const int32_t id_;
-    const std::shared_ptr<IInputContext> context_;
     std::string name_;
     int32_t deviceId_;
     InputDimensionInfo dimensionInfoX_;

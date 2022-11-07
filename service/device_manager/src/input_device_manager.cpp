@@ -440,9 +440,7 @@ void InputDeviceManager::MakeDeviceInfo(const InputDeviceInfo &hdfDevInfo, struc
 {
     info.deviceOrigin_ = hdfDevInfo;
     info.isRemote_ = IsRemote(hdfDevInfo);
-    auto context = InputHandler->GetContext();
-    CHKPV(context);
-    const auto& deviceCollector = context->GetInputDeviceCollector();
+    auto deviceCollector = InputHandler->GetInputDeviceCollector();
     CHKPV(deviceCollector);
     auto inputDevice = deviceCollector->GetDevice(hdfDevInfo.devIndex);
     CHKPV(inputDevice);
@@ -571,9 +569,7 @@ bool InputDeviceManager::IsPointerDevice(struct libinput_device* device) const
 #ifdef OHOS_BUILD_HDF
 bool InputDeviceManager::IsPointerDevice(const InputDeviceInfo &hdfDevInfo) const
 {
-    auto context = InputHandler->GetContext();
-    CHKPF(context);
-    const auto& deviceCollector = context->GetInputDeviceCollector();
+    auto deviceCollector = InputHandler->GetInputDeviceCollector();
     CHKPF(deviceCollector);
     auto device = deviceCollector->GetDevice(hdfDevInfo.devIndex);
     CHKPF(device);
@@ -593,9 +589,7 @@ bool InputDeviceManager::IsKeyboardDevice(struct libinput_device* device) const
 #ifdef OHOS_BUILD_HDF
 bool InputDeviceManager::IsKeyboardDevice(const InputDeviceInfo &hdfDevInfo) const
 {
-    auto context = InputHandler->GetContext();
-    CHKPF(context);
-    const auto& deviceCollector = context->GetInputDeviceCollector();
+    auto deviceCollector = InputHandler->GetInputDeviceCollector();
     CHKPF(deviceCollector);
     auto device = deviceCollector->GetDevice(hdfDevInfo.devIndex);
     CHKPF(device);
