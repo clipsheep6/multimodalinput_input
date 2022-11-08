@@ -22,6 +22,9 @@
 #include "dfx_hisysevent.h"
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
+#ifdef OHOS_BUILD_HDF
+#include "device.h"
+#endif // OHOS_BUILD_HDF
 #include "error_multimodal.h"
 #include "event_log_helper.h"
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
@@ -37,12 +40,7 @@
 #include "mmi_log.h"
 #include "time_cost_chk.h"
 #include "timer_manager.h"
-#include "touch_screen_handler.h"
 #include "touch_event_normalize.h"
-#ifdef OHOS_BUILD_HDF
-#include "device.h"
-#include "hdf_adapter.h"
-#endif // OHOS_BUILD_HDF
 
 namespace OHOS {
 namespace MMI {
