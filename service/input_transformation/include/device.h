@@ -85,7 +85,7 @@ public:
     virtual bool HasCapability(int32_t capability) const override;
     virtual int32_t StartReceiveEvents(const std::shared_ptr<IKernelEventHandler>& eventHandler) override;
     virtual int32_t StopReceiveEvents() override;
-    virtual void ProcessEventItem(const struct input_event* eventItem) override;
+    virtual void ProcessEventItem(const struct input_event& eventItem) override;
     virtual void SetDeviceId(int32_t deviceId) override;
     virtual int32_t GetDeviceId() const override;
 
@@ -109,11 +109,11 @@ private:
     void ProcessAbsEvent(int32_t code, int32_t value);
     void ProcessMscEvent(int32_t code, int32_t value);
     void OnEventCollected(const std::shared_ptr<const AbsEvent>& event);
-    void ProcessEvent(const struct input_event* eventItem);
+    void ProcessEvent(const struct input_event& eventItem);
 
-    int EventIsType(const struct input_event *ev, unsigned int type);
+    int EventIsType(const struct input_event& ev, unsigned int type);
     int EventtTypeGetMax(unsigned int type);
-    int EventIsCode(const struct input_event *ev, unsigned int type, unsigned int code);
+    int EventIsCode(const struct input_event& ev, unsigned int type, unsigned int code);
 
     static std::tuple<unsigned int, unsigned int> GetBitLoc(unsigned long evMacro)
     {

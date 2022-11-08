@@ -138,29 +138,29 @@ int32_t Device::CloseDevice()
     return 0;
 }
 
-void Device::ProcessEventItem(const struct input_event* eventItem)
+void Device::ProcessEventItem(const struct input_event& eventItem)
 {
     CALL_DEBUG_ENTER;
     if (mtdev_ == nullptr) {
         ProcessEvent(eventItem);
     } else {
-        mtdev_put_event(mtdev_, eventItem);
+        mtdev_put_event(mtdev_, &eventItem);
         if (EventIsCode(eventItem, EV_SYN, SYN_REPORT)) {
             while (!mtdev_empty(mtdev_)) {
-               struct input_event e;
+               struct input_event e = {0};
                mtdev_get_event(mtdev_, &e);
-               ProcessEvent(&e);
+               ProcessEvent(e);
             }
         }
     }
 }
 
-void Device::ProcessEvent(const struct input_event* eventItem)
+void Device::ProcessEvent(const struct input_event& eventItem)
 {
     CALL_DEBUG_ENTER;
-    auto type = eventItem->type;
-    auto code = eventItem->code;
-    auto value = eventItem->value;
+    auto type = eventItem.type;
+    auto code = eventItem.code;
+    auto value = eventItem.value;
     switch (type) {
         case EV_SYN:
             ProcessSyncEvent(code, value);
@@ -285,7 +285,7 @@ bool Device::HasTouchscreenCapability()
 
 void Device::ProcessSyncEvent(int32_t code, int32_t value)
 {
-    const auto& event = absEventCollector_.HandleSyncEvent(code, value);
+    auto event = absEventCollector_.HandleSyncEvent(code, value);
     if (event) {
         OnEventCollected(event);
         absEventCollector_.AfterProcessed();
@@ -330,9 +330,9 @@ int32_t Device::StopReceiveEvents()
     return 0;
 }
 
-int Device::EventIsType(const struct input_event *ev, unsigned int type)
+int Device::EventIsType(const struct input_event& ev, unsigned int type)
 {
-	return type < EV_CNT && ev->type == type;
+	return type < EV_CNT && ev.type == type;
 }
 
 int Device::EventtTypeGetMax(unsigned int type)
@@ -343,7 +343,7 @@ int Device::EventtTypeGetMax(unsigned int type)
 	return ev_max[type];
 }
 
-int Device::EventIsCode(const struct input_event *ev, unsigned int type, unsigned int code)
+int Device::EventIsCode(const struct input_event& ev, unsigned int type, unsigned int code)
 {
 	int max;
 
@@ -351,7 +351,7 @@ int Device::EventIsCode(const struct input_event *ev, unsigned int type, unsigne
 		return 0;
 
 	max = EventtTypeGetMax(type);
-	return (max > -1 && code <= (unsigned int)max && ev->code == code);
+	return (max > -1 && code <= (unsigned int)max && ev.code == code);
 }
 } // namespace MMI
 } // namespace OHOS

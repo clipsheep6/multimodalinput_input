@@ -66,7 +66,7 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleAbsEvent(int32_t code,
 
 const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleSyncEvent(int32_t code, int32_t value)
 {
-    const auto& absEvent = FinishPointer();
+    auto absEvent = FinishPointer();
     return absEvent;
 }
 

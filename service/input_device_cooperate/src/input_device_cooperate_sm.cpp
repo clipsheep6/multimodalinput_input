@@ -473,6 +473,31 @@ void InputDeviceCooperateSM::HandleEvent(libinput_event *event)
     }
 }
 
+void InputDeviceCooperateSM::HandleHDFDeviceInputEvent(const HDFDeviceInputEvent &event)
+{
+    switch (event.type) {
+        case EV_SYN:
+        case EV_ABS:
+        case EV_KEY:
+        case EV_REL:
+        case EV_MSC:
+        case EV_SW:
+        case EV_LED:
+        case EV_SND:
+        case EV_REP:
+        case EV_FF:
+        case EV_PWR:
+        case EV_FF_STATUS: {
+            MMI_HILOGW("Not supported temporarily.");
+            break;
+        }
+        default: {
+            return;
+        }
+    }
+    return;
+}
+
 void InputDeviceCooperateSM::CheckPointerEvent(struct libinput_event *event)
 {
     std::lock_guard<std::mutex> guard(mutex_);

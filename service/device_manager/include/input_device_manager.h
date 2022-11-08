@@ -41,7 +41,7 @@ namespace MMI {
 class InputDeviceManager final : public IDeviceObject {
     DECLARE_DELAYED_SINGLETON(InputDeviceManager);
 
-    struct InputDeviceInformation{
+    struct InputDeviceInformation {
         struct libinput_device *inputDeviceOrigin_ { nullptr };
 #ifdef OHOS_BUILD_HDF
         InputDeviceInfo deviceOrigin_;

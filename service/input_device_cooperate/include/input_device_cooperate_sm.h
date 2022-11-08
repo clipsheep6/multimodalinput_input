@@ -74,6 +74,7 @@ public:
     void StopRemoteCooperateResult(bool isSuccess);
     void StartCooperateOtherResult(const std::string &srcNetworkId);
     void HandleEvent(struct libinput_event *event);
+    void HandleHDFDeviceInputEvent(const HDFDeviceInputEvent &event);
     void UpdateState(CooperateState state);
     void UpdatePreparedDevices(const std::string &srcNetworkId, const std::string &sinkNetworkId);
     std::pair<std::string, std::string> GetPreparedDevices() const;

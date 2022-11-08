@@ -245,7 +245,7 @@ int32_t TouchScreenHandler::TransformToPhysicalDisplayCoordinate(const DisplayIn
 void TouchScreenHandler::GetPhysicalDisplayCoord(const std::shared_ptr<const AbsEvent>& absEvent,
     const DisplayInfo& info, EventTouch& touchInfo)
 {
-    const auto& absEventPointer = absEvent->GetPointer();
+    auto absEventPointer = absEvent->GetPointer();
     if (!absEventPointer) {
         MMI_HILOGE("Leave, null absEventPointer");
         return;

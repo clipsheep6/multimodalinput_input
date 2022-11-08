@@ -60,8 +60,25 @@ void InputEventHandler::HandleHDFDeviceStatusEvent(const HDFDeviceStatusEvent &e
 
 void InputEventHandler::HandleHDFDeviceInputEvent(const HDFDeviceInputEvent &event)
 {
+    idSeed_ += 1;
+    const uint64_t maxUInt64 = (std::numeric_limits<uint64_t>::max)() - 1;
+    if (idSeed_ >= maxUInt64) {
+        MMI_HILOGE("The value is flipped. id:%{public}" PRId64, idSeed_);
+        idSeed_ = 1;
+    }
+    int64_t beginTime = GetSysClockTime();
+    MMI_HILOGD("Event reporting. id:%{public}" PRId64 ",tid:%{public}" PRId64 ",eventType:%{public}d,"
+               "beginTime:%{public}" PRId64, idSeed_, GetThisThreadId(), event.type, beginTime);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    InputDevCooSM->HandleHDFDeviceInputEvent(event);
+#else
     CHKPV(eventNormalizeHandler_);
     eventNormalizeHandler_->HandleHDFDeviceInputEvent(event);
+#endif
+    int64_t endTime = GetSysClockTime();
+    int64_t lostTime = endTime - beginTime;
+    MMI_HILOGD("Event handling completed. id:%{public}" PRId64 ",endTime:%{public}" PRId64
+               ",lostTime:%{public}" PRId64, idSeed_, endTime, lostTime);
 }
 
 void InputEventHandler::SetContext(std::shared_ptr<IInputContext> context)

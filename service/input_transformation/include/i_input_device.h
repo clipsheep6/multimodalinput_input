@@ -75,7 +75,7 @@ public:
 
     virtual std::shared_ptr<AxisInfo> GetAxisInfo(int32_t axis) const = 0;
     virtual bool HasCapability(int32_t capability) const = 0;
-    virtual void ProcessEventItem(const struct input_event* eventItem) = 0;
+    virtual void ProcessEventItem(const struct input_event& eventItem) = 0;
     virtual int32_t StartReceiveEvents(const std::shared_ptr<IKernelEventHandler>& eventHandler) = 0;
     virtual int32_t StopReceiveEvents() = 0;
     virtual void SetDeviceId(int32_t deviceId) = 0;
