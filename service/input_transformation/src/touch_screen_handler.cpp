@@ -16,7 +16,6 @@
 #include "touch_screen_handler.h"
 
 #include "event_log_helper.h"
-#include "i_input_context.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
 #include "input_event_handler.h"
@@ -28,22 +27,23 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TouchScreenHandler" };
 };
-std::unique_ptr<TouchScreenHandler> TouchScreenHandler::CreateInstance(const IInputContext* context)
+std::shared_ptr<TouchScreenHandler> TouchScreenHandler::CreateInstance()
 {
-    if (context == nullptr) {
-        return nullptr;
-    }
-    return std::unique_ptr<TouchScreenHandler>(new TouchScreenHandler(context));
+    return std::shared_ptr<TouchScreenHandler>(new TouchScreenHandler());
 }
 
-TouchScreenHandler::TouchScreenHandler(const IInputContext* context)
-        : context_(context)
+TouchScreenHandler::TouchScreenHandler()
 {
 }
 
 std::shared_ptr<PointerEvent> TouchScreenHandler::GetPointerEvent()
 {
     return pointerEvent_;
+}
+
+std::shared_ptr<IInputDevice> TouchScreenHandler::GetDevice()
+{
+    return inputDevice_;
 }
 
 int32_t TouchScreenHandler::BindInputDevice(const std::shared_ptr<IInputDevice>& inputDevice)

@@ -23,16 +23,16 @@
 
 namespace OHOS {
 namespace MMI {
-class IInputContext;
 class PointerEvent;
 class ITouchScreenHandler {
 public:
-    static std::unique_ptr<ITouchScreenHandler> CreateInstance(const IInputContext* context);
+    static std::shared_ptr<ITouchScreenHandler> CreateInstance();
     virtual ~ITouchScreenHandler() = default;
     virtual std::shared_ptr<PointerEvent> GetPointerEvent() = 0;
     virtual void OnInputEvent(const std::shared_ptr<const AbsEvent>& event) = 0;
     virtual int32_t BindInputDevice(const std::shared_ptr<IInputDevice>& inputDevice) = 0;
     virtual int32_t UnbindInputDevice(const std::shared_ptr<IInputDevice>& inputDevice) = 0;
+    virtual std::shared_ptr<IInputDevice> GetDevice() = 0;
 };
 } // namespace MMI
 } // namespace OHOS

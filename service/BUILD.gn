@@ -453,11 +453,9 @@ ohos_shared_library("libmmi-server") {
     sources += [
         "input_transformation/src/abs_event_collector.cpp",
         "input_transformation/src/abs_event.cpp",
-        "input_transformation/src/device_collector.cpp",
         "input_transformation/src/device.cpp",
         "input_transformation/src/i_input_device.cpp",
         "input_transformation/src/i_kernel_event_handler.cpp",
-        "input_transformation/src/input_context.cpp",
         "input_transformation/src/instance_creator.cpp",
         "input_transformation/src/kernel_event_base.cpp",
         "input_transformation/src/kernel_event_handler_bridge.cpp",

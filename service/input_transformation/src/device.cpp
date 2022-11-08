@@ -55,12 +55,12 @@ void Device::Uninit()
     CloseDevice();
 }
 
-Device::Device(int32_t id, const InputDeviceInfo &devInfo) : id_(id),
-    absEventCollector_(id, AbsEvent::SOURCE_TYPE_NONE), eventHandler_(IKernelEventHandler::GetDefault()) {
-       dimensionInfoX_ = devInfo.attrSet.axisInfo[ABS_MT_POSITION_X];
-       dimensionInfoY_ = devInfo.attrSet.axisInfo[ABS_MT_POSITION_Y];
-       devAbility_ = devInfo.abilitySet;
-   }
+Device::Device(int32_t id, const InputDeviceInfo devInfo) : id_(id),
+    absEventCollector_(id, AbsEvent::SOURCE_TYPE_NONE), eventHandler_(IKernelEventHandler::GetDefault()),
+    deviceOrigin_(devInfo)
+{
+}
+
 Device::~Device()
 {
     Uninit();
@@ -99,11 +99,11 @@ std::shared_ptr<IInputDevice::AxisInfo> Device::GetAxisInfo(int32_t axis) const
     switch (axis) {
         case IInputDevice::AXIS_MT_X:
             absCode = ABS_MT_POSITION_X;
-            dimensionInfo = dimensionInfoX_;
+            dimensionInfo = deviceOrigin_.attrSet.axisInfo[ABS_MT_POSITION_X];
             break;
         case IInputDevice::AXIS_MT_Y:
             absCode = ABS_MT_POSITION_Y;
-            dimensionInfo = dimensionInfoY_;
+            dimensionInfo = deviceOrigin_.attrSet.axisInfo[ABS_MT_POSITION_Y];
             break;
         default:
             MMI_HILOGE("Leave device:%{public}s axis:%{public}s, Unknown axis", GetName().c_str(), IInputDevice::AxisToString(axis));
@@ -208,7 +208,7 @@ bool Device::HasInputProperty(int32_t property)
         MMI_HILOGE("Error");
     }
     auto curBit = (1UL) << offset;
-    return devAbility_.devProp[index] & curBit;
+    return deviceOrigin_.abilitySet.devProp[index] & curBit;
 }
 
 bool Device::HasEventType(int32_t evType) const
@@ -219,7 +219,7 @@ bool Device::HasEventType(int32_t evType) const
         MMI_HILOGE("Error");
     }
     auto curBit = (1UL) << offset;
-    return devAbility_.eventType[index] & curBit;
+    return deviceOrigin_.abilitySet.eventType[index] & curBit;
 }
 
 bool Device::HasEventCode(int32_t evType, int32_t evCode) const
@@ -236,19 +236,19 @@ bool Device::HasEventCode(int32_t evType, int32_t evCode) const
             if (index >= BITS_TO_UINT64(KEY_CNT)) {
                 MMI_HILOGE("Error");
             }
-            return devAbility_.keyCode[index] & curBit;
+            return deviceOrigin_.abilitySet.keyCode[index] & curBit;
         }
         case EV_ABS: {
             if (index >= BITS_TO_UINT64(ABS_CNT)) {
                 MMI_HILOGE("Error");
             }
-            return devAbility_.absCode[index] & curBit;
+            return deviceOrigin_.abilitySet.absCode[index] & curBit;
         }
         case EV_REL: {
             if (index >= BITS_TO_UINT64(REL_CNT)) {
                 MMI_HILOGE("Error");
             }
-            return devAbility_.relCode[index] & curBit;
+            return deviceOrigin_.abilitySet.relCode[index] & curBit;
         }
         default: {
             MMI_HILOGE("The current evType:%{public}d is not supported", evType);
@@ -352,6 +352,11 @@ int Device::EventIsCode(const struct input_event& ev, unsigned int type, unsigne
 
 	max = EventtTypeGetMax(type);
 	return (max > -1 && code <= (unsigned int)max && ev.code == code);
+}
+
+InputDeviceInfo Device::GetInputDeviceInfo() const
+{
+    return deviceOrigin_;
 }
 } // namespace MMI
 } // namespace OHOS

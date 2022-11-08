@@ -31,7 +31,7 @@ namespace MMI {
 
 class TouchScreenHandler : public NonCopyable, public ITouchScreenHandler {
 public:
-    static std::unique_ptr<TouchScreenHandler> CreateInstance(const IInputContext* context);
+    static std::shared_ptr<TouchScreenHandler> CreateInstance();
 
 public:
     virtual ~TouchScreenHandler() = default;
@@ -39,9 +39,10 @@ public:
     virtual std::shared_ptr<PointerEvent> GetPointerEvent() override;
     virtual int32_t BindInputDevice(const std::shared_ptr<IInputDevice>& inputDevice) override;
     virtual int32_t UnbindInputDevice(const std::shared_ptr<IInputDevice>& inputDevice) override;
+    virtual std::shared_ptr<IInputDevice> GetDevice() override;
 
 protected:
-    TouchScreenHandler(const IInputContext* context);
+    TouchScreenHandler();
     bool ConvertPointer(const std::shared_ptr<const AbsEvent>& absEvent,
             int32_t& pointerAction, int64_t& actionTime);
     int32_t ConvertAction(int32_t absEventAction) const;
@@ -59,7 +60,6 @@ protected:
     void ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent);
 
 private:
-    [[maybe_unused]]const IInputContext* const context_;
     std::shared_ptr<IInputDevice> inputDevice_;
     std::shared_ptr<IInputDevice::AxisInfo> xInfo_;
     std::shared_ptr<IInputDevice::AxisInfo> yInfo_;

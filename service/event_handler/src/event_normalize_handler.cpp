@@ -28,7 +28,6 @@
 #include "input_device_cooperate_sm.h"
 #include "input_device_cooperate_util.h"
 #endif // OHOS_BUILD_ENABLE_COOPERATE
-#include "input_context.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
 #include "key_auto_repeat.h"
@@ -41,7 +40,6 @@
 #include "touch_screen_handler.h"
 #include "touch_event_normalize.h"
 #ifdef OHOS_BUILD_HDF
-#include "device_collector.h"
 #include "device.h"
 #include "hdf_adapter.h"
 #endif // OHOS_BUILD_HDF
@@ -155,20 +153,16 @@ int32_t EventNormalizeHandler::OnHDFDeviceAdded(const InputDeviceInfo &devInfo)
     auto inputDevice = std::make_shared<Device>(devInfo.devIndex, devInfo);
     CHKPR(inputDevice, ERROR_NULL_POINTER);
     inputDevice->Init();
-    auto deviceCollector = InputHandler->GetInputDeviceCollector();
-    CHKPR(deviceCollector, ERROR_NULL_POINTER);
-    deviceCollector->AddDevice(inputDevice);
-    InputDevMgr->OnInputDeviceAdded(devInfo, inputDevice);
+    InputDevMgr->OnInputDeviceAdded(inputDevice);
     return RET_OK;
 }
 
 int32_t EventNormalizeHandler::OnHDFDeviceRemoved(const InputDeviceInfo &devInfo)
 {
     CALL_DEBUG_ENTER;
-    InputDevMgr->OnInputDeviceRemoved(devInfo);
-    auto deviceCollector = InputHandler->GetInputDeviceCollector();
-    CHKPR(deviceCollector, ERROR_NULL_POINTER);
-    deviceCollector->RemoveDevice(devInfo.devIndex);
+    auto device = InputDevMgr->GetDevice(devInfo.devIndex);
+    CHKPR(device, ERROR_NULL_POINTER);
+    InputDevMgr->OnInputDeviceRemoved(device);
     return RET_OK;
 }
 
@@ -182,9 +176,7 @@ int32_t EventNormalizeHandler::OnHDFEvent(int32_t devIndex, const HdfInputEvent 
         .code = hdfEevent.code,
         .value = hdfEevent.value
     };
-    auto deviceCollector = InputHandler->GetInputDeviceCollector();
-    CHKPR(deviceCollector, ERROR_NULL_POINTER);
-    const auto device = deviceCollector->GetDevice(devIndex);
+    auto device = InputDevMgr->GetDevice(devIndex);
     CHKPR(device, ERROR_NULL_POINTER);
     device->ProcessEventItem(event);
     return RET_OK;

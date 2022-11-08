@@ -76,7 +76,7 @@ class IKernelEventHandler;
 class Device : public NonCopyable, public IInputDevice {
 
 public:
-    Device(int32_t id, const InputDeviceInfo &devInfo);
+    Device(int32_t id, const InputDeviceInfo devInfo);
     virtual ~Device();
     int32_t Init();
     virtual int32_t GetId() const override;
@@ -88,6 +88,7 @@ public:
     virtual void ProcessEventItem(const struct input_event& eventItem) override;
     virtual void SetDeviceId(int32_t deviceId) override;
     virtual int32_t GetDeviceId() const override;
+    virtual InputDeviceInfo GetInputDeviceInfo() const override;
 
 protected:
     void Uninit();
@@ -141,6 +142,7 @@ private:
     mutable std::map<int32_t, std::shared_ptr<IInputDevice::AxisInfo>> axises_;
 
     std::shared_ptr<IKernelEventHandler> eventHandler_;
+    InputDeviceInfo deviceOrigin_;
 };
 } // namespace MMI
 } // namespace OHOS

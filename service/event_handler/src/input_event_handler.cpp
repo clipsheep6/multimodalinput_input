@@ -81,15 +81,6 @@ void InputEventHandler::HandleHDFDeviceInputEvent(const HDFDeviceInputEvent &eve
                ",lostTime:%{public}" PRId64, idSeed_, endTime, lostTime);
 }
 
-void InputEventHandler::SetContext(std::shared_ptr<IInputContext> context)
-{
-    context_ = context;
-}
-
-std::shared_ptr<IDeviceCollector> InputEventHandler::GetInputDeviceCollector() {
-    CHKPP(context_);
-    return context_->GetInputDeviceCollector();
-}
 #endif // OHOS_BUILD_HDF
 
 void InputEventHandler::OnLibinputEvent(void *event)

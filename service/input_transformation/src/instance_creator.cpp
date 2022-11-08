@@ -13,25 +13,13 @@
  * limitations under the License.
  */
 
-#include "device_collector.h"
-#include "input_context.h"
 #include "touch_screen_handler.h"
 
 namespace OHOS {
 namespace MMI {
-std::shared_ptr<IDeviceCollector> IDeviceCollector::CreateInstance(IInputContext* context)
+std::shared_ptr<ITouchScreenHandler> ITouchScreenHandler::CreateInstance()
 {
-    return DeviceCollector::CreateInstance(context);
-}
-
-std::shared_ptr<IInputContext> IInputContext::CreateInstance()
-{
-    return InputContext::CreateInstance();
-}
-
-std::unique_ptr<ITouchScreenHandler> ITouchScreenHandler::CreateInstance(const IInputContext* context)
-{
-    return TouchScreenHandler::CreateInstance(context);
+    return TouchScreenHandler::CreateInstance();
 }
 } // namespace MMI
 } // namespace OHOS

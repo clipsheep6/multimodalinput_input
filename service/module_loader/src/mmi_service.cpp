@@ -30,7 +30,6 @@
 #include "cooperate_event_manager.h"
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "event_dump.h"
-#include "input_context.h"
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_cooperate_sm.h"
 #endif // OHOS_BUILD_ENABLE_COOPERATE
@@ -201,9 +200,6 @@ bool MMIService::InitLibinputService()
 #ifdef OHOS_BUILD_HDF
 bool MMIService::InitHDFService()
 {
-    auto context = OHOS::MMI::InputContext::CreateInstance();
-    InputHandler->SetContext(context);
-
     if (!(hdfAdapter_.Init(std::bind(&InputEventHandler::HandleHDFDeviceStatusEvent, InputHandler, std::placeholders::_1),
         std::bind(&InputEventHandler::HandleHDFDeviceInputEvent, InputHandler, std::placeholders::_1)
         ))) {
