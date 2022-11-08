@@ -23,7 +23,6 @@ config("mmi_service_hdf_adapter_public_config") {
 ohos_source_set("mmi_service_hdf_adapter") {
   include_dirs = [
     "include",
-    "${mmi_path}/util/stack_dumper/include",
     "${mmi_path}/util/network/include",
   ]
   sources = [

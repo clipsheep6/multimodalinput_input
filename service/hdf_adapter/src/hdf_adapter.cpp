@@ -19,7 +19,6 @@
 #include "circle_stream_buffer.h"
 #include "config_multimodal.h"
 #include "error_multimodal.h"
-#include "stack_dumper_helper.h"
 #include "util_ex.h"
 
 namespace OHOS {
