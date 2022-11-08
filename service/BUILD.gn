@@ -69,7 +69,7 @@ config("libmmi_server_config") {
   if (input_feature_combination_key) {
     service_defines += [ "OHOS_BUILD_ENABLE_COMBINATION_KEY" ]
   }
-  
+
   if (resource_schedule_service_enabled) {
     service_defines += [ "OHOS_RSS_CLIENT" ]
   }
@@ -81,7 +81,6 @@ config("libmmi_server_config") {
       "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include",
     ]
   }
-
 }
 
 ohos_shared_library("libmmi-server") {
@@ -161,9 +160,7 @@ ohos_shared_library("libmmi-server") {
     sources += [ "interceptor/src/event_interceptor_handler.cpp" ]
   }
 
-  configs = [ 
-    ":libmmi_server_config",
-    ]
+  configs = [ ":libmmi_server_config" ]
 
   deps = [
     ":mmi_device_config.ini",
