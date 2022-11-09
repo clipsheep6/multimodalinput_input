@@ -97,6 +97,7 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
         return GetInputDevInfo(iter->first, iter->second.deviceOrigin_);
     }
 #endif // OHOS_BUILD_HDF
+    return nullptr;
 }
 
 std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevInfo(uint32_t devIndex, struct libinput_device *inputDeviceOrigin) const
@@ -732,7 +733,7 @@ bool InputDeviceManager::IsRemote(struct libinput_device *inputDevice) const
 bool InputDeviceManager::IsRemote(const std::shared_ptr<IInputDevice> devInfo) const
 {
     bool isRemote = false;
-    auto device = devInfo->GetInputDeviceInfo();
+    const auto &device = devInfo->GetInputDeviceInfo();
     std::string name = device.attrSet.devName;
     if (name == "" || name[0] == '\0') {
         MMI_HILOGD("Device name is empty");

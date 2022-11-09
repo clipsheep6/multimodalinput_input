@@ -61,8 +61,8 @@ void InputEventHandler::HandleHDFDeviceStatusEvent(const HDFDeviceStatusEvent &e
         idSeed_ = 1;
     }
     int64_t beginTime = GetSysClockTime();
-    MMI_HILOGD("Event reporting. id:%{public}" PRId64 ",tid:%{public}" PRId64 ",eventType:%{public}d,"
-               "beginTime:%{public}" PRId64, idSeed_, GetThisThreadId(), event.type, beginTime);
+    MMI_HILOGD("Event reporting. id:%{public}" PRId64 ",tid:%{public}" PRId64 ",devIndex:%{public}u,devType:%{public}d,devStatus:%{public}d,"
+               "beginTime:%{public}" PRId64, idSeed_, GetThisThreadId(), event.devIndex, event.devType, event.devStatus, beginTime);
     CHKPV(eventNormalizeHandler_);
     eventNormalizeHandler_->HandleHDFDeviceStatusEvent(event);
     int64_t endTime = GetSysClockTime();

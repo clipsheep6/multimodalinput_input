@@ -152,6 +152,10 @@ private:
 #endif // OHOS_BUILD_ENABLE_POINTER
     DisplayGroupInfo displayGroupInfo_;
     MouseLocation mouseLocation_ = { -1, -1 };
+#ifdef OHOS_BUILD_HDF
+    std::shared_ptr<IInputDevice::AxisInfo> xInfoHDF_;
+    std::shared_ptr<IInputDevice::AxisInfo> yInfoHDF_;
+#endif // OHOS_BUILD_HDF
 };
 
 #define WinMgr ::OHOS::DelayedSingleton<InputWindowsManager>::GetInstance()

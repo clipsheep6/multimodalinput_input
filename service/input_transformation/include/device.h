@@ -91,7 +91,7 @@ public:
     virtual void ProcessEventItem(const struct input_event& eventItem) override;
     virtual void SetDeviceId(int32_t deviceId) override;
     virtual int32_t GetDeviceId() const override;
-    virtual InputDeviceInfo GetInputDeviceInfo() const override;
+    virtual const InputDeviceInfo& GetInputDeviceInfo() const override;
 
 protected:
     void Uninit();

@@ -42,7 +42,7 @@ diff -Naur old/BUILD.gn new/BUILD.gn
  
    configs = [
 @@ -81,7 +89,7 @@
-     "//foundation/multimodalinput/input/patch/diff_mtdev_mmi:libmtdev",
+     "//third_party/mtdev:libmtdev",
    ]
  
 -  part_name = "multimodalinput_base"
@@ -51,7 +51,7 @@ diff -Naur old/BUILD.gn new/BUILD.gn
  ## Build libinput-third.so }}}
  
 @@ -113,7 +121,7 @@
-     "//foundation/multimodalinput/input/patch/diff_mtdev_mmi:libmtdev",
+     "//third_party/mtdev:libmtdev",
    ]
  
 -  part_name = "multimodalinput_base"
@@ -60,7 +60,7 @@ diff -Naur old/BUILD.gn new/BUILD.gn
  
  ohos_executable("libinput-list") {
 @@ -143,7 +151,7 @@
-     "//foundation/multimodalinput/input/patch/diff_mtdev_mmi:libmtdev",
+     "//third_party/mtdev:libmtdev",
    ]
  
 -  part_name = "multimodalinput_base"
@@ -69,7 +69,7 @@ diff -Naur old/BUILD.gn new/BUILD.gn
  
  ohos_executable("libinput-tablet") {
 @@ -173,5 +181,5 @@
-     "//foundation/multimodalinput/input/patch/diff_mtdev_mmi:libmtdev",
+     "//third_party/mtdev:libmtdev",
    ]
  
 -  part_name = "multimodalinput_base"

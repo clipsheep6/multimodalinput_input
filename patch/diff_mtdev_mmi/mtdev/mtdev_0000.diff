@@ -1,6 +1,6 @@
-diff -Naur old/mtdev/include/mtdev.h new/mtdev/include/mtdev.h
---- old/mtdev/include/mtdev.h	2021-01-01 00:00:00.000000000 +0800
-+++ new/mtdev/include/mtdev.h	2021-01-01 00:00:00.000000000 +0800
+diff -Naur old/include/mtdev.h new/include/mtdev.h
+--- old/include/mtdev.h	2021-01-01 00:00:00.000000000 +0800
++++ new/include/mtdev.h	2021-01-01 00:00:00.000000000 +0800
 @@ -91,6 +91,17 @@
  struct mtdev *mtdev_new_open(int fd);
  
@@ -19,9 +19,9 @@ diff -Naur old/mtdev/include/mtdev.h new/mtdev/include/mtdev.h
   * mtdev_open - open an mtdev converter
   * @dev: the mtdev to open
   * @fd: file descriptor of the kernel device
-diff -Naur old/mtdev/src/core.c new/mtdev/src/core.c
---- old/mtdev/src/core.c	2021-01-01 00:00:00.000000000 +0800
-+++ new/mtdev/src/core.c	2021-01-01 00:00:00.000000000 +0800
+diff -Naur old/src/core.c new/src/core.c
+--- old/src/core.c	2021-01-01 00:00:00.000000000 +0800
++++ new/src/core.c	2021-01-01 00:00:00.000000000 +0800
 @@ -432,3 +432,33 @@
  {
  	free(dev);

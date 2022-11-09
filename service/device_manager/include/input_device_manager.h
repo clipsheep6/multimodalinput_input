@@ -65,7 +65,7 @@ public:
     std::vector<int32_t> GetInputDeviceIds() const;
     std::shared_ptr<InputDevice> GetInputDevice(int32_t id) const;
 #ifdef OHOS_BUILD_HDF
-    std::shared_ptr<IInputDevice> GetDevice(int32_t id) const;
+    std::shared_ptr<IInputDevice> GetDevice(uint32_t devIndex) const;
 #endif // OHOS_BUILD_HDF
     int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes, std::vector<bool> &keystroke);
     int32_t FindInputDeviceId(struct libinput_device* inputDevice);

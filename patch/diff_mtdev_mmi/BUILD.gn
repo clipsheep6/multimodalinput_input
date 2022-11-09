@@ -38,7 +38,7 @@ config("libmtdev_config") {
 }
 
 config("libmtdev_public_config") {
-  include_dirs = [ "include" ]
+  include_dirs = [ "$gen_dst_dir/include" ]
 
   cflags = []
 }
