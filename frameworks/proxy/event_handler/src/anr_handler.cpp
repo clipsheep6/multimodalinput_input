@@ -39,13 +39,13 @@ ANRHandler::ANRHandler() {}
 
 ANRHandler::~ANRHandler() {}
 
-void ANRHandler::UpdateSendStatus(int32_t eventType, bool status)
+void ANRHandler::SetLastProcessedEventStatus(int32_t eventType, bool status)
 {
     std::lock_guard<std::mutex> guard(anrMtx_);
     event_[eventType].sendStatus = status;
 }
 
-void ANRHandler::UpdateLastEventId(int32_t eventType, int32_t eventId)
+void ANRHandler::UpdateLastProcessedEventId(int32_t eventType, int32_t eventId)
 {
     std::lock_guard<std::mutex> guard(anrMtx_);
     event_[eventType].lastEventId = eventId;
@@ -60,7 +60,7 @@ void ANRHandler::SetLastProcessedEventId(int32_t eventType, int32_t eventId, uin
             eventType, eventId, event_[eventType].lastEventId);
         return;
     }
-    UpdateLastEventId(eventType, eventId);
+    UpdateLastProcessedEventId(eventType, eventId);
 
     int64_t currentTime = GetSysClockTime();
     int64_t timeoutTime = INPUT_UI_TIMEOUT_TIME - (currentTime - actionTime);
@@ -107,7 +107,6 @@ int32_t ANRHandler::GetLastProcessedEventId(int32_t eventType)
 void ANRHandler::MarkProcessed(int32_t eventType)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(anrMtx_);
     int32_t eventId = GetLastProcessedEventId(eventType);
     if (eventId == INVALID_OR_PROCESSED_ID) {
         return;
@@ -117,7 +116,7 @@ void ANRHandler::MarkProcessed(int32_t eventType)
     if (ret != 0) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }
-    event_[eventType].sendStatus = false;
+    SetLastProcessedEventStatus(eventType, false);
     MMI_HILOGE("LW+: Event mark processed timer finish");
 }
 
@@ -131,7 +130,7 @@ void ANRHandler::SendEvent(int32_t eventType, int64_t delayTime)
         MMI_HILOGE("Invalid event type:%{public}d, lastEventId:%{public}d", eventType, event_[eventType].lastEventId);
         return;
     }
-    event_[eventType].sendStatus = true;
+    SetLastProcessedEventStatus(eventType, true);
     auto eventHandler = InputMgrImpl.GetEventHandler();
     CHKPV(eventHandler);
     std::function<void()> eventFunc = std::bind(&ANRHandler::MarkProcessed, this, eventType);
