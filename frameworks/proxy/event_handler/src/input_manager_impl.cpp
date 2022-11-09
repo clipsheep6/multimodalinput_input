@@ -371,7 +371,6 @@ int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consum
     return IMonitorMgr->AddMonitor(consumer);
 #else
     MMI_HILOGI("Monitor function does not support");
-    MMI_HILOGI("Monitor function does not support125486582");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_MONITOR
 }
@@ -388,7 +387,6 @@ void InputManagerImpl::RemoveMonitor(int32_t monitorId)
     IMonitorMgr->RemoveMonitor(monitorId);
 #else
     MMI_HILOGI("Monitor function does not support");
-    MMI_HILOGI("Monitor function does not support125486582");
 #endif // OHOS_BUILD_ENABLE_MONITOR
 }
 
@@ -404,7 +402,6 @@ void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
     IMonitorMgr->MarkConsumed(monitorId, eventId);
 #else
     MMI_HILOGI("Monitor function does not support");
-    MMI_HILOGI("Monitor function does not support125486582");
 #endif // OHOS_BUILD_ENABLE_MONITOR
 }
 
