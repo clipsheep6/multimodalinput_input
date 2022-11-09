@@ -39,7 +39,7 @@ class InputEventHandler final {
 public:
     DISALLOW_COPY_AND_MOVE(InputEventHandler);
     void Init(UDSServer& udsServer);
-    void OnLibinputEvent(void *event);
+    void OnEvent(void *event);
 #ifdef OHOS_BUILD_HDF
     void HandleHDFDeviceStatusEvent(const HDFDeviceStatusEvent &event);
     void HandleHDFDeviceInputEvent(const HDFDeviceInputEvent &event);

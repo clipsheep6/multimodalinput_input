@@ -83,7 +83,7 @@ void InputEventHandler::HandleHDFDeviceInputEvent(const HDFDeviceInputEvent &eve
 
 #endif // OHOS_BUILD_HDF
 
-void InputEventHandler::OnLibinputEvent(void *event)
+void InputEventHandler::OnEvent(void *event)
 {
     CHKPV(event);
     idSeed_ += 1;

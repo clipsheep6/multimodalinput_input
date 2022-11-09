@@ -128,7 +128,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event)
 #ifdef OHOS_BUILD_HDF
 void EventNormalizeHandler::HandleHDFDeviceStatusEvent(const HDFDeviceStatusEvent &event)
 {
-    if (event.devStatus == (static_cast<uint32_t>(HdfInputEventDevStatus::HDF_ADD_DEVICE))) {
+    if (event.devStatus == (static_cast<uint32_t>(HDFInputEventDevStatus::HDF_ADD_DEVICE))) {
         OnHDFDeviceAdded(event.devInfo);
     } else {
         OnHDFDeviceRemoved(event.devInfo);
@@ -145,7 +145,7 @@ int32_t EventNormalizeHandler::OnHDFDeviceAdded(const InputDeviceInfo &devInfo)
 {
     CALL_DEBUG_ENTER;
     if (devInfo.devType != INDEV_TYPE_TOUCH) {
-        MMI_HILOGW("Hdf doesn't support device type:%{public}d", devInfo.devType);
+        MMI_HILOGW("HDF doesn't support device type:%{public}d", devInfo.devType);
         return RET_ERR;
     }
     auto inputDevice = std::make_shared<Device>(devInfo.devIndex, devInfo);
@@ -164,7 +164,7 @@ int32_t EventNormalizeHandler::OnHDFDeviceRemoved(const InputDeviceInfo &devInfo
     return RET_OK;
 }
 
-int32_t EventNormalizeHandler::OnHDFEvent(int32_t devIndex, const HdfInputEvent &hdfEevent)
+int32_t EventNormalizeHandler::OnHDFEvent(int32_t devIndex, const HDFInputEvent &hdfEevent)
 {
     CALL_DEBUG_ENTER;
     const input_event event {

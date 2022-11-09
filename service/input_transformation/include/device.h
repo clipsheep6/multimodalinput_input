@@ -23,6 +23,8 @@
 #include "mtdev.h"
 #include <mtdev-plumbing.h>
 
+#include "nocopyable.h"
+
 #include "abs_event_collector.h"
 #include "abs_event.h"
 #include "hdf_adapter.h"
@@ -73,11 +75,12 @@ typedef unsigned int bitmask_t;
 constexpr unsigned long BITS_PER_BYTE = 8;
 constexpr unsigned long BITS_PER_LONG = sizeof(unsigned long) * BITS_PER_BYTE;
 class IKernelEventHandler;
-class Device : public NonCopyable, public IInputDevice {
+class Device : public IInputDevice {
 
 public:
     Device(int32_t id, const InputDeviceInfo devInfo);
     virtual ~Device();
+    DISALLOW_COPY_AND_MOVE(Device);
     int32_t Init();
     virtual int32_t GetId() const override;
     virtual const std::string& GetName() const override;

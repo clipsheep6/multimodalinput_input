@@ -20,15 +20,18 @@
 #include <map>
 #include <list>
 
+#include "nocopyable.h"
+
 #include "abs_event.h"
 #include "i_input_define.h"
 
 namespace OHOS {
 namespace MMI {
-class AbsEventCollector : public NonCopyable {
+class AbsEventCollector {
 public:
     AbsEventCollector(int32_t deviceId, int32_t sourceType);
     virtual ~AbsEventCollector() = default;
+    DISALLOW_COPY_AND_MOVE(AbsEventCollector);
 
     const std::shared_ptr<AbsEvent>& HandleAbsEvent(int32_t code, int32_t value);
     const std::shared_ptr<AbsEvent>& HandleSyncEvent(int32_t code, int32_t value);

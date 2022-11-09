@@ -21,22 +21,11 @@
 
 namespace OHOS {
 namespace MMI {
-struct NonCopyable {
-    NonCopyable() = default;
-    virtual ~NonCopyable() = default;;
-
-    NonCopyable(const NonCopyable&) = delete;
-    NonCopyable(NonCopyable&&) = delete;
-};
-
 #define CASE_STR(item) case item: do {return #item;} while(0)
 
 inline constexpr size_t LongsOfBits(int32_t bitsCount)  {
     return (bitsCount / (sizeof(long) * 8)) + !!(bitsCount % (sizeof(long) * 8));
 }
-
-
-#define LENTH_OF_ARRAY(arr) (sizeof(arr) / sizeof(arr[0]))
 } // namespace MMI
 } // namespace OHOS
 #endif // I_INPUT_DEFINE_H

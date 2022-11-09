@@ -25,15 +25,14 @@
 #include "system_ability.h"
 
 #include "delegate_tasks.h"
+#ifdef OHOS_BUILD_HDF
+#include "hdf_adapter.h"
+#endif
 #include "input_event_handler.h"
 #include "multimodal_input_connect_stub.h"
 #include "libinput_adapter.h"
 #include "server_msg_handler.h"
 #include "uds_server.h"
-
-#ifdef OHOS_BUILD_HDF
-#include "hdf_adapter.h"
-#endif
 
 namespace OHOS {
 namespace MMI {
@@ -151,7 +150,7 @@ private:
 
     LibinputAdapter libinputAdapter_;
 #ifdef OHOS_BUILD_HDF
-    HdfAdapter hdfAdapter_;
+    HDFAdapter hdfAdapter_;
 #endif // OHOS_BUILD_HDF
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;

@@ -18,6 +18,8 @@
 #include <memory>
 #include <map>
 
+#include "nocopyable.h"
+
 #include "abs_event.h"
 #include "input_display_info.h"
 #include "i_input_define.h"
@@ -29,12 +31,14 @@
 namespace OHOS {
 namespace MMI {
 
-class TouchScreenHandler : public NonCopyable, public ITouchScreenHandler {
+class TouchScreenHandler : public ITouchScreenHandler {
 public:
     static std::shared_ptr<TouchScreenHandler> CreateInstance();
 
 public:
     virtual ~TouchScreenHandler() = default;
+    DISALLOW_COPY_AND_MOVE(TouchScreenHandler);
+
     virtual void OnInputEvent(const std::shared_ptr<const AbsEvent>& event) override;
     virtual std::shared_ptr<PointerEvent> GetPointerEvent() override;
     virtual int32_t BindInputDevice(const std::shared_ptr<IInputDevice>& inputDevice) override;

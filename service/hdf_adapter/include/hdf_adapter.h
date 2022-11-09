@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,27 +20,29 @@
 #include <functional>
 #include <string>
 #include <sys/epoll.h>
+
 #include "input_type.h"
-#include "define_multimodal.h"
 #include "input_manager.h"
+
+#include "define_multimodal.h"
 #include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {
-enum class HdfInputEventType : uint32_t {
+enum class HDFInputEventType : uint32_t {
     DEV_NODE_EVENT = 0,
     DEV_NODE_ADD_RMV = 1,
 };
 
-enum class HdfInputEventDevStatus : int32_t {
+enum class HDFInputEventDevStatus : uint32_t {
     HDF_ADD_DEVICE = 1,
     HDF_RMV_DEVICE = 2,
 };
 
 #pragma pack(1)
-struct HdfInputEvent {
-    bool IsDevNodeAddRmvEvent() const { return (eventType == (static_cast<uint32_t>(HdfInputEventType::DEV_NODE_ADD_RMV))); }
-    bool IsDevAdd() const { return (devStatus == (static_cast<uint32_t>(HdfInputEventDevStatus::HDF_ADD_DEVICE))); }
+struct HDFInputEvent {
+    bool IsDevNodeAddRmvEvent() const { return (eventType == (static_cast<uint32_t>(HDFInputEventType::DEV_NODE_ADD_RMV))); }
+    bool IsDevAdd() const { return (devStatus == (static_cast<uint32_t>(HDFInputEventDevStatus::HDF_ADD_DEVICE))); }
     uint32_t eventType; // 0 设备节点事件, 1 设备添加删除事件
     uint32_t devIndex;    
     uint64_t time; 
@@ -65,31 +67,29 @@ struct HDFDeviceStatusEvent {
     InputDeviceInfo devInfo;
 };
 
-using HDFDeviceInputEvent = HdfInputEvent;
+using HDFDeviceInputEvent = HDFInputEvent;
 #pragma pack()
-class HdfAdapter {
+
+class HDFAdapter final {
     using HDFDeviceStatusEventCallback = std::function<void(const HDFDeviceStatusEvent &event)>;
     using HDFDeviceInputEventCallback = std::function<void(const HDFDeviceInputEvent &event)>;
 public:
-    HdfAdapter();
-    ~HdfAdapter() = default;
+    HDFAdapter();
+    ~HDFAdapter() = default;
     bool Init(HDFDeviceStatusEventCallback statusCallback, HDFDeviceInputEventCallback inputCallback);
-    void DeInit();
-    void Dump(int32_t fd, const std::vector<std::string> &args);
+    void Uninit();
     int32_t GetInputFd() const;
     int32_t ScanInputDevice();
-    void EventDispatch(epoll_event& ev);
-    void OnEventHandler(const HdfInputEvent &event);
+    void EventDispatch(epoll_event &ev);
 private:
-    int32_t ConnectHDFInit();
-    int32_t DisconnectHDFInit();
-    int32_t HandleDeviceAdd(HDFDeviceStatusEvent &retEvent);
+    int32_t ConnectHDFService();
+    int32_t DisconnectHDFService();
+    int32_t HandleDeviceAdd(HDFDeviceStatusEvent &event);
     int32_t HandleDeviceRmv(int32_t devIndex, int32_t devType);
+    void OnEventHandler(const HDFInputEvent &event);
 private:
     HDFDeviceStatusEventCallback statusCallback_;
-    HDFDeviceInputEventCallback inputCallback_;
-    std::vector<std::string> eventRecords_;
-    
+    HDFDeviceInputEventCallback inputCallback_;    
 };
 } // namespace MMI
 } // namespace OHOS

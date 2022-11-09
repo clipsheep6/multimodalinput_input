@@ -459,7 +459,7 @@ void InputDeviceManager::MakeDeviceInfo(std::shared_ptr<IInputDevice> hdfDevInfo
 {
     CHKPV(hdfDevInfo);
     info.deviceOrigin_ = hdfDevInfo;
-    info.isRemote_ = IsRemote(hdfDevInfo);;
+    info.isRemote_ = IsRemote(hdfDevInfo);
     CHKPV(hdfDevInfo);
     info.isPointerDevice_ = IsPointerDevice(hdfDevInfo);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE

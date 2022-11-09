@@ -181,7 +181,7 @@ bool MMIService::IsRunning() const
 
 bool MMIService::InitLibinputService()
 {
-    if (!(libinputAdapter_.Init(std::bind(&InputEventHandler::OnLibinputEvent, InputHandler, std::placeholders::_1),
+    if (!(libinputAdapter_.Init(std::bind(&InputEventHandler::OnEvent, InputHandler, std::placeholders::_1),
         DEF_INPUT_SEAT))) {
         MMI_HILOGE("Libinput init, bind failed");
         return false;
@@ -201,20 +201,29 @@ bool MMIService::InitLibinputService()
 bool MMIService::InitHDFService()
 {
     if (!(hdfAdapter_.Init(std::bind(&InputEventHandler::HandleHDFDeviceStatusEvent, InputHandler, std::placeholders::_1),
-        std::bind(&InputEventHandler::HandleHDFDeviceInputEvent, InputHandler, std::placeholders::_1)
-        ))) {
-        MMI_HILOGE("Libinput init, bind failed");
+        std::bind(&InputEventHandler::HandleHDFDeviceInputEvent, InputHandler, std::placeholders::_1)))) {
+        MMI_HILOGE("HDF init, bind failed");
         return false;
     }
-    auto inputFd = hdfAdapter_.GetInputFd();
-    auto ret = AddEpoll(EPOLL_EVENT_HDF, inputFd);
-    if (ret <  0) {
-        MMI_HILOGE("AddEpoll error ret:%{public}d", ret);
-        EpollClose();
-        return false;
-    }
-    MMI_HILOGI("AddEpoll, epollfd:%{public}d, fd:%{public}d", mmiFd_, inputFd);
-    return true;
+
+    do {
+        auto inputFd = hdfAdapter_.GetInputFd();
+        if (inputFd == -1) {
+            MMI_HILOGE("Invalid fd:%{public}d", inputFd);
+            break;
+        }
+        auto ret = AddEpoll(EPOLL_EVENT_HDF, inputFd);
+        if (ret <  0) {
+            MMI_HILOGE("AddEpoll error ret:%{public}d", ret);
+            EpollClose();
+            break;
+        }
+        MMI_HILOGI("AddEpoll, epollfd:%{public}d, fd:%{public}d", mmiFd_, inputFd);
+        return true;
+    } while (0);
+
+    hdfAdapter_.Uninit();
+    return false;
 }
 #endif // OHOS_BUILD_HDF
 
@@ -352,9 +361,12 @@ void MMIService::OnStart()
         WATCHDOG_INTERVAL_TIME, WATCHDOG_DELAY_TIME);
     MMI_HILOGI("Run periodical task success");
     t_.detach();
-    MMI_HILOGI("MMIService thread has detatched");
+    MMI_HILOGI("MMIService thread has detached");
 #ifdef OHOS_BUILD_HDF
-    hdfAdapter_.ScanInputDevice(); //TODO: 是否应该委托到eventRunner中执行
+    ret = hdfAdapter_.ScanInputDevice();
+    if (ret != RET_OK) {
+        MMI_HILOGE("ScanInputDevice failed, ret:%{public}d", ret);
+    }
 #endif // OHOS_BUILD_HDF
     MMI_HILOGI("MMIService OnStart has finished");
 }
@@ -365,7 +377,7 @@ void MMIService::OnStop()
     UdsStop();
     libinputAdapter_.Stop();
 #ifdef OHOS_BUILD_HDF
-    hdfAdapter_.DeInit();
+    hdfAdapter_.Uninit();
 #endif // OHOS_BUILD_HDF
     state_ = ServiceRunningState::STATE_NOT_START;
 #ifdef OHOS_RSS_CLIENT
@@ -999,8 +1011,8 @@ void MMIService::OnThread()
             CHKPC(mmiEd);
             if (mmiEd->event_type == EPOLL_EVENT_INPUT) {
                 libinputAdapter_.EventDispatch(ev[i]);
-            } else if (mmiEd->event_type == EPOLL_EVENT_HDF) {
 #ifdef OHOS_BUILD_HDF
+            } else if (mmiEd->event_type == EPOLL_EVENT_HDF) {
                 hdfAdapter_.EventDispatch(ev[i]);
 #endif // OHOS_BUILD_HDF
             } else if (mmiEd->event_type == EPOLL_EVENT_SOCKET) {
