@@ -31,6 +31,8 @@ public:
 
     void SetLastProcessedEventId(int32_t eventType, int32_t eventId, uint64_t actionTime);
     void MarkProcessed(int32_t eventType);
+
+    std::mutex anrMtx_;
 private:
     struct ANREvent {
         bool sendStatus { false };

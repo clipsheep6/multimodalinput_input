@@ -39,6 +39,18 @@ ANRHandler::ANRHandler() {}
 
 ANRHandler::~ANRHandler() {}
 
+void ANRHandler::UpdateSendStatus(int32_t eventType, bool status)
+{
+    std::lock_guard<std::mutex> guard(anrMtx_);
+    event_[eventType].sendStatus = status;
+}
+
+void ANRHandler::UpdateLastEventId(int32_t eventType, int32_t eventId)
+{
+    std::lock_guard<std::mutex> guard(anrMtx_);
+    event_[eventType].lastEventId = eventId;
+}
+
 void ANRHandler::SetLastProcessedEventId(int32_t eventType, int32_t eventId, uint64_t actionTime)
 {
     CALL_DEBUG_ENTER;
@@ -48,7 +60,7 @@ void ANRHandler::SetLastProcessedEventId(int32_t eventType, int32_t eventId, uin
             eventType, eventId, event_[eventType].lastEventId);
         return;
     }
-    event_[eventType].lastEventId = eventId;
+    UpdateLastEventId(eventType, eventId);
 
     int64_t currentTime = GetSysClockTime();
     int64_t timeoutTime = INPUT_UI_TIMEOUT_TIME - (currentTime - actionTime);
@@ -78,6 +90,7 @@ void ANRHandler::SetLastProcessedEventId(int32_t eventType, int32_t eventId, uin
 int32_t ANRHandler::GetLastProcessedEventId(int32_t eventType)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(anrMtx_);
     if (event_[eventType].lastEventId == INVALID_OR_PROCESSED_ID
         || event_[eventType].lastEventId <= event_[eventType].lastReportId) {
         MMI_HILOGD("Invalid or processed event type:%{public}d, lastEventId:%{public}d, lastReportId:%{public}d",
@@ -94,6 +107,7 @@ int32_t ANRHandler::GetLastProcessedEventId(int32_t eventType)
 void ANRHandler::MarkProcessed(int32_t eventType)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(anrMtx_);
     int32_t eventId = GetLastProcessedEventId(eventType);
     if (eventId == INVALID_OR_PROCESSED_ID) {
         return;
