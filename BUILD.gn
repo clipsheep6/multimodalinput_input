@@ -15,10 +15,9 @@ import("//build/ohos.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
 group("third_party_group") {
-  deps = []
+  deps = [ "//foundation/multimodalinput/input/patch:patch_packages", ]
   if (input_feature_libinput) {
     deps += [
-      "//foundation/multimodalinput/input/patch:patch_packages",
       "//third_party/eudev:libudev",
       "//third_party/eudev:udevd",
       "//third_party/eudev:udevadm",
@@ -26,20 +25,9 @@ group("third_party_group") {
       "//third_party/eudev:udev_conf",
       "//third_party/eudev:udev_touchscreen_rule",
       "//third_party/eudev:udev_vk_rule",
-      "//third_party/mtdev:libmtdev",
       "//third_party/libevdev:libevdev"
     ]
   }
-}
-
-ohos_prebuilt_executable("gdb") {
-  install_enable = true
-  source = "//gdb/gdb-7.10.1-arm6v"
-  symlink_target_name = [ "gdb" ]
-  module_install_dir = "bin"
-  install_images = [ "system" ]
-  part_name = "input"
-  subsystem_name = "multimodalinput"  
 }
 
 ohos_prebuilt_etc("multimodalinput.rc") {
@@ -65,7 +53,6 @@ group("multimodalinput_mmi_service") {
   deps = [
     "service:libmmi-server",
     "tools/inject_event:uinput",
-    "tools/udev_demo:udev_demo",
   ]
 }
 

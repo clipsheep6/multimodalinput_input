@@ -1,0 +1,58 @@
+diff -Naur old/mtdev/include/mtdev.h new/mtdev/include/mtdev.h
+--- old/mtdev/include/mtdev.h	2021-01-01 00:00:00.000000000 +0800
++++ new/mtdev/include/mtdev.h	2021-01-01 00:00:00.000000000 +0800
+@@ -91,6 +91,17 @@
+ struct mtdev *mtdev_new_open(int fd);
+ 
+ /**
++ * mmi_mtdev_new_open - create and open a new mtdev for multimodal
++ *
++ * Create a new mtdev and open the conversion.
++ *
++ * Returns zero in case of failure.
++ *
++ * This call combines the plumbing functions mtdev_new()
++ */
++struct mtdev *mmi_mtdev_new_open();
++
++/**
+  * mtdev_open - open an mtdev converter
+  * @dev: the mtdev to open
+  * @fd: file descriptor of the kernel device
+diff -Naur old/mtdev/src/core.c new/mtdev/src/core.c
+--- old/mtdev/src/core.c	2021-01-01 00:00:00.000000000 +0800
++++ new/mtdev/src/core.c	2021-01-01 00:00:00.000000000 +0800
+@@ -432,3 +432,33 @@
+ {
+ 	free(dev);
+ }
++
++int mmi_mtdev_open(struct mtdev *dev)
++{
++       int ret = -EINVAL;
++
++       if (!dev)
++               goto error;
++       ret = mtdev_init(dev);
++       if (ret)
++               goto error;
++       return 0;
++
++ error:
++       mtdev_close(dev);
++       return ret;
++}
++
++struct mtdev *mmi_mtdev_new_open()
++{
++       struct mtdev *dev;
++
++       dev = mtdev_new();
++       if (!dev)
++               return NULL;
++       if (!mmi_mtdev_open(dev))
++               return dev;
++
++       mtdev_delete(dev);
++       return NULL;
++}

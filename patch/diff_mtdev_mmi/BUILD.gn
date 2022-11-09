@@ -1,0 +1,65 @@
+import("//build/ohos.gni")
+import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+
+gen_src_dir = "//third_party/mtdev"
+gen_dst_dir = root_out_dir + "/diff_mtdev_mmi"
+patches_root_dir = "//foundation/multimodalinput/input/patch"
+build_gn_dir = "$patches_root_dir/diff_mtdev_mmi/mtdev"
+
+action("apply_patch") {
+  visibility = [ ":*" ]
+  script = "$patches_root_dir/apply_patch.sh"
+  inputs = [ "$gen_src_dir" ]
+  outputs = [
+    "$gen_dst_dir/src/caps.c",
+    "$gen_dst_dir/src/core.c",
+    "$gen_dst_dir/src/iobuf.c",
+    "$gen_dst_dir/src/match.c",
+    "$gen_dst_dir/src/match_four.c",
+  ]
+
+  args = [
+    rebase_path(gen_src_dir, root_build_dir),
+    rebase_path(gen_dst_dir, root_build_dir),
+    rebase_path(build_gn_dir, root_build_dir),
+  ]
+}
+
+## Build libmtdev.so {{{
+config("libmtdev_config") {
+  visibility = [ ":*" ]
+
+  include_dirs = [ "$gen_dst_dir/src" ]
+
+  cflags = [
+    "-Wno-unused-parameter",
+    "-Wno-sign-compare",
+  ]
+}
+
+config("libmtdev_public_config") {
+  include_dirs = [ "include" ]
+
+  cflags = []
+}
+
+ohos_shared_library("libmtdev") {
+  sources = [
+    "$gen_dst_dir/src/caps.c",
+    "$gen_dst_dir/src/core.c",
+    "$gen_dst_dir/src/iobuf.c",
+    "$gen_dst_dir/src/match.c",
+    "$gen_dst_dir/src/match_four.c",
+  ]
+
+  configs = [ ":libmtdev_config" ]
+
+  public_configs = [ ":libmtdev_public_config" ]
+
+  deps = [ ":apply_patch" ]
+
+  public_deps = []
+
+  part_name = "input"
+}
+## Build libmtdev.so }}}

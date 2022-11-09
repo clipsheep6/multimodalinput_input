@@ -424,6 +424,27 @@ const DisplayInfo* InputWindowsManager::FindPhysicalDisplayInfo(const std::strin
     return nullptr;
 }
 
+#ifdef OHOS_BUILD_HDF
+bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, const std::shared_ptr<const AbsEvent>& absEvent,
+                                                  EventTouch& touchInfo, int32_t& physicalDisplayId)
+{
+    CHKPF(absEvent);
+    std::string screenId = InputDevMgr->GetScreenId(deviceId);
+    if (screenId.empty()) {
+        screenId = "default0";
+    }
+    auto info = WinMgr->FindPhysicalDisplayInfo(screenId);
+    CHKPF(info);
+    physicalDisplayId = info->id;
+    if ((info->width <= 0) || (info->height <= 0)) {
+        MMI_HILOGE("Get DisplayInfo is error");
+        return false;
+    }
+    GetPhysicalDisplayCoord(absEvent, *info, touchInfo);
+    return true;
+}
+#endif // OHOS_BUILD_HDF
+
 void InputWindowsManager::RotateTouchScreen(DisplayInfo info, LogicalCoordinate& coord) const
 {
     const Direction direction = info.direction;
@@ -474,8 +495,35 @@ void InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* t
         libinput_event_touch_get_tool_height_transformed(touch, info.height));
 }
 
+#ifdef OHOS_BUILD_HDF
+void InputWindowsManager::GetPhysicalDisplayCoord(const std::shared_ptr<const AbsEvent>& absEvent,
+        const DisplayInfo& info, EventTouch& touchInfo)
+{
+    auto absEventPointer = absEvent->GetPointer();
+    if (!absEventPointer) {
+        MMI_HILOGE("Leave, null absEventPointer");
+        return;
+    }
+
+    int32_t physicalDisplayX = -1;
+    int32_t physicalDisplayY = -1;
+    auto retCode = TransformToPhysicalDisplayCoordinate(info, absEventPointer->GetX(), absEventPointer->GetY(),
+            physicalDisplayX, physicalDisplayY);
+    if (retCode < 0) {
+        MMI_HILOGE("Leave, TransformToPhysicalDisplayCoordinate Failed");
+        return;
+    }
+    touchInfo.point.x = physicalDisplayX;
+    touchInfo.point.y = physicalDisplayY;
+    touchInfo.toolRect.point.x = 0;   //TO DO...
+    touchInfo.toolRect.point.y = 0;   //TO DO...
+    touchInfo.toolRect.width = 0;     //TO DO...
+    touchInfo.toolRect.height = 0;    //TO DO...
+}
+#endif // OHOS_BUILD_HDF
+
 bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, struct libinput_event_touch* touch,
-    EventTouch& touchInfo, int32_t& physicalDisplayId)
+    EventTouch& touchInfo, int32_t& targetDisplayId)
 {
     CHKPF(touch);
     std::string screenId = InputDevMgr->GetScreenId(deviceId);
@@ -484,7 +532,7 @@ bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, struct libi
     }
     auto info = FindPhysicalDisplayInfo(screenId);
     CHKPF(info);
-    physicalDisplayId = info->id;
+    targetDisplayId = info->id;
     if ((info->width <= 0) || (info->height <= 0)) {
         MMI_HILOGE("Get DisplayInfo is error");
         return false;
@@ -654,9 +702,11 @@ bool InputWindowsManager::IsInHotArea(int32_t x, int32_t y, const std::vector<Re
         int32_t displayMaxX = 0;
         int32_t displayMaxY = 0;
         if (!AddInt32(item.x, item.width, displayMaxX)) {
+            MMI_HILOGE("The addition of displayMaxX overflows");
             return false;
         }
         if (!AddInt32(item.y, item.height, displayMaxY)) {
+            MMI_HILOGE("The addition of displayMaxY overflows");
             return false;
         }
         if (((x >= item.x) && (x < displayMaxX)) &&
@@ -892,11 +942,12 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         MMI_HILOGE("The addition of logicalY overflows");
         return RET_ERR;
     }
-
     WindowInfo *touchWindow = nullptr;
     auto targetWindowId = pointerItem.GetTargetWindowId();
     for (auto &item : displayGroupInfo_.windowsInfo) {
         if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE) {
+            MMI_HILOGD("Skip the untouchable window to continue searching, "
+                       "window:%{public}d, flags:%{public}d", item.id, item.flags);
             continue;
         }
         if (targetWindowId >= 0) {
@@ -910,6 +961,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         }
     }
     if (touchWindow == nullptr) {
+        MMI_HILOGE("The touchWindow is nullptr, logicalX:%{public}d, logicalY:%{public}d",
+            logicalX, logicalY);
         return RET_ERR;
     }
     auto windowX = logicalX - touchWindow->area.x;

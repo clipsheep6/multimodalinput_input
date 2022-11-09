@@ -242,50 +242,6 @@ int32_t TouchScreenHandler::TransformToPhysicalDisplayCoordinate(const DisplayIn
     return 0;
 }
 
-void TouchScreenHandler::GetPhysicalDisplayCoord(const std::shared_ptr<const AbsEvent>& absEvent,
-    const DisplayInfo& info, EventTouch& touchInfo)
-{
-    auto absEventPointer = absEvent->GetPointer();
-    if (!absEventPointer) {
-        MMI_HILOGE("Leave, null absEventPointer");
-        return;
-    }
-
-    int32_t physicalDisplayX = -1;
-    int32_t physicalDisplayY = -1;
-    auto retCode = TransformToPhysicalDisplayCoordinate(info, absEventPointer->GetX(), absEventPointer->GetY(),
-            physicalDisplayX, physicalDisplayY);
-    if (retCode < 0) {
-        MMI_HILOGE("Leave, TransformToPhysicalDisplayCoordinate Failed");
-        return;
-    }
-    touchInfo.point.x = physicalDisplayX;
-    touchInfo.point.y = physicalDisplayY;
-    touchInfo.toolRect.point.x = 0;   //TO DO...
-    touchInfo.toolRect.point.y = 0;   //TO DO...
-    touchInfo.toolRect.width = 0;     //TO DO...
-    touchInfo.toolRect.height = 0;    //TO DO...
-}
-
-bool TouchScreenHandler::TouchPointToDisplayPoint(int32_t deviceId, const std::shared_ptr<const AbsEvent>& absEvent,
-                                                  EventTouch& touchInfo, int32_t& physicalDisplayId)
-{
-    CHKPF(absEvent);
-    std::string screenId = InputDevMgr->GetScreenId(deviceId);
-    if (screenId.empty()) {
-        screenId = "default0";
-    }
-    auto info = WinMgr->FindPhysicalDisplayInfo(screenId);
-    CHKPF(info);
-    physicalDisplayId = info->id;
-    if ((info->width <= 0) || (info->height <= 0)) {
-        MMI_HILOGE("Get DisplayInfo is error");
-        return false;
-    }
-    GetPhysicalDisplayCoord(absEvent, *info, touchInfo);
-    return true;
-}
-
 bool TouchScreenHandler::OnEventTouchDown(const std::shared_ptr<const AbsEvent>& absEvent)
 {
     CALL_DEBUG_ENTER;
@@ -294,7 +250,7 @@ bool TouchScreenHandler::OnEventTouchDown(const std::shared_ptr<const AbsEvent>&
     int32_t logicalDisplayId = -1;
     CHKPF(inputDevice_);
     int32_t deviceId = inputDevice_->GetDeviceId();
-    if (!TouchPointToDisplayPoint(deviceId, absEvent, touchInfo, logicalDisplayId)) {
+    if (!WinMgr->TouchPointToDisplayPoint(deviceId, absEvent, touchInfo, logicalDisplayId)) {
         MMI_HILOGE("TouchDownPointToDisplayPoint failed");
         return false;
     }
@@ -364,7 +320,7 @@ bool TouchScreenHandler::OnEventTouchMotion(const std::shared_ptr<const AbsEvent
     EventTouch touchInfo;
     int32_t deviceId = inputDevice_->GetDeviceId();
     int32_t logicalDisplayId = pointerEvent_->GetTargetDisplayId();
-    if (!TouchPointToDisplayPoint(deviceId, absEvent, touchInfo, logicalDisplayId)) {
+    if (!WinMgr->TouchPointToDisplayPoint(deviceId, absEvent, touchInfo, logicalDisplayId)) {
         MMI_HILOGE("Get TouchMotionPointToDisplayPoint failed");
         return false;
     }

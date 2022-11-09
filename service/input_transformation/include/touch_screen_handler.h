@@ -55,12 +55,8 @@ protected:
     bool OnEventTouchMotion(const std::shared_ptr<const AbsEvent>& absEvent);
     int32_t TransformX(int32_t xPos, int32_t width, int32_t logicalWidth) const;
     int32_t TransformY(int32_t yPos, int32_t height, int32_t logicalHeight) const;
-    void GetPhysicalDisplayCoord(const std::shared_ptr<const AbsEvent>& absEvent,
-    const DisplayInfo& info, EventTouch& touchInfo);
     int32_t TransformToPhysicalDisplayCoordinate(const DisplayInfo& info,
             int32_t tpX, int32_t tpY, int32_t& displayX, int32_t& displayY) const;
-    bool TouchPointToDisplayPoint(int32_t deviceId, const std::shared_ptr<const AbsEvent>& absEvent,
-            EventTouch& touchInfo, int32_t& physicalDisplayId);
     void ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent);
 
 private:
