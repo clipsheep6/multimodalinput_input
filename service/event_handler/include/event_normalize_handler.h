@@ -23,7 +23,9 @@
 #include "hdf_adapter.h"
 #endif // OHOS_BUILD_HDF
 
+#ifdef OHOS_BUILD_HDF
 struct input_event;
+#endif // OHOS_BUILD_HDF
 
 namespace OHOS {
 namespace MMI {
@@ -55,7 +57,6 @@ private:
 #ifdef OHOS_BUILD_HDF
     int32_t OnHDFDeviceAdded(const InputDeviceInfo &devInfo);
     int32_t OnHDFDeviceRemoved(const InputDeviceInfo &devInfo);
-    int32_t OnHDFEvent(int32_t devIndex, const HDFInputEvent &event);
 #endif // OHOS_BUILD_HDF
     int32_t HandleKeyboardEvent(libinput_event* event);
     void Repeat(const std::shared_ptr<KeyEvent> keyEvent);

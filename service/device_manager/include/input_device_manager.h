@@ -115,9 +115,9 @@ private:
 #endif // OHOS_BUILD_HDF
     bool IsMatchKeys(struct libinput_device* device, const std::vector<int32_t> &keyCodes) const;
     void ScanPointerDevice();
-    void SetInputDevInfo(struct libinput_device *inputDeviceOrigin, std::shared_ptr<InputDevice> inputDevice) const;
+    std::shared_ptr<InputDevice> GetInputDevInfo(uint32_t devIndex, libinput_device *inputDeviceOrigin) const;
 #ifdef OHOS_BUILD_HDF
-    void SetInputDevInfo(std::shared_ptr<IInputDevice> hdfDevInfo, std::shared_ptr<InputDevice> inputDevice) const;
+    std::shared_ptr<InputDevice> GetInputDevInfo(uint32_t devIndex, std::shared_ptr<IInputDevice> hdfDevInfo) const;
     void NotifyDeviceAdded(const std::shared_ptr<IInputDevice> device);
     void NotifyDeviceRemoved(const std::shared_ptr<IInputDevice> device);
 #endif // OHOS_BUILD_HDF

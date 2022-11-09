@@ -137,17 +137,22 @@ void EventNormalizeHandler::HandleHDFDeviceStatusEvent(const HDFDeviceStatusEven
 
 void EventNormalizeHandler::HandleHDFDeviceInputEvent(const HDFDeviceInputEvent &event)
 {
-    OnHDFEvent(event.devIndex, event);
+    CALL_DEBUG_ENTER;
+    const input_event inputEvent {
+        .input_event_sec = event.time / 1000000,
+        .input_event_usec = event.time % 1000000,
+        .type = event.type,
+        .code = event.code,
+        .value = event.value
+    };
+    auto device = InputDevMgr->GetDevice(event.devIndex);
+    CHKPV(device);
+    device->ProcessEventItem(inputEvent);
 }
-
 
 int32_t EventNormalizeHandler::OnHDFDeviceAdded(const InputDeviceInfo &devInfo)
 {
     CALL_DEBUG_ENTER;
-    if (devInfo.devType != INDEV_TYPE_TOUCH) {
-        MMI_HILOGW("HDF doesn't support device type:%{public}d", devInfo.devType);
-        return RET_ERR;
-    }
     auto inputDevice = std::make_shared<Device>(devInfo.devIndex, devInfo);
     CHKPR(inputDevice, ERROR_NULL_POINTER);
     inputDevice->Init();
@@ -161,22 +166,6 @@ int32_t EventNormalizeHandler::OnHDFDeviceRemoved(const InputDeviceInfo &devInfo
     auto device = InputDevMgr->GetDevice(devInfo.devIndex);
     CHKPR(device, ERROR_NULL_POINTER);
     InputDevMgr->OnInputDeviceRemoved(device);
-    return RET_OK;
-}
-
-int32_t EventNormalizeHandler::OnHDFEvent(int32_t devIndex, const HDFInputEvent &hdfEevent)
-{
-    CALL_DEBUG_ENTER;
-    const input_event event {
-        .input_event_sec = hdfEevent.time / 1000000,
-        .input_event_usec = hdfEevent.time % 1000000,
-        .type = hdfEevent.type,
-        .code = hdfEevent.code,
-        .value = hdfEevent.value
-    };
-    auto device = InputDevMgr->GetDevice(devIndex);
-    CHKPR(device, ERROR_NULL_POINTER);
-    device->ProcessEventItem(event);
     return RET_OK;
 }
 #endif // OHOS_BUILD_HDF
@@ -266,7 +255,6 @@ void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEven
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 void EventNormalizeHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CALL_DEBUG_ENTER;
     if (nextHandler_ == nullptr) {
         MMI_HILOGW("Touchscreen device does not support");
         return;

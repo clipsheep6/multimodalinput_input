@@ -354,7 +354,7 @@ int Device::EventIsCode(const struct input_event& ev, unsigned int type, unsigne
 	return (max > -1 && code <= (unsigned int)max && ev.code == code);
 }
 
-InputDeviceInfo Device::GetInputDeviceInfo() const
+const InputDeviceInfo& Device::GetInputDeviceInfo() const
 {
     return deviceOrigin_;
 }

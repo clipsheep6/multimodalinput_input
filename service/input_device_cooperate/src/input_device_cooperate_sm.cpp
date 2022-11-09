@@ -473,30 +473,22 @@ void InputDeviceCooperateSM::HandleEvent(libinput_event *event)
     }
 }
 
+#ifdef OHOS_BUILD_HDF
 void InputDeviceCooperateSM::HandleHDFDeviceInputEvent(const HDFDeviceInputEvent &event)
 {
-    switch (event.type) {
-        case EV_SYN:
-        case EV_ABS:
-        case EV_KEY:
-        case EV_REL:
-        case EV_MSC:
-        case EV_SW:
-        case EV_LED:
-        case EV_SND:
-        case EV_REP:
-        case EV_FF:
-        case EV_PWR:
-        case EV_FF_STATUS: {
-            MMI_HILOGW("Not supported temporarily.");
-            break;
-        }
-        default: {
-            return;
-        }
+    auto device = InputDevMgr->GetDevice(event.devIndex);
+    CHKPV(device);
+    auto isPointerDevice = (hdfDevInfo->HasCapability(IInputDevice::CAPABILITY_MOUSE) ||
+        hdfDevInfo->HasCapability(IInputDevice::CAPABILITY_TOUCHPAD));
+    if (isPointerDevice) {
+        MMI_HILOGW("Not supported temporarily.");
+        return;
     }
-    return;
+    auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPV(inputEventNormalizeHandler);
+    inputEventNormalizeHandler->HandleHDFDeviceInputEvent(event);
 }
+#endif // OHOS_BUILD_HDF
 
 void InputDeviceCooperateSM::CheckPointerEvent(struct libinput_event *event)
 {

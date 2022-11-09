@@ -86,9 +86,6 @@ public:
     void Dump(int32_t fd, const std::vector<std::string> &args);
     int32_t GetWindowPid(int32_t windowId, const DisplayGroupInfo& displayGroupInfo) const;
     int32_t GetWindowPid(int32_t windowId) const;
-#ifdef OHOS_BUILD_ENABLE_TOUCH
-    const DisplayInfo* FindPhysicalDisplayInfo(const std::string& uniq) const;
-#endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
     void DispatchPointer(int32_t pointerAction);
     void SendPointerEvent(int32_t pointerAction);
@@ -119,6 +116,9 @@ private:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     const DisplayInfo* GetPhysicalDisplay(int32_t id) const;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    const DisplayInfo* FindPhysicalDisplayInfo(const std::string& uniq) const;
+#endif // OHOS_BUILD_ENABLE_TOUCH
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     std::optional<WindowInfo> SelectWindowInfo(int32_t logicalX, int32_t logicalY,
