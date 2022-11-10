@@ -530,7 +530,6 @@ int32_t MMIService::GetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &in
         return COMMON_PARAMETER_ERROR;
     }
     inputDevice = InputDevMgr->GetInputDevice(deviceId);
-    MMI_HILOGD("deiceName:%{public}s", inputDevice->GetName().c_str());
     return RET_OK;
 }
 

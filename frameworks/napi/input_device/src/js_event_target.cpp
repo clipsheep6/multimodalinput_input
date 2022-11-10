@@ -565,6 +565,7 @@ void JsEventTarget::CallKeyboardTypeAsync(uv_work_t *work, int32_t status)
 void JsEventTarget::CallKeyboardTypePromise(uv_work_t *work, int32_t status)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(work);
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
     JsUtil::DeletePtr<uv_work_t*>(work);
     cb->DecStrongRef(nullptr);

@@ -26,7 +26,7 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectProxy" };
 
-int32_t GetInputDevice(MessageParcel &reply, std::shared_ptr<InputDevice> &inputDevice)
+int32_t ParseInputDevice(MessageParcel &reply, std::shared_ptr<InputDevice> &inputDevice)
 {
     int32_t value;
     READINT32(reply, value, IPC_STUB_WRITE_PARCEL_ERR);
@@ -390,7 +390,10 @@ int32_t MultimodalInputConnectProxy::GetDevice(int32_t deviceId, std::shared_ptr
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
     }
-    GetInputDevice(reply, inputDevice);
+    ret = ParseInputDevice(reply, inputDevice);
+    if (ret != RET_OK) {
+        return RET_ERR;
+    }
     return RET_OK;
 }
 
