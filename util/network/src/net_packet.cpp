@@ -25,6 +25,14 @@ NetPacket::NetPacket(const NetPacket &pkt) : NetPacket(pkt.GetMsgId())
 {
     Clone(pkt);
 }
+
+NetPacket &NetPacket::operator=(const NetPacket &pkt)
+{
+    msgId_ = pkt.msgId_;
+    Clone(pkt);
+    return *this;
+}
+
 NetPacket::~NetPacket() {}
 
 void NetPacket::MakeData(StreamBuffer &buf) const

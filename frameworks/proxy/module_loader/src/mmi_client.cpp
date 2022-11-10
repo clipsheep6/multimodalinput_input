@@ -86,12 +86,10 @@ bool MMIClient::Start()
         std::placeholders::_1, std::placeholders::_2);
     if (!StartClient(callback)) {
         MMI_HILOGE("Client startup failed");
-        Stop();
         return false;
     }
     if (!StartEventRunner()) {
         MMI_HILOGE("Start runner failed");
-        Stop();
         return false;
     }
     MMI_HILOGD("Client started successfully");

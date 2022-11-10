@@ -55,16 +55,13 @@ private:
 private:
     class SessionHandler {
     public:
-        SessionHandler(InputHandlerType handlerType, HandleEventType eventType, SessionPtr session)
-            : handlerType_(handlerType), eventType_(eventType & HANDLE_EVENT_TYPE_ALL),
-              session_(session) {}
-        void SendToClient(std::shared_ptr<KeyEvent> keyEvent) const;
-        void SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const;
+        SessionHandler(HandleEventType eventType, SessionPtr session)
+            : eventType_(eventType & HANDLE_EVENT_TYPE_ALL), session_(session) {}
+        void SendToClient(NetPacket &pkt) const;
         bool operator<(const SessionHandler& other) const
         {
             return (session_ < other.session_);
         }
-        InputHandlerType handlerType_;
         HandleEventType eventType_;
         SessionPtr session_ { nullptr };
     };
@@ -79,6 +76,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
         int32_t AddInterceptor(const SessionHandler& interceptor);
         void RemoveInterceptor(const SessionHandler& interceptor);
+        bool HasInterceptor(HandleEventType eventType);
         void OnSessionLost(SessionPtr session);
         void Dump(int32_t fd, const std::vector<std::string> &args);
         std::set<SessionHandler> interceptors_;

@@ -59,18 +59,6 @@ HWTEST_F(StreamBufferTest, construct_001, TestSize.Level1)
 }
 
 /**
- * @tc.name:construct_002
- * @tc.desc:Verify stream buffer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(StreamBufferTest, construct_002, TestSize.Level1)
-{
-    StreamBuffer bufObj;
-    StreamBuffer bufObjTmp(bufObj);
-}
-
-/**
  * @tc.name:read_Type1_001
  * @tc.desc:Verify stream buffer read
  * @tc.type: FUNC

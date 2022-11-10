@@ -29,7 +29,15 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 
 InputEvent::InputEvent(int32_t eventType) : eventType_(eventType)
 {
-    Reset();
+    struct timespec ts = { 0, 0 };
+    if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
+        actionTime_ = 0;
+    }
+    if (!AddInt64(ts.tv_sec * 1000000, ts.tv_nsec / 1000, actionTime_)) {
+        MMI_HILOGE("The addition of actionTime_ overflows");
+        return;
+    }
+    actionStartTime_ = actionTime_;
 }
 
 InputEvent::InputEvent(const InputEvent& other)

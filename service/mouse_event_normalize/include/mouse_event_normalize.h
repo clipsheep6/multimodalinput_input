@@ -57,7 +57,7 @@ private:
     int32_t HandleMotionInner(struct libinput_event_pointer* data);
     int32_t HandleButtonInner(struct libinput_event_pointer* data);
     int32_t HandleAxisInner(struct libinput_event_pointer* data);
-    void HandlePostInner(struct libinput_event_pointer* data, int32_t deviceId, PointerEvent::PointerItem &pointerItem);
+    void HandlePostInner(struct libinput_event_pointer* data, int32_t deviceId);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     void HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY);
     void HandlePostMoveMouse(PointerEvent::PointerItem &pointerItem);
