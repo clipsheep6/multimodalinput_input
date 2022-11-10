@@ -342,7 +342,7 @@ void InputDeviceManager::MakeDeviceInfo(struct libinput_device *inputDevice, str
     }
     info.dhid = GenerateDescriptor(inputDevice, info.isRemote);
     info.isTouchableDevice = IsTouchDevice(inputDevice);
-    MMI_HILOGD("isTouchableDevice  is %{public}d", info.isTouchableDevice);
+    MMI_HILOGD("isTouchableDevice is %{public}d", info.isTouchableDevice);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 }
 
