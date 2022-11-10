@@ -94,7 +94,7 @@ private:
     int32_t imageHeight_ { 0 };
     std::map<MOUSE_ICON, IconStyle> mouseIcons_;
     std::list<PidInfo> pidInfos_;
-    bool mouseDisplayState_ { false };
+    bool mouseDisplayState_ { false }; 
 };
 } // namespace MMI
 } // namespace OHOS
