@@ -21,7 +21,7 @@
 
 namespace OHOS {
 namespace MMI {
-class KernelEventHandlerBridge : public IKernelEventHandler {
+class KernelEventHandlerBridge final : public IKernelEventHandler {
 public:
     static std::shared_ptr<IKernelEventHandler> CreateInstance(const std::shared_ptr<ITouchScreenHandler> touchScreenHandle);
 public:
