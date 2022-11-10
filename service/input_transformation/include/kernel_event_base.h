@@ -20,8 +20,6 @@
 #include <ostream>
 #include <memory>
 
-#include "stream_utils.h"
-
 struct input_event;
 namespace OHOS {
 namespace MMI {

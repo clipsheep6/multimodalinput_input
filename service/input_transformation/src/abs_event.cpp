@@ -19,7 +19,6 @@
 
 #include "i_input_define.h"
 #include "mmi_log.h"
-#include "stream_utils.h"
 
 namespace OHOS {
 namespace MMI {
@@ -120,10 +119,10 @@ const char* AbsEvent::ActionToStr(int32_t action) const
 
 std::ostream& operator<<(std::ostream& os, const AbsEvent& r)
 {
-    os << '{' << "KernelEventBase:";
-    //KernelEventBase::operator<<(os, r); // TODO: 流输入时, 子类怎样输出基类
-    os << ',';
-    os << "pointerId:" << r.pointerId_ << ','
+    os << '{' << "KernelEventBase:" 
+        << static_cast<const KernelEventBase &>(r)
+        << ','
+        << "pointerId:" << r.pointerId_ << ','
         << "sourceType:" << AbsEvent::SourceToString(r.sourceType_) << ','
         << '}';
     return os;
