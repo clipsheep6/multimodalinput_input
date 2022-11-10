@@ -27,7 +27,6 @@ namespace MMI {
 inline constexpr size_t LongsOfBits(int32_t bitsCount)  {
     return (bitsCount / (sizeof(long) * 8)) + !!(bitsCount % (sizeof(long) * 8));
 }
-
 class IKernelEventHandler;
 class IDevice {
 public:
@@ -36,14 +35,11 @@ public:
     static const int32_t CAPABILITY_KEYBOARD = 0b10;
     static const int32_t CAPABILITY_TOUCHSCREEN = 0b100;
     static const int32_t CAPABILITY_TOUCHPAD = 0b1000;
-
     static const int32_t AXIS_NONE = 0b0;
     static const int32_t AXIS_MT_X = 0b1;
     static const int32_t AXIS_MT_Y = 0b10;
     static const int32_t AXIS_MAX = 0b11;
-
     static const std::string AxisToString(int32_t axis);
-
     class AxisInfo {
         public:
             int32_t GetAxis() const { return axis_; }
@@ -52,27 +48,22 @@ public:
             int32_t GetFuzz() const { return fuzz_; }
             int32_t GetFlat() const { return flat_; }
             int32_t GetResolution() const { return resolution_; }
-            std::ostream& Print(std::ostream& os) const;
-
             void SetAxis(int32_t axis) { axis_ = axis; }
             void SetMinimum(int32_t minimum) { minimum_ = minimum; }
             void SetMaximum(int32_t maximum) { maximum_ = maximum; }
             void SetFuzz(int32_t fuzz) { fuzz_ = fuzz; }
             void SetFlat(int32_t flat) { flat_ = flat; }
             void SetResolution(int32_t resolution) { resolution_ = resolution; }
-
         private:
-            int32_t axis_;
-            int32_t minimum_;
-            int32_t maximum_;
-            int32_t fuzz_;
-            int32_t flat_;
-            int32_t resolution_;
+            int32_t axis_ { -1 };
+            int32_t minimum_ { -1 };
+            int32_t maximum_ { -1 };
+            int32_t fuzz_ { -1 };
+            int32_t flat_ { -1 };
+            int32_t resolution_ { -1 };
     };
-
     IDevice(uint32_t devIndex) : devIndex_(devIndex) {}
     virtual ~IDevice() = default;
-
     virtual int32_t GetDevIndex() const { return devIndex_; }
     virtual std::shared_ptr<AxisInfo> GetAxisInfo(int32_t axis) const = 0;
     virtual bool HasCapability(int32_t capability) const = 0;
@@ -85,11 +76,6 @@ public:
 protected:
     const uint32_t devIndex_;
 };
-
-std::ostream& operator<<(std::ostream& os, const IDevice::AxisInfo& axisInfo);
-std::ostream& operator<<(std::ostream& os, const IDevice::AxisInfo* axisInfo);
-std::ostream& operator<<(std::ostream& os, const std::shared_ptr<IDevice::AxisInfo>& axisInfo);
-std::ostream& operator<<(std::ostream& os, const std::unique_ptr<IDevice::AxisInfo>& axisInfo);
 } // namespace MMI
 } // namespace OHOS
 #endif // I_INPUT_DEVICE_H

@@ -21,19 +21,6 @@
 
 namespace OHOS {
 namespace MMI {
-std::ostream& IDevice::AxisInfo::Print(std::ostream& os) const
-{
-    os << '{'
-        <<"axis:" << AxisToString(axis_).c_str() << ','
-        <<"minimum:" << minimum_ << ','
-        <<"maximum:" << maximum_ << ','
-        <<"fuzz:" << fuzz_ << ','
-        <<"flat:" << flat_ << ','
-        <<"resolution:" << resolution_
-        << '}';
-    return os;
-}
-
 const std::string IDevice::AxisToString(int32_t axis)
 {
     switch(axis) {
@@ -44,31 +31,6 @@ const std::string IDevice::AxisToString(int32_t axis)
         default:
         return "AXIS_UNKNOWN";
     }
-}
-
-std::ostream& operator<<(std::ostream& os, const IDevice::AxisInfo& axisInfo)
-{
-    return axisInfo.Print(os);
-}
-
-std::ostream& operator<<(std::ostream& os, const IDevice::AxisInfo* axisInfo)
-{
-    if (axisInfo != nullptr) {
-        return axisInfo->Print(os);
-    }
-
-    os << "(null)";
-    return os;
-}
-
-std::ostream& operator<<(std::ostream& os, const std::shared_ptr<IDevice::AxisInfo>& axisInfo)
-{
-    return operator<<(os, axisInfo.get());
-}
-
-std::ostream& operator<<(std::ostream& os, const std::unique_ptr<IDevice::AxisInfo>& axisInfo)
-{
-    return operator<<(os, axisInfo.get());
 }
 } // namespace MMI
 } // namespace OHOS

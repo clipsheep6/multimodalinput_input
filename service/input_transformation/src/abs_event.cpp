@@ -112,7 +112,7 @@ int32_t AbsEvent::AddPointer(const std::shared_ptr<Pointer> pointer)
     return 0;
 }
 
-const char* AbsEvent::ActionToStr(int32_t action) const
+std::string AbsEvent::ActionToStr(int32_t action) const
 {
     return ActionToString(action);
 }

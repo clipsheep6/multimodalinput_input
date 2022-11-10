@@ -19,10 +19,8 @@
 #include <memory>
 
 struct input_event;
-
 namespace OHOS {
 namespace MMI {
-
 class IEventCollector {
 public:
     virtual ~IEventCollector() = default;

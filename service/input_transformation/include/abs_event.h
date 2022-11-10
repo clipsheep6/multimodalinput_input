@@ -26,18 +26,16 @@
 
 namespace OHOS {
 namespace MMI {
-class AbsEvent : public KernelEventBase {
+class AbsEvent final : public KernelEventBase {
 public:
     static constexpr int32_t ACTION_NONE = 0;
     static constexpr int32_t ACTION_DOWN = 1;
     static constexpr int32_t ACTION_MOVE = 2;
     static constexpr int32_t ACTION_UP = 3;
-
     static constexpr int32_t SOURCE_TYPE_NONE = 0;
     static constexpr int32_t SOURCE_TYPE_TOUCHSCREEN = 1;
     static constexpr int32_t SOURCE_TYPE_TOUCHPAD = 2;
     static constexpr int32_t SOURCE_TYPE_END = 3;
-public:
     static const char* SourceToString(int32_t sourceType);
     static const char* ActionToString(int32_t action);
 public:
@@ -57,7 +55,6 @@ public:
             int32_t y_ {-1};
             int64_t downTime_ {-1};
     };
-
 public:
     AbsEvent(int32_t deviceId, int32_t sourceType);
     virtual ~AbsEvent() = default;
@@ -71,7 +68,7 @@ public:
     std::tuple<std::shared_ptr<IDevice::AxisInfo>, std::shared_ptr<IDevice::AxisInfo>> GetAxisInfo() const;
     int32_t AddPointer(const std::shared_ptr<Pointer> pointer);
 protected:
-    virtual const char* ActionToStr(int32_t action) const override;
+    virtual std::string ActionToStr(int32_t action) const override;
 private:
     int32_t pointerId_;
     int32_t sourceType_;
