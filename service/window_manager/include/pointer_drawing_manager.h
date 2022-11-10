@@ -74,7 +74,8 @@ private:
     void UpdatePidInfo(int32_t pid, bool visible);
     void InitStyle();
     int32_t InitLayer(const MOUSE_ICON mouseStyle);
-
+    void SetMouseDisplayState(bool state) override;
+    bool GetMouseDisplayState() override;
 private:
     struct PidInfo {
         int32_t pid { 0 };
@@ -93,6 +94,7 @@ private:
     int32_t imageHeight_ { 0 };
     std::map<MOUSE_ICON, IconStyle> mouseIcons_;
     std::list<PidInfo> pidInfos_;
+    bool mouseDisplayState_ { false };
 };
 } // namespace MMI
 } // namespace OHOS
