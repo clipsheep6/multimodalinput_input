@@ -49,8 +49,8 @@ public:
 
     int32_t RegisterDevListener(const std::string &type, InputDevListenerPtr listener);
     int32_t UnregisterDevListener(const std::string &type, InputDevListenerPtr listener = nullptr);
-    int32_t GetInputDeviceIdsAsync(FunInputDevIds callback);
-    int32_t GetInputDeviceAsync(int32_t deviceId, FunInputDevInfo callback);
+    int32_t GetInputDeviceIds(FunInputDevIds callback);
+    int32_t GetInputDevice(int32_t deviceId, FunInputDevInfo callback);
     int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> keyCodes, FunInputDevKeys callback);
     int32_t GetKeyboardType(int32_t deviceId, FunKeyboardTypes callback);
     void OnInputDevice(int32_t userData, std::shared_ptr<InputDevice> devData);
