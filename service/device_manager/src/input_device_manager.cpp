@@ -974,7 +974,7 @@ void InputDeviceManager::NotifyDeviceAdded(const std::shared_ptr<IDevice> device
     CHKPV(touchScreenHandler);
     auto retCode = touchScreenHandler->BindInputDevice(device);
     if (retCode < 0) {
-        MMI_HILOGE("Leave, BindInputDevice Failed");
+        MMI_HILOGE("BindInputDevice Failed");
         return;
     }
     auto handler = KernelEventHandlerBridge::CreateInstance(touchScreenHandler);

@@ -22,10 +22,6 @@
 namespace OHOS {
 namespace MMI {
 #define CASE_STR(item) case item: do {return #item;} while(0)
-
-inline constexpr size_t LongsOfBits(int32_t bitsCount)  {
-    return (bitsCount / (sizeof(long) * 8)) + !!(bitsCount % (sizeof(long) * 8));
-}
 } // namespace MMI
 } // namespace OHOS
 #endif // I_INPUT_DEFINE_H

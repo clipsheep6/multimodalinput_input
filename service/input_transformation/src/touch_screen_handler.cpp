@@ -50,7 +50,7 @@ int32_t TouchScreenHandler::BindInputDevice(const std::shared_ptr<IDevice> input
 {
     CALL_DEBUG_ENTER;
     if (!inputDevice) {
-        MMI_HILOGE("Leave, null InputDevice");
+        MMI_HILOGE("null InputDevice");
         return -1;
     }
     inputDevice_ = inputDevice;
@@ -61,7 +61,7 @@ int32_t TouchScreenHandler::UnbindInputDevice(const std::shared_ptr<IDevice> inp
 {
     CALL_DEBUG_ENTER;
     if (inputDevice != inputDevice_) {
-        MMI_HILOGE("Leave, inputDevice != inputDevice_");
+        MMI_HILOGE("inputDevice != inputDevice_");
         return -1;
     }
 
@@ -112,7 +112,7 @@ bool TouchScreenHandler::ConvertPointer(const std::shared_ptr<const AbsEvent> ab
     auto action = ConvertAction(absEvent->GetAction());
     pointerAction = action;
     if (action == PointerEvent::POINTER_ACTION_UNKNOWN) {
-        MMI_HILOGE("Leave, ConvertAction Failed");
+        MMI_HILOGE("ConvertAction Failed");
         return false;
     }
     switch (action) {
@@ -138,7 +138,7 @@ bool TouchScreenHandler::ConvertPointer(const std::shared_ptr<const AbsEvent> ab
             break;
         }
         default: {
-            MMI_HILOGE("Leave, unknown absEvent Action:%{public}d", action);
+            MMI_HILOGE("unknown absEvent Action:%{public}d", action);
             return false;
         }
     }

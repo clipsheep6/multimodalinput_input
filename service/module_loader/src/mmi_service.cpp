@@ -410,7 +410,7 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
         DfxHisysevent::OnClientConnect(data, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         return RET_ERR;
     }
-    MMI_HILOGIK("Leave, programName:%{public}s,moduleType:%{public}d,alloc success",
+    MMI_HILOGIK("programName:%{public}s,moduleType:%{public}d,alloc success",
         programName.c_str(), moduleType);
     DfxHisysevent::OnClientConnect(data, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     return RET_OK;

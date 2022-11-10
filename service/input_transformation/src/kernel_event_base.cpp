@@ -21,8 +21,7 @@ namespace OHOS {
 namespace MMI {
 KernelEventBase::KernelEventBase(int32_t devIndex, int32_t action)
     : devIndex_(devIndex), action_(action), actionTime_(-1)
-{
-}
+{}
 
 int32_t KernelEventBase::GetDevIndex() const // TODO:
 {
@@ -49,23 +48,13 @@ void KernelEventBase::SetActionTime(int64_t actionTime)
     actionTime_ = actionTime;
 }
 
-std::ostream& KernelEventBase::operator<<(std::ostream& outStream) const
+std::ostream& operator<<(std::ostream& os, const KernelEventBase &r)
 {
-    return PrintInternal(outStream);
-}
-
-std::ostream& KernelEventBase::PrintInternal(std::ostream& outStream) const
-{
-    return outStream << '{'
-        << "devIndex:" << devIndex_ << ','
-        << "action:" << ActionToStr(action_) << ','
-        << "actionTime:" << actionTime_
+    return os << '{'
+        << "devIndex:" << r.devIndex_ << ','
+        << "action:" << r.ActionToStr(r.action_) << ','
+        << "actionTime:" << r.actionTime_
         << '}';
-}
-
-std::ostream& operator<<(std::ostream& outStream, const KernelEventBase& event)
-{
-    return event.operator<<(outStream);
 }
 } // namespace MMI
 } // namespace OHOS

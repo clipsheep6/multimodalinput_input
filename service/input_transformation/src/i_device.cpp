@@ -21,13 +21,10 @@
 
 namespace OHOS {
 namespace MMI {
-
-const std::unique_ptr<IDevice::AxisInfo> IDevice::AxisInfo::NULL_VALUE;
-
 std::ostream& IDevice::AxisInfo::Print(std::ostream& os) const
 {
     os << '{'
-        <<"axis:" << IDevice::AxisToString(axis_) << ','
+        <<"axis:" << AxisToString(axis_).c_str() << ','
         <<"minimum:" << minimum_ << ','
         <<"maximum:" << maximum_ << ','
         <<"fuzz:" << fuzz_ << ','
@@ -37,7 +34,7 @@ std::ostream& IDevice::AxisInfo::Print(std::ostream& os) const
     return os;
 }
 
-const char* IDevice::AxisToString(int32_t axis)
+const std::string IDevice::AxisToString(int32_t axis)
 {
     switch(axis) {
         CASE_STR(AXIS_NONE);

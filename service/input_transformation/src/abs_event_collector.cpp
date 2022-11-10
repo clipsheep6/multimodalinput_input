@@ -18,7 +18,6 @@
 #include <linux/input.h>
 
 #include "abs_event.h"
-#include "time_utils.h"
 #include "mmi_log.h"
 
 namespace OHOS {
@@ -27,7 +26,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AbsEventCollector" };
 };
 AbsEventCollector::AbsEventCollector(int32_t devIndex, int32_t sourceType)
-    : sourceType_(sourceType), curSlot_(0), absEvent_(new AbsEvent(devIndex, sourceType))
+    : sourceType_(sourceType), curSlot_(0), absEvent_(std::make_shared<AbsEvent>(devIndex, sourceType))
 {}
 
 void AbsEventCollector::HandleAbsEvent(int32_t code, int32_t value)
@@ -60,6 +59,7 @@ void AbsEventCollector::HandleAbsEvent(int32_t code, int32_t value)
         case ABS_MT_TOOL_X:
         case ABS_MT_TOOL_Y:
         default:
+            MMI_HILOGW("Unknown type: %{public}d", code);
             break;
     }
 }
@@ -100,7 +100,7 @@ void AbsEventCollector::SetAxisInfo(std::shared_ptr<IDevice::AxisInfo> xInfo,
 std::shared_ptr<AbsEvent::Pointer> AbsEventCollector::GetCurrentPointer(bool createIfNotExist)
 {
     if (curSlot_ < 0) {
-        MMI_HILOGE("Leave, curSlot_ < 0");
+        MMI_HILOGE("curSlot_ < 0");
         return nullptr;
     }
 
@@ -110,7 +110,7 @@ std::shared_ptr<AbsEvent::Pointer> AbsEventCollector::GetCurrentPointer(bool cre
     }
 
     if (!createIfNotExist) {
-        MMI_HILOGD("Leave, null pointer and !createIfNotExist");
+        MMI_HILOGD("null pointer and !createIfNotExist");
         return nullptr;
     }
 
@@ -127,18 +127,19 @@ const std::shared_ptr<AbsEvent> AbsEventCollector::FinishPointer()
         MMI_HILOGE("pointer is null. Leave.");
         return {};
     }
-    auto nowTime = TimeUtils::GetTimeStampMs();
+    auto timeNs = std::chrono::steady_clock::now().time_since_epoch();
+    auto timeMs = std::chrono::duration_cast<std::chrono::milliseconds>(timeNs).count();
     if (absEventAction_ == AbsEvent::ACTION_DOWN) {
            auto retCode = absEvent_->AddPointer(pointer);
             if (retCode < 0) {
-                MMI_HILOGE("Leave, absAction:%{public}s AddPointer Failed", AbsEvent::ActionToString(absEventAction_));
+                MMI_HILOGE("absAction:%{public}s AddPointer Failed", AbsEvent::ActionToString(absEventAction_));
                 return {};
             }
-        pointer->SetDownTime(nowTime);
+        pointer->SetDownTime(timeMs);
     }
     absEvent_->SetAction(absEventAction_);
     absEvent_->SetCurSlot(curSlot_);
-    absEvent_->SetActionTime(nowTime);
+    absEvent_->SetActionTime(timeMs);
     absEvent_->SetAxisInfo(xInfo_, yInfo_);
     return absEvent_;
 }
@@ -157,7 +158,7 @@ void AbsEventCollector::HandleMtPositionX(int32_t value)
 {
     auto pointer = GetCurrentPointer(true);
     if (!pointer) {
-        MMI_HILOGE("Leave, null pointer");
+        MMI_HILOGE("null pointer");
         return;
     }
 
@@ -169,7 +170,7 @@ void AbsEventCollector::HandleMtPositionY(int32_t value)
 {
     auto pointer = GetCurrentPointer(true);
     if (!pointer) {
-        MMI_HILOGE("Leave, null pointer");
+        MMI_HILOGE("null pointer");
         return;
     }
 

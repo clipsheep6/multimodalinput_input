@@ -37,53 +37,22 @@ struct input_event;
 namespace OHOS {
 namespace MMI {
 static const int ev_max[EV_MAX + 1] = {
-    SYN_MAX,
-    KEY_MAX,
-    REL_MAX,
-    ABS_MAX,
-    MSC_MAX,
-    SW_MAX,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    LED_MAX,
-    SND_MAX,
-    -1,
-    REP_MAX,
-    FF_MAX,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
+    SYN_MAX, KEY_MAX, REL_MAX, ABS_MAX, MSC_MAX, 
+    SW_MAX, -1, -1, -1, -1, -1, 
+    -1, -1, -1, -1, -1, -1, 
+    LED_MAX, SND_MAX, -1, REP_MAX, FF_MAX,
+    -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1,
 };
-
-typedef unsigned int bitmask_t;
-constexpr unsigned long BITS_PER_BYTE = 8;
-constexpr unsigned long BITS_PER_LONG = sizeof(unsigned long) * BITS_PER_BYTE;
 class IKernelEventHandler;
 class Device : public IDevice {
-
+    static constexpr unsigned long BITS_PER_BYTE = 8;
+    static constexpr unsigned long BITS_PER_LONG = sizeof(unsigned long) * BITS_PER_BYTE;
 public:
     Device(int32_t devIndex, const InputDeviceInfo &devInfo);
     virtual ~Device();
     DISALLOW_COPY_AND_MOVE(Device);
     int32_t Init();
-    // virtual int32_t GetDevIndex() const override;
-    //virtual const std::string& GetName() const override;
     virtual std::shared_ptr<AxisInfo> GetAxisInfo(int32_t axis) const override;
     virtual bool HasCapability(int32_t capability) const override;
     virtual int32_t StartReceiveEvent(const std::shared_ptr<IKernelEventHandler> eventHandler) override;
@@ -92,59 +61,44 @@ public:
     virtual void SetDeviceId(int32_t deviceId) override;
     virtual int32_t GetDeviceId() const override;
     virtual const InputDeviceInfo& GetInputDeviceInfo() const override;
-
 protected:
     void Uninit();
-
+    int32_t CheckAndUpdateAxisInfo();
 private:
-    void OnFdEvent(int fd, int event);
-    void ReadEvents();
     int32_t CloseDevice();
     int32_t UpdateCapability();
     bool HasInputProperty(int32_t property);
     bool HasMouseCapability();
     bool HasKeyboardCapability();
     bool HasTouchscreenCapability();
-
     bool HasEventType(int32_t evType) const;
     bool HasEventCode(int32_t evType, int32_t evCode) const;
-
     void ProcessSyncEvent(int32_t code, int32_t value);
     void ProcessAbsEvent(int32_t code, int32_t value);
     void ProcessMscEvent(int32_t code, int32_t value);
-    void OnEventCollected(const std::shared_ptr<const AbsEvent> event);
     void ProcessEventInner(const input_event &event);
-
+    void OnEventCollected(const std::shared_ptr<const AbsEvent> event);
     int EventIsType(const struct input_event& ev, unsigned int type);
-    int EventtTypeGetMax(unsigned int type);
+    int EventTypeGetMax(unsigned int type);
     int EventIsCode(const struct input_event& ev, unsigned int type, unsigned int code);
-
     static std::tuple<unsigned int, unsigned int> GetBitLoc(unsigned long evMacro)
     {
         unsigned long index = evMacro / BITS_PER_LONG;
         unsigned long offset = evMacro % BITS_PER_LONG;
-        return {index, offset};
+        return { index, offset };
     }
-
 private:
-    //std::string name_;
-    int32_t deviceId_;
-    InputDimensionInfo dimensionInfoX_;
-    InputDimensionInfo dimensionInfoY_;
-    InputDevAbility devAbility_;
-
-    int32_t capabilities_ {IDevice::CAPABILITY_UNKNOWN};
-    unsigned long inputProperty[LongsOfBits(INPUT_PROP_MAX)];
-    unsigned long evBit[LongsOfBits(EV_MAX)];
-    unsigned long relBit[LongsOfBits(REL_MAX)];
-    unsigned long absBit[LongsOfBits(ABS_MAX)];
+    int32_t deviceId_ { -1 };
+    int32_t capabilities_ { IDevice::CAPABILITY_UNKNOWN };
+    unsigned long inputProperty[LongsOfBits(INPUT_PROP_MAX)] {};
+    unsigned long evBit[LongsOfBits(EV_MAX)] {};
+    unsigned long relBit[LongsOfBits(REL_MAX)] {};
+    unsigned long absBit[LongsOfBits(ABS_MAX)] {};
     AbsEventCollector absEventCollector_;
-    mtdev* mtdev_ {nullptr};
-
+    mtdev* mtdev_ { nullptr };
     mutable std::map<int32_t, std::shared_ptr<IDevice::AxisInfo>> axises_;
-
     std::shared_ptr<IKernelEventHandler> eventHandler_;
-    InputDeviceInfo deviceOrigin_;
+    InputDeviceInfo deviceOrigin_ {};
 };
 } // namespace MMI
 } // namespace OHOS

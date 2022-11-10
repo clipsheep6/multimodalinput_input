@@ -24,6 +24,10 @@
 
 namespace OHOS {
 namespace MMI {
+inline constexpr size_t LongsOfBits(int32_t bitsCount)  {
+    return (bitsCount / (sizeof(long) * 8)) + !!(bitsCount % (sizeof(long) * 8));
+}
+
 class IKernelEventHandler;
 class IDevice {
 public:
@@ -38,11 +42,9 @@ public:
     static const int32_t AXIS_MT_Y = 0b10;
     static const int32_t AXIS_MAX = 0b11;
 
-    static const char* AxisToString(int32_t axis);
+    static const std::string AxisToString(int32_t axis);
 
     class AxisInfo {
-        public:
-            static const std::unique_ptr<AxisInfo> NULL_VALUE;
         public:
             int32_t GetAxis() const { return axis_; }
             int32_t GetMinimum() const { return minimum_; }
@@ -72,8 +74,6 @@ public:
     virtual ~IDevice() = default;
 
     virtual int32_t GetDevIndex() const { return devIndex_; }
-    //virtual const std::string& GetName() const = 0;
-
     virtual std::shared_ptr<AxisInfo> GetAxisInfo(int32_t axis) const = 0;
     virtual bool HasCapability(int32_t capability) const = 0;
     virtual void ProcessEvent(const struct input_event &event) = 0;
