@@ -44,9 +44,35 @@ int32_t Device::Init()
         MMI_HILOGE("Leave device Init, UpdateCapability Failed");
         return -1;
     }
-    if (HasCapability(IInputDevice::CAPABILITY_TOUCHSCREEN)) {
-        mtdev_ = mmi_mtdev_new_open();
+    if (HasCapability(IDevice::CAPABILITY_TOUCHSCREEN)) {
+        mtdev_ = input_mtdev_open();
     }
+
+    auto xInfo = GetAxisInfo(IDevice::AXIS_MT_X);
+    if (!xInfo) {
+        MMI_HILOGE("Leave, null AxisInfo Of AXIS_MT_X");
+        return -1;
+    }
+
+    if (xInfo->GetMinimum() >= xInfo->GetMaximum()) {
+        MMI_HILOGE("Leave, xInfo->GetMinimum():%{public}d >= xInfo->GetMaximum():%{public}d",
+                    xInfo->GetMinimum(), xInfo->GetMaximum());
+        return -1;
+    }
+
+    auto yInfo = GetAxisInfo(IDevice::AXIS_MT_Y);
+    if (!yInfo) {
+        MMI_HILOGE("Leave, null AxisInfo Of AXIS_MT_Y");
+        return -1;
+    }
+
+    if (yInfo->GetMinimum() >= yInfo->GetMaximum()) {
+    MMI_HILOGE("Leave, yInfo->GetMinimum():%{public}d >= yInfo->GetMaximum():%{public}d",
+                    yInfo->GetMinimum(), yInfo->GetMaximum());
+        return -1;
+    }
+
+    absEventCollector_.SetAxisInfo(xInfo, yInfo);
     return 0;
 }
 
@@ -55,8 +81,8 @@ void Device::Uninit()
     CloseDevice();
 }
 
-Device::Device(int32_t id, const InputDeviceInfo devInfo) : id_(id),
-    absEventCollector_(id, AbsEvent::SOURCE_TYPE_NONE), eventHandler_(IKernelEventHandler::GetDefault()),
+Device::Device(int32_t devIndex, const InputDeviceInfo &devInfo) : IDevice(devIndex),
+    absEventCollector_(devIndex, AbsEvent::SOURCE_TYPE_NONE), eventHandler_(IKernelEventHandler::GetDefault()),
     deviceOrigin_(devInfo)
 {
 }
@@ -66,15 +92,10 @@ Device::~Device()
     Uninit();
 }
 
-int32_t Device::GetId() const
-{
-    return id_;
-}
-
-const std::string& Device::GetName() const
-{
-    return name_;
-}
+// const std::string& Device::GetName() const
+// {
+//     return name_;
+// }
 
 void Device::SetDeviceId(int32_t deviceId)
 {
@@ -86,31 +107,31 @@ int32_t Device::GetDeviceId() const
     return deviceId_;
 }
 
-std::shared_ptr<IInputDevice::AxisInfo> Device::GetAxisInfo(int32_t axis) const
+std::shared_ptr<IDevice::AxisInfo> Device::GetAxisInfo(int32_t axis) const
 {
     auto it = axises_.find(axis);
     if (it != axises_.end()) {
-        MMI_HILOGD("Leave deivce:%{public}s axis:%{public}s", GetName().c_str(), IInputDevice::AxisToString(axis));
+        MMI_HILOGD("Deivce index:%{public}d axis:%{public}s", GetDevIndex(), IDevice::AxisToString(axis));
         return it->second;
     }
 
     int32_t absCode = -1;
     InputDimensionInfo dimensionInfo = {};
     switch (axis) {
-        case IInputDevice::AXIS_MT_X:
+        case IDevice::AXIS_MT_X:
             absCode = ABS_MT_POSITION_X;
             dimensionInfo = deviceOrigin_.attrSet.axisInfo[ABS_MT_POSITION_X];
             break;
-        case IInputDevice::AXIS_MT_Y:
+        case IDevice::AXIS_MT_Y:
             absCode = ABS_MT_POSITION_Y;
             dimensionInfo = deviceOrigin_.attrSet.axisInfo[ABS_MT_POSITION_Y];
             break;
         default:
-            MMI_HILOGE("Leave device:%{public}s axis:%{public}s, Unknown axis", GetName().c_str(), IInputDevice::AxisToString(axis));
+            MMI_HILOGE("Device index:%{public}d axis:%{public}s, Unknown axis", GetDevIndex(), IDevice::AxisToString(axis));
             return nullptr;
     }
 
-    auto axisInfo = std::make_shared<IInputDevice::AxisInfo>();
+    auto axisInfo = std::make_shared<IDevice::AxisInfo>();
     axisInfo->SetAxis(axis);
     axisInfo->SetMinimum(dimensionInfo.min);
     axisInfo->SetMaximum(dimensionInfo.max);
@@ -138,29 +159,29 @@ int32_t Device::CloseDevice()
     return 0;
 }
 
-void Device::ProcessEventItem(const struct input_event& eventItem)
+void Device::ProcessEvent(const struct input_event &event)
 {
-    CALL_DEBUG_ENTER;
     if (mtdev_ == nullptr) {
-        ProcessEvent(eventItem);
-    } else {
-        mtdev_put_event(mtdev_, &eventItem);
-        if (EventIsCode(eventItem, EV_SYN, SYN_REPORT)) {
-            while (!mtdev_empty(mtdev_)) {
-               struct input_event e = {0};
-               mtdev_get_event(mtdev_, &e);
-               ProcessEvent(e);
-            }
-        }
+        ProcessEventInner(event);
+        return;
+    }
+
+    mtdev_put_event(mtdev_, &event);
+    if (!EventIsCode(event, EV_SYN, SYN_REPORT)) {
+        return;
+    }
+    while (!mtdev_empty(mtdev_)) {
+        struct input_event e = {};
+        mtdev_get_event(mtdev_, &e);
+        ProcessEventInner(e);
     }
 }
 
-void Device::ProcessEvent(const struct input_event& eventItem)
+void Device::ProcessEventInner(const struct input_event& event)
 {
-    CALL_DEBUG_ENTER;
-    auto type = eventItem.type;
-    auto code = eventItem.code;
-    auto value = eventItem.value;
+    auto type = event.type;
+    auto code = event.code;
+    auto value = event.value;
     switch (type) {
         case EV_SYN:
             ProcessSyncEvent(code, value);
@@ -188,13 +209,13 @@ int32_t Device::UpdateCapability()
 {
     CALL_DEBUG_ENTER;
     if (HasMouseCapability()) {
-        capabilities_ |= IInputDevice::CAPABILITY_MOUSE;
+        capabilities_ |= IDevice::CAPABILITY_MOUSE;
     }
     if (HasKeyboardCapability()) {
-        capabilities_ |= IInputDevice::CAPABILITY_KEYBOARD;
+        capabilities_ |= IDevice::CAPABILITY_KEYBOARD;
     }
     if (HasTouchscreenCapability()) {
-        capabilities_ |= IInputDevice::CAPABILITY_TOUCHSCREEN;
+        capabilities_ |= IDevice::CAPABILITY_TOUCHSCREEN;
         absEventCollector_.SetSourceType(AbsEvent::SOURCE_TYPE_TOUCHSCREEN);
     }
     return 0;
@@ -297,7 +318,7 @@ void Device::ProcessAbsEvent(int32_t code, int32_t value)
     absEventCollector_.HandleAbsEvent(code, value);
 }
 
-void Device::OnEventCollected(const std::shared_ptr<const AbsEvent>& event)
+void Device::OnEventCollected(const std::shared_ptr<const AbsEvent> event)
 {
     if (!event) {
         MMI_HILOGE("OnEventCollected event is null");
@@ -312,7 +333,7 @@ bool Device::HasCapability(int32_t capability) const
     return (capabilities_ & capability) != 0;
 }
 
-int32_t Device::StartReceiveEvents(const std::shared_ptr<IKernelEventHandler>& eventHandler)
+int32_t Device::StartReceiveEvent(const std::shared_ptr<IKernelEventHandler> eventHandler)
 {
     CALL_DEBUG_ENTER;
     if (!eventHandler) {
@@ -324,7 +345,7 @@ int32_t Device::StartReceiveEvents(const std::shared_ptr<IKernelEventHandler>& e
     return 0;
 }
 
-int32_t Device::StopReceiveEvents()
+int32_t Device::StopReceiveEvent()
 {
     eventHandler_ = IKernelEventHandler::GetDefault();
     return 0;

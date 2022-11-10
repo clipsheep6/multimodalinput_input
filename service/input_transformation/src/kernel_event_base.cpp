@@ -19,14 +19,14 @@
 
 namespace OHOS {
 namespace MMI {
-KernelEventBase::KernelEventBase(int32_t deviceId, int32_t action)
-    : deviceId_(deviceId), action_(action), actionTime_(-1)
+KernelEventBase::KernelEventBase(int32_t devIndex, int32_t action)
+    : devIndex_(devIndex), action_(action), actionTime_(-1)
 {
 }
 
-int32_t KernelEventBase::GetDeviceId() const
+int32_t KernelEventBase::GetDevIndex() const // TODO:
 {
-    return deviceId_;
+    return devIndex_;
 }
 
 int32_t KernelEventBase::GetAction() const
@@ -57,7 +57,7 @@ std::ostream& KernelEventBase::operator<<(std::ostream& outStream) const
 std::ostream& KernelEventBase::PrintInternal(std::ostream& outStream) const
 {
     return outStream << '{'
-        << "deviceId:" << deviceId_ << ','
+        << "devIndex:" << devIndex_ << ','
         << "action:" << ActionToStr(action_) << ','
         << "actionTime:" << actionTime_
         << '}';

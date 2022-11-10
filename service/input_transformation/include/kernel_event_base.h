@@ -29,7 +29,7 @@ class KernelEventBase {
 public:
     virtual ~KernelEventBase() = default;
 
-    int32_t GetDeviceId() const;
+    int32_t GetDevIndex() const;
     int32_t GetAction() const;
     int64_t GetActionTime() const;
     virtual std::ostream& operator<<(std::ostream& outStream) const;
@@ -44,7 +44,7 @@ protected:
     std::ostream& PrintInternal(std::ostream& outStream) const;
 
 private:
-    int32_t deviceId_;
+    int32_t devIndex_;
     int32_t action_;
     int64_t actionTime_;
 };

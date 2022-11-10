@@ -26,17 +26,17 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AbsEventCollector" };
 };
-AbsEventCollector::AbsEventCollector(int32_t deviceId, int32_t sourceType)
-    : deviceId_(deviceId), sourceType_(sourceType), curSlot_(0), absEvent_(new AbsEvent(deviceId, sourceType))
-{
-}
+AbsEventCollector::AbsEventCollector(int32_t devIndex, int32_t sourceType)
+    : sourceType_(sourceType), curSlot_(0), absEvent_(new AbsEvent(devIndex, sourceType))
+{}
 
-const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleAbsEvent(int32_t code, int32_t value)
+void AbsEventCollector::HandleAbsEvent(int32_t code, int32_t value)
 {
     CALL_DEBUG_ENTER;
     switch (code) {
         case ABS_MT_SLOT:
-            return HandleMtSlot(value);
+            HandleMtSlot(value);
+            break;
         case ABS_MT_TOUCH_MAJOR:
         case ABS_MT_TOUCH_MINOR:
         case ABS_MT_WIDTH_MAJOR:
@@ -53,7 +53,8 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleAbsEvent(int32_t code,
         case ABS_MT_BLOB_ID:
             break;
         case ABS_MT_TRACKING_ID:
-            return HandleMtTrackingId(value);
+            HandleMtTrackingId(value);
+            break;
         case ABS_MT_PRESSURE:
         case ABS_MT_DISTANCE:
         case ABS_MT_TOOL_X:
@@ -61,13 +62,11 @@ const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleAbsEvent(int32_t code,
         default:
             break;
     }
-    return AbsEvent::NULL_VALUE;
 }
 
-const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleSyncEvent(int32_t code, int32_t value)
+const std::shared_ptr<AbsEvent> AbsEventCollector::HandleSyncEvent(int32_t code, int32_t value)
 {
-    auto absEvent = FinishPointer();
-    return absEvent;
+    return FinishPointer();
 }
 
 void AbsEventCollector::AfterProcessed()
@@ -89,6 +88,13 @@ int32_t AbsEventCollector::SetSourceType(int32_t sourceType)
     absEvent_->SetSourceType(sourceType_);
 
     return 0;
+}
+
+void AbsEventCollector::SetAxisInfo(std::shared_ptr<IDevice::AxisInfo> xInfo,
+    std::shared_ptr<IDevice::AxisInfo> yInfo)
+{
+    xInfo_ = xInfo;
+    yInfo_ = yInfo;
 }
 
 std::shared_ptr<AbsEvent::Pointer> AbsEventCollector::GetCurrentPointer(bool createIfNotExist)
@@ -113,38 +119,38 @@ std::shared_ptr<AbsEvent::Pointer> AbsEventCollector::GetCurrentPointer(bool cre
     return pointer;
 }
 
-const std::shared_ptr<AbsEvent>& AbsEventCollector::FinishPointer()
+const std::shared_ptr<AbsEvent> AbsEventCollector::FinishPointer()
 {
     CALL_DEBUG_ENTER;
     auto pointer = GetCurrentPointer(false);
     if (!pointer) {
         MMI_HILOGE("pointer is null. Leave.");
-        return AbsEvent::NULL_VALUE;
+        return {};
     }
     auto nowTime = TimeUtils::GetTimeStampMs();
     if (absEventAction_ == AbsEvent::ACTION_DOWN) {
            auto retCode = absEvent_->AddPointer(pointer);
             if (retCode < 0) {
                 MMI_HILOGE("Leave, absAction:%{public}s AddPointer Failed", AbsEvent::ActionToString(absEventAction_));
-                return AbsEvent::NULL_VALUE;
+                return {};
             }
         pointer->SetDownTime(nowTime);
     }
     absEvent_->SetAction(absEventAction_);
     absEvent_->SetCurSlot(curSlot_);
     absEvent_->SetActionTime(nowTime);
+    absEvent_->SetAxisInfo(xInfo_, yInfo_);
     return absEvent_;
 }
 
-const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleMtSlot(int32_t value)
+void AbsEventCollector::HandleMtSlot(int32_t value)
 {
     if (value >= slotNum_) {
         MMI_HILOGE("exceeded slot count (%{public}d of max %{public}d)", value, slotNum_);
         curSlot_ = slotNum_ - 1;
-        return AbsEvent::NULL_VALUE;
+        return;
     }
     curSlot_ = value;
-    return AbsEvent::NULL_VALUE;
 }
 
 void AbsEventCollector::HandleMtPositionX(int32_t value)
@@ -171,15 +177,13 @@ void AbsEventCollector::HandleMtPositionY(int32_t value)
     absEventAction_ = AbsEvent::ACTION_MOVE;
 }
 
-const std::shared_ptr<AbsEvent>& AbsEventCollector::HandleMtTrackingId(int32_t value)
+void AbsEventCollector::HandleMtTrackingId(int32_t value)
 {
     if (value < 0) {
         absEventAction_ = AbsEvent::ACTION_UP;
     } else {
         absEventAction_ = AbsEvent::ACTION_DOWN;
     }
-
-    return AbsEvent::NULL_VALUE;
 }
 
 void AbsEventCollector::RemoveReleasedPointer()

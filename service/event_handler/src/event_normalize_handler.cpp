@@ -145,9 +145,9 @@ void EventNormalizeHandler::HandleHDFDeviceInputEvent(const HDFDeviceInputEvent 
         .code = event.code,
         .value = event.value
     };
-    auto device = InputDevMgr->GetDevice(event.devIndex);
+    auto device = InputDevMgr->GetHDFDevice(event.devIndex);
     CHKPV(device);
-    device->ProcessEventItem(inputEvent);
+    device->ProcessEvent(inputEvent);
 }
 
 int32_t EventNormalizeHandler::OnHDFDeviceAdded(const InputDeviceInfo &devInfo)
@@ -163,7 +163,7 @@ int32_t EventNormalizeHandler::OnHDFDeviceAdded(const InputDeviceInfo &devInfo)
 int32_t EventNormalizeHandler::OnHDFDeviceRemoved(const InputDeviceInfo &devInfo)
 {
     CALL_DEBUG_ENTER;
-    auto device = InputDevMgr->GetDevice(devInfo.devIndex);
+    auto device = InputDevMgr->GetHDFDevice(devInfo.devIndex);
     CHKPR(device, ERROR_NULL_POINTER);
     InputDevMgr->OnInputDeviceRemoved(device);
     return RET_OK;

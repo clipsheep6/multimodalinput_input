@@ -28,7 +28,7 @@ namespace OHOS {
 namespace MMI {
 
 template <typename T>
-std::ostream& operator<<(std::ostream& outStream, const std::shared_ptr<T>& item) {
+std::ostream& operator<<(std::ostream& outStream, const std::shared_ptr<T> item) {
     if (item) {
         return item->operator<<(outStream);
     }

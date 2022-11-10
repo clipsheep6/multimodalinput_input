@@ -64,14 +64,12 @@ config("libmmi_server_config") {
 
   defines = input_default_defines
 
-  service_defines = []
-
   if (input_feature_combination_key) {
-    service_defines += [ "OHOS_BUILD_ENABLE_COMBINATION_KEY" ]
+    defines += [ "OHOS_BUILD_ENABLE_COMBINATION_KEY" ]
   }
 
   if (resource_schedule_service_enabled) {
-    service_defines += [ "OHOS_RSS_CLIENT" ]
+    defines += [ "OHOS_RSS_CLIENT" ]
   }
 
   if (input_feature_input_cooperation) {
@@ -135,7 +133,7 @@ ohos_shared_library("libmmi-server") {
         "input_transformation/src/abs_event_collector.cpp",
         "input_transformation/src/abs_event.cpp",
         "input_transformation/src/device.cpp",
-        "input_transformation/src/i_input_device.cpp",
+        "input_transformation/src/i_device.cpp",
         "input_transformation/src/i_kernel_event_handler.cpp",
         "input_transformation/src/instance_creator.cpp",
         "input_transformation/src/kernel_event_base.cpp",

@@ -16,16 +16,16 @@
 #ifndef I_INPUT_DEVICE_H
 #define I_INPUT_DEVICE_H
 
-#include <string>
 #include <memory>
 #include <ostream>
+#include <string>
 
 #include "input_type.h"
 
 namespace OHOS {
 namespace MMI {
 class IKernelEventHandler;
-class IInputDevice {
+class IDevice {
 public:
     static const int32_t CAPABILITY_UNKNOWN = 0b0;
     static const int32_t CAPABILITY_MOUSE = 0b1;
@@ -44,20 +44,20 @@ public:
         public:
             static const std::unique_ptr<AxisInfo> NULL_VALUE;
         public:
-            int32_t GetAxis() const;
-            int32_t GetMinimum() const;
-            int32_t GetMaximum() const;
-            int32_t GetFuzz() const;
-            int32_t GetFlat() const;
-            int32_t GetResolution() const;
-            std::ostream& Print(std::ostream& outStream) const;
+            int32_t GetAxis() const { return axis_; }
+            int32_t GetMinimum() const { return minimum_; }
+            int32_t GetMaximum() const { return maximum_; }
+            int32_t GetFuzz() const { return fuzz_; }
+            int32_t GetFlat() const { return flat_; }
+            int32_t GetResolution() const { return resolution_; }
+            std::ostream& Print(std::ostream& os) const;
 
-            void SetAxis(int32_t axis);
-            void SetMinimum(int32_t minimum);
-            void SetMaximum(int32_t maximum);
-            void SetFuzz(int32_t fuzz);
-            void SetFlat(int32_t flat);
-            void SetResolution(int32_t resolution);
+            void SetAxis(int32_t axis) { axis_ = axis; }
+            void SetMinimum(int32_t minimum) { minimum_ = minimum; }
+            void SetMaximum(int32_t maximum) { maximum_ = maximum; }
+            void SetFuzz(int32_t fuzz) { fuzz_ = fuzz; }
+            void SetFlat(int32_t flat) { flat_ = flat; }
+            void SetResolution(int32_t resolution) { resolution_ = resolution; }
 
         private:
             int32_t axis_;
@@ -68,25 +68,28 @@ public:
             int32_t resolution_;
     };
 
-    virtual ~IInputDevice() = default;
+    IDevice(uint32_t devIndex) : devIndex_(devIndex) {}
+    virtual ~IDevice() = default;
 
-    virtual int32_t GetId() const = 0;
-    virtual const std::string& GetName() const = 0;
+    virtual int32_t GetDevIndex() const { return devIndex_; }
+    //virtual const std::string& GetName() const = 0;
 
     virtual std::shared_ptr<AxisInfo> GetAxisInfo(int32_t axis) const = 0;
     virtual bool HasCapability(int32_t capability) const = 0;
-    virtual void ProcessEventItem(const struct input_event& eventItem) = 0;
-    virtual int32_t StartReceiveEvents(const std::shared_ptr<IKernelEventHandler>& eventHandler) = 0;
-    virtual int32_t StopReceiveEvents() = 0;
+    virtual void ProcessEvent(const struct input_event &event) = 0;
+    virtual int32_t StartReceiveEvent(const std::shared_ptr<IKernelEventHandler> handler) = 0;
+    virtual int32_t StopReceiveEvent() = 0;
     virtual void SetDeviceId(int32_t deviceId) = 0;
     virtual int32_t GetDeviceId() const = 0;
     virtual const InputDeviceInfo& GetInputDeviceInfo() const = 0;
+protected:
+    const uint32_t devIndex_;
 };
 
-std::ostream& operator<<(std::ostream& outStream, const IInputDevice::AxisInfo& axisInfo);
-std::ostream& operator<<(std::ostream& outStream, const IInputDevice::AxisInfo* axisInfo);
-std::ostream& operator<<(std::ostream& outStream, const std::shared_ptr<IInputDevice::AxisInfo>& axisInfo);
-std::ostream& operator<<(std::ostream& outStream, const std::unique_ptr<IInputDevice::AxisInfo>& axisInfo);
+std::ostream& operator<<(std::ostream& os, const IDevice::AxisInfo& axisInfo);
+std::ostream& operator<<(std::ostream& os, const IDevice::AxisInfo* axisInfo);
+std::ostream& operator<<(std::ostream& os, const std::shared_ptr<IDevice::AxisInfo>& axisInfo);
+std::ostream& operator<<(std::ostream& os, const std::unique_ptr<IDevice::AxisInfo>& axisInfo);
 } // namespace MMI
 } // namespace OHOS
 #endif // I_INPUT_DEVICE_H

@@ -19,7 +19,7 @@
 #include <memory>
 
 #include "abs_event.h"
-#include "i_input_device.h"
+#include "i_device.h"
 
 namespace OHOS {
 namespace MMI {
@@ -29,10 +29,10 @@ public:
     static std::shared_ptr<ITouchScreenHandler> CreateInstance();
     virtual ~ITouchScreenHandler() = default;
     virtual std::shared_ptr<PointerEvent> GetPointerEvent() = 0;
-    virtual void OnInputEvent(const std::shared_ptr<const AbsEvent>& event) = 0;
-    virtual int32_t BindInputDevice(const std::shared_ptr<IInputDevice>& inputDevice) = 0;
-    virtual int32_t UnbindInputDevice(const std::shared_ptr<IInputDevice>& inputDevice) = 0;
-    virtual std::shared_ptr<IInputDevice> GetDevice() = 0;
+    virtual void OnInputEvent(const std::shared_ptr<const AbsEvent> event) = 0;
+    virtual int32_t BindInputDevice(const std::shared_ptr<IDevice> inputDevice) = 0;
+    virtual int32_t UnbindInputDevice(const std::shared_ptr<IDevice> inputDevice) = 0;
+    virtual std::shared_ptr<IDevice> GetDevice() = 0;
 };
 } // namespace MMI
 } // namespace OHOS

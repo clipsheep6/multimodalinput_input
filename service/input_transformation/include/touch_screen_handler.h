@@ -23,7 +23,7 @@
 #include "abs_event.h"
 #include "input_display_info.h"
 #include "i_input_define.h"
-#include "i_input_device.h"
+#include "i_device.h"
 #include "i_touch_screen_handler.h"
 #include "pointer_event.h"
 #include "struct_multimodal.h"
@@ -39,30 +39,26 @@ public:
     virtual ~TouchScreenHandler() = default;
     DISALLOW_COPY_AND_MOVE(TouchScreenHandler);
 
-    virtual void OnInputEvent(const std::shared_ptr<const AbsEvent>& event) override;
+    virtual void OnInputEvent(const std::shared_ptr<const AbsEvent> event) override;
     virtual std::shared_ptr<PointerEvent> GetPointerEvent() override;
-    virtual int32_t BindInputDevice(const std::shared_ptr<IInputDevice>& inputDevice) override;
-    virtual int32_t UnbindInputDevice(const std::shared_ptr<IInputDevice>& inputDevice) override;
-    virtual std::shared_ptr<IInputDevice> GetDevice() override;
+    virtual int32_t BindInputDevice(const std::shared_ptr<IDevice> inputDevice) override;
+    virtual int32_t UnbindInputDevice(const std::shared_ptr<IDevice> inputDevice) override;
+    virtual std::shared_ptr<IDevice> GetDevice() override;
 
 protected:
     TouchScreenHandler();
-    bool ConvertPointer(const std::shared_ptr<const AbsEvent>& absEvent,
+    bool ConvertPointer(const std::shared_ptr<const AbsEvent> absEvent,
             int32_t& pointerAction, int64_t& actionTime);
     int32_t ConvertAction(int32_t absEventAction) const;
-    bool OnEventTouchDown(const std::shared_ptr<const AbsEvent>& absEvent);
-    bool OnEventTouchUp(const std::shared_ptr<const AbsEvent>& absEvent);
-    bool OnEventTouchMotion(const std::shared_ptr<const AbsEvent>& absEvent);
+    bool OnEventTouchDown(const std::shared_ptr<const AbsEvent> absEvent);
+    bool OnEventTouchUp(const std::shared_ptr<const AbsEvent> absEvent);
+    bool OnEventTouchMotion(const std::shared_ptr<const AbsEvent> absEvent);
     int32_t TransformX(int32_t xPos, int32_t width, int32_t logicalWidth) const;
     int32_t TransformY(int32_t yPos, int32_t height, int32_t logicalHeight) const;
-    int32_t TransformToPhysicalDisplayCoordinate(const DisplayInfo& info,
-            int32_t tpX, int32_t tpY, int32_t& displayX, int32_t& displayY) const;
     void ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent);
 
 private:
-    std::shared_ptr<IInputDevice> inputDevice_;
-    std::shared_ptr<IInputDevice::AxisInfo> xInfo_;
-    std::shared_ptr<IInputDevice::AxisInfo> yInfo_;
+    std::shared_ptr<IDevice> inputDevice_;
     std::shared_ptr<PointerEvent> pointerEvent_;
 };
 } // namespace MMI

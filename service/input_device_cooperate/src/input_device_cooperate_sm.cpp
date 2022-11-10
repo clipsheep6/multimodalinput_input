@@ -476,10 +476,10 @@ void InputDeviceCooperateSM::HandleEvent(libinput_event *event)
 #ifdef OHOS_BUILD_HDF
 void InputDeviceCooperateSM::HandleHDFDeviceInputEvent(const HDFDeviceInputEvent &event)
 {
-    auto device = InputDevMgr->GetDevice(event.devIndex);
+    auto device = InputDevMgr->GetHDFDevice(event.devIndex);
     CHKPV(device);
-    auto isPointerDevice = (hdfDevInfo->HasCapability(IInputDevice::CAPABILITY_MOUSE) ||
-        hdfDevInfo->HasCapability(IInputDevice::CAPABILITY_TOUCHPAD));
+    auto isPointerDevice = (device->HasCapability(IDevice::CAPABILITY_MOUSE) ||
+        device->HasCapability(IDevice::CAPABILITY_TOUCHPAD));
     if (isPointerDevice) {
         MMI_HILOGW("Not supported temporarily.");
         return;

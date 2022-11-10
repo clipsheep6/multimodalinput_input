@@ -30,7 +30,7 @@
 #include "hdf_adapter.h"
 #include "i_event_collector.h"
 #include "i_input_define.h"
-#include "i_input_device.h"
+#include "i_device.h"
 
 struct input_event;
 
@@ -75,20 +75,20 @@ typedef unsigned int bitmask_t;
 constexpr unsigned long BITS_PER_BYTE = 8;
 constexpr unsigned long BITS_PER_LONG = sizeof(unsigned long) * BITS_PER_BYTE;
 class IKernelEventHandler;
-class Device : public IInputDevice {
+class Device : public IDevice {
 
 public:
-    Device(int32_t id, const InputDeviceInfo devInfo);
+    Device(int32_t devIndex, const InputDeviceInfo &devInfo);
     virtual ~Device();
     DISALLOW_COPY_AND_MOVE(Device);
     int32_t Init();
-    virtual int32_t GetId() const override;
-    virtual const std::string& GetName() const override;
+    // virtual int32_t GetDevIndex() const override;
+    //virtual const std::string& GetName() const override;
     virtual std::shared_ptr<AxisInfo> GetAxisInfo(int32_t axis) const override;
     virtual bool HasCapability(int32_t capability) const override;
-    virtual int32_t StartReceiveEvents(const std::shared_ptr<IKernelEventHandler>& eventHandler) override;
-    virtual int32_t StopReceiveEvents() override;
-    virtual void ProcessEventItem(const struct input_event& eventItem) override;
+    virtual int32_t StartReceiveEvent(const std::shared_ptr<IKernelEventHandler> eventHandler) override;
+    virtual int32_t StopReceiveEvent() override;
+    virtual void ProcessEvent(const struct input_event& event) override;
     virtual void SetDeviceId(int32_t deviceId) override;
     virtual int32_t GetDeviceId() const override;
     virtual const InputDeviceInfo& GetInputDeviceInfo() const override;
@@ -112,8 +112,8 @@ private:
     void ProcessSyncEvent(int32_t code, int32_t value);
     void ProcessAbsEvent(int32_t code, int32_t value);
     void ProcessMscEvent(int32_t code, int32_t value);
-    void OnEventCollected(const std::shared_ptr<const AbsEvent>& event);
-    void ProcessEvent(const struct input_event& eventItem);
+    void OnEventCollected(const std::shared_ptr<const AbsEvent> event);
+    void ProcessEventInner(const input_event &event);
 
     int EventIsType(const struct input_event& ev, unsigned int type);
     int EventtTypeGetMax(unsigned int type);
@@ -127,14 +127,13 @@ private:
     }
 
 private:
-    const int32_t id_;
-    std::string name_;
+    //std::string name_;
     int32_t deviceId_;
     InputDimensionInfo dimensionInfoX_;
     InputDimensionInfo dimensionInfoY_;
     InputDevAbility devAbility_;
 
-    int32_t capabilities_ {IInputDevice::CAPABILITY_UNKNOWN};
+    int32_t capabilities_ {IDevice::CAPABILITY_UNKNOWN};
     unsigned long inputProperty[LongsOfBits(INPUT_PROP_MAX)];
     unsigned long evBit[LongsOfBits(EV_MAX)];
     unsigned long relBit[LongsOfBits(REL_MAX)];
@@ -142,7 +141,7 @@ private:
     AbsEventCollector absEventCollector_;
     mtdev* mtdev_ {nullptr};
 
-    mutable std::map<int32_t, std::shared_ptr<IInputDevice::AxisInfo>> axises_;
+    mutable std::map<int32_t, std::shared_ptr<IDevice::AxisInfo>> axises_;
 
     std::shared_ptr<IKernelEventHandler> eventHandler_;
     InputDeviceInfo deviceOrigin_;

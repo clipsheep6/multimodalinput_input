@@ -41,50 +41,23 @@ std::shared_ptr<PointerEvent> TouchScreenHandler::GetPointerEvent()
     return pointerEvent_;
 }
 
-std::shared_ptr<IInputDevice> TouchScreenHandler::GetDevice()
+std::shared_ptr<IDevice> TouchScreenHandler::GetDevice()
 {
     return inputDevice_;
 }
 
-int32_t TouchScreenHandler::BindInputDevice(const std::shared_ptr<IInputDevice>& inputDevice)
+int32_t TouchScreenHandler::BindInputDevice(const std::shared_ptr<IDevice> inputDevice)
 {
     CALL_DEBUG_ENTER;
     if (!inputDevice) {
         MMI_HILOGE("Leave, null InputDevice");
         return -1;
     }
-
-    std::shared_ptr<IInputDevice::AxisInfo> xInfo = inputDevice->GetAxisInfo(IInputDevice::AXIS_MT_X);
-    if (!xInfo) {
-        MMI_HILOGE("Leave, null AxisInfo Of AXIS_MT_X");
-        return -1;
-    }
-
-    if (xInfo->GetMinimum() >= xInfo->GetMaximum()) {
-        MMI_HILOGE("Leave, xInfo->GetMinimum():%{public}d >= xInfo->GetMaximum():%{public}d",
-                    xInfo->GetMinimum(), xInfo->GetMaximum());
-        return -1;
-    }
-
-    std::shared_ptr<IInputDevice::AxisInfo> yInfo = inputDevice->GetAxisInfo(IInputDevice::AXIS_MT_Y);
-    if (!yInfo) {
-        MMI_HILOGE("Leave, null AxisInfo Of AXIS_MT_Y");
-        return -1;
-    }
-
-    if (yInfo->GetMinimum() >= yInfo->GetMaximum()) {
-        MMI_HILOGE("Leave, yInfo->GetMinimum():%{public}d >= yInfo->GetMaximum():%{public}d",
-                    yInfo->GetMinimum(), yInfo->GetMaximum());
-        return -1;
-    }
-
     inputDevice_ = inputDevice;
-    xInfo_ = xInfo;
-    yInfo_ = yInfo;
     return 0;
 }
 
-int32_t TouchScreenHandler::UnbindInputDevice(const std::shared_ptr<IInputDevice>& inputDevice)
+int32_t TouchScreenHandler::UnbindInputDevice(const std::shared_ptr<IDevice> inputDevice)
 {
     CALL_DEBUG_ENTER;
     if (inputDevice != inputDevice_) {
@@ -106,7 +79,7 @@ void TouchScreenHandler::ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointer
     }
 }
 
-void TouchScreenHandler::OnInputEvent(const std::shared_ptr<const AbsEvent>& event)
+void TouchScreenHandler::OnInputEvent(const std::shared_ptr<const AbsEvent> event)
 {
     CALL_DEBUG_ENTER;
     int32_t pointerAction = PointerEvent::POINTER_ACTION_UNKNOWN;
@@ -130,7 +103,7 @@ void TouchScreenHandler::OnInputEvent(const std::shared_ptr<const AbsEvent>& eve
     }
 }
 
-bool TouchScreenHandler::ConvertPointer(const std::shared_ptr<const AbsEvent>& absEvent,
+bool TouchScreenHandler::ConvertPointer(const std::shared_ptr<const AbsEvent> absEvent,
         int32_t& pointerAction, int64_t& actionTime)
 {
     CALL_DEBUG_ENTER;
@@ -192,57 +165,7 @@ int32_t TouchScreenHandler::ConvertAction(int32_t absEventAction) const
     return PointerEvent::POINTER_ACTION_UNKNOWN;
 }
 
-int32_t TouchScreenHandler::TransformX(int32_t xPos, int32_t width, int32_t logicalWidth) const
-{
-    if (width <= 0) {
-        return -1;
-    }
-
-    int64_t one = 1;
-    auto result = (int32_t)(one * xPos * logicalWidth / width);
-    MMI_HILOGD("xPos:%{public}d width:%{public}d logicalWidth:%{public}d result:%{public}d",
-            xPos, width, logicalWidth, result);
-    return result;
-}
-
-int32_t TouchScreenHandler::TransformY(int32_t yPos, int32_t height, int32_t logicalHeight) const
-{
-    if (height <= 0) {
-        return -1;
-    }
-
-    int64_t one = 1;
-    auto result = (int32_t)(one * yPos * logicalHeight / height);
-    MMI_HILOGD("yPos:%{public}d height:%{public}d logicalHeight:%{public}d result:%{public}d",
-            yPos, height, logicalHeight, result);
-    return result;
-}
-
-int32_t TouchScreenHandler::TransformToPhysicalDisplayCoordinate(const DisplayInfo& info,
-        int32_t tpX, int32_t tpY, int32_t& displayX, int32_t& displayY) const
-{
-    CALL_DEBUG_ENTER;
-    if (!xInfo_) {
-        MMI_HILOGE("Leave, null xInfo_");
-        return -1;
-    }
-
-    if (!yInfo_) {
-        MMI_HILOGE("Leave, null yInfo_");
-        return -1;
-    }
-
-    int32_t deltaX = tpX  - xInfo_->GetMinimum();
-    int32_t width = xInfo_->GetMaximum() - xInfo_->GetMinimum() + 1;
-    displayX = TransformX(deltaX, width, info.width);
-
-    int32_t deltaY = tpY - yInfo_->GetMinimum();
-    int32_t height = yInfo_->GetMaximum() - yInfo_->GetMinimum() + 1;
-    displayY = TransformY(deltaY, height, info.height);
-    return 0;
-}
-
-bool TouchScreenHandler::OnEventTouchDown(const std::shared_ptr<const AbsEvent>& absEvent)
+bool TouchScreenHandler::OnEventTouchDown(const std::shared_ptr<const AbsEvent> absEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPF(absEvent);
@@ -290,7 +213,7 @@ bool TouchScreenHandler::OnEventTouchDown(const std::shared_ptr<const AbsEvent>&
     return true;
 }
 
-bool TouchScreenHandler::OnEventTouchUp(const std::shared_ptr<const AbsEvent>& absEvent)
+bool TouchScreenHandler::OnEventTouchUp(const std::shared_ptr<const AbsEvent> absEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPF(absEvent);
@@ -310,7 +233,7 @@ bool TouchScreenHandler::OnEventTouchUp(const std::shared_ptr<const AbsEvent>& a
     return true;
 }
 
-bool TouchScreenHandler::OnEventTouchMotion(const std::shared_ptr<const AbsEvent>& absEvent)
+bool TouchScreenHandler::OnEventTouchMotion(const std::shared_ptr<const AbsEvent> absEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPF(absEvent);

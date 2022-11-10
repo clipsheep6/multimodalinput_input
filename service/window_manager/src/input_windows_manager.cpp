@@ -425,7 +425,7 @@ const DisplayInfo* InputWindowsManager::FindPhysicalDisplayInfo(const std::strin
 }
 
 #ifdef OHOS_BUILD_HDF
-bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, const std::shared_ptr<const AbsEvent>& absEvent,
+bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, const std::shared_ptr<const AbsEvent> absEvent,
                                                   EventTouch& touchInfo, int32_t& physicalDisplayId)
 {
     CHKPF(absEvent);
@@ -496,25 +496,52 @@ void InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* t
 }
 
 #ifdef OHOS_BUILD_HDF
-void InputWindowsManager::GetPhysicalDisplayCoord(const std::shared_ptr<const AbsEvent>& absEvent,
-        const DisplayInfo& info, EventTouch& touchInfo)
+int32_t InputWindowsManager::TransformX(int32_t xPos, int32_t width, int32_t logicalWidth) const
 {
-    auto absEventPointer = absEvent->GetPointer();
-    if (!absEventPointer) {
-        MMI_HILOGE("Leave, null absEventPointer");
-        return;
+    if (width <= 0) {
+        return -1;
     }
 
-    int32_t physicalDisplayX = -1;
-    int32_t physicalDisplayY = -1;
-    auto retCode = TransformToPhysicalDisplayCoordinate(info, absEventPointer->GetX(), absEventPointer->GetY(),
-            physicalDisplayX, physicalDisplayY);
-    if (retCode < 0) {
-        MMI_HILOGE("Leave, TransformToPhysicalDisplayCoordinate Failed");
-        return;
+    int64_t one = 1;
+    auto result = (int32_t)(one * xPos * logicalWidth / width);
+    MMI_HILOGD("xPos:%{public}d width:%{public}d logicalWidth:%{public}d result:%{public}d",
+            xPos, width, logicalWidth, result);
+    return result;
+}
+
+int32_t InputWindowsManager::TransformY(int32_t yPos, int32_t height, int32_t logicalHeight) const
+{
+    if (height <= 0) {
+        return -1;
     }
-    touchInfo.point.x = physicalDisplayX;
-    touchInfo.point.y = physicalDisplayY;
+
+    int64_t one = 1;
+    auto result = (int32_t)(one * yPos * logicalHeight / height);
+    MMI_HILOGD("yPos:%{public}d height:%{public}d logicalHeight:%{public}d result:%{public}d",
+            yPos, height, logicalHeight, result);
+    return result;
+}
+
+void InputWindowsManager::GetPhysicalDisplayCoord(const std::shared_ptr<const AbsEvent> absEvent,
+        const DisplayInfo& info, EventTouch& touchInfo)
+{
+    CHKPV(absEvent);
+    auto absEventPointer = absEvent->GetPointer();
+    CHKPV(absEventPointer);
+    auto tpX = absEventPointer->GetX();
+    auto tpY = absEventPointer->GetY();
+
+    auto [ xInfo, yInfo ] = absEvent->GetAxisInfo();
+    CHKPV(xInfo);
+    CHKPV(yInfo);
+    int32_t deltaX = tpX  - xInfo->GetMinimum();
+    int32_t width = xInfo->GetMaximum() - xInfo->GetMinimum() + 1;
+    touchInfo.point.x = TransformX(deltaX, width, info.width);
+
+    int32_t deltaY = tpY - yInfo->GetMinimum();
+    int32_t height = yInfo->GetMaximum() - yInfo->GetMinimum() + 1;
+    touchInfo.point.y = TransformY(deltaY, height, info.height);
+
     touchInfo.toolRect.point.x = 0;   //TO DO...
     touchInfo.toolRect.point.y = 0;   //TO DO...
     touchInfo.toolRect.width = 0;     //TO DO...
@@ -523,7 +550,7 @@ void InputWindowsManager::GetPhysicalDisplayCoord(const std::shared_ptr<const Ab
 #endif // OHOS_BUILD_HDF
 
 bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, struct libinput_event_touch* touch,
-    EventTouch& touchInfo, int32_t& targetDisplayId)
+    EventTouch& touchInfo, int32_t& physicalDisplayId)
 {
     CHKPF(touch);
     std::string screenId = InputDevMgr->GetScreenId(deviceId);
@@ -532,7 +559,7 @@ bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, struct libi
     }
     auto info = FindPhysicalDisplayInfo(screenId);
     CHKPF(info);
-    targetDisplayId = info->id;
+    physicalDisplayId = info->id;
     if ((info->width <= 0) || (info->height <= 0)) {
         MMI_HILOGE("Get DisplayInfo is error");
         return false;

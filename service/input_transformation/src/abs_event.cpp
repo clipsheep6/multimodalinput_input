@@ -26,7 +26,6 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AbsEvent" };
 };
-const std::shared_ptr<AbsEvent> AbsEvent::NULL_VALUE;
 const std::shared_ptr<AbsEvent::Pointer> AbsEvent::Pointer::NULL_VALUE;
 
 const char* AbsEvent::SourceToString(int32_t sourceType)
@@ -98,14 +97,26 @@ void AbsEvent::Pointer::SetDownTime(int64_t downTime)
     downTime_ = downTime;
 }
 
-AbsEvent::AbsEvent(int32_t deviceId, int32_t sourceType)
-    : KernelEventBase(deviceId, ACTION_NONE), pointerId_(-1), sourceType_(sourceType)
+AbsEvent::AbsEvent(int32_t devIndex, int32_t sourceType)
+    : KernelEventBase(devIndex, ACTION_NONE), pointerId_(-1), sourceType_(sourceType)
 {
 }
 
 int32_t AbsEvent::GetSourceType() const
 {
     return sourceType_;
+}
+
+void AbsEvent::SetAxisInfo(std::shared_ptr<IDevice::AxisInfo> xInfo,
+    std::shared_ptr<IDevice::AxisInfo> yInfo)
+{
+    xInfo_ = xInfo;
+    yInfo_ = yInfo;
+}
+
+std::tuple<std::shared_ptr<IDevice::AxisInfo>, std::shared_ptr<IDevice::AxisInfo>> AbsEvent::GetAxisInfo() const
+{
+    return { xInfo_, yInfo_ };
 }
 
 std::shared_ptr<AbsEvent::Pointer> AbsEvent::GetPointer() const
@@ -145,7 +156,7 @@ int32_t AbsEvent::SetSourceType(int32_t sourceType)
     return 0;
 }
 
-int32_t AbsEvent::AddPointer(const std::shared_ptr<Pointer>& pointer)
+int32_t AbsEvent::AddPointer(const std::shared_ptr<Pointer> pointer)
 {
     if (!pointer) {
         MMI_HILOGE("Leave, null pointer");

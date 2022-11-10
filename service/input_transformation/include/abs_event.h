@@ -16,10 +16,12 @@
 #ifndef ABS_EVNET_H
 #define ABS_EVNET_H
 
+#include <list>
 #include <memory>
 #include <ostream>
-#include <list>
+#include <tuple>
 
+#include "i_device.h"
 #include "kernel_event_base.h"
 
 namespace OHOS {
@@ -80,7 +82,9 @@ public:
     virtual std::ostream& operator<<(std::ostream& outStream) const override;
 
     int32_t SetSourceType(int32_t sourceType);
-    int32_t AddPointer(const std::shared_ptr<Pointer>& pointer);
+    void SetAxisInfo(std::shared_ptr<IDevice::AxisInfo> xInfo, std::shared_ptr<IDevice::AxisInfo> yInfo);
+    std::tuple<std::shared_ptr<IDevice::AxisInfo>, std::shared_ptr<IDevice::AxisInfo>> GetAxisInfo() const;
+    int32_t AddPointer(const std::shared_ptr<Pointer> pointer);
 
 protected:
     virtual const char* ActionToStr(int32_t action) const override;
@@ -91,6 +95,8 @@ private:
     int32_t sourceType_;
     int32_t curSlot_;
     pointer_list pointers_;
+    std::shared_ptr<IDevice::AxisInfo> xInfo_ { nullptr };
+    std::shared_ptr<IDevice::AxisInfo> yInfo_ { nullptr };
     std::shared_ptr<AbsEvent::Pointer> curPointer_ {nullptr};
 };
 

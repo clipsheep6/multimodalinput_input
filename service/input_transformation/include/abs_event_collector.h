@@ -24,40 +24,43 @@
 
 #include "abs_event.h"
 #include "i_input_define.h"
+#include "i_device.h"
 
 namespace OHOS {
 namespace MMI {
 class AbsEventCollector {
 public:
-    AbsEventCollector(int32_t deviceId, int32_t sourceType);
+    AbsEventCollector(int32_t devIndex, int32_t sourceType);
     virtual ~AbsEventCollector() = default;
     DISALLOW_COPY_AND_MOVE(AbsEventCollector);
 
-    const std::shared_ptr<AbsEvent>& HandleAbsEvent(int32_t code, int32_t value);
-    const std::shared_ptr<AbsEvent>& HandleSyncEvent(int32_t code, int32_t value);
+    void HandleAbsEvent(int32_t code, int32_t value);
+    const std::shared_ptr<AbsEvent> HandleSyncEvent(int32_t code, int32_t value);
 
     void AfterProcessed();
 
     int32_t SetSourceType(int32_t sourceType);
+    void SetAxisInfo(std::shared_ptr<IDevice::AxisInfo> xInfo, std::shared_ptr<IDevice::AxisInfo> yInfo);
 
 protected:
-    const std::shared_ptr<AbsEvent>& HandleMtSlot(int32_t value);
+    void HandleMtSlot(int32_t value);
     void HandleMtPositionX(int32_t value);
     void HandleMtPositionY(int32_t value);
-    const std::shared_ptr<AbsEvent>& HandleMtTrackingId(int32_t value);
+    void HandleMtTrackingId(int32_t value);
 
     std::shared_ptr<AbsEvent::Pointer> GetCurrentPointer(bool createIfNotExist);
-    const std::shared_ptr<AbsEvent>& FinishPointer();
+    const std::shared_ptr<AbsEvent> FinishPointer();
 
     void RemoveReleasedPointer();
 
 private:
-    [[maybe_unused]] const int32_t deviceId_;
-    int32_t sourceType_ {-1};
-    int32_t curSlot_ {0};
-    int32_t slotNum_ {10};
-    int32_t absEventAction_ {AbsEvent::ACTION_NONE};
-    std::shared_ptr<AbsEvent> absEvent_ {nullptr};
+    int32_t sourceType_ { -1 };
+    int32_t curSlot_ {};
+    int32_t slotNum_ { 10 };
+    int32_t absEventAction_ { AbsEvent::ACTION_NONE };
+    std::shared_ptr<AbsEvent> absEvent_ { nullptr };
+    std::shared_ptr<IDevice::AxisInfo> xInfo_ { nullptr };
+    std::shared_ptr<IDevice::AxisInfo> yInfo_ { nullptr };
     std::map<int32_t, std::shared_ptr<AbsEvent::Pointer>> pointers_;
 
 };

@@ -67,7 +67,7 @@ public:
     bool TouchPointToDisplayPoint(int32_t deviceId, struct libinput_event_touch* touch,
         EventTouch& touchInfo, int32_t& targetDisplayId);
 #ifdef OHOS_BUILD_HDF
-    bool TouchPointToDisplayPoint(int32_t deviceId, const std::shared_ptr<const AbsEvent>& absEvent,
+    bool TouchPointToDisplayPoint(int32_t deviceId, const std::shared_ptr<const AbsEvent> absEvent,
         EventTouch& touchInfo, int32_t& targetDisplayId);
 #endif // OHOS_BUILD_HDF
     void RotateTouchScreen(DisplayInfo info, LogicalCoordinate& coord) const;
@@ -129,7 +129,9 @@ private:
     void GetPhysicalDisplayCoord(struct libinput_event_touch* touch,
         const DisplayInfo& info, EventTouch& touchInfo);
 #ifdef OHOS_BUILD_HDF
-    void GetPhysicalDisplayCoord(const std::shared_ptr<const AbsEvent>& absEvent,
+    int32_t TransformX(int32_t xPos, int32_t width, int32_t logicalWidth) const;
+    int32_t TransformY(int32_t yPos, int32_t height, int32_t logicalHeight) const;
+    void GetPhysicalDisplayCoord(const std::shared_ptr<const AbsEvent> absEvent,
         const DisplayInfo& info, EventTouch& touchInfo);
 #endif // OHOS_BUILD_HDF
 #endif // OHOS_BUILD_ENABLE_TOUCH
@@ -153,8 +155,8 @@ private:
     DisplayGroupInfo displayGroupInfo_;
     MouseLocation mouseLocation_ = { -1, -1 };
 #ifdef OHOS_BUILD_HDF
-    std::shared_ptr<IInputDevice::AxisInfo> xInfoHDF_;
-    std::shared_ptr<IInputDevice::AxisInfo> yInfoHDF_;
+    std::shared_ptr<IDevice::AxisInfo> xInfoHDF_;
+    std::shared_ptr<IDevice::AxisInfo> yInfoHDF_;
 #endif // OHOS_BUILD_HDF
 };
 
