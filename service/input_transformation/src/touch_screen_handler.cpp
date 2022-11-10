@@ -29,7 +29,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Touch
 };
 std::shared_ptr<TouchScreenHandler> TouchScreenHandler::CreateInstance()
 {
-    return std::make_shared<TouchScreenHandler>();
+    return std::shared_ptr<TouchScreenHandler>(new TouchScreenHandler());
 }
 
 TouchScreenHandler::TouchScreenHandler()
@@ -231,7 +231,7 @@ bool TouchScreenHandler::OnEventTouchMotion(const std::shared_ptr<const AbsEvent
         MMI_HILOGE("Get TouchMotionPointToDisplayPoint failed");
         return false;
     }
-    PointerEvent::PointerItem item;
+    PointerEvent::PointerItem item = {};
     int32_t seatSlot = absEvent->GetCurSlot();
     if (!(pointerEvent_->GetPointerItem(seatSlot, item))) {
         MMI_HILOGE("Get pointer parameter failed");

@@ -15,11 +15,17 @@
 
 #include "kernel_event_handler_bridge.h"
 
+#include "define_multimodal.h"
+
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KernelEventHandlerBridge" };
+}
+
 std::shared_ptr<IKernelEventHandler> KernelEventHandlerBridge::CreateInstance(const std::shared_ptr<ITouchScreenHandler> handler)
 {
-    return std::make_shared<KernelEventHandlerBridge>(handler);
+    return std::shared_ptr<IKernelEventHandler>(new KernelEventHandlerBridge(handler));
 }
 
 KernelEventHandlerBridge::KernelEventHandlerBridge(const std::shared_ptr<ITouchScreenHandler> handler)
