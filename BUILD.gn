@@ -14,44 +14,25 @@
 import("//build/ohos.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
-ohos_prebuilt_etc("mmi_uinput.rc") {
-  source = "mmi_uinput.rc"
-  relative_install_dir = "init"
-  part_name = "input"
-  subsystem_name = "multimodalinput"
+group("third_party_group") {
+  deps = [ "//foundation/multimodalinput/input/patch:patch_packages", ]
+  if (input_feature_libinput) {
+    deps += [
+      "//third_party/eudev:libudev",
+      "//third_party/eudev:udevd",
+      "//third_party/eudev:udevadm",
+      "//third_party/eudev:udevd.rc",
+      "//third_party/eudev:udev_conf",
+      "//third_party/eudev:udev_touchscreen_rule",
+      "//third_party/eudev:udev_vk_rule",
+      "//third_party/libevdev:libevdev"
+    ]
+  }
 }
 
 ohos_prebuilt_etc("multimodalinput.rc") {
   source = "multimodalinput.cfg"
   relative_install_dir = "init"
-  part_name = "input"
-  subsystem_name = "multimodalinput"
-}
-
-ohos_executable("uinput_inject") {
-  install_enable = true
-
-  sources = [
-    "uinput/hdf_device_event_dispatch.cpp",
-    "uinput/hdf_device_event_manager.cpp",
-    "uinput/inject_thread.cpp",
-    "uinput/keyboard_inject.cpp",
-    "uinput/virtual_device.cpp",
-    "uinput/virtual_keyboard.cpp",
-    "uinput/virtual_touch_screen.cpp",
-  ]
-
-  include_dirs = [
-    "//foundation/multimodalinput/input/util/common/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
-  ]
-
-  external_deps = [
-    "c_utils:utils",
-    "drivers_interface_input:hdi_input",
-    "hiviewdfx_hilog_native:libhilog",
-  ]
-
   part_name = "input"
   subsystem_name = "multimodalinput"
 }

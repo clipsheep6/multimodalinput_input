@@ -149,7 +149,7 @@ int32_t KeyEventInputSubscribeManager::UnsubscribeKeyEvent(int32_t subscribeId)
     for (auto it = subscribeInfos_.begin(); it != subscribeInfos_.end(); ++it) {
         if (it->GetSubscribeId() == subscribeId) {
             if (MMIEventHdl.UnsubscribeKeyEvent(subscribeId) != RET_OK) {
-                MMI_HILOGE("Leave, unsubscribe key event failed");
+                MMI_HILOGE("unsubscribe key event failed");
                 return RET_ERR;
             }
             subscribeInfos_.erase(it);
@@ -165,7 +165,7 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
     CHK_PID_AND_TID();
     CHKPR(event, ERROR_NULL_POINTER);
     if (subscribeId < 0) {
-        MMI_HILOGE("Leave, the subscribe id is less than 0");
+        MMI_HILOGE("the subscribe id is less than 0");
         return RET_ERR;
     }
 
@@ -187,7 +187,7 @@ void KeyEventInputSubscribeManager::OnConnected()
 {
     CALL_DEBUG_ENTER;
     if (subscribeInfos_.empty()) {
-        MMI_HILOGD("Leave, subscribeInfos_ is empty");
+        MMI_HILOGD("subscribeInfos_ is empty");
         return;
     }
     for (const auto& subscriberInfo : subscribeInfos_) {

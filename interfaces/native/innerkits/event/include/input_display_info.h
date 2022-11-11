@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DISPLAY_INFO_H
-#define DISPLAY_INFO_H
+#ifndef INPUT_DISPLAY_INFO_H
+#define INPUT_DISPLAY_INFO_H
 
 #include <vector>
 #include <string>
@@ -271,4 +271,4 @@ struct DisplayGroupInfo {
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // DISPLAY_INFO_H
+#endif // INPUT_DISPLAY_INFO_H
