@@ -202,7 +202,7 @@ int32_t Device::UpdateCapability()
     return 0;
 }
 
-bool Device::HasInputProperty(int32_t property)
+bool Device::HasInputProperty(unsigned long property)
 {
     CALL_DEBUG_ENTER;
     auto [index, offset] = GetBitLoc(property);
@@ -213,7 +213,7 @@ bool Device::HasInputProperty(int32_t property)
     return devAbility_.devProp[index] & curBit;
 }
 
-bool Device::HasEventType(int32_t evType) const
+bool Device::HasEventType(unsigned long evType) const
 {
     CALL_DEBUG_ENTER;
     auto [index, offset] = GetBitLoc(evType);
@@ -224,7 +224,7 @@ bool Device::HasEventType(int32_t evType) const
     return devAbility_.eventType[index] & curBit;
 }
 
-bool Device::HasEventCode(int32_t evType, int32_t evCode) const
+bool Device::HasEventCode(unsigned long evType, unsigned long evCode) const
 {
     CALL_DEBUG_ENTER;
     auto [index, offset] = GetBitLoc(evCode);
@@ -265,7 +265,7 @@ bool Device::HasMouseCapability()
     return (HasEventType(EV_REL) &&
             HasEventCode(EV_REL, REL_X) &&
             HasEventCode(EV_REL, REL_Y) &&
-            HasInputProperty(INPUT_PROP_POINTER));
+            HasInputProperty( ));
 }
 
 bool Device::HasKeyboardCapability()

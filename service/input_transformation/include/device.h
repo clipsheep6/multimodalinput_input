@@ -71,8 +71,8 @@ static const int ev_max[EV_MAX + 1] = {
 };
 
 typedef unsigned int bitmask_t;
-constexpr unsigned long BITS_PER_BYTE = 8;
-constexpr unsigned long BITS_PER_LONG = sizeof(unsigned long) * BITS_PER_BYTE;
+static constexpr unsigned long BITS_PER_BYTE = 8;
+static constexpr unsigned long BITS_PER_LONG = sizeof(unsigned long) * BITS_PER_BYTE;
 class IKernelEventHandler;
 class Device : public NonCopyable, public IInputDevice {
 
@@ -98,13 +98,13 @@ private:
     void ReadEvents();
     int32_t CloseDevice();
     int32_t UpdateCapability();
-    bool HasInputProperty(int32_t property);
+    bool HasInputProperty(unsigned long property);
     bool HasMouseCapability();
     bool HasKeyboardCapability();
     bool HasTouchscreenCapability();
 
-    bool HasEventType(int32_t evType) const;
-    bool HasEventCode(int32_t evType, int32_t evCode) const;
+    bool HasEventType(unsigned long evType) const;
+    bool HasEventCode(unsigned long evType, unsigned long evCode) const;
 
     void ProcessSyncEvent(int32_t code, int32_t value);
     void ProcessAbsEvent(int32_t code, int32_t value);
@@ -116,7 +116,7 @@ private:
     int EventtTypeGetMax(unsigned int type);
     int EventIsCode(const struct input_event *ev, unsigned int type, unsigned int code);
 
-    static std::tuple<unsigned int, unsigned int> GetBitLoc(unsigned long evMacro)
+    static std::tuple<unsigned long , unsigned long> GetBitLoc(unsigned long evMacro)
     {
         unsigned long index = evMacro / BITS_PER_LONG;
         unsigned long offset = evMacro % BITS_PER_LONG;
