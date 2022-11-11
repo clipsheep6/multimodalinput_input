@@ -238,7 +238,6 @@ void JsEventTarget::ResetEnv()
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
-    callback_.clear();
     cooperateListener_.clear();
     InputMgr->UnregisterCooperateListener(shared_from_this());
 }

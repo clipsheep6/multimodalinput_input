@@ -35,28 +35,28 @@ JsUtil::CallbackInfo::~CallbackInfo()
     }
 }
 
-napi_value JsUtil::GetEnableInfo(const std::unique_ptr<CallbackInfo> &cb)
+napi_value JsUtil::GetEnableInfo(const sptr<CallbackInfo> &cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);
     return GetResult(cb->env, cb->data.enableResult, cb->data.errCode);
 }
 
-napi_value JsUtil::GetStartInfo(const std::unique_ptr<CallbackInfo> &cb)
+napi_value JsUtil::GetStartInfo(const sptr<CallbackInfo> &cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);
     return GetResult(cb->env, cb->data.startResult, cb->data.errCode);
 }
 
-napi_value JsUtil::GetStopInfo(const std::unique_ptr<CallbackInfo> &cb)
+napi_value JsUtil::GetStopInfo(const sptr<CallbackInfo> &cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);
     return GetResult(cb->env, cb->data.stopResult, cb->data.errCode);
 }
 
-napi_value JsUtil::GetStateInfo(const std::unique_ptr<CallbackInfo> &cb)
+napi_value JsUtil::GetStateInfo(const sptr<CallbackInfo> &cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);

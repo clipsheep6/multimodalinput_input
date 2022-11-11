@@ -35,10 +35,10 @@ napi_value JsInputDeviceCooperateManager::Enable(napi_env env, bool enable, napi
     CALL_INFO_TRACE;
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     auto ret = CreateCallbackInfo(env, handle, cb);
-    auto callback = std::bind(EmitJsEnable, cd, std::placeholders::_1, std::placeholders::_2);
+    auto callback = std::bind(EmitJsEnable, cb, std::placeholders::_1, std::placeholders::_2);
     int32_t errCode = InputMgr->EnableInputDeviceCooperate(enable, callback);
     HandleExecuteResult(env, errCode);
-    return result;
+    return ret;
 }
 
 napi_value JsInputDeviceCooperateManager::Start(napi_env env, const std::string &sinkDeviceDescriptor,
@@ -47,10 +47,10 @@ napi_value JsInputDeviceCooperateManager::Start(napi_env env, const std::string 
     CALL_INFO_TRACE;
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     auto ret = CreateCallbackInfo(env, handle, cb);
-    auto callback = std::bind(EmitJsStart, cd, std::placeholders::_1, std::placeholders::_2);
+    auto callback = std::bind(EmitJsStart, cb, std::placeholders::_1, std::placeholders::_2);
     int32_t errCode = InputMgr->StartInputDeviceCooperate(sinkDeviceDescriptor, srcInputDeviceId, callback);
     HandleExecuteResult(env, errCode);
-    return result;
+    return ret;
 }
 
 napi_value JsInputDeviceCooperateManager::Stop(napi_env env, napi_value handle)
@@ -58,10 +58,10 @@ napi_value JsInputDeviceCooperateManager::Stop(napi_env env, napi_value handle)
     CALL_INFO_TRACE;
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     auto ret = CreateCallbackInfo(env, handle, cb);
-    auto callback = std::bind(EmitJsStop, cd, std::placeholders::_1, std::placeholders::_2);
+    auto callback = std::bind(EmitJsStop, cb, std::placeholders::_1, std::placeholders::_2);
     int32_t errCode = InputMgr->StopDeviceCooperate(callback);
     HandleExecuteResult(env, errCode);
-    return result;
+    return ret;
 }
 
 napi_value JsInputDeviceCooperateManager::GetState(napi_env env, const std::string &deviceDescriptor, napi_value handle)
@@ -69,10 +69,10 @@ napi_value JsInputDeviceCooperateManager::GetState(napi_env env, const std::stri
     CALL_INFO_TRACE;
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     auto ret = CreateCallbackInfo(env, handle, cb);
-    auto callback = std::bind(EmitJsGetState, cd, std::placeholders::_1);
+    auto callback = std::bind(EmitJsGetState, cb, std::placeholders::_1);
     int32_t errCode = InputMgr->GetInputDeviceCooperateState(deviceDescriptor, callback);
     HandleExecuteResult(env, errCode);
-    return result;
+    return ret;
 }
 
 void JsInputDeviceCooperateManager::RegisterListener(napi_env env, const std::string &type, napi_value handle)
