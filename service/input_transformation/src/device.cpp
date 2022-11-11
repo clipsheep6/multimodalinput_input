@@ -86,8 +86,7 @@ void Device::Uninit()
 }
 
 Device::Device(int32_t devIndex, const InputDeviceInfo &devInfo) : IDevice(devIndex),
-    absEventCollector_(devIndex, AbsEvent::SOURCE_TYPE_NONE), eventHandler_(IKernelEventHandler::GetDefault()),
-    deviceOrigin_(devInfo)
+    absEventCollector_(devIndex, AbsEvent::SOURCE_TYPE_NONE), deviceOrigin_(devInfo)
 {}
 
 Device::~Device()
@@ -299,15 +298,17 @@ void Device::ProcessAbsEvent(int32_t code, int32_t value)
     absEventCollector_.HandleAbsEvent(code, value);
 }
 
-void Device::OnEventCollected(const std::shared_ptr<const AbsEvent> event)
+void Device::OnEventCollected(const std::shared_ptr<AbsEvent> event)
 {
     if (!event) {
         MMI_HILOGE("OnEventCollected event is null");
         return;    
     }
-    CHKPV(eventHandler_);
+    if (eventHandler_ == nullptr) {
+        MMI_HILOGE("eventHandler_ is nullptr");
+        return;
+    }
     eventHandler_->OnInputEvent(event);
-    return;
 }
 
 bool Device::HasCapability(int32_t capability) const
@@ -325,7 +326,7 @@ int32_t Device::StartReceiveEvent(const std::shared_ptr<IKernelEventHandler> han
 
 int32_t Device::StopReceiveEvent()
 {
-    eventHandler_ = IKernelEventHandler::GetDefault();
+    eventHandler_ = nullptr;
     return 0;
 }
 

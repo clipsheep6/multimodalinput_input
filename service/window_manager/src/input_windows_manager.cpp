@@ -425,7 +425,7 @@ const DisplayInfo* InputWindowsManager::FindPhysicalDisplayInfo(const std::strin
 }
 
 #ifdef OHOS_BUILD_HDF
-bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, const std::shared_ptr<const AbsEvent> absEvent,
+bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, const std::shared_ptr<AbsEvent> absEvent,
                                                   EventTouch& touchInfo, int32_t& physicalDisplayId)
 {
     CHKPF(absEvent);
@@ -522,7 +522,7 @@ int32_t InputWindowsManager::TransformY(int32_t yPos, int32_t height, int32_t lo
     return result;
 }
 
-void InputWindowsManager::GetPhysicalDisplayCoord(const std::shared_ptr<const AbsEvent> absEvent,
+void InputWindowsManager::GetPhysicalDisplayCoord(const std::shared_ptr<AbsEvent> absEvent,
         const DisplayInfo& info, EventTouch& touchInfo)
 {
     CHKPV(absEvent);

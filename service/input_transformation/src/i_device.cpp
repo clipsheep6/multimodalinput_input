@@ -17,8 +17,6 @@
 
 #include <linux/input-event-codes.h>
 
-#include "i_input_define.h"
-
 namespace OHOS {
 namespace MMI {
 const std::string IDevice::AxisToString(int32_t axis)

@@ -32,9 +32,9 @@ KernelEventHandlerBridge::KernelEventHandlerBridge(const std::shared_ptr<ITouchS
     : touchScreenHandle_(handler)
 {}
 
-void KernelEventHandlerBridge::OnInputEvent(const std::shared_ptr<const KernelKeyEvent> event) {}
+void KernelEventHandlerBridge::OnInputEvent(const std::shared_ptr<KernelKeyEvent> event) {}
 
-void KernelEventHandlerBridge::OnInputEvent(const std::shared_ptr<const AbsEvent> event)
+void KernelEventHandlerBridge::OnInputEvent(const std::shared_ptr<AbsEvent> event)
 {
     CHKPV(touchScreenHandle_);
     touchScreenHandle_->OnInputEvent(event);

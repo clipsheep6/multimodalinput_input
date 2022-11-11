@@ -23,12 +23,12 @@ namespace OHOS {
 namespace MMI {
 class KernelEventHandlerBridge final : public IKernelEventHandler {
 public:
-    static std::shared_ptr<IKernelEventHandler> CreateInstance(const std::shared_ptr<ITouchScreenHandler> touchScreenHandle);
+    static std::shared_ptr<IKernelEventHandler> CreateInstance(const std::shared_ptr<ITouchScreenHandler> handler);
 public:
-    virtual void OnInputEvent(const std::shared_ptr<const KernelKeyEvent> event) override ;
-    virtual void OnInputEvent(const std::shared_ptr<const AbsEvent> event) override;
+    virtual void OnInputEvent(const std::shared_ptr<KernelKeyEvent> event) override ;
+    virtual void OnInputEvent(const std::shared_ptr<AbsEvent> event) override;
 private:
-    KernelEventHandlerBridge(const std::shared_ptr<ITouchScreenHandler> touchScreenHandle);
+    KernelEventHandlerBridge(const std::shared_ptr<ITouchScreenHandler> handler);
 private:
     std::shared_ptr<ITouchScreenHandler> touchScreenHandle_;
 };

@@ -67,7 +67,7 @@ public:
     bool TouchPointToDisplayPoint(int32_t deviceId, struct libinput_event_touch* touch,
         EventTouch& touchInfo, int32_t& targetDisplayId);
 #ifdef OHOS_BUILD_HDF
-    bool TouchPointToDisplayPoint(int32_t deviceId, const std::shared_ptr<const AbsEvent> absEvent,
+    bool TouchPointToDisplayPoint(int32_t deviceId, const std::shared_ptr<AbsEvent> absEvent,
         EventTouch& touchInfo, int32_t& targetDisplayId);
 #endif // OHOS_BUILD_HDF
     void RotateTouchScreen(DisplayInfo info, LogicalCoordinate& coord) const;
@@ -131,7 +131,7 @@ private:
 #ifdef OHOS_BUILD_HDF
     int32_t TransformX(int32_t xPos, int32_t width, int32_t logicalWidth) const;
     int32_t TransformY(int32_t yPos, int32_t height, int32_t logicalHeight) const;
-    void GetPhysicalDisplayCoord(const std::shared_ptr<const AbsEvent> absEvent,
+    void GetPhysicalDisplayCoord(const std::shared_ptr<AbsEvent> absEvent,
         const DisplayInfo& info, EventTouch& touchInfo);
 #endif // OHOS_BUILD_HDF
 #endif // OHOS_BUILD_ENABLE_TOUCH

@@ -28,8 +28,6 @@
 #include "abs_event_collector.h"
 #include "abs_event.h"
 #include "hdf_adapter.h"
-#include "i_event_collector.h"
-#include "i_input_define.h"
 #include "i_device.h"
 
 struct input_event;
@@ -77,7 +75,7 @@ private:
     void ProcessAbsEvent(int32_t code, int32_t value);
     void ProcessMscEvent(int32_t code, int32_t value);
     void ProcessEventInner(const input_event &event);
-    void OnEventCollected(const std::shared_ptr<const AbsEvent> event);
+    void OnEventCollected(const std::shared_ptr<AbsEvent> event);
     int EventIsType(const struct input_event& ev, unsigned int type);
     int EventTypeGetMax(unsigned int type);
     int EventIsCode(const struct input_event& ev, unsigned int type, unsigned int code);
@@ -97,7 +95,7 @@ private:
     AbsEventCollector absEventCollector_;
     mtdev* mtdev_ { nullptr };
     mutable std::map<int32_t, std::shared_ptr<IDevice::AxisInfo>> axises_;
-    std::shared_ptr<IKernelEventHandler> eventHandler_;
+    std::shared_ptr<IKernelEventHandler> eventHandler_ { nullptr };
     InputDeviceInfo deviceOrigin_ {};
 };
 } // namespace MMI

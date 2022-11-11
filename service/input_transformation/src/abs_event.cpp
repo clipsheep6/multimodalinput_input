@@ -17,7 +17,6 @@
 #include <algorithm>
 #include <linux/input.h>
 
-#include "i_input_define.h"
 #include "mmi_log.h"
 
 namespace OHOS {
@@ -87,19 +86,12 @@ int32_t AbsEvent::GetCurSlot() const
 
 int32_t AbsEvent::SetSourceType(int32_t sourceType)
 {
-    if (sourceType <= SOURCE_TYPE_NONE || sourceType >= SOURCE_TYPE_END)
-    {
+    if ((sourceType <= SOURCE_TYPE_NONE) || (sourceType >= SOURCE_TYPE_END)) {
         MMI_HILOGE("Invalid sourceType:%{public}s", SourceToString(sourceType));
-        return -1;
+        return RET_ERR;
     }
-
-    if (sourceType_ > SOURCE_TYPE_NONE && sourceType_ < SOURCE_TYPE_END) {
-        MMI_HILOGE("Valid sourceType_:%{public}s", SourceToString(sourceType_));
-        return -1;
-    }
-
     sourceType_ = sourceType;
-    return 0;
+    return RET_OK;
 }
 
 int32_t AbsEvent::AddPointer(const std::shared_ptr<Pointer> pointer)

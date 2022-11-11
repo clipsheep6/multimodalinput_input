@@ -23,7 +23,6 @@
 #include "nocopyable.h"
 
 #include "abs_event.h"
-#include "i_input_define.h"
 #include "i_device.h"
 
 namespace OHOS {
@@ -45,9 +44,7 @@ protected:
     void HandleMtTrackingId(int32_t value);
     std::shared_ptr<AbsEvent::Pointer> GetCurrentPointer(bool createIfNotExist);
     const std::shared_ptr<AbsEvent> FinishPointer();
-    void RemoveReleasedPointer();
 private:
-    int32_t sourceType_ { -1 };
     int32_t curSlot_ {};
     int32_t slotNum_ { 10 };
     int32_t absEventAction_ { AbsEvent::ACTION_NONE };
