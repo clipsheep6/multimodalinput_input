@@ -131,7 +131,8 @@ int32_t MultimodalInputConnectManager::UnregisterDevListener()
     return multimodalInputConnectService_->UnregisterDevListener();
 }
 
-int32_t MultimodalInputConnectManager::SupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke)
+int32_t MultimodalInputConnectManager::SupportKeys(int32_t deviceId, std::vector<int32_t> &keys,
+    std::vector<bool> &keystroke)
 {
     CHKPR(multimodalInputConnectService_, RET_ERR);
     return multimodalInputConnectService_->SupportKeys(deviceId, keys, keystroke);

@@ -316,7 +316,8 @@ int32_t MultimodalInputConnectProxy::UnregisterDevListener()
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::SupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke)
+int32_t MultimodalInputConnectProxy::SupportKeys(int32_t deviceId, std::vector<int32_t> &keys,
+    std::vector<bool> &keystroke)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
