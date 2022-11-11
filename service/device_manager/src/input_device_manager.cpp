@@ -332,13 +332,13 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
 void InputDeviceManager::MakeDeviceInfo(struct libinput_device *inputDevice, struct InputDeviceInfo& info)
 {
     info.inputDeviceOrigin = inputDevice;
+    info.isTouchableDevice = IsTouchDevice(inputDevice);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     info.isRemote = IsRemote(inputDevice);
     if (info.isRemote) {
         info.networkIdOrigin = MakeNetworkId(libinput_device_get_phys(inputDevice));
     }
     info.dhid = GenerateDescriptor(inputDevice, info.isRemote);
-    info.isTouchableDevice = IsTouchDevice(inputDevice);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 }
 
