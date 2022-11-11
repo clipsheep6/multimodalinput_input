@@ -59,7 +59,7 @@ public:
     bool IsPointerVisible() override;
     void SetPointerLocation(int32_t pid, int32_t x, int32_t y) override;
     void SetMouseDisplayState(bool state) override;
-    bool GetMouseDisplayState() override;
+    bool GetMouseDisplayState() const override;
     void AdjustMouseFocus(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
 
 private:
