@@ -219,7 +219,7 @@ void PointerDrawingManager::SetMouseDisplayState(bool state)
     }
 }
 
-bool PointerDrawingManager::GetMouseDisplayState() 
+bool PointerDrawingManager::GetMouseDisplayState() const
 {
     return mouseDisplayState_;
 }

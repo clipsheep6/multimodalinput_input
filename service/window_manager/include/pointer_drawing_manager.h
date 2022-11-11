@@ -59,6 +59,8 @@ public:
     bool IsPointerVisible() override;
     void SetPointerLocation(int32_t pid, int32_t x, int32_t y) override;
     void AdjustMouseFocus(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
+    void SetMouseDisplayState(bool state) override;
+    bool GetMouseDisplayState() const override;
 
 private:
     void CreatePointerWindow(int32_t displayId, int32_t physicalX, int32_t physicalY);
@@ -74,8 +76,7 @@ private:
     void UpdatePidInfo(int32_t pid, bool visible);
     void InitStyle();
     int32_t InitLayer(const MOUSE_ICON mouseStyle);
-    void SetMouseDisplayState(bool state) override;
-    bool GetMouseDisplayState() override;
+    
 private:
     struct PidInfo {
         int32_t pid { 0 };

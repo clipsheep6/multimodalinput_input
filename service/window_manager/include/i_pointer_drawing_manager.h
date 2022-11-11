@@ -57,7 +57,7 @@ public:
         return false;
     }
     virtual void SetMouseDisplayState(bool state) {}
-    virtual bool GetMouseDisplayState()
+    virtual bool GetMouseDisplayState() const
     {
         return true;
     }
