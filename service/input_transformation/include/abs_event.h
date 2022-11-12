@@ -36,8 +36,6 @@ public:
     static constexpr int32_t SOURCE_TYPE_TOUCHSCREEN = 1;
     static constexpr int32_t SOURCE_TYPE_TOUCHPAD = 2;
     static constexpr int32_t SOURCE_TYPE_END = 3;
-    static const char* SourceToString(int32_t sourceType);
-    static const char* ActionToString(int32_t action);
 public:
     class Pointer {
         public:
@@ -52,7 +50,6 @@ public:
             bool GetRefreshState() { return isReflashed_; }
             void SetAction(int32_t pointerAction) { pointerAction_ = pointerAction;}
             int32_t GetAction() { return pointerAction_;}
-            friend std::ostream& operator<<(std::ostream& os, const AbsEvent::Pointer& pointer);
         private:
             int32_t id_ {-1};
             int32_t x_ {-1};
@@ -65,19 +62,15 @@ public:
 public:
     AbsEvent(int32_t deviceId, int32_t sourceType);
     virtual ~AbsEvent() = default;
-    int32_t GetSourceType() const;
-    std::shared_ptr<AbsEvent::Pointer> GetPointer() const;
-    void SetCurSlot(int32_t curSlot);
-    int32_t GetCurSlot() const;
-    friend std::ostream& operator<<(std::ostream& os, const AbsEvent &r);
+    int32_t GetSourceType() const { return sourceType_; }
+    std::shared_ptr<AbsEvent::Pointer> GetPointer() const { return curPointer_; }
+    void SetCurSlot(int32_t curSlot) { curSlot_ = curSlot; }
+    int32_t GetCurSlot() const { return curSlot_; }
     int32_t SetSourceType(int32_t sourceType);
     void SetAxisInfo(std::shared_ptr<IDevice::AxisInfo> xInfo, std::shared_ptr<IDevice::AxisInfo> yInfo);
     std::tuple<std::shared_ptr<IDevice::AxisInfo>, std::shared_ptr<IDevice::AxisInfo>> GetAxisInfo() const;
     int32_t SetPointer(const std::shared_ptr<Pointer> pointer);
-protected:
-    virtual std::string ActionToStr(int32_t action) const override;
 private:
-    int32_t pointerId_;
     int32_t sourceType_;
     int32_t curSlot_;
     std::shared_ptr<IDevice::AxisInfo> xInfo_ { nullptr };

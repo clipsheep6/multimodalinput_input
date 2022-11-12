@@ -36,16 +36,6 @@ std::shared_ptr<TouchScreenHandler> TouchScreenHandler::CreateInstance()
 TouchScreenHandler::TouchScreenHandler()
 {}
 
-std::shared_ptr<PointerEvent> TouchScreenHandler::GetPointerEvent()
-{
-    return pointerEvent_;
-}
-
-std::shared_ptr<IDevice> TouchScreenHandler::GetDevice()
-{
-    return inputDevice_;
-}
-
 int32_t TouchScreenHandler::BindInputDevice(const std::shared_ptr<IDevice> inputDevice)
 {
     CALL_DEBUG_ENTER;
@@ -59,10 +49,10 @@ int32_t TouchScreenHandler::UnbindInputDevice(const std::shared_ptr<IDevice> inp
     CALL_DEBUG_ENTER;
     if (inputDevice != inputDevice_) {
         MMI_HILOGE("inputDevice != inputDevice_");
-        return -1;
+        return RET_ERR;
     }
     inputDevice_.reset();
-    return 0;
+    return RET_OK;
 }
 
 void TouchScreenHandler::ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent)

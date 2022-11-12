@@ -41,7 +41,6 @@ public:
     static const int32_t AXIS_MT_X = 0b1;
     static const int32_t AXIS_MT_Y = 0b10;
     static const int32_t AXIS_MAX = 0b11;
-    static const std::string AxisToString(int32_t axis);
     class AxisInfo {
         public:
             int32_t GetAxis() const { return axis_; }

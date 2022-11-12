@@ -34,7 +34,6 @@ public:
     void SetActionTime(int64_t actionTime) { actionTime_ = actionTime; }
 protected:
     KernelEventBase(int32_t devIndex, int32_t action) : devIndex_(devIndex), action_(action), actionTime_(-1) {}
-    virtual std::string ActionToStr(int32_t action) const = 0;
 private:
     const int32_t devIndex_;
     int32_t action_;
@@ -45,9 +44,9 @@ inline std::ostream& operator<<(std::ostream &os, const KernelEventBase &r)
 {
     return os << '{'
         << "devIndex:" << r.devIndex_ << ','
-        << "action:" << r.ActionToStr(r.action_) << ','
+        << "action:" << r.action_ << ','
         << "actionTime:" << r.actionTime_
-        << '}';    
+        << '}';
 }
 } // namespace MMI
 } // namespace OHOS

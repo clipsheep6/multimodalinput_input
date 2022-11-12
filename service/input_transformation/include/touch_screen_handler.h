@@ -34,8 +34,8 @@ class TouchScreenHandler final : public ITouchScreenHandler {
 public:
     virtual ~TouchScreenHandler() = default;
     DISALLOW_COPY_AND_MOVE(TouchScreenHandler);
-    virtual std::shared_ptr<IDevice> GetDevice() override;
-    virtual std::shared_ptr<PointerEvent> GetPointerEvent() override;
+    virtual std::shared_ptr<IDevice> GetDevice() override { return inputDevice_; }
+    virtual std::shared_ptr<PointerEvent> GetPointerEvent() override { return pointerEvent_; }
     virtual int32_t BindInputDevice(const std::shared_ptr<IDevice> inputDevice) override;
     virtual int32_t UnbindInputDevice(const std::shared_ptr<IDevice> inputDevice) override;
     virtual void OnInputEvent(const std::shared_ptr<AbsEvent> event) override;

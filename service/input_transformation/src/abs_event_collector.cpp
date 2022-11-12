@@ -15,9 +15,7 @@
 
 #include "abs_event_collector.h"
 
-#include <cstddef>
 #include <linux/input.h>
-#include <memory>
 
 #include "abs_event.h"
 #include "error_multimodal.h"
@@ -35,34 +33,39 @@ AbsEventCollector::AbsEventCollector(int32_t devIndex, int32_t sourceType, OnCol
 void AbsEventCollector::HandleAbsEvent(int32_t code, int32_t value)
 {
     switch (code) {
-        case ABS_MT_SLOT:
+        case ABS_MT_SLOT: {
             HandleMtSlot(value);
             break;
+        }
         case ABS_MT_TOUCH_MAJOR:
         case ABS_MT_TOUCH_MINOR:
         case ABS_MT_WIDTH_MAJOR:
         case ABS_MT_WIDTH_MINOR:
         case ABS_MT_ORIENTATION:
             break;
-        case ABS_MT_POSITION_X:
+        case ABS_MT_POSITION_X: {
             HandleMtPositionX(value);
             break;
-        case ABS_MT_POSITION_Y:
+        }
+        case ABS_MT_POSITION_Y: {
             HandleMtPositionY(value);
             break;
+        }
         case ABS_MT_TOOL_TYPE:
         case ABS_MT_BLOB_ID:
             break;
-        case ABS_MT_TRACKING_ID:
+        case ABS_MT_TRACKING_ID: {
             HandleMtTrackingId(value);
             break;
+        }
         case ABS_MT_PRESSURE:
         case ABS_MT_DISTANCE:
         case ABS_MT_TOOL_X:
         case ABS_MT_TOOL_Y:
-        default:
+        default: {
             MMI_HILOGW("Unknown type: %{public}d", code);
             break;
+        }
     }
 }
 

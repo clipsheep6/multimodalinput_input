@@ -95,21 +95,10 @@ Device::~Device()
     Uninit();
 }
 
-void Device::SetDeviceId(int32_t deviceId)
-{
-    deviceId_ = deviceId;
-}
-
-int32_t Device::GetDeviceId() const
-{
-    return deviceId_;
-}
-
 std::shared_ptr<IDevice::AxisInfo> Device::GetAxisInfo(int32_t axis) const
 {
     auto it = axises_.find(axis);
     if (it != axises_.end()) {
-       MMI_HILOGD("Deivce index:%{public}d axis:%{public}s", GetDevIndex(), IDevice::AxisToString(axis).c_str());
         return it->second;
     }
     int32_t absCode = -1;
@@ -123,7 +112,6 @@ std::shared_ptr<IDevice::AxisInfo> Device::GetAxisInfo(int32_t axis) const
             break;
         }
         default: {
-            MMI_HILOGE("Device index:%{public}d,Unknown axis%{public}s", GetDevIndex(), AxisToString(axis).c_str());
             return nullptr;
         }
     }
@@ -208,7 +196,7 @@ int32_t Device::UpdateCapability()
     return RET_OK;
 }
 
-bool Device::HasInputProperty(int32_t property)
+bool Device::HasInputProperty(unsigned int property)
 {
     CALL_DEBUG_ENTER;
     auto [index, offset] = GetBitLoc(property);
@@ -219,7 +207,7 @@ bool Device::HasInputProperty(int32_t property)
     return deviceOrigin_.abilitySet.devProp[index] & curBit;
 }
 
-bool Device::HasEventType(int32_t evType) const
+bool Device::HasEventType(unsigned int evType) const
 {
     CALL_DEBUG_ENTER;
     auto [index, offset] = GetBitLoc(evType);
@@ -230,7 +218,7 @@ bool Device::HasEventType(int32_t evType) const
     return deviceOrigin_.abilitySet.eventType[index] & curBit;
 }
 
-bool Device::HasEventCode(int32_t evType, int32_t evCode) const
+bool Device::HasEventCode(unsigned int evType, unsigned int evCode) const
 {
     CALL_DEBUG_ENTER;
     auto [index, offset] = GetBitLoc(evCode);
@@ -347,11 +335,6 @@ int Device::EventIsCode(const struct input_event& ev, unsigned int type, unsigne
     }
 	int max = EventTypeGetMax(type);
 	return (max > -1 && code <= (unsigned int)max && ev.code == code);
-}
-
-const InputDeviceInfo& Device::GetInputDeviceInfo() const
-{
-    return deviceOrigin_;
 }
 } // namespace MMI
 } // namespace OHOS

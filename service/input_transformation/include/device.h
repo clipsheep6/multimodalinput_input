@@ -56,21 +56,21 @@ public:
     virtual int32_t StartReceiveEvent(const std::shared_ptr<IKernelEventHandler> eventHandler) override;
     virtual int32_t StopReceiveEvent() override;
     virtual void ProcessEvent(const struct input_event& event) override;
-    virtual void SetDeviceId(int32_t deviceId) override;
-    virtual int32_t GetDeviceId() const override;
-    virtual const InputDeviceInfo& GetInputDeviceInfo() const override;
+    virtual void SetDeviceId(int32_t deviceId) override { deviceId_ = deviceId; }
+    virtual int32_t GetDeviceId() const override { return deviceId_; }
+    virtual const InputDeviceInfo& GetInputDeviceInfo() const override { return deviceOrigin_; }
 protected:
     void Uninit();
     int32_t CheckAndUpdateAxisInfo();
 private:
     int32_t CloseDevice();
     int32_t UpdateCapability();
-    bool HasInputProperty(int32_t property);
+    bool HasInputProperty(unsigned int property);
     bool HasMouseCapability();
     bool HasKeyboardCapability();
     bool HasTouchscreenCapability();
-    bool HasEventType(int32_t evType) const;
-    bool HasEventCode(int32_t evType, int32_t evCode) const;
+    bool HasEventType(unsigned int evType) const;
+    bool HasEventCode(unsigned int evType, unsigned int evCode) const;
     void ProcessSyncEvent();
     void ProcessAbsEvent(int32_t code, int32_t value);
     void ProcessMscEvent(int32_t code, int32_t value);
@@ -78,7 +78,7 @@ private:
     void OnEventCollected(const std::shared_ptr<AbsEvent> event);
     int EventIsType(const struct input_event& ev, unsigned int type);
     int EventTypeGetMax(unsigned int type);
-    int EventIsCode(const struct input_event& ev, unsigned int type, unsigned int code);
+    int EventIsCode(const struct input_event& ev, uint32_t type, uint32_t code);
     static std::tuple<unsigned int, unsigned int> GetBitLoc(unsigned long evMacro)
     {
         unsigned long index = evMacro / BITS_PER_LONG;
