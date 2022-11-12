@@ -153,7 +153,7 @@ void JsEventTarget::OnDeviceAdded(int32_t deviceId, const std::string &type)
         CHKPC(item);
         CHKPC(item->env);
         uv_loop_s *loop = nullptr;
-        CHKRV(item->env, napi_get_uv_event_loop(item->env, &loop), GET_UV_LOOP);
+        CHKRV(napi_get_uv_event_loop(item->env, &loop), GET_UV_LOOP);
         uv_work_t *work = new (std::nothrow) uv_work_t;
         CHKPV(work);
         item->data.deviceId = deviceId;
@@ -180,7 +180,7 @@ void JsEventTarget::OnDeviceRemoved(int32_t deviceId, const std::string &type)
         CHKPC(item);
         CHKPC(item->env);
         uv_loop_s *loop = nullptr;
-        CHKRV(item->env, napi_get_uv_event_loop(item->env, &loop), GET_UV_LOOP);
+        CHKRV(napi_get_uv_event_loop(item->env, &loop), GET_UV_LOOP);
         uv_work_t *work = new (std::nothrow) uv_work_t;
         CHKPV(work);
         item->data.deviceId = deviceId;
@@ -284,7 +284,7 @@ void JsEventTarget::EmitJsIds(int32_t userData, std::vector<int32_t> &ids)
     iter->second->data.ids = ids;
     iter->second->errCode = RET_OK;
     uv_loop_s *loop = nullptr;
-    CHKRV(iter->second->env, napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_LOOP);
+    CHKRV(napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
     int32_t *uData = new (std::nothrow) int32_t(userData);
@@ -394,7 +394,7 @@ void JsEventTarget::EmitJsDev(int32_t userData, std::shared_ptr<InputDevice> dev
     iter->second->data.device = device;
     iter->second->errCode = RET_OK;
     uv_loop_s *loop = nullptr;
-    CHKRV(iter->second->env, napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_LOOP);
+    CHKRV(napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
     int32_t *uData = new (std::nothrow) int32_t(userData);
@@ -543,7 +543,7 @@ void JsEventTarget::EmitSupportKeys(int32_t userData, std::vector<bool> &keystro
     iter->second->data.keystrokeAbility = keystrokeAbility;
     iter->second->errCode = RET_OK;
     uv_loop_s *loop = nullptr;
-    CHKRV(iter->second->env, napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_LOOP);
+    CHKRV(napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
     int32_t *uData = new (std::nothrow) int32_t(userData);
@@ -581,7 +581,7 @@ void JsEventTarget::EmitJsKeyboardType(int32_t userData, int32_t keyboardType)
     iter->second->data.keyboardType = keyboardType;
     iter->second->errCode = RET_OK;
     uv_loop_s *loop = nullptr;
-    CHKRV(iter->second->env, napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_LOOP);
+    CHKRV(napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_LOOP);
 
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
@@ -890,7 +890,7 @@ void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_valu
         }
     }
     napi_ref ref = nullptr;
-    CHKRV(env, napi_create_reference(env, handle, 1, &ref), CREATE_REFERENCE);
+    CHKRV(napi_create_reference(env, handle, 1, &ref), CREATE_REFERENCE);
     auto monitor = std::make_unique<JsUtil::CallbackInfo>();
     CHKPV(monitor);
     monitor->env = env;
@@ -944,9 +944,9 @@ napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, co
     cb->isApi9 = isApi9;
     napi_value promise = nullptr;
     if (handle == nullptr) {
-        CHKRP(env, napi_create_promise(env, &cb->deferred, &promise), CREATE_PROMISE);
+        CHKRP(napi_create_promise(env, &cb->deferred, &promise), CREATE_PROMISE);
     } else {
-        CHKRP(env, napi_create_reference(env, handle, 1, &cb->ref), CREATE_REFERENCE);
+        CHKRP(napi_create_reference(env, handle, 1, &cb->ref), CREATE_REFERENCE);
     }
     callback_.emplace(userData, std::move(cb));
     return promise;
@@ -958,10 +958,10 @@ napi_value JsEventTarget::GreateBusinessError(napi_env env, int32_t errCode, std
     napi_value result = nullptr;
     napi_value resultCode = nullptr;
     napi_value resultMessage = nullptr;
-    CHKRP(env, napi_create_int32(env, errCode, &resultCode), CREATE_INT32);
-    CHKRP(env, napi_create_string_utf8(env, errMessage.data(), NAPI_AUTO_LENGTH, &resultMessage), CREATE_STRING_UTF8);
-    CHKRP(env, napi_create_error(env, nullptr, resultMessage, &result), CREATE_ERROR);
-    CHKRP(env, napi_set_named_property(env, result, ERR_CODE.c_str(), resultCode), SET_NAMED_PROPERTY);
+    CHKRP(napi_create_int32(env, errCode, &resultCode), CREATE_INT32);
+    CHKRP(napi_create_string_utf8(env, errMessage.data(), NAPI_AUTO_LENGTH, &resultMessage), CREATE_STRING_UTF8);
+    CHKRP(napi_create_error(env, nullptr, resultMessage, &result), CREATE_ERROR);
+    CHKRP(napi_set_named_property(env, result, ERR_CODE.c_str(), resultCode), SET_NAMED_PROPERTY);
     return result;
 }
 
