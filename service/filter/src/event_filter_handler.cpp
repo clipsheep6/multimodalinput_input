@@ -24,15 +24,6 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventFilterHandler" };
 } // namespace
 
-EventFilterHandler::EventFilterHandler()
-{
-    CALL_DEBUG_ENTER;
-}
-
-EventFilterHandler::~EventFilterHandler()
-{
-    CALL_DEBUG_ENTER;
-}
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void EventFilterHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
@@ -82,7 +73,10 @@ bool EventFilterHandler::HandlePointerEventFilter(std::shared_ptr<PointerEvent> 
     CALL_DEBUG_ENTER;
     CHKPF(point);
     std::lock_guard<std::mutex> guard(lockFilter_);
-    CHKPF(filter_);
+    if (filter_ == nullptr) {
+        MMI_HILOGD("The filter is not setted");
+        return false;
+    }
     if (filter_->HandlePointerEvent(point)) {
         MMI_HILOGD("Call HandlePointerEvent return true");
         return true;

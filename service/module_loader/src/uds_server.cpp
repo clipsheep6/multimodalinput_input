@@ -29,9 +29,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "UDSServer"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSServer" };
 } // namespace
-UDSServer::UDSServer() {}
 
 UDSServer::~UDSServer()
 {
@@ -114,8 +113,14 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     static constexpr size_t bufferSize = 32 * 1024;
     setsockopt(sockFds[0], SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));
     setsockopt(sockFds[0], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
-    setsockopt(sockFds[1], SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));
-    setsockopt(sockFds[1], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
+    if (tokenType == TokenType::TOKEN_NATIVE) {
+        static constexpr size_t nativeBufferSize = 64 * 1024;
+        setsockopt(sockFds[1], SOL_SOCKET, SO_SNDBUF, &nativeBufferSize, sizeof(nativeBufferSize));
+        setsockopt(sockFds[1], SOL_SOCKET, SO_RCVBUF, &nativeBufferSize, sizeof(nativeBufferSize));
+    } else {
+        setsockopt(sockFds[1], SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));
+        setsockopt(sockFds[1], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
+    }
     MMI_HILOGD("Alloc socketpair, serverFd:%{public}d,clientFd:%{public}d(%{public}d)",
                serverFd, toReturnClientFd, sockFds[1]);
     auto closeSocketFdWhenError = [&serverFd, &toReturnClientFd] {
@@ -143,16 +148,13 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     }
 
     SessionPtr sess = std::make_shared<UDSSession>(programName, moduleType, serverFd, uid, pid);
-    sess->SetTokenType(tokenType);
     if (sess == nullptr) {
         cleanTaskWhenError();
         MMI_HILOGE("make_shared fail. progName:%{public}s,pid:%{public}d,errCode:%{public}d",
             programName.c_str(), pid, MAKE_SHARED_FAIL);
         return RET_ERR;
     }
-#ifdef OHOS_BUILD_MMI_DEBUG
-    sess->SetClientFd(toReturnClientFd);
-#endif // OHOS__BUILD_MMI_DEBUG
+    sess->SetTokenType(tokenType);
 
     if (!AddSession(sess)) {
         cleanTaskWhenError();
@@ -178,14 +180,16 @@ void UDSServer::Dump(int32_t fd, const std::vector<std::string> &args)
     }
 }
 
-void UDSServer::OnConnected(SessionPtr s)
+void UDSServer::OnConnected(SessionPtr sess)
 {
-    MMI_HILOGI("Session desc:%{public}s", s->GetDescript().c_str());
+    CHKPV(sess);
+    MMI_HILOGI("Session desc:%{public}s", sess->GetDescript().c_str());
 }
 
-void UDSServer::OnDisconnected(SessionPtr s)
+void UDSServer::OnDisconnected(SessionPtr sess)
 {
-    MMI_HILOGI("Session desc:%{public}s", s->GetDescript().c_str());
+    CHKPV(sess);
+    MMI_HILOGI("Session desc:%{public}s", sess->GetDescript().c_str());
 }
 
 int32_t UDSServer::AddEpoll(EpollEventType type, int32_t fd)
@@ -236,9 +240,6 @@ void UDSServer::OnEpollRecv(int32_t fd, epoll_event& ev)
     for (int32_t i = 0; i < MAX_RECV_LIMIT; i++) {
         auto size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (size > 0) {
-#ifdef OHOS_BUILD_HAVE_DUMP_DATA
-            DumpData(szBuf, size, LINEINFO, "in %s, read message from fd: %d.", __func__, fd);
-#endif
             if (!buf.Write(szBuf, size)) {
                 MMI_HILOGW("Write data failed. size:%{public}zu", size);
             }

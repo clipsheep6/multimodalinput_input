@@ -99,6 +99,7 @@ void DfxHisysevent::OnDeviceDisconnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::
 void DfxHisysevent::OnUpdateTargetPointer(std::shared_ptr<PointerEvent> pointer, int32_t fd,
     OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
+    CHKPV(pointer);
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
         int32_t ret = OHOS::HiviewDFX::HiSysEvent::Write(
             OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
@@ -129,6 +130,7 @@ void DfxHisysevent::OnUpdateTargetPointer(std::shared_ptr<PointerEvent> pointer,
 void DfxHisysevent::OnUpdateTargetKey(std::shared_ptr<KeyEvent> key, int32_t fd,
     OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
+    CHKPV(key);
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
         int32_t ret = OHOS::HiviewDFX::HiSysEvent::Write(
             OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,

@@ -52,16 +52,6 @@ EventDump::~EventDump() {}
 void ChkConfig(int32_t fd)
 {
     mprintf(fd, "ChkMMIConfig: ");
-#ifdef OHOS_BUILD_LIBINPUT
-    mprintf(fd, "OHOS_BUILD_LIBINPUT");
-#endif
-#ifdef OHOS_BUILD_HDF
-    mprintf(fd, "OHOS_BUILD_HDF");
-#endif
-#ifdef OHOS_BUILD_MMI_DEBUG
-    mprintf(fd, "OHOS_BUILD_MMI_DEBUG");
-#endif // OHOS_BUILD_MMI_DEBUG
-
     mprintf(fd, "DEF_MMI_DATA_ROOT: %s\n", DEF_MMI_DATA_ROOT);
     mprintf(fd, "EXP_CONFIG: %s\n", DEF_EXP_CONFIG);
     mprintf(fd, "EXP_SOPATH: %s\n", DEF_EXP_SOPATH);
@@ -102,6 +92,10 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
 #endif // OHOS_BUILD_ENABLE_COOPERATE
         {NULL, 0, 0, 0}
     };
+    if (args.empty()) {
+        MMI_HILOGE("size of args can't be zero");
+        return;
+    }
     char **argv = new (std::nothrow) char *[args.size()];
     CHKPV(argv);
     if (memset_s(argv, args.size() * sizeof(char*), 0, args.size() * sizeof(char*)) != EOK) {
@@ -201,7 +195,9 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
     }
     RELEASE_RES:
     for (size_t i = 0; i < args.size(); ++i) {
-        delete[] argv[i];
+        if (argv[i] != nullptr) {
+            delete[] argv[i];
+        }
     }
     delete[] argv;
 }

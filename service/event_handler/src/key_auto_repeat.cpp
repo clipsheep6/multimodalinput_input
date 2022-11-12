@@ -48,7 +48,7 @@ int32_t KeyAutoRepeat::AddDeviceConfig(struct libinput_device *device)
     DeviceConfig devConf;
     auto ret = ReadTomlFile(GetTomlFilePath(fileName), devConf);
     if (ret == RET_ERR) {
-        MMI_HILOGE("Read device config file error");
+        MMI_HILOGI("Can not read device config file");
         return RET_ERR;
     }
     int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
@@ -108,6 +108,7 @@ void KeyAutoRepeat::AddHandleTimer(int32_t timeout)
         auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
         CHKPV(inputEventNormalizeHandler);
         inputEventNormalizeHandler->HandleKeyEvent(this->keyEvent_);
+        this->keyEvent_->UpdateId();
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
         int32_t triggertime = KeyRepeat->GetIntervalTime(keyEvent_->GetDeviceId());
         this->AddHandleTimer(triggertime);
@@ -146,7 +147,7 @@ void KeyAutoRepeat::RemoveDeviceConfig(struct libinput_device *device)
     int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
     auto iter = deviceConfig_.find(deviceId);
     if (iter == deviceConfig_.end()) {
-        MMI_HILOGE("Device config file remove failed");
+        MMI_HILOGI("Can not remove device config file");
         return;
     }
     deviceConfig_.erase(iter);
