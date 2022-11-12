@@ -35,22 +35,19 @@ public:
     virtual ~TouchScreenHandler() = default;
     DISALLOW_COPY_AND_MOVE(TouchScreenHandler);
     virtual std::shared_ptr<IDevice> GetDevice() override { return inputDevice_; }
-    virtual std::shared_ptr<PointerEvent> GetPointerEvent() override { return pointerEvent_; }
     virtual int32_t BindInputDevice(const std::shared_ptr<IDevice> inputDevice) override;
     virtual int32_t UnbindInputDevice(const std::shared_ptr<IDevice> inputDevice) override;
     virtual void OnInputEvent(const std::shared_ptr<AbsEvent> event) override;
 protected:
     static std::shared_ptr<TouchScreenHandler> CreateInstance();
     TouchScreenHandler();
-    const std::shared_ptr<PointerEvent> ConvertPointer(const std::shared_ptr<AbsEvent> absEvent);
+    const std::shared_ptr<PointerEvent> TransformToPointerEvent(const std::shared_ptr<AbsEvent> absEvent);
     bool OnEventTouchDown(const std::shared_ptr<AbsEvent> absEvent);
     bool OnEventTouchUp(const std::shared_ptr<AbsEvent> absEvent);
     bool OnEventTouchMotion(const std::shared_ptr<AbsEvent> absEvent);
-    int32_t TransformX(int32_t xPos, int32_t width, int32_t logicalWidth) const;
-    int32_t TransformY(int32_t yPos, int32_t height, int32_t logicalHeight) const;
     void ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent);
 private:
-    std::shared_ptr<IDevice> inputDevice_;
+    std::shared_ptr<IDevice> inputDevice_ { nullptr };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
 };
 } // namespace MMI

@@ -29,8 +29,7 @@ AbsEvent::AbsEvent(int32_t devIndex, int32_t sourceType)
     : KernelEventBase(devIndex, ACTION_NONE), sourceType_(sourceType)
 {}
 
-void AbsEvent::SetAxisInfo(std::shared_ptr<IDevice::AxisInfo> xInfo,
-    std::shared_ptr<IDevice::AxisInfo> yInfo)
+void AbsEvent::SetAxisInfo(std::shared_ptr<IDevice::AxisInfo> xInfo, std::shared_ptr<IDevice::AxisInfo> yInfo)
 {
     xInfo_ = xInfo;
     yInfo_ = yInfo;

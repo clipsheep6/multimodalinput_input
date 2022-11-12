@@ -39,11 +39,11 @@ public:
     void SetAxisInfo(std::shared_ptr<IDevice::AxisInfo> xInfo, std::shared_ptr<IDevice::AxisInfo> yInfo);
 protected:
     void HandleMtSlot(int32_t value);
+    void HandleMtTrackingId(int32_t value);
     void HandleMtPositionX(int32_t value);
     void HandleMtPositionY(int32_t value);
-    void HandleMtTrackingId(int32_t value);
-    std::shared_ptr<AbsEvent::Pointer> GetCurrentPointer(bool createIfNotExist);
     void FinishPointer();
+    std::shared_ptr<AbsEvent::Pointer> GetCurrentPointer(bool createIfNotExist);
 private:
     int32_t curSlot_ {};
     int32_t slotNum_ { 10 };
@@ -52,7 +52,6 @@ private:
     std::shared_ptr<IDevice::AxisInfo> yInfo_ { nullptr };
     std::map<int32_t, std::shared_ptr<AbsEvent::Pointer>> pointers_;
     OnCollectCallback collectCallback_;
-
 };
 } // namespace MMI
 } // namespace OHOS

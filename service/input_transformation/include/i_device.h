@@ -13,19 +13,16 @@
  * limitations under the License.
  */
 
-#ifndef I_INPUT_DEVICE_H
-#define I_INPUT_DEVICE_H
+#ifndef I_DEVICE_H
+#define I_DEVICE_H
 
 #include <memory>
-#include <ostream>
 #include <string>
 
 #include "input_type.h"
 
 namespace OHOS {
 namespace MMI {
-#define CASE_STR(item) case item: do {return #item;} while(0)
-
 inline constexpr size_t LongsOfBits(int32_t bitsCount)  {
     return (bitsCount / (sizeof(long) * 8)) + !!(bitsCount % (sizeof(long) * 8));
 }
@@ -63,20 +60,20 @@ public:
             int32_t flat_ { -1 };
             int32_t resolution_ { -1 };
     };
-    IDevice(uint32_t devIndex) : devIndex_(devIndex) {}
+    explicit IDevice(uint32_t devIndex) : devIndex_(devIndex) {}
     virtual ~IDevice() = default;
     virtual int32_t GetDevIndex() const { return devIndex_; }
+    virtual int32_t GetDeviceId() const = 0;
+    virtual void SetDeviceId(int32_t deviceId) = 0;
+    virtual const InputDeviceInfo& GetInputDeviceInfo() const = 0;
     virtual std::shared_ptr<AxisInfo> GetAxisInfo(int32_t axis) const = 0;
     virtual bool HasCapability(int32_t capability) const = 0;
     virtual void ProcessEvent(const struct input_event &event) = 0;
     virtual int32_t StartReceiveEvent(const std::shared_ptr<IKernelEventHandler> handler) = 0;
     virtual int32_t StopReceiveEvent() = 0;
-    virtual void SetDeviceId(int32_t deviceId) = 0;
-    virtual int32_t GetDeviceId() const = 0;
-    virtual const InputDeviceInfo& GetInputDeviceInfo() const = 0;
 protected:
     const uint32_t devIndex_;
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // I_INPUT_DEVICE_H
+#endif // I_DEVICE_H

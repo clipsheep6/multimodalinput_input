@@ -41,8 +41,9 @@ void AbsEventCollector::HandleAbsEvent(int32_t code, int32_t value)
         case ABS_MT_TOUCH_MINOR:
         case ABS_MT_WIDTH_MAJOR:
         case ABS_MT_WIDTH_MINOR:
-        case ABS_MT_ORIENTATION:
+        case ABS_MT_ORIENTATION: {
             break;
+        }
         case ABS_MT_POSITION_X: {
             HandleMtPositionX(value);
             break;
@@ -52,8 +53,9 @@ void AbsEventCollector::HandleAbsEvent(int32_t code, int32_t value)
             break;
         }
         case ABS_MT_TOOL_TYPE:
-        case ABS_MT_BLOB_ID:
+        case ABS_MT_BLOB_ID: {
             break;
+        }
         case ABS_MT_TRACKING_ID: {
             HandleMtTrackingId(value);
             break;
@@ -118,27 +120,23 @@ void AbsEventCollector::FinishPointer()
             continue;
         }
         auto pointer = iter->second;
-        if (!pointer->GetRefreshState()) {
+        if (!pointer->IsDirty()) {
             iter++;
             continue;
         }
-        pointer->SetRefreshState(false);
+        pointer->MarkIsDirty(false);
         absEvent_->SetPointer(pointer);
+        absEvent_->SetAction(pointer->GetAction());      
+        absEvent_->SetCurSlot(iter->first);
+        absEvent_->SetAxisInfo(xInfo_, yInfo_);
         auto timeNs = std::chrono::steady_clock::now().time_since_epoch();
         auto timeMs = std::chrono::duration_cast<std::chrono::milliseconds>(timeNs).count();
         if (pointer->GetAction() == AbsEvent::ACTION_DOWN) {
             pointer->SetDownTime(timeMs);
         }
-        int32_t action = pointer->GetAction();
-        int32_t slot = iter->first;
-        absEvent_->SetAction(action);
-        absEvent_->SetCurSlot(slot);
         absEvent_->SetActionTime(timeMs);
-        absEvent_->SetAxisInfo(xInfo_, yInfo_);
         collectCallback_(absEvent_);
-        MMI_HILOGE("xcbai slot:%{public}d, action:%{public}d, x:%{public}d, x:%{public}d",
-            slot, action, pointer->GetX(), pointer->GetY());
-        if (action == AbsEvent::ACTION_UP) {
+        if (pointer->GetAction() == AbsEvent::ACTION_UP) {
             pointers_.erase(iter++);
             continue;
         }
@@ -164,8 +162,8 @@ void AbsEventCollector::HandleMtPositionX(int32_t value)
         return;
     }
     pointer->SetX(value);
-    pointer->SetRefreshState(true);
     pointer->SetAction(AbsEvent::ACTION_MOVE);
+    pointer->MarkIsDirty(true);
 }
 
 void AbsEventCollector::HandleMtPositionY(int32_t value)
@@ -176,8 +174,8 @@ void AbsEventCollector::HandleMtPositionY(int32_t value)
         return;
     }
     pointer->SetY(value);
-    pointer->SetRefreshState(true);
     pointer->SetAction(AbsEvent::ACTION_MOVE);
+    pointer->MarkIsDirty(true);
 }
 
 void AbsEventCollector::HandleMtTrackingId(int32_t value)
@@ -192,7 +190,7 @@ void AbsEventCollector::HandleMtTrackingId(int32_t value)
     } else {
         pointer->SetAction(AbsEvent::ACTION_DOWN);
     }
-    pointer->SetRefreshState(true);
+    pointer->MarkIsDirty(true);
 }
 } // namespace MMI
 } // namespace OHOS

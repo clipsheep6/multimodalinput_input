@@ -28,11 +28,10 @@ class ITouchScreenHandler {
 public:
     static std::shared_ptr<ITouchScreenHandler> CreateInstance();
     virtual ~ITouchScreenHandler() = default;
-    virtual std::shared_ptr<PointerEvent> GetPointerEvent() = 0;
-    virtual void OnInputEvent(const std::shared_ptr<AbsEvent> event) = 0;
+    virtual std::shared_ptr<IDevice> GetDevice() = 0;
     virtual int32_t BindInputDevice(const std::shared_ptr<IDevice> inputDevice) = 0;
     virtual int32_t UnbindInputDevice(const std::shared_ptr<IDevice> inputDevice) = 0;
-    virtual std::shared_ptr<IDevice> GetDevice() = 0;
+    virtual void OnInputEvent(const std::shared_ptr<AbsEvent> event) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

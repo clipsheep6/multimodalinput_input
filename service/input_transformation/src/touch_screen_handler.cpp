@@ -15,9 +15,6 @@
 
 #include "touch_screen_handler.h"
 
-#include "event_log_helper.h"
-#include "input_device_manager.h"
-#include "input_event_handler.h"
 #include "input_event_handler.h"
 #include "input_windows_manager.h"
 #include "mmi_log.h"
@@ -33,8 +30,7 @@ std::shared_ptr<TouchScreenHandler> TouchScreenHandler::CreateInstance()
     return std::shared_ptr<TouchScreenHandler>(new TouchScreenHandler());
 }
 
-TouchScreenHandler::TouchScreenHandler()
-{}
+TouchScreenHandler::TouchScreenHandler() {}
 
 int32_t TouchScreenHandler::BindInputDevice(const std::shared_ptr<IDevice> inputDevice)
 {
@@ -73,9 +69,9 @@ void TouchScreenHandler::OnInputEvent(const std::shared_ptr<AbsEvent> event)
         pointerEvent_ = PointerEvent::Create();
         CHKPV(pointerEvent_);
     }
-    auto pointerEvent = ConvertPointer(event);
+    auto pointerEvent = TransformToPointerEvent(event);
     if (!pointerEvent) {
-        MMI_HILOGE("ConvertPointer Failed");
+        MMI_HILOGE("TransformToPointerEvent Failed");
         return;
     }
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
@@ -86,7 +82,7 @@ void TouchScreenHandler::OnInputEvent(const std::shared_ptr<AbsEvent> event)
     }
 }
 
-const std::shared_ptr<PointerEvent> TouchScreenHandler::ConvertPointer(const std::shared_ptr<AbsEvent> event)
+const std::shared_ptr<PointerEvent> TouchScreenHandler::TransformToPointerEvent(const std::shared_ptr<AbsEvent> event)
 {
     CALL_DEBUG_ENTER;
     CHKPP(event);
@@ -192,15 +188,15 @@ bool TouchScreenHandler::OnEventTouchMotion(const std::shared_ptr<AbsEvent> absE
     CHKPF(inputDevice_);
     pointerEvent_->SetActionTime(GetSysClockTime());
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    EventTouch touchInfo;
     int32_t deviceId = inputDevice_->GetDeviceId();
+    EventTouch touchInfo;
     int32_t logicalDisplayId = pointerEvent_->GetTargetDisplayId();
     if (!WinMgr->TouchPointToDisplayPoint(deviceId, absEvent, touchInfo, logicalDisplayId)) {
-        MMI_HILOGE("Get TouchMotionPointToDisplayPoint failed");
+        MMI_HILOGE("Get TouchPointToDisplayPoint failed");
         return false;
     }
-    PointerEvent::PointerItem item = {};
     int32_t seatSlot = absEvent->GetCurSlot();
+    PointerEvent::PointerItem item;
     if (!(pointerEvent_->GetPointerItem(seatSlot, item))) {
         MMI_HILOGE("Get pointer parameter failed, seatSlot:%{public}d", seatSlot);
         return false;
