@@ -48,25 +48,32 @@ public:
             void SetX(int32_t x) { x_ = x; }
             void SetY(int32_t y) { y_ = y; }
             void SetDownTime(int64_t downTime) { downTime_ = downTime; }
+            void SetRefreshState(bool isReflashed) { isReflashed_ = isReflashed; }
+            bool GetRefreshState() { return isReflashed_; }
+            void SetAction(int32_t pointerAction) { pointerAction_ = pointerAction;}
+            int32_t GetAction() { return pointerAction_;}
             friend std::ostream& operator<<(std::ostream& os, const AbsEvent::Pointer& pointer);
         private:
             int32_t id_ {-1};
             int32_t x_ {-1};
             int32_t y_ {-1};
             int64_t downTime_ {-1};
+            bool isReflashed_ = false;
+            int32_t pointerAction_ { AbsEvent::ACTION_NONE };
+            
     };
 public:
     AbsEvent(int32_t deviceId, int32_t sourceType);
     virtual ~AbsEvent() = default;
     int32_t GetSourceType() const;
-    std::shared_ptr<Pointer> GetPointer() const;
+    std::shared_ptr<AbsEvent::Pointer> GetPointer() const;
     void SetCurSlot(int32_t curSlot);
     int32_t GetCurSlot() const;
     friend std::ostream& operator<<(std::ostream& os, const AbsEvent &r);
     int32_t SetSourceType(int32_t sourceType);
     void SetAxisInfo(std::shared_ptr<IDevice::AxisInfo> xInfo, std::shared_ptr<IDevice::AxisInfo> yInfo);
     std::tuple<std::shared_ptr<IDevice::AxisInfo>, std::shared_ptr<IDevice::AxisInfo>> GetAxisInfo() const;
-    int32_t AddPointer(const std::shared_ptr<Pointer> pointer);
+    int32_t SetPointer(const std::shared_ptr<Pointer> pointer);
 protected:
     virtual std::string ActionToStr(int32_t action) const override;
 private:

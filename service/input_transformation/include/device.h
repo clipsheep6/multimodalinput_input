@@ -71,7 +71,7 @@ private:
     bool HasTouchscreenCapability();
     bool HasEventType(int32_t evType) const;
     bool HasEventCode(int32_t evType, int32_t evCode) const;
-    void ProcessSyncEvent(int32_t code, int32_t value);
+    void ProcessSyncEvent();
     void ProcessAbsEvent(int32_t code, int32_t value);
     void ProcessMscEvent(int32_t code, int32_t value);
     void ProcessEventInner(const input_event &event);

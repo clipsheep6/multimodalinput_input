@@ -94,7 +94,7 @@ int32_t AbsEvent::SetSourceType(int32_t sourceType)
     return RET_OK;
 }
 
-int32_t AbsEvent::AddPointer(const std::shared_ptr<Pointer> pointer)
+int32_t AbsEvent::SetPointer(const std::shared_ptr<Pointer> pointer)
 {
     if (!pointer) {
         MMI_HILOGE("null pointer");

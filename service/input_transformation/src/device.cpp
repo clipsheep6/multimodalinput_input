@@ -86,7 +86,8 @@ void Device::Uninit()
 }
 
 Device::Device(int32_t devIndex, const InputDeviceInfo &devInfo) : IDevice(devIndex),
-    absEventCollector_(devIndex, AbsEvent::SOURCE_TYPE_NONE), deviceOrigin_(devInfo)
+    absEventCollector_(devIndex, AbsEvent::SOURCE_TYPE_NONE, std::bind(&Device::OnEventCollected, this, std::placeholders::_1)),
+    deviceOrigin_(devInfo)
 {}
 
 Device::~Device()
@@ -108,7 +109,7 @@ std::shared_ptr<IDevice::AxisInfo> Device::GetAxisInfo(int32_t axis) const
 {
     auto it = axises_.find(axis);
     if (it != axises_.end()) {
-        MMI_HILOGD("Deivce index:%{public}d axis:%{public}s", GetDevIndex(), IDevice::AxisToString(axis).c_str());
+       MMI_HILOGD("Deivce index:%{public}d axis:%{public}s", GetDevIndex(), IDevice::AxisToString(axis).c_str());
         return it->second;
     }
     int32_t absCode = -1;
@@ -170,7 +171,7 @@ void Device::ProcessEventInner(const struct input_event& event)
     auto value = event.value;
     switch (type) {
         case EV_SYN:
-            ProcessSyncEvent(code, value);
+            ProcessSyncEvent();
             break;
         case EV_ABS:
             ProcessAbsEvent(code, value);
@@ -284,13 +285,9 @@ bool Device::HasTouchscreenCapability()
         (HasEventCode(EV_ABS, ABS_MT_POSITION_X) && HasEventCode(EV_ABS, ABS_MT_POSITION_Y))));
 }
 
-void Device::ProcessSyncEvent(int32_t code, int32_t value)
+void Device::ProcessSyncEvent()
 {
-    auto event = absEventCollector_.HandleSyncEvent(code, value);
-    if (event) {
-        OnEventCollected(event);
-        absEventCollector_.AfterProcessed();
-    }
+    absEventCollector_.HandleSyncEvent();
 }
 
 void Device::ProcessAbsEvent(int32_t code, int32_t value)
