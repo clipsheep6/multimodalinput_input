@@ -22,13 +22,16 @@
 
 #include "bytrace_adapter.h"
 #include "multimodal_event_handler.h"
+#include "multimodal_input_connect_manager.h"
+#include "net_packet.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventInputSubscribeManager" };
 constexpr int32_t INVALID_SUBSCRIBE_ID = -1;
-constexpr size_t PRE_KEYS_NUM = 4;
+constexpr size_t PRE_KEYS_NUM = 3;
+constexpr int32_t ANR_SUBSCRIBE = 2;
 } // namespace
 int32_t KeyEventInputSubscribeManager::subscribeIdManager_ = 0;
 
@@ -159,6 +162,23 @@ int32_t KeyEventInputSubscribeManager::UnsubscribeKeyEvent(int32_t subscribeId)
     return RET_ERR;
 }
 
+static void OnSubscribeKeyEventProcessed(int32_t eventId)
+{
+    CALL_DEBUG_ENTER;
+    MMIClientPtr client = MMIEventHdl.GetMMIClient();
+    CHKPV(client);
+    NetPacket pkt(MmiMessageId::MARK_PROCESS);
+    pkt << eventId << ANR_SUBSCRIBE;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write event failed");
+        return;
+    }
+    if (!client->SendMessage(pkt)) {
+        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+        return;
+    }
+}
+
 int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_ptr<KeyEvent> event,
     int32_t subscribeId)
 {
@@ -168,7 +188,11 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
         MMI_HILOGE("Leave, the subscribe id is less than 0");
         return RET_ERR;
     }
-
+    int32_t tokenType = MultimodalInputConnMgr->GetTokenType();
+    if (tokenType == TokenType::TOKEN_HAP) {
+        MMI_HILOGI("Current session is hap");
+        event->SetProcessedCallback(OnSubscribeKeyEventProcessed);
+    }
     std::lock_guard<std::mutex> guard(mtx_);
     BytraceAdapter::StartBytrace(event, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
     auto info = GetSubscribeKeyEvent(subscribeId);

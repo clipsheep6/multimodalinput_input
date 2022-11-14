@@ -16,6 +16,7 @@
 #define JS_REGISTER_UTIL_H
 
 #include <array>
+#include <list>
 
 #include "js_register_module.h"
 #include "key_event.h"
@@ -34,7 +35,8 @@ int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks,
     KeyEventMonitorInfo *event);
 int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks,
     KeyEventMonitorInfo *event, int32_t &subscribeId);
-void EmitAsyncCallbackWork(KeyEventMonitorInfo *event);
+void EmitAsyncCallbackWork(std::list<KeyEventMonitorInfo *>& reportEvents, std::shared_ptr<KeyEvent> keyEvent);
+bool operator<(const std::shared_ptr<KeyOption> &first, const std::shared_ptr<KeyOption> &second);
 } // namespace MMI
 } // namespace OHOS
 #endif // JS_REGISTER_UTIL_H

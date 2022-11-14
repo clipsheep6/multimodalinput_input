@@ -15,6 +15,7 @@
 
 #include "key_subscriber_handler.h"
 
+#include "anr_manager.h"
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
@@ -30,6 +31,7 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeySubscriberHandler" };
 constexpr uint32_t MAX_PRE_KEY_COUNT = 4;
+constexpr int32_t ANR_SUBSCRIBER = 2;
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -193,6 +195,11 @@ void KeySubscriberHandler::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
     InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt);
     int32_t fd = subscriber->sess_->GetFd();
     pkt << fd << subscriber->id_;
+    auto currentTime = GetSysClockTime();
+    if (ANRMgr->TriggerANR(ANR_SUBSCRIBER, currentTime, subscriber->sess_)) {
+        MMI_HILOGW("The key event does not report normally, application not response");
+        return;
+    }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write dispatch subscriber failed");
         return;
@@ -201,6 +208,7 @@ void KeySubscriberHandler::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
         MMI_HILOGE("Leave, server dispatch subscriber failed");
         return;
     }
+    ANRMgr->AddTimer(ANR_SUBSCRIBER, keyEvent->GetId(), currentTime, subscriber->sess_);
 }
 
 bool KeySubscriberHandler::AddTimer(const std::shared_ptr<Subscriber> &subscriber,

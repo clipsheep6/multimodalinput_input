@@ -34,6 +34,7 @@ constexpr size_t PRE_KEYS_SIZE = 4;
 
 static Callbacks callbacks = {};
 
+
 napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonitorInfo* event,
     std::shared_ptr<KeyOption> keyOption)
 {
@@ -143,12 +144,10 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
     return ret;
 }
 
-static bool MatchCombinationKeys(KeyEventMonitorInfo* monitorInfo, std::shared_ptr<KeyEvent> keyEvent)
+static bool MatchCombinationKeys(std::shared_ptr<KeyOption> keyOption, std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPF(monitorInfo);
     CHKPF(keyEvent);
-    auto keyOption = monitorInfo->keyOption;
     CHKPF(keyOption);
     std::vector<KeyEvent::KeyItem> items = keyEvent->GetKeyItems();
     int32_t infoFinalKey = keyOption->GetFinalKey();
@@ -196,19 +195,15 @@ static void SubKeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
-    auto iter = callbacks.begin();
-    while (iter != callbacks.end()) {
-        auto &list = iter->second;
-        ++iter;
-        MMI_HILOGD("list size:%{public}zu", list.size());
-        auto infoIter = list.begin();
-        while (infoIter != list.end()) {
-            auto monitorInfo = *infoIter;
-            if (MatchCombinationKeys(monitorInfo, keyEvent)) {
-                monitorInfo->keyEvent = keyEvent;
-                EmitAsyncCallbackWork(monitorInfo);
+    std::list<KeyEventMonitorInfo *> infos;
+    for (auto& item : callbacks) {
+        if (MatchCombinationKeys(item.first, keyEvent)) {
+            if (item.second.empty()) {
+                return;
             }
-            ++infoIter;
+            EmitAsyncCallbackWork(item.second, keyEvent);
+            MMI_HILOGD("size is %{public}d", item.second.size());
+            break;
         }
     }
 }
