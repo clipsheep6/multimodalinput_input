@@ -64,6 +64,7 @@ public:
     virtual ~IDevice() = default;
     virtual int32_t GetDevIndex() const { return devIndex_; }
     virtual int32_t GetDeviceId() const = 0;
+    virtual bool IsMtDevice() const = 0;
     virtual void SetDeviceId(int32_t deviceId) = 0;
     virtual const InputDeviceInfo& GetInputDeviceInfo() const = 0;
     virtual std::shared_ptr<AxisInfo> GetAxisInfo(int32_t axis) const = 0;

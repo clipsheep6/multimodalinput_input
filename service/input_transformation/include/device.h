@@ -59,6 +59,7 @@ public:
     virtual void SetDeviceId(int32_t deviceId) override { deviceId_ = deviceId; }
     virtual int32_t GetDeviceId() const override { return deviceId_; }
     virtual const InputDeviceInfo& GetInputDeviceInfo() const override { return deviceOrigin_; }
+    virtual bool IsMtDevice() const override { return isMtFlag_; }
 protected:
     void Uninit();
     int32_t CheckAndUpdateAxisInfo();
@@ -73,6 +74,7 @@ private:
     bool HasEventCode(unsigned int evType, unsigned int evCode) const;
     void ProcessSyncEvent();
     void ProcessAbsEvent(int32_t code, int32_t value);
+    void ProcessKeyEvent(int32_t code, int32_t value);
     void ProcessMscEvent(int32_t code, int32_t value);
     void ProcessEventInner(const input_event &event);
     void OnEventCollected(const std::shared_ptr<AbsEvent> event);
@@ -85,6 +87,7 @@ private:
         unsigned long offset = evMacro % BITS_PER_LONG;
         return { index, offset };
     }
+    bool IsMtDevice();
 private:
     int32_t deviceId_ { -1 };
     int32_t capabilities_ { IDevice::CAPABILITY_UNKNOWN };
@@ -94,6 +97,7 @@ private:
     unsigned long absBit[LongsOfBits(ABS_MAX)] {};
     AbsEventCollector absEventCollector_;
     mtdev* mtdev_ { nullptr };
+    bool isMtFlag_ = false;
     mutable std::map<int32_t, std::shared_ptr<IDevice::AxisInfo>> axises_;
     std::shared_ptr<IKernelEventHandler> eventHandler_ { nullptr };
     InputDeviceInfo deviceOrigin_ {};

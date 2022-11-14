@@ -44,8 +44,10 @@ int32_t Device::Init()
         MMI_HILOGE("Leave device Init, UpdateCapability Failed");
         return RET_ERR;
     }
-    if (HasCapability(IDevice::CAPABILITY_TOUCHSCREEN)) {
+    if (HasCapability(IDevice::CAPABILITY_TOUCHSCREEN) && IsMtDevice()) {
         mtdev_ = input_mtdev_open();
+        isMtFlag_ = true;
+        absEventCollector_.SetMtFlag(true);
     }
     if (CheckAndUpdateAxisInfo() != RET_OK) {
         MMI_HILOGE("CheckAndUpdateAxisInfo failed");
@@ -87,7 +89,7 @@ void Device::Uninit()
 }
 
 Device::Device(int32_t devIndex, const InputDeviceInfo &devInfo) : IDevice(devIndex),
-    absEventCollector_(devIndex, AbsEvent::SOURCE_TYPE_NONE,
+    absEventCollector_(devIndex, AbsEvent::SOURCE_TYPE_NONE, 
     std::bind(&Device::OnEventCollected, this, std::placeholders::_1)),
     deviceOrigin_(devInfo)
 {}
@@ -141,6 +143,7 @@ int32_t Device::CloseDevice()
 void Device::ProcessEvent(const struct input_event &event)
 {
     if (mtdev_ == nullptr) {
+        MMI_HILOGE("wjw ProcessEvent mtdev_ = nullptr");
         ProcessEventInner(event);
         return;
     }
@@ -169,7 +172,10 @@ void Device::ProcessEventInner(const struct input_event& event)
             ProcessAbsEvent(code, value);
             break;
         }
-        case EV_KEY:
+        case EV_KEY: {
+            ProcessKeyEvent(code, value);
+            break;
+        }
         case EV_REL:
         case EV_MSC:
         case EV_SW:
@@ -292,7 +298,17 @@ void Device::ProcessSyncEvent()
 
 void Device::ProcessAbsEvent(int32_t code, int32_t value)
 {
-    absEventCollector_.HandleAbsEvent(code, value);
+    if (isMtFlag_) {
+        absEventCollector_.HandleAbsEvent(code, value);
+    } else {
+        absEventCollector_.HandleAbsAbsoluteEvent(code, value);
+    }
+
+}
+
+void Device::ProcessKeyEvent(int32_t code, int32_t value)
+{
+    absEventCollector_.HandleKeyEvent(code, value);
 }
 
 void Device::OnEventCollected(const std::shared_ptr<AbsEvent> event)
@@ -349,5 +365,12 @@ int Device::EventIsCode(const struct input_event& ev, unsigned int type, unsigne
 	int max = EventTypeGetMax(type);
 	return ((max > -1) && (code <= static_cast<unsigned int>(max)) && (ev.code == code));
 }
+
+bool Device::IsMtDevice()
+{
+    return HasEventCode(EV_ABS, ABS_MT_SLOT);// To Do
+}
+
+
 } // namespace MMI
 } // namespace OHOS

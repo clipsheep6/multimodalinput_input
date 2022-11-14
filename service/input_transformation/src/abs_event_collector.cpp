@@ -71,10 +71,50 @@ void AbsEventCollector::HandleAbsEvent(int32_t code, int32_t value)
     }
 }
 
+
+void AbsEventCollector::HandleAbsAbsoluteEvent(int32_t code, int32_t value)
+{
+    switch (code) {
+        case ABS_X: {  
+            auto pointer = GetCurrentPointer(true);
+            if (pointer != nullptr) {
+                pointer->SetX(value);
+                action_ = AbsEvent::ACTION_MOVE;   
+            }           
+            break;
+        }
+        case ABS_Y: {            
+            auto pointer = GetCurrentPointer(true);
+            if (pointer != nullptr) {
+                pointer->SetY(value);
+                action_ = AbsEvent::ACTION_MOVE;   
+            }           
+            break;
+        }
+        case ABS_PRESSURE:{    
+                break;
+        }
+        default: {
+            MMI_HILOGW("Unknown type: %{public}d", code);
+            break;
+        }
+    }
+}
+
+void AbsEventCollector::HandleKeyEvent(int32_t code, int32_t value)
+{
+    if (code == BTN_TOUCH) {
+        if (!isMt_) {
+            action_ =  (value == 1 ) ? AbsEvent::ACTION_DOWN : AbsEvent::ACTION_UP;
+        }
+    }
+}
+
 void AbsEventCollector::HandleSyncEvent()
 {
     FinishPointer();
 }
+
 
 int32_t AbsEventCollector::SetSourceType(int32_t sourceType)
 {
@@ -114,33 +154,114 @@ void AbsEventCollector::FinishPointer()
 {
     CALL_DEBUG_ENTER;
     CHKPV(absEvent_);
-    for (auto iter = pointers_.begin(); iter != pointers_.end();) {
-        if (iter->second == nullptr) {
-            pointers_.erase(iter++);
-            continue;
+    if (!isMt_) {
+        if (action_ == AbsEvent::ACTION_NONE) {
+            return;
         }
-        auto pointer = iter->second;
-        if (!pointer->IsDirty()) {
+        if (action_ == AbsEvent::ACTION_DOWN) {
+            FinishAbsoluteDown();
+        } else if (action_ == AbsEvent::ACTION_UP) {
+            FinishAbsoluteUp();
+        } else {
+            FinishAbsoluteMotion();
+        }
+    } else {
+        for (auto iter = pointers_.begin(); iter != pointers_.end();) {
+            if (iter->second == nullptr) {
+                pointers_.erase(iter++);
+                continue;
+            }
+            auto pointer = iter->second;
+            if (!pointer->IsDirty()) {
+                iter++;
+                continue;
+            }
+            pointer->MarkIsDirty(false);
+            absEvent_->SetPointer(pointer);
+            absEvent_->SetAction(pointer->GetAction());      
+            absEvent_->SetCurSlot(iter->first);
+            absEvent_->SetAxisInfo(xInfo_, yInfo_);
+            auto timeNs = std::chrono::steady_clock::now().time_since_epoch();
+            auto timeMs = std::chrono::duration_cast<std::chrono::milliseconds>(timeNs).count();
+            if (pointer->GetAction() == AbsEvent::ACTION_DOWN) {
+                pointer->SetDownTime(timeMs);
+            }
+            absEvent_->SetActionTime(timeMs);
+            collectCallback_(absEvent_);
+            if (pointer->GetAction() == AbsEvent::ACTION_UP) {
+                pointers_.erase(iter++);
+                continue;
+            }
             iter++;
-            continue;
         }
-        pointer->MarkIsDirty(false);
-        absEvent_->SetPointer(pointer);
-        absEvent_->SetAction(pointer->GetAction());      
-        absEvent_->SetCurSlot(iter->first);
-        absEvent_->SetAxisInfo(xInfo_, yInfo_);
-        auto timeNs = std::chrono::steady_clock::now().time_since_epoch();
-        auto timeMs = std::chrono::duration_cast<std::chrono::milliseconds>(timeNs).count();
-        if (pointer->GetAction() == AbsEvent::ACTION_DOWN) {
-            pointer->SetDownTime(timeMs);
+    }
+}
+
+void AbsEventCollector::FinishAbsoluteDown() 
+{   
+    CHKPV(absEvent_);
+	int seat_slot = __builtin_ffs(~slot_map_) - 1;
+
+	if (seat_slot == -1) {
+        return;
+    }
+    curSlot_ = seat_slot;
+    slot_map_ |= (1UL << seat_slot);
+    auto pointer = GetCurrentPointer(false);
+    CHKPV(pointer);
+    absEvent_->SetPointer(pointer);
+    absEvent_->SetAction(AbsEvent::ACTION_DOWN);      
+    absEvent_->SetCurSlot(seat_slot);
+    absEvent_->SetAxisInfo(xInfo_, yInfo_);
+    auto timeNs = std::chrono::steady_clock::now().time_since_epoch();
+    auto timeMs = std::chrono::duration_cast<std::chrono::milliseconds>(timeNs).count();
+    absEvent_->SetActionTime(timeMs);
+    collectCallback_(absEvent_);
+}
+
+void AbsEventCollector::FinishAbsoluteMotion()
+{
+    CHKPV(absEvent_);
+	int seat_slot = curSlot_;
+	if (seat_slot == -1) {
+        return;
+    }
+    auto pointer = GetCurrentPointer(false);
+    CHKPV(pointer);
+    absEvent_->SetPointer(pointer);
+    absEvent_->SetAction(AbsEvent::ACTION_MOVE);      
+    absEvent_->SetCurSlot(seat_slot);
+    absEvent_->SetAxisInfo(xInfo_, yInfo_);
+    auto timeNs = std::chrono::steady_clock::now().time_since_epoch();
+    auto timeMs = std::chrono::duration_cast<std::chrono::milliseconds>(timeNs).count();
+    absEvent_->SetActionTime(timeMs);
+    collectCallback_(absEvent_);
+}
+
+void AbsEventCollector::FinishAbsoluteUp() 
+{
+    CHKPV(absEvent_);
+	int seat_slot = curSlot_;
+	curSlot_ = -1;
+	if (seat_slot == -1) {
+	    return;
+    }
+	slot_map_ &= ~(1UL << seat_slot);
+    auto pointer = GetCurrentPointer(false);
+    CHKPV(pointer);
+    absEvent_->SetPointer(pointer);
+    absEvent_->SetAction(AbsEvent::ACTION_UP);      
+    absEvent_->SetCurSlot(seat_slot);
+    absEvent_->SetAxisInfo(xInfo_, yInfo_);
+    auto timeNs = std::chrono::steady_clock::now().time_since_epoch();
+    auto timeMs = std::chrono::duration_cast<std::chrono::milliseconds>(timeNs).count();
+    absEvent_->SetActionTime(timeMs);
+    collectCallback_(absEvent_);
+    if (pointer->GetAction() == AbsEvent::ACTION_UP) {
+        auto iter = pointers_.find(curSlot_);
+        if (iter != pointers_.end()) {
+            pointers_.erase(iter);
         }
-        absEvent_->SetActionTime(timeMs);
-        collectCallback_(absEvent_);
-        if (pointer->GetAction() == AbsEvent::ACTION_UP) {
-            pointers_.erase(iter++);
-            continue;
-        }
-        iter++;
     }
 }
 
