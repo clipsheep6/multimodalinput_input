@@ -115,6 +115,7 @@ void InputDeviceImpl::OnDevListener(int32_t deviceId, const std::string &type)
 int32_t InputDeviceImpl::GetInputDeviceIds(FunInputDevIds callback)
 {
     CALL_DEBUG_ENTER;
+    CHKPR(callback, RET_ERR);
     std::vector<int32_t> ids;
     int32_t ret = MultimodalInputConnMgr->GetDeviceIds(ids);
     if (ret != RET_OK) {
@@ -128,6 +129,7 @@ int32_t InputDeviceImpl::GetInputDeviceIds(FunInputDevIds callback)
 int32_t InputDeviceImpl::GetInputDevice(int32_t deviceId, FunInputDevInfo callback)
 {
     CALL_DEBUG_ENTER;
+    CHKPR(callback, RET_ERR);
     std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
     int32_t ret = MultimodalInputConnMgr->GetDevice(deviceId, inputDevice);
     if (ret != RET_OK) {
@@ -141,6 +143,7 @@ int32_t InputDeviceImpl::GetInputDevice(int32_t deviceId, FunInputDevInfo callba
 int32_t InputDeviceImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> keyCodes, FunInputDevKeys callback)
 {
     CALL_DEBUG_ENTER;
+    CHKPR(callback, RET_ERR);
     std::vector<bool> keystroke;
     int32_t ret = MultimodalInputConnMgr->SupportKeys(deviceId, keyCodes, keystroke);
     if (ret != RET_OK) {
@@ -154,6 +157,7 @@ int32_t InputDeviceImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> keyC
 int32_t InputDeviceImpl::GetKeyboardType(int32_t deviceId, FunKeyboardTypes callback)
 {
     CALL_DEBUG_ENTER;
+    CHKPR(callback, RET_ERR);
     int32_t keyboardType = 0;
     int32_t ret = MultimodalInputConnMgr->GetKeyboardType(deviceId, keyboardType);
     if (ret != RET_OK) {
@@ -162,39 +166,6 @@ int32_t InputDeviceImpl::GetKeyboardType(int32_t deviceId, FunKeyboardTypes call
     }
     callback(keyboardType);
     return RET_OK;
-}
-
-const InputDeviceImpl::FunInputDevInfo* InputDeviceImpl::GetDeviceInfo(int32_t userData) const
-{
-    auto iter = inputDevices_.find(userData);
-    if (iter == inputDevices_.end()) {
-        return nullptr;
-    }
-    return &iter->second.inputDevice;
-}
-
-const InputDeviceImpl::FunInputDevIds* InputDeviceImpl::GetDeviceIds(int32_t userData) const
-{
-    auto iter = inputDevices_.find(userData);
-    if (iter == inputDevices_.end()) {
-        return nullptr;
-    }
-    return &iter->second.ids;
-}
-
-const InputDeviceImpl::FunInputDevKeys* InputDeviceImpl::GetDeviceKeys(int32_t userData) const
-{
-    auto iter = inputDevices_.find(userData);
-    if (iter == inputDevices_.end()) {
-        return nullptr;
-    }
-    return &iter->second.keys;
-}
-
-const InputDeviceImpl::FunKeyboardTypes* InputDeviceImpl::GetKeyboardTypes(int32_t userData) const
-{
-    auto iter = inputDevices_.find(userData);
-    return iter == inputDevices_.end()? nullptr : &iter->second.kbTypes;
 }
 
 int32_t InputDeviceImpl::GetUserData()

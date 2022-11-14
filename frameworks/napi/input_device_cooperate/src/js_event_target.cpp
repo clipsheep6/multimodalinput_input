@@ -46,10 +46,7 @@ void JsEventTarget::EmitJsEnable(sptr<JsUtil::CallbackInfo> cb, std::string devi
 {
     CALL_INFO_TRACE;
     CHKPV(cb);
-    if (cb->env == nullptr) {
-        MMI_HILOGE("The env is nullptr");
-        return;
-    }
+    CHKPV(cb->env);
     cb->data.enableResult =
         (msg == CooperationMessage::OPEN_SUCCESS || msg == CooperationMessage::CLOSE_SUCCESS) ? true : false;
     cb->data.errCode = static_cast<int32_t>(msg);
@@ -76,10 +73,7 @@ void JsEventTarget::EmitJsStart(sptr<JsUtil::CallbackInfo> cb, std::string devic
 {
     CALL_INFO_TRACE;
     CHKPV(cb);
-    if (cb->env == nullptr) {
-        MMI_HILOGE("The env is nullptr");
-        return;
-    }
+    CHKPV(cb->env);
     cb->data.startResult = (msg == CooperationMessage::INFO_SUCCESS ? true : false);
     cb->data.errCode = static_cast<int32_t>(msg);
     uv_loop_s *loop = nullptr;
@@ -105,10 +99,7 @@ void JsEventTarget::EmitJsStop(sptr<JsUtil::CallbackInfo> cb, std::string device
 {
     CALL_INFO_TRACE;
     CHKPV(cb);
-    if (cb->env == nullptr) {
-        MMI_HILOGE("The env is nullptr");
-        return;
-    }
+    CHKPV(cb->env);
     cb->data.stopResult = (msg == CooperationMessage::STOP_SUCCESS ? true : false);
     cb->data.errCode = static_cast<int32_t>(msg);
     uv_loop_s *loop = nullptr;
@@ -134,10 +125,7 @@ void JsEventTarget::EmitJsGetState(sptr<JsUtil::CallbackInfo> cb, bool state)
 {
     CALL_INFO_TRACE;
     CHKPV(cb);
-    if (cb->env == nullptr) {
-        MMI_HILOGE("The env is nullptr");
-        return;
-    }
+    CHKPV(cb->env);
     cb->data.cooperateOpened = state;
     uv_loop_s *loop = nullptr;
     CHKRV(cb->env, napi_get_uv_event_loop(cb->env, &loop), GET_UV_LOOP);

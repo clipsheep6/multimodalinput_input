@@ -39,12 +39,6 @@ public:
     using FunInputDevIds = std::function<void(std::vector<int32_t>&)>;
     using FunInputDevKeys = std::function<void(std::vector<bool>&)>;
     using FunKeyboardTypes = std::function<void(int32_t)>;
-    struct InputDeviceData {
-        FunInputDevInfo inputDevice;
-        FunInputDevIds ids;
-        FunInputDevKeys keys;
-        FunKeyboardTypes kbTypes;
-    };
     using InputDevListenerPtr = std::shared_ptr<IInputDeviceListener>;
 
     int32_t RegisterDevListener(const std::string &type, InputDevListenerPtr listener);
@@ -62,13 +56,7 @@ public:
     std::shared_ptr<InputDevice> DevDataUnmarshalling(NetPacket &pkt);
 
 private:
-    const FunInputDevInfo* GetDeviceInfo(int32_t) const;
-    const FunInputDevIds* GetDeviceIds(int32_t) const;
-    const FunInputDevKeys* GetDeviceKeys(int32_t) const;
-    const FunKeyboardTypes* GetKeyboardTypes(int32_t) const;
-private:
     InputDeviceImpl() = default;
-    std::map<int32_t, InputDeviceData> inputDevices_;
     std::map<std::string, std::list<InputDevListenerPtr>> devListener_ = { { "change", {} } };
     int32_t userData_ { 0 };
     bool isListeningProcess_ { false };

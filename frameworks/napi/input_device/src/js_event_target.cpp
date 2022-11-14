@@ -259,10 +259,7 @@ void JsEventTarget::EmitJsIds(sptr<JsUtil::CallbackInfo> cb, std::vector<int32_t
 {
     CALL_DEBUG_ENTER;
     CHKPV(cb);
-    if (cb->env == nullptr) {
-        MMI_HILOGE("The env is nullptr");
-        return;
-    }
+    CHKPV(cb->env);
     cb->data.ids = ids;
     cb->errCode = RET_OK;
     uv_loop_s *loop = nullptr;
@@ -347,10 +344,7 @@ void JsEventTarget::EmitJsDev(sptr<JsUtil::CallbackInfo> cb, std::shared_ptr<Inp
     CALL_DEBUG_ENTER;
     CHKPV(device);
     CHKPV(cb);
-    if (cb->env == nullptr) {
-        MMI_HILOGE("The env is nullptr");
-        return;
-    }
+    CHKPV(cb->env);
     cb->data.device = device;
     cb->errCode = RET_OK;
     uv_loop_s *loop = nullptr;
@@ -475,10 +469,7 @@ void JsEventTarget::EmitSupportKeys(sptr<JsUtil::CallbackInfo> cb, std::vector<b
 {
     CALL_DEBUG_ENTER;
     CHKPV(cb);
-    if (cb->env == nullptr) {
-        MMI_HILOGE("The env is nullptr");
-        return;
-    }
+    CHKPV(cb->env);
     cb->data.keystrokeAbility = keystrokeAbility;
     cb->errCode = RET_OK;
     uv_loop_s *loop = nullptr;
@@ -503,10 +494,7 @@ void JsEventTarget::EmitJsKeyboardType(sptr<JsUtil::CallbackInfo> cb, int32_t ke
 {
     CALL_DEBUG_ENTER;
     CHKPV(cb);
-    if (cb->env == nullptr) {
-        MMI_HILOGE("The env is nullptr");
-        return;
-    }
+    CHKPV(cb->env);
     cb->data.keyboardType = keyboardType;
     cb->errCode = RET_OK;
     uv_loop_s *loop = nullptr;
