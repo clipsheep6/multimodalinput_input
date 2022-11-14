@@ -150,9 +150,6 @@ void InputWindowsManager::CheckFocusWindowChange(const DisplayGroupInfo &display
     if (oldFocusWindowId == newFocusWindowId) {
         return;
     }
-    const int32_t oldFocusWindowPid = GetWindowPid(oldFocusWindowId);
-    const int32_t newFocusWindowPid = GetWindowPid(newFocusWindowId, displayGroupInfo);
-    DfxHisysevent::OnFocusWindowChanged(oldFocusWindowId, newFocusWindowId, oldFocusWindowPid, newFocusWindowPid);
 }
 
 void InputWindowsManager::CheckZorderWindowChange(const DisplayGroupInfo &displayGroupInfo)
@@ -168,10 +165,6 @@ void InputWindowsManager::CheckZorderWindowChange(const DisplayGroupInfo &displa
     if (oldZorderFirstWindowId == newZorderFirstWindowId) {
         return;
     }
-    const int32_t oldZorderFirstWindowPid = GetWindowPid(oldZorderFirstWindowId);
-    const int32_t newZorderFirstWindowPid = GetWindowPid(newZorderFirstWindowId, displayGroupInfo);
-    DfxHisysevent::OnZorderWindowChanged(oldZorderFirstWindowId, newZorderFirstWindowId,
-        oldZorderFirstWindowPid, newZorderFirstWindowPid);
 }
 
 void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
