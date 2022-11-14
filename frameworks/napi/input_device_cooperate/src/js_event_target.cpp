@@ -47,8 +47,7 @@ void JsEventTarget::EmitJsEnable(sptr<JsUtil::CallbackInfo> cb, std::string devi
     CALL_INFO_TRACE;
     CHKPV(cb);
     CHKPV(cb->env);
-    cb->data.enableResult =
-        (msg == CooperationMessage::OPEN_SUCCESS || msg == CooperationMessage::CLOSE_SUCCESS) ? true : false;
+    cb->data.enableResult = (msg == CooperationMessage::OPEN_SUCCESS || msg == CooperationMessage::CLOSE_SUCCESS);
     cb->data.errCode = static_cast<int32_t>(msg);
     uv_loop_s *loop = nullptr;
     CHKRV(cb->env, napi_get_uv_event_loop(cb->env, &loop), GET_UV_LOOP);
@@ -74,7 +73,7 @@ void JsEventTarget::EmitJsStart(sptr<JsUtil::CallbackInfo> cb, std::string devic
     CALL_INFO_TRACE;
     CHKPV(cb);
     CHKPV(cb->env);
-    cb->data.startResult = (msg == CooperationMessage::INFO_SUCCESS ? true : false);
+    cb->data.startResult = (msg == CooperationMessage::INFO_SUCCESS);
     cb->data.errCode = static_cast<int32_t>(msg);
     uv_loop_s *loop = nullptr;
     CHKRV(cb->env, napi_get_uv_event_loop(cb->env, &loop), GET_UV_LOOP);
