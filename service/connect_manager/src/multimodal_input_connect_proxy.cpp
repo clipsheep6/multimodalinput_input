@@ -29,44 +29,44 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Multi
 int32_t ParseInputDevice(MessageParcel &reply, std::shared_ptr<InputDevice> &inputDevice)
 {
     int32_t value;
-    READINT32(reply, value, IPC_STUB_WRITE_PARCEL_ERR);
+    READINT32(reply, value, IPC_PROXY_DEAD_OBJECT_ERR);
     inputDevice->SetId(value);
-    READINT32(reply, value, IPC_STUB_WRITE_PARCEL_ERR);
+    READINT32(reply, value, IPC_PROXY_DEAD_OBJECT_ERR);
     inputDevice->SetType(value);
     std::string name;
-    READSTRING(reply, name, IPC_STUB_WRITE_PARCEL_ERR);
+    READSTRING(reply, name, IPC_PROXY_DEAD_OBJECT_ERR);
     inputDevice->SetName(name);
-    READINT32(reply, value, IPC_STUB_WRITE_PARCEL_ERR);
+    READINT32(reply, value, IPC_PROXY_DEAD_OBJECT_ERR);
     inputDevice->SetBus(value);
-    READINT32(reply, value, IPC_STUB_WRITE_PARCEL_ERR);
+    READINT32(reply, value, IPC_PROXY_DEAD_OBJECT_ERR);
     inputDevice->SetVersion(value);
-    READINT32(reply, value, IPC_STUB_WRITE_PARCEL_ERR);
+    READINT32(reply, value, IPC_PROXY_DEAD_OBJECT_ERR);
     inputDevice->SetProduct(value);
-    READINT32(reply, value, IPC_STUB_WRITE_PARCEL_ERR);
+    READINT32(reply, value, IPC_PROXY_DEAD_OBJECT_ERR);
     inputDevice->SetVendor(value);
     std::string phys;
-    READSTRING(reply, phys, IPC_STUB_WRITE_PARCEL_ERR);
+    READSTRING(reply, phys, IPC_PROXY_DEAD_OBJECT_ERR);
     inputDevice->SetPhys(phys);
     std::string uniq;
-    READSTRING(reply, uniq, IPC_STUB_WRITE_PARCEL_ERR);
+    READSTRING(reply, uniq, IPC_PROXY_DEAD_OBJECT_ERR);
     inputDevice->SetUniq(uniq);
 
     uint32_t size;
-    READUINT32(reply, size, IPC_STUB_WRITE_PARCEL_ERR);
+    READUINT32(reply, size, IPC_PROXY_DEAD_OBJECT_ERR);
     InputDevice::AxisInfo axis;
     for (uint32_t i = 0; i < size; ++i) {
         int32_t val;
-        READINT32(reply, val, IPC_STUB_WRITE_PARCEL_ERR);
+        READINT32(reply, val, IPC_PROXY_DEAD_OBJECT_ERR);
         axis.SetMinimum(val);
-        READINT32(reply, val, IPC_STUB_WRITE_PARCEL_ERR);
+        READINT32(reply, val, IPC_PROXY_DEAD_OBJECT_ERR);
         axis.SetMaximum(val);
-        READINT32(reply, val, IPC_STUB_WRITE_PARCEL_ERR);
+        READINT32(reply, val, IPC_PROXY_DEAD_OBJECT_ERR);
         axis.SetAxisType(val);
-        READINT32(reply, val, IPC_STUB_WRITE_PARCEL_ERR);
+        READINT32(reply, val, IPC_PROXY_DEAD_OBJECT_ERR);
         axis.SetFuzz(val);
-        READINT32(reply, val, IPC_STUB_WRITE_PARCEL_ERR);
+        READINT32(reply, val, IPC_PROXY_DEAD_OBJECT_ERR);
         axis.SetFlat(val);
-        READINT32(reply, val, IPC_STUB_WRITE_PARCEL_ERR);
+        READINT32(reply, val, IPC_PROXY_DEAD_OBJECT_ERR);
         axis.SetResolution(val);
         inputDevice->AddAxisInfo(axis);
     }
