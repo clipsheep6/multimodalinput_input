@@ -866,36 +866,27 @@ int32_t InputManagerImpl::GetInputDeviceCooperateState(const std::string &device
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 }
 
-bool InputManagerImpl::GetFunctionKeyState(int32_t funcKey)
+int32_t InputManagerImpl::GetFunctionKeyState(int32_t funcKey, bool &state)
 {
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CALL_DEBUG_ENTER;
-    bool state { false };
-    int32_t ret = MultimodalInputConnMgr->GetFunctionKeyState(funcKey, state);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
+    std::lock_guard<std::mutex> guard(mtx_);
+    state = false;
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return RET_ERR;
     }
-    return state;
-#else
-    MMI_HILOGW("Keyboard device does not support");
-    return false;
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
+    return InputDevImpl.GetFunctionKeyState(funcKey, state);
 }
 
 int32_t InputManagerImpl::SetFunctionKeyState(int32_t funcKey, bool enable)
 {
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CALL_DEBUG_ENTER;
-    int32_t ret = MultimodalInputConnMgr->SetFunctionKeyState(funcKey, enable);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return RET_OK;
-#else
-    MMI_HILOGW("Keyboard device does not support");
-    return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
+    return InputDevImpl.SetFunctionKeyState(funcKey, enable);
 }
 } // namespace MMI
 } // namespace OHOS

@@ -462,6 +462,102 @@ napi_value JsInputDeviceContext::CreateEnumKeyboardType(napi_env env, napi_value
     return exports;
 }
 
+napi_value JsInputDeviceContext::GetFunctionKeyState(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 2;
+    napi_value argv[2];
+    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc == 0) {
+        MMI_HILOGE("At least one argument is required");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
+        return nullptr;
+    }
+    if (!JsUtil::TypeOf(env, argv[0], napi_number)) {
+        MMI_HILOGE("First parameter type error");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "funcKey", "number");
+        return nullptr;
+    }
+    int32_t funcKey = 0;
+    CHKRP(env, napi_get_value_int32(env, argv[0], &funcKey), GET_INT32);
+
+    JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
+    CHKPP(jsDev);
+    auto jsInputDeviceMgr = jsDev->GetJsInputDeviceMgr();
+    CHKPP(jsInputDeviceMgr);
+    if (argc == 1) {
+        return jsInputDeviceMgr->GetFunctionKeyState(env, funcKey);
+    }
+    if (!JsUtil::TypeOf(env, argv[1], napi_function)) {
+        MMI_HILOGE("Second parameter type error");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        return nullptr;
+    }
+    return jsInputDeviceMgr->GetFunctionKeyState(env, funcKey, argv[1]);
+}
+
+napi_value JsInputDeviceContext::SetFunctionKeyState(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 3;
+    napi_value argv[3];
+    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc < 2) {
+        MMI_HILOGE("At least two parameters are required");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
+        return nullptr;
+    }
+    if (!JsUtil::TypeOf(env, argv[0], napi_number)) {
+        MMI_HILOGE("First parameter type error");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "funcKey", "number");
+        return nullptr;
+    }
+    if (!JsUtil::TypeOf(env, argv[1], napi_boolean)) {
+        MMI_HILOGE("Second parameter type error");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "funcKey", "bool");
+        return nullptr;
+    }
+    int32_t funcKey = 0;
+    CHKRP(env, napi_get_value_int32(env, argv[0], &funcKey), GET_INT32);
+    bool state;
+    CHKRP(env, napi_get_value_bool(env, argv[1], &state), CREATE_BOOL);
+
+    JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
+    CHKPP(jsDev);
+    auto jsInputDeviceMgr = jsDev->GetJsInputDeviceMgr();
+    CHKPP(jsInputDeviceMgr);
+    if (argc == 2) {
+        return jsInputDeviceMgr->SetFunctionKeyState(env, funcKey, state);
+    }
+    if (!JsUtil::TypeOf(env, argv[2], napi_function)) {
+        MMI_HILOGE("Third parameter type error");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        return nullptr;
+    }
+    return jsInputDeviceMgr->SetFunctionKeyState(env, funcKey, state, argv[2]);
+}
+
+napi_value JsInputDeviceContext::CreateEnumFunctionKeyType(napi_env env, napi_value exports)
+{
+    CALL_DEBUG_ENTER;
+    napi_value numLock = nullptr;
+    CHKRP(env, napi_create_int32(env, KeyEvent::NUM_LOCK_FUNCTION_KEY, &numLock), CREATE_INT32);
+    napi_value capsLock = nullptr;
+    CHKRP(env, napi_create_int32(env, KeyEvent::CAPS_LOCK_FUNCTION_KEY, &capsLock), CREATE_INT32);
+    napi_value scrollLock = nullptr;
+    CHKRP(env, napi_create_int32(env, KeyEvent::SCROLL_LOCK_FUNCTION_KEY, &scrollLock), CREATE_INT32);
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("NUM_LOCK_FUNCTION_KEY", numLock),
+        DECLARE_NAPI_STATIC_PROPERTY("CAPS_LOCK_FUNCTION_KEY", capsLock),
+        DECLARE_NAPI_STATIC_PROPERTY("SCROLL_LOCK_FUNCTION_KEY", scrollLock),
+    };
+    napi_value result = nullptr;
+    CHKRP(env, napi_define_class(env, "FunctionKey", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+        sizeof(desc) / sizeof(*desc), desc, &result), DEFINE_CLASS);
+    CHKRP(env, napi_set_named_property(env, exports, "FunctionKey", result), SET_NAMED_PROPERTY);
+    return exports;
+}
+
 napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
@@ -479,10 +575,16 @@ napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getKeyboardType", GetKeyboardType),
         DECLARE_NAPI_STATIC_FUNCTION("getDeviceList", GetDeviceList),
         DECLARE_NAPI_STATIC_FUNCTION("getDeviceInfo", GetDeviceInfo),
+        DECLARE_NAPI_STATIC_FUNCTION("getFunctionKeyState", GetFunctionKeyState),
+        DECLARE_NAPI_STATIC_FUNCTION("setFunctionKeyState", SetFunctionKeyState),
     };
     CHKRP(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     if (CreateEnumKeyboardType(env, exports) == nullptr) {
         MMI_HILOGE("Failed to create keyboard type enum");
+        return nullptr;
+    }
+    if (CreateEnumFunctionKeyType(env, exports) == nullptr) {
+        THROWERR(env, "Failed to create function key type enum");
         return nullptr;
     }
     return exports;
