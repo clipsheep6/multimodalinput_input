@@ -49,6 +49,7 @@ namespace {
 constexpr int32_t FILE_SIZE_MAX = 0x5000;
 constexpr int32_t INVALID_FILE_SIZE = -1;
 constexpr int32_t FILE_POWER = 0777;
+constexpr int32_t SLEEP_TIME = 1500000;
 const std::string PROC_PATH = "/proc";
 const std::string VIRTUAL_DEVICE_NAME = "vuinput";
 const std::string g_pid = std::to_string(getpid());
@@ -606,46 +607,76 @@ bool VirtualDevice::CloseDevice(const std::string& closeDeviceName, const std::v
     return false;
 }
 
-bool VirtualDevice::CommandBranch(std::vector<std::string>& argvList)
-{
+ bool VirtualDevice::CheckCommand(int32_t argc, char **argv) {
+    struct option longOptions[] = {
+        {"list", no_argument, NULL, 'L'},
+        {"start", no_argument, NULL, 'S'},
+        {"close", no_argument, NULL, 'C'},
+        {"help", no_argument, NULL, '?'},
+        {NULL, 0, NULL, 0}
+    };
+    int32_t c = 0;
+    int32_t optionIndex = 0;
     std::vector<std::string> deviceList = BrowseDirectory(g_folderPath);
-    if (argvList[1] == "start") {
-        if (argvList.size() != PARAMETERS_NUMBER) {
-            std::cout << "Invalid Input Para, Please Check the validity of the para" << std::endl;
-            return false;
-        }
-        if (!AddDevice(argvList.back())) {
-            std::cout << "Failed to create device" << std::endl;
-            return false;
-        }
-        return true;
-    } else if (argvList[1] == "list") {
-        if (argvList.size() != PARAMETERS_QUERY_NUMBER) {
-            std::cout << "Invalid Input Para, Please Check the validity of the para" << std::endl;
-            return false;
-        }
-        std::string::size_type pos;
-        std::cout << "PID\tDEVICE" << std::endl;
-        for (const auto &item : deviceList) {
-            pos = item.find("_");
-            std::cout << item.substr(0, pos) << "\t" << item.substr(pos + 1, item.size() - pos - 1) << std::endl;
-        }
-        return false;
-    } else if (argvList[1] == "close") {
-        if (argvList.size() != PARAMETERS_NUMBER) {
-            std::cout << "Invalid Input Para, Please Check the validity of the para" << std::endl;
-            return false;
-        }
-        if (!CloseDevice(argvList.back(), deviceList)) {
-            return false;
-        } else {
-            std::cout << "device closed successfully" << std::endl;
-            return false;
-        }
-    } else {
-        std::cout << "The command line format is incorrect" << std::endl;
+    c = getopt_long(argc, argv, "LSC?", longOptions, &optionIndex);
+    if (c == -1) {
+        std::cout << "Nonstandard input parameters" << std::endl;
         return false;
     }
+    switch (c) {
+        case 'L': {
+            if (argc != PARAMETERS_QUERY_NUMBER) {
+                std::cout << "Invalid Input Para, Please Check the validity of the para" << std::endl;
+                return false;
+            }
+            std::string::size_type pos;
+            std::cout << "PID\tDEVICE" << std::endl;
+            for (const auto &item : deviceList) {
+                pos = item.find("_");
+                std::cout << item.substr(0, pos) << "\t" << item.substr(pos + 1, item.size() - pos - 1) << std::endl;
+            }
+            break;
+        }
+        case 'S': {
+            if (argc != PARAMETERS_NUMBER) {
+                std::cout << "Invalid Input Para, Please Check the validity of the para" << std::endl;
+                return false;
+            }
+            if (!AddDevice(argv[optind])) {
+                std::cout << "Failed to create device" << std::endl;
+                return false;
+            }
+            while (true) {
+                usleep(SLEEP_TIME);
+            }
+            break;
+        }
+        case 'C': {
+            if (argc != PARAMETERS_NUMBER) {
+                std::cout << "Invalid Input Para, Please Check the validity of the para" << std::endl;
+                return false;
+            }
+            if (!CloseDevice(argv[optind], deviceList)) {
+                std::cout << "Failed to closed device" << std::endl;
+                return false;
+            }
+            std::cout << "device closed successfully" << std::endl;
+            break;
+        }
+        case '?': {
+            if (argc != PARAMETERS_QUERY_NUMBER) {
+                std::cout << "Invalid Input Para, Please Check the validity of the para" << std::endl;
+                return false;
+            }
+            ShowUsage();
+            break;
+        }
+        default: {
+            std::cout << "The command line format is incorrect" << std::endl;
+            return false;
+        }
+    }
+    return true;
 }
 
 void VirtualDevice::SetResolution(const ResolutionInfo& resolutionInfo)
@@ -706,6 +737,33 @@ const std::vector<uint32_t>& VirtualDevice::GetMiscellaneous() const
 const std::vector<uint32_t>& VirtualDevice::GetSwitches() const
 {
     return switches_;
+}
+
+void VirtualDevice::ShowUsage()
+{
+    std::cout << "Usage: vuinput <option> <command> <arg>..."      << std::endl;
+    std::cout << "The option are:                                " << std::endl;
+    std::cout << "commands for list:                             " << std::endl;
+    std::cout << "-L      --list       -display virtual devices and pid information" << std::endl;
+    std::cout << "commands for start:                            " << std::endl;
+    std::cout << "-S <device> &       --start <device> &            -start a device" << std::endl;
+    std::cout << " -start supported <device>-" << std::endl;
+    std::cout << "  mouse"         << std::endl;
+    std::cout << "  keyboard"      << std::endl;
+    std::cout << "  joystick"      << std::endl;
+    std::cout << "  trackball"     << std::endl;
+    std::cout << "  remotecontrol" << std::endl;
+    std::cout << "  trackpad"      << std::endl;
+    std::cout << "  knob"          << std::endl;
+    std::cout << "  gamepad"       << std::endl;
+    std::cout << "  touchpad"      << std::endl;
+    std::cout << "  touchscreen"   << std::endl;
+    std::cout << "  pen"           << std::endl;
+    std::cout << "-S all &            --start all &                 -start devices " << std::endl;
+    std::cout << "commands for close:                                              " << std::endl;
+    std::cout << "-C <pid> &          --close <pid> &               -close a pid   " << std::endl;
+    std::cout << "-C all &            --close all  &                -close pids    " << std::endl;
+    std::cout << "-?  --help                                                       " << std::endl;
 }
 } // namespace MMI
 } // namespace OHOS

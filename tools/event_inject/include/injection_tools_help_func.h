@@ -27,8 +27,15 @@ namespace MMI {
 class InjectionToolsHelpFunc {
 public:
     InjectionToolsHelpFunc() = default;
+    ~InjectionToolsHelpFunc() = default;
     DISALLOW_COPY_AND_MOVE(InjectionToolsHelpFunc);
-    std::string GetHelpText();
+    bool CheckInjectionCommand(int32_t argc, char **argv);
+    bool IsNumberic(std::string const &str);
+    void SetArgvs(int argc, char **argv, std::string const &str);
+    std::vector<std::string> GetArgvs();
+    void ShowUsage();
+private:
+    std::vector<std::string> injectArgvs_;
 };
 } // namespace MMI
 } // namespace OHOS

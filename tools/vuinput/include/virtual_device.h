@@ -30,7 +30,8 @@ public:
     static bool CreateHandle(const std::string& deviceArgv);
     static bool AddDevice(const std::string& startDeviceName);
     static bool CloseDevice(const std::string& closeDeviceName, const std::vector<std::string>& deviceList);
-    static bool CommandBranch(std::vector<std::string>& argvList);
+    static bool CheckCommand(int32_t argc, char **argv);
+    static void ShowUsage();
     VirtualDevice(const std::string& deviceName, uint16_t busType, uint16_t vendorId, uint16_t productId);
     DISALLOW_COPY_AND_MOVE(VirtualDevice);
     virtual ~VirtualDevice();
