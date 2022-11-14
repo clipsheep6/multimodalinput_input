@@ -35,6 +35,7 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Device" };
 };
+
 int32_t Device::Init()
 {
     CALL_DEBUG_ENTER;
@@ -59,22 +60,22 @@ int32_t Device::CheckAndUpdateAxisInfo()
     auto xInfo = GetAxisInfo(IDevice::AXIS_MT_X);
     if (!xInfo) {
         MMI_HILOGE("null AxisInfo Of AXIS_MT_X");
-        return -1;
+        return RET_ERR;
     }
     if (xInfo->GetMinimum() >= xInfo->GetMaximum()) {
         MMI_HILOGE("xInfo->GetMinimum():%{public}d >= xInfo->GetMaximum():%{public}d",
                     xInfo->GetMinimum(), xInfo->GetMaximum());
-        return -1;
+        return RET_ERR;
     }
     auto yInfo = GetAxisInfo(IDevice::AXIS_MT_Y);
     if (!yInfo) {
         MMI_HILOGE("null AxisInfo Of AXIS_MT_Y");
-        return -1;
+        return RET_ERR;
     }
     if (yInfo->GetMinimum() >= yInfo->GetMaximum()) {
         MMI_HILOGE("yInfo->GetMinimum():%{public}d >= yInfo->GetMaximum():%{public}d",
                     yInfo->GetMinimum(), yInfo->GetMaximum());
-        return -1;
+        return RET_ERR;
     }
     absEventCollector_.SetAxisInfo(xInfo, yInfo);
     return RET_OK;
@@ -86,7 +87,9 @@ void Device::Uninit()
 }
 
 Device::Device(int32_t devIndex, const InputDeviceInfo &devInfo) : IDevice(devIndex),
-    absEventCollector_(devIndex, AbsEvent::SOURCE_TYPE_NONE), deviceOrigin_(devInfo)
+    absEventCollector_(devIndex, AbsEvent::SOURCE_TYPE_NONE,
+    std::bind(&Device::OnEventCollected, this, std::placeholders::_1)),
+    deviceOrigin_(devInfo)
 {}
 
 Device::~Device()
@@ -94,21 +97,10 @@ Device::~Device()
     Uninit();
 }
 
-void Device::SetDeviceId(int32_t deviceId)
-{
-    deviceId_ = deviceId;
-}
-
-int32_t Device::GetDeviceId() const
-{
-    return deviceId_;
-}
-
 std::shared_ptr<IDevice::AxisInfo> Device::GetAxisInfo(int32_t axis) const
 {
     auto it = axises_.find(axis);
     if (it != axises_.end()) {
-        MMI_HILOGD("Deivce index:%{public}d axis:%{public}s", GetDevIndex(), IDevice::AxisToString(axis).c_str());
         return it->second;
     }
     int32_t absCode = -1;
@@ -122,12 +114,12 @@ std::shared_ptr<IDevice::AxisInfo> Device::GetAxisInfo(int32_t axis) const
             break;
         }
         default: {
-            MMI_HILOGE("Device index:%{public}d,Unknown axis%{public}s", GetDevIndex(), AxisToString(axis).c_str());
             return nullptr;
         }
     }
     const auto &dimensionInfo = deviceOrigin_.attrSet.axisInfo[absCode];
     auto axisInfo = std::make_shared<IDevice::AxisInfo>();
+    CHKPP(axisInfo);
     axisInfo->SetAxis(axis);
     axisInfo->SetMinimum(dimensionInfo.min);
     axisInfo->SetMaximum(dimensionInfo.max);
@@ -169,12 +161,14 @@ void Device::ProcessEventInner(const struct input_event& event)
     auto code = event.code;
     auto value = event.value;
     switch (type) {
-        case EV_SYN:
-            ProcessSyncEvent(code, value);
+        case EV_SYN: {
+            ProcessSyncEvent();
             break;
-        case EV_ABS:
+        }
+        case EV_ABS: {
             ProcessAbsEvent(code, value);
             break;
+        }
         case EV_KEY:
         case EV_REL:
         case EV_MSC:
@@ -185,9 +179,9 @@ void Device::ProcessEventInner(const struct input_event& event)
         case EV_FF:
         case EV_PWR:
         case EV_FF_STATUS:
+        default: {
             break;
-        default:
-            break;
+        }
     }
 }
 
@@ -207,57 +201,64 @@ int32_t Device::UpdateCapability()
     return RET_OK;
 }
 
-bool Device::HasInputProperty(int32_t property)
+bool Device::HasInputProperty(unsigned int property)
 {
     CALL_DEBUG_ENTER;
     auto [index, offset] = GetBitLoc(property);
     if (offset > BITS_PER_LONG || index >= BITS_TO_UINT64(INPUT_PROP_CNT)) {
-        MMI_HILOGE("Error");
+        MMI_HILOGE("Error, index:%{public}u, offset:%{public}u", index, offset);
+        return false;
     }
     auto curBit = (1UL) << offset;
     return deviceOrigin_.abilitySet.devProp[index] & curBit;
 }
 
-bool Device::HasEventType(int32_t evType) const
+bool Device::HasEventType(unsigned int evType) const
 {
     CALL_DEBUG_ENTER;
     auto [index, offset] = GetBitLoc(evType);
     if (offset > BITS_PER_LONG || index >= BITS_TO_UINT64(EV_CNT)) {
-        MMI_HILOGE("Error");
+        MMI_HILOGE("Error, index:%{public}u, offset:%{public}u", index, offset);
+        return false;
     }
     auto curBit = (1UL) << offset;
     return deviceOrigin_.abilitySet.eventType[index] & curBit;
 }
 
-bool Device::HasEventCode(int32_t evType, int32_t evCode) const
+bool Device::HasEventCode(unsigned int evType, unsigned int evCode) const
 {
     CALL_DEBUG_ENTER;
     auto [index, offset] = GetBitLoc(evCode);
     if (offset > BITS_PER_LONG) {
-        MMI_HILOGE("Error");
+        MMI_HILOGE("Error, offset:%{public}u", offset);
+        return false;
     }
     auto curBit = (1UL) << offset;
     switch (evType) {
         case EV_KEY: {
             if (index >= BITS_TO_UINT64(KEY_CNT)) {
-                MMI_HILOGE("Error");
+                MMI_HILOGE("Error, index:%{public}u, offset:%{public}u", index, offset);
+                return false;
             }
             return deviceOrigin_.abilitySet.keyCode[index] & curBit;
         }
         case EV_ABS: {
             if (index >= BITS_TO_UINT64(ABS_CNT)) {
-                MMI_HILOGE("Error");
+                MMI_HILOGE("Error, index:%{public}u, offset:%{public}u", index, offset);
+                return false;
             }
             return deviceOrigin_.abilitySet.absCode[index] & curBit;
         }
         case EV_REL: {
             if (index >= BITS_TO_UINT64(REL_CNT)) {
-                MMI_HILOGE("Error");
+                MMI_HILOGE("Error, index:%{public}u, offset:%{public}u", index, offset);
+                return false;
             }
             return deviceOrigin_.abilitySet.relCode[index] & curBit;
         }
         default: {
-            MMI_HILOGE("The current evType:%{public}d is not supported", evType);
+            MMI_HILOGE("The current evType:%{public}d is not supported, index:%{public}u, offset:%{public}u",
+                evType, index, offset);
             return false;
         }
     }
@@ -284,13 +285,9 @@ bool Device::HasTouchscreenCapability()
         (HasEventCode(EV_ABS, ABS_MT_POSITION_X) && HasEventCode(EV_ABS, ABS_MT_POSITION_Y))));
 }
 
-void Device::ProcessSyncEvent(int32_t code, int32_t value)
+void Device::ProcessSyncEvent()
 {
-    auto event = absEventCollector_.HandleSyncEvent(code, value);
-    if (event) {
-        OnEventCollected(event);
-        absEventCollector_.AfterProcessed();
-    }
+    absEventCollector_.HandleSyncEvent();
 }
 
 void Device::ProcessAbsEvent(int32_t code, int32_t value)
@@ -338,7 +335,8 @@ int Device::EventIsType(const struct input_event& ev, unsigned int type)
 int Device::EventTypeGetMax(unsigned int type)
 {
 	if (type > EV_MAX) {
-		return -1;
+        MMI_HILOGE("Error, type:%{public}u > EV_MAX", type);
+		return RET_ERR;
     }
 	return ev_max[type];
 }
@@ -346,15 +344,10 @@ int Device::EventTypeGetMax(unsigned int type)
 int Device::EventIsCode(const struct input_event& ev, unsigned int type, unsigned int code)
 {
 	if (!EventIsType(ev, type)) {
-		return 0;
+		return RET_OK;
     }
 	int max = EventTypeGetMax(type);
-	return (max > -1 && code <= (unsigned int)max && ev.code == code);
-}
-
-const InputDeviceInfo& Device::GetInputDeviceInfo() const
-{
-    return deviceOrigin_;
+	return ((max > -1) && (code <= static_cast<unsigned int>(max)) && (ev.code == code));
 }
 } // namespace MMI
 } // namespace OHOS

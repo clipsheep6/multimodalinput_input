@@ -26,58 +26,54 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AbsEventCollector" };
 };
-AbsEventCollector::AbsEventCollector(int32_t devIndex, int32_t sourceType)
-    : curSlot_(0), absEvent_(std::make_shared<AbsEvent>(devIndex, sourceType))
+AbsEventCollector::AbsEventCollector(int32_t devIndex, int32_t sourceType, OnCollectCallback callback)
+    : curSlot_(0), absEvent_(std::make_shared<AbsEvent>(devIndex, sourceType)), collectCallback_(callback)
 {}
 
 void AbsEventCollector::HandleAbsEvent(int32_t code, int32_t value)
 {
     switch (code) {
-        case ABS_MT_SLOT:
+        case ABS_MT_SLOT: {
             HandleMtSlot(value);
             break;
+        }
         case ABS_MT_TOUCH_MAJOR:
         case ABS_MT_TOUCH_MINOR:
         case ABS_MT_WIDTH_MAJOR:
         case ABS_MT_WIDTH_MINOR:
-        case ABS_MT_ORIENTATION:
+        case ABS_MT_ORIENTATION: {
             break;
-        case ABS_MT_POSITION_X:
+        }
+        case ABS_MT_POSITION_X: {
             HandleMtPositionX(value);
             break;
-        case ABS_MT_POSITION_Y:
+        }
+        case ABS_MT_POSITION_Y: {
             HandleMtPositionY(value);
             break;
+        }
         case ABS_MT_TOOL_TYPE:
-        case ABS_MT_BLOB_ID:
+        case ABS_MT_BLOB_ID: {
             break;
-        case ABS_MT_TRACKING_ID:
+        }
+        case ABS_MT_TRACKING_ID: {
             HandleMtTrackingId(value);
             break;
+        }
         case ABS_MT_PRESSURE:
         case ABS_MT_DISTANCE:
         case ABS_MT_TOOL_X:
         case ABS_MT_TOOL_Y:
-        default:
+        default: {
             MMI_HILOGW("Unknown type: %{public}d", code);
             break;
+        }
     }
 }
 
-const std::shared_ptr<AbsEvent> AbsEventCollector::HandleSyncEvent(int32_t code, int32_t value)
+void AbsEventCollector::HandleSyncEvent()
 {
-    return FinishPointer();
-}
-
-void AbsEventCollector::AfterProcessed()
-{
-    if (absEvent_->GetAction() != AbsEvent::ACTION_UP) {
-        return;
-    }
-    auto it = pointers_.find(curSlot_);
-    if (it != pointers_.end()) {
-        pointers_.erase(it);
-    }
+    FinishPointer();
 }
 
 int32_t AbsEventCollector::SetSourceType(int32_t sourceType)
@@ -114,30 +110,38 @@ std::shared_ptr<AbsEvent::Pointer> AbsEventCollector::GetCurrentPointer(bool cre
     return pointer;
 }
 
-const std::shared_ptr<AbsEvent> AbsEventCollector::FinishPointer()
+void AbsEventCollector::FinishPointer()
 {
     CALL_DEBUG_ENTER;
-    CHKPP(absEvent_);
-    auto pointer = GetCurrentPointer(false);
-    if (!pointer) {
-        MMI_HILOGE("pointer is null. Leave.");
-        return {};
-    }
-    auto timeNs = std::chrono::steady_clock::now().time_since_epoch();
-    auto timeMs = std::chrono::duration_cast<std::chrono::milliseconds>(timeNs).count();
-    if (absEventAction_ == AbsEvent::ACTION_DOWN) {
-        auto retCode = absEvent_->AddPointer(pointer);
-        if (retCode < 0) {
-            MMI_HILOGE("absAction:%{public}s AddPointer Failed", AbsEvent::ActionToString(absEventAction_));
-            return {};
+    CHKPV(absEvent_);
+    for (auto iter = pointers_.begin(); iter != pointers_.end();) {
+        if (iter->second == nullptr) {
+            pointers_.erase(iter++);
+            continue;
         }
-        pointer->SetDownTime(timeMs);
+        auto pointer = iter->second;
+        if (!pointer->IsDirty()) {
+            iter++;
+            continue;
+        }
+        pointer->MarkIsDirty(false);
+        absEvent_->SetPointer(pointer);
+        absEvent_->SetAction(pointer->GetAction());      
+        absEvent_->SetCurSlot(iter->first);
+        absEvent_->SetAxisInfo(xInfo_, yInfo_);
+        auto timeNs = std::chrono::steady_clock::now().time_since_epoch();
+        auto timeMs = std::chrono::duration_cast<std::chrono::milliseconds>(timeNs).count();
+        if (pointer->GetAction() == AbsEvent::ACTION_DOWN) {
+            pointer->SetDownTime(timeMs);
+        }
+        absEvent_->SetActionTime(timeMs);
+        collectCallback_(absEvent_);
+        if (pointer->GetAction() == AbsEvent::ACTION_UP) {
+            pointers_.erase(iter++);
+            continue;
+        }
+        iter++;
     }
-    absEvent_->SetAction(absEventAction_);
-    absEvent_->SetCurSlot(curSlot_);
-    absEvent_->SetActionTime(timeMs);
-    absEvent_->SetAxisInfo(xInfo_, yInfo_);
-    return absEvent_;
 }
 
 void AbsEventCollector::HandleMtSlot(int32_t value)
@@ -158,7 +162,8 @@ void AbsEventCollector::HandleMtPositionX(int32_t value)
         return;
     }
     pointer->SetX(value);
-    absEventAction_ = AbsEvent::ACTION_MOVE;
+    pointer->SetAction(AbsEvent::ACTION_MOVE);
+    pointer->MarkIsDirty(true);
 }
 
 void AbsEventCollector::HandleMtPositionY(int32_t value)
@@ -169,16 +174,23 @@ void AbsEventCollector::HandleMtPositionY(int32_t value)
         return;
     }
     pointer->SetY(value);
-    absEventAction_ = AbsEvent::ACTION_MOVE;
+    pointer->SetAction(AbsEvent::ACTION_MOVE);
+    pointer->MarkIsDirty(true);
 }
 
 void AbsEventCollector::HandleMtTrackingId(int32_t value)
 {
-    if (value < 0) {
-        absEventAction_ = AbsEvent::ACTION_UP;
-    } else {
-        absEventAction_ = AbsEvent::ACTION_DOWN;
+    auto pointer = GetCurrentPointer(true);
+    if (!pointer) {
+        MMI_HILOGE("null pointer");
+        return;
     }
+    if (value < 0) {
+        pointer->SetAction(AbsEvent::ACTION_UP);
+    } else {
+        pointer->SetAction(AbsEvent::ACTION_DOWN);
+    }
+    pointer->MarkIsDirty(true);
 }
 } // namespace MMI
 } // namespace OHOS

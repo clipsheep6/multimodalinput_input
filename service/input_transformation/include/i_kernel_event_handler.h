@@ -21,12 +21,10 @@
 
 namespace OHOS {
 namespace MMI {
-class KernelKeyEvent;
 class AbsEvent;
 class IKernelEventHandler {
 public:
     virtual ~IKernelEventHandler() = default;
-    virtual void OnInputEvent(const std::shared_ptr<KernelKeyEvent> event) = 0;
     virtual void OnInputEvent(const std::shared_ptr<AbsEvent> event) = 0;
 };
 } // namespace MMI

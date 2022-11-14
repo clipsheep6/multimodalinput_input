@@ -18,7 +18,6 @@
 
 #include <list>
 #include <memory>
-#include <ostream>
 #include <tuple>
 
 #include "i_device.h"
@@ -36,8 +35,6 @@ public:
     static constexpr int32_t SOURCE_TYPE_TOUCHSCREEN = 1;
     static constexpr int32_t SOURCE_TYPE_TOUCHPAD = 2;
     static constexpr int32_t SOURCE_TYPE_END = 3;
-    static const char* SourceToString(int32_t sourceType);
-    static const char* ActionToString(int32_t action);
 public:
     class Pointer {
         public:
@@ -48,34 +45,35 @@ public:
             void SetX(int32_t x) { x_ = x; }
             void SetY(int32_t y) { y_ = y; }
             void SetDownTime(int64_t downTime) { downTime_ = downTime; }
-            friend std::ostream& operator<<(std::ostream& os, const AbsEvent::Pointer& pointer);
+            void SetAction(int32_t pointerAction) { pointerAction_ = pointerAction;}
+            int32_t GetAction() { return pointerAction_; }
+            void MarkIsDirty(bool isDirty) { isDirty_ = isDirty; }
+            bool IsDirty() { return isDirty_; }
         private:
-            int32_t id_ {-1};
-            int32_t x_ {-1};
-            int32_t y_ {-1};
-            int64_t downTime_ {-1};
+            int32_t id_ { -1 };
+            int32_t x_ { -1 };
+            int32_t y_ { -1 };
+            int64_t downTime_ { -1 };
+            int32_t pointerAction_ { AbsEvent::ACTION_NONE };
+            bool isDirty_ { false };
     };
 public:
     AbsEvent(int32_t deviceId, int32_t sourceType);
     virtual ~AbsEvent() = default;
-    int32_t GetSourceType() const;
-    std::shared_ptr<Pointer> GetPointer() const;
-    void SetCurSlot(int32_t curSlot);
-    int32_t GetCurSlot() const;
-    friend std::ostream& operator<<(std::ostream& os, const AbsEvent &r);
+    std::shared_ptr<AbsEvent::Pointer> GetPointer() const { return curPointer_; }
+    int32_t SetPointer(const std::shared_ptr<Pointer> pointer);
+    int32_t GetSourceType() const { return sourceType_; }
     int32_t SetSourceType(int32_t sourceType);
-    void SetAxisInfo(std::shared_ptr<IDevice::AxisInfo> xInfo, std::shared_ptr<IDevice::AxisInfo> yInfo);
+    int32_t GetCurSlot() const { return curSlot_; }
+    void SetCurSlot(int32_t curSlot) { curSlot_ = curSlot; }
     std::tuple<std::shared_ptr<IDevice::AxisInfo>, std::shared_ptr<IDevice::AxisInfo>> GetAxisInfo() const;
-    int32_t AddPointer(const std::shared_ptr<Pointer> pointer);
-protected:
-    virtual std::string ActionToStr(int32_t action) const override;
+    void SetAxisInfo(std::shared_ptr<IDevice::AxisInfo> xInfo, std::shared_ptr<IDevice::AxisInfo> yInfo);
 private:
-    int32_t pointerId_;
     int32_t sourceType_;
     int32_t curSlot_;
     std::shared_ptr<IDevice::AxisInfo> xInfo_ { nullptr };
     std::shared_ptr<IDevice::AxisInfo> yInfo_ { nullptr };
-    std::shared_ptr<AbsEvent::Pointer> curPointer_ {nullptr};
+    std::shared_ptr<AbsEvent::Pointer> curPointer_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS

@@ -17,10 +17,7 @@
 #define I_KERNEL_EVENT_BASE_H
 
 #include <cstdint>
-#include <ostream>
-#include <memory>
 
-struct input_event;
 namespace OHOS {
 namespace MMI {
 class KernelEventBase {
@@ -28,27 +25,16 @@ public:
     virtual ~KernelEventBase() = default;
     int32_t GetDevIndex() const { return devIndex_; }
     int32_t GetAction() const { return action_; }
-    int64_t GetActionTime() const { return actionTime_; }
-    friend std::ostream& operator<<(std::ostream &os, const KernelEventBase &r);
     void SetAction(int32_t action) { action_ = action; }
+    int64_t GetActionTime() const { return actionTime_; }
     void SetActionTime(int64_t actionTime) { actionTime_ = actionTime; }
 protected:
     KernelEventBase(int32_t devIndex, int32_t action) : devIndex_(devIndex), action_(action), actionTime_(-1) {}
-    virtual std::string ActionToStr(int32_t action) const = 0;
 private:
     const int32_t devIndex_;
     int32_t action_;
     int64_t actionTime_;
 };
-
-inline std::ostream& operator<<(std::ostream &os, const KernelEventBase &r)
-{
-    return os << '{'
-        << "devIndex:" << r.devIndex_ << ','
-        << "action:" << r.ActionToStr(r.action_) << ','
-        << "actionTime:" << r.actionTime_
-        << '}';    
-}
 } // namespace MMI
 } // namespace OHOS
 #endif // I_KERNEL_EVENT_BASE_H
