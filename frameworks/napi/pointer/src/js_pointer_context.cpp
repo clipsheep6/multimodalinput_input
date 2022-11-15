@@ -129,7 +129,7 @@ napi_value JsPointerContext::SetPointerVisible(napi_env env, napi_callback_info 
         return nullptr;
     }
     bool visible = true;
-    CHKRP(napi_get_value_bool(env, argv[0], &visible), GET_BOOL);
+    CHKRP(napi_get_value_bool(env, argv[0], &visible), GET_VALUE_BOOL);
 
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
@@ -182,7 +182,7 @@ napi_value JsPointerContext::SetPointerSpeed(napi_env env, napi_callback_info in
         return nullptr;
     }
     int32_t pointerSpeed = STANDARD_SPEED;
-    CHKRP(napi_get_value_int32(env, argv[0], &pointerSpeed), GET_INT32);
+    CHKRP(napi_get_value_int32(env, argv[0], &pointerSpeed), GET_VALUE_INT32);
     if (pointerSpeed < MIN_SPEED) {
         pointerSpeed = MIN_SPEED;
     } else if (pointerSpeed > MAX_SPEED) {
@@ -238,7 +238,7 @@ napi_value JsPointerContext::SetPointerStyle(napi_env env, napi_callback_info in
         return nullptr;
     }
     int32_t windowid = 0;
-    CHKRP(napi_get_value_int32(env, argv[0], &windowid), GET_INT32);
+    CHKRP(napi_get_value_int32(env, argv[0], &windowid), GET_VALUE_INT32);
     if (windowid < 0) {
         MMI_HILOGE("Invalid windowid");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Windowid is invalid");
@@ -250,7 +250,7 @@ napi_value JsPointerContext::SetPointerStyle(napi_env env, napi_callback_info in
         return nullptr;
     }
     int32_t pointerStyle = 0;
-    CHKRP(napi_get_value_int32(env, argv[1], &pointerStyle), GET_INT32);
+    CHKRP(napi_get_value_int32(env, argv[1], &pointerStyle), GET_VALUE_INT32);
     if (pointerStyle < DEFAULT || pointerStyle > MIDDLE_BTN_NORTH_SOUTH_WEST_EAST) {
         MMI_HILOGE("Undefined pointer style");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Pointer style does not exist");
@@ -286,7 +286,7 @@ napi_value JsPointerContext::GetPointerStyle(napi_env env, napi_callback_info in
         return nullptr;
     }
     int32_t windowid = 0;
-    CHKRP(napi_get_value_int32(env, argv[0], &windowid), GET_INT32);
+    CHKRP(napi_get_value_int32(env, argv[0], &windowid), GET_VALUE_INT32);
     if (windowid < 0) {
         MMI_HILOGE("Invalid windowid");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Windowid is invalid");

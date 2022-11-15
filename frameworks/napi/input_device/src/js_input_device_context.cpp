@@ -156,7 +156,7 @@ napi_value JsInputDeviceContext::On(napi_env env, napi_callback_info info)
 
     char eventType[MAX_STRING_LEN] = {0};
     size_t ret = 0;
-    CHKRP(napi_get_value_string_utf8(env, argv[0], eventType, MAX_STRING_LEN - 1, &ret), GET_STRING_UTF8);
+    CHKRP(napi_get_value_string_utf8(env, argv[0], eventType, MAX_STRING_LEN - 1, &ret), GET_VALUE_STRING_UTF8);
     std::string type = eventType;
     if (type != CHANGED_TYPE) {
         MMI_HILOGE("Type is not change");
@@ -195,7 +195,7 @@ napi_value JsInputDeviceContext::Off(napi_env env, napi_callback_info info)
 
     char eventType[MAX_STRING_LEN] = {0};
     size_t ret = 0;
-    CHKRP(napi_get_value_string_utf8(env, argv[0], eventType, MAX_STRING_LEN - 1, &ret), GET_STRING_UTF8);
+    CHKRP(napi_get_value_string_utf8(env, argv[0], eventType, MAX_STRING_LEN - 1, &ret), GET_VALUE_STRING_UTF8);
     std::string type = eventType;
     if (type != CHANGED_TYPE) {
         MMI_HILOGE("Type is not change");
@@ -258,7 +258,7 @@ napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info
         return nullptr;
     }
     int32_t id = 0;
-    CHKRP(napi_get_value_int32(env, argv[0], &id), GET_INT32);
+    CHKRP(napi_get_value_int32(env, argv[0], &id), GET_VALUE_INT32);
     JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsInputDeviceMgr = jsDev->GetJsInputDeviceMgr();
@@ -290,7 +290,7 @@ napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info in
         return nullptr;
     }
     int32_t deviceId = 0;
-    CHKRP(napi_get_value_int32(env, argv[0], &deviceId), GET_INT32);
+    CHKRP(napi_get_value_int32(env, argv[0], &deviceId), GET_VALUE_INT32);
 
     if (!JsUtil::TypeOf(env, argv[1], napi_object)) {
         MMI_HILOGE("Second parameter type error");
@@ -315,7 +315,7 @@ napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info in
             THROWERR_API9(env, COMMON_PARAMETER_ERROR, "KeyCode", "number");
             return nullptr;
         }
-        CHKRP(napi_get_value_int32(env, keyValue, &data), GET_INT32);
+        CHKRP(napi_get_value_int32(env, keyValue, &data), GET_VALUE_INT32);
         keyCodes.push_back(data);
     }
 
@@ -350,7 +350,7 @@ napi_value JsInputDeviceContext::GetKeyboardType(napi_env env, napi_callback_inf
         return nullptr;
     }
     int32_t id = 0;
-    CHKRP(napi_get_value_int32(env, argv[0], &id), GET_INT32);
+    CHKRP(napi_get_value_int32(env, argv[0], &id), GET_VALUE_INT32);
 
     JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
     CHKPP(jsDev);
@@ -405,7 +405,7 @@ napi_value JsInputDeviceContext::GetDeviceInfo(napi_env env, napi_callback_info 
         return nullptr;
     }
     int32_t id = 0;
-    CHKRP(napi_get_value_int32(env, argv[0], &id), GET_INT32);
+    CHKRP(napi_get_value_int32(env, argv[0], &id), GET_VALUE_INT32);
 
     JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
     CHKPP(jsDev);

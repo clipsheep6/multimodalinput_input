@@ -83,7 +83,7 @@ bool getResult(sptr<AsyncContext> asyncContext, napi_value * results)
     if (resultType == ReturnType::BOOL) {
         bool temp;
         asyncContext->reserve >> temp;
-        CHKRF(napi_get_boolean(env, temp, &results[1]), CREATE_BOOL);
+        CHKRF(napi_get_boolean(env, temp, &results[1]), GET_BOOLEAN);
     } else if (resultType == ReturnType::NUMBER) {
         int32_t temp;
         asyncContext->reserve >> temp;
@@ -127,7 +127,7 @@ void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
                 }
             } else {
                 napi_value callback = nullptr;
-                CHKRV(napi_get_reference_value(env, asyncContext->callback, &callback), GET_REFERENCE);
+                CHKRV(napi_get_reference_value(env, asyncContext->callback, &callback), GET_REFERENCE_VALUE);
                 napi_value callResult = nullptr;
                 CHKRV(napi_call_function(env, nullptr, callback, 2, results, &callResult), CALL_FUNCTION);
             }

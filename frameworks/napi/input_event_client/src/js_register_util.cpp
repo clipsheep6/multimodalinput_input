@@ -43,7 +43,7 @@ int32_t GetNamedPropertyBool(const napi_env& env, const napi_value& object, cons
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, name.c_str(), "bool");
         return RET_ERR;
     }
-    CHKRF(napi_get_value_bool(env, napiValue, &ret), GET_BOOL);
+    CHKRF(napi_get_value_bool(env, napiValue, &ret), GET_VALUE_BOOL);
     return RET_OK;
 }
 

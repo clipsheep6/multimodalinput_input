@@ -58,7 +58,7 @@ bool GetNamedPropertyBool(const napi_env &env, const napi_value &object, const s
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, name.c_str(), "bool");
         return false;
     }
-    CHKRF(napi_get_value_bool(env, napiValue, &ret), GET_BOOL);
+    CHKRF(napi_get_value_bool(env, napiValue, &ret), GET_VALUE_BOOL);
     MMI_HILOGD("%{public}s=%{public}d", name.c_str(), ret);
     return true;
 }
@@ -102,7 +102,7 @@ napi_value GetPreKeys(const napi_env &env, const napi_value &value, std::set<int
             return nullptr;
         }
         int32_t value = 0;
-        CHKRP(napi_get_value_int32(env, napiElement, &value), GET_INT32);
+        CHKRP(napi_get_value_int32(env, napiElement, &value), GET_VALUE_INT32);
         if (value < 0) {
             MMI_HILOGE("preKey:%{public}d is less 0, can not process", value);
             THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "element of preKeys must be greater than or equal to 0");
@@ -312,7 +312,7 @@ void EmitAsyncCallbackWork(KeyEventMonitorInfo *reportEvent)
     CALL_DEBUG_ENTER;
     CHKPV(reportEvent);
     uv_loop_s *loop = nullptr;
-    CHKRV(napi_get_uv_event_loop(reportEvent->env, &loop), GET_UV_LOOP);
+    CHKRV(napi_get_uv_event_loop(reportEvent->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
     KeyEventMonitorInfoWorker *dataWorker = new (std::nothrow) KeyEventMonitorInfoWorker();

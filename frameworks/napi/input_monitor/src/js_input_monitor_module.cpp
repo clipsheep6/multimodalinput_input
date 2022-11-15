@@ -47,7 +47,7 @@ static napi_value JsOnApi9(napi_env env, napi_callback_info info)
     }
     char typeName[MAX_STRING_LEN] = { 0 };
     size_t len = 0;
-    CHKRP(napi_get_value_string_utf8(env, argv[0], typeName, MAX_STRING_LEN - 1, &len), GET_STRING_UTF8);
+    CHKRP(napi_get_value_string_utf8(env, argv[0], typeName, MAX_STRING_LEN - 1, &len), GET_VALUE_STRING_UTF8);
     if (std::strcmp(typeName, "touch") != 0 && std::strcmp(typeName, "mouse") != 0) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "EventType must be mouse or touch");
         return nullptr;
@@ -95,7 +95,7 @@ static napi_value JsOffApi9(napi_env env, napi_callback_info info)
     }
     char typeName[MAX_STRING_LEN] = { 0 };
     size_t len = 0;
-    CHKRP(napi_get_value_string_utf8(env, argv[0], typeName, MAX_STRING_LEN - 1, &len), GET_STRING_UTF8);
+    CHKRP(napi_get_value_string_utf8(env, argv[0], typeName, MAX_STRING_LEN - 1, &len), GET_VALUE_STRING_UTF8);
     if (std::strcmp(typeName, "touch") != 0 && std::strcmp(typeName, "mouse") != 0) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "EventType must be mouse or touch");
         return nullptr;

@@ -76,7 +76,7 @@ napi_value JsInputDeviceCooperateContext::Enable(napi_env env, napi_callback_inf
         return nullptr;
     }
     bool enable = false;
-    CHKRP(napi_get_value_bool(env, argv[0], &enable), GET_BOOL);
+    CHKRP(napi_get_value_bool(env, argv[0], &enable), GET_VALUE_BOOL);
 
     JsInputDeviceCooperateContext *jsDev = JsInputDeviceCooperateContext::GetInstance(env);
     CHKPP(jsDev);
@@ -118,9 +118,9 @@ napi_value JsInputDeviceCooperateContext::Start(napi_env env, napi_callback_info
     int32_t srcInputDeviceId = 0;
     size_t length = 0;
     CHKRP(napi_get_value_string_utf8(env, argv[0], sinkDeviceDescriptor,
-        sizeof(sinkDeviceDescriptor), &length), GET_STRING);
+        sizeof(sinkDeviceDescriptor), &length), GET_VALUE_STRING_UTF8);
     std::string sinkDeviceDescriptor_ = sinkDeviceDescriptor;
-    CHKRP(napi_get_value_int32(env, argv[1], &srcInputDeviceId), GET_INT32);
+    CHKRP(napi_get_value_int32(env, argv[1], &srcInputDeviceId), GET_VALUE_INT32);
 
     JsInputDeviceCooperateContext *jsDev = JsInputDeviceCooperateContext::GetInstance(env);
     CHKPP(jsDev);
@@ -177,7 +177,7 @@ napi_value JsInputDeviceCooperateContext::GetState(napi_env env, napi_callback_i
     char deviceDescriptor[MAX_STRING_LEN] = { 0 };
     size_t length = 0;
     CHKRP(napi_get_value_string_utf8(env, argv[0], deviceDescriptor,
-        sizeof(deviceDescriptor), &length), GET_STRING);
+        sizeof(deviceDescriptor), &length), GET_VALUE_STRING_UTF8);
     std::string deviceDescriptor_ = deviceDescriptor;
 
     JsInputDeviceCooperateContext *jsDev = JsInputDeviceCooperateContext::GetInstance(env);
@@ -213,7 +213,7 @@ napi_value JsInputDeviceCooperateContext::On(napi_env env, napi_callback_info in
     }
     char type[MAX_STRING_LEN] = {};
     size_t length = 0;
-    CHKRP(napi_get_value_string_utf8(env, argv[0], type, sizeof(type), &length), GET_STRING);
+    CHKRP(napi_get_value_string_utf8(env, argv[0], type, sizeof(type), &length), GET_VALUE_STRING_UTF8);
     if (std::strcmp(type, "cooperation") != 0) {
         THROWERR(env, "Register listener failed, the first parameter is invalid");
         MMI_HILOGE("Register listener failed, the first parameter is invalid");
@@ -250,7 +250,7 @@ napi_value JsInputDeviceCooperateContext::Off(napi_env env, napi_callback_info i
     }
     char type[MAX_STRING_LEN] = {};
     size_t length = 0;
-    CHKRP(napi_get_value_string_utf8(env, argv[0], type, sizeof(type), &length), GET_STRING);
+    CHKRP(napi_get_value_string_utf8(env, argv[0], type, sizeof(type), &length), GET_VALUE_STRING_UTF8);
     std::string type_ = type;
 
     JsInputDeviceCooperateContext *jsDev = JsInputDeviceCooperateContext::GetInstance(env);

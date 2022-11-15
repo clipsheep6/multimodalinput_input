@@ -56,7 +56,7 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
     }
     char eventType[EVENT_NAME_LEN] = { 0 };
     size_t typeLen = 0;
-    CHKRP(napi_get_value_string_utf8(env, argv[0], eventType, EVENT_NAME_LEN - 1, &typeLen), GET_STRING_UTF8);
+    CHKRP(napi_get_value_string_utf8(env, argv[0], eventType, EVENT_NAME_LEN - 1, &typeLen), GET_VALUE_STRING_UTF8);
     std::string type = eventType;
     if (type != SUBSCRIBE_TYPE) {
         MMI_HILOGE("Type is not key");
