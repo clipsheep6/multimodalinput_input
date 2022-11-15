@@ -14,7 +14,7 @@
  */
 
 #include "js_event_target.h"
-
+#include "js_util.h"
 #include "napi_constants.h"
 #include "util_napi_error.h"
 
@@ -399,6 +399,11 @@ void JsEventTarget::CallKeystrokeAbilityPromise(uv_work_t *work, int32_t status)
             return;
         }
         callResult = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
+        if (callResult == nullptr) {
+            MMI_HILOGE("callResult is nullptr");
+            napi_close_handle_scope(cb->env, scope);
+            return;
+        }
         CHKRV_SCOPE(cb->env, napi_reject_deferred(cb->env, cb->deferred, callResult), REJECT_DEFERRED, scope);
     } else {
         CHKRV_SCOPE(cb->env, napi_create_array(cb->env, &callResult), CREATE_ARRAY, scope);
@@ -442,6 +447,11 @@ void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
             return;
         }
         callResult[0] = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
+        if (callResult[0] == nullptr) {
+            MMI_HILOGE("callResult[0] is nullptr");
+            napi_close_handle_scope(cb->env, scope);
+            return;
+        }
         CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &callResult[1]), GET_UNDEFINED, scope);
     } else {
         CHKRV_SCOPE(cb->env, napi_create_array(cb->env, &callResult[1]), CREATE_ARRAY, scope);
@@ -457,11 +467,9 @@ void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
         CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &callResult[0]), GET_UNDEFINED, scope);
     }
     napi_value handler = nullptr;
-    CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler),
-        GET_REFERENCE, scope);
+    CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE, scope);
     napi_value result = nullptr;
-    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 2, callResult, &result),
-        CALL_FUNCTION, scope);
+    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 2, callResult, &result), CALL_FUNCTION, scope);
     napi_close_handle_scope(cb->env, scope);
 }
 
@@ -544,6 +552,11 @@ void JsEventTarget::CallKeyboardTypeAsync(uv_work_t *work, int32_t status)
             return;
         }
         callResult[0] = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
+        if (callResult[0] == nullptr) {
+            MMI_HILOGE("callResult[0] is nullptr");
+            napi_close_handle_scope(cb->env, scope);
+            return;
+        }
         CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &callResult[1]), GET_UNDEFINED, scope);
     } else {
         CHKRV_SCOPE(cb->env, napi_create_int32(cb->env, cb->data.keyboardType, &callResult[1]), CREATE_INT32, scope);
@@ -585,6 +598,11 @@ void JsEventTarget::CallKeyboardTypePromise(uv_work_t *work, int32_t status)
             return;
         }
         callResult = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
+        if (callResult == nullptr) {
+            MMI_HILOGE("callResult is nullptr");
+            napi_close_handle_scope(cb->env, scope);
+            return;
+        }
         CHKRV_SCOPE(cb->env, napi_reject_deferred(cb->env, cb->deferred, callResult), REJECT_DEFERRED, scope);
     } else {
         CHKRV_SCOPE(cb->env, napi_create_int32(cb->env, cb->data.keyboardType, &callResult), CREATE_INT32, scope);
@@ -620,6 +638,11 @@ void JsEventTarget::CallDevListAsyncWork(uv_work_t *work, int32_t status)
             return;
         }
         callResult[0] = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
+        if (callResult[0] == nullptr) {
+            MMI_HILOGE("callResult[0] is nullptr");
+            napi_close_handle_scope(cb->env, scope);
+            return;
+        }
         CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &callResult[1]), GET_UNDEFINED, scope);
     } else {
         CHKRV_SCOPE(cb->env, napi_create_array(cb->env, &callResult[1]), CREATE_ARRAY, scope);
@@ -635,8 +658,7 @@ void JsEventTarget::CallDevListAsyncWork(uv_work_t *work, int32_t status)
     napi_value handler = nullptr;
     CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE, scope);
     napi_value result = nullptr;
-    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 2, callResult, &result),
-        CALL_FUNCTION, scope);
+    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 2, callResult, &result), CALL_FUNCTION, scope);
     napi_close_handle_scope(cb->env, scope);
 }
 
@@ -666,6 +688,11 @@ void JsEventTarget::CallDevListPromiseWork(uv_work_t *work, int32_t status)
             return;
         }
         callResult = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
+        if (callResult == nullptr) {
+            MMI_HILOGE("callResult is nullptr");
+            napi_close_handle_scope(cb->env, scope);
+            return;
+        }
         CHKRV_SCOPE(cb->env, napi_reject_deferred(cb->env, cb->deferred, callResult), REJECT_DEFERRED, scope);
     } else {
         CHKRV_SCOPE(cb->env, napi_create_array(cb->env, &callResult), CREATE_ARRAY, scope);
@@ -692,7 +719,10 @@ void JsEventTarget::CallDevInfoPromiseWork(uv_work_t *work, int32_t status)
     CHKPV(cb->env);
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(cb->env, &scope);
-    CHKPV(scope);
+    if (scope == nullptr) {
+        MMI_HILOGE("scope is nullptr");
+        return;
+    }
     napi_value callResult = nullptr;
     if (cb->errCode != RET_OK) {
         if (cb->errCode == RET_ERR) {
@@ -707,11 +737,16 @@ void JsEventTarget::CallDevInfoPromiseWork(uv_work_t *work, int32_t status)
             return;
         }
         callResult = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
+        if (callResult == nullptr) {
+            MMI_HILOGE("callResult is nullptr");
+            napi_close_handle_scope(cb->env, scope);
+            return;
+        }
         CHKRV_SCOPE(cb->env, napi_reject_deferred(cb->env, cb->deferred, callResult), REJECT_DEFERRED, scope);
     } else {
         callResult = JsUtil::GetDeviceInfo(cb);
         if (callResult == nullptr) {
-            MMI_HILOGE("Check callResult is null");
+            MMI_HILOGE("Check callResult is nullptr");
             napi_close_handle_scope(cb->env, scope);
             return;
         }
@@ -746,6 +781,11 @@ void JsEventTarget::CallDevInfoAsyncWork(uv_work_t *work, int32_t status)
             return;
         }
         callResult[0] = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
+        if (callResult[0] == nullptr) {
+            MMI_HILOGE("callResult[0] is nullptr");
+            napi_close_handle_scope(cb->env, scope);
+            return;
+        }
         CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &callResult[1]), GET_UNDEFINED, scope);
     } else {
         callResult[1] = JsUtil::GetDeviceInfo(cb);
