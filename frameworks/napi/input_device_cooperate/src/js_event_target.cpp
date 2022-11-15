@@ -99,7 +99,7 @@ void JsEventTarget::EmitJsStop(sptr<JsUtil::CallbackInfo> cb, std::string device
     CALL_INFO_TRACE;
     CHKPV(cb);
     CHKPV(cb->env);
-    cb->data.stopResult = (msg == CooperationMessage::STOP_SUCCESS ? true : false);
+    cb->data.stopResult = (msg == CooperationMessage::STOP_SUCCESS);
     cb->data.errCode = static_cast<int32_t>(msg);
     uv_loop_s *loop = nullptr;
     CHKRV(cb->env, napi_get_uv_event_loop(cb->env, &loop), GET_UV_LOOP);
@@ -261,7 +261,11 @@ void JsEventTarget::CallEnablePromsieWork(uv_work_t *work, int32_t status)
 {
     CALL_INFO_TRACE;
     CHKPV(work);
-    CHKPV(work->data);
+    if (work->data == nullptr) {
+        JsUtil::DeletePtr<uv_work_t*>(work);
+        MMI_HILOGE("Check data is null");
+        return;
+    }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
     JsUtil::DeletePtr<uv_work_t*>(work);
     cb->DecStrongRef(nullptr);
@@ -293,7 +297,11 @@ void JsEventTarget::CallEnableAsyncWork(uv_work_t *work, int32_t status)
 {
     CALL_INFO_TRACE;
     CHKPV(work);
-    CHKPV(work->data);
+    if (work->data == nullptr) {
+        JsUtil::DeletePtr<uv_work_t*>(work);
+        MMI_HILOGE("Check data is null");
+        return;
+    }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
     JsUtil::DeletePtr<uv_work_t*>(work);
     cb->DecStrongRef(nullptr);
@@ -318,7 +326,11 @@ void JsEventTarget::CallStartPromiseWork(uv_work_t *work, int32_t status)
 {
     CALL_INFO_TRACE;
     CHKPV(work);
-    CHKPV(work->data);
+    if (work->data == nullptr) {
+        JsUtil::DeletePtr<uv_work_t*>(work);
+        MMI_HILOGE("Check data is null");
+        return;
+    }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
     JsUtil::DeletePtr<uv_work_t*>(work);
     cb->DecStrongRef(nullptr);
@@ -350,7 +362,11 @@ void JsEventTarget::CallStartAsyncWork(uv_work_t *work, int32_t status)
 {
     CALL_INFO_TRACE;
     CHKPV(work);
-    CHKPV(work->data);
+    if (work->data == nullptr) {
+        JsUtil::DeletePtr<uv_work_t*>(work);
+        MMI_HILOGE("Check data is null");
+        return;
+    }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
     JsUtil::DeletePtr<uv_work_t*>(work);
     cb->DecStrongRef(nullptr);
@@ -375,7 +391,11 @@ void JsEventTarget::CallStopPromiseWork(uv_work_t *work, int32_t status)
 {
     CALL_INFO_TRACE;
     CHKPV(work);
-    CHKPV(work->data);
+    if (work->data == nullptr) {
+        JsUtil::DeletePtr<uv_work_t*>(work);
+        MMI_HILOGE("Check data is null");
+        return;
+    }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
     JsUtil::DeletePtr<uv_work_t*>(work);
     cb->DecStrongRef(nullptr);
@@ -408,7 +428,11 @@ void JsEventTarget::CallStopAsyncWork(uv_work_t *work, int32_t status)
 {
     CALL_INFO_TRACE;
     CHKPV(work);
-    CHKPV(work->data);
+    if (work->data == nullptr) {
+        JsUtil::DeletePtr<uv_work_t*>(work);
+        MMI_HILOGE("Check data is null");
+        return;
+    }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
     JsUtil::DeletePtr<uv_work_t*>(work);
     cb->DecStrongRef(nullptr);
@@ -433,7 +457,11 @@ void JsEventTarget::CallGetStatePromiseWork(uv_work_t *work, int32_t status)
 {
     CALL_INFO_TRACE;
     CHKPV(work);
-    CHKPV(work->data);
+    if (work->data == nullptr) {
+        JsUtil::DeletePtr<uv_work_t*>(work);
+        MMI_HILOGE("Check data is null");
+        return;
+    }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
     JsUtil::DeletePtr<uv_work_t*>(work);
     cb->DecStrongRef(nullptr);
@@ -454,7 +482,11 @@ void JsEventTarget::CallGetStateAsyncWork(uv_work_t *work, int32_t status)
 {
     CALL_INFO_TRACE;
     CHKPV(work);
-    CHKPV(work->data);
+    if (work->data == nullptr) {
+        JsUtil::DeletePtr<uv_work_t*>(work);
+        MMI_HILOGE("Check data is null");
+        return;
+    }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
     JsUtil::DeletePtr<uv_work_t*>(work);
     cb->DecStrongRef(nullptr);
