@@ -29,7 +29,7 @@
 #include "i_input_event_handler.h"
 #include "key_subscriber_handler.h"
 #include "mouse_event_normalize.h"
-#include "event_plugins_handler.h"
+#include "plugin_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -39,7 +39,7 @@ class InputEventHandler final {
     DECLARE_DELAYED_SINGLETON(InputEventHandler);
 public:
     DISALLOW_COPY_AND_MOVE(InputEventHandler);
-    void Init(UDSServer& udsServer);
+    void Init(UDSServer& udsServer, IInputEventPluginContext *context);
     void OnEvent(void *event);
     UDSServer *GetUDSServer() const;
 
@@ -52,11 +52,12 @@ public:
     void SetJumpInterceptState(bool isJump);
     bool GetJumpInterceptState() const;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
-
 private:
+    void SetPluginEventHandler(EventHandlerType type);
     int32_t BuildInputHandlerChain();
 
     UDSServer *udsServer_ { nullptr };
+    IInputEventPluginContext *context_;
     std::shared_ptr<EventNormalizeHandler> eventNormalizeHandler_ { nullptr };
     std::shared_ptr<EventFilterHandler> eventFilterHandler_ { nullptr };
     std::shared_ptr<EventInterceptorHandler> eventInterceptorHandler_ { nullptr };

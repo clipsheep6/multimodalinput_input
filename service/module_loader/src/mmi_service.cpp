@@ -242,6 +242,8 @@ bool MMIService::InitDelegateTasks()
 int32_t MMIService::Init()
 {
     CheckDefine();
+    //pluginMgr_.SetDeivceManager(deviceMgr.GetDeviceContext()));
+    pluginMgr_.StartWatchPluginDir()
     MMI_HILOGD("WindowsManager Init");
     WinMgr->Init(*this);
     MMI_HILOGD("ANRManager Init");
@@ -262,7 +264,11 @@ int32_t MMIService::Init()
     InputDevCooSM->Init(std::bind(&DelegateTasks::PostSyncTask, &delegateTasks_, std::placeholders::_1));
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     MMI_HILOGD("Input msg handler init");
-    InputHandler->Init(*this);
+    InputHandler->Init(*this, pluginMgr_->GetContext());
+    if (!InputHandler->Build()) {
+        MMI_HILOGE("Libinput init failed");
+        return LIBINPUT_INIT_FAIL;
+    }
     if (!InitLibinputService()) {
         MMI_HILOGE("Libinput init failed");
         return LIBINPUT_INIT_FAIL;

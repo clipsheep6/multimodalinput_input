@@ -30,7 +30,7 @@
 #include "libinput_adapter.h"
 #include "server_msg_handler.h"
 #include "uds_server.h"
-
+#include "plugin_manager.h"
 namespace OHOS {
 namespace MMI {
 
@@ -41,6 +41,7 @@ class MMIService final : public UDSServer, public SystemAbility, public Multimod
     DISALLOW_COPY_AND_MOVE(MMIService);
 
 public:
+    IInputDeviceManager * GetInputDeviceManager() const { return deviceMgr_; }
     void OnStart() override;
     void OnStop() override;
     int32_t Dump(int32_t fd, const std::vector<std::u16string> &args) override;
@@ -145,7 +146,8 @@ private:
     LibinputAdapter libinputAdapter_;
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;
-
+    InputDeviceManager deviceMgr_;
+    InputEventHandlerPluginMgr pluginMgr_;
     std::atomic_bool threadStatusFlag_ { false };
 };
 } // namespace MMI

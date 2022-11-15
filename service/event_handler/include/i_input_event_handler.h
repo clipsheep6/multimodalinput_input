@@ -26,9 +26,18 @@ struct libinput_event;
 
 namespace OHOS {
 namespace MMI {
+enum class EventHandlerType {
+    NORMALLIZE,
+    FILTER,
+    INTERCEPTOR,
+    KEY_COMMAND,
+    SUBSCRIBER,
+    MONITOR
+};
 class IInputEventHandler {
 public:
-    IInputEventHandler() = default;
+    IInputEventHandler(EventHandlerType handlerType, int32_t handlerPriority) : handlerType_(handlerType),
+        handlerPriority_(handlerPriority) {}
     DISALLOW_COPY_AND_MOVE(IInputEventHandler);
     virtual ~IInputEventHandler() = default;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -46,24 +55,10 @@ public:
     };
 protected:
     std::shared_ptr<IInputEventHandler> nextHandler_ { nullptr };
-
-public:
-    struct IPluginContext {
-        enum class LoadPeriod {
-            ON_EVENT_MONITOR,
-            ON_EVENT_FILTER,
-            ON_EVENT_INTERCEPTOR,
-            ON_EVENT_KEY_COMMAND,
-            ON_EVENT_SUBSCRIBER,
-            ON_EVENT_MONITOR
-        }
-
-
-
-    }
+    const EventHandlerType handlerType_;
+    // 数字越小， 优先级越高， 内嵌的handler类型优先级为0
+    const int32_t handlerPriority_;
 };
-
-
 } // namespace MMI
 } // namespace OHOS
 #endif // I_INPUT_EVENT_HANDLER_H
