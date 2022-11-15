@@ -97,6 +97,10 @@ protected:
 #endif // OHOS_BUILD_ENABLE_POINTER
     int32_t OnRegisterDevListener(int32_t pid);
     int32_t OnUnregisterDevListener(int32_t pid);
+    int32_t OnGetDeviceIds(std::vector<int32_t> &ids);
+    int32_t OnGetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice);
+    int32_t OnSupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke);
+    int32_t OnGetKeyboardType(int32_t deviceId, int32_t &keyboardType);
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t CheckAddInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType);
     int32_t CheckRemoveInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType);

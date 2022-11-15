@@ -42,7 +42,7 @@ void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        MMI_HILOGE("Check data is null");
+        MMI_HILOGE("Check data is nullptr");
         return;
     }
     auto temp = static_cast<std::unique_ptr<JsUtil::CallbackInfo>*>(work->data);
@@ -91,7 +91,7 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        MMI_HILOGE("Check data is null");
+        MMI_HILOGE("Check data is nullptr");
         return;
     }
     auto temp = static_cast<std::unique_ptr<JsUtil::CallbackInfo>*>(work->data);
@@ -200,7 +200,7 @@ void JsEventTarget::CallIdsAsyncWork(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        MMI_HILOGE("Check data is null");
+        MMI_HILOGE("Check data is nullptr");
         return;
     }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
@@ -237,7 +237,7 @@ void JsEventTarget::CallIdsPromiseWork(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        MMI_HILOGE("Check data is null");
+        MMI_HILOGE("Check data is nullptr");
         return;
     }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
@@ -302,7 +302,7 @@ void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        MMI_HILOGE("Check data is null");
+        MMI_HILOGE("Check data is nullptr");
         return;
     }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
@@ -332,7 +332,7 @@ void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        MMI_HILOGE("Check data is null");
+        MMI_HILOGE("Check data is nullptr");
         return;
     }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
@@ -395,7 +395,7 @@ void JsEventTarget::CallKeystrokeAbilityPromise(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        MMI_HILOGE("Check data is null");
+        MMI_HILOGE("Check data is nullptr");
         return;
     }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
@@ -447,7 +447,7 @@ void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        MMI_HILOGE("Check data is null");
+        MMI_HILOGE("Check data is nullptr");
         return;
     }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
@@ -554,7 +554,7 @@ void JsEventTarget::CallKeyboardTypeAsync(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        MMI_HILOGE("Check data is null");
+        MMI_HILOGE("Check data is nullptr");
         return;
     }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
@@ -604,7 +604,7 @@ void JsEventTarget::CallKeyboardTypePromise(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        MMI_HILOGE("Check data is null");
+        MMI_HILOGE("Check data is nullptr");
         return;
     }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
@@ -649,7 +649,7 @@ void JsEventTarget::CallDevListAsyncWork(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        MMI_HILOGE("Check data is null");
+        MMI_HILOGE("Check data is nullptr");
         return;
     }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
@@ -704,7 +704,7 @@ void JsEventTarget::CallDevListPromiseWork(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        MMI_HILOGE("Check data is null");
+        MMI_HILOGE("Check data is nullptr");
         return;
     }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
@@ -752,7 +752,11 @@ void JsEventTarget::CallDevInfoPromiseWork(uv_work_t *work, int32_t status)
 {
     CALL_DEBUG_ENTER;
     CHKPV(work);
-    CHKPV(work->data);
+    if (work->data == nullptr) {
+        JsUtil::DeletePtr<uv_work_t*>(work);
+        MMI_HILOGE("Check data is nullptr");
+        return;
+    }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
     JsUtil::DeletePtr<uv_work_t*>(work);
     cb->DecStrongRef(nullptr);

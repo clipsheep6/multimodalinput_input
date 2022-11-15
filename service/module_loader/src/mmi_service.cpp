@@ -496,7 +496,7 @@ int32_t MMIService::GetPointerStyle(int32_t windowId, int32_t &pointerStyle)
     return RET_OK;
 }
 
-int32_t MMIService::SupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke)
+int32_t MMIService::OnSupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = InputDevMgr->SupportKeys(deviceId, keys, keystroke);
@@ -511,18 +511,37 @@ int32_t MMIService::SupportKeys(int32_t deviceId, std::vector<int32_t> &keys, st
     return RET_OK;
 }
 
-int32_t MMIService::GetDeviceIds(std::vector<int32_t> &ids)
+int32_t MMIService::SupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnSupportKeys, this,
+        deviceId, keys, std::ref(keystroke)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Support keys info process failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::OnGetDeviceIds(std::vector<int32_t> &ids)
 {
     CALL_DEBUG_ENTER;
     ids = InputDevMgr->GetInputDeviceIds();
-    if (ids.size() > MAX_INPUT_DEVICE) {
-        MMI_HILOGE("Device exceeds the max range");
+    return RET_OK;
+}
+
+int32_t MMIService::GetDeviceIds(std::vector<int32_t> &ids)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetDeviceIds, this, std::ref(ids)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get deviceids failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
 }
 
-int32_t MMIService::GetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice)
+int32_t MMIService::OnGetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice)
 {
     CALL_DEBUG_ENTER;
     if (InputDevMgr->GetInputDevice(deviceId) == nullptr) {
@@ -530,6 +549,18 @@ int32_t MMIService::GetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &in
         return COMMON_PARAMETER_ERROR;
     }
     inputDevice = InputDevMgr->GetInputDevice(deviceId);
+    return RET_OK;
+}
+
+int32_t MMIService::GetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetDevice, this,
+        deviceId, std::ref(inputDevice)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get input device info failed, ret:%{public}d", ret);
+        return ret;
+    }
     return RET_OK;
 }
 
@@ -585,12 +616,23 @@ int32_t MMIService::UnregisterDevListener()
     return RET_OK;
 }
 
-int32_t MMIService::GetKeyboardType(int32_t deviceId, int32_t &keyboardType)
+int32_t MMIService::OnGetKeyboardType(int32_t deviceId, int32_t &keyboardType)
 {
-    CALL_DEBUG_ENTER;
     int32_t ret = InputDevMgr->GetKeyboardType(deviceId, keyboardType);
     if (ret != RET_OK) {
         MMI_HILOGE("GetKeyboardType call failed");
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::GetKeyboardType(int32_t deviceId, int32_t &keyboardType)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetKeyboardType, this,
+        deviceId, std::ref(keyboardType)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get keyboard type failed, ret:%{public}d", ret);
         return ret;
     }
     return ret;
