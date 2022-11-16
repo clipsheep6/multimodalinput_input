@@ -177,10 +177,6 @@ bool MMIService::IsRunning() const
 
 bool MMIService::InitLibinputService()
 {
-#ifdef OHOS_BUILD_HDF
-    MMI_HILOGD("HDF Init");
-    hdfEventManager.SetupCallback();
-#endif
     if (!(libinputAdapter_.Init(std::bind(&InputEventHandler::OnEvent, InputHandler, std::placeholders::_1),
         DEF_INPUT_SEAT))) {
         MMI_HILOGE("Libinput init, bind failed");

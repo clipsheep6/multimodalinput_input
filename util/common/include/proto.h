@@ -119,8 +119,6 @@ enum class MmiMessageId : int32_t {
     DEVICE_END,
 
     ON_STANDARD = 9000,
-    SENIOR_INPUT_FUNC = 9050,
-    HDI_INJECT = 9051,
     ON_JOYSTICK = 10000,
     ON_WINDOW = 11000,
 

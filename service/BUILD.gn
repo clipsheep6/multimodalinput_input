@@ -62,17 +62,6 @@ config("libmmi_server_config") {
     ]
   }
 
-  if (input_feature_hdf) {
-    include_dirs += [
-      "hdf_adapter/include",
-      "hdi_inject/include",
-      "$root_out_dir/diff_libinput_mmi/export_include",
-      "//third_party/eudev/export_include/",
-      "$root_out_dir/diff_libevdev_hdf/export_include",
-      "$root_out_dir/diff_libinput_mmi/include/linux",
-    ]
-  }
-
   defines = []
 
   if (input_feature_combination_key) {
@@ -450,13 +439,6 @@ ohos_shared_library("libmmi-server") {
     ]
   }
 
-  if (input_feature_hdf) {
-    sources += [
-      "hdf_adapter/src/hdf_event_manager.cpp",
-      "hdi_inject/src/hdi_inject.cpp",
-    ]
-  }
-
   if (input_feature_keyboard) {
     sources += [
       "key_event_normalize/src/key_event_normalize.cpp",
@@ -632,23 +614,17 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/service/event_dispatch/include",
     "${mmi_path}/service/key_event_normalize/include",
     "${mmi_path}/service/event_handler/include",
-    "${mmi_path}/service/hdi_inject/include",
     "${mmi_path}/service/event_dump/include",
-    "${mmi_path}/service/hdf_adapter/include",
     "${mmi_path}/service/libinput_adapter/include",
     "${mmi_path}/service/message_handle/include",
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/uinput",
+    "$root_out_dir/diff_libinput_mmi/export_include",
   ]
-
-  if (input_feature_libinput || input_feature_hdf) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
-  }
 
   sources = [
     "event_dispatch/test/event_dispatch_test.cpp",
-    "hdi_inject/test/hdi_inject_test.cpp",
     "message_handle/test/server_msg_handler_test.cpp",
     "module_loader/test/uds_server_test.cpp",
     "window_manager/test/input_windows_manager_test.cpp",

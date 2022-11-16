@@ -96,11 +96,8 @@ ohos_unittest("ut-virtual-device-out") {
     "${mmi_path}/util/network/include",
     "${mmi_path}/util/socket",
     "${mmi_path}/util/socket/include",
+    "$root_out_dir/diff_libinput_mmi/export_include",
   ]
-
-  if (input_feature_libinput || input_feature_hdf) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
-  }
 
   sources = [ "test/virtual_device_test.cpp" ]
 

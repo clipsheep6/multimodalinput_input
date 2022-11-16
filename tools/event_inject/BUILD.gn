@@ -79,7 +79,6 @@ ohos_source_set("event-injection") {
 ohos_unittest("ut-event-injection-out") {
   module_out_path = module_output_path
   include_dirs = [
-    "//drivers/peripheral/input/interfaces/include",
     "//commonlibrary/c_utils/base/include",
     "//third_party/googletest/googletest/include",
     "//third_party/cJSON",
@@ -111,11 +110,8 @@ ohos_unittest("ut-event-injection-out") {
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/tools/event_inject/include",
     "${mmi_path}/uinput",
+    "$root_out_dir/diff_libinput_mmi/export_include",
   ]
-
-  if (input_feature_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
-  }
 
   sources = [
     "test/device_base_test.cpp",
