@@ -23,20 +23,6 @@ config("libmmi_virtual_device_config") {
     "//commonlibrary/c_utils/base/include",
     "//util/common/include",
   ]
-
-  defines = []
-
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (input_feature_libinput) {
-    defines += [ "OHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (input_feature_hdf) {
-    defines += [ "OHOS_BUILD_HDF" ]
-  }
 }
 
 config("virtual_device_public_config") {
@@ -78,20 +64,6 @@ ohos_source_set("libmmi-virtual-device") {
 
   configs = [ ":libmmi_virtual_device_config" ]
 
-  defines = []
-
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (input_feature_libinput) {
-    defines += [ "OHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (input_feature_hdf) {
-    defines += [ "OHOS_BUILD_HDF" ]
-  }
-
   part_name = "input"
   subsystem_name = "multimodalinput"
   external_deps = [ "c_utils:utils" ]
@@ -104,24 +76,8 @@ ohos_executable("vuinput") {
 
   deps = [
     "//foundation/multimodalinput/input/tools/vuinput:libmmi-virtual-device",
+    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
   ]
-
-  if (input_feature_libinput) {
-    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
-  }
-  defines = []
-
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (input_feature_libinput) {
-    defines += [ "OHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (input_feature_hdf) {
-    defines += [ "OHOS_BUILD_HDF" ]
-  }
 
   install_enable = true
   part_name = "input"
@@ -150,30 +106,14 @@ ohos_unittest("ut-virtual-device-out") {
 
   configs = [ ":virtual_device_public_config" ]
 
-  defines = []
-
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (input_feature_libinput) {
-    defines += [ "OHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (input_feature_hdf) {
-    defines += [ "OHOS_BUILD_HDF" ]
-  }
-
   deps = [
     "${mmi_path}/tools/vuinput:libmmi-virtual-device",
     "${mmi_path}/util:libmmi-util",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
+    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
   ]
 
-  if (input_feature_libinput || input_feature_hdf) {
-    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
-  }
   external_deps = [
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",

@@ -75,18 +75,6 @@ config("libmmi_server_config") {
 
   defines = []
 
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (input_feature_libinput) {
-    defines += [ "OHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (input_feature_hdf) {
-    defines += [ "OHOS_BUILD_HDF" ]
-  }
-
   if (input_feature_combination_key) {
     defines += [ "OHOS_BUILD_ENABLE_COMBINATION_KEY" ]
   }
@@ -563,11 +551,8 @@ ohos_shared_library("libmmi-server") {
     "//foundation/multimodalinput/input/util:libmmi-util",
     "//third_party/cJSON:cjson_static",
     "//third_party/json:nlohmann_json_static",
+    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
   ]
-
-  if (input_feature_libinput || input_feature_hdf) {
-    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
-  }
 
   if (resource_schedule_service_enabled) {
     deps += [ "//foundation/resourceschedule/resource_schedule_service/ressched/interfaces/innerkits/ressched_client:ressched_client" ]
@@ -671,18 +656,6 @@ ohos_unittest("ut-mmi-service-out") {
 
   defines = []
 
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (input_feature_libinput) {
-    defines += [ "OHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (input_feature_hdf) {
-    defines += [ "OHOS_BUILD_HDF" ]
-  }
-
   if (input_feature_pointer_drawing) {
     defines += [ "OHOS_BUILD_ENABLE_POINTER_DRAWING" ]
   }
@@ -706,12 +679,9 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
     "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
+    "//third_party/googletest:gtest_main",    
+    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
   ]
-
-  if (input_feature_libinput || input_feature_hdf) {
-    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
-  }
 
   external_deps = [
     "c_utils:utils",
@@ -729,12 +699,6 @@ ohos_unittest("TransformPointTest") {
   ]
 
   sources = [ "touch_event_normalize/test/transform_point_test.cpp" ]
-
-  defines = []
-
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
 
   deps = [
     "${mmi_path}/tools/vuinput:libmmi-virtual-device",
