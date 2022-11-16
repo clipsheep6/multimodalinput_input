@@ -167,11 +167,10 @@ ohos_shared_library("libmmi-client") {
 
 ohos_unittest("ut-mmi-proxy-out") {
   module_out_path = module_output_path
-  include_dirs = [ "//commonlibrary/c_utils/base/include" ]
-
-  if (input_feature_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
-  }
+  include_dirs = [
+    "//commonlibrary/c_utils/base/include",
+    "$root_out_dir/diff_libinput_mmi/export_include",
+  ]
 
   sources = [ "module_loader/test/mmi_client_test.cpp" ]
 
