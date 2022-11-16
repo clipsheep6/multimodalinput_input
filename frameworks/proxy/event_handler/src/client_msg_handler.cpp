@@ -366,7 +366,6 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
 void ClientMsgHandler::OnDispatchEventProcessed(int32_t eventId, int64_t actionTime)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGE("Processed event, type:%{public}d, id:%{public}d", ANR_DISPATCH, eventId);
     ANRHdl->SetLastProcessedEventId(ANR_DISPATCH, eventId, actionTime);
 }
 

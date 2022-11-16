@@ -288,7 +288,6 @@ void InputHandlerManager::OnDispatchEventProcessed(int32_t eventId, int64_t acti
         processedEvents_.emplace(eventId, count);
         return;
     }
-    MMI_HILOGD("Processed event, type:%{public}d, id:%{public}d", ANR_MONITOR, eventId);
     ANRHdl->SetLastProcessedEventId(ANR_MONITOR, eventId, actionTime);
 }
 } // namespace MMI

@@ -29,10 +29,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ANRHa
 constexpr int64_t MAX_MARK_PROCESS_DELAY_TIME = 3500000;
 constexpr int64_t MIN_MARK_PROCESS_DELAY_TIME = 50000;
 constexpr int32_t INVALID_OR_PROCESSED_ID = -1;
-const static std::map<int32_t, std::string> SendEventType = {
-    {ANR_DISPATCH, "dispatch_event_task"},
-    {ANR_MONITOR, "monitor_event_task"}
-};
 } // namespace
 
 ANRHandler::ANRHandler() {}
@@ -54,7 +50,6 @@ void ANRHandler::UpdateLastProcessedEventId(int32_t eventType, int32_t eventId)
 void ANRHandler::SetLastProcessedEventId(int32_t eventType, int32_t eventId, uint64_t actionTime)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGE("LW+: Processed event type:%{public}d, id:%{public}d", eventType, eventId);
     if (event_[eventType].lastEventId > eventId) {
         MMI_HILOGE("Event type:%{public}d, id %{public}d less then last processed lastEventId %{public}d",
             eventType, eventId, event_[eventType].lastEventId);
@@ -64,16 +59,14 @@ void ANRHandler::SetLastProcessedEventId(int32_t eventType, int32_t eventId, uin
 
     int64_t currentTime = GetSysClockTime();
     int64_t timeoutTime = INPUT_UI_TIMEOUT_TIME - (currentTime - actionTime);
-    MMI_HILOGE("LW+: Event type:%{public}d, id:%{public}d, actionTime:%{public}" PRId64 ", "
+    MMI_HILOGD("Processed event type:%{public}d, id:%{public}d, actionTime:%{public}" PRId64 ", "
         "currentTime:%{public}" PRId64 ", timeoutTime:%{public}" PRId64,
         eventType, eventId, actionTime, currentTime, timeoutTime);
 
     if (!event_[eventType].sendStatus) {
         if (timeoutTime < MIN_MARK_PROCESS_DELAY_TIME) {
-            MMI_HILOGE("LW+: Event mark processed immediately");
             SendEvent(eventType, 0);
         } else {
-            MMI_HILOGE("LW+: Event mark processed timer start");
             int64_t delayTime;
             if (timeoutTime >= MAX_MARK_PROCESS_DELAY_TIME) {
                 delayTime = MAX_MARK_PROCESS_DELAY_TIME / 1000;
@@ -82,9 +75,7 @@ void ANRHandler::SetLastProcessedEventId(int32_t eventType, int32_t eventId, uin
             }
             SendEvent(eventType, delayTime);
         }
-        return;
     }
-    MMI_HILOGE("LW+: Event mark processed running...");
 }
 
 int32_t ANRHandler::GetLastProcessedEventId(int32_t eventType)
@@ -99,7 +90,7 @@ int32_t ANRHandler::GetLastProcessedEventId(int32_t eventType)
     }
 
     event_[eventType].lastReportId = event_[eventType].lastEventId;
-    MMI_HILOGE("LW+: Processed event type:%{public}d, lastEventId:%{public}d, lastReportId:%{public}d",
+    MMI_HILOGD("Processed event type:%{public}d, lastEventId:%{public}d, lastReportId:%{public}d",
         eventType, event_[eventType].lastEventId, event_[eventType].lastReportId);
     return event_[eventType].lastEventId;
 }
@@ -111,31 +102,24 @@ void ANRHandler::MarkProcessed(int32_t eventType)
     if (eventId == INVALID_OR_PROCESSED_ID) {
         return;
     }
-    MMI_HILOGE("LW+: Processed event type:%{public}d, id:%{public}d", eventType, eventId);
+    MMI_HILOGD("Processed event type:%{public}d, id:%{public}d", eventType, eventId);
     int32_t ret = MultimodalInputConnMgr->MarkProcessed(eventType, eventId);
     if (ret != 0) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }
     SetLastProcessedEventStatus(eventType, false);
-    MMI_HILOGE("LW+: Event mark processed timer finish");
 }
 
 
 void ANRHandler::SendEvent(int32_t eventType, int64_t delayTime)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGE("LW+: Event type:%{public}d, delayTime:%{public}" PRId64, eventType, delayTime);
-    auto it = SendEventType.find(eventType);
-    if (it == SendEventType.end()) {
-        MMI_HILOGE("Invalid event type:%{public}d, lastEventId:%{public}d", eventType, event_[eventType].lastEventId);
-        return;
-    }
+    MMI_HILOGD("Event type:%{public}d, delayTime:%{public}" PRId64, eventType, delayTime);
     SetLastProcessedEventStatus(eventType, true);
     auto eventHandler = InputMgrImpl.GetEventHandler();
     CHKPV(eventHandler);
     std::function<void()> eventFunc = std::bind(&ANRHandler::MarkProcessed, this, eventType);
-
-    if (!eventHandler->PostHighPriorityTask(eventFunc, it->second, delayTime)) {
+    if (!eventHandler->PostHighPriorityTask(eventFunc, delayTime)) {
         MMI_HILOGE("Send dispatch event failed");
     }
 }

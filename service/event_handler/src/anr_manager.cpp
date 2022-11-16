@@ -46,7 +46,7 @@ void ANRManager::Init(UDSServer &udsServer)
 int32_t ANRManager::MarkProcessed(int32_t pid, int32_t eventType, int32_t eventId)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGE("pid:%{public}d, eventType:%{public}d, eventId:%{public}d", pid, eventType, eventId);
+    MMI_HILOGD("pid:%{public}d, eventType:%{public}d, eventId:%{public}d", pid, eventType, eventId);
     SessionPtr sess = udsServer_->GetSessionByPid(pid);
     CHKPR(sess, RET_ERR);
     std::list<int32_t> timerIds = sess->DelEvents(eventType, eventId);
