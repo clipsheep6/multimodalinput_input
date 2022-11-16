@@ -68,9 +68,6 @@ protected:
     int32_t OnHdiInject(SessionPtr sess, NetPacket& pkt);
 #endif
     int32_t OnDisplayInfo(SessionPtr sess, NetPacket& pkt);
-#ifdef OHOS_BUILD_MMI_DEBUG
-    int32_t OnBigPacketTest(SessionPtr sess, NetPacket& pkt);
-#endif // OHOS_BUILD_MMI_DEBUG
 
 private:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
