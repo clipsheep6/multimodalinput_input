@@ -411,13 +411,6 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event)
     CHKPR(event, ERROR_NULL_POINTER);
     auto pointerEvent = TouchEventHdr->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
-    if (InputDevCooSM->CheckTouchEvent(event)) {
-        MMI_HILOGW("Touch event filter out");
-        ResetTouchUpEvent(pointerEvent, event);
-        return RET_OK;
-    }
-#endif // OHOS_DISTRIBUTED_INPUT_MODEL
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandleTouchEvent(pointerEvent);
     ResetTouchUpEvent(pointerEvent, event);
