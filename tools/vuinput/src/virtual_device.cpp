@@ -607,7 +607,7 @@ bool VirtualDevice::CloseDevice(const std::string& closeDeviceName, const std::v
     return false;
 }
 
- bool VirtualDevice::CheckCommand(int32_t argc, char **argv)
+bool VirtualDevice::CheckCommand(int32_t argc, char **argv)
 {
     int32_t c = -1;
     if (!SelectOptions(argc, argv, c)) {
@@ -791,7 +791,7 @@ void VirtualDevice::ShowUsage()
     std::cout << "-S all &        --start all &        start all &           -start devices " << std::endl;
     std::cout << "commands for close:                                                       " << std::endl;
     std::cout << "-C <pid> &      --close <pid> &      close <pid>           -close a pid   " << std::endl;
-    std::cout << "-C all &        --close all  &       close all  &           -close pids   " << std::endl;
+    std::cout << "-C all &        --close all  &       close all  &          -close pids    " << std::endl;
     std::cout << "-?  --help   help                                                         " << std::endl;
 }
 } // namespace MMI
