@@ -38,27 +38,27 @@ bool InjectionToolsHelpFunc::CheckInjectionCommand(int32_t argc, char **argv)
     CALL_DEBUG_ENTER;
     int32_t c = -1;
     if (!SelectOptions(argc, argv, c)) {
-        std::cout << "Select option failed" << std::endl;
+        MMI_HILOGE("Select option failed");
         return false;
     }
     switch (c) {
         case 'S': {
             if (!SendEventOption(argc ,argv)) {
-                std::cout<< "SendEvent option failed" << std::endl;
+                MMI_HILOGE("SendEvent option failed");
                 return false;
             }
             break;
         }
         case 'J': {
             if (!JsonOption(argc ,argv)) {
-                std::cout<< "Json option failed" << std::endl;
+                MMI_HILOGE("Json option failed");
                 return false;
             }
             break;
         }
         case '?': {
             if (!HelpOption(argc ,argv)) {
-                std::cout<< "Help option failed" << std::endl;
+                MMI_HILOGE("Help option failed");
                 return false;
             }
             break;
@@ -80,6 +80,10 @@ bool InjectionToolsHelpFunc::SelectOptions(int32_t argc, char **argv, int32_t &o
         {"help", no_argument, NULL, '?'},
         {NULL, 0 , NULL, 0}
     };
+    if (argc < SHORT_OPTION_LENGTH) {
+        std::cout << "Please enter options or parameters" << std::endl;
+        return false;
+    }
     std::string inputOptions = argv[optind];
     if (inputOptions.find('-') == inputOptions.npos) {
         for (uint32_t i = 0; i < sizeof(longOptions) / sizeof(struct option) - 1; ++i) {
@@ -89,11 +93,10 @@ bool InjectionToolsHelpFunc::SelectOptions(int32_t argc, char **argv, int32_t &o
                 break;
             }
         }
+    } else if ((inputOptions.length() != SHORT_OPTION_LENGTH) && (inputOptions[inputOptions.find('-') + 1] != '-')) {
+        std::cout << "More than one short option is not supported" << std::endl;
+        return false;
     } else {
-        if ((inputOptions.length() != SHORT_OPTION_LENGTH) && (inputOptions.find("--") == inputOptions.npos)) {
-            std::cout << "More than one short option is not supported" << std::endl;
-            return false;
-        }
         int32_t optionIndex = 0;
         opt = getopt_long(argc, argv, "SJ?", longOptions, &optionIndex);
     }
@@ -118,7 +121,7 @@ bool InjectionToolsHelpFunc::SendEventOption(int32_t argc, char **argv)
     }
     char realPath[PATH_MAX] = {};
     if (realpath(deviceNode.c_str(), realPath) == nullptr) {
-        std::cout << "Path is error, path: " << deviceNode.c_str() << std::endl;
+        std::cout << "Device node path is error, path: " << deviceNode.c_str() << std::endl;
         return false;
     }
     while (++optind < argc) {
@@ -142,7 +145,7 @@ bool InjectionToolsHelpFunc::JsonOption(int32_t argc, char **argv)
     std::string jsonFile = argv[optind];
     char realPath[PATH_MAX] = {};
     if (realpath(jsonFile.c_str(), realPath) == nullptr) {
-        std::cout << "Path is error, path: " << jsonFile.c_str() << std::endl;
+        std::cout << "Json file path is error, path: " << jsonFile.c_str() << std::endl;
         return false;
     }
     std::string jsonBuf = ReadJsonFile(jsonFile);
@@ -173,7 +176,7 @@ void InjectionToolsHelpFunc::SetArgvs(int32_t argc, char **argv, const std::stri
 {
     injectArgvs_.clear();
     injectArgvs_.push_back(str);
-    for (int32_t i = 2; i < argc; ++i) {
+    for (int32_t i = SHORT_OPTION_LENGTH; i < argc; ++i) {
         injectArgvs_.push_back(argv[i]);
     }
 }

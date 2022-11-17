@@ -607,22 +607,14 @@ bool VirtualDevice::CloseDevice(const std::string& closeDeviceName, const std::v
     return false;
 }
 
- bool VirtualDevice::CheckCommand(int32_t argc, char **argv) {
-    struct option longOptions[] = {
-        {"list", no_argument, NULL, 'L'},
-        {"start", no_argument, NULL, 'S'},
-        {"close", no_argument, NULL, 'C'},
-        {"help", no_argument, NULL, '?'},
-        {NULL, 0, NULL, 0}
-    };
-    int32_t c = 0;
-    int32_t optionIndex = 0;
-    std::vector<std::string> deviceList = BrowseDirectory(g_folderPath);
-    c = getopt_long(argc, argv, "LSC?", longOptions, &optionIndex);
-    if (c == -1) {
-        std::cout << "Nonstandard input parameters" << std::endl;
+ bool VirtualDevice::CheckCommand(int32_t argc, char **argv)
+{
+    int32_t c = -1;
+    if (!SelectOptions(argc, argv, c)) {
+        std::cout << "Select option failed" << std::endl;
         return false;
     }
+    std::vector<std::string> deviceList = BrowseDirectory(g_folderPath);
     switch (c) {
         case 'L': {
             if (argc != PARAMETERS_QUERY_NUMBER) {
@@ -676,6 +668,43 @@ bool VirtualDevice::CloseDevice(const std::string& closeDeviceName, const std::v
             return false;
         }
     }
+    return true;
+}
+
+bool VirtualDevice::SelectOptions(int32_t argc, char **argv, int32_t &opt)
+{
+    struct option longOptions[] = {
+        {"list", no_argument, NULL, 'L'},
+        {"start", no_argument, NULL, 'S'},
+        {"close", no_argument, NULL, 'C'},
+        {"help", no_argument, NULL, '?'},
+        {NULL, 0, NULL, 0}
+    };
+    if (argc < PARAMETERS_QUERY_NUMBER) {
+        std::cout << "Please enter options or parameters" << std::endl;
+        return false;
+    }
+    std::string inputOptions = argv[optind];
+    if (inputOptions.find('-') == inputOptions.npos) {
+        for (uint32_t i = 0; i < sizeof(longOptions) / sizeof(struct option) - 1; ++i) {
+            if (longOptions[i].name == inputOptions) {
+                opt = longOptions[i].val;
+                optind++;
+                break;
+            }
+        }
+    } else if ((inputOptions.length() != PARAMETERS_QUERY_NUMBER) &&
+               (inputOptions[inputOptions.find('-') + 1] != '-')) {
+        std::cout << "More than one short option is not supported" << std::endl;
+        return false;
+    } else {
+        int32_t optionIndex = 0;
+        opt = getopt_long(argc, argv, "LSC?", longOptions, &optionIndex);
+    }
+    if (opt == -1) {
+        std::cout << "Nonstandard input parameters" << std::endl;
+        return false;
+    } 
     return true;
 }
 
@@ -744,9 +773,9 @@ void VirtualDevice::ShowUsage()
     std::cout << "Usage: vuinput <option> <command> <arg>..."      << std::endl;
     std::cout << "The option are:                                " << std::endl;
     std::cout << "commands for list:                             " << std::endl;
-    std::cout << "-L      --list       -display virtual devices and pid information" << std::endl;
+    std::cout << "-L      --list        list    -display virtual devices and pid information" << std::endl;
     std::cout << "commands for start:                            " << std::endl;
-    std::cout << "-S <device> &       --start <device> &            -start a device" << std::endl;
+    std::cout << "-S <device> &   --start <device> &    start <device> &     -start a device" << std::endl;
     std::cout << " -start supported <device>-" << std::endl;
     std::cout << "  mouse"         << std::endl;
     std::cout << "  keyboard"      << std::endl;
@@ -759,11 +788,11 @@ void VirtualDevice::ShowUsage()
     std::cout << "  touchpad"      << std::endl;
     std::cout << "  touchscreen"   << std::endl;
     std::cout << "  pen"           << std::endl;
-    std::cout << "-S all &            --start all &                 -start devices " << std::endl;
-    std::cout << "commands for close:                                              " << std::endl;
-    std::cout << "-C <pid> &          --close <pid> &               -close a pid   " << std::endl;
-    std::cout << "-C all &            --close all  &                -close pids    " << std::endl;
-    std::cout << "-?  --help                                                       " << std::endl;
+    std::cout << "-S all &        --start all &        start all &           -start devices " << std::endl;
+    std::cout << "commands for close:                                                       " << std::endl;
+    std::cout << "-C <pid> &      --close <pid> &      close <pid>           -close a pid   " << std::endl;
+    std::cout << "-C all &        --close all  &       close all  &           -close pids   " << std::endl;
+    std::cout << "-?  --help   help                                                         " << std::endl;
 }
 } // namespace MMI
 } // namespace OHOS
