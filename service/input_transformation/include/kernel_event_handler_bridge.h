@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,32 +13,23 @@
  * limitations under the License.
  */
 
-#ifndef HDF_DEVICE_EVENT_MANAGER_H
-#define HDF_DEVICE_EVENT_MANAGER_H
+#ifndef KERNEL_EVENT_HANDLER_BRIDGE_H
+#define KERNEL_EVENT_HANDLER_BRIDGE_H
 
-#include <cstdint>
-#include <thread>
-
-#include "inject_thread.h"
-#include "input_manager.h"
-#include "input_type.h"
+#include "i_kernel_event_handler.h"
+#include "i_touch_screen_handler.h"
 
 namespace OHOS {
 namespace MMI {
-class HdfDeviceEventManager {
+class KernelEventHandlerBridge final : public IKernelEventHandler {
 public:
-    HdfDeviceEventManager();
-    virtual ~HdfDeviceEventManager();
-    void ConnectHDFInit();
-    InjectThread injectThread_;
-    std::thread thread_;
-
+    static std::shared_ptr<IKernelEventHandler> CreateInstance(const std::shared_ptr<ITouchScreenHandler> handler);
+    virtual void OnInputEvent(const std::shared_ptr<AbsEvent> event) override;
 private:
-    InputDeviceInfo *iDevInfo_ { nullptr };
-    IInputInterface *inputInterface_ { nullptr };
-    InputEventCb callback_ {};
-    const uint32_t TOUCH_DEV_ID { 1 };
+    KernelEventHandlerBridge(const std::shared_ptr<ITouchScreenHandler> handler);
+private:
+    std::shared_ptr<ITouchScreenHandler> touchScreenHandle_;
 };
 } // namespace MMI
 } // namespace OHOS
-#endif  // HDF_DEVICE_EVENT_MANAGER_H
+#endif // KERNEL_EVENT_HANDLER_BRIDGE_H

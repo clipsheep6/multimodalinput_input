@@ -18,7 +18,7 @@
 
 #include <memory>
 
-#include "display_info.h"
+#include "input_display_info.h"
 #include "struct_multimodal.h"
 
 namespace OHOS {
