@@ -40,6 +40,10 @@ public:
     DISALLOW_COPY_AND_MOVE(InputEventHandler);
     void Init(UDSServer& udsServer);
     void OnEvent(void *event);
+#ifdef OHOS_BUILD_HDF
+    void HandleHDFDeviceStatusEvent(const HDFDeviceStatusEvent &event);
+    void HandleHDFDeviceInputEvent(const HDFDeviceInputEvent &event);
+#endif // OHOS_BUILD_HDF
     UDSServer *GetUDSServer() const;
 
     std::shared_ptr<EventNormalizeHandler> GetEventNormalizeHandler() const;

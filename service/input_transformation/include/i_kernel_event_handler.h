@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,27 +13,22 @@
  * limitations under the License.
  */
 
-#ifndef HDF_DEVICE_EVENT_DISPATCH_H
-#define HDF_DEVICE_EVENT_DISPATCH_H
+#ifndef I_KERNEL_EVENT_HANDLER_H
+#define I_KERNEL_EVENT_HANDLER_H
 
-#include <cstdint>
-
-#include "input_type.h"
-#include "inject_thread.h"
-#include "nocopyable.h"
+#include <string>
+#include <memory>
 
 namespace OHOS {
 namespace MMI {
-class HdfDeviceEventDispatch {
+class KernelKeyEvent;
+class AbsEvent;
+class IKernelEventHandler {
 public:
-    static void GetEventCallbackDispatch(const InputEventPackage **pkgs, uint32_t count, uint32_t devIndex);
-    HdfDeviceEventDispatch(const uint32_t maxX, const uint32_t maxY);
-    DISALLOW_COPY_AND_MOVE(HdfDeviceEventDispatch);
-    virtual ~HdfDeviceEventDispatch();
-
-private:
-    static InjectThread injectThread_;
+    virtual ~IKernelEventHandler() = default;
+    virtual void OnInputEvent(const std::shared_ptr<KernelKeyEvent> event) = 0;
+    virtual void OnInputEvent(const std::shared_ptr<AbsEvent> event) = 0;
 };
 } // namespace MMI
 } // namespace OHOS
-#endif  // HDF_DEVICE_EVENT_DISPATCH_H
+#endif // I_KERNEL_EVENT_HANDLER_H
