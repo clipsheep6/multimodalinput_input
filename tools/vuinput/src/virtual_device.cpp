@@ -611,28 +611,31 @@ bool VirtualDevice::CheckCommand(int32_t argc, char **argv)
         std::cout << "Select option failed" << std::endl;
         return false;
     }
-    std::vector<std::string> deviceList = BrowseDirectory(g_folderPath);
     switch (c) {
         case 'L': {
             if (!ListOption(argc, argv)) {
+                std::cout << "Device query failed" << std::endl;
                 return false;
             }
             break;
         }
         case 'S': {
             if (!StartOption(argc, argv)) {
+                std::cout << "Device start failed" << std::endl;
                 return false;
             }
             break;
         }
         case 'C': {
             if (!CloseOption(argc, argv)) {
+                std::cout << "Device close failed" << std::endl;
                 return false;
             }
             break;
         }
         case '?': {
             if (!HelpOption(argc, argv)) {
+                std::cout << "Failed to ask for help" << std::endl;
                 return false;
             }
             break;
