@@ -157,6 +157,7 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
         MMI_HILOGI("Operation canceled.");
     }
+    MMI_HILOGD("******************PointerAction :%{public}d", pointerEvent->GetPointerAction());
     pointerEvent->SetProcessedCallback(dispatchCallback_);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_DISPATCH_EVENT);
     InputMgrImpl.OnPointerEvent(pointerEvent);

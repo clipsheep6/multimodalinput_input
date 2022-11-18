@@ -60,9 +60,18 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
             break;
         }
     }
-    CHKPR(windowInfo, INVALID_FD);
+    int32_t pid = -1;
+    if (windowInfo == nullptr) {
+        PointerEvent::PointerItem pointerItem;
+        pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
+        pid = pointerItem.GetPid();
+        MMI_HILOGD("*********************modify cancel event pid is%{public}d", pid);
+    } else {
+        pid = windowInfo->pid;
+        MMI_HILOGD("********************* 111111111111111 event pid is%{public}d", pid);
+    }
     CHKPR(udsServer_, INVALID_FD);
-    return udsServer_->GetClientFd(windowInfo->pid);
+    return udsServer_->GetClientFd(pid);
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -925,8 +934,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         }
     }
     if (touchWindow == nullptr) {
-        MMI_HILOGE("The touchWindow is nullptr, logicalX:%{public}d, logicalY:%{public}d",
-            logicalX, logicalY);
+        MMI_HILOGE("The touchWindow is nullptr, logicalX:%{public}d, logicalY:%{public}d, pid: %{public}d",
+            logicalX, logicalY, pointerItem.GetPid());
+        pointerEvent->SetTargetWindowId(pointerItem.GetTargetWindowId());
+        pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
         return RET_ERR;
     }
     auto windowX = logicalX - touchWindow->area.x;
@@ -940,6 +951,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     pointerItem.SetToolWindowX(pointerItem.GetToolDisplayX() + physicDisplayInfo->x - touchWindow->area.x);
     pointerItem.SetToolWindowY(pointerItem.GetToolDisplayY() + physicDisplayInfo->y - touchWindow->area.y);
     pointerItem.SetTargetWindowId(touchWindow->id);
+    pointerItem.SetPid(touchWindow->pid);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     MMI_HILOGD("pid:%{public}d,logicalX:%{public}d,logicalY:%{public}d,"
                "physicalX:%{public}d,physicalY:%{public}d,windowX:%{public}d,windowY:%{public}d,"

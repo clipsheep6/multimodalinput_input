@@ -990,6 +990,8 @@ public:
          * @since 9
          */
         void SetRawDy(int32_t rawDy);
+        int32_t GetPid();
+        void SetPid(int32_t pid);
     private:
         int32_t pointerId_ {};
         bool pressed_ { false };
@@ -1016,6 +1018,7 @@ public:
         int32_t targetWindowId_ { -1 };
         int32_t rawDx_ {};
         int32_t rawDy_ {};
+        int32_t pid_ { -1 };
     };
 
 public:

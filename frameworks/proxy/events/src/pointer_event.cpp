@@ -288,6 +288,16 @@ void PointerEvent::PointerItem::SetRawDy(int32_t rawDy)
     rawDy_ = rawDy;
 }
 
+int32_t PointerEvent::PointerItem::GetPid()
+{
+    return pid_;
+}
+
+void PointerEvent::PointerItem::SetPid(int32_t pid)
+{
+    pid_ = pid;
+}
+
 bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
 {
     return (

@@ -122,6 +122,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
     InputEventDataTransformation::Marshalling(pointerEvent, pkt);
     BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
+    MMI_HILOGD("*************action is %{public}d", point->GetPointerAction());
     if (!udsServer->SendMsg(fd, pkt)) {
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return;
