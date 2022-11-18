@@ -106,7 +106,7 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
     if (eventFilterService_ == nullptr) {
         hasSendToMmiServer = false;
         eventFilterService_ = new (std::nothrow) EventFilterService();
-        CHKPR(eventFilterService_, RET_ERR);
+        CHKPR(eventFilterService_, ERROR_NULL_POINTER);
     }
 
     eventFilterService_->SetPointerEventPtr(filter);
@@ -149,8 +149,8 @@ int32_t InputManagerImpl::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption
     CHK_PID_AND_TID();
     std::lock_guard<std::mutex> guard(mtx_);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    CHKPR(keyOption, RET_ERR);
-    CHKPR(callback, RET_ERR);
+    CHKPR(keyOption, ERROR_NULL_POINTER);
+    CHKPR(callback, ERROR_NULL_POINTER);
     return KeyEventInputSubscribeMgr.SubscribeKeyEvent(keyOption, callback);
 #else
     MMI_HILOGW("Keyboard device does not support");

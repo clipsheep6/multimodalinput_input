@@ -425,7 +425,7 @@ static int32_t ConfigItemSwitch(const std::string &configItem, const std::string
     }
     if (!IsNum(value)) {
         MMI_HILOGE("Get key config item is invalid");
-        return RET_ERR;
+        return ERROR_NOT_NUMBER;
     }
     if (configItem == CONFIG_ITEM_REPEAT) {
         devConf.autoSwitch = stoi(value);

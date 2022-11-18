@@ -34,7 +34,7 @@ InputDeviceCooperateImpl &InputDeviceCooperateImpl::GetInstance()
 int32_t InputDeviceCooperateImpl::RegisterCooperateListener(InputDevCooperateListenerPtr listener)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(listener, RET_ERR);
+    CHKPR(listener, ERROR_NULL_POINTER);
     std::lock_guard<std::mutex> guard(mtx_);
     for (const auto &item : devCooperateListener_) {
         if (item == listener) {

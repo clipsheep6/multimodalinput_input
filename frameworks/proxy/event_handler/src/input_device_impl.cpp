@@ -36,7 +36,7 @@ InputDeviceImpl& InputDeviceImpl::GetInstance()
 int32_t InputDeviceImpl::RegisterDevListener(const std::string &type, InputDevListenerPtr listener)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(listener, RET_ERR);
+    CHKPR(listener, ERROR_NULL_POINTER);
     if (type != CHANGED_TYPE) {
         MMI_HILOGE("Failed to register, listener event must be \"change\"");
         return RET_ERR;

@@ -219,7 +219,7 @@ int32_t ClientMsgHandler::OnInputDevice(const UDSClient& client, NetPacket& pkt)
     int32_t userData;
     pkt >> userData;
     std::shared_ptr<InputDevice> devData = InputDevImpl.DevDataUnmarshalling(pkt);
-    CHKPR(devData, RET_ERR);
+    CHKPR(devData, ERROR_NULL_POINTER);
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read cooperate msg failed");
         return RET_ERR;

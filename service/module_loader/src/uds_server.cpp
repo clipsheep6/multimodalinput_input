@@ -105,7 +105,7 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     toReturnClientFd = sockFds[1];
     if (serverFd < 0 || toReturnClientFd < 0) {
         MMI_HILOGE("Call fcntl failed, errno:%{public}d", errno);
-        return RET_ERR;
+        return ERROR_INVALID_FD;
     }
     static constexpr size_t bufferSize = 32 * 1024;
     static constexpr size_t nativeBufferSize = 64 * 1024;

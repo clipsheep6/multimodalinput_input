@@ -91,7 +91,7 @@ int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
     CALL_DEBUG_ENTER;
     if (pointerWindow_ == nullptr) {
         MMI_HILOGD("pointerWindow_ is nullptr");
-        return RET_ERR;
+        return ERROR_NULL_POINTER;
     }
     sptr<OHOS::Surface> layer = GetLayer();
     if (layer == nullptr) {

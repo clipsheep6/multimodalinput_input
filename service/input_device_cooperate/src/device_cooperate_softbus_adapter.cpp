@@ -268,7 +268,7 @@ int32_t DeviceCooperateSoftbusAdapter::StartRemoteCooperate(const std::string &l
     cJSON_free(smsg);
     if (ret != RET_OK) {
         MMI_HILOGE("Start remote cooperate send session msg failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
@@ -296,7 +296,7 @@ int32_t DeviceCooperateSoftbusAdapter::StartRemoteCooperateResult(const std::str
     cJSON_free(smsg);
     if (ret != RET_OK) {
         MMI_HILOGE("Start remote cooperate result send session msg failed");
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
@@ -319,7 +319,7 @@ int32_t DeviceCooperateSoftbusAdapter::StopRemoteCooperate(const std::string &re
     cJSON_free(smsg);
     if (ret != RET_OK) {
         MMI_HILOGE("Stop remote cooperate send session msg failed");
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
@@ -343,7 +343,7 @@ int32_t DeviceCooperateSoftbusAdapter::StopRemoteCooperateResult(const std::stri
     cJSON_free(smsg);
     if (ret != RET_OK) {
         MMI_HILOGE("Stop remote cooperate result send session msg failed");
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
@@ -368,7 +368,7 @@ int32_t DeviceCooperateSoftbusAdapter::StartCooperateOtherResult(const std::stri
     cJSON_free(smsg);
     if (ret != RET_OK) {
         MMI_HILOGE("Start cooperate other result send session msg failed");
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }

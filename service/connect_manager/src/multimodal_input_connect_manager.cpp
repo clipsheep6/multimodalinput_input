@@ -78,7 +78,7 @@ int32_t MultimodalInputConnectManager::AddInputEventFilter(sptr<IEventFilter> fi
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ == nullptr) {
         MMI_HILOGE("The multimodalInputConnectService_ is nullptr");
-        return RET_ERR;
+        return ERROR_NULL_POINTER;
     }
     return multimodalInputConnectService_->AddInputEventFilter(filter);
 }
@@ -97,61 +97,61 @@ int32_t MultimodalInputConnectManager::IsPointerVisible(bool &visible)
 
 int32_t MultimodalInputConnectManager::SetPointerSpeed(int32_t speed)
 {
-    CHKPR(multimodalInputConnectService_, RET_ERR);
+    CHKPR(multimodalInputConnectService_, ERROR_NULL_POINTER);
     return multimodalInputConnectService_->SetPointerSpeed(speed);
 }
 
 int32_t MultimodalInputConnectManager::GetPointerSpeed(int32_t &speed)
 {
-    CHKPR(multimodalInputConnectService_, RET_ERR);
+    CHKPR(multimodalInputConnectService_, ERROR_NULL_POINTER);
     return multimodalInputConnectService_->GetPointerSpeed(speed);
 }
 
 int32_t MultimodalInputConnectManager::SetPointerStyle(int32_t windowId, int32_t pointerStyle)
 {
-    CHKPR(multimodalInputConnectService_, RET_ERR);
+    CHKPR(multimodalInputConnectService_, ERROR_NULL_POINTER);
     return multimodalInputConnectService_->SetPointerStyle(windowId, pointerStyle);
 }
 
 int32_t MultimodalInputConnectManager::GetPointerStyle(int32_t windowId, int32_t &pointerStyle)
 {
-    CHKPR(multimodalInputConnectService_, RET_ERR);
+    CHKPR(multimodalInputConnectService_, ERROR_NULL_POINTER);
     return multimodalInputConnectService_->GetPointerStyle(windowId, pointerStyle);
 }
 
 int32_t MultimodalInputConnectManager::RegisterDevListener()
 {
-    CHKPR(multimodalInputConnectService_, RET_ERR);
+    CHKPR(multimodalInputConnectService_, ERROR_NULL_POINTER);
     return multimodalInputConnectService_->RegisterDevListener();
 }
 
 int32_t MultimodalInputConnectManager::UnregisterDevListener()
 {
-    CHKPR(multimodalInputConnectService_, RET_ERR);
+    CHKPR(multimodalInputConnectService_, ERROR_NULL_POINTER);
     return multimodalInputConnectService_->UnregisterDevListener();
 }
 
 int32_t MultimodalInputConnectManager::SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> &keys)
 {
-    CHKPR(multimodalInputConnectService_, RET_ERR);
+    CHKPR(multimodalInputConnectService_, ERROR_NULL_POINTER);
     return multimodalInputConnectService_->SupportKeys(userData, deviceId, keys);
 }
 
 int32_t MultimodalInputConnectManager::GetDeviceIds(int32_t userData)
 {
-    CHKPR(multimodalInputConnectService_, RET_ERR);
+    CHKPR(multimodalInputConnectService_, ERROR_NULL_POINTER);
     return multimodalInputConnectService_->GetDeviceIds(userData);
 }
 
 int32_t MultimodalInputConnectManager::GetDevice(int32_t userData, int32_t id)
 {
-    CHKPR(multimodalInputConnectService_, RET_ERR);
+    CHKPR(multimodalInputConnectService_, ERROR_NULL_POINTER);
     return multimodalInputConnectService_->GetDevice(userData, id);
 }
 
 int32_t MultimodalInputConnectManager::GetKeyboardType(int32_t userData, int32_t deviceId)
 {
-    CHKPR(multimodalInputConnectService_, RET_ERR);
+    CHKPR(multimodalInputConnectService_, ERROR_NULL_POINTER);
     return multimodalInputConnectService_->GetKeyboardType(userData, deviceId);
 }
 
@@ -211,44 +211,44 @@ int32_t MultimodalInputConnectManager::SetAnrObserver()
 
 int32_t MultimodalInputConnectManager::RegisterCooperateListener()
 {
-    CHKPR(multimodalInputConnectService_, RET_ERR);
+    CHKPR(multimodalInputConnectService_, ERROR_NULL_POINTER);
     return multimodalInputConnectService_->RegisterCooperateListener();
 }
 
 int32_t MultimodalInputConnectManager::UnregisterCooperateListener()
 {
-    CHKPR(multimodalInputConnectService_, RET_ERR);
+    CHKPR(multimodalInputConnectService_, ERROR_NULL_POINTER);
     return multimodalInputConnectService_->UnregisterCooperateListener();
 }
 
 int32_t MultimodalInputConnectManager::EnableInputDeviceCooperate(int32_t userData, bool enabled)
 {
-    CHKPR(multimodalInputConnectService_, RET_ERR);
+    CHKPR(multimodalInputConnectService_, ERROR_NULL_POINTER);
     return multimodalInputConnectService_->EnableInputDeviceCooperate(userData, enabled);
 }
 
 int32_t MultimodalInputConnectManager::StartInputDeviceCooperate(int32_t userData,
     const std::string &sinkDeviceId, int32_t srcInputDeviceId)
 {
-    CHKPR(multimodalInputConnectService_, RET_ERR);
+    CHKPR(multimodalInputConnectService_, ERROR_NULL_POINTER);
     return multimodalInputConnectService_->StartInputDeviceCooperate(userData, sinkDeviceId, srcInputDeviceId);
 }
 
 int32_t MultimodalInputConnectManager::StopDeviceCooperate(int32_t userData)
 {
-    CHKPR(multimodalInputConnectService_, RET_ERR);
+    CHKPR(multimodalInputConnectService_, ERROR_NULL_POINTER);
     return multimodalInputConnectService_->StopDeviceCooperate(userData);
 }
 
 int32_t MultimodalInputConnectManager::GetInputDeviceCooperateState(int32_t userData, const std::string &deviceId)
 {
-    CHKPR(multimodalInputConnectService_, RET_ERR);
+    CHKPR(multimodalInputConnectService_, ERROR_NULL_POINTER);
     return multimodalInputConnectService_->GetInputDeviceCooperateState(userData, deviceId);
 }
 
 int32_t MultimodalInputConnectManager::SetInputDevice(const std::string& dhid, const std::string& screenId)
 {
-    CHKPR(multimodalInputConnectService_, RET_ERR);
+    CHKPR(multimodalInputConnectService_, ERROR_NULL_POINTER);
     return multimodalInputConnectService_->SetInputDevice(dhid, screenId);
 }
 

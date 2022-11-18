@@ -49,14 +49,14 @@ int32_t UDSSocket::EpollCtl(int32_t fd, int32_t op, struct epoll_event &event, i
 {
     if (fd < 0) {
         MMI_HILOGE("Invalid fd");
-        return RET_ERR;
+        return ERROR_INVALID_FD;
     }
     if (epollFd < 0) {
         epollFd = epollFd_;
     }
     if (epollFd < 0) {
         MMI_HILOGE("Invalid param epollFd");
-        return RET_ERR;
+        return ERROR_INVALID_FD;
     }
     int32_t ret;
     if (op == EPOLL_CTL_DEL) {
@@ -79,7 +79,7 @@ int32_t UDSSocket::EpollWait(struct epoll_event &events, int32_t maxevents, int3
     }
     if (epollFd < 0) {
         MMI_HILOGE("Invalid param epollFd");
-        return RET_ERR;
+        return ERROR_INVALID_FD;
     }
     auto ret = epoll_wait(epollFd, &events, maxevents, timeout);
     if (ret < 0) {
@@ -92,7 +92,7 @@ int32_t UDSSocket::SetNonBlockMode(int32_t fd, bool isNonBlock)
 {
     if (fd < 0) {
         MMI_HILOGE("Invalid fd");
-        return RET_ERR;
+        return ERROR_INVALID_FD;
     }
     int32_t flags = fcntl(fd, F_GETFL);
     if (flags < 0) {
