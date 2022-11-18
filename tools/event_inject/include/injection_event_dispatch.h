@@ -44,7 +44,7 @@ public:
     int32_t GetDevTypeIndex(int32_t devIndex) const;
     int32_t GetDevIndexType(int32_t devType) const;
     int32_t GetDeviceIndex(const std::string &deviceNameText) const;
-    void SetArgvs(std::vector<std::string> const &injectArgvs);
+    void SetArgvs(const std::vector<std::string> &injectArgvs);
     std::string GetFunId() const;
     bool VerifyArgvs();
     bool RegisterInjectEvent(InjectFunctionMap &msg)

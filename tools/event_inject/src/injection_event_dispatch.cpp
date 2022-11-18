@@ -88,7 +88,7 @@ int32_t InjectionEventDispatch::OnJson()
     return manageInjectDevice_.TransformJsonData(DataInit(jsonBuf, logStatus));
 }
 
-void InjectionEventDispatch::SetArgvs(std::vector<std::string> const &injectArgvs)
+void InjectionEventDispatch::SetArgvs(const std::vector<std::string> &injectArgvs)
 {
     injectArgvs_ = injectArgvs;
 }

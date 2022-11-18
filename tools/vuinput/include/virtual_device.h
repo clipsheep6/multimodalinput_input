@@ -32,6 +32,10 @@ public:
     static bool CloseDevice(const std::string& closeDeviceName, const std::vector<std::string>& deviceList);
     static bool CheckCommand(int32_t argc, char **argv);
     static bool SelectOptions(int32_t argc, char **argv, int32_t &opt);
+    static bool ListOption(int32_t argc, char **argv);
+    static bool StartOption(int32_t argc, char **argv);
+    static bool CloseOption(int32_t argc, char **argv);
+    static bool HelpOption(int32_t argc, char **argv);
     static void ShowUsage();
     VirtualDevice(const std::string& deviceName, uint16_t busType, uint16_t vendorId, uint16_t productId);
     DISALLOW_COPY_AND_MOVE(VirtualDevice);
