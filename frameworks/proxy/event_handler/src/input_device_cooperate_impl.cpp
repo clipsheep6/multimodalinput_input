@@ -111,7 +111,7 @@ int32_t InputDeviceCooperateImpl::StopDeviceCooperate(FuncCooperationMessage cal
 }
 
 int32_t InputDeviceCooperateImpl::GetInputDeviceCooperateState(
-    const std::string &deviceId, FuncCooperateionState callback)
+    const std::string &deviceId, FuncCooperationState callback)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -125,7 +125,7 @@ int32_t InputDeviceCooperateImpl::GetInputDeviceCooperateState(
     return MultimodalInputConnMgr->GetInputDeviceCooperateState(userData_++, deviceId);
 }
 
-void InputDeviceCooperateImpl::OnDevCooperateListener(const std::string deviceId, CooperationMessage msg)
+void InputDeviceCooperateImpl::HandlerDevCooperateListener(const std::string deviceId, CooperationMessage msg)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -134,7 +134,7 @@ void InputDeviceCooperateImpl::OnDevCooperateListener(const std::string deviceId
     }
 }
 
-void InputDeviceCooperateImpl::OnCooprationMessage(int32_t userData, const std::string deviceId, CooperationMessage msg)
+void InputDeviceCooperateImpl::HandlerCooprationMessage(int32_t userData, const std::string deviceId, CooperationMessage msg)
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
@@ -144,7 +144,7 @@ void InputDeviceCooperateImpl::OnCooprationMessage(int32_t userData, const std::
     (*event)(deviceId, msg);
 }
 
-void InputDeviceCooperateImpl::OnCooperationState(int32_t userData, bool state)
+void InputDeviceCooperateImpl::HandlerCooperationState(int32_t userData, bool state)
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
@@ -168,7 +168,7 @@ const InputDeviceCooperateImpl::DevCooperationMsg *InputDeviceCooperateImpl::Get
     return iter == devCooperateEvent_.end() ? nullptr : &iter->second.msg;
 }
 
-const InputDeviceCooperateImpl::DevCooperateionState *InputDeviceCooperateImpl::GetCooprateStateEvent(
+const InputDeviceCooperateImpl::DevCooperationState *InputDeviceCooperateImpl::GetCooprateStateEvent(
     int32_t userData) const
 {
     auto iter = devCooperateEvent_.find(userData);
@@ -185,5 +185,51 @@ int32_t InputDeviceCooperateImpl::SetInputDevice(const std::string &dhid, const 
     }
     return ret;
 }
+
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+int32_t InputDeviceCooperateImpl::OnCooperationListiner(NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    int32_t userData;
+    std::string deviceId;
+    int32_t nType;
+    pkt >> userData >> deviceId >> nType;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read type failed");
+        return RET_ERR;
+    }
+    HandlerDevCooperateListener(deviceId, CooperationMessage(nType));
+    return RET_OK;
+}
+
+int32_t InputDeviceCooperateImpl::OnCooperationMessage(NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    int32_t userData;
+    std::string deviceId;
+    int32_t nType;
+    pkt >> userData >> deviceId >> nType;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read cooperate msg failed");
+        return RET_ERR;
+    }
+    HandlerCooprationMessage(userData, deviceId, CooperationMessage(nType));
+    return RET_OK;
+}
+
+int32_t InputDeviceCooperateImpl::OnCooperationState(NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    int32_t userData;
+    bool state;
+    pkt >> userData >> state;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read cooperate msg failed");
+        return RET_ERR;
+    }
+    HandlerCooperationState(userData, state);
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 } // namespace MMI
 } // namespace OHOS

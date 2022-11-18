@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputFilter"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputFilter" };
 } // namespace
 
 int32_t InputFilter::AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> &filter)

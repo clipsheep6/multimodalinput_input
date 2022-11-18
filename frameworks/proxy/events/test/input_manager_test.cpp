@@ -15,7 +15,7 @@
 
 #include "event_log_helper.h"
 #include "event_util_test.h"
-#include "input_proxy_def.h"
+#include "input_manager_impl.h"
 #include "mmi_log.h"
 #include "system_info.h"
 #include "util.h"
@@ -765,7 +765,7 @@ void InputManagerTest::TestMarkConsumed(int32_t monitorId, int32_t eventId)
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_001, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
     ASSERT_TRUE(injectDownEvent != nullptr);
@@ -803,7 +803,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_001, TestSize.Level
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_002, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
     ASSERT_TRUE(injectDownEvent != nullptr);
     int64_t downTime = -1;
@@ -827,7 +827,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_002, TestSize.Level
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_003, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
     ASSERT_TRUE(injectDownEvent != nullptr);
     int64_t downTime = 0;
@@ -864,7 +864,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_003, TestSize.Level
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_004, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
     ASSERT_TRUE(injectDownEvent != nullptr);
     int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
@@ -888,7 +888,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_004, TestSize.Level
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_005, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
     ASSERT_TRUE(injectDownEvent != nullptr);
     int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
@@ -926,7 +926,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_005, TestSize.Level
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SimulatePointerEvent_001, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent001() };
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
@@ -942,7 +942,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulatePointerEvent_001, TestSize.L
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SimulatePointerEvent_002, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent002() };
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
@@ -958,7 +958,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulatePointerEvent_002, TestSize.L
  */
 HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_003, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent003() };
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
@@ -974,7 +974,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_003, Test
  */
 HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_004, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
@@ -993,7 +993,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_004, Test
  */
 HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_005, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent005() };
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -1009,7 +1009,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_005, Test
  */
 HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_006, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent006() };
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -1025,7 +1025,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_006, Test
  */
 HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_007, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent007() };
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -1041,7 +1041,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_007, Test
  */
 HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_008, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
@@ -1060,7 +1060,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_008, Test
  */
 HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_009, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent009() };
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -1076,7 +1076,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_009, Test
  */
 HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_010, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent010() };
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -1092,7 +1092,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_010, Test
  */
 HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_011, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
@@ -1128,7 +1128,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_011, Test
  */
 HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_012, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
@@ -1164,7 +1164,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_012, Test
  */
 HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_013, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
@@ -1201,7 +1201,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_013, Test
  */
 HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_014, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent016() };
     ASSERT_TRUE(pointerEvent != nullptr);
     TestSimulateInputEvent(pointerEvent);
@@ -1216,7 +1216,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_014, Test
  */
 HWTEST_F(InputManagerTest, InputManagerTest_MouseEventEnterAndLeave_001, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent014() };
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -1232,7 +1232,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_MouseEventEnterAndLeave_001, TestSiz
  */
 HWTEST_F(InputManagerTest, InputManagerTest_MouseEventEnterAndLeave_002, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> keyEvent { SetupKeyEvent002() };
     ASSERT_TRUE(keyEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -1248,7 +1248,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_MouseEventEnterAndLeave_002, TestSiz
  */
 HWTEST_F(InputManagerTest, InputManagerTest_MouseEventEnterAndLeave_003, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> keyEvent { SetupKeyEvent003() };
     ASSERT_TRUE(keyEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -1264,7 +1264,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_MouseEventEnterAndLeave_003, TestSiz
  */
 HWTEST_F(InputManagerTest, InputManagerTest_MouseEventEnterAndLeave_004, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent015() };
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -1280,7 +1280,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_MouseEventEnterAndLeave_004, TestSiz
  */
 HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePencil2Event_001, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent011() };
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
@@ -1296,7 +1296,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePencil2Event_001, Test
  */
 HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePencil2Event_002, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent012() };
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
@@ -1312,7 +1312,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePencil2Event_002, Test
  */
 HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePencil2Event_003, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent013() };
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
@@ -1328,7 +1328,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePencil2Event_003, Test
  */
 HWTEST_F(InputManagerTest, InputManager_Pencil2InputEvent_004, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
@@ -1347,7 +1347,7 @@ HWTEST_F(InputManagerTest, InputManager_Pencil2InputEvent_004, TestSize.Level1)
  */
 HWTEST_F(InputManagerTest, InputManager_NotResponse_001, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
 
@@ -1373,7 +1373,7 @@ HWTEST_F(InputManagerTest, InputManager_NotResponse_001, TestSize.Level1)
  */
 HWTEST_F(InputManagerTest, InputManager_NotResponse_002, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
 
@@ -1411,7 +1411,7 @@ std::shared_ptr<KeyOption> InputManagerTest::InitOption(const std::set<int32_t> 
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_001, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     std::set<int32_t> preKeys;
     std::shared_ptr<KeyOption> keyOption = InitOption(preKeys, KeyEvent::KEYCODE_VOLUME_MUTE, true, 0);
     int32_t response = -1;
@@ -1430,8 +1430,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_001, TestSize.Leve
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_02, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
-    ASSERT_TRUE(MMIEventHdl.InitClient());
+    CALL_TEST_DEBUG;
+    ASSERT_TRUE(InputMgrImpl.InitClient());
     // 电源键长按按下订阅
     std::set<int32_t> preKeys;
     std::shared_ptr<KeyOption> keyOption = InitOption(preKeys, KeyEvent::KEYCODE_POWER, true, 2000);
@@ -1475,8 +1475,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_02, TestSize.Level
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_03, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
-    ASSERT_TRUE(MMIEventHdl.InitClient());
+    CALL_TEST_DEBUG;
+    ASSERT_TRUE(InputMgrImpl.InitClient());
     std::set<int32_t> preKeys;
     std::shared_ptr<KeyOption> keyOption1 = InitOption(preKeys, KeyEvent::KEYCODE_VOLUME_UP, true, 10);
     int32_t subscribeId1 = -1;
@@ -1523,7 +1523,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_03, TestSize.Level
  */
 HWTEST_F(InputManagerTest, TestGetKeystrokeAbility_001, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     std::vector<int32_t> keyCodes = {17, 22, 2055};
     InputManager::GetInstance()->SupportKeys(0, keyCodes, [](std::vector<bool> keystrokeAbility) {
         MMI_HILOGD("TestGetKeystrokeAbility_001 callback ok");
@@ -1539,7 +1539,7 @@ HWTEST_F(InputManagerTest, TestGetKeystrokeAbility_001, TestSize.Level1)
  */
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_001, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item;
@@ -1581,7 +1581,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_001, TestSize.Level1)
  */
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_002, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item;
@@ -1623,7 +1623,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_002, TestSize.Level1)
  */
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_003, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item;
@@ -1665,7 +1665,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_003, TestSize.Level1)
  */
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_004, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     TestUtil->SetRecvFlag(RECV_FLAG::RECV_INTERCEPT);
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
@@ -1720,7 +1720,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_004, TestSize.Level1)
  */
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_005, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
@@ -1763,7 +1763,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_005, TestSize.Level1)
  */
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_006, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item;
@@ -1810,7 +1810,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_006, TestSize.Level1)
  */
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_007, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
     ASSERT_TRUE(injectDownEvent != nullptr);
     int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
@@ -1849,7 +1849,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_007, TestSize.Level1)
  */
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_008, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     TestUtil->SetRecvFlag(RECV_FLAG::RECV_INTERCEPT);
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
@@ -1897,7 +1897,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_008, TestSize.Level1)
  */
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_009, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     TestUtil->SetRecvFlag(RECV_FLAG::RECV_INTERCEPT);
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
@@ -1945,7 +1945,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_009, TestSize.Level1)
  */
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_010, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     TestUtil->SetRecvFlag(RECV_FLAG::RECV_INTERCEPT);
     std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
     ASSERT_TRUE(injectDownEvent != nullptr);
@@ -1990,7 +1990,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_010, TestSize.Level1)
  */
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_011, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     TestUtil->SetRecvFlag(RECV_FLAG::RECV_INTERCEPT);
     std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
     ASSERT_TRUE(injectDownEvent != nullptr);
@@ -2035,7 +2035,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_011, TestSize.Level1)
  */
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_001, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto pointerEvent = SetupPointerEvent001();
     ASSERT_TRUE(pointerEvent != nullptr);
 
@@ -2067,7 +2067,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_001, TestSize.Lev
  */
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_002, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     TestUtil->SetRecvFlag(RECV_FLAG::RECV_MONITOR);
     const std::vector<int32_t>::size_type N_TEST_CASES { 3 };
     std::vector<int32_t> ids(N_TEST_CASES);
@@ -2111,7 +2111,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_002, TestSize.Lev
  */
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_003, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto pointerEvent = SetupPointerEvent003();
     ASSERT_TRUE(pointerEvent != nullptr);
 
@@ -2143,7 +2143,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_003, TestSize.Lev
  */
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_004, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto callbackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callbackPtr != nullptr);
     int32_t monitorId = TestAddMonitor(callbackPtr);
@@ -2176,7 +2176,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_004, TestSize.Lev
  */
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_005, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto callbackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callbackPtr != nullptr);
     int32_t monitorId = TestAddMonitor(callbackPtr);
@@ -2208,7 +2208,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_005, TestSize.Lev
  */
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_001, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item;
@@ -2251,7 +2251,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_001, TestSize.L
  */
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_002, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item;
@@ -2294,7 +2294,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_002, TestSize.L
  */
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_003, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item;
@@ -2337,7 +2337,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_003, TestSize.L
  */
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     TestUtil->SetRecvFlag(RECV_FLAG::RECV_MONITOR);
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
@@ -2392,7 +2392,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.L
  */
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_005, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item;
@@ -2435,7 +2435,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_005, TestSize.L
  */
 HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_001, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto callbackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callbackPtr != nullptr);
     int32_t monitorId { TestAddMonitor(callbackPtr) };
@@ -2480,7 +2480,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_001, TestSize
  */
 HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_002, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto callbackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callbackPtr != nullptr);
     int32_t monitorId { TestAddMonitor(callbackPtr) };
@@ -2525,7 +2525,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_002, TestSize
  */
 HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_003, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto callbackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callbackPtr != nullptr);
     int32_t monitorId { TestAddMonitor(callbackPtr) };
@@ -2570,7 +2570,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_003, TestSize
  */
 HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_004, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto callbackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callbackPtr != nullptr);
     int32_t monitorId { TestAddMonitor(callbackPtr) };
@@ -2629,7 +2629,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_004, TestSize
  */
 HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_001, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto callbackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callbackPtr != nullptr);
     int32_t monitorId = TestAddMonitor(callbackPtr);
@@ -2659,7 +2659,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_001, TestSize.Level1
  */
 HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_002, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto callbackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callbackPtr != nullptr);
     int32_t monitorId = TestAddMonitor(callbackPtr);
@@ -2693,7 +2693,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_002, TestSize.Level1
  */
 HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_003, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto callbackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callbackPtr != nullptr);
     int32_t monitorId = TestAddMonitor(callbackPtr);
@@ -2724,7 +2724,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_003, TestSize.Level1
  */
 HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_004, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     TestUtil->SetRecvFlag(RECV_FLAG::RECV_MONITOR);
     const std::vector<int32_t>::size_type N_TEST_CASES { MAX_N_INPUT_HANDLERS - 1 };
     std::vector<int32_t> ids;
@@ -2768,7 +2768,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_004, TestSize.Level1
  */
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddKeyboardMonitor_001, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     TestUtil->SetRecvFlag(RECV_FLAG::RECV_MONITOR);
     const std::vector<int32_t>::size_type N_TEST_CASES { 3 };
     std::vector<int32_t> ids;
@@ -2809,7 +2809,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddKeyboardMonitor_001, TestSize.L
  */
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddKeyboardMonitor_002, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     const std::vector<int32_t>::size_type N_TEST_CASES { 3 };
     std::vector<int32_t> ids;
     auto callbackPtr = GetPtr<InputEventCallback>();
@@ -2846,7 +2846,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddKeyboardMonitor_002, TestSize.L
  */
 HWTEST_F(InputManagerTest, InputManagerTest_RemoteControlAutoRepeat, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
     ASSERT_TRUE(injectDownEvent != nullptr);
@@ -2886,7 +2886,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_RemoteControlAutoRepeat, TestSize.Le
  */
 HWTEST_F(InputManagerTest, InputManagerTest_MoveMouse_01, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     InputManager::GetInstance()->MoveMouse(50, 50);
 }
 
@@ -2898,7 +2898,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_MoveMouse_01, TestSize.Level1)
  */
 HWTEST_F(InputManagerTest, InputManagerTest_MoveMouse_02, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     InputManager::GetInstance()->MoveMouse(-1000, 100);
 }
 
@@ -2959,12 +2959,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetKeyboardType, TestSize.Level1)
 
 HWTEST_F(InputManagerTest, InputManagerTest_GetProcCpuUsage, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     SYSTEM_INFO::CpuInfo cpuInfo;
     const std::string process_name = "multimodalinput";
     auto usage = cpuInfo.GetProcCpuUsage(process_name);
     MMI_HILOGD("The CPU usage of the %{public}s process is %{public}.2f", process_name.c_str(), usage);
-    ASSERT_TRUE(usage < SYSTEM_INFO::CPU_USAGE_LOAD && usage != SYSTEM_INFO::CPU_USAGE_UNKONW);
+    ASSERT_TRUE(usage < SYSTEM_INFO::CPU_USAGE_LOAD && usage != SYSTEM_INFO::CPU_USAGE_UNKNOWN);
 }
 
 /**
@@ -2975,7 +2975,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetProcCpuUsage, TestSize.Level1)
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SetWindowInputEventConsumer_001, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto runner = AppExecFwk::EventRunner::Create(true);
     ASSERT_TRUE(runner != nullptr);
     auto eventHandler = std::make_shared<AppExecFwk::EventHandler>(runner);
@@ -3012,7 +3012,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetWindowInputEventConsumer_001, Tes
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SetWindowInputEventConsumer_002, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     const std::string threadTest = "threadNameTest";
     auto runner = AppExecFwk::EventRunner::Create(threadTest);
     ASSERT_TRUE(runner != nullptr);
@@ -3079,7 +3079,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetPointerVisible_002, TestSize.Leve
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_001, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     const int32_t speed = -1;
     InputManager::GetInstance()->SetPointerSpeed(speed);
     int32_t speed1;
@@ -3108,7 +3108,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_001, TestSize.Level1)
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_002, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     const int32_t speed = 1;
     InputManager::GetInstance()->SetPointerSpeed(speed);
     int32_t speed1;
@@ -3137,7 +3137,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_002, TestSize.Level1)
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_003, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     const int32_t speed = 4;
     InputManager::GetInstance()->SetPointerSpeed(speed);
     int32_t speed1;
@@ -3166,7 +3166,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_003, TestSize.Level1)
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_004, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     const int32_t speed = 11;
     InputManager::GetInstance()->SetPointerSpeed(speed);
     int32_t speed1;
@@ -3195,7 +3195,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_004, TestSize.Level1)
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_005, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     const int32_t speed = 20;
     InputManager::GetInstance()->SetPointerSpeed(speed);
     int32_t speed1;
@@ -3224,7 +3224,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_005, TestSize.Level1)
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SetPointerStyle_001, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto window = WindowUtilsTest::GetInstance()->GetWindow();
     uint32_t windowId = window->GetWindowId();
     int32_t pointerStyle;
@@ -3242,7 +3242,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetPointerStyle_001, TestSize.Level1
  */
 HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_001, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::NUM_LOCK_FUNCTION_KEY, true);
     InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::NUM_LOCK_FUNCTION_KEY);
 }
@@ -3255,7 +3255,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_001, TestSize.Level
  */
 HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_002, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::NUM_LOCK_FUNCTION_KEY, false);
     bool result = InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::NUM_LOCK_FUNCTION_KEY);
     ASSERT_FALSE(result);
@@ -3269,7 +3269,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_002, TestSize.Level
  */
 HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_003, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::SCROLL_LOCK_FUNCTION_KEY, true);
     InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::SCROLL_LOCK_FUNCTION_KEY);
 }
@@ -3282,7 +3282,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_003, TestSize.Level
  */
 HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_004, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::SCROLL_LOCK_FUNCTION_KEY, false);
     bool result = InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::SCROLL_LOCK_FUNCTION_KEY);
     ASSERT_FALSE(result);
@@ -3296,7 +3296,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_004, TestSize.Level
  */
 HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_005, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::CAPS_LOCK_FUNCTION_KEY, true);
     InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::CAPS_LOCK_FUNCTION_KEY);
 }
@@ -3309,7 +3309,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_005, TestSize.Level
  */
 HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_006, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::CAPS_LOCK_FUNCTION_KEY, false);
     bool result = InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::CAPS_LOCK_FUNCTION_KEY);
     ASSERT_FALSE(result);
@@ -3323,13 +3323,13 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_006, TestSize.Level
  */
 HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_007, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
-    InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::UNKOWN_FUNCTION_KEY, true);
-    bool result = InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::UNKOWN_FUNCTION_KEY);
+    CALL_TEST_DEBUG;
+    InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::UNKNOWN_FUNCTION_KEY, true);
+    bool result = InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::UNKNOWN_FUNCTION_KEY);
     ASSERT_FALSE(result);
     
-    InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::UNKOWN_FUNCTION_KEY, false);
-    result = InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::UNKOWN_FUNCTION_KEY);
+    InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::UNKNOWN_FUNCTION_KEY, false);
+    result = InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::UNKNOWN_FUNCTION_KEY);
     ASSERT_FALSE(result);
 }
 
@@ -3341,7 +3341,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_007, TestSize.Level
  */
 HWTEST_F(InputManagerTest, InputManagerTest_TouchScreenHotArea_001, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     std::shared_ptr<PointerEvent> pointerEvent { SetupTouchScreenEvent001() };
     ASSERT_TRUE(pointerEvent != nullptr);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -3356,7 +3356,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_TouchScreenHotArea_001, TestSize.Lev
  */
 HWTEST_F(InputManagerTest, InputManagerTest_TouchScreenHotArea_002, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     std::shared_ptr<PointerEvent> pointerEvent { SetupTouchScreenEvent002() };
     ASSERT_TRUE(pointerEvent != nullptr);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -3371,7 +3371,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_TouchScreenHotArea_002, TestSize.Lev
  */
 HWTEST_F(InputManagerTest, InputManagerTest_MouseHotArea_001, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     std::shared_ptr<PointerEvent> pointerEvent { SetupmouseEvent001() };
     ASSERT_TRUE(pointerEvent != nullptr);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -3386,7 +3386,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_MouseHotArea_001, TestSize.Level1)
  */
 HWTEST_F(InputManagerTest, InputManagerTest_MouseHotArea_002, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     std::shared_ptr<PointerEvent> pointerEvent { SetupmouseEvent002() };
     ASSERT_TRUE(pointerEvent != nullptr);
     ASSERT_EQ(pointerEvent->GetSourceType(), PointerEvent::SOURCE_TYPE_MOUSE);
@@ -3422,7 +3422,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupTabletToolEvent001()
  */
 HWTEST_F(InputManagerTest, InputManagerTest_MonitorTabletToolEvent_001, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto callbackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callbackPtr != nullptr);
     int32_t monitorId = TestAddMonitor(callbackPtr);
@@ -3454,7 +3454,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_MonitorTabletToolEvent_001, TestSize
  */
 HWTEST_F(InputManagerTest, InputManagerTest_InterceptTabletToolEvent_001, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto interceptor = GetPtr<InputEventCallback>();
     int32_t interceptorId { InputManager::GetInstance()->AddInterceptor(interceptor) };
     EXPECT_TRUE(IsValidHandlerId(interceptorId));

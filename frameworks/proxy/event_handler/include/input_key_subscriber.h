@@ -17,11 +17,11 @@
 #define INPUT_KEY_SUBSCRIBER_H
 
 #include <functional>
-#include <memory>
 #include <set>
 
 #include "key_event.h"
 #include "key_option.h"
+#include "net_packet.h"
 
 namespace OHOS {
 namespace MMI {
@@ -63,18 +63,19 @@ public:
     int32_t SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
         std::function<void(std::shared_ptr<KeyEvent>)> callback);
     int32_t UnsubscribeKeyEvent(int32_t subscribeId);
-
-    int32_t OnSubscribeKeyEventCallback(std::shared_ptr<KeyEvent> event, int32_t subscribeId);
     void OnConnected();
     bool GetFunctionKeyState(int32_t funcKey);
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
-
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    int32_t OnSubscribeKeyEventCallback(NetPacket& pkt);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 private:
     const SubscribeKeyEventInfo* GetSubscribeKeyEvent(int32_t id);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t HandlerSubscribeKeyEvent(const InputKeySubscriber::SubscribeKeyEventInfo& subscribeInfo);
     int32_t HandlerUnsubscribeKeyEvent(int32_t subscribeId);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+    int32_t HandlerSubscribeKeyCallback(std::shared_ptr<KeyEvent> event, int32_t subscribeId);
 private:
     std::set<SubscribeKeyEventInfo> subscribeInfos_;
     static int32_t subscribeIdManager_;

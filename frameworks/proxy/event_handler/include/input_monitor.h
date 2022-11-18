@@ -20,6 +20,7 @@
 #include <mutex>
 
 #include "i_input_event_consumer.h"
+#include "i_mmi_client.h"
 #include "input_proxy_def.h"
 
 namespace OHOS {
@@ -29,16 +30,17 @@ public:
     InputMonitor();
     DISALLOW_COPY_AND_MOVE(InputMonitor);
     ~InputMonitor() = default;
+    void SetMMIClient(MMIClientPtr &client);
     int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor,
         HandleEventType eventType = HANDLE_EVENT_TYPE_ALL);
     void RemoveMonitor(int32_t monitorId);
     void MarkConsumed(int32_t monitorId, int32_t eventId);
     void OnConnected();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent);
+    int32_t ReportMonitorKey(NetPacket& pkt);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    int32_t ReportMonitorPointer(NetPacket& pkt);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 private:
     int32_t AddLocal(int32_t handlerId, HandleEventType eventType,
@@ -50,6 +52,12 @@ private:
     bool HasHandler(int32_t handlerId);
     HandleEventType GetEventType() const;
     void OnDispatchEventProcessed(int32_t eventId);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void GetConsumerInfos(std::shared_ptr<PointerEvent> pointerEvent,
         std::map<int32_t, std::shared_ptr<IInputEventConsumer>> &consumerInfos);
@@ -60,6 +68,7 @@ private:
         HandleEventType eventType_ { HANDLE_EVENT_TYPE_ALL };
         std::shared_ptr<IInputEventConsumer> consumer_ { nullptr };
     };
+    MMIClientPtr client_ { nullptr };
     std::function<void(int32_t)> monitorCallback_ { nullptr };
     std::map<int32_t, MonitorHandler> inputHandlers_;
     std::map<int32_t, int32_t> processedEvents_;

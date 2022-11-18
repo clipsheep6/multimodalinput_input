@@ -117,7 +117,12 @@ int32_t InputConnectStub::StubHandleAllocSocketFd(MessageParcel& data, MessagePa
         }
         return ret;
     }
-    reply.WriteFileDescriptor(clientFd);
+
+    if (!reply.WriteFileDescriptor(clientFd)) {
+        MMI_HILOGE("Write file descriptor failed");
+        return IPC_STUB_WRITE_PARCEL_ERR;
+    }
+
     WRITEINT32(reply, tokenType, IPC_STUB_WRITE_PARCEL_ERR);
     MMI_HILOGI("Send clientFd to client, clientFd:%{public}d, tokenType:%{public}d", clientFd, tokenType);
     close(clientFd);

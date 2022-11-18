@@ -48,7 +48,7 @@ public:
         return std::move(str);
     }
 
-protected:
+public:
     struct MsgCallback {
         K id;
         V fun;
@@ -56,6 +56,7 @@ protected:
 
 protected:
     virtual ~MsgHandler() = default;
+public:
     V *GetMsgCallback(K id)
     {
         auto it = callbacks_.find(id);

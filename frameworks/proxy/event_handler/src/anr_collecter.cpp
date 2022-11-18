@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "AnrCollecter"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AnrCollecter" };
 } // namespace
 
 void AnrCollecter::SetAnrObserver(std::shared_ptr<IAnrObserver> &observer)
@@ -41,7 +41,7 @@ void AnrCollecter::SetAnrObserver(std::shared_ptr<IAnrObserver> &observer)
     }
 }
 
-void AnrCollecter::OnAnr(int32_t pid)
+void AnrCollecter::HandlerAnr(int32_t pid)
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
@@ -63,6 +63,20 @@ void AnrCollecter::OnConnected()
     if (ret != RET_OK) {
         MMI_HILOGE("Set anr observerfailed, ret:%{public}d", ret);
     }
+}
+
+int32_t AnrCollecter::OnAnr(NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    int32_t pid;
+    pkt >> pid;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read data failed");
+        return RET_ERR;
+    }
+    MMI_HILOGI("Client pid:%{public}d", pid);
+    HandlerAnr(pid);
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

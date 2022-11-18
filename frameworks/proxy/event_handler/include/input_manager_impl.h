@@ -20,20 +20,25 @@
 
 #include "anr_collecter.h"
 #include "event_handler.h"
-#include "i_mmi_client.h"
 #include "input_device_impl.h"
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_cooperate_impl.h"
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "input_filter.h"
 #include "input_injector.h"
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
 #include "input_interceptor.h"
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 #include "input_key_subscriber.h"
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_MONITOR
 #include "input_monitor.h"
 #endif // OHOS_BUILD_ENABLE_MONITOR
 #include "input_mouse_helper.h"
 #include "input_window_transfer.h"
+#include "i_input_device_cooperate_listener.h"
+#include "key_option.h"
 
 namespace OHOS {
 namespace MMI {
@@ -54,13 +59,6 @@ public:
 
     void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
         std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
-
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    void OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    void OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
     int32_t AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor);
     int32_t AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor);
@@ -95,7 +93,6 @@ public:
     int32_t GetPointerSpeed(int32_t &speed);
 
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
-    void OnAnr(int32_t pid);
 
     int32_t RegisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener);
     int32_t UnregisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener = nullptr);
@@ -107,34 +104,27 @@ public:
     int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
     bool GetFunctionKeyState(int32_t funcKey);
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
-    MMIClientPtr GetMMIClient();
-    InputDeviceCooperateImpl& GetInputDeviceCooImpl();
-    InputDeviceImpl& GetInputDeviceImpl();
-    InputMonitor& GetInputMonitor();
-    InputInterceptor& GetInputInterceptor();
-    InputKeySubscriber& GetKeySubscriber();
 private:
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    void OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consumer,
-        std::shared_ptr<KeyEvent> keyEvent);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    void OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer,
-        std::shared_ptr<PointerEvent> pointerEvent);
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+    void InitMsgCallback();
 private:
     MMIClientPtr client_ { nullptr };
-    std::shared_ptr<IInputEventConsumer> consumer_ { nullptr };
     std::mutex mtx_;
-    std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ { nullptr };
     AnrCollecter anrCollecter_;
     InputInjector inputInjector_;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
     InputDeviceCooperateImpl inputDeviceCooImpl_;
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     InputDeviceImpl inputDeviceImpl_;
     InputFilter inputFilter_;
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     InputInterceptor inputInterceptor_;
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     InputMonitor inputMonitor_;
+#endif // OHOS_BUILD_ENABLE_MONITOR
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     InputKeySubscriber keySubscriber_;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     InputMouseHelper mouseHelper_;
     InputWindowTransfer windowTransfer_;
 };

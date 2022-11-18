@@ -15,15 +15,22 @@
 
 #include "input_window_transfer.h"
 
+#include "bytrace_adapter.h"
+#include "event_log_helper.h"
+#include "input_event_data_transformation.h"
 #include "input_connect_manager.h"
-#include "input_manager_impl.h"
-#include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputWindowTransfer"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputWindowTransfer" };
 } // namespace
+
+void InputWindowTransfer::SetMMIClient(MMIClientPtr &client)
+{
+    CHKPV(client);
+    client_ = client;
+}
 
 void InputWindowTransfer::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
 {
@@ -50,14 +57,13 @@ void InputWindowTransfer::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
 
 void InputWindowTransfer::SendDisplayInfo()
 {
-    MMIClientPtr client = InputMgrImpl.GetMMIClient();
-    CHKPV(client);
+    CHKPV(client_);
     NetPacket pkt(MmiMessageId::DISPLAY_INFO);
     if (PackDisplayData(pkt) == RET_ERR) {
         MMI_HILOGE("Pack display info failed");
         return;
     }
-    if (!client->SendMessage(pkt)) {
+    if (!client_->SendMessage(pkt)) {
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
     }
 }
@@ -143,6 +149,7 @@ void InputWindowTransfer::PrintDisplayInfo()
 void InputWindowTransfer::OnConnected()
 {
     CALL_DEBUG_ENTER;
+    InitProcessedCallback();
     if (displayGroupInfo_.windowsInfo.empty() || displayGroupInfo_.displaysInfo.empty()) {
         MMI_HILOGE("The windows info or display info is empty");
         return;
@@ -150,5 +157,173 @@ void InputWindowTransfer::OnConnected()
     SendDisplayInfo();
     PrintDisplayInfo();
 }
+
+void InputWindowTransfer::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
+    std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
+{
+    consumer_ = inputEventConsumer;
+    eventHandler_ = eventHandler;
+}
+
+void InputWindowTransfer::InitProcessedCallback()
+{
+    CALL_DEBUG_ENTER;
+    int32_t tokenType = MultimodalInputConnMgr->GetTokenType();
+    if (tokenType == TokenType::TOKEN_HAP) {
+        MMI_HILOGD("Current session is hap");
+        dispatchCallback_ = std::bind(&InputWindowTransfer::OnDispatchEventProcessed, this, std::placeholders::_1);
+    } else if (tokenType == static_cast<int32_t>(TokenType::TOKEN_NATIVE)) {
+        MMI_HILOGD("Current session is native");
+    } else {
+        MMI_HILOGE("Current session is unknown tokenType:%{public}d", tokenType);
+    }
+}
+
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+int32_t InputWindowTransfer::OnKeyEvent(NetPacket& pkt)
+{
+    auto key = KeyEvent::Create();
+    CHKPR(key, ERROR_NULL_POINTER);
+    int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(pkt, key);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Read netPacket failed");
+        return RET_ERR;
+    }
+    int32_t fd = 0;
+    pkt >> fd;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read fd failed");
+        return PACKET_READ_FAIL;
+    }
+    MMI_HILOGI("Key event dispatcher of client, Fd:%{public}d", fd);
+    EventLogHelper::PrintEventData(key);
+    BytraceAdapter::StartBytrace(key, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_DISPATCH_EVENT);
+    key->SetProcessedCallback(dispatchCallback_);
+    HandlerKeyEvent(key);
+    key->MarkProcessed();
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+int32_t InputWindowTransfer::OnPointerEvent(NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    auto pointerEvent = PointerEvent::Create();
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    if (InputEventDataTransformation::Unmarshalling(pkt, pointerEvent) != ERR_OK) {
+        MMI_HILOGE("Failed to deserialize pointer event.");
+        return RET_ERR;
+    }
+    MMI_HILOGD("Pointer event dispatcher of client:");
+    EventLogHelper::PrintEventData(pointerEvent);
+    if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
+        MMI_HILOGI("Operation canceled.");
+    }
+    pointerEvent->SetProcessedCallback(dispatchCallback_);
+    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_DISPATCH_EVENT);
+    HandlerPointerEvent(pointerEvent);
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_JOYSTICK) {
+        pointerEvent->MarkProcessed();
+    }
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+void InputWindowTransfer::OnDispatchEventProcessed(int32_t eventId)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(client_);
+    NetPacket pkt(MmiMessageId::MARK_PROCESS);
+    pkt << eventId << ANR_DISPATCH;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write event failed");
+        return;
+    }
+    if (!client_->SendMessage(pkt)) {
+        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+        return;
+    }
+}
+
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+void InputWindowTransfer::HandlerKeyEventTask(std::shared_ptr<IInputEventConsumer> consumer,
+    std::shared_ptr<KeyEvent> keyEvent)
+{
+    CHK_PID_AND_TID();
+    CHKPV(consumer);
+    consumer->OnInputEvent(keyEvent);
+    MMI_HILOGD("Key event callback keyCode:%{public}d", keyEvent->GetKeyCode());
+}
+
+void InputWindowTransfer::HandlerKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CHK_PID_AND_TID();
+    CHKPV(keyEvent);
+    CHKPV(eventHandler_);
+    CHKPV(consumer_);
+    CHKPV(client_);
+    std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
+    std::shared_ptr<IInputEventConsumer> inputConsumer = nullptr;
+    {
+        std::lock_guard<std::mutex> guard(mtx_);
+        eventHandler = eventHandler_;
+        inputConsumer = consumer_;
+    }
+    BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_DISPATCH_EVENT);
+    if (client_->IsEventHandlerChanged()) {
+        if (!eventHandler->PostHighPriorityTask(std::bind(&InputWindowTransfer::HandlerKeyEventTask,
+            this, inputConsumer, keyEvent))) {
+            MMI_HILOGE("Post task failed");
+            return;
+        }
+    } else {
+        inputConsumer->OnInputEvent(keyEvent);
+        MMI_HILOGD("Key event report keyCode:%{public}d", keyEvent->GetKeyCode());
+    }
+    MMI_HILOGD("Key event keyCode:%{public}d", keyEvent->GetKeyCode());
+}
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+void InputWindowTransfer::HandlerPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer,
+    std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHK_PID_AND_TID();
+    CHKPV(consumer);
+    CHKPV(pointerEvent);
+    consumer->OnInputEvent(pointerEvent);
+    MMI_HILOGD("Pointer event callback pointerId:%{public}d", pointerEvent->GetPointerId());
+}
+
+void InputWindowTransfer::HandlerPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHK_PID_AND_TID();
+    CHKPV(pointerEvent);
+    CHKPV(eventHandler_);
+    CHKPV(consumer_);
+    CHKPV(client_);
+    std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
+    std::shared_ptr<IInputEventConsumer> inputConsumer = nullptr;
+    {
+        std::lock_guard<std::mutex> guard(mtx_);
+        eventHandler = eventHandler_;
+        inputConsumer = consumer_;
+    }
+    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_DISPATCH_EVENT);
+    if (client_->IsEventHandlerChanged()) {
+        if (!eventHandler->PostHighPriorityTask(std::bind(&InputWindowTransfer::HandlerPointerEventTask,
+            this, inputConsumer, pointerEvent))) {
+            MMI_HILOGE("Post task failed");
+            return;
+        }
+    } else {
+        inputConsumer->OnInputEvent(pointerEvent);
+        MMI_HILOGD("Pointer event report pointerId:%{public}d", pointerEvent->GetPointerId());
+    }
+    MMI_HILOGD("Pointer event pointerId:%{public}d", pointerEvent->GetPointerId());
+}
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace MMI
 } // namespace OHOS

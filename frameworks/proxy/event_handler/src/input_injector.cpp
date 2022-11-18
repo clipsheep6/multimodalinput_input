@@ -17,14 +17,14 @@
 
 #include "event_log_helper.h"
 #include "input_connect_manager.h"
-#include "input_event_data_transformation.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputInjector"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputInjector" };
 } // namespace
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void InputInjector::InjectKeyEvent(const std::shared_ptr<KeyEvent> &keyEvent)
 {
     CALL_DEBUG_ENTER;
@@ -40,7 +40,9 @@ void InputInjector::InjectKeyEvent(const std::shared_ptr<KeyEvent> &keyEvent)
         MMI_HILOGE("Inject key event failed, ret:%{public}d", ret);
     }
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 void InputInjector::InjectPointerEvent(std::shared_ptr<PointerEvent> &pointerEvent)
 {
     CALL_DEBUG_ENTER;
@@ -71,5 +73,6 @@ void InputInjector::InjectPointerEvent(std::shared_ptr<PointerEvent> &pointerEve
         MMI_HILOGE("Inject pointer event failed, ret:%{public}d", ret);
     }
 }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace MMI
 } // namespace OHOS

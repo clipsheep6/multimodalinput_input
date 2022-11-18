@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputMouseHelper"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputMouseHelper" };
 } // namespace
 
 void InputMouseHelper::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
@@ -38,6 +38,7 @@ void InputMouseHelper::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
 int32_t InputMouseHelper::SetPointerVisible(bool visible)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
     int32_t ret = MultimodalInputConnMgr->SetPointerVisible(visible);
     if (ret != RET_OK) {
         MMI_HILOGE("Set pointer visible failed, ret:%{public}d", ret);
@@ -48,6 +49,7 @@ int32_t InputMouseHelper::SetPointerVisible(bool visible)
 bool InputMouseHelper::IsPointerVisible()
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
     bool visible;
     int32_t ret = MultimodalInputConnMgr->IsPointerVisible(visible);
     if (ret != 0) {
@@ -59,6 +61,7 @@ bool InputMouseHelper::IsPointerVisible()
 int32_t InputMouseHelper::SetPointerSpeed(int32_t speed)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
     int32_t ret = MultimodalInputConnMgr->SetPointerSpeed(speed);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to set pointer speed");
@@ -70,6 +73,7 @@ int32_t InputMouseHelper::SetPointerSpeed(int32_t speed)
 int32_t InputMouseHelper::GetPointerSpeed(int32_t &speed)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
     int32_t ret = MultimodalInputConnMgr->GetPointerSpeed(speed);
     if (ret != RET_OK) {
         MMI_HILOGE("Get pointer speed failed");
@@ -81,6 +85,7 @@ int32_t InputMouseHelper::GetPointerSpeed(int32_t &speed)
 int32_t InputMouseHelper::SetPointerStyle(int32_t windowId, int32_t pointerStyle)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
     if (windowId < 0 || pointerStyle < 0) {
         MMI_HILOGE("The param is invalid");
         return RET_ERR;
@@ -96,6 +101,7 @@ int32_t InputMouseHelper::SetPointerStyle(int32_t windowId, int32_t pointerStyle
 int32_t InputMouseHelper::GetPointerStyle(int32_t windowId, int32_t &pointerStyle)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
     if (windowId < 0) {
         MMI_HILOGE("The param is invalid");
         return RET_ERR;

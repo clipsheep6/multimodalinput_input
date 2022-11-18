@@ -17,11 +17,10 @@
 
 #include <cinttypes>
 
-#include "define_multimodal.h"
-#include "error_multimodal.h"
-
 #include "bytrace_adapter.h"
 #include "mmi_client.h"
+#include "mmi_func_callback.h"
+#include "msg_handler.h"
 
 namespace OHOS {
 namespace MMI {
@@ -66,7 +65,7 @@ private:
 InputManagerImpl::InputManagerImpl() {}
 InputManagerImpl::~InputManagerImpl() {}
 
-void Connected(const IMMIClient& client)
+void Connected()
 {
     CALL_DEBUG_ENTER;
     InputMgrImpl.OnConnected();
@@ -83,16 +82,64 @@ bool InputManagerImpl::InitClient(EventHandlerPtr eventHandler)
         return true;
     }
     client_ = std::make_shared<MMIClient>();
-    CHKPF(client_);
     client_->SetEventHandler(eventHandler);
     client_->RegisterConnectedFunction(&Connected);
+    InitMsgCallback();
     if (!(client_->Start())) {
         client_.reset();
         client_ = nullptr;
-        MMI_HILOGE("The client fails to start");
+        MMI_HILOGE("Client start failed");
         return false;
     }
     return true;
+}
+
+void InputManagerImpl::InitMsgCallback()
+{
+    MMIClient::MsgCallback funs[] = {
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+        {MmiMessageId::ON_KEY_EVENT, MsgCallbackBind1(&InputWindowTransfer::OnKeyEvent, &windowTransfer_)},
+        {MmiMessageId::ON_SUBSCRIBE_KEY, MsgCallbackBind1(&InputKeySubscriber::OnSubscribeKeyEventCallback, &keySubscriber_)},
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+        {MmiMessageId::ON_POINTER_EVENT, MsgCallbackBind1(&InputWindowTransfer::OnPointerEvent, &windowTransfer_)},
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+        {MmiMessageId::INPUT_DEVICE, MsgCallbackBind1(&InputDeviceImpl::OnInputDevice, &inputDeviceImpl_)},
+        {MmiMessageId::INPUT_DEVICE_IDS, MsgCallbackBind1(&InputDeviceImpl::OnInputDeviceIds, &inputDeviceImpl_)},
+        {MmiMessageId::INPUT_DEVICE_SUPPORT_KEYS, MsgCallbackBind1(&InputDeviceImpl::OnSupportKeys, &inputDeviceImpl_)},
+        {MmiMessageId::INPUT_DEVICE_KEYBOARD_TYPE, MsgCallbackBind1(&InputDeviceImpl::OnInputKeyboardType, &inputDeviceImpl_)},
+        {MmiMessageId::ADD_INPUT_DEVICE_LISTENER, MsgCallbackBind1(&InputDeviceImpl::OnDevListener, &inputDeviceImpl_)},
+        {MmiMessageId::NOTICE_ANR, MsgCallbackBind1(&AnrCollecter::OnAnr, &anrCollecter_)},
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
+        {MmiMessageId::REPORT_INTERCEPTOR_KEY, MsgCallbackBind1(&InputInterceptor::ReportInterceptorKey, &inputInterceptor_)},
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && \
+    defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
+        {MmiMessageId::REPORT_INTERCEPTOR_POINTER, MsgCallbackBind1(&InputInterceptor::ReportInterceptorPointer, &inputInterceptor_)},
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_MONITOR)
+        {MmiMessageId::REPORT_MONITOR_KEY, MsgCallbackBind1(&InputMonitor::ReportMonitorKey, &inputMonitor_)},
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && \
+    defined(OHOS_BUILD_ENABLE_MONITOR)
+        {MmiMessageId::REPORT_MONITOR_POINTER, MsgCallbackBind1(&InputMonitor::ReportMonitorPointer, &inputMonitor_)},
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+        {MmiMessageId::COOPERATION_ADD_LISTENER, MsgCallbackBind1(&InputDeviceCooperateImpl::OnCooperationListiner, &inputDeviceCooImpl_)},
+        {MmiMessageId::COOPERATION_MESSAGE, MsgCallbackBind1(&InputDeviceCooperateImpl::OnCooperationMessage, &inputDeviceCooImpl_)},
+        {MmiMessageId::COOPERATION_GET_STATE, MsgCallbackBind1(&InputDeviceCooperateImpl::OnCooperationState, &inputDeviceCooImpl_)},
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+    };
+    for (auto &it : funs) {
+        if (!client_->RegistrationEvent(it)) {
+            MMI_HILOGW("Failed to register event errCode:%{public}d", EVENT_REG_FAIL);
+            continue;
+        }
+    }
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    inputMonitor_.SetMMIClient(client_);
+#endif // OHOS_BUILD_ENABLE_MONITOR
+    windowTransfer_.SetMMIClient(client_);
 }
 
 void InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
@@ -127,8 +174,7 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventCo
         MMI_HILOGE("Client init failed");
         return;
     }
-    consumer_ = inputEventConsumer;
-    eventHandler_ = eventHandler;
+    windowTransfer_.SetWindowInputEventConsumer(inputEventConsumer, eventHandler);
 }
 
 int32_t InputManagerImpl::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
@@ -165,86 +211,6 @@ void InputManagerImpl::UnsubscribeKeyEvent(int32_t subscriberId)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-void InputManagerImpl::OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consumer,
-    std::shared_ptr<KeyEvent> keyEvent)
-{
-    CHK_PID_AND_TID();
-    CHKPV(consumer);
-    consumer->OnInputEvent(keyEvent);
-    MMI_HILOGD("Key event callback keyCode:%{public}d", keyEvent->GetKeyCode());
-}
-
-void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
-{
-    CHK_PID_AND_TID();
-    CHKPV(keyEvent);
-    CHKPV(eventHandler_);
-    CHKPV(consumer_);
-    CHKPV(client_);
-    std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
-    std::shared_ptr<IInputEventConsumer> inputConsumer = nullptr;
-    {
-        std::lock_guard<std::mutex> guard(mtx_);
-        eventHandler = eventHandler_;
-        inputConsumer = consumer_;
-    }
-    BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_DISPATCH_EVENT);
-    if (client_->IsEventHandlerChanged()) {
-        if (!eventHandler->PostHighPriorityTask(std::bind(&InputManagerImpl::OnKeyEventTask,
-            this, inputConsumer, keyEvent))) {
-            MMI_HILOGE("Post task failed");
-            return;
-        }
-    } else {
-        inputConsumer->OnInputEvent(keyEvent);
-        MMI_HILOGD("Key event report keyCode:%{public}d", keyEvent->GetKeyCode());
-    }
-    MMI_HILOGD("Key event keyCode:%{public}d", keyEvent->GetKeyCode());
-}
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-void InputManagerImpl::OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer,
-    std::shared_ptr<PointerEvent> pointerEvent)
-{
-    CHK_PID_AND_TID();
-    CHKPV(consumer);
-    CHKPV(pointerEvent);
-    consumer->OnInputEvent(pointerEvent);
-    MMI_HILOGD("Pointer event callback pointerId:%{public}d", pointerEvent->GetPointerId());
-}
-
-void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
-{
-    CALL_DEBUG_ENTER;
-    CHK_PID_AND_TID();
-    CHKPV(pointerEvent);
-    CHKPV(eventHandler_);
-    CHKPV(consumer_);
-    CHKPV(client_);
-    std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
-    std::shared_ptr<IInputEventConsumer> inputConsumer = nullptr;
-    {
-        std::lock_guard<std::mutex> guard(mtx_);
-        eventHandler = eventHandler_;
-        inputConsumer = consumer_;
-    }
-    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_DISPATCH_EVENT);
-    if (client_->IsEventHandlerChanged()) {
-        if (!eventHandler->PostHighPriorityTask(std::bind(&InputManagerImpl::OnPointerEventTask,
-            this, inputConsumer, pointerEvent))) {
-            MMI_HILOGE("Post task failed");
-            return;
-        }
-    } else {
-        inputConsumer->OnInputEvent(pointerEvent);
-        MMI_HILOGD("Pointer event report pointerId:%{public}d", pointerEvent->GetPointerId());
-    }
-    MMI_HILOGD("Pointer event pointerId:%{public}d", pointerEvent->GetPointerId());
-}
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-
 int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor)
 {
     CALL_INFO_TRACE;
@@ -280,7 +246,7 @@ int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consum
     CHKPR(consumer, INVALID_HANDLER_ID);
     if (!InitClient()) {
         MMI_HILOGE("Client init failed");
-        return INVALID_HANDLER_ID;
+        return RET_ERR;
     }
     return inputMonitor_.AddMonitor(consumer);
 #else
@@ -333,7 +299,7 @@ int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> in
     CHKPR(interceptor, INVALID_HANDLER_ID);
     if (!InitClient()) {
         MMI_HILOGE("Client init failed");
-        return INVALID_HANDLER_ID;
+        return RET_ERR;
     }
     return inputInterceptor_.AddInterceptor(interceptor, HANDLE_EVENT_TYPE_ALL);
 #else
@@ -351,7 +317,7 @@ int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyE
     CHKPR(consumer, INVALID_HANDLER_ID);
     if (!InitClient()) {
         MMI_HILOGE("Client init failed");
-        return INVALID_HANDLER_ID;
+        return RET_ERR;
     }
     return inputInterceptor_.AddInterceptor(consumer, HANDLE_EVENT_TYPE_KEY);
 #else
@@ -537,12 +503,6 @@ void InputManagerImpl::SetAnrObserver(std::shared_ptr<IAnrObserver> observer)
     anrCollecter_.SetAnrObserver(observer);
 }
 
-void InputManagerImpl::OnAnr(int32_t pid)
-{
-    CALL_DEBUG_ENTER;
-    anrCollecter_.OnAnr(pid);
-}
-
 int32_t InputManagerImpl::SetInputDevice(const std::string &dhid, const std::string &screenId)
 {
     CALL_DEBUG_ENTER;
@@ -678,37 +638,6 @@ int32_t InputManagerImpl::SetFunctionKeyState(int32_t funcKey, bool enable)
     MMI_HILOGW("Keyboard device does not support");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-}
-
-MMIClientPtr InputManagerImpl::GetMMIClient()
-{
-    CHKPP(client_);
-    return client_->GetSharedPtr();
-}
-
-InputDeviceCooperateImpl& InputManagerImpl::GetInputDeviceCooImpl()
-{
-    return inputDeviceCooImpl_;
-}
-
-InputDeviceImpl& InputManagerImpl::GetInputDeviceImpl()
-{
-    return inputDeviceImpl_;
-}
-
-InputMonitor& InputManagerImpl::GetInputMonitor()
-{
-    return inputMonitor_;
-}
-
-InputInterceptor& InputManagerImpl::GetInputInterceptor()
-{
-    return inputInterceptor_;
-}
-
-InputKeySubscriber& InputManagerImpl::GetKeySubscriber()
-{
-    return keySubscriber_;
 }
 } // namespace MMI
 } // namespace OHOS

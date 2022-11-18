@@ -16,8 +16,8 @@
 #include "input_interceptor.h"
 
 #include "bytrace_adapter.h"
+#include "input_event_data_transformation.h"
 #include "input_connect_manager.h"
-#include "util.h"
 
 namespace OHOS {
 namespace MMI {
@@ -113,11 +113,10 @@ void InputInterceptor::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent)
         if ((handler.second.eventType_ & HANDLE_EVENT_TYPE_KEY) != HANDLE_EVENT_TYPE_KEY) {
             continue;
         }
-        int32_t handlerId = handler.first;
         auto consumer = handler.second.consumer_;
         CHKPV(consumer);
         consumer->OnInputEvent(keyEvent);
-        MMI_HILOGD("Key event id:%{public}d keyCode:%{public}d", handlerId, keyEvent->GetKeyCode());
+        MMI_HILOGD("Key event id:%{public}d keyCode:%{public}d", handler.first, keyEvent->GetKeyCode());
     }
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -190,5 +189,37 @@ HandleEventType InputInterceptor::GetEventType() const
     }
     return eventType;
 }
+
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+int32_t InputInterceptor::ReportInterceptorKey(NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    auto keyEvent = KeyEvent::Create();
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    if (InputEventDataTransformation::NetPacketToKeyEvent(pkt, keyEvent) != ERR_OK) {
+        MMI_HILOGE("Failed to deserialize key event.");
+        return RET_ERR;
+    }
+    BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_INTERCEPT_EVENT);
+    OnInputEvent(keyEvent);
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+int32_t InputInterceptor::ReportInterceptorPointer(NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    auto pointerEvent = PointerEvent::Create();
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    if (InputEventDataTransformation::Unmarshalling(pkt, pointerEvent) != ERR_OK) {
+        MMI_HILOGE("Failed to deserialize pointer event");
+        return RET_ERR;
+    }
+    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_INTERCEPT_EVENT);
+    OnInputEvent(pointerEvent);
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace MMI
 } // namespace OHOS

@@ -19,7 +19,6 @@
 
 #include "key_event.h"
 #include "pointer_event.h"
-#include "proto.h"
 
 namespace OHOS {
 namespace MMI {

@@ -17,10 +17,8 @@
 
 #include <cinttypes>
 
-#include "define_multimodal.h"
-#include "error_multimodal.h"
-
 #include "bytrace_adapter.h"
+#include "input_event_data_transformation.h"
 #include "input_connect_manager.h"
 
 namespace OHOS {
@@ -145,7 +143,7 @@ int32_t InputKeySubscriber::UnsubscribeKeyEvent(int32_t subscribeId)
     return RET_ERR;
 }
 
-int32_t InputKeySubscriber::OnSubscribeKeyEventCallback(std::shared_ptr<KeyEvent> event,
+int32_t InputKeySubscriber::HandlerSubscribeKeyCallback(std::shared_ptr<KeyEvent> event,
     int32_t subscribeId)
 {
     CHK_PID_AND_TID();
@@ -216,6 +214,7 @@ int32_t InputKeySubscriber::HandlerUnsubscribeKeyEvent(int32_t subscribeId)
 bool InputKeySubscriber::GetFunctionKeyState(int32_t funcKey)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
     bool state { false };
     int32_t ret = MultimodalInputConnMgr->GetFunctionKeyState(funcKey, state);
     if (ret != RET_OK) {
@@ -227,6 +226,7 @@ bool InputKeySubscriber::GetFunctionKeyState(int32_t funcKey)
 int32_t InputKeySubscriber::SetFunctionKeyState(int32_t funcKey, bool enable)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
     int32_t ret = MultimodalInputConnMgr->SetFunctionKeyState(funcKey, enable);
     if (ret != RET_OK) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
@@ -234,5 +234,33 @@ int32_t InputKeySubscriber::SetFunctionKeyState(int32_t funcKey, bool enable)
     }
     return RET_OK;
 }
+
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+int32_t InputKeySubscriber::OnSubscribeKeyEventCallback(NetPacket &pkt)
+{
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(pkt, keyEvent);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Read net packet failed");
+        return RET_ERR;
+    }
+    int32_t fd = -1;
+    int32_t subscribeId = -1;
+    pkt >> fd >> subscribeId;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read fd failed");
+        return PACKET_READ_FAIL;
+    }
+    MMI_HILOGD("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d,"
+               "KeyCode:%{public}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64 ","
+               "Action:%{public}d,KeyAction:%{public}d,EventType:%{public}d,Flag:%{public}u",
+        subscribeId, fd, keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
+        keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
+        keyEvent->GetEventType(), keyEvent->GetFlag());
+    BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
+    return HandlerSubscribeKeyCallback(keyEvent, subscribeId);
+}
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 } // namespace MMI
 } // namespace OHOS

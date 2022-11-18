@@ -21,6 +21,7 @@
 #include "nocopyable.h"
 
 #include "i_anr_observer.h"
+#include "net_packet.h"
 
 namespace OHOS {
 namespace MMI {
@@ -30,8 +31,10 @@ public:
     DISALLOW_MOVE(AnrCollecter);
     ~AnrCollecter() = default;
     void SetAnrObserver(std::shared_ptr<IAnrObserver> &observer);
-    void OnAnr(int32_t pid);
     void OnConnected();
+    int32_t OnAnr(NetPacket& pkt);
+private:
+    void HandlerAnr(int32_t pid);
 private:
     std::mutex mtx_;
     std::vector<std::shared_ptr<IAnrObserver>> anrObservers_;

@@ -21,6 +21,7 @@
 
 #include "i_input_event_consumer.h"
 #include "input_proxy_def.h"
+#include "net_packet.h"
 
 namespace OHOS {
 namespace MMI {
@@ -34,10 +35,10 @@ public:
     void RemoveInterceptor(int32_t interceptorId);
     void OnConnected();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent);
+    int32_t ReportInterceptorKey(NetPacket& pkt);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    int32_t ReportInterceptorPointer(NetPacket& pkt);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 private:
     int32_t AddLocal(int32_t handlerId, HandleEventType eventType,
@@ -47,9 +48,11 @@ private:
     void RemoveFromServer(HandleEventType eventType);
     int32_t GetNextId();
     HandleEventType GetEventType() const;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    void GetConsumerInfos(std::shared_ptr<PointerEvent> pointerEvent,
-        std::map<int32_t, std::shared_ptr<IInputEventConsumer>> &consumerInfos);
+    void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 private:
     struct InterceptorHandler {

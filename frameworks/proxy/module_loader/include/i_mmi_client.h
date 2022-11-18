@@ -18,6 +18,8 @@
 #include <functional>
 
 #include "event_handler.h"
+#include "msg_handler.h"
+#include "net_packet.h"
 
 namespace OHOS {
 namespace MMI {
@@ -25,8 +27,9 @@ class NetPacket;
 class IMMIClient;
 using MMIClientPtr = std::shared_ptr<IMMIClient>;
 using EventHandlerPtr = std::shared_ptr<AppExecFwk::EventHandler>;
-typedef std::function<void(const IMMIClient&)> ConnectCallback;
-class IMMIClient {
+typedef std::function<void()> ConnectCallback;
+typedef std::function<int32_t(NetPacket&)> ClientMsgFun;
+class IMMIClient : public MsgHandler<MmiMessageId, ClientMsgFun> {
 public:
     virtual MMIClientPtr GetSharedPtr() = 0;
     virtual bool GetCurrentConnectedStatus() const = 0;

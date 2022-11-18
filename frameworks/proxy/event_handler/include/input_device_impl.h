@@ -25,6 +25,7 @@
 
 #include "i_input_device_listener.h"
 #include "input_device.h"
+#include "net_packet.h"
 
 namespace OHOS {
 namespace MMI {
@@ -53,19 +54,23 @@ public:
     int32_t GetInputDeviceAsync(int32_t deviceId, FunInputDevInfo callback);
     int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> keyCodes, FunInputDevKeys callback);
     int32_t GetKeyboardType(int32_t deviceId, FunKeyboardTypes callback);
-    void OnInputDevice(int32_t userData, std::shared_ptr<InputDevice> devData);
-    void OnInputDeviceIds(int32_t userData, std::vector<int32_t> &ids);
-    void OnSupportKeys(int32_t userData, std::vector<bool> &keystrokeAbility);
-    void OnDevListener(int32_t deviceId, const std::string &type);
-    void OnKeyboardType(int32_t userData, int32_t keyboardType);
     int32_t GetUserData();
     std::shared_ptr<InputDevice> DevDataUnmarshalling(NetPacket &pkt);
-
+    int32_t OnInputDevice(NetPacket& pkt);
+    int32_t OnInputDeviceIds(NetPacket& pkt);
+    int32_t OnSupportKeys(NetPacket& pkt);
+    int32_t OnInputKeyboardType(NetPacket& pkt);
+    int32_t OnDevListener(NetPacket& pkt);
 private:
     const FunInputDevInfo* GetDeviceInfo(int32_t) const;
     const FunInputDevIds* GetDeviceIds(int32_t) const;
     const FunInputDevKeys* GetDeviceKeys(int32_t) const;
     const FunKeyboardTypes* GetKeyboardTypes(int32_t) const;
+    void HandlerInputDevice(int32_t userData, std::shared_ptr<InputDevice> devData);
+    void HandlerInputDeviceIds(int32_t userData, std::vector<int32_t> &ids);
+    void HandlerSupportKeys(int32_t userData, std::vector<bool> &keystrokeAbility);
+    void HandlerDevListener(int32_t deviceId, const std::string &type);
+    void HandlerKeyboardType(int32_t userData, int32_t keyboardType);
 private:
     std::map<int32_t, InputDeviceData> inputDevices_;
     std::map<std::string, std::list<InputDevListenerPtr>> devListener_ = { { "change", {} } };

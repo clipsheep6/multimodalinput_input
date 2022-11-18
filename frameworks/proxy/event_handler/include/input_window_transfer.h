@@ -18,7 +18,8 @@
 #include "nocopyable.h"
 
 #include "display_info.h"
-#include "net_packet.h"
+#include "i_input_event_consumer.h"
+#include "i_mmi_client.h"
 
 namespace OHOS {
 namespace MMI {
@@ -27,17 +28,46 @@ public:
     InputWindowTransfer() = default;
     DISALLOW_MOVE(InputWindowTransfer);
     ~InputWindowTransfer() = default;
+    void SetMMIClient(MMIClientPtr &client);
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
     void OnConnected();
+    void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
+        std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    int32_t OnKeyEvent(NetPacket& pkt);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    int32_t OnPointerEvent(NetPacket& pkt);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 private:
     void SendDisplayInfo();
     int32_t PackDisplayData(NetPacket &pkt);
     int32_t PackWindowInfo(NetPacket &pkt);
     int32_t PackDisplayInfo(NetPacket &pkt);
     void PrintDisplayInfo();
+    void InitProcessedCallback();
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    void HandlerKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    void HandlerPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    void HandlerKeyEventTask(std::shared_ptr<IInputEventConsumer> consumer,
+        std::shared_ptr<KeyEvent> keyEvent);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    void HandlerPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer,
+        std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+    void OnDispatchEventProcessed(int32_t eventId);
 private:
+    MMIClientPtr client_ { nullptr };
     std::mutex mtx_;
     DisplayGroupInfo displayGroupInfo_ {};
+    std::function<void(int32_t)> dispatchCallback_ { nullptr };
+    std::shared_ptr<IInputEventConsumer> consumer_ { nullptr };
+    std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS

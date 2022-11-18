@@ -18,7 +18,6 @@
 #include "input_connect_manager.h"
 #include "mmi_log.h"
 #include "napi_constants.h"
-#include "net_packet.h"
 
 namespace OHOS {
 namespace MMI {
@@ -86,7 +85,7 @@ listenerLabel:
     return RET_OK;
 }
 
-void InputDeviceImpl::OnDevListener(int32_t deviceId, const std::string &type)
+void InputDeviceImpl::HandlerDevListener(int32_t deviceId, const std::string &type)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -165,7 +164,7 @@ int32_t InputDeviceImpl::GetKeyboardType(int32_t deviceId, FunKeyboardTypes call
     return MultimodalInputConnMgr->GetKeyboardType(userData_++, deviceId);
 }
 
-void InputDeviceImpl::OnInputDevice(int32_t userData, std::shared_ptr<InputDevice> devData)
+void InputDeviceImpl::HandlerInputDevice(int32_t userData, std::shared_ptr<InputDevice> devData)
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
@@ -183,7 +182,7 @@ void InputDeviceImpl::OnInputDevice(int32_t userData, std::shared_ptr<InputDevic
         userData, devData->GetName().c_str(), devData->GetType());
 }
 
-void InputDeviceImpl::OnInputDeviceIds(int32_t userData, std::vector<int32_t> &ids)
+void InputDeviceImpl::HandlerInputDeviceIds(int32_t userData, std::vector<int32_t> &ids)
 {
     CHK_PID_AND_TID();
     std::lock_guard<std::mutex> guard(mtx_);
@@ -199,7 +198,7 @@ void InputDeviceImpl::OnInputDeviceIds(int32_t userData, std::vector<int32_t> &i
         userData, IdsListToString(ids).c_str());
 }
 
-void InputDeviceImpl::OnSupportKeys(int32_t userData, std::vector<bool> &keystrokeAbility)
+void InputDeviceImpl::HandlerSupportKeys(int32_t userData, std::vector<bool> &keystrokeAbility)
 {
     CHK_PID_AND_TID();
     std::lock_guard<std::mutex> guard(mtx_);
@@ -213,7 +212,7 @@ void InputDeviceImpl::OnSupportKeys(int32_t userData, std::vector<bool> &keystro
     (*devKeys)(keystrokeAbility);
 }
 
-void InputDeviceImpl::OnKeyboardType(int32_t userData, int32_t keyboardType)
+void InputDeviceImpl::HandlerKeyboardType(int32_t userData, int32_t keyboardType)
 {
     CHK_PID_AND_TID();
     std::lock_guard<std::mutex> guard(mtx_);
@@ -310,6 +309,91 @@ std::shared_ptr<InputDevice> InputDeviceImpl::DevDataUnmarshalling(NetPacket &pk
         devData->AddAxisInfo(axis);
     }
     return devData;
+}
+
+int32_t InputDeviceImpl::OnInputDeviceIds(NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    int32_t userData;
+    std::vector<int32_t> inputDeviceIds;
+    pkt >> userData >> inputDeviceIds;
+    if (inputDeviceIds.size() > MAX_INPUT_DEVICE) {
+        MMI_HILOGE("Device exceeds the max range");
+        return RET_ERR;
+    }
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read cooperate msg failed");
+        return RET_ERR;
+    }
+    HandlerInputDeviceIds(userData, inputDeviceIds);
+    return RET_OK;
+}
+
+int32_t InputDeviceImpl::OnInputDevice(NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    int32_t userData;
+    pkt >> userData;
+    std::shared_ptr<InputDevice> devData = DevDataUnmarshalling(pkt);
+    CHKPR(devData, RET_ERR);
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read cooperate msg failed");
+        return RET_ERR;
+    }
+    HandlerInputDevice(userData, devData);
+    return RET_OK;
+}
+
+int32_t InputDeviceImpl::OnSupportKeys(NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    int32_t userData;
+    size_t size;
+    pkt >> userData >> size;
+    if (size > MAX_SUPPORT_KEY) {
+        MMI_HILOGE("Keys exceeds the max range");
+        return RET_ERR;
+    }
+    std::vector<bool> abilityRet;
+    bool ret;
+    for (size_t i = 0; i < size; ++i) {
+        pkt >> ret;
+        abilityRet.push_back(ret);
+    }
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read key Data failed");
+        return RET_ERR;
+    }
+    HandlerSupportKeys(userData, abilityRet);
+    return RET_OK;
+}
+
+int32_t InputDeviceImpl::OnInputKeyboardType(NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    int32_t userData;
+    int32_t KeyboardType;
+    pkt >> userData >> KeyboardType;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read failed");
+        return PACKET_WRITE_FAIL;
+    }
+    HandlerKeyboardType(userData, KeyboardType);
+    return RET_OK;
+}
+
+int32_t InputDeviceImpl::OnDevListener(NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    std::string type;
+    int32_t deviceId;
+    pkt >> type >> deviceId;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read type failed");
+        return RET_ERR;
+    }
+    HandlerDevListener(deviceId, type);
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

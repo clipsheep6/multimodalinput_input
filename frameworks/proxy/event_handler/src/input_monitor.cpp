@@ -16,11 +16,9 @@
 #include "input_monitor.h"
 
 #include "bytrace_adapter.h"
+#include "input_event_data_transformation.h"
 #include "input_connect_manager.h"
-#include "input_manager_impl.h"
 #include "mmi_log.h"
-#include "net_packet.h"
-#include "proto.h"
 
 namespace OHOS {
 namespace MMI {
@@ -31,6 +29,12 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 InputMonitor::InputMonitor()
 {
     monitorCallback_ = std::bind(&InputMonitor::OnDispatchEventProcessed, this, std::placeholders::_1);
+}
+
+void InputMonitor::SetMMIClient(MMIClientPtr &client)
+{
+    CHKPV(client);
+    client_ = client;
 }
 
 int32_t InputMonitor::AddMonitor(std::shared_ptr<IInputEventConsumer> monitor,
@@ -254,8 +258,7 @@ void InputMonitor::OnDispatchEventProcessed(int32_t eventId)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtxHandlers_);
-    MMIClientPtr client = InputMgrImpl.GetMMIClient();
-    CHKPV(client);
+    CHKPV(client_);
     auto iter = processedEvents_.find(eventId);
     if (iter == processedEvents_.end()) {
         MMI_HILOGE("EventId not in processedEvents_");
@@ -274,10 +277,42 @@ void InputMonitor::OnDispatchEventProcessed(int32_t eventId)
         MMI_HILOGE("Packet write event failed");
         return;
     }
-    if (!client->SendMessage(pkt)) {
+    if (!client_->SendMessage(pkt)) {
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
         return;
     }
 }
+
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+int32_t InputMonitor::ReportMonitorKey(NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    auto keyEvent = KeyEvent::Create();
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    if (InputEventDataTransformation::NetPacketToKeyEvent(pkt, keyEvent) != ERR_OK) {
+        MMI_HILOGE("Failed to deserialize key event.");
+        return RET_ERR;
+    }
+    BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_INTERCEPT_EVENT);
+    OnInputEvent(keyEvent);
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+int32_t InputMonitor::ReportMonitorPointer(NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    auto pointerEvent = PointerEvent::Create();
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    if (InputEventDataTransformation::Unmarshalling(pkt, pointerEvent) != ERR_OK) {
+        MMI_HILOGE("Failed to deserialize pointer event");
+        return RET_ERR;
+    }
+    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_INTERCEPT_EVENT);
+    OnInputEvent(pointerEvent);
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace MMI
 } // namespace OHOS

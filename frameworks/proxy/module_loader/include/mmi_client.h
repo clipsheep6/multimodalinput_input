@@ -14,12 +14,12 @@
  */
 #ifndef MMI_CLIENT_H
 #define MMI_CLIENT_H
+
 #include "nocopyable.h"
 
-#include "i_mmi_client.h"
-
 #include "circle_stream_buffer.h"
-#include "client_msg_handler.h"
+#include "i_mmi_client.h"
+#include "uds_client.h"
 
 namespace OHOS {
 namespace MMI {
@@ -56,13 +56,11 @@ private:
     const std::string& GetErrorStr(ErrCode code) const;
     void OnConnected() override;
     void OnDisconnected() override;
-
+    void OnMsgHandler(NetPacket& pkt);
 private:
-    ClientMsgHandler msgHandler_;
-    ConnectCallback funConnected_;
-    ConnectCallback funDisconnected_;
+    ConnectCallback funConnected_ { nullptr };
+    ConnectCallback funDisconnected_ { nullptr };
     CircleStreamBuffer circBuf_;
-    std::mutex mtx_;
     EventHandlerPtr eventHandler_ { nullptr };
     bool isEventHandlerChanged_ { false };
     bool isListening_ { false };

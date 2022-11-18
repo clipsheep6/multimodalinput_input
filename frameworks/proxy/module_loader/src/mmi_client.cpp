@@ -12,18 +12,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "mmi_client.h"
 
 #include <cinttypes>
 #include <condition_variable>
 
-#include "mmi_log.h"
-#include "proto.h"
-#include "util.h"
-
-#include "input_manager_impl.h"
-#include "mmi_fd_listener.h"
 #include "input_connect_manager.h"
+#include "mmi_fd_listener.h"
+#include "mmi_log.h"
+#include "time_cost_chk.h"
 
 namespace OHOS {
 namespace MMI {
@@ -80,9 +78,8 @@ MMIClientPtr MMIClient::GetSharedPtr()
 bool MMIClient::Start()
 {
     CALL_DEBUG_ENTER;
-    msgHandler_.Init();
-    auto callback = std::bind(&ClientMsgHandler::OnMsgHandler, &msgHandler_,
-        std::placeholders::_1, std::placeholders::_2);
+    auto callback = std::bind(&MMIClient::OnMsgHandler, this,
+        std::placeholders::_1);
     if (!StartClient(callback)) {
         MMI_HILOGE("Client startup failed");
         Stop();
@@ -103,11 +100,10 @@ bool MMIClient::StartEventRunner()
     CHK_PID_AND_TID();
     if (eventHandler_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
+        CHKPF(runner);
         eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
-        CHKPF(eventHandler_);
         MMI_HILOGI("Create event handler, thread name:%{public}s", runner->GetRunnerThreadName().c_str());
     }
-
     if (isConnected_ && fd_ >= 0) {
         if (isListening_) {
             MMI_HILOGI("File fd is in listening");
@@ -168,7 +164,7 @@ bool MMIClient::DelFdListener(int32_t fd)
 
 void MMIClient::OnPacket(NetPacket& pkt)
 {
-    recvFun_(*this, pkt);
+    recvFun_(pkt);
 }
 
 void MMIClient::OnRecvMsg(const char *buf, size_t size)
@@ -180,6 +176,7 @@ void MMIClient::OnRecvMsg(const char *buf, size_t size)
     }
     if (!circBuf_.Write(buf, size)) {
         MMI_HILOGW("Write data failed. size:%{public}zu", size);
+        return;
     }
     OnReadPackets(circBuf_, std::bind(&MMIClient::OnPacket, this, std::placeholders::_1));
 }
@@ -222,8 +219,8 @@ void MMIClient::OnDisconnected()
     MMI_HILOGI("Disconnected from server, fd:%{public}d", fd_);
     isConnected_ = false;
     isListening_ = false;
-    if (funDisconnected_) {
-        funDisconnected_(*this);
+    if (funDisconnected_ != nullptr) {
+        funDisconnected_();
     }
     if (!DelFdListener(fd_)) {
         MMI_HILOGE("Delete fd listener failed");
@@ -241,9 +238,8 @@ void MMIClient::OnConnected()
     CALL_DEBUG_ENTER;
     MMI_HILOGI("Connection to server succeeded, fd:%{public}d", GetFd());
     isConnected_ = true;
-    msgHandler_.InitProcessedCallback();
-    if (funConnected_) {
-        funConnected_(*this);
+    if (funConnected_ != nullptr) {
+        funConnected_();
     }
     if (!isExit && !isRunning_ && fd_ >= 0 && eventHandler_ != nullptr) {
         if (!AddFdListener(fd_)) {
@@ -265,9 +261,9 @@ int32_t MMIClient::Socket()
     fd_ = MultimodalInputConnMgr->GetClientSocketFdOfAllocedSocketPair();
     if (fd_ == IInputConnect::INVALID_SOCKET_FD) {
         MMI_HILOGE("Call GetClientSocketFdOfAllocedSocketPair return invalid fd");
-    } else {
-        MMI_HILOGD("Call GetClientSocketFdOfAllocedSocketPair return fd:%{public}d", fd_);
+        return RET_ERR;
     }
+    MMI_HILOGD("Call GetClientSocketFdOfAllocedSocketPair return fd:%{public}d", fd_);
     return fd_;
 }
 
@@ -304,6 +300,22 @@ const std::string& MMIClient::GetErrorStr(ErrCode code) const
         return it->second;
     }
     return defErrString;
+}
+
+void MMIClient::OnMsgHandler(NetPacket& pkt)
+{
+    auto id = pkt.GetMsgId();
+    TimeCostChk chk("MMIClient::OnMsgHandler", "overtime 300(us)", MAX_OVER_TIME, id);
+    auto callback = GetMsgCallback(id);
+    if (callback == nullptr) {
+        MMI_HILOGE("Unknown msg id:%{public}d", id);
+        return;
+    }
+    auto ret = (*callback)(pkt);
+    if (ret < 0) {
+        MMI_HILOGE("Msg handling failed. id:%{public}d,ret:%{public}d", id, ret);
+        return;
+    }
 }
 } // namespace MMI
 } // namespace OHOS
