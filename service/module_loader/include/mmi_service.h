@@ -25,6 +25,9 @@
 #include "system_ability.h"
 
 #include "delegate_tasks.h"
+#ifdef OHOS_BUILD_HDF
+#include "hdf_adapter.h"
+#endif
 #include "input_event_handler.h"
 #include "multimodal_input_connect_stub.h"
 #include "libinput_adapter.h"
@@ -122,6 +125,9 @@ protected:
     int32_t OnGetInputDeviceCooperateState(int32_t pid, int32_t userData, const std::string &deviceId);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     bool InitLibinputService();
+#ifdef OHOS_BUILD_HDF
+    bool InitHDFService();
+#endif // OHOS_BUILD_HDF
     bool InitService();
     bool InitSignalHandler();
     bool InitDelegateTasks();
@@ -143,6 +149,9 @@ private:
 #endif
 
     LibinputAdapter libinputAdapter_;
+#ifdef OHOS_BUILD_HDF
+    HDFAdapter hdfAdapter_;
+#endif // OHOS_BUILD_HDF
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;
 
