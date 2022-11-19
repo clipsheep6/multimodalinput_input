@@ -138,18 +138,17 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
         }
     }
     if (AddEpoll(EPOLL_EVENT_SOCKET, serverFd) != RET_OK) {
-        MMI_HILOGE("epoll_ctl EPOLL_CTL_ADD failed, errCode:%{public}d", EPOLL_MODIFY_FAIL);
+        MMI_HILOGE("epoll_ctl EPOLL_CTL_ADD failed");
         goto CLOSE_SOCK;
     }
     sess = std::make_shared<UDSSession>(programName, moduleType, serverFd, uid, pid);
     if (sess == nullptr) {
-        MMI_HILOGE("make_shared fail. progName:%{public}s,pid:%{public}d,errCode:%{public}d",
-            programName.c_str(), pid, MAKE_SHARED_FAIL);
+        MMI_HILOGE("make_shared fail. progName:%{public}s,pid:%{public}d", programName.c_str(), pid);
         goto CLOSE_SOCK;
     }
     sess->SetTokenType(tokenType);
     if (!AddSession(sess)) {
-        MMI_HILOGE("AddSession fail errCode:%{public}d", INPUT_MSG_ADD_SESSION_FAIL);
+        MMI_HILOGE("Add session failed");
         goto CLOSE_SOCK;
     }
     OnConnected(sess);

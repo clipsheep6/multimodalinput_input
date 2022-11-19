@@ -26,37 +26,22 @@ inline constexpr int32_t ERROR_NO_PERMISSION = -201;
 
 
 enum {
-    MODULE_COMMON = 100,
-    MODULE_MSG    = 200,
-    MODULE_EVENT  = 600
+    MODULE_COMMON = 100,  // 公共错误码范围:100-199
+    MODULE_MSG    = 200,  // 消息处理错误码范围:200-599
+    MODULE_EVENT  = 600   // 业务错误码范围:600-10000
 };
 
-// 公共错误码
 enum {
     INPUT_COMMON_NULLPTR = MODULE_COMMON,
     INPUT_COMMON_PARAM_ERROR,
     INPUT_COMMON_INVALID_FD,
 
-    ERROR_NULL_POINTER, // 后续替换为 INPUT_COMMON_NULLPTR
-    MODULE_COMMON_END
-};
-
-// 消息处理错误码
-enum {
-    // 发送消息失败
     INPUT_MSG_SEND_FAIL = MODULE_MSG,
-   
     INPUT_MSG_PACKET_READ_FAIL,
     INPUT_MSG_PACKET_WRITE_FAIL,
     INPUT_MSG_SOCKET_FAIL,
     INPUT_MSG_SOCKET_PAIR_FAIL,
-    INPUT_MSG_ADD_SESSION_FAIL,
 
-    MODULE_MSG_END
-};
-
-// 业务错误码
-enum {
     // 事件注册失败
     INPUT_REG_EVENT_FAIL = MODULE_EVENT,
 
@@ -64,7 +49,6 @@ enum {
     INPUT_CHECK_PERMISSION_FAIL,
     // 读取配置文件失败
     INPUT_READ_FILE_FAIL,
-
 
     // SA_Service初始化错误
     INPUT_INIT_SASERVICE_FAIL,
@@ -79,7 +63,6 @@ enum {
     // Epoll创建失败
     INPUT_INIT_EPOLL_CREATE_FAIL,
 
-
     // 委托任务wait超时
     INPUT_ETASKS_WAIT_TIMEOUT,
     // 委托任务wait延期
@@ -89,15 +72,13 @@ enum {
     // 生成异步任务失败
     INPUT_ETASKS_POST_ASYNCTASK_FAIL,
 
-
-
     // 键盘事件封装失败
     INPUT_KEY_EVENT_PKG_FAIL,
 
     // 值不符合预期
     VAL_NOT_EXP,
 
-    MODULE_EVENT_END
+    INPUT_ERROR_CODE_END
 };
 
 } // namespace MMI

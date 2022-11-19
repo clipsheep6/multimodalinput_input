@@ -1127,7 +1127,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             }
                             if (joyInfo.buttonId > JOYSTICK_BUTTON_ID) {
                                 std::cout << "Pressed button value is greater than the max value" << std::endl;
-                                return EVENT_REG_FAIL;
+                                return RET_ERR;
                             }
                             state.push_back(std::pair<int32_t, JoystickInfo>(JOYSTICK_BUTTON_PRESS, joyInfo));
                             break;
