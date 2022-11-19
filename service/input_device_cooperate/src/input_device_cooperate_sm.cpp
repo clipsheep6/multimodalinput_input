@@ -141,7 +141,7 @@ int32_t InputDeviceCooperateSM::StartInputDeviceCooperate(
         MMI_HILOGE("In transition state, not process");
         return static_cast<int32_t>(CooperationMessage::COOPERATE_FAIL);
     }
-    CHKPR(currentStateSM_, ERROR_NULL_POINTER);
+    CHKPR(currentStateSM_, INPUT_COMMON_NULLPTR);
     BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_START, BytraceAdapter::LAUNCH_EVENT);
     isStarting_ = true;
     DevCooperateSoftbusAdapter->OpenInputSoftbus(remoteNetworkId);
@@ -167,7 +167,7 @@ int32_t InputDeviceCooperateSM::StopInputDeviceCooperate()
         MMI_HILOGE("In transition state, not process");
         return RET_ERR;
     }
-    CHKPR(currentStateSM_, ERROR_NULL_POINTER);
+    CHKPR(currentStateSM_, INPUT_COMMON_NULLPTR);
     BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_START, BytraceAdapter::STOP_EVENT);
     isStopping_ = true;
     std::string stopNetworkId = "";

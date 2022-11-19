@@ -173,7 +173,7 @@ int32_t CpuInfo::GetSystemCpuStatInfo(Total_Cpu_Occupy &info)
     std::ifstream statFile("/proc/stat");
     if (!statFile.is_open()) {
         MMI_HILOGE("Failed to open config file");
-        return FILE_OPEN_FAIL;
+        return RET_ERR;
     }
     std::string strLine;
     std::getline(statFile, strLine);

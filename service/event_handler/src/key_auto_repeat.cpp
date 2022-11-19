@@ -43,13 +43,13 @@ std::map<int32_t, DeviceConfig> KeyAutoRepeat::GetDeviceConfig() const
 int32_t KeyAutoRepeat::AddDeviceConfig(struct libinput_device *device)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(device, ERROR_NULL_POINTER);
+    CHKPR(device, INPUT_COMMON_NULLPTR);
     std::string fileName = KeyMapMgr->GetKeyEventFileName(device);
     DeviceConfig devConf;
     auto ret = ReadTomlFile(GetTomlFilePath(fileName), devConf);
-    if (ret == RET_ERR) {
+    if (ret != RET_OK) {
         MMI_HILOGI("Can not read device config file");
-        return RET_ERR;
+        return INPUT_READ_FILE_FAIL;
     }
     int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
     if (deviceId == INVALID_DEVICE_ID) {

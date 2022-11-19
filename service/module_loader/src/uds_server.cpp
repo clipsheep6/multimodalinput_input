@@ -77,8 +77,7 @@ bool UDSServer::SendMsg(int32_t fd, NetPacket& pkt)
     }
     auto ses = GetSession(fd);
     if (ses == nullptr) {
-        MMI_HILOGE("The fd:%{public}d not found, The message was discarded. errCode:%{public}d",
-                   fd, SESSION_NOT_FOUND);
+        MMI_HILOGE("The fd:%{public}d not found, The message was discarded", fd);
         return false;
     }
     return ses->SendMsg(pkt);
@@ -143,22 +142,21 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     ret = AddEpoll(EPOLL_EVENT_SOCKET, serverFd);
     if (ret != RET_OK) {
         cleanTaskWhenError();
-        MMI_HILOGE("epoll_ctl EPOLL_CTL_ADD return %{public}d,errCode:%{public}d", ret, EPOLL_MODIFY_FAIL);
+        MMI_HILOGE("epoll_ctl EPOLL_CTL_ADD return %{public}d", ret);
         return ret;
     }
 
     SessionPtr sess = std::make_shared<UDSSession>(programName, moduleType, serverFd, uid, pid);
     if (sess == nullptr) {
         cleanTaskWhenError();
-        MMI_HILOGE("make_shared fail. progName:%{public}s,pid:%{public}d,errCode:%{public}d",
-            programName.c_str(), pid, MAKE_SHARED_FAIL);
-        return RET_ERR;
+        MMI_HILOGE("Call make_shared fail. progName:%{public}s,pid:%{public}d", programName.c_str(), pid);
+        return INPUT_COMMON_NULLPTR;
     }
     sess->SetTokenType(tokenType);
 
     if (!AddSession(sess)) {
         cleanTaskWhenError();
-        MMI_HILOGE("AddSession fail errCode:%{public}d", ADD_SESSION_FAIL);
+        MMI_HILOGE("AddSession fail errCode:%{public}d", INPUT_MSG_ADD_SESSION_FAIL);
         return RET_ERR;
     }
     OnConnected(sess);
@@ -272,7 +270,7 @@ void UDSServer::OnEpollEvent(epoll_event& ev)
     CHKPV(ev.data.ptr);
     auto fd = *static_cast<int32_t*>(ev.data.ptr);
     if (fd < 0) {
-        MMI_HILOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
+        MMI_HILOGE("The fd less than 0");
         return;
     }
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
@@ -345,7 +343,7 @@ void UDSServer::DelSession(int32_t fd)
     CALL_DEBUG_ENTER;
     MMI_HILOGI("fd:%{public}d", fd);
     if (fd < 0) {
-        MMI_HILOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
+        MMI_HILOGE("The fd less than 0");
         return;
     }
     auto pid = GetClientPid(fd);

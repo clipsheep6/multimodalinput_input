@@ -24,102 +24,82 @@ inline constexpr int32_t ERROR_UNSUPPORT = -2;
 inline constexpr int32_t ARGV_VALID = 2;
 inline constexpr int32_t ERROR_NO_PERMISSION = -201;
 
-enum {
-    MODULE_CLIENT = 0x00,
-    MODULE_EVENT_SIMULATE = 0x01,
-    MODULE_SERVER = 0x02,
-    MODULE_UTIL = 0x03
-};
 
 enum {
-    // APL鉴权失败
-    CHECK_PERMISSION_FAIL = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_CLIENT),
+    MODULE_COMMON = 100,
+    MODULE_MSG    = 200,
+    MODULE_EVENT  = 600
 };
 
+// 公共错误码
 enum {
-    // 文件打开失败
-    FILE_OPEN_FAIL = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_EVENT_SIMULATE),
-    // 流缓冲读取失败
-    STREAM_BUF_READ_FAIL,
-    // 事件注册失败
-    EVENT_REG_FAIL,
-    // 参数注入失败
-    PARAM_INPUT_FAIL
+    INPUT_COMMON_NULLPTR = MODULE_COMMON,
+    INPUT_COMMON_PARAM_ERROR,
+    INPUT_COMMON_INVALID_FD,
+
+    ERROR_NULL_POINTER, // 后续替换为 INPUT_COMMON_NULLPTR
+    MODULE_COMMON_END
 };
 
+// 消息处理错误码
 enum {
     // 发送消息失败
-    MSG_SEND_FAIL = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_SERVER),
-    // 未知的事件
-    UNKNOWN_EVENT,
-    // 空指针
-    ERROR_NULL_POINTER,
-    // libinput初始化失败
-    LIBINPUT_INIT_FAIL,
-    // 无效的输入参数
-    PARAM_INPUT_INVALID,
-    // memcpy安全函数错误
-    MEMCPY_SEC_FUN_FAIL,
-    // 键盘事件封装失败
-    KEY_EVENT_PKG_FAIL,
-    // 多设备相同事件返回标志
-    MULTIDEVICE_SAME_EVENT_MARK,
-    // GESTURE_SWIPE事件封装失败
-    GESTURE_EVENT_PKG_FAIL,
-    // SA_Service初始化错误
-    SASERVICE_INIT_FAIL,
-    // 增加session错误
-    ADD_SESSION_FAIL,
-    // make_shared错误
-    MAKE_SHARED_FAIL,
-    // fcntl 函数调用错误
-    FCNTL_FAIL,
-    // 写入数据错误
-    PACKET_WRITE_FAIL,
-    // 读取数据错误
-    PACKET_READ_FAIL,
-    // 初始化画鼠标失败
-    POINTER_DRAW_INIT_FAIL,
-    // 多模服务未启动
-    MMISERVICE_NOT_RUNNING,
-    // 代理任务启动失败
-    ETASKS_INIT_FAIL,
-    // 委托任务wait超时
-    ETASKS_WAIT_TIMEOUT,
-    // 委托任务wait延期
-    ETASKS_WAIT_DEFERRED,
-    // 生成同步任务失败
-    ETASKS_POST_SYNCTASK_FAIL,
-    // 生成异步任务失败
-    ETASKS_POST_ASYNCTASK_FAIL,
-    // DUMP参数错误
-    DUMP_PARAM_ERR
+    INPUT_MSG_SEND_FAIL = MODULE_MSG,
+   
+    INPUT_MSG_PACKET_READ_FAIL,
+    INPUT_MSG_PACKET_WRITE_FAIL,
+    INPUT_MSG_SOCKET_FAIL,
+    INPUT_MSG_SOCKET_PAIR_FAIL,
+    INPUT_MSG_ADD_SESSION_FAIL,
+
+    MODULE_MSG_END
 };
 
+// 业务错误码
 enum {
-    // 非标准化事件
-    NON_STD_EVENT = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_UTIL),
-    // 未处理的消息
-    UNPROC_MSG,
-    // 未知消息ID
-    UNKNOWN_MSG_ID,
-    // EPOLL创建失败
-    EPOLL_CREATE_FAIL,
-    // 修改EPOLL失败
-    EPOLL_MODIFY_FAIL,
-    // 流缓冲写入失败
-    STREAM_BUF_WRITE_FAIL,
+    // 事件注册失败
+    INPUT_REG_EVENT_FAIL = MODULE_EVENT,
+
+    // APL鉴权失败
+    INPUT_CHECK_PERMISSION_FAIL,
+    // 读取配置文件失败
+    INPUT_READ_FILE_FAIL,
+
+
+    // SA_Service初始化错误
+    INPUT_INIT_SASERVICE_FAIL,
+    // libinput初始化失败
+    INPUT_INIT_LIBINPUT_FAIL,
+    // 代理任务启动失败
+    INPUT_INIT_ETASKS_FAIL,
+    // 初始化画鼠标失败
+    INPUT_INIT_POINTER_DRAW_FAIL,
+    // 多模服务未启动
+    INPUT_SERVICE_NOT_RUNNING,
+    // Epoll创建失败
+    INPUT_INIT_EPOLL_CREATE_FAIL,
+
+
+    // 委托任务wait超时
+    INPUT_ETASKS_WAIT_TIMEOUT,
+    // 委托任务wait延期
+    INPUT_ETASKS_WAIT_DEFERRED,
+    // 生成同步任务失败
+    INPUT_ETASKS_POST_SYNCTASK_FAIL,
+    // 生成异步任务失败
+    INPUT_ETASKS_POST_ASYNCTASK_FAIL,
+
+
+
+    // 键盘事件封装失败
+    INPUT_KEY_EVENT_PKG_FAIL,
+
     // 值不符合预期
     VAL_NOT_EXP,
-    // 没有足够的内存
-    MEM_NOT_ENOUGH,
-    // 内存越界
-    MEM_OUT_OF_BOUNDS,
-    // 没有找到session
-    SESSION_NOT_FOUND,
-    // 监听增加失败
-    INVALID_MONITOR_MON
+
+    MODULE_EVENT_END
 };
+
 } // namespace MMI
 } // namespace OHOS
 #endif // ERROR_MULTIMODAL_H

@@ -82,7 +82,7 @@ void InputEventHandler::OnEvent(void *event)
 int32_t InputEventHandler::BuildInputHandlerChain()
 {
     eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
-    CHKPR(eventNormalizeHandler_, ERROR_NULL_POINTER);
+    CHKPR(eventNormalizeHandler_, INPUT_COMMON_NULLPTR);
 #if !defined(OHOS_BUILD_ENABLE_KEYBOARD) && !defined(OHOS_BUILD_ENABLE_POINTER) && !defined(OHOS_BUILD_ENABLE_TOUCH)
     return RET_OK;
 #endif // !OHOS_BUILD_ENABLE_KEYBOARD && !OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_TOUCH
@@ -90,14 +90,14 @@ int32_t InputEventHandler::BuildInputHandlerChain()
     std::shared_ptr<IInputEventHandler> handler = eventNormalizeHandler_;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     eventFilterHandler_ = std::make_shared<EventFilterHandler>();
-    CHKPR(eventFilterHandler_, ERROR_NULL_POINTER);
+    CHKPR(eventFilterHandler_, INPUT_COMMON_NULLPTR);
     handler->SetNext(eventFilterHandler_);
     handler = eventFilterHandler_;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     eventInterceptorHandler_  = std::make_shared<EventInterceptorHandler>();
-    CHKPR(eventInterceptorHandler_, ERROR_NULL_POINTER);
+    CHKPR(eventInterceptorHandler_, INPUT_COMMON_NULLPTR);
     handler->SetNext(eventInterceptorHandler_);
     handler = eventInterceptorHandler_;
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
@@ -105,23 +105,23 @@ int32_t InputEventHandler::BuildInputHandlerChain()
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
     auto keyCommandHandler = std::make_shared<KeyCommandHandler>();
-    CHKPR(keyCommandHandler, ERROR_NULL_POINTER);
+    CHKPR(keyCommandHandler, INPUT_COMMON_NULLPTR);
     handler->SetNext(keyCommandHandler);
     handler = keyCommandHandler;
 #endif // OHOS_BUILD_ENABLE_COMBINATION_KEY
     eventSubscriberHandler_ = std::make_shared<KeySubscriberHandler>();
-    CHKPR(eventSubscriberHandler_, ERROR_NULL_POINTER);
+    CHKPR(eventSubscriberHandler_, INPUT_COMMON_NULLPTR);
     handler->SetNext(eventSubscriberHandler_);
     handler = eventSubscriberHandler_;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     eventMonitorHandler_ = std::make_shared<EventMonitorHandler>();
-    CHKPR(eventMonitorHandler_, ERROR_NULL_POINTER);
+    CHKPR(eventMonitorHandler_, INPUT_COMMON_NULLPTR);
     handler->SetNext(eventMonitorHandler_);
     handler = eventMonitorHandler_;
 #endif // OHOS_BUILD_ENABLE_MONITOR
     auto dispatchHandler = std::make_shared<EventDispatchHandler>();
-    CHKPR(dispatchHandler, ERROR_NULL_POINTER);
+    CHKPR(dispatchHandler, INPUT_COMMON_NULLPTR);
     handler->SetNext(dispatchHandler);
     return RET_OK;
 }

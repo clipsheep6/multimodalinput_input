@@ -183,7 +183,7 @@ void JsInputMonitor::MarkConsumed(int32_t eventId)
 
 int32_t JsInputMonitor::IsMatch(napi_env jsEnv, napi_value callback)
 {
-    CHKPR(callback, ERROR_NULL_POINTER);
+    CHKPR(callback, INPUT_COMMON_NULLPTR);
     if (jsEnv_ == jsEnv) {
         napi_value handlerTemp = nullptr;
         auto status = napi_get_reference_value(jsEnv_, receiver_, &handlerTemp);
@@ -271,7 +271,7 @@ int32_t JsInputMonitor::GetJsPointerItem(const PointerEvent::PointerItem &item, 
 
 int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
 {
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    CHKPR(pointerEvent, INPUT_COMMON_NULLPTR);
     if (SetNameProperty(jsEnv_, result, "type", GetAction(pointerEvent->GetPointerAction())) != napi_ok) {
         THROWERR(jsEnv_, "Set type property failed");
         return RET_ERR;
@@ -416,7 +416,7 @@ bool JsInputMonitor::GetAxesValue(const std::shared_ptr<PointerEvent> pointerEve
 int32_t JsInputMonitor::GetMousePointerItem(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    CHKPR(pointerEvent, INPUT_COMMON_NULLPTR);
     napi_value axes = nullptr;
     napi_status status = napi_create_array(jsEnv_, &axes);
     if (status != napi_ok || axes == nullptr) {
@@ -605,7 +605,7 @@ int32_t JsInputMonitor::TransformTsActionValue(int32_t pointerAction)
 int32_t JsInputMonitor::TransformMousePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    CHKPR(pointerEvent, INPUT_COMMON_NULLPTR);
     int32_t actionValue = TransformTsActionValue(pointerEvent->GetPointerAction());
     if (actionValue == RET_ERR) {
         MMI_HILOGE("Transform Action Value failed");

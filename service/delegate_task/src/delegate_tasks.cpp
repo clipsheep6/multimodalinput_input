@@ -74,7 +74,7 @@ void DelegateTasks::ProcessTasks()
 int32_t DelegateTasks::PostSyncTask(DTaskCallback callback)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(callback, ERROR_NULL_POINTER);
+    CHKPR(callback, INPUT_COMMON_NULLPTR);
     if (IsCallFromWorkerThread()) {
         return callback();
     }
@@ -83,7 +83,7 @@ int32_t DelegateTasks::PostSyncTask(DTaskCallback callback)
     auto task = PostTask(callback, &promise);
     if (task == nullptr) {
         MMI_HILOGE("Post sync task failed");
-        return ETASKS_POST_SYNCTASK_FAIL;
+        return INPUT_ETASKS_POST_SYNCTASK_FAIL;
     }
 
     static constexpr int32_t timeout = 3000;
@@ -92,24 +92,24 @@ int32_t DelegateTasks::PostSyncTask(DTaskCallback callback)
     task->SetWaited();
     if (res == std::future_status::timeout) {
         MMI_HILOGE("Task timeout");
-        return ETASKS_WAIT_TIMEOUT;
+        return INPUT_ETASKS_WAIT_TIMEOUT;
     } else if (res == std::future_status::deferred) {
         MMI_HILOGE("Task deferred");
-        return ETASKS_WAIT_DEFERRED;
+        return INPUT_ETASKS_WAIT_DEFERRED;
     }
     return future.get();
 }
 
 int32_t DelegateTasks::PostAsyncTask(DTaskCallback callback)
 {
-    CHKPR(callback, ERROR_NULL_POINTER);
+    CHKPR(callback, INPUT_COMMON_NULLPTR);
     if (IsCallFromWorkerThread()) {
         return callback();
     }
     auto task = PostTask(callback);
     if (task == nullptr) {
         MMI_HILOGE("Post async task failed");
-        return ETASKS_POST_ASYNCTASK_FAIL;
+        return INPUT_ETASKS_POST_ASYNCTASK_FAIL;
     }
     return RET_OK;
 }

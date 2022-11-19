@@ -92,8 +92,8 @@ bool MouseEventNormalize::GetSpeedGain(double vin, double &gain) const
 int32_t MouseEventNormalize::HandleMotionInner(struct libinput_event_pointer* data)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(data, ERROR_NULL_POINTER);
-    CHKPR(pointerEvent_, ERROR_NULL_POINTER);
+    CHKPR(data, INPUT_COMMON_NULLPTR);
+    CHKPR(pointerEvent_, INPUT_COMMON_NULLPTR);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent_->SetButtonId(buttonId_);
 
@@ -119,7 +119,7 @@ int32_t MouseEventNormalize::HandleMotionInner(struct libinput_event_pointer* da
 
 int32_t MouseEventNormalize::HandleMotionAccelerate(struct libinput_event_pointer* data)
 {
-    CHKPR(data, ERROR_NULL_POINTER);
+    CHKPR(data, INPUT_COMMON_NULLPTR);
     double dx = libinput_event_pointer_get_dx(data);
     double dy = libinput_event_pointer_get_dy(data);
     double vin = (fmax(abs(dx), abs(dy)) + fmin(abs(dx), abs(dy))) / 2.0;
@@ -157,7 +157,7 @@ void MouseEventNormalize::InitAbsolution()
 int32_t MouseEventNormalize::HandleButtonInner(struct libinput_event_pointer* data)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(data, ERROR_NULL_POINTER);
+    CHKPR(data, INPUT_COMMON_NULLPTR);
     MMI_HILOGD("Current action:%{public}d", pointerEvent_->GetPointerAction());
 
     auto ret = HandleButtonValueInner(data);
@@ -191,7 +191,7 @@ int32_t MouseEventNormalize::HandleButtonInner(struct libinput_event_pointer* da
 int32_t MouseEventNormalize::HandleButtonValueInner(struct libinput_event_pointer* data)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(data, ERROR_NULL_POINTER);
+    CHKPR(data, INPUT_COMMON_NULLPTR);
 
     uint32_t button = libinput_event_pointer_get_button(data);
     int32_t buttonId = MouseState->LibinputChangeToPointer(button);
@@ -206,7 +206,7 @@ int32_t MouseEventNormalize::HandleButtonValueInner(struct libinput_event_pointe
 int32_t MouseEventNormalize::HandleAxisInner(struct libinput_event_pointer* data)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(data, ERROR_NULL_POINTER);
+    CHKPR(data, INPUT_COMMON_NULLPTR);
     if (buttonId_ == PointerEvent::BUTTON_NONE && pointerEvent_->GetButtonId() != PointerEvent::BUTTON_NONE) {
         pointerEvent_->SetButtonId(PointerEvent::BUTTON_NONE);
     }
@@ -286,10 +286,10 @@ void MouseEventNormalize::HandlePostInner(struct libinput_event_pointer* data, i
 int32_t MouseEventNormalize::Normalize(struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(event, ERROR_NULL_POINTER);
+    CHKPR(event, INPUT_COMMON_NULLPTR);
     auto data = libinput_event_get_pointer_event(event);
-    CHKPR(data, ERROR_NULL_POINTER);
-    CHKPR(pointerEvent_, ERROR_NULL_POINTER);
+    CHKPR(data, INPUT_COMMON_NULLPTR);
+    CHKPR(pointerEvent_, INPUT_COMMON_NULLPTR);
     pointerEvent_->ClearAxisValue();
     int32_t result;
     const int32_t type = libinput_event_get_type(event);
