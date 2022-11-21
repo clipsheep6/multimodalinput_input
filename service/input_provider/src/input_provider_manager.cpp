@@ -21,19 +21,26 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputProviderManager" };
+} // namespace
 int32_t InputProviderManager::AddInputProvider(std::shared_ptr<IInputProvider> inputProvider)
 {
+    CALL_DEBUG_ENTER;
     inputProviders.push_back(inputProvider);
     return RET_OK;
 }
+
 int32_t InputProviderManager::RemoveInputProvider(std::shared_ptr<IInputProvider> inputProvider)
 {
+    CALL_DEBUG_ENTER;
     std::vector<std::shared_ptr<IInputProvider>>::iterator itor = std::find(inputProviders.begin(),
         inputProviders.end(), inputProvider);
     if (itor != inputProviders.end()) {
         inputProviders.erase(itor);
         return RET_OK;
     }
+    MMI_HILOGE("Remove input provider failed");
     return RET_ERR;
 }
 
