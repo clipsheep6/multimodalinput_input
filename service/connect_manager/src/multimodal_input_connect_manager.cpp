@@ -52,11 +52,12 @@ int32_t MultimodalInputConnectManager::AllocSocketPair(const int32_t moduleType)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
-    if (multimodalInputConnectService_ == nullptr) {
-        MMI_HILOGE("Client has not connect server");
-        return RET_ERR;
-    }
-
+    // if (multimodalInputConnectService_ == nullptr) {
+    //     MMI_HILOGE("Client has not connect server");
+    //     return RET_ERR;
+    // }
+    CHKPR(multimodalInputConnectService_, ERROR_NULL_POINTER);
+    
     const std::string programName(GetProgramName());
     int32_t result = multimodalInputConnectService_->AllocSocketFd(programName, moduleType, socketFd_, tokenType_);
     if (result != RET_OK) {
@@ -86,13 +87,13 @@ int32_t MultimodalInputConnectManager::AddInputEventFilter(sptr<IEventFilter> fi
 
 int32_t MultimodalInputConnectManager::SetPointerVisible(bool visible)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, ERROR_NULL_POINTER);
     return multimodalInputConnectService_->SetPointerVisible(visible);
 }
 
 int32_t MultimodalInputConnectManager::IsPointerVisible(bool &visible)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, ERROR_NULL_POINTER);
     return multimodalInputConnectService_->IsPointerVisible(visible);
 }
 
@@ -170,7 +171,7 @@ int32_t MultimodalInputConnectManager::RemoveInputHandler(InputHandlerType handl
 
 int32_t MultimodalInputConnectManager::MarkEventConsumed(int32_t eventId)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, ERROR_NULL_POINTER);
     return multimodalInputConnectService_->MarkEventConsumed(eventId);
 }
 
@@ -188,25 +189,25 @@ int32_t MultimodalInputConnectManager::UnsubscribeKeyEvent(int32_t subscribeId)
 
 int32_t MultimodalInputConnectManager::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, ERROR_NULL_POINTER);
     return multimodalInputConnectService_->MoveMouseEvent(offsetX, offsetY);
 }
 
 int32_t MultimodalInputConnectManager::InjectKeyEvent(const std::shared_ptr<KeyEvent> event)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, ERROR_NULL_POINTER);
     return multimodalInputConnectService_->InjectKeyEvent(event);
 }
 
 int32_t MultimodalInputConnectManager::InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, ERROR_NULL_POINTER);
     return multimodalInputConnectService_->InjectPointerEvent(pointerEvent);
 }
 
 int32_t MultimodalInputConnectManager::SetAnrObserver()
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, ERROR_NULL_POINTER);
     return multimodalInputConnectService_->SetAnrObserver();
 }
 
@@ -255,13 +256,13 @@ int32_t MultimodalInputConnectManager::SetInputDevice(const std::string& dhid, c
 
 int32_t MultimodalInputConnectManager::GetFunctionKeyState(int32_t funcKey, bool &state)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, ERROR_NULL_POINTER);
     return multimodalInputConnectService_->GetFunctionKeyState(funcKey, state);
 }
 
 int32_t MultimodalInputConnectManager::SetFunctionKeyState(int32_t funcKey, bool enable)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, ERROR_NULL_POINTER);
     return multimodalInputConnectService_->SetFunctionKeyState(funcKey, enable);
 }
 

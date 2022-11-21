@@ -553,7 +553,7 @@ int32_t InputManagerImpl::SetPointerSpeed(int32_t speed)
     int32_t ret = MultimodalInputConnMgr->SetPointerSpeed(speed);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to set pointer speed");
-        return ret;
+        return RET_ERR;
     }
     return RET_OK;
 #else
