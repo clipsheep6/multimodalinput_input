@@ -269,6 +269,7 @@ HandleEventType InputHandlerManager::GetEventType() const
 
 void InputHandlerManager::OnDispatchEventProcessed(int32_t eventId, int64_t actionTime)
 {
+    std::lock_guard<std::mutex> guard(mtxHandlers_);
     CALL_DEBUG_ENTER;
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
@@ -288,7 +289,7 @@ void InputHandlerManager::OnDispatchEventProcessed(int32_t eventId, int64_t acti
         processedEvents_.emplace(eventId, count);
         return;
     }
-    ANRHdl->SetLastProcessedEventId(ANR_MONITOR, eventId, actionTime);
+    ANRHdl->UpdateLastEventId(ANR_EVENT_TYPE_MONITOR, eventId, actionTime);
 }
 } // namespace MMI
 } // namespace OHOS

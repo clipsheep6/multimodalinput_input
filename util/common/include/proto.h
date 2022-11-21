@@ -62,8 +62,8 @@ enum ANTTimeOutTime : int64_t {
 };
 
 enum ANREventType {
-    ANR_DISPATCH,
-    ANR_MONITOR,
-    ANR_EVENT_TYPE_NUM,
+    ANR_EVENT_TYPE_DISPATCH,
+    ANR_EVENT_TYPE_MONITOR,
+    ANR_EVENT_TYPE_BUTT,
 };
 #endif // PROTO_H

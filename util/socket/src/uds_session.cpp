@@ -42,10 +42,10 @@ UDSSession::UDSSession(const std::string &programName, const int32_t moduleType,
       pid_(pid)
 {
     UpdateDescript();
-    events_[ANR_DISPATCH] = {};
-    events_[ANR_MONITOR] = {};
-    isAnrProcess_[ANR_DISPATCH] = false;
-    isAnrProcess_[ANR_MONITOR] = false;
+    events_[ANR_EVENT_TYPE_DISPATCH] = {};
+    events_[ANR_EVENT_TYPE_MONITOR] = {};
+    isAnrProcess_[ANR_EVENT_TYPE_DISPATCH] = false;
+    isAnrProcess_[ANR_EVENT_TYPE_MONITOR] = false;
 }
 
 bool UDSSession::SendMsg(const char *buf, size_t size) const

@@ -24,29 +24,25 @@
 
 namespace OHOS {
 namespace MMI {
-class ANRHandler {
+class ANRHandler final {
     DECLARE_DELAYED_SINGLETON(ANRHandler);
 public:
     DISALLOW_COPY_AND_MOVE(ANRHandler);
-
-    void SetLastProcessedEventId(int32_t eventType, int32_t eventId, uint64_t actionTime);
-    void MarkProcessed(int32_t eventType);
-    std::mutex anrMtx_;
-
+    void UpdateLastEventId(int32_t eventType, int32_t eventId, uint64_t actionTime);
+    void MarkProcessedTask();
 private:
-    struct ANREvent {
-        bool sendStatus { false };
+    void AddMarkProcessedTask(int64_t actionTime);
+    int32_t GetLastReportId(int32_t eventType);
+    void UpdateLastReportIds(const std::vector<int32_t> &ids);
+private:
+    std::mutex anrMtx_;
+    struct ANREventInfo {
         int32_t lastEventId { -1 };
         int32_t lastReportId { -1 };
     };
-    ANREvent event_[ANR_EVENT_TYPE_NUM];
-
-    void UpdateLastProcessedEventId(int32_t eventType, int32_t eventId);
-    void SetLastProcessedEventStatus(int32_t eventType, bool status);
-    int32_t GetLastProcessedEventId(int32_t eventType);
-    void SendEvent(int32_t eventType, int64_t delayTime);
+    bool isExistTask_ = false;
+    ANREventInfo eventInfos_[ANR_EVENT_TYPE_BUTT];
 };
-
 #define ANRHdl ::OHOS::DelayedSingleton<ANRHandler>::GetInstance()
 } // namespace MMI
 } // namespace OHOS

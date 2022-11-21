@@ -31,97 +31,98 @@ constexpr int64_t MIN_MARK_PROCESS_DELAY_TIME = 50000;
 constexpr int32_t INVALID_OR_PROCESSED_ID = -1;
 } // namespace
 
-ANRHandler::ANRHandler() {}
-
-ANRHandler::~ANRHandler() {}
-
-void ANRHandler::SetLastProcessedEventStatus(int32_t eventType, bool status)
-{
-    std::lock_guard<std::mutex> guard(anrMtx_);
-    event_[eventType].sendStatus = status;
-}
-
-void ANRHandler::UpdateLastProcessedEventId(int32_t eventType, int32_t eventId)
-{
-    std::lock_guard<std::mutex> guard(anrMtx_);
-    event_[eventType].lastEventId = eventId;
-}
-
-void ANRHandler::SetLastProcessedEventId(int32_t eventType, int32_t eventId, uint64_t actionTime)
+void ANRHandler::UpdateLastEventId(int32_t eventType, int32_t eventId, uint64_t actionTime)
 {
     CALL_DEBUG_ENTER;
+    anrMtx_.lock();
     if (event_[eventType].lastEventId > eventId) {
+        anrMtx_.unlock();
         MMI_HILOGE("Event type:%{public}d, id %{public}d less then last processed lastEventId %{public}d",
             eventType, eventId, event_[eventType].lastEventId);
         return;
     }
-    UpdateLastProcessedEventId(eventType, eventId);
+    event_[eventType].lastEventId = eventId;
+    bool isExistTask = isExistTask_;
+    anrMtx_.unlock();
 
-    int64_t currentTime = GetSysClockTime();
-    int64_t timeoutTime = INPUT_UI_TIMEOUT_TIME - (currentTime - actionTime);
-    MMI_HILOGD("Processed event type:%{public}d, id:%{public}d, actionTime:%{public}" PRId64 ", "
-        "currentTime:%{public}" PRId64 ", timeoutTime:%{public}" PRId64,
-        eventType, eventId, actionTime, currentTime, timeoutTime);
+    if (isExistTask) {
+        return;
+    }
+    AddMarkProcessedTask(actionTime);
+}
 
-    if (!event_[eventType].sendStatus) {
-        if (timeoutTime < MIN_MARK_PROCESS_DELAY_TIME) {
-            SendEvent(eventType, 0);
-        } else {
-            int64_t delayTime;
-            if (timeoutTime >= MAX_MARK_PROCESS_DELAY_TIME) {
-                delayTime = MAX_MARK_PROCESS_DELAY_TIME / 1000;
-            } else {
-                delayTime = timeoutTime / 1000;
-            }
-            SendEvent(eventType, delayTime);
+void ANRHandler::MarkProcessedTask()
+{
+    CALL_DEBUG_ENTER;
+    std::vector<int32_t> toReportIds;
+    anrMtx_.lock();
+    toReportIds.reserve(ANR_EVENT_TYPE_BUTT);
+    toReportIds.push_back(GetLastReportId(ANR_EVENT_TYPE_DISPATCH));
+    toReportIds.push_back(GetLastReportId(ANR_EVENT_TYPE_MONITOR));
+    UpdateLastReportIds(toReportIds);
+    isExistTask_ = false;
+    anrMtx_.unlock();
+    int32_t ret = MultimodalInputConnMgr->MarkProcessed(toReportIds);
+    if (ret != 0) {
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
+    }
+    // TODO: RETRY
+}
+
+void ANRHandler::UpdateLastReportIds(const std::vector<int32_t> &ids)
+{
+    if (ids.size() != ANR_EVENT_TYPE_BUTT) {
+        MMI_HILOGF("Not expect size");
+        return;
+    }
+    for (size_t i = 0; i < ANR_EVENT_TYPE_BUTT; ++i) {
+        auto id = ids[i];
+        if (id == INVALID_OR_PROCESSED_ID) {
+            continue;
         }
+        event_[i].lastReportId = id;
     }
 }
 
-int32_t ANRHandler::GetLastProcessedEventId(int32_t eventType)
+int32_t ANRHandler::GetLastReportId(int32_t eventType)
 {
-    CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(anrMtx_);
-    if (event_[eventType].lastEventId == INVALID_OR_PROCESSED_ID
-        || event_[eventType].lastEventId <= event_[eventType].lastReportId) {
+    if ((event_[eventType].lastEventId == INVALID_OR_PROCESSED_ID)
+        || (event_[eventType].lastEventId <= event_[eventType].lastReportId)) {
         MMI_HILOGD("Invalid or processed event type:%{public}d, lastEventId:%{public}d, lastReportId:%{public}d",
             eventType, event_[eventType].lastEventId, event_[eventType].lastReportId);
         return INVALID_OR_PROCESSED_ID;
     }
-
-    event_[eventType].lastReportId = event_[eventType].lastEventId;
-    MMI_HILOGD("Processed event type:%{public}d, lastEventId:%{public}d, lastReportId:%{public}d",
-        eventType, event_[eventType].lastEventId, event_[eventType].lastReportId);
     return event_[eventType].lastEventId;
 }
 
-void ANRHandler::MarkProcessed(int32_t eventType)
+void ANRHandler::AddMarkProcessedTask(int64_t actionTime)
 {
     CALL_DEBUG_ENTER;
-    int32_t eventId = GetLastProcessedEventId(eventType);
-    if (eventId == INVALID_OR_PROCESSED_ID) {
-        return;
-    }
-    MMI_HILOGD("Processed event type:%{public}d, id:%{public}d", eventType, eventId);
-    int32_t ret = MultimodalInputConnMgr->MarkProcessed(eventType, eventId);
-    if (ret != 0) {
-        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
-    }
-    SetLastProcessedEventStatus(eventType, false);
-}
+    int64_t currentTime = GetSysClockTime();
+    int64_t timeoutTime = INPUT_UI_TIMEOUT_TIME - (currentTime - actionTime);
+    auto delayMs = []() -> int64_t {
+        if (timeoutTime < MIN_MARK_PROCESS_DELAY_TIME) {
+            return 0;
+        } else if (timeoutTime >= MAX_MARK_PROCESS_DELAY_TIME) {
+            return MAX_MARK_PROCESS_DELAY_TIME / 1000;
+        }
+        return timeoutTime / 1000;
+    }();
 
+    MMI_HILOGD("Processed actionTime:%{public}" PRId64 ", currentTime:%{public}" PRId64
+        ", timeoutTime:%{public}" PRId64 ", delayMs:%{public}" PRId64,
+        actionTime, currentTime, timeoutTime, delayMs);
 
-void ANRHandler::SendEvent(int32_t eventType, int64_t delayTime)
-{
-    CALL_DEBUG_ENTER;
-    MMI_HILOGD("Event type:%{public}d, delayTime:%{public}" PRId64, eventType, delayTime);
-    SetLastProcessedEventStatus(eventType, true);
     auto eventHandler = InputMgrImpl.GetEventHandler();
     CHKPV(eventHandler);
-    std::function<void()> eventFunc = std::bind(&ANRHandler::MarkProcessed, this, eventType);
-    if (!eventHandler->PostHighPriorityTask(eventFunc, delayTime)) {
-        MMI_HILOGE("Send dispatch event failed");
+    std::function<void()> eventFunc = std::bind(&ANRHandler::MarkProcessedTask, this);
+    if (!eventHandler->PostHighPriorityTask(eventFunc, delayMs)) {
+        MMI_HILOGE("Send event failed");
+        return;
     }
+    anrMtx_.lock();
+    isExistTask_ = true;
+    anrMtx_.unlock();
 }
 } // namespace MMI
 } // namespace OHOS

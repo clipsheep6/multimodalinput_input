@@ -366,7 +366,7 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
 void ClientMsgHandler::OnDispatchEventProcessed(int32_t eventId, int64_t actionTime)
 {
     CALL_DEBUG_ENTER;
-    ANRHdl->SetLastProcessedEventId(ANR_DISPATCH, eventId, actionTime);
+    ANRHdl->UpdateLastEventId(ANR_EVENT_TYPE_DISPATCH, eventId, actionTime);
 }
 
 int32_t ClientMsgHandler::OnAnr(const UDSClient& client, NetPacket& pkt)
