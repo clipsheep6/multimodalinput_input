@@ -180,7 +180,7 @@ int32_t CpuInfo::GetSystemCpuStatInfo(Total_Cpu_Occupy &info)
     if (strLine.empty()) {
         MMI_HILOGE("No valid content was read");
         statFile.close();
-        return STREAM_BUF_READ_FAIL;
+        return RET_ERR;
     }
     if ((strLine.find("cpu")) == std::string::npos) {
         MMI_HILOGE("The keyword was not matched. Procedure");
