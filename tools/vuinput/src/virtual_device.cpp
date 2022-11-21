@@ -297,12 +297,12 @@ std::vector<std::string> VirtualDevice::BrowseDirectory(const std::string& fileP
 
 bool VirtualDevice::ClearFileResidues(const std::string& fileName)
 {
-    DIR *dir = nullptr;
     const std::string::size_type pos = fileName.find("_");
     const std::string procressPath = "/proc/" + fileName.substr(0, pos) + "/";
     const std::string filePath = procressPath + "cmdline";
     std::string temp;
     std::string processName;
+    DIR *dir = nullptr;
     if (!CheckFileName(fileName)) {
         std::cout << "File name check error" << std::endl;
         goto RELEASE_RES;
