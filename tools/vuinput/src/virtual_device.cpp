@@ -599,7 +599,6 @@ bool VirtualDevice::CloseDevice(const std::string& closeDeviceName, const std::v
     for (const auto &it : deviceList) {
         if (it.find(closeDeviceName) == 0) {
             kill(std::stoi(it), SIGKILL);
-            std::cout << "rm -f :" << (g_folderPath + it).c_str() << std::endl;
             remove((g_folderPath + it).c_str());
             if (BrowseDirectory(g_folderPath).empty()) {
                     RemoveDir(g_folderPath);
@@ -705,7 +704,6 @@ bool VirtualDevice::ListOption(int32_t argc, char **argv)
     std::string::size_type pos;
     std::cout << "PID\tDEVICE" << std::endl;
     for (const auto &item : deviceList) {
-        std::cout << "deviceName" << item << std::endl;
         pos = item.find("_");
         if (pos != std::string::npos) {
             std::cout << item.substr(0, pos) << "\t" << item.substr(pos + 1, item.size() - pos - 1) << std::endl;
