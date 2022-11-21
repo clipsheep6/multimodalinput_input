@@ -14,19 +14,36 @@
  */
 
 #include "input_provider_manager.h"
+#include <cstddef>
+#include <memory>
+
+#include "define_multimodal.h"
 
 namespace OHOS {
 namespace MMI {
 int32_t InputProviderManager::AddInputProvider(std::shared_ptr<IInputProvider> inputProvider)
 {
-    return 0;
+    inputProviders.push_back(inputProvider);
+    return RET_OK;
 }
 int32_t InputProviderManager::RemoveInputProvider(std::shared_ptr<IInputProvider> inputProvider)
 {
-    return 0;
+    std::vector<std::shared_ptr<IInputProvider>>::iterator itor = std::find(inputProviders.begin(),
+        inputProviders.end(), inputProvider);
+    if (itor != inputProviders.end()) {
+        inputProviders.erase(itor);
+        return RET_OK;
+    }
+    return RET_ERR;
 }
 
-std::shared_ptr<IInputProvider> InputProviderManager::GetInputProvider(std::string name){
+std::shared_ptr<IInputProvider> InputProviderManager::GetInputProvider(std::string name)
+{
+    for (const auto &item : inputProviders) {
+        if (item->GetName() == name) {
+          return item;
+        }
+    }
     return nullptr;
 }
 } // namespace MMI

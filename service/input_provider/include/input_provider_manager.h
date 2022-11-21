@@ -17,6 +17,7 @@
 #define INPUT_PROVIDER_MANAGER
 
 #include <memory>
+#include <vector>
 
 #include "i_input_provider_manager.h"
 
@@ -29,6 +30,9 @@ public:
     virtual int32_t AddInputProvider(std::shared_ptr<IInputProvider> inputProvider) override;
     virtual int32_t RemoveInputProvider(std::shared_ptr<IInputProvider> inputProvider) override;
     virtual std::shared_ptr<IInputProvider> GetInputProvider(std::string name) override;
+
+private:
+    std::vector<std::shared_ptr<IInputProvider>> inputProviders;
 
 };
 } // namespace MMI
