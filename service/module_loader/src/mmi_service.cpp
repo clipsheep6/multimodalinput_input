@@ -204,37 +204,18 @@ bool MMIService::InitLibinputService()
 #ifdef OHOS_BUILD_HDF
 bool MMIService::InitHDFService()
 {
-    // auto provider = std::make_shared<HDFInputProvider>();
-    // hdfProviderMgr_->AddInputProvider(provider);
-    // provider->BindContext(shared_from_this());
-    // provider->Enable();
-    // if (!(hdfAdapter_.Init(std::bind(&InputEventHandler::HandleHDFDeviceStatusEvent, InputHandler, std::placeholders::_1),
-    //     std::bind(&InputEventHandler::HandleHDFDeviceInputEvent, InputHandler, std::placeholders::_1)))) {
-    //     MMI_HILOGE("HDF init, bind failed");
-    //     return false;
-    // }
-
-    // do {
-    //     auto inputFd = hdfAdapter_.GetInputFd();
-    //     if (inputFd == -1) {
-    //         MMI_HILOGE("Invalid fd:%{public}d", inputFd);
-    //         break;
-    //     }
-    //     auto ret = AddEpoll(EPOLL_EVENT_HDF, inputFd);
-    //     if (ret <  0) {
-    //         MMI_HILOGE("AddEpoll error ret:%{public}d", ret);
-    //         EpollClose();
-    //         break;
-    //     }
-    //     MMI_HILOGI("AddEpoll, epollfd:%{public}d, fd:%{public}d", mmiFd_, inputFd);
-    //     return true;
-    // } while (0);
-
-    // hdfAdapter_.Uninit();
     hdfProvider_ = std::make_shared<HDFInputProvider>();
+    CHKPF(hdfProvider_);
+    hdfProvider_->BindContext(shared_from_this());
     inputProviderMgr_ = std::make_shared<InputProviderManager>();
-
-    return false;
+    CHKPF(inputProviderMgr_);
+    inputProviderMgr_->AddInputProvider(hdfProvider_);
+    int32_t result = hdfProvider_->Enable();
+    if (result != RET_OK) {
+        MMI_HILOGE("HDF provider enable failed");
+        return false;
+    }
+    return true;
 }
 #endif // OHOS_BUILD_HDF
 
@@ -373,13 +354,6 @@ void MMIService::OnStart()
     MMI_HILOGI("Run periodical task success");
     t_.detach();
     MMI_HILOGI("MMIService thread has detached");
-    // inputProviderMgr_->ScanInputDevice();
-// #ifdef OHOS_BUILD_HDF
-//     ret = hdfAdapter_.ScanInputDevice();
-//     if (ret != RET_OK) {
-//         MMI_HILOGE("ScanInputDevice failed, ret:%{public}d", ret);
-//     }
-// #endif // OHOS_BUILD_HDF
     MMI_HILOGI("MMIService OnStart has finished");
 }
 
@@ -388,9 +362,12 @@ void MMIService::OnStop()
     CHK_PID_AND_TID();
     UdsStop();
     libinputAdapter_.Stop();
-// #ifdef OHOS_BUILD_HDF
-//     hdfAdapter_.Uninit();
-// #endif // OHOS_BUILD_HDF
+#ifdef OHOS_BUILD_HDF
+    CHKPV(hdfProvider_);
+    hdfProvider_->Disable();
+    CHKPV(inputProviderMgr_);
+    inputProviderMgr_->RemoveInputProvider(hdfProvider_);
+#endif // OHOS_BUILD_HDF
     state_ = ServiceRunningState::STATE_NOT_START;
 #ifdef OHOS_RSS_CLIENT
     MMI_HILOGI("Remove system ability listener start");

@@ -40,7 +40,8 @@ namespace OHOS {
 namespace MMI {
 
 enum class ServiceRunningState {STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
-class MMIService final : public UDSServer, public IInputContext, public SystemAbility, public MultimodalInputConnectStub {
+class MMIService final : public UDSServer, public IInputContext, public SystemAbility, public MultimodalInputConnectStub,
+    public std::enable_shared_from_this<MMIService> {
     DECLARE_DELAYED_SINGLETON(MMIService);
     DECLARE_SYSTEM_ABILITY(MMIService);
     DISALLOW_COPY_AND_MOVE(MMIService);
