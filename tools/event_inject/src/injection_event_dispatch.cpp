@@ -95,7 +95,7 @@ std::string InjectionEventDispatch::GetFunId() const
 bool InjectionEventDispatch::VerifyArgvs(const int32_t &argc, const std::vector<std::string> &argv)
 {
     CALL_DEBUG_ENTER;
-    if (argc < ARGV_VALID || argv.at(ARGVS_TARGET_INDEX).empty()) {
+    if (argc < ARGVS_CODE_INDEX || argv.at(ARGVS_TARGET_INDEX).empty()) {
         MMI_HILOGE("Invalid Input Para, Please Check the validity of the para");
         return false;
     }

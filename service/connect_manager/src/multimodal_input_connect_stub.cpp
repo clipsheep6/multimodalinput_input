@@ -352,7 +352,7 @@ int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, Mes
     }
     if ((handlerType == InputHandlerType::MONITOR) && (!PerHelper->CheckMonitor())) {
         MMI_HILOGE("Monitor permission check failed");
-        return ERROR_NO_PERMISSION;
+        return INPUT_CHECK_MONITOR_FAIL;
     }
     uint32_t eventType;
     READUINT32(data, eventType, IPC_PROXY_DEAD_OBJECT_ERR);

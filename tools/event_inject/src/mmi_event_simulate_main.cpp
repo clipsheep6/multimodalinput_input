@@ -19,6 +19,7 @@
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, OHOS::MMI::MMI_LOG_DOMAIN, "MmiEventSimulateDemoMain" };
+constexpr int32_t ARGV_VALID = 2;
 } // namespace
 
 int32_t main(int32_t argc, const char* argv[])
