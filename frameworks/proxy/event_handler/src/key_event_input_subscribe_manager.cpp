@@ -148,9 +148,10 @@ int32_t KeyEventInputSubscribeManager::UnsubscribeKeyEvent(int32_t subscribeId)
 
     for (auto it = subscribeInfos_.begin(); it != subscribeInfos_.end(); ++it) {
         if (it->GetSubscribeId() == subscribeId) {
-            if (MMIEventHdl.UnsubscribeKeyEvent(subscribeId) != RET_OK) {
+          int32_t ret = MMIEventHdl.UnsubscribeKeyEvent(subscribeId);
+            if (ret != RET_OK) {
                 MMI_HILOGE("Leave, unsubscribe key event failed");
-                return RET_ERR;
+                return ret;
             }
             subscribeInfos_.erase(it);
             return RET_OK;

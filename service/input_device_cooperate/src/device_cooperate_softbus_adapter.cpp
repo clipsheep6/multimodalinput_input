@@ -150,7 +150,7 @@ int32_t DeviceCooperateSoftbusAdapter::Init()
     int32_t ret = CreateSessionServer(MMI_DINPUT_PKG_NAME, localSessionName_.c_str(), &sessListener_);
     if (ret != RET_OK) {
         MMI_HILOGE("Create session server failed, error code:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }

@@ -47,9 +47,9 @@ int32_t KeyAutoRepeat::AddDeviceConfig(struct libinput_device *device)
     std::string fileName = KeyMapMgr->GetKeyEventFileName(device);
     DeviceConfig devConf;
     auto ret = ReadTomlFile(GetTomlFilePath(fileName), devConf);
-    if (ret == RET_ERR) {
+    if (ret != RET_OK) {
         MMI_HILOGI("Can not read device config file");
-        return RET_ERR;
+        return ret;
     }
     int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
     if (deviceId == INVALID_DEVICE_ID) {

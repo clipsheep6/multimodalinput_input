@@ -122,11 +122,11 @@ int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
     }
     if (fd < 0) {
         MMI_HILOGE("Invalid param fd_");
-        return ERROR_INVALID_FD;
+        return RET_ERR;
     }
     if (mmiFd_ < 0) {
         MMI_HILOGE("Invalid param mmiFd_");
-        return ERROR_INVALID_FD;
+        return RET_ERR;
     }
     auto eventData = static_cast<mmi_epoll_event*>(malloc(sizeof(mmi_epoll_event)));
     if (!eventData) {
@@ -158,11 +158,11 @@ int32_t MMIService::DelEpoll(EpollEventType type, int32_t fd)
     }
     if (fd < 0) {
         MMI_HILOGE("Invalid param fd_");
-        return ERROR_INVALID_FD;
+        return RET_ERR;
     }
     if (mmiFd_ < 0) {
         MMI_HILOGE("Invalid param mmiFd_");
-        return ERROR_INVALID_FD;
+        return RET_ERR;
     }
     struct epoll_event ev = {};
     auto ret = EpollCtl(fd, EPOLL_CTL_DEL, ev, mmiFd_);

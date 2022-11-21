@@ -15,6 +15,7 @@
 
 #include "multimodal_input_connect_proxy.h"
 
+#include "error_multimodal.h"
 #include "message_option.h"
 #include "mmi_log.h"
 #include "multimodal_input_connect_def_parcel.h"

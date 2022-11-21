@@ -115,9 +115,8 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
         if (ret != RET_OK) {
             MMI_HILOGE("AddInputEventFilter has send to server failed, ret:%{public}d", ret);
             eventFilterService_ = nullptr;
-            return RET_ERR;
+            return ret;
         }
-        return RET_OK;
     }
     return RET_OK;
 #else
@@ -259,7 +258,8 @@ int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt)
         MMI_HILOGE("Packet write logical data failed");
         return RET_ERR;
     }
-    if (PackWindowInfo(pkt) == RET_ERR) {
+    int32_t ret = PackWindowInfo(pkt);
+    if (ret != RET_OK) {
         MMI_HILOGE("Packet write windows info failed");
         return RET_ERR;
     }
@@ -553,7 +553,7 @@ int32_t InputManagerImpl::SetPointerSpeed(int32_t speed)
     int32_t ret = MultimodalInputConnMgr->SetPointerSpeed(speed);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to set pointer speed");
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 #else
@@ -569,7 +569,7 @@ int32_t InputManagerImpl::GetPointerSpeed(int32_t &speed)
     int32_t ret = MultimodalInputConnMgr->GetPointerSpeed(speed);
     if (ret != RET_OK) {
         MMI_HILOGE("Get pointer speed failed");
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 #else
@@ -631,7 +631,7 @@ void InputManagerImpl::SendDisplayInfo()
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     NetPacket pkt(MmiMessageId::DISPLAY_INFO);
-    if (PackDisplayData(pkt) == RET_ERR) {
+    if (PackDisplayData(pkt) != RET_OK) {
         MMI_HILOGE("Pack display info failed");
         return;
     }
@@ -889,7 +889,7 @@ int32_t InputManagerImpl::SetFunctionKeyState(int32_t funcKey, bool enable)
     int32_t ret = MultimodalInputConnMgr->SetFunctionKeyState(funcKey, enable);
     if (ret != RET_OK) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 #else

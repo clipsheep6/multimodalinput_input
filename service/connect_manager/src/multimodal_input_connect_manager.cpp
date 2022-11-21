@@ -21,6 +21,7 @@
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 
+#include "error_multimodal.h"
 #include "mmi_log.h"
 #include "multimodal_input_connect_death_recipient.h"
 #include "multimodal_input_connect_define.h"
@@ -60,7 +61,7 @@ int32_t MultimodalInputConnectManager::AllocSocketPair(const int32_t moduleType)
     int32_t result = multimodalInputConnectService_->AllocSocketFd(programName, moduleType, socketFd_, tokenType_);
     if (result != RET_OK) {
         MMI_HILOGE("AllocSocketFd has error:%{public}d", result);
-        return RET_ERR;
+        return result;
     }
 
     MMI_HILOGI("AllocSocketPair success. socketFd_:%{public}d tokenType_:%{public}d", socketFd_, tokenType_);
