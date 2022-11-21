@@ -20,7 +20,6 @@
 
 namespace OHOS {
 namespace MMI {
-// 外部错误码，值不能改变
 inline constexpr int32_t ERROR_UNSUPPORT = -2;
 inline constexpr int32_t INPUT_CHECK_MONITOR_FAIL = -201;
 
@@ -34,6 +33,7 @@ enum {
     INPUT_COMMON_NULLPTR = MODULE_COMMON,
     INPUT_COMMON_PARAM_ERROR,
     INPUT_COMMON_INVALID_FD,
+    INPUT_COMMON_VAL_NOT_EXP,
 
     INPUT_MSG_SEND_FAIL = MODULE_MSG,
     INPUT_MSG_PACKET_READ_FAIL,
@@ -73,9 +73,6 @@ enum {
 
     // 键盘事件封装失败
     INPUT_KEY_EVENT_PKG_FAIL,
-
-    // 值不符合预期
-    VAL_NOT_EXP,
 
     INPUT_ERROR_CODE_END
 };
