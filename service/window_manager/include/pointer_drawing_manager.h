@@ -49,7 +49,7 @@ public:
     void UpdateDisplayInfo(const DisplayInfo& displayInfo) override;
     void OnDisplayInfo(const DisplayGroupInfo& displayGroupInfo) override;
     void OnWindowInfo(const WinInfo &info) override;
-    void UpdatePointerDevice(bool hasPointerDevicee, bool isPointerVisible) override;
+    void UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible) override;
     bool Init() override;
     void DeletePointerVisible(int32_t pid) override;
     int32_t SetPointerVisible(int32_t pid, bool visible) override;
@@ -70,9 +70,7 @@ private:
     void DrawManager();
     void FixCursorPosition(int32_t &physicalX, int32_t &physicalY);
     std::unique_ptr<OHOS::Media::PixelMap> DecodeImageToPixelMap(const std::string &imagePath);
-    void DeletePidInfo(int32_t pid);
     void UpdatePointerVisible();
-    void UpdatePidInfo(int32_t pid, bool visible);
     void InitStyle();
     int32_t InitLayer(const MOUSE_ICON mouseStyle);
 

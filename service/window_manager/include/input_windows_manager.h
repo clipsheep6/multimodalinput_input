@@ -42,7 +42,7 @@ class InputWindowsManager final {
 public:
     DISALLOW_COPY_AND_MOVE(InputWindowsManager);
     void Init(UDSServer& udsServer);
-    int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent) const;
+    int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t GetPidAndUpdateTarget(std::shared_ptr<InputEvent> inputEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -154,10 +154,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_POINTER
     DisplayGroupInfo displayGroupInfo_;
     MouseLocation mouseLocation_ = { -1, -1 };
-#ifdef OHOS_BUILD_HDF
-    std::shared_ptr<IDevice::AxisInfo> xInfoHDF_;
-    std::shared_ptr<IDevice::AxisInfo> yInfoHDF_;
-#endif // OHOS_BUILD_HDF
+    std::map<int32_t, WindowInfo> touchItemDownInfos_;
 };
 
 #define WinMgr ::OHOS::DelayedSingleton<InputWindowsManager>::GetInstance()
