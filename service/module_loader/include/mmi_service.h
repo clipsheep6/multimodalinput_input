@@ -27,7 +27,8 @@
 #include "delegate_tasks.h"
 #ifdef OHOS_BUILD_HDF
 #include "hdf_adapter.h"
-#endif
+#include "i_input_context.h"
+#endif // OHOS_BUILD_HDF
 #include "input_event_handler.h"
 #include "multimodal_input_connect_stub.h"
 #include "libinput_adapter.h"
@@ -38,7 +39,7 @@ namespace OHOS {
 namespace MMI {
 
 enum class ServiceRunningState {STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
-class MMIService final : public UDSServer, public SystemAbility, public MultimodalInputConnectStub {
+class MMIService final : public UDSServer, public IInputContext, public SystemAbility, public MultimodalInputConnectStub {
     DECLARE_DELAYED_SINGLETON(MMIService);
     DECLEAR_SYSTEM_ABILITY(MMIService);
     DISALLOW_COPY_AND_MOVE(MMIService);
@@ -47,6 +48,12 @@ public:
     void OnStart() override;
     void OnStop() override;
     int32_t Dump(int32_t fd, const std::vector<std::u16string> &args) override;
+#ifdef OHOS_BUILD_HDF
+    virtual std::shared_ptr<IInputDeviceManager> GetInputDeviceManager() override;
+    virtual std::shared_ptr<IEventQueueManager> GetEventQueueManager() override;
+    virtual std::shared_ptr<IEventHandlerManager> GetEventHandlerManager() override;
+    virtual std::shared_ptr<IInputProviderManager> GetInputProviderManager() override;
+#endif // OHOS_BUILD_HDF
     int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &toReturnClientFd, int32_t &tokenType) override;
     int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
@@ -148,8 +155,10 @@ private:
     std::atomic<uint64_t> tid_ = 0;
 #endif
 
+    std::shared_ptr<IInputProviderManager> inputProviderMgr_;
     LibinputAdapter libinputAdapter_;
 #ifdef OHOS_BUILD_HDF
+    std::shared_ptr<IInputProvider> hdfProvider_;
     HDFAdapter hdfAdapter_;
 #endif // OHOS_BUILD_HDF
     ServerMsgHandler sMsgHandler_;

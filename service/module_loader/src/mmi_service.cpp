@@ -200,6 +200,10 @@ bool MMIService::InitLibinputService()
 #ifdef OHOS_BUILD_HDF
 bool MMIService::InitHDFService()
 {
+    // auto provider = std::make_shared<HDFInputProvider>();
+    // hdfProviderMgr_->AddInputProvider(provider);
+    // provider->BindContext(shared_from_this());
+    // provider->Enable();
     if (!(hdfAdapter_.Init(std::bind(&InputEventHandler::HandleHDFDeviceStatusEvent, InputHandler, std::placeholders::_1),
         std::bind(&InputEventHandler::HandleHDFDeviceInputEvent, InputHandler, std::placeholders::_1)))) {
         MMI_HILOGE("HDF init, bind failed");
@@ -362,6 +366,7 @@ void MMIService::OnStart()
     MMI_HILOGI("Run periodical task success");
     t_.detach();
     MMI_HILOGI("MMIService thread has detached");
+    // inputProviderMgr_->ScanInputDevice();
 #ifdef OHOS_BUILD_HDF
     ret = hdfAdapter_.ScanInputDevice();
     if (ret != RET_OK) {
@@ -1125,6 +1130,26 @@ int32_t MMIService::Dump(int32_t fd, const std::vector<std::u16string> &args)
     });
     MMIEventDump->ParseCommand(fd, argList);
     return RET_OK;
+}
+
+std::shared_ptr<IInputDeviceManager> MMIService::GetInputDeviceManager()
+{
+    return InputDevMgr;
+}
+
+std::shared_ptr<IEventQueueManager> MMIService::GetEventQueueManager()
+{
+    return nullptr;
+}
+
+std::shared_ptr<IEventHandlerManager> MMIService::GetEventHandlerManager()
+{
+    return nullptr;
+}
+
+std::shared_ptr<IInputProviderManager> MMIService::GetInputProviderManager()
+{
+    return inputProviderMgr_;
 }
 
 int32_t MMIService::RegisterCooperateListener()

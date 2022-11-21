@@ -115,11 +115,11 @@ void AbsEventCollector::FinishPointer()
     CALL_DEBUG_ENTER;
     CHKPV(absEvent_);
     for (auto iter = pointers_.begin(); iter != pointers_.end();) {
-        if (iter->second == nullptr) {
+          auto pointer = iter->second;
+        if (pointer == nullptr) {
             pointers_.erase(iter++);
             continue;
         }
-        auto pointer = iter->second;
         if (!pointer->IsDirty()) {
             iter++;
             continue;
@@ -136,10 +136,10 @@ void AbsEventCollector::FinishPointer()
         }
         absEvent_->SetActionTime(timeMs);
         collectCallback_(absEvent_);
-        if (pointer->GetAction() == AbsEvent::ACTION_UP) {
-            pointers_.erase(iter++);
-            continue;
-        }
+        // if (pointer->GetAction() == AbsEvent::ACTION_UP) {
+        //     pointers_.erase(iter++);
+        //     continue;
+        // }
         iter++;
     }
 }

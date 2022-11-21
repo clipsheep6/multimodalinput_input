@@ -27,6 +27,7 @@ config("libmmi_server_config") {
   include_dirs = [
     "input_device_cooperate/include",
     "input_transformation/include",
+    "input_provider/include",
     "device_manager/include",
     "device_scalability/include",
     "delegate_task/include",

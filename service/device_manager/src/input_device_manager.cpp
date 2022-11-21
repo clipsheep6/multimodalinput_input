@@ -68,6 +68,21 @@ InputDeviceManager::InputDeviceManager() {}
 InputDeviceManager::~InputDeviceManager() {}
 
 #ifdef OHOS_BUILD_HDF
+std::shared_ptr<IInputDevice> InputDeviceManager::AddInputDevice(std::function<IInputDevice(int)>)
+{
+    return nullptr;
+}
+
+std::shared_ptr<IInputDevice> InputDeviceManager::RemoveInputDevice(std::function<IInputDevice(int)>)
+{
+    return nullptr;
+}
+
+std::shared_ptr<IInputDevice> InputDeviceManager::GetInputDevice(std::function<IInputDevice(int)>)
+{
+    return nullptr;
+}
+
 std::shared_ptr<IDevice> InputDeviceManager::GetHDFDevice(uint32_t devIndex) const
 {
     for (const auto &item : inputDevice_) {

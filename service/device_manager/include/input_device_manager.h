@@ -27,6 +27,7 @@
 #include "key_event_normalize.h"
 #include "input_device.h"
 #ifdef OHOS_BUILD_HDF
+#include "i_input_device_manager.h"
 #include "i_touch_screen_handler.h"
 #include "input_type.h"
 #endif // OHOS_BUILD_HDF
@@ -38,9 +39,10 @@
 #include "singleton.h"
 #include "util.h"
 
+
 namespace OHOS {
 namespace MMI {
-class InputDeviceManager final : public IDeviceObject {
+class InputDeviceManager final : public IDeviceObject,  public IInputDeviceManager {
     DECLARE_DELAYED_SINGLETON(InputDeviceManager);
 
     struct InputDeviceInfomation {
@@ -56,6 +58,11 @@ class InputDeviceManager final : public IDeviceObject {
     };
 public:
     DISALLOW_COPY_AND_MOVE(InputDeviceManager);
+#ifdef OHOS_BUILD_HDF
+    virtual std::shared_ptr<IInputDevice> AddInputDevice(std::function<IInputDevice(int)>) override;
+    virtual std::shared_ptr<IInputDevice> RemoveInputDevice(std::function<IInputDevice(int)>) override;
+    virtual std::shared_ptr<IInputDevice> GetInputDevice(std::function<IInputDevice(int)>) override;
+#endif // OHOS_BUILD_HDF
     void OnInputDeviceAdded(struct libinput_device *inputDevice);
 #ifdef OHOS_BUILD_HDF
     void OnInputDeviceAdded(std::shared_ptr<IDevice> inputDev);
@@ -75,9 +82,9 @@ public:
     bool GetDeviceConfig(int32_t deviceId, int32_t &KeyboardType);
     int32_t GetDeviceSupportKey(int32_t deviceId, int32_t &keyboardType);
     int32_t GetKeyboardType(int32_t deviceId, int32_t &keyboardType);
-    void Attach(std::shared_ptr<IDeviceObserver> observer);
-    void Detach(std::shared_ptr<IDeviceObserver> observer);
-    void NotifyPointerDevice(bool hasPointerDevice, bool isVisible);
+    void Attach(std::shared_ptr<IDeviceObserver> observer) override;
+    void Detach(std::shared_ptr<IDeviceObserver> observer) override;
+    void NotifyPointerDevice(bool hasPointerDevice, bool isVisible) override;
     void AddDevListener(SessionPtr sess, std::function<void(int32_t, const std::string&)> callback);
     void RemoveDevListener(SessionPtr sess);
     void Dump(int32_t fd, const std::vector<std::string> &args);
