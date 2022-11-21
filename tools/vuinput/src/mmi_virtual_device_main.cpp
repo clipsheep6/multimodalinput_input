@@ -17,14 +17,6 @@
 
 int32_t main(int32_t argc, char *argv[])
 {
-    if (argc == 1 || argc > PARAMETERS_NUMBER) {
-        std::cout << "Invalid Input Para, Please Check the validity of the para" << std::endl;
-        return 0;
-    }
-    if (access(OHOS::MMI::g_folderPath.c_str(), F_OK) != 0) {
-        printf("Directory %s did not exist, errno: %d", OHOS::MMI::g_folderPath.c_str(), errno);
-        mkdir(OHOS::MMI::g_folderPath.c_str(), SYMBOL_FOLDER_PERMISSIONS);
-    }
     if (!OHOS::MMI::VirtualDevice::CheckCommand(argc, argv)) {
         std::cout << "Try './vuinput --help' for more information" << std::endl; 
         return -1;

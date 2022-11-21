@@ -74,16 +74,16 @@ bool InjectionToolsHelpFunc::CheckInjectionCommand(int32_t argc, char **argv)
 bool InjectionToolsHelpFunc::SelectOptions(int32_t argc, char **argv, int32_t &opt)
 {
     CALL_DEBUG_ENTER;
+    if (argc < SHORT_OPTION_LENGTH) {
+        std::cout << "Please enter options or parameters" << std::endl;
+        return false;
+    }
     struct option longOptions[] = {
         {"sendevent", no_argument, NULL, 'S'},
         {"json", no_argument, NULL, 'J'},
         {"help", no_argument, NULL, '?'},
         {NULL, 0 , NULL, 0}
     };
-    if (argc < SHORT_OPTION_LENGTH) {
-        std::cout << "Please enter options or parameters" << std::endl;
-        return false;
-    }
     std::string inputOptions = argv[optind];
     if (inputOptions.find('-') == inputOptions.npos) {
         for (uint32_t i = 0; i < sizeof(longOptions) / sizeof(struct option) - 1; ++i) {

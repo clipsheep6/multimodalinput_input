@@ -121,7 +121,7 @@ static void RemoveDir(const std::string& filePath)
         }
         if (ptr->d_type == DT_REG) {
             std::string rmFile = filePath + ptr->d_name;
-            if (std::remove(rmFile.c_str()) != 0) {
+            if (remove(rmFile.c_str()) != 0) {
                 std::cout << "Remove file:" << rmFile << " failed" << std::endl;
             }
         } else if (ptr->d_type == DT_DIR) {
@@ -301,37 +301,45 @@ bool VirtualDevice::ClearFileResidues(const std::string& fileName)
     const std::string filePath = processPath + "cmdline";
     std::string temp;
     std::string processName;
+    DIR *dir = nullptr;
     if (!CheckFileName(fileName)) {
         std::cout << "File name check error" << std::endl;
-        goto RELEASE_RES;
+        goto RELEASE_RES1;
     }
     if (pos == std::string::npos) {
         std::cout << "Failed to create file" << std::endl;
-        goto RELEASE_RES;
+        goto RELEASE_RES1;
     }
-    DIR *dir = nullptr;
+    if (!IsFileExists(processPath)) {
+        std::cout <<  processPath << " folder does not exist" << std::endl;
+        goto RELEASE_RES1;
+    }
     dir = opendir(processPath.c_str());
     if (dir == nullptr) {
         std::cout << "Useless flag file:" << processPath << std::endl;
-        return false;
+        goto RELEASE_RES1;
     }
     temp = ReadUinputToolFile(filePath);
     if (temp.empty()) {
         std::cout << "Temp is empty" << std::endl;
-        goto RELEASE_RES;
+        goto RELEASE_RES2;
     }
     processName.append(temp);
-    if (processName.find(VIRTUAL_DEVICE_NAME.c_str()) != std::string::npos) {
-        if (closedir(dir) != 0) {
-            std::cout << "Close dir:" << processPath << " failed" << std::endl;
-        }
-        return true;
+    if (processName.find(VIRTUAL_DEVICE_NAME.c_str()) == std::string::npos) {
+        std::cout << "Process name is wrong" << std::endl;
+        goto RELEASE_RES2;
     }
-    RELEASE_RES:
+    return true;
+    RELEASE_RES1:
+    if (remove((g_folderPath + fileName).c_str()) != 0) {
+        std::cout << "Remove file failed" << std::endl;
+    }
+    return false;
+    RELEASE_RES2:
     if (closedir(dir) != 0) {
         std::cout << "Close dir failed" << std::endl;
     }
-    if (std::remove((g_folderPath + fileName).c_str()) != 0) {
+    if (remove((g_folderPath + fileName).c_str()) != 0) {
         std::cout << "Remove file failed" << std::endl;
     }
     return false;
@@ -558,9 +566,6 @@ bool VirtualDevice::AddDevice(const std::string& startDeviceName)
         std::cout << "Failed to start device: " << startDeviceName <<std::endl;
         return false;
     }
-    if (!IsFileExists(g_folderPath)) {
-        mkdir(g_folderPath.c_str(), FILE_POWER);
-    }
     std::string symbolFile;
     symbolFile.append(g_folderPath).append(g_pid).append("_").append(startDeviceName);
     std::ofstream flagFile;
@@ -594,8 +599,10 @@ bool VirtualDevice::CloseDevice(const std::string& closeDeviceName, const std::v
     for (const auto &it : deviceList) {
         if (it.find(closeDeviceName) == 0) {
             kill(std::stoi(it), SIGKILL);
-            if (BrowseDirectory(g_folderPath).size() == 0) {
-                RemoveDir(g_folderPath);
+            std::cout << "rm -f :" << (g_folderPath + it).c_str() << std::endl;
+            remove((g_folderPath + it).c_str());
+            if (BrowseDirectory(g_folderPath).empty()) {
+                    RemoveDir(g_folderPath);
             }
             return true;
         }
@@ -610,6 +617,9 @@ bool VirtualDevice::CheckCommand(int32_t argc, char **argv)
     if (!SelectOptions(argc, argv, c)) {
         std::cout << "Select option failed" << std::endl;
         return false;
+    }
+    if (!IsFileExists(g_folderPath)) {
+        mkdir(g_folderPath.c_str(), FILE_POWER);
     }
     switch (c) {
         case 'L': {
@@ -650,6 +660,10 @@ bool VirtualDevice::CheckCommand(int32_t argc, char **argv)
 
 bool VirtualDevice::SelectOptions(int32_t argc, char **argv, int32_t &opt)
 {
+    if (argc < PARAMETERS_QUERY_NUMBER) {
+        std::cout << "Please enter options or parameters" << std::endl;
+        return false;
+    }
     struct option longOptions[] = {
         {"list", no_argument, NULL, 'L'},
         {"start", no_argument, NULL, 'S'},
@@ -657,10 +671,6 @@ bool VirtualDevice::SelectOptions(int32_t argc, char **argv, int32_t &opt)
         {"help", no_argument, NULL, '?'},
         {NULL, 0, NULL, 0}
     };
-    if (argc < PARAMETERS_QUERY_NUMBER) {
-        std::cout << "Please enter options or parameters" << std::endl;
-        return false;
-    }
     std::string inputOptions = argv[optind];
     if (inputOptions.find('-') == inputOptions.npos) {
         for (uint32_t i = 0; i < sizeof(longOptions) / sizeof(struct option) - 1; ++i) {
@@ -695,6 +705,7 @@ bool VirtualDevice::ListOption(int32_t argc, char **argv)
     std::string::size_type pos;
     std::cout << "PID\tDEVICE" << std::endl;
     for (const auto &item : deviceList) {
+        std::cout << "deviceName" << item << std::endl;
         pos = item.find("_");
         if (pos != std::string::npos) {
             std::cout << item.substr(0, pos) << "\t" << item.substr(pos + 1, item.size() - pos - 1) << std::endl;
@@ -826,8 +837,8 @@ void VirtualDevice::ShowUsage()
     std::cout << "  pen"           << std::endl;
     std::cout << "-S all &        --start all &        start all &           -start devices " << std::endl;
     std::cout << "commands for close:                                                       " << std::endl;
-    std::cout << "-C <pid> &      --close <pid> &      close <pid>           -close a pid   " << std::endl;
-    std::cout << "-C all &        --close all  &       close all  &          -close pids    " << std::endl;
+    std::cout << "-C <pid>        --close <pid>        close <pid>           -close a pid   " << std::endl;
+    std::cout << "-C all          --close all          close all             -close pids    " << std::endl;
     std::cout << "-?  --help   help                                                         " << std::endl;
 }
 } // namespace MMI
