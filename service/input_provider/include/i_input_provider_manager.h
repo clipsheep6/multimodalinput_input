@@ -24,9 +24,9 @@ namespace OHOS {
 namespace MMI {
 class IInputProviderManager {
 public:
-    virtual std::shared_ptr<IInputProvider> AddInputProvider(std::function<IInputProvider(int)>) = 0;
-    virtual std::shared_ptr<IInputProvider> RemoveInputProvider(std::function<IInputProvider(int)>) = 0;
-    virtual std::shared_ptr<IInputProvider> GetInputProvider(std::function<IInputProvider(int)>) = 0;
+    virtual int32_t AddInputProvider(std::shared_ptr<IInputProvider> inputProvider) = 0;
+    virtual int32_t RemoveInputProvider(std::shared_ptr<IInputProvider> inputProvider) = 0;
+    virtual std::shared_ptr<IInputProvider> GetInputProvider(std::string name) = 0;
 
 };
 } // namespace MMI

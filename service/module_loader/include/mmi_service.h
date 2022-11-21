@@ -154,12 +154,10 @@ private:
 #ifdef OHOS_RSS_CLIENT
     std::atomic<uint64_t> tid_ = 0;
 #endif
-
-    std::shared_ptr<IInputProviderManager> inputProviderMgr_;
     LibinputAdapter libinputAdapter_;
 #ifdef OHOS_BUILD_HDF
     std::shared_ptr<IInputProvider> hdfProvider_;
-    HDFAdapter hdfAdapter_;
+        std::shared_ptr<IInputProviderManager> inputProviderMgr_;
 #endif // OHOS_BUILD_HDF
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;

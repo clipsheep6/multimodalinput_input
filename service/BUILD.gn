@@ -137,6 +137,8 @@ ohos_shared_library("libmmi-server") {
         "input_transformation/src/instance_creator.cpp",
         "input_transformation/src/kernel_event_handler_bridge.cpp",
         "input_transformation/src/touch_screen_handler.cpp",
+        "input_provider/src/hdf_input_provider.cpp",
+        "input_provider/src/input_provider_manager.cpp",
       ]
   }
   if (input_feature_keyboard) {

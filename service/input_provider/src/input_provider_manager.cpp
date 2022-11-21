@@ -13,23 +13,21 @@
  * limitations under the License.
  */
 
-#include "hdf_input_provider.h"
+#include "input_provider_manager.h"
 
 namespace OHOS {
 namespace MMI {
-int32_t HDFInputProvider::Enable()
+int32_t InputProviderManager::AddInputProvider(std::shared_ptr<IInputProvider> inputProvider)
+{
+    return 0;
+}
+int32_t InputProviderManager::RemoveInputProvider(std::shared_ptr<IInputProvider> inputProvider)
 {
     return 0;
 }
 
-int32_t HDFInputProvider::Disable()
-{
-    return 0;
-}
-
-std::string HDFInputProvider::GetName()
-{
-    return "HDFInputProvider";
+std::shared_ptr<IInputProvider> InputProviderManager::GetInputProvider(std::string name){
+    return nullptr;
 }
 } // namespace MMI
 } // namespace OHOS

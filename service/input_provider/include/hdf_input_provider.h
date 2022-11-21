@@ -26,7 +26,7 @@ namespace MMI {
 class HDFInputProvider : public IInputProvider {
 public:
     HDFInputProvider() = default;
-    ~HDFInputProvider() = default;
+    virtual ~HDFInputProvider() = default;
     virtual int32_t Enable() override;
     virtual int32_t Disable() override;
     virtual std::string GetName() override;

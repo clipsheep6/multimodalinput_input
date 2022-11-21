@@ -18,6 +18,7 @@
 
 #include <memory>
 #include <string>
+#include <nocopyable.h>
 
 namespace OHOS {
 namespace MMI {
@@ -27,10 +28,12 @@ public:
     IInputProvider() = default;
     DISALLOW_COPY_AND_MOVE(IInputProvider);
     virtual ~IInputProvider() = default;
-    virtual void BindContext(std::shared_ptr<IInputContext> context) = 0;
+    virtual void BindContext(std::shared_ptr<IInputContext> context) { iInputContext_ = context; }
     virtual int32_t Enable() = 0;
     virtual int32_t Disable() = 0;
     virtual std::string GetName() = 0;
+protected:
+    std::shared_ptr<IInputContext> iInputContext_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS
