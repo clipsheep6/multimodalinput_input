@@ -29,9 +29,10 @@
 #include "hdf_adapter.h"
 #include "i_input_context.h"
 #endif // OHOS_BUILD_HDF
+#include "input_device_manager.h"
 #include "input_event_handler.h"
-#include "multimodal_input_connect_stub.h"
 #include "libinput_adapter.h"
+#include "multimodal_input_connect_stub.h"
 #include "server_msg_handler.h"
 #include "uds_server.h"
 
@@ -49,10 +50,10 @@ public:
     void OnStop() override;
     int32_t Dump(int32_t fd, const std::vector<std::u16string> &args) override;
 #ifdef OHOS_BUILD_HDF
-    virtual std::shared_ptr<IInputDeviceManager> GetInputDeviceManager() override;
-    virtual std::shared_ptr<IEventQueueManager> GetEventQueueManager() override;
-    virtual std::shared_ptr<IEventHandlerManager> GetEventHandlerManager() override;
-    virtual std::shared_ptr<IInputProviderManager> GetInputProviderManager() override;
+    virtual std::shared_ptr<IInputDeviceManager> GetInputDeviceManager() override { return InputDevMgr; }
+    virtual std::shared_ptr<IEventQueueManager> GetEventQueueManager() override { return nullptr; }
+    virtual std::shared_ptr<IEventHandlerManager> GetEventHandlerManager() override { return nullptr; }
+    virtual std::shared_ptr<IInputProviderManager> GetInputProviderManager() override { return inputProviderMgr_; }
 #endif // OHOS_BUILD_HDF
     int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &toReturnClientFd, int32_t &tokenType) override;
@@ -157,7 +158,7 @@ private:
     LibinputAdapter libinputAdapter_;
 #ifdef OHOS_BUILD_HDF
     std::shared_ptr<IInputProvider> hdfProvider_;
-        std::shared_ptr<IInputProviderManager> inputProviderMgr_;
+    std::shared_ptr<IInputProviderManager> inputProviderMgr_;
 #endif // OHOS_BUILD_HDF
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;

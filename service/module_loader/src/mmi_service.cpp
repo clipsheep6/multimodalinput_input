@@ -33,7 +33,6 @@
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_cooperate_sm.h"
 #endif // OHOS_BUILD_ENABLE_COOPERATE
-#include "input_device_manager.h"
 #include "input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "key_map_manager.h"
@@ -49,7 +48,6 @@
 #endif
 #include "permission_helper.h"
 #include "timer_manager.h"
-#include "input_device_manager.h"
 #include "util.h"
 #include "xcollie/watchdog.h"
 #ifdef OHOS_BUILD_HDF
@@ -1139,26 +1137,6 @@ int32_t MMIService::Dump(int32_t fd, const std::vector<std::u16string> &args)
     });
     MMIEventDump->ParseCommand(fd, argList);
     return RET_OK;
-}
-
-std::shared_ptr<IInputDeviceManager> MMIService::GetInputDeviceManager()
-{
-    return InputDevMgr;
-}
-
-std::shared_ptr<IEventQueueManager> MMIService::GetEventQueueManager()
-{
-    return nullptr;
-}
-
-std::shared_ptr<IEventHandlerManager> MMIService::GetEventHandlerManager()
-{
-    return nullptr;
-}
-
-std::shared_ptr<IInputProviderManager> MMIService::GetInputProviderManager()
-{
-    return inputProviderMgr_;
 }
 
 int32_t MMIService::RegisterCooperateListener()
