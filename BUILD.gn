@@ -131,7 +131,6 @@ group("ut_mmi_debug_tools") {
 group("mmi_tests_manual") {
   testonly = true
   deps = [
-    "frameworks/proxy:InputManagerManualTest",
     "service:TransformPointTest",
   ]
 }
@@ -140,6 +139,7 @@ group("mmi_tests") {
   testonly = true
   deps = [
     "frameworks/proxy:InputManagerTest",
+    "frameworks/proxy:InputManagerManualTest",
     "frameworks/proxy:KeyEventTest",
     "frameworks/proxy:PointerEventTest",
     "frameworks/proxy:ut-mmi-proxy-out",
