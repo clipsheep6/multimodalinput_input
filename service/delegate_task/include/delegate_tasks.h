@@ -68,7 +68,7 @@ public:
 
 public:
     DelegateTasks() = default;
-    virtual ~DelegateTasks() = default;
+    ~DelegateTasks();
 
     bool Init();
     void ProcessTasks();
