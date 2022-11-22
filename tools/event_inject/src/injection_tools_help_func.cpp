@@ -43,21 +43,21 @@ bool InjectionToolsHelpFunc::CheckInjectionCommand(int32_t argc, char **argv)
     }
     switch (c) {
         case 'S': {
-            if (!SendEventOption(argc ,argv)) {
+            if (!SendEventOption(argc, argv)) {
                 MMI_HILOGE("SendEvent option failed");
                 return false;
             }
             break;
         }
         case 'J': {
-            if (!JsonOption(argc ,argv)) {
+            if (!JsonOption(argc, argv)) {
                 MMI_HILOGE("Json option failed");
                 return false;
             }
             break;
         }
         case '?': {
-            if (!HelpOption(argc ,argv)) {
+            if (!HelpOption(argc, argv)) {
                 MMI_HILOGE("Help option failed");
                 return false;
             }
@@ -82,7 +82,7 @@ bool InjectionToolsHelpFunc::SelectOptions(int32_t argc, char **argv, int32_t &o
         {"sendevent", no_argument, NULL, 'S'},
         {"json", no_argument, NULL, 'J'},
         {"help", no_argument, NULL, '?'},
-        {NULL, 0 , NULL, 0}
+        {NULL, 0, NULL, 0}
     };
     std::string inputOptions = argv[optind];
     if (inputOptions.find('-') == inputOptions.npos) {
@@ -107,7 +107,7 @@ bool InjectionToolsHelpFunc::SelectOptions(int32_t argc, char **argv, int32_t &o
     return true;
 }
 
-bool InjectionToolsHelpFunc::SendEventOption(int32_t argc, char **argv) 
+bool InjectionToolsHelpFunc::SendEventOption(int32_t argc, char **argv)
 {
     CALL_DEBUG_ENTER;
     if (argc != SEND_EVENT_ARGV_COUNTS) {

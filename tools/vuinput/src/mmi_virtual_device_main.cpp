@@ -18,7 +18,7 @@
 int32_t main(int32_t argc, char *argv[])
 {
     if (!OHOS::MMI::VirtualDevice::CheckCommand(argc, argv)) {
-        std::cout << "Try './vuinput --help' for more information" << std::endl; 
+        std::cout << "Try './vuinput --help' for more information" << std::endl;
         return -1;
     }
     return 0;

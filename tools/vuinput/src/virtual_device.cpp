@@ -690,7 +690,7 @@ bool VirtualDevice::SelectOptions(int32_t argc, char **argv, int32_t &opt)
     if (opt == -1) {
         std::cout << "Nonstandard input parameters" << std::endl;
         return false;
-    } 
+    }
     return true;
 }
 
