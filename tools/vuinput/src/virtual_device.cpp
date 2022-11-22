@@ -314,7 +314,7 @@ bool VirtualDevice::ClearFileResidues(const std::string& fileName)
     dir = opendir(procressPath.c_str());
     if (dir == nullptr) {
         std::cout << "Useless flag file:" << procressPath << std::endl;
-        goto RELEASE_RES;
+        return false;
     }
     temp = ReadUinputToolFile(filePath);
     if (temp.empty()) {
