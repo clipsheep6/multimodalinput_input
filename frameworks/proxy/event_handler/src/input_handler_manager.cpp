@@ -269,8 +269,8 @@ HandleEventType InputHandlerManager::GetEventType() const
 
 void InputHandlerManager::OnDispatchEventProcessed(int32_t eventId, int64_t actionTime)
 {
-    std::lock_guard<std::mutex> guard(mtxHandlers_);
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtxHandlers_);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     if (mouseEventIds_.find(eventId) != mouseEventIds_.end()) {
