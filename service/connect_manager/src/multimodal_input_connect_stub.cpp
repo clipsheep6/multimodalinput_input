@@ -194,11 +194,14 @@ int32_t MultimodalInputConnectStub::StubMarkProcessed(MessageParcel& data, Messa
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
     }
-    int32_t eventType;
-    READINT32(data, eventType, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t eventId;
-    READINT32(data, eventId, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = MarkProcessed(eventType, eventId);
+    int32_t eventSize;
+    READINT32(data, eventSize, IPC_PROXY_DEAD_OBJECT_ERR);
+    std::vector<int32_t> eventIds;
+    for (size_t i = 0; i < eventSize; ++i) {
+        READINT32(data, eventIds[i], IPC_PROXY_DEAD_OBJECT_ERR);
+    }
+
+    int32_t ret = MarkProcessed(eventIds);
     if (ret != RET_OK) {
         MMI_HILOGE("MarkProcessed failed, ret:%{public}d", ret);
         return ret;

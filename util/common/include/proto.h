@@ -61,6 +61,7 @@ enum ANTTimeOutTime : int64_t {
     INPUT_UI_TIMEOUT_TIME = 5 * 1000000
 };
 
+constexpr int32_t INVALID_OR_PROCESSED_ID = -1;
 enum ANREventType {
     ANR_EVENT_TYPE_DISPATCH,
     ANR_EVENT_TYPE_MONITOR,

@@ -95,10 +95,10 @@ int32_t MultimodalInputConnectManager::IsPointerVisible(bool &visible)
     return multimodalInputConnectService_->IsPointerVisible(visible);
 }
 
-int32_t MultimodalInputConnectManager::MarkProcessed(int32_t eventType, int32_t eventId)
+int32_t MultimodalInputConnectManager::MarkProcessed(std::vector<int32_t> eventIds)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->MarkProcessed(eventType, eventId);
+    return multimodalInputConnectService_->MarkProcessed(eventIds);
 }
 
 int32_t MultimodalInputConnectManager::SetPointerSpeed(int32_t speed)

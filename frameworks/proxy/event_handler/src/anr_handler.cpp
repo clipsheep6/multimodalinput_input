@@ -28,24 +28,27 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ANRHandler" };
 constexpr int64_t MAX_MARK_PROCESS_DELAY_TIME = 3500000;
 constexpr int64_t MIN_MARK_PROCESS_DELAY_TIME = 50000;
-constexpr int32_t INVALID_OR_PROCESSED_ID = -1;
 } // namespace
+
+ANRHandler::ANRHandler() {}
+ANRHandler::~ANRHandler() {}
 
 void ANRHandler::UpdateLastEventId(int32_t eventType, int32_t eventId, uint64_t actionTime)
 {
     CALL_DEBUG_ENTER;
     anrMtx_.lock();
-    if (event_[eventType].lastEventId > eventId) {
+    if (eventInfos_[eventType].lastEventId > eventId) {
         anrMtx_.unlock();
         MMI_HILOGE("Event type:%{public}d, id %{public}d less then last processed lastEventId %{public}d",
-            eventType, eventId, event_[eventType].lastEventId);
+            eventType, eventId, eventInfos_[eventType].lastEventId);
         return;
     }
-    event_[eventType].lastEventId = eventId;
+    eventInfos_[eventType].lastEventId = eventId;
     bool isExistTask = isExistTask_;
     anrMtx_.unlock();
 
     if (isExistTask) {
+        MMI_HILOGE("Event type:%{public}d, id %{public}d", eventType, eventId);
         return;
     }
     AddMarkProcessedTask(actionTime);
@@ -80,19 +83,19 @@ void ANRHandler::UpdateLastReportIds(const std::vector<int32_t> &ids)
         if (id == INVALID_OR_PROCESSED_ID) {
             continue;
         }
-        event_[i].lastReportId = id;
+        eventInfos_[i].lastReportId = id;
     }
 }
 
 int32_t ANRHandler::GetLastReportId(int32_t eventType)
 {
-    if ((event_[eventType].lastEventId == INVALID_OR_PROCESSED_ID)
-        || (event_[eventType].lastEventId <= event_[eventType].lastReportId)) {
+    if ((eventInfos_[eventType].lastEventId == INVALID_OR_PROCESSED_ID)
+        || (eventInfos_[eventType].lastEventId <= eventInfos_[eventType].lastReportId)) {
         MMI_HILOGD("Invalid or processed event type:%{public}d, lastEventId:%{public}d, lastReportId:%{public}d",
-            eventType, event_[eventType].lastEventId, event_[eventType].lastReportId);
+            eventType, eventInfos_[eventType].lastEventId, eventInfos_[eventType].lastReportId);
         return INVALID_OR_PROCESSED_ID;
     }
-    return event_[eventType].lastEventId;
+    return eventInfos_[eventType].lastEventId;
 }
 
 void ANRHandler::AddMarkProcessedTask(int64_t actionTime)
@@ -100,7 +103,7 @@ void ANRHandler::AddMarkProcessedTask(int64_t actionTime)
     CALL_DEBUG_ENTER;
     int64_t currentTime = GetSysClockTime();
     int64_t timeoutTime = INPUT_UI_TIMEOUT_TIME - (currentTime - actionTime);
-    auto delayMs = []() -> int64_t {
+    auto delayMs = [=]() -> int64_t {
         if (timeoutTime < MIN_MARK_PROCESS_DELAY_TIME) {
             return 0;
         } else if (timeoutTime >= MAX_MARK_PROCESS_DELAY_TIME) {

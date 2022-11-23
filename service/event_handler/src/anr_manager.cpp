@@ -43,14 +43,14 @@ void ANRManager::Init(UDSServer &udsServer)
     udsServer_->AddSessionDeletedCallback(std::bind(&ANRManager::OnSessionLost, this, std::placeholders::_1));
 }
 
-int32_t ANRManager::MarkProcessed(int32_t pid, const std::vector<int32_t> &ids)
+int32_t ANRManager::MarkProcessed(int32_t pid, std::vector<int32_t> eventIds)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("pid:%{public}d, eventType:%{public}d, eventId:%{public}d", pid, eventType, eventId);
     SessionPtr sess = udsServer_->GetSessionByPid(pid);
     CHKPR(sess, RET_ERR);
-    for (int32_t eventType = 0; eventType < ids.size(); ++eventType) {
-        int32_t eventId = ids[eventType];
+    for (int32_t eventType = 0; eventType < eventIds.size(); ++eventType) {
+        int32_t eventId = eventIds[eventType];
+        MMI_HILOGD("pid:%{public}d, eventType:%{public}d, eventId:%{public}d", pid, eventType, eventId);
         if (eventId == INVALID_OR_PROCESSED_ID) {
             continue;
         }

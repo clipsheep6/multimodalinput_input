@@ -141,7 +141,7 @@ int32_t MultimodalInputConnectProxy::IsPointerVisible(bool &visible)
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::MarkProcessed(std::array<ANREvent, ANR_EVENT_TYPE_BUTT> &anrEvents)
+int32_t MultimodalInputConnectProxy::MarkProcessed(std::vector<int32_t> eventIds)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -149,10 +149,9 @@ int32_t MultimodalInputConnectProxy::MarkProcessed(std::array<ANREvent, ANR_EVEN
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    WRITEINT32(data, int32_t(anrEvents.size()), ERR_INVALID_VALUE);
-    for (size_t i = 0; i < anrEvents.size(); ++i) {
-        WRITEINT32(data, i, ERR_INVALID_VALUE);
-        WRITEINT32(data, anrEvents[i].lastEventId, ERR_INVALID_VALUE);
+    WRITEINT32(data, int32_t(eventIds.size()), ERR_INVALID_VALUE);
+    for (size_t i = 0; i < eventIds.size(); ++i) {
+        WRITEINT32(data, eventIds[i], ERR_INVALID_VALUE);
     }
     
     MessageParcel reply;

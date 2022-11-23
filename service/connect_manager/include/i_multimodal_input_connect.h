@@ -76,7 +76,7 @@ public:
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) = 0;
     virtual int32_t SetPointerVisible(bool visible) = 0;
     virtual int32_t IsPointerVisible(bool &visible) = 0;
-    virtual int32_t MarkProcessed(int32_t eventType, int32_t eventId) = 0;
+    virtual int32_t MarkProcessed(std::vector<int32_t> eventIds) = 0;
     virtual int32_t SetPointerSpeed(int32_t speed) = 0;
     virtual int32_t GetPointerSpeed(int32_t &speed) = 0;
     virtual int32_t SetPointerStyle(int32_t windowId, int32_t pointerStyle) = 0;
