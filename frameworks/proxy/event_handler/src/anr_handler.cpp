@@ -47,8 +47,9 @@ void ANRHandler::UpdateLastEventId(int32_t eventType, int32_t eventId, uint64_t 
     bool isExistTask = isExistTask_;
     anrMtx_.unlock();
 
+    MMI_HILOGE("Event type:%{public}d, id %{public}d", eventType, eventId);
+
     if (isExistTask) {
-        MMI_HILOGE("Event type:%{public}d, id %{public}d", eventType, eventId);
         return;
     }
     AddMarkProcessedTask(actionTime);
@@ -62,7 +63,6 @@ void ANRHandler::MarkProcessedTask()
     toReportIds.reserve(ANR_EVENT_TYPE_BUTT);
     toReportIds.push_back(GetLastReportId(ANR_EVENT_TYPE_DISPATCH));
     toReportIds.push_back(GetLastReportId(ANR_EVENT_TYPE_MONITOR));
-    UpdateLastReportIds(toReportIds);
     isExistTask_ = false;
     anrMtx_.unlock();
     int32_t ret = MultimodalInputConnMgr->MarkProcessed(toReportIds);
@@ -70,21 +70,6 @@ void ANRHandler::MarkProcessedTask()
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }
     // TODO: RETRY
-}
-
-void ANRHandler::UpdateLastReportIds(const std::vector<int32_t> &ids)
-{
-    if (ids.size() != ANR_EVENT_TYPE_BUTT) {
-        MMI_HILOGF("Not expect size");
-        return;
-    }
-    for (size_t i = 0; i < ANR_EVENT_TYPE_BUTT; ++i) {
-        auto id = ids[i];
-        if (id == INVALID_OR_PROCESSED_ID) {
-            continue;
-        }
-        eventInfos_[i].lastReportId = id;
-    }
 }
 
 int32_t ANRHandler::GetLastReportId(int32_t eventType)
@@ -95,6 +80,7 @@ int32_t ANRHandler::GetLastReportId(int32_t eventType)
             eventType, eventInfos_[eventType].lastEventId, eventInfos_[eventType].lastReportId);
         return INVALID_OR_PROCESSED_ID;
     }
+    eventInfos_[eventType].lastEventId = eventInfos_[eventType].lastEventId;
     return eventInfos_[eventType].lastEventId;
 }
 

@@ -197,8 +197,11 @@ int32_t MultimodalInputConnectStub::StubMarkProcessed(MessageParcel& data, Messa
     int32_t eventSize;
     READINT32(data, eventSize, IPC_PROXY_DEAD_OBJECT_ERR);
     std::vector<int32_t> eventIds;
-    for (size_t i = 0; i < eventSize; ++i) {
-        READINT32(data, eventIds[i], IPC_PROXY_DEAD_OBJECT_ERR);
+    eventIds.reserve(ANR_EVENT_TYPE_BUTT);
+    for (int32_t i = 0; i < eventSize; ++i) {
+        int32_t eventId;
+        READINT32(data, eventId, IPC_PROXY_DEAD_OBJECT_ERR);
+        eventIds.push_back(eventId);
     }
 
     int32_t ret = MarkProcessed(eventIds);

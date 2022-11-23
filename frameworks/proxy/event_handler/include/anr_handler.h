@@ -33,7 +33,6 @@ public:
 private:
     void AddMarkProcessedTask(int64_t actionTime);
     int32_t GetLastReportId(int32_t eventType);
-    void UpdateLastReportIds(const std::vector<int32_t> &ids);
 private:
     std::mutex anrMtx_;
     struct ANREventInfo {
