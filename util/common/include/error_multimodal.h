@@ -30,16 +30,22 @@ enum {
 };
 
 enum {
+    // 空指针
     INPUT_COMMON_NULLPTR = MODULE_COMMON,
-    INPUT_COMMON_PARAM_ERROR,
-    INPUT_COMMON_INVALID_FD,
-    INPUT_COMMON_VAL_NOT_EXP,
 
+    // 参数错误
+    INPUT_COMMON_PARAM_ERROR,
+    // 非预期值
+    INPUT_COMMON_UNEXPECTED_VALUE,
+    // 无效FD
+    INPUT_COMMON_INVALID_FD,
+
+    // 消息发送失败
     INPUT_MSG_SEND_FAIL = MODULE_MSG,
+    // 消息包读失败
     INPUT_MSG_PACKET_READ_FAIL,
+    // 消息包写失败
     INPUT_MSG_PACKET_WRITE_FAIL,
-    INPUT_MSG_SOCKET_FAIL,
-    INPUT_MSG_SOCKET_PAIR_FAIL,
 
     // 事件注册失败
     INPUT_REG_EVENT_FAIL = MODULE_EVENT,
@@ -74,6 +80,7 @@ enum {
     // 键盘事件封装失败
     INPUT_KEY_EVENT_PKG_FAIL,
 
+    // 业务错误码最大值
     INPUT_ERROR_CODE_END
 };
 
