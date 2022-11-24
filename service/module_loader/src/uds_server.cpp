@@ -208,8 +208,6 @@ void UDSServer::ReleaseSession(int32_t fd, epoll_event& ev)
     if (secPtr != nullptr) {
         OnDisconnected(secPtr);
         DelSession(fd);
-    } else {
-        DfxHisysevent::OnClientDisconnect(secPtr, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
     }
     if (ev.data.ptr) {
         free(ev.data.ptr);
@@ -218,10 +216,8 @@ void UDSServer::ReleaseSession(int32_t fd, epoll_event& ev)
     if (auto it = circleBufMap_.find(fd); it != circleBufMap_.end()) {
         circleBufMap_.erase(it);
     }
-    if (close(fd) == RET_OK) {
-        DfxHisysevent::OnClientDisconnect(secPtr, fd, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
-    } else {
-        DfxHisysevent::OnClientDisconnect(secPtr, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+    if (close(fd) != RET_OK) {
+        MMI_HILOGE("Close fd:%{public}d failed", fd);
     }
 }
 
