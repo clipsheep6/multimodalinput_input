@@ -583,6 +583,10 @@ int32_t MMIService::OnGetDevice(int32_t pid, int32_t userData, int32_t deviceId)
     auto sess = GetSession(GetClientFd(pid));
     CHKPR(sess, RET_ERR);
     std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
+    if (InputDevMgr->GetInputDevice(deviceId) == nullptr) {
+        MMI_HILOGE("Input device not found");
+        return COMMON_PARAMETER_ERROR;
+    }
     inputDevice = InputDevMgr->GetInputDevice(deviceId);
     NetPacket pkt(MmiMessageId::INPUT_DEVICE);
     pkt << userData << inputDevice->GetId() << inputDevice->GetName() << inputDevice->GetType()
