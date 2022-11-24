@@ -37,10 +37,10 @@ void DfxHisysevent::OnDeviceConnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::Eve
     std::string name = "";
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::FAULT) {
         message = "The input_device connection failed for already existing";
-        name = "INPUT_DEV_CONNECTION_FAILURE";
+        name = "INPUT_DEV_STATUS_FAILURE";
     } else {
         message = "The input_device connection succeed";
-        name = "INPUT_DEV_CONNECTION_SUCCESS";
+        name = "INPUT_DEV_STATUS_SUCCESS";
     }
     if (id == INT32_MAX) {
         int32_t ret = OHOS::HiviewDFX::HiSysEvent::Write(
@@ -72,7 +72,7 @@ void DfxHisysevent::OnDeviceDisconnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::
     if (id == INVALID_DEVICE_ID) {
         int32_t ret = OHOS::HiviewDFX::HiSysEvent::Write(
             OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-            "INPUT_DEV_DISCONNECTION_FAILURE",
+            "INPUT_DEV_STATUS_FAILURE",
             type,
             "MSG", "The input device failed to disconnect to server");
         if (ret != 0) {
@@ -83,7 +83,7 @@ void DfxHisysevent::OnDeviceDisconnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::
         CHKPV(dev);
         int32_t ret = OHOS::HiviewDFX::HiSysEvent::Write(
             OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-            "INPUT_DEV_DISCONNECTION_SUCCESS",
+            "INPUT_DEV_STATUS_SUCCESS",
             type,
             "DEVICE_Id", id,
             "DEVICE_PHYS", dev->GetPhys(),
@@ -92,79 +92,6 @@ void DfxHisysevent::OnDeviceDisconnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::
             "MSG", "The input device successfully disconnect to server");
         if (ret != 0) {
             MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
-        }
-    }
-}
-
-void DfxHisysevent::OnClientConnect(const ClientConnectData &data, OHOS::HiviewDFX::HiSysEvent::EventType type)
-{
-    if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
-        int32_t ret = OHOS::HiviewDFX::HiSysEvent::Write(
-            OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-            "CLIENT_CONNECTION_SUCCESS",
-            type,
-            "PID", data.pid,
-            "UID", data.uid,
-            "MODULE_TYPE", data.moduleType,
-            "SERVER_FD", data.serverFd,
-            "PROGRAMNAME", data.programName,
-            "MSG", "The client successfully connected to the server");
-        if (ret != 0) {
-            MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
-        }
-    } else {
-        int32_t ret = OHOS::HiviewDFX::HiSysEvent::Write(
-            OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-            "CLIENT_CONNECTION_FAILURE",
-            type,
-            "PID", data.pid,
-            "UID", data.uid,
-            "MODULE_TYPE", data.moduleType,
-            "PROGRAMNAME", data.programName,
-            "MSG", "The client failed to connect to the server");
-        if (ret != 0) {
-            MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
-        }
-    }
-}
-
-void DfxHisysevent::OnClientDisconnect(const SessionPtr& secPtr, int32_t fd,
-    OHOS::HiviewDFX::HiSysEvent::EventType type)
-{
-    CHKPV(secPtr);
-    if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
-        int32_t ret = OHOS::HiviewDFX::HiSysEvent::Write(
-            OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-            "CLIENT_DISCONNECTION_SUCCESS",
-            type,
-            "PID", secPtr->GetPid(),
-            "UID", secPtr->GetUid(),
-            "MODULE_TYPE", secPtr->GetModuleType(),
-            "FD", fd,
-            "PROGRAMNAME", secPtr->GetProgramName(),
-            "MSG", "The client successfully disconnected to the server");
-        if (ret != 0) {
-            MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
-        }
-    } else {
-        if (secPtr == nullptr) {
-            int32_t ret = OHOS::HiviewDFX::HiSysEvent::Write(
-                OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-                "CLIENT_DISCONNECTION_FAILURE",
-                type,
-                "MSG", "The client failed to disconnect to the server because secPtr is nullptr");
-            if (ret != 0) {
-                MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
-            }
-        } else {
-            int32_t ret = OHOS::HiviewDFX::HiSysEvent::Write(
-                OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-                "CLIENT_DISCONNECTION_FAILURE",
-                type,
-                "MSG", "The client failed to disconnect to the server because close(fd) return error");
-            if (ret != 0) {
-                MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
-            }
         }
     }
 }
@@ -240,40 +167,6 @@ void DfxHisysevent::OnUpdateTargetKey(std::shared_ptr<KeyEvent> key, int32_t fd,
         if (ret != 0) {
             MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
         }
-    }
-}
-
-void DfxHisysevent::OnFocusWindowChanged(int32_t oldFocusWindowId, int32_t newFocusWindowId,
-    int32_t oldFocusWindowPid, int32_t newFocusWindowPid)
-{
-    int32_t ret = OHOS::HiviewDFX::HiSysEvent::Write(
-        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-        "FOCUS_WINDOW_CHANGE",
-        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
-        "OLD_FOCUS_WINDOWID", oldFocusWindowId,
-        "NEW_FOCUS_WINDOWID", newFocusWindowId,
-        "OLD_FOCUS_WINDOWPID", oldFocusWindowPid,
-        "NEW_FOCUS_WINDOWPID", newFocusWindowPid,
-        "MSG", "The focusWindowId changing succeeded");
-    if (ret != 0) {
-        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
-    }
-}
-
-void DfxHisysevent::OnZorderWindowChanged(int32_t oldZorderFirstWindowId, int32_t newZorderFirstWindowId,
-    int32_t oldZorderFirstWindowPid, int32_t newZorderFirstWindowPid)
-{
-    int32_t ret = OHOS::HiviewDFX::HiSysEvent::Write(
-        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-        "Z_ORDER_WINDOW_CHANGE",
-        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
-        "OLD_ZORDER_FIRST_WINDOWID", oldZorderFirstWindowId,
-        "NEW_ZORDER_FIRST_WINDOWID", newZorderFirstWindowId,
-        "OLD_ZORDER_FIRST_WINDOWPID", oldZorderFirstWindowPid,
-        "NEW_ZORDER_FIRST_WINDOWPID", newZorderFirstWindowPid,
-        "MSG", "The ZorderFirstWindow changing succeeded");
-    if (ret != 0) {
-        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
     }
 }
 
