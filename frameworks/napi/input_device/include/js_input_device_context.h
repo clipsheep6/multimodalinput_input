@@ -25,7 +25,7 @@ public:
     JsInputDeviceContext();
     DISALLOW_COPY_AND_MOVE(JsInputDeviceContext);
     ~JsInputDeviceContext();
-    static napi_value Export(napi_env env, napi_value exports);
+    static napi_value Init(napi_env env, napi_value exports);
     static napi_value On(napi_env env, napi_callback_info info);
     static napi_value Off(napi_env env, napi_callback_info info);
     static napi_value GetDeviceIds(napi_env env, napi_callback_info info);
@@ -42,9 +42,9 @@ private:
     static napi_value JsConstructor(napi_env env, napi_callback_info info);
     static napi_value EnumClassConstructor(napi_env env, napi_callback_info info);
     static napi_value CreateEnumKeyboardType(napi_env env, napi_value exports);
+    static napi_value GetParamKeyCodes(napi_env env, napi_value argv, std::vector<int32_t> &keyCodes);
     std::shared_ptr<JsInputDeviceManager> mgr_ { nullptr };
     napi_ref contextRef_ { nullptr };
-    std::mutex mtx_;
 };
 } // namespace MMI
 } // namespace OHOS

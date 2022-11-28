@@ -186,16 +186,6 @@ bool JsUtil::GetDeviceSourceType(const std::unique_ptr<CallbackInfo> &cb, napi_v
     return true;
 }
 
-bool JsUtil::TypeOf(napi_env env, napi_value value, napi_valuetype type)
-{
-    napi_valuetype valueType = napi_undefined;
-    CHKRF(napi_typeof(env, value, &valueType), TYPEOF);
-    if (valueType != type) {
-        return false;
-    }
-    return true;
-}
-
 void JsUtil::DeleteCallbackInfo(std::unique_ptr<CallbackInfo> callback)
 {
     CALL_DEBUG_ENTER;

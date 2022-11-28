@@ -19,10 +19,7 @@ config("inputdevice_config") {
   include_dirs = [
     "//foundation/multimodalinput/input/frameworks/napi/input_device/include",
     "//foundation/multimodalinput/input/util/common/include",
-    "//foundation/multimodalinput/input/util/network/include",
-    "//commonlibrary/c_utils/base/include",
     "//foundation/multimodalinput/input/frameworks/proxy/event_handler/include",
-    "//foundation/multimodalinput/input/frameworks/proxy/module_loader/include",
   ]
 }
 

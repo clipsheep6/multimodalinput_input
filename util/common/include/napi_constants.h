@@ -72,6 +72,12 @@ inline constexpr int32_t ANR_MONITOR = 1;
 inline constexpr uint32_t EVDEV_UDEV_TAG_KEYBOARD = (1 << 1);
 inline constexpr uint32_t EVDEV_UDEV_TAG_MOUSE = (1 << 2);
 inline constexpr uint32_t EVDEV_UDEV_TAG_TOUCHPAD = (1 << 3);
+
+inline constexpr size_t NAPI_ARGC_ZERO = 0;
+inline constexpr size_t NAPI_ARGC_ONE = 1;
+inline constexpr size_t NAPI_ARGC_TWO = 2;
+inline constexpr size_t NAPI_ARGC_THREE = 3;
+inline constexpr size_t NAPI_ARGC_FOUR = 4;
 } // namespace MMI
 } // namespace OHOS
 #endif // NAPI_CONSTANTS_H
