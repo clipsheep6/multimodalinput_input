@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,23 +13,25 @@
  * limitations under the License.
  */
 
-#include "virtual_keyboard.h"
+#ifndef EVENT_QUEUE
+#define EVENT_QUEUE
 
-#include "linux/input-event-codes.h"
+#include <memory>
+#include <map>
+#include "i_event_queue.h"
 
 namespace OHOS {
 namespace MMI {
-VirtualKeyboard::VirtualKeyboard() : VirtualDevice("VSoC keyboard", 0x6008) {}
-
-const std::vector<uint32_t>& VirtualKeyboard::GetEventTypes() const
-{
-    static const std::vector<uint32_t> evtTypes {EV_KEY};
-    return evtTypes;
-}
-const std::vector<uint32_t>& VirtualKeyboard::GetKeys() const
-{
-    static const std::vector<uint32_t> keys {KEY_BACK};
-    return keys;
-}
+class EventQueue : public IEventQueue {
+public:
+    EventQueue(int32_t devIndex);
+    virtual ~EventQueue();
+    DISALLOW_COPY_AND_MOVE(EventQueue);
+    virtual int32_t RegisterEventHandler(std::function<void(int32_t, void *, size_t)>) override;
+    virtual void UnregisterEventHandler(int32_t handlerId) override;
+    virtual int32_t SendEvent(EventData event) override;
+    virtual int32_t SetDefaultHandler(std::function<void(int32_t, void *, size_t)>) override;
+};
 } // namespace MMI
 } // namespace OHOS
+#endif // EVENT_QUEUE

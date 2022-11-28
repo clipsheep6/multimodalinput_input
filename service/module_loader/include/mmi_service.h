@@ -25,9 +25,14 @@
 #include "system_ability.h"
 
 #include "delegate_tasks.h"
+#ifdef OHOS_BUILD_HDF
+#include "hdf_adapter.h"
+#include "i_input_context.h"
+#endif // OHOS_BUILD_HDF
+#include "input_device_manager.h"
 #include "input_event_handler.h"
-#include "multimodal_input_connect_stub.h"
 #include "libinput_adapter.h"
+#include "multimodal_input_connect_stub.h"
 #include "server_msg_handler.h"
 #include "uds_server.h"
 
@@ -35,7 +40,8 @@ namespace OHOS {
 namespace MMI {
 
 enum class ServiceRunningState {STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
-class MMIService final : public UDSServer, public SystemAbility, public MultimodalInputConnectStub {
+class MMIService final : public UDSServer, public IInputContext, public SystemAbility, public MultimodalInputConnectStub,
+    public std::enable_shared_from_this<MMIService> {
     DECLARE_DELAYED_SINGLETON(MMIService);
     DECLARE_SYSTEM_ABILITY(MMIService);
     DISALLOW_COPY_AND_MOVE(MMIService);
@@ -44,6 +50,12 @@ public:
     void OnStart() override;
     void OnStop() override;
     int32_t Dump(int32_t fd, const std::vector<std::u16string> &args) override;
+#ifdef OHOS_BUILD_HDF
+    virtual std::shared_ptr<IInputDeviceManager> GetInputDeviceManager() override { return InputDevMgr; }
+    virtual std::shared_ptr<IEventQueueManager> GetEventQueueManager() override { return nullptr; }
+    virtual std::shared_ptr<IEventHandlerManager> GetEventHandlerManager() override { return nullptr; }
+    virtual std::shared_ptr<IInputProviderManager> GetInputProviderManager() override { return inputProviderMgr_; }
+#endif // OHOS_BUILD_HDF
     int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &toReturnClientFd, int32_t &tokenType) override;
     int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
@@ -122,6 +134,9 @@ protected:
     int32_t OnGetInputDeviceCooperateState(int32_t pid, int32_t userData, const std::string &deviceId);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     bool InitLibinputService();
+#ifdef OHOS_BUILD_HDF
+    bool InitHDFService();
+#endif // OHOS_BUILD_HDF
     bool InitService();
     bool InitSignalHandler();
     bool InitDelegateTasks();
@@ -141,8 +156,11 @@ private:
 #ifdef OHOS_RSS_CLIENT
     std::atomic<uint64_t> tid_ = 0;
 #endif
-
     LibinputAdapter libinputAdapter_;
+#ifdef OHOS_BUILD_HDF
+    std::shared_ptr<IInputProvider> hdfProvider_;
+    std::shared_ptr<IInputProviderManager> inputProviderMgr_;
+#endif // OHOS_BUILD_HDF
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;
 

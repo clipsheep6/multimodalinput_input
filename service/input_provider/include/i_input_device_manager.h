@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,26 +13,22 @@
  * limitations under the License.
  */
 
-#ifndef VIRTUAL_KEYBOARD_H
-#define VIRTUAL_KEYBOARD_H
+#ifndef I_INPUT_DEVICE_MANAGER
+#define I_INPUT_DEVICE_MANAGER
 
-#include <cstdint>
-#include "nocopyable.h"
+#include <memory>
 
-#include "virtual_device.h"
+#include "i_input_device.h"
 
 namespace OHOS {
 namespace MMI {
-class VirtualKeyboard : public VirtualDevice {
+class IInputDeviceManager {
 public:
-    VirtualKeyboard();
-    DISALLOW_COPY_AND_MOVE(VirtualKeyboard);
-    ~VirtualKeyboard() = default;
-protected:
-    const std::vector<uint32_t> &GetEventTypes() const override;
+    virtual std::shared_ptr<IInputDevice> AddInputDevice(std::function<IInputDevice(int)>) = 0;
+    virtual std::shared_ptr<IInputDevice> RemoveInputDevice(std::function<IInputDevice(int)>) = 0;
+    virtual std::shared_ptr<IInputDevice> GetInputDevice(std::function<IInputDevice(int)>) = 0;
 
-    const std::vector<uint32_t> &GetKeys() const override;
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // VIRTUAL_KEYBOARD_H
+#endif // I_INPUT_DEVICE_MANAGER

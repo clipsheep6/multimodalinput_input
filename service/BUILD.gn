@@ -26,6 +26,8 @@ ohos_prebuilt_etc("mmi_device_config.ini") {
 config("libmmi_server_config") {
   include_dirs = [
     "input_device_cooperate/include",
+    "input_transformation/include",
+    "input_provider/include",
     "device_manager/include",
     "device_scalability/include",
     "delegate_task/include",
@@ -48,7 +50,6 @@ config("libmmi_server_config") {
     "${mmi_service_path}/connect_manager/include",
     "${mmi_service_path}/filter/include",
     "${mmi_service_path}/module_loader/include",
-    "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "mouse_event_normalize/include",
     "//foundation/multimodalinput/interfaces/native/innerkits/event/include",
@@ -78,6 +79,14 @@ config("libmmi_server_config") {
       "//foundation/deviceprofile/device_profile_core/interfaces/innerkits/core/include",
       "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include",
     ]
+  }
+
+  if (input_feature_libinput) {
+    defines += [ "OHOS_BUILD_LIBINPUT" ]
+  }
+
+  if (input_feature_hdf) {
+    defines += [ "OHOS_BUILD_HDF" ]
   }
 }
 
@@ -120,6 +129,18 @@ ohos_shared_library("libmmi-server") {
     ]
   }
 
+  if (input_feature_hdf) {
+    sources += [
+        "input_transformation/src/abs_event_collector.cpp",
+        "input_transformation/src/abs_event.cpp",
+        "input_transformation/src/device.cpp",
+        "input_transformation/src/instance_creator.cpp",
+        "input_transformation/src/kernel_event_handler_bridge.cpp",
+        "input_transformation/src/touch_screen_handler.cpp",
+        "input_provider/src/hdf_input_provider.cpp",
+        "input_provider/src/input_provider_manager.cpp",
+      ]
+  }
   if (input_feature_keyboard) {
     sources += [
       "key_event_normalize/src/key_event_normalize.cpp",
@@ -178,6 +199,9 @@ ohos_shared_library("libmmi-server") {
     "//foundation/multimodalinput/input/util:libmmi-util",
     "//third_party/cJSON:cjson_static",
   ]
+  if (input_feature_hdf) {
+    deps += [ "hdf_adapter:mmi_service_hdf_adapter" ]
+  }
 
   if (resource_schedule_service_enabled) {
     deps += [ "//foundation/resourceschedule/resource_schedule_service/ressched/interfaces/innerkits/ressched_client:ressched_client" ]
@@ -217,6 +241,10 @@ ohos_shared_library("libmmi-server") {
     external_deps += [ "window_manager:libwm" ]
   }
 
+  if (input_feature_hdf) {
+    external_deps += [ "drivers_interface_input:hdi_input" ]
+  }
+
   part_name = "input"
   subsystem_name = "multimodalinput"
 }
@@ -242,7 +270,6 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/frameworks/proxy/module_loader",
     "${mmi_path}/frameworks/proxy/module_loader/include",
     "${mmi_path}/interfaces/native/innerkits/common/include",
-    "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "${mmi_path}/service/include",
     "${mmi_path}/service/device_manager/include",
@@ -256,8 +283,11 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/uinput",
-    "$root_out_dir/diff_libinput_mmi/export_include",
   ]
+
+  if (input_feature_libinput) {
+    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
+  }
 
   sources = [
     "event_dispatch/test/event_dispatch_test.cpp",
@@ -267,16 +297,27 @@ ohos_unittest("ut-mmi-service-out") {
 
   defines = input_default_defines
 
+  if (input_feature_libinput) {
+    defines += [ "OHOS_BUILD_LIBINPUT" ]
+  }
+
+  if (input_feature_hdf) {
+    defines += [ "OHOS_BUILD_HDF" ]
+  }
+
   configs = [ ":libmmi_server_config" ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
-    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
+
+  if (input_feature_libinput) {
+    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
+  }
 
   external_deps = [
     "c_utils:utils",
