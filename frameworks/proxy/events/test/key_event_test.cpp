@@ -20,7 +20,6 @@
 #include "input_manager.h"
 #include "key_event.h"
 #include "proto.h"
-#include "run_shell_util.h"
 
 namespace OHOS {
 namespace MMI {
@@ -36,8 +35,8 @@ public:
 };
 
 /**
- * @tc.name:KeyEventTest_OnCheckKeyEvent_001
- * @tc.desc:Verify key event
+ * @tc.name: KeyEventTest_OnCheckKeyEvent_001
+ * @tc.desc: Verify key event
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -59,8 +58,8 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_001, TestSize.Level1)
 }
 
 /**
- * @tc.name:KeyEventTest_OnCheckKeyEvent_002
- * @tc.desc:Verify key event
+ * @tc.name: KeyEventTest_OnCheckKeyEvent_002
+ * @tc.desc: Verify key event
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -88,8 +87,8 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_002, TestSize.Level1)
 }
 
 /**
- * @tc.name:KeyEventTest_OnCheckKeyEvent_003
- * @tc.desc:Verify key event
+ * @tc.name: KeyEventTest_OnCheckKeyEvent_003
+ * @tc.desc: Verify key event
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -120,8 +119,8 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_003, TestSize.Level1)
 }
 
 /**
- * @tc.name:KeyEventTest_OnCheckKeyEvent_004
- * @tc.desc:Verify key event
+ * @tc.name: KeyEventTest_OnCheckKeyEvent_004
+ * @tc.desc: Verify key event
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -153,8 +152,8 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_004, TestSize.Level1)
 }
 
 /**
- * @tc.name:KeyEventTest_OnCheckKeyEvent_005
- * @tc.desc:Verify key event
+ * @tc.name: KeyEventTest_OnCheckKeyEvent_005
+ * @tc.desc: Verify key event
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -190,8 +189,8 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_005, TestSize.Level1)
 }
 
 /**
- * @tc.name:KeyEventTest_OnCheckKeyEvent_006
- * @tc.desc:Verify key event
+ * @tc.name: KeyEventTest_OnCheckKeyEvent_006
+ * @tc.desc: Verify key event
  * @tc.type: FUNC
  * @tc.require: I5QSN3
  */
@@ -216,6 +215,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_006, TestSize.Level1)
     item.SetKeyCode(KeyEvent::KEYCODE_BACK);
     item.SetDownTime(100);
     item.SetPressed(true);
+    item.SetUnicode(0);
     keyEvent->AddKeyItem(item);
     ASSERT_TRUE(keyEvent->IsValid());
     std::vector<KeyEvent::KeyItem> items = keyEvent->GetKeyItems();
