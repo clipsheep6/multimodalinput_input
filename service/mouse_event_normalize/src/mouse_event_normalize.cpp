@@ -247,13 +247,13 @@ int32_t MouseEventNormalize::HandleAxisInner(struct libinput_event_pointer* data
     return RET_OK;
 }
 
-void MouseEventNormalize::HandlePostInner(struct libinput_event_pointer* data, int32_t deviceId,
-    PointerEvent::PointerItem &pointerItem)
+void MouseEventNormalize::HandlePostInner(struct libinput_event_pointer* data, int32_t deviceId)
 {
     CALL_DEBUG_ENTER;
     CHKPV(data);
     auto mouseInfo = WinMgr->GetMouseInfo();
     MouseState->SetMouseCoords(mouseInfo.physicalX, mouseInfo.physicalY);
+    PointerEvent::PointerItem pointerItem;
     pointerItem.SetDisplayX(mouseInfo.physicalX);
     pointerItem.SetDisplayY(mouseInfo.physicalY);
     pointerItem.SetWindowX(0);
@@ -313,8 +313,7 @@ int32_t MouseEventNormalize::Normalize(struct libinput_event *event)
         }
     }
     int32_t deviceId = InputDevMgr->FindInputDeviceId(libinput_event_get_device(event));
-    PointerEvent::PointerItem pointerItem;
-    HandlePostInner(data, deviceId, pointerItem);
+    HandlePostInner(data, deviceId);
     WinMgr->UpdateTargetPointer(pointerEvent_);
     DumpInner();
     return result;

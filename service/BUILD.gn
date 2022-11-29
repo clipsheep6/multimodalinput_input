@@ -51,7 +51,6 @@ config("libmmi_server_config") {
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "mouse_event_normalize/include",
-    "//foundation/multimodalinput/interfaces/native/innerkits/event/include",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/include",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/src",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",

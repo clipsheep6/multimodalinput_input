@@ -92,13 +92,6 @@ public:
 
 public:
     /**
-     * Copy constructor function for InputEvent
-     *
-     * @since 9
-     */
-    InputEvent(const InputEvent& other);
-
-    /**
      * Virtual destructor of InputEvent
      *
      * @since 9
@@ -334,18 +327,25 @@ protected:
      * @since 9
      */
     explicit InputEvent(int32_t eventType);
+    
+    /**
+     * Copy constructor function for InputEvent
+     *
+     * @since 9
+     */
+    InputEvent(const InputEvent& other);
 
 private:
-    int32_t eventType_;
-    int32_t id_;
-    int64_t actionTime_;
-    int32_t action_;
-    int64_t actionStartTime_;
-    int32_t deviceId_;
-    int32_t targetDisplayId_;
-    int32_t targetWindowId_;
-    int32_t agentWindowId_;
-    uint32_t bitwise_;
+    int32_t eventType_ { EVENT_TYPE_BASE };
+    int32_t id_ { -1 };
+    int64_t actionTime_ { 0 };
+    int32_t action_ { ACTION_UNKNOWN };
+    int64_t actionStartTime_ { 0 };
+    int32_t deviceId_ { -1 };
+    int32_t targetDisplayId_ { -1 };
+    int32_t targetWindowId_ { -1 };
+    int32_t agentWindowId_ { -1 };
+    uint32_t bitwise_ { EVENT_FLAG_NONE };
     std::function<void(int32_t)> processedCallback_;
 };
 } // namespace MMI

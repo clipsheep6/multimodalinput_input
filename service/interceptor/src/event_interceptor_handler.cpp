@@ -93,7 +93,7 @@ int32_t EventInterceptorHandler::AddInputHandler(InputHandlerType handlerType,
         return RET_ERR;
     }
     InitSessionLostCallback();
-    SessionHandler interceptor { handlerType, eventType, session };
+    SessionHandler interceptor { eventType, session };
     return interceptors_.AddInterceptor(interceptor);
 }
 
@@ -103,10 +103,11 @@ void EventInterceptorHandler::RemoveInputHandler(InputHandlerType handlerType,
     CALL_INFO_TRACE;
     CHKPV(session);
     if (handlerType == InputHandlerType::INTERCEPTOR) {
-        SessionHandler interceptor { handlerType, eventType, session };
+        SessionHandler interceptor { eventType, session };
         interceptors_.RemoveInterceptor(interceptor);
     }
 }
+
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 bool EventInterceptorHandler::OnHandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
@@ -151,39 +152,8 @@ void EventInterceptorHandler::OnSessionLost(SessionPtr session)
     interceptors_.OnSessionLost(session);
 }
 
-void EventInterceptorHandler::SessionHandler::SendToClient(std::shared_ptr<KeyEvent> keyEvent) const
+void EventInterceptorHandler::SessionHandler::SendToClient(NetPacket &pkt) const
 {
-    CHKPV(keyEvent);
-    NetPacket pkt(MmiMessageId::REPORT_KEY_EVENT);
-    pkt << handlerType_;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write key event failed");
-        return;
-    }
-    if (InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt) != RET_OK) {
-        MMI_HILOGE("Packet key event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
-        return;
-    }
-    if (!session_->SendMsg(pkt)) {
-        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
-        return;
-    }
-}
-
-void EventInterceptorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const
-{
-    CHKPV(pointerEvent);
-    NetPacket pkt(MmiMessageId::REPORT_POINTER_EVENT);
-    MMI_HILOGD("Service send to client InputHandlerType:%{public}d", handlerType_);
-    pkt << handlerType_;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write pointer event failed");
-        return;
-    }
-    if (InputEventDataTransformation::Marshalling(pointerEvent, pkt) != RET_OK) {
-        MMI_HILOGE("Marshalling pointer event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
-        return;
-    }
     if (!session_->SendMsg(pkt)) {
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
         return;
@@ -194,17 +164,25 @@ void EventInterceptorHandler::SessionHandler::SendToClient(std::shared_ptr<Point
 bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPF(keyEvent);
-    if (interceptors_.empty()) {
-        MMI_HILOGW("Key interceptors is empty");
-        return false;
-    }
     MMI_HILOGD("There are currently:%{public}zu interceptors", interceptors_.size());
     bool isInterceptor = false;
-    for (const auto &interceptor : interceptors_) {
-        if ((interceptor.eventType_ & HANDLE_EVENT_TYPE_KEY) == HANDLE_EVENT_TYPE_KEY) {
-            interceptor.SendToClient(keyEvent);
-            MMI_HILOGD("Key event was intercepted");
-            isInterceptor = true;
+    if (HasInterceptor(HANDLE_EVENT_TYPE_KEY)) {
+        isInterceptor = true;
+        NetPacket pkt(MmiMessageId::REPORT_KEY_EVENT);
+        pkt << InputHandlerType::INTERCEPTOR;
+        if (pkt.ChkRWError()) {
+            MMI_HILOGE("Packet write key event failed");
+            return isInterceptor;
+        }
+        if (InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt) != RET_OK) {
+            MMI_HILOGE("Packet key event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+            return isInterceptor;
+        }
+        for (const auto &interceptor : interceptors_) {
+            if ((interceptor.eventType_ & HANDLE_EVENT_TYPE_KEY) == HANDLE_EVENT_TYPE_KEY) {
+                interceptor.SendToClient(pkt);
+                MMI_HILOGD("Key event was intercepted");
+            }
         }
     }
     return isInterceptor;
@@ -215,17 +193,25 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
 bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
-    if (interceptors_.empty()) {
-        MMI_HILOGI("Interceptors are empty");
-        return false;
-    }
     MMI_HILOGD("There are currently:%{public}zu interceptors", interceptors_.size());
     bool isInterceptor = false;
-    for (const auto &interceptor : interceptors_) {
-        if ((interceptor.eventType_ & HANDLE_EVENT_TYPE_POINTER) == HANDLE_EVENT_TYPE_POINTER) {
-            interceptor.SendToClient(pointerEvent);
-            MMI_HILOGD("Pointer event was intercepted");
-            isInterceptor = true;
+    if (HasInterceptor(HANDLE_EVENT_TYPE_POINTER)) {
+        isInterceptor = true;
+        NetPacket pkt(MmiMessageId::REPORT_POINTER_EVENT);
+        pkt << InputHandlerType::INTERCEPTOR;
+        if (pkt.ChkRWError()) {
+            MMI_HILOGE("Packet write pointer event failed");
+            return isInterceptor;
+        }
+        if (InputEventDataTransformation::Marshalling(pointerEvent, pkt) != RET_OK) {
+            MMI_HILOGE("Marshalling pointer event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+            return isInterceptor;
+        }
+        for (const auto &interceptor : interceptors_) {
+            if ((interceptor.eventType_ & HANDLE_EVENT_TYPE_POINTER) == HANDLE_EVENT_TYPE_POINTER) {
+                interceptor.SendToClient(pkt);
+                MMI_HILOGD("Pointer event was intercepted");
+            }
         }
     }
     return isInterceptor;
@@ -289,6 +275,16 @@ void EventInterceptorHandler::InterceptorCollection::RemoveInterceptor(const Ses
     MMI_HILOGD("Event type is updated:%{public}u", interceptor.eventType_);
 }
 
+bool EventInterceptorHandler::InterceptorCollection::HasInterceptor(HandleEventType eventType)
+{
+    for (const auto &interceptor : interceptors_) {
+        if ((interceptor.eventType_ & eventType) == eventType) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void EventInterceptorHandler::InterceptorCollection::OnSessionLost(SessionPtr session)
 {
     CALL_INFO_TRACE;
@@ -311,15 +307,13 @@ void EventInterceptorHandler::InterceptorCollection::Dump(int32_t fd, const std:
     CALL_DEBUG_ENTER;
     mprintf(fd, "Interceptor information:\t");
     mprintf(fd, "interceptors: count=%d", interceptors_.size());
-    for (const auto &item : interceptors_) {
-        SessionPtr session = item.session_;
+    for (const auto &interceptor : interceptors_) {
+        SessionPtr session = interceptor.session_;
         CHKPV(session);
         mprintf(fd,
-                "handlerType:%d | eventType:%d | Pid:%d | Uid:%d | Fd:%d "
+                "eventType:%d | Pid:%d | Uid:%d | Fd:%d "
                 "| EarliestEventTime:%" PRId64 " | Descript:%s \t",
-                item.handlerType_, item.eventType_,
-                session->GetPid(), session->GetUid(),
-                session->GetFd(),
+                interceptor.eventType_, session->GetPid(), session->GetUid(), session->GetFd(),
                 session->GetEarliestEventTime(), session->GetDescript().c_str());
     }
 }

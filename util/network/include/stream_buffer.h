@@ -35,8 +35,6 @@ public:
     StreamBuffer() = default;
     DISALLOW_MOVE(StreamBuffer);
     virtual ~StreamBuffer() = default;
-    explicit StreamBuffer(const StreamBuffer &buf);
-    virtual StreamBuffer &operator=(const StreamBuffer &other);
     
     void Reset();
     void Clean();
@@ -78,6 +76,9 @@ public:
     StreamBuffer &operator << (const T &data);
 
 protected:
+    explicit StreamBuffer(const StreamBuffer &buf);
+    virtual StreamBuffer &operator=(const StreamBuffer &other);
+
     bool Clone(const StreamBuffer &buf);
 
 protected:

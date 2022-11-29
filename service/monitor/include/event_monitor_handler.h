@@ -62,16 +62,14 @@ private:
 private:
     class SessionHandler {
     public:
-        SessionHandler(InputHandlerType handlerType, HandleEventType eventType, SessionPtr session)
-            : handlerType_(handlerType), eventType_(eventType & HANDLE_EVENT_TYPE_ALL),
-              session_(session) {}
-        void SendToClient(std::shared_ptr<KeyEvent> keyEvent) const;
-        void SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const;
+        SessionHandler(HandleEventType eventType, SessionPtr session)
+            : eventType_(eventType & HANDLE_EVENT_TYPE_ALL), session_(session) {}
+        void SendToClient(std::shared_ptr<KeyEvent> keyEvent, NetPacket &pkt) const;
+        void SendToClient(std::shared_ptr<PointerEvent> pointerEvent, NetPacket &pkt) const;
         bool operator<(const SessionHandler& other) const
         {
             return (session_ < other.session_);
         }
-        InputHandlerType handlerType_;
         HandleEventType eventType_;
         SessionPtr session_ { nullptr };
     };
@@ -89,20 +87,27 @@ private:
         void MarkConsumed(int32_t eventId, SessionPtr session);
 
         bool HasMonitor(SessionPtr session);
+        bool HasMonitor(HandleEventType eventType);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
         void UpdateConsumptionState(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-        void Monitor(std::shared_ptr<PointerEvent> pointerEvent);
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
         void OnSessionLost(SessionPtr session);
         void Dump(int32_t fd, const std::vector<std::string> &args);
 
-    struct ConsumptionState {
-        std::unordered_set<int32_t> eventIds_;
-        bool isMonitorConsumed_ { false };
-        std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
-    };
+    private:
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+        void Monitor(std::shared_ptr<KeyEvent> KeyEvent);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+        void Monitor(std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+    private:
+        struct ConsumptionState {
+            std::unordered_set<int32_t> eventIds_;
+            bool isMonitorConsumed_ { false };
+            std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
+        };
 
     private:
         std::set<SessionHandler> monitors_;
