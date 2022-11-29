@@ -285,7 +285,7 @@ void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
     }
     (void)status;
     KeyEventMonitorInfoWorker *dataWorker = static_cast<KeyEventMonitorInfoWorker *>(work->data);
-    DeletePtr<uv_work_t*>(work);;
+    DeletePtr<uv_work_t*>(work);
     work = nullptr;
     KeyEventMonitorInfo *event = dataWorker->reportEvent;
     napi_env env = dataWorker->env;
@@ -318,7 +318,7 @@ void EmitAsyncCallbackWork(KeyEventMonitorInfo *reportEvent)
     KeyEventMonitorInfoWorker *dataWorker = new (std::nothrow) KeyEventMonitorInfoWorker();
     if (dataWorker == nullptr) {
         MMI_HILOGE("dataWorker is nullptr");
-        DeletePtr<uv_work_t*>(work);;
+        DeletePtr<uv_work_t*>(work);
         return;
     }
 
@@ -329,7 +329,7 @@ void EmitAsyncCallbackWork(KeyEventMonitorInfo *reportEvent)
     int32_t ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, UvQueueWorkAsyncCallback);
     if (ret != 0) {
         delete dataWorker;
-        DeletePtr<uv_work_t*>(work);;
+        DeletePtr<uv_work_t*>(work);
     }
 }
 } // namespace MMI
