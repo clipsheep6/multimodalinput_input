@@ -21,6 +21,12 @@
 
 namespace OHOS {
 namespace MMI {
+
+static constexpr size_t ARGC_ONE = 1;
+static constexpr size_t ARGC_TWO = 2;
+static constexpr size_t ARGC_THREE = 3;
+static constexpr size_t ARGC_FOUR = 4;
+
 #define CHKRV(state, desc) \
     do { \
         if ((state) != napi_ok) { \
@@ -42,6 +48,14 @@ namespace MMI {
         if ((state) != napi_ok) { \
             MMI_HILOGE("%{public}s failed", std::string(desc).c_str()); \
             return false; \
+        } \
+    } while (0)
+
+#define CHKRR(state, desc, r) \
+    do { \
+        if ((state) != napi_ok) { \
+            MMI_HILOGE("%{public}s failed", std::string(desc).c_str()); \
+            return r; \
         } \
     } while (0)
 
