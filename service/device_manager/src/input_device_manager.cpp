@@ -74,7 +74,6 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
     }
 
     std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
-    CHKPP(inputDevice);
     inputDevice->SetId(iter->first);
     struct libinput_device *inputDeviceOrigin = iter->second.inputDeviceOrigin;
     inputDevice->SetType(static_cast<int32_t>(libinput_device_get_tags(inputDeviceOrigin)));
