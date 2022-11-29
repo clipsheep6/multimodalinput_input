@@ -79,6 +79,7 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
         idx += count;
         remSize -= count;
         if (remSize > 0) {
+            MMI_HILOGW("Remsize:%{public}d", remSize);
             usleep(SEND_RETRY_SLEEP_TIME);
         }
     }
