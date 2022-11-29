@@ -41,14 +41,14 @@ std::shared_ptr<KeyEvent> KeyEventNormalize::GetKeyEvent()
 int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(event, PARAM_INPUT_INVALID);
-    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    CHKPR(event, INPUT_COMMON_NULLPTR);
+    CHKPR(keyEvent, INPUT_COMMON_NULLPTR);
     keyEvent->UpdateId();
     auto data = libinput_event_get_keyboard_event(event);
-    CHKPR(data, ERROR_NULL_POINTER);
+    CHKPR(data, INPUT_COMMON_NULLPTR);
 
     auto device = libinput_event_get_device(event);
-    CHKPR(device, ERROR_NULL_POINTER);
+    CHKPR(device, INPUT_COMMON_NULLPTR);
     int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
     int32_t keyCode = static_cast<int32_t>(libinput_event_keyboard_get_key(data));
     MMI_HILOGD("The linux input keyCode:%{public}d", keyCode);

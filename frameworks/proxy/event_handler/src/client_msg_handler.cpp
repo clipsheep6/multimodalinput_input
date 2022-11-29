@@ -80,7 +80,7 @@ void ClientMsgHandler::Init()
     };
     for (auto &it : funs) {
         if (!RegistrationEvent(it)) {
-            MMI_HILOGW("Failed to register event errCode:%{public}d", EVENT_REG_FAIL);
+            MMI_HILOGW("Failed to register event errCode:%{public}d", INPUT_REG_EVENT_FAIL);
             continue;
         }
     }
@@ -120,7 +120,7 @@ void ClientMsgHandler::OnMsgHandler(const UDSClient& client, NetPacket& pkt)
 int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
 {
     auto key = KeyEvent::Create();
-    CHKPR(key, ERROR_NULL_POINTER);
+    CHKPR(key, INPUT_COMMON_NULLPTR);
     int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(pkt, key);
     if (ret != RET_OK) {
         MMI_HILOGE("Read netPacket failed");
@@ -130,7 +130,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
     pkt >> fd;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read fd failed");
-        return PACKET_READ_FAIL;
+        return INPUT_MSG_PACKET_READ_FAIL;
     }
     MMI_HILOGI("Key event dispatcher of client, Fd:%{public}d", fd);
     EventLogHelper::PrintEventData(key);
@@ -147,7 +147,7 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
 {
     CALL_DEBUG_ENTER;
     auto pointerEvent = PointerEvent::Create();
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    CHKPR(pointerEvent, INPUT_COMMON_NULLPTR);
     if (InputEventDataTransformation::Unmarshalling(pkt, pointerEvent) != ERR_OK) {
         MMI_HILOGE("Failed to deserialize pointer event.");
         return RET_ERR;
@@ -171,7 +171,7 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
 int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, NetPacket &pkt)
 {
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    CHKPR(keyEvent, INPUT_COMMON_NULLPTR);
     int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(pkt, keyEvent);
     if (ret != RET_OK) {
         MMI_HILOGE("Read net packet failed");
@@ -182,7 +182,7 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
     pkt >> fd >> subscribeId;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read fd failed");
-        return PACKET_READ_FAIL;
+        return INPUT_MSG_PACKET_READ_FAIL;
     }
     MMI_HILOGD("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d,"
                "KeyCode:%{public}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64 ","
@@ -260,7 +260,7 @@ int32_t ClientMsgHandler::OnInputKeyboardType(const UDSClient& client, NetPacket
     pkt >> userData >> KeyboardType;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read failed");
-        return PACKET_WRITE_FAIL;
+        return INPUT_MSG_PACKET_READ_FAIL;
     }
     InputDevImpl.OnKeyboardType(userData, KeyboardType);
     return RET_OK;
@@ -292,7 +292,7 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
         return RET_ERR;
     }
     auto keyEvent = KeyEvent::Create();
-    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    CHKPR(keyEvent, INPUT_COMMON_NULLPTR);
     if (InputEventDataTransformation::NetPacketToKeyEvent(pkt, keyEvent) != ERR_OK) {
         MMI_HILOGE("Failed to deserialize key event.");
         return RET_ERR;
@@ -333,7 +333,7 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
     }
     MMI_HILOGD("Client handlerType:%{public}d", handlerType);
     auto pointerEvent = PointerEvent::Create();
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    CHKPR(pointerEvent, INPUT_COMMON_NULLPTR);
     if (InputEventDataTransformation::Unmarshalling(pkt, pointerEvent) != ERR_OK) {
         MMI_HILOGE("Failed to deserialize pointer event");
         return RET_ERR;
@@ -373,7 +373,7 @@ void ClientMsgHandler::OnDispatchEventProcessed(int32_t eventId)
         return;
     }
     if (!client->SendMessage(pkt)) {
-        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+        MMI_HILOGE("Send message failed, errCode:%{public}d", INPUT_MSG_SEND_FAIL);
         return;
     }
 }

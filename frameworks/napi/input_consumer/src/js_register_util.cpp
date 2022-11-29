@@ -121,20 +121,20 @@ napi_value GetPreKeys(const napi_env &env, const napi_value &value, std::set<int
 
 int32_t GetPreSubscribeId(Callbacks &callbacks, KeyEventMonitorInfo *event)
 {
-    CHKPR(event, ERROR_NULL_POINTER);
+    CHKPR(event, INPUT_COMMON_NULLPTR);
     auto it = callbacks.find(event->eventType);
     if (it == callbacks.end() || it->second.empty()) {
         MMI_HILOGE("The callbacks is empty");
         return JS_CALLBACK_EVENT_FAILED;
     }
-    CHKPR(it->second.front(), ERROR_NULL_POINTER);
+    CHKPR(it->second.front(), INPUT_COMMON_NULLPTR);
     return it->second.front()->subscribeId;
 }
 
 int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks, KeyEventMonitorInfo *event)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(event, ERROR_NULL_POINTER);
+    CHKPR(event, INPUT_COMMON_NULLPTR);
     if (callbacks.find(event->eventType) == callbacks.end()) {
         MMI_HILOGD("No callback in %{public}s", event->eventType.c_str());
         callbacks[event->eventType] = {};
@@ -172,7 +172,7 @@ int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks,
     KeyEventMonitorInfo *event, int32_t &subscribeId)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(event, ERROR_NULL_POINTER);
+    CHKPR(event, INPUT_COMMON_NULLPTR);
     if (callbacks.count(event->eventType) <= 0) {
         MMI_HILOGE("Callback doesn't exists");
         return JS_CALLBACK_EVENT_FAILED;

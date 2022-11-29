@@ -66,7 +66,7 @@ bool StreamBuffer::SeekReadPos(int32_t n)
 bool StreamBuffer::Read(std::string &buf)
 {
     if (rPos_ == wPos_) {
-        MMI_HILOGE("Not enough memory to read, errCode:%{public}d", MEM_NOT_ENOUGH);
+        MMI_HILOGE("Not enough memory to read");
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
         return false;
     }
@@ -96,23 +96,23 @@ bool StreamBuffer::Read(char *buf, size_t size)
         return false;
     }
     if (buf == nullptr) {
-        MMI_HILOGE("Invalid input parameter buf=nullptr errCode:%{public}d", ERROR_NULL_POINTER);
+        MMI_HILOGE("Invalid input parameter buf=nullptr");
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
         return false;
     }
     if (size == 0) {
-        MMI_HILOGE("Invalid input parameter size=%{public}zu errCode:%{public}d", size, PARAM_INPUT_INVALID);
+        MMI_HILOGE("Invalid input parameter size=%{public}zu", size);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
         return false;
     }
     if (rPos_ + static_cast<int32_t>(size) > wPos_) {
-        MMI_HILOGE("Memory out of bounds on read... errCode:%{public}d", MEM_OUT_OF_BOUNDS);
+        MMI_HILOGE("Memory out of bounds on read");
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
         return false;
     }
     errno_t ret = memcpy_sp(buf, size, ReadBuf(), size);
     if (ret != EOK) {
-        MMI_HILOGE("Failed to call memcpy_sp. errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
+        MMI_HILOGE("Call memcpy_sp failed");
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
         return false;
     }
@@ -127,24 +127,24 @@ bool StreamBuffer::Write(const char *buf, size_t size)
         return false;
     }
     if (buf == nullptr) {
-        MMI_HILOGE("Invalid input parameter buf=nullptr errCode:%{public}d", ERROR_NULL_POINTER);
+        MMI_HILOGE("Invalid input parameter buf=nullptr");
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_WRITE;
         return false;
     }
     if (size == 0) {
-        MMI_HILOGE("Invalid input parameter size=%{public}zu errCode:%{public}d", size, PARAM_INPUT_INVALID);
+        MMI_HILOGE("Invalid input parameter size=%{public}zu", size);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_WRITE;
         return false;
     }
     if (wPos_ + static_cast<int32_t>(size) > MAX_STREAM_BUF_SIZE) {
-        MMI_HILOGE("The write length exceeds buffer. wIdx:%{public}d size:%{public}zu maxBufSize:%{public}d "
-            "errCode:%{public}d", wPos_, size, MAX_STREAM_BUF_SIZE, MEM_OUT_OF_BOUNDS);
+        MMI_HILOGE("The write length exceeds buffer. wIdx:%{public}d size:%{public}zu maxBufSize:%{public}d",
+            wPos_, size, MAX_STREAM_BUF_SIZE);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_WRITE;
         return false;
     }
     errno_t ret = memcpy_sp(&szBuff_[wPos_], GetAvailableBufSize(), buf, size);
     if (ret != EOK) {
-        MMI_HILOGE("Failed to call memcpy_sp. errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
+        MMI_HILOGE("Call memcpy_sp failed");
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_WRITE;
         return false;
     }
