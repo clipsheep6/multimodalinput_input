@@ -48,7 +48,7 @@ const std::string UNKNOWN_SCREEN_ID = "";
 const char *SPLIT_SYMBOL = "|";
 const std::string DH_ID_PREFIX = "Input_";
 #endif // OHOS_BUILD_ENABLE_COOPERATE
-const std::string INPUT_VIRTUAL_DEVICE_NAME = "DistributedInput ";
+const std::string INPUT_VIRTUAL_DEVICE_NAME = "Hos Distributed Virtual Device ";
 std::unordered_map<int32_t, std::string> axisType {
     {ABS_MT_TOUCH_MAJOR, "TOUCH_MAJOR"},
     {ABS_MT_TOUCH_MINOR, "TOUCH_MINOR"},
@@ -682,24 +682,17 @@ std::string InputDeviceManager::MakeNetworkId(const char *phys) const
 
 std::string InputDeviceManager::Sha256(const std::string &in) const
 {
-    unsigned char out[SHA256_DIGEST_LENGTH * 2 + 1] = {0};
     SHA256_CTX ctx;
     SHA256_Init(&ctx);
-    SHA256_Update(&ctx, in.data(), in.size());
-    SHA256_Final(&out[SHA256_DIGEST_LENGTH], &ctx);
-    // here we translate sha256 hash to hexadecimal. each 8-bit char will be presented by two characters([0-9a-f])
-    constexpr int32_t WIDTH = 4;
-    constexpr unsigned char MASK = 0x0F;
-    const char* hexCode = "0123456789abcdef";
-    constexpr int32_t DOUBLE_TIMES = 2;
-    for (int32_t i = 0; i < SHA256_DIGEST_LENGTH; ++i) {
-        unsigned char value = out[SHA256_DIGEST_LENGTH + i];
-        // uint8_t is 2 digits in hexadecimal.
-        out[i * DOUBLE_TIMES] = hexCode[(value >> WIDTH) & MASK];
-        out[i * DOUBLE_TIMES + 1] = hexCode[value & MASK];
+    SHA256_Update(&ctx, reinterpret_cast<const u_char *>(in.c_str()), in.size());
+    u_char digest[SHA_DIGEST_LENGTH];
+    SHA256_Final(digest, &ctx);
+
+    std::string out;
+    for (size_t i = 0; i < SHA_DIGEST_LENGTH; i++) {
+        out += StringPrintf("%02x", digest[i]);
     }
-    out[SHA256_DIGEST_LENGTH * DOUBLE_TIMES] = 0;
-    return reinterpret_cast<char*>(out);
+    return out;
 }
 
 std::string InputDeviceManager::GenerateDescriptor(struct libinput_device *inputDevice, bool isRemote) const
@@ -722,12 +715,12 @@ std::string InputDeviceManager::GenerateDescriptor(struct libinput_device *input
     uint16_t product = libinput_device_get_id_product(inputDevice);
     std::string rawDescriptor;
     rawDescriptor += StringPrintf(":%04x:%04x:", vendor, product);
-    // add handling for USB devices to not unique kbs that show up twice
+    // add handling for USB devices to not uniqueify kbs that show up twice
     if (uniqueId != nullptr && uniqueId[0] != '\0') {
         rawDescriptor += "uniqueId:" + std::string(uniqueId);
     }
     if (physicalPath != nullptr) {
-        rawDescriptor += "physicalPath:" + std::string(physicalPath);
+        rawDescriptor += "location:" + std::string(physicalPath);
     }
     if (name != nullptr && name[0] != '\0') {
         rawDescriptor += "name:" + regex_replace(name, std::regex(" "), "");
