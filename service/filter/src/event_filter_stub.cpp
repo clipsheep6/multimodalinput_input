@@ -22,7 +22,6 @@
 #include "string_ex.h"
 
 #include "error_multimodal.h"
-#include "event_filter_parcel.h"
 #include "mmi_log.h"
 
 namespace OHOS {
