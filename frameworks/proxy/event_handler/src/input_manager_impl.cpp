@@ -115,7 +115,7 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
         if (ret != RET_OK) {
             MMI_HILOGE("AddInputEventFilter has send to server failed, ret:%{public}d", ret);
             eventFilterService_ = nullptr;
-            return ret;
+            return RET_ERR;
         }
     }
     return RET_OK;
@@ -148,8 +148,8 @@ int32_t InputManagerImpl::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption
     CHK_PID_AND_TID();
     std::lock_guard<std::mutex> guard(mtx_);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    CHKPR(keyOption, ERROR_NULL_POINTER);
-    CHKPR(callback, ERROR_NULL_POINTER);
+    CHKPR(keyOption, RET_ERR);
+    CHKPR(callback, RET_ERR);
     return KeyEventInputSubscribeMgr.SubscribeKeyEvent(keyOption, callback);
 #else
     MMI_HILOGW("Keyboard device does not support");
