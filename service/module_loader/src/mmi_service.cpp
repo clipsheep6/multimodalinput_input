@@ -204,7 +204,7 @@ bool MMIService::InitService()
         MMI_HILOGE("Service running status is not enabled");
         return false;
     }
-    if (EpollCreat(MAX_EVENT_SIZE) < 0) {
+    if (EpollCreate(MAX_EVENT_SIZE) < 0) {
         MMI_HILOGE("Create epoll failed");
         return false;
     }
@@ -253,7 +253,7 @@ int32_t MMIService::Init()
         return POINTER_DRAW_INIT_FAIL;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
-    mmiFd_ = EpollCreat(MAX_EVENT_SIZE);
+    mmiFd_ = EpollCreate(MAX_EVENT_SIZE);
     if (mmiFd_ < 0) {
         MMI_HILOGE("Create epoll failed");
         return EPOLL_CREATE_FAIL;
@@ -605,6 +605,10 @@ int32_t MMIService::OnGetDevice(int32_t pid, int32_t userData, int32_t deviceId)
         << inputDevice->GetBus() << inputDevice->GetProduct() << inputDevice->GetVendor()
         << inputDevice->GetVersion() << inputDevice->GetPhys() << inputDevice->GetUniq()
         << inputDevice->GetAxisInfo().size();
+    for (auto &axis : inputDevice->GetAxisInfo()) {
+        pkt << axis.GetAxisType() << axis.GetMinimum() << axis.GetMaximum()
+            << axis.GetFuzz() << axis.GetFlat() << axis.GetResolution();
+    }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write input device info failed");
         return RET_ERR;
@@ -718,21 +722,22 @@ int32_t MMIService::GetKeyboardType(int32_t userData, int32_t deviceId)
 
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
 int32_t MMIService::CheckAddInput(int32_t pid, InputHandlerType handlerType,
-    HandleEventType eventType)
+    HandleEventType eventType, int32_t priority)
 {
     auto sess = GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
-    return sMsgHandler_.OnAddInputHandler(sess, handlerType, eventType);
+    return sMsgHandler_.OnAddInputHandler(sess, handlerType, eventType, priority);
 }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 
-int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventType eventType)
+int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
+    int32_t priority)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&MMIService::CheckAddInput, this, pid, handlerType, eventType));
+        std::bind(&MMIService::CheckAddInput, this, pid, handlerType, eventType, priority));
     if (ret != RET_OK) {
         MMI_HILOGE("Add input handler failed, ret:%{public}d", ret);
         return RET_ERR;
@@ -742,21 +747,23 @@ int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventTyp
 }
 
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
-int32_t MMIService::CheckRemoveInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType)
+int32_t MMIService::CheckRemoveInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType,
+    int32_t priority)
 {
     auto sess = GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
-    return sMsgHandler_.OnRemoveInputHandler(sess, handlerType, eventType);
+    return sMsgHandler_.OnRemoveInputHandler(sess, handlerType, eventType, priority);
 }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 
-int32_t MMIService::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType)
+int32_t MMIService::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
+    int32_t priority)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&MMIService::CheckRemoveInput, this, pid, handlerType, eventType));
+        std::bind(&MMIService::CheckRemoveInput, this, pid, handlerType, eventType, priority));
     if (ret != RET_OK) {
         MMI_HILOGE("Remove input handler failed, ret:%{public}d", ret);
         return RET_ERR;

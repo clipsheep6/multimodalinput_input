@@ -430,7 +430,7 @@ int32_t DeviceCooperateSoftbusAdapter::SendMsg(int32_t sessionId, const std::str
 {
     CALL_DEBUG_ENTER;
     if (message.size() > MSG_MAX_SIZE) {
-        MMI_HILOGW("error:message.size() > MSG_MAX_SIZE msessage size:%{public}zu", message.size());
+        MMI_HILOGW("error:message.size() > MSG_MAX_SIZE message size:%{public}zu", message.size());
         return RET_ERR;
     }
     return SendBytes(sessionId, message.c_str(), strlen(message.c_str()));
@@ -498,7 +498,7 @@ void DeviceCooperateSoftbusAdapter::OnSessionClosed(int32_t sessionId)
     if (GetSessionSide(sessionId) != 0) {
         channelStatusMap_.erase(deviceId);
     }
-    InputDevCooSM->OnDeviceOffline(deviceId);
+    InputDevCooSM->Reset(deviceId);
 }
 } // namespace MMI
 } // namespace OHOS
