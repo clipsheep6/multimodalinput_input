@@ -115,6 +115,13 @@ void InputDeviceCooperateSM::OnCloseCooperation(const std::string &networkId, bo
     std::lock_guard<std::mutex> guard(mutex_);
     if (!preparedNetworkId_.first.empty() && !preparedNetworkId_.second.empty()) {
         if (networkId == preparedNetworkId_.first || networkId == preparedNetworkId_.second) {
+            if (cooperateState_ != CooperateState::STATE_FREE) {
+                auto  dhids = InputDevMgr->GetCooperateDhids(startDhid_);
+                DistributedAdapter->StopRemoteInput(preparedNetworkId_.first, preparedNetworkId_.second,
+                    dhids, [](bool isSuccess) {
+                    MMI_HILOGI("Failed to stop remote");
+                });
+            }
             DistributedAdapter->UnPrepareRemoteInput(preparedNetworkId_.first, preparedNetworkId_.second,
                 [](bool isSuccess) {});
         }
@@ -543,7 +550,6 @@ bool InputDeviceCooperateSM::InitDeviceManager()
 {
     CALL_DEBUG_ENTER;
     initCallback_ = std::make_shared<DeviceInitCallBack>();
-    CHKPR(initCallback_, false);
     int32_t ret = DisHardware.InitDeviceManager(MMI_DINPUT_PKG_NAME, initCallback_);
     if (ret != 0) {
         MMI_HILOGE("Init device manager failed, ret:%{public}d", ret);
