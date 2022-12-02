@@ -64,6 +64,8 @@ int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_p
             MMI_HILOGE("The preUpKeyItem is null");
         }
     }
+    uint64_t eventTime = libinput_event_keyboard_get_time_usec(data);
+    keyEvent->SetEventTime(eventTime);
     int64_t time = GetSysClockTime();
     keyEvent->SetActionTime(time);
     keyEvent->SetAction(keyAction);

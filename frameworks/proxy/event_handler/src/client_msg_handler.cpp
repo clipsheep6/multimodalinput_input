@@ -280,6 +280,16 @@ int32_t ClientMsgHandler::OnDevListener(const UDSClient& client, NetPacket& pkt)
     return RET_OK;
 }
 
+static uint64_t GetCurrentSysClockTime()
+{
+    struct timespec ts = { 0, 0 };
+    if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
+        MMI_HILOGD("clock_gettime failed:%{public}d", errno);
+        return 0;
+    }
+    return (ts.tv_sec * 1000 * 1000) + (ts.tv_nsec / 1000);
+}
+
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || \
     defined(OHOS_BUILD_ENABLE_MONITOR))
 int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt)
@@ -298,6 +308,9 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
         MMI_HILOGE("Failed to deserialize key event.");
         return RET_ERR;
     }
+    uint64_t libinput_time = keyEvent->GetEventTime();
+    uint64_t client_time = GetCurrentSysClockTime();
+    uint64_t libinputToClientTime = client_time - libinput_time;
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_INTERCEPT_EVENT);
     switch (handlerType) {
         case INTERCEPTOR: {
@@ -317,6 +330,10 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
             break;
         }
     }
+    uint64_t client_time_after_process = GetCurrentSysClockTime();
+    uint64_t process_time = client_time_after_process - client_time;
+    MMI_HILOGD("-------------cost keyevent.  libinput_time:%{public}llu, client_time:%{public}llu, after_process_time:%{public}llu, libinputToClientTime:%{public}llu, process_time:%{public}llu",
+        libinput_time, client_time, client_time_after_process, libinputToClientTime, process_time);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
@@ -340,6 +357,9 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
         MMI_HILOGE("Failed to deserialize pointer event");
         return RET_ERR;
     }
+    uint64_t libinput_time = pointerEvent->GetEventTime();
+    uint64_t client_time = GetCurrentSysClockTime();
+    uint64_t libinputToClientTime = client_time - libinput_time;
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_INTERCEPT_EVENT);
     switch (handlerType) {
         case INTERCEPTOR: {
@@ -359,6 +379,10 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
             break;
         }
     }
+    uint64_t client_time_after_process = GetCurrentSysClockTime();
+    uint64_t process_time = client_time_after_process - client_time;
+    MMI_HILOGD("-------------cost pointerevent.  libinput_time:%{public}llu, client_time:%{public}llu, after_process_time:%{public}llu, libinputToClientTime:%{public}llu, process_time:%{public}llu",
+        libinput_time, client_time, client_time_after_process, libinputToClientTime, process_time);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH

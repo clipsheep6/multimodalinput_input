@@ -327,6 +327,9 @@ public:
      */
     bool ReadFromParcel(Parcel &in);
 
+    uint64_t GetEventTime() const;
+    void SetEventTime(uint64_t eventTime);
+
 protected:
     /**
      * @brief Constructs an input event object by using the specified input event type. Generally, this method
@@ -336,6 +339,7 @@ protected:
     explicit InputEvent(int32_t eventType);
 
 private:
+    uint64_t eventTime_{};
     int32_t eventType_;
     int32_t id_;
     int64_t actionTime_;
