@@ -17,6 +17,8 @@
 
 #include <cstdlib>
 #include <cstdio>
+#include <fstream>
+#include <map>
 
 #include "dfx_hisysevent.h"
 #include "i_pointer_drawing_manager.h"
@@ -35,10 +37,108 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 constexpr int32_t DEFAULT_POINTER_STYLE = 0;
 constexpr size_t MAX_WINDOW_COUNT = 20;
 #endif // OHOS_BUILD_ENABLE_POINTER
+//constexpr int32_t DEVIDENTI_MAX = 200;
 } // namespace
 
 InputWindowsManager::InputWindowsManager() {}
 InputWindowsManager::~InputWindowsManager() {}
+
+/*
+bool InputWindowsManager::DelDeviceIBindInfofile(int32_t deviceId, std::string deviceSysuid)
+{
+   std::ifstream readIdentification;
+    readIdentification.open("/data/inputBindOutput.cfg", std::ios::in);
+    //readIdentification.open("/etc/inputBindOutput.cfg", std::ios::in);
+    if (!readIdentification.is_open()) {
+        MMI_HILOGE("Can not open /data/inputBindOutput.cfg errno = %{public}d reason = %{public}s",
+            errno, strerror(errno));
+        return false;
+    }
+    char identifibuf[DEVIDENTI_MAX] = "";
+    std::string devCfgstr;
+    while (!readIdentification.eof()) {
+        readIdentification.getline(identifibuf, DEVIDENTI_MAX);
+        if ((strlen(identifibuf) == 0)) {
+            continue;
+        }
+        if (strstr(identifibuf, deviceSysuid.c_str()) != nullptr) {
+            MMI_HILOGI("Delete device identification is:%{public}s", identifibuf);
+            continue;
+        }
+        devCfgstr = devCfgstr + identifibuf + "\n";
+    }
+    readIdentification.close();
+    std::ofstream writeIdentification;
+    //writeIdentification.open("/etc/inputBindOutput.cfg", std::ios::trunc);
+    writeIdentification.open("/data/inputBindOutput.cfg", std::ios::trunc);
+    if (!writeIdentification.is_open()) {
+        MMI_HILOGE("Can not open /data/inputBindOutput.cfg errno = %{public}d reason = %{public}s",
+            errno, strerror(errno));
+        return false;
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    if (!(devCfgstr.empty())) {
+        writeIdentification << devCfgstr;
+    }
+    writeIdentification.close();
+    return true;
+}
+
+bool InputWindowsManager::SaveDeviceBindInfofile(int32_t deviceId, std::string deviceSysuid)
+{
+    CALL_DEBUG_ENTER;
+    std::ofstream SaveIdentification;
+    SaveIdentification.open("/data/inputBindOutput.cfg", std::ios::out | std::ios::app);
+    if (!SaveIdentification.is_open()) {
+        MMI_HILOGE("Can not open /data/inputBindOutput.cfg errno = %{public}d reason = %{public}s",
+            errno, strerror(errno));
+        return false;
+    }
+    //SaveDentificationfile = open("/etc/inputBindOutput.cfg", ios::out | ios::app);
+    std::string inputIdentification = std::to_string(deviceId) + " " + deviceSysuid + "\n";
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    SaveIdentification << inputIdentification;
+    MMI_HILOGI("Save device identification is:%{public}s", inputIdentification.c_str());
+    SaveIdentification.close();
+    return true;
+}
+
+void InputWindowsManager::DeviceBindInfoChanged(int32_t deviceId, std::string deviceSysuid)
+{
+    // readFile;
+    // checkinfo if exits;
+
+    // unbindInputDevices_
+    // unbindDisplays_
+    // bool ret = SaveDeviceBindInfofile(deviceId, deviceSysuid);
+    // if (ret) {
+    //     MMI_HILOGI("Save input device bind info success");
+    // }
+    return;
+}
+
+//using inputDeviceCallback = std::function<void(std::string inputdevname, std::string devName, std::string devStatus)>;
+*/
+void InputWindowsManager::DeviceStatusChanged(int32_t deviceId, std::string inputdevname, std::string devStatus)
+{
+    CALL_INFO_TRACE;
+    std::string AddStatus = "add";
+    if (devStatus == AddStatus) {
+        unbindInputDevices_.clear();
+        unbindInputDevices_.insert(std::make_pair(deviceId, inputdevname));
+        for (const auto &item1 : unbindInputDevices_) {
+            MMI_HILOGI("lilong unbindInputDevices_ is: id:%{public}d, name:%{public}s", item1.first, item1.second.c_str());
+        }
+        MMI_HILOGI("lilong Add end unbindInputDevices_.size():%{public}u", unbindInputDevices_.size());
+        //SaveDeviceBindInfofile(inputdevname, deviceSysuid);
+    } else {
+        auto it = unbindInputDevices_.find(deviceId);
+        if (it != unbindInputDevices_.end()) {
+            unbindInputDevices_.erase(it);
+        }
+    }
+    return;
+}
 
 void InputWindowsManager::Init(UDSServer& udsServer)
 {
@@ -48,6 +148,8 @@ void InputWindowsManager::Init(UDSServer& udsServer)
     udsServer_->AddSessionDeletedCallback(std::bind(&InputWindowsManager::OnSessionLost, this, std::placeholders::_1));
     InitMouseDownInfo();
 #endif // OHOS_BUILD_ENABLE_POINTER
+    InputDevMgr->InputStatusChangeCallback(std::bind(&InputWindowsManager::DeviceStatusChanged, this,
+        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -206,6 +308,59 @@ void InputWindowsManager::CheckZorderWindowChange(const DisplayGroupInfo &displa
         oldZorderFirstWindowPid, newZorderFirstWindowPid);
 }
 
+void InputWindowsManager::PrintmapInfo()
+{
+    for (const auto &item1 : unbindInputDevices_) {
+        MMI_HILOGI("lilong unbindInputDevices_ size:%{public}u id:%{public}d, name:%{public}s",
+            unbindInputDevices_.size(), item1.first, item1.second.c_str());
+    }
+    for (const auto &item2 : unbindDisplays_) {
+        MMI_HILOGI("lilong unbindDisplays_ size:%{public}u id:%{public}d, display:%{public}s",
+            unbindDisplays_.size(), item2.first, item2.second.c_str());
+    }
+    for (const auto &item3 : inputDeviceAndDisplays_) {
+        MMI_HILOGI("lilong inputDeviceAndDisplays_ size:%{public}u id:%{public}d, display:%{public}s",
+            inputDeviceAndDisplays_.size(), item3.first, item3.second.c_str());
+    }
+}
+
+bool InputWindowsManager::CheckBindInputDevice()
+{
+    int32_t  unbindInputDevicesId;
+    std::string unbindDisplaysinfo;
+    for (const auto &item1 : unbindDisplays_) {
+        unbindDisplaysinfo = item1.second;
+    }
+    for (const auto &item2 : unbindInputDevices_) {
+        unbindInputDevicesId = item2.first;
+        if ((unbindInputDevicesId > 0) && (!unbindDisplaysinfo.empty())) {
+            if ((item2.second == "VSoC touchscreen")) {
+                inputDeviceAndDisplays_.clear();
+                inputDeviceAndDisplays_.insert(std::make_pair(unbindInputDevicesId, unbindDisplaysinfo));
+                break;
+            }
+        }
+    }
+    PrintmapInfo();
+    if (inputDeviceAndDisplays_.size() == 0) {
+        return false;
+    }
+    return true;
+}
+
+bool InputWindowsManager::SaveDisplayIdAndName() {
+    unbindDisplays_.clear();
+    for (const auto &item : displayGroupInfo_.displaysInfo) {
+        MMI_HILOGI(" lilong displayInfos id:%{public}d name:%{public}s "
+            "uniq:%{public}s ", item.id, item.name.c_str(), item.uniq.c_str());
+        unbindDisplays_.insert(std::make_pair(item.id, item.uniq));
+    }
+    if (unbindDisplays_.size() == 0) {
+        return false;
+    }
+    return true;
+}
+
 void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
 {
     CALL_DEBUG_ENTER;
@@ -213,6 +368,10 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
     CheckZorderWindowChange(displayGroupInfo);
     displayGroupInfo_ = displayGroupInfo;
     PrintDisplayInfo();
+    bool isChange = SaveDisplayIdAndName();
+    if (isChange){
+        CheckBindInputDevice();
+    }
 #ifdef OHOS_BUILD_ENABLE_POINTER
     UpdatePointerStyle();
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -546,10 +705,11 @@ bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, struct libi
     EventTouch& touchInfo, int32_t& physicalDisplayId)
 {
     CHKPF(touch);
-    std::string screenId = InputDevMgr->GetScreenId(deviceId);
-    if (screenId.empty()) {
-        screenId = "default0";
+    auto it = inputDeviceAndDisplays_.find(deviceId);
+    if (it == inputDeviceAndDisplays_.end()) {
+       return false;
     }
+    std::string screenId = it->second;
     auto info = FindPhysicalDisplayInfo(screenId);
     CHKPF(info);
     physicalDisplayId = info->id;

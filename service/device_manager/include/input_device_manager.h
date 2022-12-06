@@ -43,6 +43,7 @@ class InputDeviceManager final : public IDeviceObject {
         bool isPointerDevice { false };
         bool isTouchableDevice { false };
         std::string dhid;
+        std::string sysUid;
     };
 public:
     DISALLOW_COPY_AND_MOVE(InputDeviceManager);
@@ -83,7 +84,13 @@ public:
     bool HasTouchDevice();
     int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
     const std::string& GetScreenId(int32_t deviceId) const;
-
+    using inputDeviceCallback = std::function<void(int32_t deviceId, std::string devName, std::string devStatus)>;
+    //using inputDeviceCallback = std::function<void(std::string inputdevname, std::string devName, std::string devStatus)>;
+    inputDeviceCallback devCallbacks_ = { nullptr };
+    std::map<int32_t, std::string> displayInputBindInfos_;
+    std::string GetInputIdentification(struct libinput_device* inputDevice);
+    void InputStatusChangeCallback(inputDeviceCallback callback);
+    void NotifyDevCallback(int32_t deviceId, struct InputDeviceInfo inDevice);
 private:
     void MakeDeviceInfo(struct libinput_device *inputDevice, struct InputDeviceInfo& info);
     bool IsMatchKeys(struct libinput_device* device, const std::vector<int32_t> &keyCodes) const;

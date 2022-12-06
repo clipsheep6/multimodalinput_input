@@ -15,6 +15,8 @@
 
 #include "input_device_manager.h"
 
+#include <fstream>
+#include <iostream>
 #include <linux/input.h>
 #include <parameters.h>
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
@@ -33,6 +35,7 @@
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include "util.h"
 #endif // OHOS_BUILD_ENABLE_COOPERATE
+#include "display_info.h"
 #include "util_ex.h"
 #include "util_napi_error.h"
 
@@ -42,7 +45,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceManager" };
 constexpr int32_t INVALID_DEVICE_ID = -1;
 constexpr int32_t SUPPORT_KEY = 1;
-
+constexpr int32_t USBDEVIDEINFO_MAX = 10;
 const std::string UNKNOWN_SCREEN_ID = "";
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 const char *SPLIT_SYMBOL = "|";
@@ -249,6 +252,12 @@ int32_t InputDeviceManager::GetKeyboardType(int32_t deviceId, int32_t &keyboardT
     return GetDeviceSupportKey(deviceId, keyboardType);
 }
 
+void InputDeviceManager::InputStatusChangeCallback(inputDeviceCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    devCallbacks_ = callback;
+}
+
 void InputDeviceManager::AddDevListener(SessionPtr sess, std::function<void(int32_t, const std::string&)> callback)
 {
     CALL_DEBUG_ENTER;
@@ -293,6 +302,46 @@ bool InputDeviceManager::HasTouchDevice()
     return false;
 }
 
+std::string InputDeviceManager::GetInputIdentification(struct libinput_device* inputDevice)
+{
+    CALL_DEBUG_ENTER;
+    uint32_t deviceVendor = libinput_device_get_id_vendor(inputDevice);
+    uint32_t deviceProduct = libinput_device_get_id_product(inputDevice);
+    struct udev_device* udevDevice = libinput_device_get_udev_device(inputDevice);
+    std::string sysPath = udev_device_get_syspath(udevDevice);
+    if ((deviceVendor < 0) || (deviceProduct < 0) || sysPath.empty()) {
+        MMI_HILOGE("Get device identification failed");
+        return "";
+    }
+    char vid[USBDEVIDEINFO_MAX] = "";
+    char pid[USBDEVIDEINFO_MAX] = "";
+    sprintf_s(vid, sizeof(vid), "%04X", deviceVendor);
+    sprintf_s(pid, sizeof(pid), "%04X", deviceProduct);
+    std::string strVid(vid);
+    std::string strPid(pid);
+    std::string vendorProduct = strVid + ":" + strPid;
+    std::string deviceIdentification = sysPath.substr(0, sysPath.find(vendorProduct)) + vendorProduct;
+    MMI_HILOGI("Get device identification is:%{public}s", deviceIdentification.c_str());
+    return deviceIdentification;
+}
+
+void InputDeviceManager::NotifyDevCallback(int32_t deviceId, struct InputDeviceInfo inDevice)
+{
+    //inDevice.isTouchableDevice
+    // if ((inDevice.isPointerDevice == false) || (deviceId < 0)) {
+    //     return;
+    // }
+    std::string touchScreenName = "VSoC touchscreen";
+    std::string inputPadName = "USB Mouse Pad USB Mouse Pad Mouse";
+    std::string inputdevname = libinput_device_get_name(inDevice.inputDeviceOrigin);
+    if(inputdevname == touchScreenName) {
+        if (!inDevice.sysUid.empty()) {
+            //devCallbacks_(deviceId, inDevice.sysUid, "add");
+            devCallbacks_(deviceId, inputdevname, "add");
+        }
+    }
+}
+
 void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
 {
     CALL_DEBUG_ENTER;
@@ -320,6 +369,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
         CHKPC(item.first);
         item.second(nextId_, "add");
     }
+    NotifyDevCallback(nextId_, info);
     ++nextId_;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     if (IsKeyboardDevice(inputDevice)) {
@@ -352,6 +402,7 @@ void InputDeviceManager::MakeDeviceInfo(struct libinput_device *inputDevice, str
     info.isRemote = IsRemote(inputDevice);
     info.isPointerDevice = IsPointerDevice(inputDevice);
     info.isTouchableDevice = IsTouchDevice(inputDevice);
+    info.sysUid = GetInputIdentification(inputDevice);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     if (info.isRemote) {
         info.networkIdOrigin = MakeNetworkId(libinput_device_get_phys(inputDevice));
@@ -381,6 +432,14 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
             break;
         }
     }
+    std::string sysUid = GetInputIdentification(inputDevice);
+    std::string inputdevname = libinput_device_get_name(inputDevice);
+    MMI_HILOGI("lilong Get device inputdevname is:%{public}s", inputdevname.c_str());
+    if (!(sysUid.empty())) {
+        //devCallbacks_(deviceId, sysUid, "remove");
+        devCallbacks_(deviceId, inputdevname, "remove");
+    }
+
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (IsPointerDevice(inputDevice) && !HasPointerDevice() &&
         IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {

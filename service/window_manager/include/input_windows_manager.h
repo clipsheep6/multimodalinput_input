@@ -83,6 +83,17 @@ public:
     void DispatchPointer(int32_t pointerAction);
     void SendPointerEvent(int32_t pointerAction);
 #endif // OHOS_BUILD_ENABLE_POINTER
+    std::map<int32_t, std::string> inputDeviceAndDisplays_;
+    std::map<int32_t, std::string> unbindInputDevices_;
+    std::map<int32_t, std::string> unbindDisplays_;
+    bool DelDeviceIBindInfofile(int32_t deviceId, std::string deviceSysuid);
+    bool SaveDeviceBindInfofile(int32_t deviceId, std::string deviceSysuid);
+    void DeviceBindInfoChanged(int32_t deviceId, std::string deviceSysuid);
+    void DeviceStatusChanged(int32_t deviceId, std::string inputdevname, std::string devStatus);
+    //void DeviceStatusChanged(std::string inputdevname, std::string deviceSysuid, std::string devStatus);
+    bool CheckBindInputDevice();
+    bool SaveDisplayIdAndName();
+    void PrintmapInfo();
 
 private:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
