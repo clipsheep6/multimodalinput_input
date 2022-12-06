@@ -24,7 +24,6 @@
 #include "mmi_log.h"
 #include "net_packet.h"
 #include "proto.h"
-#include "util_ex.h"
 
 namespace OHOS {
 namespace MMI {
@@ -328,14 +327,13 @@ void EventInterceptorHandler::Dump(int32_t fd, const std::vector<std::string> &a
 void EventInterceptorHandler::InterceptorCollection::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
-    mprintf(fd, "Interceptor information:\t");
-    mprintf(fd, "interceptors: count=%d", interceptors_.size());
+    dprintf(fd, "Interceptor information:\n");
+    dprintf(fd, "interceptors: count=%d\n", interceptors_.size());
     for (const auto &item : interceptors_) {
         SessionPtr session = item.session_;
         CHKPV(session);
-        mprintf(fd,
-                "handlerType:%d | eventType:%d | Pid:%d | Uid:%d | Fd:%d "
-                "| EarliestEventTime:%" PRId64 " | Descript:%s \t",
+        dprintf(fd, "handlerType:%d | eventType:%d | Pid:%d | Uid:%d | Fd:%d "
+                "| EarliestEventTime:%" PRId64 " | Descript:%s\n",
                 item.handlerType_, item.eventType_,
                 session->GetPid(), session->GetUid(),
                 session->GetFd(),

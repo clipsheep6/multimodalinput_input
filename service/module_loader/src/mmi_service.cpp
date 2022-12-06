@@ -38,7 +38,6 @@
 #include "key_map_manager.h"
 #include "mmi_log.h"
 #include "string_ex.h"
-#include "util_ex.h"
 #include "util_napi_error.h"
 #include "multimodal_input_connect_def_parcel.h"
 #ifdef OHOS_RSS_CLIENT
@@ -1070,7 +1069,7 @@ int32_t MMIService::Dump(int32_t fd, const std::vector<std::u16string> &args)
     }
     if (args.empty()) {
         MMI_HILOGE("The args cannot be empty");
-        mprintf(fd, "args cannot be empty\n");
+        dprintf(fd, "args cannot be empty\n");
         MMIEventDump->DumpHelp(fd);
         return DUMP_PARAM_ERR;
     }

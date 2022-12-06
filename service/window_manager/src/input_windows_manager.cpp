@@ -23,7 +23,6 @@
 #include "input_device_manager.h"
 #include "mouse_event_normalize.h"
 #include "pointer_drawing_manager.h"
-#include "util_ex.h"
 #include "util_napi_error.h"
 #include "util.h"
 
@@ -1208,33 +1207,28 @@ MouseLocation InputWindowsManager::GetMouseInfo()
 void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
-    mprintf(fd, "Windows information:\t");
-    mprintf(fd, "windowsInfos,num:%zu", displayGroupInfo_.windowsInfo.size());
+    dprintf(fd, "Windows information:\n");
+    dprintf(fd, "windowsInfos,num:%zu\n", displayGroupInfo_.windowsInfo.size());
     for (const auto &item : displayGroupInfo_.windowsInfo) {
-        mprintf(fd,
-                "\t windowsInfos: id:%d | pid:%d | uid:%d | area.x:%d | area.y:%d "
+        dprintf(fd, "\t windowsInfos: id:%d | pid:%d | uid:%d | area.x:%d | area.y:%d "
                 "| area.width:%d | area.height:%d | defaultHotAreas.size:%zu "
-                "| pointerHotAreas.size:%zu | agentWindowId:%d | flags:%d \t",
+                "| pointerHotAreas.size:%zu | agentWindowId:%d | flags:%d\n",
                 item.id, item.pid, item.uid, item.area.x, item.area.y, item.area.width,
                 item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
                 item.agentWindowId, item.flags);
         for (const auto &win : item.defaultHotAreas) {
-            mprintf(fd,
-                    "\t defaultHotAreas: x:%d | y:%d | width:%d | height:%d \t",
+            dprintf(fd, "\t defaultHotAreas: x:%d | y:%d | width:%d | height:%d\n",
                     win.x, win.y, win.width, win.height);
         }
         for (const auto &pointer : item.pointerHotAreas) {
-            mprintf(fd,
-                    "\t pointerHotAreas: x:%d | y:%d | width:%d | height:%d \t",
+            dprintf(fd, "\t pointerHotAreas: x:%d | y:%d | width:%d | height:%d\n",
                     pointer.x, pointer.y, pointer.width, pointer.height);
         }
     }
-    mprintf(fd, "Displays information:\t");
-    mprintf(fd, "displayInfos,num:%zu", displayGroupInfo_.displaysInfo.size());
+    dprintf(fd, "Displays information:\n");
+    dprintf(fd, "displayInfos,num:%zu\n", displayGroupInfo_.displaysInfo.size());
     for (const auto &item : displayGroupInfo_.displaysInfo) {
-        mprintf(fd,
-                "\t displayInfos: id:%d | x:%d | y:%d | width:%d | height:%d | name:%s "
-                "| uniq:%s | direction:%d \t",
+        dprintf(fd, "\t displayInfos: id:%d | x:%d | y:%d | width:%d | height:%d | name:%s | uniq:%s | direction:%d\n",
                 item.id, item.x, item.y, item.width, item.height, item.name.c_str(),
                 item.uniq.c_str(), item.direction);
     }

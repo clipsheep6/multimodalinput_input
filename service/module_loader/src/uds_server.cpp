@@ -24,7 +24,6 @@
 #include "i_multimodal_input_connect.h"
 #include "mmi_log.h"
 #include "util.h"
-#include "util_ex.h"
 
 namespace OHOS {
 namespace MMI {
@@ -167,13 +166,12 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
 void UDSServer::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
-    mprintf(fd, "Uds_server information:\t");
-    mprintf(fd, "uds_server: count=%d", sessionsMap_.size());
+    dprintf(fd, "Uds_server information:\n");
+    dprintf(fd, "uds_server: count=%d\n", sessionsMap_.size());
     for (const auto &item : sessionsMap_) {
         std::shared_ptr<UDSSession> udsSession = item.second;
         CHKPV(udsSession);
-        mprintf(fd,
-                "Uid:%d | Pid:%d | Fd:%d | TokenType:%d | Descript:%s\t",
+        dprintf(fd, "Uid:%d | Pid:%d | Fd:%d | TokenType:%d | Descript:%s\n",
                 udsSession->GetUid(), udsSession->GetPid(), udsSession->GetFd(),
                 udsSession->GetTokenType(), udsSession->GetDescript().c_str());
     }

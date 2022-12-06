@@ -33,7 +33,6 @@
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include "util.h"
 #endif // OHOS_BUILD_ENABLE_COOPERATE
-#include "util_ex.h"
 #include "util_napi_error.h"
 
 namespace OHOS {
@@ -497,27 +496,25 @@ struct libinput_device* InputDeviceManager::GetKeyboardDevice() const
 void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
-    mprintf(fd, "Device information:\t");
-    mprintf(fd, "Input devices: count=%d", inputDevice_.size());
+    dprintf(fd, "Device information:\n");
+    dprintf(fd, "Input devices: count=%d\n", inputDevice_.size());
     for (const auto &item : inputDevice_) {
         std::shared_ptr<InputDevice> inputDevice = GetInputDevice(item.first);
         CHKPV(inputDevice);
-        mprintf(fd,
-                "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d "
-                "| product:%d | vendor:%d | phys:%s\t",
+        dprintf(fd, "deviceId:%d | deviceName:%s | deviceType:%d "
+                "| bus:%d | version:%d | product:%d | vendor:%d | phys:%s",
                 inputDevice->GetId(), inputDevice->GetName().c_str(), inputDevice->GetType(),
                 inputDevice->GetBus(), inputDevice->GetVersion(), inputDevice->GetProduct(),
                 inputDevice->GetVendor(), inputDevice->GetPhys().c_str());
         std::vector<InputDevice::AxisInfo> axisinfo = inputDevice->GetAxisInfo();
-        mprintf(fd, "axis: count=%d", axisinfo.size());
+        dprintf(fd, " | axis: count=%d\n", axisinfo.size());
         for (const auto &axis : axisinfo) {
             auto iter = axisType.find(axis.GetAxisType());
             if (iter == axisType.end()) {
                 MMI_HILOGE("The axisType is not found");
                 return;
             }
-            mprintf(fd,
-                    "\t axisType:%s | minimum:%d | maximum:%d | fuzz:%d | flat:%d | resolution:%d\t",
+            dprintf(fd, "\t axisType:%s | minimum:%d | maximum:%d | fuzz:%d | flat:%d | resolution:%d\n",
                     iter->second.c_str(), axis.GetMinimum(), axis.GetMaximum(), axis.GetFuzz(),
                     axis.GetFlat(), axis.GetResolution());
         }
@@ -528,13 +525,12 @@ void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::strin
 {
     CALL_DEBUG_ENTER;
     std::vector<int32_t> ids = GetInputDeviceIds();
-    mprintf(fd, "Total device:%d, Device list:\t", int32_t { ids.size() });
+    dprintf(fd, "Total device:%d, Device list:\n", int32_t { ids.size() });
     for (const auto &item : inputDevice_) {
         std::shared_ptr<InputDevice> inputDevice = GetInputDevice(item.first);
         CHKPV(inputDevice);
         int32_t deviceId = inputDevice->GetId();
-        mprintf(fd,
-                "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d | product:%d | vendor:%d\t",
+        dprintf(fd, "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d | product:%d | vendor:%d\n",
                 deviceId, inputDevice->GetName().c_str(), inputDevice->GetType(), inputDevice->GetBus(),
                 inputDevice->GetVersion(), inputDevice->GetProduct(), inputDevice->GetVendor());
     }

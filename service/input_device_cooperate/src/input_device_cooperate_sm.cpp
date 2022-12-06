@@ -33,7 +33,6 @@
 #include "input_device_manager.h"
 #include "mouse_event_normalize.h"
 #include "timer_manager.h"
-#include "util_ex.h"
 
 namespace OHOS {
 namespace MMI {
@@ -592,12 +591,11 @@ void InputDeviceCooperateSM::Dump(int32_t fd, const std::vector<std::string> &ar
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
-    mprintf(fd, "Keyboard and mouse crossing information:");
-    mprintf(fd, "State machine status: %d\t", cooperateState_);
-    mprintf(fd, "Peripheral keyboard and mouse information: startDhid_  srcNetworkId_:\t");
-    mprintf(fd, "%s", startDhid_.c_str());
-    mprintf(fd, "%s", srcNetworkId_.c_str());
-    mprintf(fd, "Run successfully");
+    dprintf(fd, "Keyboard and mouse crossing information:\n");
+    dprintf(fd, "State machine status: %d\n", cooperateState_);
+    dprintf(fd, "Peripheral keyboard and mouse information: start dhid: %s, network id: %s\n",
+        startDhid_.c_str(), srcNetworkId_.c_str());
+    dprintf(fd, "Run successfully\n");
 }
 
 void InputDeviceCooperateSM::DeviceInitCallBack::OnRemoteDied()

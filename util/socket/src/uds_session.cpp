@@ -111,8 +111,7 @@ void UDSSession::UpdateDescript()
         << ((fd_ < 0) ? ", closed" : ", opened")
         << ", uid = " << uid_
         << ", pid = " << pid_
-        << ", tokenType = " << tokenType_
-        << std::endl;
+        << ", tokenType = " << tokenType_;
     descript_ = oss.str().c_str();
 }
 

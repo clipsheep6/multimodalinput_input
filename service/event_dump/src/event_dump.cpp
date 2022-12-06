@@ -36,7 +36,6 @@
 #include "key_subscriber_handler.h"
 #include "mouse_event_normalize.h"
 #include "securec.h"
-#include "util_ex.h"
 #include "util.h"
 
 namespace OHOS {
@@ -48,14 +47,6 @@ constexpr size_t MAX_COMMAND_COUNT { 32 };
 
 EventDump::EventDump() {}
 EventDump::~EventDump() {}
-
-void ChkConfig(int32_t fd)
-{
-    mprintf(fd, "ChkMMIConfig: ");
-    mprintf(fd, "DEF_MMI_DATA_ROOT: %s\n", DEF_MMI_DATA_ROOT);
-    mprintf(fd, "EXP_CONFIG: %s\n", DEF_EXP_CONFIG);
-    mprintf(fd, "EXP_SOPATH: %s\n", DEF_EXP_SOPATH);
-}
 
 void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
 {
@@ -73,7 +64,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
     }
     if (count > MAX_COMMAND_COUNT) {
         MMI_HILOGE("cmd param number not more than 32");
-        mprintf(fd, "cmd param number not more than 32\n");
+        dprintf(fd, "cmd param number not more than 32\n");
         return;
     }
     int32_t optionIndex = 0;
@@ -144,7 +135,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
                 InputDevCooSM->Dump(fd, args);
 #else
-                mprintf(fd, "Input device cooperate does not support");
+                dprintf(fd, "Input device cooperate does not support\n");
 #endif // OHOS_BUILD_ENABLE_COOPERATE
                 break;
             }
@@ -154,7 +145,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
                 CHKPV(subscriberHandler);
                 subscriberHandler->Dump(fd, args);
 #else
-                mprintf(fd, "Keyboard device does not support");
+                dprintf(fd, "Keyboard device does not support\n");
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
                 break;
             }
@@ -164,7 +155,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
                 CHKPV(monitorHandler);
                 monitorHandler->Dump(fd, args);
 #else
-                mprintf(fd, "Monitor function does not support");
+                dprintf(fd, "Monitor function does not support\n");
 #endif // OHOS_BUILD_ENABLE_MONITOR
                 break;
             }
@@ -174,7 +165,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
                 CHKPV(interceptorHandler);
                 interceptorHandler->Dump(fd, args);
 #else
-                mprintf(fd, "Interceptor function does not support");
+                dprintf(fd, "Interceptor function does not support\n");
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
                 break;
             }
@@ -182,12 +173,12 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
 #ifdef OHOS_BUILD_ENABLE_POINTER
                 MouseEventHdr->Dump(fd, args);
 #else
-                mprintf(fd, "Pointer device does not support");
+                dprintf(fd, "Pointer device does not support\n");
 #endif // OHOS_BUILD_ENABLE_POINTER
                 break;
             }
             default: {
-                mprintf(fd, "cmd param is error\n");
+                dprintf(fd, "cmd param is error\n");
                 DumpHelp(fd);
                 break;
             }
@@ -209,17 +200,17 @@ void EventDump::DumpEventHelp(int32_t fd, const std::vector<std::string> &args)
 
 void EventDump::DumpHelp(int32_t fd)
 {
-    mprintf(fd, "Usage:\t");
-    mprintf(fd, "      -h, --help: dump help\t");
-    mprintf(fd, "      -d, --device: dump the device information\t");
-    mprintf(fd, "      -l, --devicelist: dump the device list information\t");
-    mprintf(fd, "      -w, --windows: dump the windows information\t");
-    mprintf(fd, "      -u, --udsserver: dump the uds_server information\t");
-    mprintf(fd, "      -o, --monitor: dump the monitor information\t");
-    mprintf(fd, "      -s, --subscriber: dump the subscriber information\t");
-    mprintf(fd, "      -i, --interceptor: dump the interceptor information\t");
-    mprintf(fd, "      -m, --mouse: dump the mouse information\t");
-    mprintf(fd, "      -c, --dump Keyboard and mouse crossing information\t");
+    dprintf(fd, "Usage:\n");
+    dprintf(fd, "      -h, --help: dump help\n");
+    dprintf(fd, "      -d, --device: dump the device information\n");
+    dprintf(fd, "      -l, --devicelist: dump the device list information\n");
+    dprintf(fd, "      -w, --windows: dump the windows information\n");
+    dprintf(fd, "      -u, --udsserver: dump the uds_server information\n");
+    dprintf(fd, "      -o, --monitor: dump the monitor information\n");
+    dprintf(fd, "      -s, --subscriber: dump the subscriber information\n");
+    dprintf(fd, "      -i, --interceptor: dump the interceptor information\n");
+    dprintf(fd, "      -m, --mouse: dump the mouse information\n");
+    dprintf(fd, "      -c, --dump Keyboard and mouse crossing information\n");
 }
 } // namespace MMI
 } // namespace OHOS

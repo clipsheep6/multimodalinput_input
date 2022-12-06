@@ -27,7 +27,6 @@
 #include "input_windows_manager.h"
 #include "mouse_device_state.h"
 #include "timer_manager.h"
-#include "util_ex.h"
 #include "util.h"
 
 namespace OHOS {
@@ -405,10 +404,9 @@ void MouseEventNormalize::Dump(int32_t fd, const std::vector<std::string> &args)
     PointerEvent::PointerItem item;
     CHKPV(pointerEvent_);
     pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item);
-    mprintf(fd, "Mouse device state information:\t");
-    mprintf(fd,
-            "PointerId:%d | SourceType:%s | PointerAction:%s | WindowX:%d | WindowY:%d | ButtonId:%d "
-            "| AgentWindowId:%d | TargetWindowId:%d | DownTime:%" PRId64 " | IsPressed:%s \t",
+    dprintf(fd, "Mouse device state information:\n");
+    dprintf(fd, "PointerId:%d | SourceType:%s | PointerAction:%s | WindowX:%d | WindowY:%d | ButtonId:%d "
+            "| AgentWindowId:%d | TargetWindowId:%d | DownTime:%" PRId64 " | IsPressed:%s\n",
             pointerEvent_->GetPointerId(), pointerEvent_->DumpSourceType(), pointerEvent_->DumpPointerAction(),
             item.GetWindowX(), item.GetWindowY(), pointerEvent_->GetButtonId(), pointerEvent_->GetAgentWindowId(),
             pointerEvent_->GetTargetWindowId(), item.GetDownTime(), item.IsPressed() ? "true" : "false");

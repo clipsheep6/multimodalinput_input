@@ -24,7 +24,6 @@
 #include "napi_constants.h"
 #include "net_packet.h"
 #include "proto.h"
-#include "util_ex.h"
 
 namespace OHOS {
 namespace MMI {
@@ -420,16 +419,13 @@ void EventMonitorHandler::Dump(int32_t fd, const std::vector<std::string> &args)
 void EventMonitorHandler::MonitorCollection::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
-    mprintf(fd, "Monitor information:\t");
-    mprintf(fd, "monitors: count=%d", monitors_.size());
+    dprintf(fd, "Monitor information:\n");
+    dprintf(fd, "monitors: count=%d\n", monitors_.size());
     for (const auto &item : monitors_) {
         SessionPtr session = item.session_;
         CHKPV(session);
-        mprintf(fd,
-                "handlerType:%d | Pid:%d | Uid:%d | Fd:%d "
-                "| EarliestEventTime:%" PRId64 " | Descript:%s \t",
-                item.handlerType_, session->GetPid(),
-                session->GetUid(), session->GetFd(),
+        dprintf(fd, "handlerType:%d | Pid:%d | Uid:%d | Fd:%d | EarliestEventTime:%" PRId64 " | Descript:%s\n",
+                item.handlerType_, session->GetPid(), session->GetUid(), session->GetFd(),
                 session->GetEarliestEventTime(), session->GetDescript().c_str());
     }
 }

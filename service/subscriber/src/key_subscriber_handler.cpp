@@ -23,7 +23,6 @@
 #include "net_packet.h"
 #include "proto.h"
 #include "timer_manager.h"
-#include "util_ex.h"
 
 namespace OHOS {
 namespace MMI {
@@ -527,8 +526,8 @@ void KeySubscriberHandler::PrintKeyUpLog(const std::shared_ptr<Subscriber> &subs
 void KeySubscriberHandler::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
-    mprintf(fd, "Subscriber information:\t");
-    mprintf(fd, "subscribers: count=%d", subscribers_.size());
+    dprintf(fd, "Subscriber information:\n");
+    dprintf(fd, "subscribers: count=%d\n", subscribers_.size());
     for (const auto &item : subscribers_) {
         std::shared_ptr<Subscriber> subscriber = item;
         CHKPV(subscriber);
@@ -536,16 +535,24 @@ void KeySubscriberHandler::Dump(int32_t fd, const std::vector<std::string> &args
         CHKPV(session);
         std::shared_ptr<KeyOption> keyOption = item->keyOption_;
         CHKPV(keyOption);
-        mprintf(fd,
-                "subscriber id:%d | timer id:%d | Pid:%d | Uid:%d | Fd:%d "
-                "| FinalKey:%d | finalKeyDownDuration:%d | IsFinalKeyDown:%s\t",
+        dprintf(fd, "subscriber id:%d | timer id:%d | Pid:%d | Uid:%d | Fd:%d "
+                "| FinalKey:%d | finalKeyDownDuration:%d | IsFinalKeyDown:%s",
                 subscriber->id_, subscriber->timerId_, session->GetPid(),
                 session->GetUid(), session->GetFd(), keyOption->GetFinalKey(),
                 keyOption->GetFinalKeyDownDuration(), keyOption->IsFinalKeyDown() ? "true" : "false");
         std::set<int32_t> preKeys = keyOption->GetPreKeys();
-        for (const auto &preKey : preKeys) {
-            mprintf(fd, "preKeys:%d\t", preKey);
+        size_t preKeysSize = preKeys.size();
+        if (preKeysSize > 0) {
+            dprintf(fd, " | preKeys:");
+            for (const auto &preKey : preKeys) {
+                dprintf(fd, "%d", preKey);
+                --preKeysSize;
+                if (preKeysSize > 0) {
+                    dprintf(fd, " ");
+                }
+            }
         }
+        dprintf(fd, "\n");
     }
 }
 } // namespace MMI
