@@ -99,6 +99,7 @@ int32_t InputEventHandler::BuildInputHandlerChain( std::list<std::shared_ptr<IIn
 #if !defined(OHOS_BUILD_ENABLE_KEYBOARD) && !defined(OHOS_BUILD_ENABLE_POINTER) && !defined(OHOS_BUILD_ENABLE_TOUCH)
     return RET_OK;
 #endif // !OHOS_BUILD_ENABLE_KEYBOARD && !OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_TOUCH
+
     std::shared_ptr<IInputEventHandler> handler = eventNormalizeHandler_;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     eventFilterHandler_ = std::make_shared<EventFilterHandler>();
@@ -205,6 +206,7 @@ int32_t InputEventHandler::Insert(std::shared_ptr<IInputEventHandler> handler)
             return RET_OK;
         }
     }
+    MMI_HILOGE("Handler priority is error");
     return RET_ERR;
 }
 

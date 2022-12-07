@@ -139,6 +139,7 @@ protected:
     void AddReloadDeviceTimer();
     void OnPluginScan(epoll_event& ev);
     bool InitINotify();
+
 private:
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t mmiFd_ { -1 };

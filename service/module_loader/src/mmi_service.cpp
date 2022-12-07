@@ -293,10 +293,6 @@ int32_t MMIService::Init()
     MMI_HILOGD("Input msg handler init");
     InputHandler->Init(*this, pluginMgr_.GetContext());
     InitINotify();
-	if (!InputHandler->Build()) {
-        MMI_HILOGE("Libinput init failed");
-        return LIBINPUT_INIT_FAIL;
-    }
     if (!InitLibinputService()) {
         MMI_HILOGE("Libinput init failed");
         return LIBINPUT_INIT_FAIL;

@@ -772,7 +772,7 @@ const std::string& InputDeviceManager::GetScreenId(int32_t deviceId) const
 std::shared_ptr<IInputDeviceManager> InputDeviceManager::GetDeviceContext()
 {
     auto device = std::make_shared<IInputDeviceManager>();
-    device->deviceName_ = "yang li device";
+    device->deviceName_ = std::to_string(GetInputDeviceIds().back());
     return device;
 }
 } // namespace MMI

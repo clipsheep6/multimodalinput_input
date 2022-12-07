@@ -28,7 +28,15 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "EventPluginsHandler"};
 const std::string INPUT_EVENT_HANDLER_PLUGIN_HOME = "/system/lib/module/multimodalinput/plugins/";
-const std::string INPUT_EVENT_HANDLER_PLUGIN_USER = "/data/user/plugins/";//plugin的移除和添加
+const std::string INPUT_EVENT_HANDLER_PLUGIN_USER = "/data/user/plugins/";
+
+int32_t max { 0 };
+int32_t avg { 0 };
+int32_t memMax { 0 };
+int32_t memAvg { 0 };
+std::map<std::shared_ptr<IInputEventHandler>, int32_t> timeOutPlugin;
+std::map<std::shared_ptr<IInputEventHandler>, int32_t> memPlugin;
+
 bool CheckFileExtendName(const std::string &filePath, const std::string &checkExtension)
 {
     std::string::size_type pos = filePath.find_last_of('.');
@@ -39,27 +47,17 @@ bool CheckFileExtendName(const std::string &filePath, const std::string &checkEx
     return (filePath.substr(pos + 1, filePath.npos) == checkExtension);
 }
 
-int32_t max { 0 };
-int32_t avg { 0 };
-int32_t memMax { 0 };
-int32_t memAvg { 0 };
-std::map<std::shared_ptr<IInputEventHandler>, int32_t> timeOutPlugin;
-std::map<std::shared_ptr<IInputEventHandler>, int32_t> memPlugin;
-} // namespace
-InputEventHandlerPluginMgr::InputEventHandlerPluginMgr()
-{
 
-}
+} // namespace
 
 void InputEventHandlerPluginMgr::StartWatchPluginDir()
 {
     ReadPluginDir(INPUT_EVENT_HANDLER_PLUGIN_HOME);
-    ReadPluginDir(INPUT_EVENT_HANDLER_PLUGIN_USER); //用户插件与系统插件同名，只加载用户插件
+    ReadPluginDir(INPUT_EVENT_HANDLER_PLUGIN_USER);
     for (auto it = pluginInfoList.begin(); it != pluginInfoList.end(); it++) {
-        MMI_HILOGE("load path = %{public}s ; os = %{public}s",it->second.osPath.data(), it->first.data());
         bool ret = LoadPlugin(it->second.osPath, it->first, true);
         if (!ret) {
-            MMI_HILOGE("plugin open error");
+            MMI_HILOGE("Plugin %{public}s open error", it->second.osPath.data());
         }
     }
 }
@@ -68,7 +66,7 @@ void InputEventHandlerPluginMgr::ReadPluginDir(const std::string pluginPath)
 {
     DIR* dir = opendir(pluginPath.c_str());
     if (dir == nullptr) {
-        MMI_HILOGE("open plugin home(%{public}s) failed. errno: %{public}d",pluginPath.data(), errno);
+        MMI_HILOGE("Open plugin home(%{public}s) failed. errno: %{public}d",pluginPath.data(), errno);
         return;
     }
     dirent* p = nullptr;
@@ -79,7 +77,6 @@ void InputEventHandlerPluginMgr::ReadPluginDir(const std::string pluginPath)
         char realPath[PATH_MAX] = {};
         std::string tmpPath = pluginPath + p->d_name;
         if (realpath(tmpPath.data(), realPath) == nullptr) {
-            MMI_HILOGE("Path is error, path:%{public}s", p->d_name);
             continue;
         }
         if (pluginInfoList.find(p->d_name) == pluginInfoList.end()) {
@@ -94,7 +91,7 @@ void InputEventHandlerPluginMgr::ReadPluginDir(const std::string pluginPath)
     }
     auto ret = closedir(dir);
     if (ret != 0) {
-        MMI_HILOGE("closedir failed, dirname:%{public}s, errno:%{public}d", INPUT_EVENT_HANDLER_PLUGIN_HOME.data(), errno);
+        MMI_HILOGE("Closedir failed, dirname:%{public}s, errno:%{public}d", INPUT_EVENT_HANDLER_PLUGIN_HOME.data(), errno);
     }
 }
 
@@ -105,19 +102,19 @@ bool InputEventHandlerPluginMgr::LoadPlugin(std::string pluginPath, std::string 
     }
     void *handle = dlopen(pluginPath.data(), RTLD_NOW);
     if(handle == nullptr){
-        MMI_HILOGE("open plugin failed, soname:%{public}s, msg:%{public}s", pluginPath.data(), dlerror());
+        MMI_HILOGE("Open plugin failed, so name:%{public}s, msg:%{public}s", pluginPath.data(), dlerror());
         return false;
     }
     GetPlugin* getPlugin = (GetPlugin*) dlsym(handle, "create");
     auto error = dlerror();
     if(error != NULL) {
-        MMI_HILOGE("dlsym msg:%{public}s", error);
+        MMI_HILOGE("Dlsym msg:%{public}s", error);
         dlclose(handle);
         return false;
     }
     auto plugin = getPlugin();
     if (!plugin) {
-        MMI_HILOGE("plugin cerate error;");
+        MMI_HILOGE("Plugin cerate error");
         return false;
     }
     auto context = std::make_shared<PluginContext>();
@@ -132,14 +129,13 @@ bool InputEventHandlerPluginMgr::LoadPlugin(std::string pluginPath, std::string 
     if (!initStatus) {
         InputHandler->Insert(pluginInfoList[pluginName].pluginHandler);
     }
-    MMI_HILOGE("dlOPEN  OK");
     return true;
 }
 
 void InputEventHandlerPluginMgr::UnloadPlugin(std::string pluginName)
 {
     if (pluginInfoList.find(pluginName) == pluginInfoList.end()) {
-        MMI_HILOGE("not plugin %{plugin}s", pluginName.data());
+        MMI_HILOGE("Not find plugin %{plugin}s", pluginName.data());
         return;
     }
     InputHandler->Remove(pluginInfoList[pluginName].pluginHandler);
@@ -167,13 +163,13 @@ bool InputEventHandlerPluginMgr::InitINotify()
 {
     int32_t fd = inotify_init();
     if (fd < 0) {
-        MMI_HILOGE("initalize inotify failed");
+        MMI_HILOGE("Plugin initalize inotify failed");
         return false;
     }
 
     int wd = inotify_add_watch(fd, INPUT_EVENT_HANDLER_PLUGIN_USER.data(), IN_ALL_EVENTS);
     if(wd < 0) {
-        MMI_HILOGE("add watch user failed ");
+        MMI_HILOGE("Add directory watch failed");
         return false;
     }
     fd_ = fd;

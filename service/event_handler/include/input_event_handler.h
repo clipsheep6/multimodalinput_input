@@ -56,6 +56,7 @@ public:
     void SetJumpInterceptState(bool isJump);
     bool GetJumpInterceptState() const;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
+
 private:
     void SetPluginEventHandler(std::list<std::shared_ptr<IInputEventPluginContext>> context);
     int32_t BuildInputHandlerChain(std::list<std::shared_ptr<IInputEventPluginContext>> context);

@@ -19,6 +19,7 @@
 #include <string>
 #include "plugin_context.h"
 #include "i_input_event_handler_plugin.h"
+
 namespace OHOS {
 namespace MMI {
 struct inputEventHandlerPlugin {
@@ -29,27 +30,10 @@ struct inputEventHandlerPlugin {
     std::shared_ptr<IInputEventHandler> pluginHandler;
 };
 
-// struct pluginMonitorTime {
-//     std::string pluginName { 0 };
-//     uint32_t pluginCostTimeMax { 0 };
-// }
-
-// struct pluginMonitorMem {
-//     std::string pluginName { 0 };
-//     uint32_t pluginCostMemMax { 0 };
-// }
-
-// struct pluginMonitor {
-//     pluginMonitorTime pluginCostTime;
-//     pluginCostTimeAvg { 0 };
-//     pluginMonitorMem pluginCostMem;
-//     pluginCostMemAvg { 0 };
-// }
-
 class InputEventHandlerPluginMgr
 {
 public:
-    explicit InputEventHandlerPluginMgr();
+    explicit InputEventHandlerPluginMgr() = default;
     ~InputEventHandlerPluginMgr() = default;
     DISALLOW_COPY_AND_MOVE(InputEventHandlerPluginMgr);
     void SetDeivceManager(std::shared_ptr<IInputDeviceManager> inputDeviceMgr);
@@ -71,7 +55,6 @@ private:
     int32_t fd_ { 0 };
     int32_t wd_ { 0 };
     std::shared_ptr<IInputDeviceManager> inputDevMgr_;
-    //pluginMonitor pluginMonitor_;
 };
 } // namespace MMI
 } // namespace OHOS

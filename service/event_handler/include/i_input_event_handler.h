@@ -46,6 +46,7 @@ public:
     {
         nextHandler_ = nextHandler;
     };
+
 protected:
     std::shared_ptr<IInputEventHandler> nextHandler_ { nullptr };
     // 数字越小， 优先级越高， 内嵌的handler类型优先级为0
