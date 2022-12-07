@@ -26,7 +26,7 @@ namespace OHOS {
 namespace MMI {
 class EventFilterHandler final : public IInputEventHandler {
 public:
-    EventFilterHandler() = default;
+    EventFilterHandler() : IInputEventHandler(100) {}
     DISALLOW_COPY_AND_MOVE(EventFilterHandler);
     ~EventFilterHandler() override = default;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD

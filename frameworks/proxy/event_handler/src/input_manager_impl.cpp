@@ -288,7 +288,7 @@ int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt)
     pkt << num;
     for (const auto &item : displayGroupInfo_.displaysInfo) {
         pkt << item.id << item.x << item.y << item.width
-            << item.height << item.name << item.uniq << item.direction;
+            << item.height << item.dpi << item.name << item.uniq << item.direction;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write display data failed");
@@ -323,9 +323,9 @@ void InputManagerImpl::PrintDisplayInfo()
     MMI_HILOGI("displayInfos,num:%{public}zu", displayGroupInfo_.displaysInfo.size());
     for (const auto &item : displayGroupInfo_.displaysInfo) {
         MMI_HILOGI("displayInfos,id:%{public}d,x:%{public}d,y:%{public}d,"
-            "width:%{public}d,height:%{public}d,name:%{public}s,"
+            "width:%{public}d,height:%{public}d,dpi:%{public}d,name:%{public}s,"
             "uniq:%{public}s,direction:%{public}d",
-            item.id, item.x, item.y, item.width, item.height, item.name.c_str(),
+            item.id, item.x, item.y, item.width, item.height, item.dpi, item.name.c_str(),
             item.uniq.c_str(), item.direction);
     }
 }
@@ -336,7 +336,6 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_MONITOR)
     CHKPR(monitor, INVALID_HANDLER_ID);
     auto consumer = std::make_shared<MonitorEventConsumer>(monitor);
-    CHKPR(consumer, INVALID_HANDLER_ID);
     return AddMonitor(consumer);
 #else
     MMI_HILOGW("Keyboard device or monitor function does not support");
@@ -350,7 +349,6 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<PointerE
 #if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && defined(OHOS_BUILD_ENABLE_MONITOR)
     CHKPR(monitor, INVALID_HANDLER_ID);
     auto consumer = std::make_shared<MonitorEventConsumer>(monitor);
-    CHKPR(consumer, INVALID_HANDLER_ID);
     return AddMonitor(consumer);
 #else
     MMI_HILOGW("Pointer/touchscreen device or monitor function does not support");
@@ -417,7 +415,8 @@ void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
-int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
+int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor,
+    int32_t priority, uint32_t deviceTags)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
@@ -427,26 +426,26 @@ int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> in
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return InputInterMgr->AddInterceptor(interceptor, HANDLE_EVENT_TYPE_ALL);
+    return InputInterMgr->AddInterceptor(interceptor, HANDLE_EVENT_TYPE_ALL, priority, deviceTags);
 #else
     MMI_HILOGW("Interceptor function does not support");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 }
 
-int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
+int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor,
+    int32_t priority, uint32_t deviceTags)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
     CHKPR(interceptor, INVALID_HANDLER_ID);
     std::lock_guard<std::mutex> guard(mtx_);
     auto consumer = std::make_shared<MonitorEventConsumer>(interceptor);
-    CHKPR(consumer, INVALID_HANDLER_ID);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return InputInterMgr->AddInterceptor(consumer, HANDLE_EVENT_TYPE_KEY);
+    return InputInterMgr->AddInterceptor(consumer, HANDLE_EVENT_TYPE_KEY, priority, deviceTags);
 #else
     MMI_HILOGW("Keyboard device or interceptor function does not support");
     return ERROR_UNSUPPORT;
@@ -612,7 +611,7 @@ void InputManagerImpl::OnConnected()
 {
     CALL_DEBUG_ENTER;
     if (displayGroupInfo_.windowsInfo.empty() || displayGroupInfo_.displaysInfo.empty()) {
-        MMI_HILOGE("The windows info or display info is empty");
+        MMI_HILOGI("The windows info or display info is empty");
         return;
     }
     SendDisplayInfo();
@@ -622,7 +621,7 @@ void InputManagerImpl::OnConnected()
     }
     int32_t ret = MultimodalInputConnMgr->SetAnrObserver();
     if (ret != RET_OK) {
-        MMI_HILOGE("Set anr observerfailed, ret:%{public}d", ret);
+        MMI_HILOGE("Set anr observer failed, ret:%{public}d", ret);
     }
 }
 

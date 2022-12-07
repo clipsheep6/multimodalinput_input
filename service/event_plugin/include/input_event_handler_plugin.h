@@ -17,33 +17,61 @@
 #define INPUT_EVENT_HANDLER_PLUGIN_H
 
 #include <string>
-#include <map>
-
+#include "plugin_context.h"
+#include "i_input_event_handler_plugin.h"
 namespace OHOS {
 namespace MMI {
 struct inputEventHandlerPlugin {
-    void* plugin;
-    std::string pluginName;
+    void* osHandler;
     bool loadStatus;
+    IPlugin* plugin;
+    std::string osPath;
+    std::shared_ptr<IInputEventHandler> pluginHandler;
 };
+
+// struct pluginMonitorTime {
+//     std::string pluginName { 0 };
+//     uint32_t pluginCostTimeMax { 0 };
+// }
+
+// struct pluginMonitorMem {
+//     std::string pluginName { 0 };
+//     uint32_t pluginCostMemMax { 0 };
+// }
+
+// struct pluginMonitor {
+//     pluginMonitorTime pluginCostTime;
+//     pluginCostTimeAvg { 0 };
+//     pluginMonitorMem pluginCostMem;
+//     pluginCostMemAvg { 0 };
+// }
+
 class InputEventHandlerPluginMgr
 {
 public:
-    explict InputEventHandlerPluginMgr()
-    {
-        context_ = std::make_shared<IPluginContext>();
-    }
+    explicit InputEventHandlerPluginMgr();
     ~InputEventHandlerPluginMgr() = default;
     DISALLOW_COPY_AND_MOVE(InputEventHandlerPluginMgr);
-    void SetDeivceManager();
+    void SetDeivceManager(std::shared_ptr<IInputDeviceManager> inputDeviceMgr);
     void StartWatchPluginDir();
     void ReadPluginDir(const std::string pluginPath);
-    bool LoadPlugin(std::string pluginPath, std::string pluginName);
-    bool UnloadPlugin(std::string pluginPath);
-    std::shared_ptr<IPluginContext> GetContext() const { return context_; }
+    bool LoadPlugin(std::string pluginPath,std::string pluginName, bool initStatus);
+    void UnloadPlugin(std::string pluginPath);
+    void UnloadPlugins();
+    bool InitINotify();
+    void OnTimer();
+    int32_t GetReadFd();
+    void stopINotify();
+    std::list<std::shared_ptr<IInputEventPluginContext>> GetContext() const { return context_; }
+    void SetHandler(std::shared_ptr<IInputEventHandler>& pHandlers);
+    void DelPlugin(std::shared_ptr<IInputEventHandler> pluginHandler);
 private:
-    std::shared_ptr<IPluginContext> context_;
+    std::list<std::shared_ptr<IInputEventPluginContext>> context_;
     std::map<std::string , inputEventHandlerPlugin> pluginInfoList = {};
+    int32_t fd_ { 0 };
+    int32_t wd_ { 0 };
+    std::shared_ptr<IInputDeviceManager> inputDevMgr_;
+    //pluginMonitor pluginMonitor_;
 };
 } // namespace MMI
 } // namespace OHOS

@@ -28,8 +28,9 @@
 #include "i_event_filter.h"
 #include "i_input_event_handler.h"
 #include "key_subscriber_handler.h"
+#include "key_command_handler.h"
 #include "mouse_event_normalize.h"
-#include "plugin_manager.h"
+#include "input_event_handler_plugin.h"
 
 namespace OHOS {
 namespace MMI {
@@ -39,13 +40,16 @@ class InputEventHandler final {
     DECLARE_DELAYED_SINGLETON(InputEventHandler);
 public:
     DISALLOW_COPY_AND_MOVE(InputEventHandler);
-    void Init(UDSServer& udsServer, IInputEventPluginContext *context);
+    void Init(UDSServer& udsServer, std::list<std::shared_ptr<IInputEventPluginContext>> context);
     void OnEvent(void *event);
+    int32_t Insert(std::shared_ptr<IInputEventHandler> handler);
+    int32_t Remove(std::shared_ptr<IInputEventHandler> handler);
     UDSServer *GetUDSServer() const;
 
     std::shared_ptr<EventNormalizeHandler> GetEventNormalizeHandler() const;
     std::shared_ptr<EventInterceptorHandler> GetInterceptorHandler() const;
     std::shared_ptr<KeySubscriberHandler> GetSubscriberHandler() const;
+    std::shared_ptr<KeyCommandHandler> GetKeyCommandHandler() const;
     std::shared_ptr<EventMonitorHandler> GetMonitorHandler() const;
     std::shared_ptr<EventFilterHandler> GetFilterHandler() const;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
@@ -53,8 +57,8 @@ public:
     bool GetJumpInterceptState() const;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 private:
-    void SetPluginEventHandler(EventHandlerType type);
-    int32_t BuildInputHandlerChain();
+    void SetPluginEventHandler(std::list<std::shared_ptr<IInputEventPluginContext>> context);
+    int32_t BuildInputHandlerChain(std::list<std::shared_ptr<IInputEventPluginContext>> context);
 
     UDSServer *udsServer_ { nullptr };
     IInputEventPluginContext *context_;
@@ -62,6 +66,7 @@ private:
     std::shared_ptr<EventFilterHandler> eventFilterHandler_ { nullptr };
     std::shared_ptr<EventInterceptorHandler> eventInterceptorHandler_ { nullptr };
     std::shared_ptr<KeySubscriberHandler> eventSubscriberHandler_ { nullptr };
+    std::shared_ptr<KeyCommandHandler> eventKeyCommandHandler_ { nullptr };
     std::shared_ptr<EventMonitorHandler> eventMonitorHandler_ { nullptr };
 
     uint64_t idSeed_ { 0 };

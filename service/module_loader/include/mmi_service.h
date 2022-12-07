@@ -30,18 +30,18 @@
 #include "libinput_adapter.h"
 #include "server_msg_handler.h"
 #include "uds_server.h"
-#include "plugin_manager.h"
+#include "input_event_handler_plugin.h"
+
 namespace OHOS {
 namespace MMI {
 
 enum class ServiceRunningState {STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
 class MMIService final : public UDSServer, public SystemAbility, public MultimodalInputConnectStub {
     DECLARE_DELAYED_SINGLETON(MMIService);
-    DECLEAR_SYSTEM_ABILITY(MMIService);
+    DECLARE_SYSTEM_ABILITY(MMIService);
     DISALLOW_COPY_AND_MOVE(MMIService);
 
 public:
-    IInputDeviceManager * GetInputDeviceManager() const { return deviceMgr_; }
     void OnStart() override;
     void OnStop() override;
     int32_t Dump(int32_t fd, const std::vector<std::u16string> &args) override;
@@ -60,8 +60,10 @@ public:
     int32_t RegisterDevListener() override;
     int32_t UnregisterDevListener() override;
     int32_t GetKeyboardType(int32_t userData, int32_t deviceId) override;
-    int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType) override;
-    int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType) override;
+    int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
+        int32_t priority, uint32_t deviceTags) override;
+    int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
+        int32_t priority, uint32_t deviceTags) override;
     int32_t MarkEventConsumed(int32_t eventId) override;
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY) override;
     int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
@@ -103,8 +105,10 @@ protected:
     int32_t OnSupportKeys(int32_t pid, int32_t userData, int32_t deviceId, std::vector<int32_t> &keys);
     int32_t OnGetKeyboardType(int32_t pid, int32_t userData, int32_t deviceId);
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
-    int32_t CheckAddInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType);
-    int32_t CheckRemoveInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType);
+    int32_t CheckAddInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType,
+        int32_t priority, uint32_t deviceTags);
+    int32_t CheckRemoveInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType,
+        int32_t priority, uint32_t deviceTags);
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
     int32_t CheckMarkConsumed(int32_t pid, int32_t eventId);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -133,7 +137,8 @@ protected:
     void OnDelegateTask(epoll_event& ev);
 
     void AddReloadDeviceTimer();
-
+    void OnPluginScan(epoll_event& ev);
+    bool InitINotify();
 private:
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t mmiFd_ { -1 };
@@ -146,7 +151,6 @@ private:
     LibinputAdapter libinputAdapter_;
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;
-    InputDeviceManager deviceMgr_;
     InputEventHandlerPluginMgr pluginMgr_;
     std::atomic_bool threadStatusFlag_ { false };
 };

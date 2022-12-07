@@ -43,7 +43,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Event
 #endif // OHOS_BUILD_ENABLE_KEYBOARD ||  OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace
 
-EventDispatchHandler::EventDispatchHandler()
+EventDispatchHandler::EventDispatchHandler() : IInputEventHandler(600)
 {
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     DistributedAdapter->RegisterEventCallback(std::bind(&EventDispatchHandler::OnDinputSimulateEvent, this,
@@ -109,7 +109,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         for (const auto& id : pointerIdList) {
             PointerEvent::PointerItem pointeritem;
             if (!pointerEvent->GetPointerItem(id, pointeritem)) {
-                MMI_HILOGW("Can't find this poinerItem");
+                MMI_HILOGW("Can't find this pointerItem");
                 continue;
             }
             auto itemPid = WinMgr->GetWindowPid(pointeritem.GetTargetWindowId());

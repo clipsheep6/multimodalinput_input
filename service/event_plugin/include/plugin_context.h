@@ -15,7 +15,8 @@
 
 #ifndef PLUGIN_CONTEXT_H
 #define PLUGIN_CONTEXT_H
-#include "i_input_event_handle_plugin_context.h"
+#include <map>
+#include "i_input_event_handler_plugin_context.h"
 
 namespace OHOS {
 namespace MMI {
@@ -24,42 +25,16 @@ class PluginContext : public IInputEventPluginContext
 public:
     PluginContext() = default;
     virtual ~PluginContext() = default;
-    void SetEventHandler(std::shared_ptr<IInputEventHandler> handler)
-    {
-        auto it = handlers_.find(handler->handlerType_);
-        if (it == handlers_.end()) {
-            handlers_.insert(handler->handlerType_, handler);
-            return;
-        }
-        auto head = *it;
-        if (head->handlerPriority_ > handler->handlerPriority_) {
-            handler->SetNext(head);
-            handlers_.emplace(std::make_pair(handler->handlerType_, handler));
-            return;
-        }
-        for (auto cur = head; !cur; cur = cur->next) {
-            auto next = cur->next;
-            if (!next) {
-                cur->SetNext(handler);
-                return;
-            }
-            if (next->handlerPriority_ > handler->handlerPriority_) {
-                cur->SetNext(handler);
-                handler->SetNext(next);
-                return;
-            }
-        }
-        MMI_HILOGW("Cannot reach here! handlerType_:%{public}d", handler->handlerType_);
-    }
-    std::shared_ptr<IInputEventHandler> GetEventHandler(EventHandlerType type) const {
-        auto it = handlers_.find(handler->handlerType_);
-        if (it == handlers_.end()) {
-            return nullptr;
-        }
-        return *it;
-    }
+    virtual void SetEventHandler(std::shared_ptr<IInputEventHandler> handler);
+    virtual std::shared_ptr<IInputEventHandler> GetEventHandler();
+    virtual std::shared_ptr<IInputDeviceManager> GetInputDeviceManager();
+    virtual void StatBegin();
+    virtual void StatEnd();
+    virtual void TimeStat(TimeStatFlag flag);
+    virtual void OnReport(int32_t &max, int32_t &avg, int32_t &memMax, int32_t &memAvg);
+    virtual void chengmem();
 private:
-    std::map<EventHandlerType, std::shared_ptr<IInputEventHandler>> handlers_;
+    std::shared_ptr<IInputEventHandler> handler_;
 };
 } // namespace MMI
 } // namespace OHOS

@@ -32,7 +32,7 @@ namespace OHOS {
 namespace MMI {
 class EventMonitorHandler final : public IInputEventHandler {
 public:
-    EventMonitorHandler() = default;
+    EventMonitorHandler() : IInputEventHandler(500) {};
     DISALLOW_COPY_AND_MOVE(EventMonitorHandler);
     ~EventMonitorHandler() override = default;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -99,7 +99,7 @@ private:
         void Dump(int32_t fd, const std::vector<std::string> &args);
 
     struct ConsumptionState {
-        std::unordered_set<int32_t> eventIds_;
+        std::set<int32_t> eventIds_;
         bool isMonitorConsumed_ { false };
         std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
     };

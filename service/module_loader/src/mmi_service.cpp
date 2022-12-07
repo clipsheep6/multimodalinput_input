@@ -19,6 +19,7 @@
 #include <csignal>
 #include <parameters.h>
 #include <sys/signalfd.h>
+#include <sys/inotify.h>
 #include "dfx_hisysevent.h"
 #ifdef OHOS_RSS_CLIENT
 #include <unordered_map>
@@ -46,6 +47,7 @@
 #include "res_type.h"
 #include "system_ability_definition.h"
 #endif
+#include "input_device_manager.h"
 #include "permission_helper.h"
 #include "timer_manager.h"
 #include "input_device_manager.h"
@@ -59,6 +61,9 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMISe
 const std::string DEF_INPUT_SEAT = "seat0";
 constexpr int32_t WATCHDOG_INTERVAL_TIME = 10000;
 constexpr int32_t WATCHDOG_DELAY_TIME = 15000;
+const std::string INPUT_EVENT_HANDLER_PLUGIN_USER = "/data/user/plugins/";
+bool pluginCreateStatus { false };
+bool pluginDelStatus { false };
 } // namespace
 
 const bool REGISTER_RESULT =
@@ -204,7 +209,7 @@ bool MMIService::InitService()
         MMI_HILOGE("Service running status is not enabled");
         return false;
     }
-    if (EpollCreat(MAX_EVENT_SIZE) < 0) {
+    if (EpollCreate(MAX_EVENT_SIZE) < 0) {
         MMI_HILOGE("Create epoll failed");
         return false;
     }
@@ -239,11 +244,29 @@ bool MMIService::InitDelegateTasks()
     return true;
 }
 
+bool MMIService::InitINotify()
+{
+    CALL_DEBUG_ENTER;
+    if (!pluginMgr_.InitINotify()) {
+        MMI_HILOGE("The delegate task init failed");
+        return false;
+    }
+    auto ret = AddEpoll(EPOLL_EVENT_PLUGIN_SCAN, pluginMgr_.GetReadFd());
+    if (ret <  0) {
+        MMI_HILOGE("AddEpoll error ret:%{public}d", ret);
+        EpollClose();
+        return false;
+    }
+    MMI_HILOGI("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, pluginMgr_.GetReadFd());
+    return true;
+
+}
+
 int32_t MMIService::Init()
 {
     CheckDefine();
-    //pluginMgr_.SetDeivceManager(deviceMgr.GetDeviceContext()));
-    pluginMgr_.StartWatchPluginDir()
+    pluginMgr_.SetDeivceManager(InputDevMgr->GetDeviceContext());
+    pluginMgr_.StartWatchPluginDir();
     MMI_HILOGD("WindowsManager Init");
     WinMgr->Init(*this);
     MMI_HILOGD("ANRManager Init");
@@ -255,17 +278,22 @@ int32_t MMIService::Init()
         return POINTER_DRAW_INIT_FAIL;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
-    mmiFd_ = EpollCreat(MAX_EVENT_SIZE);
+    mmiFd_ = EpollCreate(MAX_EVENT_SIZE);
     if (mmiFd_ < 0) {
         MMI_HILOGE("Create epoll failed");
         return EPOLL_CREATE_FAIL;
     }
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    InputDevCooSM->Init(std::bind(&DelegateTasks::PostSyncTask, &delegateTasks_, std::placeholders::_1));
+    /*
+     * PostAsyncTask is used here to prevent InputDeviceCooperateSM:: StartRemoteCooperate() and
+     * CheckPointerEvent() from holding locks, resulting in deadlocks
+     */
+    InputDevCooSM->Init(std::bind(&DelegateTasks::PostAsyncTask, &delegateTasks_, std::placeholders::_1));
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     MMI_HILOGD("Input msg handler init");
-    InputHandler->Init(*this, pluginMgr_->GetContext());
-    if (!InputHandler->Build()) {
+    InputHandler->Init(*this, pluginMgr_.GetContext());
+    InitINotify();
+	if (!InputHandler->Build()) {
         MMI_HILOGE("Libinput init failed");
         return LIBINPUT_INIT_FAIL;
     }
@@ -304,7 +332,9 @@ void MMIService::OnStart()
     AddReloadDeviceTimer();
     t_ = std::thread(std::bind(&MMIService::OnThread, this));
 #ifdef OHOS_RSS_CLIENT
+    MMI_HILOGI("Add system ability listener start");
     AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
+    MMI_HILOGI("Add system ability listener success");
 #endif
 
     TimerMgr->AddTimer(WATCHDOG_INTERVAL_TIME, -1, [this]() {
@@ -319,20 +349,24 @@ void MMIService::OnStart()
             MMI_HILOGE("Watchdog happened");
         }
     };
+    MMI_HILOGI("Run periodical task start");
     HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask("MMIService", taskFunc,
         WATCHDOG_INTERVAL_TIME, WATCHDOG_DELAY_TIME);
-
+    MMI_HILOGI("Run periodical task success");
     t_.join();
 }
 
 void MMIService::OnStop()
 {
     CHK_PID_AND_TID();
+    pluginMgr_.stopINotify();
     UdsStop();
     libinputAdapter_.Stop();
     state_ = ServiceRunningState::STATE_NOT_START;
 #ifdef OHOS_RSS_CLIENT
+    MMI_HILOGI("Remove system ability listener start");
     RemoveSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
+    MMI_HILOGI("Remove system ability listener success");
 #endif
 }
 
@@ -589,7 +623,11 @@ int32_t MMIService::OnGetDevice(int32_t pid, int32_t userData, int32_t deviceId)
     pkt << userData << inputDevice->GetId() << inputDevice->GetName() << inputDevice->GetType()
         << inputDevice->GetBus() << inputDevice->GetProduct() << inputDevice->GetVendor()
         << inputDevice->GetVersion() << inputDevice->GetPhys() << inputDevice->GetUniq()
-        << inputDevice->GetAxisInfo().size();
+        << inputDevice->GetCapabilities() << inputDevice->GetAxisInfo().size();
+    for (auto &axis : inputDevice->GetAxisInfo()) {
+        pkt << axis.GetAxisType() << axis.GetMinimum() << axis.GetMaximum()
+            << axis.GetFuzz() << axis.GetFlat() << axis.GetResolution();
+    }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write input device info failed");
         return RET_ERR;
@@ -703,21 +741,22 @@ int32_t MMIService::GetKeyboardType(int32_t userData, int32_t deviceId)
 
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
 int32_t MMIService::CheckAddInput(int32_t pid, InputHandlerType handlerType,
-    HandleEventType eventType)
+    HandleEventType eventType, int32_t priority, uint32_t deviceTags)
 {
     auto sess = GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
-    return sMsgHandler_.OnAddInputHandler(sess, handlerType, eventType);
+    return sMsgHandler_.OnAddInputHandler(sess, handlerType, eventType, priority, deviceTags);
 }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 
-int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventType eventType)
+int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
+    int32_t priority, uint32_t deviceTags)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&MMIService::CheckAddInput, this, pid, handlerType, eventType));
+        std::bind(&MMIService::CheckAddInput, this, pid, handlerType, eventType, priority, deviceTags));
     if (ret != RET_OK) {
         MMI_HILOGE("Add input handler failed, ret:%{public}d", ret);
         return RET_ERR;
@@ -727,21 +766,23 @@ int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventTyp
 }
 
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
-int32_t MMIService::CheckRemoveInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType)
+int32_t MMIService::CheckRemoveInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType,
+    int32_t priority, uint32_t deviceTags)
 {
     auto sess = GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
-    return sMsgHandler_.OnRemoveInputHandler(sess, handlerType, eventType);
+    return sMsgHandler_.OnRemoveInputHandler(sess, handlerType, eventType, priority, deviceTags);
 }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 
-int32_t MMIService::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType)
+int32_t MMIService::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
+    int32_t priority, uint32_t deviceTags)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&MMIService::CheckRemoveInput, this, pid, handlerType, eventType));
+        std::bind(&MMIService::CheckRemoveInput, this, pid, handlerType, eventType, priority, deviceTags));
     if (ret != RET_OK) {
         MMI_HILOGE("Remove input handler failed, ret:%{public}d", ret);
         return RET_ERR;
@@ -835,6 +876,7 @@ int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> point
 #ifdef OHOS_RSS_CLIENT
 void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
+    CALL_INFO_TRACE;
     if (systemAbilityId == RES_SCHED_SYS_ABILITY_ID) {
         int sleepSeconds = 1;
         sleep(sleepSeconds);
@@ -939,6 +981,37 @@ void MMIService::OnDelegateTask(epoll_event& ev)
     delegateTasks_.ProcessTasks();
 }
 
+#define EVENT_SIZE  ( sizeof (struct inotify_event) )
+#define EVENT_BUF_LEN     ( 1024 * ( EVENT_SIZE + 16 ) )
+void MMIService::OnPluginScan(epoll_event& ev)
+{
+    int32_t length, i = 0;
+    char buffer[EVENT_BUF_LEN];
+    int32_t fd = *static_cast<int32_t*>(ev.data.ptr);//ev.data.ptr
+    length = read(fd, buffer, EVENT_BUF_LEN);
+    if (length < 0) {
+        return;
+    }
+    while (i < length) {
+        struct inotify_event *event = (struct inotify_event *) &buffer[i];
+        if (event->len) {
+            if ((event->mask & IN_CREATE)  && !(event->mask & IN_ISDIR)) {
+                pluginMgr_.UnloadPlugin(event->name);
+                pluginCreateStatus = true;
+            }
+            if (pluginCreateStatus && ((event->mask & IN_CLOSE_NOWRITE) || (event->mask & IN_CLOSE_WRITE))) {
+                pluginMgr_.LoadPlugin((INPUT_EVENT_HANDLER_PLUGIN_USER + event->name), event->name, false);
+                pluginCreateStatus = false;
+            }
+            if ((event->mask & IN_DELETE) && !(event->mask & IN_ISDIR)) {
+                pluginMgr_.UnloadPlugin(event->name);
+                pluginDelStatus = true;
+            }
+        }
+        i += EVENT_SIZE + event->len;
+    }
+}
+
 void MMIService::OnThread()
 {
     SetThreadName(std::string("mmi_service"));
@@ -950,6 +1023,9 @@ void MMIService::OnThread()
 #endif
     libinputAdapter_.RetriggerHotplugEvents();
     libinputAdapter_.ProcessPendingEvents();
+    TimerMgr->AddTimer(5000, -1, [this]() {
+        pluginMgr_.OnTimer();
+    });
     while (state_ == ServiceRunningState::STATE_RUNNING) {
         epoll_event ev[MAX_EVENT_SIZE] = {};
         int32_t timeout = TimerMgr->CalcNextDelay();
@@ -966,6 +1042,8 @@ void MMIService::OnThread()
                 OnSignalEvent(mmiEd->fd);
             } else if (mmiEd->event_type == EPOLL_EVENT_ETASK) {
                 OnDelegateTask(ev[i]);
+            } else if (mmiEd->event_type == EPOLL_EVENT_PLUGIN_SCAN) {
+                OnPluginScan(ev[i]);
             } else {
                 MMI_HILOGW("Unknown epoll event type:%{public}d", mmiEd->event_type);
             }

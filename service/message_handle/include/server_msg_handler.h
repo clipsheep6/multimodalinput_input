@@ -36,8 +36,10 @@ public:
     void Init(UDSServer& udsServer);
     void OnMsgHandler(SessionPtr sess, NetPacket& pkt);
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
-    int32_t OnAddInputHandler(SessionPtr sess, InputHandlerType handlerType, HandleEventType eventType);
-    int32_t OnRemoveInputHandler(SessionPtr sess, InputHandlerType handlerType, HandleEventType eventType);
+    int32_t OnAddInputHandler(SessionPtr sess, InputHandlerType handlerType, HandleEventType eventType,
+        int32_t priority, uint32_t deviceTags);
+    int32_t OnRemoveInputHandler(SessionPtr sess, InputHandlerType handlerType, HandleEventType eventType,
+        int32_t priority, uint32_t deviceTags);
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     int32_t OnMarkConsumed(SessionPtr sess, int32_t eventId);
@@ -65,6 +67,12 @@ protected:
     int32_t MarkProcessed(SessionPtr sess, NetPacket& pkt);
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
     int32_t OnDisplayInfo(SessionPtr sess, NetPacket& pkt);
+
+private:
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    bool FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, int32_t action);
+#endif // OHOS_BUILD_ENABLE_TOUCH
+
 private:
     UDSServer *udsServer_ { nullptr };
     int32_t targetWindowId_ { -1 };

@@ -21,7 +21,6 @@
 #include "ipc_skeleton.h"
 #include "string_ex.h"
 
-#include "event_filter_parcel.h"
 #include "mmi_log.h"
 
 namespace OHOS {
@@ -47,7 +46,7 @@ int32_t EventFilterStub::OnRemoteRequest(
             return StubHandlePointerEvent(data, reply);
         }
         default: {
-            MMI_HILOGE("Unknown code:%{public}u, go switch defaut", code);
+            MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
         }
     }

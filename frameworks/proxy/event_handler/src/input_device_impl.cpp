@@ -15,6 +15,8 @@
 
 #include "input_device_impl.h"
 
+#include <algorithm>
+
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
@@ -46,14 +48,17 @@ int32_t InputDeviceImpl::RegisterDevListener(const std::string &type, InputDevLi
         MMI_HILOGE("Find change failed");
         return RET_ERR;
     }
-    for (const auto &item : iter->second) {
-        if (item == listener) {
-            MMI_HILOGW("The listener already exists");
-            return RET_ERR;
-        }
+    auto &listeners = iter->second;
+
+    if (std::all_of(listeners.cbegin(), listeners.cend(),
+                    [listener](InputDevListenerPtr tListener) {
+                        return (tListener != listener);
+                    })) {
+        MMI_HILOGI("Add device listener");
+        listeners.push_back(listener);
+    } else {
+        MMI_HILOGW("The listener already exists");
     }
-    auto monitor = listener;
-    iter->second.push_back(monitor);
     if (!isListeningProcess_) {
         MMI_HILOGI("Start monitoring");
         isListeningProcess_ = true;
@@ -276,70 +281,44 @@ int32_t InputDeviceImpl::GetUserData()
 std::shared_ptr<InputDevice> InputDeviceImpl::DevDataUnmarshalling(NetPacket &pkt)
 {
     auto devData = std::make_shared<InputDevice>();
-    CHKPP(devData);
     int32_t deviceId;
-    pkt >> deviceId;
-    devData->SetId(deviceId);
-
     std::string name;
-    pkt >> name;
-    devData->SetName(name);
-
     int32_t deviceType;
-    pkt >> deviceType;
-    devData->SetType(deviceType);
-
     int32_t bus;
-    pkt >> bus;
-    devData->SetBus(bus);
-
     int32_t product;
-    pkt >> product;
-    devData->SetProduct(product);
-
     int32_t vendor;
-    pkt >> vendor;
-    devData->SetVendor(vendor);
-
     int32_t version;
-    pkt >> version;
-    devData->SetVersion(version);
-
     std::string phys;
-    pkt >> phys;
-    devData->SetPhys(phys);
-
     std::string uniq;
-    pkt >> uniq;
+    unsigned long caps;
+    pkt >> deviceId >> name >> deviceType >> bus >> product >> vendor >> version >> phys >> uniq >> caps;
+    devData->SetId(deviceId);
+    devData->SetName(name);
+    devData->SetType(deviceType);
+    devData->SetBus(bus);
+    devData->SetProduct(product);
+    devData->SetVendor(vendor);
+    devData->SetVersion(version);
+    devData->SetPhys(phys);
     devData->SetUniq(uniq);
+    devData->SetCapabilities(caps);
 
     size_t size;
     pkt >> size;
-    std::vector<InputDevice::AxisInfo> axisInfo;
     for (size_t i = 0; i < size; ++i) {
         InputDevice::AxisInfo axis;
         int32_t type;
-        pkt >> type;
-        axis.SetAxisType(type);
-
         int32_t min;
-        pkt >> min;
-        axis.SetMinimum(min);
-
         int32_t max;
-        pkt >> max;
-        axis.SetMaximum(max);
-
         int32_t fuzz;
-        pkt >> fuzz;
-        axis.SetFuzz(fuzz);
-
         int32_t flat;
-        pkt >> flat;
-        axis.SetFlat(flat);
-
         int32_t resolution;
-        pkt >> resolution;
+        pkt >> type >> min >> max >> fuzz >> flat >> resolution;
+        axis.SetAxisType(type);
+        axis.SetMinimum(min);
+        axis.SetMaximum(max);
+        axis.SetFuzz(fuzz);
+        axis.SetFlat(flat);
         axis.SetResolution(resolution);
         devData->AddAxisInfo(axis);
     }

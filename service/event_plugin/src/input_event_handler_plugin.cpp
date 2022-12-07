@@ -1,12 +1,28 @@
-#include "plugin_manager.h"
-
+/*
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #include <dlfcn.h>
 #include <dirent.h>
+#include <sys/inotify.h>
 #include "util.h"
 
 #include "input_event_handler_plugin.h"
-#include "i_input_event_handler_plugin.h"
+
 #include "i_input_event_handler.h"
+#include "input_event_handler.h"
+
+
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -23,17 +39,29 @@ bool CheckFileExtendName(const std::string &filePath, const std::string &checkEx
     return (filePath.substr(pos + 1, filePath.npos) == checkExtension);
 }
 
+int32_t max { 0 };
+int32_t avg { 0 };
+int32_t memMax { 0 };
+int32_t memAvg { 0 };
+std::map<std::shared_ptr<IInputEventHandler>, int32_t> timeOutPlugin;
+std::map<std::shared_ptr<IInputEventHandler>, int32_t> memPlugin;
 } // namespace
-
-void InputEventHandlerPluginMgr::PluginErgodic()
+InputEventHandlerPluginMgr::InputEventHandlerPluginMgr()
 {
-    ReadPlugin(INPUT_EVENT_HANDLER_PLUGIN_USER); //优先加载用户定制插件
-    ReadPlugin(INPUT_EVENT_HANDLER_PLUGIN_HOME);
+
 }
 
-void InputEventHandlerPluginMgr::StartWatchUserPluginDir()
+void InputEventHandlerPluginMgr::StartWatchPluginDir()
 {
-    WatchPlugin(INPUT_EVENT_HANDLER_PLUGIN_USER);
+    ReadPluginDir(INPUT_EVENT_HANDLER_PLUGIN_HOME);
+    ReadPluginDir(INPUT_EVENT_HANDLER_PLUGIN_USER); //用户插件与系统插件同名，只加载用户插件
+    for (auto it = pluginInfoList.begin(); it != pluginInfoList.end(); it++) {
+        MMI_HILOGE("load path = %{public}s ; os = %{public}s",it->second.osPath.data(), it->first.data());
+        bool ret = LoadPlugin(it->second.osPath, it->first, true);
+        if (!ret) {
+            MMI_HILOGE("plugin open error");
+        }
+    }
 }
 
 void InputEventHandlerPluginMgr::ReadPluginDir(const std::string pluginPath)
@@ -49,15 +77,20 @@ void InputEventHandlerPluginMgr::ReadPluginDir(const std::string pluginPath)
             continue;
         }
         char realPath[PATH_MAX] = {};
-
-        if (realpath((pluginPath + p->d_name).data(), realPath) == nullptr) {
+        std::string tmpPath = pluginPath + p->d_name;
+        if (realpath(tmpPath.data(), realPath) == nullptr) {
             MMI_HILOGE("Path is error, path:%{public}s", p->d_name);
             continue;
         }
-        if (!CheckFileExtendName(realPath, "so")) {
+        if (pluginInfoList.find(p->d_name) == pluginInfoList.end()) {
+            inputEventHandlerPlugin pluginInfo;
+            pluginInfo.osPath = realPath;
+            pluginInfoList[p->d_name] = pluginInfo;
+            continue;
+        } else {
+            pluginInfoList[p->d_name].osPath = realPath;
             continue;
         }
-        int32_t ret = LoadPlugin(realPath, p->d_name);
     }
     auto ret = closedir(dir);
     if (ret != 0) {
@@ -65,54 +98,139 @@ void InputEventHandlerPluginMgr::ReadPluginDir(const std::string pluginPath)
     }
 }
 
-int32_t InputEventHandlerPluginMgr::UnloadPlugins()
+bool InputEventHandlerPluginMgr::LoadPlugin(std::string pluginPath, std::string pluginName, bool initStatus)
 {
-    auto it = pluginInfoList.begin();
-    while (it != pluginInfoList.end()) {
-        dlclose(it->second);
-        it++;
+    if (!CheckFileExtendName(pluginPath, "so")) {
+        return false;
     }
-    pluginInfos_.clear();
-    return RET_OK;
-}
-
-int32_t InputEventHandlerPluginMgr::LoadPlugin(std::string &pluginPath,std::string pluginName)
-{
-
-    void *handle = dlopen(pluginPath, RTLD_NOW);
+    void *handle = dlopen(pluginPath.data(), RTLD_NOW);
     if(handle == nullptr){
-        MMI_HILOGE("open plugin failed, soname:%{public}s, msg:%{public}s", pluginPath, dlerror());
-        continue;
+        MMI_HILOGE("open plugin failed, soname:%{public}s, msg:%{public}s", pluginPath.data(), dlerror());
+        return false;
     }
-    if(ret != RET_OK){
-        auto retClose = dlclose(handle);
-        MMI_HILOGE("load plugin failed, soname:%{public}s, ret:%{public}d. retClose:%{public}d", p->d_name, ret, retClose);
-        continue;
-    }
-    GetPlugin* getPlugin = (GetPlugin*) dlsym(handle, "creat");
-    if(dlerror()) {
+    GetPlugin* getPlugin = (GetPlugin*) dlsym(handle, "create");
+    auto error = dlerror();
+    if(error != NULL) {
+        MMI_HILOGE("dlsym msg:%{public}s", error);
         dlclose(handle);
+        return false;
     }
-    Iplugin* plugin = getPlugin();
-
-    plugin->init(mmi_service);
-
-    inputEventHandlerPlugin pluginInfo;
-    pluginInfo.loadStatus = true;
-    pluginInfo.pluginName = pluginName;
-    pluginInfo.plugin = handler;
-    pluginInfoList[pluginPath] = pluginInfo;
-    return RET_OK;
+    auto plugin = getPlugin();
+    if (!plugin) {
+        MMI_HILOGE("plugin cerate error;");
+        return false;
+    }
+    auto context = std::make_shared<PluginContext>();
+    context_.push_back(context);
+    if (plugin->Init(context_.back().get())) {
+        pluginInfoList[pluginName].pluginHandler = context_.back()->GetEventHandler();
+        context_.back()->inputDeviceMgr_ = inputDevMgr_;
+    }
+    pluginInfoList[pluginName].loadStatus = true;
+    pluginInfoList[pluginName].osHandler = handle;
+    pluginInfoList[pluginName].plugin = plugin;
+    if (!initStatus) {
+        InputHandler->Insert(pluginInfoList[pluginName].pluginHandler);
+    }
+    MMI_HILOGE("dlOPEN  OK");
+    return true;
 }
 
 void InputEventHandlerPluginMgr::UnloadPlugin(std::string pluginName)
 {
-
-    ReleasePlugin* relessePlugin = (ReleasePlugin*) dlsym(pluginInfoList[pluginName].plugin, "Release");
-    relessePlugin(handle);
-    dlclose(handle);
-    pluginInfoList[pluginName].loadStatus = false;
+    if (pluginInfoList.find(pluginName) == pluginInfoList.end()) {
+        MMI_HILOGE("not plugin %{plugin}s", pluginName.data());
+        return;
+    }
+    InputHandler->Remove(pluginInfoList[pluginName].pluginHandler);
+    for (auto it = context_.begin(); it != context_.end(); ++it) {
+        if ((*it)->GetEventHandler() == pluginInfoList[pluginName].pluginHandler) {
+            (*it)->SetEventHandler(nullptr);
+            it = context_.erase(it);
+            break;
+        }
+    }
+    pluginInfoList.erase(pluginName);
 }
 
+void InputEventHandlerPluginMgr::DelPlugin(std::shared_ptr<IInputEventHandler> pluginHandler)
+{
+    for (auto &item : pluginInfoList) {
+        if (item.second.pluginHandler == pluginHandler) {
+            UnloadPlugin(item.first);
+            return;
+        }
+    }
+}
+
+bool InputEventHandlerPluginMgr::InitINotify()
+{
+    int32_t fd = inotify_init();
+    if (fd < 0) {
+        MMI_HILOGE("initalize inotify failed");
+        return false;
+    }
+
+    int wd = inotify_add_watch(fd, INPUT_EVENT_HANDLER_PLUGIN_USER.data(), IN_ALL_EVENTS);
+    if(wd < 0) {
+        MMI_HILOGE("add watch user failed ");
+        return false;
+    }
+    fd_ = fd;
+    wd_ = wd;
+    return true;
+}
+
+int32_t InputEventHandlerPluginMgr::GetReadFd()
+{
+    return fd_;
+}
+
+void InputEventHandlerPluginMgr::stopINotify()
+{
+    inotify_rm_watch(fd_, wd_);
+    close(fd_);
+}
+
+void InputEventHandlerPluginMgr::SetDeivceManager(std::shared_ptr<IInputDeviceManager> inputDeviceMgr)
+{
+    inputDevMgr_ = inputDeviceMgr;
+}
+
+void InputEventHandlerPluginMgr::OnTimer()
+{
+    auto timeout = GetSysClockTime() + 3000;
+    for (auto &item: context_) {
+        item->OnReport(max, avg, memMax, memAvg);
+        if (timeOutPlugin.find(item->GetEventHandler()) == timeOutPlugin.end()) {
+            timeOutPlugin[item->GetEventHandler()] = 0;
+            memPlugin[item->GetEventHandler()] = 0;
+        }
+        if (max > 500) {
+            timeOutPlugin[item->GetEventHandler()] = timeOutPlugin[item->GetEventHandler()] + 1;
+            if (timeOutPlugin[item->GetEventHandler()] > 10) {
+                DelPlugin(item->GetEventHandler());
+            }
+        } else {
+            if (max > 0) {
+                timeOutPlugin[item->GetEventHandler()] = 0;
+            }
+        }
+
+        if (memMax > 40) {
+            memPlugin[item->GetEventHandler()] = memPlugin[item->GetEventHandler()] + 1;
+            if (memPlugin[item->GetEventHandler()] > 10) {
+                DelPlugin(item->GetEventHandler());
+            }
+        } else {
+            if (memMax > 0) {
+                memPlugin[item->GetEventHandler()] = 0;
+            }
+        }
+        if (timeout > GetSysClockTime()) {
+            return;
+        }
+    }
+}
 } // namespace MMI
 } // namespace OHOS

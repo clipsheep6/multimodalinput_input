@@ -36,7 +36,8 @@ ohos_shared_library("input_touch_2_key_handler") {
     "//foundation/multimodalinput/input/util/common/include",
   ]
   sources = [
-    "touch2key/src/touch_2_key_handler.cpp"
+    "touch2key/src/touch_2_key_handler.cpp",
+    "touch2key/src/touch_2_key_plugin.cpp"
   ]
 
   defines = []
