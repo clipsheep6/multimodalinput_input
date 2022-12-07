@@ -103,7 +103,6 @@ void PluginContext::StatEnd()
 void PluginContext::chengmem()
 {
     std::string strPid = std::to_string(GetPid());
-    MMI_HILOGE("1111111111111111 PID is %{public}s",strPid.data());
     std::string path = "/proc/" + strPid +"/smaps";
     std::ifstream mem(path);
     if (!mem.is_open()) {
@@ -127,7 +126,6 @@ void PluginContext::chengmem()
                 swap_ += GetNum(tmp);
             } else if (tmp.find("VmFlags") != std::string::npos) {
                 dataStatus = false;
-                MMI_HILOGE("%{public}s", tmp.data());
             } else {}
         }
     }
