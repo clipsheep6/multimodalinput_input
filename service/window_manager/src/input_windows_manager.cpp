@@ -212,6 +212,7 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
     CheckFocusWindowChange(displayGroupInfo);
     CheckZorderWindowChange(displayGroupInfo);
     displayGroupInfo_ = displayGroupInfo;
+    PrintDisplayInfo();
 #ifdef OHOS_BUILD_ENABLE_POINTER
     UpdatePointerStyle();
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -230,6 +231,7 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
             int32_t logicX = mouseLocation.physicalX + displayInfo->x;
             int32_t logicY = mouseLocation.physicalY + displayInfo->y;
             std::optional<WindowInfo> windowInfo;
+            CHKPV(lastPointerEvent_);
             if (lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE &&
                 lastPointerEvent_->GetPressedButtons().empty()) {
                 windowInfo = GetWindowInfo(logicX, logicY);
@@ -254,7 +256,6 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
 #endif // OHOS_BUILD_ENABLE_POINTER
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-    PrintDisplayInfo();
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -399,6 +400,7 @@ void InputWindowsManager::NotifyPointerToWindow()
 {
     CALL_INFO_TRACE;
     std::optional<WindowInfo> windowInfo;
+    CHKPV(lastPointerEvent_);
     if (lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE &&
         lastPointerEvent_->GetPressedButtons().empty()) {
         windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
@@ -671,8 +673,9 @@ int32_t InputWindowsManager::GetPointerStyle(int32_t pid, int32_t windowId, int3
     
     auto iter = it->second.find(windowId);
     if (iter == it->second.end()) {
-        MMI_HILOGE("The window id is Invalid");
-        return COMMON_PARAMETER_ERROR ;
+        MMI_HILOGW("The window id is invalid");
+        pointerStyle = DEFAULT_POINTER_STYLE;
+        return RET_OK;
     }
     
     MMI_HILOGD("Window type:%{public}d get pointer style:%{public}d success", windowId, iter->second);

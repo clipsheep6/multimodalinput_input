@@ -152,11 +152,6 @@ int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data,
 int32_t MultimodalInputConnectStub::StubSetPointerVisible(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check failed");
-        return INPUT_CHECK_PERMISSION_FAIL;
-    }
-
     bool visible = false;
     READBOOL(data, visible, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetPointerVisible(visible);
@@ -171,11 +166,6 @@ int32_t MultimodalInputConnectStub::StubSetPointerVisible(MessageParcel& data, M
 int32_t MultimodalInputConnectStub::StubIsPointerVisible(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check failed");
-        return INPUT_CHECK_PERMISSION_FAIL;
-    }
-
     bool visible = false;
     int32_t ret = IsPointerVisible(visible);
     if (ret != RET_OK) {
@@ -356,7 +346,12 @@ int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, Mes
     }
     uint32_t eventType;
     READUINT32(data, eventType, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = AddInputHandler(static_cast<InputHandlerType>(handlerType), eventType);
+    int32_t priority;
+    READINT32(data, priority, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t deviceTags;
+    READINT32(data, deviceTags, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = AddInputHandler(static_cast<InputHandlerType>(handlerType), eventType, priority,
+        deviceTags);
     if (ret != RET_OK) {
         MMI_HILOGE("Call AddInputHandler failed ret:%{public}d", ret);
         return ret;
@@ -384,7 +379,12 @@ int32_t MultimodalInputConnectStub::StubRemoveInputHandler(MessageParcel& data, 
     }
     uint32_t eventType;
     READUINT32(data, eventType, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = RemoveInputHandler(static_cast<InputHandlerType>(handlerType), eventType);
+    int32_t priority;
+    READINT32(data, priority, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t deviceTags;
+    READINT32(data, deviceTags, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = RemoveInputHandler(static_cast<InputHandlerType>(handlerType), eventType, priority,
+        deviceTags);
     if (ret != RET_OK) {
         MMI_HILOGE("Call RemoveInputHandler failed ret:%{public}d", ret);
         return ret;
@@ -431,7 +431,6 @@ int32_t MultimodalInputConnectStub::StubSubscribeKeyEvent(MessageParcel& data, M
     READINT32(data, subscribeId, IPC_PROXY_DEAD_OBJECT_ERR);
 
     auto keyOption = std::make_shared<KeyOption>();
-    CHKPR(keyOption, IPC_STUB_WRITE_PARCEL_ERR);
     if (!keyOption->ReadFromParcel(data)) {
         MMI_HILOGE("Read keyOption failed");
         return IPC_PROXY_DEAD_OBJECT_ERR;
