@@ -38,7 +38,11 @@ constexpr size_t MAX_WINDOW_COUNT = 20;
 const std::string bindCfgFileName = "/data/inputBindOutput.cfg";
 } // namespace
 
-InputWindowsManager::InputWindowsManager() : bindInfo_(bindCfgFileName) {}
+InputWindowsManager::InputWindowsManager() : bindInfo_(bindCfgFileName)
+{
+    MMI_HILOGI("Bind cfg file name:%{public}s", bindCfgFileName.c_str());
+}
+
 InputWindowsManager::~InputWindowsManager() {}
 
 void InputWindowsManager::DeviceStatusChanged(int32_t deviceId, const std::string &sysUid, const std::string devStatus)
@@ -47,12 +51,16 @@ void InputWindowsManager::DeviceStatusChanged(int32_t deviceId, const std::strin
     if (devStatus == "add") {
         auto ret = bindInfo_.AddInputDevice(deviceId, sysUid);
         if (!ret) {
-            MMI_HILOGE("AddInputDevice fail, deviceId:%{public}d,sysUid:%{public}s", deviceId, sysUid.c_str())
+            MMI_HILOGE("AddInputDevice fail, deviceId:%{public}d,sysUid:%{public}s", deviceId, sysUid.c_str());
+        } else {
+            MMI_HILOGI("AddInputDevice success, deviceId:%{public}d,sysUid:%{public}s", deviceId, sysUid.c_str());
         }
     } else {
         auto ret = bindInfo_.RemoveInputDevice(deviceId);
         if (!ret) {
-            MMI_HILOGE("AddInputDevice fail, deviceId:%{public}d,sysUid:%{public}s", deviceId, sysUid.c_str())
+            MMI_HILOGE("AddInputDevice fail, deviceId:%{public}d,sysUid:%{public}s", deviceId, sysUid.c_str());
+        } else {
+            MMI_HILOGI("AddInputDevice success, deviceId:%{public}d", deviceId);
         }
     }
 }
@@ -66,7 +74,7 @@ void InputWindowsManager::Init(UDSServer& udsServer)
     udsServer_->AddSessionDeletedCallback(std::bind(&InputWindowsManager::OnSessionLost, this, std::placeholders::_1));
     InitMouseDownInfo();
 #endif // OHOS_BUILD_ENABLE_POINTER
-    InputDevMgr->InputStatusChangeCallback(std::bind(&InputWindowsManager::DeviceStatusChanged, this,
+    InputDevMgr->SetInputStatusChangeCallback(std::bind(&InputWindowsManager::DeviceStatusChanged, this,
         std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 }
 
@@ -259,7 +267,6 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
     displayGroupInfo_ = displayGroupInfo;
     PrintDisplayInfo();
     UpdateDisplayIdAndName();
-
 #ifdef OHOS_BUILD_ENABLE_POINTER
     UpdatePointerStyle();
 #endif // OHOS_BUILD_ENABLE_POINTER

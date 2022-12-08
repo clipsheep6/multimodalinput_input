@@ -15,8 +15,6 @@
 
 #include "input_device_manager.h"
 
-#include <fstream>
-#include <iostream>
 #include <linux/input.h>
 #include <parameters.h>
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
@@ -35,7 +33,6 @@
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include "util.h"
 #endif // OHOS_BUILD_ENABLE_COOPERATE
-#include "display_info.h"
 #include "util_ex.h"
 #include "util_napi_error.h"
 
@@ -45,7 +42,6 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceManager" };
 constexpr int32_t INVALID_DEVICE_ID = -1;
 constexpr int32_t SUPPORT_KEY = 1;
-constexpr int32_t USBDEVIDEINFO_MAX = 10;
 const std::string UNKNOWN_SCREEN_ID = "";
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 const char *SPLIT_SYMBOL = "|";
@@ -252,7 +248,7 @@ int32_t InputDeviceManager::GetKeyboardType(int32_t deviceId, int32_t &keyboardT
     return GetDeviceSupportKey(deviceId, keyboardType);
 }
 
-void InputDeviceManager::InputStatusChangeCallback(inputDeviceCallback callback)
+void InputDeviceManager::SetInputStatusChangeCallback(inputDeviceCallback callback)
 {
     CALL_DEBUG_ENTER;
     devCallbacks_ = callback;
@@ -313,15 +309,16 @@ std::string InputDeviceManager::GetInputIdentification(struct libinput_device* i
         MMI_HILOGE("Get device identification failed");
         return "";
     }
-    char vid[USBDEVIDEINFO_MAX] = "";
-    char pid[USBDEVIDEINFO_MAX] = "";
+    const size_t bufSize = 10;
+    char vid[bufSize] = "";
+    char pid[bufSize] = "";
     sprintf_s(vid, sizeof(vid), "%04X", deviceVendor);
     sprintf_s(pid, sizeof(pid), "%04X", deviceProduct);
     std::string strVid(vid);
     std::string strPid(pid);
     std::string vendorProduct = strVid + ":" + strPid;
     std::string deviceIdentification = sysPath.substr(0, sysPath.find(vendorProduct)) + vendorProduct;
-    MMI_HILOGI("Get device identification is:%{public}s", deviceIdentification.c_str());
+    MMI_HILOGI("Device identification is:%{public}s", deviceIdentification.c_str());
     return deviceIdentification;
 }
 
@@ -333,10 +330,10 @@ void InputDeviceManager::NotifyDevCallback(int32_t deviceId,  struct InputDevice
     }
     if (!inDevice.sysUid.empty()) {
         devCallbacks_(deviceId, inDevice.sysUid, "add");
-        MMI_HILOGI("lilong Send device info to window manager, device id:%{public}d, system uid:%{public}s, status:add",
+        MMI_HILOGI("Send device info to window manager, device id:%{public}d, system uid:%{public}s, status:add",
             deviceId, inDevice.sysUid.c_str());
     } else {
-        MMI_HILOGE("lilong Get device system uid id is empty, deviceId:%{public}d", deviceId);
+        MMI_HILOGE("Get device system uid id is empty, deviceId:%{public}d", deviceId);
     }
 }
 
@@ -431,9 +428,9 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
         }
     }
     std::string sysUid = GetInputIdentification(inputDevice);
-    if (!(sysUid.empty())) {
+    if (!sysUid.empty()) {
         devCallbacks_(deviceId, sysUid, "remove");
-        MMI_HILOGI("lilong Send device info to window manager, device id:%{public}d, system uid:%{public}s, status:remove",
+        MMI_HILOGI("Send device info to window manager, device id:%{public}d, system uid:%{public}s, status:remove",
             deviceId, sysUid.c_str());
     }
 
