@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "accesstoken_kit.h"
+#include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "input_handler_manager.h"
@@ -112,6 +113,86 @@ void InputManagerManualTest::SetUp()
     callbackRet = 0;
 }
 
+/**
+ * @tc.name: StartBytrace_001
+ * @tc.desc: Verify keyevent start bytrace
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerManualTest, StartBytrace_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetId(0);
+    BytraceAdapter::StartBytrace(keyEvent);
+    ASSERT_EQ(keyEvent->GetId(), 0);
+}
+
+/**
+ * @tc.name: StartBytrace_002
+ * @tc.desc: Verify keyevent start bytrace
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerManualTest, StartBytrace_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetId(0);
+    keyEvent->SetKeyCode(0);
+    BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_INTERCEPT_EVENT);
+    BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_LAUNCH_EVENT);
+    BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
+    BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_DISPATCH_EVENT);
+    BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::POINT_INTERCEPT_EVENT);
+    ASSERT_EQ(keyEvent->GetKeyCode(), 0);
+}
+
+/**
+ * @tc.name: StartBytrace_003
+ * @tc.desc: Verify pointerEvent start bytrace
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerManualTest, StartBytrace_003, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP);
+    ASSERT_EQ(pointerEvent->GetSourceType(), PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+}
+
+/**
+ * @tc.name: StartBytrace_004
+ * @tc.desc: Verify pointerEvent start bytrace
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerManualTest, StartBytrace_004, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_START, BytraceAdapter::START_EVENT);
+    BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_START, BytraceAdapter::LAUNCH_EVENT);
+    BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_START, BytraceAdapter::STOP_EVENT);
+    BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_STOP, BytraceAdapter::START_EVENT);
+    BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_STOP, BytraceAdapter::LAUNCH_EVENT);
+    BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_STOP, BytraceAdapter::STOP_EVENT);
+    ASSERT_EQ(pointerEvent->GetSourceType(), PointerEvent::SOURCE_TYPE_MOUSE);
+}
+
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 void InputManagerManualTest::AddInputEventFilter()
 {
@@ -172,8 +253,8 @@ void InputManagerManualTest::SimulateInputEventHelper(int32_t physicalX, int32_t
 }
 
 /**
- * @tc.name:HandlePointerEventFilter_001
- * @tc.desc:Verify pointer event filter
+ * @tc.name: HandlePointerEventFilter_001
+ * @tc.desc: Verify pointer event filter
  * @tc.type: FUNC
  * @tc.require:
  */

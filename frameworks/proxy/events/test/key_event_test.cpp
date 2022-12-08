@@ -370,7 +370,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_TransitionFunctionKey_004, TestSize.Level1)
 
 /**
  * @tc.name: KeyEventTest_ReadFromParcel_001
- * @tc.desc: Read from parcel
+ * @tc.desc: Verify keyevent read from parcel
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -397,7 +397,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_ReadFromParcel_001, TestSize.Level1)
 
 /**
  * @tc.name: KeyEventTest_ReadFromParcel_002
- * @tc.desc: Read from parcel
+ * @tc.desc: Verify keyevent read from parcel
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -431,6 +431,32 @@ HWTEST_F(KeyEventTest, KeyEventTest_ReadFromParcel_002, TestSize.Level1)
         ret = keyItem.ReadFromParcel(data);
         ASSERT_TRUE(ret);
     }
+}
+
+/**
+ * @tc.name: KeyEventTest_ReadFromParcel_003
+ * @tc.desc: Verify keyoption read from parcel
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_ReadFromParcel_003, TestSize.Level1)
+{
+   std::set<int32_t> preKeys;
+   std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+   keyOption->SetPreKeys(preKeys);
+   MessageParcel data;
+   bool ret = keyOption->ReadFromParcel(data);
+   ASSERT_FALSE(ret);
+   preKeys.insert(0);
+   preKeys.insert(1);
+   keyOption->SetPreKeys(preKeys);
+   keyOption->SetFinalKey(0);
+   keyOption->SetFinalKeyDown(0);
+   keyOption->SetFinalKeyDownDuration(0);
+   keyOption->SetFinalKeyUpDelay(0);
+   keyOption->WriteToParcel(data);
+   ret = keyOption->ReadFromParcel(data);
+   ASSERT_TRUE(ret);
 }
 } // namespace MMI
 } // namespace OHOS
