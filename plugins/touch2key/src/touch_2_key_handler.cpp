@@ -26,7 +26,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Touch2
 void Touch2KeyHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     context_->StatBegin();
-    MMI_HILOGI("Device name is %{public}s",context_->GetInputDeviceManager()->GetDeviceName().data());
+    MMI_HILOGI("Device name is %{public}s", context_->GetInputDeviceManager()->GetDeviceName().data());
     context_->StatEnd();
     context_->chengmem();
     nextHandler_->HandleKeyEvent(keyEvent);
@@ -35,7 +35,7 @@ void Touch2KeyHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 void Touch2KeyHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     context_->StatBegin();
-    MMI_HILOGI("Device name is %{public}s",context_->GetInputDeviceManager()->GetDeviceName().data());
+    MMI_HILOGI("Device name is %{public}s", context_->GetInputDeviceManager()->GetDeviceName().data());
     context_->StatEnd();
     context_->chengmem();
     nextHandler_->HandlePointerEvent(pointerEvent);
@@ -44,7 +44,7 @@ void Touch2KeyHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> po
 void Touch2KeyHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     context_->StatBegin();
-    MMI_HILOGI("Device name is %{public}s",context_->GetInputDeviceManager()->GetDeviceName().data());
+    MMI_HILOGI("Device name is %{public}s", context_->GetInputDeviceManager()->GetDeviceName().data());
     context_->StatEnd();
     context_->chengmem();
     nextHandler_->HandleTouchEvent(pointerEvent);

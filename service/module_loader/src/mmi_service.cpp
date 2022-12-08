@@ -355,7 +355,7 @@ void MMIService::OnStart()
 void MMIService::OnStop()
 {
     CHK_PID_AND_TID();
-    pluginMgr_.stopINotify();
+    pluginMgr_.StopINotify();
     UdsStop();
     libinputAdapter_.Stop();
     state_ = ServiceRunningState::STATE_NOT_START;

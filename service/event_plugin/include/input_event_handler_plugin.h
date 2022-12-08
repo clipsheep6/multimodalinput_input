@@ -39,19 +39,19 @@ public:
     void SetDeivceManager(std::shared_ptr<IInputDeviceManager> inputDeviceMgr);
     void StartWatchPluginDir();
     void ReadPluginDir(const std::string pluginPath);
-    bool LoadPlugin(std::string pluginPath,std::string pluginName, bool initStatus);
+    bool LoadPlugin(std::string pluginPath, std::string pluginName, bool initStatus);
     void UnloadPlugin(std::string pluginPath);
     void UnloadPlugins();
     bool InitINotify();
     void OnTimer();
     int32_t GetReadFd();
-    void stopINotify();
+    void StopINotify();
     std::list<std::shared_ptr<IInputEventPluginContext>> GetContext() const { return context_; }
     void SetHandler(std::shared_ptr<IInputEventHandler>& pHandlers);
     void DelPlugin(std::shared_ptr<IInputEventHandler> pluginHandler);
 private:
     std::list<std::shared_ptr<IInputEventPluginContext>> context_;
-    std::map<std::string , inputEventHandlerPlugin> pluginInfoList = {};
+    std::map<std::string, inputEventHandlerPlugin> pluginInfoList;
     int32_t fd_ { 0 };
     int32_t wd_ { 0 };
     std::shared_ptr<IInputDeviceManager> inputDevMgr_;

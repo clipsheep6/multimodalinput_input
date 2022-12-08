@@ -19,9 +19,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "PluginContext"};
-// int64_t time { 0 };
-// std::list<uint64_t, int32_t> timeAndCostTimes_;
-// int32_t avg_ { 0 };
 int32_t max_ { 0 };
 int32_t raw_ { 0 };
 int64_t sum_ { 0 };
@@ -38,13 +35,12 @@ int32_t size_ { 0 };
 int32_t GetNum(std::string str)
 {
     std::smatch match;
-    bool isValueNumber = std::regex_search(str, match, std::regex("\\d+"));
-    if (isValueNumber) {
-        return stoi(match[0]);
-    } else {
-        MMI_HILOGE("numberValue : is error");
+    bool isNumber = std::regex_search(str, match, std::regex("\\d+"));
+    if (!isNumber) {
+        MMI_HILOGE("No numbers found");
+        return 0;
     }
-    return 0;
+    return stoi(match[0]);
 }
 } // namespace
 void PluginContext::SetEventHandler(std::shared_ptr<IInputEventHandler> handler)

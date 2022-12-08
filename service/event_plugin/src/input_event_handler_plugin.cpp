@@ -91,13 +91,14 @@ void InputEventHandlerPluginMgr::ReadPluginDir(const std::string pluginPath)
     }
     auto ret = closedir(dir);
     if (ret != 0) {
-        MMI_HILOGE("Closedir failed, dirname:%{public}s, errno:%{public}d", INPUT_EVENT_HANDLER_PLUGIN_HOME.data(), errno);
+        MMI_HILOGE("Closedir failed, dirname:%{public}s, errno:%{public}d", pluginPath.data(), errno);
     }
 }
 
 bool InputEventHandlerPluginMgr::LoadPlugin(std::string pluginPath, std::string pluginName, bool initStatus)
 {
     if (!CheckFileExtendName(pluginPath, "so")) {
+        MMI_HILOGE("File %{public}s is not .so", pluginName.data())
         return false;
     }
     void *handle = dlopen(pluginPath.data(), RTLD_NOW);
@@ -182,7 +183,7 @@ int32_t InputEventHandlerPluginMgr::GetReadFd()
     return fd_;
 }
 
-void InputEventHandlerPluginMgr::stopINotify()
+void InputEventHandlerPluginMgr::StopINotify()
 {
     inotify_rm_watch(fd_, wd_);
     close(fd_);
