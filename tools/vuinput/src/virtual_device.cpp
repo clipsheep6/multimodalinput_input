@@ -297,12 +297,12 @@ std::vector<std::string> VirtualDevice::BrowseDirectory(const std::string& fileP
 
 bool VirtualDevice::ClearFileResidues(const std::string& fileName)
 {
-    DIR *dir = nullptr;
     const std::string::size_type pos = fileName.find("_");
     const std::string procressPath = "/proc/" + fileName.substr(0, pos) + "/";
     const std::string filePath = procressPath + "cmdline";
     std::string temp;
     std::string processName;
+    DIR *dir = nullptr;
     if (!CheckFileName(fileName)) {
         std::cout << "File name check error" << std::endl;
         goto RELEASE_RES;
@@ -314,7 +314,7 @@ bool VirtualDevice::ClearFileResidues(const std::string& fileName)
     dir = opendir(procressPath.c_str());
     if (dir == nullptr) {
         std::cout << "Useless flag file:" << procressPath << std::endl;
-        goto RELEASE_RES;
+        return false;
     }
     temp = ReadUinputToolFile(filePath);
     if (temp.empty()) {
@@ -329,10 +329,8 @@ bool VirtualDevice::ClearFileResidues(const std::string& fileName)
         return true;
     }
     RELEASE_RES:
-    if (dir != nullptr) {
-        if (closedir(dir) != 0) {
-            std::cout << "Close dir failed" << std::endl;
-        }
+    if (closedir(dir) != 0) {
+        std::cout << "Close dir failed" << std::endl;
     }
     if (std::remove((g_folderPath + fileName).c_str()) != 0) {
         std::cout << "Remove file failed" << std::endl;
