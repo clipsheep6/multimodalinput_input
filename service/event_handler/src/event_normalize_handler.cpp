@@ -120,9 +120,9 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event)
 
 int32_t EventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
 {
-    CHKPR(event, ERROR_NULL_POINTER);
+    CHKPR(event, INPUT_COMMON_NULLPTR);
     auto device = libinput_event_get_device(event);
-    CHKPR(device, ERROR_NULL_POINTER);
+    CHKPR(device, INPUT_COMMON_NULLPTR);
     InputDevMgr->OnInputDeviceAdded(device);
     KeyMapMgr->ParseDeviceConfigFile(device);
     KeyRepeat->AddDeviceConfig(device);
@@ -134,9 +134,9 @@ int32_t EventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
 
 int32_t EventNormalizeHandler::OnEventDeviceRemoved(libinput_event *event)
 {
-    CHKPR(event, ERROR_NULL_POINTER);
+    CHKPR(event, INPUT_COMMON_NULLPTR);
     auto device = libinput_event_get_device(event);
-    CHKPR(device, ERROR_NULL_POINTER);
+    CHKPR(device, INPUT_COMMON_NULLPTR);
     KeyMapMgr->RemoveKeyValue(device);
     KeyRepeat->RemoveDeviceConfig(device);
     InputDevMgr->OnInputDeviceRemoved(device);
@@ -224,8 +224,8 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     }
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     auto keyEvent = KeyEventHdr->GetKeyEvent();
-    CHKPR(keyEvent, ERROR_NULL_POINTER);
-    CHKPR(event, ERROR_NULL_POINTER);
+    CHKPR(keyEvent, INPUT_COMMON_NULLPTR);
+    CHKPR(event, INPUT_COMMON_NULLPTR);
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
     int32_t lastPressedKey = -1;
     if (!pressedKeys.empty()) {
@@ -233,13 +233,9 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
         MMI_HILOGD("The last repeat button, keyCode:%{public}d", lastPressedKey);
     }
     auto packageResult = KeyEventHdr->Normalize(event, keyEvent);
-    if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
-        MMI_HILOGD("The same event reported by multi_device should be discarded");
-        return RET_OK;
-    }
     if (packageResult != RET_OK) {
-        MMI_HILOGE("KeyEvent package failed, ret:%{public}d,errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
-        return KEY_EVENT_PKG_FAIL;
+        MMI_HILOGE("KeyEvent package failed, ret:%{public}d,errCode:%{public}d", packageResult, INPUT_KEY_EVENT_PKG_FAIL);
+        return INPUT_KEY_EVENT_PKG_FAIL;
     }
 
     BytraceAdapter::StartBytrace(keyEvent);
@@ -326,11 +322,11 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
 #ifdef OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     const auto &keyEvent = KeyEventHdr->GetKeyEvent();
-    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    CHKPR(keyEvent, INPUT_COMMON_NULLPTR);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     MouseEventHdr->Normalize(event);
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    CHKPR(pointerEvent, INPUT_COMMON_NULLPTR);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
     for (const int32_t& keyCode : pressedKeys) {
@@ -353,9 +349,9 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
         return ERROR_UNSUPPORT;
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    CHKPR(event, ERROR_NULL_POINTER);
+    CHKPR(event, INPUT_COMMON_NULLPTR);
     auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH_PAD);
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    CHKPR(pointerEvent, INPUT_COMMON_NULLPTR);
     nextHandler_->HandlePointerEvent(pointerEvent);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCHPAD_UP) {
@@ -379,9 +375,9 @@ int32_t EventNormalizeHandler::HandleGestureEvent(libinput_event* event)
         return ERROR_UNSUPPORT;
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    CHKPR(event, ERROR_NULL_POINTER);
+    CHKPR(event, INPUT_COMMON_NULLPTR);
     auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::GESTURE);
-    CHKPR(pointerEvent, GESTURE_EVENT_PKG_FAIL);
+    CHKPR(pointerEvent, INPUT_COMMON_NULLPTR);
     MMI_HILOGD("GestureEvent package, eventType:%{public}d,actionTime:%{public}" PRId64 ","
                "action:%{public}d,actionStartTime:%{public}" PRId64 ","
                "pointerAction:%{public}d,sourceType:%{public}d,"
@@ -414,9 +410,9 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event)
         return ERROR_UNSUPPORT;
     }
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    CHKPR(event, ERROR_NULL_POINTER);
+    CHKPR(event, INPUT_COMMON_NULLPTR);
     auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH);
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    CHKPR(pointerEvent, INPUT_COMMON_NULLPTR);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandleTouchEvent(pointerEvent);
     ResetTouchUpEvent(pointerEvent, event);
@@ -449,9 +445,9 @@ int32_t EventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
         return ERROR_UNSUPPORT;
     }
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    CHKPR(event, ERROR_NULL_POINTER);
+    CHKPR(event, INPUT_COMMON_NULLPTR);
     auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TABLET_TOOL);
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    CHKPR(pointerEvent, INPUT_COMMON_NULLPTR);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandleTouchEvent(pointerEvent);
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
@@ -471,9 +467,9 @@ int32_t EventNormalizeHandler::HandleJoystickEvent(libinput_event* event)
         return ERROR_UNSUPPORT;
     }
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
-    CHKPR(event, ERROR_NULL_POINTER);
+    CHKPR(event, INPUT_COMMON_NULLPTR);
     auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::JOYSTICK);
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    CHKPR(pointerEvent, INPUT_COMMON_NULLPTR);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandlePointerEvent(pointerEvent);
 #else

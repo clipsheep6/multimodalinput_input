@@ -162,11 +162,11 @@ void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<KeyEvent>
         return;
     }
     if (InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt) != RET_OK) {
-        MMI_HILOGE("Packet key event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+        MMI_HILOGE("Packet key event failed");
         return;
     }
     if (!session_->SendMsg(pkt)) {
-        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+        MMI_HILOGE("Send message failed");
         return;
     }
 }
@@ -191,11 +191,11 @@ void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEv
         return;
     }
     if (InputEventDataTransformation::Marshalling(pointerEvent, pkt) != RET_OK) {
-        MMI_HILOGE("Marshalling pointer event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+        MMI_HILOGE("Marshalling pointer event failed");
         return;
     }
     if (!session_->SendMsg(pkt)) {
-        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+        MMI_HILOGE("Send message failed, errCode:%{public}d", INPUT_MSG_SEND_FAIL);
         return;
     }
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
@@ -206,8 +206,7 @@ void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEv
 int32_t EventMonitorHandler::MonitorCollection::AddMonitor(const SessionHandler& monitor)
 {
     if (monitors_.size() >= MAX_N_INPUT_MONITORS) {
-        MMI_HILOGE("The number of monitors exceeds the maximum:%{public}zu,monitors,errCode:%{public}d",
-                   monitors_.size(), INVALID_MONITOR_MON);
+        MMI_HILOGE("The number of monitors exceeds the maximum:%{public}zu,monitors", monitors_.size());
         return RET_ERR;
     }
     bool isFound = false;

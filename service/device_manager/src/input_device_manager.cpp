@@ -189,7 +189,7 @@ int32_t InputDeviceManager::GetKeyboardBusMode(int32_t deviceId)
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr dev = GetInputDevice(deviceId);
-    CHKPR(dev, ERROR_NULL_POINTER);
+    CHKPR(dev, INPUT_COMMON_NULLPTR);
     return dev->GetBus();
 }
 

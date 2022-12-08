@@ -162,11 +162,11 @@ void EventInterceptorHandler::SessionHandler::SendToClient(std::shared_ptr<KeyEv
         return;
     }
     if (InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt) != RET_OK) {
-        MMI_HILOGE("Packet key event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+        MMI_HILOGE("Packet key event failed");
         return;
     }
     if (!session_->SendMsg(pkt)) {
-        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+        MMI_HILOGE("Send message failed, errCode:%{public}d", INPUT_MSG_SEND_FAIL);
         return;
     }
 }
@@ -182,11 +182,11 @@ void EventInterceptorHandler::SessionHandler::SendToClient(std::shared_ptr<Point
         return;
     }
     if (InputEventDataTransformation::Marshalling(pointerEvent, pkt) != RET_OK) {
-        MMI_HILOGE("Marshalling pointer event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+        MMI_HILOGE("Marshalling pointer event failed");
         return;
     }
     if (!session_->SendMsg(pkt)) {
-        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+        MMI_HILOGE("Send message failed");
         return;
     }
 }

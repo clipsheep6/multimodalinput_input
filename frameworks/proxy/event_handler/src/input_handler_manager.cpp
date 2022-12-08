@@ -388,7 +388,7 @@ void InputHandlerManager::OnDispatchEventProcessed(int32_t eventId)
         return;
     }
     if (!client->SendMessage(pkt)) {
-        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+        MMI_HILOGE("Send message failed, errCode:%{public}d", INPUT_MSG_SEND_FAIL);
         return;
     }
 }

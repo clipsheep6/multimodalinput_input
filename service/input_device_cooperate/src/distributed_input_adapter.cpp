@@ -58,7 +58,7 @@ int32_t DistributedInputAdapter::StartRemoteInput(const std::string &deviceId, c
 {
     CALL_INFO_TRACE;
     sptr<IStartStopDInputsCallback> cb = new (std::nothrow) StartDInputCallbackDHIds();
-    CHKPR(cb, ERROR_NULL_POINTER);
+    CHKPR(cb, INPUT_COMMON_NULLPTR);
     SaveCallback(CallbackType::StartDInputCallbackDHIds, callback);
     return DistributedInputKit::StartRemoteInput(deviceId, dhIds, cb);
 }
@@ -68,7 +68,7 @@ int32_t DistributedInputAdapter::StartRemoteInput(const std::string &srcId, cons
 {
     CALL_INFO_TRACE;
     sptr<IStartDInputCallback> cb = new (std::nothrow) StartDInputCallback();
-    CHKPR(cb, ERROR_NULL_POINTER);
+    CHKPR(cb, INPUT_COMMON_NULLPTR);
     SaveCallback(CallbackType::StartDInputCallback, callback);
     return DistributedInputKit::StartRemoteInput(srcId, sinkId, inputTypes, cb);
 }
@@ -78,7 +78,7 @@ int32_t DistributedInputAdapter::StartRemoteInput(const std::string &srcId, cons
 {
     CALL_INFO_TRACE;
     sptr<IStartStopDInputsCallback> cb = new (std::nothrow) StartDInputCallbackSink();
-    CHKPR(cb, ERROR_NULL_POINTER);
+    CHKPR(cb, INPUT_COMMON_NULLPTR);
     SaveCallback(CallbackType::StartDInputCallbackSink, callback);
     return DistributedInputKit::StartRemoteInput(srcId, sinkId, dhIds, cb);
 }
@@ -88,7 +88,7 @@ int32_t DistributedInputAdapter::StopRemoteInput(const std::string &deviceId, co
 {
     CALL_INFO_TRACE;
     sptr<IStartStopDInputsCallback> cb = new (std::nothrow) StopDInputCallbackDHIds();
-    CHKPR(cb, ERROR_NULL_POINTER);
+    CHKPR(cb, INPUT_COMMON_NULLPTR);
     SaveCallback(CallbackType::StopDInputCallbackDHIds, callback);
     return DistributedInputKit::StopRemoteInput(deviceId, dhIds, cb);
 }
@@ -98,7 +98,7 @@ int32_t DistributedInputAdapter::StopRemoteInput(const std::string &srcId, const
 {
     CALL_INFO_TRACE;
     sptr<IStopDInputCallback> cb = new (std::nothrow) StopDInputCallback();
-    CHKPR(cb, ERROR_NULL_POINTER);
+    CHKPR(cb, INPUT_COMMON_NULLPTR);
     SaveCallback(CallbackType::StopDInputCallback, callback);
     return DistributedInputKit::StopRemoteInput(srcId, sinkId, inputTypes, cb);
 }
@@ -108,7 +108,7 @@ int32_t DistributedInputAdapter::StopRemoteInput(const std::string &srcId, const
 {
     CALL_INFO_TRACE;
     sptr<IStartStopDInputsCallback> cb = new (std::nothrow) StopDInputCallbackSink();
-    CHKPR(cb, ERROR_NULL_POINTER);
+    CHKPR(cb, INPUT_COMMON_NULLPTR);
     SaveCallback(CallbackType::StopDInputCallbackSink, callback);
     return DistributedInputKit::StopRemoteInput(srcId, sinkId, dhIds, cb);
 }
@@ -118,7 +118,7 @@ int32_t DistributedInputAdapter::PrepareRemoteInput(const std::string &srcId, co
 {
     CALL_INFO_TRACE;
     sptr<IPrepareDInputCallback> cb = new (std::nothrow) PrepareStartDInputCallbackSink();
-    CHKPR(cb, ERROR_NULL_POINTER);
+    CHKPR(cb, INPUT_COMMON_NULLPTR);
     SaveCallback(CallbackType::PrepareStartDInputCallbackSink, callback);
     return DistributedInputKit::PrepareRemoteInput(srcId, sinkId, cb);
 }
@@ -128,7 +128,7 @@ int32_t DistributedInputAdapter::UnPrepareRemoteInput(const std::string &srcId, 
 {
     CALL_INFO_TRACE;
     sptr<IUnprepareDInputCallback> cb = new (std::nothrow) UnPrepareStopDInputCallbackSink();
-    CHKPR(cb, ERROR_NULL_POINTER);
+    CHKPR(cb, INPUT_COMMON_NULLPTR);
     SaveCallback(CallbackType::UnPrepareStopDInputCallbackSink, callback);
     return DistributedInputKit::UnprepareRemoteInput(srcId, sinkId, cb);
 }
@@ -137,7 +137,7 @@ int32_t DistributedInputAdapter::PrepareRemoteInput(const std::string &deviceId,
 {
     CALL_INFO_TRACE;
     sptr<IPrepareDInputCallback> cb = new (std::nothrow) PrepareStartDInputCallback();
-    CHKPR(cb, ERROR_NULL_POINTER);
+    CHKPR(cb, INPUT_COMMON_NULLPTR);
     SaveCallback(CallbackType::PrepareStartDInputCallback, callback);
     return DistributedInputKit::PrepareRemoteInput(deviceId, cb);
 }
@@ -146,7 +146,7 @@ int32_t DistributedInputAdapter::UnPrepareRemoteInput(const std::string &deviceI
 {
     CALL_INFO_TRACE;
     sptr<IUnprepareDInputCallback> cb = new (std::nothrow) UnPrepareStopDInputCallback();
-    CHKPR(cb, ERROR_NULL_POINTER);
+    CHKPR(cb, INPUT_COMMON_NULLPTR);
     SaveCallback(CallbackType::UnPrepareStopDInputCallback, callback);
     return DistributedInputKit::UnprepareRemoteInput(deviceId, cb);
 }

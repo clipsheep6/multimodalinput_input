@@ -106,7 +106,7 @@ void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, Session
         }
         auto fd = udsServer_->GetClientFd(anrNoticedPid_);
         if (!udsServer_->SendMsg(fd, pkt)) {
-            MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+            MMI_HILOGE("Send message failed, errCode:%{public}d", INPUT_MSG_SEND_FAIL);
             return;
         }
         std::vector<int32_t> timerIds = sess->GetTimerIds(type);

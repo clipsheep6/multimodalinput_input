@@ -32,7 +32,7 @@ JsEventTarget::JsEventTarget()
 {
     CALL_DEBUG_ENTER;
     auto ret = devListener_.insert({ CHANGED_TYPE, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>() });
-    CK(ret.second, VAL_NOT_EXP);
+    CK(ret.second, INPUT_COMMON_UNEXPECTED_VALUE);
 }
 
 void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
