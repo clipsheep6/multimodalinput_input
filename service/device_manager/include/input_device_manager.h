@@ -90,7 +90,7 @@ public:
     std::map<int32_t, std::string> displayInputBindInfos_;
     std::string GetInputIdentification(struct libinput_device* inputDevice);
     void InputStatusChangeCallback(inputDeviceCallback callback);
-    void NotifyDevCallback(int32_t deviceId, struct InputDeviceInfo inDevice);
+    void NotifyDevCallback(int32_t deviceId,  struct InputDeviceInfo inDevice);
 private:
     void MakeDeviceInfo(struct libinput_device *inputDevice, struct InputDeviceInfo& info);
     bool IsMatchKeys(struct libinput_device* device, const std::vector<int32_t> &keyCodes) const;

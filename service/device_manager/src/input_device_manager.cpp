@@ -325,20 +325,18 @@ std::string InputDeviceManager::GetInputIdentification(struct libinput_device* i
     return deviceIdentification;
 }
 
-void InputDeviceManager::NotifyDevCallback(int32_t deviceId, struct InputDeviceInfo inDevice)
+void InputDeviceManager::NotifyDevCallback(int32_t deviceId,  struct InputDeviceInfo inDevice)
 {
-    //inDevice.isTouchableDevice
-    // if ((inDevice.isPointerDevice == false) || (deviceId < 0)) {
-    //     return;
-    // }
-    std::string touchScreenName = "VSoC touchscreen";
-    std::string inputPadName = "USB Mouse Pad USB Mouse Pad Mouse";
-    std::string inputdevname = libinput_device_get_name(inDevice.inputDeviceOrigin);
-    if(inputdevname == touchScreenName) {
-        if (!inDevice.sysUid.empty()) {
-            //devCallbacks_(deviceId, inDevice.sysUid, "add");
-            devCallbacks_(deviceId, inputdevname, "add");
-        }
+    if (!inDevice.isTouchableDevice || (deviceId < 0)) {
+        MMI_HILOGI("The device is not touchable device already existent");
+        return;
+    }
+    if (!inDevice.sysUid.empty()) {
+        devCallbacks_(deviceId, inDevice.sysUid, "add");
+        MMI_HILOGI("lilong Send device info to window manager, device id:%{public}d, system uid:%{public}s, status:add",
+            deviceId, inDevice.sysUid.c_str());
+    } else {
+        MMI_HILOGE("lilong Get device system uid id is empty, deviceId:%{public}d", deviceId);
     }
 }
 
@@ -433,11 +431,10 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
         }
     }
     std::string sysUid = GetInputIdentification(inputDevice);
-    std::string inputdevname = libinput_device_get_name(inputDevice);
-    MMI_HILOGI("lilong Get device inputdevname is:%{public}s", inputdevname.c_str());
     if (!(sysUid.empty())) {
-        //devCallbacks_(deviceId, sysUid, "remove");
-        devCallbacks_(deviceId, inputdevname, "remove");
+        devCallbacks_(deviceId, sysUid, "remove");
+        MMI_HILOGI("lilong Send device info to window manager, device id:%{public}d, system uid:%{public}s, status:remove",
+            deviceId, sysUid.c_str());
     }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
