@@ -42,21 +42,21 @@ HWTEST_F(UDSSocketTest, Close, TestSize.Level1)
     EXPECT_EQ(-1, socObj.GetFd());
 }
 
-HWTEST_F(UDSSocketTest, EpollCreat_001, TestSize.Level1)
+HWTEST_F(UDSSocketTest, EpollCreate_001, TestSize.Level1)
 {
     int32_t size = 0;
 
     UDSSocketUnitTest socObj;
-    int32_t retResult = socObj.EpollCreat(size);
+    int32_t retResult = socObj.EpollCreate(size);
     ASSERT_LE(retResult, 0);
 }
 
-HWTEST_F(UDSSocketTest, EpollCreat_002, TestSize.Level1)
+HWTEST_F(UDSSocketTest, EpollCreate_002, TestSize.Level1)
 {
     int32_t size = -1001;
 
     UDSSocketUnitTest socObj;
-    int32_t retResult = socObj.EpollCreat(size);
+    int32_t retResult = socObj.EpollCreate(size);
     ASSERT_LE(retResult, 0);
 }
 

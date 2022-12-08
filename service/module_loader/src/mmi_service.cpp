@@ -205,7 +205,7 @@ bool MMIService::InitService()
         MMI_HILOGE("Service initialization failed");
         return false;
     }
-    if (EpollCreat(MAX_EVENT_SIZE) < 0) {
+    if (EpollCreate(MAX_EVENT_SIZE) < 0) {
         MMI_HILOGE("Create epoll failed");
         return false;
     }
@@ -250,7 +250,7 @@ int32_t MMIService::Init()
         return POINTER_DRAW_INIT_FAIL;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
-    mmiFd_ = EpollCreat(MAX_EVENT_SIZE);
+    mmiFd_ = EpollCreate(MAX_EVENT_SIZE);
     if (mmiFd_ < 0) {
         MMI_HILOGE("Create epoll failed");
         return EPOLL_CREATE_FAIL;
