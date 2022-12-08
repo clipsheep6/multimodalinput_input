@@ -49,19 +49,9 @@ void InputWindowsManager::DeviceStatusChanged(int32_t deviceId, const std::strin
 {
     CALL_INFO_TRACE;
     if (devStatus == "add") {
-        auto ret = bindInfo_.AddInputDevice(deviceId, sysUid);
-        if (!ret) {
-            MMI_HILOGE("AddInputDevice fail, deviceId:%{public}d,sysUid:%{public}s", deviceId, sysUid.c_str());
-        } else {
-            MMI_HILOGI("AddInputDevice success, deviceId:%{public}d,sysUid:%{public}s", deviceId, sysUid.c_str());
-        }
+        bindInfo_.AddInputDevice(deviceId, sysUid);
     } else {
-        auto ret = bindInfo_.RemoveInputDevice(deviceId);
-        if (!ret) {
-            MMI_HILOGE("AddInputDevice fail, deviceId:%{public}d,sysUid:%{public}s", deviceId, sysUid.c_str());
-        } else {
-            MMI_HILOGI("AddInputDevice success, deviceId:%{public}d", deviceId);
-        }
+        bindInfo_.RemoveInputDevice(deviceId);
     }
 }
 
@@ -240,13 +230,13 @@ void InputWindowsManager::UpdateDisplayIdAndName() {
     for (const auto &item : displayGroupInfo_.displaysInfo) {
         newInfo.insert(std::make_pair(item.id, item.uniq));
     }
-    auto oldInfo = GetDisplayIdNames();
+    auto oldInfo = bindInfo_.GetDisplayIdNames();
     if (newInfo == oldInfo) {
         return;
     }
     for (auto it = oldInfo.begin(); it != oldInfo.end();) {
         if (newInfo.find(*it) == newInfo.end()) {
-            bindInfo_.RemoveDisplay(item->first, item->second);
+            bindInfo_.RemoveDisplay(it->first);
             oldInfo.erase(it++);
         } else {
             ++it;

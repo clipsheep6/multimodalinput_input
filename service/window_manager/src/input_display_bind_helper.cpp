@@ -56,6 +56,7 @@ public:
 	BindInfo GetUnbindInputDevice(const std::string &displayName);
 	BindInfo GetUnbindDisplay(const std::string &inputDeviceName);    
 	std::string GetDisplayNameByInputDevice(const std::string &name);
+	std::string GetBindDisplayNameByInputDevice(int32_t inputDeviceId) const;
 	std::string GetInputDeviceByDisplayName(const std::string &name);
     std::string GetDesc() const;
 	const std::list<BindInfo> &GetInfos() const { return infos_; }
@@ -285,7 +286,6 @@ std::ostream& operator<<(std::ostream &os, const BindInfos &r) {
 }
 
 std::istream& operator>>(std::istream &is, BindInfos &r) {
-	int32_t index = -1;
 	while (!is.eof()) {
 		BindInfo info;
 		is >> info;
@@ -303,12 +303,11 @@ InputDisplayBindHelper::InputDisplayBindHelper(const std::string bindCfgFile)
 	configFileInfos_(std::make_shared<BindInfos>())
 {}
 
-std::string InputDisplayBindHelper::GetDiplayNameByInputDeviceId(int32_t inputDeviceId) const
-{
+std::string InputDisplayBindHelper::GetBindDisplayNameByInputDevice(int32_t inputDeviceId) const {
 	if (infos_ == nullptr) {
 		return {};
 	}
-	return infos_->GetDisplayNameByInputDeviceId(inputDeviceId);
+	return infos_->GetBindDisplayNameByInputDevice(inputDeviceId);
 }
 
 void InputDisplayBindHelper::AddInputDevice(int32_t id, const std::string &name) {
