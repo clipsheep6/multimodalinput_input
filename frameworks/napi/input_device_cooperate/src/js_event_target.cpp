@@ -205,12 +205,7 @@ monitorLabel:
 napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, sptr<JsUtil::CallbackInfo> cb)
 {
     CALL_INFO_TRACE;
-<<<<<<< HEAD
     CHKPP(cb);
-=======
-    std::lock_guard<std::mutex> guard(mutex_);
-    auto cb = std::make_unique<JsUtil::CallbackInfo>();
->>>>>>> local
     cb->env = env;
     napi_value promise = nullptr;
     if (handle == nullptr) {

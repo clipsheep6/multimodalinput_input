@@ -539,6 +539,18 @@ void JsEventTarget::EmitJsKeyboardType(sptr<JsUtil::CallbackInfo> cb, int32_t ke
     work->data = cb.GetRefPtr();
     int32_t ret;
     if (cb->ref == nullptr) {
+        ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallKeyboardTypePromise);
+    } else {
+        ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallKeyboardTypeAsync);
+    }
+    if (ret != 0) {
+        MMI_HILOGE("uv_queue_work failed");
+        JsUtil::DeletePtr<uv_work_t*>(work);
+    }
+}
+
+void JsEventTarget::CallKeyboardTypeAsync(uv_work_t *work, int32_t status)
+{
     CALL_DEBUG_ENTER;
     CHKPV(work);
     if (work->data == nullptr) {
