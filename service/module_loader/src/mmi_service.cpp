@@ -61,9 +61,9 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMISe
 const std::string DEF_INPUT_SEAT = "seat0";
 constexpr int32_t WATCHDOG_INTERVAL_TIME = 10000;
 constexpr int32_t WATCHDOG_DELAY_TIME = 15000;
-const std::string INPUT_EVENT_HANDLER_PLUGIN_USER = "/data/user/plugins/";
 bool pluginCreateStatus { false };
 bool pluginDelStatus { false };
+#define DIR_BUF_LEN   (1024 * ((sizeof(struct inotify_event)) + 16))
 } // namespace
 
 const bool REGISTER_RESULT =
@@ -977,14 +977,12 @@ void MMIService::OnDelegateTask(epoll_event& ev)
     delegateTasks_.ProcessTasks();
 }
 
-#define EVENT_SIZE  ( sizeof (struct inotify_event) )
-#define EVENT_BUF_LEN     ( 1024 * ( EVENT_SIZE + 16 ) )
 void MMIService::OnPluginScan(epoll_event& ev)
 {
     int32_t length, i = 0;
-    char buffer[EVENT_BUF_LEN];
-    int32_t fd = *static_cast<int32_t*>(ev.data.ptr);//ev.data.ptr
-    length = read(fd, buffer, EVENT_BUF_LEN);
+    char buffer[DIR_BUF_LEN];
+    int32_t fd = *static_cast<int32_t*>(ev.data.ptr);
+    length = read(fd, buffer, DIR_BUF_LEN);
     if (length < 0) {
         return;
     }

@@ -28,7 +28,6 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "EventPluginsHandler"};
 const std::string INPUT_EVENT_HANDLER_PLUGIN_HOME = "/system/lib/module/multimodalinput/plugins/";
-const std::string INPUT_EVENT_HANDLER_PLUGIN_USER = "/data/user/plugins/";
 
 int32_t max { 0 };
 int32_t avg { 0 };

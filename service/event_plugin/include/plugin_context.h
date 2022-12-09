@@ -32,7 +32,7 @@ public:
     virtual void StatEnd();
     virtual void TimeStat(TimeStatFlag flag);
     virtual void OnReport(int32_t &max, int32_t &avg, int32_t &memMax, int32_t &memAvg);
-    virtual void chengmem();
+    virtual void ChengMem();
 private:
     std::shared_ptr<IInputEventHandler> handler_;
 };

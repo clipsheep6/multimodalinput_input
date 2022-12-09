@@ -28,7 +28,7 @@ void Touch2KeyHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
     context_->StatBegin();
     MMI_HILOGI("Device name is %{public}s", context_->GetInputDeviceManager()->GetDeviceName().data());
     context_->StatEnd();
-    context_->chengmem();
+    context_->ChengMem();
     nextHandler_->HandleKeyEvent(keyEvent);
 }
 
@@ -37,7 +37,7 @@ void Touch2KeyHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> po
     context_->StatBegin();
     MMI_HILOGI("Device name is %{public}s", context_->GetInputDeviceManager()->GetDeviceName().data());
     context_->StatEnd();
-    context_->chengmem();
+    context_->ChengMem();
     nextHandler_->HandlePointerEvent(pointerEvent);
 }
 
@@ -46,7 +46,7 @@ void Touch2KeyHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> poin
     context_->StatBegin();
     MMI_HILOGI("Device name is %{public}s", context_->GetInputDeviceManager()->GetDeviceName().data());
     context_->StatEnd();
-    context_->chengmem();
+    context_->ChengMem();
     nextHandler_->HandleTouchEvent(pointerEvent);
 }
 } // namespace MMI

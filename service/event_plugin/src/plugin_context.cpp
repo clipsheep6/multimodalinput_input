@@ -96,7 +96,7 @@ void PluginContext::StatEnd()
     TimeStat(TimeStatFlag::END);
 }
 
-void PluginContext::chengmem()
+void PluginContext::ChengMem()
 {
     std::string strPid = std::to_string(GetPid());
     std::string path = "/proc/" + strPid +"/smaps";
