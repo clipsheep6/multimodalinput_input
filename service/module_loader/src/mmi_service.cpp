@@ -76,7 +76,6 @@ struct mmi_epoll_event {
 template<class ...Ts>
 void CheckDefineOutput(const char* fmt, Ts... args)
 {
-    using namespace OHOS::MMI;
     CHKPV(fmt);
     char buf[MAX_PACKET_BUF_SIZE] = {};
     int32_t ret = snprintf_s(buf, MAX_PACKET_BUF_SIZE, MAX_PACKET_BUF_SIZE - 1, fmt, args...);
@@ -393,18 +392,34 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
     return RET_OK;
 }
 
-int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter)
+int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority)
 {
     CALL_INFO_TRACE;
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH) || defined(OHOS_BUILD_ENABLE_KEYBOARD)
     CHKPR(filter, ERROR_NULL_POINTER);
+    int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&ServerMsgHandler::AddInputEventFilter,
-        &sMsgHandler_, filter));
+        &sMsgHandler_, filter, filterId, priority, clientPid));
     if (ret != RET_OK) {
         MMI_HILOGE("Add event filter failed,return %{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH || OHOS_BUILD_ENABLE_KEYBOARD
+    return RET_OK;
+}
+
+int32_t MMIService::RemoveInputEventFilter(int32_t filterId)
+{
+    CALL_INFO_TRACE;
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH) || defined(OHOS_BUILD_ENABLE_KEYBOARD)
+    int32_t clientPid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&ServerMsgHandler::RemoveInputEventFilter,
+        &sMsgHandler_, filterId, clientPid));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Remove event filter failed,return %{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH || OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
 }
 
@@ -418,6 +433,10 @@ void MMIService::OnDisconnected(SessionPtr s)
 {
     CHKPV(s);
     MMI_HILOGW("Enter, session desc:%{public}s, fd:%{public}d", s->GetDescript().c_str(), s->GetFd());
+    auto ret = RemoveInputEventFilter(-1);
+    if (ret != RET_OK) {
+        MMI_HILOGF("Remove all filter failed, ret:%{public}d", ret);
+    }
 #ifdef OHOS_BUILD_ENABLE_POINTER
     IPointerDrawingManager::GetInstance()->DeletePointerVisible(s->GetPid());
 #endif // OHOS_BUILD_ENABLE_POINTER
