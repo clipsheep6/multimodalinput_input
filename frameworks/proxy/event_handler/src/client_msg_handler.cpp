@@ -69,7 +69,7 @@ void ClientMsgHandler::Init()
         {MmiMessageId::REPORT_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportPointerEvent, this)},
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-        {MmiMessageId::COOPERATION_ADD_LISTENER, MsgCallbackBind2(&ClientMsgHandler::OnCooperationListiner, this)},
+        {MmiMessageId::COOPERATION_ADD_LISTENER, MsgCallbackBind2(&ClientMsgHandler::OnCooperationListener, this)},
         {MmiMessageId::COOPERATION_MESSAGE, MsgCallbackBind2(&ClientMsgHandler::OnCooperationMessage, this)},
         {MmiMessageId::COOPERATION_GET_STATE, MsgCallbackBind2(&ClientMsgHandler::OnCooperationState, this)},
 #endif // OHOS_BUILD_ENABLE_COOPERATE
@@ -211,7 +211,8 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
 {
     CALL_DEBUG_ENTER;
     InputHandlerType handlerType;
-    pkt >> handlerType;
+    uint32_t deviceTags;
+    pkt >> handlerType >> deviceTags;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read handler failed");
         return RET_ERR;
@@ -226,13 +227,13 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
     switch (handlerType) {
         case INTERCEPTOR: {
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
-            InputInterMgr->OnInputEvent(keyEvent);
+            InputInterMgr->OnInputEvent(keyEvent, deviceTags);
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
             break;
         }
         case MONITOR: {
 #ifdef OHOS_BUILD_ENABLE_MONITOR
-            IMonitorMgr->OnInputEvent(keyEvent);
+            IMonitorMgr->OnInputEvent(keyEvent, deviceTags);
 #endif // OHOS_BUILD_ENABLE_MONITOR
             break;
         }
@@ -251,7 +252,8 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
 {
     CALL_DEBUG_ENTER;
     InputHandlerType handlerType;
-    pkt >> handlerType;
+    uint32_t deviceTags;
+    pkt >> handlerType >> deviceTags;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read Pointer data failed");
         return RET_ERR;
@@ -267,13 +269,13 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
     switch (handlerType) {
         case INTERCEPTOR: {
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
-            InputInterMgr->OnInputEvent(pointerEvent);
+            InputInterMgr->OnInputEvent(pointerEvent, deviceTags);
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
             break;
         }
         case MONITOR: {
 #ifdef OHOS_BUILD_ENABLE_MONITOR
-            IMonitorMgr->OnInputEvent(pointerEvent);
+            IMonitorMgr->OnInputEvent(pointerEvent, deviceTags);
 #endif // OHOS_BUILD_ENABLE_MONITOR
             break;
         }
@@ -318,7 +320,7 @@ int32_t ClientMsgHandler::OnAnr(const UDSClient& client, NetPacket& pkt)
 }
 
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-int32_t ClientMsgHandler::OnCooperationListiner(const UDSClient& client, NetPacket& pkt)
+int32_t ClientMsgHandler::OnCooperationListener(const UDSClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
     int32_t userData;
@@ -344,7 +346,7 @@ int32_t ClientMsgHandler::OnCooperationMessage(const UDSClient& client, NetPacke
         MMI_HILOGE("Packet read cooperate msg failed");
         return RET_ERR;
     }
-    InputDevCooperateImpl.OnCooprationMessage(userData, deviceId, CooperationMessage(nType));
+    InputDevCooperateImpl.OnCooperationMessage(userData, deviceId, CooperationMessage(nType));
     return RET_OK;
 }
 

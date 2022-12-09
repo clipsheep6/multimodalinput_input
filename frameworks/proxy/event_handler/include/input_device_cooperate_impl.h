@@ -34,16 +34,16 @@ public:
     ~InputDeviceCooperateImpl() = default;
 
     using FuncCooperationMessage = std::function<void(std::string, CooperationMessage)>;
-    using FuncCooperateionState = std::function<void(bool)>;
+    using FuncCooperationState = std::function<void(bool)>;
 
     using DevCooperationMsg = FuncCooperationMessage;
-    using DevCooperateionState = FuncCooperateionState;
+    using DevCooperationState = FuncCooperationState;
 
     using InputDevCooperateListenerPtr = std::shared_ptr<IInputDeviceCooperateListener>;
 
     struct CooperateEvent {
         DevCooperationMsg msg;
-        DevCooperateionState state;
+        DevCooperationState state;
     };
 
     int32_t RegisterCooperateListener(InputDevCooperateListenerPtr listener);
@@ -59,8 +59,8 @@ public:
     int32_t GetUserData();
 
 private:
-    const DevCooperationMsg *GetCooprateMessageEvent(int32_t userData) const;
-    const DevCooperateionState *GetCooprateStateEvent(int32_t userData) const;
+    const DevCooperationMsg *GetCooperateMessageEvent(int32_t userData) const;
+    const DevCooperationState *GetCooperateStateEvent(int32_t userData) const;
 
 private:
     InputDeviceCooperateImpl() = default;

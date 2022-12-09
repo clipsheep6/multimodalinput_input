@@ -37,7 +37,7 @@ namespace MMI {
 enum class ServiceRunningState {STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
 class MMIService final : public UDSServer, public SystemAbility, public MultimodalInputConnectStub {
     DECLARE_DELAYED_SINGLETON(MMIService);
-    DECLEAR_SYSTEM_ABILITY(MMIService);
+    DECLARE_SYSTEM_ABILITY(MMIService);
     DISALLOW_COPY_AND_MOVE(MMIService);
 
 public:
@@ -46,7 +46,8 @@ public:
     int32_t Dump(int32_t fd, const std::vector<std::u16string> &args) override;
     int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &toReturnClientFd, int32_t &tokenType) override;
-    int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
+    int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority) override;
+    int32_t RemoveInputEventFilter(int32_t filterId) override;
     int32_t SetPointerVisible(bool visible) override;
     int32_t IsPointerVisible(bool &visible) override;
     int32_t SetPointerSpeed(int32_t speed) override;
@@ -78,6 +79,7 @@ public:
     int32_t SetInputDevice(const std::string& dhid, const std::string& screenId) override;
     int32_t GetFunctionKeyState(int32_t funcKey, bool &state) override;
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable) override;
+    int32_t SetPointerLocation(int32_t x, int32_t y) override;
 
 #ifdef OHOS_RSS_CLIENT
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
@@ -102,8 +104,10 @@ protected:
     int32_t OnSupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke);
     int32_t OnGetKeyboardType(int32_t deviceId, int32_t &keyboardType);
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
-    int32_t CheckAddInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType);
-    int32_t CheckRemoveInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType);
+    int32_t CheckAddInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType,
+        int32_t priority, uint32_t deviceTags);
+    int32_t CheckRemoveInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType,
+        int32_t priority, uint32_t deviceTags);
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
     int32_t CheckMarkConsumed(int32_t pid, int32_t eventId);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD

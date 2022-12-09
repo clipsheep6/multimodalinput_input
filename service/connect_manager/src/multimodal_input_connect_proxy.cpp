@@ -109,7 +109,7 @@ int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programNam
     }
     socketFd = reply.ReadFileDescriptor();
     if (socketFd < RET_OK) {
-        MMI_HILOGE("Read file fescriptor failed, fd: %{public}d", socketFd);
+        MMI_HILOGE("Read file descriptor failed, fd: %{public}d", socketFd);
         return IPC_PROXY_DEAD_OBJECT_ERR;
     }
     READINT32(reply, tokenType, IPC_PROXY_DEAD_OBJECT_ERR);
@@ -117,7 +117,7 @@ int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programNam
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::AddInputEventFilter(sptr<IEventFilter> filter)
+int32_t MultimodalInputConnectProxy::AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -125,17 +125,38 @@ int32_t MultimodalInputConnectProxy::AddInputEventFilter(sptr<IEventFilter> filt
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-
     if (!data.WriteRemoteObject(filter->AsObject().GetRefPtr())) {
         MMI_HILOGE("Failed to write filter");
         return ERR_INVALID_VALUE;
     }
-
+    WRITEINT32(data, filterId, ERR_INVALID_VALUE);
+    WRITEINT32(data, priority, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(ADD_INPUT_EVENT_FILTER, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request message failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::RemoveInputEventFilter(int32_t filterId)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, filterId, ERR_INVALID_VALUE);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(RMV_INPUT_EVENT_FILTER, data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request message failed, ret:%{public}d", ret);
         return ret;
@@ -422,7 +443,7 @@ int32_t MultimodalInputConnectProxy::GetKeyboardType(int32_t deviceId, int32_t &
 }
 
 int32_t MultimodalInputConnectProxy::AddInputHandler(InputHandlerType handlerType,
-    HandleEventType eventType)
+    HandleEventType eventType, int32_t priority, uint32_t deviceTags)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -432,6 +453,8 @@ int32_t MultimodalInputConnectProxy::AddInputHandler(InputHandlerType handlerTyp
     }
     WRITEINT32(data, handlerType, ERR_INVALID_VALUE);
     WRITEUINT32(data, eventType, ERR_INVALID_VALUE);
+    WRITEINT32(data, priority, ERR_INVALID_VALUE);
+    WRITEUINT32(data, deviceTags, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
@@ -444,7 +467,8 @@ int32_t MultimodalInputConnectProxy::AddInputHandler(InputHandlerType handlerTyp
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType)
+int32_t MultimodalInputConnectProxy::RemoveInputHandler(InputHandlerType handlerType,
+    HandleEventType eventType, int32_t priority, uint32_t deviceTags)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -453,6 +477,8 @@ int32_t MultimodalInputConnectProxy::RemoveInputHandler(InputHandlerType handler
         return ERR_INVALID_VALUE;
     }
     WRITEINT32(data, handlerType, ERR_INVALID_VALUE);
+    WRITEUINT32(data, eventType, ERR_INVALID_VALUE);
+    WRITEINT32(data, priority, ERR_INVALID_VALUE);
     WRITEUINT32(data, eventType, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
@@ -814,6 +840,27 @@ int32_t MultimodalInputConnectProxy::SetFunctionKeyState(int32_t funcKey, bool e
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(SET_FUNCTION_KEY_STATE, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectProxy::SetPointerLocation(int32_t x, int32_t y)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    WRITEINT32(data, x, ERR_INVALID_VALUE);
+    WRITEINT32(data, y, ERR_INVALID_VALUE);
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(SET_POINTER_LOCATION, data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
     }

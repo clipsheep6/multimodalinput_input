@@ -165,11 +165,6 @@ void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_valu
     napi_ref ref = nullptr;
     CHKRV(napi_create_reference(env, handle, 1, &ref), CREATE_REFERENCE);
     auto monitor = std::make_unique<JsUtil::CallbackInfo>();
-    if (monitor == nullptr) {
-        napi_delete_reference(env, ref);
-        MMI_HILOGE("monitor is nullptr");
-        return;
-    }
     monitor->env = env;
     monitor->ref = ref;
     iter->second.push_back(std::move(monitor));
@@ -210,7 +205,12 @@ monitorLabel:
 napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, sptr<JsUtil::CallbackInfo> cb)
 {
     CALL_INFO_TRACE;
+<<<<<<< HEAD
     CHKPP(cb);
+=======
+    std::lock_guard<std::mutex> guard(mutex_);
+    auto cb = std::make_unique<JsUtil::CallbackInfo>();
+>>>>>>> local
     cb->env = env;
     napi_value promise = nullptr;
     if (handle == nullptr) {
@@ -251,13 +251,13 @@ void JsEventTarget::OnCooperateMessage(const std::string &deviceId, CooperationM
         work->data = static_cast<void*>(&item);
         int32_t result = uv_queue_work(loop, work, [](uv_work_t *work) {}, EmitCooperateMessageEvent);
         if (result != 0) {
-            MMI_HILOGE("uv_queue_work faild");
+            MMI_HILOGE("uv_queue_work failed");
             JsUtil::DeletePtr<uv_work_t*>(work);
         }
     }
 }
 
-void JsEventTarget::CallEnablePromsieWork(uv_work_t *work, int32_t status)
+void JsEventTarget::CallEnablePromiseWork(uv_work_t *work, int32_t status)
 {
     CALL_INFO_TRACE;
     CHKPV(work);

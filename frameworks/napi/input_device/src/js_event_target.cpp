@@ -347,7 +347,7 @@ void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
     }
     napi_value object = JsUtil::GetDeviceInfo(cb);
     if (object == nullptr) {
-        MMI_HILOGE("Check object is null");
+        MMI_HILOGE("Check object is nullptr");
         napi_close_handle_scope(cb->env, scope);
         return;
     }
@@ -539,18 +539,6 @@ void JsEventTarget::EmitJsKeyboardType(sptr<JsUtil::CallbackInfo> cb, int32_t ke
     work->data = cb.GetRefPtr();
     int32_t ret;
     if (cb->ref == nullptr) {
-        ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallKeyboardTypePromise);
-    } else {
-        ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallKeyboardTypeAsync);
-    }
-    if (ret != 0) {
-        MMI_HILOGE("uv_queue_work failed");
-        JsUtil::DeletePtr<uv_work_t*>(work);
-    }
-}
-
-void JsEventTarget::CallKeyboardTypeAsync(uv_work_t *work, int32_t status)
-{
     CALL_DEBUG_ENTER;
     CHKPV(work);
     if (work->data == nullptr) {
@@ -871,7 +859,6 @@ void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_valu
     napi_ref ref = nullptr;
     CHKRV(napi_create_reference(env, handle, 1, &ref), CREATE_REFERENCE);
     auto monitor = std::make_unique<JsUtil::CallbackInfo>();
-    CHKPV(monitor);
     monitor->env = env;
     monitor->ref = ref;
     iter->second.push_back(std::move(monitor));

@@ -37,7 +37,8 @@ public:
     {
         return tokenType_;
     }
-    int32_t AddInputEventFilter(sptr<IEventFilter> filter);
+    int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority);
+    int32_t RemoveInputEventFilter(int32_t filterId);
     int32_t SetPointerVisible(bool visible);
     int32_t IsPointerVisible(bool &visible);
     int32_t SetPointerSpeed(int32_t speed);
@@ -68,6 +69,7 @@ public:
     int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
     int32_t GetFunctionKeyState(int32_t funcKey, bool &state);
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
+    int32_t SetPointerLocation(int32_t x, int32_t y);
 
 private:
     MultimodalInputConnectManager() = default;
