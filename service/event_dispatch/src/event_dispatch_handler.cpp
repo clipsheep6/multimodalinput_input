@@ -41,9 +41,10 @@ namespace {
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) || defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatchHandler" };
 #endif // OHOS_BUILD_ENABLE_KEYBOARD ||  OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#define DISPATCH_PRIORITY 600
 } // namespace
 
-EventDispatchHandler::EventDispatchHandler() : IInputEventHandler(600)
+EventDispatchHandler::EventDispatchHandler() : IInputEventHandler(DISPATCH_PRIORITY)
 {
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     DistributedAdapter->RegisterEventCallback(std::bind(&EventDispatchHandler::OnDinputSimulateEvent, this,

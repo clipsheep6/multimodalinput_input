@@ -33,6 +33,10 @@ int32_t max { 0 };
 int32_t avg { 0 };
 int32_t memMax { 0 };
 int32_t memAvg { 0 };
+#define TIME_OUT_MAX 500
+#define TIME_OUT_INVALID 0
+#define MEX_MAX 40
+#define MEM_INVALID 0
 std::map<std::shared_ptr<IInputEventHandler>, int32_t> timeOutPlugin;
 std::map<std::shared_ptr<IInputEventHandler>, int32_t> memPlugin;
 
@@ -203,24 +207,24 @@ void InputEventHandlerPluginMgr::OnTimer()
             timeOutPlugin[item->GetEventHandler()] = 0;
             memPlugin[item->GetEventHandler()] = 0;
         }
-        if (max > 500) {
+        if (max > TIME_OUT_MAX) {
             timeOutPlugin[item->GetEventHandler()] = timeOutPlugin[item->GetEventHandler()] + 1;
             if (timeOutPlugin[item->GetEventHandler()] > 10) {
                 DelPlugin(item->GetEventHandler());
             }
         } else {
-            if (max > 0) {
+            if (max > TIME_OUT_INVALID) {
                 timeOutPlugin[item->GetEventHandler()] = 0;
             }
         }
 
-        if (memMax > 40) {
+        if (memMax > MEX_MAX) {
             memPlugin[item->GetEventHandler()] = memPlugin[item->GetEventHandler()] + 1;
             if (memPlugin[item->GetEventHandler()] > 10) {
                 DelPlugin(item->GetEventHandler());
             }
         } else {
-            if (memMax > 0) {
+            if (memMax > MEM_INVALID) {
                 memPlugin[item->GetEventHandler()] = 0;
             }
         }

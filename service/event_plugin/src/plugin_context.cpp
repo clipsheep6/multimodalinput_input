@@ -126,7 +126,6 @@ void PluginContext::ChengMem()
         }
     }
     mem.close();
-    MMI_HILOGE("Size = %{public}d; pss = %{public}d; dirty = %{public}d; swap = %{public}d;", size_, pss_, dirty_, swap_);
     memMax_ = std::max(dirty_, memMax_);
     memSum_ += dirty_;
     count_++;

@@ -20,9 +20,10 @@
 #include "plugin_context.h"
 namespace OHOS {
 namespace MMI {
+#define TOUCH_2_KEY_PRIORITY 1
 class Touch2KeyHandler : public IInputEventHandler {
 public:
-    Touch2KeyHandler(IInputEventPluginContext *context): IInputEventHandler(1), context_(context) {};
+    Touch2KeyHandler(IInputEventPluginContext *context): IInputEventHandler(TOUCH_2_KEY_PRIORITY), context_(context) {};
     virtual ~Touch2KeyHandler() = default;
     virtual void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
     virtual void HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
