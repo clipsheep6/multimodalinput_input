@@ -103,7 +103,7 @@ void InputEventHandlerPluginMgr::ReadPluginDir(const std::string pluginPath)
 bool InputEventHandlerPluginMgr::LoadPlugin(std::string pluginPath, std::string pluginName, bool initStatus)
 {
     if (!CheckFileExtendName(pluginPath, "so")) {
-        MMI_HILOGE("File %{public}s is not .so", pluginName.data())
+        MMI_HILOGE("File %{public}s is not .so", pluginName.data());
         return false;
     }
     void *handle = dlopen(pluginPath.data(), RTLD_NOW);

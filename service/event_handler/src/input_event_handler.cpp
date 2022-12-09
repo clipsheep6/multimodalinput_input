@@ -186,12 +186,12 @@ int32_t InputEventHandler::Insert(std::shared_ptr<IInputEventHandler> handler)
         MMI_HILOGE("Handler is nullptr");
         return RET_ERR;
     }
+    std::shared_ptr<IInputEventHandler> handler_ = eventNormalizeHandler_;
     if (handler_->handlerPriority_ > handler->handlerPriority_) {
         handler->SetNext(handler_);
         handler_ = handler;
         return RET_OK;
     }
-    std::shared_ptr<IInputEventHandler> handler_ = eventNormalizeHandler_;
     for (auto tmp = handler_; tmp != nullptr; tmp = tmp->nextHandler_) {
         auto next = tmp->nextHandler_;
         if ((tmp->handlerPriority_ <= handler->handlerPriority_) && (next == nullptr)) {
@@ -219,6 +219,7 @@ int32_t InputEventHandler::Remove(std::shared_ptr<IInputEventHandler> handler)
         }
     }
     MMI_HILOGE("Not find delet handler");
+    return RET_ERR;
 }
 } // namespace MMI
 } // namespace OHOS

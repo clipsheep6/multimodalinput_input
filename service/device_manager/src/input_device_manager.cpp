@@ -769,6 +769,7 @@ const std::string& InputDeviceManager::GetScreenId(int32_t deviceId) const
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     return UNKNOWN_SCREEN_ID;
 }
+
 std::shared_ptr<IInputDeviceManager> InputDeviceManager::GetDeviceContext()
 {
     auto device = std::make_shared<IInputDeviceManager>();

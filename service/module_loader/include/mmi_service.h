@@ -26,14 +26,15 @@
 
 #include "delegate_tasks.h"
 #include "input_event_handler.h"
+#include "input_event_handler_plugin.h"
 #include "multimodal_input_connect_stub.h"
 #include "libinput_adapter.h"
 #include "server_msg_handler.h"
 #include "uds_server.h"
-#include "input_event_handler_plugin.h"
 
 namespace OHOS {
 namespace MMI {
+
 enum class ServiceRunningState {STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
 class MMIService final : public UDSServer, public SystemAbility, public MultimodalInputConnectStub {
     DECLARE_DELAYED_SINGLETON(MMIService);

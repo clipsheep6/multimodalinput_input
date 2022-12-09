@@ -18,8 +18,8 @@
 #include <cinttypes>
 #include <csignal>
 #include <parameters.h>
-#include <sys/signalfd.h>
 #include <sys/inotify.h>
+#include <sys/signalfd.h>
 #include "dfx_hisysevent.h"
 #ifdef OHOS_RSS_CLIENT
 #include <unordered_map>
@@ -47,7 +47,6 @@
 #include "res_type.h"
 #include "system_ability_definition.h"
 #endif
-#include "input_device_manager.h"
 #include "permission_helper.h"
 #include "timer_manager.h"
 #include "input_device_manager.h"
@@ -62,8 +61,8 @@ const std::string DEF_INPUT_SEAT = "seat0";
 constexpr int32_t WATCHDOG_INTERVAL_TIME = 10000;
 constexpr int32_t WATCHDOG_DELAY_TIME = 15000;
 bool pluginCreateStatus { false };
-bool pluginDelStatus { false };
-#define DIR_BUF_LEN   (1024 * ((sizeof(struct inotify_event)) + 16))
+#define INOTIFY_SIZE sizeof(struct inotify_event)
+#define DIR_BUF_LEN   (1024 * (INOTIFY_SIZE + 16))
 } // namespace
 
 const bool REGISTER_RESULT =
@@ -259,7 +258,6 @@ bool MMIService::InitINotify()
     }
     MMI_HILOGI("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, pluginMgr_.GetReadFd());
     return true;
-
 }
 
 int32_t MMIService::Init()
@@ -1012,10 +1010,9 @@ void MMIService::OnPluginScan(epoll_event& ev)
             }
             if ((event->mask & IN_DELETE) && !(event->mask & IN_ISDIR)) {
                 pluginMgr_.UnloadPlugin(event->name);
-                pluginDelStatus = true;
             }
         }
-        i += EVENT_SIZE + event->len;
+        i += INOTIFY_SIZE + event->len;
     }
 }
 
