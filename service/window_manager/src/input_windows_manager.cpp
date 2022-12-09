@@ -1282,6 +1282,7 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
                 item.id, item.x, item.y, item.width, item.height, item.name.c_str(),
                 item.uniq.c_str(), item.direction);
     }
+    mprintf(fd, "Input device and display bind info:\n%s\n", bindInfo_.Dumps().c_str());
 }
 } // namespace MMI
 } // namespace OHOS

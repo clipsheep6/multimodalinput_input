@@ -23,6 +23,9 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputWindowsManager" };
+}
 class BindInfo
 {
 public:
@@ -175,7 +178,7 @@ bool BindInfos::Add(const BindInfo &info) {
 	}
 	auto it2 = infos_.emplace(it, std::move(info));
 	if (it2 == infos_.end()) {
-		printf("duplicate %s\n", info.GetDesc().c_str());
+		MMI_HILOGE("Duplicate %{public}s", info.GetDesc().c_str());
 	}
 	return true;
 }
@@ -303,7 +306,8 @@ InputDisplayBindHelper::InputDisplayBindHelper(const std::string bindCfgFile)
 	configFileInfos_(std::make_shared<BindInfos>())
 {}
 
-std::string InputDisplayBindHelper::GetBindDisplayNameByInputDevice(int32_t inputDeviceId) const {
+std::string InputDisplayBindHelper::GetBindDisplayNameByInputDevice(int32_t inputDeviceId) const 
+{
 	if (infos_ == nullptr) {
 		return {};
 	}
@@ -359,9 +363,9 @@ void InputDisplayBindHelper::RemoveDisplay(int32_t id) {
 
 void InputDisplayBindHelper::Store()
 {
-	std::ofstream ofs(fileName_.c_str()); 
+	std::ofstream ofs(fileName_.c_str(), std::ios::trunc | std::ios::out | std::ios::binary);
 	if (!ofs) {
-		printf("open file fail.%s\n", fileName_.c_str());
+		MMI_HILOGE("Open file fail.%{public}s", fileName_.c_str());
 		return;
 	}
 	ofs << infos_;
@@ -372,7 +376,7 @@ void InputDisplayBindHelper::Load()
 {
 	std::ifstream ifs(fileName_.c_str()); 
 	if (!ifs) {
-		printf("open file fail.%s\n", fileName_.c_str());
+		MMI_HILOGE("Open file fail.%{public}s", fileName_.c_str());
 		return;
 	}
 	ifs >> *configFileInfos_;
