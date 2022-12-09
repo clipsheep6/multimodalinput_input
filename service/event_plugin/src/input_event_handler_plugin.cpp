@@ -122,6 +122,7 @@ bool InputEventHandlerPluginMgr::LoadPlugin(std::string pluginPath, std::string 
     if (plugin->Init(context_.back().get())) {
         pluginInfoList[pluginName].pluginHandler = context_.back()->GetEventHandler();
         context_.back()->inputDeviceMgr_ = inputDevMgr_;
+        context_.back()->pluginName_ = pluginName;
     }
     pluginInfoList[pluginName].loadStatus = true;
     pluginInfoList[pluginName].osHandler = handle;

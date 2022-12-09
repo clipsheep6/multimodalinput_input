@@ -43,6 +43,7 @@ int32_t GetNum(std::string str)
     return stoi(match[0]);
 }
 } // namespace
+
 void PluginContext::SetEventHandler(std::shared_ptr<IInputEventHandler> handler)
 {
     handler_ = handler;
@@ -68,7 +69,6 @@ void PluginContext::TimeStat(TimeStatFlag flag)
 
 void PluginContext::OnReport(int32_t &max, int32_t &avg, int32_t &memMax, int32_t &memAvg)
 {
-
     max = max_;
     avg = sum_ / times_;
     memMax = memMax_;
@@ -108,7 +108,7 @@ void PluginContext::ChengMem()
     std::string tmp;
     bool dataStatus = false;
     while (std::getline(mem, tmp)) {
-        if (tmp.find("libinput_touch_2_key_handler.z.so") != std::string::npos) {
+        if (tmp.find(pluginName_) != std::string::npos) {
             dataStatus = true;
         }
         if (dataStatus) {
