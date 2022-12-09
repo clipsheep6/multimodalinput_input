@@ -33,10 +33,12 @@ int32_t max { 0 };
 int32_t avg { 0 };
 int32_t memMax { 0 };
 int32_t memAvg { 0 };
+#define TIMEING_OUT_MS 3000
 #define TIME_OUT_MAX 500
 #define TIME_OUT_INVALID 0
 #define MEX_MAX 40
 #define MEM_INVALID 0
+
 std::map<std::shared_ptr<IInputEventHandler>, int32_t> timeOutPlugin;
 std::map<std::shared_ptr<IInputEventHandler>, int32_t> memPlugin;
 
@@ -200,7 +202,7 @@ void InputEventHandlerPluginMgr::SetDeivceManager(std::shared_ptr<IInputDeviceMa
 
 void InputEventHandlerPluginMgr::OnTimer()
 {
-    auto timeout = GetSysClockTime() + 3000;
+    auto timeout = GetSysClockTime() + TIMEING_OUT_MS;
     for (auto &item: context_) {
         item->OnReport(max, avg, memMax, memAvg);
         if (timeOutPlugin.find(item->GetEventHandler()) == timeOutPlugin.end()) {
