@@ -22,8 +22,9 @@
 #include "singleton.h"
 
 #include "display_info.h"
-#include "input_event.h"
+#include "input_display_bind_helper.h"
 #include "input_event_data_transformation.h"
+#include "input_event.h"
 #include "pointer_event.h"
 #include "uds_server.h"
 
@@ -83,6 +84,9 @@ public:
     void DispatchPointer(int32_t pointerAction);
     void SendPointerEvent(int32_t pointerAction);
 #endif // OHOS_BUILD_ENABLE_POINTER
+    void DeviceStatusChanged(int32_t deviceId, const std::string &sysUid, const std::string devStatus);
+private:
+    void UpdateDisplayIdAndName();
 
 private:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -144,6 +148,7 @@ private:
     DisplayGroupInfo displayGroupInfo_;
     MouseLocation mouseLocation_ = { -1, -1 };
     std::map<int32_t, WindowInfo> touchItemDownInfos_;
+    InputDisplayBindHelper bindInfo_;
 };
 
 #define WinMgr ::OHOS::DelayedSingleton<InputWindowsManager>::GetInstance()
