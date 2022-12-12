@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,26 +13,13 @@
  * limitations under the License.
  */
 
-#ifndef VIRTUAL_KEYBOARD_H
-#define VIRTUAL_KEYBOARD_H
-
-#include <cstdint>
-#include "nocopyable.h"
-
-#include "virtual_device.h"
+#include "touch_screen_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
-class VirtualKeyboard : public VirtualDevice {
-public:
-    VirtualKeyboard();
-    DISALLOW_COPY_AND_MOVE(VirtualKeyboard);
-    ~VirtualKeyboard() = default;
-protected:
-    const std::vector<uint32_t> &GetEventTypes() const override;
-
-    const std::vector<uint32_t> &GetKeys() const override;
-};
+std::shared_ptr<IEventHandler> IEventHandler::CreateInstance()
+{
+    return TouchScreenEventHandler::CreateInstance();
+}
 } // namespace MMI
 } // namespace OHOS
-#endif // VIRTUAL_KEYBOARD_H

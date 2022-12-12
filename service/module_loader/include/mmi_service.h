@@ -25,6 +25,10 @@
 #include "system_ability.h"
 
 #include "delegate_tasks.h"
+#ifdef OHOS_BUILD_HDF
+#include "i_input_context.h"
+#endif // OHOS_BUILD_HDF
+#include "input_device_manager.h"
 #include "input_event_handler.h"
 #include "multimodal_input_connect_stub.h"
 #include "libinput_adapter.h"
@@ -35,7 +39,8 @@ namespace OHOS {
 namespace MMI {
 
 enum class ServiceRunningState {STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
-class MMIService final : public UDSServer, public SystemAbility, public MultimodalInputConnectStub {
+class MMIService final : public UDSServer, public IInputContext, public SystemAbility, public MultimodalInputConnectStub,
+    public std::enable_shared_from_this<MMIService> {
     DECLARE_DELAYED_SINGLETON(MMIService);
     DECLARE_SYSTEM_ABILITY(MMIService);
     DISALLOW_COPY_AND_MOVE(MMIService);
@@ -44,6 +49,12 @@ public:
     void OnStart() override;
     void OnStop() override;
     int32_t Dump(int32_t fd, const std::vector<std::u16string> &args) override;
+#ifdef OHOS_BUILD_HDF
+    virtual std::shared_ptr<IInputDeviceManager> GetInputDeviceManager() override { return InputDevMgr; }
+    virtual std::shared_ptr<IEventQueueManager> GetEventQueueManager() override { return eventQueueMagr_; }
+    virtual std::shared_ptr<IEventHandlerManager> GetEventHandlerManager() override { return iEventHandlerrMgr_; }
+    virtual std::shared_ptr<IInputProviderManager> GetInputProviderManager() override { return inputProviderMgr_; }
+#endif // OHOS_BUILD_HDF
     int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &toReturnClientFd, int32_t &tokenType) override;
     int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority) override;
@@ -81,6 +92,7 @@ public:
     int32_t SetInputDevice(const std::string& dhid, const std::string& screenId) override;
     int32_t GetFunctionKeyState(int32_t funcKey, bool &state) override;
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable) override;
+    void EventDispatch(epoll_event &ev);
     int32_t SetPointerLocation(int32_t x, int32_t y) override;
 
 #ifdef OHOS_RSS_CLIENT
@@ -128,17 +140,19 @@ protected:
     int32_t OnGetInputDeviceCooperateState(int32_t pid, int32_t userData, const std::string &deviceId);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     bool InitLibinputService();
+#ifdef OHOS_BUILD_HDF
+    bool InitHDFService();
+#endif // OHOS_BUILD_HDF
     bool InitService();
     bool InitSignalHandler();
     bool InitDelegateTasks();
     int32_t Init();
-
     void OnThread();
     void OnSignalEvent(int32_t signalFd);
     void OnDelegateTask(epoll_event& ev);
-
     void AddReloadDeviceTimer();
-
+    
+    bool InitQueue();
 private:
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t mmiFd_ { -1 };
@@ -149,6 +163,12 @@ private:
 #endif
 
     LibinputAdapter libinputAdapter_;
+#ifdef OHOS_BUILD_HDF
+    std::shared_ptr<IInputProvider> hdfProvider_;
+    std::shared_ptr<IInputProviderManager> inputProviderMgr_;
+    std::shared_ptr<IEventQueueManager> eventQueueMagr_;
+    std::shared_ptr<IEventHandlerManager> iEventHandlerrMgr_;
+#endif // OHOS_BUILD_HDF
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;
 

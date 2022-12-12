@@ -18,7 +18,6 @@
 #include <cinttypes>
 #include <dirent.h>
 #include <fcntl.h>
-#include <sys/epoll.h>
 #include <unistd.h>
 
 #include "define_multimodal.h"
