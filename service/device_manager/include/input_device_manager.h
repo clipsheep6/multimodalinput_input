@@ -23,6 +23,7 @@
 #include "event_dispatch_handler.h"
 #include "key_event_normalize.h"
 #include "input_device.h"
+#include "i_input_device_manager.h"
 #include "key_auto_repeat.h"
 #include "key_map_manager.h"
 #include "msg_handler.h"
@@ -30,7 +31,6 @@
 #include "pointer_drawing_manager.h"
 #include "singleton.h"
 #include "util.h"
-#include "i_input_device_manager.h"
 
 namespace OHOS {
 namespace MMI {
