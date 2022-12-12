@@ -16,9 +16,10 @@
 #ifndef I_INPUT_DEVICE_H
 #define I_INPUT_DEVICE_H
 
-#include "input_type.h"
 #include <memory>
 #include <string>
+
+#include "input_type.h"
 
 namespace OHOS {
 namespace MMI {
@@ -69,7 +70,6 @@ public:
 public:
     explicit IInputDevice(uint32_t index) : index_(index) {}
     virtual ~IInputDevice() = default;
-
     virtual void SetDeviceId(int32_t id) = 0;
     virtual int32_t Enable() = 0;
     virtual int32_t Disable() = 0;
@@ -82,6 +82,7 @@ public:
 
     virtual InputDeviceInfo GetInputDevInfo() = 0;
     virtual uint32_t GetDeviceIndex() const { return index_; }
+
 protected:
     uint32_t index_;
 

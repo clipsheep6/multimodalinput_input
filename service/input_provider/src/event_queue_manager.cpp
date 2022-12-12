@@ -14,6 +14,7 @@
  */
 
 #include "event_queue_manager.h"
+
 #include <cstddef>
 #include <memory>
 
@@ -22,7 +23,6 @@
 
 namespace OHOS {
 namespace MMI {
-
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventQueueManager" };
 } // namespace

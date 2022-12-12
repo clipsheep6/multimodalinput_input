@@ -36,8 +36,14 @@ std::map<uint32_t, int32_t> lastDevInfoMap_;
 CircleStreamBuffer g_circBuf;
 IInputInterface *g_InputInterface { nullptr };
 InputEventCb g_eventCb;
-
 } // namespace
+
+HDFInputProvider::HDFInputProvider()
+{
+    CHK_PID_AND_TID();
+    g_hostCbNew.HotPlugCallback = HotPlugCallback;
+    g_eventCb.EventPkgCallback = EventPkgCallback;
+}
 
 void HDFInputProvider::HotPlugCallback(const InputHotPlugEvent *event)
 {
@@ -112,13 +118,6 @@ void HDFInputProvider::EventPkgCallback(const InputEventPackage **pkgs, uint32_t
         queue->SendEvent(eventData);
     }
 } 
-
-HDFInputProvider::HDFInputProvider()
-{
-    CHK_PID_AND_TID();
-    g_hostCbNew.HotPlugCallback = HotPlugCallback;
-    g_eventCb.EventPkgCallback = EventPkgCallback;
-}
 
 bool HDFInputProvider::IsDupTouchBtnKey(const InputEventPackage &r, uint32_t devIndex)
 {

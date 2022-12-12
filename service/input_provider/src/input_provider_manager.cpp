@@ -14,6 +14,7 @@
  */
 
 #include "input_provider_manager.h"
+
 #include <cstddef>
 #include <memory>
 
@@ -25,6 +26,7 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputProviderManager" };
 } // namespace
+
 int32_t InputProviderManager::AddInputProvider(std::shared_ptr<IInputProvider> inputProvider)
 {
     CALL_DEBUG_ENTER;

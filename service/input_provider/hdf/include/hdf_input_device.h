@@ -45,9 +45,9 @@ public:
     virtual InputDeviceInfo GetInputDevInfo() override;
     virtual int32_t GetDeviceId() override;
     virtual std::shared_ptr<IEventHandler> GetEventHandler() override;
-    
-    int32_t UpdateCapability();
+
 private:
+    int32_t UpdateCapability();
     bool HasMouseCapability();
     bool HasKeyboardCapability();
     bool HasTouchscreenCapability();
@@ -57,7 +57,6 @@ private:
     bool HasInputProperty(unsigned int property);
     
     int32_t CheckAndUpdateAxisInfo();
-    int32_t Uninit();
     std::shared_ptr<IInputDevice::AxisInfo> GetAxisInfo(int32_t axis) const;
 
     static std::tuple<unsigned int, unsigned int> GetBitLoc(unsigned long evMacro)

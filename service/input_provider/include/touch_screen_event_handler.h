@@ -16,8 +16,6 @@
 #ifndef TOUCH_SCREEN_EVENT_HANDLER_H
 #define TOUCH_SCREEN_EVENT_HANDLER_H
 
-#include "i_event_handler.h"
-
 #include <memory>
 #include <string>
 #include <map>
@@ -25,8 +23,10 @@
 #include <nocopyable.h>
 
 #include "mtdev.h"
-#include "pointer_event.h"
+
 #include "i_event_handler_manager.h"
+#include "i_event_handler.h"
+#include "pointer_event.h"
 
 namespace OHOS {
 namespace MMI {
@@ -56,7 +56,6 @@ struct Slot {
 
 class TouchScreenEventHandler : public IEventHandler {
 public:
-    
     virtual ~TouchScreenEventHandler() = default;
     DISALLOW_COPY_AND_MOVE(TouchScreenEventHandler);
     static std::shared_ptr<TouchScreenEventHandler> CreateInstance();
@@ -73,21 +72,18 @@ private:
     void HandleMtTrackingId(int value);
     std::shared_ptr<Slot> GetCurrentPointer(bool createIfNotExist);
     void ProcessEvent(const struct input_event& event);
-
     void OnInputEvent(std::shared_ptr<Slot> slot);
     const std::shared_ptr<PointerEvent> TransformToPointerEvent(std::shared_ptr<Slot> slot);
-
     bool OnEventTouchDown(std::shared_ptr<Slot> slot);
     bool OnEventTouchUp(std::shared_ptr<Slot> slot);
     bool OnEventTouchMotion(std::shared_ptr<Slot> slot);
-
-
     int32_t EventIsCode(const struct input_event& ev, unsigned int type, unsigned int code);
     int32_t EventIsType(const struct input_event& ev, unsigned int type);
     int32_t EventTypeGetMax(unsigned int type);
 
 protected:
     TouchScreenEventHandler();
+
 private:
     int32_t slotNum_ { 10 };
     int32_t curSlot_ { 0 };

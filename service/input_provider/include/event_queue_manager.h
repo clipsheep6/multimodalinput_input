@@ -20,8 +20,9 @@
 #include <map>
 #include <vector>
 
-#include "i_event_queue_manager.h"
 #include "nocopyable.h"
+
+#include "i_event_queue_manager.h"
 
 namespace OHOS {
 namespace MMI {

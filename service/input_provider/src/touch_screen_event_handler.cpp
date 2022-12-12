@@ -14,10 +14,11 @@
  */
 
 #include "touch_screen_event_handler.h"
+
 #include "define_multimodal.h"
-#include "input-event-codes.h"
 #include "input_event_handler.h"
 #include "input_windows_manager.h"
+#include "input-event-codes.h"
 
 namespace OHOS {
 namespace MMI {
@@ -28,6 +29,11 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Touch
 TouchScreenEventHandler::TouchScreenEventHandler()
 {
     mtdev_ = input_mtdev_open();
+}
+
+std::shared_ptr<TouchScreenEventHandler> TouchScreenEventHandler::CreateInstance()
+{
+    return std::shared_ptr<TouchScreenEventHandler>(new TouchScreenEventHandler());
 }
 
 void TouchScreenEventHandler::HandleEvent(const struct input_event& event)
@@ -45,6 +51,12 @@ void TouchScreenEventHandler::HandleEvent(const struct input_event& event)
         mtdev_get_event(mtdev_, &e);
         ProcessEvent(e);
     }
+}
+
+void TouchScreenEventHandler::SetAxisInfo(std::shared_ptr<IInputDevice::AxisInfo> xInfo, std::shared_ptr<IInputDevice::AxisInfo> yInfo)
+{
+    xInfo_ = xInfo;
+    yInfo_ = yInfo;
 }
 
 int32_t TouchScreenEventHandler::EventIsCode(const struct input_event& ev, unsigned int type, unsigned int code)
@@ -93,10 +105,8 @@ void TouchScreenEventHandler::ProcessEvent(const struct input_event& event)
         case EV_REP:
         case EV_FF:
         case EV_PWR:
-        case EV_FF_STATUS: {
-            break;
-        }
-        default: {
+        case EV_FF_STATUS:
+        default:  {
             break;
         }
     }
@@ -234,11 +244,6 @@ std::shared_ptr<Slot> TouchScreenEventHandler::GetCurrentPointer(bool createIfNo
     pt->pointer = item;
     slots_.insert(std::make_pair(curSlot_, pt));
     return pt;
-}
-
-std::shared_ptr<TouchScreenEventHandler> TouchScreenEventHandler::CreateInstance()
-{
-    return std::shared_ptr<TouchScreenEventHandler>(new TouchScreenEventHandler());
 }
 
 void TouchScreenEventHandler::OnInputEvent(std::shared_ptr<Slot> slot)
@@ -398,12 +403,6 @@ bool TouchScreenEventHandler::OnEventTouchMotion(std::shared_ptr<Slot> slot)
     pointerEvent_->UpdatePointerItem(curSlot, item);
     pointerEvent_->SetPointerId(curSlot);
     return true;
-}
-
-void TouchScreenEventHandler::SetAxisInfo(std::shared_ptr<IInputDevice::AxisInfo> xInfo, std::shared_ptr<IInputDevice::AxisInfo> yInfo)
-{
-    xInfo_ = xInfo;
-    yInfo_ = yInfo;
 }
 } // namespace MMI
 } // namespace OHOS

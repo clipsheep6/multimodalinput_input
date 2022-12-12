@@ -16,10 +16,10 @@
 #include "event_handler_manager.h"
 
 #include "input_event_handler.h"
+#include "key_auto_repeat.h"
 
 namespace OHOS {
 namespace MMI {
-
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventHandlerManager" };
 } // namespace
@@ -33,9 +33,14 @@ void EventHandlerManager::DispatchEvent(std::shared_ptr<PointerEvent> event)
         ResetTouchUpEvent(event);
     }
 }
+
 void EventHandlerManager::DispatchEvent(std::shared_ptr<KeyEvent> event)
 {
-
+    CHKPV(event);
+    auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPV(inputEventNormalizeHandler);
+    inputEventNormalizeHandler->HandleKeyEvent(event);
+    KeyRepeat->SelectAutoRepeat(event);
 }
 
 void EventHandlerManager::ResetTouchUpEvent(std::shared_ptr<PointerEvent> event)

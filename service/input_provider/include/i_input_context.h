@@ -16,8 +16,6 @@
 #ifndef I_INPUT_CONTEXT
 #define I_INPUT_CONTEXT
 
-// compile: I_INPUT_CONTEXT
-
 #include <memory>
 #include <string>
 

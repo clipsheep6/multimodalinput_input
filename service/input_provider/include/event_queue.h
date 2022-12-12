@@ -18,10 +18,12 @@
 
 #include <memory>
 #include <map>
-#include "i_event_queue.h"
+
 #include "nocopyable.h"
-#include "mmi_log.h"
 #include "unistd.h"
+
+#include "i_event_queue.h"
+#include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {
@@ -42,11 +44,12 @@ public:
     virtual int32_t SendEvent(EventData &event) override;
     virtual int32_t SetDefaultHandler(std::function<void(int32_t, void *, size_t)>) override;
     virtual int32_t GetId() override { return id_; }
-    
     int32_t GetInputFd() const;
+
 private:
     void ReleasePipe();
 
+private:
     std::shared_ptr<IEventHandler> handler_;
 };
 } // namespace MMI

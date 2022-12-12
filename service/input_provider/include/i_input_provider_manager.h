@@ -17,7 +17,7 @@
 #define I_INPUT_PROVIDER_MANAGER
 
 #include <memory>
-//#include "i_input_provider.h"
+
 namespace OHOS {
 namespace MMI {
 class IInputProvider;

@@ -16,12 +16,12 @@
 #ifndef I_INPUT_PROVIDER_H
 #define I_INPUT_PROVIDER_H
 
-#include "i_input_context.h"
 #include <memory>
 #include <string>
 #include <nocopyable.h>
-
 #include <sys/epoll.h>
+
+#include "i_input_context.h"
 
 namespace OHOS {
 namespace MMI {

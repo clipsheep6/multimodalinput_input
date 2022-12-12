@@ -14,6 +14,7 @@
  */
 
 #include "hdf_input_device.h"
+
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "i_event_handler.h"
@@ -40,10 +41,8 @@ int32_t HDFInputDevice::Enable()
     CHKPR(inputInterface_->iInputManager, ERROR_NULL_POINTER);
     CHKPR(inputInterface_->iInputController, ERROR_NULL_POINTER);
     CHKPR(inputInterface_->iInputReporter, ERROR_NULL_POINTER);
-    //const uint32_t devIndex = event.devIndex;
-    //const uint32_t devType = event.devType;
     
-    auto ret = inputInterface_->iInputManager->OpenInputDevice(index_);//index_
+    auto ret = inputInterface_->iInputManager->OpenInputDevice(index_);
     if (ret != RET_OK) {
         Disable();
         return RET_ERR;
@@ -55,9 +54,7 @@ int32_t HDFInputDevice::Enable()
         if (ret != INPUT_SUCCESS) {
             break;
         }
-        if (devInfo == nullptr) {
-            break;
-        }
+        CHKPB(devInfo);
         devInfo_ = *devInfo;
  
         UpdateCapability();
@@ -68,7 +65,6 @@ int32_t HDFInputDevice::Enable()
         }
         if(CheckAndUpdateAxisInfo() != RET_OK) {
             MMI_HILOGE("CheckAndUpdateAxisInfo failed");
-            Uninit();
             break;
         }
         ret = inputInterface_->iInputReporter->RegisterReportCallback(index_, &eventCb_);
@@ -91,11 +87,6 @@ int32_t HDFInputDevice::Disable()
         return RET_ERR;
     }
     MMI_HILOGD("CloseInputDevice success, devIndex:%{public}d", index_);
-    return RET_OK;
-}
-
-int32_t HDFInputDevice::Uninit()
-{
     return RET_OK;
 }
 
@@ -160,12 +151,12 @@ std::shared_ptr<IInputDevice::AxisInfo> HDFInputDevice::GetAxisInfo(int32_t axis
 
 std::string HDFInputDevice::GetName()
 {
-    return "";
+    return "HDFInputDevice";
 }
 
 int32_t HDFInputDevice::GetCapabilities()
 {
-    return -1;
+    return capabilities_;
 }
 
 std::string HDFInputDevice::GetPath()

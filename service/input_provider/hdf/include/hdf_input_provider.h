@@ -45,10 +45,9 @@ public:
     virtual std::string GetName() override;
     virtual void EventDispatch(epoll_event &ev) override;
 
+private:
     static void HotPlugCallback(const InputHotPlugEvent *event);
     static void EventPkgCallback(const InputEventPackage **pkgs, uint32_t count, uint32_t devIndex);
-
-private:
     static void HDFDeviceStatusChanged(int32_t devIndex, int32_t devType, HDFEventDevStatus devStatus);
     static bool IsDupTouchBtnKey(const InputEventPackage &r, uint32_t devIndex);
     int32_t RegisterHotPlug();

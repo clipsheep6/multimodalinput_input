@@ -14,6 +14,7 @@
  */
 
 #include "event_queue.h"
+
 #include <errors.h>
 
 namespace OHOS {
@@ -43,7 +44,6 @@ int32_t EventQueue::Init()
         MMI_HILOGI("Connect hdf init, fds:(read:%{public}d, write:%{public}d)", fds[0], fds[1]);
         return RET_OK;
     }while(0);
-
     ReleasePipe();
     return RET_ERR;
 }
@@ -98,6 +98,7 @@ void EventQueue::ReleasePipe()
         g_mmiServiceReadFd = -1;
     }
 }
+
 int32_t EventQueue::GetInputFd() const
 {
     return g_mmiServiceReadFd;

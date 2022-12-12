@@ -74,6 +74,7 @@ std::vector<std::pair<enum libinput_device_capability, InputDeviceCapability>> d
 
 InputDeviceManager::InputDeviceManager() {}
 InputDeviceManager::~InputDeviceManager() {}
+
 #ifdef OHOS_BUILD_HDF
 void InputDeviceManager::AddInputDevice(const std::shared_ptr<IInputDevice> dev)
 {
