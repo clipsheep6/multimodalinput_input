@@ -141,7 +141,7 @@ void InputDeviceCooperateImpl::OnDevCooperateListener(const std::string &deviceI
     }
 }
 
-void InputDeviceCooperateImpl::OnCooprationMessage(const std::string &deviceId, const CooperationMessage &msg)
+void InputDeviceCooperateImpl::OnCooperationMessage(int32_t userData, const std::string &deviceId, const CooperationMessage &msg)
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();

@@ -57,7 +57,7 @@ void JsEventTarget::EmitJsEnable(sptr<JsUtil::CallbackInfo> cb, const std::strin
     work->data = cb.GetRefPtr();
     int32_t result;
     if (cb->ref == nullptr) {
-        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallEnablePromsieWork);
+        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallEnablePromiseWork);
     } else {
         result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallEnableAsyncWork);
     }
