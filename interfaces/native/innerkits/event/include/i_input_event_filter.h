@@ -13,20 +13,24 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
+#ifndef I_INPUT_EVENT_FILTER_H
+#define I_INPUT_EVENT_FILTER_H
 
-#include "input_windows_manager.h"
+#include <memory>
+
+#include "axis_event.h"
+#include "key_event.h"
+#include "pointer_event.h"
 
 namespace OHOS {
 namespace MMI {
-namespace {
-using namespace testing::ext;
-} // namespace
-
-class InputWindowsManagerTest : public testing::Test {
+struct IInputEventFilter {
 public:
-    static void SetUpTestCase(void) {}
-    static void TearDownTestCase(void) {}
+    IInputEventFilter() = default;
+    virtual ~IInputEventFilter() = default;
+    virtual bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const = 0;
+    virtual bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const = 0;
 };
 } // namespace MMI
 } // namespace OHOS
+#endif // I_INPUT_EVENT_FILTER_H

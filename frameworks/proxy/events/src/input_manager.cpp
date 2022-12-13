@@ -37,9 +37,14 @@ void InputManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
     InputMgrImpl.UpdateDisplayInfo(displayGroupInfo);
 }
 
-int32_t InputManager::AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter)
+int32_t InputManager::AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority)
 {
-    return InputMgrImpl.AddInputEventFilter(filter);
+    return InputMgrImpl.AddInputEventFilter(filter, priority);
+}
+
+int32_t InputManager::RemoveInputEventFilter(int32_t filterId)
+{
+    return InputMgrImpl.RemoveInputEventFilter(filterId);
 }
 
 void InputManager::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer)
@@ -238,6 +243,11 @@ bool InputManager::GetFunctionKeyState(int32_t funcKey)
 int32_t InputManager::SetFunctionKeyState(int32_t funcKey, bool enable)
 {
     return InputMgrImpl.SetFunctionKeyState(funcKey, enable);
+}
+
+void InputManager::SetPointerLocation(int32_t x, int32_t y)
+{
+    InputMgrImpl.SetPointerLocation(x, y);
 }
 } // namespace MMI
 } // namespace OHOS

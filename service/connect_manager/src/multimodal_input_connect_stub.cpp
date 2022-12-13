@@ -49,6 +49,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
     const static std::map<int32_t, ConnFunc> mapConnFunc = {
         {IMultimodalInputConnect::ALLOC_SOCKET_FD, &MultimodalInputConnectStub::StubHandleAllocSocketFd},
         {IMultimodalInputConnect::ADD_INPUT_EVENT_FILTER, &MultimodalInputConnectStub::StubAddInputEventFilter},
+        {IMultimodalInputConnect::RMV_INPUT_EVENT_FILTER, &MultimodalInputConnectStub::StubRemoveInputEventFilter},
         {IMultimodalInputConnect::SET_POINTER_VISIBLE, &MultimodalInputConnectStub::StubSetPointerVisible},
         {IMultimodalInputConnect::SET_POINTER_STYLE, &MultimodalInputConnectStub::StubSetPointerStyle},
         {IMultimodalInputConnect::GET_POINTER_STYLE, &MultimodalInputConnectStub::StubGetPointerStyle},
@@ -84,7 +85,8 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             &MultimodalInputConnectStub::StubGetInputDeviceCooperateState},
         {IMultimodalInputConnect::SET_INPUT_DEVICE_TO_SCREEN, &MultimodalInputConnectStub::StubSetInputDevice},
         {IMultimodalInputConnect::GET_FUNCTION_KEY_STATE, &MultimodalInputConnectStub::StubGetFunctionKeyState},
-        {IMultimodalInputConnect::SET_FUNCTION_KEY_STATE, &MultimodalInputConnectStub::StubSetFunctionKeyState}
+        {IMultimodalInputConnect::SET_FUNCTION_KEY_STATE, &MultimodalInputConnectStub::StubSetFunctionKeyState},
+        {IMultimodalInputConnect::SET_POINTER_LOCATION, &MultimodalInputConnectStub::StubSetPointerLocation}
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -139,10 +141,31 @@ int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data,
     CHKPR(client, ERR_INVALID_VALUE);
     sptr<IEventFilter> filter = iface_cast<IEventFilter>(client);
     CHKPR(filter, INPUT_COMMON_NULLPTR);
-
-    int32_t ret = AddInputEventFilter(filter);
+    int32_t filterId = -1;
+    READINT32(data, filterId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t priority = 0;
+    READINT32(data, priority, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = AddInputEventFilter(filter, filterId, priority);
     if (ret != RET_OK) {
         MMI_HILOGE("Call AddInputEventFilter failed ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("Success pid:%{public}d", GetCallingPid());
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubRemoveInputEventFilter(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+    int32_t filterId = -1;
+    READINT32(data, filterId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = RemoveInputEventFilter(filterId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call RemoveInputEventFilter failed ret:%{public}d", ret);
         return ret;
     }
     MMI_HILOGD("Success pid:%{public}d", GetCallingPid());
@@ -247,8 +270,6 @@ int32_t MultimodalInputConnectStub::StubGetPointerStyle(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubSupportKeys(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t userData = 0;
-    READINT32(data, userData, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t deviceId = -1;
     READINT32(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t size = 0;
@@ -259,9 +280,15 @@ int32_t MultimodalInputConnectStub::StubSupportKeys(MessageParcel& data, Message
         READINT32(data, key, IPC_PROXY_DEAD_OBJECT_ERR);
         keys.push_back(key);
     }
-    int32_t ret = SupportKeys(userData, deviceId, keys);
+    std::vector<bool> keystroke;
+    int32_t ret = SupportKeys(deviceId, keys, keystroke);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SupportKeys failed ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    if (!reply.WriteBoolVector(keystroke)) {
+        MMI_HILOGE("Write keyStroke failed");
+        return RET_ERR;
     }
     return ret;
 }
@@ -269,11 +296,15 @@ int32_t MultimodalInputConnectStub::StubSupportKeys(MessageParcel& data, Message
 int32_t MultimodalInputConnectStub::StubGetDeviceIds(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t userData = 0;
-    READINT32(data, userData, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = GetDeviceIds(userData);
+    std::vector<int32_t> ids;
+    int32_t ret = GetDeviceIds(ids);
     if (ret != RET_OK) {
         MMI_HILOGE("Call GetDeviceIds failed ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    if (!reply.WriteInt32Vector(ids)) {
+        MMI_HILOGE("Write ids failed");
+        return RET_ERR;
     }
     return ret;
 }
@@ -281,15 +312,33 @@ int32_t MultimodalInputConnectStub::StubGetDeviceIds(MessageParcel& data, Messag
 int32_t MultimodalInputConnectStub::StubGetDevice(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t userData = 0;
-    READINT32(data, userData, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t deviceId = -1;
     READINT32(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = GetDevice(userData, deviceId);
+    std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
+    int32_t ret = GetDevice(deviceId, inputDevice);
     if (ret != RET_OK) {
         MMI_HILOGE("Call GetDevice failed ret:%{public}d", ret);
+        return RET_ERR;
     }
-    return ret;
+    WRITEINT32(reply, inputDevice->GetId(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(reply, inputDevice->GetType(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITESTRING(reply, inputDevice->GetName(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(reply, inputDevice->GetBus(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(reply, inputDevice->GetVersion(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(reply, inputDevice->GetProduct(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(reply, inputDevice->GetVendor(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITESTRING(reply, inputDevice->GetPhys(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITESTRING(reply, inputDevice->GetUniq(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEUINT32(reply, static_cast<uint32_t>(inputDevice->GetAxisInfo().size()), IPC_STUB_WRITE_PARCEL_ERR);
+    for (const auto &item : inputDevice->GetAxisInfo()) {
+        WRITEINT32(reply, item.GetMinimum(), IPC_STUB_WRITE_PARCEL_ERR);
+        WRITEINT32(reply, item.GetMaximum(), IPC_STUB_WRITE_PARCEL_ERR);
+        WRITEINT32(reply, item.GetAxisType(), IPC_STUB_WRITE_PARCEL_ERR);
+        WRITEINT32(reply, item.GetFuzz(), IPC_STUB_WRITE_PARCEL_ERR);
+        WRITEINT32(reply, item.GetFlat(), IPC_STUB_WRITE_PARCEL_ERR);
+        WRITEINT32(reply, item.GetResolution(), IPC_STUB_WRITE_PARCEL_ERR);
+    }
+    return RET_OK;
 }
 
 int32_t MultimodalInputConnectStub::StubRegisterInputDeviceMonitor(MessageParcel& data, MessageParcel& reply)
@@ -315,14 +364,15 @@ int32_t MultimodalInputConnectStub::StubUnregisterInputDeviceMonitor(MessageParc
 int32_t MultimodalInputConnectStub::StubGetKeyboardType(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t userData = 0;
-    READINT32(data, userData, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t deviceId = -1;
     READINT32(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = GetKeyboardType(userData, deviceId);
+    int32_t keyboardType = 0;
+    int32_t ret = GetKeyboardType(deviceId, keyboardType);
     if (ret != RET_OK) {
         MMI_HILOGE("Call GetKeyboardType failed ret:%{public}d", ret);
+        return RET_ERR;
     }
+    WRITEINT32(reply, keyboardType, IPC_STUB_WRITE_PARCEL_ERR);
     return ret;
 }
 
@@ -749,6 +799,29 @@ int32_t MultimodalInputConnectStub::StubSetFunctionKeyState(MessageParcel &data,
     READINT32(data, funcKey, IPC_PROXY_DEAD_OBJECT_ERR);
     READBOOL(data, enable, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetFunctionKeyState(funcKey, enable);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetFunctionKeyState failed ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubSetPointerLocation(MessageParcel &data, MessageParcel &reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    int32_t x = 0;
+    int32_t y = 0;
+    READINT32(data, x, IPC_PROXY_DEAD_OBJECT_ERR);
+    READINT32(data, y, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetPointerLocation(x, y);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetFunctionKeyState failed ret:%{public}d", ret);
     }

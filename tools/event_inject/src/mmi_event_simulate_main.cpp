@@ -24,7 +24,6 @@ constexpr int32_t ARGV_VALID = 2;
 
 int32_t main(int32_t argc, char* argv[])
 {
-    using namespace OHOS::MMI;
     do {
         SetThreadName("main");
         InjectionToolsHelpFunc helpFunc;

@@ -31,6 +31,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerImpl" };
+constexpr size_t MAX_FILTER_NUM = 4;
 } // namespace
 
 struct MonitorEventConsumer : public IInputEventConsumer {
@@ -97,33 +98,59 @@ void InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInf
     PrintDisplayInfo();
 }
 
-int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter)
+int32_t InputManagerImpl::AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority)
 {
     CALL_INFO_TRACE;
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     std::lock_guard<std::mutex> guard(mtx_);
-    bool hasSendToMmiServer = true;
-    if (eventFilterService_ == nullptr) {
-        hasSendToMmiServer = false;
-        eventFilterService_ = new (std::nothrow) EventFilterService();
-        CHKPR(eventFilterService_, RET_ERR);
+    CHKPR(filter, RET_ERR);
+    if (eventFilterServices_.size() >= MAX_FILTER_NUM) {
+        MMI_HILOGE("Too many filters, size:%{public}zu", eventFilterServices_.size());
+        return RET_ERR;
     }
+    sptr<IEventFilter> service = new (std::nothrow) EventFilterService(filter);
+    CHKPR(service, RET_ERR);
+    const int32_t filterId = EventFilterService::GetNextId();
+    int32_t ret = MultimodalInputConnMgr->AddInputEventFilter(service, filterId, priority);
+    if (ret != RET_OK) {
+        MMI_HILOGE("AddInputEventFilter has send to server failed, priority:%{public}d, ret:%{public}d", priority, ret);
+        service = nullptr;
+        return RET_ERR;
+    }
+    auto it =  eventFilterServices_.emplace(filterId, std::make_tuple(service, priority));
+    if (!it.second) {
+        MMI_HILOGW("Filter id duplicate");
+    }
+    return filterId;
+}
 
-    eventFilterService_->SetPointerEventPtr(filter);
-    if (!hasSendToMmiServer) {
-        int32_t ret = MultimodalInputConnMgr->AddInputEventFilter(eventFilterService_);
-        if (ret != RET_OK) {
-            MMI_HILOGE("AddInputEventFilter has send to server failed, ret:%{public}d", ret);
-            eventFilterService_ = nullptr;
-            return RET_ERR;
-        }
+int32_t InputManagerImpl::RemoveInputEventFilter(int32_t filterId)
+{
+    CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (eventFilterServices_.empty()) {
+        MMI_HILOGE("Filters is empty, size:%{public}zu", eventFilterServices_.size());
         return RET_OK;
     }
+    std::map<int32_t, std::tuple<sptr<IEventFilter>, int32_t>>::iterator it;
+    if (filterId != -1) {
+        it = eventFilterServices_.find(filterId);
+        if (it == eventFilterServices_.end()) {
+            MMI_HILOGE("Filter not found");
+            return RET_OK;
+        }
+    }
+    int32_t ret = MultimodalInputConnMgr->RemoveInputEventFilter(filterId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Remove filter failed, filter id:%{public}d, ret:%{public}d", filterId, ret);
+        return RET_ERR;
+    }
+    if (filterId != -1) {
+        eventFilterServices_.erase(it);
+    } else {
+        eventFilterServices_.clear();
+    }
+    MMI_HILOGI("Filter remove success");
     return RET_OK;
-#else
-    MMI_HILOGW("Pointer and touchscreen device does not support");
-    return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 
 void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
@@ -610,6 +637,7 @@ int32_t InputManagerImpl::GetPointerStyle(int32_t windowId, int32_t &pointerStyl
 void InputManagerImpl::OnConnected()
 {
     CALL_DEBUG_ENTER;
+    ReAddInputEventFilter();
     if (displayGroupInfo_.windowsInfo.empty() || displayGroupInfo_.displaysInfo.empty()) {
         MMI_HILOGI("The windows info or display info is empty");
         return;
@@ -636,6 +664,22 @@ void InputManagerImpl::SendDisplayInfo()
     }
     if (!client->SendMessage(pkt)) {
         MMI_HILOGE("Send message failed, errCode:%{public}d", INPUT_MSG_SEND_FAIL);
+    }
+}
+
+void InputManagerImpl::ReAddInputEventFilter()
+{
+    CALL_INFO_TRACE;
+    if (eventFilterServices_.size() > MAX_FILTER_NUM) {
+        MMI_HILOGE("Too many filters, size:%{public}zu", eventFilterServices_.size());
+        return;
+    }
+    for (const auto &[filterId, t] : eventFilterServices_) {
+        const auto &[service, priority] = t;
+        int32_t ret = MultimodalInputConnMgr->AddInputEventFilter(service, filterId, priority);
+        if (ret != RET_OK) {
+            MMI_HILOGE("AddInputEventFilter has send to server failed, filterId:%{public}d, priority:%{public}d, ret:%{public}d", filterId, priority, ret);
+        }
     }
 }
 
@@ -667,7 +711,7 @@ int32_t InputManagerImpl::GetDeviceIds(std::function<void(std::vector<int32_t>&)
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return InputDevImpl.GetInputDeviceIdsAsync(callback);
+    return InputDevImpl.GetInputDeviceIds(callback);
 }
 
 int32_t InputManagerImpl::GetDevice(int32_t deviceId,
@@ -678,7 +722,7 @@ int32_t InputManagerImpl::GetDevice(int32_t deviceId,
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return InputDevImpl.GetInputDeviceAsync(deviceId, callback);
+    return InputDevImpl.GetInputDevice(deviceId, callback);
 }
 
 int32_t InputManagerImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes,
@@ -895,6 +939,19 @@ int32_t InputManagerImpl::SetFunctionKeyState(int32_t funcKey, bool enable)
     MMI_HILOGW("Keyboard device does not support");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+}
+
+void InputManagerImpl::SetPointerLocation(int32_t x, int32_t y)
+{
+    CALL_DEBUG_ENTER;
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    int32_t ret = MultimodalInputConnMgr->SetPointerLocation(x, y);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set Pointer Location failed, ret:%{public}d", ret);
+    }
+#else
+    MMI_HILOGW("Pointer device or pointer drawing module does not support");
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 } // namespace MMI
 } // namespace OHOS
