@@ -108,7 +108,7 @@ int32_t InputEventDataTransformation::NetPacketToKeyEvent(NetPacket &pkt, std::s
 
 int32_t InputEventDataTransformation::SerializeInputEvent(std::shared_ptr<InputEvent> event, NetPacket &pkt)
 {
-    CHKPR(event, ERROR_NULL_POINTER);
+    CHKPR(event, INPUT_COMMON_NULLPTR);
     pkt << event->GetEventType() << event->GetId() << event->GetActionTime()
         << event->GetAction() << event->GetActionStartTime() << event->GetDeviceId()
         << event->GetTargetDisplayId() << event->GetTargetWindowId()
@@ -122,7 +122,7 @@ int32_t InputEventDataTransformation::SerializeInputEvent(std::shared_ptr<InputE
 
 int32_t InputEventDataTransformation::DeserializeInputEvent(NetPacket &pkt, std::shared_ptr<InputEvent> event)
 {
-    CHKPR(event, ERROR_NULL_POINTER);
+    CHKPR(event, INPUT_COMMON_NULLPTR);
     int32_t tField = 0;
     pkt >> tField;
     pkt >> tField;
@@ -154,7 +154,7 @@ int32_t InputEventDataTransformation::DeserializeInputEvent(NetPacket &pkt, std:
 
 int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> event, NetPacket &pkt)
 {
-    CHKPR(event, ERROR_NULL_POINTER);
+    CHKPR(event, INPUT_COMMON_NULLPTR);
     if (SerializeInputEvent(event, pkt) != RET_OK) {
         MMI_HILOGE("Serialize input event failed");
         return RET_ERR;

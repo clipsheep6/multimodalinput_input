@@ -39,7 +39,7 @@ JsEventTarget::JsEventTarget()
 {
     CALL_DEBUG_ENTER;
     auto ret = cooperateListener_.insert({ COOPERATION, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>() });
-    CK(ret.second, VAL_NOT_EXP);
+    CK(ret.second, INPUT_COMMON_UNEXPECTED_VALUE);
 }
 
 void JsEventTarget::EmitJsEnable(sptr<JsUtil::CallbackInfo> cb, const std::string &deviceId, const CooperationMessage &msg)

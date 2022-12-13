@@ -66,7 +66,7 @@ int32_t MultimodalEventHandler::UnsubscribeKeyEvent(int32_t subscribeId)
 int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    CHKPR(keyEvent, INPUT_COMMON_NULLPTR);
     keyEvent->UpdateId();
     if (keyEvent->GetKeyCode() < 0) {
         MMI_HILOGE("KeyCode is invalid:%{public}u", keyEvent->GetKeyCode());
@@ -112,7 +112,7 @@ MMIClientPtr MultimodalEventHandler::GetMMIClient()
 int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    CHKPR(pointerEvent, INPUT_COMMON_NULLPTR);
     EventLogHelper::PrintEventData(pointerEvent);
     int32_t ret = MultimodalInputConnMgr->InjectPointerEvent(pointerEvent);
     if (ret != 0) {

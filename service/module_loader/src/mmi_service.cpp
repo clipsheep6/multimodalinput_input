@@ -249,13 +249,13 @@ int32_t MMIService::Init()
 #ifdef OHOS_BUILD_ENABLE_POINTER
     if (!IPointerDrawingManager::GetInstance()->Init()) {
         MMI_HILOGE("Pointer draw init failed");
-        return POINTER_DRAW_INIT_FAIL;
+        return INPUT_INIT_POINTER_DRAW_FAIL;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
     mmiFd_ = EpollCreate(MAX_EVENT_SIZE);
     if (mmiFd_ < 0) {
         MMI_HILOGE("Create epoll failed");
-        return EPOLL_CREATE_FAIL;
+        return INPUT_INIT_EPOLL_CREATE_FAIL;
     }
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     /*
@@ -268,11 +268,11 @@ int32_t MMIService::Init()
     InputHandler->Init(*this);
     if (!InitLibinputService()) {
         MMI_HILOGE("Libinput init failed");
-        return LIBINPUT_INIT_FAIL;
+        return INPUT_INIT_LIBINPUT_FAIL;
     }
     if (!InitDelegateTasks()) {
         MMI_HILOGE("Delegate tasks init failed");
-        return ETASKS_INIT_FAIL;
+        return INPUT_INIT_ETASKS_FAIL;
     }
     SetRecvFun(std::bind(&ServerMsgHandler::OnMsgHandler, &sMsgHandler_, std::placeholders::_1,
         std::placeholders::_2));
@@ -280,7 +280,7 @@ int32_t MMIService::Init()
     OHOS::system::SetParameter(INPUT_POINTER_DEVICE, "false");
     if (!InitService()) {
         MMI_HILOGE("Saservice init failed");
-        return SASERVICE_INIT_FAIL;
+        return INPUT_INIT_SASERVICE_FAIL;
     }
     MMI_HILOGI("Set para input.pointer.device false");
     return RET_OK;
@@ -371,7 +371,7 @@ int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter, int32_t filte
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH) || defined(OHOS_BUILD_ENABLE_KEYBOARD)
-    CHKPR(filter, ERROR_NULL_POINTER);
+    CHKPR(filter, INPUT_COMMON_NULLPTR);
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&ServerMsgHandler::AddInputEventFilter,
         &sMsgHandler_, filter, filterId, priority, clientPid));
@@ -662,7 +662,7 @@ int32_t MMIService::CheckAddInput(int32_t pid, InputHandlerType handlerType,
     HandleEventType eventType, int32_t priority, uint32_t deviceTags)
 {
     auto sess = GetSessionByPid(pid);
-    CHKPR(sess, ERROR_NULL_POINTER);
+    CHKPR(sess, INPUT_COMMON_NULLPTR);
     return sMsgHandler_.OnAddInputHandler(sess, handlerType, eventType, priority, deviceTags);
 }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
@@ -688,7 +688,7 @@ int32_t MMIService::CheckRemoveInput(int32_t pid, InputHandlerType handlerType, 
     int32_t priority, uint32_t deviceTags)
 {
     auto sess = GetSessionByPid(pid);
-    CHKPR(sess, ERROR_NULL_POINTER);
+    CHKPR(sess, INPUT_COMMON_NULLPTR);
     return sMsgHandler_.OnRemoveInputHandler(sess, handlerType, eventType, priority, deviceTags);
 }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
@@ -713,7 +713,7 @@ int32_t MMIService::RemoveInputHandler(InputHandlerType handlerType, HandleEvent
 int32_t MMIService::CheckMarkConsumed(int32_t pid, int32_t eventId)
 {
     auto sess = GetSessionByPid(pid);
-    CHKPR(sess, ERROR_NULL_POINTER);
+    CHKPR(sess, INPUT_COMMON_NULLPTR);
     return sMsgHandler_.OnMarkConsumed(sess, eventId);
 }
 #endif // OHOS_BUILD_ENABLE_MONITOR
@@ -764,7 +764,7 @@ int32_t MMIService::InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t MMIService::CheckInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
-    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    CHKPR(keyEvent, INPUT_COMMON_NULLPTR);
     return sMsgHandler_.OnInjectKeyEvent(keyEvent);
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -772,7 +772,7 @@ int32_t MMIService::CheckInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t MMIService::CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    CHKPR(pointerEvent, INPUT_COMMON_NULLPTR);
     return sMsgHandler_.OnInjectPointerEvent(pointerEvent);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
@@ -1028,13 +1028,13 @@ int32_t MMIService::Dump(int32_t fd, const std::vector<std::u16string> &args)
     CALL_DEBUG_ENTER;
     if (fd < 0) {
         MMI_HILOGE("The fd is invalid");
-        return DUMP_PARAM_ERR;
+        return INPUT_COMMON_INVALID_FD;
     }
     if (args.empty()) {
         MMI_HILOGE("The args cannot be empty");
         mprintf(fd, "args cannot be empty\n");
         MMIEventDump->DumpHelp(fd);
-        return DUMP_PARAM_ERR;
+        return INPUT_COMMON_PARAM_ERROR;
     }
     std::vector<std::string> argList = { "" };
     std::transform(args.begin(), args.end(), std::back_inserter(argList),
@@ -1208,7 +1208,7 @@ int32_t MMIService::OnEnableInputDeviceCooperate(int32_t pid, int32_t userData, 
     CHKPR(sess, RET_ERR);
     if (!sess->SendMsg(pkt)) {
         MMI_HILOGE("Sending failed");
-        return MSG_SEND_FAIL;
+        return INPUT_MSG_SEND_FAIL;
     }
     return RET_OK;
 }

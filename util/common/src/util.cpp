@@ -445,7 +445,7 @@ static int32_t ReadConfigFile(const std::string &realPath, DeviceConfig &devConf
     std::ifstream cfgFile(realPath);
     if (!cfgFile.is_open()) {
         MMI_HILOGE("Failed to open config file");
-        return FILE_OPEN_FAIL;
+        return RET_ERR;
     }
     std::string tmp;
     while (std::getline(cfgFile, tmp)) {

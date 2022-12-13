@@ -163,7 +163,7 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
     int32_t subscribeId)
 {
     CHK_PID_AND_TID();
-    CHKPR(event, ERROR_NULL_POINTER);
+    CHKPR(event, INPUT_COMMON_NULLPTR);
     if (subscribeId < 0) {
         MMI_HILOGE("Leave, the subscribe id is less than 0");
         return RET_ERR;
@@ -172,7 +172,7 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
     std::lock_guard<std::mutex> guard(mtx_);
     BytraceAdapter::StartBytrace(event, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
     auto info = GetSubscribeKeyEvent(subscribeId);
-    CHKPR(info, ERROR_NULL_POINTER);
+    CHKPR(info, INPUT_COMMON_NULLPTR);
     auto callback = info->GetCallback();
     if (!callback) {
         MMI_HILOGE("Callback is null");

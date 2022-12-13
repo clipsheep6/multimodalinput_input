@@ -50,7 +50,7 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
     };
     for (auto &it : funs) {
         if (!RegistrationEvent(it)) {
-            MMI_HILOGW("Failed to register event errCode:%{public}d", EVENT_REG_FAIL);
+            MMI_HILOGW("Failed to register event errCode:%{public}d", INPUT_REG_EVENT_FAIL);
             continue;
         }
     }
@@ -63,7 +63,7 @@ void ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
     TimeCostChk chk("ServerMsgHandler::OnMsgHandler", "overtime 300(us)", MAX_OVER_TIME, id);
     auto callback = GetMsgCallback(id);
     if (callback == nullptr) {
-        MMI_HILOGE("Unknown msg id:%{public}d,errCode:%{public}d", id, UNKNOWN_MSG_ID);
+        MMI_HILOGE("Unknown msg id:%{public}d", id);
         return;
     }
     auto ret = (*callback)(sess, pkt);
@@ -75,14 +75,14 @@ void ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
 int32_t ServerMsgHandler::MarkProcessed(SessionPtr sess, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(sess, ERROR_NULL_POINTER);
+    CHKPR(sess, INPUT_COMMON_NULLPTR);
     int32_t eventId = 0;
     int32_t eventType = 0;
     pkt >> eventId >> eventType;
     MMI_HILOGD("Event type:%{public}d, id:%{public}d", eventType, eventId);
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read data failed");
-        return PACKET_READ_FAIL;
+        return INPUT_MSG_PACKET_READ_FAIL;
     }
     ANRMgr->MarkProcessed(eventType, eventId, sess);
     return RET_OK;
@@ -92,9 +92,9 @@ int32_t ServerMsgHandler::MarkProcessed(SessionPtr sess, NetPacket& pkt)
 int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_INFO_TRACE;
-    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    CHKPR(keyEvent, INPUT_COMMON_NULLPTR);
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
-    CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
+    CHKPR(inputEventNormalizeHandler, INPUT_COMMON_NULLPTR);
     inputEventNormalizeHandler->HandleKeyEvent(keyEvent);
     MMI_HILOGD("Inject keyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     return RET_OK;
@@ -104,7 +104,7 @@ int32_t ServerMsgHandler::OnGetFunctionKeyState(int32_t funcKey, bool &state)
 {
     CALL_INFO_TRACE;
     const auto &keyEvent = KeyEventHdr->GetKeyEvent();
-    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    CHKPR(keyEvent, INPUT_COMMON_NULLPTR);
     state = keyEvent->GetFunctionKey(funcKey);
     MMI_HILOGD("Get the function key:%{public}d status as %{public}s", funcKey, state ? "open" : "close");
     return RET_OK;
@@ -114,7 +114,7 @@ int32_t ServerMsgHandler::OnSetFunctionKeyState(int32_t funcKey, bool enable)
 {
     CALL_INFO_TRACE;
     auto device = InputDevMgr->GetKeyboardDevice();
-    CHKPR(device, ERROR_NULL_POINTER);
+    CHKPR(device, INPUT_COMMON_NULLPTR);
     if (LibinputAdapter::DeviceLedUpdate(device, funcKey, enable) != RET_OK) {
         MMI_HILOGE("Failed to set the keyboard led");
         return RET_ERR;
@@ -122,7 +122,7 @@ int32_t ServerMsgHandler::OnSetFunctionKeyState(int32_t funcKey, bool enable)
     int32_t state = libinput_get_funckey_state(device, funcKey);
 
     auto keyEvent = KeyEventHdr->GetKeyEvent();
-    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    CHKPR(keyEvent, INPUT_COMMON_NULLPTR);
     int32_t ret = keyEvent->SetFunctionKey(funcKey, state);
     if (ret != funcKey) {
         MMI_HILOGE("Failed to enable the function key");
@@ -137,7 +137,7 @@ int32_t ServerMsgHandler::OnSetFunctionKeyState(int32_t funcKey, bool enable)
 int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_INFO_TRACE;
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    CHKPR(pointerEvent, INPUT_COMMON_NULLPTR);
     pointerEvent->UpdateId();
     int32_t action = pointerEvent->GetPointerAction();
     auto source = pointerEvent->GetSourceType();
@@ -145,7 +145,7 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
         case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
 #ifdef OHOS_BUILD_ENABLE_TOUCH
             auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
-            CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
+            CHKPR(inputEventNormalizeHandler, INPUT_COMMON_NULLPTR);
             if (!FixTargetWindowId(pointerEvent, action)) {
                 return RET_ERR;
             }
@@ -160,7 +160,7 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
         case PointerEvent::SOURCE_TYPE_TOUCHPAD: {
 #ifdef OHOS_BUILD_ENABLE_POINTER
             auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
-            CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
+            CHKPR(inputEventNormalizeHandler, INPUT_COMMON_NULLPTR);
             if (!IPointerDrawingManager::GetInstance()->IsPointerVisible()) {
                 IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), true);
             }
@@ -208,7 +208,7 @@ bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEv
 int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(sess, ERROR_NULL_POINTER);
+    CHKPR(sess, INPUT_COMMON_NULLPTR);
     DisplayGroupInfo displayGroupInfo;
     pkt >> displayGroupInfo.width >> displayGroupInfo.height >> displayGroupInfo.focusWindowId;
     uint32_t num = 0;
@@ -250,19 +250,19 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
 int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, InputHandlerType handlerType,
     HandleEventType eventType, int32_t priority, uint32_t deviceTags)
 {
-    CHKPR(sess, ERROR_NULL_POINTER);
+    CHKPR(sess, INPUT_COMMON_NULLPTR);
     MMI_HILOGD("handlerType:%{public}d", handlerType);
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     if (handlerType == InputHandlerType::INTERCEPTOR) {
         auto interceptorHandler = InputHandler->GetInterceptorHandler();
-        CHKPR(interceptorHandler, ERROR_NULL_POINTER);
+        CHKPR(interceptorHandler, INPUT_COMMON_NULLPTR);
         return interceptorHandler->AddInputHandler(handlerType, eventType, priority, deviceTags, sess);
     }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     if (handlerType == InputHandlerType::MONITOR) {
         auto monitorHandler = InputHandler->GetMonitorHandler();
-        CHKPR(monitorHandler, ERROR_NULL_POINTER);
+        CHKPR(monitorHandler, INPUT_COMMON_NULLPTR);
         return monitorHandler->AddInputHandler(handlerType, eventType, sess);
     }
 #endif // OHOS_BUILD_ENABLE_MONITOR
@@ -272,19 +272,19 @@ int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, InputHandlerType ha
 int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, InputHandlerType handlerType,
     HandleEventType eventType, int32_t priority, uint32_t deviceTags)
 {
-    CHKPR(sess, ERROR_NULL_POINTER);
+    CHKPR(sess, INPUT_COMMON_NULLPTR);
     MMI_HILOGD("OnRemoveInputHandler handlerType:%{public}d eventType:%{public}u", handlerType, eventType);
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     if (handlerType == InputHandlerType::INTERCEPTOR) {
         auto interceptorHandler = InputHandler->GetInterceptorHandler();
-        CHKPR(interceptorHandler, ERROR_NULL_POINTER);
+        CHKPR(interceptorHandler, INPUT_COMMON_NULLPTR);
         interceptorHandler->RemoveInputHandler(handlerType, eventType, priority, deviceTags, sess);
     }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     if (handlerType == InputHandlerType::MONITOR) {
         auto monitorHandler = InputHandler->GetMonitorHandler();
-        CHKPR(monitorHandler, ERROR_NULL_POINTER);
+        CHKPR(monitorHandler, INPUT_COMMON_NULLPTR);
         monitorHandler->RemoveInputHandler(handlerType, eventType, sess);
     }
 #endif // OHOS_BUILD_ENABLE_MONITOR
@@ -295,9 +295,9 @@ int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, InputHandlerType
 #ifdef OHOS_BUILD_ENABLE_MONITOR
 int32_t ServerMsgHandler::OnMarkConsumed(SessionPtr sess, int32_t eventId)
 {
-    CHKPR(sess, ERROR_NULL_POINTER);
+    CHKPR(sess, INPUT_COMMON_NULLPTR);
     auto monitorHandler = InputHandler->GetMonitorHandler();
-    CHKPR(monitorHandler, ERROR_NULL_POINTER);
+    CHKPR(monitorHandler, INPUT_COMMON_NULLPTR);
     monitorHandler->MarkConsumed(eventId, sess);
     return RET_OK;
 }
@@ -309,9 +309,9 @@ int32_t ServerMsgHandler::OnMoveMouse(int32_t offsetX, int32_t offsetY)
     CALL_DEBUG_ENTER;
     if (MouseEventHdr->NormalizeMoveMouse(offsetX, offsetY)) {
         auto pointerEvent = MouseEventHdr->GetPointerEvent();
-        CHKPR(pointerEvent, ERROR_NULL_POINTER);
+        CHKPR(pointerEvent, INPUT_COMMON_NULLPTR);
         auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
-        CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
+        CHKPR(inputEventNormalizeHandler, INPUT_COMMON_NULLPTR);
         inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
         MMI_HILOGD("Mouse movement message processed successfully");
     }
@@ -324,22 +324,22 @@ int32_t ServerMsgHandler::OnSubscribeKeyEvent(IUdsServer *server, int32_t pid,
     int32_t subscribeId, const std::shared_ptr<KeyOption> option)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(server, ERROR_NULL_POINTER);
+    CHKPR(server, INPUT_COMMON_NULLPTR);
     auto sess = server->GetSessionByPid(pid);
-    CHKPR(sess, ERROR_NULL_POINTER);
+    CHKPR(sess, INPUT_COMMON_NULLPTR);
     auto subscriberHandler = InputHandler->GetSubscriberHandler();
-    CHKPR(subscriberHandler, ERROR_NULL_POINTER);
+    CHKPR(subscriberHandler, INPUT_COMMON_NULLPTR);
     return subscriberHandler->SubscribeKeyEvent(sess, subscribeId, option);
 }
 
 int32_t ServerMsgHandler::OnUnsubscribeKeyEvent(IUdsServer *server, int32_t pid, int32_t subscribeId)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(server, ERROR_NULL_POINTER);
+    CHKPR(server, INPUT_COMMON_NULLPTR);
     auto sess = server->GetSessionByPid(pid);
-    CHKPR(sess, ERROR_NULL_POINTER);
+    CHKPR(sess, INPUT_COMMON_NULLPTR);
     auto subscriberHandler = InputHandler->GetSubscriberHandler();
-    CHKPR(subscriberHandler, ERROR_NULL_POINTER);
+    CHKPR(subscriberHandler, INPUT_COMMON_NULLPTR);
     return subscriberHandler->UnsubscribeKeyEvent(sess, subscribeId);
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -349,14 +349,14 @@ int32_t ServerMsgHandler::AddInputEventFilter(sptr<IEventFilter> filter,
     int32_t filterId, int32_t priority, int32_t clientPid)
 {
     auto filterHandler = InputHandler->GetFilterHandler();
-    CHKPR(filterHandler, ERROR_NULL_POINTER);
+    CHKPR(filterHandler, INPUT_COMMON_NULLPTR);
     return filterHandler->AddInputEventFilter(filter, filterId, priority, clientPid);
 }
 
 int32_t ServerMsgHandler::RemoveInputEventFilter(int32_t clientPid, int32_t filterId)
 {
     auto filterHandler = InputHandler->GetFilterHandler();
-    CHKPR(filterHandler, ERROR_NULL_POINTER);
+    CHKPR(filterHandler, INPUT_COMMON_NULLPTR);
     return filterHandler->RemoveInputEventFilter(clientPid, filterId);   
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH

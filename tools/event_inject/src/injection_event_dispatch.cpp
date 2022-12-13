@@ -61,7 +61,7 @@ void InjectionEventDispatch::InitManageFunction()
 
     for (auto &it : funs) {
         if (!RegisterInjectEvent(it)) {
-            MMI_HILOGW("Failed to register event errCode:%{public}d", EVENT_REG_FAIL);
+            MMI_HILOGW("Failed to register event errCode:%{public}d", INPUT_REG_EVENT_FAIL);
             continue;
         }
     }
@@ -242,7 +242,7 @@ bool InjectionEventDispatch::CheckEventValue(const std::string &inputType, const
 int32_t InjectionEventDispatch::OnSendEvent()
 {
     if (injectArgvs_.size() != SEND_EVENT_ARGV_COUNTS) {
-        MMI_HILOGE("Wrong number of input parameters, errCode:%{public}d", PARAM_INPUT_FAIL);
+        MMI_HILOGE("Wrong number of input parameters");
         return RET_ERR;
     }
     std::string deviceNode = injectArgvs_[SEND_EVENT_DEV_NODE_INDEX];
@@ -257,7 +257,7 @@ int32_t InjectionEventDispatch::OnSendEvent()
     }
     int32_t fd = open(realPath, O_RDWR);
     if (fd < 0) {
-        MMI_HILOGE("Open device node:%{public}s failed, errCode:%{public}d", deviceNode.c_str(), FILE_OPEN_FAIL);
+        MMI_HILOGE("Open device node:%{public}s failed", deviceNode.c_str());
         return RET_ERR;
     }
     struct timeval tm;

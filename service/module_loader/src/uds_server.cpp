@@ -77,8 +77,7 @@ bool UDSServer::SendMsg(int32_t fd, NetPacket& pkt)
     }
     auto ses = GetSession(fd);
     if (ses == nullptr) {
-        MMI_HILOGE("The fd:%{public}d not found, The message was discarded. errCode:%{public}d",
-                   fd, SESSION_NOT_FOUND);
+        MMI_HILOGE("The fd:%{public}d not found, The message was discarded", fd);
         return false;
     }
     return ses->SendMsg(pkt);
@@ -112,45 +111,44 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     static constexpr size_t nativeBufferSize = 64 * 1024;
     SessionPtr sess = nullptr;
     if (setsockopt(serverFd, SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize)) != 0) {
-        MMI_HILOGE("setsockopt serverFd failed, errno: %{public}d", errno);
+        MMI_HILOGE("Setsockopt serverFd failed, errno: %{public}d", errno);
         goto CLOSE_SOCK;
     }
     if (setsockopt(serverFd, SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize)) != 0) {
-        MMI_HILOGE("setsockopt serverFd failed, errno: %{public}d", errno);
+        MMI_HILOGE("Setsockopt serverFd failed, errno: %{public}d", errno);
         goto CLOSE_SOCK;
     }
     if (tokenType == TokenType::TOKEN_NATIVE) {
         if (setsockopt(toReturnClientFd, SOL_SOCKET, SO_SNDBUF, &nativeBufferSize, sizeof(nativeBufferSize)) != 0) {
-            MMI_HILOGE("setsockopt toReturnClientFd failed, errno: %{public}d", errno);
+            MMI_HILOGE("Setsockopt toReturnClientFd failed, errno: %{public}d", errno);
             goto CLOSE_SOCK;
         }
         if (setsockopt(toReturnClientFd, SOL_SOCKET, SO_RCVBUF, &nativeBufferSize, sizeof(nativeBufferSize)) != 0) {
-            MMI_HILOGE("setsockopt toReturnClientFd failed, errno: %{public}d", errno);
+            MMI_HILOGE("Setsockopt toReturnClientFd failed, errno: %{public}d", errno);
             goto CLOSE_SOCK;
         }
     } else {
         if (setsockopt(toReturnClientFd, SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize)) != 0) {
-            MMI_HILOGE("setsockopt toReturnClientFd failed, errno: %{public}d", errno);
+            MMI_HILOGE("Setsockopt toReturnClientFd failed, errno: %{public}d", errno);
             goto CLOSE_SOCK;
         }
         if (setsockopt(toReturnClientFd, SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize)) != 0) {
-            MMI_HILOGE("setsockopt toReturnClientFd failed, errno: %{public}d", errno);
+            MMI_HILOGE("Setsockopt toReturnClientFd failed, errno: %{public}d", errno);
             goto CLOSE_SOCK;
         }
     }
     if (AddEpoll(EPOLL_EVENT_SOCKET, serverFd) != RET_OK) {
-        MMI_HILOGE("epoll_ctl EPOLL_CTL_ADD failed, errCode:%{public}d", EPOLL_MODIFY_FAIL);
+        MMI_HILOGE("Add epoll failed");
         goto CLOSE_SOCK;
     }
     sess = std::make_shared<UDSSession>(programName, moduleType, serverFd, uid, pid);
     if (sess == nullptr) {
-        MMI_HILOGE("make_shared fail. progName:%{public}s,pid:%{public}d,errCode:%{public}d",
-            programName.c_str(), pid, MAKE_SHARED_FAIL);
+        MMI_HILOGE("Make shared ptr failed, progName:%{public}s,pid:%{public}d", programName.c_str(), pid);
         goto CLOSE_SOCK;
     }
     sess->SetTokenType(tokenType);
     if (!AddSession(sess)) {
-        MMI_HILOGE("AddSession fail errCode:%{public}d", ADD_SESSION_FAIL);
+        MMI_HILOGE("Add session failed");
         goto CLOSE_SOCK;
     }
     OnConnected(sess);
@@ -272,7 +270,7 @@ void UDSServer::OnEpollEvent(epoll_event& ev)
     CHKPV(ev.data.ptr);
     auto fd = *static_cast<int32_t*>(ev.data.ptr);
     if (fd < 0) {
-        MMI_HILOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
+        MMI_HILOGE("The fd less than 0");
         return;
     }
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
@@ -345,7 +343,7 @@ void UDSServer::DelSession(int32_t fd)
     CALL_DEBUG_ENTER;
     MMI_HILOGI("fd:%{public}d", fd);
     if (fd < 0) {
-        MMI_HILOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
+        MMI_HILOGE("The fd less than 0");
         return;
     }
     auto pid = GetClientPid(fd);

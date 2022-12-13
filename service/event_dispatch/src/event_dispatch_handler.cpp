@@ -123,7 +123,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     InputEventDataTransformation::Marshalling(pointerEvent, pkt);
     BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
     if (!udsServer->SendMsg(fd, pkt)) {
-        MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
+        MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", INPUT_MSG_SEND_FAIL);
         return;
     }
     ANRMgr->AddTimer(ANR_DISPATCH, point->GetId(), currentTime, session);
@@ -134,7 +134,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
 int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(key, PARAM_INPUT_INVALID);
+    CHKPR(key, INPUT_COMMON_NULLPTR);
     auto fd = WinMgr->UpdateTarget(key);
     if (fd < 0) {
         MMI_HILOGE("Invalid fd, fd:%{public}d", fd);
@@ -160,8 +160,8 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
         return RET_ERR;
     }
     if (!udsServer.SendMsg(fd, pkt)) {
-        MMI_HILOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
-        return MSG_SEND_FAIL;
+        MMI_HILOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", INPUT_MSG_SEND_FAIL);
+        return INPUT_MSG_SEND_FAIL;
     }
     ANRMgr->AddTimer(ANR_DISPATCH, key->GetId(), currentTime, session);
     return RET_OK;

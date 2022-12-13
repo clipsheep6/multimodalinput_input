@@ -72,8 +72,8 @@ int32_t KeySubscriberHandler::SubscribeKeyEvent(
         MMI_HILOGE("Invalid subscribe");
         return RET_ERR;
     }
-    CHKPR(sess, ERROR_NULL_POINTER);
-    CHKPR(keyOption, ERROR_NULL_POINTER);
+    CHKPR(sess, INPUT_COMMON_NULLPTR);
+    CHKPR(keyOption, INPUT_COMMON_NULLPTR);
     uint32_t preKeySize = keyOption->GetPreKeys().size();
     if (preKeySize > MAX_PRE_KEY_COUNT) {
         MMI_HILOGE("Leave, preKeySize:%{public}u", preKeySize);
