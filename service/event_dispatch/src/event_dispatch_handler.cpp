@@ -99,7 +99,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     auto session = udsServer->GetSession(fd);
     CHKPV(session);
     auto currentTime = GetSysClockTime();
-    if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, session)) {
+    if (ANRMgr->TriggerANR(ANR_EVENT_TYPE_DISPATCH, currentTime, session)) {
         MMI_HILOGW("The pointer event does not report normally, application not response");
         return;
     }
@@ -126,7 +126,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return;
     }
-    ANRMgr->AddTimer(ANR_DISPATCH, point->GetId(), currentTime, session);
+    ANRMgr->AddTimer(ANR_EVENT_TYPE_DISPATCH, point->GetId(), currentTime, session);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_POINTER
 
@@ -146,7 +146,7 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
     auto session = udsServer.GetSession(fd);
     CHKPR(session, RET_ERR);
     auto currentTime = GetSysClockTime();
-    if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, session)) {
+    if (ANRMgr->TriggerANR(ANR_EVENT_TYPE_DISPATCH, currentTime, session)) {
         MMI_HILOGW("The key event does not report normally, application not response");
         return RET_OK;
     }
@@ -163,7 +163,7 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
         MMI_HILOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
-    ANRMgr->AddTimer(ANR_DISPATCH, key->GetId(), currentTime, session);
+    ANRMgr->AddTimer(ANR_EVENT_TYPE_DISPATCH, key->GetId(), currentTime, session);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD

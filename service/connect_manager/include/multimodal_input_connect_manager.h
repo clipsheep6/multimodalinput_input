@@ -41,6 +41,7 @@ public:
     int32_t RemoveInputEventFilter(int32_t filterId);
     int32_t SetPointerVisible(bool visible);
     int32_t IsPointerVisible(bool &visible);
+    int32_t MarkProcessed(std::vector<int32_t> eventIds);
     int32_t SetPointerSpeed(int32_t speed);
     int32_t GetPointerSpeed(int32_t &speed);
     int32_t SetPointerStyle(int32_t windowId, int32_t pointerStyle);

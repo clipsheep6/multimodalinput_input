@@ -452,6 +452,18 @@ int32_t MMIService::IsPointerVisible(bool &visible)
     return RET_OK;
 }
 
+int32_t MMIService::MarkProcessed(std::vector<int32_t> eventIds)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&ANRManager::MarkProcessed, ANRMgr, GetCallingPid(), eventIds));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Mark event processed failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 int32_t MMIService::SetPointerSpeed(int32_t speed)
 {
     CALL_DEBUG_ENTER;

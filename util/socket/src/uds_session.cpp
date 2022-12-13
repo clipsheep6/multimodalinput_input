@@ -30,7 +30,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSession" };
-constexpr int64_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
 const std::string FOUNDATION = "foundation";
 } // namespace
 
@@ -43,10 +42,10 @@ UDSSession::UDSSession(const std::string &programName, const int32_t moduleType,
       pid_(pid)
 {
     UpdateDescript();
-    events_[ANR_DISPATCH] = {};
-    events_[ANR_MONITOR] = {};
-    isAnrProcess_[ANR_DISPATCH] = false;
-    isAnrProcess_[ANR_MONITOR] = false;
+    events_[ANR_EVENT_TYPE_DISPATCH] = {};
+    events_[ANR_EVENT_TYPE_MONITOR] = {};
+    isAnrProcess_[ANR_EVENT_TYPE_DISPATCH] = false;
+    isAnrProcess_[ANR_EVENT_TYPE_MONITOR] = false;
 }
 
 bool UDSSession::SendMsg(const char *buf, size_t size) const

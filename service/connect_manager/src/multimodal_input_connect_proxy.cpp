@@ -209,6 +209,31 @@ int32_t MultimodalInputConnectProxy::IsPointerVisible(bool &visible)
     return RET_OK;
 }
 
+int32_t MultimodalInputConnectProxy::MarkProcessed(std::vector<int32_t> eventIds)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, int32_t(eventIds.size()), ERR_INVALID_VALUE);
+    for (size_t i = 0; i < eventIds.size(); ++i) {
+        WRITEINT32(data, eventIds[i], ERR_INVALID_VALUE);
+    }
+    
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(MARK_PROCESSED, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
 int32_t MultimodalInputConnectProxy::SetPointerSpeed(int32_t speed)
 {
     CALL_DEBUG_ENTER;

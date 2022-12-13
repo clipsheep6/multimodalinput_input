@@ -28,7 +28,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ANRManager" };
-constexpr int64_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
 const std::string FOUNDATION = "foundation";
 constexpr int32_t MAX_ANR_TIMER_COUNT = 50;
 } // namespace
@@ -44,31 +43,42 @@ void ANRManager::Init(UDSServer &udsServer)
     udsServer_->AddSessionDeletedCallback(std::bind(&ANRManager::OnSessionLost, this, std::placeholders::_1));
 }
 
-void ANRManager::MarkProcessed(int32_t eventType, int32_t eventId, SessionPtr sess)
+int32_t ANRManager::MarkProcessed(int32_t pid, std::vector<int32_t> eventIds)
 {
-    CHKPV(sess);
-    std::list<int32_t> timerIds = sess->DelEvents(eventType, eventId);
-    for (int32_t item : timerIds) {
-        if (item != -1) {
+    CALL_DEBUG_ENTER;
+    SessionPtr sess = udsServer_->GetSessionByPid(pid);
+    CHKPR(sess, RET_ERR);
+    for (int32_t eventType = 0; eventType < eventIds.size(); ++eventType) {
+        int32_t eventId = eventIds[eventType];
+        MMI_HILOGD("pid:%{public}d, eventType:%{public}d, eventId:%{public}d", pid, eventType, eventId);
+        if (eventId == INVALID_OR_PROCESSED_ID) {
+            continue;
+        }
+        std::list<int32_t> timerIds = sess->DelEvents(eventType, eventId);
+        for (int32_t item : timerIds) {
+            if (item == -1) {
+                continue;
+            }
             TimerMgr->RemoveTimer(item);
             anrTimerCount_--;
             MMI_HILOGD("Remove anr timer, anr type:%{public}d, eventId:%{public}d, timer id:%{public}d,"
                 "count:%{public}d", eventType, eventId, item, anrTimerCount_);
         }
     }
+    return RET_OK;
 }
 
 void ANRManager::RemoveTimers(SessionPtr sess)
 {
     CHKPV(sess);
-    std::vector<int32_t> DispatchTimerIds = sess->GetTimerIds(ANR_DISPATCH);
+    std::vector<int32_t> DispatchTimerIds = sess->GetTimerIds(ANR_EVENT_TYPE_DISPATCH);
     for (int32_t item : DispatchTimerIds) {
         if (item != -1) {
             TimerMgr->RemoveTimer(item);
             anrTimerCount_--;
         }
     }
-    std::vector<int32_t> MonitorTimerIds = sess->GetTimerIds(ANR_MONITOR);
+    std::vector<int32_t> MonitorTimerIds = sess->GetTimerIds(ANR_EVENT_TYPE_MONITOR);
     for (int32_t item : MonitorTimerIds) {
         if (item != -1) {
             TimerMgr->RemoveTimer(item);
