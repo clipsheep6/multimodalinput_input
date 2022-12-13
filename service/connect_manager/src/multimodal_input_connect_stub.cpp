@@ -49,6 +49,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
     const static std::map<int32_t, ConnFunc> mapConnFunc = {
         {IMultimodalInputConnect::ALLOC_SOCKET_FD, &MultimodalInputConnectStub::StubHandleAllocSocketFd},
         {IMultimodalInputConnect::ADD_INPUT_EVENT_FILTER, &MultimodalInputConnectStub::StubAddInputEventFilter},
+        {IMultimodalInputConnect::RMV_INPUT_EVENT_FILTER, &MultimodalInputConnectStub::StubRemoveInputEventFilter},
         {IMultimodalInputConnect::SET_POINTER_VISIBLE, &MultimodalInputConnectStub::StubSetPointerVisible},
         {IMultimodalInputConnect::SET_POINTER_STYLE, &MultimodalInputConnectStub::StubSetPointerStyle},
         {IMultimodalInputConnect::GET_POINTER_STYLE, &MultimodalInputConnectStub::StubGetPointerStyle},
@@ -84,7 +85,8 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             &MultimodalInputConnectStub::StubGetInputDeviceCooperateState},
         {IMultimodalInputConnect::SET_INPUT_DEVICE_TO_SCREEN, &MultimodalInputConnectStub::StubSetInputDevice},
         {IMultimodalInputConnect::GET_FUNCTION_KEY_STATE, &MultimodalInputConnectStub::StubGetFunctionKeyState},
-        {IMultimodalInputConnect::SET_FUNCTION_KEY_STATE, &MultimodalInputConnectStub::StubSetFunctionKeyState}
+        {IMultimodalInputConnect::SET_FUNCTION_KEY_STATE, &MultimodalInputConnectStub::StubSetFunctionKeyState},
+        {IMultimodalInputConnect::SET_POINTER_LOCATION, &MultimodalInputConnectStub::StubSetPointerLocation}
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -139,10 +141,31 @@ int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data,
     CHKPR(client, ERR_INVALID_VALUE);
     sptr<IEventFilter> filter = iface_cast<IEventFilter>(client);
     CHKPR(filter, ERROR_NULL_POINTER);
-
-    int32_t ret = AddInputEventFilter(filter);
+    int32_t filterId = -1;
+    READINT32(data, filterId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t priority = 0;
+    READINT32(data, priority, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = AddInputEventFilter(filter, filterId, priority);
     if (ret != RET_OK) {
         MMI_HILOGE("Call AddInputEventFilter failed ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("Success pid:%{public}d", GetCallingPid());
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubRemoveInputEventFilter(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+    int32_t filterId = -1;
+    READINT32(data, filterId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = RemoveInputEventFilter(filterId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call RemoveInputEventFilter failed ret:%{public}d", ret);
         return ret;
     }
     MMI_HILOGD("Success pid:%{public}d", GetCallingPid());
@@ -749,6 +772,29 @@ int32_t MultimodalInputConnectStub::StubSetFunctionKeyState(MessageParcel &data,
     READINT32(data, funcKey, IPC_PROXY_DEAD_OBJECT_ERR);
     READBOOL(data, enable, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetFunctionKeyState(funcKey, enable);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetFunctionKeyState failed ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubSetPointerLocation(MessageParcel &data, MessageParcel &reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    int32_t x = 0;
+    int32_t y = 0;
+    READINT32(data, x, IPC_PROXY_DEAD_OBJECT_ERR);
+    READINT32(data, y, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetPointerLocation(x, y);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetFunctionKeyState failed ret:%{public}d", ret);
     }

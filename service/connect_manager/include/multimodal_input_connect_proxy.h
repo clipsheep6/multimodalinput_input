@@ -32,7 +32,8 @@ public:
     ~MultimodalInputConnectProxy() override = default;
     int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &socketFd, int32_t &tokenType) override;
-    int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
+    int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority) override;
+    int32_t RemoveInputEventFilter(int32_t filterId) override;
     int32_t SetPointerVisible(bool visible) override;
     int32_t IsPointerVisible(bool &visible) override;
     int32_t SetPointerSpeed(int32_t speed) override;
@@ -66,6 +67,7 @@ public:
     int32_t SetInputDevice(const std::string& dhid, const std::string& screenId) override;
     int32_t GetFunctionKeyState(int32_t funcKey, bool &state) override;
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable) override;
+    int32_t SetPointerLocation(int32_t x, int32_t y) override;
 
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;

@@ -19,10 +19,12 @@
 #include "iremote_broker.h"
 
 #include "i_event_filter.h"
+#include "i_input_event_filter.h"
 #include "input_handler_type.h"
 #include "key_event.h"
 #include "key_option.h"
 #include "pointer_event.h"
+#include "system_ability_definition.h"
 
 namespace OHOS {
 namespace MMI {
@@ -54,6 +56,7 @@ public:
         GET_POINTER_STYLE = 24,
         SET_FUNCTION_KEY_STATE = 25,
         GET_FUNCTION_KEY_STATE = 26,
+        RMV_INPUT_EVENT_FILTER = 27,
         REGISTER_COOPERATE_MONITOR = 30,
         UNREGISTER_COOPERATE_MONITOR = 31,
         ENABLE_INPUT_DEVICE_COOPERATE = 32,
@@ -61,18 +64,20 @@ public:
         STOP_DEVICE_COOPERATE = 34,
         GET_INPUT_DEVICE_COOPERATE_STATE = 35,
         SET_INPUT_DEVICE_TO_SCREEN = 50,
+        SET_POINTER_LOCATION = 51,
     };
 
     enum {
         CONNECT_MODULE_TYPE_MMI_CLIENT = 0,
     };
     static constexpr int32_t INVALID_SOCKET_FD = -1;
-    static constexpr int32_t MULTIMODAL_INPUT_CONNECT_SERVICE_ID = 3101;
+    static constexpr int32_t MULTIMODAL_INPUT_CONNECT_SERVICE_ID = MULTIMODAL_INPUT_SERVICE_ID;
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.multimodalinput.IConnectManager");
 
     virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &socketFd, int32_t &tokenType) = 0;
-    virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) = 0;
+    virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority) = 0;
+    virtual int32_t RemoveInputEventFilter(int32_t filterId) = 0;
     virtual int32_t SetPointerVisible(bool visible) = 0;
     virtual int32_t IsPointerVisible(bool &visible) = 0;
     virtual int32_t SetPointerSpeed(int32_t speed) = 0;
@@ -106,6 +111,7 @@ public:
     virtual int32_t SetInputDevice(const std::string& dhid, const std::string& screenId) = 0;
     virtual int32_t GetFunctionKeyState(int32_t funckey, bool &state) = 0;
     virtual int32_t SetFunctionKeyState(int32_t funcKey, bool enable) = 0;
+    virtual int32_t SetPointerLocation(int32_t x, int32_t y) = 0;
 };
 } // namespace MMI
 } // namespace OHOS
