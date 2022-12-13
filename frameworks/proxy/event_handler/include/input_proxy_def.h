@@ -24,6 +24,7 @@ inline constexpr size_t    MAX_N_INPUT_INTERCEPTORS { MAX_N_INPUT_HANDLERS };
 inline constexpr int32_t   MIN_HANDLER_ID { 1 };
 inline constexpr int32_t   INVALID_HANDLER_ID { -1 };
 inline constexpr int32_t   ERROR_EXCEED_MAX_COUNT { -4100001 };
+inline constexpr int32_t   DEFUALT_INTERCEPTOR_PRIORITY { 500 };
 
 using HandleEventType = uint32_t;
 inline constexpr HandleEventType HANDLE_EVENT_TYPE_NONE { 0x0 };

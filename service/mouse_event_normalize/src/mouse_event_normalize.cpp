@@ -268,9 +268,7 @@ void MouseEventNormalize::HandlePostInner(struct libinput_event_pointer* data, i
     pointerItem.SetPressure(0);
     pointerItem.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
     pointerItem.SetDeviceId(deviceId);
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
     SetDxDyForDInput(pointerItem, data);
-#endif // OHOS_BUILD_ENABLE_COOPERATE
     pointerEvent_->UpdateId();
     pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
@@ -437,7 +435,6 @@ int32_t MouseEventNormalize::GetPointerSpeed() const
     return speed_;
 }
 
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
 void MouseEventNormalize::SetDxDyForDInput(PointerEvent::PointerItem& pointerItem, libinput_event_pointer* data)
 {
     double dx = libinput_event_pointer_get_dx(data);
@@ -449,6 +446,7 @@ void MouseEventNormalize::SetDxDyForDInput(PointerEvent::PointerItem& pointerIte
     MMI_HILOGD("MouseEventNormalize SetDxDyForDInput, dx:%{public}d, dy:%{public}d", rawDx, rawDy);
 }
 
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
 void MouseEventNormalize::SetAbsolutionLocation(double xPercent, double yPercent)
 {
     MMI_HILOGI("Cross screen location, xPercent:%{public}lf, yPercent:%{public}lf",
@@ -476,5 +474,32 @@ void MouseEventNormalize::SetAbsolutionLocation(double xPercent, double yPercent
     IPointerDrawingManager::GetInstance()->SetPointerLocation(getpid(), physicalX, physicalY);
 }
 #endif // OHOS_BUILD_ENABLE_COOPERATE
+
+int32_t MouseEventNormalize::SetPointerLocation(int32_t x, int32_t y)
+{
+    MMI_HILOGI("Location, x:%{public}d, y:%{public}d",x, y);
+    auto displayGroupInfo = WinMgr->GetDisplayGroupInfo();
+    if (currentDisplayId_ == -1) {
+        if (displayGroupInfo.displaysInfo.empty()) {
+            MMI_HILOGI("The displayInfo is empty");
+            return RET_ERR;
+        }
+        currentDisplayId_ = displayGroupInfo.displaysInfo[0].id;
+    }
+    struct DisplayInfo display;
+    for (auto &it : displayGroupInfo.displaysInfo) {
+        if (it.id == currentDisplayId_) {
+            display = it;
+            break;
+        }
+    }
+    absolutionX_ = static_cast<double>(x);
+    absolutionY_ = static_cast<double>(y);
+    WinMgr->UpdateAndAdjustMouseLocation(currentDisplayId_, absolutionX_, absolutionY_);
+    int32_t physicalX = WinMgr->GetMouseInfo().physicalX;
+    int32_t physicalY = WinMgr->GetMouseInfo().physicalY;
+    IPointerDrawingManager::GetInstance()->SetPointerLocation(getpid(), physicalX, physicalY);
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

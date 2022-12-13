@@ -26,11 +26,11 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 } // namespace
 
 int32_t InputInterceptor::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor,
-    HandleEventType eventType)
+    HandleEventType eventType, int32_t priority, uint32_t deviceTags)
 {
     CHKPR(interceptor, INVALID_HANDLER_ID);
     std::lock_guard<std::mutex> guard(mtxHandlers_);
-    if (inputHandlers_.size() >= MAX_N_INPUT_HANDLERS) {
+    if (interHandlers_.size() >= MAX_N_INPUT_HANDLERS) {
         MMI_HILOGE("The number of handlers exceeds the maximum");
         return ERROR_EXCEED_MAX_COUNT;
     }
@@ -45,13 +45,13 @@ int32_t InputInterceptor::AddInterceptor(std::shared_ptr<IInputEventConsumer> in
     }
     const HandleEventType currentType = GetEventType();
     MMI_HILOGD("Register new handler:%{public}d", handlerId);
-    if (RET_OK == AddLocal(handlerId, eventType, interceptor)) {
+    if (RET_OK == AddLocal(handlerId, eventType, priority, deviceTags, interceptor)) {
         MMI_HILOGD("New handler successfully registered, report to server");
         const HandleEventType newType = GetEventType();
         if (currentType != newType) {
-            int32_t ret = AddToServer(newType);
+            int32_t ret = AddToServer(newType, priority, deviceTags);
             if (ret != RET_OK) {
-                MMI_HILOGD("Handler:%{public}d permissions failed, remove the interceptor", handlerId);
+                MMI_HILOGD("Handler:%{public}d permissions failed, remove the monitor", handlerId);
                 RemoveLocal(handlerId);
                 return ret;
             }
@@ -63,24 +63,32 @@ int32_t InputInterceptor::AddInterceptor(std::shared_ptr<IInputEventConsumer> in
 }
 
 int32_t InputInterceptor::AddLocal(int32_t handlerId, HandleEventType eventType,
-    std::shared_ptr<IInputEventConsumer> interceptor)
+    int32_t priority, uint32_t deviceTags, std::shared_ptr<IInputEventConsumer> interceptor)
 {
     InputInterceptor::InterceptorHandler handler {
         .handlerId_ = handlerId,
         .eventType_ = eventType,
+        .priority_ = priority,
+        .deviceTags_ = deviceTags,
         .consumer_ = interceptor,
     };
-    auto ret = inputHandlers_.emplace(handler.handlerId_, handler);
-    if (!ret.second) {
-        MMI_HILOGE("Duplicate handler:%{public}d", handler.handlerId_);
+    auto iterIndex = interHandlers_.begin();
+    for (; iterIndex != interHandlers_.end(); ++iterIndex) {
+        if (handler.priority_ < iterIndex->priority_) {
+            break;
+        }
+    }
+    auto iter = interHandlers_.emplace(iterIndex, handler);
+    if (iter == interHandlers_.end()) {
+        MMI_HILOGE("Add new interceptor failed");
         return RET_ERR;
     }
     return RET_OK;
 }
 
-int32_t InputInterceptor::AddToServer(HandleEventType eventType)
+int32_t InputInterceptor::AddToServer(HandleEventType eventType, int32_t priority, uint32_t deviceTags)
 {
-    int32_t ret = MultimodalInputConnMgr->AddInterceptorHandler(eventType);
+    int32_t ret = MultimodalInputConnMgr->AddInterceptorHandler(eventType, priority, deviceTags);
     if (ret != RET_OK) {
         MMI_HILOGE("Add interceptor failed, ret:%{public}d", ret);
     }
@@ -97,63 +105,69 @@ void InputInterceptor::RemoveInterceptor(int32_t interceptorId)
         MMI_HILOGD("Handler:%{public}d unregistered, report to server", interceptorId);
         const HandleEventType newType = GetEventType();
         if (currentType != newType) {
-            RemoveFromServer(newType);
+            const int32_t newLevel = GetPriority();
+            const uint64_t newTags = GetDeviceTags();
+            RemoveFromServer(newType, newLevel, newTags);
         }
     }
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-void InputInterceptor::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent)
+void InputInterceptor::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent, uint32_t deviceTags)
 {
     CHK_PID_AND_TID();
     CHKPV(keyEvent);
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_INTERCEPT_EVENT);
-    for (const auto &handler : inputHandlers_) {
-        if ((handler.second.eventType_ & HANDLE_EVENT_TYPE_KEY) != HANDLE_EVENT_TYPE_KEY) {
+    for (const auto &item : interHandlers_) {
+        if ((item.deviceTags_ !=  deviceTags) &&
+            ((item.eventType_ & HANDLE_EVENT_TYPE_KEY) != HANDLE_EVENT_TYPE_KEY)) {
             continue;
         }
-        auto consumer = handler.second.consumer_;
+        auto consumer = item.consumer_;
         CHKPV(consumer);
         consumer->OnInputEvent(keyEvent);
-        MMI_HILOGD("Key event id:%{public}d keyCode:%{public}d", handler.first, keyEvent->GetKeyCode());
+        MMI_HILOGD("Key event id:%{public}d keyCode:%{public}d", item.handlerId_, keyEvent->GetKeyCode());
+        break;
     }
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-void InputInterceptor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void InputInterceptor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent, uint32_t deviceTags)
 {
     CHK_PID_AND_TID();
     CHKPV(pointerEvent);
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_INTERCEPT_EVENT);
-    for (const auto &iter : inputHandlers_) {
-        if ((iter.second.eventType_ & HANDLE_EVENT_TYPE_POINTER) != HANDLE_EVENT_TYPE_POINTER) {
+    for (const auto &item : interHandlers_) {
+        if ((item.deviceTags_ !=  deviceTags) &&
+            ((item.eventType_ & HANDLE_EVENT_TYPE_POINTER) != HANDLE_EVENT_TYPE_POINTER)) {
             continue;
         }
-        auto consumer = iter.second.consumer_;
+        auto consumer = item.consumer_;
         CHKPV(consumer);
         consumer->OnInputEvent(pointerEvent);
-        MMI_HILOGD("Pointer event id:%{public}d pointerId:%{public}d", iter.first, pointerEvent->GetPointerId());
+        MMI_HILOGD("Pointer event id:%{public}d pointerId:%{public}d", item.handlerId_, pointerEvent->GetPointerId());
+        break;
     }
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 int32_t InputInterceptor::RemoveLocal(int32_t handlerId)
 {
-    auto iter = inputHandlers_.find(handlerId);
-    if (iter == inputHandlers_.end()) {
-        MMI_HILOGE("No handler with specified");
-        return RET_ERR;
+    for (auto it = interHandlers_.begin(); it != interHandlers_.end(); ++it) {
+        if (handlerId == it->handlerId_) {
+            interHandlers_.erase(it);
+            break;
+        }
     }
-    inputHandlers_.erase(iter);
     return RET_OK;
 }
 
-void InputInterceptor::RemoveFromServer(HandleEventType eventType)
+void InputInterceptor::RemoveFromServer(HandleEventType eventType, int32_t priority, uint32_t deviceTags)
 {
-    int32_t ret = MultimodalInputConnMgr->RemoveInterceptorHandler(eventType);
+    int32_t ret = MultimodalInputConnMgr->RemoveInterceptorHandler(eventType, priority, deviceTags);
     if (ret != 0) {
         MMI_HILOGE("Remove interceptor failed, ret:%{public}d", ret);
     }
@@ -173,27 +187,55 @@ void InputInterceptor::OnConnected()
     CALL_DEBUG_ENTER;
     HandleEventType eventType = GetEventType();
     if (eventType != HANDLE_EVENT_TYPE_NONE) {
-        AddToServer(eventType);
+        int32_t priority = GetPriority();
+        uint32_t deviceTags = GetDeviceTags();
+        AddToServer(eventType, priority, deviceTags);
     }
 }
 
 HandleEventType InputInterceptor::GetEventType() const
 {
-    if (inputHandlers_.empty()) {
-        MMI_HILOGD("InterceptorHandlers is empty");
+    if (interHandlers_.empty()) {
+        MMI_HILOGD("interHandlers_ is empty");
         return HANDLE_EVENT_TYPE_NONE;
     }
     HandleEventType eventType { HANDLE_EVENT_TYPE_NONE };
-    for (const auto &inputHandler : inputHandlers_) {
-        eventType |= inputHandler.second.eventType_;
-    }
+    eventType |= interHandlers_.front().eventType_;
     return eventType;
+}
+
+int32_t InputInterceptor::GetPriority() const
+{
+    if (interHandlers_.empty()) {
+        MMI_HILOGD("InputHandlers is empty");
+        return DEFUALT_INTERCEPTOR_PRIORITY;
+    }
+    int32_t priority { DEFUALT_INTERCEPTOR_PRIORITY };
+    priority = interHandlers_.front().priority_;
+    return priority;
+}
+
+uint32_t InputInterceptor::GetDeviceTags() const
+{
+    if (interHandlers_.empty()) {
+        MMI_HILOGD("InputHandlers is empty");
+        return DEFUALT_INTERCEPTOR_PRIORITY;
+    }
+    uint32_t deviceTags { CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX) };
+    deviceTags = interHandlers_.front().deviceTags_;
+    return deviceTags;
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t InputInterceptor::ReportInterceptorKey(NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
+    uint32_t deviceTags;
+    pkt >> deviceTags;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read handler failed");
+        return RET_ERR;
+    }
     auto keyEvent = KeyEvent::Create();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     if (InputEventDataTransformation::NetPacketToKeyEvent(pkt, keyEvent) != ERR_OK) {
@@ -201,7 +243,7 @@ int32_t InputInterceptor::ReportInterceptorKey(NetPacket& pkt)
         return RET_ERR;
     }
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_INTERCEPT_EVENT);
-    OnInputEvent(keyEvent);
+    OnInputEvent(keyEvent, deviceTags);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -210,6 +252,12 @@ int32_t InputInterceptor::ReportInterceptorKey(NetPacket& pkt)
 int32_t InputInterceptor::ReportInterceptorPointer(NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
+    uint32_t deviceTags;
+    pkt >> deviceTags;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read Pointer data failed");
+        return RET_ERR;
+    }
     auto pointerEvent = PointerEvent::Create();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (InputEventDataTransformation::Unmarshalling(pkt, pointerEvent) != ERR_OK) {
@@ -217,7 +265,7 @@ int32_t InputInterceptor::ReportInterceptorPointer(NetPacket& pkt)
         return RET_ERR;
     }
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_INTERCEPT_EVENT);
-    OnInputEvent(pointerEvent);
+    OnInputEvent(pointerEvent, deviceTags);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH

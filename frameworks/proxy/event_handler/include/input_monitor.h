@@ -72,6 +72,7 @@ private:
     std::function<void(int32_t)> monitorCallback_ { nullptr };
     std::map<int32_t, MonitorHandler> inputHandlers_;
     std::map<int32_t, int32_t> processedEvents_;
+    std::set<int32_t> mouseEventIds_;
     std::mutex mtxHandlers_;
     int32_t nextId_ { 1 };
 };

@@ -172,8 +172,13 @@ void InputMonitor::GetConsumerInfos(std::shared_ptr<PointerEvent> pointerEvent,
         return;
     }
     int32_t tokenType = MultimodalInputConnMgr->GetTokenType();
-    if (tokenType == TokenType::TOKEN_HAP &&
-        pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+    if (tokenType != TokenType::TOKEN_HAP) {
+        return;
+    }
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
+        mouseEventIds_.emplace(pointerEvent->GetId());
+    }
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         processedEvents_.emplace(pointerEvent->GetId(), consumerCount);
     }
 }
@@ -187,7 +192,6 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
     GetConsumerInfos(pointerEvent, consumerInfos);
     for (const auto &iter : consumerInfos) {
         auto tempEvent = std::make_shared<PointerEvent>(*pointerEvent);
-        CHKPV(tempEvent);
         tempEvent->SetProcessedCallback(monitorCallback_);
         CHKPV(iter.second);
         auto consumer = iter.second;
@@ -259,6 +263,10 @@ void InputMonitor::OnDispatchEventProcessed(int32_t eventId)
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     CHKPV(client_);
+    if (mouseEventIds_.find(eventId) != mouseEventIds_.end()) {
+        mouseEventIds_.erase(eventId);
+        return;
+    }
     auto iter = processedEvents_.find(eventId);
     if (iter == processedEvents_.end()) {
         MMI_HILOGE("EventId not in processedEvents_");

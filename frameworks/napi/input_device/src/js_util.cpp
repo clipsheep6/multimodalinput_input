@@ -59,7 +59,7 @@ bool JsUtil::IsSameHandle(napi_env env, napi_value handle, napi_ref ref)
     return isEqual;
 }
 
-napi_value JsUtil::GetDeviceInfo(const std::unique_ptr<CallbackInfo> &cb)
+napi_value JsUtil::GetDeviceInfo(sptr<CallbackInfo> cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);
@@ -105,7 +105,7 @@ napi_value JsUtil::GetDeviceInfo(const std::unique_ptr<CallbackInfo> &cb)
     return object;
 }
 
-bool JsUtil::GetDeviceAxisInfo(const std::unique_ptr<CallbackInfo> &cb, napi_value &object)
+bool JsUtil::GetDeviceAxisInfo(sptr<CallbackInfo> cb, napi_value &object)
 {
     CHKPF(cb);
     CHKPF(cb->env);
@@ -121,6 +121,11 @@ bool JsUtil::GetDeviceAxisInfo(const std::unique_ptr<CallbackInfo> &cb, napi_val
     }
     napi_value axisRanges = nullptr;
     CHKRF(napi_create_array(cb->env, &axisRanges), CREATE_ARRAY);
+    if (sourceType == nullptr) {
+        CHKRF(napi_set_named_property(cb->env, object, "axisRanges", axisRanges), SET_NAMED_PROPERTY);
+        MMI_HILOGD("SourceType not found");
+        return true;
+    }
     napi_value axisRange = nullptr;
     uint32_t i = 0;
     for (const auto &item : cb->data.device->GetAxisInfo()) {
@@ -157,7 +162,7 @@ bool JsUtil::GetDeviceAxisInfo(const std::unique_ptr<CallbackInfo> &cb, napi_val
     return true;
 }
 
-bool JsUtil::GetDeviceSourceType(const std::unique_ptr<CallbackInfo> &cb, napi_value &object)
+bool JsUtil::GetDeviceSourceType(sptr<CallbackInfo> cb, napi_value &object)
 {
     CHKPF(cb);
     CHKPF(cb->env);

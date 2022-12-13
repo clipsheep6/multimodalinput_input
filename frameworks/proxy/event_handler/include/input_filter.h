@@ -20,7 +20,6 @@
 #include "nocopyable.h"
 
 #include "event_filter_service.h"
-#include "pointer_event.h"
 
 namespace OHOS {
 namespace MMI {
@@ -29,10 +28,12 @@ public:
     InputFilter() = default;
     DISALLOW_MOVE(InputFilter);
     ~InputFilter() = default;
-    int32_t AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> &filter);
+    int32_t AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority);
+    int32_t RemoveInputEventFilter(int32_t filterId);
+    void OnConnected();
 private:
     std::mutex mtx_;
-    sptr<EventFilterService> eventFilterService_ { nullptr };
+    std::map<int32_t, std::tuple<sptr<IEventFilter>, int32_t>> eventFilterServices_;
 };
 } // namespace MMI
 } // namespace OHOS

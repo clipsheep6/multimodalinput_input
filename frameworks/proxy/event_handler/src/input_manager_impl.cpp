@@ -104,10 +104,6 @@ void InputManagerImpl::InitMsgCallback()
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
         {MmiMessageId::ON_POINTER_EVENT, MsgCallbackBind1(&InputWindowTransfer::OnPointerEvent, &windowTransfer_)},
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-        {MmiMessageId::INPUT_DEVICE, MsgCallbackBind1(&InputDeviceImpl::OnInputDevice, &inputDeviceImpl_)},
-        {MmiMessageId::INPUT_DEVICE_IDS, MsgCallbackBind1(&InputDeviceImpl::OnInputDeviceIds, &inputDeviceImpl_)},
-        {MmiMessageId::INPUT_DEVICE_SUPPORT_KEYS, MsgCallbackBind1(&InputDeviceImpl::OnSupportKeys, &inputDeviceImpl_)},
-        {MmiMessageId::INPUT_DEVICE_KEYBOARD_TYPE, MsgCallbackBind1(&InputDeviceImpl::OnInputKeyboardType, &inputDeviceImpl_)},
         {MmiMessageId::ADD_INPUT_DEVICE_LISTENER, MsgCallbackBind1(&InputDeviceImpl::OnDevListener, &inputDeviceImpl_)},
         {MmiMessageId::NOTICE_ANR, MsgCallbackBind1(&AnrCollecter::OnAnr, &anrCollecter_)},
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
@@ -152,11 +148,22 @@ void InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInf
     windowTransfer_.UpdateDisplayInfo(displayGroupInfo);
 }
 
-int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter)
+int32_t InputManagerImpl::AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    return inputFilter_.AddInputEventFilter(filter);
+    return inputFilter_.AddInputEventFilter(filter, priority);
+#else
+    MMI_HILOGW("Pointer and touchscreen device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+}
+
+int32_t InputManagerImpl::RemoveInputEventFilter(int32_t filterId)
+{
+    CALL_INFO_TRACE;
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    return inputFilter_.RemoveInputEventFilter(filterId);
 #else
     MMI_HILOGW("Pointer and touchscreen device does not support");
     return ERROR_UNSUPPORT;
@@ -217,7 +224,6 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_MONITOR)
     CHKPR(monitor, INVALID_HANDLER_ID);
     auto consumer = std::make_shared<MonitorEventConsumer>(monitor);
-    CHKPR(consumer, INVALID_HANDLER_ID);
     return AddMonitor(consumer);
 #else
     MMI_HILOGW("Keyboard device or monitor function does not support");
@@ -231,7 +237,6 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<PointerE
 #if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && defined(OHOS_BUILD_ENABLE_MONITOR)
     CHKPR(monitor, INVALID_HANDLER_ID);
     auto consumer = std::make_shared<MonitorEventConsumer>(monitor);
-    CHKPR(consumer, INVALID_HANDLER_ID);
     return AddMonitor(consumer);
 #else
     MMI_HILOGW("Pointer/touchscreen device or monitor function does not support");
@@ -292,7 +297,8 @@ void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
-int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
+int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor,
+    int32_t priority, uint32_t deviceTags)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
@@ -301,14 +307,15 @@ int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> in
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return inputInterceptor_.AddInterceptor(interceptor, HANDLE_EVENT_TYPE_ALL);
+    return inputInterceptor_.AddInterceptor(interceptor, HANDLE_EVENT_TYPE_ALL, priority, deviceTags);
 #else
     MMI_HILOGW("Interceptor function does not support");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 }
 
-int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
+int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor,
+    int32_t priority, uint32_t deviceTags)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
@@ -319,7 +326,7 @@ int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyE
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return inputInterceptor_.AddInterceptor(consumer, HANDLE_EVENT_TYPE_KEY);
+    return inputInterceptor_.AddInterceptor(consumer, HANDLE_EVENT_TYPE_KEY, priority, deviceTags);
 #else
     MMI_HILOGW("Keyboard device or interceptor function does not support");
     return ERROR_UNSUPPORT;
@@ -421,6 +428,7 @@ int32_t InputManagerImpl::GetPointerStyle(int32_t windowId, int32_t &pointerStyl
 void InputManagerImpl::OnConnected()
 {
     CALL_DEBUG_ENTER;
+    inputFilter_.OnConnected();
     windowTransfer_.OnConnected();
     anrCollecter_.OnConnected();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -459,7 +467,7 @@ int32_t InputManagerImpl::GetDeviceIds(std::function<void(std::vector<int32_t>&)
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return inputDeviceImpl_.GetInputDeviceIdsAsync(callback);
+    return inputDeviceImpl_.GetInputDeviceIds(callback);
 }
 
 int32_t InputManagerImpl::GetDevice(int32_t deviceId,
@@ -469,7 +477,7 @@ int32_t InputManagerImpl::GetDevice(int32_t deviceId,
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return inputDeviceImpl_.GetInputDeviceAsync(deviceId, callback);
+    return inputDeviceImpl_.GetInputDevice(deviceId, callback);
 }
 
 int32_t InputManagerImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes,
@@ -638,6 +646,16 @@ int32_t InputManagerImpl::SetFunctionKeyState(int32_t funcKey, bool enable)
     MMI_HILOGW("Keyboard device does not support");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+}
+
+void InputManagerImpl::SetPointerLocation(int32_t x, int32_t y)
+{
+    CALL_DEBUG_ENTER;
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    mouseHelper_.SetPointerLocation(x, y);
+#else
+    MMI_HILOGW("Pointer device or pointer drawing module does not support");
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 } // namespace MMI
 } // namespace OHOS

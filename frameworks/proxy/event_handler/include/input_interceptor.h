@@ -19,6 +19,7 @@
 #include <map>
 #include <mutex>
 
+#include "input_device.h"
 #include "i_input_event_consumer.h"
 #include "input_proxy_def.h"
 #include "net_packet.h"
@@ -31,7 +32,7 @@ public:
     DISALLOW_COPY_AND_MOVE(InputInterceptor);
     ~InputInterceptor() = default;
     int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor,
-        HandleEventType eventType = HANDLE_EVENT_TYPE_ALL);
+        HandleEventType eventType, int32_t priority, uint32_t deviceTags);
     void RemoveInterceptor(int32_t interceptorId);
     void OnConnected();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -42,25 +43,29 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 private:
     int32_t AddLocal(int32_t handlerId, HandleEventType eventType,
-        std::shared_ptr<IInputEventConsumer> monitor);
-    int32_t AddToServer(HandleEventType eventType);
+        int32_t priority, uint32_t deviceTags, std::shared_ptr<IInputEventConsumer> monitor);
+    int32_t AddToServer(HandleEventType eventType, int32_t priority, uint32_t deviceTags);
     int32_t RemoveLocal(int32_t handlerId);
-    void RemoveFromServer(HandleEventType eventType);
+    void RemoveFromServer(HandleEventType eventType, int32_t priority, uint32_t deviceTags);
     int32_t GetNextId();
     HandleEventType GetEventType() const;
+    int32_t GetPriority() const;
+    uint32_t GetDeviceTags() const;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent);
+    void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent, uint32_t deviceTags);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent, uint32_t deviceTags);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 private:
     struct InterceptorHandler {
         int32_t handlerId_ { 0 };
         HandleEventType eventType_ { HANDLE_EVENT_TYPE_ALL };
+        int32_t priority_ { DEFUALT_INTERCEPTOR_PRIORITY };
+        uint32_t deviceTags_ { CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX) };
         std::shared_ptr<IInputEventConsumer> consumer_ { nullptr };
     };
-    std::map<int32_t, InterceptorHandler> inputHandlers_;
+    std::list<InterceptorHandler> interHandlers_;
     std::mutex mtxHandlers_;
     int32_t nextId_ { 1 };
 };

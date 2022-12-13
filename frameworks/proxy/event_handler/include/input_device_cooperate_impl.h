@@ -55,17 +55,17 @@ public:
     int32_t GetInputDeviceCooperateState(const std::string &deviceId, FuncCooperationState callback);
     int32_t GetUserData();
     int32_t SetInputDevice(const std::string &dhid, const std::string &screenId);
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
     int32_t OnCooperationListiner(NetPacket& pkt);
     int32_t OnCooperationMessage(NetPacket& pkt);
     int32_t OnCooperationState(NetPacket& pkt);
-#endif // OHOS_BUILD_ENABLE_COOPERATE
+
 private:
-    const DevCooperationMsg *GetCooprateMessageEvent(int32_t userData) const;
-    const DevCooperationState *GetCooprateStateEvent(int32_t userData) const;
-    void HandlerDevCooperateListener(const std::string deviceId, CooperationMessage msg);
-    void HandlerCooprationMessage(int32_t userData, const std::string deviceId, CooperationMessage msg);
+    const DevCooperationMsg *GetCooperateMessageEvent(int32_t userData) const;
+    const DevCooperationState *GetCooperateStateEvent(int32_t userData) const;
+    void HandlerDevCooperateListener(const std::string &deviceId, const CooperationMessage &msg);
+    void HandlerCooperationMessage(int32_t userData, const std::string &deviceId, const CooperationMessage &msg);
     void HandlerCooperationState(int32_t userData, bool state);
+
 private:
     std::list<InputDevCooperateListenerPtr> devCooperateListener_;
     std::map<int32_t, CooperateEvent> devCooperateEvent_;

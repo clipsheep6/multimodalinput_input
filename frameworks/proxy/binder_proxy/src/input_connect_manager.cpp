@@ -50,7 +50,6 @@ std::shared_ptr<InputConnectManager> InputConnectManager::GetInstance()
 int32_t InputConnectManager::AllocSocketPair(const int32_t moduleType)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(lock_);
     if (inputConnectService_ == nullptr) {
         MMI_HILOGE("Client has not connect server");
         return RET_ERR;
@@ -73,14 +72,16 @@ int32_t InputConnectManager::GetClientSocketFdOfAllocedSocketPair() const
     return socketFd_;
 }
 
-int32_t InputConnectManager::AddInputEventFilter(sptr<IEventFilter> filter)
+int32_t InputConnectManager::AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority)
 {
-    std::lock_guard<std::mutex> guard(lock_);
-    if (inputConnectService_ == nullptr) {
-        MMI_HILOGE("The inputConnectService_ is nullptr");
-        return RET_ERR;
-    }
-    return inputConnectService_->AddInputEventFilter(filter);
+    CHKPR(inputConnectService_, RET_ERR);
+    return inputConnectService_->AddInputEventFilter(filter, filterId, priority);
+}
+
+int32_t InputConnectManager::RemoveInputEventFilter(int32_t filterId)
+{
+    CHKPR(inputConnectService_, RET_ERR);
+    return inputConnectService_->RemoveInputEventFilter(filterId);
 }
 
 int32_t InputConnectManager::SetPointerVisible(bool visible)
@@ -131,40 +132,43 @@ int32_t InputConnectManager::UnregisterDevListener()
     return inputConnectService_->UnregisterDevListener();
 }
 
-int32_t InputConnectManager::SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> &keys)
+int32_t InputConnectManager::SupportKeys(int32_t deviceId, std::vector<int32_t> &keys,
+    std::vector<bool> &keystroke)
 {
     CHKPR(inputConnectService_, RET_ERR);
-    return inputConnectService_->SupportKeys(userData, deviceId, keys);
+    return inputConnectService_->SupportKeys(deviceId, keys, keystroke);
 }
 
-int32_t InputConnectManager::GetDeviceIds(int32_t userData)
+int32_t InputConnectManager::GetDeviceIds(std::vector<int32_t> &ids)
 {
     CHKPR(inputConnectService_, RET_ERR);
-    return inputConnectService_->GetDeviceIds(userData);
+    return inputConnectService_->GetDeviceIds(ids);
 }
 
-int32_t InputConnectManager::GetDevice(int32_t userData, int32_t id)
+int32_t InputConnectManager::GetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice)
 {
     CHKPR(inputConnectService_, RET_ERR);
-    return inputConnectService_->GetDevice(userData, id);
+    return inputConnectService_->GetDevice(deviceId, inputDevice);
 }
 
-int32_t InputConnectManager::GetKeyboardType(int32_t userData, int32_t deviceId)
+int32_t InputConnectManager::GetKeyboardType(int32_t deviceId, int32_t &keyboardType)
 {
     CHKPR(inputConnectService_, RET_ERR);
-    return inputConnectService_->GetKeyboardType(userData, deviceId);
+    return inputConnectService_->GetKeyboardType(deviceId, keyboardType);
 }
 
-int32_t InputConnectManager::AddInterceptorHandler(HandleEventType eventType)
+int32_t InputConnectManager::AddInterceptorHandler(HandleEventType eventType,
+    int32_t priority, uint32_t deviceTags)
 {
     CHKPR(inputConnectService_, INVALID_HANDLER_ID);
-    return inputConnectService_->AddInterceptorHandler(eventType);
+    return inputConnectService_->AddInterceptorHandler(eventType, priority, deviceTags);
 }
 
-int32_t InputConnectManager::RemoveInterceptorHandler(HandleEventType eventType)
+int32_t InputConnectManager::RemoveInterceptorHandler(HandleEventType eventType,
+    int32_t priority, uint32_t deviceTags)
 {
     CHKPR(inputConnectService_, INVALID_HANDLER_ID);
-    return inputConnectService_->RemoveInterceptorHandler(eventType);
+    return inputConnectService_->RemoveInterceptorHandler(eventType, priority, deviceTags);
 }
 
 int32_t InputConnectManager::AddMonitorHandler(HandleEventType eventType)
@@ -276,10 +280,15 @@ int32_t InputConnectManager::SetFunctionKeyState(int32_t funcKey, bool enable)
     return inputConnectService_->SetFunctionKeyState(funcKey, enable);
 }
 
+int32_t InputConnectManager::SetPointerLocation(int32_t x, int32_t y)
+{
+    CHKPR(inputConnectService_, INVALID_HANDLER_ID);
+    return inputConnectService_->SetPointerLocation(x, y);
+}
+
 bool InputConnectManager::ConnectInputService()
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(lock_);
     if (inputConnectService_ != nullptr) {
         return true;
     }
@@ -324,7 +333,6 @@ void InputConnectManager::OnDeath()
 void InputConnectManager::Clean()
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(lock_);
     if (inputConnectService_ != nullptr) {
         inputConnectService_.clear();
         inputConnectService_ = nullptr;

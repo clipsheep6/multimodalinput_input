@@ -247,25 +247,27 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
 }
 
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
-int32_t ServerMsgHandler::OnAddInterceptorHandler(SessionPtr sess, HandleEventType eventType)
+int32_t ServerMsgHandler::OnAddInterceptorHandler(SessionPtr sess, HandleEventType eventType,
+    int32_t priority, uint32_t deviceTags)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     auto interceptorHandler = InputHandler->GetInterceptorHandler();
     CHKPR(interceptorHandler, ERROR_NULL_POINTER);
-    return interceptorHandler->AddInterceptorHandler(eventType, sess);
+    return interceptorHandler->AddInterceptorHandler(eventType, priority, deviceTags, sess);
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
     return RET_OK;
 }
 
-int32_t ServerMsgHandler::OnRemoveInterceptorHandler(SessionPtr sess, HandleEventType eventType)
+int32_t ServerMsgHandler::OnRemoveInterceptorHandler(SessionPtr sess, HandleEventType eventType,
+    int32_t priority, uint32_t deviceTags)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
     MMI_HILOGD("OnRemoveInputHandler eventType:%{public}u", eventType);
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     auto interceptorHandler = InputHandler->GetInterceptorHandler();
     CHKPR(interceptorHandler, ERROR_NULL_POINTER);
-    interceptorHandler->RemoveInterceptorHandler(eventType, sess);
+    interceptorHandler->RemoveInterceptorHandler(eventType, priority, deviceTags, sess);
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
     return RET_OK;
 }
@@ -349,12 +351,19 @@ int32_t ServerMsgHandler::OnUnsubscribeKeyEvent(IUdsServer *server, int32_t pid,
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-int32_t ServerMsgHandler::AddInputEventFilter(sptr<IEventFilter> filter)
+int32_t ServerMsgHandler::AddInputEventFilter(sptr<IEventFilter> filter,
+    int32_t filterId, int32_t priority, int32_t clientPid)
 {
     auto filterHandler = InputHandler->GetFilterHandler();
     CHKPR(filterHandler, ERROR_NULL_POINTER);
-    filterHandler->AddInputEventFilter(filter);
-    return RET_OK;
+    return filterHandler->AddInputEventFilter(filter, filterId, priority, clientPid);
+}
+
+int32_t ServerMsgHandler::RemoveInputEventFilter(int32_t filterId, int32_t clientPid)
+{
+    auto filterHandler = InputHandler->GetFilterHandler();
+    CHKPR(filterHandler, ERROR_NULL_POINTER);
+    return filterHandler->RemoveInputEventFilter(filterId, clientPid);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace MMI

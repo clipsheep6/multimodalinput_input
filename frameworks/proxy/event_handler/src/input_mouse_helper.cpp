@@ -113,5 +113,15 @@ int32_t InputMouseHelper::GetPointerStyle(int32_t windowId, int32_t &pointerStyl
     }
     return RET_OK;
 }
+
+void InputMouseHelper::SetPointerLocation(int32_t x, int32_t y)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->SetPointerLocation(x, y);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set Pointer Location failed, ret:%{public}d", ret);
+    }
+}
 } // namespace MMI
 } // namespace OHOS

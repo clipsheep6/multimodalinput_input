@@ -55,7 +55,8 @@ public:
         std::function<void(std::shared_ptr<KeyEvent>)> callback
     );
     void UnsubscribeKeyEvent(int32_t subscriberId);
-    int32_t AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter);
+    int32_t AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority);
+    int32_t RemoveInputEventFilter(int32_t filterId);
 
     void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
         std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
@@ -68,8 +69,12 @@ public:
     void MarkConsumed(int32_t monitorId, int32_t eventId);
     void MoveMouse(int32_t offsetX, int32_t offsetY);
 
-    int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor);
-    int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor);
+    int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor,
+        int32_t priority = DEFUALT_INTERCEPTOR_PRIORITY,
+        uint32_t deviceTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX));
+    int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor,
+        int32_t priority = DEFUALT_INTERCEPTOR_PRIORITY,
+        uint32_t deviceTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX));
     void RemoveInterceptor(int32_t interceptorId);
 
     void SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent);
@@ -104,6 +109,8 @@ public:
     int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
     bool GetFunctionKeyState(int32_t funcKey);
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
+    void SetPointerLocation(int32_t x, int32_t y);
+
 private:
     void InitMsgCallback();
 private:
