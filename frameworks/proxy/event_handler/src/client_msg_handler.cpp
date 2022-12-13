@@ -126,7 +126,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
     pkt >> fd;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read fd failed");
-        return PACKET_READ_FAIL;
+        return INPUT_MSG_PACKET_READ_FAIL;
     }
     MMI_HILOGI("Key event dispatcher of client, Fd:%{public}d", fd);
     EventLogHelper::PrintEventData(key);
@@ -146,7 +146,7 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (InputEventDataTransformation::Unmarshalling(pkt, pointerEvent) != ERR_OK) {
         MMI_HILOGE("Failed to deserialize pointer event.");
-        return RET_ERR;
+        return INPUT_MSG_PACKET_READ_FAIL;
     }
     MMI_HILOGD("Pointer event dispatcher of client:");
     EventLogHelper::PrintEventData(pointerEvent);
@@ -171,14 +171,14 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
     int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(pkt, keyEvent);
     if (ret != RET_OK) {
         MMI_HILOGE("Read net packet failed");
-        return RET_ERR;
+        return INPUT_MSG_PACKET_READ_FAIL;
     }
     int32_t fd = -1;
     int32_t subscribeId = -1;
     pkt >> fd >> subscribeId;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read fd failed");
-        return PACKET_READ_FAIL;
+        return INPUT_MSG_PACKET_READ_FAIL;
     }
     MMI_HILOGD("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d,"
                "KeyCode:%{public}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64 ","
@@ -199,7 +199,7 @@ int32_t ClientMsgHandler::OnDevListener(const UDSClient& client, NetPacket& pkt)
     pkt >> type >> deviceId;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read type failed");
-        return RET_ERR;
+        return INPUT_MSG_PACKET_READ_FAIL;
     }
     InputDevImpl.OnDevListener(deviceId, type);
     return RET_OK;
@@ -215,13 +215,13 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
     pkt >> handlerType >> deviceTags;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read handler failed");
-        return RET_ERR;
+        return INPUT_MSG_PACKET_READ_FAIL;
     }
     auto keyEvent = KeyEvent::Create();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     if (InputEventDataTransformation::NetPacketToKeyEvent(pkt, keyEvent) != ERR_OK) {
         MMI_HILOGE("Failed to deserialize key event.");
-        return RET_ERR;
+        return INPUT_MSG_PACKET_READ_FAIL;
     }
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_INTERCEPT_EVENT);
     switch (handlerType) {
@@ -256,14 +256,14 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
     pkt >> handlerType >> deviceTags;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read Pointer data failed");
-        return RET_ERR;
+        return INPUT_MSG_PACKET_READ_FAIL;
     }
     MMI_HILOGD("Client handlerType:%{public}d", handlerType);
     auto pointerEvent = PointerEvent::Create();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (InputEventDataTransformation::Unmarshalling(pkt, pointerEvent) != ERR_OK) {
         MMI_HILOGE("Failed to deserialize pointer event");
-        return RET_ERR;
+        return INPUT_MSG_PACKET_READ_FAIL;
     }
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_INTERCEPT_EVENT);
     switch (handlerType) {
@@ -312,7 +312,7 @@ int32_t ClientMsgHandler::OnAnr(const UDSClient& client, NetPacket& pkt)
     pkt >> pid;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read data failed");
-        return RET_ERR;
+        return INPUT_MSG_PACKET_READ_FAIL;
     }
     MMI_HILOGI("Client pid:%{public}d", pid);
     InputMgrImpl.OnAnr(pid);
@@ -329,7 +329,7 @@ int32_t ClientMsgHandler::OnCooperationListener(const UDSClient& client, NetPack
     pkt >> userData >> deviceId >> nType;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read type failed");
-        return RET_ERR;
+        return INPUT_MSG_PACKET_READ_FAIL;
     }
     InputDevCooperateImpl.OnDevCooperateListener(deviceId, CooperationMessage(nType));
     return RET_OK;
@@ -344,7 +344,7 @@ int32_t ClientMsgHandler::OnCooperationMessage(const UDSClient& client, NetPacke
     pkt >> userData >> deviceId >> nType;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read cooperate msg failed");
-        return RET_ERR;
+        return INPUT_MSG_PACKET_READ_FAIL;
     }
     InputDevCooperateImpl.OnCooperationMessage(userData, deviceId, CooperationMessage(nType));
     return RET_OK;
@@ -358,7 +358,7 @@ int32_t ClientMsgHandler::OnCooperationState(const UDSClient& client, NetPacket&
     pkt >> userData >> state;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read cooperate msg failed");
-        return RET_ERR;
+        return INPUT_MSG_PACKET_READ_FAIL;
     }
     InputDevCooperateImpl.OnCooperationState(userData, state);
     return RET_OK;

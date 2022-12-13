@@ -284,7 +284,7 @@ int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt)
     pkt << displayGroupInfo_.width << displayGroupInfo_.height << displayGroupInfo_.focusWindowId;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write logical data failed");
-        return RET_ERR;
+        return INPUT_MSG_PACKET_WRITE_FAIL;
     }
     if (PackWindowInfo(pkt) == RET_ERR) {
         MMI_HILOGE("Packet write windows info failed");
@@ -304,7 +304,7 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write windows data failed");
-        return RET_ERR;
+        return INPUT_MSG_PACKET_WRITE_FAIL;
     }
     return RET_OK;
 }
@@ -319,7 +319,7 @@ int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt)
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write display data failed");
-        return RET_ERR;
+        return INPUT_MSG_PACKET_WRITE_FAIL;
     }
     return RET_OK;
 }

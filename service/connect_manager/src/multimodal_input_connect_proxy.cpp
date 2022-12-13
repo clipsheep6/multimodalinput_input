@@ -257,11 +257,11 @@ int32_t MultimodalInputConnectProxy::SetPointerStyle(int32_t windowId, int32_t p
     MessageParcel data;
     if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
         MMI_HILOGE("Failed to write descriptor");
-        return RET_ERR;
+        return ERR_INVALID_VALUE;
     }
 
-    WRITEINT32(data, windowId, RET_ERR);
-    WRITEINT32(data, pointerStyle, RET_ERR);
+    WRITEINT32(data, windowId, ERR_INVALID_VALUE);
+    WRITEINT32(data, pointerStyle, ERR_INVALID_VALUE);
 
     MessageParcel reply;
     MessageOption option;
@@ -283,7 +283,7 @@ int32_t MultimodalInputConnectProxy::GetPointerStyle(int32_t windowId, int32_t &
         MMI_HILOGE("Failed to write descriptor");
         return RET_ERR;
     }
-    WRITEINT32(data, windowId, RET_ERR);
+    WRITEINT32(data, windowId, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
@@ -344,7 +344,7 @@ int32_t MultimodalInputConnectProxy::SupportKeys(int32_t deviceId, std::vector<i
     MessageParcel data;
     if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
         MMI_HILOGE("Failed to write descriptor");
-        return RET_ERR;
+        return ERR_INVALID_VALUE;
     }
     WRITEINT32(data, deviceId);
     WRITEINT32(data, static_cast<int32_t>(keys.size()));
