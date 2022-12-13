@@ -36,6 +36,34 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventHandler" };
+class EventMeasureWrapper
+{
+public:
+    EventMeasureWrapper(uint64_t &idSeed, uint32_t type)
+    {
+        ++idSeed;
+        const uint64_t maxUInt64 = (std::numeric_limits<uint64_t>::max)() - 1;
+        if (idSeed >= maxUInt64) {
+            MMI_HILOGE("The value is flipped. id:%{public}" PRId64, idSeed);
+            idSeed = 1;
+        }
+        idSeed_ = idSeed;
+        int64_t beginTime = GetSysClockTime();
+        MMI_HILOGD("Event reporting. id:%{public}" PRId64 ",tid:%{public}" PRId64 ", type:%{public}d,"
+                "beginTime:%{public}" PRId64, idSeed_, GetThisThreadId(), type, beginTime);      
+    }
+
+    ~EventMeasureWrapper()
+    {
+        int64_t endTime = GetSysClockTime();
+        int64_t lostTime = endTime - beginTime_;
+        MMI_HILOGD("Event handling completed. id:%{public}" PRId64 ",endTime:%{public}" PRId64
+                ",lostTime:%{public}" PRId64, idSeed_, endTime, lostTime);
+    }
+private:
+    uint64_t idSeed_;
+    int64_t beginTime_;
+};
 } // namespace
 
 InputEventHandler::InputEventHandler()
@@ -51,32 +79,39 @@ void InputEventHandler::Init(UDSServer& udsServer)
     BuildInputHandlerChain();
 }
 
+#ifdef OHOS_BUILD_HDF
+void InputEventHandler::HandleHDFDeviceStatusEvent(const HDFDeviceStatusEvent &event)
+{
+    EventMeasureWrapper measure(idSeed_, event.devType);
+    CHKPV(eventNormalizeHandler_);
+    eventNormalizeHandler_->HandleHDFDeviceStatusEvent(event);
+}
+
+void InputEventHandler::HandleHDFDeviceInputEvent(const HDFDeviceInputEvent &event)
+{
+    EventMeasureWrapper measure(idSeed_, event.type);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    InputDevCooSM->HandleHDFDeviceInputEvent(event);
+#else
+    CHKPV(eventNormalizeHandler_);
+    eventNormalizeHandler_->HandleHDFDeviceInputEvent(event);
+#endif
+}
+#endif // OHOS_BUILD_HDF
+
 void InputEventHandler::OnEvent(void *event)
 {
     CHKPV(event);
-    idSeed_ += 1;
-    const uint64_t maxUInt64 = (std::numeric_limits<uint64_t>::max)() - 1;
-    if (idSeed_ >= maxUInt64) {
-        MMI_HILOGE("The value is flipped. id:%{public}" PRId64, idSeed_);
-        idSeed_ = 1;
-    }
-
     auto *lpEvent = static_cast<libinput_event *>(event);
     CHKPV(lpEvent);
     int32_t eventType = libinput_event_get_type(lpEvent);
-    int64_t beginTime = GetSysClockTime();
-    MMI_HILOGD("Event reporting. id:%{public}" PRId64 ",tid:%{public}" PRId64 ",eventType:%{public}d,"
-               "beginTime:%{public}" PRId64, idSeed_, GetThisThreadId(), eventType, beginTime);
+    EventMeasureWrapper measure(idSeed_, eventType);
     CHKPV(eventNormalizeHandler_);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     InputDevCooSM->HandleEvent(lpEvent);
 #else
     eventNormalizeHandler_->HandleEvent(lpEvent);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
-    int64_t endTime = GetSysClockTime();
-    int64_t lostTime = endTime - beginTime;
-    MMI_HILOGD("Event handling completed. id:%{public}" PRId64 ",endTime:%{public}" PRId64
-               ",lostTime:%{public}" PRId64, idSeed_, endTime, lostTime);
 }
 
 int32_t InputEventHandler::BuildInputHandlerChain()

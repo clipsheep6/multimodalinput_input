@@ -514,7 +514,6 @@ int32_t ReadTomlFile(const std::string &filePath, DeviceConfig &devConf)
 
 int32_t ReadCursorStyleFile(const std::string &filePath)
 {
-    CALL_DEBUG_ENTER;
     if (filePath.empty()) {
         MMI_HILOGE("FilePath is empty");
         return RET_ERR;
