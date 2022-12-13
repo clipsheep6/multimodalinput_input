@@ -69,7 +69,7 @@ int32_t EventFilterHandler::AddInputEventFilter(sptr<IEventFilter> filter,
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(lockFilter_);
-    CHKPR(filter, ERROR_NULL_POINTER);
+    CHKPR(filter, INPUT_COMMON_NULLPTR);
     MMI_HILOGI("Add filter,filterId:%{public}d,priority:%{public}d,clientPid:%{public}d,filters_ size:%{public}zu",
         filterId, priority, clientPid, filters_.size());
     
@@ -102,7 +102,7 @@ int32_t EventFilterHandler::AddInputEventFilter(sptr<IEventFilter> filter,
     auto it2 = filters_.emplace(it, std::move(info));
     if (it2 == filters_.end()) {
         MMI_HILOGE("Fail to add filter");
-        return ERROR_FILTER_ADD_FAIL;
+        return INPUT_FILTER_ADD_FAIL;
     }
     return RET_OK;
 }

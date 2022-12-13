@@ -159,7 +159,7 @@ int32_t MultimodalInputConnectStub::StubRemoveInputEventFilter(MessageParcel& da
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_CORE)) {
         MMI_HILOGE("Permission check failed");
-        return CHECK_PERMISSION_FAIL;
+        return INPUT_CHECK_PERMISSION_FAIL;
     }
     int32_t filterId = -1;
     READINT32(data, filterId, IPC_PROXY_DEAD_OBJECT_ERR);
@@ -810,11 +810,11 @@ int32_t MultimodalInputConnectStub::StubSetPointerLocation(MessageParcel &data, 
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
         MMI_HILOGE("Permission check failed");
-        return CHECK_PERMISSION_FAIL;
+        return INPUT_CHECK_PERMISSION_FAIL;
     }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
-        return MMISERVICE_NOT_RUNNING;
+        return INPUT_SERVICE_NOT_RUNNING;
     }
 
     int32_t x = 0;

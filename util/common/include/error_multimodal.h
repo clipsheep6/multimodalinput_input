@@ -80,6 +80,8 @@ enum {
     // 键盘事件封装失败
     INPUT_KEY_EVENT_PKG_FAIL,
 
+    INPUT_FILTER_ADD_FAIL,
+
     // 业务错误码最大值
     INPUT_ERROR_CODE_END
 };
