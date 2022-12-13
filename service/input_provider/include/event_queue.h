@@ -51,6 +51,8 @@ private:
 
 private:
     std::shared_ptr<IEventHandler> handler_;
+    int32_t writeFd { -1 };
+    int32_t readFd { -1 };
 };
 } // namespace MMI
 } // namespace OHOS

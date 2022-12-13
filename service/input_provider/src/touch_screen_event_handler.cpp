@@ -160,17 +160,34 @@ void TouchScreenEventHandler::HandleAbsEvent(int code, int value)
             HandleMtTrackingId(value);
             break;
         }
-        case ABS_MT_TOUCH_MAJOR:
-        case ABS_MT_TOUCH_MINOR:
-        case ABS_MT_WIDTH_MAJOR:
-        case ABS_MT_WIDTH_MINOR:
-        case ABS_MT_ORIENTATION: {
+        case ABS_MT_TOUCH_MAJOR: {
+            HandleMtTouchMajor(value);
             break;
         }
-        case ABS_MT_PRESSURE:
-        case ABS_MT_DISTANCE:
-        case ABS_MT_TOOL_X:
+        case ABS_MT_TOUCH_MINOR: {
+            HandleMtTouchMinor(value);
+            break;
+        }
+        case ABS_MT_PRESSURE: {
+            HandleMtPressure(value);
+            break;
+        }
+        case ABS_MT_TOOL_TYPE: {
+            HandleMtToolType(value);
+            break;
+        }
+        case ABS_MT_TOOL_X: {
+            HandleMtToolX(value);
+            break;
+        }
         case ABS_MT_TOOL_Y: {
+            HandleMtToolY(value);
+            break;
+        }
+        case ABS_MT_WIDTH_MAJOR:
+        case ABS_MT_WIDTH_MINOR:
+        case ABS_MT_ORIENTATION:
+        case ABS_MT_DISTANCE: {
             break;
         }
         default: {
@@ -219,6 +236,66 @@ void TouchScreenEventHandler::HandleMtTrackingId(int value)
     } else {
         pointer->pointerAction = ACTION_DOWN;
     }
+    pointer->isDirty = true;
+}
+
+void TouchScreenEventHandler::HandleMtTouchMajor(int value)
+{
+    auto pointer = GetCurrentPointer(true);
+    CHKPV(pointer);
+    CHKPV(pointer->pointer);
+    pointer->pointer->SetLongAxis(value);
+    pointer->pointerAction = ACTION_MOVE;
+    pointer->isDirty = true;
+}
+
+void TouchScreenEventHandler::HandleMtTouchMinor(int value)
+{
+    auto pointer = GetCurrentPointer(true);
+    CHKPV(pointer);
+    CHKPV(pointer->pointer);
+    pointer->pointer->SetShortAxis(value);
+    pointer->pointerAction = ACTION_MOVE;
+    pointer->isDirty = true;
+}
+
+void TouchScreenEventHandler::HandleMtPressure(int value)
+{
+    auto pointer = GetCurrentPointer(true);
+    CHKPV(pointer);
+    CHKPV(pointer->pointer);
+    pointer->pointer->SetPressure(value);
+    pointer->pointerAction = ACTION_MOVE;
+    pointer->isDirty = true;
+}
+
+void TouchScreenEventHandler::HandleMtToolX(int value)
+{
+    auto pointer = GetCurrentPointer(true);
+    CHKPV(pointer);
+    CHKPV(pointer->pointer);
+    pointer->pointer->SetToolDisplayX(value);
+    pointer->pointerAction = ACTION_MOVE;
+    pointer->isDirty = true;
+}
+
+void TouchScreenEventHandler::HandleMtToolY(int value)
+{
+    auto pointer = GetCurrentPointer(true);
+    CHKPV(pointer);
+    CHKPV(pointer->pointer);
+    pointer->pointer->SetToolDisplayY(value);
+    pointer->pointerAction = ACTION_MOVE;
+    pointer->isDirty = true;
+}
+
+void TouchScreenEventHandler::HandleMtToolType(int value)
+{
+    auto pointer = GetCurrentPointer(true);
+    CHKPV(pointer);
+    CHKPV(pointer->pointer);
+    pointer->pointer->SetToolType(value);
+    pointer->pointerAction = ACTION_MOVE;
     pointer->isDirty = true;
 }
 

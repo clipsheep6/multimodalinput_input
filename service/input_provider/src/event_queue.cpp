@@ -21,8 +21,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventQueue" };
-int32_t g_hdfAdapterWriteFd { -1 };
-int32_t g_mmiServiceReadFd { -1 };
 } // namespace
 
 EventQueue::EventQueue(int32_t id) : IEventQueue(id)
@@ -39,8 +37,8 @@ int32_t EventQueue::Init()
             MMI_HILOGE("Create pipe error, errno: %{public}d, %{public}s", saveErrno, strerror(saveErrno));
             break;
         }
-        g_mmiServiceReadFd = fds[0];
-        g_hdfAdapterWriteFd = fds[1];
+        readFd = fds[0];
+        writeFd = fds[1];
         MMI_HILOGI("Connect hdf init, fds:(read:%{public}d, write:%{public}d)", fds[0], fds[1]);
         return RET_OK;
     }while(0);
@@ -65,7 +63,7 @@ int32_t EventQueue::SendEvent(EventData &event)
     if (event.type  == 0) {
         event.handler = handler_;
     }
-    auto ret = write(g_hdfAdapterWriteFd, &event, sizeof(event));
+    auto ret = write(writeFd, &event, sizeof(event));
     if (ret == -1) {
         int saveErrno = errno;
         MMI_HILOGE("Write failed, errno: %{public}d, %{public}s", saveErrno, strerror(saveErrno));
@@ -83,25 +81,25 @@ void EventQueue::ReleasePipe()
 {
     CALL_DEBUG_ENTER;
     int32_t ret = 0;
-    if (g_hdfAdapterWriteFd != -1) {
-        ret = close(g_hdfAdapterWriteFd);
+    if (writeFd != -1) {
+        ret = close(writeFd);
         if (ret != RET_OK) {
-            MMI_HILOGE("Close fd failed, write fd:%{public}d, ret:%{public}d, errno:%{public}d", g_hdfAdapterWriteFd, ret, errno); 
+            MMI_HILOGE("Close fd failed, write fd:%{public}d, ret:%{public}d, errno:%{public}d", writeFd, ret, errno); 
         }
-        g_hdfAdapterWriteFd = -1;
+        writeFd = -1;
     }
-    if (g_mmiServiceReadFd != -1) {
-        ret = close(g_mmiServiceReadFd);
+    if (readFd != -1) {
+        ret = close(readFd);
         if (ret != RET_OK) {
-            MMI_HILOGE("Close fd failed, read fd:%{public}d, ret:%{public}d, errno:%{public}d", g_mmiServiceReadFd, ret, errno);
+            MMI_HILOGE("Close fd failed, read fd:%{public}d, ret:%{public}d, errno:%{public}d", readFd, ret, errno);
         }
-        g_mmiServiceReadFd = -1;
+        readFd = -1;
     }
 }
 
 int32_t EventQueue::GetInputFd() const
 {
-    return g_mmiServiceReadFd;
+    return readFd;
 }
 } // namespace MMI
 } // namespace OHOS

@@ -70,6 +70,12 @@ private:
     void HandleMtPositionX(int value);
     void HandleMtPositionY(int value);
     void HandleMtTrackingId(int value);
+    void HandleMtTouchMajor(int value);
+    void HandleMtTouchMinor(int value);
+    void HandleMtPressure(int value);
+    void HandleMtToolX(int value);
+    void HandleMtToolY(int value);
+    void HandleMtToolType(int value);
     std::shared_ptr<Slot> GetCurrentPointer(bool createIfNotExist);
     void ProcessEvent(const struct input_event& event);
     void OnInputEvent(std::shared_ptr<Slot> slot);

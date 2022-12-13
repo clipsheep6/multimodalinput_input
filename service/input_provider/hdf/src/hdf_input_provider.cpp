@@ -18,8 +18,6 @@
 #include <array>
 #include <unistd.h>
 
-#include "circle_stream_buffer.h"
-
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "hdf_input_device.h"
@@ -30,19 +28,16 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "HDFInputProvider" };
-InputHostCb g_hostCbNew;
 std::shared_ptr<IInputContext> g_InputContext;
-std::map<uint32_t, int32_t> lastDevInfoMap_;
-CircleStreamBuffer g_circBuf;
 IInputInterface *g_InputInterface { nullptr };
-InputEventCb g_eventCb;
+std::map<uint32_t, int32_t> g_lastDevInfoMap;
 } // namespace
 
 HDFInputProvider::HDFInputProvider()
 {
     CHK_PID_AND_TID();
-    g_hostCbNew.HotPlugCallback = HotPlugCallback;
-    g_eventCb.EventPkgCallback = EventPkgCallback;
+    hostcb_.HotPlugCallback = HotPlugCallback;
+    eventcb_.EventPkgCallback = EventPkgCallback;
 }
 
 void HDFInputProvider::HotPlugCallback(const InputHotPlugEvent *event)
@@ -122,11 +117,11 @@ void HDFInputProvider::EventPkgCallback(const InputEventPackage **pkgs, uint32_t
 bool HDFInputProvider::IsDupTouchBtnKey(const InputEventPackage &r, uint32_t devIndex)
 {
     if (r.code == BTN_TOUCH && r.type == EV_KEY) {
-        auto it = lastDevInfoMap_.find(devIndex);
-        if (it != lastDevInfoMap_.end() && it->second == r.value) {
+        auto it = g_lastDevInfoMap.find(devIndex);
+        if (it != g_lastDevInfoMap.end() && it->second == r.value) {
             return true;
         }
-        lastDevInfoMap_.emplace(devIndex, r.value);
+        g_lastDevInfoMap.emplace(devIndex, r.value);
     }
     return false;
 }
@@ -177,7 +172,7 @@ int32_t HDFInputProvider::RegisterHotPlug()
     }
     CHKPR(g_InputInterface, ERROR_NULL_POINTER);
     CHKPR(g_InputInterface->iInputReporter, ERROR_NULL_POINTER);
-    ret = g_InputInterface->iInputReporter->RegisterHotPlugCallback(&g_hostCbNew);
+    ret = g_InputInterface->iInputReporter->RegisterHotPlugCallback(&hostcb_);
     if (ret != INPUT_SUCCESS) {
         MMI_HILOGE("Call RegisterHotPlugCallback fail, ret:%{public}d", ret);
         return RET_ERR;
@@ -233,24 +228,24 @@ void HDFInputProvider::EventDispatch(epoll_event &ev)
         MMI_HILOGD("Pipe no data");
         return;
     }
-    if (!g_circBuf.Write(szBuf, retSize)) {
+    if (!circbuf_.Write(szBuf, retSize)) {
         MMI_HILOGW("Write data failed. size:%{public}zu", retSize);
     }
     constexpr int32_t onceProcessLimit = 100;
     constexpr int32_t hdfEventSize = sizeof(EventData);
     for (int32_t i = 0; i < onceProcessLimit; ++i) {
-        const int32_t unreadSize = g_circBuf.UnreadSize();
+        const int32_t unreadSize = circbuf_.UnreadSize();
         if (unreadSize < hdfEventSize) {
             break;
         }
-        char *buf = const_cast<char *>(g_circBuf.ReadBuf());
+        char *buf = const_cast<char *>(circbuf_.ReadBuf());
         CHKPB(buf);
         EventData *event = reinterpret_cast<EventData*>(buf);
         CHKPB(event);
-        if (!g_circBuf.SeekReadPos(hdfEventSize)) {
+        if (!circbuf_.SeekReadPos(hdfEventSize)) {
             MMI_HILOGW("Set read position error, and this error cannot be recovered, and the buffer will be reset."
                 " hdfEventSize:%{public}d unreadSize:%{public}d", hdfEventSize, unreadSize);
-            g_circBuf.Reset();
+            circbuf_.Reset();
             break;
         }
         auto ev = event->data;
@@ -259,7 +254,7 @@ void HDFInputProvider::EventDispatch(epoll_event &ev)
             auto inputDeviceManager = g_InputContext->GetInputDeviceManager();
             CHKPB(inputDeviceManager);
             if (ev.value == 1) {
-                auto dev = std::make_shared<HDFInputDevice>(ev.code, g_InputInterface, g_eventCb);
+                auto dev = std::make_shared<HDFInputDevice>(ev.code, g_InputInterface, eventcb_);
                 CHKPC(dev);
                 inputDeviceManager->AddInputDevice(dev);
             } else {
@@ -272,8 +267,8 @@ void HDFInputProvider::EventDispatch(epoll_event &ev)
             CHKPB(iEventHandler);         
             iEventHandler->HandleEvent(ev);
         }
-        if (g_circBuf.IsEmpty()) {
-            g_circBuf.Reset();
+        if (circbuf_.IsEmpty()) {
+            circbuf_.Reset();
             break;
         }
     }

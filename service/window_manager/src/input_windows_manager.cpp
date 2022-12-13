@@ -498,7 +498,6 @@ bool InputWindowsManager::TouchPointToDisplayPoint(
         std::tuple<std::shared_ptr<IInputDevice::AxisInfo>, std::shared_ptr<IInputDevice::AxisInfo>> axisInfo,
         std::tuple<int32_t, int32_t> raw, EventTouch& touchInfo, int32_t& physicalDisplayId, int32_t deviceId)
 {
-    //CHKPF(absEvent);
     std::string screenId = InputDevMgr->GetScreenId(deviceId);
     if (screenId.empty()) {
         screenId = "default0";
@@ -595,14 +594,8 @@ void InputWindowsManager::GetPhysicalDisplayCoord(
         std::tuple<std::shared_ptr<IInputDevice::AxisInfo>, std::shared_ptr<IInputDevice::AxisInfo>> axisInfo,
         std::tuple<int32_t, int32_t> raw, const DisplayInfo& info, EventTouch& touchInfo)
 {
-    /*CHKPV(absEvent);
-    auto absEventPointer = absEvent->GetPointer();
-    CHKPV(absEventPointer);*/
-
     auto [tpX, tpY] = raw;
     auto [xInfo, yInfo] = axisInfo;
-    //auto tpX = absEventPointer->GetX();
-    //auto tpY = absEventPointer->GetY();
     CHKPV(xInfo);
     CHKPV(yInfo);
     int32_t deltaX = tpX  - xInfo->GetMinimum();

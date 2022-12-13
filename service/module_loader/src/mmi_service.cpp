@@ -216,8 +216,8 @@ bool MMIService::InitHDFService()
     inputProviderMgr_ = std::make_shared<InputProviderManager>();
     CHKPF(inputProviderMgr_);
     inputProviderMgr_->AddInputProvider(hdfProvider_);
-    iEventHandlerrMgr_ = std::make_shared<EventHandlerManager>();
-    CHKPF(iEventHandlerrMgr_);
+    iEventHandlerMgr_ = std::make_shared<EventHandlerManager>();
+    CHKPF(iEventHandlerMgr_);
     auto ret = hdfProvider_->Enable();
     if (ret != RET_OK) {
         MMI_HILOGE("HDF provider enable failed");
@@ -228,14 +228,14 @@ bool MMIService::InitHDFService()
 
 bool MMIService::InitQueue()
 {
-    eventQueueMagr_ = std::make_shared<EventQueueManager>();
-    CHKPF(eventQueueMagr_);
+    eventQueueMgr_ = std::make_shared<EventQueueManager>();
+    CHKPF(eventQueueMgr_);
     auto eventQueue = std::make_shared<EventQueue>(1);
     CHKPF(eventQueue);
-    do{
+    do {
         int32_t ret = eventQueue->Init();
         if (ret < 0) {
-            MMI_HILOGE("Eventqueue init failed");
+            MMI_HILOGE("EventQueue init failed");
             break;
         }
         auto readFd = eventQueue->GetInputFd();
@@ -245,7 +245,7 @@ bool MMIService::InitQueue()
             EpollClose();
             break;
         }
-        eventQueueMagr_->AddQueue(eventQueue);
+        eventQueueMgr_->AddQueue(eventQueue);
         return true;
     } while (0);
     return false;

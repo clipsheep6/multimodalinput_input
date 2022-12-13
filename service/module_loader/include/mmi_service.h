@@ -51,8 +51,8 @@ public:
     int32_t Dump(int32_t fd, const std::vector<std::u16string> &args) override;
 #ifdef OHOS_BUILD_HDF
     virtual std::shared_ptr<IInputDeviceManager> GetInputDeviceManager() override { return InputDevMgr; }
-    virtual std::shared_ptr<IEventQueueManager> GetEventQueueManager() override { return eventQueueMagr_; }
-    virtual std::shared_ptr<IEventHandlerManager> GetEventHandlerManager() override { return iEventHandlerrMgr_; }
+    virtual std::shared_ptr<IEventQueueManager> GetEventQueueManager() override { return eventQueueMgr_; }
+    virtual std::shared_ptr<IEventHandlerManager> GetEventHandlerManager() override { return iEventHandlerMgr_; }
     virtual std::shared_ptr<IInputProviderManager> GetInputProviderManager() override { return inputProviderMgr_; }
 #endif // OHOS_BUILD_HDF
     int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
@@ -166,8 +166,8 @@ private:
 #ifdef OHOS_BUILD_HDF
     std::shared_ptr<IInputProvider> hdfProvider_;
     std::shared_ptr<IInputProviderManager> inputProviderMgr_;
-    std::shared_ptr<IEventQueueManager> eventQueueMagr_;
-    std::shared_ptr<IEventHandlerManager> iEventHandlerrMgr_;
+    std::shared_ptr<IEventQueueManager> eventQueueMgr_;
+    std::shared_ptr<IEventHandlerManager> iEventHandlerMgr_;
 #endif // OHOS_BUILD_HDF
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;

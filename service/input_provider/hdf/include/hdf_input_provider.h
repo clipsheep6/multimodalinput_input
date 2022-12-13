@@ -19,6 +19,7 @@
 #include <map>
 #include <memory>
 
+#include "circle_stream_buffer.h"
 #include "input_manager.h"
 
 #include "i_input_provider.h"
@@ -52,6 +53,11 @@ private:
     static bool IsDupTouchBtnKey(const InputEventPackage &r, uint32_t devIndex);
     int32_t RegisterHotPlug();
     int32_t ScanInputDevice();
+
+private:
+    InputHostCb hostcb_;
+    InputEventCb eventcb_;
+    CircleStreamBuffer circbuf_;
 };
 } // namespace MMI
 } // namespace OHOS
