@@ -21,7 +21,7 @@
 #include "nocopyable.h"
 #include "singleton.h"
 
-#include "display_info.h"
+#include "window_info.h"
 #include "input_event.h"
 #include "input_event_data_transformation.h"
 #include "pointer_event.h"
@@ -43,7 +43,7 @@ public:
     };
     DISALLOW_COPY_AND_MOVE(InputWindowsManager);
     void Init(UDSServer& udsServer);
-    int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent) const;
+    int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t GetPidAndUpdateTarget(std::shared_ptr<InputEvent> inputEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -76,7 +76,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_POINTER
     const DisplayGroupInfo& GetDisplayGroupInfo();
     int32_t SetPointerStyle(int32_t pid, int32_t windowId, int32_t pointerStyle);
-    std::optional<int> GetPointerStyle(int32_t pid, int32_t windowId) const;
+    int32_t GetPointerStyle(int32_t pid, int32_t windowId, int32_t &pointerStyle) const;
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool IsNeedRefreshLayer(int32_t windowId);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -131,6 +131,7 @@ private:
     bool IsInsideDisplay(const DisplayInfo& displayInfo, int32_t physicalX, int32_t physicalY);
     void FindPhysicalDisplay(const DisplayInfo& displayInfo, int32_t& physicalX,
         int32_t& physicalY, int32_t& displayId);
+    void InitMouseDownInfo();
 #endif // OHOS_BUILD_ENABLE_POINTER
     void CheckFocusWindowChange(const DisplayGroupInfo &displayGroupInfo);
     void CheckZorderWindowChange(const DisplayGroupInfo &displayGroupInfo);
@@ -144,9 +145,11 @@ private:
     WindowInfo lastWindowInfo_;
     std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
     std::map<int32_t, std::map<int32_t, int32_t>> pointerStyle_;
+    WindowInfo mouseDownInfo_;
 #endif // OHOS_BUILD_ENABLE_POINTER
     DisplayGroupInfo displayGroupInfo_;
-    MouseLocation mouseLocation_ = { -1, -1 }; // physical coord
+    MouseLocation mouseLocation_ = { -1, -1 };
+    std::map<int32_t, WindowInfo> touchItemDownInfos_;
     std::shared_ptr<DisplayGroupInfo> dispInfoCache_;
     std::mutex dispInfoCacheMtx_;
 };

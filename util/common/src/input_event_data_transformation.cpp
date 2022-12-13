@@ -30,7 +30,7 @@ int32_t InputEventDataTransformation::KeyEventToNetPacket(
         MMI_HILOGE("Serialize input event failed");
         return RET_ERR;
     }
-    pkt << key->GetKeyCode() << key->GetKeyAction();
+    pkt << key->GetKeyCode() << key->GetKeyAction() << key->GetKeyIntention();
     auto keys = key->GetKeyItems();
     int32_t size = static_cast<int32_t>(keys.size());
     if (size > MAX_KEY_SIZE) {
@@ -63,6 +63,8 @@ int32_t InputEventDataTransformation::NetPacketToKeyEvent(NetPacket &pkt, std::s
     key->SetKeyCode(data);
     pkt >> data;
     key->SetKeyAction(data);
+    pkt >> data;
+    key->SetKeyIntention(data);
     int32_t size = 0;
     pkt >> size;
     if (size > MAX_KEY_SIZE) {
@@ -161,14 +163,10 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
     pkt << event->GetPointerAction() << event->GetPointerId() << event->GetSourceType() << event->GetButtonId()
         << event->GetAxes();
 
-    if (event->HasAxis(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)) {
-        pkt << event->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL);
-    }
-    if (event->HasAxis(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL)) {
-        pkt << event->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL);
-    }
-    if (event->HasAxis(PointerEvent::AXIS_TYPE_PINCH)) {
-        pkt << event->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH);
+    for (int32_t i = PointerEvent::AXIS_TYPE_UNKNOWN; i < PointerEvent::AXIS_TYPE_MAX; ++i) {
+        if (event->HasAxis(static_cast<PointerEvent::AxisType>(i))) {
+            pkt << event->GetAxisValue(static_cast<PointerEvent::AxisType>(i));
+        }
     }
 
     std::set<int32_t> pressedBtns { event->GetPressedButtons() };
@@ -218,21 +216,7 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
     event->SetSourceType(tField);
     pkt >> tField;
     event->SetButtonId(tField);
-    uint32_t tAxes;
-    pkt >> tAxes;
-    double axisValue;
-    if (PointerEvent::HasAxis(tAxes, PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)) {
-        pkt >> axisValue;
-        event->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, axisValue);
-    }
-    if (PointerEvent::HasAxis(tAxes, PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL)) {
-        pkt >> axisValue;
-        event->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, axisValue);
-    }
-    if (PointerEvent::HasAxis(tAxes, PointerEvent::AXIS_TYPE_PINCH)) {
-        pkt >> axisValue;
-        event->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, axisValue);
-    }
+    SetAxisInfo(pkt, event);
 
     std::set<int32_t>::size_type nPressed;
     pkt >> nPressed;
@@ -265,6 +249,19 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
     }
     event->SetPressedKeys(pressedKeys);
     return RET_OK;
+}
+
+void InputEventDataTransformation::SetAxisInfo(NetPacket &pkt, std::shared_ptr<PointerEvent> event)
+{
+    uint32_t tAxes;
+    pkt >> tAxes;
+    double axisValue;
+    for (int32_t i = PointerEvent::AXIS_TYPE_UNKNOWN; i < PointerEvent::AXIS_TYPE_MAX; ++i) {
+        if (PointerEvent::HasAxis(tAxes, static_cast<PointerEvent::AxisType>(i))) {
+            pkt >> axisValue;
+            event->SetAxisValue(static_cast<PointerEvent::AxisType>(i), axisValue);
+        }
+    }
 }
 
 int32_t InputEventDataTransformation::SerializePointerItem(NetPacket &pkt, PointerEvent::PointerItem &item)

@@ -16,6 +16,7 @@
 #include "touch_event_normalize.h"
 #include "gesture_transform_processor.h"
 #include "input_device_manager.h"
+#include "joystick_transform_processor.h"
 #include "tablet_tool_tranform_processor.h"
 #include "touch_transform_processor.h"
 #include "touchpad_transform_processor.h"
@@ -30,14 +31,13 @@ TouchEventNormalize::TouchEventNormalize() {}
 TouchEventNormalize::~TouchEventNormalize() {}
 
 std::shared_ptr<PointerEvent> TouchEventNormalize::OnLibInput(
-    struct libinput_event *event, INPUT_DEVICE_TYPE deviceType)
+    struct libinput_event *event, DeviceType deviceType)
 {
     CHKPP(event);
     auto device = libinput_event_get_device(event);
     CHKPP(device);
     std::shared_ptr<TransformProcessor> processor { nullptr };
     auto deviceId = InputDevMgr->FindInputDeviceId(device);
-
     if (auto it = processors_.find(deviceId); it != processors_.end()) {
         processor = it->second;
     } else {
@@ -52,30 +52,36 @@ std::shared_ptr<PointerEvent> TouchEventNormalize::OnLibInput(
 }
 
 std::shared_ptr<TransformProcessor> TouchEventNormalize::MakeTransformProcessor(
-    int32_t deviceId, INPUT_DEVICE_TYPE deviceType) const
+    int32_t deviceId, DeviceType deviceType) const
 {
     std::shared_ptr<TransformProcessor> processor { nullptr };
     switch (deviceType) {
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-        case INPUT_DEVICE_CAP_TOUCH: {
+        case DeviceType::TOUCH: {
             processor = std::make_shared<TouchTransformProcessor>(deviceId);
             break;
         }
-        case INPUT_DEVICE_CAP_TABLET_TOOL: {
+        case DeviceType::TABLET_TOOL: {
             processor = std::make_shared<TabletToolTransformProcessor>(deviceId);
             break;
         }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
-        case INPUT_DEVICE_CAP_TOUCH_PAD: {
+        case DeviceType::TOUCH_PAD: {
             processor = std::make_shared<TouchPadTransformProcessor>(deviceId);
             break;
         }
-        case INPUT_DEVICE_CAP_GESTURE: {
+        case DeviceType::GESTURE: {
             processor = std::make_shared<GestureTransformProcessor>(deviceId);
             break;
         }
 #endif // OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_JOYSTICK
+	    case DeviceType::JOYSTICK: {
+            processor = std::make_shared<JoystickTransformProcessor>(deviceId);
+            break;
+        }
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
         default: {
             MMI_HILOGE("Unsupported device type: %{public}d", deviceType);
             break;
