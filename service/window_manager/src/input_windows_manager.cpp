@@ -207,20 +207,34 @@ void InputWindowsManager::CheckZorderWindowChange(const DisplayGroupInfo &displa
         oldZorderFirstWindowPid, newZorderFirstWindowPid);
 }
 
-void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
+InputWindowsManager::DispInfoCacheUpdateResult InputWindowsManager::UpdateDisplayInfoCache(
+    const std::shared_ptr<DisplayGroupInfo> displayInfo)
+{
+    std::lock_guard<std::mutex> guard(dispInfoCacheMtx_);
+    auto ret = (dispInfoCache_ == nullptr) ? DispInfoCacheUpdateResult::SET : DispInfoCacheUpdateResult::UPDATE;
+    dispInfoCache_ = displayInfo;
+    return ret;
+}
+
+std::shared_ptr<DisplayGroupInfo> InputWindowsManager::GetDisplayInfoCache()
+{
+    std::lock_guard<std::mutex> guard(dispInfoCacheMtx_);
+    return std::move(dispInfoCache_);
+}
+
+int32_t InputWindowsManager::UpdateDisplayInfo()
 {
     CALL_DEBUG_ENTER;
-    CheckFocusWindowChange(displayGroupInfo);
-    CheckZorderWindowChange(displayGroupInfo);
-    displayGroupInfo_ = displayGroupInfo;
-    PrintDisplayInfo();
-#ifdef OHOS_BUILD_ENABLE_POINTER
+    const std::shared_ptr<DisplayGroupInfo> info = GetDisplayInfoCache();
+    CheckFocusWindowChange(*info);
+    CheckZorderWindowChange(*info);
+    displayGroupInfo_ = *info;
     UpdatePointerStyle();
 #endif // OHOS_BUILD_ENABLE_POINTER
 
-    if (!displayGroupInfo.displaysInfo.empty()) {
+    if (!info->displaysInfo.empty()) {
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-        IPointerDrawingManager::GetInstance()->OnDisplayInfo(displayGroupInfo);
+        IPointerDrawingManager::GetInstance()->OnDisplayInfo(*info);
         if (InputDevMgr->HasPointerDevice()) {
             MouseLocation mouseLocation = GetMouseInfo();
             int32_t displayId = MouseEventHdr->GetDisplayId();
@@ -228,7 +242,7 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
                 displayId = displayGroupInfo_.displaysInfo[0].id;
             }
             auto displayInfo = GetPhysicalDisplay(displayId);
-            CHKPV(displayInfo);
+            CHKPR(displayInfo, ERROR_NULL_POINTER);
             int32_t logicX = mouseLocation.physicalX + displayInfo->x;
             int32_t logicY = mouseLocation.physicalY + displayInfo->y;
             std::optional<WindowInfo> windowInfo;
@@ -241,7 +255,7 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
             }
             if (!windowInfo) {
                 MMI_HILOGE("The windowInfo is nullptr");
-                return;
+                return RET_ERR;
             }
             int32_t windowPid = GetWindowPid(windowInfo->id);
             WinInfo info = { .windowPid = windowPid, .windowId = windowInfo->id };
@@ -257,6 +271,8 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
 #endif // OHOS_BUILD_ENABLE_POINTER
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+    PrintDisplayInfo();
+    return RET_OK;
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER

@@ -37,6 +37,10 @@ struct MouseLocation {
 class InputWindowsManager final {
     DECLARE_DELAYED_SINGLETON(InputWindowsManager);
 public:
+    enum class DispInfoCacheUpdateResult {
+        SET,
+        UPDATE,
+    };
     DISALLOW_COPY_AND_MOVE(InputWindowsManager);
     void Init(UDSServer& udsServer);
     int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent);
@@ -46,7 +50,8 @@ public:
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t UpdateTarget(std::shared_ptr<InputEvent> inputEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-    void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
+    DispInfoCacheUpdateResult UpdateDisplayInfoCache(const std::shared_ptr<DisplayGroupInfo> displayInfo);
+    int32_t UpdateDisplayInfo();
 #ifdef OHOS_BUILD_ENABLE_POINTER
     MouseLocation GetMouseInfo();
     void UpdateAndAdjustMouseLocation(int32_t& displayId, double& x, double& y);
@@ -130,6 +135,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_POINTER
     void CheckFocusWindowChange(const DisplayGroupInfo &displayGroupInfo);
     void CheckZorderWindowChange(const DisplayGroupInfo &displayGroupInfo);
+    std::shared_ptr<DisplayGroupInfo> GetDisplayInfoCache();
 private:
     UDSServer* udsServer_ { nullptr };
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -144,6 +150,8 @@ private:
     DisplayGroupInfo displayGroupInfo_;
     MouseLocation mouseLocation_ = { -1, -1 };
     std::map<int32_t, WindowInfo> touchItemDownInfos_;
+    std::shared_ptr<DisplayGroupInfo> dispInfoCache_;
+    std::mutex dispInfoCacheMtx_;
 };
 
 #define WinMgr ::OHOS::DelayedSingleton<InputWindowsManager>::GetInstance()

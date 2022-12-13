@@ -18,6 +18,7 @@
 
 #include "iremote_broker.h"
 
+#include "display_info.h"
 #include "i_event_filter.h"
 #include "input_device.h"
 #include "i_input_event_filter.h"
@@ -65,6 +66,7 @@ public:
         START_INPUT_DEVICE_COOPERATE = 33,
         STOP_DEVICE_COOPERATE = 34,
         GET_INPUT_DEVICE_COOPERATE_STATE = 35,
+        UPDATE_DISPLAY_INFO = 36,
         SET_INPUT_DEVICE_TO_SCREEN = 50,
         SET_POINTER_LOCATION = 51,
     };
@@ -104,6 +106,7 @@ public:
     virtual int32_t UnsubscribeKeyEvent(int32_t subscribeId) = 0;
     virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual int32_t SetAnrObserver() = 0;
+    virtual int32_t UpdateDisplayInfo(const std::shared_ptr<DisplayGroupInfo> displayGroupInfo) = 0;
     virtual int32_t RegisterCooperateListener() = 0;
     virtual int32_t UnregisterCooperateListener() = 0;
     virtual int32_t EnableInputDeviceCooperate(int32_t userData, bool enabled) = 0;
