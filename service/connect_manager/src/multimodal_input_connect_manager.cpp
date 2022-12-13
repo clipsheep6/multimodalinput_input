@@ -143,28 +143,29 @@ int32_t MultimodalInputConnectManager::UnregisterDevListener()
     return multimodalInputConnectService_->UnregisterDevListener();
 }
 
-int32_t MultimodalInputConnectManager::SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> &keys)
+int32_t MultimodalInputConnectManager::SupportKeys(int32_t deviceId, std::vector<int32_t> &keys,
+    std::vector<bool> &keystroke)
 {
-    CHKPR(multimodalInputConnectService_, ERROR_NULL_POINTER);
-    return multimodalInputConnectService_->SupportKeys(userData, deviceId, keys);
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->SupportKeys(deviceId, keys, keystroke);
 }
 
-int32_t MultimodalInputConnectManager::GetDeviceIds(int32_t userData)
+int32_t MultimodalInputConnectManager::GetDeviceIds(std::vector<int32_t> &ids)
 {
-    CHKPR(multimodalInputConnectService_, ERROR_NULL_POINTER);
-    return multimodalInputConnectService_->GetDeviceIds(userData);
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->GetDeviceIds(ids);
 }
 
-int32_t MultimodalInputConnectManager::GetDevice(int32_t userData, int32_t id)
+int32_t MultimodalInputConnectManager::GetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice)
 {
-    CHKPR(multimodalInputConnectService_, ERROR_NULL_POINTER);
-    return multimodalInputConnectService_->GetDevice(userData, id);
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->GetDevice(deviceId, inputDevice);
 }
 
-int32_t MultimodalInputConnectManager::GetKeyboardType(int32_t userData, int32_t deviceId)
+int32_t MultimodalInputConnectManager::GetKeyboardType(int32_t deviceId, int32_t &keyboardType)
 {
-    CHKPR(multimodalInputConnectService_, ERROR_NULL_POINTER);
-    return multimodalInputConnectService_->GetKeyboardType(userData, deviceId);
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->GetKeyboardType(deviceId, keyboardType);
 }
 
 int32_t MultimodalInputConnectManager::AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
