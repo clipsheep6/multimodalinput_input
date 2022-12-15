@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef CLIENT_MSG_HANDLER_H
 #define CLIENT_MSG_HANDLER_H
 
@@ -65,10 +66,10 @@ protected:
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 
 private:
-    static void OnDispatchEventProcessed(int32_t eventId);
+    static void OnDispatchEventProcessed(int32_t eventId, int64_t actionTime);
 
 private:
-    std::function<void(int32_t)> dispatchCallback_ { nullptr };
+    std::function<void(int32_t, int64_t)> dispatchCallback_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS

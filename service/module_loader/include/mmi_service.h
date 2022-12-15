@@ -29,8 +29,8 @@
 #include "hdf_adapter.h"
 #endif
 #include "input_event_handler.h"
-#include "multimodal_input_connect_stub.h"
 #include "libinput_adapter.h"
+#include "multimodal_input_connect_stub.h"
 #include "server_msg_handler.h"
 #include "uds_server.h"
 
@@ -53,6 +53,7 @@ public:
     int32_t RemoveInputEventFilter(int32_t filterId) override;
     int32_t SetPointerVisible(bool visible) override;
     int32_t IsPointerVisible(bool &visible) override;
+    int32_t MarkProcessed(int32_t eventType, int32_t eventId) override;
     int32_t SetPointerSpeed(int32_t speed) override;
     int32_t GetPointerSpeed(int32_t &speed) override;
     int32_t SetPointerStyle(int32_t windowId, int32_t pointerStyle) override;
@@ -85,6 +86,7 @@ public:
     int32_t GetFunctionKeyState(int32_t funcKey, bool &state) override;
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable) override;
     int32_t SetPointerLocation(int32_t x, int32_t y) override;
+    virtual int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode) override;
 
 #ifdef OHOS_RSS_CLIENT
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;

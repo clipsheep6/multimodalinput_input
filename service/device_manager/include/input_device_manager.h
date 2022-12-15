@@ -24,13 +24,13 @@
 #endif // OHOS_BUILD_HDF
 #include "device_observer.h"
 #include "event_dispatch_handler.h"
-#include "key_event_normalize.h"
 #include "input_device.h"
 #ifdef OHOS_BUILD_HDF
 #include "i_touch_screen_handler.h"
 #include "input_type.h"
 #endif // OHOS_BUILD_HDF
 #include "key_auto_repeat.h"
+#include "key_event_normalize.h"
 #include "key_map_manager.h"
 #include "msg_handler.h"
 #include "nocopyable.h"

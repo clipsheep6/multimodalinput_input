@@ -13,21 +13,27 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
+#ifndef HDF_DEVICE_EVENT_DISPATCH_H
+#define HDF_DEVICE_EVENT_DISPATCH_H
 
-#include "define_multimodal.h"
-#include "event_dispatch_handler.h"
+#include <cstdint>
+
+#include "inject_thread.h"
+#include "input_type.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
-namespace {
-using namespace testing::ext;
-} // namespace
-
-class EventDispatchTest : public testing::Test {
+class HdfDeviceEventDispatch {
 public:
-    static void SetUpTestCase(void) {}
-    static void TearDownTestCase(void) {}
+    static void GetEventCallbackDispatch(const InputEventPackage **pkgs, uint32_t count, uint32_t devIndex);
+    HdfDeviceEventDispatch(const uint32_t maxX, const uint32_t maxY);
+    DISALLOW_COPY_AND_MOVE(HdfDeviceEventDispatch);
+    virtual ~HdfDeviceEventDispatch();
+
+private:
+    static InjectThread injectThread_;
 };
 } // namespace MMI
 } // namespace OHOS
+#endif  // HDF_DEVICE_EVENT_DISPATCH_H
