@@ -27,14 +27,14 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsUtil" };
 
 std::map<int32_t, std::string> axisType = {
-    {ABS_MT_TOUCH_MAJOR, "touchMajor"},
-    {ABS_MT_TOUCH_MINOR, "touchMinor"},
-    {ABS_MT_ORIENTATION, "orientation"},
-    {ABS_MT_POSITION_X, "x"},
-    {ABS_MT_POSITION_Y, "y"},
-    {ABS_MT_PRESSURE, "pressure"},
-    {ABS_MT_WIDTH_MAJOR, "toolMajor"},
-    {ABS_MT_WIDTH_MINOR, "toolMinor"},
+    { ABS_MT_TOUCH_MAJOR, "touchMajor" },
+    { ABS_MT_TOUCH_MINOR, "touchMinor" },
+    { ABS_MT_ORIENTATION, "orientation" },
+    { ABS_MT_POSITION_X, "x" },
+    { ABS_MT_POSITION_Y, "y" },
+    { ABS_MT_PRESSURE, "pressure" },
+    { ABS_MT_WIDTH_MAJOR, "toolMajor" },
+    { ABS_MT_WIDTH_MINOR, "toolMinor" },
 };
 
 constexpr uint32_t EVDEV_UDEV_TAG_TOUCHSCREEN = (1 << 4);
@@ -42,12 +42,12 @@ constexpr uint32_t EVDEV_UDEV_TAG_JOYSTICK = (1 << 6);
 constexpr uint32_t EVDEV_UDEV_TAG_TRACKBALL = (1 << 10);
 
 JsUtil::DeviceType g_deviceType[] = {
-    {"keyboard", EVDEV_UDEV_TAG_KEYBOARD},
-    {"mouse", EVDEV_UDEV_TAG_MOUSE},
-    {"touchpad", EVDEV_UDEV_TAG_TOUCHPAD},
-    {"touchscreen", EVDEV_UDEV_TAG_TOUCHSCREEN},
-    {"joystick", EVDEV_UDEV_TAG_JOYSTICK},
-    {"trackball", EVDEV_UDEV_TAG_TRACKBALL},
+    { "keyboard", EVDEV_UDEV_TAG_KEYBOARD },
+    { "mouse", EVDEV_UDEV_TAG_MOUSE },
+    { "touchpad", EVDEV_UDEV_TAG_TOUCHPAD },
+    { "touchscreen", EVDEV_UDEV_TAG_TOUCHSCREEN },
+    { "joystick", EVDEV_UDEV_TAG_JOYSTICK },
+    { "trackball", EVDEV_UDEV_TAG_TRACKBALL },
 };
 } // namespace
 bool JsUtil::IsSameHandle(napi_env env, napi_value handle, napi_ref ref)
@@ -59,7 +59,7 @@ bool JsUtil::IsSameHandle(napi_env env, napi_value handle, napi_ref ref)
     return isEqual;
 }
 
-napi_value JsUtil::GetDeviceInfo(const std::unique_ptr<CallbackInfo> &cb)
+napi_value JsUtil::GetDeviceInfo(sptr<CallbackInfo> cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);
@@ -105,7 +105,7 @@ napi_value JsUtil::GetDeviceInfo(const std::unique_ptr<CallbackInfo> &cb)
     return object;
 }
 
-bool JsUtil::GetDeviceAxisInfo(const std::unique_ptr<CallbackInfo> &cb, napi_value &object)
+bool JsUtil::GetDeviceAxisInfo(sptr<CallbackInfo> cb, napi_value &object)
 {
     CHKPF(cb);
     CHKPF(cb->env);
@@ -162,7 +162,7 @@ bool JsUtil::GetDeviceAxisInfo(const std::unique_ptr<CallbackInfo> &cb, napi_val
     return true;
 }
 
-bool JsUtil::GetDeviceSourceType(const std::unique_ptr<CallbackInfo> &cb, napi_value &object)
+bool JsUtil::GetDeviceSourceType(sptr<CallbackInfo> cb, napi_value &object)
 {
     CHKPF(cb);
     CHKPF(cb->env);

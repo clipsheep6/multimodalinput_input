@@ -17,8 +17,8 @@
 
 #include "mmi_log.h"
 #include "napi_constants.h"
-#include "util_napi_error.h"
 #include "util_napi.h"
+#include "util_napi_error.h"
 
 namespace OHOS {
 namespace MMI {
@@ -35,28 +35,28 @@ JsUtil::CallbackInfo::~CallbackInfo()
     }
 }
 
-napi_value JsUtil::GetEnableInfo(const std::unique_ptr<CallbackInfo> &cb)
+napi_value JsUtil::GetEnableInfo(sptr<CallbackInfo> cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);
     return GetResult(cb->env, cb->data.enableResult, cb->data.errCode);
 }
 
-napi_value JsUtil::GetStartInfo(const std::unique_ptr<CallbackInfo> &cb)
+napi_value JsUtil::GetStartInfo(sptr<CallbackInfo> cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);
     return GetResult(cb->env, cb->data.startResult, cb->data.errCode);
 }
 
-napi_value JsUtil::GetStopInfo(const std::unique_ptr<CallbackInfo> &cb)
+napi_value JsUtil::GetStopInfo(sptr<CallbackInfo> cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);
     return GetResult(cb->env, cb->data.stopResult, cb->data.errCode);
 }
 
-napi_value JsUtil::GetStateInfo(const std::unique_ptr<CallbackInfo> &cb)
+napi_value JsUtil::GetStateInfo(sptr<CallbackInfo> cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);

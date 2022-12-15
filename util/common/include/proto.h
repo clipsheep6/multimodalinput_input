@@ -12,17 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef PROTO_H
 #define PROTO_H
+
 #include <sys/types.h>
 
 enum class MmiMessageId : int32_t {
     INVALID,
-    INPUT_DEVICE,
-    INPUT_DEVICE_IDS,
-    INPUT_DEVICE_SUPPORT_KEYS,
     ADD_INPUT_DEVICE_LISTENER,
-    INPUT_DEVICE_KEYBOARD_TYPE,
     DISPLAY_INFO,
     NOTICE_ANR,
     MARK_PROCESS,
@@ -48,8 +46,13 @@ enum TokenType : int32_t {
     TOKEN_SHELL,
 };
 
+enum ANTTimeOutTime : int64_t {
+    INPUT_UI_TIMEOUT_TIME = 5 * 1000000
+};
+
 enum ANREventType {
     ANR_DISPATCH,
     ANR_MONITOR,
+    ANR_EVENT_TYPE_NUM,
 };
 #endif // PROTO_H
