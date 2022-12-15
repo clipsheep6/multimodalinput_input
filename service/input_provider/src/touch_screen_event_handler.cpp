@@ -400,10 +400,10 @@ bool TouchScreenEventHandler::OnEventTouchDown(std::shared_ptr<Slot> slot)
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     PointerEvent::PointerItem item;
-    double pressure = 0;    //TO DO ...
-    int32_t longAxis = 0;   //TO DO ...
-    int32_t shortAxis = 0;  //TO DO ...
-    int32_t toolType = 0;   //TO DO ...
+    double pressure = pointer->GetPressure();
+    int32_t longAxis = pointer->GetLongAxis();
+    int32_t shortAxis = pointer->GetShortAxis();
+    int32_t toolType = pointer->GetToolType();
     item.SetPressure(pressure);
     item.SetLongAxis(longAxis);
     item.SetShortAxis(shortAxis);
@@ -465,9 +465,9 @@ bool TouchScreenEventHandler::OnEventTouchMotion(std::shared_ptr<Slot> slot)
         MMI_HILOGE("Get pointer parameter failed, curSlot:%{public}d", curSlot);
         return false;
     }
-    double pressure = 0;     //TO DO...
-    int32_t longAxis = 0;    //TO DO...
-    int32_t shortAxis = 0;   //TO DO...
+    double pressure = pointer->GetPressure();
+    int32_t longAxis = pointer->GetLongAxis();
+    int32_t shortAxis = pointer->GetShortAxis();
     item.SetPressure(pressure);
     item.SetLongAxis(longAxis);
     item.SetShortAxis(shortAxis);

@@ -54,7 +54,9 @@ int32_t EventQueue::RegisterEventHandler(std::shared_ptr<IEventHandler> handler)
 
 int32_t EventQueue::UnregisterEventHandler()
 {
-    handler_ = nullptr;
+    if (handler_ != nullptr) {
+        handler_ = nullptr;
+    }
     return RET_OK;
 }
 
