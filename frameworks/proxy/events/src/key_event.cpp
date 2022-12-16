@@ -602,6 +602,7 @@ const int32_t KeyEvent::KEYCODE_BUTTON_BASE7 = 2413;
 const int32_t KeyEvent::KEYCODE_BUTTON_BASE8 = 2414;
 const int32_t KeyEvent::KEYCODE_BUTTON_BASE9 = 2415;
 const int32_t KeyEvent::KEYCODE_BUTTON_DEAD = 2416;
+const int32_t KeyEvent::KEYCODE_COMPOSE = 2466;
 const int32_t KeyEvent::KEYCODE_SLEEP = 2600;
 const int32_t KeyEvent::KEYCODE_ZENKAKU_HANKAKU = 2601;
 const int32_t KeyEvent::KEYCODE_102ND = 2602;
@@ -815,6 +816,38 @@ const int32_t KeyEvent::KEY_ACTION_CANCEL = 0X00000001;
 const int32_t KeyEvent::KEY_ACTION_DOWN = 0x00000002;
 const int32_t KeyEvent::KEY_ACTION_UP = 0X00000003;
 
+const int32_t KeyEvent::INTENTION_UNKNOWN = -1;
+const int32_t KeyEvent::INTENTION_UP = 1;
+const int32_t KeyEvent::INTENTION_DOWN = 2;
+const int32_t KeyEvent::INTENTION_LEFT = 3;
+const int32_t KeyEvent::INTENTION_RIGHT = 4;
+const int32_t KeyEvent::INTENTION_SELECT = 5;
+const int32_t KeyEvent::INTENTION_ESCAPE = 6;
+const int32_t KeyEvent::INTENTION_BACK = 7;
+const int32_t KeyEvent::INTENTION_FORWARD = 8;
+const int32_t KeyEvent::INTENTION_MENU = 9;
+const int32_t KeyEvent::INTENTION_HOME = 10;
+const int32_t KeyEvent::INTENTION_PAGE_UP = 11;
+const int32_t KeyEvent::INTENTION_PAGE_DOWN = 12;
+const int32_t KeyEvent::INTENTION_ZOOM_OUT = 13;
+const int32_t KeyEvent::INTENTION_ZOOM_IN = 14;
+
+const int32_t KeyEvent::INTENTION_MEDIA_PLAY_PAUSE = 100;
+const int32_t KeyEvent::INTENTION_MEDIA_FAST_FORWARD = 101;
+const int32_t KeyEvent::INTENTION_MEDIA_FAST_REWIND = 102;
+const int32_t KeyEvent::INTENTION_MEDIA_FAST_PLAYBACK = 103;
+const int32_t KeyEvent::INTENTION_MEDIA_NEXT = 104;
+const int32_t KeyEvent::INTENTION_MEDIA_PREVIOUS = 105;
+const int32_t KeyEvent::INTENTION_MEDIA_MUTE = 106;
+const int32_t KeyEvent::INTENTION_VOLUTE_UP = 107;
+const int32_t KeyEvent::INTENTION_VOLUTE_DOWN = 108;
+
+const int32_t KeyEvent::INTENTION_CALL = 200;
+const int32_t KeyEvent::INTENTION_ENDCALL = 201;
+const int32_t KeyEvent::INTENTION_REJECTCALL = 202;
+
+const int32_t KeyEvent::INTENTION_CAMERA = 300;
+
 KeyEvent::KeyItem::KeyItem() {}
 
 KeyEvent::KeyItem::~KeyItem() {}
@@ -900,7 +933,8 @@ KeyEvent::KeyEvent(const KeyEvent& other)
     : InputEvent(other),
       keyCode_(other.keyCode_),
       keys_(other.keys_),
-      keyAction_(other.keyAction_) {}
+      keyAction_(other.keyAction_),
+      keyIntention_(other.keyIntention_) {}
 
 KeyEvent::~KeyEvent() {}
 
@@ -964,29 +998,31 @@ void KeyEvent::AddPressedKeyItems(const KeyItem& keyItem)
 
 void KeyEvent::RemoveReleasedKeyItems(const KeyItem& keyItem)
 {
+    if (keyItem.IsPressed()) {
+        return;
+    }
     int32_t keyCode = keyItem.GetKeyCode();
-    std::vector<KeyItem> tempKeyItems = keys_;
-    keys_.clear();
-    for (const auto &item : tempKeyItems) {
-        if (item.GetKeyCode() != keyCode) {
-            keys_.push_back(item);
+    for (auto it = keys_.begin(); it != keys_.end(); ++it) {
+        if (it->GetKeyCode() == keyCode) {
+            keys_.erase(it);
+            return;
         }
     }
 }
 
-const KeyEvent::KeyItem* KeyEvent::GetKeyItem() const
+std::optional<KeyEvent::KeyItem> KeyEvent::GetKeyItem() const
 {
     return GetKeyItem(keyCode_);
 }
 
-const KeyEvent::KeyItem* KeyEvent::GetKeyItem(int32_t keyCode) const
+std::optional<KeyEvent::KeyItem> KeyEvent::GetKeyItem(int32_t keyCode) const
 {
     for (const auto &item : keys_) {
         if (item.GetKeyCode() == keyCode) {
-            return &item;
+            return std::make_optional(item);
         }
     }
-    return nullptr;
+    return std::nullopt;
 }
 
 const char* KeyEvent::ActionToString(int32_t action)
@@ -1125,6 +1161,7 @@ bool KeyEvent::WriteToParcel(Parcel &out) const
         }
     }
     WRITEINT32(out, keyAction_);
+    WRITEINT32(out, keyIntention_);
     return true;
 }
 
@@ -1146,6 +1183,7 @@ bool KeyEvent::ReadFromParcel(Parcel &in)
         keys_.push_back(val);
     }
     READINT32(in, keyAction_);
+    READINT32(in, keyIntention_);
     return true;
 }
 
@@ -1208,6 +1246,16 @@ int32_t KeyEvent::SetFunctionKey(int32_t funcKey, int32_t value)
             return UNKNOWN_FUNCTION_KEY;
         }
     }
+}
+
+int32_t KeyEvent::GetKeyIntention() const
+{
+    return keyIntention_;
+}
+
+void KeyEvent::SetKeyIntention(int32_t keyIntention)
+{
+    keyIntention_ = keyIntention;
 }
 } // namespace MMI
 } // namespace OHOS

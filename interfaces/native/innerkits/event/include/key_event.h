@@ -12,11 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef KEY_EVENT_H
 #define KEY_EVENT_H
 
+
 #include <memory>
 #include <vector>
+#include <set>
 
 #include "nocopyable.h"
 #include "parcel.h"
@@ -28,28 +31,28 @@ namespace MMI {
 class KeyEvent : public InputEvent {
 public:
     /**
-     * 未知的功能按键
+     * Unknown function key
      *
      * @since 9
      */
     static const int32_t UNKNOWN_FUNCTION_KEY;
 
     /**
-     * Num Lock功能按键
+     * Num Lock key
      *
      * @since 9
      */
     static const int32_t NUM_LOCK_FUNCTION_KEY;
 
     /**
-     * Caps Lock功能按键
+     * Caps Lock key
      *
      * @since 9
      */
     static const int32_t CAPS_LOCK_FUNCTION_KEY;
 
     /**
-     * Scroll Lock功能按键
+     * Scroll Lock key
      *
      * @since 9
      */
@@ -1367,6 +1370,13 @@ public:
      * @since 9
      */
     static const int32_t KEYCODE_BUTTON_DEAD;
+
+    /**
+     *  List Menu key on keyboard
+     *
+     * @since 9
+     */
+    static const int32_t KEYCODE_COMPOSE;
 
     /**
      * Sleep key
@@ -2858,6 +2868,202 @@ public:
      */
     static const int32_t KEY_ACTION_UP;
 
+    /**
+     * Unknown intention
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_UNKNOWN;
+
+    /**
+     * Up intention
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_UP;
+
+    /**
+     * Down intention
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_DOWN;
+
+    /**
+     * Left intention
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_LEFT;
+
+    /**
+     * Right intention
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_RIGHT;
+
+    /**
+     * Select intention
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_SELECT;
+
+    /**
+     * Escape intention
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_ESCAPE;
+
+    /**
+     * Back intention
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_BACK;
+
+    /**
+     * Forward intention
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_FORWARD;
+
+    /**
+     * Menu intention
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_MENU;
+    
+    /**
+     * Home intention
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_HOME;
+    
+    /**
+     * Page Up intention
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_PAGE_UP;
+    
+    /**
+     * Page down intention
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_PAGE_DOWN;
+    
+    /**
+     * Zoom out intention
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_ZOOM_OUT;
+    
+    /**
+     * Zoom in intention
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_ZOOM_IN;
+
+    /**
+     * Media play/pause intention
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_MEDIA_PLAY_PAUSE;
+    
+    /**
+     * Media fast forward intention
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_MEDIA_FAST_FORWARD;
+    
+    /**
+     * Media fast rewind intention
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_MEDIA_FAST_REWIND;
+    
+    /**
+     * Media fast playback intention
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_MEDIA_FAST_PLAYBACK;
+    
+    /**
+     * Media next intention
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_MEDIA_NEXT;
+    
+    /**
+     * Media previous intention
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_MEDIA_PREVIOUS;
+    
+    /**
+     * Media mute intention
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_MEDIA_MUTE;
+
+    /**
+     * Volume up intention
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_VOLUTE_UP;
+    
+    /**
+     * Volume down intention
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_VOLUTE_DOWN;
+
+    /**
+     * Call intention
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_CALL;
+    
+    /**
+     * End call intention
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_ENDCALL;
+    
+    /**
+     * Reject call intention
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_REJECTCALL;
+
+    /**
+     * Camera intention
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_CAMERA;
+
 public:
     class KeyItem {
     public:
@@ -2927,16 +3133,16 @@ public:
         void SetPressed(bool pressed);
 
         /**
-         * @brief 设置当前按键对应的unicode值
-         * @param unicode 指定的unicode值
-         * @return 空
+         * @brief Sets the Unicode value corresponding to the current key.
+         * @param unicode Unicode value.
+         * @return Null
          * @since 9
          */
         void SetUnicode(uint32_t unicode);
 
         /**
-         * @brief 获取当前按键的unicode值
-         * @return 返回unicode值
+         * @brief Obtains the Unicode value of the current key.
+         * @return Returns the Unicode value.
          * @since 9
          */
         uint32_t GetUnicode() const;
@@ -3079,18 +3285,18 @@ public:
 
     /**
      * @brief Obtains the key item of this key event.
-     * @return Returns the pointer to the key item.
+     * @return Returns the key item.
      * @since 9
      */
-    const KeyItem* GetKeyItem() const;
+    std::optional<KeyEvent::KeyItem> GetKeyItem() const;
 
     /**
      * @brief Obtains the key item based on a key code.
      * @param keyCode Indicates the key code.
-     * @return Returns the pointer to the key item.
+     * @return Returns the key item.
      * @since 9
      */
-    const KeyItem* GetKeyItem(int32_t keyCode) const;
+    std::optional<KeyEvent::KeyItem> GetKeyItem(int32_t keyCode) const;
 
     /**
      * @brief Checks whether this key event is valid.
@@ -3100,29 +3306,45 @@ public:
     bool IsValid() const;
 
     /**
-     * @brief 把指定的按键转换为功能按键。
-     * @param keyCode 待转换的键值。
-     * @return 返回转换后的功能按键。
+     * @brief Converts a specific key to a function key.
+     * @param keyCode Indicates the keycode of the key to convert.
+     * @return Returns the converted function key.
      * @since 9
      */
     int32_t TransitionFunctionKey(int32_t keyCode);
 
     /**
-     * @brief 给指定的功能按键设置使能状态。
-     * @param funcKey 指定的功能按键。
-     * @param value 待设置的功能按键状态。
-     * @return 返回是否设置成功。
+     * @brief Sets the enable status of the specified function key.
+     * @param funcKey Indicates the function key.
+     * @param value Indicates the enable status of the function key.
+     * @return Returns the result indicating whether the setting is successful.
      * @since 9
      */
     int32_t SetFunctionKey(int32_t funcKey, int32_t value);
 
     /**
-     * @brief 获取指定功能按键的使能状态。
-     * @param funcKey 指定的功能按键。
-     * @return 返回指定功能按键的使能状态。
+     * @brief Obtains the enable status of the specified function key.
+     * @param funcKey Indicates the function key.
+     * @return Returns the enable status of the function key.
      * @since 9
      */
     bool GetFunctionKey(int32_t funcKey) const;
+
+    /**
+     * @brief Obtains the key intention of the current event.
+     * @param void
+     * @return Returns the key intention of the current event.
+     * @since 9
+     */
+    int32_t GetKeyIntention() const;
+
+    /**
+     * @brief Sets the key intention for the current key event.
+     * @param keyIntention Specified key intention.
+     * @return void
+     * @since 9
+     */
+    void SetKeyIntention(int32_t keyIntention);
 
 public:
     /**
@@ -3156,6 +3378,7 @@ private:
     int32_t keyCode_ { -1 };
     std::vector<KeyItem> keys_;
     int32_t keyAction_ { 0 };
+    int32_t keyIntention_ { -1 };
     bool numLock_ { false };
     bool capsLock_ { false };
     bool scrollLock_ { false };

@@ -28,8 +28,8 @@
 #include "i_event_filter.h"
 #include "i_input_event_handler.h"
 #include "input_event_handler_plugin.h"
-#include "key_subscriber_handler.h"
 #include "key_command_handler.h"
+#include "key_subscriber_handler.h"
 #include "mouse_event_normalize.h"
 
 namespace OHOS {

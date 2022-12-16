@@ -21,8 +21,8 @@
 
 #include "error_multimodal.h"
 #include "napi_constants.h"
-#include "util_napi_error.h"
 #include "util_napi.h"
+#include "util_napi_error.h"
 
 namespace OHOS {
 namespace MMI {
@@ -278,7 +278,7 @@ void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
     CALL_DEBUG_ENTER;
     CHKPV(work);
     if (work->data == nullptr) {
-        MMI_HILOGE("Check data is null");
+        MMI_HILOGE("Check data is nullptr");
         delete work;
         work = nullptr;
         return;

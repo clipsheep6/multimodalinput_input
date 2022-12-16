@@ -19,11 +19,13 @@
 #include "iremote_broker.h"
 
 #include "i_event_filter.h"
+#include "input_device.h"
 #include "i_input_event_filter.h"
 #include "input_handler_type.h"
 #include "key_event.h"
 #include "key_option.h"
 #include "pointer_event.h"
+#include "system_ability_definition.h"
 
 namespace OHOS {
 namespace MMI {
@@ -34,6 +36,7 @@ public:
         ADD_INPUT_EVENT_FILTER = 1,
         SET_POINTER_VISIBLE = 2,
         IS_POINTER_VISIBLE = 3,
+        MARK_PROCESSED = 4,
         SUBSCRIBE_KEY_EVENT = 6,
         UNSUBSCRIBE_KEY_EVENT = 7,
         ADD_INPUT_HANDLER = 8,
@@ -56,6 +59,7 @@ public:
         SET_FUNCTION_KEY_STATE = 25,
         GET_FUNCTION_KEY_STATE = 26,
         RMV_INPUT_EVENT_FILTER = 27,
+        SET_CAPTURE_MODE = 28,
         REGISTER_COOPERATE_MONITOR = 30,
         UNREGISTER_COOPERATE_MONITOR = 31,
         ENABLE_INPUT_DEVICE_COOPERATE = 32,
@@ -70,7 +74,7 @@ public:
         CONNECT_MODULE_TYPE_MMI_CLIENT = 0,
     };
     static constexpr int32_t INVALID_SOCKET_FD = -1;
-    static constexpr int32_t MULTIMODAL_INPUT_CONNECT_SERVICE_ID = 3101;
+    static constexpr int32_t MULTIMODAL_INPUT_CONNECT_SERVICE_ID = MULTIMODAL_INPUT_SERVICE_ID;
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.multimodalinput.IConnectManager");
 
     virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
@@ -79,16 +83,17 @@ public:
     virtual int32_t RemoveInputEventFilter(int32_t filterId) = 0;
     virtual int32_t SetPointerVisible(bool visible) = 0;
     virtual int32_t IsPointerVisible(bool &visible) = 0;
+    virtual int32_t MarkProcessed(int32_t eventType, int32_t eventId) = 0;
     virtual int32_t SetPointerSpeed(int32_t speed) = 0;
     virtual int32_t GetPointerSpeed(int32_t &speed) = 0;
     virtual int32_t SetPointerStyle(int32_t windowId, int32_t pointerStyle) = 0;
     virtual int32_t GetPointerStyle(int32_t windowId, int32_t &pointerStyle) = 0;
-    virtual int32_t SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> &keys) = 0;
-    virtual int32_t GetDeviceIds(int32_t userData) = 0;
-    virtual int32_t GetDevice(int32_t userData, int32_t id) = 0;
+    virtual int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke) = 0;
+    virtual int32_t GetDeviceIds(std::vector<int32_t> &ids) = 0;
+    virtual int32_t GetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice) = 0;
     virtual int32_t RegisterDevListener() = 0;
     virtual int32_t UnregisterDevListener() = 0;
-    virtual int32_t GetKeyboardType(int32_t userData, int32_t deviceId) = 0;
+    virtual int32_t GetKeyboardType(int32_t deviceId, int32_t &keyboardType) = 0;
     virtual int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
         int32_t priority, uint32_t deviceTags) = 0;
     virtual int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
@@ -111,6 +116,7 @@ public:
     virtual int32_t GetFunctionKeyState(int32_t funckey, bool &state) = 0;
     virtual int32_t SetFunctionKeyState(int32_t funcKey, bool enable) = 0;
     virtual int32_t SetPointerLocation(int32_t x, int32_t y) = 0;
+    virtual int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

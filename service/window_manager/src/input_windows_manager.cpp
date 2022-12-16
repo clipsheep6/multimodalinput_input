@@ -19,13 +19,13 @@
 #include <cstdio>
 
 #include "dfx_hisysevent.h"
-#include "i_pointer_drawing_manager.h"
 #include "input_device_manager.h"
+#include "i_pointer_drawing_manager.h"
 #include "mouse_event_normalize.h"
 #include "pointer_drawing_manager.h"
+#include "util.h"
 #include "util_ex.h"
 #include "util_napi_error.h"
-#include "util.h"
 
 namespace OHOS {
 namespace MMI {
@@ -87,13 +87,14 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
             touchItemDownInfos_.erase(iter);
         }
     }
+#ifdef OHOS_BUILD_ENABLE_POINTER
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
         if (mouseDownInfo_.pid != -1) {
             pid = mouseDownInfo_.pid;
             InitMouseDownInfo();
         }
     }
-    
+#endif // OHOS_BUILD_ENABLE_POINTER
     return udsServer_->GetClientFd(pid);
 }
 
@@ -211,6 +212,11 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
     CALL_DEBUG_ENTER;
     CheckFocusWindowChange(displayGroupInfo);
     CheckZorderWindowChange(displayGroupInfo);
+    if (captureModeInfo_.isCaptureMode &&
+        ((displayGroupInfo_.focusWindowId != displayGroupInfo.focusWindowId) ||
+        (displayGroupInfo_.windowsInfo[0].id != displayGroupInfo.windowsInfo[0].id))) {
+        captureModeInfo_.isCaptureMode = false;
+    }
     displayGroupInfo_ = displayGroupInfo;
     PrintDisplayInfo();
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -436,11 +442,11 @@ void InputWindowsManager::NotifyPointerToWindow()
 
 void InputWindowsManager::PrintDisplayInfo()
 {
-    MMI_HILOGI("logicalInfo,width:%{public}d,height:%{public}d,focusWindowId:%{public}d",
+    MMI_HILOGD("logicalInfo,width:%{public}d,height:%{public}d,focusWindowId:%{public}d",
         displayGroupInfo_.width, displayGroupInfo_.height, displayGroupInfo_.focusWindowId);
-    MMI_HILOGI("windowsInfos,num:%{public}zu", displayGroupInfo_.windowsInfo.size());
+    MMI_HILOGD("windowsInfos,num:%{public}zu", displayGroupInfo_.windowsInfo.size());
     for (const auto &item : displayGroupInfo_.windowsInfo) {
-        MMI_HILOGI("windowsInfos,id:%{public}d,pid:%{public}d,uid:%{public}d,"
+        MMI_HILOGD("windowsInfos,id:%{public}d,pid:%{public}d,uid:%{public}d,"
             "area.x:%{public}d,area.y:%{public}d,area.width:%{public}d,area.height:%{public}d,"
             "defaultHotAreas.size:%{public}zu,pointerHotAreas.size:%{public}zu,"
             "agentWindowId:%{public}d,flags:%{public}d",
@@ -448,18 +454,18 @@ void InputWindowsManager::PrintDisplayInfo()
             item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
             item.agentWindowId, item.flags);
         for (const auto &win : item.defaultHotAreas) {
-            MMI_HILOGI("defaultHotAreas:x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
+            MMI_HILOGD("defaultHotAreas:x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
                 win.x, win.y, win.width, win.height);
         }
         for (const auto &pointer : item.pointerHotAreas) {
-            MMI_HILOGI("pointerHotAreas:x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
+            MMI_HILOGD("pointerHotAreas:x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
                 pointer.x, pointer.y, pointer.width, pointer.height);
         }
     }
 
-    MMI_HILOGI("displayInfos,num:%{public}zu", displayGroupInfo_.displaysInfo.size());
+    MMI_HILOGD("displayInfos,num:%{public}zu", displayGroupInfo_.displaysInfo.size());
     for (const auto &item : displayGroupInfo_.displaysInfo) {
-        MMI_HILOGI("displayInfos,id:%{public}d,x:%{public}d,y:%{public}d,"
+        MMI_HILOGD("displayInfos,id:%{public}d,x:%{public}d,y:%{public}d,"
             "width:%{public}d,height:%{public}d,name:%{public}s,"
             "uniq:%{public}s,direction:%{public}d",
             item.id, item.x, item.y, item.width, item.height, item.name.c_str(),
@@ -690,7 +696,7 @@ void InputWindowsManager::UpdatePointerStyle()
         int32_t pid = windowItem.pid;
         auto it = pointerStyle_.find(pid);
         if (it == pointerStyle_.end()) {
-            std::map<int32_t, int32_t> tmpPointerStyle = {{windowItem.id, DEFAULT_POINTER_STYLE}};
+            std::map<int32_t, int32_t> tmpPointerStyle = { { windowItem.id, DEFAULT_POINTER_STYLE } };
             auto iter = pointerStyle_.insert(std::make_pair(pid, tmpPointerStyle));
             if (!iter.second) {
                 MMI_HILOGW("The pd is duplicated");
@@ -917,6 +923,9 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
     IPointerDrawingManager::GetInstance()->DrawPointer(displayId, pointerItem.GetDisplayX(),
         pointerItem.GetDisplayY(), MOUSE_ICON(mouseStyle));
+    if (captureModeInfo_.isCaptureMode && (touchWindow->id != captureModeInfo_.windowId)) {
+        captureModeInfo_.isCaptureMode = false;
+    }
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
     int32_t windowX = logicalX - touchWindow->area.x;
@@ -944,6 +953,27 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     return ERR_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
+
+int32_t InputWindowsManager::SetMouseCaptureMode(int32_t windowId, bool isCaptureMode)
+{
+    if (windowId < 0) {
+        MMI_HILOGE("Windowid(%{public}d) is invalid", windowId);
+        return RET_ERR;
+    }
+    if ((captureModeInfo_.isCaptureMode == isCaptureMode) && !isCaptureMode) {
+        MMI_HILOGE("Windowid:(%{public}d) is not capture mode", windowId);
+        return RET_OK;
+    }
+    captureModeInfo_.windowId = windowId;
+    captureModeInfo_.isCaptureMode = isCaptureMode;
+    MMI_HILOGI("Windowid:(%{public}d) is (%{public}d)", windowId, isCaptureMode);
+    return RET_OK;
+}
+
+bool InputWindowsManager::GetMouseIsCaptureMode() const
+{
+    return captureModeInfo_.isCaptureMode;
+}
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent)

@@ -38,10 +38,10 @@ private:
     static void Print(const std::shared_ptr<KeyEvent> event)
     {
         std::vector<KeyEvent::KeyItem> eventItems { event->GetKeyItems() };
-        MMI_HILOGD("KeyCode:%{public}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64
+        MMI_HILOGD("KeyCode:%{public}d,KeyIntention:%{public}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64
             ",EventType:%{public}s,Flag:%{public}d,KeyAction:%{public}s,NumLock:%{public}d,"
             "CapsLock:%{public}d,ScrollLock:%{public}d,EventNumber:%{public}d,keyItemsCount:%{public}zu",
-            event->GetKeyCode(), event->GetActionTime(), event->GetActionStartTime(),
+            event->GetKeyCode(), event->GetKeyIntention(), event->GetActionTime(), event->GetActionStartTime(),
             InputEvent::EventTypeToString(event->GetEventType()), event->GetFlag(),
             KeyEvent::ActionToString(event->GetKeyAction()), event->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY),
             event->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY),
@@ -101,12 +101,13 @@ private:
                 "DisplayY:%{public}d,WindowX:%{public}d,WindowY:%{public}d,Width:%{public}d,Height:%{public}d,"
                 "TiltX:%{public}.2f,TiltY:%{public}.2f,ToolDisplayX:%{public}d,ToolDisplayY:%{public}d,"
                 "ToolWindowX:%{public}d,ToolWindowY:%{public}d,ToolWidth:%{public}d,ToolHeight:%{public}d,"
-                "Pressure:%{public}.2f,ToolType:%{public}d,LongAxis:%{public}d,ShortAxis:%{public}d",
+                "Pressure:%{public}.2f,ToolType:%{public}d,LongAxis:%{public}d,ShortAxis:%{public}d,RawDx:%{public}d,"
+                "RawDy:%{public}d",
                 pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(),
                 item.GetDisplayY(), item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(),
                 item.GetTiltX(), item.GetTiltY(), item.GetToolDisplayX(), item.GetToolDisplayY(),
                 item.GetToolWindowX(), item.GetToolWindowY(), item.GetToolWidth(), item.GetToolHeight(),
-                item.GetPressure(), item.GetToolType(), item.GetLongAxis(), item.GetShortAxis());
+                item.GetPressure(), item.GetToolType(), item.GetLongAxis(), item.GetShortAxis(), item.GetRawDx(), item.GetRawDy());
         }
         std::vector<int32_t> pressedKeys = event->GetPressedKeys();
         std::vector<int32_t>::const_iterator cItr = pressedKeys.cbegin();
