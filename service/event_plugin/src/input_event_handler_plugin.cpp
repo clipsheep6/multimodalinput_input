@@ -153,6 +153,13 @@ void InputEventHandlerPluginMgr::UnloadPlugin(std::string pluginName)
             break;
         }
     }
+    ReleasePlugin* RelPlugin = (ReleasePlugin*) dlsym(pluginInfoList[pluginName].osHandler, "Release");
+    auto error = dlerror();
+    if(error != NULL) {
+        MMI_HILOGE("ReleasePlugin msg:%{public}s", error);
+    }
+    RelPlugin(pluginInfoList[pluginName].plugin);
+    // dlclose(pluginInfoList[pluginName].osHandler);
     pluginInfoList.erase(pluginName);
 }
 

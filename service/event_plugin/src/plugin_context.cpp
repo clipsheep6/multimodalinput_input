@@ -27,6 +27,7 @@ int32_t times_ { 0 };
 int32_t memMax_ { 0 };
 int32_t memSum_ { 0 };
 int32_t count_ { 0 };
+int32_t rss_ { 0 };
 int32_t pss_ { 0 };
 int32_t dirty_ { 0 };
 int32_t swap_ { 0 };
@@ -114,6 +115,8 @@ void PluginContext::ChengMem()
         if (dataStatus) {
             if (tmp.find("Size") != std::string::npos) {
                 size_ += GetNum(tmp);
+            } else if (tmp.find("Rss") != std::string::npos) {
+                rss_ += GetNum(tmp);
             } else if (tmp.find("Pss") != std::string::npos) {
                 pss_ += GetNum(tmp);
             } else if (tmp.find("Private_Dirty") != std::string::npos) {
@@ -129,6 +132,7 @@ void PluginContext::ChengMem()
     memMax_ = std::max(dirty_, memMax_);
     memSum_ += dirty_;
     count_++;
+    rss_ = 0;
     size_ = 0;
     pss_ = 0;
     dirty_ = 0;
