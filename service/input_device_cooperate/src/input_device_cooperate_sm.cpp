@@ -503,6 +503,23 @@ void InputDeviceCooperateSM::HandleEvent(libinput_event *event)
     }
 }
 
+#ifdef OHOS_BUILD_HDF
+void InputDeviceCooperateSM::HandleHDFDeviceInputEvent(const HDFDeviceInputEvent &event)
+{
+    auto device = InputDevMgr->GetHDFDevice(event.devIndex);
+    CHKPV(device);
+    auto isPointerDevice = (device->HasCapability(IDevice::CAPABILITY_MOUSE) ||
+        device->HasCapability(IDevice::CAPABILITY_TOUCHPAD));
+    if (isPointerDevice) {
+        MMI_HILOGW("Not supported temporarily.");
+        return;
+    }
+    auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPV(inputEventNormalizeHandler);
+    inputEventNormalizeHandler->HandleHDFDeviceInputEvent(event);
+}
+#endif // OHOS_BUILD_HDF
+
 void InputDeviceCooperateSM::CheckPointerEvent(struct libinput_event *event)
 {
     std::lock_guard<std::mutex> guard(mutex_);

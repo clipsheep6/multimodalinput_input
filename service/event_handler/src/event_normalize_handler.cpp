@@ -15,9 +15,16 @@
 
 #include "event_normalize_handler.h"
 
+#ifdef OHOS_BUILD_HDF
+#include <linux/input.h>
+#endif // OHOS_BUILD_HDF
+
+#include "dfx_hisysevent.h"
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
-#include "dfx_hisysevent.h"
+#ifdef OHOS_BUILD_HDF
+#include "device.h"
+#endif // OHOS_BUILD_HDF
 #include "error_multimodal.h"
 #include "event_log_helper.h"
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
@@ -117,6 +124,51 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event)
     }
     DfxHisysevent::ReportDispTimes();
 }
+
+#ifdef OHOS_BUILD_HDF
+void EventNormalizeHandler::HandleHDFDeviceStatusEvent(const HDFDeviceStatusEvent &event)
+{
+    if (event.devStatus == (static_cast<uint32_t>(HDFInputEventDevStatus::HDF_ADD_DEVICE))) {
+        OnHDFDeviceAdded(event.devInfo);
+    } else {
+        OnHDFDeviceRemoved(event.devInfo);
+    }
+}
+
+void EventNormalizeHandler::HandleHDFDeviceInputEvent(const HDFDeviceInputEvent &event)
+{
+    CALL_DEBUG_ENTER;
+    const input_event inputEvent {
+        .input_event_sec = event.time / 1000000,
+        .input_event_usec = event.time % 1000000,
+        .type = event.type,
+        .code = event.code,
+        .value = event.value
+    };
+    auto device = InputDevMgr->GetHDFDevice(event.devIndex);
+    CHKPV(device);
+    device->ProcessEvent(inputEvent);
+}
+
+int32_t EventNormalizeHandler::OnHDFDeviceAdded(const InputDeviceInfo &devInfo)
+{
+    CALL_DEBUG_ENTER;
+    auto inputDevice = std::make_shared<Device>(devInfo.devIndex, devInfo);
+    CHKPR(inputDevice, ERROR_NULL_POINTER);
+    inputDevice->Init();
+    InputDevMgr->OnInputDeviceAdded(inputDevice);
+    return RET_OK;
+}
+
+int32_t EventNormalizeHandler::OnHDFDeviceRemoved(const InputDeviceInfo &devInfo)
+{
+    CALL_DEBUG_ENTER;
+    auto device = InputDevMgr->GetHDFDevice(devInfo.devIndex);
+    CHKPR(device, ERROR_NULL_POINTER);
+    InputDevMgr->OnInputDeviceRemoved(device);
+    return RET_OK;
+}
+#endif // OHOS_BUILD_HDF
 
 int32_t EventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
 {

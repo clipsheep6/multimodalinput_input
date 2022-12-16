@@ -17,6 +17,7 @@
 
 #include <cinttypes>
 #include <csignal>
+#include <memory>
 #include <parameters.h>
 #include <sys/signalfd.h>
 #ifdef OHOS_RSS_CLIENT
@@ -195,6 +196,36 @@ bool MMIService::InitLibinputService()
     return true;
 }
 
+#ifdef OHOS_BUILD_HDF
+bool MMIService::InitHDFService()
+{
+    if (!(hdfAdapter_.Init(std::bind(&InputEventHandler::HandleHDFDeviceStatusEvent, InputHandler, std::placeholders::_1),
+        std::bind(&InputEventHandler::HandleHDFDeviceInputEvent, InputHandler, std::placeholders::_1)))) {
+        MMI_HILOGE("HDF init, bind failed");
+        return false;
+    }
+
+    do {
+        auto inputFd = hdfAdapter_.GetInputFd();
+        if (inputFd == -1) {
+            MMI_HILOGE("Invalid fd:%{public}d", inputFd);
+            break;
+        }
+        auto ret = AddEpoll(EPOLL_EVENT_HDF, inputFd);
+        if (ret <  0) {
+            MMI_HILOGE("AddEpoll error ret:%{public}d", ret);
+            EpollClose();
+            break;
+        }
+        MMI_HILOGI("AddEpoll, epollfd:%{public}d, fd:%{public}d", mmiFd_, inputFd);
+        return true;
+    } while (0);
+
+    hdfAdapter_.Uninit();
+    return false;
+}
+#endif // OHOS_BUILD_HDF
+
 bool MMIService::InitService()
 {
     MMI_HILOGD("Server msg handler Init");
@@ -270,6 +301,12 @@ int32_t MMIService::Init()
         MMI_HILOGE("Libinput init failed");
         return LIBINPUT_INIT_FAIL;
     }
+#ifdef OHOS_BUILD_HDF
+    if (!InitHDFService()) {
+        MMI_HILOGE("HDF service init failed");
+        return HDF_INIT_FAIL;
+    }
+#endif // OHOS_BUILD_HDF
     if (!InitDelegateTasks()) {
         MMI_HILOGE("Delegate tasks init failed");
         return ETASKS_INIT_FAIL;
@@ -322,7 +359,15 @@ void MMIService::OnStart()
     HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask("MMIService", taskFunc,
         WATCHDOG_INTERVAL_TIME, WATCHDOG_DELAY_TIME);
     MMI_HILOGI("Run periodical task success");
-    t_.join();
+    t_.detach();
+    MMI_HILOGI("MMIService thread has detached");
+#ifdef OHOS_BUILD_HDF
+    ret = hdfAdapter_.ScanInputDevice();
+    if (ret != RET_OK) {
+        MMI_HILOGE("ScanInputDevice failed, ret:%{public}d", ret);
+    }
+#endif // OHOS_BUILD_HDF
+    MMI_HILOGI("MMIService OnStart has finished");
 }
 
 void MMIService::OnStop()
@@ -330,6 +375,9 @@ void MMIService::OnStop()
     CHK_PID_AND_TID();
     UdsStop();
     libinputAdapter_.Stop();
+#ifdef OHOS_BUILD_HDF
+    hdfAdapter_.Uninit();
+#endif // OHOS_BUILD_HDF
     state_ = ServiceRunningState::STATE_NOT_START;
 #ifdef OHOS_RSS_CLIENT
     MMI_HILOGI("Remove system ability listener start");
@@ -361,7 +409,7 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
         DfxHisysevent::OnClientConnect(data, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         return RET_ERR;
     }
-    MMI_HILOGIK("Leave, programName:%{public}s,moduleType:%{public}d,alloc success",
+    MMI_HILOGIK("programName:%{public}s,moduleType:%{public}d,alloc success",
         programName.c_str(), moduleType);
     DfxHisysevent::OnClientConnect(data, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     return RET_OK;
@@ -938,13 +986,16 @@ void MMIService::OnThread()
     while (state_ == ServiceRunningState::STATE_RUNNING) {
         epoll_event ev[MAX_EVENT_SIZE] = {};
         int32_t timeout = TimerMgr->CalcNextDelay();
-        MMI_HILOGD("timeout:%{public}d", timeout);
         int32_t count = EpollWait(ev[0], MAX_EVENT_SIZE, timeout, mmiFd_);
         for (int32_t i = 0; i < count && state_ == ServiceRunningState::STATE_RUNNING; i++) {
             auto mmiEd = reinterpret_cast<mmi_epoll_event*>(ev[i].data.ptr);
             CHKPC(mmiEd);
             if (mmiEd->event_type == EPOLL_EVENT_INPUT) {
                 libinputAdapter_.EventDispatch(ev[i]);
+#ifdef OHOS_BUILD_HDF
+            } else if (mmiEd->event_type == EPOLL_EVENT_HDF) {
+                hdfAdapter_.EventDispatch(ev[i]);
+#endif // OHOS_BUILD_HDF
             } else if (mmiEd->event_type == EPOLL_EVENT_SOCKET) {
                 OnEpollEvent(ev[i]);
             } else if (mmiEd->event_type == EPOLL_EVENT_SIGNAL) {
