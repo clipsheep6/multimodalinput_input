@@ -18,6 +18,7 @@
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "dfx_hisysevent.h"
+
 #include "error_multimodal.h"
 #include "event_log_helper.h"
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
@@ -129,6 +130,7 @@ int32_t EventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     KeyEventHdr->ResetKeyEvent(device);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+    configManagement_.OnDeviceAdd(device);
     return RET_OK;
 }
 
@@ -140,6 +142,7 @@ int32_t EventNormalizeHandler::OnEventDeviceRemoved(libinput_event *event)
     KeyMapMgr->RemoveKeyValue(device);
     KeyRepeat->RemoveDeviceConfig(device);
     InputDevMgr->OnInputDeviceRemoved(device);
+    configManagement_.OnDeviceRemove(device);
     return RET_OK;
 }
 
@@ -328,7 +331,7 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
     const auto &keyEvent = KeyEventHdr->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-    MouseEventHdr->Normalize(event);
+    MouseEventHdr->OnEvent(event);
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
