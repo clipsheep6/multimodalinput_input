@@ -37,7 +37,11 @@
 
 namespace OHOS {
 namespace MMI {
+#ifdef OHOS_BUILD_HDF
 class InputDeviceManager final : public IDeviceObject, public IInputDeviceManager {
+#else
+class InputDeviceManager final : public IDeviceObject {
+#endif // OHOS_BUILD_HDF
     DECLARE_DELAYED_SINGLETON(InputDeviceManager);
 
     struct InputDeviceInfomation {
