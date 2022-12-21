@@ -51,8 +51,6 @@ bool CheckFileExtendName(const std::string &filePath, const std::string &checkEx
     }
     return (filePath.substr(pos + 1, filePath.npos) == checkExtension);
 }
-
-
 } // namespace
 
 void InputEventHandlerPluginMgr::StartWatchPluginDir()
@@ -167,6 +165,8 @@ void InputEventHandlerPluginMgr::DelPlugin(std::shared_ptr<IInputEventHandler> p
 {
     for (auto &item : pluginInfoList) {
         if (item.second.pluginHandler == pluginHandler) {
+            timeOutPlugin.erase(pluginHandler);
+            memPlugin.erase(pluginHandler);
             UnloadPlugin(item.first);
             return;
         }
@@ -218,8 +218,9 @@ void InputEventHandlerPluginMgr::OnTimer()
         }
         if (max > TIME_OUT_MAX) {
             timeOutPlugin[item->GetEventHandler()] = timeOutPlugin[item->GetEventHandler()] + 1;
-            if (timeOutPlugin[item->GetEventHandler()] > 10) {
+            if (timeOutPlugin[item->GetEventHandler()] > 5) {
                 DelPlugin(item->GetEventHandler());
+                return;
             }
         } else {
             if (max > TIME_OUT_INVALID) {
@@ -229,8 +230,9 @@ void InputEventHandlerPluginMgr::OnTimer()
 
         if (memMax > MEX_MAX) {
             memPlugin[item->GetEventHandler()] = memPlugin[item->GetEventHandler()] + 1;
-            if (memPlugin[item->GetEventHandler()] > 10) {
+            if (memPlugin[item->GetEventHandler()] > 5) {
                 DelPlugin(item->GetEventHandler());
+                return;
             }
         } else {
             if (memMax > MEM_INVALID) {
