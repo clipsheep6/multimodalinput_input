@@ -1242,7 +1242,10 @@ bool HandleActionUp(const std::shared_ptr<PointerEvent> pointerEvent)
 
 bool CheckLocation(const std::shared_ptr<PointerEvent> pointerEvent)
 {
-
+    auto displayX = pointerEvent->GetDisplayX();
+    auto displayY = pointerEvent->GetDisplayY();
+    return displayX > MARGIN_LEFT && displayX < MARGIN_RIGHT && 
+           displayY > MARGIN_UP && displayX < MARGIN_DOWN;
 }
 
 bool CheckDuration(const std::shared_ptr<PointerEvent> pointerEvent)

@@ -83,6 +83,15 @@ struct TouchGesture {
 };
 class KeyCommandHandler final : public IInputEventHandler {
 public:
+    static int32_t MARGIN_UP; // 上下左右的留白(无效)区域的范围
+    static int32_t MARGIN_DOWN;
+    static int32_t MARGIN_LEFT;
+    static int32_t MARGIN_RIGHT;
+    static int32_t MOVEMENT_THRESHOLD; // 静态手势识别中触摸点移动距离的阈值， 单位具体是啥待定
+    static int64_t DURATION_THRESHOLD; // 多指静态手势识别中，多个指头按下的时候各个手指按下事件的时差阈值
+    static double ANGLE_THRESHOLD; // 多指手势中，多个指头按下点位之间的角度阈值
+
+public:
     KeyCommandHandler() = default;
     DISALLOW_COPY_AND_MOVE(KeyCommandHandler);
     ~KeyCommandHandler() override = default;
@@ -146,12 +155,14 @@ private:
 private:
     ShortcutKey lastMatchedKey_;
     std::map<std::string, ShortcutKey> shortcutKeys_;
-    std::map<std::string, TouchGesture> touchGestures_;
+    std::map<std::string, TouchGesture> touchGestures_; // 解析得到的手势
     std::vector<Sequence> sequences_;
     std::vector<Sequence> filterSequences_;
     std::vector<SequenceKey> keys_;
     bool isParseConfig_ { false };
-    bool isTouchGestureCfgParsed_ { false };
+    bool isTouchGestureParsed_ { false }; // 手势配置文件是否解析完成
+    std::set<std::shared_ptr<PointerEvent>> downPointerEvents_; // 当前有效按下事件
+    std::map<int32_t, std::shared_ptr<PointerEvent>> curDownPointers_; // key 为 pointerId, value 为对应当前按下的事件
     std::map<int32_t, int32_t> specialKeys_;
     std::map<int32_t, std::list<int32_t>> specialTimers_;
 };
