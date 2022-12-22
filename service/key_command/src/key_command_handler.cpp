@@ -546,6 +546,104 @@ bool ParseSequences(const JsonParser& parser, std::vector<Sequence>& sequenceVec
     }
     return true;
 }
+
+bool GetPointerNum(const cJSON* jsonData, int &pointerNum)
+{
+    if (!cJSON_IsObject(jsonData)) {
+        MMI_HILOGE("jsonData is not object");
+        return false;
+    }
+    cJSON *valueJson = cJSON_GetObjectItemCaseSensitive(jsonData, "pointerNum");
+    if (!cJSON_IsNumber(valueJson)) {
+        MMI_HILOGE("pointerNumObj must be number");
+        return false;
+    }
+    pointerNum = valueJson->valueint;
+    return true;
+}
+
+bool GetDuration(const cJSON* jsonData, int &duration)
+{
+    if (!cJSON_IsObject(jsonData)) {
+        MMI_HILOGE("jsonData is not object");
+        return false;
+    }
+    cJSON *valueJson = cJSON_GetObjectItemCaseSensitive(jsonData, "duration");
+    if (!cJSON_IsNumber(valueJson)) {
+        MMI_HILOGE("durationObj must be number");
+        return false;
+    }
+    duration = valueJson->valueint;
+    return true;
+}
+
+bool ConvertToTouchGesture(const cJSON* jsonData, TouchGesture &touchGesture)
+{
+    if (!cJSON_IsObject(jsonData)) {
+        MMI_HILOGE("jsonData is not object");
+        return false;
+    }
+    if (!GetPointerNum(jsonData, touchGesture.pointerNum)) {
+        MMI_HILOGE("Get pointerNum failed");
+        return false;
+    }
+    if (!GetDuration(jsonData, touchGesture.duration)) {
+        std::cout << "Get duration failed");
+        return false;
+    }
+    if (!GetTrigger(jsonData, touchGesture.triggerType)) {
+        MMI_HILOGE("Get trigger failed");
+        return false;
+    }
+    cJSON *ability = cJSON_GetObjectItemCaseSensitive(jsonData, "ability");
+    if (!cJSON_IsObject(ability)) {
+        MMI_HILOGE("ability is not object");
+        return false;
+    }
+    if (!PackageAbility(ability, touchGesture.ability)) {
+        MMI_HILOGE("Package ability failed");
+        return false;
+    }
+    return true;
+}
+
+std::string GenerateKey(const TouchGesture& touchGesture)
+{
+    int32_t pointerNum = touchGesture.pointerNum;
+    std::stringstream ss;
+    ss << "pointerNum: " << touchGesture.pointerNum << ", "
+          "duration: " << touchGesture.duration << ", "
+          "triggerType: " << touchGesture.triggerType;
+    return ss.str();
+}
+
+bool ParseTouchGesture(cJSON* touchGestures, std::map<std::string, TouchGesture>& touchGestureMemo)
+{
+    if (!cJSON_IsArray(touchGestures)) {
+        MMI_HILOGE("touchGestures is not array");
+        return false;
+    }
+    int32_t touchGesturesSize = cJSON_GetArraySize(touchGestures);
+    for (int32_t i = 0; i < touchGesturesSize; ++i) {
+        TouchGesture gesture;
+        cJSON *touchGesture = cJSON_GetArrayItem(touchGestures, i);
+        if (!cJSON_IsObject(touchGesture)) {
+            continue;
+        }
+        if (!ConvertToTouchGesture(touchGesture, gesture)) {
+            continue;
+        }
+        gesture.Print();
+        std::string key = GenerateKey(gesture);
+        if (touchGestureMemo.find(key) == touchGestureMemo.end()) {
+            touchGestureMemo[key] = gesture;
+        } else {
+            MMI_HILOGE("duplicate touchGesture");
+        }
+    }
+    return true;
+}
+
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -575,6 +673,11 @@ void KeyCommandHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> p
 void KeyCommandHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
+    if (OnHandleEvent(pointerEvent)) {
+        MMI_HILOGD("The pointerEvent start launch an ability, keyCode:%{public}d", pointerEvent->GetKeyCode());
+        BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_LAUNCH_EVENT);
+        return;
+    }
     CHKPV(nextHandler_);
     nextHandler_->HandleTouchEvent(pointerEvent);
 }
@@ -746,6 +849,39 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
     }
     return false;
 }
+
+bool OnHandleEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    int32_t pointerAction = pointerEvent->GetPointerAction();
+    switch (pointerAction) {
+        case pointerEvent::POINTER_ACTION_DOWN: {
+            if (!HandleActionDown(pointerEvent)) {
+                MMI_HILOGE("HandleActionDown failed");
+                return false;
+            }
+            break;
+        }
+        case pointerEvent::POINTER_ACTION_MOVE: {
+            if (!HandleActionMove(pointerEvent)) {
+                MMI_HILOGE("HandleActionMove failed");
+                return false;
+            }
+            break;
+        }
+        case pointerEvent::POINTER_ACTION_UP: { // 一旦有按下的手指抬起
+            if (!HandleActionUp(pointerEvent)) {
+                MMI_HILOGE("HandleActionUp failed");
+                return false;
+            }
+            break;
+        }
+        default: {
+            MMI_HILOGE("Unsupported action type");
+        }
+    }
+    return true;
+}
+
 
 bool KeyCommandHandler::IsRepeatKeyEvent(const SequenceKey &sequenceKey)
 {
@@ -1033,6 +1169,11 @@ void ShortcutKey::Print() const
         finalKey, ability.bundleName.c_str());
 }
 
+void TouchGesture::Print() const{
+    MMI_HILOGI("TouchGesture matched, pointerNum:%{public}d, duration:%{public}d", pointerNum, duration);
+    MMI_HILOGD("EventTouch matched, bundleName:%{public}s", ability.bundleName.c_str());
+}
+
 void KeyCommandHandler::RemoveSubscribedTimer(int32_t keyCode)
 {
     CALL_DEBUG_ENTER;
@@ -1077,6 +1218,83 @@ void KeyCommandHandler::InterruptTimers()
             item.timerId = -1;
         }
     }
+}
+
+bool HandleTouchGestures(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+
+}
+
+bool HandleActionDown(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+
+}
+
+bool HandleActionMove(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+
+}
+
+bool HandleActionUp(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+
+}
+
+bool CheckLocation(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+
+}
+
+bool CheckDuration(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+
+}
+
+bool CheckAngle(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+
+}
+
+bool CheckMovement(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+
+}
+
+bool IsGestureMatch(const TouchGesture &touchGesture, const std::shared_ptr<PointerEvent> pointerEvent)
+{
+
+}
+
+void KeyCommandHandler::LaunchAbility(const TouchGesture &gesture)
+{
+    CALL_INFO_TRACE;
+    AAFwk::Want want;
+    want.SetElementName(gesture.ability.deviceId, gesture.ability.bundleName, gesture.ability.abilityName);
+    want.SetAction(gesture.ability.action);
+    want.SetUri(gesture.ability.uri);
+    want.SetType(gesture.ability.uri);
+    for (const auto &entity : gesture.ability.entities) {
+        want.AddEntity(entity);
+    }
+    for (const auto &item : gesture.ability.params) {
+        want.SetParam(item.first, item.second);
+    }
+    // 暂时不知道这俩函数的用途
+    // DfxHisysevent::CalcComboStartTimes(lastMatchedKey_.keyDownDuration);
+    // DfxHisysevent::ReportComboStartTimes();
+    MMI_HILOGD("Start launch ability, bundleName:%{public}s", gesture.ability.bundleName.c_str());
+    ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
+    if (err != ERR_OK) {
+        MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", gesture.ability.bundleName.c_str(), err);
+    }
+    // 静态手势拉起Ability的功能需要实现一个类似的函数用于恢复相关数据结构
+    // ResetLastMatchedKey();
+    MMI_HILOGD("End launch ability, bundleName:%{public}s", gesture.ability.bundleName.c_str());
+}
+
+bool ResetPointers()
+{
+
 }
 } // namespace MMI
 } // namespace OHOS

@@ -73,6 +73,14 @@ struct Sequence {
     Ability ability;
 };
 
+struct TouchGesture {
+    int64_t duration { 0 };
+    int32_t pointerNum { 0 };
+    int32_t triggerType { 0 }; // 暂时还没用起来
+    int32_t timerId { -1 };
+    Ability ability;
+    void Print() const
+};
 class KeyCommandHandler final : public IInputEventHandler {
 public:
     KeyCommandHandler() = default;
@@ -88,6 +96,7 @@ public:
     void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
     bool OnHandleEvent(const std::shared_ptr<KeyEvent> keyEvent);
+    bool OnHandleEvent(const std::shared_ptr<PointerEvent> pointerEvent);
 private:
     void Print();
     void PrintSeq();
@@ -107,6 +116,19 @@ private:
     void RemoveSubscribedTimer(int32_t keyCode);
     void HandleSpecialKeys(int32_t keyCode, int32_t keyAction);
     void InterruptTimers();
+    bool HandleTouchGestures(const std::shared_ptr<PointerEvent> pointerEvent);
+    bool HandleActionDown(const std::shared_ptr<PointerEvent> pointerEvent);
+    bool HandleActionMove(const std::shared_ptr<PointerEvent> pointerEvent);
+    bool HandleActionUp(const std::shared_ptr<PointerEvent> pointerEvent);
+    bool CheckLocation(const std::shared_ptr<PointerEvent> pointerEvent);
+    bool CheckDuration(const std::shared_ptr<PointerEvent> pointerEvent);
+    bool CheckAngle(const std::shared_ptr<PointerEvent> pointerEvent);
+    bool CheckMovement(const std::shared_ptr<PointerEvent> pointerEvent);
+    bool IsGestureMatch(const TouchGesture &touchGesture, const std::shared_ptr<PointerEvent> pointerEvent);
+    void LaunchAbility(const TouchGesture& gesture);
+    bool ResetPointers();
+
+
     void ResetLastMatchedKey()
     {
         lastMatchedKey_.preKeys.clear();
@@ -124,10 +146,12 @@ private:
 private:
     ShortcutKey lastMatchedKey_;
     std::map<std::string, ShortcutKey> shortcutKeys_;
+    std::map<std::string, TouchGesture> touchGestures_;
     std::vector<Sequence> sequences_;
     std::vector<Sequence> filterSequences_;
     std::vector<SequenceKey> keys_;
     bool isParseConfig_ { false };
+    bool isTouchGestureCfgParsed_ { false };
     std::map<int32_t, int32_t> specialKeys_;
     std::map<int32_t, std::list<int32_t>> specialTimers_;
 };
