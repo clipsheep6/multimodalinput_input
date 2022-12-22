@@ -50,6 +50,9 @@ int32_t ParseInputDevice(MessageParcel &reply, std::shared_ptr<InputDevice> &inp
     std::string uniq;
     READSTRING(reply, uniq, IPC_PROXY_DEAD_OBJECT_ERR);
     inputDevice->SetUniq(uniq);
+    uint64_t caps;
+    READUINT64(reply, caps, IPC_PROXY_DEAD_OBJECT_ERR);
+    inputDevice->SetCapabilities(static_cast<unsigned long>(caps));
 
     uint32_t size;
     READUINT32(reply, size, IPC_PROXY_DEAD_OBJECT_ERR);
@@ -674,6 +677,61 @@ int32_t MultimodalInputConnectProxy::SetAnrObserver()
     int32_t ret = remote->SendRequest(SET_ANR_OBSERVER, data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::GetDisplayBindInfo(DisplayBindInfos &infos)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(GET_DISPLAY_BIND_INFO, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return ret;
+    }
+    int32_t size = 0;
+    READINT32(reply, size, ERR_INVALID_VALUE);
+    infos.reserve(size);
+    for (int32_t i = 0; i < size; ++i) {
+        DisplayBindInfo info;
+        READINT32(reply, info.inputDeviceId, ERR_INVALID_VALUE);
+        READSTRING(reply, info.inputDeviceName, ERR_INVALID_VALUE);
+        READINT32(reply, info.displayId, ERR_INVALID_VALUE);
+        READSTRING(reply, info.displayName, ERR_INVALID_VALUE);
+        infos.push_back(info);
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+
+    WRITEINT32(data, deviceId, ERR_INVALID_VALUE);
+    WRITEINT32(data, displayId, ERR_INVALID_VALUE);
+
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(SET_DISPLAY_BIND, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request fail, result:%{public}d", ret);
         return ret;
     }
     return RET_OK;
