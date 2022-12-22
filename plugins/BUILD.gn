@@ -49,7 +49,7 @@ ohos_shared_library("input_touch_2_key_handler") {
     "hiviewdfx_hilog_native:libhilog"
   ]
 
-  relative_install_dir = "module/multimodalinput/plugins"
+  relative_install_dir = "module/multimodalinput/plugins/event_handler"
   subsystem_name = "multimodalinput"
   part_name = "input"
 }

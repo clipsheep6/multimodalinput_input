@@ -27,20 +27,15 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "EventPluginsHandler"};
-const std::string INPUT_EVENT_HANDLER_PLUGIN_HOME = "/system/lib/module/multimodalinput/plugins/";
+const std::string INPUT_EVENT_HANDLER_PLUGIN_HOME = "/system/lib/module/multimodalinput/plugins/event_handler/";
 
 int32_t max { 0 };
 int32_t avg { 0 };
-int32_t memMax { 0 };
-int32_t memAvg { 0 };
 #define TIMEING_OUT_MS 3000
 #define TIME_OUT_MAX 500
 #define TIME_OUT_INVALID 0
-#define MEX_MAX 40
-#define MEM_INVALID 0
 
 std::map<std::shared_ptr<IInputEventHandler>, int32_t> timeOutPlugin;
-std::map<std::shared_ptr<IInputEventHandler>, int32_t> memPlugin;
 
 bool CheckFileExtendName(const std::string &filePath, const std::string &checkExtension)
 {
@@ -166,7 +161,6 @@ void InputEventHandlerPluginMgr::DelPlugin(std::shared_ptr<IInputEventHandler> p
     for (auto &item : pluginInfoList) {
         if (item.second.pluginHandler == pluginHandler) {
             timeOutPlugin.erase(pluginHandler);
-            memPlugin.erase(pluginHandler);
             UnloadPlugin(item.first);
             return;
         }
@@ -211,10 +205,9 @@ void InputEventHandlerPluginMgr::OnTimer()
 {
     auto timeout = GetSysClockTime() + TIMEING_OUT_MS;
     for (auto &item: context_) {
-        item->OnReport(max, avg, memMax, memAvg);
+        item->OnReport(max, avg);
         if (timeOutPlugin.find(item->GetEventHandler()) == timeOutPlugin.end()) {
             timeOutPlugin[item->GetEventHandler()] = 0;
-            memPlugin[item->GetEventHandler()] = 0;
         }
         if (max > TIME_OUT_MAX) {
             timeOutPlugin[item->GetEventHandler()] = timeOutPlugin[item->GetEventHandler()] + 1;
@@ -225,18 +218,6 @@ void InputEventHandlerPluginMgr::OnTimer()
         } else {
             if (max > TIME_OUT_INVALID) {
                 timeOutPlugin[item->GetEventHandler()] = 0;
-            }
-        }
-
-        if (memMax > MEX_MAX) {
-            memPlugin[item->GetEventHandler()] = memPlugin[item->GetEventHandler()] + 1;
-            if (memPlugin[item->GetEventHandler()] > 5) {
-                DelPlugin(item->GetEventHandler());
-                return;
-            }
-        } else {
-            if (memMax > MEM_INVALID) {
-                memPlugin[item->GetEventHandler()] = 0;
             }
         }
         if (timeout > GetSysClockTime()) {

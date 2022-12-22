@@ -12,37 +12,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <fstream>
-#include<regex>
+
 #include "plugin_context.h"
+
+#include <fstream>
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "PluginContext"};
+// constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "PluginContext"};
 int32_t max_ { 0 };
 int32_t raw_ { 0 };
 int64_t sum_ { 0 };
 int32_t times_ { 0 };
-
-int32_t memMax_ { 0 };
-int32_t memSum_ { 0 };
-int32_t count_ { 0 };
-int32_t rss_ { 0 };
-int32_t pss_ { 0 };
-int32_t dirty_ { 0 };
-int32_t swap_ { 0 };
-int32_t size_ { 0 };
-
-int32_t GetNum(std::string str)
-{
-    std::smatch match;
-    bool isNumber = std::regex_search(str, match, std::regex("\\d+"));
-    if (!isNumber) {
-        MMI_HILOGE("No numbers found");
-        return 0;
-    }
-    return stoi(match[0]);
-}
 } // namespace
 
 void PluginContext::SetEventHandler(std::shared_ptr<IInputEventHandler> handler)
@@ -68,15 +50,10 @@ void PluginContext::TimeStat(TimeStatFlag flag)
     }
 }
 
-void PluginContext::OnReport(int32_t &max, int32_t &avg, int32_t &memMax, int32_t &memAvg)
+void PluginContext::OnReport(int32_t &max, int32_t &avg)
 {
     max = max_;
     avg = sum_ / times_;
-    memMax = memMax_;
-    memAvg = memSum_ / count_;
-    memMax_ = 0;
-    memSum_ = 0;
-    count_ = 0;
     max_ = 0;
     sum_ = 0;
     times_  = 0;
@@ -95,48 +72,6 @@ void PluginContext::StatBegin()
 void PluginContext::StatEnd()
 {
     TimeStat(TimeStatFlag::END);
-}
-
-void PluginContext::ChengMem()
-{
-    std::string strPid = std::to_string(GetPid());
-    std::string path = "/proc/" + strPid +"/smaps";
-    std::ifstream mem(path);
-    if (!mem.is_open()) {
-        MMI_HILOGE("Failed to open config file");
-        return;
-    }
-    std::string tmp;
-    bool dataStatus = false;
-    while (std::getline(mem, tmp)) {
-        if (tmp.find(pluginName_) != std::string::npos) {
-            dataStatus = true;
-        }
-        if (dataStatus) {
-            if (tmp.find("Size") != std::string::npos) {
-                size_ += GetNum(tmp);
-            } else if (tmp.find("Rss") != std::string::npos) {
-                rss_ += GetNum(tmp);
-            } else if (tmp.find("Pss") != std::string::npos) {
-                pss_ += GetNum(tmp);
-            } else if (tmp.find("Private_Dirty") != std::string::npos) {
-                dirty_ += GetNum(tmp);
-            } else if (tmp.find("Swap") != std::string::npos) {
-                swap_ += GetNum(tmp);
-            } else if (tmp.find("VmFlags") != std::string::npos) {
-                dataStatus = false;
-            } else {}
-        }
-    }
-    mem.close();
-    memMax_ = std::max(dirty_, memMax_);
-    memSum_ += dirty_;
-    count_++;
-    rss_ = 0;
-    size_ = 0;
-    pss_ = 0;
-    dirty_ = 0;
-    swap_ = 0;
 }
 } // namespace MMI
 } // namespace OHOS

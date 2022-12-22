@@ -36,8 +36,7 @@ public:
     virtual void StatBegin() = 0;
     virtual void StatEnd() = 0;
     virtual void TimeStat(TimeStatFlag flag) = 0;
-    virtual void OnReport(int32_t &max, int32_t &avg, int32_t &memMax, int32_t &memAvg) = 0;
-    virtual void ChengMem() = 0;
+    virtual void OnReport(int32_t &max, int32_t &avg) = 0;
     std::shared_ptr<IInputDeviceManager> inputDeviceMgr_;
     std::string pluginName_;
 };

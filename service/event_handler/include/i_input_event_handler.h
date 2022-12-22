@@ -49,7 +49,7 @@ public:
 
 protected:
     std::shared_ptr<IInputEventHandler> nextHandler_ { nullptr };
-    // 数字越小， 优先级越高， 内嵌的handler类型优先级为0
+    // 数字越小， 优先级越高
     const int32_t handlerPriority_;
 };
 } // namespace MMI
