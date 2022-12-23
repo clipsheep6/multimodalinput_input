@@ -12,12 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef INPUT_WINDOW_TRANSFER_H
 #define INPUT_WINDOW_TRANSFER_H
 
 #include "nocopyable.h"
 
-#include "display_info.h"
+#include "window_info.h"
 #include "i_input_event_consumer.h"
 #include "i_mmi_client.h"
 
@@ -28,7 +29,8 @@ public:
     InputWindowTransfer() = default;
     DISALLOW_MOVE(InputWindowTransfer);
     ~InputWindowTransfer() = default;
-    void SetMMIClient(MMIClientPtr &client);
+    int32_t GetDisplayBindInfo(DisplayBindInfos &infos);
+    int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
     void OnConnected();
     void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
@@ -60,12 +62,11 @@ private:
     void HandlerPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer,
         std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-    void OnDispatchEventProcessed(int32_t eventId);
+    void OnDispatchEventProcessed(int32_t eventId, int64_t actionTime);
 private:
-    MMIClientPtr client_ { nullptr };
     std::mutex mtx_;
     DisplayGroupInfo displayGroupInfo_ {};
-    std::function<void(int32_t)> dispatchCallback_ { nullptr };
+    std::function<void(int32_t, int64_t)> dispatchCallback_ { nullptr };
     std::shared_ptr<IInputEventConsumer> consumer_ { nullptr };
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ { nullptr };
 };

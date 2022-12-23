@@ -26,6 +26,7 @@ ohos_prebuilt_etc("mmi_device_config.ini") {
 config("libmmi_server_config") {
   include_dirs = [
     "input_device_cooperate/include",
+    "device_config/include",
     "device_manager/include",
     "device_scalability/include",
     "delegate_task/include",
@@ -54,7 +55,6 @@ config("libmmi_server_config") {
     "//foundation/multimodalinput/interfaces/native/innerkits/event/include",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/include",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/src",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/util/socket/include",
     "//foundation/multimodalinput/input/util/network/include",
@@ -85,6 +85,7 @@ ohos_shared_library("libmmi-server") {
   sources = [
     "//foundation/multimodalinput/input/frameworks/proxy/dfx/src/bytrace_adapter.cpp",
     "delegate_task/src/delegate_tasks.cpp",
+    "device_config/src/device_config_file_parser.cpp",
     "device_manager/src/input_device_manager.cpp",
     "dfx/src/dfx_hisysevent.cpp",
     "event_dispatch/src/event_dispatch_handler.cpp",
@@ -101,6 +102,7 @@ ohos_shared_library("libmmi-server") {
     "module_loader/src/uds_server.cpp",
     "permission_helper/src/permission_helper.cpp",
     "timer_manager/src/timer_manager.cpp",
+    "window_manager/src/input_display_bind_helper.cpp",
     "window_manager/src/input_windows_manager.cpp",
   ]
 
@@ -137,6 +139,7 @@ ohos_shared_library("libmmi-server") {
       sources += [
         "mouse_event_normalize/src/mouse_device_state.cpp",
         "mouse_event_normalize/src/mouse_event_normalize.cpp",
+        "mouse_event_normalize/src/mouse_transform_processor.cpp",
         "touch_event_normalize/src/gesture_transform_processor.cpp",
         "touch_event_normalize/src/touchpad_transform_processor.cpp",
       ]
@@ -241,7 +244,6 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/frameworks/proxy/event_handle/include",
     "${mmi_path}/frameworks/proxy/module_loader",
     "${mmi_path}/frameworks/proxy/module_loader/include",
-    "${mmi_path}/interfaces/native/innerkits/common/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "${mmi_path}/service/include",
@@ -262,6 +264,7 @@ ohos_unittest("ut-mmi-service-out") {
   sources = [
     "event_dispatch/test/event_dispatch_test.cpp",
     "module_loader/test/uds_server_test.cpp",
+    "window_manager/test/input_display_bind_helper_test.cpp",
     "window_manager/test/input_windows_manager_test.cpp",
   ]
 
@@ -287,7 +290,6 @@ ohos_unittest("ut-mmi-service-out") {
 ohos_unittest("TransformPointTest") {
   module_out_path = module_output_path
   include_dirs = [
-    "${mmi_path}/interfaces/native/innerkits/common/include",
     "${mmi_path}/util/common/include",
     "${mmi_path}/tools/vuinput/include",
   ]

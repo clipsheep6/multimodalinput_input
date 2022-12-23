@@ -211,30 +211,6 @@ int32_t InputKeySubscriber::HandlerUnsubscribeKeyEvent(int32_t subscribeId)
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
-bool InputKeySubscriber::GetFunctionKeyState(int32_t funcKey)
-{
-    CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mtx_);
-    bool state { false };
-    int32_t ret = MultimodalInputConnMgr->GetFunctionKeyState(funcKey, state);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
-    }
-    return state;
-}
-
-int32_t InputKeySubscriber::SetFunctionKeyState(int32_t funcKey, bool enable)
-{
-    CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mtx_);
-    int32_t ret = MultimodalInputConnMgr->SetFunctionKeyState(funcKey, enable);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
-        return RET_ERR;
-    }
-    return RET_OK;
-}
-
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t InputKeySubscriber::OnSubscribeKeyEventCallback(NetPacket &pkt)
 {

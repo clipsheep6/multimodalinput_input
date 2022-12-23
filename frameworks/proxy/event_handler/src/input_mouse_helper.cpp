@@ -123,5 +123,27 @@ void InputMouseHelper::SetPointerLocation(int32_t x, int32_t y)
         MMI_HILOGE("Set Pointer Location failed, ret:%{public}d", ret);
     }
 }
+
+int32_t InputMouseHelper::EnterCaptureMode(int32_t windowId)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->SetMouseCaptureMode(windowId, true);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Enter capture mode failed");
+    }
+    return ret;
+}
+
+int32_t InputMouseHelper::LeaveCaptureMode(int32_t windowId)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->SetMouseCaptureMode(windowId, false);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Leave capture mode failed");
+    }
+    return ret;
+}
 } // namespace MMI
 } // namespace OHOS

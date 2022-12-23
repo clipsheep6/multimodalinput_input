@@ -20,7 +20,6 @@ config("libmmi_client_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
     "binder_proxy/include",
@@ -33,7 +32,6 @@ config("libmmi_client_config") {
 config("libmmi_public_client_config") {
   include_dirs = [
     "//base/notification/eventhandler/interfaces/inner_api",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
@@ -45,7 +43,6 @@ config("libmmi_test_util") {
   include_dirs = [
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_path}/frameworks/proxy/module_loader/include",
-    "${mmi_path}/interfaces/native/innerkits/common/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/test/unittest/common/include",
     "${mmi_path}/util/network/include",

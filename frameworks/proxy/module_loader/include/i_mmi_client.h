@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef I_MMI_CLIENT_H
 #define I_MMI_CLIENT_H
 
@@ -43,6 +44,7 @@ public:
     virtual void SetEventHandler(EventHandlerPtr eventHandler) = 0;
     virtual void MarkIsEventHandlerChanged(EventHandlerPtr eventHandler) = 0;
     virtual bool IsEventHandlerChanged() = 0;
+    virtual EventHandlerPtr GetEventHandler() = 0;
 };
 } // namespace MMI
 } // namespace OHOS

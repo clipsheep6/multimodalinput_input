@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef OHOS_INPUT_DEVICE_EVENT_H
 #define OHOS_INPUT_DEVICE_EVENT_H
 
@@ -49,6 +50,8 @@ public:
     int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> keyCodes, FunInputDevKeys callback);
     int32_t GetKeyboardType(int32_t deviceId, FunKeyboardTypes callback);
     int32_t OnDevListener(NetPacket& pkt);
+    bool GetFunctionKeyState(int32_t funcKey);
+    int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
 
 private:
     void HandlerDevListener(int32_t deviceId, const std::string &type);

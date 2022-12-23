@@ -176,5 +176,29 @@ void InputDeviceImpl::HandlerDevListener(int32_t deviceId, const std::string &ty
         item->OnDeviceRemoved(deviceId, type);
     }
 }
+
+bool InputDeviceImpl::GetFunctionKeyState(int32_t funcKey)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    bool state { false };
+    int32_t ret = MultimodalInputConnMgr->GetFunctionKeyState(funcKey, state);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
+    }
+    return state;
+}
+
+int32_t InputDeviceImpl::SetFunctionKeyState(int32_t funcKey, bool enable)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->SetFunctionKeyState(funcKey, enable);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

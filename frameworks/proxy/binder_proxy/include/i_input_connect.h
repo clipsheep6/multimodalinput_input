@@ -25,6 +25,7 @@
 #include "key_option.h"
 #include "pointer_event.h"
 #include "system_ability_definition.h"
+#include "window_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -35,6 +36,7 @@ public:
         ADD_INPUT_EVENT_FILTER = 1,
         SET_POINTER_VISIBLE = 2,
         IS_POINTER_VISIBLE = 3,
+        MARK_PROCESSED = 4,
         SUBSCRIBE_KEY_EVENT = 6,
         UNSUBSCRIBE_KEY_EVENT = 7,
         ADD_INTERCEPTOR_HANDLER = 8,
@@ -65,6 +67,9 @@ public:
         START_INPUT_DEVICE_COOPERATE = 33,
         STOP_DEVICE_COOPERATE = 34,
         GET_INPUT_DEVICE_COOPERATE_STATE = 35,
+        SET_CAPTURE_MODE = 36,
+        GET_DISPLAY_BIND_INFO = 37,
+        SET_DISPLAY_BIND = 38,
         SET_INPUT_DEVICE_TO_SCREEN = 50,
         SET_POINTER_LOCATION = 51,
     };
@@ -82,6 +87,7 @@ public:
     virtual int32_t RemoveInputEventFilter(int32_t filterId) = 0;
     virtual int32_t SetPointerVisible(bool visible) = 0;
     virtual int32_t IsPointerVisible(bool &visible) = 0;
+    virtual int32_t MarkProcessed(int32_t eventType, int32_t eventId) = 0;
     virtual int32_t SetPointerSpeed(int32_t speed) = 0;
     virtual int32_t GetPointerSpeed(int32_t &speed) = 0;
     virtual int32_t SetPointerStyle(int32_t windowId, int32_t pointerStyle) = 0;
@@ -114,6 +120,9 @@ public:
     virtual int32_t GetFunctionKeyState(int32_t funckey, bool &state) = 0;
     virtual int32_t SetFunctionKeyState(int32_t funcKey, bool enable) = 0;
     virtual int32_t SetPointerLocation(int32_t x, int32_t y) = 0;
+    virtual int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode) = 0;
+    virtual int32_t GetDisplayBindInfo(DisplayBindInfos &infos) = 0;
+    virtual int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

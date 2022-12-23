@@ -132,10 +132,18 @@ void InputManagerImpl::InitMsgCallback()
             continue;
         }
     }
-#ifdef OHOS_BUILD_ENABLE_MONITOR
-    inputMonitor_.SetMMIClient(client_);
-#endif // OHOS_BUILD_ENABLE_MONITOR
-    windowTransfer_.SetMMIClient(client_);
+}
+
+int32_t InputManagerImpl::GetDisplayBindInfo(DisplayBindInfos &infos)
+{
+    CALL_DEBUG_ENTER;
+    return windowTransfer_.GetDisplayBindInfo(infos);
+}
+
+int32_t InputManagerImpl::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
+{
+    CALL_DEBUG_ENTER;
+    return windowTransfer_.SetDisplayBind(deviceId, displayId, msg);
 }
 
 void InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
@@ -276,7 +284,7 @@ void InputManagerImpl::RemoveMonitor(int32_t monitorId)
 
 void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     if (!InitClient()) {
         MMI_HILOGE("Client init failed");
@@ -349,7 +357,7 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
 
 void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPV(keyEvent);
     inputInjector_.InjectKeyEvent(keyEvent);
@@ -360,7 +368,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 
 void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     CHKPV(pointerEvent);
     inputInjector_.InjectPointerEvent(pointerEvent);
@@ -628,9 +636,9 @@ int32_t InputManagerImpl::GetInputDeviceCooperateState(const std::string &device
 
 bool InputManagerImpl::GetFunctionKeyState(int32_t funcKey)
 {
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CALL_DEBUG_ENTER;
-    return keySubscriber_.GetFunctionKeyState(funcKey);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    return inputDeviceImpl_.GetFunctionKeyState(funcKey);
 #else
     MMI_HILOGW("Keyboard device does not support");
     return false;
@@ -639,9 +647,9 @@ bool InputManagerImpl::GetFunctionKeyState(int32_t funcKey)
 
 int32_t InputManagerImpl::SetFunctionKeyState(int32_t funcKey, bool enable)
 {
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CALL_DEBUG_ENTER;
-    return keySubscriber_.SetFunctionKeyState(funcKey, enable);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    return inputDeviceImpl_.SetFunctionKeyState(funcKey, enable);
 #else
     MMI_HILOGW("Keyboard device does not support");
     return ERROR_UNSUPPORT;
@@ -656,6 +664,45 @@ void InputManagerImpl::SetPointerLocation(int32_t x, int32_t y)
 #else
     MMI_HILOGW("Pointer device or pointer drawing module does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+}
+
+int32_t InputManagerImpl::EnterCaptureMode(int32_t windowId)
+{
+    CALL_DEBUG_ENTER;
+#if defined(OHOS_BUILD_ENABLE_POINTER)
+    return mouseHelper_.EnterCaptureMode(windowId);
+#else
+    MMI_HILOGW("Pointer device module does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+int32_t InputManagerImpl::LeaveCaptureMode(int32_t windowId)
+{
+    CALL_DEBUG_ENTER;
+#if defined(OHOS_BUILD_ENABLE_POINTER)
+    return mouseHelper_.LeaveCaptureMode(windowId);
+#else
+    MMI_HILOGW("Pointer device module does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+MMIClientPtr InputManagerImpl::GetMMIClient() const
+{
+    CHKPP(client_);
+    return client_;
+}
+
+AnrCollecter& InputManagerImpl::GetAnrCollecter()
+{
+    return anrCollecter_;
+}
+
+EventHandlerPtr InputManagerImpl::GetEventHandler() const
+{
+    CHKPP(client_);
+    return client_->GetEventHandler();
 }
 } // namespace MMI
 } // namespace OHOS

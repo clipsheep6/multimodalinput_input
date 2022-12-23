@@ -19,7 +19,6 @@
 #include <csignal>
 #include <parameters.h>
 #include <sys/signalfd.h>
-#include "dfx_hisysevent.h"
 #ifdef OHOS_RSS_CLIENT
 #include <unordered_map>
 #endif
@@ -28,6 +27,7 @@
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include "cooperate_event_manager.h"
 #endif // OHOS_BUILD_ENABLE_COOPERATE
+#include "dfx_hisysevent.h"
 #include "event_dump.h"
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_cooperate_sm.h"
@@ -37,19 +37,19 @@
 #include "input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "key_map_manager.h"
-#include "mmi_log.h"
+#include "permission_helper.h"
 #include "string_ex.h"
-#include "util_ex.h"
-#include "util_napi_error.h"
 #ifdef OHOS_RSS_CLIENT
 #include "res_sched_client.h"
 #include "res_type.h"
 #include "system_ability_definition.h"
 #endif
-#include "permission_helper.h"
+
+#include "mmi_log.h"
 #include "timer_manager.h"
-#include "input_device_manager.h"
 #include "util.h"
+#include "util_ex.h"
+#include "util_napi_error.h"
 #include "xcollie/watchdog.h"
 
 namespace OHOS {
@@ -452,6 +452,18 @@ int32_t MMIService::IsPointerVisible(bool &visible)
     return RET_OK;
 }
 
+int32_t MMIService::MarkProcessed(int32_t eventType, int32_t eventId)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&ANRManager::MarkProcessed, ANRMgr, GetCallingPid(), eventType, eventId));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Mark event processed failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 int32_t MMIService::SetPointerSpeed(int32_t speed)
 {
     CALL_DEBUG_ENTER;
@@ -766,7 +778,7 @@ int32_t MMIService::CheckMarkConsumed(int32_t pid, int32_t eventId)
 
 int32_t MMIService::MarkEventConsumed(int32_t eventId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -795,7 +807,7 @@ int32_t MMIService::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
 
 int32_t MMIService::InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&MMIService::CheckInjectKeyEvent, this, keyEvent));
@@ -825,7 +837,7 @@ int32_t MMIService::CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> 
 
 int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&MMIService::CheckInjectPointerEvent, this, pointerEvent));
@@ -1001,7 +1013,7 @@ void MMIService::OnThread()
 bool MMIService::InitSignalHandler()
 {
     CALL_DEBUG_ENTER;
-    sigset_t mask = {0};
+    sigset_t mask = { 0 };
     int32_t retCode = sigfillset(&mask);
     if (retCode < 0) {
         MMI_HILOGE("Fill signal set failed:%{public}d", errno);
@@ -1319,5 +1331,39 @@ int32_t MMIService::OnGetInputDeviceCooperateState(int32_t pid, int32_t userData
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_COOPERATE
+
+int32_t MMIService::SetMouseCaptureMode(int32_t windowId, bool isCaptureMode)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = WinMgr->SetMouseCaptureMode(windowId, isCaptureMode);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set capture failed,return %{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MMIService::GetDisplayBindInfo(DisplayBindInfos &infos)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&InputWindowsManager::GetDisplayBindInfo, WinMgr, std::ref(infos)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetDisplayBindInfo pid failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&InputWindowsManager::SetDisplayBind, WinMgr, deviceId, displayId, std::ref(msg)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("SetDisplayBind pid failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;    
+}
 } // namespace MMI
 } // namespace OHOS

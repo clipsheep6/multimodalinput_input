@@ -31,6 +31,16 @@ InputManager *InputManager::GetInstance()
     return instance_;
 }
 
+int32_t InputManager::GetDisplayBindInfo(DisplayBindInfos &infos)
+{
+    return InputMgrImpl.GetDisplayBindInfo(infos);
+}
+
+int32_t InputManager::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
+{
+    return InputMgrImpl.SetDisplayBind(deviceId, displayId, msg);
+}
+
 void InputManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
 {
     InputMgrImpl.UpdateDisplayInfo(displayGroupInfo);
@@ -247,6 +257,16 @@ int32_t InputManager::SetFunctionKeyState(int32_t funcKey, bool enable)
 void InputManager::SetPointerLocation(int32_t x, int32_t y)
 {
     InputMgrImpl.SetPointerLocation(x, y);
+}
+
+int32_t InputManager::EnterCaptureMode(int32_t windowId)
+{
+    return InputMgrImpl.EnterCaptureMode(windowId);
+}
+
+int32_t InputManager::LeaveCaptureMode(int32_t windowId)
+{
+    return InputMgrImpl.LeaveCaptureMode(windowId);
 }
 } // namespace MMI
 } // namespace OHOS

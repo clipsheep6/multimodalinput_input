@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef MMI_CLIENT_H
 #define MMI_CLIENT_H
 
@@ -45,6 +46,10 @@ public:
     bool IsEventHandlerChanged() override
     {
         return isEventHandlerChanged_;
+    }
+    EventHandlerPtr GetEventHandler() override
+    {
+        return eventHandler_;
     }
 
 private:

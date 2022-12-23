@@ -15,16 +15,16 @@
 
 #include "input_connect_stub.h"
 
-#include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <unistd.h>
 
 #include "string_ex.h"
 
 #include "error_multimodal.h"
 #include "input_connect_def_parcel.h"
-#include "time_cost_chk.h"
 #include "permission_helper.h"
+#include "time_cost_chk.h"
 
 namespace OHOS {
 namespace MMI {
@@ -53,6 +53,7 @@ int32_t InputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel& data,
         {IInputConnect::SET_POINTER_STYLE, &InputConnectStub::StubSetPointerStyle},
         {IInputConnect::GET_POINTER_STYLE, &InputConnectStub::StubGetPointerStyle},
         {IInputConnect::IS_POINTER_VISIBLE, &InputConnectStub::StubIsPointerVisible},
+        {IInputConnect::MARK_PROCESSED, &InputConnectStub::StubMarkProcessed},
         {IInputConnect::REGISTER_DEV_MONITOR, &InputConnectStub::StubRegisterInputDeviceMonitor},
         {IInputConnect::UNREGISTER_DEV_MONITOR,
             &InputConnectStub::StubUnregisterInputDeviceMonitor},
@@ -87,7 +88,10 @@ int32_t InputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel& data,
         {IInputConnect::SET_INPUT_DEVICE_TO_SCREEN, &InputConnectStub::StubSetInputDevice},
         {IInputConnect::GET_FUNCTION_KEY_STATE, &InputConnectStub::StubGetFunctionKeyState},
         {IInputConnect::SET_FUNCTION_KEY_STATE, &InputConnectStub::StubSetFunctionKeyState},
-        {IInputConnect::SET_POINTER_LOCATION, &InputConnectStub::StubSetPointerLocation}
+        {IInputConnect::SET_POINTER_LOCATION, &InputConnectStub::StubSetPointerLocation},
+        {IInputConnect::SET_CAPTURE_MODE, &InputConnectStub::StubSetMouseCaptureMode},
+        {IInputConnect::GET_DISPLAY_BIND_INFO, &InputConnectStub::StubGetDisplayBindInfo},
+        {IInputConnect::SET_DISPLAY_BIND, &InputConnectStub::StubSetDisplayBind}
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -198,6 +202,24 @@ int32_t InputConnectStub::StubIsPointerVisible(MessageParcel& data, MessageParce
     }
     WRITEBOOL(reply, visible, IPC_STUB_WRITE_PARCEL_ERR);
     MMI_HILOGD("visible:%{public}d,ret:%{public}d,pid:%{public}d", visible, ret, GetCallingPid());
+    return RET_OK;
+}
+
+int32_t InputConnectStub::StubMarkProcessed(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+    }
+    int32_t eventType;
+    READINT32(data, eventType, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t eventId;
+    READINT32(data, eventId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = MarkProcessed(eventType, eventId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("MarkProcessed failed, ret:%{public}d", ret);
+        return ret;
+    }
     return RET_OK;
 }
 
@@ -330,6 +352,7 @@ int32_t InputConnectStub::StubGetDevice(MessageParcel& data, MessageParcel& repl
     WRITEINT32(reply, inputDevice->GetVendor(), IPC_STUB_WRITE_PARCEL_ERR);
     WRITESTRING(reply, inputDevice->GetPhys(), IPC_STUB_WRITE_PARCEL_ERR);
     WRITESTRING(reply, inputDevice->GetUniq(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEUINT64(reply, static_cast<uint64_t>(inputDevice->GetCapabilities()), IPC_STUB_WRITE_PARCEL_ERR);
     WRITEUINT32(reply, static_cast<uint32_t>(inputDevice->GetAxisInfo().size()), IPC_STUB_WRITE_PARCEL_ERR);
     for (const auto &item : inputDevice->GetAxisInfo()) {
         WRITEINT32(reply, item.GetMinimum(), IPC_STUB_WRITE_PARCEL_ERR);
@@ -586,6 +609,7 @@ int32_t InputConnectStub::StubInjectKeyEvent(MessageParcel& data, MessageParcel&
         MMI_HILOGE("Read Key Event failed");
         return IPC_PROXY_DEAD_OBJECT_ERR;
     }
+    event->UpdateId();
     int32_t ret = InjectKeyEvent(event);
     if (ret != RET_OK) {
         MMI_HILOGE("InjectKeyEvent failed, ret:%{public}d", ret);
@@ -852,6 +876,73 @@ int32_t InputConnectStub::StubSetPointerLocation(MessageParcel &data, MessagePar
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetFunctionKeyState failed ret:%{public}d", ret);
     }
+    return ret;
+}
+
+int32_t InputConnectStub::StubSetMouseCaptureMode(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t windowId = -1;
+    bool isCaptureMode = false;
+    READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
+    READBOOL(data, isCaptureMode, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetMouseCaptureMode(windowId, isCaptureMode);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Fail to call SetMouseCaptureMode, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t InputConnectStub::StubGetDisplayBindInfo(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    DisplayBindInfos infos;
+    int32_t ret = GetDisplayBindInfo(infos);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetDisplayBindInfo failed, ret:%{public}d", ret);
+        return ret;
+    }
+    int32_t size = static_cast<int32_t>(infos.size());
+    WRITEINT32(reply, size, ERR_INVALID_VALUE);
+    infos.reserve(size);
+    for (const auto &info : infos) {
+        WRITEINT32(reply, info.inputDeviceId, ERR_INVALID_VALUE);
+        WRITESTRING(reply, info.inputDeviceName, ERR_INVALID_VALUE);
+        WRITEINT32(reply, info.displayId, ERR_INVALID_VALUE);
+        WRITESTRING(reply, info.displayName, ERR_INVALID_VALUE);
+    }
+    return RET_OK;
+}
+
+int32_t InputConnectStub::StubSetDisplayBind(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t inputDeviceId = -1;
+    READINT32(data, inputDeviceId, ERR_INVALID_VALUE);
+    int32_t displayId = -1;
+    READINT32(data, displayId, ERR_INVALID_VALUE); 
+    std::string msg;  
+    int32_t ret = SetDisplayBind(inputDeviceId, displayId, msg);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetDisplayBind failed, ret:%{public}d", ret);
+    }
+    WRITESTRING(reply, msg, ERR_INVALID_VALUE);  
     return ret;
 }
 } // namespace MMI

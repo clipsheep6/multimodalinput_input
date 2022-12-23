@@ -23,12 +23,12 @@
 #include "event_monitor_handler.h"
 #include "hos_key_event.h"
 #include "input_device_manager.h"
+#include "input_event.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
-#include "input_event.h"
 #include "input_windows_manager.h"
-#include "key_event_normalize.h"
 #include "i_pointer_drawing_manager.h"
+#include "key_event_normalize.h"
 #include "key_subscriber_handler.h"
 #include "libinput_adapter.h"
 #include "mmi_func_callback.h"
@@ -45,7 +45,6 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
 {
     udsServer_ = &udsServer;
     MsgCallback funs[] = {
-        {MmiMessageId::MARK_PROCESS, MsgCallbackBind2(&ServerMsgHandler::MarkProcessed, this)},
         {MmiMessageId::DISPLAY_INFO, MsgCallbackBind2(&ServerMsgHandler::OnDisplayInfo, this)},
     };
     for (auto &it : funs) {
@@ -72,26 +71,10 @@ void ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
     }
 }
 
-int32_t ServerMsgHandler::MarkProcessed(SessionPtr sess, NetPacket& pkt)
-{
-    CALL_DEBUG_ENTER;
-    CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t eventId = 0;
-    int32_t eventType = 0;
-    pkt >> eventId >> eventType;
-    MMI_HILOGD("Event type:%{public}d, id:%{public}d", eventType, eventId);
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read data failed");
-        return PACKET_READ_FAIL;
-    }
-    ANRMgr->MarkProcessed(eventType, eventId, sess);
-    return RET_OK;
-}
-
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
@@ -136,7 +119,7 @@ int32_t ServerMsgHandler::OnSetFunctionKeyState(int32_t funcKey, bool enable)
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     pointerEvent->UpdateId();
     int32_t action = pointerEvent->GetPointerAction();

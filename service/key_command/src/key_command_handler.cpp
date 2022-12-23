@@ -15,12 +15,12 @@
 
 #include "key_command_handler.h"
 
-#include "dfx_hisysevent.h"
 #include "ability_manager_client.h"
 #include "bytrace_adapter.h"
 #include "cJSON.h"
 #include "config_policy_utils.h"
 #include "define_multimodal.h"
+#include "dfx_hisysevent.h"
 #include "error_multimodal.h"
 #include "file_ex.h"
 #include "input_event_data_transformation.h"
@@ -943,8 +943,11 @@ bool KeyCommandHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, c
         LaunchAbility(shortcutKey);
         return true;
     }
-    const KeyEvent::KeyItem* keyItem = keyEvent->GetKeyItem();
-    CHKPF(keyItem);
+    std::optional<KeyEvent::KeyItem> keyItem = keyEvent->GetKeyItem();
+    if (!keyItem) {
+        MMI_HILOGE("The keyItem is nullopt");
+        return false;
+    }
     auto upTime = keyEvent->GetActionTime();
     auto downTime = keyItem->GetDownTime();
     MMI_HILOGD("upTime:%{public}" PRId64 ",downTime:%{public}" PRId64 ",keyDownDuration:%{public}d",

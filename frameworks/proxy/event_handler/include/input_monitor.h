@@ -30,7 +30,6 @@ public:
     InputMonitor();
     DISALLOW_COPY_AND_MOVE(InputMonitor);
     ~InputMonitor() = default;
-    void SetMMIClient(MMIClientPtr &client);
     int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor,
         HandleEventType eventType = HANDLE_EVENT_TYPE_ALL);
     void RemoveMonitor(int32_t monitorId);
@@ -51,7 +50,7 @@ private:
     int32_t GetNextId();
     bool HasHandler(int32_t handlerId);
     HandleEventType GetEventType() const;
-    void OnDispatchEventProcessed(int32_t eventId);
+    void OnDispatchEventProcessed(int32_t eventId, int64_t actionTime);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -68,8 +67,7 @@ private:
         HandleEventType eventType_ { HANDLE_EVENT_TYPE_ALL };
         std::shared_ptr<IInputEventConsumer> consumer_ { nullptr };
     };
-    MMIClientPtr client_ { nullptr };
-    std::function<void(int32_t)> monitorCallback_ { nullptr };
+    std::function<void(int32_t, int64_t)> monitorCallback_ { nullptr };
     std::map<int32_t, MonitorHandler> inputHandlers_;
     std::map<int32_t, int32_t> processedEvents_;
     std::set<int32_t> mouseEventIds_;

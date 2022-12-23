@@ -17,8 +17,8 @@ mmi_binder_proxy_path = "${mmi_path}/frameworks/proxy/binder_proxy"
 
 config("mmi_binder_proxy_config") {
   include_dirs = [
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
     "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/util/network/include",
     "//foundation/multimodalinput/input/util/socket/include",

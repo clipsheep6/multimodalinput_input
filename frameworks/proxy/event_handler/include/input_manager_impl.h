@@ -49,6 +49,8 @@ public:
     DISALLOW_MOVE(InputManagerImpl);
 
     bool InitClient(EventHandlerPtr eventHandler = nullptr);
+    int32_t GetDisplayBindInfo(DisplayBindInfos &infos);
+    int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
     int32_t SubscribeKeyEvent(
         std::shared_ptr<KeyOption> keyOption,
@@ -110,6 +112,11 @@ public:
     bool GetFunctionKeyState(int32_t funcKey);
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
     void SetPointerLocation(int32_t x, int32_t y);
+    int32_t EnterCaptureMode(int32_t windowId);
+    int32_t LeaveCaptureMode(int32_t windowId);
+    MMIClientPtr GetMMIClient() const;
+    AnrCollecter& GetAnrCollecter();
+    EventHandlerPtr GetEventHandler() const;
 
 private:
     void InitMsgCallback();

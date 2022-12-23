@@ -19,6 +19,7 @@
 #include "event_log_helper.h"
 #include "input_event_data_transformation.h"
 #include "input_connect_manager.h"
+#include "input_manager_impl.h"
 
 namespace OHOS {
 namespace MMI {
@@ -26,10 +27,27 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputWindowTransfer" };
 } // namespace
 
-void InputWindowTransfer::SetMMIClient(MMIClientPtr &client)
+int32_t InputWindowTransfer::GetDisplayBindInfo(DisplayBindInfos &infos)
 {
-    CHKPV(client);
-    client_ = client;
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->GetDisplayBindInfo(infos);
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetDisplayBindInfo failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t InputWindowTransfer::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
+{
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->SetDisplayBind(deviceId, displayId, msg);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SetDisplayBind failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
 }
 
 void InputWindowTransfer::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
@@ -57,13 +75,14 @@ void InputWindowTransfer::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
 
 void InputWindowTransfer::SendDisplayInfo()
 {
-    CHKPV(client_);
+    auto client = InputMgrImpl.GetMMIClient();
+    CHKPV(client);
     NetPacket pkt(MmiMessageId::DISPLAY_INFO);
     if (PackDisplayData(pkt) == RET_ERR) {
         MMI_HILOGE("Pack display info failed");
         return;
     }
-    if (!client_->SendMessage(pkt)) {
+    if (!client->SendMessage(pkt)) {
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
     }
 }
@@ -171,7 +190,8 @@ void InputWindowTransfer::InitProcessedCallback()
     int32_t tokenType = MultimodalInputConnMgr->GetTokenType();
     if (tokenType == TokenType::TOKEN_HAP) {
         MMI_HILOGD("Current session is hap");
-        dispatchCallback_ = std::bind(&InputWindowTransfer::OnDispatchEventProcessed, this, std::placeholders::_1);
+        dispatchCallback_ = std::bind(&InputWindowTransfer::OnDispatchEventProcessed, this, std::placeholders::_1,
+            std::placeholders::_2);
     } else if (tokenType == static_cast<int32_t>(TokenType::TOKEN_NATIVE)) {
         MMI_HILOGD("Current session is native");
     } else {
@@ -230,20 +250,10 @@ int32_t InputWindowTransfer::OnPointerEvent(NetPacket& pkt)
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
-void InputWindowTransfer::OnDispatchEventProcessed(int32_t eventId)
+void InputWindowTransfer::OnDispatchEventProcessed(int32_t eventId, int64_t actionTime)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(client_);
-    NetPacket pkt(MmiMessageId::MARK_PROCESS);
-    pkt << eventId << ANR_DISPATCH;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write event failed");
-        return;
-    }
-    if (!client_->SendMessage(pkt)) {
-        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
-        return;
-    }
+    InputMgrImpl.GetAnrCollecter().SetLastProcessedEventId(ANR_DISPATCH, eventId, actionTime);
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -262,7 +272,8 @@ void InputWindowTransfer::HandlerKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     CHKPV(keyEvent);
     CHKPV(eventHandler_);
     CHKPV(consumer_);
-    CHKPV(client_);
+    auto client = InputMgrImpl.GetMMIClient();
+    CHKPV(client);
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
     std::shared_ptr<IInputEventConsumer> inputConsumer = nullptr;
     {
@@ -271,7 +282,7 @@ void InputWindowTransfer::HandlerKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
         inputConsumer = consumer_;
     }
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_DISPATCH_EVENT);
-    if (client_->IsEventHandlerChanged()) {
+    if (client->IsEventHandlerChanged()) {
         if (!eventHandler->PostHighPriorityTask(std::bind(&InputWindowTransfer::HandlerKeyEventTask,
             this, inputConsumer, keyEvent))) {
             MMI_HILOGE("Post task failed");
@@ -303,7 +314,8 @@ void InputWindowTransfer::HandlerPointerEvent(std::shared_ptr<PointerEvent> poin
     CHKPV(pointerEvent);
     CHKPV(eventHandler_);
     CHKPV(consumer_);
-    CHKPV(client_);
+    auto client = InputMgrImpl.GetMMIClient();
+    CHKPV(client);
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
     std::shared_ptr<IInputEventConsumer> inputConsumer = nullptr;
     {
@@ -312,7 +324,7 @@ void InputWindowTransfer::HandlerPointerEvent(std::shared_ptr<PointerEvent> poin
         inputConsumer = consumer_;
     }
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_DISPATCH_EVENT);
-    if (client_->IsEventHandlerChanged()) {
+    if (client->IsEventHandlerChanged()) {
         if (!eventHandler->PostHighPriorityTask(std::bind(&InputWindowTransfer::HandlerPointerEventTask,
             this, inputConsumer, pointerEvent))) {
             MMI_HILOGE("Post task failed");

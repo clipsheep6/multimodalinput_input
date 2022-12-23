@@ -64,8 +64,6 @@ public:
         std::function<void(std::shared_ptr<KeyEvent>)> callback);
     int32_t UnsubscribeKeyEvent(int32_t subscribeId);
     void OnConnected();
-    bool GetFunctionKeyState(int32_t funcKey);
-    int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t OnSubscribeKeyEventCallback(NetPacket& pkt);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD

@@ -96,6 +96,12 @@ int32_t InputConnectManager::IsPointerVisible(bool &visible)
     return inputConnectService_->IsPointerVisible(visible);
 }
 
+int32_t InputConnectManager::MarkProcessed(int32_t eventType, int32_t eventId)
+{
+    CHKPR(inputConnectService_, INVALID_HANDLER_ID);
+    return inputConnectService_->MarkProcessed(eventType, eventId);
+}
+
 int32_t InputConnectManager::SetPointerSpeed(int32_t speed)
 {
     CHKPR(inputConnectService_, RET_ERR);
@@ -284,6 +290,24 @@ int32_t InputConnectManager::SetPointerLocation(int32_t x, int32_t y)
 {
     CHKPR(inputConnectService_, INVALID_HANDLER_ID);
     return inputConnectService_->SetPointerLocation(x, y);
+}
+
+int32_t InputConnectManager::SetMouseCaptureMode(int32_t windowId, bool isCaptureMode)
+{
+    CHKPR(inputConnectService_, INVALID_HANDLER_ID);
+    return inputConnectService_->SetMouseCaptureMode(windowId, isCaptureMode);
+}
+
+int32_t InputConnectManager::GetDisplayBindInfo(DisplayBindInfos &infos)
+{
+    CHKPR(inputConnectService_, INVALID_HANDLER_ID);
+    return inputConnectService_->GetDisplayBindInfo(infos);
+}
+
+int32_t InputConnectManager::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
+{
+    CHKPR(inputConnectService_, INVALID_HANDLER_ID);
+    return inputConnectService_->SetDisplayBind(deviceId, displayId, msg);    
 }
 
 bool InputConnectManager::ConnectInputService()

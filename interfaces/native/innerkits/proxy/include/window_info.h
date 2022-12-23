@@ -16,8 +16,8 @@
 #ifndef DISPLAY_INFO_H
 #define DISPLAY_INFO_H
 
-#include <vector>
 #include <string>
+#include <vector>
 
 namespace OHOS {
 namespace MMI {
@@ -200,7 +200,7 @@ struct DisplayInfo {
     int32_t height;
 
     /**
-     * 像素密度，表示一英寸包含的像素点数。
+     * Pixel density, which indicates the number of pixels in an inch
      *
      * @since 10
      */
@@ -269,6 +269,15 @@ struct DisplayGroupInfo {
      */
     std::vector<DisplayInfo> displaysInfo;
 };
+
+struct DisplayBindInfo
+{
+    int32_t inputDeviceId = -1;
+    std::string inputDeviceName;
+    int32_t displayId = -1;
+    std::string displayName;
+};
+using DisplayBindInfos = std::vector<DisplayBindInfo>;
 } // namespace MMI
 } // namespace OHOS
 #endif // DISPLAY_INFO_H

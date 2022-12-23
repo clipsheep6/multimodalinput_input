@@ -18,6 +18,7 @@
 #include "bytrace_adapter.h"
 #include "input_event_data_transformation.h"
 #include "input_connect_manager.h"
+#include "input_manager_impl.h"
 #include "mmi_log.h"
 
 namespace OHOS {
@@ -28,13 +29,8 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 
 InputMonitor::InputMonitor()
 {
-    monitorCallback_ = std::bind(&InputMonitor::OnDispatchEventProcessed, this, std::placeholders::_1);
-}
-
-void InputMonitor::SetMMIClient(MMIClientPtr &client)
-{
-    CHKPV(client);
-    client_ = client;
+    monitorCallback_ = std::bind(&InputMonitor::OnDispatchEventProcessed, this, std::placeholders::_1,
+        std::placeholders::_2);
 }
 
 int32_t InputMonitor::AddMonitor(std::shared_ptr<IInputEventConsumer> monitor,
@@ -258,11 +254,10 @@ HandleEventType InputMonitor::GetEventType() const
     return eventType;
 }
 
-void InputMonitor::OnDispatchEventProcessed(int32_t eventId)
+void InputMonitor::OnDispatchEventProcessed(int32_t eventId, int64_t actionTime)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtxHandlers_);
-    CHKPV(client_);
     if (mouseEventIds_.find(eventId) != mouseEventIds_.end()) {
         mouseEventIds_.erase(eventId);
         return;
@@ -279,16 +274,7 @@ void InputMonitor::OnDispatchEventProcessed(int32_t eventId)
         processedEvents_.emplace(eventId, count);
         return;
     }
-    NetPacket pkt(MmiMessageId::MARK_PROCESS);
-    pkt << eventId << ANR_MONITOR;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write event failed");
-        return;
-    }
-    if (!client_->SendMessage(pkt)) {
-        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
-        return;
-    }
+    InputMgrImpl.GetAnrCollecter().SetLastProcessedEventId(ANR_MONITOR, eventId, actionTime);
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD

@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef INPUT_MOUSE_HELPER_H
 #define INPUT_MOUSE_HELPER_H
 
@@ -34,6 +35,8 @@ public:
     int32_t SetPointerStyle(int32_t windowId, int32_t pointerStyle);
     int32_t GetPointerStyle(int32_t windowId, int32_t &pointerStyle);
     void SetPointerLocation(int32_t x, int32_t y);
+    int32_t EnterCaptureMode(int32_t windowId);
+    int32_t LeaveCaptureMode(int32_t windowId);
 private:
     std::mutex mtx_;
 };
