@@ -103,6 +103,8 @@ int32_t InputKeySubscriber::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOpti
     }
     if (HandlerSubscribeKeyEvent(*tIter) != RET_OK) {
         MMI_HILOGE("Subscribing key event failed");
+        subscribeInfos_.erase(tIter);
+        return INVALID_SUBSCRIBE_ID;
     }
 
     MMI_HILOGD("subscribeId:%{public}d,keyOption->finalKey:%{public}d,"
