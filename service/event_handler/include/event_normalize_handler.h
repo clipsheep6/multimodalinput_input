@@ -24,7 +24,7 @@ namespace OHOS {
 namespace MMI {
 class EventNormalizeHandler : public IInputEventHandler {
 public:
-    EventNormalizeHandler() = default;
+    EventNormalizeHandler() : IInputEventHandler(static_cast<int32_t>(Priority::NORMALIZE)) {};
     ~EventNormalizeHandler() = default;
     void HandleEvent(libinput_event* event);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD

@@ -26,6 +26,7 @@
 
 #include "delegate_tasks.h"
 #include "input_event_handler.h"
+#include "input_event_handler_plugin.h"
 #include "libinput_adapter.h"
 #include "multimodal_input_connect_stub.h"
 #include "server_msg_handler.h"
@@ -142,6 +143,8 @@ protected:
     void OnDelegateTask(epoll_event& ev);
 
     void AddReloadDeviceTimer();
+    void OnPluginScan(epoll_event& ev);
+    bool InitINotify();
 
 private:
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
@@ -155,7 +158,7 @@ private:
     LibinputAdapter libinputAdapter_;
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;
-
+    InputEventHandlerPluginMgr pluginMgr_;
     std::atomic_bool threadStatusFlag_ { false };
 };
 } // namespace MMI
