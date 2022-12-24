@@ -23,7 +23,6 @@
 #include "device_observer.h"
 #include "event_dispatch_handler.h"
 #include "input_device.h"
-#include "i_input_device_manager.h"
 #include "key_auto_repeat.h"
 #include "key_event_normalize.h"
 #include "key_map_manager.h"
@@ -90,7 +89,6 @@ public:
     using inputDeviceCallback = std::function<void(int32_t deviceId, std::string devName, std::string devStatus)>;
     void SetInputStatusChangeCallback(inputDeviceCallback callback);
     VendorConfig GetVendorConfig(int32_t deviceId) const;
-    std::shared_ptr<IInputDeviceManager> GetDeviceContext();
 
 private:
     void MakeDeviceInfo(struct libinput_device *inputDevice, struct InputDeviceInfo& info);

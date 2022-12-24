@@ -836,12 +836,5 @@ VendorConfig InputDeviceManager::GetVendorConfig(int32_t deviceId) const
     }
     return it->second.vendorConfig;
 }
-
-std::shared_ptr<IInputDeviceManager> InputDeviceManager::GetDeviceContext()
-{
-    auto device = std::make_shared<IInputDeviceManager>();
-    device->deviceName_ = "device name";
-    return device;
-}
 } // namespace MMI
 } // namespace OHOS

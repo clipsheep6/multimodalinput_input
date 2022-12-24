@@ -27,7 +27,6 @@ public:
     virtual ~PluginContext() = default;
     virtual void SetEventHandler(std::shared_ptr<IInputEventHandler> handler);
     virtual std::shared_ptr<IInputEventHandler> GetEventHandler();
-    virtual std::shared_ptr<IInputDeviceManager> GetInputDeviceManager();
     virtual void StatBegin();
     virtual void StatEnd();
     virtual void TimeStat(TimeStatFlag flag);

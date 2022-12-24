@@ -17,7 +17,6 @@
 #define I_INPUT_EVENT_HANDLER_PLUGIN_CONTEXT_H
 #include <iostream>
 #include "i_input_event_handler.h"
-#include "i_input_device_manager.h"
 namespace OHOS {
 namespace MMI {
 enum class TimeStatFlag {
@@ -32,12 +31,10 @@ public:
     virtual ~IInputEventPluginContext() = default;
     virtual void SetEventHandler(std::shared_ptr<IInputEventHandler> handler) = 0;
     virtual std::shared_ptr<IInputEventHandler> GetEventHandler() = 0;
-    virtual std::shared_ptr<IInputDeviceManager> GetInputDeviceManager() = 0;
     virtual void StatBegin() = 0;
     virtual void StatEnd() = 0;
     virtual void TimeStat(TimeStatFlag flag) = 0;
     virtual void OnReport(int32_t &max, int32_t &avg) = 0;
-    std::shared_ptr<IInputDeviceManager> inputDeviceMgr_;
     std::string pluginName_;
 };
 } // namespace MMI

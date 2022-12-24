@@ -262,7 +262,6 @@ bool MMIService::InitINotify()
 int32_t MMIService::Init()
 {
     CheckDefine();
-    pluginMgr_.SetDeivceManager(InputDevMgr->GetDeviceContext());
     pluginMgr_.StartWatchPluginDir();
     MMI_HILOGD("WindowsManager Init");
     WinMgr->Init(*this);
@@ -909,7 +908,7 @@ int32_t MMIService::SetDisplayBind(int32_t deviceId, int32_t displayId, std::str
         MMI_HILOGE("SetDisplayBind pid failed, ret:%{public}d", ret);
         return RET_ERR;
     }
-    return RET_OK;    
+    return RET_OK;
 }
 
 int32_t MMIService::GetFunctionKeyState(int32_t funcKey, bool &state)

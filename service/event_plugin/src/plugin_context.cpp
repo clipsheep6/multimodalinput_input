@@ -59,11 +59,6 @@ void PluginContext::OnReport(int32_t &max, int32_t &avg)
     times_  = 0;
 }
 
-std::shared_ptr<IInputDeviceManager> PluginContext::GetInputDeviceManager()
-{
-    return inputDeviceMgr_;
-}
-
 void PluginContext::StatBegin()
 {
     TimeStat(TimeStatFlag::BEGIN);

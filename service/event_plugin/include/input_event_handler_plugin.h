@@ -37,7 +37,6 @@ public:
     explicit InputEventHandlerPluginMgr() = default;
     ~InputEventHandlerPluginMgr() = default;
     DISALLOW_COPY_AND_MOVE(InputEventHandlerPluginMgr);
-    void SetDeivceManager(std::shared_ptr<IInputDeviceManager> inputDeviceMgr);
     void StartWatchPluginDir();
     void ReadPluginDir(const std::string pluginPath);
     bool LoadPlugin(std::string pluginPath, std::string pluginName, bool initStatus);
@@ -55,7 +54,6 @@ private:
     std::map<std::string, inputEventHandlerPlugin> pluginInfoList;
     int32_t fd_ { 0 };
     int32_t wd_ { 0 };
-    std::shared_ptr<IInputDeviceManager> inputDevMgr_;
 };
 } // namespace MMI
 } // namespace OHOS

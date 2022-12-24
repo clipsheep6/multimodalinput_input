@@ -105,6 +105,13 @@ group("input_jsapi_group") {
   }
 }
 
+group("examples_group") {
+  deps = [
+    "examples/input_device_display_bind:input_device_display_bind",
+    "examples/plugins:input_plugins",
+  ]
+}
+
 group("mmi_debug_tools") {
   deps = [
     "patch/diff_libinput_mmi:libinput-analyze-mmi",
@@ -117,6 +124,7 @@ group("mmi_debug_tools") {
     "tools/event_inject:mmi-event-injection",
     "tools/vuinput:vuinput",
     "//third_party/eudev:udevadm",
+    ":examples_group",
   ]
 }
 
@@ -149,8 +157,4 @@ group("mmi_tests") {
     "tools/inject_event:InjectEventTest",
     "util:ut-mmi-util-out",
   ]
-}
-
-group("examples_group") {
-  deps = [ "examples/input_device_display_bind:input_device_display_bind" ]
 }

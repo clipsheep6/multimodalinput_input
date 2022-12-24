@@ -120,7 +120,6 @@ bool InputEventHandlerPluginMgr::LoadPlugin(std::string pluginPath, std::string 
     context_.push_back(context);
     if (plugin->Init(context_.back().get())) {
         pluginInfoList[pluginName].pluginHandler = context_.back()->GetEventHandler();
-        context_.back()->inputDeviceMgr_ = inputDevMgr_;
         context_.back()->pluginName_ = pluginName;
     }
     pluginInfoList[pluginName].loadStatus = true;
@@ -152,7 +151,6 @@ void InputEventHandlerPluginMgr::UnloadPlugin(std::string pluginName)
         MMI_HILOGE("ReleasePlugin msg:%{public}s", error);
     }
     RelPlugin(pluginInfoList[pluginName].plugin);
-    // dlclose(pluginInfoList[pluginName].osHandler);
     pluginInfoList.erase(pluginName);
 }
 
@@ -194,11 +192,6 @@ void InputEventHandlerPluginMgr::StopINotify()
 {
     inotify_rm_watch(fd_, wd_);
     close(fd_);
-}
-
-void InputEventHandlerPluginMgr::SetDeivceManager(std::shared_ptr<IInputDeviceManager> inputDeviceMgr)
-{
-    inputDevMgr_ = inputDeviceMgr;
 }
 
 void InputEventHandlerPluginMgr::OnTimer()
