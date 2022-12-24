@@ -160,8 +160,7 @@ private:
     std::vector<Sequence> filterSequences_;
     std::vector<SequenceKey> keys_;
     bool isParseConfig_ { false };
-    bool isTouchGestureParsed_ { false }; // 手势配置文件是否解析完成
-    std::set<std::shared_ptr<PointerEvent>> downPointerEvents_; // 当前有效按下事件
+    // bool isTouchGestureParsed_ { false }; // 手势配置文件是否解析完成
     std::map<int32_t, std::shared_ptr<PointerEvent>> curDownPointers_; // key 为 pointerId, value 为对应当前按下的事件
     std::map<int32_t, int32_t> specialKeys_;
     std::map<int32_t, std::list<int32_t>> specialTimers_;

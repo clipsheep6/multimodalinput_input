@@ -617,8 +617,39 @@ std::string GenerateKey(const TouchGesture& touchGesture)
     return ss.str();
 }
 
-bool ParseTouchGesture(cJSON* touchGestures, std::map<std::string, TouchGesture>& touchGestureMemo)
+bool ParseTouchGesture()
 {
+    std::string defaultConfig = "/system/etc/multimodalinput/touch_gesture_config.json";
+    return ParseTouchJson(defaultConfig);
+}
+
+bool ParseTouchJson(const std::string &configFile)
+{
+    CALL_DEBUG_ENTER;
+    std::string jsonStr = ReadJsonFile(configFile);
+    if (jsonStr.empty()) {
+        MMI_HILOGE("Read configFile failed");
+        return false;
+    }
+    JsonParser parser;
+    parser.json_ = cJSON_Parse(jsonStr.c_str());
+    if (!cJSON_IsObject(parser.json_)) {
+        MMI_HILOGE("Parser.json_ is not object");
+        return false;
+    }
+
+    bool isParseTouchGestures = ParseTouchGesture(parser, touchGestures_);
+    if (!isParseTouchGestures) {
+        MMI_HILOGE("Parse configFile failed");
+        return false;
+    }
+    return true;
+}
+
+
+bool ParseTouchGesture(const JsonParser& parser, std::map<std::string, TouchGesture>& touchGestureMemo)
+{
+    cJSON* touchGestures = cJSON_GetObjectItemCaseSensitive(parser.json_, "touchGestures");
     if (!cJSON_IsArray(touchGestures)) {
         MMI_HILOGE("touchGestures is not array");
         return false;
@@ -849,39 +880,6 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
     }
     return false;
 }
-
-bool OnHandleEvent(const std::shared_ptr<PointerEvent> pointerEvent)
-{
-    int32_t pointerAction = pointerEvent->GetPointerAction();
-    switch (pointerAction) {
-        case pointerEvent::POINTER_ACTION_DOWN: {
-            if (!HandleActionDown(pointerEvent)) {
-                MMI_HILOGE("HandleActionDown failed");
-                return false;
-            }
-            break;
-        }
-        case pointerEvent::POINTER_ACTION_MOVE: {
-            if (!HandleActionMove(pointerEvent)) {
-                MMI_HILOGE("HandleActionMove failed");
-                return false;
-            }
-            break;
-        }
-        case pointerEvent::POINTER_ACTION_UP: { // 一旦有按下的手指抬起
-            if (!HandleActionUp(pointerEvent)) {
-                MMI_HILOGE("HandleActionUp failed");
-                return false;
-            }
-            break;
-        }
-        default: {
-            MMI_HILOGE("Unsupported action type");
-        }
-    }
-    return true;
-}
-
 
 bool KeyCommandHandler::IsRepeatKeyEvent(const SequenceKey &sequenceKey)
 {
@@ -1220,24 +1218,88 @@ void KeyCommandHandler::InterruptTimers()
     }
 }
 
+bool OnHandleEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(pointerEvent);
+    if (!isTouchGestureParsed_) {
+        if (!ParseTouchGesture()) {
+            MMI_HILOGE("Parse configFile failed");
+            return false;
+        }
+        isTouchGestureParsed_ = true;
+    }
+    return HandleTouchGestures(pointerEvent);
+}
+
 bool HandleTouchGestures(const std::shared_ptr<PointerEvent> pointerEvent)
 {
-
+    CALL_DEBUG_ENTER;
+    int32_t pointerAction = pointerEvent->GetPointerAction();
+    if (pointerAction == PointerEvent::POINTER_ACTION_DOWN) {
+        return HandleActionDown(pointerEvent);
+    }
+    if (pointerAction == PointerEvent::POINTER_ACTION_MOVE) {
+        return HandleActionMove(pointerEvent);
+    }
+    if (pointerAction == PointerEvent::POINTER_ACTION_UP) {
+        return HandleActionUp(pointerEvent);
+    }
+    return false;
 }
+
+// TODO HandleActionDown HandleActionUp HandleActionMove 中需要有在长按事件终止时候移除Timer的逻辑
 
 bool HandleActionDown(const std::shared_ptr<PointerEvent> pointerEvent)
 {
-
+    CALL_DEBUG_ENTER;
+    if (!CheckLocation(pointerEvent) || !CheckDuration(pointerEvent) || !CheckAngle(pointerEvent)) {
+        MMI_HILOGD("Invalid touch down");
+        return false;
+    }
+    if (touchGestures_.empty()) {
+        MMI_HILOGD("No TouchGesture configuration data");
+        return false;
+    }
+    curDownPointers_.insert(make_pair(pointerEvent->GetPointerId(), pointerEvent));
+    for (auto& item : touchGestures_) {
+        TouchGesture &touchGesture = item.second;
+        if (!IsGestureMatch(touchGesture, pointerEvent)) {
+            MMI_HILOGD("TouchGesture: %{public}s not matched", item.first);
+            continue;
+        }
+        touchGesture.timerId = TimerMgr->AddTimer(touchGesture.duration, 1, [this, touchGesture] () {
+            MMI_HILOGD("Timer callback");
+            LaunchAbility(touchGesture);
+        });
+        return true;
+    }
+    return false;
 }
 
 bool HandleActionMove(const std::shared_ptr<PointerEvent> pointerEvent)
 {
-
+    CALL_DEBUG_ENTER;
+    if (CheckMovement(pointerEvent)) {
+        return true;
+    }
+    int32_t pointerId = pointerEvent.GetPointerId();
+    if (curDownPointers_.find(pointerId) != curDownPointers_.end()) {
+        curDownPointers_.erase(pointerId);
+        return true;
+    }
+    return false;
 }
 
 bool HandleActionUp(const std::shared_ptr<PointerEvent> pointerEvent)
 {
-
+    CALL_DEBUG_ENTER;
+    int32_t pointerId = pointerEvent.GetPointerId();
+    if (curDownPointers_.find(pointerId) != curDownPointers_.end()) {
+        curDownPointers_.erase(pointerId);
+        return true;
+    }
+    return false;
 }
 
 bool CheckLocation(const std::shared_ptr<PointerEvent> pointerEvent)
@@ -1250,22 +1312,25 @@ bool CheckLocation(const std::shared_ptr<PointerEvent> pointerEvent)
 
 bool CheckDuration(const std::shared_ptr<PointerEvent> pointerEvent)
 {
-
+    // TODO
+    return true;
 }
 
 bool CheckAngle(const std::shared_ptr<PointerEvent> pointerEvent)
 {
-
+    // TODO
+    return true;
 }
 
 bool CheckMovement(const std::shared_ptr<PointerEvent> pointerEvent)
 {
-
+    // TODO
+    return true;
 }
 
 bool IsGestureMatch(const TouchGesture &touchGesture, const std::shared_ptr<PointerEvent> pointerEvent)
 {
-
+    return curDownPointers_.size() == touchGesture.pointerNum;
 }
 
 void KeyCommandHandler::LaunchAbility(const TouchGesture &gesture)
@@ -1282,7 +1347,7 @@ void KeyCommandHandler::LaunchAbility(const TouchGesture &gesture)
     for (const auto &item : gesture.ability.params) {
         want.SetParam(item.first, item.second);
     }
-    // 暂时不知道这俩函数的用途
+    // TODO
     // DfxHisysevent::CalcComboStartTimes(lastMatchedKey_.keyDownDuration);
     // DfxHisysevent::ReportComboStartTimes();
     MMI_HILOGD("Start launch ability, bundleName:%{public}s", gesture.ability.bundleName.c_str());
@@ -1295,9 +1360,11 @@ void KeyCommandHandler::LaunchAbility(const TouchGesture &gesture)
     MMI_HILOGD("End launch ability, bundleName:%{public}s", gesture.ability.bundleName.c_str());
 }
 
+// 将按下的手指都置位,
 bool ResetPointers()
 {
 
 }
+
 } // namespace MMI
 } // namespace OHOS
