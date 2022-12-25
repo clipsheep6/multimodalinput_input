@@ -135,7 +135,10 @@ private:
     bool CheckMovement(const std::shared_ptr<PointerEvent> pointerEvent);
     bool IsGestureMatch(const TouchGesture &touchGesture, const std::shared_ptr<PointerEvent> pointerEvent);
     void LaunchAbility(const TouchGesture& gesture);
-    bool ResetPointers();
+    bool ResetLastMatchedGesture()
+    {
+        
+    }
 
 
     void ResetLastMatchedKey()
@@ -154,6 +157,7 @@ private:
 
 private:
     ShortcutKey lastMatchedKey_;
+    TouchGesture lastMatchedGesture_;
     std::map<std::string, ShortcutKey> shortcutKeys_;
     std::map<std::string, TouchGesture> touchGestures_; // 解析得到的手势
     std::vector<Sequence> sequences_;
