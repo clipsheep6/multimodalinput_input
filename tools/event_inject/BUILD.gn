@@ -63,7 +63,6 @@ ohos_source_set("event-injection") {
 
   deps = [
     "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
-    "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_proxy",
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_service",
     "//foundation/multimodalinput/input/util:libmmi-util",
     "//third_party/cJSON:cjson",

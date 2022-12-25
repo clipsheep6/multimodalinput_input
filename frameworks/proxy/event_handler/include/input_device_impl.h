@@ -26,13 +26,14 @@
 
 #include "i_input_device_listener.h"
 #include "input_device.h"
+#include "net_packet.h"
 
 namespace OHOS {
 namespace MMI {
 class NetPacket;
 class InputDeviceImpl final {
 public:
-    static InputDeviceImpl& GetInstance();
+    InputDeviceImpl() = default;
     DISALLOW_COPY_AND_MOVE(InputDeviceImpl);
     ~InputDeviceImpl() = default;
 
@@ -48,21 +49,18 @@ public:
     int32_t GetInputDevice(int32_t deviceId, FunInputDevInfo callback);
     int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> keyCodes, FunInputDevKeys callback);
     int32_t GetKeyboardType(int32_t deviceId, FunKeyboardTypes callback);
-    void OnInputDevice(int32_t userData, std::shared_ptr<InputDevice> devData);
-    void OnInputDeviceIds(int32_t userData, std::vector<int32_t> &ids);
-    void OnSupportKeys(int32_t userData, std::vector<bool> &keystrokeAbility);
-    void OnDevListener(int32_t deviceId, const std::string &type);
-    void OnKeyboardType(int32_t userData, int32_t keyboardType);
-    int32_t GetUserData();
+    int32_t OnDevListener(NetPacket& pkt);
+    bool GetFunctionKeyState(int32_t funcKey);
+    int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
 
 private:
-    InputDeviceImpl() = default;
+    void HandlerDevListener(int32_t deviceId, const std::string &type);
+
+private:
     std::map<std::string, std::list<InputDevListenerPtr>> devListener_ = { { "change", {} } };
-    int32_t userData_ { 0 };
     bool isListeningProcess_ { false };
     std::mutex mtx_;
 };
 } // namespace MMI
 } // namespace OHOS
-#define InputDevImpl OHOS::MMI::InputDeviceImpl::GetInstance()
 #endif // OHOS_INPUT_DEVICE_EVENT_H

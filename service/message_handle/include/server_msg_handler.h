@@ -20,7 +20,7 @@
 
 #include "event_dispatch_handler.h"
 #include "i_event_filter.h"
-#include "input_handler_type.h"
+#include "input_proxy_def.h"
 #include "key_option.h"
 #include "msg_handler.h"
 
@@ -35,12 +35,16 @@ public:
 
     void Init(UDSServer& udsServer);
     void OnMsgHandler(SessionPtr sess, NetPacket& pkt);
-#if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
-    int32_t OnAddInputHandler(SessionPtr sess, InputHandlerType handlerType, HandleEventType eventType,
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+    int32_t OnAddInterceptorHandler(SessionPtr sess, HandleEventType eventType,
         int32_t priority, uint32_t deviceTags);
-    int32_t OnRemoveInputHandler(SessionPtr sess, InputHandlerType handlerType, HandleEventType eventType,
+    int32_t OnRemoveInterceptorHandler(SessionPtr sess, HandleEventType eventType,
         int32_t priority, uint32_t deviceTags);
-#endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    int32_t OnAddMonitorHandler(SessionPtr sess, HandleEventType eventType);
+    int32_t OnRemoveMonitorHandler(SessionPtr sess, HandleEventType eventType);
+#endif // OHOS_BUILD_ENABLE_MONITOR
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     int32_t OnMarkConsumed(SessionPtr sess, int32_t eventId);
 #endif // OHOS_BUILD_ENABLE_MONITOR
@@ -62,7 +66,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority, int32_t clientPid);
-    int32_t RemoveInputEventFilter(int32_t clientPid, int32_t filterId);
+    int32_t RemoveInputEventFilter(int32_t filterId, int32_t clientPid);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 protected:
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);

@@ -21,7 +21,7 @@
 #include "i_input_event_handler.h"
 #include "i_input_event_collection_handler.h"
 #include "input_device.h"
-#include "input_handler_type.h"
+#include "input_proxy_def.h"
 #include "nocopyable.h"
 #include "uds_session.h"
 
@@ -41,10 +41,10 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
-    int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
-        int32_t priority, uint32_t deviceTags, SessionPtr session);
-    void RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
-        int32_t priority, uint32_t deviceTags, SessionPtr session);
+    int32_t AddInterceptorHandler(HandleEventType eventType, int32_t priority,
+        uint32_t deviceTags, SessionPtr session);
+    void RemoveInterceptorHandler(HandleEventType eventType, int32_t priority,
+        uint32_t deviceTags, SessionPtr session);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     bool OnHandleEvent(std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -58,13 +58,12 @@ private:
 private:
     class SessionHandler {
     public:
-        SessionHandler(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
-            uint32_t deviceTags, SessionPtr session) : handlerType_(handlerType),
-            eventType_(eventType & HANDLE_EVENT_TYPE_ALL), priority_(priority), deviceTags_(deviceTags),
-            session_(session) {}
+        SessionHandler(HandleEventType eventType, int32_t priority,
+            uint32_t deviceTags, SessionPtr session)
+            : eventType_(eventType & HANDLE_EVENT_TYPE_ALL), priority_(priority), deviceTags_(deviceTags),
+              session_(session) {}
         void SendToClient(std::shared_ptr<KeyEvent> keyEvent) const;
         void SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const;
-        InputHandlerType handlerType_ { NONE };
         HandleEventType eventType_ { HANDLE_EVENT_TYPE_ALL };
         int32_t priority_ { DEFUALT_INTERCEPTOR_PRIORITY };
         uint32_t deviceTags_ { CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX) };

@@ -15,9 +15,8 @@
 
 #include "event_log_helper.h"
 #include "event_util_test.h"
-#include "input_handler_type.h"
+#include "input_manager_impl.h"
 #include "mmi_log.h"
-#include "multimodal_event_handler.h"
 #include "system_info.h"
 #include "util.h"
 
@@ -1472,7 +1471,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_001, TestSize.Leve
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_02, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    ASSERT_TRUE(MMIEventHdl.InitClient());
+    ASSERT_TRUE(InputMgrImpl.InitClient());
     // 电源键长按按下订阅
     std::set<int32_t> preKeys;
     std::shared_ptr<KeyOption> keyOption = InitOption(preKeys, KeyEvent::KEYCODE_POWER, true, 2000);
@@ -1517,7 +1516,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_02, TestSize.Level
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_03, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    ASSERT_TRUE(MMIEventHdl.InitClient());
+    ASSERT_TRUE(InputMgrImpl.InitClient());
     std::set<int32_t> preKeys;
     std::shared_ptr<KeyOption> keyOption1 = InitOption(preKeys, KeyEvent::KEYCODE_VOLUME_UP, true, 10);
     int32_t subscribeId1 = -1;
@@ -3327,7 +3326,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetWindowInputEventConsumer_001, Tes
     auto runner = AppExecFwk::EventRunner::Create(true);
     ASSERT_TRUE(runner != nullptr);
     auto eventHandler = std::make_shared<AppExecFwk::EventHandler>(runner);
-    ASSERT_TRUE(eventHandler != nullptr);
     uint64_t runnerThreadId = 0;
 
     auto fun = [&runnerThreadId]() {

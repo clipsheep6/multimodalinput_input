@@ -18,14 +18,13 @@
 
 #include "nocopyable.h"
 
-#include "if_mmi_client.h"
-
 #include "circle_stream_buffer.h"
-#include "client_msg_handler.h"
+#include "i_mmi_client.h"
+#include "uds_client.h"
 
 namespace OHOS {
 namespace MMI {
-class MMIClient final : public UDSClient, public IfMMIClient, public std::enable_shared_from_this<IfMMIClient> {
+class MMIClient final : public UDSClient, public IMMIClient, public std::enable_shared_from_this<IMMIClient> {
 public:
     MMIClient() = default;
     DISALLOW_COPY_AND_MOVE(MMIClient);
@@ -48,6 +47,10 @@ public:
     {
         return isEventHandlerChanged_;
     }
+    EventHandlerPtr GetEventHandler() override
+    {
+        return eventHandler_;
+    }
 
 private:
     bool StartEventRunner();
@@ -58,13 +61,11 @@ private:
     const std::string& GetErrorStr(ErrCode code) const;
     void OnConnected() override;
     void OnDisconnected() override;
-
+    void OnMsgHandler(NetPacket& pkt);
 private:
-    ClientMsgHandler msgHandler_;
-    ConnectCallback funConnected_;
-    ConnectCallback funDisconnected_;
+    ConnectCallback funConnected_ { nullptr };
+    ConnectCallback funDisconnected_ { nullptr };
     CircleStreamBuffer circBuf_;
-    std::mutex mtx_;
     EventHandlerPtr eventHandler_ { nullptr };
     bool isEventHandlerChanged_ { false };
     bool isListening_ { false };

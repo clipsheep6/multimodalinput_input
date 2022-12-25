@@ -18,7 +18,7 @@
 
 #include "file_descriptor_listener.h"
 
-#include "if_mmi_client.h"
+#include "i_mmi_client.h"
 
 namespace OHOS {
 namespace MMI {

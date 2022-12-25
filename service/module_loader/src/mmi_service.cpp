@@ -32,11 +32,11 @@
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_cooperate_sm.h"
 #endif // OHOS_BUILD_ENABLE_COOPERATE
+#include "input_connect_def_parcel.h"
 #include "input_device_manager.h"
 #include "input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "key_map_manager.h"
-#include "multimodal_input_connect_def_parcel.h"
 #include "permission_helper.h"
 #include "string_ex.h"
 #ifdef OHOS_RSS_CLIENT
@@ -343,8 +343,8 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
 {
     MMI_HILOGI("Enter, programName:%{public}s,moduleType:%{public}d", programName.c_str(), moduleType);
 
-    toReturnClientFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
-    int32_t serverFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
+    toReturnClientFd = IInputConnect::INVALID_SOCKET_FD;
+    int32_t serverFd = IInputConnect::INVALID_SOCKET_FD;
     int32_t pid = GetCallingPid();
     int32_t uid = GetCallingUid();
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&UDSServer::AddSocketPairInfo, this,
@@ -669,55 +669,101 @@ int32_t MMIService::GetKeyboardType(int32_t deviceId, int32_t &keyboardType)
     return ret;
 }
 
-#if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
-int32_t MMIService::CheckAddInput(int32_t pid, InputHandlerType handlerType,
-    HandleEventType eventType, int32_t priority, uint32_t deviceTags)
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+int32_t MMIService::CheckAddInterceptor(int32_t pid, HandleEventType eventType,
+    int32_t priority, uint32_t deviceTags)
 {
     auto sess = GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
-    return sMsgHandler_.OnAddInputHandler(sess, handlerType, eventType, priority, deviceTags);
+    return sMsgHandler_.OnAddInterceptorHandler(sess, eventType, priority, deviceTags);
 }
-#endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 
-int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
-    int32_t priority, uint32_t deviceTags)
+int32_t MMIService::AddInterceptorHandler(HandleEventType eventType, int32_t priority, uint32_t deviceTags)
 {
     CALL_INFO_TRACE;
-#if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&MMIService::CheckAddInput, this, pid, handlerType, eventType, priority, deviceTags));
+        std::bind(&MMIService::CheckAddInterceptor, this, pid, eventType, priority, deviceTags));
     if (ret != RET_OK) {
-        MMI_HILOGE("Add input handler failed, ret:%{public}d", ret);
+        MMI_HILOGE("Add interceptor handler failed, ret:%{public}d", ret);
         return RET_ERR;
     }
-#endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
     return RET_OK;
 }
 
-#if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
-int32_t MMIService::CheckRemoveInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType,
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+int32_t MMIService::CheckRemoveInterceptor(int32_t pid, HandleEventType eventType,
     int32_t priority, uint32_t deviceTags)
 {
     auto sess = GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
-    return sMsgHandler_.OnRemoveInputHandler(sess, handlerType, eventType, priority, deviceTags);
+    return sMsgHandler_.OnRemoveInterceptorHandler(sess, eventType, priority, deviceTags);
 }
-#endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 
-int32_t MMIService::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
-    int32_t priority, uint32_t deviceTags)
+int32_t MMIService::RemoveInterceptorHandler(HandleEventType eventType, int32_t priority, uint32_t deviceTags)
 {
     CALL_INFO_TRACE;
-#if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&MMIService::CheckRemoveInput, this, pid, handlerType, eventType, priority, deviceTags));
+        std::bind(&MMIService::CheckRemoveInterceptor, this, pid, eventType, priority, deviceTags));
     if (ret != RET_OK) {
-        MMI_HILOGE("Remove input handler failed, ret:%{public}d", ret);
+        MMI_HILOGE("Remove interceptor handler failed, ret:%{public}d", ret);
         return RET_ERR;
     }
-#endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+    return RET_OK;
+}
+
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+int32_t MMIService::CheckAddMonitor(int32_t pid, HandleEventType eventType)
+{
+    auto sess = GetSessionByPid(pid);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    return sMsgHandler_.OnAddMonitorHandler(sess, eventType);
+}
+#endif // OHOS_BUILD_ENABLE_MONITOR
+
+int32_t MMIService::AddMonitorHandler(HandleEventType eventType)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&MMIService::CheckAddMonitor, this, pid, eventType));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Add monitor handler failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+#endif // OHOS_BUILD_ENABLE_MONITOR
+    return RET_OK;
+}
+
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+int32_t MMIService::CheckRemoveMonitor(int32_t pid, HandleEventType eventType)
+{
+    auto sess = GetSessionByPid(pid);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    return sMsgHandler_.OnRemoveMonitorHandler(sess, eventType);
+}
+#endif // OHOS_BUILD_ENABLE_MONITOR
+
+int32_t MMIService::RemoveMonitorHandler(HandleEventType eventType)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&MMIService::CheckRemoveMonitor, this, pid, eventType));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Remove monitor handler failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+#endif // OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
 }
 
@@ -863,30 +909,6 @@ int32_t MMIService::SetAnrObserver()
     return RET_OK;
 }
 
-int32_t MMIService::GetDisplayBindInfo(DisplayBindInfos &infos)
-{
-    CALL_DEBUG_ENTER;
-    int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&InputWindowsManager::GetDisplayBindInfo, WinMgr, std::ref(infos)));
-    if (ret != RET_OK) {
-        MMI_HILOGE("GetDisplayBindInfo pid failed, ret:%{public}d", ret);
-        return RET_ERR;
-    }
-    return RET_OK;
-}
-
-int32_t MMIService::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
-{
-    CALL_DEBUG_ENTER;
-    int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&InputWindowsManager::SetDisplayBind, WinMgr, deviceId, displayId, std::ref(msg)));
-    if (ret != RET_OK) {
-        MMI_HILOGE("SetDisplayBind pid failed, ret:%{public}d", ret);
-        return RET_ERR;
-    }
-    return RET_OK;    
-}
-
 int32_t MMIService::GetFunctionKeyState(int32_t funcKey, bool &state)
 {
     CALL_INFO_TRACE;
@@ -921,7 +943,7 @@ int32_t MMIService::SetFunctionKeyState(int32_t funcKey, bool enable)
 
 int32_t MMIService::SetPointerLocation(int32_t x, int32_t y)
 {
-        CALL_DEBUG_ENTER;
+    CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MouseEventNormalize::SetPointerLocation,
         MouseEventHdr, x, y));
@@ -932,6 +954,7 @@ int32_t MMIService::SetPointerLocation(int32_t x, int32_t y)
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     return RET_OK;
 }
+
 void MMIService::OnDelegateTask(epoll_event& ev)
 {
     if ((ev.events & EPOLLIN) == 0) {
@@ -1316,7 +1339,31 @@ int32_t MMIService::SetMouseCaptureMode(int32_t windowId, bool isCaptureMode)
     if (ret != RET_OK) {
         MMI_HILOGE("Set capture failed,return %{public}d", ret);
     }
-    return ret;;
+    return ret;
+}
+
+int32_t MMIService::GetDisplayBindInfo(DisplayBindInfos &infos)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&InputWindowsManager::GetDisplayBindInfo, WinMgr, std::ref(infos)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetDisplayBindInfo pid failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&InputWindowsManager::SetDisplayBind, WinMgr, deviceId, displayId, std::ref(msg)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("SetDisplayBind pid failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;    
 }
 } // namespace MMI
 } // namespace OHOS

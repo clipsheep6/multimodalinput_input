@@ -15,25 +15,15 @@
 
 #include "input_device_impl.h"
 
-#include <algorithm>
-
+#include "input_connect_manager.h"
 #include "mmi_log.h"
-#include "multimodal_event_handler.h"
-#include "multimodal_input_connect_manager.h"
 #include "napi_constants.h"
-#include "net_packet.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceImpl" };
 } // namespace
-
-InputDeviceImpl& InputDeviceImpl::GetInstance()
-{
-    static InputDeviceImpl instance;
-    return instance;
-}
 
 int32_t InputDeviceImpl::RegisterDevListener(const std::string &type, InputDevListenerPtr listener)
 {
@@ -98,25 +88,6 @@ listenerLabel:
     return RET_OK;
 }
 
-void InputDeviceImpl::OnDevListener(int32_t deviceId, const std::string &type)
-{
-    CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mtx_);
-    auto iter = devListener_.find("change");
-    if (iter == devListener_.end()) {
-        MMI_HILOGE("Find change failed");
-        return;
-    }
-    for (const auto &item : iter->second) {
-        MMI_HILOGI("Report device change task, event type:%{public}s", type.c_str());
-        if (type == "add") {
-            item->OnDeviceAdded(deviceId, type);
-            continue;
-        }
-        item->OnDeviceRemoved(deviceId, type);
-    }
-}
-
 int32_t InputDeviceImpl::GetInputDeviceIds(FunInputDevIds callback)
 {
     CALL_DEBUG_ENTER;
@@ -173,9 +144,61 @@ int32_t InputDeviceImpl::GetKeyboardType(int32_t deviceId, FunKeyboardTypes call
     return RET_OK;
 }
 
-int32_t InputDeviceImpl::GetUserData()
+int32_t InputDeviceImpl::OnDevListener(NetPacket& pkt)
 {
-    return userData_;
+    CALL_DEBUG_ENTER;
+    std::string type;
+    int32_t deviceId;
+    pkt >> type >> deviceId;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read type failed");
+        return RET_ERR;
+    }
+    HandlerDevListener(deviceId, type);
+    return RET_OK;
+}
+
+void InputDeviceImpl::HandlerDevListener(int32_t deviceId, const std::string &type)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    auto iter = devListener_.find("change");
+    if (iter == devListener_.end()) {
+        MMI_HILOGE("Find change failed");
+        return;
+    }
+    for (const auto &item : iter->second) {
+        MMI_HILOGI("Report device change task, event type:%{public}s", type.c_str());
+        if (type == "add") {
+            item->OnDeviceAdded(deviceId, type);
+            continue;
+        }
+        item->OnDeviceRemoved(deviceId, type);
+    }
+}
+
+bool InputDeviceImpl::GetFunctionKeyState(int32_t funcKey)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    bool state { false };
+    int32_t ret = MultimodalInputConnMgr->GetFunctionKeyState(funcKey, state);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
+    }
+    return state;
+}
+
+int32_t InputDeviceImpl::SetFunctionKeyState(int32_t funcKey, bool enable)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->SetFunctionKeyState(funcKey, enable);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

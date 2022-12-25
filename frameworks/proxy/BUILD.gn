@@ -20,11 +20,11 @@ config("libmmi_client_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
+    "binder_proxy/include",
+    "dfx/include",
     "event_handler/include",
-    "events/include",
     "module_loader/include",
   ]
 }
@@ -32,7 +32,6 @@ config("libmmi_client_config") {
 config("libmmi_public_client_config") {
   include_dirs = [
     "//base/notification/eventhandler/interfaces/inner_api",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
@@ -44,7 +43,6 @@ config("libmmi_test_util") {
   include_dirs = [
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_path}/frameworks/proxy/module_loader/include",
-    "${mmi_path}/interfaces/native/innerkits/common/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/test/unittest/common/include",
     "${mmi_path}/util/network/include",
@@ -79,13 +77,14 @@ ohos_source_set("libmmi-common") {
 
 ohos_shared_library("libmmi-client") {
   sources = [
-    "event_handler/src/anr_handler.cpp",
-    "event_handler/src/bytrace_adapter.cpp",
-    "event_handler/src/client_msg_handler.cpp",
+    "dfx/src/bytrace_adapter.cpp",
+    "event_handler/src/anr_collecter.cpp",
     "event_handler/src/input_device_impl.cpp",
-    "event_handler/src/input_handler_manager.cpp",
+    "event_handler/src/input_filter.cpp",
+    "event_handler/src/input_injector.cpp",
     "event_handler/src/input_manager_impl.cpp",
-    "event_handler/src/multimodal_event_handler.cpp",
+    "event_handler/src/input_mouse_helper.cpp",
+    "event_handler/src/input_window_transfer.cpp",
     "events/src/axis_event.cpp",
     "events/src/input_manager.cpp",
     "module_loader/src/mmi_client.cpp",
@@ -98,29 +97,29 @@ ohos_shared_library("libmmi-client") {
   defines = input_default_defines
 
   if (input_feature_interceptor) {
-    sources += [ "event_handler/src/input_interceptor_manager.cpp" ]
+    sources += [ "event_handler/src/input_interceptor.cpp" ]
   }
 
   if (input_feature_monitor) {
-    sources += [ "event_handler/src/input_monitor_manager.cpp" ]
+    sources += [ "event_handler/src/input_monitor.cpp" ]
   }
 
   if (input_feature_keyboard) {
-    sources += [ "event_handler/src/key_event_input_subscribe_manager.cpp" ]
+    sources += [ "event_handler/src/input_key_subscriber.cpp" ]
   }
 
   configs = [
     ":libmmi_client_config",
+    "//foundation/multimodalinput/input/frameworks/proxy/binder_proxy:mmi_binder_proxy_config",
     "//foundation/multimodalinput/input/util:libmmi_util_public_config",
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_config",
-    "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_config",
   ]
 
   public_configs = [ ":libmmi_public_client_config" ]
 
   deps = [
     ":libmmi-common",
-    "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_proxy",
+    "//foundation/multimodalinput/input/frameworks/proxy/binder_proxy:mmi_binder_proxy",
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_service",
     "//foundation/multimodalinput/input/util:libmmi-util",
   ]
@@ -201,6 +200,7 @@ ohos_unittest("InputManagerTest") {
   include_dirs = [
     "${mmi_path}/frameworks/proxy/events/test",
     "$root_out_dir/diff_libinput_mmi/export_include",
+    "//foundation/multimodalinput/input/service/filter/include"
   ]
 
   defines = input_default_defines
@@ -234,7 +234,10 @@ ohos_unittest("InputManagerTest") {
 
 ohos_unittest("InputManagerManualTest") {
   module_out_path = module_output_path
-  include_dirs = [ "//commonlibrary/c_utils/base/include" ]
+  include_dirs = [
+    "//commonlibrary/c_utils/base/include",
+    "//foundation/multimodalinput/input/service/filter/include",
+  ]
 
   defines = input_default_defines
 

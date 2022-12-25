@@ -35,7 +35,6 @@
 #include "error_multimodal.h"
 #include "input_manager.h"
 #include "mmi_log.h"
-#include "multimodal_event_handler.h"
 #include "pointer_event.h"
 #include "util.h"
 

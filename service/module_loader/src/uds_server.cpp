@@ -21,7 +21,7 @@
 #include <sys/socket.h>
 
 #include "dfx_hisysevent.h"
-#include "i_multimodal_input_connect.h"
+#include "i_input_connect.h"
 #include "mmi_log.h"
 #include "util.h"
 #include "util_ex.h"
@@ -158,9 +158,9 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     
     CLOSE_SOCK:
     close(serverFd);
-    serverFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
+    serverFd = IInputConnect::INVALID_SOCKET_FD;
     close(toReturnClientFd);
-    toReturnClientFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
+    toReturnClientFd = IInputConnect::INVALID_SOCKET_FD;
     return RET_ERR;
 }
 

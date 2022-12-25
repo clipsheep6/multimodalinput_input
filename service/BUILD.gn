@@ -55,7 +55,6 @@ config("libmmi_server_config") {
     "//foundation/multimodalinput/interfaces/native/innerkits/event/include",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/include",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/src",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/util/socket/include",
     "//foundation/multimodalinput/input/util/network/include",
@@ -84,7 +83,7 @@ config("libmmi_server_config") {
 
 ohos_shared_library("libmmi-server") {
   sources = [
-    "//foundation/multimodalinput/input/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
+    "//foundation/multimodalinput/input/frameworks/proxy/dfx/src/bytrace_adapter.cpp",
     "delegate_task/src/delegate_tasks.cpp",
     "device_config/src/device_config_file_parser.cpp",
     "device_manager/src/input_device_manager.cpp",
@@ -245,7 +244,6 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/frameworks/proxy/event_handle/include",
     "${mmi_path}/frameworks/proxy/module_loader",
     "${mmi_path}/frameworks/proxy/module_loader/include",
-    "${mmi_path}/interfaces/native/innerkits/common/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "${mmi_path}/service/include",
@@ -292,7 +290,6 @@ ohos_unittest("ut-mmi-service-out") {
 ohos_unittest("TransformPointTest") {
   module_out_path = module_output_path
   include_dirs = [
-    "${mmi_path}/interfaces/native/innerkits/common/include",
     "${mmi_path}/util/common/include",
     "${mmi_path}/tools/vuinput/include",
   ]

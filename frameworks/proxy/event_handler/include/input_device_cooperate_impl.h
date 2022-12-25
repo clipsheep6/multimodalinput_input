@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef INPUT_DEVICE_COOPERATE_IMPL_H
 #define INPUT_DEVICE_COOPERATE_IMPL_H
 
@@ -29,7 +30,7 @@ namespace OHOS {
 namespace MMI {
 class InputDeviceCooperateImpl final {
 public:
-    static InputDeviceCooperateImpl &GetInstance();
+    InputDeviceCooperateImpl() = default;
     DISALLOW_COPY_AND_MOVE(InputDeviceCooperateImpl);
     ~InputDeviceCooperateImpl() = default;
 
@@ -53,17 +54,20 @@ public:
         FuncCooperationMessage callback);
     int32_t StopDeviceCooperate(FuncCooperationMessage callback);
     int32_t GetInputDeviceCooperateState(const std::string &deviceId, FuncCooperationState callback);
-    void OnDevCooperateListener(const std::string &deviceId, const CooperationMessage &msg);
-    void OnCooperationMessage(int32_t userData, const std::string &deviceId, const CooperationMessage &msg);
-    void OnCooperationState(int32_t userData, bool state);
     int32_t GetUserData();
+    int32_t SetInputDevice(const std::string &dhid, const std::string &screenId);
+    int32_t OnCooperationListiner(NetPacket& pkt);
+    int32_t OnCooperationMessage(NetPacket& pkt);
+    int32_t OnCooperationState(NetPacket& pkt);
 
 private:
     const DevCooperationMsg *GetCooperateMessageEvent(int32_t userData) const;
     const DevCooperationState *GetCooperateStateEvent(int32_t userData) const;
+    void HandlerDevCooperateListener(const std::string &deviceId, const CooperationMessage &msg);
+    void HandlerCooperationMessage(int32_t userData, const std::string &deviceId, const CooperationMessage &msg);
+    void HandlerCooperationState(int32_t userData, bool state);
 
 private:
-    InputDeviceCooperateImpl() = default;
     std::list<InputDevCooperateListenerPtr> devCooperateListener_;
     std::map<int32_t, CooperateEvent> devCooperateEvent_;
     std::mutex mtx_;
@@ -72,5 +76,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#define InputDevCooperateImpl OHOS::MMI::InputDeviceCooperateImpl::GetInstance()
 #endif // INPUT_DEVICE_COOPERATE_IMPL_H

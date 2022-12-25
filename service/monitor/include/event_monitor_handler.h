@@ -25,7 +25,7 @@
 
 #include "i_input_event_collection_handler.h"
 #include "i_input_event_handler.h"
-#include "input_handler_type.h"
+#include "input_proxy_def.h"
 #include "uds_session.h"
 
 namespace OHOS {
@@ -44,8 +44,8 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
-    int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType, SessionPtr session);
-    void RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType, SessionPtr session);
+    int32_t AddMonitorHandler(HandleEventType eventType, SessionPtr session);
+    void RemoveMonitorHandler(HandleEventType eventType, SessionPtr session);
     void MarkConsumed(int32_t eventId, SessionPtr session);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     bool OnHandleEvent(std::shared_ptr<KeyEvent> KeyEvent);
@@ -62,8 +62,8 @@ private:
 private:
     class SessionHandler {
     public:
-        SessionHandler(InputHandlerType handlerType, HandleEventType eventType, SessionPtr session)
-            : handlerType_(handlerType), eventType_(eventType & HANDLE_EVENT_TYPE_ALL),
+        SessionHandler(HandleEventType eventType, SessionPtr session)
+            : eventType_(eventType & HANDLE_EVENT_TYPE_ALL),
               session_(session) {}
         void SendToClient(std::shared_ptr<KeyEvent> keyEvent) const;
         void SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const;
@@ -71,7 +71,6 @@ private:
         {
             return (session_ < other.session_);
         }
-        InputHandlerType handlerType_;
         HandleEventType eventType_;
         SessionPtr session_ { nullptr };
     };

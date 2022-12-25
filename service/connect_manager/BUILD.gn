@@ -17,7 +17,6 @@ mmi_connect_manager_path = "${mmi_path}/service/connect_manager"
 
 config("mmi_connect_manager_config") {
   include_dirs = [
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
     "//foundation/multimodalinput/input/util/common/include",
@@ -27,6 +26,7 @@ config("mmi_connect_manager_config") {
     "//foundation/multimodalinput/input/service/filter/include",
     "//foundation/multimodalinput/input/service/message_handle/include",
     "//foundation/multimodalinput/input/service/permission_helper/include",
+    "//foundation/multimodalinput/input/frameworks/proxy/binder_proxy/include",
     "//foundation/multimodalinput/input/frameworks/proxy/event_handler/include",
     "${mmi_connect_manager_path}/include",
   ]
@@ -36,34 +36,14 @@ ohos_source_set("mmi_connect_manager_service") {
   part_name = "input"
   subsystem_name = "multimodalinput"
   sources = [
-    "${mmi_connect_manager_path}/src/multimodal_input_connect_def_parcel.cpp",
-    "${mmi_connect_manager_path}/src/multimodal_input_connect_stub.cpp",
+    "//foundation/multimodalinput/input/frameworks/proxy/binder_proxy/src/input_connect_def_parcel.cpp",
+    "${mmi_connect_manager_path}/src/input_connect_stub.cpp",
   ]
 
   configs = [ ":mmi_connect_manager_config" ]
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
-    "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
-    "safwk:system_ability_fwk",
-    "samgr:samgr_proxy",
-  ]
-}
-
-ohos_source_set("mmi_connect_manager_proxy") {
-  part_name = "input"
-  subsystem_name = "multimodalinput"
-  sources = [
-    "${mmi_connect_manager_path}/src/multimodal_input_connect_death_recipient.cpp",
-    "${mmi_connect_manager_path}/src/multimodal_input_connect_def_parcel.cpp",
-    "${mmi_connect_manager_path}/src/multimodal_input_connect_manager.cpp",
-    "${mmi_connect_manager_path}/src/multimodal_input_connect_proxy.cpp",
-  ]
-
-  configs = [ ":mmi_connect_manager_config" ]
-
-  external_deps = [
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",

@@ -73,8 +73,7 @@ void EventMonitorHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> p
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
-int32_t EventMonitorHandler::AddInputHandler(InputHandlerType handlerType,
-    HandleEventType eventType, SessionPtr session)
+int32_t EventMonitorHandler::AddMonitorHandler(HandleEventType eventType, SessionPtr session)
 {
     CALL_INFO_TRACE;
     CHKPR(session, RET_ERR);
@@ -83,18 +82,15 @@ int32_t EventMonitorHandler::AddInputHandler(InputHandlerType handlerType,
         return RET_ERR;
     }
     InitSessionLostCallback();
-    SessionHandler mon { handlerType, eventType, session };
+    SessionHandler mon { eventType, session };
     return monitors_.AddMonitor(mon);
 }
 
-void EventMonitorHandler::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
-                                                   SessionPtr session)
+void EventMonitorHandler::RemoveMonitorHandler(HandleEventType eventType, SessionPtr session)
 {
     CALL_INFO_TRACE;
-    if (handlerType == InputHandlerType::MONITOR) {
-        SessionHandler monitor { handlerType, eventType, session };
-        monitors_.RemoveMonitor(monitor);
-    }
+    SessionHandler monitor { eventType, session };
+    monitors_.RemoveMonitor(monitor);
 }
 
 void EventMonitorHandler::MarkConsumed(int32_t eventId, SessionPtr session)
@@ -157,12 +153,7 @@ void EventMonitorHandler::OnSessionLost(SessionPtr session)
 void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<KeyEvent> keyEvent) const
 {
     CHKPV(keyEvent);
-    NetPacket pkt(MmiMessageId::REPORT_KEY_EVENT);
-    pkt << handlerType_ << static_cast<uint32_t>(evdev_device_udev_tags::EVDEV_UDEV_TAG_INPUT);
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write key event failed");
-        return;
-    }
+    NetPacket pkt(MmiMessageId::REPORT_MONITOR_KEY);
     if (InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt) != RET_OK) {
         MMI_HILOGE("Packet key event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
         return;
@@ -177,20 +168,15 @@ void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEv
 {
     CHKPV(pointerEvent);
     CHKPV(session_);
-    NetPacket pkt(MmiMessageId::REPORT_POINTER_EVENT);
-    MMI_HILOGD("Service SendToClient InputHandlerType:%{public}d,TokenType:%{public}d, pid:%{public}d",
-        handlerType_, session_->GetTokenType(), session_->GetPid());
+    NetPacket pkt(MmiMessageId::REPORT_MONITOR_POINTER);
+    MMI_HILOGD("Service SendToClient TokenType:%{public}d, pid:%{public}d",
+        session_->GetTokenType(), session_->GetPid());
     auto currentTime = GetSysClockTime();
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         if (ANRMgr->TriggerANR(ANR_MONITOR, currentTime, session_)) {
             MMI_HILOGW("The pointer event does not report normally, application not response");
             return;
         }
-    }
-    pkt << handlerType_ << static_cast<uint32_t>(evdev_device_udev_tags::EVDEV_UDEV_TAG_INPUT);
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write pointer event failed");
-        return;
     }
     if (InputEventDataTransformation::Marshalling(pointerEvent, pkt) != RET_OK) {
         MMI_HILOGE("Marshalling pointer event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
@@ -337,7 +323,7 @@ bool EventMonitorHandler::MonitorCollection::HandleEvent(std::shared_ptr<Pointer
 
 bool EventMonitorHandler::MonitorCollection::HasMonitor(SessionPtr session)
 {
-    SessionHandler monitor { InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_ALL, session };
+    SessionHandler monitor { HANDLE_EVENT_TYPE_ALL, session };
     return (monitors_.find(monitor) != monitors_.end());
 }
 
@@ -428,10 +414,9 @@ void EventMonitorHandler::MonitorCollection::Dump(int32_t fd, const std::vector<
         SessionPtr session = item.session_;
         CHKPV(session);
         mprintf(fd,
-                "handlerType:%d | Pid:%d | Uid:%d | Fd:%d "
+                "Pid:%d | Uid:%d | Fd:%d "
                 "| EarliestEventTime:%" PRId64 " | Descript:%s \t",
-                item.handlerType_, session->GetPid(),
-                session->GetUid(), session->GetFd(),
+                session->GetPid(), session->GetUid(), session->GetFd(),
                 session->GetEarliestEventTime(), session->GetDescript().c_str());
     }
 }

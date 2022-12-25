@@ -15,21 +15,14 @@
 
 #include "input_device_cooperate_impl.h"
 
+#include "input_connect_manager.h"
 #include "mmi_log.h"
-#include "multimodal_event_handler.h"
-#include "multimodal_input_connect_manager.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceCooperateImpl" };
 } // namespace
-
-InputDeviceCooperateImpl &InputDeviceCooperateImpl::GetInstance()
-{
-    static InputDeviceCooperateImpl instance;
-    return instance;
-}
 
 int32_t InputDeviceCooperateImpl::RegisterCooperateListener(InputDevCooperateListenerPtr listener)
 {
@@ -132,7 +125,7 @@ int32_t InputDeviceCooperateImpl::GetInputDeviceCooperateState(
     return MultimodalInputConnMgr->GetInputDeviceCooperateState(userData_++, deviceId);
 }
 
-void InputDeviceCooperateImpl::OnDevCooperateListener(const std::string &deviceId, const CooperationMessage &msg)
+void InputDeviceCooperateImpl::HandlerDevCooperateListener(const std::string &deviceId, const CooperationMessage &msg)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -141,7 +134,7 @@ void InputDeviceCooperateImpl::OnDevCooperateListener(const std::string &deviceI
     }
 }
 
-void InputDeviceCooperateImpl::OnCooperationMessage(int32_t userData, const std::string &deviceId, const CooperationMessage &msg)
+void InputDeviceCooperateImpl::HandlerCooperationMessage(int32_t userData, const std::string &deviceId, const CooperationMessage &msg)
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
@@ -151,7 +144,7 @@ void InputDeviceCooperateImpl::OnCooperationMessage(int32_t userData, const std:
     (*event)(deviceId, msg);
 }
 
-void InputDeviceCooperateImpl::OnCooperationState(int32_t userData, bool state)
+void InputDeviceCooperateImpl::HandlerCooperationState(int32_t userData, bool state)
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
@@ -180,6 +173,61 @@ const InputDeviceCooperateImpl::DevCooperationState *InputDeviceCooperateImpl::G
 {
     auto iter = devCooperateEvent_.find(userData);
     return iter == devCooperateEvent_.end() ? nullptr : &iter->second.state;
+}
+
+int32_t InputDeviceCooperateImpl::SetInputDevice(const std::string &dhid, const std::string &screenId)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->SetInputDevice(dhid, screenId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t InputDeviceCooperateImpl::OnCooperationListiner(NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    int32_t userData;
+    std::string deviceId;
+    int32_t nType;
+    pkt >> userData >> deviceId >> nType;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read type failed");
+        return RET_ERR;
+    }
+    HandlerDevCooperateListener(deviceId, CooperationMessage(nType));
+    return RET_OK;
+}
+
+int32_t InputDeviceCooperateImpl::OnCooperationMessage(NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    int32_t userData;
+    std::string deviceId;
+    int32_t nType;
+    pkt >> userData >> deviceId >> nType;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read cooperate msg failed");
+        return RET_ERR;
+    }
+    HandlerCooperationMessage(userData, deviceId, CooperationMessage(nType));
+    return RET_OK;
+}
+
+int32_t InputDeviceCooperateImpl::OnCooperationState(NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    int32_t userData;
+    bool state;
+    pkt >> userData >> state;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read cooperate msg failed");
+        return RET_ERR;
+    }
+    HandlerCooperationState(userData, state);
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

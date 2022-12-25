@@ -17,21 +17,15 @@
 
 #include <cinttypes>
 
-#include "define_multimodal.h"
-#include "error_multimodal.h"
-
 #include "bytrace_adapter.h"
-#include "event_filter_service.h"
-#include "input_device_cooperate_impl.h"
 #include "mmi_client.h"
-#include "multimodal_event_handler.h"
-#include "multimodal_input_connect_manager.h"
+#include "mmi_func_callback.h"
+#include "msg_handler.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerImpl" };
-constexpr size_t MAX_FILTER_NUM = 4;
 } // namespace
 
 struct MonitorEventConsumer : public IInputEventConsumer {
@@ -71,116 +65,117 @@ private:
 InputManagerImpl::InputManagerImpl() {}
 InputManagerImpl::~InputManagerImpl() {}
 
+void Connected()
+{
+    CALL_DEBUG_ENTER;
+    InputMgrImpl.OnConnected();
+}
+
+bool InputManagerImpl::InitClient(EventHandlerPtr eventHandler)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (client_ != nullptr) {
+        if (eventHandler != nullptr) {
+            client_->MarkIsEventHandlerChanged(eventHandler);
+        }
+        return true;
+    }
+    client_ = std::make_shared<MMIClient>();
+    client_->SetEventHandler(eventHandler);
+    client_->RegisterConnectedFunction(&Connected);
+    InitMsgCallback();
+    if (!(client_->Start())) {
+        client_.reset();
+        client_ = nullptr;
+        MMI_HILOGE("Client start failed");
+        return false;
+    }
+    return true;
+}
+
+void InputManagerImpl::InitMsgCallback()
+{
+    MMIClient::MsgCallback funs[] = {
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+        {MmiMessageId::ON_KEY_EVENT, MsgCallbackBind1(&InputWindowTransfer::OnKeyEvent, &windowTransfer_)},
+        {MmiMessageId::ON_SUBSCRIBE_KEY, MsgCallbackBind1(&InputKeySubscriber::OnSubscribeKeyEventCallback, &keySubscriber_)},
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+        {MmiMessageId::ON_POINTER_EVENT, MsgCallbackBind1(&InputWindowTransfer::OnPointerEvent, &windowTransfer_)},
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+        {MmiMessageId::ADD_INPUT_DEVICE_LISTENER, MsgCallbackBind1(&InputDeviceImpl::OnDevListener, &inputDeviceImpl_)},
+        {MmiMessageId::NOTICE_ANR, MsgCallbackBind1(&AnrCollecter::OnAnr, &anrCollecter_)},
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
+        {MmiMessageId::REPORT_INTERCEPTOR_KEY, MsgCallbackBind1(&InputInterceptor::ReportInterceptorKey, &inputInterceptor_)},
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && \
+    defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
+        {MmiMessageId::REPORT_INTERCEPTOR_POINTER, MsgCallbackBind1(&InputInterceptor::ReportInterceptorPointer, &inputInterceptor_)},
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_MONITOR)
+        {MmiMessageId::REPORT_MONITOR_KEY, MsgCallbackBind1(&InputMonitor::ReportMonitorKey, &inputMonitor_)},
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && \
+    defined(OHOS_BUILD_ENABLE_MONITOR)
+        {MmiMessageId::REPORT_MONITOR_POINTER, MsgCallbackBind1(&InputMonitor::ReportMonitorPointer, &inputMonitor_)},
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+        {MmiMessageId::COOPERATION_ADD_LISTENER, MsgCallbackBind1(&InputDeviceCooperateImpl::OnCooperationListiner, &inputDeviceCooImpl_)},
+        {MmiMessageId::COOPERATION_MESSAGE, MsgCallbackBind1(&InputDeviceCooperateImpl::OnCooperationMessage, &inputDeviceCooImpl_)},
+        {MmiMessageId::COOPERATION_GET_STATE, MsgCallbackBind1(&InputDeviceCooperateImpl::OnCooperationState, &inputDeviceCooImpl_)},
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+    };
+    for (auto &it : funs) {
+        if (!client_->RegistrationEvent(it)) {
+            MMI_HILOGW("Failed to register event errCode:%{public}d", EVENT_REG_FAIL);
+            continue;
+        }
+    }
+}
 
 int32_t InputManagerImpl::GetDisplayBindInfo(DisplayBindInfos &infos)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mtx_);
-    int32_t ret = MultimodalInputConnMgr->GetDisplayBindInfo(infos);
-    if (ret != RET_OK) {
-        MMI_HILOGE("GetDisplayBindInfo failed, ret:%{public}d", ret);
-        return RET_ERR;
-    }
-    return RET_OK;
+    return windowTransfer_.GetDisplayBindInfo(infos);
 }
 
 int32_t InputManagerImpl::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
 {
-    std::lock_guard<std::mutex> guard(mtx_);
-    int32_t ret = MultimodalInputConnMgr->SetDisplayBind(deviceId, displayId, msg);
-    if (ret != RET_OK) {
-        MMI_HILOGE("SetDisplayBind failed, ret:%{public}d", ret);
-        return RET_ERR;
-    }
-    return RET_OK;
+    CALL_DEBUG_ENTER;
+    return windowTransfer_.SetDisplayBind(deviceId, displayId, msg);
 }
 
 void InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.InitClient()) {
-        MMI_HILOGE("Get mmi client is nullptr");
+    if (!InitClient()) {
+        MMI_HILOGE("Client init failed");
         return;
     }
-    if (displayGroupInfo.windowsInfo.empty() || displayGroupInfo.displaysInfo.empty()) {
-        MMI_HILOGE("The windows info or display info is empty!");
-        return;
-    }
-    for (const auto &item : displayGroupInfo.windowsInfo) {
-        if ((item.defaultHotAreas.size() > WindowInfo::MAX_HOTAREA_COUNT) ||
-            (item.pointerHotAreas.size() > WindowInfo::MAX_HOTAREA_COUNT) ||
-            item.defaultHotAreas.empty() || item.pointerHotAreas.empty()) {
-            MMI_HILOGE("Hot areas check failed! defaultHotAreas:size:%{public}zu,"
-                       "pointerHotAreas:size:%{public}zu",
-                       item.defaultHotAreas.size(), item.pointerHotAreas.size());
-            return;
-        }
-    }
-    displayGroupInfo_ = displayGroupInfo;
-    SendDisplayInfo();
-    PrintDisplayInfo();
+    windowTransfer_.UpdateDisplayInfo(displayGroupInfo);
 }
 
 int32_t InputManagerImpl::AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority)
 {
     CALL_INFO_TRACE;
-    std::lock_guard<std::mutex> guard(mtx_);
-    CHKPR(filter, RET_ERR);
-    if (eventFilterServices_.size() >= MAX_FILTER_NUM) {
-        MMI_HILOGE("Too many filters, size:%{public}zu", eventFilterServices_.size());
-        return RET_ERR;
-    }
-    sptr<IEventFilter> service = new (std::nothrow) EventFilterService(filter);
-    CHKPR(service, RET_ERR);
-    const int32_t filterId = EventFilterService::GetNextId();
-    int32_t ret = MultimodalInputConnMgr->AddInputEventFilter(service, filterId, priority);
-    if (ret != RET_OK) {
-        MMI_HILOGE("AddInputEventFilter has send to server failed, priority:%{public}d, ret:%{public}d", priority, ret);
-        service = nullptr;
-        return RET_ERR;
-    }
-    auto it =  eventFilterServices_.emplace(filterId, std::make_tuple(service, priority));
-    if (!it.second) {
-        MMI_HILOGW("Filter id duplicate");
-    }
-    return filterId;
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    return inputFilter_.AddInputEventFilter(filter, priority);
+#else
+    MMI_HILOGW("Pointer and touchscreen device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 
 int32_t InputManagerImpl::RemoveInputEventFilter(int32_t filterId)
 {
     CALL_INFO_TRACE;
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (eventFilterServices_.empty()) {
-        MMI_HILOGE("Filters is empty, size:%{public}zu", eventFilterServices_.size());
-        return RET_OK;
-    }
-    std::map<int32_t, std::tuple<sptr<IEventFilter>, int32_t>>::iterator it;
-    if (filterId != -1) {
-        it = eventFilterServices_.find(filterId);
-        if (it == eventFilterServices_.end()) {
-            MMI_HILOGE("Filter not found");
-            return RET_OK;
-        }
-    }
-    int32_t ret = MultimodalInputConnMgr->RemoveInputEventFilter(filterId);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Remove filter failed, filter id:%{public}d, ret:%{public}d", filterId, ret);
-        return RET_ERR;
-    }
-    if (filterId != -1) {
-        eventFilterServices_.erase(it);
-    } else {
-        eventFilterServices_.clear();
-    }
-    MMI_HILOGI("Filter remove success");
-    return RET_OK;
-}
-
-EventHandlerPtr InputManagerImpl::GetEventHandler() const
-{
-    CHKPP(eventHandler_);
-    return eventHandler_;
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    return inputFilter_.RemoveInputEventFilter(filterId);
+#else
+    MMI_HILOGW("Pointer and touchscreen device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 
 void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
@@ -190,13 +185,11 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventCo
     CHK_PID_AND_TID();
     CHKPV(inputEventConsumer);
     CHKPV(eventHandler);
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.InitClient(eventHandler)) {
+    if (!InitClient(eventHandler)) {
         MMI_HILOGE("Client init failed");
         return;
     }
-    consumer_ = inputEventConsumer;
-    eventHandler_ = eventHandler;
+    windowTransfer_.SetWindowInputEventConsumer(inputEventConsumer, eventHandler);
 }
 
 int32_t InputManagerImpl::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
@@ -204,11 +197,14 @@ int32_t InputManagerImpl::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption
 {
     CALL_INFO_TRACE;
     CHK_PID_AND_TID();
-    std::lock_guard<std::mutex> guard(mtx_);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPR(keyOption, RET_ERR);
     CHKPR(callback, RET_ERR);
-    return KeyEventInputSubscribeMgr.SubscribeKeyEvent(keyOption, callback);
+    if (!InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return RET_ERR;
+    }
+    return keySubscriber_.SubscribeKeyEvent(keyOption, callback);
 #else
     MMI_HILOGW("Keyboard device does not support");
     return ERROR_UNSUPPORT;
@@ -219,172 +215,15 @@ void InputManagerImpl::UnsubscribeKeyEvent(int32_t subscriberId)
 {
     CALL_INFO_TRACE;
     CHK_PID_AND_TID();
-    std::lock_guard<std::mutex> guard(mtx_);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    KeyEventInputSubscribeMgr.UnsubscribeKeyEvent(subscriberId);
+    if (!InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return;
+    }
+    keySubscriber_.UnsubscribeKeyEvent(subscriberId);
 #else
     MMI_HILOGW("Keyboard device does not support");
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-}
-
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-void InputManagerImpl::OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consumer,
-    std::shared_ptr<KeyEvent> keyEvent)
-{
-    CHK_PID_AND_TID();
-    CHKPV(consumer);
-    consumer->OnInputEvent(keyEvent);
-    MMI_HILOGD("Key event callback keyCode:%{public}d", keyEvent->GetKeyCode());
-}
-
-void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
-{
-    CHK_PID_AND_TID();
-    CHKPV(keyEvent);
-    CHKPV(eventHandler_);
-    CHKPV(consumer_);
-    std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
-    std::shared_ptr<IInputEventConsumer> inputConsumer = nullptr;
-    {
-        std::lock_guard<std::mutex> guard(mtx_);
-        eventHandler = eventHandler_;
-        inputConsumer = consumer_;
-    }
-    BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_DISPATCH_EVENT);
-    MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    CHKPV(client);
-    if (client->IsEventHandlerChanged()) {
-        if (!eventHandler->PostHighPriorityTask(std::bind(&InputManagerImpl::OnKeyEventTask,
-            this, inputConsumer, keyEvent))) {
-            MMI_HILOGE("Post task failed");
-            return;
-        }
-    } else {
-        inputConsumer->OnInputEvent(keyEvent);
-        MMI_HILOGD("Key event report keyCode:%{public}d", keyEvent->GetKeyCode());
-    }
-    MMI_HILOGD("Key event keyCode:%{public}d", keyEvent->GetKeyCode());
-}
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-void InputManagerImpl::OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer,
-    std::shared_ptr<PointerEvent> pointerEvent)
-{
-    CHK_PID_AND_TID();
-    CHKPV(consumer);
-    CHKPV(pointerEvent);
-    consumer->OnInputEvent(pointerEvent);
-    MMI_HILOGD("Pointer event callback pointerId:%{public}d", pointerEvent->GetPointerId());
-}
-
-void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
-{
-    CALL_DEBUG_ENTER;
-    CHK_PID_AND_TID();
-    CHKPV(pointerEvent);
-    CHKPV(eventHandler_);
-    CHKPV(consumer_);
-    std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
-    std::shared_ptr<IInputEventConsumer> inputConsumer = nullptr;
-    {
-        std::lock_guard<std::mutex> guard(mtx_);
-        eventHandler = eventHandler_;
-        inputConsumer = consumer_;
-    }
-    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_DISPATCH_EVENT);
-    MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    CHKPV(client);
-    if (client->IsEventHandlerChanged()) {
-        if (!eventHandler->PostHighPriorityTask(std::bind(&InputManagerImpl::OnPointerEventTask,
-            this, inputConsumer, pointerEvent))) {
-            MMI_HILOGE("Post task failed");
-            return;
-        }
-    } else {
-        inputConsumer->OnInputEvent(pointerEvent);
-        MMI_HILOGD("Pointer event report pointerId:%{public}d", pointerEvent->GetPointerId());
-    }
-    MMI_HILOGD("Pointer event pointerId:%{public}d", pointerEvent->GetPointerId());
-}
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-
-int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt)
-{
-    pkt << displayGroupInfo_.width << displayGroupInfo_.height << displayGroupInfo_.focusWindowId;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write logical data failed");
-        return RET_ERR;
-    }
-    if (PackWindowInfo(pkt) == RET_ERR) {
-        MMI_HILOGE("Packet write windows info failed");
-        return RET_ERR;
-    }
-    return PackDisplayInfo(pkt);
-}
-
-int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
-{
-    uint32_t num = static_cast<uint32_t>(displayGroupInfo_.windowsInfo.size());
-    pkt << num;
-    for (const auto &item : displayGroupInfo_.windowsInfo) {
-        pkt << item.id << item.pid << item.uid << item.area
-            << item.defaultHotAreas << item.pointerHotAreas
-            << item.agentWindowId << item.flags;
-    }
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write windows data failed");
-        return RET_ERR;
-    }
-    return RET_OK;
-}
-
-int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt)
-{
-    uint32_t num = static_cast<uint32_t>(displayGroupInfo_.displaysInfo.size());
-    pkt << num;
-    for (const auto &item : displayGroupInfo_.displaysInfo) {
-        pkt << item.id << item.x << item.y << item.width
-            << item.height << item.dpi << item.name << item.uniq << item.direction;
-    }
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write display data failed");
-        return RET_ERR;
-    }
-    return RET_OK;
-}
-
-void InputManagerImpl::PrintDisplayInfo()
-{
-    MMI_HILOGD("logicalInfo,width:%{public}d,height:%{public}d,focusWindowId:%{public}d",
-        displayGroupInfo_.width, displayGroupInfo_.height, displayGroupInfo_.focusWindowId);
-    MMI_HILOGD("windowsInfos,num:%{public}zu", displayGroupInfo_.windowsInfo.size());
-    for (const auto &item : displayGroupInfo_.windowsInfo) {
-        MMI_HILOGD("windowsInfos,id:%{public}d,pid:%{public}d,uid:%{public}d,"
-            "area.x:%{public}d,area.y:%{public}d,area.width:%{public}d,area.height:%{public}d,"
-            "defaultHotAreas.size:%{public}zu,pointerHotAreas.size:%{public}zu,"
-            "agentWindowId:%{public}d,flags:%{public}d",
-            item.id, item.pid, item.uid, item.area.x, item.area.y, item.area.width,
-            item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
-            item.agentWindowId, item.flags);
-        for (const auto &win : item.defaultHotAreas) {
-            MMI_HILOGD("defaultHotAreas:x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
-                win.x, win.y, win.width, win.height);
-        }
-        for (const auto &pointer : item.pointerHotAreas) {
-            MMI_HILOGD("pointerHotAreas:x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
-                pointer.x, pointer.y, pointer.width, pointer.height);
-        }
-    }
-
-    MMI_HILOGD("displayInfos,num:%{public}zu", displayGroupInfo_.displaysInfo.size());
-    for (const auto &item : displayGroupInfo_.displaysInfo) {
-        MMI_HILOGI("displayInfos,id:%{public}d,x:%{public}d,y:%{public}d,"
-            "width:%{public}d,height:%{public}d,dpi:%{public}d,name:%{public}s,"
-            "uniq:%{public}s,direction:%{public}d",
-            item.id, item.x, item.y, item.width, item.height, item.dpi, item.name.c_str(),
-            item.uniq.c_str(), item.direction);
-    }
 }
 
 int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor)
@@ -418,12 +257,11 @@ int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consum
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     CHKPR(consumer, INVALID_HANDLER_ID);
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.InitClient()) {
+    if (!InitClient()) {
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return IMonitorMgr->AddMonitor(consumer);
+    return inputMonitor_.AddMonitor(consumer);
 #else
     MMI_HILOGI("Monitor function does not support");
     return ERROR_UNSUPPORT;
@@ -434,12 +272,11 @@ void InputManagerImpl::RemoveMonitor(int32_t monitorId)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_MONITOR
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.InitClient()) {
+    if (!InitClient()) {
         MMI_HILOGE("Client init failed");
         return;
     }
-    IMonitorMgr->RemoveMonitor(monitorId);
+    inputMonitor_.RemoveMonitor(monitorId);
 #else
     MMI_HILOGI("Monitor function does not support");
 #endif // OHOS_BUILD_ENABLE_MONITOR
@@ -449,12 +286,11 @@ void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_MONITOR
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.InitClient()) {
+    if (!InitClient()) {
         MMI_HILOGE("Client init failed");
         return;
     }
-    IMonitorMgr->MarkConsumed(monitorId, eventId);
+    inputMonitor_.MarkConsumed(monitorId, eventId);
 #else
     MMI_HILOGI("Monitor function does not support");
 #endif // OHOS_BUILD_ENABLE_MONITOR
@@ -463,10 +299,7 @@ void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
 void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
 {
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (MMIEventHdl.MoveMouseEvent(offsetX, offsetY) != RET_OK) {
-        MMI_HILOGE("Failed to inject move mouse offset event");
-    }
+    mouseHelper_.MoveMouseEvent(offsetX, offsetY);
 #else
     MMI_HILOGW("Pointer device or pointer drawing module does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -478,12 +311,11 @@ int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> in
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     CHKPR(interceptor, INVALID_HANDLER_ID);
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.InitClient()) {
+    if (!InitClient()) {
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return InputInterMgr->AddInterceptor(interceptor, HANDLE_EVENT_TYPE_ALL, priority, deviceTags);
+    return inputInterceptor_.AddInterceptor(interceptor, HANDLE_EVENT_TYPE_ALL, priority, deviceTags);
 #else
     MMI_HILOGW("Interceptor function does not support");
     return ERROR_UNSUPPORT;
@@ -496,13 +328,13 @@ int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyE
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
     CHKPR(interceptor, INVALID_HANDLER_ID);
-    std::lock_guard<std::mutex> guard(mtx_);
     auto consumer = std::make_shared<MonitorEventConsumer>(interceptor);
-    if (!MMIEventHdl.InitClient()) {
+    CHKPR(consumer, INVALID_HANDLER_ID);
+    if (!InitClient()) {
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return InputInterMgr->AddInterceptor(consumer, HANDLE_EVENT_TYPE_KEY, priority, deviceTags);
+    return inputInterceptor_.AddInterceptor(consumer, HANDLE_EVENT_TYPE_KEY, priority, deviceTags);
 #else
     MMI_HILOGW("Keyboard device or interceptor function does not support");
     return ERROR_UNSUPPORT;
@@ -513,12 +345,11 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.InitClient()) {
+    if (!InitClient()) {
         MMI_HILOGE("Client init failed");
         return;
     }
-    InputInterMgr->RemoveInterceptor(interceptorId);
+    inputInterceptor_.RemoveInterceptor(interceptorId);
 #else
     MMI_HILOGW("Interceptor function does not support");
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
@@ -529,10 +360,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPV(keyEvent);
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (MMIEventHdl.InjectEvent(keyEvent) != RET_OK) {
-        MMI_HILOGE("Failed to inject keyEvent");
-    }
+    inputInjector_.InjectKeyEvent(keyEvent);
 #else
     MMI_HILOGW("Keyboard device does not support");
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -543,29 +371,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
     CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     CHKPV(pointerEvent);
-    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE ||
-        pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
-#ifndef OHOS_BUILD_ENABLE_POINTER
-        MMI_HILOGW("Pointer device does not support");
-        return;
-#endif
-    }
-    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-#ifndef OHOS_BUILD_ENABLE_TOUCH
-        MMI_HILOGW("Touchscreen device does not support");
-        return;
-#endif
-    }
-#ifndef OHOS_BUILD_ENABLE_JOYSTICK
-    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_JOYSTICK) {
-        MMI_HILOGW("Joystick device does not support");
-        return;
-    }
-#endif
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (MMIEventHdl.InjectPointerEvent(pointerEvent) != RET_OK) {
-        MMI_HILOGE("Failed to inject pointer event");
-    }
+    inputInjector_.InjectPointerEvent(pointerEvent);
 #else
     MMI_HILOGW("Pointer and touchscreen device does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
@@ -573,14 +379,9 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
 
 int32_t InputManagerImpl::SetPointerVisible(bool visible)
 {
-#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mtx_);
-    int32_t ret = MultimodalInputConnMgr->SetPointerVisible(visible);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Set pointer visible failed, ret:%{public}d", ret);
-    }
-    return ret;
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    return mouseHelper_.SetPointerVisible(visible);
 #else
     MMI_HILOGW("Pointer device or pointer drawing module does not support");
     return ERROR_UNSUPPORT;
@@ -589,15 +390,9 @@ int32_t InputManagerImpl::SetPointerVisible(bool visible)
 
 bool InputManagerImpl::IsPointerVisible()
 {
-#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mtx_);
-    bool visible;
-    int32_t ret = MultimodalInputConnMgr->IsPointerVisible(visible);
-    if (ret != 0) {
-        MMI_HILOGE("Get pointer visible failed, ret:%{public}d", ret);
-    }
-    return visible;
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    return mouseHelper_.IsPointerVisible();
 #else
     MMI_HILOGW("Pointer device or pointer drawing module does not support");
     return false;
@@ -608,12 +403,7 @@ int32_t InputManagerImpl::SetPointerSpeed(int32_t speed)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    int32_t ret = MultimodalInputConnMgr->SetPointerSpeed(speed);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Failed to set pointer speed");
-        return RET_ERR;
-    }
-    return RET_OK;
+    return mouseHelper_.SetPointerSpeed(speed);
 #else
     MMI_HILOGW("Pointer device does not support");
     return ERROR_UNSUPPORT;
@@ -624,12 +414,7 @@ int32_t InputManagerImpl::GetPointerSpeed(int32_t &speed)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    int32_t ret = MultimodalInputConnMgr->GetPointerSpeed(speed);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Get pointer speed failed");
-        return RET_ERR;
-    }
-    return RET_OK;
+    return mouseHelper_.GetPointerSpeed(speed);
 #else
     return ERROR_UNSUPPORT;
     MMI_HILOGW("Pointer device does not support");
@@ -639,192 +424,106 @@ int32_t InputManagerImpl::GetPointerSpeed(int32_t &speed)
 int32_t InputManagerImpl::SetPointerStyle(int32_t windowId, int32_t pointerStyle)
 {
     CALL_DEBUG_ENTER;
-    if (windowId < 0 || pointerStyle < 0) {
-        MMI_HILOGE("The param is invalid");
-        return RET_ERR;
-    }
-    int32_t ret = MultimodalInputConnMgr->SetPointerStyle(windowId, pointerStyle);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Set pointer style failed, ret:%{public}d", ret);
-        return ret;
-    }
-    return RET_OK;
+    return mouseHelper_.SetPointerStyle(windowId, pointerStyle);
 }
 
 int32_t InputManagerImpl::GetPointerStyle(int32_t windowId, int32_t &pointerStyle)
 {
     CALL_DEBUG_ENTER;
-    if (windowId < 0) {
-        MMI_HILOGE("The param is invalid");
-        return RET_ERR;
-    }
-    int32_t ret = MultimodalInputConnMgr->GetPointerStyle(windowId, pointerStyle);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Get pointer style failed, ret:%{public}d", ret);
-        return ret;
-    }
-    return RET_OK;
+    return mouseHelper_.GetPointerStyle(windowId, pointerStyle);
 }
 
 void InputManagerImpl::OnConnected()
 {
     CALL_DEBUG_ENTER;
-    ReAddInputEventFilter();
-    if (displayGroupInfo_.windowsInfo.empty() || displayGroupInfo_.displaysInfo.empty()) {
-        MMI_HILOGI("The windows info or display info is empty");
-        return;
-    }
-    SendDisplayInfo();
-    PrintDisplayInfo();
-    if (anrObservers_.empty()) {
-        return;
-    }
-    int32_t ret = MultimodalInputConnMgr->SetAnrObserver();
-    if (ret != RET_OK) {
-        MMI_HILOGE("Set anr observer failed, ret:%{public}d", ret);
-    }
-}
-
-void InputManagerImpl::SendDisplayInfo()
-{
-    MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    CHKPV(client);
-    NetPacket pkt(MmiMessageId::DISPLAY_INFO);
-    if (PackDisplayData(pkt) == RET_ERR) {
-        MMI_HILOGE("Pack display info failed");
-        return;
-    }
-    if (!client->SendMessage(pkt)) {
-        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
-    }
-}
-
-void InputManagerImpl::ReAddInputEventFilter()
-{
-    CALL_INFO_TRACE;
-    if (eventFilterServices_.size() > MAX_FILTER_NUM) {
-        MMI_HILOGE("Too many filters, size:%{public}zu", eventFilterServices_.size());
-        return;
-    }
-    for (const auto &[filterId, t] : eventFilterServices_) {
-        const auto &[service, priority] = t;
-        int32_t ret = MultimodalInputConnMgr->AddInputEventFilter(service, filterId, priority);
-        if (ret != RET_OK) {
-            MMI_HILOGE("AddInputEventFilter has send to server failed, filterId:%{public}d, priority:%{public}d, ret:%{public}d", filterId, priority, ret);
-        }
-    }
+    inputFilter_.OnConnected();
+    windowTransfer_.OnConnected();
+    anrCollecter_.OnConnected();
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    keySubscriber_.OnConnected();
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    inputMonitor_.OnConnected();
+#endif // OHOS_BUILD_ENABLE_MONITOR
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+    inputInterceptor_.OnConnected();
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 }
 
 int32_t InputManagerImpl::RegisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener)
 {
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.InitClient()) {
+    if (!InitClient()) {
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return InputDevImpl.RegisterDevListener(type, listener);
+    return inputDeviceImpl_.RegisterDevListener(type, listener);
 }
 
 int32_t InputManagerImpl::UnregisterDevListener(std::string type,
     std::shared_ptr<IInputDeviceListener> listener)
 {
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.InitClient()) {
+    if (!InitClient()) {
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return InputDevImpl.UnregisterDevListener(type, listener);
+    return inputDeviceImpl_.UnregisterDevListener(type, listener);
 }
 
 int32_t InputManagerImpl::GetDeviceIds(std::function<void(std::vector<int32_t>&)> callback)
 {
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.InitClient()) {
+    if (!InitClient()) {
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return InputDevImpl.GetInputDeviceIds(callback);
+    return inputDeviceImpl_.GetInputDeviceIds(callback);
 }
 
 int32_t InputManagerImpl::GetDevice(int32_t deviceId,
     std::function<void(std::shared_ptr<InputDevice>)> callback)
 {
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.InitClient()) {
+    if (!InitClient()) {
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return InputDevImpl.GetInputDevice(deviceId, callback);
+    return inputDeviceImpl_.GetInputDevice(deviceId, callback);
 }
 
 int32_t InputManagerImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes,
     std::function<void(std::vector<bool>&)> callback)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.InitClient()) {
+    if (!InitClient()) {
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return InputDevImpl.SupportKeys(deviceId, keyCodes, callback);
+    return inputDeviceImpl_.SupportKeys(deviceId, keyCodes, callback);
 }
 
 int32_t InputManagerImpl::GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.InitClient()) {
+    if (!InitClient()) {
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return InputDevImpl.GetKeyboardType(deviceId, callback);
+    return inputDeviceImpl_.GetKeyboardType(deviceId, callback);
 }
 
 void InputManagerImpl::SetAnrObserver(std::shared_ptr<IAnrObserver> observer)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.InitClient()) {
+    if (!InitClient()) {
         MMI_HILOGE("Client init failed");
         return;
     }
-    for (auto iter = anrObservers_.begin(); iter != anrObservers_.end(); ++iter) {
-        if (*iter == observer) {
-            MMI_HILOGE("Observer already exist");
-            return;
-        }
-    }
-    anrObservers_.push_back(observer);
-    int32_t ret = MultimodalInputConnMgr->SetAnrObserver();
-    if (ret != RET_OK) {
-        MMI_HILOGE("Set anr observer failed, ret:%{public}d", ret);
-    }
-}
-
-void InputManagerImpl::OnAnr(int32_t pid)
-{
-    CALL_DEBUG_ENTER;
-    CHK_PID_AND_TID();
-    {
-        std::lock_guard<std::mutex> guard(mtx_);
-        for (const auto &observer : anrObservers_) {
-            CHKPC(observer);
-            observer->OnAnr(pid);
-        }
-    }
-    MMI_HILOGI("ANR noticed pid:%{public}d", pid);
+    anrCollecter_.SetAnrObserver(observer);
 }
 
 int32_t InputManagerImpl::SetInputDevice(const std::string &dhid, const std::string &screenId)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    std::lock_guard<std::mutex> guard(mtx_);
-    int32_t ret = MultimodalInputConnMgr->SetInputDevice(dhid, screenId);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
-    }
-    return ret;
+    return inputDeviceCooImpl_.SetInputDevice(dhid, screenId);
 #else
     (void)(dhid);
     (void)(screenId);
@@ -837,12 +536,11 @@ int32_t InputManagerImpl::RegisterCooperateListener(std::shared_ptr<IInputDevice
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.InitClient()) {
+    if (!InitClient()) {
         MMI_HILOGE("client init failed");
         return RET_ERR;
     }
-    return InputDevCooperateImpl.RegisterCooperateListener(listener);
+    return inputDeviceCooImpl_.RegisterCooperateListener(listener);
 #else
     MMI_HILOGW("Cooperate does not support");
     (void)(listener);
@@ -854,12 +552,11 @@ int32_t InputManagerImpl::UnregisterCooperateListener(std::shared_ptr<IInputDevi
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.InitClient()) {
+    if (!InitClient()) {
         MMI_HILOGE("client init failed");
         return RET_ERR;
     }
-    return InputDevCooperateImpl.UnregisterCooperateListener(listener);
+    return inputDeviceCooImpl_.UnregisterCooperateListener(listener);
 #else
     MMI_HILOGW("Cooperate does not support");
     (void)(listener);
@@ -872,12 +569,11 @@ int32_t InputManagerImpl::EnableInputDeviceCooperate(bool enabled,
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.InitClient()) {
+    if (!InitClient()) {
         MMI_HILOGE("client init failed");
         return RET_ERR;
     }
-    return InputDevCooperateImpl.EnableInputDeviceCooperate(enabled, callback);
+    return inputDeviceCooImpl_.EnableInputDeviceCooperate(enabled, callback);
 #else
     MMI_HILOGW("Cooperate does not support");
     (void)(enabled);
@@ -891,12 +587,11 @@ int32_t InputManagerImpl::StartInputDeviceCooperate(const std::string &sinkDevic
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.InitClient()) {
+    if (!InitClient()) {
         MMI_HILOGE("client init failed");
         return RET_ERR;
     }
-    return InputDevCooperateImpl.StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId, callback);
+    return inputDeviceCooImpl_.StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId, callback);
 #else
     MMI_HILOGW("Cooperate does not support");
     (void)(sinkDeviceId);
@@ -910,12 +605,11 @@ int32_t InputManagerImpl::StopDeviceCooperate(std::function<void(std::string, Co
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.InitClient()) {
+    if (!InitClient()) {
         MMI_HILOGE("client init failed");
         return RET_ERR;
     }
-    return InputDevCooperateImpl.StopDeviceCooperate(callback);
+    return inputDeviceCooImpl_.StopDeviceCooperate(callback);
 #else
     MMI_HILOGW("Cooperate does not support");
     (void)(callback);
@@ -927,12 +621,11 @@ int32_t InputManagerImpl::GetInputDeviceCooperateState(const std::string &device
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.InitClient()) {
+    if (!InitClient()) {
         MMI_HILOGE("client init failed");
         return RET_ERR;
     }
-    return InputDevCooperateImpl.GetInputDeviceCooperateState(deviceId, callback);
+    return inputDeviceCooImpl_.GetInputDeviceCooperateState(deviceId, callback);
 #else
     MMI_HILOGW("Cooperate does not support");
     (void)(deviceId);
@@ -943,14 +636,9 @@ int32_t InputManagerImpl::GetInputDeviceCooperateState(const std::string &device
 
 bool InputManagerImpl::GetFunctionKeyState(int32_t funcKey)
 {
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CALL_DEBUG_ENTER;
-    bool state { false };
-    int32_t ret = MultimodalInputConnMgr->GetFunctionKeyState(funcKey, state);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
-    }
-    return state;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    return inputDeviceImpl_.GetFunctionKeyState(funcKey);
 #else
     MMI_HILOGW("Keyboard device does not support");
     return false;
@@ -959,14 +647,9 @@ bool InputManagerImpl::GetFunctionKeyState(int32_t funcKey)
 
 int32_t InputManagerImpl::SetFunctionKeyState(int32_t funcKey, bool enable)
 {
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CALL_DEBUG_ENTER;
-    int32_t ret = MultimodalInputConnMgr->SetFunctionKeyState(funcKey, enable);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
-        return RET_ERR;
-    }
-    return RET_OK;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    return inputDeviceImpl_.SetFunctionKeyState(funcKey, enable);
 #else
     MMI_HILOGW("Keyboard device does not support");
     return ERROR_UNSUPPORT;
@@ -977,10 +660,7 @@ void InputManagerImpl::SetPointerLocation(int32_t x, int32_t y)
 {
     CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    int32_t ret = MultimodalInputConnMgr->SetPointerLocation(x, y);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Set Pointer Location failed, ret:%{public}d", ret);
-    }
+    mouseHelper_.SetPointerLocation(x, y);
 #else
     MMI_HILOGW("Pointer device or pointer drawing module does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -988,14 +668,9 @@ void InputManagerImpl::SetPointerLocation(int32_t x, int32_t y)
 
 int32_t InputManagerImpl::EnterCaptureMode(int32_t windowId)
 {
-#if defined(OHOS_BUILD_ENABLE_POINTER)
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mtx_);
-    int32_t ret = MultimodalInputConnMgr->SetMouseCaptureMode(windowId, true);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Enter captrue mode failed");
-    }
-    return ret;
+#if defined(OHOS_BUILD_ENABLE_POINTER)
+    return mouseHelper_.EnterCaptureMode(windowId);
 #else
     MMI_HILOGW("Pointer device module does not support");
     return ERROR_UNSUPPORT;
@@ -1004,18 +679,30 @@ int32_t InputManagerImpl::EnterCaptureMode(int32_t windowId)
 
 int32_t InputManagerImpl::LeaveCaptureMode(int32_t windowId)
 {
-#if defined(OHOS_BUILD_ENABLE_POINTER)
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mtx_);
-    int32_t ret = MultimodalInputConnMgr->SetMouseCaptureMode(windowId, false);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Leave captrue mode failed");
-    }
-    return ret;
+#if defined(OHOS_BUILD_ENABLE_POINTER)
+    return mouseHelper_.LeaveCaptureMode(windowId);
 #else
     MMI_HILOGW("Pointer device module does not support");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+MMIClientPtr InputManagerImpl::GetMMIClient() const
+{
+    CHKPP(client_);
+    return client_;
+}
+
+AnrCollecter& InputManagerImpl::GetAnrCollecter()
+{
+    return anrCollecter_;
+}
+
+EventHandlerPtr InputManagerImpl::GetEventHandler() const
+{
+    CHKPP(client_);
+    return client_->GetEventHandler();
 }
 } // namespace MMI
 } // namespace OHOS
