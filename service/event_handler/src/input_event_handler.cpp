@@ -48,7 +48,9 @@ InputEventHandler::~InputEventHandler() {}
 void InputEventHandler::Init(UDSServer& udsServer,  std::list<std::shared_ptr<IInputEventPluginContext>> context)
 {
     udsServer_ = &udsServer;
-    BuildInputHandlerChain(context);
+    contextList_ = context;
+    BuildInputHandlerChain();
+
 }
 
 void InputEventHandler::OnEvent(void *event)
@@ -79,20 +81,20 @@ void InputEventHandler::OnEvent(void *event)
                ",lostTime:%{public}" PRId64, idSeed_, endTime, lostTime);
 }
 
-void InputEventHandler::SetPluginEventHandler(std::list<std::shared_ptr<IInputEventPluginContext>> context)
+void InputEventHandler::SetPluginEventHandler()
 {
-    if (context.empty()) {
+    if (contextList_.empty()) {
         MMI_HILOGE("Context is empty");
         return;
     }
-    for (auto it = context.begin(); it != context.end(); ++it) {
+    for (auto it = contextList_.begin(); it != contextList_.end(); ++it) {
         if (*it != nullptr) {
              Insert((*it)->GetEventHandler());
         }
     }
 }
 
-int32_t InputEventHandler::BuildInputHandlerChain( std::list<std::shared_ptr<IInputEventPluginContext>> context)
+int32_t InputEventHandler::BuildInputHandlerChain()
 {
     eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
 #if !defined(OHOS_BUILD_ENABLE_KEYBOARD) && !defined(OHOS_BUILD_ENABLE_POINTER) && !defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -129,7 +131,7 @@ int32_t InputEventHandler::BuildInputHandlerChain( std::list<std::shared_ptr<IIn
 #endif // OHOS_BUILD_ENABLE_MONITOR
     auto dispatchHandler = std::make_shared<EventDispatchHandler>();
     handler->SetNext(dispatchHandler);
-    SetPluginEventHandler(context);
+    SetPluginEventHandler();
     return RET_OK;
 }
 
@@ -182,16 +184,8 @@ bool InputEventHandler::GetJumpInterceptState() const
 
 int32_t InputEventHandler::Insert(std::shared_ptr<IInputEventHandler> handler)
 {
-    if (handler == nullptr) {
-        MMI_HILOGE("Handler is nullptr");
-        return RET_ERR;
-    }
+    CHKPR(handler, RET_ERR)
     std::shared_ptr<IInputEventHandler> handler_ = eventNormalizeHandler_;
-    if (handler_->handlerPriority_ > handler->handlerPriority_) {
-        handler->SetNext(handler_);
-        handler_ = handler;
-        return RET_OK;
-    }
     for (auto tmp = handler_; tmp != nullptr; tmp = tmp->nextHandler_) {
         auto next = tmp->nextHandler_;
         if ((tmp->handlerPriority_ <= handler->handlerPriority_) && (next == nullptr)) {

@@ -15,7 +15,9 @@
 
 #ifndef PLUGIN_CONTEXT_H
 #define PLUGIN_CONTEXT_H
+
 #include <map>
+
 #include "i_input_event_handler_plugin_context.h"
 
 namespace OHOS {
@@ -27,8 +29,8 @@ public:
     virtual ~PluginContext() = default;
     virtual void SetEventHandler(std::shared_ptr<IInputEventHandler> handler);
     virtual std::shared_ptr<IInputEventHandler> GetEventHandler();
-    virtual void StatBegin();
-    virtual void StatEnd();
+    virtual void BeginStat();
+    virtual void EndStat();
     virtual void TimeStat(TimeStatFlag flag);
     virtual void OnReport(int32_t &max, int32_t &avg);
 private:

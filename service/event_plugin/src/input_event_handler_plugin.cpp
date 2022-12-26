@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "input_event_handler_plugin.h"
 
 #include <dlfcn.h>
@@ -30,18 +31,20 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "EventP
 const std::string INPUT_EVENT_HANDLER_PLUGIN_HOME = "/system/lib/module/multimodalinput/plugins/event_handler/";
 int32_t max { 0 };
 int32_t avg { 0 };
-#define TIMEING_OUT_MS 3000
-#define TIME_OUT_MAX 500
-#define TIME_OUT_INVALID 0
-std::map<std::shared_ptr<IInputEventHandler>, int32_t> timeOutPlugin;
-bool CheckFileExtendName(const std::string &filePath, const std::string &checkExtension)
+#define TIMEOUT_MS 3000
+#define TIMEOUT_MAX 500
+#define TIMEOUT_INVALID 0
+#define ERRORS_NUMBER_MAX 5
+std::map<std::shared_ptr<IInputEventHandler>, int32_t> timeoutPlugin;
+
+bool CheckFileExtendName(const std::string &filePath, const std::string &extension)
 {
     std::string::size_type pos = filePath.find_last_of('.');
     if (pos == std::string::npos) {
         MMI_HILOGE("File is not find extension");
         return false;
     }
-    return (filePath.substr(pos + 1, filePath.npos) == checkExtension);
+    return (filePath.substr(pos + 1, filePath.npos) == extension);
 }
 } // namespace
 
@@ -170,7 +173,7 @@ bool InputEventHandlerPluginMgr::InitINotify()
         return false;
     }
 
-    int wd = inotify_add_watch(fd, INPUT_EVENT_HANDLER_PLUGIN_USER.data(), IN_ALL_EVENTS);
+    int32_t wd = inotify_add_watch(fd, INPUT_EVENT_HANDLER_PLUGIN_USER.data(), IN_ALL_EVENTS);
     if(wd < 0) {
         MMI_HILOGE("Add directory watch failed");
         return false;
@@ -201,7 +204,7 @@ void InputEventHandlerPluginMgr::OnTimer()
         }
         if (max > TIME_OUT_MAX) {
             timeOutPlugin[item->GetEventHandler()] = timeOutPlugin[item->GetEventHandler()] + 1;
-            if (timeOutPlugin[item->GetEventHandler()] > 5) {
+            if (timeOutPlugin[item->GetEventHandler()] > ERRORS_NUMBER_MAX) {
                 DelPlugin(item->GetEventHandler());
                 return;
             }

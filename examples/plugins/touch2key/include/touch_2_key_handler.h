@@ -18,6 +18,7 @@
 
 #include "i_input_event_handler.h"
 #include "plugin_context.h"
+
 namespace OHOS {
 namespace MMI {
 #define TOUCH_2_KEY_PRIORITY 1

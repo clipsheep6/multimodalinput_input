@@ -58,11 +58,12 @@ public:
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 
 private:
-    int32_t BuildInputHandlerChain(std::list<std::shared_ptr<IInputEventPluginContext>> context);
-    void SetPluginEventHandler(std::list<std::shared_ptr<IInputEventPluginContext>> context);
+    int32_t BuildInputHandlerChain();
+    void SetPluginEventHandler();
 
     UDSServer *udsServer_ { nullptr };
     IInputEventPluginContext *context_ { nullptr };
+    std::list<std::shared_ptr<IInputEventPluginContext>> contextList_;
     std::shared_ptr<EventNormalizeHandler> eventNormalizeHandler_ { nullptr };
     std::shared_ptr<EventFilterHandler> eventFilterHandler_ { nullptr };
     std::shared_ptr<EventInterceptorHandler> eventInterceptorHandler_ { nullptr };

@@ -45,7 +45,7 @@ void PluginContext::TimeStat(TimeStatFlag flag)
         int32_t t = GetSysClockTime() - raw_;
         max_ = std::max(t, max_);
         sum_ += t;
-        times_++;
+        ++times_;
     }
 }
 
@@ -62,12 +62,12 @@ void PluginContext::OnReport(int32_t &max, int32_t &avg)
     times_  = 0;
 }
 
-void PluginContext::StatBegin()
+void PluginContext::BeginStat()
 {
     TimeStat(TimeStatFlag::BEGIN);
 }
 
-void PluginContext::StatEnd()
+void PluginContext::EndStat()
 {
     TimeStat(TimeStatFlag::END);
 }

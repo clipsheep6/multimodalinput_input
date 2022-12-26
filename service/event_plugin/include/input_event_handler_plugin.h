@@ -17,6 +17,7 @@
 #define INPUT_EVENT_HANDLER_PLUGIN_H
 
 #include <string>
+
 #include "plugin_context.h"
 #include "i_input_event_handler_plugin.h"
 
@@ -52,8 +53,8 @@ public:
 private:
     std::list<std::shared_ptr<IInputEventPluginContext>> context_;
     std::map<std::string, inputEventHandlerPlugin> pluginInfoList;
-    int32_t fd_ { 0 };
-    int32_t wd_ { 0 };
+    int32_t fd_ { -1 };
+    int32_t wd_ { -1 };
 };
 } // namespace MMI
 } // namespace OHOS

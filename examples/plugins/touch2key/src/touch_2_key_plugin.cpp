@@ -20,11 +20,12 @@ namespace MMI {
 bool Touch2KeyPlugin::Init(IInputEventPluginContext *context)
 {
     context_ = context;
+    if (context_ == nullptr) {
+        MMI_HILOGE("Context assignment failed");
+        return false;
+    }
     context_->SetEventHandler(std::make_shared<Touch2KeyHandler>(context));
     return true;
 }
-
-void Touch2KeyPlugin::Uninit()
-{}
 } // namespace MMI
 } // namespace OHOS

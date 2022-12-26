@@ -15,13 +15,12 @@
 
 #ifndef TOUCH_2_KEY_PLUGIN_H
 #define TOUCH_2_KEY_PLUGIN_H
+
 #include "touch_2_key_handler.h"
 #include "i_input_event_handler_plugin.h"
 
-
 namespace OHOS {
 namespace MMI {
-
 class Touch2KeyPlugin : public IPlugin
 {
 public:
@@ -29,19 +28,19 @@ public:
     DISALLOW_COPY_AND_MOVE(Touch2KeyPlugin);
     virtual ~Touch2KeyPlugin() = default;
     virtual bool Init(IInputEventPluginContext *context);
-    virtual void Uninit();
+    virtual void Uninit() {}
 private:
     IInputEventPluginContext *context_;
 };
 
-//the class factories
 extern "C" IPlugin* create() {
     return new Touch2KeyPlugin();
 }
+
 extern "C" void Release(IPlugin* p) {
     delete p;
+    p = nullptr;
 }
-
 } // namespace MMI
 } // namespace OHOS
 #endif // TOUCH_2_KEY_PLUGIN_H
