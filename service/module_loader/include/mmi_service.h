@@ -143,8 +143,6 @@ protected:
     void OnDelegateTask(epoll_event& ev);
 
     void AddReloadDeviceTimer();
-    void OnPluginScan(epoll_event& ev);
-    bool InitINotify();
 
 private:
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;

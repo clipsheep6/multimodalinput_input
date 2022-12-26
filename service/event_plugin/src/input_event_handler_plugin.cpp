@@ -51,7 +51,6 @@ bool CheckFileExtendName(const std::string &filePath, const std::string &extensi
 void InputEventHandlerPluginMgr::StartWatchPluginDir()
 {
     ReadPluginDir(INPUT_EVENT_HANDLER_PLUGIN_HOME);
-    ReadPluginDir(INPUT_EVENT_HANDLER_PLUGIN_USER);
     for (auto it = pluginInfoList.begin(); it != pluginInfoList.end(); it++) {
         bool ret = LoadPlugin(it->second.osPath, it->first, true);
         if (!ret) {
@@ -125,9 +124,6 @@ bool InputEventHandlerPluginMgr::LoadPlugin(std::string pluginPath, std::string 
     pluginInfoList[pluginName].loadStatus = true;
     pluginInfoList[pluginName].osHandler = handle;
     pluginInfoList[pluginName].plugin = plugin;
-    if (!initStatus) {
-        InputHandler->Insert(pluginInfoList[pluginName].pluginHandler);
-    }
     return true;
 }
 
@@ -158,59 +154,30 @@ void InputEventHandlerPluginMgr::DelPlugin(std::shared_ptr<IInputEventHandler> p
 {
     for (auto &item : pluginInfoList) {
         if (item.second.pluginHandler == pluginHandler) {
-            timeOutPlugin.erase(pluginHandler);
+            timeoutPlugin.erase(pluginHandler);
             UnloadPlugin(item.first);
             return;
         }
     }
 }
 
-bool InputEventHandlerPluginMgr::InitINotify()
-{
-    int32_t fd = inotify_init();
-    if (fd < 0) {
-        MMI_HILOGE("Plugin initalize inotify failed");
-        return false;
-    }
-
-    int32_t wd = inotify_add_watch(fd, INPUT_EVENT_HANDLER_PLUGIN_USER.data(), IN_ALL_EVENTS);
-    if(wd < 0) {
-        MMI_HILOGE("Add directory watch failed");
-        return false;
-    }
-    fd_ = fd;
-    wd_ = wd;
-    return true;
-}
-
-int32_t InputEventHandlerPluginMgr::GetReadFd()
-{
-    return fd_;
-}
-
-void InputEventHandlerPluginMgr::StopINotify()
-{
-    inotify_rm_watch(fd_, wd_);
-    close(fd_);
-}
-
 void InputEventHandlerPluginMgr::OnTimer()
 {
-    auto timeout = GetSysClockTime() + TIMEING_OUT_MS;
+    auto timeout = GetSysClockTime() + TIMEOUT_MS;
     for (auto &item: context_) {
         item->OnReport(max, avg);
-        if (timeOutPlugin.find(item->GetEventHandler()) == timeOutPlugin.end()) {
-            timeOutPlugin[item->GetEventHandler()] = 0;
+        if (timeoutPlugin.find(item->GetEventHandler()) == timeoutPlugin.end()) {
+            timeoutPlugin[item->GetEventHandler()] = 0;
         }
-        if (max > TIME_OUT_MAX) {
-            timeOutPlugin[item->GetEventHandler()] = timeOutPlugin[item->GetEventHandler()] + 1;
-            if (timeOutPlugin[item->GetEventHandler()] > ERRORS_NUMBER_MAX) {
+        if (max > TIMEOUT_MAX) {
+            timeoutPlugin[item->GetEventHandler()] = timeoutPlugin[item->GetEventHandler()] + 1;
+            if (timeoutPlugin[item->GetEventHandler()] > ERRORS_NUMBER_MAX) {
                 DelPlugin(item->GetEventHandler());
                 return;
             }
         } else {
-            if (max > TIME_OUT_INVALID) {
-                timeOutPlugin[item->GetEventHandler()] = 0;
+            if (max > TIMEOUT_INVALID) {
+                timeoutPlugin[item->GetEventHandler()] = 0;
             }
         }
         if (timeout > GetSysClockTime()) {

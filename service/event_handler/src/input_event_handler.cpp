@@ -184,7 +184,7 @@ bool InputEventHandler::GetJumpInterceptState() const
 
 int32_t InputEventHandler::Insert(std::shared_ptr<IInputEventHandler> handler)
 {
-    CHKPR(handler, RET_ERR)
+    CHKPR(handler, RET_ERR);
     std::shared_ptr<IInputEventHandler> handler_ = eventNormalizeHandler_;
     for (auto tmp = handler_; tmp != nullptr; tmp = tmp->nextHandler_) {
         auto next = tmp->nextHandler_;

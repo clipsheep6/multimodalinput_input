@@ -23,7 +23,6 @@
 
 namespace OHOS {
 namespace MMI {
-const std::string INPUT_EVENT_HANDLER_PLUGIN_USER = "/data/service/el1/public/multimodalinput/plugins/event_handler/";
 struct inputEventHandlerPlugin {
     void* osHandler { nullptr };
     bool loadStatus;
@@ -43,10 +42,7 @@ public:
     bool LoadPlugin(std::string pluginPath, std::string pluginName, bool initStatus);
     void UnloadPlugin(std::string pluginPath);
     void UnloadPlugins();
-    bool InitINotify();
     void OnTimer();
-    int32_t GetReadFd();
-    void StopINotify();
     std::list<std::shared_ptr<IInputEventPluginContext>> GetContext() const { return context_; }
     void SetHandler(std::shared_ptr<IInputEventHandler>& pHandlers);
     void DelPlugin(std::shared_ptr<IInputEventHandler> pluginHandler);

@@ -60,7 +60,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMISe
 const std::string DEF_INPUT_SEAT = "seat0";
 constexpr int32_t WATCHDOG_INTERVAL_TIME = 10000;
 constexpr int32_t WATCHDOG_DELAY_TIME = 15000;
-bool pluginCreateStatus { false };
 #define INOTIFY_SIZE sizeof(struct inotify_event)
 #define DIR_BUF_LEN   (1024 * (INOTIFY_SIZE + 16))
 } // namespace
@@ -242,23 +241,6 @@ bool MMIService::InitDelegateTasks()
     return true;
 }
 
-bool MMIService::InitINotify()
-{
-    CALL_DEBUG_ENTER;
-    if (!pluginMgr_.InitINotify()) {
-        MMI_HILOGE("The delegate task init failed");
-        return false;
-    }
-    auto ret = AddEpoll(EPOLL_EVENT_PLUGIN_SCAN, pluginMgr_.GetReadFd());
-    if (ret <  0) {
-        MMI_HILOGE("AddEpoll error ret:%{public}d", ret);
-        EpollClose();
-        return false;
-    }
-    MMI_HILOGI("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, pluginMgr_.GetReadFd());
-    return true;
-}
-
 int32_t MMIService::Init()
 {
     CheckDefine();
@@ -288,7 +270,6 @@ int32_t MMIService::Init()
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     MMI_HILOGD("Input msg handler init");
     InputHandler->Init(*this, pluginMgr_.GetContext());
-    InitINotify();
     if (!InitLibinputService()) {
         MMI_HILOGE("Libinput init failed");
         return LIBINPUT_INIT_FAIL;
@@ -351,7 +332,6 @@ void MMIService::OnStart()
 void MMIService::OnStop()
 {
     CHK_PID_AND_TID();
-    pluginMgr_.StopINotify();
     UdsStop();
     libinputAdapter_.Stop();
     state_ = ServiceRunningState::STATE_NOT_START;
@@ -972,34 +952,6 @@ void MMIService::OnDelegateTask(epoll_event& ev)
     delegateTasks_.ProcessTasks();
 }
 
-void MMIService::OnPluginScan(epoll_event& ev)
-{
-    int32_t fd = *static_cast<int32_t*>(ev.data.ptr);
-    char buffer[DIR_BUF_LEN] = {};
-    int32_t length = read(fd, buffer, DIR_BUF_LEN);
-    if (length < 0) {
-        return;
-    }
-    int32_t i = 0;
-    while (i < length) {
-        struct inotify_event *event = (struct inotify_event *) &buffer[i];
-        if (event->len) {
-            if ((event->mask & IN_CREATE)  && !(event->mask & IN_ISDIR)) {
-                pluginMgr_.UnloadPlugin(event->name);
-                pluginCreateStatus = true;
-            }
-            if (pluginCreateStatus && ((event->mask & IN_CLOSE_NOWRITE) || (event->mask & IN_CLOSE_WRITE))) {
-                pluginMgr_.LoadPlugin((INPUT_EVENT_HANDLER_PLUGIN_USER + event->name), event->name, false);
-                pluginCreateStatus = false;
-            }
-            if ((event->mask & IN_DELETE) && !(event->mask & IN_ISDIR)) {
-                pluginMgr_.UnloadPlugin(event->name);
-            }
-        }
-        i += INOTIFY_SIZE + event->len;
-    }
-}
-
 void MMIService::OnThread()
 {
     SetThreadName(std::string("mmi_service"));
@@ -1030,8 +982,6 @@ void MMIService::OnThread()
                 OnSignalEvent(mmiEd->fd);
             } else if (mmiEd->event_type == EPOLL_EVENT_ETASK) {
                 OnDelegateTask(ev[i]);
-            } else if (mmiEd->event_type == EPOLL_EVENT_PLUGIN_SCAN) {
-                OnPluginScan(ev[i]);
             } else {
                 MMI_HILOGW("Unknown epoll event type:%{public}d", mmiEd->event_type);
             }
