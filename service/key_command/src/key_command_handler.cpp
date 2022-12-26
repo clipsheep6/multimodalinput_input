@@ -591,10 +591,10 @@ bool ConvertToTouchGesture(const cJSON* jsonData, TouchGesture &touchGesture)
          MMI_HILOGE("Get duration failed");
         return false;
     }
-    if (!GetTrigger(jsonData, touchGesture.triggerType)) {
-        MMI_HILOGE("Get trigger failed");
-        return false;
-    }
+    // if (!GetTrigger(jsonData, touchGesture.triggerType)) {
+    //     MMI_HILOGE("Get trigger failed");
+    //     return false;
+    // }
     cJSON *ability = cJSON_GetObjectItemCaseSensitive(jsonData, "ability");
     if (!cJSON_IsObject(ability)) {
         MMI_HILOGE("ability is not object");
@@ -618,6 +618,7 @@ std::string GenerateKey(const TouchGesture& touchGesture)
 
 bool ParseTouchGestureInner(const JsonParser& parser, std::map<std::string, TouchGesture>& touchGestureMemo)
 {
+    CALL_DEBUG_ENTER;
     cJSON* touchGestures = cJSON_GetObjectItemCaseSensitive(parser.json_, "touch_gesture");
     if (!cJSON_IsArray(touchGestures)) {
         MMI_HILOGE("touchGestures is not array");
@@ -628,15 +629,18 @@ bool ParseTouchGestureInner(const JsonParser& parser, std::map<std::string, Touc
         TouchGesture gesture;
         cJSON *touchGesture = cJSON_GetArrayItem(touchGestures, i);
         if (!cJSON_IsObject(touchGesture)) {
+            MMI_HILOGE("Invalid touchGesture object");
             continue;
         }
         if (!ConvertToTouchGesture(touchGesture, gesture)) {
+            MMI_HILOGE("ConvertToTouchGesture failed");
             continue;
         }
         gesture.Print();
         std::string key = GenerateKey(gesture);
         if (touchGestureMemo.find(key) == touchGestureMemo.end()) {
             touchGestureMemo[key] = gesture;
+            MMI_HILOGD("touchGesture %{public}s is added", key.c_str());
         } else {
             MMI_HILOGE("duplicate touchGesture");
         }
@@ -676,7 +680,7 @@ void KeyCommandHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> poi
     if (OnHandleEvent(pointerEvent)) {
         MMI_HILOGD("The pointerEvent start launch an ability, pointerId:%{public}d", pointerEvent->GetPointerId());
         // BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::KEY_LAUNCH_EVENT);
-        return;
+        // return;
     }
     CHKPV(nextHandler_);
     nextHandler_->HandleTouchEvent(pointerEvent);
@@ -1166,8 +1170,8 @@ void ShortcutKey::Print() const
 }
 
 void TouchGesture::Print() const{
-    MMI_HILOGI("TouchGesture matched, pointerNum:%{public}d, duration:%{public}lld", pointerNum, duration);
-    MMI_HILOGD("EventTouch matched, bundleName:%{public}s", ability.bundleName.c_str());
+    MMI_HILOGI("TouchGesture: pointerNum:%{public}d, duration:%{public}lld", pointerNum, duration);
+    MMI_HILOGI("EventTouch:bundleName:%{public}s", ability.bundleName.c_str());
 }
 
 void KeyCommandHandler::RemoveSubscribedTimer(int32_t keyCode)
@@ -1227,6 +1231,9 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<PointerEvent> pointe
         }
         isTouchGestureParsed_ = true;
         MMI_HILOGI("Parse configFile success");
+        for (const auto& elem : touchGestures_) {
+            elem.second.Print();
+        }
     }
     return HandleTouchGestures(pointerEvent);
 }
@@ -1236,12 +1243,15 @@ bool KeyCommandHandler::HandleTouchGestures(const std::shared_ptr<PointerEvent> 
     CALL_DEBUG_ENTER;
     int32_t pointerAction = pointerEvent->GetPointerAction();
     if (pointerAction == PointerEvent::POINTER_ACTION_DOWN) {
+        MMI_HILOGD("POINTER_ACTION_DOWN");
         return HandleActionDown(pointerEvent);
     }
     if (pointerAction == PointerEvent::POINTER_ACTION_MOVE) {
+        MMI_HILOGD("POINTER_ACTION_MOVE");
         return HandleActionMove(pointerEvent);
     }
     if (pointerAction == PointerEvent::POINTER_ACTION_UP) {
+        MMI_HILOGD("POINTER_ACTION_UP");
         return HandleActionUp(pointerEvent);
     }
     return false;
