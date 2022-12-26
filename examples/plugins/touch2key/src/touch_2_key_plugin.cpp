@@ -14,8 +14,12 @@
  */
 
 #include "touch_2_key_plugin.h"
+
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Touch2KeyPlugin" };
+}
 
 bool Touch2KeyPlugin::Init(IInputEventPluginContext *context)
 {
