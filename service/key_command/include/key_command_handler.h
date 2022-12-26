@@ -79,7 +79,7 @@ struct TouchGesture {
     int32_t triggerType { 0 }; // 暂时还没用起来
     int32_t timerId { -1 };
     Ability ability;
-    void Print() const
+    void Print() const;
 };
 class KeyCommandHandler final : public IInputEventHandler {
 public:
@@ -135,11 +135,10 @@ private:
     bool CheckMovement(const std::shared_ptr<PointerEvent> pointerEvent);
     bool IsGestureMatch(const TouchGesture &touchGesture, const std::shared_ptr<PointerEvent> pointerEvent);
     void LaunchAbility(const TouchGesture& gesture);
-    bool ResetLastMatchedGesture()
-    {
+    bool ResetLastMatchedGesture();
         
-    }
-
+    bool ParseTouchGesture();
+    bool ParseTouchJson(const std::string &configFile);
 
     void ResetLastMatchedKey()
     {
@@ -164,7 +163,7 @@ private:
     std::vector<Sequence> filterSequences_;
     std::vector<SequenceKey> keys_;
     bool isParseConfig_ { false };
-    // bool isTouchGestureParsed_ { false }; // 手势配置文件是否解析完成
+    bool isTouchGestureParsed_ { false }; // 手势配置文件是否解析完成
     std::map<int32_t, std::shared_ptr<PointerEvent>> curDownPointers_; // key 为 pointerId, value 为对应当前按下的事件
     std::map<int32_t, int32_t> specialKeys_;
     std::map<int32_t, std::list<int32_t>> specialTimers_;
