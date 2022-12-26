@@ -46,6 +46,9 @@ public:
     static InputManager *GetInstance();
     virtual ~InputManager() = default;
 
+    int32_t GetDisplayBindInfo(DisplayBindInfos &infos);
+    int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
+
     /**
      * @brief Updates the screen and window information.
      * @param displayGroupInfo Indicates the logical screen information.
@@ -318,59 +321,6 @@ public:
      * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      */
     int32_t SetInputDevice(const std::string &dhid, const std::string &screenId);
-
-    /**
-     * @brief Registers a listener for screen hopping events of the mouse pointer.
-     * @param listener Indicates the listener for screen hopping events of the mouse pointer.
-     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
-     * @since 9
-     */
-    int32_t RegisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener);
-
-    /**
-     * @brief Unregisters the listener for screen hopping events of the mouse pointer.
-     * @param listener Indicates the listener for screen hopping events of the mouse pointer.
-     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
-     * @since 9
-     */
-    int32_t UnregisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener = nullptr);
-
-    /**
-     * @brief Enables or disables screen hopping for the mouse pointer.
-     * @param enabled Indicates whether to enable or disable screen hopping for the mouse pointer.
-     * @param callback Indicates the callback used to receive the result of enabling or disabling screen hopping.
-     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
-     * @since 9
-     */
-    int32_t EnableInputDeviceCooperate(bool enabled, std::function<void(std::string, CooperationMessage)> callback);
-
-    /**
-     * @brief Starts screen hopping for the mouse pointer.
-     * @param sinkDeviceId Indicates the descriptor of the target input device (network ID) for screen hopping.
-     * @param srcInputDeviceId Indicates the ID of the source input device (device ID handle) for screen hopping.
-     * @param callback Indicates the callback used to receive the result of starting screen hopping.
-     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
-     * @since 9
-     */
-    int32_t StartInputDeviceCooperate(const std::string &sinkDeviceId, int32_t srcInputDeviceId,
-        std::function<void(std::string, CooperationMessage)> callback);
-
-    /**
-     * @brief Stops screen hopping for the mouse pointer.
-     * @param callback Indicates the callback used to receive the result of stopping screen hopping.
-     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
-     * @since 9
-     */
-    int32_t StopDeviceCooperate(std::function<void(std::string, CooperationMessage)> callback);
-
-    /**
-     * @brief Obtains the screen hopping status of a mouse pointer.
-     * @param deviceId Indicates the descriptor of the input device.
-     * @param callback Indicates the callback used to receive the screen hopping status.
-     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
-     * @since 9
-     */
-    int32_t GetInputDeviceCooperateState(const std::string &deviceId, std::function<void(bool)> callback);
 
     /**
      * @brief Obtains the enablement status of the specified function key on the keyboard.

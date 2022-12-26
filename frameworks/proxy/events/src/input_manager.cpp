@@ -32,6 +32,16 @@ InputManager *InputManager::GetInstance()
     return instance_;
 }
 
+int32_t InputManager::GetDisplayBindInfo(DisplayBindInfos &infos)
+{
+    return InputMgrImpl.GetDisplayBindInfo(infos);
+}
+
+int32_t InputManager::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
+{
+    return InputMgrImpl.SetDisplayBind(deviceId, displayId, msg);
+}
+
 void InputManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
 {
     InputMgrImpl.UpdateDisplayInfo(displayGroupInfo);
@@ -201,38 +211,6 @@ int32_t InputManager::GetPointerStyle(int32_t windowId, int32_t &pointerStyle)
 int32_t InputManager::SetInputDevice(const std::string& dhid, const std::string& screenId)
 {
     return InputMgrImpl.SetInputDevice(dhid, screenId);
-}
-
-int32_t InputManager::RegisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener)
-{
-    return InputMgrImpl.RegisterCooperateListener(listener);
-}
-
-int32_t InputManager::UnregisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener)
-{
-    return InputMgrImpl.UnregisterCooperateListener(listener);
-}
-
-int32_t InputManager::EnableInputDeviceCooperate(bool enabled,
-    std::function<void(std::string, CooperationMessage)> callback)
-{
-    return InputMgrImpl.EnableInputDeviceCooperate(enabled, callback);
-}
-
-int32_t InputManager::StartInputDeviceCooperate(const std::string &sinkDeviceId, int32_t srcInputDeviceId,
-    std::function<void(std::string, CooperationMessage)> callback)
-{
-    return InputMgrImpl.StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId, callback);
-}
-
-int32_t InputManager::StopDeviceCooperate(std::function<void(std::string, CooperationMessage)> callback)
-{
-    return InputMgrImpl.StopDeviceCooperate(callback);
-}
-
-int32_t InputManager::GetInputDeviceCooperateState(const std::string &deviceId, std::function<void(bool)> callback)
-{
-    return InputMgrImpl.GetInputDeviceCooperateState(deviceId, callback);
 }
 
 bool InputManager::GetFunctionKeyState(int32_t funcKey)

@@ -16,6 +16,7 @@
 #include "event_log_helper.h"
 #include "event_util_test.h"
 #include "input_handler_type.h"
+#include "input_manager_impl.h"
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"
 #include "system_info.h"
@@ -766,7 +767,7 @@ void InputManagerTest::TestMarkConsumed(int32_t monitorId, int32_t eventId)
  */
 HWTEST_F(InputManagerTest, InputManagerTest_AddMonitor_001, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto PointerEventFun = [](std::shared_ptr<PointerEvent> event) {
         MMI_HILOGD("Add monitor success");
     };
@@ -786,7 +787,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMonitor_001, TestSize.Level1)
  */
 HWTEST_F(InputManagerTest, InputManagerTest_AddMonitor_002, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto keyEventFun = [](std::shared_ptr<KeyEvent> event) {
         MMI_HILOGD("Add monitor success");
     };
@@ -1557,6 +1558,47 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_03, TestSize.Level
 }
 
 /**
+ * @tc.name: InputManagerTest_SubscribeKeyEvent_04
+ * @tc.desc: Verify subscribe key event.
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::set<int32_t> preKeys;
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    keyOption->SetPreKeys(preKeys);
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyOption->SetFinalKeyDown(true);
+    keyOption->SetFinalKeyDownDuration(-1);
+    int32_t subscribeId = -1;
+    subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
+        [](std::shared_ptr<KeyEvent> keyEvent) {
+        EventLogHelper::PrintEventData(keyEvent);
+        MMI_HILOGD("Subscribe key event KEYCODE_POWER down trigger callback");
+    });
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    EXPECT_TRUE(subscribeId >= 0);
+#else
+    EXPECT_TRUE(subscribeId < 0);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectDownEvent != nullptr);
+    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+    ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_DOWN);
+}
+
+/**
  * @tc.name: TestGetKeystrokeAbility_001
  * @tc.desc: Verify SupportKeys
  * @tc.type: FUNC
@@ -2319,7 +2361,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_015, TestSize.Level1)
  */
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_016, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     auto fun = [](std::shared_ptr<KeyEvent> keyEvent) {
         MMI_HILOGD("Add interceptor success");
     };
@@ -3724,7 +3766,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_UpdateDisplayInfo, TestSize.Level1)
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SetInputDevice, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     std::string dhid("");
     std::string screenId("");
     int32_t ret = InputManager::GetInstance()->SetInputDevice(dhid, screenId);
@@ -3745,7 +3787,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_RegisterCooperateListener_001, TestS
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<IInputDeviceCooperateListener> consumer = nullptr;
-    int32_t ret = InputManager::GetInstance()->RegisterCooperateListener(consumer);
+    int32_t ret = InputMgrImpl.RegisterCooperateListener(consumer);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     ASSERT_EQ(ret, RET_ERR);
 #else
@@ -3761,7 +3803,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_RegisterCooperateListener_001, TestS
  */
 HWTEST_F(InputManagerTest, InputManagerTest_RegisterCooperateListener_002, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     class InputDeviceCooperateListenerTest : public IInputDeviceCooperateListener {
     public:
         InputDeviceCooperateListenerTest() : IInputDeviceCooperateListener() {}
@@ -3771,13 +3813,13 @@ HWTEST_F(InputManagerTest, InputManagerTest_RegisterCooperateListener_002, TestS
         };
     };
     std::shared_ptr<InputDeviceCooperateListenerTest> consumer = std::make_shared<InputDeviceCooperateListenerTest>();
-    int32_t ret = InputManager::GetInstance()->RegisterCooperateListener(consumer);
+    int32_t ret = InputMgrImpl.RegisterCooperateListener(consumer);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     ASSERT_EQ(ret, RET_OK);
 #else
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
-    ret = InputManager::GetInstance()->UnregisterCooperateListener(consumer);
+    ret = InputMgrImpl.UnregisterCooperateListener(consumer);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     ASSERT_EQ(ret, RET_OK);
 #else
@@ -3795,7 +3837,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_UnregisterCooperateListener, TestSiz
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<IInputDeviceCooperateListener> consumer = nullptr;
-    int32_t ret = InputManager::GetInstance()->UnregisterCooperateListener(consumer);
+    int32_t ret = InputMgrImpl.UnregisterCooperateListener(consumer);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     ASSERT_EQ(ret, RET_OK);
 #else
@@ -3816,7 +3858,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_EnableInputDeviceCooperate, TestSize
     auto fun = [](std::string listener, CooperationMessage cooperateMessages) {
         MMI_HILOGD("Enable input device cooperate success");
     };
-    int32_t ret = InputManager::GetInstance()->EnableInputDeviceCooperate(enabled, fun);
+    int32_t ret = InputMgrImpl.EnableInputDeviceCooperate(enabled, fun);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     ASSERT_EQ(ret, RET_OK);
 #else
@@ -3838,7 +3880,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_StartInputDeviceCooperate, TestSize.
     auto fun = [](std::string listener, CooperationMessage cooperateMessages) {
         MMI_HILOGD("Start input device cooperate success");
     };
-    int32_t ret = InputManager::GetInstance()->StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId, fun);
+    int32_t ret = InputMgrImpl.StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId, fun);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     ASSERT_NE(ret, RET_OK);
 #else
@@ -3858,7 +3900,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_StopDeviceCooperate, TestSize.Level1
     auto fun = [](std::string listener, CooperationMessage cooperateMessages) {
         MMI_HILOGD("Start input device cooperate success");
     };
-    int32_t ret = InputManager::GetInstance()->StopDeviceCooperate(fun);
+    int32_t ret = InputMgrImpl.StopDeviceCooperate(fun);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     ASSERT_NE(ret, ERROR_UNSUPPORT);
 #else
@@ -3879,7 +3921,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetInputDeviceCooperateState, TestSi
     auto fun = [](bool state) {
         MMI_HILOGD("Get inputdevice state success");
     };
-    int32_t ret = InputManager::GetInstance()->GetInputDeviceCooperateState(deviceId, fun);
+    int32_t ret = InputMgrImpl.GetInputDeviceCooperateState(deviceId, fun);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     ASSERT_EQ(ret, RET_OK);
 #else
@@ -3937,6 +3979,86 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetDeviceIds, TestSize.Level1)
     };
     int32_t ret = InputManager::GetInstance()->GetDeviceIds(callback);
     ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_EventTypeToString
+ * @tc.desc: Verify inputevent interface
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_EventTypeToString, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputEvent = InputEvent::Create();
+    ASSERT_NE(inputEvent, nullptr);
+    auto ret = inputEvent->EventTypeToString(InputEvent::EVENT_TYPE_BASE);
+    ASSERT_STREQ(ret, "base");
+    ret =  inputEvent->EventTypeToString(InputEvent::EVENT_TYPE_KEY);
+    ASSERT_STREQ(ret, "key");
+    ret =  inputEvent->EventTypeToString(InputEvent::EVENT_TYPE_AXIS);
+    ASSERT_STREQ(ret, "axis");
+    ret =  inputEvent->EventTypeToString(-1);
+    ASSERT_STREQ(ret, "unknown");
+}
+
+/**
+ * @tc.name: InputManagerTest_InputDeviceInterface_001
+ * @tc.desc: Verify inputdevice interface
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_InputDeviceInterface_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
+    ASSERT_NE(inputDevice, nullptr);
+    inputDevice->SetId(0);
+    ASSERT_EQ(inputDevice->GetId(), 0);
+    inputDevice->SetName("name");
+    ASSERT_STREQ(inputDevice->GetName().c_str(), "name");
+    inputDevice->SetType(0);
+    ASSERT_EQ(inputDevice->GetType(), 0);
+    inputDevice->SetBus(0);
+    ASSERT_EQ(inputDevice->GetBus(), 0);
+    inputDevice->SetVersion(0);
+    ASSERT_EQ(inputDevice->GetVersion(), 0);
+    inputDevice->SetProduct(0);
+    ASSERT_EQ(inputDevice->GetProduct(), 0);
+    inputDevice->SetVendor(0);
+    ASSERT_EQ(inputDevice->GetVendor(), 0);
+    inputDevice->SetPhys("phys");
+    ASSERT_STREQ(inputDevice->GetPhys().c_str(), "phys");
+    inputDevice->SetUniq("uniq");
+    ASSERT_STREQ(inputDevice->GetUniq().c_str(), "uniq");
+}
+
+/**
+ * @tc.name: InputManagerTest_InputDeviceInterface_002
+ * @tc.desc: Verify inputdevice interface
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_InputDeviceInterface_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
+    ASSERT_NE(inputDevice, nullptr);
+    InputDevice::AxisInfo axis;
+    axis.SetAxisType(0);
+    axis.SetMinimum(0);
+    axis.SetMaximum(1);
+    axis.SetFuzz(0);
+    axis.SetFlat(1);
+    axis.SetResolution(0);
+    inputDevice->AddAxisInfo(axis);
+    auto iter = inputDevice->GetAxisInfo();
+    ASSERT_EQ(iter[0].GetAxisType(), 0);
+    ASSERT_EQ(iter[0].GetMinimum(), 0);
+    ASSERT_EQ(iter[0].GetMaximum(), 1);
+    ASSERT_EQ(iter[0].GetFuzz(), 0);
+    ASSERT_EQ(iter[0].GetFlat(), 1);
+    ASSERT_EQ(iter[0].GetResolution(), 0);
 }
 
 /**
