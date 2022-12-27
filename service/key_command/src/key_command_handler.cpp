@@ -1270,7 +1270,6 @@ bool KeyCommandHandler::HandleActionDown(const std::shared_ptr<PointerEvent> poi
         return false;
     }
     currentDownPointers_.insert(make_pair(pointerEvent->GetPointerId(), pointerEvent));
-    // 三指长按匹配之后，需要把双指长按的 Timer Remove 掉否则两者都会被唤醒
     if (isMatchedGesture_) {
         TimerMgr->RemoveTimer(lastMatchedGesture_.timerId);
         ResetLastMatchedGesture();
@@ -1295,7 +1294,6 @@ bool KeyCommandHandler::HandleActionDown(const std::shared_ptr<PointerEvent> poi
         lastMatchedGesture_.timerId = timerId;
         return true;
     }
-    // 没匹配到手势，需要打断当前已经匹配了的手势逻辑
     return false;
 }
 
@@ -1306,7 +1304,7 @@ bool KeyCommandHandler::HandleActionMove(const std::shared_ptr<PointerEvent> poi
         return true;
     }
     int32_t pointerId = pointerEvent->GetPointerId();
-    if (currentDownPointers_.find(pointerId) != currentDownPointers_.end()) { // 除此之外还应去除之前已经匹配了的手势的逻辑
+    if (currentDownPointers_.find(pointerId) != currentDownPointers_.end()) {
         currentDownPointers_.erase(pointerId);
         if (isMatchedGesture_) {
             TimerMgr->RemoveTimer(lastMatchedGesture_.timerId);
@@ -1322,7 +1320,7 @@ bool KeyCommandHandler::HandleActionUp(const std::shared_ptr<PointerEvent> point
 {
     CALL_DEBUG_ENTER;
     int32_t pointerId = pointerEvent->GetPointerId();
-    if (currentDownPointers_.find(pointerId) != currentDownPointers_.end()) { // 除此之外还应去除之前已经匹配了的手势的逻辑
+    if (currentDownPointers_.find(pointerId) != currentDownPointers_.end()) {
         currentDownPointers_.erase(pointerId);
         if (isMatchedGesture_) {
             TimerMgr->RemoveTimer(lastMatchedGesture_.timerId);
@@ -1391,13 +1389,10 @@ void KeyCommandHandler::KeyCommandHandler::LaunchAbility(const TouchGesture &ges
     if (err != ERR_OK) {
         MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", gesture.ability.bundleName.c_str(), err);
     }
-    // 静态手势拉起Ability的功能需要实现一个类似的函数用于恢复相关数据结构
     ResetLastMatchedGesture();
     currentDownPointers_.clear();
     MMI_HILOGD("End launch ability, bundleName:%{public}s", gesture.ability.bundleName.c_str());
 }
-
-// 将按下的手指都置位
 
 } // namespace MMI
 } // namespace OHOS
