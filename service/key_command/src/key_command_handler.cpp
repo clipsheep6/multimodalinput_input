@@ -1257,8 +1257,6 @@ bool KeyCommandHandler::HandleTouchGestures(const std::shared_ptr<PointerEvent> 
     return false;
 }
 
-// TODO HandleActionDown HandleActionUp HandleActionMove 中需要有在长按事件终止时候移除Timer的逻辑
-
 bool KeyCommandHandler::HandleActionDown(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
@@ -1282,6 +1280,7 @@ bool KeyCommandHandler::HandleActionDown(const std::shared_ptr<PointerEvent> poi
             MMI_HILOGD("Timer callback");
             LaunchAbility(touchGesture);
         });
+        isMatchedGesture_ = true;
         if (timerId < 0) {
             MMI_HILOGE("AddTimer failed");
         }
@@ -1303,8 +1302,11 @@ bool KeyCommandHandler::HandleActionMove(const std::shared_ptr<PointerEvent> poi
     int32_t pointerId = pointerEvent->GetPointerId();
     if (curDownPointers_.find(pointerId) != curDownPointers_.end()) { // 除此之外还应去除之前已经匹配了的手势的逻辑
         curDownPointers_.erase(pointerId);
-        TimerMgr->RemoveTimer(lastMatchedGesture_.timerId);
-        ResetLastMatchedGesture();
+        if (isMatchedGesture_) {
+            TimerMgr->RemoveTimer(lastMatchedGesture_.timerId);
+            ResetLastMatchedGesture();
+            isMatchedGesture_ = false;
+        }
         return true;
     }
     return false;
@@ -1316,8 +1318,11 @@ bool KeyCommandHandler::HandleActionUp(const std::shared_ptr<PointerEvent> point
     int32_t pointerId = pointerEvent->GetPointerId();
     if (curDownPointers_.find(pointerId) != curDownPointers_.end()) { // 除此之外还应去除之前已经匹配了的手势的逻辑
         curDownPointers_.erase(pointerId);
-        TimerMgr->RemoveTimer(lastMatchedGesture_.timerId);
-        ResetLastMatchedGesture();
+        if (isMatchedGesture_) {
+            TimerMgr->RemoveTimer(lastMatchedGesture_.timerId);
+            ResetLastMatchedGesture();
+            isMatchedGesture_ = false;
+        }
         return true;
     }
     return false;
@@ -1325,34 +1330,33 @@ bool KeyCommandHandler::HandleActionUp(const std::shared_ptr<PointerEvent> point
 
 bool KeyCommandHandler::ResetLastMatchedGesture()
 {
+    lastMatchedGesture_.duration = 0;
+    lastMatchedGesture_.pointerNum = 0;
+    lastMatchedGesture_.timerId = -1;
     return true;
 }
 
 bool KeyCommandHandler::CheckLocation(const std::shared_ptr<PointerEvent> pointerEvent)
 {
-    // TODO
-    // auto displayX = pointerEvent->GetDisplayX();
-    // auto displayY = pointerEvent->GetDisplayY();
-    // return displayX > MARGIN_LEFT && displayX < MARGIN_RIGHT && 
-    //        displayY > MARGIN_UP && displayX < MARGIN_DOWN;
+    // TODO, 判断按下事件的落点位置是否在有效区域内
     return true;
 }
 
 bool KeyCommandHandler::CheckDuration(const std::shared_ptr<PointerEvent> pointerEvent)
 {
-    // TODO
+    // TODO，判断多指按下事件之间的时差是否在合理阈值内
     return true;
 }
 
 bool KeyCommandHandler::CheckAngle(const std::shared_ptr<PointerEvent> pointerEvent)
 {
-    // TODO
+    // TODO，判断多指按下时，各点之间夹角是否在合理阈值内
     return true;
 }
 
 bool KeyCommandHandler::CheckMovement(const std::shared_ptr<PointerEvent> pointerEvent)
 {
-    // TODO
+    // TODO，判断在手指按下之后，触发的移动事件是否在合理阈值内
     return true;
 }
 
@@ -1376,9 +1380,6 @@ void KeyCommandHandler::KeyCommandHandler::LaunchAbility(const TouchGesture &ges
     for (const auto &item : gesture.ability.params) {
         want.SetParam(item.first, item.second);
     }
-    // TODO
-    // DfxHisysevent::CalcComboStartTimes(lastMatchedKey_.keyDownDuration);
-    // DfxHisysevent::ReportComboStartTimes();
     MMI_HILOGD("Start launch ability, bundleName:%{public}s", gesture.ability.bundleName.c_str());
     ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
     if (err != ERR_OK) {
