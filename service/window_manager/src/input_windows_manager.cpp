@@ -262,26 +262,42 @@ int32_t InputWindowsManager::SetDisplayBind(int32_t deviceId, int32_t displayId,
     return bindInfo_.SetDisplayBind(deviceId, displayId, msg);    
 }
 
-void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
+InputWindowsManager::DispInfoCacheUpdateResult InputWindowsManager::UpdateDisplayInfoCache(
+    const std::shared_ptr<DisplayGroupInfo> displayInfo)
+{
+    std::lock_guard<std::mutex> guard(dispInfoCacheMtx_);
+    auto ret = (dispInfoCache_ == nullptr) ? DispInfoCacheUpdateResult::SET : DispInfoCacheUpdateResult::UPDATE;
+    dispInfoCache_ = displayInfo;
+    return ret;
+}
+
+std::shared_ptr<DisplayGroupInfo> InputWindowsManager::GetDisplayInfoCache()
+{
+    std::lock_guard<std::mutex> guard(dispInfoCacheMtx_);
+    return std::move(dispInfoCache_);
+}
+
+void InputWindowsManager::UpdateDisplayInfo()
 {
     CALL_DEBUG_ENTER;
-    CheckFocusWindowChange(displayGroupInfo);
-    CheckZorderWindowChange(displayGroupInfo);
+    const std::shared_ptr<DisplayGroupInfo> info = GetDisplayInfoCache();
+    CheckFocusWindowChange(*info);
+    CheckZorderWindowChange(*info);
     if (captureModeInfo_.isCaptureMode &&
-        ((displayGroupInfo_.focusWindowId != displayGroupInfo.focusWindowId) ||
-        (displayGroupInfo_.windowsInfo[0].id != displayGroupInfo.windowsInfo[0].id))) {
+        ((displayGroupInfo_.focusWindowId != *info.focusWindowId) ||
+        (displayGroupInfo_.windowsInfo[0].id != *info.windowsInfo[0].id))) {
         captureModeInfo_.isCaptureMode = false;
     }
-    displayGroupInfo_ = displayGroupInfo;
+    displayGroupInfo_ = *info;
     PrintDisplayInfo();
     UpdateDisplayIdAndName();
 #ifdef OHOS_BUILD_ENABLE_POINTER
     UpdatePointerStyle();
 #endif // OHOS_BUILD_ENABLE_POINTER
 
-    if (!displayGroupInfo.displaysInfo.empty()) {
+    if (!info->displaysInfo.empty()) {
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-        IPointerDrawingManager::GetInstance()->OnDisplayInfo(displayGroupInfo);
+        IPointerDrawingManager::GetInstance()->OnDisplayInfo(*info);
         if (InputDevMgr->HasPointerDevice()) {
             MouseLocation mouseLocation = GetMouseInfo();
             int32_t displayId = MouseEventHdr->GetDisplayId();
@@ -289,7 +305,7 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
                 displayId = displayGroupInfo_.displaysInfo[0].id;
             }
             auto displayInfo = GetPhysicalDisplay(displayId);
-            CHKPV(displayInfo);
+            CHKPR(displayInfo, ERROR_NULL_POINTER);
             int32_t logicX = mouseLocation.physicalX + displayInfo->x;
             int32_t logicY = mouseLocation.physicalY + displayInfo->y;
             std::optional<WindowInfo> windowInfo;
@@ -302,7 +318,7 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
             }
             if (!windowInfo) {
                 MMI_HILOGE("The windowInfo is nullptr");
-                return;
+                return RET_ERR;
             }
             int32_t windowPid = GetWindowPid(windowInfo->id);
             WinInfo info = { .windowPid = windowPid, .windowId = windowInfo->id };
@@ -318,6 +334,7 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
 #endif // OHOS_BUILD_ENABLE_POINTER
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+    return RET_OK;
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER

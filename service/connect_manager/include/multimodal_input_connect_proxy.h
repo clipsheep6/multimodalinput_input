@@ -58,6 +58,7 @@ public:
     int32_t UnsubscribeKeyEvent(int32_t subscribeId) override;
     int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
     int32_t SetAnrObserver() override;
+	int32_t UpdateDisplayInfo(const std::shared_ptr<DisplayGroupInfo> displayGroupInfo) override;
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos) override;
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg) override;
     int32_t RegisterCooperateListener() override;
@@ -72,7 +73,11 @@ public:
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable) override;
     int32_t SetPointerLocation(int32_t x, int32_t y) override;
     virtual int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode) override;
-
+private:
+    int32_t WriteWindowsVecToParcel(const std::shared_ptr<DisplayGroupInfo> displayGroupInfo, MessageParcel& data);
+    int32_t WriteDisplayVecToParcel(const std::shared_ptr<DisplayGroupInfo> displayGroupInfo, MessageParcel& data);
+    int32_t WriteDisplayInfoToParcel(const std::shared_ptr<DisplayGroupInfo> displayGroupInfo, MessageParcel& data);
+	
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;
 };

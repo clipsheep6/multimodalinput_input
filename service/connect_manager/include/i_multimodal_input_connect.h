@@ -18,6 +18,7 @@
 
 #include "iremote_broker.h"
 
+#include "display_info.h"
 #include "i_event_filter.h"
 #include "i_input_event_filter.h"
 #include "input_device.h"
@@ -69,6 +70,7 @@ public:
         STOP_DEVICE_COOPERATE = 34,
         GET_INPUT_DEVICE_COOPERATE_STATE = 35,        
         SET_DISPLAY_BIND = 36,
+		UPDATE_DISPLAY_INFO = 37,
         SET_INPUT_DEVICE_TO_SCREEN = 50,
         SET_POINTER_LOCATION = 51,
     };
@@ -110,6 +112,7 @@ public:
     virtual int32_t SetAnrObserver() = 0;
     virtual int32_t GetDisplayBindInfo(DisplayBindInfos &infos) = 0;
     virtual int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg) = 0;
+	virtual int32_t UpdateDisplayInfo(const std::shared_ptr<DisplayGroupInfo> displayGroupInfo) = 0;
     virtual int32_t RegisterCooperateListener() = 0;
     virtual int32_t UnregisterCooperateListener() = 0;
     virtual int32_t EnableInputDeviceCooperate(int32_t userData, bool enabled) = 0;

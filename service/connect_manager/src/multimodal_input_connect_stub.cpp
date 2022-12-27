@@ -75,6 +75,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         {IMultimodalInputConnect::SET_ANR_OBSERVER, &MultimodalInputConnectStub::StubSetAnrListener},
         {IMultimodalInputConnect::GET_DISPLAY_BIND_INFO, &MultimodalInputConnectStub::StubGetDisplayBindInfo},
         {IMultimodalInputConnect::SET_DISPLAY_BIND, &MultimodalInputConnectStub::StubSetDisplayBind},
+		{IMultimodalInputConnect::UPDATE_DISPLAY_INFO, &MultimodalInputConnectStub::StubSendDisplayInfo},
         {IMultimodalInputConnect::REGISTER_COOPERATE_MONITOR,
             &MultimodalInputConnectStub::StubRegisterCooperateMonitor},
         {IMultimodalInputConnect::UNREGISTER_COOPERATE_MONITOR,
@@ -916,6 +917,106 @@ int32_t MultimodalInputConnectStub::StubSetMouseCaptureMode(MessageParcel& data,
     int32_t ret = SetMouseCaptureMode(windowId, isCaptureMode);
     if (ret != RET_OK) {
         MMI_HILOGE("Fail to call SetMouseCaptureMode, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectStub::ReadWindowsVecToParcel(MessageParcel& data, DisplayGroupInfo& displayGroupInfo)
+{
+    int32_t num = 0;
+    READINT32(data, num, IPC_PROXY_DEAD_OBJECT_ERR);
+    for (int32_t i = 0; i < num; i++) {
+        WindowInfo windowData = {};
+        READINT32(data, windowData.id, IPC_PROXY_DEAD_OBJECT_ERR);
+        READINT32(data, windowData.pid, IPC_PROXY_DEAD_OBJECT_ERR);
+        READINT32(data, windowData.uid, IPC_PROXY_DEAD_OBJECT_ERR);
+        READINT32(data, windowData.area.x, IPC_PROXY_DEAD_OBJECT_ERR);
+        READINT32(data, windowData.area.y, IPC_PROXY_DEAD_OBJECT_ERR);
+        READINT32(data, windowData.area.width, IPC_PROXY_DEAD_OBJECT_ERR);
+        READINT32(data, windowData.area.height, IPC_PROXY_DEAD_OBJECT_ERR);
+
+        int32_t DefaultHotAreaNum = 0;
+        READINT32(data, DefaultHotAreaNum, IPC_PROXY_DEAD_OBJECT_ERR);
+        for (int32_t i = 0; i < DefaultHotAreaNum; i++) {
+            Rect defaultHotArea = {};
+            READINT32(data, defaultHotArea.x, IPC_PROXY_DEAD_OBJECT_ERR);
+            READINT32(data, defaultHotArea.y, IPC_PROXY_DEAD_OBJECT_ERR);
+            READINT32(data, defaultHotArea.width, IPC_PROXY_DEAD_OBJECT_ERR);
+            READINT32(data, defaultHotArea.height, IPC_PROXY_DEAD_OBJECT_ERR);
+            windowData.defaultHotAreas.push_back(defaultHotArea);
+        }
+
+        int32_t pointerHotAreaNum = 0;
+        READINT32(data, pointerHotAreaNum, IPC_PROXY_DEAD_OBJECT_ERR);
+        for (int32_t i = 0; i < pointerHotAreaNum; i++) {
+            Rect pointerHotArea = {};
+            READINT32(data, pointerHotArea.x, IPC_PROXY_DEAD_OBJECT_ERR);
+            READINT32(data, pointerHotArea.y, IPC_PROXY_DEAD_OBJECT_ERR);
+            READINT32(data, pointerHotArea.width, IPC_PROXY_DEAD_OBJECT_ERR);
+            READINT32(data, pointerHotArea.height, IPC_PROXY_DEAD_OBJECT_ERR);
+            windowData.pointerHotAreas.push_back(pointerHotArea);
+        }
+        READINT32(data, windowData.agentWindowId, IPC_PROXY_DEAD_OBJECT_ERR);
+        READUINT32(data, windowData.flags, IPC_PROXY_DEAD_OBJECT_ERR);
+        displayGroupInfo.windowsInfo.push_back(windowData);
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::ReadDisplayVecToParcel(MessageParcel& data, DisplayGroupInfo& displayGroupInfo)
+{
+    int32_t num = 0;
+    DisplayInfo displaysData = {};
+    READINT32(data, num, IPC_PROXY_DEAD_OBJECT_ERR);
+    for (int32_t i = 0; i < num; i++) {
+        displaysData = {};
+
+        READINT32(data, displaysData.id, IPC_PROXY_DEAD_OBJECT_ERR);
+        READINT32(data, displaysData.x, IPC_PROXY_DEAD_OBJECT_ERR);
+        READINT32(data, displaysData.y, IPC_PROXY_DEAD_OBJECT_ERR);
+        READINT32(data, displaysData.width, IPC_PROXY_DEAD_OBJECT_ERR);
+        READINT32(data, displaysData.height, IPC_PROXY_DEAD_OBJECT_ERR);
+        READSTRING(data, displaysData.name, IPC_PROXY_DEAD_OBJECT_ERR);
+        READSTRING(data, displaysData.uniq, IPC_PROXY_DEAD_OBJECT_ERR);
+        uint32_t directionValue = 0;
+        READUINT32(data, directionValue, IPC_PROXY_DEAD_OBJECT_ERR);
+        displaysData.direction = static_cast<Direction>(directionValue);
+        displayGroupInfo.displaysInfo.push_back(displaysData);
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::ReadDisplayInfoToParcel(MessageParcel& data, DisplayGroupInfo& displayGroupInfo)
+{
+    READINT32(data, displayGroupInfo.width, IPC_PROXY_DEAD_OBJECT_ERR);
+    READINT32(data, displayGroupInfo.height, IPC_PROXY_DEAD_OBJECT_ERR);
+    READINT32(data, displayGroupInfo.focusWindowId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = ReadWindowsVecToParcel(data, displayGroupInfo);
+    ret += ReadDisplayVecToParcel(data, displayGroupInfo);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to read display info to parcel!");
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubSendDisplayInfo(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    DisplayGroupInfo displayGroupInfo = {};
+    int32_t ret = ReadDisplayInfoToParcel(data, displayGroupInfo);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to read display info");
+        return ret;
+    }
+    std::shared_ptr<DisplayGroupInfo> displayGroupInfoPtr = std::make_shared<DisplayGroupInfo>(displayGroupInfo);
+    ret = UpdateDisplayInfo(displayGroupInfoPtr);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call UpdateDisplayInfo failed ret:%{public}d", ret);
     }
     return ret;
 }
