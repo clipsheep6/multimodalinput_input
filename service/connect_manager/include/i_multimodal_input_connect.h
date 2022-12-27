@@ -18,7 +18,7 @@
 
 #include "iremote_broker.h"
 
-#include "display_info.h"
+#include "window_info.h"
 #include "i_event_filter.h"
 #include "i_input_event_filter.h"
 #include "input_device.h"
