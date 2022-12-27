@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,27 +13,21 @@
  * limitations under the License.
  */
 
-#ifndef HDF_DEVICE_EVENT_DISPATCH_H
-#define HDF_DEVICE_EVENT_DISPATCH_H
+#ifndef I_EVENT_QUEUE_MANAGER
+#define I_EVENT_QUEUE_MANAGER
 
-#include <cstdint>
+#include <memory>
 
-#include "inject_thread.h"
-#include "input_type.h"
-#include "nocopyable.h"
+#include "i_event_queue.h"
 
 namespace OHOS {
 namespace MMI {
-class HdfDeviceEventDispatch {
+class IEventQueueManager {
 public:
-    static void GetEventCallbackDispatch(const InputEventPackage **pkgs, uint32_t count, uint32_t devIndex);
-    HdfDeviceEventDispatch(const uint32_t maxX, const uint32_t maxY);
-    DISALLOW_COPY_AND_MOVE(HdfDeviceEventDispatch);
-    virtual ~HdfDeviceEventDispatch();
-
-private:
-    static InjectThread injectThread_;
+    virtual int32_t AddQueue(const std::shared_ptr<IEventQueue> eventQueue) = 0;
+    virtual int32_t RemoveQueue(int32_t id) = 0;
+    virtual std::shared_ptr<IEventQueue> GetDefaultQueue(int32_t id) = 0;
 };
 } // namespace MMI
 } // namespace OHOS
-#endif  // HDF_DEVICE_EVENT_DISPATCH_H
+#endif // I_EVENT_QUEUE_MANAGER

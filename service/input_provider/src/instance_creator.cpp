@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,23 +13,13 @@
  * limitations under the License.
  */
 
-#include "virtual_keyboard.h"
-
-#include "linux/input-event-codes.h"
+#include "touch_screen_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
-VirtualKeyboard::VirtualKeyboard() : VirtualDevice("VSoC keyboard", 0x6008) {}
-
-const std::vector<uint32_t>& VirtualKeyboard::GetEventTypes() const
+std::shared_ptr<IEventHandler> IEventHandler::CreateInstance()
 {
-    static const std::vector<uint32_t> evtTypes {EV_KEY};
-    return evtTypes;
-}
-const std::vector<uint32_t>& VirtualKeyboard::GetKeys() const
-{
-    static const std::vector<uint32_t> keys {KEY_BACK};
-    return keys;
+    return TouchScreenEventHandler::CreateInstance();
 }
 } // namespace MMI
 } // namespace OHOS

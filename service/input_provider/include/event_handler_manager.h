@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,30 +13,27 @@
  * limitations under the License.
  */
 
-#ifndef KEYBOARD_INJECT_H
-#define KEYBOARD_INJECT_H
+#ifndef EVENT_HANDLER_MANAGER
+#define EVENT_HANDLER_MANAGER
 
-#include <map>
 #include <memory>
-#include <mutex>
+#include <map>
 
-#include "singleton.h"
-
-#include "inject_thread.h"
+#include "i_event_handler_manager.h"
 
 namespace OHOS {
 namespace MMI {
-class KeyboardInject final {
-    DECLARE_DELAYED_SINGLETON(KeyboardInject);
+class EventHandlerManager : public IEventHandlerManager {
 public:
-    DISALLOW_COPY_AND_MOVE(KeyboardInject);
-    void InjectKeyEvent(uint16_t code, uint32_t value) const;
+    EventHandlerManager() = default;
+    virtual ~EventHandlerManager() = default;
+    DISALLOW_COPY_AND_MOVE(EventHandlerManager);
+    virtual void DispatchEvent(std::shared_ptr<PointerEvent> event) override;
+    virtual void DispatchEvent(std::shared_ptr<KeyEvent> event) override;
 
 private:
-    static std::unique_ptr<InjectThread> injectThread_;
-    std::map<int32_t, int32_t> keyCodeMap_ = {};
-    static std::mutex mutex_;
+    void ResetTouchUpEvent(std::shared_ptr<PointerEvent> event);
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // KEYBOARD_INJECT_H
+#endif // EVENT_HANDLER_MANAGER

@@ -17,6 +17,7 @@
 
 #include <cinttypes>
 #include <csignal>
+#include <memory>
 #include <parameters.h>
 #include <sys/signalfd.h>
 #ifdef OHOS_RSS_CLIENT
@@ -51,6 +52,13 @@
 #include "util_ex.h"
 #include "util_napi_error.h"
 #include "xcollie/watchdog.h"
+#ifdef OHOS_BUILD_HDF
+#include "event_handler_manager.h"
+#include "event_queue_manager.h"
+#include "event_queue.h"
+#include "hdf_input_provider.h"
+#include "input_provider_manager.h"
+#endif // OHOS_BUILD_HDF
 
 namespace OHOS {
 namespace MMI {
@@ -195,6 +203,56 @@ bool MMIService::InitLibinputService()
     return true;
 }
 
+#ifdef OHOS_BUILD_HDF
+bool MMIService::InitHDFService()
+{
+    bool isRet = InitQueue();
+    if (!isRet) {
+        MMI_HILOGE("InitQueue failed!");
+        return false;
+    }
+    hdfProvider_ = std::make_shared<HDFInputProvider>();
+    CHKPF(hdfProvider_);
+    hdfProvider_->BindContext(shared_from_this());
+    inputProviderMgr_ = std::make_shared<InputProviderManager>();
+    CHKPF(inputProviderMgr_);
+    inputProviderMgr_->AddInputProvider(hdfProvider_);
+    iEventHandlerMgr_ = std::make_shared<EventHandlerManager>();
+    CHKPF(iEventHandlerMgr_);
+    auto ret = hdfProvider_->Enable();
+    if (ret != RET_OK) {
+        MMI_HILOGE("HDF provider enable failed");
+        return false;
+    }
+    return true;
+}
+
+bool MMIService::InitQueue()
+{
+    eventQueueMgr_ = std::make_shared<EventQueueManager>();
+    CHKPF(eventQueueMgr_);
+    auto eventQueue = std::make_shared<EventQueue>(1);
+    CHKPF(eventQueue);
+    do {
+        int32_t ret = eventQueue->Init();
+        if (ret < 0) {
+            MMI_HILOGE("EventQueue init failed");
+            break;
+        }
+        auto readFd = eventQueue->GetInputFd();
+        ret = AddEpoll(EPOLL_EVENT_HDF, readFd);
+        if (ret < 0) {
+            MMI_HILOGE("AddEpoll error ret:%{public}d", ret);
+            EpollClose();
+            break;
+        }
+        eventQueueMgr_->AddQueue(eventQueue);
+        return true;
+    } while (0);
+    return false;
+}
+#endif // OHOS_BUILD_HDF
+
 bool MMIService::InitService()
 {
     MMI_HILOGD("Server msg handler Init");
@@ -270,6 +328,12 @@ int32_t MMIService::Init()
         MMI_HILOGE("Libinput init failed");
         return LIBINPUT_INIT_FAIL;
     }
+#ifdef OHOS_BUILD_HDF
+    if (!InitHDFService()) {
+        MMI_HILOGE("HDF service init failed");
+        return HDF_INIT_FAIL;
+    }
+#endif // OHOS_BUILD_HDF
     if (!InitDelegateTasks()) {
         MMI_HILOGE("Delegate tasks init failed");
         return ETASKS_INIT_FAIL;
@@ -322,7 +386,9 @@ void MMIService::OnStart()
     HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask("MMIService", taskFunc,
         WATCHDOG_INTERVAL_TIME, WATCHDOG_DELAY_TIME);
     MMI_HILOGI("Run periodical task success");
-    t_.join();
+    t_.detach();
+    MMI_HILOGI("MMIService thread has detached");
+    MMI_HILOGI("MMIService OnStart has finished");
 }
 
 void MMIService::OnStop()
@@ -330,6 +396,12 @@ void MMIService::OnStop()
     CHK_PID_AND_TID();
     UdsStop();
     libinputAdapter_.Stop();
+#ifdef OHOS_BUILD_HDF
+    CHKPV(hdfProvider_);
+    hdfProvider_->Disable();
+    CHKPV(inputProviderMgr_);
+    inputProviderMgr_->RemoveInputProvider(hdfProvider_);
+#endif // OHOS_BUILD_HDF
     state_ = ServiceRunningState::STATE_NOT_START;
 #ifdef OHOS_RSS_CLIENT
     MMI_HILOGI("Remove system ability listener start");
@@ -969,6 +1041,11 @@ void MMIService::OnThread()
             CHKPC(mmiEd);
             if (mmiEd->event_type == EPOLL_EVENT_INPUT) {
                 libinputAdapter_.EventDispatch(ev[i]);
+#ifdef OHOS_BUILD_HDF
+            } else if (mmiEd->event_type == EPOLL_EVENT_HDF) {
+                CHKPC(hdfProvider_);
+                hdfProvider_->EventDispatch(ev[i]);
+#endif // OHOS_BUILD_HDF
             } else if (mmiEd->event_type == EPOLL_EVENT_SOCKET) {
                 OnEpollEvent(ev[i]);
             } else if (mmiEd->event_type == EPOLL_EVENT_SIGNAL) {

@@ -158,7 +158,7 @@ ohos_source_set("patch_gen_libinput-third-mmi") {
   public_deps = [
     "//third_party/eudev:libudev",
     "//third_party/libevdev:libevdev",
-    "//third_party/mtdev:libmtdev",
+    "//foundation/multimodalinput/input/patch/diff_mtdev_mmi:libmtdev",
   ]
 }
 
@@ -174,7 +174,7 @@ ohos_shared_library("libinput-third-mmi") {
   public_deps = [
     "//third_party/eudev:libudev",
     "//third_party/libevdev:libevdev",
-    "//third_party/mtdev:libmtdev",
+    "//foundation/multimodalinput/input/patch/diff_mtdev_mmi:libmtdev",
   ]
 
   part_name = "input"
@@ -199,7 +199,7 @@ ohos_source_set("patch_gen_libinput-debug") {
   public_deps = [
     "//third_party/eudev:libudev",
     "//third_party/libevdev:libevdev",
-    "//third_party/mtdev:libmtdev",
+    "//foundation/multimodalinput/input/patch/diff_mtdev_mmi:libmtdev",
   ]
 }
 
@@ -220,7 +220,7 @@ ohos_executable("libinput-debug-mmi") {
   public_deps = [
     "//third_party/eudev:libudev",
     "//third_party/libevdev:libevdev",
-    "//third_party/mtdev:libmtdev",
+    "//foundation/multimodalinput/input/patch/diff_mtdev_mmi:libmtdev",
   ]
 
   part_name = "input"
@@ -245,7 +245,7 @@ ohos_source_set("patch_gen_libinput-list") {
   public_deps = [
     "//third_party/eudev:libudev",
     "//third_party/libevdev:libevdev",
-    "//third_party/mtdev:libmtdev",
+    "//foundation/multimodalinput/input/patch/diff_mtdev_mmi:libmtdev",
   ]
 }
 
@@ -266,7 +266,7 @@ ohos_executable("libinput-list-mmi") {
   public_deps = [
     "//third_party/eudev:libudev",
     "//third_party/libevdev:libevdev",
-    "//third_party/mtdev:libmtdev",
+    "//foundation/multimodalinput/input/patch/diff_mtdev_mmi:libmtdev",
   ]
 
   part_name = "input"
@@ -291,7 +291,7 @@ ohos_source_set("patch_gen_libinput-tablet") {
   public_deps = [
     "//third_party/eudev:libudev",
     "//third_party/libevdev:libevdev",
-    "//third_party/mtdev:libmtdev",
+    "//foundation/multimodalinput/input/patch/diff_mtdev_mmi:libmtdev",
   ]
 }
 
@@ -312,7 +312,7 @@ ohos_executable("libinput-tablet-mmi") {
   public_deps = [
     "//third_party/eudev:libudev",
     "//third_party/libevdev:libevdev",
-    "//third_party/mtdev:libmtdev",
+    "//foundation/multimodalinput/input/patch/diff_mtdev_mmi:libmtdev",
   ]
 
   part_name = "input"
@@ -338,7 +338,7 @@ ohos_source_set("patch_gen_libinput-record") {
   public_deps = [
     "//third_party/eudev:libudev",
     "//third_party/libevdev:libevdev",
-    "//third_party/mtdev:libmtdev",
+    "//foundation/multimodalinput/input/patch/diff_mtdev_mmi:libmtdev",
   ]
 }
 
@@ -359,7 +359,7 @@ ohos_executable("libinput-record-mmi") {
   public_deps = [
     "//third_party/eudev:libudev",
     "//third_party/libevdev:libevdev",
-    "//third_party/mtdev:libmtdev",
+    "//foundation/multimodalinput/input/patch/diff_mtdev_mmi:libmtdev",
   ]
 
   part_name = "input"
@@ -384,7 +384,7 @@ ohos_source_set("patch_gen_libinput-analyze") {
   public_deps = [
     "//third_party/eudev:libudev",
     "//third_party/libevdev:libevdev",
-    "//third_party/mtdev:libmtdev",
+    "//foundation/multimodalinput/input/patch/diff_mtdev_mmi:libmtdev",
   ]
 }
 
@@ -405,7 +405,7 @@ ohos_executable("libinput-analyze-mmi") {
   public_deps = [
     "//third_party/eudev:libudev",
     "//third_party/libevdev:libevdev",
-    "//third_party/mtdev:libmtdev",
+    "//foundation/multimodalinput/input/patch/diff_mtdev_mmi:libmtdev",
   ]
 
   part_name = "input"
@@ -430,7 +430,7 @@ ohos_source_set("patch_gen_libinput-measure") {
   public_deps = [
     "//third_party/eudev:libudev",
     "//third_party/libevdev:libevdev",
-    "//third_party/mtdev:libmtdev",
+    "//foundation/multimodalinput/input/patch/diff_mtdev_mmi:libmtdev",
   ]
 }
 
@@ -451,7 +451,7 @@ ohos_executable("libinput-measure-mmi") {
   public_deps = [
     "//third_party/eudev:libudev",
     "//third_party/libevdev:libevdev",
-    "//third_party/mtdev:libmtdev",
+    "//foundation/multimodalinput/input/patch/diff_mtdev_mmi:libmtdev",
   ]
 
   part_name = "input"
@@ -476,7 +476,7 @@ ohos_source_set("patch_gen_libinput-quirks") {
   public_deps = [
     "//third_party/eudev:libudev",
     "//third_party/libevdev:libevdev",
-    "//third_party/mtdev:libmtdev",
+    "//foundation/multimodalinput/input/patch/diff_mtdev_mmi:libmtdev",
   ]
 }
 
@@ -497,7 +497,7 @@ ohos_executable("libinput-quirks-mmi") {
   public_deps = [
     "//third_party/eudev:libudev",
     "//third_party/libevdev:libevdev",
-    "//third_party/mtdev:libmtdev",
+    "//foundation/multimodalinput/input/patch/diff_mtdev_mmi:libmtdev",
   ]
 
   part_name = "input"
