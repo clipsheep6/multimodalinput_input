@@ -1270,6 +1270,12 @@ bool KeyCommandHandler::HandleActionDown(const std::shared_ptr<PointerEvent> poi
         return false;
     }
     curDownPointers_.insert(make_pair(pointerEvent->GetPointerId(), pointerEvent));
+    // 三指长按匹配之后，需要把双指长按的 Timer Remove 掉否则两者都会被唤醒
+    if (isMatchedGesture_) {
+        TimerMgr->RemoveTimer(lastMatchedGesture_.timerId);
+        ResetLastMatchedGesture();
+        isMatchedGesture_ = false;
+    }
     for (auto& item : touchGestures_) {
         TouchGesture &touchGesture = item.second;
         if (!IsGestureMatch(touchGesture, pointerEvent)) {
@@ -1387,6 +1393,7 @@ void KeyCommandHandler::KeyCommandHandler::LaunchAbility(const TouchGesture &ges
     }
     // 静态手势拉起Ability的功能需要实现一个类似的函数用于恢复相关数据结构
     ResetLastMatchedGesture();
+    curDownPointers_.clear();
     MMI_HILOGD("End launch ability, bundleName:%{public}s", gesture.ability.bundleName.c_str());
 }
 
