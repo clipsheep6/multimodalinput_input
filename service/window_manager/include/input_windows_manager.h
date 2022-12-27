@@ -39,7 +39,7 @@ struct MouseLocation {
 class InputWindowsManager final {
     DECLARE_DELAYED_SINGLETON(InputWindowsManager);
 public:
-	enum class DispInfoCacheUpdateResult {
+    enum class DispInfoCacheUpdateResult {
         SET,
         UPDATE,
     };
@@ -142,7 +142,7 @@ private:
     void CheckFocusWindowChange(const DisplayGroupInfo &displayGroupInfo);
     void CheckZorderWindowChange(const DisplayGroupInfo &displayGroupInfo);
     void UpdateDisplayIdAndName();
-	std::shared_ptr<DisplayGroupInfo> GetDisplayInfoCache();
+    std::shared_ptr<DisplayGroupInfo> GetDisplayInfoCache();
 private:
     UDSServer* udsServer_ { nullptr };
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -162,7 +162,7 @@ private:
         int32_t windowId { -1 };
         bool isCaptureMode { false };
     } captureModeInfo_;
-	std::shared_ptr<DisplayGroupInfo> dispInfoCache_;
+    std::shared_ptr<DisplayGroupInfo> dispInfoCache_;
     std::mutex dispInfoCacheMtx_;
 };
 

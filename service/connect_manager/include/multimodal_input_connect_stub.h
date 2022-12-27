@@ -64,7 +64,7 @@ protected:
     int32_t StubSetDisplayBind(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPointerSpeed(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetPointerSpeed(MessageParcel& data, MessageParcel& reply);
-	int32_t StubSendDisplayInfo(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSendDisplayInfo(MessageParcel& data, MessageParcel& reply);
     int32_t StubRegisterCooperateMonitor(MessageParcel& data, MessageParcel& reply);
     int32_t StubUnregisterCooperateMonitor(MessageParcel& data, MessageParcel& reply);
     int32_t StubEnableInputDeviceCooperate(MessageParcel& data, MessageParcel& reply);

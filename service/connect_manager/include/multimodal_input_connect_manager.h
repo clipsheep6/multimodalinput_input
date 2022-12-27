@@ -65,7 +65,7 @@ public:
     int32_t UnsubscribeKeyEvent(int32_t subscribeId);
     int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
     int32_t SetAnrObserver();
-	int32_t UpdateDisplayInfo(const std::shared_ptr<DisplayGroupInfo> displayGroupInfo);
+    int32_t UpdateDisplayInfo(const std::shared_ptr<DisplayGroupInfo> displayGroupInfo);
     int32_t RegisterCooperateListener();
     int32_t UnregisterCooperateListener();
     int32_t EnableInputDeviceCooperate(int32_t userData, bool enabled);

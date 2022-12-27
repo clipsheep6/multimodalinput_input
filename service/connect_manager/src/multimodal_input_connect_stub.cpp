@@ -75,7 +75,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         {IMultimodalInputConnect::SET_ANR_OBSERVER, &MultimodalInputConnectStub::StubSetAnrListener},
         {IMultimodalInputConnect::GET_DISPLAY_BIND_INFO, &MultimodalInputConnectStub::StubGetDisplayBindInfo},
         {IMultimodalInputConnect::SET_DISPLAY_BIND, &MultimodalInputConnectStub::StubSetDisplayBind},
-		{IMultimodalInputConnect::UPDATE_DISPLAY_INFO, &MultimodalInputConnectStub::StubSendDisplayInfo},
+        {IMultimodalInputConnect::UPDATE_DISPLAY_INFO, &MultimodalInputConnectStub::StubSendDisplayInfo},
         {IMultimodalInputConnect::REGISTER_COOPERATE_MONITOR,
             &MultimodalInputConnectStub::StubRegisterCooperateMonitor},
         {IMultimodalInputConnect::UNREGISTER_COOPERATE_MONITOR,
