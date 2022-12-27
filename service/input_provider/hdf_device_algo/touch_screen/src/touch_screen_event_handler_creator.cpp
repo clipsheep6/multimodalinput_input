@@ -13,26 +13,16 @@
  * limitations under the License.
  */
 
-#ifndef VIRTUAL_KEYBOARD_H
-#define VIRTUAL_KEYBOARD_H
+#include "touch_screen_event_handler.h"
+#include "i_input_context.h"
 
-#include <cstdint>
+extern "C" bool GetIEventHandlerImpl(std::shared_ptr<OHOS::MMI::IInputContext> context, int32_t capabilities, IEventHandlerStruct **s)
+{
+    if (capabilities & OHOS::MMI::IInputDevice::CAPABILITY_TOUCHSCREEN) {
+        *s = new IEventHandlerStruct;
+        (*s)->eventHandler = OHOS::MMI::TouchScreenEventHandler::CreateInstance(context);
+        return true;
+    }
+    return false;
+}
 
-#include "nocopyable.h"
-#include "virtual_device.h"
-
-namespace OHOS {
-namespace MMI {
-class VirtualKeyboard : public VirtualDevice {
-public:
-    VirtualKeyboard();
-    DISALLOW_COPY_AND_MOVE(VirtualKeyboard);
-    ~VirtualKeyboard() = default;
-protected:
-    const std::vector<uint32_t> &GetEventTypes() const override;
-
-    const std::vector<uint32_t> &GetKeys() const override;
-};
-} // namespace MMI
-} // namespace OHOS
-#endif // VIRTUAL_KEYBOARD_H

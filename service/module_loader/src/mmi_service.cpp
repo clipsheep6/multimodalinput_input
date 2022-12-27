@@ -17,8 +17,13 @@
 
 #include <cinttypes>
 #include <csignal>
+#include <dlfcn.h>
+#include <dirent.h>
+#include <memory>
 #include <parameters.h>
+#include <sys/inotify.h>
 #include <sys/signalfd.h>
+#include <sys/types.h>
 #ifdef OHOS_RSS_CLIENT
 #include <unordered_map>
 #endif
@@ -29,6 +34,8 @@
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "dfx_hisysevent.h"
 #include "event_dump.h"
+#include "i_input_provider.h"
+#include "event_handler_creator.h"
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_cooperate_sm.h"
 #endif // OHOS_BUILD_ENABLE_COOPERATE
@@ -51,6 +58,10 @@
 #include "util_ex.h"
 #include "util_napi_error.h"
 #include "xcollie/watchdog.h"
+#include "event_handler_manager.h"
+#include "event_queue_manager.h"
+#include "event_queue.h"
+#include "input_provider_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -59,6 +70,8 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMISe
 const std::string DEF_INPUT_SEAT = "seat0";
 constexpr int32_t WATCHDOG_INTERVAL_TIME = 10000;
 constexpr int32_t WATCHDOG_DELAY_TIME = 15000;
+#define INOTIFY_SIZE sizeof(struct inotify_event)
+#define DIR_BUF_LEN   (1024 * (INOTIFY_SIZE + 16))
 } // namespace
 
 const bool REGISTER_RESULT =
@@ -195,6 +208,89 @@ bool MMIService::InitLibinputService()
     return true;
 }
 
+bool MMIService::LoadInputProvider(std::string path)
+{
+    void *handle = dlopen(path.data(), RTLD_NOW);
+    if(handle == nullptr){
+        MMI_HILOGE("Open plugin failed, so name:%{public}s, msg:%{public}s", path.data(), dlerror());
+        return false;
+    }        
+    GetInputProvider* getInputProvider = (GetInputProvider*)dlsym(handle, "GetInputProviderImpl");
+    if (getInputProvider == nullptr) {
+        auto error = dlerror();
+        MMI_HILOGE("Dlsym msg:%{public}s", error);
+        dlclose(handle);
+        return false;
+    }
+    auto eventQueue = std::make_shared<EventQueue>();
+    const auto queueId = eventQueue->GetQueueId();
+    IInputProviderStruct *s = nullptr;
+    getInputProvider(queueId, &s);
+    CHKPF(s);
+    auto provider = s->provider;
+    CHKPF(provider);
+    delete s;
+    s = nullptr;
+    provider->BindContext(shared_from_this());     
+    int32_t ret = eventQueue->Init();
+    if (ret < 0) {
+        MMI_HILOGE("EventQueue init failed");
+        dlclose(handle);
+        return false;
+    }
+    auto queueReadFd = eventQueue->GetInputFd();
+    ret = AddEpoll(EPOLL_EVENT_INPUT_PROVIDER, queueReadFd);
+    if (ret < 0) {
+        MMI_HILOGE("AddEpoll error ret:%{public}d", ret);
+        dlclose(handle);
+        return false;
+    }
+    eventQueueMgr_->AddQueue(eventQueue);
+    ret = inputProviderMgr_->AddInputProvider(provider, handle, queueReadFd);    
+    if (ret < 0) {
+        MMI_HILOGE("Add provider failed");
+        dlclose(handle);
+        return false;
+    }
+    ret = provider->Enable();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Provider enable failed");
+        DelEpoll(EPOLL_EVENT_INPUT_PROVIDER, queueReadFd);
+        dlclose(handle);
+        return false;
+    }
+    return true;
+}
+
+bool MMIService::InitInputProvider()
+{
+    const std::string input_provider_dir =  DEF_EXP_SOPATH "module/multimodalinput/plugins/input_provider";
+    DIR* dir = opendir(input_provider_dir.c_str());
+    if (dir == nullptr) {
+        MMI_HILOGE("Open plugin home(%{public}s) failed. errno: %{public}d", input_provider_dir.data(), errno);
+        return false;
+    }
+    dirent* p = nullptr;
+    while ((p = readdir(dir)) != nullptr) {
+        if (p->d_type != DT_REG) {
+            continue;
+        }
+        char realPath[PATH_MAX] = {};
+        std::string path = input_provider_dir + p->d_name;
+        if (realpath(path.data(), realPath) == nullptr) {
+            continue;
+        }
+        if (!LoadInputProvider(realPath)) {
+            MMI_HILOGE("Load input provider failed, dirname:%{public}s, errno:%{public}d", realPath, errno);
+        }        
+    }
+    auto ret = closedir(dir);
+    if (ret != 0) {
+        MMI_HILOGE("Closedir failed, dirname:%{public}s, errno:%{public}d", input_provider_dir.c_str(), errno);
+    }
+    return true;
+}
+
 bool MMIService::InitService()
 {
     MMI_HILOGD("Server msg handler Init");
@@ -241,6 +337,14 @@ bool MMIService::InitDelegateTasks()
 int32_t MMIService::Init()
 {
     CheckDefine();
+    inputProviderMgr_ = std::make_shared<InputProviderManager>();
+    CHKPR(inputProviderMgr_, RET_ERR);
+    iEventHandlerMgr_ = std::make_shared<EventHandlerManager>();
+    CHKPR(iEventHandlerMgr_, RET_ERR);
+    eventQueueMgr_ = std::make_shared<EventQueueManager>();
+    CHKPR(eventQueueMgr_, RET_ERR);
+    eventHandlerCreator_ = std::make_shared<EventHandlerCreator>();
+    pluginMgr_.StartWatchPluginDir();
     MMI_HILOGD("WindowsManager Init");
     WinMgr->Init(*this);
     MMI_HILOGD("ANRManager Init");
@@ -265,10 +369,14 @@ int32_t MMIService::Init()
     InputDevCooSM->Init(std::bind(&DelegateTasks::PostAsyncTask, &delegateTasks_, std::placeholders::_1));
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     MMI_HILOGD("Input msg handler init");
-    InputHandler->Init(*this);
+    InputHandler->Init(*this, pluginMgr_.GetContext());
     if (!InitLibinputService()) {
         MMI_HILOGE("Libinput init failed");
         return LIBINPUT_INIT_FAIL;
+    }
+    if (!InitInputProvider()) {
+        MMI_HILOGE("HDF service init failed");
+        return HDF_INIT_FAIL;
     }
     if (!InitDelegateTasks()) {
         MMI_HILOGE("Delegate tasks init failed");
@@ -322,7 +430,9 @@ void MMIService::OnStart()
     HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask("MMIService", taskFunc,
         WATCHDOG_INTERVAL_TIME, WATCHDOG_DELAY_TIME);
     MMI_HILOGI("Run periodical task success");
-    t_.join();
+    t_.detach();
+    MMI_HILOGI("MMIService thread has detached");
+    MMI_HILOGI("MMIService OnStart has finished");
 }
 
 void MMIService::OnStop()
@@ -330,6 +440,7 @@ void MMIService::OnStop()
     CHK_PID_AND_TID();
     UdsStop();
     libinputAdapter_.Stop();
+    inputProviderMgr_->RemoveAllInputProvider();
     state_ = ServiceRunningState::STATE_NOT_START;
 #ifdef OHOS_RSS_CLIENT
     MMI_HILOGI("Remove system ability listener start");
@@ -884,7 +995,7 @@ int32_t MMIService::SetDisplayBind(int32_t deviceId, int32_t displayId, std::str
         MMI_HILOGE("SetDisplayBind pid failed, ret:%{public}d", ret);
         return RET_ERR;
     }
-    return RET_OK;    
+    return RET_OK;
 }
 
 int32_t MMIService::GetFunctionKeyState(int32_t funcKey, bool &state)
@@ -959,6 +1070,9 @@ void MMIService::OnThread()
 #endif
     libinputAdapter_.RetriggerHotplugEvents();
     libinputAdapter_.ProcessPendingEvents();
+    TimerMgr->AddTimer(5000, -1, [this]() {
+        pluginMgr_.OnTimer();
+    });
     while (state_ == ServiceRunningState::STATE_RUNNING) {
         epoll_event ev[MAX_EVENT_SIZE] = {};
         int32_t timeout = TimerMgr->CalcNextDelay();
@@ -969,6 +1083,10 @@ void MMIService::OnThread()
             CHKPC(mmiEd);
             if (mmiEd->event_type == EPOLL_EVENT_INPUT) {
                 libinputAdapter_.EventDispatch(ev[i]);
+            } else if (mmiEd->event_type == EPOLL_EVENT_INPUT_PROVIDER) {
+                auto provider = inputProviderMgr_->GetProviderByQueueReadFd(mmiEd->fd);
+                CHKPC(provider);
+                provider->EventDispatch(ev[i]);
             } else if (mmiEd->event_type == EPOLL_EVENT_SOCKET) {
                 OnEpollEvent(ev[i]);
             } else if (mmiEd->event_type == EPOLL_EVENT_SIGNAL) {

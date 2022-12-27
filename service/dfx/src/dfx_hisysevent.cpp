@@ -32,7 +32,7 @@ constexpr int32_t TIMES_LEVEL4 = 50;
 
 void DfxHisysevent::OnDeviceConnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
-    std::shared_ptr dev = InputDevMgr->GetInputDevice(id);
+    auto dev = InputDevMgr->GetInputDevice(id);
     CHKPV(dev);
     std::string message;
     std::string name = "";

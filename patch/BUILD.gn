@@ -15,13 +15,12 @@ import("//build/ohos.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
 group("patch_packages") {
-  deps = [
-    "diff_libinput_mmi:libinput-third-mmi",
-    "prebuild_eudev:prebuild_eudev",
-    "prebuild_libinput:prebuild_libinput",
-    "//third_party/eudev:libudev",
-    "//third_party/eudev:udev_conf",
-    "//third_party/eudev:udevd",
-    "//third_party/eudev:udevd.rc",
-  ]
+  deps = [ "diff_mtdev_mmi:libmtdev", ]
+  if (input_feature_libinput) {
+    deps += [
+      "diff_libinput_mmi:libinput-third-mmi",
+      "prebuild_eudev:prebuild_eudev",
+      "prebuild_libinput:prebuild_libinput",
+    ]
+  }
 }

@@ -14,44 +14,25 @@
 import("//build/ohos.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
-ohos_prebuilt_etc("mmi_uinput.rc") {
-  source = "mmi_uinput.rc"
-  relative_install_dir = "init"
-  part_name = "input"
-  subsystem_name = "multimodalinput"
+group("third_party_group") {
+  deps = [ "//foundation/multimodalinput/input/patch:patch_packages", ]
+  if (input_feature_libinput) {
+    deps += [
+      "//third_party/eudev:libudev",
+      "//third_party/eudev:udevd",
+      "//third_party/eudev:udevadm",
+      "//third_party/eudev:udevd.rc",
+      "//third_party/eudev:udev_conf",
+      "//third_party/eudev:udev_touchscreen_rule",
+      "//third_party/eudev:udev_vk_rule",
+      "//third_party/libevdev:libevdev"
+    ]
+  }
 }
 
 ohos_prebuilt_etc("multimodalinput.rc") {
   source = "multimodalinput.cfg"
   relative_install_dir = "init"
-  part_name = "input"
-  subsystem_name = "multimodalinput"
-}
-
-ohos_executable("uinput_inject") {
-  install_enable = true
-
-  sources = [
-    "uinput/hdf_device_event_dispatch.cpp",
-    "uinput/hdf_device_event_manager.cpp",
-    "uinput/inject_thread.cpp",
-    "uinput/keyboard_inject.cpp",
-    "uinput/virtual_device.cpp",
-    "uinput/virtual_keyboard.cpp",
-    "uinput/virtual_touch_screen.cpp",
-  ]
-
-  include_dirs = [
-    "//foundation/multimodalinput/input/util/common/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
-  ]
-
-  external_deps = [
-    "c_utils:utils",
-    "drivers_interface_input:hdi_input",
-    "hiviewdfx_hilog_native:libhilog",
-  ]
-
   part_name = "input"
   subsystem_name = "multimodalinput"
 }
@@ -71,6 +52,8 @@ group("multimodalinput_mmi_frameworks") {
 group("multimodalinput_mmi_service") {
   deps = [
     "service:libmmi-server",
+    "service/input_provider/hdf_provider:input_provider_hdf",
+    "service/input_provider/hdf_device_algo/touch_screen:input_device_algo_touch_screen",
     "tools/inject_event:uinput",
   ]
 }
@@ -105,8 +88,16 @@ group("input_jsapi_group") {
   }
 }
 
+group("examples_group") {
+  deps = [
+    "examples/input_device_display_bind:input_device_display_bind",
+    "examples/plugins:input_plugins",
+  ]
+}
+
 group("mmi_debug_tools") {
   deps = [
+    ":examples_group",
     "patch/diff_libinput_mmi:libinput-analyze-mmi",
     "patch/diff_libinput_mmi:libinput-debug-mmi",
     "patch/diff_libinput_mmi:libinput-list-mmi",
@@ -117,6 +108,7 @@ group("mmi_debug_tools") {
     "tools/event_inject:mmi-event-injection",
     "tools/vuinput:vuinput",
     "//third_party/eudev:udevadm",
+    ":examples_group",
   ]
 }
 
@@ -149,8 +141,4 @@ group("mmi_tests") {
     "tools/inject_event:InjectEventTest",
     "util:ut-mmi-util-out",
   ]
-}
-
-group("examples_group") {
-  deps = [ "examples/input_device_display_bind:input_device_display_bind" ]
 }

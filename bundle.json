@@ -27,7 +27,8 @@
       "input_feature_mouse",
       "input_feature_touchscreen",
       "input_feature_input_device",
-      "input_feature_input_cooperation"
+      "input_feature_input_cooperation",
+      "input_feature_libinput"
     ],
     "adapted_system_type": [
       "standard"
@@ -88,11 +89,8 @@
           "//third_party/eudev:udev_conf",
           "//third_party/eudev:udev_touchscreen_rule",
           "//third_party/eudev:udev_vk_rule",
-          "//third_party/mtdev:libmtdev",
           "//third_party/libevdev:libevdev",
-          "//foundation/multimodalinput/input:uinput_inject",
-          "//foundation/multimodalinput/input:mmi_uinput.rc",
-          "//foundation/multimodalinput/input:examples_group"
+          "//foundation/multimodalinput/input:third_party_group"
         ]
       },
       "inner_kits": [

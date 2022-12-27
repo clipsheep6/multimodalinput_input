@@ -1,0 +1,42 @@
+# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+
+ohos_shared_library("input_touch_2_key_handler") {
+  include_dirs = [
+    "touch2key/include",
+    "//foundation/multimodalinput/input/service/event_handler/include",
+    "//foundation/multimodalinput/input/service/event_plugin/include",
+    "//foundation/multimodalinput/input/util/common/include",
+  ]
+  sources = [
+    "touch2key/src/touch_2_key_handler.cpp",
+    "touch2key/src/touch_2_key_plugin.cpp",
+  ]
+
+  defines = input_default_defines
+
+  deps = [ "//foundation/multimodalinput/input/util:libmmi-util" ]
+
+  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+
+  relative_install_dir = "module/multimodalinput/plugins/event_handler"
+  subsystem_name = "multimodalinput"
+  part_name = "input"
+}
+
+group("input_plugins") {
+  deps = [ ":input_touch_2_key_handler" ]
+}

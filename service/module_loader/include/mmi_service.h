@@ -25,7 +25,12 @@
 #include "system_ability.h"
 
 #include "delegate_tasks.h"
+#include "i_input_context.h"
+#include "i_input_windows_manager.h"
+#include "input_device_manager.h"
 #include "input_event_handler.h"
+#include "i_event_handler_creator.h"
+#include "input_event_handler_plugin.h"
 #include "libinput_adapter.h"
 #include "multimodal_input_connect_stub.h"
 #include "server_msg_handler.h"
@@ -35,7 +40,8 @@ namespace OHOS {
 namespace MMI {
 
 enum class ServiceRunningState {STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
-class MMIService final : public UDSServer, public SystemAbility, public MultimodalInputConnectStub {
+class MMIService final : public UDSServer, public IInputContext, public SystemAbility, public MultimodalInputConnectStub,
+    public std::enable_shared_from_this<MMIService> {
     DECLARE_DELAYED_SINGLETON(MMIService);
     DECLARE_SYSTEM_ABILITY(MMIService);
     DISALLOW_COPY_AND_MOVE(MMIService);
@@ -44,6 +50,12 @@ public:
     void OnStart() override;
     void OnStop() override;
     int32_t Dump(int32_t fd, const std::vector<std::u16string> &args) override;
+    virtual std::shared_ptr<IInputDeviceManager> GetInputDeviceManager() override { return InputDevMgr; }
+    virtual std::shared_ptr<IEventQueueManager> GetEventQueueManager() override { return eventQueueMgr_; }
+    virtual std::shared_ptr<IEventHandlerManager> GetEventHandlerManager() override { return iEventHandlerMgr_; }
+    virtual std::shared_ptr<IInputProviderManager> GetInputProviderManager() override { return inputProviderMgr_; }
+    virtual std::shared_ptr<IInputWindowsManager> GetInputWindowsManager() override { return WinMgr; }    
+    virtual std::shared_ptr<IEventHandlerCreator> GetEventHandlerCreator() override { return eventHandlerCreator_; };
     int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &toReturnClientFd, int32_t &tokenType) override;
     int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority) override;
@@ -84,6 +96,7 @@ public:
     int32_t SetInputDevice(const std::string& dhid, const std::string& screenId) override;
     int32_t GetFunctionKeyState(int32_t funcKey, bool &state) override;
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable) override;
+    void EventDispatch(epoll_event &ev);
     int32_t SetPointerLocation(int32_t x, int32_t y) override;
     virtual int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode) override;
     int32_t GetWindowPid(int32_t windowId) override;
@@ -133,17 +146,16 @@ protected:
     int32_t OnGetInputDeviceCooperateState(int32_t pid, int32_t userData, const std::string &deviceId);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     bool InitLibinputService();
+    bool InitInputProvider();
+    bool LoadInputProvider(std::string path);
     bool InitService();
     bool InitSignalHandler();
     bool InitDelegateTasks();
     int32_t Init();
-
     void OnThread();
     void OnSignalEvent(int32_t signalFd);
     void OnDelegateTask(epoll_event& ev);
-
     void AddReloadDeviceTimer();
-
 private:
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t mmiFd_ { -1 };
@@ -154,9 +166,13 @@ private:
 #endif
 
     LibinputAdapter libinputAdapter_;
+    std::shared_ptr<IInputProviderManager> inputProviderMgr_;
+    std::shared_ptr<IEventQueueManager> eventQueueMgr_;
+    std::shared_ptr<IEventHandlerManager> iEventHandlerMgr_;
+    std::shared_ptr<IEventHandlerCreator> eventHandlerCreator_;
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;
-
+    InputEventHandlerPluginMgr pluginMgr_;
     std::atomic_bool threadStatusFlag_ { false };
 };
 } // namespace MMI

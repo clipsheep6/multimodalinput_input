@@ -12,33 +12,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef I_INPUT_WINDOWS_MANAGER_H
+#define I_INPUT_WINDOWS_MANAGER_H
 
-#ifndef HDF_DEVICE_EVENT_MANAGER_H
-#define HDF_DEVICE_EVENT_MANAGER_H
-
-#include <cstdint>
-#include <thread>
-
-#include "inject_thread.h"
-#include "input_manager.h"
-#include "input_type.h"
+#include <tuple>
+#include "struct_multimodal.h"
+#include "i_input_device.h"
 
 namespace OHOS {
 namespace MMI {
-class HdfDeviceEventManager {
+class IInputWindowsManager {
 public:
-    HdfDeviceEventManager();
-    virtual ~HdfDeviceEventManager();
-    void ConnectHDFInit();
-    InjectThread injectThread_;
-    std::thread thread_;
-
-private:
-    InputDeviceInfo *iDevInfo_ { nullptr };
-    IInputInterface *inputInterface_ { nullptr };
-    InputEventCb callback_ {};
-    const uint32_t TOUCH_DEV_ID { 1 };
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    virtual bool TouchPointToDisplayPoint(
+        std::tuple<std::shared_ptr<IInputDevice::AxisInfo>, std::shared_ptr<IInputDevice::AxisInfo>> axisInfo,
+        std::tuple<int32_t, int32_t> raw, EventTouch& touchInfo, int32_t& physicalDisplayId, int32_t deviceId) = 0;
+#endif // OHOS_BUILD_ENABLE_TOUCH
 };
 } // namespace MMI
 } // namespace OHOS
-#endif  // HDF_DEVICE_EVENT_MANAGER_H
+#endif // I_INPUT_WINDOWS_MANAGER_H

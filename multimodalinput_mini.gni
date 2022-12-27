@@ -29,6 +29,7 @@ declare_args() {
   input_feature_touchscreen = true
   input_feature_input_device = true
   input_feature_input_cooperation = false
+  input_feature_libinput = true
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -50,6 +51,7 @@ print("input_feature_joystick = ${input_feature_joystick}")
 print("input_feature_touchscreen = ${input_feature_touchscreen}")
 print("input_feature_input_device = ${input_feature_input_device}")
 print("input_feature_input_cooperation = ${input_feature_input_cooperation}")
+print("input_feature_libinput = ${input_feature_libinput}")
 
 input_default_defines = []
 
@@ -83,4 +85,8 @@ if (input_feature_mouse) {
 
 if (input_feature_joystick) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_JOYSTICK" ]
+}
+
+if (input_feature_libinput) {
+  input_default_defines += [ "OHOS_BUILD_LIBINPUT" ]
 }
