@@ -18,7 +18,6 @@
 #include <cinttypes>
 #include <csignal>
 #include <parameters.h>
-#include <sys/inotify.h>
 #include <sys/signalfd.h>
 #ifdef OHOS_RSS_CLIENT
 #include <unordered_map>
@@ -244,7 +243,7 @@ bool MMIService::InitDelegateTasks()
 int32_t MMIService::Init()
 {
     CheckDefine();
-    pluginMgr_.StartWatchPluginDir();
+    pluginMgr_.ReadPluginDir();
     MMI_HILOGD("WindowsManager Init");
     WinMgr->Init(*this);
     MMI_HILOGD("ANRManager Init");

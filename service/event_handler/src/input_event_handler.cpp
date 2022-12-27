@@ -45,12 +45,11 @@ InputEventHandler::InputEventHandler()
 
 InputEventHandler::~InputEventHandler() {}
 
-void InputEventHandler::Init(UDSServer& udsServer,  std::list<std::shared_ptr<IInputEventPluginContext>> context)
+void InputEventHandler::Init(UDSServer& udsServer,  std::list<std::shared_ptr<IInputEventHandlerPluginContext>> contexts)
 {
     udsServer_ = &udsServer;
-    contextList_ = context;
+    contexts_ = contexts;
     BuildInputHandlerChain();
-
 }
 
 void InputEventHandler::OnEvent(void *event)
@@ -81,13 +80,13 @@ void InputEventHandler::OnEvent(void *event)
                ",lostTime:%{public}" PRId64, idSeed_, endTime, lostTime);
 }
 
-void InputEventHandler::SetPluginEventHandler()
+void InputEventHandler::InitPluginEventHandler()
 {
-    if (contextList_.empty()) {
+    if (contexts_.empty()) {
         MMI_HILOGE("Context is empty");
         return;
     }
-    for (auto it = contextList_.begin(); it != contextList_.end(); ++it) {
+    for (auto it = contexts_.begin(); it != contexts_.end(); ++it) {
         if (*it != nullptr) {
              Insert((*it)->GetEventHandler());
         }
@@ -131,7 +130,7 @@ int32_t InputEventHandler::BuildInputHandlerChain()
 #endif // OHOS_BUILD_ENABLE_MONITOR
     auto dispatchHandler = std::make_shared<EventDispatchHandler>();
     handler->SetNext(dispatchHandler);
-    SetPluginEventHandler();
+    InitPluginEventHandler();
     return RET_OK;
 }
 
@@ -186,15 +185,15 @@ int32_t InputEventHandler::Insert(std::shared_ptr<IInputEventHandler> handler)
 {
     CHKPR(handler, RET_ERR);
     std::shared_ptr<IInputEventHandler> handler_ = eventNormalizeHandler_;
-    for (auto tmp = handler_; tmp != nullptr; tmp = tmp->nextHandler_) {
-        auto next = tmp->nextHandler_;
-        if ((tmp->handlerPriority_ <= handler->handlerPriority_) && (next == nullptr)) {
-            tmp->SetNext(handler);
+    for (auto cur = handler_; cur != nullptr; cur = cur->nextHandler_) {
+        auto next = cur->nextHandler_;
+        if ((cur->handlerPriority_ <= handler->handlerPriority_) && (next == nullptr)) {
+            cur->SetNext(handler);
             return RET_OK;
         }
-        if ((tmp->handlerPriority_ <= handler->handlerPriority_)
-            && (next->handlerPriority_ > handler->handlerPriority_)) {
-            tmp->SetNext(handler);
+        if ((cur->handlerPriority_ <= handler->handlerPriority_) &&
+            (handler->handlerPriority_ < next->handlerPriority_)) {
+            cur->SetNext(handler);
             handler->SetNext(next);
             return RET_OK;
         }

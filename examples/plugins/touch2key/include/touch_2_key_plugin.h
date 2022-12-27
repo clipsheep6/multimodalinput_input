@@ -21,23 +21,23 @@
 
 namespace OHOS {
 namespace MMI {
-class Touch2KeyPlugin : public IPlugin
+class Touch2KeyPlugin : public IInputEventHandlerPlugin
 {
 public:
     Touch2KeyPlugin() = default;
     DISALLOW_COPY_AND_MOVE(Touch2KeyPlugin);
     virtual ~Touch2KeyPlugin() = default;
-    virtual bool Init(IInputEventPluginContext *context);
+    virtual bool Init(std::shared_ptr<IInputEventHandlerPluginContext> context);
     virtual void Uninit() {}
 private:
-    IInputEventPluginContext *context_;
+    std::shared_ptr<IInputEventHandlerPluginContext> context_ { nullptr };
 };
 
-extern "C" IPlugin* create() {
+extern "C" IInputEventHandlerPlugin* create() {
     return new Touch2KeyPlugin();
 }
 
-extern "C" void Release(IPlugin* p) {
+extern "C" void Release(IInputEventHandlerPlugin* p) {
     delete p;
     p = nullptr;
 }

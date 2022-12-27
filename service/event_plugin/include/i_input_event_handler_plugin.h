@@ -12,23 +12,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef I_INPUT_EVENT_HANDLER_PLUGIN_CONTEXT
-#define I_INPUT_EVENT_HANDLER_PLUGIN_CONTEXT
+
+#ifndef I_INPUT_EVENT_HANDLER_PLUGIN
+#define I_INPUT_EVENT_HANDLER_PLUGIN
 
 #include "i_input_event_handler_plugin_context.h"
 
 namespace OHOS {
 namespace MMI {
-class IPlugin
+class IInputEventHandlerPlugin
 {
 public:
-    IPlugin() = default;
-    virtual ~IPlugin() = default;
-    virtual bool Init(IInputEventPluginContext *context) = 0;
+    IInputEventHandlerPlugin() = default;
+    virtual ~IInputEventHandlerPlugin() = default;
+    virtual bool Init(std::shared_ptr<IInputEventHandlerPluginContext> context) = 0;
     virtual void Uninit() = 0;
 };
-typedef IPlugin* GetPlugin();
-typedef void ReleasePlugin(IPlugin* plugin);
+typedef IInputEventHandlerPlugin* GetPlugin();
+typedef void ReleasePlugin(IInputEventHandlerPlugin* plugin);
 } // namespace MMI
 } // namespace OHOS
-#endif // I_INPUT_EVENT_HANDLER_PLUGIN_CONTEXT
+#endif // I_INPUT_EVENT_HANDLER_PLUGIN

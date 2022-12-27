@@ -22,7 +22,11 @@
 
 namespace OHOS {
 namespace MMI {
-class PluginContext : public IInputEventPluginContext
+    enum class TimeStatFlag {
+        BEGIN,
+        END,
+    };
+class PluginContext : public IInputEventHandlerPluginContext
 {
 public:
     PluginContext() = default;
@@ -34,7 +38,11 @@ public:
     virtual void TimeStat(TimeStatFlag flag);
     virtual void OnReport(int32_t &max, int32_t &avg);
 private:
-    std::shared_ptr<IInputEventHandler> handler_;
+    std::shared_ptr<IInputEventHandler> handler_ { nullptr };
+    int32_t max_ { 0 };
+    int32_t raw_ { 0 };
+    int64_t sum_ { 0 };
+    int32_t times_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS

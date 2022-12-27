@@ -25,25 +25,31 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Touch2
 
 void Touch2KeyHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
+    CHKPV(context_);
     context_->BeginStat();
     MMI_HILOGD("Sys plugin");
     context_->EndStat();
+    CHKPV(nextHandler_);
     nextHandler_->HandleKeyEvent(keyEvent);
 }
 
 void Touch2KeyHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CHKPV(context_);
     context_->BeginStat();
     MMI_HILOGD("Sys plugin");
     context_->EndStat();
+    CHKPV(nextHandler_);
     nextHandler_->HandlePointerEvent(pointerEvent);
 }
 
 void Touch2KeyHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CHKPV(context_);
     context_->BeginStat();
     MMI_HILOGD("Sys plugin");
     context_->EndStat();
+    CHKPV(nextHandler_);
     nextHandler_->HandleTouchEvent(pointerEvent);
 }
 } // namespace MMI

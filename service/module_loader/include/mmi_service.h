@@ -26,7 +26,7 @@
 
 #include "delegate_tasks.h"
 #include "input_event_handler.h"
-#include "input_event_handler_plugin.h"
+#include "input_event_handler_plugin_mgr.h"
 #include "libinput_adapter.h"
 #include "multimodal_input_connect_stub.h"
 #include "server_msg_handler.h"

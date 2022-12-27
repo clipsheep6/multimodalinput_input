@@ -27,7 +27,7 @@
 #include "event_normalize_handler.h"
 #include "i_event_filter.h"
 #include "i_input_event_handler.h"
-#include "input_event_handler_plugin.h"
+#include "input_event_handler_plugin_mgr.h"
 #include "key_command_handler.h"
 #include "key_subscriber_handler.h"
 #include "mouse_event_normalize.h"
@@ -40,7 +40,7 @@ class InputEventHandler final {
     DECLARE_DELAYED_SINGLETON(InputEventHandler);
 public:
     DISALLOW_COPY_AND_MOVE(InputEventHandler);
-    void Init(UDSServer& udsServer, std::list<std::shared_ptr<IInputEventPluginContext>> context);
+    void Init(UDSServer& udsServer, std::list<std::shared_ptr<IInputEventHandlerPluginContext>> contexts);
     void OnEvent(void *event);
     int32_t Insert(std::shared_ptr<IInputEventHandler> handler);
     int32_t Remove(std::shared_ptr<IInputEventHandler> handler);
@@ -59,11 +59,11 @@ public:
 
 private:
     int32_t BuildInputHandlerChain();
-    void SetPluginEventHandler();
+    void InitPluginEventHandler();
 
     UDSServer *udsServer_ { nullptr };
-    IInputEventPluginContext *context_ { nullptr };
-    std::list<std::shared_ptr<IInputEventPluginContext>> contextList_;
+    std::shared_ptr<IInputEventHandlerPluginContext> context_ { nullptr };
+    std::list<std::shared_ptr<IInputEventHandlerPluginContext>> contexts_;
     std::shared_ptr<EventNormalizeHandler> eventNormalizeHandler_ { nullptr };
     std::shared_ptr<EventFilterHandler> eventFilterHandler_ { nullptr };
     std::shared_ptr<EventInterceptorHandler> eventInterceptorHandler_ { nullptr };

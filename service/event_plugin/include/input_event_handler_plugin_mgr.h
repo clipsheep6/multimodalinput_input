@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef INPUT_EVENT_HANDLER_PLUGIN_H
-#define INPUT_EVENT_HANDLER_PLUGIN_H
+#ifndef INPUT_EVENT_HANDLER_PLUGIN_MGR_H
+#define INPUT_EVENT_HANDLER_PLUGIN_MGR_H
 
 #include <string>
 
@@ -23,12 +23,11 @@
 
 namespace OHOS {
 namespace MMI {
-struct inputEventHandlerPlugin {
+struct InputEventHandlerPluginInfo {
     void* osHandler { nullptr };
-    bool loadStatus;
-    IPlugin* plugin { nullptr };
+    IInputEventHandlerPlugin* plugin { nullptr };
     std::string osPath;
-    std::shared_ptr<IInputEventHandler> pluginHandler;
+    std::shared_ptr<IInputEventHandler> pluginHandler { nullptr };
 };
 
 class InputEventHandlerPluginMgr
@@ -37,21 +36,21 @@ public:
     explicit InputEventHandlerPluginMgr() = default;
     ~InputEventHandlerPluginMgr() = default;
     DISALLOW_COPY_AND_MOVE(InputEventHandlerPluginMgr);
-    void StartWatchPluginDir();
-    void ReadPluginDir(const std::string pluginPath);
-    bool LoadPlugin(std::string pluginPath, std::string pluginName, bool initStatus);
-    void UnloadPlugin(std::string pluginPath);
+    void ReadPluginDir();
+    bool LoadPlugin(const std::string pluginPath, const std::string pluginName);
+    void UnloadPlugin(const std::string pluginPath);
     void UnloadPlugins();
     void OnTimer();
-    std::list<std::shared_ptr<IInputEventPluginContext>> GetContext() const { return context_; }
+    std::list<std::shared_ptr<IInputEventHandlerPluginContext>> GetContext() const { return contexts_; }
     void SetHandler(std::shared_ptr<IInputEventHandler>& pHandlers);
     void DelPlugin(std::shared_ptr<IInputEventHandler> pluginHandler);
 private:
-    std::list<std::shared_ptr<IInputEventPluginContext>> context_;
-    std::map<std::string, inputEventHandlerPlugin> pluginInfoList;
-    int32_t fd_ { -1 };
-    int32_t wd_ { -1 };
+    std::list<std::shared_ptr<IInputEventHandlerPluginContext>> contexts_;
+    std::map<std::string, InputEventHandlerPluginInfo> pluginInfos;
+    int32_t max { 0 };
+    int32_t avg { 0 };
+    std::map<std::shared_ptr<IInputEventHandler>, int32_t> timeoutInfos;
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // INPUT_EVENT_HANDLER_PLUGIN_H
+#endif // INPUT_EVENT_HANDLER_PLUGIN_MGR_H

@@ -21,7 +21,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Touch2KeyPlugin" };
 }
 
-bool Touch2KeyPlugin::Init(IInputEventPluginContext *context)
+bool Touch2KeyPlugin::Init(std::shared_ptr<IInputEventHandlerPluginContext> context)
 {
     context_ = context;
     if (context_ == nullptr) {

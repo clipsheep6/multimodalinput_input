@@ -15,17 +15,8 @@
 
 #include "plugin_context.h"
 
-#include <fstream>
-
 namespace OHOS {
 namespace MMI {
-namespace {
-int32_t max_ { 0 };
-int32_t raw_ { 0 };
-int64_t sum_ { 0 };
-int32_t times_ { 0 };
-} // namespace
-
 void PluginContext::SetEventHandler(std::shared_ptr<IInputEventHandler> handler)
 {
     handler_ = handler;
