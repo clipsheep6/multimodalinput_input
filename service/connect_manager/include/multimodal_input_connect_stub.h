@@ -76,6 +76,7 @@ protected:
     int32_t StubSetFunctionKeyState(MessageParcel &data, MessageParcel &reply);
     int32_t StubSetPointerLocation(MessageParcel &data, MessageParcel &reply);
     int32_t StubSetMouseCaptureMode(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetWindowPid(MessageParcel& data, MessageParcel& reply);
 private:
     int32_t ReadWindowsVecToParcel(MessageParcel& data, DisplayGroupInfo& displayGroupInfo);
     int32_t ReadDisplayVecToParcel(MessageParcel& data, DisplayGroupInfo& displayGroupInfo);
