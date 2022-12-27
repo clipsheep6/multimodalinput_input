@@ -1269,7 +1269,7 @@ bool KeyCommandHandler::HandleActionDown(const std::shared_ptr<PointerEvent> poi
         // 没匹配到事件，如果有之前已经匹配好了的手势，需要打断已经匹配好的手势逻辑
         return false;
     }
-    curDownPointers_.insert(make_pair(pointerEvent->GetPointerId(), pointerEvent));
+    currentDownPointers_.insert(make_pair(pointerEvent->GetPointerId(), pointerEvent));
     // 三指长按匹配之后，需要把双指长按的 Timer Remove 掉否则两者都会被唤醒
     if (isMatchedGesture_) {
         TimerMgr->RemoveTimer(lastMatchedGesture_.timerId);
@@ -1306,8 +1306,8 @@ bool KeyCommandHandler::HandleActionMove(const std::shared_ptr<PointerEvent> poi
         return true;
     }
     int32_t pointerId = pointerEvent->GetPointerId();
-    if (curDownPointers_.find(pointerId) != curDownPointers_.end()) { // 除此之外还应去除之前已经匹配了的手势的逻辑
-        curDownPointers_.erase(pointerId);
+    if (currentDownPointers_.find(pointerId) != currentDownPointers_.end()) { // 除此之外还应去除之前已经匹配了的手势的逻辑
+        currentDownPointers_.erase(pointerId);
         if (isMatchedGesture_) {
             TimerMgr->RemoveTimer(lastMatchedGesture_.timerId);
             ResetLastMatchedGesture();
@@ -1322,8 +1322,8 @@ bool KeyCommandHandler::HandleActionUp(const std::shared_ptr<PointerEvent> point
 {
     CALL_DEBUG_ENTER;
     int32_t pointerId = pointerEvent->GetPointerId();
-    if (curDownPointers_.find(pointerId) != curDownPointers_.end()) { // 除此之外还应去除之前已经匹配了的手势的逻辑
-        curDownPointers_.erase(pointerId);
+    if (currentDownPointers_.find(pointerId) != currentDownPointers_.end()) { // 除此之外还应去除之前已经匹配了的手势的逻辑
+        currentDownPointers_.erase(pointerId);
         if (isMatchedGesture_) {
             TimerMgr->RemoveTimer(lastMatchedGesture_.timerId);
             ResetLastMatchedGesture();
@@ -1368,7 +1368,7 @@ bool KeyCommandHandler::CheckMovement(const std::shared_ptr<PointerEvent> pointe
 
 bool KeyCommandHandler::IsGestureMatch(const TouchGesture &touchGesture, const std::shared_ptr<PointerEvent> pointerEvent)
 {
-    auto downPointerNum = curDownPointers_.size();
+    auto downPointerNum = currentDownPointers_.size();
     return static_cast<int32_t> (downPointerNum) == touchGesture.pointerNum;
 }
 
@@ -1393,7 +1393,7 @@ void KeyCommandHandler::KeyCommandHandler::LaunchAbility(const TouchGesture &ges
     }
     // 静态手势拉起Ability的功能需要实现一个类似的函数用于恢复相关数据结构
     ResetLastMatchedGesture();
-    curDownPointers_.clear();
+    currentDownPointers_.clear();
     MMI_HILOGD("End launch ability, bundleName:%{public}s", gesture.ability.bundleName.c_str());
 }
 
