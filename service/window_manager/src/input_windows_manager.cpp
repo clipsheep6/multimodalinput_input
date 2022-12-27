@@ -309,7 +309,7 @@ int32_t InputWindowsManager::UpdateDisplayInfo()
             int32_t logicX = mouseLocation.physicalX + displayInfo->x;
             int32_t logicY = mouseLocation.physicalY + displayInfo->y;
             std::optional<WindowInfo> windowInfo;
-            CHKPV(lastPointerEvent_);
+            CHKPR(lastPointerEvent_, ERROR_NULL_POINTER);
             if (lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE &&
                 lastPointerEvent_->GetPressedButtons().empty()) {
                 windowInfo = GetWindowInfo(logicX, logicY);
