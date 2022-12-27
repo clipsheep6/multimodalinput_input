@@ -75,7 +75,7 @@ struct Sequence {
 
 class KeyCommandHandler final : public IInputEventHandler {
 public:
-    KeyCommandHandler() = default;
+    KeyCommandHandler() : IInputEventHandler(static_cast<int32_t>(Priority::KEY_COMMAND)) {}
     DISALLOW_COPY_AND_MOVE(KeyCommandHandler);
     ~KeyCommandHandler() override = default;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,27 +13,27 @@
  * limitations under the License.
  */
 
-#ifndef HDF_DEVICE_EVENT_DISPATCH_H
-#define HDF_DEVICE_EVENT_DISPATCH_H
+#ifndef EVENT_HANDLER_MANAGER
+#define EVENT_HANDLER_MANAGER
 
-#include <cstdint>
+#include <memory>
+#include <map>
 
-#include "inject_thread.h"
-#include "input_type.h"
-#include "nocopyable.h"
+#include "i_event_handler_manager.h"
 
 namespace OHOS {
 namespace MMI {
-class HdfDeviceEventDispatch {
+class EventHandlerManager : public IEventHandlerManager {
 public:
-    static void GetEventCallbackDispatch(const InputEventPackage **pkgs, uint32_t count, uint32_t devIndex);
-    HdfDeviceEventDispatch(const uint32_t maxX, const uint32_t maxY);
-    DISALLOW_COPY_AND_MOVE(HdfDeviceEventDispatch);
-    virtual ~HdfDeviceEventDispatch();
+    EventHandlerManager() = default;
+    virtual ~EventHandlerManager() = default;
+    DISALLOW_COPY_AND_MOVE(EventHandlerManager);
+    virtual void DispatchEvent(std::shared_ptr<PointerEvent> event) override;
+    virtual void DispatchEvent(std::shared_ptr<KeyEvent> event) override;
 
 private:
-    static InjectThread injectThread_;
+    void ResetTouchUpEvent(std::shared_ptr<PointerEvent> event);
 };
 } // namespace MMI
 } // namespace OHOS
-#endif  // HDF_DEVICE_EVENT_DISPATCH_H
+#endif // EVENT_HANDLER_MANAGER

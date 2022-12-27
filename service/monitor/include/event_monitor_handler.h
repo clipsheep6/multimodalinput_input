@@ -32,7 +32,7 @@ namespace OHOS {
 namespace MMI {
 class EventMonitorHandler final : public IInputEventHandler {
 public:
-    EventMonitorHandler() = default;
+    EventMonitorHandler() : IInputEventHandler(static_cast<int32_t>(Priority::MONITOR)) {}
     DISALLOW_COPY_AND_MOVE(EventMonitorHandler);
     ~EventMonitorHandler() override = default;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD

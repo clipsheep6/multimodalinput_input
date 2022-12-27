@@ -22,12 +22,14 @@
 #include "singleton.h"
 
 #include "window_info.h"
+#include "i_input_windows_manager.h"
 #include "input_event.h"
 #include "input_display_bind_helper.h"
 #include "input_event_data_transformation.h"
 #include "input_event.h"
 #include "pointer_event.h"
 #include "uds_server.h"
+#include "i_input_device.h"
 
 namespace OHOS {
 namespace MMI {
@@ -36,7 +38,7 @@ struct MouseLocation {
     int32_t physicalY { 0 };
 };
 
-class InputWindowsManager final {
+class InputWindowsManager final : public IInputWindowsManager {
     DECLARE_DELAYED_SINGLETON(InputWindowsManager);
 public:
     DISALLOW_COPY_AND_MOVE(InputWindowsManager);
@@ -65,6 +67,9 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     bool TouchPointToDisplayPoint(int32_t deviceId, struct libinput_event_touch* touch,
         EventTouch& touchInfo, int32_t& targetDisplayId);
+    bool TouchPointToDisplayPoint(
+        std::tuple<std::shared_ptr<IInputDevice::AxisInfo>, std::shared_ptr<IInputDevice::AxisInfo>> axisInfo,
+        std::tuple<int32_t, int32_t> raw, EventTouch& touchInfo, int32_t& physicalDisplayId, int32_t deviceId) override;
     void RotateTouchScreen(DisplayInfo info, LogicalCoordinate& coord) const;
     bool TransformTipPoint(struct libinput_event_tablet_tool* tip, LogicalCoordinate& coord, int32_t& displayId) const;
     bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
@@ -127,6 +132,12 @@ private:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void GetPhysicalDisplayCoord(struct libinput_event_touch* touch,
         const DisplayInfo& info, EventTouch& touchInfo);
+    int32_t TransformX(int32_t xPos, int32_t width, int32_t logicalWidth) const;
+    int32_t TransformY(int32_t yPos, int32_t height, int32_t logicalHeight) const;
+   
+    void GetPhysicalDisplayCoord(
+        std::tuple<std::shared_ptr<IInputDevice::AxisInfo>, std::shared_ptr<IInputDevice::AxisInfo>> axisInfo,
+        std::tuple<int32_t, int32_t> raw, const DisplayInfo& info, EventTouch& touchInfo);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
     bool IsInsideDisplay(const DisplayInfo& displayInfo, int32_t physicalX, int32_t physicalY);

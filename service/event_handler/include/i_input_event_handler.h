@@ -27,8 +27,19 @@ struct libinput_event;
 namespace OHOS {
 namespace MMI {
 class IInputEventHandler {
+    friend class PluginContext;
+    friend class InputEventHandler;
 public:
-    IInputEventHandler() = default;
+    enum class Priority {
+        NORMALIZE = 0,
+        FILTER = 200,
+        INTERCEPTIR = 500,
+        KEY_COMMAND = 600,
+        KEY_SUBSCEIBER = 700,
+        MONITOR = 800,
+        DISPATCH = 1000,
+    };
+    IInputEventHandler(int32_t handlerPriority) : handlerPriority_(handlerPriority) {}
     DISALLOW_COPY_AND_MOVE(IInputEventHandler);
     virtual ~IInputEventHandler() = default;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -47,6 +58,7 @@ public:
 
 protected:
     std::shared_ptr<IInputEventHandler> nextHandler_ { nullptr };
+    const int32_t handlerPriority_;
 };
 } // namespace MMI
 } // namespace OHOS
