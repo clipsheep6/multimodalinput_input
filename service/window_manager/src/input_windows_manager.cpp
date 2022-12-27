@@ -277,15 +277,15 @@ std::shared_ptr<DisplayGroupInfo> InputWindowsManager::GetDisplayInfoCache()
     return std::move(dispInfoCache_);
 }
 
-void InputWindowsManager::UpdateDisplayInfo()
+int32_t InputWindowsManager::UpdateDisplayInfo()
 {
     CALL_DEBUG_ENTER;
     const std::shared_ptr<DisplayGroupInfo> info = GetDisplayInfoCache();
     CheckFocusWindowChange(*info);
     CheckZorderWindowChange(*info);
     if (captureModeInfo_.isCaptureMode &&
-        ((displayGroupInfo_.focusWindowId != *info.focusWindowId) ||
-        (displayGroupInfo_.windowsInfo[0].id != *info.windowsInfo[0].id))) {
+        ((displayGroupInfo_.focusWindowId != info->focusWindowId) ||
+        (displayGroupInfo_.windowsInfo[0].id != info->windowsInfo[0].id))) {
         captureModeInfo_.isCaptureMode = false;
     }
     displayGroupInfo_ = *info;

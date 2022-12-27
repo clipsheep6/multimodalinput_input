@@ -44,15 +44,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Serve
 void ServerMsgHandler::Init(UDSServer& udsServer)
 {
     udsServer_ = &udsServer;
-    MsgCallback funs[] = {
-        {MmiMessageId::DISPLAY_INFO, MsgCallbackBind2(&ServerMsgHandler::OnDisplayInfo, this)},
-    };
-    for (auto &it : funs) {
-        if (!RegistrationEvent(it)) {
-            MMI_HILOGW("Failed to register event errCode:%{public}d", EVENT_REG_FAIL);
-            continue;
-        }
-    }
 }
 
 void ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
