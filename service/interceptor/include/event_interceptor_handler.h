@@ -27,9 +27,11 @@
 
 namespace OHOS {
 namespace MMI {
+#define INTERCEPTIR_PRIORITY 200
+
 class EventInterceptorHandler : public IInputEventHandler {
 public:
-    EventInterceptorHandler() = default;
+    EventInterceptorHandler() : IInputEventHandler(INTERCEPTIR_PRIORITY) {};
     DISALLOW_COPY_AND_MOVE(EventInterceptorHandler);
     ~EventInterceptorHandler() = default;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD

@@ -22,9 +22,11 @@
 
 namespace OHOS {
 namespace MMI {
+#define NORMALIZE_PRIORITY 0
+
 class EventNormalizeHandler : public IInputEventHandler {
 public:
-    EventNormalizeHandler() = default;
+    EventNormalizeHandler() : IInputEventHandler(NORMALIZE_PRIORITY) {};
     ~EventNormalizeHandler() = default;
     void HandleEvent(libinput_event* event);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD

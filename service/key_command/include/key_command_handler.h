@@ -34,6 +34,8 @@
 
 namespace OHOS {
 namespace MMI {
+#define KEY_COMMAND_PRIORITY 300
+
 struct Ability {
     std::string bundleName;
     std::string abilityName;
@@ -75,7 +77,7 @@ struct Sequence {
 
 class KeyCommandHandler final : public IInputEventHandler {
 public:
-    KeyCommandHandler() = default;
+    KeyCommandHandler() : IInputEventHandler(KEY_COMMAND_PRIORITY) {};
     DISALLOW_COPY_AND_MOVE(KeyCommandHandler);
     ~KeyCommandHandler() override = default;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD

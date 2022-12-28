@@ -30,9 +30,11 @@
 
 namespace OHOS {
 namespace MMI {
+#define MONITOR_PRIORITY 500
+
 class EventMonitorHandler final : public IInputEventHandler {
 public:
-    EventMonitorHandler() = default;
+    EventMonitorHandler() : IInputEventHandler(MONITOR_PRIORITY) {};
     DISALLOW_COPY_AND_MOVE(EventMonitorHandler);
     ~EventMonitorHandler() override = default;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
