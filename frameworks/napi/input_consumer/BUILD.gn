@@ -19,15 +19,15 @@ config("inputconsumer_config") {
   include_dirs = [
     "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/frameworks/napi/input_consumer/include",
-    "//foundation/multimodalinput/input/tools/event_inject/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
   ]
 }
 
 ohos_shared_library("inputconsumer") {
   sources = [
-    "src/js_register_module.cpp",
-    "src/js_register_util.cpp",
+    "src/js_input_consumer_context.cpp",
+    "src/js_input_consumer_util.cpp",
+    "src/native_register_module.cpp",
   ]
 
   configs = [ ":inputconsumer_config" ]
@@ -39,7 +39,6 @@ ohos_shared_library("inputconsumer") {
   ]
 
   external_deps = [
-    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "napi:ace_napi",
   ]
