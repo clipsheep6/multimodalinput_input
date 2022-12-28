@@ -30,7 +30,7 @@ namespace OHOS {
 namespace MMI {
 class EventFilterHandler final : public IInputEventHandler, public std::enable_shared_from_this<EventFilterHandler> {
 public:
-    EventFilterHandler() = default;
+    EventFilterHandler() : IInputEventHandler(static_cast<int32_t>(Priority::FILTER)) {}
     DISALLOW_COPY_AND_MOVE(EventFilterHandler);
     ~EventFilterHandler() override = default;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD

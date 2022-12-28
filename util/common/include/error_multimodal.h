@@ -17,6 +17,7 @@
 #define ERROR_MULTIMODAL_H
 
 #include <errors.h>
+#include <stdint.h>
 
 namespace OHOS {
 namespace MMI {
@@ -49,7 +50,7 @@ enum {
 
 enum {
     // 发送消息失败
-    MSG_SEND_FAIL = 0x3E20000, //ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_SERVER),
+    MSG_SEND_FAIL = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_SERVER),
     // 未知的事件
     UNKNOWN_EVENT,
     // 空指针

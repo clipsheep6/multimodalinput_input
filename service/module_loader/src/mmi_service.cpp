@@ -59,6 +59,8 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMISe
 const std::string DEF_INPUT_SEAT = "seat0";
 constexpr int32_t WATCHDOG_INTERVAL_TIME = 10000;
 constexpr int32_t WATCHDOG_DELAY_TIME = 15000;
+#define INOTIFY_SIZE sizeof(struct inotify_event)
+#define DIR_BUF_LEN   (1024 * (INOTIFY_SIZE + 16))
 } // namespace
 
 const bool REGISTER_RESULT =
@@ -241,6 +243,7 @@ bool MMIService::InitDelegateTasks()
 int32_t MMIService::Init()
 {
     CheckDefine();
+    pluginMgr_.ReadPluginDir();
     MMI_HILOGD("WindowsManager Init");
     WinMgr->Init(*this);
     MMI_HILOGD("ANRManager Init");
@@ -265,7 +268,7 @@ int32_t MMIService::Init()
     InputDevCooSM->Init(std::bind(&DelegateTasks::PostAsyncTask, &delegateTasks_, std::placeholders::_1));
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     MMI_HILOGD("Input msg handler init");
-    InputHandler->Init(*this);
+    InputHandler->Init(*this, pluginMgr_.GetContext());
     if (!InitLibinputService()) {
         MMI_HILOGE("Libinput init failed");
         return LIBINPUT_INIT_FAIL;
@@ -885,7 +888,7 @@ int32_t MMIService::SetDisplayBind(int32_t deviceId, int32_t displayId, std::str
         MMI_HILOGE("SetDisplayBind pid failed, ret:%{public}d", ret);
         return RET_ERR;
     }
-    return RET_OK;    
+    return RET_OK;
 }
 
 int32_t MMIService::GetFunctionKeyState(int32_t funcKey, bool &state)
@@ -960,6 +963,9 @@ void MMIService::OnThread()
 #endif
     libinputAdapter_.RetriggerHotplugEvents();
     libinputAdapter_.ProcessPendingEvents();
+    TimerMgr->AddTimer(5000, -1, [this]() {
+        pluginMgr_.OnTimer();
+    });
     while (state_ == ServiceRunningState::STATE_RUNNING) {
         epoll_event ev[MAX_EVENT_SIZE] = {};
         int32_t timeout = TimerMgr->CalcNextDelay();

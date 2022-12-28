@@ -26,6 +26,7 @@
 
 #include "delegate_tasks.h"
 #include "input_event_handler.h"
+#include "input_event_handler_plugin_mgr.h"
 #include "libinput_adapter.h"
 #include "multimodal_input_connect_stub.h"
 #include "server_msg_handler.h"
@@ -157,7 +158,7 @@ private:
     LibinputAdapter libinputAdapter_;
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;
-
+    InputEventHandlerPluginMgr pluginMgr_;
     std::atomic_bool threadStatusFlag_ { false };
 };
 } // namespace MMI

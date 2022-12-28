@@ -43,7 +43,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Event
 #endif // OHOS_BUILD_ENABLE_KEYBOARD ||  OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace
 
-EventDispatchHandler::EventDispatchHandler()
+EventDispatchHandler::EventDispatchHandler() : IInputEventHandler(static_cast<int32_t>(Priority::DISPATCH))
 {
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     DistributedAdapter->RegisterEventCallback(std::bind(&EventDispatchHandler::OnDinputSimulateEvent, this,

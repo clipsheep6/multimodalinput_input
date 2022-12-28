@@ -33,7 +33,7 @@ namespace OHOS {
 namespace MMI {
 class KeySubscriberHandler final :  public IInputEventHandler {
 public:
-    KeySubscriberHandler() = default;
+    KeySubscriberHandler() : IInputEventHandler(static_cast<int32_t>(Priority::KEY_SUBSCEIBER)) {}
     DISALLOW_COPY_AND_MOVE(KeySubscriberHandler);
     ~KeySubscriberHandler() = default;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD

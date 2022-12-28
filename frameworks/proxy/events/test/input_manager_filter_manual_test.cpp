@@ -578,7 +578,7 @@ HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_006, TestSize.Level1
         sleep(1);
         serverPid2 = GetMmiServerPid();
         MMI_HILOGI("ServerPid2:%{public}d", serverPid2);
-    } while (serverPid2 == -1);
+    } while ((cnt > 0) && (serverPid2 == -1));
     ASSERT_NE(serverPid2, -1);
     sleep(1);
     cnt = 20;
@@ -586,9 +586,8 @@ HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_006, TestSize.Level1
     do {
         MMI_HILOGI("Sleep 1s, wait init client success cnt:%{public}d", cnt--);
         sleep(1);
-        --cnt;
         retInitClient = MMIEventHdl.InitClient();
-    } while (cnt > 0 && !retInitClient);
+    } while ((cnt > 0) && !retInitClient);
     ASSERT_EQ(retInitClient, true);
     std::set<std::pair<std::string, std::string>> filterInfo2;
     cnt = 20;
@@ -597,7 +596,7 @@ HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_006, TestSize.Level1
         sleep(1);
         filterInfo2.clear();
         GetSelfHidumperFilter(filterInfo2);
-    } while (cnt > 0 && filterInfo1.size() != filterInfo2.size());
+    } while ((cnt > 0) && (filterInfo1.size() != filterInfo2.size()));
     auto printFilter = [](const std::string title, const std::set<std::pair<std::string, std::string>> &s) {
         MMI_HILOGI("title:%{public}s, size:%{public}u", title.c_str(), s.size());
         for (const auto &[priority, filterId] : s) {
