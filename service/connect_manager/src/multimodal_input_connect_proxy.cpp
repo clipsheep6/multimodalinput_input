@@ -995,5 +995,94 @@ int32_t MultimodalInputConnectProxy::SetMouseCaptureMode(int32_t windowId, bool 
     }
     return ret;
 }
+
+int32_t MultimodalInputConnectProxy::WriteWindowsVecToParcel(const std::shared_ptr<DisplayGroupInfo> displayGroupInfo,
+                                                             MessageParcel& data)
+{
+    int32_t windowsNum = static_cast<int32_t>(displayGroupInfo->windowsInfo.size());
+    WRITEINT32(data, windowsNum, ERR_INVALID_VALUE);
+    for (const auto& item : displayGroupInfo->windowsInfo) {
+        WRITEINT32(data, item.id, ERR_INVALID_VALUE);
+        WRITEINT32(data, item.pid, ERR_INVALID_VALUE);
+        WRITEINT32(data, item.uid, ERR_INVALID_VALUE);
+        WRITEINT32(data, item.area.x, ERR_INVALID_VALUE);
+        WRITEINT32(data, item.area.y, ERR_INVALID_VALUE);
+        WRITEINT32(data, item.area.width, ERR_INVALID_VALUE);
+        WRITEINT32(data, item.area.height, ERR_INVALID_VALUE);
+        WRITEINT32(data, static_cast<int32_t>(item.defaultHotAreas.size()));
+        for (const auto& i : item.defaultHotAreas) {
+            WRITEINT32(data, i.x, ERR_INVALID_VALUE);
+            WRITEINT32(data, i.y, ERR_INVALID_VALUE);
+            WRITEINT32(data, i.width, ERR_INVALID_VALUE);
+            WRITEINT32(data, i.height, ERR_INVALID_VALUE);
+        }
+        WRITEINT32(data, static_cast<int32_t>(item.pointerHotAreas.size()));
+        for (const auto& i : item.pointerHotAreas) {
+            WRITEINT32(data, i.x, ERR_INVALID_VALUE);
+            WRITEINT32(data, i.y, ERR_INVALID_VALUE);
+            WRITEINT32(data, i.width, ERR_INVALID_VALUE);
+            WRITEINT32(data, i.height, ERR_INVALID_VALUE);
+        }
+        WRITEINT32(data, item.agentWindowId, ERR_INVALID_VALUE);
+        WRITEUINT32(data, item.flags, ERR_INVALID_VALUE);
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::WriteDisplayVecToParcel(const std::shared_ptr<DisplayGroupInfo> displayGroupInfo,
+                                                             MessageParcel& data)
+{
+    int32_t displayNum = static_cast<int32_t>(displayGroupInfo->displaysInfo.size());
+    WRITEINT32(data, displayNum, ERR_INVALID_VALUE);
+    for (const auto& item : displayGroupInfo->displaysInfo) {
+        WRITEINT32(data, item.id, ERR_INVALID_VALUE);
+        WRITEINT32(data, item.x, ERR_INVALID_VALUE);
+        WRITEINT32(data, item.y, ERR_INVALID_VALUE);
+        WRITEINT32(data, item.width, ERR_INVALID_VALUE);
+        WRITEINT32(data, item.height, ERR_INVALID_VALUE);
+        WRITESTRING(data, item.name, ERR_INVALID_VALUE);
+        WRITESTRING(data, item.uniq, ERR_INVALID_VALUE);
+        WRITEINT32(data, static_cast<uint32_t>(item.direction), ERR_INVALID_VALUE);
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::WriteDisplayInfoToParcel(const std::shared_ptr<DisplayGroupInfo> displayGroupInfo,
+                                                              MessageParcel& data)
+{
+    WRITEINT32(data, displayGroupInfo->width, ERR_INVALID_VALUE);
+    WRITEINT32(data, displayGroupInfo->height, ERR_INVALID_VALUE);
+    WRITEINT32(data, displayGroupInfo->focusWindowId, ERR_INVALID_VALUE);
+    int32_t ret = WriteWindowsVecToParcel(displayGroupInfo, data);
+    ret += WriteDisplayVecToParcel(displayGroupInfo, data);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to write display info to parcel!");
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectProxy::UpdateDisplayInfo(const std::shared_ptr<DisplayGroupInfo> displayGroupInfo)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    int32_t ret = WriteDisplayInfoToParcel(displayGroupInfo, data);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to write display info");
+        return ret;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    ret = remote->SendRequest(UPDATE_DISPLAY_INFO, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
 } // namespace MMI
 } // namespace OHOS

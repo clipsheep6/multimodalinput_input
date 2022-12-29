@@ -44,15 +44,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Serve
 void ServerMsgHandler::Init(UDSServer& udsServer)
 {
     udsServer_ = &udsServer;
-    MsgCallback funs[] = {
-        {MmiMessageId::DISPLAY_INFO, MsgCallbackBind2(&ServerMsgHandler::OnDisplayInfo, this)},
-    };
-    for (auto &it : funs) {
-        if (!RegistrationEvent(it)) {
-            MMI_HILOGW("Failed to register event errCode:%{public}d", EVENT_REG_FAIL);
-            continue;
-        }
-    }
 }
 
 void ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
@@ -187,47 +178,6 @@ bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEv
     return true;
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
-
-int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
-{
-    CALL_DEBUG_ENTER;
-    CHKPR(sess, ERROR_NULL_POINTER);
-    DisplayGroupInfo displayGroupInfo;
-    pkt >> displayGroupInfo.width >> displayGroupInfo.height >> displayGroupInfo.focusWindowId;
-    uint32_t num = 0;
-    pkt >> num;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read display info failed");
-        return RET_ERR;
-    }
-    for (uint32_t i = 0; i < num; i++) {
-        WindowInfo info;
-        pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
-            >> info.pointerHotAreas >> info.agentWindowId >> info.flags;
-        displayGroupInfo.windowsInfo.push_back(info);
-        if (pkt.ChkRWError()) {
-            MMI_HILOGE("Packet read display info failed");
-            return RET_ERR;
-        }
-    }
-    pkt >> num;
-    for (uint32_t i = 0; i < num; i++) {
-        DisplayInfo info;
-        pkt >> info.id >> info.x >> info.y >> info.width >> info.height
-            >> info.dpi >> info.name >> info.uniq >> info.direction;
-        displayGroupInfo.displaysInfo.push_back(info);
-        if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read display info failed");
-        return RET_ERR;
-    }
-    }
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read display info failed");
-        return RET_ERR;
-    }
-    WinMgr->UpdateDisplayInfo(displayGroupInfo);
-    return RET_OK;
-}
 
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
 int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, InputHandlerType handlerType,

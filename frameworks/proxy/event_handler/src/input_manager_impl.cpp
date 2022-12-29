@@ -694,15 +694,10 @@ void InputManagerImpl::OnConnected()
 
 void InputManagerImpl::SendDisplayInfo()
 {
-    MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    CHKPV(client);
-    NetPacket pkt(MmiMessageId::DISPLAY_INFO);
-    if (PackDisplayData(pkt) == RET_ERR) {
-        MMI_HILOGE("Pack display info failed");
-        return;
-    }
-    if (!client->SendMessage(pkt)) {
-        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+	std::shared_ptr<DisplayGroupInfo> displayGroupInfo = std::make_shared<DisplayGroupInfo>(displayGroupInfo_);
+    int32_t ret = MultimodalInputConnMgr->UpdateDisplayInfo(displayGroupInfo);
+    if (ret != 0) {
+        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
     }
 }
 

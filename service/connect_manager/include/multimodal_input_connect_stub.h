@@ -64,6 +64,7 @@ protected:
     int32_t StubSetDisplayBind(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPointerSpeed(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetPointerSpeed(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSendDisplayInfo(MessageParcel& data, MessageParcel& reply);
     int32_t StubRegisterCooperateMonitor(MessageParcel& data, MessageParcel& reply);
     int32_t StubUnregisterCooperateMonitor(MessageParcel& data, MessageParcel& reply);
     int32_t StubEnableInputDeviceCooperate(MessageParcel& data, MessageParcel& reply);
@@ -76,6 +77,10 @@ protected:
     int32_t StubSetPointerLocation(MessageParcel &data, MessageParcel &reply);
     int32_t StubSetMouseCaptureMode(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetWindowPid(MessageParcel& data, MessageParcel& reply);
+private:
+    int32_t ReadWindowsVecToParcel(MessageParcel& data, DisplayGroupInfo& displayGroupInfo);
+    int32_t ReadDisplayVecToParcel(MessageParcel& data, DisplayGroupInfo& displayGroupInfo);
+    int32_t ReadDisplayInfoToParcel(MessageParcel& data, DisplayGroupInfo& displayGroupInfo);
 };
 } // namespace MMI
 } // namespace OHOS

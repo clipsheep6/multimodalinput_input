@@ -67,7 +67,6 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 protected:
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
-    int32_t OnDisplayInfo(SessionPtr sess, NetPacket& pkt);
 
 private:
 #ifdef OHOS_BUILD_ENABLE_TOUCH

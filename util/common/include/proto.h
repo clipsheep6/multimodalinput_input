@@ -21,7 +21,6 @@
 enum class MmiMessageId : int32_t {
     INVALID,
     ADD_INPUT_DEVICE_LISTENER,
-    DISPLAY_INFO,
     NOTICE_ANR,
     MARK_PROCESS,
     ON_SUBSCRIBE_KEY,
