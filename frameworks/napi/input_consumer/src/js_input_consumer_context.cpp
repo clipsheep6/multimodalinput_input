@@ -162,7 +162,7 @@ napi_value JsInputConsumerContext::JsOn(napi_env env, napi_callback_info info)
     int32_t preSubscribeId = JsInputConsumerUtil::GetPreSubscribeId(callbacks, event);
     if (preSubscribeId < 0) {
         int32_t subscribeId = INVALID_SUBID;
-        subscribeId = InputMgr->SubscribeKeyEvent(event->keyOption, SubKeyEventCallback);
+        subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(event->keyOption, SubKeyEventCallback);
         if (subscribeId < 0) {
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
             napi_delete_reference(env, event->callback);
@@ -201,7 +201,7 @@ napi_value JsInputConsumerContext::JsOff(napi_env env, napi_callback_info info)
         return nullptr;
     }
     if (subscribeId > INVALID_SUBID) {
-        InputMgr->UnsubscribeKeyEvent(subscribeId);
+        InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
         MMI_HILOGD("UnsubscribeId:%{public}d", subscribeId);
     }
     if (event->callback != nullptr) {
