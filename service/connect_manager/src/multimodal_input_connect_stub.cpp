@@ -265,9 +265,9 @@ int32_t MultimodalInputConnectStub::StubSetPointerStyle(MessageParcel& data, Mes
 {
     CALL_DEBUG_ENTER;
     int32_t windowId;
-    READINT32(data, windowId, RET_ERR);
+    READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t pointerStyle;
-    READINT32(data, pointerStyle, RET_ERR);
+    READINT32(data, pointerStyle, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetPointerStyle(windowId, pointerStyle);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetPointerStyle failed ret:%{public}d", ret);
@@ -281,14 +281,14 @@ int32_t MultimodalInputConnectStub::StubGetPointerStyle(MessageParcel& data, Mes
 {
     CALL_DEBUG_ENTER;
     int32_t windowId;
-    READINT32(data, windowId, RET_ERR);
+    READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t pointerStyle;
     int32_t ret = GetPointerStyle(windowId, pointerStyle);
     if (ret != RET_OK) {
         MMI_HILOGE("Call GetPointerStyle failed ret:%{public}d", ret);
         return ret;
     }
-    WRITEINT32(reply, pointerStyle, RET_ERR);
+    WRITEINT32(reply, pointerStyle, IPC_STUB_WRITE_PARCEL_ERR);
     MMI_HILOGD("Successfully get window:%{public}d, icon:%{public}d", windowId, pointerStyle);
     return RET_OK;
 }
