@@ -42,7 +42,7 @@ public:
     static int32_t UnsubscribeCallback(napi_env env, const std::shared_ptr<SubscribeInfo> &event,
         Callbacks &callbacks, int32_t &subscribeId);
     static int32_t DelEventCallback(napi_env env, std::list<std::shared_ptr<SubscribeInfo>> &infos,
-    napi_value &handler1, int32_t &subscribeId);
+        napi_value &handler1, int32_t &subscribeId);
     static void EmitAsyncCallbackWork(const std::shared_ptr<SubscribeInfo> &event);
 
 private:
