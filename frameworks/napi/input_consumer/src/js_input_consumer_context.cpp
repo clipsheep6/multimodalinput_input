@@ -61,7 +61,7 @@ std::shared_ptr<KeyOption> JsInputConsumerContext::CreateKeyOption(napi_env env,
 
     int32_t finalKey = 0;
     if (!JsInputConsumerUtil::GetNamedPropertyInt32(env, object, "finalKey", finalKey)) {
-        MMI_HILOGE("Get NamedProperty failed");
+        MMI_HILOGE("GetNamedProperty failed");
         return nullptr;
     }
     keyOption->SetFinalKey(finalKey);
@@ -75,7 +75,7 @@ std::shared_ptr<KeyOption> JsInputConsumerContext::CreateKeyOption(napi_env env,
 
     int32_t finalKeyDownDuration = 0;
     if (!JsInputConsumerUtil::GetNamedPropertyInt32(env, object, "finalKeyDownDuration", finalKeyDownDuration)) {
-        MMI_HILOGE("Get NamedProperty failed");
+        MMI_HILOGE("GetNamedProperty failed");
         return nullptr;
     }
     keyOption->SetFinalKeyDownDuration(finalKeyDownDuration);
@@ -220,6 +220,5 @@ napi_value JsInputConsumerContext::Init(napi_env env, napi_value exports)
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
 }
-
 } // namespace MMI
 } // namespace OHOS
