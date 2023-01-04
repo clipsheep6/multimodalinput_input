@@ -20,6 +20,7 @@
 #include "mmi_log.h"
 #include "proto.h"
 #include "util.h"
+#include "anr_handler.h"
 
 #include "input_manager_impl.h"
 #include "mmi_fd_listener.h"
@@ -223,6 +224,7 @@ void MMIClient::OnDisconnected()
     MMI_HILOGI("Disconnected from server, fd:%{public}d", fd_);
     isConnected_ = false;
     isListening_ = false;
+    ANRHdl->CleanAndReset();
     if (funDisconnected_) {
         funDisconnected_(*this);
     }

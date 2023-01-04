@@ -123,5 +123,15 @@ void ANRHandler::SendEvent(int32_t eventType, int64_t delayTime)
         MMI_HILOGE("Send dispatch event failed");
     }
 }
+
+void ANRHandler::CleanAndReset() {
+    MMI_HILOGD("yuanxinying reset event_ to initial value");
+    for(int i = 0; i < ANR_EVENT_TYPE_NUM; i++) {
+		MMI_HILOGD("yuanxinying reset event_ to initial value");
+		event_[i].sendStatus = false;
+		event_[i].lastEventId = -1;
+		event_[i].lastReportId = -1;
+	} 
+}
 } // namespace MMI
 } // namespace OHOS
