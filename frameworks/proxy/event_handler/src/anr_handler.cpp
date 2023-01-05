@@ -123,5 +123,14 @@ void ANRHandler::SendEvent(int32_t eventType, int64_t delayTime)
         MMI_HILOGE("Send dispatch event failed");
     }
 }
+
+<<<<<<< HEAD
+void ANRHandler::ResetAnrArray() {
+    for(int i = 0; i < ANR_EVENT_TYPE_NUM; i++) {
+        event_[i].sendStatus = false;
+        event_[i].lastEventId = -1;
+        event_[i].lastReportId = -1;
+    }
+}
 } // namespace MMI
 } // namespace OHOS
