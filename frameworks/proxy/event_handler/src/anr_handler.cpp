@@ -129,7 +129,7 @@ void ANRHandler::ResetAnrArray() {
         event_[i].sendStatus = false;
         event_[i].lastEventId = -1;
         event_[i].lastReportId = -1;
-	}
+    }
 }
 } // namespace MMI
 } // namespace OHOS
