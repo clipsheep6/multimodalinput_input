@@ -21,6 +21,7 @@
 #include "mmi_log.h"
 #include "proto.h"
 #include "util.h"
+#include "anr_handler.h"
 
 #include "input_manager_impl.h"
 #include "mmi_fd_listener.h"

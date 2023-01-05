@@ -124,7 +124,6 @@ void ANRHandler::SendEvent(int32_t eventType, int64_t delayTime)
     }
 }
 
-<<<<<<< HEAD
 void ANRHandler::ResetAnrArray() {
     for(int i = 0; i < ANR_EVENT_TYPE_NUM; i++) {
         event_[i].sendStatus = false;
