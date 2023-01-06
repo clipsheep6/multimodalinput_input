@@ -89,3 +89,6 @@ KERNEL=="udmabuf", GROUP="kvm"
 SUBSYSTEM=="ptp", ATTR{clock_name}=="KVM virtual PTP", SYMLINK += "ptp_kvm"
 
 LABEL="default_end"
+
+# When plug-in MEIG modem, add read and write permissions for riladapter_host.
+SUBSYSTEM=="tty", KERNEL=="ttyUSB[0-4]*", GROUP="tty", MODE="0666"
