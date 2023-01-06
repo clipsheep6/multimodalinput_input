@@ -77,6 +77,7 @@
           "//foundation/multimodalinput/input:input_jsapi_group"
         ],
         "service_group": [
+          "//foundation/multimodalinput/input:mmi_debug_tools",
           "//foundation/multimodalinput/input:multimodalinput_mmi_service",
           "//foundation/multimodalinput/input/sa_profile:multimodalinput_sa_profile",
           "//foundation/multimodalinput/input:multimodalinput.rc",
@@ -112,7 +113,9 @@
         }
       ],
       "test": [
-        "//foundation/multimodalinput/input:mmi_tests"
+        "//foundation/multimodalinput/input:mmi_tests",
+        "//foundation/multimodalinput/input:ut_mmi_debug_tools",
+        "//foundation/multimodalinput/input:mmi_tests_manual"
       ]
     }
   }
