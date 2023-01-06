@@ -16,6 +16,7 @@
 #ifndef ERROR_MULTIMODAL_H
 #define ERROR_MULTIMODAL_H
 
+#include <cstdint>
 #include <errors.h>
 
 namespace OHOS {
