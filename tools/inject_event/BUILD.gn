@@ -18,7 +18,14 @@ SUBSYSTEM_DIR = "//foundation/multimodalinput"
 SUBSYSTEM_FRAMEWORKS_DIR = "//foundation/multimodalinput/input/frameworks"
 
 ohos_source_set("input-manager") {
-  sources = [ "src/input_manager_command.cpp" ]
+  sources = [
+    "src/input_device_manger.cpp",
+    "src/input_manager_command.cpp",
+    "src/joystick_manager_command.cpp",
+    "src/keyboard_manager_commond.cpp",
+    "src/mouse_manager_command.cpp",
+    "src/touch_manager_command.cpp",
+  ]
 
   include_dirs = [
     "include",
@@ -26,6 +33,7 @@ ohos_source_set("input-manager") {
     "out/ohos-arm-release/innerkits/ohos-arm/c_utils/utils/include/string_ex.h",
     "$SUBSYSTEM_DIR/interfaces/native/innerkits/multimodalinput_proxy/include",
     "//foundation/multimodalinput/input/util/common/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
   ]
 
   deps = [
