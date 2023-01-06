@@ -154,14 +154,14 @@ int32_t DistributedInputAdapter::UnPrepareRemoteInput(const std::string &deviceI
 int32_t DistributedInputAdapter::RegisterEventCallback(SimulateEventCallback callback)
 {
     std::lock_guard<std::mutex> guard(adapterLock_);
-    CHKPR(callback, RET_ERR);
+    CHKPR(callback, ERROR_NULL_POINTER);
     SimulateEventCallback_ = callback;
     return RET_OK;
 }
 int32_t DistributedInputAdapter::UnregisterEventCallback(SimulateEventCallback callback)
 {
     std::lock_guard<std::mutex> guard(adapterLock_);
-    CHKPR(callback, RET_ERR);
+    CHKPR(callback, ERROR_NULL_POINTER);
     SimulateEventCallback_ = nullptr;
     return RET_OK;
 }

@@ -88,7 +88,7 @@ int32_t EventInterceptorHandler::AddInputHandler(InputHandlerType handlerType,
     HandleEventType eventType, int32_t priority, uint32_t deviceTags, SessionPtr session)
 {
     CALL_INFO_TRACE;
-    CHKPR(session, RET_ERR);
+    CHKPR(session, ERROR_NULL_POINTER);
     if ((eventType & HANDLE_EVENT_TYPE_ALL) == HANDLE_EVENT_TYPE_NONE) {
         MMI_HILOGE("Invalid event type");
         return RET_ERR;

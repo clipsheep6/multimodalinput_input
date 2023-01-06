@@ -75,7 +75,7 @@ int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyE
     int32_t ret = MultimodalInputConnMgr->InjectKeyEvent(keyEvent);
     if (ret != 0) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
@@ -117,7 +117,7 @@ int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent>
     int32_t ret = MultimodalInputConnMgr->InjectPointerEvent(pointerEvent);
     if (ret != 0) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
@@ -130,7 +130,7 @@ int32_t MultimodalEventHandler::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
     int32_t ret = MultimodalInputConnMgr->MoveMouseEvent(offsetX, offsetY);
     if (ret != 0) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }

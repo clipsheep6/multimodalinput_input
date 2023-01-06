@@ -122,7 +122,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
     int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(pkt, key);
     if (ret != RET_OK) {
         MMI_HILOGE("Read netPacket failed");
-        return RET_ERR;
+        return ret;
     }
     int32_t fd = 0;
     pkt >> fd;

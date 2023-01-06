@@ -83,7 +83,7 @@ bool EventFilterProxy::HandlePointerEvent(const std::shared_ptr<PointerEvent> ev
     CHKPF(remote);
     const uint32_t code = static_cast<uint32_t>(OPERATOR_TYPE::HANDLE_POINTER_EVENT);
     int32_t ret = remote->SendRequest(code, data, reply, option);
-    if (ret != NO_ERROR) {
+    if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return false;
     }

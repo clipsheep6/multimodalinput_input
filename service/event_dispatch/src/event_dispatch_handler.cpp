@@ -144,7 +144,7 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
     MMI_HILOGD("Event dispatcher of server:KeyEvent:KeyCode:%{public}d,Action:%{public}d,EventType:%{public}d,"
         "Fd:%{public}d", key->GetKeyCode(), key->GetAction(), key->GetEventType(), fd);
     auto session = udsServer.GetSession(fd);
-    CHKPR(session, RET_ERR);
+    CHKPR(session, ERROR_NULL_POINTER);
     auto currentTime = GetSysClockTime();
     if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, session)) {
         MMI_HILOGW("The key event does not report normally, application not response");

@@ -48,7 +48,7 @@ int32_t InputDeviceCooperateStateOut::StopInputDeviceCooperate(const std::string
     std::string taskName = "process_stop_task";
     std::function<void()> handleProcessStopFunc =
         std::bind(&InputDeviceCooperateStateOut::ProcessStop, this, srcNetworkId);
-    CHKPR(eventHandler_, RET_ERR);
+    CHKPR(eventHandler_, ERROR_NULL_POINTER);
     eventHandler_->ProxyPostTask(handleProcessStopFunc, taskName, 0);
     return RET_OK;
 }

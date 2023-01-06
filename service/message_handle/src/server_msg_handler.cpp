@@ -109,7 +109,7 @@ int32_t ServerMsgHandler::OnSetFunctionKeyState(int32_t funcKey, bool enable)
     int32_t ret = keyEvent->SetFunctionKey(funcKey, state);
     if (ret != funcKey) {
         MMI_HILOGE("Failed to enable the function key");
-        return RET_ERR;
+        return ret;
     }
     MMI_HILOGD("Update function key:%{public}d succeed", funcKey);
     return RET_OK;

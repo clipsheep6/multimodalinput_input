@@ -46,7 +46,7 @@ int32_t InputDeviceCooperateStateFree::StartInputDeviceCooperate(
     std::string taskName = "process_start_task";
     std::function<void()> handleProcessStartFunc =
         std::bind(&InputDeviceCooperateStateFree::ProcessStart, this, remoteNetworkId, startInputDeviceId);
-    CHKPR(eventHandler_, RET_ERR);
+    CHKPR(eventHandler_, ERROR_NULL_POINTER);
     eventHandler_->ProxyPostTask(handleProcessStartFunc, taskName, 0);
     return RET_OK;
 }

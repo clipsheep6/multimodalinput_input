@@ -238,7 +238,7 @@ int32_t MultimodalInputConnectStub::StubSetPointerSpeed(MessageParcel& data, Mes
     int32_t ret = SetPointerSpeed(speed);
     if (ret != RET_OK) {
         MMI_HILOGE("Set pointer speed failed ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
@@ -254,7 +254,7 @@ int32_t MultimodalInputConnectStub::StubGetPointerSpeed(MessageParcel& data, Mes
     int32_t ret = GetPointerSpeed(speed);
     if (ret != RET_OK) {
         MMI_HILOGE("Call get pointer speed failed ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     WRITEINT32(reply, speed, IPC_STUB_WRITE_PARCEL_ERR);
     MMI_HILOGD("Pointer speed:%{public}d,ret:%{public}d", speed, ret);

@@ -113,7 +113,7 @@ bool DeviceProfileAdapter::GetCrossingSwitchState(const std::string &deviceId)
 
 int32_t DeviceProfileAdapter::RegisterCrossingStateListener(const std::string &deviceId, DPCallback callback)
 {
-    CHKPR(callback, RET_ERR);
+    CHKPR(callback, ERROR_NULL_POINTER);
     if (deviceId.empty()) {
         MMI_HILOGE("DeviceId is nullptr");
         return RET_ERR;
