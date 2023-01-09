@@ -88,6 +88,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
         { "interceptor", no_argument, 0, 'i' },
         { "filter", no_argument, 0, 'f' },
         { "mouse", no_argument, 0, 'm' },
+        { "chkconfig", no_argument, 0, 'n' },
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
         { "inputdevcoosm", no_argument, 0, 'k' },
 #endif // OHOS_BUILD_ENABLE_COOPERATE
@@ -117,7 +118,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
     }
     optind = 1;
     int32_t c;
-    while ((c = getopt_long (args.size(), argv, "hdlwusoifmc", dumpOptions, &optionIndex)) != -1) {
+    while ((c = getopt_long (args.size(), argv, "hdlwusoifmnc", dumpOptions, &optionIndex)) != -1) {
         switch (c) {
             case 'h': {
                 DumpEventHelp(fd, args);
@@ -193,6 +194,10 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
 #endif // OHOS_BUILD_ENABLE_POINTER
                 break;
             }
+            case 'n': {
+                DumpCheckDefine(fd, args);
+                break;
+            }
             default: {
                 mprintf(fd, "cmd param is error\n");
                 DumpHelp(fd);
@@ -227,7 +232,55 @@ void EventDump::DumpHelp(int32_t fd)
     mprintf(fd, "      -i, --interceptor: dump the interceptor information\t");
     mprintf(fd, "      -f, --filter: dump the filter information\t");
     mprintf(fd, "      -m, --mouse: dump the mouse information\t");
+    mprintf(fd, "      -n, --chkconfig: dump the ChkConfig state\t");
     mprintf(fd, "      -c, --dump Keyboard and mouse crossing information\t");
+}
+
+void EventDump::DumpCheckDefine(int32_t fd, const std::vector<std::string> &args)
+{
+    ChkDefineOutput(fd);
+}
+
+void EventDump::ChkDefineOutput(int32_t fd)
+{
+    CheckDefineOutput(fd, "ChkDefs:");
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+    CheckDefineOutput(fd, "%-40s", "OHOS_BUILD_ENABLE_POINTER_DRAWING");
+#endif
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+    CheckDefineOutput(fd, "%-40s", "OHOS_BUILD_ENABLE_INTERCEPTOR");
+#endif
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    CheckDefineOutput(fd, "%-40s", "OHOS_BUILD_ENABLE_KEYBOARD");
+#endif
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    CheckDefineOutput(fd, "%-40s", "OHOS_BUILD_ENABLE_POINTER");
+#endif
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    CheckDefineOutput(fd, "%-40s", "OHOS_BUILD_ENABLE_TOUCH");
+#endif
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    CheckDefineOutput(fd, "%-40s", "OHOS_BUILD_ENABLE_MONITOR");
+#endif
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    CheckDefineOutput(fd, "%-40s", "OHOS_BUILD_ENABLE_COOPERATE");
+#endif
+#ifdef OHOS_BUILD_ENABLE_JOYSTICK
+    CheckDefineOutput(fd, "%-40s", "OHOS_BUILD_ENABLE_JOYSTICK");
+#endif
+}
+
+template<class ...Ts>
+void EventDump::CheckDefineOutput(int32_t fd, const char* fmt, Ts... args)
+{
+    CHKPV(fmt);
+    char buf[MAX_PACKET_BUF_SIZE] = {};
+    int32_t ret = snprintf_s(buf, MAX_PACKET_BUF_SIZE, MAX_PACKET_BUF_SIZE - 1, fmt, args...);
+    if (ret == -1) {
+        KMSG_LOGI("Call snprintf_s failed.ret = %d", ret);
+        return;
+    }
+    mprintf(fd, "%s", buf);
 }
 } // namespace MMI
 } // namespace OHOS
