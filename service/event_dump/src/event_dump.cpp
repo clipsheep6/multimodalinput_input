@@ -112,7 +112,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
     }
     optind = 1;
     int32_t c;
-    while ((c = getopt_long(args.size(), argv, "hdlwusoifmnc", dumpOptions, &optionIndex)) != -1) {
+    while ((c = getopt_long(args.size(), argv, "hdlwusoifmc", dumpOptions, &optionIndex)) != -1) {
         switch (c) {
             case 'h': {
                 DumpEventHelp(fd, args);
@@ -180,7 +180,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
 #endif // OHOS_BUILD_ENABLE_POINTER
                 break;
             }
-            case 'n': {
+            case 'c': {
                 DumpCheckDefine(fd, args);
                 break;
             }
