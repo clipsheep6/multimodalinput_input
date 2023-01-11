@@ -34,9 +34,6 @@ public:
     std::thread thread_;
 
 private:
-    InputDeviceInfo *iDevInfo_ { nullptr };
-    IInputInterface *inputInterface_ { nullptr };
-    InputEventCb callback_ {};
     DeviceInfo iDevInfo_;
     sptr<IInputInterfaces> inputInterface_ {nullptr};
     sptr<IInputCallback> callback_ {nullptr};
