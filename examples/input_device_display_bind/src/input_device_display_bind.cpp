@@ -13,14 +13,14 @@
  * limitations under the License.
  */
 
-#include <iostream>
-#include <cstdio>
-#include <sstream>
-#include <getopt.h>
-#include <vector>
 #include <array>
-#include <iomanip>
 #include <algorithm>
+#include <cstdio>
+#include <getopt.h>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+#include <vector>
 
 #include "input_manager.h"
 
@@ -37,10 +37,10 @@ void Help(const std::string title = {})
 int main(int argc, char *argv[])
 {
     struct option headOptions[] = {
-        {"query", no_argument, NULL, 'q'},
-        {"set", required_argument, NULL, 's'},
-        {"help", no_argument, NULL, 'h'},
-        {NULL, 0, NULL, 0}
+        { "query", no_argument, NULL, 'q' },
+        { "set", required_argument, NULL, 's' },
+        { "help", no_argument, NULL, 'h' },
+        { NULL, 0, NULL, 0 }
     };
 
     if (argc < 2) {
