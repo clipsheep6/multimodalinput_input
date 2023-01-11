@@ -1237,9 +1237,9 @@ public:
     uint32_t GetAxes() const;
 
     /**
-     * @brief Set the front keys in the key combination.
+     * @brief Sets the front keys in the key combination.
      * @param pressedKeys Indicates the front keys to set.
-     * @return void.
+     * @return void
      * @since 9
      */
     void SetPressedKeys(const std::vector<int32_t> pressedKeys);
@@ -1259,24 +1259,23 @@ public:
     bool IsValid() const;
 
     /**
-     * @brief 设置buffer值.
-     * @param buffer 表示该事件所携带的buffer值.
-     * @return void.
+     * @brief Sets the buffer value.
+     * @param buffer Indicates the buffer value carried by the event.
+     * @return void
      * @since 9
      */
     void SetBuffer(std::vector<uint8_t> buffer);
 
     /**
-     * @brief 清空buffer值.
-     * @param void.
-     * @return void.
+     * @brief Clear the buffer value.
+     * @return void
      * @since 9
      */
     void ClearBuffer();
 
     /**
-     * @brief 获取buffer值.
-     * @return Returns buffer.
+     * @brief Obtains the buffer value.
+     * @return Returns the buffer value.
      * @since 9
      */
     std::vector<uint8_t> GetBuffer() const;
