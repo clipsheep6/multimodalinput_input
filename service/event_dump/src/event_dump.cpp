@@ -218,7 +218,7 @@ void EventDump::DumpHelp(int32_t fd)
     mprintf(fd, "      -i, --interceptor: dump the interceptor information\t");
     mprintf(fd, "      -f, --filter: dump the filter information\t");
     mprintf(fd, "      -m, --mouse: dump the mouse information\t");
-    mprintf(fd, "      -n, --chkconfig: dump the ChkConfig state\t");
+    mprintf(fd, "      -c, --chkconfig: dump the ChkConfig state\t");
 }
 
 void EventDump::DumpCheckDefine(int32_t fd, const std::vector<std::string> &args)
