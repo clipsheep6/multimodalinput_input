@@ -73,7 +73,24 @@ struct Sequence {
     Ability ability;
 };
 
+struct TouchGesture {
+    int64_t duration { 0 };
+    int32_t pointerNum { 0 };
+    int32_t triggerType { 0 }; // 暂时还没用起来
+    int32_t timerId { -1 };
+    Ability ability;
+    void Print() const;
+};
 class KeyCommandHandler final : public IInputEventHandler {
+public:
+    static int32_t MARGIN_UP; // 上下左右的留白(无效)区域的范围
+    static int32_t MARGIN_DOWN;
+    static int32_t MARGIN_LEFT;
+    static int32_t MARGIN_RIGHT;
+    static int32_t MOVEMENT_THRESHOLD; // 静态手势识别中触摸点移动距离的阈值， 单位具体是啥待定
+    static int64_t DURATION_THRESHOLD; // 多指静态手势识别中，多个指头按下的时候各个手指按下事件的时差阈值
+    static double ANGLE_THRESHOLD; // 多指手势中，多个指头按下点位之间的角度阈值
+
 public:
     KeyCommandHandler() = default;
     DISALLOW_COPY_AND_MOVE(KeyCommandHandler);
@@ -88,6 +105,7 @@ public:
     void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
     bool OnHandleEvent(const std::shared_ptr<KeyEvent> keyEvent);
+    bool OnHandleEvent(const std::shared_ptr<PointerEvent> pointerEvent);
 private:
     void Print();
     void PrintSeq();
@@ -107,6 +125,21 @@ private:
     void RemoveSubscribedTimer(int32_t keyCode);
     void HandleSpecialKeys(int32_t keyCode, int32_t keyAction);
     void InterruptTimers();
+    bool HandleTouchGestures(const std::shared_ptr<PointerEvent> pointerEvent);
+    bool HandleActionDown(const std::shared_ptr<PointerEvent> pointerEvent);
+    bool HandleActionMove(const std::shared_ptr<PointerEvent> pointerEvent);
+    bool HandleActionUp(const std::shared_ptr<PointerEvent> pointerEvent);
+    bool CheckLocation(const std::shared_ptr<PointerEvent> pointerEvent);
+    bool CheckDuration(const std::shared_ptr<PointerEvent> pointerEvent);
+    bool CheckAngle(const std::shared_ptr<PointerEvent> pointerEvent);
+    bool CheckMovement(const std::shared_ptr<PointerEvent> pointerEvent);
+    bool IsGestureMatch(const TouchGesture &touchGesture, const std::shared_ptr<PointerEvent> pointerEvent);
+    void LaunchAbility(const TouchGesture& gesture);
+    bool ResetLastMatchedGesture();
+        
+    bool ParseTouchGesture();
+    bool ParseTouchJson(const std::string &configFile);
+
     void ResetLastMatchedKey()
     {
         lastMatchedKey_.preKeys.clear();
@@ -123,11 +156,16 @@ private:
 
 private:
     ShortcutKey lastMatchedKey_;
+    TouchGesture lastMatchedGesture_;
     std::map<std::string, ShortcutKey> shortcutKeys_;
+    std::map<std::string, TouchGesture> touchGestures_; // 解析得到的手势
     std::vector<Sequence> sequences_;
     std::vector<Sequence> filterSequences_;
     std::vector<SequenceKey> keys_;
     bool isParseConfig_ { false };
+    bool isTouchGestureParsed_ { false }; // 手势配置文件是否解析完成
+    bool isMatchedGesture_ { false };
+    std::map<int32_t, std::shared_ptr<PointerEvent>> currentDownPointers_; // key 为 pointerId, value 为对应当前按下的事件
     std::map<int32_t, int32_t> specialKeys_;
     std::map<int32_t, std::list<int32_t>> specialTimers_;
 };

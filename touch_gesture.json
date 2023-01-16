@@ -1,0 +1,48 @@
+{
+    "touch_gesture": [
+      {
+        "duration": 1000,
+        "pointerNum": 2,
+        "triggerType": 1,
+        "ability": {
+          "action": "",
+          "entities": [
+            ""
+          ],
+          "type": "",
+          "deviceId": "",
+          "bundleName": "com.ohos.screenshot",
+          "abilityName": "com.ohos.screenshot.ServiceExtAbility",
+          "uri": "",
+          "params": [
+            {
+              "key": "trigger_type",
+              "value": "touchGesture"
+            }
+          ]
+        }
+      },
+      {
+        "duration": 1000,
+        "pointerNum": 3,
+        "triggerType": 3,
+        "ability": {
+          "action": "",
+          "entities": [
+            ""
+          ],
+          "type": "",
+          "deviceId": "",
+          "bundleName": "com.ohos.camera",
+          "abilityName": "com.ohos.camera.MainAbility",
+          "uri": "",
+          "params": [
+            {
+              "key": "trigger_type",
+              "value": "touchGesture"
+            }
+          ]
+        }
+      }
+    ]
+  }
