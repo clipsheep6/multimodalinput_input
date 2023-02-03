@@ -12,17 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "securec.h"
-
-#include "input_manager.h"
-#include "mmi_log.h"
+#include "stdint.h"
 
 #ifndef GETOBJECTMETHOD_H
 #define GETOBJECTMETHOD_H
-
-#define FUZZ_PROJECT_NAME "getobjectmethod"
-
-#endif // GETOBJECTMETHOD_H
 
 template<class T>
 size_t GetObject(T &object, const uint8_t *data, size_t size)
@@ -37,3 +30,5 @@ size_t GetObject(T &object, const uint8_t *data, size_t size)
     }
     return objectSize;
 }
+
+#endif // GETOBJECTMETHOD_H
