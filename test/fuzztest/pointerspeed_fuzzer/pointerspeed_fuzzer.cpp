@@ -17,7 +17,7 @@
 
 #include "securec.h"
 
-#include "getobjectmethod.h"
+#include "common_method.h"
 #include "input_manager.h"
 #include "mmi_log.h"
 
