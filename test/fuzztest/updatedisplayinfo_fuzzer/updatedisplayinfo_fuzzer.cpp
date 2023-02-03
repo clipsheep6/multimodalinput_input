@@ -42,6 +42,7 @@ size_t GetString(const uint8_t *data, size_t size, char *object, size_t objectSi
     return objectSize;
 }
 
+
 void UpdateHotAreas(const uint8_t* data, size_t size, WindowInfo &windowInfo)
 {
     size_t startPos = 0;
@@ -96,7 +97,6 @@ void UpdateDisplayInfoFuzzTest(const uint8_t* data, size_t size)
         startPos += GetObject<int32_t>(displayInfo.dpi, data + startPos, size - startPos);
         char name[] = "name";
         startPos += GetString(data + startPos, size - startPos, name, stringSize);
-
         displayInfo.name = name;
         char uniq[] = "uniq";
         startPos += GetString(data + startPos, size - startPos, uniq, stringSize);
