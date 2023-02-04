@@ -84,7 +84,8 @@ void UpdateDisplayInfoFuzzTest(const uint8_t* data, size_t size)
         startPos += GetObject<int32_t>(windowInfo.area.y, data + startPos, size - startPos);
         startPos += GetObject<int32_t>(windowInfo.area.width, data + startPos, size - startPos);
         startPos += GetObject<int32_t>(windowInfo.area.height, data + startPos, size - startPos);
-        windowsInfos.push_back(windowInfo);
+        UpdateHotAreas(data, size, windowInfo);
+        windowsInfo.push_back(windowInfo);
 
         DisplayInfo displayInfo;
         startPos += GetObject<int32_t>(displayInfo.id, data + startPos, size - startPos);
@@ -92,18 +93,10 @@ void UpdateDisplayInfoFuzzTest(const uint8_t* data, size_t size)
         startPos += GetObject<int32_t>(displayInfo.y, data + startPos, size - startPos);
         startPos += GetObject<int32_t>(displayInfo.width, data + startPos, size - startPos);
         startPos += GetObject<int32_t>(displayInfo.height, data + startPos, size - startPos);
-	    startPos += GetObject<int32_t>(displayInfo.dpi, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(displayInfo.dpi, data + startPos, size - startPos);
         char name[] = "name";
-        startPos += GetString(stringSize, data + startPos, size - startPos, name);
+        startPos += GetString(data + startPos, size - startPos, name, stringSize);
 
-        size_t objectSize = 0;
-        std::string name = "";
-        size_t ret = 0;
-        ret = GetString(objectSize, data, size, name);
-        if (ret == 0) {
-            MMI_HILOGD("%{public}s:%{public}d The return value is 0", __func__, __LINE__);
-            return;
-        }
         displayInfo.name = name;
         char uniq[] = "uniq";
         startPos += GetString(data + startPos, size - startPos, uniq, stringSize);
