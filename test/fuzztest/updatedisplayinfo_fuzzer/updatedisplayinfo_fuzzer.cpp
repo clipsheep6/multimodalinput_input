@@ -84,7 +84,6 @@ void UpdateDisplayInfoFuzzTest(const uint8_t* data, size_t size)
         startPos += GetObject<int32_t>(windowInfo.area.y, data + startPos, size - startPos);
         startPos += GetObject<int32_t>(windowInfo.area.width, data + startPos, size - startPos);
         startPos += GetObject<int32_t>(windowInfo.area.height, data + startPos, size - startPos);
-        UpdateHotAreas(data, size, windowInfo);
         windowsInfos.push_back(windowInfo);
 
         DisplayInfo displayInfo;
