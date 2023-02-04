@@ -19,6 +19,7 @@
 
 #include "securec.h"
 
+#include "common_method.h"
 #include "define_multimodal.h"
 #include "input_manager.h"
 #include "mmi_log.h"
@@ -28,19 +29,6 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UpdateDisplayInfoFuzzTest" };
 } // namespace
-template<class T>
-size_t GetObject(const uint8_t *data, size_t size, T &object)
-{
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
-}
 
 size_t GetString(const uint8_t *data, size_t size, char *object, size_t objectSize)
 {
@@ -81,6 +69,7 @@ void UpdateDisplayInfoFuzzTest(const uint8_t* data, size_t size)
 {
     DisplayGroupInfo displayGroupInfo;
     size_t startPos = 0;
+<<<<<<< HEAD
     size_t stringSize = 4;
     startPos += GetObject<int32_t>(data + startPos, size - startPos, displayGroupInfo.width);
     startPos += GetObject<int32_t>(data + startPos, size - startPos, displayGroupInfo.height);
@@ -108,6 +97,43 @@ void UpdateDisplayInfoFuzzTest(const uint8_t* data, size_t size)
         startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.dpi);
         char name[] = "name";
         startPos += GetString(data + startPos, size - startPos, name, stringSize);
+=======
+    size_t stringSize = 4;
+    startPos += GetObject<int32_t>(displayGroupInfo.width, data + startPos, size - startPos);
+    startPos += GetObject<int32_t>(displayGroupInfo.height, data + startPos, size - startPos);
+    startPos += GetObject<int32_t>(displayGroupInfo.focusWindowId, data + startPos, size - startPos);
+    std::vector<WindowInfo> windowsInfo;
+    std::vector<DisplayInfo> displaysInfo;
+    for (size_t i = 0; i < WindowInfo::MAX_HOTAREA_COUNT + 1; ++i) {
+        WindowInfo windowInfo;
+        startPos += GetObject<int32_t>(windowInfo.id, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(windowInfo.pid, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(windowInfo.uid, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(windowInfo.area.x, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(windowInfo.area.y, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(windowInfo.area.width, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(windowInfo.area.height, data + startPos, size - startPos);
+        windowsInfos.push_back(windowInfo);
+
+        DisplayInfo displayInfo;
+        startPos += GetObject<int32_t>(displayInfo.id, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(displayInfo.x, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(displayInfo.y, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(displayInfo.width, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(displayInfo.height, data + startPos, size - startPos);
+	startPos += GetObject<int32_t>(displayInfo.dpi, data + startPos, size - startPos);
+        char name[] = "name";
+        startPos += GetString(stringSize, data + startPos, size - startPos, name);
+
+        size_t objectSize = 0;
+        std::string name = "";
+        size_t ret = 0;
+        ret = GetString(objectSize, data, size, name);
+        if (ret == 0) {
+            MMI_HILOGD("%{public}s:%{public}d The return value is 0", __func__, __LINE__);
+            return;
+        }
+>>>>>>> a56dba85 (remove the duplicate code in multimodal input repository)
         displayInfo.name = name;
         char uniq[] = "uniq";
         startPos += GetString(data + startPos, size - startPos, uniq, stringSize);
