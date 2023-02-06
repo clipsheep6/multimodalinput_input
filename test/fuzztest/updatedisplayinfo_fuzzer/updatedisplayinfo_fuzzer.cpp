@@ -50,16 +50,16 @@ void UpdateHotAreas(const uint8_t* data, size_t size, WindowInfo &windowInfo)
     std::vector<Rect> pointerHotAreasInfo;
     for (size_t j = 0; j < WindowInfo::MAX_HOTAREA_COUNT; ++j) {
         Rect defaultRect;
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, defaultRect.height);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, defaultRect.width);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, defaultRect.x);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, defaultRect.y);
+        startPos += GetObject<int32_t>(defaultRect.height, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(defaultRect.width, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(defaultRect.x, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(defaultRect.y, data + startPos, size - startPos);
         defaultHotAreasInfo.push_back(defaultRect);
         Rect pointerRect;
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, pointerRect.height);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, pointerRect.width);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, pointerRect.x);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, pointerRect.y);
+        startPos += GetObject<int32_t>(pointerRect.height, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(pointerRect.width, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(pointerRect.x, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(pointerRect.y, data + startPos, size - startPos);
         pointerHotAreasInfo.push_back(pointerRect);
     }
     windowInfo.defaultHotAreas = defaultHotAreasInfo;
