@@ -23,8 +23,8 @@ ohos_fuzztest("SupportKeysFuzzTest") {
   fuzz_config_file =
       "//foundation/multimodalinput/input/test/fuzztest/supportkeys_fuzzer"
   include_dirs = [
-      "//foundation/multimodalinput/input/interfaces/util/common/include",
-      "//foundation/multimodalinput/input/test/unittest/common/include",
+      "//../../../interfaces/util/common/include",
+      "//../../../../unittest/common/include",
   ]
   cflags = [
     "-g",
