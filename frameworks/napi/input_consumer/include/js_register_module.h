@@ -54,6 +54,16 @@ struct KeyEventMonitorInfo {
     napi_ref callback[1] {};
     int32_t subscribeId { 0 };
     std::shared_ptr<KeyOption> keyOption { nullptr };
+    bool valid { true };
+    std::mutex refLock;
+    void SetValid(bool flag) {
+        std::lock_guard<std::mutext> lock(refLock);
+        valid = flag;
+    }
+    bool IsValid() {
+        std::lock_guard<std::mutex> lock(refLock);
+        return valid;
+    }
 };
 
 typedef std::map<std::string, std::list<KeyEventMonitorInfo *>> Callbacks;
