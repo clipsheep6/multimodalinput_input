@@ -3517,7 +3517,7 @@ diff -Naur old/src/evdev-tablet.h new/src/evdev-tablet.h
  		break;
 diff -Naur old/src/evdev.c new/src/evdev.c
 --- old/src/evdev.c	2021-01-01 00:00:00.000000000 +0800
-+++ new/src/evdev.c	2021-01-01 00:00:00.000000000 +0800
++++ new/src/evdev.c	2023-02-08 00:00:00.000000000 +0800
 @@ -54,25 +54,7 @@
  #define DEFAULT_BUTTON_SCROLL_TIMEOUT ms2us(200)
  #define MAX_RETRY_OPEN_DEVICE_COUNT 10
@@ -3653,7 +3653,15 @@ diff -Naur old/src/evdev.c new/src/evdev.c
  		if (udev_tags & EVDEV_UDEV_TAG_TABLET)
  			evdev_tag_tablet_touchpad(device);
  		/* whether velocity should be averaged, false by default */
-@@ -2292,6 +2302,18 @@
+@@ -1903,7 +1913,6 @@
+        if (libevdev_has_event_code(evdev, EV_REL, REL_WHEEL) ||
+		    libevdev_has_event_code(evdev, EV_REL, REL_HWHEEL)) {
+                device->scroll.natural_scrolling_enabled = true;
+-               device->seat_caps |= EVDEV_DEVICE_POINTER;
+        }
+
+        evdev_tag_keyboard(device, device->udev_device);		
+@@ -2292,6 +2301,18 @@
  }
 
  unsigned int
