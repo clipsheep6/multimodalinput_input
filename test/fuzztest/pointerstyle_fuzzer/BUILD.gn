@@ -23,7 +23,7 @@ ohos_fuzztest("PointerStyleFuzzTest") {
   fuzz_config_file =
       "//foundation/multimodalinput/input/test/fuzztest/pointerstyle_fuzzer"
   include_dirs = [
-      "//foundation/multimodalinput/input/interfaces/util/common/include",
+      "//../../../interfaces/util/common/include",
       "//../../../../unittest/common/include",
   ]
   cflags = [
