@@ -21,6 +21,7 @@
 #include <iostream>
 #include <list>
 #include <map>
+#include <mutex>
 
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
@@ -57,7 +58,7 @@ struct KeyEventMonitorInfo {
     bool valid { true };
     std::mutex refLock;
     void SetValid(bool flag) {
-        std::lock_guard<std::mutext> lock(refLock);
+        std::lock_guard<std::mutex> lock(refLock);
         valid = flag;
     }
     bool IsValid() {
