@@ -154,7 +154,7 @@ void EventLogHelper::PrintEventData(std::shared_ptr<T> event)
 {
     CHKPV(event);
     if (HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG) ||
-        (event->GetAction() == EVENT_TYPE_KEY && event->GetKeyCode() == KEYCODE_POWER)){
+        (event->GetAction() == InputEvent::EVENT_TYPE_KEY && event->GetKeyCode() == KeyEvent::KEYCODE_POWER)){
         EventLogHelper::Print(event);
     }
 }
