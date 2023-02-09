@@ -19,6 +19,7 @@
 
 #include "securec.h"
 
+#include "common_method.h"
 #include "define_multimodal.h"
 #include "input_manager.h"
 #include "mmi_log.h"
@@ -28,19 +29,6 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UpdateDisplayInfoFuzzTest" };
 } // namespace
-template<class T>
-size_t GetObject(const uint8_t *data, size_t size, T &object)
-{
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
-}
 
 size_t GetString(const uint8_t *data, size_t size, char *object, size_t objectSize)
 {
@@ -54,6 +42,7 @@ size_t GetString(const uint8_t *data, size_t size, char *object, size_t objectSi
     return objectSize;
 }
 
+
 void UpdateHotAreas(const uint8_t* data, size_t size, WindowInfo &windowInfo)
 {
     size_t startPos = 0;
@@ -61,16 +50,16 @@ void UpdateHotAreas(const uint8_t* data, size_t size, WindowInfo &windowInfo)
     std::vector<Rect> pointerHotAreasInfo;
     for (size_t j = 0; j < WindowInfo::MAX_HOTAREA_COUNT; ++j) {
         Rect defaultRect;
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, defaultRect.height);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, defaultRect.width);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, defaultRect.x);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, defaultRect.y);
+        startPos += GetObject<int32_t>(defaultRect.height, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(defaultRect.width, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(defaultRect.x, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(defaultRect.y, data + startPos, size - startPos);
         defaultHotAreasInfo.push_back(defaultRect);
         Rect pointerRect;
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, pointerRect.height);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, pointerRect.width);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, pointerRect.x);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, pointerRect.y);
+        startPos += GetObject<int32_t>(pointerRect.height, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(pointerRect.width, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(pointerRect.x, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(pointerRect.y, data + startPos, size - startPos);
         pointerHotAreasInfo.push_back(pointerRect);
     }
     windowInfo.defaultHotAreas = defaultHotAreasInfo;
@@ -82,30 +71,30 @@ void UpdateDisplayInfoFuzzTest(const uint8_t* data, size_t size)
     DisplayGroupInfo displayGroupInfo;
     size_t startPos = 0;
     size_t stringSize = 4;
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, displayGroupInfo.width);
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, displayGroupInfo.height);
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, displayGroupInfo.focusWindowId);
+    startPos += GetObject<int32_t>(displayGroupInfo.width, data + startPos, size - startPos);
+    startPos += GetObject<int32_t>(displayGroupInfo.height, data + startPos, size - startPos);
+    startPos += GetObject<int32_t>(displayGroupInfo.focusWindowId, data + startPos, size - startPos);
     std::vector<WindowInfo> windowsInfo;
     std::vector<DisplayInfo> displaysInfo;
     for (size_t i = 0; i < WindowInfo::MAX_HOTAREA_COUNT + 1; ++i) {
         WindowInfo windowInfo;
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.id);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.pid);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.uid);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.area.x);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.area.y);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.area.width);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.area.height);
+        startPos += GetObject<int32_t>(windowInfo.id, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(windowInfo.pid, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(windowInfo.uid, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(windowInfo.area.x, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(windowInfo.area.y, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(windowInfo.area.width, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(windowInfo.area.height, data + startPos, size - startPos);
         UpdateHotAreas(data, size, windowInfo);
         windowsInfo.push_back(windowInfo);
 
         DisplayInfo displayInfo;
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.id);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.x);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.y);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.width);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.height);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.dpi);
+        startPos += GetObject<int32_t>(displayInfo.id, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(displayInfo.x, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(displayInfo.y, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(displayInfo.width, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(displayInfo.height, data + startPos, size - startPos);
+        startPos += GetObject<int32_t>(displayInfo.dpi, data + startPos, size - startPos);
         char name[] = "name";
         startPos += GetString(data + startPos, size - startPos, name, stringSize);
         displayInfo.name = name;
