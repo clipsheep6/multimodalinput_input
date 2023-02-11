@@ -3653,7 +3653,15 @@ diff -Naur old/src/evdev.c new/src/evdev.c
  		if (udev_tags & EVDEV_UDEV_TAG_TABLET)
  			evdev_tag_tablet_touchpad(device);
  		/* whether velocity should be averaged, false by default */
-@@ -2292,6 +2302,18 @@
+@@ -1903,7 +1913,6 @@
+        if (libevdev_has_event_code(evdev, EV_REL, REL_WHEEL) ||
+		    libevdev_has_event_code(evdev, EV_REL, REL_HWHEEL)) {
+                device->scroll.natural_scrolling_enabled = true;
+-               device->seat_caps |= EVDEV_DEVICE_POINTER;
+        }
+
+        evdev_tag_keyboard(device, device->udev_device);		
+@@ -2292,6 +2301,18 @@
  }
 
  unsigned int
