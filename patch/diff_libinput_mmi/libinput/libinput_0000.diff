@@ -3517,7 +3517,7 @@ diff -Naur old/src/evdev-tablet.h new/src/evdev-tablet.h
  		break;
 diff -Naur old/src/evdev.c new/src/evdev.c
 --- old/src/evdev.c	2021-01-01 00:00:00.000000000 +0800
-+++ new/src/evdev.c	2023-02-08 00:00:00.000000000 +0800
++++ new/src/evdev.c	2023-02-08 18:54:34.023057234 +0800
 @@ -54,25 +54,7 @@
  #define DEFAULT_BUTTON_SCROLL_TIMEOUT ms2us(200)
  #define MAX_RETRY_OPEN_DEVICE_COUNT 10
