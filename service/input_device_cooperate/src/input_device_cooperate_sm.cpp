@@ -33,9 +33,9 @@
 #include "input_device_cooperate_util.h"
 #include "input_device_manager.h"
 #include "input_windows_manager.h"
+#include "key_auto_repeat.h"
 #include "mouse_event_normalize.h"
 #include "timer_manager.h"
-#include "util_ex.h"
 
 namespace OHOS {
 namespace MMI {
@@ -296,6 +296,7 @@ void InputDeviceCooperateSM::StopRemoteCooperateResult(bool isSuccess)
     if (isSuccess) {
         Reset(true);
     }
+    KeyRepeat->RemoveTimer();
     isStopping_ = false;
 }
 
@@ -331,6 +332,7 @@ void InputDeviceCooperateSM::OnStartFinish(bool isSuccess,
                 DevCooperateSoftbusAdapter->StartCooperateOtherResult(sink, remoteNetworkId);
             }
             UpdateState(CooperateState::STATE_FREE);
+            KeyRepeat->RemoveTimer();
         } else {
             MMI_HILOGI("Current state is out");
         }
@@ -609,18 +611,6 @@ void InputDeviceCooperateSM::OnDeviceOffline(const std::string &networkId)
             onlineDevice_.erase(it);
         }
     }
-}
-
-void InputDeviceCooperateSM::Dump(int32_t fd, const std::vector<std::string> &args)
-{
-    CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
-    mprintf(fd, "Keyboard and mouse crossing information:");
-    mprintf(fd, "State machine status: %d\t", cooperateState_);
-    mprintf(fd, "Peripheral keyboard and mouse information: startDhid_  srcNetworkId_:\t");
-    mprintf(fd, "%s", startDhid_.c_str());
-    mprintf(fd, "%s", srcNetworkId_.c_str());
-    mprintf(fd, "Run successfully");
 }
 
 void InputDeviceCooperateSM::DeviceInitCallBack::OnRemoteDied()

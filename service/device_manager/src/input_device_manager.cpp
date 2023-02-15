@@ -370,15 +370,15 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
 {
     CALL_DEBUG_ENTER;
     CHKPV(inputDevice);
-    bool hasLocalPointer = false;
+    bool hasPointer = false;
     for (const auto &item : inputDevice_) {
         if (item.second.inputDeviceOrigin == inputDevice) {
             MMI_HILOGI("The device is already existent");
             DfxHisysevent::OnDeviceConnect(item.first, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
             return;
         }
-        if (!item.second.isRemote && item.second.isPointerDevice) {
-            hasLocalPointer = true;
+        if (item.second.isPointerDevice) {
+            hasPointer = true;
         }
     }
 
@@ -413,14 +413,13 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
         InputDevCooSM->OnKeyboardOnline(info.dhid);
     }
 #endif // OHOS_BUILD_ENABLE_COOPERATE
-    if (info.isPointerDevice) {
-        bool visible = !info.isRemote || hasLocalPointer;
+    if (!hasPointer && info.isPointerDevice) {
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
         if (HasTouchDevice()) {
             IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
         }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-        NotifyPointerDevice(true, visible);
+        NotifyPointerDevice(true, true);
         OHOS::system::SetParameter(INPUT_POINTER_DEVICE, "true");
         MMI_HILOGI("Set para input.pointer.device true");
     }
