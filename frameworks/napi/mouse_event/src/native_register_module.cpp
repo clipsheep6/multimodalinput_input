@@ -23,7 +23,7 @@ static napi_module mmiMouseEventModule = {
     .nm_flags = 0,
     .nm_filename = nullptr,
     .nm_register_func = JsMouseEvent::Export,
-    .nm_modname = "multimodalInput.mouseEvent",
+    .nm_modname = "multimodalInput.MouseEvent",
     .nm_priv = ((void*)0),
     .reserved = { 0 },
 };
