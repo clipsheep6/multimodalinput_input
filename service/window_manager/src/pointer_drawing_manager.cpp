@@ -114,12 +114,9 @@ int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
 
     auto addr = static_cast<uint8_t *>(buffer->GetVirAddr());
     DoDraw(addr, buffer->GetWidth(), buffer->GetHeight(), mouseStyle);
-    OHOS::BufferFlushConfig flushConfig = {
-        .damage = {
-            .w = buffer->GetWidth(),
-            .h = buffer->GetHeight(),
-        },
-    };
+    OHOS::BufferFlushConfig flushConfig;
+    OHOS::Rect rect = { .w = buffer->GetWidth(), .h = buffer->GetHeight(), };
+    flushConfig.damages.push_back(rect);
     OHOS::SurfaceError ret = layer->FlushBuffer(buffer, -1, flushConfig);
     if (ret != OHOS::SURFACE_ERROR_OK) {
         MMI_HILOGE("Init layer failed, FlushBuffer return ret:%{public}s", SurfaceErrorStr(ret).c_str());
