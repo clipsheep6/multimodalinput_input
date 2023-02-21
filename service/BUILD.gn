@@ -198,6 +198,7 @@ ohos_shared_library("libmmi-server") {
     external_deps += [ "window_manager:libwm" ]
   }
 
+  shlib_type = "sa"
   part_name = "input"
   subsystem_name = "multimodalinput"
 }
