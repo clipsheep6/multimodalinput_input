@@ -23,7 +23,7 @@ static napi_module mmiTouchEventModule = {
     .nm_flags = 0,
     .nm_filename = nullptr,
     .nm_register_func = JsTouchEvent::Export,
-    .nm_modname = "multimodalInput.touchEvent",
+    .nm_modname = "multimodalInput.TouchEvent",
     .nm_priv = ((void*)0),
     .reserved = { 0 },
 };
