@@ -140,7 +140,7 @@ private:
     bool isFinalKeyDown_ { false };
     int32_t finalKeyDownDuration_ { 0 };
     int32_t finalKeyUpDelay_ { 0 };
-    mutable std::preKeysMutex_;
+    mutable std::mutex preKeysMutex_;
 };
 } // namespace MMI
 } // namespace OHOS
