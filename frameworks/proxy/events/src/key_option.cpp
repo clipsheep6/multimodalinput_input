@@ -37,11 +37,13 @@ void KeyOption::SetPreKeys(const std::set<int32_t> &preKeys)
 
 int32_t KeyOption::GetFinalKey() const
 {
+    std::lock_guard<std::mutex> lock(preKeysMutex_);
     return finalKey_;
 }
 
 void KeyOption::SetFinalKey(int32_t finalKey)
 {
+    std::lock_guard<std::mutex> lock(preKeysMutex_);
     finalKey_ = finalKey;
 }
 
