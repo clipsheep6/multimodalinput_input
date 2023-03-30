@@ -645,7 +645,6 @@ void JsEventTarget::CallKeyboardTypeAsync(uv_work_t *work, int32_t status)
     napi_value result = nullptr;
     CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 2, callResult, &result),
 	    CALL_FUNCTION, scope);
-    CHKRV_SCOPE(cb->env, napi_delete_reference(cb->env, cb->ref), DELETE_REFERENCE, scope);
     napi_close_handle_scope(cb->env, scope);
     JsUtil::DeleteCallbackInfo(std::move(cb));
 }
@@ -737,7 +736,6 @@ void JsEventTarget::CallDevListAsyncWork(uv_work_t *work, int32_t status)
     napi_value result = nullptr;
     CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 2, callResult, &result),
         CALL_FUNCTION, scope);
-    CHKRV_SCOPE(cb->env, napi_delete_reference(cb->env, cb->ref), DELETE_REFERENCE, scope);
     napi_close_handle_scope(cb->env, scope);
     JsUtil::DeleteCallbackInfo(std::move(cb));
 }
