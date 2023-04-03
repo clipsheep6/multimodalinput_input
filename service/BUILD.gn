@@ -159,6 +159,7 @@ ohos_shared_library("libmmi-server") {
     "multimedia_image_framework:image_native",
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
+    "preferences:native_preferences",
   ]
 
   if (input_feature_pointer_drawing) {
