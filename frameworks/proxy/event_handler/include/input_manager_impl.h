@@ -131,7 +131,6 @@ private:
     void SendDisplayInfo();
     void ReAddInputEventFilter();
 
-
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consumer,
         std::shared_ptr<KeyEvent> keyEvent);
@@ -140,7 +139,6 @@ private:
     void OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer,
         std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-
 private:
     std::map<int32_t, std::tuple<sptr<IEventFilter>, int32_t, uint32_t>> eventFilterServices_;
     std::shared_ptr<IInputEventConsumer> consumer_ { nullptr };
