@@ -13,9 +13,6 @@
 
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
-mmi_path = "//foundation/multimodalinput/input"
-common_util = "//commonlibrary/c_utils"
-
 config("shortKey_config") {
   visibility = [ ":*" ]
 
