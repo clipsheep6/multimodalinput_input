@@ -62,6 +62,7 @@ config("libmmi_server_config") {
     "//foundation/multimodalinput/input/util/network/include",
     "//foundation/multimodalinput/input/frameworks/proxy/event_handler/include",
     "//third_party/cJSON",
+    "//foundation/distributeddatamgr/preferences/frameworks/native/include",
   ]
 
   if (input_feature_combination_key) {
