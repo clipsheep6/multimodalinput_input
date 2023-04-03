@@ -289,6 +289,12 @@ int32_t MultimodalInputConnectManager::SetPointerLocation(int32_t x, int32_t y)
     return multimodalInputConnectService_->SetPointerLocation(x, y);
 }
 
+int32_t MultimodalInputConnectManager::SetKeyDownDuration(const std::string &businessId, int32_t delay)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetKeyDownDuration(businessId, delay);
+}
+
 bool MultimodalInputConnectManager::ConnectMultimodalInputService()
 {
     CALL_DEBUG_ENTER;
