@@ -52,6 +52,7 @@ config("libmmi_server_config") {
     "${mmi_service_path}/module_loader/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
+    "${preference_path}/frameworks/native/include",
     "mouse_event_normalize/include",
     "//foundation/multimodalinput/interfaces/native/innerkits/event/include",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/include",
@@ -62,6 +63,7 @@ config("libmmi_server_config") {
     "//foundation/multimodalinput/input/util/network/include",
     "//foundation/multimodalinput/input/frameworks/proxy/event_handler/include",
     "//third_party/cJSON",
+    
   ]
 
   if (input_feature_combination_key) {
@@ -157,6 +159,7 @@ ohos_shared_library("libmmi-server") {
     "ipc:ipc_single",
     "multimedia_image_framework:image_native",
     "safwk:system_ability_fwk",
+    "preferences:native_preferences",
   ]
 
   if (input_feature_pointer_drawing) {
@@ -205,6 +208,7 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/service/mouse_event_normalize/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/uinput",
+    "${mmi_path}/service/key_command/include",
     "$root_out_dir/diff_libinput_mmi/export_include",
   ]
 
@@ -219,6 +223,7 @@ ohos_unittest("ut-mmi-service-out") {
     "subscriber/test/key_subscriber_handler_test.cpp",
     "window_manager/test/input_display_bind_helper_test.cpp",
     "window_manager/test/input_windows_manager_test.cpp",
+    "key_command/test/key_command_handler_test.cpp",
   ]
 
   configs = [ ":libmmi_server_config" ]
