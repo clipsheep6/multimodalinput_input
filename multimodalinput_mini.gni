@@ -253,3 +253,7 @@ if (input_feature_mouse) {
 if (input_feature_joystick) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_JOYSTICK" ]
 }
+
+if (input_feature_short_key) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_SHORT_KEY" ]
+}
