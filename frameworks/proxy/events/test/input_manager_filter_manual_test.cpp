@@ -135,8 +135,8 @@ public:
             if (fgets(buf, 255, fp) != NULL) {
                 pid = atoi(buf);
             }
+            pclose(fp);
         }
-        pclose(fp);
         return pid;
     }
     int32_t GetSelfHidumperFilterNum() const
