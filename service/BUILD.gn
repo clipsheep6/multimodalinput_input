@@ -208,7 +208,6 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/service/mouse_event_normalize/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/uinput",
-    "${mmi_path}/service/key_command/include",
     "$root_out_dir/diff_libinput_mmi/export_include",
   ]
 
@@ -223,7 +222,6 @@ ohos_unittest("ut-mmi-service-out") {
     "subscriber/test/key_subscriber_handler_test.cpp",
     "window_manager/test/input_display_bind_helper_test.cpp",
     "window_manager/test/input_windows_manager_test.cpp",
-    "key_command/test/key_command_handler_test.cpp",
   ]
 
   configs = [ ":libmmi_server_config" ]
