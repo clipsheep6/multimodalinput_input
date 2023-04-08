@@ -30,6 +30,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ANRManager" };
 constexpr int64_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
 const std::string FOUNDATION = "foundation";
+const std::string PKG_SYSTEMUI = "com.ohos.systemui";
 constexpr int32_t MAX_ANR_TIMER_COUNT = 50;
 } // namespace
 
@@ -80,7 +81,8 @@ void ANRManager::RemoveTimers(SessionPtr sess)
 void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, SessionPtr sess)
 {
     CHKPV(sess);
-    if (sess->GetTokenType() != TokenType::TOKEN_HAP || sess->GetProgramName() == FOUNDATION) {
+    if (sess->GetTokenType() != TokenType::TOKEN_HAP || sess->GetProgramName() == FOUNDATION
+        || sess->GetProgramName() == PKG_SYSTEMUI) {
         MMI_HILOGD("Not application event, skip. pid:%{public}d, anr type:%{public}d", sess->GetPid(), type);
         return;
     }
@@ -134,7 +136,8 @@ bool ANRManager::TriggerANR(int32_t type, int64_t time, SessionPtr sess)
     CALL_DEBUG_ENTER;
     CHKPF(udsServer_);
     CHKPF(sess);
-    if (sess->GetTokenType() != TokenType::TOKEN_HAP || sess->GetProgramName() == FOUNDATION) {
+    if (sess->GetTokenType() != TokenType::TOKEN_HAP || sess->GetProgramName() == FOUNDATION
+        || sess->GetProgramName() == PKG_SYSTEMUI) {
         MMI_HILOGD("Not application event, skip. pid:%{public}d, anr type:%{public}d", sess->GetPid(), type);
         return false;
     }
