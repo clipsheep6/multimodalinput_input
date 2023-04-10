@@ -35,12 +35,13 @@ ohos_shared_library("libmmi-util") {
   public_configs = [ "${mmi_path}:coverage_flags" ]
   configs = [ ":libmmi_util_public_config" ]
 
-  public_deps = [
+  deps = [
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//commonlibrary/c_utils/base:utils",
     "//foundation/arkui/napi:ace_napi",
-    "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
   ]
+
+  public_deps = [ "${mmi_path}/frameworks/proxy:libmmi-common" ]
 
   part_name = "input"
   subsystem_name = "multimodalinput"
