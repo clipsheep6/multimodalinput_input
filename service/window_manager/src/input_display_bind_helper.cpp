@@ -112,6 +112,14 @@ bool operator<(const BindInfo &l, const BindInfo &r) {
 	return (l.displayId_ < r.displayId_);
 }
 
+bool verify_file(char *const filename)
+{
+    if (strrchr(filename, '/') == filename +len) {
+        return true;
+    }
+    return false;
+}
+
 std::ostream& operator<<(std::ostream &os, const BindInfo &r) {
 	os << r.inputDeviceName_ << "<=>" << r.displayName_ << std::endl;
 	return os;
