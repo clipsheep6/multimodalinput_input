@@ -513,7 +513,7 @@ void InputDisplayBindHelper::Load()
         MMI_HILOGE("file name is empty");
         return;
     }
-    if (!VerifyFile(realpathRes)) {
+    if (!verify_file(realpathRes)) {
         MMI_HILOGE("file name is empty");
         return;
     }
