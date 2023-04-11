@@ -383,11 +383,11 @@ void InputDisplayBindHelper::Store()
 	}
     realpathRes = realpath(fileName_.c_str(), NULL);
     if (realpathRes == NULL) {
-        MMI.HILOGE("file name is empty");
+        MMI_HILOGE("file name is empty");
         return;
     }
     if (!verify_file(realpathRes)) {
-        MMI.HILOGE("file name is empty");
+        MMI_HILOGE("file name is empty");
         return;
     }
 	std::ofstream ofs(fileName_.c_str(), std::ios::trunc | std::ios::out | std::ios_base::binary);
@@ -502,11 +502,11 @@ void InputDisplayBindHelper::Load()
     char *realpathRes = NULL;
     realpathRes = realpath(fileName_.c_str(), NULL);
     if (realpathRes == NULL) {
-        MMI.HILOGE("file name is empty");
+        MMI_HILOGE("file name is empty");
         return;
     }
-    if (!verify_file(realpathRes)) {
-        MMI.HILOGE("file name is empty");
+    if (!VerifyFile(realpathRes)) {
+        MMI_HILOGE("file name is empty");
         return;
     }
 	std::ifstream ifs(fileName_.c_str());
