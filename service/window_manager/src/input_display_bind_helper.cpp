@@ -16,6 +16,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <limits.h>
 #include <list>
 #include <sstream>
 
@@ -110,14 +111,6 @@ bool operator<(const BindInfo &l, const BindInfo &r) {
 		return (l.inputDeviceId_ < r.inputDeviceId_);
 	}
 	return (l.displayId_ < r.displayId_);
-}
-
-bool verify_file(char *const filename)
-{
-    if (strrchr(filename, '/') == filename +len) {
-        return true;
-    }
-    return false;
 }
 
 std::ostream& operator<<(std::ostream &os, const BindInfo &r) {
@@ -380,6 +373,16 @@ void InputDisplayBindHelper::RemoveDisplay(int32_t id)
 	CALL_DEBUG_ENTER;
 	MMI_HILOGD("Param: id:%{public}d", id);
 	infos_->UnbindDisplay(id);
+}
+
+bool verify_file(char *const filename)
+{
+    if ((strlen(filename) <= PATH_MAX) && strncmp(filename, "/dev", 4) == 0) {
+        return true;
+    } else {
+        MMI_HILOGE("file name is empty");
+        return false;
+    }
 }
 
 void InputDisplayBindHelper::Store()
