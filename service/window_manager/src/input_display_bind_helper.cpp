@@ -377,7 +377,7 @@ void InputDisplayBindHelper::RemoveDisplay(int32_t id)
 
 bool verify_file(char *const filename)
 {
-    if ((strlen(filename) <= PATH_MAX) && strncmp(filename, "/dev", 4) == 0) {
+    if ((strlen(filename) <= PATH_MAX)) {
         return true;
     } else {
         MMI_HILOGE("file name is empty");
