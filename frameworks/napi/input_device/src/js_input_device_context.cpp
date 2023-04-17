@@ -316,7 +316,6 @@ napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info in
     }
 
     JsInputDeviceContext *jsContext = JsInputDeviceContext::GetInstance(env);
-    CHKRP(jsContext);
     auto jsInputDeviceMgr = jsContext->GetJsInputDeviceMgr();
     if (argc == 2) {
         return jsInputDeviceMgr->SupportKeys(env, deviceId, keyCodes);
