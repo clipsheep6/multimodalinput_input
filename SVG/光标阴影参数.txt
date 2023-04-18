@@ -1,0 +1,13 @@
+阴影
+
+Sketch参数
+X:0
+Y:1
+模糊:4
+不透明度:40%
+颜色:#000000
+
+其中以下几个光标不需要加阴影：
+Screenshot Cross
+Text Cursor
+Cross
