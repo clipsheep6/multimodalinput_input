@@ -32,14 +32,11 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerDrawingManager" };
 const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
-constexpr int32_t PAD_SCREEN_WIDTH = 2560;
 constexpr int32_t PHONE_SCREEN_WIDTH = 2160;
 constexpr int32_t SMALL_ICON_WIDTH = 40;
 constexpr int32_t SMALL_ICON_HEIGHT = 40;
 constexpr int32_t MIDDLE_ICON_WIDTH = 60;
 constexpr int32_t MIDDLE_ICON_HEIGHT = 60;
-constexpr int32_t LARGE_ICON_WIDTH = 80;
-constexpr int32_t LARGE_ICON_HEIGHT = 80;
 } // namespace
 } // namespace MMI
 } // namespace OHOS
@@ -323,13 +320,8 @@ void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
     displayInfo_ = displayInfo;
 
     if ((displayInfo_.width >= PHONE_SCREEN_WIDTH) || (displayInfo_.height >= PHONE_SCREEN_WIDTH)) {
-        if ((displayInfo_.width == PAD_SCREEN_WIDTH) || (displayInfo_.height == PAD_SCREEN_WIDTH)) {
-            imageWidth_ = MIDDLE_ICON_WIDTH;
-            imageHeight_ = MIDDLE_ICON_HEIGHT;
-        } else {
-            imageWidth_ = LARGE_ICON_WIDTH;
-            imageHeight_ = LARGE_ICON_HEIGHT;
-        }
+        imageWidth_ = MIDDLE_ICON_WIDTH;
+        imageHeight_ = MIDDLE_ICON_HEIGHT;
     } else {
         imageWidth_ = SMALL_ICON_WIDTH;
         imageHeight_ = SMALL_ICON_HEIGHT;
