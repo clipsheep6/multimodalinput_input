@@ -848,6 +848,51 @@ int32_t InputManagerImpl::GetPointerStyle(int32_t windowId, PointerStyle &pointe
     return RET_OK;
 }
 
+int32_t InputManagerImpl::SetPointerSize(int32_t size)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = MultimodalInputConnMgr->SetPointerSize(size);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to set pointer size, ret:%{public}d", ret);
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+int32_t InputManagerImpl::GetPointerSize(int32_t& size)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = MultimodalInputConnMgr->GetPointerSize(size);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to get pointer size, ret:%{public}d", ret);
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+int32_t InputManagerImpl::SetPointerImages(const std::map<int32_t, std::string>& images)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = MultimodalInputConnMgr->SetPointerImages(images);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to set pointer images, ret:%{public}d", ret);
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
 void InputManagerImpl::OnConnected()
 {
     CALL_DEBUG_ENTER;

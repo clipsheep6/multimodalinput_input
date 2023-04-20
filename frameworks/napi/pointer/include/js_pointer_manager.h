@@ -72,6 +72,10 @@ public:
     napi_value GetMousePrimaryButton(napi_env env, napi_value handle = nullptr);
     napi_value SetHoverScrollState(napi_env env, bool state, napi_value handle = nullptr);
     napi_value GetHoverScrollState(napi_env env, napi_value handle = nullptr);
+    napi_value SetPointerSize(napi_env env, int32_t pointerSize, napi_value handle = nullptr);
+    napi_value GetPointerSize(napi_env env, napi_value handle = nullptr);
+    napi_value SetPointerImages(napi_env env, const std::map<int32_t, std::string>& images,
+        napi_value handle = nullptr);
 };
 } // namespace MMI
 } // namespace OHOS

@@ -63,6 +63,10 @@ namespace MMI {
 #define MAX_RECV_LIMIT 32
 #define INPUT_POINTER_DEVICE "input.pointer.device"
 #define MMI_DINPUT_PKG_NAME "ohos.multimodalinput.dinput"
+
+constexpr int32_t DEFAULT_POINTER_SIZE = -1;
+constexpr int32_t MIN_POINTER_SIZE = 40;
+constexpr int32_t MAX_POINTER_SIZE = 60;
 } // namespace MMI
 } // namespace OHOS
 #endif // CONFIG_MULTIMODAL_H

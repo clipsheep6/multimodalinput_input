@@ -319,6 +319,12 @@ void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
     displayInfo_ = displayInfo;
     imageWidth_ = displayInfo.dpi * DEVICE_INDEPENDENT_PIXELS / BASELINE_DENSITY;
     imageHeight_ = displayInfo.dpi * DEVICE_INDEPENDENT_PIXELS / BASELINE_DENSITY;
+
+    if (customPointerSize_ > 0) {
+        imageWidth_ = customPointerSize_;
+        imageHeight_ = customPointerSize_;
+    }
+
     IMAGE_WIDTH = (imageWidth_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
     IMAGE_HEIGHT = (imageHeight_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
 }
@@ -538,6 +544,51 @@ int32_t PointerDrawingManager::GetPointerStyle(int32_t pid, int32_t windowId, Po
         return ret;
     }
     MMI_HILOGD("Window id:%{public}d get pointer style:%{public}d success", windowId, pointerStyle.id);
+    return RET_OK;
+}
+
+void PointerDrawingManager::SetPointerSize(int32_t size)
+{
+    CALL_DEBUG_ENTER;
+    customPointerSize_ = size < 0 ? DEFAULT_POINTER_SIZE : std::clamp(size, MIN_POINTER_SIZE, MAX_POINTER_SIZE);
+    if (hasDisplay_) {
+        UpdateDisplayInfo(displayInfo_);
+        if (mouseDisplayState_) {
+            InitLayer(MOUSE_ICON(lastMouseStyle_.id));
+        }
+        UpdatePointerVisible();
+    }
+}
+
+int32_t PointerDrawingManager::GetPointerSize()
+{
+    CALL_DEBUG_ENTER;
+    return customPointerSize_;
+}
+
+int32_t PointerDrawingManager::SetPointerImages(const std::map<int32_t, std::string>& images)
+{
+    CALL_DEBUG_ENTER;
+    // Check arguments
+    for (auto&& entry : images) {
+        auto pos = mouseIcons_.find(static_cast<MOUSE_ICON>(entry.first));
+        if (pos == mouseIcons_.end()) {
+            MMI_HILOGE("Set pointer images failed. Invalid icon style specified: %{public}d.", entry.first);
+            return INVALID_PARAMETER_CURSOR_STYLE;
+        }
+        if (ReadCursorStyleFile(entry.second) != RET_OK) {
+            MMI_HILOGE("Set pointer images failed. Invalid file path specified: %{public}s.", entry.second.c_str());
+            return INVALID_PARAMETER_FILE_PATH;
+        }
+    }
+    // Assign values
+    for (auto&& entry : images) {
+        mouseIcons_[static_cast<MOUSE_ICON>(entry.first)].iconPath = entry.second;
+    }
+    if (mouseDisplayState_) {
+        InitLayer(MOUSE_ICON(lastMouseStyle_.id));
+    }
+    UpdatePointerVisible();
     return RET_OK;
 }
 

@@ -40,6 +40,7 @@ enum NapiErrorCode : int32_t {
     COMMON_PERMISSION_CHECK_ERROR = 201,
     COMMON_PARAMETER_ERROR = 401,
     COMMON_USE_SYSAPI_ERROR = 202,
+    INTERNAL_ERROR = 100001,
 };
 
 const std::map<int32_t, NapiError> NAPI_ERRORS = {
@@ -49,16 +50,7 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
 };
 
 #define THROWERR_CUSTOM(env, code, msg) \
-    do { \
-        napi_value businessError = nullptr; \
-        napi_value errorCode = nullptr; \
-        napi_value errorMsg = nullptr; \
-        napi_create_int32(env, code, &errorCode); \
-        napi_create_string_utf8(env, std::string(msg).c_str(), NAPI_AUTO_LENGTH, &errorMsg); \
-        napi_create_error(env, nullptr, errorMsg, &businessError); \
-        napi_set_named_property(env, businessError, ERR_CODE.c_str(), errorCode); \
-        napi_throw(env, businessError); \
-    } while (0)
+    napi_throw(env, UtilNapiError::CreateBusinessError(env, code, msg))
 
 #define THROWERR_API9(env, code, param1, param2) \
     do { \
@@ -73,8 +65,11 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
             } \
         } \
     } while (0)
+
 namespace UtilNapiError {
 bool GetApiError(int32_t code, NapiError& codeMsg);
+napi_value CreateBusinessError(napi_env env, int32_t code, std::string msg);
+napi_value CreateBusinessError(napi_env env, int32_t code);
 } // namespace UtilNapiError
 } // namespace MMI
 } // namespace OHOS

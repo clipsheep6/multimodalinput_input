@@ -54,6 +54,9 @@ public:
     int32_t GetPointerSpeed(int32_t &speed);
     int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle);
     int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle);
+    int32_t SetPointerSize(int32_t size);
+    int32_t GetPointerSize(int32_t& size);
+    int32_t SetPointerImages(const std::map<int32_t, std::string>& images);
     int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke);
     int32_t GetDeviceIds(std::vector<int32_t> &ids);
     int32_t GetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice);

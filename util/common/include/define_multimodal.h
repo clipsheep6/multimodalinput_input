@@ -227,6 +227,14 @@ inline constexpr int32_t INVALID_PID { -1 };
 #define DEFRET_1(data, value, ...) (value)
 #define DEFRET(...) DEFRET_1(__VA_ARGS__, false)
 
+#define WRITEDESCRIPTOR(parcel, ...) \
+    do { \
+        if (!(parcel).WriteInterfaceToken(GetDescriptor())) { \
+            MMI_HILOGE("Failed to write descriptor"); \
+            return DEFRET(false, ##__VA_ARGS__); \
+        } \
+    } while (0)
+
 #define WRITEBOOL(parcel, data, ...) \
     do { \
         if (!(parcel).WriteBool(data)) { \

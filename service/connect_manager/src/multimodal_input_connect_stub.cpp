@@ -91,6 +91,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         {IMultimodalInputConnect::APPEND_EXTRA_DATA, &MultimodalInputConnectStub::StubAppendExtraData},
         {IMultimodalInputConnect::ENABLE_INPUT_DEVICE, &MultimodalInputConnectStub::StubEnableInputDevice},
         {IMultimodalInputConnect::SET_KEY_DOWN_DURATION, &MultimodalInputConnectStub::StubSetKeyDownDuration},
+        {IMultimodalInputConnect::SET_POINTER_SIZE, &MultimodalInputConnectStub::StubSetPointerSize},
+        {IMultimodalInputConnect::GET_POINTER_SIZE, &MultimodalInputConnectStub::StubGetPointerSize},
+        {IMultimodalInputConnect::SET_POINTER_IMAGES, &MultimodalInputConnectStub::StubSetPointerImages},
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -444,6 +447,65 @@ int32_t MultimodalInputConnectStub::StubGetPointerStyle(MessageParcel& data, Mes
     WRITEUINT8(reply, pointerStyle.color.b, RET_ERR);
     WRITEINT32(reply, pointerStyle.id, RET_ERR);
     MMI_HILOGD("Successfully get window:%{public}d, icon:%{public}d", windowId, pointerStyle.id);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetPointerSize(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    int32_t size;
+    READINT32(data, size, ERR_INVALID_VALUE);
+    int32_t ret = SetPointerSize(size);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set pointer size failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetPointerSize(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    int32_t size;
+    int32_t ret = GetPointerSize(size);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call get pointer size failed ret:%{public}d", ret);
+        return ret;
+    }
+    WRITEINT32(reply, size, IPC_STUB_WRITE_PARCEL_ERR);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetPointerImages(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    int32_t size;
+    READINT32(data, size, ERR_INVALID_VALUE);
+    std::map<int32_t, std::string> images;
+    for (int32_t i = 0; i < size; i++) {
+        int32_t id;
+        std::string path;
+        READINT32(data, id, ERR_INVALID_VALUE);
+        READSTRING(data, path, ERR_INVALID_VALUE);
+        images.insert_or_assign(id, std::move(path));
+    }
+    int32_t ret = SetPointerImages(images);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call set pointer images ret:%{public}d", ret);
+        return ret;
+    }
     return RET_OK;
 }
 

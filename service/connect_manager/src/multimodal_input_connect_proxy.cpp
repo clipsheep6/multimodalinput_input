@@ -465,6 +465,64 @@ int32_t MultimodalInputConnectProxy::GetPointerStyle(int32_t windowId, PointerSt
     return RET_OK;
 }
 
+int32_t MultimodalInputConnectProxy::SetPointerSize(int32_t size)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    WRITEDESCRIPTOR(data, RET_ERR);
+    WRITEINT32(data, size, ERR_INVALID_VALUE);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(SET_POINTER_SIZE, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::GetPointerSize(int32_t& size)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    WRITEDESCRIPTOR(data, RET_ERR);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(GET_POINTER_SIZE, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return ret;
+    }
+    READINT32(reply, size, IPC_PROXY_DEAD_OBJECT_ERR);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::SetPointerImages(const std::map<int32_t, std::string>& images)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    WRITEDESCRIPTOR(data, RET_ERR);
+    WRITEINT32(data, static_cast<int32_t>(images.size()), ERR_INVALID_VALUE);
+    for (auto&& entry: images) {
+        WRITEINT32(data, entry.first, ERR_INVALID_VALUE);
+        WRITESTRING(data, entry.second, ERR_INVALID_VALUE);
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(SET_POINTER_IMAGES, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
 int32_t MultimodalInputConnectProxy::RegisterDevListener()
 {
     MessageParcel data;

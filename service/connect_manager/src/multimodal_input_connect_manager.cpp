@@ -200,6 +200,24 @@ int32_t MultimodalInputConnectManager::GetPointerStyle(int32_t windowId, Pointer
     return multimodalInputConnectService_->GetPointerStyle(windowId, pointerStyle);
 }
 
+int32_t MultimodalInputConnectManager::SetPointerSize(int32_t size)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->SetPointerSize(size);
+}
+
+int32_t MultimodalInputConnectManager::GetPointerSize(int32_t& size)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->GetPointerSize(size);
+}
+
+int32_t MultimodalInputConnectManager::SetPointerImages(const std::map<int32_t, std::string>& images)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->SetPointerImages(images);
+}
+
 int32_t MultimodalInputConnectManager::RegisterDevListener()
 {
     CHKPR(multimodalInputConnectService_, RET_ERR);

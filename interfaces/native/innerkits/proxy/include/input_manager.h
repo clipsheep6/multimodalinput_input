@@ -19,6 +19,7 @@
 #include <list>
 #include <map>
 #include <memory>
+#include <string>
 
 #include "event_handler.h"
 #include "nocopyable.h"
@@ -370,6 +371,10 @@ public:
      * @since 9
      */
     int32_t GetPointerSpeed(int32_t &speed);
+
+    int32_t SetPointerSize(int32_t size);
+    int32_t GetPointerSize(int32_t& size);
+    int32_t SetPointerImages(const std::map<int32_t, std::string>& images);
 
     /**
      * @brief Queries the keyboard type.
