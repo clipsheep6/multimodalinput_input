@@ -157,7 +157,7 @@ private:
     int32_t lastLogicY_ { -1 };
     WindowInfo lastWindowInfo_;
     std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
-    std::map<int32_t, std::map<int32_t, PointerStyle>> pointerStyle_;
+    std::map<int32_t, PointerStyle> pointerStyle_;
     WindowInfo mouseDownInfo_;
     PointerStyle globalStyle_;
 #endif // OHOS_BUILD_ENABLE_POINTER

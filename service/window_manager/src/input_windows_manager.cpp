@@ -716,14 +716,14 @@ bool InputWindowsManager::IsNeedRefreshLayer(int32_t windowId)
 void InputWindowsManager::OnSessionLost(SessionPtr session)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(session);
-    int32_t pid = session->GetPid();
+    // CHKPV(session);
+    // int32_t pid = session->GetPid();
 
-    auto it = pointerStyle_.find(pid);
-    if (it != pointerStyle_.end()) {
-        pointerStyle_.erase(it);
-        MMI_HILOGD("Clear the pointer style map, pd:%{public}d", pid);
-    }
+    // auto it = pointerStyle_.find(pid);
+    // if (it != pointerStyle_.end()) {
+    //     pointerStyle_.erase(it);
+    //     MMI_HILOGD("Clear the pointer style map, pd:%{public}d", pid);
+    // }
 }
 
 int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle)
@@ -734,20 +734,23 @@ int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, Poin
         MMI_HILOGD("Setting global pointer style");
         return RET_OK;
     }
-    auto it = pointerStyle_.find(pid);
-    if (it == pointerStyle_.end()) {
-        MMI_HILOGE("The pointer style map is not include param pd:%{public}d", pid);
-        return COMMON_PARAMETER_ERROR;
-    }
-    auto iter = it->second.find(windowId);
-    if (iter != it->second.end()) {
+    // auto it = pointerStyle_.find(pid);
+    // if (it == pointerStyle_.end()) {
+    //     MMI_HILOGE("The pointer style map is not include param pd:%{public}d", pid);
+    //     return COMMON_PARAMETER_ERROR;
+    // }
+    auto iter = pointerStyle_.find(windowId);
+
+    // auto iter = it->second.find(windowId);
+    // if (iter != it->second.end()) {
+    if (iter != pointerStyle_.end()) {
         iter->second = pointerStyle;
         return RET_OK;
     }
     for (const auto& windowInfo : displayGroupInfo_.windowsInfo) {
-        if (windowId == windowInfo.id && pid == windowInfo.pid) {
-            auto iterator = it->second.insert(std::make_pair(windowId, pointerStyle));
-            if (!iterator.second) {
+        if (windowId == windowInfo.id) {
+            auto iter = pointerStyle_.insert(std::make_pair(windowId, pointerStyle));
+            if (!iter.second) {
                 MMI_HILOGW("The window type is duplicated");
             }
             return RET_OK;
@@ -765,13 +768,13 @@ int32_t InputWindowsManager::GetPointerStyle(int32_t pid, int32_t windowId, Poin
         pointerStyle.id = globalStyle_.id;
         return RET_OK;
     }
-    auto it = pointerStyle_.find(pid);
-    if (it == pointerStyle_.end()) {
-        MMI_HILOGE("The pointer style map is not include param pd, %{public}d", pid);
-        return RET_ERR;
-    }
-    auto iter = it->second.find(windowId);
-    if (iter == it->second.end()) {
+    auto iter = pointerStyle_.find(windowId);
+    if (iter == pointerStyle_.end()) {
+    //     MMI_HILOGE("The pointer style map is not include param pd, %{public}d", pid);
+    //     return RET_ERR;
+    // }
+    // auto iter = it->second.find(windowId);
+    // if (iter == it->second.end()) {
         pointerStyle.id = globalStyle_.id;
         return RET_OK;
     }
@@ -787,11 +790,12 @@ void InputWindowsManager::UpdatePointerStyle()
     PointerStyle pointerStyle;
     pointerStyle.id = DEFAULT_POINTER_STYLE;
     for (const auto& windowItem : displayGroupInfo_.windowsInfo) {
-        int32_t pid = windowItem.pid;
-        auto it = pointerStyle_.find(pid);
+        auto it = pointerStyle_.find(windowItem.agentWindowId);
+        // int32_t pid = windowItem.pid;
+        // auto it = pointerStyle_.find(pid);
         if (it == pointerStyle_.end()) {
-            std::map<int32_t, PointerStyle> tmpPointerStyle = {};
-            auto iter = pointerStyle_.insert(std::make_pair(pid, tmpPointerStyle));
+            // std::map<int32_t, PointerStyle> tmpPointerStyle = {};
+            auto iter = pointerStyle_.insert(std::make_pair(windowItem.agentWindowId, PointerStyle{}));
             if (!iter.second) {
                 MMI_HILOGW("The pd is duplicated");
             }
