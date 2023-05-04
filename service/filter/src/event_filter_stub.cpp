@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,10 +27,10 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventFilterStub" };
-}  // namespace
+} // namespace
 
-int32_t EventFilterStub::OnRemoteRequest(
-    uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option)
+int32_t EventFilterStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
+    MessageOption &option)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("code:%{public}d", code);
@@ -55,7 +55,7 @@ int32_t EventFilterStub::OnRemoteRequest(
     }
 }
 
-int32_t EventFilterStub::StubHandleKeyEvent(MessageParcel& data, MessageParcel& reply)
+int32_t EventFilterStub::StubHandleKeyEvent(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<KeyEvent> event = KeyEvent::Create();
@@ -74,7 +74,7 @@ int32_t EventFilterStub::StubHandleKeyEvent(MessageParcel& data, MessageParcel& 
     return RET_OK;
 }
 
-int32_t EventFilterStub::StubHandlePointerEvent(MessageParcel& data, MessageParcel& reply)
+int32_t EventFilterStub::StubHandlePointerEvent(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<PointerEvent> event = PointerEvent::Create();

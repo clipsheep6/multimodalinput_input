@@ -1,0 +1,29 @@
+diff a/service/connect_manager/src/multimodal_input_connect_def_parcel.cpp b/service/connect_manager/src/multimodal_input_connect_def_parcel.cpp	(rejected hunks)
+@@ -4,7 +4,7 @@
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+  *
+- *     http://www.apache.org/licenses/LICENSE-2.0
++ * http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+@@ -22,15 +22,15 @@ namespace MMI {
+ namespace {
+ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectDefParcel" };
+ } // namespace
+-bool ConnectReqParcel::Marshalling(Parcel& out) const
++bool ConnectReqParcel::Marshalling(Parcel &out) const
+ {
+     WRITEINT32(out, data.moduleId);
+     return out.WriteString(data.clientName);
+ }
+ 
+-ConnectReqParcel *ConnectReqParcel::Unmarshalling(Parcel& in)
++ConnectReqParcel *ConnectReqParcel::Unmarshalling(Parcel &in)
+ {
+-    auto* request = new (std::nothrow) ConnectReqParcel();
++    auto *request = new (std::nothrow) ConnectReqParcel();
+     if (request == nullptr) {
+         return nullptr;
+     }

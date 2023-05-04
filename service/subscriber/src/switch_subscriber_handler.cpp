@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -120,8 +120,8 @@ void SwitchSubscriberHandler::InsertSubScriber(std::shared_ptr<Subscriber> subs)
     CHKPV(subs);
     for (auto it = subscribers_.begin(); it != subscribers_.end(); ++it) {
         if (subs->sess_ != nullptr && (*it)->id_ == subs->id_ && (*it)->sess_ == subs->sess_) {
-            MMI_HILOGW("Repeat registration id:%{public}d desc:%{public}s",
-                subs->id_, subs->sess_->GetDescript().c_str());
+            MMI_HILOGW("Repeat registration id:%{public}d desc:%{public}s", subs->id_,
+                subs->sess_->GetDescript().c_str());
             return;
         }
     }
@@ -142,7 +142,7 @@ void SwitchSubscriberHandler::OnSessionDelete(SessionPtr sess)
 }
 
 void SwitchSubscriberHandler::NotifySubscriber(std::shared_ptr<SwitchEvent> switchEvent,
-                                               const std::shared_ptr<Subscriber> &subscriber)
+    const std::shared_ptr<Subscriber> &subscriber)
 {
     CALL_DEBUG_ENTER;
     CHKPV(switchEvent);
@@ -152,7 +152,7 @@ void SwitchSubscriberHandler::NotifySubscriber(std::shared_ptr<SwitchEvent> swit
     NetPacket pkt(MmiMessageId::ON_SUBSCRIBE_SWITCH);
     InputEventDataTransformation::SwitchEventToNetPacket(switchEvent, pkt);
     if (subscriber->sess_ == nullptr) {
-        MMI_HILOGE("subscriber's sess is null"); 
+        MMI_HILOGE("subscriber's sess is null");
         return;
     }
     int32_t fd = subscriber->sess_->GetFd();
@@ -192,8 +192,8 @@ void SwitchSubscriberHandler::Dump(int32_t fd, const std::vector<std::string> &a
         CHKPV(subscriber);
         SessionPtr session = item->sess_;
         CHKPV(session);
-        mprintf(fd, "subscriber id:%d | Pid:%d | Uid:%d | Fd:%d\t",
-                subscriber->id_, session->GetPid(), session->GetUid(), session->GetFd());
+        mprintf(fd, "subscriber id:%d | Pid:%d | Uid:%d | Fd:%d\t", subscriber->id_, session->GetPid(),
+            session->GetUid(), session->GetFd());
     }
 }
 } // namespace MMI

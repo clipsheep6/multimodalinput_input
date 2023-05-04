@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -36,9 +36,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Multi
 std::shared_ptr<MultimodalInputConnectManager> MultimodalInputConnectManager::GetInstance()
 {
     static std::once_flag flag;
-    std::call_once(flag, [&]() {
-        g_instance.reset(new (std::nothrow) MultimodalInputConnectManager());
-    });
+    std::call_once(flag, [&]() { g_instance.reset(new (std::nothrow) MultimodalInputConnectManager()); });
 
     CHKPP(g_instance);
     if (g_instance != nullptr) {
@@ -90,7 +88,7 @@ int32_t MultimodalInputConnectManager::SetDisplayBind(int32_t deviceId, int32_t 
         MMI_HILOGE("The multimodalInputConnectService_ is nullptr");
         return RET_ERR;
     }
-    return multimodalInputConnectService_->SetDisplayBind(deviceId, displayId, msg);    
+    return multimodalInputConnectService_->SetDisplayBind(deviceId, displayId, msg);
 }
 
 int32_t MultimodalInputConnectManager::GetWindowPid(int32_t windowId)
@@ -103,8 +101,8 @@ int32_t MultimodalInputConnectManager::GetWindowPid(int32_t windowId)
     return multimodalInputConnectService_->GetWindowPid(windowId);
 }
 
-int32_t MultimodalInputConnectManager::AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority,
-    uint32_t deviceTags)
+int32_t MultimodalInputConnectManager::AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId,
+    int32_t priority, uint32_t deviceTags)
 {
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ == nullptr) {
@@ -121,7 +119,7 @@ int32_t MultimodalInputConnectManager::RemoveInputEventFilter(int32_t filterId)
         MMI_HILOGE("The multimodalInputConnectService_ is nullptr");
         return RET_ERR;
     }
-    return multimodalInputConnectService_->RemoveInputEventFilter(filterId);    
+    return multimodalInputConnectService_->RemoveInputEventFilter(filterId);
 }
 
 int32_t MultimodalInputConnectManager::SetMousePrimaryButton(int32_t primaryButton)
@@ -393,7 +391,7 @@ int32_t MultimodalInputConnectManager::SetMouseCaptureMode(int32_t windowId, boo
     return multimodalInputConnectService_->SetMouseCaptureMode(windowId, isCaptureMode);
 }
 
-int32_t MultimodalInputConnectManager::AppendExtraData(const ExtraData& extraData)
+int32_t MultimodalInputConnectManager::AppendExtraData(const ExtraData &extraData)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->AppendExtraData(extraData);

@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,42 +24,42 @@ namespace OHOS {
 namespace MMI {
 class AxisEvent : public InputEvent {
 public:
-    /**
+    /* *
      * Unknown action for the axis input event. It is usually used as initial value.
      *
      * @since 9
      */
     static constexpr int32_t AXIS_ACTION_UNKNOWN = 0;
 
-    /**
+    /* *
      * Cancel action for the axis input event.
      *
      * @since 9
      */
     static constexpr int32_t AXIS_ACTION_CANCEL = 1;
 
-    /**
+    /* *
      * Start action for the axis input event.
      *
      * @since 9
      */
     static constexpr int32_t AXIS_ACTION_START = 2;
 
-    /**
+    /* *
      * Update action for the axis input event.
      *
      * @since 9
      */
     static constexpr int32_t AXIS_ACTION_UPDATE = 3;
 
-    /**
+    /* *
      * End action for the axis input event.
      *
      * @since 9
      */
     static constexpr int32_t AXIS_ACTION_END = 4;
 
-    /**
+    /* *
      * Unknown axis type. It is the initial value of axis type.
      *
      * @since 9
@@ -74,14 +74,14 @@ public:
     DISALLOW_COPY_AND_MOVE(AxisEvent);
     virtual ~AxisEvent();
 
-    /**
+    /* *
      * @brief Obtains the action for the axis input event.
      * @return Returns the action for the axis input event.
      * @since 9
      */
     int32_t GetAxisAction();
 
-    /**
+    /* *
      * @brief Sets the action for the axis input event.
      * @param axisAction Indicates the action for the axis input event.
      * @return void
@@ -89,14 +89,14 @@ public:
      */
     void SetAxisAction(int32_t axisAction);
 
-    /**
+    /* *
      * @brief Obtains the type of the axis input event.
      * @return Returns the type of the axis input event.
      * @since 9
      */
     int32_t GetAxisType() const;
 
-    /**
+    /* *
      * @brief Sets the type of the axis input event.
      * @param axisType Indicates the type of the axis input event.
      * @return void
@@ -104,14 +104,14 @@ public:
      */
     void SetAxisType(int32_t axisType);
 
-    /**
+    /* *
      * @brief Obtains the value of the axis input event.
      * @return Returns the value of the axis input event.
      * @since 9
      */
     int32_t GetAxisValue() const;
 
-    /**
+    /* *
      * @brief Sets the value of the axis input event.
      * @param axisValue Value of the axis input event.
      * @return void
@@ -120,7 +120,7 @@ public:
     void SetAxisValue(int32_t axisValue);
 
 protected:
-    /**
+    /* *
      * @brief Constructs an input event object by using the specified input event type. Generally, this method
      * is used to construct a base class object when constructing a derived class object.
      * @since 9

@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,23 +30,26 @@ namespace OHOS {
 namespace MMI {
 class KeyAutoRepeat final {
     DECLARE_DELAYED_SINGLETON(KeyAutoRepeat);
+
 public:
     DISALLOW_COPY_AND_MOVE(KeyAutoRepeat);
     int32_t AddDeviceConfig(struct libinput_device *device);
-    void SelectAutoRepeat(std::shared_ptr<KeyEvent>& keyEvent);
+    void SelectAutoRepeat(std::shared_ptr<KeyEvent> &keyEvent);
     void AddHandleTimer(int32_t timeout);
     void RemoveDeviceConfig(struct libinput_device *device);
     int32_t GetIntervalTime(int32_t deviceId) const;
     std::map<int32_t, DeviceConfig> GetDeviceConfig() const;
     void RemoveTimer();
+
 private:
     std::string GetTomlFilePath(const std::string &fileName) const;
     DeviceConfig GetAutoSwitch(int32_t deviceId);
+
 private:
     std::map<int32_t, DeviceConfig> deviceConfig_;
-    int32_t timerId_ { -1 };
-    int32_t repeatKeyCode_ { -1 };
-    std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
+    int32_t timerId_{ -1 };
+    int32_t repeatKeyCode_{ -1 };
+    std::shared_ptr<KeyEvent> keyEvent_{ nullptr };
 };
 
 #define KeyRepeat ::OHOS::DelayedSingleton<KeyAutoRepeat>::GetInstance()

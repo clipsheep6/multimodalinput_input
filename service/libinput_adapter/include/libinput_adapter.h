@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,8 +34,8 @@ public:
     LibinputAdapter() = default;
     DISALLOW_COPY_AND_MOVE(LibinputAdapter);
     ~LibinputAdapter() = default;
-    bool Init(FunInputEvent funInputEvent, const std::string& seat_id = "seat0");
-    void EventDispatch(struct epoll_event& ev);
+    bool Init(FunInputEvent funInputEvent, const std::string &seat_id = "seat0");
+    void EventDispatch(struct epoll_event &ev);
     void Stop();
     void ProcessPendingEvents();
     void ReloadDevice();
@@ -50,9 +50,9 @@ protected:
     void OnEventHandler();
 
 protected:
-    int32_t fd_ { -1 };
-    udev *udev_ { nullptr };
-    libinput *input_ { nullptr };
+    int32_t fd_{ -1 };
+    udev *udev_{ nullptr };
+    libinput *input_{ nullptr };
 
     FunInputEvent funInputEvent_;
     std::string seat_id_;

@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,9 +35,10 @@ private:
     int32_t GetTouchPadToolType(struct libinput_event_touch *data, struct libinput_device *device);
     int32_t GetTouchPadToolType(struct libinput_device *device);
     void InitToolType();
+
 private:
-    const int32_t deviceId_ { -1 };
-    std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
+    const int32_t deviceId_{ -1 };
+    std::shared_ptr<PointerEvent> pointerEvent_{ nullptr };
     std::vector<std::pair<int32_t, int32_t>> vecToolType_;
 };
 } // namespace MMI

@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -50,12 +50,12 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     const MOUSE_ICON mouseStyle)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("Display:%{public}d,physicalX:%{public}d,physicalY:%{public}d,mouseStyle:%{public}d",
-        displayId, physicalX, physicalY, mouseStyle);
+    MMI_HILOGD("Display:%{public}d,physicalX:%{public}d,physicalY:%{public}d,mouseStyle:%{public}d", displayId,
+        physicalX, physicalY, mouseStyle);
     FixCursorPosition(physicalX, physicalY);
     lastPhysicalX_ = physicalX;
     lastPhysicalY_ = physicalY;
-    
+
     AdjustMouseFocus(ICON_TYPE(mouseIcons_[mouseStyle].alignmentWay), physicalX, physicalY);
     if (pointerWindow_ != nullptr) {
         pointerWindow_->MoveTo(physicalX + displayInfo_.x, physicalY + displayInfo_.y);
@@ -71,11 +71,11 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
             return;
         }
         UpdatePointerVisible();
-        MMI_HILOGD("Leave, display:%{public}d,physicalX:%{public}d,physicalY:%{public}d",
-            displayId, physicalX, physicalY);
+        MMI_HILOGD("Leave, display:%{public}d,physicalX:%{public}d,physicalY:%{public}d", displayId, physicalX,
+            physicalY);
         return;
     }
-    
+
     CreatePointerWindow(displayId, physicalX, physicalY);
     CHKPV(pointerWindow_);
     int32_t ret = InitLayer(mouseStyle);
@@ -84,8 +84,7 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
         return;
     }
     UpdatePointerVisible();
-    MMI_HILOGD("Leave, display:%{public}d,physicalX:%{public}d,physicalY:%{public}d",
-        displayId, physicalX, physicalY);
+    MMI_HILOGD("Leave, display:%{public}d,physicalX:%{public}d,physicalY:%{public}d", displayId, physicalX, physicalY);
 }
 
 int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
@@ -168,7 +167,7 @@ bool PointerDrawingManager::GetMouseDisplayState() const
 {
     return mouseDisplayState_;
 }
-    
+
 void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physicalY)
 {
     if (physicalX < 0) {
@@ -256,7 +255,7 @@ void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t heigh
 {
     CALL_DEBUG_ENTER;
     OHOS::Rosen::Drawing::Bitmap bitmap;
-    OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
+    OHOS::Rosen::Drawing::BitmapFormat format{ OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
         OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE };
     bitmap.Build(width, height, format);
     OHOS::Rosen::Drawing::Canvas canvas;
@@ -272,7 +271,7 @@ void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t heigh
     }
 }
 
-void PointerDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas, const std::string& iconPath)
+void PointerDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas, const std::string &iconPath)
 {
     CALL_DEBUG_ENTER;
     std::unique_ptr<OHOS::Media::PixelMap> pixelmap = DecodeImageToPixelMap(iconPath);
@@ -311,7 +310,7 @@ std::unique_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixel
     return pixelMap;
 }
 
-void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
+void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo &displayInfo)
 {
     CALL_DEBUG_ENTER;
     hasDisplay_ = true;
@@ -322,10 +321,10 @@ void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
     IMAGE_HEIGHT = (imageHeight_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
 }
 
-void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo& displayGroupInfo)
+void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
 {
     CALL_DEBUG_ENTER;
-    for (const auto& item : displayGroupInfo.displaysInfo) {
+    for (const auto &item : displayGroupInfo.displaysInfo) {
         if (item.id == displayInfo_.id) {
             UpdateDisplayInfo(item);
             DrawManager();
@@ -341,8 +340,8 @@ void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo& displayGroupIn
         pointerWindow_ = nullptr;
         MMI_HILOGD("Pointer window destroy success");
     }
-    MMI_HILOGD("displayId_:%{public}d, displayWidth_:%{public}d, displayHeight_:%{public}d",
-        displayInfo_.id, displayInfo_.width, displayInfo_.height);
+    MMI_HILOGD("displayId_:%{public}d, displayWidth_:%{public}d, displayHeight_:%{public}d", displayInfo_.id,
+        displayInfo_.width, displayInfo_.height);
 }
 
 void PointerDrawingManager::OnWindowInfo(const WinInfo &info)
@@ -459,7 +458,10 @@ int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
             break;
         }
     }
-    PidInfo info = { .pid = pid, .visible = visible };
+    PidInfo info = {
+        .pid = pid,
+        .visible = visible
+    };
     pidInfos_.push_back(info);
     if (visible) {
         InitLayer(MOUSE_ICON(lastMouseStyle_.id));
@@ -502,8 +504,8 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, Po
     }
 
     if (!WinMgr->IsNeedRefreshLayer(windowId)) {
-        MMI_HILOGD("Not need refresh layer, window type:%{public}d, pointer style:%{public}d",
-            windowId, pointerStyle.id);
+        MMI_HILOGD("Not need refresh layer, window type:%{public}d, pointer style:%{public}d", windowId,
+            pointerStyle.id);
         return RET_OK;
     }
 
@@ -564,46 +566,46 @@ void PointerDrawingManager::InitStyle()
 {
     CALL_DEBUG_ENTER;
     mouseIcons_ = {
-        {DEFAULT, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Default.svg"}},
-        {EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "East.svg"}},
-        {WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "West.svg"}},
-        {SOUTH, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "South.svg"}},
-        {NORTH, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "North.svg"}},
-        {WEST_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "West_East.svg"}},
-        {NORTH_SOUTH, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "North_South.svg"}},
-        {NORTH_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "North_East.svg"}},
-        {NORTH_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "North_West.svg"}},
-        {SOUTH_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "South_East.svg"}},
-        {SOUTH_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "South_West.svg"}},
-        {NORTH_EAST_SOUTH_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "North_East_South_West.svg"}},
-        {NORTH_WEST_SOUTH_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "North_West_South_East.svg"}},
-        {CROSS, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Cross.svg"}},
-        {CURSOR_COPY, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Copy.svg"}},
-        {CURSOR_FORBID, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Forbid.svg"}},
-        {COLOR_SUCKER, {ANGLE_SW, IMAGE_POINTER_DEFAULT_PATH + "Colorsucker.svg"}},
-        {HAND_GRABBING, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Hand_Grabbing.svg"}},
-        {HAND_OPEN, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Hand_Open.svg"}},
-        {HAND_POINTING, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Hand_Pointing.svg"}},
-        {HELP, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Help.svg"}},
-        {CURSOR_MOVE, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Move.svg"}},
-        {RESIZE_LEFT_RIGHT, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Resize_Left_Right.svg"}},
-        {RESIZE_UP_DOWN, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Resize_Up_Down.svg"}},
-        {SCREENSHOT_CHOOSE, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Screenshot_Cross.svg"}},
-        {SCREENSHOT_CURSOR, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Screenshot_Cursor.svg"}},
-        {TEXT_CURSOR, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Text_Cursor.svg"}},
-        {ZOOM_IN, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Zoom_In.svg"}},
-        {ZOOM_OUT, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Zoom_Out.svg"}},
-        {MIDDLE_BTN_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MID_Btn_East.svg"}},
-        {MIDDLE_BTN_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MID_Btn_West.svg"}},
-        {MIDDLE_BTN_SOUTH, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MID_Btn_South.svg"}},
-        {MIDDLE_BTN_NORTH, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MID_Btn_North.svg"}},
-        {MIDDLE_BTN_NORTH_SOUTH, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MID_Btn_North_South.svg"}},
-        {MIDDLE_BTN_NORTH_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MID_Btn_North_East.svg"}},
-        {MIDDLE_BTN_NORTH_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MID_Btn_North_West.svg"}},
-        {MIDDLE_BTN_SOUTH_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MID_Btn_South_East.svg"}},
-        {MIDDLE_BTN_SOUTH_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MID_Btn_South_West.svg"}},
-        {MIDDLE_BTN_NORTH_SOUTH_WEST_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH +
-            "MID_Btn_North_South_West_East.svg"}},
+        { DEFAULT, { ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Default.svg" } },
+        { EAST, { ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "East.svg" } },
+        { WEST, { ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "West.svg" } },
+        { SOUTH, { ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "South.svg" } },
+        { NORTH, { ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "North.svg" } },
+        { WEST_EAST, { ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "West_East.svg" } },
+        { NORTH_SOUTH, { ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "North_South.svg" } },
+        { NORTH_EAST, { ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "North_East.svg" } },
+        { NORTH_WEST, { ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "North_West.svg" } },
+        { SOUTH_EAST, { ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "South_East.svg" } },
+        { SOUTH_WEST, { ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "South_West.svg" } },
+        { NORTH_EAST_SOUTH_WEST, { ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "North_East_South_West.svg" } },
+        { NORTH_WEST_SOUTH_EAST, { ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "North_West_South_East.svg" } },
+        { CROSS, { ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Cross.svg" } },
+        { CURSOR_COPY, { ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Copy.svg" } },
+        { CURSOR_FORBID, { ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Forbid.svg" } },
+        { COLOR_SUCKER, { ANGLE_SW, IMAGE_POINTER_DEFAULT_PATH + "Colorsucker.svg" } },
+        { HAND_GRABBING, { ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Hand_Grabbing.svg" } },
+        { HAND_OPEN, { ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Hand_Open.svg" } },
+        { HAND_POINTING, { ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Hand_Pointing.svg" } },
+        { HELP, { ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Help.svg" } },
+        { CURSOR_MOVE, { ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Move.svg" } },
+        { RESIZE_LEFT_RIGHT, { ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Resize_Left_Right.svg" } },
+        { RESIZE_UP_DOWN, { ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Resize_Up_Down.svg" } },
+        { SCREENSHOT_CHOOSE, { ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Screenshot_Cross.svg" } },
+        { SCREENSHOT_CURSOR, { ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Screenshot_Cursor.svg" } },
+        { TEXT_CURSOR, { ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Text_Cursor.svg" } },
+        { ZOOM_IN, { ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Zoom_In.svg" } },
+        { ZOOM_OUT, { ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Zoom_Out.svg" } },
+        { MIDDLE_BTN_EAST, { ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MID_Btn_East.svg" } },
+        { MIDDLE_BTN_WEST, { ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MID_Btn_West.svg" } },
+        { MIDDLE_BTN_SOUTH, { ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MID_Btn_South.svg" } },
+        { MIDDLE_BTN_NORTH, { ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MID_Btn_North.svg" } },
+        { MIDDLE_BTN_NORTH_SOUTH, { ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MID_Btn_North_South.svg" } },
+        { MIDDLE_BTN_NORTH_EAST, { ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MID_Btn_North_East.svg" } },
+        { MIDDLE_BTN_NORTH_WEST, { ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MID_Btn_North_West.svg" } },
+        { MIDDLE_BTN_SOUTH_EAST, { ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MID_Btn_South_East.svg" } },
+        { MIDDLE_BTN_SOUTH_WEST, { ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MID_Btn_South_West.svg" } },
+        { MIDDLE_BTN_NORTH_SOUTH_WEST_EAST,
+        { ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MID_Btn_North_South_West_East.svg" } },
     };
     for (auto iter = mouseIcons_.begin(); iter != mouseIcons_.end();) {
         if ((ReadCursorStyleFile(iter->second.iconPath)) != RET_OK) {

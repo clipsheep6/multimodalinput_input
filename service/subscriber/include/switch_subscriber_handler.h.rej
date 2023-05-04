@@ -1,0 +1,51 @@
+diff a/service/subscriber/include/switch_subscriber_handler.h b/service/subscriber/include/switch_subscriber_handler.h	(rejected hunks)
+@@ -4,7 +4,7 @@
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+  *
+- *     http://www.apache.org/licenses/LICENSE-2.0
++ * http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+@@ -52,29 +52,28 @@ public:
+     int32_t SubscribeSwitchEvent(SessionPtr sess, int32_t subscribeId);
+     int32_t UnsubscribeSwitchEvent(SessionPtr sess, int32_t subscribeId);
+     void Dump(int32_t fd, const std::vector<std::string> &args);
++
+ private:
+     struct Subscriber {
+-        Subscriber(int32_t id, SessionPtr sess)
+-            : id_(id), sess_(sess), timerId_(-1) {}
+-        int32_t id_ { -1 };
+-        SessionPtr sess_ { nullptr };
+-        int32_t timerId_ { -1 };
+-        std::shared_ptr<SwitchEvent> switchEvent_ { nullptr };
++        Subscriber(int32_t id, SessionPtr sess) : id_(id), sess_(sess), timerId_(-1) {}
++        int32_t id_{ -1 };
++        SessionPtr sess_{ nullptr };
++        int32_t timerId_{ -1 };
++        std::shared_ptr<SwitchEvent> switchEvent_{ nullptr };
+     };
+     void InsertSubScriber(std::shared_ptr<Subscriber> subs);
+ 
+ private:
+     bool OnSubscribeSwitchEvent(std::shared_ptr<SwitchEvent> keyEvent);
+-    void NotifySubscriber(std::shared_ptr<SwitchEvent> keyEvent,
+-        const std::shared_ptr<Subscriber> &subscriber);
++    void NotifySubscriber(std::shared_ptr<SwitchEvent> keyEvent, const std::shared_ptr<Subscriber> &subscriber);
+     void OnSessionDelete(SessionPtr sess);
+     bool InitSessionDeleteCallback();
+ 
+ private:
+-    std::list<std::shared_ptr<Subscriber>> subscribers_ {};
+-    std::atomic_bool callbackInitialized_ { false };
+-    std::shared_ptr<SwitchEvent> switchEvent_ { nullptr };
++    std::list<std::shared_ptr<Subscriber>> subscribers_{};
++    std::atomic_bool callbackInitialized_{ false };
++    std::shared_ptr<SwitchEvent> switchEvent_{ nullptr };
+ };
+ } // namespace MMI
+ } // namespace OHOS
+-#endif  // SWITCH_SUBSCRIBER_HANDLER_H
++#endif // SWITCH_SUBSCRIBER_HANDLER_H

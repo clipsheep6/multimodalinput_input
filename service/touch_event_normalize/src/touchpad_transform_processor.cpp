@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,13 +26,12 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MMI_LOG_DOMAIN, "TouchPadTransformProcessor" };
-constexpr int32_t MT_TOOL_NONE { -1 };
-constexpr int32_t BTN_DOWN { 1 };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL{ LOG_CORE, MMI_LOG_DOMAIN, "TouchPadTransformProcessor" };
+constexpr int32_t MT_TOOL_NONE{ -1 };
+constexpr int32_t BTN_DOWN{ 1 };
 } // namespace
 
-TouchPadTransformProcessor::TouchPadTransformProcessor(int32_t deviceId)
-    : deviceId_(deviceId)
+TouchPadTransformProcessor::TouchPadTransformProcessor(int32_t deviceId) : deviceId_(deviceId)
 {
     InitToolType();
 }
@@ -98,8 +97,8 @@ void TouchPadTransformProcessor::OnEventTouchPadMotion(struct libinput_event *ev
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     PointerEvent::PointerItem item;
     if (!pointerEvent_->GetPointerItem(seatSlot, item)) {
-        MMI_HILOGE("Can't find the pointer item data, seatSlot:%{public}d, errCode:%{public}d",
-                   seatSlot, PARAM_INPUT_FAIL);
+        MMI_HILOGE("Can't find the pointer item data, seatSlot:%{public}d, errCode:%{public}d", seatSlot,
+            PARAM_INPUT_FAIL);
         return;
     }
     int32_t longAxis = libinput_event_touchpad_get_touch_contact_long_axis(touchpad);
@@ -139,8 +138,8 @@ void TouchPadTransformProcessor::OnEventTouchPadUp(struct libinput_event *event)
 
     PointerEvent::PointerItem item;
     if (!pointerEvent_->GetPointerItem(seatSlot, item)) {
-        MMI_HILOGE("Can't find the pointer item data, seatSlot:%{public}d, errCode:%{public}d",
-                   seatSlot, PARAM_INPUT_FAIL);
+        MMI_HILOGE("Can't find the pointer item data, seatSlot:%{public}d, errCode:%{public}d", seatSlot,
+            PARAM_INPUT_FAIL);
         return;
     }
     item.SetPressed(false);
@@ -182,8 +181,8 @@ std::shared_ptr<PointerEvent> TouchPadTransformProcessor::OnEvent(struct libinpu
     return pointerEvent_;
 }
 
-int32_t TouchPadTransformProcessor::GetTouchPadToolType(
-    struct libinput_event_touch *touchpad, struct libinput_device *device)
+int32_t TouchPadTransformProcessor::GetTouchPadToolType(struct libinput_event_touch *touchpad,
+    struct libinput_device *device)
 {
     int32_t toolType = libinput_event_touchpad_get_tool_type(touchpad);
     switch (toolType) {
@@ -196,7 +195,7 @@ int32_t TouchPadTransformProcessor::GetTouchPadToolType(
         case MT_TOOL_PEN: {
             return PointerEvent::TOOL_TYPE_PEN;
         }
-        default : {
+        default: {
             MMI_HILOGW("Unknown tool type, identified as finger, toolType:%{public}d", toolType);
             return PointerEvent::TOOL_TYPE_FINGER;
         }

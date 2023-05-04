@@ -1,0 +1,72 @@
+diff a/service/window_manager/test/input_windows_manager_test.cpp b/service/window_manager/test/input_windows_manager_test.cpp	(rejected hunks)
+@@ -4,7 +4,7 @@
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+  *
+- *     http://www.apache.org/licenses/LICENSE-2.0
++ * http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+@@ -28,8 +28,8 @@ using namespace testing::ext;
+ 
+ class InputWindowsManagerTest : public testing::Test {
+ public:
+-    static void SetUpTestCase(void) {};
+-    static void TearDownTestCase(void) {};
++    static void SetUpTestCase(void){};
++    static void TearDownTestCase(void){};
+     void SetUp(void)
+     {
+         // 创建displayGroupInfo_
+@@ -43,7 +43,7 @@ public:
+             info.id = 1;
+             info.pid = 1;
+             info.uid = 1;
+-            info.area = {1, 1, 1, 1};
++            info.area = { 1, 1, 1, 1 };
+             info.defaultHotAreas = { info.area };
+             info.pointerHotAreas = { info.area };
+             info.agentWindowId = 1;
+@@ -53,7 +53,7 @@ public:
+         for (uint32_t i = 0; i < num; i++) {
+             DisplayInfo info;
+             info.id = 1;
+-            info.x =1;
++            info.x = 1;
+             info.y = 1;
+             info.width = 2;
+             info.height = 2;
+@@ -139,7 +139,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayId_004, T
+         info.id = 1;
+         info.pid = 1;
+         info.uid = 1;
+-        info.area = {1, 1, 1, 1};
++        info.area = { 1, 1, 1, 1 };
+         info.defaultHotAreas = { info.area };
+         info.pointerHotAreas = { info.area };
+         info.agentWindowId = 1;
+@@ -150,7 +150,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayId_004, T
+     for (uint32_t i = 0; i < num; i++) {
+         DisplayInfo info;
+         info.id = 1;
+-        info.x =1;
++        info.x = 1;
+         info.y = 1;
+         info.width = 2;
+         info.height = 2;
+@@ -165,12 +165,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayId_004, T
+     UDSServer udsServer;
+     WinMgr->Init(udsServer);
+     WinMgr->UpdateDisplayInfo(displayGroupInfo);
+-    int32_t displayId= 1;
++    int32_t displayId = 1;
+     double x = 0;
+     double y = 0;
+     WinMgr->UpdateAndAdjustMouseLocation(displayId, x, y);
+     ASSERT_EQ(WinMgr->UpdateDisplayId(displayId), true);
+-    displayId= -1;
++    displayId = -1;
+     WinMgr->UpdateAndAdjustMouseLocation(displayId, x, y);
+     ASSERT_EQ(WinMgr->UpdateDisplayId(displayId), true);
+ }

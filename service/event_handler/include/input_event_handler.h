@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -38,9 +38,10 @@ using EventFun = std::function<int32_t(libinput_event *event)>;
 using NotifyDeviceChange = std::function<void(int32_t, int32_t, char *)>;
 class InputEventHandler final {
     DECLARE_DELAYED_SINGLETON(InputEventHandler);
+
 public:
     DISALLOW_COPY_AND_MOVE(InputEventHandler);
-    void Init(UDSServer& udsServer);
+    void Init(UDSServer &udsServer);
     void OnEvent(void *event);
     UDSServer *GetUDSServer() const;
 
@@ -55,16 +56,16 @@ public:
 private:
     int32_t BuildInputHandlerChain();
 
-    UDSServer *udsServer_ { nullptr };
-    std::shared_ptr<EventNormalizeHandler> eventNormalizeHandler_ { nullptr };
-    std::shared_ptr<EventFilterHandler> eventFilterHandler_ { nullptr };
-    std::shared_ptr<EventInterceptorHandler> eventInterceptorHandler_ { nullptr };
-    std::shared_ptr<KeySubscriberHandler> eventSubscriberHandler_ { nullptr };
-    std::shared_ptr<SwitchSubscriberHandler> switchEventSubscriberHandler_ { nullptr };
-    std::shared_ptr<KeyCommandHandler> eventKeyCommandHandler_ { nullptr };
-    std::shared_ptr<EventMonitorHandler> eventMonitorHandler_ { nullptr };
+    UDSServer *udsServer_{ nullptr };
+    std::shared_ptr<EventNormalizeHandler> eventNormalizeHandler_{ nullptr };
+    std::shared_ptr<EventFilterHandler> eventFilterHandler_{ nullptr };
+    std::shared_ptr<EventInterceptorHandler> eventInterceptorHandler_{ nullptr };
+    std::shared_ptr<KeySubscriberHandler> eventSubscriberHandler_{ nullptr };
+    std::shared_ptr<SwitchSubscriberHandler> switchEventSubscriberHandler_{ nullptr };
+    std::shared_ptr<KeyCommandHandler> eventKeyCommandHandler_{ nullptr };
+    std::shared_ptr<EventMonitorHandler> eventMonitorHandler_{ nullptr };
 
-    uint64_t idSeed_ { 0 };
+    uint64_t idSeed_{ 0 };
 };
 #define InputHandler ::OHOS::DelayedSingleton<InputEventHandler>::GetInstance()
 } // namespace MMI

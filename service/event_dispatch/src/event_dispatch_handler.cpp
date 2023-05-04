@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -96,7 +96,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     auto pointerEvent = std::make_shared<PointerEvent>(*point);
     auto pointerIdList = pointerEvent->GetPointerIds();
     if (pointerIdList.size() > 1) {
-        for (const auto& id : pointerIdList) {
+        for (const auto &id : pointerIdList) {
             PointerEvent::PointerItem pointeritem;
             if (!pointerEvent->GetPointerItem(id, pointeritem)) {
                 MMI_HILOGW("Can't find this pointerItem");
@@ -121,7 +121,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_POINTER
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key)
+int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer &udsServer, std::shared_ptr<KeyEvent> key)
 {
     CALL_DEBUG_ENTER;
     CHKPR(key, PARAM_INPUT_INVALID);
@@ -134,7 +134,8 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
         return RET_ERR;
     }
     MMI_HILOGD("Event dispatcher of server:KeyEvent:KeyCode:%{public}d,Action:%{public}d,EventType:%{public}d,"
-        "Fd:%{public}d", key->GetKeyCode(), key->GetAction(), key->GetEventType(), fd);
+        "Fd:%{public}d",
+        key->GetKeyCode(), key->GetAction(), key->GetEventType(), fd);
     auto session = udsServer.GetSession(fd);
     CHKPR(session, RET_ERR);
     auto currentTime = GetSysClockTime();

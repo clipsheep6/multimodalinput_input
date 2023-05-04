@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -44,18 +44,19 @@ public:
     bool NormalizeMoveMouse(int32_t offsetX, int32_t offsetY);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 private:
-    int32_t HandleMotionInner(struct libinput_event_pointer* data);
-    int32_t HandleButtonInner(struct libinput_event_pointer* data);
-    int32_t HandleAxisInner(struct libinput_event_pointer* data);
-    void HandlePostInner(struct libinput_event_pointer* data, PointerEvent::PointerItem &pointerItem);
+    int32_t HandleMotionInner(struct libinput_event_pointer *data);
+    int32_t HandleButtonInner(struct libinput_event_pointer *data);
+    int32_t HandleAxisInner(struct libinput_event_pointer *data);
+    void HandlePostInner(struct libinput_event_pointer *data, PointerEvent::PointerItem &pointerItem);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     void HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY);
     void HandlePostMoveMouse(PointerEvent::PointerItem &pointerItem);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-    int32_t HandleButtonValueInner(struct libinput_event_pointer* data);
-    int32_t HandleMotionAccelerate(struct libinput_event_pointer* data);
+    int32_t HandleButtonValueInner(struct libinput_event_pointer *data);
+    int32_t HandleMotionAccelerate(struct libinput_event_pointer *data);
     void DumpInner();
-    void SetDxDyForDInput(PointerEvent::PointerItem& pointerItem, struct libinput_event_pointer* data);
+    void SetDxDyForDInput(PointerEvent::PointerItem &pointerItem, struct libinput_event_pointer *data);
+
 public:
     static void InitAbsolution();
     static void OnDisplayLost(int32_t displayId);
@@ -76,12 +77,12 @@ private:
     static int32_t globalPointerSpeed_;
     static bool isUserSetSpeedStatus_;
 
-    std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
-    int32_t timerId_ { -1 };
-    int32_t buttonId_ { -1 };
-    bool isPressed_ { false };
-    int32_t deviceId_ { -1 };
-    int32_t vendorConfigPointerSpeed_ { -1 };
+    std::shared_ptr<PointerEvent> pointerEvent_{ nullptr };
+    int32_t timerId_{ -1 };
+    int32_t buttonId_{ -1 };
+    bool isPressed_{ false };
+    int32_t deviceId_{ -1 };
+    int32_t vendorConfigPointerSpeed_{ -1 };
 };
 } // namespace MMI
 } // namespace OHOS

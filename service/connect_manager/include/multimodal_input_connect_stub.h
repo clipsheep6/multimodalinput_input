@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,51 +33,51 @@ public:
     virtual ~MultimodalInputConnectStub() = default;
 
     virtual bool IsRunning() const = 0;
-    virtual int32_t OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply,
-        MessageOption& options) override;
+    virtual int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
+        MessageOption &options) override;
 
 protected:
     int32_t StubHandleAllocSocketFd(MessageParcel &data, MessageParcel &reply);
-    int32_t StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply);
-    int32_t StubRemoveInputEventFilter(MessageParcel& data, MessageParcel& reply);
-    int32_t StubSetMousePrimaryButton(MessageParcel& data, MessageParcel& reply);
-    int32_t StubGetMousePrimaryButton(MessageParcel& data, MessageParcel& reply);
-    int32_t StubSetHoverScrollState(MessageParcel& data, MessageParcel& reply);
-    int32_t StubGetHoverScrollState(MessageParcel& data, MessageParcel& reply);
-    int32_t StubSetPointerVisible(MessageParcel& data, MessageParcel& reply);
-    int32_t StubSetPointerStyle(MessageParcel& data, MessageParcel& reply);
-    int32_t StubGetPointerStyle(MessageParcel& data, MessageParcel& reply);
-    int32_t StubIsPointerVisible(MessageParcel& data, MessageParcel& reply);
-    int32_t StubMarkProcessed(MessageParcel& data, MessageParcel& reply);
-    int32_t StubSupportKeys(MessageParcel& data, MessageParcel& reply);
-    int32_t StubGetDeviceIds(MessageParcel& data, MessageParcel& reply);
-    int32_t StubGetDevice(MessageParcel& data, MessageParcel& reply);
-    int32_t StubRegisterInputDeviceMonitor(MessageParcel& data, MessageParcel& reply);
-    int32_t StubUnregisterInputDeviceMonitor(MessageParcel& data, MessageParcel& reply);
-    int32_t StubGetKeyboardType(MessageParcel& data, MessageParcel& reply);
-    int32_t StubAddInputHandler(MessageParcel& data, MessageParcel& reply);
-    int32_t StubRemoveInputHandler(MessageParcel& data, MessageParcel& reply);
-    int32_t StubMarkEventConsumed(MessageParcel& data, MessageParcel& reply);
-    int32_t StubMoveMouseEvent(MessageParcel& data, MessageParcel& reply);
-    int32_t StubInjectKeyEvent(MessageParcel& data, MessageParcel& reply);
-    int32_t StubSubscribeKeyEvent(MessageParcel& data, MessageParcel& reply);
-    int32_t StubUnsubscribeKeyEvent(MessageParcel& data, MessageParcel& reply);
-    int32_t StubSubscribeSwitchEvent(MessageParcel& data, MessageParcel& reply);
-    int32_t StubUnsubscribeSwitchEvent(MessageParcel& data, MessageParcel& reply);
-    int32_t StubInjectPointerEvent(MessageParcel& data, MessageParcel& reply);
-    int32_t StubSetAnrListener(MessageParcel& data, MessageParcel& reply);
-    int32_t StubGetDisplayBindInfo(MessageParcel& data, MessageParcel& reply);
-    int32_t StubSetDisplayBind(MessageParcel& data, MessageParcel& reply);
-    int32_t StubSetPointerSpeed(MessageParcel& data, MessageParcel& reply);
-    int32_t StubGetPointerSpeed(MessageParcel& data, MessageParcel& reply);
+    int32_t StubAddInputEventFilter(MessageParcel &data, MessageParcel &reply);
+    int32_t StubRemoveInputEventFilter(MessageParcel &data, MessageParcel &reply);
+    int32_t StubSetMousePrimaryButton(MessageParcel &data, MessageParcel &reply);
+    int32_t StubGetMousePrimaryButton(MessageParcel &data, MessageParcel &reply);
+    int32_t StubSetHoverScrollState(MessageParcel &data, MessageParcel &reply);
+    int32_t StubGetHoverScrollState(MessageParcel &data, MessageParcel &reply);
+    int32_t StubSetPointerVisible(MessageParcel &data, MessageParcel &reply);
+    int32_t StubSetPointerStyle(MessageParcel &data, MessageParcel &reply);
+    int32_t StubGetPointerStyle(MessageParcel &data, MessageParcel &reply);
+    int32_t StubIsPointerVisible(MessageParcel &data, MessageParcel &reply);
+    int32_t StubMarkProcessed(MessageParcel &data, MessageParcel &reply);
+    int32_t StubSupportKeys(MessageParcel &data, MessageParcel &reply);
+    int32_t StubGetDeviceIds(MessageParcel &data, MessageParcel &reply);
+    int32_t StubGetDevice(MessageParcel &data, MessageParcel &reply);
+    int32_t StubRegisterInputDeviceMonitor(MessageParcel &data, MessageParcel &reply);
+    int32_t StubUnregisterInputDeviceMonitor(MessageParcel &data, MessageParcel &reply);
+    int32_t StubGetKeyboardType(MessageParcel &data, MessageParcel &reply);
+    int32_t StubAddInputHandler(MessageParcel &data, MessageParcel &reply);
+    int32_t StubRemoveInputHandler(MessageParcel &data, MessageParcel &reply);
+    int32_t StubMarkEventConsumed(MessageParcel &data, MessageParcel &reply);
+    int32_t StubMoveMouseEvent(MessageParcel &data, MessageParcel &reply);
+    int32_t StubInjectKeyEvent(MessageParcel &data, MessageParcel &reply);
+    int32_t StubSubscribeKeyEvent(MessageParcel &data, MessageParcel &reply);
+    int32_t StubUnsubscribeKeyEvent(MessageParcel &data, MessageParcel &reply);
+    int32_t StubSubscribeSwitchEvent(MessageParcel &data, MessageParcel &reply);
+    int32_t StubUnsubscribeSwitchEvent(MessageParcel &data, MessageParcel &reply);
+    int32_t StubInjectPointerEvent(MessageParcel &data, MessageParcel &reply);
+    int32_t StubSetAnrListener(MessageParcel &data, MessageParcel &reply);
+    int32_t StubGetDisplayBindInfo(MessageParcel &data, MessageParcel &reply);
+    int32_t StubSetDisplayBind(MessageParcel &data, MessageParcel &reply);
+    int32_t StubSetPointerSpeed(MessageParcel &data, MessageParcel &reply);
+    int32_t StubGetPointerSpeed(MessageParcel &data, MessageParcel &reply);
     int32_t StubGetFunctionKeyState(MessageParcel &data, MessageParcel &reply);
     int32_t StubSetFunctionKeyState(MessageParcel &data, MessageParcel &reply);
     int32_t StubSetPointerLocation(MessageParcel &data, MessageParcel &reply);
-    int32_t StubSetMouseCaptureMode(MessageParcel& data, MessageParcel& reply);
-    int32_t StubGetWindowPid(MessageParcel& data, MessageParcel& reply);
-    int32_t StubAppendExtraData(MessageParcel& data, MessageParcel& reply);
-    int32_t StubEnableInputDevice(MessageParcel& data, MessageParcel& reply);
-    int32_t StubSetKeyDownDuration(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetMouseCaptureMode(MessageParcel &data, MessageParcel &reply);
+    int32_t StubGetWindowPid(MessageParcel &data, MessageParcel &reply);
+    int32_t StubAppendExtraData(MessageParcel &data, MessageParcel &reply);
+    int32_t StubEnableInputDevice(MessageParcel &data, MessageParcel &reply);
+    int32_t StubSetKeyDownDuration(MessageParcel &data, MessageParcel &reply);
 };
 } // namespace MMI
 } // namespace OHOS

@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -145,7 +145,7 @@ bool TimerManager::IsExistInternal(int32_t timerId)
     return false;
 }
 
-void TimerManager::InsertTimerInternal(std::unique_ptr<TimerItem>& timer)
+void TimerManager::InsertTimerInternal(std::unique_ptr<TimerItem> &timer)
 {
     for (auto it = timers_.begin(); it != timers_.end(); ++it) {
         if ((*it)->nextCallTime > timer->nextCallTime) {
@@ -161,7 +161,7 @@ int32_t TimerManager::CalcNextDelayInternal()
     auto delay = MIN_DELAY;
     if (!timers_.empty()) {
         auto nowTime = GetMillisTime();
-        const auto& item = *timers_.begin();
+        const auto &item = *timers_.begin();
         if (nowTime >= item->nextCallTime) {
             delay = 0;
         } else {

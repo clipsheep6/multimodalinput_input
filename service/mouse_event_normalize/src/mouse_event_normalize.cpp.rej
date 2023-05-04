@@ -1,0 +1,28 @@
+diff a/service/mouse_event_normalize/src/mouse_event_normalize.cpp b/service/mouse_event_normalize/src/mouse_event_normalize.cpp	(rejected hunks)
+@@ -4,7 +4,7 @@
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+  *
+- *     http://www.apache.org/licenses/LICENSE-2.0
++ * http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+@@ -69,7 +69,7 @@ int32_t MouseEventNormalize::GetCurrentDeviceId() const
+     return currentDeviceId_;
+ }
+ 
+-std::shared_ptr<PointerEvent>MouseEventNormalize::GetPointerEvent()
++std::shared_ptr<PointerEvent> MouseEventNormalize::GetPointerEvent()
+ {
+     auto processor = GetCurrentProcessor();
+     CHKPP(processor);
+@@ -87,7 +87,7 @@ int32_t MouseEventNormalize::OnEvent(struct libinput_event *event)
+         return RET_ERR;
+     }
+     SetCurrentDeviceId(deviceId);
+-    std::shared_ptr<MouseTransformProcessor>processor { nullptr };
++    std::shared_ptr<MouseTransformProcessor> processor{ nullptr };
+     if (auto it = processors_.find(deviceId); it != processors_.end()) {
+         processor = it->second;
+     } else {

@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -69,7 +69,7 @@ int32_t UDSServer::GetClientPid(int32_t fd) const
     return it->second->GetPid();
 }
 
-bool UDSServer::SendMsg(int32_t fd, NetPacket& pkt)
+bool UDSServer::SendMsg(int32_t fd, NetPacket &pkt)
 {
     if (fd < 0) {
         MMI_HILOGE("The fd is less than 0");
@@ -77,23 +77,21 @@ bool UDSServer::SendMsg(int32_t fd, NetPacket& pkt)
     }
     auto ses = GetSession(fd);
     if (ses == nullptr) {
-        MMI_HILOGE("The fd:%{public}d not found, The message was discarded. errCode:%{public}d",
-                   fd, SESSION_NOT_FOUND);
+        MMI_HILOGE("The fd:%{public}d not found, The message was discarded. errCode:%{public}d", fd, SESSION_NOT_FOUND);
         return false;
     }
     return ses->SendMsg(pkt);
 }
 
-void UDSServer::Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt)
+void UDSServer::Multicast(const std::vector<int32_t> &fdList, NetPacket &pkt)
 {
     for (const auto &item : fdList) {
         SendMsg(item, pkt);
     }
 }
 
-int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
-    const int32_t moduleType, const int32_t uid, const int32_t pid,
-    int32_t& serverFd, int32_t& toReturnClientFd, int32_t& tokenType)
+int32_t UDSServer::AddSocketPairInfo(const std::string &programName, const int32_t moduleType, const int32_t uid,
+    const int32_t pid, int32_t &serverFd, int32_t &toReturnClientFd, int32_t &tokenType)
 {
     CALL_DEBUG_ENTER;
     int32_t sockFds[2] = { -1 };
@@ -144,8 +142,8 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     }
     sess = std::make_shared<UDSSession>(programName, moduleType, serverFd, uid, pid);
     if (sess == nullptr) {
-        MMI_HILOGE("make_shared fail. progName:%{public}s,pid:%{public}d,errCode:%{public}d",
-            programName.c_str(), pid, MAKE_SHARED_FAIL);
+        MMI_HILOGE("make_shared fail. progName:%{public}s,pid:%{public}d,errCode:%{public}d", programName.c_str(), pid,
+            MAKE_SHARED_FAIL);
         goto CLOSE_SOCK;
     }
     sess->SetTokenType(tokenType);
@@ -155,8 +153,8 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     }
     OnConnected(sess);
     return RET_OK;
-    
-    CLOSE_SOCK:
+
+CLOSE_SOCK:
     close(serverFd);
     serverFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
     close(toReturnClientFd);
@@ -172,10 +170,8 @@ void UDSServer::Dump(int32_t fd, const std::vector<std::string> &args)
     for (const auto &item : sessionsMap_) {
         std::shared_ptr<UDSSession> udsSession = item.second;
         CHKPV(udsSession);
-        mprintf(fd,
-                "Uid:%d | Pid:%d | Fd:%d | TokenType:%d | Descript:%s\t",
-                udsSession->GetUid(), udsSession->GetPid(), udsSession->GetFd(),
-                udsSession->GetTokenType(), udsSession->GetDescript().c_str());
+        mprintf(fd, "Uid:%d | Pid:%d | Fd:%d | TokenType:%d | Descript:%s\t", udsSession->GetUid(),
+            udsSession->GetPid(), udsSession->GetFd(), udsSession->GetTokenType(), udsSession->GetDescript().c_str());
     }
 }
 
@@ -202,7 +198,7 @@ void UDSServer::SetRecvFun(MsgServerFunCallback fun)
     recvFun_ = fun;
 }
 
-void UDSServer::ReleaseSession(int32_t fd, epoll_event& ev)
+void UDSServer::ReleaseSession(int32_t fd, epoll_event &ev)
 {
     CALL_INFO_TRACE;
     auto secPtr = GetSession(fd);
@@ -226,20 +222,20 @@ void UDSServer::ReleaseSession(int32_t fd, epoll_event& ev)
     }
 }
 
-void UDSServer::OnPacket(int32_t fd, NetPacket& pkt)
+void UDSServer::OnPacket(int32_t fd, NetPacket &pkt)
 {
     auto sess = GetSession(fd);
     CHKPV(sess);
     recvFun_(sess, pkt);
 }
 
-void UDSServer::OnEpollRecv(int32_t fd, epoll_event& ev)
+void UDSServer::OnEpollRecv(int32_t fd, epoll_event &ev)
 {
     if (fd < 0) {
         MMI_HILOGE("Invalid input param fd:%{public}d", fd);
         return;
     }
-    auto& buf = circleBufMap_[fd];
+    auto &buf = circleBufMap_[fd];
     char szBuf[MAX_PACKET_BUF_SIZE] = {};
     for (int32_t i = 0; i < MAX_RECV_LIMIT; i++) {
         auto size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
@@ -250,8 +246,8 @@ void UDSServer::OnEpollRecv(int32_t fd, epoll_event& ev)
             OnReadPackets(buf, std::bind(&UDSServer::OnPacket, this, fd, std::placeholders::_1));
         } else if (size < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
-                MMI_HILOGD("Continue for errno EAGAIN|EINTR|EWOULDBLOCK size:%{public}zu errno:%{public}d",
-                    size, errno);
+                MMI_HILOGD("Continue for errno EAGAIN|EINTR|EWOULDBLOCK size:%{public}zu errno:%{public}d", size,
+                    errno);
                 continue;
             }
             MMI_HILOGE("Recv return %{public}zu errno:%{public}d", size, errno);
@@ -267,10 +263,10 @@ void UDSServer::OnEpollRecv(int32_t fd, epoll_event& ev)
     }
 }
 
-void UDSServer::OnEpollEvent(epoll_event& ev)
+void UDSServer::OnEpollEvent(epoll_event &ev)
 {
     CHKPV(ev.data.ptr);
-    auto fd = *static_cast<int32_t*>(ev.data.ptr);
+    auto fd = *static_cast<int32_t *>(ev.data.ptr);
     if (fd < 0) {
         MMI_HILOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
         return;
@@ -333,8 +329,8 @@ bool UDSServer::AddSession(SessionPtr ses)
     sessionsMap_[fd] = ses;
     DumpSession("AddSession");
     if (sessionsMap_.size() > MAX_SESSON_ALARM) {
-        MMI_HILOGW("Too many clients. Warning Value:%{public}d,Current Value:%{public}zd",
-                   MAX_SESSON_ALARM, sessionsMap_.size());
+        MMI_HILOGW("Too many clients. Warning Value:%{public}d,Current Value:%{public}zd", MAX_SESSON_ALARM,
+            sessionsMap_.size());
     }
     MMI_HILOGI("AddSession end");
     return true;
