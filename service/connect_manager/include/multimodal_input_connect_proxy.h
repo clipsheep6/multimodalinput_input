@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,8 +30,8 @@ public:
     explicit MultimodalInputConnectProxy(const sptr<IRemoteObject> &impl);
     DISALLOW_COPY_AND_MOVE(MultimodalInputConnectProxy);
     ~MultimodalInputConnectProxy() override = default;
-    int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
-        int32_t &socketFd, int32_t &tokenType) override;
+    int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &socketFd,
+        int32_t &tokenType) override;
     int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority,
         uint32_t deviceTags) override;
     int32_t RemoveInputEventFilter(int32_t filterId) override;
@@ -52,10 +52,10 @@ public:
     int32_t RegisterDevListener() override;
     int32_t UnregisterDevListener() override;
     int32_t GetKeyboardType(int32_t deviceId, int32_t &keyboardType) override;
-    int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
-        int32_t priority, uint32_t deviceTags) override;
-    int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
-        int32_t priority, uint32_t deviceTags) override;
+    int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
+        uint32_t deviceTags) override;
+    int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
+        uint32_t deviceTags) override;
     int32_t MarkEventConsumed(int32_t eventId) override;
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY) override;
     int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
@@ -72,7 +72,7 @@ public:
     int32_t SetPointerLocation(int32_t x, int32_t y) override;
     virtual int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode) override;
     int32_t GetWindowPid(int32_t windowId) override;
-    int32_t AppendExtraData(const ExtraData& extraData) override;
+    int32_t AppendExtraData(const ExtraData &extraData) override;
     int32_t EnableInputDevice(bool enable) override;
     int32_t SetKeyDownDuration(const std::string &businessId, int32_t delay) override;
 

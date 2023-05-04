@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -32,16 +32,15 @@ using DTaskCallback = std::function<int32_t()>;
 class DelegateTasks final : public IdFactory<int32_t> {
 public:
     struct TaskData {
-        uint64_t tid { 0 };
-        int32_t taskId { 0 };
+        uint64_t tid{ 0 };
+        int32_t taskId{ 0 };
     };
     class Task : public std::enable_shared_from_this<Task> {
     public:
         using Promise = std::promise<int32_t>;
         using Future = std::future<int32_t>;
         using TaskPtr = std::shared_ptr<DelegateTasks::Task>;
-        Task(int32_t id, DTaskCallback fun, Promise *promise = nullptr)
-            : id_(id), fun_(fun), promise_(promise) {}
+        Task(int32_t id, DTaskCallback fun, Promise *promise = nullptr) : id_(id), fun_(fun), promise_(promise) {}
         ~Task() = default;
         void ProcessTask();
 
@@ -59,10 +58,10 @@ public:
         }
 
     private:
-        std::atomic_bool hasWaited_ { false };
-        int32_t id_ { 0 };
+        std::atomic_bool hasWaited_{ false };
+        int32_t id_{ 0 };
         DTaskCallback fun_;
-        Promise* promise_ { nullptr };
+        Promise *promise_{ nullptr };
     };
     using TaskPtr = Task::TaskPtr;
     using Promise = Task::Promise;
@@ -95,7 +94,7 @@ private:
     TaskPtr PostTask(DTaskCallback callback, Promise *promise = nullptr);
 
 private:
-    uint64_t workerThreadId_ { 0 };
+    uint64_t workerThreadId_{ 0 };
     int32_t fds_[2] = {};
     std::mutex mux_;
     std::queue<TaskPtr> tasks_;

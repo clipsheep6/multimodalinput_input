@@ -1,0 +1,45 @@
+diff a/service/mouse_event_normalize/test/mouse_device_state_test.cpp b/service/mouse_event_normalize/test/mouse_device_state_test.cpp	(rejected hunks)
+@@ -4,7 +4,7 @@
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+  *
+- *     http://www.apache.org/licenses/LICENSE-2.0
++ * http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+@@ -30,21 +30,13 @@ public:
+     void TearDown();
+ };
+ 
+-void MouseDeviceStateTest::SetUpTestCase(void)
+-{
+-}
++void MouseDeviceStateTest::SetUpTestCase(void) {}
+ 
+-void MouseDeviceStateTest::TearDownTestCase(void)
+-{
+-}
++void MouseDeviceStateTest::TearDownTestCase(void) {}
+ 
+-void MouseDeviceStateTest::SetUp()
+-{
+-}
++void MouseDeviceStateTest::SetUp() {}
+ 
+-void MouseDeviceStateTest::TearDown()
+-{
+-}
++void MouseDeviceStateTest::TearDown() {}
+ 
+ /**
+  * @tc.name: MouseDeviceStateTest_GetMouseCoordsX_001
+@@ -87,7 +79,7 @@ HWTEST_F(MouseDeviceStateTest, MouseDeviceStateTest_GetPressedButtons_003, TestS
+     MouseState->MouseBtnStateCounts(MouseDeviceState::LIBINPUT_LEFT_BUTTON_CODE, BUTTON_STATE_PRESSED);
+     std::vector<int32_t> pressedButtons;
+     MouseState->GetPressedButtons(pressedButtons);
+-    std::vector<int32_t> idNames = {PointerEvent::MOUSE_BUTTON_LEFT};
++    std::vector<int32_t> idNames = { PointerEvent::MOUSE_BUTTON_LEFT };
+     ASSERT_EQ(pressedButtons, idNames);
+ }
+ 

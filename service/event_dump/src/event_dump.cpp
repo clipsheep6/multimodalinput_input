@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -41,7 +41,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDump" };
-constexpr size_t MAX_COMMAND_COUNT { 32 };
+constexpr size_t MAX_COMMAND_COUNT{ 32 };
 } // namespace
 
 EventDump::EventDump() {}
@@ -94,7 +94,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
     }
     char **argv = new (std::nothrow) char *[args.size()];
     CHKPV(argv);
-    if (memset_s(argv, args.size() * sizeof(char*), 0, args.size() * sizeof(char*)) != EOK) {
+    if (memset_s(argv, args.size() * sizeof(char *), 0, args.size() * sizeof(char *)) != EOK) {
         MMI_HILOGE("Call memset_s failed");
         delete[] argv;
         return;
@@ -112,7 +112,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
     }
     optind = 1;
     int32_t c;
-    while ((c = getopt_long (args.size(), argv, "hdlwusoifmc", dumpOptions, &optionIndex)) != -1) {
+    while ((c = getopt_long(args.size(), argv, "hdlwusoifmc", dumpOptions, &optionIndex)) != -1) {
         switch (c) {
             case 'h': {
                 DumpEventHelp(fd, args);
@@ -187,7 +187,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
             }
         }
     }
-    RELEASE_RES:
+RELEASE_RES:
     for (size_t i = 0; i < args.size(); ++i) {
         if (argv[i] != nullptr) {
             delete[] argv[i];

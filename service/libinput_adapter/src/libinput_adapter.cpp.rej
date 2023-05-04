@@ -1,0 +1,81 @@
+diff a/service/libinput_adapter/src/libinput_adapter.cpp b/service/libinput_adapter/src/libinput_adapter.cpp	(rejected hunks)
+@@ -4,7 +4,7 @@
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+  *
+- *     http://www.apache.org/licenses/LICENSE-2.0
++ * http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+@@ -30,10 +30,10 @@ namespace OHOS {
+ namespace MMI {
+ namespace {
+ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "LibinputAdapter" };
+-constexpr int32_t WAIT_TIME_FOR_INPUT { 10 };
++constexpr int32_t WAIT_TIME_FOR_INPUT{ 10 };
+ } // namespace
+ 
+-static void HiLogFunc(struct libinput* input, libinput_log_priority priority, const char* fmt, va_list args)
++static void HiLogFunc(struct libinput *input, libinput_log_priority priority, const char *fmt, va_list args)
+ {
+     CHKPV(input);
+     CHKPV(fmt);
+@@ -47,7 +47,7 @@ static void HiLogFunc(struct libinput* input, libinput_log_priority priority, co
+     va_end(args);
+ }
+ 
+-static void InitHiLogFunc(struct libinput* input)
++static void InitHiLogFunc(struct libinput *input)
+ {
+     CHKPV(input);
+     static bool initFlag = false;
+@@ -73,7 +73,7 @@ int32_t LibinputAdapter::DeviceLedUpdate(struct libinput_device *device, int32_t
+ }
+ 
+ constexpr static libinput_interface LIBINPUT_INTERFACE = {
+-    .open_restricted = [](const char *path, int32_t flags, void *user_data)->int32_t {
++    .open_restricted = [](const char *path, int32_t flags, void *user_data) -> int32_t {
+         if (path == nullptr) {
+             MMI_HILOGWK("Input device path is nullptr");
+             return RET_ERR;
+@@ -89,14 +89,14 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
+         MMI_HILOGWK("Libinput .open_restricted path:%{public}s,fd:%{public}d,errno:%{public}d", path, fd, errNo);
+         return fd < 0 ? RET_ERR : fd;
+     },
+-    .close_restricted = [](int32_t fd, void *user_data)
+-    {
+-        MMI_HILOGI("Libinput .close_restricted fd:%{public}d", fd);
+-        close(fd);
+-    },
++    .close_restricted =
++        [](int32_t fd, void *user_data) {
++            MMI_HILOGI("Libinput .close_restricted fd:%{public}d", fd);
++            close(fd);
++        },
+ };
+ 
+-bool LibinputAdapter::Init(FunInputEvent funInputEvent, const std::string& seat_id)
++bool LibinputAdapter::Init(FunInputEvent funInputEvent, const std::string &seat_id)
+ {
+     CALL_DEBUG_ENTER;
+     CHKPF(funInputEvent);
+@@ -127,14 +127,15 @@ bool LibinputAdapter::Init(FunInputEvent funInputEvent, const std::string& seat_
+     return true;
+ }
+ 
+-void LibinputAdapter::EventDispatch(struct epoll_event& ev)
++void LibinputAdapter::EventDispatch(struct epoll_event &ev)
+ {
+     CALL_DEBUG_ENTER;
+     CHKPV(ev.data.ptr);
+-    auto fd = *static_cast<int*>(ev.data.ptr);
++    auto fd = *static_cast<int *>(ev.data.ptr);
+     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
+         MMI_HILOGF("Epoll unrecoverable error,"
+-            "The service must be restarted. fd:%{public}d", fd);
++            "The service must be restarted. fd:%{public}d",
++            fd);
+         free(ev.data.ptr);
+         ev.data.ptr = nullptr;
+         return;

@@ -1,0 +1,51 @@
+diff a/service/event_handler/include/event_normalize_handler.h b/service/event_handler/include/event_normalize_handler.h	(rejected hunks)
+@@ -4,7 +4,7 @@
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+  *
+- *     http://www.apache.org/licenses/LICENSE-2.0
++ * http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+@@ -26,7 +26,7 @@ class EventNormalizeHandler : public IInputEventHandler {
+ public:
+     EventNormalizeHandler() = default;
+     ~EventNormalizeHandler() = default;
+-    void HandleEvent(libinput_event* event);
++    void HandleEvent(libinput_event *event);
+ #ifdef OHOS_BUILD_ENABLE_KEYBOARD
+     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
+ #endif // OHOS_BUILD_ENABLE_KEYBOARD
+@@ -37,21 +37,22 @@ public:
+     void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
+ #endif // OHOS_BUILD_ENABLE_TOUCH
+     int32_t AddHandleTimer(int32_t timeout = 300);
++
+ private:
+     int32_t OnEventDeviceAdded(libinput_event *event);
+     int32_t OnEventDeviceRemoved(libinput_event *event);
+-    int32_t HandleKeyboardEvent(libinput_event* event);
++    int32_t HandleKeyboardEvent(libinput_event *event);
+     void Repeat(const std::shared_ptr<KeyEvent> keyEvent);
+-    int32_t HandleTouchPadEvent(libinput_event* event);
+-    int32_t HandleGestureEvent(libinput_event* event);
+-    int32_t HandleMouseEvent(libinput_event* event);
+-    int32_t HandleTouchEvent(libinput_event* event);
+-    int32_t HandleSwitchInputEvent(libinput_event* event);
+-    int32_t HandleTableToolEvent(libinput_event* event);
+-    int32_t HandleJoystickEvent(libinput_event* event);
++    int32_t HandleTouchPadEvent(libinput_event *event);
++    int32_t HandleGestureEvent(libinput_event *event);
++    int32_t HandleMouseEvent(libinput_event *event);
++    int32_t HandleTouchEvent(libinput_event *event);
++    int32_t HandleSwitchInputEvent(libinput_event *event);
++    int32_t HandleTableToolEvent(libinput_event *event);
++    int32_t HandleJoystickEvent(libinput_event *event);
+ 
+ private:
+-    int32_t timerId_ { -1 };
++    int32_t timerId_{ -1 };
+     void ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent, struct libinput_event *event);
+ };
+ } // namespace MMI

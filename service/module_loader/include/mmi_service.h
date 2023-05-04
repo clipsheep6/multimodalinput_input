@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,8 +33,11 @@
 
 namespace OHOS {
 namespace MMI {
-
-enum class ServiceRunningState {STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
+enum class ServiceRunningState {
+    STATE_NOT_START,
+    STATE_RUNNING,
+    STATE_EXIT
+};
 class MMIService final : public UDSServer, public SystemAbility, public MultimodalInputConnectStub {
     DECLARE_DELAYED_SINGLETON(MMIService);
     DECLARE_SYSTEM_ABILITY(MMIService);
@@ -44,8 +47,8 @@ public:
     void OnStart() override;
     void OnStop() override;
     int32_t Dump(int32_t fd, const std::vector<std::u16string> &args) override;
-    int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
-        int32_t &toReturnClientFd, int32_t &tokenType) override;
+    int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd,
+        int32_t &tokenType) override;
     int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority,
         uint32_t deviceTags) override;
     int32_t RemoveInputEventFilter(int32_t filterId) override;
@@ -66,10 +69,10 @@ public:
     int32_t RegisterDevListener() override;
     int32_t UnregisterDevListener() override;
     int32_t GetKeyboardType(int32_t deviceId, int32_t &keyboardType) override;
-    int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
-        int32_t priority, uint32_t deviceTags) override;
-    int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
-        int32_t priority, uint32_t deviceTags) override;
+    int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
+        uint32_t deviceTags) override;
+    int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
+        uint32_t deviceTags) override;
     int32_t MarkEventConsumed(int32_t eventId) override;
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY) override;
     int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
@@ -86,12 +89,12 @@ public:
     int32_t SetPointerLocation(int32_t x, int32_t y) override;
     virtual int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode) override;
     int32_t GetWindowPid(int32_t windowId) override;
-    int32_t AppendExtraData(const ExtraData& extraData) override;
+    int32_t AppendExtraData(const ExtraData &extraData) override;
     int32_t EnableInputDevice(bool enable) override;
     int32_t SetKeyDownDuration(const std::string &businessId, int32_t delay) override;
-    
+
 #ifdef OHOS_RSS_CLIENT
-    void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+    void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
 #endif
 
 protected:
@@ -116,10 +119,10 @@ protected:
     int32_t OnGetKeyboardType(int32_t deviceId, int32_t &keyboardType);
     int32_t OnGetWindowPid(int32_t windowId, int32_t &windowPid);
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
-    int32_t CheckAddInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType,
-        int32_t priority, uint32_t deviceTags);
-    int32_t CheckRemoveInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType,
-        int32_t priority, uint32_t deviceTags);
+    int32_t CheckAddInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
+        uint32_t deviceTags);
+    int32_t CheckRemoveInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
+        uint32_t deviceTags);
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
     int32_t CheckMarkConsumed(int32_t pid, int32_t eventId);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -136,14 +139,14 @@ protected:
 
     void OnThread();
     void OnSignalEvent(int32_t signalFd);
-    void OnDelegateTask(epoll_event& ev);
+    void OnDelegateTask(epoll_event &ev);
 
     void AddReloadDeviceTimer();
     int32_t UpdateSettingsXml(const std::string &businessId, int32_t delay);
 
 private:
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
-    int32_t mmiFd_ { -1 };
+    int32_t mmiFd_{ -1 };
     std::mutex mu_;
     std::thread t_;
 #ifdef OHOS_RSS_CLIENT
@@ -154,7 +157,7 @@ private:
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;
 
-    std::atomic_bool threadStatusFlag_ { false };
+    std::atomic_bool threadStatusFlag_{ false };
 };
 } // namespace MMI
 } // namespace OHOS

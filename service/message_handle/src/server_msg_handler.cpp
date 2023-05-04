@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -42,7 +42,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ServerMsgHandler" };
 } // namespace
 
-void ServerMsgHandler::Init(UDSServer& udsServer)
+void ServerMsgHandler::Init(UDSServer &udsServer)
 {
     udsServer_ = &udsServer;
     MsgCallback funs[] = {
@@ -56,7 +56,7 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
     }
 }
 
-void ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
+void ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket &pkt)
 {
     CHKPV(sess);
     auto id = pkt.GetMsgId();
@@ -205,8 +205,8 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     }
     for (uint32_t i = 0; i < num; i++) {
         WindowInfo info;
-        pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
-            >> info.pointerHotAreas >> info.agentWindowId >> info.flags;
+        pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas >> info.pointerHotAreas >>
+            info.agentWindowId >> info.flags;
         displayGroupInfo.windowsInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");
@@ -216,13 +216,13 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     pkt >> num;
     for (uint32_t i = 0; i < num; i++) {
         DisplayInfo info;
-        pkt >> info.id >> info.x >> info.y >> info.width >> info.height
-            >> info.dpi >> info.name >> info.uniq >> info.direction;
+        pkt >> info.id >> info.x >> info.y >> info.width >> info.height >> info.dpi >> info.name >> info.uniq >>
+            info.direction;
         displayGroupInfo.displaysInfo.push_back(info);
         if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read display info failed");
-        return RET_ERR;
-    }
+            MMI_HILOGE("Packet read display info failed");
+            return RET_ERR;
+        }
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read display info failed");
@@ -233,8 +233,8 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
 }
 
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
-int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, InputHandlerType handlerType,
-    HandleEventType eventType, int32_t priority, uint32_t deviceTags)
+int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, InputHandlerType handlerType, HandleEventType eventType,
+    int32_t priority, uint32_t deviceTags)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
     MMI_HILOGD("handlerType:%{public}d", handlerType);
@@ -255,8 +255,8 @@ int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, InputHandlerType ha
     return RET_OK;
 }
 
-int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, InputHandlerType handlerType,
-    HandleEventType eventType, int32_t priority, uint32_t deviceTags)
+int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, InputHandlerType handlerType, HandleEventType eventType,
+    int32_t priority, uint32_t deviceTags)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
     MMI_HILOGD("OnRemoveInputHandler handlerType:%{public}d eventType:%{public}u", handlerType, eventType);
@@ -306,8 +306,8 @@ int32_t ServerMsgHandler::OnMoveMouse(int32_t offsetX, int32_t offsetY)
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-int32_t ServerMsgHandler::OnSubscribeKeyEvent(IUdsServer *server, int32_t pid,
-    int32_t subscribeId, const std::shared_ptr<KeyOption> option)
+int32_t ServerMsgHandler::OnSubscribeKeyEvent(IUdsServer *server, int32_t pid, int32_t subscribeId,
+    const std::shared_ptr<KeyOption> option)
 {
     CALL_DEBUG_ENTER;
     CHKPR(server, ERROR_NULL_POINTER);
@@ -355,8 +355,8 @@ int32_t ServerMsgHandler::OnUnsubscribeSwitchEvent(IUdsServer *server, int32_t p
 #endif // OHOS_BUILD_ENABLE_SWITCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-int32_t ServerMsgHandler::AddInputEventFilter(sptr<IEventFilter> filter,
-    int32_t filterId, int32_t priority, uint32_t deviceTags, int32_t clientPid)
+int32_t ServerMsgHandler::AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority,
+    uint32_t deviceTags, int32_t clientPid)
 {
     auto filterHandler = InputHandler->GetFilterHandler();
     CHKPR(filterHandler, ERROR_NULL_POINTER);
@@ -367,7 +367,7 @@ int32_t ServerMsgHandler::RemoveInputEventFilter(int32_t clientPid, int32_t filt
 {
     auto filterHandler = InputHandler->GetFilterHandler();
     CHKPR(filterHandler, ERROR_NULL_POINTER);
-    return filterHandler->RemoveInputEventFilter(clientPid, filterId);   
+    return filterHandler->RemoveInputEventFilter(clientPid, filterId);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace MMI

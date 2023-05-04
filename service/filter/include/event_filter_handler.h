@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -48,17 +48,20 @@ public:
     void Dump(int32_t fd, const std::vector<std::string> &args);
     bool HandleKeyEventFilter(std::shared_ptr<KeyEvent> event);
     bool HandlePointerEventFilter(std::shared_ptr<PointerEvent> event);
+
 private:
     std::mutex lockFilter_;
-    struct FilterInfo
-    {
+    struct FilterInfo {
         const sptr<IEventFilter> filter;
-        sptr<IRemoteObject::DeathRecipient> deathRecipient { nullptr };
+        sptr<IRemoteObject::DeathRecipient> deathRecipient{ nullptr };
         const int32_t filterId;
         const int32_t priority;
         const uint32_t deviceTags;
         const int32_t clientPid;
-        bool IsSameClient(int32_t id, int32_t pid) const { return ((filterId == id) && (clientPid == pid)); }
+        bool IsSameClient(int32_t id, int32_t pid) const
+        {
+            return ((filterId == id) && (clientPid == pid));
+        }
     };
     std::list<FilterInfo> filters_;
 };

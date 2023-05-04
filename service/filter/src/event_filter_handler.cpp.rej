@@ -1,0 +1,89 @@
+diff a/service/filter/src/event_filter_handler.cpp b/service/filter/src/event_filter_handler.cpp	(rejected hunks)
+@@ -4,7 +4,7 @@
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+  *
+- *     http://www.apache.org/licenses/LICENSE-2.0
++ * http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+@@ -65,35 +65,41 @@ void EventFilterHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> po
+ }
+ #endif // OHOS_BUILD_ENABLE_TOUCH
+ 
+-int32_t EventFilterHandler::AddInputEventFilter(sptr<IEventFilter> filter,
+-    int32_t filterId, int32_t priority, uint32_t deviceTags, int32_t clientPid)
++int32_t EventFilterHandler::AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority,
++    uint32_t deviceTags, int32_t clientPid)
+ {
+     CALL_INFO_TRACE;
+     std::lock_guard<std::mutex> guard(lockFilter_);
+     CHKPR(filter, ERROR_NULL_POINTER);
+     MMI_HILOGI("Add filter,filterId:%{public}d,priority:%{public}d,clientPid:%{public}d,filters_ size:%{public}zu",
+         filterId, priority, clientPid, filters_.size());
+-    
++
+     std::weak_ptr<EventFilterHandler> weakPtr = shared_from_this();
+     auto deathCallback = [weakPtr, filterId, clientPid](const wptr<IRemoteObject> &object) {
+         auto sharedPtr = weakPtr.lock();
+         if (sharedPtr != nullptr) {
+             auto ret = sharedPtr->RemoveInputEventFilter(filterId, clientPid);
+             if (ret != RET_OK) {
+-                MMI_HILOGW("Remove filter on dead return:%{public}d, filterId:%{public}d,clientPid:%{public}d",
+-                    ret, filterId, clientPid);
+-            } else {
+-                MMI_HILOGW("Remove filter on dead success, filterId:%{public}d,clientPid:%{public}d",
++                MMI_HILOGW("Remove filter on dead return:%{public}d, filterId:%{public}d,clientPid:%{public}d", ret,
+                     filterId, clientPid);
++            } else {
++                MMI_HILOGW("Remove filter on dead success, filterId:%{public}d,clientPid:%{public}d", filterId,
++                    clientPid);
+             }
+         }
+     };
+     sptr<IRemoteObject::DeathRecipient> deathRecipient = new (std::nothrow) EventFilterDeathRecipient(deathCallback);
+     CHKPR(deathRecipient, RET_ERR);
+     filter->AsObject()->AddDeathRecipient(deathRecipient);
+-    
+-    FilterInfo info { .filter = filter, .deathRecipient = deathRecipient, .filterId = filterId,
+-        .priority = priority, .deviceTags = deviceTags, .clientPid = clientPid };
++
++    FilterInfo info{
++        .filter = filter,
++        .deathRecipient = deathRecipient,
++        .filterId = filterId,
++        .priority = priority,
++        .deviceTags = deviceTags,
++        .clientPid = clientPid
++    };
+     auto it = filters_.cbegin();
+     for (; it != filters_.cend(); ++it) {
+         if (info.priority < it->priority) {
+@@ -149,7 +155,7 @@ void EventFilterHandler::Dump(int32_t fd, const std::vector<std::string> &args)
+     dprintf(fd, "Filters: count=%d\n", filters_.size());
+     for (const auto &item : filters_) {
+         dprintf(fd, "priority:%d | filterId:%d | Pid:%d\n", item.priority, item.filterId, item.clientPid);
+-    }    
++    }
+ }
+ 
+ bool EventFilterHandler::HandleKeyEventFilter(std::shared_ptr<KeyEvent> event)
+@@ -167,7 +173,7 @@ bool EventFilterHandler::HandleKeyEventFilter(std::shared_ptr<KeyEvent> event)
+     }
+     std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetInputDevice(keyItems.front().GetDeviceId());
+     CHKPF(inputDevice);
+-    for (auto &i: filters_) {
++    for (auto &i : filters_) {
+         if (!inputDevice->HasCapability(i.deviceTags)) {
+             continue;
+         }
+@@ -195,7 +201,7 @@ bool EventFilterHandler::HandlePointerEventFilter(std::shared_ptr<PointerEvent>
+     }
+     std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetInputDevice(pointerItem.GetDeviceId());
+     CHKPF(inputDevice);
+-    for (auto &i: filters_) {
++    for (auto &i : filters_) {
+         if (!inputDevice->HasCapability(i.deviceTags)) {
+             continue;
+         }

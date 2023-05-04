@@ -1,0 +1,56 @@
+diff a/interfaces/native/innerkits/event/include/input_device.h b/interfaces/native/innerkits/event/include/input_device.h	(rejected hunks)
+@@ -4,7 +4,7 @@
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+  *
+- *     http://www.apache.org/licenses/LICENSE-2.0
++ * http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+@@ -101,29 +101,29 @@ public:
+         int32_t GetResolution() const;
+ 
+     private:
+-        int32_t axisType_ { 0 };
+-        int32_t minimum_ { 0 };
+-        int32_t maximum_ { 0 };
+-        int32_t fuzz_ { 0 };
+-        int32_t flat_ { 0 };
+-        int32_t resolution_ { 0 };
++        int32_t axisType_{ 0 };
++        int32_t minimum_{ 0 };
++        int32_t maximum_{ 0 };
++        int32_t fuzz_{ 0 };
++        int32_t flat_{ 0 };
++        int32_t resolution_{ 0 };
+     };
+ 
+     void AddAxisInfo(AxisInfo axis);
+     std::vector<AxisInfo> GetAxisInfo();
+     InputDevice(int32_t id, std::string name, int32_t deviceType, int32_t bus, int32_t version, int32_t product,
+-                int32_t vendor, std::string phys, std::string uniq, std::vector<AxisInfo> axis);
++        int32_t vendor, std::string phys, std::string uniq, std::vector<AxisInfo> axis);
+ 
+ private:
+-    int32_t id_ { -1 };
+-    std::string name_ { "null" };
+-    int32_t type_ { 0 };
+-    int32_t bus_ { -1 };
+-    int32_t version_ { -1 };
+-    int32_t product_ { -1 };
+-    int32_t vendor_ { -1 };
+-    std::string phys_ { "null" };
+-    std::string uniq_ { "null" };
++    int32_t id_{ -1 };
++    std::string name_{ "null" };
++    int32_t type_{ 0 };
++    int32_t bus_{ -1 };
++    int32_t version_{ -1 };
++    int32_t product_{ -1 };
++    int32_t vendor_{ -1 };
++    std::string phys_{ "null" };
++    std::string uniq_{ "null" };
+     std::vector<AxisInfo> axis_;
+     std::bitset<INPUT_DEV_CAP_MAX> capabilities_;
+ };

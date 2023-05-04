@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,21 +31,13 @@ public:
     void TearDown();
 };
 
-void MouseTransformProcessorTest::SetUpTestCase(void)
-{
-}
+void MouseTransformProcessorTest::SetUpTestCase(void) {}
 
-void MouseTransformProcessorTest::TearDownTestCase(void)
-{
-}
+void MouseTransformProcessorTest::TearDownTestCase(void) {}
 
-void MouseTransformProcessorTest::SetUp()
-{
-}
+void MouseTransformProcessorTest::SetUp() {}
 
-void MouseTransformProcessorTest::TearDown()
-{
-}
+void MouseTransformProcessorTest::TearDown() {}
 
 /**
  * @tc.name: MouseDeviceStateTest_GetPointerEvent_001

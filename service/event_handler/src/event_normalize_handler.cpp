@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -38,7 +38,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventNormalizeHandler" };
 }
 
-void EventNormalizeHandler::HandleEvent(libinput_event* event)
+void EventNormalizeHandler::HandleEvent(libinput_event *event)
 {
     CALL_DEBUG_ENTER;
     CHKPV(event);
@@ -211,7 +211,7 @@ void EventNormalizeHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent>
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
-int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
+int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event *event)
 {
     if (nextHandler_ == nullptr) {
         MMI_HILOGW("Keyboard device does not support");
@@ -248,7 +248,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     return RET_OK;
 }
 
-int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
+int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event *event)
 {
     if (nextHandler_ == nullptr) {
         MMI_HILOGW("Pointer device does not support");
@@ -264,7 +264,7 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
-    for (const int32_t& keyCode : pressedKeys) {
+    for (const int32_t &keyCode : pressedKeys) {
         MMI_HILOGI("Pressed keyCode:%{public}d", keyCode);
     }
     pointerEvent->SetPressedKeys(pressedKeys);
@@ -277,7 +277,7 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
     return RET_OK;
 }
 
-int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
+int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event *event)
 {
     if (nextHandler_ == nullptr) {
         MMI_HILOGW("Pointer device does not support");
@@ -303,7 +303,7 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     return RET_OK;
 }
 
-int32_t EventNormalizeHandler::HandleGestureEvent(libinput_event* event)
+int32_t EventNormalizeHandler::HandleGestureEvent(libinput_event *event)
 {
     if (nextHandler_ == nullptr) {
         MMI_HILOGW("Pointer device does not support");
@@ -314,22 +314,20 @@ int32_t EventNormalizeHandler::HandleGestureEvent(libinput_event* event)
     auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::GESTURE);
     CHKPR(pointerEvent, GESTURE_EVENT_PKG_FAIL);
     MMI_HILOGD("GestureEvent package, eventType:%{public}d,actionTime:%{public}" PRId64 ","
-               "action:%{public}d,actionStartTime:%{public}" PRId64 ","
-               "pointerAction:%{public}d,sourceType:%{public}d,"
-               "PinchAxisValue:%{public}.2f",
-                pointerEvent->GetEventType(), pointerEvent->GetActionTime(),
-                pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
-                pointerEvent->GetPointerAction(), pointerEvent->GetSourceType(),
-                pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH));
+        "action:%{public}d,actionStartTime:%{public}" PRId64 ","
+        "pointerAction:%{public}d,sourceType:%{public}d,"
+        "PinchAxisValue:%{public}.2f",
+        pointerEvent->GetEventType(), pointerEvent->GetActionTime(), pointerEvent->GetAction(),
+        pointerEvent->GetActionStartTime(), pointerEvent->GetPointerAction(), pointerEvent->GetSourceType(),
+        pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH));
 
     PointerEvent::PointerItem item;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item);
     MMI_HILOGD("Item:DownTime:%{public}" PRId64 ",IsPressed:%{public}s,"
-               "DisplayX:%{public}d,DisplayY:%{public}d,WindowX:%{public}d,WindowY:%{public}d,"
-               "Width:%{public}d,Height:%{public}d",
-               item.GetDownTime(), (item.IsPressed() ? "true" : "false"),
-               item.GetDisplayX(), item.GetDisplayY(), item.GetWindowX(), item.GetWindowY(),
-               item.GetWidth(), item.GetHeight());
+        "DisplayX:%{public}d,DisplayY:%{public}d,WindowX:%{public}d,WindowY:%{public}d,"
+        "Width:%{public}d,Height:%{public}d",
+        item.GetDownTime(), (item.IsPressed() ? "true" : "false"), item.GetDisplayX(), item.GetDisplayY(),
+        item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight());
     nextHandler_->HandlePointerEvent(pointerEvent);
 #else
     MMI_HILOGW("Pointer device does not support");
@@ -337,7 +335,7 @@ int32_t EventNormalizeHandler::HandleGestureEvent(libinput_event* event)
     return RET_OK;
 }
 
-int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event)
+int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event *event)
 {
     LibinputAdapter::LoginfoPackagingTool(event);
     if (nextHandler_ == nullptr) {
@@ -357,8 +355,7 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event)
     return RET_OK;
 }
 
-void EventNormalizeHandler::ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent,
-    struct libinput_event *event)
+void EventNormalizeHandler::ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent, struct libinput_event *event)
 {
     CHKPV(pointerEvent);
     CHKPV(event);
@@ -373,7 +370,7 @@ void EventNormalizeHandler::ResetTouchUpEvent(std::shared_ptr<PointerEvent> poin
     }
 }
 
-int32_t EventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
+int32_t EventNormalizeHandler::HandleTableToolEvent(libinput_event *event)
 {
     if (nextHandler_ == nullptr) {
         MMI_HILOGW("TableTool device does not support");
@@ -394,7 +391,7 @@ int32_t EventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
     return RET_OK;
 }
 
-int32_t EventNormalizeHandler::HandleJoystickEvent(libinput_event* event)
+int32_t EventNormalizeHandler::HandleJoystickEvent(libinput_event *event)
 {
     CALL_DEBUG_ENTER;
     if (nextHandler_ == nullptr) {
@@ -413,7 +410,7 @@ int32_t EventNormalizeHandler::HandleJoystickEvent(libinput_event* event)
     return RET_OK;
 }
 
-int32_t EventNormalizeHandler::HandleSwitchInputEvent(libinput_event* event)
+int32_t EventNormalizeHandler::HandleSwitchInputEvent(libinput_event *event)
 {
     if (nextHandler_ == nullptr) {
         MMI_HILOGW("switch device does not support");

@@ -1,0 +1,61 @@
+diff a/service/connect_manager/src/multimodal_input_connect_proxy.cpp b/service/connect_manager/src/multimodal_input_connect_proxy.cpp	(rejected hunks)
+@@ -4,7 +4,7 @@
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+  *
+- *     http://www.apache.org/licenses/LICENSE-2.0
++ * http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+@@ -83,8 +83,8 @@ MultimodalInputConnectProxy::MultimodalInputConnectProxy(const sptr<IRemoteObjec
+     MMI_HILOGD("Enter MultimodalInputConnectProxy");
+ }
+ 
+-int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programName,
+-    const int32_t moduleType, int32_t &socketFd, int32_t &tokenType)
++int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programName, const int32_t moduleType,
++    int32_t &socketFd, int32_t &tokenType)
+ {
+     CALL_DEBUG_ENTER;
+     MessageParcel data;
+@@ -312,7 +312,7 @@ int32_t MultimodalInputConnectProxy::MarkProcessed(int32_t eventType, int32_t ev
+     }
+     WRITEINT32(data, eventType, ERR_INVALID_VALUE);
+     WRITEINT32(data, eventId, ERR_INVALID_VALUE);
+-    
++
+     MessageParcel reply;
+     MessageOption option;
+     sptr<IRemoteObject> remote = Remote();
+@@ -566,8 +566,8 @@ int32_t MultimodalInputConnectProxy::GetKeyboardType(int32_t deviceId, int32_t &
+     return RET_OK;
+ }
+ 
+-int32_t MultimodalInputConnectProxy::AddInputHandler(InputHandlerType handlerType,
+-    HandleEventType eventType, int32_t priority, uint32_t deviceTags)
++int32_t MultimodalInputConnectProxy::AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
++    int32_t priority, uint32_t deviceTags)
+ {
+     CALL_DEBUG_ENTER;
+     MessageParcel data;
+@@ -591,8 +591,8 @@ int32_t MultimodalInputConnectProxy::AddInputHandler(InputHandlerType handlerTyp
+     return RET_OK;
+ }
+ 
+-int32_t MultimodalInputConnectProxy::RemoveInputHandler(InputHandlerType handlerType,
+-    HandleEventType eventType, int32_t priority, uint32_t deviceTags)
++int32_t MultimodalInputConnectProxy::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
++    int32_t priority, uint32_t deviceTags)
+ {
+     CALL_DEBUG_ENTER;
+     MessageParcel data;
+@@ -987,7 +987,7 @@ int32_t MultimodalInputConnectProxy::SetMouseCaptureMode(int32_t windowId, bool
+     return ret;
+ }
+ 
+-int32_t MultimodalInputConnectProxy::AppendExtraData(const ExtraData& extraData)
++int32_t MultimodalInputConnectProxy::AppendExtraData(const ExtraData &extraData)
+ {
+     CALL_DEBUG_ENTER;
+     MessageParcel data;

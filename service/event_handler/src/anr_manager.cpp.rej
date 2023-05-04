@@ -1,0 +1,31 @@
+diff a/service/event_handler/src/anr_manager.cpp b/service/event_handler/src/anr_manager.cpp	(rejected hunks)
+@@ -4,7 +4,7 @@
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+  *
+- *     http://www.apache.org/licenses/LICENSE-2.0
++ * http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+@@ -57,7 +57,8 @@ int32_t ANRManager::MarkProcessed(int32_t pid, int32_t eventType, int32_t eventI
+             TimerMgr->RemoveTimer(item);
+             anrTimerCount_--;
+             MMI_HILOGD("Remove anr timer, anr type:%{public}d, eventId:%{public}d, timer id:%{public}d,"
+-                "count:%{public}d", eventType, eventId, item, anrTimerCount_);
++                "count:%{public}d",
++                eventType, eventId, item, anrTimerCount_);
+         }
+     }
+     return RET_OK;
+@@ -118,8 +119,8 @@ void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, Session
+             if (item != -1) {
+                 TimerMgr->RemoveTimer(item);
+                 anrTimerCount_--;
+-                MMI_HILOGD("Clear anr timer, type:%{public}d, timer id:%{public}d, count:%{public}d",
+-                    type, item, anrTimerCount_);
++                MMI_HILOGD("Clear anr timer, type:%{public}d, timer id:%{public}d, count:%{public}d", type, item,
++                    anrTimerCount_);
+             }
+         }
+     });

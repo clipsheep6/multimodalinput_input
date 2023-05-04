@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,15 +30,14 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectStub" };
-using ConnFunc = int32_t (MultimodalInputConnectStub::*)(MessageParcel& data, MessageParcel& reply);
+using ConnFunc = int32_t (MultimodalInputConnectStub::*)(MessageParcel &data, MessageParcel &reply);
 } // namespace
 
-int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel& data,
-    MessageParcel& reply, MessageOption& option)
+int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
+    MessageOption &option)
 {
     int32_t pid = GetCallingPid();
-    TimeCostChk chk("IPC-OnRemoteRequest", "overtime 300(us)", MAX_OVER_TIME, pid,
-        static_cast<int64_t>(code));
+    TimeCostChk chk("IPC-OnRemoteRequest", "overtime 300(us)", MAX_OVER_TIME, pid, static_cast<int64_t>(code));
     MMI_HILOGD("RemoteRequest code:%{public}d tid:%{public}" PRIu64 " pid:%{public}d", code, GetThisThreadId(), pid);
 
     std::u16string descriptor = data.ReadInterfaceToken();
@@ -47,48 +46,48 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         return ERR_INVALID_STATE;
     }
     const static std::map<int32_t, ConnFunc> mapConnFunc = {
-        {IMultimodalInputConnect::ALLOC_SOCKET_FD, &MultimodalInputConnectStub::StubHandleAllocSocketFd},
-        {IMultimodalInputConnect::ADD_INPUT_EVENT_FILTER, &MultimodalInputConnectStub::StubAddInputEventFilter},
-        {IMultimodalInputConnect::RMV_INPUT_EVENT_FILTER, &MultimodalInputConnectStub::StubRemoveInputEventFilter},
-        {IMultimodalInputConnect::SET_MOUSE_PRIMARY_BUTTON, &MultimodalInputConnectStub::StubSetMousePrimaryButton},
-        {IMultimodalInputConnect::GET_MOUSE_PRIMARY_BUTTON, &MultimodalInputConnectStub::StubGetMousePrimaryButton},
-        {IMultimodalInputConnect::SET_HOVER_SCROLL_STATE, &MultimodalInputConnectStub::StubSetHoverScrollState},
-        {IMultimodalInputConnect::GET_HOVER_SCROLL_STATE, &MultimodalInputConnectStub::StubGetHoverScrollState},
-        {IMultimodalInputConnect::SET_POINTER_VISIBLE, &MultimodalInputConnectStub::StubSetPointerVisible},
-        {IMultimodalInputConnect::SET_POINTER_STYLE, &MultimodalInputConnectStub::StubSetPointerStyle},
-        {IMultimodalInputConnect::GET_POINTER_STYLE, &MultimodalInputConnectStub::StubGetPointerStyle},
-        {IMultimodalInputConnect::IS_POINTER_VISIBLE, &MultimodalInputConnectStub::StubIsPointerVisible},
-        {IMultimodalInputConnect::REGISTER_DEV_MONITOR, &MultimodalInputConnectStub::StubRegisterInputDeviceMonitor},
-        {IMultimodalInputConnect::UNREGISTER_DEV_MONITOR,
-            &MultimodalInputConnectStub::StubUnregisterInputDeviceMonitor},
-        {IMultimodalInputConnect::GET_DEVICE_IDS, &MultimodalInputConnectStub::StubGetDeviceIds},
-        {IMultimodalInputConnect::GET_DEVICE, &MultimodalInputConnectStub::StubGetDevice},
-        {IMultimodalInputConnect::SUPPORT_KEYS, &MultimodalInputConnectStub::StubSupportKeys},
-        {IMultimodalInputConnect::GET_KEYBOARD_TYPE, &MultimodalInputConnectStub::StubGetKeyboardType},
-        {IMultimodalInputConnect::SET_POINTER_SPEED, &MultimodalInputConnectStub::StubSetPointerSpeed},
-        {IMultimodalInputConnect::GET_POINTER_SPEED, &MultimodalInputConnectStub::StubGetPointerSpeed},
-        {IMultimodalInputConnect::SUBSCRIBE_KEY_EVENT, &MultimodalInputConnectStub::StubSubscribeKeyEvent},
-        {IMultimodalInputConnect::UNSUBSCRIBE_KEY_EVENT, &MultimodalInputConnectStub::StubUnsubscribeKeyEvent},
-        {IMultimodalInputConnect::SUBSCRIBE_SWITCH_EVENT, &MultimodalInputConnectStub::StubSubscribeSwitchEvent},
-        {IMultimodalInputConnect::UNSUBSCRIBE_SWITCH_EVENT, &MultimodalInputConnectStub::StubUnsubscribeSwitchEvent},
-        {IMultimodalInputConnect::MARK_PROCESSED, &MultimodalInputConnectStub::StubMarkProcessed},
-        {IMultimodalInputConnect::ADD_INPUT_HANDLER, &MultimodalInputConnectStub::StubAddInputHandler},
-        {IMultimodalInputConnect::REMOVE_INPUT_HANDLER, &MultimodalInputConnectStub::StubRemoveInputHandler},
-        {IMultimodalInputConnect::MARK_EVENT_CONSUMED, &MultimodalInputConnectStub::StubMarkEventConsumed},
-        {IMultimodalInputConnect::MOVE_MOUSE, &MultimodalInputConnectStub::StubMoveMouseEvent},
-        {IMultimodalInputConnect::INJECT_KEY_EVENT, &MultimodalInputConnectStub::StubInjectKeyEvent},
-        {IMultimodalInputConnect::INJECT_POINTER_EVENT, &MultimodalInputConnectStub::StubInjectPointerEvent},
-        {IMultimodalInputConnect::SET_ANR_OBSERVER, &MultimodalInputConnectStub::StubSetAnrListener},
-        {IMultimodalInputConnect::GET_DISPLAY_BIND_INFO, &MultimodalInputConnectStub::StubGetDisplayBindInfo},
-        {IMultimodalInputConnect::SET_DISPLAY_BIND, &MultimodalInputConnectStub::StubSetDisplayBind},
-        {IMultimodalInputConnect::GET_FUNCTION_KEY_STATE, &MultimodalInputConnectStub::StubGetFunctionKeyState},
-        {IMultimodalInputConnect::SET_FUNCTION_KEY_STATE, &MultimodalInputConnectStub::StubSetFunctionKeyState},
-        {IMultimodalInputConnect::SET_POINTER_LOCATION, &MultimodalInputConnectStub::StubSetPointerLocation},
-        {IMultimodalInputConnect::SET_CAPTURE_MODE, &MultimodalInputConnectStub::StubSetMouseCaptureMode},
-        {IMultimodalInputConnect::GET_WINDOW_PID, &MultimodalInputConnectStub::StubGetWindowPid},
-        {IMultimodalInputConnect::APPEND_EXTRA_DATA, &MultimodalInputConnectStub::StubAppendExtraData},
-        {IMultimodalInputConnect::ENABLE_INPUT_DEVICE, &MultimodalInputConnectStub::StubEnableInputDevice},
-        {IMultimodalInputConnect::SET_KEY_DOWN_DURATION, &MultimodalInputConnectStub::StubSetKeyDownDuration},
+        { IMultimodalInputConnect::ALLOC_SOCKET_FD, &MultimodalInputConnectStub::StubHandleAllocSocketFd },
+        { IMultimodalInputConnect::ADD_INPUT_EVENT_FILTER, &MultimodalInputConnectStub::StubAddInputEventFilter },
+        { IMultimodalInputConnect::RMV_INPUT_EVENT_FILTER, &MultimodalInputConnectStub::StubRemoveInputEventFilter },
+        { IMultimodalInputConnect::SET_MOUSE_PRIMARY_BUTTON, &MultimodalInputConnectStub::StubSetMousePrimaryButton },
+        { IMultimodalInputConnect::GET_MOUSE_PRIMARY_BUTTON, &MultimodalInputConnectStub::StubGetMousePrimaryButton },
+        { IMultimodalInputConnect::SET_HOVER_SCROLL_STATE, &MultimodalInputConnectStub::StubSetHoverScrollState },
+        { IMultimodalInputConnect::GET_HOVER_SCROLL_STATE, &MultimodalInputConnectStub::StubGetHoverScrollState },
+        { IMultimodalInputConnect::SET_POINTER_VISIBLE, &MultimodalInputConnectStub::StubSetPointerVisible },
+        { IMultimodalInputConnect::SET_POINTER_STYLE, &MultimodalInputConnectStub::StubSetPointerStyle },
+        { IMultimodalInputConnect::GET_POINTER_STYLE, &MultimodalInputConnectStub::StubGetPointerStyle },
+        { IMultimodalInputConnect::IS_POINTER_VISIBLE, &MultimodalInputConnectStub::StubIsPointerVisible },
+        { IMultimodalInputConnect::REGISTER_DEV_MONITOR, &MultimodalInputConnectStub::StubRegisterInputDeviceMonitor },
+        { IMultimodalInputConnect::UNREGISTER_DEV_MONITOR,
+          &MultimodalInputConnectStub::StubUnregisterInputDeviceMonitor },
+        { IMultimodalInputConnect::GET_DEVICE_IDS, &MultimodalInputConnectStub::StubGetDeviceIds },
+        { IMultimodalInputConnect::GET_DEVICE, &MultimodalInputConnectStub::StubGetDevice },
+        { IMultimodalInputConnect::SUPPORT_KEYS, &MultimodalInputConnectStub::StubSupportKeys },
+        { IMultimodalInputConnect::GET_KEYBOARD_TYPE, &MultimodalInputConnectStub::StubGetKeyboardType },
+        { IMultimodalInputConnect::SET_POINTER_SPEED, &MultimodalInputConnectStub::StubSetPointerSpeed },
+        { IMultimodalInputConnect::GET_POINTER_SPEED, &MultimodalInputConnectStub::StubGetPointerSpeed },
+        { IMultimodalInputConnect::SUBSCRIBE_KEY_EVENT, &MultimodalInputConnectStub::StubSubscribeKeyEvent },
+        { IMultimodalInputConnect::UNSUBSCRIBE_KEY_EVENT, &MultimodalInputConnectStub::StubUnsubscribeKeyEvent },
+        { IMultimodalInputConnect::SUBSCRIBE_SWITCH_EVENT, &MultimodalInputConnectStub::StubSubscribeSwitchEvent },
+        { IMultimodalInputConnect::UNSUBSCRIBE_SWITCH_EVENT, &MultimodalInputConnectStub::StubUnsubscribeSwitchEvent },
+        { IMultimodalInputConnect::MARK_PROCESSED, &MultimodalInputConnectStub::StubMarkProcessed },
+        { IMultimodalInputConnect::ADD_INPUT_HANDLER, &MultimodalInputConnectStub::StubAddInputHandler },
+        { IMultimodalInputConnect::REMOVE_INPUT_HANDLER, &MultimodalInputConnectStub::StubRemoveInputHandler },
+        { IMultimodalInputConnect::MARK_EVENT_CONSUMED, &MultimodalInputConnectStub::StubMarkEventConsumed },
+        { IMultimodalInputConnect::MOVE_MOUSE, &MultimodalInputConnectStub::StubMoveMouseEvent },
+        { IMultimodalInputConnect::INJECT_KEY_EVENT, &MultimodalInputConnectStub::StubInjectKeyEvent },
+        { IMultimodalInputConnect::INJECT_POINTER_EVENT, &MultimodalInputConnectStub::StubInjectPointerEvent },
+        { IMultimodalInputConnect::SET_ANR_OBSERVER, &MultimodalInputConnectStub::StubSetAnrListener },
+        { IMultimodalInputConnect::GET_DISPLAY_BIND_INFO, &MultimodalInputConnectStub::StubGetDisplayBindInfo },
+        { IMultimodalInputConnect::SET_DISPLAY_BIND, &MultimodalInputConnectStub::StubSetDisplayBind },
+        { IMultimodalInputConnect::GET_FUNCTION_KEY_STATE, &MultimodalInputConnectStub::StubGetFunctionKeyState },
+        { IMultimodalInputConnect::SET_FUNCTION_KEY_STATE, &MultimodalInputConnectStub::StubSetFunctionKeyState },
+        { IMultimodalInputConnect::SET_POINTER_LOCATION, &MultimodalInputConnectStub::StubSetPointerLocation },
+        { IMultimodalInputConnect::SET_CAPTURE_MODE, &MultimodalInputConnectStub::StubSetMouseCaptureMode },
+        { IMultimodalInputConnect::GET_WINDOW_PID, &MultimodalInputConnectStub::StubGetWindowPid },
+        { IMultimodalInputConnect::APPEND_EXTRA_DATA, &MultimodalInputConnectStub::StubAppendExtraData },
+        { IMultimodalInputConnect::ENABLE_INPUT_DEVICE, &MultimodalInputConnectStub::StubEnableInputDevice },
+        { IMultimodalInputConnect::SET_KEY_DOWN_DURATION, &MultimodalInputConnectStub::StubSetKeyDownDuration },
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -98,7 +97,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
-int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel &data, MessageParcel &reply)
 {
     int32_t pid = GetCallingPid();
     if (!IsRunning()) {
@@ -131,7 +130,7 @@ int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data,
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_CORE)) {
@@ -158,7 +157,7 @@ int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data,
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectStub::StubRemoveInputEventFilter(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubRemoveInputEventFilter(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_CORE)) {
@@ -176,7 +175,7 @@ int32_t MultimodalInputConnectStub::StubRemoveInputEventFilter(MessageParcel& da
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectStub::StubSetMousePrimaryButton(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubSetMousePrimaryButton(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
@@ -194,7 +193,7 @@ int32_t MultimodalInputConnectStub::StubSetMousePrimaryButton(MessageParcel& dat
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectStub::StubGetMousePrimaryButton(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubGetMousePrimaryButton(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
@@ -212,7 +211,7 @@ int32_t MultimodalInputConnectStub::StubGetMousePrimaryButton(MessageParcel& dat
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectStub::StubSetHoverScrollState(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubSetHoverScrollState(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
@@ -230,7 +229,7 @@ int32_t MultimodalInputConnectStub::StubSetHoverScrollState(MessageParcel& data,
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectStub::StubGetHoverScrollState(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubGetHoverScrollState(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
@@ -248,7 +247,7 @@ int32_t MultimodalInputConnectStub::StubGetHoverScrollState(MessageParcel& data,
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectStub::StubSetPointerVisible(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubSetPointerVisible(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     bool visible = false;
@@ -262,7 +261,7 @@ int32_t MultimodalInputConnectStub::StubSetPointerVisible(MessageParcel& data, M
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectStub::StubIsPointerVisible(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubIsPointerVisible(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     bool visible = false;
@@ -276,7 +275,7 @@ int32_t MultimodalInputConnectStub::StubIsPointerVisible(MessageParcel& data, Me
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectStub::StubMarkProcessed(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubMarkProcessed(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     if (!IsRunning()) {
@@ -294,7 +293,7 @@ int32_t MultimodalInputConnectStub::StubMarkProcessed(MessageParcel& data, Messa
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectStub::StubSetPointerSpeed(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubSetPointerSpeed(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
@@ -311,7 +310,7 @@ int32_t MultimodalInputConnectStub::StubSetPointerSpeed(MessageParcel& data, Mes
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectStub::StubGetPointerSpeed(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubGetPointerSpeed(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
@@ -329,7 +328,7 @@ int32_t MultimodalInputConnectStub::StubGetPointerSpeed(MessageParcel& data, Mes
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectStub::StubSetPointerStyle(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubSetPointerStyle(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     int32_t windowId;
@@ -349,7 +348,7 @@ int32_t MultimodalInputConnectStub::StubSetPointerStyle(MessageParcel& data, Mes
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectStub::StubGetPointerStyle(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubGetPointerStyle(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     int32_t windowId;
@@ -369,7 +368,7 @@ int32_t MultimodalInputConnectStub::StubGetPointerStyle(MessageParcel& data, Mes
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectStub::StubSupportKeys(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubSupportKeys(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     int32_t deviceId = -1;
@@ -395,7 +394,7 @@ int32_t MultimodalInputConnectStub::StubSupportKeys(MessageParcel& data, Message
     return ret;
 }
 
-int32_t MultimodalInputConnectStub::StubGetDeviceIds(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubGetDeviceIds(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     std::vector<int32_t> ids;
@@ -411,7 +410,7 @@ int32_t MultimodalInputConnectStub::StubGetDeviceIds(MessageParcel& data, Messag
     return ret;
 }
 
-int32_t MultimodalInputConnectStub::StubGetDevice(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubGetDevice(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     int32_t deviceId = -1;
@@ -444,7 +443,7 @@ int32_t MultimodalInputConnectStub::StubGetDevice(MessageParcel& data, MessagePa
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectStub::StubRegisterInputDeviceMonitor(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubRegisterInputDeviceMonitor(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = RegisterDevListener();
@@ -454,7 +453,7 @@ int32_t MultimodalInputConnectStub::StubRegisterInputDeviceMonitor(MessageParcel
     return ret;
 }
 
-int32_t MultimodalInputConnectStub::StubUnregisterInputDeviceMonitor(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubUnregisterInputDeviceMonitor(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = UnregisterDevListener();
@@ -464,7 +463,7 @@ int32_t MultimodalInputConnectStub::StubUnregisterInputDeviceMonitor(MessageParc
     return ret;
 }
 
-int32_t MultimodalInputConnectStub::StubGetKeyboardType(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubGetKeyboardType(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     int32_t deviceId = -1;
@@ -479,7 +478,7 @@ int32_t MultimodalInputConnectStub::StubGetKeyboardType(MessageParcel& data, Mes
     return ret;
 }
 
-int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->VerifySystemApp()) {
@@ -508,8 +507,7 @@ int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, Mes
     READINT32(data, priority, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t deviceTags;
     READINT32(data, deviceTags, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = AddInputHandler(static_cast<InputHandlerType>(handlerType), eventType, priority,
-        deviceTags);
+    int32_t ret = AddInputHandler(static_cast<InputHandlerType>(handlerType), eventType, priority, deviceTags);
     if (ret != RET_OK) {
         MMI_HILOGE("Call AddInputHandler failed ret:%{public}d", ret);
         return ret;
@@ -517,7 +515,7 @@ int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, Mes
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectStub::StubRemoveInputHandler(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubRemoveInputHandler(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->VerifySystemApp()) {
@@ -546,8 +544,7 @@ int32_t MultimodalInputConnectStub::StubRemoveInputHandler(MessageParcel& data, 
     READINT32(data, priority, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t deviceTags;
     READINT32(data, deviceTags, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = RemoveInputHandler(static_cast<InputHandlerType>(handlerType), eventType, priority,
-        deviceTags);
+    int32_t ret = RemoveInputHandler(static_cast<InputHandlerType>(handlerType), eventType, priority, deviceTags);
     if (ret != RET_OK) {
         MMI_HILOGE("Call RemoveInputHandler failed ret:%{public}d", ret);
         return ret;
@@ -555,7 +552,7 @@ int32_t MultimodalInputConnectStub::StubRemoveInputHandler(MessageParcel& data, 
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectStub::StubMarkEventConsumed(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubMarkEventConsumed(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckMonitor()) {
@@ -577,7 +574,7 @@ int32_t MultimodalInputConnectStub::StubMarkEventConsumed(MessageParcel& data, M
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectStub::StubSubscribeKeyEvent(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubSubscribeKeyEvent(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->VerifySystemApp()) {
@@ -611,7 +608,7 @@ int32_t MultimodalInputConnectStub::StubSubscribeKeyEvent(MessageParcel& data, M
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectStub::StubUnsubscribeKeyEvent(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubUnsubscribeKeyEvent(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->VerifySystemApp()) {
@@ -640,7 +637,7 @@ int32_t MultimodalInputConnectStub::StubUnsubscribeKeyEvent(MessageParcel& data,
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectStub::StubSubscribeSwitchEvent(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubSubscribeSwitchEvent(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
@@ -663,7 +660,7 @@ int32_t MultimodalInputConnectStub::StubSubscribeSwitchEvent(MessageParcel& data
     return ret;
 }
 
-int32_t MultimodalInputConnectStub::StubUnsubscribeSwitchEvent(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubUnsubscribeSwitchEvent(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
@@ -686,7 +683,7 @@ int32_t MultimodalInputConnectStub::StubUnsubscribeSwitchEvent(MessageParcel& da
     return ret;
 }
 
-int32_t MultimodalInputConnectStub::StubMoveMouseEvent(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubMoveMouseEvent(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
@@ -711,7 +708,7 @@ int32_t MultimodalInputConnectStub::StubMoveMouseEvent(MessageParcel& data, Mess
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectStub::StubInjectKeyEvent(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubInjectKeyEvent(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->VerifySystemApp()) {
@@ -742,7 +739,7 @@ int32_t MultimodalInputConnectStub::StubInjectKeyEvent(MessageParcel& data, Mess
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectStub::StubInjectPointerEvent(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubInjectPointerEvent(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
@@ -767,7 +764,7 @@ int32_t MultimodalInputConnectStub::StubInjectPointerEvent(MessageParcel& data, 
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectStub::StubSetAnrListener(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubSetAnrListener(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
@@ -786,7 +783,7 @@ int32_t MultimodalInputConnectStub::StubSetAnrListener(MessageParcel& data, Mess
 }
 
 
-int32_t MultimodalInputConnectStub::StubGetDisplayBindInfo(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubGetDisplayBindInfo(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
@@ -815,7 +812,7 @@ int32_t MultimodalInputConnectStub::StubGetDisplayBindInfo(MessageParcel& data, 
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectStub::StubSetDisplayBind(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubSetDisplayBind(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
@@ -829,13 +826,13 @@ int32_t MultimodalInputConnectStub::StubSetDisplayBind(MessageParcel& data, Mess
     int32_t inputDeviceId = -1;
     READINT32(data, inputDeviceId, ERR_INVALID_VALUE);
     int32_t displayId = -1;
-    READINT32(data, displayId, ERR_INVALID_VALUE); 
-    std::string msg;  
+    READINT32(data, displayId, ERR_INVALID_VALUE);
+    std::string msg;
     int32_t ret = SetDisplayBind(inputDeviceId, displayId, msg);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetDisplayBind failed, ret:%{public}d", ret);
     }
-    WRITESTRING(reply, msg, ERR_INVALID_VALUE);  
+    WRITESTRING(reply, msg, ERR_INVALID_VALUE);
     return ret;
 }
 
@@ -851,8 +848,8 @@ int32_t MultimodalInputConnectStub::StubGetFunctionKeyState(MessageParcel &data,
         return MMISERVICE_NOT_RUNNING;
     }
 
-    int32_t funcKey { 0 };
-    bool state  { false };
+    int32_t funcKey{ 0 };
+    bool state{ false };
     READINT32(data, funcKey, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = GetFunctionKeyState(funcKey, state);
     if (ret != RET_OK) {
@@ -876,8 +873,8 @@ int32_t MultimodalInputConnectStub::StubSetFunctionKeyState(MessageParcel &data,
         return MMISERVICE_NOT_RUNNING;
     }
 
-    int32_t funcKey { 0 };
-    bool enable  { false };
+    int32_t funcKey{ 0 };
+    bool enable{ false };
     READINT32(data, funcKey, IPC_PROXY_DEAD_OBJECT_ERR);
     READBOOL(data, enable, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetFunctionKeyState(funcKey, enable);
@@ -910,7 +907,7 @@ int32_t MultimodalInputConnectStub::StubSetPointerLocation(MessageParcel &data, 
     return ret;
 }
 
-int32_t MultimodalInputConnectStub::StubSetMouseCaptureMode(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubSetMouseCaptureMode(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     int32_t windowId = -1;
@@ -924,7 +921,7 @@ int32_t MultimodalInputConnectStub::StubSetMouseCaptureMode(MessageParcel& data,
     return ret;
 }
 
-int32_t MultimodalInputConnectStub::StubGetWindowPid(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubGetWindowPid(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
@@ -946,7 +943,7 @@ int32_t MultimodalInputConnectStub::StubGetWindowPid(MessageParcel& data, Messag
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectStub::StubAppendExtraData(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubAppendExtraData(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     if (!IsRunning()) {
@@ -975,7 +972,7 @@ int32_t MultimodalInputConnectStub::StubAppendExtraData(MessageParcel& data, Mes
     return ret;
 }
 
-int32_t MultimodalInputConnectStub::StubEnableInputDevice(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubEnableInputDevice(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     if (!IsRunning()) {
@@ -991,7 +988,7 @@ int32_t MultimodalInputConnectStub::StubEnableInputDevice(MessageParcel& data, M
     return ret;
 }
 
-int32_t MultimodalInputConnectStub::StubSetKeyDownDuration(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubSetKeyDownDuration(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {

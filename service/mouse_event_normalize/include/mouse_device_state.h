@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,6 +29,7 @@ namespace OHOS {
 namespace MMI {
 class MouseDeviceState final {
     DECLARE_DELAYED_SINGLETON(MouseDeviceState);
+
 public:
     const int32_t mouseBtnMax = 8;
     enum LIBINPUT_BUTTON_CODE {
@@ -42,8 +43,8 @@ public:
         LIBINPUT_TASK_BUTTON_CODE
     };
     struct MouseDeviceCoords {
-        int32_t physicalX { 0 };
-        int32_t physicalY { 0 };
+        int32_t physicalX{ 0 };
+        int32_t physicalY{ 0 };
     };
     const std::map<uint32_t, int32_t> mapLibinputChangeToPointer = {
         { LIBINPUT_LEFT_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_LEFT },
@@ -55,18 +56,19 @@ public:
         { LIBINPUT_BACK_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_BACK },
         { LIBINPUT_TASK_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_TASK },
     };
+
 public:
     DISALLOW_COPY_AND_MOVE(MouseDeviceState);
     int32_t GetMouseCoordsX() const;
     int32_t GetMouseCoordsY() const;
     void SetMouseCoords(int32_t x, int32_t y);
     bool IsLeftBtnPressed();
-    void GetPressedButtons(std::vector<int32_t>& pressedButtons);
+    void GetPressedButtons(std::vector<int32_t> &pressedButtons);
     void MouseBtnStateCounts(uint32_t btnCode, const BUTTON_STATE btnState);
     int32_t LibinputChangeToPointer(const uint32_t keyValue);
 
 private:
-    void ChangeMouseState(const BUTTON_STATE btnState, int32_t& btnStateCount);
+    void ChangeMouseState(const BUTTON_STATE btnState, int32_t &btnStateCount);
 
 private:
     MouseDeviceCoords mouseCoord_;

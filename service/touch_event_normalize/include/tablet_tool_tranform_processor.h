@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,15 +28,15 @@ public:
     std::shared_ptr<PointerEvent> OnEvent(struct libinput_event *event) override;
 
 private:
-    int32_t GetToolType(struct libinput_event_tablet_tool* tabletEvent);
-    bool OnTip(struct libinput_event* event);
-    bool OnTipDown(struct libinput_event_tablet_tool* event);
-    bool OnTipMotion(struct libinput_event* event);
-    bool OnTipUp(struct libinput_event_tablet_tool* event);
+    int32_t GetToolType(struct libinput_event_tablet_tool *tabletEvent);
+    bool OnTip(struct libinput_event *event);
+    bool OnTipDown(struct libinput_event_tablet_tool *event);
+    bool OnTipMotion(struct libinput_event *event);
+    bool OnTipUp(struct libinput_event_tablet_tool *event);
 
 private:
-    const int32_t deviceId_ { -1 };
-    std::shared_ptr<PointerEvent> pointerEvent_  { nullptr };
+    const int32_t deviceId_{ -1 };
+    std::shared_ptr<PointerEvent> pointerEvent_{ nullptr };
 };
 } // namespace MMI
 } // namespace OHOS

@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -63,17 +63,17 @@ private:
     class SessionHandler {
     public:
         SessionHandler(InputHandlerType handlerType, HandleEventType eventType, SessionPtr session)
-            : handlerType_(handlerType), eventType_(eventType & HANDLE_EVENT_TYPE_ALL),
-              session_(session) {}
+            : handlerType_(handlerType), eventType_(eventType & HANDLE_EVENT_TYPE_ALL), session_(session)
+        {}
         void SendToClient(std::shared_ptr<KeyEvent> keyEvent) const;
         void SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const;
-        bool operator<(const SessionHandler& other) const
+        bool operator < (const SessionHandler &other) const
         {
             return (session_ < other.session_);
         }
         InputHandlerType handlerType_;
         HandleEventType eventType_;
-        SessionPtr session_ { nullptr };
+        SessionPtr session_{ nullptr };
     };
 
     class MonitorCollection : public IInputEventCollectionHandler, protected NoCopyable {
@@ -84,8 +84,8 @@ private:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
         virtual bool HandleEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-        int32_t AddMonitor(const SessionHandler& mon);
-        void RemoveMonitor(const SessionHandler& mon);
+        int32_t AddMonitor(const SessionHandler &mon);
+        void RemoveMonitor(const SessionHandler &mon);
         void MarkConsumed(int32_t eventId, SessionPtr session);
 
         bool HasMonitor(SessionPtr session);
@@ -98,11 +98,11 @@ private:
         void OnSessionLost(SessionPtr session);
         void Dump(int32_t fd, const std::vector<std::string> &args);
 
-    struct ConsumptionState {
-        std::set<int32_t> eventIds_;
-        bool isMonitorConsumed_ { false };
-        std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
-    };
+        struct ConsumptionState {
+            std::set<int32_t> eventIds_;
+            bool isMonitorConsumed_{ false };
+            std::shared_ptr<PointerEvent> lastPointerEvent_{ nullptr };
+        };
 
     private:
         std::set<SessionHandler> monitors_;
@@ -110,7 +110,7 @@ private:
     };
 
 private:
-    bool sessionLostCallbackInitialized_ { false };
+    bool sessionLostCallbackInitialized_{ false };
     MonitorCollection monitors_;
 };
 } // namespace MMI

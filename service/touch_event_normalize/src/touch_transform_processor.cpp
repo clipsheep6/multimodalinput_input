@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,13 +24,12 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MMI_LOG_DOMAIN, "TouchTransformProcessor" };
-constexpr int32_t MT_TOOL_NONE { -1 };
-constexpr int32_t BTN_DOWN { 1 };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL{ LOG_CORE, MMI_LOG_DOMAIN, "TouchTransformProcessor" };
+constexpr int32_t MT_TOOL_NONE{ -1 };
+constexpr int32_t BTN_DOWN{ 1 };
 } // namespace
 
-TouchTransformProcessor::TouchTransformProcessor(int32_t deviceId)
-    : deviceId_(deviceId)
+TouchTransformProcessor::TouchTransformProcessor(int32_t deviceId) : deviceId_(deviceId)
 {
     InitToolTypes();
 }
@@ -190,8 +189,7 @@ std::shared_ptr<PointerEvent> TouchTransformProcessor::OnEvent(struct libinput_e
     return pointerEvent_;
 }
 
-int32_t TouchTransformProcessor::GetTouchToolType(struct libinput_event_touch *data,
-    struct libinput_device *device)
+int32_t TouchTransformProcessor::GetTouchToolType(struct libinput_event_touch *data, struct libinput_device *device)
 {
     int32_t toolType = libinput_event_touch_get_tool_type(data);
     switch (toolType) {
@@ -204,7 +202,7 @@ int32_t TouchTransformProcessor::GetTouchToolType(struct libinput_event_touch *d
         case MT_TOOL_PEN: {
             return PointerEvent::TOOL_TYPE_PEN;
         }
-        default : {
+        default: {
             MMI_HILOGW("Unknown tool type, identified as finger, toolType:%{public}d", toolType);
             return PointerEvent::TOOL_TYPE_FINGER;
         }

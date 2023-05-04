@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,7 +22,7 @@
 struct libinput_device;
 
 struct VendorConfig {
-    int32_t pointerSpeed { -1 };
+    int32_t pointerSpeed{ -1 };
 };
 
 namespace OHOS {
@@ -36,6 +36,7 @@ class DeviceConfigManagement {
 public:
     DeviceConfigManagement() = default;
     ~DeviceConfigManagement() = default;
+
 public:
     VendorConfig GetVendorConfig(struct libinput_device *device) const;
 

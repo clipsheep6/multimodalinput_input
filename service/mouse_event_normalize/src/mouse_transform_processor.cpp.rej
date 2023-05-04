@@ -1,0 +1,184 @@
+diff a/service/mouse_event_normalize/src/mouse_transform_processor.cpp b/service/mouse_event_normalize/src/mouse_transform_processor.cpp	(rejected hunks)
+@@ -4,7 +4,7 @@
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+  *
+- *     http://www.apache.org/licenses/LICENSE-2.0
++ * http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+@@ -43,8 +43,7 @@ constexpr double DOUBLE_ZERO = 1e-6;
+ constexpr int32_t MIN_SPEED = 1;
+ constexpr int32_t MAX_SPEED = 11;
+ constexpr int32_t DEFAULT_SPEED = 5;
+-const std::vector<AccelerateCurve> ACCELERATE_CURVES {
+-    { { 8, 32, 128 }, { 0.16, 0.30, 0.56 }, { 0.0, -1.12, -9.44 } },
++const std::vector<AccelerateCurve> ACCELERATE_CURVES{ { { 8, 32, 128 }, { 0.16, 0.30, 0.56 }, { 0.0, -1.12, -9.44 } },
+     { { 8, 32, 128 }, { 0.32, 0.60, 1.12 }, { 0.0, -2.24, -18.88 } },
+     { { 8, 32, 128 }, { 0.48, 0.90, 1.68 }, { 0.0, -3.36, -28.32 } },
+     { { 8, 32, 128 }, { 0.64, 1.20, 2.24 }, { 0.0, -4.48, -37.76 } },
+@@ -54,8 +53,7 @@ const std::vector<AccelerateCurve> ACCELERATE_CURVES {
+     { { 8, 32, 128 }, { 0.98, 2.85, 5.32 }, { 0.0, -14.96, -94.00 } },
+     { { 8, 32, 128 }, { 1.04, 3.30, 6.16 }, { 0.0, -18.08, -109.60 } },
+     { { 8, 32, 128 }, { 1.10, 3.75, 7.00 }, { 0.0, -21.20, -125.20 } },
+-    { { 8, 32, 128 }, { 1.16, 4.20, 7.84 }, { 0.0, -24.32, -140.80 } }
+-};
++    { { 8, 32, 128 }, { 1.16, 4.20, 7.84 }, { 0.0, -24.32, -140.80 } } };
+ } // namespace
+ 
+ double MouseTransformProcessor::absolutionX_ = -1.0;
+@@ -73,7 +71,7 @@ std::shared_ptr<PointerEvent> MouseTransformProcessor::GetPointerEvent() const
+     return pointerEvent_;
+ }
+ 
+-int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer* data)
++int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer *data)
+ {
+     CALL_DEBUG_ENTER;
+     CHKPR(data, ERROR_NULL_POINTER);
+@@ -96,18 +94,18 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
+     }
+     WinMgr->UpdateAndAdjustMouseLocation(currentDisplayId_, absolutionX_, absolutionY_);
+     pointerEvent_->SetTargetDisplayId(currentDisplayId_);
+-    MMI_HILOGD("Change coordinate: x:%{public}lf, y:%{public}lf, currentDisplayId_:%{public}d",
+-        absolutionX_, absolutionY_, currentDisplayId_);
++    MMI_HILOGD("Change coordinate: x:%{public}lf, y:%{public}lf, currentDisplayId_:%{public}d", absolutionX_,
++        absolutionY_, currentDisplayId_);
+     return RET_OK;
+ }
+ 
+-int32_t MouseTransformProcessor::HandleMotionAccelerate(struct libinput_event_pointer* data)
++int32_t MouseTransformProcessor::HandleMotionAccelerate(struct libinput_event_pointer *data)
+ {
+     CHKPR(data, ERROR_NULL_POINTER);
+     double dx = libinput_event_pointer_get_dx(data);
+     double dy = libinput_event_pointer_get_dy(data);
+     double vin = (fmax(abs(dx), abs(dy)) + fmin(abs(dx), abs(dy))) / 2.0;
+-    double gain { 0.0 };
++    double gain{ 0.0 };
+     if (!GetSpeedGain(vin, gain)) {
+         MMI_HILOGE("Get speed gain failed");
+         return RET_ERR;
+@@ -115,8 +113,8 @@ int32_t MouseTransformProcessor::HandleMotionAccelerate(struct libinput_event_po
+     double correctionX = dx * gain;
+     double correctionY = dy * gain;
+     MMI_HILOGD("Get and process the movement coordinates, dx:%{public}lf, dy:%{public}lf,"
+-               "correctionX:%{public}lf, correctionY:%{public}lf, gain:%{public}lf",
+-               dx, dy, correctionX, correctionY, gain);
++        "correctionX:%{public}lf, correctionY:%{public}lf, gain:%{public}lf",
++        dx, dy, correctionX, correctionY, gain);
+     if (!WinMgr->GetMouseIsCaptureMode()) {
+         absolutionX_ += correctionX;
+         absolutionY_ += correctionY;
+@@ -141,7 +139,7 @@ void MouseTransformProcessor::InitAbsolution()
+     absolutionY_ = displayGroupInfo.displaysInfo[0].height * 1.0 / 2;
+ }
+ 
+-int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer* data)
++int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer *data)
+ {
+     CALL_DEBUG_ENTER;
+     CHKPR(data, ERROR_NULL_POINTER);
+@@ -176,7 +174,7 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
+     return RET_OK;
+ }
+ 
+-int32_t MouseTransformProcessor::HandleButtonValueInner(struct libinput_event_pointer* data)
++int32_t MouseTransformProcessor::HandleButtonValueInner(struct libinput_event_pointer *data)
+ {
+     CALL_DEBUG_ENTER;
+     CHKPR(data, ERROR_NULL_POINTER);
+@@ -209,12 +207,12 @@ int32_t MouseTransformProcessor::HandleButtonValueInner(struct libinput_event_po
+     }
+ 
+     pointerEvent_->SetButtonId(buttonId);
+-    NativePreferences::PreferencesHelper::
+-        RemovePreferencesFromCache("/data/service/el1/public/multimodalinput/mouse_settings");
++    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(
++        "/data/service/el1/public/multimodalinput/mouse_settings");
+     return RET_OK;
+ }
+ 
+-int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* data)
++int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer *data)
+ {
+     CALL_DEBUG_ENTER;
+     CHKPR(data, ERROR_NULL_POINTER);
+@@ -259,7 +257,7 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer*
+     return RET_OK;
+ }
+ 
+-void MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* data,
++void MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer *data,
+     PointerEvent::PointerItem &pointerItem)
+ {
+     CALL_DEBUG_ENTER;
+@@ -358,7 +356,7 @@ int32_t MouseTransformProcessor::GetDisplayId()
+     return currentDisplayId_;
+ }
+ 
+-void MouseTransformProcessor::HandlePostMoveMouse(PointerEvent::PointerItem& pointerItem)
++void MouseTransformProcessor::HandlePostMoveMouse(PointerEvent::PointerItem &pointerItem)
+ {
+     CALL_DEBUG_ENTER;
+     auto mouseInfo = WinMgr->GetMouseInfo();
+@@ -420,11 +418,11 @@ void MouseTransformProcessor::Dump(int32_t fd, const std::vector<std::string> &a
+     pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item);
+     mprintf(fd, "Mouse device state information:\t");
+     mprintf(fd,
+-            "PointerId:%d | SourceType:%s | PointerAction:%s | WindowX:%d | WindowY:%d | ButtonId:%d "
+-            "| AgentWindowId:%d | TargetWindowId:%d | DownTime:%" PRId64 " | IsPressed:%s \t",
+-            pointerEvent_->GetPointerId(), pointerEvent_->DumpSourceType(), pointerEvent_->DumpPointerAction(),
+-            item.GetWindowX(), item.GetWindowY(), pointerEvent_->GetButtonId(), pointerEvent_->GetAgentWindowId(),
+-            pointerEvent_->GetTargetWindowId(), item.GetDownTime(), item.IsPressed() ? "true" : "false");
++        "PointerId:%d | SourceType:%s | PointerAction:%s | WindowX:%d | WindowY:%d | ButtonId:%d "
++        "| AgentWindowId:%d | TargetWindowId:%d | DownTime:%" PRId64 " | IsPressed:%s \t",
++        pointerEvent_->GetPointerId(), pointerEvent_->DumpSourceType(), pointerEvent_->DumpPointerAction(),
++        item.GetWindowX(), item.GetWindowY(), pointerEvent_->GetButtonId(), pointerEvent_->GetAgentWindowId(),
++        pointerEvent_->GetTargetWindowId(), item.GetDownTime(), item.IsPressed() ? "true" : "false");
+ }
+ 
+ int32_t MouseTransformProcessor::SetMousePrimaryButton(int32_t primaryButton)
+@@ -445,8 +443,8 @@ int32_t MouseTransformProcessor::SetMousePrimaryButton(int32_t primaryButton)
+         MMI_HILOGE("flush sync is failed, ret:%{public}d", ret);
+         return RET_ERR;
+     }
+-    NativePreferences::PreferencesHelper::
+-        RemovePreferencesFromCache("/data/service/el1/public/multimodalinput/mouse_settings");
++    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(
++        "/data/service/el1/public/multimodalinput/mouse_settings");
+     return RET_OK;
+ }
+ 
+@@ -462,8 +460,8 @@ int32_t MouseTransformProcessor::GetMousePrimaryButton()
+     }
+     std::string name = "primaryButton";
+     int32_t primaryButton = pref->GetInt(name, 0);
+-    NativePreferences::PreferencesHelper::
+-        RemovePreferencesFromCache("/data/service/el1/public/multimodalinput/mouse_settings");
++    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(
++        "/data/service/el1/public/multimodalinput/mouse_settings");
+     MMI_HILOGD("Set mouse primary button:%{public}d", primaryButton);
+     return primaryButton;
+ }
+@@ -500,7 +498,7 @@ bool MouseTransformProcessor::GetSpeedGain(double vin, double &gain)
+         MMI_HILOGE("The speed value can't be less than 1");
+         return false;
+     }
+-    const AccelerateCurve& curve = ACCELERATE_CURVES[GetSpeed() - 1];
++    const AccelerateCurve &curve = ACCELERATE_CURVES[GetSpeed() - 1];
+     int32_t num = static_cast<int32_t>(ceil(fabs(vin)));
+     for (size_t i = 0; i < curve.speeds.size(); ++i) {
+         if (num <= curve.speeds[i]) {
+@@ -512,8 +510,8 @@ bool MouseTransformProcessor::GetSpeedGain(double vin, double &gain)
+     return true;
+ }
+ 
+-void MouseTransformProcessor::SetDxDyForDInput(PointerEvent::PointerItem& pointerItem,
+-    struct libinput_event_pointer* data)
++void MouseTransformProcessor::SetDxDyForDInput(PointerEvent::PointerItem &pointerItem,
++    struct libinput_event_pointer *data)
+ {
+     double dx = libinput_event_pointer_get_dx(data);
+     double dy = libinput_event_pointer_get_dy(data);

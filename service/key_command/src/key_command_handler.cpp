@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -50,11 +50,9 @@ enum SpecialType {
     SUBSCRIBER_BEFORE_DELAY = 1,
     KEY_DOWN_ACTION = 2
 };
-const std::map<int32_t, SpecialType> SPECIAL_KEYS = {
-    { KeyEvent::KEYCODE_POWER, SpecialType::KEY_DOWN_ACTION },
-    { KeyEvent::KEYCODE_VOLUME_DOWN, SpecialType::SPECIAL_ALL },
-    { KeyEvent::KEYCODE_VOLUME_UP, SpecialType::SPECIAL_ALL }
-};
+const std::map<int32_t, SpecialType> SPECIAL_KEYS = { { KeyEvent::KEYCODE_POWER, SpecialType::KEY_DOWN_ACTION },
+                                                      { KeyEvent::KEYCODE_VOLUME_DOWN, SpecialType::SPECIAL_ALL },
+                                                      { KeyEvent::KEYCODE_VOLUME_UP, SpecialType::SPECIAL_ALL } };
 struct JsonParser {
     JsonParser() = default;
     ~JsonParser()
@@ -67,7 +65,7 @@ struct JsonParser {
     {
         return json_;
     }
-    cJSON *json_ { nullptr };
+    cJSON *json_{ nullptr };
 };
 
 bool IsSpecialType(int32_t keyCode, SpecialType type)
@@ -79,7 +77,7 @@ bool IsSpecialType(int32_t keyCode, SpecialType type)
     return (it->second == SpecialType::SPECIAL_ALL || it->second == type);
 }
 
-bool GetBusinessId(const cJSON* jsonData, std::string &businessIdValue, std::vector<std::string> &businessIds)
+bool GetBusinessId(const cJSON *jsonData, std::string &businessIdValue, std::vector<std::string> &businessIds)
 {
     if (!cJSON_IsObject(jsonData)) {
         MMI_HILOGE("jsonData is not object");
@@ -95,13 +93,13 @@ bool GetBusinessId(const cJSON* jsonData, std::string &businessIdValue, std::vec
     return true;
 }
 
-bool GetPreKeys(const cJSON* jsonData, ShortcutKey &shortcutKey)
+bool GetPreKeys(const cJSON *jsonData, ShortcutKey &shortcutKey)
 {
     if (!cJSON_IsObject(jsonData)) {
         MMI_HILOGE("jsonData is not object");
         return false;
     }
-    cJSON* preKey = cJSON_GetObjectItemCaseSensitive(jsonData, "preKey");
+    cJSON *preKey = cJSON_GetObjectItemCaseSensitive(jsonData, "preKey");
     if (!cJSON_IsArray(preKey)) {
         MMI_HILOGE("preKey number must be array");
         return false;
@@ -129,7 +127,7 @@ bool GetPreKeys(const cJSON* jsonData, ShortcutKey &shortcutKey)
     return true;
 }
 
-bool GetTrigger(const cJSON* jsonData, int32_t &triggerType)
+bool GetTrigger(const cJSON *jsonData, int32_t &triggerType)
 {
     if (!cJSON_IsObject(jsonData)) {
         MMI_HILOGE("jsonData is not object");
@@ -140,8 +138,7 @@ bool GetTrigger(const cJSON* jsonData, int32_t &triggerType)
         MMI_HILOGE("trigger is not string");
         return false;
     }
-    if (((std::strcmp(trigger->valuestring, "key_up") != 0)
-        && (std::strcmp(trigger->valuestring, "key_down") != 0))) {
+    if (((std::strcmp(trigger->valuestring, "key_up") != 0) && (std::strcmp(trigger->valuestring, "key_down") != 0))) {
         MMI_HILOGE("trigger must be one of [key_up, key_down]");
         return false;
     }
@@ -153,7 +150,7 @@ bool GetTrigger(const cJSON* jsonData, int32_t &triggerType)
     return true;
 }
 
-bool GetKeyDownDuration(const cJSON* jsonData, int32_t &keyDownDurationInt)
+bool GetKeyDownDuration(const cJSON *jsonData, int32_t &keyDownDurationInt)
 {
     if (!cJSON_IsObject(jsonData)) {
         MMI_HILOGE("jsonData is not object");
@@ -172,7 +169,7 @@ bool GetKeyDownDuration(const cJSON* jsonData, int32_t &keyDownDurationInt)
     return true;
 }
 
-bool GetKeyFinalKey(const cJSON* jsonData, int32_t &finalKeyInt)
+bool GetKeyFinalKey(const cJSON *jsonData, int32_t &finalKeyInt)
 {
     if (!cJSON_IsObject(jsonData)) {
         MMI_HILOGE("jsonData is not object");
@@ -187,7 +184,7 @@ bool GetKeyFinalKey(const cJSON* jsonData, int32_t &finalKeyInt)
     return true;
 }
 
-void GetKeyVal(const cJSON* json, const std::string &key, std::string &value)
+void GetKeyVal(const cJSON *json, const std::string &key, std::string &value)
 {
     if (!cJSON_IsObject(json)) {
         MMI_HILOGE("json is not object");
@@ -200,7 +197,7 @@ void GetKeyVal(const cJSON* json, const std::string &key, std::string &value)
     return;
 }
 
-bool GetEntities(const cJSON* jsonAbility, Ability &ability)
+bool GetEntities(const cJSON *jsonAbility, Ability &ability)
 {
     if (!cJSON_IsObject(jsonAbility)) {
         MMI_HILOGE("jsonAbility is not object");
@@ -216,7 +213,7 @@ bool GetEntities(const cJSON* jsonAbility, Ability &ability)
     }
     int32_t entitySize = cJSON_GetArraySize(entities);
     for (int32_t i = 0; i < entitySize; i++) {
-        cJSON* entity = cJSON_GetArrayItem(entities, i);
+        cJSON *entity = cJSON_GetArrayItem(entities, i);
         if (!cJSON_IsString(entity)) {
             MMI_HILOGE("entity is not string");
             return false;
@@ -226,7 +223,7 @@ bool GetEntities(const cJSON* jsonAbility, Ability &ability)
     return true;
 }
 
-bool GetParams(const cJSON* jsonAbility, Ability &ability)
+bool GetParams(const cJSON *jsonAbility, Ability &ability)
 {
     if (!cJSON_IsObject(jsonAbility)) {
         MMI_HILOGE("jsonAbility is not object");
@@ -242,17 +239,17 @@ bool GetParams(const cJSON* jsonAbility, Ability &ability)
     }
     int32_t paramsSize = cJSON_GetArraySize(params);
     for (int32_t i = 0; i < paramsSize; ++i) {
-        cJSON* param = cJSON_GetArrayItem(params, i);
+        cJSON *param = cJSON_GetArrayItem(params, i);
         if (!cJSON_IsObject(param)) {
             MMI_HILOGE("param must be object");
             return false;
         }
-        cJSON* key = cJSON_GetObjectItemCaseSensitive(param, "key");
+        cJSON *key = cJSON_GetObjectItemCaseSensitive(param, "key");
         if (!cJSON_IsString(key)) {
             MMI_HILOGE("key is not string");
             return false;
         }
-        cJSON* value = cJSON_GetObjectItemCaseSensitive(param, "value");
+        cJSON *value = cJSON_GetObjectItemCaseSensitive(param, "value");
         if (!cJSON_IsString(value)) {
             MMI_HILOGE("value is not string");
             return false;
@@ -265,7 +262,7 @@ bool GetParams(const cJSON* jsonAbility, Ability &ability)
     return true;
 }
 
-bool PackageAbility(const cJSON* jsonAbility, Ability &ability)
+bool PackageAbility(const cJSON *jsonAbility, Ability &ability)
 {
     if (!cJSON_IsObject(jsonAbility)) {
         MMI_HILOGE("JsonAbility is not object");
@@ -288,7 +285,7 @@ bool PackageAbility(const cJSON* jsonAbility, Ability &ability)
     return true;
 }
 
-bool ConvertToShortcutKey(const cJSON* jsonData, ShortcutKey &shortcutKey, std::vector<std::string> &businessIds)
+bool ConvertToShortcutKey(const cJSON *jsonData, ShortcutKey &shortcutKey, std::vector<std::string> &businessIds)
 {
     if (!cJSON_IsObject(jsonData)) {
         MMI_HILOGE("jsonData is not object");
@@ -325,7 +322,7 @@ bool ConvertToShortcutKey(const cJSON* jsonData, ShortcutKey &shortcutKey, std::
     return true;
 }
 
-bool GetKeyCode(const cJSON* jsonData, int32_t &keyCodeInt)
+bool GetKeyCode(const cJSON *jsonData, int32_t &keyCodeInt)
 {
     if (!cJSON_IsObject(jsonData)) {
         MMI_HILOGE("jsonData is not object");
@@ -344,7 +341,7 @@ bool GetKeyCode(const cJSON* jsonData, int32_t &keyCodeInt)
     return true;
 }
 
-bool GetKeyAction(const cJSON* jsonData, int32_t &keyActionInt)
+bool GetKeyAction(const cJSON *jsonData, int32_t &keyActionInt)
 {
     if (!cJSON_IsObject(jsonData)) {
         MMI_HILOGE("jsonData is not object");
@@ -363,7 +360,7 @@ bool GetKeyAction(const cJSON* jsonData, int32_t &keyActionInt)
     return true;
 }
 
-bool GetDelay(const cJSON* jsonData, int64_t &delayInt)
+bool GetDelay(const cJSON *jsonData, int64_t &delayInt)
 {
     if (!cJSON_IsObject(jsonData)) {
         MMI_HILOGE("jsonData is not object");
@@ -382,7 +379,7 @@ bool GetDelay(const cJSON* jsonData, int64_t &delayInt)
     return true;
 }
 
-bool GetAbilityStartDelay(const cJSON* jsonData, int64_t &abilityStartDelayInt)
+bool GetAbilityStartDelay(const cJSON *jsonData, int64_t &abilityStartDelayInt)
 {
     if (!cJSON_IsObject(jsonData)) {
         MMI_HILOGE("jsonData is not object");
@@ -401,7 +398,7 @@ bool GetAbilityStartDelay(const cJSON* jsonData, int64_t &abilityStartDelayInt)
     return true;
 }
 
-bool PackageSequenceKey(const cJSON* sequenceKeysJson, SequenceKey &sequenceKey)
+bool PackageSequenceKey(const cJSON *sequenceKeysJson, SequenceKey &sequenceKey)
 {
     if (!cJSON_IsObject(sequenceKeysJson)) {
         MMI_HILOGE("sequenceKeysJson is not object");
@@ -422,13 +419,13 @@ bool PackageSequenceKey(const cJSON* sequenceKeysJson, SequenceKey &sequenceKey)
     return true;
 }
 
-bool GetSequenceKeys(const cJSON* jsonData, Sequence &sequence)
+bool GetSequenceKeys(const cJSON *jsonData, Sequence &sequence)
 {
     if (!cJSON_IsObject(jsonData)) {
         MMI_HILOGE("jsonData is not object");
         return false;
     }
-    cJSON* sequenceKeys = cJSON_GetObjectItemCaseSensitive(jsonData, "sequenceKeys");
+    cJSON *sequenceKeys = cJSON_GetObjectItemCaseSensitive(jsonData, "sequenceKeys");
     if (!cJSON_IsArray(sequenceKeys)) {
         MMI_HILOGE("sequenceKeys number must be array");
         return false;
@@ -467,7 +464,7 @@ bool IsSequenceKeysValid(const Sequence &sequence)
     }
 
     std::map<int32_t, SequenceKey> sequenceKeys;
-    for (const SequenceKey& item : sequence.sequenceKeys) {
+    for (const SequenceKey &item : sequence.sequenceKeys) {
         if (sequenceKeys.find(item.keyCode) == sequenceKeys.end()) {
             auto it = sequenceKeys.emplace(item.keyCode, item);
             if (!it.second) {
@@ -486,7 +483,7 @@ bool IsSequenceKeysValid(const Sequence &sequence)
     return true;
 }
 
-bool ConvertToKeySequence(const cJSON* jsonData, Sequence &sequence)
+bool ConvertToKeySequence(const cJSON *jsonData, Sequence &sequence)
 {
     if (!cJSON_IsObject(jsonData)) {
         MMI_HILOGE("jsonData is not object");
@@ -516,11 +513,11 @@ bool ConvertToKeySequence(const cJSON* jsonData, Sequence &sequence)
     return true;
 }
 
-std::string GenerateKey(const ShortcutKey& key)
+std::string GenerateKey(const ShortcutKey &key)
 {
     std::set<int32_t> preKeys = key.preKeys;
     std::stringstream ss;
-    for (const auto& preKey : preKeys) {
+    for (const auto &preKey : preKeys) {
         ss << preKey << ",";
     }
     ss << key.finalKey << ",";
@@ -528,10 +525,10 @@ std::string GenerateKey(const ShortcutKey& key)
     return std::string(ss.str());
 }
 
-bool ParseShortcutKeys(const JsonParser& parser, std::map<std::string, ShortcutKey>& shortcutKeyMap,
-    std::vector<std::string>& businessIds)
+bool ParseShortcutKeys(const JsonParser &parser, std::map<std::string, ShortcutKey> &shortcutKeyMap,
+    std::vector<std::string> &businessIds)
 {
-    cJSON* shortkeys = cJSON_GetObjectItemCaseSensitive(parser.json_, "Shortkeys");
+    cJSON *shortkeys = cJSON_GetObjectItemCaseSensitive(parser.json_, "Shortkeys");
     if (!cJSON_IsArray(shortkeys)) {
         MMI_HILOGE("shortkeys is not array");
         return false;
@@ -556,9 +553,9 @@ bool ParseShortcutKeys(const JsonParser& parser, std::map<std::string, ShortcutK
     return true;
 }
 
-bool ParseSequences(const JsonParser& parser, std::vector<Sequence>& sequenceVec)
+bool ParseSequences(const JsonParser &parser, std::vector<Sequence> &sequenceVec)
 {
-    cJSON* sequences = cJSON_GetObjectItemCaseSensitive(parser.json_, "Sequences");
+    cJSON *sequences = cJSON_GetObjectItemCaseSensitive(parser.json_, "Sequences");
     if (!cJSON_IsArray(sequences)) {
         MMI_HILOGE("sequences is not array");
         return false;
@@ -578,7 +575,7 @@ bool ParseSequences(const JsonParser& parser, std::vector<Sequence>& sequenceVec
     return true;
 }
 
-bool ParseTwoFingerGesture(const JsonParser& parser, TwoFingerGesture& gesture)
+bool ParseTwoFingerGesture(const JsonParser &parser, TwoFingerGesture &gesture)
 {
     cJSON *jsonData = cJSON_GetObjectItemCaseSensitive(parser.json_, "TwoFingerGesture");
     if (!cJSON_IsObject(jsonData)) {
@@ -636,7 +633,7 @@ void KeyCommandHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> poi
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
-void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent>& touchEvent)
+void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> &touchEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
@@ -664,7 +661,7 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent>& 
             }
             auto id = touchEvent->GetPointerId();
             auto pos = std::find_if(std::begin(twoFingerGesture_.touches), std::end(twoFingerGesture_.touches),
-                [id](const auto& item) { return item.id == id; });
+                [id](const auto &item) { return item.id == id; });
             if (pos == std::end(twoFingerGesture_.touches)) {
                 break;
             }
@@ -773,9 +770,9 @@ void KeyCommandHandler::Print()
             MMI_HILOGD("preKey:%{public}d", prekey);
         }
         MMI_HILOGD("finalKey:%{public}d, keyDownDuration:%{public}d, triggerType:%{public}d,"
-                   " bundleName:%{public}s, abilityName:%{public}s", shortcutKey.finalKey,
-                   shortcutKey.keyDownDuration, shortcutKey.triggerType,
-                   shortcutKey.ability.bundleName.c_str(), shortcutKey.ability.abilityName.c_str());
+            " bundleName:%{public}s, abilityName:%{public}s",
+            shortcutKey.finalKey, shortcutKey.keyDownDuration, shortcutKey.triggerType,
+            shortcutKey.ability.bundleName.c_str(), shortcutKey.ability.abilityName.c_str());
     }
 }
 
@@ -785,12 +782,12 @@ void KeyCommandHandler::PrintSeq()
     int32_t row = 0;
     for (const auto &item : sequences_) {
         MMI_HILOGD("row:%{public}d", row++);
-        for (const auto& sequenceKey : item.sequenceKeys) {
-            MMI_HILOGD("keyCode:%{public}d, keyAction:%{public}d, delay:%{public}" PRId64,
-                       sequenceKey.keyCode, sequenceKey.keyAction, sequenceKey.delay);
+        for (const auto &sequenceKey : item.sequenceKeys) {
+            MMI_HILOGD("keyCode:%{public}d, keyAction:%{public}d, delay:%{public}" PRId64, sequenceKey.keyCode,
+                sequenceKey.keyAction, sequenceKey.delay);
         }
-        MMI_HILOGD("bundleName:%{public}s, abilityName:%{public}s",
-                   item.ability.bundleName.c_str(), item.ability.abilityName.c_str());
+        MMI_HILOGD("bundleName:%{public}s, abilityName:%{public}s", item.ability.bundleName.c_str(),
+            item.ability.abilityName.c_str());
     }
 }
 
@@ -819,7 +816,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
 
     if (IsSpecialType(key->GetKeyCode(), SpecialType::SUBSCRIBER_BEFORE_DELAY)) {
         auto tmpKey = KeyEvent::Clone(key);
-        int32_t timerId = TimerMgr->AddTimer(SPECIAL_KEY_DOWN_DELAY, 1, [this, tmpKey] () {
+        int32_t timerId = TimerMgr->AddTimer(SPECIAL_KEY_DOWN_DELAY, 1, [this, tmpKey]() {
             MMI_HILOGD("Timer callback");
             auto it = specialTimers_.find(tmpKey->GetKeyCode());
             if (it != specialTimers_.end() && !it->second.empty()) {
@@ -847,7 +844,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
         MMI_HILOGD("Add timer success");
         return true;
     }
-    
+
     return false;
 }
 
@@ -895,8 +892,8 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
 bool KeyCommandHandler::IsRepeatKeyEvent(const SequenceKey &sequenceKey)
 {
     for (size_t i = keys_.size(); i > 0; --i) {
-        if (keys_[i-1].keyCode == sequenceKey.keyCode) {
-            if (keys_[i-1].keyAction == sequenceKey.keyAction) {
+        if (keys_[i - 1].keyCode == sequenceKey.keyCode) {
+            if (keys_[i - 1].keyAction == sequenceKey.keyAction) {
                 MMI_HILOGD("Is repeat key, keyCode:%{public}d", sequenceKey.keyCode);
                 return true;
             }
@@ -927,14 +924,14 @@ bool KeyCommandHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
 
     bool isLaunchAbility = false;
     std::vector<Sequence> tempSeqs;
-    for (Sequence& item : filterSequences_) {
+    for (Sequence &item : filterSequences_) {
         if (HandleSequence(item, isLaunchAbility)) {
             tempSeqs.push_back(item);
         }
     }
 
     if (isLaunchAbility) {
-        for (const auto& item : keys_) {
+        for (const auto &item : keys_) {
             if (IsSpecialType(item.keyCode, SpecialType::KEY_DOWN_ACTION)) {
                 HandleSpecialKeys(item.keyCode, item.keyAction);
             }
@@ -1015,7 +1012,7 @@ bool KeyCommandHandler::HandleSequence(Sequence &sequence, bool &isLaunchAbility
             isLaunchAbility = true;
             return true;
         }
-        sequence.timerId = TimerMgr->AddTimer(sequence.abilityStartDelay, 1, [this, sequence] () {
+        sequence.timerId = TimerMgr->AddTimer(sequence.abilityStartDelay, 1, [this, sequence]() {
             MMI_HILOGD("Timer callback");
             LaunchAbility(sequence);
         });
@@ -1066,7 +1063,7 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
         LaunchAbility(shortcutKey);
         return true;
     }
-    shortcutKey.timerId = TimerMgr->AddTimer(shortcutKey.keyDownDuration, 1, [this, shortcutKey] () {
+    shortcutKey.timerId = TimerMgr->AddTimer(shortcutKey.keyDownDuration, 1, [this, shortcutKey]() {
         MMI_HILOGD("Timer callback");
         LaunchAbility(shortcutKey);
     });
@@ -1082,7 +1079,8 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
 int32_t KeyCommandHandler::GetKeyDownDurationFromXml(const std::string &businessId)
 {
     CALL_DEBUG_ENTER;
-    std::shared_ptr<NativePreferences::Preferences> pref = NativePreferences::PreferencesHelper::GetPreferences(shortKeyFileName, errno);
+    std::shared_ptr<NativePreferences::Preferences> pref =
+        NativePreferences::PreferencesHelper::GetPreferences(shortKeyFileName, errno);
     CHKPR(pref, ERROR_DELAY_VALUE);
     return pref->GetInt(businessId, ERROR_DELAY_VALUE);
 }
@@ -1103,8 +1101,8 @@ bool KeyCommandHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, c
     }
     auto upTime = keyEvent->GetActionTime();
     auto downTime = keyItem->GetDownTime();
-    MMI_HILOGD("upTime:%{public}" PRId64 ",downTime:%{public}" PRId64 ",keyDownDuration:%{public}d",
-        upTime, downTime, shortcutKey.keyDownDuration);
+    MMI_HILOGD("upTime:%{public}" PRId64 ",downTime:%{public}" PRId64 ",keyDownDuration:%{public}d", upTime, downTime,
+        shortcutKey.keyDownDuration);
     if (upTime - downTime >= static_cast<int64_t>(shortcutKey.keyDownDuration) * 1000) {
         MMI_HILOGD("Skip, upTime - downTime >= duration");
         return false;
@@ -1166,11 +1164,10 @@ void KeyCommandHandler::LaunchAbility(const Sequence &sequence)
 
 void ShortcutKey::Print() const
 {
-    for (const auto &prekey: preKeys) {
+    for (const auto &prekey : preKeys) {
         MMI_HILOGI("Eventkey matched, preKey:%{public}d", prekey);
     }
-    MMI_HILOGD("Eventkey matched, finalKey:%{public}d, bundleName:%{public}s",
-        finalKey, ability.bundleName.c_str());
+    MMI_HILOGD("Eventkey matched, finalKey:%{public}d, bundleName:%{public}s", finalKey, ability.bundleName.c_str());
 }
 
 void KeyCommandHandler::RemoveSubscribedTimer(int32_t keyCode)
@@ -1178,7 +1175,7 @@ void KeyCommandHandler::RemoveSubscribedTimer(int32_t keyCode)
     CALL_DEBUG_ENTER;
     auto iter = specialTimers_.find(keyCode);
     if (iter != specialTimers_.end()) {
-        for (auto& item : iter->second) {
+        for (auto &item : iter->second) {
             TimerMgr->RemoveTimer(item);
         }
         specialTimers_.erase(keyCode);
@@ -1210,7 +1207,7 @@ void KeyCommandHandler::HandleSpecialKeys(int32_t keyCode, int32_t keyAction)
 
 void KeyCommandHandler::InterruptTimers()
 {
-    for (Sequence& item : filterSequences_) {
+    for (Sequence &item : filterSequences_) {
         if (item.timerId >= 0) {
             MMI_HILOGD("The key sequence change, close the timer");
             TimerMgr->RemoveTimer(item.timerId);
@@ -1234,7 +1231,8 @@ int32_t KeyCommandHandler::UpdateSettingsXml(const std::string &businessId, int3
         MMI_HILOGE("delay is not in valid range.");
         return RET_ERR;
     }
-    std::shared_ptr<NativePreferences::Preferences> pref = NativePreferences::PreferencesHelper::GetPreferences(shortKeyFileName, errno);
+    std::shared_ptr<NativePreferences::Preferences> pref =
+        NativePreferences::PreferencesHelper::GetPreferences(shortKeyFileName, errno);
     CHKPR(pref, errno);
     pref->PutInt(businessId, delay);
     int32_t ret = pref->FlushSync();

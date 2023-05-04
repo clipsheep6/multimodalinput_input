@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,9 +23,8 @@ namespace OHOS {
 namespace MMI {
 class IUdsServer : public RefBase {
 public:
-    virtual int32_t AddSocketPairInfo(const std::string& programName, const int32_t moduleType, const int32_t uid,
-                                      const int32_t pid, int32_t& serverFd, int32_t& toReturnClientFd,
-                                      int32_t& tokenType) = 0;
+    virtual int32_t AddSocketPairInfo(const std::string &programName, const int32_t moduleType, const int32_t uid,
+        const int32_t pid, int32_t &serverFd, int32_t &toReturnClientFd, int32_t &tokenType) = 0;
     virtual SessionPtr GetSessionByPid(int32_t pid) const = 0;
 };
 } // namespace MMI

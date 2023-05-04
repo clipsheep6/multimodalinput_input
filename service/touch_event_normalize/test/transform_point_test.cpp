@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,28 +24,27 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MMI_LOG_DOMAIN, "TransformPointTest" };
-constexpr int32_t WAIT_TIME_FOR_INPUT { 1000 };
-constexpr int32_t WAIT_TIME_FOR_EVENTS { 10 };
-constexpr size_t DEFAULT_BUF_SIZE { 4096 };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL{ LOG_CORE, MMI_LOG_DOMAIN, "TransformPointTest" };
+constexpr int32_t WAIT_TIME_FOR_INPUT{ 1000 };
+constexpr int32_t WAIT_TIME_FOR_EVENTS{ 10 };
+constexpr size_t DEFAULT_BUF_SIZE{ 4096 };
 } // namespace
 
-#define ARRAY_LENGTH(arr)   (sizeof(arr) / sizeof((arr)[0]))
+#define ARRAY_LENGTH(arr) (sizeof(arr) / sizeof((arr)[0]))
 
 class Context {
 public:
-    explicit Context(const std::string& node);
+    explicit Context(const std::string &node);
     ~Context();
     bool IsReady() const;
     int GetFd() const;
 
 private:
     std::string node_;
-    int fd_ { -1 };
+    int fd_{ -1 };
 };
 
-Context::Context(const std::string& node)
-    : node_(node)
+Context::Context(const std::string &node) : node_(node)
 {
     MMI_HILOGD("Open device node: \'%{public}s\'.", node_.c_str());
     fd_ = open(node_.c_str(), O_RDWR);
@@ -76,16 +75,16 @@ public:
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
     static std::string GetDeviceNodeName();
-    static int Execute(const std::string& command, std::vector<std::string>& results);
-    static void GetInputDeviceNodes(std::map<std::string, std::string>& nodes);
+    static int Execute(const std::string &command, std::vector<std::string> &results);
+    static void GetInputDeviceNodes(std::map<std::string, std::string> &nodes);
     static bool SetupVirtualStylus();
     static bool IsVirtualStylusOn();
-    bool SendEvent(const Context& ctx, struct input_event* event);
-    bool SendEvents(const Context& ctx, struct input_event* events, size_t nevents);
+    bool SendEvent(const Context &ctx, struct input_event *event);
+    bool SendEvents(const Context &ctx, struct input_event *events, size_t nevents);
 
 private:
     static VirtualPen virtualPen_;
-    static std::string  devNode_;
+    static std::string devNode_;
 };
 
 VirtualPen TransformPointTest::virtualPen_;
@@ -109,7 +108,7 @@ std::string TransformPointTest::GetDeviceNodeName()
     return devNode_;
 }
 
-bool TransformPointTest::SendEvent(const Context& ctx, struct input_event* event)
+bool TransformPointTest::SendEvent(const Context &ctx, struct input_event *event)
 {
     CALL_INFO_TRACE;
     MMI_HILOGD("Send input event.");
@@ -126,7 +125,7 @@ bool TransformPointTest::SendEvent(const Context& ctx, struct input_event* event
     return (ret > 0);
 }
 
-bool TransformPointTest::SendEvents(const Context& ctx, struct input_event* events, size_t nevents)
+bool TransformPointTest::SendEvents(const Context &ctx, struct input_event *events, size_t nevents)
 {
     CALL_INFO_TRACE;
     if (!ctx.IsReady()) {
@@ -134,8 +133,8 @@ bool TransformPointTest::SendEvents(const Context& ctx, struct input_event* even
         return false;
     }
     MMI_HILOGD("%{public}zu input events to send.", nevents);
-    struct input_event* sp = events;
-    struct input_event* tp = sp + nevents;
+    struct input_event *sp = events;
+    struct input_event *tp = sp + nevents;
     for (; sp < tp; ++sp) {
         if (!SendEvent(ctx, sp)) {
             MMI_HILOGE("Failed to send event.");
@@ -146,12 +145,12 @@ bool TransformPointTest::SendEvents(const Context& ctx, struct input_event* even
     return (sp >= tp);
 }
 
-int TransformPointTest::Execute(const std::string& command, std::vector<std::string>& results)
+int TransformPointTest::Execute(const std::string &command, std::vector<std::string> &results)
 {
     CALL_INFO_TRACE;
     MMI_HILOGD("Execute command:%{public}s.", command.c_str());
-    char buffer[DEFAULT_BUF_SIZE] {};
-    FILE* pin = popen(command.c_str(), "r");
+    char buffer[DEFAULT_BUF_SIZE]{};
+    FILE *pin = popen(command.c_str(), "r");
     if (!pin) {
         MMI_HILOGE("Failed to popen command.");
         return -1;
@@ -165,18 +164,18 @@ int TransformPointTest::Execute(const std::string& command, std::vector<std::str
     return pclose(pin);
 }
 
-void TransformPointTest::GetInputDeviceNodes(std::map<std::string, std::string>& nodes)
+void TransformPointTest::GetInputDeviceNodes(std::map<std::string, std::string> &nodes)
 {
     CALL_INFO_TRACE;
-    std::string command { "cat /proc/bus/input/devices" };
+    std::string command{ "cat /proc/bus/input/devices" };
     std::vector<std::string> results;
     Execute(command, results);
     if (results.empty()) {
         MMI_HILOGE("Failed to list devices.");
         return;
     }
-    const std::string kname { "Name=\"" };
-    const std::string kevent { "event" };
+    const std::string kname{ "Name=\"" };
+    const std::string kevent{ "event" };
     std::string name;
     for (const auto &item : results) {
         MMI_HILOGD("item:%{public}s.", item.c_str());
@@ -221,7 +220,7 @@ bool TransformPointTest::SetupVirtualStylus()
     GetInputDeviceNodes(nodes);
     MMI_HILOGD("There are %{public}zu device nodes.", nodes.size());
 
-    const std::string dev { "V-Pencil" };
+    const std::string dev{ "V-Pencil" };
     std::map<std::string, std::string>::const_iterator cItr = nodes.find(dev);
     if (cItr == nodes.cend()) {
         MMI_HILOGE("No virtual stylus is found.");
@@ -239,35 +238,175 @@ bool TransformPointTest::IsVirtualStylusOn()
     return !devNode_.empty();
 }
 
-static struct input_event inputEvents1[] {
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_X,               7950   },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_Y,               6400   },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_TILT_X,          10     },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_TILT_Y,          -10    },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_PRESSURE,        30     },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_SYN, SYN_REPORT,          0      },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_X,               8000   },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_PRESSURE,        30     },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_SYN, SYN_REPORT,          0      },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_X,               8050   },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_Y,               6450   },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_PRESSURE,        35     },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_SYN, SYN_REPORT,          0      },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_X,               8100   },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_Y,               6500   },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_PRESSURE,        1510   },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_SYN, SYN_REPORT,          0      },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_X,               8150   },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_PRESSURE,        1520   },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_SYN, SYN_REPORT,          0      },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_X,               8200   },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_Y,               6550   },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_PRESSURE,        1530   },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_SYN, SYN_REPORT,          0      },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_X,               8200   },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_Y,               6550   },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_PRESSURE,        0      },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_SYN, SYN_REPORT,          0      },
+static struct input_event inputEvents1[]{
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_X,
+    7950 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_Y,
+    6400 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_TILT_X,
+    10 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_TILT_Y,
+    -10 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_PRESSURE,
+    30 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_SYN,
+    SYN_REPORT,
+    0 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_X,
+    8000 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_PRESSURE,
+    30 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_SYN,
+    SYN_REPORT,
+    0 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_X,
+    8050 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_Y,
+    6450 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_PRESSURE,
+    35 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_SYN,
+    SYN_REPORT,
+    0 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_X,
+    8100 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_Y,
+    6500 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_PRESSURE,
+    1510 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_SYN,
+    SYN_REPORT,
+    0 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_X,
+    8150 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_PRESSURE,
+    1520 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_SYN,
+    SYN_REPORT,
+    0 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_X,
+    8200 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_Y,
+    6550 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_PRESSURE,
+    1530 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_SYN,
+    SYN_REPORT,
+    0 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_X,
+    8200 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_Y,
+    6550 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_PRESSURE,
+    0 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_SYN,
+    SYN_REPORT,
+    0 },
 };
 
 /**
@@ -280,47 +419,192 @@ HWTEST_F(TransformPointTest, TabletTransformPointProcesser1, TestSize.Level1)
 {
     CALL_INFO_TRACE;
     ASSERT_TRUE(IsVirtualStylusOn());
-    Context ctx { GetDeviceNodeName() };
+    Context ctx{ GetDeviceNodeName() };
     ASSERT_TRUE(SendEvents(ctx, inputEvents1, ARRAY_LENGTH(inputEvents1)));
 }
 
-static struct input_event inputEvents2[] {
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_X,               10752  },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_Y,               22176  },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_TILT_X,          90     },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_TILT_Y,          90     },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_PRESSURE,        0      },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_SYN, SYN_REPORT,          0      },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_X,               10753  },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_TILT_X,          -90    },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_SYN, SYN_REPORT,          0      },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_Y,               22177  },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_TILT_Y,          -90    },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_PRESSURE,        50     },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_SYN, SYN_REPORT,          0      },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_TILT_X,          90     },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_PRESSURE,        1510   },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_SYN, SYN_REPORT,          0      },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_X,               40000  },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_TILT_X,          180    },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_PRESSURE,        4096   },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_SYN, SYN_REPORT,          0      },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_X,               50000  },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_TILT_X,          270    },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_PRESSURE,        100000 },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_SYN, SYN_REPORT,          0      },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_X,               60000  },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_Y,               6550   },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_TILT_X,          360    },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_ABS, ABS_PRESSURE,        0      },
-    { .input_event_sec = 0, .input_event_usec = 0, EV_SYN, SYN_REPORT,          0      },
+static struct input_event inputEvents2[]{
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_X,
+    10752 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_Y,
+    22176 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_TILT_X,
+    90 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_TILT_Y,
+    90 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_PRESSURE,
+    0 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_SYN,
+    SYN_REPORT,
+    0 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_X,
+    10753 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_TILT_X,
+    -90 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_SYN,
+    SYN_REPORT,
+    0 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_Y,
+    22177 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_TILT_Y,
+    -90 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_PRESSURE,
+    50 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_SYN,
+    SYN_REPORT,
+    0 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_TILT_X,
+    90 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_PRESSURE,
+    1510 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_SYN,
+    SYN_REPORT,
+    0 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_X,
+    40000 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_TILT_X,
+    180 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_PRESSURE,
+    4096 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_SYN,
+    SYN_REPORT,
+    0 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_X,
+    50000 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_TILT_X,
+    270 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_PRESSURE,
+    100000 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_SYN,
+    SYN_REPORT,
+    0 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_X,
+    60000 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_Y,
+    6550 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_TILT_X,
+    360 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_ABS,
+    ABS_PRESSURE,
+    0 },
+    {
+    .input_event_sec = 0,
+    .input_event_usec = 0,
+    EV_SYN,
+    SYN_REPORT,
+    0 },
 };
 
 HWTEST_F(TransformPointTest, TabletTransformPointProcesser2, TestSize.Level1)
 {
     CALL_INFO_TRACE;
     ASSERT_TRUE(IsVirtualStylusOn());
-    Context ctx { GetDeviceNodeName() };
+    Context ctx{ GetDeviceNodeName() };
     ASSERT_TRUE(SendEvents(ctx, inputEvents2, ARRAY_LENGTH(inputEvents2)));
 }
 } // namespace MMI

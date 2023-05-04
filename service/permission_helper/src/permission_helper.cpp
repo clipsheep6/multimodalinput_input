@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -37,9 +37,8 @@ bool PermissionHelper::VerifySystemApp()
     auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
     MMI_HILOGD("token type is %{public}d", static_cast<int32_t>(tokenType));
     int32_t callingUid = IPCSkeleton::GetCallingUid();
-    if (tokenType == OHOS::Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE
-        || tokenType == OHOS::Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL
-        || callingUid == ROOT_UID) {
+    if (tokenType == OHOS::Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE ||
+        tokenType == OHOS::Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL || callingUid == ROOT_UID) {
         MMI_HILOGD("called tokenType is native, verify success");
         return true;
     }
@@ -124,7 +123,7 @@ int32_t PermissionHelper::GetTokenType()
         return TokenType::TOKEN_HAP;
     } else if (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE) {
         return TokenType::TOKEN_NATIVE;
-    }  else if (tokenType == OHOS::Security::AccessToken::TOKEN_SHELL) {
+    } else if (tokenType == OHOS::Security::AccessToken::TOKEN_SHELL) {
         return TokenType::TOKEN_SHELL;
     } else {
         MMI_HILOGW("Unsupported token type:%{public}d", tokenType);

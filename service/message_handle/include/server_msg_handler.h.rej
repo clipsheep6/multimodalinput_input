@@ -1,0 +1,62 @@
+diff a/service/message_handle/include/server_msg_handler.h b/service/message_handle/include/server_msg_handler.h	(rejected hunks)
+@@ -4,7 +4,7 @@
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+  *
+- *     http://www.apache.org/licenses/LICENSE-2.0
++ * http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+@@ -26,15 +26,15 @@
+ 
+ namespace OHOS {
+ namespace MMI {
+-typedef std::function<int32_t(SessionPtr sess, NetPacket& pkt)> ServerMsgFun;
++typedef std::function<int32_t(SessionPtr sess, NetPacket &pkt)> ServerMsgFun;
+ class ServerMsgHandler final : public MsgHandler<MmiMessageId, ServerMsgFun> {
+ public:
+     ServerMsgHandler() = default;
+     DISALLOW_COPY_AND_MOVE(ServerMsgHandler);
+     ~ServerMsgHandler() override = default;
+ 
+-    void Init(UDSServer& udsServer);
+-    void OnMsgHandler(SessionPtr sess, NetPacket& pkt);
++    void Init(UDSServer &udsServer);
++    void OnMsgHandler(SessionPtr sess, NetPacket &pkt);
+ #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
+     int32_t OnAddInputHandler(SessionPtr sess, InputHandlerType handlerType, HandleEventType eventType,
+         int32_t priority, uint32_t deviceTags);
+@@ -45,8 +45,8 @@ public:
+     int32_t OnMarkConsumed(SessionPtr sess, int32_t eventId);
+ #endif // OHOS_BUILD_ENABLE_MONITOR
+ #ifdef OHOS_BUILD_ENABLE_KEYBOARD
+-    int32_t OnSubscribeKeyEvent(IUdsServer *server, int32_t pid,
+-        int32_t subscribeId, const std::shared_ptr<KeyOption> option);
++    int32_t OnSubscribeKeyEvent(IUdsServer *server, int32_t pid, int32_t subscribeId,
++        const std::shared_ptr<KeyOption> option);
+     int32_t OnUnsubscribeKeyEvent(IUdsServer *server, int32_t pid, int32_t subscribeId);
+ #endif // OHOS_BUILD_ENABLE_KEYBOARD
+ 
+@@ -72,8 +72,8 @@ public:
+     int32_t RemoveInputEventFilter(int32_t clientPid, int32_t filterId);
+ #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+ protected:
+-    int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
+-    int32_t OnDisplayInfo(SessionPtr sess, NetPacket& pkt);
++    int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket &pkt);
++    int32_t OnDisplayInfo(SessionPtr sess, NetPacket &pkt);
+ 
+ private:
+ #ifdef OHOS_BUILD_ENABLE_TOUCH
+@@ -81,8 +81,8 @@ private:
+ #endif // OHOS_BUILD_ENABLE_TOUCH
+ 
+ private:
+-    UDSServer *udsServer_ { nullptr };
+-    int32_t targetWindowId_ { -1 };
++    UDSServer *udsServer_{ nullptr };
++    int32_t targetWindowId_{ -1 };
+ };
+ } // namespace MMI
+ } // namespace OHOS

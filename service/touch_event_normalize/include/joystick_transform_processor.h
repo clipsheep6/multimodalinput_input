@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -53,35 +53,34 @@ class JoystickTransformProcessor final : public TransformProcessor {
         LIBINPUT_THUMBL_BUTTON_CODE = 317,
         LIBINPUT_THUMBR_BUTTON_CODE = 318
     };
-    const std::map<uint32_t, int32_t> LibinputChangeToPointer = {
-        { LIBINPUT_TL2_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_TL2 },
-        { LIBINPUT_TR2_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_TR2 },
-        { LIBINPUT_TL_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_TL },
-        { LIBINPUT_TR_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_TR },
-        { LIBINPUT_SOUTH_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_SOUTH },
-        { LIBINPUT_NORTH_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_NORTH },
-        { LIBINPUT_WEST_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_WEST },
-        { LIBINPUT_EAST_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_EAST },
-        { LIBINPUT_SELECT_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_SELECT },
-        { LIBINPUT_HOMEPAGE_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_HOMEPAGE },
-        { LIBINPUT_THUMBL_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_THUMBL },
-        { LIBINPUT_THUMBR_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_THUMBR },
-        { LIBINPUT_THUMB2_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_THUMB2 },
-        { LIBINPUT_THUMB_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_THUMB },
-        { LIBINPUT_TOP_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_TOP },
-        { LIBINPUT_TOP2_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_TOP2 },
-        { LIBINPUT_PINKIE_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_PINKIE },
-        { LIBINPUT_BASE_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_BASE },
-        { LIBINPUT_BASE2_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_BASE2 },
-        { LIBINPUT_BASE3_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_BASE3 },
-        { LIBINPUT_BASE4_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_BASE4 },
-        { LIBINPUT_BASE5_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_BASE5 },
-        { LIBINPUT_BASE6_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_BASE6 },
-        { LIBINPUT_DEAD_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_DEAD },
-        { LIBINPUT_C_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_C },
-        { LIBINPUT_Z_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_Z },
-        { LIBINPUT_MODE_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_MODE }
-    };
+    const std::map<uint32_t, int32_t> LibinputChangeToPointer = { { LIBINPUT_TL2_BUTTON_CODE,
+                                                                    PointerEvent::JOYSTICK_BUTTON_TL2 },
+                                                                  { LIBINPUT_TR2_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_TR2 },
+                                                                  { LIBINPUT_TL_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_TL },
+                                                                  { LIBINPUT_TR_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_TR },
+                                                                  { LIBINPUT_SOUTH_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_SOUTH },
+                                                                  { LIBINPUT_NORTH_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_NORTH },
+                                                                  { LIBINPUT_WEST_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_WEST },
+                                                                  { LIBINPUT_EAST_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_EAST },
+                                                                  { LIBINPUT_SELECT_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_SELECT },
+                                                                  { LIBINPUT_HOMEPAGE_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_HOMEPAGE },
+                                                                  { LIBINPUT_THUMBL_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_THUMBL },
+                                                                  { LIBINPUT_THUMBR_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_THUMBR },
+                                                                  { LIBINPUT_THUMB2_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_THUMB2 },
+                                                                  { LIBINPUT_THUMB_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_THUMB },
+                                                                  { LIBINPUT_TOP_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_TOP },
+                                                                  { LIBINPUT_TOP2_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_TOP2 },
+                                                                  { LIBINPUT_PINKIE_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_PINKIE },
+                                                                  { LIBINPUT_BASE_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_BASE },
+                                                                  { LIBINPUT_BASE2_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_BASE2 },
+                                                                  { LIBINPUT_BASE3_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_BASE3 },
+                                                                  { LIBINPUT_BASE4_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_BASE4 },
+                                                                  { LIBINPUT_BASE5_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_BASE5 },
+                                                                  { LIBINPUT_BASE6_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_BASE6 },
+                                                                  { LIBINPUT_DEAD_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_DEAD },
+                                                                  { LIBINPUT_C_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_C },
+                                                                  { LIBINPUT_Z_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_Z },
+                                                                  { LIBINPUT_MODE_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_MODE } };
 
 public:
     explicit JoystickTransformProcessor(int32_t deviceId);
@@ -90,12 +89,13 @@ public:
     std::shared_ptr<PointerEvent> OnEvent(struct libinput_event *event) override;
 
 private:
-    bool OnEventJoystickButton(struct libinput_event* event);
+    bool OnEventJoystickButton(struct libinput_event *event);
     bool OnEventJoystickAxis(struct libinput_event *event);
     int32_t LibinputButtonToPointer(const uint32_t button);
+
 private:
-    int32_t deviceId_ { 0 };
-    std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
+    int32_t deviceId_{ 0 };
+    std::shared_ptr<PointerEvent> pointerEvent_{ nullptr };
     std::vector<std::pair<enum libinput_joystick_axis_source, PointerEvent::AxisType>> joystickType;
 };
 } // namespace MMI

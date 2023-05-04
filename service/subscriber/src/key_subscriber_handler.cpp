@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -65,8 +65,8 @@ void KeySubscriberHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> 
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
-int32_t KeySubscriberHandler::SubscribeKeyEvent(
-    SessionPtr sess, int32_t subscribeId, std::shared_ptr<KeyOption> keyOption)
+int32_t KeySubscriberHandler::SubscribeKeyEvent(SessionPtr sess, int32_t subscribeId,
+    std::shared_ptr<KeyOption> keyOption)
 {
     CALL_DEBUG_ENTER;
     if (subscribeId < 0) {
@@ -117,8 +117,7 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
     }
     keyEvent_ = KeyEvent::Clone(keyEvent);
     int32_t keyAction = keyEvent->GetKeyAction();
-    MMI_HILOGD("keyCode:%{public}d, keyAction:%{public}s", keyEvent->GetKeyCode(),
-        KeyEvent::ActionToString(keyAction));
+    MMI_HILOGD("keyCode:%{public}d, keyAction:%{public}s", keyEvent->GetKeyCode(), KeyEvent::ActionToString(keyAction));
     for (const auto &keyCode : keyEvent->GetPressedKeys()) {
         MMI_HILOGD("Pressed KeyCode:%{public}d", keyCode);
     }
@@ -143,8 +142,8 @@ void KeySubscriberHandler::InsertSubScriber(std::shared_ptr<Subscriber> subs)
     CHKPV(subs);
     for (auto it = subscribers_.begin(); it != subscribers_.end(); ++it) {
         if (subs->sess_ != nullptr && (*it)->id_ == subs->id_ && (*it)->sess_ == subs->sess_) {
-            MMI_HILOGW("Repeat registration id:%{public}d desc:%{public}s",
-                subs->id_, subs->sess_->GetDescript().c_str());
+            MMI_HILOGW("Repeat registration id:%{public}d desc:%{public}s", subs->id_,
+                subs->sess_->GetDescript().c_str());
             return;
         }
     }
@@ -166,7 +165,7 @@ void KeySubscriberHandler::OnSessionDelete(SessionPtr sess)
 }
 
 bool KeySubscriberHandler::IsPreKeysMatch(const std::set<int32_t> &preKeys,
-                                          const std::vector<int32_t> &pressedKeys) const
+    const std::vector<int32_t> &pressedKeys) const
 {
     if (preKeys.size() == 0) {
         return true;
@@ -187,7 +186,7 @@ bool KeySubscriberHandler::IsPreKeysMatch(const std::set<int32_t> &preKeys,
 }
 
 void KeySubscriberHandler::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
-                                            const std::shared_ptr<Subscriber> &subscriber)
+    const std::shared_ptr<Subscriber> &subscriber)
 {
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
@@ -212,7 +211,7 @@ void KeySubscriberHandler::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
 }
 
 bool KeySubscriberHandler::AddTimer(const std::shared_ptr<Subscriber> &subscriber,
-                                    const std::shared_ptr<KeyEvent> &keyEvent)
+    const std::shared_ptr<KeyEvent> &keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
@@ -237,7 +236,7 @@ bool KeySubscriberHandler::AddTimer(const std::shared_ptr<Subscriber> &subscribe
     }
 
     std::weak_ptr<Subscriber> weakSubscriber = subscriber;
-    subscriber->timerId_ = TimerMgr->AddTimer(duration, 1, [this, weakSubscriber] () {
+    subscriber->timerId_ = TimerMgr->AddTimer(duration, 1, [this, weakSubscriber]() {
         MMI_HILOGD("Timer callback");
         auto subscriber = weakSubscriber.lock();
         CHKPV(subscriber);
@@ -482,7 +481,7 @@ bool KeySubscriberHandler::IsRepeatedKeyEvent(std::shared_ptr<KeyEvent> keyEvent
 
 void KeySubscriberHandler::RemoveSubscriberKeyUpTimer(int32_t keyCode)
 {
-    for (const auto& item : subscribers_) {
+    for (const auto &item : subscribers_) {
         if ((item->timerId_ >= 0) && (item->keyOption_->GetFinalKey() == keyCode)) {
             ClearTimer(item);
         }
@@ -495,7 +494,7 @@ bool KeySubscriberHandler::IsNotifyPowerKeySubsciber(int32_t keyCode, const std:
         return true;
     }
 
-    for (const auto& pressedKey: keyCodes) {
+    for (const auto &pressedKey : keyCodes) {
         if (pressedKey == KeyEvent::KEYCODE_VOLUME_DOWN || pressedKey == KeyEvent::KEYCODE_VOLUME_UP) {
             return false;
         }
@@ -543,11 +542,11 @@ void KeySubscriberHandler::Dump(int32_t fd, const std::vector<std::string> &args
         std::shared_ptr<KeyOption> keyOption = item->keyOption_;
         CHKPV(keyOption);
         mprintf(fd,
-                "subscriber id:%d | timer id:%d | Pid:%d | Uid:%d | Fd:%d "
-                "| FinalKey:%d | finalKeyDownDuration:%d | IsFinalKeyDown:%s\t",
-                subscriber->id_, subscriber->timerId_, session->GetPid(),
-                session->GetUid(), session->GetFd(), keyOption->GetFinalKey(),
-                keyOption->GetFinalKeyDownDuration(), keyOption->IsFinalKeyDown() ? "true" : "false");
+            "subscriber id:%d | timer id:%d | Pid:%d | Uid:%d | Fd:%d "
+            "| FinalKey:%d | finalKeyDownDuration:%d | IsFinalKeyDown:%s\t",
+            subscriber->id_, subscriber->timerId_, session->GetPid(), session->GetUid(), session->GetFd(),
+            keyOption->GetFinalKey(), keyOption->GetFinalKeyDownDuration(),
+            keyOption->IsFinalKeyDown() ? "true" : "false");
         std::set<int32_t> preKeys = keyOption->GetPreKeys();
         for (const auto &preKey : preKeys) {
             mprintf(fd, "preKeys:%d\t", preKey);

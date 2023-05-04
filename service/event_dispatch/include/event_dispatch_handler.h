@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,10 +30,11 @@ namespace OHOS {
 namespace MMI {
 class EventDispatchHandler final : public IInputEventHandler {
     struct DinputSimulateEvent {
-        uint32_t type { PointerEvent::SOURCE_TYPE_UNKNOWN };
-        uint32_t code { PointerEvent::BUTTON_NONE };
-        int32_t value { PointerEvent::POINTER_ACTION_UNKNOWN };
+        uint32_t type{ PointerEvent::SOURCE_TYPE_UNKNOWN };
+        uint32_t code{ PointerEvent::BUTTON_NONE };
+        int32_t value{ PointerEvent::POINTER_ACTION_UNKNOWN };
     };
+
 public:
     EventDispatchHandler() = default;
     DISALLOW_COPY_AND_MOVE(EventDispatchHandler);
@@ -48,15 +49,15 @@ public:
     void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    int32_t DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key);
+    int32_t DispatchKeyEventPid(UDSServer &udsServer, std::shared_ptr<KeyEvent> key);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void HandlePointerEventInner(const std::shared_ptr<PointerEvent> point);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 private:
-    int32_t eventTime_ { 0 };
-    int32_t currentTime_ { 0 };
+    int32_t eventTime_{ 0 };
+    int32_t currentTime_{ 0 };
 };
 } // namespace MMI
 } // namespace OHOS

@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -60,7 +60,7 @@ int32_t KeyAutoRepeat::AddDeviceConfig(struct libinput_device *device)
     return RET_OK;
 }
 
-void KeyAutoRepeat::SelectAutoRepeat(std::shared_ptr<KeyEvent>& keyEvent)
+void KeyAutoRepeat::SelectAutoRepeat(std::shared_ptr<KeyEvent> &keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
@@ -71,8 +71,8 @@ void KeyAutoRepeat::SelectAutoRepeat(std::shared_ptr<KeyEvent>& keyEvent)
     keyEvent_ = keyEvent;
     if (keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
         if (TimerMgr->IsExist(timerId_)) {
-            MMI_HILOGI("Keyboard down but timer exists, timerId:%{public}d, keyCode:%{public}d",
-                timerId_, keyEvent_->GetKeyCode());
+            MMI_HILOGI("Keyboard down but timer exists, timerId:%{public}d, keyCode:%{public}d", timerId_,
+                keyEvent_->GetKeyCode());
             TimerMgr->RemoveTimer(timerId_);
             timerId_ = -1;
         }

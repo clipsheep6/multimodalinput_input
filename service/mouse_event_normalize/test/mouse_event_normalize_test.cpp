@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,21 +31,13 @@ public:
     void TearDown();
 };
 
-void MouseEventNormalizeTest::SetUpTestCase(void)
-{
-}
+void MouseEventNormalizeTest::SetUpTestCase(void) {}
 
-void MouseEventNormalizeTest::TearDownTestCase(void)
-{
-}
+void MouseEventNormalizeTest::TearDownTestCase(void) {}
 
-void MouseEventNormalizeTest::SetUp()
-{
-}
+void MouseEventNormalizeTest::SetUp() {}
 
-void MouseEventNormalizeTest::TearDown()
-{
-}
+void MouseEventNormalizeTest::TearDown() {}
 
 /**
  * @tc.name: MouseEventNormalizeTest_GetDisplayId()_001

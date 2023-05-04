@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -76,7 +76,7 @@ public:
     int32_t SetPointerLocation(int32_t x, int32_t y);
     int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode);
     int32_t GetWindowPid(int32_t windowId);
-    int32_t AppendExtraData(const ExtraData& extraData);
+    int32_t AppendExtraData(const ExtraData &extraData);
     int32_t EnableInputDevice(bool enable);
     int32_t SetKeyDownDuration(const std::string &businessId, int32_t delay);
 
@@ -88,10 +88,10 @@ private:
     void OnDeath();
     void Clean();
     void NotifyDeath();
-    sptr<IMultimodalInputConnect> multimodalInputConnectService_ { nullptr };
-    sptr<IRemoteObject::DeathRecipient> multimodalInputConnectRecipient_ { nullptr };
-    int32_t socketFd_ { IMultimodalInputConnect::INVALID_SOCKET_FD };
-    int32_t tokenType_ { -1 };
+    sptr<IMultimodalInputConnect> multimodalInputConnectService_{ nullptr };
+    sptr<IRemoteObject::DeathRecipient> multimodalInputConnectRecipient_{ nullptr };
+    int32_t socketFd_{ IMultimodalInputConnect::INVALID_SOCKET_FD };
+    int32_t tokenType_{ -1 };
     std::mutex lock_;
 };
 } // namespace MMI

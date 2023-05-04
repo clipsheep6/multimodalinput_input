@@ -1,0 +1,117 @@
+diff a/service/monitor/src/event_monitor_handler.cpp b/service/monitor/src/event_monitor_handler.cpp	(rejected hunks)
+@@ -4,7 +4,7 @@
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+  *
+- *     http://www.apache.org/licenses/LICENSE-2.0
++ * http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+@@ -73,8 +73,8 @@ void EventMonitorHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> p
+ }
+ #endif // OHOS_BUILD_ENABLE_TOUCH
+ 
+-int32_t EventMonitorHandler::AddInputHandler(InputHandlerType handlerType,
+-    HandleEventType eventType, SessionPtr session)
++int32_t EventMonitorHandler::AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
++    SessionPtr session)
+ {
+     CALL_INFO_TRACE;
+     CHKPR(session, RET_ERR);
+@@ -83,16 +83,16 @@ int32_t EventMonitorHandler::AddInputHandler(InputHandlerType handlerType,
+         return RET_ERR;
+     }
+     InitSessionLostCallback();
+-    SessionHandler mon { handlerType, eventType, session };
++    SessionHandler mon{ handlerType, eventType, session };
+     return monitors_.AddMonitor(mon);
+ }
+ 
+ void EventMonitorHandler::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
+-                                                   SessionPtr session)
++    SessionPtr session)
+ {
+     CALL_INFO_TRACE;
+     if (handlerType == InputHandlerType::MONITOR) {
+-        SessionHandler monitor { handlerType, eventType, session };
++        SessionHandler monitor{ handlerType, eventType, session };
+         monitors_.RemoveMonitor(monitor);
+     }
+ }
+@@ -138,13 +138,13 @@ bool EventMonitorHandler::OnHandleEvent(std::shared_ptr<PointerEvent> pointerEve
+ 
+ void EventMonitorHandler::InitSessionLostCallback()
+ {
+-    if (sessionLostCallbackInitialized_)  {
++    if (sessionLostCallbackInitialized_) {
+         return;
+     }
+     auto udsServerPtr = InputHandler->GetUDSServer();
+     CHKPV(udsServerPtr);
+-    udsServerPtr->AddSessionDeletedCallback(std::bind(
+-        &EventMonitorHandler::OnSessionLost, this, std::placeholders::_1));
++    udsServerPtr->AddSessionDeletedCallback(
++        std::bind(&EventMonitorHandler::OnSessionLost, this, std::placeholders::_1));
+     sessionLostCallbackInitialized_ = true;
+     MMI_HILOGD("The callback on session deleted is registered successfully");
+ }
+@@ -178,8 +178,8 @@ void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEv
+     CHKPV(pointerEvent);
+     CHKPV(session_);
+     NetPacket pkt(MmiMessageId::REPORT_POINTER_EVENT);
+-    MMI_HILOGD("Service SendToClient InputHandlerType:%{public}d,TokenType:%{public}d, pid:%{public}d",
+-        handlerType_, session_->GetTokenType(), session_->GetPid());
++    MMI_HILOGD("Service SendToClient InputHandlerType:%{public}d,TokenType:%{public}d, pid:%{public}d", handlerType_,
++        session_->GetTokenType(), session_->GetPid());
+     auto currentTime = GetSysClockTime();
+     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+         if (ANRMgr->TriggerANR(ANR_MONITOR, currentTime, session_)) {
+@@ -205,11 +205,11 @@ void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEv
+     }
+ }
+ 
+-int32_t EventMonitorHandler::MonitorCollection::AddMonitor(const SessionHandler& monitor)
++int32_t EventMonitorHandler::MonitorCollection::AddMonitor(const SessionHandler &monitor)
+ {
+     if (monitors_.size() >= MAX_N_INPUT_MONITORS) {
+         MMI_HILOGE("The number of monitors exceeds the maximum:%{public}zu,monitors,errCode:%{public}d",
+-                   monitors_.size(), INVALID_MONITOR_MON);
++            monitors_.size(), INVALID_MONITOR_MON);
+         return RET_ERR;
+     }
+     bool isFound = false;
+@@ -241,7 +241,7 @@ int32_t EventMonitorHandler::MonitorCollection::AddMonitor(const SessionHandler&
+     return RET_OK;
+ }
+ 
+-void EventMonitorHandler::MonitorCollection::RemoveMonitor(const SessionHandler& monitor)
++void EventMonitorHandler::MonitorCollection::RemoveMonitor(const SessionHandler &monitor)
+ {
+     auto iter = monitors_.find(monitor);
+     if (iter == monitors_.cend()) {
+@@ -337,7 +337,7 @@ bool EventMonitorHandler::MonitorCollection::HandleEvent(std::shared_ptr<Pointer
+ 
+ bool EventMonitorHandler::MonitorCollection::HasMonitor(SessionPtr session)
+ {
+-    SessionHandler monitor { InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_ALL, session };
++    SessionHandler monitor{ InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_ALL, session };
+     return (monitors_.find(monitor) != monitors_.end());
+ }
+ 
+@@ -428,11 +428,10 @@ void EventMonitorHandler::MonitorCollection::Dump(int32_t fd, const std::vector<
+         SessionPtr session = item.session_;
+         CHKPV(session);
+         mprintf(fd,
+-                "handlerType:%d | Pid:%d | Uid:%d | Fd:%d "
+-                "| EarliestEventTime:%" PRId64 " | Descript:%s \t",
+-                item.handlerType_, session->GetPid(),
+-                session->GetUid(), session->GetFd(),
+-                session->GetEarliestEventTime(), session->GetDescript().c_str());
++            "handlerType:%d | Pid:%d | Uid:%d | Fd:%d "
++            "| EarliestEventTime:%" PRId64 " | Descript:%s \t",
++            item.handlerType_, session->GetPid(), session->GetUid(), session->GetFd(), session->GetEarliestEventTime(),
++            session->GetDescript().c_str());
+     }
+ }
+ } // namespace MMI
