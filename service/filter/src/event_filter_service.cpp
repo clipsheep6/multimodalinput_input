@@ -34,7 +34,7 @@ int32_t EventFilterService::GetNextId()
 {
     if (filterIdSeed_ == std::numeric_limits<int32_t>::max()) {
         filterIdSeed_ = 0;
-    }    
+    }
     return filterIdSeed_++;
 }
 
