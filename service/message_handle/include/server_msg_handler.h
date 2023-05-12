@@ -24,6 +24,10 @@
 #include "key_option.h"
 #include "msg_handler.h"
 
+#include "base/security/security_component/interfaces/inner_api/enhance_kits/include/sec_comp_enhance_kit.h"
+#include "base/security/security_component/frameworks/enhance_adapter/include/sec_comp_enhance_adapter.h"
+#include "base/security/security_component_enhance/frameworks/input_enhance/include/sec_comp_input_enhance.h"
+
 namespace OHOS {
 namespace MMI {
 typedef std::function<int32_t(SessionPtr sess, NetPacket& pkt)> ServerMsgFun;
@@ -74,6 +78,7 @@ public:
 protected:
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
     int32_t OnDisplayInfo(SessionPtr sess, NetPacket& pkt);
+    int32_t OnEnhanceConfig(SessionPtr sess, NetPacket& pkt);
 
 private:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
