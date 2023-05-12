@@ -130,6 +130,23 @@ void InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInf
     PrintDisplayInfo();
 }
 
+void InputManagerImpl::SetEnhanceConfig(SecCompEnhanceCfgBase *cfg)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Get mmi client is nullptr");
+        return;
+    }
+    if (cfg == nullptr) {
+        MMI_HILOGE("SecCompEnhance cfg info is empty!");
+        return;
+    }
+    secCompEnhanceCfgBase_ = reinterpret_cast<Security::SecurityComponentEnhance::SecCompEnhanceCfg *>(cfg);
+    SendEnhanceConfig();
+    PrintEnhanceConfig();
+}
+
 int32_t InputManagerImpl::AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority,
     uint32_t deviceTags)
 {
@@ -356,6 +373,19 @@ int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt)
     return PackDisplayInfo(pkt);
 }
 
+int32_t InputManagerImpl::PackEnhanceConfig(NetPacket &pkt)
+{
+    pkt << secCompEnhanceCfgBase_->enable << secCompEnhanceCfgBase_->alg << secCompEnhanceCfgBase_->key.size;
+    for (uint32_t i = 0; i < secCompEnhanceCfgBase_->key.size; i++) {
+        pkt << *(secCompEnhanceCfgBase_->key.data + i);
+    }
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write security info config failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
 {
     uint32_t num = static_cast<uint32_t>(displayGroupInfo_.windowsInfo.size());
@@ -417,6 +447,15 @@ void InputManagerImpl::PrintDisplayInfo()
             "uniq:%{public}s,direction:%{public}d",
             item.id, item.x, item.y, item.width, item.height, item.dpi, item.name.c_str(),
             item.uniq.c_str(), item.direction);
+    }
+}
+
+void InputManagerImpl::PrintEnhanceConfig()
+{
+    MMI_HILOGD("securityConfigInfo,enable:%{public}d,alg:%{public}d,key.size:%{public}d",
+        secCompEnhanceCfgBase_->enable, secCompEnhanceCfgBase_->alg, secCompEnhanceCfgBase_->key.size);
+    if (secCompEnhanceCfgBase_->key.data == nullptr) {
+        MMI_HILOGE("key.data is null");
     }
 }
 
@@ -772,7 +811,9 @@ void InputManagerImpl::OnConnected()
         return;
     }
     SendDisplayInfo();
+    SendEnhanceConfig();
     PrintDisplayInfo();
+    PrintEnhanceConfig();
     if (anrObservers_.empty()) {
         return;
     }
@@ -789,6 +830,19 @@ void InputManagerImpl::SendDisplayInfo()
     NetPacket pkt(MmiMessageId::DISPLAY_INFO);
     if (PackDisplayData(pkt) == RET_ERR) {
         MMI_HILOGE("Pack display info failed");
+        return;
+    }
+    if (!client->SendMessage(pkt)) {
+        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+    }
+}
+
+void InputManagerImpl::SendEnhanceConfig()
+{
+    MMIClientPtr client = MMIEventHdl.GetMMIClient();
+    CHKPV(client);
+    NetPacket pkt(MmiMessageId::SCINFO_CONFIG);
+    if (PackEnhanceConfig(pkt) == RET_ERR) {
         return;
     }
     if (!client->SendMessage(pkt)) {

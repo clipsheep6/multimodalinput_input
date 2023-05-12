@@ -36,6 +36,7 @@
 #include "switch_subscriber_handler.h"
 #include "time_cost_chk.h"
 
+using namespace OHOS::Security::SecurityComponentEnhance;
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -47,6 +48,7 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
     udsServer_ = &udsServer;
     MsgCallback funs[] = {
         {MmiMessageId::DISPLAY_INFO, MsgCallbackBind2(&ServerMsgHandler::OnDisplayInfo, this)},
+        {MmiMessageId::SCINFO_CONFIG, MsgCallbackBind2(&ServerMsgHandler::OnEnhanceConfig, this)},
     };
     for (auto &it : funs) {
         if (!RegistrationEvent(it)) {
@@ -229,6 +231,30 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
         return RET_ERR;
     }
     WinMgr->UpdateDisplayInfo(displayGroupInfo);
+    return RET_OK;
+}
+
+int32_t ServerMsgHandler::OnEnhanceConfig(SessionPtr sess, NetPacket &pkt)
+{
+    CHKPR(sess, ERROR_NULL_POINTER);
+    SecCompEnhanceCfg* cfg = static_cast<SecCompEnhanceCfg*>(malloc(sizeof(SecCompEnhanceCfg)));
+    pkt >> cfg->enable >> cfg->alg;
+    pkt >> cfg->key.size;
+    uint32_t num = cfg->key.size;
+    uint8_t keyData[num];
+    for (uint32_t i = 0; i < num; i++) {
+        pkt >> keyData[i];
+    }
+    cfg->key.data = keyData;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read scinfo config failed");
+        return RET_ERR;
+    }
+    SecCompEnhanceCfgBase *secCompEnhanceCfgBase = reinterpret_cast<SecCompEnhanceCfgBase *>(cfg);
+    int32_t result = Security::SecurityComponent::SecCompEnhanceKit::SetEnhanceCfg(secCompEnhanceCfgBase);
+    if (result != 0) {
+        return RET_ERR;
+    }
     return RET_OK;
 }
 
