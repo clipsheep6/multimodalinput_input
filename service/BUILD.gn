@@ -158,6 +158,7 @@ ohos_shared_library("libmmi-server") {
     "multimedia_image_framework:image_native",
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
+    "security_component:libsecurity_component_enhance_sdk",
   ]
 
   if (resource_schedule_service_enabled) {

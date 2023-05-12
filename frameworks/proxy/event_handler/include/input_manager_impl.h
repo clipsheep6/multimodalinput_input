@@ -41,6 +41,10 @@
 #include "pointer_style.h"
 #include "switch_event.h"
 
+#include "base/security/security_component/frameworks/enhance_adapter/include/sec_comp_enhance_adapter.h"
+#include "base/security/security_component_enhance/frameworks/input_enhance/include/sec_comp_input_enhance.h"
+#include "foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include/scinfo_config.h"
+
 namespace OHOS {
 namespace MMI {
 class InputManagerImpl final {
@@ -53,6 +57,7 @@ public:
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
     int32_t GetWindowPid(int32_t windowId);
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
+    void SetEnhanceConfig(SecCompEnhanceCfgBase *cfg);
     int32_t SubscribeKeyEvent(
         std::shared_ptr<KeyOption> keyOption,
         std::function<void(std::shared_ptr<KeyEvent>)> callback
@@ -134,8 +139,11 @@ public:
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
     int32_t PackDisplayInfo(NetPacket &pkt);
+    int32_t PackEnhanceConfig(NetPacket &pkt);
     void PrintDisplayInfo();
+    void PrintEnhanceConfig();
     void SendDisplayInfo();
+    void SendEnhanceConfig();
     void ReAddInputEventFilter();
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -157,6 +165,7 @@ private:
     std::condition_variable cv_;
     std::thread ehThread_;
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ { nullptr };
+    Security::SecurityComponentEnhance::SecCompEnhanceCfg* secCompEnhanceCfgBase_ {};
 };
 
 #define InputMgrImpl ::OHOS::Singleton<InputManagerImpl>::GetInstance()
