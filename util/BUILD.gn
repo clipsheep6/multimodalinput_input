@@ -39,6 +39,7 @@ ohos_shared_library("libmmi-util") {
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "napi:ace_napi",
+    "security_component:libsecurity_component_enhance_sdk",
   ]
   public_deps = [ "${mmi_path}/frameworks/proxy:libmmi-common" ]
 
