@@ -43,7 +43,6 @@
 
 #include "base/security/security_component/frameworks/enhance_adapter/include/sec_comp_enhance_adapter.h"
 #include "base/security/security_component_enhance/frameworks/input_enhance/include/sec_comp_input_enhance.h"
-#include "foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include/scinfo_config.h"
 
 namespace OHOS {
 namespace MMI {
