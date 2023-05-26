@@ -64,7 +64,11 @@
         "config_policy",
         "hicollie_native",
         "init",
-        "preferences"
+        "preferences",
+        "security_component",
+        "thirdparty_libevdev",
+        "thirdparty_mtdev",
+        "cjson"
       ],
       "third_party": [
         "cJSON",
