@@ -146,23 +146,7 @@ ohos_shared_library("libmmi-server") {
     "//third_party/cJSON:cjson",
   ]
 
-  external_deps = [
-    "ability_base:want",
-    "access_token:libaccesstoken_sdk",
-    "access_token:libtokenid_sdk",
-    "c_utils:utils",
-    "config_policy:configpolicy_util",
-    "hicollie_native:libhicollie",
-    "hisysevent_native:libhisysevent",
-    "hitrace_native:hitrace_meter",
-    "hiviewdfx_hilog_native:libhilog",
-    "init:libbegetutil",
-    "ipc:ipc_single",
-    "multimedia_image_framework:image_native",
-    "preferences:native_preferences",
-    "safwk:system_ability_fwk"
-  ]
-
+  external_deps = [ "c_utils:utils" ]
   if (input_feature_pointer_drawing) {
     external_deps += [ "window_manager:libwm" ]
   }
@@ -176,11 +160,26 @@ ohos_shared_library("libmmi-server") {
   }
 
   external_deps += [
+    "ability_base:want",
     "ability_runtime:ability_manager",
     "ability_runtime:abilitykit_native",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libtokenid_sdk",
+    "config_policy:configpolicy_util",
     "graphic_standard:2d_graphics",
-    "graphic_standard:librender_service_client"
+    "graphic_standard:librender_service_client",
+    "hicollie_native:libhicollie",
+    "hisysevent_native:libhisysevent",
+    "hitrace_native:hitrace_meter",
+    "hiviewdfx_hilog_native:libhilog",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "multimedia_image_framework:image_native",
+    "preferences:native_preferences",
+    "safwk:system_ability_fwk",
   ]
+
+  external_deps += []
 
   part_name = "input"
   subsystem_name = "multimodalinput"
