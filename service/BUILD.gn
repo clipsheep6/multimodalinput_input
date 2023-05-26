@@ -179,8 +179,6 @@ ohos_shared_library("libmmi-server") {
     "safwk:system_ability_fwk",
   ]
 
-  external_deps += []
-
   part_name = "input"
   subsystem_name = "multimodalinput"
 }
