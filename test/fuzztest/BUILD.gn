@@ -38,5 +38,12 @@ group("test") {
     "supportkeys_fuzzer:fuzztest",
     "unregisterdevListener_fuzzer:fuzztest",
     "updatedisplayinfo_fuzzer:fuzztest",
+    "setkeydownduration_fuzzer:fuzztest",
+    "enableinputdevice_fuzzer:fuzztest",
+    "appendextradata_fuzzer:fuzztest",
+    "getwindowpid_fuzzer:fuzztest",
+    "setmouseprimarybutton_fuzzer:fuzztest",
+    "getmouseprimarybutton_fuzzer:fuzztest",
+    "setpointervisible_fuzzer:fuzztest",
   ]
 }
