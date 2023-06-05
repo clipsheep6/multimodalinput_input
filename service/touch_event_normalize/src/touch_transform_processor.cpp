@@ -21,6 +21,7 @@
 #include "input_windows_manager.h"
 #include "mmi_log.h"
 
+#include "fingersense_manager.h"
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -66,6 +67,8 @@ bool TouchTransformProcessor::OnEventTouchDown(struct libinput_event *event)
     item.SetPressure(pressure);
     item.SetLongAxis(longAxis);
     item.SetShortAxis(shortAxis);
+    TouchType *rawTouch = nullptr;
+    FingersenseMgr->KnuckleClassifyTouch(rawTouch);
     int32_t toolType = GetTouchToolType(touch, device);
     item.SetToolType(toolType);
     item.SetPointerId(seatSlot);
