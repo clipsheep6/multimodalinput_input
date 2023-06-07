@@ -92,6 +92,14 @@ struct TwoFingerGesture {
     } touches[MAX_TOUCH_NUM];
 };
 
+struct SingleKnuckleDoubleClickGesture {
+    
+};
+
+struct DoubleKnuckleDoubleClickGesture {
+
+};
+
 class KeyCommandHandler final : public IInputEventHandler {
 public:
     KeyCommandHandler() = default;
