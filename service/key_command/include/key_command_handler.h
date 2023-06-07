@@ -92,6 +92,19 @@ struct TwoFingerGesture {
     } touches[MAX_TOUCH_NUM];
 };
 
+struct KnuckleDoubleClickGesture {
+    bool active { false };
+    std::shared_ptr<PointerEvent> lastPointerDownEvent { nullptr };
+    std::shared_ptr<PointerEvent> lastPointerUpEvent { nullptr };
+    int64_t lastPointerUpTime { 0 };
+    int64_t downToPrevUpTime { 0 };
+    double downToPrevDownDistance {};
+    int64_t downToPrevDownTime {};
+    int32_t timerId { -1 };
+    Ability singleKnuckleGestureAbility;
+    Ability doubleKnuckleGestureAbility;
+};
+
 class KeyCommandHandler final : public IInputEventHandler {
 public:
     KeyCommandHandler() = default;
@@ -150,9 +163,16 @@ private:
         filterSequences_.clear();
     }
     bool SkipFinalKey(const int32_t keyCode, const std::shared_ptr<KeyEvent> &key);
+    void HandlePointerActionMoveEvent(const std::shared_ptr<PointerEvent>& touchEvent);
+    void HandlePointerActionDownEvent(const std::shared_ptr<PointerEvent>& touchEvent);
     void OnHandleTouchEvent(const std::shared_ptr<PointerEvent>& touchEvent);
     void StartTwoFingerGesture();
     void StopTwoFingerGesture();
+    void HandlePointerActionUpEvent(const std::shared_ptr<PointerEvent>& touchEvent);
+    void HandleFingerGestureDownEvent(const std::shared_ptr<PointerEvent>& touchEvent);
+    void HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent>& touchEvent);
+    void HandleKnuckleGestureDownEvent(const std::shared_ptr<PointerEvent>& touchEvent);
+    void HandleKnuckleGestureUpEvent(const std::shared_ptr<PointerEvent>& touchEvent);
 
 private:
     ShortcutKey lastMatchedKey_;
@@ -166,6 +186,9 @@ private:
     std::map<int32_t, int32_t> specialKeys_;
     std::map<int32_t, std::list<int32_t>> specialTimers_;
     TwoFingerGesture twoFingerGesture_;
+    KnuckleDoubleClickGesture knuckleDoubleClickGesture_;
+    std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
+    std::shared_ptr<PointerEvent> currentPointerEvent_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS
