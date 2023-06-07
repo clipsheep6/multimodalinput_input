@@ -710,13 +710,13 @@ void KeyCommandHandler::HandlePointerActionMoveEvent(const std::shared_ptr<Point
 
     if (twoFingerGesture_.timerId == -1) {
         MMI_HILOGW("Two finger gesture timer id is -1.");
-        break;
+        return;
     }
     auto id = touchEvent->GetPointerId();
     auto pos = std::find_if(std::begin(twoFingerGesture_.touches), std::end(twoFingerGesture_.touches),
         [id](const auto& item) { return item.id == id; });
     if (pos == std::end(twoFingerGesture_.touches)) {
-        break;
+        return;
     }
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
@@ -850,7 +850,6 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
 
     // update time
     knuckleDoubleClickGesture_.downToPrevUpTime = touchEvent->GetActionTime() - knuckleDoubleClickGesture_.lastPointerUpTime;
-    MMI_HILOGD("down to prev up time: %{public}ld", knuckleDoubleClickGesture_.downToPrevUpTime);
     int32_t duration = 500;
     if (knuckleDoubleClickGesture_.downToPrevUpTime < (static_cast<int64_t>(duration) * 1000)) {
         MMI_HILOGD("current pointer is knuckle double click ");
