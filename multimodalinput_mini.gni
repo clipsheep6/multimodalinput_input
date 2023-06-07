@@ -275,6 +275,6 @@ if (dlp_permission_enable) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_SECURITY_COMPONENT" ]
 }
 
-if (input_ext_feature) {
+if (input_ext_feature != "") {
   input_default_defines += [ "OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER" ]
 }
