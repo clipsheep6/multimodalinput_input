@@ -102,8 +102,7 @@
           "//third_party/libevdev:libevdev",
           "//foundation/multimodalinput/input:uinput_inject",
           "//foundation/multimodalinput/input:mmi_uinput.rc",
-          "//foundation/multimodalinput/input:examples_group",
-          "//foundation/multimodalinput/input:fingersense_wrapper"
+          "//foundation/multimodalinput/input:examples_group"
         ]
       },
       "inner_kits": [
