@@ -153,10 +153,4 @@ group("mmi_tests") {
 group("examples_group") {
   deps = [ "examples/input_device_display_bind:input_device_display_bind" ]
 }
-
-group("fingersense_wrapper") {
-  deps = []
-  if (input_ext_feature == "") {
-    deps += ["service/fingersense_wrapper:fingersense_wrapper"]
-  }
 }
