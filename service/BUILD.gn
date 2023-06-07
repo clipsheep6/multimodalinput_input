@@ -166,8 +166,6 @@ ohos_shared_library("libmmi-server") {
   ]
 
   if (input_ext_feature == "") {
-    deps += ["${mmi_path}/service/fingersense_wrapper:fingersense_wrapper"]
-  } else {
     deps += [ input_ext_feature ]
   }
 
