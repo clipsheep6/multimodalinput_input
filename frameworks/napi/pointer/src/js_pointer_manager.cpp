@@ -51,7 +51,7 @@ AsyncContext::~AsyncContext()
     }
 }
 
-bool getResult(sptr<AsyncContext> asyncContext, napi_value * results)
+bool getResult(sptr<AsyncContext> asyncContext, napi_value *results)
 {
     CALL_DEBUG_ENTER;
     napi_env env = asyncContext->env;
@@ -69,8 +69,7 @@ bool getResult(sptr<AsyncContext> asyncContext, napi_value * results)
         napi_value errMsg = nullptr;
         napi_value businessError = nullptr;
         CHKRF(napi_create_int32(env, asyncContext->errorCode, &errCode), CREATE_INT32);
-        CHKRF(napi_create_string_utf8(env, codeMsg.msg.c_str(),
-            NAPI_AUTO_LENGTH, &errMsg), CREATE_STRING_UTF8);
+        CHKRF(napi_create_string_utf8(env, codeMsg.msg.c_str(), NAPI_AUTO_LENGTH, &errMsg), CREATE_STRING_UTF8);
         CHKRF(napi_create_error(env, nullptr, errMsg, &businessError), CREATE_ERROR);
         CHKRF(napi_set_named_property(env, businessError, ERR_CODE.c_str(), errCode), SET_NAMED_PROPERTY);
         results[0] = businessError;
@@ -103,10 +102,11 @@ void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
     napi_value resource = nullptr;
     CHKRV(napi_create_string_utf8(env, "AsyncCallbackWork", NAPI_AUTO_LENGTH, &resource), CREATE_STRING_UTF8);
     asyncContext->IncStrongRef(nullptr);
-    napi_status status = napi_create_async_work(env, nullptr, resource, [](napi_env env, void* data) {},
-        [](napi_env env, napi_status status, void* data) {
+    napi_status status = napi_create_async_work(
+        env, nullptr, resource, [](napi_env env, void *data) {},
+        [](napi_env env, napi_status status, void *data) {
             sptr<AsyncContext> asyncContext(static_cast<AsyncContext *>(data));
-            /**
+            /* *
              * After the asynchronous task is created, the asyncCallbackInfo reference count is reduced
              * to 0 destruction, so you need to add 1 to the asyncCallbackInfo reference count when the
              * asynchronous task is created, and subtract 1 from the reference count after the naked
@@ -455,6 +455,123 @@ napi_value JsPointerManager::GetHoverScrollState(napi_env env, napi_value handle
     }
     AsyncCallbackWork(asyncContext);
     return promise;
+}
+
+napi_value JsPointerManager::SetTouchpadData(napi_env env, napi_value handle, int32_t errorCode)
+{
+    CALL_DEBUG_ENTER;
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    CHKPP(asyncContext);
+
+    asyncContext->errorCode = errorCode;
+    asyncContext->reserve << ReturnType::VOID;
+
+    napi_value promise = nullptr;
+    if (handle != nullptr) {
+        CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
+        CHKRP(napi_get_undefined(env, &promise), GET_UNDEFINED);
+    } else {
+        CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+    }
+    AsyncCallbackWork(asyncContext);
+    return promise;
+}
+
+napi_value JsPointerManager::GetTouchpadBoolData(napi_env env, napi_value handle, bool data, int32_t errorCode)
+{
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    CHKPP(asyncContext);
+
+    asyncContext->errorCode = errorCode;
+    asyncContext->reserve << ReturnType::BOOL << data;
+
+    napi_value promise = nullptr;
+    if (handle != nullptr) {
+        CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
+        CHKRP(napi_get_undefined(env, &promise), GET_UNDEFINED);
+    } else {
+        CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+    }
+    AsyncCallbackWork(asyncContext);
+    return promise;
+}
+
+napi_value JsPointerManager::GetTouchpadInt32Data(napi_env env, napi_value handle, int32_t data, int32_t errorCode)
+{
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    CHKPP(asyncContext);
+
+    asyncContext->errorCode = errorCode;
+    asyncContext->reserve << ReturnType::NUMBER << data;
+
+    napi_value promise = nullptr;
+    if (handle != nullptr) {
+        CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
+        CHKRP(napi_get_undefined(env, &promise), GET_UNDEFINED);
+    } else {
+        CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+    }
+    AsyncCallbackWork(asyncContext);
+    return promise;
+}
+
+napi_value JsPointerManager::SetTouchpadScrollSwitch(napi_env env, bool switchFlag, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = InputManager::GetInstance()->SetTouchpadScrollSwitch(switchFlag);
+    return SetTouchpadData(env, handle, ret);
+}
+
+napi_value JsPointerManager::GetTouchpadScrollSwitch(napi_env env, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    bool switchFlag = true;
+    int32_t ret = InputManager::GetInstance()->GetTouchpadScrollSwitch(switchFlag);
+    return GetTouchpadBoolData(env, handle, switchFlag, ret);
+}
+
+napi_value JsPointerManager::SetTouchpadScrollDirection(napi_env env, bool state, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = InputManager::GetInstance()->SetTouchpadScrollDirection(state);
+    return SetTouchpadData(env, handle, ret);
+}
+
+napi_value JsPointerManager::GetTouchpadScrollDirection(napi_env env, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    bool state = true;
+    int32_t ret = InputManager::GetInstance()->GetTouchpadScrollDirection(state);
+    return GetTouchpadBoolData(env, handle, state, ret);
+}
+
+napi_value JsPointerManager::SetTouchpadTapSwitch(napi_env env, bool switchFlag, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = InputManager::GetInstance()->SetTouchpadTapSwitch(switchFlag);
+    return SetTouchpadData(env, handle, ret);
+}
+
+napi_value JsPointerManager::GetTouchpadTapSwitch(napi_env env, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    bool switchFlag = true;
+    int32_t ret = InputManager::GetInstance()->GetTouchpadTapSwitch(switchFlag);
+    return GetTouchpadBoolData(env, handle, switchFlag, ret);
+}
+napi_value JsPointerManager::SetTouchpadPointerSpeed(napi_env env, int32_t speed, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = InputManager::GetInstance()->SetTouchpadPointerSpeed(speed);
+    return SetTouchpadData(env, handle, ret);
+}
+
+napi_value JsPointerManager::GetTouchpadPointerSpeed(napi_env env, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    int32_t speed;
+    int32_t ret = InputManager::GetInstance()->GetTouchpadPointerSpeed(speed);
+    return GetTouchpadInt32Data(env, handle, speed, ret);
 }
 } // namespace MMI
 } // namespace OHOS
