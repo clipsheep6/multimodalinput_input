@@ -46,7 +46,7 @@ public:
     enum class RightMenuSwitchType {
         TP_RIGHT_BUTTON = 1,
         TP_LEFT_BUTTON = 2,
-        TP_TWO_FINGERS_LIGHT_TAP =3
+        TP_TWO_FINGERS_LIGHT_TAP = 3,
     };
 
     enum class PointerDataSource {
@@ -103,8 +103,6 @@ public:
     static int32_t GetTouchpadPointerSpeed(int32_t &speed);
     void SetConfigPointerSpeed(int32_t speed);
     int32_t GetSpeed() const;
-
-
 
 private:
     static double absolutionX_;
