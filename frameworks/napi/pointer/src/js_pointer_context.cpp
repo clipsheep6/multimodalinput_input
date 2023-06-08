@@ -801,7 +801,8 @@ napi_value JsPointerContext::SetTouchpadScrollSwitch(napi_env env, napi_callback
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
     auto func = [jsPointerMgr] (napi_env env, bool switchFlag, napi_value handle) -> napi_value {
-        return jsPointerMgr->SetTouchpadScrollSwitch(env, switchFlag, handle);};
+        return jsPointerMgr->SetTouchpadScrollSwitch(env, switchFlag, handle);
+    };
     return SetTouchpadBoolData(env, info, func);
 }
 
@@ -811,7 +812,8 @@ napi_value JsPointerContext::GetTouchpadScrollSwitch(napi_env env, napi_callback
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
     auto func = [jsPointerMgr] (napi_env env, napi_value handle) -> napi_value {
-        return jsPointerMgr->GetTouchpadScrollSwitch(env, handle);};
+        return jsPointerMgr->GetTouchpadScrollSwitch(env, handle);
+    };
     return GetTouchpadData(env, info, func);
 }
 
@@ -821,7 +823,8 @@ napi_value JsPointerContext::SetTouchpadScrollDirection(napi_env env, napi_callb
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
     auto func = [jsPointerMgr] (napi_env env, bool state, napi_value handle) -> napi_value {
-        return jsPointerMgr->SetTouchpadScrollDirection(env, state, handle);};
+        return jsPointerMgr->SetTouchpadScrollDirection(env, state, handle);
+    };
     return SetTouchpadBoolData(env, info, func);
 }
 
@@ -831,7 +834,8 @@ napi_value JsPointerContext::GetTouchpadScrollDirection(napi_env env, napi_callb
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
     auto func = [jsPointerMgr] (napi_env env, napi_value handle) -> napi_value {
-        return jsPointerMgr->GetTouchpadScrollDirection(env, handle);};
+        return jsPointerMgr->GetTouchpadScrollDirection(env, handle);
+    };
     return GetTouchpadData(env, info, func);
 }
 
@@ -841,7 +845,8 @@ napi_value JsPointerContext::SetTouchpadTapSwitch(napi_env env, napi_callback_in
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
     auto func = [jsPointerMgr] (napi_env env, bool switchFlag, napi_value handle) -> napi_value {
-        return jsPointerMgr->SetTouchpadTapSwitch(env, switchFlag, handle);};
+        return jsPointerMgr->SetTouchpadTapSwitch(env, switchFlag, handle);
+    };
     return SetTouchpadBoolData(env, info, func);
 }
 
@@ -851,7 +856,8 @@ napi_value JsPointerContext::GetTouchpadTapSwitch(napi_env env, napi_callback_in
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
     auto func = [jsPointerMgr] (napi_env env, napi_value handle) -> napi_value {
-        return jsPointerMgr->GetTouchpadTapSwitch(env, handle);};
+        return jsPointerMgr->GetTouchpadTapSwitch(env, handle);
+    };
     return GetTouchpadData(env, info, func);
 }
 
@@ -861,7 +867,8 @@ napi_value JsPointerContext::SetTouchpadPointerSpeed(napi_env env, napi_callback
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
     auto func = [jsPointerMgr] (napi_env env, int32_t data, napi_value handle) -> napi_value {
-        return jsPointerMgr->SetTouchpadPointerSpeed(env, data, handle);};
+        return jsPointerMgr->SetTouchpadPointerSpeed(env, data, handle);
+    };
     return SetTouchpadInt32Data(env, info, func, MAX_SPEED, MIN_SPEED);
 }
 
@@ -871,7 +878,8 @@ napi_value JsPointerContext::GetTouchpadPointerSpeed(napi_env env, napi_callback
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
     auto func = [jsPointerMgr] (napi_env env, napi_value handle) -> napi_value {
-        return jsPointerMgr->GetTouchpadPointerSpeed(env, handle);};
+        return jsPointerMgr->GetTouchpadPointerSpeed(env, handle);
+    };
     return GetTouchpadData(env, info, func);
 }
 
