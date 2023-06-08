@@ -1133,7 +1133,7 @@ int32_t MultimodalInputConnectStub::VerifyTouchPadSetting(void)
 int32_t MultimodalInputConnectStub::StubSetTouchpadScrollSwitch(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (VerifyTouchPadSetting() != RET_OK){
+    if (VerifyTouchPadSetting() != RET_OK) {
         MMI_HILOGE("Verify touchpad setting failed.");
         return RET_ERR;
     }
@@ -1151,7 +1151,7 @@ int32_t MultimodalInputConnectStub::StubSetTouchpadScrollSwitch(MessageParcel& d
 int32_t MultimodalInputConnectStub::StubGetTouchpadScrollSwitch(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (VerifyTouchPadSetting() != RET_OK){
+    if (VerifyTouchPadSetting() != RET_OK) {
         MMI_HILOGE("Verify touchpad setting failed.");
         return RET_ERR;
     }
@@ -1170,7 +1170,7 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadScrollSwitch(MessageParcel& d
 int32_t MultimodalInputConnectStub::StubSetTouchpadScrollDirection(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (VerifyTouchPadSetting() != RET_OK){
+    if (VerifyTouchPadSetting() != RET_OK) {
         MMI_HILOGE("Verify touchpad setting failed.");
         return RET_ERR;
     }
@@ -1188,7 +1188,7 @@ int32_t MultimodalInputConnectStub::StubSetTouchpadScrollDirection(MessageParcel
 int32_t MultimodalInputConnectStub::StubGetTouchpadScrollDirection(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (VerifyTouchPadSetting() != RET_OK){
+    if (VerifyTouchPadSetting() != RET_OK) {
         MMI_HILOGE("Verify touchpad setting failed.");
         return RET_ERR;
     }
@@ -1207,7 +1207,7 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadScrollDirection(MessageParcel
 int32_t MultimodalInputConnectStub::StubSetTouchpadTapSwitch(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (VerifyTouchPadSetting() != RET_OK){
+    if (VerifyTouchPadSetting() != RET_OK) {
         MMI_HILOGE("Verify touchpad setting failed.");
         return RET_ERR;
     }
@@ -1225,7 +1225,7 @@ int32_t MultimodalInputConnectStub::StubSetTouchpadTapSwitch(MessageParcel& data
 int32_t MultimodalInputConnectStub::StubGetTouchpadTapSwitch(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (VerifyTouchPadSetting() != RET_OK){
+    if (VerifyTouchPadSetting() != RET_OK) {
         MMI_HILOGE("Verify touchpad setting failed.");
         return RET_ERR;
     }
@@ -1244,7 +1244,7 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadTapSwitch(MessageParcel& data
 int32_t MultimodalInputConnectStub::StubSetTouchpadPointerSpeed(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (VerifyTouchPadSetting() != RET_OK){
+    if (VerifyTouchPadSetting() != RET_OK) {
         MMI_HILOGE("Verify touchpad setting failed.");
         return RET_ERR;
     }
@@ -1262,7 +1262,7 @@ int32_t MultimodalInputConnectStub::StubSetTouchpadPointerSpeed(MessageParcel& d
 int32_t MultimodalInputConnectStub::StubGetTouchpadPointerSpeed(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (VerifyTouchPadSetting() != RET_OK){
+    if (VerifyTouchPadSetting() != RET_OK) {
         MMI_HILOGE("Verify touchpad setting failed.");
         return RET_ERR;
     }
