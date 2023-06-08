@@ -86,7 +86,6 @@ public:
     int32_t SetTouchpadPointerSpeed(int32_t speed) override;
     int32_t GetTouchpadPointerSpeed(int32_t &speed) override;
 
-
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;
     int32_t SetTouchpadBoolData(bool date, int32_t type);
