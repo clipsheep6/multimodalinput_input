@@ -3722,6 +3722,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetEnhanceConfig_001, TestSize.Level
 {
     CALL_TEST_DEBUG;
     InputManager::GetInstance()->SetEnhanceConfig(nullptr);
+    Security::SecurityComponentEnhance::SecCompEnhanceCfg secCompEnhanceCfg;
+    secCompEnhanceCfg.enable = false;
+    ASSERT_FALSE(secCompEnhanceCfg.enable);
+    InputManager::GetInstance()->SetEnhanceConfig(&secCompEnhanceCfg);
 }
 
 /**
@@ -3734,8 +3738,11 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetEnhanceConfig_002, TestSize.Level
 {
     CALL_TEST_DEBUG;
     Security::SecurityComponentEnhance::SecCompEnhanceCfg secCompEnhanceCfg;
-    secCompEnhanceCfg.enable = false;
+    secCompEnhanceCfg.enable = true;
+    secCompEnhanceCfg.alg = static_cast<Security::SecurityComponentEnhance::HmacAlg>(HMAC_SHA384 + 1);
+    ASSERT_NE(secCompEnhanceCfg.alg, 1);
     InputManager::GetInstance()->SetEnhanceConfig(&secCompEnhanceCfg);
+    delete[] secCompEnhanceCfg.key.data;
 }
 
 /**
@@ -3749,9 +3756,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetEnhanceConfig_003, TestSize.Level
     CALL_TEST_DEBUG;
     Security::SecurityComponentEnhance::SecCompEnhanceCfg secCompEnhanceCfg;
     secCompEnhanceCfg.enable = true;
-    secCompEnhanceCfg.alg = static_cast<Security::SecurityComponentEnhance::HmacAlg>(HMAC_SHA384 + 1);
+    secCompEnhanceCfg.key.data = nullptr;
+    secCompEnhanceCfg.alg = Security::SecurityComponentEnhance::HMAC_SHA384;
+    ASSERT_EQ(secCompEnhanceCfg.alg, 1);
     InputManager::GetInstance()->SetEnhanceConfig(&secCompEnhanceCfg);
-    delete[] secCompEnhanceCfg.key.data;
 }
 
 /**
@@ -3765,9 +3773,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetEnhanceConfig_004, TestSize.Level
     CALL_TEST_DEBUG;
     Security::SecurityComponentEnhance::SecCompEnhanceCfg secCompEnhanceCfg;
     secCompEnhanceCfg.enable = true;
-    secCompEnhanceCfg.key.data = nullptr;
+    secCompEnhanceCfg.key.data = new (std::nothrow) uint8_t[DATA_ARRY_LEN];
+    ASSERT_NE(secCompEnhanceCfg.key.data, nullptr);
     secCompEnhanceCfg.alg = Security::SecurityComponentEnhance::HMAC_SHA384;
+    secCompEnhanceCfg.key.size = 0;
     InputManager::GetInstance()->SetEnhanceConfig(&secCompEnhanceCfg);
+    delete[] secCompEnhanceCfg.key.data;
 }
 
 /**
@@ -3784,7 +3795,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetEnhanceConfig_005, TestSize.Level
     secCompEnhanceCfg.key.data = new (std::nothrow) uint8_t[DATA_ARRY_LEN];
     ASSERT_NE(secCompEnhanceCfg.key.data, nullptr);
     secCompEnhanceCfg.alg = Security::SecurityComponentEnhance::HMAC_SHA384;
-    secCompEnhanceCfg.key.size = 0;
+    secCompEnhanceCfg.key.size = MAX_HMAC_SIZE + 1;
     InputManager::GetInstance()->SetEnhanceConfig(&secCompEnhanceCfg);
     delete[] secCompEnhanceCfg.key.data;
 }
@@ -3796,25 +3807,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetEnhanceConfig_005, TestSize.Level
  * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SetEnhanceConfig_006, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    Security::SecurityComponentEnhance::SecCompEnhanceCfg secCompEnhanceCfg;
-    secCompEnhanceCfg.enable = true;
-    secCompEnhanceCfg.key.data = new (std::nothrow) uint8_t[DATA_ARRY_LEN];
-    ASSERT_NE(secCompEnhanceCfg.key.data, nullptr);
-    secCompEnhanceCfg.alg = Security::SecurityComponentEnhance::HMAC_SHA384;
-    secCompEnhanceCfg.key.size = MAX_HMAC_SIZE + 1;
-    InputManager::GetInstance()->SetEnhanceConfig(&secCompEnhanceCfg);
-    delete[] secCompEnhanceCfg.key.data;
-}
-
-/**
- * @tc.name: InputManagerTest_SetEnhanceConfig_007
- * @tc.desc: Set Secutity component enhance config
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_SetEnhanceConfig_007, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     Security::SecurityComponentEnhance::SecCompEnhanceCfg secCompEnhanceCfg;
