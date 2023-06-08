@@ -461,7 +461,6 @@ public:
      */
     int32_t SetKeyDownDuration(const std::string &businessId, int32_t delay);
 
-
     /**
      * @brief Set the switch of touchpad scroll.
      * @param switchFlag Indicates the touchpad scroll switch state.
