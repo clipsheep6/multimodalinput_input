@@ -35,6 +35,10 @@ enum {
 enum {
     // APL鉴权失败
     CHECK_PERMISSION_FAIL = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_CLIENT),
+    // Invalid file path passed as argument
+    INVALID_PARAMETER_FILE_PATH,
+    // Invalid cursor style passed as argument
+    INVALID_PARAMETER_CURSOR_STYLE,
 };
 
 enum {

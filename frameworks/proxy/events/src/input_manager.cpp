@@ -234,6 +234,21 @@ int32_t InputManager::GetPointerSpeed(int32_t &speed)
     return InputMgrImpl.GetPointerSpeed(speed);
 }
 
+int32_t InputManager::SetPointerSize(int32_t size)
+{
+    return InputMgrImpl.SetPointerSize(size);
+}
+
+int32_t InputManager::GetPointerSize(int32_t& size)
+{
+    return InputMgrImpl.GetPointerSize(size);
+}
+
+int32_t InputManager::SetPointerImages(const std::map<int32_t, std::string>& images)
+{
+    return InputMgrImpl.SetPointerImages(images);
+}
+
 int32_t InputManager::GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback)
 {
     return InputMgrImpl.GetKeyboardType(deviceId, callback);

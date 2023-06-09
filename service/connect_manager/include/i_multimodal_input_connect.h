@@ -79,6 +79,9 @@ public:
         GET_HOVER_SCROLL_STATE = 42,
         SET_MOUSE_SCROLL_ROWS = 43,
         GET_MOUSE_SCROLL_ROWS = 44,
+        SET_POINTER_SIZE = 45,
+        GET_POINTER_SIZE = 46,
+        SET_POINTER_IMAGES = 47,
     };
 
     enum {
@@ -106,6 +109,9 @@ public:
     virtual int32_t GetPointerSpeed(int32_t &speed) = 0;
     virtual int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle) = 0;
     virtual int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle) = 0;
+    virtual int32_t SetPointerSize(int32_t size) = 0;
+    virtual int32_t GetPointerSize(int32_t& size) = 0;
+    virtual int32_t SetPointerImages(const std::map<int32_t, std::string>& images) = 0;
     virtual int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke) = 0;
     virtual int32_t GetDeviceIds(std::vector<int32_t> &ids) = 0;
     virtual int32_t GetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice) = 0;

@@ -26,6 +26,7 @@
 #include "pixel_map.h"
 #include "window.h"
 
+#include "config_multimodal.h"
 #include "device_observer.h"
 #include "i_pointer_drawing_manager.h"
 #include "mouse_event_normalize.h"
@@ -55,6 +56,9 @@ public:
     int32_t SetPointerVisible(int32_t pid, bool visible) override;
     int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle) override;
     int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle) override;
+    void SetPointerSize(int32_t size) override;
+    int32_t GetPointerSize() override;
+    int32_t SetPointerImages(const std::map<int32_t, std::string>& images) override;
     void DrawPointerStyle() override;
     bool IsPointerVisible() override;
     void SetPointerLocation(int32_t pid, int32_t x, int32_t y) override;
@@ -91,6 +95,7 @@ private:
     int32_t windowId_ { 0 };
     int32_t imageWidth_ { 0 };
     int32_t imageHeight_ { 0 };
+    int32_t customPointerSize_ { DEFAULT_POINTER_SIZE };
     std::map<MOUSE_ICON, IconStyle> mouseIcons_;
     std::list<PidInfo> pidInfos_;
     bool mouseDisplayState_ { false };

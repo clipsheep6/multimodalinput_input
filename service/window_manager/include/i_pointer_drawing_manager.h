@@ -63,6 +63,10 @@ public:
     {
         return true;
     }
+
+    virtual void SetPointerSize(int32_t size) = 0;
+    virtual int32_t GetPointerSize() = 0;
+    virtual int32_t SetPointerImages(const std::map<int32_t, std::string>& images) = 0;
 public:
     static inline std::shared_ptr<IPointerDrawingManager> iPointDrawMgr_ { nullptr };
 };

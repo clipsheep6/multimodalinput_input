@@ -124,6 +124,10 @@ public:
     int32_t SetPointerSpeed(int32_t speed);
     int32_t GetPointerSpeed(int32_t &speed);
 
+    int32_t SetPointerSize(int32_t size);
+    int32_t GetPointerSize(int32_t& size);
+    int32_t SetPointerImages(const std::map<int32_t, std::string>& images);
+
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
     void OnAnr(int32_t pid);
 

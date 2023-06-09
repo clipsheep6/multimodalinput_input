@@ -26,6 +26,9 @@ constexpr int32_t DEFAULT_ROWS = 3;
 constexpr int32_t MIN_ROWS = 1;
 constexpr int32_t MAX_ROWS = 100;
 constexpr size_t INPUT_PARAMETER = 2;
+constexpr int32_t STANDARD_SIZE = 40;
+constexpr auto* STYLE = "style";
+constexpr auto* IMAGE = "image";
 } // namespace
 
 JsPointerContext::JsPointerContext() : mgr_(std::make_shared<JsPointerManager>()) {}
@@ -709,6 +712,123 @@ napi_value JsPointerContext::GetHoverScrollState(napi_env env, napi_callback_inf
     return jsPointerMgr->GetHoverScrollState(env, argv[0]);
 }
 
+napi_value JsPointerContext::SetPointerSize(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 2;
+    napi_value argv[2];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc == 0) {
+        MMI_HILOGE("At least 1 parameter is required");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "size", "number");
+        return nullptr;
+    }
+    if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
+        MMI_HILOGE("size parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "size", "number");
+        return nullptr;
+    }
+    int32_t pointerSize = STANDARD_SIZE;
+    CHKRP(napi_get_value_int32(env, argv[0], &pointerSize), GET_VALUE_INT32);
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    if (argc == 1) {
+        return jsPointerMgr->SetPointerSize(env, pointerSize);
+    }
+    if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
+        MMI_HILOGE("callback parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        return nullptr;
+    }
+    return jsPointerMgr->SetPointerSize(env, pointerSize, argv[1]);
+}
+
+napi_value JsPointerContext::GetPointerSize(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 1;
+    napi_value argv[1];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    if (argc == 0) {
+        return jsPointerMgr->GetPointerSize(env);
+    }
+    if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
+        MMI_HILOGE("callback parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        return nullptr;
+    }
+    return jsPointerMgr->GetPointerSize(env, argv[0]);
+}
+
+napi_value JsPointerContext::SetPointerImages(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 2;
+    napi_value argv[2];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc == 0) {
+        MMI_HILOGE("At least 1 parameter is required");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "images", "array");
+        return nullptr;
+    }
+    if (!JsCommon::TypeOf(env, argv[0], napi_object)) {
+        MMI_HILOGE("images parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "images", "array");
+        return nullptr;
+    }
+    uint32_t len;
+    if (napi_get_array_length(env, argv[0], &len) != napi_ok) {
+        MMI_HILOGE("images is not array");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "images", "array");
+        return nullptr;
+    }
+    std::map<int32_t, std::string> images;
+    for (uint32_t i = 0; i < len; i++) {
+        napi_value elem;
+        CHKRP(napi_get_element(env, argv[0], i, &elem), GET_ELEMENT);
+        bool res;
+        if (napi_has_named_property(env, elem, STYLE, &res) != napi_ok || !res) {
+            THROWERR_API9(env, COMMON_PARAMETER_ERROR, "images element", "PointerImage");
+            return nullptr;
+        }
+        if (napi_has_named_property(env, elem, IMAGE, &res) != napi_ok || !res) {
+            THROWERR_API9(env, COMMON_PARAMETER_ERROR, "images element", "PointerImage");
+            return nullptr;
+        }
+        napi_value style;
+        CHKRP(napi_get_named_property(env, elem, STYLE, &style), GET_NAMED_PROPERTY);
+        napi_value image;
+        CHKRP(napi_get_named_property(env, elem, IMAGE, &image), GET_NAMED_PROPERTY);
+        if (!JsCommon::TypeOf(env, style, napi_number)) {
+            THROWERR_API9(env, COMMON_PARAMETER_ERROR, "style", "number");
+            return nullptr;
+        }
+        if (!JsCommon::TypeOf(env, image, napi_string)) {
+            THROWERR_API9(env, COMMON_PARAMETER_ERROR, "image", "string");
+            return nullptr;
+        }
+        int32_t styleValue;
+        CHKRP(napi_get_value_int32(env, style, &styleValue), GET_VALUE_INT32);
+        char imageBuf[MAX_STRING_LEN];
+        size_t bufLen;
+        CHKRP(napi_get_value_string_utf8(env, image, imageBuf, MAX_STRING_LEN, &bufLen), GET_VALUE_STRING_UTF8);
+        images[styleValue] = std::string(imageBuf, bufLen);
+    }
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    if (argc == 1) {
+        return jsPointerMgr->SetPointerImages(env, images);
+    }
+    if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
+        MMI_HILOGE("callback parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        return nullptr;
+    }
+    return jsPointerMgr->SetPointerImages(env, images, argv[1]);
+}
+
 napi_value JsPointerContext::Export(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
@@ -732,6 +852,9 @@ napi_value JsPointerContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getMousePrimaryButton", GetMousePrimaryButton),
         DECLARE_NAPI_STATIC_FUNCTION("setHoverScrollState", SetHoverScrollState),
         DECLARE_NAPI_STATIC_FUNCTION("getHoverScrollState", GetHoverScrollState),
+        DECLARE_NAPI_STATIC_FUNCTION("setPointerSize", SetPointerSize),
+        DECLARE_NAPI_STATIC_FUNCTION("getPointerSize", GetPointerSize),
+        DECLARE_NAPI_STATIC_FUNCTION("setPointerImages", SetPointerImages),
     };
     CHKRP(napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     if (CreatePointerStyle(env, exports) == nullptr) {

@@ -56,24 +56,7 @@ bool getResult(sptr<AsyncContext> asyncContext, napi_value * results)
     CALL_DEBUG_ENTER;
     napi_env env = asyncContext->env;
     if (asyncContext->errorCode != RET_OK) {
-        if (asyncContext->errorCode == RET_ERR) {
-            MMI_HILOGE("Other errors");
-            return false;
-        }
-        NapiError codeMsg;
-        if (!UtilNapiError::GetApiError(asyncContext->errorCode, codeMsg)) {
-            MMI_HILOGE("ErrorCode not found, errCode:%{public}d", asyncContext->errorCode);
-            return false;
-        }
-        napi_value errCode = nullptr;
-        napi_value errMsg = nullptr;
-        napi_value businessError = nullptr;
-        CHKRF(napi_create_int32(env, asyncContext->errorCode, &errCode), CREATE_INT32);
-        CHKRF(napi_create_string_utf8(env, codeMsg.msg.c_str(),
-            NAPI_AUTO_LENGTH, &errMsg), CREATE_STRING_UTF8);
-        CHKRF(napi_create_error(env, nullptr, errMsg, &businessError), CREATE_ERROR);
-        CHKRF(napi_set_named_property(env, businessError, ERR_CODE.c_str(), errCode), SET_NAMED_PROPERTY);
-        results[0] = businessError;
+        results[0] = UtilNapiError::CreateBusinessError(env, asyncContext->errorCode);
     } else {
         CHKRF(napi_get_undefined(env, &results[0]), GET_UNDEFINED);
     }
@@ -446,6 +429,63 @@ napi_value JsPointerManager::GetHoverScrollState(napi_env env, napi_value handle
     }
     asyncContext->reserve << ReturnType::BOOL << state;
 
+    napi_value promise = nullptr;
+    if (handle != nullptr) {
+        CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
+        CHKRP(napi_get_undefined(env, &promise), GET_UNDEFINED);
+    } else {
+        CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+    }
+    AsyncCallbackWork(asyncContext);
+    return promise;
+}
+
+napi_value JsPointerManager::SetPointerSize(napi_env env, int32_t pointerSize, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    CHKPP(asyncContext);
+    asyncContext->errorCode = InputManager::GetInstance()->SetPointerSize(pointerSize);
+    asyncContext->reserve << ReturnType::VOID;
+    napi_value promise = nullptr;
+    if (handle != nullptr) {
+        CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
+        CHKRP(napi_get_undefined(env, &promise), GET_UNDEFINED);
+    } else {
+        CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+    }
+    AsyncCallbackWork(asyncContext);
+    return promise;
+}
+
+napi_value JsPointerManager::GetPointerSize(napi_env env, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    CHKPP(asyncContext);
+    int32_t pointerSize = 0;
+    asyncContext->errorCode = InputManager::GetInstance()->GetPointerSize(pointerSize);
+    asyncContext->reserve << ReturnType::NUMBER << pointerSize;
+    napi_value promise = nullptr;
+    uint32_t initial_refcount = 1;
+    if (handle != nullptr) {
+        CHKRP(napi_create_reference(env, handle, initial_refcount, &asyncContext->callback), CREATE_REFERENCE);
+        CHKRP(napi_get_undefined(env, &promise), GET_UNDEFINED);
+    } else {
+        CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+    }
+    AsyncCallbackWork(asyncContext);
+    return promise;
+}
+
+napi_value JsPointerManager::SetPointerImages(napi_env env, const std::map<int32_t, std::string>& images,
+    napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    CHKPP(asyncContext);
+    asyncContext->errorCode = InputManager::GetInstance()->SetPointerImages(images);
+    asyncContext->reserve << ReturnType::VOID;
     napi_value promise = nullptr;
     if (handle != nullptr) {
         CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);

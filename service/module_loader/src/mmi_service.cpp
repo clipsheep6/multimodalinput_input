@@ -615,6 +615,44 @@ int32_t MMIService::GetHoverScrollState(bool &state)
     return RET_OK;
 }
 
+int32_t MMIService::SetPointerSize(int32_t size)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    delegateTasks_.PostSyncTask([size]() {
+        IPointerDrawingManager::GetInstance()->SetPointerSize(size);
+        return RET_OK;
+    });
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
+int32_t MMIService::GetPointerSize(int32_t& size)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    delegateTasks_.PostSyncTask([&size]() {
+        size = IPointerDrawingManager::GetInstance()->GetPointerSize();
+        return RET_OK;
+    });
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
+int32_t MMIService::SetPointerImages(const std::map<int32_t, std::string>& images)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetPointerImages,
+        IPointerDrawingManager::GetInstance(), std::ref(images)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set pointer images failed,return %{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
 int32_t MMIService::OnSupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke)
 {
     CALL_DEBUG_ENTER;

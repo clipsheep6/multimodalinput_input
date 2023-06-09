@@ -72,6 +72,9 @@ protected:
     int32_t StubSetDisplayBind(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPointerSpeed(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetPointerSpeed(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetPointerSize(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetPointerSize(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetPointerImages(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetFunctionKeyState(MessageParcel &data, MessageParcel &reply);
     int32_t StubSetFunctionKeyState(MessageParcel &data, MessageParcel &reply);
     int32_t StubSetPointerLocation(MessageParcel &data, MessageParcel &reply);
