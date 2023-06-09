@@ -856,7 +856,7 @@ void KeyCommandHandler::KnuckleGestureProcesser(const std::shared_ptr<PointerEve
     int32_t state = knuckleGesture.state;
     switch (state) {
         case NONE_CLICK_STATE: {
-            MMI_HILOGD("Knuckle gesture first down");
+            MMI_HILOGD("Knuckle gesture first down event");
             knuckleGesture.timerId = TimerMgr->AddTimer(DOUBLE_CLICK_INTERVAL_TIME, 1, [&knuckleGesture]() {
                 MMI_HILOGD("Knuckle gesture processor timer callback");
                 knuckleGesture.timerId = -1;
@@ -867,7 +867,7 @@ void KeyCommandHandler::KnuckleGestureProcesser(const std::shared_ptr<PointerEve
             break;
         }
         case CLICK_STATE: {
-            MMI_HILOGD("Knuckle gesture first down");
+            MMI_HILOGD("Knuckle gesture second down event");
             knuckleGesture.downToPrevUpTime = touchEvent->GetActionTime() - knuckleGesture.lastPointerUpTime;
             if (knuckleGesture.downToPrevUpTime < (static_cast<int64_t>(DOUBLE_CLICK_INTERVAL_TIME) * 1000)) {
                 MMI_HILOGD("knuckle gesture start launch ability");
