@@ -32,6 +32,8 @@ public:
 private:
     void InitializeMouseDeathStub();
     void SleepAndUpdateTime(int64_t &currentTimeMs);
+    int32_t SingleKnuckleClickEvent(int32_t downX, int32_t downY);
+    int32_t DoubleKnuckleClickEvent(int32_t downX, int32_t downY);
     int32_t NextPos(int64_t begTimeMs, int64_t curtTimeMs, int32_t totalTimeMs, int32_t begPos, int32_t endPos);
 };
 } // namespace MMI

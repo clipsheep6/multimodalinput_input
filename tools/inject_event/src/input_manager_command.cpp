@@ -152,6 +152,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
         {"click", required_argument, nullptr, 'c'},
         {"interval", required_argument, nullptr, 'i'},
         {"drag", required_argument, nullptr, 'g'},
+        {"knuckle", no_argument, nullptr, 'k'},
         {nullptr, 0, nullptr, 0}
     };
     struct option joystickSensorOptions[] = {
@@ -162,6 +163,13 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
         {"interval", required_argument, nullptr, 'i'},
         {nullptr, 0, nullptr, 0}
     };
+
+    struct option knuckleGestureSensorOptions[] = {
+        {"single_finger_double_click", required_argument, nullptr, 's'},
+        {"double_finger_double_click", required_argument, nullptr, 'd'},
+        {nullptr, 0, nullptr, 0}
+    };
+
     int32_t c = 0;
     int32_t optionIndex = 0;
     optind = 0;
@@ -842,7 +850,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 int32_t py2 = 0;
                 int32_t totalTimeMs = 0;
                 int32_t moveArgcSeven = 7;
-                while ((c = getopt_long(argc, argv, "m:d:u:c:i:g:", touchSensorOptions, &optionIndex)) != -1) {
+                while ((c = getopt_long(argc, argv, "m:d:u:c:i:g:k", touchSensorOptions, &optionIndex)) != -1) {
                     switch (c) {
                         case 'm': {
                             if (argc < moveArgcSeven) {
@@ -1160,6 +1168,110 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             break;
                         }
+                        case 'k': {
+                            while ((c = getopt_long(argc, argv, "s:d:", knuckleGestureSensorOptions, &optionIndex)) != -1) {
+                                switch (c) {
+                                    case 's': {
+                                        int32_t knuckleUinputArgc = 8;
+                                        int32_t intervalTimeMs = 0;
+                                        if (argc == knuckleUinputArgc) {
+                                            if ((!StrToInt(optarg, px1)) || !StrToInt(argv[optind], py1) ||
+                                                !StrToInt(argv[optind + 1], px2) || !StrToInt(argv[optind + 2], py2)) {
+                                                std::cout << "invalid coordinate value" << std::endl;
+                                                return EVENT_REG_FAIL;
+                                            }
+                                            intervalTimeMs = 200;
+                                        } else if (argc == 9) {
+                                            if ((!StrToInt(optarg, px1)) ||
+                                                !StrToInt(argv[optind], py1) ||
+                                                !StrToInt(argv[optind + 1], px2) ||
+                                                !StrToInt(argv[optind + 2], py2) ||
+                                                !StrToInt(argv[optind + 3], intervalTimeMs)) {
+                                                std::cout << "input coordinate or time error" << std::endl;
+                                                return RET_ERR;
+                                            }
+                                            const int64_t minIntervalTimeMs = 1;
+                                            const int64_t maxIntervalTimeMs = 250;
+                                            if ((minIntervalTimeMs > intervalTimeMs) || (maxIntervalTimeMs < intervalTimeMs)) {
+                                                std::cout << "interval time is out of range: " << minIntervalTimeMs << "ms";
+                                                std::cout << " < interval time < " << maxIntervalTimeMs << "ms" << std::endl;
+                                                return RET_ERR;
+                                            }
+                                        } else {
+                                            std::cout << "knuckle argc:" << argc << std::endl;
+                                            std::cout << "wrong number of parameters" << std::endl;
+                                            return EVENT_REG_FAIL;
+                                        }
+                                        if (px1 < 0 || py1 < 0 || px2 < 0 || py2 < 0) {
+                                            std::cout << "Coordinate value must be greater than 0" << std::endl;
+                                            return RET_ERR;
+                                        }
+                                        std::cout << "single knukle first click coordinate: ("<< px1 << ", "  << py1 << ")" << std::endl;
+                                        std::cout << "single knukle second click coordinate: ("<< px2 << ", "  << py2 << ")" << std::endl;
+                                        std::cout << "single knuckle interval time: " << intervalTimeMs << "ms" << std::endl;
+                                        SingleKnuckleClickEvent(px1, py1);
+                                        std::this_thread::sleep_for(std::chrono::milliseconds(intervalTimeMs));
+                                        SingleKnuckleClickEvent(px2, py2);
+                                        break;
+                                    }
+                                    case 'd': {
+                                        int32_t knuckleUinputArgc = 8;
+                                        int32_t intervalTimeMs = 0;
+                                        if (argc < knuckleUinputArgc) {
+                                            std::cout << "double knuckle double click argc:" << argc << std::endl;
+                                            std::cout << "wrong number of parameters" << std::endl;
+                                            return EVENT_REG_FAIL;
+                                        }
+                                        if (argc == knuckleUinputArgc) {
+                                            if ((!StrToInt(optarg, px1)) || !StrToInt(argv[optind], py1) ||
+                                                !StrToInt(argv[optind + 1], px2) || !StrToInt(argv[optind + 2], py2)) {
+                                                std::cout << "invalid coordinate value" << std::endl;
+                                                return EVENT_REG_FAIL;
+                                            }
+                                            intervalTimeMs = 200;
+                                        } else if (argc == 9) {
+                                            if ((!StrToInt(optarg, px1)) ||
+                                                !StrToInt(argv[optind], py1) ||
+                                                !StrToInt(argv[optind + 1], px2) ||
+                                                !StrToInt(argv[optind + 2], py2) ||
+                                                !StrToInt(argv[optind + 3], intervalTimeMs)) {
+                                                std::cout << "input coordinate or time error" << std::endl;
+                                                return RET_ERR;
+                                            }
+                                            const int64_t minIntervalTimeMs = 1;
+                                            const int64_t maxIntervalTimeMs = 250;
+                                            if ((minIntervalTimeMs > intervalTimeMs) || (maxIntervalTimeMs < intervalTimeMs)) {
+                                                std::cout << "interval time is out of range: " << minIntervalTimeMs << "ms";
+                                                std::cout << " < interval time < " << maxIntervalTimeMs << "ms" << std::endl;
+                                                return RET_ERR;
+                                            }
+                                        } else {
+                                            std::cout << "knuckle argc:" << argc << std::endl;
+                                            std::cout << "wrong number of parameters" << std::endl;
+                                            return EVENT_REG_FAIL;
+                                        }
+                                        if (px1 < 0 || py1 < 0 || px2 < 0 || py2 < 0) {
+                                            std::cout << "Coordinate value must be greater than 0" << std::endl;
+                                            return RET_ERR;
+                                        }
+                                        std::cout << "double knukle first click coordinate: ("<< px1 << ", "  << py1 << ")" << std::endl;
+                                        std::cout << "double knukle second click coordinate: ("<< px2 << ", "  << py2 << ")" << std::endl;
+                                        std::cout << "double knuckle interval time: " << intervalTimeMs << "ms" << std::endl;
+
+                                        DoubleKnuckleClickEvent(px1, py1);
+                                        std::this_thread::sleep_for(std::chrono::milliseconds(intervalTimeMs));
+                                        DoubleKnuckleClickEvent(px2, py2);
+                                        break;
+                                    }
+                                    default: {
+                                        std::cout << "invalid command" << std::endl;
+                                        ShowUsage();
+                                        return EVENT_REG_FAIL;
+                                    }
+                                }
+                            }
+                            break;
+                        }
                         default: {
                             std::cout << "invalid command" << std::endl;
                             ShowUsage();
@@ -1338,6 +1450,72 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
     return ERR_OK;
 }
 
+int32_t InputManagerCommand::SingleKnuckleClickEvent(int32_t downX, int32_t downY)
+{
+    auto pointerEvent = PointerEvent::Create();
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    item.SetDisplayX(downX);
+    item.SetDisplayY(downY);
+    item.SetPressed(true);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+
+    item.SetPressed(false);
+    item.SetDisplayY(downY);
+    item.SetDisplayX(downX);
+    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    pointerEvent->UpdatePointerItem(0, item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    return ERR_OK;
+}
+
+int32_t InputManagerCommand::DoubleKnuckleClickEvent(int32_t downX, int32_t downY)
+{
+    auto pointerEvent = PointerEvent::Create();
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    PointerEvent::PointerItem item;
+    PointerEvent::PointerItem item2;
+    item.SetPointerId(0);
+    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    item.SetDisplayX(downX);
+    item.SetDisplayY(downY);
+    item.SetPressed(true);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+
+    item2.SetPointerId(1);
+    item2.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    item2.SetDisplayX(downX+1);
+    item2.SetDisplayY(downY+1);
+    item2.SetPressed(true);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->AddPointerItem(item2);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+
+    item.SetPressed(false);
+    item.SetDisplayY(downY);
+    item.SetDisplayX(downX);
+    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    item2.SetPressed(false);
+    item2.SetDisplayY(downY);
+    item2.SetDisplayX(downX);
+    item2.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    pointerEvent->UpdatePointerItem(0, item);
+    pointerEvent->UpdatePointerItem(1, item2);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    return ERR_OK;
+}
+
 void InputManagerCommand::ShowUsage()
 {
     std::cout << "Usage: uinput <option> <command> <arg>..." << std::endl;
@@ -1389,6 +1567,10 @@ void InputManagerCommand::ShowUsage()
     std::cout << "   <dx1> <dy1> <dx2> <dy2> [smooth time]      -smooth movement, "  << std::endl;
     std::cout << "                                              dx1 dy1 to dx2 dy2 smooth movement"  << std::endl;
     std::cout << "-c <dx1> <dy1> [click interval]               -touch screen click dx1 dy1"         << std::endl;
+    std::cout << "-k --knuckle                                                  " << std::endl;
+    std::cout << "commands for knucle:                                          " << std::endl;
+    std::cout << "-s <dx1> <dy1> <dx2> <dy2> [interval time]  --single knuckle double click interval time" << std::endl;
+    std::cout << "-d <dx1> <dy1> <dx2> <dy2> [interval time]  --double knuckle double click interval time" << std::endl;
     std::cout << "-i <time>                  --interval <time>  -the program interval for the (time) milliseconds";
     std::cout << std::endl;
     std::cout << "-g <dx1> <dy1> <dx2> <dy2> [press time] [total time]     -drag, "                       << std::endl;

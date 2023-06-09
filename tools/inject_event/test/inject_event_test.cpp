@@ -348,5 +348,51 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectTouch_005, TestSize.Level1)
     int32_t result = inputManagerCommand->ParseCommand(9, argv);
     EXPECT_EQ(OHOS::ERR_OK, result);
 }
+
+/**
+ * @tc.name:InjectEvent_InjectKnuckle_001
+ * @tc.desc: test inject single knuckle double click interface
+ * @tc.type: FUNC
+ * @tc.require:SR000I2QIE
+ */
+HWTEST_F(InjectEventTest, InjectEvent_InjectKnuckle_001, TestSize.Level1)
+{
+    std::unique_ptr<InputManagerCommand> inputManagerCommand = std::make_unique<InputManagerCommand>();
+    char command1[] = {"uinput"};
+    char command2[] = {"-T"};
+    char command3[] = {"-k"};
+    char command4[] = {"-s"};
+    char command5[] = {"100"};
+    char command6[] = {"200"};
+    char command7[] = {"130"};
+    char command8[] = {"230"};
+    char command9[] = {"200"};
+    char *argv[] = {command1, command2, command3, command4, command5, command6, command7, command8, command9};
+    int32_t result = inputManagerCommand->ParseCommand(9, argv);
+    EXPECT_EQ(OHOS::ERR_OK, result);
+}
+
+/**
+ * @tc.name:InjectEvent_InjectKnuckle_002
+ * @tc.desc: test inject double knuckle double click interface
+ * @tc.type: FUNC
+ * @tc.require:SR000I2QIE
+ */
+HWTEST_F(InjectEventTest, InjectEvent_InjectKnuckle_002, TestSize.Level1)
+{
+    std::unique_ptr<InputManagerCommand> inputManagerCommand = std::make_unique<InputManagerCommand>();
+    char command1[] = {"uinput"};
+    char command2[] = {"-T"};
+    char command3[] = {"-k"};
+    char command4[] = {"-d"};
+    char command5[] = {"200"};
+    char command6[] = {"300"};
+    char command7[] = {"230"};
+    char command8[] = {"330"};
+    char command9[] = {"200"};
+    char *argv[] = {command1, command2, command3, command4, command5, command6, command7, command8, command9};
+    int32_t result = inputManagerCommand->ParseCommand(9, argv);
+    EXPECT_EQ(OHOS::ERR_OK, result);
+}
 } // namespace MMI
 } // namespace OHOS
