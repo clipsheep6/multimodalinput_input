@@ -867,8 +867,8 @@ void KeyCommandHandler::KnuckleGestureProcesser(const std::shared_ptr<PointerEve
             break;
         }
         case CLICK_STATE: {
+            MMI_HILOGD("Knuckle gesture first down");
             knuckleGesture.downToPrevUpTime = touchEvent->GetActionTime() - knuckleGesture.lastPointerUpTime;
-            MMI_HILOGD("action down to prev up time: %{public}ld", knuckleGesture.downToPrevUpTime);
             if (knuckleGesture.downToPrevUpTime < (static_cast<int64_t>(DOUBLE_CLICK_INTERVAL_TIME) * 1000)) {
                 MMI_HILOGD("knuckle gesture start launch ability");
                 LaunchAbility(knuckleGesture.ability, 0);
