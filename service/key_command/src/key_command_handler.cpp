@@ -52,8 +52,8 @@ constexpr int32_t DOUBLE_CLICK_INTERVAL_TIME = 260;
 
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandHandler" };
 const std::string shortKeyFileName = "/data/service/el1/public/multimodalinput/Settings.xml";
-const std::string SINGLE_KNUCKLE_ACTIVITY = "SingleKnuckleDoubleClickGesture";
-const std::string DOUBLE_KNUCKLE_ACTIVITY = "DoubleKnuckleDoubleClickGesture";
+const std::string SINGLE_KNUCKLE_ABILITY = "SingleKnuckleDoubleClickGesture";
+const std::string DOUBLE_KNUCKLE_ABILITY = "DoubleKnuckleDoubleClickGesture";
 enum SpecialType {
     SPECIAL_ALL = 0,
     SUBSCRIBER_BEFORE_DELAY = 1,
@@ -971,8 +971,8 @@ bool KeyCommandHandler::ParseJson(const std::string &configFile)
     bool isParseShortKeys = ParseShortcutKeys(parser, shortcutKeys_, businessIds_);
     bool isParseSequences = ParseSequences(parser, sequences_);
     bool isParseTwoFingerGesture = ParseTwoFingerGesture(parser, twoFingerGesture_);
-    bool isParseSingleKnuckleGesture = ParseKnuckleGesture(parser, SINGLE_KNUCKLE_ACTIVITY, singleKnuckleGesture_);
-    bool isParseDoubleKnuckleGesture = ParseKnuckleGesture(parser, DOUBLE_KNUCKLE_ACTIVITY, doubleKnuckleGesture_);
+    bool isParseSingleKnuckleGesture = ParseKnuckleGesture(parser, SINGLE_KNUCKLE_ABILITY, singleKnuckleGesture_);
+    bool isParseDoubleKnuckleGesture = ParseKnuckleGesture(parser, DOUBLE_KNUCKLE_ABILITY, doubleKnuckleGesture_);
     if (!isParseShortKeys && !isParseSequences && !isParseTwoFingerGesture && !isParseSingleKnuckleGesture &&
         !isParseDoubleKnuckleGesture) {
         MMI_HILOGE("Parse configFile failed");
