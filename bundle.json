@@ -125,7 +125,7 @@
         }
       ],
       "test": [
-        "//foundation/multimodalinput/input:mmi_tests"
+        "//foundation/multimodalinput/input:mmi_tests" 
       ]
     }
   }
