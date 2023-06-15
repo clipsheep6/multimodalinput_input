@@ -20,6 +20,7 @@
 #include "message_parcel.h"
 #include "nocopyable.h"
 
+#include "multimodalinput_ipc_interface_code.h"
 #include "i_multimodal_input_connect.h"
 #include "mmi_log.h"
 #include "multimodal_input_connect_define.h"

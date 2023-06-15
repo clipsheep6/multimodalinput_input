@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "multimodalinput_ipc_interface_code.h"
 #include "multimodal_input_connect_stub.h"
 
 #include <sys/types.h>
@@ -47,69 +48,169 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         MMI_HILOGE("Get unexpect descriptor:%{public}s", Str16ToStr8(descriptor).c_str());
         return ERR_INVALID_STATE;
     }
-    const static std::map<int32_t, ConnFunc> mapConnFunc = {
-        {IMultimodalInputConnect::ALLOC_SOCKET_FD, &MultimodalInputConnectStub::StubHandleAllocSocketFd},
-        {IMultimodalInputConnect::ADD_INPUT_EVENT_FILTER, &MultimodalInputConnectStub::StubAddInputEventFilter},
-        {IMultimodalInputConnect::RMV_INPUT_EVENT_FILTER, &MultimodalInputConnectStub::StubRemoveInputEventFilter},
-        {IMultimodalInputConnect::SET_MOUSE_SCROLL_ROWS, &MultimodalInputConnectStub::StubSetMouseScrollRows},
-        {IMultimodalInputConnect::GET_MOUSE_SCROLL_ROWS, &MultimodalInputConnectStub::StubGetMouseScrollRows},
-        {IMultimodalInputConnect::SET_MOUSE_ICON, &MultimodalInputConnectStub::StubSetMouseIcon},
-        {IMultimodalInputConnect::SET_MOUSE_PRIMARY_BUTTON, &MultimodalInputConnectStub::StubSetMousePrimaryButton},
-        {IMultimodalInputConnect::GET_MOUSE_PRIMARY_BUTTON, &MultimodalInputConnectStub::StubGetMousePrimaryButton},
-        {IMultimodalInputConnect::SET_HOVER_SCROLL_STATE, &MultimodalInputConnectStub::StubSetHoverScrollState},
-        {IMultimodalInputConnect::GET_HOVER_SCROLL_STATE, &MultimodalInputConnectStub::StubGetHoverScrollState},
-        {IMultimodalInputConnect::SET_POINTER_VISIBLE, &MultimodalInputConnectStub::StubSetPointerVisible},
-        {IMultimodalInputConnect::SET_POINTER_STYLE, &MultimodalInputConnectStub::StubSetPointerStyle},
-        {IMultimodalInputConnect::GET_POINTER_STYLE, &MultimodalInputConnectStub::StubGetPointerStyle},
-        {IMultimodalInputConnect::IS_POINTER_VISIBLE, &MultimodalInputConnectStub::StubIsPointerVisible},
-        {IMultimodalInputConnect::REGISTER_DEV_MONITOR, &MultimodalInputConnectStub::StubRegisterInputDeviceMonitor},
-        {IMultimodalInputConnect::UNREGISTER_DEV_MONITOR,
-            &MultimodalInputConnectStub::StubUnregisterInputDeviceMonitor},
-        {IMultimodalInputConnect::GET_DEVICE_IDS, &MultimodalInputConnectStub::StubGetDeviceIds},
-        {IMultimodalInputConnect::GET_DEVICE, &MultimodalInputConnectStub::StubGetDevice},
-        {IMultimodalInputConnect::SUPPORT_KEYS, &MultimodalInputConnectStub::StubSupportKeys},
-        {IMultimodalInputConnect::GET_KEYBOARD_TYPE, &MultimodalInputConnectStub::StubGetKeyboardType},
-        {IMultimodalInputConnect::SET_POINTER_SPEED, &MultimodalInputConnectStub::StubSetPointerSpeed},
-        {IMultimodalInputConnect::GET_POINTER_SPEED, &MultimodalInputConnectStub::StubGetPointerSpeed},
-        {IMultimodalInputConnect::SUBSCRIBE_KEY_EVENT, &MultimodalInputConnectStub::StubSubscribeKeyEvent},
-        {IMultimodalInputConnect::UNSUBSCRIBE_KEY_EVENT, &MultimodalInputConnectStub::StubUnsubscribeKeyEvent},
-        {IMultimodalInputConnect::SUBSCRIBE_SWITCH_EVENT, &MultimodalInputConnectStub::StubSubscribeSwitchEvent},
-        {IMultimodalInputConnect::UNSUBSCRIBE_SWITCH_EVENT, &MultimodalInputConnectStub::StubUnsubscribeSwitchEvent},
-        {IMultimodalInputConnect::MARK_PROCESSED, &MultimodalInputConnectStub::StubMarkProcessed},
-        {IMultimodalInputConnect::ADD_INPUT_HANDLER, &MultimodalInputConnectStub::StubAddInputHandler},
-        {IMultimodalInputConnect::REMOVE_INPUT_HANDLER, &MultimodalInputConnectStub::StubRemoveInputHandler},
-        {IMultimodalInputConnect::MARK_EVENT_CONSUMED, &MultimodalInputConnectStub::StubMarkEventConsumed},
-        {IMultimodalInputConnect::MOVE_MOUSE, &MultimodalInputConnectStub::StubMoveMouseEvent},
-        {IMultimodalInputConnect::INJECT_KEY_EVENT, &MultimodalInputConnectStub::StubInjectKeyEvent},
-        {IMultimodalInputConnect::INJECT_POINTER_EVENT, &MultimodalInputConnectStub::StubInjectPointerEvent},
-        {IMultimodalInputConnect::SET_ANR_OBSERVER, &MultimodalInputConnectStub::StubSetAnrListener},
-        {IMultimodalInputConnect::GET_DISPLAY_BIND_INFO, &MultimodalInputConnectStub::StubGetDisplayBindInfo},
-        {IMultimodalInputConnect::SET_DISPLAY_BIND, &MultimodalInputConnectStub::StubSetDisplayBind},
-        {IMultimodalInputConnect::GET_FUNCTION_KEY_STATE, &MultimodalInputConnectStub::StubGetFunctionKeyState},
-        {IMultimodalInputConnect::SET_FUNCTION_KEY_STATE, &MultimodalInputConnectStub::StubSetFunctionKeyState},
-        {IMultimodalInputConnect::SET_POINTER_LOCATION, &MultimodalInputConnectStub::StubSetPointerLocation},
-        {IMultimodalInputConnect::SET_CAPTURE_MODE, &MultimodalInputConnectStub::StubSetMouseCaptureMode},
-        {IMultimodalInputConnect::GET_WINDOW_PID, &MultimodalInputConnectStub::StubGetWindowPid},
-        {IMultimodalInputConnect::APPEND_EXTRA_DATA, &MultimodalInputConnectStub::StubAppendExtraData},
-        {IMultimodalInputConnect::ENABLE_INPUT_DEVICE, &MultimodalInputConnectStub::StubEnableInputDevice},
-        {IMultimodalInputConnect::SET_KEY_DOWN_DURATION, &MultimodalInputConnectStub::StubSetKeyDownDuration},
-        {IMultimodalInputConnect::SET_TP_SCROLL_SWITCH, &MultimodalInputConnectStub::StubSetTouchpadScrollSwitch},
-        {IMultimodalInputConnect::GET_TP_SCROLL_SWITCH, &MultimodalInputConnectStub::StubGetTouchpadScrollSwitch},
-        {IMultimodalInputConnect::SET_TP_SCROLL_DIRECT_SWITCH,
-            &MultimodalInputConnectStub::StubSetTouchpadScrollDirection},
-        {IMultimodalInputConnect::GET_TP_SCROLL_DIRECT_SWITCH,
-            &MultimodalInputConnectStub::StubGetTouchpadScrollDirection},
-        {IMultimodalInputConnect::SET_TP_TAP_SWITCH, &MultimodalInputConnectStub::StubSetTouchpadTapSwitch},
-        {IMultimodalInputConnect::GET_TP_TAP_SWITCH, &MultimodalInputConnectStub::StubGetTouchpadTapSwitch},
-        {IMultimodalInputConnect::SET_TP_POINTER_SPEED, &MultimodalInputConnectStub::StubSetTouchpadPointerSpeed},
-        {IMultimodalInputConnect::GET_TP_POINTER_SPEED, &MultimodalInputConnectStub::StubGetTouchpadPointerSpeed},
-    };
-    auto it = mapConnFunc.find(code);
-    if (it != mapConnFunc.end()) {
-        return (this->*it->second)(data, reply);
+    switch (code) {
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ALLOC_SOCKET_FD):
+            StubHandleAllocSocketFd(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_INPUT_EVENT_FILTER):
+            StubAddInputEventFilter(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::RMV_INPUT_EVENT_FILTER):
+            StubRemoveInputEventFilter(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MOUSE_SCROLL_ROWS):
+            StubSetMouseScrollRows(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_MOUSE_SCROLL_ROWS):
+            StubGetMouseScrollRows(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MOUSE_ICON):
+            StubSetMouseIcon(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MOUSE_PRIMARY_BUTTON):
+            StubSetMousePrimaryButton(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_MOUSE_PRIMARY_BUTTON):
+            StubGetMousePrimaryButton(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_HOVER_SCROLL_STATE):
+            StubSetHoverScrollState(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_HOVER_SCROLL_STATE):
+            StubGetHoverScrollState(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_VISIBLE):
+            StubSetPointerVisible(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_STYLE):
+            StubSetPointerStyle(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_STYLE):
+            StubGetPointerStyle(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::IS_POINTER_VISIBLE):
+            StubIsPointerVisible(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REGISTER_DEV_MONITOR):
+            StubRegisterInputDeviceMonitor(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNREGISTER_DEV_MONITOR):
+            StubUnregisterInputDeviceMonitor(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_DEVICE_IDS):
+            StubGetDeviceIds(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_DEVICE):
+            StubGetDevice(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SUPPORT_KEYS):
+            StubSupportKeys(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_KEYBOARD_TYPE):
+            StubGetKeyboardType(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_SPEED):
+            StubSetPointerSpeed(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_SPEED):
+            StubGetPointerSpeed(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SUBSCRIBE_KEY_EVENT):
+            StubSubscribeKeyEvent(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNSUBSCRIBE_KEY_EVENT):
+            StubUnsubscribeKeyEvent(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SUBSCRIBE_SWITCH_EVENT):
+            StubSubscribeSwitchEvent(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNSUBSCRIBE_SWITCH_EVENT):
+            StubUnsubscribeSwitchEvent(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::MARK_PROCESSED):
+            StubMarkProcessed(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_INPUT_HANDLER):
+            StubAddInputHandler(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_INPUT_HANDLER):
+            StubRemoveInputHandler(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::MARK_EVENT_CONSUMED):
+            StubMarkEventConsumed(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::MOVE_MOUSE):
+            StubMoveMouseEvent(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::INJECT_KEY_EVENT):
+            StubInjectKeyEvent(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::INJECT_POINTER_EVENT):
+            StubInjectPointerEvent(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_ANR_OBSERVER):
+            StubSetAnrListener(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_DISPLAY_BIND_INFO):
+            StubGetDisplayBindInfo(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_DISPLAY_BIND):
+            StubSetDisplayBind(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_FUNCTION_KEY_STATE):
+            StubGetFunctionKeyState(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_FUNCTION_KEY_STATE):
+            StubSetFunctionKeyState(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_LOCATION):
+            StubSetPointerLocation(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_CAPTURE_MODE):
+            StubSetMouseCaptureMode(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_WINDOW_PID):
+            StubGetWindowPid(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::APPEND_EXTRA_DATA):
+            StubAppendExtraData(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ENABLE_INPUT_DEVICE):
+            StubEnableInputDevice(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_KEY_DOWN_DURATION):
+            StubSetKeyDownDuration(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_TP_SCROLL_SWITCH):
+            StubSetTouchpadScrollSwitch(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TP_SCROLL_SWITCH):
+            StubGetTouchpadScrollSwitch(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_TP_SCROLL_DIRECT_SWITCH):
+            StubSetTouchpadScrollDirection(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TP_SCROLL_DIRECT_SWITCH):
+            StubGetTouchpadScrollDirection(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_TP_TAP_SWITCH):
+            StubSetTouchpadTapSwitch(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TP_TAP_SWITCH):
+            StubGetTouchpadTapSwitch(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_TP_POINTER_SPEED):
+            StubSetTouchpadPointerSpeed(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TP_POINTER_SPEED):
+            StubGetTouchpadPointerSpeed(data, reply);
+            break;
+        default: {
+            MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
+            return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+        }
     }
-    MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
-    return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+    return RET_ERR;
 }
 
 int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& reply)
