@@ -23,6 +23,7 @@
 
 #include "nocopyable.h"
 
+#include "multimodalinput_ipc_interface_code.h"
 #include "i_multimodal_input_connect.h"
 
 namespace OHOS {
