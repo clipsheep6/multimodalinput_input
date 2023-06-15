@@ -21,6 +21,7 @@
 #include <sys/socket.h>
 
 #include "dfx_hisysevent.h"
+#include "multimodalinput_ipc_interface_code.h"
 #include "i_multimodal_input_connect.h"
 #include "mmi_log.h"
 #include "util.h"
