@@ -12,23 +12,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "gtest/gtest.h"
 
-#include <fstream>
-#include "dfx_hisysevent.h"
-#include "mmi_log.h"
+#ifndef FINGERSENSE_MANAGER_H
+#define FINGERSENSE_MANAGER_H
+
+#include "nocopyable.h"
+#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
-namespace {
-using namespace testing::ext;
-} // namespace
+struct TouchType {
+    int32_t id;
+    float x, y;                     // screen coordinates (px)
+    float touch_major, touch_minor; // widths (px)
+    float pressure;                 // 0..1
+    float orientation;              // -90..90
+    float tool_major;
+    float tool_minor;
+    int32_t touch_kind;
+};
 
-class DfxHisysEventTest : public testing::Test {
+class FingersenseManager final {
+    DECLARE_DELAYED_SINGLETON(FingersenseManager);
 public:
-    static void SetUpTestCase(void) {}
-    static void TearDownTestCase(void) {}
+    DISALLOW_COPY_AND_MOVE(FingersenseManager);
+    void Init();
+    void KnuckleClassifyTouch(TouchType *rawTouch);
 };
 } // namespace MMI
 } // namespace OHOS
-
+#endif // FINGERSENSE_MANAGER_H
