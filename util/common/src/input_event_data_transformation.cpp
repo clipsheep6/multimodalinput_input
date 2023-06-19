@@ -17,6 +17,9 @@
 
 #include "define_multimodal.h"
 #include "extra_data.h"
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+#include "sec_comp_enhance_kit.h"
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
 namespace OHOS {
 namespace MMI {
@@ -287,7 +290,7 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
         return RET_ERR;
     }
     event->SetPressedKeys(pressedKeys);
-    
+
     std::vector<uint8_t> buffer;
     std::vector<uint8_t>::size_type bufferSize;
     pkt >> bufferSize;
@@ -375,6 +378,7 @@ int32_t InputEventDataTransformation::MarshallingEnhanceData(std::shared_ptr<Poi
         MMI_HILOGE("Failed to call memcpy_sp. errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
         return RET_ERR;
     }
+    pkt << enHanceDataLen;
     for (size_t i = 0; i < enHanceDataLen; i++) {
         pkt << *(realBuf + i);
     }
@@ -384,6 +388,22 @@ int32_t InputEventDataTransformation::MarshallingEnhanceData(std::shared_ptr<Poi
         MMI_HILOGE("Marshalling enhanceData failed");
         return RET_ERR;
     }
+    return RET_OK;
+}
+
+int32_t InputEventDataTransformation::UnmarshallingEnhanceData(NetPacket &pkt, std::shared_ptr<PointerEvent> event)
+{
+    uint32_t enHanceDataLen;
+    pkt >> enHanceDataLen;
+    uint8_t enhanceData[enHanceDataLen];
+    for (size_t i = 0; i < enHanceDataLen; i++) {
+        pkt >> enhanceData[i];
+    }
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("UnmarshallingEnhanceData pointer event failed");
+        return RET_ERR;
+    }
+    event->SetEnhanceData(enhanceData);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT

@@ -1304,6 +1304,23 @@ public:
      * @since 9
      */
     std::vector<uint8_t> GetBuffer() const;
+
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    /**
+     * @brief Set the enhance data.
+     * @param enhanceData Indicates the enhance data to set.
+     * @return void.
+     * @since 10
+     */
+    void SetEnhanceData(uint8_t* enhanceData);
+
+    /**
+     * @brief Obtains the set of enhance data.
+     * @return Returns the enhance data.
+     * @since 10
+     */
+    uint8_t* GetEnhanceData() const;
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 public:
     /**
      * @brief Checks whether the axes set represented by <b>axes</b> contains a specified type of axis.
@@ -1356,6 +1373,9 @@ private:
     std::array<double, AXIS_TYPE_MAX> axisValues_ {};
     std::vector<int32_t> pressedKeys_;
     std::vector<uint8_t> buffer_;
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    uint8_t* enhanceData_ = nullptr;
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 };
 
 inline bool PointerEvent::HasAxis(AxisType axis) const

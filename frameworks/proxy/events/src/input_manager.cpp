@@ -300,9 +300,9 @@ int32_t InputManager::SetKeyDownDuration(const std::string& businessId, int32_t 
 }
 
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-void InputManager::SetEnhanceConfig(SecCompEnhanceCfgBase *cfg)
+void InputManager::SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen)
 {
-    InputMgrImpl.SetEnhanceConfig(cfg);
+    InputMgrImpl.SetEnhanceConfig(cfg, cfgLen);
 }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
