@@ -88,6 +88,12 @@ public:
         SET_TP_POINTER_SPEED = 51,
         GET_TP_POINTER_SPEED = 52,
         SET_MOUSE_ICON = 53,
+        SET_TP_PINCH_SWITCH = 54,
+        GET_TP_PINCH_SWITCH = 55,
+        SET_TP_SWIPE_SWITCH = 56,
+        GET_TP_SWIPE_SWITCH = 57,
+        SET_TP_RIGHT_CLICK_TYPE = 58,
+        GET_TP_RIGHT_CLICK_TYPE = 59,
     };
 
     enum {
@@ -153,6 +159,12 @@ public:
     virtual int32_t GetTouchpadTapSwitch(bool &switchFlag) = 0;
     virtual int32_t SetTouchpadPointerSpeed(int32_t speed) = 0;
     virtual int32_t GetTouchpadPointerSpeed(int32_t &speed) = 0;
+    virtual int32_t SetTouchpadPinchSwitch(bool switchFlag) = 0;
+    virtual int32_t GetTouchpadPinchSwitch(bool &switchFlag) = 0;
+    virtual int32_t SetTouchpadSwipeSwitch(bool switchFlag) = 0;
+    virtual int32_t GetTouchpadSwipeSwitch(bool &switchFlag) = 0;
+    virtual int32_t SetTouchpadRightClickType(int32_t type) = 0;
+    virtual int32_t GetTouchpadRightClickType(int32_t &type) = 0;
 };
 } // namespace MMI
 } // namespace OHOS
