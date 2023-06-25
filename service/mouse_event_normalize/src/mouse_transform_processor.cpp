@@ -686,7 +686,7 @@ int32_t MouseTransformProcessor::SetPointerLocation(int32_t x, int32_t y)
 }
 
 void MouseTransformProcessor::HandleTouchpadRightButton(struct libinput_event_pointer* data, const int32_t evenType,
-uint32_t &button)
+    uint32_t &button)
 {
     // touchpad left click 280 -> 272
     if (button == BTN_RIGHT_MENUE_CODE) {
@@ -713,7 +713,7 @@ uint32_t &button)
 }
 
 void MouseTransformProcessor::HandleTouchpadLeftButton(struct libinput_event_pointer* data, const int32_t evenType,
-uint32_t &button)
+    uint32_t &button)
 {
     // touchpad left click 280 -> 273
     if (button == BTN_RIGHT_MENUE_CODE) {
@@ -747,7 +747,7 @@ uint32_t &button)
 }
 
 void MouseTransformProcessor::HandleTouchpadTwoFingerButton(struct libinput_event_pointer* data,
-const int32_t evenType, uint32_t &button)
+    const int32_t evenType, uint32_t &button)
 {
     // touchpad right click 273 -> 272
     if (button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE &&
@@ -774,7 +774,7 @@ const int32_t evenType, uint32_t &button)
 }
 
 void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_pointer* data, const int32_t evenType,
-uint32_t &button)
+    uint32_t &button)
 {
     int32_t switchTypeData = RIGHT_CLICK_TYPE_MIN;
     if (GetTouchpadRightClickType(switchTypeData) != RET_OK) {
