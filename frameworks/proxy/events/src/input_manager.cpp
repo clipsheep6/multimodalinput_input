@@ -315,6 +315,7 @@ int32_t InputManager::GetTouchpadScrollSwitch(bool &switchFlag)
 {
     return InputMgrImpl.GetTouchpadScrollSwitch(switchFlag);
 }
+
 int32_t InputManager::SetTouchpadScrollDirection(bool state)
 {
     return InputMgrImpl.SetTouchpadScrollDirection(state);
@@ -324,6 +325,7 @@ int32_t InputManager::GetTouchpadScrollDirection(bool &state)
 {
     return InputMgrImpl.GetTouchpadScrollDirection(state);
 }
+
 int32_t InputManager::SetTouchpadTapSwitch(bool switchFlag)
 {
     return InputMgrImpl.SetTouchpadTapSwitch(switchFlag);
@@ -342,6 +344,36 @@ int32_t InputManager::SetTouchpadPointerSpeed(int32_t speed)
 int32_t InputManager::GetTouchpadPointerSpeed(int32_t &speed)
 {
     return InputMgrImpl.GetTouchpadPointerSpeed(speed);
+}
+
+int32_t InputManager::SetTouchpadPinchSwitch(bool switchFlag)
+{
+    return InputMgrImpl.SetTouchpadPinchSwitch(switchFlag);
+}
+
+int32_t InputManager::GetTouchpadPinchSwitch(bool &switchFlag)
+{
+    return InputMgrImpl.GetTouchpadPinchSwitch(switchFlag);
+}
+
+int32_t InputManager::SetTouchpadSwipeSwitch(bool switchFlag)
+{
+    return InputMgrImpl.SetTouchpadSwipeSwitch(switchFlag);
+}
+
+int32_t InputManager::GetTouchpadSwipeSwitch(bool &switchFlag)
+{
+    return InputMgrImpl.GetTouchpadSwipeSwitch(switchFlag);
+}
+
+int32_t InputManager::SetTouchpadRightClickType(int32_t type)
+{
+    return InputMgrImpl.SetTouchpadRightClickType(type);
+}
+
+int32_t InputManager::GetTouchpadRightClickType(int32_t &type)
+{
+    return InputMgrImpl.GetTouchpadRightClickType(type);
 }
 } // namespace MMI
 } // namespace OHOS
