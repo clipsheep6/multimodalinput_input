@@ -299,6 +299,9 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
         MMI_HILOGD("Handle mouse axis event");
         HandleMouseEvent(event);
     }
+    if (type == LIBINPUT_EVENT_TOUCHPAD_UP) {
+        buttonIds_.erase(seatSlot);
+    }
     return RET_OK;
 #else
     MMI_HILOGW("Pointer device does not support");
