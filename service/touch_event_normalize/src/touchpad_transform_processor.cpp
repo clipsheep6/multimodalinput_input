@@ -36,7 +36,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MMI_LOG_DOMAIN, "TouchPa
 constexpr int32_t MT_TOOL_NONE { -1 };
 constexpr int32_t BTN_DOWN { 1 };
 constexpr int32_t FINGER_COUNT_MAX { 5 };
-const std::string touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
+const std::string TOUCHPAD_FILE_NAME = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
 } // namespace
 
 TouchPadTransformProcessor::TouchPadTransformProcessor(int32_t deviceId)
@@ -443,7 +443,7 @@ int32_t TouchPadTransformProcessor::PutConfigDataToDatabase(std::string &key, bo
 {
     int32_t errCode = RET_OK;
     std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(touchpadFileName, errCode);
+        NativePreferences::PreferencesHelper::GetPreferences(TOUCHPAD_FILE_NAME, errCode);
     if (pref == nullptr) {
         MMI_HILOGE("pref is nullptr, errCode: %{public}d", errCode);
         return RET_ERR;
@@ -459,7 +459,7 @@ int32_t TouchPadTransformProcessor::PutConfigDataToDatabase(std::string &key, bo
         return RET_ERR;
     }
 
-    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(touchpadFileName);
+    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(TOUCHPAD_FILE_NAME);
     return RET_OK;
 }
 
@@ -467,14 +467,14 @@ int32_t TouchPadTransformProcessor::GetConfigDataFromDatabase(std::string &key, 
 {
     int32_t errCode = RET_OK;
     std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(touchpadFileName, errCode);
+        NativePreferences::PreferencesHelper::GetPreferences(TOUCHPAD_FILE_NAME, errCode);
     if (pref == nullptr) {
         MMI_HILOGE("pref is nullptr, errCode: %{public}d", errCode);
         return RET_ERR;
     }
     value = pref->GetBool(key, true);
 
-    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(touchpadFileName);
+    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(TOUCHPAD_FILE_NAME);
     return RET_OK;
 }
 } // namespace MMI
