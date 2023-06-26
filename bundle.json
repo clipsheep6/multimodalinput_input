@@ -75,7 +75,7 @@
         "json",
         "thirdparty_libevdev",
         "thirdparty_mtdev",
-        "cjson",
+        "cJSON",
         "libevdev",
         "mtdev"
       ]
