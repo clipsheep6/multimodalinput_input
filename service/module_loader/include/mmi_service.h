@@ -30,6 +30,7 @@
 #include "multimodal_input_connect_stub.h"
 #include "server_msg_handler.h"
 #include "uds_server.h"
+#include "container_ipc_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -180,6 +181,7 @@ private:
     LibinputAdapter libinputAdapter_;
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;
+    ContainerIpcMgr ipcMgr_;
 
     std::atomic_bool threadStatusFlag_ { false };
 };
