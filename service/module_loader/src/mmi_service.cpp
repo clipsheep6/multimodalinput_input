@@ -294,6 +294,15 @@ void MMIService::OnStart()
     MMI_HILOGI("Add system ability listener success");
 #endif
 
+#if 1  // to be replaced with building flag for HMOS container
+    int32_t res = ipcMgr_.Init(ContainerType::IPC_HMOS);
+    if (res != RET_OK) {
+        MMI_HILOGE("Init cotainer_ipc_manager failed");
+    } else {
+        MMI_HILOGE("server cotainer_ipc_manager run successfully");
+    }
+#endif
+
     TimerMgr->AddTimer(WATCHDOG_INTERVAL_TIME, -1, [this]() {
         MMI_HILOGD("Set thread status flag to true");
         threadStatusFlag_ = true;
@@ -892,7 +901,12 @@ int32_t MMIService::InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckInjectKeyEvent, this, keyEvent));
+    int32_t ret;
+    if (!keyEvent->HasFlag(InputEvent::EVENT_FLAG_HMOS)) {
+        ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckInjectKeyEvent, this, keyEvent));
+    } else {
+        ret = ipcMgr_.SendKeyEvent(keyEvent);
+    }
     if (ret != RET_OK) {
         MMI_HILOGE("Inject key event failed, ret:%{public}d", ret);
         return RET_ERR;
@@ -921,7 +935,12 @@ int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> point
 {
     CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckInjectPointerEvent, this, pointerEvent));
+    int32_t ret;
+    if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HMOS)) {
+        ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckInjectPointerEvent, this, pointerEvent));
+    } else {
+        ret = ipcMgr_.SendPointerEvent(pointerEvent);
+    }
     if (ret != RET_OK) {
         MMI_HILOGE("Inject pointer event failed, ret:%{public}d", ret);
         return RET_ERR;
