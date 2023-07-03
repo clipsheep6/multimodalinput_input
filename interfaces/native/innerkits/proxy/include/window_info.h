@@ -113,11 +113,25 @@ struct WindowInfo {
     int32_t pid;
 
     /**
+     * originPid of the process where the window is located
+     *
+     * @since 9
+     */
+    int32_t originPid;
+
+    /**
      * UID of the process where the window is located
      *
      * @since 9
      */
     int32_t uid;
+
+    /**
+     * originUid of the process where the window is located
+     *
+     * @since 9
+     */
+    int32_t originUid;
 
     /**
      * Window display area
