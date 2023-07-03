@@ -147,7 +147,8 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
         return RET_ERR;
     }
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-    if (InputEventDataTransformation::UnmarshallingEnhanceData(pkt, pointerEvent) != ERR_OK) {
+    if (!pointerEvent->GetEnhanceData().empty() &&
+        InputEventDataTransformation::UnmarshallingEnhanceData(pkt, pointerEvent) != ERR_OK) {
         MMI_HILOGE("Failed to deserialize enhance data pointer event.");
         return RET_ERR;
     }
@@ -300,7 +301,8 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
         return RET_ERR;
     }
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-    if (InputEventDataTransformation::UnmarshallingEnhanceData(pkt, pointerEvent) != ERR_OK) {
+    if (!pointerEvent->GetEnhanceData().empty() &&
+        InputEventDataTransformation::UnmarshallingEnhanceData(pkt, pointerEvent) != ERR_OK) {
         MMI_HILOGE("Failed to deserialize enhance data pointer event.");
         return RET_ERR;
     }
