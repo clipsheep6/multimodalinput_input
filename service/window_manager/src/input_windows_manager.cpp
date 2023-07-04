@@ -462,9 +462,8 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction)
     } else {
         pointerEvent->ClearBuffer();
     }
-    int pid = lastWindowInfo_.pid;
+    int pid = lastWindowInfo_.originPid;
     if (pointerAction == PointerEvent::POINTER_ACTION_LEAVE_WINDOW) {
-        pid = GetWindowPid(lastWindowInfo_.id);
         pointerEvent->SetAgentWindowId(lastWindowInfo_.id);
     }
     auto fd = udsServer_->GetClientFd(pid);
@@ -534,11 +533,11 @@ void InputWindowsManager::PrintDisplayInfo()
         displayGroupInfo_.width, displayGroupInfo_.height, displayGroupInfo_.focusWindowId);
     MMI_HILOGD("windowsInfos,num:%{public}zu", displayGroupInfo_.windowsInfo.size());
     for (const auto &item : displayGroupInfo_.windowsInfo) {
-        MMI_HILOGD("windowsInfos,id:%{public}d,pid:%{public}d,uid:%{public}d,"
+        MMI_HILOGD("windowsInfos,id:%{public}d,pid:%{public}d,originPid:%{public}d,uid:%{public}d,originUid:%{public}d"
             "area.x:%{public}d,area.y:%{public}d,area.width:%{public}d,area.height:%{public}d,"
             "defaultHotAreas.size:%{public}zu,pointerHotAreas.size:%{public}zu,"
             "agentWindowId:%{public}d,flags:%{public}d",
-            item.id, item.pid, item.uid, item.area.x, item.area.y, item.area.width,
+            item.id, item.pid, item.originPid, item.uid, item.originUid, item.area.x, item.area.y, item.area.width,
             item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
             item.agentWindowId, item.flags);
         for (const auto &win : item.defaultHotAreas) {
@@ -1622,10 +1621,10 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
     mprintf(fd, "windowsInfos,num:%zu", displayGroupInfo_.windowsInfo.size());
     for (const auto &item : displayGroupInfo_.windowsInfo) {
         mprintf(fd,
-                "\t windowsInfos: id:%d | pid:%d | uid:%d | area.x:%d | area.y:%d "
+                "\t windowsInfos: id:%d| pid:%d | originPid:%d | uid:%d | originUid:%d | area.x:%d | area.y:%d "
                 "| area.width:%d | area.height:%d | defaultHotAreas.size:%zu "
                 "| pointerHotAreas.size:%zu | agentWindowId:%d | flags:%d \t",
-                item.id, item.pid, item.uid, item.area.x, item.area.y, item.area.width,
+                item.id, item.pid, item.originPid, item.uid, item.originUid, item.area.x, item.area.y, item.area.width,
                 item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
                 item.agentWindowId, item.flags);
         for (const auto &win : item.defaultHotAreas) {
