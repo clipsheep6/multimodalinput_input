@@ -15,8 +15,14 @@
 
 #include "input_manager_command.h"
 
+#include "foundation/multimodalinput/input/util/common/include/mmi_log.h"
+
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, OHOS::MMI::MMI_LOG_DOMAIN, "InjectEvent" };
+
 int32_t main(int32_t argc, char** argv)
 {
+    CALL_INFO_TRACE;
+    MMI_HILOGE("==== Tools inject event begin ====");
     OHOS::MMI::InputManagerCommand command;
     return command.ParseCommand(argc, argv);
 }

@@ -32,19 +32,12 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCo
 constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
 constexpr int32_t SEC_TO_NANOSEC = 1000000000;
 constexpr int32_t COMMON_PARAMETER_ERROR = 401;
-constexpr int32_t NONE_CLICK_STATE = 0;
-constexpr int32_t CLICK_STATE = 1;
 } // namespace
 class KeyCommandHandlerTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
     std::shared_ptr<KeyEvent> SetupKeyEvent();
-#ifdef OHOS_BUILD_ENABLE_TOUCH
-    std::shared_ptr<PointerEvent> SetupDoubleFingerDownEvent();
-    std::shared_ptr<PointerEvent> SetupSingleKnuckleDownEvent();
-    std::shared_ptr<PointerEvent> SetupDoubleKnuckleDownEvent();
-#endif // OHOS_BUILD_ENABLE_TOUCH
 };
 
 int64_t GetNanoTime()
@@ -69,87 +62,6 @@ std::shared_ptr<KeyEvent> KeyCommandHandlerTest::SetupKeyEvent()
 
     return keyEvent;
 }
-
-#ifdef OHOS_BUILD_ENABLE_TOUCH
-std::shared_ptr<PointerEvent> KeyCommandHandlerTest::SetupDoubleFingerDownEvent()
-{
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    CHKPP(pointerEvent);
-    PointerEvent::PointerItem item;
-    PointerEvent::PointerItem item2;
-    item.SetPointerId(0);
-    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
-    int32_t downX = 100;
-    int32_t downY = 200;
-    item.SetDisplayX(downX);
-    item.SetDisplayY(downY);
-    item.SetPressed(true);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->AddPointerItem(item);
-
-    item2.SetPointerId(1);
-    item2.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
-    int32_t secondDownX = 120;
-    int32_t secondDownY = 220;
-    item2.SetDisplayX(secondDownX);
-    item2.SetDisplayY(secondDownY);
-    item2.SetPressed(true);
-    pointerEvent->SetPointerId(1);
-    pointerEvent->AddPointerItem(item2);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    return pointerEvent;
-}
-
-std::shared_ptr<PointerEvent> KeyCommandHandlerTest::SetupSingleKnuckleDownEvent()
-{
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    CHKPP(pointerEvent);
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
-    int32_t downX = 100;
-    int32_t downY = 200;
-    item.SetDisplayX(downX);
-    item.SetDisplayY(downY);
-    item.SetPressed(true);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->AddPointerItem(item);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    return pointerEvent;
-}
-
-std::shared_ptr<PointerEvent> KeyCommandHandlerTest::SetupDoubleKnuckleDownEvent()
-{
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    CHKPP(pointerEvent);
-    PointerEvent::PointerItem item;
-    PointerEvent::PointerItem item2;
-    item.SetPointerId(0);
-    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
-    int32_t downX = 100;
-    int32_t downY = 200;
-    item.SetDisplayX(downX);
-    item.SetDisplayY(downY);
-    item.SetPressed(true);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->AddPointerItem(item);
-
-    item2.SetPointerId(1);
-    item2.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
-    int32_t secondDownX = 120;
-    int32_t secondDownY = 220;
-    item2.SetDisplayX(secondDownX);
-    item2.SetDisplayY(secondDownY);
-    item2.SetPressed(true);
-    pointerEvent->SetPointerId(1);
-    pointerEvent->AddPointerItem(item2);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    return pointerEvent;
-}
-#endif // OHOS_BUILD_ENABLE_TOUCH
 
 /**
  * @tc.name: KeyCommandHandlerTest_001
@@ -213,6 +125,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_004, TestSize.Level1)
     KeyCommandHandler eventKeyCommandHandler;
     ASSERT_FALSE(eventKeyCommandHandler.OnHandleEvent(keyEvent));
 }
+<<<<<<< HEAD
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 /**
  * @tc.name: KeyCommandHandlerTest_TouchTest_001
@@ -306,5 +219,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleTest_003, TestSize.
     ASSERT_EQ(CLICK_STATE, keyCommandHandler.GetDoubleKnuckleGesture().state);
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
+=======
+>>>>>>> parent of f2ab142fb (   增加指关节类型&支持指关节拉起ability)
 } // namespace MMI
 } // namespace OHOS

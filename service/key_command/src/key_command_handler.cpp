@@ -44,16 +44,17 @@ constexpr int32_t MIN_SHORT_KEY_DOWN_DURATION = 0;
 constexpr int32_t ERROR_DELAY_VALUE = -1000;
 constexpr int32_t TOUCH_MAX_THRESHOLD = 15;
 constexpr int32_t COMMON_PARAMETER_ERROR = 401;
+<<<<<<< HEAD
 constexpr size_t SINGEL_KNUCKLE_SIZE = 1;
 constexpr size_t DOUBLE_KNUCKLE_SIZE = 2;
 constexpr int32_t NONE_CLICK_STATE = 0;
 constexpr int32_t CLICK_STATE = 1;
 constexpr int32_t DOUBLE_CLICK_INTERVAL_TIME = 260;
 
+=======
+>>>>>>> parent of f2ab142fb (   增加指关节类型&支持指关节拉起ability)
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandHandler" };
 const std::string shortKeyFileName = "/data/service/el1/public/multimodalinput/Settings.xml";
-const std::string SINGLE_KNUCKLE_ABILITY = "SingleKnuckleDoubleClickGesture";
-const std::string DOUBLE_KNUCKLE_ABILITY = "DoubleKnuckleDoubleClickGesture";
 enum SpecialType {
     SPECIAL_ALL = 0,
     SUBSCRIBER_BEFORE_DELAY = 1,
@@ -610,6 +611,7 @@ bool ParseTwoFingerGesture(const JsonParser& parser, TwoFingerGesture& gesture)
     gesture.active = true;
     return true;
 }
+<<<<<<< HEAD
 
 bool IsPackageKnuckleGesture(const cJSON* jsonData, const std::string knuckleGesture, Ability &launchAbility)
 {
@@ -643,6 +645,8 @@ bool IsParseKnuckleGesture(const JsonParser &parser, const std::string ability, 
     }
     return true;
 }
+=======
+>>>>>>> parent of f2ab142fb (   增加指关节类型&支持指关节拉起ability)
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -676,6 +680,7 @@ void KeyCommandHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> poi
     OnHandleTouchEvent(pointerEvent);
     nextHandler_->HandleTouchEvent(pointerEvent);
 }
+<<<<<<< HEAD
 
 void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> &touchEvent)
 {
@@ -735,13 +740,13 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
         }
     }
 }
+=======
+#endif // OHOS_BUILD_ENABLE_TOUCH
+>>>>>>> parent of f2ab142fb (   增加指关节类型&支持指关节拉起ability)
 
 void KeyCommandHandler::HandlePointerActionMoveEvent(const std::shared_ptr<PointerEvent> &touchEvent)
 {
     CALL_DEBUG_ENTER;
-    if (!twoFingerGesture_.active) {
-        return;
-    }
     if (twoFingerGesture_.timerId == -1) {
         MMI_HILOGW("Two finger gesture timer id is -1.");
         return;
@@ -761,6 +766,7 @@ void KeyCommandHandler::HandlePointerActionMoveEvent(const std::shared_ptr<Point
     }
 }
 
+<<<<<<< HEAD
 void KeyCommandHandler::HandlePointerActionUpEvent(const std::shared_ptr<PointerEvent> &touchEvent)
 {
     CALL_DEBUG_ENTER;
@@ -793,6 +799,11 @@ void KeyCommandHandler::HandleFingerGestureDownEvent(const std::shared_ptr<Point
         MMI_HILOGD("Two finger gesture is not active");
         return;
     }
+=======
+void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<PointerEvent>& touchEvent)
+{
+    CALL_DEBUG_ENTER;
+>>>>>>> parent of f2ab142fb (   增加指关节类型&支持指关节拉起ability)
     auto num = touchEvent->GetPointerIds().size();
     if (num == TwoFingerGesture::MAX_TOUCH_NUM) {
         StartTwoFingerGesture();
@@ -808,12 +819,25 @@ void KeyCommandHandler::HandleFingerGestureDownEvent(const std::shared_ptr<Point
         twoFingerGesture_.touches[num - 1].y = item.GetDisplayY();
     }
 }
+<<<<<<< HEAD
 
 void KeyCommandHandler::HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> &touchEvent)
+=======
+void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent>& touchEvent)
+>>>>>>> parent of f2ab142fb (   增加指关节类型&支持指关节拉起ability)
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
+    if (!isParseConfig_) {
+        if (!ParseConfig()) {
+            MMI_HILOGE("Parse configFile failed");
+            return;
+        }
+        isParseConfig_ = true;
+    }
+
     if (!twoFingerGesture_.active) {
+<<<<<<< HEAD
         MMI_HILOGD("Two finger gesture is not active");
         return;
     }
@@ -896,26 +920,33 @@ void KeyCommandHandler::KnuckleGestureProcesser(const std::shared_ptr<PointerEve
             });
             knuckleGesture.lastPointerDownEvent = touchEvent;
             knuckleGesture.state = CLICK_STATE;
+=======
+        return;
+    }
+    switch (touchEvent->GetPointerAction()) {
+        case PointerEvent::POINTER_ACTION_CANCEL:
+        case PointerEvent::POINTER_ACTION_UP: {
+            StopTwoFingerGesture();
+>>>>>>> parent of f2ab142fb (   增加指关节类型&支持指关节拉起ability)
             break;
         }
-        case CLICK_STATE: {
-            MMI_HILOGD("Knuckle gesture second down event");
-            knuckleGesture.downToPrevUpTime = touchEvent->GetActionTime() - knuckleGesture.lastPointerUpTime;
-            if (knuckleGesture.downToPrevUpTime < (static_cast<int64_t>(DOUBLE_CLICK_INTERVAL_TIME) * SECONDS_SYSTEM)) {
-                MMI_HILOGD("knuckle gesture start launch ability");
-                LaunchAbility(knuckleGesture.ability, 0);
-                if (knuckleGesture.timerId != -1) {
-                    TimerMgr->RemoveTimer(knuckleGesture.timerId);
-                    knuckleGesture.timerId = -1;
-                }
-                knuckleGesture.state = NONE_CLICK_STATE;
-            }
+        case PointerEvent::POINTER_ACTION_MOVE: {
+            HandlePointerActionMoveEvent(touchEvent);
             break;
         }
+<<<<<<< HEAD
         default: {
             MMI_HILOGW("other state: %{public}d not process", state);
+=======
+        case PointerEvent::POINTER_ACTION_DOWN: {
+            HandlePointerActionDownEvent(touchEvent);
+>>>>>>> parent of f2ab142fb (   增加指关节类型&支持指关节拉起ability)
             break;
         }
+        default:
+            // Don't care about other actions
+            MMI_HILOGW("other action not match.");
+            break;
     }
 }
 
@@ -936,7 +967,6 @@ void KeyCommandHandler::StopTwoFingerGesture()
         twoFingerGesture_.timerId = -1;
     }
 }
-#endif // OHOS_BUILD_ENABLE_TOUCH
 
 bool KeyCommandHandler::ParseConfig()
 {
@@ -971,10 +1001,14 @@ bool KeyCommandHandler::ParseJson(const std::string &configFile)
     bool isParseShortKeys = ParseShortcutKeys(parser, shortcutKeys_, businessIds_);
     bool isParseSequences = ParseSequences(parser, sequences_);
     bool isParseTwoFingerGesture = ParseTwoFingerGesture(parser, twoFingerGesture_);
+<<<<<<< HEAD
     bool isParseSingleKnuckleGesture = IsParseKnuckleGesture(parser, SINGLE_KNUCKLE_ABILITY, singleKnuckleGesture_);
     bool isParseDoubleKnuckleGesture = IsParseKnuckleGesture(parser, DOUBLE_KNUCKLE_ABILITY, doubleKnuckleGesture_);
     if (!isParseShortKeys && !isParseSequences && !isParseTwoFingerGesture && !isParseSingleKnuckleGesture &&
         !isParseDoubleKnuckleGesture) {
+=======
+    if (!isParseShortKeys && !isParseSequences && !isParseTwoFingerGesture) {
+>>>>>>> parent of f2ab142fb (   增加指关节类型&支持指关节拉起ability)
         MMI_HILOGE("Parse configFile failed");
         return false;
     }
@@ -1494,15 +1528,6 @@ int32_t KeyCommandHandler::UpdateSettingsXml(const std::string &businessId, int3
         return ret;
     }
     return RET_OK;
-}
-
-KnuckleGesture KeyCommandHandler::GetSingleKnuckleGesture()
-{
-    return singleKnuckleGesture_;
-}
-KnuckleGesture KeyCommandHandler::GetDoubleKnuckleGesture()
-{
-    return doubleKnuckleGesture_;
 }
 } // namespace MMI
 } // namespace OHOS
