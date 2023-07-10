@@ -291,14 +291,6 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         MMI_HILOGE("AddEventCallback failed");
         return nullptr;
     }
-    std::shared_ptr<KeyEventMonitorInfo>* cbInfo = new std::shared_ptr<KeyEventMonitorInfo>(event);
-    napi_wrap(env, thisArg, static_cast<void*>(cbInfo), [](napi_env env, void* data, void* hint) {
-        std::shared_ptr<KeyEventMonitorInfo>* cbInfo = static_cast<std::shared_ptr<KeyEventMonitorInfo>*>(data);
-        if (cbInfo != nullptr && *cbInfo != nullptr) {
-            (*cbInfo)->SetValid(false);
-            delete cbInfo;
-        }
-    }, nullptr, nullptr);
     return nullptr;
 }
 
