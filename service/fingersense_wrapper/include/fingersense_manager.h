@@ -22,14 +22,32 @@
 namespace OHOS {
 namespace MMI {
 struct TouchType {
-    int32_t id;
+    int id;
     float x, y;                     // screen coordinates (px)
     float touch_major, touch_minor; // widths (px)
     float pressure;                 // 0..1
     float orientation;              // -90..90
     float tool_major;
     float tool_minor;
-    int32_t touch_kind;
+    int touch_kind;
+};
+
+// Knuckle Type
+enum KnuckleType {
+    FS_TOUCH_KIND_PAD = 0,
+    FS_TOUCH_KIND_TIP,
+    FS_TOUCH_KIND_NAIL,
+    FS_TOUCH_KIND_KNUCKLE,
+    FS_TOUCH_KIND_ALT_HAND_1,
+    FS_TOUCH_KIND_ALT_HAND_2,
+    FS_TOUCH_KIND_BRUSH_1,
+    FS_TOUCH_KIND_BRUSH_2,
+    FS_TOUCH_KIND_STYLUS_1,
+    FS_TOUCH_KIND_STYLUS_2,
+    FS_TOUCH_KIND_ERASER,
+    FS_TOUCH_KIND_UNKNOWN,
+    FS_TOUCH_KIND_BEZEL,
+    FS_NUM_TOUCH_KIND
 };
 
 class FingersenseManager final {
@@ -37,8 +55,25 @@ class FingersenseManager final {
 public:
     DISALLOW_COPY_AND_MOVE(FingersenseManager);
     void Init();
+    void KnuckleTouchUp(TouchType *rawTouch);
     void KnuckleClassifyTouch(TouchType *rawTouch);
+    void enableFingersense();
+    void disableFingerSense();
+    void SetUpKnuckle();
+    void SetCurrentToolType(struct TouchType touchType, int32_t &toolType);
+
+private:
+    void *knuckleHandle_;
+    // Handle to the interface in libfingersense.so
+    typedef void (*KNUCKLE_TOUCH_UP_HANDLE)(struct TouchType *rawTouch);
+    typedef void (*KNUCKLE_SWITCH_MANAGER)();
+    KNUCKLE_TOUCH_UP_HANDLE knuckleTouchUpHandle_ = nullptr;
+    KNUCKLE_TOUCH_UP_HANDLE KnuckleClassifyTouchHandle_ = nullptr;
+    KNUCKLE_SWITCH_MANAGER knuckleOnResumeHandle_ = nullptr;
+    KNUCKLE_SWITCH_MANAGER knuckleOnPauseHandle_ = nullptr;
 };
+
+#define FingersenseMgr ::OHOS::DelayedSingleton<FingersenseManager>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // FINGERSENSE_MANAGER_H
