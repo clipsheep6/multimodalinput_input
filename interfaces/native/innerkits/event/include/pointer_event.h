@@ -396,13 +396,6 @@ public:
     static constexpr int32_t TOOL_TYPE_LENS = 7;
 
     /**
-     * Indicates a knuckle.
-     *
-     * @since 9
-     */
-    static constexpr int32_t TOOL_TYPE_KNUCKLE = 8;
-
-    /**
      * Indicates a touchpad.
      *
      * @since 9

@@ -62,8 +62,6 @@ constexpr int32_t BLOCK_TIME_MS = 10;
 constexpr int32_t TIME_TRANSITION = 1000;
 constexpr int64_t MIN_TAKTTIME_MS = 1;
 constexpr int64_t MAX_TAKTTIME_MS = 15000;
-constexpr int32_t DEFAULT_DELAY = 200;
-constexpr int32_t KNUCKLE_PARAM_SIZE = 9;
 enum JoystickEvent {
     JOYSTICK_BUTTON_UP,
     JOYSTICK_BUTTON_PRESS,
@@ -120,6 +118,7 @@ int32_t InputManagerCommand::NextPos(int64_t begTimeMs, int64_t curtTimeMs, int3
 
 int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
 {
+    MMI_HILOGE("uinput command begin");
     struct option headOptions[] = {
         {"mouse", no_argument, nullptr, 'M'},
         {"keyboard", no_argument, nullptr, 'K'},
@@ -154,7 +153,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
         {"click", required_argument, nullptr, 'c'},
         {"interval", required_argument, nullptr, 'i'},
         {"drag", required_argument, nullptr, 'g'},
-        {"knuckle", no_argument, nullptr, 'k'},
         {nullptr, 0, nullptr, 0}
     };
     struct option joystickSensorOptions[] = {
@@ -845,7 +843,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 int32_t py2 = 0;
                 int32_t totalTimeMs = 0;
                 int32_t moveArgcSeven = 7;
-                while ((c = getopt_long(argc, argv, "m:d:u:c:i:g:k", touchSensorOptions, &optionIndex)) != -1) {
+                while ((c = getopt_long(argc, argv, "m:d:u:c:i:g:", touchSensorOptions, &optionIndex)) != -1) {
                     switch (c) {
                         case 'm': {
                             if (argc < moveArgcSeven) {
@@ -1163,10 +1161,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             break;
                         }
-                        case 'k': {
-                            KnuckleGestureInputProcess(argc, argv, c, optionIndex);
-                            break;
-                        }
                         default: {
                             std::cout << "invalid command" << std::endl;
                             ShowUsage();
@@ -1345,6 +1339,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
     return ERR_OK;
 }
 
+<<<<<<< HEAD
 int32_t InputManagerCommand::KnuckleGestureInputProcess(int32_t argc, char *argv[], int32_t c, int32_t optionIndex)
 {
     struct option knuckleGestureSensorOptions[] = {
@@ -1546,6 +1541,8 @@ int32_t InputManagerCommand::DoubleKnuckleClickEvent(int32_t downX, int32_t down
     return ERR_OK;
 }
 
+=======
+>>>>>>> parent of f2ab142fb (   增加指关节类型&支持指关节拉起ability)
 void InputManagerCommand::ShowUsage()
 {
     std::cout << "Usage: uinput <option> <command> <arg>..." << std::endl;
@@ -1597,10 +1594,6 @@ void InputManagerCommand::ShowUsage()
     std::cout << "   <dx1> <dy1> <dx2> <dy2> [smooth time]      -smooth movement, "  << std::endl;
     std::cout << "                                              dx1 dy1 to dx2 dy2 smooth movement"  << std::endl;
     std::cout << "-c <dx1> <dy1> [click interval]               -touch screen click dx1 dy1"         << std::endl;
-    std::cout << "-k --knuckle                                                  " << std::endl;
-    std::cout << "commands for knucle:                                          " << std::endl;
-    std::cout << "-s <dx1> <dy1> <dx2> <dy2> [interval time]  --single knuckle double click interval time" << std::endl;
-    std::cout << "-d <dx1> <dy1> <dx2> <dy2> [interval time]  --double knuckle double click interval time" << std::endl;
     std::cout << "-i <time>                  --interval <time>  -the program interval for the (time) milliseconds";
     std::cout << std::endl;
     std::cout << "-g <dx1> <dy1> <dx2> <dy2> [press time] [total time]     -drag, "                       << std::endl;

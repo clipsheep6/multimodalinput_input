@@ -92,23 +92,12 @@ struct TwoFingerGesture {
     } touches[MAX_TOUCH_NUM];
 };
 
-struct KnuckleGesture {
-    std::shared_ptr<PointerEvent> lastPointerDownEvent { nullptr };
-    int32_t state { 0 };
-    int64_t lastPointerUpTime { 0 };
-    int64_t downToPrevUpTime { 0 };
-    int32_t timerId { -1 };
-    Ability ability;
-};
-
 class KeyCommandHandler final : public IInputEventHandler {
 public:
     KeyCommandHandler() = default;
     DISALLOW_COPY_AND_MOVE(KeyCommandHandler);
     ~KeyCommandHandler() override = default;
     int32_t UpdateSettingsXml(const std::string &businessId, int32_t delay);
-    KnuckleGesture GetSingleKnuckleGesture();
-    KnuckleGesture GetDoubleKnuckleGesture();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -117,9 +106,12 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
+<<<<<<< HEAD
     void HandlePointerActionDownEvent(const std::shared_ptr<PointerEvent> &touchEvent);
     void HandlePointerActionMoveEvent(const std::shared_ptr<PointerEvent> &touchEvent);
     void HandlePointerActionUpEvent(const std::shared_ptr<PointerEvent> &touchEvent);
+=======
+>>>>>>> parent of f2ab142fb (   增加指关节类型&支持指关节拉起ability)
 #endif // OHOS_BUILD_ENABLE_TOUCH
     bool OnHandleEvent(const std::shared_ptr<KeyEvent> keyEvent);
 private:
@@ -164,9 +156,12 @@ private:
         filterSequences_.clear();
     }
     bool SkipFinalKey(const int32_t keyCode, const std::shared_ptr<KeyEvent> &key);
+    void HandlePointerActionMoveEvent(const std::shared_ptr<PointerEvent>& touchEvent);
+    void HandlePointerActionDownEvent(const std::shared_ptr<PointerEvent>& touchEvent);
     void OnHandleTouchEvent(const std::shared_ptr<PointerEvent>& touchEvent);
     void StartTwoFingerGesture();
     void StopTwoFingerGesture();
+<<<<<<< HEAD
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void HandleFingerGestureDownEvent(const std::shared_ptr<PointerEvent> &touchEvent);
     void HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> &touchEvent);
@@ -176,6 +171,8 @@ private:
     void SingleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> &touchEvent);
     void DoubleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> &touchEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
+=======
+>>>>>>> parent of f2ab142fb (   增加指关节类型&支持指关节拉起ability)
 
 private:
     ShortcutKey lastMatchedKey_;
@@ -189,8 +186,6 @@ private:
     std::map<int32_t, int32_t> specialKeys_;
     std::map<int32_t, std::list<int32_t>> specialTimers_;
     TwoFingerGesture twoFingerGesture_;
-    KnuckleGesture singleKnuckleGesture_;
-    KnuckleGesture doubleKnuckleGesture_;
 };
 } // namespace MMI
 } // namespace OHOS

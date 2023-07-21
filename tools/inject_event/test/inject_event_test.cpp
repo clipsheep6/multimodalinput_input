@@ -21,7 +21,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-constexpr int32_t KNUCKLE_SIZE = 9;
 } // namespace
 class InjectEventTest : public testing::Test {
 public:
@@ -349,6 +348,7 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectTouch_005, TestSize.Level1)
     int32_t result = inputManagerCommand->ParseCommand(9, argv);
     EXPECT_EQ(OHOS::ERR_OK, result);
 }
+<<<<<<< HEAD
 
 /**
  * @tc.name:InjectEvent_InjectKnuckle_001
@@ -395,5 +395,7 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectKnuckle_002, TestSize.Level1)
     int32_t result = inputManagerCommand->ParseCommand(KNUCKLE_SIZE, argv);
     EXPECT_EQ(OHOS::ERR_OK, result);
 }
+=======
+>>>>>>> parent of f2ab142fb (   增加指关节类型&支持指关节拉起ability)
 } // namespace MMI
 } // namespace OHOS
