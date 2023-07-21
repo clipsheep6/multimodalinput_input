@@ -396,14 +396,6 @@ public:
     static constexpr int32_t TOOL_TYPE_LENS = 7;
 
     /**
-<<<<<<< HEAD
-     * Indicates a knuckle.
-     *
-     * @since 9
-     */
-    static constexpr int32_t TOOL_TYPE_KNUCKLE = 8;
-
-    /**
      * Indicates a touchpad.
      *
      * @since 9
@@ -418,8 +410,6 @@ public:
     static constexpr int32_t TOOL_TYPE_PALM = 10;
 
     /**
-=======
->>>>>>> parent of f2ab142fb (   增加指关节类型&支持指关节拉起ability)
      * Indicates the TL2 key on the joystick.
      *
      * @since 9
