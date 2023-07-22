@@ -33,7 +33,6 @@ config("libmmi_server_config") {
     "device_scalability/include",
     "delegate_task/include",
     "event_dispatch/include",
-    "fingersense_wrapper/include",
     "key_event_normalize/include",
     "event_handler/include",
     "event_dump/include",
@@ -45,6 +44,8 @@ config("libmmi_server_config") {
     "module_loader/include",
     "window_manager/include",
     "touch_event_normalize/include",
+    "fingersense_wrapper/include",
+    "display_state_manager/include",
     "key_command/include",
     "subscriber/include",
     "timer_manager/include",
@@ -193,6 +194,7 @@ ohos_shared_library("libmmi-server") {
     "napi:ace_napi",
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
+    "common_event_service:cesfwk_innerkits"
   ]
 
   part_name = "input"
