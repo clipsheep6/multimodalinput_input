@@ -32,7 +32,7 @@ config("libmmi_server_config") {
     "device_manager/include",
     "device_scalability/include",
     "delegate_task/include",
-    "display_state_mqanager/include",
+    "display_state_manager/include",
     "event_dispatch/include",
     "key_event_normalize/include",
     "event_handler/include",
