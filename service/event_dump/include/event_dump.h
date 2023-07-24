@@ -30,6 +30,8 @@ public:
     void ParseCommand(int32_t fd, const std::vector<std::string> &args);
     void DumpEventHelp(int32_t fd, const std::vector<std::string> &args);
     void DumpHelp(int32_t fd);
+    void CheckCount(int32_t fd, const std::vector<std::string> &args, size_t count);
+    int32_t CheckArgsException(const std::vector<std::string> &args);
 };
 
 #define MMIEventDump ::OHOS::DelayedSingleton<EventDump>::GetInstance()
