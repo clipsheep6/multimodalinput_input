@@ -68,6 +68,7 @@ private:
     int32_t HandleMotionInner(struct libinput_event_pointer* data, struct libinput_event *event);
     int32_t HandleButtonInner(struct libinput_event_pointer* data, struct libinput_event *event);
     int32_t HandleAxisInner(struct libinput_event_pointer* data);
+    void HandlePointerAction(libinput_pointer_axis_source source);
     int32_t HandleAxisBeginEndInner(struct libinput_event *event);
     void HandleAxisPostInner(PointerEvent::PointerItem &pointerItem);
     void HandlePostInner(struct libinput_event_pointer* data, PointerEvent::PointerItem &pointerItem);
