@@ -971,12 +971,17 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
             pointerEvent->MarkProcessed();
             bool retValue = false;
             CHKRV_SCOPE(jsEnv_, napi_get_value_bool(jsEnv_, result, &retValue), GET_VALUE_BOOL, scope);
-            if (retValue) {
-                auto eventId = pointerEvent->GetId();
-                MarkConsumed(eventId);
-            }
+            CheckConsumed(retValue, pointerEvent);
         }
         napi_close_handle_scope(jsEnv_, scope);
+    }
+}
+
+void JsInputMonitor::CheckConsumed(bool retValue, std::shared_ptr<PointerEvent> pointerEvent)
+{
+    if (retValue) {
+        auto eventId = pointerEvent->GetId();
+        MarkConsumed(eventId);
     }
 }
 
