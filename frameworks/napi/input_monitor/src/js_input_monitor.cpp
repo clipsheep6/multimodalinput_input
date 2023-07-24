@@ -953,7 +953,8 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
                 break;
             }
         }
-        if (ret != RET_OK || napiPointer == nullptr) {
+        bool checkFlag = (ret != RET_OK || napiPointer == nullptr);
+        if (checkFlag) {
             pointerEvent->MarkProcessed();
             napi_close_handle_scope(jsEnv_, scope);
             break;
@@ -964,8 +965,9 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
         napi_value result = nullptr;
         CHECK_SCOPE_BEFORE_BREAK(jsEnv_, napi_call_function(jsEnv_, nullptr, callback, 1, &napiPointer, &result),
             CALL_FUNCTION, scope, pointerEvent);
-        if (typeName == "touch" || typeName == "pinch" || typeName == "threeFingersSwipe" ||
-            typeName == "fourFingersSwipe") {
+        bool checkTypeName = (typeName == "touch" || typeName == "pinch" || typeName == "threeFingersSwipe" ||
+            typeName == "fourFingersSwipe");
+        if (checkTypeName) {
             pointerEvent->MarkProcessed();
             bool retValue = false;
             CHKRV_SCOPE(jsEnv_, napi_get_value_bool(jsEnv_, result, &retValue), GET_VALUE_BOOL, scope);
