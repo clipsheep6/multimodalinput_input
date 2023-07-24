@@ -357,7 +357,6 @@ void MouseTransformProcessor::HandlePointerAction(libinput_pointer_axis_source s
     }
 }
 
-
 int32_t MouseTransformProcessor::HandleAxisBeginEndInner(struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
