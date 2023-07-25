@@ -1,0 +1,73 @@
+diff --git a/frameworks/napi/pointer/include/js_pointer_context.h b/frameworks/napi/pointer/include/js_pointer_context.h
+index b48c59547..c23b65fd1 100644
+--- a/frameworks/napi/pointer/include/js_pointer_context.h
++++ b/frameworks/napi/pointer/include/js_pointer_context.h
+@@ -71,6 +71,7 @@ private:
+     static napi_value EnumConstructor(napi_env env, napi_callback_info info);
+     static napi_value CreatePointerStyle(napi_env env, napi_value exports);
+     static napi_value CreateMousePrimaryButton(napi_env env, napi_value exports);
++    static napi_value CreateTouchpadRightClickType(napi_env env, napi_value exports);
+     std::shared_ptr<JsPointerManager> mgr_ { nullptr };
+     napi_ref contextRef_ { nullptr };
+ };
+diff --git a/frameworks/napi/pointer/src/js_pointer_context.cpp b/frameworks/napi/pointer/src/js_pointer_context.cpp
+index 736f1c1ac..bcef3008f 100644
+--- a/frameworks/napi/pointer/src/js_pointer_context.cpp
++++ b/frameworks/napi/pointer/src/js_pointer_context.cpp
+@@ -507,6 +507,28 @@ napi_value JsPointerContext::CreatePointerStyle(napi_env env, napi_value exports
+     return exports;
+ }
+ 
++napi_value JsPointerContext::CreateTouchpadRightClickType(napi_env env, napi_value exports)
++{
++    CALL_DEBUG_ENTER;
++    napi_value touchpad_right_button = nullptr;
++    CHKRP(napi_create_int32(env, RightClickType::TOUCHPAD_RIGHT_BUTTON, &touchpad_right_button), CREATE_INT32);
++    napi_value touchpad_left_button = nullptr;
++    CHKRP(napi_create_int32(env, RightClickType::TOUCHPAD_LEFT_BUTTON, &touchpad_left_button), CREATE_INT32);
++    napi_value touchpad_two_finger_tap = nullptr;
++    CHKRP(napi_create_int32(env, RightClickType::TOUCHPAD_TWO_FINGER_TAP, &touchpad_two_finger_tap), CREATE_INT32);
++
++    napi_property_descriptor desc[] = {
++        DECLARE_NAPI_STATIC_PROPERTY("TOUCHPAD_RIGHT_BUTTON", touchpad_right_button),
++        DECLARE_NAPI_STATIC_PROPERTY("TOUCHPAD_LEFT_BUTTON", touchpad_left_button),
++        DECLARE_NAPI_STATIC_PROPERTY("TOUCHPAD_TWO_FINGER_TAP", touchpad_two_finger_tap),
++    };
++    napi_value result = nullptr;
++    CHKRP(napi_define_class(env, "RightClickType", NAPI_AUTO_LENGTH, EnumConstructor, nullptr,
++        sizeof(desc) / sizeof(*desc), desc, &result), DEFINE_CLASS);
++    CHKRP(napi_set_named_property(env, exports, "RightClickType", result), SET_NAMED_PROPERTY);
++    return exports;
++}
++
+ napi_value JsPointerContext::EnumConstructor(napi_env env, napi_callback_info info)
+ {
+     CALL_DEBUG_ENTER;
+@@ -1024,6 +1046,10 @@ napi_value JsPointerContext::Export(napi_env env, napi_value exports)
+         THROWERR(env, "Failed to create mouse primary button");
+         return nullptr;
+     }
++    if (CreateTouchpadRightClickType(env, exports) == nullptr) {
++        THROWERR(env, "Failed to create touchpad right click type");
++        return nullptr;
++    }
+     return exports;
+ }
+ } // namespace MMI
+diff --git a/util/common/include/struct_multimodal.h b/util/common/include/struct_multimodal.h
+index bb9b63e88..4aa8ef7a5 100644
+--- a/util/common/include/struct_multimodal.h
++++ b/util/common/include/struct_multimodal.h
+@@ -153,6 +153,12 @@ enum MOUSE_ICON {
+     DEVELOPER_DEFINED_ICON = -100,
+ };
+ 
++enum RightClickType {
++    TOUCHPAD_RIGHT_BUTTON = 1,
++    TOUCHPAD_LEFT_BUTTON = 2,
++    TOUCHPAD_TWO_FINGER_TAP = 3,
++};
++
+ enum ICON_TYPE {
+     ANGLE_E = 0,
+     ANGLE_S = 1,
