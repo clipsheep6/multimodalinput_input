@@ -187,7 +187,6 @@ int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks, KeyEventMoni
 {
     CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
-    std::lock_guard guard(sCallBacksMutex_);
     if (callbacks.find(event->eventType) == callbacks.end()) {
         MMI_HILOGD("No callback in %{public}s", event->eventType.c_str());
         callbacks[event->eventType] = {};
@@ -225,7 +224,6 @@ int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks, KeyEventMoni
 {
     CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
-    std::lock_guard guard(sCallBacksMutex_);
     if (callbacks.count(event->eventType) <= 0) {
         MMI_HILOGE("Callback doesn't exists");
         return JS_CALLBACK_EVENT_FAILED;
@@ -287,6 +285,7 @@ void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
     delete dataWorker;
     dataWorker = nullptr;
     CHKPV(event);
+    event->delCallback = nullptr;
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env, &scope);
     if (scope == nullptr) {
@@ -322,7 +321,7 @@ void EmitAsyncCallbackWork(KeyEventMonitorInfo *reportEvent)
         delete work;
         return;
     }
-
+    reportEvent->delCallback = [dataWorker]() {dataWorker->reportEvent = nullptr;};
     dataWorker->env = reportEvent->env;
     dataWorker->reportEvent = reportEvent;
     work->data = static_cast<void *>(dataWorker);
