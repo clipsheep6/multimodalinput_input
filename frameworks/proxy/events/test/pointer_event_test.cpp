@@ -35,7 +35,7 @@ public:
 
 void PointerEventTest::SetUpTestCase()
 {
-    TestUtil->Init();
+    ASSERT_TRUE(TestUtil->Init());
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
