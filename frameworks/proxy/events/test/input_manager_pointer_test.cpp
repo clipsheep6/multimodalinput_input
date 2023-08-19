@@ -71,7 +71,7 @@ public:
 
 void InputManagerPointerTest::SetUpTestCase()
 {
-    TestUtil->Init();
+    ASSERT_TRUE(TestUtil->Init());
 }
 
 void InputManagerPointerTest::SetUp()
