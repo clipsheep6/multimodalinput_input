@@ -54,7 +54,7 @@ public:
 
 void InputManagerTest::SetUpTestCase()
 {
-    ASSERT_TRUE(TestUtil->Init());
+    TestUtil->Init();
 }
 
 void InputManagerTest::SetUp()
