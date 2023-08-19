@@ -92,7 +92,7 @@ public:
 
 void InputManagerSimulateTest::SetUpTestCase()
 {
-    TestUtil->Init();
+    ASSERT_TRUE(TestUtil->Init());
 }
 
 void InputManagerSimulateTest::SetUp()
