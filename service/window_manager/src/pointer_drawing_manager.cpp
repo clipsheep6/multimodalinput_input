@@ -898,6 +898,9 @@ int32_t PointerDrawingManager::SetPointerStylePreference(PointerStyle pointerSty
         MMI_HILOGE("Flush sync is failed, ret:%{public}d", ret);
         return RET_ERR;
     }
+    if (pointerStyle.id != CURSOR_CIRCLE_STYLE) {
+        mouseIconUpdate_ = true;
+    }
     MMI_HILOGD("Set pointer style successfully, style:%{public}d", pointerStyle.id);
     NativePreferences::PreferencesHelper::RemovePreferencesFromCache(MOUSE_FILE_NAME);
     return RET_OK;
