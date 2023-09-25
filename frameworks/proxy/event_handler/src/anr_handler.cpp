@@ -59,7 +59,7 @@ void ANRHandler::SetLastProcessedEventId(int32_t eventType, int32_t eventId, int
     UpdateLastProcessedEventId(eventType, eventId);
 
     int64_t currentTime = GetSysClockTime();
-    int64_t timeoutTime = INPUT_UI_TIMEOUT_TIME - (currentTime - actionTime);
+    int64_t timeoutTime = INPUT_UI_TIMEOUT_TIME * 1000 - (currentTime - actionTime);
     MMI_HILOGD("Processed event type:%{public}d, id:%{public}d, actionTime:%{public}" PRId64 ", "
         "currentTime:%{public}" PRId64 ", timeoutTime:%{public}" PRId64,
         eventType, eventId, actionTime, currentTime, timeoutTime);

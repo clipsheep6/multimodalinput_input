@@ -185,7 +185,7 @@ std::list<int32_t> UDSSession::DelEvents(int32_t type, int32_t id)
     MMI_HILOGD("First event, anr type:%{public}d, id:%{public}d, timerId:%{public}d", type,
         events.begin()->id, events.begin()->timerId);
     int64_t endTime = 0;
-    if (!AddInt64(events.begin()->eventTime, INPUT_UI_TIMEOUT_TIME, endTime)) {
+    if (!AddInt64(events.begin()->eventTime, INPUT_UI_TIMEOUT_TIME * 1000, endTime)) {
         MMI_HILOGE("The addition of endTime overflows");
         return timerIds;
     }

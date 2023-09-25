@@ -44,7 +44,7 @@ enum TokenType : int32_t {
 };
 
 enum ANTTimeOutTime : int64_t {
-    INPUT_UI_TIMEOUT_TIME = 5 * 1000000
+    INPUT_UI_TIMEOUT_TIME = 5 * 1000
 };
 
 enum ANREventType {
