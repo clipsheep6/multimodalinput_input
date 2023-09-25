@@ -84,7 +84,7 @@ void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
         napi_value handler = nullptr;
         CHKRV_SCOPE(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE_VALUE, scope);
         napi_value deviceId = nullptr;
-        CHKRV_SCOPE(item->env, napi_create_int32(item->env, deviceItem->deviceId, &deviceId), CREATE_INT32, scope);
+        CHKRV_SCOPE(item->env, napi_create_int32(item->env, temp->deviceId, &deviceId), CREATE_INT32, scope);
         CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "deviceId", deviceId), SET_NAMED_PROPERTY,
             scope);
         napi_value ret = nullptr;
@@ -129,7 +129,7 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
             CREATE_STRING_UTF8, scope);
 
         napi_value deviceId = nullptr;
-        CHKRV_SCOPE(item->env, napi_create_int32(item->env, deviceItem->deviceId, &deviceId), CREATE_INT32, scope);
+        CHKRV_SCOPE(item->env, napi_create_int32(item->env, temp->deviceId, &deviceId), CREATE_INT32, scope);
 
         napi_value object = nullptr;
         CHKRV_SCOPE(item->env, napi_create_object(item->env, &object), CREATE_OBJECT, scope);
