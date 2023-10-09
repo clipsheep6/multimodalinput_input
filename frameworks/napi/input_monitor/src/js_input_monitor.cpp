@@ -23,6 +23,7 @@
 #include "js_input_monitor_manager.h"
 #include "napi_constants.h"
 #include "util_napi_value.h"
+#include "util_napi.h"
 
 namespace OHOS {
 namespace MMI {
@@ -280,41 +281,53 @@ std::string JsInputMonitor::GetAction(int32_t action) const
     }
 }
 
+std::string JsInputMonitor::GetSourceType(int32_t sourceType) const
+{
+    switch (sourceType) {
+        case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
+            return "touchscreen";
+        }
+        case PointerEvent::SOURCE_TYPE_TOUCHPAD: {
+            return "touchpad";
+        }
+        default: {
+            return "";
+        }
+    }
+}
+
 int32_t JsInputMonitor::GetJsPointerItem(const PointerEvent::PointerItem &item, napi_value value) const
 {
-    if (SetNameProperty(jsEnv_, value, "globalX", item.GetDisplayX()) != napi_ok) {
-        MMI_HILOGE("Set globalX property failed");
-        return RET_ERR;
-    }
-    if (SetNameProperty(jsEnv_, value, "globalY", item.GetDisplayY()) != napi_ok) {
-        MMI_HILOGE("Set globalY property failed");
-        return RET_ERR;
-    }
-    if (SetNameProperty(jsEnv_, value, "localX", 0) != napi_ok) {
-        MMI_HILOGE("Set localX property failed");
-        return RET_ERR;
-    }
-    if (SetNameProperty(jsEnv_, value, "localY", 0) != napi_ok) {
-        MMI_HILOGE("Set localY property failed");
-        return RET_ERR;
-    }
-    int32_t touchArea = (item.GetWidth() + item.GetHeight()) / 2;
-    if (SetNameProperty(jsEnv_, value, "size", touchArea) != napi_ok) {
-        MMI_HILOGE("Set size property failed");
-        return RET_ERR;
-    }
-    if (SetNameProperty(jsEnv_, value, "force", item.GetPressure()) != napi_ok) {
-        MMI_HILOGE("Set force property failed");
-        return RET_ERR;
-    }
+    CHKRR(SetNameProperty(jsEnv_, value, "id", item.GetPointerId()), "Set id", RET_ERR);
+    CHKRR(SetNameProperty(jsEnv_, value, "pressedTime", item.GetDownTime()), "Set pressedTime", RET_ERR);
+    CHKRR(SetNameProperty(jsEnv_, value, "screenX", item.GetDisplayX()), "Set screenX", RET_ERR);
+    CHKRR(SetNameProperty(jsEnv_, value, "screenY", item.GetDisplayY()), "Set screenY", RET_ERR);
+    CHKRR(SetNameProperty(jsEnv_, value, "windowX", item.GetWindowX()), "Set windowX", RET_ERR);
+    CHKRR(SetNameProperty(jsEnv_, value, "windowY", item.GetWindowY()), "Set windowY", RET_ERR);
+    CHKRR(SetNameProperty(jsEnv_, value, "pressure", item.GetPressure()), "Set pressure", RET_ERR);
+    CHKRR(SetNameProperty(jsEnv_, value, "width", item.GetWidth()), "Set width", RET_ERR);
+    CHKRR(SetNameProperty(jsEnv_, value, "height", item.GetHeight()), "Set height", RET_ERR);
+    CHKRR(SetNameProperty(jsEnv_, value, "tiltX", item.GetTiltX()), "Set tiltX", RET_ERR);
+    CHKRR(SetNameProperty(jsEnv_, value, "tiltY", item.GetTiltY()), "Set tiltY", RET_ERR);
+    CHKRR(SetNameProperty(jsEnv_, value, "toolX", item.GetToolDisplayX()), "Set toolX", RET_ERR);
+    CHKRR(SetNameProperty(jsEnv_, value, "toolY", item.GetToolDisplayY()), "Set toolY", RET_ERR);
+    CHKRR(SetNameProperty(jsEnv_, value, "toolWidth", item.GetToolWidth()), "Set toolWidth", RET_ERR);
+    CHKRR(SetNameProperty(jsEnv_, value, "toolHeight", item.GetToolHeight()), "Set toolHeight", RET_ERR);
+    CHKRR(SetNameProperty(jsEnv_, value, "rawX", item.GetRawDx()), "Set rawX", RET_ERR);
+    CHKRR(SetNameProperty(jsEnv_, value, "rawY", item.GetRawDy()), "Set rawY", RET_ERR);
+    CHKRR(SetNameProperty(jsEnv_, value, "toolType", item.GetToolType()), "Set toolType", RET_ERR);
     return RET_OK;
 }
 
 int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    if (SetNameProperty(jsEnv_, result, "type", GetAction(pointerEvent->GetPointerAction())) != napi_ok) {
-        MMI_HILOGE("Set type property failed");
+    if (SetNameProperty(jsEnv_, result, "action", GetAction(pointerEvent->GetPointerAction())) != napi_ok) {
+        MMI_HILOGE("Set action property failed");
+        return RET_ERR;
+    }
+    if (SetNameProperty(jsEnv_, result, "sourceType", GetSourceType(pointerEvent->GetSourceType())) != napi_ok) {
+        MMI_HILOGE("Set sourceType property failed");
         return RET_ERR;
     }
     napi_value pointers = nullptr;
@@ -333,33 +346,12 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
         pointerItems.push_back(pointerItem);
     }
     uint32_t index = 0;
-    napi_value currentPointer = nullptr;
-    int32_t currentPointerId = pointerEvent->GetPointerId();
     for (const auto &it : pointerItems) {
         napi_value element = nullptr;
         status = napi_create_object(jsEnv_, &element);
         if (status != napi_ok) {
             MMI_HILOGE("napi_create_object is failed");
             return RET_ERR;
-        }
-        if (currentPointerId == it.GetPointerId()) {
-            status = napi_create_object(jsEnv_, &currentPointer);
-            if (status != napi_ok) {
-                MMI_HILOGE("napi_create_object is failed");
-                return RET_ERR;
-            }
-            if (GetJsPointerItem(it, currentPointer) != RET_OK) {
-                MMI_HILOGE("Transform pointerItem failed");
-                return RET_ERR;
-            }
-            if (SetNameProperty(jsEnv_, result, "timestamp", pointerEvent->GetActionTime()) != napi_ok) {
-                MMI_HILOGE("Set timestamp property failed");
-                return RET_ERR;
-            }
-            if (SetNameProperty(jsEnv_, result, "deviceId", it.GetDeviceId()) != napi_ok) {
-                MMI_HILOGE("Set deviceId property failed");
-                return RET_ERR;
-            }
         }
         if (GetJsPointerItem(it, element) != RET_OK) {
             MMI_HILOGE("Transform pointerItem failed");
@@ -372,14 +364,7 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
         }
         ++index;
     }
-    if (SetNameProperty(jsEnv_, result, "touches", pointers) != napi_ok) {
-            MMI_HILOGE("Set touches property failed");
-            return RET_ERR;
-    }
-    if (SetNameProperty(jsEnv_, result, "changedTouches", currentPointer) != napi_ok) {
-            MMI_HILOGE("Set changedTouches property failed");
-            return RET_ERR;
-    }
+    CHKRR(SetNameProperty(jsEnv_, result, "touches", pointers), "Set touches", RET_ERR);
     return RET_OK;
 }
 

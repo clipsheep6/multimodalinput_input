@@ -82,6 +82,7 @@ private:
     void SetCallback(napi_value callback);
     int32_t TransformPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
     std::string GetAction(int32_t action) const;
+    std::string GetSourceType(int32_t sourceType) const;
     int32_t GetPinchAction(int32_t action) const;
     int32_t GetSwipeAction(int32_t action) const;
     int32_t GetJsPointerItem(const PointerEvent::PointerItem &item, napi_value value) const;
