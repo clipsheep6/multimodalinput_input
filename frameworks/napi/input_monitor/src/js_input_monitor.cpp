@@ -281,7 +281,7 @@ std::string JsInputMonitor::GetAction(int32_t action) const
     }
 }
 
-std::string GetSourceType(int32_t sourceType) const
+std::string JsInputMonitor::GetSourceType(int32_t sourceType) const
 {
     switch (sourceType) {
         case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
