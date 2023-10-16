@@ -99,7 +99,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     currentTime_ = point->GetActionTime();
     if (fd < 0 && currentTime_ - eventTime_ > INTERVAL_TIME) {
         eventTime_ = currentTime_;
-        MMI_HILOGE("The fd less than 0, fd:%{public}d", fd);
+        MMI_HILOGE("InputTracking id:%{public}d The fd less than 0, fd:%{public}d", point->GetId(), fd);
         DfxHisysevent::OnUpdateTargetPointer(point, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         return;
     }
@@ -107,9 +107,11 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     CHKPV(udsServer);
     auto session = udsServer->GetSession(fd);
     CHKPV(session);
+    
     auto currentTime = GetSysClockTime();
     if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, session)) {
-        MMI_HILOGD("The pointer event does not report normally, application not response");
+        MMI_HILOGW("InputTracking id:%{public}d, The pointer event does not report normally,"
+            "application not response", point->GetId());
         return;
     }
     auto pointerEvent = std::make_shared<PointerEvent>(*point);
@@ -123,6 +125,9 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
     if (!udsServer->SendMsg(fd, pkt)) {
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
+    if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
+        MMI_HILOGI("InputTracking id:%{public}d, SendMsg to %{public}s:pid:%{public}d",
+            pointerEvent->GetId(), session->GetProgramName.c_str(), session->GetPid());
         return;
     }
     if (session->GetPid() != AppDebugListener::GetInstance()->GetAppDebugPid()) {
@@ -167,8 +172,10 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
         MMI_HILOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
+    MMI_HILOGE("InputTracking id:%{public}d, SendMsg to %{public}s:pid:%{public}d",
+        key->GetId(), session->GetProgramName.c_str(), session->GetPid());
     if (session->GetPid() != AppDebugListener::GetInstance()->GetAppDebugPid()) {
-        MMI_HILOGD("session pid : %{public}d", session->GetPid());
+        MMI_HILOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
         ANRMgr->AddTimer(ANR_DISPATCH, key->GetId(), currentTime, session);
     }
     return RET_OK;
