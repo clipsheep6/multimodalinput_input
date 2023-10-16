@@ -52,8 +52,8 @@ void ANRHandler::SetLastProcessedEventId(int32_t eventType, int32_t eventId, int
 {
     CALL_DEBUG_ENTER;
     if (event_[eventType].lastEventId > eventId) {
-        MMI_HILOGE("Event type:%{public}d, id %{public}d less then last processed lastEventId %{public}d",
-            eventType, eventId, event_[eventType].lastEventId);
+        MMI_HILOGE("Event InputTracking id:%{public}d, type %{public}d less then last processed "
+            "lastEventId %{public}d", eventId, eventType, event_[eventType].lastEventId);
         return;
     }
     UpdateLastProcessedEventId(eventType, eventId);
@@ -63,7 +63,7 @@ void ANRHandler::SetLastProcessedEventId(int32_t eventType, int32_t eventId, int
     MMI_HILOGD("Processed event type:%{public}d, id:%{public}d, actionTime:%{public}" PRId64 ", "
         "currentTime:%{public}" PRId64 ", timeoutTime:%{public}" PRId64,
         eventType, eventId, actionTime, currentTime, timeoutTime);
-
+    
     if (!event_[eventType].sendStatus) {
         if (timeoutTime < MIN_MARK_PROCESS_DELAY_TIME) {
             SendEvent(eventType, 0);
