@@ -102,6 +102,7 @@
           "header": {
             "header_files": [
               "proxy/include/window_info.h",
+              "proxy/include/nap_status.h",
               "proxy/include/input_manager.h",
               "event/include/key_event.h",
               "event/include/pointer_event.h",

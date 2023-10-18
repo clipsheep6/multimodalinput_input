@@ -16,6 +16,9 @@
 #include "key_command_handler.h"
 
 #include "ability_manager_client.h"
+#include "ability_manager.h"
+#include "running_process_info.h"
+#include "app_mgr_client.h"
 #include "bytrace_adapter.h"
 #include "cJSON.h"
 #include "config_policy_utils.h"
@@ -1438,6 +1441,23 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability, int64_t delay)
     if (err != ERR_OK) {
         MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", ability.bundleName.c_str(), err);
     }
+    std::vector<AppExecFwk::RunningProcessInfo> bundleInfos;
+    auto appMgrClient = std::make_unique<AppExecFwk::AppMgrClient>();
+    appMgrClient->GetAllRunningProcesses(bundleInfos);
+    std::string targetBundleName = ability.bundleName.c_str();
+    MMI_HILOGE("pingping, targetBundleName: %{public}s", targetBundleName.c_str());
+    int32_t pid = -1;
+    int32_t uid = -1;
+    for (const auto &bundleInfo : bundleInfos) {
+            MMI_HILOGE("pingping, pid:%{public}d, uid:%{public}d, processName_:%{public}s", pid, uid, bundleInfo.bundleNames[0].c_str());
+            if (bundleInfo.bundleNames[0] == ability.bundleName) {
+                pid = bundleInfo.pid_;
+                uid = bundleInfo.uid_;
+                MMI_HILOGE("pingping, pid:%{public}d, uid:%{public}d, processName_:%{public}s", pid, uid, bundleInfo.bundleNames[0].c_str());
+                break;
+            }
+    }
+
     MMI_HILOGD("End launch ability, bundleName:%{public}s", ability.bundleName.c_str());
 }
 

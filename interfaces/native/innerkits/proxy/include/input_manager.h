@@ -29,11 +29,13 @@
 #include "i_input_device_listener.h"
 #include "i_input_event_consumer.h"
 #include "i_input_event_filter.h"
+#include "i_event_observer.h"
 #include "i_window_checker.h"
 #include "input_device.h"
 #include "key_option.h"
 #include "pointer_style.h"
 #include "window_info.h"
+#include "nap_status.h"
 
 namespace OHOS {
 namespace MMI {
@@ -60,6 +62,11 @@ public:
     int32_t AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority, uint32_t deviceTags);
     int32_t RemoveInputEventFilter(int32_t filterId);
 
+    int32_t AddInputEventObserver(std::shared_ptr<IEventObserver> observer);
+
+    void SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, bool napStatus);
+
+    int32_t GetAllNapStatusData(NapStatusDatas &datas);
     /**
      * @brief Sets a consumer for the window input event of the current process.
      * @param inputEventConsumer Indicates the consumer to set. The window input event of the current process

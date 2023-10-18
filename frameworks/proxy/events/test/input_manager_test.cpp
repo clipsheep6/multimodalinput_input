@@ -19,6 +19,7 @@
 #include "multimodal_event_handler.h"
 #include "system_info.h"
 #include "input_manager.h"
+#include "nap_status.h"
 
 namespace OHOS {
 namespace MMI {
@@ -43,6 +44,10 @@ constexpr int32_t KEYBOARD_TYPE_SIZE = 20;
 constexpr int32_t PARAMETER_ERROR = 401;
 constexpr int32_t INVAID_VALUE = -1;
 constexpr double POINTER_ITEM_PRESSURE = 5.0;
+constexpr int64_t POINTER_ITEM_DOWNTIME_ONE = 9999;
+constexpr int32_t POINTER_ITEM_DISPLAY_Y_FOUR = 357;
+constexpr int32_t POINTER_ITEM_DISPLAY_X_FOUR = 200;
+
 }  // namespace
 
 class InputManagerTest : public testing::Test {
@@ -57,6 +62,19 @@ class MMIWindowChecker : public MMI::IWindowChecker {
 public:
     virtual int32_t CheckWindowId(int32_t windowId) const override;
 };
+
+class MMIEventObserver : public MMI::IEventObserver {
+public:
+    virtual void SyncBundleName(int32_t pid, int32_t uid, std::string bundleName) override;
+};
+
+void MMIEventObserver::SyncBundleName(int32_t pid, int32_t uid, std::string bundleName)
+{
+    int32_t getPid = pid;
+    int32_t getUid = uid;
+    std::string getName = bundleName;
+    MMI_HILOGE("pingping test info is : %{public}d, %{public}d, %{public}s", getPid, getUid, getName.c_str());
+}
 
 int32_t MMIWindowChecker::CheckWindowId(int32_t windowId) const
 {
@@ -1096,6 +1114,48 @@ HWTEST_F(InputManagerTest, InputManagerTest_ClearWindowPointerStyle_001, TestSiz
     PointerStyle style;
     ret = InputManager::GetInstance()->GetPointerStyle(windowId, style);
     EXPECT_TRUE(ret == RET_OK);
+}
+
+HWTEST_F(InputManagerTest, InputManagerTest_SyncBundleName_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+
+    // auto pointerEvent = PointerEvent::Create();
+    // ASSERT_NE(pointerEvent, nullptr);
+    // PointerEvent::PointerItem item;
+    // item.SetDownTime(POINTER_ITEM_DOWNTIME_ONE);
+    // item.SetPointerId(0);
+    // item.SetPressed(true);
+    // item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_FOUR);
+    // item.SetDeviceId(1);
+    // item.SetDisplayX(POINTER_ITEM_DISPLAY_X_FOUR);
+    // pointerEvent->AddPointerItem(item);
+    // pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    // pointerEvent->SetPointerId(0);
+    // pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+
+    auto callbackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callbackPtr != nullptr);
+    int32_t monitorId = InputManagerUtil::TestAddMonitor(callbackPtr);
+
+    auto mmiObserver = std::make_shared<MMIEventObserver>();
+    InputManager::GetInstance()->AddInputEventObserver(mmiObserver);
+    InputManager::GetInstance()->SetNapStatus(10,20,"ping",true);
+    std::vector<NapStatusData> vec;
+    InputManager::GetInstance()->GetAllNapStatusData(vec);
+
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    EXPECT_TRUE(IsValidHandlerId(monitorId));
+#else
+    EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
+#endif  // OHOS_BUILD_ENABLE_MONITOR
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+
+    InputManagerUtil::TestMonitor(monitorId, pointerEvent);
+    InputManagerUtil::TestRemoveMonitor(monitorId);
+
+    std::vector<NapStatusData> vecEx;
+    InputManager::GetInstance()->GetAllNapStatusData(vecEx);
 }
 
 /**

@@ -34,6 +34,8 @@ enum class MmiMessageId : int32_t {
     ON_DEVICE_REMOVED,
     SCINFO_CONFIG,
     WINDOW_AREA_INFO,
+    NOTIFY_BUNDLE_NAME,
+    NOTIFY_NAP_STATUS,
 };
 
 enum TokenType : int32_t {
