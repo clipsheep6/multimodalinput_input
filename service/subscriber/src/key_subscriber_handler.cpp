@@ -98,6 +98,11 @@ int32_t KeySubscriberHandler::UnsubscribeKeyEvent(SessionPtr sess, int32_t subsc
 {
     CALL_INFO_TRACE;
     MMI_HILOGD("subscribeId:%{public}d", subscribeId);
+    if (subscribeId == subscribePowerKeyId) {
+        subscribePowerKeyId = -1;
+        subscribePowerKeyState_ = false;
+        MMI_HILOGD("subscribePowerKeyId remove");
+    }
     for (auto it = subscribers_.begin(); it != subscribers_.end(); ++it) {
         if ((*it)->id_ == subscribeId && (*it)->sess_ == sess) {
             ClearTimer(*it);
@@ -149,6 +154,14 @@ void KeySubscriberHandler::InsertSubScriber(std::shared_ptr<Subscriber> subs)
         }
     }
     subscribers_.push_back(subs);
+    MMI_HILOGE("current subs programName is %{public}s", subs->sess_->GetProgramName().c_str());
+    std::shared_ptr<KeyOption> keyOption = subs->keyOption_;
+    std::string name = subs->sess_->GetProgramName();
+    if (name.compare("com.ohos.sceneboard") == 0 && keyOption->GetFinalKey() == KeyEvent::KEYCODE_POWER && !keyOption->IsFinalKeyDown()) {
+        MMI_HILOGE("priority set");
+        subscribePowerKeyId = subs->id_;
+        subscribePowerKeyState_ = true;
+    }
 }
 
 void KeySubscriberHandler::OnSessionDelete(SessionPtr sess)
@@ -525,6 +538,10 @@ void KeySubscriberHandler::HandleKeyUpWithDelay(std::shared_ptr<KeyEvent> keyEve
 {
     auto keyUpDelay = subscriber->keyOption_->GetFinalKeyUpDelay();
     if (keyUpDelay <= 0) {
+        if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER && subscribePowerKeyState_ && subscriber->id_ != subscribePowerKeyId) {
+            MMI_HILOGE("current subscriber priority low");
+            return;
+        }
         NotifySubscriber(keyEvent, subscriber);
     } else {
         if (!AddTimer(subscriber, keyEvent)) {
