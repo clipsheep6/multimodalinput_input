@@ -54,6 +54,7 @@ constexpr int32_t DEFAULT_VALUE = -1;
 constexpr int32_t ANIMATION_DURATION = 500;
 constexpr int32_t DEFAULT_POINTER_STYLE = 0;
 constexpr int32_t CURSOR_CIRCLE_STYLE = 41;
+constexpr int32_t MOUSE_ICON_BIAS = 5;
 constexpr float ROTATION_ANGLE = 360.f;
 constexpr float LOADING_CENTER_RATIO = 0.5f;
 constexpr float RUNNING_X_RATIO = 0.3f;
@@ -285,7 +286,7 @@ void PointerDrawingManager::AdjustMouseFocus(ICON_TYPE iconType, int32_t &physic
             break;
         }
         case ANGLE_NW_RIGHT:{
-            physicalX -= 5;
+            physicalX -= MOUSE_ICON_BIAS;
             [[fallthrough]];
         }
         case ANGLE_NW:
