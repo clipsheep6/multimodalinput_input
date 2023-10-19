@@ -121,7 +121,7 @@ public:
             deferred = false;
         }
 
-        void updateTouchState(InputEvt &event) {
+        void UpdateTouchState(InputEvt &event) {
             if (id != event.id) {
                 return;
             }
@@ -175,13 +175,13 @@ public:
                     if (!eventBatch.empty()) {
                         for (size_t i = 0; i < eventBatch.size(); i++) {
                             InputEvt& event = eventBatch.at(i);
-                            updateTouchState(event);
+                            UpdateTouchState(event);
                         }
                         eventBatch.erase(eventBatch.begin(), eventBatch.begin() + eventBatch.size() - 1);
                         deferred = true;
                     }
                 }
-                updateTouchState(event);
+                UpdateTouchState(event);
             }
         }
 
@@ -211,7 +211,7 @@ public:
             // Consume samples in batch
             for (size_t i = 0; i < count; i++) {
                 InputEvt& event = eventBatch.at(i);
-                updateTouchState(event);
+                UpdateTouchState(event);
             }
             eventBatch.erase(eventBatch.begin(), eventBatch.begin() + count);
 

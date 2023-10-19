@@ -222,18 +222,18 @@ private:
     bool resampleTouch_ {true};
     std::shared_ptr<PointerEvent> pointerEvent_ {nullptr};
 
-    void updatePointerEvent(MotionEvent* outEvent);
-    ErrCode consumeBatch(int64_t frameTime, MotionEvent** outEvent);
-    ErrCode consumeSamples(Batch& batch, size_t count, MotionEvent** outEvent);
-    void addSample(MotionEvent* outEvent, const MotionEvent* event);
-    void updateTouchState(MotionEvent &event);
-    void resampleTouchState(int64_t sampleTime, MotionEvent* event, const MotionEvent* next);
-    ssize_t findBatch(int32_t deviceId, int32_t source) const;
-    ssize_t findTouchState(int32_t deviceId, int32_t source) const;
-    bool canAddSample(const Batch &batch, MotionEvent &event);
-    void rewriteMessage(TouchState& state, MotionEvent &event);
-    ssize_t findSampleNoLaterThan(const Batch& batch, int64_t time);
-    bool shouldResampleTool(int32_t toolType);
+    void UpdatePointerEvent(MotionEvent* outEvent);
+    ErrCode ConsumeBatch(int64_t frameTime, MotionEvent** outEvent);
+    ErrCode ConsumeSamples(Batch& batch, size_t count, MotionEvent** outEvent);
+    void AddSample(MotionEvent* outEvent, const MotionEvent* event);
+    void UpdateTouchState(MotionEvent &event);
+    void ResampleTouchState(int64_t sampleTime, MotionEvent* event, const MotionEvent* next);
+    ssize_t FindBatch(int32_t deviceId, int32_t source) const;
+    ssize_t FindTouchState(int32_t deviceId, int32_t source) const;
+    bool CanAddSample(const Batch &batch, MotionEvent &event);
+    void RewriteMessage(TouchState& state, MotionEvent &event);
+    ssize_t FindSampleNoLaterThan(const Batch& batch, int64_t time);
+    bool ShouldResampleTool(int32_t toolType);
 
 };
 
