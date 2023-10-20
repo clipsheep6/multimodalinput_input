@@ -983,7 +983,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
         napi_value callback = nullptr;
         CHECK_SCOPE_BEFORE_BREAK(jsEnv_, napi_get_reference_value(jsEnv_, receiver_, &callback),
             GET_REFERENCE_VALUE, scope, pointerEvent);
-		if (status != napi_ok) {
+        if (status != napi_ok) {
             pointerEvent->MarkProcessed();
             napi_close_handle_scope(jsEnv_, scope);
             break;
