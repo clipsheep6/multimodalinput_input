@@ -66,14 +66,16 @@ private:
         int32_t toolType;
         int32_t id;
 
-        void copyFrom(const Pointer& other) {
+        void copyFrom(const Pointer& other)
+	{
             coordX = other.coordX;
             coordY = other.coordY;
             toolType = other.toolType;
             id = other.id;
         }
 
-        void reset() {
+        void reset()
+	{
             coordX = 0;
             coordY = 0;
             toolType = 0;
@@ -89,7 +91,8 @@ private:
         int32_t pointerAction { PointerEvent::POINTER_ACTION_UNKNOWN };
         int32_t deviceId { 0 };
 
-        void reset() {
+        void reset()
+	{
             pointers.clear();
             actionTime = 0;
             pointerCount = 0;
@@ -98,7 +101,8 @@ private:
             deviceId = 0;
         }
 
-        void initializeFrom(MotionEvent& other) {
+        void initializeFrom(MotionEvent& other)
+	{
             for (auto &it : other.pointers) {
                 pointers[it.first] = it.second;
             }
@@ -109,7 +113,8 @@ private:
             pointerAction = other.pointerAction;
         }
 
-        void initializeFrom(std::shared_ptr<PointerEvent> event) {
+        void initializeFrom(std::shared_ptr<PointerEvent> event)
+	{
             actionTime = event->GetActionTime();
             deviceId = event->GetDeviceId();
             sourceType = event->GetSourceType();
@@ -141,26 +146,30 @@ private:
         std::map<uint32_t, Pointer> pointers;
         int64_t actionTime { 0 };
 
-        void initializeFrom(const MotionEvent &event) {
+        void initializeFrom(const MotionEvent &event)
+	{
             actionTime = event.actionTime;
             for (auto &it : event.pointers) {
                 pointers[it.first] = it.second;
             }
         }
 
-        void initializeFrom(const History &other) {
+        void initializeFrom(const History &other)
+	{
             actionTime = other.actionTime;
             for (auto &it : other.pointers) {
                 pointers[it.first] = it.second;
             }
         }
 
-        const Pointer& getPointerById(uint32_t id) const {
+        const Pointer& getPointerById(uint32_t id) const
+	{
             auto item = pointers.find(id);
             return item->second;
         }
 
-        bool hasPointerId(uint32_t id) const {
+        bool hasPointerId(uint32_t id) const
+	{
             auto item = pointers.find(id);
             if (item != pointers.end()) {
                 return true;
@@ -178,7 +187,8 @@ private:
         History history[2];
         History lastResample;
 
-        void initialize(int32_t deviceId, int32_t source) {
+        void initialize(int32_t deviceId, int32_t source)
+	{
             this->deviceId = deviceId;
             this->source = source;
             historyCurrent = 0;
@@ -186,7 +196,8 @@ private:
             lastResample.actionTime = 0;
         }
 
-        void addHistory(const MotionEvent &event) {
+        void addHistory(const MotionEvent &event)
+	{
             historyCurrent ^= 1;
             if (historySize < 2) {
                 historySize += 1;

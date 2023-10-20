@@ -106,7 +106,8 @@ public:
     std::shared_ptr<TestCommandHandler> eventTestCommandHandler_ { nullptr };
     std::shared_ptr<KeyCommandHandler> eventKeyCommandHandler_ { nullptr };
     void SetupKeyCommandHandler();
-    std::shared_ptr<PointerEvent> SetupPointerEvent(int32_t action, int32_t pointerId, int32_t finger_num, int32_t dispX = DEFX, int32_t dispY = DEFY);
+    std::shared_ptr<PointerEvent> SetupPointerEvent(int32_t action, int32_t pointerId, int32_t finger_num,
+		                                    int32_t dispX = DEFX, int32_t dispY = DEFY);
     bool CreateTestJson(const std::string &contentJson);
     void Delay(std::chrono::milliseconds delayMs);
     static void AbilityCallback(const AAFwk::Want &want, ErrCode err);
@@ -138,7 +139,8 @@ void TwoFingerLongTouchTest::SetupKeyCommandHandler()
     err_ = ERR_OK;
 }
 
-std::shared_ptr<PointerEvent> TwoFingerLongTouchTest::SetupPointerEvent(int32_t action, int32_t pointerId, int32_t finger_num, int32_t dispX, int32_t dispY)
+std::shared_ptr<PointerEvent> TwoFingerLongTouchTest::SetupPointerEvent(int32_t action, int32_t pointerId,
+								int32_t finger_num, int32_t dispX, int32_t dispY)
 {
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     CHKPP(pointerEvent);
@@ -312,7 +314,8 @@ HWTEST_F(TwoFingerLongTouchTest, TwoFingerLongTouchTest_003, TestSize.Level1)
 
 /**
  * @tc.name: TwoFingerLongTouchTest_004
- * @tc.desc: Test two finger long touch gesture moving inside threshold (And one more unregistered event outside of threshold)
+ * @tc.desc: Test two finger long touch gesture moving inside threshold
+ * (And one more unregistered event outside of threshold)
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -331,11 +334,13 @@ HWTEST_F(TwoFingerLongTouchTest, TwoFingerLongTouchTest_004, TestSize.Level1)
     ASSERT_NE(pointerEvent2, nullptr);
     eventKeyCommandHandler_->HandleTouchEvent(pointerEvent2);
 
-    auto pointerEvent3 = SetupPointerEvent(PointerEvent::POINTER_ACTION_MOVE, 0, 2, DEFX + LESS_THEN_THRESHOLD, DEFY + LESS_THEN_THRESHOLD);
+    auto pointerEvent3 = SetupPointerEvent(PointerEvent::POINTER_ACTION_MOVE, 0, 2, DEFX + LESS_THEN_THRESHOLD,
+		    			   DEFY + LESS_THEN_THRESHOLD);
     ASSERT_NE(pointerEvent3, nullptr);
     eventKeyCommandHandler_->HandleTouchEvent(pointerEvent3);
 
-    auto pointerEvent4 = SetupPointerEvent(PointerEvent::POINTER_ACTION_MOVE, 2, 1, DEFX + GREATER_THEN_THRESHOLD, DEFY + GREATER_THEN_THRESHOLD);
+    auto pointerEvent4 = SetupPointerEvent(PointerEvent::POINTER_ACTION_MOVE, 2, 1, DEFX + GREATER_THEN_THRESHOLD,
+		                           DEFY + GREATER_THEN_THRESHOLD);
     ASSERT_NE(pointerEvent4, nullptr);
     eventKeyCommandHandler_->HandleTouchEvent(pointerEvent4);
 
@@ -367,7 +372,8 @@ HWTEST_F(TwoFingerLongTouchTest, TwoFingerLongTouchTest_005, TestSize.Level1)
     ASSERT_NE(pointerEvent2, nullptr);
     eventKeyCommandHandler_->HandleTouchEvent(pointerEvent2);
 
-    auto pointerEvent3 = SetupPointerEvent(PointerEvent::POINTER_ACTION_MOVE, 0, 2, DEFX + GREATER_THEN_THRESHOLD, DEFY + GREATER_THEN_THRESHOLD);
+    auto pointerEvent3 = SetupPointerEvent(PointerEvent::POINTER_ACTION_MOVE, 0, 2,
+		                           DEFX + GREATER_THEN_THRESHOLD, DEFY + GREATER_THEN_THRESHOLD);
     ASSERT_NE(pointerEvent3, nullptr);
     eventKeyCommandHandler_->HandleTouchEvent(pointerEvent3);
 
@@ -416,13 +422,20 @@ const std::string TEST_JSON_4 = "{ \"TwoFingerGesture\" : {\"abilityStartDelay\"
 const std::string TEST_JSON_5 = "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : -1} }\n";
 const std::string TEST_JSON_6 = "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : \"abc\"} }\n";
 const std::string TEST_JSON_7 = "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200, \"ability\" : []} }\n";
-const std::string TEST_JSON_8 = "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200, \"ability\" : {\"bundleName\"}} }\n";
-const std::string TEST_JSON_9 = "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200, \"ability\" : {\"entities\" : {}}} }\n";
-const std::string TEST_JSON_10 = "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200, \"ability\" : {\"entities\" : [123]}} }\n";
-const std::string TEST_JSON_11 = "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200, \"ability\" : {\"params\" : {}}} }\n";
-const std::string TEST_JSON_12 = "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200, \"ability\" : {\"params\" : [[]]}} }\n";
-const std::string TEST_JSON_13 = "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200, \"ability\" : {\"params\" : [{}]}} }\n";
-const std::string TEST_JSON_14 = "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200, \"ability\" : {\"params\" : [{\"key\" : \"key1\"}]}} }\n";
+const std::string TEST_JSON_8 = "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200,"
+      				" \"ability\" : {\"bundleName\"}} }\n";
+const std::string TEST_JSON_9 = "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200,"
+                                " \"ability\" : {\"entities\" : {}}} }\n";
+const std::string TEST_JSON_10 = "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200,"
+                                 " \"ability\" : {\"entities\" : [123]}} }\n";
+const std::string TEST_JSON_11 = "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200,"
+      				 " \"ability\" : {\"params\" : {}}} }\n";
+const std::string TEST_JSON_12 = "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200,"
+      				 " \"ability\" : {\"params\" : [[]]}} }\n";
+const std::string TEST_JSON_13 = "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200,"
+      				 " \"ability\" : {\"params\" : [{}]}} }\n";
+const std::string TEST_JSON_14 = "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200,"
+      				 " \"ability\" : {\"params\" : [{\"key\" : \"key1\"}]}} }\n";
 const std::string TEST_JSON_15 = "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200, \"ability\" : {}} }\n";
 
 /**

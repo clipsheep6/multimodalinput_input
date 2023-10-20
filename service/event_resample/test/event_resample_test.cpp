@@ -56,7 +56,8 @@ public:
         int64_t frameTime { START_TIME };
         int64_t lastFrameTime { START_TIME };
 
-        void Reset(void) {
+        void Reset(void)
+	{
             lastDispX = INITIAL_COORDS;
             lastDispY = INITIAL_COORDS;
             lastTime = START_TIME;
@@ -72,7 +73,8 @@ public:
         int32_t dispY { INITIAL_COORDS };
         int32_t id { 0 };
 
-        void initialize(int32_t action, TestData &testData, Context &context) {
+        void initialize(int32_t action, TestData &testData, Context &context)
+	{
             this->action = action;
             dispX = context.lastDispX + testData.coordsDelta;
             context.lastDispX = dispX;
@@ -111,7 +113,8 @@ public:
         ExpectedData() {}
         ExpectedData(int32_t id) : id(id) {}
 
-        void reset(int32_t id) {
+        void reset(int32_t id)
+	{
             this->id = id;
             actionTime = 0;
             dispX = 0;
@@ -122,7 +125,8 @@ public:
             deferred = false;
         }
 
-        void UpdateTouchState(InputEvt &event) {
+        void UpdateTouchState(InputEvt &event)
+	{
             if (id != event.id) {
                 return;
             }
@@ -162,7 +166,8 @@ public:
             }
         }
 
-        void AddEvent(InputEvt &event) {
+        void AddEvent(InputEvt &event)
+	{
             if (id != event.id) {
                 return;
             }
@@ -186,7 +191,8 @@ public:
             }
         }
 
-        int32_t calculateExpected(int64_t frameTime) {
+        int32_t calculateExpected(int64_t frameTime)
+	{
             float alpha = 0.0;
             int64_t sampleTime = frameTime - EventResample::RESAMPLE_LATENCY;
             InputEvt current;
@@ -232,7 +238,7 @@ public:
                     return ERR_OK;
                 }
                 int64_t maxPredict = touchState[0].actionTime + std::min(delta / 2,
-				                                         EventResample::RESAMPLE_MAX_PREDICTION);
+                    EventResample::RESAMPLE_MAX_PREDICTION);
                 if (sampleTime > maxPredict) {
                     sampleTime = maxPredict;
                 }
@@ -244,7 +250,8 @@ public:
                 other.InitializeFrom(next);
                 int64_t delta = next.actionTime - touchState[0].actionTime;
                 if (delta < EventResample::RESAMPLE_MIN_DELTA) {
-                    MMI_HILOGD("RESAMPLE_MIN_DELTA = %{public}" PRId64 ", next_x = %{public}d, ts0_x = %{public}d", delta, next.dispX, touchState[0].dispX);
+                    MMI_HILOGD("RESAMPLE_MIN_DELTA = %{public}" PRId64 ", next_x = %{public}d, ts0_x = %{public}d",
+			       delta, next.dispX, touchState[0].dispX);
                     return ERR_OK;
                 }
                 alpha = static_cast<float>(sampleTime - touchState[0].actionTime) / delta;
@@ -319,7 +326,8 @@ bool EventResampleTest::SetupPointerEvent(InputEvt &event, TestData &testData)
     return true;
 }
 
-int32_t EventResampleTest::CheckResults(std::shared_ptr<PointerEvent> outEvent, std::vector<ExpectedData> &expected, Context &context)
+int32_t EventResampleTest::CheckResults(std::shared_ptr<PointerEvent> outEvent,
+		                        std::vector<ExpectedData> &expected, Context &context)
 {
     bool ret = ERR_OK;
     int32_t failCount = 0;
@@ -350,8 +358,10 @@ int32_t EventResampleTest::CheckResults(std::shared_ptr<PointerEvent> outEvent, 
             dispY = expected[it.id].touchUpY;
         }
 
-        MMI_HILOGD("OutEvent: x = %{public}d y = %{public}d t = %{public}" PRId64 " f = %{public}" PRId64 " (%{public}d)",
-                   pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), outEvent->GetActionTime(), context.frameTime, outEvent->GetPointerAction());
+        MMI_HILOGD("OutEvent: x = %{public}d y = %{public}d t = %{public}" PRId64
+		   " f = %{public}" PRId64 " (%{public}d)",
+                   pointerItem.GetDisplayX(), pointerItem.GetDisplayY(),
+		   outEvent->GetActionTime(), context.frameTime, outEvent->GetPointerAction());
         MMI_HILOGD("Expected: x = %{public}d y = %{public}d t = %{public}" PRId64, dispX, dispY, actionTime);
 
         if (pointerItem.GetDisplayX() != dispX) {
@@ -405,7 +415,8 @@ bool EventResampleTest::DoTest(TestData &testData, int32_t testId)
         ctx.lastFrameTime = ctx.frameTime;
         ctx.frameTime += FRAME_TIME;
         ctx.lastTime = 0;
-        MMI_HILOGD("Frame %{public}d: lf = %{public}" PRId64 " f = %{public}" PRId64, idx, ctx.lastFrameTime, ctx.frameTime);
+        MMI_HILOGD("Frame %{public}d: lf = %{public}" PRId64 " f = %{public}" PRId64,
+		   idx, ctx.lastFrameTime, ctx.frameTime);
 
         for (uint32_t eidx = 0; eidx < testData.evtNum; eidx++) {
             InputEvt touchMove;
@@ -420,12 +431,14 @@ bool EventResampleTest::DoTest(TestData &testData, int32_t testId)
 
             PointerEvent::PointerItem pointerItem;
             pointerEvent_->GetPointerItem(0, pointerItem);
-            MMI_HILOGD("pointerEvent_: x = %{public}d y = %{public}d t = %{public}" PRId64, pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), pointerEvent_->GetActionTime());
+            MMI_HILOGD("pointerEvent_: x = %{public}d y = %{public}d t = %{public}" PRId64,
+		        pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), pointerEvent_->GetActionTime());
 
             outEvent = EventResampleHdr->onEventConsume(pointerEvent_, ctx.frameTime, deferred, status);
             if (outEvent != nullptr) {
                 if (PointerEvent::POINTER_ACTION_DOWN != outEvent->GetPointerAction()) {
-                    MMI_HILOGE("Unexpected pointer action: %{public}d while %{public}d expected", outEvent->GetPointerAction(), PointerEvent::POINTER_ACTION_DOWN);
+                    MMI_HILOGE("Unexpected pointer action: %{public}d while %{public}d expected",
+				outEvent->GetPointerAction(), PointerEvent::POINTER_ACTION_DOWN);
                     failCount_++;
                 } else {
                     EXPECT_EQ(ERR_OK, CheckResults(outEvent, expected, ctx));

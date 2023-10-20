@@ -29,7 +29,7 @@ EventResample::EventResample(){};
 EventResample::~EventResample(){};
 
 std::shared_ptr<PointerEvent> EventResample::onEventConsume(std::shared_ptr<PointerEvent> pointerEvent,
-		                                            int64_t frameTime, bool &deferred, ErrCode &status)
+    int64_t frameTime, bool &deferred, ErrCode &status)
 {
     int32_t pointerAction = PointerEvent::POINTER_ACTION_UNKNOWN;
     MotionEvent* outEvent = nullptr;
@@ -110,7 +110,7 @@ std::shared_ptr<PointerEvent> EventResample::onEventConsume(std::shared_ptr<Poin
                 break;
             } else if (PointerEvent::POINTER_ACTION_UP == inputEvent_.pointerAction) {
                 MMI_HILOGD("Deferred event: %{public}d %{public}d %{public}d", inputEvent_.deviceId,
-			   inputEvent_.sourceType, inputEvent_.pointerAction);
+		    inputEvent_.sourceType, inputEvent_.pointerAction);
                 deferredEvent_.initializeFrom(inputEvent_);
                 msgDeferred_ = true;
                 deferred = true;

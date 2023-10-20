@@ -385,13 +385,13 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
     bool deferred = false;
     ErrCode status = RET_OK;
     std::shared_ptr<PointerEvent> outputEvent = EventResampleHdr->onEventConsume(pointerEvent, frameTime,
-		                                                                 deferred, status);
+        deferred, status);
     if ((outputEvent == nullptr) && (deferred == false)) {
         MMI_HILOGD("NULL output event received: %{public}d %{public}d", deferred, status);
         return RET_OK;
     } else {
         MMI_HILOGD("Output event received: %{public}d %{public}d %{public}d %{public}d",
-		   outputEvent->GetSourceType(), outputEvent->GetPointerAction(), deferred, status);
+            outputEvent->GetSourceType(), outputEvent->GetPointerAction(), deferred, status);
         pointerEvent = outputEvent;
     }
 
@@ -404,7 +404,7 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         pointerEvent = EventResampleHdr->onEventConsume(NULL, frameTime, deferred, status);
         if (pointerEvent != nullptr) {
             MMI_HILOGD("Deferred event received: %{public}d %{public}d %{public}d %{public}d",
-		       pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(), deferred, status);
+                pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(), deferred, status);
             BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START); // FIXME
             nextHandler_->HandleTouchEvent(pointerEvent);
         }
