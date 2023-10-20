@@ -36,8 +36,8 @@ class EventResample final {
 
 public:
     DISALLOW_COPY_AND_MOVE(EventResample);
-    std::shared_ptr<PointerEvent> onEventConsume(std::shared_ptr<PointerEvent> pointerEvent, int64_t frameTime, 
-		    				 bool &deferred, ErrCode &status);
+    std::shared_ptr<PointerEvent> onEventConsume(std::shared_ptr<PointerEvent> pointerEvent, int64_t frameTime,
+        bool &deferred, ErrCode &status);
     std::shared_ptr<PointerEvent> getPointerEvent();
 
     // Microseconds per milliseconds.
@@ -251,7 +251,6 @@ private:
     void RewriteMessage(TouchState& state, MotionEvent &event);
     ssize_t FindSampleNoLaterThan(const Batch& batch, int64_t time);
     bool ShouldResampleTool(int32_t toolType);
-
 };
 
 inline static float calcCoord(float a, float b, float alpha)
@@ -259,7 +258,7 @@ inline static float calcCoord(float a, float b, float alpha)
     return a + alpha * (b - a);
 }
 
-#define EventResampleHdr ::OHOS::DelayedSingleton<EventResample>::GetInstance()
+#define EVENT_RESAMPLE_HDR ::OHOS::DelayedSingleton<EventResample>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // EVENT_RESAMPLE_H
