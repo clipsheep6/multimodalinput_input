@@ -166,6 +166,26 @@ void InputMonitor::SetId(int32_t id)
     id_ = id;
 }
 
+void InputMonitor::SetHotRectArea(Rect hotRectArea[])
+{
+    memcpy(hotRectArea_, hotRectArea, sizeof(hotRectArea[0]) * 2);
+}
+
+Rect InputMonitor::GetHotRectArea(int32_t index)
+{
+    return hotRectArea_[index];
+}
+
+void InputMonitor::SetRectTotal(uint32_t rectTotal)
+{
+    rectTotal_ = rectTotal;
+}
+
+uint32_t InputMonitor::GetRectTotal()
+{
+    return rectTotal_;
+}
+
 void InputMonitor::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const {}
 
 void InputMonitor::OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const {}
@@ -185,7 +205,7 @@ void InputMonitor::MarkConsumed(int32_t eventId)
     consumed_ = true;
 }
 
-JsInputMonitor::JsInputMonitor(napi_env jsEnv, const std::string &typeName, napi_value callback, int32_t id)
+JsInputMonitor::JsInputMonitor(napi_env jsEnv, const std::string &typeName, Rect rectParam[], int32_t rectTotal, napi_value callback, int32_t id)
     : monitor_(std::make_shared<InputMonitor>()),
       jsEnv_(jsEnv),
       typeName_(typeName),
@@ -202,6 +222,11 @@ JsInputMonitor::JsInputMonitor(napi_env jsEnv, const std::string &typeName, napi
         jsMonitor->OnPointerEvent(pointerEvent);
     });
     monitor_->SetId(monitorId_);
+    if (rectTotal != 0) {
+        monitor_->SetHotRectArea(rectParam);
+        monitor_->SetRectTotal(rectTotal);            
+    }
+    
 }
 
 void JsInputMonitor::SetCallback(napi_value callback)
@@ -958,9 +983,51 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
         napi_value callback = nullptr;
         CHECK_SCOPE_BEFORE_BREAK(jsEnv_, napi_get_reference_value(jsEnv_, receiver_, &callback),
             GET_REFERENCE_VALUE, scope, pointerEvent);
+		if (status != napi_ok) {
+            pointerEvent->MarkProcessed();
+            napi_close_handle_scope(jsEnv_, scope);
+            break;
+        }
         napi_value result = nullptr;
-        CHECK_SCOPE_BEFORE_BREAK(jsEnv_, napi_call_function(jsEnv_, nullptr, callback, 1, &napiPointer, &result),
-            CALL_FUNCTION, scope, pointerEvent);
+
+        if (monitor_->GetRectTotal() == 0) {
+            CHECK_SCOPE_BEFORE_BREAK(jsEnv_, napi_call_function(jsEnv_, nullptr, callback, 1, &napiPointer, &result),
+            	CALL_FUNCTION, scope, pointerEvent);      
+        }else {
+            napi_value xProperty;
+            CHKRV(napi_get_named_property(jsEnv_, napiPointer, "screenX", &xProperty), GET_NAMED_PROPERTY);
+            if (xProperty == nullptr) {
+                MMI_HILOGE("xProperty == nullptr, return");
+                return;
+            }
+            int32_t xInt { 0 };
+            CHKRV(napi_get_value_int32(jsEnv_, xProperty, &xInt), GET_VALUE_INT32);
+
+            napi_value yProperty;
+            CHKRV(napi_get_named_property(jsEnv_, napiPointer, "screenY", &yProperty), GET_NAMED_PROPERTY);
+            if (yProperty == nullptr) {
+                MMI_HILOGE("yProperty == nullptr, return");
+                return;
+            }
+            int32_t yInt { 0 };
+            CHKRV(napi_get_value_int32(jsEnv_, yProperty, &yInt), GET_VALUE_INT32);
+            MMI_HILOGE("x pos : %{public}d : %{public}d", xInt, yInt);
+
+            for (uint32_t i = 0; i < monitor_->GetRectTotal(); i++) {
+                int32_t hotAreaX = monitor_->GetHotRectArea(i).x;
+                int32_t hotAreaY = monitor_->GetHotRectArea(i).y;
+                int32_t hotAreaWidth = monitor_->GetHotRectArea(i).width;
+                int32_t hotAreaHeight = monitor_->GetHotRectArea(i).height;
+                MMI_HILOGE("hotAreaX : %{public}d, hotAreaY : %{public}d, hotAreaWidth : %{public}d, hotAreaHeight : %{public}d,", 
+                monitor_->GetHotRectArea(i).x, monitor_->GetHotRectArea(i).y, monitor_->GetHotRectArea(i).width, monitor_->GetHotRectArea(i).height);
+
+                if ((xInt >= hotAreaX) && (xInt <= hotAreaX + hotAreaWidth) && (yInt >= hotAreaY) && (yInt <= hotAreaY + hotAreaHeight)) {
+                    CHECK_SCOPE_BEFORE_BREAK(jsEnv_, napi_call_function(jsEnv_, nullptr, callback, 1, &napiPointer, &result),
+            			CALL_FUNCTION, scope, pointerEvent);        
+                }                
+            } 
+        }
+        
         bool typeNameFlag = typeName == "touch" || typeName == "pinch" || typeName == "threeFingersSwipe" ||
             typeName == "fourFingersSwipe";
         if (typeNameFlag) {
