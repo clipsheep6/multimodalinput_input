@@ -28,12 +28,16 @@
 
 namespace OHOS {
 namespace MMI {
+
+constexpr uint32_t MIN_HISTORY_SIZE = 2;
+
 class EventResample final {
     DECLARE_DELAYED_SINGLETON(EventResample);
 
 public:
     DISALLOW_COPY_AND_MOVE(EventResample);
-    std::shared_ptr<PointerEvent> onEventConsume(std::shared_ptr<PointerEvent> pointerEvent, int64_t frameTime, bool &deferred, ErrCode &status);
+    std::shared_ptr<PointerEvent> onEventConsume(std::shared_ptr<PointerEvent> pointerEvent, int64_t frameTime, 
+		    				 bool &deferred, ErrCode &status);
     std::shared_ptr<PointerEvent> getPointerEvent();
 
     // Microseconds per milliseconds.

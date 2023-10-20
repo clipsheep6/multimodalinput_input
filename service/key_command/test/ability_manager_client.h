@@ -14,7 +14,8 @@
  */
 
 /*
- * This file is used as stub header for key_command_handler.cpp. It should re-define ability related methods for unit test.
+ * This file is used as stub header for key_command_handler.cpp.
+ * It should re-define ability related methods for unit test.
  */
 
 #ifndef ABILITY_MANAGER_CLIENT_STUB_H
@@ -62,7 +63,8 @@ public:
     }
     virtual ~AbilityManagerClient() {}
     static std::shared_ptr<AbilityManagerClient> GetInstance();
-    ErrCode StartAbility(const Want &want, int32_t requestCode = DEFAULT_INVAL_VALUE, int32_t userId = DEFAULT_INVAL_VALUE);
+    ErrCode StartAbility(const Want &want, int32_t requestCode = DEFAULT_INVAL_VALUE,
+		         int32_t userId = DEFAULT_INVAL_VALUE);
     void SetCallback(void (*cb)(const Want &want, ErrCode err));
     void SetErrCode(ErrCode err);
 

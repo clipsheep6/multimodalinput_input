@@ -52,6 +52,7 @@ constexpr unsigned PARAMETERS_NUM = 2;
 constexpr int32_t DEFX = 50;
 constexpr int32_t DEFY = 50;
 constexpr int32_t LESS_THEN_THRESHOLD = 10;
+constexpr int32_t TWO_FINGERS = 2;
 constexpr int32_t GREATER_THEN_THRESHOLD = 20;
 } // namespace
 
@@ -152,11 +153,11 @@ std::shared_ptr<PointerEvent> TwoFingerLongTouchTest::SetupPointerEvent(int32_t 
     item1.SetDisplayY(dispY);
     pointerEvent->AddPointerItem(item1);
 
-    if (2 == finger_num) {
+    if (finger_num == TWO_FINGERS) {
         PointerEvent::PointerItem item2;
         item2.SetPointerId(1);
-        item2.SetDisplayX(dispX + 25);
-        item2.SetDisplayY(dispY + 25);
+        item2.SetDisplayX(dispX + DEFX / 2);
+        item2.SetDisplayY(dispY + DEFY / 2);
         pointerEvent->AddPointerItem(item2);
     }
 
@@ -200,7 +201,7 @@ void TwoFingerLongTouchTest::AbilityCallback(const AAFwk::Want &want, ErrCode er
     EXPECT_EQ(want.uri_, URI);
 
     EXPECT_EQ(want.entities_.size(), ENTITY_NUM);
-    if (ENTITY_NUM == want.entities_.size()) {
+    if (want.entities_.size() == ENTITY_NUM) {
         for (unsigned i = 0; i < want.entities_.size(); ++i) {
             std::string entity = want.entities_[i];
             std::string expected = ENTITY.data() + std::to_string(i + 1);
@@ -209,7 +210,7 @@ void TwoFingerLongTouchTest::AbilityCallback(const AAFwk::Want &want, ErrCode er
     }
 
     EXPECT_EQ(want.params_.size(), PARAMETERS_NUM);
-    if (PARAMETERS_NUM == want.params_.size()) {
+    if (want.params_.size() == PARAMETERS_NUM) {
         for (unsigned i = 0; i < want.params_.size(); ++i) {
             std::string key = KEY.data() + std::to_string(i + 1);
             std::string value = VALUE.data() + std::to_string(i + 1);
