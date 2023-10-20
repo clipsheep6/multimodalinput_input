@@ -106,7 +106,7 @@ std::shared_ptr<PointerEvent> EventResample::onEventConsume(std::shared_ptr<Poin
             if (CanAddSample(batch, inputEvent_)) {
                 batch.samples.push_back(inputEvent_);
                 MMI_HILOGD("Event added to batch: %{public}d %{public}d %{public}d",
-                           inputEvent_.deviceId, inputEvent_.sourceType, inputEvent_.pointerAction);
+                    inputEvent_.deviceId, inputEvent_.sourceType, inputEvent_.pointerAction);
                 break;
             } else if (PointerEvent::POINTER_ACTION_UP == inputEvent_.pointerAction) {
                 MMI_HILOGD("Deferred event: %{public}d %{public}d %{public}d", inputEvent_.deviceId,

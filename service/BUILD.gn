@@ -300,8 +300,6 @@ ohos_unittest("event_resample_test") {
   module_out_path = module_output_path
   include_dirs = [
     "${mmi_path}/service/event_resample/include",
-    #"//base/customization/config_policy/interfaces/inner_api/include",
-    #"//commonlibrary/c_utils/base/include",
   ]
 
   sources = [
@@ -332,8 +330,6 @@ ohos_unittest("TwoFingerLongTouchTest") {
   module_out_path = module_output_path
   include_dirs = [
     "${mmi_path}/service/key_command/test",
-    #"//base/customization/config_policy/interfaces/inner_api/include",
-    #"//commonlibrary/c_utils/base/include",
   ]
 
   cflags = [ "-DUNIT_TEST" ]

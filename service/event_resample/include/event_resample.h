@@ -67,7 +67,7 @@ private:
         int32_t id;
 
         void copyFrom(const Pointer& other)
-	{
+        {
             coordX = other.coordX;
             coordY = other.coordY;
             toolType = other.toolType;
@@ -75,7 +75,7 @@ private:
         }
 
         void reset()
-	{
+        {
             coordX = 0;
             coordY = 0;
             toolType = 0;
@@ -92,7 +92,7 @@ private:
         int32_t deviceId { 0 };
 
         void reset()
-	{
+        {
             pointers.clear();
             actionTime = 0;
             pointerCount = 0;
@@ -102,7 +102,7 @@ private:
         }
 
         void initializeFrom(MotionEvent& other)
-	{
+        {
             for (auto &it : other.pointers) {
                 pointers[it.first] = it.second;
             }
@@ -114,7 +114,7 @@ private:
         }
 
         void initializeFrom(std::shared_ptr<PointerEvent> event)
-	{
+        {
             actionTime = event->GetActionTime();
             deviceId = event->GetDeviceId();
             sourceType = event->GetSourceType();
@@ -147,7 +147,7 @@ private:
         int64_t actionTime { 0 };
 
         void initializeFrom(const MotionEvent &event)
-	{
+        {
             actionTime = event.actionTime;
             for (auto &it : event.pointers) {
                 pointers[it.first] = it.second;
@@ -188,7 +188,7 @@ private:
         History lastResample;
 
         void initialize(int32_t deviceId, int32_t source)
-	{
+        {
             this->deviceId = deviceId;
             this->source = source;
             historyCurrent = 0;
@@ -197,21 +197,23 @@ private:
         }
 
         void addHistory(const MotionEvent &event)
-	{
+        {
             historyCurrent ^= 1;
-            if (historySize < 2) {
+            if (historySize < MIN_HISTORY_SIZE) {
                 historySize += 1;
             }
             history[historyCurrent].initializeFrom(event);
         }
 
-        const History* getHistory(size_t idx) const {
+        const History* getHistory(size_t idx) const
+        {
             return &history[(historyCurrent + idx) & 1];
         }
 
-        bool recentCoordinatesAreIdentical(uint32_t id) const {
+        bool recentCoordinatesAreIdentical(uint32_t id) const
+        {
             // Return true if the two most recently received "raw" coordinates are identical
-            if (historySize < 2) {
+            if (historySize < MIN_HISTORY_SIZE) {
                 return false;
             }
             if (!getHistory(0)->hasPointerId(id) || !getHistory(1)->hasPointerId(id)) {
@@ -252,7 +254,8 @@ private:
 
 };
 
-inline static float calcCoord(float a, float b, float alpha) {
+inline static float calcCoord(float a, float b, float alpha)
+{
     return a + alpha * (b - a);
 }
 

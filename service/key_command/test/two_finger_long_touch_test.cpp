@@ -51,6 +51,8 @@ constexpr unsigned ENTITY_NUM = 2;
 constexpr unsigned PARAMETERS_NUM = 2;
 constexpr int32_t DEFX = 50;
 constexpr int32_t DEFY = 50;
+constexpr int32_t DISP_INITIAL_POS_X = 25;
+constexpr int32_t DISP_INITIAL_POS_Y = 25;
 constexpr int32_t LESS_THEN_THRESHOLD = 10;
 constexpr int32_t TWO_FINGERS = 2;
 constexpr int32_t GREATER_THEN_THRESHOLD = 20;
@@ -140,7 +142,7 @@ void TwoFingerLongTouchTest::SetupKeyCommandHandler()
 }
 
 std::shared_ptr<PointerEvent> TwoFingerLongTouchTest::SetupPointerEvent(int32_t action, int32_t pointerId,
-								int32_t finger_num, int32_t dispX, int32_t dispY)
+    int32_t finger_num, int32_t dispX, int32_t dispY)
 {
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     CHKPP(pointerEvent);
@@ -158,8 +160,8 @@ std::shared_ptr<PointerEvent> TwoFingerLongTouchTest::SetupPointerEvent(int32_t 
     if (finger_num == TWO_FINGERS) {
         PointerEvent::PointerItem item2;
         item2.SetPointerId(1);
-        item2.SetDisplayX(dispX + DEFX / 2);
-        item2.SetDisplayY(dispY + DEFY / 2);
+        item2.SetDisplayX(dispX + DISP_INITIAL_POS_X);
+        item2.SetDisplayY(dispY + DISP_INITIAL_POS_Y);
         pointerEvent->AddPointerItem(item2);
     }
 
