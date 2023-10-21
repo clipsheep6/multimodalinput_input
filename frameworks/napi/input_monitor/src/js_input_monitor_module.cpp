@@ -30,6 +30,10 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitorModule" };
 const std::set<std::string> ACTION_TYPE = { "touch", "mouse", "pinch", "threeFingersSwipe", "fourFingersSwipe" };
+const int32_t RECT_LIST_SIZE = 2;
+const int32_t CALLBACK_POS_IN_THREE_PARAMS = 2;
+const int32_t TWO_PARAMS_IN_TOTAL = 2;
+const int32_t THREE_PARAMS_IN_TOTAL = 3;
 } // namespace
 
 static napi_value JsOnApi9(napi_env env, napi_callback_info info)
@@ -57,32 +61,29 @@ static napi_value JsOnApi9(napi_env env, napi_callback_info info)
         MMI_HILOGE("AddEnv failed");
         return nullptr;
     }
-    if (argc == 2) {
+    if (argc == TWO_PARAMS_IN_TOTAL) {
         CHKRP(napi_typeof(env, argv[1], &valueType), TYPEOF);
         if (valueType != napi_function) {
-            MMI_HILOGE("Second Parameter type error");
             THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Second Parameter type error");
             return nullptr;
         }
         JsInputMonMgr.AddMonitor(env, typeName, nullptr, 0, argv[1]);
-    }else if (argc == 3 && strcmp(typeName, "mouse") == 0) {
-        Rect hotRectAreaList[2];
+    } else if (argc == THREE_PARAMS_IN_TOTAL && strcmp(typeName, "mouse") == 0) {
+        Rect hotRectAreaList[RECT_LIST_SIZE];
         uint32_t rectArrayLength = 0;
         CHKRP(napi_get_array_length(env, argv[1], &rectArrayLength), GET_ARRAY_LENGTH);
-        if (rectArrayLength <= 0 || rectArrayLength > 2) {
-            MMI_HILOGE("Hot Rect Area Parameter error");
+        if (rectArrayLength <= 0 || rectArrayLength > RECT_LIST_SIZE) {
             THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Hot Rect Area Parameter error");
             return nullptr;
         }
         JsInputMonMgr.GetHotRectAreaList(env, argv[1], rectArrayLength, hotRectAreaList);
-        CHKRP(napi_typeof(env, argv[2], &valueType), TYPEOF);
+        CHKRP(napi_typeof(env, argv[CALLBACK_POS_IN_THREE_PARAMS], &valueType), TYPEOF);
         if (valueType != napi_function) {
-            MMI_HILOGE("Third Parameter type error");
             THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Third Parameter type error");
             return nullptr;
         }
-        JsInputMonMgr.AddMonitor(env, typeName, hotRectAreaList, rectArrayLength, argv[2]);    
-    }else {
+        JsInputMonMgr.AddMonitor(env, typeName, hotRectAreaList, rectArrayLength, argv[CALLBACK_POS_IN_THREE_PARAMS]);
+    } else {
         MMI_HILOGE("Wrong number of parameters");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong number of parameters");
         return nullptr;

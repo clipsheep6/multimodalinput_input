@@ -74,7 +74,8 @@ private:
 class JsInputMonitor final {
 public:
     static void JsCallback(uv_work_t *work, int32_t status);
-    JsInputMonitor(napi_env jsEnv, const std::string &typeName, Rect hotRectArea[], int32_t rectTotal, napi_value callback, int32_t id);
+    JsInputMonitor(napi_env jsEnv, const std::string &typeName, Rect hotRectArea[],
+        int32_t rectTotal, napi_value callback, int32_t id);
     ~JsInputMonitor();
 
     int32_t Start();
@@ -87,6 +88,7 @@ public:
     void CheckConsumed(bool retValue, std::shared_ptr<PointerEvent> pointerEvent);
     void OnPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
     std::string GetTypeName() const;
+    bool IsLocaledWithinRect(napi_env env, napi_value napiPointer, uint32_t rectTotal, Rect* hotRectArea);
 private:
     void SetCallback(napi_value callback);
     MapFun GetInputEventFunc(const std::shared_ptr<InputEvent> inputEvent);

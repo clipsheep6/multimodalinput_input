@@ -36,7 +36,8 @@ JsInputMonitorManager& JsInputMonitorManager::GetInstance()
     return instance;
 }
 
-void JsInputMonitorManager::AddMonitor(napi_env jsEnv, const std::string &typeName, Rect hotRectArea[], int32_t rectTotal, napi_value callback)
+void JsInputMonitorManager::AddMonitor(napi_env jsEnv, const std::string &typeName,
+    Rect hotRectArea[], int32_t rectTotal, napi_value callback)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -251,7 +252,8 @@ void JsInputMonitorManager::ThrowError(napi_env env, int32_t code)
     }
 }
 
-void JsInputMonitorManager::GetHotRectAreaList(napi_env env, napi_value rectNapiValue, uint32_t rectListLength, Rect* hotRectAreaListPtr)
+void JsInputMonitorManager::GetHotRectAreaList(napi_env env, napi_value rectNapiValue,
+    uint32_t rectListLength, Rect* hotRectAreaListPtr)
 {
     CALL_DEBUG_ENTER;
     for (uint32_t i = 0; i < rectListLength; i++) {
@@ -299,7 +301,7 @@ void JsInputMonitorManager::GetHotRectAreaList(napi_env env, napi_value rectNapi
         rectItem.height = rectHeight;
         *(hotRectAreaListPtr + i) = rectItem;
     }
-    return;  
+    return;
 }
 } // namespace MMI
 } // namespace OHOS

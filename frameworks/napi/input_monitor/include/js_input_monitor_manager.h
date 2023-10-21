@@ -35,7 +35,8 @@ public:
     DISALLOW_COPY_AND_MOVE(JsInputMonitorManager);
     ~JsInputMonitorManager() = default;
 
-    void AddMonitor(napi_env jsEnv, const std::string &typeName, Rect hotRectArea[], int32_t rectTotal, napi_value callback);
+    void AddMonitor(napi_env jsEnv, const std::string &typeName,
+        Rect hotRectArea[], int32_t rectTotal, napi_value callback);
 
     void RemoveMonitor(napi_env jsEnv, const std::string &typeName, napi_value callback);
 
