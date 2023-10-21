@@ -50,6 +50,7 @@ public:
     void SetId(int32_t id);
     void SetHotRectArea(Rect hotRectArea[]);
     Rect GetHotRectArea(int32_t index);
+    Rect* GetHotRectAreas();
     void SetRectTotal(uint32_t rectTotal);
     uint32_t GetRectTotal();
     void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override;

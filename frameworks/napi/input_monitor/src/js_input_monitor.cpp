@@ -176,6 +176,11 @@ Rect InputMonitor::GetHotRectArea(int32_t index)
     return hotRectArea_[index];
 }
 
+Rect* InputMonitor::GetHotRectAreas()
+{
+    return hotRectArea_;
+}
+
 void InputMonitor::SetRectTotal(uint32_t rectTotal)
 {
     rectTotal_ = rectTotal;
@@ -990,42 +995,10 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
         }
         napi_value result = nullptr;
 
-        if (monitor_->GetRectTotal() == 0) {
+        if (monitor_->GetRectTotal() == 0
+			|| IsLocaledWithinRect(jsEnv_, napiPointer, monitor_->GetRectTotal(), monitor_->GetHotRectAreas())) {
             CHECK_SCOPE_BEFORE_BREAK(jsEnv_, napi_call_function(jsEnv_, nullptr, callback, 1, &napiPointer, &result),
             	CALL_FUNCTION, scope, pointerEvent);      
-        }else {
-            napi_value xProperty;
-            CHKRV(napi_get_named_property(jsEnv_, napiPointer, "screenX", &xProperty), GET_NAMED_PROPERTY);
-            if (xProperty == nullptr) {
-                MMI_HILOGE("xProperty == nullptr, return");
-                return;
-            }
-            int32_t xInt { 0 };
-            CHKRV(napi_get_value_int32(jsEnv_, xProperty, &xInt), GET_VALUE_INT32);
-
-            napi_value yProperty;
-            CHKRV(napi_get_named_property(jsEnv_, napiPointer, "screenY", &yProperty), GET_NAMED_PROPERTY);
-            if (yProperty == nullptr) {
-                MMI_HILOGE("yProperty == nullptr, return");
-                return;
-            }
-            int32_t yInt { 0 };
-            CHKRV(napi_get_value_int32(jsEnv_, yProperty, &yInt), GET_VALUE_INT32);
-            MMI_HILOGE("x pos : %{public}d : %{public}d", xInt, yInt);
-
-            for (uint32_t i = 0; i < monitor_->GetRectTotal(); i++) {
-                int32_t hotAreaX = monitor_->GetHotRectArea(i).x;
-                int32_t hotAreaY = monitor_->GetHotRectArea(i).y;
-                int32_t hotAreaWidth = monitor_->GetHotRectArea(i).width;
-                int32_t hotAreaHeight = monitor_->GetHotRectArea(i).height;
-                MMI_HILOGE("hotAreaX : %{public}d, hotAreaY : %{public}d, hotAreaWidth : %{public}d, hotAreaHeight : %{public}d,", 
-                monitor_->GetHotRectArea(i).x, monitor_->GetHotRectArea(i).y, monitor_->GetHotRectArea(i).width, monitor_->GetHotRectArea(i).height);
-
-                if ((xInt >= hotAreaX) && (xInt <= hotAreaX + hotAreaWidth) && (yInt >= hotAreaY) && (yInt <= hotAreaY + hotAreaHeight)) {
-                    CHECK_SCOPE_BEFORE_BREAK(jsEnv_, napi_call_function(jsEnv_, nullptr, callback, 1, &napiPointer, &result),
-            			CALL_FUNCTION, scope, pointerEvent);        
-                }                
-            } 
         }
         
         bool typeNameFlag = typeName == "touch" || typeName == "pinch" || typeName == "threeFingersSwipe" ||
@@ -1038,6 +1011,39 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
         }
         napi_close_handle_scope(jsEnv_, scope);
     }
+}
+
+bool JsInputMonitor::IsLocaledWithinRect(napi_env env, napi_value napiPointer, uint32_t rectTotal, Rect* hotRectArea)
+{
+    napi_value xProperty;
+    CHKRF(napi_get_named_property(env, napiPointer, "screenX", &xProperty), GET_NAMED_PROPERTY);
+    if (xProperty == nullptr) {
+        MMI_HILOGE("xProperty == nullptr, return");
+        return false;
+    }
+    int32_t xInt { 0 };
+    CHKRF(napi_get_value_int32(env, xProperty, &xInt), GET_VALUE_INT32);
+
+    napi_value yProperty;
+    CHKRF(napi_get_named_property(env, napiPointer, "screenY", &yProperty), GET_NAMED_PROPERTY);
+    if (yProperty == nullptr) {
+        MMI_HILOGE("yProperty == nullptr, return");
+        return false;
+    }
+    int32_t yInt { 0 };
+    CHKRF(napi_get_value_int32(env, yProperty, &yInt), GET_VALUE_INT32);
+
+    for (int i = 0; i < rectTotal; i++) {
+        int32_t hotAreaX = (hotRectArea + i)->x;
+        int32_t hotAreaY = (hotRectArea + i)->y;
+        int32_t hotAreaWidth = (hotRectArea + i)->width;
+        int32_t hotAreaHeight = (hotRectArea + i)->height;
+                
+        if ((xInt >= hotAreaX) && (xInt <= hotAreaX + hotAreaWidth) && (yInt >= hotAreaY) && (yInt <= hotAreaY + hotAreaHeight)) {
+            return true; 
+        }                
+    }
+    return false; 
 }
 
 void JsInputMonitor::CheckConsumed(bool retValue, std::shared_ptr<PointerEvent> pointerEvent)

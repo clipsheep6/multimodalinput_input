@@ -259,47 +259,43 @@ void JsInputMonitorManager::GetHotRectAreaList(napi_env env, napi_value rectNapi
         CHKRV(napi_get_element(env, rectNapiValue, i, &napiElement), GET_ELEMENT);
         Rect rectItem;
         napi_value napiX = nullptr;
-        CHKRV(napi_get_named_property(env, napiElement, "x", &napiX), GET_NAMED_PROPERTY);
+        CHKRV(napi_get_named_property(env, napiElement, "left", &napiX), GET_NAMED_PROPERTY);
         if (napiX == nullptr) {
-            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "x not found");
+            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "left not found");
             return;
         }
         int32_t rectX = -1;
         CHKRV(napi_get_value_int32(env, napiX, &rectX), GET_VALUE_INT32);
-        MMI_HILOGE("RectX %{public}d", rectX);
         rectItem.x = rectX;
 
         napi_value napiY = nullptr;
-        CHKRV(napi_get_named_property(env, napiElement, "y", &napiY), GET_NAMED_PROPERTY);
+        CHKRV(napi_get_named_property(env, napiElement, "top", &napiY), GET_NAMED_PROPERTY);
         if (napiY == nullptr) {
-            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "y not found");
+            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "top not found");
             return;
         }
         int32_t rectY = -1;
         CHKRV(napi_get_value_int32(env, napiY, &rectY), GET_VALUE_INT32);
-        MMI_HILOGE("RectY %{public}d", rectY);
         rectItem.y = rectY;
 
         napi_value napiWidth = nullptr;
-        CHKRV(napi_get_named_property(env, napiElement, "w", &napiWidth), GET_NAMED_PROPERTY);
+        CHKRV(napi_get_named_property(env, napiElement, "width", &napiWidth), GET_NAMED_PROPERTY);
         if (napiWidth == nullptr) {
             THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "width not found");
             return;
         }
         int32_t rectWidth = -1;
         CHKRV(napi_get_value_int32(env, napiWidth, &rectWidth), GET_VALUE_INT32);
-        MMI_HILOGE("RectWidth %{public}d", rectWidth);
         rectItem.width = rectWidth;
 
         napi_value napiHeight = nullptr;
-        CHKRV(napi_get_named_property(env, napiElement, "h", &napiHeight), GET_NAMED_PROPERTY);
+        CHKRV(napi_get_named_property(env, napiElement, "height", &napiHeight), GET_NAMED_PROPERTY);
         if (napiHeight == nullptr) {
             THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "height not found");
             return;
         }
         int32_t rectHeight = -1;
         CHKRV(napi_get_value_int32(env, napiHeight, &rectHeight), GET_VALUE_INT32);
-        MMI_HILOGE("RectHeight %{public}d", rectHeight);
         rectItem.height = rectHeight;
         *(hotRectAreaListPtr + i) = rectItem;
     }

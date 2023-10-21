@@ -69,7 +69,6 @@ static napi_value JsOnApi9(napi_env env, napi_callback_info info)
         Rect hotRectAreaList[2];
         uint32_t rectArrayLength = 0;
         CHKRP(napi_get_array_length(env, argv[1], &rectArrayLength), GET_ARRAY_LENGTH);
-        MMI_HILOGE("rectArrayLength %{public}d", rectArrayLength);
         if (rectArrayLength <= 0 || rectArrayLength > 2) {
             MMI_HILOGE("Hot Rect Area Parameter error");
             THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Hot Rect Area Parameter error");
