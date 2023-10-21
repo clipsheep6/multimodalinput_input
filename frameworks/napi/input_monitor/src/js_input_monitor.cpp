@@ -232,7 +232,7 @@ JsInputMonitor::JsInputMonitor(napi_env jsEnv, const std::string &typeName, Rect
     monitor_->SetId(monitorId_);
     if (rectTotal != 0) {
         monitor_->SetHotRectArea(rectParam);
-        monitor_->SetRectTotal(rectTotal);            
+        monitor_->SetRectTotal(rectTotal);
     }
 }
 
@@ -245,7 +245,7 @@ void JsInputMonitor::SetCallback(napi_value callback)
             THROWERR(jsEnv_, "napi_create_reference is failed");
             return;
         }
-    } 
+    }
 }
 
 void JsInputMonitor::MarkConsumed(int32_t eventId)
