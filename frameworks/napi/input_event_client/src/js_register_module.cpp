@@ -308,28 +308,23 @@ static void HandleTouchPropertyInt32(napi_env env, napi_value touchHandle,
     napi_value touchProperty = HandleTouchProperty(env, touchHandle);
     CHKPV(touchProperty);
     int32_t screenX;
-    ret = GetNamedPropertyInt32(env, touchProperty, "screenX", screenX);
-    if (ret != RET_OK) {
+    if (GetNamedPropertyInt32(env, touchProperty, "screenX", screenX) != RET_OK) {
         MMI_HILOGE("Get screenX failed");
     }
     int32_t screenY;
-    ret = GetNamedPropertyInt32(env, touchProperty, "screenY", screenY);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Get screenY failed");
+    if (GetNamedPropertyInt32(env, touchProperty, "screenY", screenY) != RET_OK) {
+        MMI_HILOGE("Get screenX failed");
     }
     int64_t pressedTime;
-    ret = GetNamedPropertyInt64(env, touchProperty, "pressedTime", pressedTime);
-    if (ret != RET_OK) {
+    if (GetNamedPropertyInt64(env, touchProperty, "pressedTime", pressedTime) != RET_OK) {
         MMI_HILOGE("Get pressed time failed");
     }
     int32_t toolType;
-    ret = GetNamedPropertyInt32(env, touchProperty, "toolType", toolType);
-    if (ret != RET_OK) {
+    if (GetNamedPropertyInt32(env, touchProperty, "toolType", toolType) != RET_OK) {
         MMI_HILOGE("Get toolType failed");
     }
     double pressure;
-    ret = GetNamedPropertyDouble(env, touchProperty, "pressure", pressure);
-    if (ret != RET_OK) {
+    if (GetNamedPropertyDouble(env, touchProperty, "pressure", pressure) != RET_OK) {
         MMI_HILOGE("Get pressure failed");
     }
     item.SetDisplayX(screenX);
