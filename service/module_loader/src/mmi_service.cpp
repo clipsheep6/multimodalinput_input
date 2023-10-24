@@ -372,6 +372,7 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
     int32_t serverFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
     int32_t pid = GetCallingPid();
     int32_t uid = GetCallingUid();
+    MMI_HILOGE("pingping GetCallingUid, uid %{public}d", uid);
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&UDSServer::AddSocketPairInfo, this, programName, moduleType,
         uid, pid, serverFd, std::ref(toReturnClientFd), tokenType));
     DfxHisysevent::ClientConnectData data = {
@@ -494,6 +495,17 @@ int32_t MMIService::SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSp
         return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
+int32_t MMIService::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, bool napStatus)
+{
+    CALL_DEBUG_ENTER;
+    NapStatusData napData;
+    napData.pid = pid;
+    napData.uid = uid;
+    napData.bundleName = bundleName;
+    napMap_.emplace(napData, napStatus);
     return RET_OK;
 }
 
@@ -702,6 +714,15 @@ int32_t MMIService::GetPointerSpeed(int32_t &speed)
         return RET_ERR;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
+int32_t MMIService::NotifyNapOnline()
+{
+    CALL_DEBUG_ENTER;
+    int32_t pid = GetCallingPid();
+    napClientPid_ = pid;
+    MMI_HILOGE("pingping,return %{public}d", pid);
     return RET_OK;
 }
 
@@ -987,6 +1008,30 @@ int32_t MMIService::CheckAddInput(int32_t pid, InputHandlerType handlerType, Han
 }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 
+int32_t MMIService::NotifyBundleName(NapStatusData data)
+{
+    CALL_DEBUG_ENTER;
+    if (napClientPid_ < 0) {
+        MMI_HILOGE("nap pid is unavailable!");
+        return RET_ERR;
+    }
+    MMI_HILOGE("pingping NotifyBundleName is : %{public}d, %{public}d, %{public}s", data.pid, data.uid, data.bundleName.c_str());
+    // auto session = GetSessionByPid(napClientPid_);
+    NetPacket pkt(MmiMessageId::NOTIFY_BUNDLE_NAME); 
+    pkt << data.pid;
+    pkt << data.uid;
+    pkt << data.bundleName;
+    int32_t fd = udsServer_->GetClientFd(napClientPid_);
+    auto udsServer = InputHandler->GetUDSServer();
+    CHKPR(udsServer, RET_ERR);
+    auto session = udsServer->GetSession(fd);
+    if (!udsServer->SendMsg(fd, pkt)) {
+        MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
     uint32_t deviceTags)
 {
@@ -999,6 +1044,16 @@ int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventTyp
         MMI_HILOGE("Add input handler failed, ret:%{public}d", ret);
         return RET_ERR;
     }
+    // add napinfo to map
+    NapStatusData napData;
+    napData.pid = GetCallingPid();
+    napData.uid = GetCallingUid();
+    auto sess = GetSessionByPid(pid);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    napData.bundleName = sess->GetProgramName();
+    MMI_HILOGE("pingping AddInputHandler is : %{public}d, %{public}d, %{public}s", napData.pid, napData.uid, napData.bundleName.c_str());
+    napMap_.emplace(napData, true);
+    NotifyBundleName(napData);
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
 }
@@ -1146,6 +1201,16 @@ int32_t MMIService::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr
         MMI_HILOGE("The subscribe key event processed failed, ret:%{public}d", ret);
         return RET_ERR;
     }
+    // add napinfo to map
+    NapStatusData napData;
+    napData.pid = GetCallingPid();
+    napData.uid = GetCallingUid();
+    auto sess = GetSessionByPid(pid);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    napData.bundleName = sess->GetProgramName();
+    MMI_HILOGE("pingping SubscribeKeyEvent is : %{public}d, %{public}d, %{public}s", napData.pid, napData.uid, napData.bundleName.c_str());
+    napMap_.emplace(napData, true);
+    NotifyBundleName(napData);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
 }
@@ -1216,6 +1281,25 @@ int32_t MMIService::GetDisplayBindInfo(DisplayBindInfos &infos)
         MMI_HILOGE("GetDisplayBindInfo pid failed, ret:%{public}d", ret);
         return RET_ERR;
     }
+    return RET_OK;
+}
+
+int32_t MMIService::GetAllNapStatusData(NapStatusDatas &datas)
+{
+    CALL_DEBUG_ENTER;
+    for (const auto& map : napMap_) {
+        datas.push_back({
+            .pid = map.first.pid,
+            .uid = map.first.uid,
+            .bundleName = map.first.bundleName,
+        });
+    }
+
+    for (const auto& vec : datas)
+    {
+        MMI_HILOGE("pingping, pid:%{public}d, uid:%{public}d, name:%{public}s", vec.pid, vec.uid, vec.bundleName.c_str());
+    }
+
     return RET_OK;
 }
 

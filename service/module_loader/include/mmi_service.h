@@ -58,6 +58,7 @@ public:
     int32_t SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap) override;
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) override;
     int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override;
+    int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, bool napSt) override;
     int32_t SetMousePrimaryButton(int32_t primaryButton) override;
     int32_t GetMousePrimaryButton(int32_t &primaryButton) override;
     int32_t SetHoverScrollState(bool state) override;
@@ -70,6 +71,7 @@ public:
     int32_t SetPointerSpeed(int32_t speed) override;
     int32_t GetPointerSpeed(int32_t &speed) override;
     int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle) override;
+    int32_t NotifyNapOnline() override;
     int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle) override;
     int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke) override;
     int32_t GetDeviceIds(std::vector<int32_t> &ids) override;
@@ -95,6 +97,7 @@ public:
     int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
     int32_t SetAnrObserver() override;
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos) override;
+    int32_t GetAllNapStatusData(NapStatusDatas &datas) override;
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg) override;
     int32_t GetFunctionKeyState(int32_t funcKey, bool &state) override;
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable) override;
@@ -190,6 +193,16 @@ protected:
     void RemoveAppDebugListener();
 
 private:
+    struct NapStatusData
+    {
+        int32_t pid;
+        int32_t uid;
+        std::string bundleName;
+        bool operator==(const NapStatusData b) const { return pid == b.pid && uid == b.uid && bundleName == b.bundleName; }
+        bool operator<(const NapStatusData b) const { return pid < b.pid ? true : false; }
+    };
+    std::map<NapStatusData, bool> napMap_;
+    int32_t NotifyBundleName(NapStatusData data);
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t mmiFd_ { -1 };
     std::mutex mu_;
@@ -197,12 +210,13 @@ private:
 #ifdef OHOS_RSS_CLIENT
     std::atomic<uint64_t> tid_ = 0;
 #endif
-
+    UDSServer* udsServer_ { nullptr };
     LibinputAdapter libinputAdapter_;
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;
     sptr<AppDebugListener> appDebugListener_;
 
+    int32_t napClientPid_ { -1 };
     std::atomic_bool threadStatusFlag_ { false };
 };
 } // namespace MMI
