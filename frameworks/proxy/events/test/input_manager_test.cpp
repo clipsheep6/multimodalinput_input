@@ -61,7 +61,7 @@ public:
     virtual int32_t CheckWindowId(int32_t windowId) const override;
 };
 
-class MMIEventObserver : public MMI::IEventObserver {
+class MMIEventObserver : public MMI::MMIEventObserver {
 public:
     void SyncBundleName(int32_t pid, int32_t uid, std::string bundleName) override;
 };
