@@ -1209,9 +1209,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                        "window:%{public}d, flags:%{public}d", item.id, item.flags);
             continue;
         }
-        bool checkToolType = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
+        bool checkToolType = (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
             ((pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId) ||
-            pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN);
+            pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN)) ||
+            (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP);
         if (checkToolType) {
             if (IsInHotArea(logicalX, logicalY, item.defaultHotAreas)) {
                 touchWindow = &item;
