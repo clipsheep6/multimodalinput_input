@@ -55,7 +55,7 @@ using NapStatusDatas = std::vector<NapStatusData>;
     int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, bool napState);
     int32_t NotifyNapOnline();
     int32_t GetAllNapStatusData(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas);
-
+    int32_t RemoveInputEventObserver();
 private:
     UDSServer* udsServer_ { nullptr };
     NapProcess() = default;

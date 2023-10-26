@@ -718,6 +718,13 @@ int32_t MMIService::NotifyNapOnline()
     return RET_OK;
 }
 
+int32_t MMIService::RemoveInputEventObserver()
+{
+    CALL_DEBUG_ENTER;
+    NapProcess::GetInstance()->RemoveInputEventObserver();
+    return RET_OK;
+}
+
 int32_t MMIService::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle)
 {
     CALL_DEBUG_ENTER;

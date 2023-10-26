@@ -85,6 +85,13 @@ int32_t NapProcess::NotifyNapOnline()
     return RET_OK;
 }
 
+int32_t NapProcess::RemoveInputEventObserver()
+{
+    CALL_DEBUG_ENTER;
+    napMap_.clear();
+    return RET_OK;
+}
+
 int32_t NapProcess::GetAllNapStatusData(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas)
 {
     CALL_DEBUG_ENTER;

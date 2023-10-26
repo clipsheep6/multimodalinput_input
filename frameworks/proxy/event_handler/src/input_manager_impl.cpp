@@ -199,7 +199,7 @@ int32_t InputManagerImpl::AddInputEventFilter(std::shared_ptr<IInputEventFilter>
     return filterId;
 }
 
-int32_t InputManagerImpl::AddInputEventObserver(std::shared_ptr<IEventObserver> observer)
+int32_t InputManagerImpl::AddInputEventObserver(std::shared_ptr<MMIEventObserver> observer)
 {
     CALL_DEBUG_ENTER;
     CALL_INFO_TRACE;
@@ -208,6 +208,16 @@ int32_t InputManagerImpl::AddInputEventObserver(std::shared_ptr<IEventObserver> 
     eventObserver_ = observer;
     NotifyNapOnline();
     return RET_OK;
+}
+
+int32_t InputManagerImpl::RemoveInputEventObserver(std::shared_ptr<MMIEventObserver> observer)
+{
+    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(mtx_);
+    eventObserver_ = nullptr;
+    int32_t ret = MultimodalInputConnMgr->RemoveInputEventObserver();
+    return ret;
 }
 
 int32_t InputManagerImpl::NotifyNapOnline()
