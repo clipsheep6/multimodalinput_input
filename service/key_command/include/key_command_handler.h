@@ -94,12 +94,15 @@ struct TwoFingerGesture {
 
 struct KnuckleGesture {
     std::shared_ptr<PointerEvent> lastPointerDownEvent { nullptr };
-    size_t size { 0 };
-    int32_t state { 0 };
     int64_t lastPointerUpTime { 0 };
     int64_t downToPrevUpTime { 0 };
-    int32_t timerId { -1 };
+    float doubleClickDistance { 0.0 };
     Ability ability;
+    struct {
+        int32_t id { 0 };
+        int32_t x { 0 };
+        int32_t y { 0 };
+    } lastDownPointer;
 };
 
 class KeyCommandHandler final : public IInputEventHandler {
@@ -173,11 +176,14 @@ private:
     void HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandleKnuckleGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandleKnuckleGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
-    void KnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
     void SingleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent);
     void DoubleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent);
     void ReportKnuckleDoubleClickEvent(const std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
     void ReportKnuckleScreenCapture(const std::shared_ptr<PointerEvent> touchEvent);
+    void KnuckleGestureProcessor(const std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
+    void UpdateKnuckleGestureInfo(const std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
+    void AdjustTimeIntervalConfigIfNeed(int64_t intervalTime);
+    void AdjustDistanceConfigIfNeed(float distance);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 private:
@@ -195,6 +201,12 @@ private:
     KnuckleGesture singleKnuckleGesture_;
     KnuckleGesture doubleKnuckleGesture_;
     bool isKnuckleState_ { false };
+    bool isTimeConfig_ { false };
+    bool isDistanceConfig_ { false };
+    int32_t checkAdjustIntervalTimeCount_ { 0 };
+    int32_t checkAdjustDistanceCount_ { 0 };
+    int64_t downToPrevUpTimeConfig_ { 0 };
+    float downToPrevDownDistanceConfig_ { 0.0 };
 };
 } // namespace MMI
 } // namespace OHOS
