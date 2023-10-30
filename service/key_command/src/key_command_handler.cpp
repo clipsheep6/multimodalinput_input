@@ -650,7 +650,8 @@ bool IsParseKnuckleGesture(const JsonParser &parser, const std::string ability, 
     return true;
 }
 
-float absDiff(KnuckleGesture knuckleGesture, const std::shared_ptr<PointerEvent> pointerEvent) {
+float AbsDiff(KnuckleGesture knuckleGesture, const std::shared_ptr<PointerEvent> pointerEvent)
+{
     CHKPR(pointerEvent, -1);
     auto id = pointerEvent->GetPointerId();
     PointerEvent::PointerItem item;
@@ -659,7 +660,8 @@ float absDiff(KnuckleGesture knuckleGesture, const std::shared_ptr<PointerEvent>
         pow(knuckleGesture.lastDownPointer.y  - item.GetDisplayY(), POW_SQUARE));
 }
 
-bool isEqual(float f1, float f2) {
+bool IsEqual(float f1, float f2)
+{
     return (std::fabs(f1 - f2) <= std::numeric_limits<double>::epsilon());
 }
 } // namespace
@@ -918,7 +920,7 @@ void KeyCommandHandler::KnuckleGestureProcessor(const std::shared_ptr<PointerEve
     }
     int64_t intervalTime = touchEvent->GetActionTime() - knuckleGesture.lastPointerUpTime;
     bool isTimeIntervalReady = intervalTime > 0 && intervalTime <= downToPrevUpTimeConfig_;
-    float downToPrevDownDistance = absDiff(knuckleGesture, touchEvent);
+    float downToPrevDownDistance = AbsDiff(knuckleGesture, touchEvent);
     bool isDistanceReady = downToPrevDownDistance < downToPrevDownDistanceConfig_;
     knuckleGesture.downToPrevUpTime = intervalTime;
     knuckleGesture.doubleClickDistance = downToPrevDownDistance;
@@ -983,12 +985,12 @@ void KeyCommandHandler::AdjustDistanceConfigIfNeed(float distance)
     CALL_DEBUG_ENTER;
     float newDistanceConfig;
     MMI_HILOGI("down to prev down distance: %{public}f", distance);
-    if (isEqual(downToPrevDownDistanceConfig_, DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG)) {
+    if (IsEqual(downToPrevDownDistanceConfig_, DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG)) {
         if (distance < DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG || distance > DOUBLE_CLICK_DISTANCE_LONG_CONFIG) {
             return;
         }
         newDistanceConfig = DOUBLE_CLICK_DISTANCE_LONG_CONFIG;
-    } else if (isEqual(downToPrevDownDistanceConfig_, DOUBLE_CLICK_DISTANCE_LONG_CONFIG)) {
+    } else if (IsEqual(downToPrevDownDistanceConfig_, DOUBLE_CLICK_DISTANCE_LONG_CONFIG)) {
         if (distance > DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG) {
             return;
         }
