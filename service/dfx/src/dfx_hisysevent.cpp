@@ -546,7 +546,7 @@ void DfxHisysevent::ReportFailIfInvalidTime(const std::shared_ptr<PointerEvent> 
         knuckleFailCount = "DKF_T_I";
         invalidTimeFailCount = "DK_F_T";
     } else {
-        MMI_HILOGE("HiviewDFX Report knuckle state error, knuckle size: %{public}zu.",size);
+        MMI_HILOGE("HiviewDFX Report knuckle state error, knuckle size: %{public}zu.", size);
         return;
     }
     int32_t ret = HiSysEventWrite(
