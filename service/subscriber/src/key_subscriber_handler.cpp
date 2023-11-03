@@ -31,6 +31,9 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeySubscriberHandler" };
 constexpr uint32_t MAX_PRE_KEY_COUNT = 4;
+constexpr int32_t REMOVE_OBSERVER = -2;
+constexpr int32_t UNOBSERVED = -1;
+constexpr int32_t ACTIVE_EVENT = 2;
 const std::string HIGH_PRIORITY_BUNDLE = "com.ohos.sceneboard";
 } // namespace
 
@@ -366,6 +369,19 @@ bool KeySubscriberHandler::HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEve
             MMI_HILOGE("Leave, add timer failed");
         }
     }
+    if (NapProcess::GetInstance()->GetNapClientPid() != REMOVE_OBSERVER &&
+        NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
+        for (const auto &subscriber : subscribers_) {
+            OHOS::MMI::NapProcess::NapStatusData napData;
+            auto sess = subscriber->sess_;
+            CHKPR(sess, handled);
+            napData.pid = sess->GetPid();
+            napData.uid = sess->GetUid();
+            napData.bundleName = sess->GetPid();
+            napData.syncStatus = ACTIVE_EVENT;
+            NapProcess::GetInstance()->NotifyBundleName(napData);
+        }
+    }
     MMI_HILOGD("%{public}s", handled ? "true" : "false");
     return handled;
 }
@@ -419,6 +435,19 @@ bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
         MMI_HILOGD("upTime - downTime < duration");
         HandleKeyUpWithDelay(keyEvent, subscriber);
         handled = true;
+    }
+    if (NapProcess::GetInstance()->GetNapClientPid() != REMOVE_OBSERVER &&
+        NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
+        OHOS::MMI::NapProcess::NapStatusData napData;
+        for (const auto &subscriber : subscribers_) {
+            auto sess = subscriber->sess_;
+            CHKPR(sess, handled);
+            napData.pid = sess->GetPid();
+            napData.uid = sess->GetUid();
+            napData.bundleName = sess->GetPid();
+            napData.syncStatus = ACTIVE_EVENT;
+            NapProcess::GetInstance()->NotifyBundleName(napData);
+        }
     }
     MMI_HILOGD("%{public}s", handled ? "true" : "false");
     return handled;
