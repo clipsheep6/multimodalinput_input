@@ -18,11 +18,15 @@
 #include "input_manager_util.h"
 #include "multimodal_event_handler.h"
 #include "system_info.h"
+#include "input_manager.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputManagerTest"};
+constexpr int32_t TUPLE_PID = 0;
+constexpr int32_t TUPLE_UID = 1;
+constexpr int32_t TUPLE_NAME = 2;
 constexpr int32_t TIME_WAIT_FOR_OP = 100;
 constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
 constexpr int32_t SLEEP_MILLISECONDS = 1000;
@@ -51,6 +55,29 @@ public:
     static void SetUpTestCase();
     std::string GetEventDump();
 };
+
+class MMIWindowChecker : public MMI::IWindowChecker {
+public:
+    virtual int32_t CheckWindowId(int32_t windowId) const override;
+};
+
+class IEventObserver : public MMI::MMIEventObserver {
+public:
+    void SyncBundleName(int32_t pid, int32_t uid, std::string bundleName) override;
+};
+
+void IEventObserver::SyncBundleName(int32_t pid, int32_t uid, std::string bundleName)
+{
+    int32_t getPid = pid;
+    int32_t getUid = uid;
+    std::string getName = bundleName;
+    MMI_HILOGD("SyncBundleName info is : %{public}d, %{public}d, %{public}s", getPid, getUid, getName.c_str());
+}
+
+int32_t MMIWindowChecker::CheckWindowId(int32_t windowId) const
+{
+    return getpid();
+}
 
 void InputManagerTest::SetUpTestCase()
 {
@@ -989,6 +1016,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_EnterCaptureMode_001, TestSize.Level
 {
     CALL_TEST_DEBUG;
     auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    CHKPV(window);
     uint32_t windowId = window->GetWindowId();
     int32_t ret = InputManager::GetInstance()->EnterCaptureMode(windowId);
     ASSERT_TRUE(ret == RET_OK);
@@ -1007,6 +1035,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_LeaveCaptureMode_001, TestSize.Level
 {
     CALL_TEST_DEBUG;
     auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    CHKPV(window);
     uint32_t windowId = window->GetWindowId();
     int32_t ret = InputManager::GetInstance()->LeaveCaptureMode(windowId);
     ASSERT_TRUE(ret == RET_OK);
@@ -1025,6 +1054,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetWindowPid_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    CHKPV(window);
     uint32_t windowId = window->GetWindowId();
     ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetWindowPid(windowId));
     int32_t ret = InputManager::GetInstance()->GetWindowPid(windowId);
@@ -1058,6 +1088,404 @@ HWTEST_F(InputManagerTest, InputManagerTest_UnsubscribeSwitchEvent_001, TestSize
     CALL_TEST_DEBUG;
     int32_t subscriberId = INVAID_VALUE;
     ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UnsubscribeSwitchEvent(subscriberId));
+}
+
+/**
+ * @tc.name: InputManagerTest_ClearWindowPointerStyle_001
+ * @tc.desc: Verify invalid parameter.
+ * @tc.type: FUNC
+ * @tc.require:SR000GGQL4  AR000GJNGN
+ * @tc.author: yangguang
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_ClearWindowPointerStyle_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mmichecker = std::make_shared<MMIWindowChecker>();
+    InputManager::GetInstance()->SetWindowCheckerHandler(mmichecker);
+    auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    CHKPV(window);
+    uint32_t windowId = window->GetWindowId();
+    PointerStyle pointerStyle;
+    pointerStyle.id = MOUSE_ICON::CROSS;
+    int32_t ret = InputManager::GetInstance()->SetPointerStyle(windowId, pointerStyle);
+    InputManager::GetInstance()->ClearWindowPointerStyle(getpid(), windowId);
+    PointerStyle style;
+    ret = InputManager::GetInstance()->GetPointerStyle(windowId, style);
+    EXPECT_TRUE(ret == RET_OK);
+}
+
+HWTEST_F(InputManagerTest, InputManagerTest_SyncBundleName_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mmiObserver = std::make_shared<IEventObserver>();
+    InputManager::GetInstance()->AddInputEventObserver(mmiObserver);
+    auto callbackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callbackPtr != nullptr);
+    int32_t monitorId = InputManagerUtil::TestAddMonitor(callbackPtr);
+    InputManager::GetInstance()->SetNapStatus(10, 20, "bundleName_test", true);
+    std::vector<std::tuple<int32_t, int32_t, std::string>> vectorBefore;
+    InputManager::GetInstance()->GetAllMmiSubscribedEvents(vectorBefore);
+    for (const auto& vec : vectorBefore) {
+        if (std::get<TUPLE_PID>(vec) == 10) {
+            EXPECT_TRUE(std::get<TUPLE_UID>(vec) == 20);
+            EXPECT_TRUE(std::get<TUPLE_NAME>(vec) == "bundleName_test");
+        }
+    }
+    for (const auto& vec : vectorBefore) {
+        MMI_HILOGD("All NapStatus in vectorBefore pid:%{public}d, uid:%{public}d, name:%{public}s",
+            std::get<TUPLE_PID>(vec), std::get<TUPLE_UID>(vec), std::get<TUPLE_NAME>(vec).c_str());
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    InputManagerUtil::TestRemoveMonitor(monitorId);
+    InputManager::GetInstance()->SetNapStatus(10, 20, "bundleName_test", false);
+    std::vector<std::tuple<int32_t, int32_t, std::string>> vectorAfter;
+    InputManager::GetInstance()->GetAllMmiSubscribedEvents(vectorAfter);
+    for (const auto& vec : vectorAfter) {
+        if (std::get<TUPLE_PID>(vec) == 10) {
+            EXPECT_TRUE(std::get<TUPLE_UID>(vec) == 20);
+            EXPECT_TRUE(std::get<TUPLE_NAME>(vec) == "bundleName_test");
+        }
+    }
+    for (const auto& vec : vectorAfter) {
+        MMI_HILOGD("All NapStatus in vectorAfter pid:%{public}d, uid:%{public}d, name:%{public}s",
+            std::get<TUPLE_PID>(vec), std::get<TUPLE_UID>(vec), std::get<TUPLE_NAME>(vec).c_str());
+    }
+}
+
+/**
+ * @tc.name: InputManager_InjectMouseEvent_001
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR000GJG6G
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectMouseEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
+    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
+    ASSERT_NE(pointerEvent, nullptr);
+
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayX(200);
+    item.SetDisplayY(200);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_InjectMouseEvent_002
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR000GJG6G
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectMouseEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
+    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
+    ASSERT_NE(pointerEvent, nullptr);
+
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayX(200);
+    item.SetDisplayY(200);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_InjectMouseEvent_003
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR000GJG6G
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectMouseEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayX(200);
+    item.SetDisplayY(200);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_InjectMouseEvent_004
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR000GJG6G
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectMouseEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayX(200);
+    item.SetDisplayY(200);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_InjectMouseEvent_005
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR000GJG6G
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectMouseEvent_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
+    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
+
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayX(200);
+    item.SetDisplayY(200);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_InjectTouchEvent_001
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR000GJG6G
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectTouchEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayX(200);
+    item.SetDisplayY(200);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_InjectTouchEvent_002
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR000GJG6G
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectTouchEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayX(200);
+    item.SetDisplayY(200);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_InjectEvent_003
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR000GJG6G
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    ASSERT_NO_FATAL_FAILURE(keyEvent->SetRepeat(true));
+}
+
+/**
+ * @tc.name: InputManager_InjectEvent_001
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR000GJG6G
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+
+    KeyEvent::KeyItem item;
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    item.SetKeyCode(2017);
+    item.SetPressed(true);
+    item.SetDownTime(500);
+    keyEvent->AddKeyItem(item);
+    InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+}
+
+/**
+ * @tc.name: InputManager_InjectEvent_002
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR000GJG6G
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+    std::vector<int32_t> downKey;
+    downKey.push_back(2072);
+    downKey.push_back(2017);
+
+    KeyEvent::KeyItem item[downKey.size()];
+    for (size_t i = 0; i < downKey.size(); i++) {
+        keyEvent->SetKeyCode(2072);
+        keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+        item[i].SetKeyCode(downKey[i]);
+        item[i].SetPressed(true);
+        item[i].SetDownTime(0);
+        keyEvent->AddKeyItem(item[i]);
+    }
+    InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+}
+
+/**
+ * @tc.name: InputManagerTest_GetPointerColor_001
+ * @tc.desc: Obtains the mouse color.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetPointerColor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t setColor = 0x000000;
+    InputManager::GetInstance()->SetPointerColor(setColor);
+    int32_t getColor = 3;
+    ASSERT_TRUE(InputManager::GetInstance()->GetPointerColor(getColor) == RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_SimulateInputEventExt_001
+ * @tc.desc: Obtains the mouse color.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SimulateInputEventExt_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    PointerEvent::PointerItem item;
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_TWO);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_ONE);
+    item.SetPressure(POINTER_ITEM_PRESSURE);
+    item.SetPointerId(0);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->AddPointerItem(item);
+    
+#ifdef OHOS_BUILD_ENABLE_CONTAINER
+    InputManager::GetInstance()->SimulateInputEventExt(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEventExt(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEventExt(pointerEvent);
+#endif  // OHOS_BUILD_ENABLE_CONTAINER
+}
+
+/**
+ * @tc.name: InputManagerTest_SimulateInputEventExt_002
+ * @tc.desc: Obtains the mouse color.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SimulateInputEventExt_002, TestSize.Level1)
+{
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectDownEvent != nullptr);
+    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+
+#ifdef OHOS_BUILD_ENABLE_CONTAINER
+    InputManager::GetInstance()->SimulateInputEventExt(injectDownEvent);
+    ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_DOWN);
+#endif  // OHOS_BUILD_ENABLE_CONTAINER
+}
+
+/**
+ * @tc.name: InputManagerTest_SetShieldStatus_001
+ * @tc.desc: Test set shield status
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetShieldStatus_001, TestSize.Level1)
+{
+    bool factoryModeStatus = false;
+    bool oobeModeStatus = false;
+    int32_t ret = InputManager::GetInstance()->SetShieldStatus(SHIELD_MODE::FACTORY_MODE, true);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->GetShieldStatus(SHIELD_MODE::FACTORY_MODE, factoryModeStatus);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->GetShieldStatus(SHIELD_MODE::OOBE_MODE, oobeModeStatus);
+    ASSERT_EQ(ret, RET_OK);
+    ASSERT_TRUE(factoryModeStatus);
+    ASSERT_FALSE(oobeModeStatus);
+    ret = InputManager::GetInstance()->SetShieldStatus(SHIELD_MODE::OOBE_MODE, true);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->GetShieldStatus(SHIELD_MODE::FACTORY_MODE, factoryModeStatus);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->GetShieldStatus(SHIELD_MODE::OOBE_MODE, oobeModeStatus);
+    ASSERT_EQ(ret, RET_OK);
+    ASSERT_FALSE(factoryModeStatus);
+    ASSERT_TRUE(oobeModeStatus);
+    ret = InputManager::GetInstance()->SetShieldStatus(SHIELD_MODE::OOBE_MODE, false);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->GetShieldStatus(SHIELD_MODE::FACTORY_MODE, factoryModeStatus);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->GetShieldStatus(SHIELD_MODE::OOBE_MODE, oobeModeStatus);
+    ASSERT_EQ(ret, RET_OK);
+    ASSERT_FALSE(factoryModeStatus);
+    ASSERT_FALSE(oobeModeStatus);
 }
 }  // namespace MMI
 }  // namespace OHOS

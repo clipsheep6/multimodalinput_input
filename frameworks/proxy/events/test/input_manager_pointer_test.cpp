@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "define_multimodal.h"
 #include "event_util_test.h"
 #include "input_manager_util.h"
 #include "pixel_map.h"
@@ -66,12 +67,21 @@ public:
     void SetUp();
     void TearDown();
     static void SetUpTestCase();
+    static void TearDownTestCase();
     std::string GetEventDump();
 };
 
 void InputManagerPointerTest::SetUpTestCase()
 {
     ASSERT_TRUE(TestUtil->Init());
+}
+
+void InputManagerPointerTest::TearDownTestCase(void)
+{
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+    const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
+    ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
 }
 
 void InputManagerPointerTest::SetUp()
@@ -91,6 +101,70 @@ std::string InputManagerPointerTest::GetEventDump()
 }
 
 /**
+ * @tc.name: InputManagerPointerTest_MouseEventEnterAndLeave_001
+ * @tc.desc: Verify that the mouse moves away from the window
+ * @tc.type: FUNC
+ * @tc.require: I5HMF3 I5HMEF
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_MouseEventEnterAndLeave_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent{InputManagerUtil::SetupPointerEvent014()};
+    ASSERT_NE(pointerEvent, nullptr);
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    SimulateInputEventUtilTest(pointerEvent);
+#endif  // OHOS_BUILD_ENABLE_POINTER
+}
+
+/**
+ * @tc.name: InputManagerPointerTest_MouseEventEnterAndLeave_002
+ * @tc.desc: Verify return mouse away from the window
+ * @tc.type: FUNC
+ * @tc.require: I5HMF3 I5HMEF
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_MouseEventEnterAndLeave_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent{InputManagerUtil::SetupKeyEvent002()};
+    ASSERT_NE(keyEvent, nullptr);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    SimulateInputEventUtilTest(keyEvent);
+#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+}
+
+/**
+ * @tc.name: InputManagerPointerTest_MouseEventEnterAndLeave_003
+ * @tc.desc: Verify that the home button and mouse leave the window
+ * @tc.type: FUNC
+ * @tc.require: I5HMF3 I5HMEF
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_MouseEventEnterAndLeave_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent{InputManagerUtil::SetupKeyEvent003()};
+    ASSERT_NE(keyEvent, nullptr);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    SimulateInputEventUtilTest(keyEvent);
+#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+}
+
+/**
+ * @tc.name: InputManagerPointerTest_MouseEventEnterAndLeave_004
+ * @tc.desc: Verify that the mouse moves to the navigation bar to leave the window
+ * @tc.type: FUNC
+ * @tc.require: I5HMF3 I5HMEF
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_MouseEventEnterAndLeave_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent{InputManagerUtil::SetupPointerEvent015()};
+    ASSERT_NE(pointerEvent, nullptr);
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    SimulateInputEventUtilTest(pointerEvent);
+#endif  // OHOS_BUILD_ENABLE_POINTER
+}
+
+/**
  * @tc.name: InputManagerPointerTest_AddMonitor_001
  * @tc.desc: Verify pointerevent monitor
  * @tc.type: FUNC
@@ -106,6 +180,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_AddMonitor_001, TestSi
 #else
     ASSERT_EQ(monitorId, ERROR_UNSUPPORT);
 #endif  // OHOS_BUILD_ENABLE_MONITOR ||  OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
 }
 
 /**
@@ -124,6 +199,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_AddMonitor_002, TestSi
 #else
     ASSERT_EQ(monitorId, ERROR_UNSUPPORT);
 #endif  // OHOS_BUILD_ENABLE_KEYBOARD || OHOS_BUILD_ENABLE_MONITOR
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
 }
 
 /**
@@ -149,6 +225,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddScreenMonitor_001
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     InputManagerUtil::TestMonitor(monitorId, pointerEvent);
+    InputManagerUtil::TestRemoveMonitor(monitorId);
 }
 
 /**
@@ -193,6 +270,10 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddScreenMonitor_002
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
+
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
+        InputManagerUtil::TestRemoveMonitor(ids[i]);
+    }
 }
 
 /**
@@ -225,6 +306,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddScreenMonitor_003
         InputManagerUtil::TestRemoveMonitor(monitorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
+    InputManagerUtil::TestRemoveMonitor(monitorId);
 }
 
 /**
@@ -261,6 +343,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_0
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     InputManagerUtil::TestMonitor(monitorId, pointerEvent);
+    InputManagerUtil::TestRemoveMonitor(monitorId);
 }
 
 /**
@@ -297,6 +380,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_0
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     InputManagerUtil::TestMonitor(monitorId, pointerEvent);
+    InputManagerUtil::TestRemoveMonitor(monitorId);
 }
 
 /**
@@ -333,6 +417,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_0
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     InputManagerUtil::TestMonitor(monitorId, pointerEvent);
+    InputManagerUtil::TestRemoveMonitor(monitorId);
 }
 
 /**
@@ -388,6 +473,10 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_0
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
+
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
+        InputManagerUtil::TestRemoveMonitor(ids[i]);
+    }
 }
 
 /**
@@ -424,6 +513,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_0
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     InputManagerUtil::TestMonitor(monitorId, pointerEvent);
+    InputManagerUtil::TestRemoveMonitor(monitorId);
 }
 
 /**
@@ -447,6 +537,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_AddMouseMonitor_001, T
 
     auto pointerEvent = InputManagerUtil::SetupPointerEvent005();
     InputManagerUtil::TestMonitor(monitorId, pointerEvent);
+    InputManagerUtil::TestRemoveMonitor(monitorId);
 }
 
 /**
@@ -471,6 +562,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_AddMouseMonitor_003, T
     auto pointerEvent = InputManagerUtil::SetupPointerEvent007();
     ASSERT_TRUE(pointerEvent != nullptr);
     InputManagerUtil::TestMonitor(monitorId, pointerEvent);
+    InputManagerUtil::TestRemoveMonitor(monitorId);
 }
 
 /**
@@ -682,70 +774,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetWindowInputEventCon
 }
 
 /**
- * @tc.name: InputManagerPointerTest_MouseEventEnterAndLeave_001
- * @tc.desc: Verify that the mouse moves away from the window
- * @tc.type: FUNC
- * @tc.require: I5HMF3 I5HMEF
- */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_MouseEventEnterAndLeave_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<PointerEvent> pointerEvent{InputManagerUtil::SetupPointerEvent014()};
-    ASSERT_NE(pointerEvent, nullptr);
-#ifdef OHOS_BUILD_ENABLE_POINTER
-    SimulateInputEventUtilTest(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_POINTER
-}
-
-/**
- * @tc.name: InputManagerPointerTest_MouseEventEnterAndLeave_002
- * @tc.desc: Verify return mouse away from the window
- * @tc.type: FUNC
- * @tc.require: I5HMF3 I5HMEF
- */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_MouseEventEnterAndLeave_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<KeyEvent> keyEvent{InputManagerUtil::SetupKeyEvent002()};
-    ASSERT_NE(keyEvent, nullptr);
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    SimulateInputEventUtilTest(keyEvent);
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD
-}
-
-/**
- * @tc.name: InputManagerPointerTest_MouseEventEnterAndLeave_003
- * @tc.desc: Verify that the home button and mouse leave the window
- * @tc.type: FUNC
- * @tc.require: I5HMF3 I5HMEF
- */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_MouseEventEnterAndLeave_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<KeyEvent> keyEvent{InputManagerUtil::SetupKeyEvent003()};
-    ASSERT_NE(keyEvent, nullptr);
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    SimulateInputEventUtilTest(keyEvent);
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD
-}
-
-/**
- * @tc.name: InputManagerPointerTest_MouseEventEnterAndLeave_004
- * @tc.desc: Verify that the mouse moves to the navigation bar to leave the window
- * @tc.type: FUNC
- * @tc.require: I5HMF3 I5HMEF
- */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_MouseEventEnterAndLeave_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<PointerEvent> pointerEvent{InputManagerUtil::SetupPointerEvent015()};
-    ASSERT_NE(pointerEvent, nullptr);
-#ifdef OHOS_BUILD_ENABLE_POINTER
-    SimulateInputEventUtilTest(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_POINTER
-}
-
-/**
  * @tc.name: InputManagerPointerTest_MoveMouse_01
  * @tc.desc: Verify move mouse
  * @tc.type: FUNC
@@ -811,6 +839,20 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetPointerLocation_001
     int32_t x = 0;
     int32_t y = 0;
     ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->SetPointerLocation(x, y));
+}
+
+/**
+ * @tc.name: InputManagerPointerTest_SetPointerLocation_002
+ * @tc.desc: Sets the absolute coordinate of mouse.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetPointerLocation_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t x = 300;
+    int32_t y = 300;
+    ASSERT_TRUE(InputManager::GetInstance()->SetPointerLocation(x, y) == RET_OK);
 }
 
 /**
@@ -997,8 +1039,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetHoverScrollState_00
     CALL_TEST_DEBUG;
     ASSERT_TRUE(InputManager::GetInstance()->SetHoverScrollState(false) == RET_OK);
     InputManager::GetInstance()->SetHoverScrollState(true);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1011,8 +1051,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetHoverScrollState_00
 {
     CALL_TEST_DEBUG;
     ASSERT_TRUE(InputManager::GetInstance()->SetHoverScrollState(true) == RET_OK);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1029,8 +1067,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetHoverScrollState_00
         ASSERT_TRUE(InputManager::GetInstance()->GetHoverScrollState(state) == RET_OK);
         ASSERT_TRUE(state);
     }
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1046,8 +1082,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetMousePrimaryButton_
     ASSERT_TRUE(InputManager::GetInstance()->SetMousePrimaryButton(primaryButton) == RET_OK);
     primaryButton = 0;
     ASSERT_TRUE(InputManager::GetInstance()->SetMousePrimaryButton(primaryButton) == RET_OK);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1077,8 +1111,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetMousePrimaryButton_
         ASSERT_TRUE(InputManager::GetInstance()->GetMousePrimaryButton(primaryButton) == RET_OK);
         ASSERT_EQ(primaryButton, PrimaryButton::RIGHT_BUTTON);
     }
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1092,8 +1124,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetMouseScrollRows_001
     CALL_TEST_DEBUG;
     int32_t rows = 1;
     ASSERT_TRUE(InputManager::GetInstance()->SetMouseScrollRows(rows) == RET_OK);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1111,8 +1141,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetMouseScrollRows_001
         ASSERT_TRUE(InputManager::GetInstance()->GetMouseScrollRows(newRows) == RET_OK);
         ASSERT_EQ(rows, newRows);
     }
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1125,6 +1153,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetMouseIcon_001, Test
 {
     CALL_TEST_DEBUG;
     auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    CHKPV(window);
     uint32_t windowId = window->GetWindowId();
     const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
     PointerStyle pointerStyle;
@@ -1151,6 +1180,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetMouseIcon_002, Test
 {
     CALL_TEST_DEBUG;
     auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    CHKPV(window);
     uint32_t windowId = window->GetWindowId();
     const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/Zoom_Out.svg";
     PointerStyle pointerStyle;
@@ -1177,16 +1207,12 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetMouseIcon_003, Test
 {
     CALL_TEST_DEBUG;
     auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    CHKPV(window);
     uint32_t windowId = window->GetWindowId();
     PointerStyle pointerStyle;
     pointerStyle.id = MOUSE_ICON::DEFAULT;
     int32_t ret = InputManager::GetInstance()->SetPointerStyle(windowId, pointerStyle);
-    if ((Rosen::SceneBoardJudgement::IsSceneBoardEnabled())) {
-        ASSERT_TRUE(ret != RET_OK);
-        return;
-    } else {
-        ASSERT_TRUE(ret == RET_OK);
-    }
+    ASSERT_TRUE(ret == RET_OK);
     const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/Zoom_Out.svg";
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
     ASSERT_TRUE(pixelMap != nullptr);
@@ -1207,15 +1233,16 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetMouseHotSpot_001, T
 {
     CALL_TEST_DEBUG;
     auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    CHKPV(window);
     uint32_t windowId = window->GetWindowId();
     PointerStyle pointerStyle;
     pointerStyle.id = MOUSE_ICON::CROSS;
     if (InputManager::GetInstance()->SetPointerStyle(windowId, pointerStyle) == RET_OK) {
         ASSERT_TRUE(InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle) == RET_OK);
         ASSERT_EQ(pointerStyle.id, MOUSE_ICON::CROSS);
-        ASSERT_FALSE(
-            InputManager::GetInstance()->SetMouseHotSpot(windowId, MOUSE_ICON_HOT_SPOT, MOUSE_ICON_HOT_SPOT) == RET_OK);
     }
+    ASSERT_FALSE(
+        InputManager::GetInstance()->SetMouseHotSpot(windowId, MOUSE_ICON_HOT_SPOT, MOUSE_ICON_HOT_SPOT) == RET_OK);
 }
 
 /**
@@ -1228,6 +1255,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetMouseHotSpot_002, T
 {
     CALL_TEST_DEBUG;
     auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    CHKPV(window);
     uint32_t windowId = window->GetWindowId();
     const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/Default.svg";
     PointerStyle pointerStyle;
@@ -1239,10 +1267,9 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetMouseHotSpot_002, T
         ASSERT_EQ(pointerStyle.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
         ASSERT_TRUE(
             InputManager::GetInstance()->SetMouseHotSpot(windowId, MOUSE_ICON_HOT_SPOT, MOUSE_ICON_HOT_SPOT) == RET_OK);
-    } else if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-        ASSERT_FALSE(false);
     } else {
-        ASSERT_TRUE(false);
+        ASSERT_FALSE(
+            InputManager::GetInstance()->SetMouseHotSpot(windowId, MOUSE_ICON_HOT_SPOT, MOUSE_ICON_HOT_SPOT) == RET_OK);
     }
 }
 
@@ -1256,6 +1283,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetPointerStyle_001, T
 {
     CALL_TEST_DEBUG;
     auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    CHKPV(window);
     uint32_t windowId = window->GetWindowId();
     PointerStyle pointerStyle;
     pointerStyle.id = MOUSE_ICON::CROSS;
@@ -1294,8 +1322,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadScrollSwitc
     CALL_TEST_DEBUG;
     bool flag = false;
     ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadScrollSwitch(flag) == RET_OK);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1312,8 +1338,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadScrollSwitc
     bool newFlag = true;
     ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadScrollSwitch(newFlag) == RET_OK);
     ASSERT_TRUE(flag == newFlag);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1327,8 +1351,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadScrollDirec
     CALL_TEST_DEBUG;
     bool state = false;
     ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadScrollDirection(state) == RET_OK);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1345,8 +1367,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadScrollDirec
     bool newState = true;
     ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadScrollDirection(newState) == RET_OK);
     ASSERT_TRUE(state == newState);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1360,8 +1380,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadTapSwitch_0
     CALL_TEST_DEBUG;
     bool flag = false;
     ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadTapSwitch(flag) == RET_OK);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1378,8 +1396,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadTapSwitch_0
     bool newFlag = true;
     ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadTapSwitch(newFlag) == RET_OK);
     ASSERT_TRUE(flag == newFlag);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1393,8 +1409,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadPointerSpee
     CALL_TEST_DEBUG;
     int32_t speed = POINTER_SPEED_ONE;
     ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadPointerSpeed(speed) == RET_OK);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1411,8 +1425,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadPointerSpee
     int32_t newSpeed = POINTER_SPEED_THREE;
     ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadPointerSpeed(newSpeed) == RET_OK);
     ASSERT_TRUE(speed == newSpeed);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1426,8 +1438,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadPinchSwitch
     CALL_TEST_DEBUG;
     bool flag = false;
     ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadPinchSwitch(flag) == RET_OK);
-    const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
-    ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
 }
 
 /**
@@ -1444,8 +1454,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadPinchSwitch
     bool newFlag = true;
     ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadPinchSwitch(newFlag) == RET_OK);
     ASSERT_TRUE(flag == newFlag);
-    const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
-    ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
 }
 
 /**
@@ -1459,8 +1467,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadSwipeSwitch
     CALL_TEST_DEBUG;
     bool flag = false;
     ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadSwipeSwitch(flag) == RET_OK);
-    const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
-    ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
 }
 
 /**
@@ -1477,8 +1483,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadSwipeSwitch
     bool newFlag = true;
     ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadSwipeSwitch(newFlag) == RET_OK);
     ASSERT_TRUE(flag == newFlag);
-    const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
-    ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
 }
 
 /**
@@ -1492,8 +1496,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadRightClickT
     CALL_TEST_DEBUG;
     int32_t type = 1;
     ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadRightClickType(type) == RET_OK);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1510,8 +1512,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadRightClickT
     int32_t newType = 1;
     ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadRightClickType(newType) == RET_OK);
     ASSERT_TRUE(type == newType);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1527,8 +1527,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetPointerSize_001, Te
     ASSERT_TRUE(InputManager::GetInstance()->SetPointerSize(setSize) == RET_OK);
     setSize = 1;
     InputManager::GetInstance()->SetPointerSize(setSize);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1545,8 +1543,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetPointerSize_001, Te
     int32_t getSize = 3;
     ASSERT_TRUE(InputManager::GetInstance()->GetPointerSize(getSize) == RET_OK);
     ASSERT_TRUE(setSize == getSize);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1562,8 +1558,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetPointerColor_001, T
     ASSERT_TRUE(InputManager::GetInstance()->SetPointerColor(setColor) == RET_OK);
     setColor = 0x000000;
     InputManager::GetInstance()->SetPointerColor(setColor);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1580,8 +1574,86 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetPointerColor_001, T
     int32_t getColor = 3;
     ASSERT_TRUE(InputManager::GetInstance()->GetPointerColor(getColor) == RET_OK);
     ASSERT_TRUE(setColor == getColor);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerPointerTest_SetCustomCursor_001
+ * @tc.desc: Set the mouse custom cursor
+ * @tc.type: FUNC
+ * @tc.require: I530XS
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetCustomCursor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    CHKPV(window);
+    uint32_t windowId = window->GetWindowId();
+    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    PointerStyle pointerStyle;
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
+    ASSERT_NE(pixelMap, nullptr);
+    pointerStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    if (InputManager::GetInstance()->SetCustomCursor(windowId, (void *)pixelMap.get(), 32, 32) == RET_OK) {
+        ASSERT_TRUE(InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle) == RET_OK);
+        ASSERT_EQ(pointerStyle.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
+    } else if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        ASSERT_FALSE(false);  // errors occur
+    } else {
+        ASSERT_TRUE(false);
+    }
+}
+
+/**
+ * @tc.name: InputManagerPointerTest_SetCustomCursor_002
+ * @tc.desc: Set the mouse custom cursor
+ * @tc.type: FUNC
+ * @tc.require: I530XS
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetCustomCursor_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    CHKPV(window);
+    uint32_t windowId = window->GetWindowId();
+    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/Zoom_Out.svg";
+    PointerStyle pointerStyle;
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
+    ASSERT_NE(pixelMap, nullptr);
+    pointerStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    if (InputManager::GetInstance()->SetCustomCursor(windowId, (void *)pixelMap.get(), 64, 64) == RET_OK) {
+        ASSERT_TRUE(InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle) == RET_OK);
+        ASSERT_EQ(pointerStyle.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
+    } else if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        ASSERT_FALSE(false);  // errors occur
+    } else {
+        ASSERT_TRUE(false);
+    }
+}
+
+/**
+ * @tc.name: InputManagerPointerTest_SetCustomCursor_003
+ * @tc.desc: Set the mouse custom cursor
+ * @tc.type: FUNC
+ * @tc.require: I530XS
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetCustomCursor_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    CHKPV(window);
+    uint32_t windowId = window->GetWindowId();
+    PointerStyle pointerStyle;
+    pointerStyle.id = MOUSE_ICON::DEFAULT;
+    int32_t ret = InputManager::GetInstance()->SetPointerStyle(windowId, pointerStyle);
+    ASSERT_TRUE(ret == RET_OK);
+    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/Zoom_Out.svg";
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
+    ASSERT_TRUE(pixelMap != nullptr);
+    pointerStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    ret = InputManager::GetInstance()->SetCustomCursor(INVAID_VALUE, (void *)pixelMap.get(), 0, 0);
+    ASSERT_EQ(ret, RET_ERR);
+    ASSERT_TRUE(InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle) == RET_OK);
+    ASSERT_EQ(pointerStyle.id, MOUSE_ICON::DEFAULT);
 }
 }  // namespace MMI
 }  // namespace OHOS

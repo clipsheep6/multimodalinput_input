@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,6 +27,12 @@ constexpr int32_t INPUT_PARAMETER_MIDDLE = 2;
 std::mutex mutex_;
 const std::string ADD_EVENT = "add";
 const std::string REMOVE_EVENT = "remove";
+
+struct DeviceItem {
+    int32_t deviceId;
+    void *item;
+};
+
 } // namespace
 
 JsEventTarget::JsEventTarget()
@@ -47,46 +53,46 @@ void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
         MMI_HILOGE("Check data is nullptr");
         return;
     }
-    auto temp = static_cast<std::unique_ptr<JsUtil::CallbackInfo> *>(work->data);
+    auto temp = static_cast<DeviceItem*>(work->data);
+    auto workItem = static_cast<std::unique_ptr<JsUtil::CallbackInfo> *>(temp->item);
     JsUtil::DeletePtr<uv_work_t *>(work);
     auto addEvent = devListener_.find(CHANGED_TYPE);
     if (addEvent == devListener_.end()) {
         MMI_HILOGE("Find change event failed");
         return;
     }
-
     for (const auto &item : addEvent->second) {
         CHKPC(item->env);
-        if (item->ref != (*temp)->ref) {
+        if (item->ref != (*workItem)->ref) {
             continue;
         }
         napi_handle_scope scope = nullptr;
         napi_open_handle_scope(item->env, &scope);
         if (scope == nullptr) {
             MMI_HILOGE("scope is nullptr");
+            delete temp;
             return;
         }
         napi_value eventType = nullptr;
-        CHKRV_SCOPE(item->env, napi_create_string_utf8(item->env, ADD_EVENT.c_str(), NAPI_AUTO_LENGTH, &eventType),
-            CREATE_STRING_UTF8, scope);
+        CHKRV_SCOPE_DEL(item->env, napi_create_string_utf8(item->env, ADD_EVENT.c_str(), NAPI_AUTO_LENGTH, &eventType),
+            CREATE_STRING_UTF8, scope, temp);
         napi_value object = nullptr;
-        CHKRV_SCOPE(item->env, napi_create_object(item->env, &object), CREATE_OBJECT, scope);
-        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "type", eventType), SET_NAMED_PROPERTY,
-            scope);
+        CHKRV_SCOPE_DEL(item->env, napi_create_object(item->env, &object), CREATE_OBJECT, scope, temp);
+        CHKRV_SCOPE_DEL(item->env, napi_set_named_property(item->env, object, "type", eventType), SET_NAMED_PROPERTY,
+            scope, temp);
         napi_value handler = nullptr;
-        CHKRV_SCOPE(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE_VALUE, scope);
-        for (const auto &devId : item->data.deviceIds) {
-            napi_value deviceId = nullptr;
-            CHKRV_SCOPE(item->env, napi_create_int32(item->env, devId, &deviceId), CREATE_INT32, scope);
-            CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "deviceId", deviceId), SET_NAMED_PROPERTY,
-                scope);
-            napi_value ret = nullptr;
-            CHKRV_SCOPE(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret), CALL_FUNCTION,
-                scope);
-        }
-        item->data.deviceIds.clear();
+        CHKRV_SCOPE_DEL(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE_VALUE,
+            scope, temp);
+        napi_value deviceId = nullptr;
+        CHKRV_SCOPE_DEL(item->env, napi_create_int32(item->env, temp->deviceId, &deviceId), CREATE_INT32, scope, temp);
+        CHKRV_SCOPE_DEL(item->env, napi_set_named_property(item->env, object, "deviceId", deviceId), SET_NAMED_PROPERTY,
+            scope, temp);
+        napi_value ret = nullptr;
+        CHKRV_SCOPE_DEL(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret), CALL_FUNCTION,
+            scope, temp);
         napi_close_handle_scope(item->env, scope);
     }
+    delete temp;
 }
 
 void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
@@ -99,49 +105,46 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
         MMI_HILOGE("Check data is nullptr");
         return;
     }
-    auto temp = static_cast<std::unique_ptr<JsUtil::CallbackInfo> *>(work->data);
+    auto temp = static_cast<DeviceItem*>(work->data);
+    auto workItem = static_cast<std::unique_ptr<JsUtil::CallbackInfo> *>(temp->item);
     JsUtil::DeletePtr<uv_work_t *>(work);
     auto removeEvent = devListener_.find(CHANGED_TYPE);
     if (removeEvent == devListener_.end()) {
         MMI_HILOGE("Find change event failed");
         return;
     }
-
     for (const auto &item : removeEvent->second) {
         CHKPC(item->env);
-        if (item->ref != (*temp)->ref) {
+        if (item->ref != (*workItem)->ref) {
             continue;
         }
         napi_handle_scope scope = nullptr;
         napi_open_handle_scope(item->env, &scope);
-        CHKPV(scope);
-        for (const auto &devId : item->data.deviceIds) {
-            napi_value eventType = nullptr;
-            CHKRV_SCOPE(item->env,
-                napi_create_string_utf8(item->env, REMOVE_EVENT.c_str(), NAPI_AUTO_LENGTH, &eventType),
-                CREATE_STRING_UTF8, scope);
-
-            napi_value deviceId = nullptr;
-            CHKRV_SCOPE(item->env, napi_create_int32(item->env, devId, &deviceId), CREATE_INT32, scope);
-
-            napi_value object = nullptr;
-            CHKRV_SCOPE(item->env, napi_create_object(item->env, &object), CREATE_OBJECT, scope);
-            CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "type", eventType), SET_NAMED_PROPERTY,
-                scope);
-            CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "deviceId", deviceId), SET_NAMED_PROPERTY,
-                scope);
-
-            napi_value handler = nullptr;
-            CHKRV_SCOPE(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE_VALUE,
-                scope);
-
-            napi_value ret = nullptr;
-            CHKRV_SCOPE(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret), CALL_FUNCTION,
-                scope);
+        if (scope == nullptr) {
+            MMI_HILOGE("scope is nullptr");
+            delete temp;
+            return;
         }
-        item->data.deviceIds.clear();
+        napi_value eventType = nullptr;
+        CHKRV_SCOPE_DEL(item->env, napi_create_string_utf8(item->env, REMOVE_EVENT.c_str(), NAPI_AUTO_LENGTH,
+            &eventType), CREATE_STRING_UTF8, scope, temp);
+        napi_value deviceId = nullptr;
+        CHKRV_SCOPE_DEL(item->env, napi_create_int32(item->env, temp->deviceId, &deviceId), CREATE_INT32, scope, temp);
+        napi_value object = nullptr;
+        CHKRV_SCOPE_DEL(item->env, napi_create_object(item->env, &object), CREATE_OBJECT, scope, temp);
+        CHKRV_SCOPE_DEL(item->env, napi_set_named_property(item->env, object, "type", eventType), SET_NAMED_PROPERTY,
+            scope, temp);
+        CHKRV_SCOPE_DEL(item->env, napi_set_named_property(item->env, object, "deviceId", deviceId), SET_NAMED_PROPERTY,
+            scope, temp);
+        napi_value handler = nullptr;
+        CHKRV_SCOPE_DEL(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE_VALUE,
+            scope, temp);
+        napi_value ret = nullptr;
+        CHKRV_SCOPE_DEL(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret), CALL_FUNCTION,
+            scope, temp);
         napi_close_handle_scope(item->env, scope);
     }
+    delete temp;
 }
 
 void JsEventTarget::OnDeviceAdded(int32_t deviceId, const std::string &type)
@@ -161,12 +164,15 @@ void JsEventTarget::OnDeviceAdded(int32_t deviceId, const std::string &type)
         CHKRV(napi_get_uv_event_loop(item->env, &loop), GET_UV_EVENT_LOOP);
         uv_work_t *work = new (std::nothrow) uv_work_t;
         CHKPV(work);
-        item->data.deviceIds.push_back(deviceId);
-        work->data = static_cast<void *>(&item);
-        int32_t ret = uv_queue_work(
-            loop, work, [](uv_work_t *work) {}, EmitAddedDeviceEvent);
+        item->data.deviceId = deviceId;
+        DeviceItem *deviceItem = new DeviceItem();
+        deviceItem->deviceId = deviceId;
+        deviceItem->item = static_cast<void *>(&item);
+        work->data = deviceItem;
+        int32_t ret = uv_queue_work_with_qos(
+            loop, work, [](uv_work_t *work) {}, EmitAddedDeviceEvent, uv_qos_user_initiated);
         if (ret != 0) {
-            MMI_HILOGE("uv_queue_work failed");
+            MMI_HILOGE("uv_queue_work_with_qos failed");
             JsUtil::DeletePtr<uv_work_t *>(work);
             return;
         }
@@ -189,12 +195,15 @@ void JsEventTarget::OnDeviceRemoved(int32_t deviceId, const std::string &type)
         CHKRV(napi_get_uv_event_loop(item->env, &loop), GET_UV_EVENT_LOOP);
         uv_work_t *work = new (std::nothrow) uv_work_t;
         CHKPV(work);
-        item->data.deviceIds.push_back(deviceId);
-        work->data = static_cast<void *>(&item);
-        int32_t ret = uv_queue_work(
-            loop, work, [](uv_work_t *work) {}, EmitRemoveDeviceEvent);
+        item->data.deviceId = deviceId;
+        DeviceItem *deviceItem = new DeviceItem();
+        deviceItem->deviceId = deviceId;
+        deviceItem->item = static_cast<void *>(&item);
+        work->data = deviceItem;
+        int32_t ret = uv_queue_work_with_qos(
+            loop, work, [](uv_work_t *work) {}, EmitRemoveDeviceEvent, uv_qos_user_initiated);
         if (ret != 0) {
-            MMI_HILOGE("uv_queue_work failed");
+            MMI_HILOGE("uv_queue_work_with_qos failed");
             JsUtil::DeletePtr<uv_work_t *>(work);
             return;
         }
@@ -288,23 +297,23 @@ void JsEventTarget::EmitJsIds(sptr<JsUtil::CallbackInfo> cb, std::vector<int32_t
     int32_t ret;
     if (cb->isApi9) {
         if (cb->ref == nullptr) {
-            ret = uv_queue_work(
-                loop, work, [](uv_work_t *work) {}, CallDevListPromiseWork);
+            ret = uv_queue_work_with_qos(
+                loop, work, [](uv_work_t *work) {}, CallDevListPromiseWork, uv_qos_user_initiated);
         } else {
-            ret = uv_queue_work(
-                loop, work, [](uv_work_t *work) {}, CallDevListAsyncWork);
+            ret = uv_queue_work_with_qos(
+                loop, work, [](uv_work_t *work) {}, CallDevListAsyncWork, uv_qos_user_initiated);
         }
     } else {
         if (cb->ref == nullptr) {
-            ret = uv_queue_work(
-                loop, work, [](uv_work_t *work) {}, CallIdsPromiseWork);
+            ret = uv_queue_work_with_qos(
+                loop, work, [](uv_work_t *work) {}, CallIdsPromiseWork, uv_qos_user_initiated);
         } else {
-            ret = uv_queue_work(
-                loop, work, [](uv_work_t *work) {}, CallIdsAsyncWork);
+            ret = uv_queue_work_with_qos(
+                loop, work, [](uv_work_t *work) {}, CallIdsAsyncWork, uv_qos_user_initiated);
         }
     }
     if (ret != 0) {
-        MMI_HILOGE("uv_queue_work failed");
+        MMI_HILOGE("uv_queue_work_with_qos failed");
         JsUtil::DeletePtr<uv_work_t *>(work);
     }
 }
@@ -386,23 +395,23 @@ void JsEventTarget::EmitJsDev(sptr<JsUtil::CallbackInfo> cb, std::shared_ptr<Inp
     int32_t ret;
     if (cb->isApi9) {
         if (cb->ref == nullptr) {
-            ret = uv_queue_work(
-                loop, work, [](uv_work_t *work) {}, CallDevInfoPromiseWork);
+            ret = uv_queue_work_with_qos(
+                loop, work, [](uv_work_t *work) {}, CallDevInfoPromiseWork, uv_qos_user_initiated);
         } else {
-            ret = uv_queue_work(
-                loop, work, [](uv_work_t *work) {}, CallDevInfoAsyncWork);
+            ret = uv_queue_work_with_qos(
+                loop, work, [](uv_work_t *work) {}, CallDevInfoAsyncWork, uv_qos_user_initiated);
         }
     } else {
         if (cb->ref == nullptr) {
-            ret = uv_queue_work(
-                loop, work, [](uv_work_t *work) {}, CallDevPromiseWork);
+            ret = uv_queue_work_with_qos(
+                loop, work, [](uv_work_t *work) {}, CallDevPromiseWork, uv_qos_user_initiated);
         } else {
-            ret = uv_queue_work(
-                loop, work, [](uv_work_t *work) {}, CallDevAsyncWork);
+            ret = uv_queue_work_with_qos(
+                loop, work, [](uv_work_t *work) {}, CallDevAsyncWork, uv_qos_user_initiated);
         }
     }
     if (ret != 0) {
-        MMI_HILOGE("uv_queue_work failed");
+        MMI_HILOGE("uv_queue_work_with_qos failed");
         JsUtil::DeletePtr<uv_work_t *>(work);
     }
 }
@@ -531,14 +540,14 @@ void JsEventTarget::EmitSupportKeys(sptr<JsUtil::CallbackInfo> cb, std::vector<b
     work->data = cb.GetRefPtr();
     int32_t ret;
     if (cb->ref == nullptr) {
-        ret = uv_queue_work(
-            loop, work, [](uv_work_t *work) {}, CallKeystrokeAbilityPromise);
+        ret = uv_queue_work_with_qos(
+            loop, work, [](uv_work_t *work) {}, CallKeystrokeAbilityPromise, uv_qos_user_initiated);
     } else {
-        ret = uv_queue_work(
-            loop, work, [](uv_work_t *work) {}, CallKeystrokeAbilityAsync);
+        ret = uv_queue_work_with_qos(
+            loop, work, [](uv_work_t *work) {}, CallKeystrokeAbilityAsync, uv_qos_user_initiated);
     }
     if (ret != 0) {
-        MMI_HILOGE("uv_queue_work failed");
+        MMI_HILOGE("uv_queue_work_with_qos failed");
         JsUtil::DeletePtr<uv_work_t *>(work);
     }
 }
@@ -559,14 +568,14 @@ void JsEventTarget::EmitJsKeyboardType(sptr<JsUtil::CallbackInfo> cb, int32_t ke
     work->data = cb.GetRefPtr();
     int32_t ret;
     if (cb->ref == nullptr) {
-        ret = uv_queue_work(
-            loop, work, [](uv_work_t *work) {}, CallKeyboardTypePromise);
+        ret = uv_queue_work_with_qos(
+            loop, work, [](uv_work_t *work) {}, CallKeyboardTypePromise, uv_qos_user_initiated);
     } else {
-        ret = uv_queue_work(
-            loop, work, [](uv_work_t *work) {}, CallKeyboardTypeAsync);
+        ret = uv_queue_work_with_qos(
+            loop, work, [](uv_work_t *work) {}, CallKeyboardTypeAsync, uv_qos_user_initiated);
     }
     if (ret != 0) {
-        MMI_HILOGE("uv_queue_work failed");
+        MMI_HILOGE("uv_queue_work_with_qos failed");
         JsUtil::DeletePtr<uv_work_t *>(work);
     }
 }
@@ -869,6 +878,34 @@ void JsEventTarget::CallDevInfoAsyncWork(uv_work_t *work, int32_t status)
     napi_close_handle_scope(cb->env, scope);
 }
 
+void JsEventTarget::EmitJsSetKeyboardRepeatDelay(sptr<JsUtil::CallbackInfo> cb, int32_t errCode)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(cb);
+    CHKPV(cb->env);
+    cb->data.keyboardRepeatDelay = 0;
+    cb->errCode = errCode;
+    uv_loop_s *loop = nullptr;
+    CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
+
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    CHKPV(work);
+    cb->IncStrongRef(nullptr);
+    work->data = cb.GetRefPtr();
+    int32_t ret;
+    if (cb->ref == nullptr) {
+        ret = uv_queue_work_with_qos(
+            loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatDelayPromise, uv_qos_user_initiated);
+    } else {
+        ret = uv_queue_work_with_qos(
+            loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatDelayAsync, uv_qos_user_initiated);
+    }
+    if (ret != 0) {
+        MMI_HILOGE("uv_queue_work_with_qos failed");
+        JsUtil::DeletePtr<uv_work_t *>(work);
+    }
+}
+
 void JsEventTarget::EmitJsKeyboardRepeatDelay(sptr<JsUtil::CallbackInfo> cb, int32_t delay)
 {
     CALL_DEBUG_ENTER;
@@ -885,14 +922,14 @@ void JsEventTarget::EmitJsKeyboardRepeatDelay(sptr<JsUtil::CallbackInfo> cb, int
     work->data = cb.GetRefPtr();
     int32_t ret;
     if (cb->ref == nullptr) {
-        ret = uv_queue_work(
-            loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatDelayPromise);
+        ret = uv_queue_work_with_qos(
+            loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatDelayPromise, uv_qos_user_initiated);
     } else {
-        ret = uv_queue_work(
-            loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatDelayAsync);
+        ret = uv_queue_work_with_qos(
+            loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatDelayAsync, uv_qos_user_initiated);
     }
     if (ret != 0) {
-        MMI_HILOGE("uv_queue_work failed");
+        MMI_HILOGE("uv_queue_work_with_qos failed");
         JsUtil::DeletePtr<uv_work_t *>(work);
     }
 }
@@ -996,6 +1033,34 @@ void JsEventTarget::CallKeyboardRepeatDelayPromise(uv_work_t *work, int32_t stat
     napi_close_handle_scope(cb->env, scope);
 }
 
+void JsEventTarget::EmitJsSetKeyboardRepeatRate(sptr<JsUtil::CallbackInfo> cb, int32_t errCode)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(cb);
+    CHKPV(cb->env);
+    cb->data.keyboardRepeatRate = 0;
+    cb->errCode = errCode;
+    uv_loop_s *loop = nullptr;
+    CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
+
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    CHKPV(work);
+    cb->IncStrongRef(nullptr);
+    work->data = cb.GetRefPtr();
+    int32_t ret;
+    if (cb->ref == nullptr) {
+        ret = uv_queue_work_with_qos(
+            loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatRatePromise, uv_qos_user_initiated);
+    } else {
+        ret = uv_queue_work_with_qos(
+            loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatRateAsync, uv_qos_user_initiated);
+    }
+    if (ret != 0) {
+        MMI_HILOGE("uv_queue_work_with_qos failed");
+        JsUtil::DeletePtr<uv_work_t *>(work);
+    }
+}
+
 void JsEventTarget::EmitJsKeyboardRepeatRate(sptr<JsUtil::CallbackInfo> cb, int32_t rate)
 {
     CALL_DEBUG_ENTER;
@@ -1012,14 +1077,14 @@ void JsEventTarget::EmitJsKeyboardRepeatRate(sptr<JsUtil::CallbackInfo> cb, int3
     work->data = cb.GetRefPtr();
     int32_t ret;
     if (cb->ref == nullptr) {
-        ret = uv_queue_work(
-            loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatRatePromise);
+        ret = uv_queue_work_with_qos(
+            loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatRatePromise, uv_qos_user_initiated);
     } else {
-        ret = uv_queue_work(
-            loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatRateAsync);
+        ret = uv_queue_work_with_qos(
+            loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatRateAsync, uv_qos_user_initiated);
     }
     if (ret != 0) {
-        MMI_HILOGE("uv_queue_work failed");
+        MMI_HILOGE("uv_queue_work_with_qos failed");
         JsUtil::DeletePtr<uv_work_t *>(work);
     }
 }

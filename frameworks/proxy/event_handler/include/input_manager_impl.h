@@ -24,6 +24,7 @@
 #include "net_packet.h"
 
 #include "window_info.h"
+#include "nap_process.h"
 #include "event_filter_service.h"
 #include "event_handler.h"
 #include "extra_data.h"
@@ -36,6 +37,8 @@
 #include "input_monitor_manager.h"
 #endif // OHOS_BUILD_ENABLE_MONITOR
 #include "i_anr_observer.h"
+#include "mmi_event_observer.h"
+#include "i_window_checker.h"
 #include "key_option.h"
 #include "pointer_event.h"
 #include "pointer_style.h"
@@ -50,9 +53,11 @@ public:
     DISALLOW_MOVE(InputManagerImpl);
 
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos);
+    int32_t GetAllMmiSubscribedEvents(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas);
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
     int32_t GetWindowPid(int32_t windowId);
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
+    void SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     void SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen);
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
@@ -65,9 +70,15 @@ public:
     void UnsubscribeSwitchEvent(int32_t subscriberId);
     int32_t AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority, uint32_t deviceTags);
     int32_t RemoveInputEventFilter(int32_t filterId);
-
+    int32_t AddInputEventObserver(std::shared_ptr<MMIEventObserver> observer);
+    int32_t RemoveInputEventObserver(std::shared_ptr<MMIEventObserver> observer);
+    int32_t NotifyNapOnline();
+    void NotifyBundleName(int32_t pid, int32_t uid, std::string bundleName);
     void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
         std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
+    void ClearWindowPointerStyle(int32_t pid, int32_t windowId);
+    void SetWindowCheckerHandler(std::shared_ptr<IWindowChecker> windowChecker);
+    int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, bool napStatus);
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
@@ -113,6 +124,7 @@ public:
     int32_t GetMouseScrollRows(int32_t &rows);
     int32_t SetPointerSize(int32_t size);
     int32_t GetPointerSize(int32_t &size);
+    int32_t SetCustomCursor(int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap);
     int32_t SetMouseIcon(int32_t windowId, void* pixelMap);
     int32_t SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, int32_t hotSpotY);
     int32_t SetMousePrimaryButton(int32_t primaryButton);
@@ -152,18 +164,21 @@ public:
     int32_t LeaveCaptureMode(int32_t windowId);
     bool GetFunctionKeyState(int32_t funcKey);
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
-    void SetPointerLocation(int32_t x, int32_t y);
+    int32_t SetPointerLocation(int32_t x, int32_t y);
     int32_t EnableInputDevice(bool enable);
     // 快捷键拉起Ability
     int32_t SetKeyDownDuration(const std::string &businessId, int32_t delay);
 
     EventHandlerPtr GetEventHandler() const;
     void AppendExtraData(const ExtraData& extraData);
+    int32_t SetShieldStatus(int32_t shieldMode, bool isShield);
+    int32_t GetShieldStatus(int32_t shieldMode, bool &isShield);
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
     int32_t PackDisplayInfo(NetPacket &pkt);
     void PrintDisplayInfo();
     void SendDisplayInfo();
+    void SendWindowAreaInfo(WindowArea area, int32_t pid, int32_t windowId);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     int32_t PackEnhanceConfig(NetPacket &pkt);
     void SendEnhanceConfig();
@@ -181,9 +196,10 @@ private:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 private:
     std::map<int32_t, std::tuple<sptr<IEventFilter>, int32_t, uint32_t>> eventFilterServices_;
+    std::shared_ptr<MMIEventObserver> eventObserver_ { nullptr };
     std::shared_ptr<IInputEventConsumer> consumer_ { nullptr };
     std::vector<std::shared_ptr<IAnrObserver>> anrObservers_;
-
+    std::shared_ptr<IWindowChecker> winChecker_ { nullptr };
     DisplayGroupInfo displayGroupInfo_ {};
     std::mutex mtx_;
     std::mutex handleMtx_;

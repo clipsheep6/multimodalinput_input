@@ -19,6 +19,7 @@
 #include <iostream>
 #include <list>
 
+#include <ui/rs_canvas_node.h>
 #include <ui/rs_surface_node.h>
 #include <transaction/rs_transaction.h>
 
@@ -46,7 +47,7 @@ public:
     DISALLOW_COPY_AND_MOVE(PointerDrawingManager);
     ~PointerDrawingManager() override = default;
     void DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
-        const MOUSE_ICON mouseStyle = MOUSE_ICON::DEFAULT) override;
+        const PointerStyle pointerStyle) override;
     void UpdateDisplayInfo(const DisplayInfo& displayInfo) override;
     void OnDisplayInfo(const DisplayGroupInfo& displayGroupInfo) override;
     void OnWindowInfo(const WinInfo &info) override;
@@ -57,18 +58,24 @@ public:
     void DeletePointerVisible(int32_t pid) override;
     int32_t SetPointerVisible(int32_t pid, bool visible) override;
     int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle) override;
+    int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) override;
     int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle) override;
     int32_t SetPointerSize(int32_t size) override;
     int32_t GetPointerSize() override;
-    void DrawPointerStyle() override;
+    void DrawPointerStyle(const PointerStyle& pointerStyle) override;
     bool IsPointerVisible() override;
-    void SetPointerLocation(int32_t pid, int32_t x, int32_t y) override;
+    void SetPointerLocation(int32_t x, int32_t y) override;
     void AdjustMouseFocus(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void SetMouseDisplayState(bool state) override;
     bool GetMouseDisplayState() const override;
-    int32_t SetMouseIcon(int32_t windowId, void* pixelMap) override;
-    int32_t SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override;
+    int32_t SetCustomCursor(void* pixelMap, int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY) override;
+    int32_t SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap) override;
+    int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override;
+    PointerStyle GetLastMouseStyle() override;
+    std::map<MOUSE_ICON, IconStyle> GetMouseIconPath() override;
 private:
+    void DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle);
+    void DrawRunningPointerAnimate(const MOUSE_ICON mouseStyle);
     void CreatePointerWindow(int32_t displayId, int32_t physicalX, int32_t physicalY);
     sptr<OHOS::Surface> GetLayer();
     sptr<OHOS::SurfaceBuffer> GetSurfaceBuffer(sptr<OHOS::Surface> layer) const;
@@ -76,12 +83,14 @@ private:
     void DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas, const MOUSE_ICON mouseStyle);
     void DrawManager();
     void FixCursorPosition(int32_t &physicalX, int32_t &physicalY);
-    std::unique_ptr<OHOS::Media::PixelMap> DecodeImageToPixelMap(const std::string &imagePath);
+    std::shared_ptr<OHOS::Media::PixelMap> DecodeImageToPixelMap(const std::string &imagePath);
     void UpdatePointerVisible();
     int32_t UpdateDefaultPointerStyle(int32_t pid, int32_t windowId, PointerStyle style);
     void CheckMouseIconPath();
     void InitStyle();
     int32_t InitLayer(const MOUSE_ICON mouseStyle);
+    int32_t SetPointerStylePreference(PointerStyle pointerStyle);
+    void UpdateMouseStyle();
 
 private:
     struct PidInfo {
@@ -101,11 +110,14 @@ private:
     std::map<MOUSE_ICON, IconStyle> mouseIcons_;
     std::list<PidInfo> pidInfos_;
     bool mouseDisplayState_ { false };
+    bool mouseIconUpdate_ { false };
     std::unique_ptr<OHOS::Media::PixelMap> userIcon_ { nullptr };
     uint64_t screenId_ { 0 };
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_;
+    std::shared_ptr<Rosen::RSCanvasNode> canvasNode_;
     int32_t userIconHotSpotX_ { 0 };
     int32_t userIconHotSpotY_ { 0 };
+    int32_t tempPointerColor_ { -1 };
 };
 } // namespace MMI
 } // namespace OHOS

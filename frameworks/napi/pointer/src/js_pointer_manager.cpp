@@ -139,7 +139,7 @@ void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
             }
         },
         asyncContext.GetRefPtr(), &asyncContext->work);
-    if (status != napi_ok || napi_queue_async_work(env, asyncContext->work) != napi_ok) {
+    if (status != napi_ok || napi_queue_async_work_with_qos(env, asyncContext->work, napi_qos_t::napi_qos_user_initiated) != napi_ok) {
         MMI_HILOGE("Create async work failed");
         asyncContext->DecStrongRef(nullptr);
     }
@@ -165,6 +165,18 @@ napi_value JsPointerManager::SetPointerVisible(napi_env env, bool visible, napi_
     return promise;
 }
 
+napi_value JsPointerManager::SetPointerVisibleSync(napi_env env, bool visible)
+{
+    CALL_DEBUG_ENTER;
+    InputManager::GetInstance()->SetPointerVisible(visible);
+    napi_value result = nullptr;
+    if (napi_get_undefined(env, &result) != napi_ok) {
+        MMI_HILOGE("Get undefined result is failed");
+        return nullptr;
+    }
+    return result;
+}
+
 napi_value JsPointerManager::IsPointerVisible(napi_env env, napi_value handle)
 {
     CALL_DEBUG_ENTER;
@@ -184,6 +196,15 @@ napi_value JsPointerManager::IsPointerVisible(napi_env env, napi_value handle)
     }
     AsyncCallbackWork(asyncContext);
     return promise;
+}
+
+napi_value JsPointerManager::IsPointerVisibleSync(napi_env env)
+{
+    CALL_DEBUG_ENTER;
+    bool visible = InputManager::GetInstance()->IsPointerVisible();
+    napi_value result = nullptr;
+    NAPI_CALL(env, napi_get_boolean(env, visible, &result));
+    return result;
 }
 
 napi_value JsPointerManager::SetPointerColor(napi_env env, int32_t color, napi_value handle)
@@ -291,6 +312,18 @@ napi_value JsPointerManager::SetPointerSpeed(napi_env env, int32_t pointerSpeed,
     return promise;
 }
 
+napi_value JsPointerManager::SetPointerSpeedSync(napi_env env, int32_t pointerSpeed)
+{
+    CALL_DEBUG_ENTER;
+    InputManager::GetInstance()->SetPointerSpeed(pointerSpeed);
+    napi_value result = nullptr;
+    if (napi_get_undefined(env, &result) != napi_ok) {
+        MMI_HILOGE("Get undefined result is failed");
+        return nullptr;
+    }
+    return result;
+}
+
 napi_value JsPointerManager::GetPointerSpeed(napi_env env, napi_value handle)
 {
     CALL_DEBUG_ENTER;
@@ -309,6 +342,16 @@ napi_value JsPointerManager::GetPointerSpeed(napi_env env, napi_value handle)
     }
     AsyncCallbackWork(asyncContext);
     return promise;
+}
+
+napi_value JsPointerManager::GetPointerSpeedSync(napi_env env)
+{
+    CALL_DEBUG_ENTER;
+    int32_t pointerSpeed = 0;
+    InputManager::GetInstance()->GetPointerSpeed(pointerSpeed);
+    napi_value result = nullptr;
+    NAPI_CALL(env, napi_create_int32(env, pointerSpeed, &result));
+    return result;
 }
 
 napi_value JsPointerManager::SetMouseScrollRows(napi_env env, int32_t rows, napi_value handle)
@@ -354,6 +397,27 @@ napi_value JsPointerManager::GetMouseScrollRows(napi_env env, napi_value handle)
     uint32_t initialRefCount = 1;
     if (handle != nullptr) {
         CHKRP(napi_create_reference(env, handle, initialRefCount, &asyncContext->callback), CREATE_REFERENCE);
+        if (napi_get_undefined(env, &promise) != napi_ok) {
+            CHKRP(napi_delete_reference(env, asyncContext->callback), DELETE_REFERENCE);
+            return nullptr;
+        }
+    } else {
+        CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+    }
+    AsyncCallbackWork(asyncContext);
+    return promise;
+}
+
+napi_value JsPointerManager::SetPointerLocation(napi_env env, int32_t x, int32_t y, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    CHKPP(asyncContext);
+    InputManager::GetInstance()->SetPointerLocation(x, y);
+    asyncContext->reserve << ReturnType::VOID;
+    napi_value promise = nullptr;
+    if (handle != nullptr) {
+        CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
         if (napi_get_undefined(env, &promise) != napi_ok) {
             CHKRP(napi_delete_reference(env, asyncContext->callback), DELETE_REFERENCE);
             return nullptr;
@@ -473,6 +537,20 @@ napi_value JsPointerManager::SetPointerStyle(napi_env env, int32_t windowid, int
     return promise;
 }
 
+napi_value JsPointerManager::SetPointerStyleSync(napi_env env, int32_t windowid, int32_t pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+    PointerStyle style;
+    style.id = pointerStyle;
+    InputManager::GetInstance()->SetPointerStyle(windowid, style);
+    napi_value result = nullptr;
+    if (napi_get_undefined(env, &result) != napi_ok) {
+        MMI_HILOGE("Get undefined result is failed");
+        return nullptr;
+    }
+    return result;
+}
+
 napi_value JsPointerManager::GetPointerStyle(napi_env env, int32_t windowid, napi_value handle)
 {
     CALL_DEBUG_ENTER;
@@ -490,6 +568,16 @@ napi_value JsPointerManager::GetPointerStyle(napi_env env, int32_t windowid, nap
     }
     AsyncCallbackWork(asyncContext);
     return promise;
+}
+
+napi_value JsPointerManager::GetPointerStyleSync(napi_env env, int32_t windowid)
+{
+    CALL_DEBUG_ENTER;
+    PointerStyle pointerStyle;
+    InputManager::GetInstance()->GetPointerStyle(windowid, pointerStyle);
+    napi_value result = nullptr;
+    NAPI_CALL(env, napi_create_int32(env, pointerStyle.id, &result));
+    return result;
 }
 
 napi_value JsPointerManager::EnterCaptureMode(napi_env env, int32_t windowId, napi_value handle)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,7 +23,9 @@
 #include <unordered_map>
 #endif
 
+#include "ability_manager_client.h"
 #include "anr_manager.h"
+#include "app_debug_listener.h"
 #include "dfx_hisysevent.h"
 #include "event_dump.h"
 #include "input_device_manager.h"
@@ -58,6 +60,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMISe
 const std::string DEF_INPUT_SEAT = "seat0";
 constexpr int32_t WATCHDOG_INTERVAL_TIME = 10000;
 constexpr int32_t WATCHDOG_DELAY_TIME = 15000;
+constexpr int32_t REMOVE_OBSERVER = -2;
 } // namespace
 
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(DelayedSingleton<MMIService>::GetInstance().get());
@@ -240,6 +243,8 @@ int32_t MMIService::Init()
     CheckDefine();
     MMI_HILOGD("WindowsManager Init");
     WinMgr->Init(*this);
+    MMI_HILOGD("NapProcess Init");
+    NapProcess::GetInstance()->Init(*this);
     MMI_HILOGD("ANRManager Init");
     ANRMgr->Init(*this);
     MMI_HILOGD("PointerDrawingManager Init");
@@ -299,7 +304,10 @@ void MMIService::OnStart()
     AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
     MMI_HILOGI("Add system ability listener success");
 #endif
-
+    AddAppDebugListener();
+#ifdef OHOS_BUILD_ENABLE_CONTAINER
+    InitContainer();
+#endif // OHOS_BUILD_ENABLE_CONTAINER
     TimerMgr->AddTimer(WATCHDOG_INTERVAL_TIME, -1, [this]() {
         MMI_HILOGD("Set thread status flag to true");
         threadStatusFlag_ = true;
@@ -329,6 +337,32 @@ void MMIService::OnStop()
     RemoveSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
     MMI_HILOGI("Remove system ability listener success");
 #endif
+    RemoveAppDebugListener();
+#ifdef OHOS_BUILD_ENABLE_CONTAINER
+    StopContainer();
+#endif // OHOS_BUILD_ENABLE_CONTAINER
+}
+
+void MMIService::AddAppDebugListener()
+{
+    CALL_DEBUG_ENTER;
+    appDebugListener_ = AppDebugListener::GetInstance();
+    auto errCode =
+        AAFwk::AbilityManagerClient::GetInstance()->RegisterAppDebugListener(appDebugListener_);
+    if (errCode != RET_OK) {
+        MMI_HILOGE("Call RegisterAppDebugListener failed, errCode: %{public}d", errCode);
+    }
+}
+
+void MMIService::RemoveAppDebugListener()
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(appDebugListener_);
+    auto errCode =
+        AAFwk::AbilityManagerClient::GetInstance()->UnregisterAppDebugListener(appDebugListener_);
+    if (errCode != RET_OK) {
+        MMI_HILOGE("Call UnregisterAppDebugListener failed, errCode: %{public}d", errCode);
+    }
 }
 
 int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd,
@@ -423,12 +457,26 @@ int32_t MMIService::SetMouseScrollRows(int32_t rows)
     return RET_OK;
 }
 
-int32_t MMIService::SetMouseIcon(int32_t windowId, void* pixelMap)
+int32_t MMIService::SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap)
+{
+    CALL_DEBUG_ENTER;
+#if defined OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(std::bind(&IPointerDrawingManager::SetCustomCursor,
+        IPointerDrawingManager::GetInstance(), pixelMap, pid, windowId, focusX, focusY)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set the custom cursor failed, ret: %{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
+int32_t MMIService::SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap)
 {
     CALL_DEBUG_ENTER;
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(std::bind(&IPointerDrawingManager::SetMouseIcon,
-        IPointerDrawingManager::GetInstance(), windowId, pixelMap)));
+        IPointerDrawingManager::GetInstance(), pid, windowId, pixelMap)));
     if (ret != RET_OK) {
         MMI_HILOGE("Set the mouse icon failed, return %{public}d", ret);
         return ret;
@@ -437,17 +485,24 @@ int32_t MMIService::SetMouseIcon(int32_t windowId, void* pixelMap)
     return RET_OK;
 }
 
-int32_t MMIService::SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, int32_t hotSpotY)
+int32_t MMIService::SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY)
 {
     CALL_DEBUG_ENTER;
 #if defined OHOS_BUILD_ENABLE_POINTER
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(std::bind(&IPointerDrawingManager::SetMouseHotSpot,
-        IPointerDrawingManager::GetInstance(), windowId, hotSpotX, hotSpotY)));
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetMouseHotSpot,
+        IPointerDrawingManager::GetInstance(), pid, windowId, hotSpotX, hotSpotY));
     if (ret != RET_OK) {
         MMI_HILOGE("Set the mouse hot spot failed, return %{public}d", ret);
         return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
+int32_t MMIService::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, bool napStatus)
+{
+    CALL_DEBUG_ENTER;
+    NapProcess::GetInstance()->SetNapStatus(pid, uid, bundleName, napStatus);
     return RET_OK;
 }
 
@@ -659,12 +714,40 @@ int32_t MMIService::GetPointerSpeed(int32_t &speed)
     return RET_OK;
 }
 
+int32_t MMIService::NotifyNapOnline()
+{
+    CALL_DEBUG_ENTER;
+    NapProcess::GetInstance()->NotifyNapOnline();
+    return RET_OK;
+}
+
+int32_t MMIService::RemoveInputEventObserver()
+{
+    CALL_DEBUG_ENTER;
+    NapProcess::GetInstance()->RemoveInputEventObserver();
+    return RET_OK;
+}
+
 int32_t MMIService::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetPointerStyle,
         IPointerDrawingManager::GetInstance(), GetCallingPid(), windowId, pointerStyle));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set pointer style failed,return %{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
+int32_t MMIService::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::ClearWindowPointerStyle,
+        IPointerDrawingManager::GetInstance(), pid, windowId));
     if (ret != RET_OK) {
         MMI_HILOGE("Set pointer style failed,return %{public}d", ret);
         return ret;
@@ -939,6 +1022,18 @@ int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventTyp
         MMI_HILOGE("Add input handler failed, ret:%{public}d", ret);
         return RET_ERR;
     }
+    if (NapProcess::GetInstance()->GetNapClientPid() != REMOVE_OBSERVER) {
+        OHOS::MMI::NapProcess::NapStatusData napData;
+        napData.pid = GetCallingPid();
+        napData.uid = GetCallingUid();
+        auto sess = GetSessionByPid(pid);
+        CHKPR(sess, ERROR_NULL_POINTER);
+        napData.bundleName = sess->GetProgramName();
+        MMI_HILOGD("AddInputHandler info to nap : pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
+            napData.pid, napData.uid, napData.bundleName.c_str());
+        NapProcess::GetInstance()->AddMmiSubscribedEventData(napData);
+        NapProcess::GetInstance()->NotifyBundleName(napData);
+    }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
 }
@@ -1010,7 +1105,12 @@ int32_t MMIService::InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckInjectKeyEvent, this, keyEvent));
+    int32_t ret;
+#ifdef OHOS_BUILD_ENABLE_CONTAINER
+    ret = InjectKeyEventExt(keyEvent);
+#else
+    ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckInjectKeyEvent, this, keyEvent));
+#endif // OHOS_BUILD_ENABLE_CONTAINER
     if (ret != RET_OK) {
         MMI_HILOGE("Inject key event failed, ret:%{public}d", ret);
         return RET_ERR;
@@ -1039,7 +1139,12 @@ int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> point
 {
     CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckInjectPointerEvent, this, pointerEvent));
+    int32_t ret;
+#ifdef OHOS_BUILD_ENABLE_CONTAINER
+    ret = InjectPointerEventExt(pointerEvent);
+#else
+    ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckInjectPointerEvent, this, pointerEvent));
+#endif // OHOS_BUILD_ENABLE_CONTAINER
     if (ret != RET_OK) {
         MMI_HILOGE("Inject pointer event failed, ret:%{public}d", ret);
         return RET_ERR;
@@ -1075,6 +1180,18 @@ int32_t MMIService::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr
     if (ret != RET_OK) {
         MMI_HILOGE("The subscribe key event processed failed, ret:%{public}d", ret);
         return RET_ERR;
+    }
+    if (NapProcess::GetInstance()->GetNapClientPid() != REMOVE_OBSERVER) {
+        OHOS::MMI::NapProcess::NapStatusData napData;
+        napData.pid = GetCallingPid();
+        napData.uid = GetCallingUid();
+        auto sess = GetSessionByPid(pid);
+        CHKPR(sess, ERROR_NULL_POINTER);
+        napData.bundleName = sess->GetProgramName();
+        MMI_HILOGD("AddInputHandler info to nap : pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
+            napData.pid, napData.uid, napData.bundleName.c_str());
+        NapProcess::GetInstance()->AddMmiSubscribedEventData(napData);
+        NapProcess::GetInstance()->NotifyBundleName(napData);
     }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
@@ -1146,6 +1263,13 @@ int32_t MMIService::GetDisplayBindInfo(DisplayBindInfos &infos)
         MMI_HILOGE("GetDisplayBindInfo pid failed, ret:%{public}d", ret);
         return RET_ERR;
     }
+    return RET_OK;
+}
+
+int32_t MMIService::GetAllMmiSubscribedEvents(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas)
+{
+    CALL_DEBUG_ENTER;
+    NapProcess::GetInstance()->GetAllMmiSubscribedEvents(datas);
     return RET_OK;
 }
 
@@ -1666,6 +1790,28 @@ int32_t MMIService::GetTouchpadRightClickType(int32_t &type)
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
+}
+
+int32_t MMIService::SetShieldStatus(int32_t shieldMode, bool isShield)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&ServerMsgHandler::SetShieldStatus, &sMsgHandler_, shieldMode, isShield));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set shield event interception state failed, return %{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MMIService::GetShieldStatus(int32_t shieldMode, bool &isShield)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&ServerMsgHandler::GetShieldStatus, &sMsgHandler_, shieldMode, std::ref(isShield)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to set shield event interception status, ret:%{public}d", ret);
+    }
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS

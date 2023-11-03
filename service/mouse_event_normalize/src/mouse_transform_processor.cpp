@@ -43,6 +43,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Mouse
 constexpr int32_t MIN_SPEED = 1;
 constexpr int32_t MAX_SPEED = 11;
 constexpr int32_t DEFAULT_SPEED = 5;
+constexpr int32_t DEFAULT_TOUCHPAD_SPEED = 9;
 constexpr int32_t DEFAULT_ROWS = 3;
 constexpr int32_t MIN_ROWS = 1;
 constexpr int32_t MAX_ROWS = 100;
@@ -58,11 +59,12 @@ double MouseTransformProcessor::absolutionX_ = -1.0;
 double MouseTransformProcessor::absolutionY_ = -1.0;
 int32_t MouseTransformProcessor::currentDisplayId_ = -1;
 int32_t MouseTransformProcessor::globalPointerSpeed_ = DEFAULT_SPEED;
-bool MouseTransformProcessor::isUserSetSpeedStatus_ = false;
 
 MouseTransformProcessor::MouseTransformProcessor(int32_t deviceId)
     : pointerEvent_(PointerEvent::Create()), deviceId_(deviceId)
-{}
+{
+    globalPointerSpeed_ = GetPointerSpeed();
+}
 
 std::shared_ptr<PointerEvent> MouseTransformProcessor::GetPointerEvent() const
 {
@@ -94,7 +96,7 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
             &absolutionY_, GetTouchpadSpeed());
     } else {
         ret = HandleMotionAccelerate(&offset, WinMgr->GetMouseIsCaptureMode(), &absolutionX_,
-            &absolutionY_, GetSpeed());
+            &absolutionY_, globalPointerSpeed_);
     }
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to handle motion correction");
@@ -103,7 +105,7 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
 #ifdef OHOS_BUILD_EMULATOR
     absolutionX_ = offset.dx;
     absolutionY_ = offset.dy;
-#endif
+#endif // OHOS_BUILD_EMULATOR
     WinMgr->UpdateAndAdjustMouseLocation(currentDisplayId_, absolutionX_, absolutionY_);
     pointerEvent_->SetTargetDisplayId(currentDisplayId_);
     MMI_HILOGD("Change coordinate: x:%{public}lf, y:%{public}lf, currentDisplayId_:%{public}d",
@@ -150,6 +152,11 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
 
     TransTouchpadRightButton(data, type, button);
 
+    if (button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_MIDDLE_BUTTON_CODE && 
+        type == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
+        button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE;
+    }
+
     auto ret = HandleButtonValueInner(data, button);
     if (ret != RET_OK) {
         MMI_HILOGE("The button value does not exist");
@@ -159,22 +166,14 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
     auto state = libinput_event_pointer_get_button_state(data);
     if (state == LIBINPUT_BUTTON_STATE_RELEASED) {
         MouseState->MouseBtnStateCounts(button, BUTTON_STATE_RELEASED);
-#ifndef OHOS_BUILD_EMULATOR
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
-#else
-        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-#endif
         int32_t buttonId = MouseState->LibinputChangeToPointer(button);
         pointerEvent_->DeleteReleaseButton(buttonId);
         isPressed_ = false;
         buttonId_ = PointerEvent::BUTTON_NONE;
     } else if (state == LIBINPUT_BUTTON_STATE_PRESSED) {
         MouseState->MouseBtnStateCounts(button, BUTTON_STATE_PRESSED);
-#ifndef OHOS_BUILD_EMULATOR
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
-#else
-        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-#endif
         int32_t buttonId = MouseState->LibinputChangeToPointer(button);
         pointerEvent_->SetButtonPressed(buttonId);
         isPressed_ = true;
@@ -360,10 +359,10 @@ int32_t MouseTransformProcessor::HandleAxisBeginEndInner(struct libinput_event *
     if (buttonId_ == PointerEvent::BUTTON_NONE && pointerEvent_->GetButtonId() != PointerEvent::BUTTON_NONE) {
         pointerEvent_->SetButtonId(PointerEvent::BUTTON_NONE);
     }
-    if (libinput_event_get_type(event) == LIBINPUT_EVENT_TOUCHPAD_DOWN) {
+    if (libinput_event_get_type(event) == LIBINPUT_EVENT_TOUCHPAD_DOWN && !isPressed_) {
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
         MMI_HILOGD("Axis begin");
-    } else if (libinput_event_get_type(event) == LIBINPUT_EVENT_TOUCHPAD_UP) {
+    } else if (libinput_event_get_type(event) == LIBINPUT_EVENT_TOUCHPAD_UP && !isPressed_) {
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
         MMI_HILOGD("Axis end");
     } else {
@@ -469,11 +468,9 @@ int32_t MouseTransformProcessor::Normalize(struct libinput_event *event)
         case LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD:
             result = HandleButtonInner(data, event);
             break;
-#ifndef OHOS_BUILD_EMULATOR
         case LIBINPUT_EVENT_POINTER_AXIS:
             result = HandleAxisInner(data);
             break;
-#endif
         case LIBINPUT_EVENT_TOUCHPAD_DOWN:
         case LIBINPUT_EVENT_TOUCHPAD_UP:
             result = HandleAxisBeginEndInner(event);
@@ -492,11 +489,24 @@ int32_t MouseTransformProcessor::Normalize(struct libinput_event *event)
         HandlePostInner(data, pointerItem);
     }
     WinMgr->UpdateTargetPointer(pointerEvent_);
-#ifdef OHOS_BUILD_EMULATOR
-    pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-#endif
     DumpInner();
     return result;
+}
+
+int32_t MouseTransformProcessor::NormalizeRotateEvent(struct libinput_event *event, int32_t type, double angle)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(event, ERROR_NULL_POINTER);
+    CHKPR(pointerEvent_, ERROR_NULL_POINTER);
+    auto data = libinput_event_get_pointer_event(event);
+    pointerEvent_->SetPointerAction(type);
+    pointerEvent_->ClearAxisValue();
+    pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_ROTATE, angle);
+    PointerEvent::PointerItem pointerItem;
+    HandlePostInner(data, pointerItem);
+    WinMgr->UpdateTargetPointer(pointerEvent_);
+    DumpInner();
+    return RET_OK;
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -600,9 +610,8 @@ int32_t MouseTransformProcessor::SetMousePrimaryButton(int32_t primaryButton)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Set mouse primary button:%{public}d", primaryButton);
-    std::string file = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
     std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(file, errno);
+        NativePreferences::PreferencesHelper::GetPreferences(mouseFileName, errno);
     if (pref == nullptr) {
         MMI_HILOGE("pref is nullptr,  errno: %{public}d", errno);
         return RET_ERR;
@@ -614,25 +623,22 @@ int32_t MouseTransformProcessor::SetMousePrimaryButton(int32_t primaryButton)
         MMI_HILOGE("flush sync is failed, ret:%{public}d", ret);
         return RET_ERR;
     }
-    NativePreferences::PreferencesHelper::
-        RemovePreferencesFromCache("/data/service/el1/public/multimodalinput/mouse_settings");
+    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(mouseFileName);
     return RET_OK;
 }
 
 int32_t MouseTransformProcessor::GetMousePrimaryButton()
 {
     CALL_DEBUG_ENTER;
-    std::string file = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
     std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(file, errno);
+        NativePreferences::PreferencesHelper::GetPreferences(mouseFileName, errno);
     if (pref == nullptr) {
         MMI_HILOGE("pref is nullptr,  errno: %{public}d", errno);
         return RET_ERR;
     }
     std::string name = "primaryButton";
     int32_t primaryButton = pref->GetInt(name, 0);
-    NativePreferences::PreferencesHelper::
-        RemovePreferencesFromCache("/data/service/el1/public/multimodalinput/mouse_settings");
+    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(mouseFileName);
     MMI_HILOGD("Set mouse primary button:%{public}d", primaryButton);
     return primaryButton;
 }
@@ -641,30 +647,57 @@ int32_t MouseTransformProcessor::SetPointerSpeed(int32_t speed)
 {
     CALL_DEBUG_ENTER;
     if (speed < MIN_SPEED) {
-        globalPointerSpeed_ = MIN_SPEED;
+        speed = MIN_SPEED;
     } else if (speed > MAX_SPEED) {
-        globalPointerSpeed_ = MAX_SPEED;
-    } else {
-        globalPointerSpeed_ = speed;
+        speed = MAX_SPEED;
     }
-    isUserSetSpeedStatus_ = true;
-    MMI_HILOGD("Set pointer speed:%{public}d", globalPointerSpeed_);
+    globalPointerSpeed_ = speed;
+    int32_t errCode = RET_OK;
+    std::shared_ptr<NativePreferences::Preferences> pref =
+        NativePreferences::PreferencesHelper::GetPreferences(mouseFileName, errCode);
+    if (pref == nullptr) {
+        MMI_HILOGE("pref is nullptr,  errCode: %{public}d", errCode);
+        return RET_ERR;
+    }
+    std::string name = "speed";
+    int32_t ret = pref->PutInt(name, speed);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Put speed is failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    ret = pref->FlushSync();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Flush sync is failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    MMI_HILOGD("Set pointer speed successfully, speed:%{public}d", speed);
+    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(mouseFileName);
     return RET_OK;
 }
 
 int32_t MouseTransformProcessor::GetPointerSpeed()
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("Get pointer speed:%{public}d", globalPointerSpeed_);
-    return globalPointerSpeed_;
+    int32_t errCode = RET_OK;
+    std::shared_ptr<NativePreferences::Preferences> pref =
+        NativePreferences::PreferencesHelper::GetPreferences(mouseFileName, errCode);
+    if (pref == nullptr) {
+        MMI_HILOGE("pref is nullptr,  errCode: %{public}d", errCode);
+        return RET_ERR;
+    }
+    std::string name = "speed";
+    int32_t speed = pref->GetInt(name, DEFAULT_SPEED);
+    MMI_HILOGD("Get pointer speed successfully, speed:%{public}d", speed);
+    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(mouseFileName);
+    return speed;
 }
 
 int32_t MouseTransformProcessor::GetTouchpadSpeed(void)
 {
-    int32_t speed = DEFAULT_SPEED;
+    int32_t speed = DEFAULT_TOUCHPAD_SPEED;
     if (GetTouchpadPointerSpeed(speed) != RET_OK) {
-        // if failed to get touchpad from database, return DEFAULT_SPEED
-        return DEFAULT_SPEED;
+        // if failed to get touchpad from database, return DEFAULT_TOUCHPAD_SPEED
+        return DEFAULT_TOUCHPAD_SPEED;
     }
 
     return speed;
@@ -698,7 +731,7 @@ int32_t MouseTransformProcessor::SetPointerLocation(int32_t x, int32_t y)
     WinMgr->UpdateAndAdjustMouseLocation(currentDisplayId_, absolutionX_, absolutionY_);
     int32_t physicalX = WinMgr->GetMouseInfo().physicalX;
     int32_t physicalY = WinMgr->GetMouseInfo().physicalY;
-    IPointerDrawingManager::GetInstance()->SetPointerLocation(getpid(), physicalX, physicalY);
+    IPointerDrawingManager::GetInstance()->SetPointerLocation(physicalX, physicalY);
     return RET_OK;
 }
 
@@ -822,24 +855,6 @@ void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_poi
     }
 }
 
-int32_t MouseTransformProcessor::GetSpeed() const
-{
-    if ((vendorConfigPointerSpeed_ == -1) || isUserSetSpeedStatus_) {
-        return globalPointerSpeed_;
-    }
-    return vendorConfigPointerSpeed_;
-}
-
-void MouseTransformProcessor::SetConfigPointerSpeed(int32_t speed)
-{
-    if (speed < MIN_SPEED) {
-        vendorConfigPointerSpeed_ = MIN_SPEED;
-    } else if (speed > MAX_SPEED) {
-        vendorConfigPointerSpeed_ = MAX_SPEED;
-    } else {
-        vendorConfigPointerSpeed_ = speed;
-    }
-}
 int32_t MouseTransformProcessor::SetTouchpadScrollSwitch(bool switchFlag)
 {
     std::string name = "scrollSwitch";
@@ -937,7 +952,7 @@ int32_t MouseTransformProcessor::GetTouchpadPointerSpeed(int32_t &speed)
     }
 
     if (speed == 0) {
-        speed = DEFAULT_SPEED;
+        speed = DEFAULT_TOUCHPAD_SPEED;
     }
 
     // if speed < MIN_SPEED | speed > MAX_SPEED, touchpad would be out of action

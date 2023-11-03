@@ -150,6 +150,10 @@ enum MOUSE_ICON {
     HORIZONTAL_TEXT_CURSOR = 39,
     CURSOR_CROSS = 40,
     CURSOR_CIRCLE = 41,
+    LOADING = 42,
+    RUNNING = 43,
+    RUNNING_LEFT = 44,
+    RUNNING_RIGHT = 45,
     DEVELOPER_DEFINED_ICON = -100,
 };
 
@@ -169,6 +173,7 @@ enum ICON_TYPE {
     ANGLE_SW = 6,
     ANGLE_NW = 7,
     ANGLE_CENTER = 8,
+    ANGLE_NW_RIGHT = 9,
 };
 
 enum PrimaryButton {
@@ -176,6 +181,11 @@ enum PrimaryButton {
     RIGHT_BUTTON = 1,
 };
 
+enum SHIELD_MODE {
+    UNSET_MODE = -1,
+    FACTORY_MODE = 0,
+    OOBE_MODE = 1,
+};
 struct IconStyle {
     int32_t alignmentWay { 0 };
     std::string iconPath;

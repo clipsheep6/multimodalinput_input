@@ -37,6 +37,11 @@ int32_t InputManager::GetDisplayBindInfo(DisplayBindInfos &infos)
     return InputMgrImpl.GetDisplayBindInfo(infos);
 }
 
+int32_t InputManager::GetAllMmiSubscribedEvents(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas)
+{
+    return InputMgrImpl.GetAllMmiSubscribedEvents(datas);
+}
+
 int32_t InputManager::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
 {
     return InputMgrImpl.SetDisplayBind(deviceId, displayId, msg);
@@ -61,6 +66,16 @@ int32_t InputManager::AddInputEventFilter(std::shared_ptr<IInputEventFilter> fil
 int32_t InputManager::RemoveInputEventFilter(int32_t filterId)
 {
     return InputMgrImpl.RemoveInputEventFilter(filterId);
+}
+
+int32_t InputManager::AddInputEventObserver(std::shared_ptr<MMIEventObserver> observer)
+{
+    return InputMgrImpl.AddInputEventObserver(observer);
+}
+
+int32_t InputManager::RemoveInputEventObserver(std::shared_ptr<MMIEventObserver> observer)
+{
+    return InputMgrImpl.RemoveInputEventObserver(observer);
 }
 
 void InputManager::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer)
@@ -149,11 +164,13 @@ void InputManager::RemoveInterceptor(int32_t interceptorId)
 
 void InputManager::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
     InputMgrImpl.SimulateInputEvent(keyEvent);
 }
 
 void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
     InputMgrImpl.SimulateInputEvent(pointerEvent);
 }
 
@@ -204,6 +221,11 @@ int32_t InputManager::SetMouseScrollRows(int32_t Rows)
 int32_t InputManager::GetMouseScrollRows(int32_t &Rows)
 {
     return InputMgrImpl.GetMouseScrollRows(Rows);
+}
+
+int32_t InputManager::SetCustomCursor(int32_t windowId, void* pixelMap, int32_t focusX, int32_t focusY)
+{
+    return InputMgrImpl.SetCustomCursor(windowId, focusX, focusY, pixelMap);
 }
 
 int32_t InputManager::SetMouseIcon(int32_t windowId, void* pixelMap)
@@ -307,9 +329,9 @@ int32_t InputManager::SetFunctionKeyState(int32_t funcKey, bool enable)
     return InputMgrImpl.SetFunctionKeyState(funcKey, enable);
 }
 
-void InputManager::SetPointerLocation(int32_t x, int32_t y)
+int32_t InputManager::SetPointerLocation(int32_t x, int32_t y)
 {
-    InputMgrImpl.SetPointerLocation(x, y);
+    return InputMgrImpl.SetPointerLocation(x, y);
 }
 
 int32_t InputManager::EnterCaptureMode(int32_t windowId)
@@ -430,6 +452,34 @@ int32_t InputManager::SetTouchpadRightClickType(int32_t type)
 int32_t InputManager::GetTouchpadRightClickType(int32_t &type)
 {
     return InputMgrImpl.GetTouchpadRightClickType(type);
+}
+void InputManager::SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId)
+{
+    InputMgrImpl.SetWindowPointerStyle(area, pid, windowId);
+}
+void InputManager::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
+{
+    InputMgrImpl.ClearWindowPointerStyle(pid, windowId);
+}
+void InputManager::SetWindowCheckerHandler(std::shared_ptr<IWindowChecker> windowChecker)
+{
+    CHKPV(windowChecker);
+    InputMgrImpl.SetWindowCheckerHandler(windowChecker);
+}
+
+void InputManager::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, bool napStatus)
+{
+    InputMgrImpl.SetNapStatus(pid, uid, bundleName, napStatus);
+}
+
+int32_t InputManager::SetShieldStatus(int32_t shieldMode, bool isShield)
+{
+    return InputMgrImpl.SetShieldStatus(shieldMode, isShield);
+}
+
+int32_t InputManager::GetShieldStatus(int32_t shieldMode, bool &isShield)
+{
+    return InputMgrImpl.GetShieldStatus(shieldMode, isShield);
 }
 } // namespace MMI
 } // namespace OHOS

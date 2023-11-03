@@ -36,7 +36,8 @@
     "rom": "5120KB",
     "ram": "5120KB",
     "hisysevent_config":[
-      "//foundation/multimodalinput/input/service/hisysevent.yaml"
+      "//foundation/multimodalinput/input/service/hisysevent.yaml",
+      "//foundation/multimodalinput/input/service/hisysevent_input_ue.yaml"
     ],
     "deps": {
       "components": [
@@ -62,7 +63,7 @@
         "hicollie",
         "init",
         "preferences",
-        "security_component",
+        "security_component_manager",
         "hilog",
         "common_event_service"
       ],
@@ -89,13 +90,6 @@
           "//foundation/multimodalinput/input/sa_profile:multimodalinput_sa_profile",
           "//foundation/multimodalinput/input:multimodalinput.rc",
           "//foundation/multimodalinput/input/patch:patch_packages",
-          "//third_party/eudev:libudev",
-          "//third_party/eudev:udevd",
-          "//third_party/eudev:udevadm",
-          "//third_party/eudev:udevd.rc",
-          "//third_party/eudev:udev_conf",
-          "//third_party/eudev:udev_touchscreen_rule",
-          "//third_party/eudev:udev_vk_rule",
           "//third_party/libevdev:libevdev",
           "//foundation/multimodalinput/input:uinput_inject",
           "//foundation/multimodalinput/input:mmi_uinput.rc",
@@ -111,7 +105,8 @@
               "proxy/include/input_manager.h",
               "event/include/key_event.h",
               "event/include/pointer_event.h",
-              "event/include/input_event.h"
+              "event/include/input_event.h",
+              "event/include/mmi_event_observer.h"
             ],
             "header_base": "//foundation/multimodalinput/input/interfaces/native/innerkits"
           },

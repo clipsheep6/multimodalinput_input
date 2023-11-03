@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,7 @@
 #include "hitrace_meter.h"
 
 #include "anr_manager.h"
+#include "app_debug_listener.h"
 #include "bytrace_adapter.h"
 #include "error_multimodal.h"
 #include "input_event_data_transformation.h"
@@ -98,7 +99,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     currentTime_ = point->GetActionTime();
     if (fd < 0 && currentTime_ - eventTime_ > INTERVAL_TIME) {
         eventTime_ = currentTime_;
-        MMI_HILOGE("The fd less than 0, fd:%{public}d", fd);
+        MMI_HILOGE("InputTracking id:%{public}d The fd less than 0, fd:%{public}d", point->GetId(), fd);
         DfxHisysevent::OnUpdateTargetPointer(point, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         return;
     }
@@ -108,7 +109,8 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     CHKPV(session);
     auto currentTime = GetSysClockTime();
     if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, session)) {
-        MMI_HILOGD("The pointer event does not report normally, application not response");
+        MMI_HILOGW("InputTracking id:%{public}d, The pointer event does not report normally,"
+            "application not response", point->GetId());
         return;
     }
     auto pointerEvent = std::make_shared<PointerEvent>(*point);
@@ -116,12 +118,22 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     FilterInvalidPointerItem(pointerEvent, fd);
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
     InputEventDataTransformation::Marshalling(pointerEvent, pkt);
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    InputEventDataTransformation::MarshallingEnhanceData(pointerEvent, pkt);
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
+    if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
+        MMI_HILOGI("InputTracking id:%{public}d, SendMsg to %{public}s:pid:%{public}d",
+            pointerEvent->GetId(), session->GetProgramName().c_str(), session->GetPid());
+    }
     if (!udsServer->SendMsg(fd, pkt)) {
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return;
     }
-    ANRMgr->AddTimer(ANR_DISPATCH, point->GetId(), currentTime, session);
+    if (session->GetPid() != AppDebugListener::GetInstance()->GetAppDebugPid()) {
+        MMI_HILOGD("session pid : %{public}d", session->GetPid());
+        ANRMgr->AddTimer(ANR_DISPATCH, point->GetId(), currentTime, session);
+    }
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_POINTER
 
@@ -156,11 +168,16 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
         MMI_HILOGE("Packet write structure of EventKeyboard failed");
         return RET_ERR;
     }
+    MMI_HILOGI("InputTracking id:%{public}d, SendMsg to %{public}s:pid:%{public}d",
+        key->GetId(), session->GetProgramName().c_str(), session->GetPid());
     if (!udsServer.SendMsg(fd, pkt)) {
         MMI_HILOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
-    ANRMgr->AddTimer(ANR_DISPATCH, key->GetId(), currentTime, session);
+    if (session->GetPid() != AppDebugListener::GetInstance()->GetAppDebugPid()) {
+        MMI_HILOGD("session pid : %{public}d", session->GetPid());
+        ANRMgr->AddTimer(ANR_DISPATCH, key->GetId(), currentTime, session);
+    }
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD

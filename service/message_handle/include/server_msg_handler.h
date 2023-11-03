@@ -74,9 +74,12 @@ public:
         int32_t clientPid);
     int32_t RemoveInputEventFilter(int32_t clientPid, int32_t filterId);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+    int32_t SetShieldStatus(int32_t shieldMode, bool isShield);
+    int32_t GetShieldStatus(int32_t shieldMode, bool &isShield);
 protected:
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
     int32_t OnDisplayInfo(SessionPtr sess, NetPacket& pkt);
+    int32_t OnWindowAreaInfo(SessionPtr sess, NetPacket& pkt);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     int32_t OnEnhanceConfig(SessionPtr sess, NetPacket& pkt);
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT

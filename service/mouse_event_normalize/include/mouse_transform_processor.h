@@ -60,6 +60,7 @@ public:
     ~MouseTransformProcessor() = default;
     std::shared_ptr<PointerEvent> GetPointerEvent() const;
     int32_t Normalize(struct libinput_event *event);
+    int32_t NormalizeRotateEvent(struct libinput_event *event, int32_t type, double angle);
     void Dump(int32_t fd, const std::vector<std::string> &args);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool NormalizeMoveMouse(int32_t offsetX, int32_t offsetY);
@@ -110,22 +111,18 @@ public:
     static int32_t GetTouchpadRightClickType(int32_t &type);
     static int32_t SetTouchpadPointerSpeed(int32_t speed);
     static int32_t GetTouchpadPointerSpeed(int32_t &speed);
-    void SetConfigPointerSpeed(int32_t speed);
-    int32_t GetSpeed() const;
 
 private:
     static double absolutionX_;
     static double absolutionY_;
     static int32_t currentDisplayId_;
     static int32_t globalPointerSpeed_;
-    static bool isUserSetSpeedStatus_;
 
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     int32_t timerId_ { -1 };
     int32_t buttonId_ { -1 };
     bool isPressed_ { false };
     int32_t deviceId_ { -1 };
-    int32_t vendorConfigPointerSpeed_ { -1 };
 };
 } // namespace MMI
 } // namespace OHOS

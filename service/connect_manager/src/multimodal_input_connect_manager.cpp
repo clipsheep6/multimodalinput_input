@@ -81,6 +81,17 @@ int32_t MultimodalInputConnectManager::GetDisplayBindInfo(DisplayBindInfos &info
     return multimodalInputConnectService_->GetDisplayBindInfo(infos);
 }
 
+int32_t MultimodalInputConnectManager::GetAllMmiSubscribedEvents(std::vector<std::tuple<int32_t, int32_t,
+    std::string>> &datas)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    if (multimodalInputConnectService_ == nullptr) {
+        MMI_HILOGE("The multimodalInputConnectService_ is nullptr");
+        return RET_ERR;
+    }
+    return multimodalInputConnectService_->GetAllMmiSubscribedEvents(datas);
+}
+
 int32_t MultimodalInputConnectManager::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
 {
     std::lock_guard<std::mutex> guard(lock_);
@@ -112,6 +123,26 @@ int32_t MultimodalInputConnectManager::AddInputEventFilter(sptr<IEventFilter> fi
     return multimodalInputConnectService_->AddInputEventFilter(filter, filterId, priority, deviceTags);
 }
 
+int32_t MultimodalInputConnectManager::NotifyNapOnline()
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    if (multimodalInputConnectService_ == nullptr) {
+        MMI_HILOGE("The multimodalInputConnectService_ is nullptr");
+        return RET_ERR;
+    }
+    return multimodalInputConnectService_->NotifyNapOnline();
+}
+
+int32_t MultimodalInputConnectManager::RemoveInputEventObserver()
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    if (multimodalInputConnectService_ == nullptr) {
+        MMI_HILOGE("The multimodalInputConnectService_ is nullptr");
+        return RET_ERR;
+    }
+    return multimodalInputConnectService_->RemoveInputEventObserver();
+}
+
 int32_t MultimodalInputConnectManager::RemoveInputEventFilter(int32_t filterId)
 {
     std::lock_guard<std::mutex> guard(lock_);
@@ -128,16 +159,24 @@ int32_t MultimodalInputConnectManager::SetMouseScrollRows(int32_t rows)
     return multimodalInputConnectService_->SetMouseScrollRows(rows);
 }
 
-int32_t MultimodalInputConnectManager::SetMouseIcon(int32_t windowId, void* pixelMap)
+int32_t MultimodalInputConnectManager::SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY,
+    void* pixelMap)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->SetMouseIcon(windowId, pixelMap);
+    return multimodalInputConnectService_->SetCustomCursor(pid, windowId, focusX, focusY, pixelMap);
 }
 
-int32_t MultimodalInputConnectManager::SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, int32_t hotSpotY)
+int32_t MultimodalInputConnectManager::SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->SetMouseHotSpot(windowId, hotSpotX, hotSpotY);
+    return multimodalInputConnectService_->SetMouseIcon(pid, windowId, pixelMap);
+}
+
+int32_t MultimodalInputConnectManager::SetMouseHotSpot(
+    int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetMouseHotSpot(pid, windowId, hotSpotX, hotSpotY);
 }
 
 int32_t MultimodalInputConnectManager::GetMouseScrollRows(int32_t &rows)
@@ -150,6 +189,12 @@ int32_t MultimodalInputConnectManager::SetPointerSize(int32_t size)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetPointerSize(size);
+}
+
+int32_t MultimodalInputConnectManager::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, bool napStatus)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetNapStatus(pid, uid, bundleName, napStatus);
 }
 
 int32_t MultimodalInputConnectManager::GetPointerSize(int32_t &size)
@@ -228,6 +273,12 @@ int32_t MultimodalInputConnectManager::SetPointerStyle(int32_t windowId, Pointer
 {
     CHKPR(multimodalInputConnectService_, RET_ERR);
     return multimodalInputConnectService_->SetPointerStyle(windowId, pointerStyle);
+}
+
+int32_t MultimodalInputConnectManager::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->ClearWindowPointerStyle(pid, windowId);
 }
 
 int32_t MultimodalInputConnectManager::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle)
@@ -563,6 +614,18 @@ int32_t MultimodalInputConnectManager::GetTouchpadRightClickType(int32_t &type)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetTouchpadRightClickType(type);
+}
+
+int32_t MultimodalInputConnectManager::SetShieldStatus(int32_t shieldMode, bool isShield)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetShieldStatus(shieldMode, isShield);
+}
+
+int32_t MultimodalInputConnectManager::GetShieldStatus(int32_t shieldMode, bool &isShield)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetShieldStatus(shieldMode, isShield);
 }
 } // namespace MMI
 } // namespace OHOS

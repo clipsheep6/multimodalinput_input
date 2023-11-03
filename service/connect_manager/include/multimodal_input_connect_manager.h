@@ -40,14 +40,19 @@ public:
     }
     int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority, uint32_t deviceTags);
     int32_t RemoveInputEventFilter(int32_t filterId);
+    int32_t NotifyNapOnline();
+    int32_t RemoveInputEventObserver();
+    int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, bool napStatus);
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos);
+    int32_t GetAllMmiSubscribedEvents(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas);
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
     int32_t SetMouseScrollRows(int32_t rows);
     int32_t GetMouseScrollRows(int32_t &rows);
     int32_t SetPointerSize(int32_t size);
     int32_t GetPointerSize(int32_t &size);
-    int32_t SetMouseIcon(int32_t windowId, void* pixelMap);
-    int32_t SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, int32_t hotSpotY);
+    int32_t SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap);
+    int32_t SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap);
+    int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY);
     int32_t SetMousePrimaryButton(int32_t primaryButton);
     int32_t GetMousePrimaryButton(int32_t &primaryButton);
     int32_t SetHoverScrollState(bool state);
@@ -61,6 +66,7 @@ public:
     int32_t GetPointerSpeed(int32_t &speed);
     int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle);
     int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle);
+    int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId);
     int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke);
     int32_t GetDeviceIds(std::vector<int32_t> &ids);
     int32_t GetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice);
@@ -106,7 +112,8 @@ public:
     int32_t GetTouchpadSwipeSwitch(bool &switchFlag);
     int32_t SetTouchpadRightClickType(int32_t type);
     int32_t GetTouchpadRightClickType(int32_t &type);
-
+    int32_t SetShieldStatus(int32_t shieldMode, bool isShield);
+    int32_t GetShieldStatus(int32_t shieldMode, bool &isShield);
 private:
     MultimodalInputConnectManager() = default;
     DISALLOW_COPY_AND_MOVE(MultimodalInputConnectManager);

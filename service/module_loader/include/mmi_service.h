@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,12 +24,14 @@
 #include "singleton.h"
 #include "system_ability.h"
 
+#include "app_debug_listener.h"
 #include "delegate_tasks.h"
 #include "input_event_handler.h"
 #include "libinput_adapter.h"
 #include "multimodal_input_connect_stub.h"
 #include "server_msg_handler.h"
 #include "uds_server.h"
+#include "nap_process.h"
 
 namespace OHOS {
 namespace MMI {
@@ -53,8 +55,11 @@ public:
     int32_t GetPointerSize(int32_t &size) override;
     int32_t SetMouseScrollRows(int32_t rows) override;
     int32_t GetMouseScrollRows(int32_t &rows) override;
-    int32_t SetMouseIcon(int32_t windowId, void* pixelMap) override;
-    int32_t SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override;
+    int32_t SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap) override;
+    int32_t SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap) override;
+    int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) override;
+    int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override;
+    int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, bool napState) override;
     int32_t SetMousePrimaryButton(int32_t primaryButton) override;
     int32_t GetMousePrimaryButton(int32_t &primaryButton) override;
     int32_t SetHoverScrollState(bool state) override;
@@ -67,6 +72,8 @@ public:
     int32_t SetPointerSpeed(int32_t speed) override;
     int32_t GetPointerSpeed(int32_t &speed) override;
     int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle) override;
+    int32_t NotifyNapOnline() override;
+    int32_t RemoveInputEventObserver() override;
     int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle) override;
     int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke) override;
     int32_t GetDeviceIds(std::vector<int32_t> &ids) override;
@@ -92,6 +99,7 @@ public:
     int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
     int32_t SetAnrObserver() override;
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos) override;
+    int32_t GetAllMmiSubscribedEvents(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas) override;
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg) override;
     int32_t GetFunctionKeyState(int32_t funcKey, bool &state) override;
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable) override;
@@ -115,10 +123,18 @@ public:
     int32_t GetTouchpadSwipeSwitch(bool &switchFlag) override;
     int32_t SetTouchpadRightClickType(int32_t type) override;
     int32_t GetTouchpadRightClickType(int32_t &type) override;
-
+    int32_t SetShieldStatus(int32_t shieldMode, bool isShield) override;
+    int32_t GetShieldStatus(int32_t shieldMode, bool &isShield) override;
 #ifdef OHOS_RSS_CLIENT
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
 #endif
+
+#ifdef OHOS_BUILD_ENABLE_CONTAINER
+    void InitContainer();
+    void StopContainer();
+    int32_t InjectKeyEventExt(const std::shared_ptr<KeyEvent> keyEvent);
+    int32_t InjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_CONTAINER
 
 protected:
     void OnConnected(SessionPtr s) override;
@@ -176,6 +192,8 @@ protected:
 
     void AddReloadDeviceTimer();
     int32_t UpdateSettingsXml(const std::string &businessId, int32_t delay);
+    void AddAppDebugListener();
+    void RemoveAppDebugListener();
 
 private:
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
@@ -185,10 +203,10 @@ private:
 #ifdef OHOS_RSS_CLIENT
     std::atomic<uint64_t> tid_ = 0;
 #endif
-
     LibinputAdapter libinputAdapter_;
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;
+    sptr<AppDebugListener> appDebugListener_;
 
     std::atomic_bool threadStatusFlag_ { false };
 };

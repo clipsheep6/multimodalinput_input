@@ -19,16 +19,14 @@
 
 namespace OHOS {
 namespace MMI {
-struct PointerStyleColor {
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
-};
-
 struct PointerStyle {
     int32_t size{ -1 };
-    PointerStyleColor color{ 0 };
+    int32_t color{ 0 };
     int32_t id{ 0 };
+    bool operator==(const PointerStyle& rhs) const
+    {
+        return id == rhs.id && size == rhs.size && color == rhs.color;
+    }
 };
 } // namespace MMI
 } // namespace OHOS

@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -54,6 +54,7 @@ config("libmmi_server_config") {
     "${mmi_service_path}/filter/include",
     "${mmi_service_path}/module_loader/include",
     "${mmi_service_path}/event_resample/include",
+    "${mmi_service_path}/nap_process/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "mouse_event_normalize/include",
@@ -66,6 +67,10 @@ config("libmmi_server_config") {
     "${preferences_path}/frameworks/native/include",
     "${graphics_path}/2d_graphics/include",
   ]
+
+  if (input_ext_feature) {
+    include_dirs += [ "${mmi_ext_path}/container_ipc_manager/include" ]
+  }
 
   if (input_feature_combination_key) {
     defines += [ "OHOS_BUILD_ENABLE_COMBINATION_KEY" ]
@@ -170,7 +175,8 @@ ohos_shared_library("libmmi-server") {
   }
 
   if (security_component_enable) {
-    external_deps += [ "security_component:libsecurity_component_enhance_sdk" ]
+    external_deps +=
+        [ "security_component_manager:libsecurity_component_enhance_sdk" ]
   }
 
   if (resource_schedule_service_enabled) {
@@ -181,6 +187,7 @@ ohos_shared_library("libmmi-server") {
     "ability_base:want",
     "ability_runtime:ability_manager",
     "ability_runtime:abilitykit_native",
+    "ability_runtime:app_manager",
     "access_token:libaccesstoken_sdk",
     "access_token:libtokenid_sdk",
     "common_event_service:cesfwk_innerkits",
@@ -198,10 +205,20 @@ ohos_shared_library("libmmi-server") {
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "window_manager:libwm",
+    "window_manager:libwsutils",
   ]
+
+  if (defined(use_rosen_drawing) && use_rosen_drawing) {
+    defines += [ "USE_ROSEN_DRAWING" ]
+  }
 
   part_name = "input"
   subsystem_name = "multimodalinput"
+
+  if (is_ohos && is_clang && (target_cpu == "arm" || target_cpu == "arm64") &&
+      enhanced_opt) {
+    ldflags = [ "-Wl,-Bsymbolic" ]
+  }
 }
 
 import("//build/test.gni")
@@ -252,6 +269,7 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/test/unittest/common/src/system_info.cpp",
     "dfx/test/dfx_hisysevent_test.cpp",
     "event_dispatch/test/event_dispatch_test.cpp",
+    "event_handler/test/gesture_handler_test.cpp",
     "event_handler/test/key_event_value_transformation_test.cpp",
     "key_command/test/key_command_handler_test.cpp",
     "module_loader/test/uds_server_test.cpp",
@@ -285,6 +303,7 @@ ohos_unittest("ut-mmi-service-out") {
     "hilog:libhilog",
     "image_framework:image_native",
     "window_manager:libwm",
+    "window_manager:libwsutils",
   ]
 }
 
