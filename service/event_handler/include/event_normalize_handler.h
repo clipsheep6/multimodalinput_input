@@ -54,7 +54,7 @@ private:
 private:
     int32_t timerId_ { -1 };
     std::set<int32_t> buttonIds_ {};
-    void ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent, struct libinput_event *event);
+    void ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent);
 };
 } // namespace MMI
 } // namespace OHOS
