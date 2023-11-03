@@ -112,6 +112,7 @@ private:
     void UpdatePointerEvent(int32_t logicalX, int32_t logicalY,
         const std::shared_ptr<PointerEvent>& pointerEvent, const WindowInfo& touchWindow);
     void NotifyPointerToWindow();
+    void NotifyTouchToWindow();
     void OnSessionLost(SessionPtr session);
     void InitPointerStyle();
     int32_t UpdatePoinerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle);
