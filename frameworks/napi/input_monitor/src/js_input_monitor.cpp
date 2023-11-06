@@ -199,6 +199,8 @@ void InputMonitor::SetRectTotal(uint32_t rectTotal)
 uint32_t InputMonitor::GetRectTotal()
 {
     return rectTotal_;
+}
+
 void InputMonitor::SetFingers(int32_t fingers)
 {
     fingers_ = fingers;
@@ -230,7 +232,6 @@ JsInputMonitor::JsInputMonitor(napi_env jsEnv, const std::string &typeName, Rect
       typeName_(typeName),
       monitorId_(id),
       fingers_(fingers)
-
 {
     SetCallback(callback);
     if (monitor_ == nullptr) {
