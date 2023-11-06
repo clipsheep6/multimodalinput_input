@@ -26,6 +26,7 @@
 #include "napi/native_node_api.h"
 #include "nocopyable.h"
 #include "util_napi.h"
+#include "window_info.h"
 
 #include "i_input_event_consumer.h"
 #include "js_touch_event.h"
@@ -47,6 +48,11 @@ public:
     void MarkConsumed(int32_t eventId);
     void SetCallback(std::function<void(std::shared_ptr<PointerEvent>)> callback);
     void SetId(int32_t id);
+    void SetHotRectArea(Rect hotRectArea[]);
+    Rect GetHotRectArea(int32_t index);
+    Rect* GetHotRectAreas();
+    void SetRectTotal(uint32_t rectTotal);
+    uint32_t GetRectTotal();
     void SetFingers(int32_t fingers);
     void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override;
     void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override;
@@ -59,6 +65,8 @@ private:
     std::function<void(std::shared_ptr<PointerEvent>)> callback_;
     int32_t id_ { -1 };
     int32_t monitorId_ { -1 };
+    Rect hotRectArea_[2];
+    uint32_t rectTotal_ { 0 };
     int32_t fingers_ { 0 };
     mutable bool consumed_ { false };
     mutable std::mutex mutex_;
@@ -68,7 +76,8 @@ private:
 class JsInputMonitor final {
 public:
     static void JsCallback(uv_work_t *work, int32_t status);
-    JsInputMonitor(napi_env jsEnv, const std::string &typeName, napi_value callback, int32_t id, int32_t fingers);
+    JsInputMonitor(napi_env jsEnv, const std::string &typeName, Rect hotRectArea[],
+        int32_t rectTotal, napi_value callback, int32_t id, int32_t fingers);
     ~JsInputMonitor();
 
     int32_t Start();
@@ -82,6 +91,7 @@ public:
     void CheckConsumed(bool retValue, std::shared_ptr<PointerEvent> pointerEvent);
     void OnPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
     std::string GetTypeName() const;
+    bool IsLocaledWithinRect(napi_env env, napi_value napiPointer, uint32_t rectTotal, Rect* hotRectArea);
 private:
     void SetCallback(napi_value callback);
     MapFun GetInputEventFunc(const std::shared_ptr<InputEvent> inputEvent);
