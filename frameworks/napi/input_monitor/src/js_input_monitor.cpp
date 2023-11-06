@@ -1159,7 +1159,6 @@ bool JsInputMonitor::IsRotate(std::shared_ptr<PointerEvent> pointerEvent)
     return true;
 }
 
-
 bool JsInputMonitor::IsThreeFingersSwipe(std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD ||
