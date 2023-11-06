@@ -70,6 +70,7 @@ void ClientMsgHandler::Init()
     (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR))
         { MmiMessageId::REPORT_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportPointerEvent, this) },
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+        { MmiMessageId::NOTIFY_BUNDLE_NAME, MsgCallbackBind2(&ClientMsgHandler::NotifyBundleName, this) },
     };
     for (auto &it : funs) {
         if (!RegistrationEvent(it)) {
@@ -127,6 +128,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
         return PACKET_READ_FAIL;
     }
     MMI_HILOGD("Key event dispatcher of client, Fd:%{public}d", fd);
+    MMI_HILOGI("InputTracking id:%{public}d KeyEvent ReceivedMsg", key->GetId());
     EventLogHelper::PrintEventData(key);
     BytraceAdapter::StartBytrace(key, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_DISPATCH_EVENT);
     key->SetProcessedCallback(dispatchCallback_);
@@ -135,6 +137,17 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+int32_t ClientMsgHandler::NotifyBundleName(const UDSClient& client, NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    int32_t pid, uid;
+    std::string bundleName;
+    pkt >> pid >> uid >> bundleName;
+    InputMgrImpl.NotifyBundleName(pid, uid, bundleName);
+    MMI_HILOGD("client info in NotifyBundleName is : %{public}d, %{public}d, %{public}s", pid, uid, bundleName.c_str());
+    return RET_OK;
+}
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt)
@@ -153,6 +166,9 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     MMI_HILOGI("Pointer event dispatcher of client:");
+    if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
+        MMI_HILOGI("InputTracking id:%{public}d PointerEvent ReceivedMsg", pointerEvent->GetId());
+    }
     EventLogHelper::PrintEventData(pointerEvent);
     if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
         MMI_HILOGI("Operation canceled.");

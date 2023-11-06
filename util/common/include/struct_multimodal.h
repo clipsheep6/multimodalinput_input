@@ -173,6 +173,7 @@ enum ICON_TYPE {
     ANGLE_SW = 6,
     ANGLE_NW = 7,
     ANGLE_CENTER = 8,
+    ANGLE_NW_RIGHT = 9,
 };
 
 enum PrimaryButton {
@@ -180,6 +181,11 @@ enum PrimaryButton {
     RIGHT_BUTTON = 1,
 };
 
+enum SHIELD_MODE {
+    UNSET_MODE = -1,
+    FACTORY_MODE = 0,
+    OOBE_MODE = 1,
+};
 struct IconStyle {
     int32_t alignmentWay { 0 };
     std::string iconPath;

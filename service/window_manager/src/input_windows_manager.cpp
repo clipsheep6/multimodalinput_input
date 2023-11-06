@@ -409,6 +409,7 @@ void InputWindowsManager::SetWindowPointerStyle(WindowArea area, int32_t pid, in
         }
         lastPointerStyle_ = style;
     }
+    MMI_HILOGI("Window id:%{public}d set pointer style:%{public}d success", windowId, lastPointerStyle_.id);
     IPointerDrawingManager::GetInstance()->DrawPointerStyle(lastPointerStyle_);
 }
 
@@ -1241,9 +1242,6 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     pointerItem.SetWindowX(windowX);
     pointerItem.SetWindowY(windowY);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
-#ifdef OHOS_BUILD_EMULATOR
-    extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
-#endif
     if (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) {
         pointerEvent->SetBuffer(extraData_.buffer);
         UpdatePointerAction(pointerEvent);
@@ -1437,8 +1435,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), pointerStyle);
     } else {
         if (IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
-            DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
-            IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+            if (!checkExtraData) {
+                DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
+                IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+            }
         }
     }
 

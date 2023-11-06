@@ -40,7 +40,11 @@ public:
     }
     int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority, uint32_t deviceTags);
     int32_t RemoveInputEventFilter(int32_t filterId);
+    int32_t NotifyNapOnline();
+    int32_t RemoveInputEventObserver();
+    int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, bool napStatus);
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos);
+    int32_t GetAllMmiSubscribedEvents(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas);
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
     int32_t SetMouseScrollRows(int32_t rows);
     int32_t GetMouseScrollRows(int32_t &rows);
@@ -108,7 +112,8 @@ public:
     int32_t GetTouchpadSwipeSwitch(bool &switchFlag);
     int32_t SetTouchpadRightClickType(int32_t type);
     int32_t GetTouchpadRightClickType(int32_t &type);
-
+    int32_t SetShieldStatus(int32_t shieldMode, bool isShield);
+    int32_t GetShieldStatus(int32_t shieldMode, bool &isShield);
 private:
     MultimodalInputConnectManager() = default;
     DISALLOW_COPY_AND_MOVE(MultimodalInputConnectManager);

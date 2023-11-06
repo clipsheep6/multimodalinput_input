@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,27 +13,23 @@
  * limitations under the License.
  */
 
-#ifndef JS_MOUSE_EVENT
-#define JS_MOUSE_EVENT
+#ifndef MMI_EVENT_OBSERVER_H
+#define MMI_EVENT_OBSERVER_H
 
-#include "napi/native_api.h"
-#include "napi/native_node_api.h"
-#include "nocopyable.h"
+#include "iremote_broker.h"
+
+#include "key_event.h"
+#include "pointer_event.h"
 
 namespace OHOS {
 namespace MMI {
-class JsMouseEvent final {
+class MMIEventObserver {
 public:
-    JsMouseEvent() = default;
-    ~JsMouseEvent() = default;
-    DISALLOW_COPY_AND_MOVE(JsMouseEvent);
-    static napi_value Export(napi_env env, napi_value exports);
-private:
-    static napi_value GetNapiInt32(napi_env env, int32_t code);
-    static napi_value EnumClassConstructor(napi_env env, napi_callback_info info);
-    static napi_value HandleActionPropertyArr(napi_env env, napi_value exports);
+    MMIEventObserver() = default;
+    virtual ~MMIEventObserver() = default;
+
+    virtual void SyncBundleName(int32_t pid, int32_t uid, std::string bundleName) = 0;
 };
 } // namespace MMI
 } // namespace OHOS
-
-#endif // JS_MOUSE_EVENT
+#endif // MMI_EVENT_OBSERVER_H

@@ -42,6 +42,7 @@ ohos_executable("uinput_inject") {
   sources = uinput_inject_sources
 
   include_dirs = [
+    "${mmi_path}/service/nap_process/include",
     "${mmi_path}/util/common/include",
     "${mmi_path}/interfaces/native/innerkits/common/include",
   ]
@@ -146,6 +147,7 @@ group("mmi_tests") {
     "service:mmi-service-tests",
     "service:rust_mmi_test",
     "service:ut-mmi-service-out",
+    "service:event_resample_test",
     "test/fuzztest:test",
     "tools/inject_event:InjectEventTest",
     "util:rust_mmi_key_config_test",

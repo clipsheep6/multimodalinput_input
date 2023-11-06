@@ -87,6 +87,18 @@ int32_t InputManagerImpl::GetDisplayBindInfo(DisplayBindInfos &infos)
     return RET_OK;
 }
 
+int32_t InputManagerImpl::GetAllMmiSubscribedEvents(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->GetAllMmiSubscribedEvents(datas);
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetDisplayBindInfo failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 int32_t InputManagerImpl::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
 {
     std::lock_guard<std::mutex> guard(mtx_);
@@ -180,11 +192,43 @@ int32_t InputManagerImpl::AddInputEventFilter(std::shared_ptr<IInputEventFilter>
         service = nullptr;
         return RET_ERR;
     }
-    auto it =  eventFilterServices_.emplace(filterId, std::make_tuple(service, priority, deviceTags));
+    auto it = eventFilterServices_.emplace(filterId, std::make_tuple(service, priority, deviceTags));
     if (!it.second) {
         MMI_HILOGW("Filter id duplicate");
     }
     return filterId;
+}
+
+int32_t InputManagerImpl::AddInputEventObserver(std::shared_ptr<MMIEventObserver> observer)
+{
+    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(mtx_);
+    CHKPR(observer, RET_ERR);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Get mmi client is nullptr");
+        return RET_ERR;
+    }
+    eventObserver_ = observer;
+    NotifyNapOnline();
+    return RET_OK;
+}
+
+int32_t InputManagerImpl::RemoveInputEventObserver(std::shared_ptr<MMIEventObserver> observer)
+{
+    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(mtx_);
+    eventObserver_ = nullptr;
+    int32_t ret = MultimodalInputConnMgr->RemoveInputEventObserver();
+    return ret;
+}
+
+int32_t InputManagerImpl::NotifyNapOnline()
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = MultimodalInputConnMgr->NotifyNapOnline();
+    return ret;
 }
 
 int32_t InputManagerImpl::RemoveInputEventFilter(int32_t filterId)
@@ -322,6 +366,7 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
         eventHandler = eventHandler_;
         inputConsumer = consumer_;
     }
+    MMI_HILOGI("InputTracking id:%{public}d Key Event", keyEvent->GetId());
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_DISPATCH_EVENT);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
@@ -367,6 +412,9 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_DISPATCH_EVENT);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
+    if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
+        MMI_HILOGI("InputTracking id:%{public}d Pointer Event", pointerEvent->GetId());
+    }
     if (client->IsEventHandlerChanged()) {
         if (!eventHandler->PostHighPriorityTask(std::bind(&InputManagerImpl::OnPointerEventTask,
             this, inputConsumer, pointerEvent))) {
@@ -375,7 +423,7 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
         }
     } else {
         inputConsumer->OnInputEvent(pointerEvent);
-        MMI_HILOGD("Pointer event report pointerId:%{public}d", pointerEvent->GetPointerId());
+        MMI_HILOGI("Pointer event report pointerId:%{public}d", pointerEvent->GetPointerId());
     }
     MMI_HILOGD("Pointer event pointerId:%{public}d", pointerEvent->GetPointerId());
 }
@@ -631,7 +679,6 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPV(keyEvent);
-    std::lock_guard<std::mutex> guard(mtx_);
     if (MMIEventHdl.InjectEvent(keyEvent) != RET_OK) {
         MMI_HILOGE("Failed to inject keyEvent");
     }
@@ -664,7 +711,6 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
         return;
     }
 #endif
-    std::lock_guard<std::mutex> guard(mtx_);
     if (MMIEventHdl.InjectPointerEvent(pointerEvent) != RET_OK) {
         MMI_HILOGE("Failed to inject pointer event");
     }
@@ -1242,7 +1288,7 @@ int32_t InputManagerImpl::SetFunctionKeyState(int32_t funcKey, bool enable)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
-void InputManagerImpl::SetPointerLocation(int32_t x, int32_t y)
+int32_t InputManagerImpl::SetPointerLocation(int32_t x, int32_t y)
 {
     CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
@@ -1250,8 +1296,10 @@ void InputManagerImpl::SetPointerLocation(int32_t x, int32_t y)
     if (ret != RET_OK) {
         MMI_HILOGE("Set Pointer Location failed, ret:%{public}d", ret);
     }
+    return ret;
 #else
     MMI_HILOGW("Pointer device or pointer drawing module does not support");
+    return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
@@ -1559,6 +1607,28 @@ void InputManagerImpl::SetWindowCheckerHandler(std::shared_ptr<IWindowChecker> w
     #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     return;
 }
+
+int32_t InputManagerImpl::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, bool napStatus)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->SetNapStatus(pid, uid, bundleName, napStatus);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set napStatus failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+void InputManagerImpl::NotifyBundleName(int32_t pid, int32_t uid, std::string bundleName)
+{
+    CALL_DEBUG_ENTER;
+    if (eventObserver_ == nullptr) {
+        MMI_HILOGE("eventObserver_ is nullptr");
+        return;
+    }
+    eventObserver_->SyncBundleName(pid, uid, bundleName);
+}
+
 void InputManagerImpl::SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId)
 {
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
@@ -1605,6 +1675,28 @@ void InputManagerImpl::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
         MMI_HILOGE("ClearWindowPointerStyle failed, ret:%{public}d", ret);
         return;
     }
+}
+
+int32_t InputManagerImpl::SetShieldStatus(int32_t shieldMode, bool isShield)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->SetShieldStatus(shieldMode, isShield);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set shield event interception status failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t InputManagerImpl::GetShieldStatus(int32_t shieldMode, bool &isShield)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->GetShieldStatus(shieldMode, isShield);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get shield event interception status failed, ret:%{public}d", ret);
+    }
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS
