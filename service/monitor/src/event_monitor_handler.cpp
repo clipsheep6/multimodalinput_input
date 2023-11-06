@@ -34,7 +34,9 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Event
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 constexpr size_t MAX_EVENTIDS_SIZE = 1000;
 #endif // OHOS_BUILD_ENABLE_TOUCH
-constexpr int32_t SYS_PINCH_FINGER_CNT { 2 };
+constexpr int32_t ACTIVE_EVENT = 2;
+constexpr int32_t REMOVE_OBSERVER = -2;
+constexpr int32_t UNOBSERVED = -1;
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -318,6 +320,18 @@ bool EventMonitorHandler::MonitorCollection::HandleEvent(std::shared_ptr<KeyEven
             mon.SendToClient(keyEvent);
         }
     }
+    if (NapProcess::GetInstance()->GetNapClientPid() != REMOVE_OBSERVER &&
+        NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
+        OHOS::MMI::NapProcess::NapStatusData napData;
+        for (const auto &mon : monitors_) {
+            auto sess = mon.session_;
+            napData.pid = sess->GetPid();
+            napData.uid = sess->GetUid();
+            napData.bundleName = sess->GetProgramName();
+            napData.syncStatus = ACTIVE_EVENT;
+            NapProcess::GetInstance()->NotifyBundleName(napData);
+        }
+    }
     return false;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -326,17 +340,6 @@ bool EventMonitorHandler::MonitorCollection::HandleEvent(std::shared_ptr<KeyEven
 bool EventMonitorHandler::MonitorCollection::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
-
-    // if is 2 finger pinch,then return false
-    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE &&
-       (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_BEGIN ||
-        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_UPDATE ||
-        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_END) &&
-        pointerEvent->GetFingerCount() == SYS_PINCH_FINGER_CNT) {
-        MMI_HILOGD("Source type = %{public}d,  pointer action = %{public}d  finger count = %{public}d",
-            pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(), pointerEvent->GetFingerCount());
-        return false;
-    }
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     UpdateConsumptionState(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
@@ -417,6 +420,18 @@ void EventMonitorHandler::MonitorCollection::Monitor(std::shared_ptr<PointerEven
     for (const auto &monitor : monitors_) {
         if ((monitor.eventType_ & HANDLE_EVENT_TYPE_POINTER) == HANDLE_EVENT_TYPE_POINTER) {
             monitor.SendToClient(pointerEvent);
+        }
+    }
+    if (NapProcess::GetInstance()->GetNapClientPid() != REMOVE_OBSERVER &&
+        NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
+        OHOS::MMI::NapProcess::NapStatusData napData;
+        for (const auto &mon : monitors_) {
+            auto sess = mon.session_;
+            napData.pid = sess->GetPid();
+            napData.uid = sess->GetUid();
+            napData.bundleName = sess->GetProgramName();
+            napData.syncStatus = ACTIVE_EVENT;
+            NapProcess::GetInstance()->NotifyBundleName(napData);
         }
     }
 }

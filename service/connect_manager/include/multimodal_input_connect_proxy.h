@@ -22,6 +22,7 @@
 #include "system_ability.h"
 
 #include "i_multimodal_input_connect.h"
+#include "mmi_event_observer.h"
 #include "multimodalinput_ipc_interface_code.h"
 
 namespace OHOS {
@@ -35,10 +36,13 @@ public:
         int32_t &socketFd, int32_t &tokenType) override;
     int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority,
         uint32_t deviceTags) override;
+    int32_t NotifyNapOnline() override;
+    int32_t RemoveInputEventObserver() override;
     int32_t RemoveInputEventFilter(int32_t filterId) override;
     int32_t SetMouseScrollRows(int32_t rows) override;
     int32_t GetMouseScrollRows(int32_t &rows) override;
     int32_t SetPointerSize(int32_t size) override;
+    int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus) override;
     int32_t GetPointerSize(int32_t &size) override;
     int32_t SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap) override;
     int32_t SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap) override;
@@ -81,6 +85,7 @@ public:
     int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
     int32_t SetAnrObserver() override;
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos) override;
+    int32_t GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> &datas) override;
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg) override;
     int32_t GetFunctionKeyState(int32_t funcKey, bool &state) override;
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable) override;
@@ -104,6 +109,8 @@ public:
     int32_t GetTouchpadSwipeSwitch(bool &switchFlag) override;
     int32_t SetTouchpadRightClickType(int32_t type) override;
     int32_t GetTouchpadRightClickType(int32_t &type) override;
+    int32_t SetShieldStatus(int32_t shieldMode, bool isShield) override;
+    int32_t GetShieldStatus(int32_t shieldMode, bool &isShield) override;
 
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;

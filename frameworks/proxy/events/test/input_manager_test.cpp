@@ -24,6 +24,9 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputManagerTest"};
+constexpr int32_t TUPLE_PID = 0;
+constexpr int32_t TUPLE_UID = 1;
+constexpr int32_t TUPLE_NAME = 2;
 constexpr int32_t TIME_WAIT_FOR_OP = 100;
 constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
 constexpr int32_t SLEEP_MILLISECONDS = 1000;
@@ -57,6 +60,21 @@ class MMIWindowChecker : public MMI::IWindowChecker {
 public:
     virtual int32_t CheckWindowId(int32_t windowId) const override;
 };
+
+class IEventObserver : public MMI::MMIEventObserver {
+public:
+    void SyncBundleName(int32_t pid, int32_t uid, std::string bundleName, int32_t syncStatus) override;
+};
+
+void IEventObserver::SyncBundleName(int32_t pid, int32_t uid, std::string bundleName, int32_t syncStatus)
+{
+    int32_t getPid = pid;
+    int32_t getUid = uid;
+    std::string getName = bundleName;
+    int32_t getStatus = syncStatus;
+    MMI_HILOGD("SyncBundleName info is : %{public}d, %{public}d, %{public}s, %{public}d",
+        getPid, getUid, getName.c_str(), getStatus);
+}
 
 int32_t MMIWindowChecker::CheckWindowId(int32_t windowId) const
 {
@@ -1098,6 +1116,47 @@ HWTEST_F(InputManagerTest, InputManagerTest_ClearWindowPointerStyle_001, TestSiz
     EXPECT_TRUE(ret == RET_OK);
 }
 
+HWTEST_F(InputManagerTest, InputManagerTest_SyncBundleName_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mmiObserver = std::make_shared<IEventObserver>();
+    InputManager::GetInstance()->AddInputEventObserver(mmiObserver);
+    auto callbackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callbackPtr != nullptr);
+    int32_t monitorId = InputManagerUtil::TestAddMonitor(callbackPtr);
+    InputManager::GetInstance()->SetNapStatus(10, 20, "bundleName_test", 2);
+    std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> mapBefore;
+    InputManager::GetInstance()->GetAllMmiSubscribedEvents(mapBefore);
+    for (auto map = mapBefore.begin(); map != mapBefore.end(); ++map) {
+        if (std::get<TUPLE_PID>(map->first) == 10) {
+            EXPECT_TRUE(std::get<TUPLE_UID>(map->first) == 20);
+            EXPECT_TRUE(std::get<TUPLE_NAME>(map->first) == "bundleName_test");
+            EXPECT_TRUE(map->second == 2);
+        }
+    }
+    for (const auto& map : mapBefore) {
+        MMI_HILOGD("All NapStatus in mapBefore pid:%{public}d, uid:%{public}d, name:%{public}s, status:%{public}d",
+            std::get<TUPLE_PID>(map.first), std::get<TUPLE_UID>(map.first), std::get<TUPLE_NAME>(map.first).c_str(),
+            map.second);
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    InputManagerUtil::TestRemoveMonitor(monitorId);
+    InputManager::GetInstance()->SetNapStatus(10, 20, "bundleName_test", 0);
+    std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> mapAfter;
+    InputManager::GetInstance()->GetAllMmiSubscribedEvents(mapAfter);
+    for (const auto& map : mapAfter) {
+        EXPECT_FALSE(std::get<TUPLE_PID>(map.first) == 10);
+        EXPECT_FALSE(std::get<TUPLE_UID>(map.first) == 20);
+        EXPECT_FALSE(std::get<TUPLE_NAME>(map.first) == "bundleName_test");
+    }
+    for (const auto& map : mapAfter) {
+        MMI_HILOGD("All NapStatus in mapAfter pid:%{public}d, uid:%{public}d, name:%{public}s, status:%{public}d",
+            std::get<TUPLE_PID>(map.first), std::get<TUPLE_UID>(map.first), std::get<TUPLE_NAME>(map.first).c_str(),
+            map.second);
+    }
+    InputManager::GetInstance()->RemoveInputEventObserver(mmiObserver);
+}
+
 /**
  * @tc.name: InputManager_InjectMouseEvent_001
  * @tc.desc: Injection interface detection
@@ -1266,6 +1325,20 @@ HWTEST_F(InputManagerTest, InputManager_InjectTouchEvent_002, TestSize.Level1)
 }
 
 /**
+ * @tc.name: InputManager_InjectEvent_003
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR000GJG6G
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    ASSERT_NO_FATAL_FAILURE(keyEvent->SetRepeat(true));
+}
+
+/**
  * @tc.name: InputManager_InjectEvent_001
  * @tc.desc: Injection interface detection
  * @tc.type: FUNC
@@ -1382,6 +1455,42 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateInputEventExt_002, TestSize.
     InputManager::GetInstance()->SimulateInputEventExt(injectDownEvent);
     ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_DOWN);
 #endif  // OHOS_BUILD_ENABLE_CONTAINER
+}
+
+/**
+ * @tc.name: InputManagerTest_SetShieldStatus_001
+ * @tc.desc: Test set shield status
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetShieldStatus_001, TestSize.Level1)
+{
+    bool factoryModeStatus = false;
+    bool oobeModeStatus = false;
+    int32_t ret = InputManager::GetInstance()->SetShieldStatus(SHIELD_MODE::FACTORY_MODE, true);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->GetShieldStatus(SHIELD_MODE::FACTORY_MODE, factoryModeStatus);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->GetShieldStatus(SHIELD_MODE::OOBE_MODE, oobeModeStatus);
+    ASSERT_EQ(ret, RET_OK);
+    ASSERT_TRUE(factoryModeStatus);
+    ASSERT_FALSE(oobeModeStatus);
+    ret = InputManager::GetInstance()->SetShieldStatus(SHIELD_MODE::OOBE_MODE, true);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->GetShieldStatus(SHIELD_MODE::FACTORY_MODE, factoryModeStatus);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->GetShieldStatus(SHIELD_MODE::OOBE_MODE, oobeModeStatus);
+    ASSERT_EQ(ret, RET_OK);
+    ASSERT_FALSE(factoryModeStatus);
+    ASSERT_TRUE(oobeModeStatus);
+    ret = InputManager::GetInstance()->SetShieldStatus(SHIELD_MODE::OOBE_MODE, false);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->GetShieldStatus(SHIELD_MODE::FACTORY_MODE, factoryModeStatus);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->GetShieldStatus(SHIELD_MODE::OOBE_MODE, oobeModeStatus);
+    ASSERT_EQ(ret, RET_OK);
+    ASSERT_FALSE(factoryModeStatus);
+    ASSERT_FALSE(oobeModeStatus);
 }
 }  // namespace MMI
 }  // namespace OHOS

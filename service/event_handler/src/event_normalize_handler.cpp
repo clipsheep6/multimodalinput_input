@@ -21,6 +21,7 @@
 
 #include "error_multimodal.h"
 #include "event_log_helper.h"
+#include "gesture_handler.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
 #include "key_auto_repeat.h"
@@ -159,7 +160,7 @@ void EventNormalizeHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEv
     DfxHisysevent::GetDispStartTime();
     CHKPV(keyEvent);
     EventLogHelper::PrintEventData(keyEvent);
-    nextHandler_->HandleKeyEvent(keyEvent);
+    UpdateKeyEventHandlerChain(keyEvent);
     if (keyEvent->IsRepeat()) {
         KeyRepeat->SelectAutoRepeat(keyEvent);
         keyEvent->SetRepeat(false);
@@ -248,13 +249,28 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
 
     BytraceAdapter::StartBytrace(keyEvent);
     EventLogHelper::PrintEventData(keyEvent);
-    nextHandler_->HandleKeyEvent(keyEvent);
+    UpdateKeyEventHandlerChain(keyEvent);
     KeyRepeat->SelectAutoRepeat(keyEvent);
     MMI_HILOGD("keyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
 #else
     MMI_HILOGW("Keyboard device does not support");
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
+}
+
+void EventNormalizeHandler::UpdateKeyEventHandlerChain(const std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(keyEvent);
+    int32_t currentShieldMode = KeyEventHdr->GetCurrentShieldMode();
+    if (currentShieldMode == SHIELD_MODE::FACTORY_MODE) {
+        auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
+        CHKPV(eventDispatchHandler);
+        eventDispatchHandler->HandleKeyEvent(keyEvent);
+    } else {
+        CHKPV(nextHandler_);
+        nextHandler_->HandleKeyEvent(keyEvent);
+    }
 }
 
 int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
@@ -312,6 +328,7 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     auto touchpad = libinput_event_get_touchpad_event(event);
     CHKPR(touchpad, ERROR_NULL_POINTER);
     int32_t seatSlot = libinput_event_touchpad_get_seat_slot(touchpad);
+    GestureIdentify(event);
     buttonIds_.insert(seatSlot);
     auto type = libinput_event_get_type(event);
     if (buttonIds_.size() == FINGER_NUM &&
@@ -320,6 +337,44 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
         HandleMouseEvent(event);
     }
     return RET_OK;
+#else
+    MMI_HILOGW("Pointer device does not support");
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
+int32_t EventNormalizeHandler::GestureIdentify(libinput_event* event)
+{
+    CHKPR(event, ERROR_NULL_POINTER);
+    auto touchpad = libinput_event_get_touchpad_event(event);
+    CHKPR(touchpad, ERROR_NULL_POINTER);
+    int32_t seatSlot = libinput_event_touchpad_get_seat_slot(touchpad);
+    double logicalX = libinput_event_touchpad_get_x(touchpad);
+    double logicalY = libinput_event_touchpad_get_y(touchpad);
+    auto originType = libinput_event_get_type(event);
+    auto actionType = GESTURE_HANDLER->GestureIdentify(originType, seatSlot, logicalX, logicalY);
+    if (actionType == PointerEvent::POINTER_ACTION_UNKNOWN) {
+        MMI_HILOGD("Gesture identify failed");
+        return RET_ERR;
+    }
+    auto rotateAngle = GESTURE_HANDLER->GetRotateAngle();
+
+    if (nextHandler_ == nullptr) {
+        MMI_HILOGW("Pointer device does not support");
+        return ERROR_UNSUPPORT;
+    }
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    if (MouseEventHdr->NormalizeRotateEvent(event, actionType, rotateAngle) == RET_ERR) {
+        MMI_HILOGE("OnEvent is failed");
+        return RET_ERR;
+    }
+    auto pointerEvent = MouseEventHdr->GetPointerEvent();
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
+    nextHandler_->HandlePointerEvent(pointerEvent);
+    if (actionType == PointerEvent::POINTER_ACTION_ROTATE_END) {
+        pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
+    }
 #else
     MMI_HILOGW("Pointer device does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -454,8 +509,7 @@ int32_t EventNormalizeHandler::AddHandleTimer(int32_t timeout)
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
         auto keyEvent = KeyEventHdr->GetKeyEvent();
         CHKPV(keyEvent);
-        CHKPV(nextHandler_);
-        nextHandler_->HandleKeyEvent(keyEvent);
+        UpdateKeyEventHandlerChain(keyEvent);
         int32_t triggerTime = KeyRepeat->GetIntervalTime(keyEvent->GetDeviceId());
         this->AddHandleTimer(triggerTime);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD

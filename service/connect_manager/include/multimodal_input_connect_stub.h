@@ -21,6 +21,7 @@
 #include "nocopyable.h"
 
 #include "i_multimodal_input_connect.h"
+#include "mmi_event_observer.h"
 #include "mmi_log.h"
 #include "multimodalinput_ipc_interface_code.h"
 #include "multimodal_input_connect_define.h"
@@ -54,6 +55,9 @@ protected:
     int32_t StubGetHoverScrollState(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPointerVisible(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPointerStyle(MessageParcel& data, MessageParcel& reply);
+    int32_t StubNotifyNapOnline(MessageParcel& data, MessageParcel& reply);
+    int32_t StubRemoveInputEventObserver(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetNapStatus(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetPointerStyle(MessageParcel& data, MessageParcel& reply);
     int32_t StubIsPointerVisible(MessageParcel& data, MessageParcel& reply);
     int32_t StubMarkProcessed(MessageParcel& data, MessageParcel& reply);
@@ -79,6 +83,7 @@ protected:
     int32_t StubInjectPointerEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetAnrListener(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetDisplayBindInfo(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetAllMmiSubscribedEvents(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetDisplayBind(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPointerColor(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetPointerColor(MessageParcel& data, MessageParcel& reply);
@@ -107,6 +112,8 @@ protected:
     int32_t StubSetTouchpadRightClickType(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetTouchpadRightClickType(MessageParcel& data, MessageParcel& reply);
     int32_t StubClearWindowPointerStyle(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetShieldStatus(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetShieldStatus(MessageParcel& data, MessageParcel& reply);
 private:
     int32_t VerifyTouchPadSetting(void);
 };

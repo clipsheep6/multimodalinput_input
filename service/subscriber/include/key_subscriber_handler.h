@@ -28,6 +28,7 @@
 #include "key_event.h"
 #include "key_option.h"
 #include "uds_server.h"
+#include "nap_process.h"
 
 namespace OHOS {
 namespace MMI {
@@ -82,12 +83,15 @@ private:
     bool IsNotifyPowerKeySubsciber(int32_t keyCode, const std::vector<int32_t> &keyCodes);
     void HandleKeyUpWithDelay(std::shared_ptr<KeyEvent> keyEvent, const std::shared_ptr<Subscriber> &subscriber);
     void PrintKeyUpLog(const std::shared_ptr<Subscriber> &subscriber);
+    void SubscriberNotify();
 
 private:
     std::list<std::shared_ptr<Subscriber>> subscribers_ {};
     bool callbackInitialized_ { false };
     bool hasEventExecuting_ { false };
     std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
+    int32_t subscribePowerKeyId_ { -1 };
+    bool subscribePowerKeyState_ { false };
 };
 } // namespace MMI
 } // namespace OHOS

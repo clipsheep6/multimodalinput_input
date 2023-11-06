@@ -31,6 +31,10 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeySubscriberHandler" };
 constexpr uint32_t MAX_PRE_KEY_COUNT = 4;
+constexpr int32_t REMOVE_OBSERVER = -2;
+constexpr int32_t UNOBSERVED = -1;
+constexpr int32_t ACTIVE_EVENT = 2;
+const std::string HIGH_PRIORITY_BUNDLE = "com.ohos.sceneboard";
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -98,6 +102,11 @@ int32_t KeySubscriberHandler::UnsubscribeKeyEvent(SessionPtr sess, int32_t subsc
 {
     CALL_INFO_TRACE;
     MMI_HILOGD("subscribeId:%{public}d", subscribeId);
+    if (subscribeId == subscribePowerKeyId_) {
+        subscribePowerKeyId_ = -1;
+        subscribePowerKeyState_ = false;
+        MMI_HILOGD("subscribePowerKeyId_ remove");
+    }
     for (auto it = subscribers_.begin(); it != subscribers_.end(); ++it) {
         if ((*it)->id_ == subscribeId && (*it)->sess_ == sess) {
             ClearTimer(*it);
@@ -149,6 +158,15 @@ void KeySubscriberHandler::InsertSubScriber(std::shared_ptr<Subscriber> subs)
         }
     }
     subscribers_.push_back(subs);
+    MMI_HILOGD("current subs programName is %{public}s", subs->sess_->GetProgramName().c_str());
+    std::shared_ptr<KeyOption> keyOption = subs->keyOption_;
+    std::string name = subs->sess_->GetProgramName();
+    if (name.compare(HIGH_PRIORITY_BUNDLE) == 0 && keyOption->GetFinalKey() == KeyEvent::KEYCODE_POWER &&
+        !keyOption->IsFinalKeyDown()) {
+        MMI_HILOGI("high priority subscribe power key up");
+        subscribePowerKeyId_ = subs->id_;
+        subscribePowerKeyState_ = true;
+    }
 }
 
 void KeySubscriberHandler::OnSessionDelete(SessionPtr sess)
@@ -322,37 +340,50 @@ bool KeySubscriberHandler::HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEve
         for (const auto &keyCode : keyOption->GetPreKeys()) {
             MMI_HILOGD("keyOption->prekey:%{public}d", keyCode);
         }
-
         if (!keyOption->IsFinalKeyDown()) {
             MMI_HILOGD("!keyOption->IsFinalKeyDown()");
             continue;
         }
-
         if (keyCode != keyOption->GetFinalKey()) {
             ClearTimer(subscriber);
             MMI_HILOGD("keyCode != keyOption->GetFinalKey()");
             continue;
         }
-
         if (!IsPreKeysMatch(keyOption->GetPreKeys(), pressedKeys)) {
             ClearTimer(subscriber);
             MMI_HILOGD("preKeysMatch failed");
             continue;
         }
-
         if (keyOption->GetFinalKeyDownDuration() <= 0) {
             MMI_HILOGD("keyOption->GetFinalKeyDownDuration() <= 0");
             NotifySubscriber(keyEvent, subscriber);
             handled = true;
             continue;
         }
-
         if (!AddTimer(subscriber, keyEvent)) {
             MMI_HILOGE("Leave, add timer failed");
         }
     }
+    SubscriberNotify();
     MMI_HILOGD("%{public}s", handled ? "true" : "false");
     return handled;
+}
+
+void KeySubscriberHandler::SubscriberNotify()
+{
+    if (NapProcess::GetInstance()->GetNapClientPid() != REMOVE_OBSERVER &&
+        NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
+        OHOS::MMI::NapProcess::NapStatusData napData;
+        for (const auto &subscriber : subscribers_) {
+            auto sess = subscriber->sess_;
+            CHKPV(sess);
+            napData.pid = sess->GetPid();
+            napData.uid = sess->GetUid();
+            napData.bundleName = sess->GetPid();
+            napData.syncStatus = ACTIVE_EVENT;
+            NapProcess::GetInstance()->NotifyBundleName(napData);
+        }
+    }
 }
 
 bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent)
@@ -391,10 +422,7 @@ bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
             continue;
         }
         std::optional<KeyEvent::KeyItem> keyItem = keyEvent->GetKeyItem();
-        if (!keyItem) {
-            MMI_HILOGE("The keyItem is nullopt");
-            return false;
-        }
+        CHK_KEY_ITEM(keyItem);
         auto upTime = keyEvent->GetActionTime();
         auto downTime = keyItem->GetDownTime();
         if (upTime - downTime >= (static_cast<int64_t>(duration) * 1000)) {
@@ -405,6 +433,7 @@ bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
         HandleKeyUpWithDelay(keyEvent, subscriber);
         handled = true;
     }
+    SubscriberNotify();
     MMI_HILOGD("%{public}s", handled ? "true" : "false");
     return handled;
 }
@@ -525,6 +554,11 @@ void KeySubscriberHandler::HandleKeyUpWithDelay(std::shared_ptr<KeyEvent> keyEve
 {
     auto keyUpDelay = subscriber->keyOption_->GetFinalKeyUpDelay();
     if (keyUpDelay <= 0) {
+        if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER && subscribePowerKeyState_ &&
+            subscriber->id_ != subscribePowerKeyId_) {
+            MMI_HILOGE("stop notify, current subscriber in low priority");
+            return;
+        }
         NotifySubscriber(keyEvent, subscriber);
     } else {
         if (!AddTimer(subscriber, keyEvent)) {

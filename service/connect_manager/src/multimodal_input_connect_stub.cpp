@@ -27,6 +27,7 @@
 #include "permission_helper.h"
 #include "pixel_map.h"
 #include "time_cost_chk.h"
+#include "nap_process.h"
 
 namespace OHOS {
 namespace MMI {
@@ -34,6 +35,9 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectStub" };
 using ConnFunc = int32_t (MultimodalInputConnectStub::*)(MessageParcel& data, MessageParcel& reply);
 } // namespace
+const int32_t TUPLE_PID = 0;
+const int32_t TUPLE_UID = 1;
+const int32_t TUPLE_NAME = 2;
 const int32_t MAX_BUFFER_SIZE = 1000000;
 const int32_t DEFAULT_POINTER_COLOR = 0x000000;
 int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel& data,
@@ -94,6 +98,15 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_STYLE):
             return StubSetPointerStyle(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NOTIFY_NAP_ONLINE):
+            return StubNotifyNapOnline(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::RMV_INPUT_EVENT_OBSERVER):
+            return StubRemoveInputEventObserver(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_NAP_STATUS):
+            return StubSetNapStatus(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::CLEAN_WIDNOW_STYLE):
             return StubClearWindowPointerStyle(data, reply);
@@ -172,6 +185,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_DISPLAY_BIND_INFO):
             return StubGetDisplayBindInfo(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_ALL_NAPSTATUS_DATA):
+            return StubGetAllMmiSubscribedEvents(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_DISPLAY_BIND):
             return StubSetDisplayBind(data, reply);
@@ -256,6 +272,12 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MOUSE_HOT_SPOT):
             return StubSetMouseHotSpot(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_SHIELD_STATUS):
+            return StubSetShieldStatus(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_SHIELD_STATUS):
+            return StubGetShieldStatus(data, reply);
             break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
@@ -529,6 +551,31 @@ int32_t MultimodalInputConnectStub::StubSetPointerSize(MessageParcel& data, Mess
     return RET_OK;
 }
 
+int32_t MultimodalInputConnectStub::StubSetNapStatus(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t napPid = -1;
+    int32_t napUid = -1;
+    std::string napBundleName;
+    int32_t napStatus = 0;
+    READINT32(data, napPid, IPC_PROXY_DEAD_OBJECT_ERR);
+    READINT32(data, napUid, IPC_PROXY_DEAD_OBJECT_ERR);
+    READSTRING(data, napBundleName, IPC_PROXY_DEAD_OBJECT_ERR);
+    READINT32(data, napStatus, IPC_PROXY_DEAD_OBJECT_ERR);
+
+    int32_t ret = SetNapStatus(napPid, napUid, napBundleName, napStatus);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call StubSetNapStatus failed ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("Success set napStatus:%{public}d, pid:%{public}d", napStatus, GetCallingPid());
+    return RET_OK;
+}
+
 int32_t MultimodalInputConnectStub::StubGetPointerSize(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
@@ -758,6 +805,20 @@ int32_t MultimodalInputConnectStub::StubGetPointerSpeed(MessageParcel& data, Mes
     WRITEINT32(reply, speed, IPC_STUB_WRITE_PARCEL_ERR);
     MMI_HILOGD("Pointer speed:%{public}d,ret:%{public}d", speed, ret);
     return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubNotifyNapOnline(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = NotifyNapOnline();
+    return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubRemoveInputEventObserver(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = RemoveInputEventObserver();
+    return ret;
 }
 
 int32_t MultimodalInputConnectStub::StubSetPointerStyle(MessageParcel& data, MessageParcel& reply)
@@ -1256,6 +1317,34 @@ int32_t MultimodalInputConnectStub::StubGetDisplayBindInfo(MessageParcel& data, 
     return RET_OK;
 }
 
+int32_t MultimodalInputConnectStub::StubGetAllMmiSubscribedEvents(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> datas;
+    int32_t ret = GetAllMmiSubscribedEvents(datas);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetDisplayBindInfo failed, ret:%{public}d", ret);
+        return ret;
+    }
+    int32_t size = static_cast<int32_t>(datas.size());
+    WRITEINT32(reply, size, ERR_INVALID_VALUE);
+    for (const auto &data : datas) {
+        WRITEINT32(reply, std::get<TUPLE_PID>(data.first), ERR_INVALID_VALUE);
+        WRITEINT32(reply, std::get<TUPLE_UID>(data.first), ERR_INVALID_VALUE);
+        WRITESTRING(reply, std::get<TUPLE_NAME>(data.first), ERR_INVALID_VALUE);
+        WRITEINT32(reply, data.second, ERR_INVALID_VALUE);
+    }
+    return RET_OK;
+}
+
 int32_t MultimodalInputConnectStub::StubSetDisplayBind(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
@@ -1434,11 +1523,6 @@ int32_t MultimodalInputConnectStub::StubSetKeyDownDuration(MessageParcel& data, 
     if (!PerHelper->VerifySystemApp()) {
         MMI_HILOGE("verify system APP failed");
         return ERROR_NOT_SYSAPI;
-    }
-
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check failed");
-        return CHECK_PERMISSION_FAIL;
     }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
@@ -1825,6 +1909,63 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadRightClickType(MessageParcel&
     }
     WRITEINT32(reply, type, IPC_STUB_WRITE_PARCEL_ERR);
     MMI_HILOGD("Touchpad right button menu type :%{public}d, ret:%{public}d", type, ret);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetShieldStatus(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!PerHelper->CheckDispatchControl()) {
+        MMI_HILOGE("input dispatch control permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    int32_t shieldMode { 0 };
+    bool isShield { false };
+    READINT32(data, shieldMode, IPC_PROXY_DEAD_OBJECT_ERR);
+    READBOOL(data, isShield, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetShieldStatus(shieldMode, isShield);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetShieldStatus failed, ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("Success shieldMode:%{public}d, isShield:%{public}d", shieldMode, isShield);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetShieldStatus(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!PerHelper->CheckDispatchControl()) {
+        MMI_HILOGE("input dispatch control permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    int32_t shieldMode { 0 };
+    bool state { false };
+    READINT32(data, shieldMode, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = GetShieldStatus(shieldMode, state);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetShieldStatus failed ret:%{public}d", ret);
+        return ret;
+    }
+    WRITEBOOL(reply, state, IPC_PROXY_DEAD_OBJECT_ERR);
     return RET_OK;
 }
 } // namespace MMI

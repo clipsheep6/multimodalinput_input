@@ -29,6 +29,7 @@
 #include "i_input_device_listener.h"
 #include "i_input_event_consumer.h"
 #include "i_input_event_filter.h"
+#include "mmi_event_observer.h"
 #include "i_window_checker.h"
 #include "input_device.h"
 #include "key_option.h"
@@ -60,6 +61,40 @@ public:
     int32_t AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority, uint32_t deviceTags);
     int32_t RemoveInputEventFilter(int32_t filterId);
 
+    /**
+     * @brief Updates the process info to other server.
+     * @param observer Indicates the progess info.
+     * @return the observer setting successed or not.
+     * @since 10
+     */
+    int32_t AddInputEventObserver(std::shared_ptr<MMIEventObserver> observer);
+
+    /**
+     * @brief Callback interface of the remove module.
+     * @param observer Indicates the progess info.
+     * @return EC_OK if unsubscribe successfully, else return other errcodes.
+     * @since 10
+     */
+    int32_t RemoveInputEventObserver(std::shared_ptr<MMIEventObserver> observer = nullptr);
+
+    /**
+     * @brief Set the process info to mmi server.
+     * @param pid Indicates pid.
+     * @param uid Indicates uid.
+     * @param bundleName Indicates bundleName.
+     * @param napStatus Indicates napStatus.
+     * @since 10
+     */
+    void SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus);
+
+    /**
+     * @brief Get the process info datas to other server.
+     * @param callback Indicates the callback used to receive the reported data.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 10
+     */
+    int32_t GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> &datas);
+    
     /**
      * @brief Sets a consumer for the window input event of the current process.
      * @param inputEventConsumer Indicates the consumer to set. The window input event of the current process
@@ -709,6 +744,27 @@ public:
      * @since 9
      */
     void SetWindowCheckerHandler(std::shared_ptr<IWindowChecker> windowChecker);
+
+    /**
+     * @brief Sets whether shield key event interception, only support shield key event.
+     * @param shieldMode Indicates shield mode.
+     * @param isShield Indicates whether key event handler chain is shield. The value <b>true</b> indicates that
+     * the key event build chain is shield, all key events derictly dispatch to window,
+     * if the value <b>false</b> indicates not shield key event interception, handle by the chain.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t SetShieldStatus(int32_t shieldMode, bool isShield);
+
+    /**
+    * Gets shield event interception status corresponding to shield mode
+    *
+    * @param shieldMode - Accroding the shield mode select shield status.
+    * @param isShield - shield status of shield mode param.
+    * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+    * @since 9
+    */
+    int32_t GetShieldStatus(int32_t shieldMode, bool &isShield);
 
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     /**

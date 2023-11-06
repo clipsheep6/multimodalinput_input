@@ -36,15 +36,15 @@ public:
     ~JsInputMonitorManager() = default;
 
     void AddMonitor(napi_env jsEnv, const std::string &typeName,
-        Rect hotRectArea[], int32_t rectTotal, napi_value callback);
+        Rect hotRectArea[], int32_t rectTotal, napi_value callback, const int32_t fingers = 0);
 
-    void RemoveMonitor(napi_env jsEnv, const std::string &typeName, napi_value callback);
+    void RemoveMonitor(napi_env jsEnv, const std::string &typeName, napi_value callback, const int32_t fingers = 0);
 
-    void RemoveMonitor(napi_env jsEnv, const std::string &typeName);
+    void RemoveMonitor(napi_env jsEnv, const std::string &typeName, const int32_t fingers = 0);
 
     void RemoveMonitor(napi_env jsEnv);
 
-    const std::shared_ptr<JsInputMonitor> GetMonitor(int32_t id);
+    const std::shared_ptr<JsInputMonitor> GetMonitor(int32_t id, int32_t fingers);
 
     bool AddEnv(napi_env env, napi_callback_info cbInfo);
 

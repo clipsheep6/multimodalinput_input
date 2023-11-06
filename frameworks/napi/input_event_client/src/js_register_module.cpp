@@ -27,6 +27,8 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterModule" };
+constexpr int32_t JS_CALLBACK_MOUSE_BUTTON_MIDDLE = 1;
+constexpr int32_t JS_CALLBACK_MOUSE_BUTTON_RIGHT = 2;
 } // namespace
 
 static void GetInjectionEventData(napi_env env, std::shared_ptr<KeyEvent> keyEvent, napi_value keyHandle)
@@ -115,6 +117,32 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     return result;
 }
 
+static void HandleMouseButton(napi_env env, napi_value mouseHandle, std::shared_ptr<PointerEvent> pointerEvent)
+{
+    int32_t button;
+    int32_t ret = GetNamedPropertyInt32(env, mouseHandle, "button", button);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get button failed");
+    }
+    if (button < 0) {
+        MMI_HILOGE("button:%{public}d is less 0, can not process", button);
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "button must be greater than or equal to 0");
+    }
+
+    switch (button) {
+        case JS_CALLBACK_MOUSE_BUTTON_MIDDLE:
+            button = PointerEvent::MOUSE_BUTTON_MIDDLE;
+            break;
+        case JS_CALLBACK_MOUSE_BUTTON_RIGHT:
+            button = PointerEvent::MOUSE_BUTTON_RIGHT;
+            break;
+        default:
+            break;
+    }
+    pointerEvent->SetButtonId(button);
+    pointerEvent->SetButtonPressed(button);
+}
+
 static void HandleMouseAction(napi_env env, napi_value mouseHandle,
     std::shared_ptr<PointerEvent> pointerEvent, PointerEvent::PointerItem &item)
 {
@@ -122,6 +150,7 @@ static void HandleMouseAction(napi_env env, napi_value mouseHandle,
     int32_t ret = GetNamedPropertyInt32(env, mouseHandle, "action", action);
     if (ret != RET_OK) {
         MMI_HILOGE("Get action failed");
+        return;
     }
     switch (action) {
         case JS_CALLBACK_MOUSE_ACTION_MOVE:
@@ -148,17 +177,7 @@ static void HandleMouseAction(napi_env env, napi_value mouseHandle,
             break;
     }
     if (action == JS_CALLBACK_MOUSE_ACTION_BUTTON_DOWN || action == JS_CALLBACK_MOUSE_ACTION_BUTTON_UP) {
-        int32_t button;
-        ret = GetNamedPropertyInt32(env, mouseHandle, "button", button);
-        if (ret != RET_OK) {
-            MMI_HILOGE("Get button failed");
-        }
-        if (button < 0) {
-            MMI_HILOGE("button:%{public}d is less 0, can not process", button);
-            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "button must be greater than or equal to 0");
-        }
-        pointerEvent->SetButtonId(button);
-        pointerEvent->SetButtonPressed(button);
+        HandleMouseButton(env, mouseHandle, pointerEvent);
     }
 }
 
@@ -242,6 +261,7 @@ static int32_t HandleTouchAction(napi_env env, napi_value touchHandle,
     int32_t ret = GetNamedPropertyInt32(env, touchHandle, "action", action);
     if (ret != RET_OK) {
         MMI_HILOGE("Get action failed");
+        return RET_ERR;
     }
     switch (action) {
         case JS_CALLBACK_TOUCH_ACTION_DOWN:
@@ -268,18 +288,22 @@ static napi_value HandleTouchProperty(napi_env env, napi_value touchHandle)
     int32_t ret = napi_get_named_property(env, touchHandle, "touch", &touchProperty);
     if (ret != RET_OK) {
         MMI_HILOGE("Get touch failed");
+        return nullptr;
     }
     if (touchProperty == nullptr) {
         MMI_HILOGE("Touch value is null");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid touch");
+        return nullptr;
     }
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, touchProperty, &tmpType) != napi_ok) {
         MMI_HILOGE("Call napi_typeof failed");
+        return nullptr;
     }
     if (tmpType != napi_object) {
         MMI_HILOGE("touch is not napi_object");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "touch", "object");
+        return nullptr;
     }
     return touchProperty;
 }
@@ -287,7 +311,6 @@ static napi_value HandleTouchProperty(napi_env env, napi_value touchHandle)
 static void HandleTouchPropertyInt32(napi_env env, napi_value touchHandle,
     std::shared_ptr<PointerEvent> pointerEvent, PointerEvent::PointerItem &item, int32_t action)
 {
-    napi_value touchProperty = HandleTouchProperty(env, touchHandle);
     int32_t sourceType;
     int32_t ret = GetNamedPropertyInt32(env, touchHandle, "sourceType", sourceType);
     if (ret != RET_OK) {
@@ -297,9 +320,11 @@ static void HandleTouchPropertyInt32(napi_env env, napi_value touchHandle,
         MMI_HILOGE("sourceType:%{public}d is less 0, can not process", sourceType);
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "sourceType must be greater than or equal to 0");
     }
-    if (sourceType == TOUCH_SCREEN) {
+    if (sourceType == TOUCH_SCREEN || sourceType == PEN) {
         sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
     }
+    napi_value touchProperty = HandleTouchProperty(env, touchHandle);
+    CHKPV(touchProperty);
     int32_t screenX;
     ret = GetNamedPropertyInt32(env, touchProperty, "screenX", screenX);
     if (ret != RET_OK) {
@@ -315,9 +340,21 @@ static void HandleTouchPropertyInt32(napi_env env, napi_value touchHandle,
     if (ret != RET_OK) {
         MMI_HILOGE("Get pressed time failed");
     }
+    int32_t toolType;
+    ret = GetNamedPropertyInt32(env, touchProperty, "toolType", toolType);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get toolType failed");
+    }
+    double pressure;
+    ret = GetNamedPropertyDouble(env, touchProperty, "pressure", pressure);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get pressure failed");
+    }
     item.SetDisplayX(screenX);
     item.SetDisplayY(screenY);
     item.SetPointerId(0);
+    item.SetToolType(toolType);
+    item.SetPressure(pressure);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetSourceType(sourceType);
