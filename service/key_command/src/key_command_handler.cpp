@@ -926,7 +926,7 @@ void KeyCommandHandler::KnuckleGestureProcessor(const std::shared_ptr<PointerEve
     int64_t intervalTime = touchEvent->GetActionTime() - knuckleGesture.lastPointerUpTime;
     bool isTimeIntervalReady = intervalTime > 0 && intervalTime <= downToPrevUpTimeConfig_;
     float downToPrevDownDistance = AbsDiff(knuckleGesture, touchEvent);
-    bool isDistanceReady = downToPrevDownDistance < downToPrevDownDistanceConfig_;
+    bool isDistanceReady = true;
     knuckleGesture.downToPrevUpTime = intervalTime;
     knuckleGesture.doubleClickDistance = downToPrevDownDistance;
     UpdateKnuckleGestureInfo(touchEvent, knuckleGesture);
