@@ -583,7 +583,7 @@ int32_t JsInputMonitor::TransformMultiTapEvent(const std::shared_ptr<PointerEven
 
 int32_t JsInputMonitor::GetMultiTapAction(int32_t action) const
 {
-    switch(action) {
+    switch (action) {
         case PointerEvent::POINTER_ACTION_TRIPTAP: {
             return GESTURE_END;
         }
