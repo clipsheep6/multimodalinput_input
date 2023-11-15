@@ -330,6 +330,9 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
     if (InputDevMgr->HasPointerDevice()) {
         NotifyPointerToWindow();
     }
+    if (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        NotifyTouchToWindow();
+    }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
@@ -478,7 +481,7 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction)
 {
     CALL_INFO_TRACE;
     CHKPV(udsServer_);
-    if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+    if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState() && (!extraData_.appended)) {
         MMI_HILOGI("the mouse is hide");
         return;
     }
@@ -1103,7 +1106,7 @@ void InputWindowsManager::UpdatePointerEvent(int32_t logicalX, int32_t logicalY,
 {
     CHKPV(pointerEvent);
     MMI_HILOGD("LastWindowInfo:%{public}d, touchWindow:%{public}d", lastWindowInfo_.id, touchWindow.id);
-    if (lastWindowInfo_.id != touchWindow.id) {
+    if (lastWindowInfo_.id != touchWindow.id && lastWindowInfo_.id != -1) {
         DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
         lastLogicX_ = logicalX;
         lastLogicY_ = logicalY;
@@ -1223,7 +1226,9 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         }
         if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
             IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
-            DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
+            if (!extraData_.appended) {
+                DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
+            }
         }
         IPointerDrawingManager::GetInstance()->UpdateDisplayInfo(*physicalDisplayInfo);
         WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
@@ -1265,9 +1270,12 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
                "displayX:%{public}d,displayY:%{public}d,windowX:%{public}d,windowY:%{public}d",
                touchWindow->pid, touchWindow->id, touchWindow->agentWindowId,
                logicalX, logicalY, pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), windowX, windowY);
-    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP ||
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL) {
         MMI_HILOGD("Clear extra data");
         ClearExtraData();
+        lastPointerEvent_ = nullptr;
+        lastWindowInfo_.id = -1;
     }
     return ERR_OK;
 }
@@ -1400,16 +1408,14 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     pointerItem.SetToolWindowY(pointerItem.GetToolDisplayY() + physicDisplayInfo->y - touchWindow->area.y);
     pointerItem.SetTargetWindowId(touchWindow->id);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
-    bool checkExtraData = extraData_.appended && ((extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
-        extraData_.pointerId == pointerId) || pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN);
+    bool checkExtraData = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
+        ((extraData_.pointerId == pointerId) || pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN);
     if (checkExtraData) {
         pointerEvent->SetBuffer(extraData_.buffer);
         UpdatePointerAction(pointerEvent);
         PullEnterLeaveEvent(logicalX, logicalY, pointerEvent, touchWindow);
     } else {
         pointerEvent->ClearBuffer();
-        lastTouchEvent_ = nullptr;
-        lastTouchWindowInfo_.id = -1;
     }
     MMI_HILOGI("pid:%{public}d,eventId:%{public}d,", touchWindow->pid, pointerEvent->GetId());
     MMI_HILOGD("logicalX:%{public}d,logicalY:%{public}d,"
@@ -1435,7 +1441,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), pointerStyle);
     } else {
         if (IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
-            if (!checkExtraData) {
+            if (!extraData_.appended && (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_UP)) {
                 DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
                 IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
             }
@@ -1453,11 +1459,49 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             MMI_HILOGD("Clear the touch info, action is up, pointerid:%{public}d", pointerId);
         }
     }
-    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP ||
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL) {
         MMI_HILOGD("Clear extra data");
         ClearExtraData();
+        lastTouchEvent_ = nullptr;
+        lastTouchWindowInfo_.id = -1;
     }
     return ERR_OK;
+}
+
+void InputWindowsManager::NotifyTouchToWindow()
+{
+    CALL_INFO_TRACE;
+    std::optional<WindowInfo> windowInfo;
+    CHKPV(lastTouchEvent_);
+
+    if (lastTouchEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_MOVE) {
+        windowInfo = GetWindowInfo(lastTouchLogicX_, lastTouchLogicY_);
+    }
+
+    if (!windowInfo) {
+        MMI_HILOGE("The windowInfo is nullptr");
+        return;
+    }
+    if (windowInfo->id == lastTouchWindowInfo_.id) {
+        MMI_HILOGI("The touch pointer does not leave the window:%{public}d", lastTouchWindowInfo_.id);
+        lastTouchWindowInfo_ = *windowInfo;
+        return;
+    }
+    bool isFindLastWindow = false;
+    for (const auto &item : displayGroupInfo_.windowsInfo) {
+        if (item.id == lastTouchWindowInfo_.id) {
+            DispatchTouch(PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW);
+            isFindLastWindow = true;
+            break;
+        }
+    }
+    if (!isFindLastWindow) {
+        if (udsServer_ != nullptr && udsServer_->GetClientFd(lastTouchWindowInfo_.pid) != INVALID_FD) {
+            DispatchTouch(PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW);
+        }
+    }
+    DispatchTouch(PointerEvent::POINTER_ACTION_PULL_IN_WINDOW);
 }
 
 void InputWindowsManager::PullEnterLeaveEvent(int32_t logicalX, int32_t logicalY,
