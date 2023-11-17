@@ -953,7 +953,7 @@ void KeyCommandHandler::KnuckleGestureProcessor(const std::shared_ptr<PointerEve
     knuckleGesture.doubleClickDistance = downToPrevDownDistance;
     UpdateKnuckleGestureInfo(touchEvent, knuckleGesture);
     if (isTimeIntervalReady && isDistanceReady) {
-        MMI_HILOGD("knuckle gesture start launch ability");
+        MMI_HILOGI("knuckle gesture start launch ability");
         DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime);
         LaunchAbility(knuckleGesture.ability, 0);
         knuckleGesture.state = true;
@@ -1372,11 +1372,8 @@ bool KeyCommandHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
     }
 
     bool isLaunchAbility = false;
-    std::vector<Sequence> tempSeqs;
-    for (Sequence& item : sequences_) {
-        if (HandleSequence(item, isLaunchAbility)) {
-            tempSeqs.push_back(item);
-        }
+    for (Sequence& item : filterSequences_) {
+        HandleSequence(item, isLaunchAbility);
     }
 
     if (isLaunchAbility) {
@@ -1387,12 +1384,6 @@ bool KeyCommandHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
             InputHandler->GetSubscriberHandler()->RemoveSubscriberKeyUpTimer(item.keyCode);
             RemoveSubscribedTimer(item.keyCode);
         }
-    }
-
-    if (tempSeqs.empty()) {
-        MMI_HILOGD("No matching sequence found");
-    } else {
-        filterSequences_ = tempSeqs;
     }
     return isLaunchAbility;
 }
@@ -1459,11 +1450,13 @@ bool KeyCommandHandler::HandleSequence(Sequence &sequence, bool &isLaunchAbility
             MMI_HILOGD("Start launch ability immediately");
             LaunchAbility(sequence);
             isLaunchAbility = true;
+            filterSequences_.clear();
             return true;
         }
         sequence.timerId = TimerMgr->AddTimer(sequence.abilityStartDelay, 1, [this, sequence] () {
             MMI_HILOGD("Timer callback");
             LaunchAbility(sequence);
+            filterSequences_.clear();
         });
         if (sequence.timerId < 0) {
             MMI_HILOGE("Add Timer failed");
