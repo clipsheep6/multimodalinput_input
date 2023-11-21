@@ -52,6 +52,18 @@ enum Direction {
     DIRECTION270
 };
 
+enum DisplayMode {
+    FOLD_DISPLAY_MODE_UNKNOW,
+
+    FOLD_DISPLAY_MODE_FULL,
+
+    FOLD_DISPLAY_MODE_MAIN,
+
+    FOLD_DISPLAY_MODE_SUB,
+
+    FOLD_DISPLAY_MODE_COORDINATION
+};
+
 struct Rect {
     /**
      * X coordinate of the upper left corner
@@ -155,6 +167,14 @@ struct WindowInfo {
      * @since 9
      */
     uint32_t flags;
+
+    int32_t action;
+
+    int32_t displayId;
+
+    int32_t zOrder;
+
+    std::vector<int32_t> pointerChangeAreas;
 };
 
 /**
@@ -227,6 +247,8 @@ struct DisplayInfo {
      * @since 9
      */
     Direction direction;
+
+    DisplayMode displayMode;
 };
 
 /**

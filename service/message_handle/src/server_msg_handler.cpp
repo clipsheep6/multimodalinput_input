@@ -211,7 +211,8 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     for (uint32_t i = 0; i < num; i++) {
         WindowInfo info;
         pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
-            >> info.pointerHotAreas >> info.agentWindowId >> info.flags;
+            >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
+            >> info.displayId >> info.zOrder >> info.pointerChangeAreas;
         displayGroupInfo.windowsInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");
@@ -222,7 +223,7 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     for (uint32_t i = 0; i < num; i++) {
         DisplayInfo info;
         pkt >> info.id >> info.x >> info.y >> info.width >> info.height
-            >> info.dpi >> info.name >> info.uniq >> info.direction;
+            >> info.dpi >> info.name >> info.uniq >> info.direction >> info.displayMode;
         displayGroupInfo.displaysInfo.push_back(info);
         if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read display info failed");

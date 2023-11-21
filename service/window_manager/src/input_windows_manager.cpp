@@ -610,10 +610,11 @@ void InputWindowsManager::PrintDisplayInfo()
         MMI_HILOGD("windowsInfos,id:%{public}d,pid:%{public}d,uid:%{public}d,"
             "area.x:%{public}d,area.y:%{public}d,area.width:%{public}d,area.height:%{public}d,"
             "defaultHotAreas.size:%{public}zu,pointerHotAreas.size:%{public}zu,"
-            "agentWindowId:%{public}d,flags:%{public}d",
+            "agentWindowId:%{public}d,flags:%{public}d,action:%{public}d,displayId:%{public}d,"
+            "zOrder:%{public}d",
             item.id, item.pid, item.uid, item.area.x, item.area.y, item.area.width,
             item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
-            item.agentWindowId, item.flags);
+            item.agentWindowId, item.flags, item.action, item.displayId, item.zOrder);
         for (const auto &win : item.defaultHotAreas) {
             MMI_HILOGD("defaultHotAreas:x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
                 win.x, win.y, win.width, win.height);
@@ -622,15 +623,18 @@ void InputWindowsManager::PrintDisplayInfo()
             MMI_HILOGD("pointerHotAreas:x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
                 pointer.x, pointer.y, pointer.width, pointer.height);
         }
+        for (const auto &areaSize : item.pointerChangeAreas) {
+            MMI_HILOGD("pointerChangeAreas:%{public}d", areaSize);
+        }
     }
 
     MMI_HILOGD("displayInfos,num:%{public}zu", displayGroupInfo_.displaysInfo.size());
     for (const auto &item : displayGroupInfo_.displaysInfo) {
         MMI_HILOGD("displayInfos,id:%{public}d,x:%{public}d,y:%{public}d,"
             "width:%{public}d,height:%{public}d,name:%{public}s,"
-            "uniq:%{public}s,direction:%{public}d",
+            "uniq:%{public}s,direction:%{public}d,displayMode:%{public}d",
             item.id, item.x, item.y, item.width, item.height, item.name.c_str(),
-            item.uniq.c_str(), item.direction);
+            item.uniq.c_str(), item.direction, item.displayMode);
     }
 }
 
