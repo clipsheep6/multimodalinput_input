@@ -46,6 +46,7 @@ public:
     void Init(UDSServer& udsServer);
     int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent);
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
+    void UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo);
     void SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId);
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId);
     void Dump(int32_t fd, const std::vector<std::string> &args);
@@ -99,12 +100,16 @@ public:
 
 private:
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
+    void PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo);
     void PrintDisplayInfo();
+    void PrintWindowGroupInfo(const WindowGroupInfo &windowGroupInfo);
     void CheckFocusWindowChange(const DisplayGroupInfo &displayGroupInfo);
     void CheckZorderWindowChange(const DisplayGroupInfo &displayGroupInfo);
     void UpdateDisplayIdAndName();
     void UpdatePointerAction(std::shared_ptr<PointerEvent> pointerEvent);
     bool IsNeedDrawPointer(PointerEvent::PointerItem &pointerItem) const;
+    void UpdateDisplayInfoByIncrementalInfo(const WindowInfo &item, DisplayGroupInfo &displayGroupInfo);
+    void UpdateWindowsInfoPerDisplay(const DisplayGroupInfo &displayGroupInfo);
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
     void GetPointerStyleByArea(WindowArea area, int32_t pid, int32_t winId, PointerStyle& pointerStyle);
@@ -163,6 +168,7 @@ private:
     std::shared_ptr<PointerEvent> lastTouchEvent_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_POINTER
     DisplayGroupInfo displayGroupInfo_;
+    std::map<int32_t, WindowGroupInfo> windowsPerDisplay_;
     PointerStyle lastPointerStyle_ {.id = -1};
     MouseLocation mouseLocation_ = { -1, -1 };
     std::map<int32_t, WindowInfo> touchItemDownInfos_;
