@@ -69,7 +69,8 @@ ohos_source_set("libmmi-common") {
   }
   external_deps = [
     "c_utils:utils",
-    "hilog:libhilog",
+    "ffrt:libffrt",
+    "hilog:libhilog"
   ]
 
   part_name = "input"
