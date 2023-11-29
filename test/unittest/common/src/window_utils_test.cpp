@@ -118,6 +118,5 @@ sptr<Rosen::Window> WindowUtilsTest::CreateWindow(const TestWindowInfo& info)
     }
     return Rosen::Window::Create(info.name, option);
 }
-
 } // namespace MMI
 } // namespace OHOS
