@@ -1035,6 +1035,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetHoverScrollState_00
 {
     CALL_TEST_DEBUG;
     ASSERT_TRUE(InputManager::GetInstance()->SetHoverScrollState(false) == RET_OK);
+    InputManager::GetInstance()->SetHoverScrollState(true);
 }
 
 /**
