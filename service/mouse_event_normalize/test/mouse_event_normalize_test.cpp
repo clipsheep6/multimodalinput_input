@@ -18,6 +18,7 @@
 
 #include "libinput.h"
 #include "mouse_event_normalize.h"
+#include "multimodal_input_preferences_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -38,8 +39,6 @@ void MouseEventNormalizeTest::SetUpTestCase(void)
 
 void MouseEventNormalizeTest::TearDownTestCase(void)
 {
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 void MouseEventNormalizeTest::SetUp()
