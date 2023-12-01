@@ -22,6 +22,27 @@
 namespace OHOS {
 namespace MMI {
 inline constexpr int32_t GLOBAL_WINDOW_ID = -1;
+
+inline constexpr int32_t DEFAULT_DISPLAY_ID = -1;
+
+/**
+ * @brief Enumerates the fold display mode.
+ */
+enum class FoldDisplayMode: uint32_t {
+    UNKNOWN = 0,
+    FULL = 1,
+    MAIN = 2,
+    SUB = 3,
+    COORDINATION = 4,
+};
+
+enum class WINDOW_UPDATE_ACTION: uint32_t {
+    UNKNOWN = 0,
+    ADD = 1,
+    DEL = 2,
+    CHANGE = 3,
+};
+
 enum Direction {
     /**
      * Rotating the display clockwise by 0 degree
@@ -91,6 +112,8 @@ struct WindowInfo {
      */
     static constexpr int32_t MAX_HOTAREA_COUNT = 10;
 
+    static constexpr int32_t POINTER_CHANGEAREA_COUNT = 4;
+
     /**
      * Untouchable window
      *
@@ -155,6 +178,30 @@ struct WindowInfo {
      * @since 9
      */
     uint32_t flags;
+
+    /**
+     * Agent window ID
+     *
+     * @since 9
+     */
+    WINDOW_UPDATE_ACTION action { WINDOW_UPDATE_ACTION::UNKNOWN };
+
+    /**
+     * Window display ID
+     *
+     * @since 9
+     */
+    int32_t displayId { DEFAULT_DISPLAY_ID };
+
+    /**
+     * Window order in Z-index
+     *
+     * @since 9
+     */
+    float zOrder { 0.0f };
+
+
+    std::vector<int32_t> pointerChangeAreas;
 };
 
 /**
@@ -227,6 +274,8 @@ struct DisplayInfo {
      * @since 9
      */
     Direction direction;
+
+    FoldDisplayMode displayMode { FoldDisplayMode::UNKNOWN };
 };
 
 /**
@@ -269,6 +318,29 @@ struct DisplayGroupInfo {
      * @since 9
      */
     std::vector<DisplayInfo> displaysInfo;
+};
+
+struct WindowGroupInfo {
+    /**
+     * ID of the focus window
+     *
+     * @since 9
+     */
+    int32_t focusWindowId { GLOBAL_WINDOW_ID };
+
+    /**
+     * Window display ID
+     *
+     * @since 9
+     */
+    int32_t displayId { DEFAULT_DISPLAY_ID };
+
+    /**
+     * List of window information of the logical display arranged in Z order, with the top window at the top
+     *
+     * @since 9
+     */
+    std::vector<WindowInfo> windowsInfo;
 };
 
 struct DisplayBindInfo {

@@ -57,6 +57,12 @@ void InputManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
     InputMgrImpl.UpdateDisplayInfo(displayGroupInfo);
 }
 
+void InputManager::UpdateWindowInfo(int32_t displayId, const std::vector<WindowInfo> &windows,
+    int32_t focusWindowId)
+{
+    InputMgrImpl.UpdateWindowInfo(displayId, windows, focusWindowId);
+}
+
 int32_t InputManager::AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority,
     uint32_t deviceTags)
 {

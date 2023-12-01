@@ -19,6 +19,7 @@
 #include <list>
 #include <map>
 #include <memory>
+#include <vector>
 
 #include "event_handler.h"
 #include "nocopyable.h"
@@ -57,6 +58,14 @@ public:
      * @since 9
      */
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
+
+    /**
+     * @brief Updates the windows information.
+     * @param windows Indicates the windows information.
+     * @since 9
+     */
+    void UpdateWindowInfo(int32_t displayId, const std::vector<WindowInfo> &windows, int32_t focusWindowId);
+
 
     int32_t AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority, uint32_t deviceTags);
     int32_t RemoveInputEventFilter(int32_t filterId);

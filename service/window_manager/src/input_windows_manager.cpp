@@ -15,6 +15,7 @@
 
 #include "input_windows_manager.h"
 
+#include <algorithm>
 #include <cstdlib>
 #include <cstdio>
 #include <linux/input.h>
@@ -281,9 +282,79 @@ int32_t InputWindowsManager::SetDisplayBind(int32_t deviceId, int32_t displayId,
     return bindInfo_.SetDisplayBind(deviceId, displayId, msg);
 }
 
+void InputWindowsManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo)
+{
+    CALL_DEBUG_ENTER;
+    PrintWindowGroupInfo(windowGroupInfo);
+    DisplayGroupInfo displayGroupInfo = displayGroupInfo_;
+    displayGroupInfo.focusWindowId = windowGroupInfo.focusWindowId;
+    for (const auto &item : windowGroupInfo.windowsInfo) {
+        UpdateDisplayInfoByIncrementalInfo(item, displayGroupInfo);
+    }
+    UpdateDisplayInfo(displayGroupInfo);
+}
+
+void InputWindowsManager::UpdateDisplayInfoByIncrementalInfo(const WindowInfo &item, DisplayGroupInfo &displayGroupInfo)
+{
+    CALL_DEBUG_ENTER;
+    switch (item.action) {
+        case WINDOW_UPDATE_ACTION::ADD: {
+            displayGroupInfo.windowsInfo.emplace_back(item);
+            break;
+        }
+        case WINDOW_UPDATE_ACTION::DEL: {
+            auto oldWindow = displayGroupInfo.windowsInfo.begin();
+            while (oldWindow != displayGroupInfo.windowsInfo.end()) {
+                if (oldWindow->id == item.id) {
+                    oldWindow = displayGroupInfo.windowsInfo.erase(oldWindow);
+                } else {
+                    oldWindow++;
+                }
+            }
+            break;
+        }
+        case WINDOW_UPDATE_ACTION::CHANGE: {
+            for (size_t idx = 0; idx < displayGroupInfo.windowsInfo.size(); idx++) {
+                if (item.id == displayGroupInfo.windowsInfo[idx].id) {
+                    displayGroupInfo.windowsInfo[idx] = item;
+                }
+            }
+            break;
+        }
+        default: {
+            MMI_HILOGD("WINDOW_UPDATE_ACTION is invalid, action:%d", item.action);
+            break;
+        }
+    }
+}
+
+void InputWindowsManager::UpdateWindowsInfoPerDisplay(const DisplayGroupInfo &displayGroupInfo)
+{
+    CALL_DEBUG_ENTER;
+    windowsPerDisplay_.clear();
+    for (const auto &window : displayGroupInfo.windowsInfo) {
+        auto it = windowsPerDisplay_.find(window.displayId);
+        if (it == windowsPerDisplay_.end()) {
+            windowsPerDisplay_[window.displayId] = WindowGroupInfo {-1, window.displayId, {window}};
+        } else {
+            it->second.windowsInfo.emplace_back(window);
+        }
+        if (displayGroupInfo.focusWindowId == window.id) {
+            windowsPerDisplay_[window.displayId].focusWindowId = window.id;
+        }
+    }
+    for (auto iter : windowsPerDisplay_) {
+        std::sort(iter.second.windowsInfo.begin(), iter.second.windowsInfo.end(), 
+            [](const WindowInfo &lwindow, const WindowInfo &rwindow) -> bool {
+            return lwindow.zOrder > rwindow.zOrder;
+        });
+    }
+}
+
 void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
 {
     CALL_DEBUG_ENTER;
+    UpdateWindowsInfoPerDisplay(displayGroupInfo);
     CheckFocusWindowChange(displayGroupInfo);
     CheckZorderWindowChange(displayGroupInfo);
     if (captureModeInfo_.isCaptureMode &&
@@ -292,6 +363,10 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
         captureModeInfo_.isCaptureMode = false;
     }
     displayGroupInfo_ = displayGroupInfo;
+    std::sort(displayGroupInfo_.windowsInfo.begin(), displayGroupInfo_.windowsInfo.end(), 
+        [](const WindowInfo &lwindow, const WindowInfo &rwindow) -> bool {
+        return lwindow.zOrder > rwindow.zOrder;
+    });
     PrintDisplayInfo();
     UpdateDisplayIdAndName();
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -602,19 +677,17 @@ void InputWindowsManager::NotifyPointerToWindow()
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
-void InputWindowsManager::PrintDisplayInfo()
+void InputWindowsManager::PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo)
 {
-    MMI_HILOGD("logicalInfo,width:%{public}d,height:%{public}d,focusWindowId:%{public}d",
-        displayGroupInfo_.width, displayGroupInfo_.height, displayGroupInfo_.focusWindowId);
-    MMI_HILOGD("windowsInfos,num:%{public}zu", displayGroupInfo_.windowsInfo.size());
-    for (const auto &item : displayGroupInfo_.windowsInfo) {
+    for (const auto &item : windowsInfo) {
         MMI_HILOGD("windowsInfos,id:%{public}d,pid:%{public}d,uid:%{public}d,"
             "area.x:%{public}d,area.y:%{public}d,area.width:%{public}d,area.height:%{public}d,"
             "defaultHotAreas.size:%{public}zu,pointerHotAreas.size:%{public}zu,"
-            "agentWindowId:%{public}d,flags:%{public}d",
+            "agentWindowId:%{public}d,flags:%{public}d,action:%{public}d,displayId:%{public}d,"
+            "zOrder:%{public}f",
             item.id, item.pid, item.uid, item.area.x, item.area.y, item.area.width,
             item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
-            item.agentWindowId, item.flags);
+            item.agentWindowId, item.flags, item.action, item.displayId, item.zOrder);
         for (const auto &win : item.defaultHotAreas) {
             MMI_HILOGD("defaultHotAreas:x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
                 win.x, win.y, win.width, win.height);
@@ -623,7 +696,25 @@ void InputWindowsManager::PrintDisplayInfo()
             MMI_HILOGD("pointerHotAreas:x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
                 pointer.x, pointer.y, pointer.width, pointer.height);
         }
+        for (size_t idx = 0; idx < item.pointerChangeAreas.size(); idx++) {
+            MMI_HILOGD("pointChangeAreas:%{public}zu:%{public}d", idx, item.pointerChangeAreas[idx]);
+        }
     }
+}
+
+void InputWindowsManager::PrintWindowGroupInfo(const WindowGroupInfo &windowGroupInfo)
+{
+    MMI_HILOGD("windowsGroupInfo,focusWindowId:%{public}d,displayId:%{public}d",
+        windowGroupInfo.focusWindowId, windowGroupInfo.displayId);
+    PrintWindowInfo(windowGroupInfo.windowsInfo);
+}
+
+void InputWindowsManager::PrintDisplayInfo()
+{
+    MMI_HILOGD("logicalInfo,width:%{public}d,height:%{public}d,focusWindowId:%{public}d",
+        displayGroupInfo_.width, displayGroupInfo_.height, displayGroupInfo_.focusWindowId);
+    MMI_HILOGD("windowsInfos,num:%{public}zu", displayGroupInfo_.windowsInfo.size());
+    PrintWindowInfo(displayGroupInfo_.windowsInfo);
 
     MMI_HILOGD("displayInfos,num:%{public}zu", displayGroupInfo_.displaysInfo.size());
     for (const auto &item : displayGroupInfo_.displaysInfo) {
@@ -1797,10 +1888,11 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
         mprintf(fd,
                 "\t windowsInfos: id:%d | pid:%d | uid:%d | area.x:%d | area.y:%d "
                 "| area.width:%d | area.height:%d | defaultHotAreas.size:%zu "
-                "| pointerHotAreas.size:%zu | agentWindowId:%d | flags:%d \t",
+                "| pointerHotAreas.size:%zu | agentWindowId:%d | flags:%d "
+                "| action:%d | displayId:%d | zOrder:%f \t",
                 item.id, item.pid, item.uid, item.area.x, item.area.y, item.area.width,
                 item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
-                item.agentWindowId, item.flags);
+                item.agentWindowId, item.flags, item.action, item.displayId, item.zOrder);
         for (const auto &win : item.defaultHotAreas) {
             mprintf(fd,
                     "\t defaultHotAreas: x:%d | y:%d | width:%d | height:%d \t",
@@ -1817,9 +1909,9 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
     for (const auto &item : displayGroupInfo_.displaysInfo) {
         mprintf(fd,
                 "\t displayInfos: id:%d | x:%d | y:%d | width:%d | height:%d | name:%s "
-                "| uniq:%s | direction:%d \t",
+                "| uniq:%s | direction:%d | displayMode:%d \t",
                 item.id, item.x, item.y, item.width, item.height, item.name.c_str(),
-                item.uniq.c_str(), item.direction);
+                item.uniq.c_str(), item.direction, item.displayMode);
     }
     mprintf(fd, "Input device and display bind info:\n%s\n", bindInfo_.Dumps().c_str());
 }
