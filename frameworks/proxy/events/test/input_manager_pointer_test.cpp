@@ -79,10 +79,6 @@ void InputManagerPointerTest::SetUpTestCase()
 
 void InputManagerPointerTest::TearDownTestCase(void)
 {
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
-    const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
-    ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
 }
 
 void InputManagerPointerTest::SetUp()

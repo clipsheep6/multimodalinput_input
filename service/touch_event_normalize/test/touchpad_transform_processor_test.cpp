@@ -19,6 +19,7 @@
 #include "libinput.h"
 #include "define_multimodal.h"
 #include "touchpad_transform_processor.h"
+#include "multimodal_input_preferences_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -35,10 +36,12 @@ public:
 
 void TouchPadTransformProcessorTest::SetUpTestCase(void)
 {
+    PREFERENCES_MANAGER->InitPreferences();
 }
 
 void TouchPadTransformProcessorTest::TearDownTestCase(void)
 {
+    PREFERENCES_MANAGER->InitPreferences();
 }
 
 void TouchPadTransformProcessorTest::SetUp()
@@ -61,8 +64,6 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_SetTouch
     TouchPadTransformProcessor processor(deviceId);
     bool flag = false;
     ASSERT_TRUE(processor.SetTouchpadPinchSwitch(flag) == RET_OK);
-    const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
-    ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
 }
 
 /**
@@ -80,8 +81,6 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetTouch
     bool newFlag = false;
     ASSERT_TRUE(processor.GetTouchpadPinchSwitch(flag) == RET_OK);
     ASSERT_TRUE(flag == newFlag);
-    const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
-    ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
 }
 
 /**
@@ -96,8 +95,6 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_SetTouch
     TouchPadTransformProcessor processor(deviceId);
     bool flag = false;
     ASSERT_TRUE(processor.SetTouchpadSwipeSwitch(flag) == RET_OK);
-    const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
-    ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
 }
 
 /**
@@ -115,8 +112,6 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetTouch
     bool newFlag = false;
     ASSERT_TRUE(processor.GetTouchpadSwipeSwitch(flag) == RET_OK);
     ASSERT_TRUE(flag == newFlag);
-    const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
-    ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
 }
 }
 }

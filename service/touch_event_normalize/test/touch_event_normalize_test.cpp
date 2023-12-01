@@ -18,6 +18,7 @@
 
 #include "define_multimodal.h"
 #include "touch_event_normalize.h"
+#include "multimodal_input_preferences_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -34,10 +35,12 @@ public:
 
 void TouchEventNormalizeTest::SetUpTestCase(void)
 {
+    PREFERENCES_MANAGER->InitPreferences();
 }
 
 void TouchEventNormalizeTest::TearDownTestCase(void)
 {
+    PREFERENCES_MANAGER->InitPreferences();
 }
 
 void TouchEventNormalizeTest::SetUp()
@@ -58,8 +61,6 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_SetTouchpadPinchSwitch
 {
     bool flag = false;
     ASSERT_TRUE(TouchEventHdr->SetTouchpadPinchSwitch(flag) == RET_OK);
-    const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
-    ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
 }
 
 /**
@@ -75,8 +76,6 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_GetTouchpadPinchSwitch
     bool newFlag = true;
     ASSERT_TRUE(TouchEventHdr->GetTouchpadPinchSwitch(flag) == RET_OK);
     ASSERT_TRUE(flag == newFlag);
-    const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
-    ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
 }
 
 /**
@@ -89,8 +88,6 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_SetTouchpadSwipeSwitch
 {
     bool flag = false;
     ASSERT_TRUE(TouchEventHdr->SetTouchpadSwipeSwitch(flag) == RET_OK);
-    const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
-    ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
 }
 
 /**
@@ -106,8 +103,6 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_GetTouchpadSwipeSwitch
     bool newFlag = true;
     ASSERT_TRUE(TouchEventHdr->GetTouchpadSwipeSwitch(flag) == RET_OK);
     ASSERT_TRUE(flag == newFlag);
-    const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
-    ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
 }
 }
 }
