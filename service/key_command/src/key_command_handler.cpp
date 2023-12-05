@@ -1389,6 +1389,7 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
         return true;
     }
     count_ = 0;
+    isLongPress_ = false;
     isRepeatKeyState_ = false;
     isHandleSequence_ = false;
     return false;
@@ -1492,6 +1493,10 @@ bool KeyCommandHandler::HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEven
         }
     }
 
+    if (isLongPress_) {
+        return false;
+    }
+
     if (isLaunched) {
         isRepeatKeyState_ = true;
     }
@@ -1525,6 +1530,7 @@ bool KeyCommandHandler::HandleRepeatKeyCount(const RepeatKey &item, const std::s
     if (keyEvent->GetKeyCode() == item.keyCode && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
         int64_t downDurationTime = keyEvent->GetActionTime() - downActionTime_;
         if (count_ == 0 && downDurationTime > LONG_PRESS_DOWN_TIME) {
+            isLongPress_ = true;
             return false;
         }
         if (repeatKey_.keyCode != item.keyCode) {
