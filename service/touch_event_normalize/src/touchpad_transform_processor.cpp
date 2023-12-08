@@ -29,6 +29,7 @@
 #include "preferences_helper.h"
 #include "preferences_xml_utils.h"
 #include "dfx_hisysevent.h"
+#include "multimodal_input_preferences_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -40,7 +41,7 @@ constexpr int32_t FINGER_COUNT_MAX { 5 };
 constexpr int32_t FINGER_TAP_MIN { 3 };
 constexpr int32_t FINGER_MOTION_MAX { 9 };
 constexpr int32_t TP_SYSTEM_PINCH_FINGER_CNT { 2 };
-const std::string TOUCHPAD_FILE_NAME = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
+const std::string TOUCHPAD_FILE_NAME = "touchpad_settings.xml";
 } // namespace
 
 TouchPadTransformProcessor::TouchPadTransformProcessor(int32_t deviceId)
@@ -535,40 +536,12 @@ int32_t TouchPadTransformProcessor::GetTouchpadPinchSwitch(bool &switchFlag)
 
 int32_t TouchPadTransformProcessor::PutConfigDataToDatabase(std::string &key, bool value)
 {
-    int32_t errCode = RET_OK;
-    std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(TOUCHPAD_FILE_NAME, errCode);
-    if (pref == nullptr) {
-        MMI_HILOGE("pref is nullptr, errCode: %{public}d", errCode);
-        return RET_ERR;
-    }
-    int32_t ret = pref->PutBool(key, value);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Put value is failed, ret:%{public}d", ret);
-        return RET_ERR;
-    }
-    ret = pref->FlushSync();
-    if (ret != RET_OK) {
-        MMI_HILOGE("Flush sync is failed, ret:%{public}d", ret);
-        return RET_ERR;
-    }
-
-    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(TOUCHPAD_FILE_NAME);
-    return RET_OK;
+    return PREFERENCES_MANAGER->SetBoolValue(key, TOUCHPAD_FILE_NAME, value);
 }
 
 int32_t TouchPadTransformProcessor::GetConfigDataFromDatabase(std::string &key, bool &value)
 {
-    int32_t errCode = RET_OK;
-    std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(TOUCHPAD_FILE_NAME, errCode);
-    if (pref == nullptr) {
-        MMI_HILOGE("pref is nullptr, errCode: %{public}d", errCode);
-        return RET_ERR;
-    }
-    value = pref->GetBool(key, true);
-
-    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(TOUCHPAD_FILE_NAME);
+    value = PREFERENCES_MANAGER->GetBoolValue(key, true);
     return RET_OK;
 }
 

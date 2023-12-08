@@ -26,6 +26,7 @@
 #include "ability_manager_client.h"
 #include "anr_manager.h"
 #include "app_debug_listener.h"
+#include "app_state_observer.h"
 #include "dfx_hisysevent.h"
 #include "event_dump.h"
 #include "input_device_manager.h"
@@ -52,6 +53,7 @@
 #include "touch_event_normalize.h"
 #include "display_event_monitor.h"
 #include "fingersense_wrapper.h"
+#include "multimodal_input_preferences_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -241,7 +243,7 @@ bool MMIService::InitDelegateTasks()
     MMI_HILOGI("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, delegateTasks_.GetReadFd());
     return true;
 }
-
+__attribute__((no_sanitize("cfi")))
 int32_t MMIService::Init()
 {
     CheckDefine();
@@ -254,7 +256,6 @@ int32_t MMIService::Init()
     MMI_HILOGD("PointerDrawingManager Init");
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     FINGERSENSE_WRAPPER->InitFingerSenseWrapper();
-    DISPLAY_MONITOR->InitCommonEventSubscriber();
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 #ifdef OHOS_BUILD_ENABLE_POINTER
     if (!IPointerDrawingManager::GetInstance()->Init()) {
@@ -279,7 +280,7 @@ int32_t MMIService::Init()
     }
     SetRecvFun(std::bind(&ServerMsgHandler::OnMsgHandler, &sMsgHandler_, std::placeholders::_1, std::placeholders::_2));
     KeyMapMgr->GetConfigKeyValue("default_keymap", KeyMapMgr->GetDefaultKeyId());
-    OHOS::system::SetParameter(INPUT_POINTER_DEVICE, "false");
+    OHOS::system::SetParameter(INPUT_POINTER_DEVICES, "false");
     if (!InitService()) {
         MMI_HILOGE("Saservice init failed");
         return SASERVICE_INIT_FAIL;
@@ -306,10 +307,19 @@ void MMIService::OnStart()
     AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
     MMI_HILOGI("Add system ability listener success");
 #endif
+#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+    MMI_HILOGI("Add system ability listener start");
+    AddSystemAbilityListener(COMMON_EVENT_SERVICE_ID);
+    MMI_HILOGI("Add system ability listener success");
+#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+    MMI_HILOGI("Add app manager service listener start");
+    AddSystemAbilityListener(APP_MGR_SERVICE_ID);
+    APP_OBSERVER_MGR->InitAppStateObserver();
     AddAppDebugListener();
 #ifdef OHOS_BUILD_ENABLE_ANCO
     InitAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
+    PREFERENCES_MANAGER->InitPreferences();
     TimerMgr->AddTimer(WATCHDOG_INTERVAL_TIME, -1, [this]() {
         MMI_HILOGD("Set thread status flag to true");
         threadStatusFlag_ = true;
@@ -339,6 +349,10 @@ void MMIService::OnStop()
     RemoveSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
     MMI_HILOGI("Remove system ability listener success");
 #endif
+#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+    RemoveSystemAbilityListener(COMMON_EVENT_SERVICE_ID);
+#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+    RemoveSystemAbilityListener(APP_MGR_SERVICE_ID);
     RemoveAppDebugListener();
 #ifdef OHOS_BUILD_ENABLE_ANCO
     StopAncoUds();
@@ -1173,10 +1187,10 @@ int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> point
     return RET_OK;
 }
 
-#ifdef OHOS_RSS_CLIENT
 void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
 {
     CALL_INFO_TRACE;
+#ifdef OHOS_RSS_CLIENT
     if (systemAbilityId == RES_SCHED_SYS_ABILITY_ID) {
         int sleepSeconds = 1;
         sleep(sleepSeconds);
@@ -1187,8 +1201,18 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
         ResourceSchedule::ResSchedClient::GetInstance().ReportData(
             ResourceSchedule::ResType::RES_TYPE_REPORT_MMI_PROCESS, tid, payload);
     }
+#endif // OHOS_RSS_CLIENT
+#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+    if (systemAbilityId == COMMON_EVENT_SERVICE_ID) {
+        isCesStart_ = true;
+        MMI_HILOGD("Common event service started");
+    }
+#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+    if (systemAbilityId == APP_MGR_SERVICE_ID) {
+        MMI_HILOGI("Init app state observer start");
+        APP_OBSERVER_MGR->InitAppStateObserver();
+    }
 }
-#endif
 
 int32_t MMIService::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option)
 {
@@ -1395,6 +1419,11 @@ void MMIService::OnThread()
 #endif
     libinputAdapter_.ProcessPendingEvents();
     while (state_ == ServiceRunningState::STATE_RUNNING) {
+#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+        if (isCesStart_ && !DISPLAY_MONITOR->IsCommonEventSubscriberInit()) {
+            DISPLAY_MONITOR->InitCommonEventSubscriber();
+        }
+#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
         epoll_event ev[MAX_EVENT_SIZE] = {};
         int32_t timeout = TimerMgr->CalcNextDelay();
         MMI_HILOGD("timeout:%{public}d", timeout);

@@ -46,6 +46,7 @@ struct Ability {
     std::string type;
     std::string deviceId;
     std::string uri;
+    std::string abilityType;
     std::vector<std::string> entities;
     std::map<std::string, std::string> params;
 };
@@ -53,6 +54,8 @@ struct Ability {
 struct ShortcutKey {
     std::set<int32_t> preKeys;
     std::string businessId;
+    std::string statusConfig;
+    bool statusConfigValue { true };
     int32_t finalKey { -1 };
     int32_t keyDownDuration { 0 };
     int32_t triggerType { KeyEvent::KEY_ACTION_DOWN };
@@ -74,6 +77,8 @@ struct SequenceKey {
 
 struct Sequence {
     std::vector<SequenceKey> sequenceKeys;
+    std::string statusConfig;
+    bool statusConfigValue { true };
     int64_t abilityStartDelay { 0 };
     int32_t timerId { -1 };
     Ability ability;
@@ -110,6 +115,17 @@ struct MultiFingersTap {
     Ability ability;
 };
 
+struct RepeatKey {
+    int32_t keyCode { -1 };
+    int32_t keyAction { 0 };
+    int32_t times { 0 };
+    int64_t actionTime { 0 };
+    int64_t delay { 0 };
+    std::string statusConfig;
+    bool statusConfigValue { true };
+    Ability ability;
+};
+
 class KeyCommandHandler final : public IInputEventHandler {
 public:
     KeyCommandHandler() = default;
@@ -140,6 +156,9 @@ private:
     void PrintSeq();
     bool ParseConfig();
     bool ParseJson(const std::string &configFile);
+    void ParseRepeatKeyMaxCount();
+    void ParseStatusConfigObserver();
+    void LaunchAbility(const Ability &ability);
     void LaunchAbility(const Ability &ability, int64_t delay);
     void LaunchAbility(const ShortcutKey &key);
     void LaunchAbility(const Sequence &sequence);
@@ -148,17 +167,25 @@ private:
     bool HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey);
     bool HandleKeyDown(ShortcutKey &shortcutKey);
     bool HandleKeyCancel(ShortcutKey &shortcutKey);
+    bool HandleEvent(const std::shared_ptr<KeyEvent> key);
+    bool HandleRepeatKeyCount(const RepeatKey &item, const std::shared_ptr<KeyEvent> keyEvent);
+    bool HandleRepeatKey(const RepeatKey& item, bool &isLaunchAbility, const std::shared_ptr<KeyEvent> keyEvent);
+    bool HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleSequence(Sequence& sequence, bool &isLaunchAbility);
     bool HandleSequences(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleConsumedKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleMulFingersTap(const std::shared_ptr<PointerEvent> pointerEvent);
     bool AddSequenceKey(const std::shared_ptr<KeyEvent> keyEvent);
+    std::shared_ptr<KeyEvent> CreateKeyEvent(int32_t keyCode, int32_t keyAction, bool isPressed);
     bool IsEnableCombineKey(const std::shared_ptr<KeyEvent> key);
     void RemoveSubscribedTimer(int32_t keyCode);
     void HandleSpecialKeys(int32_t keyCode, int32_t keyAction);
     void InterruptTimers();
     int32_t GetKeyDownDurationFromXml(const std::string &businessId);
+    void SendKeyEvent();
+    template <class T>
+    void CreateStatusConfigObserver(T item);
     void ResetLastMatchedKey()
     {
         lastMatchedKey_.preKeys.clear();
@@ -173,6 +200,7 @@ private:
         currentLaunchAbilityKey_.timerId = -1;
         currentLaunchAbilityKey_.keyDownDuration = 0;
     }
+
     void ResetSequenceKeys()
     {
         keys_.clear();
@@ -204,6 +232,7 @@ private:
     std::vector<Sequence> sequences_;
     std::vector<Sequence> filterSequences_;
     std::vector<SequenceKey> keys_;
+    std::vector<RepeatKey> repeatKeys_;
     std::vector<std::string> businessIds_;
     bool isParseConfig_ { false };
     std::map<int32_t, int32_t> specialKeys_;
@@ -222,6 +251,18 @@ private:
     float distanceDefaultConfig_ { 0.0f };
     float distanceLongConfig_ { 0.0f };
     bool enableCombineKey_ { true };
+    RepeatKey repeatKey_;
+    int32_t maxCount_ { 0 };
+    int32_t count_ { 0 };
+    int32_t repeatTimerId_ { 0 };
+    int32_t downActionTime_ { 0 };
+    int64_t upActionTime_ { 0 };
+    int32_t launchAbilityCount_ { 0 };
+    int64_t intervalTime_ { 120000 };
+    bool isHandleSequence_ { false };
+    bool isParseMaxCount_ { false };
+    bool isRepeatKeyState_ { false };
+    bool isParseStatusConfig_ { false };
 };
 } // namespace MMI
 } // namespace OHOS

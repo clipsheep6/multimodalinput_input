@@ -35,6 +35,7 @@
 #include "dfx_hisysevent.h"
 #include "util_ex.h"
 #include "util.h"
+#include "multimodal_input_preferences_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -52,7 +53,7 @@ constexpr int32_t BTN_RIGHT_MENUE_CODE = 0x118;
 constexpr int32_t RIGHT_CLICK_TYPE_MIN = 1;
 constexpr int32_t RIGHT_CLICK_TYPE_MAX = 3;
 constexpr int32_t TP_RIGHT_CLICK_FINGER_CNT = 2;
-const std::string mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+const std::string mouseFileName = "mouse_settings.xml";
 } // namespace
 
 double MouseTransformProcessor::absolutionX_ = -1.0;
@@ -196,15 +197,8 @@ int32_t MouseTransformProcessor::HandleButtonValueInner(struct libinput_event_po
         return RET_ERR;
     }
 
-    std::string file = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(file, errno);
-    if (pref == nullptr) {
-        MMI_HILOGE("pref is nullptr,  errno: %{public}d", errno);
-        return RET_ERR;
-    }
     std::string name = "primaryButton";
-    int32_t primaryButton = pref->GetInt(name, 0);
+    int32_t primaryButton = PREFERENCES_MANAGER->GetIntValue(name, 0);
     MMI_HILOGD("Set mouse primary button:%{public}d", primaryButton);
     if (primaryButton == RIGHT_BUTTON) {
         if (buttonId == PointerEvent::MOUSE_BUTTON_LEFT) {
@@ -217,8 +211,6 @@ int32_t MouseTransformProcessor::HandleButtonValueInner(struct libinput_event_po
     }
 
     pointerEvent_->SetButtonId(buttonId);
-    NativePreferences::PreferencesHelper::
-        RemovePreferencesFromCache("/data/service/el1/public/multimodalinput/mouse_settings");
     return RET_OK;
 }
 
@@ -230,43 +222,18 @@ int32_t MouseTransformProcessor::SetMouseScrollRows(int32_t rows)
     } else if (rows > MAX_ROWS) {
         rows = MAX_ROWS;
     }
-    int32_t errCode = RET_OK;
-    std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(mouseFileName, errCode);
-    if (pref == nullptr) {
-        MMI_HILOGE("pref is nullptr,  errCode: %{public}d", errCode);
-        return RET_ERR;
-    }
     std::string name = "rows";
-    int32_t ret = pref->PutInt(name, rows);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Put rows is failed, ret:%{public}d", ret);
-        return RET_ERR;
-    }
-    ret = pref->FlushSync();
-    if (ret != RET_OK) {
-        MMI_HILOGE("Flush sync is failed, ret:%{public}d", ret);
-        return RET_ERR;
-    }
+    int32_t ret = PREFERENCES_MANAGER->SetIntValue(name, mouseFileName, rows);
     MMI_HILOGD("Set mouse scroll rows successfully, rows:%{public}d", rows);
-    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(mouseFileName);
-    return RET_OK;
+    return ret;
 }
 
 int32_t MouseTransformProcessor::GetMouseScrollRows()
 {
     CALL_DEBUG_ENTER;
-    int32_t errCode = RET_OK;
-    std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(mouseFileName, errCode);
-    if (pref == nullptr) {
-        MMI_HILOGE("pref is nullptr,  errCode: %{public}d", errCode);
-        return RET_ERR;
-    }
     std::string name = "rows";
-    int32_t rows = pref->GetInt(name, DEFAULT_ROWS);
+    int32_t rows = PREFERENCES_MANAGER->GetIntValue(name, DEFAULT_ROWS);
     MMI_HILOGD("Get mouse scroll rows successfully, rows:%{public}d", rows);
-    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(mouseFileName);
     return rows;
 }
 
@@ -359,17 +326,30 @@ int32_t MouseTransformProcessor::HandleAxisBeginEndInner(struct libinput_event *
     if (buttonId_ == PointerEvent::BUTTON_NONE && pointerEvent_->GetButtonId() != PointerEvent::BUTTON_NONE) {
         pointerEvent_->SetButtonId(PointerEvent::BUTTON_NONE);
     }
-    if (libinput_event_get_type(event) == LIBINPUT_EVENT_TOUCHPAD_DOWN && !isPressed_) {
-        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
-        MMI_HILOGD("Axis begin");
-    } else if (libinput_event_get_type(event) == LIBINPUT_EVENT_TOUCHPAD_UP && !isPressed_) {
-        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
-        MMI_HILOGD("Axis end");
-    } else {
+    if (!isAxisBegin_ && isPressed_) {
         MMI_HILOGE("Axis is invalid");
         return RET_ERR;
     }
-    return RET_OK;
+    if (isAxisBegin_ && isPressed_) {
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
+        isAxisBegin_ = false;
+        MMI_HILOGD("Axis end due to a pressed event");
+        return RET_OK;
+    }
+    if (libinput_event_get_type(event) == LIBINPUT_EVENT_TOUCHPAD_DOWN && !isPressed_) {
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+        isAxisBegin_ = true;
+        MMI_HILOGD("Axis begin");
+        return RET_OK;
+    }
+    if (libinput_event_get_type(event) == LIBINPUT_EVENT_TOUCHPAD_UP && !isPressed_) {
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
+        isAxisBegin_ = false;
+        MMI_HILOGD("Axis end");
+        return RET_OK;
+    }
+    MMI_HILOGE("Axis is invalid");
+    return RET_ERR;
 }
 
 void MouseTransformProcessor::HandleAxisPostInner(PointerEvent::PointerItem &pointerItem)
@@ -610,35 +590,16 @@ int32_t MouseTransformProcessor::SetMousePrimaryButton(int32_t primaryButton)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Set mouse primary button:%{public}d", primaryButton);
-    std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(mouseFileName, errno);
-    if (pref == nullptr) {
-        MMI_HILOGE("pref is nullptr,  errno: %{public}d", errno);
-        return RET_ERR;
-    }
     std::string name = "primaryButton";
-    pref->PutInt(name, primaryButton);
-    int32_t ret = pref->FlushSync();
-    if (ret != RET_OK) {
-        MMI_HILOGE("flush sync is failed, ret:%{public}d", ret);
-        return RET_ERR;
-    }
-    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(mouseFileName);
+    PREFERENCES_MANAGER->SetIntValue(name, mouseFileName, primaryButton);
     return RET_OK;
 }
 
 int32_t MouseTransformProcessor::GetMousePrimaryButton()
 {
     CALL_DEBUG_ENTER;
-    std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(mouseFileName, errno);
-    if (pref == nullptr) {
-        MMI_HILOGE("pref is nullptr,  errno: %{public}d", errno);
-        return RET_ERR;
-    }
     std::string name = "primaryButton";
-    int32_t primaryButton = pref->GetInt(name, 0);
-    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(mouseFileName);
+    int32_t primaryButton = PREFERENCES_MANAGER->GetIntValue(name, 0);
     MMI_HILOGD("Set mouse primary button:%{public}d", primaryButton);
     return primaryButton;
 }
@@ -652,43 +613,18 @@ int32_t MouseTransformProcessor::SetPointerSpeed(int32_t speed)
         speed = MAX_SPEED;
     }
     globalPointerSpeed_ = speed;
-    int32_t errCode = RET_OK;
-    std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(mouseFileName, errCode);
-    if (pref == nullptr) {
-        MMI_HILOGE("pref is nullptr,  errCode: %{public}d", errCode);
-        return RET_ERR;
-    }
     std::string name = "speed";
-    int32_t ret = pref->PutInt(name, speed);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Put speed is failed, ret:%{public}d", ret);
-        return RET_ERR;
-    }
-    ret = pref->FlushSync();
-    if (ret != RET_OK) {
-        MMI_HILOGE("Flush sync is failed, ret:%{public}d", ret);
-        return RET_ERR;
-    }
+    int32_t ret = PREFERENCES_MANAGER->SetIntValue(name, mouseFileName, speed);
     MMI_HILOGD("Set pointer speed successfully, speed:%{public}d", speed);
-    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(mouseFileName);
-    return RET_OK;
+    return ret;
 }
 
 int32_t MouseTransformProcessor::GetPointerSpeed()
 {
     CALL_DEBUG_ENTER;
-    int32_t errCode = RET_OK;
-    std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(mouseFileName, errCode);
-    if (pref == nullptr) {
-        MMI_HILOGE("pref is nullptr,  errCode: %{public}d", errCode);
-        return RET_ERR;
-    }
     std::string name = "speed";
-    int32_t speed = pref->GetInt(name, DEFAULT_SPEED);
+    int32_t speed = PREFERENCES_MANAGER->GetIntValue(name, DEFAULT_SPEED);
     MMI_HILOGD("Get pointer speed successfully, speed:%{public}d", speed);
-    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(mouseFileName);
     return speed;
 }
 
@@ -754,10 +690,6 @@ void MouseTransformProcessor::HandleTouchpadRightButton(struct libinput_event_po
     // touchpad two finger button 272 -> 0
     if (button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE &&
         evenType == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
-        uint32_t fingerCount = libinput_event_pointer_get_finger_count(data);
-        if (fingerCount == TP_RIGHT_CLICK_FINGER_CNT) {
-            button = 0;
-        }
         return;
     }
 }
@@ -788,10 +720,6 @@ void MouseTransformProcessor::HandleTouchpadLeftButton(struct libinput_event_poi
     // touchpad two finger button 272 -> 0
     if (button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE &&
         evenType == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
-        uint32_t fingerCount = libinput_event_pointer_get_finger_count(data);
-        if (fingerCount == TP_RIGHT_CLICK_FINGER_CNT) {
-            button = 0;
-        }
         return;
     }
 }
@@ -997,79 +925,24 @@ int32_t MouseTransformProcessor::GetTouchpadRightClickType(int32_t &type)
 
 int32_t MouseTransformProcessor::PutConfigDataToDatabase(std::string &key, bool value)
 {
-    int32_t errCode = RET_OK;
-    std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(mouseFileName, errCode);
-    if (pref == nullptr) {
-        MMI_HILOGE("pref is nullptr, errCode: %{public}d", errCode);
-        return RET_ERR;
-    }
-    int32_t ret = pref->PutBool(key, value);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Put value is failed, ret:%{public}d", ret);
-        return RET_ERR;
-    }
-    ret = pref->FlushSync();
-    if (ret != RET_OK) {
-        MMI_HILOGE("Flush sync is failed, ret:%{public}d", ret);
-        return RET_ERR;
-    }
-
-    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(mouseFileName);
-    return RET_OK;
+    return PREFERENCES_MANAGER->SetBoolValue(key, mouseFileName, value);
 }
 
 int32_t MouseTransformProcessor::GetConfigDataFromDatabase(std::string &key, bool &value)
 {
-    int32_t errCode = RET_OK;
-    std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(mouseFileName, errCode);
-    if (pref == nullptr) {
-        MMI_HILOGE("pref is nullptr, errCode: %{public}d", errCode);
-        return RET_ERR;
-    }
-    value = pref->GetBool(key, true);
-
-    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(mouseFileName);
+    value = PREFERENCES_MANAGER->GetBoolValue(key, true);
     return RET_OK;
 }
 
 int32_t MouseTransformProcessor::PutConfigDataToDatabase(std::string &key, int32_t value)
 {
-    int32_t errCode = RET_OK;
-    std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(mouseFileName, errCode);
-    if (pref == nullptr) {
-        MMI_HILOGE("pref is nullptr, errCode: %{public}d", errCode);
-        return RET_ERR;
-    }
-    int32_t ret = pref->PutInt(key, value);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Put value is failed, ret:%{public}d", ret);
-        return RET_ERR;
-    }
-    ret = pref->FlushSync();
-    if (ret != RET_OK) {
-        MMI_HILOGE("Flush sync is failed, ret:%{public}d", ret);
-        return RET_ERR;
-    }
-
-    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(mouseFileName);
-    return RET_OK;
+    return PREFERENCES_MANAGER->SetIntValue(key, mouseFileName, value);
 }
 
 int32_t MouseTransformProcessor::GetConfigDataFromDatabase(std::string &key, int32_t &value)
 {
-    int32_t errCode = RET_OK;
-    std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(mouseFileName, errCode);
-    if (pref == nullptr) {
-        MMI_HILOGE("pref is nullptr, errCode: %{public}d", errCode);
-        return RET_ERR;
-    }
-    value = pref->GetInt(key, 0);
-
-    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(mouseFileName);
+    int32_t defaultValue = value;
+    value = PREFERENCES_MANAGER->GetIntValue(key, defaultValue);
     return RET_OK;
 }
 } // namespace MMI

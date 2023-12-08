@@ -36,7 +36,7 @@ public:
     }
 
     virtual ~DisplyChangedReceiver() = default;
-
+    __attribute__((no_sanitize("cfi")))
     void OnReceiveEvent(const EventFwk::CommonEventData &eventData)
     {
         CALL_DEBUG_ENTER;
@@ -99,6 +99,11 @@ void DisplayEventMonitor::InitCommonEventSubscriber()
     EventFwk::CommonEventSubscribeInfo commonEventSubscribeInfo(matchingSkills);
     hasInit_ = OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(
         std::make_shared<DisplyChangedReceiver>(commonEventSubscribeInfo));
+}
+
+bool DisplayEventMonitor::IsCommonEventSubscriberInit()
+{
+    return hasInit_;
 }
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 } // namespace AppExecFwk

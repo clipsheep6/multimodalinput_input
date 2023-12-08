@@ -21,6 +21,9 @@ security_component_path = "//base/security"
 
 declare_args() {
   resource_schedule_service_enabled = false
+  input_feature_product = "default"
+  input_feature_enable_pgo = false
+  input_feature_pgo_path = ""
   input_feature_combination_key = true
   input_feature_pointer_drawing = true
   input_feature_interceptor = true
@@ -80,6 +83,7 @@ declare_args() {
 
   libmmi_service_sources = [
     "$mmi_path/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
+    "app_state_manager/src/app_state_observer.cpp",
     "delegate_task/src/delegate_tasks.cpp",
     "device_config/src/device_config_file_parser.cpp",
     "device_manager/src/input_device_manager.cpp",
@@ -100,6 +104,7 @@ declare_args() {
     "message_handle/src/server_msg_handler.cpp",
     "module_loader/src/app_debug_listener.cpp",
     "module_loader/src/mmi_service.cpp",
+    "module_loader/src/multimodal_input_preferences_manager.cpp",
     "module_loader/src/uds_server.cpp",
     "nap_process/src/nap_process.cpp",
     "permission_helper/src/permission_helper.cpp",
@@ -303,9 +308,9 @@ if (input_ext_feature_anco) {
   mmi_ext_path = "//vendor/huawei/foundation/multimodalinput/input_ext"
   input_default_defines += [ "OHOS_BUILD_ENABLE_ANCO" ]
   libmmi_client_sources +=
-      [ "${mmi_ext_path}/container_ipc_manager/src/input_manager_ext.cpp" ]
+      [ "${mmi_ext_path}/anco_uds_manager/src/input_manager_ext.cpp" ]
   libmmi_service_sources += [
-    "${mmi_ext_path}/container_ipc_manager/src/container_ipc_manager.cpp",
-    "${mmi_ext_path}/container_ipc_manager/src/mmi_service_ext.cpp",
+    "${mmi_ext_path}/anco_uds_manager/src/anco_uds_manager.cpp",
+    "${mmi_ext_path}/anco_uds_manager/src/mmi_service_ext.cpp",
   ]
 }

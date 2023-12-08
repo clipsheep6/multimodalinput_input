@@ -19,6 +19,9 @@
       "SystemCapability.MultimodalInput.Input.ShortKey"
     ],
     "features": [
+      "input_feature_product",
+      "input_feature_enable_pgo",
+      "input_feature_pgo_path",
       "input_feature_combination_key",
       "input_feature_input_device",
       "input_feature_interceptor",
@@ -65,7 +68,10 @@
         "preferences",
         "security_component_manager",
         "hilog",
-        "common_event_service"
+        "common_event_service",
+        "data_share",
+        "relational_store",
+        "ffrt"
       ],
       "third_party": [
         "cJSON",

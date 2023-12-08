@@ -34,6 +34,7 @@
 #include "util_napi_error.h"
 #include "input_device_manager.h"
 #include "scene_board_judgement.h"
+#include "multimodal_input_preferences_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -43,7 +44,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 constexpr int32_t DEFAULT_POINTER_STYLE = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER
 const std::string bindCfgFileName = "/data/service/el1/public/multimodalinput/display_bind.cfg";
-const std::string mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+const std::string mouseFileName = "mouse_settings.xml";
 const std::string defaultIconPath = "/system/etc/multimodalinput/mouse_icon/Default.svg";
 } // namespace
 
@@ -280,16 +281,21 @@ int32_t InputWindowsManager::SetDisplayBind(int32_t deviceId, int32_t displayId,
     return bindInfo_.SetDisplayBind(deviceId, displayId, msg);
 }
 
-void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
+void InputWindowsManager::UpdateCaptureMode(const DisplayGroupInfo &displayGroupInfo)
 {
-    CALL_DEBUG_ENTER;
-    CheckFocusWindowChange(displayGroupInfo);
-    CheckZorderWindowChange(displayGroupInfo);
     if (captureModeInfo_.isCaptureMode &&
         ((displayGroupInfo_.focusWindowId != displayGroupInfo.focusWindowId) ||
         (displayGroupInfo_.windowsInfo[0].id != displayGroupInfo.windowsInfo[0].id))) {
         captureModeInfo_.isCaptureMode = false;
     }
+}
+
+void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
+{
+    CALL_DEBUG_ENTER;
+    CheckFocusWindowChange(displayGroupInfo);
+    CheckZorderWindowChange(displayGroupInfo);
+    UpdateCaptureMode(displayGroupInfo);
     displayGroupInfo_ = displayGroupInfo;
     PrintDisplayInfo();
     UpdateDisplayIdAndName();
@@ -322,7 +328,9 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
             WinInfo info = { .windowPid = windowPid, .windowId = windowInfo->id };
             IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
             PointerStyle pointerStyle;
-            int32_t ret = WinMgr->GetPointerStyle(info.windowPid, info.windowPid, pointerStyle);
+            int32_t ret = WinMgr->GetPointerStyle(info.windowPid, info.windowId, pointerStyle);
+            MMI_HILOGD("get pointer style, pid: %{public}d, windowid: %{public}d, style: %{public}d",
+                info.windowPid, info.windowId, pointerStyle.id);
             CHKNOKRV(ret, "Draw pointer style failed, pointerStyleInfo is nullptr");
             IPointerDrawingManager::GetInstance()->DrawPointerStyle(pointerStyle);
         }
@@ -1124,37 +1132,15 @@ int32_t InputWindowsManager::SetHoverScrollState(bool state)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Set mouse hover scroll state:%{public}d", state);
-    int32_t errCode = RET_OK;
-    std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(mouseFileName, errCode);
-    if (pref == nullptr) {
-        MMI_HILOGE("pref is nullptr,  errCode: %{public}d", errCode);
-        return RET_ERR;
-    }
     std::string name = "isEnableHoverScroll";
-    pref->PutBool(name, state);
-    int ret = pref->FlushSync();
-    if (ret != RET_OK) {
-        MMI_HILOGE("flush sync is failed, ret:%{public}d", ret);
-        return RET_ERR;
-    }
-    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(mouseFileName);
-    return RET_OK;
+    return PREFERENCES_MANAGER->SetBoolValue(name, mouseFileName, state);
 }
 
 bool InputWindowsManager::GetHoverScrollState() const
 {
     CALL_DEBUG_ENTER;
-    int32_t errCode = RET_OK;
-    std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(mouseFileName, errCode);
-    if (pref == nullptr) {
-        MMI_HILOGE("pref is nullptr,  errCode: %{public}d", errCode);
-        return RET_ERR;
-    }
     std::string name = "isEnableHoverScroll";
-    bool state = pref->GetBool(name, true);
-    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(mouseFileName);
+    bool state = PREFERENCES_MANAGER->GetBoolValue(name, true);
     MMI_HILOGD("Get mouse hover scroll state:%{public}d", state);
     return state;
 }
