@@ -36,10 +36,10 @@ bool PermissionHelper::VerifySystemApp()
     auto callerToken = IPCSkeleton::GetCallingTokenID();
     auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
     MMI_HILOGD("token type is %{public}d", static_cast<int32_t>(tokenType));
-    int32_t callingUid = IPCSkeleton::GetCallingUid();
-    if (tokenType == OHOS::Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE
-        || tokenType == OHOS::Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL
-        || callingUid == ROOT_UID) {
+    if (OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken,"ohos.permission.DISTRIBUTED_DATASYNC") == OHOS::Security::AccessToken::PERMISSION_GRANTED
+    ||OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, "ohos.permission.ACCESS_SERVICE_DM") == OHOS::Security::AccessToken::PERMISSION_GRANTED
+    ||OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, "ohos.permission.REPORT_RESOURCE_SCHEDULE_EVENT") == OHOS::Security::AccessToken::PERMISSION_GRANTED)
+    {
         MMI_HILOGD("called tokenType is native, verify success");
         return true;
     }
@@ -119,16 +119,19 @@ bool PermissionHelper::CheckDispatchControl()
 {
     CALL_DEBUG_ENTER;
     auto tokenId = IPCSkeleton::GetCallingTokenID();
+    auto callerToken = IPCSkeleton::GetCallingTokenID();
     auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
     if ((tokenType == OHOS::Security::AccessToken::TOKEN_HAP) ||
         (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE)) {
         return CheckDispatchControlPermission(tokenId);
-    } else if (tokenType == OHOS::Security::AccessToken::TOKEN_SHELL) {
+    } else if (!(OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken,"ohos.permission.DISTRIBUTED_DATASYNC") == OHOS::Security::AccessToken::PERMISSION_GRANTED
+    ||OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, "ohos.permission.ACCESS_SERVICE_DM") == OHOS::Security::AccessToken::PERMISSION_GRANTED
+    ||OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, "ohos.permission.REPORT_RESOURCE_SCHEDULE_EVENT") == OHOS::Security::AccessToken::PERMISSION_GRANTED)) {
+       MMI_HILOGE("Unsupported token type:%{public}d", tokenType);
+        return false;
+    } else {
         MMI_HILOGI("Token type is shell");
         return true;
-    } else {
-        MMI_HILOGE("Unsupported token type:%{public}d", tokenType);
-        return false;
     }
 }
 
