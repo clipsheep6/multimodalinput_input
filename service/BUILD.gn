@@ -366,6 +366,8 @@ ohos_unittest("event_resample_test") {
     "config_policy:configpolicy_util",
     "hilog:libhilog",
     "preferences:native_preferences",
+    "image_framework:image_native",
+    "window_manager:libwm",
   ]
 }
 
