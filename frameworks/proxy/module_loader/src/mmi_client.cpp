@@ -148,8 +148,6 @@ bool MMIClient::AddFdListener(int32_t fd)
         return false;
     }
     isRunning_ = true;
-    MMI_HILOGI("serverFd:%{public}d was listening,mask:%{public}u pid:%{public}d threadId:%{public}" PRIu64,
-        fd, FILE_DESCRIPTOR_INPUT_EVENT, GetPid(), GetThisThreadId());
     return true;
 }
 
