@@ -285,9 +285,7 @@ void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
     delete dataWorker;
     dataWorker = nullptr;
     CHKPV(event);
-    if (event->delCallback != nullptr) {
-        event->delCallback = nullptr;
-    }
+    event->delCallback = nullptr;
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env, &scope);
     if (scope == nullptr) {
