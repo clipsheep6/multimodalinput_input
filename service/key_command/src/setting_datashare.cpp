@@ -192,6 +192,9 @@ void SettingDataShare::Initialize(int32_t systemAbilityId)
 
 ErrCode SettingDataShare::GetStringValue(const std::string& key, std::string& value)
 {
+    if (key.empty()) {
+        return ERR_NO_INIT;
+    }
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
     auto helper = CreateDataShareHelper();
     if (helper == nullptr) {
