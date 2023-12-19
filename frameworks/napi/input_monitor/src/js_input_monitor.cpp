@@ -43,6 +43,7 @@ constexpr int32_t AXIS_END = 6;
 constexpr int32_t MIDDLE = 1;
 constexpr int32_t RIGHT = 2;
 constexpr int32_t MOUSE_FLOW = 10;
+constexpr int32_t THREE_FINGER_FLOW = 4;
 constexpr int32_t THREE_FINGERS = 3;
 constexpr int32_t FOUR_FINGERS = 4;
 constexpr int32_t GESTURE_BEGIN = 1;
@@ -101,6 +102,18 @@ void InputMonitor::SetCallback(std::function<void(std::shared_ptr<PointerEvent>)
     callback_ = callback;
 }
 
+bool IsThreeFingersSwipe(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD ||
+        pointerEvent->GetFingerCount() != THREE_FINGERS ||
+        (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_BEGIN &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_END)) {
+        return false;
+    }
+    return true;
+}
+
 void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
 {
     CALL_DEBUG_ENTER;
@@ -116,6 +129,14 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
             return;
         } else {
             flowCtrl_ = 0;
+        }
+    }
+    if (IsThreeFingersSwipe(pointerEvent)) {
+        if (++threeFingerFlowCtrl_ < THREE_FINGER_FLOW) {
+            pointerEvent->MarkProcessed();
+            return;
+        } else {
+            threeFingerFlowCtrl_ = 0;
         }
     }
     std::function<void(std::shared_ptr<PointerEvent>)> callback;
