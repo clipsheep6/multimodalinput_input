@@ -70,6 +70,7 @@ private:
     mutable bool consumed_ { false };
     mutable std::mutex mutex_;
     mutable int32_t flowCtrl_ { 0 };
+    mutable int32_t threeFingerFlowCtrl_ { 0 };
 };
 
 class JsInputMonitor final {
