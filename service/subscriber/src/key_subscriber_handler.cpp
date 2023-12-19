@@ -546,7 +546,7 @@ void KeySubscriberHandler::HandlePowerLongPressDown(std::shared_ptr<KeyEvent> ke
             continue;
         }
         if (keyOption->GetFinalKeyDownDuration() > 0) {
-            MMI_HILOGD("keyOption->GetFinalKeyDownDuration() <= 0");
+            MMI_HILOGD("keyOption->GetFinalKeyDownDuration() > 0");
             NotifyKeyDownRightNow(keyEvent, subscribers, handled);
             continue;
         }
