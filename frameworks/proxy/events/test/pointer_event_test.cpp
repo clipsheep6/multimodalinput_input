@@ -73,7 +73,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_001, TestSiz
 {
     std::shared_ptr<PointerEvent> pointerEvent = CreatePointEvent();
     ASSERT_NE(pointerEvent, nullptr);
-    std::vector<int32_t> pressedKeys { KeyEvent::KEYCODE_CTRL_LEFT };
+    std::vector<int32_t> pressedKeys { KeyEvent::KEYCODE_C };
     pointerEvent->SetPressedKeys(pressedKeys);
     SimulateInputEventUtilTest(pointerEvent);
 }
@@ -89,7 +89,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_002, TestSiz
 {
     std::shared_ptr<PointerEvent> pointerEvent = CreatePointEvent();
     ASSERT_TRUE(pointerEvent != nullptr);
-    std::vector<int32_t> pressedKeys { KeyEvent::KEYCODE_CTRL_RIGHT };
+    std::vector<int32_t> pressedKeys { KeyEvent::KEYCODE_D };
     pointerEvent->SetPressedKeys(pressedKeys);
     SimulateInputEventUtilTest(pointerEvent);
 }
@@ -105,7 +105,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_003, TestSiz
 {
     std::shared_ptr<PointerEvent> pointerEvent = CreatePointEvent();
     ASSERT_TRUE(pointerEvent != nullptr);
-    std::vector<int32_t> pressedKeys { KeyEvent::KEYCODE_CTRL_LEFT, KeyEvent::KEYCODE_CTRL_RIGHT };
+    std::vector<int32_t> pressedKeys { KeyEvent::KEYCODE_A, KeyEvent::KEYCODE_B };
     pointerEvent->SetPressedKeys(pressedKeys);
     SimulateInputEventUtilTest(pointerEvent);
 }

@@ -1760,7 +1760,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_PointerEventDisplay_00
     CALL_TEST_DEBUG;
     std::shared_ptr<PointerEvent> pointerEvent{InputManagerUtil::SetupPointerEvent015()};
     ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetTargetDisplayId(TARGET_DISPLAY_ID);
+    pointerEvent->SetTargetDisplayId(0);
 #ifdef OHOS_BUILD_ENABLE_POINTER
     SimulateInputEventUtilTest(pointerEvent);
 #endif  // OHOS_BUILD_ENABLE_POINTER
@@ -1777,7 +1777,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerKeyTest_KeyEventDisplay_001, TestS
     CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> keyEvent{InputManagerUtil::SetupKeyEvent001()};
     ASSERT_NE(keyEvent, nullptr);
-    keyEvent->SetTargetDisplayId(TARGET_DISPLAY_ID);
+    keyEvent->SetTargetDisplayId(0);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     SimulateInputEventUtilTest(keyEvent);
 #endif  // OHOS_BUILD_ENABLE_KEYBOAR
