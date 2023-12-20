@@ -149,6 +149,12 @@ void InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInf
     PrintDisplayInfo();
 }
 
+void InputManagerImpl::UpdateWindowInfo(int32_t displatId,const std::vector<WindowInfo> &windows,
+    int32_t focusWindowId)
+{
+
+}
+
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 void InputManagerImpl::SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen)
 {
@@ -469,7 +475,8 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
     for (const auto &item : displayGroupInfo_.windowsInfo) {
         pkt << item.id << item.pid << item.uid << item.area
             << item.defaultHotAreas << item.pointerHotAreas
-            << item.agentWindowId << item.flags;
+            << item.agentWindowId << item.flags << item.action
+            << item.displayId << item.zOrder << item.pointerChangeAreas;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write windows data failed");
@@ -484,7 +491,8 @@ int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt)
     pkt << num;
     for (const auto &item : displayGroupInfo_.displaysInfo) {
         pkt << item.id << item.x << item.y << item.width
-            << item.height << item.dpi << item.name << item.uniq << item.direction;
+            << item.height << item.dpi << item.name << item.uniq << item.direction
+            << item.displayMode;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write display data failed");
@@ -502,10 +510,11 @@ void InputManagerImpl::PrintDisplayInfo()
         MMI_HILOGD("windowsInfos,id:%{public}d,pid:%{public}d,uid:%{public}d,"
             "area.x:%{public}d,area.y:%{public}d,area.width:%{public}d,area.height:%{public}d,"
             "defaultHotAreas.size:%{public}zu,pointerHotAreas.size:%{public}zu,"
-            "agentWindowId:%{public}d,flags:%{public}d",
+            "agentWindowId:%{public}d,flags:%{public}d,action:%{public}d,displayId:%{public}d,"
+            "zOrder:%{public}d",
             item.id, item.pid, item.uid, item.area.x, item.area.y, item.area.width,
             item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
-            item.agentWindowId, item.flags);
+            item.agentWindowId, item.flags, item.action, item.displayId, item.zOrder);
         for (const auto &win : item.defaultHotAreas) {
             MMI_HILOGD("defaultHotAreas:x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
                 win.x, win.y, win.width, win.height);
@@ -514,15 +523,18 @@ void InputManagerImpl::PrintDisplayInfo()
             MMI_HILOGD("pointerHotAreas:x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
                 pointer.x, pointer.y, pointer.width, pointer.height);
         }
+        for (const auto &areaSize : item.pointerChangeAreas) {
+            MMI_HILOGD("pointerChangeAreas:%{public}d", areaSize);
+        }
     }
 
     MMI_HILOGD("displayInfos,num:%{public}zu", displayGroupInfo_.displaysInfo.size());
     for (const auto &item : displayGroupInfo_.displaysInfo) {
         MMI_HILOGD("displayInfos,id:%{public}d,x:%{public}d,y:%{public}d,"
             "width:%{public}d,height:%{public}d,dpi:%{public}d,name:%{public}s,"
-            "uniq:%{public}s,direction:%{public}d",
+            "uniq:%{public}s,direction:%{public}d,displayMode:%{public}d",
             item.id, item.x, item.y, item.width, item.height, item.dpi, item.name.c_str(),
-            item.uniq.c_str(), item.direction);
+            item.uniq.c_str(), item.direction, item.displayMode);
     }
 }
 

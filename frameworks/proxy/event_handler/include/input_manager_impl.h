@@ -57,6 +57,7 @@ public:
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
     int32_t GetWindowPid(int32_t windowId);
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
+    void UpdateWindowInfo(int32_t displatId,const std::vector<WindowInfo> &windows, int32_t focusWindowId);
     void SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     void SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen);
