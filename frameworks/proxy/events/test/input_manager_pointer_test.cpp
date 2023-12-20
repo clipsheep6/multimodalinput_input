@@ -60,7 +60,6 @@ constexpr int64_t POINTER_ITEM_DOWNTIME_TWO = 10001;
 constexpr int64_t POINTER_ITEM_DOWNTIME_THREE = 10003;
 constexpr int64_t POINTER_ITEM_DOWNTIME_FOUR = 10009;
 constexpr int64_t POINTER_ITEM_DOWNTIME_FIVE = 10010;
-constexpr int32_t TARGET_DISPLAY_ID = 1;
 }  // namespace
 
 class InputManagerPointerTest : public testing::Test {
