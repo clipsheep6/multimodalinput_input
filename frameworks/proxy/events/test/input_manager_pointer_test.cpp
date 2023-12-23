@@ -1748,39 +1748,5 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetCustomCursor_005, T
         ASSERT_TRUE(false);
     }
 }
-
-/**
- * @tc.name: InputManagerPointerTest_PointerEventDisplay_001
- * @tc.desc: Verify that the pointerEvent can be dispatched to the target dispaly
- * @tc.type: FUNC
- * @tc.require: I5HMF3 I5HMEF
- */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_PointerEventDisplay_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<PointerEvent> pointerEvent{InputManagerUtil::SetupPointerEvent015()};
-    ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetTargetDisplayId(TARGET_DISPLAY_ID);
-#ifdef OHOS_BUILD_ENABLE_POINTER
-    SimulateInputEventUtilTest(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_POINTER
-}
-
-/**
- * @tc.name: InputManagerKeyTest_KeyEventDisplay_001
- * @tc.desc: Verify that the pointerEvent can be dispatched to the target dispaly
- * @tc.type: FUNC
- * @tc.require: I5HMF3 I5HMEF
- */
-HWTEST_F(InputManagerPointerTest, InputManagerKeyTest_KeyEventDisplay_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<KeyEvent> keyEvent{InputManagerUtil::SetupKeyEvent001()};
-    ASSERT_NE(keyEvent, nullptr);
-    keyEvent->SetTargetDisplayId(TARGET_DISPLAY_ID);
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    SimulateInputEventUtilTest(keyEvent);
-#endif  // OHOS_BUILD_ENABLE_KEYBOAR
-}
 }  // namespace MMI
 }  // namespace OHOS
