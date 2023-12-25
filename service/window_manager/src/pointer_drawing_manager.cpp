@@ -56,6 +56,7 @@ constexpr int32_t ANIMATION_DURATION = 500;
 constexpr int32_t DEFAULT_POINTER_STYLE = 0;
 constexpr int32_t CURSOR_CIRCLE_STYLE = 41;
 constexpr int32_t MOUSE_ICON_BAIS = 5;
+constexpr int32_t VISIBLE_LIST_MAX_SIZE = 100;
 constexpr float ROTATION_ANGLE = 360.f;
 constexpr float LOADING_CENTER_RATIO = 0.5f;
 constexpr float RUNNING_X_RATIO = 0.3f;
@@ -63,6 +64,7 @@ constexpr float RUNNING_Y_RATIO = 0.675f;
 constexpr float INCREASE_RATIO = 1.22;
 constexpr int32_t MIN_POINTER_COLOR = 0x000000;
 constexpr int32_t MAX_POINTER_COLOR = 0xffffff;
+constexpr int32_t MIN_CURSOR_SIZE = 64;
 const std::string MOUSE_FILE_NAME = "mouse_settings.xml";
 bool isRsRemoteDied = false;
 } // namespace
@@ -93,24 +95,31 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     AdjustMouseFocus(ICON_TYPE(mouseIcons_[MOUSE_ICON(pointerStyle.id)].alignmentWay), physicalX, physicalY);
 
     if (surfaceNode_ != nullptr) {
-        surfaceNode_->SetBounds(physicalX + displayInfo_.x,
-            physicalY + displayInfo_.y,
-            surfaceNode_->GetStagingProperties().GetBounds().z_,
-            surfaceNode_->GetStagingProperties().GetBounds().w_);
-        Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("Pointer window move success");
         if (lastMouseStyle_ == pointerStyle && !mouseIconUpdate_) {
+            surfaceNode_->SetBounds(physicalX + displayInfo_.x,
+                physicalY + displayInfo_.y,
+                surfaceNode_->GetStagingProperties().GetBounds().z_,
+                surfaceNode_->GetStagingProperties().GetBounds().w_);
+            Rosen::RSTransaction::FlushImplicitTransaction();
             MMI_HILOGD("The lastpointerStyle is equal with pointerStyle,id %{public}d size:%{public}d",
                 pointerStyle.id, pointerStyle.size);
             return;
         }
         lastMouseStyle_ = pointerStyle;
+        surfaceNode_->SetVisible(false);
         int32_t ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
         if (ret != RET_OK) {
             mouseIconUpdate_ = false;
             MMI_HILOGE("Init layer failed");
             return;
         }
+        surfaceNode_->SetBounds(physicalX + displayInfo_.x,
+            physicalY + displayInfo_.y,
+            surfaceNode_->GetStagingProperties().GetBounds().z_,
+            surfaceNode_->GetStagingProperties().GetBounds().w_);
+        surfaceNode_->SetVisible(true);
+        Rosen::RSTransaction::FlushImplicitTransaction();
         UpdatePointerVisible();
         mouseIconUpdate_ = false;
         MMI_HILOGD("Leave, display:%{public}d,physicalX:%{public}d,physicalY:%{public}d",
@@ -523,6 +532,8 @@ int32_t PointerDrawingManager::UpdateCursorProperty(void* pixelMap)
         pow(INCREASE_RATIO, cursorSize - 1) * displayInfo_.dpi * DEVICE_INDEPENDENT_PIXELS / BASELINE_DENSITY;
     int32_t cursorHeight =
         pow(INCREASE_RATIO, cursorSize - 1) * displayInfo_.dpi * DEVICE_INDEPENDENT_PIXELS / BASELINE_DENSITY;
+    cursorWidth = cursorWidth < MIN_CURSOR_SIZE ? MIN_CURSOR_SIZE : cursorWidth;
+    cursorHeight = cursorHeight < MIN_CURSOR_SIZE ? MIN_CURSOR_SIZE : cursorHeight;
     float xAxis = (float)cursorWidth / (float)imageInfo.size.width;
     float yAxis = (float)cursorHeight / (float)imageInfo.size.height;
     newPixelMap->scale(xAxis, yAxis, Media::AntiAliasingOption::LOW);
@@ -850,6 +861,16 @@ void PointerDrawingManager::DeletePointerVisible(int32_t pid)
     }
 }
 
+bool PointerDrawingManager::GetPointerVisible(int32_t pid)
+{
+    for (auto it = pidInfos_.begin(); it != pidInfos_.end(); ++it) {
+        if (it->pid == pid) {
+            return it->visible;
+        }
+    }
+    return true;
+}
+
 int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
 {
     CALL_DEBUG_ENTER;
@@ -861,8 +882,8 @@ int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
     }
     PidInfo info = { .pid = pid, .visible = visible };
     pidInfos_.push_back(info);
-    if (visible) {
-        InitLayer(MOUSE_ICON(lastMouseStyle_.id));
+    if (pidInfos_.size() > VISIBLE_LIST_MAX_SIZE) {
+        pidInfos_.pop_front();
     }
     UpdatePointerVisible();
     return RET_OK;
