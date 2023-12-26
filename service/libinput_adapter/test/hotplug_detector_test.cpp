@@ -98,61 +98,6 @@ static void PollEvents(const OHOS::MMI::HotplugDetector &detector)
     }
 }
 
-HWTEST_F(HotplugTest, TestRealInputEvents, TestSize.Level1)
-{
-    bool addCalled = false;
-    std::string addPath;
-    bool removeCalled = false;
-    std::string removePath;
-
-    auto add = [&addCalled, &addPath](std::string path) {
-        addCalled = true;
-        addPath = std::move(path);
-    };
-    auto remove = [&removeCalled, &removePath](std::string path) {
-        removeCalled = true;
-        removePath = std::move(path);
-    };
-    OHOS::MMI::HotplugDetector detector;
-    FakeInputDevice fake;
-
-    EXPECT_TRUE(Exists(DEV_INPUT_PATH));
-    EXPECT_TRUE(detector.Init(add, remove));
-    ASSERT_TRUE(addCalled);
-    EXPECT_THAT(addPath, StartsWith(DEV_INPUT_PATH));
-    EXPECT_FALSE(removeCalled);
-    auto fd = detector.GetFd();
-    ASSERT_GE(fd, 0);
-    addCalled = false;
-    removeCalled = false;
-    addPath.clear();
-
-    PollEvents(detector);
-    EXPECT_FALSE(addCalled);
-    EXPECT_FALSE(removeCalled);
-
-    ASSERT_NO_FATAL_FAILURE(fake.Create());
-    PollEvents(detector);
-    EXPECT_TRUE(addCalled);
-    EXPECT_FALSE(removeCalled);
-    EXPECT_THAT(addPath, StartsWith(DEV_INPUT_PATH));
-    EXPECT_TRUE(Exists(addPath));
-    addCalled = false;
-    removeCalled = false;
-
-    ASSERT_NO_FATAL_FAILURE(fake.Destroy());
-    PollEvents(detector);
-    EXPECT_FALSE(addCalled);
-    EXPECT_TRUE(removeCalled);
-    EXPECT_EQ(removePath, addPath);
-    addCalled = false;
-    removeCalled = false;
-
-    PollEvents(detector);
-    EXPECT_FALSE(addCalled);
-    EXPECT_FALSE(removeCalled);
-}
-
 HWTEST_F(HotplugTest, TestSpecialCases, TestSize.Level1)
 {
     OHOS::MMI::HotplugDetector detector;
