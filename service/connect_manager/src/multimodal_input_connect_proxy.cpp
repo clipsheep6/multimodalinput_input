@@ -1248,6 +1248,7 @@ int32_t MultimodalInputConnectProxy::InjectPointerEvent(const std::shared_ptr<Po
     return RET_OK;
 }
 
+__attribute__((no_sanitize("cfi")))
 int32_t MultimodalInputConnectProxy::SetAnrObserver()
 {
     CALL_DEBUG_ENTER;
