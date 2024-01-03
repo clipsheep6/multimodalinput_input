@@ -70,6 +70,13 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
     if ((type < LIBINPUT_EVENT_TOUCHPAD_DOWN) || (type > LIBINPUT_EVENT_TOUCHPAD_MOTION)) {
         MULTI_FINGERTAP_HDR->SetMULTI_FINGERTAP_HDRDefault();
     }
+    HandleEventByType(event, frameTime);
+    DfxHisysevent::ReportDispTimes();
+}
+
+void EventNormalizeHandler::HandleEventByType(libinput_event* event, int64_t frameTime)
+{
+    auto type = libinput_event_get_type(event);
     switch (type) {
         case LIBINPUT_EVENT_DEVICE_ADDED: {
             OnEventDeviceAdded(event);
@@ -140,7 +147,6 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
             break;
         }
     }
-    DfxHisysevent::ReportDispTimes();
 }
 
 bool EventNormalizeHandler::ProcessNullEvent(libinput_event *event, int64_t frameTime)
