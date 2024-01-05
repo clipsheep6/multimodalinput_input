@@ -21,9 +21,7 @@ ohos_shared_library("native_input_event") {
     "${mmi_path}/interfaces/native/innerkits/",
   ]
 
-  sources = [
-    "./native_input_event_manager.cpp",
-  ]
+  sources = [ "./native_input_event_manager.cpp" ]
 
   cflags = [ "-Werror" ]
 

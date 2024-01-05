@@ -1,0 +1,5 @@
+[
+    { "name": "OH_InputEvent_InjectEvent" },
+    { "name": "OH_InputEvent_InjectMouseEvent" },
+    { "name": "OH_InputEvent_InjectTouchEvent" }
+]
