@@ -43,7 +43,7 @@ typedef enum {
     MOUSE_ACTION_ACTION_DOWN = 7,
     /** Lifting of the mouse touch pad. */
     MOUSE_ACTION_ACTION_UP = 8
-} MouseAction;
+} InputEvent_MouseAction;
 
 typedef enum {
     /** Left button on the mouse. */
@@ -62,7 +62,7 @@ typedef enum {
     MOUSE_BUTTON_BACK = 6,
     /** Task key on the mouse. */
     MOUSE_BUTTON_TASK = 7
-} MouseButton;
+} InputEvent_MouseButton;
 
 typedef enum {
     /** Vertical scroll axis. */
@@ -71,7 +71,7 @@ typedef enum {
     MOUSE_AXIS_SCROLL_HORIZONTAL = 1,
     /** Pinch axis. */
     MOUSE_AXIS_PINCH = 2
-} MouseAxis;
+} InputEvent_MouseAxis;
 
 typedef enum {
     /** Unknown type. */
@@ -82,19 +82,19 @@ typedef enum {
     MOUSE_TOOLTYPE_JOYSTICK = 2,
     /** Touch pad. */
     MOUSE_TOOLTYPE_TOUCHPAD = 3
-} MouseToolType;
+} InputEvent_MouseToolType;
 
 
 struct InputEvent_AxisValue {
     /** Axis type. */
-    MouseAxis axis;
+    InputEvent_MouseAxis axis;
     /** Axis value. */
     int32_t value;
 };
 
 struct InputEvent_MouseEvent {
     /** Mouse event action. */
-    MouseAction action;
+    InputEvent_MouseAction action;
     /** X coordinate of the mouse pointer on the screen. */
     int32_t screenX;
     /** Y coordinate of the mouse pointer on the screen. */
@@ -111,9 +111,9 @@ struct InputEvent_MouseEvent {
     /** Y axis offset relative to the previous reported mouse pointer position. */
     int32_t rawDeltaY;
     /** Button that is currently pressed or released. */
-    MouseButton button;
+    InputEvent_MouseButton button;
     /** Button that is being pressed. */
-    std::vector<MouseButton> pressedButtons;
+    std::vector<InputEvent_MouseButton> pressedButtons;
     /** All axis data contained in the event. */
     std::vector<InputEvent_AxisValue> axes;
     /** List of pressed keys. */
@@ -135,7 +135,7 @@ struct InputEvent_MouseEvent {
     /** Whether scrollLock is active. */
     bool scrollLock;
     /** Tool type */
-    MouseToolType toolType;
+    InputEvent_MouseToolType toolType;
 };
 
 #ifdef __cplusplus

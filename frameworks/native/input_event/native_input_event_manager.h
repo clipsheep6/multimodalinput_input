@@ -27,11 +27,11 @@ enum {
     COMMON_PARAMETER_ERROR = 401,
 }; 
 
-int32_t OH_InputEvent_InjectEvent(struct InputEvent_KeyEvent* keyEvent);
+int32_t OH_InputEventClient_InjectEvent(struct OH_KeyEvent* keyEvent);
 
-int32_t OH_InputEvent_InjectMouseEvent(struct InputEvent_MouseEvent* mouseEvent);
+int32_t OH_InputEventClient_InjectMouseEvent(struct OH_MouseEvent* mouseEvent);
 
-int32_t OH_InputEvent_InjectTouchEvent(struct InputEvent_TouchEvent* touchEvent);
+int32_t OH_InputEventClient_InjectTouchEvent(struct OH_TouchEvent* touchEvent);
 
 #ifdef __cplusplus
 }

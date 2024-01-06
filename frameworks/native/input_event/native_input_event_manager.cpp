@@ -22,7 +22,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, OHOS::MMI::MMI_LOG_DOMAIN, "NativeInputEventManager" };
 } // namespace
 
-int32_t OH_InputEvent_InjectEvent(struct InputEvent_KeyEvent* keyEvent)
+int32_t OH_InputEventClient_InjectEvent(struct OH_KeyEvent* keyEvent)
 {
     MMI_HILOGI("InputEvent injectEvent");
     if (keyEvent->keyDownDuration < 0) {
@@ -60,7 +60,7 @@ int32_t OH_InputEvent_InjectEvent(struct InputEvent_KeyEvent* keyEvent)
     return 0;
 }
 
-static int32_t HandleMouseButton(struct InputEvent_MouseEvent* mouseEvent, std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
+static int32_t HandleMouseButton(struct OH_MouseEvent* mouseEvent, std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
 {
     int32_t button = mouseEvent->button;
     if (button < 0) {
@@ -84,7 +84,7 @@ static int32_t HandleMouseButton(struct InputEvent_MouseEvent* mouseEvent, std::
     return 0;
 }
 
-static int32_t HandleMouseAction(struct InputEvent_MouseEvent* mouseEvent,
+static int32_t HandleMouseAction(struct OH_MouseEvent* mouseEvent,
     std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent, OHOS::MMI::PointerEvent::PointerItem &item)
 {
     switch (mouseEvent->action) {
@@ -118,7 +118,7 @@ static int32_t HandleMouseAction(struct InputEvent_MouseEvent* mouseEvent,
 }
 
 
-static int32_t HandleMousePropertyInt32(struct InputEvent_MouseEvent* mouseEvent,
+static int32_t HandleMousePropertyInt32(struct OH_MouseEvent* mouseEvent,
     std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent, OHOS::MMI::PointerEvent::PointerItem &item)
 {
     int32_t screenX = mouseEvent->screenX;
@@ -138,7 +138,7 @@ static int32_t HandleMousePropertyInt32(struct InputEvent_MouseEvent* mouseEvent
 }
 
 
-int32_t OH_InputEvent_InjectMouseEvent(struct InputEvent_MouseEvent* mouseEvent)
+int32_t OH_InputEventClient_InjectMouseEvent(struct OH_MouseEvent* mouseEvent)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGI("InputEvent injectEvent");
@@ -157,7 +157,7 @@ int32_t OH_InputEvent_InjectMouseEvent(struct InputEvent_MouseEvent* mouseEvent)
     return 0;
 }
 
-static int32_t HandleTouchAction(struct InputEvent_TouchEvent* touchEvent,
+static int32_t HandleTouchAction(struct OH_TouchEvent* touchEvent,
     std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent, OHOS::MMI::PointerEvent::PointerItem &item)
 {
     int32_t action = touchEvent->action;
@@ -180,7 +180,7 @@ static int32_t HandleTouchAction(struct InputEvent_TouchEvent* touchEvent,
     return action;
 }
 
-static int32_t HandleTouchPropertyInt32(struct InputEvent_TouchEvent* touchEvent,
+static int32_t HandleTouchPropertyInt32(struct OH_TouchEvent* touchEvent,
     std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent, OHOS::MMI::PointerEvent::PointerItem &item, int32_t action)
 {
     int32_t sourceType = touchEvent->sourceType;
@@ -215,7 +215,7 @@ static int32_t HandleTouchPropertyInt32(struct InputEvent_TouchEvent* touchEvent
     return 0;
 }
 
-int32_t OH_InputEvent_InjectTouchEvent(struct InputEvent_TouchEvent* touchEvent)
+int32_t OH_InputEventClient_InjectTouchEvent(struct OH_TouchEvent* touchEvent)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGI("InputEvent injectTouchEvent");
