@@ -46,17 +46,7 @@ constexpr int64_t SECONDS_SYSTEM = 1000;
 constexpr int32_t SPECIAL_KEY_DOWN_DELAY = 150;
 constexpr int32_t MAX_SHORT_KEY_DOWN_DURATION = 4000;
 constexpr int32_t MIN_SHORT_KEY_DOWN_DURATION = 0;
-constexpr int32_t TOUCH_MAX_THRESHOLD = 15;
 constexpr int32_t COMMON_PARAMETER_ERROR = 401;
-constexpr size_t SINGLE_KNUCKLE_SIZE = 1;
-constexpr size_t DOUBLE_KNUCKLE_SIZE = 2;
-constexpr int32_t MAX_TIME_FOR_ADJUST_CONFIG = 5;
-constexpr int32_t POW_SQUARE = 2;
-constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_DEFAULT = 250000;
-constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_SLOW = 450000;
-constexpr float DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG = 64.0f;
-constexpr float DOUBLE_CLICK_DISTANCE_LONG_CONFIG = 96.0f;
-constexpr float VPR_CONFIG = 3.25f;
 constexpr int32_t REMOVE_OBSERVER = -2;
 constexpr int32_t ACTIVE_EVENT = 2;
 const std::string EXTENSION_ABILITY = "extensionAbility";
@@ -75,6 +65,18 @@ const std::map<int32_t, SpecialType> SPECIAL_KEYS = {
     { KeyEvent::KEYCODE_VOLUME_DOWN, SpecialType::SPECIAL_ALL },
     { KeyEvent::KEYCODE_VOLUME_UP, SpecialType::SPECIAL_ALL }
 };
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+constexpr int32_t TOUCH_MAX_THRESHOLD = 15;
+constexpr size_t SINGLE_KNUCKLE_SIZE = 1;
+constexpr size_t DOUBLE_KNUCKLE_SIZE = 2;
+constexpr int32_t MAX_TIME_FOR_ADJUST_CONFIG = 5;
+constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_DEFAULT = 250000;
+constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_SLOW = 450000;
+constexpr int32_t POW_SQUARE = 2;
+constexpr float DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG = 64.0f;
+constexpr float DOUBLE_CLICK_DISTANCE_LONG_CONFIG = 96.0f;
+constexpr float VPR_CONFIG = 3.25f;
+#endif // OHOS_BUILD_ENABLE_TOUCH
 struct JsonParser {
     JsonParser() = default;
     ~JsonParser()
@@ -740,6 +742,7 @@ bool IsParseKnuckleGesture(const JsonParser &parser, const std::string ability, 
     return true;
 }
 
+#ifdef OHOS_BUILD_ENABLE_TOUCH
 float AbsDiff(KnuckleGesture knuckleGesture, const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, -1);
@@ -754,6 +757,7 @@ bool IsEqual(float f1, float f2)
 {
     return (std::fabs(f1 - f2) <= std::numeric_limits<double>::epsilon());
 }
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
 bool ParseMultiFingersTap(const JsonParser &parser, const std::string ability, MultiFingersTap &mulFingersTap)
 {
@@ -2108,6 +2112,8 @@ KnuckleGesture KeyCommandHandler::GetDoubleKnuckleGesture()
 {
     return doubleKnuckleGesture_;
 }
+
+#ifdef OHOS_BUILD_ENABLE_TOUCH
 void KeyCommandHandler::SetKnuckleDoubleTapIntervalTime(int64_t interval)
 {
     CALL_DEBUG_ENTER;
@@ -2126,5 +2132,6 @@ void KeyCommandHandler::SetKnuckleDoubleTapDistance(float distance)
     }
     downToPrevDownDistanceConfig_ = distance;
 }
+#endif // OHOS_BUILD_ENABLE_TOUCH
 } // namespace MMI
 } // namespace OHOS

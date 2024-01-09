@@ -91,22 +91,38 @@ std::shared_ptr<TransformProcessor> TouchEventNormalize::MakeTransformProcessor(
 
 int32_t TouchEventNormalize::SetTouchpadPinchSwitch(bool switchFlag) const
 {
+#ifdef OHOS_BUILD_ENABLE_POINTER
     return TouchPadTransformProcessor::SetTouchpadPinchSwitch(switchFlag);
+#else
+    return RET_OK;
+#endif // OHOS_BUILD_ENABLE_POINTER
 }
 
 int32_t TouchEventNormalize::GetTouchpadPinchSwitch(bool &switchFlag) const
 {
+#ifdef OHOS_BUILD_ENABLE_POINTER
     return TouchPadTransformProcessor::GetTouchpadPinchSwitch(switchFlag);
+#else
+    return RET_OK;
+#endif // OHOS_BUILD_ENABLE_POINTER
 }
 
 int32_t TouchEventNormalize::SetTouchpadSwipeSwitch(bool switchFlag) const
 {
+#ifdef OHOS_BUILD_ENABLE_POINTER
     return TouchPadTransformProcessor::SetTouchpadSwipeSwitch(switchFlag);
+#else
+    return RET_OK;
+#endif // OHOS_BUILD_ENABLE_POINTER
 }
 
 int32_t TouchEventNormalize::GetTouchpadSwipeSwitch(bool &switchFlag) const
 {
+#ifdef OHOS_BUILD_ENABLE_POINTER
     return TouchPadTransformProcessor::GetTouchpadSwipeSwitch(switchFlag);
+#else
+    return RET_OK;
+#endif // OHOS_BUILD_ENABLE_POINTER
 }
 } // namespace MMI
 } // namespace OHOS

@@ -40,8 +40,10 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventNormalizeHandler" };
-constexpr int32_t FINGER_NUM = 2;
 constexpr int32_t MT_TOOL_PALM = 2;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+constexpr int32_t FINGER_NUM = 2;
+#endif // OHOS_BUILD_ENABLE_POINTER
 }
 
 void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime)
@@ -62,6 +64,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
         MMI_HILOGD("This touch event is canceled type:%{public}d", type);
         return;
     }
+#ifdef OHOS_BUILD_ENABLE_POINTER
     if ((type == LIBINPUT_EVENT_POINTER_TAP) &&
         (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLETAP)) {
         MULTI_FINGERTAP_HDR->SetMULTI_FINGERTAP_HDRDefault();
@@ -70,6 +73,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
     if ((type < LIBINPUT_EVENT_TOUCHPAD_DOWN) || (type > LIBINPUT_EVENT_TOUCHPAD_MOTION)) {
         MULTI_FINGERTAP_HDR->SetMULTI_FINGERTAP_HDRDefault();
     }
+#endif // OHOS_BUILD_ENABLE_POINTER
     switch (type) {
         case LIBINPUT_EVENT_DEVICE_ADDED: {
             OnEventDeviceAdded(event);
@@ -145,6 +149,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
 
 bool EventNormalizeHandler::ProcessNullEvent(libinput_event *event, int64_t frameTime)
 {
+#ifdef OHOS_BUILD_ENABLE_TOUCH
     std::shared_ptr<PointerEvent> pointerEvent = EventResampleHdr->GetPointerEvent();
     if ((event == nullptr) && (pointerEvent != nullptr) && MMISceneBoardJudgement::IsSceneBoardEnabled()
         && MMISceneBoardJudgement::IsResampleEnabled()) {
@@ -156,6 +161,7 @@ bool EventNormalizeHandler::ProcessNullEvent(libinput_event *event, int64_t fram
         }
         return true;
     }
+#endif // OHOS_BUILD_ENABLE_TOUCH
     return false;
 }
 
@@ -297,6 +303,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
 void EventNormalizeHandler::UpdateKeyEventHandlerChain(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPV(keyEvent);
     int32_t currentShieldMode = KeyEventHdr->GetCurrentShieldMode();
     if (currentShieldMode == SHIELD_MODE::FACTORY_MODE) {
@@ -307,6 +314,7 @@ void EventNormalizeHandler::UpdateKeyEventHandlerChain(const std::shared_ptr<Key
         CHKPV(nextHandler_);
         nextHandler_->HandleKeyEvent(keyEvent);
     }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
@@ -412,13 +420,13 @@ int32_t EventNormalizeHandler::GestureIdentify(libinput_event* event)
         MMI_HILOGD("Gesture identify failed");
         return RET_ERR;
     }
-    auto rotateAngle = GESTURE_HANDLER->GetRotateAngle();
 
     if (nextHandler_ == nullptr) {
         MMI_HILOGW("Pointer device does not support");
         return ERROR_UNSUPPORT;
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
+    auto rotateAngle = GESTURE_HANDLER->GetRotateAngle();
     if (MouseEventHdr->NormalizeRotateEvent(event, actionType, rotateAngle) == RET_ERR) {
         MMI_HILOGE("OnEvent is failed");
         return RET_ERR;
@@ -552,7 +560,9 @@ int32_t EventNormalizeHandler::HandleJoystickEvent(libinput_event* event)
     auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::JOYSTICK);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
+#ifdef OHOS_BUILD_ENABLE_POINTER
     nextHandler_->HandlePointerEvent(pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER
 #else
     MMI_HILOGW("Joystick device does not support");
 #endif // OHOS_BUILD_ENABLE_JOYSTICK

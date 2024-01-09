@@ -517,6 +517,7 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
 void InputWindowsManager::GetPointerStyleByArea(WindowArea area, int32_t pid, int32_t winId, PointerStyle& pointerStyle)
 {
     CALL_DEBUG_ENTER;
@@ -571,10 +572,12 @@ void InputWindowsManager::GetPointerStyleByArea(WindowArea area, int32_t pid, in
             break;
     }
 }
+#endif // OHOS_BUILD_ENABLE_POINTER
 
 void InputWindowsManager::SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId)
 {
     CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
     PointerStyle pointerStyle;
     GetPointerStyleByArea(area, pid, windowId, pointerStyle);
     UpdateWindowPointerVisible(pid);
@@ -596,12 +599,15 @@ void InputWindowsManager::SetWindowPointerStyle(WindowArea area, int32_t pid, in
     }
     MMI_HILOGI("Window id:%{public}d set pointer style:%{public}d success", windowId, lastPointerStyle_.id);
     IPointerDrawingManager::GetInstance()->DrawPointerStyle(lastPointerStyle_);
+#endif // OHOS_BUILD_ENABLE_POINTER
 }
 
 void InputWindowsManager::UpdateWindowPointerVisible(int32_t pid)
 {
+#ifdef OHOS_BUILD_ENABLE_POINTER
     bool visible = IPointerDrawingManager::GetInstance()->GetPointerVisible(pid);
     IPointerDrawingManager::GetInstance()->SetPointerVisible(pid, visible);
+#endif // OHOS_BUILD_ENABLE_POINTER
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -1841,6 +1847,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                "displayId:%{public}d,TargetWindowId:%{public}d,AgentWindowId:%{public}d",
                logicalX, logicalY, physicalX, physicalY, windowX, windowY, displayId,
                pointerEvent->GetTargetWindowId(), pointerEvent->GetAgentWindowId());
+#ifdef OHOS_BUILD_ENABLE_POINTER
     if (IsNeedDrawPointer(pointerItem)) {
         if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
             IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
@@ -1865,6 +1872,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             }
         }
     }
+#endif // OHOS_BUILD_ENABLE_POINTER
 
     int32_t pointerAction = pointerEvent->GetPointerAction();
     if (pointerAction == PointerEvent::POINTER_ACTION_DOWN) {
@@ -2060,6 +2068,7 @@ template <class T>
 void InputWindowsManager::CreateStatusConfigObserver(T& item)
 {
     CALL_DEBUG_ENTER;
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_COMBINATION_KEY)
     SettingObserver::UpdateFunc updateFunc = [&item](const std::string& key) {
         bool statusValue = false;
         auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
@@ -2078,6 +2087,7 @@ void InputWindowsManager::CreateStatusConfigObserver(T& item)
         MMI_HILOGE("register setting observer failed, ret=%{public}d", ret);
         statusObserver = nullptr;
     }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
