@@ -1204,6 +1204,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     WindowInfo *touchWindow = nullptr;
     auto targetWindowId = pointerItem.GetTargetWindowId();
     for (auto &item : displayGroupInfo_.windowsInfo) {
+		MMI_HILOGD("in for loop,window:%{public}d, flags:%{public}d", item.id, item.flags);
         if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE) {
             MMI_HILOGD("Skip the untouchable window to continue searching, "
                        "window:%{public}d, flags:%{public}d", item.id, item.flags);
@@ -1212,20 +1213,25 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         bool checkToolType = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
             ((pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId) ||
             pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN);
+		MMI_HILOGD("checkToolType, %{public}d, appended:%{public}d, sourceType%{public}d", checkToolType, extraData_.appended, extraData_.sourceType);
         if (checkToolType) {
             if (IsInHotArea(logicalX, logicalY, item.defaultHotAreas)) {
                 touchWindow = &item;
+				MMI_HILOGD("find touchWindow %{public}d", touchWindow->id);
                 break;
             } else {
+				MMI_HILOGD("continue");
                 continue;
             }
         }
         if (targetWindowId >= 0) {
+			MMI_HILOGD("item.id %{public}d, targetWindowId %{public}d", targetWindowId, item.id);
             if (item.id == targetWindowId) {
                 touchWindow = &item;
                 break;
             }
         } else if (IsInHotArea(logicalX, logicalY, item.defaultHotAreas)) {
+			MMI_HILOGD("IsInHotArea targetWindowId %{public}d, item.id %{public}d", targetWindowId, item.id);
             touchWindow = &item;
             break;
         }
