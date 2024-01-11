@@ -66,6 +66,7 @@ constexpr int32_t REMOVE_OBSERVER = -2;
 constexpr int32_t UNSUBSCRIBED = -1;
 constexpr int32_t UNOBSERVED = -1;
 constexpr int32_t SUBSCRIBED = 1;
+constexpr int32_t INTERVAL_MS = 5000;
 } // namespace
 
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(DelayedSingleton<MMIService>::GetInstance().get());
@@ -278,12 +279,28 @@ int32_t MMIService::Init()
     SetRecvFun(std::bind(&ServerMsgHandler::OnMsgHandler, &sMsgHandler_, std::placeholders::_1, std::placeholders::_2));
     KeyMapMgr->GetConfigKeyValue("default_keymap", KeyMapMgr->GetDefaultKeyId());
     OHOS::system::SetParameter(INPUT_POINTER_DEVICES, "false");
+    AddSystemObserver();
     if (!InitService()) {
         MMI_HILOGE("Saservice init failed");
         return SASERVICE_INIT_FAIL;
     }
     MMI_HILOGI("Set para input.pointer.device false");
     return RET_OK;
+}
+
+void MMIService::AddSystemObserver()
+{
+    std::shared_ptr<KeyCommandHandler> eventKeyCommandHandler = InputHandler->GetKeyCommandHandler();
+    CHKPV(eventKeyCommandHandler);
+    if (eventKeyCommandHandler->ParseConfig()) {
+        eventKeyCommandHandler->SetParseConfigFlg(true);
+    }
+    int32_t repeatCount = 1;
+    TimerMgr->AddTimer(INTERVAL_MS, repeatCount, [this]() {
+        std::shared_ptr<KeyCommandHandler> eventKeyCommandHandler = InputHandler->GetKeyCommandHandler();
+        CHKPV(eventKeyCommandHandler);
+        eventKeyCommandHandler->ParseStatusConfigObserver();
+    });
 }
 
 void MMIService::OnStart()

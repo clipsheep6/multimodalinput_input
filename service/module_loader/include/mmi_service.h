@@ -195,6 +195,7 @@ protected:
     void AddAppDebugListener();
     void RemoveAppDebugListener();
     int32_t UpdateCombineKeyState(bool enable);
+    void AddSystemObserver();
 
 private:
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
