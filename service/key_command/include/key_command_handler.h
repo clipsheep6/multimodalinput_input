@@ -151,6 +151,9 @@ public:
 #endif // OHOS_BUILD_ENABLE_TOUCH
     bool OnHandleEvent(const std::shared_ptr<KeyEvent> keyEvent);
     bool OnHandleEvent(const std::shared_ptr<PointerEvent> pointerEvent);
+    bool ParseConfig();
+    void ParseStatusConfigObserver();
+    void SetParseConfigFlg(bool parseConfigFlg);
 
 #ifdef UNIT_TEST
 public:
@@ -159,10 +162,8 @@ private:
 #endif
     void Print();
     void PrintSeq();
-    bool ParseConfig();
     bool ParseJson(const std::string &configFile);
     void ParseRepeatKeyMaxCount();
-    void ParseStatusConfigObserver();
     void LaunchAbility(const Ability &ability);
     void LaunchAbility(const Ability &ability, int64_t delay);
     void LaunchAbility(const ShortcutKey &key);
@@ -269,7 +270,6 @@ private:
     bool isKeyCancel_ { false };
     bool isHandleSequence_ { false };
     bool isParseMaxCount_ { false };
-    bool isParseStatusConfig_ { false };
 };
 } // namespace MMI
 } // namespace OHOS

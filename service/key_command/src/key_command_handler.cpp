@@ -1389,11 +1389,6 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
         }
     }
 
-    if (!isParseStatusConfig_) {
-        ParseStatusConfigObserver();
-        isParseStatusConfig_ = true;
-    }
-
     bool isHandled = HandleShortKeys(key);
     isHandled = HandleSequences(key) || isHandled;
     if (isHandled) {
@@ -2107,10 +2102,12 @@ KnuckleGesture KeyCommandHandler::GetSingleKnuckleGesture()
 {
     return singleKnuckleGesture_;
 }
+
 KnuckleGesture KeyCommandHandler::GetDoubleKnuckleGesture()
 {
     return doubleKnuckleGesture_;
 }
+
 void KeyCommandHandler::SetKnuckleDoubleTapIntervalTime(int64_t interval)
 {
     CALL_DEBUG_ENTER;
@@ -2120,6 +2117,7 @@ void KeyCommandHandler::SetKnuckleDoubleTapIntervalTime(int64_t interval)
     }
     downToPrevUpTimeConfig_ = interval;
 }
+
 void KeyCommandHandler::SetKnuckleDoubleTapDistance(float distance)
 {
     CALL_DEBUG_ENTER;
@@ -2128,6 +2126,11 @@ void KeyCommandHandler::SetKnuckleDoubleTapDistance(float distance)
         return;
     }
     downToPrevDownDistanceConfig_ = distance;
+}
+
+void KeyCommandHandler::SetParseConfigFlg(bool parseConfigFlg)
+{
+    isParseConfig_ = parseConfigFlg;
 }
 } // namespace MMI
 } // namespace OHOS
