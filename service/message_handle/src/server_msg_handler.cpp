@@ -456,12 +456,20 @@ int32_t ServerMsgHandler::RemoveInputEventFilter(int32_t clientPid, int32_t filt
 
 int32_t ServerMsgHandler::SetShieldStatus(int32_t shieldMode, bool isShield)
 {
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     return KeyEventHdr->SetShieldStatus(shieldMode, isShield);
+#else
+    return RET_OK;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 int32_t ServerMsgHandler::GetShieldStatus(int32_t shieldMode, bool &isShield)
 {
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     return KeyEventHdr->GetShieldStatus(shieldMode, isShield);
+#else
+    return RET_OK;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 } // namespace MMI
 } // namespace OHOS

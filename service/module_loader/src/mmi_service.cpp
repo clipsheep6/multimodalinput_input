@@ -1609,6 +1609,7 @@ int32_t MMIService::EnableInputDevice(bool enable)
 
 int32_t MMIService::UpdateCombineKeyState(bool enable)
 {
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_COMBINATION_KEY)
     auto eventSubscriberHandler = InputHandler->GetSubscriberHandler();
     CHKPR(eventSubscriberHandler, RET_ERR);
     int32_t ret = eventSubscriberHandler->EnableCombineKey(enable);
@@ -1623,6 +1624,9 @@ int32_t MMIService::UpdateCombineKeyState(bool enable)
         MMI_HILOGE("EnableCombineKey is failed in key command: %{public}d", ret);
     }
     return ret;
+#else
+    return RET_OK;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY
 }
 
 int32_t MMIService::EnableCombineKey(bool enable)
@@ -1640,7 +1644,11 @@ int32_t MMIService::UpdateSettingsXml(const std::string &businessId, int32_t del
 {
     std::shared_ptr<KeyCommandHandler> eventKeyCommandHandler = InputHandler->GetKeyCommandHandler();
     CHKPR(eventKeyCommandHandler, RET_ERR);
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_COMBINATION_KEY)
     return eventKeyCommandHandler->UpdateSettingsXml(businessId, delay);
+#else
+    return RET_OK;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY
 }
 
 int32_t MMIService::SetKeyDownDuration(const std::string &businessId, int32_t delay)
