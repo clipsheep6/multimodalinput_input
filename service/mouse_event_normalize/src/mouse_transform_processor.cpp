@@ -209,7 +209,8 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
     return RET_OK;
 }
 
-int32_t MouseTransformProcessor::HandleButtonValueInner(struct libinput_event_pointer *data, uint32_t button, const int32_t type)
+int32_t MouseTransformProcessor::HandleButtonValueInner(struct libinput_event_pointer *data, uint32_t button,
+    const int32_t type)
 {
     CALL_DEBUG_ENTER;
     CHKPR(data, ERROR_NULL_POINTER);
