@@ -498,7 +498,7 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     UpdateDisplayMode();
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
-    if (InputDevMgr->HasPointerDevice()) {
+    if (InputDevMgr->HasPointerDevice() && pointerDrawFlag_) {
         NotifyPointerToWindow();
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -1036,14 +1036,20 @@ bool InputWindowsManager::TransformTipPoint(struct libinput_event_tablet_tool* t
                "PhysicalDisplay.topLeftX:%{public}d, PhysicalDisplay.topLeftY:%{public}d",
                displayInfo->width, displayInfo->height, displayInfo->x, displayInfo->y);
     displayId = displayInfo->id;
-    PhysicalCoordinate phys {
-        .x = libinput_event_tablet_tool_get_x_transformed(tip, displayInfo->width),
-        .y = libinput_event_tablet_tool_get_y_transformed(tip, displayInfo->height)
+    auto width = displayInfo->width;
+    auto height = displayInfo->height;
+    if (displayInfo->direction == DIRECTION90 || displayInfo->direction == DIRECTION270) {
+        width = displayInfo->height;
+        height = displayInfo->width;
+    }
+    LogicalCoordinate phys {
+        .x = static_cast<int32_t>(libinput_event_tablet_tool_get_x_transformed(tip, width)),
+        .y = static_cast<int32_t>(libinput_event_tablet_tool_get_y_transformed(tip, height))
     };
-
+    RotateTouchScreen(*displayInfo, phys);
     coord.x = static_cast<int32_t>(phys.x);
     coord.y = static_cast<int32_t>(phys.y);
-    MMI_HILOGD("physicalX:%{public}f, physicalY:%{public}f, displayId:%{public}d", phys.x, phys.y, displayId);
+    MMI_HILOGD("physicalX:%{public}d, physicalY:%{public}d, displayId:%{public}d", phys.x, phys.y, displayId);
     return true;
 }
 
