@@ -43,6 +43,7 @@ void SetUp() override
 void TearDown() override
 {
     close(fd_);
+    fd_ = NULL;
 }
 
 int32_t fd_;
