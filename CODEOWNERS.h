@@ -13,3 +13,7 @@
 
 # any change to tools/multimodalinput_ipc_interface_code.h needs to be reviewed by @leonchan5
 tools/multimodalinput_ipc_interface_code.h @leonchan5
+
+#ifndef CODEOWNERS_H
+#define CODEOWNERS_H
+#endif // CODEOWNERS_H
