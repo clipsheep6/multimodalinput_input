@@ -111,6 +111,22 @@ struct KnuckleGesture {
     } lastDownPointer;
 };
 
+struct TabletTool {
+    std::shared_ptr<PointerEvent> lastPointerDownEvent { nullptr };
+    bool state { false };
+    std::string statusConfig {};
+    std::string abilityInfo {};
+    int64_t lastPointerUpTime { 0 };
+    int64_t maxInterval { 0 };
+    double doubleClickDistance { 0.0f };
+    Ability ability;
+    struct {
+        int32_t id { 0 };
+        int32_t x { 0 };
+        int32_t y { 0 };
+    } lastDownPointer;
+};
+
 struct MultiFingersTap {
     Ability ability;
 };
@@ -221,12 +237,16 @@ private:
     void HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandleKnuckleGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandleKnuckleGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
+    void HandleTabletToolDownEvent(const std::shared_ptr<PointerEvent> touchEvent);
+    void HandleTabletToolUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void SingleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent);
     void DoubleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent);
     void ReportKnuckleDoubleClickEvent(const std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
     void ReportKnuckleScreenCapture(const std::shared_ptr<PointerEvent> touchEvent);
     void KnuckleGestureProcessor(const std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
     void UpdateKnuckleGestureInfo(const std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
+    void TabletToolProcesser(const std::shared_ptr<PointerEvent> touchEvent, TabletTool &tabletTool);
+    void UpdateTabletToolInfo(const std::shared_ptr<PointerEvent> touchEvent, TabletTool &tabletTool);
     void AdjustTimeIntervalConfigIfNeed(int64_t intervalTime);
     void AdjustDistanceConfigIfNeed(float distance);
 #endif // OHOS_BUILD_ENABLE_TOUCH
@@ -246,6 +266,7 @@ private:
     TwoFingerGesture twoFingerGesture_;
     KnuckleGesture singleKnuckleGesture_;
     KnuckleGesture doubleKnuckleGesture_;
+    TabletTool tabletTool_;
     MultiFingersTap threeFingersTap_;
     bool isKnuckleState_ { false };
     bool isTimeConfig_ { false };
