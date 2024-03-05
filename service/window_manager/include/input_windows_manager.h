@@ -115,6 +115,7 @@ public:
     bool IsAncoWindow(const WindowInfo &window) const;
     bool IsAncoWindowFocus(const WindowInfo &window) const;
     void SimulatePointerExt(std::shared_ptr<PointerEvent> pointerEvent);
+    void SimulateKeyExt(std::shared_ptr<KeyEvent> keyEvent);
     void DumpAncoWindows(std::string& out) const;
 #endif // OHOS_BUILD_ENABLE_ANCO
 
@@ -124,6 +125,10 @@ public:
     int32_t UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent);
     const DisplayInfo* GetPhysicalDisplay(int32_t id) const;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    void UpdatePointerChangeAreas();
+#endif // OHOS_BUILD_ENABLE_POINTER
 
 private:
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;

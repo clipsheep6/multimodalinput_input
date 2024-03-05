@@ -249,6 +249,9 @@ int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> key
 #ifdef OHOS_BUILD_ENABLE_ANCO
     if (IsAncoWindowFocus(*windowInfo)) {
         MMI_HILOGD("focusWindowId:%{public}d is anco window.", focusWindowId);
+        if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
+            SimulateKeyExt(keyEvent);
+        }
         return INVALID_PID;
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -496,7 +499,7 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
     }
     PrintDisplayInfo();
     UpdateDisplayIdAndName();
-    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled() && InputDevMgr->HasPointerDevice()) {
         UpdatePointerChangeAreas(displayGroupInfo);
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -1479,6 +1482,12 @@ void InputWindowsManager::UpdatePointerChangeAreas(const DisplayGroupInfo &displ
             windowsHotAreas_[windowId] = windowHotAreas;
         }
     }
+}
+
+void InputWindowsManager::UpdatePointerChangeAreas(const DisplayGroupInfo &displayGroupInfo)
+{
+    CALL_DEBUG_ENTER;
+    UpdatePointerChangeAreas(displayGroupInfoTmp_);
 }
 
 void InputWindowsManager::UpdateTopBottomArea(const Rect &windowArea, std::vector<int32_t> &pointerChangeAreas,
