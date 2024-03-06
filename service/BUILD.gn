@@ -240,6 +240,8 @@ ohos_shared_library("libmmi-server") {
     "safwk:system_ability_fwk",
     "window_manager:libwm",
     "window_manager:libwsutils",
+    "graphic_2d:libcomposer",
+    "graphic_2d:window_animation",
   ]
 
   if (defined(use_rosen_drawing) && use_rosen_drawing) {

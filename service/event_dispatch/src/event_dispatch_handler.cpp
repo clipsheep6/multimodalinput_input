@@ -32,6 +32,7 @@
 #include "napi_constants.h"
 #include "proto.h"
 #include "util.h"
+#include <transaction/rs_interfaces.h>
 
 namespace OHOS {
 namespace MMI {
@@ -91,6 +92,14 @@ void EventDispatchHandler::FilterInvalidPointerItem(const std::shared_ptr<Pointe
     }
 }
 
+bool EventDispatchHandler::IsTouchEnable()
+{
+    std::function<void(bool)> callback;
+    bool touchStatus = OHOS::Rosen::RSInterfaces::GetInstance().RegisterHgmTouchEnableChangeCallback(callback);
+    MMI_HILOGD("set touchEnable status after callback: %{public}d", touchStatus);
+    return touchStatus;
+}
+
 void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<PointerEvent> point)
 {
     CALL_DEBUG_ENTER;
@@ -125,6 +134,12 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
         MMI_HILOGI("InputTracking id:%{public}d, SendMsg to %{public}s:pid:%{public}d",
             pointerEvent->GetId(), session->GetProgramName().c_str(), session->GetPid());
+        if (IsTouchEnable()) {
+            MMI_HILOGD("touch interface to RS Enable");
+            OHOS::Rosen::RSInterfaces::GetInstance().NotifyTouchEvent(pointerEvent->GetPointerAction());
+        } else {
+            MMI_HILOGD("touch interface to RS NOT Enable");
+        }
     }
     if (!udsServer->SendMsg(fd, pkt)) {
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
