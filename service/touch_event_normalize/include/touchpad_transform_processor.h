@@ -100,10 +100,15 @@ private:
     int32_t GetTouchPadToolType(struct libinput_event_touch *data, struct libinput_device *device);
     int32_t GetTouchPadToolType(struct libinput_device *device);
     void InitToolType();
+    void preparePointerEvent();
+    void compensateDelta(float& delta);
+    void getCDGain(float* deltaX, float* deltaY);
 private:
     const int32_t deviceId_ { -1 };
     const int32_t defaultPointerId { 0 };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
+    double lastPointerX_ { 0.0 };
+    double lastPointerY_ { 0.0 };
     std::vector<std::pair<int32_t, int32_t>> vecToolType_;
 };
 } // namespace MMI
