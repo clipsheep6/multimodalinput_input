@@ -73,6 +73,7 @@ const std::string bindCfgFileName = "/data/service/el1/public/multimodalinput/di
 const std::string mouseFileName = "mouse_settings.xml";
 const std::string defaultIconPath = "/system/etc/multimodalinput/mouse_icon/Default.svg";
 const std::string showCursorSwitchName = "settings.input.show_touch_hint";
+const std::string stylusNavigationSwitchName = "settings.input.stylus_navigation_hint";
 } // namespace
 
 enum PointerHotArea : int32_t {
@@ -1852,7 +1853,6 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         return RET_ERR;
     }
     WindowInfo *touchWindow = nullptr;
-    bool bTouchGesNavigation = false;
     auto targetWindowId = pointerItem.GetTargetWindowId();
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
     for (auto &item : windowsInfo) {
@@ -1867,10 +1867,9 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                        "window:%{public}d, flags:%{public}d", item.id, item.flags);
             continue;
         }
-        if (item.zOrder == TOUCH_GESTURE_NAVIGATION_ZORDER && windowsInfo.size() > 1 &&
-            pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId) {
-            bTouchGesNavigation = true;
-            break;
+        if (item.zOrder == TOUCH_GESTURE_NAVIGATION_ZORDER && 
+            needDistributeStylusEvents(std::shared_ptr<PointerEvent::PointerItem>(&pointerItem))) {
+            continue;
         }
         bool checkToolType = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
             ((pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId) ||
@@ -1894,11 +1893,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             break;
         }
     }
-    MMI_HILOGD("bTouchGesNavigation %{public}d", bTouchGesNavigation);
-    if (bTouchGesNavigation && windowsInfo.size() > 1) {
-        touchWindow = &windowsInfo[1];
-        MMI_HILOGD("top window is ges navigation window: zorder %{public}f", windowsInfo[0].zOrder);
-    }
+
     
     if (touchWindow == nullptr) {
         auto it = touchItemDownInfos_.find(pointerId);
@@ -2221,6 +2216,30 @@ void InputWindowsManager::CreateStatusConfigObserver(T& item)
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
+template <class T>
+void InputWindowsManager::CreateStatusStylusObserver(T& item)
+{
+    CALL_DEBUG_ENTER;
+    SettingObserver::UpdateFunc updateFunc = [&item](const std::string& key) {
+        bool statusValue = false;
+        auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
+            .GetBoolValue(key, statusValue);
+        if (ret != RET_OK) {
+            MMI_HILOGE("Get value from setting date fail");
+            return;
+        }
+        item.isOpen = statusValue;
+        MMI_HILOGI("key: %{public}s, statusValue: %{public}d", key.c_str(), statusValue);
+    };
+    sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
+        .CreateObserver(item.SwitchName, updateFunc);
+    ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).RegisterObserver(statusObserver);
+    if (ret != ERR_OK) {
+        MMI_HILOGE("register setting observer failed, ret=%{public}d", ret);
+        statusObserver = nullptr;
+    }
+}
+
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent)
 {
@@ -2326,6 +2345,20 @@ void InputWindowsManager::GetWidthAndHeight(const DisplayInfo* displayInfo, int3
         width = displayInfo->width;
         height = displayInfo->height;
     }
+}
+
+bool InputWindowsManager::needDistributeStylusEvents(std::shared_ptr<PointerEvent::PointerItem> pointerItem)
+{
+    CALL_DEBUG_ENTER;
+    if (!isOpenStylusStatusObserver_) {
+        TouchPreventionStatus_.SwitchName = stylusNavigationSwitchName;
+        CreateStatusStylusObserver(TouchPreventionStatus_);
+        isOpenStylusStatusObserver_ = true;
+    }
+    if (pointerItem->GetToolType() != PointerEvent::TOOL_TYPE_PEN && TouchPreventionStatus_.isOpen) {
+        return false;
+    }
+    return true;
 }
 
 void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, double& x, double& y)
