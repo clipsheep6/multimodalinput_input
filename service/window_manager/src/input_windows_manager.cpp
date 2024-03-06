@@ -65,6 +65,7 @@ constexpr int32_t BOTTOM_RIGHT_AREA = 4;
 constexpr int32_t BOTTOM_AREA = 5;
 constexpr int32_t BOTTOM_LEFT_AREA = 6;
 constexpr int32_t LEFT_AREA = 7;
+constexpr int32_t TOUCH_GESTURE_NAVIGATION_ZORDER = 0xff;
 #ifdef OHOS_BUILD_ENABLE_ANCO
 constexpr int32_t SHELL_WINDOW_COUNT = 1;
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -1851,6 +1852,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         return RET_ERR;
     }
     WindowInfo *touchWindow = nullptr;
+    bool bTouchGesNavigation = false;
     auto targetWindowId = pointerItem.GetTargetWindowId();
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
     for (auto &item : windowsInfo) {
@@ -1865,7 +1867,11 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                        "window:%{public}d, flags:%{public}d", item.id, item.flags);
             continue;
         }
-
+        if (item.zOrder == TOUCH_GESTURE_NAVIGATION_ZORDER && windowsInfo.size() > 1 &&
+            pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId) {
+            bTouchGesNavigation = true;
+            break;
+        }
         bool checkToolType = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
             ((pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId) ||
             pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN);
@@ -1888,6 +1894,12 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             break;
         }
     }
+    MMI_HILOGD("bTouchGesNavigation %{public}d", bTouchGesNavigation);
+    if (bTouchGesNavigation && windowsInfo.size() > 1) {
+        touchWindow = &windowsInfo[1];
+        MMI_HILOGD("top window is ges navigation window: zorder %{public}f", windowsInfo[0].zOrder);
+    }
+    
     if (touchWindow == nullptr) {
         auto it = touchItemDownInfos_.find(pointerId);
         if (it == touchItemDownInfos_.end() ||
@@ -1936,6 +1948,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         windowY = windowXY.second;
     }
     MMI_HILOGD("touch event send to window:%{public}d", touchWindow->id);
+    MMI_HILOGD("zxh::UpdateTouchScreenTarget pointerEvent: %{public}f, touchWindow: %{public}f ",
+            pointerEvent->GetZOrder(), touchWindow->zOrder);
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
     pointerItem.SetDisplayX(physicalX);
