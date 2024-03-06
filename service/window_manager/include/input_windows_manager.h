@@ -44,6 +44,11 @@ struct DevMode {
     std::string SwitchName;
     bool isShow { false };
 };
+GESTURENAVIGATION
+struct StylusGestureNavigationStatus {
+    std::string SwitchName;
+    bool isOpen { false };
+};
 
 struct WindowInfoEX {
     WindowInfo window;
@@ -178,6 +183,7 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
+    bool SkipGestureNavigationWindow(uint32_t flag, const PointerEvent::PointerItem& item);
     int32_t UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent);
     void PullEnterLeaveEvent(int32_t logicalX, int32_t logicalY,
         const std::shared_ptr<PointerEvent> pointerEvent, const WindowInfo* touchWindow);
@@ -193,7 +199,8 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
     template <class T>
     void CreateStatusConfigObserver(T& item);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-
+    template <class T>
+    void CreateStylusGestureNavigationStatusObserver(T& item);
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
     int32_t UpdateJoystickTarget(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_JOYSTICK
@@ -239,6 +246,8 @@ private:
     bool pointerDrawFlag_ { false };
     DevMode showCursor_;
     DisplayMode displayMode_ { DisplayMode::UNKNOWN };
+    StylusGestureNavigationStatus StylusGestureNavigationStatus_;
+    bool isOpenStylusStatusObserver_ { false };
 };
 
 #define WinMgr ::OHOS::DelayedSingleton<InputWindowsManager>::GetInstance()
