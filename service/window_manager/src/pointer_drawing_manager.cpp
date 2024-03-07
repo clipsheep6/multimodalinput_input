@@ -89,10 +89,23 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
     const PointerStyle pointerStyle, Direction direction)
 {
     MMI_HILOGD("Pointer window move success");
+    if (hwCursorManager_->SetTargetDevice(displayId) != RET_OK) {
+        // my--my 设置devid
+        MMI_HILOGE("my--my Set hardware cursor position is error.");
+        return;
+    }
     if (lastMouseStyle_ == pointerStyle && !mouseIconUpdate_ && lastDirection_ == direction) {
         surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
             surfaceNode_->GetStagingProperties().GetBounds().z_,
             surfaceNode_->GetStagingProperties().GetBounds().w_);
+        uint64_t value = 0;
+        if (hwCursorManager_->IsEnable(1, value)) {
+            // my--my 向HWC上报光标位置
+            /*if (hwCursorManager_->SetPosition(physicalX, physicalY)) != RET_OK) {
+                MMI_HILOGD("my--my Set hardware cursor position is error.");
+                return;
+            }*/
+        }
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("The lastpointerStyle is equal with pointerStyle,id %{public}d size:%{public}d",
             pointerStyle.id, pointerStyle.size);
@@ -110,10 +123,19 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
         MMI_HILOGE("Init layer failed");
         return;
     }
+    // my--my if support HW cursor, call HDI API HWSetCursorPosition
     surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
         surfaceNode_->GetStagingProperties().GetBounds().z_,
         surfaceNode_->GetStagingProperties().GetBounds().w_);
     surfaceNode_->SetVisible(true);
+    /*uint64_t value = 0;
+    if (hwCursorManager_->IsEnable(1, value)) {
+        // my--my 向HWC上报光标位置
+        if (hwCursorManager_->SetPosition(physicalX, physicalY)) != RET_OK) {
+            MMI_HILOGD("my--my Set hardware cursor position is error.");
+            return;
+        }
+    }*/
     Rosen::RSTransaction::FlushImplicitTransaction();
     UpdatePointerVisible();
     mouseIconUpdate_ = false;
@@ -395,6 +417,8 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
     isRsRemoteDied = false;
     Rosen::OnRemoteDiedCallback callback = RsRemoteDiedCallback;
     Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(callback);
+    // my--my 针对硬光标需求创建surfacenode时， config是否需要变化？-> 无需变化
+    // my--my RS可以提供专门的surface windows types 给鼠标窗口（待定）
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
@@ -403,6 +427,19 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
     surfaceNode_->SetFrameGravity(Rosen::Gravity::RESIZE_ASPECT_FILL);
     surfaceNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
     surfaceNode_->SetBounds(physicalX, physicalY, IMAGE_WIDTH, IMAGE_HEIGHT);
+    /*if (hwCursorManager_->SetTargetDevice(displayId) != RET_OK) {
+        // my--my 设置devid
+        MMI_HILOGD("my--my Set hardware cursor position is error.");
+        return;
+    }*/
+    /*uint64_t value = 0;
+    if (hwCursorManager_->IsEnable(1, value)) {
+        // my--my 向HWC上报光标位置
+        if (hwCursorManager_->SetPosition(physicalX, physicalY)) != RET_OK) {
+            MMI_HILOGD("my--my Set hardware cursor position is error.");
+            return;
+        }
+    }*/
 #ifndef USE_ROSEN_DRAWING
     surfaceNode_->SetBackgroundColor(SK_ColorTRANSPARENT);
 #else
@@ -689,6 +726,12 @@ int32_t PointerDrawingManager::GetPointerColor()
 void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
 {
     CALL_DEBUG_ENTER;
+    /*
+    if (hwCursorManager_->SetTargetDevice(displayInfo.id) != RET_OK) {
+        MMI_HILOGE("Set target device is failed.");
+        return;
+    }
+    */
     hasDisplay_ = true;
     displayInfo_ = displayInfo;
     int32_t size = GetPointerSize();
