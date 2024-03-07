@@ -55,6 +55,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     void RegisterHgmTouchEnableChangeCallback();
     void HgmTouchEnableChangeCallback(bool touchStatus);
+    void NotifyPointerEventToRS(int32_t pointAction);
 private:
     int32_t eventTime_ { 0 };
     int32_t currentTime_ { 0 };

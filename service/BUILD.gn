@@ -226,7 +226,9 @@ ohos_shared_library("libmmi-server") {
     "data_share:datashare_consumer",
     "faultloggerd:libbacktrace_local",
     "graphic_2d:2d_graphics",
+    "graphic_2d:libcomposer",
     "graphic_2d:librender_service_client",
+    "graphic_2d:window_animation",
     "hicollie:libhicollie",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
@@ -240,8 +242,6 @@ ohos_shared_library("libmmi-server") {
     "safwk:system_ability_fwk",
     "window_manager:libwm",
     "window_manager:libwsutils",
-    "graphic_2d:libcomposer",
-    "graphic_2d:window_animation",
   ]
 
   if (defined(use_rosen_drawing) && use_rosen_drawing) {
