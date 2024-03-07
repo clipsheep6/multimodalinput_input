@@ -53,10 +53,13 @@ public:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void HandlePointerEventInner(const std::shared_ptr<PointerEvent> point);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-    bool IsTouchEnable();
+    void RegisterHgmTouchEnableChangeCallback();
+    void HgmTouchEnableChangeCallback(bool touchStatus);
 private:
     int32_t eventTime_ { 0 };
     int32_t currentTime_ { 0 };
+    bool IsTouchEnable_ = true;
+    std::once_flag isRegisterCallback_;
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void FilterInvalidPointerItem(const std::shared_ptr<PointerEvent> pointEvent, int32_t fd);

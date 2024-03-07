@@ -92,12 +92,17 @@ void EventDispatchHandler::FilterInvalidPointerItem(const std::shared_ptr<Pointe
     }
 }
 
-bool EventDispatchHandler::IsTouchEnable()
+void EventDispatchHandler::RegisterHgmTouchEnableChangeCallback()
 {
-    std::function<void(bool)> callback;
-    bool touchStatus = OHOS::Rosen::RSInterfaces::GetInstance().RegisterHgmTouchEnableChangeCallback(callback);
-    MMI_HILOGD("set touchEnable status after callback: %{public}d", touchStatus);
-    return touchStatus;
+    auto touchChangeCallback = std::bind(&EventDispatchHandler::HgmTouchEnableChangeCallback, this,
+    std::placeholders::_1);
+    OHOS::Rosen::RSInterfaces::GetInstance().RegisterHgmTouchEnableChangeCallback(touchChangeCallback);
+}
+
+void EventDispatchHandler::HgmTouchEnableChangeCallback(bool touchStatus)
+{
+    IsTouchEnable_ = touchStatus;
+    MMI_HILOGD("RS touch enable callback, touchEnable:%{public}d ", IsTouchEnable_);
 }
 
 void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<PointerEvent> point)
@@ -131,10 +136,13 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     InputEventDataTransformation::MarshallingEnhanceData(pointerEvent, pkt);
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
+    std::call_once(isRegisterCallback_, [this] () {
+        RegisterHgmTouchEnableChangeCallback();
+    });
     if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
         MMI_HILOGI("InputTracking id:%{public}d, SendMsg to %{public}s:pid:%{public}d",
             pointerEvent->GetId(), session->GetProgramName().c_str(), session->GetPid());
-        if (IsTouchEnable()) {
+        if (IsTouchEnable_) {
             MMI_HILOGD("touch interface to RS Enable");
             OHOS::Rosen::RSInterfaces::GetInstance().NotifyTouchEvent(pointerEvent->GetPointerAction());
         } else {
