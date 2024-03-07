@@ -891,6 +891,9 @@ void InputWindowsManager::PrintWindowInfo(const std::vector<WindowInfo> &windows
 
 void InputWindowsManager::PrintWindowGroupInfo(const WindowGroupInfo &windowGroupInfo)
 {
+    if (!HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)) {
+        return;
+    }
     MMI_HILOGD("windowsGroupInfo,focusWindowId:%{public}d,displayId:%{public}d",
         windowGroupInfo.focusWindowId, windowGroupInfo.displayId);
     PrintWindowInfo(windowGroupInfo.windowsInfo);
@@ -898,6 +901,9 @@ void InputWindowsManager::PrintWindowGroupInfo(const WindowGroupInfo &windowGrou
 
 void InputWindowsManager::PrintDisplayInfo()
 {
+    if (!HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)) {
+        return;
+    }
     MMI_HILOGD("logicalInfo,width:%{public}d,height:%{public}d,focusWindowId:%{public}d",
         displayGroupInfo_.width, displayGroupInfo_.height, displayGroupInfo_.focusWindowId);
     MMI_HILOGD("windowsInfos,num:%{public}zu", displayGroupInfo_.windowsInfo.size());
@@ -1136,7 +1142,7 @@ int32_t InputWindowsManager::UpdateSceneBoardPointerStyle(int32_t pid, int32_t w
     auto sceneIter = pointerStyle_.find(scenePid);
     if (sceneIter == pointerStyle_.end() || sceneIter->second.find(sceneWinId) == sceneIter->second.end()) {
         pointerStyle_[scenePid] = {};
-        MMI_HILOGE("SceneBoardPid %{public}d or windowId:%{public}d  does not exist on pointerStyle_",
+        MMI_HILOGE("SceneBoardPid %{public}d or windowId:%{public}d does not exist on pointerStyle_",
             scenePid, sceneWinId);
     }
     pointerStyle_[scenePid][sceneWinId] = pointerStyle;
@@ -1286,8 +1292,8 @@ void InputWindowsManager::InWhichHotArea(int32_t x, int32_t y, const std::vector
             MMI_HILOGE("The addition of displayMaxY overflows");
             return;
         }
-        if (((x >= item.x) && (x < displayMaxX)) &&
-            (y >= item.y) && (y < displayMaxY)) {
+        if (((x > item.x) && (x <= displayMaxX)) &&
+            (y > item.y) && (y <= displayMaxY)) {
             findFlag = true;
             pointerStyle.id = areaNum;
         }
@@ -1707,11 +1713,14 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         dragFlag_ = false;
     }
     Direction direction = DIRECTION0;
+    int32_t physicalX = pointerItem.GetDisplayX();
+    int32_t physicalY = pointerItem.GetDisplayY();
     if (physicalDisplayInfo->displayDirection == DIRECTION0) {
         direction = physicalDisplayInfo->direction;
+        TOUCH_DRAWING_MANAGER->GetOriginalTouchScreenCoordinates(direction, physicalDisplayInfo->width,
+            physicalDisplayInfo->height, physicalX, physicalY);
     }
-    IPointerDrawingManager::GetInstance()->DrawPointer(displayId, static_cast<int32_t>(absolutionX_),
-        static_cast<int32_t>(absolutionY_), dragPointerStyle_, direction);
+    IPointerDrawingManager::GetInstance()->DrawPointer(displayId, physicalX, physicalY, dragPointerStyle_, direction);
 
     if (captureModeInfo_.isCaptureMode && (touchWindow->id != captureModeInfo_.windowId)) {
         captureModeInfo_.isCaptureMode = false;
@@ -1843,6 +1852,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     }
     WindowInfo *touchWindow = nullptr;
     auto targetWindowId = pointerItem.GetTargetWindowId();
+    MMI_HILOGD("targetWindowId:%{public}d", targetWindowId);
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
     for (auto &item : windowsInfo) {
         for (const auto &win : item.defaultHotAreas) {
@@ -1894,7 +1904,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         }
     }
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    bool isInAnco =  touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
+    bool isInAnco = touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
     if (isInAnco) {
         MMI_HILOGD("Process touch screen event in Anco window, targetWindowId:%{public}d", touchWindow->id);
         bool isCompensatePointer = pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE); //&&
@@ -2096,7 +2106,7 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction)
 int32_t InputWindowsManager::UpdateTouchPadTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
-    int32_t pointerAction =  pointerEvent->GetPointerAction();
+    int32_t pointerAction = pointerEvent->GetPointerAction();
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     switch (pointerAction) {
         case PointerEvent::POINTER_ACTION_BUTTON_DOWN:
@@ -2325,8 +2335,6 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     CoordinateCorrection(width, height, integerX, integerY);
     x = static_cast<double>(integerX) + (x - floor(x));
     y = static_cast<double>(integerY) + (y - floor(y));
-    absolutionX_ = x;
-    absolutionY_ = y;
     if (displayInfo->displayDirection == DIRECTION0) {
         LogicalCoordinate coord {
             .x = integerX,

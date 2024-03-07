@@ -21,6 +21,7 @@
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 
+#include "anr_handler.h"
 #include "bytrace_adapter.h"
 #include "event_filter_service.h"
 #include "mmi_client.h"
@@ -36,6 +37,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 constexpr size_t MAX_FILTER_NUM = 4;
 constexpr int32_t MAX_DELAY = 4000;
 constexpr int32_t MIN_DELAY = 0;
+constexpr int32_t ANR_DISPATCH = 0;
 } // namespace
 
 struct MonitorEventConsumer : public IInputEventConsumer {
@@ -564,6 +566,9 @@ int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt)
 
 void InputManagerImpl::PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo)
 {
+    if (!HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)) {
+        return;
+    }
     for (const auto &item : windowsInfo) {
         MMI_HILOGD("windowsInfos,id:%{public}d,pid:%{public}d,uid:%{public}d,"
             "area.x:%{public}d,area.y:%{public}d,area.width:%{public}d,area.height:%{public}d,"
@@ -602,6 +607,9 @@ void InputManagerImpl::PrintWindowInfo(const std::vector<WindowInfo> &windowsInf
 
 void InputManagerImpl::PrintDisplayInfo()
 {
+    if (!HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)) {
+        return;
+    }
     MMI_HILOGD("logicalInfo,width:%{public}d,height:%{public}d,focusWindowId:%{public}d",
         displayGroupInfo_.width, displayGroupInfo_.height, displayGroupInfo_.focusWindowId);
     MMI_HILOGD("windowsInfos,num:%{public}zu", displayGroupInfo_.windowsInfo.size());
@@ -620,6 +628,9 @@ void InputManagerImpl::PrintDisplayInfo()
 
 void InputManagerImpl::PrintWindowGroupInfo()
 {
+    if (!HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)) {
+        return;
+    }
     MMI_HILOGD("windowsGroupInfo,focusWindowId:%{public}d,displayId:%{public}d",
         windowGroupInfo_.focusWindowId, windowGroupInfo_.displayId);
     PrintWindowInfo(windowGroupInfo_.windowsInfo);
@@ -1723,7 +1734,7 @@ void InputManagerImpl::SetWindowCheckerHandler(std::shared_ptr<IWindowChecker> w
     #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
         CALL_DEBUG_ENTER;
         CHKPV(windowChecker);
-        MMI_HILOGD("winChecker_ is not null in  %{public}d", getpid());
+        MMI_HILOGD("winChecker_ is not null in %{public}d", getpid());
         winChecker_ = windowChecker;
     #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     return;
@@ -1828,6 +1839,13 @@ void InputManagerImpl::AddServiceWatcher(std::shared_ptr<IInputServiceWatcher> w
 void InputManagerImpl::RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher)
 {
     MultimodalInputConnMgr->RemoveServiceWatcher(watcher);
+}
+
+int32_t InputManagerImpl::MarkProcessed(int32_t eventId, int64_t actionTime)
+{
+    CALL_DEBUG_ENTER;
+    ANRHDL->SetLastProcessedEventId(ANR_DISPATCH, eventId, actionTime);
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

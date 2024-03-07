@@ -1385,7 +1385,7 @@ int32_t MultimodalInputConnectStub::StubSetFunctionKeyState(MessageParcel &data,
     }
 
     int32_t funcKey { 0 };
-    bool enable  { false };
+    bool enable { false };
     READINT32(data, funcKey, IPC_PROXY_DEAD_OBJECT_ERR);
     READBOOL(data, enable, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetFunctionKeyState(funcKey, enable);
@@ -1431,10 +1431,6 @@ int32_t MultimodalInputConnectStub::StubSetMouseCaptureMode(MessageParcel& data,
 int32_t MultimodalInputConnectStub::StubGetWindowPid(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->VerifySystemApp()) {
-        MMI_HILOGE("verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
