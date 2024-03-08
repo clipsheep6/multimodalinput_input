@@ -30,7 +30,7 @@
 #include "window.h"
 
 #include "device_observer.h"
-#include "hw_cursor_manager.h"
+#include "hwc_cursor_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "mouse_event_normalize.h"
 #include "struct_multimodal.h"
@@ -128,7 +128,7 @@ private:
     int32_t tempPointerColor_ { -1 };
     Direction lastDirection_ { DIRECTION0 };
     Direction currentDirection_ { DIRECTION0 };
-    std::shared_ptr<HwCursorManager> hwCursorManager_ { nullptr };
+    std::shared_ptr<HwcCursorManager> hwcCursorManager_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS

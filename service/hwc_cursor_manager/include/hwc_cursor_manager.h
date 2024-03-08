@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef HW_CURSOR_MANAGER_H
-#define HW_CURSOR_MANAGER_H
+#ifndef HWC_CURSOR_MANAGER_H
+#define HWC_CURSOR_MANAGER_H
 
 #include <mutex>
 #include <iservmgr_hdi.h>
@@ -25,10 +25,10 @@ namespace OHOS {
 namespace MMI {
 using namespace OHOS::HDI::Display::Composer::V1_0;
 // my--my
-class HwCursorManager {
+class HwcCursorManager {
 public:
-    HwCursorManager() = default;
-    ~HwCursorManager() = default;
+    HwcCursorManager() = default;
+    ~HwcCursorManager() = default;
     int32_t SetTargetDevice(uint32_t devId);
     bool IsEnable(uint32_t id, uint64_t& value);
     int32_t SetPosition(int32_t x, int32_t y);
@@ -42,4 +42,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // HW_CURSOR_MANAGER_H
+#endif // HWC_CURSOR_MANAGER_H
