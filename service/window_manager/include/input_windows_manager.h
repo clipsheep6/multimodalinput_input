@@ -56,6 +56,11 @@ struct DevMode {
     bool isShow { false };
 };
 
+struct StylusPreventionStatus {
+    std::string SwitchName;
+    bool isOpen { false };
+};
+
 struct WindowInfoEX {
     WindowInfo window;
     bool flag { false };
@@ -87,6 +92,7 @@ public:
     void ClearExtraData();
     const std::vector<WindowInfo>& GetWindowGroupInfoByDisplayId(int32_t displayId) const;
     std::pair<int32_t, int32_t> TransformWindowXY(const WindowInfo &window, int32_t logicX, int32_t logicY) const;
+    bool IsInvalidStylusEvent(std::shared_ptr<PointerEvent::PointerItem> pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
     int32_t UpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
@@ -206,7 +212,8 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
     template <class T>
     void CreateStatusConfigObserver(T& item);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-
+    template <class T>
+    void CreateStatusStylusObserver(T& item);
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
     int32_t UpdateJoystickTarget(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_JOYSTICK
@@ -253,6 +260,8 @@ private:
     bool pointerDrawFlag_ { false };
     DevMode showCursor_;
     DisplayMode displayMode_ { DisplayMode::UNKNOWN };
+    StylusPreventionStatus TouchPreventionStatus_;
+    bool isOpenStylusStatusObserver_ { false };
 };
 
 #define WinMgr ::OHOS::DelayedSingleton<InputWindowsManager>::GetInstance()
