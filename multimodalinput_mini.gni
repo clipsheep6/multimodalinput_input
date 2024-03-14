@@ -100,6 +100,7 @@ declare_args() {
     "event_handler/src/key_event_value_transformation.cpp",
     "event_handler/src/key_map_manager.cpp",
     "fingersense_wrapper/src/fingersense_wrapper.cpp",
+    "hwc_cursor_manager/src/hwc_cursor_manager.cpp",
     "libinput_adapter/src/hotplug_detector.cpp",
     "libinput_adapter/src/libinput_adapter.cpp",
     "message_handle/src/server_msg_handler.cpp",

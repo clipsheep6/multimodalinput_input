@@ -3063,6 +3063,27 @@ public:
      */
     static const int32_t INTENTION_CAMERA;
 
+    /**
+     * Start Recent Tasks
+     *
+     * @since 11
+     */
+    static const int32_t KEYCODE_RECENT_TASKS;
+
+    /**
+     * Outbound Notification Center
+     *
+     * @since 11
+     */
+    static const int32_t KEYCODE_NOTIFICATION_CENTER;
+
+     /**
+     * Outbound Control Center
+     *
+     * @since 11
+     */
+    static const int32_t KEYCODE_CONTROL_CENTER;
+
 public:
     class KeyItem {
     public:
