@@ -278,7 +278,7 @@ void InputDeviceManager::RemoveDevListener(SessionPtr sess)
 {
     CALL_DEBUG_ENTER;
     devListener_.remove(sess);
-    MMI_HILOGI("sess with fd%{public}d with pid %{public}d has been deleted", sess->GetFd(), sess->GetPid());
+    MMI_HILOGI("sess with fd:%{public}d with pid %{public}d has been deleted", sess->GetFd(), sess->GetPid());
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
