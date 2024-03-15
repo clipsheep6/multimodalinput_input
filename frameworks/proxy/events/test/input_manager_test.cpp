@@ -1948,6 +1948,42 @@ HWTEST_F(InputManagerTest, InputManagerTest_RemoveInputEventFilter_003, TestSize
     ASSERT_EQ(ret, RET_OK);
 }
 
+/**
+ * @tc.name: InputManager_SlideUpBrightScreenUnlockEvent_001
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR000GJG6G
+ */
+HWTEST_F(InputManagerTest, InputManager_SlideUpBrightScreenUnlockEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_NE(injectDownEvent, nullptr);
+    injectDownEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_F5);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(500);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_F5);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+
+    std::shared_ptr<KeyEvent> injectUpEvent = KeyEvent::Create();
+    ASSERT_NE(injectUpEvent, nullptr);
+    injectDownEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+
+    KeyEvent::KeyItem kitUp;
+    kitUp.SetKeyCode(KeyEvent::KEYCODE_F5);
+    kitUp.SetPressed(false);
+    kitUp.SetDownTime(500);
+    injectUpEvent->SetKeyCode(KeyEvent::KEYCODE_F5);
+    injectUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    injectUpEvent->RemoveReleasedKeyItems(kitUp);
+    InputManager::GetInstance()->SimulateInputEvent(injectUpEvent);
+}
+
 #ifdef INPUT_MANAGER_TEST_ENABLE_DEMO
 class ServiceWatcher final : public IInputServiceWatcher {
 public:

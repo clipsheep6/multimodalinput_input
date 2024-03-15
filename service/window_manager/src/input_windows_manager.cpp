@@ -53,6 +53,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputWindowsManager" };
 #ifdef OHOS_BUILD_ENABLE_POINTER
 constexpr int32_t DEFAULT_POINTER_STYLE = 0;
+constexpr int32_t CURSOR_CIRCLE_STYLE = 41;
 #endif // OHOS_BUILD_ENABLE_POINTER
 constexpr int32_t OUTWINDOW_HOT_AREA = 20;
 constexpr int32_t SCALE_X = 0;
@@ -68,6 +69,8 @@ constexpr int32_t LEFT_AREA = 7;
 #ifdef OHOS_BUILD_ENABLE_ANCO
 constexpr int32_t SHELL_WINDOW_COUNT = 1;
 #endif // OHOS_BUILD_ENABLE_ANCO
+constexpr double HALF_RATIO = 0.5;
+constexpr int32_t TWOFOLD = 2;
 const std::string bindCfgFileName = "/data/service/el1/public/multimodalinput/display_bind.cfg";
 const std::string mouseFileName = "mouse_settings.xml";
 const std::string defaultIconPath = "/system/etc/multimodalinput/mouse_icon/Default.svg";
@@ -496,7 +499,7 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
     }
     PrintDisplayInfo();
     UpdateDisplayIdAndName();
-    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled() && InputDevMgr->HasPointerDevice()) {
         UpdatePointerChangeAreas(displayGroupInfo);
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -1166,11 +1169,26 @@ int32_t InputWindowsManager::UpdateSceneBoardPointerStyle(int32_t pid, int32_t w
     return RET_OK;
 }
 
+void InputWindowsManager::SetGlobalDefaultPointerStyle()
+{
+    for (auto &iter : pointerStyle_) {
+        for (auto &item : iter.second) {
+            if (item.second.id == DEFAULT_POINTER_STYLE) {
+                item.second.id = globalStyle_.id;
+            } else if (item.second.id == CURSOR_CIRCLE_STYLE) {
+                item.second.id = globalStyle_.id;
+            }
+        }
+    }
+    return;
+}
+
 int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle)
 {
     CALL_DEBUG_ENTER;
     if (windowId == GLOBAL_WINDOW_ID) {
         globalStyle_.id = pointerStyle.id;
+        SetGlobalDefaultPointerStyle();
         MMI_HILOGD("Setting global pointer style");
         return RET_OK;
     }
@@ -1479,6 +1497,12 @@ void InputWindowsManager::UpdatePointerChangeAreas(const DisplayGroupInfo &displ
             windowsHotAreas_[windowId] = windowHotAreas;
         }
     }
+}
+
+void InputWindowsManager::UpdatePointerChangeAreas()
+{
+    CALL_DEBUG_ENTER;
+    UpdatePointerChangeAreas(displayGroupInfoTmp_);
 }
 
 void InputWindowsManager::UpdateTopBottomArea(const Rect &windowArea, std::vector<int32_t> &pointerChangeAreas,
@@ -1936,7 +1960,6 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         windowX = windowXY.first;
         windowY = windowXY.second;
     }
-    MMI_HILOGD("touch event send to window:%{public}d", touchWindow->id);
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
     pointerItem.SetDisplayX(physicalX);
@@ -1962,9 +1985,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     }
     MMI_HILOGI("pid:%{public}d, targetWindowId:%{public}d, foucsWindowId:%{public}d, eventId:%{public}d,"
                " displayX:%{public}d, displayY:%{public}d, windowX:%{public}d, windowY:%{public}d, width:%{public}d,"
-               " height:%{public}d,", touchWindow->pid, touchWindow->id, displayGroupInfo_.focusWindowId,
-               pointerEvent->GetId(), physicalX, physicalY, windowX, windowY, touchWindow->area.width,
-               touchWindow->area.height);
+               " height:%{public}d, area.x:%{public}d, area.y:%{public}d, flags:%{public}d, zOrder:%{public}f",
+               touchWindow->pid, touchWindow->id, displayGroupInfo_.focusWindowId, pointerEvent->GetId(), physicalX,
+               physicalY, windowX, windowY, touchWindow->area.width, touchWindow->area.height, touchWindow->area.x,
+               touchWindow->area.y, touchWindow->flags, touchWindow->zOrder);
     MMI_HILOGD("logicalX:%{public}d,logicalY:%{public}d,"
                "physicalX:%{public}d,physicalY:%{public}d,windowX:%{public}d,windowY:%{public}d,"
                "displayId:%{public}d,TargetWindowId:%{public}d,AgentWindowId:%{public}d",
@@ -2335,6 +2359,11 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     CoordinateCorrection(width, height, integerX, integerY);
     x = static_cast<double>(integerX) + (x - floor(x));
     y = static_cast<double>(integerY) + (y - floor(y));
+
+    cursorPos_.displayId = displayId;
+    cursorPos_.cursorPos.x = x;
+    cursorPos_.cursorPos.y = y;
+
     if (displayInfo->displayDirection == DIRECTION0) {
         LogicalCoordinate coord {
             .x = integerX,
@@ -2347,19 +2376,46 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
         mouseLocation_.physicalX = integerX;
         mouseLocation_.physicalY = integerY;
     }
+    mouseLocation_.displayId = displayId;
     MMI_HILOGD("Mouse Data: physicalX:%{public}d,physicalY:%{public}d, displayId:%{public}d",
         mouseLocation_.physicalX, mouseLocation_.physicalY, displayId);
 }
 
 MouseLocation InputWindowsManager::GetMouseInfo()
 {
-    if (mouseLocation_.physicalX == -1 || mouseLocation_.physicalY == -1) {
-        if (!displayGroupInfo_.displaysInfo.empty()) {
-            mouseLocation_.physicalX = displayGroupInfo_.displaysInfo[0].width / 2;
-            mouseLocation_.physicalY = displayGroupInfo_.displaysInfo[0].height / 2;
-        }
+    if ((mouseLocation_.displayId < 0) && !displayGroupInfo_.displaysInfo.empty()) {
+        const DisplayInfo &displayInfo = displayGroupInfo_.displaysInfo[0];
+        mouseLocation_.displayId = displayInfo.id;
+        mouseLocation_.physicalX = displayInfo.width / TWOFOLD;
+        mouseLocation_.physicalY = displayInfo.height / TWOFOLD;
     }
     return mouseLocation_;
+}
+
+CursorPosition InputWindowsManager::GetCursorPos()
+{
+    if ((cursorPos_.displayId < 0) && !displayGroupInfo_.displaysInfo.empty()) {
+        const DisplayInfo &displayInfo = displayGroupInfo_.displaysInfo[0];
+        cursorPos_.displayId = displayInfo.id;
+        cursorPos_.cursorPos.x = displayInfo.width * HALF_RATIO;
+        cursorPos_.cursorPos.y = displayInfo.height * HALF_RATIO;
+    }
+    return cursorPos_;
+}
+
+CursorPosition InputWindowsManager::ResetCursorPos()
+{
+    if (!displayGroupInfo_.displaysInfo.empty()) {
+        const DisplayInfo &displayInfo = displayGroupInfo_.displaysInfo[0];
+        cursorPos_.displayId = displayInfo.id;
+        cursorPos_.cursorPos.x = displayInfo.width * HALF_RATIO;
+        cursorPos_.cursorPos.y = displayInfo.height * HALF_RATIO;
+    } else {
+        cursorPos_.displayId = -1;
+        cursorPos_.cursorPos.x = 0;
+        cursorPos_.cursorPos.y = 0;
+    }
+    return cursorPos_;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 

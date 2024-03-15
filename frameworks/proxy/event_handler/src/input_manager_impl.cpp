@@ -454,6 +454,7 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
         std::lock_guard<std::mutex> guard(mtx_);
         eventHandler = eventHandler_;
         inputConsumer = consumer_;
+        lastPointerEvent_ = std::make_shared<PointerEvent>(*pointerEvent);
     }
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_DISPATCH_EVENT);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
@@ -1178,6 +1179,42 @@ void InputManagerImpl::OnConnected()
     }
 }
 
+template<typename T>
+bool InputManagerImpl::RecoverPointerEvent(std::initializer_list<T> pointerActionEvents, T pointerActionEvent)
+{
+    CHKPF(lastPointerEvent_);
+    int32_t pointerAction = lastPointerEvent_->GetPointerAction();
+    for (const auto &it : pointerActionEvents) {
+        if (pointerAction == it) {
+            lastPointerEvent_->SetPointerAction(pointerActionEvent);
+            PointerEvent::PointerItem item;
+            item.SetPressed(false);
+            lastPointerEvent_->UpdatePointerItem(lastPointerEvent_->GetPointerId(), item);
+            OnPointerEvent(lastPointerEvent_);
+            return true;
+        }
+    }
+    return false;
+}
+
+void InputManagerImpl::OnDisconnected()
+{
+    CALL_DEBUG_ENTER;
+    std::initializer_list<int32_t> pointerActionEvents { PointerEvent::POINTER_ACTION_MOVE,
+        PointerEvent::POINTER_ACTION_DOWN };
+    std::initializer_list<int32_t> pointerActionPullEvents { PointerEvent::POINTER_ACTION_PULL_MOVE,
+        PointerEvent::POINTER_ACTION_PULL_DOWN };
+    if (RecoverPointerEvent(pointerActionEvents, PointerEvent::POINTER_ACTION_UP)) {
+        MMI_HILOGE("Up event for service exception re-sending");
+        return;
+    }
+
+    if (RecoverPointerEvent(pointerActionPullEvents, PointerEvent::POINTER_ACTION_PULL_UP)) {
+        MMI_HILOGE("Pull up event for service exception re-sending");
+        return;
+    }
+}
+
 int32_t InputManagerImpl::SendDisplayInfo()
 {
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
@@ -1729,6 +1766,39 @@ int32_t InputManagerImpl::GetTouchpadRightClickType(int32_t &type)
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
+
+int32_t InputManagerImpl::SetTouchpadRotateSwitch(bool rotateSwitch)
+{
+    CALL_DEBUG_ENTER;
+#if defined OHOS_BUILD_ENABLE_POINTER
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->SetTouchpadRotateSwitch(rotateSwitch);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set touchpad rotate switch failed, ret:%{public}d", ret);
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device module does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+int32_t InputManagerImpl::GetTouchpadRotateSwitch(bool &rotateSwitch)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->GetTouchpadRotateSwitch(rotateSwitch);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get touchpad rotate switch failed");
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
 void InputManagerImpl::SetWindowCheckerHandler(std::shared_ptr<IWindowChecker> windowChecker)
 {
     #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)

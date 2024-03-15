@@ -109,6 +109,9 @@ public:
     void SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent);
     void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void OnConnected();
+    template<typename T>
+    bool RecoverPointerEvent(std::initializer_list<T> pointerActionEvents, T pointerActionEvent);
+    void OnDisconnected();
 
     int32_t RegisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener);
     int32_t UnregisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener = nullptr);
@@ -159,6 +162,8 @@ public:
     int32_t GetTouchpadSwipeSwitch(bool &switchFlag);
     int32_t SetTouchpadRightClickType(int32_t type);
     int32_t GetTouchpadRightClickType(int32_t &type);
+    int32_t SetTouchpadRotateSwitch(bool rotateSwitch);
+    int32_t GetTouchpadRotateSwitch(bool &rotateSwitch);
 
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
     void OnAnr(int32_t pid);
@@ -225,6 +230,7 @@ private:
     std::condition_variable cv_;
     std::thread ehThread_;
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ { nullptr };
+    std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     uint8_t* enhanceCfg_ = nullptr;
     uint32_t enhanceCfgLen_ = 0;
