@@ -124,6 +124,8 @@ public:
     virtual int32_t GetTouchpadRightClickType(int32_t &type) = 0;
     virtual int32_t SetShieldStatus(int32_t shieldMode, bool isShield) = 0;
     virtual int32_t GetShieldStatus(int32_t shieldMode, bool &isShield) = 0;
+    virtual int32_t EnableHardwareCursorStats(bool enable) = 0;
+    virtual int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

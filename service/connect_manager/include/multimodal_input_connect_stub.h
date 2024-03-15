@@ -112,6 +112,8 @@ protected:
     int32_t StubGetTouchpadSwipeSwitch(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetTouchpadRightClickType(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetTouchpadRightClickType(MessageParcel& data, MessageParcel& reply);
+    int32_t StubEnableHardwareCursorStats(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetHardwareCursorStats(MessageParcel& data, MessageParcel& reply);
     int32_t StubClearWindowPointerStyle(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetShieldStatus(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetShieldStatus(MessageParcel& data, MessageParcel& reply);

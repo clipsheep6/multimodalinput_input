@@ -807,10 +807,10 @@ const int32_t KeyEvent::KEYCODE_RIGHT_KNOB_ROLL_UP = 10004;
 const int32_t KeyEvent::KEYCODE_RIGHT_KNOB_ROLL_DOWN = 10005;
 const int32_t KeyEvent::KEYCODE_RIGHT_KNOB = 10006;
 const int32_t KeyEvent::KEYCODE_VOICE_SOURCE_SWITCH = 10007;
-const int32_t KeyEvent::KEYCODE_LAUNCHER_MENU = 10008;
-const int32_t KeyEvent::KEYCODE_RECENT_TASKS = 10086;
-const int32_t KeyEvent::KEYCODE_NOTIFICATION_CENTER = 10087;
-const int32_t KeyEvent::KEYCODE_CONTROL_CENTER = 10088;
+const int32_t KeyEvent::KEYCODE_LAUNCHER_MENU = 10008;  // ¡Á??¨¹¨¨???
+// const int32_t KeyEvent::KEYCODE_RECENT_TASKS = 10019;
+const int32_t KeyEvent::KEYCODE_NOTIFICATION_CENTER = 10009; // ¨ª¡§?a?DD?
+const int32_t KeyEvent::KEYCODE_CONTROL_CENTER = 10010;  // ?????DD?
 
 const int32_t KeyEvent::KEY_ACTION_UNKNOWN = 0X00000000;
 const int32_t KeyEvent::KEY_ACTION_CANCEL = 0X00000001;

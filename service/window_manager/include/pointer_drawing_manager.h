@@ -30,7 +30,7 @@
 #include "window.h"
 
 #include "device_observer.h"
-#include "hwc_cursor_manager.h"
+#include "hwc_pointer_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "mouse_event_normalize.h"
 #include "struct_multimodal.h"
@@ -98,6 +98,8 @@ private:
     void RotateDegree(Direction direction);
     void DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
         const PointerStyle pointerStyle, Direction direction);
+    int32_t EnableHardwareCursorStats(int32_t pid, bool enable) override;
+    int32_t GetHardwareCursorStats(int32_t pid, uint32_t &frameCount, uint32_t &vsyncCount) override;
 
 private:
     struct PidInfo {
@@ -128,7 +130,7 @@ private:
     int32_t tempPointerColor_ { -1 };
     Direction lastDirection_ { DIRECTION0 };
     Direction currentDirection_ { DIRECTION0 };
-    std::shared_ptr<HwcCursorManager> hwcCursorManager_ { nullptr };
+    std::shared_ptr<HwcPointerManager> hwcPointerManager_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS

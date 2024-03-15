@@ -111,6 +111,8 @@ public:
     int32_t GetTouchpadSwipeSwitch(bool &switchFlag) override;
     int32_t SetTouchpadRightClickType(int32_t type) override;
     int32_t GetTouchpadRightClickType(int32_t &type) override;
+    int32_t EnableHardwareCursorStats(bool enable) override;
+    int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) override;
     int32_t SetShieldStatus(int32_t shieldMode, bool isShield) override;
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield) override;
 

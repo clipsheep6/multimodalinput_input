@@ -89,7 +89,7 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
     const PointerStyle pointerStyle, Direction direction)
 {
     MMI_HILOGD("Pointer window move success");
-    if (hwcCursorManager_->SetTargetDevice(displayId) != RET_OK) {
+    if (hwcPointerManager_->SetTargetDevice(displayId) != RET_OK) {
         // my--my 设置devid
         MMI_HILOGE("my--my Set hardware cursor position is error.");
         return;
@@ -99,7 +99,7 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
             surfaceNode_->GetStagingProperties().GetBounds().z_,
             surfaceNode_->GetStagingProperties().GetBounds().w_);
         uint64_t value = 0;
-        if (hwcCursorManager_->IsEnable(1, value)) {
+        if (hwcPointerManager_->IsSupported(1, value)) {
             // my--my 向HWC上报光标位置
             /*if (hwcCursorManager_->SetPosition(physicalX, physicalY)) != RET_OK) {
                 MMI_HILOGD("my--my Set hardware cursor position is error.");
@@ -129,9 +129,9 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
         surfaceNode_->GetStagingProperties().GetBounds().w_);
     surfaceNode_->SetVisible(true);
     /*uint64_t value = 0;
-    if (hwcCursorManager_->IsEnable(1, value)) {
+    if (hwcPointerManager_->IsSupported(1, value)) {
         // my--my 向HWC上报光标位置
-        if (hwcCursorManager_->SetPosition(physicalX, physicalY)) != RET_OK) {
+        if (hwcPointerManager_->SetPosition(physicalX, physicalY)) != RET_OK) {
             MMI_HILOGD("my--my Set hardware cursor position is error.");
             return;
         }
@@ -433,9 +433,9 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
         return;
     }*/
     /*uint64_t value = 0;
-    if (hwcCursorManager_->IsEnable(1, value)) {
+    if (hwcPointerManager_->IsSupported(1, value)) {
         // my--my 向HWC上报光标位置
-        if (hwcCursorManager_->SetPosition(physicalX, physicalY)) != RET_OK) {
+        if (hwcPointerManager_->SetPosition(physicalX, physicalY)) != RET_OK) {
             MMI_HILOGD("my--my Set hardware cursor position is error.");
             return;
         }
@@ -727,7 +727,7 @@ void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
 {
     CALL_DEBUG_ENTER;
     /*
-    if (hwcCursorManager_->SetTargetDevice(displayInfo.id) != RET_OK) {
+    if (hwcPointerManager_->SetTargetDevice(displayInfo.id) != RET_OK) {
         MMI_HILOGE("Set target device is failed.");
         return;
     }
@@ -974,6 +974,14 @@ void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y)
             y,
             surfaceNode_->GetStagingProperties().GetBounds().z_,
             surfaceNode_->GetStagingProperties().GetBounds().w_);
+        /*uint64_t value = 0;
+        if (hwcPointerManager_->IsSupported(1, value)) {
+            // my--my ��HWC�ϱ����λ��
+            if (hwcPointerManager_->SetPosition(lastPhysicalX_, lastPhysicalY_)) != RET_OK) {
+                MMI_HILOGD("my--my Set hardware cursor position is error.");
+                return;
+            }
+        }*/
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("Pointer window move success");
     }
@@ -1149,6 +1157,26 @@ void PointerDrawingManager::CheckMouseIconPath()
         }
         ++iter;
     }
+}
+
+// my--my 开启/关闭硬光标统计
+int32_t PointerDrawingManager::EnableHardwareCursorStats(int32_t pid, bool enable)
+{
+    if ((hwcPointerManager_->EnableStats(fenable)) != RET_OK) {
+        MMI_HILOGE("Enable stats failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+// my--my 查询硬光标信息
+int32_t PointerDrawingManager::GetHardwareCursorStats(int32_t pid, uint32_t &frameCount, uint32_t &vsyncCount)
+{
+    if ((hwcPointerManager_->QueryStats(frameCount, vsyncCount)) != RET_OK) {
+        MMI_HILOGE("Query stats failed");
+        return RET_ERR;
+    }
+    return RET_OK;
 }
 
 void PointerDrawingManager::InitStyle()

@@ -97,6 +97,8 @@ enum class MultimodalinputConnectInterfaceCode {
     SET_SHIELD_STATUS = 75,
     GET_SHIELD_STATUS = 76,
     ENABLE_COMBINE_KEY = 77,
+    ENABLE_HARDWARE_CURSOR_STATS = 78,
+    GET_HARDWARE_CURSOR_STATS = 79,
 };
 
 enum class MultimodalinputEventObserverCode {
