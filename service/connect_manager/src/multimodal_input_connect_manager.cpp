@@ -681,5 +681,11 @@ void MultimodalInputConnectManager::RemoveServiceWatcher(std::shared_ptr<IInputS
     std::lock_guard<std::mutex> guard(lock_);
     watchers_.erase(watcher);
 }
+
+int32_t MultimodalInputConnectManager::SetMoveEventFilters(bool flag)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->SetMoveEventFilters(flag);
+}
 } // namespace MMI
 } // namespace OHOS

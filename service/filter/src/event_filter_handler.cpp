@@ -23,6 +23,9 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventFilterHandler" };
+const double EPS = 1e-8;
+const double MOVE_EVENT_FILTER_THRESHOLD = 5.0;
+const int32_t SQUARE = 2;
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -56,6 +59,10 @@ void EventFilterHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> 
 void EventFilterHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
+    if (HandleTouchEventWithFlag(pointerEvent)) {
+        MMI_HILOGI("Touch event is filtered with flag");
+        return;
+    }
     if (HandlePointerEventFilter(pointerEvent)) {
         MMI_HILOGD("Touch event is filtered");
         return;
@@ -205,6 +212,70 @@ bool EventFilterHandler::HandlePointerEventFilter(std::shared_ptr<PointerEvent> 
         }
     }
     return false;
+}
+
+int32_t EventFilterHandler::SetMoveEventFilters(bool flag)
+{
+    std::lock_guard<std::mutex> guard(lockFlag_);
+    moveEventFilterFlag_ = flag;
+    return RET_OK;
+}
+
+bool EventFilterHandler::HandleTouchEventWithFlag(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(lockFlag_);
+    if (!moveEventFilterFlag_) {
+        MMI_HILOGI("touch move event flag is false");
+        return false;
+    }
+    CHKPF(pointerEvent);
+    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        MMI_HILOGI("touch event is not from touch screen");
+        return false;
+    }
+
+    auto action = pointerEvent->GetPointerAction();
+    if (action == PointerEvent::POINTER_ACTION_DOWN) {
+        for (const auto &pointerId : pointerEvent->GetPointerIds()) {
+            PointerEvent::PointerItem item;
+            if (pointerEvent->GetPointerItem(pointerId, item)) {
+                lastTouchDownItems_.emplace_back(item);
+            }
+        }
+    } else if (action == PointerEvent::POINTER_ACTION_MOVE) {
+        double offset = CalcTouchOffset(pointerEvent);
+        MMI_HILOGI("touch move event, offset:%{public}f", offset);
+        return (offset + EPS < MOVE_EVENT_FILTER_THRESHOLD);
+    } else if (action == PointerEvent::POINTER_ACTION_UP) {
+        lastTouchDownItems_.clear();
+    }
+    return false;
+}
+
+double EventFilterHandler::CalcTouchOffset(std::shared_ptr<PointerEvent> touchMoveEvent)
+{
+    CALL_INFO_TRACE;
+    CHKPR(touchMoveEvent, ERROR_NULL_POINTER);
+    if (touchMoveEvent->GetPointerIds().empty() || lastTouchDownItems_.empty()) {
+        MMI_HILOGE("touchMoveEvent or lastTouchDownItems_ is invalid.");
+        return 0.f;
+    }
+    PointerEvent::PointerItem itemMove;
+    int32_t pointerIdMove = touchMoveEvent->GetPointerIds().at(0);
+    if (!touchMoveEvent->GetPointerItem(pointerIdMove, itemMove)) {
+        MMI_HILOGE("Invalid touch move pointer: %{public}d.", pointerIdMove);
+        return 0.f;
+    }
+    MMI_HILOGI("Poniter itemMove, pointerId:%{public}d, DisplayX:%{public}d, DisplayY:%{public}d",
+        pointerIdMove, itemMove.GetDisplayX(), itemMove.GetDisplayY());
+    PointerEvent::PointerItem itemDown = lastTouchDownItems_.at(0);
+    MMI_HILOGI("Poniter itemDown, pointerId:%{public}d, DisplayX:%{public}d, DisplayY:%{public}d",
+        itemDown.GetPointerId(), itemDown.GetDisplayX(), itemDown.GetDisplayY());
+
+    double offset = sqrt(pow(itemMove.GetDisplayX() - itemDown.GetDisplayX(), SQUARE) +
+        pow(itemMove.GetDisplayY() - itemDown.GetDisplayY(), SQUARE));
+    return offset;
 }
 } // namespace MMI
 } // namespace OHOS

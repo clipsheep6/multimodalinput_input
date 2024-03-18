@@ -1953,5 +1953,20 @@ int32_t MMIService::GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int3
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
 }
+
+int32_t MMIService::SetMoveEventFilters(bool flag)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&InputEventHandler::SetMoveEventFilters, InputHandler, flag));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to set move event filter flag, ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGI("Succeed to set move event filter flag");
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

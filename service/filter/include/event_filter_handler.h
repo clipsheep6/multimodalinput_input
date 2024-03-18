@@ -48,6 +48,12 @@ public:
     void Dump(int32_t fd, const std::vector<std::string> &args);
     bool HandleKeyEventFilter(std::shared_ptr<KeyEvent> event);
     bool HandlePointerEventFilter(std::shared_ptr<PointerEvent> event);
+    int32_t SetMoveEventFilters(bool flag);
+
+private:
+    bool HandleTouchEventWithFlag(const std::shared_ptr<PointerEvent> pointerEvent);
+    double CalcTouchOffset(std::shared_ptr<PointerEvent> touchMoveEvent); // 计算触摸down与move事件之间移动的位移
+
 private:
     std::mutex lockFilter_;
     struct FilterInfo {
@@ -60,6 +66,10 @@ private:
         bool IsSameClient(int32_t id, int32_t pid) const { return ((filterId == id) && (clientPid == pid)); }
     };
     std::list<FilterInfo> filters_;
+
+    bool moveEventFilterFlag_ { false };
+    std::mutex lockFlag_;
+    std::vector<PointerEvent::PointerItem> lastTouchDownItems_ {};
 };
 } // namespace MMI
 } // namespace OHOS

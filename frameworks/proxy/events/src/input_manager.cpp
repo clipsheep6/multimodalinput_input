@@ -517,5 +517,10 @@ int32_t InputManager::GetKeyState(std::vector<int32_t> &pressedKeys, std::map<in
 {
     return InputMgrImpl.GetKeyState(pressedKeys, specialKeysState);
 }
+
+int32_t InputManager::SetMoveEventFilters(bool flag)
+{
+    return InputMgrImpl.SetMoveEventFilters(flag);
+}
 } // namespace MMI
 } // namespace OHOS
