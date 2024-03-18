@@ -240,5 +240,12 @@ std::shared_ptr<EventDispatchHandler> InputEventHandler::GetEventDispatchHandler
 {
     return eventDispatchHandler_;
 }
+
+int32_t InputEventHandler::SetMoveEventFilters(bool flag)
+{
+    CALL_INFO_TRACE;
+    CHKPR(eventFilterHandler_, INVALID_HANDLER_ID);
+    return eventFilterHandler_->SetMoveEventFilters(flag);
+}
 } // namespace MMI
 } // namespace OHOS

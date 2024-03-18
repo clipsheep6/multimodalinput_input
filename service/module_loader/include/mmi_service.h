@@ -130,6 +130,7 @@ public:
     int32_t SetShieldStatus(int32_t shieldMode, bool isShield) override;
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield) override;
     int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState) override;
+    int32_t SetMoveEventFilters(bool flag) override;
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
