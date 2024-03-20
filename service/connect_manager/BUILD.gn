@@ -97,6 +97,8 @@ ohos_source_set("mmi_connect_manager_proxy") {
 
   configs = [ ":mmi_connect_manager_config" ]
 
+  public_external_deps = [ "eventhandler:libeventhandler" ]
+
   external_deps = [
     "hilog:libhilog",
     "image_framework:image_native",
