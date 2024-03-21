@@ -193,6 +193,13 @@ struct WindowInfo {
     static constexpr uint32_t FLAG_BIT_UNTOUCHABLE = 1;
 
     /**
+     * annotation window
+     *
+     * @since 9
+     */
+    static constexpr uint32_t FLAG_BIT_ANNOTATION = 2;
+
+    /**
      * Globally unique identifier of the window
      *
      * @since 9

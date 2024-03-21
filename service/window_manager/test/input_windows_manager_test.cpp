@@ -154,6 +154,202 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTargetPointer_00
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_UpdateTargetPointer_006
+ * @tc.desc: Test UpdateTargetPointer(SkipAnnotationWindow 0,0)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTargetPointer_006, TestSize.Level1)
+{
+    WindowInfo window;
+    window.id = 21;
+    window.pid = 1256;
+    window.uid = 10;
+    window.area = {1, 1, 1, 1};
+    window.defaultHotAreas = { window.area };
+    window.pointerHotAreas = { window.area };
+    window.pointerChangeAreas = {1, 2, 1, 2};
+    window.displayId = 0;
+    window.agentWindowId = 1;
+    window.flags = 1;
+    window.action = WINDOW_UPDATE_ACTION::UNKNOWN;
+    WinMgr->UpdateWindowInfo({0, 21, {window}});
+
+    UDSServer udsServer;
+    WinMgr->Init(udsServer);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    int32_t downX = 100;
+    int32_t downY = 200;
+    item.SetDisplayX(downX);
+    item.SetDisplayY(downY);
+    item.SetPressed(true);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    ASSERT_EQ(WinMgr->UpdateTargetPointer(pointerEvent), -1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTargetPointer_007
+ * @tc.desc: Test UpdateTargetPointer(SkipAnnotationWindow 0,1)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTargetPointer_007, TestSize.Level1)
+{
+    WindowInfo window;
+    window.id = 22;
+    window.pid = 1257;
+    window.uid = 11;
+    window.area = {1, 1, 1, 1};
+    window.defaultHotAreas = { window.area };
+    window.pointerHotAreas = { window.area };
+    window.pointerChangeAreas = {1, 2, 1, 2};
+    window.displayId = 0;
+    window.agentWindowId = 1;
+    window.flags = 1;
+    window.action = WINDOW_UPDATE_ACTION::UNKNOWN;
+
+    WindowInfo window2;
+    window2.id = 23;
+    window2.pid = 1221;
+    window2.uid = 1;
+    window2.area = {1, 1, 1, 1};
+    window2.defaultHotAreas = { window2.area };
+    window2.pointerHotAreas = { window2.area };
+    window2.pointerChangeAreas = {1, 2, 1, 2};
+    window2.displayId = 0;
+    window2.agentWindowId = 1;
+    window2.flags = 1;
+    window2.action = WINDOW_UPDATE_ACTION::UNKNOWN;
+    WinMgr->UpdateWindowInfo({0, 22, {window, window2}});
+
+    UDSServer udsServer;
+    WinMgr->Init(udsServer);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    int32_t downX = 100;
+    int32_t downY = 200;
+    item.SetDisplayX(downX);
+    item.SetDisplayY(downY);
+    item.SetPressed(true);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    ASSERT_EQ(WinMgr->UpdateTargetPointer(pointerEvent), -1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTargetPointer_008
+ * @tc.desc: Test UpdateTargetPointer(SkipAnnotationWindow 1,0)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTargetPointer_008, TestSize.Level1)
+{
+    WindowInfo window;
+    window.id = 22;
+    window.pid = 1257;
+    window.uid = 11;
+    window.area = {1, 1, 1, 1};
+    window.defaultHotAreas = { window.area };
+    window.pointerHotAreas = { window.area };
+    window.pointerChangeAreas = {1, 2, 1, 2};
+    window.displayId = 0;
+    window.agentWindowId = 1;
+    window.flags = 1;
+    window.action = WINDOW_UPDATE_ACTION::UNKNOWN;
+
+    WindowInfo window2;
+    window2.id = 23;
+    window2.pid = 1221;
+    window2.uid = 1;
+    window2.area = {1, 1, 1, 1};
+    window2.defaultHotAreas = { window2.area };
+    window2.pointerHotAreas = { window2.area };
+    window2.pointerChangeAreas = {1, 2, 1, 2};
+    window2.displayId = 0;
+    window2.agentWindowId = 1;
+    window2.flags = 2;
+    window2.action = WINDOW_UPDATE_ACTION::UNKNOWN;
+    WinMgr->UpdateWindowInfo({0, 22, {window, window2}});
+
+    UDSServer udsServer;
+    WinMgr->Init(udsServer);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    int32_t downX = 100;
+    int32_t downY = 200;
+    item.SetDisplayX(downX);
+    item.SetDisplayY(downY);
+    item.SetPressed(true);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    ASSERT_EQ(WinMgr->UpdateTargetPointer(pointerEvent), -1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTargetPointer_009
+ * @tc.desc: Test UpdateTargetPointer(SkipAnnotationWindow 1,1)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTargetPointer_009, TestSize.Level1)
+{
+    WindowInfo window;
+    window.id = 22;
+    window.pid = 1257;
+    window.uid = 11;
+    window.area = {1, 1, 1, 1};
+    window.defaultHotAreas = { window.area };
+    window.pointerHotAreas = { window.area };
+    window.pointerChangeAreas = {1, 2, 1, 2};
+    window.displayId = 0;
+    window.agentWindowId = 1;
+    window.flags = 1;
+    window.action = WINDOW_UPDATE_ACTION::UNKNOWN;
+
+    WindowInfo window2;
+    window2.id = 23;
+    window2.pid = 1221;
+    window2.uid = 1;
+    window2.area = {1, 1, 1, 1};
+    window2.defaultHotAreas = { window2.area };
+    window2.pointerHotAreas = { window2.area };
+    window2.pointerChangeAreas = {1, 2, 1, 2};
+    window2.displayId = 0;
+    window2.agentWindowId = 1;
+    window2.flags = 2;
+    window2.action = WINDOW_UPDATE_ACTION::UNKNOWN;
+    WinMgr->UpdateWindowInfo({0, 22, {window, window2}});
+
+    UDSServer udsServer;
+    WinMgr->Init(udsServer);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    int32_t downX = 100;
+    int32_t downY = 200;
+    item.SetDisplayX(downX);
+    item.SetDisplayY(downY);
+    item.SetPressed(true);
+    
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    ASSERT_EQ(WinMgr->UpdateTargetPointer(pointerEvent), -1);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_IsNeedRefreshLayer_006
  * @tc.desc: Test IsNeedRefreshLayer
  * @tc.type: FUNC
