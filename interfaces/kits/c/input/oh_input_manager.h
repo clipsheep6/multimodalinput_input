@@ -112,7 +112,7 @@ struct Input_KeyState* OH_Input_CreateKeyState();
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 12
  */
-void OH_Input_DestroyKeyState(struct Input_KeyState* keyState);
+void OH_Input_DestroyKeyState(struct Input_KeyState** keyState);
 
 /**
  * @brief Sets the key value of a key status enumeration object.
