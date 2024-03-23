@@ -1923,8 +1923,11 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         auto it = touchItemDownInfos_.find(pointerId);
         if (it == touchItemDownInfos_.end() ||
             pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
-            MMI_HILOGE("The touchWindow is nullptr, logicalX:%{public}d, logicalY:%{public}d",
-                logicalX, logicalY);
+            MMI_HILOGE("The touchWindow is nullptr, logicalX:%{public}d, logicalY:%{public}d, pointerId:%{public}d",
+                logicalX, logicalY, pointerId);
+            for (const auto &item : touchItemDownInfos_) {
+                MMI_HILOGD("pointerId:%{public}d, touchWindow:%{public}d", item.first, item.second.window.id);
+            }
             return RET_ERR;
         }
         touchWindow = &it->second.window;
@@ -1993,11 +1996,11 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                "eventId:%{public}d,logicalX:%{public}d,logicalY:%{public}d,displayX:%{public}d,displayY:%{public}d,"
                "windowX:%{public}d,windowY:%{public}d,width:%{public}d,height:%{public}d,area.x:%{public}d,"
                "area.y:%{public}d,flags:%{public}d,displayId:%{public}d,TargetWindowId:%{public}d,"
-               "AgentWindowId:%{public}d,zOrder:%{public}f", pointerEvent->DumpPointerAction(), touchWindow->pid,
-               touchWindow->id, displayGroupInfo_.focusWindowId, pointerEvent->GetId(), logicalX, logicalY, physicalX,
-               physicalY, windowX, windowY, touchWindow->area.width, touchWindow->area.height, touchWindow->area.x,
-               touchWindow->area.y, touchWindow->flags, displayId, pointerEvent->GetTargetWindowId(),
-               pointerEvent->GetAgentWindowId(), touchWindow->zOrder);
+               "AgentWindowId:%{public}d,zOrder:%{public}f,pointerId:%{public}d", pointerEvent->DumpPointerAction(),
+               touchWindow->pid, touchWindow->id, displayGroupInfo_.focusWindowId, pointerEvent->GetId(), logicalX,
+               logicalY, physicalX, physicalY, windowX, windowY, touchWindow->area.width, touchWindow->area.height,
+               touchWindow->area.x, touchWindow->area.y, touchWindow->flags, displayId,
+               pointerEvent->GetTargetWindowId(), pointerEvent->GetAgentWindowId(), touchWindow->zOrder, pointerId);
 
     if (IsNeedDrawPointer(pointerItem)) {
         if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
@@ -2030,6 +2033,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         windowInfoEX.window = *touchWindow;
         windowInfoEX.flag = true;
         touchItemDownInfos_[pointerId] = windowInfoEX;
+        MMI_HILOGI("pointerId:%{public}d, touchWindow:%{public}d", pointerId, touchWindow->id);
+        for (const auto &item : touchItemDownInfos_) {
+            MMI_HILOGD("pointerId:%{public}d, touchWindow:%{public}d", item.first, item.second.window.id);
+        }
     }
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
         MMI_HILOGD("Clear extra data");
