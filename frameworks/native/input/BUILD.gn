@@ -34,6 +34,8 @@ ohos_shared_library("oh_input_manager") {
 
   deps = [ "${mmi_path}/frameworks/proxy:libmmi-client" ]
 
+  public_external_deps = [ "eventhandler:libeventhandler" ]
+
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",

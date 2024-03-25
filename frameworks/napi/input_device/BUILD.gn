@@ -47,6 +47,8 @@ ohos_shared_library("inputdevice") {
     "${mmi_path}/util:libmmi-util",
   ]
 
+  public_external_deps = [ "eventhandler:libeventhandler" ]
+
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",

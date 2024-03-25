@@ -23,6 +23,8 @@ ohos_executable("input_device_display_bind") {
   }
   include_dirs = []
 
+  public_external_deps = [ "eventhandler:libeventhandler" ]
+
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",

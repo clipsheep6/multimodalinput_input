@@ -50,6 +50,8 @@ ohos_shared_library("inputeventclient") {
     "${mmi_path}/util:libmmi-util",
   ]
 
+  public_external_deps = [ "eventhandler:libeventhandler" ]
+
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
