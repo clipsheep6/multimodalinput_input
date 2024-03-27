@@ -107,6 +107,16 @@ bool DisplayEventMonitor::IsCommonEventSubscriberInit()
 {
     return hasInit_;
 }
+
+void DisplayEventMonitor::SetScreenState(bool state)
+{
+    screenIsOn = state;
+}
+
+bool DisplayEventMonitor::GetScreenState()
+{
+    return screenIsOn;
+}
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 } // namespace AppExecFwk
 } // namespace OHOS

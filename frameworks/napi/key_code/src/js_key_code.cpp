@@ -394,7 +394,6 @@ napi_value JsKeyCode::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_PROPERTY("KEYCODE_BTN_7", GetNapiInt32(env, KeyEvent::KEYCODE_BTN_7)),
         DECLARE_NAPI_STATIC_PROPERTY("KEYCODE_BTN_8", GetNapiInt32(env, KeyEvent::KEYCODE_BTN_8)),
         DECLARE_NAPI_STATIC_PROPERTY("KEYCODE_BTN_9", GetNapiInt32(env, KeyEvent::KEYCODE_BTN_9)),
-        DECLARE_NAPI_STATIC_PROPERTY("KEYCODE_STYLUS_SCREEN", GetNapiInt32(env, KeyEvent::KEYCODE_STYLUS_SCREEN)),
     };
 
     napi_value result = nullptr;

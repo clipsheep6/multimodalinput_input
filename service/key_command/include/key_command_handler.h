@@ -128,8 +128,9 @@ struct RepeatKey {
 
 struct StylusKey {
     int32_t durationTimes { 0 };
-    int32_t timeId { 0 };
-    bool firstStylusEvent { true };
+    int32_t timerId { -1 };
+    bool lastEventIsStylus { false };
+    bool isTimeOut { false };
     Ability ability;
 };
 

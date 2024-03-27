@@ -818,6 +818,7 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
+    stylusKey_.lastEventIsStylus = false;
     if (!isParseConfig_) {
         if (!ParseConfig()) {
             MMI_HILOGE("Parse configFile failed");
@@ -1476,6 +1477,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<PointerEvent> pointe
 {
     CALL_DEBUG_ENTER;
     CHKPF(pointer);
+    stylusKey_.lastEventIsStylus = false;
     if (!isParseConfig_) {
         if (!ParseConfig()) {
             MMI_HILOGE("Parse configFile failed");
@@ -1644,37 +1646,41 @@ bool KeyCommandHandler::HandleStylusKey(const std::shared_ptr<KeyEvent> keyEvent
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
     if (keyEvent->GetKeyCode() != KeyEvent::KEYCODE_STYLUS_SCREEN) {
+        stylusKey_.lastEventIsStylus = false;
         return false;
     }
     bool isScreenOn = DISPLAY_MONITOR->GetScreenState();
-    if (isScreenOn) {
+    if (isScreenOn && stylusKey_.lastEventIsStylus && !stylusKey_.isTimeOut) {
+        TimerMgr->RemoveTimer(stylusKey_.timerId);
+        stylusKey_.timerId = -1;
+        stylusKey_.isTimeOut = false;
+        stylusKey_.ability.abilityName = STYLUS_ABILITY_NAME;
+        stylusKey_.ability.bundleName = STYLUS_BUNDLE_NAME;
+        stylusKey_.ability.abilityType = EXTENSION_ABILITY;
+        LaunchAbility(stylusKey_.ability);
         return true;
     }
-    if (!stylusKey_.firstStylusEvent) {
-        return true;
-    }
-    if (stylusKey_.timerId > 0) {
+
+    if (stylusKey_.isTimeOut) {
+        stylusKey_.isTimeOut = false;
         TimerMgr->RemoveTimer(stylusKey_.timerId);
         stylusKey_.timerId = -1;
     }
-    stylusKey_.firstStylusEvent = false;
-    stylusKey_.durationTimes = STYLUS_SCREEN_ON_DURATION;
-    stylusKey_.timerId = TimerMgr->AddTimer(stylusKey_.durationTimes, 1, [this] () {
-        MMI_HILOGD("Timer callback");
-        stylusKey_.firstStylusEvent = true;
-        bool isScreenOn = DISPLAY_MONITOR->GetScreenState();
-        if (isScreenOn) {
-            stylusKey_.ability.abilityName = STYLUS_ABILITY_NAME;
-            stylusKey_.ability.bundleName = STYLUS_BUNDLE_NAME;
-            stylusKey_.ability.abilityType = EXTENSION_ABILITY;
-            LaunchAbility(stylusKey_.ability);
-        }
-    });
+
+    if (!isScreenOn && stylusKey_.timerId < 0) {
+        stylusKey_.isTimeOut = false;
+        stylusKey_.durationTimes = STYLUS_SCREEN_ON_DURATION;
+        stylusKey_.timerId = TimerMgr->AddTimer(stylusKey_.durationTimes, 1, [this] () {
+            MMI_HILOGD("Timer callback");
+            stylusKey_.isTimeOut = true;
+        });
+    }
     if (stylusKey_.timerId < 0) {
         MMI_HILOGE("Add Timer failed");
         return false;
     }
-    return true;
+    stylusKey_.lastEventIsStylus = true;
+    return false;
 }
 
 bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent)

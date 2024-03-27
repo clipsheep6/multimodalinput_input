@@ -779,6 +779,7 @@ const int32_t KeyEvent::KEYCODE_WLAN = 2844;
 const int32_t KeyEvent::KEYCODE_UWB = 2845;
 const int32_t KeyEvent::KEYCODE_WWAN_WIMAX = 2846;
 const int32_t KeyEvent::KEYCODE_RFKILL = 2847;
+const int32_t KeyEvent::KEYCODE_STYLUS_SCREEN = 2849;
 const int32_t KeyEvent::KEYCODE_CHANNEL = 3001;
 const int32_t KeyEvent::KEYCODE_BTN_0 = 3100;
 const int32_t KeyEvent::KEYCODE_BTN_1 = 3101;
@@ -808,7 +809,6 @@ const int32_t KeyEvent::KEYCODE_RIGHT_KNOB_ROLL_DOWN = 10005;
 const int32_t KeyEvent::KEYCODE_RIGHT_KNOB = 10006;
 const int32_t KeyEvent::KEYCODE_VOICE_SOURCE_SWITCH = 10007;
 const int32_t KeyEvent::KEYCODE_LAUNCHER_MENU = 10008;
-const int32_t KeyEvent::KEYCODE_STYLUS_SCREEN = 10197;
 
 const int32_t KeyEvent::KEY_ACTION_UNKNOWN = 0X00000000;
 const int32_t KeyEvent::KEY_ACTION_CANCEL = 0X00000001;
