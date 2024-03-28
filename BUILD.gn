@@ -154,6 +154,7 @@ group("mmi_tests") {
     "tools/inject_event:InjectEventTest",
     "util:rust_mmi_key_config_test",
     "util:ut-mmi-util-out",
+    "test/unittest/interfaces:InputNativeTest",
   ]
 }
 
