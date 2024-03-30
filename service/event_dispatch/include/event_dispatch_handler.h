@@ -52,14 +52,15 @@ public:
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void HandlePointerEventInner(const std::shared_ptr<PointerEvent> point);
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     void RegisterHgmTouchEnableChangeCallback();
     void HgmTouchEnableChangeCallback(bool touchStatus);
-    void NotifyPointerEventToRS(int32_t pointAction);
+    void NotifyPointerEventToRS(int32_t pointAction, const std::string& programName, uint32_t pid);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
 private:
     int32_t eventTime_ { 0 };
     int32_t currentTime_ { 0 };
-    bool IsTouchEnable_ = true;
+    bool isTouchEnable_ = true;
     std::once_flag isRegisterCallback_;
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)

@@ -101,15 +101,15 @@ void EventDispatchHandler::RegisterHgmTouchEnableChangeCallback()
 
 void EventDispatchHandler::HgmTouchEnableChangeCallback(bool touchStatus)
 {
-    IsTouchEnable_ = touchStatus;
-    MMI_HILOGD("RS touch enable callback, touchEnable:%{public}d ", IsTouchEnable_);
+    isTouchEnable_ = touchStatus;
+    MMI_HILOGD("RS touch enable callback, touchEnable:%{public}d ", isTouchEnable_);
 }
 
-void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction)
+void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction, const std::string& programName, uint32_t pid)
 {
-    if (IsTouchEnable_) {
+    if (isTouchEnable_) {
         MMI_HILOGD("touch interface to RS Enable");
-        OHOS::Rosen::RSInterfaces::GetInstance().NotifyTouchEvent(pointAction);
+        OHOS::Rosen::RSInterfaces::GetInstance().NotifyTouchEvent(pointAction, programName, pid);
     } else {
         MMI_HILOGD("touch interface to RS NOT Enable");
     }
@@ -152,7 +152,8 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
         MMI_HILOGI("InputTracking id:%{public}d, SendMsg to %{public}s:pid:%{public}d",
             pointerEvent->GetId(), session->GetProgramName().c_str(), session->GetPid());
-        NotifyPointerEventToRS(pointerEvent->GetPointerAction());
+        std::string programName(session->GetProgramName());
+        NotifyPointerEventToRS(pointerEvent->GetPointerAction(), programName, session->GetPid());
     }
     if (!udsServer->SendMsg(fd, pkt)) {
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
