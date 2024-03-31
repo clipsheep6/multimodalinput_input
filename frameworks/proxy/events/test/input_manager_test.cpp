@@ -14,7 +14,6 @@
  */
 
 #include <semaphore.h>
-#include <random>
 
 #include "event_log_helper.h"
 #include "event_util_test.h"
@@ -151,12 +150,9 @@ std::shared_ptr<OHOS::Media::PixelMap> InputManagerTest::MatrixToPixelmap(
 std::vector<std::vector<uint32_t>> InputManagerTest::CreateMatrix(int32_t width, int32_t height)
 {
     std::vector<std::vector<uint32_t>> matrix(height, std::vector<uint32_t>(width, 0));
-    std::random_device random;
-    std::mt19937 gen(random());
-    std::uniform_int_distribution<int> dist(0, 1);
-    for(int32_t i = 0; i < height; i++) {
-        for(int32_t j = 0; j < width; j++) {
-            matrix[i][j] = dist(gen);
+    for (int32_t i = 0; i < height; i++) {
+        for (int32_t j = 0; j < width; j++) {
+            matrix[i][j] = (i % 3 == 0)? 0 : 1;
         }
     }
     return matrix;
@@ -2064,8 +2060,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_InputServiceWatcher, TestSize.Level1
 HWTEST_F(InputManagerTest, InputManagerTest_UpdateDisplayInfo_Shaped01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int32_t width = 6;
-    int32_t height = 8;
+    int32_t width = 200;
+    int32_t height = 300;
     OHOS::Media::PixelMap* pixelMap = MatrixToPixelmap(CreateMatrix(width, height)).get();
     DisplayGroupInfo displayGroupInfo;
     displayGroupInfo.focusWindowId = 1;
@@ -2138,8 +2134,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_UpdateDisplayInfo_Shaped02, TestSize
         info.flags = 0;
         info.displayId = 0;
         info.zOrder = static_cast<float>(MAX_WINDOW_NUMS - i);
-        int32_t width = 10;
-        int32_t height = 20;
+        int32_t width = 100;
+        int32_t height = 200;
         OHOS::Media::PixelMap* pixelMap = MatrixToPixelmap(CreateMatrix(width, height)).get();
         info.pixelMap = pixelMap;
         displayGroupInfo.windowsInfo.push_back(info);
@@ -2182,8 +2178,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_UpdateDisplayInfo_Shaped03, TestSize
         info.agentWindowId = 1;
         info.flags = 0;
         info.displayId = i;
-        int32_t width = 30;
-        int32_t height = 30;
+        int32_t width = 200;
+        int32_t height = 50;
         OHOS::Media::PixelMap* pixelMap = MatrixToPixelmap(CreateMatrix(width, height)).get();
         info.pixelMap = pixelMap;
         displayGroupInfo.windowsInfo.push_back(info);
