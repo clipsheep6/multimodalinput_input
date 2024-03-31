@@ -32,6 +32,7 @@
 #include "napi_constants.h"
 #include "proto.h"
 #include "util.h"
+#include <transaction/rs_interfaces.h>
 
 namespace OHOS {
 namespace MMI {
@@ -91,6 +92,29 @@ void EventDispatchHandler::FilterInvalidPointerItem(const std::shared_ptr<Pointe
     }
 }
 
+void EventDispatchHandler::RegisterHgmTouchEnableChangeCallback()
+{
+    auto touchChangeCallback = std::bind(&EventDispatchHandler::HgmTouchEnableChangeCallback, this,
+    std::placeholders::_1);
+    OHOS::Rosen::RSInterfaces::GetInstance().RegisterHgmTouchEnableChangeCallback(touchChangeCallback);
+}
+
+void EventDispatchHandler::HgmTouchEnableChangeCallback(bool touchStatus)
+{
+    isTouchEnable_ = touchStatus;
+    MMI_HILOGD("RS touch enable callback, touchEnable:%{public}d ", isTouchEnable_);
+}
+
+void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction, const std::string& programName, uint32_t pid)
+{
+    if (isTouchEnable_) {
+        MMI_HILOGD("touch interface to RS Enable");
+        OHOS::Rosen::RSInterfaces::GetInstance().NotifyTouchEvent(pointAction, programName, pid);
+    } else {
+        MMI_HILOGD("touch interface to RS NOT Enable");
+    }
+}
+
 void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<PointerEvent> point)
 {
     CALL_DEBUG_ENTER;
@@ -122,9 +146,14 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     InputEventDataTransformation::MarshallingEnhanceData(pointerEvent, pkt);
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
+    std::call_once(isRegisterCallback_, [this] () {
+        RegisterHgmTouchEnableChangeCallback();
+    });
     if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
         MMI_HILOGI("InputTracking id:%{public}d, SendMsg to %{public}s:pid:%{public}d",
             pointerEvent->GetId(), session->GetProgramName().c_str(), session->GetPid());
+        std::string programName(session->GetProgramName());
+        NotifyPointerEventToRS(pointerEvent->GetPointerAction(), programName, session->GetPid());
     }
     if (!udsServer->SendMsg(fd, pkt)) {
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
