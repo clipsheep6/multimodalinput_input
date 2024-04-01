@@ -2007,5 +2007,119 @@ HWTEST_F(InputManagerTest, InputManagerTest_InputServiceWatcher, TestSize.Level1
     InputManager::GetInstance()->RemoveServiceWatcher(watcher);
 }
 #endif // INPUT_MANAGER_TEST_ENABLE_DEMO
+
+/**
+ * @tc.name: InputManagerTest_MoveMouse_001
+ * @tc.desc: MoveMouse interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_MoveMouse_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t offsetX = 20;
+    int32_t offsetY = 20;
+    InputManager::GetInstance()->MoveMouse(offsetX, offsetY);
+}
+
+/**
+ * @tc.name: InputManagerTest_MouseScrollRows_001
+ * @tc.desc: SetMouseScrollRows and GetMouseScrollRows interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_MouseScrollRows_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t rows = 1;
+    int32_t result = InputManager::GetInstance()->SetMouseScrollRows(rows);
+    ASSERT_EQ(result, RET_OK);
+    result = InputManager::GetInstance()->GetMouseScrollRows(rows);
+    ASSERT_EQ(rows, 1);
+    ASSERT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_SetCustomCursor_001
+ * @tc.desc: SetCustomCursor interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetCustomCursor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t windowId = 500;
+    void* pixelMap = nullptr;
+    int32_t result = InputManager::GetInstance()->SetCustomCursor(windowId, pixelMap);
+    ASSERT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerTest_SetMouseIcon_001
+ * @tc.desc: SetMouseIcon interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetMouseIcon_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t windowId = 500;
+    void* pixelMap = nullptr;
+    int32_t result = InputManager::GetInstance()->SetMouseIcon(windowId, pixelMap);
+    ASSERT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerTest_SetMouseHotSpot_001
+ * @tc.desc: SetMouseHotSpot interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetMouseHotSpot_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t windowId = 500;
+    int32_t hotSpotX = 20;
+    int32_t hotSpotY = 20;
+    int32_t result = InputManager::GetInstance()->SetMouseHotSpot(windowId, hotSpotX, hotSpotY);
+    ASSERT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerTest_PointerSize_001
+ * @tc.desc: SetPointerSize and GetPointerSize interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_PointerSize_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t size = 5;
+    int32_t result = InputManager::GetInstance()->SetPointerSize(size);
+    ASSERT_EQ(result, RET_OK);
+    result = InputManager::GetInstance()->GetPointerSize(size);
+    ASSERT_EQ(size, 5);
+    ASSERT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_MousePrimaryButton_001
+ * @tc.desc: SetMousePrimaryButton and GetMousePrimaryButton interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_MousePrimaryButton_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t primaryButton = 2;
+    int32_t result = InputManager::GetInstance()->SetMousePrimaryButton(primaryButton);
+    ASSERT_EQ(result, RET_ERR);
+    primaryButton = 1;
+    result = InputManager::GetInstance()->SetMousePrimaryButton(primaryButton);
+    ASSERT_EQ(result, RET_OK);
+    result = InputManager::GetInstance()->GetMousePrimaryButton(primaryButton);
+    ASSERT_EQ(primaryButton, 1);
+    ASSERT_EQ(result, RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS
