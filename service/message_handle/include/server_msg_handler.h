@@ -23,9 +23,11 @@
 #include "input_handler_type.h"
 #include "key_option.h"
 #include "msg_handler.h"
+#include "pixel_map.h"
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 #include "sec_comp_enhance_kit.h"
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+#include "window_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -89,6 +91,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     int32_t SetShieldStatus(int32_t shieldMode, bool isShield);
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield);
+    void CreatPixelMap(size_t size, NetPacket &pkt, WindowInfo &info);
     int32_t OnAuthorize(bool isAuthorize);
     int32_t OnCancelInjection();
 protected:
@@ -109,6 +112,7 @@ private:
 private:
     UDSServer *udsServer_ { nullptr };
     std::map<int32_t, int32_t> targetWindowIds_;
+    std::map<int32_t, std::unique_ptr<Media::PixelMap>> transparentWins_;
     std::map<int32_t, AuthorizationStatus> authorizationCollection_;
     int32_t CurrentPID_ { -1 };
     InjectionType InjectionType_ { InjectionType::UNKNOWN };
