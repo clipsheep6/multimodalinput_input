@@ -98,11 +98,13 @@ struct Input_KeyState* OH_Input_CreateKeyState()
     return keyState;
 }
 
-void OH_Input_DestroyKeyState(struct Input_KeyState* keyState)
+void OH_Input_DestroyKeyState(struct Input_KeyState** keyState)
 {
     CHKPV(keyState);
-    delete keyState;
-    keyState = nullptr;
+    if (*keyState == nullptr) {
+        delete *keyState;
+        *keyState = nullptr;
+    }
 }
 
 void OH_Input_SetKeyCode(struct Input_KeyState* keyState, int32_t keyCode)
