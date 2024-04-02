@@ -21,6 +21,7 @@
 #include "multimodal_event_handler.h"
 #include "system_info.h"
 #include "input_manager.h"
+#include "pixel_map.h"
 
 namespace OHOS {
 namespace MMI {
@@ -61,6 +62,8 @@ public:
     void TearDown();
     static void SetUpTestCase();
     std::string GetEventDump();
+    std::shared_ptr<OHOS::Media::PixelMap> MatrixToPixelmap(const std::vector<std::vector<uint32_t>>& windowMask);
+    std::vector<std::vector<uint32_t>> CreateMatrix(int32_t width, int32_t height);
 
 private:
     int32_t keyboardRepeatRate_ { 50 };
@@ -113,6 +116,46 @@ void InputManagerTest::TearDown()
 std::string InputManagerTest::GetEventDump()
 {
     return TestUtil->GetEventDump();
+}
+
+std::shared_ptr<OHOS::Media::PixelMap> InputManagerTest::MatrixToPixelmap(
+    const std::vector<std::vector<uint32_t>>& windowMask)
+{
+    uint32_t maskHeight = windowMask.size();
+    uint32_t maskWidth = windowMask[0].size();
+
+    OHOS::Media::InitializationOptions ops;
+    ops.size.width = maskWidth;
+    ops.size.height = maskHeight;
+    ops.pixelFormat = OHOS::Media::PixelFormat::ALPHA_8;
+    ops.alphaType = OHOS::Media::AlphaType::IMAGE_ALPHA_TYPE_OPAQUE;
+    ops.scaleMode = OHOS::Media::ScaleMode::FIT_TARGET_SIZE;
+    uint32_t length = maskWidth * maskHeight;
+    uint32_t *data = new (std::nothrow) uint32_t[length];
+    for (uint32_t i = 0; i < maskHeight; i++) {
+        for (uint32_t j = 0; j < maskWidth; j++) {
+            uint32_t idx = i * maskWidth + j;
+            data[idx] = windowMask[i][j];
+        }
+    }
+    std::shared_ptr<OHOS::Media::PixelMap> pixelMap = OHOS::Media::PixelMap::Create(data, length, ops);
+    delete[] data;
+    if (pixelMap == nullptr) {
+        MMI_HILOGE("Failed to create a pixelMap");
+        return nullptr;
+    }
+    return pixelMap;
+}
+
+std::vector<std::vector<uint32_t>> InputManagerTest::CreateMatrix(int32_t width, int32_t height)
+{
+    std::vector<std::vector<uint32_t>> matrix(height, std::vector<uint32_t>(width, 0));
+    for (int32_t i = 0; i < height; i++) {
+        for (int32_t j = 0; j < width; j++) {
+            matrix[i][j] = (i % 3 == 0)? 0 : 1;
+        }
+    }
+    return matrix;
 }
 
 /**
@@ -852,7 +895,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_UpdateDisplayInfo002, TestSize.Level
 }
 
 /**
- * @tc.name: InputManagerTest_UpdateDisplayInfo for 1 display and 1 window
+ * @tc.name: InputManagerTest_UpdateDisplayInfo for max-display and max-window
  * @tc.desc: Update window information
  * @tc.type: FUNC
  * @tc.require:
@@ -2130,5 +2173,141 @@ HWTEST_F(InputManagerTest, InputManagerTest_InputServiceWatcher, TestSize.Level1
     InputManager::GetInstance()->RemoveServiceWatcher(watcher);
 }
 #endif // INPUT_MANAGER_TEST_ENABLE_DEMO
+
+/**
+ * @tc.name: InputManagerTest_UpdateDisplayInfo for 1 display and 1 window
+ * @tc.desc: Update shaped window information
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_UpdateDisplayInfo_Shaped01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t width = 200;
+    int32_t height = 300;
+    OHOS::Media::PixelMap* pixelMap = MatrixToPixelmap(CreateMatrix(width, height)).get();
+    DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.focusWindowId = 1;
+    displayGroupInfo.width = 1000;
+    displayGroupInfo.height = 2000;
+    DisplayInfo displayInfo;
+    displayInfo.id = 0;
+    displayInfo.x =1;
+    displayInfo.y = 1;
+    displayInfo.width = 2;
+    displayInfo.height = 2;
+    displayInfo.dpi = 240;
+    displayInfo.name = "pp";
+    displayInfo.uniq = "pp";
+    displayInfo.direction = DIRECTION0;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+    WindowInfo info;
+    info.id = 1;
+    info.pid = 1;
+    info.uid = 1;
+    info.area = {1, 1, 1, 1};
+    info.defaultHotAreas = { info.area };
+    info.pointerHotAreas = { info.area };
+    info.pointerChangeAreas = {16, 5, 16, 5, 16, 5, 16, 5};
+    info.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    info.agentWindowId = 1;
+    info.flags = 0;
+    info.displayId = 0;
+    info.pixelMap = pixelMap;
+    displayGroupInfo.windowsInfo.push_back(info);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo));
+}
+
+/**
+ * @tc.name: InputManagerTest_UpdateDisplayInfo for 1 display and max-windows
+ * @tc.desc: Update shaped window information
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_UpdateDisplayInfo_Shaped02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.focusWindowId = 0;
+    displayGroupInfo.width = 1000;
+    displayGroupInfo.height = 2000;
+    DisplayInfo displayInfo;
+    displayInfo.id = 0;
+    displayInfo.x =1;
+    displayInfo.y = 1;
+    displayInfo.width = 2;
+    displayInfo.height = 2;
+    displayInfo.dpi = 240;
+    displayInfo.name = "pp";
+    displayInfo.uniq = "pp";
+    displayInfo.direction = DIRECTION0;
+    displayInfo.displayMode = DisplayMode::FULL;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+    for (uint32_t i = 0; i < MAX_WINDOW_NUMS; i++) {
+        WindowInfo info;
+        info.id = i + 1;
+        info.pid = 1;
+        info.uid = 1;
+        info.area = {1, 1, 1, 1};
+        info.defaultHotAreas = { info.area };
+        info.pointerHotAreas = { info.area };
+        info.pointerChangeAreas = {16, 5, 16, 5, 16, 5, 16, 5};
+        info.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+        info.agentWindowId = 1;
+        info.flags = 0;
+        info.displayId = 0;
+        info.zOrder = static_cast<float>(MAX_WINDOW_NUMS - i);
+        int32_t width = 100;
+        int32_t height = 200;
+        OHOS::Media::PixelMap* pixelMap = MatrixToPixelmap(CreateMatrix(width, height)).get();
+        info.pixelMap = pixelMap;
+        displayGroupInfo.windowsInfo.push_back(info);
+    }
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo));
+}
+
+/**
+ * @tc.name: InputManagerTest_UpdateDisplayInfo for max-display and max-window
+ * @tc.desc: Update shaped window information
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_UpdateDisplayInfo_Shaped03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.focusWindowId = 1;
+    displayGroupInfo.width = 1000;
+    displayGroupInfo.height = 2000;
+    DisplayInfo displayInfo;
+    for (uint32_t i = 0; i < 2; i++) { // one is default-display and another is simulate display
+        displayInfo.id = i;
+        displayInfo.x =1;
+        displayInfo.y = 1;
+        displayInfo.width = 2;
+        displayInfo.height = 2;
+        displayInfo.dpi = 240;
+        displayInfo.name = "pp";
+        displayInfo.uniq = "pp";
+        displayInfo.direction = DIRECTION0;
+        displayGroupInfo.displaysInfo.push_back(displayInfo);
+    }
+    WindowInfo info;
+    for (uint32_t i = 0; i < 2; i++) { // 2 widnows for 2 display
+        info.id = 1;
+        info.pid = 1;
+        info.uid = 1;
+        info.defaultHotAreas = { {1, 1, 1, 1} };
+        info.agentWindowId = 1;
+        info.flags = 0;
+        info.displayId = i;
+        int32_t width = 200;
+        int32_t height = 50;
+        OHOS::Media::PixelMap* pixelMap = MatrixToPixelmap(CreateMatrix(width, height)).get();
+        info.pixelMap = pixelMap;
+        displayGroupInfo.windowsInfo.push_back(info);
+    }
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo));
+}
 } // namespace MMI
 } // namespace OHOS
