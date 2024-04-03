@@ -28,6 +28,7 @@
 #include "input_event_handler.h"
 #include "mmi_log.h"
 #include "net_packet.h"
+#include "power_mgr_client.h"
 #include "proto.h"
 #include "setting_datashare.h"
 #include "system_ability_definition.h"
@@ -726,6 +727,109 @@ bool IsPackageKnuckleGesture(const cJSON* jsonData, const std::string knuckleGes
     return true;
 }
 
+bool GetStatusConfig(const cJSON* jsonData, std::string &statusConfigString)
+{
+    if (!cJSON_IsObject(jsonData)) {
+        MMI_HILOGE("jsonData is not object");
+        return false;
+    }
+    cJSON *statusConfig = cJSON_GetObjectItemCaseSensitive(jsonData, "statusConfig");
+    if (!cJSON_IsString(statusConfig)) {
+        MMI_HILOGE("maxInterval is not string");
+        return false;
+    }
+    statusConfigString = statusConfig->valuestring
+    return true;
+}
+
+bool GetAbilityInfo(const cJSON* jsonData, std::string &abilityInfoString)
+{
+    if (!cJSON_IsObject(jsonData)) {
+        MMI_HILOGE("jsonData is not object");
+        return false;
+    }
+    cJSON *abilityInfo = cJSON_GetObjectItemCaseSensitive(jsonData, "abilityInfo");
+    if (!cJSON_IsString(abilityInfo)) {
+        MMI_HILOGE("maxInterval is not string");
+        return false;
+    }
+    abilityInfoString = abilityInfo->valuestring
+    return true;
+}
+
+bool GetMaxInterval(const cJSON* jsonData, int64_t &maxIntervalInt)
+{
+    if (!cJSON_IsObject(jsonData)) {
+        MMI_HILOGE("jsonData is not object");
+        return false;
+    }
+    cJSON *maxInterval = cJSON_GetObjectItemCaseSensitive(jsonData, "maxInterval");
+    if (!cJSON_IsNumber(maxInterval)) {
+        MMI_HILOGE("maxInterval is not number");
+        return false;
+    }
+    if ((maxInterval->valueint < 0)) {
+        MMI_HILOGE("maxInterval must be number and bigger and equal zero");
+        return false;
+    }
+    maxIntervalInt = maxInterval->valueint * SECONDS_SYSTEM;
+    return true;
+}
+
+bool GetDoubleClickDistance(const cJSON* jsonData, double &doubleClickDistanceDouble)
+{
+    if (!cJSON_IsObject(jsonData)) {
+        MMI_HILOGE("jsonData is not object");
+        return false;
+    }
+    cJSON *doubleClickDistance = cJSON_GetObjectItemCaseSensitive(jsonData, "doubleClickDistance");
+    if (!cJSON_IsNumber(doubleClickDistance)) {
+        MMI_HILOGE("doubleClickDistance is not number");
+        return false;
+    }
+    doubleClickDistanceDouble = doubleClickDistance->valuedouble;
+    return true;
+}
+
+bool IsPackageTabletTool(const cJSON* jsonData, TabletTool &tabletTool)
+{
+    if (!cJSON_IsObject(jsonData)) {
+        MMI_HILOGE("tablettool is not object");
+        return false;
+    }
+
+    if (!GetStatusConfig(jsonData, tabletTool.statusConfig)) {
+        MMI_HILOGE("get statusConfig failed");
+        return false;
+    }
+
+    if (!GetAbilityInfo(jsonData, tabletTool.abilityInfo)) {
+        MMI_HILOGE("get abilityInfo failed");
+        return false;
+    }
+
+    if (!GetMaxInterval(jsonData, tabletTool.maxInterval)) {
+        MMI_HILOGE("get maxInterval failed");
+        return false;
+    }
+
+    if (!GetDoubleClickDistance(jsonData, tabletTool.doubleClickDistance)) {
+        MMI_HILOGE("get doubleClickDistance failed");
+        return false;
+    }
+
+    cJSON *ability = cJSON_GetObjectItemCaseSensitive(jsonData, "ability");
+    if (!cJSON_IsObject(ability)) {
+        MMI_HILOGE("Ability is not object");
+        return false;
+    }
+    if (!PackageAbility(ability, tabletTool.ability)) {
+        MMI_HILOGE("Package ability failed");
+        return false;
+    }
+    return true;
+}
+
 bool IsParseKnuckleGesture(const JsonParser &parser, const std::string ability, KnuckleGesture &knuckleGesture)
 {
     cJSON *jsonData = cJSON_GetObjectItemCaseSensitive(parser.json_, "KnuckleGesture");
@@ -740,6 +844,20 @@ bool IsParseKnuckleGesture(const JsonParser &parser, const std::string ability, 
     return true;
 }
 
+bool ParseTabletTool(const JsonParser &parser, TabletTool &tabletTool)
+{
+    cJSON *jsonData = cJSON_GetObjectItemCaseSensitive(parser.json_, "TabletTool");
+    if (!cJSON_IsObject(jsonData)) {
+        MMI_HILOGE("tablettool is not object");
+        return false;
+    }
+    if (!IsPackageTabletTool(jsonData, tabletTool)) {
+        MMI_HILOGE("Package tablettool failed");
+        return false;
+    }
+    return true;
+}
+
 float AbsDiff(KnuckleGesture knuckleGesture, const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, -1);
@@ -748,6 +866,16 @@ float AbsDiff(KnuckleGesture knuckleGesture, const std::shared_ptr<PointerEvent>
     pointerEvent->GetPointerItem(id, item);
     return (float) sqrt(pow(knuckleGesture.lastDownPointer.x - item.GetDisplayX(), POW_SQUARE) +
         pow(knuckleGesture.lastDownPointer.y  - item.GetDisplayY(), POW_SQUARE));
+}
+
+double AbsDiff(TabletTool tabletTool, const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPR(pointerEvent, -1);
+    auto id = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem item;
+    pointerEvent->GetPointerItem(id, item);
+    return (double) sqrt(pow(tabletTool.lastDownPointer.x - item.GetDisplayX(), POW_SQUARE) +
+        pow(tabletTool.lastDownPointer.y  - item.GetDisplayY(), POW_SQUARE));
 }
 
 bool IsEqual(float f1, float f2)
@@ -875,6 +1003,13 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
             HandleKnuckleGestureDownEvent(touchEvent);
             break;
         }
+        case PointerEvent::TOOL_TYPE_PEN: {
+            bool isScreenOn = PowerMgr::PowerMgrClient::GetInstance().IsScreenOn();
+            if (!isScreenOn) {
+                HandleTabletToolDownEvent(touchEvent);
+            }
+            break;
+        }
         default: {
             // other tool type are not processed
             isKnuckleState_ = false;
@@ -924,6 +1059,13 @@ void KeyCommandHandler::HandlePointerActionUpEvent(const std::shared_ptr<Pointer
         }
         case PointerEvent::TOOL_TYPE_KNUCKLE: {
             HandleKnuckleGestureUpEvent(touchEvent);
+            break;
+        }
+        case PointerEvent::TOOL_TYPE_PEN: {
+            bool isScreenOn = PowerMgr::PowerMgrClient::GetInstance().IsScreenOn();
+            if (!isScreenOn) {
+                HandleTabletToolUpEvent(touchEvent);
+            }
             break;
         }
         default: {
@@ -992,6 +1134,22 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
     }
 }
 
+void KeyCommandHandler::HandleTabletToolDownEvent(const std::shared_ptr<PointerEvent> touchEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(touchEvent);
+
+    auto id = touchEvent->GetPointerId();
+    PointerEvent::PointerItem item;
+    touchEvent->GetPointerItem(id, item);
+    if (item.GetToolType() != PointerEvent::TOOL_TYPE_PEN) {
+        MMI_HILOGW("Touch event tool type:%{public}d not tablet tool", item.GetToolType());
+        return;
+    }
+
+    TabletToolProcesser(touchEvent, tabletTool_);
+}
+
 void KeyCommandHandler::HandleKnuckleGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
@@ -1004,6 +1162,13 @@ void KeyCommandHandler::HandleKnuckleGestureUpEvent(const std::shared_ptr<Pointe
     } else {
         MMI_HILOGW("Other kunckle size not process, size:%{public}zu", size);
     }
+}
+
+void KeyCommandHandler::HandleTabletToolUpEvent(const std::shared_ptr<PointerEvent> touchEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(touchEvent);
+    tabletTool_.lastPointerUpTime = touchEvent->GetActionTime();
 }
 
 void KeyCommandHandler::SingleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent)
@@ -1058,6 +1223,40 @@ void KeyCommandHandler::KnuckleGestureProcessor(const std::shared_ptr<PointerEve
     }
     AdjustTimeIntervalConfigIfNeed(intervalTime);
     AdjustDistanceConfigIfNeed(downToPrevDownDistance);
+}
+
+void KeyCommandHandler::TabletToolProcesser(const std::shared_ptr<PointerEvent> touchEvent,
+    TabletTool &tabletTool)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(touchEvent);
+    if (tabletTool.lastPointerDownEvent == nullptr) {
+        MMI_HILOGI("tabletTool first down Event");
+        tabletTool.lastPointerDownEvent = touchEvent;
+        UpdateTabletToolInfo(touchEvent, tabletTool);
+        return;
+    }
+    int64_t intervalTime = touchEvent->GetActionTime() - tabletTool.lastPointerUpTime;
+    bool isTimeIntervalReady = intervalTime > 0 && intervalTime <= tabletTool.maxInterval;
+    double downToPrevDownDistance = AbsDiff(tabletTool, touchEvent);
+    bool isDistanceReady = downToPrevDownDistance < tableTool.doubleClickDistance;
+    UpdateTabletToolInfo(touchEvent, tabletTool);
+    if (isTimeIntervalReady && isDistanceReady) {
+        MMI_HILOGI("tabletTool start launch ability");
+        LaunchAbility(tabletTool.ability, 0);
+        tabletTool.state = true;
+    }
+}
+
+void KeyCommandHandler::UpdateTabletToolInfo(const std::shared_ptr<PointerEvent> touchEvent,
+    TabletTool &tabletTool)
+{
+    auto id = touchEvent->GetPointerId();
+    PointerEvent::PointerItem item;
+    touchEvent->GetPointerItem(id, item);
+    tabletTool.lastDownPointer.x = item.GetDisplayX();
+    tabletTool.lastDownPointer.y = item.GetDisplayY();
+    tabletTool.lastDownPointer.id = touchEvent->GetId();
 }
 
 void KeyCommandHandler::UpdateKnuckleGestureInfo(const std::shared_ptr<PointerEvent> touchEvent,
@@ -1228,8 +1427,9 @@ bool KeyCommandHandler::ParseJson(const std::string &configFile)
     bool isParseDoubleKnuckleGesture = IsParseKnuckleGesture(parser, DOUBLE_KNUCKLE_ABILITY, doubleKnuckleGesture_);
     bool isParseMultiFingersTap = ParseMultiFingersTap(parser, TOUCHPAD_TRIP_TAP_ABILITY, threeFingersTap_);
     bool isParseRepeatKeys = ParseRepeatKeys(parser, repeatKeys_);
+    bool isParseTabletTool = ParseTabletTool(parser, tabletTool_);
     if (!isParseShortKeys && !isParseSequences && !isParseTwoFingerGesture && !isParseSingleKnuckleGesture &&
-        !isParseDoubleKnuckleGesture && !isParseMultiFingersTap && !isParseRepeatKeys) {
+        !isParseDoubleKnuckleGesture && !isParseMultiFingersTap && !isParseRepeatKeys && !isParseTabletTool) {
         MMI_HILOGE("Parse configFile failed");
         return false;
     }
