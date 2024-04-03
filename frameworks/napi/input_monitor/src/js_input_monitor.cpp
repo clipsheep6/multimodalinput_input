@@ -1210,6 +1210,7 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
         uv_work_t *work = new (std::nothrow) uv_work_t;
         CHKPV(work);
         MonitorInfo *monitorInfo = new MonitorInfo();
+        CHKPV(monitorInfo);
         monitorInfo->monitorId = monitorId_;
         monitorInfo->fingers = fingers_;
         work->data = monitorInfo;
