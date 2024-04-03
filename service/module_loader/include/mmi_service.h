@@ -132,6 +132,7 @@ public:
     int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState) override;
     int32_t Authorize(bool isAuthorize) override;
     int32_t CancelInjection() override;
+    int32_t SetMoveEventFilters(bool flag) override;
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
