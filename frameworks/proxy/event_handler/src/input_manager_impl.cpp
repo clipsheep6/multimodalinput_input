@@ -2023,16 +2023,5 @@ int32_t InputManagerImpl::CancelInjection()
     }
     return RET_OK;
 }
-
-int32_t InputManagerImpl::SetMoveEventFilters(bool flag)
-{
-    CALL_DEBUG_ENTER;
-    int32_t ret = MultimodalInputConnMgr->SetMoveEventFilters(flag);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Set move event filters failed, ret:%{public}d", ret);
-        return ret;
-    }
-    return RET_OK;
-}
 } // namespace MMI
 } // namespace OHOS

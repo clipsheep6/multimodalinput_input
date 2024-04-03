@@ -121,7 +121,6 @@ public:
     int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState);
     int32_t Authorize(bool isAuthorize);
     int32_t CancelInjection();
-    int32_t SetMoveEventFilters(bool flag);
 
     void AddServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
     void RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);

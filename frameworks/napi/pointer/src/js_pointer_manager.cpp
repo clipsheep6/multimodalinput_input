@@ -960,17 +960,5 @@ napi_value JsPointerManager::GetTouchpadRotateSwitch(napi_env env, napi_value ha
     int32_t ret = InputManager::GetInstance()->GetTouchpadRotateSwitch(rotateSwitch);
     return GetTouchpadBoolData(env, handle, rotateSwitch, ret);
 }
-
-napi_value JsPointerManager::SetMoveEventFilters(napi_env env, bool flag)
-{
-    CALL_DEBUG_ENTER;
-    InputManager::GetInstance()->SetMoveEventFilters(flag);
-    napi_value result = nullptr;
-    if (napi_get_undefined(env, &result) != napi_ok) {
-        MMI_HILOGE("Get undefined result is failed");
-        return nullptr;
-    }
-    return result;
-}
 } // namespace MMI
 } // namespace OHOS
