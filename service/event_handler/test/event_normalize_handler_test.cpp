@@ -303,6 +303,31 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_CalcTouchOffset_00
 }
 
 /**
+ * @tc.name: EventNormalizeHandlerTest_CalcTouchOffset_002
+ * @tc.desc: Determine whether the touch produces displacement
+ * @tc.type: FUNC
+ * @tc.require:SR000HQ0RR
+ */
+HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_CalcTouchOffset_002, TestSize.Level1)
+{
+    EventNormalizeHandler eventNormalizeHandler;
+    PointerEvent::PointerItem item1;
+    item1.SetPointerId(0);
+    item1.SetDisplayX(0);
+    item1.SetDisplayY(0);
+    eventNormalizeHandler.lastTouchDownItems_.push_back(item1);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item2;
+    item2.SetPointerId(0);
+    item2.SetDisplayX(0);
+    item2.SetDisplayY(1);
+    pointerEvent->AddPointerItem(item2);
+    double offSet = eventNormalizeHandler.CalcTouchOffset(pointerEvent);
+    ASSERT_EQ(offSet, 1.f);
+}
+
+/**
  * @tc.name: EventNormalizeHandlerTest_HandleSwitchInputEvent_001
  * @tc.desc: Handle Switch Input Event
  * @tc.type: FUNC
