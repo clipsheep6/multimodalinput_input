@@ -467,7 +467,11 @@ int32_t MMIService::SetCustomCursor(int32_t pid, int32_t windowId, int32_t focus
 {
     CALL_DEBUG_ENTER;
 #if defined OHOS_BUILD_ENABLE_POINTER
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(std::bind(&IPointerDrawingManager::SetCustomCursor,
+    int32_t ret = CheckPidPermission(pid);
+    if (ret != RET_OK) {
+        return ret;
+    }
+    ret = delegateTasks_.PostSyncTask(std::bind(std::bind(&IPointerDrawingManager::SetCustomCursor,
         IPointerDrawingManager::GetInstance(), pixelMap, pid, windowId, focusX, focusY)));
     if (ret != RET_OK) {
         MMI_HILOGE("Set the custom cursor failed, ret: %{public}d", ret);
@@ -481,7 +485,11 @@ int32_t MMIService::SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap)
 {
     CALL_DEBUG_ENTER;
 #if defined OHOS_BUILD_ENABLE_POINTER
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(std::bind(&IPointerDrawingManager::SetMouseIcon,
+    int32_t ret = CheckPidPermission(pid);
+    if (ret != RET_OK) {
+        return ret;
+    }
+    ret = delegateTasks_.PostSyncTask(std::bind(std::bind(&IPointerDrawingManager::SetMouseIcon,
         IPointerDrawingManager::GetInstance(), pid, windowId, pixelMap)));
     if (ret != RET_OK) {
         MMI_HILOGE("Set the mouse icon failed, return %{public}d", ret);
@@ -495,7 +503,11 @@ int32_t MMIService::SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSp
 {
     CALL_DEBUG_ENTER;
 #if defined OHOS_BUILD_ENABLE_POINTER
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetMouseHotSpot,
+    int32_t ret = CheckPidPermission(pid);
+    if (ret != RET_OK) {
+        return ret;
+    }
+    ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetMouseHotSpot,
         IPointerDrawingManager::GetInstance(), pid, windowId, hotSpotX, hotSpotY));
     if (ret != RET_OK) {
         MMI_HILOGE("Set the mouse hot spot failed, return %{public}d", ret);
@@ -508,6 +520,10 @@ int32_t MMIService::SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSp
 int32_t MMIService::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus)
 {
     CALL_DEBUG_ENTER;
+    int32_t ret = CheckPidPermission(pid);
+    if (ret != RET_OK) {
+        return ret;
+    }
     NapProcess::GetInstance()->SetNapStatus(pid, uid, bundleName, napStatus);
     return RET_OK;
 }
@@ -753,7 +769,11 @@ int32_t MMIService::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::ClearWindowPointerStyle,
+    int32_t ret = CheckPidPermission(pid);
+    if (ret != RET_OK) {
+        return ret;
+    }
+    ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::ClearWindowPointerStyle,
         IPointerDrawingManager::GetInstance(), pid, windowId));
     if (ret != RET_OK) {
         MMI_HILOGE("Set pointer style failed,return %{public}d", ret);
@@ -1594,6 +1614,17 @@ int32_t MMIService::UpdateCombineKeyState(bool enable)
         MMI_HILOGE("EnableCombineKey is failed in key command: %{public}d", ret);
     }
     return ret;
+}
+
+int32_t MMIService::CheckPidPermission(int32_t pid)
+{
+    CALL_DEBUG_ENTER;
+    int32_t checkingPid = GetCallingPid();
+    if (checkingPid != pid) {
+        MMI_HILOGE("check pid failed, input pid is %{public}d, but checking pid is %{public}d", pid, checkingPid);
+        return RET_ERR;
+    }
+    return RET_OK;
 }
 
 int32_t MMIService::EnableCombineKey(bool enable)
