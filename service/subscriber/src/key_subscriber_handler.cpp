@@ -15,9 +15,11 @@
 
 #include "key_subscriber_handler.h"
 
+#include "audio_system_manager.h"
 #include "app_state_observer.h"
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
+#include "device_event_monitor.h"
 #include "dfx_hisysevent.h"
 #include "error_multimodal.h"
 #include "input_event_data_transformation.h"
@@ -246,9 +248,51 @@ bool KeySubscriberHandler::IsEnableCombineKeySwipe(const std::shared_ptr<KeyEven
     return true;
 }
  
+bool HandleRingMute(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGI("HandleRingMute1111");
+    CHKPF(keyEvent);
+    if (keyEvent->GetKeyCode() != KeyEvent::KEYCODE_VOLUME_DOWN && keyEvent->GetKeyCode() != KeyEvent::KEYCODE_VOLUME_UP && 
+        keyEvent->GetKeyCode() != KeyEvent::KEYCODE_POWER) {
+        MMI_HILOGD("There is no need to set mute");
+        return false;
+    }
+    if (DEVICE_MONITOR->GetCallState() == StateType::CALL_STATUS_INCOMING) {
+        if (!AudioStandard::AudioSystemManager::GetInstance()->IsStreamMute(AudioStandard::AudioVolumeType::STREAM_RING)) {
+            if (AudioStandard::AudioSystemManager::GetInstance()->SetMute(AudioStandard::AudioVolumeType::STREAM_RING, true) != 0) {
+                MMI_HILOGE("SetMute fail");
+                return false;
+            }
+            MMI_HILOGI("Set mute success!");
+            return true;
+        } else {
+            if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER) {
+                MMI_HILOGI("Set mute success keycode power miss!");
+                return false;
+            }
+        }
+    }
+    if (DEVICE_MONITOR->GetCallState() == StateType::CALL_STATUS_ACTIVE || DEVICE_MONITOR->GetCallState() ==
+        StateType::CALL_STATUS_DISCONNECTED || DEVICE_MONITOR->GetCallState() == StateType::CALL_STATUS_DISCONNECTING) {
+        int32_t initVol = AudioStandard::AudioSystemManager::GetInstance()->GetVolume(AudioStandard::AudioVolumeType::STREAM_RING);
+        bool suc = AudioStandard::AudioSystemManager::GetInstance()->SetVolume(AudioStandard::AudioVolumeType::STREAM_RING, initVol);
+        if (suc == 0) {
+            MMI_HILOGI("Set volume success!");
+            return true;
+        }
+    }
+    return true;
+}
+
 bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
+    CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
+    if (HandleRingMute(keyEvent)) {
+        MMI_HILOGI("Mute Ring in subscribe keyEvent");
+        return true;
+    }
     if (!IsEnableCombineKey(keyEvent)) {
         MMI_HILOGI("Combine key is taken over in subscribe keyEvent");
         return false;
