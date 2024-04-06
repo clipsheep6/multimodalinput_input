@@ -527,25 +527,27 @@ void ServerMsgHandler::LaunchAbility()
 
 int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
 {
-    if (isAuthorize) {
-        auto ret = authorizationCollection_.insert(std::make_pair(CurrentPID_, AuthorizationStatus::AUTHORIZED));
-        if (!ret.second) {
-            MMI_HILOGE("pid:%{public}d has already triggered authorization", CurrentPID_);
-        }
-        if (InjectionType_ == InjectionType::KEYEVENT) {
-            OnInjectKeyEvent(keyEvent_, CurrentPID_, true);
-        }
-        if (InjectionType_ == InjectionType::POINTEREVENT) {
-            OnInjectPointerEvent(pointerEvent_, CurrentPID_, true);
-        }
-        return ERR_OK;
-    } else {
+    CALL_DEBUG_ENTER;
+    if (!isAuthorize) {
         auto ret = authorizationCollection_.insert(std::make_pair(CurrentPID_, AuthorizationStatus::UNAUTHORIZED));
         if (!ret.second) {
             MMI_HILOGE("pid:%{public}d has already triggered authorization", CurrentPID_);
         }
+        MMI_HILOGD("Reject application injection,pid:%{public}d", CurrentPID_);
         return ERR_OK;
     }
+    auto ret = authorizationCollection_.insert(std::make_pair(CurrentPID_, AuthorizationStatus::AUTHORIZED));
+    if (!ret.second) {
+        MMI_HILOGE("pid:%{public}d has already triggered authorization", CurrentPID_);
+    }
+    MMI_HILOGD("Agree to apply injection,pid:%{public}d", CurrentPID_);
+    if (InjectionType_ == InjectionType::KEYEVENT) {
+        OnInjectKeyEvent(keyEvent_, CurrentPID_, true);
+    }
+    if (InjectionType_ == InjectionType::POINTEREVENT) {
+        OnInjectPointerEvent(pointerEvent_, CurrentPID_, true);
+    }
+    return ERR_OK;
 }
 
 int32_t ServerMsgHandler::OnCancelInjection()
