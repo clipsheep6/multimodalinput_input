@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//build/test.gni")
 import("../../multimodalinput_mini.gni")
 event_filter_path = "${mmi_path}/service/filter"
 
@@ -95,4 +96,33 @@ ohos_source_set("mmi_event_filter_proxy") {
       cflags += [ "-moutline-atomics" ]
     }
   }
+}
+
+ohos_unittest("EventFilterDeathRecipientTest") {
+  module_out_path = "multimodalinput/mmi_unit_out"
+
+  include_dirs = [ "${mmi_path}/service/filter/include" ]
+
+  sources =
+      [ "${mmi_path}/service/filter/test/event_filter_death_recipient_test.cpp" ]
+      
+  configs = [
+    "${mmi_path}:coverage_flags",
+    "${mmi_path}/frameworks/proxy:libmmi_test_util",
+  ]
+
+  deps = [
+    "${mmi_path}/util:libmmi-util",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+    "image_framework:image_native",
+  ]
+
+  subsystem_name = "multimodalinput"
+  part_name = "input"
 }

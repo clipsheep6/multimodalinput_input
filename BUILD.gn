@@ -143,6 +143,7 @@ group("mmi_tests") {
     "frameworks/proxy:KeyEventTest",
     "frameworks/proxy:PointerEventTest",
     "frameworks/proxy:ut-mmi-proxy-out",
+    "service/filter:EventFilterDeathRecipientTest",
     "libudev:test",
     "service:TransformPointTest",
     "service:TwoFingerLongTouchTest",
