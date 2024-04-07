@@ -90,6 +90,13 @@ config("libmmi_server_config") {
     include_dirs += [ "${mmi_ext_path}/anco_uds_manager/include" ]
   }
 
+  if (input_ext_feature_magiccursor) {
+    include_dirs += [
+      "${mmi_ext_path}/magic_cursor/include",
+      "${g2d_ext_path}/sdf/include",
+    ]
+  }
+
   if (input_feature_combination_key) {
     defines += [ "OHOS_BUILD_ENABLE_COMBINATION_KEY" ]
   }
@@ -203,6 +210,13 @@ ohos_shared_library("libmmi-server") {
     external_deps += [ "window_manager:libwm" ]
   }
 
+  if (input_ext_feature_magiccursor) {
+    external_deps += [
+      "eventhandler:libeventhandler",
+      "graphic_2d_ext:libsdf",
+    ]
+  }
+
   if (security_component_enable) {
     external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
   }
@@ -224,6 +238,7 @@ ohos_shared_library("libmmi-server") {
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
     "faultloggerd:libbacktrace_local",
+    "ffrt:libffrt",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hicollie:libhicollie",
