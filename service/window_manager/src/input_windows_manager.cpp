@@ -1976,16 +1976,12 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     bool checkExtraData = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
         ((pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId) ||
-        pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN);
-    checkExtraData = checkExtraData || (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP);
+        pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN) ||
+            (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP);
     if (checkExtraData) {
         pointerEvent->SetBuffer(extraData_.buffer);
         UpdatePointerAction(pointerEvent);
         PullEnterLeaveEvent(logicalX, logicalY, pointerEvent, touchWindow);
-    } else {
-        pointerEvent->ClearBuffer();
-        lastTouchEvent_ = nullptr;
-        lastTouchWindowInfo_.id = -1;
     }
     int32_t pointerAction = pointerEvent->GetPointerAction();
     if (PointerEvent::POINTER_ACTION_PULL_MOVE != pointerAction && PointerEvent::POINTER_ACTION_MOVE != pointerAction) {
@@ -2034,6 +2030,9 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         MMI_HILOGI("PointerId:%{public}d, touchWindow:%{public}d", pointerId, touchWindow->id);
     } else if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
         MMI_HILOGD("Clear extra data");
+        pointerEvent->ClearBuffer();
+        lastTouchEvent_ = nullptr;
+        lastTouchWindowInfo_.id = -1;
         ClearExtraData();
     }
     return ERR_OK;
