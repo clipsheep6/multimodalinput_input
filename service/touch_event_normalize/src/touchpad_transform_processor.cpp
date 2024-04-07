@@ -40,7 +40,46 @@ constexpr int32_t FINGER_COUNT_MAX { 5 };
 constexpr int32_t FINGER_TAP_MIN { 3 };
 constexpr int32_t FINGER_MOTION_MAX { 9 };
 constexpr int32_t TP_SYSTEM_PINCH_FINGER_CNT { 2 };
+constexpr int32_t TOUCHPAD_SPEED_SCALE { 7 };
+constexpr int32_t DIVISOR_HALF { 2 };
 const std::string TOUCHPAD_FILE_NAME = "touchpad_settings.xml";
+
+static int gSpeedIndex = TOUCHPAD_SPEED_SCALE;
+static std::vector<float> gTouchpadSpeed = {0, 2, 20, 30};
+static std::vector<std::vector<float>> gTouchpadSlope {
+    {0.12, 0.21, 0.45, 0.87},
+    {0.12, 0.21, 0.45, 0.87},
+    {0.12, 0.21, 0.45, 0.87},
+    {0.16, 0.28, 0.60, 1.16},
+    {0.20, 0.35, 0.75, 1.45},
+    {0.24, 0.42, 0.90, 1.74},
+    {0.32, 0.56, 1.20, 2.32},
+    {0.40, 0.70, 1.50, 2.90},
+    {0.48, 0.84, 1.80, 3.48},
+    {0.60, 1.05, 2.25, 4.35},
+    {0.76, 1.33, 2.85, 5.51},
+    {0.92, 1.61, 3.45, 6.67},
+    {1.08, 1.89, 4.05, 7.83},
+    {1.08, 1.89, 4.05, 7.83},
+    {1.08, 1.89, 4.05, 7.83}
+};
+static std::vector<std::vector<float>> gTouchpadDiff {
+    {0, - 0.18, - 4.98, - 17.58},
+    {0, - 0.18, - 4.98, - 17.58},
+    {0, - 0.18, - 4.98, - 17.58},
+    {0, - 0.24, - 6.64, - 23.44},
+    {0, - 0.30, - 8.30, - 29.30},
+    {0, - 0.36, - 9.96, - 35.16},
+    {0, - 0.48, - 13.28, - 46.88},
+    {0, - 0.60, - 16.60, - 58.60},
+    {0, - 0.72, - 19.92, - 70.32},
+    {0, - 0.90, - 24.90, - 87.90},
+    {0, - 1.14, - 31.54, - 111.34},
+    {0, - 1.38, - 38.18, - 134.78},
+    {0, - 1.62, - 44.82, - 158.22},
+    {0, - 1.62, - 44.82, - 158.22},
+    {0, - 1.62, - 44.82, - 158.22}
+};
 } // namespace
 
 TouchPadTransformProcessor::TouchPadTransformProcessor(int32_t deviceId)
@@ -146,7 +185,7 @@ int32_t TouchPadTransformProcessor::OnEventTouchPadMotion(struct libinput_event 
     item.SetToolHeight(static_cast<int32_t>(toolHeight));
     pointerEvent_->UpdatePointerItem(seatSlot, item);
     pointerEvent_->SetPointerId(seatSlot);
-
+    preparePointerEvent();
     return RET_OK;
 }
 
@@ -189,7 +228,7 @@ std::shared_ptr<PointerEvent> TouchPadTransformProcessor::OnEvent(struct libinpu
         pointerEvent_ = PointerEvent::Create();
         CHKPP(pointerEvent_);
     }
-
+    
     int32_t ret = RET_OK;
     int32_t type = libinput_event_get_type(event);
     switch (type) {
@@ -572,6 +611,75 @@ int32_t TouchPadTransformProcessor::GetConfigDataFromDatabase(std::string &key, 
 {
     value = PreferencesMgr->GetBoolValue(key, true);
     return RET_OK;
+}
+
+void TouchPadTransformProcessor::preparePointerEvent()
+{
+    PointerEvent::PointerItem currentPointer;
+    pointerEvent_->GetPointerItem(defaultPointerId, currentPointer);
+    if (lastPointerX_ == 0 && lastPointerY_ == 0) {
+        lastPointerX_ = currentPointer.GetDisplayX();
+        lastPointerY_ = currentPointer.GetDisplayY();
+        return;
+    }
+
+    float deltaX = currentPointer.GetDisplayX() - lastPointerX_;
+    float deltaY = currentPointer.GetDisplayY() - lastPointerY_;
+    getCDGain(&deltaX, &deltaY);
+    compensateDelta(deltaX);
+    compensateDelta(deltaY);
+
+    currentPointer.SetDisplayX(currentPointer.GetDisplayX() + deltaX);
+    currentPointer.SetDisplayY(currentPointer.GetDisplayY() + deltaY);
+    pointerEvent_->UpdatePointerItem(defaultPointerId, currentPointer);
+    lastPointerX_ = currentPointer.GetDisplayX();
+    lastPointerY_ = currentPointer.GetDisplayY();
+}
+
+void TouchPadTransformProcessor::compensateDelta(float& delta)
+{
+    float compensateValue = 0.0f;
+    int integerPart = static_cast <int>(delta); // Get the integer part
+    float fractionalPart = delta - integerPart; // Get the fractional part
+    compensateValue += fractionalPart;
+    delta = integerPart;
+    if (fabs(compensateValue) >= 1) {
+        delta += static_cast <int>(compensateValue);
+        compensateValue = compensateValue - static_cast <int>(compensateValue);
+    }
+}
+
+void TouchPadTransformProcessor::getCDGain(float* deltaX, float* deltaY)
+{
+    if (*deltaX == 0 && *deltaY == 0) {
+        return;
+    }
+    float velocity = fmax(fabs(*deltaX), fabs(*deltaY)) + fmin(fabs(*deltaX), fabs(*deltaY) / DIVISOR_HALF);
+    if (velocity == 0.0) {
+        return;
+    }
+    float cdGain = 0.0f;
+    int index = 0;
+    if (gSpeedIndex < 0) {
+        gSpeedIndex = 0;
+    }
+    if (gSpeedIndex >= static_cast <int>(gTouchpadSlope.size())) {
+        gSpeedIndex = static_cast <int>(gTouchpadSlope.size()) - 1;
+    }
+    for (size_t i = 0; i < gTouchpadSpeed.size(); i++) {
+        if (velocity > gTouchpadSpeed[i]) {
+            cdGain = (velocity * gTouchpadSlope[gSpeedIndex][i] + gTouchpadDiff[gSpeedIndex][i]) / velocity;
+            index = i;
+        }
+    }
+    MMI_HILOGD("Gestures:1Move mouse cursor deltaX:%0.2f deltaY:%0.2f velocity:%0.2f slope:%0.2f diff:%0.2f cdGain:%0.2f",
+        * deltaX, * deltaY, velocity, gTouchpadSlope[gSpeedIndex][index], gTouchpadDiff[gSpeedIndex][index], cdGain);
+    if (deltaX) {
+        *deltaX *= cdGain;
+    }
+    if (deltaY) {
+        *deltaY *= cdGain;
+    }
 }
 
 MultiFingersTapHandler::MultiFingersTapHandler() {}
