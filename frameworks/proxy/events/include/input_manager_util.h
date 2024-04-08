@@ -58,6 +58,7 @@ public:
     static std::shared_ptr<PointerEvent> SetupSimulateEvent002();
     static std::shared_ptr<PointerEvent> SetupSimulateEvent003();
     static std::shared_ptr<PointerEvent> SetupSimulateEvent004();
+    static std::shared_ptr<PointerEvent> SetupSimulateEvent005();
     static std::shared_ptr<KeyEvent> SetupKeyEvent001();
     static std::shared_ptr<KeyEvent> SetupKeyEvent002();
     static std::shared_ptr<KeyEvent> SetupKeyEvent003();
