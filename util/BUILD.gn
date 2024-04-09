@@ -117,6 +117,7 @@ ohos_unittest("ut-mmi-util-out") {
     "socket/test/uds_client_test.cpp",
     "socket/test/uds_session_test.cpp",
     "socket/test/uds_socket_test.cpp",
+    "network/test/stream_buffer_test.cpp",
   ]
 
   deps = [
