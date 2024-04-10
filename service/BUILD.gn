@@ -253,11 +253,14 @@ ohos_shared_library("libmmi-server") {
     "ipc:ipc_single",
     "napi:ace_napi",
     "preferences:native_preferences",
-    "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
+
+  if (!build_ohos_sdk) {
+    external_deps += [ "relational_store:native_rdb" ]
+  }
 
   if (defined(use_rosen_drawing) && use_rosen_drawing) {
     defines += [ "USE_ROSEN_DRAWING" ]
