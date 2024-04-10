@@ -522,5 +522,10 @@ void InputManager::Authorize(bool isAuthorize)
 {
     InputMgrImpl.Authorize(isAuthorize);
 }
+
+int32_t InputManager::SetMoveEventFilters(bool flag)
+{
+    return InputMgrImpl.SetMoveEventFilters(flag);
+}
 } // namespace MMI
 } // namespace OHOS

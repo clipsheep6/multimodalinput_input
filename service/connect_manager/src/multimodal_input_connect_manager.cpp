@@ -694,5 +694,11 @@ int32_t MultimodalInputConnectManager::CancelInjection()
     CHKPR(multimodalInputConnectService_, RET_ERR);
     return multimodalInputConnectService_->CancelInjection();
 }
+
+int32_t MultimodalInputConnectManager::SetMoveEventFilters(bool flag)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->SetMoveEventFilters(flag);
+}
 } // namespace MMI
 } // namespace OHOS
