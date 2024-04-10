@@ -22,8 +22,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-constexpr int32_t rationId { 0 };
-constexpr int32_t rightcode { 0 }; 
 } // namespace
 
 class TimerManagerTest : public testing::Test {
@@ -48,7 +46,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ManagerTimer_001, TestSize.Level1)
     int32_t repeatCount = 3;
     int32_t intervalMs  = 1000;
     int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, SomeFunction);
-    EXPECT_EQ(timerld, rationId);
+    EXPECT_EQ(timerld, 0);
 }
 
 /**
@@ -62,7 +60,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ManagerTimer_002, TestSize.Level1)
     int32_t repeatCount = 3;
     int32_t intervalMs  = 1000;
     int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, SomeFunction);
-    ASSERT_EQ(TimerMgr->RemoveTimer(timerld), rightcode);
+    ASSERT_EQ(TimerMgr->RemoveTimer(timerld), 0);
 }
 
 /**
