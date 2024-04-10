@@ -184,12 +184,12 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
 #ifdef OHOS_BUILD_ENABLE_POINTER
             auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
             CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
+            inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
             if (((action < PointerEvent::POINTER_ACTION_PULL_DOWN) ||
                 (action > PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW)) &&
                 !IPointerDrawingManager::GetInstance()->IsPointerVisible()) {
                 IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), true);
             }
-            inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
             break;
         }
