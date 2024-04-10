@@ -816,6 +816,8 @@ public:
      */
     int32_t GetTouchpadRotateSwitch(bool &rotateSwitch);
 
+    int32_t SetMoveEventFilters(bool flag);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

@@ -35,6 +35,7 @@
 #include "touch_event_normalize.h"
 #include "event_resample.h"
 #include "touchpad_transform_processor.h"
+#include "multimodal_input_preferences_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -42,6 +43,10 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventNormalizeHandler" };
 constexpr int32_t FINGER_NUM = 2;
 constexpr int32_t MT_TOOL_PALM = 2;
+constexpr double EPS = 1e-8;
+constexpr double TOUCH_SLOP = 1.0;
+constexpr int32_t SQUARE = 2;
+constexpr double DENSITY_BASELINE = 160.0;
 }
 
 void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime)
@@ -486,6 +491,11 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         CHKPR(pointerEvent, ERROR_NULL_POINTER);
     }
 
+    if (HandleTouchEventWithFlag(pointerEvent)) {
+        MMI_HILOGI("Touch event is filtered with flag");
+        return RET_OK;
+    }
+
     if (MMISceneBoardJudgement::IsSceneBoardEnabled() && MMISceneBoardJudgement::IsResampleEnabled()) {
         ErrCode status = RET_OK;
         std::shared_ptr<PointerEvent> outputEvent = EventResampleHdr->OnEventConsume(pointerEvent, frameTime, status);
@@ -603,6 +613,76 @@ int32_t EventNormalizeHandler::AddHandleTimer(int32_t timeout)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     });
     return timerId_;
+}
+
+int32_t EventNormalizeHandler::SetMoveEventFilters(bool flag)
+{
+    std::lock_guard<std::mutex> guard(lockFlag_);
+    moveEventFilterFlag_ = flag;
+
+    int32_t ret = PreferencesMgr->SetBoolValue("moveEventFilterFlag", "mouse_settings.xml", moveEventFilterFlag_);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to save moveEventFilterFlag, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+bool EventNormalizeHandler::HandleTouchEventWithFlag(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    std::lock_guard<std::mutex> guard(lockFlag_);
+    if (!moveEventFilterFlag_) {
+        return false;
+    }
+    CHKPF(pointerEvent);
+    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        MMI_HILOGI("Touch event is not from touch screen");
+        return false;
+    }
+    static bool isFirstMoveEvent = false;
+    int32_t action = pointerEvent->GetPointerAction();
+    if (action == PointerEvent::POINTER_ACTION_DOWN) {
+        isFirstMoveEvent = false;
+        lastTouchDownItems_ = pointerEvent->GetAllPointerItems();
+    } else if (action == PointerEvent::POINTER_ACTION_MOVE) {
+        if (isFirstMoveEvent) {
+            return false;
+        }
+        double offset = CalcTouchOffset(pointerEvent);
+        bool isMoveEventFiltered = (offset + EPS < TOUCH_SLOP);
+        MMI_HILOGI("Touch move event, offset:%{public}f, isMoveEventFiltered:%{public}s",
+            offset, isMoveEventFiltered ? "true" : "false");
+        isFirstMoveEvent = !isMoveEventFiltered;
+        return isMoveEventFiltered;
+    } else if (action == PointerEvent::POINTER_ACTION_UP) {
+        lastTouchDownItems_.clear();
+    }
+    return false;
+}
+
+double EventNormalizeHandler::CalcTouchOffset(const std::shared_ptr<PointerEvent> touchMoveEvent)
+{
+    CHKPR(touchMoveEvent, ERROR_NULL_POINTER);
+    auto moveItems = touchMoveEvent->GetAllPointerItems();
+    if (moveItems.empty() || lastTouchDownItems_.empty()) {
+        MMI_HILOGE("moveItems or lastTouchDownItems_ is empty");
+        return 0.f;
+    }
+    PointerEvent::PointerItem itemMove = moveItems.front();
+    PointerEvent::PointerItem itemDown = lastTouchDownItems_.front();
+    MMI_HILOGI("Move item, pointerId:%{public}d, location:(%{public}d, %{public}d)",
+        itemMove.GetPointerId(), itemMove.GetDisplayX(), itemMove.GetDisplayY());
+    MMI_HILOGI("Down item, pointerId:%{public}d, location:(%{public}d, %{public}d)",
+        itemDown.GetPointerId(), itemDown.GetDisplayX(), itemDown.GetDisplayY());
+
+    double offset = sqrt(pow(itemMove.GetDisplayX() - itemDown.GetDisplayX(), SQUARE) +
+        pow(itemMove.GetDisplayY() - itemDown.GetDisplayY(), SQUARE));
+    auto displayInfo = WinMgr->GetPhysicalDisplay(touchMoveEvent->GetTargetDisplayId());
+    if (displayInfo != nullptr) {
+        double scale = static_cast<double>(displayInfo->dpi / DENSITY_BASELINE);
+        offset *= scale;
+    }
+    return offset;
 }
 } // namespace MMI
 } // namespace OHOS

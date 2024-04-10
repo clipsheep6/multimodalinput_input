@@ -52,7 +52,7 @@ public:
     virtual void SetNext(std::shared_ptr<IInputEventHandler> nextHandler)
     {
         nextHandler_ = nextHandler;
-    };
+    }
 
 protected:
     std::shared_ptr<IInputEventHandler> nextHandler_ { nullptr };
