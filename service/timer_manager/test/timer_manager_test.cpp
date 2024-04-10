@@ -33,14 +33,14 @@ public:
     static void TearDownTestCase(void) {}
 };
 
-void SomeFunction()
+void Lambda()
 {
     return;
 }
 
 /**
  * @tc.name: TimerManagerTest_ManagerTimer_001
- * @tc.desc: Test AddTimer
+ * @tc.desc: Test The Function AddTimer
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -48,13 +48,13 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ManagerTimer_001, TestSize.Level1)
 {
     int32_t repeatCount = 3;
     int32_t intervalMs  = 1000;
-    int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, SomeFunction);
+    int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, Lambda);
     EXPECT_EQ(timerld, 0);
 }
 
 /**
  * @tc.name: TimerManagerTest_ManagerTimer_002
- * @tc.desc: Test RemoveTimer
+ * @tc.desc: Test The Function RemoveTimer
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -62,13 +62,13 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ManagerTimer_002, TestSize.Level1)
 {
     int32_t repeatCount = 3;
     int32_t intervalMs  = 1000;
-    int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, SomeFunction);
+    int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, Lambda);
     ASSERT_EQ(TimerMgr->RemoveTimer(timerld), 0);
 }
 
 /**
  * @tc.name: TimerManagerTest_ManagerTimer_003
- * @tc.desc: Test ResetTimer
+ * @tc.desc: Test The Function ResetTimer
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -76,14 +76,14 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ManagerTimer_003, TestSize.Level1)
 {
     int32_t repeatCount = 3;
     int32_t intervalMs = 1000;
-    int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, SomeFunction);
+    int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, Lambda);
     int32_t result = TimerMgr->ResetTimer(timerld);
     EXPECT_EQ(result, 0);
 }
 
 /**
  * @tc.name: TimerManagerTest_ManagerTimer_004
- * @tc.desc: Test IsExist
+ * @tc.desc: Test The Function IsExist
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -91,7 +91,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ManagerTimer_004, TestSize.Level1)
 {
     int32_t repeatCount = 3;
     int32_t intervalMs = 1000;
-    int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, SomeFunction);
+    int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, Lambda);
     ASSERT_TRUE(TimerMgr->IsExist(timerld));
 }
 } // namespace MMI
