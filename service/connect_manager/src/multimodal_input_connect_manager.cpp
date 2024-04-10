@@ -651,6 +651,17 @@ int32_t MultimodalInputConnectManager::GetTouchpadRotateSwitch(bool &rotateSwitc
     return multimodalInputConnectService_->GetTouchpadRotateSwitch(rotateSwitch);
 }
 
+int32_t MultimodalInputConnectManager::EnableHardwareCursorStats(bool enable)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->EnableHardwareCursorStats(enable);
+}
+
+int32_t MultimodalInputConnectManager::GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetHardwareCursorStats(frameCount, vsyncCount);
+}
 int32_t MultimodalInputConnectManager::SetShieldStatus(int32_t shieldMode, bool isShield)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);

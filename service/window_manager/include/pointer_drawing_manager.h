@@ -77,6 +77,7 @@ public:
     std::map<MOUSE_ICON, IconStyle> GetMouseIconPath() override;
     bool UseMgaicCursor();
     int32_t DrawCursor(const MOUSE_ICON mouseStyle);
+	std::shared_ptr<Rosen::Drawing::Bitmap> PointerDrawingManager::PixelMapToBitMap(const std::shared_ptr<Media::PixelMap>& pixelMap)
 private:
     void DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle);
     void DrawRunningPointerAnimate(const MOUSE_ICON mouseStyle);
@@ -103,6 +104,8 @@ private:
     void AdjustMouseFocusByDirection90(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void AdjustMouseFocusByDirection180(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void AdjustMouseFocusByDirection270(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
+    int32_t EnableHardwareCursorStats(int32_t pid, bool enable) override;
+    int32_t GetHardwareCursorStats(int32_t pid, uint32_t &frameCount, uint32_t &vsyncCount) override;
 
 private:
     struct PidInfo {
