@@ -32,7 +32,7 @@ public:
     static void TearDownTestCase(void) {}
 };
 
-void someFunction()
+void SomeFunction()
 {
     return;
 }
@@ -47,7 +47,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ManagerTimer_001, TestSize.Level1)
 {
     int32_t repeatCount = 3;
     int32_t intervalMs  = 1000;
-    int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, someFunction);
+    int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, SomeFunction);
     EXPECT_EQ(timerld, rationId);
 }
 
@@ -61,7 +61,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ManagerTimer_002, TestSize.Level1)
 {
     int32_t repeatCount = 3;
     int32_t intervalMs  = 1000;
-    int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, someFunction);
+    int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, SomeFunction);
     ASSERT_EQ(TimerMgr->RemoveTimer(timerld), rightcode);
 }
 
@@ -75,7 +75,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ManagerTimer_003, TestSize.Level1)
 {
     int32_t repeatCount = 3;
     int32_t intervalMs = 1000;
-    int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, someFunction);
+    int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, SomeFunction);
     int32_t result = TimerMgr->ResetTimer(timerld);
     EXPECT_EQ(result, 0);
 }
@@ -90,7 +90,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ManagerTimer_004, TestSize.Level1)
 {
     int32_t repeatCount = 3;
     int32_t intervalMs = 1000;
-    int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, someFunction);
+    int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, SomeFunction);
     ASSERT_TRUE(TimerMgr->IsExist(timerld));
 }
 } // namespace MMI
