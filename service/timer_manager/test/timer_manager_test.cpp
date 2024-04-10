@@ -12,11 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-#include <gtest/gtest.h>
+
 #include <fstream>
-#include "timer_manager.h"
+
+#include <gtest/gtest.h>
+
 #include "mmi_log.h"
 #include "uds_server.h"
+#include "timer_manager.h"
 
 namespace OHOS {
 namespace MMI {
