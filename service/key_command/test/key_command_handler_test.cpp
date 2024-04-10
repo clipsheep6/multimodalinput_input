@@ -69,7 +69,6 @@ std::shared_ptr<KeyEvent> KeyCommandHandlerTest::SetupKeyEvent()
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_HOME);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     keyEvent->AddPressedKeyItems(kitDown);
-
     return keyEvent;
 }
 
