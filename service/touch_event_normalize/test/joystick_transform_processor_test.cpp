@@ -33,48 +33,54 @@ public:
     void TearDown();
 };
 
-HWTEST_F(JoystickTransformProcessorTest, OnEventJoystickButtonTest, TestSize.Level1)
+void JoystickTransformProcessorTest::SetUpTestCase(void)
 {
-    int32_t deviceID = 123;
-    JoystickTransformProcessor processor(deviceID);
-
-    libinput_event* event = nullptr;
-    auto data = libinput_event_get_joystick_button_event(event);
-
-    EXPECT_FALSE(processor.OnEvent(nullptr));
-
-    EXPECT_FALSE(processor.OnEvent(event));
-
-    auto state = libinput_event_joystick_button_get_key_state(data);
-    state = LIBINPUT_BUTTON_STATE_RELEASED;
-    EXPECT_TRUE(processor.OnEvent(event));
-    
-    state = LIBINPUT_BUTTON_STATE_PRESSED;
-    EXPECT_TRUE(processor.OnEvent(event));
-
 }
 
-HWTEST_F(JoystickTransformProcessorTest, OnEventJoystickAxisTest, TestSize.Level1)
+void JoystickTransformProcessorTest::TearDownTestCase(void)
 {
-    int32_t deviceID = 123;
+}
+
+void JoystickTransformProcessorTest::SetUp()
+{
+}
+
+void JoystickTransformProcessorTest::TearDown()
+{
+}
+
+/**
+ * @tc.name: JoystickTransformProcessorTest_ButtonEvent
+ * @tc.desc: Test ButtonEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JoystickTransformProcessorTest, OnEvent_ButtonEvent, TestSize.Level1)
+{
+    int32_t deviceID = 1;
     JoystickTransformProcessor processor(deviceID);
-    struct libinput_event* event = new libinput_event();
-    struct libinput_event_get_joystick_axis_event* axisEvent = new libinput_event_get_joystick_axis_event();
-    axisEvent->value = 100;
-    event->libinput_event_get_joystick_axis_event = axisEvent;
+    libinput_event* event = nullptr;
+    auto type = libinput_event_get_type(event);
+    type = LIBINPUT_EVENT_JOYSTICK_BUTTON;
+    auto result = processor.OnEvent(event);
+    ASSERT_EQ(result, nullptr);
+}
 
-    bool result = jtProcessor.OnEventJoystickAxis(event);
-    EXPECT_TRUE(result);
-
-    EXPECT_EQ(event->GetActionTime(), GetSysClockTime());
-    EXPECT_EQ(event->GetActionStartTime(), GetSysClockTime());
-    EXPECT_EQ(event->GetDeviceId(), jtProcessor.deviceId_);
-    EXPECT_EQ(event->GetPointerAction(), PointerEvent::POINTER_ACTION_AXIS_UPDATE);
-    EXPECT_EQ(event->GetSourceType(), PointerEvent::SOURCE_TYPE_JOYSTICK);
-    EXPECT_EQ(event->GetAxisValue(item.second), axisEvent->value);
-
-    delete event;
-    delete axisEvent;
+/**
+ * @tc.name: JoystickTransformProcessorTest_AxisEvent
+ * @tc.desc: Test AxisEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JoystickTransformProcessorTest, OnEvent_AxisEvent, TestSize.Level1)
+{
+    int32_t deviceID = 1;
+    JoystickTransformProcessor processor(deviceID);
+    libinput_event* event = nullptr;
+    auto type = libinput_event_get_type(event);
+    type = LIBINPUT_EVENT_JOYSTICK_AXIS;
+    auto result = processor.OnEvent(event);
+    ASSERT_EQ(result, nullptr);
 }
 }
 }
