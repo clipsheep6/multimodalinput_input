@@ -33,14 +33,14 @@ public:
     static void TearDownTestCase(void) {}
 };
 
-void Lambda()
+void AddTimerCallback()
 {
     return;
 }
 
 /**
  * @tc.name: TimerManagerTest_ManagerTimer_001
- * @tc.desc: Test The Function AddTimer
+ * @tc.desc: Test the function AddTimer
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -48,13 +48,13 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ManagerTimer_001, TestSize.Level1)
 {
     int32_t repeatCount = 3;
     int32_t intervalMs  = 1000;
-    int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, Lambda);
+    int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, AddTimerCallback);
     EXPECT_EQ(timerld, 0);
 }
 
 /**
  * @tc.name: TimerManagerTest_ManagerTimer_002
- * @tc.desc: Test The Function RemoveTimer
+ * @tc.desc: Test the function RemoveTimer
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -62,13 +62,13 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ManagerTimer_002, TestSize.Level1)
 {
     int32_t repeatCount = 3;
     int32_t intervalMs  = 1000;
-    int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, Lambda);
+    int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, AddTimerCallback);
     ASSERT_EQ(TimerMgr->RemoveTimer(timerld), 0);
 }
 
 /**
  * @tc.name: TimerManagerTest_ManagerTimer_003
- * @tc.desc: Test The Function ResetTimer
+ * @tc.desc: Test the function ResetTimer
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -76,14 +76,14 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ManagerTimer_003, TestSize.Level1)
 {
     int32_t repeatCount = 3;
     int32_t intervalMs = 1000;
-    int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, Lambda);
+    int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, AddTimerCallback);
     int32_t result = TimerMgr->ResetTimer(timerld);
     EXPECT_EQ(result, 0);
 }
 
 /**
  * @tc.name: TimerManagerTest_ManagerTimer_004
- * @tc.desc: Test The Function IsExist
+ * @tc.desc: Test the function IsExist
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -91,8 +91,22 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ManagerTimer_004, TestSize.Level1)
 {
     int32_t repeatCount = 3;
     int32_t intervalMs = 1000;
-    int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, Lambda);
+    int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, AddTimerCallback);
     ASSERT_TRUE(TimerMgr->IsExist(timerld));
+}
+
+/**
+ * @tc.name: TimerManagerTest_ManagerTimer_005
+ * @tc.desc: Test the function AddTimer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TimerManagerTest, TimerManagerTest_ManagerTimer_005, TestSize.Level1)
+{
+    int32_t repeatCount = 3;
+    int32_t intervalMs  = 1000;
+    int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, nullptr);
+    EXPECT_EQ(timerld, 0);
 }
 } // namespace MMI
 } // namespace OHOS
