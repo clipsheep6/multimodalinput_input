@@ -1209,7 +1209,8 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
     if (!evQueue_.empty()) {
         uv_work_t *work = new (std::nothrow) uv_work_t;
         CHKPV(work);
-        MonitorInfo *monitorInfo = new MonitorInfo();
+        MonitorInfo *monitorInfo = new (std::nothrow) MonitorInfo();
+        CHKPV(monitorInfo);
         monitorInfo->monitorId = monitorId_;
         monitorInfo->fingers = fingers_;
         work->data = monitorInfo;
@@ -1228,13 +1229,9 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
             loop, work, [](uv_work_t *work) {}, &JsInputMonitor::JsCallback, uv_qos_user_initiated);
         if (ret != 0) {
             MMI_HILOGE("add uv_queue failed, ret is %{public}d", ret);
-            if (monitorInfo != nullptr) {
                 delete monitorInfo;
                 monitorInfo = nullptr;
-            }
-            if (work != nullptr) {
-                delete work;
-                work = nullptr;
+                JsUtil::DeletePtr<uv_work_t *>(work);
             }
         }
     }
