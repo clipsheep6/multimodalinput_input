@@ -137,10 +137,10 @@ group("mmi_tests") {
   testonly = true
   deps = [
     "frameworks/proxy:InputManagerFilterManualTest",
+    "frameworks/proxy:InputManagerInjectTest",
     "frameworks/proxy:InputManagerManualTest",
     "frameworks/proxy:InputManagerSimulateTest",
     "frameworks/proxy:InputManagerTest",
-    "frameworks/proxy:InputManagerInjectTest",
     "frameworks/proxy:KeyEventTest",
     "frameworks/proxy:PointerEventTest",
     "frameworks/proxy:ut-mmi-proxy-out",
