@@ -1230,10 +1230,9 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
             loop, work, [](uv_work_t *work) {}, &JsInputMonitor::JsCallback, uv_qos_user_initiated);
         if (ret != 0) {
             MMI_HILOGE("add uv_queue failed, ret is %{public}d", ret);
-                delete monitorInfo;
-                monitorInfo = nullptr;
-                JsUtil::DeletePtr<uv_work_t *>(work);
-            }
+            delete monitorInfo;
+            monitorInfo = nullptr;
+            JsUtil::DeletePtr<uv_work_t *>(work);
         }
     }
 }
