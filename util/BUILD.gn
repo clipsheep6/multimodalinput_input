@@ -113,6 +113,7 @@ ohos_unittest("ut-mmi-util-out") {
 
   sources = [
     "network/test/net_packet_test.cpp",
+    "network/test/network_stream_buffer_test.cpp",
     "socket/test/stream_buffer_test.cpp",
     "socket/test/uds_client_test.cpp",
     "socket/test/uds_session_test.cpp",
