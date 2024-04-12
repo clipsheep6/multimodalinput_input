@@ -21,6 +21,7 @@
 #include "error_multimodal.h"
 #include "input_manager.h"
 #include "js_input_monitor_manager.h"
+#include "js_util.h"
 #include "util_napi_value.h"
 #include "napi_constants.h"
 #include "securec.h"
