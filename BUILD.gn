@@ -140,6 +140,7 @@ group("mmi_tests") {
     "frameworks/proxy:InputManagerManualTest",
     "frameworks/proxy:InputManagerSimulateTest",
     "frameworks/proxy:InputManagerTest",
+    "frameworks/proxy:InputManagerInjectTest",
     "frameworks/proxy:KeyEventTest",
     "frameworks/proxy:PointerEventTest",
     "frameworks/proxy:ut-mmi-proxy-out",
