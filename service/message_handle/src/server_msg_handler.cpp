@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -96,7 +96,7 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
             InjectionType_ = InjectionType::KEYEVENT;
             keyEvent_ = keyEvent;
             LaunchAbility();
-            return RET_OK;
+            return COMMON_PERMISSION_CHECK_ERROR;
         }
         if (iter->second == AuthorizationStatus::UNAUTHORIZED) {
             return COMMON_PERMISSION_CHECK_ERROR;
@@ -155,7 +155,7 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
             InjectionType_ = InjectionType::POINTEREVENT;
             pointerEvent_ = pointerEvent;
             LaunchAbility();
-            return RET_OK;
+            return COMMON_PERMISSION_CHECK_ERROR;
         }
         if (iter->second == AuthorizationStatus::UNAUTHORIZED) {
             return COMMON_PERMISSION_CHECK_ERROR;
@@ -184,12 +184,14 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
 #ifdef OHOS_BUILD_ENABLE_POINTER
             auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
             CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
-            if (((action < PointerEvent::POINTER_ACTION_PULL_DOWN) ||
+            inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
+            if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER)) {
+                IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), false);
+            } else if (((action < PointerEvent::POINTER_ACTION_PULL_DOWN) ||
                 (action > PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW)) &&
                 !IPointerDrawingManager::GetInstance()->IsPointerVisible()) {
                 IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), true);
             }
-            inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
             break;
         }
