@@ -133,6 +133,8 @@ public:
     int32_t Authorize(bool isAuthorize) override;
     int32_t CancelInjection() override;
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+    int32_t EnableHardwareCursorStats(bool enable) override;
+    int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) override;
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitAncoUds();
