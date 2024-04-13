@@ -111,7 +111,6 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     if (fd < 0 && currentTime_ - eventTime_ > INTERVAL_TIME) {
         eventTime_ = currentTime_;
         MMI_HILOGE("InputTracking id:%{public}d The fd less than 0, fd:%{public}d", point->GetId(), fd);
-        DfxHisysevent::OnUpdateTargetPointer(point, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         return;
     }
     auto udsServer = InputHandler->GetUDSServer();
@@ -137,7 +136,8 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         || pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP
         || pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_DOWN
         || pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
-        NotifyPointerEventToRS(pointerEvent->GetPointerAction(), session->GetProgramName(), session->GetPid());
+        NotifyPointerEventToRS(pointerEvent->GetPointerAction(), session->GetProgramName(),
+            static_cast<uint32_t>(session->GetPid()));
     }
     if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
         MMI_HILOGI("InputTracking id:%{public}d, SendMsg to %{public}s:pid:%{public}d",
