@@ -71,6 +71,7 @@ constexpr float ROTATION_ANGLE90 = 90.f;
 constexpr int32_t MIN_POINTER_COLOR = 0x000000;
 constexpr int32_t MAX_POINTER_COLOR = 0xffffff;
 constexpr int32_t MIN_CURSOR_SIZE = 64;
+constexpr int32_t FOLD_SCREEN_ID = 5;
 const std::string MOUSE_FILE_NAME = "mouse_settings.xml";
 bool isRsRemoteDied = false;
 } // namespace
@@ -606,9 +607,10 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
 #else
     surfaceNode_->SetBackgroundColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
 #endif
-
-    screenId_ = static_cast<uint64_t>(displayId);
-    std::cout << "ScreenId: " << screenId_ << std::endl;
+    
+    int32_t screenId = (displayInfo_.displayMode == DisplayMode::MAIN) ? (FOLD_SCREEN_ID) : (displayId);
+    MMI_HILOGD("screen is :%{public}d", screenId);
+    screenId_ = static_cast<uint64_t>(screenId);
     surfaceNode_->AttachToDisplay(screenId_);
     RotateDegree(direction);
     lastDirection_ = direction;
