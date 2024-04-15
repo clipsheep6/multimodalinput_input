@@ -1166,6 +1166,10 @@ bool PointerDrawingManager::GetPointerVisible(int32_t pid)
 int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
 {
     MMI_HILOGI("pid:%{public}d,visible:%{public}s", pid, visible ? "true" : "false");
+    if (WinMgr.GetExtraData().appended) {
+        MMI_HILOGE("current is drag state, cannot change pointer visible");
+        return RET_ERR;
+    }
     for (auto it = pidInfos_.begin(); it != pidInfos_.end(); ++it) {
         if (it->pid == pid) {
             pidInfos_.erase(it);
@@ -1184,6 +1188,10 @@ int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
 void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y)
 {
     CALL_DEBUG_ENTER;
+    if (WinMgr.GetExtraData().appended) {
+        MMI_HILOGE("current is drag state, cannot change pointer visible");
+        return RET_ERR;
+    }
     FixCursorPosition(x, y);
     lastPhysicalX_ = x;
     lastPhysicalY_ = y;
@@ -1259,6 +1267,10 @@ int32_t PointerDrawingManager::SetPointerStylePreference(PointerStyle pointerSty
 int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle)
 {
     CALL_DEBUG_ENTER;
+    if (WinMgr.GetExtraData().appended) {
+        MMI_HILOGE("current is drag state, cannot change pointer visible");
+        return RET_ERR;
+    }
     if (windowId == GLOBAL_WINDOW_ID) {
         int32_t ret = SetPointerStylePreference(pointerStyle);
         if (ret != RET_OK) {
