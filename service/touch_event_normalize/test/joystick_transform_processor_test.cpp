@@ -27,27 +27,11 @@ using namespace testing::ext;
 }
 class JoystickTransformProcessorTest : public testing::Test {
 public:
-    static void SetUpTestCase(void);
-    static void TearDownTestCase(void);
-    void SetUp();
-    void TearDown();
+    static void SetUpTestCase(void) {}
+    static void TearDownTestCase(void) {}
+    void SetUp() {}
+    void TearDoen() {}
 };
-
-void JoystickTransformProcessorTest::SetUpTestCase(void)
-{
-}
-
-void JoystickTransformProcessorTest::TearDownTestCase(void)
-{
-}
-
-void JoystickTransformProcessorTest::SetUp()
-{
-}
-
-void JoystickTransformProcessorTest::TearDown()
-{
-}
 
 /**
  * @tc.name: JoystickTransformProcessorTest_ButtonEvent
