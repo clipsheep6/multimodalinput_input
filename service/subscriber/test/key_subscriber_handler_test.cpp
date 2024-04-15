@@ -272,7 +272,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsMatchForegroundPid
     std::list<std::shared_ptr<OHOS::MMI::KeySubscriberHandler::Subscriber>> subs;
     std::set<int32_t> foregroundPids = {1, 2, 3};
     ASSERT_FALSE(handler.IsMatchForegroundPid(subs, foregroundPids));
-} 
+}
 
 /**
  * @tc.name: KeySubscriberHandlerTest_NotifyKeyDownSubscriber_001
