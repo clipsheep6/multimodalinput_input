@@ -230,11 +230,11 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsPreKeysMatch_001, 
     KeySubscriberHandler handler;
     std::set<int32_t> preKeys;
     std::vector<int32_t> pressedKeys = {1, 2, 3};
-    ASSERT_TRUE(handler.IsPreKeysMatch(preKeys,pressedKeys));
+    ASSERT_TRUE(handler.IsPreKeysMatch(preKeys, pressedKeys));
     preKeys = {1, 2, 3};
-    ASSERT_TRUE(handler.IsPreKeysMatch(preKeys,pressedKeys));
+    ASSERT_TRUE(handler.IsPreKeysMatch(preKeys, pressedKeys));
     pressedKeys = {1, 2, 3, 4};
-    ASSERT_FALSE(handler.IsPreKeysMatch(preKeys,pressedKeys));
+    ASSERT_FALSE(handler.IsPreKeysMatch(preKeys, pressedKeys));
     pressedKeys = {1, 2, 3};
     preKeys = {1, 2, 3, 4};
     ASSERT_FALSE(handler.IsPreKeysMatch(preKeys,pressedKeys));
