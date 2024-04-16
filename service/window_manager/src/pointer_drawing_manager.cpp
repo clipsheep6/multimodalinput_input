@@ -15,14 +15,11 @@
 
 #include "pointer_drawing_manager.h"
 
-#include "image/bitmap.h"
-#include "image_source.h"
-#include "image_type.h"
-#include "image_utils.h"
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 #include "magic_pointer_drawing_manager.h"
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
+#include "core_canvas.h"
 #include "define_multimodal.h"
 #include "i_multimodal_input_connect.h"
 #include "input_device_manager.h"
@@ -92,8 +89,10 @@ PointerDrawingManager::PointerDrawingManager()
 
     MAGIC_CURSOR->InitStyle();
     InitStyle();
+    hwcPointerManager_ = std::make_shared<HwcPointerManager>();
 #else
     InitStyle();
+    hwcPointerManager_ = std::make_shared<HwcPointerManager>();
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 }
 
@@ -107,10 +106,23 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
     const PointerStyle pointerStyle, Direction direction)
 {
     MMI_HILOGD("Pointer window move success");
+    /*if (hwcPointerManager_->SetTargetDevice(displayId) != RET_OK) {
+        // my--my
+        MMI_HILOGE("my--my Set hardware cursor position is error.");
+        return;
+    }*/
     if (lastMouseStyle_ == pointerStyle && !mouseIconUpdate_ && lastDirection_ == direction) {
         surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
             surfaceNode_->GetStagingProperties().GetBounds().z_,
             surfaceNode_->GetStagingProperties().GetBounds().w_);
+        /*uint64_t value = 0;
+        if (hwcPointerManager_->IsSupported(1, value)) {
+            // my--my
+            if (hwcPointerManager_->SetPosition(physicalX, physicalY) != RET_OK) {
+                MMI_HILOGD("my--my Set hardware cursor position is error.");
+                return;
+            }
+        }*/
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("The lastpointerStyle is equal with pointerStyle,id %{public}d size:%{public}d",
             pointerStyle.id, pointerStyle.size);
@@ -128,10 +140,19 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
         MMI_HILOGE("Init layer failed");
         return;
     }
+    // my--my if support HW cursor, call HDI API HWSetCursorPosition
     surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
         surfaceNode_->GetStagingProperties().GetBounds().z_,
         surfaceNode_->GetStagingProperties().GetBounds().w_);
     surfaceNode_->SetVisible(true);
+    /*uint64_t value = 0;
+    if (hwcPointerManager_->IsSupported(1, value)) {
+        // my--my
+        if (hwcPointerManager_->SetPosition(physicalX, physicalY) != RET_OK) {
+            MMI_HILOGD("my--my Set hardware cursor position is error.");
+            return;
+        }
+    }*/
     Rosen::RSTransaction::FlushImplicitTransaction();
     UpdatePointerVisible();
     mouseIconUpdate_ = false;
@@ -602,6 +623,21 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
     surfaceNode_->SetFrameGravity(Rosen::Gravity::RESIZE_ASPECT_FILL);
     surfaceNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
     surfaceNode_->SetBounds(physicalX, physicalY, IMAGE_WIDTH, IMAGE_HEIGHT);
+    /*int ret = hwcPointerManager_->SetTargetDevice(displayId);
+    if (ret != RET_OK) {
+        // my--my
+        MMI_HILOGD("my--my Set hardware cursor position is error.");
+        return;
+    }
+    uint64_t value = 0;
+    if (hwcPointerManager_->IsSupported(1, value)) {
+        // my--my
+        ret = hwcPointerManager_->SetPosition(physicalX, physicalY);
+        if (ret != RET_OK) {
+            MMI_HILOGD("my--my Set hardware cursor position is error.");
+            return;
+        }
+    }*/
 #ifndef USE_ROSEN_DRAWING
     surfaceNode_->SetBackgroundColor(SK_ColorTRANSPARENT);
 #else
@@ -668,10 +704,10 @@ void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t heigh
     OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
         OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE };
     bitmap.Build(width, height, format);
-    OHOS::Rosen::Drawing::Canvas canvas;
-    canvas.Bind(bitmap);
-    canvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
-    DrawPixelmap(canvas, mouseStyle);
+    OHOS::Rosen::Drawing::CoreCanvas coreCanvas;
+    coreCanvas.Bind(bitmap);
+    coreCanvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
+    DrawPixelmap(coreCanvas, mouseStyle);
     static constexpr uint32_t stride = 4;
     uint32_t addrSize = width * height * stride;
     errno_t ret = memcpy_s(addr, addrSize, bitmap.GetPixels(), addrSize);
@@ -681,7 +717,62 @@ void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t heigh
     }
 }
 
-void PointerDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas, const MOUSE_ICON mouseStyle)
+static Rosen::Drawing::ColorType PixelFormatToDrawingColorType(Media::PixelFormat pixelFormat)
+{
+    switch (pixelFormat) {
+        case Media::PixelFormat::RGB_565:
+            return Rosen::Drawing::ColorType::COLORTYPE_RGB_565;
+        case Media::PixelFormat::RGBA_8888:
+            return Rosen::Drawing::ColorType::COLORTYPE_RGBA_8888;
+        case Media::PixelFormat::BGRA_8888:
+            return Rosen::Drawing::ColorType::COLORTYPE_BGRA_8888;
+        case Media::PixelFormat::ALPHA_8:
+            return Rosen::Drawing::ColorType::COLORTYPE_ALPHA_8;
+        case Media::PixelFormat::RGBA_F16:
+            return Rosen::Drawing::ColorType::COLORTYPE_RGBA_F16;
+        case Media::PixelFormat::UNKNOWN:
+        case Media::PixelFormat::ARGB_8888:
+        case Media::PixelFormat::RGB_888:
+        case Media::PixelFormat::NV21:
+        case Media::PixelFormat::NV12:
+        case Media::PixelFormat::CMYK:
+        default:
+            return Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN;
+    }
+}
+
+static Rosen::Drawing::AlphaType AlphaTypeToDrawingAlphaType(Media::AlphaType alphaType)
+{
+    switch (alphaType) {
+        case Media::AlphaType::IMAGE_ALPHA_TYPE_UNKNOWN:
+            return Rosen::Drawing::AlphaType::ALPHATYPE_UNKNOWN;
+        case Media::AlphaType::IMAGE_ALPHA_TYPE_OPAQUE:
+            return Rosen::Drawing::AlphaType::ALPHATYPE_OPAQUE;
+        case Media::AlphaType::IMAGE_ALPHA_TYPE_PREMUL:
+            return Rosen::Drawing::AlphaType::ALPHATYPE_PREMUL;
+        case Media::AlphaType::IMAGE_ALPHA_TYPE_UNPREMUL:
+            return Rosen::Drawing::AlphaType::ALPHATYPE_UNPREMUL;
+        default:
+            return Rosen::Drawing::AlphaType::ALPHATYPE_UNKNOWN;
+    }
+}
+
+// Ace::Napi::ImageConverter::
+static std::shared_ptr<Rosen::Drawing::Bitmap> PixelmapObjectToBitMap(Media::PixelMap pixelMap)
+{
+    auto data = pixelMap.GetPixels();
+    OHOS::Rosen::Drawing::Bitmap bitmap;
+    OHOS::Rosen::Drawing::ColorType colorType = PixelFormatToDrawingColorType(pixelMap.GetPixelFormat());
+    OHOS::Rosen::Drawing::AlphaType alphaType = AlphaTypeToDrawingAlphaType(pixelMap.GetAlphaType());
+    OHOS::Rosen::Drawing::ImageInfo imageInfo(pixelMap.GetWidth(), pixelMap.GetHeight(), colorType, alphaType);
+    bitmap.Build(imageInfo);
+    MMI_HILOGE("my-my, imageInfo.GetWidth:%{public}d, imageInfo.GetHeight:%{public}d", bitmap.GetWidth(), bitmap.GetHeight());
+    MMI_HILOGE("my-my, imageInfo.IsValid:%{public}d", bitmap.IsValid());
+    bitmap.SetPixels(const_cast<uint8_t*>(data));
+    return std::make_shared<Rosen::Drawing::Bitmap>(bitmap);
+}
+
+void PointerDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::CoreCanvas &coreCanvas, const MOUSE_ICON mouseStyle)
 {
     CALL_DEBUG_ENTER;
     OHOS::Rosen::Drawing::Pen pen;
@@ -689,10 +780,13 @@ void PointerDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas, c
     pen.SetColor(OHOS::Rosen::Drawing::Color::COLOR_BLUE);
     OHOS::Rosen::Drawing::scalar penWidth = 1;
     pen.SetWidth(penWidth);
-    canvas.AttachPen(pen);
+    coreCanvas.AttachPen(pen);
+    std::shared_ptr<Rosen::Drawing::Bitmap> bitmap;
     if (mouseStyle == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         MMI_HILOGD("set mouseicon by userIcon_");
-        OHOS::Rosen::RSPixelMapUtil::DrawPixelMap(canvas, *userIcon_, 0, 0);
+        bitmap = PixelmapObjectToBitMap(*userIcon_);
+        CHKPV(bitmap);
+        coreCanvas.DrawBitmap(*bitmap, 0.0f, 0.0f);
     } else {
         std::shared_ptr<OHOS::Media::PixelMap> pixelmap;
         if (mouseStyle == MOUSE_ICON::RUNNING) {
@@ -701,8 +795,10 @@ void PointerDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas, c
             pixelmap = DecodeImageToPixelMap(mouseIcons_[mouseStyle].iconPath);
         }
         CHKPV(pixelmap);
+        bitmap = PixelmapObjectToBitMap(*pixelmap);
+        CHKPV(bitmap);
         MMI_HILOGD("set mouseicon to OHOS system");
-        OHOS::Rosen::RSPixelMapUtil::DrawPixelMap(canvas, *pixelmap, 0, 0);
+        coreCanvas.DrawBitmap(*bitmap, 0.0f, 0.0f);
     }
 }
 
@@ -863,6 +959,7 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixel
     return pixelMap;
 }
 
+
 int32_t PointerDrawingManager::SetPointerColor(int32_t color)
 {
     CALL_DEBUG_ENTER;
@@ -911,6 +1008,11 @@ int32_t PointerDrawingManager::GetPointerColor()
 void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo &displayInfo)
 {
     CALL_DEBUG_ENTER;
+	// my-my
+    /*if (hwcPointerManager_->SetTargetDevice(displayInfo.id) != RET_OK) {
+        MMI_HILOGE("Set target device is failed.");
+        return;
+    }*/
     hasDisplay_ = true;
     displayInfo_ = displayInfo;
     int32_t size = GetPointerSize();
@@ -1194,6 +1296,14 @@ void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y)
             y,
             surfaceNode_->GetStagingProperties().GetBounds().z_,
             surfaceNode_->GetStagingProperties().GetBounds().w_);
+        /*uint64_t value = 0;
+        if (hwcPointerManager_->IsSupported(1, value)) {
+            // my--my
+            if (hwcPointerManager_->SetPosition(lastPhysicalX_, lastPhysicalY_) != RET_OK) {
+                MMI_HILOGD("my--my Set hardware cursor position is error.");
+                return;
+            }
+        }*/
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("Pointer window move success");
     }
@@ -1388,6 +1498,26 @@ void PointerDrawingManager::CheckMouseIconPath()
         }
         ++iter;
     }
+}
+
+// my--my
+int32_t PointerDrawingManager::EnableHardwareCursorStats(int32_t pid, bool enable)
+{
+    if ((hwcPointerManager_->EnableStats(enable)) != RET_OK) {
+        MMI_HILOGE("Enable stats failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+// my--my
+int32_t PointerDrawingManager::GetHardwareCursorStats(int32_t pid, uint32_t &frameCount, uint32_t &vsyncCount)
+{
+    if ((hwcPointerManager_->QueryStats(frameCount, vsyncCount)) != RET_OK) {
+        MMI_HILOGE("Query stats failed");
+        return RET_ERR;
+    }
+    return RET_OK;
 }
 
 void PointerDrawingManager::InitStyle()

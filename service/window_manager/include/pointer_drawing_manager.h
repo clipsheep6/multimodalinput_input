@@ -24,12 +24,19 @@
 #include <transaction/rs_transaction.h>
 #include <transaction/rs_interfaces.h>
 
+#include "image/bitmap.h"
+#include "image_converter.h"
+#include "image_source.h"
+#include "image_type.h"
+#include "image_utils.h"
+
 #include "draw/canvas.h"
 #include "nocopyable.h"
 #include "pixel_map.h"
 #include "window.h"
 
 #include "device_observer.h"
+#include "hwc_pointer_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "mouse_event_normalize.h"
 #include "setting_observer.h"
@@ -91,7 +98,7 @@ private:
     sptr<OHOS::Surface> GetLayer();
     sptr<OHOS::SurfaceBuffer> GetSurfaceBuffer(sptr<OHOS::Surface> layer) const;
     void DoDraw(uint8_t *addr, uint32_t width, uint32_t height, const MOUSE_ICON mouseStyle = MOUSE_ICON::DEFAULT);
-    void DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas, const MOUSE_ICON mouseStyle);
+    void DrawPixelmap(OHOS::Rosen::Drawing::CoreCanvas &coreCanvas, const MOUSE_ICON mouseStyle);
     void DrawManager();
     void FixCursorPosition(int32_t &physicalX, int32_t &physicalY);
     std::shared_ptr<OHOS::Media::PixelMap> DecodeImageToPixelMap(const std::string &imagePath);
@@ -113,6 +120,8 @@ private:
     void CreatePointerSwiftObserver(isMagicCursor& item);
     int32_t GetIndependentPixels();
     bool CheckPointerStyleParam(int32_t windowId, PointerStyle pointerStyle);
+	int32_t EnableHardwareCursorStats(int32_t pid, bool enable) override;
+    int32_t GetHardwareCursorStats(int32_t pid, uint32_t &frameCount, uint32_t &vsyncCount) override;
 
 private:
     struct PidInfo {
@@ -144,6 +153,7 @@ private:
     Direction lastDirection_ { DIRECTION0 };
     Direction currentDirection_ { DIRECTION0 };
     isMagicCursor hasMagicCursor_;
+	std::shared_ptr<HwcPointerManager> hwcPointerManager_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS
