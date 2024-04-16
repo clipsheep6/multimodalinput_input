@@ -15,11 +15,14 @@
 
 #include <gtest/gtest.h>
 #include <fstream>
+#include <list>
 
 #include "key_subscriber_handler.h"
 #include "switch_subscriber_handler.h"
 #include "mmi_log.h"
 #include "uds_server.h"
+
+#include"key_option.h"
 
 namespace OHOS {
 namespace MMI {
@@ -32,6 +35,15 @@ class KeySubscriberHandlerTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
+    struct Subscriber {
+        Subscriber(int32_t id, SessionPtr sess, std::shared_ptr<KeyOption> keyOption)
+            : id_(id), sess_(sess), keyOption_(keyOption), timerId_(-1) {}
+        int32_t id_ { -1 };
+        SessionPtr sess_ { nullptr };
+        std::shared_ptr<KeyOption> keyOption_ { nullptr };
+        int32_t timerId_ { -1 };
+        std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
+    };
 };
 
 /**
@@ -113,6 +125,245 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_EnableCombineKey_001
 {
     KeySubscriberHandler keySubscriberHandler;
     ASSERT_EQ(keySubscriberHandler.EnableCombineKey(true), RET_OK);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_SubscribeKeyEvent_001
+ * @tc.desc: Test subscribe keyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_SubscribeKeyEvent_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+    SessionPtr sess;
+    auto keyOption = std::make_shared<KeyOption>();
+    int32_t ret = handler.SubscribeKeyEvent(sess, -1, keyOption);
+    ASSERT_EQ(ret, RET_ERR);
+    ret = handler.SubscribeKeyEvent(nullptr, 1, keyOption);
+    ASSERT_NE(ret, RET_OK);
+    ret = handler.SubscribeKeyEvent(sess, 1, keyOption);
+    ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_RemoveSubscriber_001
+ * @tc.desc: Test remove subscriber
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_RemoveSubscriber_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+    SessionPtr sess;
+    int32_t ret = handler.RemoveSubscriber(sess, 1);
+    ASSERT_EQ(ret, RET_OK);
+    ret = handler.RemoveSubscriber(nullptr, 1);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_IsEqualKeyOption_001
+ * @tc.desc: Test is equal keyOption
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsEqualKeyOption_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+    auto newOption = std::make_shared<KeyOption>();
+    auto oldOption = std::make_shared<KeyOption>();
+    newOption->SetPreKeys({1, 2, 3});
+    oldOption->SetPreKeys({4, 5, 6});
+    ASSERT_FALSE(handler.IsEqualKeyOption(newOption, oldOption));
+    newOption->SetFinalKey(1);
+    oldOption->SetFinalKey(2);
+    ASSERT_FALSE(handler.IsEqualKeyOption(newOption, oldOption));
+    newOption->SetFinalKeyDown(true);
+    oldOption->SetFinalKeyDown(false);
+    ASSERT_FALSE(handler.IsEqualKeyOption(newOption, oldOption));
+    newOption->SetFinalKeyDownDuration(100);
+    oldOption->SetFinalKeyDownDuration(200);
+    ASSERT_FALSE(handler.IsEqualKeyOption(newOption, oldOption));
+    newOption->SetFinalKeyUpDelay(100);
+    oldOption->SetFinalKeyUpDelay(200);
+    ASSERT_FALSE(handler.IsEqualKeyOption(newOption, oldOption));
+    newOption->SetPreKeys({1, 2, 3});
+    oldOption->SetPreKeys({1, 2, 3});
+    newOption->SetFinalKey(1);
+    oldOption->SetFinalKey(1);
+    newOption->SetFinalKeyDown(true);
+    oldOption->SetFinalKeyDown(true);
+    newOption->SetFinalKeyDownDuration(100);
+    oldOption->SetFinalKeyDownDuration(100);
+    newOption->SetFinalKeyUpDelay(100);
+    oldOption->SetFinalKeyUpDelay(100);
+    ASSERT_FALSE(handler.IsEqualKeyOption(newOption, oldOption));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_OnSessionDelete_001
+ * @tc.desc: Test onSession delete
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_OnSessionDelete_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+    SessionPtr sess;
+    ASSERT_NO_FATAL_FAILURE(handler.OnSessionDelete(sess));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_IsPreKeysMatch_001
+ * @tc.desc: Test is preKeys match
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsPreKeysMatch_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+    std::set<int32_t> preKeys;
+    std::vector<int32_t> pressedKeys = {1, 2, 3};
+    ASSERT_TRUE(handler.IsPreKeysMatch(preKeys,pressedKeys));
+    preKeys = {1, 2, 3};
+    ASSERT_TRUE(handler.IsPreKeysMatch(preKeys,pressedKeys));
+    pressedKeys = {1, 2, 3, 4};
+    ASSERT_FALSE(handler.IsPreKeysMatch(preKeys,pressedKeys));
+    pressedKeys = {1, 2, 3};
+    preKeys = {1, 2, 3, 4};
+    ASSERT_FALSE(handler.IsPreKeysMatch(preKeys,pressedKeys));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_IsEqualPreKeys_001
+ * @tc.desc: Test is equal preKeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsEqualPreKeys_001, TestSize.Level1)
+{
+    KeySubscriberHandler handler;
+    std::set<int32_t> preKeys = {1, 2, 3};
+    std::set<int32_t> pressedKeys = {4, 5, 6};
+    ASSERT_FALSE(handler.IsEqualPreKeys(preKeys, pressedKeys));
+    pressedKeys = {1, 2, 3};
+    ASSERT_TRUE(handler.IsEqualPreKeys(preKeys, pressedKeys));
+    pressedKeys = {1, 2};
+    ASSERT_FALSE(handler.IsEqualPreKeys(preKeys, pressedKeys));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_IsMatchForegroundPid_001
+ * @tc.desc: Test is match foreground pid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsMatchForegroundPid_001, TestSize.Level1)
+{
+    KeySubscriberHandler handler;
+    std::list<std::shared_ptr<OHOS::MMI::KeySubscriberHandler::Subscriber>> subs;
+    std::set<int32_t> foregroundPids = {1, 2, 3};
+    ASSERT_FALSE(handler.IsMatchForegroundPid(subs, foregroundPids));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_NotifyKeyDownSubscriber_001
+ * @tc.desc: Test notify key down subscriber
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifyKeyDownSubscriber_001, TestSize.Level1)
+{
+    KeySubscriberHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    auto keyOption = std::make_shared<KeyOption>();
+    std::list<std::shared_ptr<OHOS::MMI::KeySubscriberHandler::Subscriber>> subscribers;
+    bool handled = false;
+    ASSERT_NO_FATAL_FAILURE(handler.NotifyKeyDownSubscriber(keyEvent, keyOption, subscribers, handled));
+    keyEvent = nullptr;
+    ASSERT_NO_FATAL_FAILURE(handler.NotifyKeyDownSubscriber(keyEvent, keyOption, subscribers, handled));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_NotifyKeyDownRightNow_001
+ * @tc.desc: Test notify key down right now
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifyKeyDownRightNow_001, TestSize.Level1)
+{
+    KeySubscriberHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    std::list<std::shared_ptr<OHOS::MMI::KeySubscriberHandler::Subscriber>> subscribers;
+    bool handled = false;
+    handler.NotifyKeyDownRightNow(keyEvent, subscribers, handled);
+    ASSERT_TRUE(handled);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_NotifyKeyDownDelay_001
+ * @tc.desc: Test notify key down delay
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifyKeyDownDelay_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    CHKPV(keyEvent);
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(KeyEvent::KEYCODE_POWER);
+    keyEvent->AddKeyItem(item);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    std::list<std::shared_ptr<OHOS::MMI::KeySubscriberHandler::Subscriber>> subscribers;
+    bool handled = false;
+    handler.NotifyKeyDownDelay(keyEvent, subscribers, handled);
+    ASSERT_TRUE(handled);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_ClearTimer_001
+ * @tc.desc: Test clear timer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_ClearTimer_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+    std::shared_ptr<OHOS::MMI::KeySubscriberHandler::Subscriber> subscriber;
+    subscriber->timerId_ = -1;
+    handler.ClearTimer(subscriber);
+    ASSERT_EQ(subscriber->timerId_, -1);
+    subscriber->timerId_ = 1;
+    handler.ClearTimer(subscriber);
+    ASSERT_EQ(subscriber->timerId_, -1);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_OnTimer_001
+ * @tc.desc: Test onTimer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_OnTimer_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+    std::shared_ptr<OHOS::MMI::KeySubscriberHandler::Subscriber> subscriber;
+    subscriber->timerId_ = 1;
+    handler.OnTimer(subscriber);
+    ASSERT_EQ(subscriber->timerId_, -1);
+    subscriber = nullptr;
+    handler.OnTimer(subscriber);
+    ASSERT_EQ(subscriber->timerId_, -1);
 }
 } // namespace MMI
 } // namespace OHOS
