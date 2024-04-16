@@ -2026,5 +2026,93 @@ int32_t MMIService::OnCancelInjection()
 {
     return sMsgHandler_.OnCancelInjection();
 }
+
+
+int32_t MMIService::HasIrEmitter(bool &hasIrEmitter)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnHasIrEmitter, this,  std::ref(hasIrEmitter)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("OnHasIrEmitter failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetInfraredFrequencies, this,  std::ref(requencys)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("OnGetInfraredFrequencies failed, returnCode:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+    
+}
+
+int32_t MMIService::TransmitInfrared(int64_t number, std::vector<int64_t> pattern)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnTransmitInfrared, this,  number, pattern));
+    if (ret != RET_OK) {
+        MMI_HILOGE("OnTransmitInfrared failed, returnCode:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;    
+}
+
+int32_t MMIService::OnHasIrEmitter( bool &hasIrEmitter)
+{
+    int32_t pid = GetCallingPid();
+    int32_t uid = GetCallingUid();
+    // int32_t ret = CheckPidPermission(pid);
+    // if (ret != RET_OK) {
+    //     return ret;
+    // }
+
+    /***引入驱动,处理***/
+    return RET_OK;  
+}
+
+int32_t MMIService::OnGetInfraredFrequencies( std::vector<InfraredFrequency>& requencys)
+{    
+    int32_t pid = GetCallingPid();
+    int32_t uid = GetCallingUid();
+    // int32_t ret = CheckPidPermission(pid);
+    // if (ret != RET_OK) {
+    //     return ret;
+    // }
+    return 202;
+    for(int i = 1; i < 20; i++) {
+        InfraredFrequency itemFrequency;
+        itemFrequency.max_ = 500*i;
+        itemFrequency.min_ = 100*i; 
+        requencys.emplace_back(itemFrequency);
+    }
+    /***引入驱动,处理***/
+    return RET_OK;
+}
+
+int32_t MMIService::OnTransmitInfrared( int64_t number, std::vector<int64_t> pattern)
+{
+    int32_t pid = GetCallingPid();
+    int32_t uid = GetCallingUid();
+    // int32_t ret = CheckPidPermission(pid);
+    // if (ret != RET_OK) {
+    //     return ret;
+    // }
+
+    std::string context = "*********** number:" + std::to_string(number) + ";";
+    int32_t size = static_cast<int32_t>(pattern.size());
+    for(int32_t i = 0; i < size; i ++) {
+        context = context +  std::to_string( i) + ":  pattern: " +std::to_string( pattern[i]) + ";";
+    }
+    MMI_HILOGF("OnTransmitInfrared para : argv:%{public}s " , context.c_str());
+
+    /***引入驱动,处理***/  
+    return RET_OK;    
+}
+
 } // namespace MMI
 } // namespace OHOS
