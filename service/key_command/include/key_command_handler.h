@@ -75,6 +75,12 @@ struct SequenceKey {
     }
 };
 
+struct ExcludeKey {
+    int32_t keyCode { -1 };
+    int32_t keyAction { -1 };
+    int64_t delay { 0 };
+};
+
 struct Sequence {
     std::vector<SequenceKey> sequenceKeys;
     std::string statusConfig;
@@ -160,7 +166,9 @@ private:
     void Print();
     void PrintSeq();
     bool ParseConfig();
+    bool ParseExcludeConfig();
     bool ParseJson(const std::string &configFile);
+    bool ParseExcludeJson(const std::string &configFile);
     void ParseRepeatKeyMaxCount();
     void ParseStatusConfigObserver();
     void LaunchAbility(const Ability &ability);
@@ -185,6 +193,7 @@ private:
     bool AddSequenceKey(const std::shared_ptr<KeyEvent> keyEvent);
     std::shared_ptr<KeyEvent> CreateKeyEvent(int32_t keyCode, int32_t keyAction, bool isPressed);
     bool IsEnableCombineKey(const std::shared_ptr<KeyEvent> key);
+    bool IsExcludeKey(const std::shared_ptr<KeyEvent> key);
     void RemoveSubscribedTimer(int32_t keyCode);
     void HandleSpecialKeys(int32_t keyCode, int32_t keyAction);
     void InterruptTimers();
@@ -232,15 +241,18 @@ private:
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 private:
+    Sequence matchedSequence_;
     ShortcutKey lastMatchedKey_;
     ShortcutKey currentLaunchAbilityKey_;
     std::map<std::string, ShortcutKey> shortcutKeys_;
     std::vector<Sequence> sequences_;
+    std::vector<ExcludeKey> excludeKeys_;
     std::vector<Sequence> filterSequences_;
     std::vector<SequenceKey> keys_;
     std::vector<RepeatKey> repeatKeys_;
     std::vector<std::string> businessIds_;
     bool isParseConfig_ { false };
+    bool isParseExcludeConfig_ { false };
     std::map<int32_t, int32_t> specialKeys_;
     std::map<int32_t, std::list<int32_t>> specialTimers_;
     TwoFingerGesture twoFingerGesture_;
