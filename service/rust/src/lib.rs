@@ -61,18 +61,13 @@ impl AccelerateCurves {
                     },
                     CurveItem {
                         speeds: vec![8, 32, 128],
-                        slopes: vec![0.48, 0.90, 1.68],
-                        diff_nums: vec![0.0, -3.36, -28.32],
-                    },
-                    CurveItem {
-                        speeds: vec![8, 32, 128],
-                        slopes: vec![0.64, 1.20, 2.24],
+                        slopes: vec![0.64, 1.2, 2.24],
                         diff_nums: vec![0.0, -4.48, -37.76],
                     },
                     CurveItem {
                         speeds: vec![8, 32, 128],
                         slopes: vec![0.80, 1.50, 2.80],
-                        diff_nums: vec![0.0, -5.60, -47.20],
+                        diff_nums: vec![0.0, -5.6, -47.2],
                     },
                     CurveItem {
                         speeds: vec![8, 32, 128],
