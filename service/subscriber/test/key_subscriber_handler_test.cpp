@@ -237,7 +237,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsPreKeysMatch_001, 
     ASSERT_FALSE(handler.IsPreKeysMatch(preKeys, pressedKeys));
     pressedKeys = {1, 2, 3};
     preKeys = {1, 2, 3, 4};
-    ASSERT_FALSE(handler.IsPreKeysMatch(preKeys,pressedKeys));
+    ASSERT_FALSE(handler.IsPreKeysMatch(preKeys, pressedKeys));
 }
 
 /**
