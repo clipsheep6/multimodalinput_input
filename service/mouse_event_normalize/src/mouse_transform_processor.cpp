@@ -87,9 +87,11 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
         libinput_event_pointer_get_dy_unaccelerated(data)};
     auto displayInfo = WinMgr->GetPhysicalDisplay(cursorPos.displayId);
     CHKPR(displayInfo, ERROR_NULL_POINTER);
+#ifndef OHOS_BUILD_EMULATOR
     if (displayInfo->displayDirection == DIRECTION0) {
         CalculateOffset(displayInfo->direction, offset);
     }
+#endif // OHOS_BUILD_EMULATOR
     const int32_t type = libinput_event_get_type(event);
     int32_t ret = RET_ERR;
     if (type == LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD) {
@@ -109,7 +111,7 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
 #endif // OHOS_BUILD_EMULATOR
     WinMgr->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
     pointerEvent_->SetTargetDisplayId(cursorPos.displayId);
-    MMI_HILOGD("Change coordinate: x:%{public}lf, y:%{public}lf, currentDisplayId:%{public}d",
+    MMI_HILOGD("Change coordinate: x:%{public}.2f, y:%{public}.2f, currentDisplayId:%{public}d",
         cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
     return RET_OK;
 }
@@ -665,7 +667,7 @@ int32_t MouseTransformProcessor::SetPointerLocation(int32_t x, int32_t y)
     cursorPos.cursorPos.x = x;
     cursorPos.cursorPos.y = y;
 
-    WinMgr->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
+    WinMgr->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y, false);
     auto mouseLoc = WinMgr->GetMouseInfo();
     IPointerDrawingManager::GetInstance()->SetPointerLocation(mouseLoc.physicalX, mouseLoc.physicalY);
     return RET_OK;
