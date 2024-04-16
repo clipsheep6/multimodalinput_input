@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
-#include <cstdio>
-#include <gtest/gtest.h>
 
+#include <gtest/gtest.h>
 #include "libinput.h"
+
 #include "define_multimodal.h"
 #include "gesture_transform_processor.h"
 
@@ -27,27 +27,11 @@ using namespace testing::ext;
 }
 class GestureTransformProcessorTest : public testing::Test {
 public:
-    static void SetUpTestCase(void);
-    static void TearDownTestCase(void);
-    void SetUp();
-    void TearDown();
+    static void SetUpTestCase(void) {}
+    static void TearDownTestCase(void) {}
+    void SetUp() {}
+    void TearDoen() {}
 };
-
-void GestureTransformProcessorTest::SetUpTestCase(void)
-{
-}
-
-void GestureTransformProcessorTest::TearDownTestCase(void)
-{
-}
-
-void GestureTransformProcessorTest::SetUp()
-{
-}
-
-void GestureTransformProcessorTest::TearDown()
-{
-}
 
 /**
  * @tc.name: GestureTransformProcessorTest
