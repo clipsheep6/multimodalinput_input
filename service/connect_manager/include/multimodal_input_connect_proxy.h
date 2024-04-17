@@ -25,6 +25,7 @@
 #include "mmi_event_observer.h"
 #include "multimodalinput_ipc_interface_code.h"
 
+
 namespace OHOS {
 namespace MMI {
 class MultimodalInputConnectProxy final : public IRemoteProxy<IMultimodalInputConnect> {
@@ -118,6 +119,32 @@ public:
     int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState) override;
     int32_t Authorize(bool isAuthorize) override;
     int32_t CancelInjection() override;
+    
+    /**
+     * @brief Get whether System has IrEmitter.1
+     * @param hasIrEmitter the para takes the value which Indicates the device has  IrEmitter or not,  .
+     * @return 0 if success; returns a non-0 value otherwise.
+     * @since 11
+     */
+    int32_t HasIrEmitter(  bool &hasIrEmitter) override;
+
+    /**
+     * @brief Get InfraredFrequency of the IrEmitter in device.
+     * @param requencys take out the IrEmitter's Frequency  .
+     * @return 0 if success; returns a non-0 value otherwise.
+     * @since 11
+     */
+    int32_t GetInfraredFrequencies( std::vector<InfraredFrequency>& requencys) override;
+
+    /**
+     * @brief user IrEmitter with parameter number and pattern.
+     * @param number   Frequency of IrEmitter works .
+     * @param requencys  pattern  of IrEmitter works .
+     * @return 0 if success; returns a non-0 value otherwise.
+     * @since 11
+     */
+    int32_t TransmitInfrared( int64_t number, std::vector<int64_t> pattern) override;
+
 
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;
