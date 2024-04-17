@@ -2094,8 +2094,6 @@ int32_t MultimodalInputConnectStub::StubHasIrEmitter(MessageParcel& data, Messag
         return ERROR_NOT_SYSAPI;
     }
     
-    int32_t pid = 0; 
-
     bool hasIrEmitter = false;
     int32_t ret = HasIrEmitter( hasIrEmitter);
     if (ret != RET_OK) {

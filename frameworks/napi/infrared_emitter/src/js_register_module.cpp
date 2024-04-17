@@ -102,7 +102,7 @@ CALL_DEBUG_ENTER;
 size_t argc = 2;
 napi_value argv[2];
 CHKRF(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-// MMI_HILOGE(" result from ParseTransmitInfraredJSParam argc :%{public}d",   argc);
+// MMI_HILOGE(" result from ParseTransmitInfraredJSParam argc :%{public}zu",   argc);
 if ( argc != 2) {
     MMI_HILOGE("ParseTransmitInfraredJSParam Parameter number error");
     return false;
