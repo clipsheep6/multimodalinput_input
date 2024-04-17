@@ -205,16 +205,16 @@ static napi_value GetInfraredFrequencies(napi_env env, napi_callback_info info)
         MMI_HILOGE("Parse GetInfraredFrequencies  requst error. returnCode: %{public}d", ret);
         return result;
     }
-    //int32_t size = requencys.size();
-    // std::string logPrint = "size:" + std::to_string(size) + ";\r\n";  
-    // MMI_HILOGE(" result from GetInfraredFrequencies :%{public}s " , logPrint.c_str());
-    // for(int32_t i = 0; i < size; i++)
-    // {
-    //     InfraredFrequency frequencyItem = requencys[i];
-    //     logPrint = std::to_string(i) + ":--  max:" + std::to_string(frequencyItem.max_) + ";min:" 
-    //     +  std::to_string(frequencyItem.min_) + ";\r\n";
-    //     MMI_HILOGE("  :%{public}s " , logPrint.c_str());
-    // } 
+    int32_t size = requencys.size();
+    std::string logPrint = "size:" + std::to_string(size) + ";\r\n";  
+    MMI_HILOGI(" result from GetInfraredFrequencies :%{public}s " , logPrint.c_str());
+    for(int32_t i = 0; i < size; i++)
+    {
+        InfraredFrequency frequencyItem = requencys[i];
+        logPrint = std::to_string(i) + "max:" + std::to_string(frequencyItem.max_) + ";min:" 
+        +  std::to_string(frequencyItem.min_) + ";\r\n";
+        MMI_HILOGI("index:[%{}d]:%{public}s " ,i ,logPrint.c_str());
+    } 
     
     CHKRP(napi_create_array(env, &result), CREATE_ARRAY); 
     for(size_t i = 0; i < requencys.size(); i++) {
@@ -242,13 +242,13 @@ static napi_value TransmitInfrared(napi_env env, napi_callback_info info) {
         return nullptr;
     }
 
-    // int32_t size = static_cast<int32_t>(pattern.size());
-    // std::string context = "number:" + std::to_string(number) + "\r\n" + ";  size=" + std::to_string(size) + ";\r\n";
-    // MMI_HILOGE("***************************** js_register_module TransmitInfrared para size :%{public}s " , context.c_str());
-    // for(int32_t i = 0; i < size; i++) {
-    //     context =  std::to_string(i) + ":  pattern: " + std::to_string(pattern[i]) + ";\r\n";
-    //     MMI_HILOGE("***************************** js_register_module TransmitInfrared para :%{public}s " , context.c_str());
-    // }            
+    int32_t size = static_cast<int32_t>(pattern.size());
+    std::string context = "number:" + std::to_string(number) + "\r\n" + ";  size=" + std::to_string(size) + ";\r\n";
+    MMI_HILOGI("js_register_module.TransmitInfrared para size :%{public}s " , context.c_str());
+    for(int32_t i = 0; i < size; i++) {
+        context =  std::to_string(i) + ":  pattern: " + std::to_string(pattern[i]) + ";\r\n";
+        MMI_HILOGI("***************************** js_register_module TransmitInfrared para :%{public}s " , context.c_str());
+    }            
     int32_t ret = InputManager::GetInstance()->TransmitInfrared(number, pattern);      
     /********处理权限错误的问题 *******/
     if(0 > ret) {

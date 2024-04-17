@@ -1940,11 +1940,7 @@ int32_t MultimodalInputConnectProxy::GetInfraredFrequencies(std::vector<Infrared
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     } 
-    
-    // int32_t pid = GetCallingPid();
-     int32_t pid = 0;
-    // /**写入pid**/
-    WRITEINT32(data, pid, ERR_INVALID_VALUE);
+
 
     MessageParcel reply;
     MessageOption option;
@@ -1989,15 +1985,12 @@ int32_t MultimodalInputConnectProxy::TransmitInfrared(int64_t number, std::vecto
         return ERR_INVALID_VALUE;
     }
 
-    //int32_t pid = GetCallingPid();
-    int32_t pid = 0;
-    // /**写入pid**/
-    WRITEINT32(data, pid, ERR_INVALID_VALUE);
-
     WRITEINT64(data, number, ERR_INVALID_VALUE);
+
     /*******写入,数组大小 *******/
     WRITEINT32(data, static_cast<int64_t>(pattern.size()), ERR_INVALID_VALUE);
     /*******  Pattern of signal transmission in alternate on/off mode, in microseconds.    **********/
+    
     for (const auto &item : pattern) {
         WRITEINT64(data, item);
     }

@@ -2095,7 +2095,7 @@ int32_t MultimodalInputConnectStub::StubHasIrEmitter(MessageParcel& data, Messag
     }
     
     int32_t pid = 0;
-    /** 读取   pid **/
+    /** 锟斤拷取   pid **/
     READINT32(data, pid, IPC_PROXY_DEAD_OBJECT_ERR);
 
     bool hasIrEmitter = false;
@@ -2104,7 +2104,7 @@ int32_t MultimodalInputConnectStub::StubHasIrEmitter(MessageParcel& data, Messag
         MMI_HILOGE("Call StubHasIrEmitter failed ret:%{public}d", ret);
         return ret;
     }
-    /**** 操作结果写道返回结构中 ****/
+    /****  ****/
     WRITEINT32(reply, ret); 
     WRITEBOOL(reply, hasIrEmitter, IPC_STUB_WRITE_PARCEL_ERR);
     return RET_OK;
@@ -2113,18 +2113,16 @@ int32_t MultimodalInputConnectStub::StubHasIrEmitter(MessageParcel& data, Messag
 
 int32_t MultimodalInputConnectStub::StubGetInfraredFrequencies(MessageParcel& data, MessageParcel& reply)
 {
-    MMI_HILOGE("StubGetInfraredFrequencies for trace, delete this while finish  %d",__LINE__);
-
-    CALL_DEBUG_ENTER;
+    // CALL_DEBUG_ENTER;
     // if (!PerHelper->VerifySystemApp()) {
     //     MMI_HILOGE("GetInfraredFrequencies Verify system APP failed");
     //     return ERROR_NOT_SYSAPI;
     // }
  
-    if (!PerHelper->CheckInfraredEmmit()) {
-        MMI_HILOGE("MultimodalInputConnectStub::StubGetInfraredFrequencies permission check failed. returnCode:%{public}d", ERROR_NO_PERMISSION);
-        return ERROR_NO_PERMISSION;
-    }
+    // if (!PerHelper->CheckInfraredEmmit()) {
+    //     MMI_HILOGE("MultimodalInputConnectStub::StubGetInfraredFrequencies permission check failed. returnCode:%{public}d", ERROR_NO_PERMISSION);
+    //     return ERROR_NO_PERMISSION;
+    // }
 
     std::vector<InfraredFrequency> requencys;
     int32_t ret = GetInfraredFrequencies( requencys);
@@ -2132,8 +2130,6 @@ int32_t MultimodalInputConnectStub::StubGetInfraredFrequencies(MessageParcel& da
         MMI_HILOGE("Call StubGetInfraredFrequencies failed returnCode:%{public}d", ret);
         return ret;
     }
-    /**** 操作结果写道返回结构中 ****/
-    WRITEINT32(reply, ret);
 
     WRITEINT64(reply, requencys.size());
     for(const auto &item : requencys) 
@@ -2152,17 +2148,12 @@ int32_t MultimodalInputConnectStub::StubTransmitInfrared(MessageParcel& data, Me
     //     MMI_HILOGE("StubTransmitInfrared Verify system APP failed");
     //     return ERROR_NOT_SYSAPI;
     // }
+  
+    // if (!PerHelper->CheckInfraredEmmit()) {
+    //     MMI_HILOGE("StubTransmitInfrared permission check failed. returnCode:%{public}d", ERROR_NO_PERMISSION);
+    //     return ERROR_NO_PERMISSION;
+    // }
  
-    int32_t pid = GetCallingPid(); 
-    if (!PerHelper->CheckInfraredEmmit()) {
-        MMI_HILOGE("StubTransmitInfrared permission check failed. returnCode:%{public}d", ERROR_NO_PERMISSION);
-        return ERROR_NO_PERMISSION;
-    }
-
-    /** 读取   pid **/
-    READINT32(data, pid, IPC_PROXY_DEAD_OBJECT_ERR);
-    //MMI_HILOGE("MultimodalInputConnectStub::StubTransmitInfrared GetCallingPid():%d, parameter pid:  %d",pidFunction, pid);
-
     int64_t number =0;
     READINT64(data, number, IPC_PROXY_DEAD_OBJECT_ERR);
 
@@ -2180,7 +2171,7 @@ int32_t MultimodalInputConnectStub::StubTransmitInfrared(MessageParcel& data, Me
         MMI_HILOGE("Call StubTransmitInfrared failed returnCode:%{public}d", ret);
         return ret;
     }
-    /**** 操作结果写道返回结构中 ****/
+    /****   ****/
     WRITEINT32(reply, ret);
     return RET_OK;
 }

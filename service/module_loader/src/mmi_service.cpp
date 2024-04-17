@@ -2064,53 +2064,55 @@ int32_t MMIService::TransmitInfrared(int64_t number, std::vector<int64_t> patter
 
 int32_t MMIService::OnHasIrEmitter( bool &hasIrEmitter)
 {
-    int32_t pid = GetCallingPid();
-    int32_t uid = GetCallingUid();
+    int32_t pid = GetCallingPid(); 
     // int32_t ret = CheckPidPermission(pid);
     // if (ret != RET_OK) {
     //     return ret;
     // }
 
-    /***引入驱动,处理***/
+    /*** ***/
     return RET_OK;  
 }
 
 int32_t MMIService::OnGetInfraredFrequencies( std::vector<InfraredFrequency>& requencys)
 {    
-    int32_t pid = GetCallingPid();
-    int32_t uid = GetCallingUid();
+    int32_t pid = GetCallingPid(); 
     // int32_t ret = CheckPidPermission(pid);
     // if (ret != RET_OK) {
     //     return ret;
     // }
-    return 202;
+    /********get data from hdf ******/
     for(int i = 1; i < 20; i++) {
         InfraredFrequency itemFrequency;
         itemFrequency.max_ = 500*i;
         itemFrequency.min_ = 100*i; 
         requencys.emplace_back(itemFrequency);
     }
-    /***引入驱动,处理***/
+    /*** construct requencys data as a string, and print the string to log   ***/
+    std::string context = "";
+    int32_t size = static_cast<int32_t>(requencys.size());
+    for(int32_t i = 0; i < size; i ++) {
+        context = context + "requencys[" + std::to_string(i) + 
+            "]. max="  + std::to_string( requencys[i].max_) + ",min=" + std::to_string( requencys[i].min_) +";";
+    } 
+    MMI_HILOGI("MMIService::OnGetInfraredFrequencies data from hdf is. %{public}s " , context.c_str());
     return RET_OK;
 }
 
-int32_t MMIService::OnTransmitInfrared( int64_t number, std::vector<int64_t> pattern)
+int32_t MMIService::OnTransmitInfrared( int64_t infraredFrequency, std::vector<int64_t> pattern)
 {
-    int32_t pid = GetCallingPid();
-    int32_t uid = GetCallingUid();
+    int32_t pid = GetCallingPid(); 
     // int32_t ret = CheckPidPermission(pid);
     // if (ret != RET_OK) {
     //     return ret;
     // }
-
-    std::string context = "*********** number:" + std::to_string(number) + ";";
+    std::string context = "infraredFrequency:" + std::to_string(infraredFrequency) + ";";
     int32_t size = static_cast<int32_t>(pattern.size());
     for(int32_t i = 0; i < size; i ++) {
-        context = context +  std::to_string( i) + ":  pattern: " +std::to_string( pattern[i]) + ";";
-    }
-    MMI_HILOGF("OnTransmitInfrared para : argv:%{public}s " , context.c_str());
-
-    /***引入驱动,处理***/  
+        context = context  + "index:" +  std::to_string( i) + ": pattern:" +std::to_string( pattern[i]) + ";";
+    } 
+    MMI_HILOGI("MMIService::OnTransmitInfrared para.  %{public}s \r\n" , context.c_str());
+    /*** ***/  
     return RET_OK;    
 }
 
