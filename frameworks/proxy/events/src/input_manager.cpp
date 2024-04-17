@@ -522,5 +522,41 @@ void InputManager::Authorize(bool isAuthorize)
 {
     InputMgrImpl.Authorize(isAuthorize);
 }
+
+    /**
+     * @brief Get whether System has IrEmitter.
+     * @param hasIrEmitter the para takes the value which Indicates the device has  IrEmitter or not,  .
+     * @return 0 if success; returns a non-0 value otherwise.
+     * @since 11
+     */
+    int32_t InputManager::HasIrEmitter(bool &hasIrEmitter) 
+    {
+        return InputMgrImpl.HasIrEmitter(hasIrEmitter);
+    }
+
+    /**
+     * @brief Get InfraredFrequency of the IrEmitter in device.
+     * @param requencys take out the IrEmitter's Frequency  .
+     * @return 0 if success; returns a non-0 value otherwise.
+     * @since 11
+     */
+    int32_t InputManager::GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys)
+    {
+        return InputMgrImpl.GetInfraredFrequencies(requencys);        
+    }
+    /**
+     * @brief user IrEmitter with parameter number and pattern.
+     * @param number   Frequency of IrEmitter works .
+     * @param requencys  pattern  of IrEmitter works .
+     * @return 0 if success; returns a non-0 value otherwise.
+     * @since 11
+     */
+    int32_t InputManager::TransmitInfrared(int64_t number, std::vector<int64_t> pattern)
+    {
+        return InputMgrImpl.TransmitInfrared(number, pattern);                
+    }
+	
+	 
+
 } // namespace MMI
 } // namespace OHOS
