@@ -80,7 +80,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchEventWi
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent->AddPointerItem(item1);
     flag = eventNormalizeHandler.HandleTouchEventWithFlag(pointerEvent);
-    ASSERT_EQ(flag, false);
+    ASSERT_FALSE(flag);
 
     pointerEvent->RemovePointerItem(0);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
@@ -90,7 +90,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchEventWi
     item2.SetDisplayY(0);
     pointerEvent->AddPointerItem(item2);
     flag = eventNormalizeHandler.HandleTouchEventWithFlag(pointerEvent);
-    ASSERT_EQ(flag, true);
+    ASSERT_TRUE(flag);
 }
 
 /**
@@ -116,7 +116,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchEventWi
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent->AddPointerItem(item1);
     flag = eventNormalizeHandler.HandleTouchEventWithFlag(pointerEvent);
-    ASSERT_EQ(flag, false);
+    ASSERT_FALSE(flag);
 
     pointerEvent->RemovePointerItem(0);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
@@ -126,7 +126,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchEventWi
     item2.SetDisplayY(1);
     pointerEvent->AddPointerItem(item2);
     flag = eventNormalizeHandler.HandleTouchEventWithFlag(pointerEvent);
-    ASSERT_EQ(flag, false);
+    ASSERT_FALSE(flag);
 }
 
 /**
@@ -152,7 +152,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchEventWi
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent->AddPointerItem(item1);
     flag = eventNormalizeHandler.HandleTouchEventWithFlag(pointerEvent);
-    ASSERT_EQ(flag, false);
+    ASSERT_FALSE(flag);
 
     pointerEvent->RemovePointerItem(0);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
@@ -162,7 +162,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchEventWi
     item2.SetDisplayY(2);
     pointerEvent->AddPointerItem(item2);
     flag = eventNormalizeHandler.HandleTouchEventWithFlag(pointerEvent);
-    ASSERT_EQ(flag, false);
+    ASSERT_FALSE(flag);
 }
 
 /**
@@ -188,7 +188,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchEventWi
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent->AddPointerItem(item1);
     flag = eventNormalizeHandler.HandleTouchEventWithFlag(pointerEvent);
-    ASSERT_EQ(flag, false);
+    ASSERT_FALSE(flag);
 
     pointerEvent->RemovePointerItem(0);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
@@ -198,7 +198,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchEventWi
     item2.SetDisplayY(0);
     pointerEvent->AddPointerItem(item2);
     flag = eventNormalizeHandler.HandleTouchEventWithFlag(pointerEvent);
-    ASSERT_EQ(flag, false);
+    ASSERT_FALSE(flag);
 }
 
 /**
@@ -224,7 +224,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchEventWi
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent->AddPointerItem(item1);
     flag = eventNormalizeHandler.HandleTouchEventWithFlag(pointerEvent);
-    ASSERT_EQ(flag, false);
+    ASSERT_FALSE(flag);
 
     pointerEvent->RemovePointerItem(0);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
@@ -234,7 +234,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchEventWi
     item2.SetDisplayY(1);
     pointerEvent->AddPointerItem(item2);
     flag = eventNormalizeHandler.HandleTouchEventWithFlag(pointerEvent);
-    ASSERT_EQ(flag, false);
+    ASSERT_FALSE(flag);
 }
 
 /**
@@ -260,7 +260,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchEventWi
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent->AddPointerItem(item1);
     flag = eventNormalizeHandler.HandleTouchEventWithFlag(pointerEvent);
-    ASSERT_EQ(flag, false);
+    ASSERT_FALSE(flag);
 
     pointerEvent->RemovePointerItem(0);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
@@ -270,7 +270,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchEventWi
     item2.SetDisplayY(2);
     pointerEvent->AddPointerItem(item2);
     flag = eventNormalizeHandler.HandleTouchEventWithFlag(pointerEvent);
-    ASSERT_EQ(flag, false);
+    ASSERT_FALSE(flag);
 }
 
 /**
@@ -282,7 +282,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchEventWi
 HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_AddHandleTimer_001, TestSize.Level1)
 {
     EventNormalizeHandler eventNormalizeHandler;
-    int32_t timeOut = 400;
+    const int32_t timeOut = 400;
     int32_t timeId = eventNormalizeHandler.AddHandleTimer(timeOut);
     ASSERT_NE(timeId, -1);
 }
@@ -466,7 +466,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_ProcessNullEvent_0
     libinput_event *event = nullptr;
     int64_t frametime = 30;
     bool flag = eventNormalizeHandler.ProcessNullEvent(event, frametime);
-    ASSERT_EQ(flag, false);
+    ASSERT_FALSE(flag);
 }
 } // namespace MMI
 } // namespace OHOS

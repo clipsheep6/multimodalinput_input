@@ -960,6 +960,9 @@ const DisplayInfo* InputWindowsManager::FindPhysicalDisplayInfo(const std::strin
         }
     }
     MMI_HILOGE("Failed to search for Physical,uniq:%{public}s", uniq.c_str());
+    if (displayGroupInfo_.displaysInfo.size() > 0) {
+        return &displayGroupInfo_.displaysInfo[0];
+    }
     return nullptr;
 }
 
@@ -1877,6 +1880,15 @@ bool InputWindowsManager::IsNeedDrawPointer(PointerEvent::PointerItem &pointerIt
 }
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
+bool InputWindowsManager::SkipAnnotationWindow(uint32_t flag, int32_t toolType)
+{
+    if ((flag & WindowInfo::FLAG_BIT_HANDWRITING) == WindowInfo::FLAG_BIT_HANDWRITING
+        && toolType == PointerEvent::TOOL_TYPE_FINGER) {
+        return true;
+    }
+    return false;
+}
+
 int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -1922,6 +1934,9 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         if (checkWindow) {
             MMI_HILOGD("Skip the untouchable or invalid zOrder window to continue searching, "
                        "window:%{public}d, flags:%{public}d", item.id, item.flags);
+            continue;
+        }
+        if (SkipAnnotationWindow(item.flags, pointerItem.GetToolType())) {
             continue;
         }
 
@@ -2379,8 +2394,42 @@ void InputWindowsManager::GetWidthAndHeight(const DisplayInfo* displayInfo, int3
         height = displayInfo->height;
     }
 }
+void InputWindowsManager::ReverseRotateScreen(const DisplayInfo& info, const double x, const double y,
+    Coordinate2D& cursorPos) const
+{
+    const Direction direction = info.direction;
+    MMI_HILOGD("X:%{public}.2f, Y:%{public}.2f, info.width:%{public}d, info.height:%{public}d",
+        x, y, info.width, info.height);
+    if (direction == DIRECTION0) {
+        MMI_HILOGD("direction is DIRECTION0");
+        cursorPos.x = x;
+        cursorPos.y = y;
+        MMI_HILOGD("physicalX:%{public}.2f, physicalY:%{public}.2f", cursorPos.x, cursorPos.y);
+        return;
+    }
+    if (direction == DIRECTION90) {
+        MMI_HILOGD("direction is DIRECTION90");
+        cursorPos.y = static_cast<double>(info.width) - x;
+        cursorPos.y = y;
+        MMI_HILOGD("physicalX:%{public}.2f, physicalY:%{public}.2f", cursorPos.x, cursorPos.y);
+        return;
+    }
+    if (direction == DIRECTION180) {
+        MMI_HILOGD("direction is DIRECTION180");
+        cursorPos.x = static_cast<double>(info.width) - x;
+        cursorPos.y = static_cast<double>(info.height) - y;
+        MMI_HILOGD("physicalX:%{public}.2f, physicalY:%{public}.2f", cursorPos.x, cursorPos.y);
+        return;
+    }
+    if (direction == DIRECTION270) {
+        MMI_HILOGD("direction is DIRECTION270");
+        cursorPos.x = static_cast<double>(info.height) - y;
+        cursorPos.y = x;
+        MMI_HILOGD("physicalX:%{public}.2f, physicalY:%{public}.2f", cursorPos.x, cursorPos.y);
+    }
+}
 
-void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, double& x, double& y)
+void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, double& x, double& y, bool isRealData)
 {
     auto displayInfo = GetPhysicalDisplay(displayId);
     CHKPV(displayInfo);
@@ -2401,11 +2450,7 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     x = static_cast<double>(integerX) + (x - floor(x));
     y = static_cast<double>(integerY) + (y - floor(y));
 
-    cursorPos_.displayId = displayId;
-    cursorPos_.cursorPos.x = x;
-    cursorPos_.cursorPos.y = y;
-
-    if (displayInfo->displayDirection == DIRECTION0) {
+    if (displayInfo->displayDirection == DIRECTION0 && isRealData) {
         LogicalCoordinate coord {
             .x = integerX,
             .y = integerY,
@@ -2420,6 +2465,13 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     mouseLocation_.displayId = displayId;
     MMI_HILOGD("Mouse Data: physicalX:%{public}d,physicalY:%{public}d, displayId:%{public}d",
         mouseLocation_.physicalX, mouseLocation_.physicalY, displayId);
+    cursorPos_.displayId = displayId;
+    if (isRealData) {
+        cursorPos_.cursorPos.x = x;
+        cursorPos_.cursorPos.y = y;
+        return;
+    }
+    ReverseRotateScreen(*displayInfo, x, y, cursorPos_.cursorPos);
 }
 
 MouseLocation InputWindowsManager::GetMouseInfo()

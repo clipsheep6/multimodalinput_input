@@ -1910,9 +1910,8 @@ int32_t MultimodalInputConnectProxy::SetMoveEventFilters(bool flag)
         SET_MOVE_EVENT_FILTERS), data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS

@@ -209,6 +209,7 @@ void InputManagerImpl::SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen)
         return;
     }
     enhanceCfg_ = new (std::nothrow) uint8_t[cfgLen];
+    CHKPV(enhanceCfg_);
     if (memcpy_s(enhanceCfg_, cfgLen, cfg, cfgLen)) {
         MMI_HILOGE("cfg memcpy failed!");
         return;
@@ -2030,9 +2031,8 @@ int32_t InputManagerImpl::SetMoveEventFilters(bool flag)
     int32_t ret = MultimodalInputConnMgr->SetMoveEventFilters(flag);
     if (ret != RET_OK) {
         MMI_HILOGE("Set move event filters failed, ret:%{public}d", ret);
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS

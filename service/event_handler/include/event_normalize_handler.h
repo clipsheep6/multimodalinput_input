@@ -63,7 +63,7 @@ private:
     std::set<int32_t> buttonIds_ {};
     bool moveEventFilterFlag_ { false };
     std::mutex lockFlag_;
-    std::list<PointerEvent::PointerItem> lastTouchDownItems_ {};
+    std::list<PointerEvent::PointerItem> lastTouchDownItems_;
 
     void ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent, struct libinput_event *event);
     bool ProcessNullEvent(libinput_event *event, int64_t frameTime);

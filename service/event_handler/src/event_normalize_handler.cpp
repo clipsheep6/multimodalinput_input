@@ -21,6 +21,7 @@
 
 #include "error_multimodal.h"
 #include "event_log_helper.h"
+#include "event_resample.h"
 #include "gesture_handler.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
@@ -30,12 +31,14 @@
 #include "key_event_value_transformation.h"
 #include "libinput_adapter.h"
 #include "mmi_log.h"
+#include "multimodal_input_preferences_manager.h"
 #include "time_cost_chk.h"
 #include "timer_manager.h"
 #include "touch_event_normalize.h"
-#include "event_resample.h"
 #include "touchpad_transform_processor.h"
-#include "multimodal_input_preferences_manager.h"
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+#include "fingerprint_event_processor.h"
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
 namespace OHOS {
 namespace MMI {
@@ -43,7 +46,6 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventNormalizeHandler" };
 constexpr int32_t FINGER_NUM = 2;
 constexpr int32_t MT_TOOL_PALM = 2;
-constexpr double EPS = 1e-8;
 constexpr double TOUCH_SLOP = 1.0;
 constexpr int32_t SQUARE = 2;
 constexpr double DENSITY_BASELINE = 160.0;
@@ -262,6 +264,11 @@ void EventNormalizeHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent>
 
 int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
 {
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+    if (FingerprintEventHdr->IsFingerprintEvent(event)) {
+        return FingerprintEventHdr->HandleFingerprintEvent(event);
+    }
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
     if (nextHandler_ == nullptr) {
         MMI_HILOGW("Keyboard device does not support");
         return ERROR_UNSUPPORT;
@@ -317,6 +324,11 @@ void EventNormalizeHandler::UpdateKeyEventHandlerChain(const std::shared_ptr<Key
 
 int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
 {
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+    if (FingerprintEventHdr->IsFingerprintEvent(event)) {
+        return FingerprintEventHdr->HandleFingerprintEvent(event);
+    }
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
     if (nextHandler_ == nullptr) {
         MMI_HILOGW("Pointer device does not support");
         return ERROR_UNSUPPORT;
@@ -426,7 +438,7 @@ int32_t EventNormalizeHandler::GestureIdentify(libinput_event* event)
         MMI_HILOGD("touchpad rotate switch is false");
         return RET_ERR;
     }
-    
+
     auto rotateAngle = GESTURE_HANDLER->GetRotateAngle();
 
     if (nextHandler_ == nullptr) {
@@ -623,9 +635,8 @@ int32_t EventNormalizeHandler::SetMoveEventFilters(bool flag)
     int32_t ret = PreferencesMgr->SetBoolValue("moveEventFilterFlag", "mouse_settings.xml", moveEventFilterFlag_);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to save moveEventFilterFlag, ret:%{public}d", ret);
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 
 bool EventNormalizeHandler::HandleTouchEventWithFlag(const std::shared_ptr<PointerEvent> pointerEvent)
@@ -649,7 +660,7 @@ bool EventNormalizeHandler::HandleTouchEventWithFlag(const std::shared_ptr<Point
             return false;
         }
         double offset = CalcTouchOffset(pointerEvent);
-        bool isMoveEventFiltered = (offset + EPS < TOUCH_SLOP);
+        bool isMoveEventFiltered = MMI_LNE(offset, TOUCH_SLOP);
         MMI_HILOGI("Touch move event, offset:%{public}f, isMoveEventFiltered:%{public}s",
             offset, isMoveEventFiltered ? "true" : "false");
         isFirstMoveEvent = !isMoveEventFiltered;
@@ -680,7 +691,9 @@ double EventNormalizeHandler::CalcTouchOffset(const std::shared_ptr<PointerEvent
     auto displayInfo = WinMgr->GetPhysicalDisplay(touchMoveEvent->GetTargetDisplayId());
     if (displayInfo != nullptr) {
         double scale = static_cast<double>(displayInfo->dpi / DENSITY_BASELINE);
-        offset *= scale;
+        if (!MMI_EQ(static_cast<float>(scale), 0.f)) {
+            offset /= scale;
+        }
     }
     return offset;
 }

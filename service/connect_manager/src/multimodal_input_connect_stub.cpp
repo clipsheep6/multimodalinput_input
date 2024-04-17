@@ -2082,9 +2082,8 @@ int32_t MultimodalInputConnectStub::StubSetMoveEventFilters(MessageParcel& data,
     int32_t ret = SetMoveEventFilters(flag);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetMoveEventFilters failed, ret:%{public}d", ret);
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS
