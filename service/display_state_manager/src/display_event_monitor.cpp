@@ -45,6 +45,7 @@ public:
             MMI_HILOGE("action is empty");
             return;
         }
+        screenStatus_ = action;
         if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
             MMI_HILOGD("display screen on");
             if (FINGERSENSE_WRAPPER->enableFingersense_ != nullptr) {

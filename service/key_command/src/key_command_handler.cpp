@@ -35,6 +35,7 @@
 #include "util_ex.h"
 #include "nap_process.h"
 #include "multimodal_input_preferences_manager.h"
+#include "display_event_monitor.h"
 
 namespace OHOS {
 namespace MMI {
@@ -563,6 +564,37 @@ bool ConvertToKeySequence(const cJSON* jsonData, Sequence &sequence)
     return true;
 }
 
+bool ConvertToExcludeKey(const cJSON* jsonData, ExcludeKey &exKey)
+{
+    if (!cJSON_IsObject(jsonData)) {
+        MMI_HILOGE("ExcludeKey jsonData is not object");
+        return false;
+    }
+
+    cJSON *keyCodeJson = cJSON_GetObjectItemCaseSensitive(jsonData, "keyCode");
+    if (!cJSON_IsNumber(keyCodeJson)) {
+        MMI_HILOGE("keyCodeJson is not number");
+        return false;
+    }
+    exKey.keyCode = keyCodeJson->valueint;
+
+    cJSON *keyActionJson = cJSON_GetObjectItemCaseSensitive(jsonData, "keyAction");
+    if (!cJSON_IsNumber(keyActionJson)) {
+        MMI_HILOGE("keyActionJson is not number");
+        return false;
+    }
+    exKey.keyAction = keyActionJson->valueint;
+
+    cJSON *delayJson = cJSON_GetObjectItemCaseSensitive(jsonData, "delay");
+    if (!cJSON_IsNumber(delayJson)) {
+        MMI_HILOGE("delayJson is not number");
+        return false;
+    }
+    exKey.delay = delayJson->valueint;
+
+    return true;
+}
+
 bool ConvertToKeyRepeat(const cJSON* jsonData, RepeatKey &repeatKey)
 {
     if (!cJSON_IsObject(jsonData)) {
@@ -607,7 +639,8 @@ std::string GenerateKey(const ShortcutKey& key)
         ss << preKey << ",";
     }
     ss << key.finalKey << ",";
-    ss << key.triggerType;
+    ss << key.triggerType << ",";
+    ss << key.keyDownDuration;
     return std::string(ss.str());
 }
 
@@ -657,6 +690,28 @@ bool ParseSequences(const JsonParser& parser, std::vector<Sequence>& sequenceVec
             continue;
         }
         sequenceVec.push_back(seq);
+    }
+    return true;
+}
+
+bool ParseExcludeKeys(const JsonParser& parser, std::vector<ExcludeKey>& excludeKeyVec)
+{
+    cJSON* excludeKeys = cJSON_GetObjectItemCaseSensitive(parser.json_, "excludeKeys");
+    if (!cJSON_IsArray(excludeKeys)) {
+        MMI_HILOGE("excludeKeys is not array");
+        return false;
+    }
+    int32_t excludeKeysSize = cJSON_GetArraySize(excludeKeys);
+    for (int32_t i = 0; i < excludeKeysSize; ++i) {
+        ExcludeKey exKey;
+        cJSON *keyJson = cJSON_GetArrayItem(excludeKeys, i);
+        if (!cJSON_IsObject(keyJson)) {
+            continue;
+        }
+        if (!ConvertToExcludeKey(keyJson, exKey)) {
+            continue;
+        }
+        excludeKeyVec.push_back(exKey);
     }
     return true;
 }
@@ -1198,6 +1253,29 @@ bool KeyCommandHandler::ParseConfig()
     return ParseJson(customConfig) || ParseJson(defaultConfig);
 }
 
+bool KeyCommandHandler::ParseExcludeConfig()
+{
+#ifndef UNIT_TEST
+    const char *testPathSuffix = "/etc/multimodalinput/exclude_keys_config.json";
+#else
+    const char *testPathSuffix = "/data/test/exclude_keys_config.json";
+#endif // UNIT_TEST
+    char buf[MAX_PATH_LEN] = { 0 };
+    char *filePath = GetOneCfgFile(testPathSuffix, buf, MAX_PATH_LEN);
+#ifndef UNIT_TEST
+    std::string defaultConfig = "/system/etc/multimodalinput/exclude_keys_config.json";
+#else
+    std::string defaultConfig = "/data/test/exclude_keys_config.json";
+#endif // UNIT_TEST
+    if (filePath == nullptr || filePath[0] == '\0' || strlen(filePath) > MAX_PATH_LEN) {
+        MMI_HILOGD("Can not get customization exclude_keys_config.json file");
+        return ParseExcludeJson(defaultConfig);
+    }
+    std::string customConfig = filePath;
+    MMI_HILOGD("The exclude_keys_config.json file path is :%{public}s", customConfig.c_str());
+    return ParseExcludeJson(customConfig) || ParseExcludeJson(defaultConfig);
+}
+
 void KeyCommandHandler::ParseRepeatKeyMaxCount()
 {
     if (repeatKeys_.empty()) {
@@ -1245,6 +1323,29 @@ bool KeyCommandHandler::ParseJson(const std::string &configFile)
     return true;
 }
 
+bool KeyCommandHandler::ParseExcludeJson(const std::string &configFile)
+{
+    CALL_DEBUG_ENTER;
+    std::string jsonStr = ReadJsonFile(configFile);
+    if (jsonStr.empty()) {
+        MMI_HILOGE("Read excludeKey configFile failed");
+        return false;
+    }
+    JsonParser parser;
+    parser.json_ = cJSON_Parse(jsonStr.c_str());
+    if (!cJSON_IsObject(parser.json_)) {
+        MMI_HILOGE("Parser.json_ of excludeKey is not object");
+        return false;
+    }
+    bool isParseExcludeKeys = ParseExcludeKeys(parser, excludeKeys_);
+    if (!isParseExcludeKeys) {
+        MMI_HILOGE("Parse ExcludeKeys configFile failed");
+        return false;
+    }
+
+    return true;
+}
+
 void KeyCommandHandler::Print()
 {
     MMI_HILOGI("shortcutKey count:%{public}zu", shortcutKeys_.size());
@@ -1277,13 +1378,38 @@ void KeyCommandHandler::PrintSeq()
     }
 }
 
+bool KeyCommandHandler::IsExcludeKey(const std::shared_ptr<KeyEvent> key)
+{
+    size_t keysSize = excludeKeys_.size();
+    for(size_t i = 0; i < keysSize; i++){
+        if(key->GetKeyCode() == excludeKeys_[i].keyCode){
+            if(key->GetKeyAction() == excludeKeys_[i].keyAction){
+                return true;
+            }
+            // if(excludeKeys_[i].keyAction == -1){
+            //     return true;
+            // }
+        }
+    }
+    return false;
+}
+
 bool KeyCommandHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> key)
 {
     CHKPF(key);
     if (enableCombineKey_) {
         return true;
     }
-    if (key->GetKeyCode() == KeyEvent::KEYCODE_POWER && key->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
+
+    if (!isParseExcludeConfig_) {
+        if (!ParseExcludeConfig()) {
+            MMI_HILOGE("Parse Exclude configFile failed");
+            return false;
+        }
+        isParseExcludeConfig_ = true;
+    }
+
+    if (IsExcludeKey(key)) {
         auto items = key->GetKeyItems();
         if (items.size() != 1) {
             return enableCombineKey_;
@@ -1659,6 +1785,7 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
         TimerMgr->RemoveTimer(lastMatchedKey_.timerId);
     }
     ResetLastMatchedKey();
+    bool result = false;
     for (auto &item : shortcutKeys_) {
         ShortcutKey &shortcutKey = item.second;
         if (!shortcutKey.statusConfigValue) {
@@ -1675,12 +1802,15 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
         }
         shortcutKey.Print();
         if (shortcutKey.triggerType == KeyEvent::KEY_ACTION_DOWN) {
-            return HandleKeyDown(shortcutKey);
+            result = HandleKeyDown(shortcutKey) || result;
         } else if (shortcutKey.triggerType == KeyEvent::KEY_ACTION_UP) {
-            return HandleKeyUp(keyEvent, shortcutKey);
+            result = HandleKeyUp(keyEvent, shortcutKey) || result;
         } else {
-            return HandleKeyCancel(shortcutKey);
+            result = HandleKeyCancel(shortcutKey) || result;
         }
+    }
+    if(result){
+        return result;
     }
     return HandleConsumedKeyEvent(keyEvent);
 }
@@ -1722,6 +1852,11 @@ bool KeyCommandHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
 {
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
+    if (matchedSequence_.timerId >= 0) {
+        MMI_HILOGD("Remove matchedSequence timer:%{public}d", matchedSequence_.timerId);
+        TimerMgr->RemoveTimer(matchedSequence_.timerId);
+        matchedSequence_.timerId = -1;
+    }
     if (sequences_.empty()) {
         MMI_HILOGD("No sequences configuration data");
         return false;
@@ -1826,6 +1961,27 @@ bool KeyCommandHandler::HandleSequence(Sequence &sequence, bool &isLaunchAbility
     }
 
     if (keysSize == sequenceKeysSize) {
+        if(sequence.ability.bundleName == "com.ohos.screenshot"){
+            std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
+            if(screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF){
+                MMI_HILOGI("screen off, com.ohos.screenshot invalid.");
+                return false;
+            }else if(screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED){
+                MMI_HILOGI("screen locked, com.ohos.screenshot delay 2000 milisecond.");
+                sequence.timerId = TimerMgr->AddTimer(2000, 1, [this, sequence] () {
+                    MMI_HILOGI("Timer callback");
+                    LaunchAbility(sequence);
+                });
+                if (sequence.timerId < 0) {
+                    MMI_HILOGE("Add Timer failed");
+                    return false;
+                }
+                MMI_HILOGI("Add timer success");
+                matchedSequence_ = sequence;
+                isLaunchAbility = true;
+                return true;
+            }
+        }
         if (sequence.abilityStartDelay == 0) {
             MMI_HILOGI("Start launch ability immediately");
             LaunchAbility(sequence);
