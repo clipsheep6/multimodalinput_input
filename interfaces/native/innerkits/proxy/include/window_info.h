@@ -200,6 +200,13 @@ struct WindowInfo {
     static constexpr uint32_t FLAG_BIT_HANDWRITING = 2;
 
     /**
+     * gesture navigation window
+     *
+     * @since 12
+     */
+    static constexpr uint32_t FLAG_BIT_NAVIGATION = 3;
+
+    /**
      * Globally unique identifier of the window
      *
      * @since 9

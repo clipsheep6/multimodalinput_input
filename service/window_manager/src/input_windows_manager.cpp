@@ -76,6 +76,7 @@ const std::string bindCfgFileName = "/data/service/el1/public/multimodalinput/di
 const std::string mouseFileName = "mouse_settings.xml";
 const std::string defaultIconPath = "/system/etc/multimodalinput/mouse_icon/Default.svg";
 const std::string showCursorSwitchName = "settings.input.show_touch_hint";
+const std::string navigationSwitchName = "settings.input.stylus_navigation_hint";
 } // namespace
 
 enum PointerHotArea : int32_t {
@@ -1877,6 +1878,26 @@ bool InputWindowsManager::IsNeedDrawPointer(PointerEvent::PointerItem &pointerIt
 }
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
+bool InputWindowsManager::SkipNavigationWindow(uint32_t flag, int32_t toolType)
+{
+    CALL_DEBUG_ENTER;
+    if ((flag & WindowInfo::FLAG_BIT_NAVIGATION) != WindowInfo::FLAG_BIT_NAVIGATION
+        || (toolType != PointerEvent::TOOL_TYPE_PEN)) {
+        return false;
+    }
+    if (!isOpenNavigationObserver_) {
+        NavigationMode_.SwitchName = navigationSwitchName;
+        CreateNavigationStatusObserver(NavigationMode_);
+        isOpenNavigationObserver_ = true;
+        SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(navigationSwitchName, 
+            NavigationMode_.isOpen);
+    }
+    if (NavigationMode_.isOpen) {
+        return true;
+    }
+    return false;
+}
+
 int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -1922,6 +1943,9 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         if (checkWindow) {
             MMI_HILOGD("Skip the untouchable or invalid zOrder window to continue searching, "
                        "window:%{public}d, flags:%{public}d", item.id, item.flags);
+            continue;
+        }
+        if (SkipNavigationWindow(item.flags, pointerItem.GetToolType())) {
             continue;
         }
 
@@ -2272,6 +2296,25 @@ void InputWindowsManager::CreateStatusConfigObserver(T& item)
     }
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+template <class T>
+void InputWindowsManager::CreateNavigationStatusObserver(T& item)
+{
+    CALL_DEBUG_ENTER;
+    SettingObserver::UpdateFunc updateFunc = [&item](const std::string& key) {
+        MMI_HILOGD("key: %{public}s, statusValue: %{public}d", key.c_str(), item.isOpen);
+        if (SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(key, item.isOpen) != RET_OK) {
+            MMI_HILOGE("get settingdata failed, key: %{public}s", key.c_str());
+        }
+    };
+    sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
+        .CreateObserver(item.SwitchName, updateFunc);
+    ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).RegisterObserver(statusObserver);
+    if (ret != ERR_OK) {
+        MMI_HILOGE("register setting observer failed, ret=%{public}d", ret);
+        statusObserver = nullptr;
+    }
+}
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent)
