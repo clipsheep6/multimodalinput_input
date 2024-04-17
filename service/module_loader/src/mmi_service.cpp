@@ -2065,10 +2065,6 @@ int32_t MMIService::TransmitInfrared(int64_t number, std::vector<int64_t> patter
 int32_t MMIService::OnHasIrEmitter( bool &hasIrEmitter)
 {
     int32_t pid = GetCallingPid(); 
-    // int32_t ret = CheckPidPermission(pid);
-    // if (ret != RET_OK) {
-    //     return ret;
-    // }
 
     /*** ***/
     return RET_OK;  
@@ -2077,10 +2073,6 @@ int32_t MMIService::OnHasIrEmitter( bool &hasIrEmitter)
 int32_t MMIService::OnGetInfraredFrequencies( std::vector<InfraredFrequency>& requencys)
 {    
     int32_t pid = GetCallingPid(); 
-    // int32_t ret = CheckPidPermission(pid);
-    // if (ret != RET_OK) {
-    //     return ret;
-    // }
     /********get data from hdf ******/
     for(int i = 1; i < 20; i++) {
         InfraredFrequency itemFrequency;
@@ -2102,10 +2094,6 @@ int32_t MMIService::OnGetInfraredFrequencies( std::vector<InfraredFrequency>& re
 int32_t MMIService::OnTransmitInfrared( int64_t infraredFrequency, std::vector<int64_t> pattern)
 {
     int32_t pid = GetCallingPid(); 
-    // int32_t ret = CheckPidPermission(pid);
-    // if (ret != RET_OK) {
-    //     return ret;
-    // }
     std::string context = "infraredFrequency:" + std::to_string(infraredFrequency) + ";";
     int32_t size = static_cast<int32_t>(pattern.size());
     for(int32_t i = 0; i < size; i ++) {

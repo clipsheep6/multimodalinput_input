@@ -54,6 +54,7 @@ bool ParseInt64(const napi_env& env, const napi_value& value, int64_t& result)
 {
     if (!CheckType(env, value, napi_number)) {
         MMI_HILOGE("ParseInt64 type not number");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "element of pattern", "Number");
         return false;
     }
     if (napi_get_value_int64(env, value, &result) != napi_ok) {
@@ -68,6 +69,7 @@ bool ParsePatternArray(const napi_env& env, const napi_value& value, std::vector
     uint32_t length = 0;
     if (!IsArray(env, value)) {
         MMI_HILOGE("  ParsePatternArray second para not array");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "pattern", "Array");
         return false;
     }
     napi_get_array_length(env, value, &length);
