@@ -2064,7 +2064,6 @@ int32_t MMIService::TransmitInfrared(int64_t number, std::vector<int64_t> patter
 
 int32_t MMIService::OnHasIrEmitter( bool &hasIrEmitter)
 {
-    int32_t pid = GetCallingPid(); 
 
     /*** ***/
     return RET_OK;  
