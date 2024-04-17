@@ -26,6 +26,7 @@
 #include "file_ex.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
+#include "input_windows_manager.h"
 #include "mmi_log.h"
 #include "net_packet.h"
 #include "proto.h"
@@ -955,6 +956,7 @@ void KeyCommandHandler::HandleFingerGestureDownEvent(const std::shared_ptr<Point
         twoFingerGesture_.touches[num - 1].id = id;
         twoFingerGesture_.touches[num - 1].x = item.GetDisplayX();
         twoFingerGesture_.touches[num - 1].y = item.GetDisplayY();
+        twoFingerGesture_.touches[num - 1].downTime = item.GetDownTime();
     }
 }
 
@@ -1160,8 +1162,19 @@ void KeyCommandHandler::StartTwoFingerGesture()
 {
     CALL_DEBUG_ENTER;
     twoFingerGesture_.timerId = TimerMgr->AddTimer(twoFingerGesture_.abilityStartDelay, 1, [this]() {
-        LaunchAbility(twoFingerGesture_.ability, twoFingerGesture_.abilityStartDelay);
         twoFingerGesture_.timerId = -1;
+        // do final check
+        bool result = DoFinalCheckForTwoFingerGestureAction();
+        if (!result) {
+            return;
+        }
+        // append the fingers position
+        twoFingerGesture_.ability.params.emplace("displayX1", twoFingerGesture_.touches[0].x);
+        twoFingerGesture_.ability.params.emplace("displayY1", twoFingerGesture_.touches[0].y);
+        twoFingerGesture_.ability.params.emplace("displayX2", twoFingerGesture_.touches[1].x);
+        twoFingerGesture_.ability.params.emplace("displayY2", twoFingerGesture_.touches[1].y);
+        // do the launch
+        LaunchAbility(twoFingerGesture_.ability, twoFingerGesture_.abilityStartDelay);
     });
 }
 
@@ -1173,6 +1186,38 @@ void KeyCommandHandler::StopTwoFingerGesture()
         twoFingerGesture_.timerId = -1;
     }
 }
+
+bool KeyCommandHandler::DoFinalCheckForTwoFingerGestureAction() const
+{
+    if (!twoFingerGesture_.active) {
+        return false;
+    }
+
+    // 判断两个手指之间的距离
+
+    // 判断两根手指down time的时间间隔
+
+    // 判断两根手指与屏幕边缘的距离
+
+    // 以上检查都通过了
+    return true;
+}
+
+int32_t KeyCommandHandler::ConvertVPToPX(int32_t vp) const
+{
+    if (vp <= 0) {
+        return 0;
+    }
+    auto displayInfo = WinMgr->GetDefaultDisplayInfo();
+    CHKPR(displayInfo, 0);
+    int32_t dpi = displayInfo->dpi;
+    if (dpi <= 0) {
+        return 0;
+    }
+    const int32_t base = 160; // px = vp *（dpi/160)
+    return vp * (dpi / base);
+}
+
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 bool KeyCommandHandler::ParseConfig()
