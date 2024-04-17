@@ -37,25 +37,9 @@ public:
     int32_t GetTokenType();
     bool CheckDispatchControl();
     bool VerifySystemApp();
-    bool CheckInfraredEmmit();
 
 private:
     bool CheckHapPermission(uint32_t tokenId, uint32_t required);
-    
-    /***
-     * tokenId: id of applicaiton 
-     * permissionCode: code of permission for checked
-     * returnedValue: true: check successful; false: check failed
-     * ****/
-    bool CheckHapPermission(uint32_t tokenId, std::string permissionCode);
-
-    
-    /***
-     * permissionCode: code of permission for checked
-     * returnedValue: true: check successful; false: check failed
-     * ****/
-    bool CheckHapPermission(std::string permissionCode);
-
     bool CheckMonitorPermission(uint32_t tokenId);
     bool CheckInterceptorPermission(uint32_t tokenId);
     bool CheckDispatchControlPermission(uint32_t tokenId);
