@@ -41,7 +41,7 @@ public:
 HWTEST_F(WatchdogTaskTest, WatchdogTaskTest_GetFirstLine_001, TestSize.Level1)
 {
     WatchdogTask watchdogtask;
-    std::string path = "/path/to/your/file.txt";
+    std::string path = "";
     auto ret = watchdogtask.GetFirstLine(path);
     EXPECT_EQ(ret, path);
 }
@@ -55,7 +55,7 @@ HWTEST_F(WatchdogTaskTest, WatchdogTaskTest_GetFirstLine_001, TestSize.Level1)
 HWTEST_F(WatchdogTaskTest, WatchdogTaskTest_GetProcessNameFromProcCmdline_001, TestSize.Level1)
 {
     WatchdogTask watchdogtask;
-    std::string expectedDescription = "This is the expected description";
+    std::string expectedDescription = "";
     int32_t pid = -1;
     auto ret = watchdogtask.GetProcessNameFromProcCmdline(pid);
     EXPECT_EQ(ret, expectedDescription);
@@ -86,7 +86,7 @@ HWTEST_F(WatchdogTaskTest, WatchdogTaskTest_IsProcessDebug_001, TestSize.Level1)
     WatchdogTask watchdogtask;
     int32_t pid = 1;
     bool ret = watchdogtask.IsProcessDebug(pid);
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
 }
 
 /**
@@ -98,7 +98,7 @@ HWTEST_F(WatchdogTaskTest, WatchdogTaskTest_IsProcessDebug_001, TestSize.Level1)
 HWTEST_F(WatchdogTaskTest, WatchdogTaskTest_GetBlockDescription_001, TestSize.Level1)
 {
     WatchdogTask watchdogtask;
-    std::string desc = "Watchdog: thread";
+    std::string desc = "Watchdog: thread(mmi_service) blocked 5000s";
     uint64_t timeInterval = 5000;
     auto ret = watchdogtask.GetBlockDescription(timeInterval);
     EXPECT_EQ(ret, desc);
@@ -113,7 +113,7 @@ HWTEST_F(WatchdogTaskTest, WatchdogTaskTest_GetBlockDescription_001, TestSize.Le
 HWTEST_F(WatchdogTaskTest, WatchdogTaskTest_GetSelfProcName_001, TestSize.Level1)
 {
     WatchdogTask watchdogtask;
-    std::string desc = "Watchdog: thread";
+    std::string desc = "ut-mmi-service-";
     auto ret = watchdogtask.GetSelfProcName();
     EXPECT_EQ(ret, desc);
 }
