@@ -138,7 +138,12 @@ ohos_shared_library("libmmi-server") {
     cfi_cross_dso = true
     debug = false
   }
-  sources += [ "window_manager/src/touch_drawing_manager.cpp" ]
+  sources += [ "window_manager/src/touch_drawing_manager.cpp",
+    "window_manager/src/knuckle_dynamic_drawing_manager.cpp",
+    "window_manager/src/knuckle_glow_point.cpp",
+    "window_manager/src/knuckle_glow_trace_system.cpp",
+    "window_manager/src/Knukle_divergent_point.cpp",
+  ]
 
   if (input_feature_keyboard) {
     sources += [

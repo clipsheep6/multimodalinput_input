@@ -2262,6 +2262,11 @@ int32_t InputWindowsManager::UpdateJoystickTarget(std::shared_ptr<PointerEvent> 
 void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
+    if (knuckleDynamicDrawingManager_ == nullptr) {
+        knuckleDynamicDrawingManager_ = std::make_shared<KnuckleDynamicDrawingManager>();
+        CHKPV(knuckleDynamicDrawingManager_);
+    }
+    
     if (!haveSetObserver_) {
         showCursor_.SwitchName = showCursorSwitchName;
         CreateStatusConfigObserver(showCursor_);
@@ -2279,6 +2284,13 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
     }
     auto physicDisplayInfo = GetPhysicalDisplay(displayId);
     CHKPV(physicDisplayInfo);
+    if (knuckleDynamicDrawingManager_ == nullptr) {
+        knuckleDynamicDrawingManager_ = std::make_shared<KnuckleDynamicDrawingManager>();
+        CHKPV(knuckleDynamicDrawingManager_);
+    }
+    knuckleDynamicDrawingManager_->UpdateDisplayInfo(*physicDisplayInfo);
+    knuckleDynamicDrawingManager_->KnuckleDynamicDrawHandler(pointerEvent);
+
     TouchDrawingMgr->UpdateDisplayInfo(*physicDisplayInfo);
     TouchDrawingMgr->TouchDrawHandler(pointerEvent);
 }
