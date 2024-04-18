@@ -125,7 +125,7 @@ public:
 
     int32_t HasIrEmitter( bool &hasIrEmitter);
     int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys);
-    int32_t TransmitInfrared(int64_t number, std::vector<int64_t> pattern);
+    int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
 
     void AddServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
     void RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);

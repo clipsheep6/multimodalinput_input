@@ -2031,7 +2031,7 @@ int32_t InputManagerImpl::CancelInjection()
      * @return 0 if success; returns a non-0 value otherwise.
      * @since 11
      */
-    int32_t InputManagerImpl::HasIrEmitter(bool &hasIrEmitter) 
+    int32_t InputManagerImpl::HasIrEmitter(bool &hasIrEmitter)
 	{
         CALL_INFO_TRACE;
         return MultimodalInputConnMgr->HasIrEmitter(hasIrEmitter);
@@ -2043,7 +2043,7 @@ int32_t InputManagerImpl::CancelInjection()
      * @return 0 if success; returns a non-0 value otherwise.
      * @since 11
      */
-    int32_t InputManagerImpl::GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys) 
+    int32_t InputManagerImpl::GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys)
 	{
         CALL_INFO_TRACE;
         return MultimodalInputConnMgr->GetInfraredFrequencies(requencys);
@@ -2055,7 +2055,7 @@ int32_t InputManagerImpl::CancelInjection()
      * @return 0 if success; returns a non-0 value otherwise.
      * @since 11
      */
-    int32_t InputManagerImpl::TransmitInfrared(int64_t number, std::vector<int64_t> pattern) 
+    int32_t InputManagerImpl::TransmitInfrared(int64_t number, std::vector<int64_t>& pattern)
 	{
         CALL_INFO_TRACE;
         return MultimodalInputConnMgr->TransmitInfrared(number, pattern);

@@ -126,7 +126,7 @@ public:
      * @return 0 if success; returns a non-0 value otherwise.
      * @since 11
      */
-    int32_t HasIrEmitter(  bool &hasIrEmitter) override;
+    int32_t HasIrEmitter(bool &hasIrEmitter) override;
 
     /**
      * @brief Get InfraredFrequency of the IrEmitter in device.
@@ -134,16 +134,16 @@ public:
      * @return 0 if success; returns a non-0 value otherwise.
      * @since 11
      */
-    int32_t GetInfraredFrequencies( std::vector<InfraredFrequency>& requencys) override;
+    int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys) override;
 
     /**
      * @brief user IrEmitter with parameter number and pattern.
      * @param number   Frequency of IrEmitter works .
      * @param requencys  pattern  of IrEmitter works .
-     * @return 0 if success; returns a non-0 value otherwise.
+     * @return 0 if success; returns a non-0 value otherwise. 
      * @since 11
      */
-    int32_t TransmitInfrared( int64_t number, std::vector<int64_t> pattern) override;
+    int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern) override;
 
 
 private:

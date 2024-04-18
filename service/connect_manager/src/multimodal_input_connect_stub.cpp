@@ -2092,15 +2092,13 @@ int32_t MultimodalInputConnectStub::StubHasIrEmitter(MessageParcel& data, Messag
     if (!PerHelper->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
-    }
-    
+    }    
     bool hasIrEmitter = false;
     int32_t ret = HasIrEmitter( hasIrEmitter);
     if (ret != RET_OK) {
         MMI_HILOGE("Call StubHasIrEmitter failed ret:%{public}d", ret);
         return ret;
     }
-    /****  ****/
     WRITEINT32(reply, ret); 
     WRITEBOOL(reply, hasIrEmitter, IPC_STUB_WRITE_PARCEL_ERR);
     return RET_OK;
@@ -2113,20 +2111,17 @@ int32_t MultimodalInputConnectStub::StubGetInfraredFrequencies(MessageParcel& da
     if (!PerHelper->VerifySystemApp()) {
         MMI_HILOGE("GetInfraredFrequencies Verify system APP failed");
         return ERROR_NOT_SYSAPI;
-    }
- 
+    } 
     if (!PerHelper->CheckInfraredEmmit()) {
         MMI_HILOGE("MultimodalInputConnectStub::StubGetInfraredFrequencies permission check failed. returnCode:%{public}d", ERROR_NO_PERMISSION);
         return ERROR_NO_PERMISSION;
     }
-
     std::vector<InfraredFrequency> requencys;
-    int32_t ret = GetInfraredFrequencies( requencys);
+    int32_t ret = GetInfraredFrequencies(requencys);
     if (ret != RET_OK) {
         MMI_HILOGE("Call StubGetInfraredFrequencies failed returnCode:%{public}d", ret);
         return ret;
     }
-
     WRITEINT64(reply, requencys.size());
     for(const auto &item : requencys) 
     {
@@ -2143,20 +2138,16 @@ int32_t MultimodalInputConnectStub::StubTransmitInfrared(MessageParcel& data, Me
     if (!PerHelper->VerifySystemApp()) {
         MMI_HILOGE("StubTransmitInfrared Verify system APP failed");
         return ERROR_NOT_SYSAPI;
-    }
-  
+    }  
     if (!PerHelper->CheckInfraredEmmit()) {
         MMI_HILOGE("StubTransmitInfrared permission check failed. returnCode:%{public}d", ERROR_NO_PERMISSION);
         return ERROR_NO_PERMISSION;
-    }
- 
+    } 
     int64_t number =0;
     READINT64(data, number, IPC_PROXY_DEAD_OBJECT_ERR);
-
     int32_t pattern_len =0; 
     std::vector<int64_t> pattern;
     READINT32(data, pattern_len, IPC_PROXY_DEAD_OBJECT_ERR);
-
     for(int32_t i =0; i < pattern_len; i++) {
         int64_t value =0;
         READINT64(data, value);
@@ -2167,7 +2158,6 @@ int32_t MultimodalInputConnectStub::StubTransmitInfrared(MessageParcel& data, Me
         MMI_HILOGE("Call StubTransmitInfrared failed returnCode:%{public}d", ret);
         return ret;
     }
-    /****   ****/
     WRITEINT32(reply, ret);
     return RET_OK;
 }

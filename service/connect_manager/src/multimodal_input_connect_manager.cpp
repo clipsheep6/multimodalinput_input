@@ -702,10 +702,10 @@ int32_t MultimodalInputConnectManager::CancelInjection()
      * @return 0 if success; returns a non-0 value otherwise.
      * @since 11
      */
-    int32_t MultimodalInputConnectManager::HasIrEmitter(bool &hasIrEmitter) 
+    int32_t MultimodalInputConnectManager::HasIrEmitter(bool &hasIrEmitter)
     {
         CHKPR(multimodalInputConnectService_, RET_ERR);
-        return multimodalInputConnectService_->HasIrEmitter( hasIrEmitter);
+        return multimodalInputConnectService_->HasIrEmitter(hasIrEmitter);
 	}
 
     /**
@@ -714,10 +714,10 @@ int32_t MultimodalInputConnectManager::CancelInjection()
      * @return 0 if success; returns a non-0 value otherwise.
      * @since 11
      */
-    int32_t MultimodalInputConnectManager::GetInfraredFrequencies( std::vector<InfraredFrequency>& requencys) 
+    int32_t MultimodalInputConnectManager::GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys)
     {
         CHKPR(multimodalInputConnectService_, RET_ERR);
-        return multimodalInputConnectService_->GetInfraredFrequencies( requencys);
+        return multimodalInputConnectService_->GetInfraredFrequencies(requencys);
 	}
     /**
      * @brief user IrEmitter with parameter number and pattern.
@@ -726,10 +726,10 @@ int32_t MultimodalInputConnectManager::CancelInjection()
      * @return 0 if success; returns a non-0 value otherwise.
      * @since 11
      */
-    int32_t MultimodalInputConnectManager::TransmitInfrared(int64_t number, std::vector<int64_t> pattern) 
+    int32_t MultimodalInputConnectManager::TransmitInfrared(int64_t number, std::vector<int64_t>& pattern)
     {
         CHKPR(multimodalInputConnectService_, RET_ERR);
-        return multimodalInputConnectService_->TransmitInfrared( number, pattern);
+        return multimodalInputConnectService_->TransmitInfrared(number, pattern);
 	}
 	
 

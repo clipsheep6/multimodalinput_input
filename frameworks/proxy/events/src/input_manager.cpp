@@ -542,7 +542,7 @@ void InputManager::Authorize(bool isAuthorize)
      */
     int32_t InputManager::GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys)
     {
-        return InputMgrImpl.GetInfraredFrequencies(requencys);        
+        return InputMgrImpl.GetInfraredFrequencies(requencys);
     }
     /**
      * @brief user IrEmitter with parameter number and pattern.
@@ -551,9 +551,9 @@ void InputManager::Authorize(bool isAuthorize)
      * @return 0 if success; returns a non-0 value otherwise.
      * @since 11
      */
-    int32_t InputManager::TransmitInfrared(int64_t number, std::vector<int64_t> pattern)
+    int32_t InputManager::TransmitInfrared(int64_t number, std::vector<int64_t>& pattern)
     {
-        return InputMgrImpl.TransmitInfrared(number, pattern);                
+        return InputMgrImpl.TransmitInfrared(number, pattern);
     }
 	
 	 

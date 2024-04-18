@@ -130,9 +130,9 @@ public:
     virtual int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState) = 0;
     virtual int32_t Authorize(bool isAuthorize) = 0;
     virtual int32_t CancelInjection() = 0;
-    virtual int32_t HasIrEmitter(bool &hasIrEmitter) =0;
-    virtual int32_t GetInfraredFrequencies( std::vector<InfraredFrequency>& requencys) =0;
-    virtual int32_t TransmitInfrared( int64_t number, std::vector<int64_t> pattern) =0;
+    virtual int32_t HasIrEmitter(bool &hasIrEmitter) = 0;
+    virtual int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys) = 0;
+    virtual int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

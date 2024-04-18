@@ -840,7 +840,7 @@ public:
      * @return 0 if success; returns a non-0 value otherwise.
      * @since 11
      */
-    int32_t TransmitInfrared(int64_t number, std::vector<int64_t> pattern);
+    int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
 
 private:
     InputManager() = default;

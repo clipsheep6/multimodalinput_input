@@ -1907,7 +1907,7 @@ int32_t MultimodalInputConnectProxy::HasIrEmitter(bool &hasIrEmitter)
     if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
-    } 
+    }
     // int32_t pid = GetCallingPid();
      int32_t pid = 0;
     // /**写入pid**/
@@ -1919,11 +1919,12 @@ int32_t MultimodalInputConnectProxy::HasIrEmitter(bool &hasIrEmitter)
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_INFRARED_OWN),
         data, reply, option);
     /*** hasIrEmitter ***/
-    READBOOL(reply, hasIrEmitter, IPC_PROXY_DEAD_OBJECT_ERR);    
+    READBOOL(reply, hasIrEmitter, IPC_PROXY_DEAD_OBJECT_ERR);
     if (ret != RET_OK) {
         MMI_HILOGE("MultimodalInputConnectProxy::HasIrEmitter Send request fail, ret:%{public}d", ret);
+        return ret;
     }
-    return ret;
+    return RET_OK;
 }
 
 /**
@@ -1939,9 +1940,7 @@ int32_t MultimodalInputConnectProxy::GetInfraredFrequencies(std::vector<Infrared
     if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
-    } 
-
-
+    }
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
@@ -1950,12 +1949,10 @@ int32_t MultimodalInputConnectProxy::GetInfraredFrequencies(std::vector<Infrared
         data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("MultimodalInputConnectProxy::GetInfraredFrequencies Send request fail, ret:%{public}d", ret);
+        return ret;
     }
-
     int64_t number;
-
     READINT64(reply, number, IPC_PROXY_DEAD_OBJECT_ERR);
-    
     int64_t min,max;
     for (int32_t i = 0; i < number; i++) {
         READINT64(reply, max);
@@ -1976,7 +1973,7 @@ int32_t MultimodalInputConnectProxy::GetInfraredFrequencies(std::vector<Infrared
  * @return 0 if success; returns a non-0 value otherwise.
  * @since 11
  */
-int32_t MultimodalInputConnectProxy::TransmitInfrared(int64_t number, std::vector<int64_t> pattern)
+int32_t MultimodalInputConnectProxy::TransmitInfrared(int64_t number, std::vector<int64_t>& pattern)
 {   
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -1984,28 +1981,24 @@ int32_t MultimodalInputConnectProxy::TransmitInfrared(int64_t number, std::vecto
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-
     WRITEINT64(data, number, ERR_INVALID_VALUE);
-
-    /*******写入,数组大小 *******/
+    /******* write size of array to data *******/
     WRITEINT32(data, static_cast<int64_t>(pattern.size()), ERR_INVALID_VALUE);
     /*******  Pattern of signal transmission in alternate on/off mode, in microseconds.    **********/
-    
     for (const auto &item : pattern) {
         WRITEINT64(data, item);
     }
- 
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_CANCEL_TRANSMIT),
         data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("MultimodalInputConnectProxy::TransmitInfrared Send request fail, ret:%{public}d", ret);
+        return ret;
     }
-    return ret;
+    return RET_OK;
 }
 
 } // namespace MMI
