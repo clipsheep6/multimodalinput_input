@@ -61,12 +61,14 @@ constexpr float DOUBLE_CLICK_DISTANCE_LONG_CONFIG = 96.0f;
 constexpr float VPR_CONFIG = 3.25f;
 constexpr int32_t REMOVE_OBSERVER = -2;
 constexpr int32_t ACTIVE_EVENT = 2;
+constexpr int32_t LONG_ABILITY_START_DELAY = 2000;
 const std::string EXTENSION_ABILITY = "extensionAbility";
 
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandHandler" };
 const std::string SINGLE_KNUCKLE_ABILITY = "SingleKnuckleDoubleClickGesture";
 const std::string DOUBLE_KNUCKLE_ABILITY = "DoubleKnuckleDoubleClickGesture";
 const std::string TOUCHPAD_TRIP_TAP_ABILITY = "ThreeFingersTap";
+
 enum SpecialType {
     SPECIAL_ALL = 0,
     SUBSCRIBER_BEFORE_DELAY = 1,
@@ -566,11 +568,6 @@ bool ConvertToKeySequence(const cJSON* jsonData, Sequence &sequence)
 
 bool ConvertToExcludeKey(const cJSON* jsonData, ExcludeKey &exKey)
 {
-    if (!cJSON_IsObject(jsonData)) {
-        MMI_HILOGE("ExcludeKey jsonData is not object");
-        return false;
-    }
-
     cJSON *keyCodeJson = cJSON_GetObjectItemCaseSensitive(jsonData, "keyCode");
     if (!cJSON_IsNumber(keyCodeJson)) {
         MMI_HILOGE("keyCodeJson is not number");
@@ -1968,7 +1965,7 @@ bool KeyCommandHandler::HandleSequence(Sequence &sequence, bool &isLaunchAbility
                 return false;
             }else if(screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED){
                 MMI_HILOGI("screen locked, com.ohos.screenshot delay 2000 milisecond.");
-                sequence.timerId = TimerMgr->AddTimer(2000, 1, [this, sequence] () {
+                sequence.timerId = TimerMgr->AddTimer(LONG_ABILITY_START_DELAY, 1, [this, sequence] () {
                     MMI_HILOGI("Timer callback");
                     LaunchAbility(sequence);
                 });
