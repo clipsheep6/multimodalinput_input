@@ -16,11 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "proto.h"
-
-#define protected public
-#define private public
 #include "mmi_service.h"
-
 #include "udp_wrap.h"
 
 namespace OHOS {
