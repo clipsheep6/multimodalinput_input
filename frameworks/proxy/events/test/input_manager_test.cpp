@@ -2603,6 +2603,23 @@ HWTEST_F(InputManagerTest, InputManager_SimulateEvent_004, TestSize.Level1)
     InputManagerUtil::PrintPointerEventId(pointerEvent);
 }
 
+/**
+ * @tc.name: InputManager_SimulateEvent_001
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR20240223308600
+ */
+HWTEST_F(InputManagerTest, InputManager_SimulateEvent_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = InputManagerUtil::SetupSimulateEvent005();
+    MMI_HILOGI("Before handle SimulateInputEvent");
+    InputManagerUtil::PrintPointerEventId(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    MMI_HILOGI("After handle SimulateInputEvent");
+    InputManagerUtil::PrintPointerEventId(pointerEvent);
+}
+
 class ServiceWatcher final : public IInputServiceWatcher {
 public:
     ServiceWatcher() = default;
