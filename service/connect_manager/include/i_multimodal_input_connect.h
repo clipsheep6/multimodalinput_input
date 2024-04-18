@@ -129,6 +129,7 @@ public:
     virtual int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState) = 0;
     virtual int32_t Authorize(bool isAuthorize) = 0;
     virtual int32_t CancelInjection() = 0;
+    virtual int32_t SetPixelMapData(int32_t infoId, void* pixelMap) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

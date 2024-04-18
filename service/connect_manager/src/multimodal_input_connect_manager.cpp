@@ -694,5 +694,11 @@ int32_t MultimodalInputConnectManager::CancelInjection()
     CHKPR(multimodalInputConnectService_, RET_ERR);
     return multimodalInputConnectService_->CancelInjection();
 }
+
+int32_t MultimodalInputConnectManager::SetPixelMapData(int32_t infoId, void* pixelMap)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->SetPixelMapData(infoId, pixelMap);
+}
 } // namespace MMI
 } // namespace OHOS

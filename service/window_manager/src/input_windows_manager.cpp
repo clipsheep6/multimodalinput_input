@@ -2696,15 +2696,17 @@ bool InputWindowsManager::IsTransparentWin(void* pixelMap, int32_t logicalX, int
 {
     CALL_DEBUG_ENTER;
     if (pixelMap == nullptr) {
-        MMI_HILOGE("The pixelmap is nullptr");
+        MMI_HILOGD("The pixelmap is null");
         return false;
     }
 
     uint32_t dst = 0;
     OHOS::Media::Position pos { logicalY, logicalX };
-    OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMapPtr(static_cast<OHOS::Media::PixelMap*>(pixelMap));
     CHKPF(pixelMapPtr);
     uint32_t result = pixelMapPtr->ReadPixel(pos, dst);
+    MMI_HILOGD("dst:%{public}d, byteCount:%{public}d, width:%{public}d, height:%{public}d",
+        dst, pixelMapPtr->GetByteCount(), pixelMapPtr->GetWidth(), pixelMapPtr->GetHeight());
     if (result != RET_OK) {
         MMI_HILOGE("Failed to read pixelmap");
         return false;
