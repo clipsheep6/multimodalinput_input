@@ -104,7 +104,6 @@ protected:
     int32_t OnEnhanceConfig(SessionPtr sess, NetPacket& pkt);
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     void SetWindowInfo(int32_t infoId, WindowInfo &info);
-    bool HasWindowId(int32_t infoId);
 
 private:
 #ifdef OHOS_BUILD_ENABLE_TOUCH

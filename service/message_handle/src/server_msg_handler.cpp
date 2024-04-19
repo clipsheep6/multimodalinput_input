@@ -278,9 +278,8 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
         pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
             >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
             >> info.displayId >> info.zOrder >> info.pointerChangeAreas >> info.transform;
-        if (HasWindowId(info.id)) {
-            SetWindowInfo(info.id, info);
-        }
+
+        SetWindowInfo(info.id, info);
         displayGroupInfo.windowsInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");
@@ -576,12 +575,6 @@ int32_t ServerMsgHandler::OnCancelInjection()
     return ERR_OK;
 }
 
-bool ServerMsgHandler::HasWindowId(int32_t infoId)
-{
-    CALL_DEBUG_ENTER;
-    return transparentWins_.find(infoId) != transparentWins_.end();
-}
-
 void ServerMsgHandler::SetWindowInfo(int32_t infoId, WindowInfo &info)
 {
     CALL_DEBUG_ENTER;
@@ -603,11 +596,7 @@ int32_t ServerMsgHandler::SetPixelMapData(int32_t infoId, void* pixelMap)
     std::unique_ptr<OHOS::Media::PixelMap> pixelMapPtr(static_cast<OHOS::Media::PixelMap*>(pixelMap));
     MMI_HILOGD("byteCount:%{public}d, width:%{public}d, height:%{public}d",
         pixelMapPtr->GetByteCount(), pixelMapPtr->GetWidth(), pixelMapPtr->GetHeight());
-    if (transparentWins_.find(infoId) != transparentWins_.end()) {
-        transparentWins_[infoId] = std::move(pixelMapPtr);
-    } else {
-        transparentWins_.insert_or_assign(infoId, std::move(pixelMapPtr));
-    }
+    transparentWins_.insert_or_assign(infoId, std::move(pixelMapPtr));
     return RET_OK;
 }
 } // namespace MMI
