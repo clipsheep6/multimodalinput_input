@@ -1,5 +1,19 @@
-#include "infrared_emitter_controller.h"
+/*
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
+#include "infrared_emitter_controller.h"
 #include "mmi_log.h"
 
 namespace OHOS {
@@ -34,12 +48,10 @@ bool InfraredEmitterController::Transmit(int64_t carrierFreq, std::vector<int64_
         return false;
     }
 
-    int32_t tempCarrierFreq tempCarrierFreq;
-    tempCarrierFreq = carrierFreq;
+    int32_t tempCarrierFreq = carrierFreq;
     std::vector<int32_t> tempPattern;
     std::string context = "infraredFrequency:" + std::to_string(tempCarrierFreq) + ";";
-    for (size_t i = 0; i < pattern.size(); i++)
-    {
+    for (size_t i = 0; i < pattern.size(); i++) {
         int32_t per = pattern[i];
         context = context + "index:" + std::to_string(i) + ": pattern:" + std::to_string(per) + ";";
         tempPattern.push_back(per);
@@ -81,13 +93,12 @@ bool InfraredEmitterController::GetFrequencies(std::vector<InfraredFrequency> &f
         return false;
     }
     std::string context = "size:" + std::to_string(outRange.size()) + ";";
-    for (size_t i = 0; i < outRange.size(); i++)
-    {
+    for (size_t i = 0; i < outRange.size(); i++) {
         InfraredFrequency item;
         context = context + "index:" + std::to_string(i) + ": per.max:" + std::to_string(outRange[i].max) +
          ": per.min:" + std::to_string(outRange[i].min) + ";";
         item.max_ = outRange[i].max;
-        item.min_  = outRange[i].min;
+        item.min_ = outRange[i].min;
         frequencyInfo.pushback(item);
     }
     return true;

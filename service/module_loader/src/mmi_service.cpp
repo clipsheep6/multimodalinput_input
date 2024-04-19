@@ -56,7 +56,9 @@
 #include "display_event_monitor.h"
 #include "fingersense_wrapper.h"
 #include "multimodal_input_preferences_manager.h"
+#ifdef OHOS_BUILD_ENABLE_ANCO
 #include "infrared_emitter_controller.h"
+#endif
 
 namespace OHOS {
 namespace MMI {

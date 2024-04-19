@@ -32,7 +32,6 @@ class InputNativeTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
-
     void SetUp() {}
     void TearDown() {}
 };
@@ -490,7 +489,6 @@ HWTEST_F(InputNativeTest, InputNativeTest_TouchEventActionTime_001, TestSize.Lev
  */
 HWTEST_F(InputNativeTest, InputNativeTest_IR_001, TestSize.Level1)
 {
-
 #ifdef OHOS_BUILD_ENABLE_ANCO
     InfraredEmitter::GetInstance()->InitInfraredEmitter();
     std::vector<InfraredFrequency> frequencyInfo;
