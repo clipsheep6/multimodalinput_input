@@ -119,9 +119,7 @@ declare_args() {
     "window_manager/src/input_windows_manager.cpp",
   ]
 
-  infraredemitter_sources = [
-    "src/js_register_module.cpp",
-  ]
+  infraredemitter_sources = [ "src/js_register_module.cpp" ]
 
   inputdevice_sources = [
     "src/js_event_target.cpp",
@@ -202,6 +200,8 @@ declare_args() {
   libmmi_virtual_device_sources = [
     "src/virtual_device.cpp",
     "src/virtual_finger.cpp",
+    "src/virtual_fingerprint_key.cpp",
+    "src/virtual_fingerprint_mouse.cpp",
     "src/virtual_gamepad.cpp",
     "src/virtual_joystick.cpp",
     "src/virtual_keyboard.cpp",
@@ -227,8 +227,6 @@ declare_args() {
     "src/virtual_trackpad.cpp",
     "src/virtual_trackpad_mouse.cpp",
     "src/virtual_trackpad_sys_ctrl.cpp",
-    "src/virtual_fingerprint_key.cpp",
-    "src/virtual_fingerprint_mouse.cpp",
   ]
 
   libmmi_util_sources = [
