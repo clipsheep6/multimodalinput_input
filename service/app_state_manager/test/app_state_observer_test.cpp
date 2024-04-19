@@ -15,7 +15,9 @@
 
 #include <gtest/gtest.h>
 
+#define private public
 #include "app_state_observer.h"
+#undef private
 
 namespace OHOS {
 namespace MMI {
