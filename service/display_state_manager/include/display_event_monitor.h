@@ -41,7 +41,8 @@ class DisplayEventMonitor final {
         void UpdateShieldStatusOnScreenOff();
         void InitCommonEventSubscriber();
         bool IsCommonEventSubscriberInit();
-        std::string GetScreenStatus(){
+        std::string GetScreenStatus()
+        {
             return screenStatus_;
         }
     private:

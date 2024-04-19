@@ -144,8 +144,8 @@ ohos_shared_library("libmmi-server") {
     ]
     if (input_feature_combination_key) {
       sources += [
-        "key_command/src/key_command_handler_util.cpp",
         "key_command/src/key_command_handler.cpp",
+        "key_command/src/key_command_handler_util.cpp",
         "key_command/src/setting_datashare.cpp",
         "key_command/src/setting_observer.cpp",
       ]
@@ -412,8 +412,8 @@ ohos_unittest("TwoFingerLongTouchTest") {
   cflags = [ "-DUNIT_TEST" ]
 
   sources = [
-    "key_command/src/key_command_handler_util.cpp",
     "key_command/src/key_command_handler.cpp",
+    "key_command/src/key_command_handler_util.cpp",
     "key_command/test/ability_manager_client_stub.cpp",
     "key_command/test/two_finger_long_touch_test.cpp",
   ]
