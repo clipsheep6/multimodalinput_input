@@ -56,6 +56,7 @@
 #include "display_event_monitor.h"
 #include "fingersense_wrapper.h"
 #include "multimodal_input_preferences_manager.h"
+#include "infrared_emitter_controller.h"
 
 namespace OHOS {
 namespace MMI {
@@ -247,7 +248,14 @@ int32_t MMIService::Init()
     NapProcess::GetInstance()->Init(*this);
     MMI_HILOGD("ANRManager Init");
     ANRMgr->Init(*this);
-    MMI_HILOGD("PointerDrawingManager Init");
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    MMI_HILOGI("InitInfraredEmitter Init");
+    InfraredEmitterController::GetInstance()->InitInfraredEmitter();
+#else
+    MMI_HILOGI("InfraredEmitter not supported");
+#endif
+
+    MMI_HILOGI("PointerDrawingManager Init");
 #ifdef OHOS_BUILD_ENABLE_POINTER
     if (!IPointerDrawingManager::GetInstance()->Init()) {
         MMI_HILOGE("Pointer draw init failed");
@@ -2069,15 +2077,9 @@ int32_t MMIService::OnHasIrEmitter(bool &hasIrEmitter)
 
 int32_t MMIService::OnGetInfraredFrequencies(std::vector<InfraredFrequency>& requencys)
 {
-    int const tempSizeOfData = 20;
-    int const maxStandard = 550;
-    int const minStandard = 550;
-    for (int i = 1; i < tempSizeOfData; i++) {
-        InfraredFrequency itemFrequency;
-        itemFrequency.max_ = maxStandard * i;
-        itemFrequency.min_ = minStandard * i;
-        requencys.emplace_back(itemFrequency);
-    }
+    #ifdef OHOS_BUILD_ENABLE_ANCO
+    InfraredEmitterController::GetInstance()->GetFrequencies(requencys);
+    #endif
     std::string context = "";
     int32_t size = static_cast<int32_t>(requencys.size());
     for (int32_t i = 0; i < size; i++) {
@@ -2095,6 +2097,10 @@ int32_t MMIService::OnTransmitInfrared(int64_t infraredFrequency, std::vector<in
     for (int32_t i = 0; i < size; i++) {
         context = context + "index:" + std::to_string(i) + ": pattern:" + std::to_string(pattern[i]) + ";";
     }
+    #ifdef OHOS_BUILD_ENABLE_ANCO
+    InfraredEmitterController::GetInstance()->OnTransmitInfrared(infraredFrequency, pattern);
+    #endif
+
     MMI_HILOGI("MMIService::OnTransmitInfrared para. %{public}s", context.c_str());
     return RET_OK;
 }
