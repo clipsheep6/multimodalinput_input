@@ -548,16 +548,22 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
     uint32_t num = static_cast<uint32_t>(displayGroupInfo_.windowsInfo.size());
     pkt << num;
     for (const auto &item : displayGroupInfo_.windowsInfo) {
+        int32_t byteCount = 0;
         pkt << item.id << item.pid << item.uid << item.area << item.defaultHotAreas
             << item.pointerHotAreas << item.agentWindowId << item.flags << item.action
             << item.displayId << item.zOrder << item.pointerChangeAreas << item.transform;
         if (item.pixelMap != nullptr) {
+            OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(item.pixelMap);
+            byteCount = pixelMapPtr->GetByteCount();
             int32_t ret = SetPixelMapData(item.id, item.pixelMap);
             if (ret != RET_OK) {
+                byteCount = 0;
                 MMI_HILOGE("Failed to set pixel map");
-                continue;
             }
+            pkt << byteCount;
+            continue;
         }
+        pkt << byteCount;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write windows data failed");

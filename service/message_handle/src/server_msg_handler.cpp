@@ -275,11 +275,16 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     }
     for (uint32_t i = 0; i < num; i++) {
         WindowInfo info;
+        int32_t byteCount = 0;
         pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
-            >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
-            >> info.displayId >> info.zOrder >> info.pointerChangeAreas >> info.transform;
+            >> info.pointerHotAreas >> info.agentWindowId >> info.flags
+            >> info.action >> info.displayId >> info.zOrder >> info.pointerChangeAreas
+            >> info.transform >> byteCount;
 
-        SetWindowInfo(info.id, info);
+        if (byteCount != 0) {
+            MMI_HILOGD("byteCount:%{public}d", byteCount);
+            SetWindowInfo(info.id, info);
+        }
         displayGroupInfo.windowsInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");
