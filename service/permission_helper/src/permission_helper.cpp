@@ -68,8 +68,6 @@ bool PermissionHelper::CheckPermission(uint32_t required)
     }
 }
 
-
-
 bool PermissionHelper::CheckMonitor()
 {
     CALL_DEBUG_ENTER;
@@ -120,38 +118,42 @@ bool PermissionHelper::CheckHapPermission(uint32_t tokenId, uint32_t required)
     return true;
 }
 
-/***    
- * add this funciton just because  CheckHapPermission(int, String) and CheckHapPermission(string ) are private function. 
- * In fact I want add the previous two functions as public, but consider the privacy and security add them as private
+/***
+ * add this funciton just because CheckHapPermission(int, String) and
+ * CheckHapPermission(string ) are private function.
+ * In fact this should be added as the previous two functions as public,
+ * but consider the privacy and security add them as private
  * ***/
-bool PermissionHelper::CheckInfraredEmmit() {
+bool PermissionHelper::CheckInfraredEmmit() 
+{
     std::string infraredEmmitPermissionCode = "ohos.permission.INFRARED_EMITTER";
     return CheckHapPermission(infraredEmmitPermissionCode);
 }
 
 /***
- * tokenId: id of applicaiton 
+ * this function is checked whether a oparate from APP has certial permissions
+ * tokenId: id of applicaiton
  * permissionCode: code of permission for checked
  * returnedValue: true: check successful; false: check failed
- * permissionCode of InfraredEmitter Function: ohos.permission.INFRARED_EMITTER 
- *    CheckHapPermission(pid, permissionCode)
+ * permissionCode of InfraredEmitter Function: ohos.permission.INFRARED_EMITTER
  * ****/
-bool PermissionHelper::CheckHapPermission(const std::string permissionCode) {
-    
+bool PermissionHelper::CheckHapPermission(const std::string permissionCode)
+{
     CALL_DEBUG_ENTER;
     auto tokenId = IPCSkeleton::GetCallingTokenID();
-    return CheckHapPermission(tokenId, permissionCode); 
+    return CheckHapPermission(tokenId, permissionCode);
 }
 
-
 /***
+ * this function is checked whether a oparate from APP has certial permissions
  * tokenId: id of applicaiton 
  * permissionCode: code of permission for checked
  * returnedValue: true: check successful; false: check failed
- * permissionCode of InfraredEmitter Function: ohos.permission.InfraredEmitter 
- *    CheckHapPermission(pid, permissionCode)
+ * permissionCode of InfraredEmitter Function: ohos.permission.InfraredEmitter
+ * CheckHapPermission(pid, permissionCode)
  * ****/
-bool PermissionHelper::CheckHapPermission(uint32_t tokenId, const std::string permissionCode) {
+bool PermissionHelper::CheckHapPermission(uint32_t tokenId, const std::string permissionCode)
+{
     CALL_DEBUG_ENTER;
     auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
     if ((tokenType == OHOS::Security::AccessToken::TOKEN_HAP) ||
@@ -166,10 +168,11 @@ bool PermissionHelper::CheckHapPermission(uint32_t tokenId, const std::string pe
     }
 
     /*** check permission here ***/
-    std::string context  = "For CheckHapPermission. permissionCode" + permissionCode + "; applicationId:" + std::to_string(tokenId);
+    std::string context = "For CheckPerm. PermiCode" + permissionCode + ";appId:" + std::to_string(tokenId);
     int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, permissionCode);
     if (ret != OHOS::Security::AccessToken::PERMISSION_GRANTED) {
-        MMI_HILOGE("Check permission: %{public}s failed for applicationId:%{public}d, and ret:%{public}d", permissionCode.c_str(), tokenId, ret);
+        MMI_HILOGE("Check Permi: %{public}s fail for appId:%{public}d, and ret:%{public}d",
+                permissionCode.c_str(), tokenId, ret);
         return false;
     }
     MMI_HILOGD("Check permission( %{public}s) permission success", permissionCode.c_str());
