@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,14 +18,18 @@ namespace MMI {
 namespace {
 using namespace testing::ext;
 } // namespace
-/********* 实现DTS的接口如何测试？   *********/
 class RegisterModuleTest : public testing::Test {
     public:
-        /***** 测试使用红外的频率(使用返回的第一个频率) ******/
         int64_t frequency_Max;
         int64_t frequency_Min;
 };
 
+/**
+ * @tc.name: GetInfraredFrequenciesTest
+ * @tc.desc: Event dump CheckCount
+ * @tc.type: FUNC
+ * @tc.require:AR000GJG6G
+ */
 HWTEST_F(RegisterModuleTest, GetInfraredFrequenciesTest, TestSize.Level1)
 {
     std::vector<InfraredFrequency> requencys;

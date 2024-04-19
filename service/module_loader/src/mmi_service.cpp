@@ -2063,27 +2063,24 @@ int32_t MMIService::TransmitInfrared(int64_t number, std::vector<int64_t>& patte
 
 int32_t MMIService::OnHasIrEmitter(bool &hasIrEmitter)
 {
-    /** defautl not support IR **/
     hasIrEmitter = false;
     return RET_OK;
 }
 
 int32_t MMIService::OnGetInfraredFrequencies(std::vector<InfraredFrequency>& requencys)
 {
-    /** get data from hdf **/
     int const tempSizeOfData = 20;
-    /** stub code for test, delete the following while hdf is connected**/
     int const maxStandard = 550;
     int const minStandard = 550;
     for (int i = 1; i < tempSizeOfData; i++) {
         InfraredFrequency itemFrequency;
-        itemFrequency.max_ = maxStandard*i;
-        itemFrequency.min_ = minStandard*i;
+        itemFrequency.max_ = maxStandard * i;
+        itemFrequency.min_ = minStandard * i;
         requencys.emplace_back(itemFrequency);
     }
     std::string context = "";
     int32_t size = static_cast<int32_t>(requencys.size());
-    for (int32_t i = 0; i < size; i ++) {
+    for (int32_t i = 0; i < size; i++) {
         context = context + "requencys[" + std::to_string(i) + "]. max="
                 + std::to_string(requencys[i].max_) + ",min=" + std::to_string(requencys[i].min_) +";";
     }
@@ -2095,8 +2092,8 @@ int32_t MMIService::OnTransmitInfrared(int64_t infraredFrequency, std::vector<in
 {
     std::string context = "infraredFrequency:" + std::to_string(infraredFrequency) + ";";
     int32_t size = static_cast<int32_t>(pattern.size());
-    for (int32_t i = 0; i < size; i ++) {
-        context = context + "index:" + std::to_string(i) + ": pattern:" +std::to_string(pattern[i]) + ";";
+    for (int32_t i = 0; i < size; i++) {
+        context = context + "index:" + std::to_string(i) + ": pattern:" + std::to_string(pattern[i]) + ";";
     }
     MMI_HILOGI("MMIService::OnTransmitInfrared para. %{public}s", context.c_str());
     return RET_OK;

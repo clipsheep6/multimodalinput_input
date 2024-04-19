@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,11 +17,11 @@
 #define I_INFRARED_MANAGER
 
 namespace OHOS {
-    namespace MMI {
-        struct InfraredFrequency {
-            int64_t max_ { 0 };
-            int64_t min_ { 0 };
-        };
-    } // namespace MMI
+namespace MMI {
+struct InfraredFrequency {
+    int64_t max_ { 0 };
+    int64_t min_ { 0 };
+};
+} // namespace MMI
 } // namespace OHOS
 #endif // I_INFRARED_MANAGER

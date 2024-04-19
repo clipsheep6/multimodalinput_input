@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,9 +14,9 @@
  */
 
 #include "js_register_module.h"
-#include "input_manager.h"
 #include <linux/input.h>
 
+#include "input_manager.h"
 #include "mmi_log.h"
 #include "napi_constants.h"
 #include "util_napi_error.h"
@@ -98,7 +98,6 @@ bool ParseTransmitInfraredJSParam(const napi_env& env, const napi_callback_info 
     size_t argc = NUMBER_DEFAULT;
     napi_value argv[NUMBER_PARAMETERS];
     CHKRF(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    /******* modify NUMBER_PARAMETERS as const *******/
     if (argc != NUMBER_PARAMETERS) {
         MMI_HILOGE("ParseTransmitInfraredJSParam Parameter number error");
         return false;
@@ -166,7 +165,6 @@ static napi_value GetInfraredFrequencies(napi_env env, napi_callback_info info)
     std::vector<InfraredFrequency> requencys;
     int32_t ret = InputManager::GetInstance()->GetInfraredFrequencies(requencys);
     if (ret != RET_OK) {
-        /** error permission business. permissionCode is a negative value ***/
         if (RET_OK > ret || COMMON_PERMISSION_CHECK_ERROR == ret || ERROR_NOT_SYSAPI == ret) {
             MMI_HILOGE("js_register.GetFreq reqErr. Permi Err or Not System APP. Positive retCode:%{public}d", ret);
             ThrowError(env, ret, "GetInfraredFrequencies");
@@ -210,7 +208,6 @@ static napi_value TransmitInfrared(napi_env env, napi_callback_info info)
     }
     MMI_HILOGD("js_register_module.TransmitInfrared para size :%{public}s", context.c_str());
     int32_t ret = InputManager::GetInstance()->TransmitInfrared(number, pattern);
-    /******** permission error service *******/
     if (ret != RET_OK) {
         if (RET_OK > ret || COMMON_PERMISSION_CHECK_ERROR == ret || ERROR_NOT_SYSAPI == ret) {
             MMI_HILOGE("js_register.Transmit req err. Per Er or Not Sys APP. Posi retCode:%{public}d", ret);

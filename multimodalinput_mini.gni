@@ -40,7 +40,7 @@ declare_args() {
   input_ext_feature_fingersense = false
   input_feature_fingerprint = false
   input_ext_feature_magiccursor = false
-  input_feature_infrared_emitter = true
+  input_feature_infrared_emitter = false
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {

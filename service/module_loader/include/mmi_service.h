@@ -134,11 +134,9 @@ public:
     int32_t Authorize(bool isAuthorize) override;
     int32_t CancelInjection() override;
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
-
     int32_t HasIrEmitter(bool &hasIrEmitter) override;
     int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys) override;
-    int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern) override;
-   
+    int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern) override;   
     int32_t OnHasIrEmitter(bool &hasIrEmitter);
     int32_t OnGetInfraredFrequencies(std::vector<InfraredFrequency>& requencys);
     int32_t OnTransmitInfrared(int64_t number, std::vector<int64_t>& pattern);

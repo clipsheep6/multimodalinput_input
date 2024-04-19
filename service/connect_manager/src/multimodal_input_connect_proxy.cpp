@@ -1894,12 +1894,6 @@ int32_t MultimodalInputConnectProxy::CancelInjection()
     return RET_OK;
 }
 
-/**
- * @brief Get whether System has IrEmitter
- * @param hasIrEmitter the para takes the value which Indicates the device has IrEmitter or not
- * @return 0 if success; returns a non-0 value otherwise.
- * @since 11
- */
 int32_t MultimodalInputConnectProxy::HasIrEmitter(bool &hasIrEmitter)
 {
     CALL_DEBUG_ENTER;
@@ -1914,7 +1908,6 @@ int32_t MultimodalInputConnectProxy::HasIrEmitter(bool &hasIrEmitter)
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_INFRARED_OWN),
         data, reply, option);
-    /*** hasIrEmitter ***/
     READBOOL(reply, hasIrEmitter, IPC_PROXY_DEAD_OBJECT_ERR);
     if (ret != RET_OK) {
         MMI_HILOGE("MultimodalInputConnectProxy::HasIrEmitter Send request fail, ret:%{public}d", ret);
@@ -1923,12 +1916,6 @@ int32_t MultimodalInputConnectProxy::HasIrEmitter(bool &hasIrEmitter)
     return RET_OK;
 }
 
-/**
- * @brief Get InfraredFrequency of the IrEmitter in device.
- * @param requencys take out the IrEmitter's Frequency  .
- * @return 0 if success; returns a non-0 value otherwise.
- * @since 11
- */
 int32_t MultimodalInputConnectProxy::GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys)
 {
     CALL_DEBUG_ENTER;
@@ -1963,13 +1950,6 @@ int32_t MultimodalInputConnectProxy::GetInfraredFrequencies(std::vector<Infrared
     return ret;
 }
 
-/**
- * @brief user IrEmitter with parameter number and pattern.
- * @param number Frequency of IrEmitter works .
- * @param requencys pattern of IrEmitter works .
- * @return 0 if success; returns a non-0 value otherwise.
- * @since 11
- */
 int32_t MultimodalInputConnectProxy::TransmitInfrared(int64_t number, std::vector<int64_t>& pattern)
 {
     CALL_DEBUG_ENTER;
@@ -1979,9 +1959,7 @@ int32_t MultimodalInputConnectProxy::TransmitInfrared(int64_t number, std::vecto
         return ERR_INVALID_VALUE;
     }
     WRITEINT64(data, number, ERR_INVALID_VALUE);
-    /******* write size of array to data *******/
     WRITEINT32(data, static_cast<int64_t>(pattern.size()), ERR_INVALID_VALUE);
-    /******* Pattern of signal transmission in alternate on/off mode, in microseconds. **********/
     for (const auto &item : pattern) {
         WRITEINT64(data, item);
     }

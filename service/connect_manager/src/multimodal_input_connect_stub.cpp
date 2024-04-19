@@ -2077,12 +2077,6 @@ int32_t MultimodalInputConnectStub::StubCancelInjection(MessageParcel& data, Mes
     return RET_OK;
 }
 
-/**
- * @brief Get whether System has IrEmitter.
- * @param hasIrEmitter the para takes the value which Indicates the device has IrEmitter or not,.
- * @return 0 if success; returns a non-0 value otherwise.
- * @since 11
- */
 int32_t MultimodalInputConnectStub::StubHasIrEmitter(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
