@@ -186,6 +186,8 @@ private:
     bool HandleRepeatKey(const RepeatKey& item, bool &isLaunchAbility, const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleSequence(Sequence& sequence, bool &isLaunchAbility);
+    bool HandleNormalSequence(Sequence& sequence, bool &isLaunchAbility);
+    bool HandleScreenLocked(Sequence& sequence, bool &isLaunchAbility);
     bool HandleSequences(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleConsumedKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);

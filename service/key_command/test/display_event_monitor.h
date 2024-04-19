@@ -22,31 +22,22 @@ namespace OHOS {
 namespace MMI {
 class DisplayEventMonitor final {
     public:
-        DisplayEventMonitor()
+        DisplayEventMonitor() {}
+        virtual ~DisplayEventMonitor() {}
+        static std::shared_ptr<DisplayEventMonitor> GetInstance()
         {
-            
-        }
-        virtual ~DisplayEventMonitor() {
-
-        }
-        static std::shared_ptr<DisplayEventMonitor> GetInstance(){
             std::shared_ptr<DisplayEventMonitor> instance = std::make_shared<DisplayEventMonitor>();
             return instance;
         }
-
-        void UpdateShieldStatusOnScreenOn(){
-
-        }
-        void UpdateShieldStatusOnScreenOff(){
-
-        }
-        void InitCommonEventSubscriber(){
-
-        }
-        bool IsCommonEventSubscriberInit(){
+        void UpdateShieldStatusOnScreenOn() {}
+        void UpdateShieldStatusOnScreenOff() {}
+        void InitCommonEventSubscriber() {}
+        bool IsCommonEventSubscriberInit()
+        {
             return false;
         }
-        std::string GetScreenStatus(){
+        std::string GetScreenStatus()
+        {
             return screenStatus_;
         }
     private:

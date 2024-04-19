@@ -106,9 +106,7 @@ public:
     static const std::string COMMON_EVENT_SCREEN_UNLOCKED;
 public:
     CommonEventSupport();
-
     virtual ~CommonEventSupport();
-
 };
 }  // namespace EventFwk
 } // namespace OHOS

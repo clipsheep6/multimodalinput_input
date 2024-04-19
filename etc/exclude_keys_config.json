@@ -1,11 +1,6 @@
 {
   "excludeKeys": [
     {
-      "keyCode": 2028,
-      "keyAction": -1,
-      "delay": 0
-    },
-    {
       "keyCode": 18,
       "keyAction": 3,
       "delay": 0
