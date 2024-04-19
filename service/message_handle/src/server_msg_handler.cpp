@@ -596,15 +596,11 @@ int32_t ServerMsgHandler::SetPixelMapData(int32_t infoId, void* pixelMap)
 {
     CALL_DEBUG_ENTER;
     if (infoId < 0 || pixelMap == nullptr) {
-        MMI_HILOGE("The infoId is invalid or pixelMap is null");
+        MMI_HILOGE("The infoId is invalid or pixelMap is nullptr");
         return ERR_INVALID_VALUE;
     }
-    std::unique_ptr<OHOS::Media::PixelMap> pixelMapPtr(static_cast<OHOS::Media::PixelMap*>(pixelMap));
-    if (pixelMapPtr == nullptr) {
-        MMI_HILOGE("The pixelMapPtr is null");
-        return RET_ERR;
-    }
 
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMapPtr(static_cast<OHOS::Media::PixelMap*>(pixelMap));
     MMI_HILOGD("byteCount:%{public}d, width:%{public}d, height:%{public}d",
         pixelMapPtr->GetByteCount(), pixelMapPtr->GetWidth(), pixelMapPtr->GetHeight());
     if (transparentWins_.find(infoId) != transparentWins_.end()) {

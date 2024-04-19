@@ -1902,7 +1902,7 @@ int32_t MultimodalInputConnectProxy::SetPixelMapData(int32_t infoId, void* pixel
     }
     OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
     if (pixelMapPtr->GetCapacity() == 0) {
-        MMI_HILOGE("The pixelMap is empty");
+        MMI_HILOGE("pixelMap is empty");
         return RET_ERR;
     }
     MMI_HILOGD("byteCount:%{public}d, width:%{public}d, height:%{public}d",
@@ -1924,9 +1924,8 @@ int32_t MultimodalInputConnectProxy::SetPixelMapData(int32_t infoId, void* pixel
         static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_PIXEL_MAP_DATA), data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to send request, ret:%{public}d", ret);
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS

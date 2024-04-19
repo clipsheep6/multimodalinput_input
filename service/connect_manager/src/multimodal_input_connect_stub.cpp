@@ -2086,15 +2086,14 @@ int32_t MultimodalInputConnectStub::StubSetPixelMapData(MessageParcel& data, Mes
     }
     OHOS::Media::PixelMap* pixelMap = Media::PixelMap::Unmarshalling(data);
     if (pixelMap == nullptr) {
-        MMI_HILOGE("The pixelMap is null");
+        MMI_HILOGE("pixelMap is nullptr");
         return RET_ERR;
     }
-    int32_t ret = SetPixelMapData(infoId, (void*)pixelMap);
+    int32_t ret = SetPixelMapData(infoId, static_cast<void*>(pixelMap));
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to call SetPixelMapData, ret:%{public}d", ret);
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS

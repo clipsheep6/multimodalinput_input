@@ -553,11 +553,10 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
             << item.displayId << item.zOrder << item.pointerChangeAreas << item.transform;
         if (item.pixelMap != nullptr) {
             int32_t ret = SetPixelMapData(item.id, item.pixelMap);
-            if (ret == RET_ERR) {
+            if (ret != RET_OK) {
                 MMI_HILOGE("Failed to set pixel map");
                 continue;
             }
-            MMI_HILOGD("Set pixel map success");
         }
     }
     if (pkt.ChkRWError()) {

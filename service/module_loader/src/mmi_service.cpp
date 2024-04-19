@@ -2035,7 +2035,7 @@ int32_t MMIService::SetPixelMapData(int32_t infoId, void* pixelMap)
         infoId, pixelMap));
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to set pixelmap, ret:%{public}d", ret);
-        return ret;
+        return RET_ERR;
     }
     return RET_OK;
 }
