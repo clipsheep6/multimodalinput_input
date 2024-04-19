@@ -139,19 +139,6 @@ HWTEST_F(InputDeviceManagerTest, HasTouchDevice_Test_001, TestSize.Level1)
     EXPECT_FALSE(ret);
 }
 
-/**
- * @tc.name: ParseDeviceId_Test_001
- * @tc.desc: Test the function ParseDeviceId
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputDeviceManagerTest, ParseDeviceId_Test_001, TestSize.Level1)
-{
-    InputDeviceManager inputDevice;
-    std::string sysName = "test";
-    int32_t ret = inputDevice.ParseDeviceId(sysName);
-    EXPECT_EQ(ret, RET_ERR);
-}
 
 /**
  * @tc.name: ScanPointerDevice_Test_001

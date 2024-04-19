@@ -2098,7 +2098,7 @@ int32_t MMIService::OnTransmitInfrared(int64_t infraredFrequency, std::vector<in
         context = context + "index:" + std::to_string(i) + ": pattern:" + std::to_string(pattern[i]) + ";";
     }
     #ifdef OHOS_BUILD_ENABLE_ANCO
-    InfraredEmitterController::GetInstance()->OnTransmitInfrared(infraredFrequency, pattern);
+    InfraredEmitterController::GetInstance()->Transmit(infraredFrequency, pattern);
     #endif
 
     MMI_HILOGI("MMIService::OnTransmitInfrared para. %{public}s", context.c_str());
