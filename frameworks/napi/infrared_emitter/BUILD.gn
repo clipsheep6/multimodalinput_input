@@ -12,13 +12,20 @@
 # limitations under the License.
 
 import("../../../multimodalinput_mini.gni")
-print("******************************************************************************************************")
-print("******************************************************************************************************")
-print("******input_feature_infrared_emitter = ${input_feature_infrared_emitter}")
-print("******input_feature_infrared_emitter = ${input_feature_infrared_emitter}")
-print("******input_feature_infrared_emitter = ${input_feature_infrared_emitter}")
-print("******************************************************************************************************")
-print("******************************************************************************************************")
+print(
+    "******************************************************************************************************")
+print(
+    "******************************************************************************************************")
+print(
+    "******input_feature_infrared_emitter = ${input_feature_infrared_emitter}")
+print(
+    "******input_feature_infrared_emitter = ${input_feature_infrared_emitter}")
+print(
+    "******input_feature_infrared_emitter = ${input_feature_infrared_emitter}")
+print(
+    "******************************************************************************************************")
+print(
+    "******************************************************************************************************")
 
 config("infraredemitter_config") {
   visibility = [ ":*" ]
@@ -29,7 +36,6 @@ config("infraredemitter_config") {
     "${mmi_path}/util/network/include",
   ]
 }
-
 
 ohos_shared_library("infraredemitter") {
   sources = infraredemitter_sources
@@ -42,7 +48,6 @@ ohos_shared_library("infraredemitter") {
     cfi_cross_dso = true
     debug = false
   }
-
 
   configs = [
     "${mmi_path}:coverage_flags",
