@@ -61,10 +61,9 @@ HWTEST_F(RegisterModuleTest, TransmitInfraredTest, TestSize.Level1)
         requencys.push_back(dist * i + frequency_Min);
     }
     int32_t ret = InputManager::GetInstance()->TransmitInfrared(frequency_Min, requencys);
-    if(0 != ret) {
+    if (0 != ret) {
         testResult = true;
     }
-    //EXPECT_NE(ret, 0);
     EXPECT_EQ(testResult, true);
 }
 

@@ -1895,12 +1895,12 @@ int32_t MultimodalInputConnectProxy::CancelInjection()
 }
 
 /**
- * @brief Get whether System has IrEmitter.
- * @param hasIrEmitter the para takes the value which Indicates the device has  IrEmitter or not,  .
+ * @brief Get whether System has IrEmitter
+ * @param hasIrEmitter the para takes the value which Indicates the device has IrEmitter or not
  * @return 0 if success; returns a non-0 value otherwise.
  * @since 11
  */
-int32_t MultimodalInputConnectProxy::HasIrEmitter(bool &hasIrEmitter) 
+int32_t MultimodalInputConnectProxy::HasIrEmitter(bool &hasIrEmitter)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -1942,7 +1942,8 @@ int32_t MultimodalInputConnectProxy::GetInfraredFrequencies(std::vector<Infrared
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(
-                    MultimodalinputConnectInterfaceCode::NATIVE_INFRARED_FREQUENCY), data, reply, option);
+                                      MultimodalinputConnectInterfaceCode::NATIVE_INFRARED_FREQUENCY), 
+                                      data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("MultimodalInputConnectProxy::GetInfraredFrequencies Send request fail, ret:%{public}d", ret);
         return ret;
@@ -1989,7 +1990,8 @@ int32_t MultimodalInputConnectProxy::TransmitInfrared(int64_t number, std::vecto
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(
-                    MultimodalinputConnectInterfaceCode::NATIVE_CANCEL_TRANSMIT), data, reply, option);
+                                      MultimodalinputConnectInterfaceCode::NATIVE_CANCEL_TRANSMIT),
+                                      data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("MultimodalInputConnectProxy::TransmitInfrared Send request fail, ret:%{public}d", ret);
         return ret;

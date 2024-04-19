@@ -92,7 +92,7 @@ bool ParsePatternArray(const napi_env& env, const napi_value& value, std::vector
 };
 
 bool ParseTransmitInfraredJSParam(const napi_env& env, const napi_callback_info &info, int64_t & infraredFrequency,
-                                std::vector<int64_t> & vecPattern)
+                                  std::vector<int64_t> & vecPattern)
 {
     CALL_DEBUG_ENTER;
     size_t argc = NUMBER_DEFAULT;
@@ -144,7 +144,7 @@ napi_value CreateInfraredFrequencyItem(napi_env env, const InfraredFrequency &in
     CHKRP(napi_create_int64(env, infraredFrequency.min_, &jsMin), "napi_create_int64:min");
     CHKRP(napi_set_named_property(env, result, "min", jsMin), SET_NAMED_PROPERTY);
     return result;
-}  
+}
 
 static napi_value HasIrEmitter(napi_env env, napi_callback_info info)
 {
@@ -192,7 +192,7 @@ static napi_value GetInfraredFrequencies(napi_env env, napi_callback_info info)
     return result;
 }
 
-static napi_value TransmitInfrared(napi_env env, napi_callback_info info) 
+static napi_value TransmitInfrared(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     napi_value result = nullptr;
@@ -208,12 +208,12 @@ static napi_value TransmitInfrared(napi_env env, napi_callback_info info)
     for (int32_t i = 0; i < size; i++) {
         context = context + std::to_string(i) + ": pattern: " + std::to_string(pattern[i]) + ";";
     }
-    MMI_HILOGD("js_register_module.TransmitInfrared para size :%{public}s " , context.c_str());
+    MMI_HILOGD("js_register_module.TransmitInfrared para size :%{public}s", context.c_str());
     int32_t ret = InputManager::GetInstance()->TransmitInfrared(number, pattern);
     /******** permission error service *******/
     if (ret != RET_OK) {
         if (RET_OK > ret || COMMON_PERMISSION_CHECK_ERROR == ret || ERROR_NOT_SYSAPI == ret) {
-            MMI_HILOGE("js_register_module.TransmitInfrared requst error. Permission Error or Not System APP.. Positive returnCode:%{public}d", ret);
+            MMI_HILOGE("js_register.Transmit req err. Per Er or Not Sys APP. Posi retCode:%{public}d", ret);
             ThrowError(env, ret, "TransmitInfrared");
         }
         MMI_HILOGE("js_register_module.TransmitInfrared requst error. returnCode:%{public}d", ret);

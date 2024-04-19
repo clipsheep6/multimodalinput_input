@@ -529,7 +529,7 @@ void InputManager::Authorize(bool isAuthorize)
  * @return 0 if success; returns a non-0 value otherwise.
  * @since 11
  */
-int32_t InputManager::HasIrEmitter(bool &hasIrEmitter) 
+int32_t InputManager::HasIrEmitter(bool &hasIrEmitter)
 {
     return InputMgrImpl.HasIrEmitter(hasIrEmitter);
 }

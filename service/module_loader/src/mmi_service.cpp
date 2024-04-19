@@ -2042,13 +2042,12 @@ int32_t MMIService::GetInfraredFrequencies(std::vector<InfraredFrequency>& reque
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetInfraredFrequencies,
-                                                this, std::ref(requencys)));
+                                              this, std::ref(requencys)));
     if (ret != RET_OK) {
         MMI_HILOGE("OnGetInfraredFrequencies failed, returnCode:%{public}d", ret);
         return RET_ERR;
     }
-    return RET_OK;
-    
+    return RET_OK;    
 }
 
 int32_t MMIService::TransmitInfrared(int64_t number, std::vector<int64_t>& pattern)

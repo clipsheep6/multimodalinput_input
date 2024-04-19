@@ -120,11 +120,11 @@ bool PermissionHelper::CheckHapPermission(uint32_t tokenId, uint32_t required)
 
 /***
  * add this funciton just because CheckHapPermission(int, String) and
- * CheckHapPermission(string ) are private function.
- * In fact this should be added as the previous two functions as public,
+ * CheckHapPermission(string ) are private function
+ * In fact this should be added as the previous two functions as public
  * but consider the privacy and security add them as private
  * ***/
-bool PermissionHelper::CheckInfraredEmmit() 
+bool PermissionHelper::CheckInfraredEmmit()
 {
     std::string infraredEmmitPermissionCode = "ohos.permission.INFRARED_EMITTER";
     return CheckHapPermission(infraredEmmitPermissionCode);
@@ -172,7 +172,7 @@ bool PermissionHelper::CheckHapPermission(uint32_t tokenId, const std::string pe
     int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, permissionCode);
     if (ret != OHOS::Security::AccessToken::PERMISSION_GRANTED) {
         MMI_HILOGE("Check Permi: %{public}s fail for appId:%{public}d, and ret:%{public}d",
-                permissionCode.c_str(), tokenId, ret);
+                   permissionCode.c_str(), tokenId, ret);
         return false;
     }
     MMI_HILOGD("Check permission( %{public}s) permission success", permissionCode.c_str());
