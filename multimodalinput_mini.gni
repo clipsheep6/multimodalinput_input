@@ -119,7 +119,6 @@ declare_args() {
     "window_manager/src/input_windows_manager.cpp",
   ]
 
-
   infraredemitter_sources = [
     "src/js_register_module.cpp",
   ]

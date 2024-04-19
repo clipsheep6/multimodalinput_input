@@ -41,21 +41,19 @@ public:
 
 private:
     bool CheckHapPermission(uint32_t tokenId, uint32_t required);
-    
     /***
+     * this function is checked whether a oparate from APP has certial permissions
      * tokenId: id of applicaiton 
      * permissionCode: code of permission for checked
      * returnedValue: true: check successful; false: check failed
      * ****/
     bool CheckHapPermission(uint32_t tokenId, std::string permissionCode);
-
-    
     /***
+     * this function is checked whether a oparate from APP has certial permissions
      * permissionCode: code of permission for checked
      * returnedValue: true: check successful; false: check failed
      * ****/
     bool CheckHapPermission(std::string permissionCode);
-
     bool CheckMonitorPermission(uint32_t tokenId);
     bool CheckInterceptorPermission(uint32_t tokenId);
     bool CheckDispatchControlPermission(uint32_t tokenId);

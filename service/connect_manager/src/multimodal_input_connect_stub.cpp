@@ -296,7 +296,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_CANCEL_INJECTION):
             return StubCancelInjection(data, reply);
-            break;            
+            break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_INFRARED_OWN):
             return StubHasIrEmitter(data, reply);
             break;
@@ -305,7 +305,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_CANCEL_TRANSMIT):
             return StubTransmitInfrared(data, reply);
-            break; 
+            break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -2077,24 +2077,21 @@ int32_t MultimodalInputConnectStub::StubCancelInjection(MessageParcel& data, Mes
     return RET_OK;
 }
 
-
-    /**
-     * @brief Get whether System has IrEmitter.
-     * @param hasIrEmitter the para takes the value which Indicates the device has  IrEmitter or not,  .
-     * @return 0 if success; returns a non-0 value otherwise.
-     * @since 11
-     */
-
+/**
+ * @brief Get whether System has IrEmitter.
+ * @param hasIrEmitter the para takes the value which Indicates the device has IrEmitter or not,.
+ * @return 0 if success; returns a non-0 value otherwise.
+ * @since 11
+ */
 int32_t MultimodalInputConnectStub::StubHasIrEmitter(MessageParcel& data, MessageParcel& reply)
 {
-    MMI_HILOGE("StubHasIrEmitter for trace, delete this while finish.  %d",__LINE__);
     CALL_DEBUG_ENTER;
     if (!PerHelper->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
-    }    
+    }
     bool hasIrEmitter = false;
-    int32_t ret = HasIrEmitter( hasIrEmitter);
+    int32_t ret = HasIrEmitter(hasIrEmitter);
     if (ret != RET_OK) {
         MMI_HILOGE("Call StubHasIrEmitter failed ret:%{public}d", ret);
         return ret;
@@ -2104,7 +2101,6 @@ int32_t MultimodalInputConnectStub::StubHasIrEmitter(MessageParcel& data, Messag
     return RET_OK;
 }
 
-
 int32_t MultimodalInputConnectStub::StubGetInfraredFrequencies(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
@@ -2113,7 +2109,7 @@ int32_t MultimodalInputConnectStub::StubGetInfraredFrequencies(MessageParcel& da
         return ERROR_NOT_SYSAPI;
     } 
     if (!PerHelper->CheckInfraredEmmit()) {
-        MMI_HILOGE("MultimodalInputConnectStub::StubGetInfraredFrequencies permission check failed. returnCode:%{public}d", ERROR_NO_PERMISSION);
+        MMI_HILOGE("MulmodalConStub::StubGetInfr permi check failed. returnCode:%{public}d", ERROR_NO_PERMISSION);
         return ERROR_NO_PERMISSION;
     }
     std::vector<InfraredFrequency> requencys;
@@ -2123,14 +2119,12 @@ int32_t MultimodalInputConnectStub::StubGetInfraredFrequencies(MessageParcel& da
         return ret;
     }
     WRITEINT64(reply, requencys.size());
-    for(const auto &item : requencys) 
-    {
+    for (const auto &item : requencys) {
         WRITEINT64(reply, item.max_);
         WRITEINT64(reply, item.min_);
     }
     return RET_OK;
 }
-
 
 int32_t MultimodalInputConnectStub::StubTransmitInfrared(MessageParcel& data, MessageParcel& reply)
 {
@@ -2138,18 +2132,18 @@ int32_t MultimodalInputConnectStub::StubTransmitInfrared(MessageParcel& data, Me
     if (!PerHelper->VerifySystemApp()) {
         MMI_HILOGE("StubTransmitInfrared Verify system APP failed");
         return ERROR_NOT_SYSAPI;
-    }  
+    }
     if (!PerHelper->CheckInfraredEmmit()) {
         MMI_HILOGE("StubTransmitInfrared permission check failed. returnCode:%{public}d", ERROR_NO_PERMISSION);
         return ERROR_NO_PERMISSION;
     } 
-    int64_t number =0;
+    int64_t number = 0;
     READINT64(data, number, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t pattern_len =0; 
+    int32_t pattern_len = 0; 
     std::vector<int64_t> pattern;
     READINT32(data, pattern_len, IPC_PROXY_DEAD_OBJECT_ERR);
-    for(int32_t i =0; i < pattern_len; i++) {
-        int64_t value =0;
+    for (int32_t i = 0; i < pattern_len; i++) {
+        int64_t value = 0;
         READINT64(data, value);
         pattern.push_back(value);
     }
@@ -2161,6 +2155,5 @@ int32_t MultimodalInputConnectStub::StubTransmitInfrared(MessageParcel& data, Me
     WRITEINT32(reply, ret);
     return RET_OK;
 }
-
 } // namespace MMI
 } // namespace OHOS

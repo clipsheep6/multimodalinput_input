@@ -16,16 +16,11 @@
 #ifndef I_INFRARED_MANAGER
 #define I_INFRARED_MANAGER
 
-
-//#include "nocopyable.h"
-
 namespace OHOS {
-    namespace MMI {
-    
+    namespace MMI {    
         struct InfraredFrequency {
-            
            int64_t max_  { 0 };
-           int64_t min_  { 0 }; 
+           int64_t min_  { 0 };
         };
     } // namespace MMI
 } // namespace OHOS
