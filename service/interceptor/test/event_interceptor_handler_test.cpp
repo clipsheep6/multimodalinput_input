@@ -19,10 +19,7 @@
 #include "mmi_log.h"
 #include "uds_server.h"
 
-#define private public
 #include "event_interceptor_handler.h"
-#undef private
-
 
 namespace OHOS {
 namespace MMI {
