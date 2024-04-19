@@ -133,6 +133,7 @@ public:
     int32_t Authorize(bool isAuthorize) override;
     int32_t CancelInjection() override;
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+    int32_t SetPixelMapData(int32_t infoId, void* pixelMap) override;
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitAncoUds();
