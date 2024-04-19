@@ -96,7 +96,7 @@ bool InfraredEmitterController::GetFrequencies(std::vector<InfraredFrequency> &f
     for (size_t i = 0; i < outRange.size(); i++) {
         InfraredFrequency item;
         context = context + "index:" + std::to_string(i) + ": per.max:" + std::to_string(outRange[i].max) +
-         ": per.min:" + std::to_string(outRange[i].min) + ";";
+         ": per.min:" + std::to_string(outRange[i].min) + ";;";
         item.max_ = outRange[i].max;
         item.min_ = outRange[i].min;
         frequencyInfo.pushback(item);
