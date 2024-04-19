@@ -102,6 +102,8 @@ enum class MultimodalinputConnectInterfaceCode {
     GET_KEY_STATE = 80,
     NATIVE_AUTHORIZE = 81,
     NATIVE_CANCEL_INJECTION = 82,
+    ENABLE_HARDWARE_CURSOR_STATS = 83,
+    GET_HARDWARE_CURSOR_STATS = 84,
 };
 
 enum class MultimodalinputEventObserverCode {

@@ -1958,6 +1958,37 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadRotateSwitch(MessageParcel& d
     return RET_OK;
 }
 
+int32_t MultimodalInputConnectStub::StubEnableHardwareCursorStats(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    bool enable = false;
+    READBOOL(data, enable, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = EnableHardwareCursorStats(enable);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call EnableHardwareCursorStats failed ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("Success enable:%{public}d,pid:%{public}d", enable, GetCallingPid());
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetHardwareCursorStats(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    uint32_t frameCount = 0;
+    uint32_t vsyncCount = 0;
+    int32_t ret = GetHardwareCursorStats(frameCount, vsyncCount);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetHardwareCursorStats failed ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("Success frameCount:%{public}d, vsyncCount:%{public}d, pid:%{public}d", frameCount,
+        vsyncCount, GetCallingPid());
+    WRITEBOOL(reply, frameCount, IPC_PROXY_DEAD_OBJECT_ERR);
+    WRITEBOOL(reply, vsyncCount, IPC_PROXY_DEAD_OBJECT_ERR);
+    return RET_OK;
+}
+
 int32_t MultimodalInputConnectStub::StubSetShieldStatus(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
