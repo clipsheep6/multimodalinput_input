@@ -2047,7 +2047,7 @@ int32_t MMIService::GetInfraredFrequencies(std::vector<InfraredFrequency>& reque
         MMI_HILOGE("OnGetInfraredFrequencies failed, returnCode:%{public}d", ret);
         return RET_ERR;
     }
-    return RET_OK;    
+    return RET_OK;
 }
 
 int32_t MMIService::TransmitInfrared(int64_t number, std::vector<int64_t>& pattern)

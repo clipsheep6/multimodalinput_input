@@ -47,7 +47,7 @@ private:
      * permissionCode: code of permission for checked
      * returnedValue: true: check successful; false: check failed
      * ****/
-    bool CheckHapPermission(uint32_t tokenId, std::string permissionCode);    
+    bool CheckHapPermission(uint32_t tokenId, std::string permissionCode);
     /***
      * this function is checked whether a oparate from APP has certial permissions
      * permissionCode: code of permission for checked

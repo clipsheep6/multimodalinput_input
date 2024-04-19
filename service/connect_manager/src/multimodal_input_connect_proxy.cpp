@@ -1942,7 +1942,7 @@ int32_t MultimodalInputConnectProxy::GetInfraredFrequencies(std::vector<Infrared
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(
-                                      MultimodalinputConnectInterfaceCode::NATIVE_INFRARED_FREQUENCY), 
+                                      MultimodalinputConnectInterfaceCode::NATIVE_INFRARED_FREQUENCY),
                                       data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("MultimodalInputConnectProxy::GetInfraredFrequencies Send request fail, ret:%{public}d", ret);

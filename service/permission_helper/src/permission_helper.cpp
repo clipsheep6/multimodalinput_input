@@ -146,9 +146,9 @@ bool PermissionHelper::CheckHapPermission(const std::string permissionCode)
 
 /***
  * this function is checked whether a oparate from APP has certial permissions
- * tokenId: id of applicaiton 
- * permissionCode: code of permission for checked
- * returnedValue: true: check successful; false: check failed
+ * tokenId:id of applicaiton
+ * permissionCode:code of permission for checked
+ * returnedValue:true: check successful; false: check failed
  * permissionCode of InfraredEmitter Function: ohos.permission.InfraredEmitter
  * CheckHapPermission(pid, permissionCode)
  * ****/
