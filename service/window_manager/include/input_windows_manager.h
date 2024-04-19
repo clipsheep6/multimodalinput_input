@@ -85,8 +85,9 @@ public:
     int32_t AppendExtraData(const ExtraData& extraData);
     bool IsWindowVisible(int32_t pid);
     void ClearExtraData();
+    ExtraData GetExtraData() const;
     const std::vector<WindowInfo>& GetWindowGroupInfoByDisplayId(int32_t displayId) const;
-    std::pair<int32_t, int32_t> TransformWindowXY(const WindowInfo &window, int32_t logicX, int32_t logicY) const;
+    std::pair<double, double> TransformWindowXY(const WindowInfo &window, double logicX, double logicY) const;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
     int32_t UpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
@@ -113,14 +114,14 @@ public:
 #endif //OHOS_BUILD_ENABLE_POINTER
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    void AdjustDisplayCoordinate(const DisplayInfo& displayInfo, int32_t& physicalX, int32_t& physicalY) const;
+    void AdjustDisplayCoordinate(const DisplayInfo& displayInfo, double& physicalX, double& physicalY) const;
     bool TouchPointToDisplayPoint(int32_t deviceId, struct libinput_event_touch* touch,
         EventTouch& touchInfo, int32_t& targetDisplayId);
-    void RotateScreen(const DisplayInfo& info, LogicalCoordinate& coord) const;
     void ReverseRotateScreen(const DisplayInfo& info, const double x, const double y, Coordinate2D& cursorPos) const;
-    bool TransformTipPoint(struct libinput_event_tablet_tool* tip, LogicalCoordinate& coord, int32_t& displayId) const;
+    void RotateScreen(const DisplayInfo& info, PhysicalCoordinate& coord) const;
+    bool TransformTipPoint(struct libinput_event_tablet_tool* tip, PhysicalCoordinate& coord, int32_t& displayId) const;
     bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
-        int32_t& targetDisplayId, LogicalCoordinate& coord) const;
+        int32_t& targetDisplayId, PhysicalCoordinate& coord) const;
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
@@ -188,7 +189,7 @@ private:
     void FindPhysicalDisplay(const DisplayInfo& displayInfo, int32_t& physicalX,
         int32_t& physicalY, int32_t& displayId);
     void InitMouseDownInfo();
-    void SelectPointerChangeArea(const WindowInfo &windowInfo, PointerStyle &pointerStyle,
+    bool SelectPointerChangeArea(const WindowInfo &windowInfo, PointerStyle &pointerStyle,
         int32_t logicalX, int32_t logicalY);
     void UpdatePointerChangeAreas(const DisplayGroupInfo &displayGroupInfo);
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -211,7 +212,7 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool IsInHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects, const WindowInfo &window) const;
-    void InWhichHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects, PointerStyle &pointerStyle) const;
+    bool InWhichHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects, PointerStyle &pointerStyle) const;
     template <class T>
     void CreateStatusConfigObserver(T& item);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
@@ -259,6 +260,7 @@ private:
     ExtraData extraData_;
     bool haveSetObserver_ { false };
     bool dragFlag_ { false };
+    bool isDragBorder_ { false };
     bool pointerDrawFlag_ { false };
     DevMode showCursor_;
     DisplayMode displayMode_ { DisplayMode::UNKNOWN };
