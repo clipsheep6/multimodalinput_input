@@ -384,7 +384,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                         }
                         case 's': {
                             if (!StrToInt(optarg, scrollValue)) {
-                                std::cout << "invalid  scroll button command" << std::endl;
+                                std::cout << "invalid scroll button command" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
                             std::cout << "scroll wheel " << scrollValue << std::endl;
