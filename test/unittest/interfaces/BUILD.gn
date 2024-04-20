@@ -20,7 +20,11 @@ module_output_path = "multimodalinput/mmi_unit_out"
 ohos_unittest("InputNativeTest") {
   module_out_path = module_output_path
   defines = []
-  include_dirs = [ "${mmi_path}/interfaces/kits/c/input" ]
+  include_dirs = [
+    "${mmi_path}/interfaces/kits/c/input",
+    "${mmi_path}/frameworks/napi/infrared_emitter/include",
+    "${mmi_path}/frameworks/",
+  ]
   if (input_ext_feature_anco) {
     defines += [ "OHOS_BUILD_ENABLE_ANCO" ]
   }
