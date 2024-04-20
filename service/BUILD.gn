@@ -91,7 +91,10 @@ config("libmmi_server_config") {
   }
 
   if (input_ext_feature_anco) {
-    include_dirs += [ "${mmi_ext_path}/anco_uds_manager/include" ]
+    include_dirs += [
+      "${mmi_ext_path}/anco_uds_manager/include",
+      "${mmi_service_path}/infrared_emitter/include",
+    ]
   }
 
   if (input_ext_feature_magiccursor) {
@@ -233,6 +236,13 @@ ohos_shared_library("libmmi-server") {
     external_deps += [ "resource_schedule_service:ressched_client" ]
   }
 
+  if (input_ext_feature_anco) {
+    external_deps += [
+      "drivers_interface_rtos_extra:libconsumerir_proxy_1.0",
+      "hdf_core:libhdi",
+    ]
+  }
+
   external_deps += [
     "ability_base:want",
     "ability_base:zuri",
@@ -300,6 +310,7 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "${mmi_path}/service/include",
     "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/device_config/include",
     "${mmi_path}/service/device_manager/include",
     "${mmi_path}/service/device_scalability/include",
     "${mmi_path}/service/dfx/include",
@@ -324,6 +335,7 @@ ohos_unittest("ut-mmi-service-out") {
   sources = [
     "${mmi_path}/test/unittest/common/src/system_info.cpp",
     "connect_manager/test/multimodal_input_connect_stub_test.cpp",
+    "device_config/test/device_config_file_parser_test.cpp",
     "event_dispatch/test/event_dispatch_test.cpp",
     "event_dump/test/event_dump_test.cpp",
     "event_handler/test/anr_manager_test.cpp",

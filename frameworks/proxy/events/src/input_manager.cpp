@@ -523,6 +523,21 @@ void InputManager::Authorize(bool isAuthorize)
     InputMgrImpl.Authorize(isAuthorize);
 }
 
+int32_t InputManager::HasIrEmitter(bool &hasIrEmitter)
+{
+    return InputMgrImpl.HasIrEmitter(hasIrEmitter);
+}
+
+int32_t InputManager::GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys)
+{
+    return InputMgrImpl.GetInfraredFrequencies(requencys);
+}
+
+int32_t InputManager::TransmitInfrared(int64_t number, std::vector<int64_t>& pattern)
+{
+    return InputMgrImpl.TransmitInfrared(number, pattern);
+}
+
 int32_t InputManager::SetMoveEventFilters(bool flag)
 {
     return InputMgrImpl.SetMoveEventFilters(flag);

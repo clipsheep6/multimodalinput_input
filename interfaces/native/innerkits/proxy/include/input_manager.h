@@ -37,6 +37,7 @@
 #include "key_option.h"
 #include "pointer_style.h"
 #include "window_info.h"
+#include "infrared_frequency_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -817,6 +818,30 @@ public:
     int32_t GetTouchpadRotateSwitch(bool &rotateSwitch);
 
     int32_t SetMoveEventFilters(bool flag);
+    /**
+     * @brief Get whether System has IrEmitter.
+     * @param hasIrEmitter the para takes the value which Indicates the device has  IrEmitter or not.
+     * @return 0 if success; returns a non-0 value otherwise.
+     * @since 12
+     */
+    int32_t HasIrEmitter(bool &hasIrEmitter);
+
+    /**
+     * @brief Get InfraredFrequency of the IrEmitter in device.
+     * @param requencys take out the IrEmitter's Frequency.
+     * @return 0 if success; returns a non-0 value otherwise.
+     * @since 12
+     */
+    int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys);
+
+    /**
+     * @brief user IrEmitter with parameter number and pattern.
+     * @param number   Frequency of IrEmitter works .
+     * @param pattern  Pattern of signal transmission in alternate on/off mode, in microseconds.
+     * @return 0 if success; returns a non-0 value otherwise.
+     * @since 12
+     */
+    int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
 
 private:
     InputManager() = default;
