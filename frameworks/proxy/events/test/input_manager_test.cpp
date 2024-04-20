@@ -130,7 +130,7 @@ HWTEST_F(InputManagerTest, GetInfraredFrequenciesTest, TestSize.Level1)
     int32_t size = requencys.size();
     std::string context = "data.size=" + std::to_string(size) + ";";
     for (int32_t i = 0; i < size; i++) {
-        context = context + std::to_string(i) + ": pattern: " + std::to_string(pattern[i]) + ";";
+        context = context + std::to_string(i) + ": requencys: " + std::to_string(requencys[i]) + ";";
     }
     MMI_HILOGD("js_register_module.TransmitInfrared para size :%{public}s", context.c_str());
     bool testResult = true;
