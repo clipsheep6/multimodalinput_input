@@ -65,8 +65,8 @@ public:
 private:
     int32_t keyboardRepeatRate_ { 50 };
     int32_t keyboardRepeatDelay_ { 500 };
-    int64_t frequency_Max {1000};
-    int64_t frequency_Min = {100};
+    int64_t frequencyMax {1000};
+    int64_t frequencyMin = {100};
 };
 
 class MMIWindowChecker : public MMI::IWindowChecker {
@@ -147,12 +147,12 @@ HWTEST_F(InputManagerTest, TransmitInfraredTest, TestSize.Level1)
 {
     int_32 times = 10;
     std::vector<InfraredFrequency> requencys;
-    int64_t dist = (frequency_Max - frequency_Min) / times;
+    int64_t dist = (frequencyMax - frequencyMin) / times;
 
     for (int i = 0; i < times; i++) {
-        requencys.push_back(dist * i + frequency_Min);
+        requencys.push_back(dist * i + frequencyMin);
     }
-    int32_t ret = InputManager::GetInstance()->TransmitInfrared(frequency_Min, requencys);
+    int32_t ret = InputManager::GetInstance()->TransmitInfrared(frequencyMin, requencys);
     EXPECT_EQ(RET_OK, ret);
 }
 
