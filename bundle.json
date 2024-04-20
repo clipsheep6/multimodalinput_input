@@ -17,7 +17,8 @@
       "SystemCapability.MultimodalInput.Input.InputMonitor",
       "SystemCapability.MultimodalInput.Input.Pointer",
       "SystemCapability.MultimodalInput.Input.ShortKey",
-      "SystemCapability.MultimodalInput.Input.InfraredEmitter"
+      "SystemCapability.MultimodalInput.Input.InfraredEmitter",
+      "SystemCapability.MultimodalInput.Input.Cooperator"
     ],
     "features": [
       "input_feature_product",
