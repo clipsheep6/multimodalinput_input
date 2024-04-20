@@ -192,10 +192,11 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
             auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
             CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
             inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
+            CHKPR(pointerEvent, ERROR_NULL_POINTER);
             if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER)) {
                 IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), false);
-            } else if (((action < PointerEvent::POINTER_ACTION_PULL_DOWN) ||
-                (action > PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW)) &&
+            } else if (((pointerEvent->GetPointerAction() < PointerEvent::POINTER_ACTION_PULL_DOWN) ||
+                (pointerEvent->GetPointerAction() > PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW)) &&
                 !IPointerDrawingManager::GetInstance()->IsPointerVisible()) {
                 IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), true);
             }
@@ -277,7 +278,8 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
         size_t size = 0;
         pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
             >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
-            >> info.displayId >> info.zOrder >> info.pointerChangeAreas >> info.transform >> size;
+            >> info.displayId >> info.zOrder >> info.pointerChangeAreas >> info.transform
+            >> info.windowInputType >> size;
         if (size != 0) {
             CreatPixelMap(size, pkt, info);
         }
@@ -339,7 +341,8 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
         WindowInfo info;
         pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
             >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
-            >> info.displayId >> info.zOrder >> info.pointerChangeAreas >> info.transform;
+            >> info.displayId >> info.zOrder >> info.pointerChangeAreas >> info.transform
+            >> info.windowInputType;
         windowGroupInfo.windowsInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");
