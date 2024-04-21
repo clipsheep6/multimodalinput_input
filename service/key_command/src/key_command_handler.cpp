@@ -712,10 +712,8 @@ std::shared_ptr<KeyEvent> KeyCommandHandler::CreateKeyEvent(int32_t keyCode, int
     return keyEvent;
 }
 
-bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
+bool KeyCommandHandler::PreHandleEvent(const std::shared_ptr<KeyEvent> key)
 {
-    CALL_DEBUG_ENTER;
-    CHKPF(key);
     MMI_HILOGD("KeyEvent occured. keyCode:%{public}d, keyAction:%{public}d",
                key->GetKeyCode(), key->GetKeyAction());
     if (!IsEnableCombineKey(key)) {
@@ -728,6 +726,16 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
             return false;
         }
         isParseConfig_ = true;
+    }
+    return true;
+}
+
+bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(key);
+    if (!PreHandleEvent(key)) {
+        return false;
     }
     if (!isParseMaxCount_) {
         ParseRepeatKeyMaxCount();
