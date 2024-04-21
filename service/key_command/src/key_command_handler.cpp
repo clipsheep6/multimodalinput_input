@@ -581,7 +581,7 @@ void KeyCommandHandler::PrintExcludeKeys()
 {
     size_t keysSize = excludeKeys_.size();
     for (size_t i = 0; i < keysSize; i++) {
-        MMI_HILOGD("keyCode:%{public}d, keyAction:%{public}d, delay:%{public}" PRId64, 
+        MMI_HILOGD("keyCode:%{public}d, keyAction:%{public}d, delay:%{public}" PRId64,
                    excludeKeys_[i].keyCode, excludeKeys_[i].keyAction, excludeKeys_[i].delay);
     }
 }
@@ -716,8 +716,8 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
 {
     CALL_DEBUG_ENTER;
     CHKPF(key);
-    MMI_HILOGD("KeyEvent occured. keyCode:%{public}d, keyAction:%{public}d", 
-                key->GetKeyCode(), key->GetKeyAction());
+    MMI_HILOGD("KeyEvent occured. keyCode:%{public}d, keyAction:%{public}d",
+               key->GetKeyCode(), key->GetKeyAction());
     if (!IsEnableCombineKey(key)) {
         MMI_HILOGI("Combine key is taken over in key command");
         return false;
@@ -729,7 +729,6 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
         }
         isParseConfig_ = true;
     }
-
     if (!isParseMaxCount_) {
         ParseRepeatKeyMaxCount();
         isParseMaxCount_ = true;
@@ -737,12 +736,10 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
             intervalTime_ = repeatKeys_[0].delay;
         }
     }
-
     if (!isParseStatusConfig_) {
         ParseStatusConfigObserver();
         isParseStatusConfig_ = true;
     }
-
     bool isHandled = HandleShortKeys(key);
     isHandled = HandleSequences(key) || isHandled;
     if (isHandled) {
@@ -754,7 +751,6 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
         }
         return true;
     }
-
     if (!isDownStart_) {
         HandleRepeatKeys(key);
         return false;
@@ -764,7 +760,6 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
             return true;
         }
     }
-
     count_ = 0;
     isDownStart_ = false;
     return false;
