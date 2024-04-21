@@ -556,7 +556,7 @@ bool KeyCommandHandler::ParseExcludeJson(const std::string &configFile)
         MMI_HILOGE("Parse ExcludeKeys configFile failed");
         return false;
     }
-
+    PrintExcludeKeys();
     return true;
 }
 
@@ -574,6 +574,15 @@ void KeyCommandHandler::Print()
                    " bundleName:%{public}s, abilityName:%{public}s", shortcutKey.finalKey,
                    shortcutKey.keyDownDuration, shortcutKey.triggerType,
                    shortcutKey.ability.bundleName.c_str(), shortcutKey.ability.abilityName.c_str());
+    }
+}
+
+void KeyCommandHandler::PrintExcludeKeys()
+{
+    size_t keysSize = excludeKeys_.size();
+    for (size_t i = 0; i < keysSize; i++) {
+        MMI_HILOGD("keyCode:%{public}d, keyAction:%{public}d, delay:%{public}" PRId64, 
+                   excludeKeys_[i].keyCode, excludeKeys_[i].keyAction, excludeKeys_[i].delay);
     }
 }
 
@@ -707,6 +716,8 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
 {
     CALL_DEBUG_ENTER;
     CHKPF(key);
+    MMI_HILOGD("KeyEvent occured. keyCode:%{public}d, keyAction:%{public}d", 
+                key->GetKeyCode(), key->GetKeyAction());
     if (!IsEnableCombineKey(key)) {
         MMI_HILOGI("Combine key is taken over in key command");
         return false;
@@ -1210,6 +1221,7 @@ bool KeyCommandHandler::HandleSequence(Sequence &sequence, bool &isLaunchAbility
 
     if (keysSize == sequenceKeysSize) {
         std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
+        MMI_HILOGD("screenStatus is : %{public}s", screenStatus.c_str());
         if (sequence.ability.bundleName == "com.ohos.screenshot" &&
             screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
             MMI_HILOGI("screen off, com.ohos.screenshot invalid.");
