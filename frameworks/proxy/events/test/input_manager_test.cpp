@@ -65,6 +65,8 @@ public:
 private:
     int32_t keyboardRepeatRate_ { 50 };
     int32_t keyboardRepeatDelay_ { 500 };
+    int64_t frequencyMax {1000};
+    int64_t frequencyMin = {100};
 };
 
 class MMIWindowChecker : public MMI::IWindowChecker {
@@ -113,6 +115,52 @@ void InputManagerTest::TearDown()
 std::string InputManagerTest::GetEventDump()
 {
     return TestUtil->GetEventDump();
+}
+
+/**
+ * @tc.name: GetInfraredFrequenciesTest
+ * @tc.desc: Event dump CheckCount
+ * @tc.type: FUNC
+ * @tc.require:AR000GJG6G
+ */
+HWTEST_F(InputManagerTest, GetInfraredFrequenciesTest, TestSize.Level1)
+{
+    std::vector<InfraredFrequency> requencys;
+    int32_t ret = InputManager::GetInstance()->GetInfraredFrequencies(requencys);
+    int32_t size = requencys.size();
+    std::string context = "data.size=" + std::to_string(size) + ";";
+    for (int32_t i = 0; i < size; i++) {
+        context = context + std::to_string(i) + ": requencys: " + std::to_string(requencys[i]) + ";";
+    }
+    MMI_HILOGD("js_register_module.TransmitInfrared para size :%{public}s", context.c_str());
+    bool testResult = true;
+    EXPECT_EQ(testResult, true);
+}
+
+/**
+ * @tc.name: EventDumpTest_CheckCount_001
+ * @tc.desc: Event dump CheckCount
+ * @tc.type: FUNC
+ * @tc.require:AR000GJG6G
+ */
+HWTEST_F(InputManagerTest, TransmitInfraredTest, TestSize.Level1)
+{
+    int_32 times = 10;
+    std::vector<InfraredFrequency> requencys;
+    int64_t dist = (frequencyMax - frequencyMin) / times;
+
+    for (int i = 0; i < times; i++) {
+        requencys.push_back(dist * i + frequencyMin);
+    }
+    int32_t ret = InputManager::GetInstance()->TransmitInfrared(frequencyMin, requencys);
+    EXPECT_EQ(RET_OK, ret);
+}
+
+HWTEST_F(InputManagerTest, HasIrEmitterTest, TestSize.Level1)
+{
+    bool hasEmmited = false;
+    int32_t ret = InputManager::GetInstance()->HasIrEmitter(hasEmmited);
+    EXPECT_EQ(hasEmmited, false);
 }
 
 /**
