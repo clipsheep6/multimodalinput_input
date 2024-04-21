@@ -86,8 +86,15 @@ config("libmmi_server_config") {
     "${graphics_path}/2d_graphics/include",
   ]
 
+  if (input_feature_fingerprint) {
+    include_dirs += [ "fingerprint_event_processor/include" ]
+  }
+
   if (input_ext_feature_anco) {
-    include_dirs += [ "${mmi_ext_path}/anco_uds_manager/include" ]
+    include_dirs += [
+      "${mmi_ext_path}/anco_uds_manager/include",
+      "${mmi_service_path}/infrared_emitter/include",
+    ]
   }
 
   if (input_ext_feature_magiccursor) {
@@ -180,6 +187,10 @@ ohos_shared_library("libmmi-server") {
       ]
     }
   }
+  if (input_feature_fingerprint) {
+    sources +=
+        [ "fingerprint_event_processor/src/fingerprint_event_processor.cpp" ]
+  }
   if (input_feature_joystick) {
     sources += [ "touch_event_normalize/src/joystick_transform_processor.cpp" ]
   }
@@ -224,6 +235,13 @@ ohos_shared_library("libmmi-server") {
 
   if (resource_schedule_service_enabled) {
     external_deps += [ "resource_schedule_service:ressched_client" ]
+  }
+
+  if (input_ext_feature_anco) {
+    external_deps += [
+      "drivers_interface_rtos_extra:libconsumerir_proxy_1.0",
+      "hdf_core:libhdi",
+    ]
   }
 
   external_deps += [
@@ -293,6 +311,9 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "${mmi_path}/service/include",
     "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/delegate_task/include",
+    "${mmi_path}/service/device_config/include",
+    "${mmi_path}/service/display_state_manager/include",
     "${mmi_path}/service/device_manager/include",
     "${mmi_path}/service/device_scalability/include",
     "${mmi_path}/service/dfx/include",
@@ -317,6 +338,9 @@ ohos_unittest("ut-mmi-service-out") {
   sources = [
     "${mmi_path}/test/unittest/common/src/system_info.cpp",
     "connect_manager/test/multimodal_input_connect_stub_test.cpp",
+    "delegate_task/test/delegate_tasks_test.cpp",
+    "device_config/test/device_config_file_parser_test.cpp",
+    "display_state_manager/test/display_event_monitor_test.cpp",
     "event_dispatch/test/event_dispatch_test.cpp",
     "event_dump/test/event_dump_test.cpp",
     "event_handler/test/anr_manager_test.cpp",
@@ -326,6 +350,7 @@ ohos_unittest("ut-mmi-service-out") {
     "interceptor/test/event_interceptor_handler_test.cpp",
     "key_command/test/key_command_handler_test.cpp",
     "module_loader/test/uds_server_test.cpp",
+    "module_loader/test/watchdog_task_test.cpp",
     "monitor/test/event_monitor_handler_test.cpp",
     "mouse_event_normalize/test/mouse_device_state_test.cpp",
     "mouse_event_normalize/test/mouse_event_normalize_test.cpp",
