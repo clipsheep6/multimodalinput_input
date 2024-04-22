@@ -964,12 +964,9 @@ napi_value JsPointerManager::GetTouchpadRotateSwitch(napi_env env, napi_value ha
 napi_value JsPointerManager::SetMoveEventFilters(napi_env env, bool flag)
 {
     CALL_DEBUG_ENTER;
-    InputManager::GetInstance()->SetMoveEventFilters(flag);
+    int32_t ret = InputManager::GetInstance()->SetMoveEventFilters(flag);
     napi_value result = nullptr;
-    if (napi_get_undefined(env, &result) != napi_ok) {
-        MMI_HILOGE("Get undefined result is failed");
-        return nullptr;
-    }
+    CHKRP(napi_create_int32(env, ret, &result), CREATE_INT32);
     return result;
 }
 } // namespace MMI
