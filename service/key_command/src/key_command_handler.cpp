@@ -35,6 +35,7 @@
 #include "util_ex.h"
 #include "nap_process.h"
 #include "multimodal_input_preferences_manager.h"
+#include "display_event_monitor.h"
 
 namespace OHOS {
 namespace MMI {
@@ -46,6 +47,7 @@ constexpr int64_t SECONDS_SYSTEM = 1000;
 constexpr int32_t SPECIAL_KEY_DOWN_DELAY = 150;
 constexpr int32_t MAX_SHORT_KEY_DOWN_DURATION = 4000;
 constexpr int32_t MIN_SHORT_KEY_DOWN_DURATION = 0;
+constexpr int32_t STYLUS_SCREEN_ON_DURATION = 500;
 constexpr int32_t TOUCH_MAX_THRESHOLD = 15;
 constexpr int32_t COMMON_PARAMETER_ERROR = 401;
 constexpr int32_t KNUCKLE_KNOCKS = 1;
@@ -66,6 +68,8 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCo
 const std::string SINGLE_KNUCKLE_ABILITY = "SingleKnuckleDoubleClickGesture";
 const std::string DOUBLE_KNUCKLE_ABILITY = "DoubleKnuckleDoubleClickGesture";
 const std::string TOUCHPAD_TRIP_TAP_ABILITY = "ThreeFingersTap";
+const std::string STYLUS_ABILITY_NAME = "com.huawei.hmos.shorthand.MainAbility";
+const std::string STYLUS_BUNDLE_NAME = "com.huawei.hmos.shorthand";
 enum SpecialType {
     SPECIAL_ALL = 0,
     SUBSCRIBER_BEFORE_DELAY = 1,
@@ -815,6 +819,7 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
+    stylusKey_.lastEventIsStylus = false;
     if (!isParseConfig_) {
         if (!ParseConfig()) {
             MMI_HILOGE("Parse configFile failed");
@@ -1395,6 +1400,10 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
         isParseStatusConfig_ = true;
     }
 
+    if(HandleStylusKey(key)) {
+        return true;
+    }
+
     bool isHandled = HandleShortKeys(key);
     isHandled = HandleSequences(key) || isHandled;
     if (isHandled) {
@@ -1474,6 +1483,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<PointerEvent> pointe
 {
     CALL_DEBUG_ENTER;
     CHKPF(pointer);
+    stylusKey_.lastEventIsStylus = false;
     if (!isParseConfig_) {
         if (!ParseConfig()) {
             MMI_HILOGE("Parse configFile failed");
@@ -1635,6 +1645,48 @@ void KeyCommandHandler::SendKeyEvent()
     isDownStart_ = false;
     isHandleSequence_ = false;
     launchAbilityCount_ = 0;
+}
+
+bool KeyCommandHandler::HandleStylusKey(const std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(keyEvent);
+    if (keyEvent->GetKeyCode() != KeyEvent::KEYCODE_STYLUS_SCREEN) {
+        stylusKey_.lastEventIsStylus = false;
+        return false;
+    }
+    bool isScreenOn = DISPLAY_MONITOR->GetScreenState();
+    if (isScreenOn && stylusKey_.lastEventIsStylus && !stylusKey_.isTimeOut) {
+        TimerMgr->RemoveTimer(stylusKey_.timerId);
+        stylusKey_.timerId = -1;
+        stylusKey_.isTimeOut = false;
+        stylusKey_.ability.abilityName = STYLUS_ABILITY_NAME;
+        stylusKey_.ability.bundleName = STYLUS_BUNDLE_NAME;
+        stylusKey_.ability.abilityType = EXTENSION_ABILITY;
+        LaunchAbility(stylusKey_.ability);
+        return true;
+    }
+
+    if (stylusKey_.isTimeOut) {
+        stylusKey_.isTimeOut = false;
+        TimerMgr->RemoveTimer(stylusKey_.timerId);
+        stylusKey_.timerId = -1;
+    }
+
+    if (!isScreenOn && stylusKey_.timerId < 0) {
+        stylusKey_.isTimeOut = false;
+        stylusKey_.durationTimes = STYLUS_SCREEN_ON_DURATION;
+        stylusKey_.timerId = TimerMgr->AddTimer(stylusKey_.durationTimes, 1, [this] () {
+            MMI_HILOGD("Timer callback");
+            stylusKey_.isTimeOut = true;
+        });
+    }
+    if (stylusKey_.timerId < 0) {
+        MMI_HILOGE("Add Timer failed");
+        return false;
+    }
+    stylusKey_.lastEventIsStylus = true;
+    return false;
 }
 
 bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent)

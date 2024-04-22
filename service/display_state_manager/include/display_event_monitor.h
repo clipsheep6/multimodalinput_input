@@ -41,9 +41,12 @@ class DisplayEventMonitor final {
         void UpdateShieldStatusOnScreenOff();
         void InitCommonEventSubscriber();
         bool IsCommonEventSubscriberInit();
+        void SetScreenState(bool state);
+        bool GetScreenState();
     private:
         int32_t shieldModeBeforeSreenOff_ { -1 };
         bool hasInit_ { false };
+        bool screenIsOn { false };
 };
 #define DISPLAY_MONITOR ::OHOS::DelayedSingleton<DisplayEventMonitor>::GetInstance()
 } // namespace MMI

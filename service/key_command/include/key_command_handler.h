@@ -126,6 +126,14 @@ struct RepeatKey {
     Ability ability;
 };
 
+struct StylusKey {
+    int32_t durationTimes { 0 };
+    int32_t timerId { -1 };
+    bool lastEventIsStylus { false };
+    bool isTimeOut { false };
+    Ability ability;
+};
+
 class KeyCommandHandler final : public IInputEventHandler {
 public:
     KeyCommandHandler() = default;
@@ -180,6 +188,7 @@ private:
     bool HandleSequence(Sequence& sequence, bool &isLaunchAbility);
     bool HandleSequences(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent);
+    bool HandleStylusKey(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleConsumedKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleMulFingersTap(const std::shared_ptr<PointerEvent> pointerEvent);
     bool AddSequenceKey(const std::shared_ptr<KeyEvent> keyEvent);
@@ -258,6 +267,7 @@ private:
     float distanceLongConfig_ { 0.0f };
     bool enableCombineKey_ { true };
     RepeatKey repeatKey_;
+    StylusKey stylusKey_;
     int32_t maxCount_ { 0 };
     int32_t count_ { 0 };
     int32_t repeatTimerId_ { -1 };

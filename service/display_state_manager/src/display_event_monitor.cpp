@@ -47,6 +47,7 @@ public:
         }
         if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
             MMI_HILOGD("display screen on");
+            DISPLAY_MONITOR->SetScreenState(true);
             if (FINGERSENSE_WRAPPER->enableFingersense_ != nullptr) {
                 MMI_HILOGD("start enable fingersense");
                 FINGERSENSE_WRAPPER->enableFingersense_();
@@ -54,6 +55,7 @@ public:
             DISPLAY_MONITOR->UpdateShieldStatusOnScreenOn();
         } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
             MMI_HILOGD("display screen off");
+            DISPLAY_MONITOR->SetScreenState(false);
             if (FINGERSENSE_WRAPPER->disableFingerSense_ != nullptr) {
                 FINGERSENSE_WRAPPER->disableFingerSense_();
             }
@@ -104,6 +106,16 @@ void DisplayEventMonitor::InitCommonEventSubscriber()
 bool DisplayEventMonitor::IsCommonEventSubscriberInit()
 {
     return hasInit_;
+}
+
+void DisplayEventMonitor::SetScreenState(bool state)
+{
+    screenIsOn = state;
+}
+
+bool DisplayEventMonitor::GetScreenState()
+{
+    return screenIsOn;
 }
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 } // namespace AppExecFwk
