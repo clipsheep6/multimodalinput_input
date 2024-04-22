@@ -713,6 +713,12 @@ int32_t MultimodalInputConnectManager::TransmitInfrared(int64_t number, std::vec
     return multimodalInputConnectService_->TransmitInfrared(number, pattern);
 }
 
+int32_t MultimodalInputConnectManager::SetPixelMapData(int32_t infoId, void* pixelMap)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->SetPixelMapData(infoId, pixelMap);
+}
+
 int32_t MultimodalInputConnectManager::SetMoveEventFilters(bool flag)
 {
     CHKPR(multimodalInputConnectService_, RET_ERR);

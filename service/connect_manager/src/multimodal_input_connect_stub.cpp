@@ -296,6 +296,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_CANCEL_INJECTION):
             return StubCancelInjection(data, reply);
+            break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_INFRARED_OWN):
             return StubHasIrEmitter(data, reply);
             break;
@@ -304,6 +305,10 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_CANCEL_TRANSMIT):
             return StubTransmitInfrared(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_PIXEL_MAP_DATA):
+            return StubSetPixelMapData(data, reply);
+            break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MOVE_EVENT_FILTERS):
             return StubSetMoveEventFilters(data, reply);
             break;
@@ -1387,7 +1392,7 @@ int32_t MultimodalInputConnectStub::StubGetFunctionKeyState(MessageParcel &data,
     }
 
     int32_t funcKey { 0 };
-    bool state  { false };
+    bool state { false };
     READINT32(data, funcKey, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = GetFunctionKeyState(funcKey, state);
     if (ret != RET_OK) {
@@ -2148,6 +2153,31 @@ int32_t MultimodalInputConnectStub::StubTransmitInfrared(MessageParcel& data, Me
     }
     WRITEINT32(reply, ret);
     return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetPixelMapData(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t infoId = -1;
+    READINT32(data, infoId, IPC_PROXY_DEAD_OBJECT_ERR);
+    if (infoId <= 0) {
+        MMI_HILOGE("Invalid infoId, infoId: %{public}d", infoId);
+        return RET_ERR;
+    }
+    OHOS::Media::PixelMap* pixelMap = Media::PixelMap::Unmarshalling(data);
+    if (pixelMap == nullptr) {
+        MMI_HILOGE("pixelMap is nullptr");
+        return RET_ERR;
+    }
+    int32_t ret = SetPixelMapData(infoId, static_cast<void*>(pixelMap));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to call SetPixelMapData, ret:%{public}d", ret);
+    }
+    return ret;
 }
 
 int32_t MultimodalInputConnectStub::StubSetMoveEventFilters(MessageParcel& data, MessageParcel& reply)

@@ -105,7 +105,8 @@ enum class MultimodalinputConnectInterfaceCode {
     NATIVE_INFRARED_OWN = 83,
     NATIVE_INFRARED_FREQUENCY = 84,
     NATIVE_CANCEL_TRANSMIT = 85,
-    SET_MOVE_EVENT_FILTERS = 86,
+    SET_PIXEL_MAP_DATA = 86,
+    SET_MOVE_EVENT_FILTERS = 87,
 };
 
 enum class MultimodalinputEventObserverCode {

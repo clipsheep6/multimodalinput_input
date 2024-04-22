@@ -18,6 +18,7 @@
 
 #include <vector>
 
+
 namespace OHOS {
 namespace MMI {
 struct ExtraData {
