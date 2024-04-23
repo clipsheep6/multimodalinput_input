@@ -2,7 +2,7 @@
   "Shortkeys": [
     {
       "preKey": [],
-      "finalKey": 2067,
+      "finalKey": 18,
       "trigger": "key_down",
       "keyDownDuration": 500,
       "ability": {
@@ -12,31 +12,8 @@
         ],
         "type": "",
         "deviceId": "",
-        "bundleName": "com.ohos.photos",
-        "abilityName": "com.ohos.photos.MainAbility",
-        "uri": "",
-        "params": [
-          {
-            "key": "launch_type",
-            "value": "power_key"
-          }
-        ]
-      }
-    },
-    {
-      "preKey": [],
-      "finalKey": 2067,
-      "trigger": "key_down",
-      "keyDownDuration": 5000,
-      "ability": {
-        "action": "",
-        "entities": [
-          ""
-        ],
-        "type": "",
-        "deviceId": "",
-        "bundleName": "com.ohos.camera",
-        "abilityName": "com.ohos.camera.MainAbility",
+        "bundleName": "com.hmos.aibase",
+        "abilityName": "WakeUpExtAbility",
         "uri": "",
         "params": [
           {
