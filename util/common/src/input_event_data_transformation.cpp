@@ -123,7 +123,7 @@ int32_t InputEventDataTransformation::SwitchEventToNetPacket(
         MMI_HILOGE("Serialize input event failed");
         return RET_ERR;
     }
-    pkt << swEvent->GetSwitchValue() << swEvent->GetSwitchMask();
+    pkt << swEvent->GetSwitchType() << swEvent->GetSwitchValue() << swEvent->GetSwitchMask();
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write key event failed");
         return RET_ERR;
@@ -138,6 +138,8 @@ int32_t InputEventDataTransformation::NetPacketToSwitchEvent(NetPacket &pkt, std
         return RET_ERR;
     }
     int32_t data = 0;
+    pkt >> data;
+    swEvent->SetSwitchType(data);
     pkt >> data;
     swEvent->SetSwitchValue(data);
     pkt >> data;

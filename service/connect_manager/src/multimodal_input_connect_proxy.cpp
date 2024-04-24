@@ -1190,7 +1190,7 @@ int32_t MultimodalInputConnectProxy::UnsubscribeKeyEvent(int32_t subscribeId)
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::SubscribeSwitchEvent(int32_t subscribeId)
+int32_t MultimodalInputConnectProxy::SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -1199,6 +1199,7 @@ int32_t MultimodalInputConnectProxy::SubscribeSwitchEvent(int32_t subscribeId)
         return ERR_INVALID_VALUE;
     }
     WRITEINT32(data, subscribeId, ERR_INVALID_VALUE);
+    WRITEINT32(data, switchType, ERR_INVALID_VALUE);
 
     MessageParcel reply;
     MessageOption option;
