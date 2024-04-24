@@ -19,6 +19,9 @@
 #include "libinput.h"
 #include "define_multimodal.h"
 #include "server_msg_handler.h"
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+#include "sec_comp_enhance_kit.h"
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
 namespace OHOS {
 namespace MMI {
