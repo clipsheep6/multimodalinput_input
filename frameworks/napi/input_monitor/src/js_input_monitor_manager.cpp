@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -91,7 +91,7 @@ void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv, const std::string &typ
                 monitors_.erase(it++);
                 continue;
             }
-            if ((*it)->GetTypeName() == typeName && (*it)->GetFingers() == fingers) {
+            if (IsFindJsInputMonitor(*it, typeName, fingers)) {
                 if ((*it)->IsMatch(jsEnv, callback) == RET_OK) {
                     monitor = *it;
                     monitors_.erase(it++);
@@ -118,7 +118,7 @@ void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv, const std::string &typ
                 monitors_.erase(it++);
                 continue;
             }
-            if ((*it)->GetTypeName() == typeName && (*it)->GetFingers() == fingers) {
+            if (IsFindJsInputMonitor(*it, typeName, fingers)) {
                 if ((*it)->IsMatch(jsEnv) == RET_OK) {
                     monitors.push_back(*it);
                     monitors_.erase(it++);
@@ -213,8 +213,8 @@ bool JsInputMonitorManager::AddEnv(napi_env env, napi_callback_info cbInfo)
                                 int32_t *id = static_cast<int32_t *>(data);
                                 delete id;
                                 id = nullptr;
-                                JsInputMonMgr.RemoveMonitor(env);
-                                JsInputMonMgr.RemoveEnv(env);
+                                JS_INPUT_MONITOR_MGR.RemoveMonitor(env);
+                                JS_INPUT_MONITOR_MGR.RemoveEnv(env);
                                 MMI_HILOGD("napi_wrap leave");
                                 }, nullptr, nullptr);
     if (status != napi_ok) {
@@ -338,6 +338,12 @@ std::vector<Rect> JsInputMonitorManager::GetHotRectAreaList(napi_env env,
         hotRectAreaList.push_back(rectItem);
     }
     return hotRectAreaList;
+}
+
+bool JsInputMonitorManager::IsFindJsInputMonitor(const std::shared_ptr<JsInputMonitor> monitor,
+    const std::string &typeName, int32_t fingers)
+{
+    return ((monitor->GetTypeName() == typeName) && (monitor->GetFingers() == fingers));
 }
 } // namespace MMI
 } // namespace OHOS

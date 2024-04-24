@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -62,7 +62,7 @@ public:
     static constexpr int32_t POINTER_ACTION_MOVE = 3;
 
     /**
-     * Indicates a pointer action representing that a finger leaves  the touchscreen or touchpad.
+     * Indicates a pointer action representing that a finger leaves the touchscreen or touchpad.
      *
      * @since 9
      */
@@ -175,7 +175,9 @@ public:
 
     static constexpr int32_t POINTER_ACTION_FINGERPRINT_SLIDE = 30;
 
-    static constexpr int32_t POINTER_ACTION_FINGERPRINT_CLICK = 31;
+    static constexpr int32_t POINTER_ACTION_FINGERPRINT_RETOUCH = 31;
+
+    static constexpr int32_t POINTER_ACTION_FINGERPRINT_CLICK = 32;
 
     enum AxisType {
         /**
@@ -700,6 +702,21 @@ public:
         void SetPointerId(int32_t pointerId);
 
         /**
+         * @brief Obtains the origin id of the pointer in this event.
+         * @return Returns the pointer id.
+         * @since 12
+         */
+        int32_t GetOriginPointerId() const;
+
+        /**
+         * @brief Sets the origin id of the pointer in this event.
+         * @param pointerId Indicates the pointer id to set.
+         * @return void
+         * @since 12
+         */
+        void SetOriginPointerId(int32_t originPointerId);
+
+        /**
          * @brief Obtains the time when the pointer is pressed.
          * @return Returns the time.
          * @since 9
@@ -1124,6 +1141,7 @@ public:
         int64_t downTime_ {};
         int32_t toolType_ {};
         int32_t targetWindowId_ { -1 };
+        int32_t originPointerId_ { -1 };
         int32_t rawDx_ {};
         int32_t rawDy_ {};
     };
@@ -1478,6 +1496,20 @@ public:
      */
     bool ReadFromParcel(Parcel &in);
 
+    /**
+     * @brief The number of times the input event is dispatched.
+     * @return Return the event dispatch times.
+     * @since 12
+     */
+    int32_t GetDispatchTimes() const;
+
+    /**
+     * @brief The number of times the same input event was distributed to multiple different windows.
+     * @return void
+     * @since 12
+     */
+    void SetDispatchTimes(int32_t dispatchTimes);
+
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     /**
      * @brief Set the fingerprint distance X.
@@ -1527,6 +1559,7 @@ private:
 private:
     bool ReadEnhanceDataFromParcel(Parcel &in);
     bool ReadBufferFromParcel(Parcel &in);
+    bool ReadAxisFromParcel(Parcel &in);
 
 private:
     int32_t pointerId_ { -1 };
@@ -1541,13 +1574,14 @@ private:
     std::array<double, AXIS_TYPE_MAX> axisValues_ {};
     std::vector<int32_t> pressedKeys_;
     std::vector<uint8_t> buffer_;
-#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-    std::vector<uint8_t> enhanceData_;
-#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     double fingerprintDistanceX_ { 0.0 };
     double fingerprintDistanceY_ { 0.0 };
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
+    int32_t dispatchTimes_ { 0 };
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    std::vector<uint8_t> enhanceData_;
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 };
 
 inline bool PointerEvent::HasAxis(AxisType axis) const
