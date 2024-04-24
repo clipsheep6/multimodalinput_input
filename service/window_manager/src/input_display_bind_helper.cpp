@@ -507,7 +507,7 @@ std::string InputDisplayBindHelper::GetContent(const std::string &fileName)
     if (file.is_open()) {
         std::string line;
         while (getline(file, line)) {
-            conent.append(line);
+            content.append(line);
         }
         file.close();
     }
