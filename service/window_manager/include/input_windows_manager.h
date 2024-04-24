@@ -55,12 +55,6 @@ struct DevMode {
     std::string SwitchName;
     bool isShow { false };
 };
-
-struct StylusNavigationStatus {
-    std::string switchName;
-    bool isOpen { false };
-};
-
 struct WindowInfoEX {
     WindowInfo window;
     bool flag { false };
@@ -71,6 +65,8 @@ class InputWindowsManager final {
 public:
     DISALLOW_COPY_AND_MOVE(InputWindowsManager);
     void Init(UDSServer& udsServer);
+    void SetMouseFlag(bool state);
+    bool GetMouseFlag();
     int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent, int32_t windowId);
     bool HandleWindowInputType(const WindowInfo &window, std::shared_ptr<PointerEvent> pointerEvent);
@@ -212,7 +208,7 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     bool SkipAnnotationWindow(uint32_t flag, int32_t toolType);
-    bool SkipNavigationWindow(uint32_t flag, int32_t toolType);
+    bool SkipNavigationWindow(WindowInputType windowType, int32_t toolType);
     int32_t UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent);
     void PullEnterLeaveEvent(int32_t logicalX, int32_t logicalY,
         const std::shared_ptr<PointerEvent> pointerEvent, const WindowInfo* touchWindow);
@@ -228,7 +224,7 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
     template <class T>
     void CreateStatusConfigObserver(T& item);
     template <class T>
-    void CreateNavigationStatusObserver(T& item);
+    void CreateAntiMisTakeObserver(T& item);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
@@ -278,8 +274,12 @@ private:
     bool pointerDrawFlag_ { false };
     DevMode showCursor_;
     DisplayMode displayMode_ { DisplayMode::UNKNOWN };
-    StylusNavigationStatus navigationMode_;
-    bool isOpenNavigationObserver_ { false };
+    struct AntiMisTake {
+        std::string switchName;
+        bool isOpen { false };
+    } antiMistake_;
+    bool isOpenAntiMisTakeObserver_ { false };
+    bool mouseFlag_ {false};
     std::map<int32_t, std::vector<int32_t>> targetWindowIds_;
 };
 

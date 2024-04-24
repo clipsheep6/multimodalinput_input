@@ -609,6 +609,7 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
         }
         WindowInfo window = *windowInfo;
         if (!dragFlag_) {
+            SetMouseFlag(lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP);
             isDragBorder_ = SelectPointerChangeArea(window, pointerStyle, logicX, logicY);
             dragPointerStyle_ = pointerStyle;
             MMI_HILOGD("not in drag SelectPointerStyle, pointerStyle is:%{public}d", dragPointerStyle_.id);
@@ -1353,7 +1354,6 @@ bool InputWindowsManager::IsInHotArea(int32_t x, int32_t y, const std::vector<Re
 bool InputWindowsManager::InWhichHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects,
     PointerStyle &pointerStyle) const
 {
-    CALL_DEBUG_ENTER;
     int32_t areaNum = 0;
     bool findFlag = false;
     for (const auto &item : rects) {
@@ -1367,8 +1367,7 @@ bool InputWindowsManager::InWhichHotArea(int32_t x, int32_t y, const std::vector
             MMI_HILOGE("The addition of displayMaxY overflows");
             return findFlag;
         }
-        if (((x > item.x) && (x <= displayMaxX)) &&
-            (y > item.y) && (y <= displayMaxY)) {
+        if (((x > item.x) && (x <= displayMaxX)) && (y > item.y) && (y <= displayMaxY)) {
             findFlag = true;
             pointerStyle.id = areaNum;
         }
@@ -1475,7 +1474,7 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
         }
         bool isHotArea = false;
         for (const auto &item : windowsInfo) {
-            if (IsTransparentWin(item.pixelMap, logicalX, logicalY)) {
+            if (IsTransparentWin(item.pixelMap, logicalX - item.area.x, logicalY - item.area.y)) {
                 MMI_HILOGE("It's an abnormal window and pointer find the next window");
                 continue;
             }
@@ -1816,10 +1815,12 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             "logicalY is :%{public}d", pointerStyle.id, window.id, logicalX, logicalY);
     }
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
+        SetMouseFlag(true);
         dragFlag_ = true;
         MMI_HILOGD("Is in drag scene");
     }
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP) {
+        SetMouseFlag(false);
         dragFlag_ = false;
         isDragBorder_ = false;
     }
@@ -1889,6 +1890,16 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
+void InputWindowsManager::SetMouseFlag(bool state)
+{
+    mouseFlag_ = state;
+}
+
+bool InputWindowsManager::GetMouseFlag()
+{
+    return mouseFlag_;
+}
+
 int32_t InputWindowsManager::SetMouseCaptureMode(int32_t windowId, bool isCaptureMode)
 {
     if (windowId < 0) {
@@ -1939,21 +1950,20 @@ bool InputWindowsManager::SkipAnnotationWindow(uint32_t flag, int32_t toolType)
     return false;
 }
 
-bool InputWindowsManager::SkipNavigationWindow(uint32_t flag, int32_t toolType)
+bool InputWindowsManager::SkipNavigationWindow(WindowInputType windowType, int32_t toolType)
 {
     CALL_DEBUG_ENTER;
-    if ((flag & WindowInfo::FLAG_BIT_NAVIGATION) != WindowInfo::FLAG_BIT_NAVIGATION
-        || (toolType != PointerEvent::TOOL_TYPE_PEN)) {
+    if (windowType != WindowInputType::ANTI_MISTAKE_TOUCH || toolType != PointerEvent::TOOL_TYPE_PEN) {
         return false;
     }
-    if (!isOpenNavigationObserver_) {
-        navigationMode_.switchName = navigationSwitchName;
-        CreateNavigationStatusObserver(navigationMode_);
-        isOpenNavigationObserver_ = true;
+    if (!isOpenAntiMisTakeObserver_) {
+        antiMistake_.switchName = navigationSwitchName;
+        CreateAntiMisTakeObserver(antiMistake_);
+        isOpenAntiMisTakeObserver_ = true;
         SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(navigationSwitchName,
-            navigationMode_.isOpen);
+            antiMistake_.isOpen);
     }
-    if (navigationMode_.isOpen) {
+    if (antiMistake_.isOpen) {
         return true;
     }
     return false;
@@ -2009,7 +2019,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     bool isHotArea = false;
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
     for (auto &item : windowsInfo) {
-        if (IsTransparentWin(item.pixelMap, logicalX, logicalY)) {
+        if (IsTransparentWin(item.pixelMap, logicalX - item.area.x, logicalY - item.area.y)) {
             MMI_HILOGE("It's an abnormal window and touchscreen find the next window");
             continue;
         }
@@ -2023,7 +2033,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         if (SkipAnnotationWindow(item.flags, pointerItem.GetToolType())) {
             continue;
         }
-        if (SkipNavigationWindow(item.flags, pointerItem.GetToolType())) {
+        if (SkipNavigationWindow(item.windowInputType, pointerItem.GetToolType())) {
             continue;
         }
 
@@ -2392,7 +2402,7 @@ void InputWindowsManager::CreateStatusConfigObserver(T& item)
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 template <class T>
-void InputWindowsManager::CreateNavigationStatusObserver(T& item)
+void InputWindowsManager::CreateAntiMisTakeObserver(T& item)
 {
     CALL_DEBUG_ENTER;
     SettingObserver::UpdateFunc updateFunc = [&item](const std::string& key) {
@@ -2864,19 +2874,21 @@ bool InputWindowsManager::IsTransparentWin(void* pixelMap, int32_t logicalX, int
 {
     CALL_DEBUG_ENTER;
     if (pixelMap == nullptr) {
-        MMI_HILOGE("The pixelmap is nullptr");
+        MMI_HILOGD("The pixelmap is nullptr");
         return false;
     }
 
     uint32_t dst = 0;
     OHOS::Media::Position pos { logicalY, logicalX };
-    OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMapPtr(static_cast<OHOS::Media::PixelMap*>(pixelMap));
     CHKPF(pixelMapPtr);
     uint32_t result = pixelMapPtr->ReadPixel(pos, dst);
     if (result != RET_OK) {
         MMI_HILOGE("Failed to read pixelmap");
         return false;
     }
+    MMI_HILOGD("dst:%{public}d, byteCount:%{public}d, width:%{public}d, height:%{public}d",
+        dst, pixelMapPtr->GetByteCount(), pixelMapPtr->GetWidth(), pixelMapPtr->GetHeight());
     return dst == RET_OK;
 }
 } // namespace MMI

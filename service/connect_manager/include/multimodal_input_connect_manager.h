@@ -127,6 +127,7 @@ public:
     int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
     void AddServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
     void RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
+    int32_t SetPixelMapData(int32_t infoId, void* pixelMap);
 
 private:
     MultimodalInputConnectManager() = default;
@@ -146,5 +147,5 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#define MultimodalInputConnMgr MultimodalInputConnectManager::GetInstance()
+#define MULTIMODAL_INPUT_CONNECT_MGR MultimodalInputConnectManager::GetInstance()
 #endif // MULTIMODAL_INPUT_CONNECT_MANAGER_H
