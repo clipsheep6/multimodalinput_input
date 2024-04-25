@@ -39,7 +39,7 @@ const std::string EVENT = "event";
 const std::string NAME = "name";
 const std::string EMPTY = "";
 const int32_t DISPLAY_ID_MAIN = 0;
-const int32_t DISPLAY_ID_SUB = 5; 
+const int32_t DISPLAY_ID_SUB = 5;
 }
 
 namespace fs = std::filesystem;
@@ -473,12 +473,12 @@ std::string InputDisplayBindHelper::GetInputDeviceById(int32_t id)
 }
 
 std::string InputDisplayBindHelper::GetInputNodeNameByCfg(int32_t id)
- {
+{
     std::ifstream file(INPUT_DEVICE_NAME_CONFIG);
     std::string res = "";
     if (file.is_open()) {
         std::string line;
-        while(getline(file, line)) {
+        while (getline(file, line)) {
             const std::string delim = "<=>";
             size_t pos = line.find(delim);
             if (pos == std::string::npos) {
@@ -497,10 +497,10 @@ std::string InputDisplayBindHelper::GetInputNodeNameByCfg(int32_t id)
         res.pop_back();
     }
     return res;
- }
+}
 
 std::string InputDisplayBindHelper::GetContent(const std::string &fileName)
- {
+{
     std::string content = "";
     std::ifstream file(fileName);
     if (file.is_open()) {
@@ -511,7 +511,7 @@ std::string InputDisplayBindHelper::GetContent(const std::string &fileName)
         file.close();
     }
     return content;
- }
+}
 
 std::string InputDisplayBindHelper::GetInputNode(const std::string &inputNodeName)
 {
@@ -530,7 +530,7 @@ std::string InputDisplayBindHelper::GetInputNode(const std::string &inputNodeNam
         }
     }
     return inputNode;
- }
+}
 
 void InputDisplayBindHelper::RemoveDisplay(int32_t id)
 {
