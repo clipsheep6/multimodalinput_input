@@ -16,10 +16,12 @@
 #include "input_display_bind_helper.h"
 
 #include <fstream>
+#include <filesystem>
 #include <iostream>
 #include <list>
 #include <sstream>
 
+#include <parameters.h>
 #include "mmi_log.h"
 #include "util.h"
 
@@ -27,7 +29,26 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputDisplayBindHelper" };
+static const std::string FOLD_SCREEN_FLAG = system::GetParameter("const.window.foldscreen.type", "");
+const std::string INPUT_DEVICE_NAME_CONFIG = "/sys_prod/etc/input/input_device_name.cfg";
+const std::string DIRECTORY = "/sys/devices/virtual/input";
+const std::string SEPARATOR = "/";
+const std::string SUFFIX = "0000:0000";
+const std::string INPUT = "input";
+const std::string EVENT = "event";
+const std::string NAME = "name";
+const std::string EMPTY = "";
+const int32_t DISPLAY_ID_MAIN = 0;
+const int32_t DISPLAY_ID_SUB = 5; 
 }
+
+namespace fs = std::filesystem;
+
+static bool IsDualDisplayFoldDevice()
+{
+    return (FOLD_SCREEN_FLAG != "" && FOLD_SCREEN_FLAG[0] == '2');
+}
+
 class BindInfo {
 public:
     int32_t GetInputDeviceId() const
@@ -408,11 +429,108 @@ void InputDisplayBindHelper::AddDisplay(int32_t id, const std::string &name)
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Param: id:%{public}d, name:%{public}s", id, name.c_str());
     auto inputDeviceName = configFileInfos_->GetInputDeviceByDisplayName(name);
+    if (IsDualDisplayFoldDevice()) {
+        std::string temp = GetInputDeviceById(id);
+        if (temp != EMPTY) {
+            inputDeviceName = temp;
+        }
+    }
     BindInfo info = infos_->GetUnbindDisplay(inputDeviceName);
     info.AddDisplay(id, name);
     infos_->Add(info);
     Store();
 }
+
+std::string InputDisplayBindHelper::GetInputDeviceById(int32_t id)
+{
+    if (id != DISPLAY_ID_MAIN && id != DISPLAY_ID_SUB) {
+        return EMPTY;
+    }
+
+    std::string inputNodeName = GetInputNodeNameByCfg(id);
+    if (inputNodeName == EMPTY) {
+        return EMPTY;
+    }
+
+    std::string inputNode = GetInputNode(inputNodeName);
+    if (inputNode == EMPTY) {
+        return EMPTY;
+    }
+
+    std::string inputEvent = inputNode;
+    size_t pos = inputEvent.find(INPUT);
+    if (pos != std::string::npos) {
+        inputEvent.replace(pos, INPUT.length(), EVENT);
+    }
+
+    std::string inputDeviceName = "";
+    inputDeviceName.append(DIRECTORY).append(SEPARATOR)
+        .append(inputNode).append(SEPARATOR)
+        .append(inputEvent).append(SUFFIX);
+    
+    MMI_HILOGI("GetInputDeviceById, id=%{public}d, inputDevice=%{public}s", id, inputDeviceName.c_str());
+    return inputDeviceName;
+}
+
+std::string InputDisplayBindHelper::GetInputNodeNameByCfg(int32_t id)
+ {
+    std::ifstream file(INPUT_DEVICE_NAME_CONFIG);
+    std::string res = "";
+    if (file.is_open()) {
+        std::string line;
+        while(getline(file, line)) {
+            const std::string delim = "<=>";
+            size_t pos = line.find(delim);
+            if (pos == std::string::npos) {
+                continue;
+            }
+            std::string displayId = line.substr(0, pos);
+            std::string inputNodeName = line.substr(pos + delim.length());
+            if (std::stoi(displayId) == id) {
+                res = inputNodeName;
+                break;
+            }
+        }
+        file.close();
+    }
+    if (res != EMPTY && (res.back() == '\n' || res.back() == '\r')) {
+        res.pop_back();
+    }
+    return res;
+ }
+
+std::string InputDisplayBindHelper::GetContent(const std::string &fileName)
+ {
+    std::string content = "";
+    std::ifstream file(fileName);
+    if (file.is_open()) {
+        std::string line;
+        while (getline(file, line)) {
+            content.append(line);
+        }
+        file.close();
+    }
+    return content;
+ }
+
+std::string InputDisplayBindHelper::GetInputNode(const std::string &inputNodeName)
+{
+    std::string inputNode = "";
+    if (fs::exists(DIRECTORY) && fs::is_directory(DIRECTORY)) {
+        for (const auto& entry : fs::directory_iterator(DIRECTORY)) {
+            std::string node = fs::path(entry.path()).filename();
+            std::string file = "";
+            file.append(DIRECTORY).append(SEPARATOR)
+                .append(node).append(SEPARATOR)
+                .append(NAME);
+            if (inputNodeName == GetContent(file)) {
+                inputNode = node;
+                break;
+            }
+        }
+    }
+    return inputNode;
+ }
 
 void InputDisplayBindHelper::RemoveDisplay(int32_t id)
 {
