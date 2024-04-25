@@ -70,9 +70,9 @@ bool InputDisplayBindHelperTest::InitInputNode()
         }
     }
     if (fs::create_directory(INPUT_NODE_PATH)) {
-        MMI_HILOGI("clear success");
+        MMI_HILOGI("create success");
     } else {
-        MMI_HILOGE("clear fail");
+        MMI_HILOGE("create fail");
         return false;
     }
     std::ofstream file(INPUT_DEVICE_NAME_FILE);
