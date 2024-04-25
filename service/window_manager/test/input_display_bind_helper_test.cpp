@@ -315,7 +315,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetDisplayIdName
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputDeviceById_007, TestSize.Level1)
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputDeviceById_008, TestSize.Level1)
 {
     InputDisplayBindHelper idh("/data/service/el1/public/multimodalinput/0.txt");
     if (!(InputDisplayBindHelperTest::InitInputNode())) {
