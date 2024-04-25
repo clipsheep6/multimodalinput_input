@@ -64,13 +64,13 @@ bool InputDisplayBindHelperTest::InitInputNode()
 {
     if (fs::exists(INPUT_NODE_PATH) && fs::is_directory(INPUT_NODE_PATH)) {
         if (fs::remove_all(INPUT_NODE_PATH) == 0) {
-            MMI_HILOI("clear success");
+            MMI_HILOGI("clear success");
         } else {
             MMI_HILOGE("clear fail");
         }
     }
     if (fs::create_directory(INPUT_NODE_PATH)) {
-        MMI_HILOI("clear success");
+        MMI_HILOGI("clear success");
     } else {
         MMI_HILOGE("clear fail");
         return false;
