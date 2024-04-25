@@ -46,7 +46,7 @@ public:
             return callback_;
         }
     private:
-        int32_t switchType_ { 0 };
+        int32_t switchType_ { -1 };
         std::function<void(std::shared_ptr<SwitchEvent>)> callback_ { nullptr };
     };
 

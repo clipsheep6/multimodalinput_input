@@ -46,7 +46,7 @@ int32_t SwitchEventInputSubscribeManager::SubscribeSwitchEvent(
 {
     CALL_INFO_TRACE;
     CHKPR(callback, INVALID_SUBSCRIBE_ID);
-    if (switchType < 0) {
+    if (switchType < SwitchEvent::SwitchType::DEFAULT) {
         MMI_HILOGE("switch type error");
         return RET_ERR;
     }

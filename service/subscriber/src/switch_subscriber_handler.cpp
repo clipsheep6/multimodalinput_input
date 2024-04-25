@@ -78,7 +78,7 @@ int32_t SwitchSubscriberHandler::SubscribeSwitchEvent(SessionPtr sess, int32_t s
         MMI_HILOGE("Invalid subscribeId");
         return RET_ERR;
     }
-    if (switchType < 0) {
+    if (switchType < SwitchEvent::SwitchType::DEFAULT) {
         MMI_HILOGE("Invalid switchType");
         return RET_ERR;
     }
@@ -110,7 +110,7 @@ bool SwitchSubscriberHandler::OnSubscribeSwitchEvent(std::shared_ptr<SwitchEvent
     CHKPF(switchEvent);
     MMI_HILOGD("switchValue:%{public}d", switchEvent->GetSwitchValue());
 
-    if (switchEvent->GetSwitchType() == LIBINPUT_SWITCH_LID)
+    if (switchEvent->GetSwitchType() == SwitchEvent::SwitchType::LID)
     {
         DfxHisysevent::OnLidSwitchChanged(switchEvent->GetSwitchValue());
     }

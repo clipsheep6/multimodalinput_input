@@ -483,7 +483,8 @@ int32_t ServerMsgHandler::OnUnsubscribeKeyEvent(IUdsServer *server, int32_t pid,
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #ifdef OHOS_BUILD_ENABLE_SWITCH
-int32_t ServerMsgHandler::OnSubscribeSwitchEvent(IUdsServer *server, int32_t pid, int32_t subscribeId, int32_t switchType)
+int32_t ServerMsgHandler::OnSubscribeSwitchEvent(
+    IUdsServer *server, int32_t pid, int32_t subscribeId, int32_t switchType)
 {
     CALL_DEBUG_ENTER;
     CHKPR(server, ERROR_NULL_POINTER);
