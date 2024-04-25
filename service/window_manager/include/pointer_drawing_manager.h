@@ -79,6 +79,7 @@ public:
     IconStyle GetIconStyle(const MOUSE_ICON mouseStyle) override;
     bool HasMagicCursor();
     int32_t DrawCursor(const MOUSE_ICON mouseStyle);
+    void DrawToPixelmap(OHOS::Rosen::Drawing::CoreCanvas &coreCanvas, const MOUSE_ICON mouseStyle);
 private:
     IconStyle GetIconType(MOUSE_ICON mouseIcon);
     void DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle);
