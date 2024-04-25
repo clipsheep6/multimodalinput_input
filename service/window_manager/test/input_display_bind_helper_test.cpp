@@ -17,6 +17,7 @@
 
 #include <fstream>
 #include <filesystem>
+
 #include <iostream>
 #include "input_display_bind_helper.h"
 #include "mmi_log.h"
