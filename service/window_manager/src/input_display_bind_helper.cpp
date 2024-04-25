@@ -31,7 +31,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputDisplayBindHelper" };
 static const std::string FOLD_SCREEN_FLAG = system::GetParameter("const.window.foldscreen.type", "");
 const std::string INPUT_DEVICE_NAME_CONFIG = "/sys_prod/etc/input/input_device_name.cfg";
-const std::string DIRECTORY = "/sys/device/virtual/input";
+const std::string DIRECTORY = "/sys/devices/virtual/input";
 const std::string SEPARATOR = "/";
 const std::string SUFFIX = "0000:0000";
 const std::string INPUT = "input";
