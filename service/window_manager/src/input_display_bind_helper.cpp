@@ -429,7 +429,6 @@ void InputDisplayBindHelper::AddDisplay(int32_t id, const std::string &name)
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Param: id:%{public}d, name:%{public}s", id, name.c_str());
     auto inputDeviceName = configFileInfos_->GetInputDeviceByDisplayName(name);
-
     if (IsDualDisplayFoldDevice()) {
         std::string temp = GetInputDeviceById(id);
         if (temp != EMPTY) {
