@@ -42,6 +42,7 @@ ohos_shared_library("inputconsumer") {
 
   external_deps = [
     "c_utils:utils",
+    "eventhandler:libeventhandler",
     "hilog:libhilog",
     "napi:ace_napi",
   ]
