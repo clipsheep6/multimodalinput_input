@@ -92,7 +92,6 @@ private:
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_ { nullptr };
     std::shared_ptr<Rosen::RSCanvasNode> bubbleCanvasNode_ { nullptr };
     std::shared_ptr<Rosen::RSCanvasNode> pointerCanvasNode_ { nullptr };
-//    std::shared_ptr<Rosen::RSCanvasDrawingNode>  pointerCanvasNode_ { nullptr };
     DisplayInfo displayInfo_ {};
     uint64_t screenId_ { 0 };
     Bubble bubble_;
@@ -126,10 +125,8 @@ private:
     PointerEvent::PointerItem currentPointerItem_;
 #ifndef USE_ROSEN_DRAWING
     Rosen::RSRecordingCanvas *trackerCanvas_;
-//    Rosen::RSRecordingCanvas *bubbleCanvas_;
 #else
     Rosen::Drawing::RecordingCanvas *trackerCanvas_;
-//    Rosen::Drawing::RecordingCanvas *bubbleCanvas_;
 #endif
 
 };
