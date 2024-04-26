@@ -16,18 +16,14 @@
 #ifndef TOUCH_DRAWING_MANAGER_H
 #define TOUCH_DRAWING_MANAGER_H
 
+#include "nocopyable.h"
+#include "singleton.h"
+#include "window_info.h"
+#include "pointer_event.h"
 #include <ui/rs_canvas_node.h>
 #include <ui/rs_surface_node.h>
 #include <transaction/rs_transaction.h>
-
 #include "draw/canvas.h"
-#include "nocopyable.h"
-#include "pointer_event.h"
-#include "window_info.h"
-#include "singleton.h"
-#include "setting_observer.h"
-
-#include "ui/rs_canvas_drawing_node.h"
 #include "utils/rect.h"
 #ifndef USE_ROSEN_DRAWING
 #include "pipeline/rs_recording_canvas.h"
@@ -37,6 +33,8 @@
 #endif
 namespace OHOS {
 namespace MMI {
+
+class TouchDrawingManager {
 struct Bubble {
     int32_t innerCircleRadius { 0 };
     int32_t outerCircleRadius { 0 };
@@ -46,95 +44,88 @@ struct DevMode {
     std::string SwitchName;
     bool isShow { false };
 };
-class TouchDrawingManager {
+#ifndef USE_ROSEN_DRAWING
+    using RosenCanvas = Rosen::RSRecordingCanvas;
+#else
+    using RosenCanvas = Rosen::Drawing::RecordingCanvas;
+#endif
+
     DECLARE_DELAYED_SINGLETON(TouchDrawingManager);
-public:
+	
+	public:
     DISALLOW_COPY_AND_MOVE(TouchDrawingManager);
     void TouchDrawHandler(const std::shared_ptr<PointerEvent>& pointerEvent);
     void UpdateDisplayInfo(const DisplayInfo& displayInfo);
     void GetOriginalTouchScreenCoordinates(Direction direction, int32_t width, int32_t height,
         int32_t &physicalX, int32_t &physicalY);
     void UpdateLabels(bool isShow);
-
 private:
     void CreateObserver();
-    void CreateCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& canvasNode);
+    void InitCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& canvasNode);
     void CreateTouchWindow();
-#ifndef USE_ROSEN_DRAWING
-    Rosen::RSRecordingCanvas*
-#else
-    Rosen::Drawing::RecordingCanvas*
-#endif
-    CreateCanvas(const std::shared_ptr<Rosen::RSCanvasNode>& canvasNode);
     void DrawBubbleHandler();
     void DrawBubble();
     void DrawPointerPositionHandler();
     void DrawTracker(int32_t x, int32_t y, int32_t pointerId);
     void DrawCrosshairs(int32_t x, int32_t y);
-    void DrawOval(int32_t x, int32_t y, int32_t longAxis, int32_t shortAxis);
     void DrawLabels();
-    void DrawRect(int32_t left, int32_t top, int32_t right, int32_t bottom);
-    void ClearPointerPosition();
-    void ClearTracker();
+    void DrawRectItem(RosenCanvas* canvas, const std::string &text, const Rosen::Drawing::Rect &rect, const Rosen::Drawing::Color &color);
     void UpdatePointerPositionInfo();
     void UpdateLastPointerItem(int32_t pointerId, PointerEvent::PointerItem &pointerItem);
-
-    bool IsValidAction(const int32_t action);
     void UpdateVelocity();
     void UpdateDisplayCoord();
-    
+    void ClearPointerPosition();
+    void ClearTracker();
+    bool IsValidAction(const int32_t action);
     template <class T>
     void CreateBubbleObserver(T& item);
     template <class T>
     void CreatePointerObserver(T& item);
-
-private:
+    template <class T>
+    std::string FormatNumber(T& number, int32_t precision);
+	
+	private:
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_ { nullptr };
     std::shared_ptr<Rosen::RSCanvasNode> bubbleCanvasNode_ { nullptr };
-    std::shared_ptr<Rosen::RSCanvasNode> pointerCanvasNode_ { nullptr };
-//    std::shared_ptr<Rosen::RSCanvasDrawingNode>  pointerCanvasNode_ { nullptr };
+    std::shared_ptr<Rosen::RSCanvasNode> trackerCanvasNode_ { nullptr };
+    std::shared_ptr<Rosen::RSCanvasNode> crosshairCanvasNode_ { nullptr };
+    std::shared_ptr<Rosen::RSCanvasNode> labelsCanvasNode_ { nullptr };
     DisplayInfo displayInfo_ {};
-    uint64_t screenId_ { 0 };
     Bubble bubble_;
-    Rosen::Drawing::Brush brush_;
-    Rosen::Drawing::Pen pen_;
-    std::shared_ptr<PointerEvent> pointerEvent_{ nullptr };
-    DevMode bubbleMode_;
-    DevMode pointerMode_;
-    bool hasBubbleObserver_{ false };
-    bool hasPointerObserver_{ false };
-    int32_t currentPointerId_ { 0 };
-    int32_t maxPointerCount_ { 0 };
-    int32_t currentPointerCount_ { 0 };
-    int64_t lastActionTime_ { 0 };
-    float xVelocity_ { 0.0 };
-    float yVelocity_ { 0.0 };
-    int32_t currentPhysicalX_ { 0 };
-    int32_t currentPhysicalY_ { 0 };
-
-    double pressure_ { 0.0 };
+    Rosen::Drawing::Brush bubbleBrush_;
+    Rosen::Drawing::Pen bubblePen_;
     Rosen::Drawing::Brush textBrush_;
-    Rosen::Drawing::Pen textPen_;
+    Rosen::Drawing::Brush rectBrush_;
     Rosen::Drawing::Pen pathPen_;
     Rosen::Drawing::Pen pointPen_;
     Rosen::Drawing::Pen crosshairsPen_;
+    DevMode bubbleMode_;
+    DevMode pointerMode_;
+    int32_t currentPointerId_ { 0 };
+    int32_t maxPointerCount_ { 0 };
+    int32_t currentPointerCount_ { 0 };
+    int32_t currentPhysicalX_ { 0 };
+    int32_t currentPhysicalY_ { 0 };
+    int64_t lastActionTime_ { 0 };
+    double xVelocity_ { 0.0 };
+    double yVelocity_ { 0.0 };
+    double pressure_ { 0.0 };
+    bool hasBubbleObserver_{ false };
+    bool hasPointerObserver_{ false };
     bool isFirstDownAction_ { false };
     bool isUpAction_ { false };
     bool isDownAction_ { false };
-    std::list<PointerEvent::PointerItem> lastPointerItem_;
-    Rosen::Drawing::Rect rect_;
+    std::shared_ptr<PointerEvent> pointerEvent_{ nullptr };
+    std::list<PointerEvent::PointerItem> lastPointerItem_ { };
     PointerEvent::PointerItem currentPointerItem_;
-#ifndef USE_ROSEN_DRAWING
-    Rosen::RSRecordingCanvas *trackerCanvas_;
-//    Rosen::RSRecordingCanvas *bubbleCanvas_;
-#else
-    Rosen::Drawing::RecordingCanvas *trackerCanvas_;
-//    Rosen::Drawing::RecordingCanvas *bubbleCanvas_;
-#endif
-
+    RosenCanvas *trackerCanvas_;
+    RosenCanvas *crosshairCanvas_;
+    RosenCanvas *labelsCanvas_;
+    Rosen::Drawing::Color colorWhite_ { Rosen::Drawing::Color::ColorQuadSetARGB(192, 255, 255, 255) };
+    Rosen::Drawing::Color colorBlack_ { Rosen::Drawing::Color::ColorQuadSetARGB(192, 0, 0, 0) };
+    Rosen::Drawing::Color colorRed_ { Rosen::Drawing::Color::ColorQuadSetARGB(192, 255, 0, 0) };
 };
 #define TouchDrawingMgr ::OHOS::DelayedSingleton<TouchDrawingManager>::GetInstance()
-
 } // namespace MMI
 } // namespace OHOS
 #endif // TOUCH_DRAWING_MANAGER_H
