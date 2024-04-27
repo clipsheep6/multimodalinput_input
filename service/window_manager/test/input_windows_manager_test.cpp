@@ -617,7 +617,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetWindowPointerStyle_
     IconStyle defaultIconStyle;
     area = WindowArea::ENTER;
     defaultIconStyle.iconPath = "default_icon_path";
-    IPointerDrawingManager::GetInstance()->GetMouseIconPath()[MOUSE_ICON::DEFAULT] = defaultIconStyle;
     WinMgr->SetWindowPointerStyle(area, pid, windowId);
     assert(lastPointerStyle_.id == pointerStyle.id);
     assert(windowId != GLOBAL_WINDOW_ID && (pointerStyle.id == MOUSE_ICON::DEFAULT &&
