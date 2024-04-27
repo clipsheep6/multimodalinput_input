@@ -633,7 +633,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetWindowPointerStyle_
  * @tc.require:
  */
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateWindowPointerVisible_001, TestSize.Level1)
-{    
+{
     int32_t pid = 123;
     bool visible = true;
     IPointerDrawingManager::GetInstance()->GetPointerVisible(pid);
@@ -648,7 +648,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateWindowPointerVis
  * @tc.require:
  */
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchPointer_001, TestSize.Level1)
-{    
+{
     int32_t pointerAction = PointerEvent::POINTER_ACTION_ENTER_WINDOW;
     ASSERT_NO_FATAL_FAILURE(WinMgr->DispatchPointer(pointerAction));
     pointerAction = PointerEvent::POINTER_ACTION_LEAVE_WINDOW;
@@ -664,7 +664,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchPointer_001, T
  * @tc.require:
  */
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_NotifyPointerToWindow_001, TestSize.Level1)
-{    
+{
     InputWindowsManager inputWindowsManager;
     auto windowInfo = inputWindowsManager.GetWindowInfo(0, 0);
     inputWindowsManager.lastWindowInfo_ = WindowInfo{1};
@@ -678,7 +678,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_NotifyPointerToWindow_
  * @tc.require:
  */
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PrintWindowInfo_001, TestSize.Level1)
-{    
+{
     WindowInfo windowInfo1;
     windowInfo1.id = 1;
     windowInfo1.pid = 100;
@@ -730,7 +730,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PrintWindowGroupInfo_0
  * @tc.require:
  */
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PrintDisplayInfo_001, TestSize.Level1)
-{    
+{
     InputWindowsManager manager;
     manager.displayGroupInfo_.width = 1920;
     manager.displayGroupInfo_.height = 1080;
@@ -761,7 +761,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPhysicalDisplay_001
  * @tc.require:
  */
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPhysicalDisplay_002, TestSize.Level1)
-{    
+{
     int32_t id = -1;
     const DisplayInfo* displayInfo = WinMgr->GetPhysicalDisplay(id);
     EXPECT_EQ(displayInfo, nullptr);
