@@ -747,7 +747,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PrintDisplayInfo_001, 
  * @tc.require:
  */
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPhysicalDisplay_001, TestSize.Level1)
-{    
+{
     int32_t id = 1;
     const DisplayInfo* displayInfo = WinMgr->GetPhysicalDisplay(id);
     EXPECT_NE(displayInfo, nullptr);
