@@ -554,6 +554,23 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPointerStyleByArea_
     area = WindowArea::FOCUS_ON_LEFT;
     WinMgr->GetPointerStyleByArea(area, pid, winId, pointerStyle);
     EXPECT_EQ(pointerStyle.id, MOUSE_ICON::WEST_EAST);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetPointerStyleByArea_002
+ * @tc.desc: Test getting pointer style by area
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPointerStyleByArea_002, TestSize.Level1)
+{
+    WindowArea area;
+    int32_t pid = 123;
+    int32_t winId = 678;
+    PointerStyle pointerStyle;
+    pointerStyle.size = 1;
+    pointerStyle.color = 2;
+    pointerStyle.id = 3;
     area = WindowArea::FOCUS_ON_RIGHT;
     WinMgr->GetPointerStyleByArea(area, pid, winId, pointerStyle);
     EXPECT_EQ(pointerStyle.id, MOUSE_ICON::WEST_EAST);
@@ -689,7 +706,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PrintWindowInfo_001, T
     windowInfo2.pointerChangeAreas = {40, 50, 60};
     windowInfo2.transform = {4.0f, 5.0f, 6.0f};
     std::vector<WindowInfo> windowsInfo = {windowInfo1, windowInfo2};
-    ASSERT_NO_FATAL_FAILURE(WinMgr->PrintWindowInfo(windowsInfo)); 
+    ASSERT_NO_FATAL_FAILURE(WinMgr->PrintWindowInfo(windowsInfo));
 }
 
 /**
@@ -699,7 +716,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PrintWindowInfo_001, T
  * @tc.require:
  */
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PrintWindowGroupInfo_001, TestSize.Level1)
-{    
+{
     WindowGroupInfo testData;
     testData.focusWindowId = 1;
     testData.displayId = 2;
@@ -735,6 +752,19 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPhysicalDisplay_001
     const DisplayInfo* displayInfo = WinMgr->GetPhysicalDisplay(id);
     EXPECT_NE(displayInfo, nullptr);
     EXPECT_EQ(displayInfo->id, id);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetPhysicalDisplay_002
+ * @tc.desc: Test getting physical display information
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPhysicalDisplay_002, TestSize.Level1)
+{    
+    int32_t id = -1;
+    const DisplayInfo* displayInfo = WinMgr->GetPhysicalDisplay(id);
+    EXPECT_EQ(displayInfo, nullptr);
 }
 } // namespace MMI
 } // namespace OHOS
