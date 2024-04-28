@@ -618,11 +618,11 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetWindowPointerStyle_
     area = WindowArea::ENTER;
     defaultIconStyle.iconPath = "default_icon_path";
     WinMgr->SetWindowPointerStyle(area, pid, windowId);
-    ASSERT_EQ(lastPointerStyle_.id, pointerStyle.id);
+    EXPECT_EQ(lastPointerStyle_.id, pointerStyle.id);
     assert(windowId != GLOBAL_WINDOW_ID && (pointerStyle.id == MOUSE_ICON::DEFAULT &&
         mouseIcons[MOUSE_ICON(pointerStyle.id)].iconPath != defaultIconPath));
-    ASSERT_EQ(WinMgr->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style), RET_OK);
-    ASSERT_EQ(lastPointerStyle_.id, style.id);
+    EXPECT_EQ(WinMgr->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style), RET_OK);
+    EXPECT_EQ(lastPointerStyle_.id, style.id);
 }
 
 /**
@@ -666,7 +666,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_NotifyPointerToWindow_
 {
     InputWindowsManager inputWindowsManager;
     auto windowInfo = inputWindowsManager.GetWindowInfo(0, 0);
-    WindowInfo windowInfo{1};
     inputWindowsManager.lastWindowInfo_ = windowInfo;
     ASSERT_NO_FATAL_FAILURE(WinMgr->NotifyPointerToWindow());
 }
