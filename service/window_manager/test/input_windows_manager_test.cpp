@@ -20,10 +20,10 @@
 #include "input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "mmi_log.h"
+#include "uds_server.h"
 #include "proto.h"
 #include "scene_board_judgement.h"
 #include "struct_multimodal.h"
-#include "uds_server.h"
 #include "window_info.h"
 
 namespace OHOS {
