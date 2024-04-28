@@ -2931,5 +2931,53 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetTouchpadTapSwitch_001, TestSize.L
     ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadTapSwitch(newFlag) == RET_OK);
     ASSERT_TRUE(flag == newFlag);
 }
+
+
+/**
+ * @tc.name: InputManagerTest_MouseChangeColor_001
+ * @tc.desc: Update color or mouse to triger the DrawManager and DrawPointer and CreatePointerWindow  and RotateDegree and DrawMovePointer
+ * 
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_MouseChangeColor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t setColor = 0x000000;
+    int32_t setRedColor = 0xff0000;
+    InputManager::GetInstance()->SetPointerColor(setColor);
+    int32_t getColor = 3;
+    ASSERT_TRUE(InputManager::GetInstance()->GetPointerColor(getColor) == RET_OK);
+    InputManager::GetInstance()->SetPointerColor(setRedColor);
+    getColor = 3;
+    ASSERT_TRUE(InputManager::GetInstance()->GetPointerColor(getColor) == RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_MouseMove_01
+ * @tc.desc: Update color or mouse to triger the DrawManager and DrawPointer and CreatePointerWindow  and RotateDegree and DrawMovePointer
+ * @ construct LIBINPUT_EVENT_POINTER_MOTION event to triger usage of  mouse_transform_processor.Normalize and mouse_transform_processor.HandleMotionInner and UpdateAndAdjustMouseLocation and RotateScreen
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_MouseMove_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_ONE);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_ONE);
+
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_HIDE_POINTER);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    ASSERT_FALSE(InputManager::GetInstance()->IsPointerVisible());
+}
 } // namespace MMI
 } // namespace OHOS
