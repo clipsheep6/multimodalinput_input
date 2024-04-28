@@ -20,10 +20,10 @@
 #include "input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "mmi_log.h"
-#include "uds_server.h"
 #include "proto.h"
 #include "scene_board_judgement.h"
 #include "struct_multimodal.h"
+#include "uds_server.h"
 #include "window_info.h"
 
 namespace OHOS {
@@ -618,11 +618,11 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetWindowPointerStyle_
     area = WindowArea::ENTER;
     defaultIconStyle.iconPath = "default_icon_path";
     WinMgr->SetWindowPointerStyle(area, pid, windowId);
-    assert(lastPointerStyle_.id == pointerStyle.id);
+    ASSERT_EQ(lastPointerStyle_.id, pointerStyle.id);
     assert(windowId != GLOBAL_WINDOW_ID && (pointerStyle.id == MOUSE_ICON::DEFAULT &&
         mouseIcons[MOUSE_ICON(pointerStyle.id)].iconPath != defaultIconPath));
-    assert(WinMgr->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style) == RET_OK);
-    assert(lastPointerStyle_.id == style.id);
+    ASSERT_EQ(WinMgr->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style), RET_OK);
+    ASSERT_EQ(lastPointerStyle_.id, style.id);
 }
 
 /**
@@ -666,7 +666,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_NotifyPointerToWindow_
 {
     InputWindowsManager inputWindowsManager;
     auto windowInfo = inputWindowsManager.GetWindowInfo(0, 0);
-    inputWindowsManager.lastWindowInfo_ = WindowInfo{1};
+    WindowInfo windowInfo{1};
+    inputWindowsManager.lastWindowInfo_ = windowInfo;
     ASSERT_NO_FATAL_FAILURE(WinMgr->NotifyPointerToWindow());
 }
 
