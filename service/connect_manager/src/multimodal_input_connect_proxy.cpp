@@ -259,15 +259,7 @@ int32_t MultimodalInputConnectProxy::SetMouseIcon(int32_t pid, int32_t windowId,
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    std::vector<uint8_t> buff;
-    pixelMapPtr->EncodeTlv(buff);
-    uint32_t size = buff.size();
-
-    MMI_HILOGD("image buffer size being sent is %{public}d", size);
-    WRITEINT32(data, size, ERR_INVALID_VALUE);
-    for (uint32_t i = 0; i < size; i++) {
-        WRITEUINT8(data, buff[i], ERR_INVALID_VALUE);
-    }
+    pixelMapPtr->Marshalling(data);
     WRITEINT32(data, pid, ERR_INVALID_VALUE);
     MMI_HILOGD("windowId being sent is %{public}d", windowId);
     WRITEINT32(data, windowId, ERR_INVALID_VALUE);
@@ -561,7 +553,7 @@ int32_t MultimodalInputConnectProxy::MarkProcessed(int32_t eventType, int32_t ev
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::MARK_PROCESSED),
         data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+        MMI_HILOGD("Send request fail, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;

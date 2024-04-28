@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -187,7 +187,7 @@ void EventResample::UpdatePointerEvent(MotionEvent* outEvent)
             auto logicY = it.second.coordY;
             item.SetDisplayX(logicX);
             item.SetDisplayY(logicY);
-            
+
             auto windowXY = TransformSampleWindowXY(pointerEvent_, item, logicX, logicY);
             item.SetWindowX(windowXY.first);
             item.SetWindowY(windowXY.second);
@@ -303,7 +303,7 @@ void EventResample::UpdateTouchState(MotionEvent &event)
             if (idx < 0) {
                 TouchState newState;
                 touchStates_.push_back(newState);
-                idx = static_cast<ssize_t>(touchStates_.size() - 1);
+                idx = static_cast<ssize_t>(touchStates_.size()) - 1;
             }
             TouchState& touchState = touchStates_.at(idx);
             touchState.Initialize(deviceId, source);
@@ -513,7 +513,8 @@ void EventResample::PrintfDeviceName()
         MMI_HILOGW("The device is not found");
         return;
     }
-    MMI_HILOGI("The id:%{public}d event created by:%{public}s", pointerEvent_->GetId(), device->GetName().c_str());
+    MMI_HILOGI("InputTracking id:%{public}d event created by:%{public}s", pointerEvent_->GetId(),
+        device->GetName().c_str());
 }
 
 } // namespace MMI
