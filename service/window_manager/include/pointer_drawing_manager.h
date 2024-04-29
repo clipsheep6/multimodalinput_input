@@ -136,7 +136,7 @@ private:
     bool mouseDisplayState_ { false };
     bool mouseIconUpdate_ { false };
     std::unique_ptr<OHOS::Media::PixelMap> userIcon_ { nullptr };
-    uint64_t screenId_ { 0 };
+    uint64_t displayId_ { 0 };
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_;
     std::shared_ptr<Rosen::RSCanvasNode> canvasNode_;
     int32_t userIconHotSpotX_ { 0 };

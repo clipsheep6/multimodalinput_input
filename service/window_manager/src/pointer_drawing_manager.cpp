@@ -41,6 +41,8 @@
 #include "util.h"
 #include "timer_manager.h"
 
+#include "display_manager.h"
+
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "PointerDrawingManager"
 
@@ -113,6 +115,14 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
         surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
             surfaceNode_->GetStagingProperties().GetBounds().z_,
             surfaceNode_->GetStagingProperties().GetBounds().w_);
+        
+        if (displayId_ != static_cast<Rosen::DisplayId>(displayId)) {
+            // Move pointer to another display. 'Add' before 'Remove' to avoid the surfaceNode_ to be destroyed by dms.
+            Rosen::DisplayManager::GetInstance().AddSurfaceNodeToDisplay(displayId, surfaceNode_);
+            Rosen::DisplayManager::GetInstance().RemoveSurfaceNodeFromDisplay(displayId_, surfaceNode_);
+            displayId_ = static_cast<Rosen::DisplayId>(displayId);
+        }
+        
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("The lastpointerStyle is equal with pointerStyle,id %{public}d size:%{public}d",
             pointerStyle.id, pointerStyle.size);
@@ -257,7 +267,7 @@ void PointerDrawingManager::CreatePointerSwiftObserver(isMagicCursor& item)
         if (item.isShow != tmp) {
             MMI_HILOGD("switch pointer style");
             if (surfaceNode_ != nullptr) {
-                surfaceNode_->DetachToDisplay(screenId_);
+                Rosen::DisplayManager::GetInstance().RemoveSurfaceNodeFromDisplay(displayId_, surfaceNode_);
                 Rosen::RSTransaction::FlushImplicitTransaction();
                 this->SwitchPointerStyle();
             }
@@ -304,7 +314,7 @@ int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle)
     sptr<OHOS::Surface> layer = GetLayer();
     if (layer == nullptr) {
         MMI_HILOGE("Init layer is failed, Layer is nullptr");
-        surfaceNode_->DetachToDisplay(screenId_);
+        Rosen::DisplayManager::GetInstance().RemoveSurfaceNodeFromDisplay(displayId_, surfaceNode_);
         surfaceNode_ = nullptr;
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGE("Pointer window destroy success");
@@ -314,7 +324,7 @@ int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle)
     sptr<OHOS::SurfaceBuffer> buffer = GetSurfaceBuffer(layer);
     if (buffer == nullptr || buffer->GetVirAddr() == nullptr) {
         MMI_HILOGE("Init layer is failed, buffer or virAddr is nullptr");
-        surfaceNode_->DetachToDisplay(screenId_);
+        Rosen::DisplayManager::GetInstance().RemoveSurfaceNodeFromDisplay(displayId_, surfaceNode_);
         surfaceNode_ = nullptr;
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGE("Pointer window destroy success");
@@ -652,10 +662,10 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
 #else
     surfaceNode_->SetBackgroundColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
 #endif
-
-    screenId_ = static_cast<uint64_t>(displayId);
-    std::cout << "ScreenId: " << screenId_ << std::endl;
-    surfaceNode_->AttachToDisplay(screenId_);
+    
+    displayId_ = static_cast<Rosen::DisplayId>(displayId);
+    MMI_HILOGD("DisplayId: %{public}" PRIu64 "", displayId_);
+    Rosen::DisplayManager::GetInstance().AddSurfaceNodeToDisplay(displayId_, surfaceNode_);
     RotateDegree(direction);
     lastDirection_ = direction;
 
@@ -1058,7 +1068,7 @@ void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo &displayGroupIn
     lastPhysicalY_ = displayGroupInfo.displaysInfo[0].height / CALCULATE_MIDDLE;
     MouseEventHdr->OnDisplayLost(displayInfo_.id);
     if (surfaceNode_ != nullptr) {
-        surfaceNode_->DetachToDisplay(screenId_);
+        Rosen::DisplayManager::GetInstance().RemoveSurfaceNodeFromDisplay(displayId_, surfaceNode_);
         surfaceNode_ = nullptr;
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("Pointer window destroy success");
@@ -1093,7 +1103,7 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
     DrawManager();
     if (!hasPointerDevice_ && surfaceNode_ != nullptr) {
         MMI_HILOGD("Pointer window destroy start");
-        surfaceNode_->DetachToDisplay(screenId_);
+        Rosen::DisplayManager::GetInstance().RemoveSurfaceNodeFromDisplay(displayId_, surfaceNode_);
         surfaceNode_ = nullptr;
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("Pointer window destroy success");
@@ -1180,7 +1190,7 @@ void PointerDrawingManager::DeletePointerVisible(int32_t pid)
     MMI_HILOGI("isRsRemoteDied:%{public}d", isRsRemoteDied ? 1 : 0);
     if (isRsRemoteDied && surfaceNode_ != nullptr) {
         isRsRemoteDied = false;
-        surfaceNode_->DetachToDisplay(screenId_);
+        Rosen::DisplayManager::GetInstance().RemoveSurfaceNodeFromDisplay(displayId_, surfaceNode_);
         surfaceNode_ = nullptr;
         Rosen::RSTransaction::FlushImplicitTransaction();
     }
@@ -1436,7 +1446,7 @@ void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle)
     }
     if (hasDisplay_ && hasPointerDevice_) {
         if (surfaceNode_ != nullptr) {
-            surfaceNode_->AttachToDisplay(screenId_);
+            Rosen::DisplayManager::GetInstance().AddSurfaceNodeToDisplay(displayId_, surfaceNode_);
             Rosen::RSTransaction::FlushImplicitTransaction();
         }
         Direction direction = DIRECTION0;
