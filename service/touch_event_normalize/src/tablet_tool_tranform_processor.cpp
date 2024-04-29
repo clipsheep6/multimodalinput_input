@@ -17,10 +17,12 @@
 #include "input_windows_manager.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "TabletToolTransformProcessor"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MMI_LOG_DOMAIN, "TabletToolTransformProcessor" };
 constexpr int32_t DEFAULT_POINTER_ID { 0 };
 } // namespace
 
@@ -138,7 +140,7 @@ bool TabletToolTransformProcessor::OnTipDown(struct libinput_event_tablet_tool* 
     CALL_DEBUG_ENTER;
     CHKPF(event);
     int32_t targetDisplayId = -1;
-    LogicalCoordinate tCoord;
+    PhysicalCoordinate tCoord;
     if (!WinMgr->CalculateTipPoint(event, targetDisplayId, tCoord)) {
         MMI_HILOGE("CalculateTipPoint failed");
         return false;
@@ -162,8 +164,10 @@ bool TabletToolTransformProcessor::OnTipDown(struct libinput_event_tablet_tool* 
     item.SetDeviceId(deviceId_);
     item.SetDownTime(time);
     item.SetPressed(true);
-    item.SetDisplayX(tCoord.x);
-    item.SetDisplayY(tCoord.y);
+    item.SetDisplayX(static_cast<int32_t>(tCoord.x));
+    item.SetDisplayY(static_cast<int32_t>(tCoord.y));
+    item.SetDisplayXPos(tCoord.x);
+    item.SetDisplayYPos(tCoord.y);
     item.SetTiltX(tiltX);
     item.SetTiltY(tiltY);
     item.SetPressure(pressure);
@@ -187,7 +191,7 @@ bool TabletToolTransformProcessor::OnTipMotion(struct libinput_event* event)
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
 
     int32_t targetDisplayId = pointerEvent_->GetTargetDisplayId();
-    LogicalCoordinate tCoord;
+    PhysicalCoordinate tCoord;
     if (!WinMgr->CalculateTipPoint(tabletEvent, targetDisplayId, tCoord)) {
         MMI_HILOGE("CalculateTipPoint failed");
         return false;
@@ -211,8 +215,10 @@ bool TabletToolTransformProcessor::OnTipMotion(struct libinput_event* event)
         item.SetPressed(true);
         item.SetToolType(toolType);
     }
-    item.SetDisplayX(tCoord.x);
-    item.SetDisplayY(tCoord.y);
+    item.SetDisplayX(static_cast<int32_t>(tCoord.x));
+    item.SetDisplayY(static_cast<int32_t>(tCoord.y));
+    item.SetDisplayXPos(tCoord.x);
+    item.SetDisplayYPos(tCoord.y);
     item.SetTiltX(tiltX);
     item.SetTiltY(tiltY);
     item.SetPressure(pressure);

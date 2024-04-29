@@ -20,10 +20,12 @@
 #include "hos_key_event.h"
 #include "util.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KeyEventValueTransformation"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventValueTransformation" };
 constexpr int32_t INVALID_KEY_CODE = -1;
 } // namespace
 
@@ -224,7 +226,7 @@ const std::multimap<int32_t, KeyEventValueTransformation> MAP_KEY_EVENT_VALUE_TR
     {168, {"KEY_MEDIA_REWIND", 168, 14, HOS_KEY_MEDIA_REWIND}},
     {208, {"KEY_MEDIA_FAST_FORWARD", 208, 15, HOS_KEY_MEDIA_FAST_FORWARD}},
     {582, {"KEY_VOICE_ASSISTANT", 582, 20, HOS_KEY_VOICE_ASSISTANT}},
-    {240, {"KEY_UNKNOWN", 240, -1, HOS_KEY_UNKNOWN}},
+    {240, {"KEY_FN", 240, 0, HOS_KEY_FN}},
 
     {142, {"KEY_SLEEP", 142, 2600, HOS_KEY_SLEEP}},
     {85, {"KEY_ZENKAKU_HANKAKU", 85, 2601, HOS_KEY_ZENKAKU_HANKAKU}},

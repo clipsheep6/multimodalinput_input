@@ -23,10 +23,12 @@
 #include "mmi_log.h"
 #include "parameter.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "WatchdogTask"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "WatchdogTask" };
 const std::string THREAD_NAME = "mmi_service";
 } // namespace
 
@@ -59,17 +61,15 @@ std::string WatchdogTask::GetProcessNameFromProcCmdline(int32_t pid)
     if (procCmdlineContent.empty()) {
         return "";
     }
-    size_t procNameStartPos = 0;
-    size_t procNameEndPos = procCmdlineContent.size();
-    for (size_t i = 0; i < procCmdlineContent.size(); i++) {
-        if (procCmdlineContent[i] == '/') {
-            procNameStartPos = i + 1;
-        } else if (procCmdlineContent[i] == '\0') {
-            procNameEndPos = i;
-            break;
-        }
+    auto pos = procCmdlineContent.find('\0');
+    if (pos != std::string::npos) {
+        procCmdlineContent = procCmdlineContent.substr(0, pos);
     }
-    return procCmdlineContent.substr(procNameStartPos, procNameEndPos - procNameStartPos);
+    pos = procCmdlineContent.rfind('/');
+    if (pos != std::string::npos) {
+        return procCmdlineContent.substr(pos + 1);
+    }
+    return procCmdlineContent;
 }
 
 bool WatchdogTask::IsNumberic(const std::string &str)
@@ -116,7 +116,7 @@ std::string WatchdogTask::GetSelfProcName()
     fin.close();
 
     std::string ret = std::string(readStr);
-    ret.erase(std::remove_if(ret.begin(), ret.end(), [](unsigned char c) {
+    auto comparisonFun = [](unsigned char c) {
         if (c >= '0' && c <= '9') {
             return false;
         }
@@ -129,7 +129,9 @@ std::string WatchdogTask::GetSelfProcName()
         if (c == '.' || c == '-' || c == '_') {
             return false;
         }
-        return true;}), ret.end());
+        return true;
+    };
+    ret.erase(std::remove_if(ret.begin(), ret.end(), comparisonFun), ret.end());
     return ret;
 }
 

@@ -27,10 +27,12 @@
 #include "timer_manager.h"
 #include "util_ex.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KeySubscriberHandler"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeySubscriberHandler" };
 constexpr uint32_t MAX_PRE_KEY_COUNT = 4;
 constexpr int32_t REMOVE_OBSERVER = -2;
 constexpr int32_t UNOBSERVED = -1;
@@ -193,20 +195,34 @@ int32_t KeySubscriberHandler::EnableCombineKey(bool enable)
     return RET_OK;
 }
 
+bool KeySubscriberHandler::IsFunctionKey(const std::shared_ptr<KeyEvent> keyEvent)
+{
+    MMI_HILOGD("Is Funciton Key In");
+    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_BRIGHTNESS_DOWN
+        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_BRIGHTNESS_UP) {
+        return true;
+    }
+    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_UP
+        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_DOWN
+        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_MUTE) {
+        return true;
+    }
+    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_MUTE
+        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_SWITCHVIDEOMODE
+        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_WLAN
+        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_CONFIG) {
+        return true;
+    }
+    return false;
+}
+
 bool KeySubscriberHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPF(keyEvent);
     if (enableCombineKey_) {
         return true;
     }
-    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_BRIGHTNESS_DOWN
-        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_BRIGHTNESS_UP) {
-        auto items = keyEvent->GetKeyItems();
-        return items.size() != 1 ? enableCombineKey_ : true;
-    }
-    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_UP
-        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_DOWN
-        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_MUTE) {
+    if (IsFunctionKey(keyEvent)) {
         auto items = keyEvent->GetKeyItems();
         return items.size() != 1 ? enableCombineKey_ : true;
     }
@@ -597,7 +613,7 @@ void KeySubscriberHandler::SubscriberNotifyNap(const std::shared_ptr<Subscriber>
     CHKPV(subscriber);
     int32_t state = NapProcess::GetInstance()->GetNapClientPid();
     if (state == REMOVE_OBSERVER || state == UNOBSERVED) {
-        MMI_HILOGW("nap client status:%{public}d", state);
+        MMI_HILOGD("nap client status:%{public}d", state);
         return;
     }
 

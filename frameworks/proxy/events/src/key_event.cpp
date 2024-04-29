@@ -17,11 +17,13 @@
 
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KeyEvent"
+
 using namespace OHOS::HiviewDFX;
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEvent" };
 const std::map <int32_t, std::string> KEYCODE_TO_STRING = {
     {KeyEvent::KEYCODE_FN, "KEYCODE_FN"},
     {KeyEvent::KEYCODE_UNKNOWN, "KEYCODE_UNKNOWN"},
@@ -412,6 +414,8 @@ const std::map <int32_t, std::string> KEYCODE_TO_STRING = {
     {KeyEvent::KEYCODE_RIGHT_KNOB, "KEYCODE_RIGHT_KNOB"},
     {KeyEvent::KEYCODE_VOICE_SOURCE_SWITCH, "KEYCODE_VOICE_SOURCE_SWITCH"},
     {KeyEvent::KEYCODE_LAUNCHER_MENU, "KEYCODE_LAUNCHER_MENU"},
+    {KeyEvent::KEYCODE_CALL_NOTIFICATION_CENTER, "KEYCODE_CALL_NOTIFICATION_CENTER"},
+    {KeyEvent::KEYCODE_CALL_CONTROL_CENTER, "KEYCODE_CALL_CONTROL_CENTER"},
 };
 } // namespace
 const int32_t KeyEvent::UNKNOWN_FUNCTION_KEY = -1;
@@ -808,12 +812,14 @@ const int32_t KeyEvent::KEYCODE_RIGHT_KNOB_ROLL_DOWN = 10005;
 const int32_t KeyEvent::KEYCODE_RIGHT_KNOB = 10006;
 const int32_t KeyEvent::KEYCODE_VOICE_SOURCE_SWITCH = 10007;
 const int32_t KeyEvent::KEYCODE_LAUNCHER_MENU = 10008;
+const int32_t KeyEvent::KEYCODE_CALL_NOTIFICATION_CENTER = 10009;
+const int32_t KeyEvent::KEYCODE_CALL_CONTROL_CENTER = 10010;
 
-const int32_t KeyEvent::KEY_ACTION_UNKNOWN = 0X00000000;
-const int32_t KeyEvent::KEY_ACTION_CANCEL = 0X00000001;
+const int32_t KeyEvent::KEY_ACTION_UNKNOWN = 0XFFFFFFFF;
+const int32_t KeyEvent::KEY_ACTION_CANCEL = 0X00000000;
 
-const int32_t KeyEvent::KEY_ACTION_DOWN = 0x00000002;
-const int32_t KeyEvent::KEY_ACTION_UP = 0X00000003;
+const int32_t KeyEvent::KEY_ACTION_DOWN = 0x00000001;
+const int32_t KeyEvent::KEY_ACTION_UP = 0X00000002;
 
 const int32_t KeyEvent::INTENTION_UNKNOWN = -1;
 const int32_t KeyEvent::INTENTION_UP = 1;
@@ -938,7 +944,11 @@ KeyEvent::KeyEvent(const KeyEvent& other)
       keyCode_(other.keyCode_),
       keys_(other.keys_),
       keyAction_(other.keyAction_),
-      keyIntention_(other.keyIntention_) {}
+      keyIntention_(other.keyIntention_),
+      numLock_(other.numLock_),
+      capsLock_(other.capsLock_),
+      scrollLock_(other.scrollLock_),
+      repeat_(other.repeat_) {}
 
 KeyEvent::~KeyEvent() {}
 

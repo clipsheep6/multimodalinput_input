@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,6 +39,9 @@
 #include "pointer_event.h"
 #include "util.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InputManagerCommand"
+
 class InputManagerCommand {
 public:
     int32_t ParseCommand(int32_t argc, char *argv[]);
@@ -50,7 +53,6 @@ private:
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerCommand" };
 constexpr int32_t SLEEPTIME = 20;
 constexpr int32_t MOUSE_ID = 7;
 constexpr int32_t JOYSTICK_BUTTON_ID = 25;
@@ -64,6 +66,12 @@ constexpr int64_t MIN_TAKTTIME_MS = 1;
 constexpr int64_t MAX_TAKTTIME_MS = 15000;
 constexpr int32_t DEFAULT_DELAY = 200;
 constexpr int32_t KNUCKLE_PARAM_SIZE = 9;
+constexpr int32_t DEFAULT_POINTER_ID_FIRST = 9;
+constexpr int32_t TOTAL_TIME_MS = 1000;
+constexpr int32_t BUTTON_PARAM_SIZE = 8;
+constexpr int32_t KEY_PARAM_SIZE = 5;
+constexpr int32_t KEY_TIME_PARAM_SIZE = 6;
+constexpr int32_t INTERVAL_TIME_MS = 100;
 enum JoystickEvent {
     JOYSTICK_BUTTON_UP,
     JOYSTICK_BUTTON_PRESS,
@@ -282,9 +290,9 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                         << std::endl;
                                     return RET_ERR;
                                 }
-                                std::cout << "start coordinate: (" << px1 << ", "  << py1 << ")" << std::endl;
-                                std::cout << "  end coordinate: (" << px2 << ", "  << py2 << ")" << std::endl;
-                                std::cout << "     total times: "  << totalTimeMs  << " ms"      << std::endl;
+                                std::cout << "start coordinate: (" << px1 << ", " << py1 << ")" << std::endl;
+                                std::cout << "  end coordinate: (" << px2 << ", " << py2 << ")" << std::endl;
+                                std::cout << "     total times: "  << totalTimeMs << " ms"      << std::endl;
                                 std::cout << "      trace mode: " << std::boolalpha << foundTraceOption << std::endl;
                                 auto pointerEvent = PointerEvent::Create();
                                 CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -311,7 +319,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 while (currentTimeMs < endTimeMs) {
                                     item.SetDisplayX(NextPos(startTimeMs, currentTimeMs, totalTimeMs, px1, px2));
                                     item.SetDisplayY(NextPos(startTimeMs, currentTimeMs, totalTimeMs, py1, py2));
-                                    pointerEvent->SetActionTime(currentTimeMs);
+                                    pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
                                     pointerEvent->UpdatePointerItem(0, item);
                                     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                                     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -322,7 +330,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 py = py2;
                                 item.SetDisplayX(px);
                                 item.SetDisplayY(py);
-                                pointerEvent->SetActionTime(endTimeMs);
+                                pointerEvent->SetActionTime(endTimeMs * TIME_TRANSITION);
                                 pointerEvent->UpdatePointerItem(0, item);
                                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -383,7 +391,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                         }
                         case 's': {
                             if (!StrToInt(optarg, scrollValue)) {
-                                std::cout << "invalid  scroll button command" << std::endl;
+                                std::cout << "invalid scroll button command" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
                             std::cout << "scroll wheel " << scrollValue << std::endl;
@@ -497,7 +505,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     return RET_ERR;
                                 }
                             }
-                            if (argc == 8) {
+                            if (argc == BUTTON_PARAM_SIZE) {
                                 if (!StrToInt(argv[optind + 3], clickIntervalTimeMs)) {
                                     std::cout << "invalid interval between hits" << std::endl;
                                     return RET_ERR;
@@ -626,7 +634,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 item.SetDisplayY(NextPos(startTimeMs, currentTimeMs, totalTimeMs, py1, py2));
                                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                                 pointerEvent->UpdatePointerItem(0, item);
-                                pointerEvent->SetActionTime(currentTimeMs);
+                                pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                                 SleepAndUpdateTime(currentTimeMs);
                             }
@@ -634,7 +642,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             item.SetDisplayX(px2);
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-                            pointerEvent->SetActionTime(endTimeMs);
+                            pointerEvent->SetActionTime(endTimeMs * TIME_TRANSITION);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             std::this_thread::sleep_for(std::chrono::milliseconds(BLOCK_TIME_MS));
 
@@ -642,7 +650,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             item.SetDisplayY(py2);
                             item.SetDisplayX(px2);
                             pointerEvent->UpdatePointerItem(0, item);
-                            pointerEvent->SetActionTime(endTimeMs);
+                            pointerEvent->SetActionTime(endTimeMs * TIME_TRANSITION);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             break;
@@ -854,7 +862,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 return EVENT_REG_FAIL;
                             }
                             if (argv[optind + 3] == nullptr || argv[optind + 3][0] == '-') {
-                                totalTimeMs = 1000;
+                                totalTimeMs = TOTAL_TIME_MS;
                                 if ((!StrToInt(optarg, px1)) ||
                                     (!StrToInt(argv[optind], py1)) ||
                                     (!StrToInt(argv[optind + 1], px2)) ||
@@ -892,11 +900,11 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             PointerEvent::PointerItem item;
                             item.SetDisplayY(py1);
                             item.SetDisplayX(px1);
-                            item.SetPointerId(0);
+                            item.SetPointerId(DEFAULT_POINTER_ID_FIRST);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
                             pointerEvent->AddPointerItem(item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-                            pointerEvent->SetPointerId(0);
+                            pointerEvent->SetPointerId(DEFAULT_POINTER_ID_FIRST);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
                             int64_t startTimeUs = pointerEvent->GetActionStartTime();
@@ -915,7 +923,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 item.SetDisplayX(NextPos(startTimeMs, currentTimeMs, totalTimeMs, px1, px2));
                                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                                 pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
-                                pointerEvent->UpdatePointerItem(0, item);
+                                pointerEvent->UpdatePointerItem(DEFAULT_POINTER_ID_FIRST, item);
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                                 nowSysTimeUs = GetSysClockTime();
                                 nowSysTimeMs = nowSysTimeUs / TIME_TRANSITION;
@@ -928,13 +936,13 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             item.SetDisplayX(px2);
                             pointerEvent->SetActionTime(endTimeMs * TIME_TRANSITION);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-                            pointerEvent->UpdatePointerItem(0, item);
+                            pointerEvent->UpdatePointerItem(DEFAULT_POINTER_ID_FIRST, item);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             std::this_thread::sleep_for(std::chrono::milliseconds(BLOCK_TIME_MS));
 
                             item.SetDisplayX(px2);
                             item.SetDisplayY(py2);
-                            pointerEvent->UpdatePointerItem(0, item);
+                            pointerEvent->UpdatePointerItem(DEFAULT_POINTER_ID_FIRST, item);
                             pointerEvent->SetActionTime((endTimeMs + BLOCK_TIME_MS) * TIME_TRANSITION);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -959,9 +967,9 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             CHKPR(pointerEvent, ERROR_NULL_POINTER);
                             PointerEvent::PointerItem item;
                             item.SetDisplayY(py1);
-                            item.SetPointerId(0);
+                            item.SetPointerId(DEFAULT_POINTER_ID_FIRST);
                             item.SetDisplayX(px1);
-                            pointerEvent->SetPointerId(0);
+                            pointerEvent->SetPointerId(DEFAULT_POINTER_ID_FIRST);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
                             pointerEvent->AddPointerItem(item);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
@@ -987,9 +995,9 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             CHKPR(pointerEvent, ERROR_NULL_POINTER);
                             PointerEvent::PointerItem item;
                             item.SetDisplayY(py1);
-                            item.SetPointerId(0);
+                            item.SetPointerId(DEFAULT_POINTER_ID_FIRST);
                             item.SetDisplayX(px1);
-                            pointerEvent->SetPointerId(0);
+                            pointerEvent->SetPointerId(DEFAULT_POINTER_ID_FIRST);
                             pointerEvent->AddPointerItem(item);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
@@ -999,14 +1007,14 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                         }
                         case 'c': {
                             int32_t intervalTimeMs = 0;
-                            if (argc == 5) {
+                            if (argc == KEY_PARAM_SIZE) {
                                 if (!StrToInt(optarg, px1) ||
                                     !StrToInt(argv[optind], py1)) {
                                     std::cout << "input coordinate error" << std::endl;
                                     return RET_ERR;
                                 }
-                                intervalTimeMs = 100;
-                            } else if (argc == 6) {
+                                intervalTimeMs = INTERVAL_TIME_MS;
+                            } else if (argc == KEY_TIME_PARAM_SIZE) {
                                 if (!StrToInt(optarg, px1) ||
                                     !StrToInt(argv[optind], py1) ||
                                     !StrToInt(argv[optind + 1], intervalTimeMs)) {
@@ -1033,11 +1041,11 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             auto pointerEvent = PointerEvent::Create();
                             CHKPR(pointerEvent, ERROR_NULL_POINTER);
                             PointerEvent::PointerItem item;
-                            item.SetPointerId(0);
+                            item.SetPointerId(DEFAULT_POINTER_ID_FIRST);
                             item.SetDisplayX(px1);
                             item.SetDisplayY(py1);
                             item.SetPressed(true);
-                            pointerEvent->SetPointerId(0);
+                            pointerEvent->SetPointerId(DEFAULT_POINTER_ID_FIRST);
                             pointerEvent->AddPointerItem(item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
@@ -1047,7 +1055,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             item.SetPressed(false);
                             item.SetDisplayY(py1);
                             item.SetDisplayX(px1);
-                            pointerEvent->UpdatePointerItem(0, item);
+                            pointerEvent->UpdatePointerItem(DEFAULT_POINTER_ID_FIRST, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             break;
@@ -1077,7 +1085,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 std::cout << "wrong number of parameters" << std::endl;
                                 return RET_ERR;
                             }
-                            totalTimeMs = 1000;
+                            totalTimeMs = TOTAL_TIME_MS;
                             int32_t pressTimems = 500;
                             if (argc == moveArgcSeven) {
                                 if ((!StrToInt(optarg, px1)) ||
@@ -1125,7 +1133,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             item.SetDisplayY(py1);
                             item.SetDisplayX(px1);
                             pointerEvent->AddPointerItem(item);
-                            pointerEvent->SetPointerId(0);
+                            pointerEvent->SetPointerId(DEFAULT_POINTER_ID_FIRST);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -1147,8 +1155,8 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 if (currentTimeMs > downTimeMs) {
                                     item.SetDisplayX(NextPos(downTimeMs, currentTimeMs, moveTimeMs, px1, px2));
                                     item.SetDisplayY(NextPos(downTimeMs, currentTimeMs, moveTimeMs, py1, py2));
-                                    pointerEvent->UpdatePointerItem(0, item);
-                                    pointerEvent->SetActionTime(currentTimeMs);
+                                    pointerEvent->UpdatePointerItem(DEFAULT_POINTER_ID_FIRST, item);
+                                    pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
                                     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                                     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                                 }
@@ -1157,8 +1165,8 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             }
                             item.SetDisplayX(px2);
                             item.SetDisplayY(py2);
-                            pointerEvent->UpdatePointerItem(0, item);
-                            pointerEvent->SetActionTime(endTimeMs);
+                            pointerEvent->UpdatePointerItem(DEFAULT_POINTER_ID_FIRST, item);
+                            pointerEvent->SetActionTime(endTimeMs * TIME_TRANSITION);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             break;

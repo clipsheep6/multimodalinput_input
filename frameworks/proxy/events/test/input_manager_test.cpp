@@ -22,10 +22,12 @@
 #include "system_info.h"
 #include "input_manager.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InputManagerTest"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputManagerTest"};
 constexpr int32_t TUPLE_PID = 0;
 constexpr int32_t TUPLE_UID = 1;
 constexpr int32_t TUPLE_NAME = 2;
@@ -1345,6 +1347,57 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetPointerVisible_001, TestSize.Leve
 }
 
 /**
+ * @tc.name: InputManagerTest_IsPointerVisible_001
+ * @tc.desc: Test flag `InputEvent::EVENT_FLAG_HIDE_POINTER` on controlling pointer visibility
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_IsPointerVisible_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_ONE);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_ONE);
+
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_HIDE_POINTER);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    ASSERT_FALSE(InputManager::GetInstance()->IsPointerVisible());
+}
+
+/**
+ * @tc.name: InputManagerTest_IsPointerVisible_002
+ * @tc.desc: Test flag `InputEvent::EVENT_FLAG_HIDE_POINTER` on controlling pointer visibility
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_IsPointerVisible_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_TWO);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_TWO);
+
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    ASSERT_TRUE(InputManager::GetInstance()->IsPointerVisible());
+}
+
+/**
  * @tc.name: InputManagerTest_SetTouchpadScrollSwitch_001
  * @tc.desc: Set touchpad scroll switch
  * @tc.type: FUNC
@@ -1746,6 +1799,326 @@ HWTEST_F(InputManagerTest, InputManager_InjectMouseEvent_005, TestSize.Level1)
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
+
+static bool SimulateInputEventInjectKeyTest(int32_t keyAction, int32_t keyCode, bool isPressed, int32_t downTime)
+{
+    auto keyEvent = KeyEvent::Create();
+    if (keyEvent == nullptr) {
+        return false;
+    }
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+    keyEvent->SetKeyCode(keyCode);
+
+    KeyEvent::KeyItem item;
+    keyEvent->SetKeyAction(keyAction);
+    item.SetKeyCode(keyCode);
+    item.SetPressed(isPressed);
+    item.SetDownTime(downTime);
+    keyEvent->AddKeyItem(item);
+    InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+    return true;
+}
+
+/**
+ * @tc.name: InputManager_InjectKeyEvent_001
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectKeyEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEventFun = [](std::shared_ptr<KeyEvent> event) {
+        MMI_HILOGD("Add monitor success");
+    };
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(keyEventFun);
+    ASSERT_NE(monitorId, ERROR_UNSUPPORT);
+    ASSERT_TRUE(SimulateInputEventInjectKeyTest(KeyEvent::KEY_ACTION_DOWN,
+        KeyEvent::KEYCODE_CALL_NOTIFICATION_CENTER, true, 500));
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
+}
+
+/**
+ * @tc.name: InputManager_InjectKeyEvent_002
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectKeyEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEventFun = [](std::shared_ptr<KeyEvent> event) {
+        MMI_HILOGD("Add monitor success");
+    };
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(keyEventFun);
+    ASSERT_NE(monitorId, ERROR_UNSUPPORT);
+    ASSERT_TRUE(SimulateInputEventInjectKeyTest(KeyEvent::KEY_ACTION_DOWN,
+        KeyEvent::KEYCODE_CALL_CONTROL_CENTER, true, 500));
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
+}
+
+/**
+ * @tc.name: InputManager_InjectKeyEvent_003
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectKeyEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEventFun = [](std::shared_ptr<KeyEvent> event) {
+        MMI_HILOGD("Add monitor success");
+    };
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(keyEventFun);
+    ASSERT_NE(monitorId, ERROR_UNSUPPORT);
+    ASSERT_TRUE(SimulateInputEventInjectKeyTest(KeyEvent::KEY_ACTION_DOWN,
+        KeyEvent::KEYCODE_CALL_NOTIFICATION_CENTER, false, 500));
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
+}
+
+/**
+ * @tc.name: InputManager_InjectKeyEvent_004
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectKeyEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEventFun = [](std::shared_ptr<KeyEvent> event) {
+        MMI_HILOGD("Add monitor success");
+    };
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(keyEventFun);
+    ASSERT_NE(monitorId, ERROR_UNSUPPORT);
+    ASSERT_TRUE(SimulateInputEventInjectKeyTest(KeyEvent::KEY_ACTION_DOWN,
+        KeyEvent::KEYCODE_CALL_CONTROL_CENTER, false, 500));
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
+}
+
+/**
+ * @tc.name: InputManager_InjectKeyEvent_005
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectKeyEvent_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEventFun = [](std::shared_ptr<KeyEvent> event) {
+        MMI_HILOGD("Add monitor success");
+    };
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(keyEventFun);
+    ASSERT_NE(monitorId, ERROR_UNSUPPORT);
+    ASSERT_TRUE(SimulateInputEventInjectKeyTest(KeyEvent::KEY_ACTION_DOWN,
+        KeyEvent::KEYCODE_CALL_NOTIFICATION_CENTER, true, 1000));
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
+}
+
+/**
+ * @tc.name: InputManager_InjectKeyEvent_006
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectKeyEvent_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEventFun = [](std::shared_ptr<KeyEvent> event) {
+        MMI_HILOGD("Add monitor success");
+    };
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(keyEventFun);
+    ASSERT_NE(monitorId, ERROR_UNSUPPORT);
+    ASSERT_TRUE(SimulateInputEventInjectKeyTest(KeyEvent::KEY_ACTION_DOWN,
+        KeyEvent::KEYCODE_CALL_CONTROL_CENTER, true, 1000));
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
+}
+
+/**
+ * @tc.name: InputManager_InjectKeyEvent_007
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectKeyEvent_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEventFun = [](std::shared_ptr<KeyEvent> event) {
+        MMI_HILOGD("Add monitor success");
+    };
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(keyEventFun);
+    ASSERT_NE(monitorId, ERROR_UNSUPPORT);
+    ASSERT_TRUE(SimulateInputEventInjectKeyTest(KeyEvent::KEY_ACTION_DOWN,
+        KeyEvent::KEYCODE_CALL_NOTIFICATION_CENTER, false, 1000));
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
+}
+
+/**
+ * @tc.name: InputManager_InjectKeyEvent_008
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectKeyEvent_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEventFun = [](std::shared_ptr<KeyEvent> event) {
+        MMI_HILOGD("Add monitor success");
+    };
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(keyEventFun);
+    ASSERT_NE(monitorId, ERROR_UNSUPPORT);
+    ASSERT_TRUE(SimulateInputEventInjectKeyTest(KeyEvent::KEY_ACTION_DOWN,
+        KeyEvent::KEYCODE_CALL_CONTROL_CENTER, false, 1000));
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
+}
+
+/**
+ * @tc.name: InputManager_InjectKeyEvent_009
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectKeyEvent_009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEventFun = [](std::shared_ptr<KeyEvent> event) {
+        MMI_HILOGD("Add monitor success");
+    };
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(keyEventFun);
+    ASSERT_NE(monitorId, ERROR_UNSUPPORT);
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+
+    KeyEvent::KeyItem itemFirst;
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_META_LEFT);
+
+    itemFirst.SetKeyCode(KeyEvent::KEYCODE_META_LEFT);
+    itemFirst.SetPressed(false);
+    itemFirst.SetDownTime(1000);
+    keyEvent->AddKeyItem(itemFirst);
+
+    KeyEvent::KeyItem itemSecond;
+    itemSecond.SetKeyCode(KeyEvent::KEYCODE_R);
+    itemSecond.SetPressed(true);
+    itemSecond.SetDownTime(1000);
+    keyEvent->AddKeyItem(itemSecond);
+    InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
+}
+
+/**
+ * @tc.name: InputManager_InjectKeyEvent_010
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectKeyEvent_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEventFun = [](std::shared_ptr<KeyEvent> event) {
+        MMI_HILOGD("Add monitor success");
+    };
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(keyEventFun);
+    ASSERT_NE(monitorId, ERROR_UNSUPPORT);
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+
+    KeyEvent::KeyItem itemFirst;
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_META_LEFT);
+
+    itemFirst.SetKeyCode(KeyEvent::KEYCODE_META_LEFT);
+    itemFirst.SetPressed(false);
+    itemFirst.SetDownTime(1000);
+    keyEvent->AddKeyItem(itemFirst);
+
+    KeyEvent::KeyItem itemSecond;
+    itemSecond.SetKeyCode(KeyEvent::KEYCODE_R);
+    itemSecond.SetPressed(false);
+    itemSecond.SetDownTime(1000);
+    keyEvent->AddKeyItem(itemSecond);
+    InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
+}
+
+/**
+ * @tc.name: InputManager_InjectKeyEvent_011
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR000GJG6G mymy
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectKeyEvent_011, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEventFun = [](std::shared_ptr<KeyEvent> event) {
+        MMI_HILOGD("Add monitor success");
+    };
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(keyEventFun);
+    ASSERT_NE(monitorId, ERROR_UNSUPPORT);
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+
+    KeyEvent::KeyItem itemFirst;
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_META_LEFT);
+
+    itemFirst.SetKeyCode(KeyEvent::KEYCODE_META_LEFT);
+    itemFirst.SetPressed(false);
+    itemFirst.SetDownTime(500);
+    keyEvent->AddKeyItem(itemFirst);
+
+    KeyEvent::KeyItem itemSecond;
+    itemSecond.SetKeyCode(KeyEvent::KEYCODE_R);
+    itemSecond.SetPressed(false);
+    itemSecond.SetDownTime(500);
+    keyEvent->AddKeyItem(itemSecond);
+    InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
+}
+
+/**
+ * @tc.name: InputManager_InjectKeyEvent_012
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR000GJG6G mymy
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectKeyEvent_012, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEventFun = [](std::shared_ptr<KeyEvent> event) {
+        MMI_HILOGD("Add monitor success");
+    };
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(keyEventFun);
+    ASSERT_NE(monitorId, ERROR_UNSUPPORT);
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+
+    KeyEvent::KeyItem itemFirst;
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_META_LEFT);
+
+    itemFirst.SetKeyCode(KeyEvent::KEYCODE_META_LEFT);
+    itemFirst.SetPressed(false);
+    itemFirst.SetDownTime(500);
+    keyEvent->AddKeyItem(itemFirst);
+
+    KeyEvent::KeyItem itemSecond;
+    itemSecond.SetKeyCode(KeyEvent::KEYCODE_R);
+    itemSecond.SetPressed(true);
+    itemSecond.SetDownTime(500);
+    keyEvent->AddKeyItem(itemSecond);
+    InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
 }
 
 /**

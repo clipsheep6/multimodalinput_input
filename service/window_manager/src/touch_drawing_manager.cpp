@@ -28,10 +28,12 @@
 #include "recording/recording_canvas.h"
 #endif
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "TouchDrawingManager"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TouchDrawingManager" };
 constexpr int32_t DENSITY_BASELINE = 160;
 constexpr int32_t INDEPENDENT_INNER_PIXELS = 20;
 constexpr int32_t INDEPENDENT_OUTER_PIXELS = 21;
@@ -83,7 +85,7 @@ void TouchDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
     displayInfo_ = displayInfo;
     bubble_.innerCircleRadius = displayInfo.dpi * INDEPENDENT_INNER_PIXELS / DENSITY_BASELINE / CALCULATE_MIDDLE;
     bubble_.outerCircleRadius = displayInfo.dpi * INDEPENDENT_OUTER_PIXELS / DENSITY_BASELINE / CALCULATE_MIDDLE;
-    bubble_.outerCircleWidth = displayInfo.dpi * INDEPENDENT_WIDTH_PIXELS / DENSITY_BASELINE;
+    bubble_.outerCircleWidth = static_cast<float>(displayInfo.dpi * INDEPENDENT_WIDTH_PIXELS) / DENSITY_BASELINE;
 }
 
 void TouchDrawingManager::StartTouchDraw(const std::shared_ptr<PointerEvent> pointerEvent)

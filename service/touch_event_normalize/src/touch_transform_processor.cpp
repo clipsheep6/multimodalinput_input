@@ -23,10 +23,12 @@
 #include "fingersense_wrapper.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "TouchTransformProcessor"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MMI_LOG_DOMAIN, "TouchTransformProcessor" };
 constexpr int32_t MT_TOOL_NONE { -1 };
 constexpr int32_t BTN_DOWN { 1 };
 } // namespace
@@ -88,6 +90,8 @@ void TouchTransformProcessor::UpdatePointerItemProperties(PointerEvent::PointerI
     CALL_DEBUG_ENTER;
     item.SetDisplayX(touchInfo.point.x);
     item.SetDisplayY(touchInfo.point.y);
+    item.SetDisplayXPos(touchInfo.point.x);
+    item.SetDisplayYPos(touchInfo.point.y);
     item.SetToolDisplayX(touchInfo.toolRect.point.x);
     item.SetToolDisplayY(touchInfo.toolRect.point.y);
     item.SetToolWidth(touchInfo.toolRect.width);
@@ -144,6 +148,8 @@ bool TouchTransformProcessor::OnEventTouchMotion(struct libinput_event *event)
     item.SetShortAxis(shortAxis);
     item.SetDisplayX(touchInfo.point.x);
     item.SetDisplayY(touchInfo.point.y);
+    item.SetDisplayXPos(touchInfo.point.x);
+    item.SetDisplayYPos(touchInfo.point.y);
     item.SetToolDisplayX(touchInfo.toolRect.point.x);
     item.SetToolDisplayY(touchInfo.toolRect.point.y);
     item.SetToolWidth(touchInfo.toolRect.width);
@@ -224,7 +230,8 @@ std::shared_ptr<PointerEvent> TouchTransformProcessor::OnEvent(struct libinput_e
     pointerEvent_->UpdateId();
     auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
     CHKPP(device);
-    MMI_HILOGI("The id:%{public}d event created by:%{public}s", pointerEvent_->GetId(), device->GetName().c_str());
+    MMI_HILOGI("InputTracking id:%{public}d event created by:%{public}s", pointerEvent_->GetId(),
+        device->GetName().c_str());
     WinMgr->UpdateTargetPointer(pointerEvent_);
     EventLogHelper::PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(),
         pointerEvent_->GetPointerIds().size());

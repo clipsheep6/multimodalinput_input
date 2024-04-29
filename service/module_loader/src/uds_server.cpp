@@ -27,12 +27,11 @@
 #include "util.h"
 #include "util_ex.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "UDSServer"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSServer" };
-} // namespace
-
 UDSServer::~UDSServer()
 {
     CALL_DEBUG_ENTER;
@@ -146,8 +145,13 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
 
 int32_t UDSServer::SetFdProperty(int32_t& tokenType, int32_t& serverFd, int32_t& toReturnClientFd)
 {
-    static constexpr size_t bufferSize = 64 * 1024;
-    static constexpr size_t nativeBufferSize = 128 * 1024;
+    static size_t bufferSize = 64 * 1024;
+    static size_t nativeBufferSize = 128 * 1024;
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    bufferSize = 512 * 1024;
+    nativeBufferSize = 1024 * 1024;
+#endif // OHOS_BUILD_ENABLE_ANCO
+
     if (setsockopt(serverFd, SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize)) != 0) {
         MMI_HILOGE("setsockopt serverFd failed, errno: %{public}d", errno);
         return RET_ERR;

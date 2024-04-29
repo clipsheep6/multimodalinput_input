@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,17 +32,19 @@
 #include "device_observer.h"
 #include "i_pointer_drawing_manager.h"
 #include "mouse_event_normalize.h"
+#include "setting_observer.h"
 #include "struct_multimodal.h"
 
 namespace OHOS {
 namespace MMI {
+struct isMagicCursor {
+    std::string name;
+    bool isShow { false };
+};
+
 class PointerDrawingManager final : public IPointerDrawingManager,
                                     public IDeviceObserver,
                                     public std::enable_shared_from_this<PointerDrawingManager> {
-public:
-    int32_t IMAGE_WIDTH = 64;
-    int32_t IMAGE_HEIGHT = 64;
-
 public:
     PointerDrawingManager();
     DISALLOW_COPY_AND_MOVE(PointerDrawingManager);
@@ -52,7 +54,7 @@ public:
     void UpdateDisplayInfo(const DisplayInfo& displayInfo) override;
     void OnDisplayInfo(const DisplayGroupInfo& displayGroupInfo) override;
     void OnWindowInfo(const WinInfo &info) override;
-    void UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible) override;
+    void UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible, bool isHotPlug) override;
     bool Init() override;
     int32_t SetPointerColor(int32_t color) override;
     int32_t GetPointerColor() override;
@@ -74,10 +76,11 @@ public:
     int32_t SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap) override;
     int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override;
     PointerStyle GetLastMouseStyle() override;
-    std::map<MOUSE_ICON, IconStyle> GetMouseIconPath() override;
-    bool UseMgaicCursor();
+    IconStyle GetIconStyle(const MOUSE_ICON mouseStyle) override;
+    bool HasMagicCursor();
     int32_t DrawCursor(const MOUSE_ICON mouseStyle);
 private:
+    IconStyle GetIconType(MOUSE_ICON mouseIcon);
     void DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle);
     void DrawRunningPointerAnimate(const MOUSE_ICON mouseStyle);
     void CreatePointerWindow(int32_t displayId, int32_t physicalX, int32_t physicalY, Direction direction);
@@ -103,6 +106,12 @@ private:
     void AdjustMouseFocusByDirection90(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void AdjustMouseFocusByDirection180(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void AdjustMouseFocusByDirection270(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
+    void CreatePointerSwiftObserver(isMagicCursor& item);
+    int32_t GetIndependentPixels();
+    int32_t SwitchPointerStyle();
+    bool CheckPointerStyleParam(int32_t windowId, PointerStyle pointerStyle);
+    std::map<MOUSE_ICON, IconStyle>& GetMouseIcons();
+    void UpdateIconPath(const MOUSE_ICON mouseStyle, std::string iconPath);
 
 private:
     struct PidInfo {
@@ -120,6 +129,8 @@ private:
     int32_t windowId_ { 0 };
     int32_t imageWidth_ { 0 };
     int32_t imageHeight_ { 0 };
+    int32_t canvasWidth_ = 64;
+    int32_t canvasHeight_ = 64;
     std::map<MOUSE_ICON, IconStyle> mouseIcons_;
     std::list<PidInfo> pidInfos_;
     bool mouseDisplayState_ { false };
@@ -133,6 +144,7 @@ private:
     int32_t tempPointerColor_ { -1 };
     Direction lastDirection_ { DIRECTION0 };
     Direction currentDirection_ { DIRECTION0 };
+    isMagicCursor hasMagicCursor_;
 };
 } // namespace MMI
 } // namespace OHOS

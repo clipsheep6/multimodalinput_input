@@ -18,10 +18,12 @@
 #include "napi_constants.h"
 #include "util_napi_error.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "JsEventTarget"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsEventTarget" };
 constexpr int32_t INPUT_PARAMETER_MIDDLE = 2;
 
 std::mutex mutex_;
@@ -161,7 +163,11 @@ void JsEventTarget::OnDeviceAdded(int32_t deviceId, const std::string &type)
         uv_work_t *work = new (std::nothrow) uv_work_t;
         CHKPV(work);
         sptr<JsUtil::ReportData> reportData = new (std::nothrow) JsUtil::ReportData;
-        CHKPV(reportData);
+        if (reportData == nullptr) {
+            MMI_HILOGE("Memory allocation failed");
+            JsUtil::DeletePtr<uv_work_t *>(work);
+            return;
+        }
         reportData->deviceId = deviceId;
         reportData->ref = item->ref;
         reportData->IncStrongRef(nullptr);
@@ -194,7 +200,11 @@ void JsEventTarget::OnDeviceRemoved(int32_t deviceId, const std::string &type)
         uv_work_t *work = new (std::nothrow) uv_work_t;
         CHKPV(work);
         sptr<JsUtil::ReportData> reportData = new (std::nothrow) JsUtil::ReportData;
-        CHKPV(reportData);
+        if (reportData == nullptr) {
+            MMI_HILOGE("Memory allocation failed");
+            JsUtil::DeletePtr<uv_work_t *>(work);
+            return;
+        }
         reportData->deviceId = deviceId;
         reportData->ref = item->ref;
         reportData->IncStrongRef(nullptr);
