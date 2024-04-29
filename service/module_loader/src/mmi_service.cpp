@@ -56,14 +56,13 @@
 #include "display_event_monitor.h"
 #include "fingersense_wrapper.h"
 #include "multimodal_input_preferences_manager.h"
-#ifdef OHOS_BUILD_ENABLE_ANCO
-#include "infrared_emitter_controller.h"
-#endif
+
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "MMIService"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIService" };
 const std::string DEF_INPUT_SEAT = "seat0";
 const std::string THREAD_NAME = "mmi-service";
 constexpr int32_t WATCHDOG_INTERVAL_TIME = 30000;
@@ -250,13 +249,6 @@ int32_t MMIService::Init()
     NapProcess::GetInstance()->Init(*this);
     MMI_HILOGD("ANRManager Init");
     ANRMgr->Init(*this);
-#ifdef OHOS_BUILD_ENABLE_ANCO
-    MMI_HILOGI("InitInfraredEmitter Init");
-    InfraredEmitterController::GetInstance()->InitInfraredEmitter();
-#else
-    MMI_HILOGI("InfraredEmitter not supported");
-#endif
-
     MMI_HILOGI("PointerDrawingManager Init");
 #ifdef OHOS_BUILD_ENABLE_POINTER
     if (!IPointerDrawingManager::GetInstance()->Init()) {
@@ -670,7 +662,7 @@ int32_t MMIService::MarkProcessed(int32_t eventType, int32_t eventId)
     int32_t ret =
         delegateTasks_.PostSyncTask(std::bind(&ANRManager::MarkProcessed, ANRMgr, GetCallingPid(), eventType, eventId));
     if (ret != RET_OK) {
-        MMI_HILOGE("Mark event processed failed, ret:%{public}d", ret);
+        MMI_HILOGD("Mark event processed failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -793,7 +785,7 @@ int32_t MMIService::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
 
 int32_t MMIService::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::GetPointerStyle,
         IPointerDrawingManager::GetInstance(), GetCallingPid(), windowId, std::ref(pointerStyle)));
@@ -959,7 +951,7 @@ int32_t MMIService::OnGetKeyboardType(int32_t deviceId, int32_t &keyboardType)
 
 int32_t MMIService::GetKeyboardType(int32_t deviceId, int32_t &keyboardType)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     int32_t ret =
         delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetKeyboardType, this, deviceId, std::ref(keyboardType)));
     if (ret != RET_OK) {
@@ -2079,16 +2071,14 @@ int32_t MMIService::OnHasIrEmitter(bool &hasIrEmitter)
 
 int32_t MMIService::OnGetInfraredFrequencies(std::vector<InfraredFrequency>& requencys)
 {
-    #ifdef OHOS_BUILD_ENABLE_ANCO
-    InfraredEmitterController::GetInstance()->GetFrequencies(requencys);
-    #endif
+    MMI_HILOGI("start get infrared frequency");
     std::string context = "";
     int32_t size = static_cast<int32_t>(requencys.size());
     for (int32_t i = 0; i < size; i++) {
         context = context + "requencys[" + std::to_string(i) + "]. max="
                 + std::to_string(requencys[i].max_) + ",min=" + std::to_string(requencys[i].min_) +";";
     }
-    MMI_HILOGD("MMIService::OnGetInfraredFrequencies data from hdf is. %{public}s ", context.c_str());
+    MMI_HILOGD("data from hdf is. %{public}s ", context.c_str());
     return RET_OK;
 }
 
@@ -2099,11 +2089,8 @@ int32_t MMIService::OnTransmitInfrared(int64_t infraredFrequency, std::vector<in
     for (int32_t i = 0; i < size; i++) {
         context = context + "index:" + std::to_string(i) + ": pattern:" + std::to_string(pattern[i]) + ";";
     }
-    #ifdef OHOS_BUILD_ENABLE_ANCO
-    InfraredEmitterController::GetInstance()->Transmit(infraredFrequency, pattern);
-    #endif
 
-    MMI_HILOGI("MMIService::OnTransmitInfrared para. %{public}s", context.c_str());
+    MMI_HILOGI("TransmitInfrared para. %{public}s", context.c_str());
     return RET_OK;
 }
 
@@ -2115,6 +2102,17 @@ int32_t MMIService::SetPixelMapData(int32_t infoId, void* pixelMap)
         infoId, pixelMap));
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to set pixelmap, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::SetCurrentUser(int32_t userId)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputWindowsManager::SetCurrentUser, WinMgr, userId));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to set current user, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;

@@ -66,6 +66,8 @@ class InputWindowsManager final {
 public:
     DISALLOW_COPY_AND_MOVE(InputWindowsManager);
     void Init(UDSServer& udsServer);
+    void SetMouseFlag(bool state);
+    bool GetMouseFlag();
     int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent, int32_t windowId);
     bool HandleWindowInputType(const WindowInfo &window, std::shared_ptr<PointerEvent> pointerEvent);
@@ -152,6 +154,7 @@ public:
     void AddTargetWindowIds(int32_t pointerItemId, int32_t windowId);
     void ClearTargetWindowIds();
     bool IsTransparentWin(void* pixelMap, int32_t logicalX, int32_t logicalY);
+    int32_t SetCurrentUser(int32_t userId);
 
 private:
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
@@ -270,7 +273,9 @@ private:
     bool pointerDrawFlag_ { false };
     DevMode showCursor_;
     DisplayMode displayMode_ { DisplayMode::UNKNOWN };
+    bool mouseFlag_ {false};
     std::map<int32_t, std::vector<int32_t>> targetWindowIds_;
+    int32_t currentUserId_ { -1 };
 };
 
 #define WinMgr ::OHOS::DelayedSingleton<InputWindowsManager>::GetInstance()

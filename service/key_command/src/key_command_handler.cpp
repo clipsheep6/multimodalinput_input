@@ -38,6 +38,9 @@
 #include "display_event_monitor.h"
 #include "key_command_handler_util.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KeyCommandHandler"
+
 namespace OHOS {
 namespace MMI {
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD

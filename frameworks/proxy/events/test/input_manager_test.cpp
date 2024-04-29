@@ -22,10 +22,12 @@
 #include "system_info.h"
 #include "input_manager.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InputManagerTest"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputManagerTest"};
 constexpr int32_t TUPLE_PID = 0;
 constexpr int32_t TUPLE_UID = 1;
 constexpr int32_t TUPLE_NAME = 2;
@@ -1806,6 +1808,7 @@ static bool SimulateInputEventInjectKeyTest(int32_t keyAction, int32_t keyCode, 
         return false;
     }
     keyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+    keyEvent->SetKeyCode(keyCode);
 
     KeyEvent::KeyItem item;
     keyEvent->SetKeyAction(keyAction);
@@ -1990,8 +1993,10 @@ HWTEST_F(InputManagerTest, InputManager_InjectKeyEvent_009, TestSize.Level1)
 
     KeyEvent::KeyItem itemFirst;
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_META_LEFT);
+
     itemFirst.SetKeyCode(KeyEvent::KEYCODE_META_LEFT);
-    itemFirst.SetPressed(true);
+    itemFirst.SetPressed(false);
     itemFirst.SetDownTime(1000);
     keyEvent->AddKeyItem(itemFirst);
 
@@ -2025,6 +2030,8 @@ HWTEST_F(InputManagerTest, InputManager_InjectKeyEvent_010, TestSize.Level1)
 
     KeyEvent::KeyItem itemFirst;
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_META_LEFT);
+
     itemFirst.SetKeyCode(KeyEvent::KEYCODE_META_LEFT);
     itemFirst.SetPressed(false);
     itemFirst.SetDownTime(1000);
@@ -2060,6 +2067,8 @@ HWTEST_F(InputManagerTest, InputManager_InjectKeyEvent_011, TestSize.Level1)
 
     KeyEvent::KeyItem itemFirst;
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_META_LEFT);
+
     itemFirst.SetKeyCode(KeyEvent::KEYCODE_META_LEFT);
     itemFirst.SetPressed(false);
     itemFirst.SetDownTime(500);
@@ -2095,15 +2104,17 @@ HWTEST_F(InputManagerTest, InputManager_InjectKeyEvent_012, TestSize.Level1)
 
     KeyEvent::KeyItem itemFirst;
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_META_LEFT);
+
     itemFirst.SetKeyCode(KeyEvent::KEYCODE_META_LEFT);
     itemFirst.SetPressed(false);
-    itemFirst.SetDownTime(1000);
+    itemFirst.SetDownTime(500);
     keyEvent->AddKeyItem(itemFirst);
 
     KeyEvent::KeyItem itemSecond;
     itemSecond.SetKeyCode(KeyEvent::KEYCODE_R);
-    itemSecond.SetPressed(false);
-    itemSecond.SetDownTime(1000);
+    itemSecond.SetPressed(true);
+    itemSecond.SetDownTime(500);
     keyEvent->AddKeyItem(itemSecond);
     InputManager::GetInstance()->SimulateInputEvent(keyEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
