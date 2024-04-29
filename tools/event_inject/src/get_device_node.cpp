@@ -79,6 +79,8 @@ void GetDeviceNode::InitDeviceInfo()
     deviceList_["trackball"] = "Virtual Trackball";
     deviceList_["trackpad model1"] = "Virtual TrackPadMouse";
     deviceList_["trackpad model2"] = "Virtual Trackpad";
+    deviceList_["lid"] = "Virtual Lid";
+    deviceList_["superprivacy"] = "Virtual SuperPrivacy";
 }
 
 std::vector<std::string> GetDeviceNode::ReadDeviceFile()

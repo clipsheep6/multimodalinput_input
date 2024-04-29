@@ -47,6 +47,8 @@
 #include "virtual_trackpad_mouse.h"
 #include "virtual_fingerprint_key.h"
 #include "virtual_fingerprint_mouse.h"
+#include "virtual_super_privacy.h"
+#include "virtual_lid.h"
 
 namespace OHOS {
 namespace MMI {
@@ -197,6 +199,18 @@ static void StartPc()
     virtualPcSwitch.SetUp();
 }
 
+static void StartLid()
+{
+    static VirtualLid virtualLid;
+    virtualLid.SetUp();
+}
+
+static void StartSuperPrivacy()
+{
+    static VirtualSuperPrivacy virtualSuperPrivacy;
+    virtualSuperPrivacy.SetUp();
+}
+
 static void StartKnob()
 {
     static VirtualKnob virtualKnob;
@@ -267,7 +281,9 @@ std::map<std::string, VirtualFun> mapFun = {
     {"pc", &StartPc},
     {"touchscreen", &StartTouchScreen},
     {"pen", &StartPen},
-    {"fingerprint", &StartFingerprint}
+    {"fingerprint", &StartFingerprint},
+    {"lid", &StartLid},
+    {"superprivacy", &StartSuperPrivacy}
 };
 
 static void StartAllDevices()
@@ -423,7 +439,8 @@ bool VirtualDevice::SetPhys(const std::string& deviceName)
         {"Virtual Trackpad",             "trackpad"},
         {"Virtual TrackPadMouse",        "trackpad"},
         {"Virtual TrackpadSysCtrl",      "trackpad"},
-        {"Virtual Finger",               "touchpad"},
+        {"Virtual Lid",                  "lid"},
+        {"Virtual SuperPrivacy",         "superprivacy"},
         {"Virtual SingleFinger",         "touchpad"},
         {"Virtual Stylus",               "touchpad"},
         {"Virtual Touchpad",             "touchpad"},
