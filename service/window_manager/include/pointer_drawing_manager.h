@@ -30,6 +30,7 @@
 #include "window.h"
 
 #include "device_observer.h"
+#include "hardware_cursor_pointer_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "mouse_event_normalize.h"
 #include "setting_observer.h"
@@ -112,6 +113,8 @@ private:
     bool CheckPointerStyleParam(int32_t windowId, PointerStyle pointerStyle);
     std::map<MOUSE_ICON, IconStyle>& GetMouseIcons();
     void UpdateIconPath(const MOUSE_ICON mouseStyle, std::string iconPath);
+    int32_t EnableHardwareCursorStats(int32_t pid, bool enable) override;
+    int32_t GetHardwareCursorStats(int32_t pid, uint32_t &frameCount, uint32_t &vsyncCount) override;
 
 private:
     struct PidInfo {
@@ -145,6 +148,7 @@ private:
     Direction lastDirection_ { DIRECTION0 };
     Direction currentDirection_ { DIRECTION0 };
     isMagicCursor hasMagicCursor_;
+    std::shared_ptr<HardwareCursorPointerManager> hardwareCursorPointerManager_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS
