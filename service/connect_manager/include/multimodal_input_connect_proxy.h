@@ -123,6 +123,7 @@ public:
     int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern) override;
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap) override;
     int32_t SetMoveEventFilters(bool flag) override;
+    int32_t SetCurrentUser(int32_t userId) override;
 
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;
