@@ -331,9 +331,9 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventCo
 {
     CALL_INFO_TRACE;
     CHK_PID_AND_TID();
+    std::lock_guard<std::mutex> guard(mtx_);
     CHKPV(inputEventConsumer);
     CHKPV(eventHandler);
-    std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient(eventHandler)) {
         MMI_HILOGE("Client init failed");
         return;
@@ -410,12 +410,12 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     CALL_INFO_TRACE;
     CHK_PID_AND_TID();
     CHKPV(keyEvent);
-    CHKPV(eventHandler_);
-    CHKPV(consumer_);
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
     std::shared_ptr<IInputEventConsumer> inputConsumer = nullptr;
     {
         std::lock_guard<std::mutex> guard(mtx_);
+        CHKPV(eventHandler_);
+        CHKPV(consumer_);
         eventHandler = eventHandler_;
         inputConsumer = consumer_;
     }
@@ -455,12 +455,12 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     CHKPV(pointerEvent);
-    CHKPV(eventHandler_);
-    CHKPV(consumer_);
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
     std::shared_ptr<IInputEventConsumer> inputConsumer = nullptr;
     {
         std::lock_guard<std::mutex> guard(mtx_);
+        CHKPV(eventHandler_);
+        CHKPV(consumer_);
         eventHandler = eventHandler_;
         inputConsumer = consumer_;
         lastPointerEvent_ = std::make_shared<PointerEvent>(*pointerEvent);
@@ -1901,6 +1901,7 @@ int32_t InputManagerImpl::SetNapStatus(int32_t pid, int32_t uid, std::string bun
 void InputManagerImpl::NotifyBundleName(int32_t pid, int32_t uid, std::string bundleName, int32_t syncStatus)
 {
     CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(mtx_);
     if (eventObserver_ == nullptr) {
         MMI_HILOGE("eventObserver_ is nullptr");
         return;
