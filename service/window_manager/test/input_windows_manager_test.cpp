@@ -624,5 +624,153 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleWindowInputType_
     window.windowInputType = WindowInputType::ANTI_MISTAKE_TOUCH;
     ASSERT_TRUE(WinMgr->HandleWindowInputType(window, pointerEvent));
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdatePointerAction_001
+ * @tc.desc: Test UpdatePointerAction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerAction_001, TestSize.Level1)
+{
+    UDSServer udsServer;
+    WinMgr->Init(udsServer);
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t action = pointerEvent->GetPointerAction();
+    action = PointerEvent::POINTER_ACTION_MOVE;
+    WinMgr->UpdatePointerAction(pointerEvent);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_MOVE));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdatePointerAction_002
+ * @tc.desc: Test UpdatePointerAction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerAction_002, TestSize.Level1)
+{
+    UDSServer udsServer;
+    WinMgr->Init(udsServer);
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t action = pointerEvent->GetPointerAction();
+    action = PointerEvent::POINTER_ACTION_UP;
+    WinMgr->UpdatePointerAction(pointerEvent);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_UP));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdatePointerAction_003
+ * @tc.desc: Test UpdatePointerAction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerAction_003, TestSize.Level1)
+{
+    UDSServer udsServer;
+    WinMgr->Init(udsServer);
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t action = pointerEvent->GetPointerAction();
+    action = PointerEvent::POINTER_ACTION_ENTER_WINDOW;
+    WinMgr->UpdatePointerAction(pointerEvent);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_IN_WINDOW));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdatePointerAction_004
+ * @tc.desc: Test UpdatePointerAction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerAction_004, TestSize.Level1)
+{
+    UDSServer udsServer;
+    WinMgr->Init(udsServer);
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t action = pointerEvent->GetPointerAction();
+    action = PointerEvent::POINTER_ACTION_LEAVE_WINDOW;
+    WinMgr->UpdatePointerAction(pointerEvent);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTargetPointer_001
+ * @tc.desc: Test UpdateTargetPointer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTargetPointer_001, TestSize.Level1)
+{
+    UDSServer udsServer;
+    WinMgr->Init(udsServer);
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    auto source = pointerEvent->GetSourceType();
+    source = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+    WinMgr->UpdateTargetPointer(pointerEvent);
+    int32_t ret = WinMgr->UpdateTouchScreenTarget(pointerEvent);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTargetPointer_002
+ * @tc.desc: Test UpdateTargetPointer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTargetPointer_002, TestSize.Level1)
+{
+    UDSServer udsServer;
+    WinMgr->Init(udsServer);
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    auto source = pointerEvent->GetSourceType();
+    source = PointerEvent::SOURCE_TYPE_MOUSE;
+    WinMgr->UpdateTargetPointer(pointerEvent);
+    int32_t ret = WinMgr->UpdateMouseTarget(pointerEvent);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTargetPointer_003
+ * @tc.desc: Test UpdateTargetPointer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTargetPointer_003, TestSize.Level1)
+{
+    UDSServer udsServer;
+    WinMgr->Init(udsServer);
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    auto source = pointerEvent->GetSourceType();
+    source = PointerEvent::SOURCE_TYPE_TOUCHPAD;
+    WinMgr->UpdateTargetPointer(pointerEvent);
+    int32_t ret = WinMgr->UpdateTouchPadTarget(pointerEvent);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTargetPointer_004
+ * @tc.desc: Test UpdateTargetPointer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTargetPointer_004, TestSize.Level1)
+{
+    UDSServer udsServer;
+    WinMgr->Init(udsServer);
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    auto source = pointerEvent->GetSourceType();
+    source = PointerEvent::SOURCE_TYPE_JOYSTICK;
+    WinMgr->UpdateTargetPointer(pointerEvent);
+    int32_t ret = WinMgr->UpdateJoystickTarget(pointerEvent);
+    EXPECT_EQ(ret, RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS
