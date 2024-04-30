@@ -20,8 +20,8 @@
 #include "define_multimodal.h"
 #include "libinput.h"
 #include "pixel_map.h"
-#include "server_msg_handler.h"
 #include "sec_comp_enhance_kit.h"
+#include "server_msg_handler.h"
 
 namespace OHOS {
 namespace MMI {
@@ -127,24 +127,5 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEvent, TestSi
     int32_t result = servermsghandler.OnInjectPointerEvent(pointerEvent, pid, isNativeInject);
     EXPECT_EQ(result, RET_OK);
 }
-
-
-// /**
-//  * @tc.name: ServerMsgHandlerTest_SetShieldStatus_01
-//  * @tc.desc: Test SetShieldStatus
-//  * @tc.type: FUNC
-//  * @tc.require:
-//  */
-// HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SetShieldStatus_05, TestSize.Level1)
-// {
-//     ServerMsgHandler handler;
-//     auto pointerEvent = PointerEvent::Create();
-//     ASSERT_NE(pointerEvent, nullptr);
-//     int32_t pid = 1;
-//     bool isNativeInject = false;
-//     int32_t result = handler.OnInjectPointerEvent(pointerEvent, 1, isNativeInject);
-//     EXPECT_NE(result, COMMON_PERMISSION_CHECK_ERROR);
-// }
-
 }
 }
