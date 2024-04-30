@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -144,7 +144,6 @@ void GetKeyVal(const cJSON* json, const std::string &key, std::string &value)
     if (cJSON_IsString(valueJson)) {
         value = valueJson->valuestring;
     }
-    return;
 }
 
 bool GetEntities(const cJSON* jsonAbility, Ability &ability)
@@ -206,7 +205,7 @@ bool GetParams(const cJSON* jsonAbility, Ability &ability)
         }
         auto ret = ability.params.emplace(key->valuestring, value->valuestring);
         if (!ret.second) {
-            MMI_HILOGW("Emplace to failed");
+            MMI_HILOGW("key is duplicated");
         }
     }
     return true;
@@ -441,7 +440,7 @@ bool IsSequenceKeysValid(const Sequence &sequence)
         if (sequenceKeys.find(item.keyCode) == sequenceKeys.end()) {
             auto it = sequenceKeys.emplace(item.keyCode, item);
             if (!it.second) {
-                MMI_HILOGE("Emplace duplicated");
+                MMI_HILOGE("keyCode is duplicated");
                 return false;
             }
         } else {
@@ -645,11 +644,11 @@ bool ParseRepeatKeys(const JsonParser& parser, std::vector<RepeatKey>& repeatKey
     }
     int32_t repeatKeysSize = cJSON_GetArraySize(repeatKeys);
     for (int32_t i = 0; i < repeatKeysSize; i++) {
-        RepeatKey rep;
         cJSON *repeatKey = cJSON_GetArrayItem(repeatKeys, i);
         if (!cJSON_IsObject(repeatKey)) {
             continue;
         }
+        RepeatKey rep;
         if (!ConvertToKeyRepeat(repeatKey, rep)) {
             continue;
         }
@@ -722,8 +721,8 @@ float AbsDiff(KnuckleGesture knuckleGesture, const std::shared_ptr<PointerEvent>
     auto id = pointerEvent->GetPointerId();
     PointerEvent::PointerItem item;
     pointerEvent->GetPointerItem(id, item);
-    return (float) sqrt(pow(knuckleGesture.lastDownPointer.x - item.GetDisplayX(), POW_SQUARE) +
-        pow(knuckleGesture.lastDownPointer.y  - item.GetDisplayY(), POW_SQUARE));
+    return static_cast<float>(sqrt(pow(knuckleGesture.lastDownPointer.x - item.GetDisplayX(), POW_SQUARE) +
+        pow(knuckleGesture.lastDownPointer.y  - item.GetDisplayY(), POW_SQUARE)));
 }
 
 bool IsEqual(float f1, float f2)

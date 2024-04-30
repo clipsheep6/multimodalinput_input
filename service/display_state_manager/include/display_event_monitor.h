@@ -41,11 +41,11 @@ class DisplayEventMonitor final {
         void UpdateShieldStatusOnScreenOff();
         void InitCommonEventSubscriber();
         bool IsCommonEventSubscriberInit();
-        void SetScreenStatus(std::string screenStatus)
+        void SetScreenStatus(const std::string &screenStatus)
         {
             screenStatus_ = screenStatus;
         }
-        std::string GetScreenStatus()
+        const std::string GetScreenStatus()
         {
             return screenStatus_;
         }

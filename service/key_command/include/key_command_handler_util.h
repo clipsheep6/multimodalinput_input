@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,29 +16,30 @@
 #ifndef KEY_COMMAND_HANDLER_UTIL_H
 #define KEY_COMMAND_HANDLER_UTIL_H
 
-#include "key_command_handler.h"
-
 #include "ability_manager_client.h"
-#include "nap_process.h"
 #include "bytrace_adapter.h"
 #include "cJSON.h"
 #include "config_policy_utils.h"
 #include "define_multimodal.h"
 #include "dfx_hisysevent.h"
+#include "display_event_monitor.h"
 #include "error_multimodal.h"
 #include "file_ex.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
+#include "key_command_handler.h"
 #include "mmi_log.h"
+#include "multimodal_input_preferences_manager.h"
+#include "nap_process.h"
 #include "net_packet.h"
 #include "proto.h"
 #include "setting_datashare.h"
 #include "system_ability_definition.h"
 #include "timer_manager.h"
 #include "util_ex.h"
-#include "nap_process.h"
-#include "multimodal_input_preferences_manager.h"
-#include "display_event_monitor.h"
+
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KeyCommandHandlerUtil"
 
 namespace OHOS {
 namespace MMI {
@@ -65,8 +66,6 @@ constexpr int32_t REMOVE_OBSERVER = -2;
 constexpr int32_t ACTIVE_EVENT = 2;
 constexpr int32_t LONG_ABILITY_START_DELAY = 2000;
 const std::string EXTENSION_ABILITY = "extensionAbility";
-
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandHandler" };
 const std::string SINGLE_KNUCKLE_ABILITY = "SingleKnuckleDoubleClickGesture";
 const std::string DOUBLE_KNUCKLE_ABILITY = "DoubleKnuckleDoubleClickGesture";
 const std::string TOUCHPAD_TRIP_TAP_ABILITY = "ThreeFingersTap";

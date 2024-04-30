@@ -1227,15 +1227,15 @@ bool KeyCommandHandler::HandleSequence(Sequence &sequence, bool &isLaunchAbility
 
     if (keysSize == sequenceKeysSize) {
         std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
-        MMI_HILOGD("screenStatus is : %{public}s", screenStatus.c_str());
+        MMI_HILOGD("screenStatus: %{public}s", screenStatus.c_str());
         if (sequence.ability.bundleName == "com.ohos.screenshot" &&
             screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
-            MMI_HILOGI("screen off, com.ohos.screenshot invalid.");
+            MMI_HILOGI("screen off, com.ohos.screenshot invalid");
             return false;
         }
         if (sequence.ability.bundleName == "com.ohos.screenshot" &&
             screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
-            MMI_HILOGI("screen locked, com.ohos.screenshot delay 2000 milisecond.");
+            MMI_HILOGI("screen locked, com.ohos.screenshot delay 2000 milisecond");
             return HandleScreenLocked(sequence, isLaunchAbility);
         }
         return HandleNormalSequence(sequence, isLaunchAbility);

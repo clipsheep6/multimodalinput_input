@@ -36,7 +36,7 @@ class DisplayEventMonitor final {
         {
             return false;
         }
-        std::string GetScreenStatus()
+        const std::string GetScreenStatus()
         {
             return screenStatus_;
         }
