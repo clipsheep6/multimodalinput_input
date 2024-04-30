@@ -1061,6 +1061,11 @@ void InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* t
         libinput_event_touch_get_tool_height_transformed(touch, height));
 }
 
+void InputWindowsManager::SetAntiMisTake(bool state)
+{
+    antiMistake_.isOpen = state;
+}
+
 bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, struct libinput_event_touch* touch,
     EventTouch& touchInfo, int32_t& physicalDisplayId)
 {
@@ -1964,6 +1969,7 @@ bool InputWindowsManager::SkipNavigationWindow(WindowInputType windowType, int32
             antiMistake_.isOpen);
     }
     if (antiMistake_.isOpen) {
+        MMI_HILOGD("anti mistake switch is open.");
         return true;
     }
     return false;
