@@ -26,6 +26,7 @@
 #include "file_ex.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
+#include "input_windows_manager.h"
 #include "mmi_log.h"
 #include "net_packet.h"
 #include "proto.h"
@@ -177,7 +178,8 @@ void KeyCommandHandler::HandlePointerActionMoveEvent(const std::shared_ptr<Point
     touchEvent->GetPointerItem(id, item);
     auto dx = std::abs(pos->x - item.GetDisplayX());
     auto dy = std::abs(pos->y - item.GetDisplayY());
-    if (dx > TOUCH_MAX_THRESHOLD || dy > TOUCH_MAX_THRESHOLD) {
+    auto moveDistance = sqrt(pow(dx, 2) + pow(dy, 2));
+    if (moveDistance > ConvertVPToPX(TOUCH_MAX_THRESHOLD)) {
         StopTwoFingerGesture();
     }
 }
@@ -227,6 +229,7 @@ void KeyCommandHandler::HandleFingerGestureDownEvent(const std::shared_ptr<Point
         twoFingerGesture_.touches[num - 1].id = id;
         twoFingerGesture_.touches[num - 1].x = item.GetDisplayX();
         twoFingerGesture_.touches[num - 1].y = item.GetDisplayY();
+        twoFingerGesture_.touches[num - 1].downTime = item.GetDownTime();
     }
 }
 
@@ -432,8 +435,16 @@ void KeyCommandHandler::StartTwoFingerGesture()
 {
     CALL_DEBUG_ENTER;
     twoFingerGesture_.timerId = TimerMgr->AddTimer(twoFingerGesture_.abilityStartDelay, 1, [this]() {
-        LaunchAbility(twoFingerGesture_.ability, twoFingerGesture_.abilityStartDelay);
         twoFingerGesture_.timerId = -1;
+        if (!CheckTwoFingerGestureAction()) {
+            return;
+        }
+        twoFingerGesture_.ability.params.emplace("displayX1", std::to_string(twoFingerGesture_.touches[0].x));
+        twoFingerGesture_.ability.params.emplace("displayY1", std::to_string(twoFingerGesture_.touches[0].y));
+        twoFingerGesture_.ability.params.emplace("displayX2", std::to_string(twoFingerGesture_.touches[1].x));
+        twoFingerGesture_.ability.params.emplace("displayY2", std::to_string(twoFingerGesture_.touches[1].y));
+        MMI_HILOGI("Start launch ability immediately");
+        LaunchAbility(twoFingerGesture_.ability, twoFingerGesture_.abilityStartDelay);
     });
 }
 
@@ -445,6 +456,61 @@ void KeyCommandHandler::StopTwoFingerGesture()
         twoFingerGesture_.timerId = -1;
     }
 }
+
+bool KeyCommandHandler::CheckTwoFingerGestureAction() const
+{
+    if (!twoFingerGesture_.active) {
+        return false;
+    }
+
+    auto firstFinger = twoFingerGesture_.touches[0];
+    auto secondFinger = twoFingerGesture_.touches[1];
+
+    auto pressTimeInterval = fabs(firstFinger.downTime - secondFinger.downTime);
+    if (pressTimeInterval > TWO_FINGERS_TIME_LIMIT) {
+        return false;
+    }
+
+    auto devX = firstFinger.x - secondFinger.x;
+    auto devY = firstFinger.y - secondFinger.y;
+    auto distance = sqrt(pow(devX, 2) + pow(devY, 2));
+    if (distance < ConvertVPToPX(TWO_FINGERS_DISTANCE_LIMIT)) {
+        MMI_HILOGI("two fingers distance:%{public}f too small", distance);
+        return false;
+    }
+
+    auto displayInfo = WinMgr->GetDefaultDisplayInfo();
+    CHKPR(displayInfo, false);
+    auto leftLimit = ConvertVPToPX(TOUCH_LIFT_LIMIT);
+    auto rightLimit = displayInfo->width - ConvertVPToPX(TOUCH_RIGHT_LIMIT);
+    auto topLimit = ConvertVPToPX(TOUCH_TOP_LIMIT);
+    auto bottomLimit = displayInfo->height - ConvertVPToPX(TOUCH_BOTTOM_LIMIT);
+    if (firstFinger.x <= leftLimit || firstFinger.x >= rightLimit ||
+        firstFinger.y <= topLimit || firstFinger.y >= bottomLimit ||
+        secondFinger.x <= leftLimit || secondFinger.x >= rightLimit ||
+        secondFinger.y <= topLimit || secondFinger.y >= bottomLimit) {
+        MMI_HILOGI("any finger out of region");
+        return false;
+    }
+
+    return true;
+}
+
+int32_t KeyCommandHandler::ConvertVPToPX(int32_t vp) const
+{
+    if (vp <= 0) {
+        return 0;
+    }
+    auto displayInfo = WinMgr->GetDefaultDisplayInfo();
+    CHKPR(displayInfo, 0);
+    int32_t dpi = displayInfo->dpi;
+    if (dpi <= 0) {
+        return 0;
+    }
+    const int32_t base = 160;
+    return vp * (dpi / base);
+}
+
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 bool KeyCommandHandler::ParseConfig()

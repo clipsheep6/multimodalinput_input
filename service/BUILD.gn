@@ -292,6 +292,11 @@ ohos_unittest("event_resample_test") {
 
   configs = [ ":libmmi_server_config" ]
 
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
   deps = [
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
@@ -574,8 +579,14 @@ ohos_unittest("TouchEventNormalizeTest") {
   ]
 
   deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
+  ]
+
+  external_deps = [
+    "graphic_2d:librender_service_client",
+    "window_manager:libwm",
   ]
 }
 
@@ -988,6 +999,14 @@ ohos_unittest("ConnectManagerTest") {
   deps = [
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
+  ]
+
+  external_deps = [
+    "ability_runtime:app_manager",
+    "image_framework:image_native",
+    "ipc:ipc_single",
+    "security_component_manager:libsecurity_component_sdk",
+    "window_manager:libwm",
   ]
 }
 
