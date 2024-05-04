@@ -86,6 +86,7 @@ config("libmmi_server_config") {
     "//third_party/cJSON",
     "${preferences_path}/frameworks/native/include",
     "${graphics_path}/2d_graphics/include",
+    "${graphics_path}/2d_graphics/src/drawing/draw",
   ]
 
   if (input_feature_fingerprint) {
@@ -253,6 +254,8 @@ ohos_shared_library("libmmi-server") {
     "audio_framework:audio_client",
     "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
+    "drivers_interface_display:display_composer_idl_headers",
+    "drivers_interface_display:libdisplay_composer_hdi_impl",
     "data_share:datashare_consumer",
     "faultloggerd:libbacktrace_local",
     "ffrt:libffrt",
@@ -260,6 +263,7 @@ ohos_shared_library("libmmi-server") {
     "graphic_2d:libcomposer",
     "graphic_2d:librender_service_client",
     "graphic_2d:window_animation",
+    "hdf_core:libhdi",
     "hicollie:libhicollie",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
