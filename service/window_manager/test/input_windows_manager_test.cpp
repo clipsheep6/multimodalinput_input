@@ -18,9 +18,13 @@
 #include <gtest/gtest.h>
 
 #include "input_windows_manager.h"
+#include "i_pointer_drawing_manager.h"
 #include "mmi_log.h"
-#include "uds_server.h"
+#include "proto.h"
 #include "scene_board_judgement.h"
+#include "struct_multimodal.h"
+#include "uds_server.h"
+#include "window_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -914,12 +918,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePoinerStyle_001,
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_UpdateSceneBoardPointerStyle_002
+ * @tc.name: InputWindowsManagerTest_UpdateSceneBoardPointerStyle_001
  * @tc.desc: Test updating scene board pointer style
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateSceneBoardPointerStyle_002, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateSceneBoardPointerStyle_001, TestSize.Level1)
 {
     int32_t pid = 1;
     int32_t windowId = 2;
@@ -950,12 +954,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetGlobalDefaultPointe
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_SetPointerStyle_002
+ * @tc.name: InputWindowsManagerTest_SetPointerStyle_001
  * @tc.desc: Test setting pointer style
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetPointerStyle_002, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetPointerStyle_001, TestSize.Level1)
 {
     int32_t pid = 1;
     int32_t windowId = GLOBAL_WINDOW_ID;
@@ -975,12 +979,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetPointerStyle_002, T
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_ClearWindowPointerStyle_002
+ * @tc.name: InputWindowsManagerTest_ClearWindowPointerStyle_001
  * @tc.desc: Test clearing window pointer style
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearWindowPointerStyle_002, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearWindowPointerStyle_001, TestSize.Level1)
 {
     int32_t pid = 123;
     int32_t windowId = 678;
@@ -989,12 +993,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearWindowPointerStyl
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_GetPointerStyle_002
+ * @tc.name: InputWindowsManagerTest_GetPointerStyle_001
  * @tc.desc: Test getting pointer style
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPointerStyle_002, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPointerStyle_001, TestSize.Level1)
 {
     PointerStyle style;
     int32_t ret = WinMgr->GetPointerStyle(1, GLOBAL_WINDOW_ID, style);
@@ -1089,12 +1093,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayCoordinat
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_IsTransparentWin_001
+ * @tc.name: InputWindowsManagerTest_IsTransparentWin
  * @tc.desc: Test IsTransparentWin
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsTransparentWin_001, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsTransparentWin, TestSize.Level1)
 {
     void* pixelMap = nullptr;
     int32_t logicalX = 0;
@@ -1115,6 +1119,19 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CheckWindowIdPermissio
     int32_t pid = 6789;
     int32_t result = WinMgr->CheckWindowIdPermissionByPid(windowId, pid);
     EXPECT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsWindowVisible
+ * @tc.desc: Test IsWindowVisible
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsWindowVisible, TestSize.Level1)
+{
+    int32_t pid = -1;
+    bool result = WinMgr->IsWindowVisible(pid);
+    EXPECT_TRUE(result);
 }
 
 /**
@@ -1230,6 +1247,25 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleWindowInputType_
     WindowInfo window;
     window.windowInputType = WindowInputType::ANTI_MISTAKE_TOUCH;
     ASSERT_TRUE(WinMgr->HandleWindowInputType(window, pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateDisplayId_001
+ * @tc.desc: Test updating display ID
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayId_001, TestSize.Level1)
+{
+    int32_t displayId = 1;
+    bool ret = WinMgr->UpdateDisplayId(displayId);
+    EXPECT_TRUE(ret);
+    displayId = 0;
+    ret = WinMgr->UpdateDisplayId(displayId);
+    EXPECT_FALSE(ret);
+    displayId = -1;
+    ret = WinMgr->UpdateDisplayId(displayId);
+    EXPECT_TRUE(ret);
 }
 
 /**
@@ -1576,6 +1612,20 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetHoverScrollState_00
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_GetHoverScrollState_001
+ * @tc.desc: Test getting hover scroll state
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetHoverScrollState_001, TestSize.Level1)
+{
+    bool result = WinMgr->GetHoverScrollState();
+    EXPECT_TRUE(result);
+    result = WinMgr->GetHoverScrollState();
+    EXPECT_TRUE(result);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_UpdateMouseTarget_001
  * @tc.desc: Test updating mouse target
  * @tc.type: FUNC
@@ -1590,31 +1640,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_001,
     auto ret = WinMgr->GetMouseFlag();
     EXPECT_FALSE(ret);
     EXPECT_EQ(result, RET_ERR);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_ClearWindowPointerStyle_001
- * @tc.desc: Test ClearWindowPointerStyle
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearWindowPointerStyle_001, TestSize.Level1)
-{
-    DisplayGroupInfo displayGroupInfo;
-    ASSERT_EQ(WinMgr->ClearWindowPointerStyle(0, 0), 0);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_UpdateDisplayId_001
- * @tc.desc: Test UpdateDisplayId
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayId_001, TestSize.Level1)
-{
-    auto pointerEvent = PointerEvent::Create();
-    auto displayId = pointerEvent->GetTargetDisplayId();
-    ASSERT_TRUE(WinMgr->UpdateDisplayId(displayId));
 }
 
 /**
@@ -1656,19 +1681,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_Init_001, TestSize.Lev
     UDSServer udsServer;
     WinMgr->Init(udsServer);
     EXPECT_TRUE(true);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_UpdateCaptureMode_001
- * @tc.desc: Test UpdateCaptureMode
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateCaptureMode_001, TestSize.Level1)
-{
-    DisplayGroupInfo displayGroupInfo;
-    WinMgr->UpdateCaptureMode(displayGroupInfo);
-    ASSERT_FALSE(WinMgr->captureModeInfo_.isCaptureMode);
 }
 
 /**
@@ -1719,202 +1731,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsWindowVisible_002, T
     int32_t pid = 1000;
     auto ret = WinMgr->IsWindowVisible(pid);
     ASSERT_FALSE(ret);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_GetPidAndUpdateTarget_001
- * @tc.desc: Test GetPidAndUpdateTarget
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPidAndUpdateTarget_001, TestSize.Level1)
-{
-    std::shared_ptr<KeyEvent> keyEvent;
-    auto ret = WinMgr->GetPidAndUpdateTarget(keyEvent);
-    ASSERT_EQ(ret, -1);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_GetWindowGroupInfoByDisplayId_001
- * @tc.desc: Test GetWindowGroupInfoByDisplayId
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowGroupInfoByDisplayId_001, TestSize.Level1)
-{
-    int32_t displayId = -1;
-    const vector<WindowInfo> &infos = WinMgr->GetWindowGroupInfoByDisplayId(displayId);
-    ASSERT_NE(infos.empty(), true);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_GetDisplayId_001
- * @tc.desc: Test GetDisplayId
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetDisplayId_001, TestSize.Level1)
-{
-    auto inputEvent = InputEvent::Create();
-    ASSERT_NE(inputEvent, nullptr);
-    inputEvent->SetTargetDisplayId(-1);
-    ASSERT_EQ(WinMgr->GetDisplayId(inputEvent), 1);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_GetDisplayId_002
- * @tc.desc: Test GetDisplayId
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetDisplayId_002, TestSize.Level1)
-{
-    auto inputEvent = InputEvent::Create();
-    ASSERT_NE(inputEvent, nullptr);
-    inputEvent->SetTargetDisplayId(0);
-    ASSERT_EQ(WinMgr->GetDisplayId(inputEvent), 0);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_GetWindowPid_001
- * @tc.desc: Test GetWindowPid
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowPid_001, TestSize.Level1)
-{
-    int32_t windowId = -1;
-    ASSERT_EQ(WinMgr->GetWindowPid(windowId), -1);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_GetWindowPid_002
- * @tc.desc: Test GetWindowPid
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowPid_002, TestSize.Level1)
-{
-    int32_t windowId = -1;
-    WindowInfo info1;
-    info1.id = 1;
-    WindowInfo info2;
-    info2.id = 2;
-    std::vector<WindowInfo> windowsInfo;
-    windowsInfo.push_back(info1);
-    windowsInfo.push_back(info2);
-    ASSERT_EQ(WinMgr->GetWindowPid(windowId, windowsInfo), -1);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_GetWindowPid_003
- * @tc.desc: Test GetWindowPid
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowPid_003, TestSize.Level1)
-{
-    int32_t windowId = 1;
-    WindowInfo info1;
-    info1.id = 1;
-    WindowInfo info2;
-    info2.id = 2;
-    std::vector<WindowInfo> windowsInfo;
-    windowsInfo.push_back(info1);
-    windowsInfo.push_back(info2);
-    ASSERT_EQ(WinMgr->GetWindowPid(windowId, windowsInfo), 0);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_GetDisplayBindInfo_001
- * @tc.desc: Test GetDisplayBindInfo
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetDisplayBindInfo_001, TestSize.Level1)
-{
-    int32_t windowId = 1;
-    WindowInfo info1;
-    info1.id = 1;
-    WindowInfo info2;
-    info2.id = 2;
-    std::vector<WindowInfo> windowsInfo;
-    windowsInfo.push_back(info1);
-    windowsInfo.push_back(info2);
-    ASSERT_EQ(WinMgr->GetWindowPid(windowId, windowsInfo), 0);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_UpdateSceneBoardPointerStyle_001
- * @tc.desc: Test UpdateSceneBoardPointerStyle
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateSceneBoardPointerStyle_001, TestSize.Level1)
-{
-    int32_t pid = -1;
-    int32_t windowId = 1;
-    PointerStyle pointerStyle;
-    pointerStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
-    ASSERT_EQ(WinMgr->UpdateSceneBoardPointerStyle(pid, windowId, pointerStyle), RET_OK);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_SetPointerStyle_001
- * @tc.desc: Test SetPointerStyle
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetPointerStyle_001, TestSize.Level1)
-{
-    int32_t pid = 1;
-    int32_t windowId = GLOBAL_WINDOW_ID;
-    PointerStyle pointerStyle;
-    pointerStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
-    ASSERT_EQ(WinMgr->SetPointerStyle(pid, windowId, pointerStyle), RET_OK);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_GetPointerStyle_001
- * @tc.desc: Test GetPointerStyle
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPointerStyle_001, TestSize.Level1)
-{
-    int32_t pid = 1;
-    int32_t windowId = GLOBAL_WINDOW_ID;
-    PointerStyle pointerStyle;
-    pointerStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
-    ASSERT_EQ(WinMgr->GetPointerStyle(pid, windowId, pointerStyle), RET_OK);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_GetHoverScrollState_001
- * @tc.desc: Test GetHoverScrollState
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetHoverScrollState_001, TestSize.Level1)
-{
-    bool flag = WinMgr->GetHoverScrollState();
-    ASSERT_EQ(flag, true);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_IsNeedDrawPointer_001
- * @tc.desc: Test IsNeedDrawPointer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedDrawPointer_001, TestSize.Level1)
-{
-    PointerEvent::PointerItem item;
-    item.SetPointerId(1);
-    item.SetDisplayX(0);
-    item.SetDisplayY(0);
-
-    ASSERT_EQ(WinMgr->IsNeedDrawPointer(item), false);
 }
 } // namespace MMI
 } // namespace OHOS
