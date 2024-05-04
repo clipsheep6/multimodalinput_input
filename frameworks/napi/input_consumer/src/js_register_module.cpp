@@ -264,6 +264,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard guard(sCallBacksMutex);
+    InitHandler();
     size_t argc = 3;
     napi_value argv[3] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);

@@ -19,6 +19,7 @@
 #include <uv.h>
 
 #include "error_multimodal.h"
+#include "event_handler.h"
 #include "napi_constants.h"
 #include "util_napi.h"
 #include "util_napi_error.h"
@@ -28,6 +29,18 @@
 
 namespace OHOS {
 namespace MMI {
+
+static std::shared_ptr<AppExecFwk::EventHandler> g_handler = nullptr;
+
+void InitHandler()
+{
+    if (g_handler == nullptr) {
+        auto runner = AppExecFwk::EventRunner::GetMainEventRunner();
+        if (runner != nullptr) {
+            g_handler = std::make_shared<AppExecFwk::EventHandler>(runner);
+        }
+    }
+}
 
 void SetNamedProperty(const napi_env &env, napi_value &object, const std::string &name, int32_t value)
 {
@@ -265,26 +278,12 @@ struct KeyEventMonitorInfoWorker {
     KeyEventMonitorInfo *reportEvent { nullptr };
 };
 
-void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
+void UvQueueWorkAsyncCallback(KeyEventMonitorInfo *event)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(work);
-    if (work->data == nullptr) {
-        MMI_HILOGE("Check data is nullptr");
-        delete work;
-        work = nullptr;
-        return;
-    }
-    (void)status;
-    KeyEventMonitorInfoWorker *dataWorker = static_cast<KeyEventMonitorInfoWorker *>(work->data);
-    delete work;
-    work = nullptr;
-    KeyEventMonitorInfo *event = dataWorker->reportEvent;
-    napi_env env = dataWorker->env;
-    delete dataWorker;
-    dataWorker = nullptr;
     CHKPV(event);
     event->delCallback = nullptr;
+    napi_env env = event->env;
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env, &scope);
     if (scope == nullptr) {
@@ -310,25 +309,11 @@ void EmitAsyncCallbackWork(KeyEventMonitorInfo *reportEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(reportEvent);
-    uv_loop_s *loop = nullptr;
-    CHKRV(napi_get_uv_event_loop(reportEvent->env, &loop), GET_UV_EVENT_LOOP);
-    uv_work_t *work = new (std::nothrow) uv_work_t;
-    CHKPV(work);
-    KeyEventMonitorInfoWorker *dataWorker = new (std::nothrow) KeyEventMonitorInfoWorker();
-    if (dataWorker == nullptr) {
-        MMI_HILOGE("dataWorker is nullptr");
-        delete work;
-        return;
-    }
-    reportEvent->delCallback = [dataWorker]() {dataWorker->reportEvent = nullptr;};
-    dataWorker->env = reportEvent->env;
-    dataWorker->reportEvent = reportEvent;
-    work->data = static_cast<void *>(dataWorker);
-
-    int32_t ret = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, UvQueueWorkAsyncCallback, uv_qos_user_initiated);
-    if (ret != 0) {
-        delete dataWorker;
-        delete work;
+    auto task = [reportEvent] {
+        UvQueueWorkAsyncCallback(reportEvent);
+    };
+    if (g_handler != nullptr) {
+        g_handler->PostTask(task);
     }
 }
 } // namespace MMI
