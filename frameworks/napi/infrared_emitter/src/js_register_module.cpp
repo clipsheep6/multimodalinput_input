@@ -57,12 +57,12 @@ bool IsArray(const napi_env& env, const napi_value& value)
 bool ParseInt64(const napi_env& env, const napi_value& value, int64_t& result)
 {
     if (!CheckType(env, value, napi_number)) {
-         MMI_HILOG_TAGE(MMI_TAG_INFRAREMITT, "ParseInt64 type not number");
+        MMI_HILOG_TAGE(MMI_TAG_INFRAREMITT, "ParseInt64 type not number");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "element of pattern", "Number");
         return false;
     }
     if (napi_get_value_int64(env, value, &result) != napi_ok) {
-         MMI_HILOG_TAGE(MMI_TAG_INFRAREMITT, "ParseInt64 cannot get value int64");
+        MMI_HILOG_TAGE(MMI_TAG_INFRAREMITT, "ParseInt64 cannot get value int64");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "element of pattern", "Int64");
         return false;
     }
@@ -73,7 +73,7 @@ bool ParsePatternArray(const napi_env& env, const napi_value& value, std::vector
 {
     uint32_t length = 0;
     if (!IsArray(env, value)) {
-         MMI_HILOG_TAGE(MMI_TAG_INFRAREMITT, "ParsePatternArray second para not array");
+        MMI_HILOG_TAGE(MMI_TAG_INFRAREMITT, "ParsePatternArray second para not array");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "pattern", "Array");
         return false;
     }
@@ -81,12 +81,12 @@ bool ParsePatternArray(const napi_env& env, const napi_value& value, std::vector
     for (uint32_t i = 0; i < length; i++) {
         napi_value valueArray = nullptr;
         if (napi_get_element(env, value, i, &valueArray) != napi_ok) {
-             MMI_HILOG_TAGE(MMI_TAG_INFRAREMITT, "ParsePatternArray napi_get_element failed. index:%{public}d", i);
+            MMI_HILOG_TAGE(MMI_TAG_INFRAREMITT, "ParsePatternArray napi_get_element failed. index:%{public}d", i);
             return false;
         }
         int64_t res = 0;
         if (!ParseInt64(env, valueArray, res)) {
-             MMI_HILOG_TAGE(MMI_TAG_INFRAREMITT, "ParsePatternArray parse array fail. index:%{public}d", i);
+            MMI_HILOG_TAGE(MMI_TAG_INFRAREMITT, "ParsePatternArray parse array fail. index:%{public}d", i);
             THROWERR_API9(env, COMMON_PARAMETER_ERROR, "element of pattern", "Int64");
             return false;
         }
@@ -107,11 +107,12 @@ bool ParseTransmitInfraredJSParam(const napi_env& env, const napi_callback_info 
     napi_value argv[NUMBER_PARAMETERS];
     CHKRF(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc != NUMBER_PARAMETERS) {
-         MMI_HILOG_TAGE(MMI_TAG_INFRAREMITT, "ParseTransmitInfraredJSParam Parameter number error");
+        MMI_HILOG_TAGE(MMI_TAG_INFRAREMITT, "ParseTransmitInfraredJSParam Parameter number error");
         return false;
     }
     if (!CheckType(env, argv[0], napi_number)) {
-         MMI_HILOG_TAGE(MMI_TAG_INFRAREMITT, "ParseTransmitInfraredJSParam infraredFrequency parameter[0] type is invalid.");
+        MMI_HILOG_TAGE(MMI_TAG_INFRAREMITT, 
+            "ParseTransmitInfraredJSParam infraredFrequency parameter[0] type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "infraredFrequency", "number");
         return false;
     }
@@ -121,7 +122,7 @@ bool ParseTransmitInfraredJSParam(const napi_env& env, const napi_callback_info 
         return false;
     }
     if (!ParsePatternArray(env, argv[1], vecPattern)) {
-         MMI_HILOG_TAGE(MMI_TAG_INFRAREMITT, "ParsePatternArray parse pattern array fail.");
+        MMI_HILOG_TAGE(MMI_TAG_INFRAREMITT, "ParsePatternArray parse pattern array fail.");
         return false;
     }
     if (vecPattern.size() > MAX_NUMBER_ARRAY_ELEMENT) {
@@ -137,7 +138,8 @@ static void ThrowError(napi_env env, int32_t code, std::string operateType)
     if (code > 0) {
         errorCode = code;
     }
-     MMI_HILOG_TAGE(MMI_TAG_INFRAREMITT, "Operate %{public}s requst error. returnCode:%{public}d", operateType.c_str(), code);
+    MMI_HILOG_TAGE(MMI_TAG_INFRAREMITT, 
+        "Operate %{public}s requst error. returnCode:%{public}d", operateType.c_str(), code);
     if (errorCode == COMMON_PERMISSION_CHECK_ERROR) {
         THROWERR_API9(env, COMMON_PERMISSION_CHECK_ERROR, "Infrared", "ohos.permission.MANAGE_INPUT_INFRARED_EMITTER");
     } else if (COMMON_USE_SYSAPI_ERROR == errorCode) {
@@ -182,10 +184,11 @@ static napi_value GetInfraredFrequencies(napi_env env, napi_callback_info info)
     int32_t ret = InputManager::GetInstance()->GetInfraredFrequencies(requencys);
     if (ret != RET_OK) {
         if (RET_OK > ret || COMMON_PERMISSION_CHECK_ERROR == ret || ERROR_NOT_SYSAPI == ret) {
-             MMI_HILOG_TAGE(MMI_TAG_INFRAREMITT, "js_register.GetFreq reqErr. Permi Err or Not System APP. Positive retCode:%{public}d", ret);
+            MMI_HILOG_TAGE(MMI_TAG_INFRAREMITT,
+                "js_register.GetFreq reqErr. Permi Err or Not System APP. Positive retCode:%{public}d", ret);
             ThrowError(env, ret, "GetInfraredFrequencies");
         }
-         MMI_HILOG_TAGE(MMI_TAG_INFRAREMITT, "Parse GetInfraredFrequencies requst error. returnCode: %{public}d", ret);
+        MMI_HILOG_TAGE(MMI_TAG_INFRAREMITT, "Parse GetInfraredFrequencies requst error. returnCode: %{public}d", ret);
         return result;
     }
     size_t size = requencys.size();
@@ -197,12 +200,12 @@ static napi_value GetInfraredFrequencies(napi_env env, napi_callback_info info)
                     + std::to_string(frequencyItem.min_) + ";";
         napi_value item = CreateInfraredFrequencyItem(env, requencys[i]);
         if (item == nullptr) {
-             MMI_HILOG_TAGE(MMI_TAG_INFRAREMITT, "CreateInfraredFrequencyItem error");
+            MMI_HILOG_TAGE(MMI_TAG_INFRAREMITT, "CreateInfraredFrequencyItem error");
             return nullptr;
         }
         CHKRP(napi_set_element(env, result, i, item), SET_ELEMENT);
     }
-     MMI_HILOG_TAGD(MMI_TAG_INFRAREMITT, "js_register_module.GetInfraredFrequencies :%{public}s ", logPrint.c_str());
+    MMI_HILOG_TAGD(MMI_TAG_INFRAREMITT, "js_register_module.GetInfraredFrequencies :%{public}s ", logPrint.c_str());
     return result;
 }
 
@@ -213,7 +216,7 @@ static napi_value TransmitInfrared(napi_env env, napi_callback_info info)
     int64_t number = -1;
     std::vector<int64_t> pattern;
     if (!ParseTransmitInfraredJSParam(env, info, number, pattern)) {
-         MMI_HILOG_TAGE(MMI_TAG_INFRAREMITT, "Parse TransmitInfrared JSParam error");
+        MMI_HILOG_TAGE(MMI_TAG_INFRAREMITT, "Parse TransmitInfrared JSParam error");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parse TransmitInfrared JSParam error");
         return nullptr;
     }
@@ -222,14 +225,15 @@ static napi_value TransmitInfrared(napi_env env, napi_callback_info info)
     for (int32_t i = 0; i < size; i++) {
         context = context + std::to_string(i) + ": pattern: " + std::to_string(pattern[i]) + ";";
     }
-     MMI_HILOG_TAGD(MMI_TAG_INFRAREMITT, "js_register_module.TransmitInfrared para size :%{public}s", context.c_str());
+    MMI_HILOG_TAGD(MMI_TAG_INFRAREMITT, "js_register_module.TransmitInfrared para size :%{public}s", context.c_str());
     int32_t ret = InputManager::GetInstance()->TransmitInfrared(number, pattern);
     if (ret != RET_OK) {
         if (RET_OK > ret || COMMON_PERMISSION_CHECK_ERROR == ret || ERROR_NOT_SYSAPI == ret) {
-             MMI_HILOG_TAGE(MMI_TAG_INFRAREMITT, "js_register.Transmit req err. Per Er or Not Sys APP. Posi retCode:%{public}d", ret);
+            MMI_HILOG_TAGE(MMI_TAG_INFRAREMITT, 
+                "js_register.Transmit req err. Per Er or Not Sys APP. Posi retCode:%{public}d", ret);
             ThrowError(env, ret, "TransmitInfrared");
         }
-         MMI_HILOG_TAGE(MMI_TAG_INFRAREMITT, "js_register_module.TransmitInfrared requst error. returnCode:%{public}d", ret);
+        MMI_HILOG_TAGE(MMI_TAG_INFRAREMITT, "js_register_module.TransmitInfrared requst error. returnCode:%{public}d", ret);
         return nullptr;
     }
     CHKRP(napi_create_int32(env, 0, &result), CREATE_INT32);
