@@ -31,7 +31,8 @@
 #undef MMI_LOG_DOMAIN
 #endif
 #define MMI_LOG_DOMAIN 0XD002800
-
+#define MMI_TAG_GESTUREEVENT "GestureEvent"
+#define MMI_TAG_INFRAREMITT "InfrarEmitt"
 #ifndef MMI_FUNC_FMT
 #define MMI_FUNC_FMT "in %{public}s, "
 #endif
@@ -64,6 +65,24 @@
 } while (0)
 #define MMI_HILOGF(fmt, ...) do { \
     HILOG_IMPL(LOG_CORE, LOG_FATAL, MMI_LOG_DOMAIN, MMI_LOG_TAG, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
+} while (0)
+
+#define MMI_HILOG_TAGD(fmt, tag, ...) do { \
+    if (HiLogIsLoggable(MMI_LOG_DOMAIN, tag, LOG_DEBUG)) { \
+        HILOG_IMPL(LOG_CORE, LOG_DEBUG, MMI_LOG_DOMAIN, tag, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
+    } \
+} while (0)
+#define MMI_HILOG_TAGI(fmt, tag, ...) do { \
+    HILOG_IMPL(LOG_CORE, LOG_INFO, MMI_LOG_DOMAIN, tag, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_TAGW(fmt, tag, ...) do { \
+    HILOG_IMPL(LOG_CORE, LOG_WARN, MMI_LOG_DOMAIN, tag, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_TAGE(fmt, tag, ...) do { \
+    HILOG_IMPL(LOG_CORE, LOG_ERROR, MMI_LOG_DOMAIN, tag, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_TAGF(fmt, tag, ...) do { \
+    HILOG_IMPL(LOG_CORE, LOG_FATAL, MMI_LOG_DOMAIN, tag, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 
 #define MMI_HILOGDK(fmt, ...) do { \
