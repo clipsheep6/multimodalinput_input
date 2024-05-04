@@ -721,7 +721,7 @@ void InputWindowsManager::SetWindowPointerStyle(WindowArea area, int32_t pid, in
 void InputWindowsManager::UpdateWindowPointerVisible(int32_t pid)
 {
     bool visible = IPointerDrawingManager::GetInstance()->GetPointerVisible(pid);
-    IPointerDrawingManager::GetInstance()->SetPointerVisible(pid, visible);
+    IPointerDrawingManager::GetInstance()->SetPointerVisible(pid, visible, 0);
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -2367,6 +2367,21 @@ int32_t InputWindowsManager::UpdateJoystickTarget(std::shared_ptr<PointerEvent> 
 void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(pointerEvent);
+    if (knuckleDrawMgr == nullptr) {
+        knuckleDrawMgr = std::make_shared<KnuckleDrawingManager>();
+    }
+    auto displayId = pointerEvent->GetTargetDisplayId();
+    if (!UpdateDisplayId(displayId)) {
+        MMI_HILOGE("This display is not exist");
+        return;
+    }
+    auto physicDisplayInfo = GetPhysicalDisplay(displayId);
+    CHKPV(physicDisplayInfo);
+    
+    knuckleDrawMgr->UpdateDisplayInfo(*physicDisplayInfo);
+    knuckleDrawMgr->KnuckleDrawHandler(pointerEvent);
+
     if (!haveSetObserver_) {
         showCursor_.SwitchName = showCursorSwitchName;
         CreateStatusConfigObserver(showCursor_);
@@ -2376,14 +2391,6 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
         MMI_HILOGD("The touchCursor does not need to be displayed.");
         return;
     }
-    CHKPV(pointerEvent);
-    auto displayId = pointerEvent->GetTargetDisplayId();
-    if (!UpdateDisplayId(displayId)) {
-        MMI_HILOGE("This display is nonexistent");
-        return;
-    }
-    auto physicDisplayInfo = GetPhysicalDisplay(displayId);
-    CHKPV(physicDisplayInfo);
     TouchDrawingMgr->UpdateDisplayInfo(*physicDisplayInfo);
     TouchDrawingMgr->TouchDrawHandler(pointerEvent);
 }

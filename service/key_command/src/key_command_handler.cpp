@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,28 +16,30 @@
 #include "key_command_handler.h"
 
 #include "ability_manager_client.h"
-#include "nap_process.h"
 #include "bytrace_adapter.h"
 #include "cJSON.h"
 #include "config_policy_utils.h"
+#include "file_ex.h"
+#include "setting_datashare.h"
+#include "system_ability_definition.h"
+
 #include "define_multimodal.h"
 #include "dfx_hisysevent.h"
+#include "display_event_monitor.h"
 #include "error_multimodal.h"
-#include "file_ex.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "input_windows_manager.h"
+#include "key_command_handler_util.h"
 #include "mmi_log.h"
+#include "multimodal_input_preferences_manager.h"
+#include "nap_process.h"
 #include "net_packet.h"
 #include "proto.h"
-#include "setting_datashare.h"
-#include "system_ability_definition.h"
+#include "stylus_key_handler.h"
 #include "timer_manager.h"
 #include "util_ex.h"
-#include "nap_process.h"
-#include "multimodal_input_preferences_manager.h"
-#include "display_event_monitor.h"
-#include "key_command_handler_util.h"
+
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "KeyCommandHandler"
@@ -88,6 +90,9 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
+#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+    STYLUS_HANDLER->SetLastEventState(false);
+#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     if (!isParseConfig_) {
         if (!ParseConfig()) {
             MMI_HILOGE("Parse configFile failed");
@@ -783,6 +788,7 @@ std::shared_ptr<KeyEvent> KeyCommandHandler::CreateKeyEvent(int32_t keyCode, int
 
 bool KeyCommandHandler::PreHandleEvent(const std::shared_ptr<KeyEvent> key)
 {
+    CHKPF(key);
     MMI_HILOGD("KeyEvent occured. keyCode:%{public}d, keyAction:%{public}d",
                key->GetKeyCode(), key->GetKeyAction());
     if (!IsEnableCombineKey(key)) {
@@ -806,17 +812,13 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
     if (!PreHandleEvent(key)) {
         return false;
     }
-    if (!isParseMaxCount_) {
-        ParseRepeatKeyMaxCount();
-        isParseMaxCount_ = true;
-        if (repeatKeys_.size() > 0) {
-            intervalTime_ = repeatKeys_[0].delay;
-        }
+
+#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+    if (STYLUS_HANDLER->HandleStylusKey(key)) {
+        return true;
     }
-    if (!isParseStatusConfig_) {
-        ParseStatusConfigObserver();
-        isParseStatusConfig_ = true;
-    }
+#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+
     bool isHandled = HandleShortKeys(key);
     isHandled = HandleSequences(key) || isHandled;
     if (isHandled) {
@@ -894,6 +896,9 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<PointerEvent> pointe
 {
     CALL_DEBUG_ENTER;
     CHKPF(pointer);
+#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+    STYLUS_HANDLER->SetLastEventState(false);
+#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     if (!isParseConfig_) {
         if (!ParseConfig()) {
             MMI_HILOGE("Parse configFile failed");

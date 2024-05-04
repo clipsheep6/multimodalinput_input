@@ -54,6 +54,7 @@
 #include "key_command_handler.h"
 #include "touch_event_normalize.h"
 #include "display_event_monitor.h"
+#include "device_event_monitor.h"
 #include "fingersense_wrapper.h"
 #include "multimodal_input_preferences_manager.h"
 #ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
@@ -622,12 +623,12 @@ int32_t MMIService::GetMousePrimaryButton(int32_t &primaryButton)
     return RET_OK;
 }
 
-int32_t MMIService::SetPointerVisible(bool visible)
+int32_t MMIService::SetPointerVisible(bool visible, int32_t priority)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetPointerVisible,
-        IPointerDrawingManager::GetInstance(), GetCallingPid(), visible));
+        IPointerDrawingManager::GetInstance(), GetCallingPid(), visible, priority));
     if (ret != RET_OK) {
         MMI_HILOGE("Set pointer visible failed,return %{public}d", ret);
         return ret;
@@ -1237,6 +1238,10 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
     if (systemAbilityId == APP_MGR_SERVICE_ID) {
         MMI_HILOGI("Init app state observer start");
         APP_OBSERVER_MGR->InitAppStateObserver();
+    }
+    if (systemAbilityId == COMMON_EVENT_SERVICE_ID) {
+        DEVICE_MONITOR->InitCommonEventSubscriber();
+        MMI_HILOGD("Common event service started");
     }
 }
 
