@@ -23,6 +23,7 @@
 #include "magic_pointer_drawing_manager.h"
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
+#include "core_canvas.h"
 #include "define_multimodal.h"
 #include "i_multimodal_input_connect.h"
 #include "input_device_manager.h"
@@ -373,6 +374,60 @@ void PointerDrawingManager::DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle)
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
+static Rosen::Drawing::ColorType PixelFormatToDrawingColorType(Media::PixelFormat pixelFormat)
+{
+    switch (pixelFormat) {
+        case Media::PixelFormat::RGB_565:
+            return Rosen::Drawing::ColorType::COLORTYPE_RGB_565;
+        case Media::PixelFormat::RGBA_8888:
+            return Rosen::Drawing::ColorType::COLORTYPE_RGBA_8888;
+        case Media::PixelFormat::BGRA_8888:
+            return Rosen::Drawing::ColorType::COLORTYPE_BGRA_8888;
+        case Media::PixelFormat::ALPHA_8:
+            return Rosen::Drawing::ColorType::COLORTYPE_ALPHA_8;
+        case Media::PixelFormat::RGBA_F16:
+            return Rosen::Drawing::ColorType::COLORTYPE_RGBA_F16;
+        case Media::PixelFormat::UNKNOWN:
+        case Media::PixelFormat::ARGB_8888:
+        case Media::PixelFormat::RGB_888:
+        case Media::PixelFormat::NV21:
+        case Media::PixelFormat::NV12:
+        case Media::PixelFormat::CMYK:
+        default:
+            return Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN;
+    }
+}
+
+static Rosen::Drawing::AlphaType AlphaTypeToDrawingAlphaType(Media::AlphaType alphaType)
+{
+    switch (alphaType) {
+        case Media::AlphaType::IMAGE_ALPHA_TYPE_UNKNOWN:
+            return Rosen::Drawing::AlphaType::ALPHATYPE_UNKNOWN;
+        case Media::AlphaType::IMAGE_ALPHA_TYPE_OPAQUE:
+            return Rosen::Drawing::AlphaType::ALPHATYPE_OPAQUE;
+        case Media::AlphaType::IMAGE_ALPHA_TYPE_PREMUL:
+            return Rosen::Drawing::AlphaType::ALPHATYPE_PREMUL;
+        case Media::AlphaType::IMAGE_ALPHA_TYPE_UNPREMUL:
+            return Rosen::Drawing::AlphaType::ALPHATYPE_UNPREMUL;
+        default:
+            return Rosen::Drawing::AlphaType::ALPHATYPE_UNKNOWN;
+    }
+}
+
+static std::shared_ptr<Rosen::Drawing::Bitmap> PixelmapObjectToBitMap(Media::PixelMap pixelMap)
+{
+    auto data = pixelMap.GetPixels();
+    OHOS::Rosen::Drawing::Bitmap bitmap;
+    OHOS::Rosen::Drawing::ColorType colorType = PixelFormatToDrawingColorType(pixelMap.GetPixelFormat());
+    OHOS::Rosen::Drawing::AlphaType alphaType = AlphaTypeToDrawingAlphaType(pixelMap.GetAlphaType());
+    OHOS::Rosen::Drawing::ImageInfo imageInfo(pixelMap.GetWidth(), pixelMap.GetHeight(), colorType, alphaType);
+    bitmap.Build(imageInfo);
+    MMI_HILOGE("my-my, imageInfo.GetWidth:%{public}d, imageInfo.GetHeight:%{public}d", bitmap.GetWidth(), bitmap.GetHeight());
+    MMI_HILOGE("my-my, imageInfo.IsValid:%{public}d", bitmap.IsValid());
+    bitmap.SetPixels(const_cast<uint8_t*>(data));
+    return std::make_shared<Rosen::Drawing::Bitmap>(bitmap);
+}
+
 void PointerDrawingManager::DrawRunningPointerAnimate(const MOUSE_ICON mouseStyle)
 {
     CALL_DEBUG_ENTER;
@@ -395,17 +450,24 @@ void PointerDrawingManager::DrawRunningPointerAnimate(const MOUSE_ICON mouseStyl
     MMI_HILOGD("set mouseicon to OHOS system");
 
 #ifndef USE_ROSEN_DRAWING
-    auto canvas = static_cast<Rosen::RSRecordingCanvas *>(canvasNode_->BeginRecording(imageWidth_, imageHeight_));
-    canvas->DrawPixelMap(pixelmap, 0, 0, SkSamplingOptions(), nullptr);
+    auto coreCanvas = static_cast<OHOS::Rosen::Drawing::CoreCanvas *>
+        (canvasNode_->BeginRecording(imageWidth_, imageHeight_));
+    auto bitMap = PixelmapObjectToBitMap(*pixelmap);
+    CHKPV(bitMap);
+    auto image = bitMap->MakeImage();
+    coreCanvas->DrawImage(image->get(), 0, 0, SkSamplingOptions());
 #else
     Rosen::Drawing::Brush brush;
     Rosen::Drawing::Rect src = Rosen::Drawing::Rect(0, 0, pixelmap->GetWidth(), pixelmap->GetHeight());
     Rosen::Drawing::Rect dst = Rosen::Drawing::Rect(src);
-    auto canvas =
-        static_cast<Rosen::ExtendRecordingCanvas *>(canvasNode_->BeginRecording(imageWidth_, imageHeight_));
-    canvas->AttachBrush(brush);
-    canvas->DrawPixelMapRect(pixelmap, src, dst, Rosen::Drawing::SamplingOptions());
-    canvas->DetachBrush();
+    auto coreCanvas = static_cast<OHOS::Rosen::Drawing::CoreCanvas *>
+        (canvasNode_->BeginRecording(imageWidth_, imageHeight_));
+    auto bitMap = PixelmapObjectToBitMap(*pixelmap);
+    CHKPV(bitMap);
+    coreCanvas->AttachBrush(brush);
+    auto image = bitMap->MakeImage();
+    coreCanvas->DrawImageRect(*image, src, dst, Rosen::Drawing::SamplingOptions());
+    coreCanvas->DetachBrush();
 #endif
 
     canvasNode_->FinishRecording();
@@ -710,6 +772,34 @@ sptr<OHOS::SurfaceBuffer> PointerDrawingManager::GetSurfaceBuffer(sptr<OHOS::Sur
     return buffer;
 }
 
+void PointerDrawingManager::DrawToPixelmap(OHOS::Rosen::Drawing::CoreCanvas &coreCanvas, const MOUSE_ICON mouseStyle)
+{
+    CALL_DEBUG_ENTER;
+    OHOS::Rosen::Drawing::Pen pen;
+    pen.SetAntiAlias(true);
+    pen.SetColor(OHOS::Rosen::Drawing::Color::COLOR_BLUE);
+    OHOS::Rosen::Drawing::scalar penWidth = 1;
+    pen.SetWidth(penWidth);
+    coreCanvas.AttachPen(pen);
+    std::shared_ptr<Rosen::Drawing::Bitmap> bitmap;
+    if (mouseStyle == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+        MMI_HILOGD("set mouseicon by userIcon_");
+        bitmap = PixelmapObjectToBitMap(*userIcon_);
+    } else {
+        std::shared_ptr<OHOS::Media::PixelMap> pixelmap;
+        if (mouseStyle == MOUSE_ICON::RUNNING) {
+            pixelmap = DecodeImageToPixelMap(mouseIcons_[MOUSE_ICON::RUNNING_LEFT].iconPath);
+        } else {
+            pixelmap = DecodeImageToPixelMap(mouseIcons_[mouseStyle].iconPath);
+        }
+        CHKPV(pixelmap);
+        bitmap = PixelmapObjectToBitMap(*pixelmap);
+    }
+    CHKPV(bitmap);
+    MMI_HILOGD("set mouseicon to OHOS system");
+    coreCanvas.DrawBitmap(*bitmap, 0.0f, 0.0f);
+}
+
 void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t height, const MOUSE_ICON mouseStyle)
 {
     CALL_DEBUG_ENTER;
@@ -717,10 +807,10 @@ void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t heigh
     OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
         OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE };
     bitmap.Build(width, height, format);
-    OHOS::Rosen::Drawing::Canvas canvas;
-    canvas.Bind(bitmap);
-    canvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
-    DrawPixelmap(canvas, mouseStyle);
+    OHOS::Rosen::Drawing::CoreCanvas coreCanvas;
+    coreCanvas.Bind(bitmap);
+    coreCanvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
+    DrawToPixelmap(coreCanvas, mouseStyle);
     static constexpr uint32_t stride = 4;
     uint32_t addrSize = width * height * stride;
     errno_t ret = memcpy_s(addr, addrSize, bitmap.GetPixels(), addrSize);
