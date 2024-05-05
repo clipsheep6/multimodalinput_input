@@ -16,6 +16,11 @@
 #include "js_gesture_event.h"
 #include "node_api.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG MMI_TAG_GESTUREEVENT
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN 0XD002801
+
 namespace OHOS {
 namespace MMI {
 static napi_module mmiGestureEventModule = {
