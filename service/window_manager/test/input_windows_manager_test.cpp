@@ -1696,6 +1696,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipNavigationWindow_0
 {
     WinMgr->SetAntiMisTake(true);
     ASSERT_TRUE(WinMgr->SkipNavigationWindow(WindowInputType::ANTI_MISTAKE_TOUCH, PointerEvent::TOOL_TYPE_PEN));
-
+}
 } // namespace MMI
 } // namespace OHOS
