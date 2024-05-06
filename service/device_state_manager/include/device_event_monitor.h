@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DISPLAY_EVENT_MONITOR_H
-#define DISPLAY_EVENT_MONITOR_H
+#ifndef DEVICE_EVENT_MONITOR_H
+#define DEVICE_EVENT_MONITOR_H
 
 #include "nocopyable.h"
 #include "singleton.h"
@@ -23,38 +23,40 @@
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "define_multimodal.h"
-#include "fingersense_manager.h"
-#include "fingersense_wrapper.h"
-#include "key_event_normalize.h"
 #include "mmi_log.h"
 #include "want.h"
 #include "util.h"
 
 namespace OHOS {
 namespace MMI {
-class DisplayEventMonitor final {
-    DECLARE_DELAYED_SINGLETON(DisplayEventMonitor);
-    public:
-        DISALLOW_COPY_AND_MOVE(DisplayEventMonitor);
-
-        void UpdateShieldStatusOnScreenOn();
-        void UpdateShieldStatusOnScreenOff();
-        void InitCommonEventSubscriber();
-        bool IsCommonEventSubscriberInit();
-        void SetScreenStatus(const std::string &screenStatus)
-        {
-            screenStatus_ = screenStatus;
-        }
-        const std::string GetScreenStatus()
-        {
-            return screenStatus_;
-        }
-    private:
-        int32_t shieldModeBeforeSreenOff_ { -1 };
-        bool hasInit_ { false };
-        std::string screenStatus_;
+enum StateType {
+    CALL_STATUS_ACTIVE = 0,
+    CALL_STATUS_HOLDING = 1,
+    CALL_STATUS_DIALING = 2,
+    CALL_STATUS_ALERTING = 3,
+    CALL_STATUS_INCOMING = 4,
+    CALL_STATUS_WAITING = 5,
+    CALL_STATUS_DISCONNECTED = 6,
+    CALL_STATUS_DISCONNECTING = 7,
+    CALL_STATUS_IDLE = 8
 };
-#define DISPLAY_MONITOR ::OHOS::DelayedSingleton<DisplayEventMonitor>::GetInstance()
+
+class DeviceEventMonitor final {
+    DECLARE_DELAYED_SINGLETON(DeviceEventMonitor);
+    public:
+        DISALLOW_COPY_AND_MOVE(DeviceEventMonitor);
+
+        void InitCommonEventSubscriber();
+        void SetCallState(const EventFwk::CommonEventData &eventData, int32_t callState);
+        int32_t GetCallState();
+        void SetHasHandleRingMute(bool hasHandleRingMute);
+    private:
+        bool hasInit_ { false };
+        int32_t callState_ { -1 };
+        bool hasHandleRingMute_ { false };
+        std::mutex stateMutex_;
+};
+#define DEVICE_MONITOR ::OHOS::DelayedSingleton<DeviceEventMonitor>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#endif // DISPLAY_EVENT_MONITOR_H
+#endif // DEVICE_EVENT_MONITOR_H
