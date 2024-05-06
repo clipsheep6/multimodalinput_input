@@ -21,9 +21,6 @@
 
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InjectEventFuzzTest" };
-} // namespace
 
 template<class T>
 size_t GetObject(T &object, const uint8_t *data, size_t size)

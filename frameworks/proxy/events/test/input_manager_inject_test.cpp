@@ -22,10 +22,12 @@
 #include "system_info.h"
 #include "input_manager.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InputManagerInjectTest"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputManagerInjectTest"};
 constexpr int32_t TIME_WAIT_FOR_OP = 100;
 constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_ONE = 147;
@@ -239,44 +241,6 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_006, TestSize.Level1)
 }
 
 /**
- * @tc.name: InputManagerTest_SubscribeKeyEvent_004
- * @tc.desc: Injection interface detection
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerInjectTest, InputManagerTest_SubscribeKeyEvent_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto keyEventFun = [](std::shared_ptr<KeyEvent> keyEvent) {
-        EventLogHelper::PrintEventData(keyEvent);
-        MMI_HILOGI("Add monitor SubscribeKeyEvent_004");
-    };
-    auto monitorId = InputManager::GetInstance()->AddMonitor(keyEventFun);
-
-    std::set<int32_t> preKeys;
-    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
-    keyOption->SetPreKeys(preKeys);
-    keyOption->SetFinalKey(KeyEvent::KEYCODE_VOLUME_UP);
-    keyOption->SetFinalKeyDown(true);
-    keyOption->SetFinalKeyDownDuration(INVAID_VALUE);
-    int32_t subscribeId = INVAID_VALUE;
-    subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, keyEventFun);
-
-    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
-    ASSERT_TRUE(injectDownEvent != nullptr);
-    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
-    KeyEvent::KeyItem kitDown;
-    kitDown.SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
-    kitDown.SetPressed(true);
-    kitDown.SetDownTime(downTime);
-    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
-    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-    injectDownEvent->AddPressedKeyItems(kitDown);
-    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
-    InputManager::GetInstance()->RemoveMonitor(monitorId);
-}
-
-/**
  * @tc.name: InputManager_InjectEvent_007
  * @tc.desc: Injection interface detection
  * @tc.type: FUNC
@@ -390,42 +354,6 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_009, TestSize.Level1)
     }
     InputManager::GetInstance()->SimulateInputEvent(keyUpEvent);
     ASSERT_TRUE(ret);
-    InputManager::GetInstance()->RemoveMonitor(monitorId);
-}
-
-/**
- * @tc.name: InputManagerTest_SubscribeKeyEvent_005
- * @tc.desc: Injection interface detection
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerInjectTest, InputManagerTest_SubscribeKeyEvent_005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto keyEventFun = [](std::shared_ptr<KeyEvent> keyEvent) {
-        EventLogHelper::PrintEventData(keyEvent);
-        MMI_HILOGI("Add monitor SubscribeKeyEvent_005");
-    };
-    auto monitorId = InputManager::GetInstance()->AddMonitor(keyEventFun);
-
-    std::set<int32_t> preKeys;
-    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
-    keyOption->SetPreKeys(preKeys);
-    keyOption->SetFinalKey(KeyEvent::KEYCODE_VOLUME_UP);
-    keyOption->SetFinalKeyDown(true);
-    keyOption->SetFinalKeyDownDuration(INVAID_VALUE);
-    int32_t subscribeId = INVAID_VALUE;
-    subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, keyEventFun);
-
-    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
-    ASSERT_TRUE(injectDownEvent != nullptr);
-    KeyEvent::KeyItem kitDown;
-    kitDown.SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
-    kitDown.SetPressed(true);
-    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
-    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-    injectDownEvent->AddPressedKeyItems(kitDown);
-    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
     InputManager::GetInstance()->RemoveMonitor(monitorId);
 }
 
@@ -628,6 +556,111 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_018, TestSize.Level1)
 }
 
 /**
+ * @tc.name: InputManager_InjectEvent_019
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerInjectTest, InputManager_InjectEvent_019, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool ret = true;
+    auto keyEventFun = [&ret](std::shared_ptr<KeyEvent> event) {
+        MMI_HILOGI("Add monitor InjectEvent_019");
+    };
+    auto monitorId = InputManager::GetInstance()->AddMonitor(keyEventFun);
+    ASSERT_NE(monitorId, ERROR_UNSUPPORT);
+
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+
+    KeyEvent::KeyItem item;
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    item.SetKeyCode(-1);
+    item.SetPressed(true);
+    item.SetDownTime(500);
+    keyEvent->AddKeyItem(item);
+    InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+    ASSERT_TRUE(ret);
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
+}
+
+/**
+ * @tc.name: InputManagerTest_SubscribeKeyEvent_004
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerInjectTest, InputManagerTest_SubscribeKeyEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEventFun = [](std::shared_ptr<KeyEvent> keyEvent) {
+        EventLogHelper::PrintEventData(keyEvent);
+        MMI_HILOGI("Add monitor SubscribeKeyEvent_004");
+    };
+    auto monitorId = InputManager::GetInstance()->AddMonitor(keyEventFun);
+
+    std::set<int32_t> preKeys;
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    keyOption->SetPreKeys(preKeys);
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_VOLUME_UP);
+    keyOption->SetFinalKeyDown(true);
+    keyOption->SetFinalKeyDownDuration(INVAID_VALUE);
+    int32_t subscribeId = INVAID_VALUE;
+    subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, keyEventFun);
+
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectDownEvent != nullptr);
+    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
+}
+
+/**
+ * @tc.name: InputManagerTest_SubscribeKeyEvent_005
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerInjectTest, InputManagerTest_SubscribeKeyEvent_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEventFun = [](std::shared_ptr<KeyEvent> keyEvent) {
+        EventLogHelper::PrintEventData(keyEvent);
+        MMI_HILOGI("Add monitor SubscribeKeyEvent_005");
+    };
+    auto monitorId = InputManager::GetInstance()->AddMonitor(keyEventFun);
+
+    std::set<int32_t> preKeys;
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    keyOption->SetPreKeys(preKeys);
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_VOLUME_UP);
+    keyOption->SetFinalKeyDown(true);
+    keyOption->SetFinalKeyDownDuration(INVAID_VALUE);
+    int32_t subscribeId = INVAID_VALUE;
+    subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, keyEventFun);
+
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectDownEvent != nullptr);
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    kitDown.SetPressed(true);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
+}
+
+/**
  * @tc.name: InputManager_InjectMouseEvent_006
  * @tc.desc: Injection interface detection
  * @tc.type: FUNC
@@ -644,15 +677,15 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_006, TestSize.Lev
 
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetButtonId(PointerEvent::BUTTON_NONE);
-    pointerEvent->SetButtonPressed(PointerEvent::BUTTON_NONE);
+    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_RIGHT);
+    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_RIGHT);
 
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
     item.SetDisplayX(200);
     item.SetDisplayY(200);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -683,7 +716,7 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_007, TestSize.Lev
     item.SetPointerId(0);
     item.SetDisplayX(200);
     item.SetDisplayY(200);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
@@ -708,14 +741,14 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_008, TestSize.Lev
 
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_RIGHT);
-    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_RIGHT);
+    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_MIDDLE);
+    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_MIDDLE);
 
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
     item.SetDisplayX(200);
     item.SetDisplayY(200);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
@@ -740,8 +773,6 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_009, TestSize.Lev
 
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_MIDDLE);
-    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_MIDDLE);
 
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
@@ -772,14 +803,13 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_010, TestSize.Lev
 
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_MIDDLE);
-    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_MIDDLE);
+    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_RIGHT);
+    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_RIGHT);
 
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
     item.SetDisplayX(200);
-    item.SetDisplayY(200);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_DOWN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
@@ -804,19 +834,19 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_011, TestSize.Lev
 
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_RIGHT);
+    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_RIGHT);
 
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
-    item.SetDisplayX(200);
     item.SetDisplayY(200);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     InputManager::GetInstance()->RemoveMonitor(monitorId);
 }
-
 
 /**
  * @tc.name: InputManager_InjectMouseEvent_012
@@ -841,9 +871,9 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_012, TestSize.Lev
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
     item.SetDisplayX(200);
+    item.SetDisplayY(200);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     InputManager::GetInstance()->RemoveMonitor(monitorId);
@@ -872,7 +902,7 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_013, TestSize.Lev
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
     item.SetDisplayY(200);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
@@ -884,7 +914,7 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_013, TestSize.Lev
  * @tc.name: InputManager_InjectMouseEvent_014
  * @tc.desc: Injection interface detection
  * @tc.type: FUNC
- * @tc.require:AR000GJG6G  mymy
+ * @tc.require:
  */
 HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_014, TestSize.Level1)
 {
@@ -903,9 +933,9 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_014, TestSize.Lev
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
     item.SetDisplayX(200);
-    item.SetDisplayY(200);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     InputManager::GetInstance()->RemoveMonitor(monitorId);
@@ -915,7 +945,7 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_014, TestSize.Lev
  * @tc.name: InputManager_InjectMouseEvent_015
  * @tc.desc: Injection interface detection
  * @tc.type: FUNC
- * @tc.require:AR000GJG6G  mymy
+ * @tc.require:
  */
 HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_015, TestSize.Level1)
 {
@@ -933,10 +963,10 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_015, TestSize.Lev
 
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
+    item.SetDisplayX(200);
     item.SetDisplayY(200);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     InputManager::GetInstance()->RemoveMonitor(monitorId);
@@ -959,68 +989,6 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_016, TestSize.Lev
 
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_RIGHT);
-    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_RIGHT);
-
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    item.SetDisplayX(200);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->AddPointerItem(item);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    InputManager::GetInstance()->RemoveMonitor(monitorId);
-}
-
-/**
- * @tc.name: InputManager_InjectMouseEvent_017
- * @tc.desc: Injection interface detection
- * @tc.type: FUNC
- * @tc.require:AR000GJG6G  mymy
- */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_017, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEventFun = [](std::shared_ptr<PointerEvent> event) {
-        MMI_HILOGI("Add monitor InjectMouseEvent_017");
-    };
-    int32_t monitorId = InputManager::GetInstance()->AddMonitor(pointerEventFun);
-    ASSERT_NE(monitorId, ERROR_UNSUPPORT);
-
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_RIGHT);
-    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_RIGHT);
-
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    item.SetDisplayX(200);
-    item.SetDisplayY(200);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    pointerEvent->AddPointerItem(item);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    InputManager::GetInstance()->RemoveMonitor(monitorId);
-}
-
-/**
- * @tc.name: InputManager_InjectMouseEvent_018
- * @tc.desc: Injection interface detection
- * @tc.type: FUNC
- * @tc.require:AR000GJG6G  mymy
- */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_018, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEventFun = [](std::shared_ptr<PointerEvent> event) {
-        MMI_HILOGI("Add monitor InjectMouseEvent_018");
-    };
-    int32_t monitorId = InputManager::GetInstance()->AddMonitor(pointerEventFun);
-    ASSERT_NE(monitorId, ERROR_UNSUPPORT);
-
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_SIDE);
     pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_MIDDLE);
 
@@ -1037,16 +1005,16 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_018, TestSize.Lev
 }
 
 /**
- * @tc.name: InputManager_InjectMouseEvent_015
+ * @tc.name: InputManager_InjectMouseEvent_017
  * @tc.desc: Injection interface detection
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_019, TestSize.Level1)
+HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_017, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto pointerEventFun = [](std::shared_ptr<PointerEvent> event) {
-        MMI_HILOGI("Add monitor InjectMouseEvent_019");
+        MMI_HILOGI("Add monitor InjectMouseEvent_017");
     };
     int32_t monitorId = InputManager::GetInstance()->AddMonitor(pointerEventFun);
     ASSERT_NE(monitorId, ERROR_UNSUPPORT);
@@ -1069,16 +1037,16 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_019, TestSize.Lev
 }
 
 /**
- * @tc.name: InputManager_InjectMouseEvent_016
+ * @tc.name: InputManager_InjectMouseEvent_018
  * @tc.desc: Injection interface detection
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_020, TestSize.Level1)
+HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_018, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto pointerEventFun = [](std::shared_ptr<PointerEvent> event) {
-        MMI_HILOGI("Add monitor InjectMouseEvent_020");
+        MMI_HILOGI("Add monitor InjectMouseEvent_018");
     };
     int32_t monitorId = InputManager::GetInstance()->AddMonitor(pointerEventFun);
     ASSERT_NE(monitorId, ERROR_UNSUPPORT);
@@ -1087,7 +1055,6 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_020, TestSize.Lev
     ASSERT_NE(pointerEvent, nullptr);
 
     PointerEvent::PointerItem item;
-    item.SetPointerId(0);
     item.SetDisplayX(200);
     item.SetDisplayY(200);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
@@ -1098,16 +1065,16 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_020, TestSize.Lev
 }
 
 /**
- * @tc.name: InputManager_InjectMouseEvent_020
+ * @tc.name: InputManager_InjectMouseEvent_019
  * @tc.desc: Injection interface detection
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_021, TestSize.Level1)
+HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_019, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto pointerEventFun = [](std::shared_ptr<PointerEvent> event) {
-        MMI_HILOGI("Add monitor InjectMouseEvent_021");
+        MMI_HILOGI("Add monitor InjectMouseEvent_019");
     };
     int32_t monitorId = InputManager::GetInstance()->AddMonitor(pointerEventFun);
     ASSERT_NE(monitorId, ERROR_UNSUPPORT);
@@ -1117,36 +1084,8 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_021, TestSize.Lev
 
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
-    item.SetDisplayY(200);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->AddPointerItem(item);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    InputManager::GetInstance()->RemoveMonitor(monitorId);
-}
-
-/**
- * @tc.name: InputManager_InjectMouseEvent_022
- * @tc.desc: Injection interface detection
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_022, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEventFun = [](std::shared_ptr<PointerEvent> event) {
-        MMI_HILOGI("Add monitor InjectMouseEvent_022");
-    };
-    int32_t monitorId = InputManager::GetInstance()->AddMonitor(pointerEventFun);
-    ASSERT_NE(monitorId, ERROR_UNSUPPORT);
-
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    item.SetDisplayX(200);
+    item.SetDisplayX(2000);
+    item.SetDisplayY(2000);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerId(0);
@@ -1586,7 +1525,7 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectTouchscreenEvent_009, TestSi
 
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
-    item.SetDisplayY(200);
+    item.SetDisplayX(200);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_MOVE);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent->SetPointerId(0);
