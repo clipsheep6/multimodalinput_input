@@ -104,7 +104,7 @@ public:
      * @since 10
      */
     int32_t GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> &datas);
-    
+
     /**
      * @brief Sets a consumer for the window input event of the current process.
      * @param inputEventConsumer Indicates the consumer to set. The window input event of the current process
@@ -437,7 +437,7 @@ public:
      * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
-    int32_t SetPointerVisible(bool visible);
+    int32_t SetPointerVisible(bool visible, int32_t priority = 0);
 
     /**
      * @brief Checks whether the pointer icon is visible.
@@ -453,7 +453,7 @@ public:
      * @return Returns <b>0</b> if the operation is successful; returns an error code otherwise.
      * @since 9
      */
-    int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle);
+    int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle, bool isUiExtension = false);
 
     /**
      * @brief Obtains the mouse pointer style.
@@ -462,7 +462,7 @@ public:
      * @return Returns <b>0</b> if the operation is successful; returns an error code otherwise.
      * @since 9
      */
-    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle);
+    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension = false);
 
     /**
      * @brief Sets pointer color.
@@ -817,7 +817,6 @@ public:
      */
     int32_t GetTouchpadRotateSwitch(bool &rotateSwitch);
 
-    int32_t SetMoveEventFilters(bool flag);
     /**
      * @brief Get whether System has IrEmitter.
      * @param hasIrEmitter the para takes the value which Indicates the device has  IrEmitter or not.

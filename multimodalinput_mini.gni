@@ -37,10 +37,11 @@ declare_args() {
   input_feature_short_key = true
   input_feature_coverage = false
   input_ext_feature_anco = false
-  input_ext_feature_fingersense = false
+  input_ext_feature_fingersense = true
   input_feature_fingerprint = false
   input_ext_feature_magiccursor = false
   input_feature_infrared_emitter = true
+  input_feature_test = false
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -91,6 +92,7 @@ declare_args() {
     "delegate_task/src/delegate_tasks.cpp",
     "device_config/src/device_config_file_parser.cpp",
     "device_manager/src/input_device_manager.cpp",
+    "device_state_manager/src/device_event_monitor.cpp",
     "dfx/src/dfx_hisysevent.cpp",
     "display_state_manager/src/display_event_monitor.cpp",
     "event_dispatch/src/event_dispatch_handler.cpp",
@@ -263,6 +265,7 @@ print("input_feature_touchscreen = ${input_feature_touchscreen}")
 print("input_feature_input_device = ${input_feature_input_device}")
 print("input_feature_short_key = ${input_feature_short_key}")
 print("input_feature_infrared_emitter = ${input_feature_infrared_emitter}")
+print("input_feature_test = ${input_feature_test}")
 
 input_default_defines = []
 
@@ -306,6 +309,10 @@ if (input_feature_fingerprint) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_FINGERPRINT" ]
 }
 
+if (input_feature_test) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_TEST" ]
+}
+
 if (!defined(global_parts_info) ||
     defined(global_parts_info.security_security_component_manager)) {
   security_component_enable = true
@@ -326,18 +333,30 @@ if (input_ext_feature_anco) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_ANCO" ]
   libmmi_client_sources +=
       [ "${mmi_ext_path}/anco_uds_manager/src/input_manager_ext.cpp" ]
+
+  if (input_feature_product != "pc") {
+    input_default_defines += [ "OHOS_BUILD_ENABLE_INFRARED_EMITTER" ]
+  }
+
   libmmi_service_sources += [
     "${mmi_ext_path}/anco_uds_manager/src/anco_uds_manager.cpp",
     "${mmi_ext_path}/anco_uds_manager/src/input_windows_manager_ext.cpp",
     "${mmi_ext_path}/anco_uds_manager/src/mmi_service_ext.cpp",
   ]
+
+  if (input_feature_product != "pc") {
+    libmmi_service_sources += [ "${mmi_path}/service/infrared_emitter/src/infrared_emitter_controller.cpp" ]
+  }
 }
 
 if (input_ext_feature_magiccursor) {
   mmi_ext_path = "//vendor/huawei/foundation/multimodalinput/input_ext"
   g2d_ext_path = "//foundation/graphic/graphic_2d_ext"
   g2d_path = "//foundation/graphic/graphic_2d"
+  surface_path = "//foundation/graphic/graphic_surface"
   input_default_defines += [ "OHOS_BUILD_ENABLE_MAGICCURSOR" ]
-  libmmi_service_sources +=
-      [ "${mmi_ext_path}/magic_cursor/src/magic_pointer_drawing_manager.cpp" ]
+  libmmi_service_sources += [
+    "${mmi_ext_path}/magic_cursor/src/magic_pointer_drawing_manager.cpp",
+    "${mmi_ext_path}/magic_cursor/src/magic_pointer_velocity_tracker.cpp",
+  ]
 }

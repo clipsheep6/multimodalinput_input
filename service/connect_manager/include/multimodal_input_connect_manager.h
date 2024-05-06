@@ -59,7 +59,7 @@ public:
     int32_t GetMousePrimaryButton(int32_t &primaryButton);
     int32_t SetHoverScrollState(bool state);
     int32_t GetHoverScrollState(bool &state);
-    int32_t SetPointerVisible(bool visible);
+    int32_t SetPointerVisible(bool visible, int32_t priority);
     int32_t IsPointerVisible(bool &visible);
     int32_t MarkProcessed(int32_t eventType, int32_t eventId);
     int32_t SetPointerColor(int32_t color);
@@ -67,8 +67,8 @@ public:
     int32_t EnableCombineKey(bool enable);
     int32_t SetPointerSpeed(int32_t speed);
     int32_t GetPointerSpeed(int32_t &speed);
-    int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle);
-    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle);
+    int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle, bool isUiExtension = false);
+    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension = false);
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId);
     int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke);
     int32_t GetDeviceIds(std::vector<int32_t> &ids);
@@ -125,7 +125,6 @@ public:
     int32_t HasIrEmitter(bool &hasIrEmitter);
     int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys);
     int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
-    int32_t SetMoveEventFilters(bool flag);
     void AddServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
     void RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap);

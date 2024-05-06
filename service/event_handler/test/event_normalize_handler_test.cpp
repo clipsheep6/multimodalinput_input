@@ -29,6 +29,7 @@ public:
     static void TearDownTestCase(void) {}
 };
 
+#ifdef OHOS_BUILD_ENABLE_TEST
 /**
  * @tc.name: EventNormalizeHandlerTest_SetMoveEventFilters_001
  * @tc.desc: Set moveEventFilterFlag_
@@ -468,5 +469,6 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_ProcessNullEvent_0
     bool flag = eventNormalizeHandler.ProcessNullEvent(event, frametime);
     ASSERT_FALSE(flag);
 }
+#endif
 } // namespace MMI
 } // namespace OHOS

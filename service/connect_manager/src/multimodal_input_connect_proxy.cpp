@@ -490,7 +490,7 @@ int32_t MultimodalInputConnectProxy::GetHoverScrollState(bool &state)
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::SetPointerVisible(bool visible)
+int32_t MultimodalInputConnectProxy::SetPointerVisible(bool visible, int32_t priority)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -500,6 +500,7 @@ int32_t MultimodalInputConnectProxy::SetPointerVisible(bool visible)
     }
 
     WRITEBOOL(data, visible, ERR_INVALID_VALUE);
+    WRITEINT32(data, priority, ERR_INVALID_VALUE);
 
     MessageParcel reply;
     MessageOption option;
@@ -691,7 +692,7 @@ int32_t MultimodalInputConnectProxy::RemoveInputEventObserver()
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle)
+int32_t MultimodalInputConnectProxy::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle, bool isUiExtension)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -704,6 +705,7 @@ int32_t MultimodalInputConnectProxy::SetPointerStyle(int32_t windowId, PointerSt
     WRITEINT32(data, pointerStyle.size, RET_ERR);
     WRITEINT32(data, pointerStyle.color, RET_ERR);
     WRITEINT32(data, pointerStyle.id, RET_ERR);
+    WRITEBOOL(data, isUiExtension, RET_ERR);
 
     MessageParcel reply;
     MessageOption option;
@@ -743,7 +745,7 @@ int32_t MultimodalInputConnectProxy::ClearWindowPointerStyle(int32_t pid, int32_
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle)
+int32_t MultimodalInputConnectProxy::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -752,6 +754,7 @@ int32_t MultimodalInputConnectProxy::GetPointerStyle(int32_t windowId, PointerSt
         return RET_ERR;
     }
     WRITEINT32(data, windowId, RET_ERR);
+    WRITEBOOL(data, isUiExtension, RET_ERR);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
@@ -2006,26 +2009,6 @@ int32_t MultimodalInputConnectProxy::SetPixelMapData(int32_t infoId, void* pixel
     return ret;
 }
 
-int32_t MultimodalInputConnectProxy::SetMoveEventFilters(bool flag)
-{
-    CALL_DEBUG_ENTER;
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
-        MMI_HILOGE("Failed to write descriptor");
-        return ERR_INVALID_VALUE;
-    }
-    MessageParcel reply;
-    MessageOption option;
-    WRITEBOOL(data, flag, ERR_INVALID_VALUE);
-    sptr<IRemoteObject> remote = Remote();
-    CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
-        SET_MOVE_EVENT_FILTERS), data, reply, option);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
-    }
-    return ret;
-}
 
 int32_t MultimodalInputConnectProxy::SetCurrentUser(int32_t userId)
 {

@@ -18,19 +18,20 @@
 
 #include <vector>
 
-#include "extra_data.h"
 #include "libinput.h"
 #include "nocopyable.h"
+#include "pixel_map.h"
 #include "singleton.h"
 
-#include "window_info.h"
-#include "window_manager.h"
+#include "extra_data.h"
 #include "input_display_bind_helper.h"
-#include "input_event_data_transformation.h"
 #include "input_event.h"
-#include "pixel_map.h"
+#include "input_event_data_transformation.h"
+#include "knuckle_drawing_manager.h"
 #include "pointer_event.h"
 #include "pointer_style.h"
+#include "window_info.h"
+#include "window_manager.h"
 #include "uds_server.h"
 
 namespace OHOS {
@@ -51,11 +52,6 @@ struct CursorPosition {
     Coordinate2D cursorPos {};
 };
 
-struct DevMode {
-    std::string SwitchName;
-    bool isShow { false };
-};
-
 struct WindowInfoEX {
     WindowInfo window;
     bool flag { false };
@@ -68,6 +64,7 @@ public:
     void Init(UDSServer& udsServer);
     void SetMouseFlag(bool state);
     bool GetMouseFlag();
+    void JudgMouseIsDownOrUp(bool dragState);
     int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent, int32_t windowId);
     bool HandleWindowInputType(const WindowInfo &window, std::shared_ptr<PointerEvent> pointerEvent);
@@ -107,8 +104,10 @@ public:
     const DisplayGroupInfo& GetDisplayGroupInfo();
     int32_t SetHoverScrollState(bool state);
     bool GetHoverScrollState() const;
-    int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle);
-    int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle) const;
+    int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle, bool isUiExtension = false);
+    int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle,
+        bool isUiExtension = false) const;
+    void SetUiExtensionInfo(bool isUiExtension, int32_t uiExtensionPid, int32_t uiExtensionWindoId);
     void DispatchPointer(int32_t pointerAction);
     void SendPointerEvent(int32_t pointerAction);
     PointerStyle GetLastPointerStyle() const;
@@ -126,6 +125,7 @@ public:
     bool TransformTipPoint(struct libinput_event_tablet_tool* tip, PhysicalCoordinate& coord, int32_t& displayId) const;
     bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
         int32_t& targetDisplayId, PhysicalCoordinate& coord) const;
+    const DisplayInfo *GetDefaultDisplayInfo() const;
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
@@ -189,7 +189,8 @@ private:
     void OnSessionLost(SessionPtr session);
     void InitPointerStyle();
     int32_t UpdatePoinerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle);
-    int32_t UpdateSceneBoardPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle);
+    int32_t UpdateSceneBoardPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle,
+        bool isUiExtension = false);
     int32_t UpdateTouchPadTarget(std::shared_ptr<PointerEvent> pointerEvent);
     std::optional<WindowInfo> SelectWindowInfo(int32_t logicalX, int32_t logicalY,
         const std::shared_ptr<PointerEvent>& pointerEvent);
@@ -222,8 +223,6 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool IsInHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects, const WindowInfo &window) const;
     bool InWhichHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects, PointerStyle &pointerStyle) const;
-    template <class T>
-    void CreateStatusConfigObserver(T& item);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
@@ -237,12 +236,16 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
 private:
     UDSServer* udsServer_ { nullptr };
 #ifdef OHOS_BUILD_ENABLE_POINTER
+    bool isUiExtension_ { false };
+    int32_t uiExtensionPid_ { -1 };
+    int32_t uiExtensionWindowId_ { -1 };
     int32_t firstBtnDownWindowId_ { -1 };
     int32_t lastLogicX_ { -1 };
     int32_t lastLogicY_ { -1 };
     WindowInfo lastWindowInfo_;
     std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
     std::map<int32_t, std::map<int32_t, PointerStyle>> pointerStyle_;
+    std::map<int32_t, std::map<int32_t, PointerStyle>> uiExtensionPointerStyle_;
     WindowInfo mouseDownInfo_;
     PointerStyle globalStyle_;
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -271,10 +274,11 @@ private:
     bool dragFlag_ { false };
     bool isDragBorder_ { false };
     bool pointerDrawFlag_ { false };
-    DevMode showCursor_;
     DisplayMode displayMode_ { DisplayMode::UNKNOWN };
+    std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr { nullptr };
     bool mouseFlag_ {false};
     std::map<int32_t, std::vector<int32_t>> targetWindowIds_;
+    int32_t pointerActionFlag_ { -1 };
     int32_t currentUserId_ { -1 };
 };
 

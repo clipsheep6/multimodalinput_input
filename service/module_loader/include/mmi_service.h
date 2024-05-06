@@ -65,7 +65,7 @@ public:
     int32_t GetMousePrimaryButton(int32_t &primaryButton) override;
     int32_t SetHoverScrollState(bool state) override;
     int32_t GetHoverScrollState(bool &state) override;
-    int32_t SetPointerVisible(bool visible) override;
+    int32_t SetPointerVisible(bool visible, int32_t priority) override;
     int32_t IsPointerVisible(bool &visible) override;
     int32_t MarkProcessed(int32_t eventType, int32_t eventId) override;
     int32_t SetPointerColor(int32_t color) override;
@@ -73,10 +73,10 @@ public:
     int32_t EnableCombineKey(bool enable) override;
     int32_t SetPointerSpeed(int32_t speed) override;
     int32_t GetPointerSpeed(int32_t &speed) override;
-    int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle) override;
+    int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle, bool isUiExtension = false) override;
     int32_t NotifyNapOnline() override;
     int32_t RemoveInputEventObserver() override;
-    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle) override;
+    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension = false) override;
     int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke) override;
     int32_t GetDeviceIds(std::vector<int32_t> &ids) override;
     int32_t GetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice) override;
@@ -133,7 +133,6 @@ public:
     int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState) override;
     int32_t Authorize(bool isAuthorize) override;
     int32_t CancelInjection() override;
-    int32_t SetMoveEventFilters(bool flag) override;
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
     int32_t HasIrEmitter(bool &hasIrEmitter) override;
     int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys) override;
