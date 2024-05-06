@@ -17,10 +17,12 @@
 #include "input_manager_util.h"
 #include "multimodal_event_handler.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InputManagerSimulateTest"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputManagerSimulateTest"};
 constexpr int32_t TIME_WAIT_FOR_OP = 100;
 constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
 constexpr int32_t DEFAULT_POINTER_ID = 0;
@@ -553,22 +555,6 @@ HWTEST_F(InputManagerSimulateTest, MultimodalEventHandler_SimulatePointerEvent_0
     SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
-
-#ifdef OHOS_BUILD_ENABLE_JOYSTICK
-/**
- * @tc.name: MultimodalEventHandler_SimulatePointerEvent_014
- * @tc.desc: Dispatch joystick event dispatch to focus window
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerSimulateTest, MultimodalEventHandler_SimulatePointerEvent_014, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<PointerEvent> pointerEvent{InputManagerUtil::SetupPointerEvent016()};
-    ASSERT_NE(pointerEvent, nullptr);
-    SimulateInputEventUtilTest(pointerEvent);
-}
-#endif // OHOS_BUILD_ENABLE_JOYSTICK
 
 /**
  * @tc.name: MultimodalEventHandler_SimulatePencil2Event_001

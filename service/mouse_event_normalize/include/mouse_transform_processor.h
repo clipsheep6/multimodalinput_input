@@ -34,6 +34,8 @@ extern "C" {
         double dy;
     };
     int32_t HandleMotionAccelerate(const Offset* offset, bool mode, double* abs_x, double* abs_y, int32_t speed);
+    int32_t HandleMotionAccelerateTouchpad(const Offset* offset, bool mode, double* abs_x, double* abs_y,
+        int32_t speed);
 }
 
 namespace MMI {
@@ -77,7 +79,7 @@ private:
     int32_t HandleAxisInner(struct libinput_event_pointer* data);
     int32_t HandleAxisBeginEndInner(struct libinput_event *event);
     void HandleAxisPostInner(PointerEvent::PointerItem &pointerItem);
-    void HandlePostInner(struct libinput_event_pointer* data, PointerEvent::PointerItem &pointerItem);
+    bool HandlePostInner(struct libinput_event_pointer* data, PointerEvent::PointerItem &pointerItem);
     void HandleTouchPadAxisState(libinput_pointer_axis_source source, int32_t& direction, bool& tpScrollSwitch);
     void HandleTouchpadRightButton(struct libinput_event_pointer* data, const int32_t evenType, uint32_t &button);
     void HandleTouchpadLeftButton(struct libinput_event_pointer* data, const int32_t evenType, uint32_t &button);

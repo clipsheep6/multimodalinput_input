@@ -34,10 +34,12 @@
 #include "mmi_log.h"
 #include "securec.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "Util"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Util" };
 constexpr int32_t FILE_SIZE_MAX = 0x6C445;
 constexpr int32_t MAX_PRO_FILE_SIZE = 128000;
 constexpr int32_t INVALID_FILE_SIZE = -1;
@@ -57,6 +59,7 @@ const std::string KEY_PATH = "/vendor/etc/keymap/";
 constexpr size_t BUF_TID_SIZE = 10;
 constexpr size_t BUF_CMD_SIZE = 512;
 constexpr size_t PROGRAM_NAME_SIZE = 256;
+constexpr int32_t TIME_CONVERSION_UNIT = 1000;
 } // namespace
 
 int64_t GetSysClockTime()
@@ -66,7 +69,7 @@ int64_t GetSysClockTime()
         MMI_HILOGD("clock_gettime failed:%{public}d", errno);
         return 0;
     }
-    return (ts.tv_sec * 1000 * 1000) + (ts.tv_nsec / 1000);
+    return (ts.tv_sec * TIME_CONVERSION_UNIT * TIME_CONVERSION_UNIT) + (ts.tv_nsec / TIME_CONVERSION_UNIT);
 }
 
 int64_t GetMillisTime()

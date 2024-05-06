@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -75,6 +75,12 @@ struct SequenceKey {
     }
 };
 
+struct ExcludeKey {
+    int32_t keyCode { -1 };
+    int32_t keyAction { -1 };
+    int64_t delay { 0 };
+};
+
 struct Sequence {
     std::vector<SequenceKey> sequenceKeys;
     std::string statusConfig;
@@ -94,6 +100,7 @@ struct TwoFingerGesture {
         int32_t id { 0 };
         int32_t x { 0 };
         int32_t y { 0 };
+        int64_t downTime { 0 };
     } touches[MAX_TOUCH_NUM];
 };
 
@@ -159,8 +166,11 @@ private:
 #endif // UNIT_TEST
     void Print();
     void PrintSeq();
+    void PrintExcludeKeys();
     bool ParseConfig();
+    bool ParseExcludeConfig();
     bool ParseJson(const std::string &configFile);
+    bool ParseExcludeJson(const std::string &configFile);
     void ParseRepeatKeyMaxCount();
     void ParseStatusConfigObserver();
     void LaunchAbility(const Ability &ability);
@@ -172,12 +182,15 @@ private:
     bool HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey);
     bool HandleKeyDown(ShortcutKey &shortcutKey);
     bool HandleKeyCancel(ShortcutKey &shortcutKey);
+    bool PreHandleEvent(const std::shared_ptr<KeyEvent> key);
     bool HandleEvent(const std::shared_ptr<KeyEvent> key);
     bool HandleKeyUpCancel(const RepeatKey &item, const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleRepeatKeyCount(const RepeatKey &item, const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleRepeatKey(const RepeatKey& item, bool &isLaunchAbility, const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleSequence(Sequence& sequence, bool &isLaunchAbility);
+    bool HandleNormalSequence(Sequence& sequence, bool &isLaunchAbility);
+    bool HandleScreenLocked(Sequence& sequence, bool &isLaunchAbility);
     bool HandleSequences(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleConsumedKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
@@ -185,6 +198,7 @@ private:
     bool AddSequenceKey(const std::shared_ptr<KeyEvent> keyEvent);
     std::shared_ptr<KeyEvent> CreateKeyEvent(int32_t keyCode, int32_t keyAction, bool isPressed);
     bool IsEnableCombineKey(const std::shared_ptr<KeyEvent> key);
+    bool IsExcludeKey(const std::shared_ptr<KeyEvent> key);
     void RemoveSubscribedTimer(int32_t keyCode);
     void HandleSpecialKeys(int32_t keyCode, int32_t keyAction);
     void InterruptTimers();
@@ -216,6 +230,7 @@ private:
     void OnHandleTouchEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void StartTwoFingerGesture();
     void StopTwoFingerGesture();
+    bool CheckTwoFingerGestureAction() const;
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void HandleFingerGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
@@ -229,18 +244,22 @@ private:
     void UpdateKnuckleGestureInfo(const std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
     void AdjustTimeIntervalConfigIfNeed(int64_t intervalTime);
     void AdjustDistanceConfigIfNeed(float distance);
+    int32_t ConvertVPToPX(int32_t vp) const;
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 private:
+    Sequence matchedSequence_;
     ShortcutKey lastMatchedKey_;
     ShortcutKey currentLaunchAbilityKey_;
     std::map<std::string, ShortcutKey> shortcutKeys_;
     std::vector<Sequence> sequences_;
+    std::vector<ExcludeKey> excludeKeys_;
     std::vector<Sequence> filterSequences_;
     std::vector<SequenceKey> keys_;
     std::vector<RepeatKey> repeatKeys_;
     std::vector<std::string> businessIds_;
     bool isParseConfig_ { false };
+    bool isParseExcludeConfig_ { false };
     std::map<int32_t, int32_t> specialKeys_;
     std::map<int32_t, std::list<int32_t>> specialTimers_;
     TwoFingerGesture twoFingerGesture_;
@@ -269,8 +288,6 @@ private:
     bool isDownStart_ { false };
     bool isKeyCancel_ { false };
     bool isHandleSequence_ { false };
-    bool isParseMaxCount_ { false };
-    bool isParseStatusConfig_ { false };
     bool isDoubleClick_ { false };
 };
 } // namespace MMI
