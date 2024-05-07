@@ -604,9 +604,13 @@ int32_t EventNormalizeHandler::HandleSwitchInputEvent(libinput_event* event)
     CHKPR(swev, ERROR_NULL_POINTER);
 
     enum libinput_switch_state state = libinput_event_switch_get_switch_state(swev);
-    auto swEvent = std::make_unique<SwitchEvent>(static_cast<int32_t>(state));
     enum libinput_switch sw = libinput_event_switch_get_switch(swev);
     MMI_HILOGD("libinput_event_switch type: %{public}d, state: %{public}d", sw, state);
+    if (sw == LIBINPUT_SWITCH_PRIVACY && state == LIBINPUT_SWITCH_STATE_OFF) {
+        MMI_HILOGD("privacy switch event ignored");
+        return RET_OK;
+    }
+    auto swEvent = std::make_unique<SwitchEvent>(static_cast<int32_t>(state));
     swEvent->SetSwitchType(static_cast<int32_t>(sw));
     nextHandler_->HandleSwitchEvent(std::move(swEvent));
 #else
