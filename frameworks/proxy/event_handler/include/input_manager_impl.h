@@ -199,6 +199,7 @@ public:
     int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap);
     int32_t SetCurrentUser(int32_t userId);
+    int32_t SetMoveEventFilters(bool flag);
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
