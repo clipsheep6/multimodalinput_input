@@ -27,8 +27,7 @@ public:
     static constexpr int32_t SWITCH_ON = 0;
     static constexpr int32_t SWITCH_OFF = 1;
 
-    enum SwitchType
-    {
+    enum SwitchType {
         DEFAULT = 0,
         LID,
         TABLET,

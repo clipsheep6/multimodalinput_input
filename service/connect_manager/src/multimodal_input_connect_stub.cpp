@@ -1164,7 +1164,8 @@ int32_t MultimodalInputConnectStub::StubSubscribeSwitchEvent(MessageParcel& data
         return MMISERVICE_NOT_RUNNING;
     }
 
-    int32_t subscribeId, switchType;
+    int32_t subscribeId;
+    int32_t switchType;
     READINT32(data, subscribeId, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, switchType, IPC_PROXY_DEAD_OBJECT_ERR);
 

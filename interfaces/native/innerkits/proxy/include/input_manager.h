@@ -153,7 +153,7 @@ public:
      * the subscription is successful. Otherwise, the subscription fails.
      * @since 9
      */
-    int32_t SubscribeSwitchEvent(std::function<void(std::shared_ptr<SwitchEvent>)> callback, 
+    int32_t SubscribeSwitchEvent(std::function<void(std::shared_ptr<SwitchEvent>)> callback,
         SwitchEvent::SwitchType switchType = SwitchEvent::SwitchType::DEFAULT);
 
     /**

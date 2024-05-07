@@ -109,18 +109,15 @@ bool SwitchSubscriberHandler::OnSubscribeSwitchEvent(std::shared_ptr<SwitchEvent
     CHKPF(switchEvent);
     MMI_HILOGD("switchValue:%{public}d", switchEvent->GetSwitchValue());
 
-    if (switchEvent->GetSwitchType() == SwitchEvent::SwitchType::LID)
-    {
+    if (switchEvent->GetSwitchType() == SwitchEvent::SwitchType::LID) {
         DfxHisysevent::OnLidSwitchChanged(switchEvent->GetSwitchValue());
     }
 
     bool handled = false;
-    for (const auto &subscriber : subscribers_)
-    {
+    for (const auto &subscriber : subscribers_) {
         if (subscriber->switchType_ == switchEvent->GetSwitchType()
-            || (subscriber->switchType_ == SwitchEvent::SwitchType::DEFAULT && 
-                switchEvent->GetSwitchType() != SwitchEvent::SwitchType::PRIVACY))
-        {
+            || (subscriber->switchType_ == SwitchEvent::SwitchType::DEFAULT &&
+                switchEvent->GetSwitchType() != SwitchEvent::SwitchType::PRIVACY)) {
             NotifySubscriber(switchEvent, subscriber);
             handled = true;
         }

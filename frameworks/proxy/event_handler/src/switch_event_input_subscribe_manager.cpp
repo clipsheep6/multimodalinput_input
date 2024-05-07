@@ -43,7 +43,7 @@ SwitchEventInputSubscribeManager::SubscribeSwitchEventInfo::SubscribeSwitchEvent
 }
 
 int32_t SwitchEventInputSubscribeManager::SubscribeSwitchEvent(
-    int32_t switchType, 
+    int32_t switchType,
     std::function<void(std::shared_ptr<SwitchEvent>)> callback)
 {
     CALL_INFO_TRACE;
