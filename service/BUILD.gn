@@ -216,6 +216,7 @@ ohos_shared_library("libmmi-server") {
   external_deps = [ "c_utils:utils" ]
   if (input_feature_pointer_drawing) {
     external_deps += [ "window_manager:libwm" ]
+    external_deps += [ "window_manager:libdm" ]
   }
 
   if (input_ext_feature_magiccursor) {
@@ -390,6 +391,7 @@ ohos_unittest("ut-mmi-service-out") {
     "image_framework:image_native",
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
+    "window_manager:libdm",
     "window_manager:libwsutils",
   ]
 }
