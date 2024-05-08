@@ -230,6 +230,8 @@ declare_args() {
     "src/virtual_trackpad.cpp",
     "src/virtual_trackpad_mouse.cpp",
     "src/virtual_trackpad_sys_ctrl.cpp",
+    "src/virtual_super_privacy.cpp",
+    "src/virtual_lid.cpp",
   ]
 
   libmmi_util_sources = [
