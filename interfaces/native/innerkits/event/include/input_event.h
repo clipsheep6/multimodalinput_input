@@ -332,6 +332,7 @@ public:
      * @since 9
      */
     void ClearFlag();
+    void ClearFlag(uint32_t flag);
 
     /**
      * @brief Marks an input event as completed.
