@@ -2487,7 +2487,11 @@ int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> p
 #ifdef OHOS_BUILD_ENABLE_POINTER
 bool InputWindowsManager::IsInsideDisplay(const DisplayInfo& displayInfo, int32_t physicalX, int32_t physicalY)
 {
-    return (physicalX >= 0 && physicalX < displayInfo.width) && (physicalY >= 0 && physicalY < displayInfo.height);
+    if (displayInfo.direction == DIRECTION0 || displayInfo.direction == DIRECTION180) {
+        return (physicalX >= 0 && physicalX < displayInfo.width) && (physicalY >= 0 && physicalY < displayInfo.height);
+    }
+    
+    return (physicalX >= 0 && physicalX < displayInfo.height) && (physicalY >= 0 && physicalY < displayInfo.width);
 }
 
 void InputWindowsManager::FindPhysicalDisplay(const DisplayInfo& displayInfo, int32_t& physicalX,
@@ -2504,17 +2508,30 @@ void InputWindowsManager::FindPhysicalDisplay(const DisplayInfo& displayInfo, in
         MMI_HILOGE("The addition of logicalY overflows");
         return;
     }
+
     for (const auto &item : displayGroupInfo_.displaysInfo) {
         int32_t displayMaxX = 0;
         int32_t displayMaxY = 0;
-        if (!AddInt32(item.x, item.width, displayMaxX)) {
-            MMI_HILOGE("The addition of displayMaxX overflows");
-            return;
+        if (item.direction == DIRECTION0 || item.direction == DIRECTION180) {
+            if (!AddInt32(item.x, item.width, displayMaxX)) {
+                MMI_HILOGE("The addition of displayMaxX overflows");
+                return;
+            }
+            if (!AddInt32(item.y, item.height, displayMaxY)) {
+                MMI_HILOGE("The addition of displayMaxY overflows");
+                return;
+            }
+        } else {
+            if (!AddInt32(item.x, item.height, displayMaxX)) {
+                MMI_HILOGE("The addition of displayMaxX overflows");
+                return;
+            }
+            if (!AddInt32(item.y, item.width, displayMaxY)) {
+                MMI_HILOGE("The addition of displayMaxY overflows");
+                return;
+            }
         }
-        if (!AddInt32(item.y, item.height, displayMaxY)) {
-            MMI_HILOGE("The addition of displayMaxY overflows");
-            return;
-        }
+        
         if ((logicalX >= item.x && logicalX < displayMaxX) &&
             (logicalY >= item.y && logicalY < displayMaxY)) {
             physicalX = logicalX - item.x;

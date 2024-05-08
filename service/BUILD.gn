@@ -228,7 +228,10 @@ ohos_shared_library("libmmi-server") {
 
   external_deps = [ "c_utils:utils" ]
   if (input_feature_pointer_drawing) {
-    external_deps += [ "window_manager:libwm" ]
+    external_deps += [
+      "window_manager:libdm",
+      "window_manager:libwm",
+    ]
   }
 
   if (input_ext_feature_magiccursor) {
