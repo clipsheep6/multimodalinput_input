@@ -22,12 +22,11 @@
 #include "stream_buffer.h"
 #include "uds_socket.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "MMIFdListener"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIFdListener" };
-}
-
 using namespace AppExecFwk;
 MMIFdListener::MMIFdListener(MMIClientPtr client) : mmiClient_(client)
 {
@@ -48,8 +47,6 @@ void MMIFdListener::OnReadable(int32_t fd)
             mmiClient_->OnRecvMsg(szBuf, size);
         } else if (size < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
-                MMI_HILOGW("Continue for errno EAGAIN|EINTR|EWOULDBLOCK size:%{public}zu errno:%{public}d",
-                    size, errno);
                 continue;
             }
             MMI_HILOGE("Recv return %{public}zu errno:%{public}d", size, errno);

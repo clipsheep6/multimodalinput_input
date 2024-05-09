@@ -27,12 +27,11 @@
 #include "net_packet.h"
 #include "proto.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InputHandlerManager"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputHandlerManager" };
-} // namespace
-
 InputHandlerManager::InputHandlerManager()
 {
     monitorCallback_ =
@@ -462,7 +461,6 @@ void InputHandlerManager::OnDispatchEventProcessed(int32_t eventId, int64_t acti
     }
     auto iter = processedEvents_.find(eventId);
     if (iter == processedEvents_.end()) {
-        MMI_HILOGE("EventId not in processedEvents_");
         return;
     }
     int32_t count = iter->second;

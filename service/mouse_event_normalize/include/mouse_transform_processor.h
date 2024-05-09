@@ -34,6 +34,8 @@ extern "C" {
         double dy;
     };
     int32_t HandleMotionAccelerate(const Offset* offset, bool mode, double* abs_x, double* abs_y, int32_t speed);
+    int32_t HandleMotionAccelerateTouchpad(const Offset* offset, bool mode, double* abs_x, double* abs_y,
+        int32_t speed);
 }
 
 namespace MMI {
@@ -77,7 +79,7 @@ private:
     int32_t HandleAxisInner(struct libinput_event_pointer* data);
     int32_t HandleAxisBeginEndInner(struct libinput_event *event);
     void HandleAxisPostInner(PointerEvent::PointerItem &pointerItem);
-    void HandlePostInner(struct libinput_event_pointer* data, PointerEvent::PointerItem &pointerItem);
+    bool HandlePostInner(struct libinput_event_pointer* data, PointerEvent::PointerItem &pointerItem);
     void HandleTouchPadAxisState(libinput_pointer_axis_source source, int32_t& direction, bool& tpScrollSwitch);
     void HandleTouchpadRightButton(struct libinput_event_pointer* data, const int32_t evenType, uint32_t &button);
     void HandleTouchpadLeftButton(struct libinput_event_pointer* data, const int32_t evenType, uint32_t &button);
@@ -90,7 +92,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t HandleButtonValueInner(struct libinput_event_pointer* data, uint32_t button, int32_t type);
     void DumpInner();
-    int32_t GetTouchpadSpeed(void);
+
     static int32_t PutConfigDataToDatabase(std::string &key, bool value);
     static int32_t GetConfigDataFromDatabase(std::string &key, bool &value);
     static int32_t PutConfigDataToDatabase(std::string &key, int32_t value);
@@ -116,6 +118,7 @@ public:
     static int32_t GetTouchpadRightClickType(int32_t &type);
     static int32_t SetTouchpadPointerSpeed(int32_t speed);
     static int32_t GetTouchpadPointerSpeed(int32_t &speed);
+    static int32_t GetTouchpadSpeed();
 
 private:
     static int32_t globalPointerSpeed_;
@@ -126,7 +129,7 @@ private:
     bool isPressed_ { false };
     int32_t deviceId_ { -1 };
     bool isAxisBegin_ { false };
-    Movement accelerated_ {};
+    Movement unaccelerated_ {};
 };
 } // namespace MMI
 } // namespace OHOS

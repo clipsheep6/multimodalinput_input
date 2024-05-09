@@ -26,10 +26,12 @@
 #include "uds_socket.h"
 #include "proto.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "UDSSession"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSession" };
 const std::string FOUNDATION = "foundation";
 } // namespace
 
@@ -69,7 +71,6 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
         auto count = send(fd_, &buf[idx], remSize, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (count < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
-                MMI_HILOGW("Continue for errno EAGAIN|EINTR|EWOULDBLOCK, errno:%{public}d", errno);
                 continue;
             }
             if (errno == ENOTSOCK) {

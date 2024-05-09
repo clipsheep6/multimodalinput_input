@@ -20,12 +20,11 @@
 #include "define_multimodal.h"
 #include "multimodal_event_handler.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InputManager"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManager" };
-} // namespace
-
 InputManager *InputManager::instance_ = new (std::nothrow) InputManager();
 InputManager *InputManager::GetInstance()
 {
@@ -269,9 +268,9 @@ int32_t InputManager::GetHoverScrollState(bool &state)
     return InputMgrImpl.GetHoverScrollState(state);
 }
 
-int32_t InputManager::SetPointerVisible(bool visible)
+int32_t InputManager::SetPointerVisible(bool visible, int32_t priority)
 {
-    return InputMgrImpl.SetPointerVisible(visible);
+    return InputMgrImpl.SetPointerVisible(visible, priority);
 }
 
 bool InputManager::IsPointerVisible()
@@ -314,14 +313,14 @@ void InputManager::SetAnrObserver(std::shared_ptr<IAnrObserver> observer)
     InputMgrImpl.SetAnrObserver(observer);
 }
 
-int32_t InputManager::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle)
+int32_t InputManager::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle, bool isUiExtension)
 {
-    return InputMgrImpl.SetPointerStyle(windowId, pointerStyle);
+    return InputMgrImpl.SetPointerStyle(windowId, pointerStyle, isUiExtension);
 }
 
-int32_t InputManager::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle)
+int32_t InputManager::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension)
 {
-    return InputMgrImpl.GetPointerStyle(windowId, pointerStyle);
+    return InputMgrImpl.GetPointerStyle(windowId, pointerStyle, isUiExtension);
 }
 
 bool InputManager::GetFunctionKeyState(int32_t funcKey)
@@ -540,6 +539,11 @@ int32_t InputManager::GetInfraredFrequencies(std::vector<InfraredFrequency>& req
 int32_t InputManager::TransmitInfrared(int64_t number, std::vector<int64_t>& pattern)
 {
     return InputMgrImpl.TransmitInfrared(number, pattern);
+}
+
+int32_t InputManager::SetCurrentUser(int32_t userId)
+{
+    return InputMgrImpl.SetCurrentUser(userId);
 }
 } // namespace MMI
 } // namespace OHOS

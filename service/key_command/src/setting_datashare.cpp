@@ -27,9 +27,11 @@
 #include "result_set.h"
 #include "uri.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "setting_DataShare"
+
 namespace OHOS {
 namespace MMI {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "setting_DataShare" };
 std::shared_ptr<SettingDataShare> SettingDataShare::instance_ = nullptr;
 std::mutex SettingDataShare::mutex_;
 sptr<IRemoteObject> SettingDataShare::remoteObj_;
@@ -37,7 +39,7 @@ namespace {
 const std::string SETTING_COLUMN_KEYWORD = "KEYWORD";
 const std::string SETTING_COLUMN_VALUE = "VALUE";
 const std::string SETTING_URI_PROXY = "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
-constexpr const char *SETTINGS_DATA_EXT_URI = "datashare:///com.ohos.settingsdata.DataAbility";
+const std::string SETTINGS_DATA_EXT_URI = "datashare:///com.ohos.settingsdata.DataAbility";
 constexpr int32_t LONG_CAST_NUM = 10;
 } // namespace
 
@@ -250,7 +252,7 @@ ErrCode SettingDataShare::PutStringValue(const std::string& key, const std::stri
 
 std::shared_ptr<DataShare::DataShareHelper> SettingDataShare::CreateDataShareHelper()
 {
-    auto helper = DataShare::DataShareHelper::Creator(remoteObj_, SETTING_URI_PROXY, SETTINGS_DATA_EXT_URI);
+    auto helper = DataShare::DataShareHelper::Creator(remoteObj_, SETTING_URI_PROXY, SETTINGS_DATA_EXT_URI.c_str());
     if (helper == nullptr) {
         return nullptr;
     }

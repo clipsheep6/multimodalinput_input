@@ -15,14 +15,16 @@
 
 #include "js_short_key_context.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "JsShortKeyContext"
+
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t MAX_DELAY = 4000;
 constexpr int32_t MIN_DELAY = 0;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsShortKeyContext" };
-constexpr const char *SHORT_KEY_CLASS = "multimodalinput_short_key_class";
-constexpr const char *SHORT_KEY_INSTANCE = "multimodalinput_short_key";
+const std::string SHORT_KEY_CLASS = "multimodalinput_short_key_class";
+const std::string SHORT_KEY_INSTANCE = "multimodalinput_short_key";
 } // namespace
 
 JsShortKeyContext::JsShortKeyContext() : mgr_(std::make_shared<JsShortKeyManager>()) {}
@@ -40,12 +42,12 @@ napi_value JsShortKeyContext::CreateInstance(napi_env env)
                                            nullptr, sizeof(desc) / sizeof(desc[0]), nullptr, &jsClass);
     CHKRP(status, DEFINE_CLASS);
 
-    status = napi_set_named_property(env, global, SHORT_KEY_CLASS, jsClass);
+    status = napi_set_named_property(env, global, SHORT_KEY_CLASS.c_str(), jsClass);
     CHKRP(status, SET_NAMED_PROPERTY);
 
     napi_value jsInstance = nullptr;
     CHKRP(napi_new_instance(env, jsClass, 0, nullptr, &jsInstance), NEW_INSTANCE);
-    CHKRP(napi_set_named_property(env, global, SHORT_KEY_INSTANCE, jsInstance), SET_NAMED_PROPERTY);
+    CHKRP(napi_set_named_property(env, global, SHORT_KEY_INSTANCE.c_str(), jsInstance), SET_NAMED_PROPERTY);
 
     JsShortKeyContext *jsContext = nullptr;
     CHKRP(napi_unwrap(env, jsInstance, (void**)&jsContext), UNWRAP);
@@ -70,7 +72,7 @@ napi_value JsShortKeyContext::CreateJsObject(napi_env env, napi_callback_info in
     JsShortKeyContext *jsContext = new (std::nothrow) JsShortKeyContext();
     CHKPP(jsContext);
     napi_status status = napi_wrap(env, thisVar, jsContext, [](napi_env env, void* data, void* hin) {
-        MMI_HILOGI("jsvm ends");
+        MMI_HILOGI("Jsvm ends");
         JsShortKeyContext *context = static_cast<JsShortKeyContext*>(data);
         delete context;
     }, nullptr, nullptr);
@@ -89,14 +91,14 @@ JsShortKeyContext* JsShortKeyContext::GetInstance(napi_env env)
     CHKRP(napi_get_global(env, &global), GET_GLOBAL);
 
     bool result = false;
-    CHKRP(napi_has_named_property(env, global, SHORT_KEY_INSTANCE, &result), HAS_NAMED_PROPERTY);
+    CHKRP(napi_has_named_property(env, global, SHORT_KEY_INSTANCE.c_str(), &result), HAS_NAMED_PROPERTY);
     if (!result) {
         THROWERR(env, "multimodal_short_key was not found");
         return nullptr;
     }
 
     napi_value object = nullptr;
-    CHKRP(napi_get_named_property(env, global, SHORT_KEY_INSTANCE, &object), SET_NAMED_PROPERTY);
+    CHKRP(napi_get_named_property(env, global, SHORT_KEY_INSTANCE.c_str(), &object), SET_NAMED_PROPERTY);
     if (object == nullptr) {
         THROWERR(env, "object is nullptr");
         return nullptr;

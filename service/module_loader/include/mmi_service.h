@@ -66,7 +66,7 @@ public:
     int32_t GetMousePrimaryButton(int32_t &primaryButton) override;
     int32_t SetHoverScrollState(bool state) override;
     int32_t GetHoverScrollState(bool &state) override;
-    int32_t SetPointerVisible(bool visible) override;
+    int32_t SetPointerVisible(bool visible, int32_t priority) override;
     int32_t IsPointerVisible(bool &visible) override;
     int32_t MarkProcessed(int32_t eventType, int32_t eventId) override;
     int32_t SetPointerColor(int32_t color) override;
@@ -74,10 +74,10 @@ public:
     int32_t EnableCombineKey(bool enable) override;
     int32_t SetPointerSpeed(int32_t speed) override;
     int32_t GetPointerSpeed(int32_t &speed) override;
-    int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle) override;
+    int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle, bool isUiExtension = false) override;
     int32_t NotifyNapOnline() override;
     int32_t RemoveInputEventObserver() override;
-    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle) override;
+    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension = false) override;
     int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke) override;
     int32_t GetDeviceIds(std::vector<int32_t> &ids) override;
     int32_t GetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice) override;
@@ -142,6 +142,7 @@ public:
     int32_t OnGetInfraredFrequencies(std::vector<InfraredFrequency>& requencys);
     int32_t OnTransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap) override;
+    int32_t SetCurrentUser(int32_t userId) override;
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitAncoUds();

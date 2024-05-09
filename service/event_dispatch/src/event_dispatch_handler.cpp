@@ -34,12 +34,12 @@
 #include "util.h"
 #include <transaction/rs_interfaces.h>
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "EventDispatchHandler"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-#if defined(OHOS_BUILD_ENABLE_KEYBOARD) || defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatchHandler" };
-#endif // OHOS_BUILD_ENABLE_KEYBOARD ||  OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 constexpr int32_t INTERVAL_TIME = 3000; // log time interval is 3 seconds.
 } // namespace
 
@@ -118,8 +118,8 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
             windowX = windowXY.first;
             windowY = windowXY.second;
         }
-        pointerItem.SetDisplayX(windowX);
-        pointerItem.SetDisplayY(windowY);
+        pointerItem.SetWindowX(windowX);
+        pointerItem.SetWindowY(windowY);
         pointerItem.SetTargetWindowId(windowId);
         pointerEvent->UpdatePointerItem(pointerId, pointerItem);
         pointerEvent->SetDispatchTimes(count++);
@@ -127,14 +127,10 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
     }
 }
 
-void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction, const std::string& programName, uint32_t pid)
+void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction, const std::string& programName,
+    uint32_t pid, int32_t pointCnt)
 {
-    if (isTouchEnable_) {
-        MMI_HILOGD("touch interface to RS Enable");
-        OHOS::Rosen::RSInterfaces::GetInstance().NotifyTouchEvent(pointAction);
-    } else {
-        MMI_HILOGD("touch interface to RS NOT Enable");
-    }
+    OHOS::Rosen::RSInterfaces::GetInstance().NotifyTouchEvent(pointAction, pointCnt);
 }
 
 bool EventDispatchHandler::AcquireEnableMark(std::shared_ptr<PointerEvent> event)
@@ -157,8 +153,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
         return;
     }
-    pointerItem.SetOriginPointerId(pointerItem.GetPointerId());
-    point->UpdatePointerItem(pointerId, pointerItem);
+
     std::vector<int32_t> windowIds;
     WinMgr->GetTargetWindowIds(pointerItem.GetPointerId(), windowIds);
     if (!windowIds.empty()) {
@@ -202,8 +197,9 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
         || pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP
         || pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_DOWN
         || pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
+        int32_t pointerCnt = pointerEvent->GetPointerCount();
         NotifyPointerEventToRS(pointerEvent->GetPointerAction(), session->GetProgramName(),
-            static_cast<uint32_t>(session->GetPid()));
+            static_cast<uint32_t>(session->GetPid()), pointerCnt);
     }
     if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
         MMI_HILOGI("InputTracking id:%{public}d, SendMsg to %{public}s:pid:%{public}d",

@@ -17,11 +17,13 @@
 
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KeyEvent"
+
 using namespace OHOS::HiviewDFX;
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEvent" };
 const std::map <int32_t, std::string> KEYCODE_TO_STRING = {
     {KeyEvent::KEYCODE_FN, "KEYCODE_FN"},
     {KeyEvent::KEYCODE_UNKNOWN, "KEYCODE_UNKNOWN"},
@@ -781,6 +783,7 @@ const int32_t KeyEvent::KEYCODE_WLAN = 2844;
 const int32_t KeyEvent::KEYCODE_UWB = 2845;
 const int32_t KeyEvent::KEYCODE_WWAN_WIMAX = 2846;
 const int32_t KeyEvent::KEYCODE_RFKILL = 2847;
+const int32_t KeyEvent::KEYCODE_STYLUS_SCREEN = 2849;
 const int32_t KeyEvent::KEYCODE_CHANNEL = 3001;
 const int32_t KeyEvent::KEYCODE_BTN_0 = 3100;
 const int32_t KeyEvent::KEYCODE_BTN_1 = 3101;
@@ -955,6 +958,22 @@ std::shared_ptr<KeyEvent> KeyEvent::Create()
     auto event = std::shared_ptr<KeyEvent>(new (std::nothrow) KeyEvent(InputEvent::EVENT_TYPE_KEY));
     CHKPP(event);
     return event;
+}
+
+void KeyEvent::Reset()
+{
+    InputEvent::Reset();
+    keyCode_ = KeyEvent::UNKNOWN_FUNCTION_KEY;
+    keyAction_ = KeyEvent::KEY_ACTION_UNKNOWN;
+    keyIntention_ = KeyEvent::INTENTION_UNKNOWN;
+    numLock_ = false;
+    capsLock_ = false;
+    scrollLock_ = false;
+    repeat_ = false;
+    keys_.clear();
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    enhanceData_.clear();
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 }
 
 int32_t KeyEvent::GetKeyCode() const
