@@ -85,6 +85,7 @@ bool KnuckleDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent> touchE
     if (item.GetToolType() != PointerEvent::TOOL_TYPE_KNUCKLE ||
         touchEvent->GetPointerIds().size() != 1) {
         if (canvasNode_ != nullptr) {
+            MMI_HILOGD("clear canvas");
             path_.Reset();
             pointerInfos_.clear();
             canvasNode_->ResetSurface();
