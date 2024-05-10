@@ -1186,6 +1186,42 @@ int32_t MMIService::CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> 
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     return sMsgHandler_.OnInjectPointerEvent(pointerEvent, pid, isNativeInject);
 }
+
+int32_t MMIService::SelfAdaptiveResolution(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CALL_DEBUG_ENTER;
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
+        return RET_ERR;
+    }
+    auto display = OHOS::Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
+    enum ResolutionIndex {
+        FIRST = 0,
+        CURRENT = 1
+    };
+    if (sptrDisplays_[FIRST] == nullptr) {
+        sptrDisplays_[FIRST] = display;
+    } else {
+        sptrDisplays_[CURRENT] = display;
+    }
+    if (sptrDisplays_[FIRST] != nullptr && sptrDisplays_[CURRENT] != nullptr) {
+        int32_t srcX = pointerItem.GetDisplayX();
+        int32_t srcY = pointerItem.GetDisplayY();
+        int32_t destX = srcX * sptrDisplays_[CURRENT]->GetWidth() / sptrDisplays_[FIRST]->GetWidth();
+        int32_t destY = srcY * sptrDisplays_[CURRENT]->GetHeight() / sptrDisplays_[FIRST]->GetHeight();
+        pointerItem.SetDisplayX(destX);
+        pointerItem.SetDisplayY(destY);
+        MMI_HILOGI("PointerItem's display_x is %{public}d, display_y is %{public}d when first inject,"
+            "Screen resolution first got is %{public}d * %{public}d,"
+            "Screen resolution current got is %{public}d * %{public}d,"
+            "PointerItem's display_x is %{public}d, display_y is %{public}d after self-adaptaion",
+            srcX, srcY, sptrDisplays_[FIRST]->GetWidth(), sptrDisplays_[FIRST]->GetHeight(),
+            sptrDisplays_[CURRENT]->GetWidth(), sptrDisplays_[CURRENT]->GetHeight(), srcX, srcY);
+    }
+    return RET_OK;
+}
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject)
@@ -1194,6 +1230,7 @@ int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> point
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t ret;
     int32_t pid = GetCallingPid();
+    SelfAdaptiveResolution(pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_ANCO
     ret = InjectPointerEventExt(pointerEvent, pid, isNativeInject);
 #else
