@@ -111,6 +111,14 @@ public:
     {
         return {};
     }
+    virtual int32_t EnableHardwareCursorStats(int32_t pid, bool enable)
+    {
+        return 0;
+    }
+    virtual int32_t GetHardwareCursorStats(int32_t pid, uint32_t &frameCount, uint32_t &vsyncCount)
+    {
+        return 0;
+    }
 public:
     static inline std::shared_ptr<IPointerDrawingManager> iPointDrawMgr_ { nullptr };
 };

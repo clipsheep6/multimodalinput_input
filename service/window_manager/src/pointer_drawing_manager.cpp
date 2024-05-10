@@ -94,8 +94,10 @@ PointerDrawingManager::PointerDrawingManager()
 
     MAGIC_CURSOR->InitStyle();
     InitStyle();
+    hardwareCursorPointerManager_ = std::make_shared<HwcPointerManager>();
 #else
     InitStyle();
+    hardwareCursorPointerManager_ = std::make_shared<HwcPointerManager>();
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 }
 
@@ -108,11 +110,21 @@ PointerStyle PointerDrawingManager::GetLastMouseStyle()
 void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
     const PointerStyle pointerStyle, Direction direction)
 {
-    MMI_HILOGD("Pointer window move success");
+    if (hardwareCursorPointerManager_->SetTargetDevice(displayId) != RET_OK) {
+        MMI_HILOGE("my-my Set hardware cursor position is error.");
+        return;
+    }
     if (lastMouseStyle_ == pointerStyle && !mouseIconUpdate_ && lastDirection_ == direction) {
         surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
             surfaceNode_->GetStagingProperties().GetBounds().z_,
             surfaceNode_->GetStagingProperties().GetBounds().w_);
+        uint64_t value = 0;
+        if (hardwareCursorPointerManager_->IsSupported(1, value)) {
+            if (hardwareCursorPointerManager_->SetPosition(physicalX, physicalY) != RET_OK) {
+                MMI_HILOGE("my-my Set hardware cursor position is error.");
+                return;
+            }
+        }
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("The lastpointerStyle is equal with pointerStyle,id %{public}d size:%{public}d",
             pointerStyle.id, pointerStyle.size);
@@ -124,8 +136,7 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
     }
     lastMouseStyle_ = pointerStyle;
     surfaceNode_->SetVisible(false);
-    int32_t ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
-    if (ret != RET_OK) {
+    if (InitLayer(MOUSE_ICON(lastMouseStyle_.id)) != RET_OK) {
         mouseIconUpdate_ = false;
         MMI_HILOGE("Init layer failed");
         return;
@@ -134,6 +145,13 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
         surfaceNode_->GetStagingProperties().GetBounds().z_,
         surfaceNode_->GetStagingProperties().GetBounds().w_);
     surfaceNode_->SetVisible(true);
+    uint64_t value = 0;
+    if (hardwareCursorPointerManager_->IsSupported(1, value)) {
+        if (hardwareCursorPointerManager_->SetPosition(physicalX, physicalY) != RET_OK) {
+            MMI_HILOGE("my-my Set hardware cursor position is error.");
+            return;
+        }
+    }
     Rosen::RSTransaction::FlushImplicitTransaction();
     UpdatePointerVisible();
     mouseIconUpdate_ = false;
@@ -146,8 +164,6 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     const PointerStyle pointerStyle, Direction direction)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("Display:%{public}d,physicalX:%{public}d,physicalY:%{public}d,pointerStyle:%{public}d",
-        displayId, physicalX, physicalY, pointerStyle.id);
     FixCursorPosition(physicalX, physicalY);
     lastPhysicalX_ = physicalX;
     lastPhysicalY_ = physicalY;
@@ -672,6 +688,17 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
     surfaceNode_->SetFrameGravity(Rosen::Gravity::RESIZE_ASPECT_FILL);
     surfaceNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
     surfaceNode_->SetBounds(physicalX, physicalY, canvasWidth_, canvasHeight_);
+    if (hardwareCursorPointerManager_->SetTargetDevice(displayId) != RET_OK) {
+        MMI_HILOGE("my--my Set hardware cursor position is error.");
+        return;
+    }
+    uint64_t value = 0;
+    if (hardwareCursorPointerManager_->IsSupported(1, value)) {
+        if (hardwareCursorPointerManager_->SetPosition(physicalX, physicalY) != RET_OK) {
+            MMI_HILOGE("my--my Set hardware cursor position is error.");
+            return;
+        }
+    }
 #ifndef USE_ROSEN_DRAWING
     surfaceNode_->SetBackgroundColor(SK_ColorTRANSPARENT);
 #else
@@ -981,6 +1008,10 @@ int32_t PointerDrawingManager::GetPointerColor()
 void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo &displayInfo)
 {
     CALL_DEBUG_ENTER;
+    if (hardwareCursorPointerManager_->SetTargetDevice(displayInfo.id) != RET_OK) {
+        MMI_HILOGE("my-my Set target device is failed.");
+        return;
+    }
     hasDisplay_ = true;
     displayInfo_ = displayInfo;
     int32_t size = GetPointerSize();
@@ -1268,6 +1299,13 @@ void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y)
             y,
             surfaceNode_->GetStagingProperties().GetBounds().z_,
             surfaceNode_->GetStagingProperties().GetBounds().w_);
+        uint64_t value = 0;
+        if (hardwareCursorPointerManager_->IsSupported(1, value)) {
+            if (hardwareCursorPointerManager_->SetPosition(lastPhysicalX_, lastPhysicalY_) != RET_OK) {
+                MMI_HILOGE("my--my, Set hardware cursor position is error.");
+                return;
+            }
+        }
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("Pointer window move success");
     }
@@ -1488,6 +1526,26 @@ void PointerDrawingManager::CheckMouseIconPath()
         }
         ++iter;
     }
+}
+
+int32_t PointerDrawingManager::EnableHardwareCursorStats(int32_t pid, bool enable)
+{
+    if ((hardwareCursorPointerManager_->EnableStats(enable)) != RET_OK) {
+        MMI_HILOGE("my-my Enable stats failed");
+        return RET_ERR;
+    }
+    MMI_HILOGI("my-my, EnableHardwareCursorStats, enable:%{public}d", enable);
+    return RET_OK;
+}
+
+int32_t PointerDrawingManager::GetHardwareCursorStats(int32_t pid, uint32_t &frameCount, uint32_t &vsyncCount)
+{
+    if ((hardwareCursorPointerManager_->QueryStats(frameCount, vsyncCount)) != RET_OK) {
+        MMI_HILOGE("my-my Query stats failed");
+        return RET_ERR;
+    }
+    MMI_HILOGI("my-my GetHardwareCursorStats, frameCount:%{public}d, vsyncCount:%{public}d", frameCount, vsyncCount);
+    return RET_OK;
 }
 
 void PointerDrawingManager::InitStyle()
