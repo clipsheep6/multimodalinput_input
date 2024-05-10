@@ -23,11 +23,13 @@
 #include "knuckle_drawing_manager.h"
 #include "window_info.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KnuckleDrawingManagerTest"
+
 namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KnuckleDrawingManagerTest" };
 } // namespace
 class KnuckleDrawingManagerTest : public testing::Test {
 public:
