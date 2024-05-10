@@ -228,6 +228,8 @@ ohos_shared_library("libmmi-server") {
 
   external_deps = [ "c_utils:utils" ]
   if (input_feature_pointer_drawing) {
+    external_deps += [ "window_manager:libdm" ]
+    external_deps += [ "window_manager:libwm" ]
     external_deps += [ "window_manager:libwm_lite" ]
   }
 
@@ -766,6 +768,7 @@ ohos_unittest("ModuleLoaderTest") {
     "image_framework:image_native",
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
+    "window_manager:libdm",
   ]
 }
 
@@ -1062,6 +1065,7 @@ ohos_unittest("ConnectManagerTest") {
     "ipc:ipc_single",
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
+    "window_manager:libdm",
   ]
 }
 
