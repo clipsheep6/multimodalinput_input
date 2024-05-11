@@ -332,7 +332,7 @@ void TouchDrawingManager::DrawBubble()
         int32_t physicalY = pointerItem.GetDisplayY();
         if (displayInfo_.displayDirection == DIRECTION0) {
             ConvertCoordinates(displayInfo_.direction, displayInfo_.width,
-            displayInfo_.height, physicalX, physicalY);
+                displayInfo_.height, physicalX, physicalY);
         }
         Rosen::Drawing::Point centerPt(physicalX, physicalY);
         bubblePen_.SetWidth(bubble_.outerCircleWidth);
