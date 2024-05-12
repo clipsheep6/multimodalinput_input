@@ -605,5 +605,57 @@ void DfxHisysevent::ReportScreenCaptureGesture()
         MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
     }
 }
+
+void DfxHisysevent::ReportMagicCursorColorChange(std::string fill_Color, std::string stroke_color)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "MAGIC_CURSOR_COLOR",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "FILL_COLOR", fill_Color,
+        "STROKE_COLOR", stroke_color);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportMagicCursorShapeChange(std::string fill_Code, OHOS::MMI::MOUSE_ICON mouse_Style)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "MAGIC_CURSOR_CHANGE",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "FILL_COLOR", fill_Code,
+        "STROKE_COLOR", stroke_color);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+oid DfxHisysevent::ReportMagicCursorColorChange(std::string fill_Color, std::string stroke_color);
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "MAGIC_CURSOR_COLOR",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "FILL_COLOR", fill_Code,
+        "STROKE_COLOR", stroke_color);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+oid DfxHisysevent::ReportMagicCursorColorChange(std::string fill_Color, std::string stroke_color);
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "MAGIC_CURSOR_COLOR",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "FILL_COLOR", fill_Code,
+        "STROKE_COLOR", stroke_color);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
 }
 }
