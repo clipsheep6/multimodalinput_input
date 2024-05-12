@@ -101,6 +101,10 @@ public:
     static void ReportSingleKnuckleDoubleClickEvent(int32_t intervalTime);
     static void ReportFailIfInvalidTime(const std::shared_ptr<PointerEvent> touchEvent, int32_t intervalTime);
     static void ReportFailIfInvalidDistance(const std::shared_ptr<PointerEvent> touchEvent, float distance);
+    static void ReportMagicCursorColorChange(std::string fill_Color, std::string stroke_color);
+    static void ReportMagicCursorShapeChange(std::string fill_Code, OHOS::MMI::MOUSE_ICON mouse_Style);
+    static void ReportMagicCursorSizeChange(std::string fill_Code, std::string ,mouse_Size);
+    static void ReportMagicCursorSizeFailed(std::string error_Code, std::string error_Name);
 
 private:
     static inline int64_t dispatchStartTime_ { 0 };
