@@ -59,8 +59,8 @@ public:
     void TouchDrawHandler(const std::shared_ptr<PointerEvent>& pointerEvent);
     void UpdateLabels();
     void UpdateDisplayInfo(const DisplayInfo& displayInfo);
-    void GetOriginalTouchScreenCoordinates(Direction direction, int32_t width, int32_t height,
-        int32_t &physicalX, int32_t &physicalY);
+    void ConvertCoordinates(Direction direction,
+    int32_t width, int32_t height, int32_t &physicalX, int32_t &physicalY);
     void SetPointerPositionState(bool state);
 private:
     void CreateObserver();
@@ -88,6 +88,7 @@ private:
     template <class T>
     std::string FormatNumber(T& number, int32_t precision);
     bool IsValidAction(const int32_t action);
+    Rosen::Drawing::Rect CalcRectPosition();
 private:
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_ { nullptr };
     std::shared_ptr<Rosen::RSCanvasNode> bubbleCanvasNode_ { nullptr };

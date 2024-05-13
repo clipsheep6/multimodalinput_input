@@ -39,6 +39,7 @@ constexpr int32_t INDEPENDENT_WIDTH_PIXELS = 2;
 constexpr int32_t MULTIPLE_FACTOR = 10;
 constexpr int32_t CALCULATE_MIDDLE = 2;
 constexpr int32_t DEFAULT_VALUE = -1;
+constexpr int32_t TOUCH_SLOP = 30;
 constexpr int32_t RECT_COUNT = 6;
 constexpr int32_t RECT_TOP = 118;
 constexpr int32_t RECT_HEIGHT = 50;
@@ -120,8 +121,8 @@ void TouchDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
     itemRectW_ = static_cast<double>(displayInfo_.width) / RECT_COUNT;
 }
 
-void TouchDrawingManager::GetOriginalTouchScreenCoordinates(Direction direction, int32_t width, int32_t height,
-    int32_t &physicalX, int32_t &physicalY)
+void TouchDrawingManager::ConvertCoordinates(Direction direction,
+    int32_t width, int32_t height, int32_t &physicalX, int32_t &physicalY)
 {
     switch (direction) {
         case DIRECTION0: {
@@ -132,23 +133,17 @@ void TouchDrawingManager::GetOriginalTouchScreenCoordinates(Direction direction,
             int32_t temp = physicalY;
             physicalY = width - physicalX;
             physicalX = temp;
-            MMI_HILOGD("direction is DIRECTION90, Original touch screen physicalX:%{public}d, physicalY:%{public}d",
-                physicalX, physicalY);
             break;
         }
         case DIRECTION180: {
             physicalX = width - physicalX;
             physicalY = height - physicalY;
-            MMI_HILOGD("direction is DIRECTION180, Original touch screen physicalX:%{public}d, physicalY:%{public}d",
-                physicalX, physicalY);
             break;
         }
         case DIRECTION270: {
             int32_t temp = physicalX;
             physicalX = height - physicalY;
             physicalY = temp;
-            MMI_HILOGD("direction is DIRECTION270, Original touch screen physicalX:%{public}d, physicalY:%{public}d",
-                physicalX, physicalY);
             break;
         }
         default: {
@@ -156,6 +151,8 @@ void TouchDrawingManager::GetOriginalTouchScreenCoordinates(Direction direction,
             break;
         }
     }
+    MMI_HILOGD("direction: %{public}d, x: %{public}d, y: %{public}d",
+        static_cast<int32_t>(direction), physicalX, physicalY);
 }
 
 void TouchDrawingManager::SetPointerPositionState(bool state)
@@ -336,7 +333,7 @@ void TouchDrawingManager::DrawBubble()
         int32_t physicalX = pointerItem.GetDisplayX();
         int32_t physicalY = pointerItem.GetDisplayY();
         if (displayInfo_.displayDirection == DIRECTION0) {
-            GetOriginalTouchScreenCoordinates(displayInfo_.direction, displayInfo_.width,
+            ConvertCoordinates(displayInfo_.direction, displayInfo_.width,
                 displayInfo_.height, physicalX, physicalY);
         }
         Rosen::Drawing::Point centerPt(physicalX, physicalY);
@@ -368,6 +365,8 @@ void TouchDrawingManager::DrawPointerPositionHandler()
         }
         int32_t displayX = pointerItem.GetDisplayX();
         int32_t displayY = pointerItem.GetDisplayY();
+        ConvertCoordinates(displayInfo_.direction, displayInfo_.width,
+            displayInfo_.height, displayX, displayY);
         DrawTracker(displayX, displayY, pointerId);
         if (pointerEvent_->GetPointerAction() != PointerEvent::POINTER_ACTION_UP) {
             DrawCrosshairs(canvas, displayX, displayY);
@@ -447,23 +446,21 @@ void TouchDrawingManager::DrawLabels()
     std::string viewXv = "Xv: " + FormatNumber(xVelocity_, THREE_PRECISION);
     std::string viewYv = "Yv: " + FormatNumber(yVelocity_, THREE_PRECISION);
     std::string viewPrs = "Prs: " + FormatNumber(pressure_, TWO_PRECISION);
-    Rosen::Drawing::Rect rect;
-    rect.left_ = 0;
-    rect.right_ = itemRectW_ + rect.left_;
-    rect.top_ = RECT_TOP;
-    rect.bottom_ = RECT_TOP + RECT_HEIGHT;
+    
     Rosen::Drawing::Color color = LABELS_DEFAULT_COLOR;
     auto canvas = static_cast<RosenCanvas *>
         (labelsCanvasNode_->BeginRecording(displayInfo_.width, displayInfo_.height));
     CHKPV(canvas);
+    canvas->Clear();
+    Rosen::Drawing::Rect rect = CalcRectPosition();
     DrawRectItem(canvas, viewP, rect, color);
     if (isDownAction_ || !lastPointerItem_.empty()) {
         DrawRectItem(canvas, viewX, rect, color);
         DrawRectItem(canvas, viewY, rect, color);
     } else {
-        color = dx == 0 ? LABELS_DEFAULT_COLOR : LABELS_RED_COLOR;
+        color = std::abs(dx) < TOUCH_SLOP ? LABELS_DEFAULT_COLOR : LABELS_RED_COLOR;
         DrawRectItem(canvas, viewDx, rect, color);
-        color = dy == 0 ? LABELS_DEFAULT_COLOR : LABELS_RED_COLOR;
+        color = std::abs(dx) < TOUCH_SLOP ? LABELS_DEFAULT_COLOR : LABELS_RED_COLOR;
         DrawRectItem(canvas, viewDy, rect, color);
     }
     DrawRectItem(canvas, viewXv, rect, LABELS_DEFAULT_COLOR);
@@ -488,8 +485,16 @@ void TouchDrawingManager::DrawRectItem(RosenCanvas* canvas, const std::string &t
     canvas->AttachBrush(textBrush_);
     canvas->DrawTextBlob(textBlob.get(), rect.left_, RECT_TOP + TEXT_TOP);
     canvas->DetachBrush();
-    rect.left_ += itemRectW_ + RECT_SPACEING;
-    rect.right_ += itemRectW_ + RECT_SPACEING;
+    if (displayInfo_.direction == DIRECTION0 || displayInfo_.direction == DIRECTION180) {
+        rect.left_ += itemRectW_ + RECT_SPACEING;
+        rect.right_ += itemRectW_ + RECT_SPACEING;
+    } else if (displayInfo_.direction == DIRECTION90) {
+        rect.top_ += itemRectW_ + RECT_SPACEING;
+        rect.bottom_ += itemRectW_ + RECT_SPACEING;
+    } else if (displayInfo_.direction == DIRECTION270) {
+        rect.top_ -= itemRectW_ + RECT_SPACEING;
+        rect.bottom_ -= itemRectW_ + RECT_SPACEING;
+    }
 }
 
 void TouchDrawingManager::UpdatePointerPosition()
@@ -632,6 +637,43 @@ bool TouchDrawingManager::IsValidAction(const int32_t action)
         return true;
     }
     return false;
+}
+
+Rosen::Drawing::Rect TouchDrawingManager::CalcRectPosition()
+{
+    int32_t left = 0;
+    int32_t top = 0;
+    int32_t right = 0;
+    int32_t bottom = 0;
+    MMI_HILOGD("direction is invalid, direction:%{public}d", displayInfo_.direction);
+    switch (displayInfo_.direction) {
+        case DIRECTION0:
+        case DIRECTION180: {
+            left = 0;
+            top = RECT_TOP;
+            right = itemRectW_ + left;
+            bottom = RECT_TOP + RECT_HEIGHT;
+            break;
+        }
+        case DIRECTION90: {
+            left = displayInfo_.width - RECT_HEIGHT;
+            top = 0;
+            right = displayInfo_.width;
+            bottom = itemRectW_ + top;
+            break;
+        }
+        case DIRECTION270: {
+            left = 0;
+            top = displayInfo_.height;
+            right = RECT_HEIGHT;
+            bottom = displayInfo_.height - itemRectW_;
+            break;
+        }
+        default: {
+            break;
+        }
+    }
+    return Rosen::Drawing::Rect(left, top, std::abs(right - left), std::abs(bottom - top));
 }
 } // namespace MMI
 } // namespace OHOS

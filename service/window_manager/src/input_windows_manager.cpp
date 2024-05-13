@@ -1921,7 +1921,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     int32_t physicalY = pointerItem.GetDisplayY();
     if (physicalDisplayInfo->displayDirection == DIRECTION0) {
         direction = physicalDisplayInfo->direction;
-        TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(direction, physicalDisplayInfo->width,
+        TOUCH_DRAWING_MGR->ConvertCoordinates(direction, physicalDisplayInfo->width,
             physicalDisplayInfo->height, physicalX, physicalY);
     }
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
