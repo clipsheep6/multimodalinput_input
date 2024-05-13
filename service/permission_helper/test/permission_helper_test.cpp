@@ -18,8 +18,10 @@
 
 #include <gtest/gtest.h>
 #include "ipc_skeleton.h"
+#include "mmi_log.h"
 #include "proto.h"
 #include "tokenid_kit.h"
+#include "uds_server.h"
 
 #include "define_multimodal.h"
 #include "permission_helper.h"
@@ -49,6 +51,7 @@ public:
  */
 HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckMonitorPermission, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     uint32_t tokenId = 1;
     int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, inputMonitor);
     ret = OHOS::Security::AccessToken::PERMISSION_GRANTED;
@@ -64,6 +67,7 @@ HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckMonitorPermission, Test
  */
 HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckInterceptorPermission, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     uint32_t tokenId = 1;
     int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, inputInterceptor);
     ret = OHOS::Security::AccessToken::PERMISSION_GRANTED;
@@ -79,6 +83,7 @@ HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckInterceptorPermission, 
  */
 HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckDispatchControlPermission, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     uint32_t tokenId = 1;
     int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, inputDispatchControl);
     ret = OHOS::Security::AccessToken::PERMISSION_GRANTED;
@@ -94,6 +99,7 @@ HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckDispatchControlPermissi
  */
 HWTEST_F(PermissionHelperTest, PermissionHelperTest_GetTokenType, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     uint32_t tokenId = 5;
     auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
     tokenType = OHOS::Security::AccessToken::TOKEN_HAP;
@@ -115,6 +121,7 @@ HWTEST_F(PermissionHelperTest, PermissionHelperTest_GetTokenType, TestSize.Level
  */
 HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckDispatchControl, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     uint32_t tokenId = 2;
     auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
     tokenType = OHOS::Security::AccessToken::TOKEN_HAP;
@@ -136,6 +143,7 @@ HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckDispatchControl, TestSi
  */
 HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckHapPermission, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     uint32_t tokenId = 3;
     std::string permissionCode = "access";
     auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
@@ -158,6 +166,7 @@ HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckHapPermission, TestSize
  */
 HWTEST_F(PermissionHelperTest, PermissionHelperTest_VerifySystemApp, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     uint32_t callerToken = 3;
     auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
     tokenType = OHOS::Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE;
@@ -176,6 +185,7 @@ HWTEST_F(PermissionHelperTest, PermissionHelperTest_VerifySystemApp, TestSize.Le
  */
 HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckPermission, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     uint32_t tokenId = 1;
     uint32_t required = 2;
     auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
