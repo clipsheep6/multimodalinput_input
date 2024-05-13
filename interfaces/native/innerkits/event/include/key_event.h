@@ -2838,6 +2838,13 @@ public:
     static const int32_t KEYCODE_LAUNCHER_MENU;
 
     /**
+     * Stylus key
+     *
+     * @since 9
+     */
+    static const int32_t KEYCODE_STYLUS_SCREEN;
+
+    /**
      * Unknown key operation, which is usually used to indicate the initial invalid value.
      *
      * @since 9
@@ -3226,6 +3233,8 @@ public:
      * @since 9
      */
     static std::shared_ptr<KeyEvent> Create();
+
+    virtual void Reset() override;
 
     /**
      * @brief Obtains the key code of this key event.

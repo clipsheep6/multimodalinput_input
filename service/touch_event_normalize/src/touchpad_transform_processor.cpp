@@ -30,6 +30,8 @@
 #include "dfx_hisysevent.h"
 #include "multimodal_input_preferences_manager.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "TouchPadTransformProcessor"
 
@@ -568,12 +570,12 @@ int32_t TouchPadTransformProcessor::GetTouchpadRotateSwitch(bool &rotateSwitch)
 
 int32_t TouchPadTransformProcessor::PutConfigDataToDatabase(std::string &key, bool value)
 {
-    return PreferencesMgr->SetBoolValue(key, TOUCHPAD_FILE_NAME, value);
+    return PREFERENCES_MGR->SetBoolValue(key, TOUCHPAD_FILE_NAME, value);
 }
 
 int32_t TouchPadTransformProcessor::GetConfigDataFromDatabase(std::string &key, bool &value)
 {
-    value = PreferencesMgr->GetBoolValue(key, true);
+    value = PREFERENCES_MGR->GetBoolValue(key, true);
     return RET_OK;
 }
 

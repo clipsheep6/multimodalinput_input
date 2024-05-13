@@ -14,7 +14,10 @@
  */
 
 #include "display_event_monitor.h"
+#include "stylus_key_handler.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_SERVER
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "DisplayEventMonitor"
 
@@ -42,8 +45,10 @@ public:
             MMI_HILOGE("action is empty");
             return;
         }
+        DISPLAY_MONITOR->SetScreenStatus(action);
         if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
             MMI_HILOGD("display screen on");
+            STYLUS_HANDLER->IsLaunchAbility();
             if (FINGERSENSE_WRAPPER->enableFingersense_ != nullptr) {
                 MMI_HILOGD("start enable fingersense");
                 FINGERSENSE_WRAPPER->enableFingersense_();

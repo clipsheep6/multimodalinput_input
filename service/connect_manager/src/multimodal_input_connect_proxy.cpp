@@ -25,6 +25,8 @@
 #include "input_scene_board_judgement.h"
 #include "infrared_frequency_info.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_SERVER
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MultimodalInputConnectProxy"
 
@@ -490,7 +492,7 @@ int32_t MultimodalInputConnectProxy::GetHoverScrollState(bool &state)
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::SetPointerVisible(bool visible)
+int32_t MultimodalInputConnectProxy::SetPointerVisible(bool visible, int32_t priority)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -500,6 +502,7 @@ int32_t MultimodalInputConnectProxy::SetPointerVisible(bool visible)
     }
 
     WRITEBOOL(data, visible, ERR_INVALID_VALUE);
+    WRITEINT32(data, priority, ERR_INVALID_VALUE);
 
     MessageParcel reply;
     MessageOption option;
@@ -691,7 +694,7 @@ int32_t MultimodalInputConnectProxy::RemoveInputEventObserver()
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle)
+int32_t MultimodalInputConnectProxy::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle, bool isUiExtension)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -704,6 +707,7 @@ int32_t MultimodalInputConnectProxy::SetPointerStyle(int32_t windowId, PointerSt
     WRITEINT32(data, pointerStyle.size, RET_ERR);
     WRITEINT32(data, pointerStyle.color, RET_ERR);
     WRITEINT32(data, pointerStyle.id, RET_ERR);
+    WRITEBOOL(data, isUiExtension, RET_ERR);
 
     MessageParcel reply;
     MessageOption option;
@@ -743,7 +747,7 @@ int32_t MultimodalInputConnectProxy::ClearWindowPointerStyle(int32_t pid, int32_
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle)
+int32_t MultimodalInputConnectProxy::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -752,6 +756,7 @@ int32_t MultimodalInputConnectProxy::GetPointerStyle(int32_t windowId, PointerSt
         return RET_ERR;
     }
     WRITEINT32(data, windowId, RET_ERR);
+    WRITEBOOL(data, isUiExtension, RET_ERR);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();

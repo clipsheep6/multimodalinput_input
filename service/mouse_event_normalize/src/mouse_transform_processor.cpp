@@ -38,6 +38,8 @@
 #include "util.h"
 #include "multimodal_input_preferences_manager.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MouseTransformProcessor"
 
@@ -84,9 +86,10 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
         MMI_HILOGE("No display");
         return RET_ERR;
     }
+    unaccelerated_.dx = libinput_event_pointer_get_dx_unaccelerated(data);
+    unaccelerated_.dy = libinput_event_pointer_get_dy_unaccelerated(data);
 
-    Offset offset = {libinput_event_pointer_get_dx_unaccelerated(data),
-        libinput_event_pointer_get_dy_unaccelerated(data)};
+    Offset offset { unaccelerated_.dx, unaccelerated_.dy };
     auto displayInfo = WinMgr->GetPhysicalDisplay(cursorPos.displayId);
     CHKPR(displayInfo, ERROR_NULL_POINTER);
 #ifndef OHOS_BUILD_EMULATOR
@@ -96,13 +99,13 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
 #endif // OHOS_BUILD_EMULATOR
     const int32_t type = libinput_event_get_type(event);
     int32_t ret = RET_ERR;
-    accelerated_.dx = cursorPos.cursorPos.x;
-    accelerated_.dy = cursorPos.cursorPos.y;
 
     if (type == LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD) {
-        ret = HandleMotionAccelerate(&offset, WinMgr->GetMouseIsCaptureMode(),
+        pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
+        ret = HandleMotionAccelerateTouchpad(&offset, WinMgr->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, GetTouchpadSpeed());
     } else {
+        pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
         ret = HandleMotionAccelerate(&offset, WinMgr->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, globalPointerSpeed_);
     }
@@ -110,8 +113,6 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
         MMI_HILOGE("Failed to handle motion correction");
         return ret;
     }
-    accelerated_.dx = cursorPos.cursorPos.x - accelerated_.dx;
-    accelerated_.dy = cursorPos.cursorPos.y - accelerated_.dy;
 #ifdef OHOS_BUILD_EMULATOR
     cursorPos.cursorPos.x = offset.dx;
     cursorPos.cursorPos.y = offset.dy;
@@ -208,7 +209,7 @@ int32_t MouseTransformProcessor::HandleButtonValueInner(struct libinput_event_po
     }
 
     std::string name = "primaryButton";
-    int32_t primaryButton = PreferencesMgr->GetIntValue(name, 0);
+    int32_t primaryButton = PREFERENCES_MGR->GetIntValue(name, 0);
     MMI_HILOGD("Set mouse primary button:%{public}d", primaryButton);
     if (type == LIBINPUT_EVENT_POINTER_BUTTON && primaryButton == RIGHT_BUTTON) {
         if (buttonId == PointerEvent::MOUSE_BUTTON_LEFT) {
@@ -233,7 +234,7 @@ int32_t MouseTransformProcessor::SetMouseScrollRows(int32_t rows)
         rows = MAX_ROWS;
     }
     std::string name = "rows";
-    int32_t ret = PreferencesMgr->SetIntValue(name, mouseFileName, rows);
+    int32_t ret = PREFERENCES_MGR->SetIntValue(name, mouseFileName, rows);
     MMI_HILOGD("Set mouse scroll rows successfully, rows:%{public}d", rows);
     return ret;
 }
@@ -242,7 +243,7 @@ int32_t MouseTransformProcessor::GetMouseScrollRows()
 {
     CALL_DEBUG_ENTER;
     std::string name = "rows";
-    int32_t rows = PreferencesMgr->GetIntValue(name, DEFAULT_ROWS);
+    int32_t rows = PREFERENCES_MGR->GetIntValue(name, DEFAULT_ROWS);
     MMI_HILOGD("Get mouse scroll rows successfully, rows:%{public}d", rows);
     return rows;
 }
@@ -423,8 +424,8 @@ bool MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
         pointerItem.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
     }
     pointerItem.SetDeviceId(deviceId_);
-    pointerItem.SetRawDx(static_cast<int32_t>(accelerated_.dx));
-    pointerItem.SetRawDy(static_cast<int32_t>(accelerated_.dy));
+    pointerItem.SetRawDx(static_cast<int32_t>(unaccelerated_.dx));
+    pointerItem.SetRawDy(static_cast<int32_t>(unaccelerated_.dy));
 
     pointerEvent_->UpdateId();
     pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
@@ -621,7 +622,7 @@ int32_t MouseTransformProcessor::SetMousePrimaryButton(int32_t primaryButton)
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Set mouse primary button:%{public}d", primaryButton);
     std::string name = "primaryButton";
-    PreferencesMgr->SetIntValue(name, mouseFileName, primaryButton);
+    PREFERENCES_MGR->SetIntValue(name, mouseFileName, primaryButton);
     return RET_OK;
 }
 
@@ -629,7 +630,7 @@ int32_t MouseTransformProcessor::GetMousePrimaryButton()
 {
     CALL_DEBUG_ENTER;
     std::string name = "primaryButton";
-    int32_t primaryButton = PreferencesMgr->GetIntValue(name, 0);
+    int32_t primaryButton = PREFERENCES_MGR->GetIntValue(name, 0);
     MMI_HILOGD("Set mouse primary button:%{public}d", primaryButton);
     return primaryButton;
 }
@@ -644,28 +645,27 @@ int32_t MouseTransformProcessor::SetPointerSpeed(int32_t speed)
     }
     globalPointerSpeed_ = speed;
     std::string name = "speed";
-    int32_t ret = PreferencesMgr->SetIntValue(name, mouseFileName, speed);
+    int32_t ret = PREFERENCES_MGR->SetIntValue(name, mouseFileName, speed);
     MMI_HILOGD("Set pointer speed successfully, speed:%{public}d", speed);
     return ret;
 }
 
 int32_t MouseTransformProcessor::GetPointerSpeed()
 {
-    CALL_DEBUG_ENTER;
     std::string name = "speed";
-    int32_t speed = PreferencesMgr->GetIntValue(name, DEFAULT_SPEED);
-    MMI_HILOGD("Get pointer speed successfully, speed:%{public}d", speed);
+    int32_t speed = PREFERENCES_MGR->GetIntValue(name, DEFAULT_SPEED);
+    MMI_HILOGD("Pointer speed:%{public}d", speed);
     return speed;
 }
 
-int32_t MouseTransformProcessor::GetTouchpadSpeed(void)
+int32_t MouseTransformProcessor::GetTouchpadSpeed()
 {
     int32_t speed = DEFAULT_TOUCHPAD_SPEED;
     if (GetTouchpadPointerSpeed(speed) != RET_OK) {
         // if failed to get touchpad from database, return DEFAULT_TOUCHPAD_SPEED
         return DEFAULT_TOUCHPAD_SPEED;
     }
-
+    MMI_HILOGD("(TouchPad) pointer speed:%{public}d", speed);
     return speed;
 }
 
@@ -940,24 +940,24 @@ int32_t MouseTransformProcessor::GetTouchpadRightClickType(int32_t &type)
 
 int32_t MouseTransformProcessor::PutConfigDataToDatabase(std::string &key, bool value)
 {
-    return PreferencesMgr->SetBoolValue(key, mouseFileName, value);
+    return PREFERENCES_MGR->SetBoolValue(key, mouseFileName, value);
 }
 
 int32_t MouseTransformProcessor::GetConfigDataFromDatabase(std::string &key, bool &value)
 {
-    value = PreferencesMgr->GetBoolValue(key, true);
+    value = PREFERENCES_MGR->GetBoolValue(key, true);
     return RET_OK;
 }
 
 int32_t MouseTransformProcessor::PutConfigDataToDatabase(std::string &key, int32_t value)
 {
-    return PreferencesMgr->SetIntValue(key, mouseFileName, value);
+    return PREFERENCES_MGR->SetIntValue(key, mouseFileName, value);
 }
 
 int32_t MouseTransformProcessor::GetConfigDataFromDatabase(std::string &key, int32_t &value)
 {
     int32_t defaultValue = value;
-    value = PreferencesMgr->GetIntValue(key, defaultValue);
+    value = PREFERENCES_MGR->GetIntValue(key, defaultValue);
     return RET_OK;
 }
 } // namespace MMI

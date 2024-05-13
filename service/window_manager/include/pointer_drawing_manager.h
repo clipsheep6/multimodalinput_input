@@ -59,11 +59,13 @@ public:
     int32_t SetPointerColor(int32_t color) override;
     int32_t GetPointerColor() override;
     void DeletePointerVisible(int32_t pid) override;
-    int32_t SetPointerVisible(int32_t pid, bool visible) override;
+    int32_t SetPointerVisible(int32_t pid, bool visible, int32_t priority) override;
     bool GetPointerVisible(int32_t pid) override;
-    int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle) override;
+    int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle,
+        bool isUiExtension = false) override;
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) override;
-    int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle) override;
+    int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle,
+        bool isUiExtension = false) override;
     int32_t SetPointerSize(int32_t size) override;
     int32_t GetPointerSize() override;
     void DrawPointerStyle(const PointerStyle& pointerStyle) override;
@@ -76,11 +78,14 @@ public:
     int32_t SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap) override;
     int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override;
     PointerStyle GetLastMouseStyle() override;
+    std::map<MOUSE_ICON, IconStyle> GetMouseIconPath() override;
     IconStyle GetIconStyle(const MOUSE_ICON mouseStyle) override;
     bool HasMagicCursor();
     int32_t DrawCursor(const MOUSE_ICON mouseStyle);
+    int32_t SwitchPointerStyle() override;
 private:
     IconStyle GetIconType(MOUSE_ICON mouseIcon);
+    void GetPreferenceKey(std::string &name);
     void DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle);
     void DrawRunningPointerAnimate(const MOUSE_ICON mouseStyle);
     void CreatePointerWindow(int32_t displayId, int32_t physicalX, int32_t physicalY, Direction direction);
@@ -92,7 +97,7 @@ private:
     void FixCursorPosition(int32_t &physicalX, int32_t &physicalY);
     std::shared_ptr<OHOS::Media::PixelMap> DecodeImageToPixelMap(const std::string &imagePath);
     void UpdatePointerVisible();
-    int32_t UpdateDefaultPointerStyle(int32_t pid, int32_t windowId, PointerStyle style);
+    int32_t UpdateDefaultPointerStyle(int32_t pid, int32_t windowId, PointerStyle style, bool isUiExtension = false);
     void CheckMouseIconPath();
     void InitStyle();
     int32_t InitLayer(const MOUSE_ICON mouseStyle);
@@ -106,9 +111,9 @@ private:
     void AdjustMouseFocusByDirection90(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void AdjustMouseFocusByDirection180(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void AdjustMouseFocusByDirection270(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
+    void CreateMagicCursorChangeObserver();
     void CreatePointerSwiftObserver(isMagicCursor& item);
     int32_t GetIndependentPixels();
-    int32_t SwitchPointerStyle();
     bool CheckPointerStyleParam(int32_t windowId, PointerStyle pointerStyle);
     std::map<MOUSE_ICON, IconStyle>& GetMouseIcons();
     void UpdateIconPath(const MOUSE_ICON mouseStyle, std::string iconPath);

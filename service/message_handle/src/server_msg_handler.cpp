@@ -39,6 +39,8 @@
 #include "time_cost_chk.h"
 #include "util_napi_error.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_SERVER
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "ServerMsgHandler"
 
@@ -171,14 +173,12 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     pointerEvent->UpdateId();
-    int32_t action = pointerEvent->GetPointerAction();
-    auto source = pointerEvent->GetSourceType();
-    switch (source) {
+    switch (pointerEvent->GetSourceType()) {
         case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
 #ifdef OHOS_BUILD_ENABLE_TOUCH
             auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
             CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
-            if (!FixTargetWindowId(pointerEvent, action)) {
+            if (!FixTargetWindowId(pointerEvent, pointerEvent->GetPointerAction())) {
                 return RET_ERR;
             }
             inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
@@ -191,26 +191,91 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
 #endif // OHOS_BUILD_ENABLE_JOYSTICK
         case PointerEvent::SOURCE_TYPE_TOUCHPAD: {
 #ifdef OHOS_BUILD_ENABLE_POINTER
+            int32_t ret = AccelerateMotion(pointerEvent);
+            if (ret != RET_OK) {
+                MMI_HILOGE("Failed to accelerate motion, error:%{public}d", ret);
+                return ret;
+            }
+            UpdatePointerEvent(pointerEvent);
             auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
             CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
             inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
             CHKPR(pointerEvent, ERROR_NULL_POINTER);
             if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER)) {
-                IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), false);
+                IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), false, 0);
             } else if (((pointerEvent->GetPointerAction() < PointerEvent::POINTER_ACTION_PULL_DOWN) ||
                 (pointerEvent->GetPointerAction() > PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW)) &&
                 !IPointerDrawingManager::GetInstance()->IsPointerVisible()) {
-                IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), true);
+                IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), true, 0);
             }
 #endif // OHOS_BUILD_ENABLE_POINTER
             break;
         }
         default: {
-            MMI_HILOGW("Source type is unknown, source:%{public}d", source);
+            MMI_HILOGW("Source type is unknown, source:%{public}d", pointerEvent->GetSourceType());
             break;
         }
     }
     return SaveTargetWindowId(pointerEvent);
+}
+
+int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT) ||
+        (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE) ||
+        ((pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) &&
+         (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE))) {
+        return RET_OK;
+    }
+    PointerEvent::PointerItem pointerItem {};
+    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
+        MMI_HILOGE("Pointer event is corrupted");
+        return RET_ERR;
+    }
+    CursorPosition cursorPos = WinMgr->GetCursorPos();
+    if (cursorPos.displayId < 0) {
+        MMI_HILOGE("No display");
+        return RET_ERR;
+    }
+    Offset offset {
+        .dx = pointerItem.GetRawDx(),
+        .dy = pointerItem.GetRawDy(),
+    };
+    int32_t ret = RET_OK;
+
+    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER)) {
+        ret = HandleMotionAccelerateTouchpad(&offset, WinMgr->GetMouseIsCaptureMode(),
+            &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, MouseTransformProcessor::GetTouchpadSpeed());
+    } else {
+        ret = HandleMotionAccelerate(&offset, WinMgr->GetMouseIsCaptureMode(),
+            &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, MouseTransformProcessor::GetPointerSpeed());
+    }
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to accelerate pointer motion, error:%{public}d", ret);
+        return ret;
+    }
+    WinMgr->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
+    MMI_HILOGD("Cursor move to (x:%{public}.2f,y:%{public}.2f,DisplayId:%{public}d)",
+        cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
+    return RET_OK;
+}
+
+void ServerMsgHandler::UpdatePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT) ||
+        (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE)) {
+        return;
+    }
+    PointerEvent::PointerItem pointerItem {};
+    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
+        MMI_HILOGE("Pointer event is corrupted");
+        return;
+    }
+    auto mouseInfo = WinMgr->GetMouseInfo();
+    pointerItem.SetDisplayX(mouseInfo.physicalX);
+    pointerItem.SetDisplayY(mouseInfo.physicalY);
+    pointerEvent->UpdatePointerItem(pointerEvent->GetPointerId(), pointerItem);
+    pointerEvent->SetTargetDisplayId(mouseInfo.displayId);
 }
 
 int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent)

@@ -76,8 +76,10 @@
         "faultloggerd",
         "ffrt",
         "graphic_2d_ext",
-        "drivers_interface_rtos_extra",
-        "hdf_core"
+        "audio_framework",
+        "drivers_interface_tros_extra",
+        "hdf_core",
+        "bounds_checking_function"
       ],
       "third_party": [
         "cJSON",
