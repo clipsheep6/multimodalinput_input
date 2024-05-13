@@ -41,6 +41,7 @@ declare_args() {
   input_feature_fingerprint = false
   input_ext_feature_magiccursor = false
   input_feature_infrared_emitter = true
+  input_feature_test = false
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -265,6 +266,7 @@ print("input_feature_touchscreen = ${input_feature_touchscreen}")
 print("input_feature_input_device = ${input_feature_input_device}")
 print("input_feature_short_key = ${input_feature_short_key}")
 print("input_feature_infrared_emitter = ${input_feature_infrared_emitter}")
+print("input_feature_test = ${input_feature_test}")
 
 input_default_defines = []
 
@@ -306,6 +308,10 @@ if (input_feature_short_key) {
 
 if (input_feature_fingerprint) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_FINGERPRINT" ]
+}
+
+if (input_feature_test) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_TEST" ]
 }
 
 if (!defined(global_parts_info) ||
