@@ -979,18 +979,22 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
     if (keyEvent->GetKeyCode() != item.keyCode) {
         return false;
     }
-    if (count_ == item.times) {
-        bool statusValue = true;
-        auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-            .GetBoolValue(item.statusConfig, statusValue);
-        if (ret != RET_OK) {
-            MMI_HILOGE("Get value from setting date fail");
-            return false;
+    if (item.count == item.times) {
+        if (item.statusConfig != "") {
+            bool statusValue = true;
+            auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
+                .GetBoolValue(item.statusConfig, statusValue);
+            if (ret != RET_OK) {
+                MMI_HILOGE("Get value from setting date fail");
+                return false;
+            }
+            if (!statusValue) {
+                return false;
+            }
         }
-        if (!statusValue) {
-            return false;
-        }
+        
         LaunchAbility(item.ability);
+        item.count = 0;
         launchAbilityCount_ = count_;
         isLaunched = true;
         isDownStart_ = false;
@@ -1024,17 +1028,21 @@ bool KeyCommandHandler::HandleRepeatKeyCount(const RepeatKey &item, const std::s
 
             if (pressedKeys.size() == 0) {
                 count_ = 1;
+                item.count = 1;
             } else {
                 count_ = 0;
+                item.count = 0;
             }
             repeatKey_.keyCode = item.keyCode;
         } else {
+            item.count++;
             count_++;
         }
 
         upActionTime_ = keyEvent->GetActionTime();
         repeatTimerId_ = TimerMgr->AddTimer(intervalTime_ / SECONDS_SYSTEM, 1, [this] () {
             SendKeyEvent();
+            item.count = 0;
         });
         if (repeatTimerId_ < 0) {
             return false;
@@ -1495,7 +1503,7 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability)
     want.SetElementName(ability.deviceId, ability.bundleName, ability.abilityName);
     want.SetAction(ability.action);
     want.SetUri(ability.uri);
-    want.SetType(ability.uri);
+    want.SetType(ability.type);
     for (const auto &entity : ability.entities) {
         want.AddEntity(entity);
     }

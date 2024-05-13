@@ -128,6 +128,7 @@ struct RepeatKey {
     int32_t times { 0 };
     int64_t actionTime { 0 };
     int64_t delay { 0 };
+    int32_t count { 0 };
     std::string statusConfig;
     bool statusConfigValue { true };
     Ability ability;

@@ -1520,5 +1520,33 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ReportKnuckleDoubleClickEv
     touchEvent->AddPointerItem(item);
     ASSERT_NO_FATAL_FAILURE(handler.ReportKnuckleDoubleClickEvent(touchEvent, knuckleGesture));
 }
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ParseJson_001
+ * @tc.desc: Test ParseJson
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ParseJson_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::string configPath = "/system/etc/multimodalinput/ability_launch_config.json";
+    ASSERT_TRUE(handler.ParseJson(configPath));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ParseJson_002
+ * @tc.desc: Test ParseJson
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ParseJson_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::string configPath = "";
+    ASSERT_FALSE(handler.ParseJson(configPath));
+}
 } // namespace MMI
 } // namespace OHOS
