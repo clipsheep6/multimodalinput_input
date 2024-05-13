@@ -1056,8 +1056,8 @@ ohos_unittest("PermissionHelperTest") {
   ]
 
   external_deps = [
-    "access_token:libaccesstoken_sdk",
     "ability_runtime:dataobs_manager",
+    "access_token:libaccesstoken_sdk",
     "c_utils:utils",
     "hilog:libhilog",
     "security_component_manager:libsecurity_component_sdk",
