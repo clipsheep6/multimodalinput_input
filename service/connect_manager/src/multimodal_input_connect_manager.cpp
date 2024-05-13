@@ -723,6 +723,12 @@ int32_t MultimodalInputConnectManager::SetPixelMapData(int32_t infoId, void* pix
     return multimodalInputConnectService_->SetPixelMapData(infoId, pixelMap);
 }
 
+int32_t MultimodalInputConnectManager::SetMoveEventFilters(bool flag)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->SetMoveEventFilters(flag);
+}
+
 int32_t MultimodalInputConnectManager::SetCurrentUser(int32_t userId)
 {
     CHKPR(multimodalInputConnectService_, RET_ERR);

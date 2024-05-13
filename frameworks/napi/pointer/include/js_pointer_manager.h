@@ -104,6 +104,7 @@ public:
     napi_value GetTouchpadRightClickType(napi_env env, napi_value handle = nullptr);
     napi_value SetTouchpadRotateSwitch(napi_env env, bool rotateSwitch, napi_value handle = nullptr);
     napi_value GetTouchpadRotateSwitch(napi_env env, napi_value handle = nullptr);
+    napi_value SetMoveEventFilters(napi_env env, bool flag);
 
 private:
     napi_value SetTouchpadData(napi_env env, napi_value handle, int32_t errorCode);
