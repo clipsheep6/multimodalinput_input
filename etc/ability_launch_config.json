@@ -129,5 +129,18 @@
         ]
       }
     }
-  }
+  },
+  "RepeatKeys": [
+    {
+      "keyCode": 18,
+      "times": 5,
+      "delay": 120,
+      "statusConfig": "",
+      "ability": {
+        "bundleName": "com.ohos.screenshot",
+        "abilityName": "com.ohos.screenshot.ServiceExtAbility",
+        "abilityType": "extensionAbility"
+      }
+    }
+  ]
 }
