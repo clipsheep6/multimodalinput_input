@@ -13,15 +13,11 @@
  * limitations under the License.
  */
 
-#include <cstdio>
-#include <fstream>
-
 #include <gtest/gtest.h>
 
 #include "mmi_log.h"
 #include "pointer_event.h"
 #include "knuckle_dynamic_drawing_manager.h"
-#include "window_info.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "KnuckleDynamicDrawingManagerTest"
@@ -250,6 +246,64 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Upda
     CALL_TEST_DEBUG;
     DisplayInfo displayInfo;
     EXPECT_NO_FATAL_FAILURE(knuckleDynamicDrawingMgr->UpdateDisplayInfo(displayInfo));
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_AlphaTypeToAlphaType
+ * @tc.desc: Test AlphaTypeToAlphaType
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_AlphaTypeToAlphaType, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDynamicDrawingManager knuckleDynamicDrawMgr;
+    Media::AlphaType alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_UNKNOWN;
+    ASSERT_EQ(knuckleDynamicDrawMgr.AlphaTypeToAlphaType(alphaType), Rosen::Drawing::AlphaType::ALPHATYPE_UNKNOWN);
+    alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_OPAQUE;
+    ASSERT_EQ(knuckleDynamicDrawMgr.AlphaTypeToAlphaType(alphaType), Rosen::Drawing::AlphaType::ALPHATYPE_OPAQUE);
+    alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_PREMUL;
+    ASSERT_EQ(knuckleDynamicDrawMgr.AlphaTypeToAlphaType(alphaType), Rosen::Drawing::AlphaType::ALPHATYPE_PREMUL);
+    alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_UNPREMUL;
+    ASSERT_EQ(knuckleDynamicDrawMgr.AlphaTypeToAlphaType(alphaType), Rosen::Drawing::AlphaType::ALPHATYPE_UNPREMUL);
+    alphaType = static_cast<Media::AlphaType>(5);
+    ASSERT_EQ(knuckleDynamicDrawMgr.AlphaTypeToAlphaType(alphaType), Rosen::Drawing::AlphaType::ALPHATYPE_UNKNOWN);
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_PixelFormatToColorType
+ * @tc.desc: Test PixelFormatToColorType
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_PixelFormatToColorType, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDynamicDrawingManager knuckleDynamicDrawMgr;
+    Media::PixelFormat pixelFmt = Media::PixelFormat::RGB_565;
+    ASSERT_EQ(knuckleDynamicDrawMgr.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_RGB_565);
+    pixelFmt = Media::PixelFormat::RGBA_8888;
+    ASSERT_EQ(knuckleDynamicDrawMgr.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_RGBA_8888);
+    pixelFmt = Media::PixelFormat::BGRA_8888;
+    ASSERT_EQ(knuckleDynamicDrawMgr.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_BGRA_8888);
+    pixelFmt = Media::PixelFormat::ALPHA_8;
+    ASSERT_EQ(knuckleDynamicDrawMgr.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_ALPHA_8);
+    pixelFmt = Media::PixelFormat::RGBA_F16;
+    ASSERT_EQ(knuckleDynamicDrawMgr.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_RGBA_F16);
+    pixelFmt = Media::PixelFormat::UNKNOWN;
+    ASSERT_EQ(knuckleDynamicDrawMgr.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
+    pixelFmt = Media::PixelFormat::ARGB_8888;
+    ASSERT_EQ(knuckleDynamicDrawMgr.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
+    pixelFmt = Media::PixelFormat::RGB_888;
+    ASSERT_EQ(knuckleDynamicDrawMgr.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
+    pixelFmt = Media::PixelFormat::NV21;
+    ASSERT_EQ(knuckleDynamicDrawMgr.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
+    pixelFmt = Media::PixelFormat::NV12;
+    ASSERT_EQ(knuckleDynamicDrawMgr.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
+    pixelFmt = Media::PixelFormat::CMYK;
+    ASSERT_EQ(knuckleDynamicDrawMgr.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
+    pixelFmt = static_cast<Media::PixelFormat>(100);
+    ASSERT_EQ(knuckleDynamicDrawMgr.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
 }
 } // namespace MMI
 } // namespace OHOS
