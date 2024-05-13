@@ -545,5 +545,10 @@ int32_t InputManager::SetCurrentUser(int32_t userId)
 {
     return InputMgrImpl.SetCurrentUser(userId);
 }
+
+int32_t InputManager::SetMoveEventFilters(bool flag)
+{
+    return InputMgrImpl.SetMoveEventFilters(flag);
+}
 } // namespace MMI
 } // namespace OHOS

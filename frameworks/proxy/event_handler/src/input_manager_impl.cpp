@@ -2082,5 +2082,15 @@ int32_t InputManagerImpl::SetCurrentUser(int32_t userId)
     }
     return ret;
 }
+
+int32_t InputManagerImpl::SetMoveEventFilters(bool flag)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetMoveEventFilters(flag);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set move event filters failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
 } // namespace MMI
 } // namespace OHOS
