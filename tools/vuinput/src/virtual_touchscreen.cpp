@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,14 +18,14 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t ABS_MAX_X = 480;
-constexpr int32_t ABS_MAX_Y = 960;
-constexpr int32_t ABS_PRESSURE_MAX = 100;
-constexpr int32_t ABS_MT_ORIENTATION_MIN = -90;
-constexpr int32_t ABS_MT_ORIENTATION_MAX = 90;
-constexpr int32_t ABS_MT_BLOB_ID_MAX = 10;
-constexpr int32_t ABS_MT_TRACKING_ID_MAX = 9;
-constexpr int32_t ABS_TOOL_TYPE_MAX = 15;
+constexpr int32_t ABS_MAX_X { 480 };
+constexpr int32_t ABS_MAX_Y { 960 };
+constexpr int32_t ABS_PRESSURE_MAX { 100 };
+constexpr int32_t ABS_MT_ORIENTATION_MIN { -90 };
+constexpr int32_t ABS_MT_ORIENTATION_MAX { 90 };
+constexpr int32_t ABS_MT_BLOB_ID_MAX { 10 };
+constexpr int32_t ABS_MT_TRACKING_ID_MAX { 9 };
+constexpr int32_t ABS_TOOL_TYPE_MAX { 15 };
 
 AbsInfo absInfos[] = {
     { ABS_X, 0, ABS_MAX_X, 0, 0 },
