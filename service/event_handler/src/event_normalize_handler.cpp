@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -158,8 +158,6 @@ bool EventNormalizeHandler::ProcessNullEvent(libinput_event *event, int64_t fram
         int32_t sourceType = pointerEvent->GetSourceType();
         if (sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
             HandleTouchEvent(event, frameTime);
-        } else {
-            return true;
         }
         return true;
     }
@@ -366,6 +364,7 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
 
 void EventNormalizeHandler::HandlePalmEvent(libinput_event* event, std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CHKPV(pointerEvent);
     auto touchpad = libinput_event_get_touchpad_event(event);
     CHKPV(touchpad);
     int32_t toolType = libinput_event_touchpad_get_tool_type(touchpad);
