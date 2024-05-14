@@ -18,17 +18,17 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t ABS_MAX_X = 1919;
-constexpr int32_t ABS_MAX_Y = 1079;
-constexpr int32_t ABS_SLOT_MAX = 4;
-constexpr int32_t ABS_POSITION_X_MAX = 1919;
-constexpr int32_t ABS_POSITION_Y_MAX = 1079;
-constexpr int32_t ABS_MT_TOOL_TYPE_MAX = 2;
-constexpr int32_t ABS_MT_TRACKING_ID_MAX = 65535;
-constexpr int32_t ABS_X_RANGE = 16;
-constexpr int32_t ABS_Y_RANGE = 15;
-constexpr int32_t ABS_MT_X_RANGE = 16;
-constexpr int32_t ABS_MT_Y_RANGE = 15;
+constexpr int32_t ABS_MAX_X { 1919 };
+constexpr int32_t ABS_MAX_Y { 1079 };
+constexpr int32_t ABS_SLOT_MAX { 4 };
+constexpr int32_t ABS_POSITION_X_MAX { 1919 };
+constexpr int32_t ABS_POSITION_Y_MAX { 1079 };
+constexpr int32_t ABS_MT_TOOL_TYPE_MAX { 2 };
+constexpr int32_t ABS_MT_TRACKING_ID_MAX { 65535 };
+constexpr int32_t ABS_X_RANGE { 16 };
+constexpr int32_t ABS_Y_RANGE { 15 };
+constexpr int32_t ABS_MT_X_RANGE { 16 };
+constexpr int32_t ABS_MT_Y_RANGE { 15 };
 
 AbsInfo absInfos[] = {
     { ABS_X, 0, ABS_MAX_X, 0, 0 },
