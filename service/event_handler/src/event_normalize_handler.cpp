@@ -518,10 +518,10 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         ErrCode status = RET_OK;
         std::shared_ptr<PointerEvent> outputEvent = EventResampleHdr->OnEventConsume(pointerEvent, frameTime, status);
         if (outputEvent == nullptr) {
-            MMI_HILOGD("NULL output event received: %{public}d", status);
+            MMI_HILOGD("NULL output event received:%{public}d", status);
             return RET_OK;
         } else {
-            MMI_HILOGD("Output event received: %{public}d %{public}d %{public}d",
+            MMI_HILOGD("Output event received:%{public}d %{public}d %{public}d",
                        outputEvent->GetSourceType(), outputEvent->GetPointerAction(), status);
             pointerEvent = outputEvent;
         }
@@ -621,7 +621,7 @@ int32_t EventNormalizeHandler::HandleSwitchInputEvent(libinput_event* event)
     CHKPR(swev, ERROR_NULL_POINTER);
 
     enum libinput_switch_state state = libinput_event_switch_get_switch_state(swev);
-    MMI_HILOGD("libinput_event_switch type: %{public}d, state: %{public}d",
+    MMI_HILOGD("libinput_event_switch type:%{public}d, state:%{public}d",
         libinput_event_switch_get_switch(swev), state);
     auto swEvent = std::make_unique<SwitchEvent>(static_cast<int>(state));
     nextHandler_->HandleSwitchEvent(std::move(swEvent));
