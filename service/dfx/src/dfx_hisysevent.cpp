@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -42,10 +42,10 @@ const std::string EMPTY_STRING { "" };
 
 void DfxHisysevent::OnDeviceConnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
-    std::shared_ptr dev = InputDevMgr->GetInputDevice(id);
+    std::shared_ptr<InputDevice> dev = InputDevMgr->GetInputDevice(id);
     CHKPV(dev);
     std::string message;
-    std::string name = "";
+    std::string name;
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::FAULT) {
         message = "The input_device connection failed for already existing";
         name = "INPUT_DEV_CONNECTION_FAILURE";
@@ -469,7 +469,7 @@ void DfxHisysevent::StatisticTouchpadGesture(std::shared_ptr<PointerEvent> point
             MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
         }
     } else {
-        MMI_HILOGW("HiviewDFX Statistic touchpad gesture is error, pointer action is invalid.");
+        MMI_HILOGW("HiviewDFX Statistic touchpad gesture is error, pointer action is invalid");
     }
 }
 
@@ -485,7 +485,7 @@ void DfxHisysevent::ReportTouchpadSettingState(TOUCHPAD_SETTING_CODE settingCode
 
     auto it = mapSettingCodeToSettingType.find(settingCode);
     if (it == mapSettingCodeToSettingType.end()) {
-        MMI_HILOGE("HiviewDFX Report touchpad setting state is error, setting code is invalid.");
+        MMI_HILOGE("HiviewDFX Report touchpad setting state is error, setting code is invalid");
         return;
     }
     std::string name = it->second;
@@ -509,7 +509,7 @@ void DfxHisysevent::ReportTouchpadSettingState(TOUCHPAD_SETTING_CODE settingCode
 
     auto it = mapSettingCodeToSettingType.find(settingCode);
     if (it == mapSettingCodeToSettingType.end()) {
-        MMI_HILOGW("HiviewDFX Report touchpad setting state is error, setting code is invalid.");
+        MMI_HILOGW("HiviewDFX Report touchpad setting state is error, setting code is invalid");
         return;
     }
     std::string name = it->second;
@@ -550,7 +550,7 @@ void DfxHisysevent::ReportFailIfInvalidTime(const std::shared_ptr<PointerEvent> 
         knuckleFailCount = "DKF_T_I";
         invalidTimeFailCount = "DK_F_T";
     } else {
-        MMI_HILOGE("HiviewDFX Report knuckle state error, knuckle size: %{public}zu.", size);
+        MMI_HILOGE("HiviewDFX Report knuckle state error, knuckle size:%{public}zu", size);
         return;
     }
     int32_t ret = HiSysEventWrite(

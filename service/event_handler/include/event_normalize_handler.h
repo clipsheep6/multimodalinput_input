@@ -57,7 +57,7 @@ private:
     bool HandleTouchEventWithFlag(const std::shared_ptr<PointerEvent> pointerEvent);
     double CalcTouchOffset(const std::shared_ptr<PointerEvent> touchMoveEvent);
     int32_t SetOriginPointerId(std::shared_ptr<PointerEvent> pointerEvent);
-    int32_t ResampleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    void TouchEventSetPressedKeys(std::shared_ptr<PointerEvent> pointerEvent);
 
 private:
     int32_t timerId_ { -1 };
