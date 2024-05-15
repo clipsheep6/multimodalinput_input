@@ -226,5 +226,37 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_KnuckleDrawHandler
     pointerEvent->AddPointerItem(item);
     EXPECT_NO_FATAL_FAILURE(knuckleDrawMgr->KnuckleDrawHandler(pointerEvent));
 }
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_IsSingleKnuckle
+ * @tc.desc: Test Overrides IsSingleKnuckle function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_IsSingleKnuckle, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    auto pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    ASSERT_TRUE(kceDrawMgr.IsSingleKnuckle(pointerEvent));
+
+    item.SetPointerId(1);
+    item.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    kceDrawMgr.canvasNode_ = nullptr;
+    ASSERT_FALSE(kceDrawMgr.IsSingleKnuckle(pointerEvent));
+
+    kceDrawMgr.canvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.canvasNode_, nullptr);
+    ASSERT_FALSE(kceDrawMgr.IsSingleKnuckle(pointerEvent));
+}
 } // namespace MMI
 } // namespace OHOS
