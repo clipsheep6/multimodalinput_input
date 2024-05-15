@@ -611,6 +611,7 @@ ohos_unittest("TouchEventNormalizeTest") {
 
   external_deps = [
     "graphic_2d:librender_service_client",
+    "hilog:libhilog",
     "window_manager:libwm",
   ]
 }
@@ -724,6 +725,7 @@ ohos_unittest("MonitorTest") {
     "c_utils:utils",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
+    "hilog:libhilog",
     "image_framework:image_native",
     "window_manager:libwm",
   ]
@@ -793,6 +795,7 @@ ohos_unittest("KeyEventNormalizeTest") {
   external_deps = [
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
+    "hilog:libhilog",
     "image_framework:image_native",
     "window_manager:libwm",
   ]
@@ -832,6 +835,35 @@ ohos_unittest("KeyCommandTest") {
     "hilog:libhilog",
     "image_framework:image_native",
     "window_manager:libwm",
+  ]
+}
+
+ohos_unittest("StylusKeyTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [ "${mmi_path}/test/unittest/common/include" ]
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "key_command/test/stylus_key_handler_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
   ]
 }
 
