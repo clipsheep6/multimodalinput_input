@@ -1139,6 +1139,7 @@ ohos_unittest("ConnectManagerTest") {
     "ipc:ipc_single",
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
+    "hilog:libhilog",
   ]
 }
 
