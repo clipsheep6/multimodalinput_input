@@ -129,5 +129,17 @@
         ]
       }
     }
-  }
+  },
+  "RepeatKeys": [
+    {
+      "keyCode": 18,
+      "times": 5,
+      "delay": 120,
+      "statusConfig": "",
+      "ability": {
+        "bundleName": "com.huawei.hmos.emergencycommunication",
+        "abilityName": "com.huawei.hmos.emergencycommunication.EmergencyCallAbility"
+      }
+    }
+  ]
 }
