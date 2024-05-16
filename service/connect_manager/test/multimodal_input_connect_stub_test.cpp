@@ -2199,11 +2199,13 @@ HWTEST_F(MultimodalInputConnectStubTest, StubInjectPointerEvent_001, TestSize.Le
 
 int32_t MultimodalInputConnectStubTest::VerifySystemApp001()
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
-    WRITEINT32(data, -1, -1);
-    WRITESTRING(data, "VerifySystemApp_001", -1);
-    WRITEINT32(data, -1, -1);
+    int32_t userID = -1;
+    int32_t instIndex = -1;
+    WRITEINT32(data, userID, RET_ERR);
+    WRITESTRING(data, "VerifySystemApp_001", RET_ERR);
+    WRITEINT32(data, instIndex, RET_ERR);
     bool ret = stub->VerifySystemApp(data);
     EXPECT_NE(ret, true);
     return RET_OK;
@@ -2211,11 +2213,13 @@ int32_t MultimodalInputConnectStubTest::VerifySystemApp001()
 
 int32_t MultimodalInputConnectStubTest::VerifySystemApp002()
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
-    WRITEINT32(data, 123, -1);
-    WRITESTRING(data, "", -1);
-    WRITEINT32(data, 546, -1);
+    int32_t userID = 123;
+    int32_t instIndex = 456;
+    WRITEINT32(data, userID, RET_ERR);
+    WRITESTRING(data, "", RET_ERR);
+    WRITEINT32(data, instIndex, RET_ERR);
     bool ret = stub->VerifySystemApp(data);
     EXPECT_NE(ret, true);
     return RET_OK;
@@ -2223,18 +2227,20 @@ int32_t MultimodalInputConnectStubTest::VerifySystemApp002()
 
 int32_t MultimodalInputConnectStubTest::VerifySystemApp003()
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     std::vector<std::int32_t> directives {
-           1083943472,1670933590,319664736,101075694,302485518,1153447329,1864579187,1160667870,1231569351,190550799,
-           1297853727,349520038,2134193229,60559057,970575243,1136827635,1896721686,165083511,1585792076,411402912,
-           20027535,630759033,407672954,1304638688,2016195419,1902257801,437166375,1420798591,657996038,560661383
+           1083943472, 1670933590, 319664736, 101075694, 302485518, 1153447329, 1864579187,
+           1160667870, 1231569351, 190550799, 1297853727, 349520038, 2134193229, 60559057, 970575243,
+           1136827635, 1896721686, 165083511, 1585792076, 411402912, 20027535, 630759033, 407672954,
+           1304638688, 2016195419, 1902257801, 437166375, 1420798591, 657996038, 560661383
            };
 
     MessageParcel data;
+    int32_t instIndex = 123456;
     for (auto s : directives) {
-        WRITEINT32(data, s, -1);
-        WRITESTRING(data, "VerifySystemApp003", -1);
-        WRITEINT32(data, 123456, -1);
+        WRITEINT32(data, s, RET_ERR);
+        WRITESTRING(data, "VerifySystemApp003", RET_ERR);
+        WRITEINT32(data, instIndex, RET_ERR);
         bool ret = stub->VerifySystemApp(data);
         EXPECT_NE(ret, true);
     }
@@ -2243,18 +2249,20 @@ int32_t MultimodalInputConnectStubTest::VerifySystemApp003()
 
 int32_t MultimodalInputConnectStubTest::VerifySystemApp004()
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     std::vector<std::int32_t> directives {
-           1083943472,1670933590,319664736,101075694,302485518,1153447329,1864579187,1160667870,1231569351,190550799,
-           1297853727,349520038,2134193229,60559057,970575243,1136827635,1896721686,165083511,1585792076,411402912,
-           20027535,630759033,407672954,1304638688,2016195419,1902257801,437166375,1420798591,657996038,560661383
+           1083943472, 1670933590, 319664736, 101075694, 302485518, 1153447329, 1864579187,
+           1160667870, 1231569351, 190550799, 1297853727, 349520038, 2134193229, 60559057, 970575243,
+           1136827635, 1896721686, 165083511, 1585792076, 411402912, 20027535, 630759033, 407672954,
+           1304638688, 2016195419, 1902257801, 437166375, 1420798591, 657996038, 560661383
            };
 
     MessageParcel data;
+    int32_t userID = 7890;
     for (auto s : directives) {
-        WRITEINT32(data, 7890, -1);
-        WRITESTRING(data, "VerifySystemApp004", -1);
-        WRITEINT32(data, s, -1);
+        WRITEINT32(data, 7890, RET_ERR);
+        WRITESTRING(data, "VerifySystemApp004", RET_ERR);
+        WRITEINT32(data, s, RET_ERR);
         bool ret = stub->VerifySystemApp(data);
         EXPECT_NE(ret, true);
     }
@@ -2263,21 +2271,23 @@ int32_t MultimodalInputConnectStubTest::VerifySystemApp004()
 
 int32_t MultimodalInputConnectStubTest::VerifySystemApp005()
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     std::vector<std::string> directives {
-        "accesstoken_test01","accesstoken_test02","accesstoken_test03","accesstoken_test04","accesstoken_test05",
-        "accesstoken_test06","accesstoken_test07","accesstoken_test08","accesstoken_test09","accesstoken_test10",
-        "accesstoken_test11","accesstoken_test12","accesstoken_test13","accesstoken_test14","accesstoken_test15",
-        "accesstoken_test16","accesstoken_test17","accesstoken_test18","accesstoken_test19","accesstoken_test20",
-        "accesstoken_test21","accesstoken_test22","accesstoken_test23","accesstoken_test24","accesstoken_test25",
-        "accesstoken_test26","accesstoken_test27","accesstoken_test28","accesstoken_test29","accesstoken_test30",
+        "accesstoken_test01", "accesstoken_test02", "accesstoken_test03", "accesstoken_test04", "accesstoken_test05",
+        "accesstoken_test06", "accesstoken_test07", "accesstoken_test08", "accesstoken_test09", "accesstoken_test10",
+        "accesstoken_test11", "accesstoken_test12", "accesstoken_test13", "accesstoken_test14", "accesstoken_test15",
+        "accesstoken_test16", "accesstoken_test17", "accesstoken_test18", "accesstoken_test19", "accesstoken_test20",
+        "accesstoken_test21", "accesstoken_test22", "accesstoken_test23", "accesstoken_test24", "accesstoken_test25",
+        "accesstoken_test26", "accesstoken_test27", "accesstoken_test28", "accesstoken_test29", "accesstoken_test30",
         };
 
     MessageParcel data;
+    int32_t userID = 89093490;
+    int32_t instIndex = 13411143;
     for (auto s : directives) {
-        WRITEINT32(data, 89093490, -1);
-        WRITESTRING(data, s, -1);
-        WRITEINT32(data, 13411143, -1);
+        WRITEINT32(data, userID, RET_ERR);
+        WRITESTRING(data, s, RET_ERR);
+        WRITEINT32(data, instIndex, RET_ERR);
         bool ret = stub->VerifySystemApp(data);
         EXPECT_NE(ret, true);
     }

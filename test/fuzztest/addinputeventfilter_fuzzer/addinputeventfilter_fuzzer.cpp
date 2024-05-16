@@ -57,7 +57,7 @@ void AddInputEventFilterFuzzTest(const uint8_t *data, size_t size)
             return false;
         }
     };
-    VerifySystemAppFuzzTest(data,size);
+    VerifySystemAppFuzzTest(data, size);
     auto filter = std::make_shared<TestFilter>();
     const auto priority = 200 + (size % 100);
     uint32_t touchTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX);
