@@ -35,7 +35,7 @@ void VerifySystemAppFuzzTest(const uint8_t *data, size_t size)
     MessageParcel reply;
     MessageOption option;
     int32_t ret = stub->OnRemoteRequest(offset + size, request, reply, option);
-    if (ret == -1) {
+    if (ret == RET_ERR) {
         MMI_HILOGE("VerifySystemApp falied,ret:%{public}d", ret);
         return;
     }
