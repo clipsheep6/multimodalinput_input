@@ -119,6 +119,16 @@ public:
     {
         return 0;
     }
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    virtual int32_t EnableHardwareCursorStats(int32_t pid, bool enable)
+    {
+        return 0;
+    }
+    virtual int32_t GetHardwareCursorStats(int32_t pid, uint32_t &frameCount, uint32_t &vsyncCount)
+    {
+        return 0;
+    }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 public:
     static inline std::shared_ptr<IPointerDrawingManager> iPointDrawMgr_ { nullptr };
 };

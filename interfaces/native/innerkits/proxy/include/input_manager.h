@@ -742,6 +742,25 @@ public:
      */
     void SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId);
 
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+     /**
+     * @brief Turn on or off hard cursor statistics.
+     * @param frameCount Counting the frame rate of continuous mouse movement.
+     * @param frameCount Statistics of mouse continuous movement synchronization frame rate.
+     * @return if success; returns a non-0 value otherwise.
+     * @since 12
+     */
+    int32_t EnableHardwareCursorStats(bool enable);
+    /**
+     * @brief Get the mouse hard cursor information.
+     * @param frameCount Counting the frame rate of continuous mouse movement.
+     * @param frameCount Statistics of mouse continuous movement synchronization frame rate.
+     * @return if success; returns a non-0 value otherwise.
+     * @since 12
+     */
+    int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+
     /**
      * @brief ClearWindowPointerStyle.
      * @param pid Indicates pid.

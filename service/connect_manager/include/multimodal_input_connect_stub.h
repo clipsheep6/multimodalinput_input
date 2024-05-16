@@ -125,6 +125,11 @@ protected:
     int32_t StubTransmitInfrared(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPixelMapData(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetCurrentUser(MessageParcel& data, MessageParcel& reply);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    int32_t StubEnableHardwareCursorStats(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetHardwareCursorStats(MessageParcel& data, MessageParcel& reply);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+
 private:
     int32_t VerifyTouchPadSetting(void);
 };

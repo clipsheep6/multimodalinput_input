@@ -142,6 +142,10 @@ public:
     int32_t OnTransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap) override;
     int32_t SetCurrentUser(int32_t userId) override;
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    int32_t EnableHardwareCursorStats(bool enable) override;
+    int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) override;
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitAncoUds();
