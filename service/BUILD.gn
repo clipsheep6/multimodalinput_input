@@ -1155,6 +1155,7 @@ ohos_unittest("ConnectManagerTest") {
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libdm",
     "window_manager:libwm",
+    "hilog:libhilog",
   ]
 }
 
