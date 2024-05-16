@@ -2296,7 +2296,7 @@ int32_t MultimodalInputConnectStubTest::VerifySystemApp005()
 
 /**
  * @tc.name: MultimodalInputConnectStubTest_VerifySystemApp_001
- * @tc.desc: Test the function StubSetCurrentUser
+ * @tc.desc: Test the function VerifySystemApp
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2307,7 +2307,7 @@ HWTEST_F(MultimodalInputConnectStubTest, VerifySystemApp_001, TestSize.Level1)
 
 /**
  * @tc.name: MultimodalInputConnectStubTest_VerifySystemApp_002
- * @tc.desc: Test the function StubSetCurrentUser
+ * @tc.desc: Test the function VerifySystemApp
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2318,7 +2318,7 @@ HWTEST_F(MultimodalInputConnectStubTest, VerifySystemApp_002, TestSize.Level1)
 
 /**
  * @tc.name: MultimodalInputConnectStubTest_VerifySystemApp_003
- * @tc.desc: Test the function StubSetCurrentUser
+ * @tc.desc: Test the function VerifySystemApp
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2329,7 +2329,7 @@ HWTEST_F(MultimodalInputConnectStubTest, VerifySystemApp_003, TestSize.Level1)
 
 /**
  * @tc.name: MultimodalInputConnectStubTest_VerifySystemApp_004
- * @tc.desc: Test the function StubSetCurrentUser
+ * @tc.desc: Test the function VerifySystemApp
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2340,7 +2340,7 @@ HWTEST_F(MultimodalInputConnectStubTest, VerifySystemApp_004, TestSize.Level1)
 
 /**
  * @tc.name: MultimodalInputConnectStubTest_VerifySystemApp_005
- * @tc.desc: Test the function StubSetCurrentUser
+ * @tc.desc: Test the function VerifySystemApp
  * @tc.type: FUNC
  * @tc.require:
  */
