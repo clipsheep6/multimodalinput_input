@@ -15,12 +15,14 @@
 
 #include <gtest/gtest.h>
 #include <libinput.h>
+#include "libinput-private.h"
 
 #include "dfx_hisysevent.h"
 #include "event_normalize_handler.h"
+#include "mmi_log.h"
 
-#include "libinput-private.h"
-
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "EventNormalizeHandlerTest"
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -41,6 +43,7 @@ public:
  */
 HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleEvent_001, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     EventNormalizeHandler handler;
     int64_t frameTime = 10000;
     libinput_event* event = nullptr;
@@ -98,6 +101,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleEvent_001, T
  */
 HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleEvent_002, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     EventNormalizeHandler handler;
     int64_t frameTime = 10000;
     libinput_event* event = new (std::nothrow) libinput_event;
@@ -154,6 +158,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleEvent_002, T
  */
 HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_ProcessNullEvent_001, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     EventNormalizeHandler handler;
     int64_t frameTime = 10000;
     libinput_event* event = nullptr;
@@ -174,6 +179,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_ProcessNullEvent_0
  */
 HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleKeyEvent_001, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetRepeat(true);
@@ -191,6 +197,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleKeyEvent_001
  */
 HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandlePointerEvent_001, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     EventNormalizeHandler handler;
@@ -208,6 +215,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandlePointerEvent
  */
 HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchEvent_001, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     EventNormalizeHandler handler;
@@ -224,6 +232,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchEvent_0
  */
 HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_UpdateKeyEventHandlerChain_001, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     EventNormalizeHandler handler;
@@ -240,6 +249,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_UpdateKeyEventHand
  */
 HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_SetOriginPointerId_001, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     EventNormalizeHandler handler;
