@@ -17,6 +17,7 @@
 
 #include "proto.h"
 
+#include "input_event_handler.h"
 #include "mmi_log.h"
 #include "mmi_service.h"
 #include "udp_wrap.h"
@@ -922,6 +923,53 @@ HWTEST_F(MMIServerTest, MMIServerTest_InitService, TestSize.Level1)
     service.state_ = ServiceRunningState::STATE_NOT_START;
     service.mmiFd_ = 1000;
     ASSERT_FALSE(service.InitService());
+}
+
+/**
+ * @tc.name: MMIServerTest_AddReloadDeviceTimer
+ * @tc.desc: Test AddReloadDeviceTimer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_AddReloadDeviceTimer, TestSize.Level1)
+{
+    MMIService service;
+    std::vector<int32_t> deviceIds;
+    EXPECT_TRUE(deviceIds.empty());
+    ASSERT_NO_FATAL_FAILURE(service.AddReloadDeviceTimer());
+}
+
+/**
+ * @tc.name: MMIServerTest_InitSignalHandler
+ * @tc.desc: Test InitSignalHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_InitSignalHandler, TestSize.Level1)
+{
+    MMIService service;
+    sigset_t mask = { 0 };
+    int32_t retCode = sigfillset(&mask);
+    EXPECT_FALSE(retCode < 0);
+    bool ret = service.InitSignalHandler();
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: MMIServerTest_UpdateCombineKeyState
+ * @tc.desc: Test UpdateCombineKeyState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_UpdateCombineKeyState, TestSize.Level1)
+{
+    MMIService service;
+    bool enable = false;
+    auto eventSubscriberHandler = InputHandler->GetSubscriberHandler();
+    int32_t ret = eventSubscriberHandler->EnableCombineKey(enable);
+    EXPECT_NE(ret, RET_OK);
+    ret = service.UpdateCombineKeyState(enable);
+    EXPECT_EQ(ret, 1);
 }
 } // namespace MMI
 } // namespace OHOS
