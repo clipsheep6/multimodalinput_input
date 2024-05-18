@@ -476,6 +476,46 @@ ohos_unittest("EventFilterHandlerTest") {
   ]
 }
 
+ohos_unittest("EventFilterServiceTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [
+    "${mmi_path}/service/filter/include",
+    "${graphics_path}/2d_graphics/include",
+  ]
+
+  configs = [ ":libmmi_server_config" ]
+
+  cflags = [ "-DUNIT_TEST" ]
+
+  sources = [
+    "${mmi_path}/service/filter/src/event_filter_service.cpp",
+    "${mmi_path}/service/filter/test/event_filter_service_test.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+    "//third_party/cJSON:cjson",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "config_policy:configpolicy_util",
+    "data_share:datashare_consumer",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "ipc:ipc_single",
+    "preferences:native_preferences",
+    "window_manager:libwm",
+  ]
+}
+
 ohos_unittest("ApplicationStateObserverTest") {
   module_out_path = module_output_path
 
