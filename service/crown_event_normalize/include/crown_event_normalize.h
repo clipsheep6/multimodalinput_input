@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef CROWN_TRANSFORM_PROCESSOR_H
-#define CROWN_TRANSFORM_PROCESSOR_H
+#ifndef CROWN_EVENT_NORMALIZE_H
+#define CROWN_EVENT_NORMALIZE_H
 
 #include <map>
 #include <memory>
@@ -31,9 +31,11 @@ class CrownEventNormalize final : public std::enable_shared_from_this<CrownEvent
 
 public:
     DISALLOW_COPY_AND_MOVE(CrownEventNormalize);
-    bool IsCrownEvent(struct libinput_event *event);
-    int32_t NormalizeKeyEvent(struct libinput_event *event);
-    int32_t NormalizeRotateEvent(struct libinput_event *event);
+    CrownEventNormalize() = default;
+    ~CrownEventNormalize() = default;
+    bool IsCrownEvent(const struct libinput_event *event);
+    int32_t NormalizeKeyEvent(const struct libinput_event *event);
+    int32_t NormalizeRotateEvent(const struct libinput_event *event);
     void Dump(int32_t fd, const std::vector<std::string> &args);
 
     static constexpr int32_t CROWN_CODE_POWER = 116;
@@ -48,10 +50,10 @@ private:
     const std::string CROWN_SOURCE = "rotary_crown";
 
     std::map<int32_t, std::shared_ptr<CrownTransformProcessor>> processors_;
-    int32_t currentDeviceId { -1 };
+    int32_t currentDeviceId_ { -1 };
 };
-#define CrownEventHdr ::OHOS::DelayedSingleton<CrownEventNormalize>::GetInstance()
+#define CROWNEVENTHDR ::OHOS::DelayedSingleton<CrownEventNormalize>::GetInstance()
 #endif // OHOS_BUILD_ENABLE_CROWN
 } // namespace MMI
 } // namespace OHOS
-#endif // CROWN_TRANSFORM_PROCESSOR_H
+#endif // CROWN_EVENT_NORMALIZE_H

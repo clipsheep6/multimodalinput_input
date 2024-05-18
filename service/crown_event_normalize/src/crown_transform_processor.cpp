@@ -13,24 +13,23 @@
  * limitations under the License.
  */
 
-#include "crown_transform_processor.h"
-
 #include "event_log_helper.h"
 #include "input_event_handler.h"
 #include "input_device_manager.h"
+
+#include "crown_transform_processor.h"
 
 namespace OHOS {
 namespace MMI {
 #ifdef OHOS_BUILD_ENABLE_CROWN
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "CrownTransformProcessor"};
+constexpr double SCALE_RATIO = static_cast<double>(360) / 532;
+constexpr uint64_t MICROSECONDS_PER_SECOND = 1000 * 1000;
 }
 
 CrownTransformProcessor::CrownTransformProcessor(int32_t deviceId)
     : pointerEvent_(PointerEvent::Create()), deviceId_(deviceId)
-{}
-
-CrownTransformProcessor::~CrownTransformProcessor()
 {}
 
 std::shared_ptr<PointerEvent> CrownTransformProcessor::GetPointerEvent() const
@@ -38,7 +37,7 @@ std::shared_ptr<PointerEvent> CrownTransformProcessor::GetPointerEvent() const
     return pointerEvent_;
 }
 
-int32_t CrownTransformProcessor::NormalizeKeyEvent(struct libinput_event *event)
+int32_t CrownTransformProcessor::NormalizeKeyEvent(const struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
@@ -51,7 +50,7 @@ int32_t CrownTransformProcessor::NormalizeKeyEvent(struct libinput_event *event)
     return RET_OK;
 }
 
-int32_t CrownTransformProcessor::NormalizeRotateEvent(struct libinput_event *event)
+int32_t CrownTransformProcessor::NormalizeRotateEvent(const struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
@@ -64,13 +63,15 @@ int32_t CrownTransformProcessor::NormalizeRotateEvent(struct libinput_event *eve
         MMI_HILOGI("Libinput event axis source type is wheel");
         double scrollValue = libinput_event_pointer_get_scroll_value_v120(rawPointerEvent, 
             LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL);
-        double degree = scrollValue * (360 / 532);
+        double degree = scrollValue * SCALE_RATIO;
         double angularVelocity = 0.0;
 
         uint64_t currentTime = libinput_event_pointer_get_time_usec(rawPointerEvent);
 
         if (TimerMgr->IsExist(timerId_)) {
-            angularVelocity = (degree * (1000 * 1000)) / (currentTime - lastTime_);
+            if (currentTime - lastTime_ != 0) {
+                angularVelocity = (degree * MICROSECONDS_PER_SECOND) / (currentTime - lastTime_);
+            }
             HandleCrownRotatePostInner(angularVelocity, degree, PointerEvent::POINTER_ACTION_CROWN_ROTATE_UPDATE);
             TimerMgr->ResetTimer(timerId_);
             MMI_HILOGD("Wheel axis update, crown rotate update");

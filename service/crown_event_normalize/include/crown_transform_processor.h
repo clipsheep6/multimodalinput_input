@@ -32,16 +32,16 @@ public:
     explicit CrownTransformProcessor(int32_t deviceId);
     ~CrownTransformProcessor() = default;
     std::shared_ptr<PointerEvent> GetPointerEvent() const;
-    int32_t NormalizeKeyEvent(struct libinput_event *event);
-    int32_t NormalizeRotateEvent(struct libinput_event *event);
+    int32_t NormalizeKeyEvent(const struct libinput_event *event);
+    int32_t NormalizeRotateEvent(const struct libinput_event *event);
     void Dump(int32_t fd, const std::vector<std::string> &args);
 
 private:
     void DumpInner();
     
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
-    int32_t deviceId { -1 };
-    int32_t timerId { -1 };
+    int32_t deviceId_ { -1 };
+    int32_t timerId_ { -1 };
     uint64_t lastTime_ { 0 };
 };
 #endif // OHOS_BUILD_ENABLE_CROWN

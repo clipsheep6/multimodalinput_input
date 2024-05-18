@@ -59,7 +59,7 @@ void CrownEventNormalizeTest::TearDown()
 HWTEST_F(CrownEventNormalizeTest, CrownEventNormalizeTest_IsCrownEvent_001, TestSize.Level1)
 {
     struct libinput_event *event = nullptr;
-    ASSERT_NE(CrownEventHdr->IsCrownEvent(event), false);
+    ASSERT_NE(CROWNEVENTHDR->IsCrownEvent(event), false);
 }
 
 /**
@@ -71,7 +71,7 @@ HWTEST_F(CrownEventNormalizeTest, CrownEventNormalizeTest_IsCrownEvent_001, Test
 HWTEST_F(CrownEventNormalizeTest, CrownEventNormalizeTest_NormalizeKeyEvent_002, TestSize.Level1)
 {
     struct libinput_event *event = nullptr;
-    ASSERT_NE(CrownEventHdr->NormalizeKeyEvent(event), RET_OK);
+    ASSERT_NE(CROWNEVENTHDR->NormalizeKeyEvent(event), RET_OK);
 }
 
 /**
@@ -83,7 +83,7 @@ HWTEST_F(CrownEventNormalizeTest, CrownEventNormalizeTest_NormalizeKeyEvent_002,
 HWTEST_F(CrownEventNormalizeTest, CrownEventNormalizeTest_NormalizeRotateEvent_003, TestSize.Level1)
 {
     struct libinput_event *event = nullptr;
-    ASSERT_NE(CrownEventHdr->NormalizeRotateEvent(event), RET_OK);
+    ASSERT_NE(CROWNEVENTHDR->NormalizeRotateEvent(event), RET_OK);
 }
 
 /**
@@ -97,7 +97,7 @@ HWTEST_F(CrownEventNormalizeTest, CrownEventNormalizeTest_Dump_004, TestSize.Lev
     std::vector<std::string> args;
     std::vector<std::string> idNames;
     int32_t fd = 0;
-    CrownEventHdr->Dump(fd, args);
+    CROWNEVENTHDR->Dump(fd, args);
     ASSERT_EQ(args, idNames);
 }
 }

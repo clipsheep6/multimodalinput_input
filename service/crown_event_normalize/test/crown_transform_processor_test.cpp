@@ -110,12 +110,12 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_HandleCrownRot
 }
 
 /**
- * @tc.name: CrownTransformProcessorTest_DumpInner_004
+ * @tc.name: CrownTransformProcessorTest_DumpInner_005
  * @tc.desc: Test DumpInner
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_DumpInner_004, TestSize.Level1)
+HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_DumpInner_005 , TestSize.Level1)
 {
     int32_t deviceId = 0;
     CrownTransformProcessor processor(deviceId);
@@ -128,7 +128,7 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_DumpInner_004,
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_Dump_005, TestSize.Level1)
+HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_Dump_006, TestSize.Level1)
 {
     std::vector<std::string> args;
     std::vector<std::string> idNames;

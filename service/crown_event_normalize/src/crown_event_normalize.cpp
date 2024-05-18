@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#include "crown_event_normalize.h"
-
 #include "input_device_manager.h"
+
+#include "crown_event_normalize.h"
 
 namespace OHOS {
 namespace MMI {
@@ -23,10 +23,6 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "CrownEventNormalize"};
 } // namespace
-
-CrownEventNormalize::CrownEventNormalize() {}
-
-CrownEventNormalize::~CrownEventNormalize() {}
 
 std::shared_ptr<CrownTransformProcessor> CrownEventNormalize::GetProcessor(int32_t deviceId) const
 {
@@ -66,7 +62,7 @@ int32_t CrownEventNormalize::GetCurrentDeviceId() const
     return currentDeviceId_;
 }
 
-bool CrownEventNormalize::IsCrownEvent(struct libinput_event *event)
+bool CrownEventNormalize::IsCrownEvent(const struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
     CHKPR(event, false);
@@ -100,7 +96,7 @@ bool CrownEventNormalize::IsCrownEvent(struct libinput_event *event)
     return false;
 }
 
-int32_t CrownEventNormalize::NormalizeKeyEvent(struct libinput_event *event)
+int32_t CrownEventNormalize::NormalizeKeyEvent(const struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
@@ -121,7 +117,7 @@ int32_t CrownEventNormalize::NormalizeKeyEvent(struct libinput_event *event)
     return processor->NormalizeKeyEvent(event);
 }
 
-int32_t CrownEventNormalize::NormalizeRotateEvent(struct libinput_event *event)
+int32_t CrownEventNormalize::NormalizeRotateEvent(const struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
