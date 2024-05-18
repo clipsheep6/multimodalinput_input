@@ -115,7 +115,7 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_HandleCrownRot
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_DumpInner_005 , TestSize.Level1)
+HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_DumpInner_005, TestSize.Level1)
 {
     int32_t deviceId = 0;
     CrownTransformProcessor processor(deviceId);

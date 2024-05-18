@@ -61,7 +61,7 @@ int32_t CrownTransformProcessor::NormalizeRotateEvent(const struct libinput_even
     libinput_pointer_axis_source source = libinput_event_pointer_get_axis_source(rawPointerEvent);
     if (source == LIBINPUT_POINTER_AXIS_SOURCE_WHEEL) {
         MMI_HILOGI("Libinput event axis source type is wheel");
-        double scrollValue = libinput_event_pointer_get_scroll_value_v120(rawPointerEvent, 
+        double scrollValue = libinput_event_pointer_get_scroll_value_v120(rawPointerEvent,
             LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL);
         double degree = scrollValue * SCALE_RATIO;
         double angularVelocity = 0.0;
@@ -78,7 +78,7 @@ int32_t CrownTransformProcessor::NormalizeRotateEvent(const struct libinput_even
         } else {
             static constexpr int32_t timeout = 100;
             std::weak_ptr<CrownTransformProcessor> weakPtr = shared_from_this();
-            timerId_ = TimerMgr->AddTimer(timeout, 1, [weakPtr](){
+            timerId_ = TimerMgr->AddTimer(timeout, 1, [weakPtr]() {
                 CALL_DEBUG_ENTER;
                 auto sharedPtr = weakPtr.lock();
                 CHKPV(sharedPtr);
@@ -131,7 +131,7 @@ void CrownTransformProcessor::DumpInner()
     EventLogHelper::PrintEventData(pointerEvent_);
     auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
     CHKPV(device);
-    MMI_HILOGI("The crown device id: %{public}d, event created by: %{public}s", pointerEvent_->GetId(), 
+    MMI_HILOGI("The crown device id: %{public}d, event created by: %{public}s", pointerEvent_->GetId(),
         device->GetName().c_str());
 }
 
@@ -142,10 +142,10 @@ void CrownTransformProcessor::Dump(int32_t fd, const std::vector<std::string> &a
     mprintf(fd, "Crown device state information:\t");
     mprintf(fd,
             "PointerId:%d | SourceType:%s | PointerAction:%s | ActionTime:%" PRId64 " | CrownAngularVelocity:%f "
-            "| CrownDegree:%s | AgentWindowId:%d | TargetWindowId:%d\t", pointerEvent_->GetPointerId(), 
-            pointerEvent_->DumpSourceType(), pointerEvent_->DumpPointerAction(), pointerEvent_->GetActionTime(), 
-            pointerEvent_->GetCrownAngularVelocity(), pointerEvent_->GetCrownDegree(), pointerEvent_->GetAgentWindowId(),
-            pointerEvent_->GetTargetWindowId());
+            "| CrownDegree:%s | AgentWindowId:%d | TargetWindowId:%d\t", pointerEvent_->GetPointerId(),
+            pointerEvent_->DumpSourceType(), pointerEvent_->DumpPointerAction(), pointerEvent_->GetActionTime(),
+            pointerEvent_->GetCrownAngularVelocity(), pointerEvent_->GetCrownDegree(),
+            pointerEvent_->GetAgentWindowId(), pointerEvent_->GetTargetWindowId());
 }
 #endif // OHOS_BUILD_ENABLE_CROWN
 } // namespace MMI
