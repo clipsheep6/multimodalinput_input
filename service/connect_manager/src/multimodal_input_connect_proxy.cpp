@@ -302,9 +302,8 @@ int32_t MultimodalInputConnectProxy::SetMouseHotSpot(int32_t pid, int32_t window
         data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t MultimodalInputConnectProxy::GetMouseScrollRows(int32_t &rows)
@@ -348,8 +347,9 @@ int32_t MultimodalInputConnectProxy::SetPointerSize(int32_t size)
         data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return ret;
     }
-    return ret;
+    return RET_OK;
 }
 
 int32_t MultimodalInputConnectProxy::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus)
@@ -628,7 +628,7 @@ int32_t MultimodalInputConnectProxy::SetPointerSpeed(int32_t speed)
         data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
-        return ret;
+        return RET_ERR;
     }
     return RET_OK;
 }
@@ -1007,7 +1007,7 @@ int32_t MultimodalInputConnectProxy::GetKeyboardRepeatRate(int32_t &rate)
         GET_KEYBOARD_REPEAT_RATE), data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
-        return ret;
+        return RET_ERR;
     }
     READINT32(reply, rate, IPC_PROXY_DEAD_OBJECT_ERR);
     return RET_OK;
