@@ -102,6 +102,40 @@ void TouchDrawingManager::ConvertPointerEvent(const std::shared_ptr<PointerEvent
         item.SetDisplayX(displayX);
         item.SetDisplayY(displayY);
         pointerEvent_->AddPointerItem(item);
+   }
+}
+
+void TouchDrawingManager::RecordLabelsInfo(const std::shared_ptr<PointerEvent>& pointerEvent)
+{
+    CHKPV(pointerEvent);
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(currentPointerId_, pointerItem)) {
+        MMI_HILOGE("Can't find pointer item, pointer:%{public}d", currentPointerId_);
+        return;
+    }
+    if (pointerItem.IsPressed()) {
+        currentPt_.SetX(pointerItem.GetDisplayX());
+        currentPt_.SetY(pointerItem.GetDisplayY());
+        pressure_ = pointerItem.GetPressure();
+    }
+    if (isFirstDownAction_) {
+        firstPt_.SetX(pointerItem.GetDisplayX());
+        firstPt_.SetY(pointerItem.GetDisplayY());
+        isFirstDownAction_ = false;
+    }
+    int64_t actionTime = pointerEvent->GetActionTime();
+    if (pointerEvent->GetPointerId() == currentPointerId_ && !lastPointerItem_.empty()) {
+        double diffTime = static_cast<double>(actionTime - lastActionTime_) / 1000;
+        if (MMI_EQ(diffTime, 0.0)) {
+            xShowVelocity_ = 0.0;
+            yShowVelocity_ = 0.0;
+        } else {
+            auto diffX = currentPt_.GetX() - lastPt_.GetX();
+            auto diffY = currentPt_.GetY() - lastPt_.GetY();
+            xShowVelocity_ = diffX / diffTime;
+            yShowVelocity_ = diffY / diffTime;
+        }
+        lastActionTime_ = actionTime;
     }
 }
 
@@ -134,7 +168,9 @@ void TouchDrawingManager::TouchDrawHandler(const std::shared_ptr<PointerEvent>& 
     if (pointerMode_.isShow) {
         UpdatePointerPosition();
         ClearTracker();
+        RecordLabelsInfo(pointerEvent);
         DrawPointerPositionHandler();
+        lastPt_ = currentPt_;
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
@@ -281,7 +317,7 @@ void TouchDrawingManager::CreatePointerObserver(T &item)
 }
 
 template <class T>
-std::string TouchDrawingManager::FormatNumber(T& number, int32_t precision)
+std::string TouchDrawingManager::FormatNumber(T number, int32_t precision)
 {
     std::string temp(".000");
     auto str = std::to_string(number);
@@ -484,14 +520,14 @@ void TouchDrawingManager::DrawLabels()
     CALL_DEBUG_ENTER;
     CHKPV(labelsCanvasNode_);
     std::string viewP = "P: " + std::to_string(currentPointerCount_) + " / " + std::to_string(maxPointerCount_);
-    std::string viewX = "X: " + FormatNumber(currentPhysicalX_, ONE_PRECISION);
-    std::string viewY = "Y: " + FormatNumber(currentPhysicalY_, ONE_PRECISION);
-    auto dx = currentPhysicalX_ - firstPointerItem_.GetDisplayX();
-    auto dy = currentPhysicalY_ - firstPointerItem_.GetDisplayY();
+        std::string viewX = "X: " + FormatNumber(currentPt_.GetX(), ONE_PRECISION);
+    std::string viewY = "Y: " + FormatNumber(currentPt_.GetY(), ONE_PRECISION);
+    auto dx = currentPt_.GetX() - firstPt_.GetX();
+    auto dy = currentPt_.GetY() - firstPt_.GetY();
     std::string viewDx = "dX: " + FormatNumber(dx, ONE_PRECISION);
     std::string viewDy = "dY: " + FormatNumber(dy, ONE_PRECISION);
-    std::string viewXv = "Xv: " + FormatNumber(xVelocity_, THREE_PRECISION);
-    std::string viewYv = "Yv: " + FormatNumber(yVelocity_, THREE_PRECISION);
+    std::string viewXv = "Xv: " + FormatNumber(xShowVelocity_, THREE_PRECISION);
+    std::string viewYv = "Yv: " + FormatNumber(yShowVelocity_, THREE_PRECISION);
     std::string viewPrs = "Prs: " + FormatNumber(pressure_, TWO_PRECISION);
     Rosen::Drawing::Color color = LABELS_DEFAULT_COLOR;
     auto canvas = static_cast<RosenCanvas *>
@@ -572,17 +608,7 @@ void TouchDrawingManager::UpdatePointerPosition()
             currentPointerId_ = lastPointerItem_.front().GetPointerId();
         }
     }
-    if (isFirstDownAction_) {
-        PointerEvent::PointerItem pointerItem;
-        if (!pointerEvent_->GetPointerItem(pointerId, pointerItem)) {
-            MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
-            return;
-        }
-        firstPointerItem_ = pointerItem;
-        isFirstDownAction_ = false;
-    }
     UpdateVelocity();
-    UpdateDisplayCoord();
 }
 
 void TouchDrawingManager::UpdateLastPointerItem(int32_t pointerId, PointerEvent::PointerItem &pointerItem)
@@ -626,22 +652,6 @@ void TouchDrawingManager::UpdateVelocity()
                 yVelocity_ = diffY / diffTime;
             }
         }
-        lastActionTime_ = actionTime;
-    }
-}
-
-void TouchDrawingManager::UpdateDisplayCoord()
-{
-    CHKPV(pointerEvent_);
-    PointerEvent::PointerItem pointerItem;
-    if (!pointerEvent_->GetPointerItem(currentPointerId_, pointerItem)) {
-        MMI_HILOGE("Can't find pointer item, pointer:%{public}d", currentPointerId_);
-        return;
-    }
-    if (pointerItem.IsPressed()) {
-        currentPhysicalX_ = pointerItem.GetDisplayX();
-        currentPhysicalY_ = pointerItem.GetDisplayY();
-        pressure_ = pointerItem.GetPressure();
     }
 }
 
