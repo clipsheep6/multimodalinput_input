@@ -67,6 +67,7 @@ public:
 private:
     void CreateObserver();
     void InitCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& canvasNode);
+    void ConvertPointerEvent(const std::shared_ptr<PointerEvent>& pointerEvent);
     void CreateTouchWindow();
     void DrawBubbleHandler();
     void DrawBubble();
@@ -113,6 +114,7 @@ private:
     int32_t currentPointerCount_ { 0 };
     int32_t currentPhysicalX_ { 0 };
     int32_t currentPhysicalY_ { 0 };
+    int32_t rectTopPosition_ { 0 };
     int64_t lastActionTime_ { 0 };
     double xVelocity_ { 0.0 };
     double yVelocity_ { 0.0 };
