@@ -91,7 +91,9 @@ Input_Result OH_Input_GetKeyState(struct Input_KeyState* keyState)
 struct Input_KeyState* OH_Input_CreateKeyState()
 {
     Input_KeyState* keyState = new (std::nothrow) Input_KeyState();
-    CHKPL(keyState);
+    if (keyState == nullptr) {
+        MMI_HILOGE("Memory allocation failed");
+    }
     return keyState;
 }
 
@@ -210,7 +212,9 @@ int32_t OH_Input_InjectKeyEvent(const struct Input_KeyEvent* keyEvent)
 struct Input_KeyEvent* OH_Input_CreateKeyEvent()
 {
     Input_KeyEvent* keyEvent = new (std::nothrow) Input_KeyEvent();
-    CHKPL(keyEvent);
+    if (keyEvent == nullptr) {
+        MMI_HILOGE("Memory allocation failed");
+    }
     return keyEvent;
 }
 
@@ -386,7 +390,9 @@ struct Input_MouseEvent* OH_Input_CreateMouseEvent()
 {
     CALL_DEBUG_ENTER;
     Input_MouseEvent* mouseEvent = new (std::nothrow) Input_MouseEvent();
-    CHKPL(mouseEvent);
+    if (mouseEvent == nullptr) {
+        MMI_HILOGE("Memory allocation failed");
+    }
     return mouseEvent;
 }
 
@@ -615,7 +621,9 @@ struct Input_TouchEvent* OH_Input_CreateTouchEvent()
 {
     CALL_DEBUG_ENTER;
     Input_TouchEvent* touchEvent = new (std::nothrow) Input_TouchEvent();
-    CHKPL(touchEvent);
+    if (touchEvent == nullptr) {
+        MMI_HILOGE("Memory allocation failed");
+    }
     return touchEvent;
 }
 
