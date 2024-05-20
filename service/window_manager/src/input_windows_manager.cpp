@@ -1179,6 +1179,11 @@ void InputWindowsManager::SetAntiMisTake(bool state)
     antiMistake_.isOpen = state;
 }
 
+void InputWindowsManager::SetAntiMisTakeStatus(bool state)
+{
+    isOpenAntiMisTakeObserver_ = state;
+}
+
 bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, struct libinput_event_touch* touch,
     EventTouch& touchInfo, int32_t& physicalDisplayId)
 {
@@ -2146,7 +2151,7 @@ bool InputWindowsManager::SkipAnnotationWindow(uint32_t flag, int32_t toolType)
 
 bool InputWindowsManager::SkipNavigationWindow(WindowInputType windowType, int32_t toolType)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     if (windowType != WindowInputType::ANTI_MISTAKE_TOUCH || toolType != PointerEvent::TOOL_TYPE_PEN) {
         return false;
     }
@@ -2160,7 +2165,7 @@ bool InputWindowsManager::SkipNavigationWindow(WindowInputType windowType, int32
         MMI_HILOGI("Get anti mistake touch switch end");
     }
     if (antiMistake_.isOpen) {
-        MMI_HILOGD("Anti mistake switch is open");
+        MMI_HILOGI("Anti mistake switch is open");
         return true;
     }
     return false;
