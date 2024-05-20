@@ -256,28 +256,24 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_SetOriginPointerId
  * @tc.type: FUNC
  * @tc.require:
  */
-// HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandlerEvent_001, TestSize.Level1)
-// {
-//     EventNormalizeHandler handler;
-//     int64_t = frameTime = 10000;
-//     struct libinput_event *ev;
-//     struct libinput *li;
-//     struct litest_device *dev;
+HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandlerEvent_001, TestSize.Level1)
+{
+    EventNormalizeHandler handler;
+    int64_t = frameTime = 10000;
+    struct libinput_event *ev;
+    struct libinput *li;
+    struct litest_device *dev;
 
-//     li = litest_create_context();
+    li = litest_create_context();
 
-//     dev = litest_add_device(li, LITEST_MOUSE);
-//     libinput_dispatch(li);
+    dev = litest_add_device(li, LITEST_MOUSE);
+    libinput_dispatch(li);
 
-//     ev = libinput_get_event(li);
+    ev = libinput_get_event(li);
 
-//     ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(ev, frameTime));
-//     litest_delete_device(dev);
-//     libinput_unref(li);
-// }
-
-
-
-
+    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(ev, frameTime));
+    litest_delete_device(dev);
+    libinput_unref(li);
+}
 } // namespace MMI
 } // namespace OHOS
