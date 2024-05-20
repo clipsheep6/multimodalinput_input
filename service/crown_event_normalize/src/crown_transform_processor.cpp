@@ -64,18 +64,17 @@ int32_t CrownTransformProcessor::NormalizeRotateEvent(const struct libinput_even
     CHKPR(rawPointerEvent, ERROR_NULL_POINTER);
     libinput_pointer_axis_source source = libinput_event_pointer_get_axis_source(rawPointerEvent);
     if (source == LIBINPUT_POINTER_AXIS_SOURCE_WHEEL) {
-        MMI_HILOGI("Libinput event axis source type is wheel");
         double scrollValue = libinput_event_pointer_get_scroll_value_v120(rawPointerEvent,
             LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL);
         double degree = scrollValue * SCALE_RATIO;
         double angularVelocity = 0.0;
 
         uint64_t currentTime = libinput_event_pointer_get_time_usec(rawPointerEvent);
-        uint64_t diffTime = currentTime - lastTime_;
+        uint64_t intervalTime = currentTime - lastTime_;
 
         if (TimerMgr->IsExist(timerId_)) {
-            if (diffTime != 0) {
-                angularVelocity = (degree * MICROSECONDS_PER_SECOND) / (currentTime - lastTime_);
+            if (intervalTime != 0) {
+                angularVelocity = (degree * MICROSECONDS_PER_SECOND) / intervalTime);
             }
             HandleCrownRotatePostInner(angularVelocity, degree, PointerEvent::POINTER_ACTION_CROWN_ROTATE_UPDATE);
             TimerMgr->ResetTimer(timerId_);
