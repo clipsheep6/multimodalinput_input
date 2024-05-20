@@ -15,7 +15,6 @@
 
 #include <cstdio>
 #include <gtest/gtest.h>
-/*--------------dognzhanwu--------------*/
 #include <cerrno>
 #include <cinttypes>
 #include <csignal>
@@ -36,7 +35,6 @@
 #include "linux/input.h"
 #include "linux/uinput.h"
 #include "securec.h"
-/*--------------dognzhanwu--------------*/
 #include "mmi_log.h"
 #include "libinput_wrapper.h"
 #include "mouse_event_normalize.h"
@@ -113,31 +111,21 @@ void MouseEventNormalizeTest::TearDown()
 int32_t MouseEventNormalizeTest::CreateMouseDevice()
 {
     int uinput_fd = open("/dev/uinput", O_WRONLY | O_NONBLOCK);
-    printf("dongzhanwu---------------------------------1\n");
     struct uinput_user_dev uinput_dev;
 	if(uinput_fd < 0) {
 		printf("%s:%d\n", __func__, __LINE__);
 		return -1;//error process.
 	}
-    printf("dongzhanwu---------------------------------2\n");
     memset(&uinput_dev, 0, sizeof(struct uinput_user_dev));
 	snprintf(uinput_dev.name, UINPUT_MAX_NAME_SIZE, "uinput-custom-dev");
 	uinput_dev.id.version = 1;
 	uinput_dev.id.bustype = BUS_USB; // uinput_dev.id.bustype = BUS_USB;
 	uinput_dev.id.vendor = 0x1234;
 	uinput_dev.id.product = 0xfedc;
-    printf("dongzhanwu---------------------------------3\n");
     // action this device support
 	ioctl(uinput_fd, UI_SET_EVBIT, EV_SYN);
 	ioctl(uinput_fd, UI_SET_EVBIT, EV_KEY);
     ioctl(uinput_fd, UI_SET_EVBIT, EV_REL);
-	printf("dongzhanwu---------------------------------4\n");	
-    //set keyboard event
-	// for(int i = 272; i < 280; i++){
-	// 	ioctl(uinput_fd, UI_SET_KEYBIT, i);
-	// }
-
-    //set mouse event
 	ioctl(uinput_fd, UI_SET_KEYBIT, BTN_LEFT);
 	ioctl(uinput_fd, UI_SET_KEYBIT, BTN_RIGHT);
 	ioctl(uinput_fd, UI_SET_KEYBIT, BTN_MIDDLE);
@@ -188,7 +176,6 @@ int32_t MouseEventNormalizeTest::CreateMouseDevice()
     return 0;
 }
 
-/*
 void report_key(unsigned int type, unsigned int keycode, unsigned int value)  
 {  
 	struct input_event key_ev;  
@@ -296,7 +283,6 @@ void report_mouse_key(uint16_t type, uint16_t keycode, int32_t value)
 		printf("syn key report error\n");
 	}
 }
-*/
 
 /**
  * @tc.name: MouseEventNormalizeTest_GetDisplayId()_001
@@ -631,22 +617,5 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadRightClickT
     ASSERT_TRUE(MouseEventHdr->GetTouchpadRightClickType(newType) == RET_OK);
     ASSERT_TRUE(type == newType);
 }
-
-/**
- * @tc.name: MouseEventNormalizeTest_GetPointerEvent
- * @tc.desc: Test GetPointerEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-// HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetPointerEvent, TestSize.Level1)
-// {
-//     MouseEventNormalize mouseEventNormalize;
-//     int32_t deviceId = 1;
-//     auto processor = std::shared_ptr<MouseTransformProcessor>(new (std::nothrow) MouseTransformProcessor());
-//     mouseEventNormalize.processors_.insert(std::make_pair(deviceId, processor));
-//     ASSERT_NE(MouseEventHdr->GetPointerEvent(deviceId), nullptr);
-//     deviceId = 2;
-//     ASSERT_EQ(MouseEventHdr->GetPointerEvent(deviceId), nullptr);
-// }
 }
 }
