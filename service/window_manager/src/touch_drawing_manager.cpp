@@ -102,7 +102,7 @@ void TouchDrawingManager::ConvertPointerEvent(const std::shared_ptr<PointerEvent
         item.SetDisplayX(displayX);
         item.SetDisplayY(displayY);
         pointerEvent_->AddPointerItem(item);
-   }
+    }
 }
 
 void TouchDrawingManager::RecordLabelsInfo(const std::shared_ptr<PointerEvent>& pointerEvent)
