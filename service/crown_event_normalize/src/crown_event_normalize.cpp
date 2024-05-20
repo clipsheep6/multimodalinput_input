@@ -17,23 +17,30 @@
 
 #include "crown_event_normalize.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "CrownEventNormalize"
+
 namespace OHOS {
 namespace MMI {
 #ifdef OHOS_BUILD_ENABLE_CROWN
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "CrownEventNormalize"};
+constexpr std::string CROWN_SOURCE = "rotary_crown";
 } // namespace
 
 std::shared_ptr<CrownTransformProcessor> CrownEventNormalize::GetProcessor(int32_t deviceId) const
 {
     std::shared_ptr<CrownTransformProcessor> processor { nullptr };
-    if (auto it = processors_.find(deviceId); it != processors_.end()) {
+    auto it = processors_.find(deviceId);
+    if (it != processors_.end()) {
         processor = it->second;
     } else {
         processor = std::make_shared<CrownTransformProcessor>(deviceId);
         auto [iIter, isOk] = processors_.emplace(deviceId, processor);
         if (!isOk) {
             MMI_HILOGE("Duplicate device record, deviceId: %{public}d", deviceId);
+            return nullptr;
         }
     }
 
@@ -65,34 +72,34 @@ int32_t CrownEventNormalize::GetCurrentDeviceId() const
 bool CrownEventNormalize::IsCrownEvent(const struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(event, false);
+    CHKPF(event);
     auto device = libinput_event_get_device(event);
-    CHKPR(device, false);
+    CHKPF(device);
     std::string name = libinput_device_get_name(device);
     if (name == CROWN_SOURCE) {
         auto type = libinput_event_get_type(event);
         if (type == LIBINPUT_EVENT_KEYBOARD_KEY) {
             struct libinput_event_keyboard *keyBoard = libinput_event_get_keyboard_event(event);
-            CHKPR(keyBoard, false);
+            CHKPF(keyBoard);
             auto key = libinput_event_keyboard_get_key(keyBoard);
             if (key != CROWN_CODE_POWER) {
-                MMI_HILOGD("not crown event, unknown key: %{public}d", key);
+                MMI_HILOGD("Not crown event, unknown key: %{public}d", key);
                 return false;
             }
             return true;
         } else if (type == LIBINPUT_EVENT_POINTER_AXIS) {
             struct libinput_event_pointer *pointerEvent = libinput_event_get_pointer_event(event);
-            CHKPR(pointerEvent, false);
+            CHKPF(pointerEvent);
             auto source = libinput_event_pointer_get_axis_source(event);
             if (source != LIBINPUT_POINTER_AXIS_SOURCE_WHEEL) {
-                MMI_HILOGD("not crown event, unknown axis source: %{public}d", source);
+                MMI_HILOGD("Not crown event, unknown axis source: %{public}d", source);
                 return false;
             }
             return true;
         }
     }
     
-    MMI_HILOGD("not crown event, unknown device name: %{public}s", name.c_str());
+    MMI_HILOGD("Not crown event, unknown device name: %{public}s", name.c_str());
     return false;
 }
 
@@ -109,8 +116,8 @@ int32_t CrownEventNormalize::NormalizeKeyEvent(const struct libinput_event *even
     }
 
     std::shared_ptr<CrownTransformProcessor> processor = GetProcessorId(deviceId);
-    if (!processor) {
-        MMI_HILOGE("not found crown processor for deviceId: %{public}d", deviceId);
+    if (processor == nullptr) {
+        MMI_HILOGE("Not found crown processor for deviceId: %{public}d", deviceId);
         return PARAM_INPUT_INVALID;
     }
 
@@ -130,8 +137,8 @@ int32_t CrownEventNormalize::NormalizeRotateEvent(const struct libinput_event *e
     }
 
     std::shared_ptr<CrownTransformProcessor> processor = GetProcessorId(deviceId);
-    if (!processor) {
-        MMI_HILOGE("not found crown processor for deviceId: %{public}d", deviceId);
+    if (processor == nullptr) {
+        MMI_HILOGE("Not found crown processor for deviceId: %{public}d", deviceId);
         return PARAM_INPUT_INVALID;
     }
 

@@ -21,6 +21,7 @@
 
 #include "libinput.h"
 #include "singleton.h"
+
 #include "pointer_event.h"
 
 namespace OHOS {

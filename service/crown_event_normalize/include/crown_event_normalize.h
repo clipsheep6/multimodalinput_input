@@ -21,6 +21,7 @@
 
 #include "libinput.h"
 #include "singleton.h"
+
 #include "crown_transform_processor.h"
 
 namespace OHOS {
@@ -47,8 +48,6 @@ private:
     int32_t GetCurrentDeviceId() const;
     
 private:
-    const std::string CROWN_SOURCE = "rotary_crown";
-
     std::map<int32_t, std::shared_ptr<CrownTransformProcessor>> processors_;
     int32_t currentDeviceId_ { -1 };
 };

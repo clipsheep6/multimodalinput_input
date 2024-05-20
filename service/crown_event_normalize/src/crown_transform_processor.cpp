@@ -19,11 +19,15 @@
 
 #include "crown_transform_processor.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "CrownTransformProcessor"
+
 namespace OHOS {
 namespace MMI {
 #ifdef OHOS_BUILD_ENABLE_CROWN
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "CrownTransformProcessor"};
 constexpr double SCALE_RATIO = static_cast<double>(360) / 532;
 constexpr uint64_t MICROSECONDS_PER_SECOND = 1000 * 1000;
 }
@@ -67,9 +71,10 @@ int32_t CrownTransformProcessor::NormalizeRotateEvent(const struct libinput_even
         double angularVelocity = 0.0;
 
         uint64_t currentTime = libinput_event_pointer_get_time_usec(rawPointerEvent);
+        uint64_t diffTime = currentTime - lastTime_;
 
         if (TimerMgr->IsExist(timerId_)) {
-            if (currentTime - lastTime_ != 0) {
+            if (diffTime != 0) {
                 angularVelocity = (degree * MICROSECONDS_PER_SECOND) / (currentTime - lastTime_);
             }
             HandleCrownRotatePostInner(angularVelocity, degree, PointerEvent::POINTER_ACTION_CROWN_ROTATE_UPDATE);
@@ -80,11 +85,11 @@ int32_t CrownTransformProcessor::NormalizeRotateEvent(const struct libinput_even
             std::weak_ptr<CrownTransformProcessor> weakPtr = shared_from_this();
             timerId_ = TimerMgr->AddTimer(timeout, 1, [weakPtr]() {
                 CALL_DEBUG_ENTER;
-                auto sharedPtr = weakPtr.lock();
-                CHKPV(sharedPtr);
-                MMI_HILOGI("Timer:%{public}d", sharedPtr->timerId_);
-                sharedPtr->timerId_ = -1;
-                auto pointerEvent = sharedPtr->GetPointerEvent();
+                auto sharedProcessor = weakPtr.lock();
+                CHKPV(sharedProcessor);
+                MMI_HILOGI("Timer:%{public}d", sharedProcessor->timerId_);
+                sharedProcessor->timerId_ = -1;
+                auto pointerEvent = sharedProcessor->GetPointerEvent();
                 CHKPV(pointerEvent);
                 HandleCrownRotatePostInner(0.0, 0.0, PointerEvent::POINTER_ACTION_CROWN_ROTATE_END);
                 MMI_HILOGI("Wheel axis end, crown rotate end");
@@ -97,7 +102,9 @@ int32_t CrownTransformProcessor::NormalizeRotateEvent(const struct libinput_even
             MMI_HILOGI("Wheel axis begin, crown rotate begin");
         }
 
-        InputHandler->GetMonitorHandler()->OnHandleEvent(pointerEvent);
+        auto eventMonitorHandler = InputHandler->GetMonitorHandler();
+        CHKPR(eventMonitorHandler, ERROR_NULL_POINTER);
+        eventMonitorHandler->OnHandleEvent(pointerEvent);
         DumpInner();
         lastTime_ = currentTime;
     }
