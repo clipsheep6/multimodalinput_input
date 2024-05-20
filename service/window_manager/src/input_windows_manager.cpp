@@ -522,6 +522,10 @@ void InputWindowsManager::UpdateDisplayInfoExtIfNeed(DisplayGroupInfo &displayGr
         UpdateDisplayInfoExt(displayGroupInfo);
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
+    auto physicDisplayInfo = GetPhysicalDisplay(displayGroupInfo.displaysInfo[0].id);
+    CHKPV(physicDisplayInfo);
+    TOUCH_DRAWING_MGR->UpdateDisplayInfo(*physicDisplayInfo);
+    TOUCH_DRAWING_MGR->UpdateLabels();
 }
 
 void InputWindowsManager::UpdateDisplayInfoByIncrementalInfo(const WindowInfo &window,
