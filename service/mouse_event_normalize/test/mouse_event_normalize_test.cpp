@@ -15,23 +15,51 @@
 
 #include <cstdio>
 #include <gtest/gtest.h>
+/*--------------dognzhanwu--------------*/
+#include <cerrno>
+#include <cinttypes>
+#include <csignal>
+#include <cstdint>
+#include <cstring>
+#include <dirent.h>
+#include <fcntl.h>
+#include <fstream>
+#include <functional>
+#include <iostream>
+#include <map>
+#include <memory>
+#include <sstream>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <vector>
 
-#include "libinput.h"
+#include "linux/input.h"
+#include "linux/uinput.h"
+#include "securec.h"
+/*--------------dognzhanwu--------------*/
+#include "mmi_log.h"
+#include "libinput_wrapper.h"
 #include "mouse_event_normalize.h"
+#include "virtual_mouse.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
+#define MMI_LOG_TAG "MouseEventNormalizeTest"
 }
 class MouseEventNormalizeTest : public testing::Test {
 public:
-    static void SetUpTestCase(void);
-    static void TearDownTestCase(void);
+    static void SetUpTestCase();
+    static void TearDownTestCase();
     void SetUp();
     void TearDown();
+    static int32_t CreateMouseDevice();
 
 private:
+    static VirtualMouse vMouse_;
+    static LibinputWrapper libinput_;
+
     int32_t prePointerSpeed_ { 5 };
     int32_t prePrimaryButton_ { 0 };
     int32_t preScrollRows_ { 3 };
@@ -42,12 +70,20 @@ private:
     bool preTapSwitch_ { true };
 };
 
-void MouseEventNormalizeTest::SetUpTestCase(void)
+VirtualMouse MouseEventNormalizeTest::vMouse_;
+LibinputWrapper MouseEventNormalizeTest::libinput_;
+
+void MouseEventNormalizeTest::SetUpTestCase()
 {
+    ASSERT_TRUE(vMouse_.SetUp());
+    std::cout << "device node name: " << vMouse_.GetDevPath() << std::endl;
+    ASSERT_TRUE(libinput_.Init());
+    ASSERT_TRUE(libinput_.AddPath(vMouse_.GetDevPath()));
 }
 
-void MouseEventNormalizeTest::TearDownTestCase(void)
+void MouseEventNormalizeTest::TearDownTestCase()
 {
+    vMouse_.Close();
 }
 
 void MouseEventNormalizeTest::SetUp()
@@ -74,6 +110,194 @@ void MouseEventNormalizeTest::TearDown()
     MouseEventHdr->SetTouchpadTapSwitch(preTapSwitch_);
 }
 
+int32_t MouseEventNormalizeTest::CreateMouseDevice()
+{
+    int uinput_fd = open("/dev/uinput", O_WRONLY | O_NONBLOCK);
+    printf("dongzhanwu---------------------------------1\n");
+    struct uinput_user_dev uinput_dev;
+	if(uinput_fd < 0) {
+		printf("%s:%d\n", __func__, __LINE__);
+		return -1;//error process.
+	}
+    printf("dongzhanwu---------------------------------2\n");
+    memset(&uinput_dev, 0, sizeof(struct uinput_user_dev));
+	snprintf(uinput_dev.name, UINPUT_MAX_NAME_SIZE, "uinput-custom-dev");
+	uinput_dev.id.version = 1;
+	uinput_dev.id.bustype = BUS_USB; // uinput_dev.id.bustype = BUS_USB;
+	uinput_dev.id.vendor = 0x1234;
+	uinput_dev.id.product = 0xfedc;
+    printf("dongzhanwu---------------------------------3\n");
+    // action this device support
+	ioctl(uinput_fd, UI_SET_EVBIT, EV_SYN);
+	ioctl(uinput_fd, UI_SET_EVBIT, EV_KEY);
+    ioctl(uinput_fd, UI_SET_EVBIT, EV_REL);
+	printf("dongzhanwu---------------------------------4\n");	
+    //set keyboard event
+	// for(int i = 272; i < 280; i++){
+	// 	ioctl(uinput_fd, UI_SET_KEYBIT, i);
+	// }
+
+    //set mouse event
+	ioctl(uinput_fd, UI_SET_KEYBIT, BTN_LEFT);
+	ioctl(uinput_fd, UI_SET_KEYBIT, BTN_RIGHT);
+	ioctl(uinput_fd, UI_SET_KEYBIT, BTN_MIDDLE);
+
+	ioctl(uinput_fd, UI_SET_RELBIT, REL_X);
+	ioctl(uinput_fd, UI_SET_RELBIT, REL_Y);
+
+    int ret = ioctl(uinput_fd, UI_DEV_CREATE);
+	if(ret < 0){
+		printf("%s:%d\n", __func__, __LINE__);
+		close(uinput_fd);
+		return ret;//error process.
+	}
+    sleep(20000000);
+    struct input_event mouse_ev;
+    struct timeval tm;
+    
+	memset(&mouse_ev, 0, sizeof(struct input_event));
+    gettimeofday(&tm, 0);
+	mouse_ev.input_event_sec = tm.tv_sec;
+    mouse_ev.input_event_usec = tm.tv_usec;
+	mouse_ev.type = EV_REL;
+	mouse_ev.code = REL_X;
+	mouse_ev.value = 10;
+    write(uinput_fd, &mouse_ev, sizeof(struct input_event));
+ 
+	memset(&mouse_ev, 0, sizeof(struct input_event));
+    gettimeofday(&tm, 0);
+	mouse_ev.input_event_sec = tm.tv_sec;
+    mouse_ev.input_event_usec = tm.tv_usec;
+	mouse_ev.type = EV_REL;
+	mouse_ev.code = REL_Y;
+	mouse_ev.value = 20;
+    write(uinput_fd, &mouse_ev, sizeof(struct input_event));
+
+	memset(&mouse_ev, 0, sizeof(struct input_event));
+    gettimeofday(&tm, 0);
+	mouse_ev.input_event_sec = tm.tv_sec;
+    mouse_ev.input_event_usec = tm.tv_usec;
+	mouse_ev.type = 0;
+	mouse_ev.code = 0;
+	mouse_ev.value = 0;
+    write(uinput_fd, &mouse_ev, sizeof(struct input_event));
+	sleep(2);
+	ioctl(uinput_fd, UI_DEV_DESTROY);
+	close(uinput_fd);
+
+    return 0;
+}
+
+/*
+void report_key(unsigned int type, unsigned int keycode, unsigned int value)  
+{  
+	struct input_event key_ev;  
+		
+	memset(&key_ev, 0, sizeof(struct input_event));  
+		
+	gettimeofday(&key_ev.time, NULL);  
+	key_ev.type = type;  
+	key_ev.code = keycode;  
+	key_ev.value = value;  
+	if (write(uinput_fd, &key_ev, sizeof(struct input_event)) < 0) {
+		printf("%s:%d\n", __func__, __LINE__);  
+	}  
+		
+	gettimeofday(&key_ev.time, NULL);  
+	key_ev.type = EV_SYN;  
+	key_ev.code = SYN_REPORT;  
+	key_ev.value = 0;//event status sync  
+	if (write(uinput_fd, &key_ev, sizeof(struct input_event)) < 0) {
+		printf("%s:%d\n", __func__, __LINE__);  
+	}
+}  
+
+void report_mouse_position(int px, int py)
+{
+	struct input_event mouse_ev;
+ 
+	memset(&mouse_ev, 0, sizeof(struct input_event));
+
+	gettimeofday(&mouse_ev.time, NULL);  
+	mouse_ev.type = EV_ABS;
+	mouse_ev.code = ABS_X;
+	mouse_ev.value = px;
+	if (write(uinput_fd, &mouse_ev, sizeof(struct input_event)) < 0) {
+		printf("position error\n");
+	}
+ 
+    gettimeofday(&mouse_ev.time, NULL);  
+	mouse_ev.type = EV_ABS;
+	mouse_ev.code = ABS_Y;
+	mouse_ev.value = py;
+	if (write(uinput_fd, &mouse_ev, sizeof(struct input_event)) < 0) {
+		printf("position error\n");
+	}
+
+    gettimeofday(&mouse_ev.time, NULL);  
+	mouse_ev.type = EV_SYN;
+	mouse_ev.code = SYN_REPORT;
+	mouse_ev.value = 0;
+	if (write(uinput_fd, &mouse_ev, sizeof(struct input_event)) < 0) {
+		printf("syn position error\n");
+	}
+}
+
+void report_mouse_move(int dx, int dy)
+{
+	struct input_event mouse_ev;
+ 
+	memset(&mouse_ev, 0, sizeof(struct input_event));
+
+	gettimeofday(&mouse_ev.time, NULL);  
+	mouse_ev.type = EV_REL;
+	mouse_ev.code = REL_X;
+	mouse_ev.value = dx;
+	if (write(uinput_fd, &mouse_ev, sizeof(struct input_event)) < 0) {
+		printf("move error\n");
+	}
+ 
+    gettimeofday(&mouse_ev.time, NULL);  
+	mouse_ev.type = EV_REL;
+	mouse_ev.code = REL_Y;
+	mouse_ev.value = dy;
+	if (write(uinput_fd, &mouse_ev, sizeof(struct input_event)) < 0) {
+		printf("move error\n");
+	}
+ 
+    gettimeofday(&mouse_ev.time, NULL);  
+	mouse_ev.type = EV_SYN;
+	mouse_ev.code = SYN_REPORT;
+	mouse_ev.value = 0;
+	if (write(uinput_fd, &mouse_ev, sizeof(struct input_event)) < 0) {
+		printf("syn move error\n");
+	}
+}
+
+void report_mouse_key(uint16_t type, uint16_t keycode, int32_t value)
+{
+	struct input_event mouse_ev;
+ 
+	memset(&mouse_ev, 0, sizeof(struct input_event));
+
+	gettimeofday(&mouse_ev.time, NULL);  
+	mouse_ev.type = type;
+	mouse_ev.code = keycode;
+	mouse_ev.value = value;
+	if (write(uinput_fd, &mouse_ev, sizeof(struct input_event)) < 0) {
+		printf("key report error\n");
+	}
+
+    gettimeofday(&mouse_ev.time, NULL);  
+	mouse_ev.type = EV_SYN;
+	mouse_ev.code = SYN_REPORT;
+	mouse_ev.value = 0;
+	if (write(uinput_fd, &mouse_ev, sizeof(struct input_event)) < 0) {
+		printf("syn key report error\n");
+	}
+}
+*/
+
 /**
  * @tc.name: MouseEventNormalizeTest_GetDisplayId()_001
  * @tc.desc: Test GetDisplayId()
@@ -83,6 +307,7 @@ void MouseEventNormalizeTest::TearDown()
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetDisplayId_001, TestSize.Level1)
 {
     int32_t idNames = -1;
+    CreateMouseDevice(); // add dongzhanwu
     ASSERT_EQ(MouseEventHdr->GetDisplayId(), idNames);
 }
 
@@ -105,9 +330,22 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetPointerEvent_002, T
  */
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_OnEvent_003, TestSize.Level1)
 {
-    libinput_event *event = nullptr;
-    int idNames = -1;
-    ASSERT_EQ(MouseEventHdr->OnEvent(event), idNames);
+    CALL_TEST_DEBUG;
+    vMouse_.SendEvent(EV_REL, REL_X, 5);
+    vMouse_.SendEvent(EV_REL, REL_Y, -10);
+    vMouse_.SendEvent(EV_SYN, SYN_REPORT, 0);
+
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+
+    struct libinput_device *dev = libinput_event_get_device(event);
+    ASSERT_TRUE(dev != nullptr);
+    std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
+    ASSERT_EQ(MouseEventHdr->OnEvent(event), RET_OK);
+
+    auto pointerEvent = MouseEventHdr->GetPointerEvent();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    EXPECT_EQ(pointerEvent->GetPointerAction(), PointerEvent::POINTER_ACTION_MOVE);
 }
 
 /**
@@ -393,5 +631,22 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadRightClickT
     ASSERT_TRUE(MouseEventHdr->GetTouchpadRightClickType(newType) == RET_OK);
     ASSERT_TRUE(type == newType);
 }
+
+/**
+ * @tc.name: MouseEventNormalizeTest_GetPointerEvent
+ * @tc.desc: Test GetPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+// HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetPointerEvent, TestSize.Level1)
+// {
+//     MouseEventNormalize mouseEventNormalize;
+//     int32_t deviceId = 1;
+//     auto processor = std::shared_ptr<MouseTransformProcessor>(new (std::nothrow) MouseTransformProcessor());
+//     mouseEventNormalize.processors_.insert(std::make_pair(deviceId, processor));
+//     ASSERT_NE(MouseEventHdr->GetPointerEvent(deviceId), nullptr);
+//     deviceId = 2;
+//     ASSERT_EQ(MouseEventHdr->GetPointerEvent(deviceId), nullptr);
+// }
 }
 }

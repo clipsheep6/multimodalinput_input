@@ -703,15 +703,24 @@ ohos_unittest("MouseEventNormalizeTest") {
   ]
 
   sources = [
+    "mouse_event_normalize/test/libinput_wrapper.cpp",
     "mouse_event_normalize/test/mouse_device_state_test.cpp",
     "mouse_event_normalize/test/mouse_event_normalize_test.cpp",
     "mouse_event_normalize/test/mouse_transform_processor_test.cpp",
+    "mouse_event_normalize/test/virtual_device.cpp",
+    "mouse_event_normalize/test/virtual_mouse.cpp",
+    "mouse_event_normalize/test/v_input_device.cpp",
   ]
 
   deps = [
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
   ]
 }
 
