@@ -70,6 +70,7 @@ config("libmmi_server_config") {
     "subscriber/include",
     "timer_manager/include",
     "permission_helper/include",
+    "infrared_emitter/include",
     "${mmi_service_path}/connect_manager/include",
     "${mmi_service_path}/device_state_manager/include",
     "${mmi_service_path}/filter/include",
@@ -173,6 +174,8 @@ ohos_shared_library("libmmi-server") {
   if (input_feature_switch) {
     sources += [ "subscriber/src/switch_subscriber_handler.cpp" ]
   }
+
+  sources += [ "infrared_emitter/src/infrared_emitter_controller.cpp" ]
 
   if (input_feature_mouse || input_feature_touchscreen) {
     sources += [ "touch_event_normalize/src/touch_event_normalize.cpp" ]
@@ -282,6 +285,7 @@ ohos_shared_library("libmmi-server") {
     "preferences:native_preferences",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
+    "window_manager:libdm",
     "window_manager:libwm_lite",
     "window_manager:libwsutils",
   ]
@@ -333,6 +337,7 @@ ohos_unittest("event_resample_test") {
     "hilog:libhilog",
     "image_framework:image_native",
     "preferences:native_preferences",
+    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -374,6 +379,7 @@ ohos_unittest("TwoFingerLongTouchTest") {
     "hilog:libhilog",
     "image_framework:image_native",
     "preferences:native_preferences",
+    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -392,6 +398,7 @@ ohos_unittest("TransformPointTest") {
 
   deps = [
     "${mmi_path}/tools/vuinput:libmmi-virtual-device",
+    "${mmi_path}/util:libmmi-util",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -472,6 +479,7 @@ ohos_unittest("EventFilterHandlerTest") {
     "image_framework:image_native",
     "ipc:ipc_single",
     "preferences:native_preferences",
+    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -569,6 +577,8 @@ ohos_unittest("WindowManagerTest") {
     "window_manager/test/input_windows_manager_test.cpp",
     "window_manager/test/knuckle_drawing_manager_test.cpp",
     "window_manager/test/knuckle_dynamic_drawing_manager_test.cpp",
+    "window_manager/test/knuckle_glow_point_test.cpp",
+    "window_manager/test/knuckle_glow_trace_system_test.cpp",
     "window_manager/test/pointer_drawing_manager_test.cpp",
     "window_manager/test/touch_drawing_manager_test.cpp",
   ]
@@ -585,6 +595,7 @@ ohos_unittest("WindowManagerTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
@@ -606,6 +617,7 @@ ohos_unittest("TouchEventNormalizeTest") {
   sources = [
     "touch_event_normalize/test/tablet_tool_tranform_processor_test.cpp",
     "touch_event_normalize/test/touch_event_normalize_test.cpp",
+    "touch_event_normalize/test/touch_transform_processor_test.cpp",
     "touch_event_normalize/test/touchpad_transform_processor_test.cpp",
   ]
 
@@ -613,11 +625,13 @@ ohos_unittest("TouchEventNormalizeTest") {
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
   ]
 
   external_deps = [
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
+    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -733,6 +747,7 @@ ohos_unittest("MonitorTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -775,6 +790,7 @@ ohos_unittest("ModuleLoaderTest") {
     "hilog:libhilog",
     "image_framework:image_native",
     "security_component_manager:libsecurity_component_sdk",
+    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -797,6 +813,7 @@ ohos_unittest("KeyEventNormalizeTest") {
   deps = [
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
   ]
 
   external_deps = [
@@ -804,6 +821,7 @@ ohos_unittest("KeyEventNormalizeTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -825,6 +843,7 @@ ohos_unittest("KeyCommandTest") {
 
   sources = [
     "key_command/test/key_command_handler_test.cpp",
+    "key_command/test/key_command_handler_util_test.cpp",
     "key_command/test/setting_datashare_test.cpp",
   ]
 
@@ -835,12 +854,15 @@ ohos_unittest("KeyCommandTest") {
   ]
 
   external_deps = [
+    "ability_runtime:app_manager",
     "c_utils:utils",
+    "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -897,7 +919,7 @@ ohos_unittest("InterceptorTest") {
   external_deps = [ "hilog:libhilog" ]
 }
 
-ohos_unittest("EventDumpTest") {
+ohos_unittest("EventHandlerTest") {
   module_out_path = module_output_path
 
   configs = [
@@ -931,6 +953,7 @@ ohos_unittest("EventDumpTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -1039,12 +1062,14 @@ ohos_unittest("DisplayStateManagerTest") {
   deps = [
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
   ]
 
   external_deps = [
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "image_framework:image_native",
+    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -1092,6 +1117,7 @@ ohos_unittest("DeviceConfigTest") {
 
   deps = [
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
     "//third_party/googletest:gmock_main",
   ]
 }
@@ -1111,7 +1137,10 @@ ohos_unittest("DelegateTaskTest") {
 
   sources = [ "delegate_task/test/delegate_tasks_test.cpp" ]
 
-  deps = [ "${mmi_path}/service:libmmi-server" ]
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
 
   external_deps = [ "hilog:libhilog" ]
 }
@@ -1143,6 +1172,40 @@ ohos_unittest("ConnectManagerTest") {
     "image_framework:image_native",
     "ipc:ipc_single",
     "security_component_manager:libsecurity_component_sdk",
+    "window_manager:libdm",
+    "window_manager:libwm",
+  ]
+}
+
+ohos_unittest("EventDumpTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [ "${mmi_path}/test/unittest/common/include" ]
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "event_dump/test/event_dump_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }

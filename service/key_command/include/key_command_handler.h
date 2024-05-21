@@ -96,6 +96,7 @@ struct Sequence {
     int64_t abilityStartDelay { 0 };
     int32_t timerId { -1 };
     Ability ability;
+    friend std::ostream& operator<<(std::ostream&, const Sequence&);
 };
 
 struct TwoFingerGesture {
@@ -118,6 +119,8 @@ struct KnuckleGesture {
     int64_t lastPointerUpTime { 0 };
     int64_t downToPrevUpTime { 0 };
     float doubleClickDistance { 0.0f };
+    std::string statusConfig;
+    bool statusConfigValue { true };
     Ability ability;
     struct {
         int32_t id { 0 };
