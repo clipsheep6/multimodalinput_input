@@ -174,10 +174,17 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
         {"interval", required_argument, nullptr, 'i'},
         {nullptr, 0, nullptr, 0}
     };
+    struct option touchpadSensorOptions[] = {
+        {"rotate", required_argument, nullptr, 'r'},
+        {"swipe", required_argument, nullptr, 's'},
+        {"pinch", required_argument, nullptr, 'p'},
+        {"interval", required_argument, nullptr, 'i'},
+        {nullptr, 0, nullptr, 0}
+    };
     int32_t c = 0;
     int32_t optionIndex = 0;
     optind = 0;
-    if ((c = getopt_long(argc, argv, "MKTJ?", headOptions, &optionIndex)) != -1) {
+    if ((c = getopt_long(argc, argv, "MKTJP?", headOptions, &optionIndex)) != -1) {
         switch (c) {
             case 'M': {
                 int32_t px = 0;
@@ -1413,6 +1420,42 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 }
                 break;
             }
+            case 'P': {
+                while ((c = getopt_long(argc, argv, "r:s:p:i", touchpadSensorOptions, &optionIndex)) != -1) {
+                    switch (c) {
+                        case 'r': {
+                            int32_t rotateValue = 0;
+                            int32_t actionType = POINTER_ACTION_MOVE;
+                            if(argc>=4){
+                                if (!StrToInt(argv[3], rotateValue)) {
+                                    std::cout << "Invalid angle data" << std::endl;
+                                    return RET_ERR;
+                                }
+                                auto pointerEvent = PointerEvent::Create();
+                                PointerEvent::PointerItem item;
+                                item.SetPressed(true);
+                                item.SetPointerId(0);
+                                pointerEvent->AddPointerItem(item);
+                                pointerEvent->SetPointerAction(actionType);
+                                pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+                                pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_ROTATE, rotateValue);
+                                InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            }
+                            break;
+                        }
+                        case 's': {
+                            break;
+                        }
+                        case 'p': {
+                            break;
+                        }
+                        case 'i': {
+                            break;
+                        }
+                    }
+                }
+                break;
+            }            
             case '?': {
                 ShowUsage();
                 return ERR_OK;
