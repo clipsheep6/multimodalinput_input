@@ -42,12 +42,13 @@ public:
     bool IsEnded() const;
 
 private:
-    double moveVelocityX_ { 0.f };
-    double moveVelocityY_ { 0.f };
-    double pointX_ { 0.f };
-    double pointY_ { 0.f };
+    double moveVelocityX_ { 0.0 };
+    double moveVelocityY_ { 0.0 };
+    double pointX_ { 0.0 };
+    double pointY_ { 0.0 };
     int32_t lifespan_ { DEFAULT_LIFESPAN };
     Rosen::Drawing::Bitmap traceShadow_;
+    Rosen::Drawing::Matrix traceMatrix_;
 };
 } // namespace MMI
 } // namespace OHOS

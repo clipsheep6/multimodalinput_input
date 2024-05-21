@@ -250,7 +250,6 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_SetOriginPointerId
     ASSERT_EQ(ret, ERROR_NULL_POINTER);
 }
 
-
 #ifdef OHOS_BUILD_ENABLE_TEST
 /**
  * @tc.name: EventNormalizeHandlerTest_SetMoveEventFilters_001
@@ -593,12 +592,12 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTableToolEve
 }
 
 /**
- * @tc.name: EventNormalizeHandlerTest_HandleTouchEvent_001
+ * @tc.name: EventNormalizeHandlerTest_HandleTouchEvent_002
  * @tc.desc: Handle touch event
  * @tc.type: FUNC
  * @tc.require:SR000HQ0RR
  */
-HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchEvent_001, TestSize.Level1)
+HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchEvent_002, TestSize.Level1)
 {
     EventNormalizeHandler eventNormalizeHandler;
     libinput_event *event = nullptr;
@@ -678,12 +677,12 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_OnEventDeviceRemov
 }
 
 /**
- * @tc.name: EventNormalizeHandlerTest_ProcessNullEvent_001
+ * @tc.name: EventNormalizeHandlerTest_ProcessNullEvent_002
  * @tc.desc: Process nullEvent
  * @tc.type: FUNC
  * @tc.require:SR000HQ0RR
  */
-HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_ProcessNullEvent_001, TestSize.Level1)
+HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_ProcessNullEvent_002, TestSize.Level1)
 {
     EventNormalizeHandler eventNormalizeHandler;
     libinput_event *event = nullptr;

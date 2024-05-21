@@ -644,7 +644,7 @@ VendorConfig InputDeviceManager::GetVendorConfig(int32_t deviceId) const
     CALL_DEBUG_ENTER;
     auto it = inputDevice_.find(deviceId);
     if (it == inputDevice_.end()) {
-        MMI_HILOGE("Device info not find id: %{public}d", deviceId);
+        MMI_HILOGE("Device info not find id:%{public}d", deviceId);
         return {};
     }
     return it->second.vendorConfig;
@@ -653,7 +653,7 @@ VendorConfig InputDeviceManager::GetVendorConfig(int32_t deviceId) const
 int32_t InputDeviceManager::OnEnableInputDevice(bool enable)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("Enable input device: %{public}s", enable ? "true" : "false");
+    MMI_HILOGD("Enable input device:%{public}s", enable ? "true" : "false");
     for (auto &item : inputDevice_) {
         if (item.second.isRemote && item.second.enable != enable) {
             int32_t keyboardType = KEYBOARD_TYPE_NONE;
@@ -716,6 +716,19 @@ void InputDeviceManager::OnSessionLost(SessionPtr session)
 {
     CALL_DEBUG_ENTER;
     devListener_.remove(session);
+}
+
+std::vector<int32_t> InputDeviceManager::GetTouchPadIds()
+{
+    CALL_DEBUG_ENTER;
+    std::vector<int32_t> ids;
+    for (const auto &item : inputDevice_) {
+        auto inputDevice = item.second.inputDeviceOrigin;
+        if (libinput_device_has_capability(inputDevice, LIBINPUT_DEVICE_CAP_TABLET_PAD)) {
+            ids.push_back(item.first);
+        }
+    }
+    return ids;
 }
 } // namespace MMI
 } // namespace OHOS
