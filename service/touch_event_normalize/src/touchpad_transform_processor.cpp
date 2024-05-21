@@ -245,9 +245,10 @@ std::shared_ptr<PointerEvent> TouchPadTransformProcessor::OnEvent(struct libinpu
     }
 
     pointerEvent_->UpdateId();
+    StartLogTraceId(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
     MMI_HILOGD("Pointer event dispatcher of server:");
     EventLogHelper::PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(),
-        pointerEvent_->GetPointerIds().size());
+        pointerEvent_->GetPointerIds().size(), MMI_LOG_HEADER);
     auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
     CHKPP(device);
     MMI_HILOGI("InputTracking id:%{public}d event created by:%{public}s, type:%{public}d",
@@ -270,7 +271,7 @@ int32_t TouchPadTransformProcessor::GetTouchPadToolType(
             return PointerEvent::TOOL_TYPE_PEN;
         }
         case MT_TOOL_PALM: {
-            MMI_HILOGD("ToolType is MT_TOOL_PALM");
+            MMI_HILOGD("toolType is MT_TOOL_PALM");
             return PointerEvent::TOOL_TYPE_PALM;
         }
         default : {
@@ -297,11 +298,11 @@ int32_t TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *
 
     bool tpSwipeSwitch = true;
     if (GetTouchpadSwipeSwitch(tpSwipeSwitch) != RET_OK) {
-        MMI_HILOGD("Failed to get touchpad swipe switch flag, default is true.");
+        MMI_HILOGD("Failed to get touchpad swipe switch flag, default is true");
     }
 
     if (!tpSwipeSwitch) {
-        MMI_HILOGD("Touchpad swipe switch is false.");
+        MMI_HILOGD("Touchpad swipe switch is false");
         return RET_ERR;
     }
 
@@ -317,13 +318,13 @@ int32_t TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *
 
     int32_t fingerCount = libinput_event_gesture_get_finger_count(gesture);
     if (fingerCount < 0 || fingerCount > FINGER_COUNT_MAX) {
-        MMI_HILOGE("Finger count is invalid.");
+        MMI_HILOGE("Finger count is invalid");
         return RET_ERR;
     }
     pointerEvent_->SetFingerCount(fingerCount);
 
     if (fingerCount == 0) {
-        MMI_HILOGD("There is no finger in swipe action %{public}d.", action);
+        MMI_HILOGD("There is no finger in swipe action:%{public}d", action);
         return RET_ERR;
     }
 
@@ -386,7 +387,7 @@ int32_t TouchPadTransformProcessor::SetTouchPadPinchData(struct libinput_event *
 
     bool tpPinchSwitch = true;
     if (GetTouchpadPinchSwitch(tpPinchSwitch) != RET_OK) {
-        MMI_HILOGD("Failed to get touchpad pinch switch flag, default is true.");
+        MMI_HILOGD("Failed to get touchpad pinch switch flag, default is true");
     }
 
     CHKPR(event, RET_ERR);
@@ -394,12 +395,12 @@ int32_t TouchPadTransformProcessor::SetTouchPadPinchData(struct libinput_event *
     CHKPR(gesture, RET_ERR);
     int32_t fingerCount = libinput_event_gesture_get_finger_count(gesture);
     if (fingerCount <= 0 || fingerCount > FINGER_COUNT_MAX) {
-        MMI_HILOGE("Finger count is invalid.");
+        MMI_HILOGE("Finger count is invalid");
         return RET_ERR;
     }
 
     if (!tpPinchSwitch && fingerCount == TP_SYSTEM_PINCH_FINGER_CNT) {
-        MMI_HILOGD("Touchpad pinch switch is false.");
+        MMI_HILOGD("Touchpad pinch switch is false");
         return RET_ERR;
     }
 
@@ -500,7 +501,7 @@ int32_t TouchPadTransformProcessor::SetTouchpadSwipeSwitch(bool switchFlag)
 {
     std::string name = "touchpadSwipe";
     if (PutConfigDataToDatabase(name, switchFlag) != RET_OK) {
-        MMI_HILOGE("Failed to set touchpad swpie switch flag to mem.");
+        MMI_HILOGE("Failed to set touchpad swpie switch flag to mem");
         return RET_ERR;
     }
 
@@ -513,7 +514,7 @@ int32_t TouchPadTransformProcessor::GetTouchpadSwipeSwitch(bool &switchFlag)
 {
     std::string name = "touchpadSwipe";
     if (GetConfigDataFromDatabase(name, switchFlag) != RET_OK) {
-        MMI_HILOGE("Failed to get touchpad swpie switch flag from mem.");
+        MMI_HILOGE("Failed to get touchpad swpie switch flag from mem");
         return RET_ERR;
     }
 
@@ -524,7 +525,7 @@ int32_t TouchPadTransformProcessor::SetTouchpadPinchSwitch(bool switchFlag)
 {
     std::string name = "touchpadPinch";
     if (PutConfigDataToDatabase(name, switchFlag) != RET_OK) {
-        MMI_HILOGE("Failed to set touchpad pinch switch flag to mem.");
+        MMI_HILOGE("Failed to set touchpad pinch switch flag to mem");
         return RET_ERR;
     }
 
@@ -537,7 +538,7 @@ int32_t TouchPadTransformProcessor::GetTouchpadPinchSwitch(bool &switchFlag)
 {
     std::string name = "touchpadPinch";
     if (GetConfigDataFromDatabase(name, switchFlag) != RET_OK) {
-        MMI_HILOGE("Failed to get touchpad pinch switch flag from mem.");
+        MMI_HILOGE("Failed to get touchpad pinch switch flag from mem");
         return RET_ERR;
     }
 
@@ -579,6 +580,11 @@ int32_t TouchPadTransformProcessor::GetConfigDataFromDatabase(std::string &key, 
     return RET_OK;
 }
 
+std::shared_ptr<PointerEvent> TouchPadTransformProcessor::GetPointerEvent()
+{
+    return pointerEvent_;
+}
+
 MultiFingersTapHandler::MultiFingersTapHandler() {}
 
 MultiFingersTapHandler::~MultiFingersTapHandler() {}
@@ -602,7 +608,7 @@ int32_t MultiFingersTapHandler::HandleMulFingersTap(struct libinput_event_touch 
     lastTime = time;
     if ((deltaTime > perTimeThreshold) || ((lastTime - beginTime) > totalTimeThreshold)) {
         MMI_HILOGD("Not multitap, single time interval or total time interval is out of range."
-            "single: %{public}" PRId64 ", total: %{public}" PRId64, deltaTime, (lastTime - beginTime));
+            "single:%{public}" PRId64 ", total:%{public}" PRId64, deltaTime, (lastTime - beginTime));
         SetMULTI_FINGERTAP_HDRDefault();
         return RET_OK;
     }
@@ -629,7 +635,7 @@ int32_t MultiFingersTapHandler::HandleMulFingersTap(struct libinput_event_touch 
     }
     if ((upCnt == downCnt) && (upCnt >= FINGER_TAP_MIN) && (upCnt <= FINGER_COUNT_MAX)) {
         multiFingersState = static_cast<MulFingersTap>(upCnt);
-        MMI_HILOGD("This is multifinger tap event, finger count: %{public}d", upCnt);
+        MMI_HILOGD("This is multifinger tap event, finger count:%{public}d", upCnt);
         return RET_OK;
     }
     return RET_OK;

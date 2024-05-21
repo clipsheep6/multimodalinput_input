@@ -21,9 +21,14 @@
 #include "libinput.h"
 #include "pixel_map.h"
 #include "sec_comp_enhance_kit.h"
+#include "util_napi_error.h"
 
 #include "define_multimodal.h"
+#include "mmi_log.h"
 #include "server_msg_handler.h"
+
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "ServerMsgHandlerTest"
 
 namespace OHOS {
 namespace MMI {
@@ -52,6 +57,7 @@ public:
  */
 HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SetPixelMapData, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     ServerMsgHandler servermsghandler;
     int32_t infoId = -1;
     void* pixelMap = nullptr;
@@ -67,6 +73,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SetPixelMapData, TestSize.Le
  */
 HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SetShieldStatus_01, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     ServerMsgHandler servermsghandler;
     int32_t shieldMode = -1;
     bool isShield = false;
@@ -82,6 +89,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SetShieldStatus_01, TestSize
  */
 HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SetShieldStatus_02, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     ServerMsgHandler servermsghandler;
     int32_t shieldMode = 1;
     bool isShield = true;
@@ -97,6 +105,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SetShieldStatus_02, TestSize
  */
 HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_GetShieldStatus_01, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     ServerMsgHandler servermsghandler;
     int32_t shieldMode = -1;
     bool isShield = false;
@@ -112,6 +121,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_GetShieldStatus_01, TestSize
  */
 HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_GetShieldStatus_02, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     ServerMsgHandler servermsghandler;
     int32_t shieldMode = 1;
     bool isShield = true;
@@ -127,13 +137,14 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_GetShieldStatus_02, TestSize
  */
 HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEvent, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     ServerMsgHandler servermsghandler;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     int32_t pid = 1;
-    bool isNativeInject = false;
+    bool isNativeInject = true;
     int32_t result = servermsghandler.OnInjectPointerEvent(pointerEvent, pid, isNativeInject);
-    EXPECT_EQ(result, RET_OK);
+    EXPECT_EQ(result, COMMON_PERMISSION_CHECK_ERROR);
 }
 
 /**
@@ -144,9 +155,14 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEvent, TestSi
  */
 HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAuthorize_01, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     ServerMsgHandler servermsghandler;
     bool isAuthorize = true;
+    InjectionType InjectionType_ = InjectionType::KEYEVENT;
     int32_t result = servermsghandler.OnAuthorize(isAuthorize);
+    EXPECT_EQ(result, ERR_OK);
+    InjectionType_ = InjectionType::POINTEREVENT;
+    result = servermsghandler.OnAuthorize(isAuthorize);
     EXPECT_EQ(result, ERR_OK);
 }
 
@@ -158,6 +174,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAuthorize_01, TestSize.Lev
  */
 HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAuthorize_02, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     ServerMsgHandler servermsghandler;
     bool isAuthorize = false;
     int32_t result = servermsghandler.OnAuthorize(isAuthorize);
@@ -172,6 +189,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAuthorize_02, TestSize.Lev
  */
 HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_01, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     ServerMsgHandler servermsghandler;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
@@ -188,6 +206,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_01, TestSi
  */
 HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_02, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     ServerMsgHandler servermsghandler;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
@@ -204,6 +223,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_02, TestSi
  */
 HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_03, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     ServerMsgHandler servermsghandler;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
@@ -222,6 +242,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_03, TestSi
  */
 HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_Init, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     ServerMsgHandler servermsghandler;
     UDSServer udsServerFirst;
     ASSERT_NO_FATAL_FAILURE(servermsghandler.Init(udsServerFirst));
@@ -237,6 +258,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_Init, TestSize.Level1)
  */
 HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAddInputHandlerWithNullSession, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     ServerMsgHandler servermsghandler;
     SessionPtr sess = nullptr;
     InputHandlerType handlerType = InputHandlerType::INTERCEPTOR;
@@ -255,6 +277,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAddInputHandlerWithNullSes
  */
 HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAddInputHandlerWithInterceptorHandler001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     ServerMsgHandler servermsghandler;
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     InputHandlerType handlerType = InputHandlerType::INTERCEPTOR;
@@ -273,6 +296,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAddInputHandlerWithInterce
  */
 HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAddInputHandlerWithMonitorHandler001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     ServerMsgHandler servermsghandler;
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     InputHandlerType handlerType = InputHandlerType::MONITOR;
@@ -291,6 +315,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAddInputHandlerWithMonitor
  */
 HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnRemoveInputHandlerWithNullSession, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     ServerMsgHandler servermsghandler;
     SessionPtr sess = nullptr;
     InputHandlerType handlerType = InputHandlerType::INTERCEPTOR;
@@ -309,6 +334,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnRemoveInputHandlerWithNull
  */
 HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnRemoveInputHandlerWithInterceptorHandler001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     ServerMsgHandler servermsghandler;
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     InputHandlerType handlerType = InputHandlerType::INTERCEPTOR;
@@ -327,6 +353,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnRemoveInputHandlerWithInte
  */
 HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnRemoveInputHandlerWithMonitorHandler001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     ServerMsgHandler servermsghandler;
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     InputHandlerType handlerType = InputHandlerType::MONITOR;
@@ -345,6 +372,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnRemoveInputHandlerWithMoni
  */
 HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnMarkConsumedWithNullSession, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     ServerMsgHandler servermsghandler;
     SessionPtr sess = nullptr;
     int32_t eventId = 11;
@@ -359,6 +387,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnMarkConsumedWithNullSessio
  */
 HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnMarkConsumedWithMonitorHandler001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     ServerMsgHandler servermsghandler;
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     int32_t eventId = 11;
@@ -373,6 +402,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnMarkConsumedWithMonitorHan
  */
 HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAddInputHandlerWithInterceptorHandler002, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     ServerMsgHandler servermsghandler;
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     InputHandlerType handlerType = InputHandlerType::INTERCEPTOR;
@@ -391,6 +421,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAddInputHandlerWithInterce
  */
 HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAddInputHandlerWithMonitorHandler002, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     ServerMsgHandler servermsghandler;
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     InputHandlerType handlerType = InputHandlerType::MONITOR;
@@ -408,6 +439,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAddInputHandlerWithMonitor
  */
 HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnRemoveInputHandlerWithInterceptorHandler002, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     ServerMsgHandler servermsghandler;
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     InputHandlerType handlerType = InputHandlerType::INTERCEPTOR;
@@ -425,6 +457,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnRemoveInputHandlerWithInte
  */
 HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnRemoveInputHandlerWithMonitorHandler002, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     ServerMsgHandler servermsghandler;
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     InputHandlerType handlerType = InputHandlerType::MONITOR;
@@ -442,6 +475,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnRemoveInputHandlerWithMoni
  */
 HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnMarkConsumedWithMonitorHandler002, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     ServerMsgHandler servermsghandler;
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     int32_t eventId = 11;

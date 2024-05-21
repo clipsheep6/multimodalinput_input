@@ -27,6 +27,8 @@
 #include "proto.h"
 #include "util_ex.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_HANDLER
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "EventMonitorHandler"
 
@@ -105,6 +107,7 @@ void EventMonitorHandler::RemoveInputHandler(InputHandlerType handlerType, Handl
 
 void EventMonitorHandler::MarkConsumed(int32_t eventId, SessionPtr session)
 {
+    LogTracer lt(eventId, 0, 0);
     monitors_.MarkConsumed(eventId, session);
 }
 
@@ -175,7 +178,6 @@ void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<KeyEvent>
     }
     if (!session_->SendMsg(pkt)) {
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
-        return;
     }
 }
 
@@ -475,10 +477,12 @@ void EventMonitorHandler::MonitorCollection::Dump(int32_t fd, const std::vector<
         CHKPV(session);
         mprintf(fd,
                 "handlerType:%d | Pid:%d | Uid:%d | Fd:%d "
-                "| EarliestEventTime:%" PRId64 " | Descript:%s \t",
+                "| EarliestEventTime:%" PRId64 " | Descript:%s "
+                "| EventType:%s | ProgramName:%s \t",
                 item.handlerType_, session->GetPid(),
                 session->GetUid(), session->GetFd(),
-                session->GetEarliestEventTime(), session->GetDescript().c_str());
+                session->GetEarliestEventTime(), session->GetDescript().c_str(),
+                item.eventType_, session->GetProgramName().c_str());
     }
 }
 } // namespace MMI

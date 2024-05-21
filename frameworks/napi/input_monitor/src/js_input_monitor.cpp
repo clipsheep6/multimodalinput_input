@@ -1357,6 +1357,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
         napi_open_handle_scope(jsEnv_, &scope);
         CHKPV(scope);
         auto pointerEvent = evQueue_.front();
+        LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
         if (pointerEvent == nullptr) {
             MMI_HILOGE("scope is nullptr");
             napi_close_handle_scope(jsEnv_, scope);
@@ -1591,6 +1592,7 @@ bool JsInputMonitor::IsFingerprint(std::shared_ptr<PointerEvent> pointerEvent)
         pointerEvent->GetPointerAction() <= PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK)) {
             return true;
     }
+    MMI_HILOGD("not fingerprint event");
     return false;
 }
 } // namespace MMI

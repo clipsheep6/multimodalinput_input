@@ -30,6 +30,8 @@
 #include "util_ex.h"
 #include "util.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MouseEventNormalize"
 
@@ -69,11 +71,22 @@ int32_t MouseEventNormalize::GetCurrentDeviceId() const
     return currentDeviceId_;
 }
 
-std::shared_ptr<PointerEvent>MouseEventNormalize::GetPointerEvent()
+std::shared_ptr<PointerEvent> MouseEventNormalize::GetPointerEvent()
 {
     auto processor = GetCurrentProcessor();
     CHKPP(processor);
     return processor->GetPointerEvent();
+}
+
+std::shared_ptr<PointerEvent> MouseEventNormalize::GetPointerEvent(int32_t deviceId)
+{
+    auto iter = processors_.find(deviceId);
+    if (iter == processors_.end()) {
+        MMI_HILOGE("Can't find mouse processor by deviceId:%{public}d", deviceId);
+        return nullptr;
+    }
+    CHKPP(iter->second);
+    return iter->second->GetPointerEvent();
 }
 
 int32_t MouseEventNormalize::OnEvent(struct libinput_event *event)
@@ -134,7 +147,7 @@ int32_t MouseEventNormalize::NormalizeRotateEvent(struct libinput_event *event, 
     CHKPR(device, RET_ERR);
     int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
     if (deviceId < 0) {
-        MMI_HILOGE("The deviceId is invalid, deviceId: %{public}d", deviceId);
+        MMI_HILOGE("The deviceId is invalid, deviceId:%{public}d", deviceId);
         return RET_ERR;
     }
     SetCurrentDeviceId(deviceId);
@@ -145,10 +158,29 @@ int32_t MouseEventNormalize::NormalizeRotateEvent(struct libinput_event *event, 
         processor = std::make_shared<MouseTransformProcessor>(deviceId);
         auto [tIter, isOk] = processors_.emplace(deviceId, processor);
         if (!isOk) {
-            MMI_HILOGE("Duplicate device record, deviceId: %{public}d", deviceId);
+            MMI_HILOGE("Duplicate device record, deviceId:%{public}d", deviceId);
         }
     }
     return processor->NormalizeRotateEvent(event, type, angle);
+}
+
+bool MouseEventNormalize::CheckAndPackageAxisEvent(libinput_event* event)
+{
+    CHKPF(event);
+    auto device = libinput_event_get_device(event);
+    CHKPR(device, RET_ERR);
+    int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
+    if (deviceId < 0) {
+        MMI_HILOGE("The deviceId is invalid, deviceId: %{public}d", deviceId);
+        return RET_ERR;
+    }
+    SetCurrentDeviceId(deviceId);
+    std::shared_ptr<MouseTransformProcessor> processor { nullptr };
+    if (auto it = processors_.find(deviceId); it != processors_.end()) {
+        processor = it->second;
+    }
+    CHKPF(processor);
+    return processor->CheckAndPackageAxisEvent();
 }
 
 int32_t MouseEventNormalize::SetMouseScrollRows(int32_t rows)

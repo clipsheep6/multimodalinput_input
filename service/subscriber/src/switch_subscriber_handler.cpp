@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -72,17 +72,21 @@ void SwitchSubscriberHandler::HandleSwitchEvent(const std::shared_ptr<SwitchEven
 }
 #endif // OHOS_BUILD_ENABLE_SWITCH
 
-int32_t SwitchSubscriberHandler::SubscribeSwitchEvent(SessionPtr sess, int32_t subscribeId)
+int32_t SwitchSubscriberHandler::SubscribeSwitchEvent(SessionPtr sess, int32_t subscribeId, int32_t switchType)
 {
     CALL_INFO_TRACE;
     if (subscribeId < 0) {
         MMI_HILOGE("Invalid subscribeId");
         return RET_ERR;
     }
+    if (switchType < SwitchEvent::SwitchType::SWITCH_DEFAULT) {
+        MMI_HILOGE("Invalid switchType");
+        return RET_ERR;
+    }
     CHKPR(sess, ERROR_NULL_POINTER);
 
-    MMI_HILOGD("subscribeId:%{public}d", subscribeId);
-    auto subscriber = std::make_shared<Subscriber>(subscribeId, sess);
+    MMI_HILOGD("subscribeId:%{public}d switchType:%{public}d", subscribeId, switchType);
+    auto subscriber = std::make_shared<Subscriber>(subscribeId, sess, switchType);
     InsertSubScriber(std::move(subscriber));
     InitSessionDeleteCallback();
     return RET_OK;
@@ -106,12 +110,19 @@ bool SwitchSubscriberHandler::OnSubscribeSwitchEvent(std::shared_ptr<SwitchEvent
 {
     CHKPF(switchEvent);
     MMI_HILOGD("switchValue:%{public}d", switchEvent->GetSwitchValue());
-    DfxHisysevent::OnLidSwitchChanged(switchEvent->GetSwitchValue());
+
+    if (switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_LID) {
+        DfxHisysevent::OnLidSwitchChanged(switchEvent->GetSwitchValue());
+    }
 
     bool handled = false;
     for (const auto &subscriber : subscribers_) {
-        NotifySubscriber(switchEvent, subscriber);
-        handled = true;
+        if (subscriber->switchType_ == switchEvent->GetSwitchType() ||
+            (subscriber->switchType_ == SwitchEvent::SwitchType::SWITCH_DEFAULT &&
+                switchEvent->GetSwitchType() != SwitchEvent::SwitchType::SWITCH_PRIVACY)) {
+            NotifySubscriber(switchEvent, subscriber);
+            handled = true;
+        }
     }
     MMI_HILOGD("%{public}s", handled ? "true" : "false");
     return handled;

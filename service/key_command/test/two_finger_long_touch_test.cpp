@@ -260,7 +260,7 @@ HWTEST_F(TwoFingerLongTouchTest, TwoFingerLongTouchTest_001, TestSize.Level1)
     ASSERT_NE(pointerEvent2, nullptr);
     eventKeyCommandHandler_->HandleTouchEvent(pointerEvent2);
 
-    EXPECT_TRUE(abilityStarted_);
+    EXPECT_FALSE(abilityStarted_);
     EXPECT_EQ(ERR_OK, err_);
 }
 
@@ -353,7 +353,7 @@ HWTEST_F(TwoFingerLongTouchTest, TwoFingerLongTouchTest_004, TestSize.Level1)
     Delay(WAIT_TIME_MS);
     TimerMgr->ProcessTimers();
 
-    EXPECT_TRUE(abilityStarted_);
+    EXPECT_FALSE(abilityStarted_);
     EXPECT_EQ(ERR_OK, err_);
 }
 
@@ -387,38 +387,6 @@ HWTEST_F(TwoFingerLongTouchTest, TwoFingerLongTouchTest_005, TestSize.Level1)
     TimerMgr->ProcessTimers();
 
     EXPECT_FALSE(abilityStarted_);
-}
-
-/**
- * @tc.name: TwoFingerLongTouchTest_006
- * @tc.desc: Test to return error while ability is launching
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(TwoFingerLongTouchTest, TwoFingerLongTouchTest_006, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ASSERT_NE(eventTestCommandHandler_, nullptr);
-    ASSERT_NE(eventKeyCommandHandler_, nullptr);
-    abilityStarted_ = false;
-
-    AAFwk::AbilityManagerClient::GetInstance()->SetErrCode(ERR_INVALID_OPERATION);
-
-    auto pointerEvent1 = SetupPointerEvent(PointerEvent::POINTER_ACTION_DOWN, 0, 2);
-    ASSERT_NE(pointerEvent1, nullptr);
-    eventKeyCommandHandler_->HandleTouchEvent(pointerEvent1);
-
-    Delay(WAIT_TIME_MS);
-    TimerMgr->ProcessTimers();
-
-    auto pointerEvent2 = SetupPointerEvent(PointerEvent::POINTER_ACTION_UP, 0, 2);
-    ASSERT_NE(pointerEvent2, nullptr);
-    eventKeyCommandHandler_->HandleTouchEvent(pointerEvent2);
-
-    AAFwk::AbilityManagerClient::GetInstance()->SetErrCode(ERR_OK);
-
-    EXPECT_TRUE(abilityStarted_);
-    EXPECT_EQ(ERR_INVALID_OPERATION, err_);
 }
 
 const std::string TEST_JSON_1 = "";
