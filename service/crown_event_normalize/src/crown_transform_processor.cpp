@@ -118,7 +118,8 @@ int32_t CrownTransformProcessor::HandleCrownRotateEnd()
     return HandleCrownRotatePostInner(0.0, 0.0, PointerEvent::POINTER_ACTION_CROWN_ROTATE_END);
 }
 
-int32_t CrownTransformProcessor::HandleCrownRotateBeginAndUpdate(const struct libinput_event_pointer *rawPointerEvent, int32_t action)
+int32_t CrownTransformProcessor::HandleCrownRotateBeginAndUpdate(const struct libinput_event_pointer *rawPointerEvent,
+    int32_t action)
 {
     CALL_DEBUG_ENTER;
     CHKPR(rawPointerEvent, ERROR_NULL_POINTER);
@@ -127,7 +128,7 @@ int32_t CrownTransformProcessor::HandleCrownRotateBeginAndUpdate(const struct li
     double scrollValue = libinput_event_pointer_get_scroll_value_v120(rawPointerEvent,
         LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL);
     double degree = scrollValue * SCALE_RATIO;
-    double angularVelocity = 0.0;    
+    double angularVelocity = 0.0;
     
     if (action == PointerEvent::POINTER_ACTION_CROWN_ROTATE_BEGIIN) {
         lastTime_ = currentTime;
