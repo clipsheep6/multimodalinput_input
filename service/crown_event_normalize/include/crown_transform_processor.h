@@ -38,6 +38,10 @@ public:
     void Dump(int32_t fd, const std::vector<std::string> &args);
 
 private:
+    int32_t HandleCrownRotateBegin(const struct libinput_event_pointer *rawPointerEvent);
+    int32_t HandleCrownRotateUpdate(const struct libinput_event_pointer *rawPointerEvent);
+    int32_t HandleCrownRotateEnd();
+    int32_t HandleCrownRotateBeginAndUpdate(const struct libinput_event_pointer *rawPointerEvent, int32_t action);
     void DumpInner();
     
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };

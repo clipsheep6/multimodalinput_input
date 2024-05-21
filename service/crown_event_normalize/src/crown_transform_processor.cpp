@@ -14,8 +14,8 @@
  */
 
 #include "event_log_helper.h"
-#include "input_event_handler.h"
 #include "input_device_manager.h"
+#include "input_event_handler.h"
 
 #include "crown_transform_processor.h"
 
@@ -58,25 +58,13 @@ int32_t CrownTransformProcessor::NormalizeRotateEvent(const struct libinput_even
 {
     CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
-    CHKPR(pointerEvent_, ERROR_NULL_POINTER);
 
     struct libinput_event_pointer *rawPointerEvent = libinput_event_get_pointer_event(event);
     CHKPR(rawPointerEvent, ERROR_NULL_POINTER);
     libinput_pointer_axis_source source = libinput_event_pointer_get_axis_source(rawPointerEvent);
     if (source == LIBINPUT_POINTER_AXIS_SOURCE_WHEEL) {
-        double scrollValue = libinput_event_pointer_get_scroll_value_v120(rawPointerEvent,
-            LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL);
-        double degree = scrollValue * SCALE_RATIO;
-        double angularVelocity = 0.0;
-
-        uint64_t currentTime = libinput_event_pointer_get_time_usec(rawPointerEvent);
-        uint64_t intervalTime = currentTime - lastTime_;
-
         if (TimerMgr->IsExist(timerId_)) {
-            if (intervalTime != 0) {
-                angularVelocity = (degree * MICROSECONDS_PER_SECOND) / intervalTime);
-            }
-            HandleCrownRotatePostInner(angularVelocity, degree, PointerEvent::POINTER_ACTION_CROWN_ROTATE_UPDATE);
+            HandleCrownRotateUpdate(rawPointerEvent);
             TimerMgr->ResetTimer(timerId_);
             MMI_HILOGD("Wheel axis update, crown rotate update");
         } else {
@@ -90,14 +78,13 @@ int32_t CrownTransformProcessor::NormalizeRotateEvent(const struct libinput_even
                 sharedProcessor->timerId_ = -1;
                 auto pointerEvent = sharedProcessor->GetPointerEvent();
                 CHKPV(pointerEvent);
-                HandleCrownRotatePostInner(0.0, 0.0, PointerEvent::POINTER_ACTION_CROWN_ROTATE_END);
+                HandleCrownRotateEnd();
                 MMI_HILOGI("Wheel axis end, crown rotate end");
-                lastTime_ = 0;
                 auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
                 CHKPV(inputEventNormalizeHandler);
                 inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
             });
-            HandleCrownRotatePostInner(angularVelocity, degree, PointerEvent::POINTER_ACTION_CROWN_ROTATE_BEGIN);
+            HandleCrownRotateBegin(rawPointerEvent);
             MMI_HILOGI("Wheel axis begin, crown rotate begin");
         }
 
@@ -105,13 +92,62 @@ int32_t CrownTransformProcessor::NormalizeRotateEvent(const struct libinput_even
         CHKPR(eventMonitorHandler, ERROR_NULL_POINTER);
         eventMonitorHandler->OnHandleEvent(pointerEvent);
         DumpInner();
-        lastTime_ = currentTime;
+        return RET_OK;
+    } else {
+        MMI_HILOGE("The source is invalid, source: %{public}d", source);
+        return RET_ERR;
     }
-
-    return RET_OK;
 }
 
-void CrownTransformProcessor::HandleCrownRotatePostInner(double angularVelocity, double degree, int32_t actoin)
+int32_t CrownTransformProcessor::HandleCrownRotateBegin(const struct libinput_event_pointer *rawPointerEvent)
+{
+    CALL_DEBUG_ENTER;
+    return HandleCrownRotateBeginAndUpdate(rawPointerEvent, POINTER_ACTION_CROWN_ROTATE_BEGIN);
+}
+
+int32_t CrownTransformProcessor::HandleCrownRotateUpdate(const struct libinput_event_pointer *rawPointerEvent)
+{
+    CALL_DEBUG_ENTER;
+    return HandleCrownRotateBeginAndUpdate(rawPointerEvent, POINTER_ACTION_CROWN_ROTATE_UPDATE);
+}
+
+int32_t CrownTransformProcessor::HandleCrownRotateEnd()
+{
+    CALL_DEBUG_ENTER;
+    lastTime_ = 0;
+    return HandleCrownRotatePostInner(0.0, 0.0, PointerEvent::POINTER_ACTION_CROWN_ROTATE_END);
+}
+
+int32_t CrownTransformProcessor::HandleCrownRotateBeginAndUpdate(const struct libinput_event_pointer *rawPointerEvent, int32_t action)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(rawPointerEvent, ERROR_NULL_POINTER);
+
+    uint64_t currentTime = libinput_event_pointer_get_time_usec(rawPointerEvent);
+    double scrollValue = libinput_event_pointer_get_scroll_value_v120(rawPointerEvent,
+        LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL);
+    double degree = scrollValue * SCALE_RATIO;
+    double angularVelocity = 0.0;    
+    
+    if (action == PointerEvent::POINTER_ACTION_CROWN_ROTATE_BEGIIN) {
+        lastTime_ = currentTime;
+    } else if (action == PointerEvent::POINTER_ACTION_CROWN_ROTATE_UPDATE) {
+        uint64_t intervalTime = currentTime - lastTime_;
+        if (intervalTime > 0) {
+            angularVelocity = (degree * MICROSECONDS_PER_SECOND) / intervalTime);
+        } else {
+            degree = 0.0;
+        }
+        lastTime_ = currentTime;
+    } else {
+        MMI_HILOGE("The action is invalid, action: %{public}d", action);
+        return RET_ERR;
+    }
+
+    return HandleCrownRotatePostInner(angularVelocity, degree, action);
+}
+
+void CrownTransformProcessor::HandleCrownRotatePostInner(double angularVelocity, double degree, int32_t action)
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent_);
