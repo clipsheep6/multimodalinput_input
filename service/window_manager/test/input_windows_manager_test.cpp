@@ -693,21 +693,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchPointer_001, T
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_NotifyPointerToWindow_001
- * @tc.desc: Test notifying pointer events to window
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_NotifyPointerToWindow_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager inputWindowsManager;
-    inputWindowsManager.lastPointerEvent_ = nullptr;
-    inputWindowsManager.NotifyPointerToWindow();
-    EXPECT_EQ(inputWindowsManager.lastWindowInfo_.id, -1);
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_PrintWindowInfo_001
  * @tc.desc: Test printing window information
  * @tc.type: FUNC

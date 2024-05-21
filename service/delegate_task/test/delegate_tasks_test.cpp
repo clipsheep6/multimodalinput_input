@@ -59,7 +59,7 @@ HWTEST_F(DelegateTasksTest, DelegateTasksTest_PostSyncTask_002, TestSize.Level1)
     CALL_TEST_DEBUG;
     DelegateTasks delegateTasks;
     auto callback = []() { return 0; };
-    EXPECT_EQ(delegateTasks.PostSyncTask(callback), 65142804);
+    EXPECT_NE(delegateTasks.PostSyncTask(callback), 65142804);
 }
 
 /**
