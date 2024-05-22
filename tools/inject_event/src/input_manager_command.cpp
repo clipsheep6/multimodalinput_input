@@ -174,7 +174,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
         {"interval", required_argument, nullptr, 'i'},
         {nullptr, 0, nullptr, 0}
     };
-    struct option touchpadSensorOptions[] = {
+    struct option touchPadSensorOptions[] = {
         {"rotate", required_argument, nullptr, 'r'},
         {"swipe", required_argument, nullptr, 's'},
         {"pinch", required_argument, nullptr, 'p'},
@@ -1426,7 +1426,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                         case 'r': {
                             int32_t rotateValue = 0;
                             int32_t actionType = POINTER_ACTION_MOVE;
-                            if(argc>=4) {
+                            if(argc >= 4) {
                                 if (!StrToInt(optarg, rotateValue)) {
                                     std::cout << "Invalid angle data" << std::endl;
                                     return RET_ERR;
@@ -1456,7 +1456,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                     }
                 }
                 break;
-            }           
+            }
             case '?': {
                 ShowUsage();
                 return ERR_OK;
