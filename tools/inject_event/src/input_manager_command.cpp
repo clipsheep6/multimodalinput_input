@@ -156,7 +156,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
         {"interval", required_argument, nullptr, 'i'},
         {nullptr, 0, nullptr, 0}
     };
-    struct option touchPadOptions[] = {
+    struct option touchSensorOptions[] = {
         {"move", required_argument, nullptr, 'm'},
         {"down", required_argument, nullptr, 'd'},
         {"up", required_argument, nullptr, 'u'},
@@ -174,21 +174,13 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
         {"interval", required_argument, nullptr, 'i'},
         {nullptr, 0, nullptr, 0}
     };
-    // struct option touchPadSensorOptions[] = {
-    //     {"rotate", required_argument, nullptr, 'r'},
-    //     {"swipe", required_argument, nullptr, 's'},
-    //     {"pinch", required_argument, nullptr, 'p'},
-    //     {"interval", required_argument, nullptr, 'i'},
-    //     {nullptr, 0, nullptr, 0}
-    // };
-    struct option touchSensorOptions[] = {
-        {"move", required_argument, nullptr, 'm'},
-        {"down", required_argument, nullptr, 'd'},
-        {"up", required_argument, nullptr, 'u'},
-        {"click", required_argument, nullptr, 'c'},
+    struct option padSensorOptions[] = {
+        {"rotate", required_argument, nullptr, 'r'},
+        {"swipe", required_argument, nullptr, 's'},
+        {"pinch", required_argument, nullptr, 'p'},
         {"interval", required_argument, nullptr, 'i'},
         {nullptr, 0, nullptr, 0}
-    };   
+    };
     int32_t c = 0;
     int32_t optionIndex = 0;
     optind = 0;
@@ -1429,7 +1421,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 break;
             }
             case 'P': {
-                while ((c = getopt_long(argc, argv, "r:s:p:i", touchPadSensorOptions, &optionIndex)) != -1) {
+                while ((c = getopt_long(argc, argv, "r:s:p:i", padSensorOptions, &optionIndex)) != -1) {
                     switch (c) {
                         case 'r': {
                             int32_t rotateValue = 0;
