@@ -687,7 +687,10 @@ ohos_unittest("NapProcessTest") {
     "${mmi_path}/util:libmmi-util",
   ]
 
-  external_deps = [ "c_utils:utils" ]
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+  ]
 }
 
 ohos_unittest("MouseEventNormalizeTest") {
@@ -714,6 +717,7 @@ ohos_unittest("MouseEventNormalizeTest") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]
+  external_deps = [ "hilog:libhilog" ]
 }
 
 ohos_unittest("MonitorTest") {
@@ -911,7 +915,6 @@ ohos_unittest("InterceptorTest") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]
-
   external_deps = [ "hilog:libhilog" ]
 }
 
@@ -974,7 +977,10 @@ ohos_unittest("EventDispatchTest") {
     "${mmi_path}/util:libmmi-util",
   ]
 
-  external_deps = [ "c_utils:utils" ]
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+  ]
 }
 
 ohos_unittest("ServerMsgHandlerTest") {
@@ -1064,6 +1070,7 @@ ohos_unittest("DisplayStateManagerTest") {
   external_deps = [
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
+    "hilog:libhilog",
     "image_framework:image_native",
     "window_manager:libdm",
     "window_manager:libwm",
@@ -1165,6 +1172,7 @@ ohos_unittest("ConnectManagerTest") {
     "ability_runtime:app_manager",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
+    "hilog:libhilog",
     "image_framework:image_native",
     "ipc:ipc_single",
     "security_component_manager:libsecurity_component_sdk",
