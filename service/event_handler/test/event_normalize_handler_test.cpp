@@ -192,5 +192,31 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_SetOriginPointerId
     pointerEvent = nullptr;
     ASSERT_EQ(ret, ERROR_NULL_POINTER);
 }
+
+/**
+ * @tc.name: EventNormalizeHandlerTest_SetOriginPointerId_001
+ * @tc.desc: Test the function SetOriginPointerId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandlerEvent_001, TestSize.Level1)
+{
+    EventNormalizeHandler handler;
+    int64_t = frameTime = 10000;
+    struct libinput_event *ev;
+    struct libinput *li;
+    struct litest_device *dev;
+
+    li = litest_create_context();
+
+    dev = litest_add_device(li, LITEST_MOUSE);
+    libinput_dispatch(li);
+
+    ev = libinput_get_event(li);
+
+    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(ev, frameTime));
+    litest_delete_device(dev);
+    libinput_unref(li);
+}
 } // namespace MMI
 } // namespace OHOS
