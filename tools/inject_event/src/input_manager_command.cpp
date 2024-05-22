@@ -1426,11 +1426,12 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                         case 'r': {
                             int32_t rotateValue = 0;
                             int32_t actionType = POINTER_ACTION_MOVE;
-                            if(argc>=4){
-                                if (!StrToInt(argv[3], rotateValue)) {
+                            if(argc>=4) {
+                                if (!StrToInt(optarg, rotateValue)) {
                                     std::cout << "Invalid angle data" << std::endl;
                                     return RET_ERR;
                                 }
+                                std::cout << "Invalid rotateValue:"<<rotateValue << std::endl;
                                 auto pointerEvent = PointerEvent::Create();
                                 PointerEvent::PointerItem item;
                                 item.SetPressed(true);
@@ -1455,7 +1456,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                     }
                 }
                 break;
-            }            
+            }           
             case '?': {
                 ShowUsage();
                 return ERR_OK;
