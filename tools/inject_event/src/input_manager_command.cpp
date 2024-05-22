@@ -166,7 +166,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
         {"knuckle", no_argument, nullptr, 'k'},
         {nullptr, 0, nullptr, 0}
     };
-    struct option joystickSensorOptions[] = {
+    struct option touchPadSensorOptions[] = {
         {"move", required_argument, nullptr, 'm'},
         {"down", required_argument, nullptr, 'd'},
         {"up", required_argument, nullptr, 'u'},
@@ -174,13 +174,21 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
         {"interval", required_argument, nullptr, 'i'},
         {nullptr, 0, nullptr, 0}
     };
-    struct option touchPadSensorOptions[] = {
-        {"rotate", required_argument, nullptr, 'r'},
-        {"swipe", required_argument, nullptr, 's'},
-        {"pinch", required_argument, nullptr, 'p'},
+    // struct option touchPadSensorOptions[] = {
+    //     {"rotate", required_argument, nullptr, 'r'},
+    //     {"swipe", required_argument, nullptr, 's'},
+    //     {"pinch", required_argument, nullptr, 'p'},
+    //     {"interval", required_argument, nullptr, 'i'},
+    //     {nullptr, 0, nullptr, 0}
+    // };
+    struct option joystickSensorOptions[] = {
+        {"move", required_argument, nullptr, 'm'},
+        {"down", required_argument, nullptr, 'd'},
+        {"up", required_argument, nullptr, 'u'},
+        {"click", required_argument, nullptr, 'c'},
         {"interval", required_argument, nullptr, 'i'},
         {nullptr, 0, nullptr, 0}
-    };
+    };   
     int32_t c = 0;
     int32_t optionIndex = 0;
     optind = 0;
