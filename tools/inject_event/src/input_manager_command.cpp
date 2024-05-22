@@ -1421,12 +1421,12 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 break;
             }
             case 'P': {
-                while ((c = getopt_long(argc, argv, "r:s:p:i", touchpadSensorOptions, &optionIndex)) != -1) {
+                while ((c = getopt_long(argc, argv, "r:s:p:i", touchPadSensorOptions, &optionIndex)) != -1) {
                     switch (c) {
                         case 'r': {
                             int32_t rotateValue = 0;
                             int32_t actionType = POINTER_ACTION_MOVE;
-                            if(argc >= 4) {
+                            if (argc >= 4) {
                                 if (!StrToInt(optarg, rotateValue)) {
                                     std::cout << "Invalid angle data" << std::endl;
                                     return RET_ERR;
