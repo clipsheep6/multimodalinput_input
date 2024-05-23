@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace MMI {
 enum class MulFingersTap : int32_t {
-    NOTAP = 0,
+    NO_TAP = 0,
     TRIPLETAP = 3,
     QUADTAP = 4,
     QUINTTAP = 5,
@@ -44,7 +44,7 @@ public:
     };
 
     int32_t HandleMulFingersTap(struct libinput_event_touch *event, int32_t type);
-    MulFingersTap GetMultiFingersState();
+    MulFingersTap GetMultiFingersState() const;
     void SetMULTI_FINGERTAP_HDRDefault(bool isAllDefault = true);
     bool ClearPointerItems(std::shared_ptr<PointerEvent> pointer);
     bool IsInvalidMulTapGesture(struct libinput_event_touch *event);
@@ -52,17 +52,17 @@ public:
     bool CanUnsetPointerItem(struct libinput_event_touch *event);
 
 private:
-    int32_t downCnt = 0;
-    int32_t upCnt = 0;
-    int32_t motionCnt = 0;
+    int32_t downCnt_ = 0;
+    int32_t upCnt_ = 0;
+    int32_t motionCnt_ = 0;
     TapTrends tapTrends_ = TapTrends::BEGIN;
-    MulFingersTap multiFingersState = MulFingersTap::NOTAP;
-    uint64_t lastTime = 0;
-    uint64_t beginTime = 0;
-    std::map<int32_t, std::pair<float, float>> pointerMaps;
-    const uint64_t perTimeThreshold = 150 * 1e3;
-    const uint64_t totalTimeThreshold = 500 * 1e3;
-    const float distanceThreshold = 0.15;
+    MulFingersTap multiFingersState_ = MulFingersTap::NO_TAP;
+    uint64_t lastTime_ = 0;
+    uint64_t beginTime_ = 0;
+    std::map<int32_t, std::pair<float, float>> pointerMaps_;
+    const uint64_t perTimeThreshold_ = 150 * 1e3;
+    const uint64_t totalTimeThreshold_ = 500 * 1e3;
+    const float distanceThreshold_ = 0.15F;
 };
 #define MULTI_FINGERTAP_HDR ::OHOS::DelayedSingleton<MultiFingersTapHandler>::GetInstance()
 

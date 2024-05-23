@@ -424,7 +424,7 @@ int32_t InputEventDataTransformation::MarshallingEnhanceData(std::shared_ptr<Poi
         pkt << 0;
         free(secCompPointEvent);
         secCompPointEvent = nullptr;
-        MMI_HILOGD("GetPointerEventEnhanceData failed!");
+        MMI_HILOGD("GetPointerEventEnhanceData failed");
         return RET_ERR;
     }
     pkt << enHanceDataLen;

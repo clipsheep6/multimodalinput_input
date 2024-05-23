@@ -1198,7 +1198,7 @@ bool KeyEvent::WriteToParcel(Parcel &out) const
     WRITEBOOL(out, repeat_);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     WRITEINT32(out, static_cast<int32_t>(enhanceData_.size()));
-    for (uint32_t i = 0; i < enhanceData_.size(); i++) {
+    for (size_t i = 0; i < enhanceData_.size(); i++) {
         WRITEUINT32(out, enhanceData_[i]);
     }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
@@ -1353,7 +1353,7 @@ std::string_view KeyEvent::ActionToShortStr(int32_t action)
 }
 
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-void KeyEvent::SetEnhanceData(const std::vector<uint8_t> enhanceData)
+void KeyEvent::SetEnhanceData(const std::vector<uint8_t> &enhanceData)
 {
     enhanceData_ = enhanceData;
 }
