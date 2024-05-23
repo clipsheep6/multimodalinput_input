@@ -81,11 +81,10 @@ constexpr int32_t SHELL_WINDOW_COUNT = 1;
 #endif // OHOS_BUILD_ENABLE_ANCO
 constexpr double HALF_RATIO = 0.5;
 constexpr int32_t TWOFOLD = 2;
-const std::string bindCfgFileName = "/data/service/el1/public/multimodalinput/display_bind.cfg";
-const std::string mouseFileName = "mouse_settings.xml";
-const std::string defaultIconPath = "/system/etc/multimodalinput/mouse_icon/Default.svg";
-
-const std::string navigationSwitchName = "settings.input.stylus_navigation_hint";
+constexpr std::string_view BIND_CFG_FILE_NAME = "/data/service/el1/public/multimodalinput/display_bind.cfg";
+constexpr std::string_view MOUSE_FILE_NAME = "mouse_settings.xml";
+constexpr std::string_view DEFAULT_ICON_PATH = "/system/etc/multimodalinput/mouse_icon/Default.svg";
+constexpr std::string_view NAVIGATION_SWITCH_NAME = "settings.input.stylus_navigation_hint";
 } // namespace
 
 enum PointerHotArea : int32_t {
@@ -113,9 +112,9 @@ std::shared_ptr<InputWindowsManager> InputWindowsManager::GetInstance()
     return instance_;
 }
 
-InputWindowsManager::InputWindowsManager() : bindInfo_(bindCfgFileName)
+InputWindowsManager::InputWindowsManager() : bindInfo_(BIND_CFG_FILE_NAME)
 {
-    MMI_HILOGI("Bind cfg file name:%{public}s", bindCfgFileName.c_str());
+    MMI_HILOGI("Bind cfg file name:%{public}s", BIND_CFG_FILE_NAME.c_str());
     lastWindowInfo_.id = -1;
     lastWindowInfo_.pid = -1;
     lastWindowInfo_.uid = -1;
@@ -843,7 +842,7 @@ void InputWindowsManager::SetWindowPointerStyle(WindowArea area, int32_t pid, in
     lastPointerStyle_.id = pointerStyle.id;
     IconStyle iconStyle = IPointerDrawingManager::GetInstance()->GetIconStyle(MOUSE_ICON(pointerStyle.id));
     if (windowId != GLOBAL_WINDOW_ID && (pointerStyle.id == MOUSE_ICON::DEFAULT &&
-        iconStyle.iconPath != defaultIconPath)) {
+        iconStyle.iconPath != DEFAULT_ICON_PATH)) {
         PointerStyle style;
         int32_t ret = WinMgr->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style);
         if (ret != RET_OK) {
@@ -1922,7 +1921,7 @@ int32_t InputWindowsManager::SetHoverScrollState(bool state)
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Set mouse hover scroll state:%{public}d", state);
     std::string name = "isEnableHoverScroll";
-    return PREFERENCES_MGR->SetBoolValue(name, mouseFileName, state);
+    return PREFERENCES_MGR->SetBoolValue(name, BIND_CFG_FILE_NAME, state);
 }
 
 bool InputWindowsManager::GetHoverScrollState() const
@@ -2192,11 +2191,11 @@ bool InputWindowsManager::SkipNavigationWindow(WindowInputType windowType, int32
         return false;
     }
     if (!isOpenAntiMisTakeObserver_) {
-        antiMistake_.switchName = navigationSwitchName;
+        antiMistake_.switchName = NAVIGATION_SWITCH_NAME;
         CreateAntiMisTakeObserver(antiMistake_);
         isOpenAntiMisTakeObserver_ = true;
         MMI_HILOGI("Get anti mistake touch switch start");
-        SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(navigationSwitchName,
+        SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(NAVIGATION_SWITCH_NAME,
             antiMistake_.isOpen);
         MMI_HILOGI("Get anti mistake touch switch end");
     }
