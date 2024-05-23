@@ -268,7 +268,7 @@ void PointerDrawingManager::CreateMagicCursorChangeObserver()
 {
     // Listening enabling cursor deformation and color inversion
     SettingObserver::UpdateFunc func = [](const std::string& key) {
-        bool statusValue = false;
+        bool statusValue = true;
         auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(key, statusValue);
         if (ret != RET_OK) {
             MMI_HILOGE("Get value from setting date fail");
