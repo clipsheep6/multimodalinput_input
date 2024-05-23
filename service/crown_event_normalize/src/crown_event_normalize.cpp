@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "define_multimodal.h"
 #include "input_device_manager.h"
 
 #include "crown_event_normalize.h"
@@ -28,7 +29,10 @@ namespace {
 const std::string CROWN_SOURCE = "rotary_crown";
 } // namespace
 
-std::shared_ptr<CrownTransformProcessor> CrownEventNormalize::GetProcessor(int32_t deviceId) const
+CrownEventNormalize::CrownEventNormalize() {}
+CrownEventNormalize::~CrownEventNormalize() {}
+
+std::shared_ptr<CrownTransformProcessor> CrownEventNormalize::GetProcessor(int32_t deviceId)
 {
     std::shared_ptr<CrownTransformProcessor> processor { nullptr };
     auto it = processors_.find(deviceId);
@@ -68,7 +72,7 @@ int32_t CrownEventNormalize::GetCurrentDeviceId() const
     return currentDeviceId_;
 }
 
-bool CrownEventNormalize::IsCrownEvent(const struct libinput_event *event)
+bool CrownEventNormalize::IsCrownEvent(struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
     CHKPF(event);
@@ -89,7 +93,7 @@ bool CrownEventNormalize::IsCrownEvent(const struct libinput_event *event)
         } else if (type == LIBINPUT_EVENT_POINTER_AXIS) {
             struct libinput_event_pointer *pointerEvent = libinput_event_get_pointer_event(event);
             CHKPF(pointerEvent);
-            auto source = libinput_event_pointer_get_axis_source(event);
+            auto source = libinput_event_pointer_get_axis_source(pointerEvent);
             if (source != LIBINPUT_POINTER_AXIS_SOURCE_WHEEL) {
                 MMI_HILOGD("Not crown event, unknown axis source: %{public}d", source);
                 return false;
@@ -102,7 +106,7 @@ bool CrownEventNormalize::IsCrownEvent(const struct libinput_event *event)
     return false;
 }
 
-int32_t CrownEventNormalize::NormalizeKeyEvent(const struct libinput_event *event)
+int32_t CrownEventNormalize::NormalizeKeyEvent(struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
@@ -123,7 +127,7 @@ int32_t CrownEventNormalize::NormalizeKeyEvent(const struct libinput_event *even
     return processor->NormalizeKeyEvent(event);
 }
 
-int32_t CrownEventNormalize::NormalizeRotateEvent(const struct libinput_event *event)
+int32_t CrownEventNormalize::NormalizeRotateEvent(struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);

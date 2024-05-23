@@ -33,15 +33,16 @@ public:
     explicit CrownTransformProcessor(int32_t deviceId);
     ~CrownTransformProcessor() = default;
     std::shared_ptr<PointerEvent> GetPointerEvent() const;
-    int32_t NormalizeKeyEvent(const struct libinput_event *event);
-    int32_t NormalizeRotateEvent(const struct libinput_event *event);
+    int32_t NormalizeKeyEvent(struct libinput_event *event);
+    int32_t NormalizeRotateEvent(struct libinput_event *event);
     void Dump(int32_t fd, const std::vector<std::string> &args);
 
 private:
-    int32_t HandleCrownRotateBegin(const struct libinput_event_pointer *rawPointerEvent);
-    int32_t HandleCrownRotateUpdate(const struct libinput_event_pointer *rawPointerEvent);
+    int32_t HandleCrownRotateBegin(struct libinput_event_pointer *rawPointerEvent);
+    int32_t HandleCrownRotateUpdate(struct libinput_event_pointer *rawPointerEvent);
     int32_t HandleCrownRotateEnd();
-    int32_t HandleCrownRotateBeginAndUpdate(const struct libinput_event_pointer *rawPointerEvent, int32_t action);
+    int32_t HandleCrownRotateBeginAndUpdate(struct libinput_event_pointer *rawPointerEvent, int32_t action);
+    void HandleCrownRotatePostInner(double angularVelocity, double degree, int32_t action);
     void DumpInner();
     
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };

@@ -13,6 +13,10 @@
  * limitations under the License.
  */
 
+#include <cinttypes>
+#include <functional>
+
+#include "define_multimodal.h"
 #include "event_log_helper.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
@@ -42,7 +46,7 @@ std::shared_ptr<PointerEvent> CrownTransformProcessor::GetPointerEvent() const
     return pointerEvent_;
 }
 
-int32_t CrownTransformProcessor::NormalizeKeyEvent(const struct libinput_event *event)
+int32_t CrownTransformProcessor::NormalizeKeyEvent(struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
@@ -55,7 +59,7 @@ int32_t CrownTransformProcessor::NormalizeKeyEvent(const struct libinput_event *
     return RET_OK;
 }
 
-int32_t CrownTransformProcessor::NormalizeRotateEvent(const struct libinput_event *event)
+int32_t CrownTransformProcessor::NormalizeRotateEvent(struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
@@ -79,7 +83,7 @@ int32_t CrownTransformProcessor::NormalizeRotateEvent(const struct libinput_even
                 sharedProcessor->timerId_ = -1;
                 auto pointerEvent = sharedProcessor->GetPointerEvent();
                 CHKPV(pointerEvent);
-                HandleCrownRotateEnd();
+                sharedProcessor->HandleCrownRotateEnd();
                 MMI_HILOGI("Wheel axis end, crown rotate end");
                 auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
                 CHKPV(inputEventNormalizeHandler);
@@ -90,7 +94,7 @@ int32_t CrownTransformProcessor::NormalizeRotateEvent(const struct libinput_even
         }
 
         auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
-        CHKPV(inputEventNormalizeHandler);
+        CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
         inputEventNormalizeHandler->HandlePointerEvent(pointerEvent_);
         DumpInner();
         return RET_OK;
@@ -100,13 +104,13 @@ int32_t CrownTransformProcessor::NormalizeRotateEvent(const struct libinput_even
     }
 }
 
-int32_t CrownTransformProcessor::HandleCrownRotateBegin(const struct libinput_event_pointer *rawPointerEvent)
+int32_t CrownTransformProcessor::HandleCrownRotateBegin(struct libinput_event_pointer *rawPointerEvent)
 {
     CALL_DEBUG_ENTER;
     return HandleCrownRotateBeginAndUpdate(rawPointerEvent, PointerEvent::POINTER_ACTION_CROWN_ROTATE_BEGIN);
 }
 
-int32_t CrownTransformProcessor::HandleCrownRotateUpdate(const struct libinput_event_pointer *rawPointerEvent)
+int32_t CrownTransformProcessor::HandleCrownRotateUpdate(struct libinput_event_pointer *rawPointerEvent)
 {
     CALL_DEBUG_ENTER;
     return HandleCrownRotateBeginAndUpdate(rawPointerEvent, PointerEvent::POINTER_ACTION_CROWN_ROTATE_UPDATE);
@@ -120,7 +124,7 @@ int32_t CrownTransformProcessor::HandleCrownRotateEnd()
     return RET_OK;
 }
 
-int32_t CrownTransformProcessor::HandleCrownRotateBeginAndUpdate(const struct libinput_event_pointer *rawPointerEvent,
+int32_t CrownTransformProcessor::HandleCrownRotateBeginAndUpdate(struct libinput_event_pointer *rawPointerEvent,
     int32_t action)
 {
     CALL_DEBUG_ENTER;
@@ -137,7 +141,7 @@ int32_t CrownTransformProcessor::HandleCrownRotateBeginAndUpdate(const struct li
     } else if (action == PointerEvent::POINTER_ACTION_CROWN_ROTATE_UPDATE) {
         uint64_t intervalTime = currentTime - lastTime_;
         if (intervalTime > 0) {
-            angularVelocity = (degree * MICROSECONDS_PER_SECOND) / intervalTime);
+            angularVelocity = (degree * MICROSECONDS_PER_SECOND) / intervalTime;
         } else {
             degree = 0.0;
         }
@@ -174,7 +178,7 @@ void CrownTransformProcessor::HandleCrownRotatePostInner(double angularVelocity,
 
 void CrownTransformProcessor::DumpInner()
 {
-    EventLogHelper::PrintEventData(pointerEvent_);
+    EventLogHelper::PrintEventData(pointerEvent_, MMI_LOG_HEADER);
     auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
     CHKPV(device);
     MMI_HILOGI("The crown device id: %{public}d, event created by: %{public}s", pointerEvent_->GetId(),

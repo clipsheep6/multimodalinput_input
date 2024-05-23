@@ -32,15 +32,15 @@ class CrownEventNormalize final : public std::enable_shared_from_this<CrownEvent
 
 public:
     DISALLOW_COPY_AND_MOVE(CrownEventNormalize);
-    bool IsCrownEvent(const struct libinput_event *event);
-    int32_t NormalizeKeyEvent(const struct libinput_event *event);
-    int32_t NormalizeRotateEvent(const struct libinput_event *event);
+    bool IsCrownEvent(struct libinput_event *event);
+    int32_t NormalizeKeyEvent(struct libinput_event *event);
+    int32_t NormalizeRotateEvent(struct libinput_event *event);
     void Dump(int32_t fd, const std::vector<std::string> &args);
 
     static constexpr int32_t CROWN_CODE_POWER = 116;
 
 private:
-    std::shared_ptr<CrownTransformProcessor> GetProcessor(int32_t deviceId) const;
+    std::shared_ptr<CrownTransformProcessor> GetProcessor(int32_t deviceId);
     std::shared_ptr<CrownTransformProcessor> GetCurrentProcessor() const;
     void SetCurrentDeviceId(int32_t deviceId);
     int32_t GetCurrentDeviceId() const;
