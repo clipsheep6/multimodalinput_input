@@ -487,13 +487,13 @@ void InputWindowsManager::UpdateDisplayIdAndName()
         newInfo.insert(std::make_pair(item.id, item.uniq));
     }
     auto oldInfo = bindInfo_.GetDisplayIdNames();
-    for (auto it = oldInfo.begin(); it != oldInfo.end();) {
-        if (newInfo.find(*it) == newInfo.end()) {
-            bindInfo_.RemoveDisplay(it->first);
-            oldInfo.erase(it++);
-        } else {
-            ++it;
-        }
+    auto newIt = newInfo.begin();
+    auto oldIt = oldInfo.begin();
+    while (newIt != newInfo.end()) {
+        bindInfo_.AddDisplay(newIt->first, newIt->second);
+    }
+    while (oldIt != oldInfo.end()) {
+        bindInfo_.RemoveDisplay(oldIt->first);
     }
     const auto &displayInfo = displayGroupInfo_.displaysInfo[0];
     bindInfo_.AddLocalDisplay(displayInfo.id, displayInfo.uniq);
