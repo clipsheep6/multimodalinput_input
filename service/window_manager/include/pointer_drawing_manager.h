@@ -39,7 +39,7 @@ namespace OHOS {
 namespace MMI {
 struct isMagicCursor {
     std::string name;
-    bool isShow { false };
+    bool isShow { true };
 };
 
 class PointerDrawingManager final : public IPointerDrawingManager,
