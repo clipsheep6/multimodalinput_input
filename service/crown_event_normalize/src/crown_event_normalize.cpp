@@ -24,9 +24,8 @@
 
 namespace OHOS {
 namespace MMI {
-#ifdef OHOS_BUILD_ENABLE_CROWN
 namespace {
-constexpr std::string CROWN_SOURCE = "rotary_crown";
+const std::string CROWN_SOURCE = "rotary_crown";
 } // namespace
 
 std::shared_ptr<CrownTransformProcessor> CrownEventNormalize::GetProcessor(int32_t deviceId) const
@@ -115,7 +114,7 @@ int32_t CrownEventNormalize::NormalizeKeyEvent(const struct libinput_event *even
         return PARAM_INPUT_INVALID;
     }
 
-    std::shared_ptr<CrownTransformProcessor> processor = GetProcessorId(deviceId);
+    std::shared_ptr<CrownTransformProcessor> processor = GetProcessor(deviceId);
     if (processor == nullptr) {
         MMI_HILOGE("Not found crown processor for deviceId: %{public}d", deviceId);
         return PARAM_INPUT_INVALID;
@@ -136,7 +135,7 @@ int32_t CrownEventNormalize::NormalizeRotateEvent(const struct libinput_event *e
         return PARAM_INPUT_INVALID;
     }
 
-    std::shared_ptr<CrownTransformProcessor> processor = GetProcessorId(deviceId);
+    std::shared_ptr<CrownTransformProcessor> processor = GetProcessor(deviceId);
     if (processor == nullptr) {
         MMI_HILOGE("Not found crown processor for deviceId: %{public}d", deviceId);
         return PARAM_INPUT_INVALID;
@@ -151,6 +150,5 @@ void CrownEventNormalize::Dump(int32_t fd, const std::vector<std::string> &args)
     CHKPV(processor);
     processor->Dump(fd, args);
 }
-#endif // OHOS_BUILD_ENABLE_CROWN
 } // namespace MMI
 } // namespace OHOS

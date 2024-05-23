@@ -32,8 +32,6 @@ class CrownEventNormalize final : public std::enable_shared_from_this<CrownEvent
 
 public:
     DISALLOW_COPY_AND_MOVE(CrownEventNormalize);
-    CrownEventNormalize() = default;
-    ~CrownEventNormalize() = default;
     bool IsCrownEvent(const struct libinput_event *event);
     int32_t NormalizeKeyEvent(const struct libinput_event *event);
     int32_t NormalizeRotateEvent(const struct libinput_event *event);

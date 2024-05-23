@@ -16,6 +16,8 @@
 #include "event_log_helper.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
+#include "timer_manager.h"
+#include "util_ex.h"
 
 #include "crown_transform_processor.h"
 
@@ -26,7 +28,6 @@
 
 namespace OHOS {
 namespace MMI {
-#ifdef OHOS_BUILD_ENABLE_CROWN
 namespace {
 constexpr double SCALE_RATIO = static_cast<double>(360) / 532;
 constexpr uint64_t MICROSECONDS_PER_SECOND = 1000 * 1000;
@@ -88,9 +89,9 @@ int32_t CrownTransformProcessor::NormalizeRotateEvent(const struct libinput_even
             MMI_HILOGI("Wheel axis begin, crown rotate begin");
         }
 
-        auto eventMonitorHandler = InputHandler->GetMonitorHandler();
-        CHKPR(eventMonitorHandler, ERROR_NULL_POINTER);
-        eventMonitorHandler->OnHandleEvent(pointerEvent);
+        auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+        CHKPV(inputEventNormalizeHandler);
+        inputEventNormalizeHandler->HandlePointerEvent(pointerEvent_);
         DumpInner();
         return RET_OK;
     } else {
@@ -102,20 +103,21 @@ int32_t CrownTransformProcessor::NormalizeRotateEvent(const struct libinput_even
 int32_t CrownTransformProcessor::HandleCrownRotateBegin(const struct libinput_event_pointer *rawPointerEvent)
 {
     CALL_DEBUG_ENTER;
-    return HandleCrownRotateBeginAndUpdate(rawPointerEvent, POINTER_ACTION_CROWN_ROTATE_BEGIN);
+    return HandleCrownRotateBeginAndUpdate(rawPointerEvent, PointerEvent::POINTER_ACTION_CROWN_ROTATE_BEGIN);
 }
 
 int32_t CrownTransformProcessor::HandleCrownRotateUpdate(const struct libinput_event_pointer *rawPointerEvent)
 {
     CALL_DEBUG_ENTER;
-    return HandleCrownRotateBeginAndUpdate(rawPointerEvent, POINTER_ACTION_CROWN_ROTATE_UPDATE);
+    return HandleCrownRotateBeginAndUpdate(rawPointerEvent, PointerEvent::POINTER_ACTION_CROWN_ROTATE_UPDATE);
 }
 
 int32_t CrownTransformProcessor::HandleCrownRotateEnd()
 {
     CALL_DEBUG_ENTER;
     lastTime_ = 0;
-    return HandleCrownRotatePostInner(0.0, 0.0, PointerEvent::POINTER_ACTION_CROWN_ROTATE_END);
+    HandleCrownRotatePostInner(0.0, 0.0, PointerEvent::POINTER_ACTION_CROWN_ROTATE_END);
+    return RET_OK;
 }
 
 int32_t CrownTransformProcessor::HandleCrownRotateBeginAndUpdate(const struct libinput_event_pointer *rawPointerEvent,
@@ -130,7 +132,7 @@ int32_t CrownTransformProcessor::HandleCrownRotateBeginAndUpdate(const struct li
     double degree = scrollValue * SCALE_RATIO;
     double angularVelocity = 0.0;
     
-    if (action == PointerEvent::POINTER_ACTION_CROWN_ROTATE_BEGIIN) {
+    if (action == PointerEvent::POINTER_ACTION_CROWN_ROTATE_BEGIN) {
         lastTime_ = currentTime;
     } else if (action == PointerEvent::POINTER_ACTION_CROWN_ROTATE_UPDATE) {
         uint64_t intervalTime = currentTime - lastTime_;
@@ -145,7 +147,8 @@ int32_t CrownTransformProcessor::HandleCrownRotateBeginAndUpdate(const struct li
         return RET_ERR;
     }
 
-    return HandleCrownRotatePostInner(angularVelocity, degree, action);
+    HandleCrownRotatePostInner(angularVelocity, degree, action);
+    return RET_OK;
 }
 
 void CrownTransformProcessor::HandleCrownRotatePostInner(double angularVelocity, double degree, int32_t action)
@@ -190,6 +193,5 @@ void CrownTransformProcessor::Dump(int32_t fd, const std::vector<std::string> &a
             pointerEvent_->GetCrownAngularVelocity(), pointerEvent_->GetCrownDegree(),
             pointerEvent_->GetAgentWindowId(), pointerEvent_->GetTargetWindowId());
 }
-#endif // OHOS_BUILD_ENABLE_CROWN
 } // namespace MMI
 } // namespace OHOS
