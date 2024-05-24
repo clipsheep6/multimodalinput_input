@@ -1677,7 +1677,8 @@ int32_t MMIService::AppendExtraData(const ExtraData &extraData)
 int32_t MMIService::EnableInputDevice(bool enable)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputDeviceManager::OnEnableInputDevice, INPUT_DEV_MGR, enable));
+    int32_t ret =
+        delegateTasks_.PostSyncTask(std::bind(&InputDeviceManager::OnEnableInputDevice, INPUT_DEV_MGR, enable));
     if (ret != RET_OK) {
         MMI_HILOGE("OnEnableInputDevice failed:%{public}d", ret);
     }
