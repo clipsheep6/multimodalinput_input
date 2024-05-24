@@ -265,6 +265,9 @@ void PointerDrawingManager::CreateMagicCursorChangeObserver()
     // Listening enabling cursor deformation and color inversion
     SettingObserver::UpdateFunc func = [](const std::string& key) {
         bool statusValue = false;
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+        bool statusValue = true;
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
         auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(key, statusValue);
         if (ret != RET_OK) {
             MMI_HILOGE("Get value from setting date fail");
