@@ -36,6 +36,7 @@ private:
     void PrintKeyboardUsage();
     void PrintTouchUsage();
     void PrintKnuckleUsage();
+    void PrintTouchPadUsage();
     bool IsCoordinateInvalid(int32_t firstDownX, int32_t firstDownY, int32_t secondDownX, int32_t secondDownY);
     int32_t SingleKnuckleClickEvent(int32_t downX, int32_t downY);
     int32_t DoubleKnuckleClickEvent(int32_t downX, int32_t downY);
@@ -43,6 +44,12 @@ private:
     int32_t SingleKnuckleGestureProcesser(int32_t argc, char *argv[]);
     int32_t DoubleKnuckleGestureProcesser(int32_t argc, char *argv[]);
     int32_t NextPos(int64_t begTimeMs, int64_t curtTimeMs, int32_t totalTimeMs, int32_t begPos, int32_t endPos);
+    int32_t TouchPadGestureInputProcess(int32_t argc, char *argv[], int32_t c, int32_t optionIndex);
+    int32_t PinchGestureProcesser(int32_t argc, char *argv[]);
+    int32_t PinchEvent(const int32_t fingerCount, const int32_t scaleNumberator);
+    int32_t RotateGestureProcesser(int32_t argc, char *argv[]);
+    int32_t ProcessTouchPadFingerSwipe(int32_t argc, char *argv[]);
+    int32_t SwipeEvent(const int32_t fingerCount, const int32_t px1, const int32_t py1, const int32_t px2, const int32_t py2);
 };
 } // namespace MMI
 } // namespace OHOS
