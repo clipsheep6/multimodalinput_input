@@ -30,6 +30,9 @@
 #include "window.h"
 
 #include "device_observer.h"
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+#include "hardware_cursor_pointer_manager.h"
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 #include "i_pointer_drawing_manager.h"
 #include "mouse_event_normalize.h"
 #include "setting_observer.h"
@@ -40,6 +43,18 @@ namespace MMI {
 struct isMagicCursor {
     std::string name;
     bool isShow { false };
+};
+
+struct PixelMapReleaseContext {
+    explicit PixelMapReleaseContext(std::shared_ptr<Media::PixelMap> pixelMap) : pixelMap_(pixelMap) {}
+
+    ~PixelMapReleaseContext()
+    {
+        pixelMap_ = nullptr;
+    }
+
+private:
+    std::shared_ptr<Media::PixelMap> pixelMap_;
 };
 
 class PointerDrawingManager final : public IPointerDrawingManager,
@@ -120,6 +135,13 @@ private:
     bool CheckPointerStyleParam(int32_t windowId, PointerStyle pointerStyle);
     std::map<MOUSE_ICON, IconStyle>& GetMouseIcons();
     void UpdateIconPath(const MOUSE_ICON mouseStyle, std::string iconPath);
+    std::shared_ptr<Rosen::Drawing::ColorSpace> ConvertToDrawingColorSpace(Media::ColorSpace colorSpace);
+    Rosen::Drawing::ColorType PixelFormatToDrawingColorType(Media::PixelFormat pixelFormat);
+    Rosen::Drawing::AlphaType AlphaTypeToDrawingAlphaType(Media::AlphaType alphaType);
+    std::shared_ptr<Rosen::Drawing::Image> ExtractDrawingImage(std::shared_ptr<Media::PixelMap> pixelMap);
+    void DrawToImage(OHOS::Rosen::Drawing::Canvas &canvas, const MOUSE_ICON mouseStyle);
+	int32_t EnableHardwareCursorStats(int32_t pid, bool enable) override;
+    int32_t GetHardwareCursorStats(int32_t pid, uint32_t &frameCount, uint32_t &vsyncCount) override;
 
 private:
     struct PidInfo {
@@ -143,7 +165,7 @@ private:
     std::list<PidInfo> pidInfos_;
     bool mouseDisplayState_ { false };
     bool mouseIconUpdate_ { false };
-    std::unique_ptr<OHOS::Media::PixelMap> userIcon_ { nullptr };
+    std::shared_ptr<OHOS::Media::PixelMap> userIcon_;
     uint64_t screenId_ { 0 };
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_;
     std::shared_ptr<Rosen::RSCanvasNode> canvasNode_;
@@ -153,6 +175,9 @@ private:
     Direction lastDirection_ { DIRECTION0 };
     Direction currentDirection_ { DIRECTION0 };
     isMagicCursor hasMagicCursor_;
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    std::shared_ptr<HardwareCursorPointerManager> hardwareCursorPointerManager_;
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 };
 } // namespace MMI
 } // namespace OHOS
