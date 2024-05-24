@@ -247,7 +247,7 @@ int32_t MMIService::Init()
 {
     CheckDefine();
     MMI_HILOGD("WindowsManager Init");
-    WinMgr->Init(*this);
+    WIN_MGR->Init(*this);
     MMI_HILOGD("NapProcess Init");
     NapProcess::GetInstance()->Init(*this);
     MMI_HILOGD("ANRManager Init");
@@ -807,7 +807,7 @@ int32_t MMIService::SetHoverScrollState(bool state)
 {
     CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputWindowsManager::SetHoverScrollState, WinMgr, state));
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputWindowsManager::SetHoverScrollState, WIN_MGR, state));
     if (ret != RET_OK) {
         MMI_HILOGE("Set mouse hover scroll state failed,return %{public}d", ret);
         return ret;
@@ -819,7 +819,7 @@ int32_t MMIService::SetHoverScrollState(bool state)
 #ifdef OHOS_BUILD_ENABLE_POINTER
 int32_t MMIService::ReadHoverScrollState(bool &state)
 {
-    state = WinMgr->GetHoverScrollState();
+    state = WIN_MGR->GetHoverScrollState();
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -840,7 +840,7 @@ int32_t MMIService::GetHoverScrollState(bool &state)
 int32_t MMIService::OnSupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = InputDevMgr->SupportKeys(deviceId, keys, keystroke);
+    int32_t ret = INPUT_DEV_MGR->SupportKeys(deviceId, keys, keystroke);
     if (keystroke.size() > MAX_SUPPORT_KEY) {
         MMI_HILOGE("Device exceeds the max range");
         return RET_ERR;
@@ -867,7 +867,7 @@ int32_t MMIService::SupportKeys(int32_t deviceId, std::vector<int32_t> &keys, st
 int32_t MMIService::OnGetDeviceIds(std::vector<int32_t> &ids)
 {
     CALL_DEBUG_ENTER;
-    ids = InputDevMgr->GetInputDeviceIds();
+    ids = INPUT_DEV_MGR->GetInputDeviceIds();
     return RET_OK;
 }
 
@@ -885,11 +885,11 @@ int32_t MMIService::GetDeviceIds(std::vector<int32_t> &ids)
 int32_t MMIService::OnGetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice)
 {
     CALL_DEBUG_ENTER;
-    if (InputDevMgr->GetInputDevice(deviceId) == nullptr) {
+    if (INPUT_DEV_MGR->GetInputDevice(deviceId) == nullptr) {
         MMI_HILOGE("Input device not found");
         return COMMON_PARAMETER_ERROR;
     }
-    inputDevice = InputDevMgr->GetInputDevice(deviceId);
+    inputDevice = INPUT_DEV_MGR->GetInputDevice(deviceId);
     return RET_OK;
 }
 
@@ -909,7 +909,7 @@ int32_t MMIService::OnRegisterDevListener(int32_t pid)
 {
     auto sess = GetSession(GetClientFd(pid));
     CHKPR(sess, RET_ERR);
-    InputDevMgr->AddDevListener(sess);
+    INPUT_DEV_MGR->AddDevListener(sess);
     return RET_OK;
 }
 
@@ -928,7 +928,7 @@ int32_t MMIService::RegisterDevListener()
 int32_t MMIService::OnUnregisterDevListener(int32_t pid)
 {
     auto sess = GetSession(GetClientFd(pid));
-    InputDevMgr->RemoveDevListener(sess);
+    INPUT_DEV_MGR->RemoveDevListener(sess);
     return RET_OK;
 }
 
@@ -947,7 +947,7 @@ int32_t MMIService::UnregisterDevListener()
 int32_t MMIService::OnGetKeyboardType(int32_t deviceId, int32_t &keyboardType)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = InputDevMgr->GetKeyboardType(deviceId, keyboardType);
+    int32_t ret = INPUT_DEV_MGR->GetKeyboardType(deviceId, keyboardType);
     if (ret != RET_OK) {
         MMI_HILOGE("GetKeyboardType call failed");
         return ret;
@@ -1400,7 +1400,7 @@ int32_t MMIService::GetDisplayBindInfo(DisplayBindInfos &infos)
 {
     CALL_INFO_TRACE;
     int32_t ret =
-        delegateTasks_.PostSyncTask(std::bind(&InputWindowsManager::GetDisplayBindInfo, WinMgr, std::ref(infos)));
+        delegateTasks_.PostSyncTask(std::bind(&InputWindowsManager::GetDisplayBindInfo, WIN_MGR, std::ref(infos)));
     if (ret != RET_OK) {
         MMI_HILOGE("GetDisplayBindInfo pid failed, ret:%{public}d", ret);
         return RET_ERR;
@@ -1419,7 +1419,7 @@ int32_t MMIService::SetDisplayBind(int32_t deviceId, int32_t displayId, std::str
 {
     CALL_INFO_TRACE;
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&InputWindowsManager::SetDisplayBind, WinMgr, deviceId, displayId, std::ref(msg)));
+        std::bind(&InputWindowsManager::SetDisplayBind, WIN_MGR, deviceId, displayId, std::ref(msg)));
     if (ret != RET_OK) {
         MMI_HILOGE("SetDisplayBind pid failed, ret:%{public}d", ret);
         return RET_ERR;
@@ -1600,7 +1600,7 @@ void MMIService::AddReloadDeviceTimer()
 {
     CALL_DEBUG_ENTER;
     TimerMgr->AddTimer(2000, 2, [this]() {
-        auto deviceIds = InputDevMgr->GetInputDeviceIds();
+        auto deviceIds = INPUT_DEV_MGR->GetInputDeviceIds();
         if (deviceIds.empty()) {
             libinputAdapter_.ReloadDevice();
         }
@@ -1631,7 +1631,7 @@ int32_t MMIService::SetMouseCaptureMode(int32_t windowId, bool isCaptureMode)
 {
     CALL_INFO_TRACE;
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&InputWindowsManager::SetMouseCaptureMode, WinMgr, windowId, isCaptureMode));
+        std::bind(&InputWindowsManager::SetMouseCaptureMode, WIN_MGR, windowId, isCaptureMode));
     if (ret != RET_OK) {
         MMI_HILOGE("Set capture failed,return %{public}d", ret);
         return RET_ERR;
@@ -1642,7 +1642,7 @@ int32_t MMIService::SetMouseCaptureMode(int32_t windowId, bool isCaptureMode)
 int32_t MMIService::OnGetWindowPid(int32_t windowId, int32_t &windowPid)
 {
     CALL_DEBUG_ENTER;
-    windowPid = WinMgr->GetWindowPid(windowId);
+    windowPid = WIN_MGR->GetWindowPid(windowId);
     if (windowPid == RET_ERR) {
         MMI_HILOGE("Get window pid failed");
     }
@@ -1667,7 +1667,7 @@ int32_t MMIService::GetWindowPid(int32_t windowId)
 int32_t MMIService::AppendExtraData(const ExtraData &extraData)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputWindowsManager::AppendExtraData, WinMgr, extraData));
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputWindowsManager::AppendExtraData, WIN_MGR, extraData));
     if (ret != RET_OK) {
         MMI_HILOGE("Append extra data failed:%{public}d", ret);
     }
@@ -1677,7 +1677,8 @@ int32_t MMIService::AppendExtraData(const ExtraData &extraData)
 int32_t MMIService::EnableInputDevice(bool enable)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputDeviceManager::OnEnableInputDevice, InputDevMgr, enable));
+    int32_t ret =
+        delegateTasks_.PostSyncTask(std::bind(&InputDeviceManager::OnEnableInputDevice, INPUT_DEV_MGR, enable));
     if (ret != RET_OK) {
         MMI_HILOGE("OnEnableInputDevice failed:%{public}d", ret);
     }
@@ -2174,7 +2175,7 @@ int32_t MMIService::SetPixelMapData(int32_t infoId, void* pixelMap)
 int32_t MMIService::SetCurrentUser(int32_t userId)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputWindowsManager::SetCurrentUser, WinMgr, userId));
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputWindowsManager::SetCurrentUser, WIN_MGR, userId));
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to set current user, ret:%{public}d", ret);
         return RET_ERR;

@@ -249,7 +249,7 @@ std::shared_ptr<PointerEvent> TouchPadTransformProcessor::OnEvent(struct libinpu
     MMI_HILOGD("Pointer event dispatcher of server:");
     EventLogHelper::PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(),
         pointerEvent_->GetPointerIds().size(), MMI_LOG_HEADER);
-    auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
+    auto device = INPUT_DEV_MGR->GetInputDevice(pointerEvent_->GetDeviceId());
     CHKPP(device);
     MMI_HILOGI("InputTracking id:%{public}d event created by:%{public}s, type:%{public}d",
                pointerEvent_->GetId(), device->GetName().c_str(), type);
@@ -425,7 +425,7 @@ void TouchPadTransformProcessor::SetPinchPointerItem(int64_t time)
     pointerItem.SetPointerId(defaultPointerId);
     pointerItem.SetWindowX(0);
     pointerItem.SetWindowY(0);
-    auto mouseInfo = WinMgr->GetMouseInfo();
+    auto mouseInfo = WIN_MGR->GetMouseInfo();
     pointerItem.SetDisplayX(mouseInfo.physicalX);
     pointerItem.SetDisplayY(mouseInfo.physicalY);
     pointerEvent_->UpdatePointerItem(defaultPointerId, pointerItem);
@@ -442,7 +442,7 @@ void TouchPadTransformProcessor::ProcessTouchPadPinchDataEvent(int32_t fingerCou
 
     pointerEvent_->SetFingerCount(fingerCount);
     pointerEvent_->SetDeviceId(deviceId_);
-    auto mouseInfo = WinMgr->GetMouseInfo();
+    auto mouseInfo = WIN_MGR->GetMouseInfo();
     pointerEvent_->SetTargetDisplayId(mouseInfo.displayId);
     pointerEvent_->SetTargetWindowId(-1);
     pointerEvent_->SetPointerId(defaultPointerId);
@@ -458,7 +458,7 @@ void TouchPadTransformProcessor::ProcessTouchPadPinchDataEvent(int32_t fingerCou
     }
 
     if (pointerEvent_->GetFingerCount() == TP_SYSTEM_PINCH_FINGER_CNT) {
-        WinMgr->UpdateTargetPointer(pointerEvent_);
+        WIN_MGR->UpdateTargetPointer(pointerEvent_);
     }
 
     // only three or four finger pinch need to statistic

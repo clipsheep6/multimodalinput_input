@@ -175,8 +175,8 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     currentDirection_ = direction;
     AdjustMouseFocus(direction, ICON_TYPE(GetMouseIconPath()[MOUSE_ICON(pointerStyle.id)].alignmentWay),
         physicalX, physicalY);
-    if (WinMgr->GetMouseFlag()) {
-        WinMgr->SetMouseFlag(false);
+    if (WIN_MGR->GetMouseFlag()) {
+        WIN_MGR->SetMouseFlag(false);
         return;
     }
     MMI_HILOGI("MagicCursor AdjustMouseFocus:%{public}d",
@@ -700,7 +700,7 @@ void PointerDrawingManager::AttachToDisplay()
 {
     CALL_DEBUG_ENTER;
     CHKPV(surfaceNode_);
-    if ((WinMgr->GetDisplayMode() == DisplayMode::MAIN) && (screenId_ == 0)) {
+    if ((WIN_MGR->GetDisplayMode() == DisplayMode::MAIN) && (screenId_ == 0)) {
         screenId_ = FOLD_SCREEN_ID;
     }
     surfaceNode_->AttachToDisplay(screenId_);
@@ -836,7 +836,7 @@ int32_t PointerDrawingManager::SetCustomCursor(void* pixelMap, int32_t pid, int3
         MMI_HILOGE("windowId is invalid, windowId:%{public}d", windowId);
         return RET_ERR;
     }
-    if (WinMgr->CheckWindowIdPermissionByPid(windowId, pid) != RET_OK) {
+    if (WIN_MGR->CheckWindowIdPermissionByPid(windowId, pid) != RET_OK) {
         MMI_HILOGE("windowId not in right pid");
         return RET_ERR;
     }
@@ -898,7 +898,7 @@ int32_t PointerDrawingManager::SetMouseIcon(int32_t pid, int32_t windowId, void*
         MMI_HILOGE("get invalid windowId, %{public}d", windowId);
         return RET_ERR;
     }
-    if (WinMgr->CheckWindowIdPermissionByPid(windowId, pid) != RET_OK) {
+    if (WIN_MGR->CheckWindowIdPermissionByPid(windowId, pid) != RET_OK) {
         MMI_HILOGE("windowId not in right pid");
         return RET_ERR;
     }
@@ -925,7 +925,7 @@ int32_t PointerDrawingManager::SetMouseHotSpot(int32_t pid, int32_t windowId, in
         MMI_HILOGE("invalid windowId, %{public}d", windowId);
         return RET_ERR;
     }
-    if (WinMgr->CheckWindowIdPermissionByPid(windowId, pid) != RET_OK) {
+    if (WIN_MGR->CheckWindowIdPermissionByPid(windowId, pid) != RET_OK) {
         MMI_HILOGE("windowId not in right pid");
         return RET_ERR;
     }
@@ -934,7 +934,7 @@ int32_t PointerDrawingManager::SetMouseHotSpot(int32_t pid, int32_t windowId, in
         return RET_ERR;
     }
     PointerStyle pointerStyle;
-    int32_t ret = WinMgr->GetPointerStyle(pid, windowId, pointerStyle);
+    int32_t ret = WIN_MGR->GetPointerStyle(pid, windowId, pointerStyle);
     if (ret != RET_OK || pointerStyle.id != MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         MMI_HILOGE("Get pointer style failed, pid %{publid}d, pointerStyle %{public}d", pid, pointerStyle.id);
         return RET_ERR;
@@ -1190,7 +1190,7 @@ void PointerDrawingManager::DrawManager()
     if (hasDisplay_ && hasPointerDevice_ && surfaceNode_ == nullptr) {
         MMI_HILOGD("Draw pointer begin");
         PointerStyle pointerStyle;
-        int32_t ret = WinMgr->GetPointerStyle(pid_, windowId_, pointerStyle);
+        int32_t ret = WIN_MGR->GetPointerStyle(pid_, windowId_, pointerStyle);
         MMI_HILOGD("get pid %{publid}d with pointerStyle %{public}d", pid_, pointerStyle.id);
         if (ret != RET_OK) {
             MMI_HILOGE("Get pointer style failed, pointerStyleInfo is nullptr");
@@ -1203,12 +1203,12 @@ void PointerDrawingManager::DrawManager()
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
             DrawPointer(displayInfo_.id, displayInfo_.width / CALCULATE_MIDDLE, displayInfo_.height / CALCULATE_MIDDLE,
                 pointerStyle, direction);
-            WinMgr->SendPointerEvent(PointerEvent::POINTER_ACTION_MOVE);
+            WIN_MGR->SendPointerEvent(PointerEvent::POINTER_ACTION_MOVE);
             MMI_HILOGD("Draw manager, mouseStyle:%{public}d, last physical is initial value", pointerStyle.id);
             return;
         }
         DrawPointer(displayInfo_.id, lastPhysicalX_, lastPhysicalY_, pointerStyle, direction);
-        WinMgr->SendPointerEvent(PointerEvent::POINTER_ACTION_MOVE);
+        WIN_MGR->SendPointerEvent(PointerEvent::POINTER_ACTION_MOVE);
         MMI_HILOGD("Draw manager, mouseStyle:%{public}d", pointerStyle.id);
         return;
     }
@@ -1217,7 +1217,7 @@ void PointerDrawingManager::DrawManager()
 bool PointerDrawingManager::Init()
 {
     CALL_DEBUG_ENTER;
-    InputDevMgr->Attach(shared_from_this());
+    INPUT_DEV_MGR->Attach(shared_from_this());
     pidInfos_.clear();
     return true;
 }
@@ -1296,7 +1296,7 @@ bool PointerDrawingManager::GetPointerVisible(int32_t pid)
 int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible, int32_t priority)
 {
     MMI_HILOGI("pid:%{public}d,visible:%{public}s,priority:%{public}d", pid, visible ? "true" : "false", priority);
-    if (WinMgr->GetExtraData().appended && visible && priority == 0) {
+    if (WIN_MGR->GetExtraData().appended && visible && priority == 0) {
         MMI_HILOGE("current is drag state, can not set pointer visible");
         return RET_ERR;
     }
@@ -1340,7 +1340,7 @@ int32_t PointerDrawingManager::UpdateDefaultPointerStyle(int32_t pid, int32_t wi
         return RET_OK;
     }
     PointerStyle style;
-    int32_t ret = WinMgr->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style, isUiExtension);
+    int32_t ret = WIN_MGR->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style, isUiExtension);
     if (ret != RET_OK) {
         MMI_HILOGE("Get global pointer style failed!");
         return RET_ERR;
@@ -1467,15 +1467,15 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, Po
         MMI_HILOGE("Update default pointer iconPath failed");
         return RET_ERR;
     }
-    if (WinMgr->SetPointerStyle(pid, windowId, pointerStyle, isUiExtension) != RET_OK) {
+    if (WIN_MGR->SetPointerStyle(pid, windowId, pointerStyle, isUiExtension) != RET_OK) {
         MMI_HILOGE("Set pointer style failed");
         return RET_ERR;
     }
-    if (!InputDevMgr->HasPointerDevice()) {
+    if (!INPUT_DEV_MGR->HasPointerDevice()) {
         MMI_HILOGD("The pointer device is not exist");
         return RET_OK;
     }
-    if (!WinMgr->IsNeedRefreshLayer(windowId)) {
+    if (!WIN_MGR->IsNeedRefreshLayer(windowId)) {
         MMI_HILOGD("Not need refresh layer, window type:%{public}d, pointer style:%{public}d",
             windowId, pointerStyle.id);
         return RET_OK;
@@ -1483,7 +1483,7 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, Po
     if (windowId != GLOBAL_WINDOW_ID && (pointerStyle.id == MOUSE_ICON::DEFAULT &&
         iconPath[MOUSE_ICON(pointerStyle.id)].iconPath != DefaultIconPath)) {
         PointerStyle style;
-        if (WinMgr->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style) != RET_OK) {
+        if (WIN_MGR->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style) != RET_OK) {
             MMI_HILOGE("Get global pointer style failed");
             return RET_ERR;
         }
@@ -1515,7 +1515,7 @@ int32_t PointerDrawingManager::GetPointerStyle(int32_t pid, int32_t windowId, Po
             return RET_OK;
         }
     }
-    int32_t ret = WinMgr->GetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
+    int32_t ret = WIN_MGR->GetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
     if (ret != RET_OK) {
         MMI_HILOGE("Get pointer style failed, pointerStyleInfo is nullptr");
         return ret;
@@ -1527,7 +1527,7 @@ int32_t PointerDrawingManager::GetPointerStyle(int32_t pid, int32_t windowId, Po
 int32_t PointerDrawingManager::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
 {
     CALL_DEBUG_ENTER;
-    return WinMgr->ClearWindowPointerStyle(pid, windowId);
+    return WIN_MGR->ClearWindowPointerStyle(pid, windowId);
 }
 
 void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle)
