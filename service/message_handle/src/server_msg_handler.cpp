@@ -132,7 +132,7 @@ int32_t ServerMsgHandler::OnGetFunctionKeyState(int32_t funcKey, bool &state)
 int32_t ServerMsgHandler::OnSetFunctionKeyState(int32_t funcKey, bool enable)
 {
     CALL_INFO_TRACE;
-    auto device = InputDevMgr->GetKeyboardDevice();
+    auto device = INPUT_DEV_MGR ->GetKeyboardDevice();
     CHKPR(device, ERROR_NULL_POINTER);
     if (LibinputAdapter::DeviceLedUpdate(device, funcKey, enable) != RET_OK) {
         MMI_HILOGE("Failed to set the keyboard led");
@@ -239,7 +239,7 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
         MMI_HILOGE("Pointer event is corrupted");
         return RET_ERR;
     }
-    CursorPosition cursorPos = WinMgr->GetCursorPos();
+    CursorPosition cursorPos = WIN_MGR->GetCursorPos();
     if (cursorPos.displayId < 0) {
         MMI_HILOGE("No display");
         return RET_ERR;
@@ -258,18 +258,18 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
     int32_t ret = RET_OK;
 
     if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER)) {
-        ret = HandleMotionAccelerateTouchpad(&offset, WinMgr->GetMouseIsCaptureMode(),
+        ret = HandleMotionAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y,
             MouseTransformProcessor::GetTouchpadSpeed(), static_cast<int32_t>(DeviceType::DEVICE_KLV));
     } else {
-        ret = HandleMotionAccelerate(&offset, WinMgr->GetMouseIsCaptureMode(),
+        ret = HandleMotionAccelerate(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, MouseTransformProcessor::GetPointerSpeed());
     }
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to accelerate pointer motion, error:%{public}d", ret);
         return ret;
     }
-    WinMgr->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
+    WIN_MGR->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
     MMI_HILOGD("Cursor move to (x:%{public}.2f,y:%{public}.2f,DisplayId:%{public}d)",
         cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
     return RET_OK;
@@ -303,7 +303,7 @@ void ServerMsgHandler::UpdatePointerEvent(std::shared_ptr<PointerEvent> pointerE
         MMI_HILOGE("Pointer event is corrupted");
         return;
     }
-    auto mouseInfo = WinMgr->GetMouseInfo();
+    auto mouseInfo = WIN_MGR->GetMouseInfo();
     pointerItem.SetDisplayX(mouseInfo.physicalX);
     pointerItem.SetDisplayY(mouseInfo.physicalY);
     pointerEvent->UpdatePointerItem(pointerEvent->GetPointerId(), pointerItem);
@@ -406,7 +406,7 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
         MMI_HILOGE("Packet read display info failed");
         return RET_ERR;
     }
-    WinMgr->UpdateDisplayInfoExtIfNeed(displayGroupInfo, true);
+    WIN_MGR->UpdateDisplayInfoExtIfNeed(displayGroupInfo, true);
     return RET_OK;
 }
 
@@ -423,7 +423,7 @@ int32_t ServerMsgHandler::OnWindowAreaInfo(SessionPtr sess, NetPacket &pkt)
         MMI_HILOGE("Packet read display info failed");
         return RET_ERR;
     }
-    WinMgr->SetWindowPointerStyle(area, pid, windowId);
+    WIN_MGR->SetWindowPointerStyle(area, pid, windowId);
     return RET_OK;
 }
 
@@ -451,7 +451,7 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
             return RET_ERR;
         }
     }
-    WinMgr->UpdateWindowInfo(windowGroupInfo);
+    WIN_MGR->UpdateWindowInfo(windowGroupInfo);
     return RET_OK;
 }
 
