@@ -57,6 +57,7 @@ napi_status KeyEventNapi::GetKeyEvent(napi_env env, napi_value in, std::shared_p
     CHECK_RETURN((status == napi_ok) && (valueType == napi_object), "object type invalid", status);
 
     KeyEvent::KeyItem item = GetNamePropertyKeyItem(env, in, "key");
+    CHKPP(out);
     out->SetKeyCode(item.GetKeyCode());
 
     uint32_t unicode = GetNamePropertyUint32(env, in, "unicodeChar");
