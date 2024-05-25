@@ -75,7 +75,7 @@ void TouchPadTransformProcessorTest::SetupTouchpad()
     ASSERT_EQ(libinput_event_get_type(event), LIBINPUT_EVENT_DEVICE_ADDED);
     struct libinput_device *device = libinput_event_get_device(event);
     ASSERT_TRUE(device != nullptr);
-    InputDevMgr->OnInputDeviceAdded(device);
+    INPUT_DEV_MGR ->OnInputDeviceAdded(device);
 }
 
 void TouchPadTransformProcessorTest::CloseTouchpad()
@@ -378,13 +378,13 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_OnEventT
     struct libinput_device *dev = libinput_event_get_device(event);
     ASSERT_TRUE(dev != nullptr);
     std::cout << "touchpad device: " << libinput_device_get_name(dev) << std::endl;
-    auto iter = InputDevMgr->inputDevice_.begin();
-    for (; iter != InputDevMgr->inputDevice_.end(); ++iter) {
+    auto iter = INPUT_DEV_MGR ->inputDevice_.begin();
+    for (; iter != INPUT_DEV_MGR ->inputDevice_.end(); ++iter) {
         if (iter->second.inputDeviceOrigin == dev) {
             break;
         }
     }
-    ASSERT_TRUE(iter != InputDevMgr->inputDevice_.end());
+    ASSERT_TRUE(iter != INPUT_DEV_MGR ->inputDevice_.end());
     int32_t deviceId = iter->first;
     TouchPadTransformProcessor processor(deviceId);
     processor.pointerEvent_ = PointerEvent::Create();
@@ -414,13 +414,13 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_OnEventT
     struct libinput_device *dev = libinput_event_get_device(event);
     ASSERT_TRUE(dev != nullptr);
     std::cout << "touchpad device: " << libinput_device_get_name(dev) << std::endl;
-    auto iter = InputDevMgr->inputDevice_.begin();
-    for (; iter != InputDevMgr->inputDevice_.end(); ++iter) {
+    auto iter = INPUT_DEV_MGR ->inputDevice_.begin();
+    for (; iter != INPUT_DEV_MGR ->inputDevice_.end(); ++iter) {
         if (iter->second.inputDeviceOrigin == dev) {
             break;
         }
     }
-    ASSERT_TRUE(iter != InputDevMgr->inputDevice_.end());
+    ASSERT_TRUE(iter != INPUT_DEV_MGR ->inputDevice_.end());
     int32_t deviceId = iter->first;
     TouchPadTransformProcessor processor(deviceId);
     processor.pointerEvent_ = PointerEvent::Create();
@@ -451,13 +451,13 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_OnEventT
     struct libinput_device *dev = libinput_event_get_device(event);
     ASSERT_TRUE(dev != nullptr);
     std::cout << "touchpad device: " << libinput_device_get_name(dev) << std::endl;
-    auto iter = InputDevMgr->inputDevice_.begin();
-    for (; iter != InputDevMgr->inputDevice_.end(); ++iter) {
+    auto iter = INPUT_DEV_MGR ->inputDevice_.begin();
+    for (; iter != INPUT_DEV_MGR ->inputDevice_.end(); ++iter) {
         if (iter->second.inputDeviceOrigin == dev) {
             break;
         }
     }
-    ASSERT_TRUE(iter != InputDevMgr->inputDevice_.end());
+    ASSERT_TRUE(iter != INPUT_DEV_MGR ->inputDevice_.end());
     int32_t deviceId = iter->first;
     TouchPadTransformProcessor processor(deviceId);
     processor.pointerEvent_ = PointerEvent::Create();
@@ -491,13 +491,13 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_OnEventT
     struct libinput_device *dev = libinput_event_get_device(event);
     ASSERT_TRUE(dev != nullptr);
     std::cout << "touchpad device: " << libinput_device_get_name(dev) << std::endl;
-    auto iter = InputDevMgr->inputDevice_.begin();
-    for (; iter != InputDevMgr->inputDevice_.end(); ++iter) {
+    auto iter = INPUT_DEV_MGR ->inputDevice_.begin();
+    for (; iter != INPUT_DEV_MGR ->inputDevice_.end(); ++iter) {
         if (iter->second.inputDeviceOrigin == dev) {
             break;
         }
     }
-    ASSERT_TRUE(iter != InputDevMgr->inputDevice_.end());
+    ASSERT_TRUE(iter != INPUT_DEV_MGR ->inputDevice_.end());
     int32_t deviceId = iter->first;
     TouchPadTransformProcessor processor(deviceId);
     processor.pointerEvent_ = PointerEvent::Create();
@@ -531,13 +531,13 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_OnEventT
     struct libinput_device *dev = libinput_event_get_device(event);
     ASSERT_TRUE(dev != nullptr);
     std::cout << "touchpad device: " << libinput_device_get_name(dev) << std::endl;
-    auto iter = InputDevMgr->inputDevice_.begin();
-    for (; iter != InputDevMgr->inputDevice_.end(); ++iter) {
+    auto iter = INPUT_DEV_MGR ->inputDevice_.begin();
+    for (; iter != INPUT_DEV_MGR ->inputDevice_.end(); ++iter) {
         if (iter->second.inputDeviceOrigin == dev) {
             break;
         }
     }
-    ASSERT_TRUE(iter != InputDevMgr->inputDevice_.end());
+    ASSERT_TRUE(iter != INPUT_DEV_MGR ->inputDevice_.end());
     int32_t deviceId = iter->first;
     TouchPadTransformProcessor processor(deviceId);
     processor.pointerEvent_ = PointerEvent::Create();
@@ -568,13 +568,13 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_OnEventT
     struct libinput_device *dev = libinput_event_get_device(event);
     ASSERT_TRUE(dev != nullptr);
     std::cout << "touchpad device: " << libinput_device_get_name(dev) << std::endl;
-    auto iter = InputDevMgr->inputDevice_.begin();
-    for (; iter != InputDevMgr->inputDevice_.end(); ++iter) {
+    auto iter = INPUT_DEV_MGR ->inputDevice_.begin();
+    for (; iter != INPUT_DEV_MGR ->inputDevice_.end(); ++iter) {
         if (iter->second.inputDeviceOrigin == dev) {
             break;
         }
     }
-    ASSERT_TRUE(iter != InputDevMgr->inputDevice_.end());
+    ASSERT_TRUE(iter != INPUT_DEV_MGR ->inputDevice_.end());
     int32_t deviceId = iter->first;
     TouchPadTransformProcessor processor(deviceId);
     processor.pointerEvent_ = PointerEvent::Create();
@@ -600,13 +600,13 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_OnEvent_
     struct libinput_device *dev = libinput_event_get_device(event);
     ASSERT_TRUE(dev != nullptr);
     std::cout << "touchpad device: " << libinput_device_get_name(dev) << std::endl;
-    auto iter = InputDevMgr->inputDevice_.begin();
-    for (; iter != InputDevMgr->inputDevice_.end(); ++iter) {
+    auto iter = INPUT_DEV_MGR ->inputDevice_.begin();
+    for (; iter != INPUT_DEV_MGR ->inputDevice_.end(); ++iter) {
         if (iter->second.inputDeviceOrigin == dev) {
             break;
         }
     }
-    ASSERT_TRUE(iter != InputDevMgr->inputDevice_.end());
+    ASSERT_TRUE(iter != INPUT_DEV_MGR ->inputDevice_.end());
     int32_t deviceId = iter->first;
     TouchPadTransformProcessor processor(deviceId);
     auto pointerEvent = processor.OnEvent(event);
@@ -629,13 +629,13 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_OnEvent_
     struct libinput_device *dev = libinput_event_get_device(event);
     ASSERT_TRUE(dev != nullptr);
     std::cout << "touchpad device: " << libinput_device_get_name(dev) << std::endl;
-    auto iter = InputDevMgr->inputDevice_.begin();
-    for (; iter != InputDevMgr->inputDevice_.end(); ++iter) {
+    auto iter = INPUT_DEV_MGR ->inputDevice_.begin();
+    for (; iter != INPUT_DEV_MGR ->inputDevice_.end(); ++iter) {
         if (iter->second.inputDeviceOrigin == dev) {
             break;
         }
     }
-    ASSERT_TRUE(iter != InputDevMgr->inputDevice_.end());
+    ASSERT_TRUE(iter != INPUT_DEV_MGR ->inputDevice_.end());
     int32_t deviceId = iter->first;
     TouchPadTransformProcessor processor(deviceId);
     processor.pointerEvent_ = PointerEvent::Create();
