@@ -25,7 +25,7 @@ namespace OHOS {
 namespace MMI {
 napi_status KeyEventNapi::CreateKeyEvent(napi_env env, const std::shared_ptr<KeyEvent> &in, napi_value &out)
 {
-    CHKPP(in);
+    CHKPR(in, napi_invalid_arg);
     auto status = SetNameProperty(env, out, "action", in->GetKeyAction() - KeyEvent::KEY_ACTION_CANCEL);
     CHKRR(status, "set action property", status);
 
@@ -57,7 +57,7 @@ napi_status KeyEventNapi::GetKeyEvent(napi_env env, napi_value in, std::shared_p
     CHECK_RETURN((status == napi_ok) && (valueType == napi_object), "object type invalid", status);
 
     KeyEvent::KeyItem item = GetNamePropertyKeyItem(env, in, "key");
-    CHKPP(out);
+    CHKPR(out, napi_invalid_arg);
     out->SetKeyCode(item.GetKeyCode());
 
     uint32_t unicode = GetNamePropertyUint32(env, in, "unicodeChar");
@@ -83,7 +83,7 @@ napi_status KeyEventNapi::GetKeyEvent(napi_env env, napi_value in, std::shared_p
 
 napi_status KeyEventNapi::CreateKeyItem(napi_env env, const std::optional<KeyEvent::KeyItem> in, napi_value &out)
 {
-    CHKPP(in);
+    CHKPR(in, napi_invalid_arg);
     auto status = SetNameProperty(env, out, "code", in->GetKeyCode());
     CHKRR(status, "set code property", status);
 
@@ -138,7 +138,7 @@ napi_status KeyEventNapi::WriteKeyStatusToJs(napi_env env, const std::vector<int
 
 napi_status KeyEventNapi::WriteFunctionKeyStatusToJs(napi_env env, const std::shared_ptr<KeyEvent> &in, napi_value &out)
 {
-    CHKPP(in);
+    CHKPR(in, napi_invalid_arg);
     auto status = SetNameProperty(env, out, "capsLock", in->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY));
     CHKRR(status, "set capsLock property", status);
 
