@@ -16,7 +16,6 @@
 #include <cstdio>
 #include <gtest/gtest.h>
 
-
 #include "define_multimodal.h"
 #include "general_stylus.h"
 #include "input_device_manager.h"
