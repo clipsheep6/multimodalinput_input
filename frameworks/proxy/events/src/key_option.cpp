@@ -82,7 +82,7 @@ bool KeyOption::ReadFromParcel(Parcel &in)
         return false;
     }
     if (preKeysSize > PRE_KEYS_MAX_SIZE) {
-        MMI_HILOGE("The preKeys size(%{public}d) exceeds maximum allowed size(%{public}d)", preKeysSize,
+        MMI_HILOGE("The preKeys size:%{public}d exceeds maximum allowed size:%{public}d", preKeysSize,
             PRE_KEYS_MAX_SIZE);
         return false;
     }
