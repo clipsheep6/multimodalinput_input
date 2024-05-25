@@ -936,11 +936,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<PointerEvent> pointe
         }
         isParseConfig_ = true;
     }
-    bool isHandled = HandleMulFingersTap(pointer);
-    if (isHandled) {
-        return true;
-    }
-    return false;
+    return HandleMulFingersTap(pointer);
 }
 
 bool KeyCommandHandler::HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEvent)
@@ -1364,7 +1360,8 @@ bool KeyCommandHandler::HandleMulFingersTap(const std::shared_ptr<PointerEvent> 
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_TRIPTAP) {
         MMI_HILOGI("The touchpad trip tap will launch ability");
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_MULTI_FINGERS, threeFingersTap_.ability.bundleName);
-        LaunchAbility(threeFingersTap_.ability, 0);
+        int64_t delay = 0;
+        LaunchAbility(threeFingersTap_.ability, delay);
         BytraceAdapter::StopLaunchAbility();
         return true;
     }
