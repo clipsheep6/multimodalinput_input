@@ -254,15 +254,19 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-    if (!singleKnuckleGesture_.statusConfigValue) {
-        MMI_HILOGI("Knuckle switch closed");
-        return;
-    }
     int32_t id = touchEvent->GetPointerId();
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
     if (item.GetToolType() != PointerEvent::TOOL_TYPE_KNUCKLE) {
         MMI_HILOGW("Touch event tool type:%{public}d not knuckle", item.GetToolType());
+        return;
+    }
+    if (singleKnuckleGesture_.statusConfigValue) {
+        MMI_HILOGI("Knuckle switch closed");
+        return;
+    }
+    if (CheckInputMethodArea(touchEvent)) {
+        MMI_HILOGI("In input method area, skip");
         return;
     }
     size_t pointercnt = touchEvent->GetPointerIds().size();
@@ -1641,10 +1645,12 @@ KnuckleGesture KeyCommandHandler::GetSingleKnuckleGesture() const
 {
     return singleKnuckleGesture_;
 }
+
 KnuckleGesture KeyCommandHandler::GetDoubleKnuckleGesture() const
 {
     return doubleKnuckleGesture_;
 }
+
 void KeyCommandHandler::SetKnuckleDoubleTapIntervalTime(int64_t interval)
 {
     CALL_DEBUG_ENTER;
@@ -1654,6 +1660,7 @@ void KeyCommandHandler::SetKnuckleDoubleTapIntervalTime(int64_t interval)
     }
     downToPrevUpTimeConfig_ = interval;
 }
+
 void KeyCommandHandler::SetKnuckleDoubleTapDistance(float distance)
 {
     CALL_DEBUG_ENTER;
@@ -1663,6 +1670,40 @@ void KeyCommandHandler::SetKnuckleDoubleTapDistance(float distance)
     }
     downToPrevDownDistanceConfig_ = distance;
 }
+
+bool KeyCommandHandler::CheckInputMethodArea(const std::shared_ptr<PointerEvent> touchEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(touchEvent);
+    int32_t id = touchEvent->GetPointerId();
+    PointerEvent::PointerItem item;
+    touchEvent->GetPointerItem(id, item);
+    int32_t displayX = item->GetDisplayX();
+    int32_t displayY = item->GetDisplayY();
+    int32_t displayId = touchEvent->GetTargetDisplayId();
+    auto windows = WinMgr->GetWindowGroupInfoByDisplayId(displayId);
+    for (auto window : windows) {
+        if (window.windowType != WINDOW_INPUT_METHOD_TYPE) {
+            continue;
+        }
+        int32_t rightDownX;
+        int32_t rightDownY;
+        if (!AddInt32(window.area.x, window.area.width, rightDownX)) {
+            MMI_HILOGE("The addition of displayMaxX overflows");
+            return false;
+        }
+        if (!AddInt32(window.area.y, window.area.height, rightDownY)) {
+            MMI_HILOGE("The addition of displayMaxX overflows");
+            return false;
+        }
+        if (displayX >= window.area.x && displayX <= rightDownX &&
+            displayY >= window.area.y && displayY <= rightDownY) {
+                return true;
+        }
+    }
+    return false;
+}
+
 void KeyCommandHandler::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     static const std::unordered_map<int32_t, std::string> actionMap = { {0, "UNKNOWN"},
