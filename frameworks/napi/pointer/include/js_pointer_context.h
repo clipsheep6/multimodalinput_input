@@ -77,6 +77,10 @@ public:
     static napi_value GetTouchpadRotateSwitch(napi_env env, napi_callback_info info);
     static napi_value SetCustomCursor(napi_env env, napi_callback_info info);
     static napi_value SetCustomCursorSync(napi_env env, napi_callback_info info);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    static napi_value EnableHardwareCursorStatsSync(napi_env env, napi_callback_info info);
+    static napi_value GetHardwareCursorStatsSync(napi_env env, napi_callback_info info);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 private:
     static napi_value SetTouchpadBoolData(napi_env env, napi_callback_info info, SetTouchpadBoolDataFunc func);

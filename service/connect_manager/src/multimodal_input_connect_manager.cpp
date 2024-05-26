@@ -692,5 +692,19 @@ int32_t MultimodalInputConnectManager::SetCurrentUser(int32_t userId)
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetCurrentUser(userId);
 }
+
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+int32_t MultimodalInputConnectManager::EnableHardwareCursorStats(bool enable)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->EnableHardwareCursorStats(enable);
+}
+
+int32_t MultimodalInputConnectManager::GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetHardwareCursorStats(frameCount, vsyncCount);
+}
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 } // namespace MMI
 } // namespace OHOS
