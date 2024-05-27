@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -381,9 +381,7 @@ InputDisplayBindHelper::InputDisplayBindHelper(const std::string bindCfgFile)
 std::string InputDisplayBindHelper::GetBindDisplayNameByInputDevice(int32_t inputDeviceId) const
 {
     CALL_DEBUG_ENTER;
-    if (infos_ == nullptr) {
-        return {};
-    }
+    CHKPO(infos_);
     return infos_->GetBindDisplayNameByInputDevice(inputDeviceId);
 }
 
@@ -444,6 +442,42 @@ void InputDisplayBindHelper::AddDisplay(int32_t id, const std::string &name)
     info.AddDisplay(id, name);
     infos_->Add(info);
     Store();
+}
+
+void InputDisplayBindHelper::AddLocalDisplay(int32_t id, const std::string &name)
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGD("Param: id:%{public}d, name:%{public}s", id, name.c_str());
+    CHKPV(infos_);
+
+    const auto &infos = infos_->GetInfos();
+    std::vector<std::string> unbindDevices;
+    for (const auto &info : infos) {
+        if (info.DisplayNotBind()) {
+            unbindDevices.push_back(info.GetInputDeviceName());
+            MMI_HILOGI("Unbind InputDevice, id:%{public}d, inputDevice:%{public}s",
+                info.GetInputDeviceId(), info.GetInputDeviceName().c_str());
+        }
+    }
+    
+    bool IsStore = false;
+    for (auto &item : unbindDevices) {
+        auto inputDeviceName = item;
+        if (IsDualDisplayFoldDevice()) {
+            std::string deviceName = GetInputDeviceById(id);
+            if (!deviceName.empty()) {
+                inputDeviceName = deviceName;
+            }
+        }
+        BindInfo info = infos_->GetUnbindDisplay(inputDeviceName);
+        info.AddDisplay(id, name);
+        infos_->Add(info);
+        IsStore = true;
+    }
+    if (IsStore) {
+        Store();
+    }
+    unbindDevices.clear();
 }
 
 std::string InputDisplayBindHelper::GetInputDeviceById(int32_t id)
@@ -558,14 +592,9 @@ void InputDisplayBindHelper::RemoveDisplay(int32_t id)
 void InputDisplayBindHelper::Store()
 {
     CALL_DEBUG_ENTER;
-    if (infos_ == nullptr) {
-        return;
-    }
+    CHKPV(infos_);
     char realPath[PATH_MAX] = {};
-    if (realpath(fileName_.c_str(), realPath) == nullptr) {
-        MMI_HILOGE("file name is empty");
-        return;
-    }
+    CHKPV(realpath(fileName_.c_str(), realPath));
     if (!IsValidJsonPath(realPath)) {
         MMI_HILOGE("file path is invalid");
         return;
@@ -582,10 +611,7 @@ void InputDisplayBindHelper::Store()
 int32_t InputDisplayBindHelper::GetDisplayBindInfo(DisplayBindInfos &infos)
 {
     CALL_DEBUG_ENTER;
-    if (infos_ == nullptr) {
-        MMI_HILOGE("Infos_ is nullptr");
-        return RET_ERR;
-    }
+    CHKPR(infos_, RET_ERR);
     for (const auto &item : infos_->GetInfos()) {
         infos.push_back({
             .inputDeviceId = item.GetInputDeviceId(),
@@ -678,10 +704,7 @@ void InputDisplayBindHelper::Load()
 {
     CALL_DEBUG_ENTER;
     char realPath[PATH_MAX] = {};
-    if (realpath(fileName_.c_str(), realPath) == nullptr) {
-        MMI_HILOGE("file name is empty");
-        return;
-    }
+    CHKPV(realpath(fileName_.c_str(), realPath));
     if (!IsValidJsonPath(realPath)) {
         MMI_HILOGE("file path is invalid");
         return;
@@ -699,9 +722,7 @@ void InputDisplayBindHelper::Load()
 std::string InputDisplayBindHelper::Dumps() const
 {
     CALL_DEBUG_ENTER;
-    if (infos_ == nullptr) {
-        return {};
-    }
+    CHKPO(infos_);
     std::ostringstream oss;
     oss << *infos_;
     return oss.str();

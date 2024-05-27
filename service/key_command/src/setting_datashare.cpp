@@ -42,7 +42,7 @@ const std::string SETTING_COLUMN_KEYWORD = "KEYWORD";
 const std::string SETTING_COLUMN_VALUE = "VALUE";
 const std::string SETTING_URI_PROXY = "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
 const std::string SETTINGS_DATA_EXT_URI = "datashare:///com.ohos.settingsdata.DataAbility";
-constexpr int32_t LONG_CAST_NUM = 10;
+constexpr int32_t DECIMAL_BASE = 10;
 } // namespace
 
 SettingDataShare::~SettingDataShare() {}
@@ -79,7 +79,7 @@ ErrCode SettingDataShare::GetLongValue(const std::string& key, int64_t& value)
         MMI_HILOGE("Get long value fail");
         return ret;
     }
-    value = static_cast<int64_t>(strtoll(valueStr.c_str(), nullptr, LONG_CAST_NUM));
+    value = static_cast<int64_t>(strtoll(valueStr.c_str(), nullptr, DECIMAL_BASE));
     return ERR_OK;
 }
 
@@ -128,19 +128,13 @@ sptr<SettingObserver> SettingDataShare::CreateObserver(const std::string& key, S
 
 void SettingDataShare::ExecRegisterCb(const sptr<SettingObserver>& observer)
 {
-    if (observer == nullptr) {
-        MMI_HILOGE("observer is nullptr");
-        return;
-    }
+    CHKPV(observer);
     observer->OnChange();
 }
 
 ErrCode SettingDataShare::RegisterObserver(const sptr<SettingObserver>& observer)
 {
-    if (observer == nullptr) {
-        MMI_HILOGE("observer is nullptr");
-        return RET_ERR;
-    }
+    CHKPR(observer, RET_ERR);
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
     auto uri = AssembleUri(observer->GetKey());
     auto helper = CreateDataShareHelper();
@@ -159,10 +153,7 @@ ErrCode SettingDataShare::RegisterObserver(const sptr<SettingObserver>& observer
 
 ErrCode SettingDataShare::UnregisterObserver(const sptr<SettingObserver>& observer)
 {
-    if (observer == nullptr) {
-        MMI_HILOGE("observer is nullptr");
-        return RET_ERR;
-    }
+    CHKPR(observer, RET_ERR);
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
     auto uri = AssembleUri(observer->GetKey());
     auto helper = CreateDataShareHelper();
@@ -179,13 +170,9 @@ ErrCode SettingDataShare::UnregisterObserver(const sptr<SettingObserver>& observ
 void SettingDataShare::Initialize(int32_t systemAbilityId)
 {
     auto sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (sam == nullptr) {
-        return;
-    }
+    CHKPV(sam);
     auto remoteObj = sam->GetSystemAbility(systemAbilityId);
-    if (remoteObj == nullptr) {
-        return;
-    }
+    CHKPV(remoteObj);
     remoteObj_ = remoteObj;
 }
 
@@ -207,7 +194,7 @@ ErrCode SettingDataShare::GetStringValue(const std::string& key, std::string& va
         IPCSkeleton::SetCallingIdentity(callingIdentity);
         return ERR_INVALID_OPERATION;
     }
-    int32_t count;
+    int32_t count = 0;
     resultSet->GetRowCount(count);
     if (count == 0) {
         IPCSkeleton::SetCallingIdentity(callingIdentity);
@@ -255,9 +242,7 @@ ErrCode SettingDataShare::PutStringValue(const std::string& key, const std::stri
 std::shared_ptr<DataShare::DataShareHelper> SettingDataShare::CreateDataShareHelper()
 {
     auto helper = DataShare::DataShareHelper::Creator(remoteObj_, SETTING_URI_PROXY, SETTINGS_DATA_EXT_URI.c_str());
-    if (helper == nullptr) {
-        return nullptr;
-    }
+    CHKPP(helper);
     return helper;
 }
 

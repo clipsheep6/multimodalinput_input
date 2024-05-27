@@ -27,7 +27,7 @@
 #include <vector>
 
 #include "nocopyable.h"
-
+#include "gesturesense_wrapper.h"
 #include "i_input_event_handler.h"
 #include "key_event.h"
 #include "struct_multimodal.h"
@@ -45,6 +45,14 @@ enum KeyCommandType : int32_t {
     TYPE_FINGERSCENE = 2,
     TYPE_REPEAT_KEY = 3,
     TYPE_MULTI_FINGERS = 4,
+};
+
+enum class NotifyType : int32_t {
+    CANCEL,
+    INCONSISTENTGESTURE,
+    REGIONGESTURE,
+    LETTERGESTURE,
+    OTHER
 };
 
 struct Ability {
@@ -96,6 +104,7 @@ struct Sequence {
     int64_t abilityStartDelay { 0 };
     int32_t timerId { -1 };
     Ability ability;
+    friend std::ostream& operator<<(std::ostream&, const Sequence&);
 };
 
 struct TwoFingerGesture {
@@ -118,6 +127,8 @@ struct KnuckleGesture {
     int64_t lastPointerUpTime { 0 };
     int64_t downToPrevUpTime { 0 };
     float doubleClickDistance { 0.0f };
+    std::string statusConfig;
+    bool statusConfigValue { true };
     Ability ability;
     struct {
         int32_t id { 0 };
@@ -148,8 +159,11 @@ public:
     ~KeyCommandHandler() override = default;
     int32_t UpdateSettingsXml(const std::string &businessId, int32_t delay);
     int32_t EnableCombineKey(bool enable);
-    KnuckleGesture GetSingleKnuckleGesture();
-    KnuckleGesture GetDoubleKnuckleGesture();
+    KnuckleGesture GetSingleKnuckleGesture() const;
+    KnuckleGesture GetDoubleKnuckleGesture() const;
+    void Dump(int32_t fd, const std::vector<std::string> &args);
+    void PrintGestureInfo(int32_t fd);
+    std::string KeyActionToString(int32_t keyAction);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -254,6 +268,14 @@ private:
     void AdjustDistanceConfigIfNeed(float distance);
     int32_t ConvertVPToPX(int32_t vp) const;
 #endif // OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+    void HandleKnuckleGestureTouchDown(std::shared_ptr<PointerEvent> touchEvent);
+    void HandleKnuckleGestureTouchMove(std::shared_ptr<PointerEvent> touchEvent);
+    void HandleKnuckleGestureTouchUp();
+    void ProcessKnuckleGestureTouchUp(NotifyType type);
+    void ResetKnuckleGesture();
+    std::string GesturePointsToStr() const;
+#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 
 private:
     Sequence matchedSequence_;
@@ -299,6 +321,15 @@ private:
     bool isParseMaxCount_ { false };
     bool isParseStatusConfig_ { false };
     bool isDoubleClick_ { false };
+#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+    bool isGesturing_ { false };
+    bool isLetterGesturing_ { false };
+    float gestureLastX_ { 0.0f };
+    float gestureLastY_ { 0.0f };
+    float gestureTrackLength_ { 0.0f };
+    std::vector<float> gesturePoints_;
+    std::vector<int64_t> gestureTimeStamps_;
+#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 };
 } // namespace MMI
 } // namespace OHOS

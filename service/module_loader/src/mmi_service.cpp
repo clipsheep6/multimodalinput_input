@@ -36,30 +36,28 @@
 #include "key_map_manager.h"
 #include "multimodal_input_connect_def_parcel.h"
 #include "permission_helper.h"
-#include "string_ex.h"
-#include "watchdog_task.h"
 #ifdef OHOS_RSS_CLIENT
 #include "res_sched_client.h"
 #include "res_type.h"
 #include "system_ability_definition.h"
 #endif // OHOS_RSS_CLIENT
+#include "string_ex.h"
+#include "watchdog_task.h"
 
+#include "display_event_monitor.h"
+#include "device_event_monitor.h"
+#include "fingersense_wrapper.h"
+#include "infrared_emitter_controller.h"
+#include "key_auto_repeat.h"
+#include "key_command_handler.h"
 #include "mmi_log.h"
+#include "multimodal_input_preferences_manager.h"
 #include "timer_manager.h"
+#include "touch_event_normalize.h"
 #include "util.h"
 #include "util_ex.h"
 #include "util_napi_error.h"
 #include "xcollie/watchdog.h"
-#include "key_auto_repeat.h"
-#include "key_command_handler.h"
-#include "touch_event_normalize.h"
-#include "display_event_monitor.h"
-#include "device_event_monitor.h"
-#include "fingersense_wrapper.h"
-#include "multimodal_input_preferences_manager.h"
-#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
-#include "infrared_emitter_controller.h"
-#endif
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MMIService"
 #undef MMI_LOG_DOMAIN
@@ -86,7 +84,7 @@ template <class... Ts> void CheckDefineOutput(const char *fmt, Ts... args)
     char buf[MAX_PACKET_BUF_SIZE] = {};
     int32_t ret = snprintf_s(buf, MAX_PACKET_BUF_SIZE, MAX_PACKET_BUF_SIZE - 1, fmt, args...);
     if (ret == -1) {
-        KMSG_LOGI("Call snprintf_s failed.ret = %d", ret);
+        KMSG_LOGE("Call snprintf_s failed.ret = %d", ret);
         return;
     }
     KMSG_LOGI("%s", buf);
@@ -122,7 +120,7 @@ MMIService::~MMIService() {}
 
 int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
 {
-    if (!(type >= EPOLL_EVENT_BEGIN && type < EPOLL_EVENT_END)) {
+    if (type < EPOLL_EVENT_BEGIN || type >= EPOLL_EVENT_END) {
         MMI_HILOGE("Invalid param type");
         return RET_ERR;
     }
@@ -137,7 +135,7 @@ int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
     auto eventData = std::make_shared<mmi_epoll_event>();
     eventData->fd = fd;
     eventData->event_type = type;
-    MMI_HILOGI("userdata:[fd:%{public}d,type:%{public}d]", eventData->fd, eventData->event_type);
+    MMI_HILOGI("userdata:[fd:%{public}d, type:%{public}d]", eventData->fd, eventData->event_type);
 
     struct epoll_event ev = {};
     ev.events = EPOLLIN;
@@ -154,7 +152,7 @@ int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
 
 int32_t MMIService::DelEpoll(EpollEventType type, int32_t fd)
 {
-    if (!(type >= EPOLL_EVENT_BEGIN && type < EPOLL_EVENT_END)) {
+    if (type < EPOLL_EVENT_BEGIN || type >= EPOLL_EVENT_END) {
         MMI_HILOGE("Invalid param type");
         return RET_ERR;
     }
@@ -195,7 +193,7 @@ bool MMIService::InitLibinputService()
             EpollClose();
             return false;
         }
-        MMI_HILOGI("AddEpoll, epollfd:%{public}d, fd:%{public}d", mmiFd_, fd);
+        MMI_HILOGD("AddEpoll, epollfd:%{public}d, fd:%{public}d", mmiFd_, fd);
     }
     return true;
 }
@@ -224,7 +222,7 @@ bool MMIService::InitService()
         MMI_HILOGE("Service initialization failed");
         return false;
     }
-    MMI_HILOGI("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, epollFd_);
+    MMI_HILOGI("AddEpoll, epollfd:%{public}d, fd:%{public}d", mmiFd_, epollFd_);
     return true;
 }
 
@@ -241,7 +239,7 @@ bool MMIService::InitDelegateTasks()
         EpollClose();
         return false;
     }
-    MMI_HILOGI("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, delegateTasks_.GetReadFd());
+    MMI_HILOGI("AddEpoll, epollfd:%{public}d, fd:%{public}d", mmiFd_, delegateTasks_.GetReadFd());
     return true;
 }
 __attribute__((no_sanitize("cfi")))
@@ -310,6 +308,9 @@ void MMIService::OnStart()
     MMI_HILOGI("Add system ability listener success");
     DISPLAY_MONITOR->InitCommonEventSubscriber();
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+    GESTURESENSE_WRAPPER->InitGestureSenseWrapper();
+#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     MMI_HILOGI("Add app manager service listener start");
     AddSystemAbilityListener(APP_MGR_SERVICE_ID);
     APP_OBSERVER_MGR->InitAppStateObserver();
@@ -318,11 +319,7 @@ void MMIService::OnStart()
 #ifdef OHOS_BUILD_ENABLE_ANCO
     InitAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
-    PREFERENCES_MGR->InitPreferences();
-    ret = SetMoveEventFilters(PREFERENCES_MGR->GetBoolValue("moveEventFilterFlag", false));
-    if (ret != RET_OK) {
-        MMI_HILOGE("Failed to read moveEventFilterFlag, ret:%{public}d", ret);
-    }
+    InitPreferences();
 
     TimerMgr->AddTimer(WATCHDOG_INTERVAL_TIME, -1, [this]() {
         MMI_HILOGD("Set thread status flag to true");
@@ -555,8 +552,8 @@ int32_t MMIService::GetMouseScrollRows(int32_t &rows)
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadMouseScrollRows, this, std::ref(rows)));
     if (ret != RET_OK) {
-        MMI_HILOGE("Get the number of mouse scrolling rows failed, return %{public}d", ret);
-        return RET_ERR;
+        MMI_HILOGE("Get the number of mouse scrolling rows failed, ret:%{public}d", ret);
+        return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
@@ -1058,7 +1055,7 @@ int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventTyp
         CHKPR(sess, ERROR_NULL_POINTER);
         napData.bundleName = sess->GetProgramName();
         int32_t syncState = SUBSCRIBED;
-        MMI_HILOGD("AddInputHandler info to observer : pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
+        MMI_HILOGD("AddInputHandler info to observer : pid:%{public}d, uid:%{public}d, bundleName:%{public}s",
             napData.pid, napData.uid, napData.bundleName.c_str());
         NapProcess::GetInstance()->AddMmiSubscribedEventData(napData, syncState);
         if (NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
@@ -1099,7 +1096,7 @@ int32_t MMIService::RemoveInputHandler(InputHandlerType handlerType, HandleEvent
         CHKPR(sess, ERROR_NULL_POINTER);
         napData.bundleName = sess->GetProgramName();
         int32_t syncState = UNSUBSCRIBED;
-        MMI_HILOGD("RemoveInputHandler info to observer : pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
+        MMI_HILOGD("RemoveInputHandler info to observer : pid:%{public}d, uid:%{public}d, bundleName:%{public}s",
             napData.pid, napData.uid, napData.bundleName.c_str());
         NapProcess::GetInstance()->AddMmiSubscribedEventData(napData, syncState);
         if (NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
@@ -1198,6 +1195,49 @@ int32_t MMIService::CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> 
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     return sMsgHandler_.OnInjectPointerEvent(pointerEvent, pid, isNativeInject);
 }
+
+int32_t MMIService::AdaptScreenResolution(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOGE("Can't find pointer item, pointerId:%{public}d", pointerId);
+        return RET_ERR;
+    }
+    auto display = OHOS::Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
+    CHKPR(display, ERROR_NULL_POINTER);
+    enum ResolutionIndex {
+        FIRST = 0,
+        CURRENT = 1
+    };
+    if (displays_[FIRST] == nullptr) {
+        displays_[FIRST] = display;
+    } else {
+        displays_[CURRENT] = display;
+    }
+    if (displays_[FIRST] != nullptr && displays_[CURRENT] != nullptr) {
+        int32_t sourceX = pointerItem.GetDisplayX();
+        int32_t sourceY = pointerItem.GetDisplayY();
+        if ((displays_[FIRST]->GetWidth() == 0) || (displays_[FIRST]->GetHeight() == 0)) {
+            MMI_HILOGE("Invalid display, screen resolution width:%{public}d, height:%{public}d",
+                displays_[FIRST]->GetWidth(), displays_[FIRST]->GetHeight());
+            return RET_ERR;
+        }
+        int32_t destX = sourceX * displays_[CURRENT]->GetWidth() / displays_[FIRST]->GetWidth();
+        int32_t destY = sourceY * displays_[CURRENT]->GetHeight() / displays_[FIRST]->GetHeight();
+        pointerItem.SetDisplayX(destX);
+        pointerItem.SetDisplayY(destY);
+        MMI_HILOGI("PointerItem's displayX:%{public}d, displayY:%{public}d when first inject,"
+            "Screen resolution width:%{public}d, height:%{public}d first got,"
+            "Screen resolution width:%{public}d, height:%{public}d current got,"
+            "PointerItem's displayX:%{public}d, displayY:%{public}d after self adaptaion",
+            sourceX, sourceY, displays_[FIRST]->GetWidth(), displays_[FIRST]->GetHeight(),
+            displays_[CURRENT]->GetWidth(), displays_[CURRENT]->GetHeight(), destX, destY);
+    }
+    return RET_OK;
+}
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject)
@@ -1206,6 +1246,7 @@ int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> point
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t ret;
     int32_t pid = GetCallingPid();
+    AdaptScreenResolution(pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_ANCO
     ret = InjectPointerEventExt(pointerEvent, pid, isNativeInject);
 #else
@@ -1276,7 +1317,7 @@ int32_t MMIService::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr
         CHKPR(sess, ERROR_NULL_POINTER);
         napData.bundleName = sess->GetProgramName();
         int32_t syncState = SUBSCRIBED;
-        MMI_HILOGD("SubscribeKeyEvent info to observer : pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
+        MMI_HILOGD("SubscribeKeyEvent info to observer : pid:%{public}d, uid:%{public}d, bundleName:%{public}s",
             napData.pid, napData.uid, napData.bundleName.c_str());
         NapProcess::GetInstance()->AddMmiSubscribedEventData(napData, syncState);
         if (NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
@@ -1306,7 +1347,7 @@ int32_t MMIService::UnsubscribeKeyEvent(int32_t subscribeId)
         CHKPR(sess, ERROR_NULL_POINTER);
         napData.bundleName = sess->GetProgramName();
         int32_t syncState = UNSUBSCRIBED;
-        MMI_HILOGD("UnsubscribeKeyEvent info to observer : pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
+        MMI_HILOGD("UnsubscribeKeyEvent info to observer : pid:%{public}d, uid:%{public}d, bundleName:%{public}s",
             napData.pid, napData.uid, napData.bundleName.c_str());
         NapProcess::GetInstance()->AddMmiSubscribedEventData(napData, syncState);
         if (NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
@@ -1608,6 +1649,7 @@ int32_t MMIService::OnGetWindowPid(int32_t windowId, int32_t &windowPid)
     windowPid = WinMgr->GetWindowPid(windowId);
     if (windowPid == RET_ERR) {
         MMI_HILOGE("Get window pid failed");
+        return RET_ERR;
     }
     MMI_HILOGD("windowpid is %{public}d", windowPid);
     return RET_OK;
@@ -1946,7 +1988,7 @@ int32_t MMIService::GetTouchpadRightClickType(int32_t &type)
         std::ref(type)));
     if (ret != RET_OK) {
         MMI_HILOGE("Get touchpad right button menu type failed, return %{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
@@ -1974,7 +2016,7 @@ int32_t MMIService::GetTouchpadRotateSwitch(bool &rotateSwitch)
         std::ref(rotateSwitch)));
     if (ret != RET_OK) {
         MMI_HILOGE("Get touchpad rotate switch failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
@@ -2037,7 +2079,7 @@ int32_t MMIService::CancelInjection()
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnCancelInjection, this));
     if (ret != RET_OK) {
-        MMI_HILOGE("OnAuthorize failed, ret:%{public}d", ret);
+        MMI_HILOGE("OnCancelInjection failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -2088,10 +2130,9 @@ int32_t MMIService::OnHasIrEmitter(bool &hasIrEmitter)
     return RET_OK;
 }
 
-int32_t MMIService::OnGetInfraredFrequencies(std::vector<InfraredFrequency>& requencys)
+int32_t MMIService::OnGetInfraredFrequencies(std::vector<InfraredFrequency> &requencys)
 {
     MMI_HILOGI("start get infrared frequency");
-#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
     std::vector<InfraredFrequencyInfo> infos;
     InfraredEmitterController::GetInstance()->GetFrequencies(infos);
     for (auto &item : infos) {
@@ -2100,27 +2141,24 @@ int32_t MMIService::OnGetInfraredFrequencies(std::vector<InfraredFrequency>& req
         info.max_ = item.max_;
         requencys.push_back(info);
     }
-#endif
     std::string context = "";
     int32_t size = static_cast<int32_t>(requencys.size());
     for (int32_t i = 0; i < size; i++) {
-        context = context + "requencys[" + std::to_string(i) + "]. max="
-                + std::to_string(requencys[i].max_) + ",min=" + std::to_string(requencys[i].min_) +";";
+        context = context + "requencys[" + std::to_string(i) + "]. max=" + std::to_string(requencys[i].max_) +
+        ",min=" + std::to_string(requencys[i].min_) + ";";
     }
     MMI_HILOGD("data from hdf is. %{public}s ", context.c_str());
     return RET_OK;
 }
 
-int32_t MMIService::OnTransmitInfrared(int64_t infraredFrequency, std::vector<int64_t>& pattern)
+int32_t MMIService::OnTransmitInfrared(int64_t infraredFrequency, std::vector<int64_t> &pattern)
 {
     std::string context = "infraredFrequency:" + std::to_string(infraredFrequency) + ";";
     int32_t size = static_cast<int32_t>(pattern.size());
     for (int32_t i = 0; i < size; i++) {
         context = context + "index:" + std::to_string(i) + ": pattern:" + std::to_string(pattern[i]) + ";";
     }
-#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
     InfraredEmitterController::GetInstance()->Transmit(infraredFrequency, pattern);
-#endif
     MMI_HILOGI("TransmitInfrared para. %{public}s", context.c_str());
     return RET_OK;
 }
@@ -2136,6 +2174,15 @@ int32_t MMIService::SetPixelMapData(int32_t infoId, void* pixelMap)
         return RET_ERR;
     }
     return RET_OK;
+}
+
+void MMIService::InitPreferences()
+{
+    PREFERENCES_MGR->InitPreferences();
+    int32_t ret = SetMoveEventFilters(PREFERENCES_MGR->GetBoolValue("moveEventFilterFlag", false));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to read moveEventFilterFlag, ret:%{public}d", ret);
+    }
 }
 
 int32_t MMIService::SetMoveEventFilters(bool flag)

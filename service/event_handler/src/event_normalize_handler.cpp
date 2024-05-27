@@ -148,7 +148,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
             break;
         }
         default: {
-            MMI_HILOGW("This device does not support :%d", type);
+            MMI_HILOGD("This device does not support :%d", type);
             break;
         }
     }
@@ -200,13 +200,10 @@ int32_t EventNormalizeHandler::OnEventDeviceRemoved(libinput_event *event)
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void EventNormalizeHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
-    if (nextHandler_ == nullptr) {
-        MMI_HILOGW("Keyboard device does not support");
-        return;
-    }
+    CHKPV(nextHandler_);
     DfxHisysevent::GetDispStartTime();
     CHKPV(keyEvent);
-    EventLogHelper::PrintEventData(keyEvent);
+    EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
     UpdateKeyEventHandlerChain(keyEvent);
     if (keyEvent->IsRepeat()) {
         KeyRepeat->SelectAutoRepeat(keyEvent);
@@ -220,10 +217,7 @@ void EventNormalizeHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEv
 #ifdef OHOS_BUILD_ENABLE_POINTER
 void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
-    if (nextHandler_ == nullptr) {
-        MMI_HILOGW("Pointer device does not support");
-        return;
-    }
+    CHKPV(nextHandler_);
     DfxHisysevent::GetDispStartTime();
     CHKPV(pointerEvent);
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_END) {
@@ -255,10 +249,7 @@ void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEven
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 void EventNormalizeHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
-    if (nextHandler_ == nullptr) {
-        MMI_HILOGW("Touchscreen device does not support");
-        return;
-    }
+    CHKPV(nextHandler_);
     DfxHisysevent::GetDispStartTime();
     CHKPV(pointerEvent);
     WinMgr->UpdateTargetPointer(pointerEvent);
@@ -275,10 +266,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
         return FingerprintEventHdr->HandleFingerprintEvent(event);
     }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
-    if (nextHandler_ == nullptr) {
-        MMI_HILOGW("Keyboard device does not support");
-        return ERROR_UNSUPPORT;
-    }
+    CHKPR(nextHandler_, ERROR_UNSUPPORT);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     BytraceAdapter::StartPackageEvent("package keyEvent");
     auto keyEvent = KeyEventHdr->GetKeyEvent();
@@ -302,7 +290,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     }
     BytraceAdapter::StopPackageEvent();
     BytraceAdapter::StartBytrace(keyEvent);
-    EventLogHelper::PrintEventData(keyEvent);
+    EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
     auto device = InputDevMgr->GetInputDevice(keyEvent->GetDeviceId());
     CHKPR(device, RET_ERR);
     MMI_HILOGI("InputTracking id:%{public}d event created by:%{public}s", keyEvent->GetId(), device->GetName().c_str());
@@ -337,16 +325,15 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
         return FingerprintEventHdr->HandleFingerprintEvent(event);
     }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
-    if (nextHandler_ == nullptr) {
-        MMI_HILOGW("Pointer device does not support");
-        return ERROR_UNSUPPORT;
-    }
+    CHKPR(nextHandler_, ERROR_UNSUPPORT);
 #ifdef OHOS_BUILD_ENABLE_POINTER
     BytraceAdapter::StartPackageEvent("package mouseEvent");
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     const auto &keyEvent = KeyEventHdr->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+    TerminateRotate(event);
+    TerminateAxis(event);
     if (MouseEventHdr->OnEvent(event) == RET_ERR) {
         MMI_HILOGE("OnEvent is failed");
         return RET_ERR;
@@ -378,7 +365,9 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
 void EventNormalizeHandler::HandlePalmEvent(libinput_event* event, std::shared_ptr<PointerEvent> pointerEvent)
 {
     auto touchpad = libinput_event_get_touchpad_event(event);
-    CHKPV(touchpad);
+    if (touchpad == nullptr) {
+        return;
+    }
     int32_t toolType = libinput_event_touchpad_get_tool_type(touchpad);
     if (toolType == MT_TOOL_PALM) {
         MMI_HILOGD("ToolType is MT_TOOL_PALM");
@@ -388,10 +377,7 @@ void EventNormalizeHandler::HandlePalmEvent(libinput_event* event, std::shared_p
 
 int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
 {
-    if (nextHandler_ == nullptr) {
-        MMI_HILOGW("Pointer device does not support");
-        return ERROR_UNSUPPORT;
-    }
+    CHKPR(nextHandler_, ERROR_UNSUPPORT);
 #ifdef OHOS_BUILD_ENABLE_POINTER
     CHKPR(event, ERROR_NULL_POINTER);
     auto touchpad = libinput_event_get_touchpad_event(event);
@@ -401,8 +387,8 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     GestureIdentify(event);
     MULTI_FINGERTAP_HDR->HandleMulFingersTap(touchpad, type);
     auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH_PAD);
-    LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     if (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLETAP) {
         nextHandler_->HandlePointerEvent(pointerEvent);
         MULTI_FINGERTAP_HDR->ClearPointerItems(pointerEvent);
@@ -445,7 +431,7 @@ int32_t EventNormalizeHandler::GestureIdentify(libinput_event* event)
     CHKPR(device, RET_ERR);
     int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
     auto mouseEvent = MouseEventHdr->GetPointerEvent(deviceId);
-    auto actionType  = PointerEvent::POINTER_ACTION_UNKNOWN;
+    auto actionType = PointerEvent::POINTER_ACTION_UNKNOWN;
     if (mouseEvent == nullptr || mouseEvent->GetPressedButtons().empty()) {
         actionType = GESTURE_HANDLER->GestureIdentify(originType, seatSlot, logicalX, logicalY);
     }
@@ -454,18 +440,13 @@ int32_t EventNormalizeHandler::GestureIdentify(libinput_event* event)
         return RET_ERR;
     }
     bool tpRotateSwitch = true;
-    if (TouchEventHdr->GetTouchpadRotateSwitch(tpRotateSwitch) != RET_OK) {
-        MMI_HILOGD("Failed to get touchpad rotate switch, default is true");
-    }
+    TouchEventHdr->GetTouchpadRotateSwitch(tpRotateSwitch);
     if (!tpRotateSwitch) {
         MMI_HILOGD("touchpad rotate switch is false");
         return RET_ERR;
     }
     auto rotateAngle = GESTURE_HANDLER->GetRotateAngle();
-    if (nextHandler_ == nullptr) {
-        MMI_HILOGW("Pointer device does not support");
-        return ERROR_UNSUPPORT;
-    }
+    CHKPR(nextHandler_, ERROR_UNSUPPORT);
 #ifdef OHOS_BUILD_ENABLE_POINTER
     if (MouseEventHdr->NormalizeRotateEvent(event, actionType, rotateAngle) == RET_ERR) {
         MMI_HILOGE("OnEvent is failed");
@@ -487,10 +468,7 @@ int32_t EventNormalizeHandler::GestureIdentify(libinput_event* event)
 
 int32_t EventNormalizeHandler::HandleGestureEvent(libinput_event* event)
 {
-    if (nextHandler_ == nullptr) {
-        MMI_HILOGW("Pointer device does not support");
-        return ERROR_UNSUPPORT;
-    }
+    CHKPR(nextHandler_, ERROR_UNSUPPORT);
 #ifdef OHOS_BUILD_ENABLE_POINTER
     CHKPR(event, ERROR_NULL_POINTER);
     auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH_PAD);
@@ -514,16 +492,12 @@ int32_t EventNormalizeHandler::HandleGestureEvent(libinput_event* event)
 
 int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t frameTime)
 {
-    if (nextHandler_ == nullptr) {
-        MMI_HILOGW("Touchscreen device does not support");
-        return ERROR_UNSUPPORT;
-    }
+    CHKPR(nextHandler_, ERROR_UNSUPPORT);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     BytraceAdapter::StartPackageEvent("package touchEvent");
     std::shared_ptr<PointerEvent> pointerEvent = nullptr;
     LogTracer lt;
     if (event != nullptr) {
-        CHKPR(event, ERROR_NULL_POINTER);
         pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH);
         CHKPR(pointerEvent, ERROR_NULL_POINTER);
         lt = LogTracer(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
@@ -535,27 +509,22 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
     if (MMISceneBoardJudgement::IsSceneBoardEnabled() && MMISceneBoardJudgement::IsResampleEnabled()) {
         ErrCode status = RET_OK;
         std::shared_ptr<PointerEvent> outputEvent = EventResampleHdr->OnEventConsume(pointerEvent, frameTime, status);
-        if (outputEvent == nullptr) {
-            MMI_HILOGD("NULL output event received: %{public}d", status);
-            return RET_OK;
-        } else {
-            MMI_HILOGD("Output event received: %{public}d %{public}d %{public}d",
-                       outputEvent->GetSourceType(), outputEvent->GetPointerAction(), status);
-            EndLogTraceId(pointerEvent->GetId());
-            pointerEvent = outputEvent;
-            lt = LogTracer(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
-        }
+        CHKPR(outputEvent, RET_OK);
+        MMI_HILOGD("Output event received: %{public}d %{public}d %{public}d",
+            outputEvent->GetSourceType(), outputEvent->GetPointerAction(), status);
+        EndLogTraceId(pointerEvent->GetId());
+        pointerEvent = outputEvent;
+        lt = LogTracer(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     }
     BytraceAdapter::StopPackageEvent();
     TouchEventSetPressedKeys(pointerEvent);
-    if (pointerEvent != nullptr) {
-        BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
-        if (SetOriginPointerId(pointerEvent) != RET_OK) {
-            MMI_HILOGE("Failed to set origin pointerId");
-            return RET_ERR;
-        }
-        nextHandler_->HandleTouchEvent(pointerEvent);
+
+    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
+    if (SetOriginPointerId(pointerEvent) != RET_OK) {
+        MMI_HILOGE("Failed to set origin pointerId");
+        return RET_ERR;
     }
+    nextHandler_->HandleTouchEvent(pointerEvent);
     if ((pointerEvent != nullptr) && (event != nullptr)) {
         ResetTouchUpEvent(pointerEvent, event);
     }
@@ -596,10 +565,7 @@ void EventNormalizeHandler::ResetTouchUpEvent(std::shared_ptr<PointerEvent> poin
 
 int32_t EventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
 {
-    if (nextHandler_ == nullptr) {
-        MMI_HILOGW("TableTool device does not support");
-        return ERROR_UNSUPPORT;
-    }
+    CHKPR(nextHandler_, ERROR_UNSUPPORT);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     CHKPR(event, ERROR_NULL_POINTER);
     BytraceAdapter::StartPackageEvent("package penEvent");
@@ -620,11 +586,7 @@ int32_t EventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
 
 int32_t EventNormalizeHandler::HandleJoystickEvent(libinput_event* event)
 {
-    CALL_DEBUG_ENTER;
-    if (nextHandler_ == nullptr) {
-        MMI_HILOGW("Joystick device does not support");
-        return ERROR_UNSUPPORT;
-    }
+    CHKPR(nextHandler_, ERROR_UNSUPPORT);
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
     CHKPR(event, ERROR_NULL_POINTER);
     BytraceAdapter::StartPackageEvent("package joystickEvent");
@@ -641,11 +603,7 @@ int32_t EventNormalizeHandler::HandleJoystickEvent(libinput_event* event)
 
 int32_t EventNormalizeHandler::HandleSwitchInputEvent(libinput_event* event)
 {
-    CALL_INFO_TRACE;
-    if (nextHandler_ == nullptr) {
-        MMI_HILOGW("switch device does not support");
-        return ERROR_UNSUPPORT;
-    }
+    CHKPR(nextHandler_, ERROR_UNSUPPORT);
 #ifdef OHOS_BUILD_ENABLE_SWITCH
     CHKPR(event, ERROR_NULL_POINTER);
     struct libinput_event_switch *swev = libinput_event_get_switch_event(event);
@@ -653,13 +611,17 @@ int32_t EventNormalizeHandler::HandleSwitchInputEvent(libinput_event* event)
 
     enum libinput_switch_state state = libinput_event_switch_get_switch_state(swev);
     enum libinput_switch sw = libinput_event_switch_get_switch(swev);
-    MMI_HILOGD("libinput_event_switch type: %{public}d, state: %{public}d", sw, state);
+    MMI_HILOGI("libinput_event_switch type: %{public}d, state: %{public}d", sw, state);
     if (sw == LIBINPUT_SWITCH_PRIVACY && state == LIBINPUT_SWITCH_STATE_OFF) {
         MMI_HILOGD("privacy switch event ignored");
         return RET_OK;
     }
     auto swEvent = std::make_unique<SwitchEvent>(static_cast<int32_t>(state));
-    swEvent->SetSwitchType(static_cast<int32_t>(sw));
+    int32_t switchStatus = static_cast<int32_t>(sw);
+    if (switchStatus) {
+        RestoreTouchPadStatus();
+    }
+    swEvent->SetSwitchType(switchStatus);
     nextHandler_->HandleSwitchEvent(std::move(swEvent));
 #else
     MMI_HILOGW("switch device does not support");
@@ -740,7 +702,7 @@ double EventNormalizeHandler::CalcTouchOffset(const std::shared_ptr<PointerEvent
 
     double offset = sqrt(pow(itemMove.GetDisplayX() - itemDown.GetDisplayX(), SQUARE) +
         pow(itemMove.GetDisplayY() - itemDown.GetDisplayY(), SQUARE));
-    auto displayInfo = WinMgr->GetPhysicalDisplay(touchMoveEvent->GetTargetDisplayId());
+    auto displayInfo = WIN_MGR->GetPhysicalDisplay(touchMoveEvent->GetTargetDisplayId());
     if (displayInfo != nullptr) {
         double scale = static_cast<double>(displayInfo->dpi) / DENSITY_BASELINE;
         if (!MMI_EQ(static_cast<float>(scale), 0.f)) {
@@ -765,6 +727,65 @@ int32_t EventNormalizeHandler::SetOriginPointerId(std::shared_ptr<PointerEvent> 
     MMI_HILOGD("pointerId:%{public}d, originPointerId:%{public}d",
         pointerId, pointerItem.GetPointerId());
     return RET_OK;
+}
+
+void EventNormalizeHandler::RestoreTouchPadStatus()
+{
+    CALL_INFO_TRACE;
+    auto ids = InputDevMgr->GetTouchPadIds();
+    for (auto id : ids) {
+        MMI_HILOGI("Restore touchpad, deviceId:%{public}d", id);
+        auto mouseEvent = TouchEventHdr->GetPointerEvent(id);
+        if (mouseEvent != nullptr) {
+            mouseEvent->Reset();
+        }
+        mouseEvent = MouseEventHdr->GetPointerEvent(id);
+        if (mouseEvent != nullptr) {
+            mouseEvent->Reset();
+        }
+    }
+    buttonIds_.clear();
+}
+
+void EventNormalizeHandler::TerminateRotate(libinput_event* event)
+{
+    CALL_DEBUG_ENTER;
+    if (!GESTURE_HANDLER->GetRotateStatus()) {
+        return;
+    }
+    auto type = libinput_event_get_type(event);
+    if (type == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
+        MMI_HILOGI("Terminate rotate event");
+        auto rotateAngle = GESTURE_HANDLER->GetRotateAngle();
+        int32_t actionType = PointerEvent::POINTER_ACTION_ROTATE_END;
+        if (MouseEventHdr->NormalizeRotateEvent(event, actionType, rotateAngle) == RET_ERR) {
+            MMI_HILOGE("OnEvent is failed");
+            return;
+        }
+        auto pointerEvent = MouseEventHdr->GetPointerEvent();
+        CHKPV(pointerEvent);
+        LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
+        nextHandler_->HandlePointerEvent(pointerEvent);
+        pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
+        GESTURE_HANDLER->InitRotateGesture();
+    }
+}
+
+void EventNormalizeHandler::TerminateAxis(libinput_event* event)
+{
+    CALL_DEBUG_ENTER;
+    auto type = libinput_event_get_type(event);
+    if (type == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
+        bool result = MouseEventHdr->CheckAndPackageAxisEvent(event);
+        if (!result) {
+            return;
+        }
+        MMI_HILOGI("Terminate axis event");
+        auto pointerEvent = MouseEventHdr->GetPointerEvent();
+        CHKPV(pointerEvent);
+        LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
+        nextHandler_->HandlePointerEvent(pointerEvent);
+    }
 }
 } // namespace MMI
 } // namespace OHOS

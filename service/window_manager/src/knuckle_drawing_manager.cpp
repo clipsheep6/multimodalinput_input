@@ -14,6 +14,7 @@
  */
 
 #include "knuckle_drawing_manager.h"
+#include "touch_drawing_manager.h"
 
 #include "image/bitmap.h"
 #include "image_source.h"
@@ -25,6 +26,7 @@
 #include "ui/rs_canvas_drawing_node.h"
 #endif // USE_ROSEN_DRAWING
 
+#include "define_multimodal.h"
 #include "mmi_log.h"
 
 #undef MMI_LOG_TAG
@@ -43,6 +45,10 @@ constexpr int32_t POINT_INDEX3 = 3;
 constexpr int32_t POINT_INDEX4 = 4;
 constexpr int32_t PAINT_STROKE_WIDTH = 10;
 constexpr int32_t PAINT_PATH_RADIUS = 10;
+constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_SLOW = 450000;
+constexpr float DOUBLE_CLICK_DISTANCE_LONG_CONFIG = 96.0f;
+constexpr float VPR_CONFIG = 3.25f;
+constexpr int32_t POW_SQUARE = 2;
 } // namespace
 
 KnuckleDrawingManager::KnuckleDrawingManager()
@@ -55,9 +61,15 @@ KnuckleDrawingManager::KnuckleDrawingManager()
     paint_.SetJoinStyle(Rosen::Drawing::Pen::JoinStyle::ROUND_JOIN);
     paint_.SetCapStyle(Rosen::Drawing::Pen::CapStyle::ROUND_CAP);
     paint_.SetPathEffect(Rosen::Drawing::PathEffect::CreateCornerPathEffect(PAINT_PATH_RADIUS));
+    displayInfo_.x = 0;
+    displayInfo_.y = 0;
+    displayInfo_.id = 0;
+    displayInfo_.dpi = 0;
+    displayInfo_.width = 0;
+    displayInfo_.height = 0;
+    displayInfo_.direction = Direction::DIRECTION0;
+    displayInfo_.displayDirection = Direction::DIRECTION0;
 }
-
-KnuckleDrawingManager::~KnuckleDrawingManager() {}
 
 void KnuckleDrawingManager::KnuckleDrawHandler(std::shared_ptr<PointerEvent> touchEvent)
 {
@@ -70,7 +82,7 @@ void KnuckleDrawingManager::KnuckleDrawHandler(std::shared_ptr<PointerEvent> tou
     int32_t displayId = touchEvent->GetTargetDisplayId();
     CreateTouchWindow(displayId);
     int32_t touchAction = touchEvent->GetPointerAction();
-    if (IsValidAction(touchAction)) {
+    if (IsValidAction(touchAction) && IsSingleKnuckleDoubleClick(touchEvent)) {
         StartTouchDraw(touchEvent);
     }
 }
@@ -79,19 +91,55 @@ bool KnuckleDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent> touchE
 {
     CALL_DEBUG_ENTER;
     CHKPF(touchEvent);
-    auto id = touchEvent->GetPointerId();
+    int32_t id = touchEvent->GetPointerId();
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
     if (item.GetToolType() != PointerEvent::TOOL_TYPE_KNUCKLE ||
         touchEvent->GetPointerIds().size() != 1) {
-        if (canvasNode_ != nullptr) {
-            path_.Reset();
+        if (!pointerInfos_.empty()) {
             pointerInfos_.clear();
-            canvasNode_->ResetSurface();
+#ifndef USE_ROSEN_DRAWING
+            auto canvas = static_cast<Rosen::RSRecordingCanvas *>(canvasNode_->
+                BeginRecording(displayInfo_.width, displayInfo_.height));
+#else
+            auto canvas = static_cast<Rosen::Drawing::RecordingCanvas *>(canvasNode_->
+                BeginRecording(displayInfo_.width, displayInfo_.height));
+#endif // USE_ROSEN_DRAWING
+            canvas->Clear();
+            auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(canvasNode_.get());
+            canvasNode->ResetSurface();
+            canvasNode_->FinishRecording();
             Rosen::RSTransaction::FlushImplicitTransaction();
         }
-        MMI_HILOGE("touch tool type is not single knuckle");
         return false;
+    }
+    MMI_HILOGI("touch tool type is single knuckle");
+    return true;
+}
+
+bool KnuckleDrawingManager::IsSingleKnuckleDoubleClick(std::shared_ptr<PointerEvent> touchEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(touchEvent);
+    int32_t touchAction = touchEvent->GetPointerAction();
+    if (touchAction == PointerEvent::POINTER_ACTION_DOWN) {
+        int64_t intervalTime = touchEvent->GetActionTime() - lastUpTime_;
+        bool isTimeIntervalReady = intervalTime > 0 && intervalTime <= DOUBLE_CLICK_INTERVAL_TIME_SLOW;
+        int32_t id = touchEvent->GetPointerId();
+        PointerEvent::PointerItem pointerItem;
+        touchEvent->GetPointerItem(id, pointerItem);
+        int32_t physicalX = pointerItem.GetDisplayX();
+        int32_t physicalY = pointerItem.GetDisplayY();
+        float downToPrevDownDistance = static_cast<float>(sqrt(pow(lastDownPointer_.x - physicalX, POW_SQUARE) +
+            pow(lastDownPointer_.y - physicalY, POW_SQUARE)));
+        bool isDistanceReady = downToPrevDownDistance < DOUBLE_CLICK_DISTANCE_LONG_CONFIG * POW_SQUARE;
+        if (isTimeIntervalReady && isDistanceReady) {
+            return false;
+        }
+        lastDownPointer_.x = physicalX;
+        lastDownPointer_.y = physicalY;
+    } else if (touchAction == PointerEvent::POINTER_ACTION_UP) {
+        lastUpTime_ = touchEvent->GetActionTime();
     }
     return true;
 }
@@ -99,8 +147,10 @@ bool KnuckleDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent> touchE
 bool KnuckleDrawingManager::IsValidAction(const int32_t action)
 {
     CALL_DEBUG_ENTER;
-    if (action == PointerEvent::POINTER_ACTION_DOWN || action == PointerEvent::POINTER_ACTION_UP ||
-        (action == PointerEvent::POINTER_ACTION_MOVE && (!pointerInfos_.empty()))) {
+    if (action == PointerEvent::POINTER_ACTION_DOWN || action == PointerEvent::POINTER_ACTION_PULL_DOWN ||
+        (action == PointerEvent::POINTER_ACTION_MOVE && (!pointerInfos_.empty())) ||
+        (action == PointerEvent::POINTER_ACTION_PULL_MOVE && (!pointerInfos_.empty())) ||
+        action == PointerEvent::POINTER_ACTION_UP || action == PointerEvent::POINTER_ACTION_PULL_UP) {
         return true;
     }
     MMI_HILOGE("action is not down or move or up, action:%{public}d", action);
@@ -110,10 +160,6 @@ bool KnuckleDrawingManager::IsValidAction(const int32_t action)
 void KnuckleDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
 {
     CALL_DEBUG_ENTER;
-    if (displayInfo.dpi == displayInfo_.dpi) {
-        MMI_HILOGD("dpi is not need to change");
-        return;
-    }
     displayInfo_ = displayInfo;
 }
 
@@ -187,14 +233,20 @@ int32_t KnuckleDrawingManager::GetPointerPos(std::shared_ptr<PointerEvent> touch
         return RET_OK;
     }
     PointerInfo pointerInfo;
-    auto pointerId = touchEvent->GetPointerId();
+    int32_t pointerId = touchEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
     if (!touchEvent->GetPointerItem(pointerId, pointerItem)) {
         MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
         return RET_ERR;
     }
-    pointerInfo.x = pointerItem.GetDisplayX();
-    pointerInfo.y = pointerItem.GetDisplayY();
+    int32_t displayX = pointerItem.GetDisplayX();
+    int32_t displayY = pointerItem.GetDisplayY();
+    if (displayInfo_.displayDirection == DIRECTION0) {
+        TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(displayInfo_.direction, displayInfo_.width,
+            displayInfo_.height, displayX, displayY);
+    }
+    pointerInfo.x = displayX;
+    pointerInfo.y = displayY;
     pointerInfos_.push_back(pointerInfo);
 
     if (pointerInfos_.size() == MAX_POINTER_NUM) {
@@ -242,7 +294,8 @@ int32_t KnuckleDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> touchEv
         MMI_HILOGD("isActionUp_ is true");
         isActionUp_ = false;
         pointerInfos_.clear();
-        canvasNode_->ResetSurface();
+        auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(canvasNode_.get());
+        canvasNode->ResetSurface();
     }
     path_.Reset();
     canvasNode_->FinishRecording();

@@ -672,7 +672,7 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupSimulateEvent004()
 
 void InputManagerUtil::PrintPointerEventId(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_HILOGI("PointerEvent pointerId: %{public}d", pointerEvent->GetPointerId());
+    MMI_HILOGI("PointerEvent pointerId:%{public}d", pointerEvent->GetPointerId());
     auto pointerItems = pointerEvent->GetAllPointerItems();
     auto it = pointerItems.begin();
     int32_t count = 1;
@@ -879,9 +879,7 @@ std::unique_ptr<OHOS::Media::PixelMap> InputManagerUtil::SetMouseIconTest(const 
     decodeOpts.desiredSize = {.width = MOUSE_ICON_SIZE, .height = MOUSE_ICON_SIZE};
 
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, ret);
-    if (pixelMap == nullptr) {
-        MMI_HILOGE("The pixelMap is nullptr");
-    }
+    CHKPL(pixelMap);
     return pixelMap;
 }
 

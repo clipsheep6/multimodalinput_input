@@ -83,6 +83,9 @@ public:
     bool HasMagicCursor();
     int32_t DrawCursor(const MOUSE_ICON mouseStyle);
     int32_t SwitchPointerStyle() override;
+    void DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY) override;
+    void Dump(int32_t fd, const std::vector<std::string> &args) override;
+    void AttachToDisplay();
 private:
     IconStyle GetIconType(MOUSE_ICON mouseIcon);
     void GetPreferenceKey(std::string &name);
@@ -112,7 +115,7 @@ private:
     void AdjustMouseFocusByDirection180(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void AdjustMouseFocusByDirection270(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void CreateMagicCursorChangeObserver();
-    void CreatePointerSwiftObserver(isMagicCursor& item);
+    void CreatePointerSwitchObserver(isMagicCursor& item);
     int32_t GetIndependentPixels();
     bool CheckPointerStyleParam(int32_t windowId, PointerStyle pointerStyle);
     std::map<MOUSE_ICON, IconStyle>& GetMouseIcons();
