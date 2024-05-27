@@ -560,7 +560,7 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
         pkt << item.id << item.pid << item.uid << item.area << item.defaultHotAreas
             << item.pointerHotAreas << item.agentWindowId << item.flags << item.action
             << item.displayId << item.zOrder << item.pointerChangeAreas << item.transform
-            << item.windowInputType << item.privacyMode;
+            << item.windowInputType << item.privacyMode << item.windowType;
 
         if (item.pixelMap == nullptr) {
             pkt << byteCount;
