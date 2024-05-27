@@ -53,7 +53,7 @@ int32_t MultimodalInputConnectManager::AllocSocketPair(const int32_t moduleType)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
 
     const std::string programName(GetProgramName());
     int32_t result = multimodalInputConnectService_->AllocSocketFd(programName, moduleType, socketFd_, tokenType_);
@@ -75,7 +75,7 @@ int32_t MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair() co
 int32_t MultimodalInputConnectManager::GetDisplayBindInfo(DisplayBindInfos &infos)
 {
     std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->GetDisplayBindInfo(infos);
 }
 
@@ -83,21 +83,21 @@ int32_t MultimodalInputConnectManager::GetAllMmiSubscribedEvents(std::map<std::t
     int32_t> &datas)
 {
     std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->GetAllMmiSubscribedEvents(datas);
 }
 
 int32_t MultimodalInputConnectManager::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
 {
     std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SetDisplayBind(deviceId, displayId, msg);
 }
 
 int32_t MultimodalInputConnectManager::GetWindowPid(int32_t windowId)
 {
     std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->GetWindowPid(windowId);
 }
 
@@ -105,310 +105,310 @@ int32_t MultimodalInputConnectManager::AddInputEventFilter(sptr<IEventFilter> fi
     int32_t priority, uint32_t deviceTags)
 {
     std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->AddInputEventFilter(filter, filterId, priority, deviceTags);
 }
 
 int32_t MultimodalInputConnectManager::NotifyNapOnline()
 {
     std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->NotifyNapOnline();
 }
 
 int32_t MultimodalInputConnectManager::RemoveInputEventObserver()
 {
     std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->RemoveInputEventObserver();
 }
 
 int32_t MultimodalInputConnectManager::RemoveInputEventFilter(int32_t filterId)
 {
     std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->RemoveInputEventFilter(filterId);
 }
 
 int32_t MultimodalInputConnectManager::SetMouseScrollRows(int32_t rows)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SetMouseScrollRows(rows);
 }
 
 int32_t MultimodalInputConnectManager::SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY,
     void* pixelMap)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SetCustomCursor(pid, windowId, focusX, focusY, pixelMap);
 }
 
 int32_t MultimodalInputConnectManager::SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SetMouseIcon(pid, windowId, pixelMap);
 }
 
 int32_t MultimodalInputConnectManager::SetMouseHotSpot(
     int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SetMouseHotSpot(pid, windowId, hotSpotX, hotSpotY);
 }
 
 int32_t MultimodalInputConnectManager::GetMouseScrollRows(int32_t &rows)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->GetMouseScrollRows(rows);
 }
 
 int32_t MultimodalInputConnectManager::SetPointerSize(int32_t size)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SetPointerSize(size);
 }
 
 int32_t MultimodalInputConnectManager::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SetNapStatus(pid, uid, bundleName, napStatus);
 }
 
 int32_t MultimodalInputConnectManager::GetPointerSize(int32_t &size)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->GetPointerSize(size);
 }
 
 int32_t MultimodalInputConnectManager::SetMousePrimaryButton(int32_t primaryButton)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SetMousePrimaryButton(primaryButton);
 }
 
 int32_t MultimodalInputConnectManager::GetMousePrimaryButton(int32_t &primaryButton)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->GetMousePrimaryButton(primaryButton);
 }
 
 int32_t MultimodalInputConnectManager::SetHoverScrollState(bool state)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SetHoverScrollState(state);
 }
 
 int32_t MultimodalInputConnectManager::GetHoverScrollState(bool &state)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->GetHoverScrollState(state);
 }
 
 int32_t MultimodalInputConnectManager::SetPointerVisible(bool visible, int32_t priority)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SetPointerVisible(visible, priority);
 }
 
 int32_t MultimodalInputConnectManager::IsPointerVisible(bool &visible)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->IsPointerVisible(visible);
 }
 
 int32_t MultimodalInputConnectManager::MarkProcessed(int32_t eventType, int32_t eventId)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->MarkProcessed(eventType, eventId);
 }
 
 int32_t MultimodalInputConnectManager::SetPointerColor(int32_t color)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SetPointerColor(color);
 }
 
 int32_t MultimodalInputConnectManager::GetPointerColor(int32_t &color)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->GetPointerColor(color);
 }
 
 int32_t MultimodalInputConnectManager::SetPointerSpeed(int32_t speed)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SetPointerSpeed(speed);
 }
 
 int32_t MultimodalInputConnectManager::GetPointerSpeed(int32_t &speed)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->GetPointerSpeed(speed);
 }
 
 int32_t MultimodalInputConnectManager::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle, bool isUiExtension)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SetPointerStyle(windowId, pointerStyle, isUiExtension);
 }
 
 int32_t MultimodalInputConnectManager::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->ClearWindowPointerStyle(pid, windowId);
 }
 
 int32_t MultimodalInputConnectManager::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->GetPointerStyle(windowId, pointerStyle, isUiExtension);
 }
 
 int32_t MultimodalInputConnectManager::RegisterDevListener()
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->RegisterDevListener();
 }
 
 int32_t MultimodalInputConnectManager::UnregisterDevListener()
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->UnregisterDevListener();
 }
 
 int32_t MultimodalInputConnectManager::SupportKeys(int32_t deviceId, std::vector<int32_t> &keys,
     std::vector<bool> &keystroke)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SupportKeys(deviceId, keys, keystroke);
 }
 
 int32_t MultimodalInputConnectManager::GetDeviceIds(std::vector<int32_t> &ids)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->GetDeviceIds(ids);
 }
 
 int32_t MultimodalInputConnectManager::GetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->GetDevice(deviceId, inputDevice);
 }
 
 int32_t MultimodalInputConnectManager::GetKeyboardType(int32_t deviceId, int32_t &keyboardType)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->GetKeyboardType(deviceId, keyboardType);
 }
 
 int32_t MultimodalInputConnectManager::SetKeyboardRepeatDelay(int32_t delay)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SetKeyboardRepeatDelay(delay);
 }
 
 int32_t MultimodalInputConnectManager::SetKeyboardRepeatRate(int32_t rate)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SetKeyboardRepeatRate(rate);
 }
 
 int32_t MultimodalInputConnectManager::GetKeyboardRepeatDelay(int32_t &delay)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->GetKeyboardRepeatDelay(delay);
 }
 
 int32_t MultimodalInputConnectManager::GetKeyboardRepeatRate(int32_t &rate)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->GetKeyboardRepeatRate(rate);
 }
 
 int32_t MultimodalInputConnectManager::AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
     int32_t priority, uint32_t deviceTags)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->AddInputHandler(handlerType, eventType, priority, deviceTags);
 }
 
 int32_t MultimodalInputConnectManager::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
     int32_t priority, uint32_t deviceTags)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->RemoveInputHandler(handlerType, eventType, priority, deviceTags);
 }
 
 int32_t MultimodalInputConnectManager::MarkEventConsumed(int32_t eventId)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->MarkEventConsumed(eventId);
 }
 
 int32_t MultimodalInputConnectManager::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SubscribeKeyEvent(subscribeId, option);
 }
 
 int32_t MultimodalInputConnectManager::UnsubscribeKeyEvent(int32_t subscribeId)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->UnsubscribeKeyEvent(subscribeId);
 }
 
 int32_t MultimodalInputConnectManager::SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SubscribeSwitchEvent(subscribeId, switchType);
 }
 
 int32_t MultimodalInputConnectManager::UnsubscribeSwitchEvent(int32_t subscribeId)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->UnsubscribeSwitchEvent(subscribeId);
 }
 
 int32_t MultimodalInputConnectManager::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->MoveMouseEvent(offsetX, offsetY);
 }
 
 int32_t MultimodalInputConnectManager::InjectKeyEvent(const std::shared_ptr<KeyEvent> event, bool isNativeInject)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->InjectKeyEvent(event, isNativeInject);
 }
 
 int32_t MultimodalInputConnectManager::InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent,
     bool isNativeInject)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->InjectPointerEvent(pointerEvent, isNativeInject);
 }
 
 int32_t MultimodalInputConnectManager::SetAnrObserver()
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SetAnrObserver();
 }
 
 int32_t MultimodalInputConnectManager::GetFunctionKeyState(int32_t funcKey, bool &state)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->GetFunctionKeyState(funcKey, state);
 }
 
 int32_t MultimodalInputConnectManager::SetFunctionKeyState(int32_t funcKey, bool enable)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SetFunctionKeyState(funcKey, enable);
 }
 
 int32_t MultimodalInputConnectManager::SetPointerLocation(int32_t x, int32_t y)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SetPointerLocation(x, y);
 }
 
@@ -495,146 +495,146 @@ void MultimodalInputConnectManager::NotifyDeath()
 
 int32_t MultimodalInputConnectManager::SetMouseCaptureMode(int32_t windowId, bool isCaptureMode)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SetMouseCaptureMode(windowId, isCaptureMode);
 }
 
 int32_t MultimodalInputConnectManager::AppendExtraData(const ExtraData &extraData)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->AppendExtraData(extraData);
 }
 
 int32_t MultimodalInputConnectManager::EnableCombineKey(bool enable)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->EnableCombineKey(enable);
 }
 
 int32_t MultimodalInputConnectManager::EnableInputDevice(bool enable)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->EnableInputDevice(enable);
 }
 
 int32_t MultimodalInputConnectManager::SetKeyDownDuration(const std::string &businessId, int32_t delay)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SetKeyDownDuration(businessId, delay);
 }
 
 int32_t MultimodalInputConnectManager::SetTouchpadScrollSwitch(bool switchFlag)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SetTouchpadScrollSwitch(switchFlag);
 }
 
 int32_t MultimodalInputConnectManager::GetTouchpadScrollSwitch(bool &switchFlag)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->GetTouchpadScrollSwitch(switchFlag);
 }
 
 int32_t MultimodalInputConnectManager::SetTouchpadScrollDirection(bool state)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SetTouchpadScrollDirection(state);
 }
 
 int32_t MultimodalInputConnectManager::GetTouchpadScrollDirection(bool &state)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->GetTouchpadScrollDirection(state);
 }
 
 int32_t MultimodalInputConnectManager::SetTouchpadTapSwitch(bool switchFlag)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SetTouchpadTapSwitch(switchFlag);
 }
 
 int32_t MultimodalInputConnectManager::GetTouchpadTapSwitch(bool &switchFlag)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->GetTouchpadTapSwitch(switchFlag);
 }
 
 int32_t MultimodalInputConnectManager::SetTouchpadPointerSpeed(int32_t speed)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SetTouchpadPointerSpeed(speed);
 }
 
 int32_t MultimodalInputConnectManager::GetTouchpadPointerSpeed(int32_t &speed)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->GetTouchpadPointerSpeed(speed);
 }
 
 int32_t MultimodalInputConnectManager::SetTouchpadPinchSwitch(bool switchFlag)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SetTouchpadPinchSwitch(switchFlag);
 }
 
 int32_t MultimodalInputConnectManager::GetTouchpadPinchSwitch(bool &switchFlag)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->GetTouchpadPinchSwitch(switchFlag);
 }
 
 int32_t MultimodalInputConnectManager::SetTouchpadSwipeSwitch(bool switchFlag)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SetTouchpadSwipeSwitch(switchFlag);
 }
 
 int32_t MultimodalInputConnectManager::GetTouchpadSwipeSwitch(bool &switchFlag)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->GetTouchpadSwipeSwitch(switchFlag);
 }
 
 int32_t MultimodalInputConnectManager::SetTouchpadRightClickType(int32_t type)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SetTouchpadRightClickType(type);
 }
 
 int32_t MultimodalInputConnectManager::GetTouchpadRightClickType(int32_t &type)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->GetTouchpadRightClickType(type);
 }
 
 int32_t MultimodalInputConnectManager::SetTouchpadRotateSwitch(bool rotateSwitch)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SetTouchpadRotateSwitch(rotateSwitch);
 }
 
 int32_t MultimodalInputConnectManager::GetTouchpadRotateSwitch(bool &rotateSwitch)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->GetTouchpadRotateSwitch(rotateSwitch);
 }
 
 int32_t MultimodalInputConnectManager::SetShieldStatus(int32_t shieldMode, bool isShield)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SetShieldStatus(shieldMode, isShield);
 }
 
 int32_t MultimodalInputConnectManager::GetShieldStatus(int32_t shieldMode, bool &isShield)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->GetShieldStatus(shieldMode, isShield);
 }
 
 int32_t MultimodalInputConnectManager::GetKeyState(std::vector<int32_t> &pressedKeys,
     std::map<int32_t, int32_t> &specialKeysState)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->GetKeyState(pressedKeys, specialKeysState);
 }
 
@@ -653,43 +653,43 @@ void MultimodalInputConnectManager::RemoveServiceWatcher(std::shared_ptr<IInputS
 
 int32_t MultimodalInputConnectManager::Authorize(bool isAuthorize)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->Authorize(isAuthorize);
 }
 
 int32_t MultimodalInputConnectManager::CancelInjection()
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->CancelInjection();
 }
 
 int32_t MultimodalInputConnectManager::HasIrEmitter(bool &hasIrEmitter)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->HasIrEmitter(hasIrEmitter);
 }
 
 int32_t MultimodalInputConnectManager::GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->GetInfraredFrequencies(requencys);
 }
 
 int32_t MultimodalInputConnectManager::TransmitInfrared(int64_t number, std::vector<int64_t>& pattern)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->TransmitInfrared(number, pattern);
 }
 
 int32_t MultimodalInputConnectManager::SetPixelMapData(int32_t infoId, void* pixelMap)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SetPixelMapData(infoId, pixelMap);
 }
 
 int32_t MultimodalInputConnectManager::SetCurrentUser(int32_t userId)
 {
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(multimodalInputConnectService_, CONNECT_SERVICE_FAILED);
     return multimodalInputConnectService_->SetCurrentUser(userId);
 }
 } // namespace MMI
