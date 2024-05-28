@@ -442,19 +442,19 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_UpdateMouseStyle_001
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_CreatePointerSwiftObserver_001
- * @tc.desc: Test CreatePointerSwiftObserver
+ * @tc.name: InputWindowsManagerTest_CreatePointerSwitchObserver_001
+ * @tc.desc: Test CreatePointerSwitchObserver
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_CreatePointerSwiftObserver_001, TestSize.Level1)
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_CreatePointerSwitchObserver_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
     isMagicCursor item;
     item.isShow = true;
     item.name = "test";
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.CreatePointerSwiftObserver(item));
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.CreatePointerSwitchObserver(item));
 }
 
 /**
@@ -748,6 +748,165 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_CheckMouseIconPath_0
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.CheckMouseIconPath());
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_ConvertToDrawingColorSpace
+ * @tc.desc: Test ConvertToDrawingColorSpace
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ConvertToDrawingColorSpace, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    Media::ColorSpace colorSpace = Media::ColorSpace::DISPLAY_P3;
+    ASSERT_NE(pointerDrawingManager.ConvertToDrawingColorSpace(colorSpace), nullptr);
+    colorSpace = Media::ColorSpace::LINEAR_SRGB;
+    ASSERT_NE(pointerDrawingManager.ConvertToDrawingColorSpace(colorSpace), nullptr);
+    colorSpace = Media::ColorSpace::SRGB;
+    ASSERT_NE(pointerDrawingManager.ConvertToDrawingColorSpace(colorSpace), nullptr);
+    colorSpace = static_cast<Media::ColorSpace>(5);
+    ASSERT_NE(pointerDrawingManager.ConvertToDrawingColorSpace(colorSpace), nullptr);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_PixelFormatToDrawingColorType
+ * @tc.desc: Test PixelFormatToDrawingColorType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_PixelFormatToDrawingColorType, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    Media::PixelFormat pixelFmt = Media::PixelFormat::RGB_565;
+    ASSERT_EQ(pointerDrawingManager.PixelFormatToDrawingColorType(pixelFmt),
+        Rosen::Drawing::ColorType::COLORTYPE_RGB_565);
+    pixelFmt = Media::PixelFormat::RGBA_8888;
+    ASSERT_EQ(pointerDrawingManager.PixelFormatToDrawingColorType(pixelFmt),
+        Rosen::Drawing::ColorType::COLORTYPE_RGBA_8888);
+    pixelFmt = Media::PixelFormat::BGRA_8888;
+    ASSERT_EQ(pointerDrawingManager.PixelFormatToDrawingColorType(pixelFmt),
+        Rosen::Drawing::ColorType::COLORTYPE_BGRA_8888);
+    pixelFmt = Media::PixelFormat::ALPHA_8;
+    ASSERT_EQ(pointerDrawingManager.PixelFormatToDrawingColorType(pixelFmt),
+        Rosen::Drawing::ColorType::COLORTYPE_ALPHA_8);
+    pixelFmt = Media::PixelFormat::RGBA_F16;
+    ASSERT_EQ(pointerDrawingManager.PixelFormatToDrawingColorType(pixelFmt),
+        Rosen::Drawing::ColorType::COLORTYPE_RGBA_F16);
+    pixelFmt = Media::PixelFormat::UNKNOWN;
+    ASSERT_EQ(pointerDrawingManager.PixelFormatToDrawingColorType(pixelFmt),
+        Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
+    pixelFmt = Media::PixelFormat::ARGB_8888;
+    ASSERT_EQ(pointerDrawingManager.PixelFormatToDrawingColorType(pixelFmt),
+        Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
+    pixelFmt = Media::PixelFormat::RGB_888;
+    ASSERT_EQ(pointerDrawingManager.PixelFormatToDrawingColorType(pixelFmt),
+        Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
+    pixelFmt = Media::PixelFormat::NV21;
+    ASSERT_EQ(pointerDrawingManager.PixelFormatToDrawingColorType(pixelFmt),
+        Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
+    pixelFmt = Media::PixelFormat::NV12;
+    ASSERT_EQ(pointerDrawingManager.PixelFormatToDrawingColorType(pixelFmt),
+        Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
+    pixelFmt = Media::PixelFormat::CMYK;
+    ASSERT_EQ(pointerDrawingManager.PixelFormatToDrawingColorType(pixelFmt),
+        Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
+    pixelFmt = static_cast<Media::PixelFormat>(100);
+    ASSERT_EQ(pointerDrawingManager.PixelFormatToDrawingColorType(pixelFmt),
+        Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest__AlphaTypeToDrawingAlphaType
+ * @tc.desc: Test AlphaTypeToDrawingAlphaType
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_AlphaTypeToAlphaType, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    Media::AlphaType alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_UNKNOWN;
+    ASSERT_EQ(pointerDrawingManager.AlphaTypeToDrawingAlphaType(alphaType),
+        Rosen::Drawing::AlphaType::ALPHATYPE_UNKNOWN);
+    alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_OPAQUE;
+    ASSERT_EQ(pointerDrawingManager.AlphaTypeToDrawingAlphaType(alphaType),
+        Rosen::Drawing::AlphaType::ALPHATYPE_OPAQUE);
+    alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_PREMUL;
+    ASSERT_EQ(pointerDrawingManager.AlphaTypeToDrawingAlphaType(alphaType),
+        Rosen::Drawing::AlphaType::ALPHATYPE_PREMUL);
+    alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_UNPREMUL;
+    ASSERT_EQ(pointerDrawingManager.AlphaTypeToDrawingAlphaType(alphaType),
+        Rosen::Drawing::AlphaType::ALPHATYPE_UNPREMUL);
+    alphaType = static_cast<Media::AlphaType>(5);
+    ASSERT_EQ(pointerDrawingManager.AlphaTypeToDrawingAlphaType(alphaType),
+        Rosen::Drawing::AlphaType::ALPHATYPE_UNKNOWN);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_ExtractDrawingImage_001
+ * @tc.desc: Test ExtractDrawingImage
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ExtractDrawingImage_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OHOS::Rosen::Drawing::Bitmap bitmap;
+    OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
+        OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE };
+    PointerDrawingManager pointerDrawingManager;
+    bitmap.Build(64, 64, format);
+    OHOS::Rosen::Drawing::Canvas canvas(256, 256);
+    canvas.Bind(bitmap);
+    canvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
+    MOUSE_ICON mouseStyle = MOUSE_ICON::RUNNING_LEFT;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawToImage(canvas, mouseStyle));
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_ExtractDrawingImage_002
+ * @tc.desc: Test ExtractDrawingImage
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ExtractDrawingImage_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OHOS::Rosen::Drawing::Bitmap bitmap;
+    OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
+        OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE };
+    PointerDrawingManager pointerDrawingManager;
+    bitmap.Build(64, 64, format);
+    OHOS::Rosen::Drawing::Canvas canvas(256, 256);
+    canvas.Bind(bitmap);
+    canvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
+    MOUSE_ICON mouseStyle = MOUSE_ICON::RUNNING;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawToImage(canvas, mouseStyle));
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_ExtractDrawingImage_003
+ * @tc.desc: Test ExtractDrawingImage
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ExtractDrawingImage_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OHOS::Rosen::Drawing::Bitmap bitmap;
+    OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
+        OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE };
+    PointerDrawingManager pointerDrawingManager;
+    bitmap.Build(64, 64, format);
+    OHOS::Rosen::Drawing::Canvas canvas(256, 256);
+    canvas.Bind(bitmap);
+    canvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
+    MOUSE_ICON mouseStyle = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawToImage(canvas, mouseStyle));
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetPointerLocation(200, 200));
 }
 } // namespace MMI
 } // namespace OHOS

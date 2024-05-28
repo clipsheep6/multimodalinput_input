@@ -44,21 +44,21 @@ bool HardwareCursorPointerManager::IsSupported()
 int32_t HardwareCursorPointerManager::SetPosition(int32_t x, int32_t y)
 {
     CALL_DEBUG_ENTER;
-	MMI_HILOGI("SetPosition, x:%{public}d, y:%{public}d", x, y);
+    MMI_HILOGD("SetPosition, x:%{public}d, y:%{public}d", x, y);
     return RET_OK;
 }
 
 int32_t HardwareCursorPointerManager::EnableStats(bool enable)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGI("EnableStats, enable:%{public}d", enable);
+    MMI_HILOGD("EnableStats, enable:%{public}d", enable);
     return RET_OK;
 }
 
 int32_t HardwareCursorPointerManager::QueryStats(uint32_t &frameCount, uint32_t &vsyncCount)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGI("Get hardware cursor stats, frameCount:%{public}d, vsyncCount:%{public}d", frameCount, vsyncCount);
+    MMI_HILOGD("Get hardware cursor stats, frameCount:%{public}d, vsyncCount:%{public}d", frameCount, vsyncCount);
     return RET_OK;
 }
 } // namespace MMI
