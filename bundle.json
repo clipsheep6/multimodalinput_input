@@ -79,7 +79,8 @@
         "audio_framework",
         "hdf_core",
         "bounds_checking_function",
-        "qos_manager"
+        "qos_manager",
+        "memmgr"
       ],
       "third_party": [
         "cJSON",

@@ -61,6 +61,11 @@ ohos_executable("uinput_inject") {
 
   defines = [ "MMI_DISABLE_LOG_TRACE" ]
 
+  if (input_feature_memmgr_enable) {
+    defines += [ "MEMMGR_ENABLE" ]
+    external_deps += [ "memmgr:memmgrclient" ]
+  }
+
   part_name = "input"
   subsystem_name = "multimodalinput"
 }

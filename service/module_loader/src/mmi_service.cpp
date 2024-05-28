@@ -58,6 +58,9 @@
 #include "util_ex.h"
 #include "util_napi_error.h"
 #include "xcollie/watchdog.h"
+#ifdef MEMMGR_ENABLE
+#include "mem_mgr_client.h"
+#endif
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MMIService"
 #undef MMI_LOG_DOMAIN
@@ -320,6 +323,9 @@ void MMIService::OnStart()
     InitAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
     PREFERENCES_MGR->InitPreferences();
+#ifdef MEMMGR_ENABLE
+    AddSystemAbilityListener(MEMORY_MANAGER_SA_ID);
+#endif
     TimerMgr->AddTimer(WATCHDOG_INTERVAL_TIME, -1, [this]() {
         MMI_HILOGD("Set thread status flag to true");
         threadStatusFlag_ = true;
@@ -356,6 +362,10 @@ void MMIService::OnStop()
 #ifdef OHOS_BUILD_ENABLE_ANCO
     StopAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
+#ifdef MEMMGR_ENABLE
+    Memory::MemMgrClient::GetInstance().NotifyProcessStatus(getpid(), PROCESS_TYPE_SA, PROCESS_STATUS_DIED,
+        MULTIMODAL_INPUT_CONNECT_SERVICE_ID);
+#endif
 }
 
 void MMIService::AddAppDebugListener()
@@ -1300,6 +1310,12 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
         DEVICE_MONITOR->InitCommonEventSubscriber();
         MMI_HILOGD("Common event service started");
     }
+#ifdef MEMMGR_ENABLE
+    if (systemAbilityId == MEMORY_MANAGER_SA_ID) {
+        Memory::MemMgrClient::GetInstance().NotifyProcessStatus(getpid(), PROCESS_TYPE_SA, PROCESS_STATUS_STARTED,
+            MULTIMODAL_INPUT_CONNECT_SERVICE_ID);
+    }
+#endif
 }
 
 int32_t MMIService::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option)
