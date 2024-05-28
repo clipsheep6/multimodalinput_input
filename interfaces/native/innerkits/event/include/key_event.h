@@ -3388,7 +3388,7 @@ public:
      * @return void.
      * @since 11
      */
-    void SetEnhanceData(std::vector<uint8_t> enhanceData);
+    void SetEnhanceData(std::vector<uint8_t>& enhanceData);
     /**
      * @brief Obtains the enhance data.
      * @return Returns the enhance data.
