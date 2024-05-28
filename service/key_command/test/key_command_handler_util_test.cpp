@@ -122,7 +122,7 @@ HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetPreKeys_002, Te
     CALL_TEST_DEBUG;
     cJSON* jsonData = cJSON_CreateObject();
     cJSON* preKey = cJSON_CreateArray();
-    for (int i = 0; i < MAX_PREKEYS_NUM + 1; ++i) {
+    for (int32_t i = 0; i < MAX_PREKEYS_NUM + 1; ++i) {
         cJSON_AddItemToArray(preKey, cJSON_CreateNumber(i));
     }
     cJSON_AddItemToObject(jsonData, "preKey", preKey);
@@ -325,7 +325,7 @@ HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetPreKeys_008, Te
     CALL_TEST_DEBUG;
     cJSON* jsonData = cJSON_CreateObject();
     cJSON* preKey = cJSON_CreateArray();
-    for (int i = 0; i < 10; ++i) {
+    for (int32_t i = 0; i < 10; ++i) {
         cJSON_AddItemToArray(preKey, cJSON_CreateNumber(i));
     }
     cJSON_AddItemToObject(jsonData, "preKey", preKey);
@@ -596,6 +596,230 @@ HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetKeyFinalKey_003
     EXPECT_TRUE(OHOS::MMI::GetKeyFinalKey(jsonData, finalKeyInt));
     EXPECT_EQ(finalKeyInt, 123);
     cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetKeyVal_001
+ * @tc.desc: Test key does not exist in JSON object
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetKeyVal_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON *json = nullptr;
+    std::string value;
+    OHOS::MMI::GetKeyVal(json, "key", value);
+    EXPECT_TRUE(value.empty());
+    cJSON_Delete(json);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetKeyVal_002
+ * @tc.desc: The value corresponding to the test key is a string type
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetKeyVal_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON *json = cJSON_CreateObject();
+    cJSON_AddStringToObject(json, "key", "value");
+    std::string value;
+    OHOS::MMI::GetKeyVal(json, "key", value);
+    EXPECT_EQ(value, "value");
+    cJSON_Delete(json);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetEntities_001
+ * @tc.desc: Testing jsonAbility is not an object
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetEntities_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    cJSON* jsonAbility = nullptr;
+    ASSERT_FALSE(OHOS::MMI::GetEntities(jsonAbility, ability));
+    cJSON_Delete(jsonAbility);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetEntities_002
+ * @tc.desc: Test has no entities field
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetEntities_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    cJSON* jsonAbility = cJSON_CreateObject();
+    ASSERT_TRUE(OHOS::MMI::GetEntities(jsonAbility, ability));
+    cJSON_Delete(jsonAbility);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetEntities_003
+ * @tc.desc: The test entities field exists but is not an array
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetEntities_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    cJSON* jsonAbility = cJSON_CreateObject();
+    cJSON_AddItemToObject(jsonAbility, "entities", cJSON_CreateNumber(123));
+    ASSERT_FALSE(OHOS::MMI::GetEntities(jsonAbility, ability));
+    cJSON_Delete(jsonAbility);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetEntities_004
+ * @tc.desc: Test array contains non-string elements
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetEntities_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    cJSON* jsonAbility = cJSON_CreateObject();
+    cJSON* entities = cJSON_CreateArray();
+    cJSON_AddItemToArray(entities, cJSON_CreateNumber(123));
+    cJSON_AddItemToObject(jsonAbility, "entities", entities);
+    ASSERT_FALSE(OHOS::MMI::GetEntities(jsonAbility, ability));
+    cJSON_Delete(jsonAbility);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetEntities_005
+ * @tc.desc: Test normal conditions
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetEntities_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    cJSON* jsonAbility = cJSON_CreateObject();
+    cJSON* entities = cJSON_CreateArray();
+    cJSON_AddItemToArray(entities, cJSON_CreateString("entity1"));
+    cJSON_AddItemToArray(entities, cJSON_CreateString("entity2"));
+    cJSON_AddItemToObject(jsonAbility, "entities", entities);
+    ASSERT_TRUE(OHOS::MMI::GetEntities(jsonAbility, ability));
+    EXPECT_EQ(ability.entities.size(), 2);
+    EXPECT_EQ(ability.entities[0], "entity1");
+    EXPECT_EQ(ability.entities[1], "entity2");
+    cJSON_Delete(jsonAbility);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetParams_001
+ * @tc.desc: Test jsonAbility is not an object
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetParams_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    cJSON* jsonAbility = nullptr;
+    ASSERT_FALSE(OHOS::MMI::GetParams(jsonAbility, ability));
+    cJSON_Delete(jsonAbility);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetParams_002
+ * @tc.desc: Test params are not an array
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetParams_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    cJSON* jsonAbility = cJSON_CreateObject();
+    cJSON* params = cJSON_CreateString("not an array");
+    cJSON_AddItemToObject(jsonAbility, "params", params);
+    bool result = OHOS::MMI::GetParams(jsonAbility, ability);
+    ASSERT_FALSE(result);
+    ASSERT_TRUE(ability.params.empty());
+    cJSON_Delete(jsonAbility);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetParams_003
+ * @tc.desc: Test Params for nullptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetParams_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    cJSON* jsonAbility = cJSON_CreateObject();
+    cJSON* params = cJSON_CreateArray();
+    cJSON_AddItemToObject(jsonAbility, "params", params);
+    cJSON_AddItemToArray(params, nullptr);
+    bool result = OHOS::MMI::GetParams(jsonAbility, ability);
+    EXPECT_TRUE(result);
+    cJSON_Delete(jsonAbility);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetParams_004
+ * @tc.desc: Test param is not an object
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetParams_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    cJSON* jsonAbility = cJSON_CreateObject();
+    cJSON* params = cJSON_CreateObject();
+    cJSON_AddItemToObject(jsonAbility, "params", params);
+    bool result = OHOS::MMI::GetParams(jsonAbility, ability);
+    EXPECT_FALSE(result);
+    cJSON_Delete(jsonAbility);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetParams_005
+ * @tc.desc: The test key is not a string
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetParams_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    const char* jsonStr = R"({"params":[{"key":123,"value":"value"}]})";
+    cJSON* jsonAbility = cJSON_Parse(jsonStr);
+    bool result = OHOS::MMI::GetParams(jsonAbility, ability);
+    ASSERT_FALSE(result);
+    cJSON_Delete(jsonAbility);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetParams_006
+ * @tc.desc: The test value is not a string
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetParams_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    const char* jsonStr = R"({"params":[{"key":"key","value":123}]})";
+    cJSON* jsonAbility = cJSON_Parse(jsonStr);
+    bool result = OHOS::MMI::GetParams(jsonAbility, ability);
+    ASSERT_FALSE(result);
+    cJSON_Delete(jsonAbility);
 }
 
 /**
@@ -964,6 +1188,423 @@ HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetKeyAction_004, 
     int32_t keyActionInt;
     EXPECT_TRUE(OHOS::MMI::GetKeyAction(jsonData, keyActionInt));
     EXPECT_EQ(keyActionInt, KeyEvent::KEY_ACTION_DOWN);
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetDelay_001
+ * @tc.desc: Tests when jsonData is not an object
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetDelay_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = nullptr;
+    int64_t delayInt = 1;
+    EXPECT_FALSE(OHOS::MMI::GetDelay(jsonData, delayInt));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetDelay_002
+ * @tc.desc: Tests the condition when the delay entry is present but not numeric
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetDelay_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = cJSON_CreateObject();
+    cJSON_AddItemToObject(jsonData, "delay", cJSON_CreateString("not a number"));
+    int64_t delayInt = 1;
+    EXPECT_FALSE(OHOS::MMI::GetDelay(jsonData, delayInt));
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetDelay_003
+ * @tc.desc: Tests the case when the delay term is a negative number
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetDelay_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = cJSON_CreateObject();
+    cJSON_AddNumberToObject(jsonData, "delay", -1);
+    int64_t delayInt = 1;
+    EXPECT_FALSE(OHOS::MMI::GetDelay(jsonData, delayInt));
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetDelay_004
+ * @tc.desc: Test the condition when all conditions are met
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetDelay_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = cJSON_CreateObject();
+    cJSON_AddNumberToObject(jsonData, "delay", 10);
+    int64_t delayInt = 1;
+    EXPECT_TRUE(OHOS::MMI::GetDelay(jsonData, delayInt));
+    EXPECT_EQ(delayInt, 10 * SECONDS_SYSTEM);
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetRepeatTimes_001
+ * @tc.desc: Tests when jsonData is not an object
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetRepeatTimes_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t repeatTimesInt = 1;
+    EXPECT_FALSE(OHOS::MMI::GetRepeatTimes(nullptr, repeatTimesInt));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetRepeatTimes_002
+ * @tc.desc: Tests the case when the delay term is a negative number
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetRepeatTimes_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON *jsonData = cJSON_CreateObject();
+    cJSON_AddItemToObject(jsonData, "times", cJSON_CreateString("not a number"));
+    int32_t repeatTimesInt = 1;
+    EXPECT_FALSE(OHOS::MMI::GetRepeatTimes(jsonData, repeatTimesInt));
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetRepeatTimes_003
+ * @tc.desc: Test the case when the timers entry is a negative number
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetRepeatTimes_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON *jsonData = cJSON_CreateObject();
+    cJSON_AddItemToObject(jsonData, "times", cJSON_CreateNumber(-1));
+    int32_t repeatTimesInt = 1;
+    EXPECT_FALSE(OHOS::MMI::GetRepeatTimes(jsonData, repeatTimesInt));
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetRepeatTimes_004
+ * @tc.desc: Test the condition when all conditions are met
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetRepeatTimes_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON *jsonData = cJSON_CreateObject();
+    cJSON_AddItemToObject(jsonData, "times", cJSON_CreateNumber(1));
+    int32_t repeatTimesInt = 1;
+    EXPECT_TRUE(OHOS::MMI::GetRepeatTimes(jsonData, repeatTimesInt));
+    EXPECT_EQ(repeatTimesInt, 1);
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetAbilityStartDelay_001
+ * @tc.desc: Tests when jsonData is not an object
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetAbilityStartDelay_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int64_t delay = 1;
+    EXPECT_FALSE(OHOS::MMI::GetAbilityStartDelay(nullptr, delay));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetAbilityStartDelay_002
+ * @tc.desc: Tests the value of the abilityStartDela field is not a number
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetAbilityStartDelay_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON *jsonData = cJSON_CreateObject();
+    cJSON_AddItemToObject(jsonData, "abilityStartDelay", cJSON_CreateString("not a number"));
+    int64_t delay = 1;
+    EXPECT_FALSE(OHOS::MMI::GetAbilityStartDelay(jsonData, delay));
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetAbilityStartDelay_003
+ * @tc.desc: Test the case when the abilityStartDelay entry is a negative number
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetAbilityStartDelay_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON *jsonData = cJSON_CreateObject();
+    cJSON_AddItemToObject(jsonData, "abilityStartDelay", cJSON_CreateNumber(-1));
+    int64_t delay = 1;
+    EXPECT_FALSE(OHOS::MMI::GetAbilityStartDelay(jsonData, delay));
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetAbilityStartDelay_004
+ * @tc.desc: Test the condition when all conditions are met
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetAbilityStartDelay_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON *jsonData = cJSON_CreateObject();
+    cJSON_AddItemToObject(jsonData, "abilityStartDelay", cJSON_CreateNumber(10));
+    int64_t delay = 1;
+    EXPECT_TRUE(OHOS::MMI::GetAbilityStartDelay(jsonData, delay));
+    EXPECT_EQ(delay, 10);
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_PackageSequenceKey_001
+ * @tc.desc: Tests when jsonData is not an object
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_PackageSequenceKey_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON* json = nullptr;
+    SequenceKey sequenceKey;
+    bool result = OHOS::MMI::PackageSequenceKey(json, sequenceKey);
+    EXPECT_FALSE(result);
+    cJSON_Delete(json);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_PackageSequenceKey_002
+ * @tc.desc: Tests get keyCode failed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_PackageSequenceKey_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char* jsonStr = "{\"otherKey\": \"value\"}";
+    cJSON *json = cJSON_Parse(jsonStr);
+    SequenceKey sequenceKey;
+    bool result = OHOS::MMI::PackageSequenceKey(json, sequenceKey);
+    EXPECT_FALSE(result);
+    cJSON_Delete(json);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_PackageSequenceKey_003
+ * @tc.desc: Tests get keyAction failed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_PackageSequenceKey_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char* jsonStr = "{\"keyCode\": 123}";
+    cJSON *jsonData = cJSON_Parse(jsonStr);
+    SequenceKey sequenceKey;
+    bool result = OHOS::MMI::PackageSequenceKey(jsonData, sequenceKey);
+    EXPECT_FALSE(result);
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetSequenceKeys_001
+ * @tc.desc: Tests when jsonData is not an object
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetSequenceKeys_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = nullptr;
+    Sequence sequence;
+    bool result = OHOS::MMI::GetSequenceKeys(jsonData, sequence);
+    EXPECT_FALSE(result);
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetSequenceKeys_002
+ * @tc.desc: Tests sequenceKeys number must be array
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetSequenceKeys_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = cJSON_CreateObject();
+    cJSON_AddItemToObject(jsonData, "sequenceKeys", cJSON_CreateString("invalid"));
+    Sequence sequence;
+    bool result = OHOS::MMI::GetSequenceKeys(jsonData, sequence);
+    EXPECT_FALSE(result);
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetSequenceKeys_003
+ * @tc.desc: Tests sequenceKeysSize number must less
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetSequenceKeys_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = cJSON_CreateObject();
+    cJSON* sequenceKeys = cJSON_CreateArray();
+    for (int32_t i = 0; i <= MAX_SEQUENCEKEYS_NUM; ++i) {
+        cJSON* sequenceKeyJson = cJSON_CreateObject();
+        cJSON_AddItemToObject(sequenceKeyJson, "key", cJSON_CreateString("key"));
+        cJSON_AddItemToArray(sequenceKeys, sequenceKeyJson);
+    }
+    cJSON_AddItemToObject(jsonData, "sequenceKeys", sequenceKeys);
+    Sequence sequence;
+    bool result = OHOS::MMI::GetSequenceKeys(jsonData, sequence);
+    EXPECT_FALSE(result);
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetSequenceKeys_004
+ * @tc.desc: Tests packege sequenceKey failed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetSequenceKeys_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = cJSON_CreateObject();
+    cJSON* sequenceKeys = cJSON_CreateArray();
+    for (int32_t i = 0; i < MAX_SEQUENCEKEYS_NUM; ++i) {
+        cJSON* sequenceKeyJson = cJSON_CreateObject();
+        cJSON_AddItemToObject(sequenceKeyJson, "key", cJSON_CreateString("key"));
+        cJSON_AddItemToArray(sequenceKeys, sequenceKeyJson);
+    }
+    cJSON_AddItemToObject(jsonData, "sequenceKeys", sequenceKeys);
+    Sequence sequence;
+    bool result = OHOS::MMI::GetSequenceKeys(jsonData, sequence);
+    EXPECT_FALSE(result);
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_IsSequenceKeysValid_001
+ * @tc.desc: Test case check when sequenceKeys is empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_IsSequenceKeysValid_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Sequence sequence;
+    sequence.sequenceKeys = {};
+    EXPECT_FALSE(OHOS::MMI::IsSequenceKeysValid(sequence));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_IsSequenceKeysValid_002
+ * @tc.desc: Test cases check when the size of sequenceKeys exceeds the maximum limit
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_IsSequenceKeysValid_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Sequence sequence;
+    sequence.sequenceKeys.resize(MAX_SEQUENCEKEYS_NUM + 1);
+    EXPECT_FALSE(OHOS::MMI::IsSequenceKeysValid(sequence));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_IsSequenceKeysValid_003
+ * @tc.desc: Test cases check when there are duplicate keys in sequenceKeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_IsSequenceKeysValid_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Sequence sequence;
+    SequenceKey key1;
+    key1.keyCode = 1;
+    key1.delay = 0;
+    sequence.sequenceKeys.push_back(key1);
+    SequenceKey key2;
+    key2.keyCode = 1;
+    key2.delay = 0;
+    sequence.sequenceKeys.push_back(key2);
+    EXPECT_FALSE(IsSequenceKeysValid(sequence));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_IsSequenceKeysValid_004
+ * @tc.desc: Test cases check when sequenceKeys are valid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_IsSequenceKeysValid_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Sequence sequence;
+    SequenceKey key1;
+    key1.keyCode = 1;
+    key1.delay = 0;
+    sequence.sequenceKeys.push_back(key1);
+    SequenceKey key2;
+    key2.keyCode = 2;
+    key2.delay = 0;
+    sequence.sequenceKeys.push_back(key2);
+    EXPECT_TRUE(OHOS::MMI::IsSequenceKeysValid(sequence));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_ConvertToKeySequence_001
+ * @tc.desc: Tests when jsonData is not an object
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_ConvertToKeySequence_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = nullptr;
+    Sequence sequence;
+    EXPECT_FALSE(OHOS::MMI::ConvertToKeySequence(jsonData, sequence));
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_ConvertToKeySequence_002
+ * @tc.desc: Tests Get sequenceKeys failed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_ConvertToKeySequence_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = cJSON_CreateObject();
+    Sequence sequence;
+    cJSON_AddItemToObject(jsonData, "sequenceKeys", cJSON_CreateString("invalid"));
+    EXPECT_FALSE(OHOS::MMI::ConvertToKeySequence(jsonData, sequence));
     cJSON_Delete(jsonData);
 }
 } // namespace MMI

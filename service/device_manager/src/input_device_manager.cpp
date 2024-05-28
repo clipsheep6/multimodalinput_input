@@ -67,8 +67,19 @@ constexpr size_t EXPECTED_N_SUBMATCHES{ 2 };
 constexpr size_t EXPECTED_SUBMATCH{ 1 };
 } // namespace
 
-InputDeviceManager::InputDeviceManager() {}
-InputDeviceManager::~InputDeviceManager() {}
+std::shared_ptr<InputDeviceManager> InputDeviceManager::instance_ = nullptr;
+std::mutex InputDeviceManager::mutex_;
+
+std::shared_ptr<InputDeviceManager> InputDeviceManager::GetInstance()
+{
+    if (instance_ == nullptr) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (instance_ == nullptr) {
+            instance_ = std::make_shared<InputDeviceManager>();
+        }
+    }
+    return instance_;
+}
 
 std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id, bool checked) const
 {
@@ -353,10 +364,7 @@ int32_t InputDeviceManager::ParseDeviceId(struct libinput_device *inputDevice)
     std::regex pattern("^event(\\d+)$");
     std::smatch mr;
     const char *sysName = libinput_device_get_sysname(inputDevice);
-    if (sysName == nullptr) {
-        MMI_HILOGE("The return value of the libinput_device_get_sysname is null");
-        return -1;
-    }
+    CHKPR(sysName, RET_ERR);
     std::string strName(sysName);
     if (std::regex_match(strName, mr, pattern)) {
         if (mr.ready() && mr.size() == EXPECTED_N_SUBMATCHES) {
@@ -364,7 +372,7 @@ int32_t InputDeviceManager::ParseDeviceId(struct libinput_device *inputDevice)
         }
     }
     MMI_HILOGE("Parsing strName failed: \'%{public}s\'", strName.c_str());
-    return -1;
+    return RET_ERR;
 }
 
 void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
@@ -411,8 +419,8 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     if (IsPointerDevice(inputDevice) && !HasPointerDevice() &&
         IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
 #ifdef OHOS_BUILD_ENABLE_POINTER
-        WinMgr->UpdatePointerChangeAreas();
-        WinMgr->DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
+        WIN_MGR->UpdatePointerChangeAreas();
+        WIN_MGR->DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
 #endif // OHOS_BUILD_ENABLE_POINTER
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -456,7 +464,7 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
     if (IsPointerDevice(inputDevice) && !HasPointerDevice() &&
         IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
 #ifdef OHOS_BUILD_ENABLE_POINTER
-        WinMgr->DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
+        WIN_MGR->DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
 #endif // OHOS_BUILD_ENABLE_POINTER
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING

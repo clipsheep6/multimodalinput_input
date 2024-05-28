@@ -16,6 +16,7 @@
 #include "input_manager_impl.h"
 
 #include <cinttypes>
+
 #include <unistd.h>
 
 #include "define_multimodal.h"
@@ -101,9 +102,8 @@ int32_t InputManagerImpl::GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t,
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetAllMmiSubscribedEvents(datas);
     if (ret != RET_OK) {
         MMI_HILOGE("GetDisplayBindInfo failed, ret:%{public}d", ret);
-        return RET_ERR;
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t InputManagerImpl::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
@@ -240,7 +240,7 @@ int32_t InputManagerImpl::AddInputEventFilter(std::shared_ptr<IInputEventFilter>
     }
     auto it = eventFilterServices_.emplace(filterId, std::make_tuple(service, priority, deviceTags));
     if (!it.second) {
-        MMI_HILOGW("Filter id duplicate");
+        MMI_HILOGW("filterId duplicate");
     }
     return filterId;
 }
@@ -417,7 +417,7 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
         eventHandler = eventHandler_;
         inputConsumer = consumer_;
     }
-    MMI_HILOG_DISPATCHI("InputTracking id:%{public}d Key Event", keyEvent->GetId());
+    MMI_HILOG_DISPATCHI("id:%{public}d recv", keyEvent->GetId());
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_DISPATCH_EVENT);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
@@ -473,8 +473,7 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
-        MMI_HILOG_DISPATCHI("InputTracking id:%{public}d Pointer Event",
-            pointerEvent->GetId());
+        MMI_HILOG_DISPATCHI("id:%{public}d recv", pointerEvent->GetId());
     }
     if (client->IsEventHandlerChanged()) {
         BytraceAdapter::StartConsumer(pointerEvent);
@@ -700,7 +699,7 @@ void InputManagerImpl::PrintEnhanceConfig()
 
 int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_MONITOR)
     CHKPR(monitor, INVALID_HANDLER_ID);
     auto consumer = std::make_shared<MonitorEventConsumer>(monitor);
@@ -713,7 +712,7 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent
 
 int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && defined(OHOS_BUILD_ENABLE_MONITOR)
     CHKPR(monitor, INVALID_HANDLER_ID);
     auto consumer = std::make_shared<MonitorEventConsumer>(monitor);
@@ -726,7 +725,7 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<PointerE
 
 int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consumer, HandleEventType eventType)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     CHKPR(consumer, INVALID_HANDLER_ID);
     std::lock_guard<std::mutex> guard(mtx_);
@@ -743,7 +742,7 @@ int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consum
 
 void InputManagerImpl::RemoveMonitor(int32_t monitorId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
@@ -787,7 +786,7 @@ void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
 int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor,
     int32_t priority, uint32_t deviceTags)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     CHKPR(interceptor, INVALID_HANDLER_ID);
     std::lock_guard<std::mutex> guard(mtx_);
@@ -805,7 +804,7 @@ int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> in
 int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor,
     int32_t priority, uint32_t deviceTags)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
     CHKPR(interceptor, INVALID_HANDLER_ID);
     std::lock_guard<std::mutex> guard(mtx_);
@@ -823,7 +822,7 @@ int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyE
 
 void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
@@ -841,7 +840,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent, bo
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPV(keyEvent);
-    MMI_HILOGI("KeyCode: %{public}d, action: %{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+    MMI_HILOGI("KeyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     if (MMIEventHdl.InjectEvent(keyEvent, isNativeInject) != RET_OK) {
         MMI_HILOGE("Failed to inject keyEvent");
     }
@@ -852,7 +851,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent, bo
 
 void InputManagerImpl::HandleSimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     int maxPointerId = SIMULATE_EVENT_START_ID;
     std::list<PointerEvent::PointerItem> pointerItems = pointerEvent->GetAllPointerItems();
     for (auto &pointerItem : pointerItems) {
@@ -866,8 +865,10 @@ void InputManagerImpl::HandleSimulateInputEvent(std::shared_ptr<PointerEvent> po
     }
     for (auto &pointerItem : pointerItems) {
         int32_t pointerId = pointerItem.GetPointerId();
-        pointerItem.SetOriginPointerId(pointerId);
-        pointerItem.SetPointerId(pointerId + SIMULATE_EVENT_START_ID);
+        if (pointerId < SIMULATE_EVENT_START_ID) {
+            pointerItem.SetOriginPointerId(pointerId);
+            pointerItem.SetPointerId(pointerId + SIMULATE_EVENT_START_ID);
+        }
     }
     pointerEvent->RemoveAllPointerItems();
     for (auto &pointerItem : pointerItems) {
@@ -877,7 +878,9 @@ void InputManagerImpl::HandleSimulateInputEvent(std::shared_ptr<PointerEvent> po
         pointerEvent->SetPointerId(pointerItems.front().GetPointerId());
         MMI_HILOGD("Simulate pointer event id:%{public}d", pointerEvent->GetPointerId());
     }
-    pointerEvent->SetPointerId(pointerEvent->GetPointerId() + SIMULATE_EVENT_START_ID);
+    if (pointerEvent->GetPointerId() < SIMULATE_EVENT_START_ID) {
+        pointerEvent->SetPointerId(pointerEvent->GetPointerId() + SIMULATE_EVENT_START_ID);
+    }
 }
 
 void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject)
@@ -885,7 +888,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
     CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     CHKPV(pointerEvent);
-    MMI_HILOGI("Action: %{public}d", pointerEvent->GetPointerAction());
+    MMI_HILOGI("Action:%{public}d", pointerEvent->GetPointerAction());
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE ||
         pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
 #ifndef OHOS_BUILD_ENABLE_POINTER
@@ -1360,6 +1363,7 @@ void InputManagerImpl::SendEnhanceConfig()
 void InputManagerImpl::ReAddInputEventFilter()
 {
     CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(mtx_);
     if (eventFilterServices_.size() > MAX_FILTER_NUM) {
         MMI_HILOGE("Too many filters, size:%{public}zu", eventFilterServices_.size());
         return;
