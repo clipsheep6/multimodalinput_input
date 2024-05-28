@@ -637,6 +637,7 @@ void MultiFingersTapHandler::SetMULTI_FINGERTAP_HDRDefault(bool isAlldefault)
 
 bool MultiFingersTapHandler::ClearPointerItems(std::shared_ptr<PointerEvent> pointer)
 {
+    CHKPB(pointer);
     auto ids_ = pointer->GetPointerIds();
     for (const auto &id : ids_) {
         pointer->RemovePointerItem(id);
