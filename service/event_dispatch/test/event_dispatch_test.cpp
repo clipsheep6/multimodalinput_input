@@ -117,6 +117,11 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandlePointerEventInner_001, TestS
 {
     EventDispatchHandler eventdispatchhandler;
     auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem itemFirst;
+    itemFirst.SetPointerId(0);
+    itemFirst.SetPressed(true);
+    pointerEvent->UpdatePointerItem(0, itemFirst);
     ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.HandlePointerEventInner(pointerEvent));
 }
 
