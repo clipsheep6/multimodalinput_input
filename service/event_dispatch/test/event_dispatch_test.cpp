@@ -17,6 +17,7 @@
 
 #include "define_multimodal.h"
 #include "event_dispatch_handler.h"
+#include "input_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
@@ -54,9 +55,40 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_FilterInvalidPointerItem_001, Test
 {
     EventDispatchHandler eventdispatchhandler;
     int32_t fd = 1;
-    int32_t eventType = 3;
-    std::shared_ptr<PointerEvent> sharedPointerEvent = std::make_shared<PointerEvent>(eventType);
-    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.FilterInvalidPointerItem(sharedPointerEvent, fd));
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem itemFirst;
+    itemFirst.SetPointerId(0);
+    itemFirst.SetPressed(true);
+    pointerEvent->UpdatePointerItem(0, itemFirst);
+    UDSServer udsServer;
+    InputHandler->udsServer_ = &udsServer;
+    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.FilterInvalidPointerItem(pointerEvent, fd));
+}
+
+/**
+ * @tc.name: EventDispatchTest_FilterInvalidPointerItem_002
+ * @tc.desc: Test the function FilterInvalidPointerItem
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_FilterInvalidPointerItem_002, TestSize.Level1)
+{
+    EventDispatchHandler eventdispatchhandler;
+    int32_t fd = 1;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem itemFirst;
+    itemFirst.SetPointerId(0);
+    itemFirst.SetPressed(true);
+    pointerEvent->UpdatePointerItem(0, itemFirst);
+    PointerEvent::PointerItem itemSecond;
+    itemSecond.SetPointerId(1);
+    itemSecond.SetPressed(true);
+    pointerEvent->UpdatePointerItem(1, itemSecond);
+    UDSServer udsServer;
+    InputHandler->udsServer_ = &udsServer;
+    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.FilterInvalidPointerItem(pointerEvent, fd));
 }
 
 /**
@@ -84,10 +116,8 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_NotifyPointerEventToRS_001, TestSi
 HWTEST_F(EventDispatchTest, EventDispatchTest_HandlePointerEventInner_001, TestSize.Level1)
 {
     EventDispatchHandler eventdispatchhandler;
-    int32_t eventType = 3;
-    PointerEvent* pointerEvent = new PointerEvent(eventType);
-    std::shared_ptr<PointerEvent> sharedPointerEvent(pointerEvent);
-    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.HandlePointerEventInner(sharedPointerEvent));
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.HandlePointerEventInner(pointerEvent));
 }
 
 /**
@@ -100,10 +130,11 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchKeyEventPid_001, TestSize.
 {
     EventDispatchHandler eventdispatchhandler;
     UDSServer udsServer;
-    int32_t keyevent = 3;
-    KeyEvent* keyEvent = new KeyEvent(keyevent);
-    std::shared_ptr<KeyEvent> sharedKeyEvent(keyEvent);
-    int32_t ret = eventdispatchhandler.DispatchKeyEventPid(udsServer, sharedKeyEvent);
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetId(0);
+    keyEvent->SetKeyCode(0);
+    int32_t ret = eventdispatchhandler.DispatchKeyEventPid(udsServer, keyEvent);
     EXPECT_EQ(ret, -1);
 }
 
@@ -136,8 +167,8 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandlePointerEventInner, TestSize.
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     PointerEvent::PointerItem pointerItem;
-    pointerEvent->SetPointerId(5);
-    pointerItem.SetPointerId(5);
+    pointerItem.SetPointerId(0);
+    pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(pointerItem);
     ASSERT_NO_FATAL_FAILURE(dispatch.HandlePointerEventInner(pointerEvent));
 }
@@ -154,6 +185,12 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchPointerEventInner, TestSiz
     int32_t fd = -1;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem itemFirst;
+    itemFirst.SetPointerId(0);
+    itemFirst.SetPressed(true);
+    itemFirst.SetDownTime(5000);
+    pointerEvent->UpdatePointerItem(0, itemFirst);
+    pointerEvent->SetPointerId(0);
     dispatch.eventTime_ = 1000;
     pointerEvent->SetActionTime(5000);
     ASSERT_NO_FATAL_FAILURE(dispatch.DispatchPointerEventInner(pointerEvent, fd));
@@ -174,6 +211,25 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchKeyEventPid, TestSize.Leve
     dispatch.eventTime_ = 1000;
     KeyEvent->SetActionTime(5000);
     ASSERT_EQ(dispatch.DispatchKeyEventPid(udsServer, KeyEvent), RET_ERR);
+}
+
+/**
+ * @tc.name: EventDispatchTest_HandleMultiWindowPointerEvent_001
+ * @tc.desc: Test HandleMultiWindowPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_HandleMultiWindowPointerEvent_001, TestSize.Level1)
+{
+    EventDispatchHandler dispatch;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem itemFirst;
+    itemFirst.SetPointerId(0);
+    itemFirst.SetPressed(true);
+    pointerEvent->UpdatePointerItem(0, itemFirst);
+    pointerEvent->SetPointerId(0);
+    ASSERT_NO_FATAL_FAILURE(dispatch.HandleMultiWindowPointerEvent(pointerEvent, itemFirst));
 }
 } // namespace MMI
 } // namespace OHOS
