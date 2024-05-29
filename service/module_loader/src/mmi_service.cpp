@@ -2130,10 +2130,9 @@ int32_t MMIService::TransmitInfrared(int64_t number, std::vector<int64_t>& patte
     return RET_OK;
 }
 
-int32_t MMIService::OnHasIrEmitter(bool &hasIrEmitter)
+void MMIService::OnHasIrEmitter(bool &hasIrEmitter)
 {
     hasIrEmitter = false;
-    return RET_OK;
 }
 
 int32_t MMIService::OnGetInfraredFrequencies(std::vector<InfraredFrequency> &requencys)
