@@ -22,6 +22,7 @@
 #include "table_dump.h"
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 #include "magic_pointer_drawing_manager.h"
+#include "magic_pointer_velocity_tracker.h"
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 #include "define_multimodal.h"
@@ -83,6 +84,8 @@ constexpr int32_t MAX_POINTER_COLOR = 0xffffff;
 constexpr int32_t MIN_CURSOR_SIZE = 64;
 constexpr uint32_t RGB_CHANNEL_BITS_LENGTH = 24;
 constexpr float MAX_ALPHA_VALUE = 255.f;
+constexpr int32_t MOUSE_STYLE_OPT = 0;
+constexpr int32_t MAGIC_STYLE_OPT = 1;
 const std::string MOUSE_FILE_NAME = "mouse_settings.xml";
 bool isRsRemoteDied = false;
 constexpr uint64_t FOLD_SCREEN_ID {5};
@@ -120,8 +123,8 @@ PointerStyle PointerDrawingManager::GetLastMouseStyle()
     return lastMouseStyle_;
 }
 
-void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
-    const PointerStyle pointerStyle, Direction direction)
+int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
+    PointerStyle pointerStyle, Direction direction)
 {
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     hardwareCursorPointerManager_->SetTargetDevice(displayId);
@@ -132,6 +135,19 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
         }
     }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    if (surfaceNode_ == nullptr) {
+        return RET_ERR;
+    }
+    MMI_HILOGD("Pointer window move success");
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    bool cursorEnlarged = MAGIC_POINTER_VELOCITY_TRACKER->GetCursorEnlargedStatus();
+    if (cursorEnlarged && pointerStyle.id != MOUSE_ICON::DEFAULT) {
+        // 触发光标找回效果时恢复为默认光标
+        MMI_HILOGI("Restores to the default cursor when the cursor retrieval effect is triggered.");
+        pointerStyle.id = 0;
+    }
+    surfaceNode_->SetScale(scale_);
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     if (lastMouseStyle_ == pointerStyle && !mouseIconUpdate_ && lastDirection_ == direction) {
         surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
             surfaceNode_->GetStagingProperties().GetBounds().z_,
@@ -139,7 +155,7 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("The lastpointerStyle is equal with pointerStyle,id %{public}d size:%{public}d",
             pointerStyle.id, pointerStyle.size);
-        return;
+        return RET_OK;
     }
     if (lastDirection_ != direction) {
         RotateDegree(direction);
@@ -151,7 +167,7 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
     if (ret != RET_OK) {
         mouseIconUpdate_ = false;
         MMI_HILOGE("Init layer failed");
-        return;
+        return RET_ERR;
     }
     surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
         surfaceNode_->GetStagingProperties().GetBounds().z_,
@@ -162,19 +178,27 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
     mouseIconUpdate_ = false;
     MMI_HILOGD("Leave, display:%{public}d, physicalX:%{public}d, physicalY:%{public}d",
         displayId, physicalX, physicalY);
-    return;
+    return RET_OK;
 }
 
 void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY)
 {
     CALL_DEBUG_ENTER;
     if (surfaceNode_ != nullptr) {
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+        surfaceNode_->SetScale(scale_);
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
         surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
             surfaceNode_->GetStagingProperties().GetBounds().z_,
             surfaceNode_->GetStagingProperties().GetBounds().w_);
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("Move pointer, physicalX:%{public}d physicalY:%{public}d", physicalX, physicalY);
     }
+}
+
+void PointerDrawingManager::SetPointerScale(float scale)
+{
+    scale_ = scale;
 }
 
 void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
@@ -195,8 +219,7 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
         MMI_HILOGI("MagicCursor AdjustMouseFocus:%{public}d",
             ICON_TYPE(GetMouseIconPath()[MOUSE_ICON(pointerStyle.id)].alignmentWay));
     }
-    if (surfaceNode_ != nullptr) {
-        DrawMovePointer(displayId, physicalX, physicalY, pointerStyle, direction);
+    if (DrawMovePointer(displayId, physicalX, physicalY, pointerStyle, direction) == RET_OK) {
         return;
     }
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -302,6 +325,22 @@ void PointerDrawingManager::CreateMagicCursorChangeObserver()
     }
 }
 
+void PointerDrawingManager::UpdateStyleOptions()
+{
+    CALL_DEBUG_ENTER;
+    PointerStyle curPointerStyle;
+    int result = WIN_MGR->GetPointerStyle(pid_, GLOBAL_WINDOW_ID, curPointerStyle);
+    if (result != RET_OK) {
+        MMI_HILOGE("Get current pointer style failed");
+        return;
+    }
+    curPointerStyle.options = HasMagicCursor() ? MAGIC_STYLE_OPT : MOUSE_STYLE_OPT;
+    int ret = WIN_MGR->SetPointerStyle(pid_, GLOBAL_WINDOW_ID, curPointerStyle);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set pointer style failed");
+    }
+}
+
 void PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
 {
     CALL_DEBUG_ENTER;
@@ -317,6 +356,7 @@ void PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
         }
         bool tmp = item.isShow;
         item.isShow = statusValue;
+        this->UpdateStyleOptions();
         if (item.isShow != tmp) {
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
             MAGIC_CURSOR->InitRenderThread([]() { IPointerDrawingManager::GetInstance()->SwitchPointerStyle(); });
