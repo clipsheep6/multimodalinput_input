@@ -248,7 +248,7 @@ std::shared_ptr<PointerEvent> TouchPadTransformProcessor::OnEvent(struct libinpu
     MMI_HILOGD("Pointer event dispatcher of server:");
     EventLogHelper::PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(),
         pointerEvent_->GetPointerIds().size(), MMI_LOG_HEADER);
-    auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
+    auto device = INPUT_DEV_MGR->GetInputDevice(pointerEvent_->GetDeviceId());
     CHKPP(device);
     aggregator_.Record(MMI_LOG_HEADER, "Pointer event created by: " + device->GetName() + ", target window: " +
         std::to_string(pointerEvent_->GetTargetWindowId()) + ", action: " + pointerEvent_->DumpPointerAction(),
@@ -421,7 +421,7 @@ void TouchPadTransformProcessor::SetPinchPointerItem(int64_t time)
     pointerItem.SetPointerId(DEFAULT_POINTER_ID);
     pointerItem.SetWindowX(0);
     pointerItem.SetWindowY(0);
-    auto mouseInfo = WinMgr->GetMouseInfo();
+    auto mouseInfo = WIN_MGR->GetMouseInfo();
     pointerItem.SetDisplayX(mouseInfo.physicalX);
     pointerItem.SetDisplayY(mouseInfo.physicalY);
     pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, pointerItem);
@@ -438,7 +438,7 @@ void TouchPadTransformProcessor::ProcessTouchPadPinchDataEvent(int32_t fingerCou
 
     pointerEvent_->SetFingerCount(fingerCount);
     pointerEvent_->SetDeviceId(deviceId_);
-    auto mouseInfo = WinMgr->GetMouseInfo();
+    auto mouseInfo = WIN_MGR->GetMouseInfo();
     pointerEvent_->SetTargetDisplayId(mouseInfo.displayId);
     pointerEvent_->SetTargetWindowId(-1);
     pointerEvent_->SetPointerId(DEFAULT_POINTER_ID);
@@ -454,7 +454,7 @@ void TouchPadTransformProcessor::ProcessTouchPadPinchDataEvent(int32_t fingerCou
     }
 
     if (pointerEvent_->GetFingerCount() == TP_SYSTEM_PINCH_FINGER_CNT) {
-        WinMgr->UpdateTargetPointer(pointerEvent_);
+        WIN_MGR->UpdateTargetPointer(pointerEvent_);
     }
 
     // only three or four finger pinch need to statistic
@@ -608,15 +608,14 @@ int32_t MultiFingersTapHandler::HandleMulFingersTap(struct libinput_event_touch 
     } else if (type == LIBINPUT_EVENT_TOUCHPAD_MOTION) {
         motionCnt++;
         if ((motionCnt >= FINGER_MOTION_MAX) || IsInvalidMulTapGesture(event)) {
-            MMI_HILOGD("the motion is too much");
+            MMI_HILOGD("The motion is too much");
             SetMULTI_FINGERTAP_HDRDefault();
             return RET_OK;
         }
     }
     if ((upCnt == downCnt) && (upCnt >= FINGER_TAP_MIN) && (upCnt <= FINGER_COUNT_MAX)) {
-        multiFingersState = static_cast<MulFingersTap>(upCnt);
+        multiFingersState_ = static_cast<MulFingersTap>(upCnt);
         MMI_HILOGD("This is multifinger tap event, finger count:%{public}d", upCnt);
-        return RET_OK;
     }
     return RET_OK;
 }
@@ -630,7 +629,7 @@ void MultiFingersTapHandler::SetMULTI_FINGERTAP_HDRDefault(bool isAlldefault)
     beginTime = 0;
     lastTime = 0;
     if (isAlldefault) {
-        multiFingersState = MulFingersTap::NOTAP;
+        multiFingersState_ = MulFingersTap::NOTAP;
     }
     pointerMaps.clear();
 }
@@ -644,9 +643,9 @@ bool MultiFingersTapHandler::ClearPointerItems(std::shared_ptr<PointerEvent> poi
     return true;
 }
 
-MulFingersTap MultiFingersTapHandler::GetMultiFingersState()
+MulFingersTap MultiFingersTapHandler::GetMultiFingersState() const
 {
-    return multiFingersState;
+    return multiFingersState_;
 }
 
 bool MultiFingersTapHandler::CanAddToPointerMaps(struct libinput_event_touch *event)
@@ -685,7 +684,7 @@ bool MultiFingersTapHandler::CanUnsetPointerItem(struct libinput_event_touch *ev
     if (pointerMaps.find(seatSlot) != pointerMaps.end()) {
         return false;
     } else {
-        pointerMaps[seatSlot] = {-1.0, -1.0};
+        pointerMaps[seatSlot] = {-1.0F, -1.0F};
         return true;
     }
 }

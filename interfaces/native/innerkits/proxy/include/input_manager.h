@@ -847,6 +847,8 @@ public:
 
     int32_t SetCurrentUser(int32_t userId);
 
+    int32_t GetWinSyncBatchSize(int32_t maxAreasCount, int32_t displayCount);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);
